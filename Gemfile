@@ -15,6 +15,7 @@ gem 'sqlite3'
 
 # javascript & stylesheet
 gem 'coffee-rails', '~> 4.2'
+gem 'haml-rails', '~> 1.0'
 gem 'jbuilder', '~> 2.5'
 gem 'sass-rails', '~> 5.0'
 
