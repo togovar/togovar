@@ -22,6 +22,7 @@ gem 'sass-rails', '~> 5.0'
 
 # utility
 gem 'action_args', '~> 2.2'
+gem 'settingslogic', '~> 2.0'
 
 # optimisation
 gem 'turbolinks', '~> 5'
