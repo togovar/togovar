@@ -1,0 +1,26 @@
+defaults: &defaults
+  gene:
+    nanostanza:
+      -
+        uri: http://togostanza.org/stanza/gene_length_nano
+        span: 1
+      -
+        uri: http://togostanza.org/stanza/protein_ec_number_nano
+        span: 1
+
+    togostanza:
+      -
+        uri: http://togostanza.org/stanza/protein_names
+        name: Protein names
+      -
+        uri: http://togostanza.org/stanza/gene_attributes
+        name: Gene attributes
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults
