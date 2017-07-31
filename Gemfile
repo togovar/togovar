@@ -17,6 +17,7 @@ gem 'sqlite3'
 gem 'coffee-rails', '~> 4.2'
 gem 'haml-rails', '~> 1.0'
 gem 'jbuilder', '~> 2.5'
+gem 'jquery-rails', '~> 4.3'
 gem 'sass-rails', '~> 5.0'
 
 # optimisation
