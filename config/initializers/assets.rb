@@ -12,3 +12,18 @@ Rails.application.config.assets.paths << Rails.root.join('node_modules')
 # application.js, application.css, and all non-JS/CSS in the app/assets
 # folder are already added.
 # Rails.application.config.assets.precompile += %w( admin.js admin.css )
+Rails.application.config.assets.precompile << proc do |path|
+  if path =~ /\.(css|js)\z/
+    full_path = Rails.application.assets.resolve(path)
+    app_assets_path = Rails.root.join('app', 'assets').to_path
+    if full_path =~ /^#{app_assets_path}/
+      Rails.logger.debug "  Included asset: #{full_path}"
+      true
+    else
+      Rails.logger.debug "  Excluded asset: #{full_path}"
+      false
+    end
+  else
+    false
+  end
+end
