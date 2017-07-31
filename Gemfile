@@ -20,6 +20,9 @@ gem 'jbuilder', '~> 2.5'
 gem 'jquery-rails', '~> 4.3'
 gem 'sass-rails', '~> 5.0'
 
+# utility
+gem 'action_args', '~> 2.2'
+
 # optimisation
 gem 'turbolinks', '~> 5'
 gem 'uglifier', '>= 1.3.0'
