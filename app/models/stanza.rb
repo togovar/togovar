@@ -16,10 +16,12 @@ class Stanza < Settingslogic # :nodoc:
 
   private
 
-  def make_tag(tag_name, options = {})
-    param = options.map do |k, v|
-      %(#{k}="#{v.to_s.gsub('"'.freeze, '&quot;'.freeze)}")
-    end.join(' ')
+  def make_tag(tag_name, parameters = {})
+    param = if parameters
+              parameters.slice(*params.map(&:intern)).map do |k, v|
+                %(#{k}="#{v.to_s.gsub('"'.freeze, '&quot;'.freeze)}")
+              end.join(' ')
+            end
     "<#{tag_name}#{" #{param}" if param.present?} />".html_safe
   end
 end
