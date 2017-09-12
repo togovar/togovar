@@ -33,6 +33,55 @@ defaults: &defaults
         name: clinvar_variant_alleles
         label: Variant Alleles
 
+  exac:
+    nanostanza: []
+
+    togostanza:
+      -
+        name: exac_variant_information
+        label: Variant Information
+        params:
+          -
+            exac_id
+      -
+        name: exac_variant_annotations
+        label: Variant Annotation
+        params:
+          -
+            exac_id
+      -
+        name: exac_variant_population_frequencies
+        label: Population Frequencies
+        params:
+          -
+            exac_id
+      -
+        name: exac_variant_quality_histogram
+        label: Quality Histogram
+        params:
+          -
+            exac_id
+      -
+        name: exac_gene_comparison_between_population
+        label: Gene Comparison
+        params:
+          -
+            gene_id
+          -
+            population1
+          -
+            threshold1
+          -
+            population2
+          -
+            threshold2
+      -
+        name: exac_gene_variant_list
+        label: Variant List
+        params:
+          -
+            gene_id
+
 development:
   <<: *defaults
 
