@@ -1,4 +1,7 @@
 defaults: &defaults
+  server:
+    url: http://dev.togogenome.org/stanza
+
   gene:
     nanostanza:
       -
@@ -15,6 +18,20 @@ defaults: &defaults
       -
         uri: http://togostanza.org/stanza/gene_attributes
         name: Gene attributes
+
+  clin_var:
+    nanostanza: []
+
+    togostanza:
+      -
+        name: clinvar_variant_information
+        label: Variant Information
+      -
+        name: clinvar_variant_interpretation
+        label: Variant Interpretation
+      -
+        name: clinvar_variant_alleles
+        label: Variant Alleles
 
 development:
   <<: *defaults
