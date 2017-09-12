@@ -26,12 +26,21 @@ defaults: &defaults
       -
         name: clinvar_variant_information
         label: Variant Information
+        params:
+          -
+            clinvar_id
       -
         name: clinvar_variant_interpretation
         label: Variant Interpretation
+        params:
+          -
+            clinvar_id
       -
         name: clinvar_variant_alleles
         label: Variant Alleles
+        params:
+          -
+            clinvar_id
 
   exac:
     nanostanza: []
