@@ -18,11 +18,11 @@
   #header.tg-report-header
     %p.tg-report-type ClinVar report
     %h1
-      %span#tg-title-id #{@clin_var_id}
+      %span#tg-title-id #{@clinvar_id}
       %span#tg-title-label
 
   - Stanza.clin_var.togostanza.each do |stanza|
     %section{id: stanza.name}
       .page-header
         %h2= stanza.label
-      = stanza.tag(clinvar_id: 202166)
+      = stanza.tag({ clinvar_id: @clinvar_id })
