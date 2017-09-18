@@ -1,0 +1,33 @@
+/* Sticky footer styles
+-------------------------------------------------- */
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 110px;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 110px;
+  line-height: 20px;
+  /* Vertically center the text there */
+  background-color: #f5f5f5;
+}
+
+body > main {
+  padding: 15px 15px 0;
+}
+
+footer > .container {
+  padding-top: 15px;
+  padding-right: 15px;
+  padding-left: 15px;
+}

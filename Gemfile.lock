@@ -40,11 +40,17 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     arel (8.0.0)
+    autoprefixer-rails (7.1.4)
+      execjs
     better_errors (2.2.0)
       coderay (>= 1.0.0)
       erubis (>= 2.6.6)
       rack (>= 0.9.0)
     bindex (0.5.0)
+    bootstrap (4.0.0.beta)
+      autoprefixer-rails (>= 6.0.3)
+      popper_js (~> 1.11.1)
+      sass (>= 3.4.19)
     builder (3.2.3)
     byebug (9.0.6)
     coderay (1.1.1)
@@ -102,6 +108,7 @@ GEM
     nio4r (2.1.0)
     nokogiri (1.8.0)
       mini_portile2 (~> 2.2.0)
+    popper_js (1.11.1)
     puma (3.9.1)
     rack (2.0.3)
     rack-test (0.6.3)
@@ -188,6 +195,7 @@ PLATFORMS
 DEPENDENCIES
   action_args (~> 2.2)
   better_errors (~> 2.2)
+  bootstrap (~> 4.0.0.beta)
   byebug
   coffee-rails (~> 4.2)
   haml-rails (~> 1.0)
