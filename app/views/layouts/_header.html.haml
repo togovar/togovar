@@ -1,0 +1,14 @@
+%nav.navbar.navbar-toggleable-md.navbar-inverse.fixed-top.bg-inverse
+  %button.navbar-toggler.navbar-toggler-right{"aria-controls" => "navbarCollapse", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-target" => "#navbarCollapse", "data-toggle" => "collapse", :type => "button"}
+    %span.navbar-toggler-icon
+  %a.navbar-brand{:href => "#"} TogoVar
+  #navbarCollapse.collapse.navbar-collapse
+    %ul.navbar-nav.mr-auto
+      %li.nav-item.active
+        %a.nav-link{:href => "#"}
+          Search
+          %span.sr-only (current)
+      %li.nav-item
+        %a.nav-link{:href => "#"} Link
+      %li.nav-item
+        %a.nav-link.disabled{:href => "#"} Disabled

@@ -1,0 +1,36 @@
+= content_for :header do
+  = stylesheet_link_tag 'bootstrap-combobox', media: :all
+  = javascript_include_tag 'bootstrap-combobox'
+
+%section
+  .row
+    .col-lg-8
+      .input-group
+        .input-group-btn
+          %select.form-control
+            %option{ value: 'gene' } Gene
+            %option{ value: 'dis' } Disease
+            %option{ value: 'var' } Variation
+        %input.form-control{ placeholder: 'Search for...', type: 'text' }/
+        %span.input-group-btn
+          %button.btn.btn-primary{ type: 'button' } Search
+          %button.btn.btn-secondary{ type: 'button' } Clear
+%section
+  .row
+    .col-lg-8
+      .input-group
+        .input-group-btn
+          %select.form-control
+            %option{ value: 'grch38' } GRCh38
+            %option{ value: 'grch37' } GRCh38
+            %option{ value: 'jrgv2' } JRGv2
+        %input.form-control{ placeholder: 'Search for...', type: 'text' }/
+        %span.input-group-btn
+          %button.btn.btn-primary{ type: 'button' } Search
+          %button.btn.btn-secondary{ type: 'button' } Clear
+
+= content_for :javascript do
+  :javascript
+    $(document).ready(function(){
+      $('.combobox').combobox();
+    });

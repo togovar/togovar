@@ -2,9 +2,18 @@
 %html
   %head
     %title TogoVar
+    %meta{ charset: 'utf-8' }
     = csrf_meta_tags
-    = stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload'
-    = javascript_include_tag 'application', 'data-turbolinks-track': 'reload'
+    = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload'
+    = javascript_include_tag 'application',               'data-turbolinks-track': 'reload'
     = yield :header
   %body
-    = yield
+    = render partial: 'layouts/header'
+
+    %main.container
+      = yield
+
+    %footer.footer
+      = render partial: 'layouts/footer'
+
+    = yield :javascript
