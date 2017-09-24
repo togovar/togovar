@@ -1,0 +1,22 @@
+defaults: &defaults
+  ontology:
+    exac:    'http://togogenome.org/variation/exac'
+    clinvar: 'http://togogenome.org/variation/clinvar'
+    medgen:  'http://togogenome.org/variation/medgen'
+    so:      'http://togogenome.org/variation/so'
+  prefix:
+    dc:   'http://purl.org/dc/terms/'
+    cv:   'http://purl.jp/bio/10/clinvar/'
+    cvid: 'http://identifiers.org/clinvar/'
+
+development:
+  <<: *defaults
+  url:
+
+test:
+  <<: *defaults
+  url:
+
+production:
+  <<: *defaults
+  url:
