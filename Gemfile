@@ -26,6 +26,7 @@ gem 'action_args', '~> 2.2'
 gem 'settingslogic', '~> 2.0'
 
 # optimisation
+gem 'redis-rails', '~> 5.0'
 gem 'turbolinks', '~> 5'
 gem 'uglifier', '>= 1.3.0'
 
