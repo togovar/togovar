@@ -36,6 +36,7 @@ group :development, :test do
 end
 
 group :development do
+  gem 'awesome_print'
   gem 'better_errors', '~> 2.2'
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'spring'

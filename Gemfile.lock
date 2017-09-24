@@ -44,6 +44,7 @@ GEM
     arel (8.0.0)
     autoprefixer-rails (7.1.4)
       execjs
+    awesome_print (1.8.0)
     bcp47 (0.3.3)
       i18n
     better_errors (2.2.0)
@@ -337,6 +338,7 @@ PLATFORMS
 
 DEPENDENCIES
   action_args (~> 2.2)
+  awesome_print
   better_errors (~> 2.2)
   bootstrap (~> 4.0.0.beta)
   byebug
