@@ -16,6 +16,21 @@ class Disease
   end
 
   class << self
+    # class method to execute autocomplete search
+    def auto_complete(term)
+      return nil if term.blank?
+
+      query = {
+        suggest: {
+          text:       'cancer',
+          completion: {
+            field: 'suggest'
+          }
+        }
+      }
+      __elasticsearch__.client.suggest(index: 'disease', body: query)['suggest'].first['options']
+    end
+
     def list(offset: 0, limit: 1_000)
       sparql = <<-EOS.strip_heredoc
         DEFINE sql:select-option "order"
