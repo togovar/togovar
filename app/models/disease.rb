@@ -1,5 +1,19 @@
 class Disease
   include Queryable
+  include Elasticsearch::Model
+  include Elasticsearch::Model::Callbacks
+
+  # define elasticsearch index and type for model
+  index_name 'disease'
+  document_type 'term'
+
+  # custom elasticsearch mapping per autocompletion
+  mapping do
+    indexes :name, type: 'string'
+    indexes :suggest, type:  'completion',
+            analyzer:        'simple',
+            search_analyzer: 'simple'
+  end
 
   class << self
     def list(offset: 0, limit: 1_000)
@@ -21,6 +35,45 @@ class Disease
       EOS
 
       query(sparql)
+    end
+
+    def update_index!
+      if __elasticsearch__.client.indices.exists? index: index_name
+        __elasticsearch__.client.indices.delete index: index_name
+      end
+
+      body = {
+        mappings: {
+          mapping.to_hash.first[0] => mapping.to_hash.first[1]
+        }
+      }
+      __elasticsearch__.client.indices.create(index: index_name, body: body)
+
+      limit = 1_000
+      page  = 0
+
+      c = 0
+      loop do
+        result = list(offset: limit * page, limit: limit)
+        break if result.empty?
+
+        result.each do |r|
+          next unless (name = r[:phenotype])
+
+          data = {
+            name:    name,
+            cvid:    r[:cvid].split('/').last,
+            suggest: {
+              input: name.split(/\W+/)
+            },
+            output:  name
+          }
+          __elasticsearch__.client.index(index: index_name, type: document_type, body: data)
+        end
+
+        Rails.logger.info("index: #{c += result.count}")
+        page += 1
+      end
     end
   end
 end
