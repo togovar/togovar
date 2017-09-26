@@ -1,4 +1,5 @@
 require 'linkeddata'
+require 'benchmark'
 
 module Queryable
   extend ActiveSupport::Concern
@@ -9,39 +10,58 @@ module Queryable
   ACCEPTABLE_KEYS = %i[method protocol headers read_timeout].freeze
 
   module ClassMethods
-    def query(sparql, options = {})
+    # @param [String] sparql query
+    # @param [Hash] options :endpoint, :method, :protocol, :headers, :read_timeout
+    # @see SPARQL::Client
+    def query(sparql, **options)
       digest = Digest::MD5.hexdigest(sparql)
 
-      start = Time.now
-      arr = ["started query for #{Endpoint.url} at #{Time.now}",
+      ep = options.delete(:endpoint) || Endpoint.url
+
+      arr = ["started query for #{ep} at #{Time.now}",
              "  Cache: #{Rails.cache.exist?(digest)}",
              "  Query: #{sparql.gsub(/^\s+/, '').tr("\n", ' ')}"]
 
-      options = DEFAULT_OPTIONS.merge(options.slice(*ACCEPTABLE_KEYS))
-
       json = []
-      begin
-        json = Rails.cache.fetch(digest, expires_in: 1.month) do
-          client = SPARQL::Client.new(Endpoint.url, options)
-          result = client.query(sparql, content_type: SPARQL::Client::RESULT_JSON)
-          JSON.parse(result.to_json)
+      time = Benchmark.realtime do
+        begin
+          json = Rails.cache.fetch(digest, expires_in: 1.month) do
+            options = DEFAULT_OPTIONS.merge(options.slice(*ACCEPTABLE_KEYS))
+            client  = SPARQL::Client.new(ep, options)
+            result  = client.query(sparql, content_type: SPARQL::Client::RESULT_JSON)
+            JSON.parse(result.to_json)
+          end
+        rescue StandardError => se
+          arr << "  Error: #{se.message}"
+          arr << se.backtrace.join("\n")
         end
-      rescue StandardError => se
-        arr << format('  Elapse: %.3f [s]', (Time.now - start))
-        arr << "  Error: #{se.message}\n"
-        Rails.logger.error(arr.join("\n"))
       end
 
-      arr << format("  Elapse: %.3f [s]\n", (Time.now - start))
-      Rails.logger.info(arr.join("\n"))
+      arr << format("  Elapse: %.3f [s]\n", time)
 
-      return [] unless (r = json['results']) && (b = r['bindings']) && !b.empty?
+      log(*arr)
 
-      json['results']['bindings'].map do |bind|
-        json['head']['vars'].each_with_object({}) do |key, hash|
+      format_result(json)
+    end
+
+    private
+
+    def log(*args)
+      severity = args.any? { |x| x.strip =~ /^Error:/ } ? :error : :info
+      Rails.logger.send(severity, args.join("\n"))
+    end
+
+    def format_result(result)
+      return result unless result.is_a?(Array)
+
+      return [] unless (r = result['results']) && (bindings = r['bindings']) && !bindings.empty?
+
+      bindings.map do |bind|
+        result['head']['vars'].each_with_object({}) do |key, hash|
           hash[key.to_sym] = bind[key]['value'] if bind.key?(key)
         end
       end
     end
+
   end
 end
