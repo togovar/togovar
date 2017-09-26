@@ -19,7 +19,7 @@ module Queryable
       ep = options.delete(:endpoint) || Endpoint.url
 
       arr = ["started query for #{ep} at #{Time.now}",
-             "  Cache: #{Rails.cache.exist?(digest)}",
+             "  Cache: #{Rails.cache.exist?(digest) && digest}",
              "  Query: #{sparql.gsub(/^\s+/, '').tr("\n", ' ')}"]
 
       json = []
