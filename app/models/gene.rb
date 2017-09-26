@@ -78,7 +78,6 @@ class Gene
         break if result.empty?
 
         result.each do |r|
-          puts r
           next unless (name = r[:gene_name])
 
           data = {

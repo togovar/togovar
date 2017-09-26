@@ -52,7 +52,7 @@ module Queryable
     end
 
     def format_result(result)
-      return result unless result.is_a?(Array)
+      return result unless result.is_a?(Hash)
 
       return [] unless (r = result['results']) && (bindings = r['bindings']) && !bindings.empty?
 
