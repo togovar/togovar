@@ -52,7 +52,7 @@ class Disease
       query(sparql)
     end
 
-    def update_index!
+    def create_index!
       if __elasticsearch__.client.indices.exists? index: index_name
         __elasticsearch__.client.indices.delete index: index_name
       end
