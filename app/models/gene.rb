@@ -96,7 +96,6 @@ class Gene
 
         Rails.logger.info("index: #{c += result.count}")
         page += 1
-        break
       end
     end
 
