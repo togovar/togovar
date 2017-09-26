@@ -22,7 +22,7 @@ class Disease
 
       query = {
         suggest: {
-          text:       'cancer',
+          text:       term,
           completion: {
             field: 'suggest'
           }
