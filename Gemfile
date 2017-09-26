@@ -10,8 +10,8 @@ end
 gem 'rails', '~> 5.1.2'
 
 # infrastructure
-gem 'elasticsearch-model', git: 'git://github.com/elasticsearch/elasticsearch-rails.git'
-gem 'elasticsearch-rails', git: 'git://github.com/elasticsearch/elasticsearch-rails.git'
+gem 'elasticsearch-model', github: 'elastic/elasticsearch-rails', branch: '5.x'
+gem 'elasticsearch-rails', github: 'elastic/elasticsearch-rails', branch: '5.x'
 gem 'puma', '~> 3.7'
 gem 'sqlite3'
 
