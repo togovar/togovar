@@ -1,7 +1,7 @@
 %nav.navbar.navbar-toggleable-md.navbar-inverse.fixed-top.bg-inverse
   %button.navbar-toggler.navbar-toggler-right{"aria-controls" => "navbarCollapse", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-target" => "#navbarCollapse", "data-toggle" => "collapse", :type => "button"}
     %span.navbar-toggler-icon
-  %a.navbar-brand{:href => "#"} TogoVar
+  = link_to TogoVar, root_path, { class: 'navbar-brand' }
   #navbarCollapse.collapse.navbar-collapse
     %ul.navbar-nav.mr-auto
       %li.nav-item.active
