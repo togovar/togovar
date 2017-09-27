@@ -53,6 +53,58 @@ class Gene
       query(sparql, endpoint: Endpoint.tg)
     end
 
+    def all_count
+      sparql = <<-EOS.strip_heredoc
+        DEFINE sql:select-option "order"
+        PREFIX insdc: <#{Endpoint.prefix.insdc}>
+        PREFIX obo: <#{Endpoint.prefix.obo}>
+        PREFIX idtax: <#{Endpoint.prefix.idtax}>
+        SELECT COUNT (DISTINCT ?togogenome) AS ?count
+        WHERE
+        {
+          GRAPH <#{Endpoint.ontology.refseq}>
+          {
+            ?refseq_gene obo:RO_0002162 idtax:9606 ;
+              rdf:type insdc:Gene ;
+              rdfs:label ?gene_name .
+          }
+          GRAPH <#{Endpoint.ontology.tgup}>
+          {
+            ?togogenome skos:exactMatch ?refseq_gene .
+          }
+        }
+      EOS
+
+      query(sparql, endpoint: Endpoint.tg).first[:count].to_i
+    end
+
+    def search(params, offset: 0, limit: 1_000)
+      sparql = <<-EOS.strip_heredoc
+        DEFINE sql:select-option "order"
+        PREFIX insdc: <#{Endpoint.prefix.insdc}>
+        PREFIX obo: <#{Endpoint.prefix.obo}>
+        PREFIX idtax: <#{Endpoint.prefix.idtax}>
+        SELECT DISTINCT ?gene_name ?togogenome
+        WHERE
+        {
+          GRAPH <#{Endpoint.ontology.refseq}>
+          {
+            ?refseq_gene obo:RO_0002162 idtax:9606 ;
+              rdf:type insdc:Gene ;
+              rdfs:label ?gene_name .
+          }
+          GRAPH <#{Endpoint.ontology.tgup}>
+          {
+            ?togogenome skos:exactMatch ?refseq_gene .
+          }
+        }
+        OFFSET #{offset}
+        LIMIT #{limit}
+      EOS
+
+      query(sparql, endpoint: Endpoint.tg)
+    end
+
     # 37,997 records (2017/9)
     def create_index!
       if client.indices.exists? index: index_name
@@ -96,4 +148,29 @@ class Gene
       __elasticsearch__.client
     end
   end
+
+  def initialize(params)
+    @params = params
+  end
+
+  def as_json(options = {})
+    {
+      recordsTotal:    Gene.all_count,
+      recordsFiltered: Gene.all_count,
+      data:            genes.as_json
+    }
+  end
+
+  def genes
+    @genes ||= Gene.search(@params, offset: (page - 1) * per, limit: per)
+  end
+
+  def page
+    @params['start'].to_i / per + 1
+  end
+
+  def per
+    @params['length'].to_i.positive? ? @params['length'].to_i : 10
+  end
+
 end
