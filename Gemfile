@@ -20,12 +20,14 @@ gem 'bootstrap', '~> 4.0.0.beta'
 gem 'coffee-rails', '~> 4.2'
 gem 'haml-rails', '~> 1.0'
 gem 'jbuilder', '~> 2.5'
+gem 'jquery-datatables-rails', '~> 3.4'
 gem 'jquery-rails', '~> 4.3'
 gem 'jquery-ui-rails', '~> 6.0'
 gem 'sass-rails', '~> 5.0'
 
 # utility
 gem 'action_args', '~> 2.2'
+gem 'kaminari', '~> 1.0'
 gem 'linkeddata', '~> 2.2'
 gem 'settingslogic', '~> 2.0'
 
