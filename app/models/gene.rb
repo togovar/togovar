@@ -5,12 +5,12 @@ class Gene
 
   # define elasticsearch index and type for model
   index_name 'gene'
-  document_type 'name'
+  document_type 'gene_suggest'
 
   # custom elasticsearch mapping per autocompletion
   mapping do
-    indexes :name, type: 'string'
-    indexes :suggest, type: 'completion'
+    indexes :name, type: 'string', copy_to: :suggest
+    indexes :suggest, type: 'completion', analyzer: 'standard', search_analyzer: 'standard'
   end
 
   class << self
@@ -35,17 +35,14 @@ class Gene
         PREFIX insdc: <#{Endpoint.prefix.insdc}>
         PREFIX obo: <#{Endpoint.prefix.obo}>
         PREFIX idtax: <#{Endpoint.prefix.idtax}>
-        SELECT DISTINCT ?gene_name ?togogenome
-        WHERE
-        {
-          GRAPH <#{Endpoint.ontology.refseq}>
-          {
+        SELECT DISTINCT ?gene_name
+        WHERE {
+          GRAPH <#{Endpoint.ontology.refseq}> {
             ?refseq_gene obo:RO_0002162 idtax:9606 ;
               rdf:type insdc:Gene ;
               rdfs:label ?gene_name .
           }
-          GRAPH <#{Endpoint.ontology.tgup}>
-          {
+          GRAPH <#{Endpoint.ontology.tgup}> {
             ?togogenome skos:exactMatch ?refseq_gene .
           }
         }
@@ -81,12 +78,7 @@ class Gene
           next unless (name = r[:gene_name])
 
           data = {
-            name:    name,
-            tgid:    r[:togogenome].split('/').last,
-            suggest: {
-              input: name
-            },
-            output:  name
+            name: name
           }
           client.index(index: index_name,
                        type:  document_type,

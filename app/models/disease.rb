@@ -5,14 +5,12 @@ class Disease
 
   # define elasticsearch index and type for model
   index_name 'disease'
-  document_type 'term'
+  document_type 'disease_suggest'
 
   # custom elasticsearch mapping per autocompletion
   mapping do
-    indexes :name, type: 'string'
-    indexes :suggest, type:  'completion',
-            analyzer:        'simple',
-            search_analyzer: 'simple'
+    indexes :name, type: 'string', copy_to: :suggest
+    indexes :suggest, type: 'completion', analyzer: 'standard', search_analyzer: 'standard'
   end
 
   class << self
@@ -28,21 +26,16 @@ class Disease
           }
         }
       }
-      __elasticsearch__.client.suggest(index: 'disease', body: query)['suggest'].first['options']
+      client.suggest(index: 'disease', body: query)['suggest'].first['options']
     end
 
     def list(offset: 0, limit: 1_000)
       sparql = <<-EOS.strip_heredoc
         DEFINE sql:select-option "order"
-        PREFIX dc: <#{Endpoint.prefix.dc}>
         PREFIX cv: <#{Endpoint.prefix.cv}>
-        PREFIX cvid: <#{Endpoint.prefix.cvid}>
-        SELECT DISTINCT ?cvid ?phenotype
+        SELECT DISTINCT ?phenotype
         FROM <#{Endpoint.ontology.clinvar}> {
-          ?cvid cv:submission ?submission .
-          OPTIONAL {
-            ?submission cv:reportedPhenotypeInfo ?phenotype .
-          }
+          ?submission cv:reportedPhenotypeInfo ?phenotype .
           FILTER ( ?phenotype NOT IN ("not provided", "not specified") )
         }
         OFFSET #{offset}
@@ -52,9 +45,10 @@ class Disease
       query(sparql)
     end
 
+    # 9637 records (2017/9)
     def create_index!
-      if __elasticsearch__.client.indices.exists? index: index_name
-        __elasticsearch__.client.indices.delete index: index_name
+      if client.indices.exists? index: index_name
+        client.indices.delete index: index_name
       end
 
       body = {
@@ -62,7 +56,7 @@ class Disease
           mapping.to_hash.first[0] => mapping.to_hash.first[1]
         }
       }
-      __elasticsearch__.client.indices.create(index: index_name, body: body)
+      client.indices.create(index: index_name, body: body)
 
       limit = 1_000
       page  = 0
@@ -76,12 +70,7 @@ class Disease
           next unless (name = r[:phenotype])
 
           data = {
-            name:    name,
-            cvid:    r[:cvid].split('/').last,
-            suggest: {
-              input: name.split(/\W+/)
-            },
-            output:  name
+            name: name
           }
           __elasticsearch__.client.index(index: index_name, type: document_type, body: data)
         end
@@ -89,6 +78,12 @@ class Disease
         Rails.logger.info("index: #{c += result.count}")
         page += 1
       end
+    end
+
+    private
+
+    def client
+      __elasticsearch__.client
     end
   end
 end
