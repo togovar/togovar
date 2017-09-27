@@ -11,7 +11,7 @@
                        class: 'form-control'
         = text_field :search, :text, class: 'form-control', placeholder: 'BRCA1'
         %span.input-group-btn
-          %button.btn.btn-primary{ type: 'submit' } Search
+          %button.btn.btn-primary{ id: 'btn_search', type: 'button' } Search
           %button.btn.btn-secondary{ type: 'button', onClick: "$('#search_box').val('')" } Clear
 
 %section
