@@ -13,6 +13,7 @@
 //= require rails-ujs
 //= require turbolinks
 //= require jquery
+//= require dataTables/jquery.dataTables
 //= require jquery-ui/widgets/autocomplete
 //= require popper
 //= require bootstrap-sprockets
