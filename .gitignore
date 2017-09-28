@@ -7,9 +7,15 @@
 # Ignore bundler config.
 /.bundle
 
+# Ignore config
+/config/endpoint.yml
+
 # Ignore the default SQLite database.
 /db/*.sqlite3
 /db/*.sqlite3-journal
+
+# Ignore compiled assets
+/public/assets
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -21,5 +27,3 @@
 /yarn-error.log
 
 .byebug_history
-
-/config/endpoint.yml
