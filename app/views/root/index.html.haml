@@ -3,16 +3,7 @@
 
 .container
   = render partial: 'search'
-
   .spacer-10
-  %p Direct link for report page
-  %li
-    = link_to 'gene/9606:A1CF', 'gene/9606:A1CF'
-  %li
-    = link_to 'clin_var/202166', 'clin_var/202166'
-  %li
-    = link_to 'exac/4-100229017-G-A', 'exac/4-100229017-G-A'
-
   = render partial: 'result'
 
 = content_for :javascript do
