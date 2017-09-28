@@ -47,6 +47,72 @@ class Disease
       query(sparql)
     end
 
+    def all_count
+      sparql = <<-EOS.strip_heredoc
+        DEFINE sql:select-option "order"
+        PREFIX cv: <http://purl.jp/bio/10/clinvar/>
+        SELECT COUNT(?variation) AS ?count
+        FROM <http://togogenome.org/variation/clinvar> {
+          ?variation a cv:Variant .
+        }
+      EOS
+
+      query(sparql).first[:count].to_i
+    end
+
+    def filtered_count(label)
+      sparql = <<-EOS.strip_heredoc
+        DEFINE sql:select-option "order"
+        PREFIX cv: <http://purl.jp/bio/10/clinvar/>
+        SELECT COUNT(?variation) AS ?count
+        FROM <http://togogenome.org/variation/clinvar> {
+          ?submission cv:reportedPhenotypeInfo ?info .
+          FILTER regex(?info, "#{label}", "i")
+          ?variation cv:submission ?submission .
+        }
+      EOS
+
+      query(sparql).first[:count].to_i
+    end
+
+    def all(offset: 0, limit: 1_000)
+      sparql = <<-EOS.strip_heredoc
+        DEFINE sql:select-option "order"
+        PREFIX cv: <http://purl.jp/bio/10/clinvar/>
+        SELECT ?variation GROUP_CONCAT(DISTINCT ?label ; SEPARATOR="\\n") AS ?location GROUP_CONCAT(DISTINCT ?info ; SEPARATOR="\\n") AS ?phenotype COUNT(DISTINCT ?submission) AS ?submission_num COUNT(DISTINCT ?allele) AS ?allele_num
+        FROM <http://togogenome.org/variation/clinvar> {
+          ?variation cv:submission ?submission ;
+                     cv:allele ?allele .
+          ?submission cv:reportedPhenotypeInfo ?info .
+          ?allele rdfs:label ?label .
+        } GROUP BY ?variation
+        OFFSET #{offset}
+        LIMIT #{limit}
+      EOS
+
+      query(sparql)
+    end
+
+    def search_by_disease(label, offset: 0, limit: 1_000)
+      sparql = <<-EOS.strip_heredoc
+        DEFINE sql:select-option "order"
+        PREFIX cv: <http://purl.jp/bio/10/clinvar/>
+        SELECT ?variation GROUP_CONCAT(DISTINCT ?label ; SEPARATOR="\\n") AS ?location MAX(?info) AS ?phenotype COUNT(DISTINCT ?submissions) AS ?submission_num COUNT(DISTINCT ?allele) AS ?allele_num
+        FROM <http://togogenome.org/variation/clinvar> {
+          ?submission cv:reportedPhenotypeInfo ?info .
+          FILTER regex(?info, "#{label}", "i")
+          ?variation cv:submission ?submission ;
+                     cv:submission ?submissions ;
+                     cv:allele ?allele .
+          ?allele rdfs:label ?label .
+        } GROUP BY ?variation
+        OFFSET #{offset}
+        LIMIT #{limit}
+      EOS
+
+      query(sparql)
+    end
+
     # 9637 records (2017/9)
     def create_index!
       if client.indices.exists? index: index_name
@@ -87,5 +153,33 @@ class Disease
     def client
       __elasticsearch__.client
     end
+  end
+
+  def initialize(params)
+    @params = params
+  end
+
+  def as_json(options = {})
+    {
+      recordsTotal:    (all = Disease.all_count),
+      recordsFiltered: @params['term'].present? ? Disease.filtered_count(@params['term']) : all,
+      data:            disease.as_json
+    }
+  end
+
+  def disease
+    @disease ||= if (term = @params['term']).present?
+                   Disease.search_by_disease(term, offset: (page - 1) * per, limit: per)
+                 else
+                   Disease.all(offset: (page - 1) * per, limit: per)
+                 end
+  end
+
+  def page
+    @params['start'].to_i / per + 1
+  end
+
+  def per
+    @params['length'].to_i.positive? ? @params['length'].to_i : 10
   end
 end
