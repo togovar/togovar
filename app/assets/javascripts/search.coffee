@@ -96,10 +96,13 @@ $ ->
     sel = $('#search_type').val()
     switch sel
       when 'gene'
+        $('.nav-tabs a[href="#tab_content_gene"]').tab('show')
         $('#result_gene').DataTable().draw()
       when 'disease'
+        $('.nav-tabs a[href="#tab_content_disease"]').tab('show')
         $('#result_disease').DataTable().draw()
       when 'variation'
+        $('.nav-tabs a[href="#tab_content_variation"]').tab('show')
         $('#result_variation').DataTable().draw()
       else
         console.warn('Unknown select option: ' + sel)

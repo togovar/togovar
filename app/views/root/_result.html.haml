@@ -1,29 +1,42 @@
-%table#result_gene.table.table-striped.table-bordered
-  %thead
-    %tr
-      %th ID
-      %th Name
-  %tbody
+%ul.nav.nav-tabs{ id: 'tablist_result', role: 'tablist'}
+  %li.nav-item
+    %a.nav-link#tab_gene.active{ 'data-toggle': 'tab', href: '#tab_content_gene', role: 'tab' } Gene
+  %li.nav-item
+    %a.nav-link#tab_disease{ 'data-toggle': 'tab', href: '#tab_content_disease', role: 'tab' } Disease
+  %li.nav-item
+    %a.nav-link#tab_variation{ 'data-toggle': 'tab', href: '#tab_content_variation', role: 'tab' } Variation
 
-%table#result_disease.table.table-striped.table-bordered
-  %thead
-    %tr
-      %th ID
-      %th Location
-      %th Phenotype
-      %th Submissions
-      %th Alleles
-  %tbody
+#result_tab_content.tab-content
 
-%table#result_variation.table.table-striped.table-bordered
-  %thead
-    %tr
-      %th ID
-      %th Chrom
-      %th Position
-      %th Filter
-      %th Annotation
-      %th Allele Count
-      %th Allele Number
-      %th Allele Frequency
-  %tbody
+  #tab_content_gene.tab-pane.active
+    %table#result_gene.table.table-striped.table-bordered{ width: '100%' }
+      %thead
+        %tr
+          %th ID
+          %th Name
+      %tbody
+
+  #tab_content_disease.tab-pane
+    %table#result_disease.table.table-striped.table-bordered{ width: '100%' }
+      %thead
+        %tr
+          %th ID
+          %th Location
+          %th Phenotype
+          %th Submissions
+          %th Alleles
+      %tbody
+
+  #tab_content_variation.tab-pane
+    %table#result_variation.table.table-striped.table-bordered{ width: '100%' }
+      %thead
+        %tr
+          %th ID
+          %th Chrom
+          %th Position
+          %th Filter
+          %th Annotation
+          %th Allele Count
+          %th Allele Number
+          %th Allele Frequency
+      %tbody
