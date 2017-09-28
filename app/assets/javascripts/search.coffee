@@ -91,6 +91,36 @@ $ ->
 $ ->
   $('#result_variation').DataTable().draw()
 
+
+$ ->
+  $('#search_type').change ->
+    switch event.target.value
+      when 'disease'
+        $('#search_text').attr("placeholder", 'breast cancer')
+      when 'variation'
+        $('#search_text').attr("placeholder", '22:46615715-46615880')
+      else
+        $('#search_text').attr("placeholder", 'BRCA1')
+    return
+  return
+
+$ ->
+  $('#search_text').autocomplete
+    source: (request, response) ->
+      $.getJSON '/disease/suggest.json', { term: request.term, type: $('#search_type').val() }, response
+      return
+    minLength: 1
+    messages:
+      noResults: ''
+      results: ->
+    focus: (event, ui) ->
+      false
+    select: (event, ui) ->
+      $('#search_text').val ui.item._source.name
+      false
+  .autocomplete('instance')._renderItem = (ul, item) ->
+    $('<li>').append('<div>' + item._source.name + '</div>').appendTo ul
+
 $ ->
   $('#btn_search').on 'click', ->
     sel = $('#search_type').val()
@@ -113,3 +143,4 @@ $ ->
     $('#result_gene').DataTable().draw()
     $('#result_disease').DataTable().draw()
     $('#result_variation').DataTable().draw()
+
