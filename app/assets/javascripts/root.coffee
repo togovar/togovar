@@ -7,6 +7,9 @@ $ ->
       $.getJSON '/disease/suggest.json', { term: request.term, type: $('#search_type').val() }, response
       return
     minLength: 1
+    messages:
+      noResults: ''
+      results: ->
     focus: (event, ui) ->
       false
     select: (event, ui) ->
