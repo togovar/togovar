@@ -52,11 +52,44 @@ jQuery ($) ->
       { data: "allele_num" }
     ]
 
+  $('#result_variation').dataTable
+    retrieve: true,
+    processing: true
+    serverSide: true
+    searching: false
+    ajax:
+      url: "report_type/variation"
+      data: (d) ->
+        d.type = 'variation'
+        d.term = $('#search_text').val()
+        d
+    columns: [
+      {
+        data: "variant"
+        render: (data, type, row, meta) ->
+          if(type == 'display')
+            slp = data.split('/')
+            id = slp[slp.length - 1]
+            data = '<a href="/exac/' + id + '" target="_blank">' + slp[slp.length - 1] + '</a>';
+          return data;
+      }
+      { data: "chr" }
+      { data: "position" }
+      { data: "filter" }
+      { data: "annotation" }
+      { data: "allele_count" }
+      { data: "allele_num" }
+      { data: "allele_frequency" }
+    ]
+
 $ ->
   $('#result_gene').DataTable().draw()
 
 $ ->
   $('#result_disease').DataTable().draw()
+
+$ ->
+  $('#result_variation').DataTable().draw()
 
 $ ->
   $('#btn_search').on 'click', ->
@@ -66,5 +99,7 @@ $ ->
         $('#result_gene').DataTable().draw()
       when 'disease'
         $('#result_disease').DataTable().draw()
+      when 'variation'
+        $('#result_variation').DataTable().draw()
       else
         console.warn('Unknown select option: ' + sel)

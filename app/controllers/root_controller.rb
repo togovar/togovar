@@ -6,6 +6,8 @@ class RootController < ApplicationController
       render json: Disease.auto_complete(params[:term])
     when 'gene'
       render json: Gene.auto_complete(params[:term])
+    when 'variation'
+      render json: {}
     else
       raise("Unknown search type: #{params[:type]}")
     end

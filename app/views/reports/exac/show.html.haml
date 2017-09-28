@@ -2,7 +2,7 @@
   - Stanza.exac.nanostanza.each do |stanza|
     = stanza_link_tag(stanza.name)
 
-  - Stanza.exac.togostanza.each do |stanza|
+  - Stanza.exac.togostanza.exac_id.each do |stanza|
     = stanza_link_tag(stanza.name)
 
 %h1 ExAcReport#show
@@ -12,17 +12,17 @@
     #navbar.navbar
       .navbar-inner
         %ul.nav
-          - Stanza.exac.togostanza.each do |stanza|
+          - Stanza.exac.togostanza.exac_id.each do |stanza|
             %li= link_to stanza.name, "##{stanza.name}"
 
   #header.tg-report-header
     %p.tg-report-type ExAC report
     %h1
-      %span#tg-title-id #{@clin_var_id}
+      %span#tg-title-id #{@exac_id}
       %span#tg-title-label
 
-  - Stanza.exac.togostanza.each do |stanza|
+  - Stanza.exac.togostanza.exac_id.each do |stanza|
     %section{id: stanza.name}
       .page-header
         %h2= stanza.label
-      = stanza.tag(@params)
+      = stanza.tag({ exac_id: @exac_id })
