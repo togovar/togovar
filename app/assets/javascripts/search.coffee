@@ -106,3 +106,10 @@ $ ->
         $('#result_variation').DataTable().draw()
       else
         console.warn('Unknown select option: ' + sel)
+
+$ ->
+  $('#btn_clear').on 'click', ->
+    $('#search_text').val('')
+    $('#result_gene').DataTable().draw()
+    $('#result_disease').DataTable().draw()
+    $('#result_variation').DataTable().draw()

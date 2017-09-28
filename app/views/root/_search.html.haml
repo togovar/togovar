@@ -9,8 +9,8 @@
                        class: 'form-control'
         = text_field :search, :text, class: 'form-control', placeholder: 'BRCA1'
         %span.input-group-btn
-          %button.btn.btn-primary{ id: 'btn_search', type: 'button' } Search
-          %button.btn.btn-secondary{ type: 'button', onClick: "$('#search_text').val('')" } Clear
+          %button#btn_search.btn.btn-primary{ type: 'button' } Search
+          %button#btn_clear.btn.btn-secondary{ type: 'button' } Clear
 
 = content_for :javascript do
   = javascript_include_tag :root
