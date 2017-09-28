@@ -30,79 +30,38 @@ class Gene
     end
 
     def list(offset: 0, limit: 1_000)
-      sparql = <<-EOS.strip_heredoc
-        DEFINE sql:select-option "order"
-        PREFIX insdc: <#{Endpoint.prefix.insdc}>
-        PREFIX obo: <#{Endpoint.prefix.obo}>
-        PREFIX idtax: <#{Endpoint.prefix.idtax}>
-        SELECT DISTINCT ?gene_name
-        WHERE {
-          GRAPH <#{Endpoint.ontology.refseq}> {
-            ?refseq_gene obo:RO_0002162 idtax:9606 ;
-              rdf:type insdc:Gene ;
-              rdfs:label ?gene_name .
-          }
-          GRAPH <#{Endpoint.ontology.tgup}> {
-            ?togogenome skos:exactMatch ?refseq_gene .
-          }
-        }
-        OFFSET #{offset}
-        LIMIT #{limit}
-      EOS
+      sparql = gene_template.sub('%%TARGET%%', 'DISTINCT ?gene_name')
+                 .sub('%%VALUES%%', '')
+                 .sub('%%OFFSET%%', "OFFSET #{offset}")
+                 .sub('%%LIMIT%%', "LIMIT #{limit}")
 
       query(sparql, endpoint: Endpoint.tg)
     end
 
     def all_count
-      sparql = <<-EOS.strip_heredoc
-        DEFINE sql:select-option "order"
-        PREFIX insdc: <#{Endpoint.prefix.insdc}>
-        PREFIX obo: <#{Endpoint.prefix.obo}>
-        PREFIX idtax: <#{Endpoint.prefix.idtax}>
-        SELECT COUNT (DISTINCT ?togogenome) AS ?count
-        WHERE
-        {
-          GRAPH <#{Endpoint.ontology.refseq}>
-          {
-            ?refseq_gene obo:RO_0002162 idtax:9606 ;
-              rdf:type insdc:Gene ;
-              rdfs:label ?gene_name .
-          }
-          GRAPH <#{Endpoint.ontology.tgup}>
-          {
-            ?togogenome skos:exactMatch ?refseq_gene .
-          }
-        }
-      EOS
+      sparql = gene_template.sub('%%TARGET%%', 'COUNT (DISTINCT ?togogenome) AS ?count')
+                 .sub('%%VALUES%%', '')
+                 .sub('%%OFFSET%%', '')
+                 .sub('%%LIMIT%%', '')
 
       query(sparql, endpoint: Endpoint.tg).first[:count].to_i
     end
 
-    def search(params, offset: 0, limit: 1_000)
-      sparql = <<-EOS.strip_heredoc
-        DEFINE sql:select-option "order"
-        PREFIX insdc: <#{Endpoint.prefix.insdc}>
-        PREFIX obo: <#{Endpoint.prefix.obo}>
-        PREFIX idtax: <#{Endpoint.prefix.idtax}>
-        SELECT DISTINCT ?gene_name ?togogenome
-        WHERE
-        {
-          GRAPH <#{Endpoint.ontology.refseq}>
-          {
-            ?refseq_gene obo:RO_0002162 idtax:9606 ;
-              rdf:type insdc:Gene ;
-              rdfs:label ?gene_name .
-          }
-          GRAPH <#{Endpoint.ontology.tgup}>
-          {
-            ?togogenome skos:exactMatch ?refseq_gene .
-          }
-        }
-        OFFSET #{offset}
-        LIMIT #{limit}
-      EOS
+    def search_by_gene(labels, offset: 0, limit: 1_000)
+      labels = labels.nil? || labels.empty? ? nil : Array(labels)
+      values = labels ? value_clause(labels) : ''
+
+      sparql = gene_template.sub('%%TARGET%%', 'DISTINCT ?gene_name ?togogenome')
+                 .sub('%%VALUES%%', values)
+                 .sub('%%OFFSET%%', "OFFSET #{offset}")
+                 .sub('%%LIMIT%%', "LIMIT #{limit}")
 
       query(sparql, endpoint: Endpoint.tg)
+    end
+
+    def value_clause(values)
+      str = values.map { |v| "\"#{v}\"" }.join(' ')
+      "VALUES ?gene_name { #{str} }"
     end
 
     # 37,997 records (2017/9)
@@ -144,6 +103,29 @@ class Gene
 
     private
 
+    def gene_template
+      <<-EOS.strip_heredoc
+        DEFINE sql:select-option "order"
+        PREFIX insdc: <#{Endpoint.prefix.insdc}>
+        PREFIX obo: <#{Endpoint.prefix.obo}>
+        PREFIX idtax: <#{Endpoint.prefix.idtax}>
+        SELECT %%TARGET%%
+        WHERE {
+          %%VALUES%%
+          GRAPH <#{Endpoint.ontology.refseq}> {
+            ?refseq_gene obo:RO_0002162 idtax:9606 ;
+              rdf:type insdc:Gene ;
+              rdfs:label ?gene_name .
+          }
+          GRAPH <#{Endpoint.ontology.tgup}> {
+            ?togogenome skos:exactMatch ?refseq_gene .
+          }
+        }
+        %%OFFSET%%
+        %%LIMIT%%
+      EOS
+    end
+
     def client
       __elasticsearch__.client
     end
@@ -155,14 +137,14 @@ class Gene
 
   def as_json(options = {})
     {
-      recordsTotal:    Gene.all_count,
-      recordsFiltered: Gene.all_count,
+      recordsTotal:    (all = Gene.all_count),
+      recordsFiltered: @params['term'].present? ? Array(@params['term']).count : all,
       data:            genes.as_json
     }
   end
 
   def genes
-    @genes ||= Gene.search(@params, offset: (page - 1) * per, limit: per)
+    @genes ||= Gene.search_by_gene(@params['term'], offset: (page - 1) * per, limit: per)
   end
 
   def page
