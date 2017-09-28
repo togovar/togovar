@@ -4,7 +4,7 @@ module ReportType
       respond_to do |format|
         format.html
         format.json do
-          render json: Gene.new(params)
+          render json: Gene.new(params.permit(:type, :term, :start, :length))
         end
       end
     end

@@ -6,12 +6,12 @@ jQuery ($) ->
     processing: true
     serverSide: true
     searching: false
-    bInfo : false
     ajax:
       url: "report_type/gene"
       data: (d) ->
         d.type = 'gene'
-        d.term = $('#search_box').val();
+        d.term = $('#search_text').val()
+        d
     columns: [
       {
         data: "togogenome"
@@ -30,6 +30,4 @@ $ ->
 
 $ ->
   $('#btn_search').on 'click', ->
-    $('#result_gene').DataTable()
-      .page('next')
-      .draw('page')
+    $('#result_gene').DataTable().draw()
