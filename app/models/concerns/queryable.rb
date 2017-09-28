@@ -14,13 +14,12 @@ module Queryable
     # @param [Hash] options :endpoint, :method, :protocol, :headers, :read_timeout
     # @see SPARQL::Client
     def query(sparql, **options)
-      digest = Digest::MD5.hexdigest(sparql)
-
-      ep = options.delete(:endpoint) || Endpoint.url
+      ep     = options.delete(:endpoint) || Endpoint.url
+      digest = Digest::MD5.hexdigest(normalize(sparql))
 
       arr = ["started query for #{ep} at #{Time.now}",
              "  Cache: #{Rails.cache.exist?(digest) && digest}",
-             "  Query: #{sparql.gsub(/^\s+/, '').tr("\n", ' ')}"]
+             "  Query: #{normalize sparql}"]
 
       json = []
       time = Benchmark.realtime do
@@ -45,6 +44,10 @@ module Queryable
     end
 
     private
+
+    def normalize(sparql)
+      sparql.gsub(/^\s+\n/, '').gsub(/^\s+|\s+$/, '').tr("\n", ' ')
+    end
 
     def log(*args)
       severity = args.any? { |x| x.strip =~ /^Error:/ } ? :error : :info
