@@ -21,7 +21,7 @@ $ ->
       when 'disease'
         $('#search_text').attr("placeholder", 'breast cancer')
       when 'variation'
-        $('#search_text').attr("placeholder", '10:89623000:89730000')
+        $('#search_text').attr("placeholder", '22:46615715-46615880')
       else
         $('#search_text').attr("placeholder", 'BRCA1')
     return
