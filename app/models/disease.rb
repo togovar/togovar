@@ -20,13 +20,15 @@ class Disease
 
       query = {
         suggest: {
-          text:       term,
-          completion: {
-            field: 'suggest'
+          disease_suggest: {
+            text:       term,
+            completion: {
+              field: 'suggest'
+            }
           }
         }
       }
-      client.suggest(index: 'disease', body: query)['suggest'].first['options']
+      client.search(index: 'disease', type: document_type, body: query)['suggest']['disease_suggest'].first['options']
     end
 
     def list(offset: 0, limit: 1_000)

@@ -2,14 +2,27 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 $ ->
-  $('#search_box').autocomplete(
+  $('#search_text').autocomplete
+    source: (request, response) ->
+      $.getJSON '/disease/suggest.json', { term: request.term, type: $('#search_type').val() }, response
+      return
     minLength: 1
-    source: "/disease/suggest.json?type=disease",
     focus: (event, ui) ->
-      $('#search_box').val ui.item._source.name
       false
     select: (event, ui) ->
-      $('#search_box').val ui.item._source.name
+      $('#search_text').val ui.item._source.name
       false
-  ).autocomplete('instance')._renderItem = (ul, item) ->
-    $('<li>').append('<div>' + item._source.name + '<br><b>Type: </b>' + item._type + '</div>').appendTo ul
+  .autocomplete('instance')._renderItem = (ul, item) ->
+    $('<li>').append('<div>' + item._source.name + '</div>').appendTo ul
+
+$ ->
+  $('#search_type').change ->
+    switch event.target.value
+      when 'disease'
+        $('#search_text').attr("placeholder", 'breast cancer')
+      when 'variation'
+        $('#search_text').attr("placeholder", '10:89623000:89730000')
+      else
+        $('#search_text').attr("placeholder", 'BRCA1')
+    return
+  return

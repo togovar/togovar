@@ -1,6 +1,4 @@
-= content_for :header do
-  = stylesheet_link_tag 'bootstrap-combobox', media: :all
-  = javascript_include_tag 'bootstrap-combobox'
+-#= content_for :header do
 
 %h3 Search
 %section
@@ -8,11 +6,10 @@
     .col-lg-8
       = form_tag root_path, class: 'input-group', method: :get, enforce_utf8: false do
         .input-group-btn
-          %select.form-control
-            %option{ value: 'gene' } Gene
-            %option{ value: 'dis' } Disease
-            %option{ value: 'var' } Variation
-        %input.form-control{ id: 'search_box', name: 'search_box', placeholder: 'Search for...', type: 'search', value: params[:q]}
+          = select_tag 'search[type]',
+                       options_for_select({'Gene': 'gene', 'Disease': 'disease', 'Variation': 'variation'}),
+                       class: 'form-control'
+        = text_field :search, :text, class: 'form-control', placeholder: 'BRCA1'
         %span.input-group-btn
           %button.btn.btn-primary{ type: 'submit' } Search
           %button.btn.btn-secondary{ type: 'button', onClick: "$('#search_box').val('')" } Clear
@@ -33,7 +30,3 @@
 
 = content_for :javascript do
   = javascript_include_tag :root
-  :javascript
-    $(document).ready(function(){
-      $('.combobox').combobox();
-    });
