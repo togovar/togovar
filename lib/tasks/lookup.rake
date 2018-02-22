@@ -1,10 +1,16 @@
 namespace :lookup do
-  namespace :vep do
-    desc 'import basic information'
-    task drop: :environment do
-      Lookup.collection.drop
-    end
+  desc 'drop the collection'
+  task drop: :environment do
+    Lookup.collection.drop
+  end
 
+  desc 'create index on lookup'
+  task create_index: :environment do
+    Lookup.index({ tgv_id: 1 }, unique: true)
+    Lookup.create_indexes
+  end
+
+  namespace :vep do
     desc 'import basic information'
     task :import, ['path'] => :environment do |task, args|
       file = args[:path] || raise("Usage: rake #{task.name}[file_path]")
