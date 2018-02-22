@@ -1,5 +1,5 @@
 module VariantClass
-  def variant_class(str)
+  def vc_to_id(str)
     case str
       when 'SNV'
         'SO:0001483'
@@ -58,7 +58,7 @@ module VariantClass
       when 'probe'
         'SO:0000051'
       else
-        raise ParseError
+        raise ParseError("Unsupported consequence type: #{str}")
     end
   end
 
