@@ -28,8 +28,8 @@ module Tasks
             operations = lookups.map do |lookup|
               json    = g.find { |hash| hash[:tgv_id] == lookup.tgv_id }.as_json
               clinvar = { clinvar: json.tap { |hash| hash.delete(:tgv_id) } }
-              d       = lookup.as_json.merge(clinvar)
-              update_operation(lookup.id, d)
+              doc     = lookup.as_json.merge(clinvar).deep_reject { |k, _| k == '_id' }
+              update_operation(lookup.id, doc)
             end
             ::Lookup.collection.bulk_write(operations)
             thread[:done] = @io.lineno if thread

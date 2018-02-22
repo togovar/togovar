@@ -38,6 +38,7 @@ module Tasks
 
       def task_with_progress
         Thread.abort_on_exception = false
+
         thread = Thread.new do
           task(Thread.current)
         end
@@ -94,6 +95,20 @@ module Tasks
         log(msg, :warn)
         nil
       end
+    end
+  end
+end
+
+class Hash
+  def deep_reject(&blk)
+    dup.deep_reject!(&blk)
+  end
+
+  def deep_reject!(&blk)
+    each do |k, v|
+      v.each { |x| x.deep_reject!(&blk) } if v.is_a?(Array)
+      v.deep_reject!(&blk) if v.is_a?(Hash)
+      delete(k) if blk.call(k, v)
     end
   end
 end
