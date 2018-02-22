@@ -17,6 +17,8 @@ module Tasks
           super
         end
 
+        private
+
         def task(thread)
           if thread
             thread[:done]  = 0
@@ -25,19 +27,18 @@ module Tasks
 
           records.each_slice(@batch_num) do |g|
             ::Lookup.collection.insert_many(g)
-            thread[:done] = @tsv.lineno if thread
+            thread[:done] = @io.lineno if thread
           end
         end
-
-        private
 
         def records(&block)
           return to_enum(__method__) unless block_given?
 
           reader.open(@file_path) do |f|
-            @tsv = CSV.new(f, col_sep: "\t", skip_lines: '^#')
+            @io = CSV.new(f, col_sep: "\t", skip_lines: '^#')
             each(&block)
           end
+          @io = nil
         end
 
         def each
@@ -57,7 +58,7 @@ module Tasks
 
           loop do
             # read one line but do not read if @line is present
-            return nil unless @line ||= @tsv.readline
+            return nil unless @line ||= @io.readline
 
             # keep @line and return the entry if ID changes
             break record if current_id && current_id != @line[0]
@@ -99,7 +100,7 @@ module Tasks
           return nil unless filter_blank(str)
           v = if (m = str.match(/(\d+)-\d+/))
                 msg = "position format: #{str}"
-                msg << " at line #{@tsv.lineno}"
+                msg << " at line #{@io.lineno}"
                 log(msg, :warn)
                 m[1]
               else
@@ -123,7 +124,7 @@ module Tasks
           vc_to_id(str)
         rescue VariantClass::ParseError
           msg = "unknown variant class: #{str}"
-          msg << " at line #{@tsv.lineno}"
+          msg << " at line #{@io.lineno}"
           log(msg, :warn)
           nil
         end
@@ -146,7 +147,7 @@ module Tasks
           parse_consequences(str)
         rescue Consequence::ParseError
           msg = "unknown consequence: #{row[6]}"
-          msg << " at line #{@tsv.lineno}"
+          msg << " at line #{@io.lineno}"
           log(msg, :warn)
           nil
         end
@@ -158,7 +159,7 @@ module Tasks
             Hash[%i[prediction value].zip([m[1], to_float(m[2])])]
           else
             msg = "failed to parse sift: #{str}"
-            msg << " at line #{@tsv.lineno}"
+            msg << " at line #{@io.lineno}"
             log(msg, :warn)
             nil
           end

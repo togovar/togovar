@@ -18,10 +18,6 @@ module Tasks
         raise("Unknown options: #{options.inspect}") unless options.empty?
       end
 
-      def task(thread)
-        # OVERRIDE ME
-      end
-
       def start
         log("start import #{@file_path}", :info)
 
@@ -35,6 +31,10 @@ module Tasks
       end
 
       private
+
+      def task(thread)
+        # OVERRIDE ME
+      end
 
       def task_with_progress
         Thread.abort_on_exception = false
@@ -80,8 +80,8 @@ module Tasks
         Integer(str)
       rescue ArgumentError => e
         msg = e.message
-        msg << " at line #{@tsv.lineno}"
-        Importer.logger&.warn(msg)
+        msg << " at line #{@io.lineno}"
+        log(msg, :warn)
         nil
       end
 
@@ -90,8 +90,8 @@ module Tasks
         Float(str)
       rescue ArgumentError => e
         msg = e.message
-        msg << " at line #{@tsv.lineno}"
-        Importer.logger&.warn(msg)
+        msg << " at line #{@io.lineno}"
+        log(msg, :warn)
         nil
       end
     end
