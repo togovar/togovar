@@ -25,6 +25,21 @@ namespace :lookup do
     end
   end
 
+  namespace :clinvar do
+    desc 'import ClinVar information'
+    task :import, ['path'] => :environment do |task, args|
+      file = args[:path] || raise("Usage: rake #{task.name}[file_path]")
+      raise("Cannot open #{file}") unless File.file?(file)
+
+      require 'tasks/lookup/clin_var/importer'
+
+      log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
+      Tasks::Lookup::ClinVar::Importer.logger = Logger.new(log_file, 'daily')
+
+      Tasks::Lookup::ClinVar::Importer.import(file, progress: STDOUT.tty?)
+    end
+  end
+
   namespace :exac do
     desc 'import ExAC information'
     task :import, ['path'] => :environment do |task, args|
