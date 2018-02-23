@@ -95,6 +95,16 @@ module Tasks
         log(msg, :warn)
         nil
       end
+
+      # create update operation for bulk write to mongo
+      def update_operation(id, doc)
+        {
+          update_one: {
+            filter: { _id: id },
+            update: { '$set': doc }
+          }
+        }
+      end
     end
   end
 end

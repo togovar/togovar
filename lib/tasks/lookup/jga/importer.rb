@@ -36,15 +36,6 @@ module Tasks
           end
         end
 
-        def update_operation(id, doc)
-          {
-            update_one: {
-              filter: { _id: id },
-              update: { '$set': doc }
-            }
-          }
-        end
-
         def records
           return to_enum(__method__) unless block_given?
 
