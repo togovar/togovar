@@ -39,4 +39,19 @@ namespace :lookup do
       Tasks::Lookup::ExAC::Importer.import(file, progress: STDOUT.tty?)
     end
   end
+
+  namespace :jga do
+    desc 'import ExAC information'
+    task :import, ['path'] => :environment do |task, args|
+      file = args[:path] || raise("Usage: rake #{task.name}[file_path]")
+      raise("Cannot open #{file}") unless File.file?(file)
+
+      require 'tasks/lookup/jga/importer'
+
+      log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
+      Tasks::Lookup::JGA::Importer.logger = Logger.new(log_file, 'daily')
+
+      Tasks::Lookup::JGA::Importer.import(file, progress: STDOUT.tty?)
+    end
+  end
 end
