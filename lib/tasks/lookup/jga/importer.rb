@@ -1,10 +1,10 @@
 require 'csv'
-require 'zlib'
+require 'tasks/lookup/importer_base'
 
 module Tasks
   module Lookup
     module JGA
-      class Importer
+      class Importer < ImporterBase
         class << self
           def import(*args)
             new(*args).start
