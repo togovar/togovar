@@ -26,9 +26,9 @@ module Tasks
           records.each_slice(@batch_num) do |g|
             lookups    = ::Lookup.in(tgv_id: g.collect { |h| h[:tgv_id] })
             operations = lookups.map do |lookup|
-              json    = g.find { |hash| hash[:tgv_id] == lookup.tgv_id }.as_json
-              clinvar = { clinvar: json.tap { |hash| hash.delete(:tgv_id) } }
-              doc     = lookup.as_json.merge(clinvar).deep_reject { |k, _| k == '_id' }
+              json = g.find { |hash| hash[:tgv_id] == lookup.tgv_id }.as_json
+              exac = { exac: json.tap { |hash| hash.delete('tgv_id') } }
+              doc  = lookup.as_json.merge(exac).deep_reject { |k, _| k == '_id' }
               update_operation(lookup.id, doc)
             end
             ::Lookup.collection.bulk_write(operations)
