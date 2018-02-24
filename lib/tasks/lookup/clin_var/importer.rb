@@ -36,16 +36,45 @@ module Tasks
           end
         end
 
-        def records
+        def records(&block)
           return to_enum(__method__) unless block_given?
 
           reader.open(@file_path) do |f|
-            @io = CSV.new(f, col_sep: ' ', skip_lines: '^#')
-            @io.each do |r|
-              hash = { tgv_id:    to_int(r[1].sub('tgv', '')),
-                       allele_id: to_int(r[6]) }
-              yield hash
+            @io = CSV.new(f, col_sep: "\t", skip_lines: '^#')
+            each(&block)
+          end
+          @io = nil
+        end
+
+        def each
+          if block_given?
+            while (record = shift)
+              yield record
             end
+          else
+            to_enum
+          end
+        end
+
+        # @return [Hash] an entry which is grouped by first column's value
+        def shift
+          record     = {}
+          current_id = nil
+
+          loop do
+            # read one line but do not read if @line is present
+            return nil unless @line ||= @io.readline
+
+            # keep @line and return the entry if ID changes
+            break record if current_id && current_id != @line[0]
+
+            record[:tgv_id]       ||= to_int(@line[0].sub('tgv', ''))
+            record[:allele_id]    ||= to_int(@line[1])
+            record[:significance] ||= @line[2]
+            (record[:conditions] ||= []) << @line[3]
+
+            current_id = @line[0]
+            @line      = nil
           end
         end
       end

@@ -5,8 +5,8 @@ class Lookup
 
   embeds_one :base, class_name: 'Lookup::Base'
   embeds_one :molecular_annotation, class_name: 'Lookup::MolecularAnnotation'
-  embeds_one :clinvar, class_name: 'Lookup::ClinVar'
-  embeds_one :exac, class_name: 'Lookup::ExAC'
+  embeds_one :clinvar_info, class_name: 'Lookup::ClinVar' # FIXME
+  embeds_one :clinvar, class_name: 'Lookup::ExAC' # FIXME
   embeds_one :jga, class_name: 'Lookup::JGA'
 
   class << self
@@ -79,25 +79,27 @@ class Lookup
     include Mongoid::Document
 
     field :allele_id, type: Integer
+    field :significance
+    field :conditions, type: Array
 
-    embedded_in :lookup, inverse_of: :clinvar
+    embedded_in :lookup, inverse_of: :clinvar_info # FIXME
   end
 
   class ExAC
     include Mongoid::Document
 
-    field :num_alleles, type: Integer
     field :num_alt_alleles, type: Integer
-    field :num_homo_genotypes, type: Integer
+    field :num_alleles, type: Integer
     field :frequency, type: Float
 
-    embedded_in :lookup, inverse_of: :exac
+    embedded_in :lookup, inverse_of: :clinvar # FIXME
   end
 
   class JGA
     include Mongoid::Document
 
     field :num_alt_alleles, type: Integer
+    field :num_alleles, type: Integer
     field :frequency, type: Float
 
     embedded_in :lookup, inverse_of: :jga

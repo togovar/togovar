@@ -26,6 +26,42 @@ namespace :lookup do
   end
 
   namespace :clinvar do
+    desc 'fetch ClinVar information'
+    task :fetch, ['path'] => :environment do |task, args|
+      file = args[:path] || raise("Usage: rake #{task.name}[file_path]")
+      raise("Cannot open #{file}") unless File.file?(file)
+
+      require 'tasks/lookup/clin_var/disease'
+
+      Rails.logger = Logger.new(File::NULL)
+
+      disease = Tasks::Lookup::ClinVar::Disease.new
+      disease.alleles = File.readlines(file).map(&:chomp)
+
+      disease.tsv
+    end
+
+    desc 'merge ClinVar information into TogoVar'
+    task :merge_tgv, %w[path_to_id_map path_to_disease_list] => :environment do |task, args|
+      file1 = args[:path_to_id_map] || raise("Usage: rake #{task.name}[file_path]")
+      raise("Cannot open #{file1}") unless File.file?(file1)
+
+      file2 = args[:path_to_disease_list] || raise("Usage: rake #{task.name}[file_path]")
+      raise("Cannot open #{file2}") unless File.file?(file2)
+
+      require 'csv'
+
+      allele_to_tgv = File.readlines(file1).map { |x| x.chomp.split.reverse }.to_h
+
+      tsv = CSV.generate(col_sep: "\t") do |tsv|
+        CSV.foreach(file2, col_sep: "\t").each do |row|
+          allele_id = row[0]
+          tsv << [allele_to_tgv[allele_id], *row]
+        end
+      end
+      puts tsv
+    end
+
     desc 'import ClinVar information'
     task :import, ['path'] => :environment do |task, args|
       file = args[:path] || raise("Usage: rake #{task.name}[file_path]")
@@ -36,7 +72,7 @@ namespace :lookup do
       log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
       Tasks::Lookup::ClinVar::Importer.logger = Logger.new(log_file, 'daily')
 
-      Tasks::Lookup::ClinVar::Importer.import(file, progress: STDOUT.tty?)
+      Tasks::Lookup::ClinVar::Importer.import(file, progress: false)
     end
   end
 
