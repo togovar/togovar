@@ -72,7 +72,7 @@ namespace :lookup do
       log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
       Tasks::Lookup::ClinVar::Importer.logger = Logger.new(log_file, 'daily')
 
-      Tasks::Lookup::ClinVar::Importer.import(file, progress: false)
+      Tasks::Lookup::ClinVar::Importer.import(file, progress: STDOUT.tty?)
     end
   end
 
