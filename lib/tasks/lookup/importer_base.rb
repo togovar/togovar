@@ -116,7 +116,7 @@ class Hash
 
   def deep_reject!(&blk)
     each do |k, v|
-      v.each { |x| x.deep_reject!(&blk) } if v.is_a?(Array)
+      v.each { |x| x.deep_reject!(&blk) if x.respond_to?(:deep_reject!) } if v.is_a?(Array)
       v.deep_reject!(&blk) if v.is_a?(Hash)
       delete(k) if blk.call(k, v)
     end
