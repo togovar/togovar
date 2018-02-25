@@ -17,7 +17,7 @@ gem 'puma', '~> 3.7'
 gem 'sqlite3'
 
 # javascript & stylesheet
-gem 'bootstrap', '~> 4.0.0.beta'
+gem 'bootstrap', '~> 4.0'
 gem 'coffee-rails', '~> 4.2'
 gem 'haml-rails', '~> 1.0'
 gem 'jbuilder', '~> 2.5'
