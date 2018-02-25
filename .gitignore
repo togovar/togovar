@@ -10,6 +10,7 @@
 # Ignore config
 /config/endpoint.yml
 /config/elasticsearch.yml
+/config/mongoid.yml
 
 # Ignore the default SQLite database.
 /db/*.sqlite3
