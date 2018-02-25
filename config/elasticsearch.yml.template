@@ -1,0 +1,10 @@
+development: &default
+  host: 'localhost:9200'
+  user: 'elastic'
+  password: 'changeme'
+
+test:
+  <<: *default
+
+production:
+  <<: *default

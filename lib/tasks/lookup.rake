@@ -1,13 +1,33 @@
 namespace :lookup do
-  desc 'drop the collection'
-  task drop: :environment do
-    Lookup.collection.drop
+  namespace :mongo do
+    desc 'drop the collection'
+    task drop: :environment do
+      Lookup.collection.drop
+    end
+
+    desc 'create index on lookup'
+    task create_index: :environment do
+      Lookup.index({ tgv_id: 1 }, unique: true)
+      Lookup.create_indexes
+    end
   end
 
-  desc 'create index on lookup'
-  task create_index: :environment do
-    Lookup.index({ tgv_id: 1 }, unique: true)
-    Lookup.create_indexes
+  namespace :elastic do
+    desc 'create index'
+    task create_index: :environment do
+      puts Lookup.elasticsearch.create_index! force: true
+      puts Lookup.elasticsearch.refresh_index!
+    end
+
+    desc 'delete index'
+    task delete_index: :environment do
+      puts Lookup.client.indices.delete index: Lookup.index_name
+    end
+
+    desc 'import index'
+    task import_index: :environment do
+      puts Lookup.import
+    end
   end
 
   namespace :vep do
@@ -19,6 +39,7 @@ namespace :lookup do
       require 'tasks/lookup/vep/importer'
 
       log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
+
       Tasks::Lookup::Vep::Importer.logger = Logger.new(log_file, 'daily')
 
       Tasks::Lookup::Vep::Importer.import(file, progress: STDOUT.tty?)
@@ -35,7 +56,7 @@ namespace :lookup do
 
       Rails.logger = Logger.new(File::NULL)
 
-      disease = Tasks::Lookup::ClinVar::Disease.new
+      disease         = Tasks::Lookup::ClinVar::Disease.new
       disease.alleles = File.readlines(file).map(&:chomp)
 
       disease.tsv
@@ -70,6 +91,7 @@ namespace :lookup do
       require 'tasks/lookup/clin_var/importer'
 
       log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
+
       Tasks::Lookup::ClinVar::Importer.logger = Logger.new(log_file, 'daily')
 
       Tasks::Lookup::ClinVar::Importer.import(file, progress: STDOUT.tty?)
@@ -85,6 +107,7 @@ namespace :lookup do
       require 'tasks/lookup/ex_ac/importer'
 
       log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
+
       Tasks::Lookup::ExAC::Importer.logger = Logger.new(log_file, 'daily')
 
       Tasks::Lookup::ExAC::Importer.import(file, progress: STDOUT.tty?)
@@ -100,6 +123,7 @@ namespace :lookup do
       require 'tasks/lookup/jga/importer'
 
       log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
+
       Tasks::Lookup::JGA::Importer.logger = Logger.new(log_file, 'daily')
 
       Tasks::Lookup::JGA::Importer.import(file, progress: STDOUT.tty?)

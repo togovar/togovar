@@ -1,6 +1,8 @@
 class Lookup
   include Mongoid::Document
 
+  include Lookup::Searchable
+
   field :tgv_id
 
   embeds_one :base, class_name: 'Lookup::Base'
