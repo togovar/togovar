@@ -19,7 +19,30 @@ defaults: &defaults
         uri: http://togostanza.org/stanza/gene_attributes
         name: Gene attributes
 
-  clin_var:
+  clinvar:
+    nanostanza: []
+
+    togostanza:
+      -
+        name: clinvar_variant_information
+        label: Variant Information
+        params:
+          -
+            clinvar_id
+      -
+        name: clinvar_variant_interpretation
+        label: Variant Interpretation
+        params:
+          -
+            clinvar_id
+      -
+        name: clinvar_variant_alleles
+        label: Variant Alleles
+        params:
+          -
+            clinvar_id
+
+  clinvar_allele:
     nanostanza: []
 
     togostanza:
