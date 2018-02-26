@@ -26,7 +26,10 @@ jQuery ($) ->
         data: 'tgv_id'
         render: (data, type, row, meta) ->
           if type == 'display'
-            return 'tgv' + data
+            allele_id = row['clinvar_info']['allele_id']
+            unless allele_id?
+              return 'tgv' + data
+            return '<a target="_blank" href="variation?allele_id=' + allele_id + '">tgv' + data + '</a>'
           else
             return data
       }
@@ -158,6 +161,7 @@ jQuery ($) ->
       }
 ## End Function
     ]
+  return
 
 # on ready
 $ ->
