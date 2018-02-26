@@ -1,0 +1,23 @@
+= content_for :header do
+  - Stanza.clinvar.nanostanza.each do |stanza|
+    = stanza_link_tag(stanza.name)
+  - Stanza.clinvar.togostanza.each do |stanza|
+    = stanza_link_tag(stanza.name)
+
+%main
+
+  %h1 Variation Report
+
+  .container
+    #nav-wrapper
+      #navbar.navbar
+        .navbar-inner
+          %ul.nav
+            - Stanza.clinvar.togostanza.each do |stanza|
+              %li= link_to stanza.name, "##{stanza.name}"
+
+    - Stanza.clinvar.togostanza.each do |stanza|
+      %section{id: stanza.name}
+        .page-header
+          %h2= stanza.label
+        = stanza.tag({ clinvar_id: @variation_id })

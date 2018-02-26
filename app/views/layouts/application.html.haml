@@ -10,11 +10,7 @@
   %body
     = render partial: 'layouts/header'
 
-    .container-fluid
-      .row
-        = render partial: 'layouts/sidebar'
-        %main.col-sm-9.offset-sm-3.col-md-10.offset-md-2.pt-3
-          = yield
+    = yield
 
     %footer.footer
       = render partial: 'layouts/footer'

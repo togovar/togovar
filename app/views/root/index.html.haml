@@ -1,9 +1,13 @@
 = content_for :header do
   = stylesheet_link_tag 'root/index', media: :all
 
+.container-fluid
+  .row
+    = render partial: 'layouts/sidebar'
+    %main.col-sm-9.offset-sm-3.col-md-10.offset-md-2.pt-3
+      = render partial: 'search'
+      .spacer-10
+      = render partial: 'result'
+
 = content_for :javascript do
   = javascript_include_tag 'root/index'
-
-= render partial: 'search'
-.spacer-10
-= render partial: 'result'
