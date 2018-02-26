@@ -12,10 +12,6 @@
 /config/elasticsearch.yml
 /config/mongoid.yml
 
-# Ignore the default SQLite database.
-/db/*.sqlite3
-/db/*.sqlite3-journal
-
 # Ignore compiled assets
 /public/assets
 
