@@ -1,16 +1,19 @@
 class RootController < ApplicationController
-
   def suggest
-    case params[:type]
-    when 'disease'
-      render json: Disease.auto_complete(params[:term])
-    when 'gene'
-      render json: Gene.auto_complete(params[:term])
-    when 'variation'
-      render json: {}
-    else
-      raise("Unknown search type: #{params[:type]}")
+    respond_to do |format|
+      format.html
+      format.json do
+        render json: Suggest.suggest(params.permit(:term)[:term])
+      end
     end
   end
 
+  def list
+    respond_to do |format|
+      format.html
+      format.json do
+        render json: Lookup.list(params.permit(:term, :start, :length))
+      end
+    end
+  end
 end

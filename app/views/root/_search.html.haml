@@ -1,16 +1,35 @@
-%h3 Search
 %section
   .row
-    .col-lg-8
+    .col-lg-6
       .input-group
-        .input-group-btn
-          = select_tag 'search[type]',
-                       options_for_select({'Gene': 'gene', 'Disease': 'disease', 'Variation': 'variation'}),
-                       class: 'form-control'
-        = text_field :search, :text, class: 'form-control', placeholder: 'BRCA1'
+        %input#search_text.form-control{placeholder: 'Search for disease or gene symbol or rs...'}
         %span.input-group-btn
           %button#btn_search.btn.btn-primary{ type: 'button' } Search
           %button#btn_clear.btn.btn-secondary{ type: 'button' } Clear
-
-= content_for :javascript do
-  = javascript_include_tag :root
+  .form-inline.my-2
+    Reference Genome:
+    .form-check.form-check-inline.ml-2
+      %input#inlineRadio1.form-check-input{name: 'grch38', type: 'radio', value: 'grch38', checked: true}/
+      %label.form-check-label{for: 'grch38'} GRCh38
+    .form-check.form-check-inline.ml-2
+      %input#inlineRadio2.form-check-input{name: 'grch37', type: 'radio', value: 'grch37', disabled: true}/
+      %label.form-check-label{for: 'grch37'} hg19/GRCh37
+  %small.form-text.text-muted<>
+    Example - Disease:
+    %a#ex_disease{href: 'javascript:void(0)', onClick: '$("#search_text").val("Breast-ovarian cancer"); return false;'}<>
+      Breast-ovarian cancer
+    , Gene:
+    %a#ex_gene{href: 'javascript:void(0)', onClick: '$("#search_text").val("BRCA2"); return false;'}<>
+      BRCA2
+    , refSNP:
+    %a#ex_rs{href: 'javascript:void(0)', onClick: '$("#search_text").val("rs7988901"); return false;'}<>
+      rs7988901
+    , TogoVar:
+    %a#ex_tgv{href: 'javascript:void(0)', onClick: '$("#search_text").val("tgv10000000"); return false;'}<>
+      tgv10000000
+    , Position:
+    %a#ex_position{href: 'javascript:void(0)', onClick: '$("#search_text").val("13:32889080"); return false;'}<>
+      13:32889080
+    , Region:
+    %a#ex_region{href: 'javascript:void(0)', onClick: '$("#search_text").val("13:32889785-32889787"); return false;'}<>
+      13:32889785-32889787

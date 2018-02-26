@@ -1,42 +1,49 @@
-%ul.nav.nav-tabs{ id: 'tablist_result', role: 'tablist'}
-  %li.nav-item
-    %a.nav-link#tab_gene.active{ 'data-toggle': 'tab', href: '#tab_content_gene', role: 'tab' } Gene
-  %li.nav-item
-    %a.nav-link#tab_disease{ 'data-toggle': 'tab', href: '#tab_content_disease', role: 'tab' } Disease
-  %li.nav-item
-    %a.nav-link#tab_variation{ 'data-toggle': 'tab', href: '#tab_content_variation', role: 'tab' } Variation
+%table#result.table.stripe.compact.nowrap
+  %thead
+    %tr
+      %th.cell-border{colspan: 7} Base Information
+      %th.cell-border{colspan: 2} Molecular Annotation
+      %th.cell-border{colspan: 2} ClinVar
+      %th.cell-border{colspan: 2} Alt Allele (JGA)
+      %th.cell-border{colspan: 2} Alt Allele (ToMMo)
+      %th.cell-border{colspan: 2} Alt Allele (HGVD)
+      %th.cell-border{colspan: 2} Alt Allele (ExAC)
+      %th.cell-border{colspan: 2} Function
+    %tr
+      -# Base Information
+      %th.cell-border ID
+      %th rs#
+      %th Type
+      %th Chr
+      %th Pos
+      %th Ref
+      %th Alt
 
-#result_tab_content.tab-content
+      -# Annotations
+      %th.cell-border Symbol
+      %th Consequences
 
-  #tab_content_gene.tab-pane.active
-    %table#result_gene.table.table-striped.table-bordered{ width: '100%' }
-      %thead
-        %tr
-          %th ID
-          %th Name
-      %tbody
+      -# ClinVar
+      %th.cell-border Conditions
+      %th Pathogenicity
 
-  #tab_content_disease.tab-pane
-    %table#result_disease.table.table-striped.table-bordered{ width: '100%' }
-      %thead
-        %tr
-          %th ID
-          %th Location
-          %th Phenotype
-          %th Submissions
-          %th Alleles
-      %tbody
+      -# JGA
+      %th.cell-border Count
+      %th Freq
 
-  #tab_content_variation.tab-pane
-    %table#result_variation.table.table-striped.table-bordered{ width: '100%' }
-      %thead
-        %tr
-          %th ID
-          %th Chrom
-          %th Position
-          %th Filter
-          %th Annotation
-          %th Allele Count
-          %th Allele Number
-          %th Allele Frequency
-      %tbody
+      -# Tommo
+      %th.cell-border Count
+      %th Freq
+
+      -# HGVD
+      %th.cell-border Count
+      %th Freq
+
+      -# ExAC
+      %th.cell-border Count
+      %th Freq
+
+      -# Function
+      %th.cell-border SIFT
+      %th Polyphen
+  %tbody

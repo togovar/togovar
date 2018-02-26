@@ -1,9 +1,6 @@
-.fixed-top {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 1030;
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 50px;
 }
 
 .bg-inverse {
@@ -12,21 +9,6 @@
 
 a.bg-inverse:focus, a.bg-inverse:hover {
   background-color: #101112 !important;
-}
-
-// copy from original Bootstrap 4.0
-.navbar {
-  position: relative;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  padding: 0.5rem 1rem;
 }
 
 .navbar-brand {
@@ -43,59 +25,6 @@ a.bg-inverse:focus, a.bg-inverse:hover {
   text-decoration: none;
 }
 
-.navbar-nav {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  padding-left: 0;
-  margin-bottom: 0;
-  list-style: none;
-}
-
-.navbar-nav .nav-link {
-  padding-right: 0;
-  padding-left: 0;
-}
-
-.navbar-text {
-  display: inline-block;
-  padding-top: .425rem;
-  padding-bottom: .425rem;
-}
-
-.navbar-toggler {
-  -webkit-align-self: flex-start;
-  -ms-flex-item-align: start;
-  align-self: flex-start;
-  padding: 0.25rem 0.75rem;
-  font-size: 1.25rem;
-  line-height: 1;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 0.25rem;
-}
-
-.navbar-toggler:focus, .navbar-toggler:hover {
-  text-decoration: none;
-}
-
-.navbar-toggler-icon {
-  display: inline-block;
-  width: 1.5em;
-  height: 1.5em;
-  vertical-align: middle;
-  content: "";
-  background: no-repeat center center;
-  -webkit-background-size: 100% 100%;
-  background-size: 100% 100%;
-}
-
 .navbar-toggler-left {
   position: absolute;
   left: 1rem;
@@ -104,6 +33,48 @@ a.bg-inverse:focus, a.bg-inverse:hover {
 .navbar-toggler-right {
   position: absolute;
   right: 1rem;
+}
+
+.navbar-inverse .navbar-brand,
+.navbar-inverse .navbar-toggler {
+  color: white;
+}
+
+.navbar-inverse .navbar-brand:focus, .navbar-inverse .navbar-brand:hover,
+.navbar-inverse .navbar-toggler:focus,
+.navbar-inverse .navbar-toggler:hover {
+  color: white;
+}
+
+.navbar-inverse .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.navbar-inverse .navbar-nav .nav-link:focus, .navbar-inverse .navbar-nav .nav-link:hover {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.navbar-inverse .navbar-nav .nav-link.disabled {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.navbar-inverse .navbar-nav .open > .nav-link,
+.navbar-inverse .navbar-nav .active > .nav-link,
+.navbar-inverse .navbar-nav .nav-link.open,
+.navbar-inverse .navbar-nav .nav-link.active {
+  color: white;
+}
+
+.navbar-inverse .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-inverse .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}
+
+.navbar-inverse .navbar-text {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 @media (max-width: 575px) {
@@ -416,88 +387,4 @@ a.bg-inverse:focus, a.bg-inverse:hover {
 
 .navbar-toggleable-xl .navbar-toggler {
   display: none;
-}
-
-.navbar-light .navbar-brand,
-.navbar-light .navbar-toggler {
-  color: rgba(0, 0, 0, 0.9);
-}
-
-.navbar-light .navbar-brand:focus, .navbar-light .navbar-brand:hover,
-.navbar-light .navbar-toggler:focus,
-.navbar-light .navbar-toggler:hover {
-  color: rgba(0, 0, 0, 0.9);
-}
-
-.navbar-light .navbar-nav .nav-link {
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .nav-link:hover {
-  color: rgba(0, 0, 0, 0.7);
-}
-
-.navbar-light .navbar-nav .nav-link.disabled {
-  color: rgba(0, 0, 0, 0.3);
-}
-
-.navbar-light .navbar-nav .open > .nav-link,
-.navbar-light .navbar-nav .active > .nav-link,
-.navbar-light .navbar-nav .nav-link.open,
-.navbar-light .navbar-nav .nav-link.active {
-  color: rgba(0, 0, 0, 0.9);
-}
-
-.navbar-light .navbar-toggler {
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-.navbar-light .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 0, 0, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
-}
-
-.navbar-light .navbar-text {
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.navbar-inverse .navbar-brand,
-.navbar-inverse .navbar-toggler {
-  color: white;
-}
-
-.navbar-inverse .navbar-brand:focus, .navbar-inverse .navbar-brand:hover,
-.navbar-inverse .navbar-toggler:focus,
-.navbar-inverse .navbar-toggler:hover {
-  color: white;
-}
-
-.navbar-inverse .navbar-nav .nav-link {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.navbar-inverse .navbar-nav .nav-link:focus, .navbar-inverse .navbar-nav .nav-link:hover {
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.navbar-inverse .navbar-nav .nav-link.disabled {
-  color: rgba(255, 255, 255, 0.25);
-}
-
-.navbar-inverse .navbar-nav .open > .nav-link,
-.navbar-inverse .navbar-nav .active > .nav-link,
-.navbar-inverse .navbar-nav .nav-link.open,
-.navbar-inverse .navbar-nav .nav-link.active {
-  color: white;
-}
-
-.navbar-inverse .navbar-toggler {
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.navbar-inverse .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
-}
-
-.navbar-inverse .navbar-text {
-  color: rgba(255, 255, 255, 0.5);
 }

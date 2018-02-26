@@ -4,8 +4,9 @@
  *= require_self
  */
 @import "bootstrap";
-@import "header";
-@import "footer";
+@import "layouts/header";
+@import "layouts/sidebar";
+@import "layouts/footer";
 
 .spacer-10 {
   margin:0 !important;
@@ -53,4 +54,8 @@
   border-color: rgba(0, 0, 0, 0.2);
   border-style: solid;
   border-width: 1px;
+}
+
+ul.nav li {
+  padding: 0 5px;
 }

@@ -11,15 +11,40 @@ class Lookup
   embeds_one :clinvar, class_name: 'Lookup::ExAC' # FIXME
   embeds_one :jga, class_name: 'Lookup::JGA'
 
+  include VariantClass
+  include TermType
+
   class << self
     def list(params)
-      result = Base.order_by(tgv_id: 'asc')
-                 .skip(params['start'])
-                 .limit(params['length'])
+      term   = term_type(params['term'].strip)
+      start  = params['start'].to_i || 0
+      length = params['length'].to_i || 10
+
+      puts term
+
+      result = (term ? where(term.where) : all)
+                 .order_by(tgv_id: 'asc')
+                 .skip(start)
+                 .limit(length)
+
+      # FIXME: insert SO label into base.variant_class
+      replace = result.map do |r|
+        json = r.as_json
+        if (base = r[:base])
+          if (var_class = base[:variant_class])
+            base[:variant_class] = label(var_class)
+            json.merge(base: base)
+          else
+            json
+          end
+        else
+          json
+        end
+      end
 
       { recordsTotal:    Base.all.count,
         recordsFiltered: result.count,
-        data:            result }
+        data:            replace }
     end
   end
 
