@@ -30,11 +30,11 @@ class Suggest
       def import
         errors = []
         Lookup.distinct('molecular_annotation.symbol').each_slice(1000) do |group|
-          request = { index:   index_name,
-                      type:    document_type,
-                      body:    group.map { |symbol| { index: { data: { label: symbol } } } },
-                      refresh: true }
-          client.bulk(request)
+          request  = { index:   index_name,
+                       type:    document_type,
+                       body:    group.map { |symbol| { index: { data: { label: symbol } } } },
+                       refresh: true }
+          response = client.bulk(request)
           errors   += response['items'].select { |k, _| k.values.first['error'] }
         end
         errors
