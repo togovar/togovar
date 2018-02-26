@@ -22,10 +22,20 @@ class Lookup
 
       puts term
 
-      result = (term ? where(term.where) : all)
-                 .order_by(tgv_id: 'asc')
-                 .skip(start)
-                 .limit(length)
+      # Mongo
+      # result = (term ? where(term.where) : all)
+      #            .order_by(tgv_id: 'asc')
+      #            .skip(start)
+      #            .limit(length)
+
+      # Elasticsearch
+      result = if term
+                 body = term.query.merge(size: length, from: start)
+                 r = client.search(index: index_name, body: body)
+                 r['hits']['hits'].map { |x| x['_source'] }
+               else
+                 all.order_by(tgv_id: 'asc').skip(start).limit(length)
+               end
 
       # FIXME: insert SO label into base.variant_class
       replace = result.map do |r|

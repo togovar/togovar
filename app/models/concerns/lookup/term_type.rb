@@ -6,11 +6,19 @@ class Lookup
       def where
         { 'clinvar_info.conditions': { '$in': [term] } }
       end
+
+      def query
+        { query: { match: { 'clinvar_info.conditions': term } } }
+      end
     end
 
     SYMBOL = Struct.new(:term) do
       def where
         { 'molecular_annotation.symbol': /^#{term}$/i }
+      end
+
+      def query
+        { query: { match: { 'molecular_annotation.symbol': term } } }
       end
     end
 
@@ -18,11 +26,19 @@ class Lookup
       def where
         { 'base.existing_variation': /#{term}(,.*)?$/ }
       end
+
+      def query
+        { query: { match: { 'base.existing_variation': term } } }
+      end
     end
 
     TGV = Struct.new(:term) do
       def where
         { tgv_id: term }
+      end
+
+      def query
+        { query: { match: { tgv_id: term } } }
       end
     end
 
@@ -32,6 +48,17 @@ class Lookup
       def where
         { 'base.chromosome': chr, 'base.position': position }
       end
+
+      def query
+        {
+          query: {
+            bool: {
+              must: [{ match: { 'base.chromosome': chr } },
+                     { match: { 'base.position': position } }]
+            }
+          }
+        }
+      end
     end
 
     # @param [String] chr Chromosome
@@ -40,6 +67,18 @@ class Lookup
     REGION = Struct.new(:chr, :start, :stop) do
       def where
         { 'base.chromosome': chr, 'base.position': { '$gte': start, '$lte': stop } }
+      end
+
+      def query
+        {
+          query: {
+            bool: {
+              filter: [{ match: { 'base.chromosome': chr } },
+                       { range: { 'base.position': { gte: start } } },
+                       { range: { 'base.position': { lte: stop } } }]
+            }
+          }
+        }
       end
     end
 
