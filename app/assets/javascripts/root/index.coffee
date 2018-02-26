@@ -76,6 +76,8 @@ jQuery ($) ->
         defaultContent: ''
         render: (data, type, row, meta) ->
           if type == 'display'
+            unless data?
+              return ''
             return '<ul>' + ('<li>' + label + '</li>' for label in data).join('') + '</ul>';
           else
             return data
