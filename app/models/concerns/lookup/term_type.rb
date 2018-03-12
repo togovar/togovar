@@ -73,9 +73,11 @@ class Lookup
         {
           query: {
             bool: {
-              filter: [{ match: { 'base.chromosome': chr } },
-                       { range: { 'base.position': { gte: start } } },
-                       { range: { 'base.position': { lte: stop } } }]
+              must: [{ match: { 'base.chromosome': chr } },
+                     { range: { 'base.position': {
+                       gte: start,
+                       lte: stop
+                     } } }]
             }
           }
         }
@@ -93,22 +95,22 @@ class Lookup
       def term_type(str)
         return nil if str.blank?
         case str
-          when /^tgv(\d+)$/i
-            TGV.new(Regexp.last_match(1).to_i)
-          when /^rs\d+$/i
-            RS.new(str.downcase)
-          when /^(\d+|[XY]):(\d+)$/
-            m = Regexp.last_match
-            POSITION.new(m[1].to_s, m[2].to_i)
-          when /^(\d+|[XY]):(\d+)-(\d+)$/
-            m = Regexp.last_match
-            REGION.new(m[1].to_s, m[2].to_i, m[3].to_i)
+        when /^tgv(\d+)$/i
+          TGV.new(Regexp.last_match(1).to_i)
+        when /^rs\d+$/i
+          RS.new(str.downcase)
+        when /^(\d+|[XY]):(\d+)$/
+          m = Regexp.last_match
+          POSITION.new(m[1].to_s, m[2].to_i)
+        when /^(\d+|[XY]):(\d+)-(\d+)$/
+          m = Regexp.last_match
+          REGION.new(m[1].to_s, m[2].to_i, m[3].to_i)
+        else
+          if Lookup.where(SYMBOL.new(str).where).count.positive?
+            SYMBOL.new(str)
           else
-            if Lookup.where(SYMBOL.new(str).where).count.positive?
-              SYMBOL.new(str)
-            else
-              DISEASE.new(str)
-            end
+            DISEASE.new(str)
+          end
         end
       end
     end
