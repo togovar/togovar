@@ -1,8 +1,20 @@
-.col-sm-9.offset-sm-3.col-md-10.offset-md-2.pt-3
-  %a{ href: '#', target: '_blank' } Company Name
-
-  %address
-    Address:
-    Phone:
-
-  %span#copyright Copyright &copy; 2017 Company Name
+%footer.footer
+  .container-fluid
+    .row
+      .col-sm-3.col-md-2.hidden-xs-down
+      .col-sm-9.offset-sm-3.col-md-10.offset-md-2.pt-3
+        %a#rt-logo{:href => "#", :target => "_blank"} Company Name
+        %address
+          Address:
+          %a{:href => "#", :target => "_blank"}
+            %br>/
+            National Bioscience Database Center (NBDC)
+            %br>/
+            Japan Science and Technology Agency（JST）
+            %br/
+            5-3, Science Plaza 7F, Yonbancho, Chiyoda-ku, Tokyo 102-8666 Japan
+          %br/
+          Tel : +81-3-5214-8491
+          %br/
+          Fax : +81-3-5214-8470
+        %span#copyright Copyright© 2011 Japan Science and Technology Agency. All Rights Reserved.

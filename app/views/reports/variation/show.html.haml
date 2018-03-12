@@ -1,20 +1,19 @@
 = content_for :header do
+  = stylesheet_link_tag 'reports/variation/show', media: :all
   - Stanza.clinvar.nanostanza.each do |stanza|
     = stanza_link_tag(stanza.name)
   - Stanza.clinvar.togostanza.each do |stanza|
     = stanza_link_tag(stanza.name)
 
+#nav-wrapper
+  #navbar.navbar
+    .navbar-inner
+      %ul.nav
+        - Stanza.clinvar.togostanza.each do |stanza|
+          %li= link_to stanza.name, "##{stanza.name}"
 %main
-
-  %h1 Variation Report
-
   .container
-    #nav-wrapper
-      #navbar.navbar
-        .navbar-inner
-          %ul.nav
-            - Stanza.clinvar.togostanza.each do |stanza|
-              %li= link_to stanza.name, "##{stanza.name}"
+    %h1 Variation Report
 
     - Stanza.clinvar.togostanza.each do |stanza|
       %section{id: stanza.name}

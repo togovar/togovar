@@ -1,5 +1,6 @@
 = content_for :header do
   = stylesheet_link_tag 'root/index', media: :all
+  = javascript_include_tag 'root/index'
 
 .container-fluid
   .row
@@ -8,6 +9,3 @@
       = render partial: 'search'
       .spacer-10
       = render partial: 'result'
-
-= content_for :javascript do
-  = javascript_include_tag 'root/index'

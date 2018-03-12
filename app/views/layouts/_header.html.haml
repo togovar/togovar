@@ -1,4 +1,4 @@
-%nav.navbar.navbar-toggleable-md.navbar-inverse.fixed-top.bg-inverse
+%nav.navbar.navbar-toggleable-md.fixed-top
   %button.navbar-toggler.navbar-toggler-right{"aria-controls" => "navbarCollapse", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-target" => "#navbarCollapse", "data-toggle" => "collapse", :type => "button"}
     %span.navbar-toggler-icon
   = link_to TogoVar, root_path, { class: 'navbar-brand' }
@@ -6,3 +6,10 @@
     %ul.navbar-nav.mr-auto
       %li.nav-item
         .nav-link.disabled Prototype ver.
+      %li.nav-item.active
+        %a.nav-link{:href => "search"}
+          Search
+          %span.sr-only (current)
+      %li.nav-item.active
+        %a.nav-link{:href => "about"}
+          About
