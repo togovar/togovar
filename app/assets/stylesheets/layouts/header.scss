@@ -1,24 +1,52 @@
-/* Move down content because we have a fixed navbar that is 50px tall */
 body {
   padding-top: 50px;
 }
 
-.bg-inverse {
-  background-color: #292b2c !important;
-}
-
-a.bg-inverse:focus, a.bg-inverse:hover {
-  background-color: #101112 !important;
+.navbar {
+  position: relative;
+  background-color: #fff !important;
+  -webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+  padding: 0 15px;
 }
 
 .navbar-brand {
   display: inline-block;
   padding-top: .25rem;
   padding-bottom: .25rem;
-  margin-right: 1rem;
   font-size: 1.25rem;
   line-height: inherit;
   white-space: nowrap;
+  text-indent: -9999px;
+  background-image: url(togovar.png);
+  background-repeat: no-repeat;
+  width: 150px;
+  height: 40px;
+  margin-bottom: 3px;
+  margin-right: 0;
+}
+
+.navbar-light .navbar-toggler-icon {
+  background-color: #cacaca;
+}
+
+.navbar-toggler-right {
+  border: 1px solid rgba(135, 135, 135, 0.2) !important;
+  background-color: #e0e0e0;
+}
+
+.fixed-top {
+  position: fixed;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  padding-top: 4px;
+}
+
+.nav-item {
+  color: #999;
 }
 
 .navbar-brand:focus, .navbar-brand:hover {
@@ -33,48 +61,6 @@ a.bg-inverse:focus, a.bg-inverse:hover {
 .navbar-toggler-right {
   position: absolute;
   right: 1rem;
-}
-
-.navbar-inverse .navbar-brand,
-.navbar-inverse .navbar-toggler {
-  color: white;
-}
-
-.navbar-inverse .navbar-brand:focus, .navbar-inverse .navbar-brand:hover,
-.navbar-inverse .navbar-toggler:focus,
-.navbar-inverse .navbar-toggler:hover {
-  color: white;
-}
-
-.navbar-inverse .navbar-nav .nav-link {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.navbar-inverse .navbar-nav .nav-link:focus, .navbar-inverse .navbar-nav .nav-link:hover {
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.navbar-inverse .navbar-nav .nav-link.disabled {
-  color: rgba(255, 255, 255, 0.25);
-}
-
-.navbar-inverse .navbar-nav .open > .nav-link,
-.navbar-inverse .navbar-nav .active > .nav-link,
-.navbar-inverse .navbar-nav .nav-link.open,
-.navbar-inverse .navbar-nav .nav-link.active {
-  color: white;
-}
-
-.navbar-inverse .navbar-toggler {
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.navbar-inverse .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
-}
-
-.navbar-inverse .navbar-text {
-  color: rgba(255, 255, 255, 0.5);
 }
 
 @media (max-width: 575px) {

@@ -1,33 +1,39 @@
-/* Sticky footer styles
--------------------------------------------------- */
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-  /* Margin bottom by footer height */
-  margin-bottom: 110px;
-}
-
 footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  height: 110px;
-  line-height: 20px;
-  /* Vertically center the text there */
-  background-color: #f5f5f5;
+  position: relative;
+  background-color: #fff;
+  color: #000;
+  padding: 25px 25px 15px;
+  height: auto;
 }
 
-body > main {
-  padding: 15px 15px 0;
+footer address {
+  font-size: 12px;
+  line-height: 20px;
 }
 
 footer > .container {
-  padding-top: 15px;
-  padding-right: 15px;
-  padding-left: 15px;
+  padding: 0;
+  color: #000;
+}
+
+footer a {
+  text-decoration: underline;
+}
+
+footer a:hover {
+  color: #45b8cc;
+}
+
+#rt-logo {
+  height: 60px;
+  display: block;
+  text-indent: -9999px;
+  background-image: url(rt-logo.png);
+  background-size: 160px;
+  background-repeat: no-repeat;
+  margin-bottom: 10px;
+}
+
+#copyright {
+  font-size: 12px;
 }

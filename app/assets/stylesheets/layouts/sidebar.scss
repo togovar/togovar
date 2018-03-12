@@ -5,16 +5,10 @@
   left: 0;
   height: auto;
   z-index: 1000;
-  padding: 20px;
+  margin-top: 10px;
   overflow-x: hidden;
   overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-  border-right: 1px solid #eee;
-}
-
-/* Sidebar navigation */
-.sidebar {
-  padding-left: 0;
-  padding-right: 0;
+  padding: 0;
 }
 
 .sidebar .nav {
