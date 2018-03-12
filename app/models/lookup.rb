@@ -16,29 +16,25 @@ class Lookup
 
   class << self
     def list(params)
-      term   = term_type(params['term'].strip)
-      start  = params['start'].to_i || 0
-      length = params['length'].to_i || 10
-
-      puts term
-
-      # Mongo
-      # result = (term ? where(term.where) : all)
-      #            .order_by(tgv_id: 'asc')
-      #            .skip(start)
-      #            .limit(length)
+      term   = term_type((params['term'] || '').strip)
+      start  = (params['start'] || 0).to_i
+      length = (params['length'] || 10).to_i
 
       # Elasticsearch
-      result = if term
-                 body = term.query.merge(size: length, from: start)
-                 r = client.search(index: index_name, body: body)
-                 r['hits']['hits'].map { |x| x['_source'] }
-               else
-                 all.order_by(tgv_id: 'asc').skip(start).limit(length)
-               end
+      body = if term
+               term.query.merge(size: length, from: start)
+             else
+               { size: length,
+                 from: start }
+             end
+
+      result    = client.search(index: index_name, body: body)
+      hit_count = result['hits']['total']
+      sources   = result['hits']['hits'].map { |x| x['_source'] }
+      total     = client.count(index: index_name)
 
       # FIXME: insert SO label into base.variant_class
-      replace = result.map do |r|
+      replace = sources.map do |r|
         json = r.as_json
         if (base = r[:base])
           if (var_class = base[:variant_class])
@@ -52,8 +48,10 @@ class Lookup
         end
       end
 
-      { recordsTotal:    Base.all.count,
-        recordsFiltered: result.count,
+      filter_count = term ? hit_count : total['count']
+
+      { recordsTotal:    total['count'],
+        recordsFiltered: filter_count,
         data:            replace }
     end
   end
