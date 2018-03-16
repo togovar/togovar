@@ -4,12 +4,11 @@
   = link_to TogoVar, root_path, { class: 'navbar-brand' }
   #navbarCollapse.collapse.navbar-collapse
     %ul.navbar-nav.mr-auto
-      %li.nav-item
-        .nav-link.disabled Prototype ver.
       %li.nav-item.active
-        %a.nav-link{:href => "search"}
+        = link_to search_path, class: 'nav-link' do
           Search
           %span.sr-only (current)
-      %li.nav-item.active
-        %a.nav-link{:href => "about"}
-          About
+      %li.nav-item= link_to 'About', about_path, class: 'nav-link'
+      %li.nav-item= link_to 'Terms', terms_path, class: 'nav-link'
+      %li.nav-item= link_to 'Contact', contact_path, class: 'nav-link'
+      %li.nav-item= link_to 'FAQ', faq_path, class: 'nav-link'
