@@ -1,52 +1,53 @@
-%table#result.table.stripe.compact.nowrap
-  %thead
-    %tr
-      %th.cell-border{colspan: 7} Base Information
-      %th.cell-border{colspan: 2} Molecular Annotation
-      %th.cell-border{colspan: 2} ClinVar
-      %th.cell-border{colspan: 2} Alt Allele (JGA)
-      %th.cell-border{colspan: 2} Alt Allele (ToMMo)
-      %th.cell-border{colspan: 2} Alt Allele (HGVD)
-      %th.cell-border{colspan: 2} Alt Allele (ExAC)
-      %th.cell-border{colspan: 2} Function
-    %tr
-      -# Base Information
-      %th.cell-border ID
-      %th rs#
-      %th Type
-      %th Chr
-      %th Pos
-      %th Ref
-      %th Alt
+.table_wrapper.mt-4
+  %table#result.table.stripe.compact.nowrap
+    %thead
+      %tr
+        %th.cell-border{colspan: 7} Base Information
+        %th.cell-border{colspan: 2} Molecular Annotation
+        %th.cell-border{colspan: 2} ClinVar
+        %th.cell-border{colspan: 2} Alt Allele (JGA)
+        %th.cell-border{colspan: 2} Alt Allele (ToMMo)
+        %th.cell-border{colspan: 2} Alt Allele (HGVD)
+        %th.cell-border{colspan: 2} Alt Allele (ExAC)
+        %th.cell-border{colspan: 2} Function
+      %tr
+        -# Base Information
+        %th.cell-border ID
+        %th rs#
+        %th Type
+        %th Chr
+        %th Pos
+        %th Ref
+        %th Alt
 
-      -# Annotations
-      %th.cell-border Symbol
-      %th Consequences
+        -# Annotations
+        %th.cell-border Symbol
+        %th Consequences
 
-      -# ClinVar
-      %th.cell-border Conditions
-      %th Pathogenicity
+        -# ClinVar
+        %th.cell-border Conditions
+        %th Pathogenicity
 
-      -# JGA
-      %th.cell-border Count
-      %th Freq
+        -# JGA
+        %th.cell-border Count
+        %th Freq
 
-      -# Tommo
-      %th.cell-border Count
-      %th Freq
+        -# Tommo
+        %th.cell-border Count
+        %th Freq
 
-      -# HGVD
-      %th.cell-border Count
-      %th Freq
+        -# HGVD
+        %th.cell-border Count
+        %th Freq
 
-      -# ExAC
-      %th.cell-border Count
-      %th Freq
+        -# ExAC
+        %th.cell-border Count
+        %th Freq
 
-      -# Function
-      %th.cell-border SIFT
-      %th Polyphen
-  %tbody
+        -# Function
+        %th.cell-border SIFT
+        %th Polyphen
+    %tbody
 
 = content_for :javascript do
   :coffee

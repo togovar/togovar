@@ -1,7 +1,7 @@
 !!!
 %html
   %head
-    %title TogoVar
+    %title= title(yield(:title))
     %meta{ charset: 'utf-8' }
     = csrf_meta_tags
     = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload'
@@ -9,10 +9,6 @@
     = yield :header
   %body
     = render partial: 'layouts/header'
-
     = yield
-
-    %footer.footer
-      = render partial: 'layouts/footer'
-
+    = render partial: 'layouts/footer'
     = yield :javascript
