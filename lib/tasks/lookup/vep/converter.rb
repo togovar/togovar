@@ -153,6 +153,7 @@ module Tasks
         end
 
         def consequences(str)
+          return nil unless filter_blank(str)
           str.split(',').map { |x| SequenceOntology.find_by_label(x).id }.compact
         end
 
