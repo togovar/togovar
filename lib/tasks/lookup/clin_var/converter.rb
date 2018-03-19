@@ -1,10 +1,10 @@
 require 'csv'
-require 'tasks/lookup/importer_base'
+require 'tasks/lookup/converter_base'
 
 module Tasks
   module Lookup
     module ClinVar
-      class Converter < ImporterBase
+      class Converter < ConverterBase
         class << self
           def convert(*args, &block)
             new(*args).start(&block)
@@ -46,13 +46,13 @@ module Tasks
                 yield lookup.to_rdf
               rescue StandardError => e
                 msg = e.message
-                msg << " allele_id: #{id}"
+                msg << " tgv_id: #{tgv_id}"
                 log(msg, :error)
                 raise e
+              ensure
+                thread[:done] = @csv.lineno if thread
               end
             end
-
-            thread[:done] = @io.lineno if thread
           end
         end
 
@@ -63,7 +63,7 @@ module Tasks
             @csv = CSV.new(f, col_sep: ' ', skip_lines: '^#')
             @csv.each(&block)
           end
-          @io = nil
+          @csv = nil
         end
 
         def sparql(alleles)

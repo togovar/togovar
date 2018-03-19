@@ -3,7 +3,7 @@ require 'zlib'
 
 module Tasks
   module Lookup
-    class ImporterBase
+    class ConverterBase
       class << self
         attr_accessor :logger
       end

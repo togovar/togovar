@@ -40,7 +40,7 @@ namespace :lookup do
   end
 
   namespace :vep do
-    desc 'convert vep information'
+    desc 'convert VEP annotation'
     task :convert, %w[in out] => :environment do |task, args|
       file_in  = args[:in] || raise("Usage: rake #{task.name}[in out]")
       file_out = args[:out] || "#{File.basename(file_in)}.nt"
@@ -63,7 +63,7 @@ namespace :lookup do
   end
 
   namespace :clinvar do
-    desc 'convert ClinVar information'
+    desc 'convert ClinVar data'
     task :convert, %w[in out] => :environment do |task, args|
       file_in  = args[:in] || raise("Usage: rake #{task.name}[in out]")
       file_out = args[:out] || "#{File.basename(file_in)}.nt"
@@ -86,34 +86,48 @@ namespace :lookup do
   end
 
   namespace :exac do
-    desc 'import ExAC information'
-    task :import, ['path'] => :environment do |task, args|
-      file = args[:path] || raise("Usage: rake #{task.name}[file_path]")
-      raise("Cannot open #{file}") unless File.file?(file)
+    desc 'convert ExAC data'
+    task :convert, %w[in out] => :environment do |task, args|
+      file_in  = args[:in] || raise("Usage: rake #{task.name}[in out]")
+      file_out = args[:out] || "#{File.basename(file_in)}.nt"
 
-      require 'tasks/lookup/ex_ac/importer'
+      require 'tasks/lookup/ex_ac/converter'
 
       log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
 
-      Tasks::Lookup::ExAC::Importer.logger = Logger.new(log_file, 'daily')
+      Tasks::Lookup::ExAC::Converter.logger = Logger.new(log_file, 'daily')
+      Rails.logger                          = Tasks::Lookup::ExAC::Converter.logger
 
-      Tasks::Lookup::ExAC::Importer.import(file, progress: STDOUT.tty?)
+      File.open(file_out, 'w') do |file|
+        RDF::Writer.for(file_name: file_out).new(file) do |writer|
+          Tasks::Lookup::ExAC::Converter.convert(file_in, progress: STDOUT.tty?) do |rdf|
+            writer << rdf
+          end
+        end
+      end
     end
   end
 
   namespace :jga do
-    desc 'import ExAC information'
-    task :import, ['path'] => :environment do |task, args|
-      file = args[:path] || raise("Usage: rake #{task.name}[file_path]")
-      raise("Cannot open #{file}") unless File.file?(file)
+    desc 'convert ExAC data'
+    task :convert, %w[in out] => :environment do |task, args|
+      file_in  = args[:in] || raise("Usage: rake #{task.name}[in out]")
+      file_out = args[:out] || "#{File.basename(file_in)}.nt"
 
-      require 'tasks/lookup/jga/importer'
+      require 'tasks/lookup/jga/converter'
 
       log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
 
-      Tasks::Lookup::JGA::Importer.logger = Logger.new(log_file, 'daily')
+      Tasks::Lookup::JGA::Converter.logger = Logger.new(log_file, 'daily')
+      Rails.logger                         = Tasks::Lookup::JGA::Converter.logger
 
-      Tasks::Lookup::JGA::Importer.import(file, progress: STDOUT.tty?)
+      File.open(file_out, 'w') do |file|
+        RDF::Writer.for(file_name: file_out).new(file) do |writer|
+          Tasks::Lookup::JGA::Converter.convert(file_in, progress: STDOUT.tty?) do |rdf|
+            writer << rdf
+          end
+        end
+      end
     end
   end
 end

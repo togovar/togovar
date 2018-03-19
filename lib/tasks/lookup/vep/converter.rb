@@ -1,12 +1,12 @@
 require 'csv'
-require 'tasks/lookup/importer_base'
+require 'tasks/lookup/converter_base'
 
 require 'awesome_print'
 
 module Tasks
   module Lookup
     module Vep
-      class Converter < ImporterBase
+      class Converter < ConverterBase
         class << self
           def convert(*args, &block)
             new(*args).start(&block)
@@ -43,12 +43,12 @@ module Tasks
             rescue StandardError => e
               msg = e.message
               msg << " at line #{@io.lineno},"
-              msg << " data: #{@line}"
+              msg << " tgv_id: #{r[:tgv_id]}"
               log(msg, :error)
               raise e
+            ensure
+              thread[:done] = @io.lineno if thread
             end
-
-            thread[:done] = @io.lineno if thread
           end
         end
 
