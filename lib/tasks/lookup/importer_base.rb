@@ -18,13 +18,13 @@ module Tasks
         raise("Unknown options: #{options.inspect}") unless options.empty?
       end
 
-      def start
+      def start(&block)
         log("start import #{@file_path}", :info)
 
         if @show_progress
-          task_with_progress
+          task_with_progress(&block)
         else
-          task(nil)
+          task(nil, &block)
         end
 
         log("finish #{@file_path}", :info)
@@ -36,14 +36,15 @@ module Tasks
         # OVERRIDE ME
       end
 
-      def task_with_progress
+      def task_with_progress(&block)
         Thread.abort_on_exception = false
 
         thread = Thread.new do
-          task(Thread.current)
+          task(Thread.current, &block)
         end
 
         progress = ProgressWrapper.new(format:     '%t|%B| %J%% %a (%E)',
+                                       output:     $stderr,
                                        proc_total: proc { thread.send(:[], :total) },
                                        proc_done:  proc { thread.send(:[], :done) })
 
@@ -64,10 +65,10 @@ module Tasks
 
       def reader
         case @file_path
-          when /\.gz$/
-            Zlib::GzipReader
-          else
-            File
+        when /\.gz$/
+          Zlib::GzipReader
+        else
+          File
         end
       end
 

@@ -40,70 +40,48 @@ namespace :lookup do
   end
 
   namespace :vep do
-    desc 'import basic information'
-    task :import, ['path'] => :environment do |task, args|
-      file = args[:path] || raise("Usage: rake #{task.name}[file_path]")
-      raise("Cannot open #{file}") unless File.file?(file)
+    desc 'convert vep information'
+    task :convert, %w[in out] => :environment do |task, args|
+      file_in  = args[:in] || raise("Usage: rake #{task.name}[in out]")
+      file_out = args[:out] || "#{File.basename(file_in)}.nt"
 
-      require 'tasks/lookup/vep/importer'
+      require 'tasks/lookup/vep/converter'
 
       log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
 
-      Tasks::Lookup::Vep::Importer.logger = Logger.new(log_file, 'daily')
+      Tasks::Lookup::Vep::Converter.logger = Logger.new(log_file, 'daily')
+      Rails.logger                         = Tasks::Lookup::Vep::Converter.logger
 
-      Tasks::Lookup::Vep::Importer.import(file, progress: STDOUT.tty?)
+      File.open(file_out, 'w') do |file|
+        RDF::Writer.for(file_name: file_out).new(file) do |writer|
+          Tasks::Lookup::Vep::Converter.convert(file_in, progress: STDOUT.tty?) do |rdf|
+            writer << rdf
+          end
+        end
+      end
     end
   end
 
   namespace :clinvar do
-    desc 'fetch ClinVar information'
-    task :fetch, ['path'] => :environment do |task, args|
-      file = args[:path] || raise("Usage: rake #{task.name}[file_path]")
-      raise("Cannot open #{file}") unless File.file?(file)
+    desc 'convert ClinVar information'
+    task :convert, %w[in out] => :environment do |task, args|
+      file_in  = args[:in] || raise("Usage: rake #{task.name}[in out]")
+      file_out = args[:out] || "#{File.basename(file_in)}.nt"
 
-      require 'tasks/lookup/clin_var/disease'
-
-      Rails.logger = Logger.new(File::NULL)
-
-      disease         = Tasks::Lookup::ClinVar::Disease.new
-      disease.alleles = File.readlines(file).map(&:chomp)
-
-      disease.tsv
-    end
-
-    desc 'merge ClinVar information into TogoVar'
-    task :merge_tgv, %w[path_to_id_map path_to_disease_list] => :environment do |task, args|
-      file1 = args[:path_to_id_map] || raise("Usage: rake #{task.name}[file_path]")
-      raise("Cannot open #{file1}") unless File.file?(file1)
-
-      file2 = args[:path_to_disease_list] || raise("Usage: rake #{task.name}[file_path]")
-      raise("Cannot open #{file2}") unless File.file?(file2)
-
-      require 'csv'
-
-      allele_to_tgv = File.readlines(file1).map { |x| x.chomp.split.reverse }.to_h
-
-      tsv = CSV.generate(col_sep: "\t") do |tsv|
-        CSV.foreach(file2, col_sep: "\t").each do |row|
-          allele_id = row[0]
-          tsv << [allele_to_tgv[allele_id], *row]
-        end
-      end
-      puts tsv
-    end
-
-    desc 'import ClinVar information'
-    task :import, ['path'] => :environment do |task, args|
-      file = args[:path] || raise("Usage: rake #{task.name}[file_path]")
-      raise("Cannot open #{file}") unless File.file?(file)
-
-      require 'tasks/lookup/clin_var/importer'
+      require 'tasks/lookup/clin_var/converter'
 
       log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
 
-      Tasks::Lookup::ClinVar::Importer.logger = Logger.new(log_file, 'daily')
+      Tasks::Lookup::ClinVar::Converter.logger = Logger.new(log_file, 'daily')
+      Rails.logger                             = Tasks::Lookup::ClinVar::Converter.logger
 
-      Tasks::Lookup::ClinVar::Importer.import(file, progress: STDOUT.tty?)
+      File.open(file_out, 'w') do |file|
+        RDF::Writer.for(file_name: file_out).new(file) do |writer|
+          Tasks::Lookup::ClinVar::Converter.convert(file_in, progress: STDOUT.tty?) do |rdf|
+            writer << rdf
+          end
+        end
+      end
     end
   end
 

@@ -5,11 +5,17 @@ module Tasks
   module Lookup
     module ClinVar
       class Disease
-        include Queryable
-
         attr_accessor :alleles
 
-        EP = 'http://ep.dbcls.jp/sparql72hv'.freeze
+        EP_URL = 'localhost:8890/sparql'.freeze
+
+        def fetch
+          return nil if alleles.blank?
+
+          Array(alleles).each_slice(300) do |g|
+            Disease.query(sparql(g), endpoint: EP_URL)
+          end
+        end
 
         # write TSV to STDOUT
         def tsv
@@ -18,9 +24,9 @@ module Tasks
           progress
 
           Array(alleles).each_slice(300) do |g|
-            tsv = CSV.generate(col_sep: "\t") do |tsv|
-              Disease.query(sparql(g), endpoint: EP).each do |r|
-                tsv << [r[:allele_id], r[:significance], r[:phenotype]]
+            tsv = CSV.generate(col_sep: "\t") do |t|
+              Disease.query(sparql(g), endpoint: EP_URL).each do |r|
+                t << [r[:allele_id], r[:significance], r[:phenotype]]
               end
             end
             puts tsv
@@ -30,7 +36,7 @@ module Tasks
 
         def sparql(alleles)
           values = alleles.map { |x| "cv_allele:#{x}" }.join(' ')
-          <<-SPARQL
+          <<-SPARQL.strip_heredoc
             DEFINE sql:select-option "order"
             PREFIX dc: <http://purl.org/dc/terms/>
             PREFIX obo: <http://purl.obolibrary.org/obo/>
@@ -39,7 +45,7 @@ module Tasks
             PREFIX cv_allele: <http://purl.jp/bio/10/clinvar.allele/>
 
             SELECT DISTINCT ?allele_id ?significance ?phenotype
-            FROM <http://togogenome.org/variation/clinvar>
+            FROM <http://togovar.org/graph/clinvar>
             WHERE {
               VALUES ?allele { #{values} }
               ?allele dc:identifier ?allele_id ;

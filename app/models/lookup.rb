@@ -1,142 +1,50 @@
 class Lookup
-  include Mongoid::Document
+  extend ActiveModel::Naming
+  include ActiveModel::Validations
 
   include Lookup::Searchable
 
-  field :tgv_id
+  attr_accessor :tgv_id
 
-  embeds_one :base, class_name: 'Lookup::Base'
-  embeds_one :molecular_annotation, class_name: 'Lookup::MolecularAnnotation'
-  embeds_one :clinvar_info, class_name: 'Lookup::ClinVar' # FIXME
-  embeds_one :clinvar, class_name: 'Lookup::ExAC' # FIXME
-  embeds_one :jga, class_name: 'Lookup::JGA'
+  attr_accessor :base
+  attr_accessor :molecular_annotation
+  attr_accessor :clinvar
+  attr_accessor :exac
+  attr_accessor :jga
 
-  include VariantClass
-  include TermType
+  validates :tgv_id, presence: true, numericality: { only_integer: true,
+                                                     greater_than: 0 }
+  validates :base, allow_nil: true, type: { type: BaseInfo }
+  validates :molecular_annotation, allow_nil: true, type: { type: MolecularAnnotation }
+  validates :clinvar, allow_nil: true, type: { type: ClinVar }
+  validates :exac, allow_nil: true, type: { type: ExAC }
+  validates :jga, allow_nil: true, type: { type: JGA }
 
-  class << self
-    def list(params)
-      term   = term_type((params['term'] || '').strip)
-      start  = (params['start'] || 0).to_i
-      length = (params['length'] || 10).to_i
-
-      # Elasticsearch
-      body = if term
-               term.query.merge(size: length, from: start)
-             else
-               { size: length,
-                 from: start }
-             end
-
-      result    = client.search(index: index_name, body: body)
-      hit_count = result['hits']['total']
-      sources   = result['hits']['hits'].map { |x| x['_source'] }
-      total     = client.count(index: index_name)
-
-      # FIXME: insert SO label into base.variant_class
-      replace = sources.map do |r|
-        json = r.as_json
-        if (base = r[:base])
-          if (var_class = base[:variant_class])
-            base[:variant_class] = label(var_class)
-            json.merge(base: base)
-          else
-            json
-          end
-        else
-          json
-        end
-      end
-
-      filter_count = term ? hit_count : total['count']
-
-      { recordsTotal:    total['count'],
-        recordsFiltered: filter_count,
-        data:            replace }
+  def initialize(**attributes)
+    attributes.each do |k, v|
+      send("#{k}=", v)
     end
+    yield self if block_given?
   end
 
-  class Base
-    include Mongoid::Document
+  # @return [Array<RDF::Statement>]
+  def to_rdf
+    raise ValidationError unless valid?
 
-    field :chromosome
-    field :position, type: Integer
-    field :allele
-    field :existing_variation
-    field :variant_class
+    s = RDF::URI("http://togovar.org/variation/#{tgv_id}")
 
-    embedded_in :lookup, inverse_of: :base
-  end
+    graph = RDF::Graph.new
+    graph << [s, RDF::Vocab::DC.identifier, tgv_id]
 
-  class MolecularAnnotation
-    include Mongoid::Document
+    %i[base molecular_annotation clinvar exac jga].each do |attr|
+      data = method(attr).call
+      next if data.nil?
 
-    field :gene
-    field :symbol
+      bn = RDF::Node.new
+      graph << [s, TgvLookup[attr], bn]
+      graph.insert(*data.to_rdf(bn).statements)
+    end
 
-    embeds_many :transcripts
-
-    embedded_in :lookup, inverse_of: :molecular_annotation
-  end
-
-  class Transcript
-    include Mongoid::Document
-
-    field :consequences, type: Array
-    field :impact
-    field :hgvsc
-
-    embeds_one :sift
-    embeds_one :polyphen
-
-    embedded_in :molecular_annotation, inverse_of: :transcripts
-  end
-
-  class Sift
-    include Mongoid::Document
-
-    field :prediction
-    field :value, type: Float
-
-    embedded_in :transcript, inverse_of: :sift
-  end
-
-  class Polyphen
-    include Mongoid::Document
-
-    field :prediction
-    field :value, type: Float
-
-    embedded_in :transcript, inverse_of: :polyphen
-  end
-
-  class ClinVar
-    include Mongoid::Document
-
-    field :allele_id, type: Integer
-    field :significance
-    field :conditions, type: Array
-
-    embedded_in :lookup, inverse_of: :clinvar_info # FIXME
-  end
-
-  class ExAC
-    include Mongoid::Document
-
-    field :num_alt_alleles, type: Integer
-    field :num_alleles, type: Integer
-    field :frequency, type: Float
-
-    embedded_in :lookup, inverse_of: :clinvar # FIXME
-  end
-
-  class JGA
-    include Mongoid::Document
-
-    field :num_alt_alleles, type: Integer
-    field :num_alleles, type: Integer
-    field :frequency, type: Float
-
-    embedded_in :lookup, inverse_of: :jga
+    graph
   end
 end
