@@ -63,7 +63,6 @@ module Tasks
             @csv = CSV.new(f, col_sep: ' ', skip_lines: '^#')
             @csv.each(&block)
           end
-          @csv = nil
         end
 
         def sparql(alleles)
