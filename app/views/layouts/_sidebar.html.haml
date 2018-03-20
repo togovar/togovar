@@ -4,81 +4,34 @@
       .card-header.p-2
         Variant Type
       .card-body.p-2
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'variant_type_1', value: '1'}/
-          %label.form-check-label{for: 'variant_type_1'}
-            SNV
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'variant_type_2', value: '1'}/
-          %label.form-check-label{for: 'variant_type_2'}
-            insertion
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'variant_type_3', value: '1'}/
-          %label.form-check-label{for: 'variant_type_3'}
-            deletion
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'variant_type_4', value: '1'}/
-          %label.form-check-label{for: 'variant_type_4'}
-            duplication
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'variant_type_5', value: '1'}/
-          %label.form-check-label{for: 'variant_type_5'}
-            indel
+        - %w[snv insertion deletion indel substitution sequence_alteration].each do |x|
+          .form-check
+            %input.form-check-input{type: 'checkbox', id: "variant_type_#{x}", value: '1'}/
+            %label.form-check-label{for: "variant_type_#{x}", class: "filter_icon variant_type_#{x}"}
+              = filter_label_for(x)
 
     .card.m-2
       .card-header.p-2
         Data Set
       .card-body.p-2
         .form-check
-          %input.form-check-input{type: 'checkbox', id: 'data_set_1', value: '1'}/
-          %label.form-check-label{for: 'data_set_1'}
-            JGA
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'data_set_2', value: '1'}/
-          %label.form-check-label{for: 'data_set_2'}
-            ToMMo 3.5KJPN
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'data_set_3', value: '1'}/
-          %label.form-check-label{for: 'data_set_3'}
-            HGVD
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'data_set_4', value: '1'}/
-          %label.form-check-label{for: 'data_set_4'}
-            ExAC
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'data_set_5', value: '1'}/
-          %label.form-check-label{for: 'data_set_5'}
-            ClinVar
+        - %w[togovar tommo hgvd exac].each do |x|
+          .form-check
+            %input.form-check-input{type: 'checkbox', id: "source_#{x}", value: '1'}/
+            %label.form-check-label{for: "source_#{x}", class: "filter_icon source_#{x}"}
+              = filter_label_for(x)
 
     .card.m-2
       .card-header.p-2
         Clinical Significance
       .card-body.p-2
         .form-check
-          %input.form-check-input{type: 'checkbox', id: 'significance_1', value: '1'}/
-          %label.form-check-label{for: 'significance_1'}
-            Conflicting interpretations
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'significance_2', value: '1'}/
-          %label.form-check-label{for: 'significance_2'}
-            Benign
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'significance_3', value: '1'}/
-          %label.form-check-label{for: 'significance_3'}
-            Likely benign
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'significance_4', value: '1'}/
-          %label.form-check-label{for: 'significance_4'}
-            Uncertain significance
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'significance_5', value: '1'}/
-          %label.form-check-label{for: 'significance_5'}
-            Likely pathogenic
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'significance_6', value: '1'}/
-          %label.form-check-label{for: 'significance_6'}
-            Pathogenic
-        .form-check
-          %input.form-check-input{type: 'checkbox', id: 'significance_7', value: '1'}/
-          %label.form-check-label{for: 'significance_7'}
-            Risk factor
+        :ruby
+          significances = %w[benign likely_benign uncertain_significance likely_pathogenic pathogenic
+                             conflicting_interpretations_of_pathogenicity drug_response association risk_factor
+                             protective affects conflicting_data_from_submitters other not_provided]
+        - significances.each do |x|
+          .form-check
+            %input.form-check-input{type: 'checkbox', id: "significance_#{x}", value: '1'}/
+            %label.form-check-label{for: "significance_#{x}", class: "filter_icon significance_#{x}"}
+              = filter_label_for(x)
