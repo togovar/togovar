@@ -675,3 +675,51 @@ only screen and (min-device-pixel-ratio: 2),
   background-size: 30px;
 }
 
+/* Nano Stanza
+ -------------------------------- */
+#nanostanzas {
+  margin-bottom: 30px;
+}
+.nanostanza-container {
+  height: 160px;
+  background: url('loading.gif') no-repeat 50% 50% #fff;
+  -webkit-box-shadow: 0 2px 2px rgba(0,0,0,.2);
+  -moz-box-shadow: 0 2px 2px rgba(0,0,0,.2);
+  box-shadow: 0 2px 2px rgba(0,0,0,.2);
+  display: inline-block;
+  margin: 0 2px 2px 0;
+  float: none;
+}
+
+.nanostanza-container iframe {
+  border: none;
+  margin: 0;
+  height: 160px;
+  -moz-transition: -ms-transform .2s ease-out 0, opacity .2s ease-out 0;
+  -webkit-transition: -webkit-transform .2s ease-out 0, opacity .2s ease-out 0;
+  -o-transition: -o-transform .2s ease-out 0, opacity .2s ease-out 0;
+  -ms-transition: -ms-transform .2s ease-out 0, opacity .2s ease-out 0;
+  transition: transform .2s ease-out 0, opacity .2s ease-out 0;
+}
+
+.nanostanza-container iframe.unload {
+  opacity: 0;
+  transform: scale(.5);
+}
+
+.nanostanza-container iframe,
+.nanostanza-container[data-nanostanza-span="1"] iframe {
+  width: 160px !important;
+}
+
+.nanostanza-container[data-nanostanza-span="2"] iframe {
+  width: 326px !important;
+}
+
+.nanostanza-container[data-nanostanza-span="3"] iframe {
+  width: 492px !important;
+}
+
+.nanostanza-container[data-nanostanza-span="4"] iframe {
+  width: 658px !important;
+}

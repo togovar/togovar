@@ -142,8 +142,9 @@
           {
             data: '.base.allele'
             render: (data, type, row, meta) ->
-              if data && data.length > 4
-                data = data.substr(0, 4).concat('...')
+              if type == 'display'
+                if data && data.length > 4
+                  data = data.substr(0, 4).concat('...')
               return data
           }
           ## End Base Information
@@ -151,6 +152,11 @@
           ## Molecular Annotation
           {
             data: '.molecular_annotation.symbol'
+            render: (data, type, row, meta) ->
+              if type == 'display'
+                if data
+                  data = '<a href="/gene/' + data + '">' + data + '</a>'
+              return data
           }
           {
             data: '.molecular_annotation.transcripts.[].consequences.[].label'
