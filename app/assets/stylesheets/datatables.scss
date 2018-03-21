@@ -27,6 +27,11 @@ div#result_wrapper .dataTables_processing {
   border-radius: 4px;
 }
 
+.dataTables_wrapper ul {
+  list-style: none;
+  padding: 0;
+}
+
 .dataTables_wrapper .dataTables_info {
   position: relative;
   padding: 3px 0 0 5px;
@@ -307,3 +312,174 @@ $color_pale_blue: #ecf8fa;
 .pagination-slider-dotted-line-right {
   border-top: dashed 1px $color_base_blue;
 }
+
+.frequency7 {
+  display: inline-block;
+  width: 15px;
+  height: 36px;
+  position: relative;
+  margin: 0 2px;
+}
+
+.frequency4 {
+  display: inline-block;
+  width: 15px;
+  height: 37px;
+  position: relative;
+  margin: 0 2px;
+}
+
+.tgv_frequency {
+  background: #65B7C9;
+}
+
+.tommo_frequency {
+  background: #C88298;
+}
+
+.hgvd_frequency {
+  background: #3A6EB8;
+}
+
+.exac_frequency {
+  background: #668A41;
+}
+
+.frequency_none {
+  background: none !important;
+}
+
+.frequency_1_7:before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 13px;
+  height: 4px;
+  left: 1px;
+  top: 1px;
+  background: #FFF;
+  box-shadow:
+          0 5px 0 #FFF,
+          0 10px 0 #FFF,
+          0 15px 0 #FFF,
+          0 20px 0 #FFF,
+          0 25px 0 #FFF;
+}
+
+.frequency_2_7:before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 13px;
+  height: 4px;
+  left: 1px;
+  top: 1px;
+  background: #FFF;
+  box-shadow:
+          0 5px 0 #FFF,
+          0 10px 0 #FFF,
+          0 15px 0 #FFF,
+          0 20px 0 #FFF;
+}
+
+.frequency_3_7:before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 13px;
+  height: 4px;
+  left: 1px;
+  top: 1px;
+  background: #FFF;
+  box-shadow:
+          0 5px 0 #FFF,
+          0 10px 0 #FFF,
+          0 15px 0 #FFF;
+}
+
+.frequency_4_7:before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 13px;
+  height: 4px;
+  left: 1px;
+  top: 1px;
+  background: #FFF;
+  box-shadow:
+          0 5px 0 #FFF,
+          0 10px 0 #FFF;
+}
+
+.frequency_5_7:before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 13px;
+  height: 4px;
+  left: 1px;
+  top: 1px;
+  background: #FFF;
+  box-shadow:
+          0 5px 0 #FFF;
+}
+
+.frequency_6_7:before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 13px;
+  height: 4px;
+  left: 1px;
+  top: 1px;
+  background: #FFF;
+}
+
+.frequency_7_7:before {
+  content: "";
+  display: block;
+}
+
+.frequency_1_4:before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 13px;
+  height: 8px;
+  left: 1px;
+  top: 1px;
+  background: #FFF;
+  box-shadow:
+          0 9px 0 #FFF,
+          0 18px 0 #FFF;
+}
+
+.frequency_2_4:before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 13px;
+  height: 8px;
+  left: 1px;
+  top: 1px;
+  background: #FFF;
+  box-shadow:
+          0 9px 0 #FFF;
+}
+
+.frequency_3_4:before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 13px;
+  height: 8px;
+  left: 1px;
+  top: 1px;
+  background: #FFF;
+}
+
+.frequency_4_4:before {
+  content: "";
+  display: block;
+}
+

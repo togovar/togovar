@@ -2,9 +2,11 @@
   %table#result.table.stripe.compact.nowrap
     %thead
       %tr
-        %th.cell-border{colspan: 7} Base Information
+        %th.cell-border{colspan: 4} Base Information
         %th.cell-border{colspan: 2} Molecular Annotation
         %th.cell-border{colspan: 2} ClinVar
+        %th.cell-border Frequencies
+        %th.cell-border Frequencies
         %th.cell-border{colspan: 2} Alt Allele (JGA)
         %th.cell-border{colspan: 2} Alt Allele (ToMMo)
         %th.cell-border{colspan: 2} Alt Allele (HGVD)
@@ -13,20 +15,21 @@
       %tr
         -# Base Information
         %th.cell-border ID
-        %th rs#
         %th Type
-        %th Chr
-        %th Pos
-        %th Ref
-        %th Alt
+        %th Position
+        %th Allele
 
         -# Annotations
         %th.cell-border Symbol
         %th Consequences
 
         -# ClinVar
-        %th.cell-border Conditions
-        %th Pathogenicity
+        %th.cell-border
+        %th Conditions
+
+        -# Frequencies
+        %th.cell-border
+        %th.cell-border
 
         -# JGA
         %th.cell-border Count
@@ -51,8 +54,54 @@
 
 = content_for :javascript do
   :coffee
+    frequency7 = (f, c) ->
+      if c == 1
+        return 'frequency_1_7'
+      else if f < 0.0001
+        return 'frequency_2_7'
+      else if f < 0.001
+        return 'frequency_3_7'
+      else if f < 0.01
+        return 'frequency_4_7'
+      else if f < 0.05
+        return 'frequency_5_7'
+      else if f < 0.5
+        return 'frequency_6_7'
+      else if f >= 0.5
+        return 'frequency_7_7'
+      else
+        return 'frequency_none'
+
+    frequency4 = (f, c) ->
+      if f < 0.01
+        return 'frequency_1_4'
+      else if f < 0.05
+        return 'frequency_2_4'
+      else if f < 0.5
+        return 'frequency_3_4'
+      else if f >= 0.5
+        return 'frequency_4_4'
+      else
+        return 'frequency_none'
+
+    sift_class = (v) ->
+      if v < 0.05
+        return 'sift_deleterious'
+      else
+        return 'sift_tolerated'
+
+    polyphen_class = (v) ->
+      if v > 0.908
+        return 'polyphen_probably_damaging'
+      else if v > 0.446 && v <= 0.908
+        return 'polyphen_possibly_damaging'
+      else if v <= 0.446
+        return 'polyphen_benign'
+      else
+        return 'polyphen_unknown'
+
     $ ->
-      result_table = $("#result");
+      result_table = $('#result');
       result_table.DataTable
         ajax:
           url: '/list.json'
@@ -62,34 +111,40 @@
             data: 'tgv_id'
             render: (data, type, row, meta) ->
               if type == 'display'
-                if (row && row.clinvar_info && row.clinvar_info.allele_id)
-                  return '<a target="_blank" href="variation?allele_id=' + row.clinvar_info.allele_id + '">tgv' + data + '</a>'
-                return 'tgv' + data
-              else
-                return data
-          }
-          {
-            data: '.base.existing_variation'
+                html = '<ul>'
+                if row && row.clinvar_info && row.clinvar_info.allele_id
+                  tgv_id = "<a target='_blank' href='variation?allele_id=" + row.clinvar_info.allele_id + "'>tgv" + data + "</a>"
+                else
+                  tgv_id = "tgv" + data
+                html = html.concat('<li>', tgv_id, '</li>')
+                if row && row.base && row.base.existing_variation
+                  html = html.concat('<li class="text-muted">', row.base.existing_variation.split(',')[0], '</li>')
+                html = html.concat('</ul>')
+                return html
+              return data
           }
           {
             data: '.base.variant_class'
+            render: (data, type, row, meta) ->
+              if type == 'display'
+                data = '<span class="variant_type_' + data.replace(/\ /g, '_').toLowerCase() + '" />'
+              return data
           }
           {
             data: '.base.chromosome'
             className: 'dt-body-right'
-          }
-          {
-            data: '.base.position'
-            className: 'dt-body-right'
-          }
-          {
-          # ref
-          data: null
-          render: (data, type, row, meta) ->
-            return ''
+            render: (data, type, row, meta) ->
+              if type == 'display'
+                if row && row.base && row.base.position
+                  data = data.concat(':', row.base.position)
+              return data
           }
           {
             data: '.base.allele'
+            render: (data, type, row, meta) ->
+              if data && data.length > 4
+                data = data.substr(0, 4).concat('...')
+              return data
           }
           ## End Base Information
 
@@ -102,13 +157,24 @@
             render: (data, type, row, meta) ->
               if type == 'display'
                 consequences = [].concat.apply([], data).unique()
-                return '<ul>' + ('<li>' + label + '</li>' for label in consequences).join('') + '</ul>';
-              else
-                return data
+                data = '<ul>' + ('<li>' + label + '</li>' for label in consequences).join('') + '</ul>'
+              return data
           }
           ## End Molecular Annotation
 
           ## ClinVar Annotation
+          {
+            data: '.clinvar_info.significance'
+            defaultContent: ''
+            className: 'dt-body-center'
+            render: (data, type, row, meta) ->
+              if type == 'display'
+                unless data?
+                  return ''
+                return '<span class="significance_' + data.replace(/\ /g, '_').toLowerCase() + '" />'
+              else
+                return data
+          }
           {
             data: '.clinvar_info.conditions'
             defaultContent: ''
@@ -116,15 +182,68 @@
               if type == 'display'
                 unless data?
                   return ''
-                return '<ul>' + ('<li>' + label + '</li>' for label in data).join('') + '</ul>';
+                return '<ul>' + ('<li>' + label + '</li>' for label in data).join('') + '</ul>'
               else
                 return data
           }
-          {
-            data: '.clinvar_info.significance'
-            defaultContent: ''
-          }
           ## End ClinVar Annotation
+
+          ## Frequencies
+          {
+            data: null
+            defaultContent: ''
+            render: (data, type, row, meta) ->
+              if type == 'display'
+                html = ''
+                if row.jga
+                  f = frequency7(row.jga.frequency, row.jga.num_alt_alleles)
+                else
+                  f = 'frequency_none'
+                html = html.concat('<span class="frequency7 tgv_frequency ' + f + '"></span>')
+                if row.tommo
+                  f = frequency7(row.tommo.frequency, row.tommo.num_alt_alleles)
+                else
+                  f = 'frequency_none'
+                html = html.concat('<span class="frequency7 tommo_frequency ' + f + '"></span>')
+                if row.hgvd
+                  f = frequency7(row.hgvd.frequency, row.hgvd.num_alt_alleles)
+                else
+                  f = 'frequency_none'
+                html = html.concat('<span class="frequency7 hgvd_frequency ' + f + '"></span>')
+                if row.clinvar
+                  f = frequency7(row.clinvar.frequency, row.clinvar.num_alt_alleles)
+                else
+                  f = 'frequency_none'
+                html = html.concat('<span class="frequency7 exac_frequency ' + f + '"></span>')
+          }
+          {
+            data: null
+            defaultContent: ''
+            render: (data, type, row, meta) ->
+              if type == 'display'
+                html = ''
+                if row.jga
+                  f = frequency4(row.jga.frequency, row.jga.num_alt_alleles)
+                else
+                  f = 'frequency_none'
+                html = html.concat('<span class="frequency4 tgv_frequency ' + f + '"></span>')
+                if row.tommo
+                  f = frequency4(row.tommo.frequency, row.tommo.num_alt_alleles)
+                else
+                  f = 'frequency_none'
+                html = html.concat('<span class="frequency4 tommo_frequency ' + f + '"></span>')
+                if row.hgvd
+                  f = frequency4(row.hgvd.frequency, row.hgvd.num_alt_alleles)
+                else
+                  f = 'frequency_none'
+                html = html.concat('<span class="frequency4 hgvd_frequency ' + f + '"></span>')
+                if row.clinvar
+                  f = frequency4(row.clinvar.frequency, row.clinvar.num_alt_alleles)
+                else
+                  f = 'frequency_none'
+                html = html.concat('<span class="frequency4 exac_frequency ' + f + '"></span>')
+          }
+          ## End Frequencies
 
           ## JGA
           {
@@ -185,14 +304,18 @@
             render: (data, type, row, meta) ->
               if type == 'display'
                 list = data.filter (x) -> x
-                return '<ul>' + ('<li>' + sift.prediction + '(' + sift.value + ')' + '</li>' for sift in list).join('') + '</ul>'
+                return ('<div class="' + sift_class(sift.value) + '">' + sift.value + '</div>' for sift in list).join('')
               else
                 return data
           }
           {
-            data: null
+            data: '.molecular_annotation.transcripts.[].polyphen'
             render: (data, type, row, meta) ->
-              return ''
+              if type == 'display'
+                list = data.filter (x) -> x
+                return ('<div class="' + polyphen_class(polyphen.value) + '">' + polyphen.value + '</div>' for polyphen in list).join('')
+              else
+                return data
           }
           ## End Function
         ]

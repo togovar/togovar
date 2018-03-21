@@ -7,7 +7,7 @@
         - %w[snv insertion deletion indel substitution sequence_alteration].each do |x|
           .form-check
             %input.form-check-input{type: 'checkbox', id: "variant_type_#{x}", value: '1'}/
-            %label.form-check-label{for: "variant_type_#{x}", class: "filter_icon variant_type_#{x}"}
+            %label.form-check-label{for: "variant_type_#{x}", class: "variant_type_#{x}"}
               = filter_label_for(x)
 
     .card.m-2
@@ -18,7 +18,7 @@
         - %w[togovar tommo hgvd exac].each do |x|
           .form-check
             %input.form-check-input{type: 'checkbox', id: "source_#{x}", value: '1'}/
-            %label.form-check-label{for: "source_#{x}", class: "filter_icon source_#{x}"}
+            %label.form-check-label{for: "source_#{x}", class: "source_#{x}"}
               = filter_label_for(x)
 
     .card.m-2
@@ -33,5 +33,22 @@
         - significances.each do |x|
           .form-check
             %input.form-check-input{type: 'checkbox', id: "significance_#{x}", value: '1'}/
-            %label.form-check-label{for: "significance_#{x}", class: "filter_icon significance_#{x}"}
+            %label.form-check-label{for: "significance_#{x}", class: "significance_#{x}"}
               = filter_label_for(x)
+
+    .card.m-2
+      .card-header.p-2
+        Alternative Allele Frequency
+      .card-body.p-2
+        %select{:name => "frequency_data_source"}
+          %option{:value => "togovar"} TogoVar
+          %option{:value => "tommo"} ToMMo 3.5KJPN
+          %option{:value => "hgvd"} HGVD
+          %option{:value => "exac"} ExAC
+        %select{:name => "frequency_relation"}
+          %option{:value => "eq"} =
+          %option{:value => "lt"} <
+          %option{:value => "gt"} >
+          %option{:value => "le"} <=
+          %option{:value => "ge"} >=
+        %input{size: 6, placeholder: 'ex: 0.1'}
