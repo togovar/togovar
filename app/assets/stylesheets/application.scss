@@ -364,3 +364,314 @@ only screen and (min-device-pixel-ratio: 2),
   -moz-box-shadow: none;
   box-shadow: none;
 }
+
+.variant_type_deletion:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/variant_type/deletion.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.variant_type_indel:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/variant_type/indel.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.variant_type_insertion:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/variant_type/insertion.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.variant_type_sequence_alteration:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/variant_type/sequence_alteration.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.variant_type_snv:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/variant_type/snv.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.variant_type_substitution:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/variant_type/substitution.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.source_clinvar:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/source/clinvar.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.source_exac:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/source/exac.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.source_hgvd:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/source/hgvd.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.source_togovar:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/source/togovar.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.source_tommo:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/source/tommo_3.5kjpn.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_affects:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/significance/affects.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_association:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/significance/association.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_benign:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/significance/benign.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_conflicting_data_from_submitters:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/significance/conflicting_data_from_submitters.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_conflicting_interpretations_of_pathogenicity:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/significance/conflicting_interpretations_of_pathogenicity.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_drug_response:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/significance/drug_response.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_likely_benign:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/significance/likely_benign.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_likely_pathogenic:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/significance/likely_pathogenic.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_not_provided:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/significance/not_provided.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_other:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/significance/other.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_pathogenic:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/significance/pathogenic.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_protective:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/significance/protective.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_risk_factor:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/significance/risk_factor.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_uncertain_significance:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/significance/uncertain_significance.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.sift_deleterious:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/sift/deleterious.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.sift_tolerated:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/sift/tolerated.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.polyphen_probably_damaging:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/polyphen/probably_damaging.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.polyphen_possibly_damaging:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/polyphen/possibly_damaging.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.polyphen_benign:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/polyphen/benign.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.polyphen_unknown:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/polyphen/unknown.png') no-repeat -6px;
+  background-size: 30px;
+}
+
