@@ -4,7 +4,6 @@ module Reports
 
     class << self
       def variation_id_for_allele(allele_id)
-        # FIXME: Endpoint URL
         result = query(<<-SPARQL)
           DEFINE sql:select-option "order"
           PREFIX dcterms: <http://purl.org/dc/terms/>
