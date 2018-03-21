@@ -4,7 +4,8 @@ module Reports
 
     class << self
       def variation_id_for_allele(allele_id)
-        result = query(<<-SPARQL, endpoint: 'http://ep.dbcls.jp/sparql72hv')
+        # FIXME: Endpoint URL
+        result = query(<<-SPARQL)
           DEFINE sql:select-option "order"
           PREFIX dcterms: <http://purl.org/dc/terms/>
           PREFIX cvo: <http://purl.jp/bio/10/clinvar/>

@@ -1,27 +1,37 @@
-class Stanza < Settingslogic # :nodoc:
-  namespace Rails.env
+class Stanza < Settingslogic
   source File.join(Rails.root, 'config', 'stanza.yml')
+  namespace Rails.env
 
-  # @return [Hash]
-  def all
-    flat_map { |_, stanzas| stanzas.map(&:symbolize_keys) }
+  class ClinVar < Stanza
+    include Stanza::Base
   end
 
-  # @param [Hash] args
-  # @return [String, nil]
-  def tag(*args)
-    options = args.last.is_a?(Hash) ? args.pop : {}
-    make_tag("togostanza-#{name}", options)
+  attr_reader :name
+  attr_reader :label
+
+  def initialize(name, label, **options)
+    @name = name
+    @label = label
+    @options = options
   end
 
-  private
+  def link
+    tag = %(<link rel='import' href='http://#{Stanza.host}/stanza/)
+    tag << @name
+    tag << %(/' />)
+    tag.html_safe
+  end
 
-  def make_tag(tag_name, parameters = {})
-    param = if parameters
-              parameters.slice(*params.map(&:intern)).map do |k, v|
-                %(#{k}="#{v.to_s.gsub('"'.freeze, '&quot;'.freeze)}")
-              end.join(' ')
-            end
-    "<#{tag_name}#{" #{param}" if param.present?} />".html_safe
+  def tag
+    params = @options.map { |k, v| %(#{k}="#{v.to_s.gsub('"', '&quot;')}") }
+
+    tag = '<togostanza-'
+    tag << @name
+    if params.present?
+      tag << ' '
+      tag << params.join(' ')
+    end
+    tag << ' />'
+    tag.html_safe
   end
 end

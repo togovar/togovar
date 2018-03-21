@@ -1,0 +1,8 @@
+development: &default
+  host:
+
+test:
+  <<: *default
+
+production:
+  <<: *default
