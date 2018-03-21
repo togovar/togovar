@@ -106,7 +106,7 @@ class Lookup
           m = Regexp.last_match
           REGION.new(m[1].to_s, m[2].to_i, m[3].to_i)
         else
-          if Lookup.where(SYMBOL.new(str).where).count.positive?
+          if Lookup.count(SYMBOL.new(str).query).positive?
             SYMBOL.new(str)
           else
             DISEASE.new(str)
