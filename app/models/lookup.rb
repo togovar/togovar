@@ -29,7 +29,7 @@ class Lookup
 
   # @return [Array<RDF::Statement>]
   def to_rdf
-    raise ValidationError unless valid?
+    validate!
 
     s = RDF::URI("http://togovar.org/variation/#{tgv_id}")
 
