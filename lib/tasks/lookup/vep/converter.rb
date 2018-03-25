@@ -45,7 +45,6 @@ module Tasks
               msg << " at line #{@io.lineno},"
               msg << " tgv_id: #{r[:tgv_id]}"
               log(msg, :error)
-              raise e
             ensure
               thread[:done] = @io.lineno if thread
             end
