@@ -36,6 +36,7 @@ class Lookup
       validate!
 
       graph = RDF::Graph.new
+
       graph << [subject, TgvLookup.chromosome, chromosome]
       graph << [subject, TgvLookup.position, position]
       graph << [subject, TgvLookup.ref, reference] if reference

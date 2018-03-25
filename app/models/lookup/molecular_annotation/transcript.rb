@@ -25,12 +25,14 @@ class Lookup
         validate!
 
         graph = RDF::Graph.new
-        consequences.each do |x|
+
+        consequences&.each do |x|
           graph << [subject, TgvLookup.consequence, x]
         end
         graph << [subject, TgvLookup.hgvsc, hgvsc] if hgvsc
         graph << [subject, TgvLookup.sift, sift] if sift
         graph << [subject, TgvLookup.polyphen, polyphen] if polyphen
+
         graph
       end
     end

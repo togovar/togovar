@@ -42,8 +42,11 @@ module Tasks
               yield lookup.to_rdf
             rescue StandardError => e
               msg = e.message
-              msg << " at line #{@io.lineno},"
-              msg << " tgv_id: #{r[:tgv_id]}"
+              msg << " #{@file_path}" if @file_path
+              msg << " at line #{@io.lineno}," if @io.respond_to?(:lineno)
+              msg << " tgv_id: #{r[:tgv_id]}" if r[:tgv_id]
+              msg << "\n"
+              msg << e.backtrace.join("\n")
               log(msg, :error)
             ensure
               thread[:done] = @io.lineno if thread

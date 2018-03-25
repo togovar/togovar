@@ -25,13 +25,15 @@ class Lookup
       validate!
 
       graph = RDF::Graph.new
+
       graph << [subject, TgvLookup.allele_id, allele_id] if allele_id
-      significances.each do |x|
+      significances&.each do |x|
         graph << [subject, TgvLookup.significances, x]
       end
-      conditions.each do |x|
+      conditions&.each do |x|
         graph << [subject, TgvLookup.conditions, x]
       end
+
       graph
     end
   end

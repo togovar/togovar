@@ -24,7 +24,7 @@ class Lookup
       graph << [subject, TgvLookup.gene, gene] if gene
       graph << [subject, TgvLookup.symbol, symbol] if symbol
 
-      transcripts.each do |ts|
+      transcripts&.each do |ts|
         bn = RDF::Node.new
         graph << [subject, TgvLookup.transcript, bn]
         graph.insert(*ts.to_rdf(bn))

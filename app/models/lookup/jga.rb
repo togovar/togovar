@@ -24,9 +24,12 @@ class Lookup
       validate!
 
       graph = RDF::Graph.new
+
       graph << [subject, TgvLookup.num_alt_alleles, num_alt_alleles] if num_alt_alleles
       graph << [subject, TgvLookup.num_alleles, num_alleles] if num_alleles
       graph << [subject, TgvLookup.frequency, frequency] if frequency
+
+      graph
     end
   end
 end
