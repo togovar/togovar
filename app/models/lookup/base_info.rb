@@ -2,7 +2,7 @@ class Lookup
   class BaseInfo
     include ActiveModel::Validations
 
-    CHROMOSOME = (1..22).map(&:to_s).concat(%w[X Y]).freeze
+    CHROMOSOME = (1..22).map(&:to_s).concat(%w[X Y MT]).freeze
     NUCLEOBASE = /\A[ATGCURYMKSWBHVDN]+\z/
 
     attr_accessor :chromosome
