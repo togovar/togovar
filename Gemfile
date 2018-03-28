@@ -12,7 +12,6 @@ gem 'rails', '~> 5.1.2'
 # infrastructure
 gem 'elasticsearch-model', github: 'elastic/elasticsearch-rails', branch: '5.x'
 gem 'elasticsearch-rails', github: 'elastic/elasticsearch-rails', branch: '5.x'
-gem 'mongoid', '~> 6.2'
 gem 'puma', '~> 3.7'
 
 # javascript & stylesheet
