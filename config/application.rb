@@ -28,5 +28,9 @@ module TogoVar
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    console do
+      Rails.logger = Logger.new(STDOUT)
+    end
   end
 end
