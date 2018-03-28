@@ -8,9 +8,7 @@
 /.bundle
 
 # Ignore config
-/config/endpoint.yml
-/config/elasticsearch.yml
-/config/mongoid.yml
+/config/*.yml
 
 # Ignore compiled assets
 /public/assets
