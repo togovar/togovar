@@ -1,8 +1,6 @@
 require 'csv'
 require 'tasks/lookup/converter_base'
 
-require 'awesome_print'
-
 module Tasks
   module Lookup
     module Vep
