@@ -30,6 +30,7 @@ gem 'kaminari', '~> 1.0'
 gem 'linkeddata', '~> 3.0'
 gem 'ruby-progressbar', '~> 1.9'
 gem 'settingslogic', '~> 2.0'
+gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
 # optimisation
 gem 'redis-rails', '~> 5.0'
@@ -57,4 +58,12 @@ group :test do
   gem 'rspec-rails', '~> 3.7'
 end
 
-gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
+group :deployment do
+  gem 'capistrano', '~> 3.10', require: false
+  gem 'capistrano-bundler', '~> 1.3', require: false
+  gem 'capistrano-rails', '~> 1.3', require: false
+  gem 'capistrano-rbenv', '~> 2.1', require: false
+  gem 'capistrano-sidekiq', '~> 1.0', require: false
+  gem 'capistrano3-puma', '~> 3.1', require: false
+  gem 'capistrano3-unicorn', '~> 0.2.1', require: false
+end
