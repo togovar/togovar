@@ -27,8 +27,9 @@ module Tasks
             lookup = ::Lookup.new(tgv_id: hash[:tgv_id]) do |l|
               l.exac = ::Lookup::ExAC.new do |e|
                 e.num_alt_alleles = hash[:num_alt_alleles]
-                e.num_alleles = hash[:num_alleles]
-                e.frequency = hash[:frequency]
+                e.num_alleles     = hash[:num_alleles]
+                e.passed          = hash[:passed]
+                e.frequency       = hash[:frequency]
               end
             end
 
@@ -52,12 +53,17 @@ module Tasks
             @io = CSV.new(f, col_sep: ' ', skip_lines: '^#')
             @io.each do |r|
               hash = { tgv_id:          to_int(r[1].sub('tgv', '')),
-                       num_alt_alleles: to_int(r[6].split(',').first), # TODO
+                       num_alt_alleles: to_int(r[6]),
                        num_alleles:     to_int(r[7]),
-                       frequency:       to_float(r[9].split(',').first) } # TODO
+                       passed:          filter(r[31]),
+                       frequency:       to_float(r[32]) }
               yield hash
             end
           end
+        end
+
+        def filter(str)
+          str && str.match?(/PASS/)
         end
       end
     end

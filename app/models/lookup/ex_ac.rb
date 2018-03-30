@@ -4,12 +4,14 @@ class Lookup
 
     attr_accessor :num_alt_alleles
     attr_accessor :num_alleles
+    attr_accessor :passed
     attr_accessor :frequency
 
     validates :num_alt_alleles, numericality: { only_integer: true,
                                                 greater_than_or_equal_to: 0 }
     validates :num_alleles, numericality: { only_integer: true,
                                             greater_than_or_equal_to: 0 }
+    validates :passed, inclusion: { in: [true, false] }
     validates :frequency, numericality: { greater_than_or_equal_to: 0 }
 
     def initialize(**attributes)
@@ -27,6 +29,7 @@ class Lookup
 
       graph << [subject, TgvLookup.num_alt_alleles, num_alt_alleles] if num_alt_alleles
       graph << [subject, TgvLookup.num_alleles, num_alleles] if num_alleles
+      graph << [subject, TgvLookup.passed, passed]
       graph << [subject, TgvLookup.frequency, frequency] if frequency
 
       graph

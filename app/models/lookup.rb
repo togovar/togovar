@@ -43,10 +43,13 @@ class Lookup
       graph.insert(*data.to_rdf(s).statements)
     end
 
-    if clinvar
+    %i[clinvar exac].each do |name|
+      data = method(name).call
+      next unless data
+
       bn = RDF::Node.new
-      graph << [s, TgvLookup[:clinvar], bn]
-      graph.insert(*clinvar.to_rdf(s).statements)
+      graph << [s, TgvLookup[name], bn]
+      graph.insert(*data.to_rdf(bn).statements)
     end
 
     graph
