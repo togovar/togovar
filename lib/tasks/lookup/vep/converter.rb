@@ -100,34 +100,24 @@ module Tasks
         end
 
         def base(row)
+          chr, start, stop = row[1].split(/[:-]/)
           {
-            chromosome:    row[1].split(':')[0],
-            position:      to_int(position(row[1].split(':')[1])),
+            chromosome:    chr,
+            start:         to_int(start),
+            stop:          to_int(stop || start),
+            reference:     filter_blank(row[30]),
             alternative:   filter_blank(row[2]),
-            variant_class: variant_class(row[17]),
             rs:            rs_list(row[12])
           }
         end
 
         def molecular_annotation(row)
           {
-            gene:   filter_blank(row[3]),
-            symbol: filter_blank(row[18])
+            gene:          filter_blank(row[3]),
+            symbol:        filter_blank(row[18]),
+            symbol_source: filter_blank(row[19]),
+            hgvs_g:        filter_blank(row[26])
           }
-        end
-
-        # @return [Int, nil]
-        def position(str)
-          return nil unless filter_blank(str)
-          v = if (m = str.match(/(\d+)-\d+/))
-                msg = "position format: #{str}"
-                msg << " at line #{@io.lineno}"
-                log(msg, :warn)
-                m[1]
-              else
-                str
-              end
-          to_int(v)
         end
 
         # @return [Int, nil]
@@ -135,23 +125,24 @@ module Tasks
           SequenceOntology.find_by_label(str).id
         end
 
-        # @return [String, nil]
+        # @return [Array, nil]
         def rs_list(str)
           return nil unless filter_blank(str)
           rs = str.split(',').select { |x| x.match?(/^rs/) }
           return nil if rs.empty?
-          rs.join(',')
+          rs
         end
 
         # @return [Hash, nil]
         def transcript(row)
-          values = [consequences(row[6]),
+          values = [variant_class(row[17]),
+                    consequences(row[6]),
                     filter_blank(row[23]),
                     sift(row[21]),
                     polyphen(row[22])]
           return nil unless values.any?
 
-          Hash[%i[consequences hgvsc sift polyphen].zip(values)]
+          Hash[%i[variant_class consequences hgvs_c sift polyphen].zip(values)]
         end
 
         def consequences(str)

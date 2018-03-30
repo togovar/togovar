@@ -36,13 +36,11 @@ class Lookup
     graph = RDF::Graph.new
     graph << [s, RDF::Vocab::DC.identifier, tgv_id]
 
-    %i[base molecular_annotation clinvar exac jga].each do |attr|
+    %i[base molecular_annotation].each do |attr|
       data = method(attr).call
       next if data.nil?
 
-      bn = RDF::Node.new
-      graph << [s, TgvLookup[attr], bn]
-      graph.insert(*data.to_rdf(bn).statements)
+      graph.insert(*data.to_rdf(s).statements)
     end
 
     graph
