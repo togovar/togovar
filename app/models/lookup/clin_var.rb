@@ -20,7 +20,6 @@ class Lookup
       yield self if block_given?
     end
 
-    # @return [Array<RDF::Statement>]
     def to_rdf(subject = RDF::Node.new)
       validate!
 
