@@ -55,15 +55,11 @@ module Tasks
               hash = { tgv_id:          to_int(r[1].sub('tgv', '')),
                        num_alt_alleles: to_int(r[6]),
                        num_alleles:     to_int(r[7]),
-                       passed:          filter(r[31]),
+                       passed:          passed?(r[31]),
                        frequency:       to_float(r[32]) }
               yield hash
             end
           end
-        end
-
-        def filter(str)
-          str && str.match?(/PASS/)
         end
       end
     end

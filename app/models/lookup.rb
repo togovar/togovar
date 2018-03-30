@@ -10,7 +10,8 @@ class Lookup
   attr_accessor :molecular_annotation
   attr_accessor :clinvar
   attr_accessor :exac
-  attr_accessor :jga
+  attr_accessor :jga_ngs
+  attr_accessor :jga_snp
 
   validates :tgv_id, presence: true, numericality: { only_integer: true,
                                                      greater_than: 0 }
@@ -18,7 +19,8 @@ class Lookup
   validates :molecular_annotation, allow_nil: true, type: { type: MolecularAnnotation }
   validates :clinvar, allow_nil: true, type: { type: ClinVar }
   validates :exac, allow_nil: true, type: { type: ExAC }
-  validates :jga, allow_nil: true, type: { type: JGA }
+  validates :jga_ngs, allow_nil: true, type: { type: JGA::NGS }
+  validates :jga_snp, allow_nil: true, type: { type: JGA::SNP }
 
   def initialize(**attributes)
     attributes.each do |k, v|
@@ -43,7 +45,7 @@ class Lookup
       graph.insert(*data.to_rdf(s).statements)
     end
 
-    %i[clinvar exac].each do |name|
+    %i[clinvar exac jga_ngs jga_snp].each do |name|
       data = method(name).call
       next unless data
 

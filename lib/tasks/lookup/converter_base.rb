@@ -97,14 +97,8 @@ module Tasks
         nil
       end
 
-      # create update operation for bulk write to mongo
-      def update_operation(id, doc)
-        {
-          update_one: {
-            filter: { _id: id },
-            update: { '$set': doc }
-          }
-        }
+      def passed?(str)
+        str && str.match?(/PASS/)
       end
     end
   end
