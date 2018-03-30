@@ -105,8 +105,8 @@ module Tasks
             chromosome:    chr,
             start:         to_int(start),
             stop:          to_int(stop || start),
-            reference:     filter_blank(row[30]),
-            alternative:   filter_blank(row[2]),
+            reference:     filter_blank(row[30])&.upcase,
+            alternative:   filter_blank(row[2])&.upcase,
             rs:            rs_list(row[12])
           }
         end
