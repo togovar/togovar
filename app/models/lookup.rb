@@ -12,6 +12,7 @@ class Lookup
   attr_accessor :exac
   attr_accessor :jga_ngs
   attr_accessor :jga_snp
+  attr_accessor :hgvd
 
   validates :tgv_id, presence: true, numericality: { only_integer: true,
                                                      greater_than: 0 }
@@ -21,6 +22,7 @@ class Lookup
   validates :exac, allow_nil: true, type: { type: ExAC }
   validates :jga_ngs, allow_nil: true, type: { type: JGA::NGS }
   validates :jga_snp, allow_nil: true, type: { type: JGA::SNP }
+  validates :hgvd, allow_nil: true, type: { type: HGVD }
 
   def initialize(**attributes)
     attributes.each do |k, v|
@@ -45,7 +47,7 @@ class Lookup
       graph.insert(*data.to_rdf(s).statements)
     end
 
-    %i[clinvar exac jga_ngs jga_snp].each do |name|
+    %i[clinvar exac jga_ngs jga_snp hgvd].each do |name|
       data = method(name).call
       next unless data
 

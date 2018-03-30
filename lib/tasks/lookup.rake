@@ -154,4 +154,27 @@ namespace :lookup do
       end
     end
   end
+
+  namespace :hgvd do
+    desc 'convert HGVD data'
+    task :convert, %w[in out] => :environment do |task, args|
+      file_in  = args[:in] || raise("Usage: rake #{task.name}[in out]")
+      file_out = args[:out] || "#{File.basename(file_in)}.nt"
+
+      require 'tasks/lookup/hgvd/converter'
+
+      log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
+
+      Tasks::Lookup::HGVD::Converter.logger = Logger.new(log_file, 'daily')
+      Rails.logger                          = Tasks::Lookup::HGVD::Converter.logger
+
+      File.open(file_out, 'w') do |file|
+        RDF::Writer.for(file_name: file_out).new(file) do |writer|
+          Tasks::Lookup::HGVD::Converter.convert(file_in, progress: STDOUT.tty?) do |rdf|
+            writer << rdf
+          end
+        end
+      end
+    end
+  end
 end
