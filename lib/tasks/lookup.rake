@@ -1,26 +1,4 @@
 namespace :lookup do
-  namespace :mongo do
-    desc 'drop the collection'
-    task drop: :environment do
-      Lookup.collection.drop
-    end
-
-    namespace :tgv do
-      desc 'create index on tgv_id'
-      task create_index: :environment do
-        Lookup.index({ tgv_id: 1 }, unique: true)
-        Lookup.create_indexes
-      end
-    end
-
-    desc 'create index on lookup'
-    task create_index: :environment do
-      Lookup.index({ 'molecular_annotation.symbol': 1 })
-      Lookup.index({ 'clinvar_info.conditions': 1 })
-      Lookup.create_indexes
-    end
-  end
-
   namespace :elastic do
     desc 'create index'
     task create_index: :environment do
