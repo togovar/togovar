@@ -109,21 +109,91 @@ namespace :lookup do
   end
 
   namespace :jga do
-    desc 'convert ExAC data'
+    namespace :ngs do
+      desc 'convert JGA-NGS data'
+      task :convert, %w[in out] => :environment do |task, args|
+        file_in  = args[:in] || raise("Usage: rake #{task.name}[in out]")
+        file_out = args[:out] || "#{File.basename(file_in)}.nt"
+
+        require 'tasks/lookup/jga/ngs/converter'
+
+        log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
+
+        Tasks::Lookup::JGA::NGS::Converter.logger = Logger.new(log_file, 'daily')
+        Rails.logger                              = Tasks::Lookup::JGA::NGS::Converter.logger
+
+        File.open(file_out, 'w') do |file|
+          RDF::Writer.for(file_name: file_out).new(file) do |writer|
+            Tasks::Lookup::JGA::NGS::Converter.convert(file_in, progress: STDOUT.tty?) do |rdf|
+              writer << rdf
+            end
+          end
+        end
+      end
+    end
+    namespace :snp do
+      desc 'convert JGA-SNP data'
+      task :convert, %w[in out] => :environment do |task, args|
+        file_in  = args[:in] || raise("Usage: rake #{task.name}[in out]")
+        file_out = args[:out] || "#{File.basename(file_in)}.nt"
+
+        require 'tasks/lookup/jga/snp/converter'
+
+        log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
+
+        Tasks::Lookup::JGA::SNP::Converter.logger = Logger.new(log_file, 'daily')
+        Rails.logger                              = Tasks::Lookup::JGA::SNP::Converter.logger
+
+        File.open(file_out, 'w') do |file|
+          RDF::Writer.for(file_name: file_out).new(file) do |writer|
+            Tasks::Lookup::JGA::SNP::Converter.convert(file_in, progress: STDOUT.tty?) do |rdf|
+              writer << rdf
+            end
+          end
+        end
+      end
+    end
+  end
+
+  namespace :hgvd do
+    desc 'convert HGVD data'
     task :convert, %w[in out] => :environment do |task, args|
       file_in  = args[:in] || raise("Usage: rake #{task.name}[in out]")
       file_out = args[:out] || "#{File.basename(file_in)}.nt"
 
-      require 'tasks/lookup/jga/converter'
+      require 'tasks/lookup/hgvd/converter'
 
       log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
 
-      Tasks::Lookup::JGA::Converter.logger = Logger.new(log_file, 'daily')
-      Rails.logger                         = Tasks::Lookup::JGA::Converter.logger
+      Tasks::Lookup::HGVD::Converter.logger = Logger.new(log_file, 'daily')
+      Rails.logger                          = Tasks::Lookup::HGVD::Converter.logger
 
       File.open(file_out, 'w') do |file|
         RDF::Writer.for(file_name: file_out).new(file) do |writer|
-          Tasks::Lookup::JGA::Converter.convert(file_in, progress: STDOUT.tty?) do |rdf|
+          Tasks::Lookup::HGVD::Converter.convert(file_in, progress: STDOUT.tty?) do |rdf|
+            writer << rdf
+          end
+        end
+      end
+    end
+  end
+
+  namespace :tommo do
+    desc 'convert HGVD data'
+    task :convert, %w[in out] => :environment do |task, args|
+      file_in  = args[:in] || raise("Usage: rake #{task.name}[in out]")
+      file_out = args[:out] || "#{File.basename(file_in)}.nt"
+
+      require 'tasks/lookup/to_m_mo/converter'
+
+      log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
+
+      Tasks::Lookup::ToMMo::Converter.logger = Logger.new(log_file, 'daily')
+      Rails.logger                           = Tasks::Lookup::ToMMo::Converter.logger
+
+      File.open(file_out, 'w') do |file|
+        RDF::Writer.for(file_name: file_out).new(file) do |writer|
+          Tasks::Lookup::ToMMo::Converter.convert(file_in, progress: STDOUT.tty?) do |rdf|
             writer << rdf
           end
         end

@@ -3,7 +3,7 @@ require 'tasks/lookup/converter_base'
 
 module Tasks
   module Lookup
-    module JGA
+    module HGVD
       class Converter < ConverterBase
         class << self
           def convert(*args, &block)
@@ -25,10 +25,10 @@ module Tasks
 
           records do |hash|
             lookup = ::Lookup.new(tgv_id: hash[:tgv_id]) do |l|
-              l.jga = ::Lookup::JGA.new do |e|
+              l.hgvd = ::Lookup::HGVD.new do |e|
                 e.num_alt_alleles = hash[:num_alt_alleles]
-                e.num_alleles = hash[:num_alleles]
-                e.frequency = hash[:frequency]
+                e.num_alleles     = hash[:num_alleles]
+                e.frequency       = hash[:frequency]
               end
             end
 
@@ -52,9 +52,9 @@ module Tasks
             @io = CSV.new(f, col_sep: ' ', skip_lines: '^#')
             @io.each do |r|
               hash = { tgv_id:          to_int(r[1].sub('tgv', '')),
-                       num_alt_alleles: to_int(r[6].split(',').first), # TODO
-                       num_alleles:     250, # TODO
-                       frequency:       to_float(r[7].split(',').first) } # TODO
+                       num_alt_alleles: to_int(r[6]),
+                       num_alleles:     to_int(r[7]),
+                       frequency:       to_float(r[8]) }
               yield hash
             end
           end

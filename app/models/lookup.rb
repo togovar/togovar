@@ -10,7 +10,10 @@ class Lookup
   attr_accessor :molecular_annotation
   attr_accessor :clinvar
   attr_accessor :exac
-  attr_accessor :jga
+  attr_accessor :jga_ngs
+  attr_accessor :jga_snp
+  attr_accessor :hgvd
+  attr_accessor :tommo
 
   validates :tgv_id, presence: true, numericality: { only_integer: true,
                                                      greater_than: 0 }
@@ -18,7 +21,10 @@ class Lookup
   validates :molecular_annotation, allow_nil: true, type: { type: MolecularAnnotation }
   validates :clinvar, allow_nil: true, type: { type: ClinVar }
   validates :exac, allow_nil: true, type: { type: ExAC }
-  validates :jga, allow_nil: true, type: { type: JGA }
+  validates :jga_ngs, allow_nil: true, type: { type: JGA::NGS }
+  validates :jga_snp, allow_nil: true, type: { type: JGA::SNP }
+  validates :hgvd, allow_nil: true, type: { type: HGVD }
+  validates :tommo, allow_nil: true, type: { type: ToMMo }
 
   def initialize(**attributes)
     attributes.each do |k, v|
@@ -36,12 +42,19 @@ class Lookup
     graph = RDF::Graph.new
     graph << [s, RDF::Vocab::DC.identifier, tgv_id]
 
-    %i[base molecular_annotation clinvar exac jga].each do |attr|
+    %i[base molecular_annotation].each do |attr|
       data = method(attr).call
       next if data.nil?
 
+      graph.insert(*data.to_rdf(s).statements)
+    end
+
+    %i[clinvar exac jga_ngs jga_snp hgvd tommo].each do |name|
+      data = method(name).call
+      next unless data
+
       bn = RDF::Node.new
-      graph << [s, TgvLookup[attr], bn]
+      graph << [s, TgvLookup[name], bn]
       graph.insert(*data.to_rdf(bn).statements)
     end
 

@@ -3,7 +3,7 @@ require 'tasks/lookup/converter_base'
 
 module Tasks
   module Lookup
-    module ExAC
+    module ToMMo
       class Converter < ConverterBase
         class << self
           def convert(*args, &block)
@@ -25,10 +25,9 @@ module Tasks
 
           records do |hash|
             lookup = ::Lookup.new(tgv_id: hash[:tgv_id]) do |l|
-              l.exac = ::Lookup::ExAC.new do |e|
+              l.tommo = ::Lookup::ToMMo.new do |e|
                 e.num_alt_alleles = hash[:num_alt_alleles]
                 e.num_alleles     = hash[:num_alleles]
-                e.passed          = hash[:passed]
                 e.frequency       = hash[:frequency]
               end
             end
@@ -55,8 +54,7 @@ module Tasks
               hash = { tgv_id:          to_int(r[1].sub('tgv', '')),
                        num_alt_alleles: to_int(r[6]),
                        num_alleles:     to_int(r[7]),
-                       passed:          passed?(r[31]),
-                       frequency:       to_float(r[32]) }
+                       frequency:       to_float(r[8]) }
               yield hash
             end
           end
