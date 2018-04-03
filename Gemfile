@@ -30,6 +30,7 @@ gem 'kaminari', '~> 1.0'
 gem 'linkeddata', '~> 3.0'
 gem 'ruby-progressbar', '~> 1.9'
 gem 'settingslogic', '~> 2.0'
+gem 'sidekiq', '~> 5.1'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
 # optimisation
