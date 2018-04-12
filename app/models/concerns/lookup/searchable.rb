@@ -10,83 +10,89 @@ class Lookup
 
       # document_type "lookup_#{Rails.env}"
 
-      settings do
-        mappings dynamic: false do
+      settings index: { number_of_shards: 3, number_of_replicas: 0 } do
+        mappings dynamic: false, _all: { enabled: false } do
           indexes :tgv_id,
-                  type: 'text'
+                  type: 'integer'
 
-          indexes :base do
-            indexes :chromosome,
-                    type: 'text'
+          indexes :chromosome,
+                  type: 'keyword'
 
-            indexes :position,
-                    type: 'integer'
+          indexes :start,
+                  type: 'integer'
 
-            indexes :allele,
-                    type: 'text'
+          indexes :stop,
+                  type: 'integer'
 
-            indexes :existing_variation,
-                    type: 'text'
+          indexes :variant_type,
+                  type: 'keyword'
 
-            indexes :variant_class,
-                    type:      'text',
-                    fielddata: true
+          indexes :reference,
+                  type: 'keyword'
+
+          indexes :alternative,
+                  type: 'keyword'
+
+          indexes :rs,
+                  type: 'keyword'
+
+          indexes :gene,
+                  type: 'keyword'
+
+          indexes :symbol,
+                  type: 'keyword'
+
+          indexes :symbol_source,
+                  type: 'keyword'
+
+          indexes :hgvs_g,
+                  type: 'keyword'
+
+          indexes :transcripts, type: 'nested' do
+            indexes :consequences,
+                    type: 'keyword'
+
+            indexes :hgvs_c,
+                    type: 'keyword'
+
+            indexes :sift,
+                    type: 'float'
+
+            indexes :polyphen,
+                    type: 'float'
           end
 
-          indexes :molecular_annotation do
-            indexes :gene,
-                    type: 'text'
-
-            indexes :symbol,
-                    type: 'text'
-
-            indexes :transcripts, type: 'nested' do
-              indexes :impact,
-                      type: 'text'
-
-              indexes :hgvsc,
-                      type: 'text'
-
-              indexes :consequences, type: 'nested' do
-                indexes :id,
-                        type: 'text'
-
-                indexes :label,
-                        type: 'text'
-              end
-
-              indexes :sift do
-                indexes :prediction,
-                        type: 'text'
-
-                indexes :value,
-                        type: 'float'
-              end
-
-              indexes :polyphen do
-                indexes :prediction,
-                        type: 'text'
-
-                indexes :value,
-                        type: 'float'
-              end
-            end
-          end
-
-          indexes :clinvar_info do
+          indexes :clinvar do
             indexes :allele_id,
                     type: 'integer'
 
             indexes :significance,
-                    type:      'text',
-                    fielddata: true
+                    type: 'keyword'
 
             indexes :conditions,
-                    type:      'text',
-                    fielddata: true
+                    type:   'text',
+                    fields: {
+                      raw: {
+                        type: 'keyword'
+                      }
+                    }
           end
 
-          indexes :clinvar do
+          indexes :exac do
+            indexes :num_alt_alleles,
+                    type: 'integer'
+
+            indexes :num_alleles,
+                    type: 'integer'
+
+            indexes :frequency,
+                    type: 'float'
+
+            indexes :passed,
+                    type: 'boolean'
+          end
+
+          indexes :hgvd do
             indexes :num_alt_alleles,
                     type: 'integer'
 
@@ -97,7 +103,44 @@ class Lookup
                     type: 'float'
           end
 
-          indexes :jga do
+          indexes :jga_ngs do
+            indexes :num_alt_alleles,
+                    type: 'integer'
+
+            indexes :num_alleles,
+                    type: 'integer'
+
+            indexes :frequency,
+                    type: 'float'
+
+            indexes :quality_score,
+                    type: 'float'
+
+            indexes :passed,
+                    type: 'boolean'
+          end
+
+          indexes :jga_snp do
+            indexes :num_alt_alleles,
+                    type: 'integer'
+
+            indexes :num_alleles,
+                    type: 'integer'
+
+            indexes :frequency,
+                    type: 'float'
+
+            indexes :genotype_ref_hom,
+                    type: 'integer'
+
+            indexes :genotype_alt_hom,
+                    type: 'integer'
+
+            indexes :genotype_het,
+                    type: 'integer'
+          end
+
+          indexes :tommo do
             indexes :num_alt_alleles,
                     type: 'integer'
 
@@ -116,48 +159,58 @@ class Lookup
     module ClassMethods
       def list(params)
         term   = term_type((params['term'] || '').strip)
+        Rails.logger.info('term: ' + term.inspect)
         start  = (params['start'] || 0).to_i
         length = (params['length'] || 10).to_i
 
-        query = if term
-                  term.query.merge(size: length, from: start)
-                else
-                  { size: length,
-                    from: start }
-                end
+        query = { size: length,
+                  from: start,
+                  aggs: {
+                    total_variant_type: {
+                      terms: {
+                        field: 'variant_type'
+                      }
+                    }
+                  } }
 
+        if term
+          query.merge!(term.query)
+        end
+
+        Rails.logger.info(query)
         result    = search(query)
         hit_count = result['hits']['total']
         sources   = result['hits']['hits'].map { |x| x['_source'] }
         total     = client.count(index: index_name)
 
+        total_variant_type = result['aggregations']['total_variant_type']['buckets'].map do |t|
+          [SequenceOntology.find(t['key']).label.downcase, t['doc_count']]
+        end.to_h
+
         # FIXME: insert SO label into base.variant_class
         replace = sources.map do |r|
           json = r.as_json
-          if (base = r['base'])
-            if (var_class = base['variant_class'])
-              base['variant_class'] = SequenceOntology.find(var_class.tr(':', '_')).label
-              json.merge(base: base)
-            else
-              json
+          if (var_class = json['variant_type'])
+            json['variant_type'] = SequenceOntology.find(var_class).label
+          end
+          if (tr = json['transcripts'])
+            json['transcripts'] = select_most_severe_consequence(tr)
+            json['transcripts'].each do |t|
+              t['consequences'] = t['consequences'].map do |c|
+                SequenceOntology.find(c).label
+              end
             end
-          else
-            json
           end
-        end
-
-        replace.each do |r|
-          next unless (m = r['molecular_annotation'])
-          if (t = m['transcripts'])
-            r['molecular_annotation']['transcripts'] = select_most_severe_consequence(t)
-          end
+          json
         end
 
         filter_count = term ? hit_count : total['count']
 
-        { recordsTotal:    total['count'],
-          recordsFiltered: filter_count,
-          data:            replace }
+        { recordsTotal:       total['count'],
+          recordsFiltered:    filter_count,
+          data:               replace,
+          total_variant_type: total_variant_type
+        }
       end
 
       def search(query)
@@ -173,21 +226,21 @@ class Lookup
         0
       end
 
-      CONSEQUENCES_ORDER = %w[SO:0001893 SO:0001574 SO:0001575 SO:0001587
-                              SO:0001589 SO:0001578 SO:0002012 SO:0001889
-                              SO:0001821 SO:0001822 SO:0001583 SO:0001818
-                              SO:0001630 SO:0001626 SO:0001567 SO:0001819
-                              SO:0001580 SO:0001620 SO:0001623 SO:0001624
-                              SO:0001792 SO:0001627 SO:0001621 SO:0001619
-                              SO:0001631 SO:0001632 SO:0001895 SO:0001892
-                              SO:0001782 SO:0001894 SO:0001891 SO:0001907
-                              SO:0001566 SO:0001906 SO:0001628].freeze
+      CONSEQUENCES_ORDER = %w[SO_0001893 SO_0001574 SO_0001575 SO_0001587
+                              SO_0001589 SO_0001578 SO_0002012 SO_0001889
+                              SO_0001821 SO_0001822 SO_0001583 SO_0001818
+                              SO_0001630 SO_0001626 SO_0001567 SO_0001819
+                              SO_0001580 SO_0001620 SO_0001623 SO_0001624
+                              SO_0001792 SO_0001627 SO_0001621 SO_0001619
+                              SO_0001631 SO_0001632 SO_0001895 SO_0001892
+                              SO_0001782 SO_0001894 SO_0001891 SO_0001907
+                              SO_0001566 SO_0001906 SO_0001628].freeze
 
       def select_most_severe_consequence(transcripts)
         CONSEQUENCES_ORDER.each do |so|
           t = transcripts.select do |x|
             if (c = x['consequences'])
-              c.map { |y| y['id'] == so }.any?
+              c.map { |y| y == so }.any?
             end
           end
           return t if t.present?
@@ -202,10 +255,27 @@ class Lookup
       def client
         elasticsearch.client
       end
-    end
 
-    def as_indexed_json(options = {})
-      as_json(except: %i[id _id])
+      def import(*id)
+        errors = []
+
+        id = id.map(&:to_i)
+
+        records = fetch(*id)
+        if (m = id - records.keys).present?
+          Rails.logger.warn("missing tgv_id: #{m.join(', ')} in Lookup::import")
+        end
+
+        request  = { index:   index_name,
+                     type:    document_type,
+                     body:    records.map { |_, v| { index: { data: v } } },
+                     refresh: true }
+        response = client.bulk(request)
+        errors   += response['items'].select { |k, _| k.values.first['error'] }
+
+        Rails.logger.error(errors) if errors.present?
+        errors
+      end
     end
   end
 end

@@ -2,11 +2,22 @@ class Lookup
   class MolecularAnnotation
     include ActiveModel::Validations
 
-    attr_accessor :gene
-    attr_accessor :symbol
-    attr_accessor :symbol_source
-    attr_accessor :hgvs_g
-    attr_accessor :transcripts
+    class << self
+      # gene
+      # symbol
+      # symbol_source
+      # hgvs_g
+      # transcripts
+      ATTRIBUTES = %i[gene symbol symbol_source hgvs_g transcripts].freeze
+
+      def attributes
+        ATTRIBUTES
+      end
+    end
+
+    attributes.each do |name|
+      attr_accessor name
+    end
 
     validates :transcripts, allow_nil: true, array_of: { type: Transcript }
 
@@ -16,6 +27,19 @@ class Lookup
         send("#{k}=", v)
       end
       yield self if block_given?
+    end
+
+    def attributes
+      self.class.attributes.map do |name|
+        v = send(name)
+        v = v.attributes if v.respond_to?(:attributes)
+        if v.is_a?(Array)
+          v = v.map do |v2|
+            v2.respond_to?(:attributes) ? v2.attributes : v2
+          end
+        end
+        [name, v]
+      end.to_h
     end
 
     # @return [Array<RDF::Statement>]

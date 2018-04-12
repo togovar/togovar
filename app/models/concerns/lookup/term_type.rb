@@ -3,40 +3,24 @@ class Lookup
     extend ActiveSupport::Concern
 
     DISEASE = Struct.new(:term) do
-      def where
-        { 'clinvar_info.conditions': { '$in': [term] } }
-      end
-
       def query
         { query: { match: { 'clinvar_info.conditions': term } } }
       end
     end
 
     SYMBOL = Struct.new(:term) do
-      def where
-        { 'molecular_annotation.symbol': /^#{term}$/i }
-      end
-
       def query
         { query: { match: { 'molecular_annotation.symbol': term } } }
       end
     end
 
     RS = Struct.new(:term) do
-      def where
-        { 'base.existing_variation': /#{term}(,.*)?$/ }
-      end
-
       def query
         { query: { match: { 'base.existing_variation': term } } }
       end
     end
 
     TGV = Struct.new(:term) do
-      def where
-        { tgv_id: term }
-      end
-
       def query
         { query: { match: { tgv_id: term } } }
       end
@@ -45,10 +29,6 @@ class Lookup
     # @param [String] chr Chromosome
     # @param [Int] position Position
     POSITION = Struct.new(:chr, :position) do
-      def where
-        { 'base.chromosome': chr, 'base.position': position }
-      end
-
       def query
         {
           query: {
@@ -65,10 +45,6 @@ class Lookup
     # @param [Int] start Start
     # @param [Int] stop Stop
     REGION = Struct.new(:chr, :start, :stop) do
-      def where
-        { 'base.chromosome': chr, 'base.position': { '$gte': start, '$lte': stop } }
-      end
-
       def query
         {
           query: {

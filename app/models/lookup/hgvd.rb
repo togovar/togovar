@@ -2,9 +2,20 @@ class Lookup
   class HGVD
     include ActiveModel::Validations
 
-    attr_accessor :num_alt_alleles
-    attr_accessor :num_alleles
-    attr_accessor :frequency
+    class << self
+      # num_alt_alleles
+      # num_alleles
+      # frequency
+      ATTRIBUTES = %i[num_alt_alleles num_alleles frequency].freeze
+
+      def attributes
+        ATTRIBUTES
+      end
+    end
+
+    attributes.each do |name|
+      attr_accessor name
+    end
 
     validates :num_alt_alleles, numericality: { only_integer: true,
                                                 greater_than_or_equal_to: 0 }
@@ -19,14 +30,18 @@ class Lookup
       yield self if block_given?
     end
 
+    def attributes
+      self.class.attributes.map { |name| [name, send(name)] }.to_h
+    end
+
     def to_rdf(subject = RDF::Node.new)
       validate!
 
       graph = RDF::Graph.new
 
-      graph << [subject, TgvLookup.num_alt_alleles, num_alt_alleles]
-      graph << [subject, TgvLookup.num_alleles, num_alleles]
-      graph << [subject, TgvLookup.frequency, frequency]
+      graph << [subject, TgvLookup[:num_alt_alleles], num_alt_alleles]
+      graph << [subject, TgvLookup[:num_alleles], num_alleles]
+      graph << [subject, TgvLookup[:frequency], frequency]
 
       graph
     end

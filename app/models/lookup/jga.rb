@@ -3,11 +3,22 @@ class Lookup
     class NGS
       include ActiveModel::Validations
 
-      attr_accessor :num_alt_alleles
-      attr_accessor :num_alleles
-      attr_accessor :frequency
-      attr_accessor :quality_score
-      attr_accessor :passed
+      class << self
+        # num_alt_alleles
+        # num_alleles
+        # frequency
+        # quality_score
+        # passed
+        ATTRIBUTES = %i[num_alt_alleles num_alleles frequency quality_score passed].freeze
+
+        def attributes
+          ATTRIBUTES
+        end
+      end
+
+      attributes.each do |name|
+        attr_accessor name
+      end
 
       validates :num_alt_alleles, numericality: { only_integer: true,
                                                   greater_than_or_equal_to: 0 }
@@ -22,6 +33,10 @@ class Lookup
           send("#{k}=", v)
         end
         yield self if block_given?
+      end
+
+      def attributes
+        self.class.attributes.map { |name| [name, send(name)] }.to_h
       end
 
       # @return [Array<RDF::Statement>]
@@ -43,12 +58,23 @@ class Lookup
     class SNP
       include ActiveModel::Validations
 
-      attr_accessor :num_alt_alleles
-      attr_accessor :num_alleles
-      attr_accessor :frequency
-      attr_accessor :genotype_ref_hom
-      attr_accessor :genotype_alt_hom
-      attr_accessor :genotype_het
+      class << self
+        # num_alt_alleles
+        # num_alleles
+        # frequency
+        # genotype_ref_hom
+        # genotype_alt_hom
+        # genotype_het
+        ATTRIBUTES = %i[num_alt_alleles num_alleles frequency genotype_ref_hom genotype_alt_hom genotype_het].freeze
+
+        def attributes
+          ATTRIBUTES
+        end
+      end
+
+      attributes.each do |name|
+        attr_accessor name
+      end
 
       validates :num_alt_alleles, numericality: { only_integer: true,
                                                   greater_than_or_equal_to: 0 }
@@ -67,6 +93,10 @@ class Lookup
           send("#{k}=", v)
         end
         yield self if block_given?
+      end
+
+      def attributes
+        self.class.attributes.map { |name| [name, send(name)] }.to_h
       end
 
       # @return [Array<RDF::Statement>]

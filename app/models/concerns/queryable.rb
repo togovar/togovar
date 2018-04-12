@@ -15,20 +15,19 @@ module Queryable
     # @see SPARQL::Client
     def query(sparql, **options)
       ep     = options.delete(:endpoint) || Endpoint.url
-      digest = Digest::MD5.hexdigest(normalize(sparql))
+      digest = Digest::MD5.hexdigest(sparql)
 
       arr = ["started query for #{ep} at #{Time.now}",
              "  Cache: #{Rails.cache.exist?(digest) && digest}",
-             "  Query: #{normalize sparql}"]
+             "  Query: #{sparql.indent(9, ' ')}"]
 
-      json = []
+      result = []
       time = Benchmark.realtime do
         begin
-          json = Rails.cache.fetch(digest, expires_in: 1.month) do
+          result = Rails.cache.fetch(digest, expires_in: 1.month) do
             options = DEFAULT_OPTIONS.merge(options.slice(*ACCEPTABLE_KEYS))
             client  = SPARQL::Client.new(ep, options)
-            result  = client.query(sparql, content_type: SPARQL::Client::RESULT_JSON)
-            JSON.parse(result.to_json)
+            client.query(sparql, content_type: SPARQL::Client::RESULT_JSON)
           end
         rescue StandardError => se
           arr << "  Error: #{se.message}"
@@ -40,14 +39,10 @@ module Queryable
 
       log(*arr)
 
-      format_result(json)
+      format_result(result)
     end
 
     private
-
-    def normalize(sparql)
-      sparql.gsub(/^\s+\n/, '').gsub(/^\s+|\s+$/, '').tr("\n", ' ')
-    end
 
     def log(*args)
       severity = args.any? { |x| x.strip =~ /^Error:/ } ? :error : :info
@@ -55,14 +50,34 @@ module Queryable
     end
 
     def format_result(result)
-      return result unless result.is_a?(Hash)
+      raise TypeError unless result.is_a?(RDF::Query::Solutions)
 
-      return [] unless (r = result['results']) && (bindings = r['bindings']) && !bindings.empty?
+      (0...result.count).map do |i|
+        result.bindings.map do |k, v|
+          [k, typed(v[i])]
+        end.to_h
+      end
+    end
 
-      bindings.map do |bind|
-        result['head']['vars'].each_with_object({}) do |key, hash|
-          hash[key.to_sym] = bind[key]['value'] if bind.key?(key)
-        end
+    def typed(term)
+      case term
+      when RDF::Literal::Boolean
+        return true if term.true?
+        false
+      when RDF::Literal::Date
+        Date.parse(term.to_s)
+      when RDF::Literal::Time
+        Time.parse(term.to_s)
+      when RDF::Literal::DateTime
+        DateTime.parse(term.to_s)
+      when RDF::Literal::Integer
+        term.to_s.to_i
+      when RDF::Literal::Double, RDF::Literal::Float
+        term.to_s.to_f
+      when RDF::Literal::Numeric, RDF::Literal::Decimal
+        term.to_s.to_d
+      else
+        term.to_s
       end
     end
 

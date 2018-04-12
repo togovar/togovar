@@ -3,14 +3,22 @@ class Lookup
     class Transcript
       include ActiveModel::Validations
 
-      attr_accessor :variant_class
-      attr_accessor :consequences
-      attr_accessor :hgvs_c
-      attr_accessor :sift
-      attr_accessor :polyphen
+      class << self
+        # consequences
+        # hgvs_c
+        # sift
+        # polyphen
+        ATTRIBUTES = %i[consequences hgvs_c sift polyphen].freeze
 
-      validates :variant_class, presence: true, format: { with:    /\ASO_\d+\z/,
-                                                          message: 'is invalid SO term' }
+        def attributes
+          ATTRIBUTES
+        end
+      end
+
+      attributes.each do |name|
+        attr_accessor name
+      end
+
       validates :consequences, allow_nil: true, array_of: { type: String }
       validates :sift, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
       validates :polyphen, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
@@ -23,13 +31,16 @@ class Lookup
         yield self if block_given?
       end
 
+      def attributes
+        self.class.attributes.map { |name| [name, send(name)] }.to_h
+      end
+
       # @return [Array<RDF::Statement>]
       def to_rdf(subject = RDF::Node.new)
         validate!
 
         graph = RDF::Graph.new
 
-        graph << [subject, TgvLookup[:variant_class], variant_class]
         consequences&.each do |x|
           graph << [subject, TgvLookup[:consequence], x]
         end

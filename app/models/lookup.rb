@@ -2,18 +2,29 @@ class Lookup
   extend ActiveModel::Naming
   include ActiveModel::Validations
 
+  include Lookup::Queryable
   include Lookup::Searchable
 
-  attr_accessor :tgv_id
+  class << self
+    # tgv_id # sortable
+    # base
+    # molecular_annotation
+    # clinvar
+    # exac
+    # jga_ngs
+    # jga_snp
+    # hgvd
+    # tommo
+    ATTRIBUTES = %i[tgv_id base molecular_annotation clinvar exac jga_ngs jga_snp hgvd tommo].freeze
 
-  attr_accessor :base
-  attr_accessor :molecular_annotation
-  attr_accessor :clinvar
-  attr_accessor :exac
-  attr_accessor :jga_ngs
-  attr_accessor :jga_snp
-  attr_accessor :hgvd
-  attr_accessor :tommo
+    def attributes
+      ATTRIBUTES
+    end
+  end
+
+  attributes.each do |name|
+    attr_accessor name
+  end
 
   validates :tgv_id, presence: true, numericality: { only_integer: true,
                                                      greater_than: 0 }
@@ -31,6 +42,14 @@ class Lookup
       send("#{k}=", v)
     end
     yield self if block_given?
+  end
+
+  def attributes
+    self.class.attributes.map do |name|
+      v = send(name)
+      v = v.attributes if v.respond_to?(:attributes)
+      [name, v]
+    end.to_h
   end
 
   # @return [Array<RDF::Statement>]

@@ -2,9 +2,20 @@ class Lookup
   class ClinVar
     include ActiveModel::Validations
 
-    attr_accessor :allele_id
-    attr_accessor :significances
-    attr_accessor :conditions
+    class << self
+      # allele_id
+      # significances # filterable
+      # conditions
+      ATTRIBUTES = %i[allele_id significances conditions].freeze
+
+      def attributes
+        ATTRIBUTES
+      end
+    end
+
+    attributes.each do |name|
+      attr_accessor name
+    end
 
     validates :allele_id, numericality: { only_integer: true,
                                           greater_than: 0 }
@@ -20,17 +31,21 @@ class Lookup
       yield self if block_given?
     end
 
+    def attributes
+      self.class.attributes.map { |name| [name, send(name)] }.to_h
+    end
+
     def to_rdf(subject = RDF::Node.new)
       validate!
 
       graph = RDF::Graph.new
 
-      graph << [subject, TgvLookup.allele_id, allele_id] if allele_id
+      graph << [subject, TgvLookup[:allele_id], allele_id] if allele_id
       significances&.each do |x|
-        graph << [subject, TgvLookup.significances, x]
+        graph << [subject, TgvLookup[:significances], x]
       end
       conditions&.each do |x|
-        graph << [subject, TgvLookup.conditions, x]
+        graph << [subject, TgvLookup[:conditions], x]
       end
 
       graph

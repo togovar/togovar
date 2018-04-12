@@ -3,51 +3,46 @@ class Stanza < Settingslogic
   namespace Rails.env
 
   class Base
-    class << self
-
-      def method_missing(sym, *args)
-        (class << self; self; end).module_eval do
-          define_method sym do
-            name    = sym.to_s
-            label   = args.shift
-            options = args.extract_options!
-
-            new(name, label, options)
-          end
+    def self.inherited(_child)
+      class << self
+        def method_missing(sym, *args)
+          new(sym.to_s, args.shift, args.extract_options!)
         end
       end
     end
-  end
 
-  class ClinVar < Base
-  end
+    include ActionView::Helpers::TagHelper
 
-  attr_reader :name
-  attr_reader :label
+    attr_reader :name
+    attr_reader :label
 
-  def initialize(name, label, **options)
-    @name    = name
-    @label   = label
-    @options = options
-  end
-
-  def link
-    tag = %(<link rel='import' href='http://#{Stanza.host}/stanza/)
-    tag << @name
-    tag << %(/' />)
-    tag.html_safe
-  end
-
-  def tag
-    params = @options.map { |k, v| %(#{k}="#{v.to_s.gsub('"', '&quot;')}") }
-
-    tag = '<togostanza-'
-    tag << @name
-    if params.present?
-      tag << ' '
-      tag << params.join(' ')
+    def initialize(name, label, **options)
+      @name    = name
+      @label   = label
+      @options = options
     end
-    tag << ' />'
-    tag.html_safe
+
+    def link
+      tag = %(<link rel='import' href='http://#{Stanza.host}/stanza/)
+      tag << @name
+      tag << %(/' />)
+      tag.html_safe
+    end
+
+    def tag
+      params = @options.map { |k, v| %(#{k}="#{v.to_s.gsub('"', '&quot;')}") }
+
+      tag = "<togostanza-#{@name}"
+      if params.present?
+        tag << ' '
+        tag << params.join(' ')
+      end
+      tag << ' />'
+
+      tag.html_safe
+    end
+  end
+
+  class ClinVar < Base;
   end
 end
