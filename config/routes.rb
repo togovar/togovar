@@ -1,3 +1,5 @@
+require 'sidekiq/web'
+
 Rails.application.routes.draw do
   root 'root#index'
 
@@ -19,4 +21,6 @@ Rails.application.routes.draw do
   # api
   get 'suggest', to: 'root#suggest', defaults: { format: 'json' }
   get 'list', to: 'root#list', defaults: { format: 'json' }
+
+  mount Sidekiq::Web, at: 'sidekiq'
 end
