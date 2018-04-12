@@ -31,10 +31,12 @@ gem 'linkeddata', '~> 3.0'
 gem 'ruby-progressbar', '~> 1.9'
 gem 'settingslogic', '~> 2.0'
 gem 'sidekiq', '~> 5.1'
+gem 'sinatra', require: false
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
 # optimisation
 gem 'redis-rails', '~> 5.0'
+gem 'redis-namespace', '~> 1.6'
 gem 'turbolinks', '~> 5'
 gem 'uglifier', '>= 1.3.0'
 
