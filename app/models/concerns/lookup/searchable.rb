@@ -158,7 +158,7 @@ class Lookup
 
     module ClassMethods
       def list(params)
-        term   = term_type((params['term'] || '').strip)
+        term = term_type((params['term'] || '').strip)
         Rails.logger.info('term: ' + term.inspect)
         start  = (params['start'] || 0).to_i
         length = (params['length'] || 10).to_i
@@ -169,6 +169,34 @@ class Lookup
                     total_variant_type: {
                       terms: {
                         field: 'variant_type'
+                      }
+                    },
+                    total_exac:         {
+                      filter: {
+                        exists: {
+                          field: 'exac'
+                        }
+                      }
+                    },
+                    total_hgvd:         {
+                      filter: {
+                        exists: {
+                          field: 'hgvd'
+                        }
+                      }
+                    },
+                    total_togovar:      {
+                      filter: {
+                        exists: {
+                          field: 'jga_ngs'
+                        }
+                      }
+                    },
+                    total_tommo:        {
+                      filter: {
+                        exists: {
+                          field: 'tommo'
+                        }
                       }
                     }
                   } }
@@ -185,6 +213,9 @@ class Lookup
 
         total_variant_type = result['aggregations']['total_variant_type']['buckets'].map do |t|
           [SequenceOntology.find(t['key']).label.downcase, t['doc_count']]
+        end.to_h
+        total_dataset = %w[togovar hgvd tommo exac].map do |d|
+          [d, result['aggregations']["total_#{d}"]['doc_count']]
         end.to_h
 
         # FIXME: insert SO label into base.variant_class
@@ -209,7 +240,8 @@ class Lookup
         { recordsTotal:       total['count'],
           recordsFiltered:    filter_count,
           data:               replace,
-          total_variant_type: total_variant_type
+          total_variant_type: total_variant_type,
+          total_dataset:      total_dataset
         }
       end
 

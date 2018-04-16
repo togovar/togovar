@@ -10,6 +10,7 @@
             %input.form-check-input{type: 'checkbox', id: "source_#{x}", value: '1'}/
             %label.form-check-label{for: "source_#{x}", class: "source_#{x}"}
               = filter_label_for(x)
+              %span{ id: "dataset_cnt_#{x}", class: 'text-muted' }
 
     .card.m-2
       .card-header.p-2
@@ -64,13 +65,14 @@
 
     .card.m-2
       .card-header.p-2
-        Variant type
+        Variant Type
       .card-body.p-2
         - %w[snv insertion deletion indel substitution].each do |x|
           .form-check
             %input.form-check-input{type: 'checkbox', id: "variant_type_#{x}", value: '1'}/
-            %label.form-check-label{for: "variant_type_#{x}", class: "variant_type_#{x}"}
+            %label.form-check-label{for: "variant_type_#{x}", id: "variant_type_#{x}", class: "variant_type_#{x}"}
               = filter_label_for(x)
+              %span{ id: "variant_type_cnt_#{x}", class: 'text-muted' }
 
     .card.m-2
       .card-header.p-2
