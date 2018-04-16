@@ -345,8 +345,33 @@ $color_pale_blue: #ecf8fa;
   background: #668A41;
 }
 
-.frequency_none {
-  background: none !important;
+.frequency_none:before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 13px;
+  height: 34px;
+  left: 1px;
+  top: 1px;
+  background: #FFF;
+}
+
+.frequency_0_7:before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 13px;
+  height: 4px;
+  left: 1px;
+  top: 1px;
+  background: #FFF;
+  box-shadow:
+          0 5px 0 #FFF,
+          0 10px 0 #FFF,
+          0 15px 0 #FFF,
+          0 20px 0 #FFF,
+          0 25px 0 #FFF,
+          0 30px 0 #FFF;
 }
 
 .frequency_1_7:before {

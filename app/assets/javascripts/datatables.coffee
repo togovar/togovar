@@ -25,17 +25,17 @@ $ ->
       error: ->
         alert "failing query..."
         return
-    drawCallback: (setting) ->
+    drawCallback: (settings) ->
       api = @api()
       pane = $('#result_wrapper')
 
       # donwload link
       params = {}
-      # setting.ajax.data params
+      # settings.ajax.data params
       # url = "/list.json?" + $.param(params)
       # pane.find(".result-download-container > a").attr "href", url
 
-      tmpPaginationSlider = setting.oInit.paginationSlider
+      tmpPaginationSlider = settings.oInit.paginationSlider
       unless tmpPaginationSlider
         html = """
                <div class='pagination-slider'>
@@ -158,5 +158,9 @@ $ ->
         tmpPaginationSlider.pagination.show()
         tmpPaginationSlider.render()
 
-      setting.oInit.paginationSlider = tmpPaginationSlider
+      settings.oInit.paginationSlider = tmpPaginationSlider
+
+      if (settings.oInit.callback)
+        settings.oInit.callback(settings)
+
       return
