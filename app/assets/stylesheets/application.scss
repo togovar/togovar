@@ -1,3 +1,7 @@
+/*
+ *= require_self
+ *= require font-awesome
+ */
 @import 'jquery-ui/autocomplete';
 @import 'datatables';
 @import "layouts/header";
@@ -95,6 +99,11 @@ h1.title:after {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+hr {
+  margin-top: 0.1rem !important;
+  margin-bottom: 0.1rem !important;
+}
+
 input, button, select, textarea {
   font-family: "Myriad Pro", "Helvetica Neue", sans-serif;
 }
@@ -159,6 +168,11 @@ main .container {
   margin: 0 !important;
   padding: 0 !important;
   height: 50px !important;
+}
+
+.vertical-middle {
+  display:table-cell;
+  vertical-align: middle;
 }
 
 .ui-autocomplete {
@@ -365,6 +379,10 @@ only screen and (min-device-pixel-ratio: 2),
   box-shadow: none;
 }
 
+.freq_tooltip_wrapper {
+
+}
+
 .variant_type_deletion:before {
   content: '';
   display: block;
@@ -456,6 +474,26 @@ only screen and (min-device-pixel-ratio: 2),
 }
 
 .source_togovar:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/source/togovar.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.source_jga_ngs:before {
+  content: '';
+  display: block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background: url('icon/source/togovar.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.source_jga_snp:before {
   content: '';
   display: block;
   float: left;

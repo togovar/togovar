@@ -1,3 +1,5 @@
+
+
 %nav.col-sm-3.col-md-2.hidden-xs-down.bg-faded.sidebar
   .nav.nav-pills.flex-column
     .card.m-2
@@ -5,9 +7,9 @@
         Data set
       .card-body.p-2
         .form-check
-        - %w[togovar tommo hgvd exac].each do |x|
+        - %w[jga_ngs jga_snp tommo hgvd exac clinvar].each do |x|
           .form-check
-            %input.form-check-input{type: 'checkbox', id: "source_#{x}", value: '1'}/
+            %input.form-check-input{type: 'checkbox', name: 'source', id: "source_#{x}", value: x}/
             %label.form-check-label{for: "source_#{x}", class: "source_#{x}"}
               = filter_label_for(x)
               %span{ id: "dataset_cnt_#{x}", class: 'text-muted' }
@@ -15,53 +17,12 @@
     .card.m-2
       .card-header.p-2
         Alternative allele frequency
+      #freq_filter_wrapper
       .card-body.p-2
-        %select{:name => "frequency_data_source"}
-          %option{:value => "togovar"} TogoVar
-          %option{:value => "tommo"} 3.5KJPN
-          %option{:value => "hgvd"} HGVD
-          %option{:value => "exac"} ExAC
-        %select{:name => "frequency_relation"}
-          %option{:value => "le"} &le;
-          %option{:value => "ge"} &ge;
-          %option{:value => "lt"} &lt;
-          %option{:value => "gt"} &gt;
-          %option{:value => "eq"} =
-        %input{size: 7, placeholder: 'ex: 0.1'}
-
-    .card.m-2
-      .card-header.p-2
-        Alternative allele frequency
-      .card-body.p-2
-        %span.frequency7.tgv_frequency.frequency_1_7
-        %span
-          0.0001 %
-        %span.frequency7.tommo_frequency.frequency_1_7
-        %span
-          0.0001 %
-        %span.frequency7.hgvd_frequency.frequency_1_7
-        %span
-          0.0001 %
-        %span.frequency7.exac_frequency.frequency_1_7
-        %span
-          0.0001 %
-
-    .card.m-2
-      .card-header.p-2
-        Sample size
-      .card-body.p-2
-        %select{:name => "frequency_data_source"}
-          %option{:value => "togovar"} TogoVar
-          %option{:value => "tommo"} 3.5KJPN
-          %option{:value => "hgvd"} HGVD
-          %option{:value => "exac"} ExAC
-        %select{:name => "frequency_relation"}
-          %option{:value => "ge"} &ge;
-          %option{:value => "le"} &le;
-          %option{:value => "gt"} &gt;
-          %option{:value => "lt"} &lt;
-          %option{:value => "eq"} =
-        %input{size: 7, placeholder: 'ex: 1000'}
+        %a#add_freq_filter{href: 'javascript:void(0)'}
+          = fa_icon 'plus-circle'
+          Add filter
+      %input{ type: 'button', id: 'update_freq_filter', value: 'Update'}
 
     .card.m-2
       .card-header.p-2
@@ -69,7 +30,7 @@
       .card-body.p-2
         - %w[snv insertion deletion indel substitution].each do |x|
           .form-check
-            %input.form-check-input{type: 'checkbox', id: "variant_type_#{x}", value: '1'}/
+            %input.form-check-input{type: 'checkbox', name: 'variant_type', id: "variant_type_#{x}", value: x}/
             %label.form-check-label{for: "variant_type_#{x}", id: "variant_type_#{x}", class: "variant_type_#{x}"}
               = filter_label_for(x)
               %span{ id: "variant_type_cnt_#{x}", class: 'text-muted' }
@@ -79,12 +40,15 @@
         Clinical significance
       .card-body.p-2
         .form-check
+          %input.form-check-input{type: 'checkbox', name: 'significance', id: "significance_all", value: 'all', checked: true}/
+          %label.form-check-label{for: "significance_all", class: "significance_all"} Not in ClinVar
+        %hr
         :ruby
           significances = %w[pathogenic likely_pathogenic uncertain_significance likely_benign benign
                              conflicting_interpretations_of_pathogenicity drug_response association risk_factor
                              protective affects conflicting_data_from_submitters other not_provided]
         - significances.each do |x|
           .form-check
-            %input.form-check-input{type: 'checkbox', id: "significance_#{x}", value: '1'}/
+            %input.form-check-input{type: 'checkbox', name: 'significance', id: "significance_#{x}", value: x, checked: true}/
             %label.form-check-label{for: "significance_#{x}", class: "significance_#{x}"}
               = filter_label_for(x)

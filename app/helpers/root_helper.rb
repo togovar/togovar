@@ -6,9 +6,15 @@ module RootHelper
     when 'togovar'
       'TogoVar'
     when 'tommo'
-      'ToMMo 3.5KJPN'
+      '3.5KJPN'
     when 'exac'
       'ExAC'
+    when 'clinvar'
+      'ClinVar'
+    when 'jga_ngs'
+      'JGA NGS'
+    when 'jga_snp'
+      'JGA SNP'
     else
       str.humanize
     end

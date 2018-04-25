@@ -29,7 +29,7 @@ class SequenceOntology < RDF::Vocabulary('http://purl.obolibrary.org/obo/')
     def find_by_label(label)
       return nil if label.blank?
 
-      r = cache.find { |_, v| v.label == label }
+      r = cache.find { |_, v| v.label.downcase == label }
       return r[1] if r
 
       id = id_for_label(label)

@@ -6,14 +6,14 @@
         %span.input-group-btn
           %button#btn_search.btn.btn-primary{ type: 'button' } Search
           %button#btn_clear.btn.btn-secondary{ type: 'button' } Clear
-  .form-inline.my-2
-    Reference Genome:
-    .form-check.form-check-inline.ml-2
-      %input#inlineRadio1.form-check-input{name: 'grch38', type: 'radio', value: 'grch38', checked: true}/
-      %label.form-check-label{for: 'grch38'} GRCh38
-    .form-check.form-check-inline.ml-2
-      %input#inlineRadio2.form-check-input{name: 'grch37', type: 'radio', value: 'grch37', disabled: true}/
-      %label.form-check-label{for: 'grch37'} hg19/GRCh37
+  -#.form-inline.my-2
+  -#  Reference Genome:
+  -#  .form-check.form-check-inline.ml-2
+  -#    %input#inlineRadio1.form-check-input{name: 'grch38', type: 'radio', value: 'grch38', checked: true}/
+  -#    %label.form-check-label{for: 'grch38'} GRCh38
+  -#  .form-check.form-check-inline.ml-2
+  -#    %input#inlineRadio2.form-check-input{name: 'grch37', type: 'radio', value: 'grch37', disabled: true}/
+  -#    %label.form-check-label{for: 'grch37'} hg19/GRCh37
   %small.form-text.text-muted<>
     Example - Disease:
     %a#ex_disease{href: 'javascript:void(0)', onClick: '$("#search_text").val("Breast-ovarian cancer"); return false;'}<>

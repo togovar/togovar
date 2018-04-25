@@ -3,23 +3,24 @@
     %thead
       %tr
         -# Base Information
+        %th
         %th ID
-        %th Type
         %th Position
         %th Ref
         %th Alt
 
         -# Annotations
         %th Symbol
-        %th Consequences
+        %th Consequence
 
         -# ClinVar
         %th
         %th ClinVar conditions
 
         -# Frequencies
-        %th Frequency
-
+        %th
+          Frequency
+          = fa_icon 'question-circle', id: 'freq_tooltip', class: 'gray-tooltip', 'data-toggle': 'tooltip', 'data-html': 'true', title: "#{render partial: 'layouts/freq_tooltip'}"
         -# Function
         %th SIFT
         %th Polyphen
@@ -30,6 +31,8 @@
     frequency7 = (f, c) ->
       if c == 1
         return 'frequency_1_7'
+      else if c == 0 || f == 0
+        return 'frequency_0_7'
       else if f < 0.0001
         return 'frequency_2_7'
       else if f < 0.001
@@ -43,7 +46,7 @@
       else if f >= 0.5
         return 'frequency_7_7'
       else
-        return 'frequency_0_7'
+        return 'frequency_none'
 
     sift_class = (v) ->
       if v < 0.05
@@ -76,6 +79,15 @@
         ajax:
           url: 'list.json',
           type: 'POST',
+          data: (d) ->
+            d.term = $('#search_text').val()
+            d.source = $("[name=source]:checked").map(() -> $(this).val()).get()
+            d.freq_source = $("[name=frequency_data_source] option:selected").map(() -> $(this).val()).get()
+            d.freq_relation = $("[name=frequency_relation] option:selected").map(() -> $(this).val()).get()
+            d.freq_value = $("[name=frequency]").map(() -> $(this).val()).get()
+            d.variant_type = $("[name=variant_type]:checked").map(() -> $(this).val()).get()
+
+            return
           beforeSend: (xhr) ->
             xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))
         callback: (settings) ->
@@ -85,6 +97,14 @@
 
         columns: [
           ## Base Information
+          {
+            data: 'variant_type'
+            render: (data, type, row, meta) ->
+              if type == 'display'
+                if data
+                  data = '<span class="variant_type_' + data.replace(/\ /g, '_').toLowerCase() + '" />'
+              return data
+          }
           {
             data: 'tgv_id'
             render: (data, type, row, meta) ->
@@ -96,14 +116,6 @@
                   html = html.concat('<li class="text-muted">', row.rs, '</li>')
                 html = html.concat('</ul>')
                 return html
-              return data
-          }
-          {
-            data: 'variant_type'
-            render: (data, type, row, meta) ->
-              if type == 'display'
-                if data
-                  data = '<span class="variant_type_' + data.replace(/\ /g, '_').toLowerCase() + '" />'
               return data
           }
           {
@@ -120,18 +132,20 @@
           {
             data: 'reference'
             render: (data, type, row, meta) ->
+              html = data
               if type == 'display'
                 if data && data.length > 4
-                  data = data.substr(0, 4).concat('...') + '<br><span class="text-muted">(' + data.length + ')</span>'
-              return data
+                  html = '<span title="' + data + '">' + data.substr(0, 4).concat('...') + '<br><span class="text-muted">(' + data.length + ')</span></span>'
+              return html
           }
           {
             data: 'alternative'
             render: (data, type, row, meta) ->
+              html = data
               if type == 'display'
                 if data && data.length > 4
-                  data = data.substr(0, 4).concat('...') + '<br><span class="text-muted">(' + data.length + ')</span>'
-              return data
+                  html = '<span title="' + data + '">' + data.substr(0, 4).concat('...') + '<br><span class="text-muted">(' + data.length + ')</span></span>'
+              return html
           }
           ## End Base Information
 
@@ -187,24 +201,39 @@
                 html = ''
                 if row.jga
                   f = frequency7(row.jga.frequency, row.jga.num_alt_alleles)
+                  t = 'title="' + row.jga.frequency.toExponential(3) + '"'
                 else
                   f = 'frequency_none'
-                html = html.concat('<span class="frequency7 tgv_frequency ' + f + '"></span>')
+                  t = 'title="No data"'
+                html = html.concat('<span class="frequency7 tgv_frequency ' + f + '" ' + t + '></span>')
+                if row.jga_snp
+                  f = frequency7(row.jga.frequency, row.jga.num_alt_alleles)
+                  t = 'title="' + row.jga.frequency.toExponential(3) + '"'
+                else
+                  f = 'frequency_none'
+                  t = 'title="No data"'
+                html = html.concat('<span class="frequency7 tgv_frequency ' + f + '" ' + t + '></span>')
                 if row.tommo
                   f = frequency7(row.tommo.frequency, row.tommo.num_alt_alleles)
+                  t = 'title="' + row.tommo.frequency.toExponential(3) + '"'
                 else
                   f = 'frequency_none'
-                html = html.concat('<span class="frequency7 tommo_frequency ' + f + '"></span>')
+                  t = 'title="No data"'
+                html = html.concat('<span class="frequency7 tommo_frequency ' + f + '" ' + t + '"></span>')
                 if row.hgvd
                   f = frequency7(row.hgvd.frequency, row.hgvd.num_alt_alleles)
+                  t = 'title="' + row.hgvd.frequency.toExponential(3) + '"'
                 else
                   f = 'frequency_none'
-                html = html.concat('<span class="frequency7 hgvd_frequency ' + f + '"></span>')
+                  t = 'title="No data"'
+                html = html.concat('<span class="frequency7 hgvd_frequency ' + f + '" ' + t + '"></span>')
                 if row.exac
                   f = frequency7(row.exac.frequency, row.exac.num_alt_alleles)
+                  t = 'title="' + row.exac.frequency.toExponential(3) + '"'
                 else
                   f = 'frequency_none'
-                html = html.concat('<span class="frequency7 exac_frequency ' + f + '"></span>')
+                  t = 'title="No data"'
+                html = html.concat('<span class="frequency7 exac_frequency ' + f + '" ' + t + '"></span>')
           }
 
           ## Function
@@ -230,5 +259,6 @@
           }
           ## End Function
         ]
-      return
       result_table.parent().find(".result-download-container").append("<a><i class='fa fa-file'></i> Download CSV</a>")
+      $('#freq_tooltip').tooltip()
+    return

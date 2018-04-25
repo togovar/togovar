@@ -1,0 +1,172 @@
+Array::unique = ->
+  output = {}
+  output[@[key]] = @[key] for key in [0...@length]
+  value for key, value of output
+
+$ ->
+  $('#search_text').autocomplete
+    source: (request, response) ->
+      $.getJSON 'suggest.json', {term: request.term}, response
+      return
+    minLength: 3
+    messages:
+      noResults: 'No match'
+      results: ->
+    focus: (event, ui) ->
+      false
+    select: (event, ui) ->
+      $('#search_text').val ui.item[0]
+      $('#result').DataTable().draw()
+      false
+  # -> TO HERE $('#search_text').autocomplete
+
+  .autocomplete('instance')._renderItem = (ul, item) ->
+    $('<li>').append('<div><span class="text-muted">[' + item[1] + ']</span> ' + item[0] + '</div>').appendTo ul
+
+  $('#btn_search').on 'click', ->
+    $('#result').DataTable().draw()
+
+  $('#btn_clear').on 'click', ->
+    $('#search_text').val('')
+    $('#result').DataTable().draw()
+
+  # query examples
+  $('#ex_disease').on 'click', ->
+    $('#search_text').val('Breast-ovarian cancer')
+    $('#result').DataTable().draw()
+    return false
+  $('#ex_gene').on 'click', ->
+    $('#search_text').val('BRCA2')
+    $('#result').DataTable().draw()
+    return false
+  $('#ex_rs').on 'click', ->
+    $('#search_text').val('rs7988901')
+    $('#result').DataTable().draw()
+    return false
+  $('#ex_tgv').on 'click', ->
+    $('#search_text').val('tgv10000000')
+    $('#result').DataTable().draw()
+    return false
+  $('#ex_position').on 'click', ->
+    $('#search_text').val('13:32889080')
+    $('#result').DataTable().draw()
+    return false
+  $('#ex_region').on 'click', ->
+    $('#search_text').val('13:32889785-32889787')
+    $('#result').DataTable().draw()
+    return false
+
+  $("[name=source]").on 'click', ->
+    $('#result').DataTable().draw()
+
+  $("[name=variant_type]").on 'click', ->
+    $('#result').DataTable().draw()
+
+  add_freq_filter = () ->
+    html = """
+    <%= Haml::Engine.new(File.read(File.join(Rails.root, 'app/views/layouts', '_freq_filter.html.haml'))).render(Object.new) %>
+    """
+    $('#freq_filter_wrapper').append(html)
+    $(".remove_freq_filter").on 'click', ->
+      $(this).parent().remove()
+    return
+
+  add_freq_filter()
+
+  $("#add_freq_filter").on 'click', ->
+    add_freq_filter()
+
+  $("#update_freq_filter").on 'click', ->
+    $('#result').DataTable().draw()
+
+  pos_to_freq_class = (y) ->
+    c = Math.floor((35 - y) / 5) + 1
+    c = Math.min(c, 7)
+    c = Math.max(c, 0)
+    return 'frequency_' + c + '_7'
+
+  class_to_tooltip_text = (c) ->
+    if c == 'frequency_0_7'
+      'Monomorphic(REF)'
+    else if c == 'frequency_1_7'
+      'Singleton'
+    else if c == 'frequency_2_7'
+      '&lt; 1/10,000'
+    else if c == 'frequency_3_7'
+      '&lt; 1/1,000'
+    else if c == 'frequency_4_7'
+      '&lt; 1%'
+    else if c == 'frequency_5_7'
+      '&lt; 5%'
+    else if c == 'frequency_6_7'
+      '&lt; 50%'
+    else if c == 'frequency_7_7'
+      '&ge; 50%'
+    else
+      'Not available'
+
+  $("#freq_filter_meter_tgv").on 'click', (e) ->
+    clientRect = this.getBoundingClientRect()
+
+    posY = clientRect.top + window.pageYOffset
+    y = event.pageY - posY
+
+    class_name = pos_to_freq_class(y)
+
+    $(this).removeClass()
+    $(this).addClass('frequency7 tgv_frequency ' + class_name)
+
+    $('#freq_filter_meter_tgv_tooltip').html(class_to_tooltip_text(class_name))
+
+    return
+
+  $("#freq_filter_meter_tommo").on 'click', (e) ->
+    clientRect = this.getBoundingClientRect()
+
+    posY = clientRect.top + window.pageYOffset
+    y = event.pageY - posY
+
+    class_name = pos_to_freq_class(y)
+
+    $(this).removeClass()
+    $(this).addClass('frequency7 tommo_frequency ' + class_name)
+
+    $('#freq_filter_meter_tommo_tooltip').html(class_to_tooltip_text(class_name))
+
+    return
+
+  $("#freq_filter_meter_hgvd").on 'click', (e) ->
+    clientRect = this.getBoundingClientRect()
+
+    posY = clientRect.top + window.pageYOffset
+    y = event.pageY - posY
+
+    class_name = pos_to_freq_class(y)
+
+    $(this).removeClass()
+    $(this).addClass('frequency7 hgvd_frequency ' + class_name)
+
+    $('#freq_filter_meter_hgvd_tooltip').html(class_to_tooltip_text(class_name))
+
+    return
+
+  $("#freq_filter_meter_exac").on 'click', (e) ->
+    clientRect = this.getBoundingClientRect()
+
+    posY = clientRect.top + window.pageYOffset
+    y = event.pageY - posY
+
+    class_name = pos_to_freq_class(y)
+
+    $(this).removeClass()
+    $(this).addClass('frequency7 exac_frequency ' + class_name)
+
+    $('#freq_filter_meter_exac_tooltip').html(class_to_tooltip_text(class_name))
+
+    return
+
+  $('#freq_filter_meter_tgv_tooltip').html(class_to_tooltip_text('frequency_0_7'))
+  $('#freq_filter_meter_tommo_tooltip').html(class_to_tooltip_text('frequency_0_7'))
+  $('#freq_filter_meter_hgvd_tooltip').html(class_to_tooltip_text('frequency_0_7'))
+  $('#freq_filter_meter_exac_tooltip').html(class_to_tooltip_text('frequency_0_7'))
+

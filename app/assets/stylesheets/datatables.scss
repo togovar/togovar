@@ -321,14 +321,6 @@ $color_pale_blue: #ecf8fa;
   margin: 0 2px;
 }
 
-.frequency4 {
-  display: inline-block;
-  width: 15px;
-  height: 37px;
-  position: relative;
-  margin: 0 2px;
-}
-
 .tgv_frequency {
   background: #65B7C9;
 }
@@ -344,6 +336,9 @@ $color_pale_blue: #ecf8fa;
 .exac_frequency {
   background: #668A41;
 }
+
+.tooltip-arrow,
+.gray-tooltip + .tooltip > .tooltip-inner {background-color: #CCC;}
 
 .frequency_none:before {
   content: "";

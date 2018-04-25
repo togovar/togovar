@@ -4,19 +4,19 @@ class Lookup
 
     DISEASE = Struct.new(:term) do
       def query
-        { query: { match: { 'clinvar_info.conditions': term } } }
+        { query: { match: { 'clinvar.conditions': term } } }
       end
     end
 
     SYMBOL = Struct.new(:term) do
       def query
-        { query: { match: { 'molecular_annotation.symbol': term } } }
+        { query: { match: { 'symbol': term } } }
       end
     end
 
     RS = Struct.new(:term) do
       def query
-        { query: { match: { 'base.existing_variation': term } } }
+        { query: { match: { 'rs': term } } }
       end
     end
 

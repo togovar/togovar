@@ -160,62 +160,31 @@ class Lookup
       def list(params)
         term = term_type((params['term'] || '').strip)
         Rails.logger.info('term: ' + term.inspect)
+
         start  = (params['start'] || 0).to_i
         length = (params['length'] || 10).to_i
 
         query = { size: length,
-                  from: start,
-                  aggs: {
-                    total_variant_type: {
-                      terms: {
-                        field: 'variant_type'
-                      }
-                    },
-                    total_exac:         {
-                      filter: {
-                        exists: {
-                          field: 'exac'
-                        }
-                      }
-                    },
-                    total_hgvd:         {
-                      filter: {
-                        exists: {
-                          field: 'hgvd'
-                        }
-                      }
-                    },
-                    total_togovar:      {
-                      filter: {
-                        exists: {
-                          field: 'jga_ngs'
-                        }
-                      }
-                    },
-                    total_tommo:        {
-                      filter: {
-                        exists: {
-                          field: 'tommo'
-                        }
-                      }
-                    }
-                  } }
+                  from: start }
 
-        if term
-          query.merge!(term.query)
-        end
+        query.merge!(term.query) if term.present?
+
+        query = filter_by_source(query, params)
+        query = filter_by_frequency(query, params)
+        query = filter_by_variant_type(query, params)
 
         Rails.logger.info(query)
         result    = search(query)
         hit_count = result['hits']['total']
         sources   = result['hits']['hits'].map { |x| x['_source'] }
-        total     = client.count(index: index_name)
+        total     = count_each_category(term.present? ? term.query : {})
 
-        total_variant_type = result['aggregations']['total_variant_type']['buckets'].map do |t|
+        total_variant_type = total['aggregations']['total_variant_type']['buckets'].map do |t|
           [SequenceOntology.find(t['key']).label.downcase, t['doc_count']]
         end.to_h
+
         total_dataset = %w[togovar hgvd tommo exac].map do |d|
-          [d, result['aggregations']["total_#{d}"]['doc_count']]
+          [d, total['aggregations']["total_#{d}"]['doc_count']]
         end.to_h
 
         # FIXME: insert SO label into base.variant_class
@@ -235,27 +204,130 @@ class Lookup
           json
         end
 
-        filter_count = term ? hit_count : total['count']
+        # filter_count = term ? hit_count : total['hits']['total']
 
-        { recordsTotal:       total['count'],
-          recordsFiltered:    filter_count,
+        { recordsTotal:       total['hits']['total'],
+          recordsFiltered:    hit_count,
           data:               replace,
           total_variant_type: total_variant_type,
-          total_dataset:      total_dataset
-        }
+          total_dataset:      total_dataset }
       end
 
       def search(query)
         client.search(index: index_name, body: query)
       end
 
-      def count(query)
-        if (r = search(query))
-          if (h = r['hits'])
-            h['total']
+      def count(query = {})
+        begin
+          if (r = search(query))
+            if (h = r['hits'])
+              return h['total']
+            end
           end
+        rescue
+          return 1
         end
-        0
+      end
+
+      def filter_by_source(query, params)
+        source = params['source'] || []
+
+        return query if source.empty?
+
+        q = query.delete(:query)
+
+        sources   = source.map { |x| { exists: { field: x } } }
+        condition = [q, { bool: { should: sources } }].compact
+
+        query.merge(query: { bool: { must: condition } })
+      end
+
+      def filter_by_variant_type(query, params)
+        variant_type = params['variant_type'] || []
+
+        return query if variant_type.empty?
+
+        q = query.delete(:query)
+
+        types     = variant_type.map { |x| { term: { variant_type: SequenceOntology.find_by_label(x).id } } }
+        condition = [q, { bool: { should: types } }].compact
+
+        query.merge(query: { bool: { must: condition } })
+      end
+
+      def filter_by_frequency(query, params)
+        freq_source   = params['freq_source'] || []
+        freq_relation = params['freq_relation'] || []
+        freq_value    = params['freq_value'] || []
+
+        freq = freq_source.zip(freq_relation, freq_value).select { |x| x.last.present? }
+
+        return query if freq.empty?
+
+        q = query.delete(:query)
+
+        sources = freq.map do |x, y, z|
+          value = begin
+            Float(z)
+          rescue
+            next nil
+          end
+
+          next nil unless %w[togovar tommo hgvd exac].include?(x)
+          next nil unless %w[ge gte le lte].include?(y)
+
+          { range: { "#{x}.frequency" => { y => value } } }
+        end.compact
+
+        condition = [q, { bool: { should: sources } }].compact
+
+        query.merge(query: { bool: { must: condition } })
+      end
+
+      def count_each_category(query = {})
+        query = query.merge aggs: {
+          total_variant_type: {
+            terms: {
+              field: 'variant_type'
+            }
+          },
+          total_clinvar:      {
+            filter: {
+              exists: {
+                field: 'clinvar'
+              }
+            }
+          },
+          total_exac:         {
+            filter: {
+              exists: {
+                field: 'exac'
+              }
+            }
+          },
+          total_hgvd:         {
+            filter: {
+              exists: {
+                field: 'hgvd'
+              }
+            }
+          },
+          total_togovar:      {
+            filter: {
+              exists: {
+                field: 'jga_ngs'
+              }
+            }
+          },
+          total_tommo:        {
+            filter: {
+              exists: {
+                field: 'tommo'
+              }
+            }
+          }
+        }
+        search(query)
       end
 
       CONSEQUENCES_ORDER = %w[SO_0001893 SO_0001574 SO_0001575 SO_0001587

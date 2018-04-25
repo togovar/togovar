@@ -12,7 +12,15 @@ class RootController < ApplicationController
     respond_to do |format|
       format.html
       format.json do
-        render json: Lookup.list(params.permit(:term, :start, :length))
+        parameters = [:term,
+                      :start,
+                      :length,
+                      source:        [],
+                      variant_type:  [],
+                      freq_source:   [],
+                      freq_relation: [],
+                      freq_value:    []]
+        render json: Lookup.list(params.permit(*parameters))
       end
     end
   end

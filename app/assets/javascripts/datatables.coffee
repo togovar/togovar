@@ -19,9 +19,6 @@ $ ->
     pagingType: "custom-bootstrap"
     paginationSlider: null
     ajax:
-      data: (d) ->
-        d.term = $('#search_text').val()
-        return
       error: ->
         alert "failing query..."
         return
