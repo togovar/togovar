@@ -17,6 +17,7 @@ gem 'puma', '~> 3.7'
 # javascript & stylesheet
 gem 'bootstrap', '~> 4.0'
 gem 'coffee-rails', '~> 4.2'
+gem 'font-awesome-rails', '~> 4.7'
 gem 'haml-rails', '~> 1.0'
 gem 'jbuilder', '~> 2.5'
 gem 'jquery-datatables-rails', '~> 3.4'
