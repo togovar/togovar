@@ -36,11 +36,11 @@ namespace :lookup do
     ToMMo:     Tasks::Lookup::ToMMo::Converter }.each do |k, v|
     namespace k.to_s.underscore do
       desc "convert #{k} data"
-      task :convert, %w[in out out_jsonl] => :environment do |task, args|
+      task :convert, %w[in] => :environment do |task, args|
         file_in  = args[:in] || raise("Usage: rake #{task.name}[in out]")
-        file_out = args[:out] || "#{File.basename(file_in)}.nt"
 
-        file_out_json = args[:out_jsonl] || "#{File.basename(file_in)}.jsonl"
+        file_out = "#{File.basename(file_in)}.nt"
+        file_out_json = "#{File.basename(file_in)}.jsonl"
 
         log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
 
