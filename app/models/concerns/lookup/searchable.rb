@@ -10,7 +10,7 @@ class Lookup
 
       # document_type "lookup_#{Rails.env}"
 
-      settings index: { number_of_shards: 3, number_of_replicas: 0 } do
+      settings index: { number_of_shards: 5, number_of_replicas: 0 } do
         mappings dynamic: false, _all: { enabled: false } do
           indexes :tgv_id,
                   type: 'integer'
@@ -36,19 +36,25 @@ class Lookup
           indexes :rs,
                   type: 'keyword'
 
-          indexes :gene,
-                  type: 'keyword'
-
-          indexes :symbol,
-                  type: 'keyword'
-
-          indexes :symbol_source,
-                  type: 'keyword'
-
           indexes :hgvs_g,
                   type: 'keyword'
 
           indexes :transcripts, type: 'nested' do
+            indexes :ensg_id,
+                    type: 'keyword'
+
+            indexes :enst_id,
+                    type: 'keyword'
+
+            indexes :symbol,
+                    type: 'keyword'
+
+            indexes :symbol_source,
+                    type: 'keyword'
+
+            indexes :ncbi_gene_id,
+                    type: 'integer'
+
             indexes :consequences,
                     type: 'keyword'
 
@@ -380,6 +386,16 @@ class Lookup
         Rails.logger.error(errors) if errors.present?
         errors
       end
+    end
+
+    # @return [Hash]
+    def meta_json
+      { index: { _index: self.class.index_name, _type: self.class.document_type, _id: tgv_id } }
+    end
+
+    # @return [Hash]
+    def as_indexed_json(options = {})
+      as_json(except: %w[validation_context errors])
     end
   end
 end

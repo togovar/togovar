@@ -1,3 +1,5 @@
+require 'identifiers'
+
 class Lookup
   class Transcript
     include ActiveModel::Validations
@@ -13,15 +15,17 @@ class Lookup
                             SO_0001566 SO_0001906 SO_0001628].freeze
 
     class << self
-      # gene
+      # ensg_id
+      # enst_id
       # symbol
       # symbol_source
+      # ncbi_gene_id
       # hgvs_c
       # consequences
       # sift
       # polyphen
       # most_severe
-      ATTRIBUTES = %i[gene symbol symbol_source hgvs_c consequences sift polyphen most_severe].freeze
+      ATTRIBUTES = %i[ensg_id enst_id symbol symbol_source ncbi_gene_id hgvs_c consequences sift polyphen most_severe].freeze
 
       def attributes
         ATTRIBUTES
@@ -32,6 +36,7 @@ class Lookup
       attr_accessor name
     end
 
+    validates :ncbi_gene_id, allow_nil: true, numericality: { only_integer: true, greater_than: 0 }
     validates :consequences, allow_nil: true, array_of: { type: String }
     validates :sift, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
     validates :polyphen, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
@@ -57,9 +62,11 @@ class Lookup
       graph = RDF::Graph.new
 
       graph << [subject, RDF.type, RDF::URI('http://togovar.org/ontology/Transcript')]
-      graph << [subject, Tgvl[:gene], gene] if gene
+      graph << [subject, Tgvl[:ensembl_gene], Identifiers::ENSEMBL[ensg_id]] if ensg_id
+      graph << [subject, Tgvl[:ensembl_transcript], Identifiers::ENSEMBL[enst_id]] if enst_id
       graph << [subject, Tgvl[:symbol], symbol] if symbol
       graph << [subject, Tgvl[:symbol_source], symbol_source] if symbol_source
+      graph << [subject, Tgvl[:ncbi_gene], Identifiers::NCBI_GENE[ncbi_gene_id]] if ncbi_gene_id
       graph << [subject, Tgvl[:hgvs_c], hgvs_c] if hgvs_c
       consequences&.each do |x|
         graph << [subject, Tgvl[:consequence], Obo[x]]

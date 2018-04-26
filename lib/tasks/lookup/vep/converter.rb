@@ -118,9 +118,11 @@ module Tasks
 
         # @return [Hash, nil]
         def transcript(row)
-          { gene:          filter_blank(row[3]),
+          { ensg_id:       filter_blank(row[3]),
+            enst_id:       filter_blank(row[4]),
             symbol:        filter_blank(row[18]),
             symbol_source: filter_blank(row[19]),
+            ncbi_gene_id:  to_int(filter_blank(row[20])),
             hgvs_c:        filter_blank(row[26]),
             consequences:  consequences(row[6]),
             sift:          extract_value(row[21]),

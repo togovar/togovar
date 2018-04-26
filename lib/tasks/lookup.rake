@@ -54,9 +54,7 @@ namespace :lookup do
             RDF::Writer.for(file_name: file_out).new(file) do |writer|
               v.convert(file_in, progress: STDOUT.tty?) do |model|
                 writer << model.to_rdf
-                meta = { index: { _index: Lookup.index_name, _type: Lookup.document_type, _id: model.tgv_id } }
-
-                json.puts meta.to_json
+                json.puts model.meta_json.to_json
                 json.puts model.as_indexed_json.to_json
               end
             end

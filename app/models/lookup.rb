@@ -1,3 +1,5 @@
+require 'identifiers'
+
 class Lookup
   extend ActiveModel::Naming
   include ActiveModel::Validations
@@ -24,7 +26,9 @@ class Lookup
     # jga_snp
     # hgvd
     # tommo
-    ATTRIBUTES = %i[tgv_id chromosome start stop variant_type reference alternative rs hgvs_g transcripts clinvar exac jga_ngs jga_snp hgvd tommo].freeze
+    ATTRIBUTES = %i[tgv_id chromosome start stop variant_type reference
+                    alternative rs hgvs_g transcripts clinvar exac jga_ngs
+                    jga_snp hgvd tommo].freeze
 
     def attributes
       ATTRIBUTES
@@ -35,28 +39,22 @@ class Lookup
     attr_accessor name
   end
 
-  validates :tgv_id, presence: true, numericality: { only_integer: true,
-                                                     greater_than: 0 }
-  validates :chromosome, presence: true, inclusion: { in:      CHROMOSOME,
-                                                      message: 'invalid chromosome' }
-  validates :start, presence: true, numericality: { only_integer: true,
-                                                    greater_than: 0 }
-  validates :stop, presence: true, numericality: { only_integer: true,
-                                                   greater_than: 0 }
-  validates :variant_type, presence: true, format: { with:    /\ASO_\d+\z/,
-                                                     message: 'is invalid SO term' }
-  validates :reference, allow_nil: true, format: { with:    NUCLEOBASE,
-                                                   message: 'has invalid nucleobase' }
-  validates :alternative, allow_nil: true, format: { with:    NUCLEOBASE,
-                                                     message: 'has invalid nucleobase' }
+  validates :tgv_id, presence: true, numericality: { only_integer: true, greater_than: 0 }
+  validates :chromosome, presence: true, inclusion: { in: CHROMOSOME, message: 'invalid chromosome' }
+  validates :start, presence: true, numericality: { only_integer: true, greater_than: 0 }
+  validates :stop, presence: true, numericality: { only_integer: true, greater_than: 0 }
+  validates :variant_type, presence: true, format: { with: /\ASO_\d+\z/, message: 'is invalid SO term' }
+  validates :reference, allow_nil: true, format: { with: NUCLEOBASE, message: 'has invalid nucleobase' }
+  validates :alternative, allow_nil: true, format: { with: NUCLEOBASE, message: 'has invalid nucleobase' }
   validates :rs, allow_nil: true, array_of: { type: String }
+
   validates :transcripts, allow_nil: true, array_of: { type: Transcript }
   validates :clinvar, allow_nil: true, type: { type: ClinVar }
-  validates :exac, allow_nil: true, type: { type: ExAC }
   validates :jga_ngs, allow_nil: true, type: { type: JGA::NGS }
   validates :jga_snp, allow_nil: true, type: { type: JGA::SNP }
-  validates :hgvd, allow_nil: true, type: { type: HGVD }
   validates :tommo, allow_nil: true, type: { type: ToMMo }
+  validates :hgvd, allow_nil: true, type: { type: HGVD }
+  validates :exac, allow_nil: true, type: { type: ExAC }
 
   def initialize(**attributes)
     attributes.each do |k, v|
@@ -77,10 +75,10 @@ class Lookup
   def to_rdf
     validate!
 
-    s = RDF::URI("http://togovar.org/variant/#{tgv_id}")
+    s = RDF::URI("http://togovar.org/variation/#{tgv_id}")
 
     graph = RDF::Graph.new
-    graph << [s, RDF.type, RDF::URI('http://togovar.org/ontology/Variant')]
+    graph << [s, RDF.type, RDF::URI('http://togovar.org/ontology/Variation')]
     graph << [s, RDF::Vocab::DC.identifier, tgv_id]
 
     graph << [s, Tgvl[:chromosome], chromosome]
@@ -90,7 +88,7 @@ class Lookup
     graph << [s, Tgvl[:ref], reference] if reference
     graph << [s, Tgvl[:alt], alternative] if alternative
     rs&.each do |x|
-      graph << [s, Tgvl[:rs], x]
+      graph << [s, Tgvl[:rs], Identifiers::DBSNP[x]]
     end
     graph << [s, Tgvl[:hgvs_g], hgvs_g] if hgvs_g
 
@@ -112,10 +110,6 @@ class Lookup
     end
 
     graph
-  end
-
-  def as_indexed_json(options = {})
-    as_json(except: %w[validation_context errors])
   end
 end
 
