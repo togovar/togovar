@@ -40,17 +40,29 @@ namespace :lookup do
         file_in  = args[:in] || raise("Usage: rake #{task.name}[in out]")
         file_out = args[:out] || "#{File.basename(file_in)}.nt"
 
+        file_out_json = args[:out] || "#{File.basename(file_in)}.jsonl"
+
         log_file = File.join(Rails.root, 'log', "rake_#{task.name.tr(':', '_')}.#{Rails.env}.log")
 
         v.logger     = Logger.new(log_file, 'daily')
         Rails.logger = v.logger
 
-        File.open(file_out, 'w') do |file|
-          RDF::Writer.for(file_name: file_out).new(file) do |writer|
-            v.convert(file_in, progress: STDOUT.tty?) do |rdf|
-              writer << rdf
+        begin
+          json = File.open(file_out_json, 'w')
+
+          File.open(file_out, 'w') do |file|
+            RDF::Writer.for(file_name: file_out).new(file) do |writer|
+              v.convert(file_in, progress: STDOUT.tty?) do |model|
+                writer << model.to_rdf
+                meta = { index: { _index: Lookup.index_name, _type: Lookup.document_type, _id: model.tgv_id } }
+
+                json.puts meta.to_json
+                json.puts model.as_indexed_json.to_json
+              end
             end
           end
+        ensure
+          json&.close
         end
       end
     end

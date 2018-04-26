@@ -13,7 +13,7 @@ class Lookup
       # reference
       # alternative
       # rs
-      ATTRIBUTES = %i[chromosome start stop variant_type reference alternative rs].freeze
+      ATTRIBUTES = %i[chromosome start stop variant_type reference alternative rs hgvs_g].freeze
 
       def attributes
         ATTRIBUTES
@@ -55,15 +55,16 @@ class Lookup
 
       graph = RDF::Graph.new
 
-      graph << [subject, TgvLookup[:chromosome], chromosome]
-      graph << [subject, TgvLookup[:start], start]
-      graph << [subject, TgvLookup[:stop], stop]
-      graph << [subject, TgvLookup[:variant_type], variant_type]
-      graph << [subject, TgvLookup[:ref], reference] if reference
-      graph << [subject, TgvLookup[:alt], alternative] if alternative
+      graph << [subject, Tgvl[:chromosome], chromosome]
+      graph << [subject, Tgvl[:start], start]
+      graph << [subject, Tgvl[:stop], stop]
+      graph << [subject, Tgvl[:variant_type], Obo[variant_type]]
+      graph << [subject, Tgvl[:ref], reference] if reference
+      graph << [subject, Tgvl[:alt], alternative] if alternative
       rs&.each do |x|
-        graph << [subject, TgvLookup[:rs], x]
+        graph << [subject, Tgvl[:rs], x]
       end
+      graph << [subject, Tgvl[:hgvs_g], hgvs_g] if hgvs_g
       graph
     end
   end

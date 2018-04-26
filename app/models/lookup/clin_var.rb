@@ -40,12 +40,12 @@ class Lookup
 
       graph = RDF::Graph.new
 
-      graph << [subject, TgvLookup[:allele_id], allele_id] if allele_id
+      graph << [subject, Tgvl[:allele_id], allele_id] if allele_id
       significances&.each do |x|
-        graph << [subject, TgvLookup[:significances], x]
+        graph << [subject, Tgvl[:significances], x]
       end
       conditions&.each do |x|
-        graph << [subject, TgvLookup[:conditions], x]
+        graph << [subject, Tgvl[:conditions], x]
       end
 
       graph

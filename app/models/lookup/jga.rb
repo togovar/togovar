@@ -45,11 +45,11 @@ class Lookup
 
         graph = RDF::Graph.new
 
-        graph << [subject, TgvLookup[:num_alt_alleles], num_alt_alleles]
-        graph << [subject, TgvLookup[:num_alleles], num_alleles]
-        graph << [subject, TgvLookup[:frequency], frequency]
-        graph << [subject, TgvLookup[:quality_score], quality_score]
-        graph << [subject, TgvLookup[:passed], passed]
+        graph << [subject, Tgvl[:num_alt_alleles], num_alt_alleles]
+        graph << [subject, Tgvl[:num_alleles], num_alleles]
+        graph << [subject, Tgvl[:frequency], frequency]
+        graph << [subject, Tgvl[:quality_score], quality_score]
+        graph << [subject, Tgvl[:passed], passed]
 
         graph
       end
@@ -105,12 +105,12 @@ class Lookup
 
         graph = RDF::Graph.new
 
-        graph << [subject, TgvLookup[:num_alt_alleles], num_alt_alleles]
-        graph << [subject, TgvLookup[:num_alleles], num_alleles]
-        graph << [subject, TgvLookup[:frequency], frequency]
-        graph << [subject, TgvLookup[:genotype_ref_hom], genotype_ref_hom]
-        graph << [subject, TgvLookup[:genotype_alt_hom], genotype_alt_hom]
-        graph << [subject, TgvLookup[:genotype_het], genotype_het]
+        graph << [subject, Tgvl[:num_alt_alleles], num_alt_alleles]
+        graph << [subject, Tgvl[:num_alleles], num_alleles]
+        graph << [subject, Tgvl[:frequency], frequency]
+        graph << [subject, Tgvl[:genotype_ref_hom], genotype_ref_hom]
+        graph << [subject, Tgvl[:genotype_alt_hom], genotype_alt_hom]
+        graph << [subject, Tgvl[:genotype_het], genotype_het]
 
         graph
       end

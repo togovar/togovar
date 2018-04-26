@@ -39,9 +39,9 @@ class Lookup
 
       graph = RDF::Graph.new
 
-      graph << [subject, TgvLookup[:num_alt_alleles], num_alt_alleles]
-      graph << [subject, TgvLookup[:num_alleles], num_alleles]
-      graph << [subject, TgvLookup[:frequency], frequency]
+      graph << [subject, Tgvl[:num_alt_alleles], num_alt_alleles]
+      graph << [subject, Tgvl[:num_alleles], num_alleles]
+      graph << [subject, Tgvl[:frequency], frequency]
 
       graph
     end

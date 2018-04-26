@@ -5,17 +5,26 @@ class Lookup
   include Lookup::Queryable
   include Lookup::Searchable
 
+  CHROMOSOME = (1..22).map(&:to_s).concat(%w[X Y MT]).freeze
+  NUCLEOBASE = /\A[ATGCURYMKSWBHVDN]+\z/
+
   class << self
     # tgv_id # sortable
-    # base
-    # molecular_annotation
+    # chromosome # sortable
+    # start # sortable
+    # stop # sortable
+    # variant_type # filterable
+    # reference
+    # alternative
+    # rs
+    # transcripts
     # clinvar
     # exac
     # jga_ngs
     # jga_snp
     # hgvd
     # tommo
-    ATTRIBUTES = %i[tgv_id base molecular_annotation clinvar exac jga_ngs jga_snp hgvd tommo].freeze
+    ATTRIBUTES = %i[tgv_id chromosome start stop variant_type reference alternative rs hgvs_g transcripts clinvar exac jga_ngs jga_snp hgvd tommo].freeze
 
     def attributes
       ATTRIBUTES
@@ -28,8 +37,20 @@ class Lookup
 
   validates :tgv_id, presence: true, numericality: { only_integer: true,
                                                      greater_than: 0 }
-  validates :base, allow_nil: true, type: { type: BaseInfo }
-  validates :molecular_annotation, allow_nil: true, type: { type: MolecularAnnotation }
+  validates :chromosome, presence: true, inclusion: { in:      CHROMOSOME,
+                                                      message: 'invalid chromosome' }
+  validates :start, presence: true, numericality: { only_integer: true,
+                                                    greater_than: 0 }
+  validates :stop, presence: true, numericality: { only_integer: true,
+                                                   greater_than: 0 }
+  validates :variant_type, presence: true, format: { with:    /\ASO_\d+\z/,
+                                                     message: 'is invalid SO term' }
+  validates :reference, allow_nil: true, format: { with:    NUCLEOBASE,
+                                                   message: 'has invalid nucleobase' }
+  validates :alternative, allow_nil: true, format: { with:    NUCLEOBASE,
+                                                     message: 'has invalid nucleobase' }
+  validates :rs, allow_nil: true, array_of: { type: String }
+  validates :transcripts, allow_nil: true, array_of: { type: Transcript }
   validates :clinvar, allow_nil: true, type: { type: ClinVar }
   validates :exac, allow_nil: true, type: { type: ExAC }
   validates :jga_ngs, allow_nil: true, type: { type: JGA::NGS }
@@ -56,16 +77,29 @@ class Lookup
   def to_rdf
     validate!
 
-    s = RDF::URI("http://togovar.org/variation/#{tgv_id}")
+    s = RDF::URI("http://togovar.org/variant/#{tgv_id}")
 
     graph = RDF::Graph.new
+    graph << [s, RDF.type, RDF::URI('http://togovar.org/ontology/Variant')]
     graph << [s, RDF::Vocab::DC.identifier, tgv_id]
 
-    %i[base molecular_annotation].each do |attr|
-      data = method(attr).call
-      next if data.nil?
+    graph << [s, Tgvl[:chromosome], chromosome]
+    graph << [s, Tgvl[:start], start]
+    graph << [s, Tgvl[:stop], stop]
+    graph << [s, Tgvl[:variant_type], Obo[variant_type]]
+    graph << [s, Tgvl[:ref], reference] if reference
+    graph << [s, Tgvl[:alt], alternative] if alternative
+    rs&.each do |x|
+      graph << [s, Tgvl[:rs], x]
+    end
+    graph << [s, Tgvl[:hgvs_g], hgvs_g] if hgvs_g
 
-      graph.insert(*data.to_rdf(s).statements)
+    transcripts&.each do |t|
+      bn = RDF::Node.new
+      gr = t.to_rdf(bn)
+
+      graph << [s, Tgvl[:transcript], bn]
+      graph.insert(*gr.statements)
     end
 
     %i[clinvar exac jga_ngs jga_snp hgvd tommo].each do |name|
@@ -73,10 +107,16 @@ class Lookup
       next unless data
 
       bn = RDF::Node.new
-      graph << [s, TgvLookup[name], bn]
+      graph << [s, Tgvl[name], bn]
       graph.insert(*data.to_rdf(bn).statements)
     end
 
     graph
   end
+
+  def as_indexed_json(options = {})
+    as_json(except: %w[validation_context errors])
+  end
 end
+
+class Tgvl < RDF::Vocabulary('http://togovar.org/lookup#'); end

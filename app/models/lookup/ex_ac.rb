@@ -42,10 +42,10 @@ class Lookup
 
       graph = RDF::Graph.new
 
-      graph << [subject, TgvLookup[:num_alt_alleles], num_alt_alleles] if num_alt_alleles
-      graph << [subject, TgvLookup[:num_alleles], num_alleles] if num_alleles
-      graph << [subject, TgvLookup[:passed], passed]
-      graph << [subject, TgvLookup[:frequency], frequency] if frequency
+      graph << [subject, Tgvl[:num_alt_alleles], num_alt_alleles] if num_alt_alleles
+      graph << [subject, Tgvl[:num_alleles], num_alleles] if num_alleles
+      graph << [subject, Tgvl[:passed], passed]
+      graph << [subject, Tgvl[:frequency], frequency] if frequency
 
       graph
     end

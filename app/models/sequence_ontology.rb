@@ -1,6 +1,8 @@
 require 'benchmark'
 require 'rdf'
 
+class Obo < RDF::Vocabulary('http://purl.obolibrary.org/obo/'); end
+
 # Wrapper class for accessing so.owl
 class SequenceOntology < RDF::Vocabulary('http://purl.obolibrary.org/obo/')
   class << self
@@ -96,5 +98,4 @@ class SequenceOntology < RDF::Vocabulary('http://purl.obolibrary.org/obo/')
 
     yield self if block_given?
   end
-
 end
