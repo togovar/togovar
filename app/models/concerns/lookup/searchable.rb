@@ -85,10 +85,10 @@ class Lookup
           end
 
           indexes :exac do
-            indexes :num_alt_alleles,
+            indexes :num_alleles,
                     type: 'integer'
 
-            indexes :num_alleles,
+            indexes :num_alt_alleles,
                     type: 'integer'
 
             indexes :frequency,
@@ -99,10 +99,10 @@ class Lookup
           end
 
           indexes :hgvd do
-            indexes :num_alt_alleles,
+            indexes :num_alleles,
                     type: 'integer'
 
-            indexes :num_alleles,
+            indexes :num_alt_alleles,
                     type: 'integer'
 
             indexes :frequency,
@@ -110,10 +110,10 @@ class Lookup
           end
 
           indexes :jga_ngs do
-            indexes :num_alt_alleles,
+            indexes :num_alleles,
                     type: 'integer'
 
-            indexes :num_alleles,
+            indexes :num_alt_alleles,
                     type: 'integer'
 
             indexes :frequency,
@@ -127,34 +127,40 @@ class Lookup
           end
 
           indexes :jga_snp do
+            indexes :num_alleles,
+                    type: 'integer'
+
+            indexes :num_ref_alleles,
+                    type: 'integer'
+
             indexes :num_alt_alleles,
                     type: 'integer'
 
-            indexes :num_alleles,
+            indexes :num_genotype_hetero,
+                    type: 'integer'
+
+            indexes :num_genotype_ref_homo,
+                    type: 'integer'
+
+            indexes :num_genotype_alt_homo,
                     type: 'integer'
 
             indexes :frequency,
                     type: 'float'
-
-            indexes :genotype_ref_hom,
-                    type: 'integer'
-
-            indexes :genotype_alt_hom,
-                    type: 'integer'
-
-            indexes :genotype_het,
-                    type: 'integer'
           end
 
           indexes :tommo do
-            indexes :num_alt_alleles,
+            indexes :num_alleles,
                     type: 'integer'
 
-            indexes :num_alleles,
+            indexes :num_alt_alleles,
                     type: 'integer'
 
             indexes :frequency,
                     type: 'float'
+
+            indexes :passed,
+                    type: 'boolean'
           end
         end
       end
