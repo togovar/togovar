@@ -123,7 +123,7 @@ module Tasks
             symbol:        filter_blank(row[18]),
             symbol_source: filter_blank(row[19]),
             ncbi_gene_id:  to_int(filter_blank(row[20])),
-            hgvs_c:        filter_blank(row[26]),
+            hgvs_c:        filter_blank(row[23]),
             consequences:  consequences(row[6]),
             sift:          extract_value(row[21]),
             polyphen:      extract_value(row[22]) }
