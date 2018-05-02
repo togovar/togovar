@@ -84,7 +84,7 @@ module Tasks
 
           loop do
             # read one line but do not read if @line is present
-            return nil unless @line ||= @io.readline
+            break record unless @line ||= @io.readline
 
             # keep @line and return the entry if ID changes
             break record if current_id && current_id != @line[0]
@@ -98,6 +98,7 @@ module Tasks
             current_id = @line[0]
             @line      = nil
           end
+          return nil if record.empty?
           mark_most_severe_consequence(record[:transcripts])
           record
         end
