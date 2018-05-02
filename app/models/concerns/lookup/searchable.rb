@@ -177,7 +177,8 @@ class Lookup
         length = (params['length'] || 10).to_i
 
         query = { size: length,
-                  from: start }
+                  from: start,
+                  sort: 'chr' }
 
         query.merge!(term.query) if term.present?
 
