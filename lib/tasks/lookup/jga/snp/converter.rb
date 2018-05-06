@@ -27,17 +27,18 @@ module Tasks
             records do |hash|
               lookup = ::Lookup.new(tgv_id: hash[:tgv_id]) do |l|
                 l.jga_snp = ::Lookup::JGA::SNP.new do |e|
-                  e.num_alt_alleles  = hash[:num_alt_alleles]
-                  e.num_alleles      = hash[:num_alleles]
-                  e.frequency        = hash[:frequency]
-                  e.genotype_ref_hom = hash[:genotype_ref_hom]
-                  e.genotype_alt_hom = hash[:genotype_alt_hom]
-                  e.genotype_het     = hash[:genotype_het]
+                  e.num_alleles           = hash[:num_alleles]
+                  e.num_ref_alleles       = hash[:num_ref_alleles]
+                  e.num_alt_alleles       = hash[:num_alt_alleles]
+                  e.num_genotype_ref_homo = hash[:num_genotype_ref_homo]
+                  e.num_genotype_hetero   = hash[:num_genotype_hetero]
+                  e.num_genotype_alt_homo = hash[:num_genotype_alt_homo]
+                  e.frequency             = hash[:frequency]
                 end
               end
 
               begin
-                yield lookup.to_rdf
+                yield lookup
               rescue StandardError => e
                 msg = e.message
                 msg << " tgv_id: #{hash[:tgv_id]}"
@@ -55,13 +56,14 @@ module Tasks
             reader.open(@file_path) do |f|
               @io = CSV.new(f, col_sep: ' ', skip_lines: '^#')
               @io.each do |r|
-                hash = { tgv_id:           to_int(r[0].sub('tgv', '')),
-                         num_alt_alleles:  to_int(r[1]),
-                         num_alleles:      to_int(r[2]),
-                         frequency:        to_float(r[3]),
-                         genotype_ref_hom: to_int(r[4]),
-                         genotype_alt_hom: to_int(r[5]),
-                         genotype_het:     to_int(r[6]) }
+                hash = { tgv_id:                to_int(r[1].sub('tgv', '')),
+                         num_alleles:           to_int(r[2]),
+                         num_ref_alleles:       to_int(r[3]),
+                         num_alt_alleles:       to_int(r[4]),
+                         num_genotype_ref_homo: to_int(r[5]),
+                         num_genotype_hetero:   to_int(r[6]),
+                         num_genotype_alt_homo: to_int(r[7]),
+                         frequency:             to_float(r[8]) }
                 yield hash
               end
             end

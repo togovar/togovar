@@ -72,7 +72,7 @@ class Lookup
             indexes :allele_id,
                     type: 'integer'
 
-            indexes :significance,
+            indexes :significance, # TODO: pluralize
                     type: 'keyword'
 
             indexes :conditions,
@@ -107,6 +107,9 @@ class Lookup
 
             indexes :frequency,
                     type: 'float'
+
+            indexes :passed,
+                    type: 'boolean'
           end
 
           indexes :jga_ngs do

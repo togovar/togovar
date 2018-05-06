@@ -27,8 +27,8 @@ module Tasks
             records do |hash|
               lookup = ::Lookup.new(tgv_id: hash[:tgv_id]) do |l|
                 l.jga_ngs = ::Lookup::JGA::NGS.new do |e|
-                  e.num_alt_alleles = hash[:num_alt_alleles]
                   e.num_alleles     = hash[:num_alleles]
+                  e.num_alt_alleles = hash[:num_alt_alleles]
                   e.frequency       = hash[:frequency]
                   e.quality_score   = hash[:quality_score]
                   e.passed          = hash[:passed]
@@ -36,7 +36,7 @@ module Tasks
               end
 
               begin
-                yield lookup.to_rdf
+                yield lookup
               rescue StandardError => e
                 msg = e.message
                 msg << " tgv_id: #{hash[:tgv_id]}"

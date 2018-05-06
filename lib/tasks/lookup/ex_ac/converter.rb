@@ -34,7 +34,7 @@ module Tasks
             end
 
             begin
-              yield lookup.to_rdf
+              yield lookup
             rescue StandardError => e
               msg = e.message
               msg << " tgv_id: #{hash[:tgv_id]}"

@@ -26,7 +26,7 @@ module Tasks
           records.each_slice(@batch_num) do |g|
             ids = g.map { |r| r[6] }
 
-            client = SPARQL::Client.new('http://localhost:8890/sparql')
+            client = SPARQL::Client.new('http://togovar.org/sparql')
             result = client.query(sparql(ids))
 
             result.group_by(&:allele_id).each do |id, results|
@@ -43,7 +43,7 @@ module Tasks
               end
 
               begin
-                yield lookup.to_rdf
+                yield lookup
               rescue StandardError => e
                 msg = e.message
                 msg << " tgv_id: #{tgv_id}"

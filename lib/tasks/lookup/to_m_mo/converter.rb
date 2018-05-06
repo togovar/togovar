@@ -29,11 +29,12 @@ module Tasks
                 e.num_alt_alleles = hash[:num_alt_alleles]
                 e.num_alleles     = hash[:num_alleles]
                 e.frequency       = hash[:frequency]
+                e.passed          = hash[:passed]
               end
             end
 
             begin
-              yield lookup.to_rdf
+              yield lookup
             rescue StandardError => e
               msg = e.message
               msg << " tgv_id: #{hash[:tgv_id]}"
@@ -54,7 +55,8 @@ module Tasks
               hash = { tgv_id:          to_int(r[1].sub('tgv', '')),
                        num_alt_alleles: to_int(r[6]),
                        num_alleles:     to_int(r[7]),
-                       frequency:       to_float(r[8]) }
+                       frequency:       to_float(r[8]),
+                       passed:          passed?(r[9]) }
               yield hash
             end
           end

@@ -98,7 +98,7 @@ module Tasks
       end
 
       def passed?(str)
-        str && str.match?(/PASS/)
+        (str&.match?(/PASS/) || str&.match?(/Passed/)) || false
       end
     end
   end

@@ -25,8 +25,8 @@ namespace :lookup do
       { VEP:       Tasks::Lookup::Vep::Converter,
         ClinVar:   Tasks::Lookup::ClinVar::Converter,
         ExAC:      Tasks::Lookup::ExAC::Converter,
-        'JGA-NGS': Tasks::Lookup::JGA::NGS::Converter,
-        'JGA-SNP': Tasks::Lookup::JGA::SNP::Converter,
+        'JGA_NGS': Tasks::Lookup::JGA::NGS::Converter,
+        'JGA_SNP': Tasks::Lookup::JGA::SNP::Converter,
         HGVD:      Tasks::Lookup::HGVD::Converter,
         ToMMo:     Tasks::Lookup::ToMMo::Converter }.each do |k, v|
         desc "convert #{k} data to RDF"
@@ -39,10 +39,12 @@ namespace :lookup do
           v.logger     = Logger.new(log_file, 'daily')
           Rails.logger = v.logger
 
+          annotation_only = (k != :VEP)
+
           File.open(file_out, 'w') do |file|
             RDF::Writer.for(file_name: file_out).new(file) do |writer|
               v.convert(file_in, progress: STDOUT.tty?) do |model|
-                writer << model.to_rdf
+                writer << model.to_rdf(annotation_only)
               end
             end
           end

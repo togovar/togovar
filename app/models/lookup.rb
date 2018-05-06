@@ -40,10 +40,10 @@ class Lookup
   end
 
   validates :tgv_id, presence: true, numericality: { only_integer: true, greater_than: 0 }
-  validates :chromosome, presence: true, inclusion: { in: CHROMOSOME, message: 'invalid chromosome' }
-  validates :start, presence: true, numericality: { only_integer: true, greater_than: 0 }
-  validates :stop, presence: true, numericality: { only_integer: true, greater_than: 0 }
-  validates :variant_type, presence: true, format: { with: /\ASO_\d+\z/, message: 'is invalid SO term' }
+  validates :chromosome, allow_nil: true, inclusion: { in: CHROMOSOME, message: 'invalid chromosome' }
+  validates :start, allow_nil: true, numericality: { only_integer: true, greater_than: 0 }
+  validates :stop, allow_nil: true, numericality: { only_integer: true, greater_than: 0 }
+  validates :variant_type, allow_nil: true, format: { with: /\ASO_\d+\z/, message: 'is invalid SO term' }
   validates :reference, allow_nil: true, format: { with: NUCLEOBASE, message: 'has invalid nucleobase' }
   validates :alternative, allow_nil: true, format: { with: NUCLEOBASE, message: 'has invalid nucleobase' }
   validates :rs, allow_nil: true, array_of: { type: String }
@@ -72,32 +72,35 @@ class Lookup
   end
 
   # @return [Array<RDF::Statement>]
-  def to_rdf
+  def to_rdf(annotation_only = false)
     validate!
 
     s = RDF::URI("http://togovar.org/variation/#{tgv_id}")
 
     graph = RDF::Graph.new
-    graph << [s, RDF.type, RDF::URI('http://togovar.org/ontology/Variation')]
-    graph << [s, RDF::Vocab::DC.identifier, tgv_id]
 
-    graph << [s, Tgvl[:chromosome], chromosome]
-    graph << [s, Tgvl[:start], start]
-    graph << [s, Tgvl[:stop], stop]
-    graph << [s, Tgvl[:variant_type], Obo[variant_type]]
-    graph << [s, Tgvl[:ref], reference] if reference
-    graph << [s, Tgvl[:alt], alternative] if alternative
-    rs&.each do |x|
-      graph << [s, Tgvl[:rs], Identifiers::DBSNP[x]]
-    end
-    graph << [s, Tgvl[:hgvs_g], hgvs_g] if hgvs_g
+    unless annotation_only
+      graph << [s, RDF.type, RDF::URI('http://togovar.org/ontology/Variation')]
+      graph << [s, RDF::Vocab::DC.identifier, tgv_id]
 
-    transcripts&.each do |t|
-      bn = RDF::Node.new
-      gr = t.to_rdf(bn)
+      graph << [s, Tgvl[:chromosome], chromosome]
+      graph << [s, Tgvl[:start], start]
+      graph << [s, Tgvl[:stop], stop]
+      graph << [s, Tgvl[:variant_type], Obo[variant_type]]
+      graph << [s, Tgvl[:ref], reference] if reference
+      graph << [s, Tgvl[:alt], alternative] if alternative
+      rs&.each do |x|
+        graph << [s, Tgvl[:rs], Identifiers::DBSNP[x]]
+      end
+      graph << [s, Tgvl[:hgvs_g], hgvs_g] if hgvs_g
 
-      graph << [s, Tgvl[:transcript], bn]
-      graph.insert(*gr.statements)
+      transcripts&.each do |t|
+        bn = RDF::Node.new
+        gr = t.to_rdf(bn)
+
+        graph << [s, Tgvl[:transcript], bn]
+        graph.insert(*gr.statements)
+      end
     end
 
     %i[clinvar exac jga_ngs jga_snp hgvd tommo].each do |name|
@@ -113,4 +116,5 @@ class Lookup
   end
 end
 
-class Tgvl < RDF::Vocabulary('http://togovar.org/lookup#'); end
+class Tgvl < RDF::Vocabulary('http://togovar.org/lookup#');
+end

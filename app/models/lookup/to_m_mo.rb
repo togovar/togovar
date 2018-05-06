@@ -6,18 +6,22 @@ class Lookup
       # num_alt_alleles
       # num_alleles
       # frequency
-      ATTRIBUTES = %i[num_alt_alleles num_alleles frequency].freeze
+      # passed
+      ATTRIBUTES = %i[num_alt_alleles num_alleles frequency passed].freeze
 
       def attributes
         ATTRIBUTES
       end
     end
 
-    validates :num_alt_alleles, numericality: { only_integer: true,
-                                                greater_than_or_equal_to: 0 }
-    validates :num_alleles, numericality: { only_integer: true,
-                                            greater_than_or_equal_to: 0 }
+    attributes.each do |name|
+      attr_accessor name
+    end
+
+    validates :num_alt_alleles, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+    validates :num_alleles, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
     validates :frequency, numericality: { greater_than_or_equal_to: 0 }
+    validates :passed, inclusion: { in: [true, false] }
 
     def initialize(**attributes)
       attributes.each do |k, v|
@@ -38,6 +42,7 @@ class Lookup
       graph << [subject, Tgvl[:num_alt_alleles], num_alt_alleles]
       graph << [subject, Tgvl[:num_alleles], num_alleles]
       graph << [subject, Tgvl[:frequency], frequency]
+      graph << [subject, Tgvl[:passed], passed]
 
       graph
     end
