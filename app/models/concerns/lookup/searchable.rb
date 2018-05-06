@@ -399,11 +399,6 @@ class Lookup
     end
 
     # @return [Hash]
-    def meta_json
-      { index: { _index: self.class.index_name, _type: self.class.document_type, _id: tgv_id } }
-    end
-
-    # @return [Hash]
     def as_indexed_json(options = {})
       as_json(except: %w[validation_context errors])
     end
