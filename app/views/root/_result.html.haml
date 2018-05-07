@@ -69,7 +69,7 @@
         v = if obj[x] then obj[x] else 0
         $('#variant_type_cnt_' + x).text('(' + v + ')')
 
-      for x in ['togovar', 'tommo', 'hgvd', 'exac']
+      for x in ['jga_ngs', 'jga_snp', 'tommo', 'hgvd', 'exac', 'clinvar']
         v = if dataset[x] then dataset[x] else 0
         $('#dataset_cnt_' + x).text('(' + v + ')')
 

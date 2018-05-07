@@ -181,7 +181,7 @@ class Lookup
 
         query = { size: length,
                   from: start,
-                  sort: 'chr' }
+                  sort: %w[chromosome start stop] }
 
         query.merge!(term.query) if term.present?
 
@@ -199,7 +199,7 @@ class Lookup
           [SequenceOntology.find(t['key']).label.downcase, t['doc_count']]
         end.to_h
 
-        total_dataset = %w[togovar hgvd tommo exac].map do |d|
+        total_dataset = %w[jga_ngs jga_snp tommo hgvd exac clinvar].map do |d|
           [d, total['aggregations']["total_#{d}"]['doc_count']]
         end.to_h
 
@@ -307,17 +307,24 @@ class Lookup
               field: 'variant_type'
             }
           },
-          total_clinvar:      {
+          total_jga_ngs:      {
             filter: {
               exists: {
-                field: 'clinvar'
+                field: 'jga_ngs'
               }
             }
           },
-          total_exac:         {
+          total_jga_snp:      {
             filter: {
               exists: {
-                field: 'exac'
+                field: 'jga_snp'
+              }
+            }
+          },
+          total_tommo:        {
+            filter: {
+              exists: {
+                field: 'tommo'
               }
             }
           },
@@ -328,17 +335,17 @@ class Lookup
               }
             }
           },
-          total_togovar:      {
+          total_exac:         {
             filter: {
               exists: {
-                field: 'jga_ngs'
+                field: 'exac'
               }
             }
           },
-          total_tommo:        {
+          total_clinvar:      {
             filter: {
               exists: {
-                field: 'tommo'
+                field: 'clinvar'
               }
             }
           }
