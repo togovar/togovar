@@ -30,7 +30,7 @@ module Tasks
             result = client.query(sparql(ids))
 
             result.group_by(&:allele_id).each do |id, results|
-              significance = results.map(&:significance).map(&:to_s).map { |x| x.split(/[,\/]/) }.flatten.uniq
+              significance = results.map(&:significance).map(&:to_s).map { |x| x.split(/[,\/]/) }.flatten.uniq.map(&:downcase)
               phenotype =  results.map(&:phenotype).map(&:to_s)
 
               tgv_id = g.find { |x| x[6] == id.to_s }[1].sub('tgv', '').to_i
