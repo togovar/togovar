@@ -11,9 +11,17 @@
           %li= link_to stanza.name, "##{stanza.name}"
 %main
   .container
-    %h1 Variation Report
+    %h1 Variant Report
+
+    -#%section#nanostanzas.row-fluid
+    -#  - StanzaRuby.providers.variant.nanostanza.each do |stanza|
+    -#    .nanostanza-container{data: {stanza: stanza.uri, 'stanza_tgv-id': @tgv_id, nanostanza_span: stanza.span}}
+
     - @stanza.each do |stanza|
       %section{id: stanza.name}
         .page-header
           %h2= stanza.label
         = stanza.tag
+
+= content_for :javascript do
+  = javascript_include_tag 'stanza'

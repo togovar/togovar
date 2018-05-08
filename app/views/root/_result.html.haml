@@ -13,17 +13,18 @@
         %th Symbol
         %th Consequence
 
-        -# ClinVar
-        %th
-        %th ClinVar conditions
-
         -# Frequencies
         %th
           Frequency
           = fa_icon 'question-circle', id: 'freq_tooltip', class: 'gray-tooltip', 'data-toggle': 'tooltip', 'data-html': 'true', title: "#{render partial: 'layouts/freq_tooltip'}"
+
         -# Function
         %th SIFT
         %th Polyphen
+
+        -# ClinVar
+        %th
+        %th ClinVar conditions
     %tbody
 
 = content_for :javascript do

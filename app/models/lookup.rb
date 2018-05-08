@@ -57,6 +57,35 @@ class Lookup
   validates :exac, allow_nil: true, type: { type: ExAC }
 
   def initialize(**attributes)
+    if attributes[:transcripts].is_a?(Array) && attributes[:transcripts].first.is_a?(Hash)
+      array = attributes.delete(:transcripts)
+      attributes[:transcripts] = array.map { |x| Transcript.new(x) }
+    end
+    if attributes[:clinvar].is_a? Hash
+      hash = attributes.delete(:clinvar)
+      attributes[:clinvar] = ClinVar.new(hash)
+    end
+    if attributes[:jga_ngs].is_a? Hash
+      hash = attributes.delete(:jga_ngs)
+      attributes[:jga_ngs] = JGA::NGS.new(hash)
+    end
+    if attributes[:jga_snp].is_a? Hash
+      hash = attributes.delete(:jga_snp)
+      attributes[:jga_snp] = JGA::SNP.new(hash)
+    end
+    if attributes[:tommo].is_a? Hash
+      hash = attributes.delete(:tommo)
+      attributes[:tommo] = ToMMo.new(hash)
+    end
+    if attributes[:hgvd].is_a? Hash
+      hash = attributes.delete(:hgvd)
+      attributes[:hgvd] = HGVD.new(hash)
+    end
+    if attributes[:exac].is_a? Hash
+      hash = attributes.delete(:exac)
+      attributes[:exac] = ExAC.new(hash)
+    end
+
     attributes.each do |k, v|
       send("#{k}=", v)
     end

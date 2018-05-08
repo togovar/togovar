@@ -6,11 +6,11 @@ Rails.application.routes.draw do
   get 'search', to: 'root#index'
 
   # static pages
-  get 'about', to: 'static#about'
-  get 'terms', to: 'static#terms'
-  get 'policy', to: 'static#policy'
-  get 'contact', to: 'static#contact'
-  get 'faq', to: 'static#faq'
+  get 'doc/about', to: 'static#about'
+  get 'doc/terms', to: 'static#terms'
+  get 'doc/policy', to: 'static#policy'
+  get 'doc/contact', to: 'static#contact'
+  get 'doc/faq', to: 'static#faq'
 
   # variation report
   get 'variation', to: 'reports/variation#show'
