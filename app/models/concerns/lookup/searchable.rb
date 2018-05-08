@@ -72,7 +72,7 @@ class Lookup
             indexes :allele_id,
                     type: 'integer'
 
-            indexes :significance, # TODO: pluralize
+            indexes :significances,
                     type: 'keyword'
 
             indexes :conditions,
