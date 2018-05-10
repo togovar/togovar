@@ -8,27 +8,28 @@ class Suggest
 
       index_name "suggest_#{Rails.env}"
 
-      settings analysis: {
-        filter:   {
-          ngram_filter: {
-            type:     'nGram',
-            min_gram: 3,
-            max_gram: 15
-          }
-        },
-        analyzer: {
-          index_ngram_analyzer:  {
-            tokenizer: 'standard',
-            filter:    %w[standard lowercase stop ngram_filter],
-            type:      'custom'
-          },
-          search_ngram_analyzer: {
-            tokenizer: 'standard',
-            filter:    %w[standard lowercase stop],
-            type:      'custom'
-          }
-        }
-      }
+      settings index:    { number_of_shards: 1, number_of_replicas: 0 },
+               analysis: {
+                 filter:   {
+                   ngram_filter: {
+                     type:     'nGram',
+                     min_gram: 3,
+                     max_gram: 15
+                   }
+                 },
+                 analyzer: {
+                   index_ngram_analyzer:  {
+                     tokenizer: 'standard',
+                     filter:    %w[standard lowercase stop ngram_filter],
+                     type:      'custom'
+                   },
+                   search_ngram_analyzer: {
+                     tokenizer: 'standard',
+                     filter:    %w[standard lowercase stop],
+                     type:      'custom'
+                   }
+                 }
+               }
     end
 
     module ClassMethods

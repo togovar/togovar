@@ -1,4 +1,6 @@
 class Suggest
+  extend ActiveModel::Naming
+
   include Suggest::Suggestable
 
   class << self

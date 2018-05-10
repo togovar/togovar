@@ -8,8 +8,6 @@ class Lookup
 
       index_name "lookup_#{Rails.env}"
 
-      # document_type "lookup_#{Rails.env}"
-
       settings index: { number_of_shards: 5, number_of_replicas: 0 } do
         mappings dynamic: false, _all: { enabled: false } do
           indexes :tgv_id,

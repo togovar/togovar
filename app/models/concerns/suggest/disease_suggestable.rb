@@ -10,11 +10,18 @@ class Suggest
 
       document_type 'disease'
 
-      mappings dynamic: false do
-        indexes :label,
-                type:            'text',
-                analyzer:        'index_ngram_analyzer',
-                search_analyzer: 'search_ngram_analyzer'
+      settings index: { number_of_shards: 1, number_of_replicas: 0 } do
+        mappings dynamic: false, _all: { enabled: false } do
+          indexes :label,
+                  type:            'text',
+                  fields:          {
+                    raw: {
+                      type: 'keyword'
+                    }
+                  },
+                  analyzer:        'index_ngram_analyzer',
+                  search_analyzer: 'search_ngram_analyzer'
+        end
       end
     end
 
@@ -25,21 +32,6 @@ class Suggest
 
       def client
         elasticsearch.client
-      end
-
-      def import
-        errors = []
-        # FIXME: clinvar_info
-        Lookup.distinct('clinvar_info.conditions').each_slice(1000) do |group|
-          request  = { index:   index_name,
-                       type:    document_type,
-                       body:    group.map { |symbol| { index: { data: { label: symbol } } } },
-                       refresh: true }
-          response = client.bulk(request)
-          errors   += response['items'].select { |k, _| k.values.first['error'] }
-        end
-
-        errors
       end
     end
   end

@@ -2,7 +2,11 @@ namespace :suggest do
   namespace :elastic do
     desc 'create index'
     task create_index: :environment do
-      puts Suggest.create_index
+      mappings = {}
+      mappings.merge! GeneSuggest.mappings.to_hash
+      mappings.merge! DiseaseSuggest.mappings.to_hash
+      puts Suggest.elasticsearch.create_index! mappings: mappings, force: true
+      puts Suggest.elasticsearch.refresh_index!
     end
 
     desc 'delete index'

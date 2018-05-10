@@ -10,9 +10,14 @@ class Suggest
 
       document_type 'gene'
 
-      mappings dynamic: false do
+      mappings dynamic: false, _all: { enabled: false } do
         indexes :label,
                 type:            'text',
+                fields:          {
+                  raw: {
+                    type: 'keyword'
+                  }
+                },
                 analyzer:        'index_ngram_analyzer',
                 search_analyzer: 'search_ngram_analyzer'
       end
@@ -25,19 +30,6 @@ class Suggest
 
       def client
         elasticsearch.client
-      end
-
-      def import
-        errors = []
-        Lookup.distinct('molecular_annotation.symbol').each_slice(1000) do |group|
-          request  = { index:   index_name,
-                       type:    document_type,
-                       body:    group.map { |symbol| { index: { data: { label: symbol } } } },
-                       refresh: true }
-          response = client.bulk(request)
-          errors   += response['items'].select { |k, _| k.values.first['error'] }
-        end
-        errors
       end
     end
   end
