@@ -7,43 +7,23 @@ class Lookup
     end
 
     module ClassMethods
-      ATTRIBUTES = { clinvar: Lookup::ClinVar,
-                     exac:    Lookup::ExAC,
-                     jga_ngs: Lookup::JGA::NGS,
+      ATTRIBUTES = { jga_ngs: Lookup::JGA::NGS,
                      jga_snp: Lookup::JGA::SNP,
+                     tommo:   Lookup::ToMMo,
                      hgvd:    Lookup::HGVD,
-                     tommo:   Lookup::ToMMo }.freeze
+                     exac:    Lookup::ExAC,
+                     clinvar: Lookup::ClinVar }.freeze
 
       def find(*id)
-        r = fetch(*id).map do |k, v|
-          Lookup.new(tgv_id: k.to_i) do |l|
-            l.base = Lookup::BaseInfo.new(v.slice(*Lookup::BaseInfo.attributes))
-
-            mol = v.slice(*Lookup::MolecularAnnotation.attributes)
-            if (ts = v[:transcripts])
-              mol[:transcripts] = ts.map do |t|
-                Lookup::MolecularAnnotation::Transcript.new(t)
-              end
-            end
-            l.molecular_annotation = Lookup::MolecularAnnotation.new(mol)
-
-            ATTRIBUTES.each do |k2, v2|
-              if (c = v[k2])
-                l.send("#{k2}=", v2.new(c))
-              end
-            end
-          end
-        end
-
-        return r.first if id.count == 1
-        r
+        r = fetch(*id).map { |_, v| Lookup.new(v) }
+        id.count == 1 ? r.first : r
       end
 
       def fetch(*id)
         result = base_and_mol(*id)
 
         result.deep_merge!(rs(*id))
-        result.deep_merge!(gene(*id))
+        # result.deep_merge!(gene(*id))
         result.deep_merge!(transcript(*id))
         result.deep_merge!(clinvar(*id))
         result.deep_merge!(exac(*id))
@@ -130,7 +110,7 @@ class Lookup
               tgl:chromosome ?chromosome ;
               tgl:start ?start ;
               tgl:stop ?stop ;
-              tgl:variant_class ?variant_type .
+              tgl:variant_type ?variant_type .
             OPTIONAL { ?var tgl:ref ?reference . }
             OPTIONAL { ?var tgl:alt ?alternative . }
             OPTIONAL { ?var tgl:hgvs_g ?hgvs_g . }
@@ -208,7 +188,7 @@ class Lookup
             VALUES ?var { #{values(*args)} }
             ?var tgl:clinvar ?clinvar ;
               dc:identifier ?tgv_id .
-            ?clinvar tgl:alleleId ?allele_id ;
+            ?clinvar tgl:allele_id ?allele_id ;
               tgl:conditions ?condition ;
               tgl:significances ?significance .
           }

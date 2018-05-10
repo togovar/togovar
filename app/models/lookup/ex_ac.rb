@@ -26,6 +26,8 @@ class Lookup
     validates :frequency, numericality: { greater_than_or_equal_to: 0 }
 
     def initialize(**attributes)
+      @passed = false
+
       attributes.each do |k, v|
         send("#{k}=", v)
       end
