@@ -4,13 +4,24 @@ class Lookup
 
     DISEASE = Struct.new(:term) do
       def query
-        { query: { match: { 'clinvar.conditions': term } } }
+        { query: { match: { 'clinvar.conditions.raw': term } } }
       end
     end
 
     SYMBOL = Struct.new(:term) do
       def query
-        { query: { match: { 'symbol': term } } }
+        {
+          query: {
+            nested: {
+              path:  'transcripts',
+              query: {
+                match: {
+                  'transcripts.symbol': term
+                }
+              }
+            }
+          }
+        }
       end
     end
 
@@ -33,8 +44,31 @@ class Lookup
         {
           query: {
             bool: {
-              must: [{ match: { 'base.chromosome': chr } },
-                     { match: { 'base.position': position } }]
+              must:
+                [
+                  {
+                    match: {
+                      chromosome: chr.to_s
+                    }
+                  },
+                  {
+                    bool: {
+                      must:
+                        [
+                          {
+                            range: {
+                              start: { lte: position }
+                            }
+                          },
+                          {
+                            range: {
+                              stop: { gte: position }
+                            }
+                          }
+                        ]
+                    }
+                  }
+                ]
             }
           }
         }
@@ -49,11 +83,37 @@ class Lookup
         {
           query: {
             bool: {
-              must: [{ match: { 'base.chromosome': chr } },
-                     { range: { 'base.position': {
-                       gte: start,
-                       lte: stop
-                     } } }]
+              must:
+                [
+                  {
+                    match: {
+                      chromosome: chr.to_s
+                    }
+                  },
+                  {
+                    bool: {
+                      should:
+                        [
+                          {
+                            range: {
+                              start: {
+                                gte: start,
+                                lte: stop
+                              }
+                            }
+                          },
+                          {
+                            range: {
+                              stop: {
+                                gte: start,
+                                lte: stop
+                              }
+                            }
+                          }
+                        ]
+                    }
+                  }
+                ]
             }
           }
         }

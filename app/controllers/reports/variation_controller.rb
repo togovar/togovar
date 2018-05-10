@@ -5,7 +5,7 @@ module Reports
 
       @stanza = []
 
-      url = "http://togovar.l5dev.jp/sparqlist/api/variant_basic_information?tgv_id=#{tgv_id}"
+      url = "/sparqlist/api/variant_basic_information?tgv_id=#{tgv_id}"
       @stanza << Stanza::ClinVar.row_headered_table("ID: tgv#{tgv_id}", url: url)
 
       lookup = Lookup.find(tgv_id)

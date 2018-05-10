@@ -153,13 +153,14 @@
 
           ## Molecular Annotation
           {
-            data: 'symbol'
-            defaultContent: []
+            data: 'transcripts.[].symbol'
             render: (data, type, row, meta) ->
               if type == 'display'
                 if data
-                  data = '<ul>' + ('<li>' + symbol + '</li>' for symbol in data).join('') + '</ul>'
-              return data
+                  list = data.filter((x) -> x).unique()
+                  data = '<ul>' + ('<li>' + x + '</li>' for x in list).join('') + '</ul>'
+              else
+                return data
           }
 
           ## Frequencies
@@ -169,16 +170,16 @@
             render: (data, type, row, meta) ->
               if type == 'display'
                 html = ''
-                if row.jga
-                  f = frequency7(row.jga.frequency, row.jga.num_alt_alleles)
-                  t = 'title="' + row.jga.frequency.toExponential(3) + '"'
+                if row.jga_ngs
+                  f = frequency7(row.jga_ngs.frequency, row.jga_ngs.num_alt_alleles)
+                  t = 'title="' + row.jga_ngs.frequency.toExponential(3) + '"'
                 else
                   f = 'frequency_none'
                   t = 'title="No data"'
                 html = html.concat('<span class="frequency7 tgv_frequency ' + f + '" ' + t + '></span>')
                 if row.jga_snp
-                  f = frequency7(row.jga.frequency, row.jga.num_alt_alleles)
-                  t = 'title="' + row.jga.frequency.toExponential(3) + '"'
+                  f = frequency7(row.jga_snp.frequency, row.jga_snp.num_alt_alleles)
+                  t = 'title="' + row.jga_snp.frequency.toExponential(3) + '"'
                 else
                   f = 'frequency_none'
                   t = 'title="No data"'
@@ -210,7 +211,7 @@
             data: 'transcripts.[].consequences'
             render: (data, type, row, meta) ->
               if type == 'display'
-                consequences = [].concat.apply([], data).unique()
+                consequences = [].concat.apply([], data).unique() # flatten and unique
                 data = '<ul>' + ('<li>' + label + '</li>' for label in consequences).join('') + '</ul>'
               return data
           }

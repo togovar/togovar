@@ -110,7 +110,7 @@ class Lookup
 
     unless annotation_only
       graph << [s, RDF.type, RDF::URI('http://togovar.org/ontology/Variation')]
-      graph << [s, RDF::Vocab::DC.identifier, tgv_id]
+      graph << [s, RDF::Vocab::DC.identifier, tgv_id.to_s]
 
       graph << [s, Tgvl[:chromosome], chromosome]
       graph << [s, Tgvl[:start], start]
