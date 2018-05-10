@@ -11,19 +11,21 @@
 
         -# Annotations
         %th Symbol
-        %th Consequence
-
-        -# ClinVar
-        %th
-        %th ClinVar conditions
 
         -# Frequencies
         %th
           Frequency
           = fa_icon 'question-circle', id: 'freq_tooltip', class: 'gray-tooltip', 'data-toggle': 'tooltip', 'data-html': 'true', title: "#{render partial: 'layouts/freq_tooltip'}"
+
+        %th Consequence
+
         -# Function
         %th SIFT
         %th Polyphen
+
+        -# ClinVar
+        %th
+        %th ClinVar conditions
     %tbody
 
 = content_for :javascript do
@@ -67,11 +69,11 @@
     update_total = (obj, dataset) ->
       for x in ['snv', 'insertion', 'deletion', 'indel', 'substitution']
         v = if obj[x] then obj[x] else 0
-        $('#variant_type_cnt_' + x).text('(' + v + ')')
+        $('#variant_type_cnt_' + x).text('(' + v.toLocaleString() + ')')
 
       for x in ['jga_ngs', 'jga_snp', 'tommo', 'hgvd', 'exac', 'clinvar']
         v = if dataset[x] then dataset[x] else 0
-        $('#dataset_cnt_' + x).text('(' + v + ')')
+        $('#dataset_cnt_' + x).text('(' + v.toLocaleString() + ')')
 
     $ ->
       result_table = $('#result');
@@ -159,38 +161,6 @@
                   data = '<ul>' + ('<li>' + symbol + '</li>' for symbol in data).join('') + '</ul>'
               return data
           }
-          {
-            data: 'transcripts.[].consequences'
-            render: (data, type, row, meta) ->
-              if type == 'display'
-                consequences = [].concat.apply([], data).unique()
-                data = '<ul>' + ('<li>' + label + '</li>' for label in consequences).join('') + '</ul>'
-              return data
-          }
-          ## End Molecular Annotation
-
-          ## ClinVar Annotation
-          {
-            data: 'clinvar.significances'
-            defaultContent: ''
-            className: 'dt-body-center'
-            render: (data, type, row, meta) ->
-              if type == 'display'
-                if data
-                  data = ('<span class="significance_' + s.replace(/\ /g, '_').toLowerCase() + '" />' for s in data).join('')
-                  return data
-              return data
-          }
-          {
-            data: 'clinvar.conditions'
-            defaultContent: ''
-            render: (data, type, row, meta) ->
-              if type == 'display'
-                if data
-                  return '<ul>' + ('<li>' + label + '</li>' for label in data).join('') + '</ul>'
-              return data
-          }
-          ## End ClinVar Annotation
 
           ## Frequencies
           {
@@ -236,6 +206,16 @@
                 html = html.concat('<span class="frequency7 exac_frequency ' + f + '" ' + t + '"></span>')
           }
 
+          {
+            data: 'transcripts.[].consequences'
+            render: (data, type, row, meta) ->
+              if type == 'display'
+                consequences = [].concat.apply([], data).unique()
+                data = '<ul>' + ('<li>' + label + '</li>' for label in consequences).join('') + '</ul>'
+              return data
+          }
+          ## End Molecular Annotation
+
           ## Function
           {
             data: 'transcripts.[].sift'
@@ -258,6 +238,29 @@
                 return data
           }
           ## End Function
+
+          ## ClinVar Annotation
+          {
+            data: 'clinvar.significances'
+            defaultContent: ''
+            className: 'dt-body-center'
+            render: (data, type, row, meta) ->
+              if type == 'display'
+                if data
+                  data = ('<span class="significance_' + s.replace(/\ /g, '_').toLowerCase() + '" />' for s in data).join('')
+                  return data
+              return data
+          }
+          {
+            data: 'clinvar.conditions'
+            defaultContent: ''
+            render: (data, type, row, meta) ->
+              if type == 'display'
+                if data
+                  return '<ul>' + ('<li>' + label + '</li>' for label in data).join('') + '</ul>'
+              return data
+          }
+          ## End ClinVar Annotation
         ]
       result_table.parent().find(".result-download-container").append("<a><i class='fa fa-file'></i> Download CSV</a>")
       $('#freq_tooltip').tooltip()
