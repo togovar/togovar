@@ -73,7 +73,7 @@ class Lookup
       end
       graph << [subject, Tgvl[:sift], sift] if sift
       graph << [subject, Tgvl[:polyphen], polyphen] if polyphen
-      graph << [subject, Tgvl[:most_severe], most_severe] if most_severe
+      graph << [subject, Tgvl[:most_severe], most_severe]
 
       graph
     end

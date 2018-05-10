@@ -29,6 +29,8 @@ class Lookup
       validates :passed, inclusion: { in: [true, false] }
 
       def initialize(**attributes)
+        @passed = false
+
         attributes.each do |k, v|
           send("#{k}=", v)
         end
