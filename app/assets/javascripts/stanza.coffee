@@ -11,14 +11,19 @@ jQuery ($) ->
       return
     src = data.stanza + '?' + $.param(params)
     setTimeout (->
-      $('<iframe></iframe>').addClass('unload').attr(
+      $('<iframe></iframe>')
+      .addClass('unload')
+      .attr(
         src: src
         frameborder: 0
         id: 'stanza-frame-' + index
-        name: 'stanza-frame-' + index).width(data.stanzaWidth or '100%').height(data.stanzaHeight).appendTo($this).load ->
-      $(this).removeClass 'unload'
-      return
-      return
+        name: 'stanza-frame-' + index
+      )
+      .width(data.stanzaWidth or '100%')
+      .height(data.stanzaHeight)
+      .appendTo($this)
+      .load ->
+        $(this).removeClass 'unload'
     ), index * 500
     return
 
@@ -30,3 +35,4 @@ jQuery ($) ->
     return
 
   return
+
