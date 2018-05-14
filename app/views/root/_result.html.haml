@@ -112,7 +112,7 @@
             render: (data, type, row, meta) ->
               if type == 'display'
                 html = '<ul>'
-                tgv_id = "<a target='_blank' href='variation?tgv_id=" + data + "'>tgv" + data + "</a>"
+                tgv_id = "<a target='_blank' href='variation/" + data + "'>tgv" + data + "</a>"
                 html = html.concat('<li>', tgv_id, '</li>')
                 if row && row.rs
                   html = html.concat('<li class="text-muted">', row.rs, '</li>')
@@ -158,7 +158,7 @@
               if type == 'display'
                 if data
                   list = data.filter((x) -> x).unique()
-                  data = '<ul>' + ('<li>' + x + '</li>' for x in list).join('') + '</ul>'
+                  data = '<ul>' + ('<li>' + "<a target='_blank' href='gene/" + x + "'>" + x + "</a>" + '</li>' for x in list).join('') + '</ul>'
               else
                 return data
           }
