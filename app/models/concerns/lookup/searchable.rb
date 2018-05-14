@@ -197,6 +197,10 @@ class Lookup
           [SequenceOntology.find(t['key']).label.downcase, t['doc_count']]
         end.to_h
 
+        total_significance = total['aggregations']['total_significance']['buckets'].map do |t|
+          [t['key'], t['doc_count']]
+        end.to_h
+
         total_dataset = %w[jga_ngs jga_snp tommo hgvd exac clinvar].map do |d|
           [d, total['aggregations']["total_#{d}"]['doc_count']]
         end.to_h
@@ -224,6 +228,7 @@ class Lookup
           recordsFiltered:    hit_count,
           data:               replace,
           total_variant_type: total_variant_type,
+          total_significance: total_significance,
           total_dataset:      total_dataset }
       end
 
@@ -303,6 +308,12 @@ class Lookup
           total_variant_type: {
             terms: {
               field: 'variant_type'
+            }
+          },
+          total_significance: {
+            terms: {
+              field: 'clinvar.significances',
+              size: 20
             }
           },
           total_jga_ngs:      {

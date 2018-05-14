@@ -52,3 +52,4 @@
             %input.form-check-input{type: 'checkbox', name: 'significance', id: "significance_#{x}", value: x, checked: true}/
             %label.form-check-label{for: "significance_#{x}", class: "significance_#{x}"}
               = filter_label_for(x)
+              %span{ id: "significance_cnt_#{x}", class: 'text-muted' }

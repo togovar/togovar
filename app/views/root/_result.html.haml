@@ -66,14 +66,28 @@
       else
         return 'polyphen_unknown'
 
-    update_total = (obj, dataset) ->
+    clear_total = () ->
+      $("[id^='variant_type_cnt_']").text('(0)')
+      $("[id^='dataset_cnt_']").text('(0)')
+      $("[id^='significance_cnt_cnt_']").text('(0)')
+      return
+
+    update_total = (variant_type, dataset, significance) ->
+      clear_total()
+
       for x in ['snv', 'insertion', 'deletion', 'indel', 'substitution']
-        v = if obj[x] then obj[x] else 0
+        v = if variant_type[x] then variant_type[x] else 0
         $('#variant_type_cnt_' + x).text('(' + v.toLocaleString() + ')')
 
       for x in ['jga_ngs', 'jga_snp', 'tommo', 'hgvd', 'exac', 'clinvar']
         v = if dataset[x] then dataset[x] else 0
         $('#dataset_cnt_' + x).text('(' + v.toLocaleString() + ')')
+
+      for x in ['affects', 'association', 'benign', 'conflicting_data_from_submitters', 'conflicting_interpretations_of_pathogenicity',
+        'drug_response', 'likely_benign', 'likely_pathogenic', 'not_provided', 'other', 'pathogenic', 'protective', 'risk_factor', 'uncertain_significance']
+        key = x.replace(/_/g, ' ')
+        v = if significance[key] then significance[key] else 0
+        $('#significance_cnt_' + x).text('(' + v.toLocaleString() + ')')
 
     $ ->
       result_table = $('#result');
@@ -95,7 +109,8 @@
         callback: (settings) ->
           total_variant_type = settings.json.total_variant_type
           total_dataset = settings.json.total_dataset
-          update_total(total_variant_type, total_dataset)
+          total_significance = settings.json.total_significance
+          update_total(total_variant_type, total_dataset, total_significance)
 
         columns: [
           ## Base Information
