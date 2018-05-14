@@ -40,8 +40,8 @@
         Clinical significance
       .card-body.p-2
         .form-check
-          %input.form-check-input{type: 'checkbox', name: 'significance', id: "significance_all", value: 'all', checked: true}/
-          %label.form-check-label{for: "significance_all", class: "significance_all"} Not in ClinVar
+          %input.form-check-input{type: 'checkbox', name: 'significance', id: "significance_not_in_clinvar", value: 'not_in_clinvar', checked: true}/
+          %label.form-check-label{for: "significance_not_in_clinvar", class: "significance_not_in_clinvar"} Not in ClinVar
         %hr
         :ruby
           significances = %w[pathogenic likely_pathogenic uncertain_significance likely_benign benign

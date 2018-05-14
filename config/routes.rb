@@ -13,7 +13,7 @@ Rails.application.routes.draw do
   get 'doc/faq', to: 'static#faq'
 
   # variation report
-  get 'variation', to: 'reports/variation#show'
+  get 'variation/:id', to: 'reports/variation#show', constraints: { id: /\d+/ }
 
   # gene report
   get 'gene/:id', to: 'reports/gene#show', constraints: { id: %r{[\w\-:.\/]+} }

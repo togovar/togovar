@@ -24,10 +24,10 @@ class Lookup
 
         result.deep_merge!(rs(*id))
         # result.deep_merge!(gene(*id))
-        result.deep_merge!(transcript(*id))
-        result.deep_merge!(clinvar(*id))
-        result.deep_merge!(exac(*id))
-        result.deep_merge!(hgvd(*id))
+        # result.deep_merge!(transcript(*id))
+        # result.deep_merge!(clinvar(*id))
+        # result.deep_merge!(exac(*id))
+        # result.deep_merge!(hgvd(*id))
 
         result
       end
@@ -42,7 +42,7 @@ class Lookup
       def rs(*id)
         rs = query(sparql_for_rs(*id))
         rs.group_by { |x| x[:tgv_id] }
-          .map { |x| [x[0], { rs: x[1].map { |y| y[:rs] } }] }
+          .map { |x| [x[0], { rs: x[1].map { |y| y[:rs]&.split('/').last } }] }
           .to_h
       end
 

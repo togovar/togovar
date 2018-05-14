@@ -1,5 +1,9 @@
 = content_for :header do
   = stylesheet_link_tag 'reports/gene/show', media: :all
+  = javascript_include_tag 'reports/gene/show'
+
+= content_for :javascript do
+  = javascript_include_tag 'stanza'
 
 .container-fluid
   #nav-wrapper
@@ -25,6 +29,3 @@
       .page-header
         %h2= stanza.name
       %div{data: {stanza: stanza.uri, stanza_tax_id: 9606, stanza_gene_id: @gene_id}}
-
-= content_for :javascript do
-  = javascript_include_tag 'stanza'

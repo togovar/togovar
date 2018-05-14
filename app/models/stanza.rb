@@ -1,7 +1,10 @@
 class Stanza
+  include Configurable
+
+  load_config(Rails.root.join('config', 'stanza.yml'), :stanza)
+
   class << self
     def method_missing(sym, *args)
-      return super if super.respond_to?(sym)
       new(sym.to_s, args.shift, args.extract_options!)
     end
 
@@ -22,7 +25,7 @@ class Stanza
   end
 
   def link
-    "<link rel='import' href='/stanza/#{@name}/' />".html_safe
+    "<link rel='import' href='#{Rails.application.config.stanza.uri}/stanza/#{@name}/' />".html_safe
   end
 
   def tag

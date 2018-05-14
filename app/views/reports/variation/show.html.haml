@@ -1,7 +1,11 @@
 = content_for :header do
   = stylesheet_link_tag 'reports/variation/show', media: :all
+  = javascript_include_tag 'reports/variation/show'
   - @stanza.each do |stanza|
     = stanza.link
+
+= content_for :javascript do
+  = javascript_include_tag 'stanza'
 
 #nav-wrapper
   #navbar.navbar
@@ -13,15 +17,14 @@
   .container
     %h1 Variant Report
 
-    -#%section#nanostanzas.row-fluid
-    -#  - StanzaRuby.providers.variant.nanostanza.each do |stanza|
-    -#    .nanostanza-container{data: {stanza: stanza.uri, 'stanza_tgv-id': @tgv_id, nanostanza_span: stanza.span}}
+    %h2= "ID: tgv#{@tgv_id}"
+
+    %section#nanostanzas.row-fluid
+      - StanzaRuby.providers.variant.nanostanza.each do |stanza|
+        .nanostanza-container{data: {stanza: stanza.uri, 'stanza_tgv_id': @tgv_id, nanostanza_span: stanza.span}}
 
     - @stanza.each do |stanza|
       %section{id: stanza.name}
         .page-header
           %h2= stanza.label
         = stanza.tag
-
-= content_for :javascript do
-  = javascript_include_tag 'stanza'

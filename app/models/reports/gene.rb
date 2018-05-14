@@ -10,12 +10,12 @@ module Reports
 
           SELECT DISTINCT ?name
           WHERE {
-            GRAPH <http://togovar.org.graph/tgup> {
-              <http://togovar.org/gene/#{id}> rdfs:seeAlso ?uniprot_id .
+            GRAPH <http://togovar.org/graph/tgup> {
+              <http://togovar.org/gene/9606:#{id}> rdfs:seeAlso ?uniprot_id .
               ?uniprot_id rdf:type <http://identifiers.org/uniprot> ;
                           rdfs:seeAlso ?uniprot_up .
             }
-            GRAPH <http://togovar.org.graph/uniprot> {
+            GRAPH <http://togovar.org/graph/uniprot> {
               ?uniprot_up up:recommendedName/up:fullName ?name
             }
           }
