@@ -122,22 +122,16 @@ main .container {
   border-radius: 4px;
 }
 
-@media (min-width: 768px) {
-  .container {
-    max-width: none;
-  }
+table .center {
+  text-align: center;
 }
 
-@media (min-width: 576px) {
-  .container {
-    max-width: none;
-  }
+table .bottom {
+  vertical-align: bottom;
 }
 
-@media (min-width: 1200px) {
-  .container {
-    max-width: 1140px !important;
-  }
+ul .hidden {
+  list-style: none;
 }
 
 .spacer-10 {

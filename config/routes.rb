@@ -7,10 +7,14 @@ Rails.application.routes.draw do
 
   # static pages
   get 'doc/about', to: 'static#about'
-  get 'doc/terms', to: 'static#terms'
-  get 'doc/policy', to: 'static#policy'
   get 'doc/contact', to: 'static#contact'
-  get 'doc/faq', to: 'static#faq'
+  get 'doc/datasets', to: 'static#datasets'
+  get 'doc/datasets/jga_ngs', to: 'static#jga_ngs'
+  get 'doc/datasets/jga_snp', to: 'static#jga_snp'
+  get 'doc/datasets/analysis', to: 'static#analysis'
+  get 'doc/help', to: 'static#help'
+  get 'doc/policy', to: 'static#policy'
+  get 'doc/terms', to: 'static#terms'
 
   # variation report
   get 'variation/:id', to: 'reports/variation#show', constraints: { id: /\d+/ }

@@ -1,10 +1,19 @@
 - provide(:title, 'Contact')
 %main
   .container
-    %h1 Contact us
-    %p 我々のサービスに対しての問題や質問またはご提案がございましたら、e-mailにてお知らせ下さい。
-    %p humandbs [at] biosciencedbc [dot] jp
-    %p また、NBDCはFAIR原則に基づいたオープンサイエンスを推進しております。データを再利用する、または、ご提供いただける研究者の方々からのご連絡もお待ちしております。
-    %p You can contact us by email to report problems, questions, or suggestions on our service.
-    %p humandbs [at] biosciencedbc [dot] jp
-    %p We, NBDC promote open science based on the FAIR data principles. Please feel free to contact us about data use for your study and data sharing of your data.
+    %h1.title Contact us
+    %p
+      You can contact us by email to report problems, questions, or suggestions on our service.
+    %p{class: 'ml-5', style: 'font-size: 125%;'}
+      togovar [at] biosciencedbc [dot] jp
+    %p
+      We, NBDC promote open science based on
+      = succeed '.' do
+        %a{href: 'https://www.force11.org/fairprinciples/'} the FAIR data principles
+    %h1.title お問い合わせ
+    %p
+      我々のサービスに対しての問題や質問またはご提案がございましたら、e-mailにてお知らせ下さい。
+    %p{class: 'ml-5', style: 'font-size: 125%;'}
+      togovar [at] biosciencedbc [dot] jp
+    %p
+      また、NBDCはFAIR原則に基づいたオープンサイエンスを推進しております。データを再利用する、または、ご提供いただける研究者の方々からのご連絡もお待ちしております。
