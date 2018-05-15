@@ -62,10 +62,40 @@ $ ->
     $('#result').DataTable().draw()
     return false
 
-  $("[name=source]").on 'click', ->
+  # filter source
+  $('input[name=source_all]').on 'click', ->
+    $('input[name=source]').prop('checked', $('input[name=source_all]').prop('checked'))
     $('#result').DataTable().draw()
 
-  $("[name=variant_type]").on 'click', ->
+  $('input[name=source]').on 'click', ->
+    if $('input[name=source]:not(:checked)').size() == 0
+      $('input[name=source_all]').prop('checked', true)
+    else
+      $('input[name=source_all]').prop('checked', false)
+    $('#result').DataTable().draw()
+
+  # filter variant type
+  $('input[name=variant_type_all]').on 'click', ->
+    $('input[name=variant_type]').prop('checked', $('input[name=variant_type_all]').prop('checked'))
+    $('#result').DataTable().draw()
+
+  $('input[name=variant_type]').on 'click', ->
+    if $('input[name=variant_type]:not(:checked)').size() == 0
+      $('input[name=variant_type_all]').prop('checked', true)
+    else
+      $('input[name=variant_type_all]').prop('checked', false)
+    $('#result').DataTable().draw()
+
+  # filter significance
+  $('input[name=significance_all]').on 'click', ->
+    $('input[name=significance]').prop('checked', $('input[name=significance_all]').prop('checked'))
+    $('#result').DataTable().draw()
+
+  $('input[name=significance]').on 'click', ->
+    if $('input[name=significance]:not(:checked)').size() == 0
+      $('input[name=significance_all]').prop('checked', true)
+    else
+      $('input[name=significance_all]').prop('checked', false)
     $('#result').DataTable().draw()
 
   add_freq_filter = () ->

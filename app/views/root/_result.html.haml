@@ -97,12 +97,12 @@
           type: 'POST',
           data: (d) ->
             d.term = $('#search_text').val()
-            d.source = $("[name=source]:checked").map(() -> $(this).val()).get()
-            d.freq_source = $("[name=frequency_data_source] option:selected").map(() -> $(this).val()).get()
-            d.freq_relation = $("[name=frequency_relation] option:selected").map(() -> $(this).val()).get()
-            d.freq_value = $("[name=frequency]").map(() -> $(this).val()).get()
-            d.variant_type = $("[name=variant_type]:checked").map(() -> $(this).val()).get()
-
+            d.source = $('input[name^=source]:checked').map(() -> $(this).val()).get()
+            d.freq_source = $('select[name=frequency_data_source] option:selected').map(() -> $(this).val()).get()
+            d.freq_relation = $('select[name=frequency_relation] option:selected').map(() -> $(this).val()).get()
+            d.freq_value = $('input[name=frequency]').map(() -> $(this).val()).get()
+            d.variant_type = $('input[name^=variant_type]:checked').map(() -> $(this).val()).get()
+            d.significance = $('input[name^=significance]:checked').map(() -> $(this).val()).get()
             return
           beforeSend: (xhr) ->
             xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))

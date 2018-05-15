@@ -7,7 +7,7 @@ module Reports
 
       @stanza << Stanza.row_headered_table('', url: "https://togovar.org/sparqlist/api/variant_basic_information?tgv_id=#{id}")
       @stanza << Stanza.variant_frequency('Frequency', tgv_id: id)
-      @stanza << Stanza.variant_jbrowse('Variant Information', tgv_id: id)
+      @stanza << Stanza.variant_jbrowse('Genomic context', tgv_id: id)
       @stanza << Stanza.column_headered_table('Transcripts', url: "https://togovar.org/sparqlist/api/variant_transcripts?tgv_id=#{id}")
 
       lookup = Lookup.find(id)
@@ -20,11 +20,8 @@ module Reports
       end
 
       if (rs = lookup&.rs)
-        puts '===='
-        puts rs
-        puts '===='
         Array(rs).each do |x|
-          @stanza << Stanza.pubtator_stanza('Publications', rs: x)
+          @stanza << Stanza.column_headered_table('Publications', url: "https://togovar.org/sparqlist/api/rs2disease?rs=#{x}")
         end
       end
     end

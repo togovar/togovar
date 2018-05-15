@@ -19,7 +19,8 @@ class RootController < ApplicationController
                       variant_type:  [],
                       freq_source:   [],
                       freq_relation: [],
-                      freq_value:    []]
+                      freq_value:    [],
+                      significance:  []]
         render json: Lookup.list(params.permit(*parameters))
       end
     end

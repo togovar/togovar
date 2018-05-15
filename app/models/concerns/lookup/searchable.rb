@@ -172,22 +172,40 @@ class Lookup
     module ClassMethods
       def list(params)
         term = term_type((params['term'] || '').strip)
-        Rails.logger.info('term: ' + term.inspect)
 
-        start  = (params['start'] || 0).to_i
-        length = (params['length'] || 10).to_i
+        if [params['source'], params['significance'], params['significance']].any?(&:blank?)
+          query = { size: 0 }
+        else
+          start  = (params['start'] || 0).to_i
+          length = (params['length'] || 10).to_i
 
-        query = { size: length,
-                  from: start,
-                  sort: %w[chromosome start stop] }
+          query = { size: length,
+                    from: start,
+                    sort: %w[chromosome start stop] }
 
-        query.merge!(term.query) if term.present?
+          query.merge!(term.query) if term.present?
 
-        query = filter_by_source(query, params)
-        query = filter_by_frequency(query, params)
-        query = filter_by_variant_type(query, params)
+          query = filter_by_frequency(query, params)
+          if params['source']
+            unless params['source'].include?('source_all')
+              query = filter_by_source(query, params)
+            end
+          end
+          if params['variant_type']
+            unless params['variant_type'].include?('variant_type_all')
+              query = filter_by_variant_type(query, params)
+            end
+          end
+          if params['significance']
+            unless params['significance'].include?('significance_all')
+              query = filter_by_significance(query, params)
+            end
+          end
+        end
 
-        Rails.logger.info(query)
+        Rails.logger.info('query term: ' + term.inspect)
+        Rails.logger.info('es query: ' + query.to_json)
+
         result    = search(query)
         hit_count = result['hits']['total']
         sources   = result['hits']['hits'].map { |x| x['_source'] }
@@ -292,13 +310,37 @@ class Lookup
             next nil
           end
 
-          next nil unless %w[togovar tommo hgvd exac].include?(x)
-          next nil unless %w[ge gte le lte].include?(y)
+          next nil unless %w[jga_ngs jga_snp tommo hgvd exac clinvar].include?(x)
+          next nil unless %w[gte gt lte lt].include?(y)
 
           { range: { "#{x}.frequency" => { y => value } } }
         end.compact
 
         condition = [q, { bool: { should: sources } }].compact
+
+        query.merge(query: { bool: { must: condition } })
+      end
+
+      def filter_by_significance(query, params)
+        significance = params['significance'] || []
+
+        return query if significance.empty?
+
+        q = query.delete(:query)
+
+        types = []
+        if significance.delete('not_in_clinvar')
+          types.push bool: {
+            must_not: {
+              exists: {
+                field: 'clinvar'
+              }
+            }
+          }
+        end
+
+        types.push(*significance.map { |x| { term: { 'clinvar.significances': x } } })
+        condition = [q, { bool: { should: types } }].compact
 
         query.merge(query: { bool: { must: condition } })
       end
@@ -313,7 +355,7 @@ class Lookup
           total_significance: {
             terms: {
               field: 'clinvar.significances',
-              size: 20
+              size:  20
             }
           },
           total_jga_ngs:      {

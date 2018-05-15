@@ -9,3 +9,33 @@ table thead tr th.cell-border {
 table thead tr th.cell-border:first-child {
   border-left: 0;
 }
+
+.sidebar {
+  margin-top: 15px;
+  width: 260px;
+}
+
+main {
+  margin-top: 15px;
+  margin-left: 260px !important;
+}
+
+footer {
+  margin-left: 260px !important;
+}
+
+@media (min-width: 1500px) {
+  .sidebar {
+    margin-top: 15px;
+    width: 400px;
+  }
+
+  main {
+    margin-top: 15px;
+    margin-left: 400px !important;
+  }
+
+  footer {
+    margin-left: 400px !important;
+  }
+}

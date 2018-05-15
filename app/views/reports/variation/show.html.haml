@@ -7,14 +7,16 @@
 = content_for :javascript do
   = javascript_include_tag 'stanza'
 
-#nav-wrapper
-  #navbar.navbar
-    .navbar-inner
-      %ul.nav
-        - @stanza.each do |stanza|
-          %li= link_to stanza.name, "##{stanza.name}"
+.container-fluid
+  #nav-wrapper
+    #navbar.navbar
+      .navbar-inner
+        %ul.nav
+          - @stanza.each do |stanza|
+            %li= link_to stanza.name, "##{stanza.name}"
+
 %main
-  .container
+  .container-fluid
     %h1 Variant Report
 
     %h2= "ID: tgv#{@tgv_id}"
