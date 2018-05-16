@@ -5,8 +5,8 @@
   #navbarCollapse.collapse.navbar-collapse
     %ul.navbar-nav.mr-auto
       %li.nav-item.active
-        = link_to search_path, class: 'nav-link' do
-          Search
+        = link_to root_path, class: 'nav-link' do
+          Home
           %span.sr-only (current)
       %li.nav-item= link_to 'Datasets', doc_datasets_path, class: 'nav-link'
       %li.nav-item= link_to 'Terms', doc_terms_path, class: 'nav-link'
