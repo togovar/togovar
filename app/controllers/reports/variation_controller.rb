@@ -9,17 +9,17 @@ module Reports
                                            nav_id:    'variant_information',
                                            nav_label: 'Variant Information',
                                            args:      { url: "https://togovar.org/sparqlist/api/variant_basic_information?tgv_id=#{id}" })
-      @stanza << Stanza.variant_frequency('Frequency', tgv_id: id)
-      @stanza << Stanza.variant_jbrowse('Genomic context', tgv_id: id)
+      @stanza << Stanza.variant_frequency('Frequency', args: { tgv_id: id })
+      @stanza << Stanza.variant_jbrowse('Genomic context', args: { tgv_id: id })
       @stanza << Stanza.column_headered_table('Transcripts', args: { url: "https://togovar.org/sparqlist/api/variant_transcripts?tgv_id=#{id}" })
 
       lookup = Lookup.find(id)
 
       if (allele_id = lookup&.clinvar&.allele_id)
         variation_id = Reports::Variation.variation_id_for_allele(allele_id)
-        @stanza << Stanza.clinvar_variant_information('Variant Information', clinvar_id: variation_id)
-        @stanza << Stanza.clinvar_variant_interpretation('Variant Interpretation', clinvar_id: variation_id)
-        @stanza << Stanza.clinvar_variant_alleles('Variant Alleles', clinvar_id: variation_id)
+        @stanza << Stanza.clinvar_variant_information('Variant Information', args: { clinvar_id: variation_id })
+        @stanza << Stanza.clinvar_variant_interpretation('Variant Interpretation', args: { clinvar_id: variation_id })
+        @stanza << Stanza.clinvar_variant_alleles('Variant Alleles', args: { clinvar_id: variation_id })
       end
 
       if (rs = lookup&.rs)
