@@ -316,7 +316,7 @@ class Lookup
           { range: { "#{x}.frequency" => { y => value } } }
         end.compact
 
-        condition = [q, { bool: { should: sources } }].compact
+        condition = [q, { bool: { must: sources } }].compact
 
         query.merge(query: { bool: { must: condition } })
       end
