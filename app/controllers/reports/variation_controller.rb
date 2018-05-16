@@ -6,12 +6,12 @@ module Reports
       @stanza = []
 
       @stanza << Stanza.row_headered_table(nil,
-                                           nav_id: 'variant_information',
+                                           nav_id:    'variant_information',
                                            nav_label: 'Variant Information',
-                                           args:  { url: "https://togovar.org/sparqlist/api/variant_basic_information?tgv_id=#{id}" })
+                                           args:      { url: "https://togovar.org/sparqlist/api/variant_basic_information?tgv_id=#{id}" })
       @stanza << Stanza.variant_frequency('Frequency', tgv_id: id)
       @stanza << Stanza.variant_jbrowse('Genomic context', tgv_id: id)
-      @stanza << Stanza.column_headered_table('Transcripts', url: "https://togovar.org/sparqlist/api/variant_transcripts?tgv_id=#{id}")
+      @stanza << Stanza.column_headered_table('Transcripts', args: { url: "https://togovar.org/sparqlist/api/variant_transcripts?tgv_id=#{id}" })
 
       lookup = Lookup.find(id)
 
@@ -24,7 +24,10 @@ module Reports
 
       if (rs = lookup&.rs)
         Array(rs).each do |x|
-          @stanza << Stanza.column_headered_table('Publications', url: "https://togovar.org/sparqlist/api/rs2disease?rs=#{x}")
+          @stanza << Stanza.column_headered_table("Publications (#{x})",
+                                                  nav_id:    "publication_#{x}",
+                                                  nav_label: 'Publications',
+                                                  args:      { url: "https://togovar.org/sparqlist/api/rs2disease?rs=#{x}" })
         end
       end
     end
