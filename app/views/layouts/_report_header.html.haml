@@ -1,0 +1,10 @@
+- label ||= nil
+#report-header
+  %p.report-type
+    Variant Report
+  %h1
+    %span#report-title-id
+      = id
+    - if label
+      %span#report-title-label
+        = label

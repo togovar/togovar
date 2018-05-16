@@ -707,6 +707,49 @@ only screen and (min-device-pixel-ratio: 2),
   background-size: 30px;
 }
 
+// Report page
+
+#report-header {
+  padding-top: 20px;
+  margin-bottom: 24px;
+  border-bottom: solid 3px #555;
+}
+
+#report-header p.report-type {
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: bold;
+  margin-bottom: 2px;
+  background-color: #333;
+  color: #fff;
+  padding: 1px 8px;
+  letter-spacing: .15em;
+}
+
+#report-header h1 {
+  padding: 3px 0 0;
+  margin: 0;
+}
+
+#report-header h1 span + span {
+  margin-left: .75em;
+}
+
+#report-header h1 span:before {
+  color: #45b8cc;
+  font-size: 0.5em;
+  font-weight: lighter;
+}
+
+#report-header h1 span#report-title-id:before {
+  content: "ID: ";
+}
+
+#report-header h1 span#report-title-label:before {
+  content: "Label: ";
+}
+
+
 /* Nano Stanza
  -------------------------------- */
 #nanostanzas {

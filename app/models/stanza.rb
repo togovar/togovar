@@ -16,12 +16,20 @@ class Stanza
   include ActionView::Helpers::TagHelper
 
   attr_reader :name
-  attr_reader :label
 
-  def initialize(name, label, **options)
-    @name    = name
-    @label   = label
-    @options = options
+  # the title shown above the stanza
+  attr_reader :title
+
+  # for navigation menu
+  attr_reader :nav_id
+  attr_reader :nav_label
+
+  def initialize(name, title, **options)
+    @name      = name
+    @title     = title || ''
+    @nav_id    = options.delete(:nav_id) || @title.underscore
+    @nav_label = options.delete(:nav_label) || @title
+    @options   = options
   end
 
   def link
@@ -29,7 +37,8 @@ class Stanza
   end
 
   def tag
-    params = @options.map { |k, v| %(#{k}="#{v.to_s.gsub('"', '&quot;')}") }
+    args   = @options[:args] || {}
+    params = args.map { |k, v| %(#{k}="#{v.to_s.gsub('"', '&quot;')}") }
 
     tag = "<togostanza-#{@name}"
     if params.present?

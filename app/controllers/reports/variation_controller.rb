@@ -5,7 +5,10 @@ module Reports
 
       @stanza = []
 
-      @stanza << Stanza.row_headered_table('', url: "https://togovar.org/sparqlist/api/variant_basic_information?tgv_id=#{id}")
+      @stanza << Stanza.row_headered_table(nil,
+                                           nav_id: 'variant_information',
+                                           nav_label: 'Variant Information',
+                                           args:  { url: "https://togovar.org/sparqlist/api/variant_basic_information?tgv_id=#{id}" })
       @stanza << Stanza.variant_frequency('Frequency', tgv_id: id)
       @stanza << Stanza.variant_jbrowse('Genomic context', tgv_id: id)
       @stanza << Stanza.column_headered_table('Transcripts', url: "https://togovar.org/sparqlist/api/variant_transcripts?tgv_id=#{id}")

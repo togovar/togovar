@@ -15,11 +15,7 @@
 
 %main
   .container-fluid
-    #header.tg-report-header
-      %p.tg-report-type Gene report
-      %h1
-        %span#tg-title-id #{@gene_id}
-        %span#tg-title-label #{@gene.name}
+    = render partial: 'layouts/report_header', locals: { id: @gene_id, label: @gene.name }
 
     %section#nanostanzas.row-fluid
       - StanzaRuby.providers.genes.nanostanza.each do |stanza|
