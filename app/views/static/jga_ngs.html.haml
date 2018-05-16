@@ -5,18 +5,26 @@
 
     %h2 概要
     %p
-      %a{href: "https://humandbs.biosciencedbc.jp/en/"}> NBDCヒトデータベース(humandbs)
+      %a{href: 'https://humandbs.biosciencedbc.jp/en/'}> NBDCヒトデータベース(humandbs)
       \/
-      %a{href: "https://www.ddbj.nig.ac.jp/jga/index-e.html"}> Japanese Genotype-phenotype Archive (JGA)
-      に登録されている個人レベルのゲノム配列データを再解析して検出したバリアントを集約したデータです。
-      ２次データ作成の許諾が得られたhumandbs/JGAデータの全てが集約対象です。
-      なお、Alternative allele数が5未満のバリアントは含まれていません。
+      %a{href: 'https://www.ddbj.nig.ac.jp/jga/index-e.html'}> Japanese Genotype-phenotype Archive (JGA)
+      に
+      登録されている個人レベルのゲノム配列データを再解析して検出したバリアントを集約したデータです。２次データ作成の許諾が得られたhumandbs/JGAデータの全てが集約対象です。なお、Alternative allele数が5以下のバリアントは含まれていません。
+    %ul
+      %li
+        バージョン/最終更新日：06/01/2018
+      %li
+        サンプルサイズ：125
+      %li
+        バリアント数： 13,338,968 (QC PASSED: 1,557,674)
+      %li
+        バリアント部位数：12,980,041 (QC PASSED: 1,459,952)
 
     %h2 利用条件
 
     %h3 データ利用者の権利
     %p
-      %a{href: "https://humandbs.biosciencedbc.jp/guidelines/data-sharing-guidelines"}> NBDCヒトデータ共有ガイドライン
+      %a{href: 'https://humandbs.biosciencedbc.jp/guidelines/data-sharing-guidelines'}> NBDCヒトデータ共有ガイドライン
       の5-2. データ利用者の権利の5-2-1. 非制限公開データに準拠します。
     %ol
       %li
@@ -25,11 +33,9 @@
         データ利用者は、『NBDCヒトデータベース』のデータを利用した研究結果をもとにした知的財産権をデータ利用者の責務を遵守する限り自由に取得できる。
 
     %h3 データ利用者の責務
-    %p
-      NBDCヒトデータ共有ガイドラインの5-3. データ利用者の責務の5-3-1. 非制限公開データに準拠します。
+    %p NBDCヒトデータ共有ガイドラインの5-3. データ利用者の責務の5-3-1. 非制限公開データに準拠します。
     %ol
-      %li
-        データ利用に際してのデータの品質・内容・科学的妥当性については、利用者の責任と判断のもとで活用すること。
+      %li データ利用に際してのデータの品質・内容・科学的妥当性については、利用者の責任と判断のもとで活用すること。
       %li
         データ利用者は、下記の事項を遵守すること。
         %ul
@@ -43,146 +49,113 @@
         公衆利用（例：データを利用して論文等で発表する場合など）の際は以下の引用を付与してください。
         %p
           Variant set aggregated from NGS data in
-          %a{href: "https://humandbs.biosciencedbc.jp/en/"} NBDC human database
-          \/
-          %a{href: "https://www.ddbj.nig.ac.jp/jga/index-e.html"} JGA
-          [Internet]. Tokyo: Japan Science and Technology Agency (Japan), National Bioscience Database Center; [2018] – . JGA-NGS Dataset; [cited YYYY Mmm DD]. Available from:
-          %a{href: "jga-ngs"} https://togovar.biosciencedbc.jp/datasets/jga-ngs
+          = succeed '/' do
+            %a{href: 'https://humandbs.biosciencedbc.jp/en/'} NBDC human database
+          %a{href: 'https://www.ddbj.nig.ac.jp/jga/index-e.html'}> JGA
+          \ [Internet]. Tokyo: Japan Science and Technology Agency (Japan), National Bioscience Database Center; [2018] – . JGA-NGS Dataset; [cited YYYY Mmm DD]. Available from:
+          = link_to 'https://togovar.biosciencedbc.jp/doc/datasets/jga_ngs', doc_datasets_jga_snp_path
 
     %h2 データ解析手法
-    %a{href: "analysis"} TogoVarデータセット作成方法
+    = succeed 'のページを参照ください。' do
+      %a{href: 'analysis'} JGAデータセット作成方法
 
     %h2 集約されたデータの由来
-    %table{border: "1"}
+    %table{border: '1'}
       %thead
         %tr
+          %th JGAID
+          %th ヒトDB
+          %th 研究題目
+          %th 対象集団
           %th
-            JGAID
-          %th
-            ヒトDB
-          %th
-            研究題目
-          %th
-            対象集団
-          %th
-            %p
-              サンプル
-            %p
-              サイズ
-          %th
-            データ提供者
+            サンプル
+            %br>/
+            サイズ
+          %th データ提供者
       %tbody
         %tr
           %td
-            %a{href: "https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000004"} JGAD00000000004
+            %a{href: 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000004'} JGAD00000000004
           %td
-            %a{href: "https://humandbs.biosciencedbc.jp/hum0006-v3"} hum0006
+            %a{href: 'https://humandbs.biosciencedbc.jp/hum0006-v3'} hum0006
+          %td 脳腫瘍のゲノム・遺伝子解析とその臨床病理学的意義の解明
+          %td 脳腫瘍 アストロサイトーマ
+          %td{align: 'right'} 6
           %td
-            脳腫瘍のゲノム・遺伝子解析とその臨床病理学的意義の解明
-          %td
-            脳腫瘍  アストロサイトーマ
-          %td{align: "right"}
-            6
-          %td
-            %p
-              斉藤 延人
-            %p
-              (P-DIRECT)
+            斉藤 延人
+            %br>/
+            (P-DIRECT)
         %tr
           %td
-            %a{href: "https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000106"} JGAD00000000106
+            %a{href: 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000106'} JGAD00000000106
           %td
-            %a{href: "https://humandbs.biosciencedbc.jp/hum0006-v3"} hum0006
+            %a{href: 'https://humandbs.biosciencedbc.jp/hum0006-v3'} hum0006
+          %td 脳腫瘍のゲノム・遺伝子解析とその臨床病理学的意義の解明
+          %td 脳腫瘍 オリゴデンドログリオーマ
+          %td{align: 'right'} 16
           %td
-            脳腫瘍のゲノム・遺伝子解析とその臨床病理学的意義の解明
-          %td
-            脳腫瘍 オリゴデンドログリオーマ
-          %td{align: "right"}
-            16
-          %td
-            %p
-              斉藤 延人
-            %p
-              (P-DIRECT)
+            斉藤 延人
+            %br>/
+            (P-DIRECT)
         %tr
           %td
-            %a{href: "https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000112"} JGAD00000000112
+            %a{href: 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000112'} JGAD00000000112
           %td
-            %a{href: "https://humandbs.biosciencedbc.jp/hum0006-v3"} hum0006
+            %a{href: 'https://humandbs.biosciencedbc.jp/hum0006-v3'} hum0006
+          %td 脳腫瘍のゲノム・遺伝子解析とその臨床病理学的意義の解明
+          %td 脳腫瘍 小脳グリオーマ
+          %td{align: 'right'} 17
           %td
-            脳腫瘍のゲノム・遺伝子解析とその臨床病理学的意義の解明
-          %td
-            脳腫瘍 小脳グリオーマ
-          %td{align: "right"}
-            17
-          %td
-            %p
-              斉藤 延人
-            %p
-              (P-DIRECT)
+            斉藤 延人
+            %br>/
+            (P-DIRECT)
         %tr
           %td
-            %a{href: "https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000014"} JGAD00000000014
+            %a{href: 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000014'} JGAD00000000014
           %td
-            %a{href: "https://humandbs.biosciencedbc.jp/hum0021-v1"} hum0021
+            %a{href: 'https://humandbs.biosciencedbc.jp/hum0021-v1'} hum0021
+          %td 精神神経疾患の原因解明および診断法・治療法の開発に関する研究
+          %td 健常一卵性双生児
+          %td{align: 'right'} 6
           %td
-            精神神経疾患の原因解明および診断法・治療法の開発に関する研究
-          %td
-            健常一卵性双生児
-          %td{align: "right"}
-            6
-          %td
-            %p
-              加藤 忠史
-            %p
-              （ゲノム支援）
+            加藤 忠史
+            %br>/
+            (ゲノム支援)
         %tr
           %td
-            %a{href: "https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000036"} JGAD00000000036
+            %a{href: 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000036'} JGAD00000000036
           %td
-            %a{href: "https://humandbs.biosciencedbc.jp/hum0035-v1"} hum0035
+            %a{href: 'https://humandbs.biosciencedbc.jp/hum0035-v1'} hum0035
+          %td 固形腫瘍における遺伝子異常の網羅的解析
+          %td 多数の固形腫瘍性疾患検体
+          %td{align: 'right'} 23
           %td
-            固形腫瘍における遺伝子異常の網羅的解析
-          %td
-            多数の固形腫瘍性疾患検体
-          %td{align: "right"}
-            23
-          %td
-            %p
-              滝田 順子
-            %p
-              （P-DIRECT）
+            滝田 順子
+            %br>/
+            (P-DIRECT)
         %tr
           %td
-            %a{href: "https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000038"} JGAD00000000038
+            %a{href: 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000038'} JGAD00000000038
           %td
-            %a{href: "https://humandbs.biosciencedbc.jp/hum0040-v1/"} hum0040
+            %a{href: 'https://humandbs.biosciencedbc.jp/hum0040-v1/'} hum0040
+          %td ヒト胎盤におけるインプリント制御領域およびインプリント遺伝子の同定
+          %td ヒト胎盤および母体血
+          %td{align: 'right'} 48
           %td
-            ヒト胎盤におけるインプリント制御領域およびインプリント遺伝子の同定
-          %td
-            ヒト胎盤および母体血
-          %td{align: "right"}
-            48
-          %td
-            %p
-              有馬 隆博
-            %p
-              （IHEC)
+            有馬 隆博
+            %br>/
+            (IHEC)
         %tr
           %td
-            %a{href: "https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000060"} JGAD00000000060
+            %a{href: 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000060'} JGAD00000000060
+            %a
           %td
-            %a{href: "https://humandbs.biosciencedbc.jp/hum0066-v1"} hum0066
-          %td
-            癌の再発・転移に関与するnon-coding RNAの同定とその機序の解明
-          %td
-            大腸がん
-          %td{align: "right"}
-          9
-          %td
-            三森 功士
+            %a{href: 'https://humandbs.biosciencedbc.jp/hum0066-v1'} hum0066
+          %td 癌の再発・転移に関与するnon-coding RNAの同定とその機序の解明
+          %td 大腸がん
+          %td{align: 'right'} 9
+          %td 三森 功士
         %tr
-          %td{align: "center", :colspan => "4"}
+          %td{align: 'center', colspan: '4'}
             %strong 合計
-          %td{align: "right"}
-            125
+          %td{align: 'right'} 125

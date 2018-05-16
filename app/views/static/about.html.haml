@@ -2,16 +2,28 @@
 %main
   .container
     %h1.title About TogoVar
-    %p TogoVarは、日本人ゲノムのバリアントを中心に、それに関連する遺伝子および疾患情報を収集し整理統合したサイトです。
-    %ol
-      %li 日本人のバリアント情報を研究プロジェクト横断的に統合します
-      TogoVarではJGAの個人ゲノムデータを集約して得られた日本人集団のバリアント情報を提供します。TogoVarやJGAの情報を利用して疾患に関連する日本人特有の希少なバリアントの発見などが期待されます。
-      %li バリアントの解釈に必要な情報をワンストップで提供します
-      TogoVarでは日本人のバリアント情報と海外の様々なデータベースで公開されている情報を統合し、日本人のゲノムバリアントを解釈するためのリファレンスを提供します。
+    %p TogoVar（日本人ゲノム多様性統合データベース）は、日本人ゲノムのバリアントを中心に、それに関連する遺伝子および疾患情報を収集し整理統合したサイトです。
+
+    %h2 1. 日本人のバリアント情報を研究プロジェクト横断的に統合します
+    %p
+      %a{:href => "https://humandbs.biosciencedbc.jp/en/"}> NBDCヒトデータベース(humandbs)
+      \/
+      %a{:href => "https://www.ddbj.nig.ac.jp/jga/index-e.html"}> Japanese Genotype-phenotype Archive (JGA)
+      = precede 'の個人ゲノムデータを集約して得られた日本人集団のバリアント情報(' do
+        = succeed 'と' do
+          = link_to 'JGA-NGS', doc_datasets_jga_ngs_path
+      = succeed ')を提供します。' do
+        = link_to 'JGA-SNP', doc_datasets_jga_snp_path
+      これまで検出できなかった新たな疾患関連バリアントの同定につながる可能性が期待できます。
+
+    %h2 2. バリアントの解釈に必要な情報をワンストップで提供します
+    %p
+      日本人のバリアント情報と海外の様々なデータベースで公開されている情報を統合し、日本人のゲノムバリアントを解釈するためのリファレンスを提供します。
+
     %h2 開発者/Developers
     %p
       TogoVarは、
-      %a{href: 'https://biosciencedbc.jp/'}> 国立研究開発法人科学技術振興機構 バイオサイエンスデータベースセンター (NBDC)
+      %a{:href => "https://biosciencedbc.jp/"} 国立研究開発法人科学技術振興機構 バイオサイエンスデータベースセンター (NBDC)
       と
-      %a{href: 'http://dbcls.rois.ac.jp/'}> 大学共同利用機関法人 情報・システム研究機構 データサイエンス共同利用基盤施設 ライフサイエンス統合データベースセンター (DBCLS)
-      との共同研究で開発されています。
+      %a{:href => "http://dbcls.rois.ac.jp/"} 大学共同利用機関法人 情報・システム研究機構 データサイエンス共同利用基盤施設 ライフサイエンス統合データベースセンター (DBCLS)
+      との共同研究で開発しています。

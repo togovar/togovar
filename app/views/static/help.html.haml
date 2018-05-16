@@ -2,50 +2,52 @@
 %main
   .container
     %h1.title Help
-    %ul
+    %ul{style: "font-size: 100%"}
       %li
-        %a{href: '#general'}
-          %strong TogoVar全般
+        %strong TogoVar全般
         %ul
           %li
-            TogoVarの目的や有用性は何でしょうか。
+            %a{href: "#g1"} TogoVarの目的や有用性は何でしょうか。
           %li
-            インハウスでTogoVarを利用できますか。
+            %a{href: "#g2"} インハウスでTogoVarを利用できますか。
       %li
-        %a{href: '#terms'}
-          %strong 利用条件に関して
+        %strong 利用条件に関して
         %ul
           %li
-            データベースの利用は無償でしょうか。
+            %a{href: "#t1"} データベースの利用は無償でしょうか。
           %li
-            商用利用は可能でしょうか。
+            %a{href: "#t2"} データベースの情報を利用して論文を書くには、どのようにすれば良いでしょうか
+          %li
+            %a{href: "#t3"} 商用利用は可能でしょうか。
       %li
-        %a{href: '#data'}
-          %strong TogoVar収録データに関して
+        %strong TogoVar収録データに関して
         %ul
           %li
-            個人レベルの表現型情報の取得は可能でしょうか。
+            %a{href: "#d1"} 個人レベルの表現型情報の取得は可能でしょうか。
           %li
-            遺伝子発現やタンパク質の情報とは結び付かないのでしょうか。
+            %a{href: "#d2"} 遺伝子発現やタンパク質の情報とは結び付かないのでしょうか。
           %li
-            バリアントの検出の際に使用したソフトウェアおよび品質管理の方法を教えてください。
+            %a{href: "#d3"} バリアントの検出の際に使用したソフトウェアおよび品質管理の方法を教えてください。
           %li
-            Molecular AnnotationのConsequenceの値はどのように計算していますか
+            %a{href: "#d4"} TogoVarで対象としているバリアントの種類は何ですか
           %li
-            SIFTとPolyPhenとは何ですか
+            %a{href: "#d5"} Molecular AnnotationのConsequenceの値はどのように計算していますか。
           %li
-            Clinical Significanceの値はどのように計算していますか
+            %a{href: "#d6"} SIFTとPolyPhenとは何ですか。
+          %li
+            %a{href: "#d7"} Clinical Significanceの値はどのように計算していますか。
       %li
-        %a{href: '#system'}
-          %strong TogoVar検索システムに関して
+        %strong TogoVar検索システムに関して
         %ul
           %li
-            検索結果のFrequency列に表示される頻度メーターは何を表現していますか。
+            %a{href: "#s1"} 検索結果のFrequency列に表示される頻度メーターは何を表現していますか。
           %li
-            リファレンスゲノム上の範囲を検索条件にした場合、どのようなバリアントがヒットしますか。
+            %a{href: "#s2"} リファレンスゲノム上の範囲を検索条件にした場合、どのようなバリアントがヒットしますか。
+
+
     %h2#general TogoVar全般
 
-    %h4 Q. TogoVarの目的や有用性は何でしょうか。
+    %h4#g1 Q. TogoVarの目的や有用性は何でしょうか。
     %p
       A. ゲノムの解読はNGSにより低頻度の変異を取得することが可能となりました。
       しかし、欧米の既存データベースには、十分なサンプル数の日本人集団における頻度データはありません。
@@ -57,25 +59,25 @@
       そこで、当データベースでは同じバリアントにはユニークなIDを付与することで、
       研究者が行っているバリアントの位置情報を参照配列間で変換する作業を省力化します。
 
-    %h4 Q. インハウスでTogoVarを利用できますか。
+    %h4#g2 Q. インハウスでTogoVarを利用できますか。
     %p
       A. dockerイメージを公開する予定です。しばらくお待ちください。
 
     %h2{id: '#terms'} 利用条件に関して
 
-    %h4 Q. データベースの利用は無償でしょうか。
+    %h4#t1 Q. データベースの利用は無償でしょうか。
     %p
       A. すべて無償での利用が可能です。データベースの利用については、
       %span>= link_to 'Terms', doc_terms_path
       のページを参照してください。
 
-    %h4 Q. データベースの情報を利用して論文を書くには、どのようにすれば良いでしょうか？
+    %h4#t2 Q. データベースの情報を利用して論文を書くには、どのようにすれば良いでしょうか？
     %p
       A.
       %span>= link_to 'Terms', doc_terms_path
       のクレジットの表示例を参考にしてください。
 
-    %h4 Q. 商用利用は可能でしょうか。
+    %h4#t3 Q. 商用利用は可能でしょうか。
     %p
       A. TogoVarのwebサイトの閲覧や公開予定のdockerイメージは商用利用可能です。TogoVarが取り込んでいる第三者作成データに関してはそれそれの利用条件に従ってください。詳しくは
       %span>= link_to 'Terms', doc_terms_path
@@ -83,7 +85,7 @@
 
     %h2#data TogoVar収録データに関して
 
-    %h4 Q. 個人レベルの表現型情報の取得は可能でしょうか。
+    %h4#d1 Q. 個人レベルの表現型情報の取得は可能でしょうか。
     %p
       A. 当データベースは個人情報を保持しておらず、また、個人ごとの表現型情報は現在のところ提供はしておりません。
       表現型情報の詳細については、
@@ -92,19 +94,19 @@
       %span>= link_to 'JGA-SNPデータセット', doc_datasets_jga_snp_path
       に記載されている研究グループに直接お問い合わせ下さい。
 
-    %h4 Q. 遺伝子発現やタンパク質の情報とは結び付かないのでしょうか。
+    %h4#d2 Q. 遺伝子発現やタンパク質の情報とは結び付かないのでしょうか。
     %p
       A. 当データベースはヒトゲノムの遺伝子変異について、日本人の公開情報を中心として統合したものです。
       当データベースはRDFの技術をベースとして利用している為、遺伝子発現やタンパク質の情報がRDFを利用しているデータベースである場合は、
       容易に拡張が可能と考えております。遺伝子発現やタンパク質の情報への拡張は順次実施する予定です。
 
-    %h4 Q. バリアントの検出の際に使用したソフトウェアおよび品質管理の方法を教えてください。
+    %h4#d3 Q. バリアントの検出の際に使用したソフトウェアおよび品質管理の方法を教えてください。
     %p
       = precede 'A. ' do
         %span>= link_to 'TogoVarデータセット作成方法', doc_datasets_analysis_path
       を参照ください。
 
-    %h4 Q. TogoVarで対象としているバリアントの種類は何ですか
+    %h4#d4 Q. TogoVarで対象としているバリアントの種類は何ですか
     %p
       A. SNV、Insertion、Deletion、Indel、Substitutionの5種類です。
       %a{href: 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants'}> HGVSがType of variantsに列挙した5種類
@@ -114,13 +116,13 @@
       %a{href: 'https://www.ensembl.org/vep'}> Variant Effect Predictor (VEP)
       を利用しています。
 
-    %h4 Q. Molecular AnnotationのConsequenceの値はどのように計算していますか
+    %h4#d5 Q. Molecular AnnotationのConsequenceの値はどのように計算していますか
     %p
       = precede 'A. ' do
         %a{href: 'https://asia.ensembl.org/info/genome/variation/predicted_data.html#consequences'}> Variant Effect Predictor (VEP)のvariant consequence
-      の値を表示しています。
+      の値を表示しています。１バリアントに対応するトランスクリプトが複数ある場合は、一番重大なConsequenceのみを表示している場合があります。
 
-    %h4 Q. SIFTとPolyPhenとは何ですか
+    %h4#d6 Q. SIFTとPolyPhenとは何ですか
     %p
       A. バリアントによってアミノ酸配列が変化する場合、それがタンパク質の機能に与える影響を予測したものです。
       %a{href: 'https://asia.ensembl.org/info/genome/variation/predicted_data.html#nsSNP'}> Variant Effect Predictor (VEP)
@@ -145,7 +147,7 @@
           %li{class: 'polyphen_unknown'}
             Unknown
 
-    %h4 Q. Clinical Significanceの値はどのように計算していますか
+    %h4#d7 Q. Clinical Significanceの値はどのように計算していますか
     %p
       = precede 'A. ' do
         %a{href: 'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv'}> ClinVarのclinical significance
@@ -153,7 +155,7 @@
 
     %h2#system TogoVarの検索システムに関して
 
-    %h4 Q. 検索結果のFrequency列に表示される頻度メーターは何を表現していますか。
+    %h4#s1 Q. 検索結果のFrequency列に表示される頻度メーターは何を表現していますか。
     %p
       A. 各データセットにおけるAlternative allele頻度を表現しています。頻度メータの色はデータセットに割り当てられた色に対応しています。
       データの有無や頻度の値を９段階で表現しています。
@@ -193,9 +195,15 @@
               ClinVar
       %tr{class: 'center'}
         %td{class: 'px-2'}
-          %span Not Available
+          %span
+            Not
+            %br
+            Available
         %td{class: 'px-2'}
-          %span Monomorphic(REF)
+          %span
+            Monomorphic
+            %br
+            (REF)
         %td{class: 'px-2'}
           %span Singleton
         %td{class: 'px-2'}
@@ -211,7 +219,7 @@
         %td{class: 'px-2'}
           %span &ge; 0.5
 
-    %h4 Q. リファレンスゲノム上の範囲を検索条件にした場合、どのようなバリアントがヒットしますか。
+    %h4#s2 Q. リファレンスゲノム上の範囲を検索条件にした場合、どのようなバリアントがヒットしますか。
     %p
       A. 長さ１bp以上の範囲を検索条件にした場合、その範囲にposition（バリアントの先頭（5'端））が含まれるバリアントがヒットします。
       例えば、chr13:32914101-32914102 (GRCh37)に存在する2bpのindelは、検索条件がchr13:32914101の場合はヒットしますが、chr13:32914102の場合はヒットしません。
