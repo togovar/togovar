@@ -1,4 +1,5 @@
 .table_wrapper.mt-4
+  #search_alert
   %table#result.table.stripe.compact.nowrap
     %thead
       %tr
@@ -89,6 +90,12 @@
         v = if significance[key] then significance[key] else 0
         $('#significance_cnt_' + x).text('(' + v.toLocaleString() + ')')
 
+    show_warning = (message) ->
+      console.log(message)
+      html = if message then '<div class="alert alert-warning" role="alert"><strong>Warning!</strong> ' + message + '</div>' else ''
+      $('#search_alert').html(html)
+      return
+
     $ ->
       result_table = $('#result');
       result_table.DataTable
@@ -111,6 +118,7 @@
           total_dataset = settings.json.total_dataset
           total_significance = settings.json.total_significance
           update_total(total_variant_type, total_dataset, total_significance)
+          show_warning(settings.json.warning)
 
         columns: [
           ## Base Information

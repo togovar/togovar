@@ -242,16 +242,32 @@ class Lookup
 
         # filter_count = term ? hit_count : total['hits']['total']
 
+        warning_message = hit_count > 1_000_000 ? 'Scroll function over 1,000,000 results is currently unavailable.' : nil
+
         { recordsTotal:       total['hits']['total'],
-          recordsFiltered:    hit_count,
+          recordsFiltered:    hit_count <= 1_000_000 ? hit_count : 1_000_000,
           data:               replace,
           total_variant_type: total_variant_type,
           total_significance: total_significance,
-          total_dataset:      total_dataset }
+          total_dataset:      total_dataset,
+          warning:            warning_message }
       end
 
       def search(query)
         client.search(index: index_name, body: query)
+      end
+
+      # @deprecated too slow
+      def scroll(query, size, pages)
+        response = client.search(index: index_name, scroll: '5m', size: size, body: query)
+
+        (pages - 1).times do
+          response = client.scroll(index: index_name, scroll_id: response['_scroll_id'], scroll: '5m',)
+        end
+
+        client.clear_scroll(index: index_name, scroll_id: response['_scroll_id'])
+
+        response
       end
 
       def count(query = {})
