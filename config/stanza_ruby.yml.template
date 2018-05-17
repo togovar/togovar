@@ -66,7 +66,7 @@ defaults: &defaults
           span: 1
         -
           uri: https://togovar.org/legacy_stanza/togovar_clinvar_nano
-          span: 1
+          span: 2
         -
           uri: https://togovar.org/legacy_stanza/togovar_jgangs_nano
           span: 1

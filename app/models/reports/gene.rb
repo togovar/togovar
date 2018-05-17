@@ -8,7 +8,7 @@ module Reports
           DEFINE sql:select-option "order"
           PREFIX up: <http://purl.uniprot.org/core/>
 
-          SELECT DISTINCT ?name
+          SELECT DISTINCT ?name ?ensembl_gene
           WHERE {
             GRAPH <http://togovar.org/graph/tgup> {
               <http://togovar.org/gene/9606:#{id}> rdfs:seeAlso ?uniprot_id .
@@ -17,11 +17,22 @@ module Reports
             }
             GRAPH <http://togovar.org/graph/uniprot> {
               ?uniprot_up up:recommendedName/up:fullName ?name
+              OPTIONAL {
+                ?uniprot_up rdfs:seeAlso ?ensembl_transcript .
+                ?ensembl_transcript a up:Transcript_Resource ;
+                  up:transcribedFrom ?ensembl_gene .
+              }
             }
           }
         SPARQL
 
-        OpenStruct.new(query(sparql).first)
+        gene = query(sparql).first
+
+        if (uri = gene[:ensembl_gene])
+          gene[:ensembl_gene] = uri.split('/').last
+        end
+
+        OpenStruct.new(gene)
       end
     end
   end
