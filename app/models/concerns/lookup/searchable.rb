@@ -173,7 +173,7 @@ class Lookup
       def list(params)
         term = term_type((params['term'] || '').strip)
 
-        if [params['source'], params['significance'], params['significance']].any?(&:blank?)
+        if [params['source'], params['variant_type'], params['significance']].any?(&:blank?)
           query = { size: 0 }
         else
           start  = (params['start'] || 0).to_i
