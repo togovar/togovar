@@ -6,6 +6,9 @@ defaults: &defaults
           uri: https://togovar.org/legacy_stanza/gene_length_nano
           span: 1
         -
+          uri: https://togovar.org/legacy_stanza/togovar_variant_number_by_gene_nano
+          span: 1
+        -
           uri: https://togovar.org/legacy_stanza/protein_ec_number_nano
           span: 1
         -
