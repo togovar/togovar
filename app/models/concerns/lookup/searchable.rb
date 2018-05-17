@@ -240,12 +240,16 @@ class Lookup
           json
         end
 
-        # filter_count = term ? hit_count : total['hits']['total']
+        warning_message = sources.present? && hit_count > 1_000_000 ? 'Scroll function over 1,000,000 results is currently unavailable.' : nil
 
-        warning_message = hit_count > 1_000_000 ? 'Scroll function over 1,000,000 results is currently unavailable.' : nil
+        filtered_count = if sources.blank?
+                           0
+                         else
+                           hit_count <= 1_000_000 ? hit_count : 1_000_000
+                         end
 
         { recordsTotal:       total['hits']['total'],
-          recordsFiltered:    hit_count <= 1_000_000 ? hit_count : 1_000_000,
+          recordsFiltered:    filtered_count,
           data:               replace,
           total_variant_type: total_variant_type,
           total_significance: total_significance,
@@ -355,7 +359,7 @@ class Lookup
           }
         end
 
-        types.push(*significance.map { |x| { term: { 'clinvar.significances': x } } })
+        types.push(*significance.map { |x| { term: { 'clinvar.significances': x.tr('_', ' ') } } })
         condition = [q, { bool: { should: types } }].compact
 
         query.merge(query: { bool: { must: condition } })
