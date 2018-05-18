@@ -23,7 +23,7 @@
       - if @gene.ensembl_gene.present?
         - StanzaRuby.providers.genes.nanostanza[1..1].each do |stanza|
           .nanostanza-container{data: {stanza: stanza.uri, stanza_gene_id: @gene.ensembl_gene, nanostanza_span: stanza.span}}
-      - StanzaRuby.providers.genes.nanostanza[1..-1].each do |stanza|
+      - StanzaRuby.providers.genes.nanostanza[2..-1].each do |stanza|
         .nanostanza-container{data: {stanza: stanza.uri, stanza_tax_id: 9606, stanza_gene_id: @gene_id, nanostanza_span: stanza.span}}
 
     - StanzaRuby.providers.genes.togostanza.each do |stanza|
