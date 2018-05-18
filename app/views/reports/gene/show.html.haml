@@ -15,7 +15,7 @@
 
 %main
   .container-fluid
-    = render partial: 'layouts/report_header', locals: { title: 'Gene Report', id: @gene_id, label: @gene.name }
+    = render partial: 'layouts/report_header', locals: { title: 'Gene report', id: @gene_id, label: @gene.name }
 
     %section#nanostanzas.row-fluid
       - StanzaRuby.providers.genes.nanostanza[0..0].each do |stanza|
