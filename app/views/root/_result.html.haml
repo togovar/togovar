@@ -21,8 +21,12 @@
         %th Consequence
 
         -# Function
-        %th SIFT
-        %th Polyphen
+        %th
+          SIFT
+          = fa_icon 'question-circle', id: 'tooltip_sift', class: 'gray-tooltip', 'data-toggle': 'tooltip', 'data-html': 'true', title: "#{render partial: 'layouts/tooltip_sift'}"
+        %th
+          Polyphen
+          = fa_icon 'question-circle', id: 'tooltip_polyphen', class: 'gray-tooltip', 'data-toggle': 'tooltip', 'data-html': 'true', title: "#{render partial: 'layouts/tooltip_polyphen'}"
 
         -# ClinVar
         %th
@@ -97,6 +101,10 @@
       return
 
     $ ->
+      $('#freq_tooltip').tooltip()
+      $('#tooltip_sift').tooltip()
+      $('#tooltip_polyphen').tooltip()
+
       result_table = $('#result');
       result_table.DataTable
         ajax:
@@ -287,5 +295,4 @@
           ## End ClinVar Annotation
         ]
       result_table.parent().find(".result-download-container").append("<a><i class='fa fa-file'></i> Download CSV</a>")
-      $('#freq_tooltip').tooltip()
     return
