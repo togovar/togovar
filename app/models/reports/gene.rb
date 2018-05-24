@@ -29,7 +29,7 @@ module Reports
         gene = query(sparql).first
 
         if (uri = gene[:ensembl_gene])
-          gene[:ensembl_gene] = uri.split('/').last
+          gene[:ensembl_gene] = uri&.split('/')&.last || ''
         end
 
         OpenStruct.new(gene)
