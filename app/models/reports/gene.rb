@@ -26,7 +26,7 @@ module Reports
           }
         SPARQL
 
-        gene = query(sparql).first
+        gene = Hash(query(sparql).first)
 
         if (uri = gene[:ensembl_gene])
           gene[:ensembl_gene] = uri&.split('/')&.last || ''
