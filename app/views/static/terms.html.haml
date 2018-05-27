@@ -1,3 +1,9 @@
+- provide(:title, 'Terms')
+- provide(:active, doc_terms_path)
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
 %main
   .container
     %h1.title 利用条件 / Terms of Use

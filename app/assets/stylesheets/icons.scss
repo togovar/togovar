@@ -1,0 +1,308 @@
+.sidebar_icon {
+  content: '';
+  display: inline-block;
+  float: left;
+  width: 20px;
+  height: 20px;
+  margin-right: 0.3rem;
+  vertical-align: middle;
+}
+
+.variant_type_deletion:before {
+  @extend .sidebar_icon;
+  background: url('icon/variant_type/deletion.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.variant_type_indel:before {
+  @extend .sidebar_icon;
+  background: url('icon/variant_type/indel.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.variant_type_insertion:before {
+  @extend .sidebar_icon;
+  background: url('icon/variant_type/insertion.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.variant_type_sequence_alteration:before {
+  @extend .sidebar_icon;
+  background: url('icon/variant_type/sequence_alteration.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.variant_type_snv:before {
+  @extend .sidebar_icon;
+  background: url('icon/variant_type/snv.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.variant_type_substitution:before {
+  @extend .sidebar_icon;
+  background: url('icon/variant_type/substitution.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.source_clinvar:before {
+  @extend .sidebar_icon;
+  background: url('icon/source/clinvar.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.source_exac:before {
+  @extend .sidebar_icon;
+  background: url('icon/source/exac.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.source_hgvd:before {
+  @extend .sidebar_icon;
+  background: url('icon/source/hgvd.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.source_togovar:before {
+  @extend .sidebar_icon;
+  background: url('icon/source/togovar.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.source_jga_ngs:before {
+  @extend .sidebar_icon;
+  background: url('icon/source/togovar.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.source_jga_snp:before {
+  @extend .sidebar_icon;
+  background: url('icon/source/togovar.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.source_tommo:before {
+  @extend .sidebar_icon;
+  background: url('icon/source/tommo_3.5kjpn.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_affects:before {
+  @extend .sidebar_icon;
+  background: url('icon/significance/affects.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_association:before {
+  @extend .sidebar_icon;
+  background: url('icon/significance/association.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_benign:before {
+  @extend .sidebar_icon;
+  background: url('icon/significance/benign.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_conflicting_data_from_submitters:before {
+  @extend .sidebar_icon;
+  background: url('icon/significance/conflicting_data_from_submitters.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_conflicting_interpretations_of_pathogenicity:before {
+  @extend .sidebar_icon;
+  background: url('icon/significance/conflicting_interpretations_of_pathogenicity.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_drug_response:before {
+  @extend .sidebar_icon;
+  background: url('icon/significance/drug_response.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_likely_benign:before {
+  @extend .sidebar_icon;
+  background: url('icon/significance/likely_benign.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_likely_pathogenic:before {
+  @extend .sidebar_icon;
+  background: url('icon/significance/likely_pathogenic.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_not_provided:before {
+  @extend .sidebar_icon;
+  background: url('icon/significance/not_provided.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_other:before {
+  @extend .sidebar_icon;
+  background: url('icon/significance/other.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_pathogenic:before {
+  @extend .sidebar_icon;
+  background: url('icon/significance/pathogenic.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_protective:before {
+  @extend .sidebar_icon;
+  background: url('icon/significance/protective.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_risk_factor:before {
+  @extend .sidebar_icon;
+  background: url('icon/significance/risk_factor.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.significance_uncertain_significance:before {
+  @extend .sidebar_icon;
+  background: url('icon/significance/uncertain_significance.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.sift_deleterious:before {
+  @extend .sidebar_icon;
+  background: url('icon/sift/deleterious.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.sift_tolerated:before {
+  @extend .sidebar_icon;
+  background: url('icon/sift/tolerated.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.polyphen_probably_damaging:before {
+  @extend .sidebar_icon;
+  background: url('icon/polyphen/probably_damaging.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.polyphen_possibly_damaging:before {
+  @extend .sidebar_icon;
+  background: url('icon/polyphen/possibly_damaging.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.polyphen_benign:before {
+  @extend .sidebar_icon;
+  background: url('icon/polyphen/benign.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+.polyphen_unknown:before {
+  @extend .sidebar_icon;
+  background: url('icon/polyphen/unknown.png') no-repeat -6px;
+  background-size: 30px;
+}
+
+// Frequency meter
+.tgv_frequency {
+  background: #65B7C9;
+}
+
+.tommo_frequency {
+  background: #C88298;
+}
+
+.hgvd_frequency {
+  background: #3A6EB8;
+}
+
+.exac_frequency {
+  background: #668A41;
+}
+
+.frequency7 {
+  position: relative;
+  display: inline-block;
+  height: 36px;
+  width: 15px;
+  margin: 0 2px;
+}
+
+.frequency_box {
+  content: "";
+  display: block;
+  position: absolute;
+  height: 4px;
+  width: 13px;
+  left: 1px;
+  top: 1px;
+  background: #FFF;
+}
+
+.frequency_none:before {
+  @extend .frequency_box;
+  height: 34px;
+}
+
+.frequency_0_7:before {
+  @extend .frequency_box;
+  box-shadow:
+          0 5px 0 #FFF,
+          0 10px 0 #FFF,
+          0 15px 0 #FFF,
+          0 20px 0 #FFF,
+          0 25px 0 #FFF,
+          0 30px 0 #FFF;
+}
+
+.frequency_1_7:before {
+  @extend .frequency_box;
+  box-shadow:
+          0 5px 0 #FFF,
+          0 10px 0 #FFF,
+          0 15px 0 #FFF,
+          0 20px 0 #FFF,
+          0 25px 0 #FFF;
+}
+
+.frequency_2_7:before {
+  @extend .frequency_box;
+  box-shadow:
+          0 5px 0 #FFF,
+          0 10px 0 #FFF,
+          0 15px 0 #FFF,
+          0 20px 0 #FFF;
+}
+
+.frequency_3_7:before {
+  @extend .frequency_box;
+  box-shadow:
+          0 5px 0 #FFF,
+          0 10px 0 #FFF,
+          0 15px 0 #FFF;
+}
+
+.frequency_4_7:before {
+  @extend .frequency_box;
+  box-shadow:
+          0 5px 0 #FFF,
+          0 10px 0 #FFF;
+}
+
+.frequency_5_7:before {
+  @extend .frequency_box;
+  box-shadow:
+          0 5px 0 #FFF;
+}
+
+.frequency_6_7:before {
+  @extend .frequency_box;
+}
+
+.frequency_7_7:before {
+  @extend .frequency_box;
+  height: 0;
+}

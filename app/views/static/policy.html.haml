@@ -1,4 +1,8 @@
 - provide(:title, 'Policy')
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
 %main
   .container
     %h1.title Site Policies

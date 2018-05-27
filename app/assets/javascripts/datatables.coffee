@@ -9,6 +9,7 @@
 
 $ ->
   $.extend $.fn.dataTable.defaults,
+    retrieve: true,
     processing: true
     serverSide: true
     ordering: false

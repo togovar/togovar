@@ -1,15 +1,20 @@
-%nav.navbar.navbar-toggleable-md.fixed-top
-  %button.navbar-toggler.navbar-toggler-right{"aria-controls" => "navbarCollapse", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-target" => "#navbarCollapse", "data-toggle" => "collapse", :type => "button"}
-    %span.navbar-toggler-icon
-  = link_to TogoVar, root_path, { class: 'navbar-brand' }
-  #navbarCollapse.collapse.navbar-collapse
-    %ul.navbar-nav.mr-auto
-      %li.nav-item.active
-        = link_to root_path, class: 'nav-link' do
-          Home
-          %span.sr-only (current)
-      %li.nav-item= link_to 'Datasets', doc_datasets_path, class: 'nav-link'
-      %li.nav-item= link_to 'Terms', doc_terms_path, class: 'nav-link'
-      %li.nav-item= link_to 'Contact', doc_contact_path, class: 'nav-link'
-      %li.nav-item= link_to 'About', doc_about_path, class: 'nav-link'
-      %li.nav-item= link_to 'Help', doc_help_path, class: 'nav-link'
+%header.header-stickey
+  #navbar-site.navbar.navbar-expand.flex-column.flex-md-row
+    = link_to TogoVar, root_path, { class: 'navbar-brand mr-0 mr-md-2' }
+    .navbar-scroll
+      %ul.navbar-nav.flex-row
+        - active = yield(:active)
+        %li.nav-item
+          = nav_link 'Home', root_path, active, data: { turbolinks: false }
+        %li.nav-item
+          = nav_link 'Datasets', doc_datasets_path, active, data: { turbolinks: false }
+        %li.nav-item
+          = nav_link 'Terms', doc_terms_path, active, data: { turbolinks: false }
+        %li.nav-item
+          = nav_link 'Contact', doc_contact_path, active, data: { turbolinks: false }
+        %li.nav-item
+          = nav_link 'About', doc_about_path, active, data: { turbolinks: false }
+        %li.nav-item
+          = nav_link 'Help', doc_help_path, active, data: { turbolinks: false }
+
+  = yield :navbar

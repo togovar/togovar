@@ -1,8 +1,11 @@
 #= require jquery
+#= require jquery_ujs
+#= require rails-ujs
 #= require popper
 #= require bootstrap-sprockets
 #= require datatables
 #= require jquery-ui/widgets/autocomplete
+#= require turbolinks
 
 Array::unique = ->
   output = {}
@@ -10,6 +13,70 @@ Array::unique = ->
   value for key, value of output
 
 $ ->
+  frequency7 = (f, c) ->
+    if c == 1
+      return 'frequency_1_7'
+    else if c == 0 || f == 0
+      return 'frequency_0_7'
+    else if f < 0.0001
+      return 'frequency_2_7'
+    else if f < 0.001
+      return 'frequency_3_7'
+    else if f < 0.01
+      return 'frequency_4_7'
+    else if f < 0.05
+      return 'frequency_5_7'
+    else if f < 0.5
+      return 'frequency_6_7'
+    else if f >= 0.5
+      return 'frequency_7_7'
+    else
+      return 'frequency_none'
+
+  sift_class = (v) ->
+    if v < 0.05
+      return 'sift_deleterious'
+    else
+      return 'sift_tolerated'
+
+  polyphen_class = (v) ->
+    if v > 0.908
+      return 'polyphen_probably_damaging'
+    else if v > 0.446 && v <= 0.908
+      return 'polyphen_possibly_damaging'
+    else if v <= 0.446
+      return 'polyphen_benign'
+    else
+      return 'polyphen_unknown'
+
+  clear_total = () ->
+    $("[id^='variant_type_cnt_']").text('(0)')
+    $("[id^='dataset_cnt_']").text('(0)')
+    $("[id^='significance_cnt_cnt_']").text('(0)')
+    return
+
+  update_total = (variant_type, dataset, significance) ->
+    clear_total()
+
+    for x in ['snv', 'insertion', 'deletion', 'indel', 'substitution']
+      v = if variant_type[x] then variant_type[x] else 0
+      $('#variant_type_cnt_' + x).text('(' + v.toLocaleString() + ')')
+
+    for x in ['jga_ngs', 'jga_snp', 'tommo', 'hgvd', 'exac', 'clinvar']
+      v = if dataset[x] then dataset[x] else 0
+      $('#dataset_cnt_' + x).text('(' + v.toLocaleString() + ')')
+
+    for x in ['affects', 'association', 'benign', 'conflicting_data_from_submitters', 'conflicting_interpretations_of_pathogenicity',
+      'drug_response', 'likely_benign', 'likely_pathogenic', 'not_provided', 'other', 'pathogenic', 'protective', 'risk_factor', 'uncertain_significance']
+      key = x.replace(/_/g, ' ')
+      v = if significance[key] then significance[key] else 0
+      $('#significance_cnt_' + x).text('(' + v.toLocaleString() + ')')
+
+  show_warning = (message) ->
+    html = if message then '<div class="alert alert-warning" role="alert"><strong>Warning!</strong> ' + message + '</div>' else ''
+    $('#search-alert').html(html)
+    return
+
   $('#search_text').autocomplete
     source: (request, response) ->
       $.getJSON 'suggest.json', {term: request.term}, response
@@ -97,6 +164,204 @@ $ ->
     else
       $('input[name=significance_all]').prop('checked', false)
     $('#result').DataTable().draw()
+
+
+
+  $('#freq_tooltip').tooltip()
+  $('#tooltip_sift').tooltip()
+  $('#tooltip_polyphen').tooltip()
+
+  result_table = $('#result');
+  result_table.DataTable
+    ajax:
+      url: 'list.json',
+      type: 'POST',
+      data: (d) ->
+        d.term = $('#search_text').val()
+        d.source = $('input[name^=source]:checked').map(() -> $(this).val()).get()
+        d.freq_source = $('select[name=frequency_data_source] option:selected').map(() -> $(this).val()).get()
+        d.freq_relation = $('select[name=frequency_relation] option:selected').map(() -> $(this).val()).get()
+        d.freq_value = $('input[name=frequency]').map(() -> $(this).val()).get()
+        d.variant_type = $('input[name^=variant_type]:checked').map(() -> $(this).val()).get()
+        d.significance = $('input[name^=significance]:checked').map(() -> $(this).val()).get()
+        return
+      beforeSend: (xhr) ->
+        xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))
+    callback: (settings) ->
+      total_variant_type = settings.json.total_variant_type
+      total_dataset = settings.json.total_dataset
+      total_significance = settings.json.total_significance
+      update_total(total_variant_type, total_dataset, total_significance)
+      show_warning(settings.json.warning)
+
+    columns: [
+## Base Information
+      {
+        data: 'variant_type'
+        render: (data, type, row, meta) ->
+          if type == 'display'
+            if data
+              data = '<span class="variant_type_' + data.replace(/\ /g, '_').toLowerCase() + '" />'
+          return data
+      }
+      {
+        data: 'tgv_id'
+        render: (data, type, row, meta) ->
+          if type == 'display'
+            html = '<ul>'
+            tgv_id = "<a target='_blank' href='variation/" + data + "'>tgv" + data + "</a>"
+            html = html.concat('<li>', tgv_id, '</li>')
+            if row && row.rs
+              html = html.concat('<li class="text-muted">', row.rs, '</li>')
+            html = html.concat('</ul>')
+            return html
+          return data
+      }
+      {
+        data: 'chromosome'
+        render: (data, type, row, meta) ->
+          if type == 'display'
+            if !data
+              data = '?'
+            if row && row.start
+              data = data.concat(':', row.start)
+
+          return data
+      }
+      {
+        data: 'reference'
+        render: (data, type, row, meta) ->
+          html = data
+          if type == 'display'
+            if data && data.length > 4
+              html = '<span title="' + data + '">' + data.substr(0, 4).concat('...') + '<br><span class="text-muted">(' + data.length + ')</span></span>'
+          return html
+      }
+      {
+        data: 'alternative'
+        render: (data, type, row, meta) ->
+          html = data
+          if type == 'display'
+            if data && data.length > 4
+              html = '<span title="' + data + '">' + data.substr(0, 4).concat('...') + '<br><span class="text-muted">(' + data.length + ')</span></span>'
+          return html
+      }
+## End Base Information
+
+## Molecular Annotation
+      {
+        data: 'transcripts.[].symbol'
+        render: (data, type, row, meta) ->
+          if type == 'display'
+            if data
+              list = data.filter((x) -> x).unique()
+              data = '<ul>' + ('<li>' + "<a target='_blank' href='gene/" + x + "'>" + x + "</a>" + '</li>' for x in list).join('') + '</ul>'
+          else
+            return data
+      }
+
+## Frequencies
+      {
+        data: null
+        defaultContent: ''
+        render: (data, type, row, meta) ->
+          if type == 'display'
+            html = ''
+            if row.jga_ngs
+              f = frequency7(row.jga_ngs.frequency, row.jga_ngs.num_alt_alleles)
+              t = 'title="' + row.jga_ngs.frequency.toExponential(3) + '"'
+            else
+              f = 'frequency_none'
+              t = 'title="No data"'
+            html = html.concat('<span class="frequency7 tgv_frequency ' + f + '" ' + t + '></span>')
+            if row.jga_snp
+              f = frequency7(row.jga_snp.frequency, row.jga_snp.num_alt_alleles)
+              t = 'title="' + row.jga_snp.frequency.toExponential(3) + '"'
+            else
+              f = 'frequency_none'
+              t = 'title="No data"'
+            html = html.concat('<span class="frequency7 tgv_frequency ' + f + '" ' + t + '></span>')
+            if row.tommo
+              f = frequency7(row.tommo.frequency, row.tommo.num_alt_alleles)
+              t = 'title="' + row.tommo.frequency.toExponential(3) + '"'
+            else
+              f = 'frequency_none'
+              t = 'title="No data"'
+            html = html.concat('<span class="frequency7 tommo_frequency ' + f + '" ' + t + '"></span>')
+            if row.hgvd
+              f = frequency7(row.hgvd.frequency, row.hgvd.num_alt_alleles)
+              t = 'title="' + row.hgvd.frequency.toExponential(3) + '"'
+            else
+              f = 'frequency_none'
+              t = 'title="No data"'
+            html = html.concat('<span class="frequency7 hgvd_frequency ' + f + '" ' + t + '"></span>')
+            if row.exac
+              f = frequency7(row.exac.frequency, row.exac.num_alt_alleles)
+              t = 'title="' + row.exac.frequency.toExponential(3) + '"'
+            else
+              f = 'frequency_none'
+              t = 'title="No data"'
+            html = html.concat('<span class="frequency7 exac_frequency ' + f + '" ' + t + '"></span>')
+      }
+
+      {
+        data: 'transcripts.[].consequences'
+        render: (data, type, row, meta) ->
+          if type == 'display'
+            consequences = [].concat.apply([], data).unique() # flatten and unique
+            data = '<ul>' + ('<li>' + label + '</li>' for label in consequences).join('') + '</ul>'
+          return data
+      }
+## End Molecular Annotation
+
+## Function
+      {
+        data: 'transcripts.[].sift'
+        render: (data, type, row, meta) ->
+          if type == 'display'
+            if data
+              list = data.filter (x) -> x
+              return ('<div class="' + sift_class(x) + '">' + x + '</div>' for x in list).join('')
+          else
+            return data
+      }
+      {
+        data: 'transcripts.[].polyphen'
+        render: (data, type, row, meta) ->
+          if type == 'display'
+            if data
+              list = data.filter (x) -> x
+              return ('<div class="' + polyphen_class(x) + '">' + x + '</div>' for x in list).join('')
+          else
+            return data
+      }
+## End Function
+
+## ClinVar Annotation
+      {
+        data: 'clinvar.significances'
+        defaultContent: ''
+        className: 'dt-body-center'
+        render: (data, type, row, meta) ->
+          if type == 'display'
+            if data
+              data = ('<span class="significance_' + s.replace(/\ /g, '_').toLowerCase() + '" />' for s in data).join('')
+              return data
+          return data
+      }
+      {
+        data: 'clinvar.conditions'
+        defaultContent: ''
+        render: (data, type, row, meta) ->
+          if type == 'display'
+            if data
+              return '<ul>' + ('<li>' + label + '</li>' for label in data).join('') + '</ul>'
+          return data
+      }
+## End ClinVar Annotation
+    ]
+
+  result_table.parent().find(".result-download-container").append("<a><i class='fa fa-file'></i> Download CSV</a>")
 
   add_freq_filter = () ->
     html = """

@@ -1,4 +1,8 @@
 - provide(:title, 'Datasets > Analysis')
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
 %main
   .container
     %h1.title JGAデータセット作成方法
@@ -7,7 +11,7 @@
       下記の解析ツール群を一括実行可能な解析パイプラインソフト(
       %a{href: 'http://amelieff.jp/'}> アメリエフ社
       製 BioReT (Ver.3.3.1.1))を利用しました。
-    %table{border: '1'}
+    %table.table.table-bordered.table-sm
       %thead
         %tr
           %td プログラム名

@@ -1,19 +1,14 @@
 = content_for :header do
-  = stylesheet_link_tag 'reports/variation/show', media: :all
-  = javascript_include_tag 'reports/variation/show'
-  - @stanza.each do |stanza|
-    = stanza.link
+  = stylesheet_link_tag 'reports/gene/show', media: :all
+  = javascript_include_tag 'reports/gene/show'
 
-= content_for :javascript do
-  = javascript_include_tag 'stanza'
-
-.container-fluid
-  #nav-wrapper
-    #navbar.navbar
-      .navbar-inner
-        %ul.nav
+= content_for :navbar do
+  %nav#navbar-stanza.navbar.navbar-expand.flex-column.flex-md-row
+    .navbar-inner
+      .navbar-scroll
+        %ul.navbar-nav.flex-row
           - @stanza.each do |stanza|
-            %li= link_to stanza.nav_label, "##{stanza.nav_id}"
+            %li{ class: 'nav-item' }= link_to stanza.nav_label, "##{stanza.nav_id}", class: 'nav-link', data: { turbolinks: false }
 
 %main
   .container-fluid

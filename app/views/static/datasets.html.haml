@@ -1,4 +1,9 @@
 - provide(:title, 'Dataset')
+- provide(:active, doc_datasets_path)
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
 %main
   .container
     %h1.title TogoVar収録データセット一覧
@@ -9,10 +14,8 @@
         %a{href: 'https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh37.p13'} GRCh37.p13 (06/28/2013)
 
     %h2 Japanese Genotype-phenotype Archive (JGA)の個人ゲノムデータ由来のバリアントデータセット
-    %table{border: '1'}
-      %colgroup
-        %col{span: '1', style: 'text-align:right;'}/
-      %thead{align: 'center'}
+    %table.table.table-bordered.table-sm
+      %thead.text-center
         %tr
           %th データセット名
           %th バージョン/最終更新日
@@ -28,12 +31,12 @@
               %br
               (QC PASSED)
           %td 06/01/2018
-          %td{align: 'right'} 125
-          %td{align: 'right'}
+          %td.text-right 125
+          %td.text-right
             13,338,968
             %br
             (1,557,674)
-          %td{align: 'right'}
+          %td.text-right
             12,980,041
             %br
             (1,459,952)
@@ -42,16 +45,14 @@
           %td
             = link_to 'JGA-SNP', doc_datasets_jga_snp_path
           %td 06/01/2018
-          %td{align: 'right'} 183,884
-          %td{align: 'right'} 1,966,919
-          %td{align: 'right'} 1,958,606
+          %td.text-right 183,884
+          %td.text-right 1,966,919
+          %td.text-right 1,958,606
           %td NBDC
 
     %h2 第三者が作成したバリアントデータセット
-    %table{border: '1'}
-      %colgroup
-        %col{span: '1', style: 'text-align:right;'}
-      %thead{align: 'center'}
+    %table.table.table-bordered.table-sm
+      %thead.text-center
         %tr
           %th データセット名
           %th バージョン/最終更新日
@@ -67,40 +68,38 @@
           %td
             %a{href: 'ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/'} ClinVar
           %td 02/01/2017
-          %td{align: 'center'} —
-          %td{align: 'center'} —
-          %td{align: 'right'} 198,707
+          %td.text-center —
+          %td.text-center —
+          %td.text-right 198,707
           %td NCBI
         %tr
           %td
             %a{href: 'http://exac.broadinstitute.org/downloads'} Exome Aggregation Consortium (ExAC)
           %td Release 1 (02/27/2017)
-          %td{align: 'right'} 60,706
-          %td{align: 'right'} 10,195,872
-          %td{align: 'right'} 9,362,319
+          %td.text-right 60,706
+          %td.text-right 10,195,872
+          %td.text-right 9,362,319
           %td Broad Institute
         %tr
           %td
             %a{href: 'http://www.hgvd.genome.med.kyoto-u.ac.jp/download.html'} Human Genetic Variation Database (HGVD)
           %td Version 2.30 (08/02/2017)
-          %td{align: 'right'} 1,208
-          %td{align: 'right'} 554,461
-          %td{align: 'right'} 501,556
+          %td.text-right 1,208
+          %td.text-right 554,461
+          %td.text-right 501,556
           %td 京都大学
         %tr
           %td
             %a{href: 'https://ijgvd.megabank.tohoku.ac.jp/download_3.5kjpn/'} Integrative Japanese Genome Variation Database (iJGVD)
           %td 3.5KJPN (09/28/2017)
-          %td{align: 'right'} 3,554
-          %td{align: 'right'} 50,266,064
-          %td{align: 'right'} 50,099,977
+          %td.text-right 3,554
+          %td.text-right 50,266,064
+          %td.text-right 50,099,977
           %td 東北メディカル・メガバンク機構
 
     %h2 バリアント以外のデータセット
-    %table{border: '1'}
-      %colgroup
-        %col{span: '1', style: 'text-align:right;'}
-      %thead{align: 'center'}
+    %table.table.table-bordered.table-sm
+      %thead.text-center
         %tr
           %th データセット名
           %th バージョン/最終更新日

@@ -1,39 +1,42 @@
+@import 'colors';
+
 footer {
   position: relative;
-  background-color: #fff;
-  color: #000;
+  z-index: 900;
   padding: 15px 25px;
   height: auto;
-}
+  background-color: #fff;
 
-footer address {
-  font-size: 12px;
-  line-height: 20px;
-}
+  #copyright {
+    font-size: 12px;
+    margin-bottom: 0;
+  }
 
-footer > .container {
-  padding: 0;
-  color: #000;
-}
+  #nbdc_logo {
+    display: block;
+    text-indent: -9999px;
+    height: 57px;
+    width: 160px;
+    margin-bottom: 10px;
+    background: url(nbdc_logo.png) no-repeat;
+    background-size: 160px;
+  }
 
-footer a {
-  text-decoration: underline;
-}
+  & > .container {
+    padding: 0;
+    color: #000;
+  }
 
-footer a:hover {
-  color: #45b8cc;
-}
+  a {
+    text-decoration: underline;
 
-#rt-logo {
-  height: 60px;
-  display: block;
-  text-indent: -9999px;
-  background-image: url(rt-logo.png);
-  background-size: 160px;
-  background-repeat: no-repeat;
-  margin-bottom: 10px;
-}
+    &:hover {
+      color: $color_base_blue;
+    }
+  }
 
-#copyright {
-  font-size: 12px;
+  address {
+    font-size: 12px;
+    line-height: 20px;
+  }
 }

@@ -1,4 +1,4 @@
-jQuery ($) ->
+$ ->
   RE = /^data-stanza-(.+)/
   $('[data-stanza]').each (index) ->
     $this = $(this)
@@ -35,4 +35,3 @@ jQuery ($) ->
     return
 
   return
-

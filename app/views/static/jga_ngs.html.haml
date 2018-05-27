@@ -1,4 +1,8 @@
 - provide(:title, 'Dataset > JGA-NGS')
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
 %main
   .container
     %h1.title JGA-NGSデータセット
@@ -60,7 +64,7 @@
       %a{href: 'analysis'} JGAデータセット作成方法
 
     %h2 集約されたデータの由来
-    %table{border: '1'}
+    %table.table.table-bordered.table-sm
       %thead
         %tr
           %th JGAID
@@ -80,7 +84,7 @@
             %a{href: 'https://humandbs.biosciencedbc.jp/hum0006-v3'} hum0006
           %td 脳腫瘍のゲノム・遺伝子解析とその臨床病理学的意義の解明
           %td 脳腫瘍 アストロサイトーマ
-          %td{align: 'right'} 6
+          %td.text-right 6
           %td
             斉藤 延人
             %br>/
@@ -92,7 +96,7 @@
             %a{href: 'https://humandbs.biosciencedbc.jp/hum0006-v3'} hum0006
           %td 脳腫瘍のゲノム・遺伝子解析とその臨床病理学的意義の解明
           %td 脳腫瘍 オリゴデンドログリオーマ
-          %td{align: 'right'} 16
+          %td.text-right 16
           %td
             斉藤 延人
             %br>/
@@ -104,7 +108,7 @@
             %a{href: 'https://humandbs.biosciencedbc.jp/hum0006-v3'} hum0006
           %td 脳腫瘍のゲノム・遺伝子解析とその臨床病理学的意義の解明
           %td 脳腫瘍 小脳グリオーマ
-          %td{align: 'right'} 17
+          %td.text-right 17
           %td
             斉藤 延人
             %br>/
@@ -116,7 +120,7 @@
             %a{href: 'https://humandbs.biosciencedbc.jp/hum0021-v1'} hum0021
           %td 精神神経疾患の原因解明および診断法・治療法の開発に関する研究
           %td 健常一卵性双生児
-          %td{align: 'right'} 6
+          %td.text-right 6
           %td
             加藤 忠史
             %br>/
@@ -128,7 +132,7 @@
             %a{href: 'https://humandbs.biosciencedbc.jp/hum0035-v1'} hum0035
           %td 固形腫瘍における遺伝子異常の網羅的解析
           %td 多数の固形腫瘍性疾患検体
-          %td{align: 'right'} 23
+          %td.text-right 23
           %td
             滝田 順子
             %br>/
@@ -140,7 +144,7 @@
             %a{href: 'https://humandbs.biosciencedbc.jp/hum0040-v1/'} hum0040
           %td ヒト胎盤におけるインプリント制御領域およびインプリント遺伝子の同定
           %td ヒト胎盤および母体血
-          %td{align: 'right'} 48
+          %td.text-right 48
           %td
             有馬 隆博
             %br>/
@@ -153,9 +157,9 @@
             %a{href: 'https://humandbs.biosciencedbc.jp/hum0066-v1'} hum0066
           %td 癌の再発・転移に関与するnon-coding RNAの同定とその機序の解明
           %td 大腸がん
-          %td{align: 'right'} 9
+          %td.text-right 9
           %td 三森 功士
         %tr
-          %td{align: 'center', colspan: '4'}
+          %td.text-center{colspan: '4'}
             %strong 合計
-          %td{align: 'right'} 125
+          %td.text-right 125

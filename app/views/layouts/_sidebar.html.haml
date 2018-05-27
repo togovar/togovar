@@ -1,9 +1,9 @@
-%nav.bg-faded.container-fluid.sidebar
+.sidebar.sidebar-sticky
   .nav.nav-pills.flex-column
     .card.m-2
-      .card-header.p-2
+      .card-header
         Data set
-      .card-body.p-2
+      .card-body
         .form-check
           %input.form-check-input{type: 'checkbox', name: 'source_all', id: "source_all", value: 'source_all', checked: true}/
           %label.form-check-label{for: "source_all", class: "source_all"} All
@@ -17,19 +17,19 @@
               %span{ id: "dataset_cnt_#{x}", class: 'text-muted' }
 
     .card.m-2
-      .card-header.p-2
+      .card-header
         Alternative allele frequency
       #freq_filter_wrapper
-      .card-body.p-2
+      .card-body
         %a#add_freq_filter{href: 'javascript:void(0)'}
           = fa_icon 'plus-circle'
           Add filter
       %input{ type: 'button', id: 'update_freq_filter', value: 'Update'}
 
     .card.m-2
-      .card-header.p-2
-        Variant Type
-      .card-body.p-2
+      .card-header
+        Variant type
+      .card-body
         .form-check
           %input.form-check-input{type: 'checkbox', name: 'variant_type_all', id: "variant_type_all", value: 'variant_type_all', checked: true}/
           %label.form-check-label{for: "variant_type_all", class: "variant_type_all"} All
@@ -42,9 +42,9 @@
               %span{ id: "variant_type_cnt_#{x}", class: 'text-muted' }
 
     .card.m-2
-      .card-header.p-2
+      .card-header
         Clinical significance
-      .card-body.p-2
+      .card-body
         .form-check
           %input.form-check-input{type: 'checkbox', name: 'significance_all', id: "significance_all", value: 'significance_all', checked: true}/
           %label.form-check-label{for: "significance_all", class: "significance_all"} All

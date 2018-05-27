@@ -1,4 +1,9 @@
 - provide(:title, 'Help')
+- provide(:active, doc_help_path)
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
 %main
   .container
     %h1.title Help
@@ -159,64 +164,64 @@
     %p
       A. 各データセットにおけるAlternative allele頻度を表現しています。頻度メータの色はデータセットに割り当てられた色に対応しています。
       データの有無や頻度の値を９段階で表現しています。
-    %table
+    %table.table.borderless
       %tr
-        %td{class: 'center bottom'}
+        %td.text-center.align-bottom
           %span.frequency7.tgv_frequency.frequency_none
-        %td{class: 'center bottom'}
+        %td.text-center.align-bottom
           %span.frequency7.tgv_frequency.frequency_0_7
-        %td{class: 'center bottom'}
+        %td.text-center.align-bottom
           %span.frequency7.tgv_frequency.frequency_1_7
-        %td{class: 'center bottom'}
+        %td.text-center.align-bottom
           %span.frequency7.tgv_frequency.frequency_2_7
-        %td{class: 'center bottom'}
+        %td.text-center.align-bottom
           %span.frequency7.tgv_frequency.frequency_3_7
-        %td{class: 'center bottom'}
+        %td.text-center.align-bottom
           %span.frequency7.tgv_frequency.frequency_4_7
-        %td{class: 'center bottom'}
+        %td.text-center.align-bottom
           %span.frequency7.tgv_frequency.frequency_5_7
-        %td{class: 'center bottom'}
+        %td.text-center.align-bottom
           %span.frequency7.tgv_frequency.frequency_6_7
-        %td{class: 'center bottom'}
+        %td.text-center.align-bottom
           %span.frequency7.tgv_frequency.frequency_7_7
         %td{rowspan: 2}
           %ul
-            %li{class: 'source_jga_ngs hidden'}
+            %li.source_jga_ngs.no-bullet
               JGA-NGS
-            %li{class: 'source_jga_snp hidden'}
+            %li.source_jga_snp.no-bullet
               JGA-SNP
-            %li{class: 'source_tommo hidden'}
+            %li.source_tommo.no-bullet
               3.5KJPN
-            %li{class: 'source_hgvd hidden'}
+            %li.source_hgvd.no-bullet
               HGVD
-            %li{class: 'source_exac hidden'}
+            %li.source_exac.no-bullet
               ExAC
-            %li{class: 'source_clinvar hidden'}
+            %li.source_clinvar.no-bullet
               ClinVar
-      %tr{class: 'center'}
-        %td{class: 'px-2'}
+      %tr.text-center
+        %td
           %span
             Not
             %br
             Available
-        %td{class: 'px-2'}
+        %td
           %span
             Monomorphic
             %br
             (REF)
-        %td{class: 'px-2'}
+        %td
           %span Singleton
-        %td{class: 'px-2'}
+        %td
           %span &lt; 0.0001
-        %td{class: 'px-2'}
+        %td
           %span &lt; 0.001
-        %td{class: 'px-2'}
+        %td
           %span &lt; 0.01
-        %td{class: 'px-2'}
+        %td
           %span &lt; 0.05
-        %td{class: 'px-2'}
+        %td
           %span &lt; 0.5
-        %td{class: 'px-2'}
+        %td
           %span &ge; 0.5
 
     %h4#s2 Q. リファレンスゲノム上の範囲を検索条件にした場合、どのようなバリアントがヒットしますか。

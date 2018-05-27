@@ -1,10 +1,13 @@
+- provide(:active, root_path)
+
 = content_for :header do
   = stylesheet_link_tag 'root/index', media: :all
   = javascript_include_tag 'root/index'
 
 .container-fluid
-  .row
+  .row.flex-nowrap
     = render partial: 'layouts/sidebar'
-    %main.container-fluid
-      = render partial: 'search'
-      = render partial: 'result'
+    %main
+      .main_inner
+        = render partial: 'search'
+        = render partial: 'result'
