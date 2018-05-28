@@ -1,6 +1,6 @@
 %header.header-stickey
   #navbar-site.navbar.navbar-expand.flex-column.flex-md-row
-    = link_to TogoVar, root_path, { class: 'navbar-brand mr-0 mr-md-2' }
+    = link_to TogoVar, root_path, class: 'navbar-brand mr-0 mr-md-2', data: { turbolinks: false }
     .navbar-scroll
       %ul.navbar-nav.flex-row
         - active = yield(:active)
