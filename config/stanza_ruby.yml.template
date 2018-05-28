@@ -44,9 +44,6 @@ defaults: &defaults
           uri: https://togovar.org/legacy_stanza/protein_sequence_annotation
           name: Protein sequence annotation
         -
-          uri: https://togovar.org/legacy_stanza/protein_pfam_plot
-          name: Pfam plot
-        -
           uri: https://togovar.org/legacy_stanza/protein_orthologs
           name: Protein orthologs
         -
