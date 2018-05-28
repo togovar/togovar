@@ -51,7 +51,9 @@
         %hr
         .form-check
           %input.form-check-input{type: 'checkbox', name: 'significance', id: "significance_not_in_clinvar", value: 'not_in_clinvar', checked: true}/
-          %label.form-check-label{for: "significance_not_in_clinvar", class: "significance_not_in_clinvar"} Not in ClinVar
+          %label.form-check-label{for: "significance_not_in_clinvar", class: "significance_not_in_clinvar"}
+            Not in ClinVar
+            %span{ id: "significance_cnt_not_in_clinvar", class: 'text-muted' }
         %hr
         :ruby
           significances = %w[pathogenic likely_pathogenic uncertain_significance likely_benign benign

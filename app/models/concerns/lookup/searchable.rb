@@ -203,24 +203,31 @@ class Lookup
           end
         end
 
+        query = enable_scope(query)
+        query = enable_count(query)
+
         Rails.logger.info('query term: ' + term.inspect)
         Rails.logger.info('es query: ' + query.to_json)
 
-        result    = search(query)
-        hit_count = result['hits']['total']
-        sources   = result['hits']['hits'].map { |x| x['_source'] }
-        total     = count_each_category(term.present? ? term.query : {})
+        result     = search(query)
+        hits_total = result['hits']['total']
+        sources    = result['hits']['hits'].map { |x| x['_source'] }
 
-        total_variant_type = total['aggregations']['total_variant_type']['buckets'].map do |t|
+        # total_query = enable_scope(term.present? ? term.query : {})
+        # Rails.logger.info('count query: ' + total_query.to_json)
+        # total = count_each_category(total_query)
+
+        total_variant_type = result['aggregations']['total_variant_type']['buckets'].map do |t|
           [SequenceOntology.find(t['key']).label.downcase, t['doc_count']]
         end.to_h
 
-        total_significance = total['aggregations']['total_significance']['buckets'].map do |t|
+        total_significance = result['aggregations']['total_significance']['buckets'].map do |t|
           [t['key'], t['doc_count']]
         end.to_h
+        total_significance['not in clinvar'] = result['aggregations']['total_not_in_clinvar']['doc_count']
 
         total_dataset = %w[jga_ngs jga_snp tommo hgvd exac clinvar].map do |d|
-          [d, total['aggregations']["total_#{d}"]['doc_count']]
+          [d, result['aggregations']["total_#{d}"]['doc_count']]
         end.to_h
 
         # FIXME: insert SO label into base.variant_class
@@ -240,15 +247,15 @@ class Lookup
           json
         end
 
-        warning_message = sources.present? && hit_count > 1_000_000 ? 'Scroll function over 1,000,000 results is currently unavailable.' : nil
+        warning_message = sources.present? && hits_total > 1_000_000 ? 'Scroll function over 1,000,000 results is currently unavailable.' : nil
 
         filtered_count = if sources.blank?
                            0
                          else
-                           hit_count <= 1_000_000 ? hit_count : 1_000_000
+                           hits_total <= 1_000_000 ? hits_total : 1_000_000
                          end
 
-        { recordsTotal:       total['hits']['total'],
+        { recordsTotal:       hits_total,
           recordsFiltered:    filtered_count,
           data:               replace,
           total_variant_type: total_variant_type,
@@ -365,55 +372,114 @@ class Lookup
         query.merge(query: { bool: { must: condition } })
       end
 
-      def count_each_category(query = {})
+      def enable_scope(query = {})
+        q = query.delete(:query)
+
+        condition = {
+          bool: {
+            should:
+              [
+                {
+                  exists: {
+                    field: 'jga_ngs'
+                  }
+                },
+                {
+                  exists: {
+                    field: 'jga_snp'
+                  }
+                },
+                {
+                  exists: {
+                    field: 'tommo'
+                  }
+                },
+                {
+                  exists: {
+                    field: 'hgvd'
+                  }
+                },
+                {
+                  exists: {
+                    field: 'exac'
+                  }
+                },
+                {
+                  exists: {
+                    field: 'clinvar'
+                  }
+                }
+              ]
+          }
+        }
+
+        if q
+          query.merge(query: { bool: { must: [q, condition] } })
+        else
+          query.merge(query: condition)
+        end
+      end
+
+      def enable_count(query = {})
         query = query.merge aggs: {
-          total_variant_type: {
+          total_variant_type:   {
             terms: {
               field: 'variant_type'
             }
           },
-          total_significance: {
+          total_significance:   {
             terms: {
               field: 'clinvar.significances',
               size:  20
             }
           },
-          total_jga_ngs:      {
+          total_not_in_clinvar: {
+            filter: {
+              bool: {
+                must_not: {
+                  exists: {
+                    field: 'clinvar'
+                  }
+                }
+              }
+            }
+          },
+          total_jga_ngs:        {
             filter: {
               exists: {
                 field: 'jga_ngs'
               }
             }
           },
-          total_jga_snp:      {
+          total_jga_snp:        {
             filter: {
               exists: {
                 field: 'jga_snp'
               }
             }
           },
-          total_tommo:        {
+          total_tommo:          {
             filter: {
               exists: {
                 field: 'tommo'
               }
             }
           },
-          total_hgvd:         {
+          total_hgvd:           {
             filter: {
               exists: {
                 field: 'hgvd'
               }
             }
           },
-          total_exac:         {
+          total_exac:           {
             filter: {
               exists: {
                 field: 'exac'
               }
             }
           },
-          total_clinvar:      {
+          total_clinvar:        {
             filter: {
               exists: {
                 field: 'clinvar'
@@ -421,7 +487,7 @@ class Lookup
             }
           }
         }
-        search(query)
+          # search(query)
       end
 
       CONSEQUENCES_ORDER = %w[SO_0001893 SO_0001574 SO_0001575 SO_0001587
