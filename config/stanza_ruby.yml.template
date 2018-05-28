@@ -20,14 +20,11 @@ defaults: &defaults
 
       togostanza:
         -
-          uri: https://togovar.org/legacy_stanza/protein_names
-          name: Protein names
+          uri: https://togovar.org/legacy_stanza/togovar_gene_attributes
+          name: Gene attributes
         -
           uri: https://togovar.org/legacy_stanza/genome_jbrowse
           name: Genomic context
-        -
-          uri: https://togovar.org/legacy_stanza/gene_attributes
-          name: Gene attributes
         -
           uri: https://togovar.org/legacy_stanza/nucleotide_sequence
           name: Nucleotide sequence
