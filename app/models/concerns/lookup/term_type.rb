@@ -6,6 +6,10 @@ class Lookup
       def query
         { query: { match: { 'clinvar.conditions.raw': term } } }
       end
+
+      def display_condition
+        %(reported for disease "#{term}".)
+      end
     end
 
     SYMBOL = Struct.new(:term) do
@@ -23,17 +27,29 @@ class Lookup
           }
         }
       end
+
+      def display_condition
+        %(in the gene "#{term}".)
+      end
     end
 
     RS = Struct.new(:term) do
       def query
         { query: { match: { 'rs': term } } }
       end
+
+      def display_condition
+        %(identified by "#{term}".)
+      end
     end
 
     TGV = Struct.new(:term) do
       def query
         { query: { match: { tgv_id: term } } }
+      end
+
+      def display_condition
+        %(identified by "#{term}")
       end
     end
 
@@ -72,6 +88,10 @@ class Lookup
             }
           }
         }
+      end
+
+      def display_condition
+        %(on position "#{chr}:#{position}".)
       end
     end
 
@@ -118,10 +138,19 @@ class Lookup
           }
         }
       end
+
+      def display_condition
+        %(in region "#{chr}:#{start}-#{stop}".)
+      end
     end
 
     HGVS = Struct.new(:term) do
       def where
+        # TODO: implement
+        nil
+      end
+
+      def display_condition
         # TODO: implement
         nil
       end

@@ -77,7 +77,6 @@ $ ->
       if $('#significance_' + x).prop('checked')
         $('#significance_cnt_' + x).text('(' + v.toLocaleString() + ')')
 
-
   show_warning = (message) ->
     html = if message then '<div class="alert alert-warning" role="alert"><strong>Warning!</strong> ' + message + '</div>' else ''
     $('#search-alert').html(html)
@@ -97,8 +96,10 @@ $ ->
       $('#search_text').val ui.item[0]
       $('#result').DataTable().draw()
       false
-  # -> TO HERE $('#search_text').autocomplete
-
+  .keyup (e) ->
+    if e.keyCode == 13 # pressed enter
+      $('.ui-menu-item').hide()
+      $('#result').DataTable().draw()
   .autocomplete('instance')._renderItem = (ul, item) ->
     $('<li>').append('<div><span class="text-muted">[' + item[1] + ']</span> ' + item[0] + '</div>').appendTo ul
 
@@ -171,14 +172,17 @@ $ ->
       $('input[name=significance_all]').prop('checked', false)
     $('#result').DataTable().draw()
 
-  $('#freq_tooltip').tooltip()
-  $('#tooltip_sift').tooltip()
-  $('#tooltip_polyphen').tooltip()
-
   result_table = $('#result');
   result_table.DataTable
+    language:
+      emptyTable:   'No variants found',
+      info:         'Showing _START_ to _END_ of _TOTAL_ variants <strong id="dataTables_info_condition"></strong>'
+      infoEmpty:    'Showing 0 to 0 of 0 variants',
+      infoFiltered: '(filtered from _MAX_ variants)'
+      lengthMenu:   'Display _MENU_ variants per page',
+      zeroRecords:  'No matching variants found',
     ajax:
-      url: 'list.json',
+      url:  'list.json',
       type: 'POST',
       data: (d) ->
         d.term = $('#search_text').val()
@@ -192,6 +196,8 @@ $ ->
       beforeSend: (xhr) ->
         xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))
     callback: (settings) ->
+      $('[data-toggle="tooltip"]').tooltip()
+      $('#dataTables_info_condition').text(settings.json.condition || '')
       total_variant_type = settings.json.total_variant_type
       total_dataset = settings.json.total_dataset
       total_significance = settings.json.total_significance
@@ -306,6 +312,10 @@ $ ->
               f = 'frequency_none'
               t = 'title="No data"'
             html = html.concat('<span class="frequency7 exac_frequency ' + f + '" ' + t + '"></span>')
+            partial = """
+            <%= Haml::Engine.new(File.read(File.join(Rails.root, 'app/views/layouts', '_tooltip_row.html.haml'))).render(Object.new) %>
+            """
+            html = html.concat('<i class="fa fa-search-plus fa-lg popup-frequency" data-toggle="tooltip" data-container="body" data-html="true" title="' + partial + '"></i>')
       }
 
       {

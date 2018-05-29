@@ -16,7 +16,7 @@ $ ->
     searching: false
     scrollX: true
     pageLength: 25
-    dom: "<'span10'<'span5'i><'span5'l>p><'.result-download-container.span2'>rtip"
+    dom: "l<<i>p><'#download-container'>rtipl"
     pagingType: "custom-bootstrap"
     paginationSlider: null
     ajax:

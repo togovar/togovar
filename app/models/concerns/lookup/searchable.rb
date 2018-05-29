@@ -213,10 +213,6 @@ class Lookup
         hits_total = result['hits']['total']
         sources    = result['hits']['hits'].map { |x| x['_source'] }
 
-        # total_query = enable_scope(term.present? ? term.query : {})
-        # Rails.logger.info('count query: ' + total_query.to_json)
-        # total = count_each_category(total_query)
-
         total_variant_type = result['aggregations']['total_variant_type']['buckets'].map do |t|
           [SequenceOntology.find(t['key']).label.downcase, t['doc_count']]
         end.to_h
@@ -247,7 +243,9 @@ class Lookup
           json
         end
 
-        warning_message = sources.present? && hits_total > 1_000_000 ? 'Scroll function over 1,000,000 results is currently unavailable.' : nil
+        warning_message = if sources.present? && hits_total > 1_000_000
+                            'Scroll function over 1,000,000 results is currently unavailable.'
+                          end
 
         filtered_count = if sources.blank?
                            0
@@ -255,8 +253,14 @@ class Lookup
                            hits_total <= 1_000_000 ? hits_total : 1_000_000
                          end
 
-        { recordsTotal:       hits_total,
+        time = if (took = result['took'])
+                 format('%.1f[s]', (took.to_f / 1000.0))
+               end
+
+        { recordsTotal:       search(enable_scope(size: 0))['hits']['total'],
           recordsFiltered:    filtered_count,
+          condition:          term&.display_condition,
+          took:               time,
           data:               replace,
           total_variant_type: total_variant_type,
           total_significance: total_significance,
@@ -487,7 +491,7 @@ class Lookup
             }
           }
         }
-          # search(query)
+        # search(query)
       end
 
       CONSEQUENCES_ORDER = %w[SO_0001893 SO_0001574 SO_0001575 SO_0001587
