@@ -1,6 +1,7 @@
 module Reports
-  class VariationController < ApplicationController
+  class VariantController < ApplicationController
     def show(id)
+      id.sub!('tgv', '') # TODO: remove when RDF updated
       @tgv_id = id
 
       @stanza = []
@@ -16,7 +17,7 @@ module Reports
       lookup = Lookup.find(id)
 
       if (allele_id = lookup&.clinvar&.allele_id)
-        variation_id = Reports::Variation.variation_id_for_allele(allele_id)
+        variation_id = Reports::Variant.variation_id_for_allele(allele_id)
         @stanza << Stanza.clinvar_variant_information('Variant Information', args: { clinvar_id: variation_id })
         @stanza << Stanza.clinvar_variant_interpretation('Variant Interpretation', args: { clinvar_id: variation_id })
         @stanza << Stanza.clinvar_variant_alleles('Variant Alleles', args: { clinvar_id: variation_id })

@@ -1,5 +1,5 @@
 module Reports
-  class Variation
+  class Variant
     include Queryable
 
     class << self

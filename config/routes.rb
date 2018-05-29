@@ -3,7 +3,8 @@ require 'sidekiq/web'
 Rails.application.routes.draw do
   root 'root#index'
 
-  get 'search', to: 'root#index'
+  resources :gene, only: [:show], controller: 'reports/gene', constraints: { id: %r{[\w\-:.\/]+} }
+  resources :variant, only: [:show], controller: 'reports/variant', constraints: { id: /tgv\d+/ }
 
   # static pages
   get 'doc/about', to: 'static#about'
@@ -15,12 +16,6 @@ Rails.application.routes.draw do
   get 'doc/help', to: 'static#help'
   get 'doc/policy', to: 'static#policy'
   get 'doc/terms', to: 'static#terms'
-
-  # variation report
-  get 'variation/:id', to: 'reports/variation#show', constraints: { id: /\d+/ }
-
-  # gene report
-  get 'gene/:id', to: 'reports/gene#show', constraints: { id: %r{[\w\-:.\/]+} }
 
   # api
   get 'suggest', to: 'root#suggest', defaults: { format: 'json' }
