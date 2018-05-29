@@ -21,6 +21,7 @@ gem 'jbuilder', '~> 2.5'
 gem 'jquery-datatables-rails', '~> 3.4'
 gem 'jquery-rails', '~> 4.3'
 gem 'jquery-ui-rails', '~> 6.0'
+gem 'js-routes', '~> 1.4'
 gem 'sass-rails', '~> 5.0'
 
 # utility
@@ -34,8 +35,8 @@ gem 'sinatra', require: false
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
 # optimisation
-gem 'redis-rails', '~> 5.0'
 gem 'redis-namespace', '~> 1.6'
+gem 'redis-rails', '~> 5.0'
 gem 'turbolinks', '~> 5'
 gem 'uglifier', '>= 1.3.0'
 

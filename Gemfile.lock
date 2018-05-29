@@ -163,6 +163,9 @@ GEM
       thor (>= 0.14, < 2.0)
     jquery-ui-rails (6.0.1)
       railties (>= 3.2.16)
+    js-routes (1.4.4)
+      railties (>= 3.2)
+      sprockets-rails
     json-ld (2.2.1)
       multi_json (~> 1.12)
       rdf (>= 2.2.8, < 4.0)
@@ -481,6 +484,7 @@ DEPENDENCIES
   jquery-datatables-rails (~> 3.4)
   jquery-rails (~> 4.3)
   jquery-ui-rails (~> 6.0)
+  js-routes (~> 1.4)
   kaminari (~> 1.0)
   linkeddata (~> 3.0)
   listen (>= 3.0.5, < 3.2)
