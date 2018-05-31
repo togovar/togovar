@@ -220,6 +220,8 @@ $ ->
         return
       beforeSend: (xhr) ->
         xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))
+    preDrawCallback: (settings) ->
+      $('[data-toggle="tooltip"]').tooltip('dispose')
     callback: (settings) ->
       $('#dataTables_info_condition').text(settings.json.condition || '')
       total_variant_type = settings.json.total_variant_type
