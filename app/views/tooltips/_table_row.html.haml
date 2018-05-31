@@ -1,0 +1,22 @@
+%table.table.table-sm.text-nowrap.tooltip_table_row
+  %thead
+    %tr
+      %th
+      %th
+        %span{ scope: 'col', data: { icon: 'source_jga_ngs' } } JGA-NGS
+      %th
+        %span{ scope: 'col', data: { icon: 'source_jga_snp' } } JGA-SNP
+      %th
+        %span{ scope: 'col', data: { icon: 'source_tommo' } } 3.5KJPN
+      %th
+        %span{ scope: 'col', data: { icon: 'source_hgvd' } } HGVD
+      %th
+        %span{ scope: 'col', data: { icon: 'source_exac' } } ExAC
+  %tbody
+    - %w[alt ref freq].each do |row|
+      %tr
+        %th{ scope: 'row' }
+          = row.capitalize
+        - %w[jga_ngs jga_snp tommo hgvd exac].each do |source|
+          %td
+            = "{{#{source}.#{row}}}"

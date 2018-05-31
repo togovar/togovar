@@ -25,6 +25,12 @@
     z-index: 100;
   }
 
+  .dataTables_scroll {
+    .dataTables_scrollBody {
+      min-height: 400px;
+    }
+  }
+
   .dataTables_info {
     padding: 3px 0 3px 5px;
     font-size: 14px;
@@ -203,27 +209,5 @@
         background-size: 1.3rem 0.6rem;
       }
     }
-  }
-
-  .table {
-    margin: 0;
-
-    thead th,
-    thead td {
-      border-top: none;
-      border-bottom: 2px solid #111;
-    }
-
-    tbody td {
-      border-top: 1px solid #dddddd;
-      a {
-        text-decoration: none;
-      }
-    }
-  }
-
-  ul {
-    list-style: none;
-    padding: 0;
   }
 }

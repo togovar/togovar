@@ -1,5 +1,3 @@
-@import 'icons';
-
 .sidebar {
   position: sticky;
   top: 6rem;
@@ -21,11 +19,26 @@
 
   .form-check {
     padding-left: 2rem;
-  }
 
-  .form-check-input {
-    position: absolute;
-    margin-top: 0.5rem;
-    margin-left: -2rem;
+    .form-check-input {
+      position: absolute;
+      margin-top: 0.5rem;
+      margin-left: -2rem;
+    }
+
+    .form-check-label[data-icon] {
+      padding-left: 20px;
+      &:before {
+        margin-left: -23px;
+      }
+    }
+
+    .form-check-label[data-icon^="significance_"] {
+      padding-left: 23px;
+      &:before {
+        margin-left: -26px;
+      }
+    }
+
   }
 }

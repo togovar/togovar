@@ -74,35 +74,156 @@ main {
       padding-left: 0.5rem;
       width: 100%;
       margin-top: -2rem;
-      background-color: #f4f3f2;
+      background-color: #F4F3F2;
     }
   }
 }
 
+.dataTables_wrapper {
+  .table {
+    margin: 0;
+
+    thead th,
+    thead td {
+      border-top: none;
+      border-bottom: 2px solid #111;
+    }
+
+    tbody td {
+      border-top: 1px solid #dddddd;
+      a {
+        text-decoration: none;
+      }
+
+      [data-icon^='variant_type'] {
+        min-width: 3rem;
+        &:before {
+          position: relative;
+          margin: 0.5rem;
+        }
+      }
+
+      [data-icon^='sift'],
+      [data-icon^='polyphen'] {
+        position: relative;
+        padding-left: 2.5rem;
+
+        &:before {
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          margin: auto auto auto 0;
+        }
+      }
+
+      [data-source^='jga'] {
+        background: $color_source_jga_ngs;
+      }
+
+      [data-source='tommo'] {
+        background: $color_source_tommo;
+      }
+
+      [data-source='hgvd'] {
+        background: $color_source_hgvd;
+      }
+
+      [data-source='exac'] {
+        background: $color_source_exac;
+      }
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .frequency_wrapper {
+    margin: 0;
+    padding: 5px 0;
+    height: 46px;
+  }
+}
+
 .tooltip {
-  font-size: 1rem !important;
+  font-size: 1.4rem;
+  line-height: 2.3rem;
+  filter: drop-shadow(0 0 24px rgba(0, 0, 0, 0.2));
+
+  &.show {
+    opacity: 1;
+  }
 
   .tooltip-inner {
-    max-width: 200px;
-    padding: 3px 8px;
+    border: 2px solid $color_base_blue_dark;
+    max-width: 100% !important;
+    padding: 1rem;
     color: #000;
-    text-align: center;
-    background-color: #f4f3f2;
-    border-radius: .25rem;
+    background-color: #FFF;
+    border-radius: 0.5rem;
   }
 
-  .tooltip.bs-tooltip-auto[x-placement^=top] .arrow::before, .tooltip.bs-tooltip-top .arrow::before {
-    margin-left: -3px;
-    content: "";
-    border-width: 5px 5px 0;
-    border-top-color: #f4f3f2;
+  &.bs-tooltip-auto[x-placement^=top],
+  &.bs-tooltip-top,
+  &.bs-tooltip-bottom {
+    .arrow::before {
+      border-top-color: $color_base_blue_dark;
+      border-bottom-color: $color_base_blue_dark;
+    }
   }
 
-  .tooltip_polyphen,
-  .tooltip_frequency,
-  .tooltip_sift {
-    div {
-      margin: 1rem;
+  div[data-icon] {
+    position: relative;
+    margin-left: 2.5rem;
+
+    &:before {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto 0 auto -2.5rem;
+    }
+  }
+
+  table.tooltip_table_row {
+    margin-bottom: 0;
+
+    thead {
+      tr {
+        th {
+          padding-top: 2rem;
+
+          span {
+            &[data-icon]:before {
+              top: 0;
+              bottom: 0;
+              left: 0;
+              right: 0;
+              margin: -2rem auto 0;
+            }
+
+            &[data-icon='jga_ngs'],
+            &[data-icon='jga_snp'] {
+              position: relative;
+              color: $color_source_jga_ngs;
+            }
+            &[data-icon='tommo'] {
+              position: relative;
+              color: $color_source_tommo;
+            }
+            &[data-icon='hgvd'] {
+              position: relative;
+              color: $color_source_hgvd;
+            }
+            &[data-icon='exac'] {
+              position: relative;
+              color: $color_source_exac;
+            }
+          }
+        }
+      }
     }
   }
 }

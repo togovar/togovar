@@ -14,41 +14,48 @@ Array::unique = ->
   value for key, value of output
 
 $ ->
-  frequency7 = (f, c) ->
-    if c == 1
-      return 'frequency_1_7'
-    else if c == 0 || f == 0
-      return 'frequency_0_7'
+  popup_template = () ->
+    """
+    <%= Haml::Engine.new(File.read(File.join(Rails.root, 'app/views/tooltips', '_table_row.html.haml'))).render(Object.new) %>
+    """
+
+  classify = (data) ->
+    f = data.frequency
+    n = data.num_alt_alleles
+    if f == 1
+      return '1/7'
+    else if n == 0 || f == 0
+      return '0/7'
     else if f < 0.0001
-      return 'frequency_2_7'
+      return '2/0'
     else if f < 0.001
-      return 'frequency_3_7'
+      return '3/7'
     else if f < 0.01
-      return 'frequency_4_7'
+      return '4/7'
     else if f < 0.05
-      return 'frequency_5_7'
+      return '5/7'
     else if f < 0.5
-      return 'frequency_6_7'
+      return '6/7'
     else if f >= 0.5
-      return 'frequency_7_7'
+      return '7/7'
     else
-      return 'frequency_none'
+      return 'null'
 
   sift_class = (v) ->
     if v < 0.05
-      return 'sift_deleterious'
+      return 'deleterious'
     else
-      return 'sift_tolerated'
+      return 'tolerated'
 
   polyphen_class = (v) ->
     if v > 0.908
-      return 'polyphen_probably_damaging'
+      return 'probably_damaging'
     else if v > 0.446 && v <= 0.908
-      return 'polyphen_possibly_damaging'
+      return 'possibly_damaging'
     else if v <= 0.446
-      return 'polyphen_benign'
+      return 'benign'
     else
-      return 'polyphen_unknown'
+      return 'unknown'
 
   clear_total = () ->
     $("[id^='variant_type_cnt_']").text('')
@@ -81,6 +88,24 @@ $ ->
     html = if message then '<div class="alert alert-warning" role="alert"><strong>Warning!</strong> ' + message + '</div>' else ''
     $('#search-alert').html(html)
     return
+
+  popup_html = (freq_data) ->
+    html = popup_template()
+    ['jga_ngs', 'jga_snp', 'tommo', 'hgvd', 'exac'].forEach (source) ->
+      if v = freq_data[source]
+        html = html.replace "{{#{source}.alt}}", v.num_alt_alleles
+        html = html.replace "{{#{source}.ref}}", v.num_alleles
+        f = v.frequency
+        if f == 0
+          f = '0.0'
+        else if f < 0.001
+          f = f.toExponential(3)
+        else
+          f = Math.round(f * Math.pow(10, 3)) / Math.pow(10, 3)
+        html = html.replace "{{#{source}.freq}}", f
+
+    html = html.replace /{{.*}}/g, '-'
+    html
 
   $('#search_text').autocomplete
     source: (request, response) ->
@@ -196,13 +221,13 @@ $ ->
       beforeSend: (xhr) ->
         xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))
     callback: (settings) ->
-      $('[data-toggle="tooltip"]').tooltip()
       $('#dataTables_info_condition').text(settings.json.condition || '')
       total_variant_type = settings.json.total_variant_type
       total_dataset = settings.json.total_dataset
       total_significance = settings.json.total_significance
       update_total(total_variant_type, total_dataset, total_significance)
       show_warning(settings.json.warning)
+      $('[data-toggle="tooltip"]').tooltip()
 
     columns: [
 ## Base Information
@@ -211,7 +236,7 @@ $ ->
         render: (data, type, row, meta) ->
           if type == 'display'
             if data
-              data = '<span class="variant_type_' + data.replace(/\ /g, '_').toLowerCase() + '" />'
+              data = '<span data-icon="variant_type_' + data.replace(/\ /g, '_').toLowerCase() + '" />'
           return data
       }
       {
@@ -228,33 +253,28 @@ $ ->
           return data
       }
       {
-        data: 'chromosome'
+        data: 'start'
         render: (data, type, row, meta) ->
           if type == 'display'
-            if !data
-              data = '?'
-            if row && row.start
-              data = data.concat(':', row.start)
-
+            if row && row.chromosome
+              data = "#{row.chromosome}:#{data}"
           return data
       }
       {
         data: 'reference'
         render: (data, type, row, meta) ->
-          html = data
           if type == 'display'
             if data && data.length > 4
-              html = '<span title="' + data + '">' + data.substr(0, 4).concat('...') + '<br><span class="text-muted">(' + data.length + ')</span></span>'
-          return html
+              data = '<span title="' + data + '">' + data.substr(0, 4).concat('...') + '<br><span class="text-muted">(' + data.length + ')</span></span>'
+          return data
       }
       {
         data: 'alternative'
         render: (data, type, row, meta) ->
-          html = data
           if type == 'display'
             if data && data.length > 4
-              html = '<span title="' + data + '">' + data.substr(0, 4).concat('...') + '<br><span class="text-muted">(' + data.length + ')</span></span>'
-          return html
+              data = '<span title="' + data + '">' + data.substr(0, 4).concat('...') + '<br><span class="text-muted">(' + data.length + ')</span></span>'
+          return data
       }
 ## End Base Information
 
@@ -274,48 +294,20 @@ $ ->
       {
         data: null
         defaultContent: ''
+        class: 'align-middle text-center'
         render: (data, type, row, meta) ->
           if type == 'display'
-            html = ''
-            if row.jga_ngs
-              f = frequency7(row.jga_ngs.frequency, row.jga_ngs.num_alt_alleles)
-              t = 'title="' + row.jga_ngs.frequency.toExponential(3) + '"'
-            else
-              f = 'frequency_none'
-              t = 'title="No data"'
-            html = html.concat('<span class="frequency7 tgv_frequency ' + f + '" ' + t + '></span>')
-            if row.jga_snp
-              f = frequency7(row.jga_snp.frequency, row.jga_snp.num_alt_alleles)
-              t = 'title="' + row.jga_snp.frequency.toExponential(3) + '"'
-            else
-              f = 'frequency_none'
-              t = 'title="No data"'
-            html = html.concat('<span class="frequency7 tgv_frequency ' + f + '" ' + t + '></span>')
-            if row.tommo
-              f = frequency7(row.tommo.frequency, row.tommo.num_alt_alleles)
-              t = 'title="' + row.tommo.frequency.toExponential(3) + '"'
-            else
-              f = 'frequency_none'
-              t = 'title="No data"'
-            html = html.concat('<span class="frequency7 tommo_frequency ' + f + '" ' + t + '"></span>')
-            if row.hgvd
-              f = frequency7(row.hgvd.frequency, row.hgvd.num_alt_alleles)
-              t = 'title="' + row.hgvd.frequency.toExponential(3) + '"'
-            else
-              f = 'frequency_none'
-              t = 'title="No data"'
-            html = html.concat('<span class="frequency7 hgvd_frequency ' + f + '" ' + t + '"></span>')
-            if row.exac
-              f = frequency7(row.exac.frequency, row.exac.num_alt_alleles)
-              t = 'title="' + row.exac.frequency.toExponential(3) + '"'
-            else
-              f = 'frequency_none'
-              t = 'title="No data"'
-            html = html.concat('<span class="frequency7 exac_frequency ' + f + '" ' + t + '"></span>')
-            partial = """
-            <%= Haml::Engine.new(File.read(File.join(Rails.root, 'app/views/layouts', '_tooltip_row.html.haml'))).render(Object.new) %>
-            """
-            html = html.concat('<i class="fa fa-search-plus fa-lg popup-frequency" data-toggle="tooltip" data-container="body" data-html="true" title="' + partial + '"></i>')
+            html = '<div class="frequency_wrapper" data-toggle="tooltip" data-placement="bottom" data-html="true" title="' + popup_html(row) + '">'
+
+            ['jga_ngs', 'jga_snp', 'tommo', 'hgvd', 'exac'].forEach (x) ->
+              klass = if v = row[x]
+                classify(v)
+              else
+                'null'
+              html = html.concat('<span data-source="' + x + '" data-frequency="' + klass + '"></span>')
+
+            data = html.concat('</div>')
+          return data
       }
 
       {
@@ -334,20 +326,26 @@ $ ->
         render: (data, type, row, meta) ->
           if type == 'display'
             if data
-              list = data.filter (x) -> x
-              return ('<div class="' + sift_class(x) + '">' + x + '</div>' for x in list).join('')
-          else
-            return data
+              arr = data.filter (x) -> x
+              if arr.length != 0
+                v = Math.min.apply(null, arr)
+                data = "<span data-icon='sift_#{sift_class(v)}'>#{v}</div>"
+              else
+                data = ''
+          return data
       }
       {
         data: 'transcripts.[].polyphen'
         render: (data, type, row, meta) ->
           if type == 'display'
             if data
-              list = data.filter (x) -> x
-              return ('<div class="' + polyphen_class(x) + '">' + x + '</div>' for x in list).join('')
-          else
-            return data
+              arr = data.filter (x) -> x
+              if arr.length != 0
+                v = Math.max.apply(null, arr)
+                data = "<span data-icon='polyphen_#{polyphen_class(v)}'>#{v}</div>"
+              else
+                data = ''
+          return data
       }
 ## End Function
 
@@ -359,7 +357,7 @@ $ ->
         render: (data, type, row, meta) ->
           if type == 'display'
             if data
-              data = ('<span class="significance_' + s.replace(/\ /g, '_').toLowerCase() + '" />' for s in data).join('')
+              data = ('<span data-icon="significance_' + s.replace(/\ /g, '_').toLowerCase() + '" />' for s in data).join('')
               return data
           return data
       }

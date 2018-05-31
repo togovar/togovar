@@ -3,31 +3,22 @@
   %table#result.table.stripe.compact.nowrap
     %thead
       %tr
-        -# Base Information
         %th
         %th ID
         %th Position
         %th Ref
         %th Alt
-
-        -# Annotations
         %th Symbol
-
-        -# Frequencies
         %th
           Frequency
-          = fa_icon 'question-circle', id: 'tooltip_frequency', class: 'light-tooltip', 'data-toggle': 'tooltip', 'data-html': 'true', title: "#{render partial: 'layouts/tooltip_frequency'}"
-
+          = fa_icon 'question-circle', id: 'tooltip_frequency', data: { toggle: 'tooltip', placement: 'top', html: 'true' }, title: "#{render partial: 'tooltips/frequency'}"
         %th Consequence
-
-        -# Function
         %th
           SIFT
-          = fa_icon 'question-circle', id: 'tooltip_sift', class: 'light-tooltip', 'data-toggle': 'tooltip', 'data-html': 'true', title: "#{render partial: 'layouts/tooltip_sift'}"
+          = fa_icon 'question-circle', id: 'tooltip_sift', data: { toggle: 'tooltip', placement: 'top', html: 'true' }, title: "#{render partial: 'tooltips/sift'}"
         %th
           Polyphen
-          = fa_icon 'question-circle', id: 'tooltip_polyphen', class: 'light-tooltip', 'data-toggle': 'tooltip', 'data-html': 'true', title: "#{render partial: 'layouts/tooltip_polyphen'}"
-        -# ClinVar
+          = fa_icon 'question-circle', id: 'tooltip_polyphen', data: { toggle: 'tooltip', placement: 'top', html: 'true' }, title: "#{render partial: 'tooltips/polyphen'}"
         %th
         %th ClinVar conditions
     %tbody
