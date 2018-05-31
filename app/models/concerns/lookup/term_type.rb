@@ -8,7 +8,7 @@ class Lookup
       end
 
       def display_condition
-        %(reported for disease "#{term}".)
+        %(related to disease "#{term}".)
       end
     end
 
