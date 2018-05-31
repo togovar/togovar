@@ -63,6 +63,16 @@ $ ->
     $("[id^='significance_cnt_']").text('')
     return
 
+  display_float = (v) ->
+    if v == 0
+      v = '0.0'
+    else if v == 1
+      v = '1.0'
+    else if v < 0.001
+      v = v.toExponential(3)
+    else
+      v = Math.round(v * Math.pow(10, 3)) / Math.pow(10, 3)
+
   update_total = (variant_type, dataset, significance) ->
     clear_total()
 
@@ -96,13 +106,7 @@ $ ->
         html = html.replace "{{#{source}.alt}}", v.num_alt_alleles
         html = html.replace "{{#{source}.ref}}", v.num_alleles
         f = v.frequency
-        if f == 0
-          f = '0.0'
-        else if f < 0.001
-          f = f.toExponential(3)
-        else
-          f = Math.round(f * Math.pow(10, 3)) / Math.pow(10, 3)
-        html = html.replace "{{#{source}.freq}}", f
+        html = html.replace "{{#{source}.freq}}", display_float(f)
 
     html = html.replace /{{.*}}/g, '-'
     html
@@ -328,10 +332,10 @@ $ ->
         render: (data, type, row, meta) ->
           if type == 'display'
             if data
-              arr = data.filter (x) -> x
+              arr = data.filter (x) -> x || x == 0
               if arr.length != 0
                 v = Math.min.apply(null, arr)
-                data = "<span data-icon='sift_#{sift_class(v)}'>#{v}</div>"
+                data = "<span data-icon='sift_#{sift_class(v)}'>#{display_float(v)}</div>"
               else
                 data = ''
           return data
@@ -341,10 +345,10 @@ $ ->
         render: (data, type, row, meta) ->
           if type == 'display'
             if data
-              arr = data.filter (x) -> x
+              arr = data.filter (x) -> x || x == 0
               if arr.length != 0
                 v = Math.max.apply(null, arr)
-                data = "<span data-icon='polyphen_#{polyphen_class(v)}'>#{v}</div>"
+                data = "<span data-icon='polyphen_#{polyphen_class(v)}'>#{display_float(v)}</div>"
               else
                 data = ''
           return data
