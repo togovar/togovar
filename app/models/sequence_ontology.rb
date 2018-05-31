@@ -1,7 +1,8 @@
 require 'benchmark'
 require 'rdf'
 
-class Obo < RDF::Vocabulary('http://purl.obolibrary.org/obo/'); end
+class Obo < RDF::Vocabulary('http://purl.obolibrary.org/obo/');
+end
 
 # Wrapper class for accessing so.owl
 class SequenceOntology < RDF::Vocabulary('http://purl.obolibrary.org/obo/')
@@ -52,36 +53,34 @@ class SequenceOntology < RDF::Vocabulary('http://purl.obolibrary.org/obo/')
     end
 
     def repository
-      @repo ||= begin
-        log("Loading #{FILE_PATH}")
-        g    = nil
-        time = Benchmark.realtime { g = RDF::Graph.load(FILE_PATH) }
-        log("Completed in #{(time * 1000).round(1)}ms")
-        g
-      end
+      @repo ||= SPARQL::Client.new(Endpoint.url)
     end
 
     def solution(id)
       log("Obtaining solutions for #{id}")
-      s          = self[id]
+      subject    = self[id]
       definition = self['IAO_0000115']
 
-      query = RDF::Query.new do
-        pattern [s, RDF::Vocab::RDFS.label, :label], optional: true
-        pattern [s, definition, :definition], optional: true
-        pattern [s, RDF::Vocab::RDFS.subClassOf, :sub_class_of], optional: true
-      end
-      query.execute(repository)
+      repository
+        .select
+        .graph('http://togovar.org/graph/so')
+        .optional([subject, RDF::Vocab::RDFS.label, :label])
+        .optional([subject, definition, :definition])
+        .optional([subject, RDF::Vocab::RDFS.subClassOf, :sub_class_of])
+        .execute
     end
 
     def id_for_label(label)
       log("Obtaining ID for #{label}")
-      query = RDF::Query.new do
-        pattern [:s, RDF::Vocab::RDFS.label, label]
-      end
 
-      r = query.execute(repository).first
-      r ? r.s.to_s.split('/').last : nil
+      r = repository
+            .select
+            .graph('http://togovar.org/graph/so')
+            .where([:subject, RDF::Vocab::RDFS.label, :label])
+            .execute
+            .first
+
+      r ? r.subject.to_s.split('/').last : nil
     end
   end
 
