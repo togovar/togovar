@@ -136,21 +136,15 @@
       %li
         SIFT
         %ul
-          %li{class: 'sift_deleterious'}
-            Deleterious
-          %li{class: 'sift_tolerated'}
-            Tolerated
-      %li
+          %li{ data: { icon: 'sift_deleterious' } } Deleterious
+          %li{ data: { icon: 'sift_tolerated' } } Tolerated
+
         PolyPhen
         %ul
-          %li{class: 'polyphen_probably_damaging'}
-            Probably Damaging
-          %li{class: 'polyphen_possibly_damaging'}
-            Possibly Damaging
-          %li{class: 'polyphen_benign'}
-            Benign
-          %li{class: 'polyphen_unknown'}
-            Unknown
+          %li{ data: { icon: 'polyphen_probably_damaging' } } Probably Damaging
+          %li{ data: { icon: 'polyphen_possibly_damaging' } } Possibly Damaging
+          %li{ data: { icon: 'polyphen_benign' } } Benign
+          %li{ data: { icon: 'polyphen_unknown' } } Unknown
 
     %h4#d7 Q. Clinical Significanceの値はどのように計算していますか
     %p
@@ -167,36 +161,36 @@
     %table.table.borderless
       %tr
         %td.text-center.align-bottom
-          %span.frequency7.tgv_frequency.frequency_none
+          %span{ data: { frequency: 'null' } }
         %td.text-center.align-bottom
-          %span.frequency7.tgv_frequency.frequency_0_7
+          %span{ data: { frequency: '0/7' } }
         %td.text-center.align-bottom
-          %span.frequency7.tgv_frequency.frequency_1_7
+          %span{ data: { frequency: '1/7' } }
         %td.text-center.align-bottom
-          %span.frequency7.tgv_frequency.frequency_2_7
+          %span{ data: { frequency: '2/7' } }
         %td.text-center.align-bottom
-          %span.frequency7.tgv_frequency.frequency_3_7
+          %span{ data: { frequency: '3/7' } }
         %td.text-center.align-bottom
-          %span.frequency7.tgv_frequency.frequency_4_7
+          %span{ data: { frequency: '4/7' } }
         %td.text-center.align-bottom
-          %span.frequency7.tgv_frequency.frequency_5_7
+          %span{ data: { frequency: '5/7' } }
         %td.text-center.align-bottom
-          %span.frequency7.tgv_frequency.frequency_6_7
+          %span{ data: { frequency: '6/7' } }
         %td.text-center.align-bottom
-          %span.frequency7.tgv_frequency.frequency_7_7
+          %span{ data: { frequency: '7/7' } }
         %td{rowspan: 2}
           %ul
-            %li.source_jga_ngs.no-bullet
+            %li.no-bullet{ data: { icon: 'source_jga_ngs' } }
               JGA-NGS
-            %li.source_jga_snp.no-bullet
+            %li.no-bullet{ data: { icon: 'source_jga_snp' } }
               JGA-SNP
-            %li.source_tommo.no-bullet
+            %li.no-bullet{ data: { icon: 'source_tommo' } }
               3.5KJPN
-            %li.source_hgvd.no-bullet
+            %li.no-bullet{ data: { icon: 'source_hgvd' } }
               HGVD
-            %li.source_exac.no-bullet
+            %li.no-bullet{ data: { icon: 'source_exac' } }
               ExAC
-            %li.source_clinvar.no-bullet
+            %li.no-bullet{ data: { icon: 'source_clinvar' } }
               ClinVar
       %tr.text-center
         %td
