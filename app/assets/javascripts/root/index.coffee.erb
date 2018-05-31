@@ -22,7 +22,7 @@ $ ->
   classify = (data) ->
     f = data.frequency
     n = data.num_alt_alleles
-    if f == 1
+    if n == 1
       return '1/7'
     else if n == 0 || f == 0
       return '0/7'
