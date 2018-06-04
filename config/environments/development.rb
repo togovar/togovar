@@ -14,10 +14,7 @@ Rails.application.configure do
 
   # Enable/disable caching. By default caching is disabled.
   config.action_controller.perform_caching = false
-  config.cache_store = :redis_store, { host:      'localhost',
-                                       port:      6379,
-                                       db:        0,
-                                       namespace: 'sparql' }
+  config.cache_store = :null_store
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
