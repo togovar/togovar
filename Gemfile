@@ -10,7 +10,9 @@ gem 'rails', '~> 5.1.2'
 # infrastructure
 gem 'elasticsearch-model', github: 'elastic/elasticsearch-rails', branch: '5.x'
 gem 'elasticsearch-rails', github: 'elastic/elasticsearch-rails', branch: '5.x'
+gem 'foreman', '~> 0.84.0'
 gem 'puma', '~> 3.7'
+gem 'unicorn', '~> 5.4'
 
 # javascript & stylesheet
 gem 'bootstrap', '~> 4.0'
