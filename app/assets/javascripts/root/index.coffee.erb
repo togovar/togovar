@@ -19,6 +19,19 @@ $ ->
     <%= Haml::Engine.new(File.read(File.join(Rails.root, 'app/views/tooltips', '_table_row.html.haml'))).render(Object.new) %>
     """
 
+  gene_link = (row) ->
+    if row && row.transcripts?
+      row.transcripts.map (x) ->
+        if x.ncbi_gene_id?
+          href = "http://identifiers.org/hgnc/#{x.ncbi_gene_id}"
+          return "<li><a target='_blank' href='#{href}'>#{x.symbol}</a></li>"
+        if x.ensembl_gene?
+          return "<li><a target='_blank' href='#{ensembl_gene}'>#{x.symbol}</a></li>"
+        else
+          return null
+      .filter((x) -> x)
+      .unique()
+
   classify = (data) ->
     f = data.frequency
     n = data.num_alt_alleles
@@ -250,12 +263,13 @@ $ ->
         render: (data, type, row, meta) ->
           if type == 'display'
             html = '<ul>'
-            tgv_id = "<a target='_blank' href='" + Routes.variant_path('tgv' + data) + "'>tgv" + data + "</a>"
+            tgv_id = "<a target='_blank' href='#{Routes.variant_path('tgv' + data)}'>tgv#{data}</a>"
             html = html.concat('<li>', tgv_id, '</li>')
             if row && row.rs
-              html = html.concat('<li class="text-muted">', row.rs, '</li>')
+              rs_id = "<a class='text-muted' target='_blank' href='http://identifiers.org/dbsnp/#{row.rs}'>#{row.rs}</a>"
+              html = html.concat('<li>', rs_id, '</li>')
             html = html.concat('</ul>')
-            return html
+            data = html
           return data
       }
       {
@@ -290,17 +304,15 @@ $ ->
         render: (data, type, row, meta) ->
           if type == 'display'
             if data
-              list = data.filter((x) -> x).unique()
-              data = '<ul>' + ('<li>' + "<a target='_blank' href='" + Routes.gene_path(x) + "'>" + x + "</a>" + '</li>' for x in list).join('') + '</ul>'
-          else
-            return data
+              data = "<ul>#{gene_link(row)}</ul>"
+          return data
       }
 
 ## Frequencies
       {
         data: null
         defaultContent: ''
-        class: 'align-middle text-center'
+        class: 'text-center'
         render: (data, type, row, meta) ->
           if type == 'display'
             html = '<div class="frequency_wrapper" data-toggle="tooltip" data-placement="bottom" data-html="true" title="' + popup_html(row) + '">'
