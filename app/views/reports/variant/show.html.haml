@@ -18,11 +18,13 @@
 
     %section#nanostanzas
       %div
-        - StanzaRuby.providers.variant.nanostanza.take(3).each do |stanza|
+        - StanzaRuby.providers.variant.nanostanza.each do |stanza|
           .nanostanza-container{data: {stanza: stanza.uri, 'stanza_tgv_id': @tgv_id, nanostanza_span: stanza.span}}
       %div
-        - StanzaRuby.providers.variant.nanostanza.drop(3).each do |stanza|
-          .nanostanza-container{data: {stanza: stanza.uri, 'stanza_tgv_id': @tgv_id, nanostanza_span: stanza.span}}
+        - %w[jga_ngs jga_snp 35kjpn hgvd exac].each do |dataset|
+          - stanza = StanzaRuby.providers.variant.nanostanza_meta.frequency
+          - sparqlist = "https://togovar.org/sparqlist/api/variant_#{dataset}_nano?tgv_id=#{@tgv_id}"
+          .nanostanza-container{data: {stanza: stanza.uri, stanza_sparqlist: sparqlist, nanostanza_span: stanza.span}}
 
     - @stanza.each do |stanza|
       %section{id: stanza.nav_id}

@@ -63,21 +63,10 @@ defaults: &defaults
           span: 1
         -
           uri: https://togovar.org/legacy_stanza/togovar_clinvar_nano
-          span: 2
-        -
-          uri: https://togovar.org/legacy_stanza/togovar_jgangs_nano
           span: 1
-        -
-          uri: https://togovar.org/legacy_stanza/togovar_jgasnp_nano
-          span: 1
-        -
-          uri: https://togovar.org/legacy_stanza/togovar_35kjpn_nano
-          span: 1
-        -
-          uri: https://togovar.org/legacy_stanza/togovar_hgvd_nano
-          span: 1
-        -
-          uri: https://togovar.org/legacy_stanza/togovar_exac_nano
+      nanostanza_meta:
+        frequency:
+          uri: https://togovar.org/legacy_stanza/togovar_variant_frequency_nano
           span: 1
 
 development:
