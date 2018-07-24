@@ -1,8 +1,0 @@
-default: &default
-  uri: 'http://localhost:8080'
-
-development:
-  <<: *default
-
-production:
-  <<: *default

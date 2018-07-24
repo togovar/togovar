@@ -1,58 +1,5 @@
 defaults: &defaults
   providers:
-    genes:
-      nanostanza:
-        -
-          uri: https://togovar.org/legacy_stanza/gene_length_nano
-          span: 1
-        -
-          uri: https://togovar.org/legacy_stanza/togovar_variant_number_by_gene_nano
-          span: 1
-        -
-          uri: https://togovar.org/legacy_stanza/protein_ec_number_nano
-          span: 1
-        -
-          uri: https://togovar.org/legacy_stanza/protein_3d_structure_nano
-          span: 1
-        -
-          uri: https://togovar.org/legacy_stanza/protein_references_timeline_nano
-          span: 2
-
-      togostanza:
-        -
-          uri: https://togovar.org/legacy_stanza/togovar_gene_attributes
-          name: Gene attributes
-        -
-          uri: https://togovar.org/legacy_stanza/genome_jbrowse
-          name: Genomic context
-        -
-          uri: https://togovar.org/legacy_stanza/nucleotide_sequence
-          name: Nucleotide sequence
-        -
-          uri: https://togovar.org/legacy_stanza/protein_attributes
-          name: Protein attributes
-        -
-          uri: https://togovar.org/legacy_stanza/protein_sequence
-          name: Protein sequence
-        -
-          uri: https://togovar.org/legacy_stanza/protein_general_annotation
-          name: Protein general annotation
-        -
-          uri: https://togovar.org/legacy_stanza/protein_ontologies
-          name: Protein ontologies
-        -
-          uri: https://togovar.org/legacy_stanza/protein_sequence_annotation
-          name: Protein sequence annotation
-        -
-          uri: https://togovar.org/legacy_stanza/protein_orthologs
-          name: Protein orthologs
-        -
-          uri: https://togovar.org/legacy_stanza/protein_references
-          name: Protein references
-        -
-          uri: https://togovar.org/legacy_stanza/protein_cross_references
-          name: Protein cross references
-
     variant:
       nanostanza:
         -
@@ -63,10 +10,21 @@ defaults: &defaults
           span: 1
         -
           uri: https://togovar.org/legacy_stanza/togovar_clinvar_nano
+          span: 2
+        -
+          uri: https://togovar.org/legacy_stanza/togovar_jgangs_nano
           span: 1
-      nanostanza_meta:
-        frequency:
-          uri: https://togovar.org/legacy_stanza/togovar_variant_frequency_nano
+        -
+          uri: https://togovar.org/legacy_stanza/togovar_jgasnp_nano
+          span: 1
+        -
+          uri: https://togovar.org/legacy_stanza/togovar_35kjpn_nano
+          span: 1
+        -
+          uri: https://togovar.org/legacy_stanza/togovar_hgvd_nano
+          span: 1
+        -
+          uri: https://togovar.org/legacy_stanza/togovar_exac_nano
           span: 1
 
 development:

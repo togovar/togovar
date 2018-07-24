@@ -1,38 +1,11 @@
 defaults: &defaults
-  ontology:
-    exac: 'http://togogenome.org/variation/exac'
-    clinvar: 'http://togogenome.org/variation/clinvar'
-    medgen: 'http://togogenome.org/variation/medgen'
-    so: 'http://togogenome.org/variation/so'
-
-    go: 'http://togogenome.org/graph/go'
-    refseq: 'http://togogenome.org/graph/refseq'
-    tgup: 'http://togogenome.org/graph/tgup'
-    uniprot: 'http://togogenome.org/graph/uniprot'
-
-  prefix:
-    dc: 'http://purl.org/dc/terms/'
-    cv: 'http://purl.jp/bio/10/clinvar/'
-    cvid: 'http://identifiers.org/clinvar/'
-    exid: 'http://identifiers.org/exac.variant/'
-    exo: 'http://purl.jp/bio/10/exac/'
-    faldo: 'http://biohackathon.org/resource/faldo#'
-    idtax: 'http://identifiers.org/taxonomy/'
-    insdc: 'http://ddbj.nig.ac.jp/ontologies/nucleotide/'
-    obo: 'http://purl.obolibrary.org/obo/'
-    up: 'http://purl.uniprot.org/core/'
+  url: 'https://togovar.org/sparql'
 
 development:
   <<: *defaults
-  url: 'http://ep.dbcls.jp/sparql72hv'
-  tg: 'http://dev.togogenome.org/sparql-test'
 
 test:
   <<: *defaults
-  url: 'http://ep.dbcls.jp/sparql72hv'
-  tg: 'http://dev.togogenome.org/sparql-test'
 
 production:
   <<: *defaults
-  url: 'http://ep.dbcls.jp/sparql72hv'
-  tg: 'http://dev.togogenome.org/sparql-test'
