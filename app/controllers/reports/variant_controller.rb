@@ -9,10 +9,12 @@ module Reports
       @stanza << Stanza.row_headered_table(nil,
                                            nav_id:    'variant_information',
                                            nav_label: 'Variant Information',
-                                           args:      { url: "https://togovar.org/sparqlist/api/variant_basic_information?tgv_id=#{id}" })
+                                           args:      {
+                                             url: variant_information
+                                           })
       @stanza << Stanza.variant_frequency('Frequency', args: { tgv_id: id })
       @stanza << Stanza.variant_jbrowse('Genomic context', args: { tgv_id: id })
-      @stanza << Stanza.column_headered_table('Transcripts', args: { url: "https://togovar.org/sparqlist/api/variant_transcripts?tgv_id=#{id}" })
+      @stanza << Stanza.column_headered_table('Transcripts', args: { url: transcripts })
 
       lookup = Lookup.find(id)
 
@@ -28,9 +30,23 @@ module Reports
           @stanza << Stanza.variant_publications("Publications (#{x})",
                                                  nav_id:    "publication_#{x}",
                                                  nav_label: 'Publications',
-                                                 args:      { url: "https://togovar.org/sparqlist/api/rs2disease?rs=#{x}" })
+                                                 args:      { url: variant_publications(x) })
         end
       end
+    end
+
+    private
+
+    def variant_information
+      URI.join(root_url, "/sparqlist/api/variant_basic_information?tgv_id=#{@tgv_id}").to_s
+    end
+
+    def transcripts
+      URI.join(root_url, "/sparqlist/api/variant_transcripts?tgv_id=#{@tgv_id}").to_s
+    end
+
+    def variant_publications(rs)
+      URI.join(root_url, "/sparqlist/api/rs2disease?rs=#{rs}").to_s
     end
   end
 end

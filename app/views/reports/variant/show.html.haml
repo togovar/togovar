@@ -24,7 +24,7 @@
       %div
         - %w[jga_ngs jga_snp 35kjpn hgvd exac].each do |dataset|
           - stanza = StanzaRuby.providers.variant.nanostanza_meta.frequency
-          - sparqlist = "https://togovar.org/sparqlist/api/variant_#{dataset}_nano?tgv_id=#{@tgv_id}"
+          - sparqlist = URI.join(root_url, "/sparqlist/api/variant_#{dataset}_nano?tgv_id=#{@tgv_id}")
           .nanostanza-container{data: {stanza: stanza.uri, stanza_sparqlist: sparqlist, nanostanza_span: stanza.span}}
 
     - @stanza.each do |stanza|
