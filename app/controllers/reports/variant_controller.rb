@@ -25,7 +25,7 @@ module Reports
 
       if (rs = lookup&.rs)
         Array(rs).each do |x|
-          @stanza << Stanza.togovar_publications("Publications (#{x})",
+          @stanza << Stanza.variant_publications("Publications (#{x})",
                                                  nav_id:    "publication_#{x}",
                                                  nav_label: 'Publications',
                                                  args:      { url: "https://togovar.org/sparqlist/api/rs2disease?rs=#{x}" })
