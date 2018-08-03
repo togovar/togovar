@@ -1,0 +1,386 @@
+- provide(:title, 'Help')
+- provide(:active, doc_help_path)
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
+%main
+  .container
+    %h1.title
+      Help
+    %ul
+      %li
+        %strong
+          TogoVar in general
+        %ul
+          %li
+            = link_to '#g1' do
+              What are the objectives and utilities of TogoVar?
+          %li
+            = link_to '#g2' do
+              Can I use TogoVar in-house?
+      %li
+        %strong
+          About the terms of use
+        %ul
+          %li
+            = link_to '#t1' do
+              Can I use the database for free?
+          %li
+            = link_to '#t2' do
+              What should I do to write a scientific paper using database information?
+          %li
+            = link_to '#t3' do
+              Can I use it for commercial purposes?
+      %li
+        %strong
+          About the data collected in TogoVar
+        %ul
+          %li
+            = link_to '#d1' do
+              Can I retrieve phenotype information on an individual level?
+          %li
+            = link_to '#d2' do
+              Are the data linked with information about gene expression and proteins?
+          %li
+            = link_to '#d3' do
+              What is the name of the software used for detecting variants and how you manage the quality?
+          %li
+            = link_to '#d4' do
+              What are the targeted variant types for TogoVar?
+          %li
+            = link_to '#d5' do
+              How do you calculate the Consequence value?
+          %li
+            = link_to '#d6' do
+              What are SIFT and PolyPhen?
+          %li
+            = link_to '#d7' do
+              How do you calculate the value of Clinical significance?
+      %li
+        %strong
+          About the TogoVar search system
+        %ul
+          %li
+            = link_to '#s1' do
+              What does the Frequency meter in the Frequency column of the search results represent?
+          %li
+            = link_to '#s2' do
+              What are the relationships between Position, Ref, and Alt for each variant type?
+          %li
+            = link_to '#s3' do
+              Are there any notational differences for variants in the dbSNP, VCF format, or HGVS format?
+    %section
+      %h2
+        TogoVar in general
+
+      %h3#g1
+        Q. What are the objectives and utilities of TogoVar?
+      %p
+        A. NGS allowed genome sequencing, which was able to capture variants at low frequencies. However, existing
+        databases in Western countries do not contain sufficient frequency data for Japanese populations. To address this
+        problem, TogoVar seeks to provide a more reliable frequency information by assembling available information of
+        genomic variation in Japanese individuals, as well as information from human databases that have been entrusted
+        to the NBDC.
+      %p
+        In addition, since the reference human genome sequence is not always constant and can be updated, the genomic
+        position may vary for the same variant if it refers to different sequences. Thus, in our database, a unique ID is
+        assigned to the same variant, thereby preventing the need to convert the positional information of the variant
+        among different reference sequences, as done by researchers.
+
+      %h3#g2
+        Q. Can I use TogoVar in-house?
+      %p
+        A. Docker images will be released. We request your patience.
+
+    %section
+      %h2
+        About the terms of use
+
+      %h3#t1
+        Q. Can I use the database for free?
+      %p
+        A. You can use all the available data for free. For the use of the database, refer to
+        = succeed '.' do
+          = link_to 'Terms', doc_terms_path
+
+      %h3#t2
+        Q. What should I do to write a scientific paper using database information?
+      %p
+        A. Refer to the attribution (credit) display examples in
+        = succeed '.' do
+          = link_to 'Terms', doc_terms_path
+
+      %h3#t3
+        Q. Can I use it for commercial purposes?
+      %p
+        A. You are free to browse the TogoVar websites and use the docker images to be released for commercial purposes.
+        For data created by third parties and imported in TogoVar, please follow the terms of use of each organization.
+        For more details, refer to
+        = succeed '.' do
+          = link_to 'Terms', doc_terms_path
+
+    %section
+      %h2
+        About the data collected in TogoVar
+
+      %h3#d1
+        Q. Can I retrieve phenotype information on an individual level?
+      %p
+        A. Our database does not keep private information, and we do not currently provide phenotype information for each
+        individual. For more details about phenotype information, please directly contact the research groups described in
+        the
+        = link_to 'JGA-NGS dataset', doc_datasets_jga_ngs_path
+        and
+        = succeed '.' do
+          = link_to 'JGA-SNP dataset', doc_datasets_jga_snp_path
+
+      %h3#d2
+        Q. Are the data linked with information about gene expression and proteins?
+      %p
+        A. Our database has primarily integrated open information on Japanese subjects regarding their genetic variants
+        in their genomes. Since our database uses RDF as the base technology, if there is a database that uses RDF to
+        provide information about gene expression or proteins, we believe that our database can easily be extended to
+        accommodate such information. An extension to the information about gene expression and proteins will be carried
+        out in sequence.
+
+      %h3#d3
+        Q. What is the name of the software used for detecting variants and how you manage the quality?
+      %p
+        A. Refer to
+        = succeed '.' do
+          = link_to 'How JGA dataset was generated', doc_datasets_analysis_path
+
+      %h3#d4
+        Q. What are the targeted variant types for TogoVar?
+      %p
+        A. There are five targeted variant types for TogoVar: SNV, Insertion, Deletion, Indel, and Substitution. Of
+        = succeed ',' do
+          = link_to '5 types that HGVS enumerated as the types of variants', 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants'
+        Duplication is classified as Insertion, and Indels, for which the lengths of Insertion and Deletion are the same,
+        are classified as Substitution. To identify the type of the variant,
+        = link_to 'https://www.ensembl.org/vep' do
+          Variant Effect Predictor (VEP)
+        is used.
+
+      %h3#d5
+        Q. How do you calculate the Consequence value?
+      %p
+        A. The value of variant consequence in
+        = link_to 'https://asia.ensembl.org/info/genome/variation/predicted_data.html#consequences' do
+          Variant Effect Predictor (VEP)
+        is displayed. If there are multiple transcripts for a single variant, only the most critical consequence may be
+        displayed.
+
+      %h3#d6
+        Q. What are SIFT and PolyPhen?
+      %p
+        A. When an amino acid sequence undergoes alteration due to a variant, they predict the effects it has on the
+        protein function. Values calculated through
+        = link_to 'https://asia.ensembl.org/info/genome/variation/predicted_data.html#nsSNP' do
+          Variant Effect Predictor (VEP)
+        are displayed. The meaning of each icon is as follows.
+
+      %ul
+        %li
+          SIFT
+          %ul
+            %li{ data: { icon: 'sift_deleterious' } } Deleterious
+            %li{ data: { icon: 'sift_tolerated' } } Tolerated
+        %li
+          PolyPhen
+          %ul
+            %li{ data: { icon: 'polyphen_probably_damaging' } } Probably Damaging
+            %li{ data: { icon: 'polyphen_possibly_damaging' } } Possibly Damaging
+            %li{ data: { icon: 'polyphen_benign' } } Benign
+            %li{ data: { icon: 'polyphen_unknown' } } Unknown
+
+      %h3#d7
+        Q. How do you calculate the value of Clinical significance?
+      %p
+        A. The value of
+        = link_to 'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv' do
+          clinical significance in ClinVar
+        is displayed.
+
+    %section
+      %h2
+        About the TogoVar search system
+
+      %h3#s1
+        Q. What does the Frequency meter in the Frequency column of the search results represent?
+      %p
+        A. The Frequency meter represents the alternative allele frequency for each dataset. The color of the frequency
+        meter corresponds to the color allocated to the dataset. The data availability or frequency value is represented
+        on a 9-point scale.
+
+        .d-flex.flex-wrap
+          .frequency
+            %span{ data: { frequency: 'null' } }
+            %label Not<br>Available
+          .frequency
+            %span{ data: { frequency: '0/7' } }
+            %label Monomorphic<br>(REF)
+          .frequency
+            %span{ data: { frequency: '1/7' } }
+            %label Singleton
+          .frequency
+            %span{ data: { frequency: '2/7' } }
+            %label &lt; 0.0001
+          .frequency
+            %span{ data: { frequency: '3/7' } }
+            %label &lt; 0.001
+          .frequency
+            %span{ data: { frequency: '4/7' } }
+            %label &lt; 0.01
+          .frequency
+            %span{ data: { frequency: '5/7' } }
+            %label &lt; 0.05
+          .frequency
+            %span{ data: { frequency: '6/7' } }
+            %label &lt; 0.5
+          .frequency
+            %span{ data: { frequency: '7/7' } }
+            %label &ge; 0.5
+          .frequency
+            %ul.no-list-style
+              %li{ data: { icon: 'source_jga_ngs' } }
+                JGA-NGS
+              %li{ data: { icon: 'source_jga_snp' } }
+                JGA-SNP
+              %li{ data: { icon: 'source_tommo' } }
+                3.5KJPN
+              %li{ data: { icon: 'source_hgvd' } }
+                HGVD
+              %li{ data: { icon: 'source_exac' } }
+                ExAC
+              %li{ data: { icon: 'source_clinvar' } }
+                ClinVar
+
+      %h3#s2
+        Q. What are the relationships between Position, Ref, and Alt for each variant type?
+      %p
+        A. For a description based on examples of specific instances, refer to the table below. Note that the position of
+        the first base in the chromosome is not 0, but 1.
+
+      %table.table.table-bordered.table-sm
+        %thead
+          %tr
+            %th Variant Type
+            %th ID
+            %th Position
+            %th Ref
+            %th Alt
+            %th Description
+        %tbody
+          %tr
+            %td SNV
+            %td= link_to 'tgv41', variant_path(id: 'tgv41')
+            %td 1:13116
+            %td T
+            %td G
+            %td The 13116th base T in Chromosome 1 was replaced by G.
+          %tr
+            %td Ins
+            %td= link_to 'tgv1019', variant_path(id: 'tgv1019')
+            %td 1:138646
+            %td
+            %td A
+            %td A base A was inserted between the 138646th and 138647th bases in Chromosome 1.
+          %tr
+            %td Del
+            %td= link_to 'tgv63', variant_path(id: 'tgv63')
+            %td 1:13486
+            %td GC
+            %td
+            %td The 13486th and 13487th bases, GC, in Chromosome 1 were deleted.
+          %tr
+            %td Indel
+            %td= link_to 'tgv1537710', variant_path(id: 'tgv1537710')
+            %td 1:53676691
+            %td C
+            %td TA
+            %td The 53676691st base C in Chromosome 1 was deleted and TA was inserted in its place.
+          %tr
+            %td Substitution
+            %td= link_to 'tgv675673', variant_path(id: 'tgv675673')
+            %td 1:21889705
+            %td AC
+            %td CA
+            %td The 21889705th bases, AC, in Chromosome 1 were deleted and CA were inserted in their place.
+
+      %h3#s3
+        Q. Are there any notational differences for variants in the dbSNP, VCF format, or HGVS format?
+      %p
+        A. TogoVar conforms to the notations of dbSNP. The notations in the
+        = link_to 'VCF format', 'https://samtools.github.io/hts-specs/VCFv4.2.pdf'
+        and
+        = link_to 'HGVS format', 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants'
+        are as follows.
+
+      %table.table.table-bordered.table-sm
+        %thead
+          %tr
+            %th{rowspan: '2'} Variant Type
+            %th{rowspan: '2'} ID
+            %th{colspan: '3'} TogoVar/dbSNP
+            %th{colspan: '3'} VCF
+            %th{rowspan: '2'} HGVS
+          %tr
+            %th Position
+            %th Ref
+            %th Alt
+            %th Position
+            %th Ref
+            %th Alt
+        %tbody
+          %tr
+            %td SNV
+            %td= link_to 'tgv41', variant_path(id: 'tgv41')
+            %td 1:13116
+            %td T
+            %td G
+            %td 1:13116
+            %td T
+            %td G
+            %td 1:g.13116T&gt;G
+          %tr
+            %td Ins
+            %td= link_to 'tgv1019', variant_path(id: 'tgv1019')
+            %td 1:138646
+            %td
+            %td A
+            %td 1:138646
+            %td C
+            %td CA
+            %td 1:g.138646_138647insA
+          %tr
+            %td Del
+            %td= link_to 'tgv63', variant_path(id: 'tgv63')
+            %td 1:13486
+            %td GC
+            %td
+            %td 1:13485
+            %td AGC
+            %td A
+            %td 1:g.13486_13487del
+          %tr
+            %td Indel
+            %td= link_to 'tgv1537710', variant_path(id: 'tgv1537710')
+            %td 1:53676691
+            %td C
+            %td TA
+            %td 1:53676691
+            %td C
+            %td TA
+            %td 1:g.53676691delinsTA
+          %tr
+            %td Substitution
+            %td= link_to 'tgv675673', variant_path(id: 'tgv675673')
+            %td 1:21889705
+            %td AC
+            %td CA
+            %td 1:21889705
+            %td AC
+            %td CA
+            %td 1:g.21889705_21889706delinsCA

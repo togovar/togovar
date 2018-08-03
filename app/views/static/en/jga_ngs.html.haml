@@ -1,0 +1,146 @@
+- provide(:title, 'Dataset > JGA-NGS')
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
+%main
+  .container
+    %h1.title
+      JGA-NGS dataset
+
+    %h2
+      Summary
+    %p
+      - humandb = link_to 'NBDC Human Database', 'https://humandbs.biosciencedbc.jp/en/'
+      - jga = link_to 'Japanese Genotype-phenotype Archive (JGA)', 'https://www.ddbj.nig.ac.jp/jga/index-e.html'
+      JGA-NGS dataset is a frequency dataset that assembles variants detected by reanalyzing individual-level genome
+      sequence data in the #{humandb}/#{jga}. All JGA data for which an approval for creating secondary data has been
+      obtained are to be aggregated. Note that no variants with 5 alternative alleles or less are included.
+    %ul
+      %li
+        Version/Last update: 06/01/2018
+      %li
+        Sample size: 125
+      %li
+        \# of detected variants: 13,338,968
+      %li
+        \# of variants after the exclusion: 4,679,025
+
+    %h2
+      Terms of use
+
+    %h3
+      Rights of Data Users
+    %p
+      The rights of data users shall conform to "5-2-1. Open Data" in "5-2. Rights of Data Users" listed in
+      = link_to 'https://humandbs.biosciencedbc.jp/guidelines/data-sharing-guidelines' do
+        the NBDC Human Data Sharing Guidelines.
+    %ol
+      %li
+        The data user can freely present the result of the study for which data from the NBDC Human Database are used.
+      %li
+        The data user can freely acquire intellectual property rights based on the result of the study for which data
+        from the NBDC Human Database are used.
+
+    %h3
+      Responsibilities of Data Users
+    %p
+      Responsibilities of data users shall conform to "5-­3-­1. Open Data" in "5­-3. Responsibilities of Data Users"
+      listed in the NBDC Human Data Sharing Guidelines.
+    %ol
+      %li
+        In using data, the user must take responsibility for and make judgments concerning the quality, content, and
+        scientific validity of the data.
+      %li
+        The data user must comply with the following rules.
+        %ul
+          %li
+            The use of data is limited to the study being undertaken.
+          %li
+            Identification of individuals is prohibited
+          %li
+            Redistribution of data is prohibited.
+      %li
+        The data user must add the following citation while using the data in public (e.g. publishing an article).
+        %p
+          - jga = link_to 'JGA', 'https://www.ddbj.nig.ac.jp/jga/index-e.html'
+          Variant dataset aggregated from NGS data in #{humandb}/#{jga} [Internet]. Tokyo: Japan Science and
+          Technology Agency (Japan), National Bioscience Database Center; [2018] - .
+          JGA-NGS dataset; [cited YYYY Mmm DD]. Available from:
+          = link_to 'https://togovar.biosciencedbc.jp/doc/datasets/jga_ngs', doc_datasets_jga_ngs_path
+
+    %h2
+      Data Analysis Method
+    %p
+      Please visit
+      = succeed '.' do
+        = link_to 'How JGA dataset was created', 'analysis'
+
+    %h2
+      Derivations of aggregated data
+    %table.table.table-bordered.table-sm
+      %thead
+        %tr
+          %th JGAID
+          %th Human DB ID
+          %th Study title
+          %th Participants
+          %th
+            Sample
+            %br>/
+            size
+          %th Data provider
+      %tbody
+        %tr
+          %td= link_to 'JGAD00000000004', 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000004'
+          %td= link_to 'hum0006', 'https://humandbs.biosciencedbc.jp/en/hum0006-v3'
+          %td Genomic and Genetic Analysis of Brain Tumors and Analysis of Their Clinicopathological Significance
+          %td astrocytomas
+          %td{align: 'right'} 6
+          %td Nobuhito Saito<br>(P-DIRECT)
+        %tr
+          %td= link_to 'JGAD00000000106', 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000106'
+          %td= link_to 'hum0006', 'https://humandbs.biosciencedbc.jp/en/hum0006-v3'
+          %td Genomic and Genetic Analysis of Brain Tumors and Analysis of Their Clinicopathological Significance
+          %td oligodendrogliomas
+          %td{align: 'right'} 16
+          %td Nobuhito Saito<br>(P-DIRECT)
+        %tr
+          %td= link_to 'JGAD00000000112', 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000112'
+          %td= link_to 'hum0006', 'https://humandbs.biosciencedbc.jp/en/hum0006-v3'
+          %td Genomic and Genetic Analysis of Brain Tumors and Analysis of Their Clinicopathological Significance
+          %td gliomas
+          %td{align: 'right'} 17
+          %td Nobuhito Saito<br>(P-DIRECT)
+        %tr
+          %td= link_to 'JGAD00000000014', 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000014'
+          %td= link_to 'hum0021', 'https://humandbs.biosciencedbc.jp/en/hum0021-v1'
+          %td Genetic Analysis in Psychiatric Disorders
+          %td Healthy Monozygotic Twins
+          %td{align: 'right'} 6
+          %td Tadafumi Kato<br>(Genome Science)
+        %tr
+          %td= link_to 'JGAD00000000036', 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000036'
+          %td= link_to 'hum0035', 'https://humandbs.biosciencedbc.jp/en/hum0035-v1'
+          %td Genome wide analysis of gene mutations in solid tumors
+          %td solid tumors
+          %td{align: 'right'} 23
+          %td Junko Takita<br>(P-DIRECT)
+        %tr
+          %td= link_to 'JGAD00000000038', 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000038'
+          %td= link_to 'hum0040', 'https://humandbs.biosciencedbc.jp/en/hum0040-v1/'
+          %td Epigenomic analysis of the human placenta
+          %td human placenta and maternal blood
+          %td{align: 'right'} 48
+          %td Takahiro Arima<br>IHEC)
+        %tr
+          %td= link_to 'JGAD00000000060', 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000060'
+          %td= link_to 'hum0066', 'https://humandbs.biosciencedbc.jp/en/hum0066-v1'
+          %td Identification of non­coding RNAs involved in the recurrence or spread of cancer and the elucidation of their mechanisms
+          %td Colon cancer
+          %td{align: 'right'} 9
+          %td Koshi Mimori
+      %tfoot
+        %tr
+          %th.text-center{colspan: '4'} Total
+          %td.text-right 125

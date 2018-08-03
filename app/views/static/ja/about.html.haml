@@ -1,0 +1,32 @@
+- provide(:title, 'About')
+- provide(:active, doc_about_path)
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
+- humandb = link_to 'NBDCヒトデータベース', 'https://humandbs.biosciencedbc.jp/'
+- jga = link_to 'Japanese Genotype-phenotype Archive (JGA)', 'https://www.ddbj.nig.ac.jp/jga/index.html'
+- nbdc = link_to '国立研究開発法人科学技術振興機構 バイオサイエンスデータベースセンター (NBDC)', 'https://biosciencedbc.jp/'
+- dbcls = link_to '大学共同利用機関法人 情報・システム研究機構 データサイエンス共同利用基盤施設 ライフサイエンス統合データベースセンター (DBCLS)', 'http://dbcls.rois.ac.jp/'
+
+%main
+  .container
+    %h1.title
+      About TogoVar
+    %p
+      TogoVar（日本人ゲノム多様性統合データベース）は、日本人ゲノム配列の個人による違い（バリアント）とそれに関係する疾患情報などを収集・整理したデータベースです。
+
+    %h2
+      1. 研究プロジェクト横断的に集約した日本人におけるバリアントの頻度情報を提供します
+    %p
+      #{humandb}/#{jga}に 登録されている個人ごとのゲノムデータを集約して得られた「日本人におけるバリアントの頻度情報」(#{link_to 'JGA-NGS', doc_datasets_jga_ngs_path}と#{link_to 'JGA-SNP', doc_datasets_jga_snp_path})を提供します。
+
+    %h2
+      2. 散在するデータを整理統合して、ワンストップでわかりやすく提供します
+    %p
+      多種多様なデータベースに散在して収録されてきた遺伝子型や表現型に関連する情報を整理統合し、バリアントを解釈するための情報をワンストップでわかりやすく提供します。
+
+    %h2
+      開発者/Developers
+    %p
+      TogoVarは、#{nbdc}と#{dbcls}との共同研究で開発しています。

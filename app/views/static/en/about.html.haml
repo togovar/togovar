@@ -1,0 +1,41 @@
+- provide(:title, 'About')
+- provide(:active, doc_about_path)
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
+- humandb = link_to 'the NBDC Human Database', 'https://humandbs.biosciencedbc.jp/en/'
+- jga = link_to 'Japanese Genotype-phenotype Archive (JGA)', 'https://www.ddbj.nig.ac.jp/jga/index-e.html'
+- nbdc = link_to 'https://biosciencedbc.jp/en' do
+  National Bioscience Database Center (NBDC), Japan Science and Technology Agency (JST)
+- dbcls = link_to 'https://dbcls.rois.ac.jp/index-en.html' do
+  Research Organization of Information and Systems, Joint Support-Center for Data Science Research, Database
+  Center for Life Science (DBCLS).
+
+%main
+  .container
+    %h1.title
+      About TogoVar
+    %p
+      TogoVar (NBDC's integrated database of Japanese genomic variation) is a database that has collected and organized
+      genome sequence differences between individuals (variants) in the Japanese population and disease information
+      associated with them.
+
+    %h2
+      1. TogoVar provides variant frequencies in the Japanese population that have been aggregated across research
+      projects
+    %p
+      It provides variant frequencies in the Japanese population (#{link_to 'JGA-NGS', doc_datasets_jga_ngs_path} and
+      #{link_to 'JGA-SNP', doc_datasets_jga_snp_path}) obtained by aggregating individual genomic data that have been
+      registered in #{humandb}/#{jga}.
+
+    %h2
+      2. TogoVar provides information in a one-stop, easy-to-understand manner by integrating scattered data
+    %p
+      It integrates information related to genotypes or phenotypes that has been compiled sporadically in a variety of
+      different databases and provides information for interpreting variants in a one-stop, easy-to-understand manner.
+
+    %h2
+      Developers
+    %p
+      TogoVar has been developed as a joint research project of #{nbdc} and #{dbcls}.

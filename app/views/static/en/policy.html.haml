@@ -1,0 +1,26 @@
+- provide(:title, 'Policy')
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
+%main
+  .container
+    %h1.title
+      Site Policies
+
+    %h2
+      About This Website
+    %p
+      This website is operated and managed by the National Bioscience Database Center ("NBDC") of the Japan Science and
+      Technology Agency (“JST”).
+
+    %h2
+      About Site Policies
+    %p
+      Site policies, including link, copyright, prohibited uses, disclaimer, personal information, transfer of the
+      services of this website, general clauses and continuous improvement, conform to
+      = succeed '.' do
+        = link_to 'NBDC Site Policies', 'https://biosciencedbc.jp/en/sitepolicies'
+      Policies written in
+      = link_to 'the Terms page', doc_terms_path
+      are prior to the NBDC Site Policies.

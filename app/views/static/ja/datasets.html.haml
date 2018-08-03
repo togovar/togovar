@@ -6,14 +6,47 @@
 
 %main
   .container
-    %h1.title TogoVar収録データセット一覧
+    %h1.title
+      TogoVar収録データセット一覧
 
-    %h2 ヒトゲノムリファレンス配列
+    %h2
+      ヒトゲノムリファレンス配列
     %ul
       %li
-        %a{href: 'https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh37.p13'} GRCh37.p13 (06/28/2013)
+        = link_to 'GRCh37.p13 (06/28/2013)', 'https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh37.p13'
 
-    %h2 Japanese Genotype-phenotype Archive (JGA)の個人ゲノムデータ由来のバリアントデータセット
+    %h2
+      Japanese Genotype-phenotype Archive (JGA)の個人ゲノムデータ由来のバリアントデータセット
+    %table.table.table-bordered.table-sm
+      %thead.text-center
+        %tr
+          %th データセット名
+          %th バージョン/最終更新日
+          %th サンプルサイズ
+          %th 検出バリアント数
+          %th 除外後バリアント数
+          %th 作成者
+      %tbody
+        %tr
+          %td= link_to 'JGA-NGS', doc_datasets_jga_ngs_path
+          %td 06/01/2018
+          %td.text-right 125
+          %td.text-right 13,338,968
+          %td.text-right 4,679,025
+          %td NBDC
+        %tr
+          %td= link_to 'JGA-SNP', doc_datasets_jga_snp_path
+          %td 06/01/2018
+          %td.text-right 183,884
+          %td.text-right 1,966,919
+          %td.text-right 1,249,724
+          %td NBDC
+
+    %em
+      注：アレル数5以下のバリアントはJGA-NGS/JGA-SNPデータセットから削除しています。
+
+    %h2
+      第三者が作成したバリアントデータセット
     %table.table.table-bordered.table-sm
       %thead.text-center
         %tr
@@ -25,79 +58,39 @@
           %th 作成者
       %tbody
         %tr
-          %td
-            = link_to doc_datasets_jga_ngs_path do
-              JGA-NGS
-              %br
-              (QC PASSED)
-          %td 06/01/2018
-          %td.text-right 125
-          %td.text-right
-            13,338,968
-            %br
-            (1,557,674)
-          %td.text-right
-            12,980,041
-            %br
-            (1,459,952)
-          %td NBDC
-        %tr
-          %td
-            = link_to 'JGA-SNP', doc_datasets_jga_snp_path
-          %td 06/01/2018
-          %td.text-right 183,884
-          %td.text-right 1,966,919
-          %td.text-right 1,958,606
-          %td NBDC
-
-    %h2 第三者が作成したバリアントデータセット
-    %table.table.table-bordered.table-sm
-      %thead.text-center
-        %tr
-          %th データセット名
-          %th バージョン/最終更新日
-          %th
-            サンプル
-            %br
-            サイズ
-          %th バリアント数
-          %th バリアント部位数
-          %th 作成者
-      %tbody
-        %tr
-          %td
-            %a{href: 'ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/'} ClinVar
+          %td= link_to 'ClinVar', 'ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/'
           %td 02/01/2017
           %td.text-center —
-          %td.text-center —
           %td.text-right 198,707
+          %td.text-center —
           %td NCBI
         %tr
-          %td
-            %a{href: 'http://exac.broadinstitute.org/downloads'} Exome Aggregation Consortium (ExAC)
+          %td= link_to 'Exome Aggregation Consortium (ExAC)', 'http://exac.broadinstitute.org/downloads'
           %td Release 1 (02/27/2017)
           %td.text-right 60,706
           %td.text-right 10,195,872
           %td.text-right 9,362,319
           %td Broad Institute
         %tr
-          %td
-            %a{href: 'http://www.hgvd.genome.med.kyoto-u.ac.jp/download.html'} Human Genetic Variation Database (HGVD)
+          %td= link_to 'Human Genetic Variation Database (HGVD)', 'http://www.hgvd.genome.med.kyoto-u.ac.jp/download.html'
           %td Version 2.30 (08/02/2017)
           %td.text-right 1,208
           %td.text-right 554,461
           %td.text-right 501,556
           %td 京都大学
         %tr
-          %td
-            %a{href: 'https://ijgvd.megabank.tohoku.ac.jp/download_3.5kjpn/'} Integrative Japanese Genome Variation Database (iJGVD)
+          %td= link_to 'Integrative Japanese Genome Variation Database (iJGVD)', 'https://ijgvd.megabank.tohoku.ac.jp/download_3.5kjpn/?lang=ja'
           %td 3.5KJPN (09/28/2017)
           %td.text-right 3,554
-          %td.text-right 50,266,064
-          %td.text-right 50,099,977
+          %td.text-center —
+          %td.text-right 7,931,579
           %td 東北メディカル・メガバンク機構
 
-    %h2 バリアント以外のデータセット
+    %em
+      注：iJGVD 3.5KJPNについては、DTAなしで閲覧可能なアレル頻度1%以上のバリアントのみを収録しております。詳細は#{link_to 'Data release', 'https://ijgvd.megabank.tohoku.ac.jp/'}をご覧ください。
+
+    %h2
+      バリアント以外のデータセット
     %table.table.table-bordered.table-sm
       %thead.text-center
         %tr
@@ -107,20 +100,17 @@
           %th 作成者
       %tbody
         %tr
-          %td
-            %a{href: 'ftp://ftp.dbcls.jp/colil'} Colil
+          %td= link_to 'Colil', 'ftp://ftp.dbcls.jp/colil'
           %td 01/29/2018
           %td 生命科学分野の文献間の引用関係の情報
           %td DBCLS
         %tr
-          %td
-            %a{href: 'ftp://ftp.ncbi.nlm.nih.gov/pub/lu/PubTator/'} PubTator
+          %td= link_to 'PubTator', 'ftp://ftp.ncbi.nlm.nih.gov/pub/lu/PubTator/'
           %td 04/23/2018
           %td バリアント名が出現する文献の情報
           %td NCBI
         %tr
-          %td
-            %a{href: 'http://togogenome.org/'} TogoGenome
+          %td= link_to 'TogoGenome', 'http://togogenome.org/'
           %td hg19+UniProt_201804
           %td ゲノムに関連する多種多様な情報
           %td DBCLS

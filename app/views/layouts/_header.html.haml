@@ -1,8 +1,8 @@
 %header.header-stickey
   #navbar-site.navbar.navbar-expand.flex-column.flex-md-row
     = link_to TogoVar, root_path, class: 'navbar-brand mr-0 mr-md-2', data: { turbolinks: false }
-    .navbar-scroll
-      %ul.navbar-nav.flex-row
+    .navbar-scroll.mr-md-auto
+      %ul.navbar-nav
         - active = yield(:active)
         %li.nav-item
           = nav_link 'Home', root_path, active, data: { turbolinks: false }
@@ -16,5 +16,7 @@
           = nav_link 'About', doc_about_path, active, data: { turbolinks: false }
         %li.nav-item
           = nav_link 'Help', doc_help_path, active, data: { turbolinks: false }
-
+    - if @locale
+      .navbar-locale.ml-auto.ml-md-0
+        = render 'layouts/locale_selector'
   = yield :navbar

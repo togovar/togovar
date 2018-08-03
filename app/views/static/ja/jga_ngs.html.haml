@@ -1,0 +1,122 @@
+- provide(:title, 'Dataset > JGA-NGS')
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
+%main
+  .container
+    %h1.title
+      JGA-NGSデータセット
+
+    %h2
+      概要
+    %p
+      - humandb = link_to 'NBDCヒトデータベース', 'https://humandbs.biosciencedbc.jp/'
+      - jga = link_to 'Japanese Genotype-phenotype Archive (JGA)', 'https://www.ddbj.nig.ac.jp/jga/index.html'
+      #{humandb}/#{jga}に登録されている個人レベルのゲノム配列データを再解析して検出したバリアントを集約した頻度データです。２次データ作成の許諾が得られたJGAデータの全てが集約対象です。なお、Alternative allele数が5以下のバリアントは含まれていません。
+    %ul
+      %li バージョン/最終更新日：06/01/2018
+      %li サンプルサイズ：125
+      %li 検出バリアント数：13,338,968
+      %li 除外後バリアント数：4,679,025
+
+    %h2 利用条件
+
+    %h3 データ利用者の権利
+    %p
+      #{link_to 'NBDCヒトデータ共有ガイドライン', 'https://humandbs.biosciencedbc.jp/guidelines/data-sharing-guidelines'}の5-2. データ利用者の権利の5-2-1. 非制限公開データに準拠します。
+    %ol
+      %li データ利用者は、『NBDCヒトデータベース』のデータを利用した研究成果をデータ利用者の責務を遵守する限り自由に発表できる。
+      %li データ利用者は、『NBDCヒトデータベース』のデータを利用した研究結果をもとにした知的財産権をデータ利用者の責務を遵守する限り自由に取得できる。
+
+    %h3
+      データ利用者の責務
+    %p
+      NBDCヒトデータ共有ガイドラインの5-3. データ利用者の責務の5-3-1. 非制限公開データに準拠します。
+    %ol
+      %li データ利用に際してのデータの品質・内容・科学的妥当性については、利用者の責任と判断のもとで活用すること。
+      %li
+        データ利用者は、下記の事項を遵守すること。
+        %ul
+          %li 研究利用への限定
+          %li 個人同定の禁止
+          %li 再配布の禁止
+      %li
+        公衆利用（例：データを利用して論文等で発表する場合など）の際は以下の引用を付与してください。
+        %p
+          - jga = link_to 'JGA', 'https://www.ddbj.nig.ac.jp/jga/index.html'
+          Variant dataset aggregated from NGS data in #{humandb}/#{jga} [Internet]. Tokyo: Japan Science and
+          Technology Agency (Japan), National Bioscience Database Center; [2018] - .
+          JGA-NGS dataset; [cited YYYY Mmm DD]. Available from:
+          = link_to 'https://togovar.biosciencedbc.jp/doc/datasets/jga_ngs', doc_datasets_jga_ngs_path
+
+    %h2
+      データ解析手法
+    %p
+      #{link_to 'JGAデータセット作成方法', 'analysis'}のページを参照ください。
+
+    %h2
+      集約されたデータの由来
+    %table.table.table-bordered.table-sm
+      %thead
+        %tr
+          %th JGAID
+          %th ヒトDB
+          %th 研究題目
+          %th 対象集団
+          %th サンプルサイズ
+          %th データ提供者
+      %tbody
+        %tr
+          %td= link_to 'JGAD00000000004', 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000004'
+          %td= link_to 'hum0006', 'https://humandbs.biosciencedbc.jp/hum0006-v3'
+          %td 脳腫瘍のゲノム・遺伝子解析とその臨床病理学的意義の解明
+          %td 脳腫瘍 アストロサイトーマ
+          %td.text-right 6
+          %td 斉藤 延人<br>(P-DIRECT)
+        %tr
+          %td= link_to 'JGAD00000000106', 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000106'
+          %td= link_to 'hum0006', 'https://humandbs.biosciencedbc.jp/hum0006-v3'
+          %td 脳腫瘍のゲノム・遺伝子解析とその臨床病理学的意義の解明
+          %td 脳腫瘍 オリゴデンドログリオーマ
+          %td.text-right 16
+          %td 斉藤 延人<br>(P-DIRECT)
+        %tr
+          %td= link_to 'JGAD00000000112', 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000112'
+          %td= link_to 'hum0006', 'https://humandbs.biosciencedbc.jp/hum0006-v3'
+          %td 脳腫瘍のゲノム・遺伝子解析とその臨床病理学的意義の解明
+          %td 脳腫瘍 小脳グリオーマ
+          %td.text-right 17
+          %td 斉藤 延人<br>(P-DIRECT)
+        %tr
+          %td= link_to 'JGAD00000000014', 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000014'
+          %td= link_to 'hum0021', 'https://humandbs.biosciencedbc.jp/hum0021-v1'
+          %td 精神神経疾患の原因解明および診断法・治療法の開発に関する研究
+          %td 健常一卵性双生児
+          %td.text-right 6
+          %td 加藤 忠史<br>(ゲノム支援)
+        %tr
+          %td= link_to 'JGAD00000000036', 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000036'
+          %td= link_to 'hum0035', 'https://humandbs.biosciencedbc.jp/hum0035-v1'
+          %td 固形腫瘍における遺伝子異常の網羅的解析
+          %td 多数の固形腫瘍性疾患検体
+          %td.text-right 23
+          %td 滝田 順子<br>(P-DIRECT)
+        %tr
+          %td= link_to 'JGAD00000000038', 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000038'
+          %td= link_to 'hum0040', 'https://humandbs.biosciencedbc.jp/hum0040-v1/'
+          %td ヒト胎盤におけるインプリント制御領域およびインプリント遺伝子の同定
+          %td ヒト胎盤および母体血
+          %td.text-right 48
+          %td 有馬 隆博<br>(IHEC)
+        %tr
+          %td= link_to 'JGAD00000000060', 'https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000060'
+          %td= link_to 'hum0066', 'https://humandbs.biosciencedbc.jp/hum0066-v1'
+          %td 癌の再発・転移に関与するnon-coding RNAの同定とその機序の解明
+          %td 大腸がん
+          %td.text-right 9
+          %td 三森 功士
+      %tfoot
+        %tr
+          %th.text-center{colspan: '4'} 合計
+          %th.text-right 125

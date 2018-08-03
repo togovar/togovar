@@ -42,7 +42,6 @@ header {
         .navbar-nav {
           overflow-x: auto;
           white-space: nowrap;
-          height: 5rem;
           min-width: 100%;
 
           .nav-item {
@@ -51,14 +50,23 @@ header {
             .nav-link {
               color: $color_base_blue;
               font-size: 1.6rem;
-              padding-right: 1rem !important;
-              padding-left: 1rem !important;
+              padding: 0.5rem 1rem !important;
 
               &.active {
                 font-weight: bold;
               }
             }
           }
+        }
+      }
+
+      .navbar-locale {
+        padding: 0 1rem;
+
+        .form-inline .form-control {
+          display: inline-block !important;
+          width: auto !important;
+          vertical-align: middle !important;
         }
       }
     }

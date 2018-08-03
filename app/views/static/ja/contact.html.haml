@@ -1,0 +1,16 @@
+- provide(:title, 'Contact')
+- provide(:active, doc_contact_path)
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
+%main
+  .container
+    %h1.title
+      お問い合わせ
+    %p
+      我々のサービスに対しての問題や質問またはご提案がございましたら、e-mailにてお知らせ下さい。
+    %p.email
+      togovar [at] biosciencedbc [dot] jp
+    %p
+      また、NBDCは#{link_to 'FAIR原則', 'https://www.force11.org/fairprinciples/'}に基づいたオープンサイエンスを推進しております。データを再利用する、または、ご提供いただける研究者の方々からのご連絡もお待ちしております。

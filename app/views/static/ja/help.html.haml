@@ -1,0 +1,329 @@
+- provide(:title, 'Help')
+- provide(:active, doc_help_path)
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
+%main
+  .container
+    %h1.title
+      Help
+    %ul
+      %li
+        %strong TogoVar全般
+        %ul
+          %li
+            = link_to '#g1' do
+              TogoVarの目的や有用性は何でしょうか。
+          %li
+            = link_to '#g2' do
+              インハウスでTogoVarを利用できますか。
+      %li
+        %strong 利用条件に関して
+        %ul
+          %li
+            = link_to '#t1' do
+              データベースの利用は無償でしょうか。
+          %li
+            = link_to '#t2' do
+              データベースの情報を利用して論文を書くには、どのようにすれば良いでしょうか。
+          %li
+            = link_to '#t3' do
+              商用利用は可能でしょうか。
+      %li
+        %strong TogoVar収録データに関して
+        %ul
+          %li
+            = link_to '#d1' do
+              個人レベルの表現型情報の取得は可能でしょうか。
+          %li
+            = link_to '#d2' do
+              遺伝子発現やタンパク質の情報とは結び付かないのでしょうか。
+          %li
+            = link_to '#d3' do
+              バリアントの検出の際に使用したソフトウェアおよび品質管理の方法を教えてください。
+          %li
+            = link_to '#d4' do
+              TogoVarで対象としているバリアントの種類は何ですか。
+          %li
+            = link_to '#d5' do
+              Consequenceの値はどのように計算していますか。
+          %li
+            = link_to '#d6' do
+              SIFTとPolyPhenとは何ですか。
+          %li
+            = link_to '#d7' do
+              Clinical Significanceの値はどのように計算していますか。
+      %li
+        %strong TogoVar検索システムに関して
+        %ul
+          %li
+            = link_to '#s1' do
+              検索結果のFrequency列に表示される頻度メーターは何を表現していますか。
+          %li
+            = link_to '#s2' do
+              バリアントタイプごとにPosition、Ref、Altの関係を説明してください。
+          %li
+            = link_to '#s3' do
+              dbSNPやVCFフォーマット、HGVSフォーマットとバリアントの表記方法に違いはありますか。
+
+    %section
+      %h2
+        TogoVar全般
+
+      %h3#g1
+        Q. TogoVarの目的や有用性は何でしょうか。
+      %p
+        A. ゲノムの解読はNGSにより低頻度の変異を取得することが可能となりました。しかし、欧米の既存データベースには、十分なサンプル数の日本人集団における頻度データはありません。この問題を解決するため、公開されている日本人のゲノム変異情報やNBDCに寄託されたヒトデータベースからの情報を集積し、より信頼性の高い頻度情報を提供することを目指します。
+      %p
+        また、ヒトゲノムの参照配列は常に一定ではなく更新される情報であるため、同じバリアントであっても参照配列が異なるとゲノム上の位置が異なリます。そこで、当データベースでは同じバリアントにはユニークなIDを付与することで、研究者が行っているバリアントの位置情報を参照配列間で変換する作業を省力化します。
+
+      %h3#g2
+        Q. インハウスでTogoVarを利用できますか。
+      %p
+        A. dockerイメージを公開する予定です。しばらくお待ちください。
+
+    %section
+      %h2
+        利用条件に関して
+
+      %h3#t1
+        Q. データベースの利用は無償でしょうか。
+      %p
+        A. すべて無償での利用が可能です。データベースの利用については、#{link_to 'Terms', doc_terms_path}のページを参照してください。
+
+      %h3#t2
+        Q. データベースの情報を利用して論文を書くには、どのようにすれば良いでしょうか。
+      %p
+        A. #{link_to 'Terms', doc_terms_path}のクレジットの表示例を参考にしてください。
+
+      %h3#t3
+        Q. 商用利用は可能でしょうか。
+      %p
+        A. TogoVarのwebサイトの閲覧や公開予定のdockerイメージは商用利用可能です。TogoVarが取り込んでいる第三者作成データに関してはそれそれの利用条件に従ってください。詳しくは#{link_to 'Terms', doc_terms_path}をご覧ください。
+
+    %section
+      %h2
+        TogoVar収録データに関して
+
+      %h3#d1
+        Q. 個人レベルの表現型情報の取得は可能でしょうか。
+      %p
+        A. 当データベースは個人情報を保持しておらず、また、個人ごとの表現型情報は現在のところ提供はしておりません。表現型情報の詳細については、#{link_to 'JGA-NGSデータセット', doc_datasets_jga_ngs_path}及び#{link_to 'JGA-SNPデータセット', doc_datasets_jga_snp_path}に記載されている研究グループに直接お問い合わせ下さい。
+
+      %h3#d2
+        Q. 遺伝子発現やタンパク質の情報とは結び付かないのでしょうか。
+      %p
+        A. 当データベースはヒトゲノムの遺伝子変異について、日本人の公開情報を中心として統合したものです。当データベースはRDFの技術をベースとして利用している為、遺伝子発現やタンパク質の情報がRDFを利用しているデータベースである場合は、容易に拡張が可能と考えております。遺伝子発現やタンパク質の情報への拡張は順次実施する予定です。
+
+      %h3#d3
+        Q. バリアントの検出の際に使用したソフトウェアおよび品質管理の方法を教えてください。
+      %p
+        A. #{link_to 'TogoVarデータセット作成方法', doc_datasets_analysis_path}を参照ください。
+
+      %h3#d4
+        Q. TogoVarで対象としているバリアントの種類は何ですか。
+      %p
+        A. SNV、Insertion、Deletion、Indel、Substitutionの5種類です。#{link_to 'HGVSがType of variantsに列挙した5種類', 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants'}のうち、DuplicationはInsertionに、DeletionとInsertionの長さが同じIndelはSubstitionに分類されています。なお、バリアントの種類の特定には、#{link_to 'Variant Effect Predictor (VEP)', 'https://www.ensembl.org/vep'}を利用しています。
+
+      %h3#d5
+        Q. Consequenceの値はどのように計算していますか。
+      %p
+        A. #{link_to 'Variant Effect Predictor (VEP)のvariant consequence', 'https://asia.ensembl.org/info/genome/variation/predicted_data.html#consequences'}の値を表示しています。１バリアントに対応するトランスクリプトが複数ある場合は、一番重大なconsequenceのみを表示している場合があります。
+
+      %h3#d6
+        Q. SIFTとPolyPhenとは何ですか。
+      %p
+        A. バリアントによってアミノ酸配列が変化する場合、それがタンパク質の機能に与える影響を予測したものです。#{link_to 'Variant Effect Predictor (VEP)', 'https://asia.ensembl.org/info/genome/variation/predicted_data.html#nsSNP'}で計算した値を表示しています。アイコンの意味は以下の通りです。
+      %ul
+        %li
+          SIFT
+          %ul
+            %li{ data: { icon: 'sift_deleterious' } } Deleterious
+            %li{ data: { icon: 'sift_tolerated' } } Tolerated
+        %li
+          PolyPhen
+          %ul
+            %li{ data: { icon: 'polyphen_probably_damaging' } } Probably Damaging
+            %li{ data: { icon: 'polyphen_possibly_damaging' } } Possibly Damaging
+            %li{ data: { icon: 'polyphen_benign' } } Benign
+            %li{ data: { icon: 'polyphen_unknown' } } Unknown
+
+      %h3#d7
+        Q. Clinical Significanceの値はどのように計算していますか。
+      %p
+        A. #{link_to 'ClinVarのclinical significance', 'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv'}の値を表示しています。
+
+    %section
+      %h2 TogoVarの検索システムに関して
+
+      %h3#s1
+        Q. 検索結果のFrequency列に表示される頻度メーターは何を表現していますか。
+      %p
+        A. 各データセットにおけるAlternative allele頻度を表現しています。頻度メータの色はデータセットに割り当てられた色に対応しています。データの有無や頻度の値を９段階で表現しています。
+
+        .d-flex.flex-wrap
+          .frequency
+            %span{ data: { frequency: 'null' } }
+            %label Not<br>Available
+          .frequency
+            %span{ data: { frequency: '0/7' } }
+            %label Monomorphic<br>(REF)
+          .frequency
+            %span{ data: { frequency: '1/7' } }
+            %label Singleton
+          .frequency
+            %span{ data: { frequency: '2/7' } }
+            %label &lt; 0.0001
+          .frequency
+            %span{ data: { frequency: '3/7' } }
+            %label &lt; 0.001
+          .frequency
+            %span{ data: { frequency: '4/7' } }
+            %label &lt; 0.01
+          .frequency
+            %span{ data: { frequency: '5/7' } }
+            %label &lt; 0.05
+          .frequency
+            %span{ data: { frequency: '6/7' } }
+            %label &lt; 0.5
+          .frequency
+            %span{ data: { frequency: '7/7' } }
+            %label &ge; 0.5
+          .frequency
+            %ul.no-list-style
+              %li{ data: { icon: 'source_jga_ngs' } }
+                JGA-NGS
+              %li{ data: { icon: 'source_jga_snp' } }
+                JGA-SNP
+              %li{ data: { icon: 'source_tommo' } }
+                3.5KJPN
+              %li{ data: { icon: 'source_hgvd' } }
+                HGVD
+              %li{ data: { icon: 'source_exac' } }
+                ExAC
+              %li{ data: { icon: 'source_clinvar' } }
+                ClinVar
+
+      %h3#s2
+        Q. バリアントタイプごとにPosition、Ref、Altの関係を説明してください。
+      %p
+        A. 例を使って説明すると以下の通りです。また、染色体の最初の塩基の位置は0ではなく1です。
+
+      %table.table.table-bordered.table-sm
+        %thead
+          %tr
+            %th Variant Type
+            %th ID
+            %th Position
+            %th Ref
+            %th Alt
+            %th 説明
+        %tbody
+          %tr
+            %td SNV
+            %td= link_to 'tgv41', variant_path(id: 'tgv41')
+            %td 1:13116
+            %td T
+            %td G
+            %td 1番染色体13116番目の塩基TがGに置換された
+          %tr
+            %td Ins
+            %td= link_to 'tgv1019', variant_path(id: 'tgv1019')
+            %td 1:138646
+            %td
+            %td A
+            %td 1番染色体138646番目と138647番目の塩基の間に塩基Aが挿入された
+          %tr
+            %td Del
+            %td= link_to 'tgv63', variant_path(id: 'tgv63')
+            %td 1:13486
+            %td GC
+            %td
+            %td 1番染色体13486番目と13487番目の塩基GCが欠失した
+          %tr
+            %td Indel
+            %td= link_to 'tgv1537710', variant_path(id: 'tgv1537710')
+            %td 1:53676691
+            %td C
+            %td TA
+            %td 1番染色体53676691番目の塩基Cが欠失して、その場所にTAが挿入された
+          %tr
+            %td Substitution
+            %td= link_to 'tgv675673', variant_path(id: 'tgv675673')
+            %td 1:21889705
+            %td AC
+            %td CA
+            %td 1番染色体21889705番目の塩基ACが欠失して、その場所にCAが挿入された
+
+      %h3#s3
+        Q. dbSNPや#{link_to 'VCFフォーマット', 'https://samtools.github.io/hts-specs/VCFv4.2.pdf'}、HGVSフォーマットとバリアントの表記方法に違いはありますか。
+      %p
+        A. TogoVarはdbSNPの表記に準じています。VCFフォーマット、HGVSフォーマットで表記すると以下のようになります。
+
+      %table.table.table-bordered.table-sm
+        %thead
+          %tr
+            %th{rowspan: '2'} Variant Type
+            %th{rowspan: '2'} ID
+            %th{colspan: '3'} TogoVar/dbSNP
+            %th{colspan: '3'} VCF
+            %th{rowspan: '2'} HGVS
+          %tr
+            %th Position
+            %th Ref
+            %th Alt
+            %th Position
+            %th Ref
+            %th Alt
+        %tbody
+          %tr
+            %td SNV
+            %td= link_to 'tgv41', variant_path(id: 'tgv41')
+            %td 1:13116
+            %td T
+            %td G
+            %td 1:13116
+            %td T
+            %td G
+            %td 1:g.13116T&gt;G
+          %tr
+            %td Ins
+            %td= link_to 'tgv1019', variant_path(id: 'tgv1019')
+            %td 1:138646
+            %td
+            %td A
+            %td 1:138646
+            %td C
+            %td CA
+            %td 1:g.138646_138647insA
+          %tr
+            %td Del
+            %td= link_to 'tgv63', variant_path(id: 'tgv63')
+            %td 1:13486
+            %td GC
+            %td
+            %td 1:13485
+            %td AGC
+            %td A
+            %td 1:g.13486_13487del
+          %tr
+            %td Indel
+            %td= link_to 'tgv1537710', variant_path(id: 'tgv1537710')
+            %td 1:53676691
+            %td C
+            %td TA
+            %td 1:53676691
+            %td C
+            %td TA
+            %td 1:g.53676691delinsTA
+          %tr
+            %td Substitution
+            %td= link_to 'tgv675673', variant_path(id: 'tgv675673')
+            %td 1:21889705
+            %td AC
+            %td CA
+            %td 1:21889705
+            %td AC
+            %td CA
+            %td 1:g.21889705_21889706delinsCA

@@ -1,0 +1,18 @@
+- provide(:title, 'Contact')
+- provide(:active, doc_contact_path)
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
+%main
+  .container
+    %h1.title
+      Contact us
+    %p
+      You can contact us by email to report problems, questions, or suggestions on our service.
+    %p.email
+      togovar [at] biosciencedbc [dot] jp
+    %p
+      We, NBDC promote open science based on
+      #{link_to 'the FAIR data principles', 'https://www.force11.org/fairprinciples/'}. Please feel free to contact us
+      about data use for your study and data sharing of your data.
