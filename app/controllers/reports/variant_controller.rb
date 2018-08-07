@@ -12,8 +12,8 @@ module Reports
                                            args:      {
                                              url: variant_information
                                            })
-      @stanza << Stanza.variant_frequency('Frequency', args: { tgv_id: id })
-      @stanza << Stanza.variant_jbrowse('Genomic context', args: { tgv_id: id })
+      @stanza << Stanza.variant_frequency('Frequency', args: { url1: variant_frequency, url2: variant_exac_frequency })
+      @stanza << Stanza.variant_jbrowse('Genomic context', args: { url: variant_jbrowse_position })
       @stanza << Stanza.column_headered_table('Transcripts', args: { url: transcripts })
 
       lookup = Lookup.find(id)
@@ -36,6 +36,18 @@ module Reports
     end
 
     private
+
+    def variant_frequency
+      URI.join(root_url, "/sparqlist/api/variant_frequency?tgv_id=#{@tgv_id}").to_s
+    end
+
+    def variant_exac_frequency
+      URI.join(root_url, "/sparqlist/api/variant_exac_frequency?tgv_id=#{@tgv_id}").to_s
+    end
+
+    def variant_jbrowse_position
+      URI.join(root_url, "/sparqlist/api/variant_jbrowse_position?tgv_id=#{@tgv_id}").to_s
+    end
 
     def variant_information
       URI.join(root_url, "/sparqlist/api/variant_basic_information?tgv_id=#{@tgv_id}").to_s
