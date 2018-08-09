@@ -6,3 +6,4 @@
 #= require reports/navigation.coffee
 #= require stanza
 #= require turbolinks
+#= require js_stanza
