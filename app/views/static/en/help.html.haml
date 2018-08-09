@@ -25,10 +25,10 @@
         %ul
           %li
             = link_to '#t1' do
-              Can I use the database for free?
+              Can I use the TogoVar for free?
           %li
             = link_to '#t2' do
-              What should I do to write a scientific paper using database information?
+              How to cite the TogoVar database in my publication?
           %li
             = link_to '#t3' do
               Can I use it for commercial purposes?
@@ -44,7 +44,7 @@
               Are the data linked with information about gene expression and proteins?
           %li
             = link_to '#d3' do
-              What is the name of the software used for detecting variants and how you manage the quality?
+              What software is used for detecting variants and how you manage the quality?
           %li
             = link_to '#d4' do
               What are the targeted variant types for TogoVar?
@@ -63,13 +63,14 @@
         %ul
           %li
             = link_to '#s1' do
-              What does the Frequency meter in the Frequency column of the search results represent?
+              What does the frequency indicator in the Frequency column of the search results represent?
           %li
             = link_to '#s2' do
-              What are the relationships between Position, Ref, and Alt for each variant type?
+              For each variant type, how is the position, reference and alternative allele described respectively?
           %li
             = link_to '#s3' do
-              Are there any notational differences for variants in the dbSNP, VCF format, or HGVS format?
+              In TogoVar, How is the variant described?
+
     %section
       %h2
         TogoVar in general
@@ -77,35 +78,35 @@
       %h3#g1
         Q. What are the objectives and utilities of TogoVar?
       %p
-        A. NGS allowed genome sequencing, which was able to capture variants at low frequencies. However, existing
-        databases in Western countries do not contain sufficient frequency data for Japanese populations. To address this
-        problem, TogoVar seeks to provide a more reliable frequency information by assembling available information of
-        genomic variation in Japanese individuals, as well as information from human databases that have been entrusted
-        to the NBDC.
+        A. NGS technologies have enabled large-scale genome sequencing to capture variants at low frequencies. However,
+        existing databases do not contain sufficient variant frequency data for Japanese populations.
+        To address this problem, TogoVar seeks to provide a reliable frequency information by assembling variant
+        information from the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA) and public Japanese genomic
+        variation data.
       %p
-        In addition, since the reference human genome sequence is not always constant and can be updated, the genomic
-        position may vary for the same variant if it refers to different sequences. Thus, in our database, a unique ID is
+        In addition, since the reference human genome sequence can be updated, the genomic position may vary for the
+        same variant if it refers to a different genome build. Thus, in our database, a unique ID is
         assigned to the same variant, thereby preventing the need to convert the positional information of the variant
         among different reference sequences, as done by researchers.
 
       %h3#g2
         Q. Can I use TogoVar in-house?
       %p
-        A. Docker images will be released. We request your patience.
+        A. A Docker image will be released. We request your patience.
 
     %section
       %h2
         About the terms of use
 
       %h3#t1
-        Q. Can I use the database for free?
+        Q. Can I use the TogoVar for free?
       %p
-        A. You can use all the available data for free. For the use of the database, refer to
+        A. You can use the TogoVar service for free. For the use of the database, refer to the
         = succeed '.' do
           = link_to 'Terms', doc_terms_path
 
       %h3#t2
-        Q. What should I do to write a scientific paper using database information?
+        Q. How to cite the TogoVar database in my publication?
       %p
         A. Refer to the attribution (credit) display examples in
         = succeed '.' do
@@ -127,9 +128,9 @@
       %h3#d1
         Q. Can I retrieve phenotype information on an individual level?
       %p
-        A. Our database does not keep private information, and we do not currently provide phenotype information for each
-        individual. For more details about phenotype information, please directly contact the research groups described in
-        the
+        A. A. TogoVar database does not keep private information, and we do not currently provide phenotype information
+        for each individual. For more details about phenotype information, please directly contact the research groups
+        described in the
         = link_to 'JGA-NGS dataset', doc_datasets_jga_ngs_path
         and
         = succeed '.' do
@@ -138,14 +139,10 @@
       %h3#d2
         Q. Are the data linked with information about gene expression and proteins?
       %p
-        A. Our database has primarily integrated open information on Japanese subjects regarding their genetic variants
-        in their genomes. Since our database uses RDF as the base technology, if there is a database that uses RDF to
-        provide information about gene expression or proteins, we believe that our database can easily be extended to
-        accommodate such information. An extension to the information about gene expression and proteins will be carried
-        out in sequence.
+        A. Not yet but planned.
 
       %h3#d3
-        Q. What is the name of the software used for detecting variants and how you manage the quality?
+        Q. What software is used for detecting variants and how you manage the quality?
       %p
         A. Refer to
         = succeed '.' do
@@ -167,7 +164,7 @@
         Q. How do you calculate the Consequence value?
       %p
         A. The value of variant consequence in
-        = link_to 'https://asia.ensembl.org/info/genome/variation/predicted_data.html#consequences' do
+        = link_to 'https://asia.ensembl.org/info/genome/variation/prediction/predicted_data.html#consequences' do
           Variant Effect Predictor (VEP)
         is displayed. If there are multiple transcripts for a single variant, only the most critical consequence may be
         displayed.
@@ -175,9 +172,9 @@
       %h3#d6
         Q. What are SIFT and PolyPhen?
       %p
-        A. When an amino acid sequence undergoes alteration due to a variant, they predict the effects it has on the
-        protein function. Values calculated through
-        = link_to 'https://asia.ensembl.org/info/genome/variation/predicted_data.html#nsSNP' do
+        A. Both SIFT and PolyPhen are scores which indicate the predicted effects on the protein function when an amino
+        acid sequence undergoes alteration due to a variant. Values calculated through
+        = link_to 'https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html' do
           Variant Effect Predictor (VEP)
         are displayed. The meaning of each icon is as follows.
 
@@ -208,9 +205,9 @@
         About the TogoVar search system
 
       %h3#s1
-        Q. What does the Frequency meter in the Frequency column of the search results represent?
+        Q. What does the frequency indicator in the Frequency column of the search results represent?
       %p
-        A. The Frequency meter represents the alternative allele frequency for each dataset. The color of the frequency
+        A. The frequency indicator represents the alternative allele frequency for each dataset. The color of the frequency
         meter corresponds to the color allocated to the dataset. The data availability or frequency value is represented
         on a 9-point scale.
 
@@ -258,10 +255,10 @@
                 ClinVar
 
       %h3#s2
-        Q. What are the relationships between Position, Ref, and Alt for each variant type?
+        Q. For each variant type, how is the position, reference and alternative allele described respectively?
       %p
-        A. For a description based on examples of specific instances, refer to the table below. Note that the position of
-        the first base in the chromosome is not 0, but 1.
+        A. An example for each variant type is shown below. Note that the position of the first base in the chromosome
+        is 1.
 
       %table.table.table-bordered.table-sm
         %thead
@@ -310,13 +307,14 @@
             %td The 21889705th bases, AC, in Chromosome 1 were deleted and CA were inserted in their place.
 
       %h3#s3
-        Q. Are there any notational differences for variants in the dbSNP, VCF format, or HGVS format?
+        Q. In TogoVar, How is the variant described?
       %p
-        A. TogoVar conforms to the notations of dbSNP. The notations in the
-        = link_to 'VCF format', 'https://samtools.github.io/hts-specs/VCFv4.2.pdf'
+        A. In TogoVar a variant is identified as a set of its genomic position, reference and alternative allele and human
+        genome build. Examples of variant notations in TogoVar, dbSNP,
+        = link_to 'VCF', 'https://samtools.github.io/hts-specs/VCFv4.2.pdf'
         and
-        = link_to 'HGVS format', 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants'
-        are as follows.
+        = link_to 'HGVS', 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants'
+        are shown below.
 
       %table.table.table-bordered.table-sm
         %thead

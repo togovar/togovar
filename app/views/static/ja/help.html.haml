@@ -23,10 +23,10 @@
         %ul
           %li
             = link_to '#t1' do
-              データベースの利用は無償でしょうか。
+              TogoVarデータベースの利用は無償でしょうか。
           %li
             = link_to '#t2' do
-              データベースの情報を利用して論文を書くには、どのようにすれば良いでしょうか。
+              TogoVar データベースを論文で引用するにはどうすれば良いでしょうか。
           %li
             = link_to '#t3' do
               商用利用は可能でしょうか。
@@ -62,10 +62,10 @@
               検索結果のFrequency列に表示される頻度メーターは何を表現していますか。
           %li
             = link_to '#s2' do
-              バリアントタイプごとにPosition、Ref、Altの関係を説明してください。
+              バリアントタイプごとにPosition、Ref、Altはそれぞれどのように記述されますか。
           %li
             = link_to '#s3' do
-              dbSNPやVCFフォーマット、HGVSフォーマットとバリアントの表記方法に違いはありますか。
+              TogoVar では、どのようにバリアントを表記していますか？
 
     %section
       %h2
@@ -88,12 +88,12 @@
         利用条件に関して
 
       %h3#t1
-        Q. データベースの利用は無償でしょうか。
+        Q. TogoVarデータベースの利用は無償でしょうか。
       %p
         A. すべて無償での利用が可能です。データベースの利用については、#{link_to 'Terms', doc_terms_path}のページを参照してください。
 
       %h3#t2
-        Q. データベースの情報を利用して論文を書くには、どのようにすれば良いでしょうか。
+        Q. TogoVar データベースを論文で引用するにはどうすれば良いでしょうか。
       %p
         A. #{link_to 'Terms', doc_terms_path}のクレジットの表示例を参考にしてください。
 
@@ -129,12 +129,12 @@
       %h3#d5
         Q. Consequenceの値はどのように計算していますか。
       %p
-        A. #{link_to 'Variant Effect Predictor (VEP)のvariant consequence', 'https://asia.ensembl.org/info/genome/variation/predicted_data.html#consequences'}の値を表示しています。１バリアントに対応するトランスクリプトが複数ある場合は、一番重大なconsequenceのみを表示している場合があります。
+        A. #{link_to 'Variant Effect Predictor (VEP)のvariant consequence', 'https://asia.ensembl.org/info/genome/variation/prediction/predicted_data.html#consequences'}の値を表示しています。１バリアントに対応するトランスクリプトが複数ある場合は、一番重大なconsequenceのみを表示している場合があります。
 
       %h3#d6
         Q. SIFTとPolyPhenとは何ですか。
       %p
-        A. バリアントによってアミノ酸配列が変化する場合、それがタンパク質の機能に与える影響を予測したものです。#{link_to 'Variant Effect Predictor (VEP)', 'https://asia.ensembl.org/info/genome/variation/predicted_data.html#nsSNP'}で計算した値を表示しています。アイコンの意味は以下の通りです。
+        A. バリアントによってアミノ酸配列が変化する場合、それがタンパク質の機能に与える影響を予測したものです。#{link_to 'Variant Effect Predictor (VEP)', 'https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html'}で計算した値を表示しています。アイコンの意味は以下の通りです。
       %ul
         %li
           SIFT
@@ -206,9 +206,9 @@
                 ClinVar
 
       %h3#s2
-        Q. バリアントタイプごとにPosition、Ref、Altの関係を説明してください。
+        Q. バリアントタイプごとにPosition、Ref、Altはそれぞれどのように記述されますか。
       %p
-        A. 例を使って説明すると以下の通りです。また、染色体の最初の塩基の位置は0ではなく1です。
+        A. 以下に、各バリアントタイプ毎の例を示します。染色体の最初の塩基の位置は1です。
 
       %table.table.table-bordered.table-sm
         %thead
@@ -257,9 +257,9 @@
             %td 1番染色体21889705番目の塩基ACが欠失して、その場所にCAが挿入された
 
       %h3#s3
-        Q. dbSNPや#{link_to 'VCFフォーマット', 'https://samtools.github.io/hts-specs/VCFv4.2.pdf'}、HGVSフォーマットとバリアントの表記方法に違いはありますか。
+        Q. TogoVar では、どのようにバリアントを表記していますか？
       %p
-        A. TogoVarはdbSNPの表記に準じています。VCFフォーマット、HGVSフォーマットで表記すると以下のようになります。
+        A. TogoVarでは、ゲノム上の位置及びreference allele、alternative allele、ヒトゲノム標準配列のビルド番号の組み合わせでバリアントを一意に識別します。TogoVar及びdbSNP、#{link_to 'VCF', 'https://samtools.github.io/hts-specs/VCFv4.2.pdf'}、#{link_to 'HGVS', 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants'}での表記例を下の表に示しています。
 
       %table.table.table-bordered.table-sm
         %thead

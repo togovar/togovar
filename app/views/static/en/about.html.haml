@@ -11,6 +11,7 @@
 - dbcls = link_to 'https://dbcls.rois.ac.jp/index-en.html' do
   Research Organization of Information and Systems, Joint Support-Center for Data Science Research, Database
   Center for Life Science (DBCLS).
+- release = link_to 'a EurekAlert! press release', 'https://www.eurekalert.org/pub_releases/2018-07/jsat-jr071018.php'
 
 %main
   .container
@@ -20,22 +21,15 @@
       TogoVar (NBDC's integrated database of Japanese genomic variation) is a database that has collected and organized
       genome sequence differences between individuals (variants) in the Japanese population and disease information
       associated with them.
-
-    %h2
-      1. TogoVar provides variant frequencies in the Japanese population that have been aggregated across research
-      projects
     %p
-      It provides variant frequencies in the Japanese population (#{link_to 'JGA-NGS', doc_datasets_jga_ngs_path} and
-      #{link_to 'JGA-SNP', doc_datasets_jga_snp_path}) obtained by aggregating individual genomic data that have been
-      registered in #{humandb}/#{jga}.
-
-    %h2
-      2. TogoVar provides information in a one-stop, easy-to-understand manner by integrating scattered data
-    %p
-      It integrates information related to genotypes or phenotypes that has been compiled sporadically in a variety of
-      different databases and provides information for interpreting variants in a one-stop, easy-to-understand manner.
-
-    %h2
-      Developers
+      TogoVar provides variant frequencies in the Japanese population that have been aggregated across research
+      projects. Two available datasets, #{link_to 'JGA-NGS', doc_datasets_jga_ngs_path} and
+      #{link_to 'JGA-SNP', doc_datasets_jga_snp_path}, are obtained by aggregating individual genomic data that have
+      been registered in #{humandb} / #{jga}. In addition, TogoVar integrates
+      #{link_to 'information related to genotypes or phenotypes', doc_datasets_path} that has been compiled
+      independently in a variety of different databases and provides information for interpreting variants in a
+      one-stop, easy-to-understand manner.
     %p
       TogoVar has been developed as a joint research project of #{nbdc} and #{dbcls}.
+    %p
+      See also #{release} for details.
