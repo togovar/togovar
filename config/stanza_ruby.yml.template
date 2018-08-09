@@ -1,7 +1,6 @@
 defaults: &defaults
   providers:
     variant:
-    variant:
       nanostanza:
         -
           uri: https://togovar.org/legacy_stanza/togovar_variant_nano
