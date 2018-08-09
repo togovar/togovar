@@ -35,7 +35,7 @@ class Stanza
       tag << ' '
       tag << params.join(' ')
     end
-    tag << ' />'
+    tag << "></togostanza-#{@name}>"
 
     tag.html_safe
   end
