@@ -69,7 +69,7 @@
               For each variant type, how is the position, reference and alternative allele described respectively?
           %li
             = link_to '#s3' do
-              In TogoVar, How is the variant described?
+              In TogoVar, how is the variant described?
 
     %section
       %h2
@@ -307,7 +307,7 @@
             %td The 21889705th bases, AC, in Chromosome 1 were deleted and CA were inserted in their place.
 
       %h3#s3
-        Q. In TogoVar, How is the variant described?
+        Q. In TogoVar, how is the variant described?
       %p
         A. In TogoVar a variant is identified as a set of its genomic position, reference and alternative allele and human
         genome build. Examples of variant notations in TogoVar, dbSNP,
@@ -320,34 +320,53 @@
         %thead
           %tr
             %th{rowspan: '2'} Variant Type
-            %th{rowspan: '2'} ID
-            %th{colspan: '3'} TogoVar/dbSNP
+            %th{colspan: '4'} TogoVar
+            %th{colspan: '3'} dbSNP
             %th{colspan: '3'} VCF
             %th{rowspan: '2'} HGVS
           %tr
+            %th ID
             %th Position
             %th Ref
             %th Alt
+            %th ID
+            %th Position(GRCh37)
+            %th Alleles
             %th Position
             %th Ref
             %th Alt
         %tbody
           %tr
-            %td SNV
-            %td= link_to 'tgv41', variant_path(id: 'tgv41')
-            %td 1:13116
-            %td T
+            %td{rowspan: '2'} SNV
+            %td= link_to 'tgv30913364', variant_path(id: 'tgv30913364')
+            %td 7:127254587
             %td G
-            %td 1:13116
-            %td T
+            %td A
+            %td{rowspan: '2'}= link_to 'rs114202595', 'https://www.ncbi.nlm.nih.gov/snp/rs114202595'
+            %td{rowspan: '2'} chr7:127254587
+            %td{rowspan: '2'} G&gt;A / G&gt;T
+            %td 7:127254587
             %td G
-            %td 1:g.13116T&gt;G
+            %td A
+            %td 7:g.127254587:G&gt;A
+          %tr
+            %td= link_to 'tgv30913365', variant_path(id: 'tgv30913365')
+            %td 7:127254587
+            %td G
+            %td T
+            %td 7:127254587
+            %td G
+            %td T
+            %td 7:g.127254587:G&gt;T
           %tr
             %td Ins
             %td= link_to 'tgv1019', variant_path(id: 'tgv1019')
             %td 1:138646
             %td
             %td A
+            %td= link_to 'rs761725800', 'https://www.ncbi.nlm.nih.gov/snp/rs761725800'
+            %td chr1:138646
+            %td dupA
             %td 1:138646
             %td C
             %td CA
@@ -358,6 +377,9 @@
             %td 1:13486
             %td GC
             %td
+            %td= link_to 'rs780379327', 'https://www.ncbi.nlm.nih.gov/snp/rs780379327'
+            %td chr1:13486-13487
+            %td delGC
             %td 1:13485
             %td AGC
             %td A
@@ -368,6 +390,9 @@
             %td 1:53676691
             %td C
             %td TA
+            %td= link_to 'rs1057517525', 'https://www.ncbi.nlm.nih.gov/snp/rs1057517525'
+            %td chr1:53676691
+            %td delCinsTA
             %td 1:53676691
             %td C
             %td TA
@@ -378,6 +403,9 @@
             %td 1:21889705
             %td AC
             %td CA
+            %td= link_to 'rs786204530', 'https://www.ncbi.nlm.nih.gov/snp/rs786204530'
+            %td chr1:21889705-21889706
+            %td AC&gt;CA
             %td 1:21889705
             %td AC
             %td CA

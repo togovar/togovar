@@ -7,7 +7,7 @@
 %main
   .container
     %h1.title
-      List of datasets in TogoVar
+      TogoVar datasets
 
     %h2
       Human genome reference sequence
@@ -23,8 +23,8 @@
           %th Dataset name
           %th Version/Last update
           %th Sample size
-          %th # of detected variants
-          %th # of variants after the exclusion
+          %th Number of detected variants
+          %th Number of variants after the exclusion
           %th Author
       %tbody
         %tr
@@ -53,8 +53,8 @@
           %th Dataset name
           %th Version/Last update
           %th Sample size
-          %th # of variants
-          %th # of variant sites
+          %th Number of variants
+          %th Number of variant sites
           %th Author
       %tbody
         %tr
@@ -89,8 +89,8 @@
           %td Tohoku Medical Megabank Organization
 
     %em
-      Note that of iJGVD 3.5KJPN variants, TogoVar contains only those accessible without DTA. Their frequencies are 1%
-      or more. See #{link_to 'Data release', 'https://ijgvd.megabank.tohoku.ac.jp/'} for details.
+      Note that of iJGVD 3.5KJPN variants, TogoVar contains only those accessible without DTA (i.e.  their frequencies
+      are 1% or more). See #{link_to 'Data release', 'https://ijgvd.megabank.tohoku.ac.jp/'} for details.
 
     %h2
       Datasets other than those for variants
