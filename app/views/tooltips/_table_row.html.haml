@@ -13,7 +13,7 @@
       %th
         %span{ scope: 'col', data: { icon: 'source_exac' } } ExAC
   %tbody
-    - %w[alt ref freq].each do |row|
+    - %w[alt total freq].each do |row|
       %tr
         %th{ scope: 'row' }
           = row.capitalize

@@ -117,7 +117,7 @@ $ ->
     ['jga_ngs', 'jga_snp', 'tommo', 'hgvd', 'exac'].forEach (source) ->
       if v = freq_data[source]
         html = html.replace "{{#{source}.alt}}", v.num_alt_alleles
-        html = html.replace "{{#{source}.ref}}", v.num_alleles
+        html = html.replace "{{#{source}.total}}", v.num_alleles
         f = v.frequency
         html = html.replace "{{#{source}.freq}}", display_float(f)
 
