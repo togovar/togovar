@@ -17,6 +17,8 @@ Rails.application.routes.draw do
   get 'doc/policy', to: 'static#policy'
   get 'doc/terms', to: 'static#terms'
 
+  get '/downloads', to: 'static#downloads'
+
   # api
   get 'suggest', to: 'root#suggest', defaults: { format: 'json' }
   match 'list', to: 'root#list', defaults: { format: 'json' }, via: [:get,:post]

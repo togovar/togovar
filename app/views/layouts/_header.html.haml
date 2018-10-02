@@ -8,6 +8,9 @@
           = nav_link 'Home', root_path, active, data: { turbolinks: false }
         %li.nav-item
           = nav_link 'Datasets', doc_datasets_path, active, data: { turbolinks: false }
+        - if Rails.configuration.x.download
+          %li.nav-item
+            = nav_link 'Downloads', downloads_path, active, data: { turbolinks: false }
         %li.nav-item
           = nav_link 'Terms', doc_terms_path, active, data: { turbolinks: false }
         %li.nav-item

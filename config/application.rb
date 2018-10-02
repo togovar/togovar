@@ -32,5 +32,10 @@ module TogoVar
     console do
       Rails.logger = Logger.new(STDOUT)
     end
+
+    config.paths.add File.join('app', 'utils'), eager_load: true
+
+    config.x.download = true
+    config.x.download_dir = '/var/www/public'
   end
 end

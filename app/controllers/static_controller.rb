@@ -21,6 +21,22 @@ class StaticController < ApplicationController
     end
   end
 
+  include Downloads
+
+  def downloads
+    if params.key?(:clear_cache)
+      Rails.logger.info('Clearing list of downloads')
+      Rails.cache.delete 'downloads'
+    end
+
+    @list = Rails.cache.fetch 'downloads' do
+      Rails.logger.info('Loading list of downloads')
+      downloads_list
+    end
+
+    render file: "static/#{@locale}/downloads"
+  end
+
   private
 
   def set_locale

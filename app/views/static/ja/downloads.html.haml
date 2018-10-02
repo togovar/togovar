@@ -1,0 +1,37 @@
+- provide(:title, 'Downloads')
+- provide(:active, downloads_path)
+
+= content_for :header do
+  = stylesheet_link_tag 'static/style', media: :all
+
+%main
+  .container
+    %h1.title
+      Downloads
+    %p
+      TogoVarデータは以下のリンクからダウンロード可能です。詳細は
+      = link_to 'README.txt', download_path('README.txt')
+      をご覧ください。
+
+    %table.table
+      %caption Latest release: 20180601
+      %thead
+        %tr
+          %th{scope: 'col', class: 'text-center'} Chromosome
+          %th{scope: 'col', class: 'text-center'} Variation frequency
+          %th{scope: 'col', class: 'text-center'} Molecular annotation
+      %tbody
+        - Array(1..22).map(&:to_s).concat(%w[X Y MT]).each do |chr|
+          %tr
+            %th{scope: 'row', class: 'text-center'}= chr
+            %td{class: 'text-center'}
+              - frequency = @list[chr][:frequency]
+              = frequency[:label]
+              - frequency[:file].each do |y|
+                [#{link_to y[:label], download_path(y[:name])}] (#{y[:size]})
+
+            %td{class: 'text-center'}
+              - annotation = @list[chr][:molecular_annotation]
+              = annotation[:label]
+              - annotation[:file].each do |y|
+                [#{link_to y[:label], download_path(y[:name])}] (#{y[:size]})
