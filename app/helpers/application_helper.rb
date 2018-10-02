@@ -21,4 +21,11 @@ module ApplicationHelper #:nodoc:
 
     link_to label.html_safe, path, class: klass, **options
   end
+
+  def locale_selector
+    links = I18n.available_locales.map do |x|
+      x == I18n.locale ? x : link_to(x, "#{request.path_info}?locale=#{x}")
+    end
+    links.join(' / ').html_safe
+  end
 end

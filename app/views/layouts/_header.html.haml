@@ -18,5 +18,8 @@
           = nav_link 'Help', doc_help_path, active, data: { turbolinks: false }
     - if @locale
       .navbar-locale.ml-auto.ml-md-0
-        = render 'layouts/locale_selector'
+        %div
+          Language:
+          = locale_selector
+
   = yield :navbar
