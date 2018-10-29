@@ -124,17 +124,17 @@
       %h3#d4
         Q. TogoVarで対象としているバリアントの種類は何ですか。
       %p
-        A. SNV、Insertion、Deletion、Indel、Substitutionの5種類です。#{link_to 'HGVSがType of variantsに列挙した5種類', 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants'}のうち、DuplicationはInsertionに、DeletionとInsertionの長さが同じIndelはSubstitionに分類されています。なお、バリアントの種類の特定には、#{link_to 'Variant Effect Predictor (VEP)', 'https://www.ensembl.org/vep'}を利用しています。
+        A. SNV、Insertion、Deletion、Indel、Substitutionの5種類です。#{link_to 'HGVSがType of variantsに列挙した5種類', 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants', target: '_blank'}のうち、DuplicationはInsertionに、DeletionとInsertionの長さが同じIndelはSubstitionに分類されています。なお、バリアントの種類の特定には、#{link_to 'Variant Effect Predictor (VEP)', 'https://www.ensembl.org/vep', target: '_blank'}を利用しています。
 
       %h3#d5
         Q. Consequenceの値はどのように計算していますか。
       %p
-        A. #{link_to 'Variant Effect Predictor (VEP)のvariant consequence', 'https://asia.ensembl.org/info/genome/variation/prediction/predicted_data.html#consequences'}の値を表示しています。１バリアントに対応するトランスクリプトが複数ある場合は、一番重大なconsequenceのみを表示している場合があります。
+        A. #{link_to 'Variant Effect Predictor (VEP)のvariant consequence', 'https://asia.ensembl.org/info/genome/variation/prediction/predicted_data.html#consequences', target: '_blank'}の値を表示しています。１バリアントに対応するトランスクリプトが複数ある場合は、一番重大なconsequenceのみを表示している場合があります。
 
       %h3#d6
         Q. SIFTとPolyPhenとは何ですか。
       %p
-        A. バリアントによってアミノ酸配列が変化する場合、それがタンパク質の機能に与える影響を予測したものです。#{link_to 'Variant Effect Predictor (VEP)', 'https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html'}で計算した値を表示しています。アイコンの意味は以下の通りです。
+        A. バリアントによってアミノ酸配列が変化する場合、それがタンパク質の機能に与える影響を予測したものです。#{link_to 'Variant Effect Predictor (VEP)', 'https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html', target: '_blank'}で計算した値を表示しています。アイコンの意味は以下の通りです。
       %ul
         %li
           SIFT
@@ -152,7 +152,7 @@
       %h3#d7
         Q. Clinical Significanceの値はどのように計算していますか。
       %p
-        A. #{link_to 'ClinVarのclinical significance', 'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv'}の値を表示しています。
+        A. #{link_to 'ClinVarのclinical significance', 'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv', target: '_blank'}の値を表示しています。
 
     %section
       %h2 TogoVarの検索システムに関して
@@ -222,35 +222,35 @@
         %tbody
           %tr
             %td SNV
-            %td= link_to 'tgv41', variant_path(id: 'tgv41')
+            %td= link_to 'tgv41', variant_path(id: 'tgv41'), target: '_blank'
             %td 1:13116
             %td T
             %td G
             %td 1番染色体13116番目の塩基TがGに置換された
           %tr
             %td Ins
-            %td= link_to 'tgv1019', variant_path(id: 'tgv1019')
+            %td= link_to 'tgv1019', variant_path(id: 'tgv1019'), target: '_blank'
             %td 1:138646
             %td
             %td A
             %td 1番染色体138646番目と138647番目の塩基の間に塩基Aが挿入された
           %tr
             %td Del
-            %td= link_to 'tgv63', variant_path(id: 'tgv63')
+            %td= link_to 'tgv63', variant_path(id: 'tgv63'), target: '_blank'
             %td 1:13486
             %td GC
             %td
             %td 1番染色体13486番目と13487番目の塩基GCが欠失した
           %tr
             %td Indel
-            %td= link_to 'tgv1537710', variant_path(id: 'tgv1537710')
+            %td= link_to 'tgv1537710', variant_path(id: 'tgv1537710'), target: '_blank'
             %td 1:53676691
             %td C
             %td TA
             %td 1番染色体53676691番目の塩基Cが欠失して、その場所にTAが挿入された
           %tr
             %td Substitution
-            %td= link_to 'tgv675673', variant_path(id: 'tgv675673')
+            %td= link_to 'tgv675673', variant_path(id: 'tgv675673'), target: '_blank'
             %td 1:21889705
             %td AC
             %td CA
@@ -259,7 +259,7 @@
       %h3#s3
         Q. TogoVarでは、どのようにバリアントを表記していますか。
       %p
-        A. TogoVarでは、ゲノム上の位置及びreference allele、alternative allele、ヒトゲノム標準配列のビルド番号の組み合わせでバリアントを一意に識別します。TogoVar及びdbSNP、#{link_to 'VCF', 'https://samtools.github.io/hts-specs/VCFv4.2.pdf'}、#{link_to 'HGVS', 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants'}での表記例を下の表に示しています。
+        A. TogoVarでは、ゲノム上の位置及びreference allele、alternative allele、ヒトゲノム標準配列のビルド番号の組み合わせでバリアントを一意に識別します。TogoVar及びdbSNP、#{link_to 'VCF', 'https://samtools.github.io/hts-specs/VCFv4.2.pdf', target: '_blank'}、#{link_to 'HGVS', 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants', target: '_blank'}での表記例を下の表に示しています。
 
       %table.table.table-bordered.table-sm
         %thead
@@ -283,11 +283,11 @@
         %tbody
           %tr
             %td{rowspan: '2'} SNV
-            %td= link_to 'tgv30913364', variant_path(id: 'tgv30913364')
+            %td= link_to 'tgv30913364', variant_path(id: 'tgv30913364'), target: '_blank'
             %td 7:127254587
             %td G
             %td A
-            %td{rowspan: '2'}= link_to 'rs114202595', 'https://www.ncbi.nlm.nih.gov/snp/rs114202595'
+            %td{rowspan: '2'}= link_to 'rs114202595', 'https://www.ncbi.nlm.nih.gov/snp/rs114202595', target: '_blank'
             %td{rowspan: '2'} chr7:127254587
             %td{rowspan: '2'} G&gt;A / G&gt;T
             %td 7:127254587
@@ -295,7 +295,7 @@
             %td A
             %td 7:g.127254587:G&gt;A
           %tr
-            %td= link_to 'tgv30913365', variant_path(id: 'tgv30913365')
+            %td= link_to 'tgv30913365', variant_path(id: 'tgv30913365'), target: '_blank'
             %td 7:127254587
             %td G
             %td T
@@ -305,11 +305,11 @@
             %td 7:g.127254587:G&gt;T
           %tr
             %td Ins
-            %td= link_to 'tgv1019', variant_path(id: 'tgv1019')
+            %td= link_to 'tgv1019', variant_path(id: 'tgv1019'), target: '_blank'
             %td 1:138646
             %td
             %td A
-            %td= link_to 'rs761725800', 'https://www.ncbi.nlm.nih.gov/snp/rs761725800'
+            %td= link_to 'rs761725800', 'https://www.ncbi.nlm.nih.gov/snp/rs761725800', target: '_blank'
             %td chr1:138646
             %td dupA
             %td 1:138646
@@ -318,11 +318,11 @@
             %td 1:g.138646_138647insA
           %tr
             %td Del
-            %td= link_to 'tgv63', variant_path(id: 'tgv63')
+            %td= link_to 'tgv63', variant_path(id: 'tgv63'), target: '_blank'
             %td 1:13486
             %td GC
             %td
-            %td= link_to 'rs780379327', 'https://www.ncbi.nlm.nih.gov/snp/rs780379327'
+            %td= link_to 'rs780379327', 'https://www.ncbi.nlm.nih.gov/snp/rs780379327', target: '_blank'
             %td chr1:13486-13487
             %td delGC
             %td 1:13485
@@ -331,11 +331,11 @@
             %td 1:g.13486_13487del
           %tr
             %td Indel
-            %td= link_to 'tgv1537710', variant_path(id: 'tgv1537710')
+            %td= link_to 'tgv1537710', variant_path(id: 'tgv1537710'), target: '_blank'
             %td 1:53676691
             %td C
             %td TA
-            %td= link_to 'rs1057517525', 'https://www.ncbi.nlm.nih.gov/snp/rs1057517525'
+            %td= link_to 'rs1057517525', 'https://www.ncbi.nlm.nih.gov/snp/rs1057517525', target: '_blank'
             %td chr1:53676691
             %td delCinsTA
             %td 1:53676691
@@ -344,11 +344,11 @@
             %td 1:g.53676691delinsTA
           %tr
             %td Substitution
-            %td= link_to 'tgv675673', variant_path(id: 'tgv675673')
+            %td= link_to 'tgv675673', variant_path(id: 'tgv675673'), target: '_blank'
             %td 1:21889705
             %td AC
             %td CA
-            %td= link_to 'rs786204530', 'https://www.ncbi.nlm.nih.gov/snp/rs786204530'
+            %td= link_to 'rs786204530', 'https://www.ncbi.nlm.nih.gov/snp/rs786204530', target: '_blank'
             %td chr1:21889705-21889706
             %td AC&gt;CA
             %td 1:21889705

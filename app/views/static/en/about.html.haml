@@ -4,14 +4,14 @@
 = content_for :header do
   = stylesheet_link_tag 'static/style', media: :all
 
-- humandb = link_to 'the NBDC Human Database', 'https://humandbs.biosciencedbc.jp/en/'
-- jga = link_to 'Japanese Genotype-phenotype Archive (JGA)', 'https://www.ddbj.nig.ac.jp/jga/index-e.html'
-- nbdc = link_to 'https://biosciencedbc.jp/en' do
+- humandb = link_to 'the NBDC Human Database', 'https://humandbs.biosciencedbc.jp/en/', target: '_blank'
+- jga = link_to 'Japanese Genotype-phenotype Archive (JGA)', 'https://www.ddbj.nig.ac.jp/jga/index-e.html', target: '_blank'
+- nbdc = link_to 'https://biosciencedbc.jp/en', target: '_blank' do
   National Bioscience Database Center (NBDC), Japan Science and Technology Agency (JST)
-- dbcls = link_to 'https://dbcls.rois.ac.jp/index-en.html' do
+- dbcls = link_to 'https://dbcls.rois.ac.jp/index-en.html', target: '_blank' do
   Database Center for Life Science (DBCLS), Joint Support-Center for Data Science Research, Research Organization of
   Information and Systems (ROIS)
-- release = link_to 'a EurekAlert! press release', 'https://www.eurekalert.org/pub_releases/2018-07/jsat-jr071018.php'
+- release = link_to 'a EurekAlert! press release', 'https://www.eurekalert.org/pub_releases/2018-07/jsat-jr071018.php', target: '_blank'
 
 %main
   .container

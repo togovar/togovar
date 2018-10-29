@@ -153,10 +153,10 @@
       %p
         A. There are five targeted variant types for TogoVar: SNV, Insertion, Deletion, Indel, and Substitution. Of
         = succeed ',' do
-          = link_to '5 types that HGVS enumerated as the types of variants', 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants'
+          = link_to '5 types that HGVS enumerated as the types of variants', 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants', target: '_blank'
         Duplication is classified as Insertion, and Indels, for which the lengths of Insertion and Deletion are the same,
         are classified as Substitution. To identify the type of the variant,
-        = link_to 'https://www.ensembl.org/vep' do
+        = link_to 'https://www.ensembl.org/vep', target: '_blank' do
           Variant Effect Predictor (VEP)
         is used.
 
@@ -164,7 +164,7 @@
         Q. How do you calculate the Consequence value?
       %p
         A. The value of variant consequence in
-        = link_to 'https://asia.ensembl.org/info/genome/variation/prediction/predicted_data.html#consequences' do
+        = link_to 'https://asia.ensembl.org/info/genome/variation/prediction/predicted_data.html#consequences', target: '_blank' do
           Variant Effect Predictor (VEP)
         is displayed. If there are multiple transcripts for a single variant, only the most critical consequence may be
         displayed.
@@ -174,7 +174,7 @@
       %p
         A. Both SIFT and PolyPhen are scores which indicate the predicted effects on the protein function when an amino
         acid sequence undergoes alteration due to a variant. Values calculated through
-        = link_to 'https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html' do
+        = link_to 'https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html', target: '_blank' do
           Variant Effect Predictor (VEP)
         are displayed. The meaning of each icon is as follows.
 
@@ -196,7 +196,7 @@
         Q. How do you calculate the value of Clinical significance?
       %p
         A. The value of
-        = link_to 'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv' do
+        = link_to 'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv', target: '_blank' do
           clinical significance in ClinVar
         is displayed.
 
@@ -272,35 +272,35 @@
         %tbody
           %tr
             %td SNV
-            %td= link_to 'tgv41', variant_path(id: 'tgv41')
+            %td= link_to 'tgv41', variant_path(id: 'tgv41'), target: '_blank'
             %td 1:13116
             %td T
             %td G
             %td The 13116th base T in Chromosome 1 was replaced by G.
           %tr
             %td Ins
-            %td= link_to 'tgv1019', variant_path(id: 'tgv1019')
+            %td= link_to 'tgv1019', variant_path(id: 'tgv1019'), target: '_blank'
             %td 1:138646
             %td
             %td A
             %td A base A was inserted between the 138646th and 138647th bases in Chromosome 1.
           %tr
             %td Del
-            %td= link_to 'tgv63', variant_path(id: 'tgv63')
+            %td= link_to 'tgv63', variant_path(id: 'tgv63'), target: '_blank'
             %td 1:13486
             %td GC
             %td
             %td The 13486th and 13487th bases, GC, in Chromosome 1 were deleted.
           %tr
             %td Indel
-            %td= link_to 'tgv1537710', variant_path(id: 'tgv1537710')
+            %td= link_to 'tgv1537710', variant_path(id: 'tgv1537710'), target: '_blank'
             %td 1:53676691
             %td C
             %td TA
             %td The 53676691st base C in Chromosome 1 was deleted and TA was inserted in its place.
           %tr
             %td Substitution
-            %td= link_to 'tgv675673', variant_path(id: 'tgv675673')
+            %td= link_to 'tgv675673', variant_path(id: 'tgv675673'), target: '_blank'
             %td 1:21889705
             %td AC
             %td CA
@@ -311,9 +311,9 @@
       %p
         A. In TogoVar a variant is identified as a set of its genomic position, reference and alternative allele and human
         genome build. Examples of variant notations in TogoVar, dbSNP,
-        = link_to 'VCF', 'https://samtools.github.io/hts-specs/VCFv4.2.pdf'
+        = link_to 'VCF', 'https://samtools.github.io/hts-specs/VCFv4.2.pdf', target: '_blank'
         and
-        = link_to 'HGVS', 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants'
+        = link_to 'HGVS', 'http://varnomen.hgvs.org/bg-material/simple/#types-of-variants', target: '_blank'
         are shown below.
 
       %table.table.table-bordered.table-sm
@@ -338,11 +338,11 @@
         %tbody
           %tr
             %td{rowspan: '2'} SNV
-            %td= link_to 'tgv30913364', variant_path(id: 'tgv30913364')
+            %td= link_to 'tgv30913364', variant_path(id: 'tgv30913364'), target: '_blank'
             %td 7:127254587
             %td G
             %td A
-            %td{rowspan: '2'}= link_to 'rs114202595', 'https://www.ncbi.nlm.nih.gov/snp/rs114202595'
+            %td{rowspan: '2'}= link_to 'rs114202595', 'https://www.ncbi.nlm.nih.gov/snp/rs114202595', target: '_blank'
             %td{rowspan: '2'} chr7:127254587
             %td{rowspan: '2'} G&gt;A / G&gt;T
             %td 7:127254587
@@ -350,7 +350,7 @@
             %td A
             %td 7:g.127254587:G&gt;A
           %tr
-            %td= link_to 'tgv30913365', variant_path(id: 'tgv30913365')
+            %td= link_to 'tgv30913365', variant_path(id: 'tgv30913365'), target: '_blank'
             %td 7:127254587
             %td G
             %td T
@@ -360,11 +360,11 @@
             %td 7:g.127254587:G&gt;T
           %tr
             %td Ins
-            %td= link_to 'tgv1019', variant_path(id: 'tgv1019')
+            %td= link_to 'tgv1019', variant_path(id: 'tgv1019'), target: '_blank'
             %td 1:138646
             %td
             %td A
-            %td= link_to 'rs761725800', 'https://www.ncbi.nlm.nih.gov/snp/rs761725800'
+            %td= link_to 'rs761725800', 'https://www.ncbi.nlm.nih.gov/snp/rs761725800', target: '_blank'
             %td chr1:138646
             %td dupA
             %td 1:138646
@@ -373,11 +373,11 @@
             %td 1:g.138646_138647insA
           %tr
             %td Del
-            %td= link_to 'tgv63', variant_path(id: 'tgv63')
+            %td= link_to 'tgv63', variant_path(id: 'tgv63'), target: '_blank'
             %td 1:13486
             %td GC
             %td
-            %td= link_to 'rs780379327', 'https://www.ncbi.nlm.nih.gov/snp/rs780379327'
+            %td= link_to 'rs780379327', 'https://www.ncbi.nlm.nih.gov/snp/rs780379327', target: '_blank'
             %td chr1:13486-13487
             %td delGC
             %td 1:13485
@@ -386,11 +386,11 @@
             %td 1:g.13486_13487del
           %tr
             %td Indel
-            %td= link_to 'tgv1537710', variant_path(id: 'tgv1537710')
+            %td= link_to 'tgv1537710', variant_path(id: 'tgv1537710'), target: '_blank'
             %td 1:53676691
             %td C
             %td TA
-            %td= link_to 'rs1057517525', 'https://www.ncbi.nlm.nih.gov/snp/rs1057517525'
+            %td= link_to 'rs1057517525', 'https://www.ncbi.nlm.nih.gov/snp/rs1057517525', target: '_blank'
             %td chr1:53676691
             %td delCinsTA
             %td 1:53676691
@@ -399,11 +399,11 @@
             %td 1:g.53676691delinsTA
           %tr
             %td Substitution
-            %td= link_to 'tgv675673', variant_path(id: 'tgv675673')
+            %td= link_to 'tgv675673', variant_path(id: 'tgv675673'), target: '_blank'
             %td 1:21889705
             %td AC
             %td CA
-            %td= link_to 'rs786204530', 'https://www.ncbi.nlm.nih.gov/snp/rs786204530'
+            %td= link_to 'rs786204530', 'https://www.ncbi.nlm.nih.gov/snp/rs786204530', target: '_blank'
             %td chr1:21889705-21889706
             %td AC&gt;CA
             %td 1:21889705

@@ -28,4 +28,8 @@ module ApplicationHelper #:nodoc:
     end
     links.join(' / ').html_safe
   end
+
+  def labeled_link_to(name = nil, html_options = nil, &block)
+    link_to(name, name.to_s, html_options, &block)
+  end
 end
