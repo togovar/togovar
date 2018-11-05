@@ -10,7 +10,10 @@ class Suggest
       query = {
         query: {
           match: {
-            label: term
+            label: {
+              query: term,
+              operator: 'and'
+            }
           }
         }
       }
