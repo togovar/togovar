@@ -34,7 +34,7 @@ gem 'ruby-progressbar', '~> 1.9'
 gem 'settingslogic', '~> 2.0'
 gem 'sidekiq', '~> 5.1'
 gem 'sinatra', require: false
-gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
+# gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
 # optimisation
 gem 'redis-namespace', '~> 1.6'
