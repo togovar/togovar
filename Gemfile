@@ -5,7 +5,7 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-gem 'rails', '~> 5.1.2'
+gem 'rails', '~> 5.2', '>= 5.2.2'
 
 # infrastructure
 gem 'elasticsearch-model', github: 'elastic/elasticsearch-rails', branch: '5.x'
@@ -51,7 +51,8 @@ end
 
 group :development do
   gem 'awesome_print'
-  gem 'better_errors', '~> 2.2'
+  gem 'better_errors', '~> 2.5'
+  gem 'better_errors-pry', '~> 1.0'
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
