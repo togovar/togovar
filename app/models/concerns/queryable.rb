@@ -50,7 +50,8 @@ module Queryable
     end
 
     def format_result(result)
-      raise TypeError unless result.is_a?(RDF::Query::Solutions)
+      # raise TypeError unless result.is_a?(RDF::Query::Solutions)
+      return {} unless result.is_a?(RDF::Query::Solutions)
 
       (0...result.count).map do |i|
         result.bindings.map do |k, v|
