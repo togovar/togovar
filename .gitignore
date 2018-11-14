@@ -8,7 +8,9 @@
 /.bundle
 
 # Ignore config
-/config/*.yml
+/config/elasticsearch.yml
+/config/endpoint.yml
+/config/stanza_ruby.yml
 
 # Ignore compiled assets
 /public/assets
