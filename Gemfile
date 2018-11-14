@@ -25,6 +25,7 @@ gem 'jquery-rails', '~> 4.3'
 gem 'jquery-ui-rails', '~> 6.0'
 gem 'js-routes', '~> 1.4'
 gem 'sass-rails', '~> 5.0'
+gem 'webpacker', '~> 3.5'
 
 # utility
 gem 'action_args', '~> 2.2'
