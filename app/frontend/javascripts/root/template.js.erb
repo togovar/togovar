@@ -1,0 +1,5 @@
+<% table_row = File.join(Rails.root, 'app', 'views', 'tooltips', '_table_row.html.haml') %>
+<% freq_filter = File.join(Rails.root, 'app', 'views', 'layouts', '_freq_filter.html.haml') %>
+window.Template = {};
+window.Template.table_row = "<%= Haml::Engine.new(File.read(table_row), remove_whitespace: true).render(Object.new) %>"
+window.Template.freq_filter = "<%= Haml::Engine.new(File.read(freq_filter), remove_whitespace: true).render(Object.new) %>"
