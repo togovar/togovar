@@ -1,0 +1,222 @@
+@import 'colors';
+
+[data-icon] {
+  position: relative;
+}
+
+[data-icon]:before {
+  content: '';
+  display: inline-block;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: url('~images/sprite.svg') no-repeat;
+}
+
+// Data set
+[data-icon='source_jga_ngs']:before {
+  background-position: 0 -52px;
+}
+
+[data-icon='source_jga_snp']:before {
+  background-position: 0 -52px;
+}
+
+[data-icon='source_tommo']:before {
+  background-position: -22px -52px;
+}
+
+[data-icon='source_hgvd']:before {
+  background-position: -44px -52px;
+}
+
+[data-icon='source_exac']:before {
+  background-position: -66px -52px;
+}
+
+[data-icon='source_clinvar']:before {
+  background-position: -88px -52px;
+}
+
+// Variant type
+[data-icon='variant_type_snv']:before {
+  background-position: 0 -74px;
+}
+
+[data-icon='variant_type_insertion']:before {
+  background-position: -22px -74px;
+}
+
+[data-icon='variant_type_deletion']:before {
+  background-position: -44px -74px;
+}
+
+[data-icon='variant_type_indel']:before {
+  background-position: -66px -74px;
+}
+
+[data-icon='variant_type_substitution']:before {
+  background-position: -88px -74px;
+}
+
+// Clinical significance
+[data-icon^='significance_']:before {
+  width: 23px;
+}
+
+[data-icon='significance_pathogenic']:before {
+  background-position: 0 -96px;
+}
+
+[data-icon='significance_likely_pathogenic']:before {
+  background-position: -25px -96px;
+}
+
+[data-icon='significance_uncertain_significance']:before {
+  background-position: -50px -96px;
+}
+
+[data-icon='significance_likely_benign']:before {
+  background-position: -75px -96px;
+}
+
+[data-icon='significance_benign']:before {
+  background-position: -100px -96px;
+}
+
+[data-icon='significance_conflicting_interpretations_of_pathogenicity']:before {
+  background-position: -125px -96px;
+}
+
+[data-icon='significance_drug_response']:before {
+  background-position: -150px -96px;
+}
+
+[data-icon='significance_association']:before {
+  background-position: -175px -96px;
+}
+
+[data-icon='significance_risk_factor']:before {
+  background-position: -200px -96px;
+}
+
+[data-icon='significance_protective']:before {
+  background-position: -225px -96px;
+}
+
+[data-icon='significance_affects']:before {
+  background-position: -250px -96px;
+}
+
+[data-icon='significance_conflicting_data_from_submitters']:before {
+  background-position: -275px -96px;
+}
+
+[data-icon='significance_other']:before {
+  background-position: -300px -96px;
+}
+
+[data-icon='significance_not_provided']:before {
+  background-position: -325px -96px;
+}
+
+// sift
+[data-icon='sift_deleterious']:before {
+  background-position: 0 -118px;
+}
+
+[data-icon='sift_tolerated']:before {
+  background-position: -22px -118px;
+}
+
+// polyphen
+[data-icon^='polyphen_']:before {
+  width: 21px;
+}
+
+[data-icon='polyphen_probably_damaging']:before {
+  background-position: 0 -140px;
+}
+
+[data-icon='polyphen_possibly_damaging']:before {
+  background-position: -23px -140px;
+}
+
+[data-icon='polyphen_benign']:before {
+  background-position: -46px -140px;
+}
+
+[data-icon='polyphen_unknown']:before {
+  background-position: -69px -140px;
+}
+
+// Frequency meter
+[data-frequency] {
+  position: relative;
+  display: inline-block;
+  height: 36px;
+  width: 15px;
+  margin: 0 2px;
+  background: $color_base_blue_dark;
+
+  &:before {
+    content: "";
+    display: block;
+    position: absolute;
+    height: 4px;
+    width: 13px;
+    left: 1px;
+    top: 1px;
+    background: #FFF;
+  }
+}
+
+[data-frequency='null']:before {
+  height: 34px;
+}
+
+[data-frequency='0/7']:before {
+  box-shadow: 0 5px 0 #FFF,
+  0 10px 0 #FFF,
+  0 15px 0 #FFF,
+  0 20px 0 #FFF,
+  0 25px 0 #FFF,
+  0 30px 0 #FFF;
+}
+
+[data-frequency='1/7']:before {
+  box-shadow: 0 5px 0 #FFF,
+  0 10px 0 #FFF,
+  0 15px 0 #FFF,
+  0 20px 0 #FFF,
+  0 25px 0 #FFF;
+}
+
+[data-frequency='2/7']:before {
+  box-shadow: 0 5px 0 #FFF,
+  0 10px 0 #FFF,
+  0 15px 0 #FFF,
+  0 20px 0 #FFF;
+}
+
+[data-frequency='3/7']:before {
+  box-shadow: 0 5px 0 #FFF,
+  0 10px 0 #FFF,
+  0 15px 0 #FFF;
+}
+
+[data-frequency='4/7']:before {
+  box-shadow: 0 5px 0 #FFF,
+  0 10px 0 #FFF;
+}
+
+[data-frequency='5/7']:before {
+  box-shadow: 0 5px 0 #FFF;
+}
+
+[data-frequency='6/7']:before {
+}
+
+[data-frequency='7/7']:before {
+  height: 0;
+}

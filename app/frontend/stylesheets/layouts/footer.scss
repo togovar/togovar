@@ -1,0 +1,42 @@
+@import 'colors';
+
+footer {
+  position: relative;
+  z-index: 900;
+  padding: 15px 25px;
+  height: auto;
+  background-color: #fff;
+
+  #copyright {
+    font-size: 12px;
+    margin-bottom: 0;
+  }
+
+  #nbdc_logo {
+    display: block;
+    text-indent: -9999px;
+    height: 57px;
+    width: 160px;
+    margin-bottom: 10px;
+    background: image-url('nbdc_logo.png') no-repeat;
+    background-size: 160px;
+  }
+
+  & > .container {
+    padding: 0;
+    color: #000;
+  }
+
+  a {
+    text-decoration: underline;
+
+    &:hover {
+      color: $color_base_blue;
+    }
+  }
+
+  address {
+    font-size: 12px;
+    line-height: 20px;
+  }
+}
