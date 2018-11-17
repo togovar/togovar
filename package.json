@@ -5,9 +5,13 @@
     "@rails/webpacker": "3.5",
     "bootstrap": "^4.2.1",
     "datatables.net": "^1.10.19",
+    "datatables.net-bs4": "^1.10.19",
+    "expose-loader": "^0.7.5",
     "font-awesome": "^4.7.0",
     "jquery": "^3.3.1",
-    "popper.js": "^1.14.6"
+    "jquery-ui": "^1.12.1",
+    "popper.js": "^1.14.6",
+    "rails-erb-loader": "^5.5.0"
   },
   "devDependencies": {
     "webpack-dev-server": "2.11.2"
