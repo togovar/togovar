@@ -1,8 +1,8 @@
 - provide(:active, root_path)
 
 = content_for :header do
-  = stylesheet_link_tag 'root/index', media: :all
-  = javascript_include_tag 'root/index'
+  = stylesheet_pack_tag 'root/index', media: :all
+  = javascript_pack_tag 'root/index'
   = bioschemas
 
 .container-fluid
