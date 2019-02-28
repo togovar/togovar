@@ -6,165 +6,7 @@ class Lookup
       include Elasticsearch::Model
       # include Elasticsearch::Model::Callbacks
 
-      index_name "lookup_#{Rails.env}"
-
-      settings index: { number_of_shards: 5, number_of_replicas: 0 } do
-        mappings dynamic: false, _all: { enabled: false } do
-          indexes :tgv_id,
-                  type: 'integer'
-
-          indexes :chromosome,
-                  type: 'keyword'
-
-          indexes :start,
-                  type: 'integer'
-
-          indexes :stop,
-                  type: 'integer'
-
-          indexes :variant_type,
-                  type: 'keyword'
-
-          indexes :reference,
-                  type: 'keyword'
-
-          indexes :alternative,
-                  type: 'keyword'
-
-          indexes :rs,
-                  type: 'keyword'
-
-          indexes :hgvs_g,
-                  type: 'keyword'
-
-          indexes :transcripts, type: 'nested' do
-            indexes :ensg_id,
-                    type: 'keyword'
-
-            indexes :enst_id,
-                    type: 'keyword'
-
-            indexes :symbol,
-                    type: 'keyword'
-
-            indexes :symbol_source,
-                    type: 'keyword'
-
-            indexes :ncbi_gene_id,
-                    type: 'integer'
-
-            indexes :consequences,
-                    type: 'keyword'
-
-            indexes :hgvs_c,
-                    type: 'keyword'
-
-            indexes :sift,
-                    type: 'float'
-
-            indexes :polyphen,
-                    type: 'float'
-          end
-
-          indexes :clinvar do
-            indexes :allele_id,
-                    type: 'integer'
-
-            indexes :significances,
-                    type: 'keyword'
-
-            indexes :conditions,
-                    type:   'text',
-                    fields: {
-                      raw: {
-                        type: 'keyword'
-                      }
-                    }
-          end
-
-          indexes :exac do
-            indexes :num_alleles,
-                    type: 'integer'
-
-            indexes :num_alt_alleles,
-                    type: 'integer'
-
-            indexes :frequency,
-                    type: 'float'
-
-            indexes :passed,
-                    type: 'boolean'
-          end
-
-          indexes :hgvd do
-            indexes :num_alleles,
-                    type: 'integer'
-
-            indexes :num_alt_alleles,
-                    type: 'integer'
-
-            indexes :frequency,
-                    type: 'float'
-
-            indexes :passed,
-                    type: 'boolean'
-          end
-
-          indexes :jga_ngs do
-            indexes :num_alleles,
-                    type: 'integer'
-
-            indexes :num_alt_alleles,
-                    type: 'integer'
-
-            indexes :frequency,
-                    type: 'float'
-
-            indexes :quality_score,
-                    type: 'float'
-
-            indexes :passed,
-                    type: 'boolean'
-          end
-
-          indexes :jga_snp do
-            indexes :num_alleles,
-                    type: 'integer'
-
-            indexes :num_ref_alleles,
-                    type: 'integer'
-
-            indexes :num_alt_alleles,
-                    type: 'integer'
-
-            indexes :num_genotype_hetero,
-                    type: 'integer'
-
-            indexes :num_genotype_ref_homo,
-                    type: 'integer'
-
-            indexes :num_genotype_alt_homo,
-                    type: 'integer'
-
-            indexes :frequency,
-                    type: 'float'
-          end
-
-          indexes :tommo do
-            indexes :num_alleles,
-                    type: 'integer'
-
-            indexes :num_alt_alleles,
-                    type: 'integer'
-
-            indexes :frequency,
-                    type: 'float'
-
-            indexes :passed,
-                    type: 'boolean'
-          end
-        end
-      end
+      index_name :variant
     end
 
     include TermType
@@ -176,7 +18,7 @@ class Lookup
         if [params['source'], params['variant_type'], params['significance']].any?(&:blank?)
           query = { size: 0 }
         else
-          start  = (params['start'] || 0).to_i
+          start = (params['start'] || 0).to_i
           length = (params['length'] || 10).to_i
 
           query = { size: length,
@@ -209,15 +51,18 @@ class Lookup
         Rails.logger.info('query term: ' + term.inspect)
         Rails.logger.info('es query: ' + query.to_json)
 
-        result     = search(query)
+        result = search(query)
+
+        ap result
+
         hits_total = result['hits']['total']
-        sources    = result['hits']['hits'].map { |x| x['_source'] }
+        sources = result['hits']['hits'].map { |x| x['_source'] }
 
         total_variant_type = result['aggregations']['total_variant_type']['buckets'].map do |t|
           [SequenceOntology.find(t['key']).label.downcase, t['doc_count']]
         end.to_h
 
-        total_significance = result['aggregations']['total_significance']['buckets'].map do |t|
+        total_significance = result.dig('aggregations', 'total_significance', 'by_interpretation', 'buckets').map do |t|
           [t['key'], t['doc_count']]
         end.to_h
         total_significance['not in clinvar'] = result['aggregations']['total_not_in_clinvar']['doc_count']
@@ -232,13 +77,8 @@ class Lookup
           if (var_class = json['variant_type'])
             json['variant_type'] = SequenceOntology.find(var_class).label
           end
-          if (tr = json['transcripts'])
-            json['transcripts'] = select_most_severe_consequence(tr)
-            json['transcripts'].each do |t|
-              t['consequences'] = t['consequences'].map do |c|
-                SequenceOntology.find(c).label
-              end
-            end
+          if (consequence = json['most_severe_consequence'])
+            json['most_severe_consequence'] = SequenceOntology.find(consequence).label
           end
           json
         end
@@ -257,15 +97,15 @@ class Lookup
                  format('%.1f[s]', (took.to_f / 1000.0))
                end
 
-        { recordsTotal:       search(enable_scope(size: 0))['hits']['total'],
-          recordsFiltered:    filtered_count,
-          condition:          term&.display_condition,
-          took:               time,
-          data:               replace,
+        { recordsTotal: search(enable_scope(size: 0))['hits']['total'],
+          recordsFiltered: filtered_count,
+          condition: term&.display_condition,
+          took: time,
+          data: replace,
           total_variant_type: total_variant_type,
           total_significance: total_significance,
-          total_dataset:      total_dataset,
-          warning:            warning_message }
+          total_dataset: total_dataset,
+          warning: warning_message }
       end
 
       def search(query)
@@ -304,7 +144,7 @@ class Lookup
 
         q = query.delete(:query)
 
-        sources   = source.map { |x| { exists: { field: x } } }
+        sources = source.map { |x| { exists: { field: x } } }
         condition = [q, { bool: { should: sources } }].compact
 
         query.merge(query: { bool: { must: condition } })
@@ -317,16 +157,16 @@ class Lookup
 
         q = query.delete(:query)
 
-        types     = variant_type.map { |x| { term: { variant_type: SequenceOntology.find_by_label(x).id } } }
+        types = variant_type.map { |x| { term: { variant_type: SequenceOntology.find_by_label(x).id } } }
         condition = [q, { bool: { should: types } }].compact
 
         query.merge(query: { bool: { must: condition } })
       end
 
       def filter_by_frequency(query, params)
-        freq_source   = params['freq_source'] || []
+        freq_source = params['freq_source'] || []
         freq_relation = params['freq_relation'] || []
-        freq_value    = params['freq_value'] || []
+        freq_value = params['freq_value'] || []
 
         freq = freq_source.zip(freq_relation, freq_value).select { |x| x.last.present? }
 
@@ -337,7 +177,7 @@ class Lookup
         sources = freq.map do |x, y, z|
           value = begin
             Float(z)
-          rescue
+          rescue ArgumentError
             next nil
           end
 
@@ -363,8 +203,13 @@ class Lookup
         if significance.delete('not_in_clinvar')
           types.push bool: {
             must_not: {
-              exists: {
-                field: 'clinvar'
+              nested: {
+                path: 'condition',
+                query: {
+                  exists: {
+                    field: 'condition'
+                  }
+                }
               }
             }
           }
@@ -377,47 +222,18 @@ class Lookup
       end
 
       def enable_scope(query = {})
-        q = query.delete(:query)
-
         condition = {
-          bool: {
-            should:
-              [
-                {
-                  exists: {
-                    field: 'jga_ngs'
-                  }
-                },
-                {
-                  exists: {
-                    field: 'jga_snp'
-                  }
-                },
-                {
-                  exists: {
-                    field: 'tommo'
-                  }
-                },
-                {
-                  exists: {
-                    field: 'hgvd'
-                  }
-                },
-                {
-                  exists: {
-                    field: 'exac'
-                  }
-                },
-                {
-                  exists: {
-                    field: 'clinvar'
-                  }
-                }
-              ]
+          nested: {
+            path: 'frequency',
+            query: {
+              exists: {
+                field: 'frequency'
+              }
+            }
           }
         }
 
-        if q
+        if (q = query.delete(:query))
           query.merge(query: { bool: { must: [q, condition] } })
         else
           query.merge(query: condition)
@@ -425,73 +241,114 @@ class Lookup
       end
 
       def enable_count(query = {})
-        query = query.merge aggs: {
-          total_variant_type:   {
+        query.merge aggs: {
+          total_variant_type: {
             terms: {
               field: 'variant_type'
             }
           },
-          total_significance:   {
-            terms: {
-              field: 'clinvar.significances',
-              size:  20
+          total_significance: {
+            nested: {
+              path: 'condition'
+            },
+            aggs: {
+              by_interpretation: {
+                terms: {
+                  field: 'condition.interpretation',
+                  size: 20
+                }
+              }
+            }
+          },
+          total_clinvar: {
+            filter: {
+              nested: {
+                path: 'condition',
+                query: {
+                  exists: {
+                    field: 'condition'
+                  }
+                }
+              }
             }
           },
           total_not_in_clinvar: {
             filter: {
               bool: {
                 must_not: {
-                  exists: {
-                    field: 'clinvar'
+                  nested: {
+                    path: 'condition',
+                    query: {
+                      exists: {
+                        field: 'condition'
+                      }
+                    }
                   }
                 }
               }
             }
           },
-          total_jga_ngs:        {
+          total_jga_ngs: {
             filter: {
-              exists: {
-                field: 'jga_ngs'
+              nested: {
+                path: 'frequency',
+                query: {
+                  match: {
+                    'frequency.source': 'JGA-NGS'
+                  }
+                }
               }
             }
           },
-          total_jga_snp:        {
+          total_jga_snp: {
             filter: {
-              exists: {
-                field: 'jga_snp'
+              nested: {
+                path: 'frequency',
+                query: {
+                  match: {
+                    'frequency.source': 'JGA-SNP'
+                  }
+                }
               }
             }
           },
-          total_tommo:          {
+          total_tommo: {
             filter: {
-              exists: {
-                field: 'tommo'
+              nested: {
+                path: 'frequency',
+                query: {
+                  match: {
+                    'frequency.source': 'ToMMo'
+                  }
+                }
               }
             }
           },
-          total_hgvd:           {
+          total_hgvd: {
             filter: {
-              exists: {
-                field: 'hgvd'
+              nested: {
+                path: 'frequency',
+                query: {
+                  match: {
+                    'frequency.source': 'HGVD'
+                  }
+                }
               }
             }
           },
-          total_exac:           {
+          total_exac: {
             filter: {
-              exists: {
-                field: 'exac'
-              }
-            }
-          },
-          total_clinvar:        {
-            filter: {
-              exists: {
-                field: 'clinvar'
+              nested: {
+                path: 'frequency',
+                query: {
+                  match: {
+                    'frequency.source': 'ExAC'
+                  }
+                }
               }
             }
           }
         }
-        # search(query)
       end
 
       CONSEQUENCES_ORDER = %w[SO_0001893 SO_0001574 SO_0001575 SO_0001587
@@ -534,12 +391,12 @@ class Lookup
           Rails.logger.warn("missing tgv_id: #{m.join(', ')} in Lookup::import")
         end
 
-        request  = { index:   index_name,
-                     type:    document_type,
-                     body:    records.map { |_, v| { index: { data: v } } },
-                     refresh: true }
+        request = { index: index_name,
+                    type: document_type,
+                    body: records.map { |_, v| { index: { data: v } } },
+                    refresh: true }
         response = client.bulk(request)
-        errors   += response['items'].select { |k, _| k.values.first['error'] }
+        errors += response['items'].select { |k, _| k.values.first['error'] }
 
         Rails.logger.error(errors) if errors.present?
         errors

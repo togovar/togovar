@@ -4,7 +4,18 @@ class Lookup
 
     DISEASE = Struct.new(:term) do
       def query
-        { query: { match: { 'clinvar.conditions.raw': term } } }
+        {
+          query: {
+            nested: {
+              path: 'condition',
+              query: {
+                match: {
+                  'condition.condition': term
+                }
+              }
+            }
+          }
+        }
       end
 
       def display_condition
@@ -17,10 +28,10 @@ class Lookup
         {
           query: {
             nested: {
-              path:  'transcripts',
+              path: 'transcript',
               query: {
                 match: {
-                  'transcripts.symbol': term
+                  'transcript.symbol': term
                 }
               }
             }
@@ -35,7 +46,7 @@ class Lookup
 
     RS = Struct.new(:term) do
       def query
-        { query: { match: { 'rs': term } } }
+        { query: { match: { 'rs': term.to_s.sub('rs', '').to_i } } }
       end
 
       def display_condition

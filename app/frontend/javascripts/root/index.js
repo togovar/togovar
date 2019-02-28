@@ -17,21 +17,22 @@ let popup_template = function () {
 };
 
 let gene_link = function (row) {
-  if (row && (row.transcripts != null)) {
-    return row.transcripts.map(function (x) {
+  if (row && (row.transcript != null)) {
+    return row.transcript.map(function (x) {
       var href;
-      if (x.ncbi_gene_id != null) {
-        href = "http://identifiers.org/hgnc/" + x.ncbi_gene_id;
+      if (x.hgnc_id != null) {
+        href = "http://identifiers.org/hgnc/" + x.hgnc_id;
         return "<li><a target='_blank' href='" + href + "'>" + x.symbol + "</a></li>";
       }
-      if (x.ensembl_gene != null) {
-        return "<li><a target='_blank' href='" + ensembl_gene + "'>" + x.symbol + "</a></li>";
+      if (x.gene_id != null) {
+        href = "http://identifiers.org/ensembl/" + x.gene_id;
+        return "<li><a target='_blank' href='" + href + "'>" + x.symbol + "</a></li>";
       } else {
         return null;
       }
     }).filter(function (x) {
       return x;
-    }).unique();
+    }).unique().join('');
   }
 };
 
@@ -137,15 +138,15 @@ let show_warning = function (message) {
   $('#search-alert').html(html);
 };
 
-let popup_html = function (freq_data) {
+let popup_html = function (row) {
   var html = popup_template();
-  ['jga_ngs', 'jga_snp', 'tommo', 'hgvd', 'exac'].forEach(function (source) {
-    let v = freq_data[source];
-    console.log(source + ': ' + v);
+  ['JGA-NGS', 'JGA-SNP', 'ToMMo', 'HGVD', 'ExAC'].forEach(function (source) {
+    let v = row.frequency.filter(y => y.source === source)[0];
     if (v) {
-      html = html.replace("{{" + source + ".alt}}", v.num_alt_alleles);
-      html = html.replace("{{" + source + ".total}}", v.num_alleles);
-      html = html.replace("{{" + source + ".freq}}", display_float(v.frequency));
+      key = source.toLocaleLowerCase().replace('-', '_')
+      html = html.replace("{{" + key + ".alt}}", v.num_alt_alleles);
+      html = html.replace("{{" + key + ".total}}", v.num_alleles);
+      html = html.replace("{{" + key + ".freq}}", display_float(v.frequency));
     }
   });
   html = html.replace(/{{[^{}]+}}/g, '-');
@@ -358,6 +359,7 @@ $(document).ready(function () {
         }
       }, {
         data: 'reference',
+        defaultContent: '',
         render: function (data, type, row, meta) {
           if (type === 'display') {
             if (data && data.length > 4) {
@@ -368,6 +370,7 @@ $(document).ready(function () {
         }
       }, {
         data: 'alternative',
+        defaultContent: '',
         render: function (data, type, row, meta) {
           if (type === 'display') {
             if (data && data.length > 4) {
@@ -377,7 +380,7 @@ $(document).ready(function () {
           return data;
         }
       }, {
-        data: 'transcripts.[].symbol',
+        data: 'transcript.[].symbol',
         render: function (data, type, row, meta) {
           if (type === 'display') {
             if (data) {
@@ -394,34 +397,19 @@ $(document).ready(function () {
           let html;
           if (type === 'display') {
             html = '<div class="frequency_wrapper" data-toggle="tooltip" data-placement="bottom" data-html="true" title="' + popup_html(row) + '">';
-            ['jga_ngs', 'jga_snp', 'tommo', 'hgvd', 'exac'].forEach(function (x) {
+            ['JGA-NGS', 'JGA-SNP', 'ToMMo', 'HGVD', 'ExAC'].forEach(function (x) {
               let v;
-              let klass = (v = row[x]) ? classify(v) : 'null';
-              return html = html.concat('<span data-source="' + x + '" data-frequency="' + klass + '"></span>');
+              let klass = (v = row.frequency.filter(y => y.source === x)[0]) ? classify(v) : 'null';
+              return html = html.concat('<span data-source="' + x.toLocaleLowerCase().replace('-', '_') + '" data-frequency="' + klass + '"></span>');
             });
             data = html.concat('</div>');
           }
           return data;
         }
       }, {
-        data: 'transcripts.[].consequences',
-        render: function (data, type, row, meta) {
-          if (type === 'display') {
-            let consequences = [].concat.apply([], data).unique();
-            data = '<ul>' + ((function () {
-              var _i, _len, _results;
-              _results = [];
-              for (_i = 0, _len = consequences.length; _i < _len; _i++) {
-                let label = consequences[_i];
-                _results.push('<li>' + label + '</li>');
-              }
-              return _results;
-            })()).join('') + '</ul>';
-          }
-          return data;
-        }
+        data: 'most_severe_consequence'
       }, {
-        data: 'transcripts.[].sift',
+        data: 'transcript.[].sift',
         render: function (data, type, row, meta) {
           if (type === 'display') {
             if (data) {
@@ -439,7 +427,7 @@ $(document).ready(function () {
           return data;
         }
       }, {
-        data: 'transcripts.[].polyphen',
+        data: 'transcript.[].polyphen',
         render: function (data, type, row, meta) {
           if (type === 'display') {
             if (data) {
@@ -457,40 +445,12 @@ $(document).ready(function () {
           return data;
         }
       }, {
-        data: 'clinvar.significances',
+        data: 'condition.[]',
         defaultContent: '',
         render: function (data, type, row, meta) {
           if (type === 'display') {
             if (data) {
-              data = ((function () {
-                var _i, _len, _results;
-                _results = [];
-                for (_i = 0, _len = data.length; _i < _len; _i++) {
-                  let s = data[_i];
-                  _results.push('<span data-icon="significance_' + s.replace(/\ /g, '_').toLowerCase() + '" />');
-                }
-                return _results;
-              })()).join('');
-              return data;
-            }
-          }
-          return data;
-        }
-      }, {
-        data: 'clinvar.conditions',
-        defaultContent: '',
-        render: function (data, type, row, meta) {
-          if (type === 'display') {
-            if (data) {
-              return '<ul>' + ((function () {
-                var _i, _len, _results;
-                _results = [];
-                for (_i = 0, _len = data.length; _i < _len; _i++) {
-                  let label = data[_i];
-                  _results.push('<li>' + label + '</li>');
-                }
-                return _results;
-              })()).join('') + '</ul>';
+              data = '<ul>' + data.map(x => '<li><span data-icon="significance_' + x.interpretation[0].replace(/\ /g, '_') + '">' + x.condition + '</span></li>').join('') + '</ul>';
             }
           }
           return data;
