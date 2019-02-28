@@ -1,7 +1,6 @@
 = content_for :header do
-  = stylesheet_link_tag 'reports/variant/show', media: :all
-  <script src="/stanza/assets/components/webcomponentsjs/webcomponents-loader.js"></script>
-  = javascript_include_tag 'reports/variant/show'
+  = stylesheet_pack_tag 'reports/variant/show', media: :all
+  = javascript_pack_tag 'reports/variant/show'
   - @stanza.each do |stanza|
     = stanza.link
 
