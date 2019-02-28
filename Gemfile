@@ -13,6 +13,7 @@ gem 'puma', '~> 3.7'
 gem 'unicorn', '~> 5.4'
 
 # elasticsearch
+gem 'elasticsearch-dsl', github: 'elastic/elasticsearch-ruby', branch: '6.x'
 gem 'elasticsearch-model', github: 'elastic/elasticsearch-rails', branch: '6.x'
 gem 'elasticsearch-rails', github: 'elastic/elasticsearch-rails', branch: '6.x'
 
