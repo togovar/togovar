@@ -1,100 +1,65 @@
-require 'benchmark'
 require 'rdf'
 
 class Obo < RDF::Vocabulary('http://purl.obolibrary.org/obo/');
 end
 
-# Wrapper class for accessing so.owl
-class SequenceOntology < RDF::Vocabulary('http://purl.obolibrary.org/obo/')
+class SequenceOntology
   class << self
-    FILE_PATH = File.join(Rails.root, 'res', 'so.owl')
-    ID_FORMAT = /SO_\d{7}/
-
     def find(id)
-      unless id.match?(ID_FORMAT)
-        msg = "Expected is #{ID_FORMAT.inspect}, but given is #{id}"
-        raise ArgumentError(msg)
-      end
-
-      cache.fetch(id) do |k|
-        result = solution(k).first
-        break nil unless result
-        v = new do |r|
-          r.id           = k
-          r.label        = result.label.to_s
-          r.definition   = result.definition.to_s
-          r.sub_class_of = result.sub_class_of.to_s
-        end
-        cache.store(k, v)
-      end
+      const_get(id)
     end
 
     def find_by_label(label)
-      return nil if label.blank?
-
-      r = cache.find { |_, v| v.label.downcase == label }
-      return r[1] if r
-
-      id = id_for_label(label)
-      raise("No definitions found for #{label}") unless id
-
-      find(id)
-    end
-
-    private
-
-    def cache
-      @cache ||= {}
-    end
-
-    def log(msg, level = :info)
-      return unless Rails.logger
-      Rails.logger.send(level, msg) if Rails.logger.respond_to?(level)
-    end
-
-    def repository
-      @repo ||= SPARQL::Client.new(Endpoint.url)
-    end
-
-    def solution(id)
-      log("Obtaining solutions for #{id}")
-      subject    = self[id]
-      definition = self['IAO_0000115']
-
-      repository
-        .select
-        .graph('http://togovar.org/graph/so')
-        .optional([subject, RDF::Vocab::RDFS.label, :label])
-        .optional([subject, definition, :definition])
-        .optional([subject, RDF::Vocab::RDFS.subClassOf, :sub_class_of])
-        .execute
-    end
-
-    def id_for_label(label)
-      log("Obtaining ID for #{label}")
-
-      r = repository
-            .select
-            .graph('http://togovar.org/graph/so')
-            .where([:subject, RDF::Vocab::RDFS.label, :label])
-            .execute
-            .first
-
-      r ? r.subject.to_s.split('/').last : nil
+      constants.select do |sym|
+        sym.to_s.starts_with?('SO_') && const_get(sym).label == label
+      end.map(&method(:const_get))
     end
   end
 
-  attr_accessor :id
-  attr_accessor :label
-  attr_accessor :definition
-  attr_accessor :sub_class_of
+  TERM = Struct.new(:id, :label, :display_term)
 
-  def initialize(*args)
-    @id           = args.shift
-    @label        = args.shift
-    @definition   = args.shift
-    @sub_class_of = args.shift
+  # Variant classification
+  SO_0001483 = TERM.new('SO_0001483', 'SNV')
+  SO_0000667 = TERM.new('SO_0000667', 'insertion')
+  SO_0000159 = TERM.new('SO_0000159', 'deletion')
+  SO_1000032 = TERM.new('SO_1000032', 'indel')
+  SO_1000002 = TERM.new('SO_1000002', 'substitution')
 
-    yield self if block_given?
-  end
+  # Variant consequences
+  SO_0001893 = TERM.new('SO_0001893', 'transcript_ablation', 'Transcript ablation')
+  SO_0001574 = TERM.new('SO_0001574', 'splice_acceptor_variant', 'Splice acceptor variant')
+  SO_0001575 = TERM.new('SO_0001575', 'splice_donor_variant', 'Splice donor variant')
+  SO_0001587 = TERM.new('SO_0001587', 'stop_gained', 'Stop gained')
+  SO_0001589 = TERM.new('SO_0001589', 'frameshift_variant', 'Frameshift variant')
+  SO_0001578 = TERM.new('SO_0001578', 'stop_lost', 'Stop lost')
+  SO_0002012 = TERM.new('SO_0002012', 'start_lost', 'Start lost')
+  SO_0001889 = TERM.new('SO_0001889', 'transcript_amplification', 'Transcript amplification')
+  SO_0001821 = TERM.new('SO_0001821', 'inframe_insertion', 'Inframe insertion')
+  SO_0001822 = TERM.new('SO_0001822', 'inframe_deletion', 'Inframe deletion')
+  SO_0001583 = TERM.new('SO_0001583', 'missense_variant', 'Missense variant')
+  SO_0001818 = TERM.new('SO_0001818', 'protein_altering_variant', 'Protein altering variant')
+  SO_0001630 = TERM.new('SO_0001630', 'splice_region_variant', 'Splice region variant')
+  SO_0001626 = TERM.new('SO_0001626', 'incomplete_terminal_codon_variant', 'Incomplete terminal codon variant')
+  SO_0002019 = TERM.new('SO_0002019', 'start_retained_variant', 'Start retained variant')
+  SO_0001567 = TERM.new('SO_0001567', 'stop_retained_variant', 'Stop retained variant')
+  SO_0001819 = TERM.new('SO_0001819', 'synonymous_variant', 'Synonymous variant')
+  SO_0001580 = TERM.new('SO_0001580', 'coding_sequence_variant', 'Coding sequence variant')
+  SO_0001620 = TERM.new('SO_0001620', 'mature_miRNA_variant', 'Mature miRNA variant')
+  SO_0001623 = TERM.new('SO_0001623', '5_prime_UTR_variant', '5 prime UTR variant')
+  SO_0001624 = TERM.new('SO_0001624', '3_prime_UTR_variant', '3 prime UTR variant')
+  SO_0001792 = TERM.new('SO_0001792', 'non_coding_transcript_exon_variant', 'Non coding transcript exon variant')
+  SO_0001627 = TERM.new('SO_0001627', 'intron_variant', 'Intron variant')
+  SO_0001621 = TERM.new('SO_0001621', 'NMD_transcript_variant', 'NMD transcript variant')
+  SO_0001619 = TERM.new('SO_0001619', 'non_coding_transcript_variant', 'Non coding transcript variant')
+  SO_0001631 = TERM.new('SO_0001631', 'upstream_gene_variant', 'Upstream gene variant')
+  SO_0001632 = TERM.new('SO_0001632', 'downstream_gene_variant', 'Downstream gene variant')
+  SO_0001895 = TERM.new('SO_0001895', 'TFBS_ablation', 'TFBS ablation')
+  SO_0001892 = TERM.new('SO_0001892', 'TFBS_amplification', 'TFBS amplification')
+  SO_0001782 = TERM.new('SO_0001782', 'TF_binding_site_variant', 'TF binding site variant')
+  SO_0001894 = TERM.new('SO_0001894', 'regulatory_region_ablation', 'Regulatory region ablation')
+  SO_0001891 = TERM.new('SO_0001891', 'regulatory_region_amplification', 'Regulatory region amplification')
+  SO_0001907 = TERM.new('SO_0001907', 'feature_elongation', 'Feature elongation')
+  SO_0001566 = TERM.new('SO_0001566', 'regulatory_region_variant', 'Regulatory region variant')
+  SO_0001906 = TERM.new('SO_0001906', 'feature_truncation', 'Feature truncation')
+  SO_0001628 = TERM.new('SO_0001628', 'intergenic_variant', 'Intergenic variant')
 end
