@@ -1,4 +1,6 @@
 class RootController < ApplicationController
+  protect_from_forgery except: %i[suggest list]
+
   def suggest
     respond_to do |format|
       format.html
