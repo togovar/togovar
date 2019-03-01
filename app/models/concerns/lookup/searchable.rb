@@ -53,8 +53,6 @@ class Lookup
 
         result = search(query)
 
-        ap result
-
         hits_total = result['hits']['total']
         sources = result['hits']['hits'].map { |x| x['_source'] }
 
