@@ -341,7 +341,7 @@ $(document).ready(function () {
             let tgv_id = "<a target='_blank' href='" + (Routes.variant_path('tgv' + data)) + "'>tgv" + data + "</a>";
             html = html.concat('<li>', tgv_id, '</li>');
             if (row && row.rs) {
-              let rs_id = "<a class='text-muted' target='_blank' href='http://identifiers.org/dbsnp/" + row.rs + "'>" + row.rs + "</a>";
+              let rs_id = "<a class='text-muted' target='_blank' href='http://identifiers.org/dbsnp/rs" + row.rs + "'>rs" + row.rs + "</a>";
               html = html.concat('<li>', rs_id, '</li>');
             }
             html = html.concat('</ul>');
