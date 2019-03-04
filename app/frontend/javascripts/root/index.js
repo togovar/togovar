@@ -141,12 +141,14 @@ let show_warning = function (message) {
 let popup_html = function (row) {
   var html = popup_template();
   ['JGA-NGS', 'JGA-SNP', 'ToMMo', 'HGVD', 'ExAC'].forEach(function (source) {
-    let v = row.frequency.filter(y => y.source === source)[0];
-    if (v) {
-      key = source.toLocaleLowerCase().replace('-', '_')
-      html = html.replace("{{" + key + ".alt}}", v.num_alt_alleles);
-      html = html.replace("{{" + key + ".total}}", v.num_alleles);
-      html = html.replace("{{" + key + ".freq}}", display_float(v.frequency));
+    if (row.frequency) {
+      let v = row.frequency.filter(y => y.source === source)[0];
+      if (v) {
+        key = source.toLocaleLowerCase().replace('-', '_')
+        html = html.replace("{{" + key + ".alt}}", v.num_alt_alleles);
+        html = html.replace("{{" + key + ".total}}", v.num_alleles);
+        html = html.replace("{{" + key + ".freq}}", display_float(v.frequency));
+      }
     }
   });
   html = html.replace(/{{[^{}]+}}/g, '-');
@@ -397,10 +399,10 @@ $(document).ready(function () {
           let html;
           if (type === 'display') {
             html = '<div class="frequency_wrapper" data-toggle="tooltip" data-placement="bottom" data-html="true" title="' + popup_html(row) + '">';
-            ['JGA-NGS', 'JGA-SNP', 'ToMMo', 'HGVD', 'ExAC'].forEach(function (x) {
-              let v;
-              let klass = (v = row.frequency.filter(y => y.source === x)[0]) ? classify(v) : 'null';
-              return html = html.concat('<span data-source="' + x.toLocaleLowerCase().replace('-', '_') + '" data-frequency="' + klass + '"></span>');
+            ['JGA-NGS', 'JGA-SNP', 'ToMMo', 'HGVD', 'ExAC'].forEach(x => {
+              let v = row.frequency ? row.frequency.filter(y => y.source === x)[0] : null;
+              let klass = v ? classify(v) : 'null';
+              html = html.concat('<span data-source="' + x.toLocaleLowerCase().replace('-', '_') + '" data-frequency="' + klass + '"></span>');
             });
             data = html.concat('</div>');
           }

@@ -221,13 +221,29 @@ class Lookup
 
       def enable_scope(query = {})
         condition = {
-          nested: {
-            path: 'frequency',
-            query: {
-              exists: {
-                field: 'frequency'
+          bool: {
+            should: [
+              {
+                nested: {
+                  path: 'frequency',
+                  query: {
+                    exists: {
+                      field: 'frequency'
+                    }
+                  }
+                }
+              },
+              {
+                nested: {
+                  path: 'condition',
+                  query: {
+                    exists: {
+                      field: 'condition'
+                    }
+                  }
+                }
               }
-            }
+            ]
           }
         }
 
