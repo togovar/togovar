@@ -21,5 +21,5 @@ Rails.application.routes.draw do
 
   # api
   get 'suggest', to: 'root#suggest', defaults: { format: 'json' }
-  match 'list', to: 'root#list', defaults: { format: 'json' }, via: [:get,:post]
+  get 'search', to: 'root#search', defaults: { format: 'json' }
 end
