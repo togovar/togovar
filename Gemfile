@@ -13,9 +13,9 @@ gem 'puma', '~> 3.7'
 gem 'unicorn', '~> 5.4'
 
 # elasticsearch
-gem 'elasticsearch-dsl', github: 'elastic/elasticsearch-ruby', branch: '6.x'
-gem 'elasticsearch-model', github: 'elastic/elasticsearch-rails', branch: '6.x'
-gem 'elasticsearch-rails', github: 'elastic/elasticsearch-rails', branch: '6.x'
+gem 'elasticsearch-dsl', '~> 0.1.6'
+gem 'elasticsearch-model', '~> 6.0'
+gem 'elasticsearch-rails', '~> 6.0'
 
 # redis
 gem 'redis-namespace', '~> 1.6'
@@ -47,6 +47,8 @@ gem 'pry-rails', '~> 0.3.6'
 
 group :development, :test do
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
+  gem 'elasticsearch-extensions', '~> 0.0.31'
+  gem 'factory_bot_rails', '~> 4.9'
 end
 
 group :development do
