@@ -28,6 +28,7 @@ class RootController < ApplicationController
     respond_to do |format|
       format.json do
         builder = Elasticsearch::QueryBuilder.new
+        builder.term(@param.term)
 
         if BINARY_FILTERS.map { |x| param.selected_none?(x) }.any?
           builder.count_only(true)
