@@ -21,6 +21,10 @@ module Form
         (found = map.select { |_, v| v.label == label }).present? ? found.first : nil
       end
 
+      def defaults
+        all.map { |x| [x.param_name, x.default] }.to_h.symbolize_keys
+      end
+
       private
 
       def map

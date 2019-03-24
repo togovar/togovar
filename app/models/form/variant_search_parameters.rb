@@ -28,13 +28,13 @@ module Form
       end
     end
 
-    DEFAULT_DATASET = Form::Dataset.all.map { |x| [x.param_name, x.default] }.to_h.freeze
-    DEFAULT_FREQUENCY = Form::Frequency.all.map { |x| [x.param_name, x.default] }.to_h.freeze
-    DEFAULT_TYPE = Form::Type.all.map { |x| [x.param_name, x.default] }.to_h.freeze
-    DEFAULT_SIGNIFICANCE = Form::ClinicalSignificance.all.map { |x| [x.param_name, x.default] }.to_h.freeze
-    DEFAULT_CONSEQUENCE = Form::Consequence.all.map { |x| [x.param_name, x.default] }.to_h.freeze
-    DEFAULT_SIFT = Form::Sift.all.map { |x| [x.param_name, x.default] }.to_h.freeze
-    DEFAULT_POLYPHEN = Form::Polyphen.all.map { |x| [x.param_name, x.default] }.to_h.freeze
+    DEFAULT_DATASET = Form::Dataset.defaults.freeze
+    DEFAULT_FREQUENCY = Form::Frequency.defaults.freeze
+    DEFAULT_TYPE = Form::Type.defaults.freeze
+    DEFAULT_SIGNIFICANCE = Form::ClinicalSignificance.defaults.freeze
+    DEFAULT_CONSEQUENCE = Form::Consequence.defaults.freeze
+    DEFAULT_SIFT = Form::Sift.defaults.freeze
+    DEFAULT_POLYPHEN = Form::Polyphen.defaults.freeze
 
     attr_reader :dataset
     attr_reader :frequency
@@ -49,7 +49,9 @@ module Form
     attr_reader :limit
 
     def initialize(*args)
-      options = args.last.respond_to?(:to_hash) ? args.pop.to_hash.deep_symbolize_keys : {}
+      options = args.last.respond_to?(:to_hash) ? args.pop.to_hash : {}
+
+      options.deep_symbolize_keys!
 
       @term = args.shift || options.fetch(:term, '')
       @dataset = (args.shift || DEFAULT_DATASET.merge(options.fetch(:dataset, {})))
