@@ -15,6 +15,8 @@ module Form
       def permit(params)
         params.permit(:term,
                       :quality,
+                      :offset,
+                      :limit,
                       :debug,
                       dataset: Form::Dataset.parameters,
                       frequency: Form::Frequency.parameters,
@@ -59,8 +61,8 @@ module Form
       @sift = (args.shift || DEFAULT_SIFT.merge(options.fetch(:sift, {})))
       @polyphen = (args.shift || DEFAULT_POLYPHEN.merge(options.fetch(:polyphen, {})))
 
-      @offset = args.shift || options.fetch(:offset, 0).between(0, 10_000)
-      @limit = args.shift || options.fetch(:limit, 100).between(0, 100)
+      @offset = args.shift || options.fetch(:offset, 0).to_i.between(0, 10_000)
+      @limit = args.shift || options.fetch(:limit, 100).to_i.between(0, 100)
 
       @debug = options.fetch(:debug, false)
     end
