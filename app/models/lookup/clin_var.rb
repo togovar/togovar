@@ -17,11 +17,6 @@ class Lookup
       attr_accessor name
     end
 
-    validates :allele_id, numericality: { only_integer: true,
-                                          greater_than: 0 }
-    validates :significances, array_of: { type: String }
-    validates :conditions, array_of: { type: String }
-
     def initialize(**attributes)
       @significances = []
       @conditions = []

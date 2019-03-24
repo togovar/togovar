@@ -18,13 +18,6 @@ class Lookup
       attr_accessor name
     end
 
-    validates :num_alt_alleles, numericality: { only_integer: true,
-                                                greater_than_or_equal_to: 0 }
-    validates :num_alleles, numericality: { only_integer: true,
-                                            greater_than_or_equal_to: 0 }
-    validates :passed, inclusion: { in: [true, false] }
-    validates :frequency, numericality: { greater_than_or_equal_to: 0 }
-
     def initialize(**attributes)
       @passed = false
 

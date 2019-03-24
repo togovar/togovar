@@ -36,12 +36,6 @@ class Lookup
       attr_accessor name
     end
 
-    validates :ncbi_gene_id, allow_nil: true, numericality: { only_integer: true, greater_than: 0 }
-    validates :consequences, allow_nil: true, array_of: { type: String }
-    validates :sift, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
-    validates :polyphen, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
-    validates :most_severe, inclusion: { in: [true, false] }
-
     def initialize(**attributes)
       @consequences = []
       @most_severe  = false
