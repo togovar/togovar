@@ -1,8 +1,3 @@
-require 'rdf'
-
-class Obo < RDF::Vocabulary('http://purl.obolibrary.org/obo/');
-end
-
 class SequenceOntology
   class << self
     def find(id)
@@ -12,7 +7,7 @@ class SequenceOntology
     def find_by_label(label)
       constants.select do |sym|
         sym.to_s.starts_with?('SO_') && const_get(sym).label == label
-      end.map(&method(:const_get))
+      end.map(&method(:const_get)).first
     end
   end
 
