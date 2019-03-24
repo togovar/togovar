@@ -23,30 +23,30 @@ class RootController < ApplicationController
   BINARY_FILTERS = %i[dataset type significance consequence sift polyphen].freeze
 
   def search
-    param = Form::VariantSearchParameters.new(search_params)
+    @param = Form::VariantSearchParameters.new(search_params)
 
     respond_to do |format|
       format.json do
         builder = Elasticsearch::QueryBuilder.new
         builder.term(@param.term)
 
-        if BINARY_FILTERS.map { |x| param.selected_none?(x) }.any?
+        if BINARY_FILTERS.map { |x| @param.selected_none?(x) }.any?
           builder.count_only(true)
         else
-          unless param.selected_all?(:dataset)
-            param.selected_items(:dataset).each do |name|
+          unless @param.selected_all?(:dataset)
+            @param.selected_items(:dataset).each do |name|
               builder.dataset(name)
             end
           end
 
           %i[type significance consequence sift polyphen].each do |x|
-            unless param.selected_all?(x)
-              builder.send(x, *param.selected_items(x))
+            unless @param.selected_all?(x)
+              builder.send(x, *@param.selected_items(x))
             end
           end
         end
 
-        if param.debug?
+        if @param.debug?
           render json: builder.build
           return
         end
