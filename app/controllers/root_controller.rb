@@ -29,6 +29,9 @@ class RootController < ApplicationController
       format.json do
         builder = Elasticsearch::QueryBuilder.new
         builder.term(@param.term)
+        builder.stat(@param.stat?)
+        builder.from = @param.offset
+        builder.size = @param.limit
 
         if BINARY_FILTERS.map { |x| @param.selected_none?(x) }.any?
           builder.count_only(true)

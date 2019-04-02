@@ -20,9 +20,15 @@ module Elasticsearch
       @from = 0
       @size = 100
       @count_only = false
+      @stat = true
     end
 
     def term(term)
+      if term.blank?
+        @term = nil
+        return self
+      end
+
       @term = case term.delete(' ')
               when /^tgv\d+(,tgv\d+)*$/
                 tgv_condition(term)
@@ -97,6 +103,11 @@ module Elasticsearch
 
     def count_only(boolean)
       @count_only = !!boolean
+      self
+    end
+
+    def stat(boolean)
+      @stat = !!boolean
       self
     end
 
@@ -279,10 +290,15 @@ module Elasticsearch
                 }
               end
 
-      query[:from] = @from unless @from.zero?
-      query[:size] = @count_only ? 0 : @size
+      if @count_only
+        query[:size] = 0
+      else
+        query[:size] = @size
+        query[:from] = @from unless @from.zero?
+        query[:sort] = %i[chromosome start stop]
+      end
 
-      query.merge!(aggregations) if statistics
+      query.merge!(aggregations) if @stat
 
       query
     end

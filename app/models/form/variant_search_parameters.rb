@@ -17,7 +17,9 @@ module Form
                       :quality,
                       :offset,
                       :limit,
+                      :stat,
                       :debug,
+                      :format,
                       dataset: Form::Dataset.parameters,
                       frequency: Form::Frequency.parameters,
                       type: Form::Type.parameters,
@@ -27,14 +29,6 @@ module Form
                       polyphen: Form::Polyphen.parameters)
       end
     end
-
-    DEFAULT_DATASET = Form::Dataset.defaults.freeze
-    DEFAULT_FREQUENCY = Form::Frequency.defaults.freeze
-    DEFAULT_TYPE = Form::Type.defaults.freeze
-    DEFAULT_SIGNIFICANCE = Form::ClinicalSignificance.defaults.freeze
-    DEFAULT_CONSEQUENCE = Form::Consequence.defaults.freeze
-    DEFAULT_SIFT = Form::Sift.defaults.freeze
-    DEFAULT_POLYPHEN = Form::Polyphen.defaults.freeze
 
     attr_reader :dataset
     attr_reader :frequency
@@ -49,28 +43,34 @@ module Form
     attr_reader :limit
 
     def initialize(*args)
-      options = args.last.respond_to?(:to_hash) ? args.pop.to_hash : {}
+      params = args.last.respond_to?(:to_hash) ? args.last.to_hash : args
 
-      options.deep_symbolize_keys!
+      params.deep_symbolize_keys!
 
-      @term = args.shift || options.fetch(:term, '')
-      @dataset = (args.shift || DEFAULT_DATASET.merge(options.fetch(:dataset, {})))
-      @frequency = (args.shift || DEFAULT_FREQUENCY.merge(options.fetch(:frequency, {})))
-      @quality = args.shift || options.delete(:quality) || 1
-      @type = (args.shift || DEFAULT_TYPE.merge(options.fetch(:type, {})))
-      @significance = (args.shift || DEFAULT_SIGNIFICANCE.merge(options.fetch(:significance, {})))
-      @consequence = (args.shift || DEFAULT_CONSEQUENCE.merge(options.fetch(:consequence, {})))
-      @sift = (args.shift || DEFAULT_SIFT.merge(options.fetch(:sift, {})))
-      @polyphen = (args.shift || DEFAULT_POLYPHEN.merge(options.fetch(:polyphen, {})))
+      @term = params.fetch(:term, '')
+      @dataset = Form::Dataset.defaults.merge(params.fetch(:dataset, {}))
+      @frequency = Form::Frequency.defaults.merge(params.fetch(:frequency, {}))
+      @quality = params.delete(:quality) || '1'
+      @type = Form::Type.defaults.merge(params.fetch(:type, {}))
+      @significance = Form::ClinicalSignificance.defaults.merge(params.fetch(:significance, {}))
+      @consequence = Form::Consequence.defaults.merge(params.fetch(:consequence, {}))
+      @sift = Form::Sift.defaults.merge(params.fetch(:sift, {}))
+      @polyphen = Form::Polyphen.defaults.merge(params.fetch(:polyphen, {}))
 
-      @offset = args.shift || options.fetch(:offset, 0).to_i.between(0, 10_000)
-      @limit = args.shift || options.fetch(:limit, 100).to_i.between(0, 100)
+      @offset = params.fetch(:offset, '0').to_i.between(0, 10_000)
+      @limit = params.fetch(:limit, '100').to_i.between(0, 100)
 
-      @debug = options.fetch(:debug, false)
+      @stat = params.fetch(:stat, '1')
+
+      @debug = params.key?(:debug)
     end
 
     def debug?
-      !!@debug
+      @debug
+    end
+
+    def stat?
+      @stat != '0'
     end
 
     def term
@@ -114,43 +114,6 @@ module Form
       return true if @consequence.all? { |_, v| v.to_i.zero? }
 
       false
-    end
-
-    def dataset_given?
-      @dataset_given ||= params.dataset.any? { |_, v| v == '1' }
-    end
-
-    def frequency_given?
-      @frequency_given ||= begin
-        (params.frequency[:from].to_f == 0) &&
-          (params.frequency[:to].to_f == 1) &&
-          (params.frequency[:invert] == '0') &&
-          (params.frequency[:match] == 'any')
-      end
-    end
-
-    def quality_given?
-      @quality_given ||= (params.quality == '1')
-    end
-
-    def type_given?
-      @type_given ||= params.type.any? { |_, v| v == '1' }
-    end
-
-    def significance_given?
-      @significance_given ||= params.significance.any? { |_, v| v == '1' }
-    end
-
-    def consequence_given?
-      @consequence_given ||= params.consequence.any? { |_, v| v == '1' }
-    end
-
-    def sift_given?
-      @sift_given ||= params.sift.any? { |_, v| v == '1' }
-    end
-
-    def polyphen_given?
-      @polyphen_given ||= params.polyphen.any? { |_, v| v == '1' }
     end
   end
 end

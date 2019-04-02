@@ -8,38 +8,40 @@ json.scroll do
   json.limit @param.limit
 end
 
-json.statistics do
-  json.total Variant.total
-  json.filtered filtered_total
+if aggs.present?
+  json.statistics do
+    json.total Variant.total
+    json.filtered filtered_total
 
-  json.dataset do
-    Array(aggs.dig(:aggs_frequencies, :group_by_source, :buckets)).each do |x|
-      json.set! x[:key].downcase.tr('-', '_'), x[:doc_count]
+    json.dataset do
+      Array(aggs.dig(:aggs_frequencies, :group_by_source, :buckets)).each do |x|
+        json.set! x[:key].downcase.tr('-', '_'), x[:doc_count]
+      end
+      unless (c = aggs.dig(:total_clinvar, :doc_count)).zero?
+        json.clinvar c
+      end
     end
-    unless (c = aggs.dig(:total_clinvar, :doc_count)).zero?
-      json.clinvar c
-    end
-  end
 
-  json.type do
-    Array(aggs.dig(:group_by_type, :buckets)).each do |x|
-      json.set! x[:key], x[:doc_count]
+    json.type do
+      Array(aggs.dig(:group_by_type, :buckets)).each do |x|
+        json.set! x[:key], x[:doc_count]
+      end
     end
-  end
 
-  json.significance do
-    unless (c = filtered_total - aggs.dig(:total_clinvar, :doc_count)).zero?
-      json.NC c
+    json.significance do
+      unless (c = filtered_total - aggs.dig(:total_clinvar, :doc_count)).zero?
+        json.NC c
+      end
+      Array(aggs.dig(:aggs_conditions, :group_by_interpretations, :buckets)).each do |x|
+        key = x[:key].downcase.tr(' ', '_').to_sym
+        json.set! Form::ClinicalSignificance[key].param_name, x[:doc_count]
+      end
     end
-    Array(aggs.dig(:aggs_conditions, :group_by_interpretations, :buckets)).each do |x|
-      key = x[:key].downcase.tr(' ', '_').to_sym
-      json.set! Form::ClinicalSignificance[key].param_name, x[:doc_count]
-    end
-  end
 
-  json.consequence do
-    Array(aggs.dig(:aggs_consequences, :group_by_consequences, :buckets)).each do |x|
-      json.set! x[:key], x[:doc_count]
+    json.consequence do
+      Array(aggs.dig(:aggs_consequences, :group_by_consequences, :buckets)).each do |x|
+        json.set! x[:key], x[:doc_count]
+      end
     end
   end
 end
@@ -49,9 +51,9 @@ json.data results do |variant|
 
   existing_variations = Array(source[:existing_variations]).map { |x| "rs#{x}" }
   symbols = Array(source[:transcripts])
-             .select { |x| x[:symbol] && x[:symbol_source] == 'HGNC' && x[:hgnc_id] }
-             .map { |x| { name: x[:symbol], id: x[:hgnc_id], synonyms: GeneSymbol.synonyms_for(x[:symbol]) } }
-             .uniq
+              .select { |x| x[:symbol] && x[:symbol_source] == 'HGNC' && x[:hgnc_id] }
+              .map { |x| { name: x[:symbol], id: x[:hgnc_id], synonyms: GeneSymbol.synonyms_for(x[:symbol]) } }
+              .uniq
 
   frequencies = Array(source[:frequencies]).each do |x|
     x[:source] = x[:source].downcase.tr('-', '_')
