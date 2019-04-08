@@ -6,6 +6,7 @@ filtered_total = @response.raw_response['hits']['total']
 json.scroll do
   json.offset @param.offset
   json.limit @param.limit
+  json.max_rows 10_000 # FIXME extract to config
 end
 
 if aggs.present?

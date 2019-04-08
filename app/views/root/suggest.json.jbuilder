@@ -7,6 +7,6 @@ json.data do
   end
 
   json.disease @response[:disease] do |result|
-    json.symbol result.dig(:_source, :term)
+    json.name result.dig(:_source, :term)
   end
 end
