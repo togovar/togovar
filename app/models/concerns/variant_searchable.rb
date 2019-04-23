@@ -8,28 +8,34 @@ module VariantSearchable
 
     config = Rails.configuration.elasticsearch
 
-    settings index: {
-      number_of_shards: config.dig('indices', 'variants', 'number_of_shards'),
-      number_of_replicas: config.dig('indices', 'variants', 'number_of_replicas')
-    } do
+    settings = {
+      index: {
+        number_of_shards: config.dig('indices', 'variants', 'number_of_shards') || 1,
+        number_of_replicas: config.dig('indices', 'variants', 'number_of_replicas') || 0
+      }
+    }
+
+    settings settings do
       mapping dynamic: false do
         indexes :tgv_id, type: :long
 
+        indexes :variant_type, type: :keyword
+
         indexes :chromosome, type: :keyword
+        indexes :chromosome_sort, type: :integer
         indexes :start, type: :integer
         indexes :stop, type: :integer
-
-        indexes :variant_type, type: :keyword
         indexes :reference, type: :keyword
         indexes :alternative, type: :keyword
-        indexes :hgvs_g, type: :keyword
 
         indexes :vcf do
+          indexes :chromosome, type: :keyword
           indexes :position, type: :integer
           indexes :reference, type: :keyword
           indexes :alternative, type: :keyword
         end
 
+        indexes :hgvs_g, type: :keyword
         indexes :existing_variations, type: :keyword
 
         indexes :transcripts, type: :nested do
@@ -41,8 +47,8 @@ module VariantSearchable
           indexes :symbol_source, type: :keyword
           indexes :hgvs_c, type: :keyword
           indexes :hgvs_p, type: :keyword
-          indexes :polyphen, type: :float
           indexes :sift, type: :float
+          indexes :polyphen, type: :float
         end
 
         indexes :conditions, type: :nested do
