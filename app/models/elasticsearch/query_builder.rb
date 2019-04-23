@@ -295,7 +295,7 @@ module Elasticsearch
       else
         query[:size] = @size
         query[:from] = @from unless @from.zero?
-        query[:sort] = %i[chromosome start stop]
+        query[:sort] = %i[chromosome_sort start stop]
       end
 
       query.merge!(aggregations) if @stat
