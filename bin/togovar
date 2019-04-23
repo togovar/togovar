@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+APP_PATH = File.expand_path('../config/application', __dir__)
+
+require_relative '../config/boot'
+require 'thor'
+
+Dir[File.expand_path('./lib/tasks/**/*.thor')].each(&method(:load))
+
+module TogoVar
+  class CLI < Thor
+    namespace :togovar
+
+    register(Convert, 'convert', 'convert [COMMAND]', 'convert tools')
+    register(Elasticsearch, 'elasticsearch', 'elasticsearch [COMMAND]', 'elasticsearch tools')
+  end
+end
+
+TogoVar::CLI.start
