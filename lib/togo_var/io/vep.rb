@@ -93,6 +93,7 @@ module TogoVar
 
         def foreach(path, options = Hash.new, &block)
           return to_enum(__method__, path, options) unless block
+
           open(path, options) do |vep|
             vep.each(&block)
           end
