@@ -87,7 +87,7 @@ module TogoVar
       end
 
       def index
-        { index: { _index: Variant::Elasticsearch.index_name, _type: '_doc', _id: _id } }
+        { index: { _index: ::Variant::Elasticsearch.index_name, _type: '_doc', _id: _id } }
       end
 
       def to_h
