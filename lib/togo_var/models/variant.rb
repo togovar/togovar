@@ -83,7 +83,7 @@ module TogoVar
 
         md5 = Digest::MD5.hexdigest("#{ref}/#{alt}")
 
-        "#{format('%02d', @vcf[:chromosome])}:#{format('%010d', @vcf[:position])}:#{md5}"
+        "#{format('%02d', CHROMOSOME_CODE[@vcf[:chromosome]])}:#{format('%010d', @vcf[:position])}:#{md5}"
       end
 
       def index
