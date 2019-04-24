@@ -94,8 +94,8 @@ module TogoVar
         ATTRIBUTES.map { |x| [x, send(x)] }.to_h.compact
       end
 
-      def to_json
-        to_h.to_json
+      def to_json(*args)
+        to_h.to_json(*args)
       end
     end
   end
