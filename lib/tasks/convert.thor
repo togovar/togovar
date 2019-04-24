@@ -6,6 +6,7 @@ module TogoVar
 
     desc 'vep2es <VEP_FILE>', 'convert VEP annotation to Elasticsearch index'
     option :output, aliases: '-o', type: :string, default: 'out', desc: 'path to output directory'
+    option :prefix, aliases: '-p', type: :string, desc: 'file name prefix'
 
     def vep2es(path)
       output = File.expand_path(options[:output]).tap(&assert_directory_presence)
@@ -16,7 +17,8 @@ module TogoVar
 
       inside(output) do
         i = 0
-        ::TogoVar::IO::NDJSON.open(prefix: "#{File.basename(vep, File.extname(vep))}_") do |f|
+        prefix = options[:prefix].present? ? options[:prefix] : "#{File.basename(vep, File.extname(vep))}_"
+        ::TogoVar::IO::NDJSON.open(prefix: prefix) do |f|
           ::TogoVar::IO::VEP.foreach(vep) do |v|
             variant = ::TogoVar::Models::Variant.compose(*v)
             f.write [variant.index, variant]
