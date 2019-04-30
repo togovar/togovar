@@ -5,6 +5,7 @@ module TogoVar
   end
 
   module Models
+    require 'togo_var/models/frequency'
     require 'togo_var/models/transcript'
     require 'togo_var/models/variant'
   end

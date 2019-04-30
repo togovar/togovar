@@ -31,6 +31,37 @@ module TogoVar
       end
     end
 
+    desc 'frequency2es <FREQ_FILE>', 'convert frequency data to Elasticsearch index'
+    option :output, aliases: '-o', type: :string, default: 'out', desc: 'path to output directory'
+    option :prefix, aliases: '-p', type: :string, desc: 'file name prefix'
+
+    def frequency2es(file)
+      output = File.expand_path(options[:output]).tap(&assert_directory_presence)
+      path = File.expand_path(file).tap(&assert_file_presence)
+
+      require_relative '../../config/environment'
+      require 'togo_var'
+      require 'csv'
+
+      inside(output) do
+        i = 0
+        prefix = options[:prefix].present? ? options[:prefix] : "#{File.basename(path, File.extname(path))}_"
+
+        ::TogoVar::IO::NDJSON.open(prefix: prefix) do |f|
+          (path.match?(/\.gz$/) ? Zlib::GzipReader : File).open(path) do |input|
+            CSV.new(input, headers: true, col_sep: "\t").each do |row|
+              freq = ::TogoVar::Models::Frequency.new(row)
+              f.write [freq.update, freq]
+
+              STDERR.print "\r #{i}" if ((i += 1) % 10_000).zero?
+            end
+          end
+        end
+
+        STDERR.puts "\r #{i}"
+      end
+    end
+
     def self.banner(task, namespace = false, subcommand = true)
       super
     end
