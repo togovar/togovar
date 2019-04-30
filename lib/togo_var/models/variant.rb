@@ -28,6 +28,7 @@ module TogoVar
       CHROMOSOME_CODE = {
         'X' => 23,
         'Y' => 24,
+        'M' => 25,
         'MT' => 25
       }.merge((1..22).map { |x| [x.to_s, x] }.to_h).freeze
 
