@@ -4,6 +4,8 @@ require 'elasticsearch/model'
 module TogoVar
   class Elasticsearch < Thor
 
+    namespace 'togovar elasticsearch'
+
     desc 'health', 'health check'
     def health
       require_relative '../../config/environment'
