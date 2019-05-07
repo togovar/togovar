@@ -39,5 +39,7 @@ module TogoVar
     config.x.download_dir = '/var/www/public'
 
     config.elasticsearch = config_for(:elasticsearch)
+    config.endpoint = config_for(:endpoint)
+    config.virtuoso = config_for(:virtuoso)
   end
 end
