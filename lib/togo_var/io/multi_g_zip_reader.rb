@@ -66,7 +66,11 @@ module TogoVar
 
       def gets
         @line ||= each
-        @line.next
+        begin
+          @line.next
+        rescue StopIteration
+          nil
+        end
       end
 
       alias each each_line
