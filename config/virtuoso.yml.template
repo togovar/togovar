@@ -1,0 +1,18 @@
+defaults: &defaults
+  host: localhost
+  isql: isql
+  port: 1111
+  user: dba
+  password:
+  default_graph: http://togovar.biosciencedbc.jp
+  load_dir: /data/togovar
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults
+  host: virtuoso
