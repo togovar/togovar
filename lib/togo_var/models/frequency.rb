@@ -3,8 +3,6 @@ require 'active_support/core_ext'
 require 'csv'
 require 'json'
 
-require 'togo_var/models/transcript'
-
 module TogoVar
   module Models
     class Frequency
@@ -68,9 +66,9 @@ module TogoVar
         {
           script: {
             source: 'if (ctx._source.frequencies == null) { ctx._source.frequencies = [] } ctx._source.frequencies.add(params.frequency)',
-            "lang": 'painless',
-            "params": {
-              "frequency": ATTRIBUTES.map { |x| [x, send(x)] }.to_h.compact
+            lang: 'painless',
+            params: {
+              frequency: ATTRIBUTES.map { |x| [x, send(x)] }.to_h.compact
             }
           }
         }
