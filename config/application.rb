@@ -31,6 +31,8 @@ module TogoVar
 
     console do
       Rails.logger = Logger.new(STDOUT)
+
+      require 'togo_var'
     end
 
     config.paths.add File.join('app', 'utils'), eager_load: true
