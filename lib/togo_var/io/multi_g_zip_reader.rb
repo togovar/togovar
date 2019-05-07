@@ -7,7 +7,15 @@ module TogoVar
         def open(filename)
           gz = new(File.open(filename, 'rb'))
 
-          yield gz if block_given?
+          if block_given?
+            begin
+              yield gz
+            ensure
+              gz.close
+            end
+          else
+            gz
+          end
         end
       end
 
