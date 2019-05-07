@@ -13,6 +13,7 @@ module TogoVar
 
     register(Convert, 'convert', 'convert [COMMAND]', 'convert tools')
     register(Elasticsearch, 'elasticsearch', 'elasticsearch [COMMAND]', 'elasticsearch tools')
+    register(Virtuoso, 'virtuoso', 'virtuoso [COMMAND]', 'virtuoso tools')
   end
 end
 
