@@ -129,7 +129,7 @@ module TogoVar
                 if conditions
                   f.write [conditions.first.update, Models::Condition.upsert_action(*conditions)]
                 end
-                STDERR.print "\r #{i}" if ((i += 1) % 10_000).zero?
+                STDERR.print "\r #{i}" if ((i += 1) % 1_000).zero?
               end
             end
           end
