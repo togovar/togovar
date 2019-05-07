@@ -54,6 +54,7 @@ module VariantSearchable
         indexes :conditions, type: :nested do
           indexes :vcv, type: :keyword
           indexes :rcv, type: :keyword
+          indexes :medgen, type: :keyword
           indexes :condition, type: :keyword
           indexes :interpretations, type: :keyword
         end
