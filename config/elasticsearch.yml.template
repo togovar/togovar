@@ -11,6 +11,6 @@ test:
 
 production:
   <<: *defaults
-  host: togovar_es:9200
+  host: elasticsearch:9200
   user: elastic
   password: changeme
