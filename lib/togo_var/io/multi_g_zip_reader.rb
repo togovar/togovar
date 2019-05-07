@@ -26,6 +26,10 @@ module TogoVar
         @lineno = 0
       end
 
+      def close
+        @io.close
+      end
+
       def each_line(**options)
         return to_enum(__method__, **options) unless block_given?
 
@@ -54,10 +58,15 @@ module TogoVar
             unused = (u = gz.unused) ? u.size : 0
             gz.finish
           end
-          @io.seek(-unused, IO::SEEK_CUR)
+          @io.seek(-unused, ::IO::SEEK_CUR)
         end
 
         @io.close
+      end
+
+      def gets
+        @line ||= each
+        @line.next
       end
 
       alias each each_line
