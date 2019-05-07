@@ -1,5 +1,6 @@
 module TogoVar
   module IO
+    require 'togo_var/io/multi_g_zip_reader'
     require 'togo_var/io/ndjson'
     require 'togo_var/io/vcf'
     require 'togo_var/io/vep'

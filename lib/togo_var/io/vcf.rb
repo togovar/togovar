@@ -122,7 +122,7 @@ module TogoVar
       class << self
         def open(*args)
           f = if args.first.match?(/\.gz$/)
-                Zlib::GzipReader.open(*args)
+                MultiGZipReader.open(*args)
               else
                 File.open(*args)
               end
