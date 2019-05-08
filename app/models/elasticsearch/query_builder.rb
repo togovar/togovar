@@ -19,8 +19,7 @@ module Elasticsearch
       @polyphen_conditions = []
       @from = 0
       @size = 100
-      @count_only = false
-      @stat = true
+      @sort = true
     end
 
     def term(term)
@@ -46,6 +45,7 @@ module Elasticsearch
                   disease_condition(term)
                 end
               end
+
       self
     end
 
@@ -98,16 +98,6 @@ module Elasticsearch
 
     def for_all_datasets(boolean)
       @for_all_datasets = !!boolean
-      self
-    end
-
-    def count_only(boolean)
-      @count_only = !!boolean
-      self
-    end
-
-    def stat(boolean)
-      @stat = !!boolean
       self
     end
 
@@ -237,7 +227,27 @@ module Elasticsearch
       self
     end
 
-    def build(statistics = true)
+    def limit(size)
+      @size = size
+      self
+    end
+
+    def sort(bool)
+      @sort = bool
+      self
+    end
+
+    def stat_query
+      query = build
+
+      query[:size] = 0
+      query.delete(:from)
+      query.delete(:sort)
+
+      query.merge(aggregations)
+    end
+
+    def build
       conditions = []
 
       conditions << @term[:query] if @term
@@ -278,9 +288,7 @@ module Elasticsearch
       query = if conditions.empty?
                 default_scope
               else
-                if @dataset_conditions.empty?
-                  conditions << default_scope[:query] if @dataset_conditions.empty?
-                end
+                conditions << default_scope[:query] if @dataset_conditions.empty?
                 {
                   query: {
                     bool: {
@@ -290,15 +298,9 @@ module Elasticsearch
                 }
               end
 
-      if @count_only
-        query[:size] = 0
-      else
-        query[:size] = @size
-        query[:from] = @from unless @from.zero?
-        query[:sort] = %i[chromosome_sort start stop]
-      end
-
-      query.merge!(aggregations) if @stat
+      query[:size] = @size
+      query[:from] = @from unless @from.zero?
+      query[:sort] = %i[chromosome_sort start stop] if @sort
 
       query
     end

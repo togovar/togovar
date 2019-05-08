@@ -14,8 +14,9 @@ class Variant
     def total
       @total ||= begin
         query = ::Elasticsearch::QueryBuilder.new
-                  .count_only(true)
-                  .build(false)
+                  .limit(0)
+                  .sort(false)
+                  .build
 
         Elasticsearch.search(query).results.total
       end
