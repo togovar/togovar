@@ -6,8 +6,8 @@ class Variant
   class << self
     # @param [Hash] query
     # @return [Elasticsearch::Model::Response] response
-    def search(query)
-      Elasticsearch.search(query)
+    def search(query, options = {})
+      Elasticsearch.search(query, options)
     end
 
     # @return [Integer] number of total records

@@ -1,53 +1,52 @@
-# avoid multi time query execution
-results = @response.raw_response['hits']['hits'].map { |hit| Elasticsearch::Model::Response::Result.new(hit) }
-aggs = @response.aggregations
-filtered_total = @response.raw_response['hits']['total']
-
 json.scroll do
   json.offset @param.offset
   json.limit @param.limit
   json.max_rows 10_000 # FIXME extract to config
 end
 
-if aggs.present?
+if @result[:aggs].present?
   json.statistics do
     json.total Variant.total
-    json.filtered filtered_total
+    json.filtered @result[:filtered_total]
 
     json.dataset do
-      Array(aggs.dig(:aggs_frequencies, :group_by_source, :buckets)).each do |x|
+      Array(@result[:aggs].dig(:aggs_frequencies, :group_by_source, :buckets)).each do |x|
         json.set! x[:key].downcase.tr('-', '_'), x[:doc_count]
       end
-      unless (c = aggs.dig(:total_clinvar, :doc_count)).zero?
+      unless (c = @result[:aggs].dig(:total_clinvar, :doc_count)).zero?
         json.clinvar c
       end
     end
 
     json.type do
-      Array(aggs.dig(:group_by_type, :buckets)).each do |x|
+      Array(@result[:aggs].dig(:group_by_type, :buckets)).each do |x|
         json.set! x[:key], x[:doc_count]
       end
     end
 
     json.significance do
-      unless (c = filtered_total - aggs.dig(:total_clinvar, :doc_count)).zero?
+      unless (c = @result[:filtered_total] - @result[:aggs].dig(:total_clinvar, :doc_count)).zero?
         json.NC c
       end
-      Array(aggs.dig(:aggs_conditions, :group_by_interpretations, :buckets)).each do |x|
+      Array(@result[:aggs].dig(:aggs_conditions, :group_by_interpretations, :buckets)).each do |x|
         key = x[:key].downcase.tr(' ', '_').to_sym
-        json.set! Form::ClinicalSignificance[key].param_name, x[:doc_count]
+        if (sig = Form::ClinicalSignificance[key])
+          json.set! sig.param_name, x[:doc_count]
+        else
+          Rails.logger.warn("Not found `#{key}` in Form::ClinicalSignificance")
+        end
       end
     end
 
     json.consequence do
-      Array(aggs.dig(:aggs_consequences, :group_by_consequences, :buckets)).each do |x|
+      Array(@result[:aggs].dig(:aggs_consequences, :group_by_consequences, :buckets)).each do |x|
         json.set! x[:key], x[:doc_count]
       end
     end
   end
 end
 
-json.data results do |variant|
+json.data @result[:hits] do |variant|
   source = variant[:_source].deep_symbolize_keys
 
   existing_variations = Array(source[:existing_variations]).map { |x| "rs#{x}" }
