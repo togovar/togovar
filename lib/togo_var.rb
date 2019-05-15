@@ -8,7 +8,9 @@ module TogoVar
 
   module Models
     require 'togo_var/models/condition'
+    require 'togo_var/models/disease'
     require 'togo_var/models/frequency'
+    require 'togo_var/models/gene_symbol'
     require 'togo_var/models/transcript'
     require 'togo_var/models/variant'
   end
