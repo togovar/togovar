@@ -4,7 +4,7 @@ defaults: &defaults
   port: 1111
   user: dba
   password:
-  default_graph: http://togovar.biosciencedbc.jp
+  base_url: http://togovar.biosciencedbc.jp
   load_dir: /data/togovar
 
 development:
