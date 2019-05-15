@@ -51,13 +51,11 @@ module TogoVar
 
         prefix = options[:prefix].present? ? options[:prefix] : "variants_#{date_time_for_file_name}_"
 
-        ::TogoVar::IO::VEP.open(vep).each_slice(100_000).with_index(1) do |slice, i|
-          Zlib::GzipWriter.open("#{prefix}#{i}.nt.gz") do |gz|
-            RDF::Writer.for(:ntriples).new(gz) do |writer|
-              slice.each do |v|
-                writer << ::TogoVar::Models::Variant.compose(*v)
-                STDERR.print "\r #{count}" if ((count += 1) % 1000).zero?
-              end
+        Zlib::GzipWriter.open("#{prefix}.nt.gz") do |gz|
+          RDF::Writer.for(:ntriples).new(gz) do |writer|
+            ::TogoVar::IO::VEP.foreach(vep) do |v|
+              writer << ::TogoVar::Models::Variant.compose(*v)
+              STDERR.print "\r #{count}" if ((count += 1) % 1000).zero?
             end
           end
         end
