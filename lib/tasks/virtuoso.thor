@@ -8,17 +8,24 @@ module TogoVar
 
     namespace 'togovar virtuoso'
 
-    desc 'load [name = clinvar|...]', 'load RDF'
+    desc 'load [name = clinvar|hgnc|so|...]', 'load RDF'
+
     def load(name)
       require_relative '../../config/environment'
 
       config = Rails.configuration.virtuoso
 
-      case name.downcase
-      when 'clinvar'
-        load_dir File.join(config['load_dir'], 'virtuoso', 'clinvar', 'latest'),
-                 '*.ttl.gz',
-                 RDF::URI.new(config['default_graph']).join('/graph/clinvar')
+      case (key = name.downcase)
+      when 'clinvar', 'hgnc'
+        path = File.join(config['load_dir'], 'virtuoso', key, 'latest')
+        graph = RDF::URI.new(config['base_url']).join("/graph/#{key}")
+
+        load_dir path, '*.ttl.gz', graph
+      when 'so'
+        path = File.join(config['load_dir'], 'virtuoso', key, 'latest')
+        graph = RDF::URI.new(config['base_url']).join("/graph/#{key}")
+
+        load_dir path, '*.owl', graph
       else
         raise("unknown name: #{name}")
       end
@@ -82,7 +89,7 @@ module TogoVar
       run <<-BASH, verbose: false
         #{isql} -H #{host} -S #{port} -U #{user} -P #{password} VERBOSE=OFF BANNER=OFF EXEC="ld_dir('#{path}', '#{pattern}', '#{graph}');"
 
-        echo
+        echo "Graph: #{graph}"
         echo "Files to be loaded"
         echo
         #{isql} -H #{host} -S #{port} -U #{user} -P #{password} VERBOSE=OFF BANNER=OFF EXEC="SELECT ll_file FROM DB.DBA.LOAD_LIST where ll_state = 0;"
