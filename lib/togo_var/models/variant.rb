@@ -1,12 +1,15 @@
 require 'active_support'
 require 'active_support/core_ext'
 require 'json'
+require 'rdf'
 
 require 'togo_var/models/transcript'
+require 'togo_var/rdf/vocabulary'
 
 module TogoVar
   module Models
     class Variant
+      include TogoVar::Vocabulary
 
       SO_VARIANT_TYPE = Hash.new { |hash, key| hash[key] = SequenceOntology.find_by_label(key) }
 
@@ -19,7 +22,7 @@ module TogoVar
 
           new(data.first) do |v|
             trs = data.map { |x| Transcript.new(x) }
-            v.transcripts = trs.map(&:to_h)
+            v.transcripts = trs
             v.most_severe_consequence = Transcript.most_severe_consequence(*trs)
           end
         end
@@ -98,6 +101,73 @@ module TogoVar
       def to_json(*args)
         to_h.to_json(*args)
       end
+
+      def to_rdf
+        data = RDFDataset.new
+
+        s = RDF::URI.new("#{Rails.configuration.virtuoso['base_url']}/variant/tgv#{tgv_id}")
+
+        data << [s, RDF.type, OBO[variant_type]]
+
+        data << [s, RDF::Vocab::DC.identifier, "tgv#{tgv_id}"]
+        data << [s, RDF::Vocab::RDFS.label, hgvs_g] if hgvs_g.present?
+
+        data << [s, M2R['reference_allele'], reference || '']
+        data << [s, M2R['alternative_allele'], alternative || '']
+
+        # position
+        region   = RDF::Node.new
+        bn_begin = RDF::Node.new
+        if start != stop
+          bn_end = RDF::Node.new
+
+          data << [region, RDF.type, FALDO.Region]
+          data << [region, FALDO.begin, bn_begin]
+          data << [region, FALDO.end, bn_end]
+
+          data << [bn_end, RDF.type, FALDO.ExactPosition]
+          data << [bn_end, FALDO.position, stop]
+          data << [bn_end, FALDO.reference, HCO[chromosome] / '#GRCh37']
+        end
+
+        data << [bn_begin, RDF.type, FALDO.ExactPosition]
+        data << [bn_begin, FALDO.position, start]
+        data << [bn_begin, FALDO.reference, HCO[chromosome] / '#GRCh37']
+
+        data << [s, FALDO.location, start == stop ? bn_begin : region]
+
+        Array(existing_variations).each do |x|
+          data << [s, RDF::Vocab::RDFS.seeAlso, RDF::URI.new("http://identifiers.org/dbsnp/#{x}")]
+        end
+
+        data << [s, TGVO.most_severe_consequence, OBO[most_severe_consequence]] if most_severe_consequence.present?
+
+        transcripts.each do |t|
+          data.concat(t.to_triples(s))
+        end
+
+        data
+      end
+    end
+
+    class RDFDataset
+      extend Forwardable
+      include RDF::Enumerable
+
+      def initialize
+        super
+        @array = []
+      end
+
+      def <<(data)
+        @array << RDF::Statement(*data)
+      end
+
+      def concat(other)
+        other.each { |o| self << o }
+      end
+
+      def_delegators :@array, :each
     end
   end
 end

@@ -2,9 +2,12 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'json'
 
+require 'togo_var/rdf/vocabulary'
+
 module TogoVar
   module Models
     class Transcript
+      include TogoVar::Vocabulary
 
       SO_CONSEQUENCE = Hash.new { |hash, key| hash[key] = SequenceOntology.find_by_label(key) }
 
@@ -21,10 +24,8 @@ module TogoVar
         end
       end
 
-      ATTRIBUTES = %i[most_severe most_severe consequences gene_id transcript_id
+      ATTRIBUTES = %i[consequences gene_id transcript_id
                       hgnc_id symbol symbol_source hgvs_c hgvs_p sift polyphen].freeze
-
-      attr_accessor :most_severe
 
       attr_accessor :transcript_id
       attr_accessor :consequences
@@ -40,9 +41,9 @@ module TogoVar
       def initialize(data = nil)
         if data.is_a?(TogoVar::IO::VEP::Annotation)
           @consequences = data.consequence
-                           &.split(',')
-                           &.map { |x| SO_CONSEQUENCE[x]&.id }
-                           &.compact.presence
+                            &.split(',')
+                            &.map { |x| SO_CONSEQUENCE[x]&.id }
+                            &.compact.presence
           @gene_id = data.gene.presence
           @transcript_id = data.feature.presence
           @hgnc_id = data.hgnc_id.presence&.to_i
@@ -59,6 +60,25 @@ module TogoVar
 
       def to_h
         ATTRIBUTES.map { |x| [x, send(x)] }.to_h.compact
+      end
+
+      def to_triples(parent = RDF::Node.new)
+        data = []
+
+        data << [parent, TGVO.has_consequence, (s = RDF::Node.new)]
+
+        Array(consequences).each do |x|
+          data << [s, RDF.type, OBO[x]]
+        end
+
+        data << [s, RDF::Vocab::RDFS.label, hgvs_c] if hgvs_c.present?
+        data << [s, RDF::Vocab::RDFS.label, hgvs_p] if hgvs_p.present?
+        data << [s, TGVO.gene, RDF::URI("http://rdf.ebi.ac.uk/resource/ensembl/#{gene_id}")] if gene_id.present?
+        data << [s, TGVO.transcript, RDF::URI("http://rdf.ebi.ac.uk/resource/ensembl.transcript/#{transcript_id}")] if transcript_id.presence
+        data << [s, TGVO.sift, sift.to_f] if sift.present?
+        data << [s, TGVO.polyphen, polyphen.to_f] if polyphen.present?
+
+        data
       end
     end
   end

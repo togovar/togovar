@@ -104,6 +104,8 @@ module TogoVar
         col_sep: /\s+/
       }.freeze
 
+      include Enumerable
+
       attr_reader :lineno
 
       def initialize(data, options = Hash.new)
