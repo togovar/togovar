@@ -14,7 +14,7 @@ class GeneSymbol
           'symbol-suggest': {
             prefix: prefix,
             completion: {
-              field: 'symbol',
+              field: 'symbol.suggest',
               size: 100
             }
           }
