@@ -54,31 +54,38 @@ module Elasticsearch
         query do
           bool do
             must do
-              nested do
-                path :frequencies
-                query do
-                  bool do
-                    must { match 'frequencies.source': key }
-                    if filtered
-                      must { regexp 'frequencies.filter': 'PASS|Passed' }
-                    end
-                    if frequency_from && frequency_to
-                      if invert
-                        must do
-                          bool do
-                            must_not do
-                              range 'frequencies.frequency' do
-                                gte frequency_from.to_f
-                                lte frequency_to.to_f
+              if key.to_s == 'clinvar'
+                nested do
+                  path :conditions
+                  query { exists { field :conditions } }
+                end
+              else
+                nested do
+                  path :frequencies
+                  query do
+                    bool do
+                      must { match 'frequencies.source': key }
+                      if filtered
+                        must { regexp 'frequencies.filter': 'PASS|Passed' }
+                      end
+                      if frequency_from && frequency_to
+                        if invert
+                          must do
+                            bool do
+                              must_not do
+                                range 'frequencies.frequency' do
+                                  gte frequency_from.to_f
+                                  lte frequency_to.to_f
+                                end
                               end
                             end
                           end
-                        end
-                      else
-                        must do
-                          range 'frequencies.frequency' do
-                            gte frequency_from.to_f
-                            lte frequency_to.to_f
+                        else
+                          must do
+                            range 'frequencies.frequency' do
+                              gte frequency_from.to_f
+                              lte frequency_to.to_f
+                            end
                           end
                         end
                       end
@@ -387,14 +394,14 @@ module Elasticsearch
     end
 
     def tgv_condition(term)
-      id = term.delete(' ').split(',')
+      id = term.split(/[\s,]/)
 
       query = Elasticsearch::DSL::Search.search do
         query do
           bool do
             id.each do |x|
               should do
-                match tgv_id: x
+                match tgv_id: x.sub(/^tgv/, '').to_i
               end
             end
           end
@@ -405,14 +412,14 @@ module Elasticsearch
     end
 
     def rs_condition(term)
-      id = term.delete(' ').split(',')
+      id = term.split(/[\s,]/)
 
       query = Elasticsearch::DSL::Search.search do
         query do
           bool do
             id.each do |x|
               should do
-                match existing_variations: x.sub(/^rs/, '').to_i
+                match existing_variations: x
               end
             end
           end
@@ -423,7 +430,7 @@ module Elasticsearch
     end
 
     def position_condition(term)
-      positions = term.delete(' ').split(',')
+      positions = term.split(/[\s,]/)
 
       query = Elasticsearch::DSL::Search.search do
         query do
@@ -446,7 +453,7 @@ module Elasticsearch
     end
 
     def region_condition(term)
-      positions = term.delete(' ').split(',')
+      positions = term.split(/[\s,]/)
 
       query = Elasticsearch::DSL::Search.search do
         query do
@@ -471,9 +478,19 @@ module Elasticsearch
                           lte stop.to_i
                         end
                       end
-                      bool do
-                        must { range(:start) { lte start.to_i } }
-                        must { range(:stop) { gte stop.to_i } }
+                      should do
+                        bool do
+                          must do
+                            range :start do
+                              lte start.to_i
+                            end
+                          end
+                          must do
+                            range :stop do
+                              gte stop.to_i
+                            end
+                          end
+                        end
                       end
                     end
                   end
