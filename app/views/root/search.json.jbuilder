@@ -49,7 +49,7 @@ end
 json.data @result[:hits] do |variant|
   source = variant[:_source].deep_symbolize_keys
 
-  existing_variations = Array(source[:existing_variations]).map { |x| "rs#{x}" }
+  existing_variations = Array(source[:existing_variations])
   symbols = Array(source[:transcripts])
               .select { |x| x[:symbol] && x[:symbol_source] == 'HGNC' && x[:hgnc_id] }
               .map { |x| { name: x[:symbol], id: x[:hgnc_id], synonyms: GeneSymbol.synonyms_for(x[:symbol]) } }
