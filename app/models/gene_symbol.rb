@@ -29,7 +29,7 @@ class GeneSymbol
     def search(term)
       query = ::Elasticsearch::DSL::Search.search do
         query do
-          match 'symbol.raw': term
+          match 'symbol': term
         end
       end
 
