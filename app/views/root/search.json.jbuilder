@@ -65,6 +65,7 @@ json.data @result[:hits] do |variant|
   sift = Array(source[:transcripts]).map { |x| x[:sift] }.compact.max
   polyphen = Array(source[:transcripts]).map { |x| x[:polyphen] }.compact.min
 
+  # TODO: remove vcv
   conditions = Array(source[:conditions]).map do |x|
     x.slice(:condition, :vcv, :interpretations)
   end
@@ -84,6 +85,15 @@ json.data @result[:hits] do |variant|
   json.alternative source[:alternative]
 
   json.symbols symbols
+
+  json.external_link do
+    if source[:existing_variations].present?
+      json.dbsnp Array(source[:existing_variations])
+    end
+    if source[:conditions].present?
+      json.clinvar source[:conditions].map { |x| x[:vcv] }.compact.uniq
+    end
+  end
 
   json.most_severe_consequence source[:most_severe_consequence]
   json.sift sift
