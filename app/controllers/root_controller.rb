@@ -32,15 +32,23 @@ class RootController < ApplicationController
           return
         end
 
-        aggs = @param.stat? ? Variant.search(builder.stat_query).aggregations : {}
-        response = Variant.search(builder.build, @param.term.present? ? {} : { request_cache: true })
+        @result = if BINARY_FILTERS.map { |x| @param.selected_none?(x) }.any?
+                    {
+                      filtered_total: 0,
+                      hits: [],
+                      aggs: {}
+                    }
+                  else
+                    aggs = @param.stat? ? Variant.search(builder.stat_query).aggregations : {}
+                    response = Variant.search(builder.build, request_cache: !@param.term.present? )
 
-        @result = {
-          filtered_total: response.raw_response['hits']['total'],
-          hits: response.raw_response['hits']['hits']
-                  .map { |hit| Elasticsearch::Model::Response::Result.new(hit) },
-          aggs: aggs
-        }
+                    {
+                      filtered_total: response.raw_response['hits']['total'],
+                      hits: response.raw_response['hits']['hits']
+                              .map { |hit| Elasticsearch::Model::Response::Result.new(hit) },
+                      aggs: aggs
+                    }
+                  end
 
         render 'search', formats: 'json', handlers: 'jbuilder'
       end

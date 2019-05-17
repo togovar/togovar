@@ -4,11 +4,11 @@ json.scroll do
   json.max_rows 10_000 # FIXME extract to config
 end
 
-if @result[:aggs].present?
-  json.statistics do
-    json.total Variant.total
-    json.filtered @result[:filtered_total]
+json.statistics do
+  json.total Variant.total
+  json.filtered @result[:filtered_total]
 
+  if @result[:aggs].present?
     json.dataset do
       Array(@result[:aggs].dig(:aggs_frequencies, :group_by_source, :buckets)).each do |x|
         json.set! x[:key].downcase.tr('-', '_'), x[:doc_count]

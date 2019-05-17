@@ -7,7 +7,6 @@ module Elasticsearch
     attr_accessor :from
     attr_accessor :size
 
-    # @param [Form::VariantSearchParameters] params
     def initialize
       @term = nil
       @dataset_conditions = []
@@ -144,11 +143,12 @@ module Elasticsearch
             end
             values.each do |x|
               next if x == 'Not in ClinVar'
+              next unless (p = Form::ClinicalSignificance.param_name(x))
 
               should do
                 nested do
                   path :conditions
-                  query { match 'conditions.interpretations': x.downcase }
+                  query { match 'conditions.interpretations': p.key }
                 end
               end
             end
@@ -182,18 +182,25 @@ module Elasticsearch
       self
     end
 
-    def sift(from, to)
+    def sift(*values)
       query = Elasticsearch::DSL::Search.search do
         query do
-          should do
-            nested do
-              path :transcripts
-              query do
-                bool do
-                  should do
-                    range 'transcripts.sift' do
-                      gte from.to_f
-                      lte to.to_f
+          bool do
+            values.each do |x|
+              should do
+                nested do
+                  path :transcripts
+                  query do
+                    bool do
+                      should do
+                        range 'transcripts.sift' do
+                          if x == :D
+                            lt 0.05
+                          elsif x == :T
+                            gte 0.05
+                          end
+                        end
+                      end
                     end
                   end
                 end
@@ -208,18 +215,30 @@ module Elasticsearch
       self
     end
 
-    def polyphen(from, to)
+    def polyphen(*values)
       query = Elasticsearch::DSL::Search.search do
         query do
-          should do
-            nested do
-              path :transcripts
-              query do
-                bool do
-                  should do
-                    range 'transcripts.polyphen' do
-                      gte from.to_f
-                      lte to.to_f
+          bool do
+            values.each do |x|
+              next if x == :U
+
+              should do
+                nested do
+                  path :transcripts
+                  query do
+                    bool do
+                      should do
+                        range 'transcripts.polyphen' do
+                          if x == :PROBD
+                            gt 0.908
+                          elsif x == :POSSD
+                            gt 0.446
+                            lte 0.908
+                          elsif x == :B
+                            lte 0.446
+                          end
+                        end
+                      end
                     end
                   end
                 end
@@ -260,10 +279,16 @@ module Elasticsearch
       conditions << @term[:query] if @term
 
       unless @dataset_conditions.empty?
-        conditions << if @for_all_datasets
-                        { bool: { must: @dataset_conditions } }
+        conditions << if @dataset_conditions.size == 1
+                        @dataset_conditions.first
                       else
-                        { bool: { should: @dataset_conditions } }
+                        {
+                          bool: if @for_all_datasets
+                                  { must: @dataset_conditions }
+                                else
+                                  { should: @dataset_conditions }
+                                end
+                        }
                       end
       end
 
@@ -297,11 +322,15 @@ module Elasticsearch
               else
                 conditions << default_scope[:query] if @dataset_conditions.empty?
                 {
-                  query: {
-                    bool: {
-                      must: conditions
-                    }
-                  }
+                  query: if conditions.size == 1
+                           conditions.first
+                         else
+                           {
+                             bool: {
+                               must: conditions
+                             }
+                           }
+                         end
                 }
               end
 
