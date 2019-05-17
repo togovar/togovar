@@ -57,7 +57,8 @@ class RootController < ApplicationController
       builder.size = @param.limit
 
       if BINARY_FILTERS.map { |x| @param.selected_none?(x) }.any?
-        builder.count_only(true)
+        builder.from = 0
+        builder.size = 0
       else
         unless @param.selected_all?(:dataset)
           @param.selected_items(:dataset).each do |name|
