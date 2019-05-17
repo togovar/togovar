@@ -15,6 +15,6 @@ module Form
     # register(:conflicting_data_from_submitters, 'Conflicting data from submitters', 'CD', '1')
     register(:other, 'Other', 'O', '1')
     register(:not_provided, 'Not provided', 'NP', '1')
-    # register(:association_not_found, 'Association not found', 'AN', '1')
+    register(:association_not_found, 'Association not found', 'AN', '1')
   end
 end
