@@ -117,6 +117,105 @@ module TogoVar
         def initialize
           yield self if block_given?
         end
+
+        def variant_type_so
+          case (v = variant_type)
+          when :snv
+            'SO_0001483'
+          when :ins
+            'SO_0000667'
+          when :del
+            'SO_0000159'
+          when :indel
+            'SO_1000032'
+          when :sub
+            'SO_1000002'
+          else
+            raise("Unknown variant type: #{v}")
+          end
+        end
+
+        def start
+          case (v = variant_type)
+          when :snv
+            pos
+          when :ins
+            pos
+          when :del
+            pos + 1
+          when :indel
+            pos
+          when :sub
+            pos
+          else
+            raise("Unknown variant type: #{v}")
+          end
+        end
+
+        def stop
+          case (v = variant_type)
+          when :snv
+            pos
+          when :ins
+            pos + 1
+          when :del
+            pos + ref.length - 2
+          when :indel
+            pos + ref.length - 1
+          when :sub
+            pos + ref.length - 1
+          else
+            raise("Unknown variant type: #{v}")
+          end
+        end
+
+        def ref_display
+          case (v = variant_type)
+          when :snv
+            ref
+          when :ins
+            nil
+          when :del
+            ref[1..-1]
+          when :indel
+            ref
+          when :sub
+            ref
+          else
+            raise("Unknown variant type: #{v}")
+          end
+        end
+
+        def alt_display
+          case (v = variant_type)
+          when :snv
+            alt
+          when :ins
+            alt[1..-1]
+          when :del
+            nil
+          when :indel
+            alt
+          when :sub
+            alt
+          else
+            raise("Unknown variant type: #{v}")
+          end
+        end
+
+        private
+
+        def variant_type
+          raise("#{ref.nil? ? 'ref' : 'alt'} cannot be nil") if ref.nil? || alt.nil?
+
+          @variant_type ||= if ref.length == alt.length
+                              ref.length == 1 ? :snv : :sub
+                            elsif ref[0] == alt[0]
+                              ref.length < alt.length ? :ins : :del
+                            else
+                              :indel
+                            end
+        end
       end
 
       class << self
