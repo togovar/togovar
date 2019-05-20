@@ -35,7 +35,7 @@ module TogoVar
           @num_genotype_hetero = data['num_genotype_hetero']&.to_i
           @frequency = data['frequency']&.to_f
           @filter = data['filter']&.split(/[,;]/)
-          @quality = data['quality']
+          @quality = data['quality']&.to_f
           @vcf = { chromosome: data['chr']&.to_s,
                    position: data['pos']&.to_i,
                    reference: data['ref'],
