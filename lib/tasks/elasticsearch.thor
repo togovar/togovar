@@ -1,3 +1,4 @@
+require 'awesome_print'
 require 'thor'
 require 'elasticsearch/model'
 
