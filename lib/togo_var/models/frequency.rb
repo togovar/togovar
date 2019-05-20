@@ -27,17 +27,17 @@ module TogoVar
       def initialize(data = nil)
         if data.is_a?(CSV::Row)
           @source = data['source']
-          @num_alleles = data['num_alleles']
-          @num_ref_alleles = data['num_ref_alleles']
-          @num_alt_alleles = data['num_alt_alleles']
-          @num_genotype_ref_homo = data['num_genotype_ref_homo']
-          @num_genotype_alt_homo = data['num_genotype_alt_homo']
-          @num_genotype_hetero = data['num_genotype_hetero']
-          @frequency = data['frequency']
+          @num_alleles = data['num_alleles']&.to_i
+          @num_ref_alleles = data['num_ref_alleles']&.to_i
+          @num_alt_alleles = data['num_alt_alleles']&.to_i
+          @num_genotype_ref_homo = data['num_genotype_ref_homo']&.to_i
+          @num_genotype_alt_homo = data['num_genotype_alt_homo']&.to_i
+          @num_genotype_hetero = data['num_genotype_hetero']&.to_i
+          @frequency = data['frequency']&.to_f
           @filter = data['filter']
           @quality = data['quality']
-          @vcf = { chromosome: data['chr'],
-                   position: data['pos'],
+          @vcf = { chromosome: data['chr']&.to_s,
+                   position: data['pos']&.to_i,
                    reference: data['ref'],
                    alternative: data['alt'] }.compact
         end
