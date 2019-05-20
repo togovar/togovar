@@ -106,9 +106,6 @@ module TogoVar
       require_relative '../../config/environment'
       require 'togo_var'
 
-      config = Rails.configuration.endpoint
-      endpoint = SPARQL::Client.new(config['url'])
-
       inside(output) do
         prefix = options[:prefix].present? ? options[:prefix] : "conditions_#{date_time_for_file_name}_"
         i = 0
@@ -116,32 +113,7 @@ module TogoVar
         ::TogoVar::IO::NDJSON.open(prefix: prefix) do |f|
           ::TogoVar::IO::VCF.open(path) do |vcf|
             vcf.each_slice(300) do |slice|
-              query = format(<<~SPARQL, slice.map { |x| "vcv:#{x.id}" }.join(' '))
-                DEFINE sql:select-option "order"
-                PREFIX cvo: <http://purl.jp/bio/10/clinvar/>
-                PREFIX vcv: <http://identifiers.org/clinvar:>
-
-                SELECT DISTINCT ?vcv ?rcv ?condition ?interpretation ?medgen
-                FROM <http://togovar.biosciencedbc.jp/graph/clinvar>
-                WHERE {
-                  VALUES ?_vcv { %s }
-                  ?_vcv cvo:interpreted_record/cvo:rcv_list/cvo:rcv_accession ?_rcv ;
-                    cvo:accession ?vcv .
-                  ?_rcv cvo:interpretation ?interpretation ;
-                    cvo:accession ?rcv ;
-                    cvo:interpreted_condition/cvo:type_rcv_interpreted_condition ?condition .
-                  OPTIONAL {
-                    ?_rcv cvo:interpreted_condition/cvo:db ?db .
-                    ?_rcv cvo:interpreted_condition/cvo:id ?medgen .
-                    FILTER( ?db IN ("MedGen") )
-                  }
-                }
-              SPARQL
-
-              results = endpoint.query(query)
-                          .map { |x| x.bindings.map { |k, v| [k, v.value] }.to_h }
-                          .group_by { |x| x[:vcv] }
-                          .map { |k, v| [k.sub(/^VCV/, '').to_i, v] }.to_h
+              results = Models::Condition.find_conditions(*slice.map(&:id))
 
               slice.each do |row|
                 conditions = results[row.id.to_i]&.map do |r|

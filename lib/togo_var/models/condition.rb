@@ -8,6 +8,38 @@ module TogoVar
     class Condition
 
       class << self
+        def find_conditions(*vcv)
+          config = Rails.configuration.endpoint
+          endpoint = SPARQL::Client.new(config['url'])
+
+          query = format(<<~SPARQL, vcv.map { |x| "vcv:#{x}" }.join(' '))
+            DEFINE sql:select-option "order"
+            PREFIX cvo: <http://purl.jp/bio/10/clinvar/>
+            PREFIX vcv: <http://identifiers.org/clinvar:>
+
+            SELECT DISTINCT ?vcv ?rcv ?condition ?interpretation ?medgen
+            FROM <http://togovar.biosciencedbc.jp/graph/clinvar>
+            WHERE {
+              VALUES ?_vcv { %s }
+              ?_vcv cvo:interpreted_record/cvo:rcv_list/cvo:rcv_accession ?_rcv ;
+                cvo:accession ?vcv .
+              ?_rcv cvo:interpretation ?interpretation ;
+                cvo:accession ?rcv ;
+                cvo:interpreted_condition/cvo:type_rcv_interpreted_condition ?condition .
+              OPTIONAL {
+                ?_rcv cvo:interpreted_condition/cvo:db ?db .
+                ?_rcv cvo:interpreted_condition/cvo:id ?medgen .
+                FILTER( ?db IN ("MedGen") )
+              }
+            }
+          SPARQL
+
+          endpoint.query(query)
+            .map { |x| x.bindings.map { |k, v| [k, v.value] }.to_h }
+            .group_by { |x| x[:vcv] }
+            .map { |k, v| [k.sub(/^VCV/, '').to_i, v] }.to_h
+        end
+
         def upsert_action(*conditions)
           c = conditions.first
           {
@@ -19,18 +51,19 @@ module TogoVar
               }
             },
             upsert: {
-              chromosome: c.vcf[:chromosome],
-              chromosome_sort: Variant::CHROMOSOME_CODE[c.vcf[:chromosome]],
-              start: c.vcf[:position].to_i,
-              stop: c.vcf[:position].to_i + c.vcf[:reference].length - 1,
-              reference: c.vcf[:reference],
-              alternative: c.vcf[:alternative],
-              vcf: { chromosome: c.vcf[:chromosome],
-                     position: c.vcf[:position].to_i,
-                     reference: c.vcf[:reference],
-                     alternative: c.vcf[:alternative] },
+              chromosome: c.vcf.chrom,
+              chromosome_sort: Variant::CHROMOSOME_CODE[c.vcf.chrom],
+              start: c.vcf.start,
+              stop: c.vcf.stop,
+              variant_type: c.vcf.variant_type_so,
+              reference: c.vcf.ref_display,
+              alternative: c.vcf.alt_display,
+              vcf: { chromosome: c.vcf.chrom,
+                     position: c.vcf.pos.to_i,
+                     reference: c.vcf.ref,
+                     alternative: c.vcf.alt }.compact,
               conditions: conditions.map(&:to_h)
-            }
+            }.compact
           }
         end
       end
@@ -46,12 +79,7 @@ module TogoVar
       attr_accessor :vcf
 
       def initialize(data = nil)
-        if data.is_a?(TogoVar::IO::VCF::Row)
-          @vcf = { chromosome: data.chrom,
-                   position: data.pos,
-                   reference: data.ref,
-                   alternative: data.alt }.compact
-        end
+        @vcf = data if data.is_a?(TogoVar::IO::VCF::Row)
 
         yield self if block_given?
       end
@@ -59,7 +87,12 @@ module TogoVar
       def _id
         return if @vcf.nil?
 
-        TogoVar::Models::Variant.new { |x| x.vcf = @vcf }._id
+        TogoVar::Models::Variant.new do |x|
+          x.vcf = { chromosome: @vcf.chrom,
+                    position: @vcf.pos,
+                    reference: @vcf.ref,
+                    alternative: @vcf.alt }.compact
+        end._id
       end
 
       def update
