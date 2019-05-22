@@ -10,6 +10,7 @@ module Elasticsearch
     def initialize
       @term = nil
       @dataset_conditions = []
+      @frequency_conditions = []
       @for_all_datasets = false
       @type_conditions = []
       @significance_conditions = []
@@ -48,12 +49,12 @@ module Elasticsearch
       self
     end
 
-    def dataset(key, frequency_from = nil, frequency_to = nil, invert = false, filtered = false)
+    def dataset(key)
       query = Elasticsearch::DSL::Search.search do
         query do
           bool do
             must do
-              if key.to_s == 'clinvar'
+              if key.to_sym == :clinvar
                 nested do
                   path :conditions
                   query { exists { field :conditions } }
@@ -61,31 +62,47 @@ module Elasticsearch
               else
                 nested do
                   path :frequencies
-                  query do
-                    bool do
-                      must { match 'frequencies.source': key }
-                      if filtered
-                        must { regexp 'frequencies.filter': 'PASS|Passed' }
-                      end
-                      if frequency_from && frequency_to
-                        if invert
-                          must do
-                            bool do
-                              must_not do
-                                range 'frequencies.frequency' do
-                                  gte frequency_from.to_f
-                                  lte frequency_to.to_f
-                                end
-                              end
-                            end
-                          end
-                        else
-                          must do
+                  query { match 'frequencies.source': key }
+                end
+              end
+            end
+          end
+        end
+      end
+
+      @dataset_conditions.push query.to_hash[:query]
+
+      self
+    end
+
+    def frequency(key, frequency_from, frequency_to, invert = false)
+      return self if key.to_sym == :clinvar
+
+      query = Elasticsearch::DSL::Search.search do
+        query do
+          bool do
+            must do
+              nested do
+                path :frequencies
+                query do
+                  bool do
+                    must { match 'frequencies.source': key }
+                    if invert
+                      must do
+                        bool do
+                          must_not do
                             range 'frequencies.frequency' do
                               gte frequency_from.to_f
                               lte frequency_to.to_f
                             end
                           end
+                        end
+                      end
+                    else
+                      must do
+                        range 'frequencies.frequency' do
+                          gte frequency_from.to_f
+                          lte frequency_to.to_f
                         end
                       end
                     end
@@ -97,7 +114,7 @@ module Elasticsearch
         end
       end
 
-      @dataset_conditions.push query.to_hash[:query]
+      @frequency_conditions.push query.to_hash[:query]
 
       self
     end
@@ -282,11 +299,19 @@ module Elasticsearch
         conditions << if @dataset_conditions.size == 1
                         @dataset_conditions.first
                       else
+                        { bool: { should: @dataset_conditions } }
+                      end
+      end
+
+      unless @frequency_conditions.empty?
+        conditions << if @frequency_conditions.size == 1
+                        @frequency_conditions.first
+                      else
                         {
                           bool: if @for_all_datasets
-                                  { must: @dataset_conditions }
+                                  { must: @frequency_conditions }
                                 else
-                                  { should: @dataset_conditions }
+                                  { should: @frequency_conditions }
                                 end
                         }
                       end

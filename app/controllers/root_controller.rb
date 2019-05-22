@@ -74,6 +74,13 @@ class RootController < ApplicationController
           end
         end
 
+        unless @param.frequency == Form::Frequency.defaults
+          @param.selected_items(:dataset).each do |name|
+            builder.frequency(name, @param.frequency[:from], @param.frequency[:to], @param.frequency[:invert] == '1')
+          end
+          builder.for_all_datasets(@param.frequency[:match] == 'all')
+        end
+
         %i[type significance consequence sift polyphen].each do |x|
           unless @param.selected_all?(x)
             builder.send(x, *@param.selected_items(x))
