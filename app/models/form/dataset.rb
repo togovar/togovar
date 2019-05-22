@@ -2,6 +2,7 @@ module Form
   class Dataset < ParameterBase
     register(:jga_ngs, 'JGA-NGS', 'jga_ngs', '1')
     register(:jga_snp, 'JGA-SNP', 'jga_snp', '1')
+    register(:hgvd, 'HGVD', 'hgvd', '1')
     register(:tommo, 'ToMMo', 'tommo', '1')
     register(:exac, 'ExAC', 'exac', '1')
     # register(:gnomad, 'gnomAD', 'gnomad', '0')
