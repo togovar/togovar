@@ -43,7 +43,7 @@ module Form
     attr_reader :limit
 
     def initialize(*args)
-      params = args.last.respond_to?(:to_hash) ? args.last.to_hash : args
+      params = args.last.respond_to?(:to_hash) ? args.pop.to_hash : {}
 
       params.deep_symbolize_keys!
 
