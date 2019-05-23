@@ -26,6 +26,45 @@ module TogoVar
             v.most_severe_consequence = Transcript.most_severe_consequence(*trs)
           end
         end
+
+        # @param [TogoVar::IO::VCF::Row] rows
+        def find_by_vcf(*rows)
+          query = ::Elasticsearch::DSL::Search.search do
+            query do
+              bool do
+                rows.each do |vcf|
+                  should do
+                    bool do
+                      must { match 'vcf.chromosome': vcf.chrom }
+                      must { match 'vcf.position': vcf.pos.to_i }
+                      must { match 'vcf.reference': vcf.ref }
+                      must { match 'vcf.alternative': vcf.alt }
+                    end
+                  end
+                end
+              end
+            end
+            size rows.size
+          end
+
+          results = ::Variant.search(query.to_hash).results.map { |x| x._source.to_hash.slice('tgv_id', 'vcf') }
+
+          rows.map do |vcf|
+            match = results.find do |x|
+              x['vcf']['chromosome'] == vcf.chrom &&
+                x['vcf']['position'].to_i == vcf.pos.to_i &&
+                x['vcf']['reference'] == vcf.ref &&
+                x['vcf']['alternative'] == vcf.alt
+            end
+
+            if match
+              id = (v = match['tgv_id']) ? "tgv#{v}" : [vcf.chrom, vcf.pos, vcf.ref, vcf.alt].join('-')
+              [id, vcf.id] # vcf.id = ClinVar VCV
+            else
+              nil
+            end
+          end.compact
+        end
       end
 
       CHROMOSOME_CODE = {

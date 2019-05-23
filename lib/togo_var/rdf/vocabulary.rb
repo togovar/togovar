@@ -1,3 +1,5 @@
+require 'rdf'
+
 module TogoVar
   module Vocabulary
     FALDO = RDF::Vocabulary.new('http://biohackathon.org/resource/faldo#')

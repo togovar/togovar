@@ -139,6 +139,41 @@ module TogoVar
       end
     end
 
+    desc 'condition2rdf <VEP_FILE>', 'convert ClinVar VCF to RDF'
+    option :output, aliases: '-o', type: :string, default: 'out', desc: 'path to output directory'
+    option :prefix, aliases: '-p', type: :string, desc: 'file name prefix'
+
+    def condition2rdf(file)
+      output = File.expand_path(options[:output]).tap(&assert_directory_presence)
+      path = File.expand_path(file).tap(&assert_file_presence)
+
+      require_relative '../../config/environment'
+      require 'rdf'
+      require 'togo_var'
+      require 'zlib'
+
+      inside(output) do
+        count = 0
+
+        prefix = options[:prefix].present? ? options[:prefix] : "variant_conditions_#{date_time_for_file_name}_"
+
+        Zlib::GzipWriter.open("#{prefix}.nt.gz") do |gz|
+          RDF::Writer.for(:ntriples).new(gz) do |writer|
+            IO::VCF.open(path) do |vcf|
+              vcf.each_slice(300) do |slice|
+                Models::Variant.find_by_vcf(*slice).each do |tgv, vcv|
+                  writer << [RDF::URI.new("#{Rails.configuration.virtuoso['base_url']}/variant/#{tgv}"), Vocabulary::TGVO.has_interpreted_condition, RDF::URI("http://identifiers.org/clinvar:#{vcv}")]
+                end
+                STDERR.print "\r #{count += slice.size}"
+              end
+            end
+          end
+        end
+
+        STDERR.puts "\r #{count}"
+      end
+    end
+
     desc 'gene2es <VEP_FILE>', 'Convert gene symbols to Elasticsearch index'
     option :output, aliases: '-o', type: :string, default: 'out', desc: 'path to output directory'
     option :prefix, aliases: '-p', type: :string, desc: 'file name prefix'
