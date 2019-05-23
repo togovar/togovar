@@ -95,6 +95,40 @@ module TogoVar
       end
     end
 
+    desc 'frequency2rdf <VEP_FILE>', 'convert frequency data to RDF'
+    option :output, aliases: '-o', type: :string, default: 'out', desc: 'path to output directory'
+    option :prefix, aliases: '-p', type: :string, desc: 'file name prefix'
+
+    def frequency2rdf(file)
+      output = File.expand_path(options[:output]).tap(&assert_directory_presence)
+      path = File.expand_path(file).tap(&assert_file_presence)
+
+      require_relative '../../config/environment'
+      require 'rdf'
+      require 'togo_var'
+      require 'zlib'
+
+      inside(output) do
+        count = 0
+
+        prefix = options[:prefix].present? ? options[:prefix] : "variant_conditions_#{date_time_for_file_name}_"
+
+        Zlib::GzipWriter.open("#{prefix}.nt.gz") do |gz|
+          RDF::Writer.for(:ntriples).new(gz) do |writer|
+            (path.match?(/\.gz$/) ? Zlib::GzipReader : File).open(path) do |input|
+              CSV.new(input, headers: true, col_sep: "\t").each do |row|
+                writer << Models::Frequency.new(row)
+
+                STDERR.print "\r #{count}" if ((count += 1) % 10_000).zero?
+              end
+            end
+          end
+        end
+
+        STDERR.puts "\r #{count}"
+      end
+    end
+
     desc 'condition2es <VCF_FILE>', 'convert ClinVar VCF to Elasticsearch index'
     option :output, aliases: '-o', type: :string, default: 'out', desc: 'path to output directory'
     option :prefix, aliases: '-p', type: :string, desc: 'file name prefix'
