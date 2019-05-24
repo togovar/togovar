@@ -8,53 +8,47 @@ module Elasticsearch
     attr_accessor :size
 
     def initialize
-      @term = nil
-      @dataset_conditions = []
-      @frequency_conditions = []
-      @for_all_datasets = false
-      @type_conditions = []
-      @significance_conditions = []
-      @consequence_conditions = []
-      @sift_conditions = []
-      @polyphen_conditions = []
       @from = 0
       @size = 100
       @sort = true
     end
 
     def term(term)
-      if term.blank?
-        @term = nil
-        return self
-      end
+      @term_condition = nil
 
-      @term = case term.delete(' ')
-              when /^tgv\d+(,tgv\d+)*$/
-                tgv_condition(term)
-              when /^rs\d+(,rs\d+)*$/i
-                rs_condition(term)
-              when /^(\d+|[XY]|MT):\d+(,(\d+|[XY]|MT):\d+)*$/
-                position_condition(term)
-              when /^(\d+|[XY]|MT):\d+-\d+(,(\d+|[XY]|MT):\d+-\d+)*$/
-                region_condition(term)
-              else
-                if (results = GeneSymbol.search(term).results).total.positive?
-                  symbol_root = results.first.dig(:_source, :alias_of)
-                  gene_condition(symbol_root || results.first.dig(:_source, :symbol))
-                else
-                  disease_condition(term)
-                end
-              end
+      return self if term.blank?
+
+      @term_condition = case term.delete(' ')
+                        when /^tgv\d+(,tgv\d+)*$/
+                          tgv_condition(term)
+                        when /^rs\d+(,rs\d+)*$/i
+                          rs_condition(term)
+                        when /^(\d+|[XY]|MT):\d+(,(\d+|[XY]|MT):\d+)*$/
+                          position_condition(term)
+                        when /^(\d+|[XY]|MT):\d+-\d+(,(\d+|[XY]|MT):\d+-\d+)*$/
+                          region_condition(term)
+                        else
+                          if (results = GeneSymbol.search(term).results).total.positive?
+                            symbol_root = results.first.dig(:_source, :alias_of)
+                            gene_condition(symbol_root || results.first.dig(:_source, :symbol))
+                          else
+                            disease_condition(term)
+                          end
+                        end
 
       self
     end
 
-    def dataset(key)
+    def dataset(names)
+      @dataset_condition = []
+
+      return self if names.empty?
+
       query = Elasticsearch::DSL::Search.search do
         query do
           bool do
-            must do
-              if key.to_sym == :clinvar
+            should do
+              if names.delete(:clinvar)
                 nested do
                   path :conditions
                   query { exists { field :conditions } }
@@ -62,47 +56,57 @@ module Elasticsearch
               else
                 nested do
                   path :frequencies
-                  query { match 'frequencies.source': key }
+                  query { terms 'frequencies.source': names }
                 end
               end
             end
           end
         end
-      end
+      end.to_hash[:query]
 
-      @dataset_conditions.push query.to_hash[:query]
+      @dataset_condition = if query[:bool][:should].size == 1
+                             query[:bool][:should].first
+                           else
+                             query
+                           end
 
       self
     end
 
-    def frequency(key, frequency_from, frequency_to, invert = false)
-      return self if key.to_sym == :clinvar
+    def frequency(datasets, frequency_from, frequency_to, invert, all_datasets)
+      @frequency_condition = nil
+      names = datasets.dup
+      names.delete(:clinvar)
 
-      query = Elasticsearch::DSL::Search.search do
+      return self if names.empty?
+
+      @frequency_condition = Elasticsearch::DSL::Search.search do
         query do
           bool do
-            must do
-              nested do
-                path :frequencies
-                query do
-                  bool do
-                    must { match 'frequencies.source': key }
-                    if invert
-                      must do
-                        bool do
-                          must_not do
-                            range 'frequencies.frequency' do
-                              gte frequency_from.to_f
-                              lte frequency_to.to_f
+            names.each do |name|
+              send(all_datasets ? :must : :should) do
+                nested do
+                  path :frequencies
+                  query do
+                    bool do
+                      must { match 'frequencies.source': name }
+                      if invert
+                        must do
+                          bool do
+                            must_not do
+                              range 'frequencies.frequency' do
+                                gte frequency_from.to_f
+                                lte frequency_to.to_f
+                              end
                             end
                           end
                         end
-                      end
-                    else
-                      must do
-                        range 'frequencies.frequency' do
-                          gte frequency_from.to_f
-                          lte frequency_to.to_f
+                      else
+                        must do
+                          range 'frequencies.frequency' do
+                            gte frequency_from.to_f
+                            lte frequency_to.to_f
+                          end
                         end
                       end
                     end
@@ -112,41 +116,60 @@ module Elasticsearch
             end
           end
         end
-      end
-
-      @frequency_conditions.push query.to_hash[:query]
+      end.to_hash[:query]
 
       self
     end
 
-    def for_all_datasets(boolean)
-      @for_all_datasets = !!boolean
-      self
-    end
+    def quality(datasets)
+      @quality_condition = nil
 
-    def type(*keys)
-      query = Elasticsearch::DSL::Search.search do
+      datasets &= %i[jga_ngs hgvd tommo exac]
+
+      return self if datasets.empty?
+
+      @quality_condition = Elasticsearch::DSL::Search.search do
         query do
-          bool do
-            keys.each do |x|
-              should do
-                match variant_type: x
+          nested do
+            path :frequencies
+            query do
+              bool do
+                must { terms 'frequencies.source': datasets }
+                must { match 'frequencies.filter': 'PASS' }
               end
             end
           end
         end
-      end
+      end.to_hash[:query]
 
-      @type_conditions.push query.to_hash[:query]
+      self
+    end
+
+    def type(*keys)
+      @type_condition = nil
+
+      return self if keys.empty?
+
+      @type_condition = Elasticsearch::DSL::Search.search do
+        query do
+          terms variant_type: keys
+        end
+      end.to_hash[:query]
 
       self
     end
 
     def significance(*values)
-      query = Elasticsearch::DSL::Search.search do
+      @significance_condition = nil
+
+      return self if values.empty?
+
+      values = values.dup
+
+      @significance_condition = Elasticsearch::DSL::Search.search do
         query do
           bool do
-            if values.include?('Not in ClinVar')
+            if values.delete(:NC)
               should do
                 bool do
                   must_not do
@@ -158,65 +181,59 @@ module Elasticsearch
                 end
               end
             end
-            values.each do |x|
-              next if x == 'Not in ClinVar'
-              next unless (p = Form::ClinicalSignificance.param_name(x))
 
-              should do
-                nested do
-                  path :conditions
-                  query { match 'conditions.interpretations': p.key }
-                end
+            interpretations = values.map { |x| Form::ClinicalSignificance.find_by_param_name(x).key }.compact
+
+            break if interpretations.empty?
+
+            should do
+              nested do
+                path :conditions
+                query { terms 'conditions.interpretations': interpretations }
               end
             end
           end
         end
-      end
-
-      @significance_conditions.push query.to_hash[:query]
+      end.to_hash[:query]
 
       self
     end
 
     def consequence(*values)
-      query = Elasticsearch::DSL::Search.search do
+      @consequence_condition = nil
+
+      return self if values.empty?
+
+      @consequence_condition = Elasticsearch::DSL::Search.search do
         query do
-          bool do
-            values.each do |x|
-              should do
-                nested do
-                  path :transcripts
-                  query { match 'transcripts.consequences': x }
-                end
-              end
-            end
+          nested do
+            path :transcripts
+            query { terms 'transcripts.consequences': values }
           end
         end
-      end
-
-      @consequence_conditions.push query.to_hash[:query]
+      end.to_hash[:query]
 
       self
     end
 
     def sift(*values)
-      query = Elasticsearch::DSL::Search.search do
+      @sift_condition = nil
+
+      return self if values.empty?
+
+      @sift_condition = Elasticsearch::DSL::Search.search do
         query do
-          bool do
-            values.each do |x|
-              should do
-                nested do
-                  path :transcripts
-                  query do
-                    bool do
-                      should do
-                        range 'transcripts.sift' do
-                          if x == :D
-                            lt 0.05
-                          elsif x == :T
-                            gte 0.05
-                          end
-                        end
+          nested do
+            path :transcripts
+            query do
+              bool do
+                values.each do |x|
+                  should do
+                    range 'transcripts.sift' do
+                      if x == :D
+                        lt 0.05
+                      elsif x == :T
+                        gte 0.05
                       end
                     end
                   end
@@ -225,36 +242,34 @@ module Elasticsearch
             end
           end
         end
-      end
-
-      @sift_conditions.push query.to_hash[:query]
+      end.to_hash[:query]
 
       self
     end
 
     def polyphen(*values)
-      query = Elasticsearch::DSL::Search.search do
-        query do
-          bool do
-            values.each do |x|
-              next if x == :U
+      @polyphen_condition = nil
 
-              should do
-                nested do
-                  path :transcripts
-                  query do
-                    bool do
-                      should do
-                        range 'transcripts.polyphen' do
-                          if x == :PROBD
-                            gt 0.908
-                          elsif x == :POSSD
-                            gt 0.446
-                            lte 0.908
-                          elsif x == :B
-                            lte 0.446
-                          end
-                        end
+      values &= [:PROBD, :POSSD, :B]
+
+      return self if values.empty?
+
+      @polyphen_condition = Elasticsearch::DSL::Search.search do
+        query do
+          nested do
+            path :transcripts
+            query do
+              bool do
+                values.each do |x|
+                  should do
+                    range 'transcripts.polyphen' do
+                      if x == :PROBD
+                        gt 0.908
+                      elsif x == :POSSD
+                        gt 0.446
+                        lte 0.908
+                      elsif x == :B
+                        lte 0.446
                       end
                     end
                   end
@@ -263,9 +278,7 @@ module Elasticsearch
             end
           end
         end
-      end
-
-      @polyphen_conditions.push query.to_hash[:query]
+      end.to_hash[:query]
 
       self
     end
@@ -276,7 +289,7 @@ module Elasticsearch
     end
 
     def sort(bool)
-      @sort = bool
+      @sort = !!bool
       self
     end
 
@@ -293,70 +306,26 @@ module Elasticsearch
     def build
       conditions = []
 
-      conditions << @term[:query] if @term
+      conditions << @term_condition
+      conditions << @dataset_condition
+      conditions << @frequency_condition
+      conditions << @quality_condition
+      conditions << @type_condition
+      conditions << @significance_condition
+      conditions << @consequence_condition
+      conditions << @sift_condition
+      conditions << @polyphen_condition
 
-      unless @dataset_conditions.empty?
-        conditions << if @dataset_conditions.size == 1
-                        @dataset_conditions.first
-                      else
-                        { bool: { should: @dataset_conditions } }
-                      end
+      conditions.compact!
+
+      if @dataset_condition.nil? && @frequency_condition.nil? && @quality_condition.nil?
+        conditions << default_scope
       end
 
-      unless @frequency_conditions.empty?
-        conditions << if @frequency_conditions.size == 1
-                        @frequency_conditions.first
-                      else
-                        {
-                          bool: if @for_all_datasets
-                                  { must: @frequency_conditions }
-                                else
-                                  { should: @frequency_conditions }
-                                end
-                        }
-                      end
-      end
-
-      unless @type_conditions.empty?
-        merge = @type_conditions.inject([]) { |memo, obj| memo + obj.dig(:bool, :should) }
-        conditions << { bool: { should: merge } }
-      end
-
-      unless @significance_conditions.empty?
-        merge = @significance_conditions.inject([]) { |memo, obj| memo + obj.dig(:bool, :should) }
-        conditions << { bool: { should: merge } }
-      end
-
-      unless @consequence_conditions.empty?
-        merge = @consequence_conditions.inject([]) { |memo, obj| memo + obj.dig(:bool, :should) }
-        conditions << { bool: { should: merge } }
-      end
-
-      unless @sift_conditions.empty?
-        merge = @sift_conditions.inject([]) { |memo, obj| memo + obj.dig(:bool, :should) }
-        conditions << { bool: { should: merge } }
-      end
-
-      unless @polyphen_conditions.empty?
-        merge = @polyphen_conditions.inject([]) { |memo, obj| memo + obj.dig(:bool, :should) }
-        conditions << { bool: { should: merge } }
-      end
-
-      query = if conditions.empty?
-                default_scope
+      query = if conditions.size == 1
+                { query: conditions.first }
               else
-                conditions << default_scope[:query] if @dataset_conditions.empty?
-                {
-                  query: if conditions.size == 1
-                           conditions.first
-                         else
-                           {
-                             bool: {
-                               must: conditions
-                             }
-                           }
-                         end
-                }
+                { query: { bool: { must: conditions } } }
               end
 
       query[:size] = @size
@@ -444,7 +413,7 @@ module Elasticsearch
         end
       end
 
-      query.to_hash
+      query.to_hash[:query]
     end
 
     def tgv_condition(term)
@@ -462,7 +431,7 @@ module Elasticsearch
         end
       end
 
-      query.to_hash
+      query.to_hash[:query]
     end
 
     def rs_condition(term)
@@ -480,7 +449,7 @@ module Elasticsearch
         end
       end
 
-      query.to_hash
+      query.to_hash[:query]
     end
 
     def position_condition(term)
@@ -503,7 +472,7 @@ module Elasticsearch
         end
       end
 
-      query.to_hash
+      query.to_hash[:query]
     end
 
     def region_condition(term)
@@ -555,7 +524,7 @@ module Elasticsearch
         end
       end
 
-      query.to_hash
+      query.to_hash[:query]
     end
 
     def gene_condition(term)
@@ -570,7 +539,7 @@ module Elasticsearch
         end
       end
 
-      query.to_hash
+      query.to_hash[:query]
     end
 
     def disease_condition(term)
@@ -585,7 +554,7 @@ module Elasticsearch
         end
       end
 
-      query.to_hash
+      query.to_hash[:query]
     end
   end
 end

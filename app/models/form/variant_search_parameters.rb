@@ -50,7 +50,7 @@ module Form
       @term = params.fetch(:term, '')
       @dataset = Form::Dataset.defaults.merge(params.fetch(:dataset, {}))
       @frequency = Form::Frequency.defaults.merge(params.fetch(:frequency, {}))
-      @quality = params.delete(:quality) || '1'
+      @quality = params.fetch(:quality, '1')
       @type = Form::Type.defaults.merge(params.fetch(:type, {}))
       @significance = Form::ClinicalSignificance.defaults.merge(params.fetch(:significance, {}))
       @consequence = Form::Consequence.defaults.merge(params.fetch(:consequence, {}))

@@ -5,10 +5,6 @@ module Form
         map[key] ||= new(key: key, label: label, param_name: param_name, default: default)
       end
 
-      def parameters
-        @parameters ||= all.map(&:param_name)
-      end
-
       def all
         map.values
       end
@@ -17,15 +13,15 @@ module Form
         map[key]
       end
 
-      def lookup(label)
-        (found = map.select { |_, v| v.label == label }).present? ? found.first : nil
-      end
-
       def defaults
         all.map { |x| [x.param_name, x.default] }.to_h.symbolize_keys
       end
 
-      def param_name(name)
+      def parameters
+        @parameters ||= all.map(&:param_name)
+      end
+
+      def find_by_param_name(name)
         map.find { |_, v| v.param_name == name.to_s }&.last
       end
 
