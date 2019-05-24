@@ -66,7 +66,12 @@ json.data @result[:hits] do |variant|
   polyphen = Array(source[:transcripts]).map { |x| x[:polyphen] }.compact.min
 
   conditions = Array(source[:conditions]).map do |x|
-    x.slice(:condition, :interpretations)
+    {
+      condition: x[:condition],
+      interpretations: x[:interpretations].map do |key|
+        Form::ClinicalSignificance[key.downcase.tr(' ', '_').to_sym]&.param_name
+      end
+    }
   end
 
   transcripts = Array(source[:transcripts])
