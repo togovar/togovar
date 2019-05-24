@@ -69,16 +69,19 @@ class RootController < ApplicationController
         builder.size = 0
       else
         unless @param.selected_all?(:dataset)
-          @param.selected_items(:dataset).each do |name|
-            builder.dataset(name)
-          end
+          builder.dataset(@param.selected_items(:dataset))
         end
 
         unless @param.frequency == Form::Frequency.defaults
-          @param.selected_items(:dataset).each do |name|
-            builder.frequency(name, @param.frequency[:from], @param.frequency[:to], @param.frequency[:invert] == '1')
-          end
-          builder.for_all_datasets(@param.frequency[:match] == 'all')
+          builder.frequency(@param.selected_items(:dataset),
+                            @param.frequency[:from],
+                            @param.frequency[:to],
+                            @param.frequency[:invert] == '1',
+                            @param.frequency[:match] == 'all')
+        end
+
+        if @param.quality == '1'
+          builder.quality(@param.selected_items(:dataset))
         end
 
         %i[type significance consequence sift polyphen].each do |x|
