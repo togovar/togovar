@@ -65,9 +65,8 @@ json.data @result[:hits] do |variant|
   sift = Array(source[:transcripts]).map { |x| x[:sift] }.compact.max
   polyphen = Array(source[:transcripts]).map { |x| x[:polyphen] }.compact.min
 
-  # TODO: remove vcv
   conditions = Array(source[:conditions]).map do |x|
-    x.slice(:condition, :vcv, :interpretations)
+    x.slice(:condition, :interpretations)
   end
 
   transcripts = Array(source[:transcripts])
