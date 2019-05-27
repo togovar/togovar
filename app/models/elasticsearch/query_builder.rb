@@ -6,11 +6,13 @@ module Elasticsearch
 
     attr_accessor :from
     attr_accessor :size
+    attr_accessor :start_only
 
     def initialize
       @from = 0
       @size = 100
       @sort = true
+      @start_only = false
     end
 
     def term(term)
@@ -454,6 +456,7 @@ module Elasticsearch
 
     def position_condition(term)
       positions = term.split(/[\s,]/)
+      start_only = @start_only
 
       query = Elasticsearch::DSL::Search.search do
         query do
@@ -463,16 +466,24 @@ module Elasticsearch
               should do
                 bool do
                   must { match chromosome: chr }
-                  must { range(:start) { lte pos.to_i } }
-                  must { range(:stop) { gte pos.to_i } }
+                  if start_only
+                    must { match start: pos.to_i }
+                  else
+                    must { range(:start) { lte pos.to_i } }
+                    must { range(:stop) { gte pos.to_i } }
+                  end
                 end
               end
             end
           end
         end
-      end
+      end.to_hash[:query]
 
-      query.to_hash[:query]
+      if query[:bool][:should].size == 1
+        query[:bool][:should].first
+      else
+        query
+      end
     end
 
     def region_condition(term)

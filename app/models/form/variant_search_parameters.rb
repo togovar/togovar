@@ -19,6 +19,7 @@ module Form
                       :limit,
                       :stat,
                       :debug,
+                      :start_only,
                       :format,
                       dataset: Form::Dataset.parameters,
                       frequency: Form::Frequency.parameters,
@@ -61,8 +62,8 @@ module Form
       @limit = params.fetch(:limit, '100').to_i.between(0, 100)
 
       @stat = params.fetch(:stat, '1')
-
       @debug = params.key?(:debug)
+      @start_only = params.key?(:start_only)
     end
 
     def debug?
@@ -71,6 +72,10 @@ module Form
 
     def stat?
       @stat != '0'
+    end
+
+    def start_only?
+      @start_only
     end
 
     def term

@@ -60,7 +60,11 @@ class RootController < ApplicationController
   def builder
     @builder ||= begin
       builder = Elasticsearch::QueryBuilder.new
-      builder.term(@param.term)
+
+      builder.start_only = @param.start_only?
+
+      builder.term(@param.term) if @param.term.present?
+
       builder.from = @param.offset
       builder.size = @param.limit
 
