@@ -42,6 +42,11 @@ module TogoVar
         graph = RDF::URI.new(config['base_url']).join("/graph/#{key}")
 
         load_dir path, '*.owl', graph
+      when 'hco'
+        path = File.join(config['load_dir'], 'virtuoso', key, 'latest')
+        graph = RDF::URI.new(config['base_url']).join("/graph/#{key}")
+
+        load_dir path, '*.ttl', graph
       when 'ensembl37'
         path = File.join(config['load_dir'], 'virtuoso', 'ensembl', 'GRCh37', 'latest')
         graph = RDF::URI.new(config['base_url']).join("/graph/#{key}")
