@@ -22,13 +22,13 @@ module TogoVar
 
         load_dir path, '*.ttl.gz', graph
       when 'condition'
-        path = File.join(config['load_dir'], 'virtuoso', key, 'latest')
+        path = File.join(config['load_dir'], 'virtuoso', 'variant_condition', 'latest')
         graph = RDF::URI.new(config['base_url']).join("/graph/variant/condition#{key}")
 
         load_dir path, '*.ttl.gz', graph
       when /^frequency\.(.*)$/
         source = $1
-        path = File.join(config['load_dir'], 'virtuoso', 'frequency', source, 'latest')
+        path = File.join(config['load_dir'], 'virtuoso', 'variant_frequency', source, 'latest')
         graph = RDF::URI.new(config['base_url']).join("/graph/variant/frequency/#{source}")
 
         load_dir path, '*.nt.gz', graph
