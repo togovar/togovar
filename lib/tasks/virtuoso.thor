@@ -21,11 +21,12 @@ module TogoVar
         graph = RDF::URI.new(config['base_url']).join("/graph/#{key}")
 
         load_dir path, '*.ttl.gz', graph
-      when 'condition'
-        path = File.join(config['load_dir'], 'virtuoso', 'variant_condition', 'latest')
-        graph = RDF::URI.new(config['base_url']).join("/graph/variant/condition#{key}")
+      when /^condition\.(.*)$/
+        source = $1
+        path = File.join(config['load_dir'], 'virtuoso', 'variant_condition', source, 'latest')
+        graph = RDF::URI.new(config['base_url']).join("/graph/variant/condition/#{source}")
 
-        load_dir path, '*.ttl.gz', graph
+        load_dir path, '*.nt.gz', graph
       when /^frequency\.(.*)$/
         source = $1
         path = File.join(config['load_dir'], 'virtuoso', 'variant_frequency', source, 'latest')
