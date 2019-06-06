@@ -1,0 +1,90 @@
+$PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * .5
+$WIDTH_LOGO: 380px
+
+#GlobalHeader
+  height: $HEIGHT_GLOBAL_MENU
+  background-color: white
+  position: relative
+  padding: 10px $PADDING_SIDE
+  box-shadow: 0 2px 2px rgba(black, .2)
+  min-width: $WIDTH_MIN
+  z-index: $Z_INDEX_GLOBAL_HEADER
+
+  > .heading
+    display: inline-block
+
+    > .link
+      > .logotype
+        width: 101px
+        height: 31px
+        position: relative
+        left: -5px
+        margin-right: .3rem
+
+    > .summary
+      font-size: 12px
+      font-weight: normal
+
+  > .menus
+    position: absolute
+    right: 0
+    top: 0
+    font-size: 14px
+    padding-right: $PADDING_SIDE
+    max-width: calc(100vw - #{$WIDTH_LOGO})
+    text-align: right
+    white-space: nowrap
+    overflow-x: auto
+
+    &:before, &:after
+      content: ""
+      display: block
+      width: 10px
+      height: $HEIGHT_GLOBAL_MENU
+      position: fixed
+      top: 0
+
+    &:before
+      left: $WIDTH_LOGO
+      background: linear-gradient(to right, white, rgba(white, 0))
+
+    &:after
+      right: 0
+      background: linear-gradient(to left, white, rgba(white, 0))
+
+    > .menu
+      display: inline-block
+      padding: #{$PADDING_RIGHT_ELEMENTS - 1px} 0
+      border-left: solid 1px $COLOR_SEPARATOR
+      margin-left: $PADDING_SIDE - 8px
+      padding-left: $PADDING_SIDE - 5px
+      margin-bottom: 0
+
+      &:first-child
+        border-left: none
+
+    > .navigation
+      > .item
+        > .link
+          color: $COLOR_BLACK
+          text-decoration: none
+          line-height: $HEIGHT_NAVIGATION_ITEM
+
+        &.-current
+          > .link
+            color: $COLOR_KEY_DEEP
+
+        &:hover
+          > .link
+            color: $COLOR_KEY_DEEP
+            text-decoration: none
+
+    > .config
+
+    > .languageswitcher
+      > .language
+        width: $HEIGHT_NAVIGATION_ITEM
+        text-align: center
+        padding: 0
+
+

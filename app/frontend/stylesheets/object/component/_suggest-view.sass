@@ -1,0 +1,57 @@
+$PADDING_SIDE: 14px
+
+.suggest-view
+  background-color: white
+  z-index: $Z_INDEX_SUGGEST_VIEW
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .2)
+  display: flex
+  font-size: 14px
+  line-height: 24px
+
+  > .column
+    + .column
+      border-left: solid 1px $COLOR_SEPARATOR_SUB
+
+    > .title
+      color: $COLOR_KEY_DEEP
+      font-size: 12px
+      font-weight: normal
+      line-height: 16px
+      margin: 4px 0 0
+      padding: 0 $PADDING_SIDE 10px
+
+    > .list
+      margin-bottom: 0
+      padding-left: 0
+      list-style: none
+
+      > .item
+        cursor: pointer
+        padding: 0 $PADDING_SIDE
+        height: 26px
+        cursor: pointer
+        transition: background-color $GUI_DURATION
+
+        &:first-child
+          padding-top: 4px
+          height: 30px
+
+        &:hover
+          background-color: rgba($COLOR_SELECTED, .2)
+
+        &.-disabled
+          cursor: auto
+
+          &:hover
+            background-color: inherit
+
+        > .sub
+          padding-left: .5em
+          color: rgba($COLOR_BLACK, .5)
+          font-size: 12px
+
+        &.-selected
+          background-color: rgba($COLOR_SELECTED, 1)
+
+
+

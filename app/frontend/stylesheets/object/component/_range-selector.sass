@@ -1,0 +1,115 @@
+$PADDING_METER: 8px
+.range-selector
+  > .input
+    margin-bottom: 8px
+    margin-top: 2px
+    text-align: center
+
+    > input
+      display: inline-block
+      width: 5em
+      margin-right: 3px
+      text-align: right
+      line-height: 18px
+      padding: 0 0 0 8px
+      border-radius: 9px
+      border: solid 1px $COLOR_GRAY
+      box-shadow: 0 1px 1px rgba(0, 0, 0, .2) inset
+      outline: none
+
+    > label
+      margin-left: 8px
+      margin-bottom: 0
+
+  > .meter
+    padding: 0 $PADDING_METER 8px
+    position: relative
+
+    > .barcontainer
+      width: 100%
+      height: 8px
+      background-color: $COLOR_LIGHT_GRAY
+      position: relative
+
+      > .bar
+        position: absolute
+        top: 0
+        background-color: $COLOR_KEY
+        height: 8px
+        width: 100%
+
+    > .ruler
+      border-top: solid 1px $COLOR_GRAY
+      margin-top: 4px
+      padding-bottom: 14px
+      position: relative
+
+      > .scale
+        position: absolute
+        font-size: 10px
+        line-height: 10px
+        text-align: center
+        width: 20px
+        left: calc(0% - 10px)
+        top: 6px
+
+        &:nth-child(2)
+          left: calc(10% - 10px)
+
+        &:nth-child(3)
+          left: calc(20% - 10px)
+
+        &:nth-child(4)
+          left: calc(30% - 10px)
+
+        &:nth-child(5)
+          left: calc(40% - 10px)
+
+        &:nth-child(6)
+          left: calc(50% - 10px)
+
+        &:nth-child(7)
+          left: calc(60% - 10px)
+
+        &:nth-child(8)
+          left: calc(70% - 10px)
+
+        &:nth-child(9)
+          left: calc(80% - 10px)
+
+        &:nth-child(10)
+          left: calc(90% - 10px)
+
+        &:nth-child(11)
+          left: calc(100% - 10px)
+
+        &:before
+          content: ""
+          border-left: solid 1px $COLOR_GRAY
+          height: 5px
+          top: -7px
+          left: 10px
+          display: block
+          position: absolute
+
+    > .slider
+      width: 100%
+      height: 8px
+      position: absolute
+      top: 0
+      left: 0
+
+      > *
+        position: absolute
+        width: 8px
+        height: 16px
+        top: -4px
+        cursor: col-resize
+
+  > .match
+    text-align: center
+
+    > label
+      + label
+        margin-left: 1em
+
