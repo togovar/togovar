@@ -9,27 +9,28 @@ module ApplicationHelper #:nodoc:
   end
 
   def nav_link(name, path, active = nil, **options)
-    label = name.dup
-    klass = 'nav-link'
+    klass = 'item menu-button'
+    klass << ' -current' if path == active
 
-    if path == active
-      label << content_tag(:span, '(current)', class: 'sr-only')
-      klass << ' active'
-
-      return content_tag(:span, label.html_safe, class: klass, **options)
+    content_tag :li, class: klass do
+      if path == active
+        content_tag :span, name
+      else
+        link_to name, path, class: 'link', **options
+      end
     end
-
-    link_to label.html_safe, path, class: klass, **options
   end
 
-  def locale_selector
-    links = I18n.available_locales.map do |x|
-      x == I18n.locale ? x : link_to(x, "#{request.path_info}?locale=#{x}")
-    end
-    links.join(' / ').html_safe
-  end
+  def locale_selector(locale, **options)
+    klass = 'language menu-button'
+    klass << ' -current' if locale == I18n.locale
 
-  def labeled_link_to(name = nil, html_options = nil, &block)
-    link_to(name, name.to_s, html_options, &block)
+    content_tag :li, class: klass do
+      if locale == I18n.locale
+        content_tag :span, locale
+      else
+        link_to(locale, "#{request.path_info}?locale=#{locale}")
+      end
+    end
   end
 end
