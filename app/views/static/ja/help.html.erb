@@ -1,0 +1,577 @@
+<% provide(:title, 'Help') %>
+<% provide(:page, 'help') %>
+<% provide(:active, doc_help_path) %>
+
+<main>
+  <article class="common-document">
+    <header class="header">
+      <h2 class="title">Help</h2>
+    </header>
+    <div class="contents">
+      <section class="section">
+        <ul class="page-index">
+          <li class="category">
+            <h3 class="categorytitle">TogoVar全般</h3>
+            <ul class="categorylist">
+              <li class="item -question"><a class="link" href="#g1">TogoVarの目的や有用性は何でしょうか。</a></li>
+              <li class="item -question"><a class="link" href="#g2">インハウスでTogoVarを利用できますか。</a></li>
+            </ul>
+          </li>
+          <li class="category">
+            <h3 class="categorytitle">利用条件に関して</h3>
+            <ul class="categorylist">
+              <li class="item -question"><a class="link" href="#t1">TogoVarデータベースの利用は無償でしょうか。</a></li>
+              <li class="item -question"><a class="link" href="#t2">TogoVarデータベースを論文で引用するにはどうすれば良いでしょうか。</a></li>
+              <li class="item -question"><a class="link" href="#t3">商用利用は可能でしょうか。</a></li>
+            </ul>
+          </li>
+          <li class="category">
+            <h3 class="categorytitle">TogoVar収録データに関して</h3>
+            <ul class="categorylist">
+              <li class="item -question"><a class="link" href="#d1">個人レベルの表現型情報の取得は可能でしょうか。</a></li>
+              <li class="item -question"><a class="link" href="#d2">遺伝子発現やタンパク質の情報とは結び付かないのでしょうか。</a></li>
+              <li class="item -question"><a class="link" href="#d3">バリアントの検出の際に使用したソフトウェアおよび品質管理の方法を教えてください。</a></li>
+              <li class="item -question"><a class="link" href="#d4">TogoVarで対象としているバリアントの種類は何ですか。</a></li>
+              <li class="item -question"><a class="link" href="#d5">Consequenceの値はどのように計算していますか。</a></li>
+              <li class="item -question"><a class="link" href="#d6">SIFTとPolyPhenとは何ですか。</a></li>
+              <li class="item -question"><a class="link" href="#d7">Clinical Significanceの値はどのように計算していますか。</a></li>
+            </ul>
+          </li>
+          <li class="category">
+            <h3 class="categorytitle">TogoVar検索システムに関して</h3>
+            <ul class="categorylist">
+              <li class="item -question"><a class="link" href="#s1">検索結果のFrequency列に表示される頻度メーターは何を表現していますか。</a></li>
+              <li class="item -question"><a class="link" href="#s2">バリアントタイプごとにPosition、Ref、Altはそれぞれどのように記述されますか。</a>
+              </li>
+              <li class="item -question"><a class="link" href="#s3">TogoVarでは、どのようにバリアントを表記していますか。</a></li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="contents">
+      <section class="section">
+        <h3 class="sectiontitle">TogoVar全般</h3>
+        <div class="question-answer" id="g1">
+          <h4 class="question">TogoVarの目的や有用性は何でしょうか。</h4>
+          <div class="answer">
+            <p>ゲノムの解読はNGSにより低頻度の変異を取得することが可能となりました。しかし、欧米の既存データベースには、十分なサンプル数の日本人集団における頻度データはありません。この問題を解決するため、公開されている日本人のゲノム変異情報やNBDCに寄託されたヒトデータベースからの情報を集積し、より信頼性の高い頻度情報を提供することを目指します。</p>
+            <p>また、ヒトゲノムの参照配列は常に一定ではなく更新される情報であるため、同じバリアントであっても参照配列が異なるとゲノム上の位置が異なリます。そこで、当データベースでは同じバリアントにはユニークなIDを付与することで、研究者が行っているバリアントの位置情報を参照配列間で変換する作業を省力化します。</p>
+          </div>
+        </div>
+        <div class="question-answer" id="g2">
+          <h4 class="question">インハウスでTogoVarを利用できますか。</h4>
+          <div class="answer">
+            <p>dockerイメージを公開する予定です。しばらくお待ちください。</p>
+          </div>
+        </div>
+      </section>
+      <section class="section">
+        <h3 class="sectiontitle">利用条件に関して</h3>
+        <div class="question-answer" id="t1">
+          <h4 class="question">TogoVarデータベースの利用は無償でしょうか。</h4>
+          <div class="answer">
+            <p>すべて無償での利用が可能です。データベースの利用については、<a href="./terms.html">Terms</a>のページを参照してください。</p>
+          </div>
+        </div>
+        <div class="question-answer" id="t2">
+          <h4 class="question">TogoVarデータベースを論文で引用するにはどうすれば良いでしょうか。</h4>
+          <div class="answer">
+            <p><a href="./terms.html">Terms</a>のクレジットの表示例を参考にしてください。</p>
+          </div>
+        </div>
+        <div class="question-answer" id="t3">
+          <h4 class="question">商用利用は可能でしょうか。</h4>
+          <div class="answer">
+            <p>TogoVarのwebサイトの閲覧や公開予定のdockerイメージは商用利用可能です。TogoVarが取り込んでいる第三者作成データに関してはそれそれの利用条件に従ってください。詳しくは<a href="./terms.html">Terms</a>をご覧ください。
+            </p>
+          </div>
+        </div>
+      </section>
+      <section class="section">
+        <h3 class="sectiontitle">TogoVar収録データに関して</h3>
+        <div class="question-answer" id="d1">
+          <h4 class="question">個人レベルの表現型情報の取得は可能でしょうか。</h4>
+          <div class="answer">
+            <p>当データベースは個人情報を保持しておらず、また、個人ごとの表現型情報は現在のところ提供はしておりません。表現型情報の詳細については、<a href="./datasets/jga_ngs.html">JGA-NGSデータセット</a>及び<a href="./datasets/jga_snp.html">JGA-SNPデータセット</a>に記載されている研究グループに直接お問い合わせ下さい。
+            </p>
+          </div>
+        </div>
+        <div class="question-answer" id="d2">
+          <h4 class="question">遺伝子発現やタンパク質の情報とは結び付かないのでしょうか。</h4>
+          <div class="answer">
+            <p>当データベースはヒトゲノムの遺伝子変異について、日本人の公開情報を中心として統合したものです。当データベースはRDFの技術をベースとして利用している為、遺伝子発現やタンパク質の情報がRDFを利用しているデータベースである場合は、容易に拡張が可能と考えております。遺伝子発現やタンパク質の情報への拡張は順次実施する予定です。</p>
+          </div>
+        </div>
+        <div class="question-answer" id="d3">
+          <h4 class="question">バリアントの検出の際に使用したソフトウェアおよび品質管理の方法を教えてください。</h4>
+          <div class="answer">
+            <p><a href="./datasets/analysis.html">TogoVarデータセット作成方法</a>を参照ください。</p>
+          </div>
+        </div>
+        <div class="question-answer" id="d4">
+          <h4 class="question">TogoVarで対象としているバリアントの種類は何ですか。</h4>
+          <div class="answer">
+            <p>SNV、Insertion、Deletion、Indel、Substitutionの5種類です。<a class="hyper-text -external" target="_blank" href="http://varnomen.hgvs.org/bg-material/simple/#types-of-variants">HGVSがType
+              of variantsに列挙した5種類</a>のうち、DuplicationはInsertionに、DeletionとInsertionの長さが同じIndelはSubstitionに分類されています。なお、バリアントの種類の特定には、<a class="hyper-text -external" target="_blank" href="https://www.ensembl.org/vep">Variant
+              Effect Predictor (VEP)</a>を利用しています。</p>
+          </div>
+        </div>
+        <div class="question-answer" id="d5">
+          <h4 class="question">Consequenceの値はどのように計算していますか。</h4>
+          <div class="answer">
+            <p>
+              <a class="hyper-text -external" target="_blank" href="https://asia.ensembl.org/info/genome/variation/prediction/predicted_data.html#consequences">Variant
+                Effect Predictor (VEP)のvariant consequence</a>の値を表示しています。１バリアントに対応するトランスクリプトが複数ある場合は、一番重大なconsequenceのみを表示している場合があります。
+            </p>
+          </div>
+        </div>
+        <div class="question-answer" id="d6">
+          <h4 class="question">SIFTとPolyPhenとは何ですか。</h4>
+          <div class="answer">
+            <p>バリアントによってアミノ酸配列が変化する場合、それがタンパク質の機能に与える影響を予測したものです。<a class="hyper-text -external" target="_blank" href="https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html">Variant
+              Effect Predictor (VEP)</a>で計算した値を表示しています。アイコンの意味は以下の通りです。</p>
+            <ul class="unordered-list _margin-bottom _align-left">
+              <li><strong>SIFT</strong><br>
+                <div>
+                  <div class="variant-function _width_5em _align-center" data-function="deleterious">&lt; 0.05</div>
+                  <span class="_margin-left">Deleterious</span>
+                </div>
+                <div>
+                  <div class="variant-function _width_5em _align-center" data-function="tolerated">≥ 0.05</div>
+                  <span class="_margin-left">Tolerated</span>
+                </div>
+              </li>
+              <li><strong>PolyPhen</strong><br>
+                <div>
+                  <div class="variant-function _width_5em _align-center" data-function="probably_damaging">&gt; 0.908
+                  </div>
+                  <span class="_margin-left">Probably Damaging</span>
+                </div>
+                <div>
+                  <div class="variant-function _width_5em _align-center" data-function="possibly_damaging">&gt; 0.446
+                  </div>
+                  <span class="_margin-left">Possibly Damaging</span>
+                </div>
+                <div>
+                  <div class="variant-function _width_5em _align-center" data-function="benign">≤ 0.446</div>
+                  <span class="_margin-left">Benign</span>
+                </div>
+                <div>
+                  <div class="variant-function _width_5em _align-center" data-function="unknown">  </div>
+                  <span class="_margin-left">Unknown</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="question-answer" id="d7">
+          <h4 class="question">Clinical Significanceの値はどのように計算していますか。</h4>
+          <div class="answer">
+            <p><a class="hyper-text -external" target="_blank" href="https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv">ClinVarのclinical
+              significance</a>の値を表示しています。</p>
+          </div>
+        </div>
+      </section>
+      <section class="section">
+        <h3 class="sectiontitle">TogoVarの検索システムに関して</h3>
+        <div class="question-answer _column-span-all" id="s1">
+          <h4 class="question">検索結果のFrequency列に表示される頻度メーターは何を表現していますか。</h4>
+          <div class="answer">
+            <p>各データセットにおけるAlternative allele頻度を表現しています。頻度メータの色はデータセットに割り当てられた色に対応しています。データの有無や頻度の値を９段階で表現しています。</p>
+            <div class="_flex _break-avoid">
+              <div class="_padding-right-large">
+                <div class="frequency-graph _margin-bottom">
+                  <div class="dataset" data-frequency="na"></div>
+                  <span class="_margin-left">Not Available</span>
+                </div>
+                <div class="frequency-graph _margin-bottom">
+                  <div class="dataset" data-frequency="monomorphic"></div>
+                  <span class="_margin-left">Monomorphic (REF)</span>
+                </div>
+                <div class="frequency-graph _margin-bottom">
+                  <div class="dataset" data-frequency="singleton"></div>
+                  <span class="_margin-left">Singleton</span>
+                </div>
+                <div class="frequency-graph _margin-bottom">
+                  <div class="dataset" data-frequency="<0.0001"></div>
+                  <span class="_margin-left">&lt; 0.0001</span>
+                </div>
+                <div class="frequency-graph _margin-bottom">
+                  <div class="dataset" data-frequency="<0.001"></div>
+                  <span class="_margin-left">&lt; 0.001</span>
+                </div>
+                <div class="frequency-graph _margin-bottom">
+                  <div class="dataset" data-frequency="<0.01"></div>
+                  <span class="_margin-left">&lt; 0.01</span>
+                </div>
+                <div class="frequency-graph _margin-bottom">
+                  <div class="dataset" data-frequency="<0.05"></div>
+                  <span class="_margin-left">&lt; 0.05</span>
+                </div>
+                <div class="frequency-graph _margin-bottom">
+                  <div class="dataset" data-frequency="<0.5"></div>
+                  <span class="_margin-left">&lt; 0.5</span>
+                </div>
+                <div class="frequency-graph _margin-bottom">
+                  <div class="dataset" data-frequency="≥0.5"></div>
+                  <span class="_margin-left">≥ 0.5</span>
+                </div>
+              </div>
+              <div>
+                <div class="frequency-graph _margin-bottom">
+                  <div class="dataset" data-dataset="jga_ngs"></div>
+                  <span class="_margin-left">JGA-NGS</span>
+                </div>
+                <div class="frequency-graph _margin-bottom">
+                  <div class="dataset" data-dataset="jga_snp"></div>
+                  <span class="_margin-left">JGA-SNP</span>
+                </div>
+                <div class="frequency-graph _margin-bottom">
+                  <div class="dataset" data-dataset="tommo"></div>
+                  <span class="_margin-left">3.5KJPN</span>
+                </div>
+                <div class="frequency-graph _margin-bottom">
+                  <div class="dataset" data-dataset="hgvd"></div>
+                  <span class="_margin-left">HGVD</span>
+                </div>
+                <div class="frequency-graph _margin-bottom">
+                  <div class="dataset" data-dataset="exac"></div>
+                  <span class="_margin-left">ExAC</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="question-answer _column-span-all" id="s2">
+          <h4 class="question">バリアントタイプごとにPosition、Ref、Altはそれぞれどのように記述されますか。</h4>
+          <div class="answer">
+            <p>以下に、各バリアントタイプ毎の例を示します。染色体の最初の塩基の位置は1です。</p>
+            <table class="results-view">
+              <thead>
+              <tr>
+                <th>
+                  <p>Variant Type</p>
+                </th>
+                <th>
+                  <p>ID</p>
+                </th>
+                <th>
+                  <p>Position</p>
+                </th>
+                <th>
+                  <p>Ref / Alt</p>
+                </th>
+                <th>
+                  <p>説明</p>
+                </th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>
+                  <div class="variant-type">SNV</div>
+                </td>
+                <td><a target="_blank" href="/variant/tgv41">tgv41</a></td>
+                <td>
+                  <div class="chromosome-position">
+                    <div class="chromosome">1</div>
+                    <div class="coordinate">13116</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="ref-alt"><span class="ref">T</span><span class="arrow"></span><span class="alt">G</span>
+                  </div>
+                </td>
+                <td>1番染色体13116番目の塩基TがGに置換された</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="variant-type">Ins</div>
+                </td>
+                <td><a target="_blank" href="/variant/tgv1019">tgv1019</a></td>
+                <td>
+                  <div class="chromosome-position">
+                    <div class="chromosome">1</div>
+                    <div class="coordinate">138646</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="ref-alt"><span class="ref"></span><span class="arrow"></span><span class="alt">A</span>
+                  </div>
+                </td>
+                <td>1番染色体138646番目と138647番目の塩基の間に塩基Aが挿入された</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="variant-type">Del</div>
+                </td>
+                <td><a target="_blank" href="/variant/tgv63">tgv63</a></td>
+                <td>
+                  <div class="chromosome-position">
+                    <div class="chromosome">1</div>
+                    <div class="coordinate">13486</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="ref-alt"><span class="ref">GC</span><span class="arrow"></span><span class="alt"></span>
+                  </div>
+                </td>
+                <td>1番染色体13486番目と13487番目の塩基GCが欠失した</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="variant-type">Indel</div>
+                </td>
+                <td><a target="_blank" href="/variant/tgv1537710">tgv1537710</a></td>
+                <td>
+                  <div class="chromosome-position">
+                    <div class="chromosome">1</div>
+                    <div class="coordinate">53676691</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="ref-alt"><span class="ref">C</span><span class="arrow"></span><span class="alt">TA</span>
+                  </div>
+                </td>
+                <td>1番染色体53676691番目の塩基Cが欠失して、その場所にTAが挿入された</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="variant-type">Substitution</div>
+                </td>
+                <td><a target="_blank" href="/variant/tgv675673">tgv675673</a></td>
+                <td>
+                  <div class="chromosome-position">
+                    <div class="chromosome">1</div>
+                    <div class="coordinate">21889705</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="ref-alt"><span class="ref">AC</span><span class="arrow"></span><span class="alt">CA</span>
+                  </div>
+                </td>
+                <td>1番染色体21889705番目の塩基ACが欠失して、その場所にCAが挿入された</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="question-answer _column-span-all" id="s3">
+          <h4 class="question">TogoVarでは、どのようにバリアントを表記していますか。</h4>
+          <div class="answer">
+            <p>TogoVarでは、ゲノム上の位置及びreference allele、alternative
+              allele、ヒトゲノム標準配列のビルド番号の組み合わせでバリアントを一意に識別します。TogoVar及びdbSNP、<a class="hyper-text -external" target="_blank" href="https://samtools.github.io/hts-specs/VCFv4.2.pdf">VCF</a>、<a class="hyper-text -external" target="_blank" href="http://varnomen.hgvs.org/bg-material/simple/#types-of-variants">HGVS</a>での表記例を下の表に示しています。
+            </p>
+            <table class="results-view">
+              <thead>
+              <tr class="groupingrow">
+                <th colspan="2"></th>
+                <th colspan="4">
+                  <p>TogoVar</p>
+                </th>
+                <th colspan="4">
+                  <p>dbSNP</p>
+                </th>
+                <th colspan="4">
+                  <p>VCF</p>
+                </th>
+                <th>
+                  <p>HGVS</p>
+                </th>
+              </tr>
+              <tr>
+                <th>
+                  <!--p Variant Type-->
+                </th>
+                <th class="separator"></th>
+                <th>
+                  <p>ID</p>
+                </th>
+                <th>
+                  <p>Position</p>
+                </th>
+                <th>
+                  <p>Ref / Alt</p>
+                </th>
+                <th class="separator"></th>
+                <th>
+                  <p>ID</p>
+                </th>
+                <th>
+                  <p>Position(GRCh37)</p>
+                </th>
+                <th>
+                  <p>Alleles</p>
+                </th>
+                <th class="separator"></th>
+                <th>
+                  <p>Position</p>
+                </th>
+                <th>
+                  <p>Ref</p>
+                </th>
+                <th>
+                  <p>Alt</p>
+                </th>
+                <th class="separator"></th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td rowspan="2">
+                  <div class="variant-type">SNV</div>
+                </td>
+                <td class="separator" rowspan="2"></td>
+                <td><a target="_blank" href="/variant/tgv30913364">tgv30913364</a></td>
+                <td rowspan="2">
+                  <div class="chromosome-position">
+                    <div class="chromosome">7</div>
+                    <div class="coordinate">127254587</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="ref-alt"><span class="ref">G</span><span class="arrow"></span><span class="alt">A</span>
+                  </div>
+                </td>
+                <td class="separator" rowspan="2"></td>
+                <td rowspan="2"><a class="hyper-text -external" target="_blank" href="https://www.ncbi.nlm.nih.gov/snp/rs114202595">rs114202595</a>
+                </td>
+                <td rowspan="2">chr7:127254587</td>
+                <td>G&gt;A</td>
+                <td class="separator" rowspan="2"></td>
+                <td rowspan="2">7:127254587</td>
+                <td>G</td>
+                <td>A</td>
+                <td class="separator" rowspan="2"></td>
+                <td>7:g.127254587:G&gt;A</td>
+              </tr>
+              <tr>
+                <td><a target="_blank" href="/variant/tgv30913365">tgv30913365</a></td>
+                <td>
+                  <div class="ref-alt"><span class="ref">G</span><span class="arrow"></span><span class="alt">T</span>
+                  </div>
+                </td>
+                <td>G&gt;T</td>
+                <td>G</td>
+                <td>T</td>
+                <td>7:g.127254587:G&gt;T</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="variant-type">Ins</div>
+                </td>
+                <td class="separator"></td>
+                <td><a target="_blank" href="/variant/tgv1019">tgv1019</a></td>
+                <td>
+                  <div class="chromosome-position">
+                    <div class="chromosome">1</div>
+                    <div class="coordinate">138646</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="ref-alt"><span class="ref"> </span><span class="arrow"></span><span class="alt">A</span>
+                  </div>
+                </td>
+                <td class="separator"></td>
+                <td><a class="hyper-text -external" target="_blank" href="https://www.ncbi.nlm.nih.gov/snp/rs761725800">rs761725800</a></td>
+                <td>chr1:138646</td>
+                <td>dupA</td>
+                <td class="separator"></td>
+                <td>1:138646</td>
+                <td>C</td>
+                <td>CA</td>
+                <td class="separator"></td>
+                <td>1:g.138646_138647insA</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="variant-type">Del</div>
+                </td>
+                <td class="separator"></td>
+                <td><a target="_blank" href="/variant/tgv63">tgv63</a></td>
+                <td>
+                  <div class="chromosome-position">
+                    <div class="chromosome">1</div>
+                    <div class="coordinate">13486</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="ref-alt"><span class="ref">GC</span><span class="arrow"></span><span class="alt"> </span>
+                  </div>
+                </td>
+                <td class="separator"></td>
+                <td><a class="hyper-text -external" target="_blank" href="https://www.ncbi.nlm.nih.gov/snp/rs780379327">rs780379327</a></td>
+                <td>chr1:13486-13487</td>
+                <td>delGC</td>
+                <td class="separator"></td>
+                <td>1:13485</td>
+                <td>AGC</td>
+                <td>A</td>
+                <td class="separator"></td>
+                <td>1:g.13486_13487del</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="variant-type">Indel</div>
+                </td>
+                <td class="separator"></td>
+                <td><a target="_blank" href="/variant/tgv1537710">tgv1537710</a></td>
+                <td>
+                  <div class="chromosome-position">
+                    <div class="chromosome">1</div>
+                    <div class="coordinate">53676691</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="ref-alt"><span class="ref">C</span><span class="arrow"></span><span class="alt">TA</span>
+                  </div>
+                </td>
+                <td class="separator"></td>
+                <td><a class="hyper-text -external" target="_blank" href="https://www.ncbi.nlm.nih.gov/snp/rs1057517525">rs1057517525</a></td>
+                <td>chr1:53676691</td>
+                <td>delCinsTA</td>
+                <td class="separator"></td>
+                <td>1:53676691</td>
+                <td>C</td>
+                <td>TA</td>
+                <td class="separator"></td>
+                <td>1:g.53676691delinsTA</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="variant-type">Substitution</div>
+                </td>
+                <td class="separator"></td>
+                <td><a target="_blank" href="/variant/tgv675673">tgv675673</a></td>
+                <td>
+                  <div class="chromosome-position">
+                    <div class="chromosome">1</div>
+                    <div class="coordinate">21889705</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="ref-alt"><span class="ref">AC</span><span class="arrow"></span><span class="alt">CA</span>
+                  </div>
+                </td>
+                <td class="separator"></td>
+                <td><a class="hyper-text -external" target="_blank" href="https://www.ncbi.nlm.nih.gov/snp/rs786204530">rs786204530</a></td>
+                <td>chr1:21889705-21889706</td>
+                <td>AC&gt;CA</td>
+                <td class="separator"></td>
+                <td>1:21889705</td>
+                <td>AC</td>
+                <td>CA</td>
+                <td class="separator"></td>
+                <td>1:g.21889705_21889706delinsCA</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </article>
+</main>

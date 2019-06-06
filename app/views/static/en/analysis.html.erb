@@ -1,0 +1,68 @@
+<% provide(:title, 'Datasets > Analysis') %>
+<% provide(:page, 'datasets') %>
+
+<main>
+  <article class="common-document">
+    <header class="header">
+      <h2 class="title">How JGA dataset was generated</h2>
+    </header>
+    <div class="contents">
+      <section class="section">
+        <h3 class="sectiontitle">JGA-NGS</h3>
+        <p class="body _margin-bottom">Analysis pipeline software
+          (<a target="_blank" href="http://amelieff.jp/english/">Amelieff</a> BioReT Ver.3.3.1.1) that can
+          execute the following group of analysis tools was used.</p>
+        <table class="table">
+          <thead>
+          <tr>
+            <td>Tool name</td>
+            <td>Version</td>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>qcleaner</td>
+            <td>4.1.0</td>
+          </tr>
+          <tr>
+            <td>SAM tools</td>
+            <td>1.6</td>
+          </tr>
+          <tr>
+            <td>FastQC</td>
+            <td>0.11.5</td>
+          </tr>
+          <tr>
+            <td>calcCoverage</td>
+            <td>1.7</td>
+          </tr>
+          <tr>
+            <td>BWA</td>
+            <td>0.7.16a</td>
+          </tr>
+          <tr>
+            <td>igvtools</td>
+            <td>2.3.98</td>
+          </tr>
+          <tr>
+            <td>Picard</td>
+            <td>2.13.2</td>
+          </tr>
+          <tr>
+            <td>GATK</td>
+            <td>3.8.0-ge9d806836</td>
+          </tr>
+          <tr>
+            <td>SnpEff</td>
+            <td>v4.3_core</td>
+          </tr>
+          <tr>
+            <td>bedtools</td>
+            <td>2.13.3</td>
+          </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </article>
+</main>

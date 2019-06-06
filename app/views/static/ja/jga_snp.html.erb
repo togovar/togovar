@@ -1,0 +1,116 @@
+<% provide(:title, 'Dataset > JGA-SNP') %>
+<% provide(:page, 'datasets') %>
+
+<main>
+  <article class="common-document">
+    <header class="header">
+      <h2 class="title">JGA-SNPデータセット</h2>
+    </header>
+    <!--.contents.-two-columns-->
+    <div class="contents">
+      <section class="section">
+        <h3 class="sectiontitle">概要</h3>
+        <p class="body">
+          <a target="_blank" href="https://humandbs.biosciencedbc.jp/">NBDCヒトデータベース</a>/<a target="_blank" href="https://www.ddbj.nig.ac.jp/jga/index.html">Japanese
+          Genotype-phenotype Archive (JGA)</a>に登録されている個人レベルのSNPチップデータから検出したバリアントを集約した頻度データです。２次データ作成の許諾が得られたJGAデータの全てが集約対象です。なお、Alternative
+          allele数が5以下のバリアントは含まれていません。</p>
+        <ul class="unordered-list">
+          <li>バージョン/最終更新日：06/01/2018</li>
+          <li>サンプルサイズ：183,884</li>
+          <li>検出バリアント数：1,966,919</li>
+          <li>除外後バリアント数：1,249,724</li>
+        </ul>
+      </section>
+      <section class="section">
+        <h3 class="sectiontitle">利用条件</h3>
+        <div class="subsection">
+          <h4 class="heading">データ利用者の権利</h4>
+          <p class="body">
+            <a target="_blank" href="https://humandbs.biosciencedbc.jp/guidelines/data-sharing-guidelines">NBDCヒトデータ共有ガイドライン</a>の5-2.
+            データ利用者の権利の5-2-1. 非制限公開データに準拠します。</p>
+          <ol class="ordered-list">
+            <li>データ利用者は、『NBDCヒトデータベース』のデータを利用した研究成果をデータ利用者の責務を遵守する限り自由に発表できる。</li>
+            <li>データ利用者は、『NBDCヒトデータベース』のデータを利用した研究結果をもとにした知的財産権をデータ利用者の責務を遵守する限り自由に取得できる。</li>
+          </ol>
+        </div>
+        <div class="subsection">
+          <h4 class="heading">データ利用者の責務</h4>
+          <p class="body">NBDCヒトデータ共有ガイドラインの5-3. データ利用者の責務の5-3-1. 非制限公開データに準拠します。</p>
+          <ol class="ordered-list">
+            <li>データ利用に際してのデータの品質・内容・科学的妥当性については、利用者の責任と判断のもとで活用すること。</li>
+            <li>データ利用者は、下記の事項を遵守すること。
+              <ul class="unordered-list">
+                <li>研究利用への限定</li>
+                <li>個人同定の禁止</li>
+                <li>再配布の禁止</li>
+              </ul>
+            </li>
+            <li>公衆利用（例：データを利用して論文等で発表する場合など）の際は以下の引用を付与してください。
+              <p>Variant dataset aggregated from SNP-chip data in
+                <a target="_blank" href="https://humandbs.biosciencedbc.jp/">NBDCヒトデータベース</a>/<a target="_blank" href="https://www.ddbj.nig.ac.jp/jga/index.html">JGA</a>
+                [Internet]. Tokyo: Japan Science and
+                Technology Agency (Japan), National Bioscience Database Center; [2018] - .
+                JGA-SNP dataset; [cited YYYY Mmm DD]. Available
+                from:<a href="https://togovar.biosciencedbc.jp/doc/datasets/jga_snp">https://togovar.biosciencedbc.jp/doc/datasets/jga_snp</a>
+              </p>
+            </li>
+          </ol>
+        </div>
+      </section>
+      <section class="section">
+        <h3 class="sectiontitle">集約されたデータの由来</h3>
+        <table class="table _column-span-all">
+          <thead>
+          <tr>
+            <th>JGAID</th>
+            <th>ヒトDB</th>
+            <th>研究題目</th>
+            <th>対象集団</th>
+            <th>サンプルサイズ</th>
+            <th>データ提供者</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>
+              <a target="_blank" href="https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000114/">JGAD00000000123</a>
+            </td>
+            <td><a target="_blank" href="https://humandbs.biosciencedbc.jp/hum0014-v8/">hum0014</a></td>
+            <td>オーダーメイド医療の実現プログラム</td>
+            <td>健常者及び罹患者</td>
+            <td class="_align-right">182,557</td>
+            <td>久保 充明 (BBJ)</td>
+          </tr>
+          <tr>
+            <td>
+              <a target="_blank" href="https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000018/">JGAD00000000018</a>
+            </td>
+            <td><a target="_blank" href="https://humandbs.biosciencedbc.jp/hum0028-v1/">hum0028</a></td>
+            <td>オーダーメイド医療の実現プログラム</td>
+            <td>健常者</td>
+            <td class="_align-right">908</td>
+            <td>久保 充明 (BBJ)</td>
+          </tr>
+          <tr>
+            <td>
+              <a target="_blank" href="https://ddbj.nig.ac.jp/jga/viewer/view/study/JGAS00000000120/">JGAD00000000130/131</a>
+            </td>
+            <td><a target="_blank" href="https://humandbs.biosciencedbc.jp/hum0082-v2/">hum0082</a></td>
+            <td>日本人健常者におけるゲノム全域のSNP解析</td>
+            <td>健常者</td>
+            <td class="_align-right">419</td>
+            <td>徳永 勝士</td>
+          </tr>
+          </tbody>
+          <tfoot>
+          <tr>
+            <th class="_align-center" colspan="4">合計</th>
+            <th class="_align-right">183,884</th>
+            <th></th>
+          </tr>
+          </tfoot>
+        </table>
+      </section>
+    </div>
+  </article>
+</main>

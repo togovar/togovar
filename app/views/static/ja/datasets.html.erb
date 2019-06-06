@@ -1,0 +1,145 @@
+<% provide(:title, 'Datasets') %>
+<% provide(:page, 'datasets') %>
+<% provide(:active, doc_datasets_path) %>
+
+<main>
+  <article class="common-document">
+    <header class="header">
+      <h2 class="title">TogoVar収録データセット一覧</h2>
+    </header>
+    <div class="contents">
+      <section class="section">
+        <h3 class="sectiontitle">ヒトゲノムリファレンス配列</h3>
+        <ul>
+          <li>
+            <a class="hyper-text -external" target="_blank" href="https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh37.p13">GRCh37.p13
+              (06/28/2013)</a>
+          </li>
+        </ul>
+      </section>
+      <section class="section">
+        <h3 class="sectiontitle">Japanese Genotype-phenotype Archive (JGA)の個人ゲノムデータ由来のバリアントデータセット</h3>
+        <table class="table">
+          <thead>
+          <tr>
+            <th>データセット名</th>
+            <th>バージョン/最終更新日</th>
+            <th>サンプルサイズ</th>
+            <th>検出バリアント数</th>
+            <th>除外後バリアント数</th>
+            <th>作成者</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><a href="./datasets/jga_ngs.html">JGA-NGS</a></td>
+            <td>06/01/2018</td>
+            <td class="_align-right">125</td>
+            <td class="_align-right">13,338,968</td>
+            <td class="_align-right">4,679,025</td>
+            <td>NBDC</td>
+          </tr>
+          <tr>
+            <td><a href="./datasets/jga_snp.html">JGA-SNP</a></td>
+            <td>06/01/2018</td>
+            <td class="_align-right">183,884</td>
+            <td class="_align-right">1,966,919</td>
+            <td class="_align-right">1,249,724</td>
+            <td>NBDC</td>
+          </tr>
+          </tbody>
+        </table>
+        <p class="notice">注：アレル数5以下のバリアントはJGA-NGS/JGA-SNPデータセットから削除しています。</p>
+      </section>
+      <section class="section">
+        <h3 class="sectiontitle">第三者が作成したバリアントデータセット</h3>
+        <table class="table _column-span-all">
+          <thead>
+          <tr>
+            <th>データセット名</th>
+            <th>バージョン/最終更新日</th>
+            <th>サンプルサイズ</th>
+            <th>バリアント数</th>
+            <th>バリアント部位数</th>
+            <th>作成者</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><a target="_blank" href="ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/">ClinVar</a></td>
+            <td>02/01/2017</td>
+            <td class="_align-center">—</td>
+            <td class="_align-right">198,707</td>
+            <td class="_align-center">—</td>
+            <td>NCBI</td>
+          </tr>
+          <tr>
+            <td>
+              <a target="_blank" href="http://exac.broadinstitute.org/downloads">Exome Aggregation Consortium (ExAC)</a>
+            </td>
+            <td>Release 1 (02/27/2017)</td>
+            <td class="_align-right">60,706</td>
+            <td class="_align-right">10,195,872</td>
+            <td class="_align-right">9,362,319</td>
+            <td>Broad Institute</td>
+          </tr>
+          <tr>
+            <td><a target="_blank" href="http://www.hgvd.genome.med.kyoto-u.ac.jp/download.html">Human Genetic Variation
+              Database (HGVD)</a></td>
+            <td>Version 2.30 (08/02/2017)</td>
+            <td class="_align-right">1,208</td>
+            <td class="_align-right">554,461</td>
+            <td class="_align-right">501,556</td>
+            <td>京都大学</td>
+          </tr>
+          <tr>
+            <td><a target="_blank" href="https://ijgvd.megabank.tohoku.ac.jp/download_3.5kjpn/?lang=ja">Integrative
+              Japanese Genome Variation Database (iJGVD)</a></td>
+            <td>3.5KJPN (09/28/2017)</td>
+            <td class="_align-right">3,554</td>
+            <td class="_align-center">—</td>
+            <td class="_align-right">7,931,579</td>
+            <td>東北メディカル・メガバンク機構</td>
+          </tr>
+          </tbody>
+        </table>
+        <p class="notice">注：iJGVD
+          3.5KJPNについては、DTAなしで閲覧可能なアレル頻度1%以上のバリアントのみを収録しております。詳細は<a target="_blank" href="https://ijgvd.megabank.tohoku.ac.jp/">Data
+          release</a>をご覧ください。</p>
+      </section>
+      <section class="section">
+        <h3 class="sectiontitle">バリアント以外のデータセット</h3>
+        <table class="table">
+          <thead>
+          <tr>
+            <th>データセット名</th>
+            <th>バージョン/最終更新日</th>
+            <th>内容</th>
+            <th>作成者</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><a target="_blank" href="ftp://ftp.dbcls.jp/colil">Colil</a></td>
+            <td>01/29/2018</td>
+            <td>生命科学分野の文献間の引用関係の情報</td>
+            <td>DBCLS</td>
+          </tr>
+          <tr>
+            <td><a target="_blank" href="ftp://ftp.ncbi.nlm.nih.gov/pub/lu/PubTator/">PubTator</a></td>
+            <td>04/23/2018</td>
+            <td>バリアント名が出現する文献の情報</td>
+            <td>NCBI</td>
+          </tr>
+          <tr>
+            <td><a target="_blank" href="http://togogenome.org/">TogoGenome</a></td>
+            <td>hg19+UniProt_201804</td>
+            <td>ゲノムに関連する多種多様な情報</td>
+            <td>DBCLS</td>
+          </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </article>
+</main>
