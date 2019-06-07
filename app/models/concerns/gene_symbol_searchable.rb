@@ -9,8 +9,8 @@ module GeneSymbolSearchable
     config = Rails.configuration.elasticsearch
 
     settings index: {
-      number_of_shards: config.dig('indices', 'gene_symbols', 'number_of_shards'),
-      number_of_replicas: config.dig('indices', 'gene_symbols', 'number_of_replicas')
+      number_of_shards: config.dig('indices', 'gene_symbols', 'number_of_shards') || 1,
+      number_of_replicas: config.dig('indices', 'gene_symbols', 'number_of_replicas') || 0
     } do
       mapping dynamic: false do
         indexes :gene_id, type: :keyword
