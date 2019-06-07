@@ -1,0 +1,11 @@
+defaults: &defaults
+  togovar: https://togovar.biosciencedbc.jp/sparql
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults
