@@ -1,6 +1,6 @@
 defaults: &defaults
-  triplestore: https://togovar.l5dev.jp/sparql
-  sparqlist: https://togovar.l5dev.jp/sparqlist/api
+  triplestore: https://togovar.biosciencedbc.jp/sparql
+  sparqlist: https://togovar.biosciencedbc.jp/sparqlist/api
 
 development:
   <<: *defaults
