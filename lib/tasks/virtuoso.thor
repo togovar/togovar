@@ -8,7 +8,30 @@ module TogoVar
 
     namespace 'togovar virtuoso'
 
-    desc 'load [name = clinvar|hgnc|so|...]', 'load RDF'
+    desc 'load [name = variant|condition.clinvar|...]', 'load RDF'
+
+    def load_all(name)
+      # ontologies
+      self.load 'hco'
+      self.load 'hgnc'
+      self.load 'so'
+
+      # TogoVar datasets
+      self.load 'variant'
+      self.load 'condition.clinvar'
+      self.load 'frequency.tommo'
+      self.load 'frequency.jga_snp'
+      self.load 'frequency.jga_ngs'
+      self.load 'frequency.hgvd'
+      self.load 'frequency.exac'
+
+      # other datasets
+      self.load 'clinvar'
+      self.load 'ensembl37'
+      self.load 'ensembl38'
+    end
+
+    desc 'load [name = variant|condition.clinvar|...]', 'load RDF'
 
     def load(name)
       require_relative '../../config/environment'
