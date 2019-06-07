@@ -9,7 +9,7 @@ module TogoVar
 
       class << self
         def find_conditions(*vcv)
-          config = Rails.configuration.endpoint
+          config = Rails.configuration.endpoint['togovar']
           endpoint = SPARQL::Client.new(config['url'])
 
           query = format(<<~SPARQL, vcv.map { |x| "vcv:#{x}" }.join(' '))

@@ -186,6 +186,8 @@ module TogoVar
       require 'togo_var'
       require 'zlib'
 
+      base_url = Rails.configuration.virtuoso['base_url'] || raise('Resource base URI is not set.')
+
       inside(output) do
         count = 0
 
@@ -196,7 +198,7 @@ module TogoVar
             IO::VCF.open(path) do |vcf|
               vcf.each_slice(300) do |slice|
                 Models::Variant.find_by_vcf(*slice).each do |tgv, vcv|
-                  writer << [RDF::URI.new("#{Rails.configuration.virtuoso['base_url']}/variant/#{tgv}"), Vocabulary::TGVO.has_interpreted_condition, RDF::URI("http://identifiers.org/clinvar:#{vcv}")]
+                  writer << [RDF::URI.new("#{base_url}/variant/#{tgv}"), Vocabulary::TGVO.has_interpreted_condition, RDF::URI("http://identifiers.org/clinvar:#{vcv}")]
                 end
                 STDERR.print "\r #{count += slice.size}"
               end

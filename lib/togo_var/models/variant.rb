@@ -144,7 +144,8 @@ module TogoVar
       def to_rdf
         data = RDFDataset.new
 
-        s = RDF::URI.new("#{Rails.configuration.virtuoso['base_url']}/variant/tgv#{tgv_id}")
+        base_url = Rails.configuration.virtuoso['base_url'] || raise('Resource base URI is not set.')
+        s = RDF::URI.new("#{base_url}/variant/tgv#{tgv_id}")
 
         data << [s, RDF.type, OBO[variant_type]]
 

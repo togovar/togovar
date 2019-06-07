@@ -37,48 +37,49 @@ module TogoVar
       require_relative '../../config/environment'
 
       config = Rails.configuration.virtuoso
+      base_url = config['base_url'] || raise('Resource base URI is not set.')
 
       case (key = name.downcase)
       when 'variant'
         path = File.join(config['load_dir'], 'virtuoso', key, 'latest')
-        graph = RDF::URI.new(config['base_url']).join("/graph/#{key}")
+        graph = RDF::URI.new(base_url).join("/graph/#{key}")
 
         load_dir path, '*.ttl.gz', graph
       when /^condition\.(.*)$/
         source = $1
         path = File.join(config['load_dir'], 'virtuoso', 'variant_condition', source, 'latest')
-        graph = RDF::URI.new(config['base_url']).join("/graph/variant/condition/#{source}")
+        graph = RDF::URI.new(base_url).join("/graph/variant/condition/#{source}")
 
         load_dir path, '*.nt.gz', graph
       when /^frequency\.(.*)$/
         source = $1
         path = File.join(config['load_dir'], 'virtuoso', 'variant_frequency', source, 'latest')
-        graph = RDF::URI.new(config['base_url']).join("/graph/variant/frequency/#{source}")
+        graph = RDF::URI.new(base_url).join("/graph/variant/frequency/#{source}")
 
         load_dir path, '*.nt.gz', graph
       when 'clinvar', 'hgnc'
         path = File.join(config['load_dir'], 'virtuoso', key, 'latest')
-        graph = RDF::URI.new(config['base_url']).join("/graph/#{key}")
+        graph = RDF::URI.new(base_url).join("/graph/#{key}")
 
         load_dir path, '*.ttl.gz', graph
       when 'so'
         path = File.join(config['load_dir'], 'virtuoso', key, 'latest')
-        graph = RDF::URI.new(config['base_url']).join("/graph/#{key}")
+        graph = RDF::URI.new(base_url).join("/graph/#{key}")
 
         load_dir path, '*.owl', graph
       when 'hco'
         path = File.join(config['load_dir'], 'virtuoso', key, 'latest')
-        graph = RDF::URI.new(config['base_url']).join("/graph/#{key}")
+        graph = RDF::URI.new(base_url).join("/graph/#{key}")
 
         load_dir path, '*.ttl', graph
       when 'ensembl37'
         path = File.join(config['load_dir'], 'virtuoso', 'ensembl', 'GRCh37', 'latest')
-        graph = RDF::URI.new(config['base_url']).join("/graph/#{key}")
+        graph = RDF::URI.new(base_url).join("/graph/#{key}")
 
         load_dir path, '*.ttl', graph
       when 'ensembl38'
         path = File.join(config['load_dir'], 'virtuoso', 'ensembl', 'GRCh38', 'latest')
-        graph = RDF::URI.new(config['base_url']).join("/graph/#{key}")
+        graph = RDF::URI.new(base_url).join("/graph/#{key}")
 
         load_dir path, '*.ttl.gz', graph
       else

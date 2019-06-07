@@ -11,7 +11,7 @@ module TogoVar
         SPARQL_LIMIT_PER_QUERY = 1000
 
         def distinct
-          config = Rails.configuration.endpoint
+          config = Rails.configuration.endpoint['togovar']
           endpoint = SPARQL::Client.new(config['url'])
 
           i = 0

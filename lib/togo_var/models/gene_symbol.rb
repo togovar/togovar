@@ -8,7 +8,7 @@ module TogoVar
 
       class << self
         def fetch_alias(gene_symbols)
-          config = Rails.configuration.endpoint
+          config = Rails.configuration.endpoint['togovar']
           endpoint = SPARQL::Client.new(config['url'])
 
           buf = []
