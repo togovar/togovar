@@ -11,8 +11,7 @@
     "jquery-deparam": "^0.5.3",
     "jquery-ui-dist": "^1.12.1",
     "popper.js": "^1.14.6",
-    "rails-erb-loader": "^5.5.0",
-    "webcomponents-loader": "^1.0.1"
+    "rails-erb-loader": "^5.5.0"
   },
   "devDependencies": {
     "webpack-dev-server": "2.11.2"

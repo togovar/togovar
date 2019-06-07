@@ -2,18 +2,13 @@ const {environment} = require('@rails/webpacker')
 const webpack = require('webpack')
 
 environment.plugins.prepend('Provide',
-    new webpack.ProvidePlugin({
-      $: 'jquery/dist/jquery',
-      jQuery: 'jquery/dist/jquery',
-      Popper: 'popper.js/dist/popper'
-    })
+  new webpack.ProvidePlugin({
+    $: 'jquery/dist/jquery'
+  })
 );
 
 const erb = require('./loaders/erb')
 environment.loaders.prepend('erb', erb)
-
-const webcomponents = require('./loaders/webcomponents')
-environment.loaders.prepend('webcomponents', webcomponents)
 
 // To enable jQuery for $ in browser console
 environment.loaders.append('expose', {

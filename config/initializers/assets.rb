@@ -11,11 +11,3 @@ Rails.application.config.assets.paths << Rails.root.join('node_modules')
 # Precompile additional assets.
 # application.js, application.scss, and all non-JS/CSS in the app/assets
 # folder are already added.
-Rails.application.config.assets.precompile << 'root/index.js'
-Rails.application.config.assets.precompile << 'root/index.css'
-Rails.application.config.assets.precompile << 'reports/gene/show.js'
-Rails.application.config.assets.precompile << 'reports/gene/show.css'
-Rails.application.config.assets.precompile << 'reports/variant/show.js'
-Rails.application.config.assets.precompile << 'reports/variant/show.css'
-Rails.application.config.assets.precompile << 'static/style.css'
-Rails.application.config.assets.precompile << 'webcomponents-loader.js'
