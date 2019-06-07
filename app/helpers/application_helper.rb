@@ -33,4 +33,12 @@ module ApplicationHelper #:nodoc:
       end
     end
   end
+
+  def link_tag(**options)
+    tag :link, options
+  end
+
+  def stanza_tag(name, **options)
+    tag "togostanza-#{name}", options
+  end
 end

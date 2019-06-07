@@ -1,34 +1,20 @@
-= content_for :header do
-  = stylesheet_pack_tag 'reports/variant/show', media: :all
-  = javascript_pack_tag 'reports/variant/show'
-  - @stanza.each do |stanza|
-    = stanza.link
+= content_for :head do
+  = javascript_include_tag '/stanza/assets/js/stanza.js'
+  = javascript_include_tag '/stanza/assets/components/webcomponentsjs/webcomponents-loader.js'
 
-= content_for :navbar do
-  %nav#navbar-stanza.navbar.navbar-expand.flex-column.flex-md-row
-    .navbar-inner
-      .navbar-scroll
-        %ul.navbar-nav.flex-row
-          - @stanza.each do |stanza|
-            %li{ class: 'nav-item' }= link_to stanza.nav_label, "##{stanza.nav_id}", class: 'nav-link', data: { turbolinks: false }
+  = link_tag rel: 'import', href: "/stanza/#{@header[0]}"
+  - @stanzas.each do |stanza|
+    = link_tag rel: 'import', href: "/stanza/#{stanza[0]}"
 
-%main
-  .container-fluid
-    = render partial: 'layouts/report_header', locals: { title: 'Variant report', id: "tgv#{@tgv_id}" }
+%header#DetailHeader
+  %p.pagetype Variant report
+  %h2.title tgv6332
+  = stanza_tag @header[0], @header[1]
 
-    %section#nanostanzas
-      %div
-        - StanzaRuby.providers.variant.nanostanza.each do |stanza|
-          .nanostanza-container{data: {stanza: stanza.uri, 'stanza_tgv_id': @tgv_id, nanostanza_span: stanza.span}}
-      %div
-        - %w[jga_ngs jga_snp 35kjpn hgvd exac].each do |dataset|
-          - stanza = StanzaRuby.providers.variant.nanostanza_meta.frequency
-          - sparqlist = URI.join(root_url, "/sparqlist/api/variant_#{dataset}_nano?tgv_id=#{@tgv_id}")
-          .nanostanza-container{data: {stanza: stanza.uri, stanza_sparqlist: sparqlist, nanostanza_span: stanza.span}}
-
-    - @stanza.each do |stanza|
-      %section{id: stanza.nav_id}
-        .page-header
-          %h2= stanza.title
-        .stanza-wrap
-          = stanza.tag
+%main#ReportMain.LayoutReport
+  - @stanzas.each do |stanza|
+    %section.stanza-view
+      %h3.title
+        = stanza[1]
+      .stanza
+        = stanza_tag stanza[0], stanza[2]
