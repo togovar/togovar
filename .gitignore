@@ -11,7 +11,7 @@
 # Ignore config
 /config/elasticsearch.yml
 /config/endpoint.yml
-/config/stanza_ruby.yml
+/config/virtuoso.yml
 
 # Ignore compiled assets
 /public/assets
