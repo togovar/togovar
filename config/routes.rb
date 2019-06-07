@@ -3,7 +3,6 @@ require 'sidekiq/web'
 Rails.application.routes.draw do
   root 'root#index'
 
-  resources :gene, only: [:show], controller: 'reports/gene', constraints: { id: %r{[\w\-:.\/]+} }
   resources :variant, only: [:show], controller: 'reports/variant', constraints: { id: /tgv\d+/ }
 
   # static pages
