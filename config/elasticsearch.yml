@@ -1,0 +1,26 @@
+defaults: &defaults
+  host: localhost:9200
+  user: elastic
+  password: changeme
+
+  indices:
+    variants:
+      number_of_replicas: 0
+      number_of_shards: 1
+    gene_symbols:
+      number_of_replicas: 0
+      number_of_shards: 1
+    diseases:
+      number_of_replicas: 0
+      number_of_shards: 1
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+  host: localhost:9250
+
+production:
+  <<: *defaults
+  host: elasticsearch:9200
