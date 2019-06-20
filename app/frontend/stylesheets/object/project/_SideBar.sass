@@ -6,6 +6,7 @@
   overflow-y: auto
   transform: translateX(-297px)
   transition: transform $GUI_DURATION
+  white-space: nowrap
 
   .-drawer-opened &
     padding-bottom: $HEIGHT_BOTTOM_DRAWER_OPENED + $PADDING_SIDEBAR_SIDE
@@ -15,6 +16,7 @@
     vertical-align: top
     width: $WIDTH_SIDEBAR - $PADDING_SIDEBAR_SIDE * 2
     padding-bottom: $PADDING_SIDEBAR_SIDE + $HEIGHT_BOTTOM_DRAWER
+    white-space: initial
 
     > .title
       color: white

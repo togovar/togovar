@@ -1,7 +1,6 @@
 /*global $ */
 import PanelView from "./PanelView.js";
 import StoreManager from "./StoreManager.js";
-import {DEFAULT_CONDITIONS} from "../global.js";
 
 export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView {
 
@@ -21,6 +20,7 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
     this.all = rangeSelector.querySelector('.match > label > .all');
     this.any = rangeSelector.querySelector('.match > label > .any');
 
+    this.conditionMaster = StoreManager.getSearchConditionMaster(this.kind);
     const condition = this.getFrequency();
     this.from.value = condition.from;
     this.to.value = condition.to;
@@ -64,9 +64,9 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
 
   getFrequency() {
     let condition = StoreManager.getSearchCondition('frequency');
-    condition = condition ? condition : DEFAULT_CONDITIONS.frequency;
-    for (const key in DEFAULT_CONDITIONS.frequency) {
-      condition[key] = condition[key] ? condition[key] : DEFAULT_CONDITIONS.frequency[key];
+    condition = condition ? condition : this.conditionMaster.items.reduce((acc, item) => Object.assign(acc, {[item.id]: item.default}), {});
+    for (const item of this.conditionMaster.items) {
+      condition[item.id] = condition[item.id] ? condition[item.id] : this.conditionMaster.items.find(frequency => frequency.id === item.id).default;
     }
     return condition;
   }

@@ -1,4 +1,4 @@
-import {VARIANT_TYPE_LABELS, DATASETS, CONSEQUENCES, COLUMNS} from '../global.js';
+import {COLUMNS} from '../global.js';
 import StoreManager from "./StoreManager.js";
 
 const REF_ALT_SHOW_LENGTH = 4;
@@ -61,20 +61,22 @@ export default class ResultsRowView {
         case 'gene':
           html += '<td class="gene" data-remains=""><a href="" class="hyper-text -internal" target="_blank"></a></td>';
           break;
-        case 'alt_frequency':
-          html += `
-            <td class="alt_frequency">
-              <div class="frequency-graph">
-                ${Object.keys(DATASETS).map(dataset => {
-                  if (dataset == 'gnomad' || dataset == 'mgend' || dataset == 'clinvar') {
-                    return '';
-                  } else {
-                    return `<div class="dataset" data-dataset="${dataset}" data-frequency=""></div>`;
-                  }
-                }).join('')}
-              </div>
-            </td>
-          `;
+        case 'alt_frequency': // frequency
+          {
+            const master = StoreManager.getSearchConditionMaster('dataset');
+            html += `
+              <td class="alt_frequency">
+                <div class="frequency-graph">
+                  ${master.items.map(dataset => {
+                    if (dataset.id === 'gnomad' || dataset.id === 'mgend' || dataset.id === 'clinvar') {
+                      return '';
+                    } else {
+                      return `<div class="dataset" data-dataset="${dataset.id}" data-frequency=""></div>`;
+                    }
+                  }).join('')}
+                </div>
+              </td>`;
+          }
           break;
         case 'consequence':
           html += '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>';
@@ -86,7 +88,7 @@ export default class ResultsRowView {
           html += '<td class="polyphen" data-remains=""><div class="variant-function" data-function=""></div></td>';
           break;
         case 'clinical_significance':
-          html += '<td class="clinical_significance" data-remains=""><div href="" class="clinical-significance" data-sign=""></div><a href="" class="hyper-text -internal" target="_blank"></a></td>';
+          html += '<td class="clinical_significance" data-remains=""><div href="" class="clinical-significance" data-sign=""></div><a></a></td>';
           break;
       }
     }
@@ -114,7 +116,8 @@ export default class ResultsRowView {
     this.tdPolyphenFunction = this.tdPolyphen.querySelector('.variant-function');
     this.tdClinical = this.tr.querySelector('td.clinical_significance');
     this.tdClinicalSign = this.tdClinical.querySelector('.clinical-significance');
-    this.tdClinicalAnchor = this.tdClinical.querySelector('a.hyper-text.-internal');
+    //this.tdClinicalAnchor = this.tdClinical.querySelector('a.hyper-text.-internal');
+    this.tdClinicalAnchor = this.tdClinical.querySelector('a');
   }
 
   update() {
@@ -144,154 +147,168 @@ export default class ResultsRowView {
 
     for (const column of COLUMNS) {
       switch (column.id) {
-        case 'togovar_id': {
-          this.tdTGVAnchor.href = `/variant/${result.id}`;
-          this.tdTGVAnchor.textContent = result.id;
-        }
-          break;
-        case 'refsnp_id': {
-          if (result.existing_variations.length > 0) {
-            this.tdRS.dataset.remains = result.existing_variations.length - 1;
-            this.tdRSAnchor.href = `http://identifiers.org/dbsnp/${result.existing_variations[0]}`;
-            this.tdRSAnchor.textContent = `${result.existing_variations[0]}`;
-          } else {
-            this.tdRS.dataset.remains = 0;
-            this.tdRSAnchor.href = '';
-            this.tdRSAnchor.textContent = '';
+        case 'togovar_id':
+          {
+            this.tdTGVAnchor.href = `/variant/${result.id}`;
+            this.tdTGVAnchor.textContent = result.id;
           }
-        }
           break;
-        case 'position': {
-          this.tdPositionChromosome.textContent = result.chromosome;
-          this.tdPositionCoordinate.textContent = result.start;
-        }
+        case 'refsnp_id':
+          {
+            if (result.existing_variations.length > 0) {
+              this.tdRS.dataset.remains = result.existing_variations.length - 1;
+              this.tdRSAnchor.href = `http://identifiers.org/dbsnp/${result.existing_variations[0]}`;
+              this.tdRSAnchor.textContent = `${result.existing_variations[0]}`;
+            } else {
+              this.tdRS.dataset.remains = 0;
+              this.tdRSAnchor.href = '';
+              this.tdRSAnchor.textContent = '';
+            }
+          }
           break;
-        case 'ref_alt': {
-          const refalt = {
-            ref: result.reference ? result.reference : '',
-            alt: result.alternative ? result.alternative : ''
-          };
-          this.tdRefAltRef.textContent = refalt.ref.substr(0, REF_ALT_SHOW_LENGTH) + (refalt.ref.length > REF_ALT_SHOW_LENGTH ? '...' : '');
-          this.tdRefAltRef.dataset.sum = refalt.ref.length;
-          this.tdRefAltAlt.textContent = refalt.alt.substr(0, REF_ALT_SHOW_LENGTH) + (refalt.alt.length > REF_ALT_SHOW_LENGTH ? '...' : '');
-          this.tdRefAltAlt.dataset.sum = refalt.alt.length;
-        }
+        case 'position':
+          {
+            this.tdPositionChromosome.textContent = result.chromosome;
+            this.tdPositionCoordinate.textContent = result.start;
+          }
+          break;
+        case 'ref_alt':
+          {
+            const refalt = {
+              ref: result.reference ? result.reference : '',
+              alt: result.alternative ? result.alternative : ''
+            };
+            this.tdRefAltRef.textContent = refalt.ref.substr(0, REF_ALT_SHOW_LENGTH) + (refalt.ref.length > REF_ALT_SHOW_LENGTH ? '...' : '');
+            this.tdRefAltRef.dataset.sum = refalt.ref.length;
+            this.tdRefAltAlt.textContent = refalt.alt.substr(0, REF_ALT_SHOW_LENGTH) + (refalt.alt.length > REF_ALT_SHOW_LENGTH ? '...' : '');
+            this.tdRefAltAlt.dataset.sum = refalt.alt.length;
+          }
           break;
         case 'type': {
-          this.tdType.textContent = VARIANT_TYPE_LABELS[result.type];
-        }
-          break;
-        case 'gene': {
-          if (result.symbols.length) {
-            this.tdGene.dataset.remains = result.symbols.length - 1;
-            this.tdGeneAnchor.href = `http://identifiers.org/hgnc/${result.symbols[0].id}`;
-            this.tdGeneAnchor.textContent = result.symbols[0].name;
-          } else {
-            this.tdGene.dataset.remains = 0;
-            this.tdGeneAnchor.href = '';
-            this.tdGeneAnchor.textContent = '';
+          const master = StoreManager.getSearchConditionMaster('type').items;
+          this.tdType.textContent = master.find(type => type.id === result.type).label;
           }
-        }
           break;
-        case 'alt_frequency': {
-          for (const key in DATASETS) {
-            if (key === 'gnomad' || key === 'mgend' || key === 'clinvar') continue;
-            const frequency = result.frequencies ? result.frequencies.find(frequency => frequency.source === DATASETS[key].search) : undefined;
-            let frequencyValue;
-            if (frequency) {
+        case 'gene':
+          {
+            if (result.symbols.length) {
+              this.tdGene.dataset.remains = result.symbols.length - 1;
+              this.tdGeneAnchor.href = `http://identifiers.org/hgnc/${result.symbols[0].id}`;
+              this.tdGeneAnchor.textContent = result.symbols[0].name;
+            } else {
+              this.tdGene.dataset.remains = 0;
+              this.tdGeneAnchor.href = '';
+              this.tdGeneAnchor.textContent = '';
+            }
+          }
+          break;
+        case 'alt_frequency':
+          {
+            const master = StoreManager.getSearchConditionMaster('dataset');
+            for (const dataset of master.items) {
+              if (dataset.id === 'gnomad' || dataset.id === 'mgend' || dataset.id === 'clinvar') continue;
+              const frequency = result.frequencies ? result.frequencies.find(frequency => frequency.source === dataset.id) : undefined;
+              let frequencyValue;
+              if (frequency) {
+                switch (true) {
+                  case frequency.num_alt_alleles == 1:
+                    frequencyValue = 'singleton';
+                    break;
+                  case frequency.frequency >= .5:
+                    frequencyValue = '≥0.5';
+                    break;
+                  case frequency.frequency > .05:
+                    frequencyValue = '<0.5';
+                    break;
+                  case frequency.frequency > .01:
+                    frequencyValue = '<0.05';
+                    break;
+                  case frequency.frequency > .001:
+                    frequencyValue = '<0.01';
+                    break;
+                  case frequency.frequency > .0001:
+                    frequencyValue = '<0.001';
+                    break;
+                  case frequency.frequency > 0:
+                    frequencyValue = '<0.0001';
+                    break;
+                  default:
+                    frequencyValue = 'monomorphic';
+                    break;
+                }
+              } else {
+                frequencyValue = 'na';
+              }
+              this.tdFrequencies[dataset.id].dataset.frequency = frequencyValue;
+            }
+          }
+          break;
+        case 'consequence':
+          {
+            if (result.most_severe_consequence) {
+              const master = StoreManager.getSearchConditionMaster('consequence');
+              const unique = [...new Set(result.transcripts.reduce((accumulator, transcript) => accumulator.concat(transcript.consequences), []))];
+              this.tdConsequence.dataset.remains = unique.length - 1;
+              this.tdConsequenceItem.textContent = master.items.find(consequence => consequence.id === result.most_severe_consequence).label;
+            } else {
+              this.tdConsequence.dataset.remains = 0;
+              this.tdConsequenceItem.textContent = '';
+            }
+          }
+          break;
+        case 'sift':
+          {
+            const sifts = result.transcripts.filter(transcript => transcript.sift);
+            if (sifts.length > 0) {
+              this.tdSift.dataset.remains = sifts.length - 1;
+              this.tdSiftFunction.textContent = result.sift;
+              this.tdSiftFunction.dataset.function = result.sift >= .05 ? 'T' : 'D';
+            } else {
+              this.tdSift.dataset.remains = 0;
+              this.tdSiftFunction.textContent = '';
+              this.tdSiftFunction.dataset.function = '';
+            }
+          }
+          break;
+        case 'polyphen':
+          {
+            const polyphens = result.transcripts.filter(transcript => transcript.polyphen);
+            if (polyphens.length > 0) {
+              this.tdPolyphen.dataset.remains = polyphens.length - 1;
+              this.tdPolyphenFunction.textContent = result.polyphen;
               switch (true) {
-                case frequency.num_alt_alleles == 1:
-                  frequencyValue = 'singleton';
+                case result.polyphen > .908:
+                  this.tdPolyphenFunction.dataset.function = 'PROBD';
                   break;
-                case frequency.frequency >= .5:
-                  frequencyValue = '≥0.5';
+                case result.polyphen > .446:
+                  this.tdPolyphenFunction.dataset.function = 'POSSD';
                   break;
-                case frequency.frequency > .05:
-                  frequencyValue = '<0.5';
-                  break;
-                case frequency.frequency > .01:
-                  frequencyValue = '<0.05';
-                  break;
-                case frequency.frequency > .001:
-                  frequencyValue = '<0.01';
-                  break;
-                case frequency.frequency > .0001:
-                  frequencyValue = '<0.001';
-                  break;
-                case frequency.frequency > 0:
-                  frequencyValue = '<0.0001';
+                case result.polyphen >= 0:
+                  this.tdPolyphenFunction.dataset.function = 'B';
                   break;
                 default:
-                  frequencyValue = 'monomorphic';
+                  this.tdPolyphenFunction.dataset.function = 'U';
                   break;
               }
             } else {
-              frequencyValue = 'na';
+              this.tdPolyphen.dataset.remains = 0;
+              this.tdPolyphenFunction.textContent = '';
+              this.tdPolyphenFunction.dataset.function = '';
             }
-            this.tdFrequencies[key].dataset.frequency = frequencyValue;
           }
-        }
           break;
-        case 'consequence': {
-          if (result.most_severe_consequence) {
-            this.tdConsequence.dataset.remains = result.transcripts.length - 1;
-            this.tdConsequenceItem.textContent = CONSEQUENCES.find(consequence => consequence.accession === result.most_severe_consequence).label;
-          } else {
-            this.tdConsequence.dataset.remains = 0;
-            this.tdConsequenceItem.textContent = '';
-          }
-        }
-          break;
-        case 'sift': {
-          const sifts = result.transcripts.filter(transcript => transcript.sift);
-          if (sifts.length > 0) {
-            this.tdSift.dataset.remains = sifts.length - 1;
-            this.tdSiftFunction.textContent = result.sift;
-            this.tdSiftFunction.dataset.function = result.sift >= .05 ? 'T' : 'D';
-          } else {
-            this.tdSift.dataset.remains = 0;
-            this.tdSiftFunction.textContent = '';
-            this.tdSiftFunction.dataset.function = '';
-          }
-        }
-          break;
-        case 'polyphen': {
-          const polyphens = result.transcripts.filter(transcript => transcript.polyphen);
-          if (polyphens.length > 0) {
-            this.tdPolyphen.dataset.remains = polyphens.length - 1;
-            this.tdPolyphenFunction.textContent = result.polyphen;
-            switch (true) {
-              case result.polyphen > .908:
-                this.tdPolyphenFunction.dataset.function = 'PROBD';
-                break;
-              case result.polyphen > .446:
-                this.tdPolyphenFunction.dataset.function = 'POSSD';
-                break;
-              case result.polyphen >= 0:
-                this.tdPolyphenFunction.dataset.function = 'B';
-                break;
-              default:
-                this.tdPolyphenFunction.dataset.function = 'U';
-                break;
+        case 'clinical_significance':
+          {
+            if (result.significance.length) {
+              this.tdClinical.dataset.remains = result.significance.length - 1;
+              this.tdClinicalSign.dataset.sign = result.significance[0].interpretations[0];
+              this.tdClinicalAnchor.textContent = result.significance[0].condition;
+            } else {
+              this.tdClinical.dataset.remains = 0;
+              this.tdClinicalSign.dataset.sign = '';
+              this.tdClinicalAnchor.textContent = '';
             }
-          } else {
-            this.tdPolyphen.dataset.remains = 0;
-            this.tdPolyphenFunction.textContent = '';
-            this.tdPolyphenFunction.dataset.function = '';
           }
-        }
-          break;
-        case 'clinical_significance': {
-          if (result.significance.length) {
-            this.tdClinical.dataset.remains = result.significance.length - 1;
-            this.tdClinicalSign.dataset.sign = result.significance[0].interpretations[0];
-            this.tdClinicalAnchor.textContent = result.significance[0].condition;
-          } else {
-            this.tdClinical.dataset.remains = 0;
-            this.tdClinicalSign.dataset.sign = '';
-            this.tdClinicalAnchor.textContent = '';
-          }
-        }
           break;
       }
     }

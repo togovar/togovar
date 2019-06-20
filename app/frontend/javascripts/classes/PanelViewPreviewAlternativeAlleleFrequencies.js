@@ -1,4 +1,4 @@
-import {DATASETS, strIns} from '../global.js';
+import {strIns} from '../global.js';
 import PanelView from "./PanelView.js";
 import StoreManager from "./StoreManager.js";
 
@@ -11,11 +11,12 @@ export default class PanelViewPreviewAlternativeAlleleFrequencies extends PanelV
     StoreManager.bind('selectedRow', this);
     StoreManager.bind('offset', this);
     const tbody = this.elm.querySelector('.frequency-detail > tbody');
+    this.master = StoreManager.getSearchConditionMaster('dataset').items;
     this.datasets = {};
-    for (const dataset in DATASETS) {
-      const tr = tbody.querySelector(`tr[data-dataset="${dataset}"]`);
+    for (const dataset of this.master) {
+      const tr = tbody.querySelector(`tr[data-dataset="${dataset.id}"]`);
       if (tr) {
-        this.datasets[dataset] = {
+        this.datasets[dataset.id] = {
           alt: tr.querySelector('.alt'),
           total: tr.querySelector('.total'),
           frequency: tr.querySelector('.frequency')
@@ -33,22 +34,26 @@ export default class PanelViewPreviewAlternativeAlleleFrequencies extends PanelV
   }
 
   update() {
-    for (const dataset in DATASETS) {
-      if (this.datasets[dataset]) {
-        this.datasets[dataset].alt.textContent = '';
-        this.datasets[dataset].total.textContent = '';
-        this.datasets[dataset].frequency.textContent = '';
+    for (const dataset of this.master) {
+      if (this.datasets[dataset.id]) {
+        this.datasets[dataset.id].alt.textContent = '';
+        this.datasets[dataset.id].total.textContent = '';
+        this.datasets[dataset.id].frequency.textContent = '';
       }
     }
     if (StoreManager.getData('selectedRow') !== undefined) {
       const record = StoreManager.getSelectedRecord();
       if (record) {
-        for (const dataset in DATASETS) {
-          const frequency = record.frequencies.find(frequency => frequency.source === DATASETS[dataset].search);
+        for (const dataset of this.master) {
+          const frequency = record.frequencies.find(frequency => frequency.source === dataset.id);
           if (frequency) {
-            this.datasets[dataset].alt.textContent = frequency.num_alt_alleles.toLocaleString();
-            this.datasets[dataset].total.textContent = frequency.num_alleles.toLocaleString();
-            this.datasets[dataset].frequency.textContent = strIns((Math.round(frequency.frequency * 10 ** DECIMAL_DIGIT) + '').padStart(DECIMAL_DIGIT + 1, '0'), -DECIMAL_DIGIT, '.');
+            this.datasets[dataset.id].alt.textContent = frequency.num_alt_alleles.toLocaleString();
+            this.datasets[dataset.id].total.textContent = frequency.num_alleles.toLocaleString();
+            if ((frequency.frequency + '').length > DECIMAL_DIGIT + 2) {
+              this.datasets[dataset.id].frequency.textContent = frequency.frequency.toExponential(DECIMAL_DIGIT - 1);
+            } else {
+              this.datasets[dataset.id].frequency.textContent = strIns((Math.round(frequency.frequency * 10 ** DECIMAL_DIGIT) + '').padStart(DECIMAL_DIGIT + 1, '0'), -DECIMAL_DIGIT, '.');
+            }
           }
         }
       }

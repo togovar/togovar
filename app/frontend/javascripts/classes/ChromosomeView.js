@@ -11,6 +11,7 @@ export default class ChromosomeView {
    * @param maxLength:Number Max length of chromosomes
    */
   constructor(elm, no, map, maxLength) {
+    return;
     this.no = no;
     this.map = map;
     this.elm = elm;

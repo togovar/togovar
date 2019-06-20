@@ -59,13 +59,11 @@ $CHAR_EXTERNAL_LINK: "\f08e"
 $CHAR_ARROW_CIRCLE_RIGHT: "\f0a9"
 $CHAR_WRENCH: "\f0ad"
 
-
 @mixin sprite($width, $height, $x, $y)
   background-image: url('~images/csssprite.png')
   background-repeat: no-repeat
   background-position: #{-$x} #{-$y}
   background-size: 200px 60px
-
 
 @font-face
   font-family: 'FontAwesome'
@@ -81,6 +79,7 @@ body
   color: $COLOR_BLACK
   //min-width: $WIDTH_MIN
   height: 100%
+  padding-top: $HEIGHT_GLOBAL_MENU
   -moz-osx-font-smoothing: grayscale
   -webkit-font-smoothing: antialiased
 

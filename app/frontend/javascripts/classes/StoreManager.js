@@ -1,5 +1,4 @@
 /*global $ */
-import {DEFAULT_CONDITIONS} from "../global.js";
 
 const LIMIT = 100;
 
@@ -26,6 +25,7 @@ class StoreManager {
           .then(response => response.json())
       ])
       .then(responses => {
+        Object.freeze(responses[0]);
         this.setData('searchConditionsMaster', responses[0]);
         this.store.searchConditions = this.extractSearchCondition(this.URIParameters);
         callback();
@@ -133,6 +133,10 @@ class StoreManager {
     return this.copy(this.store.searchConditions[key]);
   }
 
+  getSearchConditionMaster(key) {
+    return this.getData('searchConditionsMaster').find(condition => condition.id === key);
+  }
+
   extractSearchCondition(condition) {
     const searchConditionsMaster = this.getData('searchConditionsMaster');
 
@@ -167,10 +171,10 @@ class StoreManager {
   }
 
   reflectSearchConditionToURI() {
+    const master = this.getData('searchConditionsMaster');
     const diffConditions = this.extractSearchCondition(this.store.searchConditions);
-
-    for (const key in DEFAULT_CONDITIONS) {
-      delete this.URIParameters[key];
+    for (const condition of master) {
+      delete this.URIParameters[condition.id];
     }
 
     Object.assign(this.URIParameters, diffConditions);
@@ -230,6 +234,7 @@ class StoreManager {
         this.setData('statisticsDataset', json.statistics.dataset);
         this.setData('statisticsSignificance', json.statistics.significance);
         this.setData('statisticsType', json.statistics.type);
+        this.setData('statisticsConsequence', json.statistics.consequence);
 
         this.fetching = false;
         this.notify('offset');

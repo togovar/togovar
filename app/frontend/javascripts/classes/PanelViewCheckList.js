@@ -32,12 +32,21 @@ export default class PanelViewCheckList extends PanelView {
 
     // statistics
     this[this.statisticsType] = values => {
-      let all = 0;
-      for (const key in values) {
-        all += values[key];
-        this.inputsValues[key].value.textContent = values[key].toLocaleString();
+      if (values) {
+        let all = 0;
+        for (const key in this.inputsValues) {
+          const count = values[key] ? values[key] : 0;
+          all += count;
+          this.inputsValues[key].value.textContent = count.toLocaleString();
+        }
+        this.inputsValues.all.value.textContent = all.toLocaleString();
+      } else {
+        // 統計値が帰ってこなかった場合
+        for (const key in this.inputsValues) {
+          this.inputsValues[key].value.textContent = '0';
+        }
       }
-      this.inputsValues.all.value.textContent = all.toLocaleString();
+      this.inputsValues.all.value.textContent = StoreManager.getData('searchStatus').filtered.toLocaleString();
     }
   }
 

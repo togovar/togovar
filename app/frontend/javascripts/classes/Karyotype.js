@@ -258,8 +258,6 @@ export default class Karyotype {
         geneMap[i],
         this.maxLength));
     }
-    for (const key of CHROMOSOME_KEYS) {
-    }
   }
 
   changeKaryotype(params) {

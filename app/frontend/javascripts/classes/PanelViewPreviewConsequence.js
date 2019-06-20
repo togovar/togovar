@@ -1,5 +1,3 @@
-/*global $ */
-import {CONSEQUENCES} from '../global.js';
 import PanelView from "./PanelView.js";
 import StoreManager from "./StoreManager.js";
 
@@ -28,7 +26,8 @@ export default class PanelViewPreviewConsequence extends PanelView {
       if (record && record.transcripts && record.transcripts.length > 0) {
         let accessions = record.transcripts.map(transcript => transcript.consequences).reduce((first, second) => first.concat(second));
         accessions = Array.from(new Set(accessions));
-        const consequences = accessions.map(accession => CONSEQUENCES.find(consequence => consequence.accession === accession));
+        const master = StoreManager.getSearchConditionMaster('consequence');
+        const consequences = accessions.map(accession => master.items.find(consequence => consequence.id === accession));
         html = consequences.map(consequence => `<dl class="above-headline"><dt>${consequence.label}</dt><dd>${consequence.description}</dd></dl>`).join('');
         this.elm.classList.remove('-notfound');
       }
