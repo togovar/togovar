@@ -7,7 +7,7 @@ module Reports
         ep: config['triplestore']
       }.compact
 
-      search_api = config['search_api'] || search_path
+      search_api = config['search_api'] || search_url
       jbrowse = config['jbrowse']
 
       @header = ['variant_header', default.merge(tgv_id: id)]
