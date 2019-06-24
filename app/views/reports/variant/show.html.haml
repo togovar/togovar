@@ -1,14 +1,16 @@
 = content_for :head do
   = javascript_include_tag '/stanza/assets/components/webcomponentsjs/webcomponents-loader.js'
 
-  = link_tag rel: 'import', href: "/stanza/#{@header[0]}/"
+  = link_tag rel: 'import', href: "/stanza/#{@header[:stanza][0]}/"
   - @stanzas.each do |stanza|
     = link_tag rel: 'import', href: "/stanza/#{stanza[0]}/"
 
 %header#DetailHeader
-  %p.pagetype Variant report
-  %h2.title tgv6332
-  = stanza_tag @header[0], @header[1]
+  .title-wrapper
+    %p.pagetype Variant report
+    %h2.title= @header[:id]
+  .title-wrapper
+    = stanza_tag @header[:stanza][0], @header[:stanza][1]
 
 %main#ReportMain.LayoutReport
   - @stanzas.each do |stanza|

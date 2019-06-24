@@ -10,7 +10,7 @@ module Reports
       search_api = config['search_api'] || search_url
       jbrowse = config['jbrowse']
 
-      @header = ['variant_header', default.merge(tgv_id: id)]
+      @header = { id: id, stanza: ['variant_header', default.merge(tgv_id: id)] }
 
       @stanzas = [
         ['variant_summary', nil, default.merge(tgv_id: id)],
