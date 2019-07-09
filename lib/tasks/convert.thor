@@ -20,7 +20,7 @@ module TogoVar
       inside(output) do
         i = 0
         prefix = options[:prefix].present? ? options[:prefix] : "variants_#{date_time_for_file_name}_"
-        ::TogoVar::IO::NDJSON.open(prefix: prefix) do |f|
+        ::TogoVar::IO::NDJSON.open(prefix, file_torate: true, start: 1) do |f|
           ::TogoVar::IO::VEP.foreach(vep) do |v|
             variant = ::TogoVar::Models::Variant.compose(*v)
             f.write [variant.index, variant]
