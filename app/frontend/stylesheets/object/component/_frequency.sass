@@ -2,7 +2,6 @@ $HEIGHT_BIT: 2px
 $HEIGHT_BIT_SHIFT: $HEIGHT_BIT + 1px
 
 .frequency-graph
-  //margin-bottom: -4px
   > .dataset
     display: inline-block
     width: 9px
@@ -72,8 +71,6 @@ $HEIGHT_BIT_SHIFT: $HEIGHT_BIT + 1px
     &[data-frequency="<0.5"]
       &:before
         height: #{$HEIGHT_BIT_SHIFT - 1px}
-
-    &[data-frequency="≥0.5"]
 
 .frequency-detail
   width: 100%
