@@ -96,7 +96,7 @@ module TogoVar
 
       def initialize(data = nil)
         if data.is_a?(TogoVar::IO::VEP::Annotation)
-          @tgv_id = data.uploaded_variation.sub(/^tgv/, '').to_i
+          @tgv_id = (m = data.uploaded_variation.match(/^tgv(\d+)/)) ? m[1].to_i : nil
           @variant_type = SO_VARIANT_TYPE[data.variant_class]&.id
           @chromosome = data.location.split(':')[0].presence
           @chromosome_sort = CHROMOSOME_CODE[@chromosome]
@@ -156,7 +156,7 @@ module TogoVar
         data << [s, M2R['alternative_allele'], alternative || '']
 
         # position
-        region   = RDF::Node.new
+        region = RDF::Node.new
         bn_begin = RDF::Node.new
         if start != stop
           bn_end = RDF::Node.new
