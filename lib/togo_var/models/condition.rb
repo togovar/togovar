@@ -33,10 +33,19 @@ module TogoVar
             }
           SPARQL
 
-          endpoint.query(query)
-            .map { |x| x.bindings.map { |k, v| [k, v.value] }.to_h }
-            .group_by { |x| x[:vcv] }
-            .map { |k, v| [k.sub(/^VCV/, '').to_i, v] }.to_h
+          i = 0
+          begin
+            endpoint.query(query)
+              .map { |x| x.bindings.map { |k, v| [k, v.value] }.to_h }
+              .group_by { |x| x[:vcv] }
+              .map { |k, v| [k.sub(/^VCV/, '').to_i, v] }.to_h
+          rescue SocketError => e
+            if (i += 1) <= 5
+              sleep 2.pow(i)
+              retry
+            end
+            raise e
+          end
         end
 
         def upsert_action(*conditions)
