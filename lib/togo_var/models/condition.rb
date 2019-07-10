@@ -9,8 +9,6 @@ module TogoVar
 
       class << self
         def find_conditions(*vcv)
-          endpoint = SPARQL::Client.new(Rails.configuration.endpoint['triplestore'])
-
           query = format(<<~SPARQL, vcv.map { |x| "vcv:#{x}" }.join(' '))
             DEFINE sql:select-option "order"
             PREFIX cvo: <http://purl.jp/bio/10/clinvar/>
@@ -73,6 +71,12 @@ module TogoVar
               conditions: conditions.map(&:to_h)
             }.compact
           }
+        end
+
+        private
+
+        def endpoint
+          @endpoint ||= SPARQL::Client.new(Rails.configuration.endpoint['triplestore'])
         end
       end
 

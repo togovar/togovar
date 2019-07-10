@@ -11,8 +11,6 @@ module TogoVar
         SPARQL_LIMIT_PER_QUERY = 1000
 
         def distinct
-          endpoint = SPARQL::Client.new(Rails.configuration.endpoint['triplestore'])
-
           i = 0
           buf = []
 
@@ -43,6 +41,12 @@ module TogoVar
 
           buf
         end
+      end
+
+      private
+
+      def endpoint
+        @endpoint ||= SPARQL::Client.new(Rails.configuration.endpoint['triplestore'])
       end
 
       ATTRIBUTES = %i[term].freeze
