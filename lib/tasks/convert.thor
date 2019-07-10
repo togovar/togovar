@@ -80,7 +80,7 @@ module TogoVar
         i = 0
         prefix = options[:prefix].present? ? options[:prefix] : "frequencies_#{date_time_for_file_name}_"
 
-        ::TogoVar::IO::NDJSON.open(prefix: prefix) do |f|
+        ::TogoVar::IO::NDJSON.open(prefix, file_torate: true, start: 1) do |f|
           (path.match?(/\.gz$/) ? Zlib::GzipReader : File).open(path) do |input|
             CSV.new(input, headers: true, col_sep: "\t").each do |row|
               freq = ::TogoVar::Models::Frequency.new(row)
@@ -144,7 +144,7 @@ module TogoVar
         prefix = options[:prefix].present? ? options[:prefix] : "conditions_#{date_time_for_file_name}_"
         i = 0
 
-        ::TogoVar::IO::NDJSON.open(prefix: prefix) do |f|
+        ::TogoVar::IO::NDJSON.open(prefix, file_torate: true, start: 1) do |f|
           ::TogoVar::IO::VCF.open(path) do |vcf|
             vcf.each_slice(300) do |slice|
               results = Models::Condition.find_conditions(*slice.map(&:id))
@@ -253,7 +253,7 @@ module TogoVar
         end)
         STDERR.print "\r #{symbols.size}/#{symbols.size}"
 
-        ::TogoVar::IO::NDJSON.open(prefix: prefix) do |f|
+        ::TogoVar::IO::NDJSON.open(prefix, file_torate: true, start: 1) do |f|
           symbols.each do |x|
             f.write [x.index, x]
           end
@@ -273,7 +273,7 @@ module TogoVar
 
       inside(output) do
         prefix = options[:prefix].present? ? options[:prefix] : "diseases_#{date_time_for_file_name}_"
-        ::TogoVar::IO::NDJSON.open(prefix: prefix) do |f|
+        ::TogoVar::IO::NDJSON.open(prefix, file_torate: true, start: 1) do |f|
           ::TogoVar::Models::Disease.distinct.each do |x|
             f.write [x.index, x]
           end
