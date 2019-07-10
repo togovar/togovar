@@ -140,6 +140,8 @@ module TogoVar
       require_relative '../../config/environment'
       require 'togo_var'
 
+      chromosomes = ('1'..'22').to_a.concat(%w[X Y MT])
+
       inside(output) do
         prefix = options[:prefix].present? ? options[:prefix] : "conditions_#{date_time_for_file_name}_"
         i = 0
@@ -147,6 +149,8 @@ module TogoVar
         ::TogoVar::IO::NDJSON.open(prefix, file_torate: true, start: 1) do |f|
           ::TogoVar::IO::VCF.open(path) do |vcf|
             vcf.each_slice(300) do |slice|
+              slice = slice.select { |x| chromosomes.include?(x.chrom) }
+
               results = Models::Condition.find_conditions(*slice.map(&:id))
 
               slice.each do |row|
@@ -188,6 +192,8 @@ module TogoVar
 
       base_url = Rails.configuration.virtuoso['base_url'] || raise('Resource base URI is not set.')
 
+      chromosomes = ('1'..'22').to_a.concat(%w[X Y MT])
+
       inside(output) do
         count = 0
 
@@ -197,6 +203,8 @@ module TogoVar
           RDF::Writer.for(:ntriples).new(gz) do |writer|
             IO::VCF.open(path) do |vcf|
               vcf.each_slice(300) do |slice|
+                slice = slice.select { |x| chromosomes.include?(x.chrom) }
+
                 Models::Variant.find_by_vcf(*slice).each do |tgv, vcv|
                   writer << [RDF::URI.new("#{base_url}/variant/#{tgv}"), Vocabulary::TGVO.has_interpreted_condition, RDF::URI("http://identifiers.org/clinvar:#{vcv}")]
                 end
