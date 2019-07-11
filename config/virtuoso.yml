@@ -1,11 +1,11 @@
 defaults: &defaults
-  command: isql
   host: localhost
+  isql: isql
   port: 1111
   user: dba
   password:
-  base_url: http://togovar.biosciencedbc.jp
-  load_dir: /load
+  base_url: <%= ENV.fetch('RDF_BASE_URI') { 'http://togovar.biosciencedbc.jp' } %>
+  load_dir: <%= ENV.fetch('LOAD_DIR') { '/' }.concat('load') %>
 
 development:
   <<: *defaults
