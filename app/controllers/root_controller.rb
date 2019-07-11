@@ -32,23 +32,30 @@ class RootController < ApplicationController
           return
         end
 
-        @result = if BINARY_FILTERS.map { |x| @param.selected_none?(x) }.any?
-                    {
-                      filtered_total: 0,
-                      hits: [],
-                      aggs: {}
-                    }
-                  else
-                    aggs = @param.stat? ? Variant.search(builder.stat_query).aggregations : {}
-                    response = Variant.search(builder.build, request_cache: !@param.term.present? )
+        @result = begin
+          if BINARY_FILTERS.map { |x| @param.selected_none?(x) }.any?
+            {
+              filtered_total: 0,
+              hits: [],
+              aggs: {}
+            }
+          else
+            aggs = @param.stat? ? Variant.search(builder.stat_query).aggregations : {}
+            response = Variant.search(builder.build, request_cache: !@param.term.present?)
 
-                    {
-                      filtered_total: response.raw_response['hits']['total'],
-                      hits: response.raw_response['hits']['hits']
-                              .map { |hit| Elasticsearch::Model::Response::Result.new(hit) },
-                      aggs: aggs
-                    }
-                  end
+            {
+              filtered_total: response.raw_response['hits']['total'],
+              hits: response.raw_response['hits']['hits']
+                      .map { |hit| Elasticsearch::Model::Response::Result.new(hit) },
+              aggs: aggs
+            }
+          end
+        rescue StandardError => e
+          Rails.logger.error('search') { builder.stat_query.to_json }
+          Rails.logger.error('search') { builder.build.to_json }
+          Rails.logger.error('search') { e.message }
+          {}
+        end
 
         render 'search', formats: 'json', handlers: 'jbuilder'
       end
