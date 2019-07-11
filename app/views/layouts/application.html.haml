@@ -7,6 +7,5 @@
     = stylesheet_pack_tag 'application', media: 'all'
     = yield :head
   %body
-    = javascript_include_tag 'https://dbcls.rois.ac.jp/NBDC-common-header-footer/common-header-and-footer/script/common-header-and-footer.js', style: 'display: block', id: 'common-header-and-footer__script'
     = render partial: 'layouts/header'
     = yield
