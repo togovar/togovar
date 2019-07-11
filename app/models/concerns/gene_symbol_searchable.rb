@@ -13,17 +13,22 @@ module GeneSymbolSearchable
       number_of_replicas: config.dig('indices', 'gene_symbols', 'number_of_replicas') || 0,
       analysis: {
         filter: {
-          sugget_filter: {
+          symbol_edge_ngram_filter: {
             type: 'edge_ngram',
             min_gram: 3,
             max_gram: 20
           }
         },
         analyzer: {
-          sugget_analyzer: {
+          symbol_index_analyzer: {
             type: 'custom',
-            tokenizer: 'standard',
-            filter: %w[lowercase sugget_filter]
+            tokenizer: 'whitespace',
+            filter: %w[lowercase symbol_edge_ngram_filter]
+          },
+          symbol_search_analyzer: {
+            type: 'custom',
+            tokenizer: 'whitespace',
+            filter: %w[lowercase]
           }
         }
       }
@@ -32,7 +37,7 @@ module GeneSymbolSearchable
         indexes :gene_id, type: :keyword
         indexes :symbol,
                 type: :text,
-                analyzer: 'sugget_analyzer',
+                analyzer: 'symbol_index_analyzer',
                 fields: {
                   raw: { type: :keyword }
                 }
