@@ -152,6 +152,9 @@ export default class ResultsRowView {
             if (result.id) {
               this.tdTGVAnchor.href = `/variant/${result.id}`;
               this.tdTGVAnchor.textContent = result.id;
+            } else {
+              this.tdTGVAnchor.href = '';
+              this.tdTGVAnchor.textContent = '';
             }
           }
           break;
