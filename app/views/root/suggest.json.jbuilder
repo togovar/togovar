@@ -1,4 +1,4 @@
-json.gene @response[:gene] do |result|
+json.gene(@response[:gene].sort_by { |x| x[:_score] }) do |result|
   json.term result.dig(:_source, :symbol)
   if (a = result.dig(:_source, :alias_of))
     json.alias_of a

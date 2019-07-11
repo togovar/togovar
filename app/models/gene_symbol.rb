@@ -9,17 +9,11 @@ class GeneSymbol
     # @param [String] prefix
     # @return [Elasticsearch::Model::Response] response
     def suggest(prefix)
-      query = {
-        suggest: {
-          'symbol-suggest': {
-            prefix: prefix,
-            completion: {
-              field: 'symbol.suggest',
-              size: 100
-            }
-          }
-        }
-      }
+      query = ::Elasticsearch::DSL::Search.search do
+        query do
+          match 'symbol': { query: prefix, analyzer: 'standard' }
+        end
+      end
 
       Elasticsearch.search(query)
     end
@@ -29,7 +23,7 @@ class GeneSymbol
     def search(term)
       query = ::Elasticsearch::DSL::Search.search do
         query do
-          match 'symbol': term
+          match 'symbol.raw': term
         end
       end
 

@@ -8,7 +8,7 @@ class RootController < ApplicationController
       format.json do
         @response = if term && term.length >= 3
                       {
-                        gene: GeneSymbol.suggest(term).suggestions.map { |_, v| v.first[:options] }.flatten,
+                        gene: GeneSymbol.suggest(term).results,
                         disease: Disease.suggest(term).results
                       }
                     else
