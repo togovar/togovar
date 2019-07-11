@@ -32,6 +32,7 @@ gem 'webpacker', '~> 3.5'
 
 # utility
 gem 'action_args', '~> 2.2'
+gem 'gtm_rails', '~> 0.5.0'
 gem 'kaminari', '~> 1.0'
 gem 'linkeddata', '~> 3.0'
 gem 'settingslogic', '~> 2.0'
