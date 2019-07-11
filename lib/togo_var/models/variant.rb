@@ -152,6 +152,9 @@ module TogoVar
         data << [s, RDF::Vocab::DC.identifier, "tgv#{tgv_id}"]
         data << [s, RDF::Vocab::RDFS.label, hgvs_g] if hgvs_g.present?
 
+        alt_label = [vcf[:chromosome], vcf[:position], vcf[:reference], vcf[:alternative]].join('_')
+        data << [s, RDF::Vocab::SKOS.altLabel, alt_label]
+
         data << [s, M2R['reference_allele'], reference || '']
         data << [s, M2R['alternative_allele'], alternative || '']
 
