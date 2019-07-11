@@ -2,7 +2,7 @@ import StoreManager from "./StoreManager.js";
 import ChromosomeView from "./ChromosomeView.js";
 
 const CHROMOSOME_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y'];
-const HEIGHTS = [30, 400];
+const HEIGHTS = [0, 400];
 const DEFAULT = {
   isOpened: false,
   isShowBand: true,

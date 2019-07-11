@@ -37,9 +37,11 @@ $PADDING_SIDEBAR_SIDE: 15px
 $PADDING_PANEL_VIEW: 10px
 $WIDTH_MIN: 900px
 $WIDTH_SIDEBAR: 300px
+$HEIGHT_NBDC_COMMON_HEADER: 24px
+$HEIGHT_NBDC_COMMON_FOOTER: 24px
 $HEIGHT_NAVIGATION_ITEM: 20px
 $HEIGHT_GLOBAL_MENU: 50px
-$HEIGHT_BOTTOM_DRAWER: 30px
+$HEIGHT_BOTTOM_DRAWER: 0
 $HEIGHT_BOTTOM_DRAWER_OPENED: 400px
 
 $Z_INDEX_ROW_INDICATOR: 1
@@ -77,9 +79,8 @@ body
   font-size: 10px
   font-family: 'Roboto Condensed', sans-serif
   color: $COLOR_BLACK
-  //min-width: $WIDTH_MIN
   height: 100%
-  padding-top: $HEIGHT_GLOBAL_MENU
+  padding-top: $HEIGHT_GLOBAL_MENU + $HEIGHT_NBDC_COMMON_HEADER !important
   -moz-osx-font-smoothing: grayscale
   -webkit-font-smoothing: antialiased
 

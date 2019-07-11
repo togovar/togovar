@@ -1,5 +1,6 @@
 export const PAGE = document.getElementsByTagName('html')[0].dataset.page;
 export const TR_HEIGHT = 27;
+export const COMMON_HEADER_HEIGHT = 30;
 
 export const COLUMNS = [
   {label: 'TogoVar ID', id: 'togovar_id'},

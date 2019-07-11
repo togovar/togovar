@@ -162,7 +162,7 @@ export default class SearchConditionController {
     let html = '';
     for (let i = 0; i < this.suggestList.length; i++) {
       const column = this.suggestList[i];
-      html += '<div class="column"><ul class="list">';
+      html += `<div class="column"><h3 class="title">${SUGGEST_LABELS[columnTypes[i]]}</h3><ul class="list">`;
       for (const item of column) {
         html += `
         <li class="item${item === undefined ? ' -disabled' : ''}" data-value="${item ? item.term : ''}">
@@ -172,7 +172,7 @@ export default class SearchConditionController {
         </li>
         `;
       }
-      html += `</ul><h3 class="title">${SUGGEST_LABELS[columnTypes[i]]}</h3></div>`;
+      html += '</ul></div>';
     }
 
     this.suggestView.innerHTML = html;
