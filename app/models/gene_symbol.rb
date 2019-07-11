@@ -11,7 +11,14 @@ class GeneSymbol
     def suggest(prefix)
       query = ::Elasticsearch::DSL::Search.search do
         query do
-          match 'symbol': { query: prefix, analyzer: 'standard' }
+          bool do
+            should do
+              match 'symbol.raw': { query: prefix, boost: 2 }
+            end
+            should do
+              match 'symbol': { query: prefix, analyzer: 'symbol_search_analyzer' }
+            end
+          end
         end
       end
 
