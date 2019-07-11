@@ -5,6 +5,6 @@ json.gene(@response[:gene].sort_by { |x| x[:_score] }) do |result|
   end
 end
 
-json.disease @response[:disease] do |result|
+json.disease(@response[:disease].sort_by { |x| x[:_score] }) do |result|
   json.term result.dig(:_source, :term)
 end

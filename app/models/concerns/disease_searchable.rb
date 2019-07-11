@@ -15,7 +15,6 @@ module DiseaseSearchable
         normalizer: {
           lowercase_normalizer: {
             type: 'custom',
-            char_filter: [],
             filter: %w[lowercase]
           }
         },
