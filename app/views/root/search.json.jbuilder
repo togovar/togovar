@@ -77,7 +77,7 @@ json.data @result[:hits] do |variant|
   transcripts = Array(source[:transcripts])
   transcripts.each { |x| x.delete(:most_severe) }
 
-  json.id "tgv#{source[:tgv_id]}"
+  json.id source[:tgv_id].present? ? "tgv#{source[:tgv_id]}" : nil
   json.existing_variations(existing_variations)
 
   json.chromosome source[:chromosome]

@@ -149,8 +149,10 @@ export default class ResultsRowView {
       switch (column.id) {
         case 'togovar_id':
           {
-            this.tdTGVAnchor.href = `/variant/${result.id}`;
-            this.tdTGVAnchor.textContent = result.id;
+            if (result.id) {
+              this.tdTGVAnchor.href = `/variant/${result.id}`;
+              this.tdTGVAnchor.textContent = result.id;
+            }
           }
           break;
         case 'refsnp_id':
