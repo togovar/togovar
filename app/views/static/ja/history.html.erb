@@ -1,0 +1,37 @@
+<% provide(:title, 'History') %>
+<% provide(:page, 'history') %>
+<% provide(:active, doc_history_path) %>
+
+<main>
+  <article class="common-document">
+    <header class="header">
+      <h2 class="title">更新履歴</h2>
+    </header>
+
+    <div class="contents">
+      <section class="section">
+        <h3 class="sectiontitle">2019/7/12</h3>
+        <ul class="unordered-list">
+          <li><strong>Keyword search: </strong>HGNC Gene Symbolの別名(例：PD-1、p53)で検索できるようになりました。</li>
+          <li><strong>Filters: </strong>Alternative allele
+            frequencyを検索条件にする場合に、検索対象としてユーザーが選択した「全てのDataset」または「いずれかのDataset」のどちらかを指定できるようになりました。
+          </li>
+          <li><strong>Filters: </strong>Consequence、SIFT、Polyphenの値でファセット検索可能になりました。</li>
+          <li><strong>Filters: </strong>低品質のバリアントを非表示にできるようになりました。
+          </li>
+          <li><strong>Datasets: </strong>ToMMo 3.5KJPNをVer.2
+            (<a href="https://jmorp.megabank.tohoku.ac.jp/201905/downloads/">ToMMo 3.5KJPNv2 Allele Frequency Panel</a>)に更新しました。ClinVar、Variant
+            Effect Predictor (VEP)も更新しました。詳細は<%= link_to 'Datasets', doc_datasets_path %>を参照ください。
+          </li>
+          <li><strong>Usability: </strong>Configurationメニューで表示項目の選択ができるようになりました。</li>
+          <li><strong>Usability: </strong>ユーザーインターフェースを改善して使いやすくしました。</li>
+        </ul>
+        <h3 class="sectiontitle">2018/6/7</h3>
+        <ul class="unordered-list">
+          <li>TogoVarの公開を開始しました。詳細は<a href="https://www.jst.go.jp/pr/announce/20180607/index.html">プレスリリース</a>を参照ください。
+          </li>
+        </ul>
+      </section>
+    </div>
+  </article>
+</main>
