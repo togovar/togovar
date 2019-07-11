@@ -3,6 +3,9 @@
   %head
     %title= title(yield(:title))
     %meta{ charset: 'utf-8' }
+    - if Rails.env.production?
+      - Rails.configuration.gtm.keys.each do |key|
+        = google_tag_manager_script_tag(key)
     = csrf_meta_tags
     = stylesheet_pack_tag 'application', media: 'all'
     = yield :head

@@ -42,6 +42,7 @@ module TogoVar
 
     config.elasticsearch = config_for(:elasticsearch)
     config.endpoint = config_for(:endpoint)
+    config.gtm = config_for(:google_tag_manager)
     config.virtuoso = config_for(:virtuoso)
   end
 end
