@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   get 'doc/datasets/jga_ngs', to: 'static#jga_ngs'
   get 'doc/datasets/jga_snp', to: 'static#jga_snp'
   get 'doc/datasets/analysis', to: 'static#analysis'
+  get 'doc/history', to: 'static#history'
   get 'doc/help', to: 'static#help'
   get 'doc/policy', to: 'static#policy'
   get 'doc/terms', to: 'static#terms'
