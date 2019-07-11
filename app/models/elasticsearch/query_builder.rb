@@ -47,6 +47,8 @@ module Elasticsearch
 
       return self if names.empty?
 
+      names = names.dup
+
       query = Elasticsearch::DSL::Search.search do
         query do
           bool do
@@ -56,10 +58,18 @@ module Elasticsearch
                   path :conditions
                   query { exists { field :conditions } }
                 end
-              else
-                nested do
-                  path :frequencies
-                  query { terms 'frequencies.source': names }
+              end
+              if names.present?
+                if names.size == 1
+                  nested do
+                    path :frequencies
+                    query { match 'frequencies.source': names.first }
+                  end
+                else
+                  nested do
+                    path :frequencies
+                    query { terms 'frequencies.source': names }
+                  end
                 end
               end
             end
@@ -321,10 +331,6 @@ module Elasticsearch
 
       conditions.compact!
 
-      if @dataset_condition.nil? && @frequency_condition.nil? && @quality_condition.nil?
-        conditions << default_scope
-      end
-
       query = if conditions.size == 1
                 { query: conditions.first }
               else
@@ -394,29 +400,6 @@ module Elasticsearch
       }
 
       query.to_hash.deep_merge(total_clinvar)
-    end
-
-    def default_scope
-      query = Elasticsearch::DSL::Search.search do
-        query do
-          bool do
-            should do
-              nested do
-                path :frequencies
-                query { exists { field :frequencies } }
-              end
-            end
-            should do
-              nested do
-                path :conditions
-                query { exists { field :conditions } }
-              end
-            end
-          end
-        end
-      end
-
-      query.to_hash[:query]
     end
 
     def tgv_condition(term)
@@ -545,11 +528,7 @@ module Elasticsearch
           nested do
             path :transcripts
             query do
-              if terms.size == 1
-                match 'transcripts.symbol': terms.first
-              else
-                terms 'transcripts.symbol': terms
-              end
+              terms 'transcripts.symbol': terms
             end
           end
         end
