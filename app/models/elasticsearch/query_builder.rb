@@ -31,8 +31,9 @@ module Elasticsearch
                           region_condition(term)
                         else
                           if (results = GeneSymbol.search(term).results).total.positive?
-                            symbol_root = results.first.dig(:_source, :alias_of)
-                            gene_condition(symbol_root || results.first.dig(:_source, :symbol))
+                            symbol = results.reject { |x| x.dig(:_source, :alias_of) }.map { |x| x.dig(:_source, :symbol) }.uniq
+                            symbol_roots = results.map { |x| x.dig(:_source, :alias_of) }.compact
+                            gene_condition(*symbol.concat(symbol_roots))
                           else
                             disease_condition(term)
                           end
@@ -538,13 +539,17 @@ module Elasticsearch
       query.to_hash[:query]
     end
 
-    def gene_condition(term)
+    def gene_condition(*terms)
       query = Elasticsearch::DSL::Search.search do
         query do
           nested do
             path :transcripts
             query do
-              match 'transcripts.symbol': term
+              if terms.size == 1
+                match 'transcripts.symbol': terms.first
+              else
+                terms 'transcripts.symbol': terms
+              end
             end
           end
         end
