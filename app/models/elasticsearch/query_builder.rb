@@ -52,24 +52,19 @@ module Elasticsearch
       query = Elasticsearch::DSL::Search.search do
         query do
           bool do
-            should do
-              if names.delete(:clinvar)
+            if names.delete(:clinvar)
+              should do
                 nested do
                   path :conditions
                   query { exists { field :conditions } }
                 end
               end
-              if names.present?
-                if names.size == 1
-                  nested do
-                    path :frequencies
-                    query { match 'frequencies.source': names.first }
-                  end
-                else
-                  nested do
-                    path :frequencies
-                    query { terms 'frequencies.source': names }
-                  end
+            end
+            if names.present?
+              should do
+                nested do
+                  path :frequencies
+                  query { terms 'frequencies.source': names }
                 end
               end
             end
