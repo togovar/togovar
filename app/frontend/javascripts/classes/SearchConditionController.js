@@ -59,7 +59,8 @@ export default class SearchConditionController {
     e.preventDefault();
     if (e.key === 'Enter') {
       if (this.suggesting && this.suggestPosition.x !== -1 && this.suggestPosition.y !== -1) {
-        this.field.value = this.suggestList[this.suggestPosition.x][this.suggestPosition.y].term;
+        this.field.value = this.suggestList[this.suggestPosition.x][this.suggestPosition.y].alias_of ||
+          this.suggestList[this.suggestPosition.x][this.suggestPosition.y].term;
       }
       this.suggesting = false;
       this.suggestView.innerHTML = '';
@@ -165,7 +166,7 @@ export default class SearchConditionController {
       html += `<div class="column"><h3 class="title">${SUGGEST_LABELS[columnTypes[i]]}</h3><ul class="list">`;
       for (const item of column) {
         html += `
-        <li class="item${item === undefined ? ' -disabled' : ''}" data-value="${item ? item.term : ''}">
+        <li class="item${item === undefined ? ' -disabled' : ''}" data-value="${item ? item.term : ''}" data-alias="${item && item.alias_of ? item.alias_of : ''}">
           ${item ? `${
             `<span class="main">${item.term}</span>` + (item.alias_of ? `<span class="sub">${item.alias_of}</span>` : '')
           }` : ''}
@@ -181,7 +182,7 @@ export default class SearchConditionController {
       if (!item.classList.contains('-disabled')) {
         $(item).on('click', e => {
           e.stopPropagation();
-          this.field.value = e.currentTarget.dataset.value;
+          this.field.value = e.currentTarget.dataset.alias || e.currentTarget.dataset.value;
           this.suggesting = false;
           this.suggestView.innerHTML = '';
           this.search();
