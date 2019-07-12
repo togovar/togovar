@@ -17,6 +17,7 @@ import PanelViewFilterVariantCallingQuality from '../javascripts/classes/PanelVi
 import PanelViewFilterConsequence from '../javascripts/classes/PanelViewFIlterConsequence.js';
 
 import PanelViewPreviewGene from '../javascripts/classes/PanelViewPreviewGene.js';
+import PreviewToVariantReport from '../javascripts/classes/PreviewToVariantReport.js';
 import PanelViewPreviewExternalLinks from '../javascripts/classes/PanelViewPreviewExternalLinks.js';
 import PanelViewPreviewAlternativeAlleleFrequencies from '../javascripts/classes/PanelViewPreviewAlternativeAlleleFrequencies.js';
 import PanelViewPreviewConsequence from '../javascripts/classes/PanelViewPreviewConsequence.js';
@@ -69,6 +70,7 @@ function initHome() {
     new PanelViewCheckList(document.getElementById('FilterPolyPhen'), 'polyphen');
 
     new PanelViewPreviewGene(document.getElementById('PreviewGene'));
+    new PreviewToVariantReport(document.getElementById('PreviewToVariantReport'));
     new PanelViewPreviewExternalLinks(document.getElementById('PreviewExternalLinks'));
     new PanelViewPreviewAlternativeAlleleFrequencies(document.getElementById('PreviewAlternativeAlleleFrequencies'));
     new PanelViewPreviewConsequence(document.getElementById('PreviewConsequence'));

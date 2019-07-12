@@ -71,11 +71,15 @@
     background: $GRADIENT_HEADING
     transition: background-color $GUI_DURATION
 
+    &.-disable
+      color: white
+      background: $GRADIENT_HEADING_DISABLE
+
     &:hover
       background-color: $COLOR_KEY_DEEP
 
     > .title
-      > a
+      > a, span
         color: white
         text-decoration: none
         padding: 8px $PADDING_PANEL_VIEW 6px
