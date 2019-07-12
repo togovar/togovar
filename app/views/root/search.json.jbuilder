@@ -62,8 +62,8 @@ json.data @result[:hits] do |variant|
     end
   end
 
-  sift = Array(source[:transcripts]).map { |x| x[:sift] }.compact.max
-  polyphen = Array(source[:transcripts]).map { |x| x[:polyphen] }.compact.min
+  sift = Array(source[:transcripts]).map { |x| x[:sift] }.compact.min
+  polyphen = Array(source[:transcripts]).map { |x| x[:polyphen] }.compact.max
 
   conditions = Array(source[:conditions]).map do |x|
     {
