@@ -144,6 +144,39 @@
           </tbody>
         </table>
       </section>
+      <section class="section">
+        <h3 class="sectiontitle">データ加工に利用したツール</h3>
+        <table class="table">
+          <thead>
+          <tr>
+            <th>ツール名</th>
+            <th>バージョン</th>
+            <th>内容</th>
+            <th>作成者</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><a target="_blank" href="https://samtools.github.io/bcftools/">bcftools</a></td>
+            <td></td>
+            <td>Indelの正規化とmultiallelicバリアントのbiallelicバリアントへの分割</td>
+            <td>Genome Research Ltd.</td>
+          </tr>
+          <tr>
+            <td><%= link_to 'BioReT', doc_datasets_analysis_path, class: { target: '_blank' } %></td>
+            <td>‐</td>
+            <td>NGSデータからバリアントを特定するツール群を一括実行</td>
+            <td><a href="https://amelieff.jp/">アメリエフ</a></td>
+          </tr>
+          <tr>
+            <td><a target="_blank" href="https://www.ensembl.org/info/docs/tools/vep/index.html">Variant Effect Predictor (VEP)</a></td>
+            <td>Ver.96</td>
+            <td>バリアントに<a href="https://www.ensembl.org/info/docs/tools/vep/script/vep_cache.html#cache_content">アノテーション（遺伝子名、Consequence等）</a>を付加</td>
+            <td>EMBL-EBI</td>
+          </tr>
+          </tbody>
+        </table>
+      </section>
     </div>
   </article>
 </main>
