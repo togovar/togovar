@@ -2,8 +2,8 @@ defaults: &defaults
   sparql: <%= ENV.fetch('TOGOVAR_ENDPOINT_SPARQL') { 'http://togovar.biosciencedbc.jp/sparql' } %>
   sparqlist: <%= ENV.fetch('TOGOVAR_ENDPOINT_SPARQLIST') { 'http://togovar.biosciencedbc.jp/sparqlist' } %>
   search: <%= ENV.fetch('TOGOVAR_ENDPOINT_SEARCH') { 'http://togovar.biosciencedbc.jp/search' } %>
-  jbrowse: <%= ENV.fetch('TOGOVAR_ENDPOINT_JBROWSE') %>
-  stanza: <%= ENV.fetch('TOGOVAR_ENDPOINT_STANZA') %>
+  jbrowse: <%= ENV.fetch('TOGOVAR_ENDPOINT_JBROWSE') { '' } %>
+  stanza: <%= ENV.fetch('TOGOVAR_ENDPOINT_STANZA') { '' } %>
 
 development:
   <<: *defaults
