@@ -1,8 +1,9 @@
 defaults: &defaults
-  triplestore: <%= ENV.fetch('TOGOVAR_ENDPOINT') { 'http://togovar.biosciencedbc.jp/sparql' } %>
-  sparqlist: <%= "#{ENV.fetch('TOGOVAR_SPARQLIST') { 'http://togovar.biosciencedbc.jp/sparqlist' }}/api" %>
-  search_api: <%= ENV.fetch('TOGOVAR_SEARCH_API') { 'http://togovar.biosciencedbc.jp/search' } %>
-  jbrowse: <%= "#{ENV.fetch('TOGOVAR_JBROWSE') { 'https://togovar.biosciencedbc.jp/jbrowse' }}/index.html" %>
+  sparql: <%= ENV.fetch('TOGOVAR_ENDPOINT_SPARQL') { 'http://togovar.biosciencedbc.jp/sparql' } %>
+  sparqlist: <%= ENV.fetch('TOGOVAR_ENDPOINT_SPARQLIST') { 'http://togovar.biosciencedbc.jp/sparqlist' } %>
+  search: <%= ENV.fetch('TOGOVAR_ENDPOINT_SEARCH') { 'http://togovar.biosciencedbc.jp/search' } %>
+  jbrowse: <%= ENV.fetch('TOGOVAR_ENDPOINT_JBROWSE') %>
+  stanza: <%= ENV.fetch('TOGOVAR_ENDPOINT_STANZA') %>
 
 development:
   <<: *defaults

@@ -50,7 +50,7 @@ module TogoVar
         private
 
         def endpoint
-          @endpoint ||= SPARQL::Client.new(Rails.configuration.endpoint['triplestore'])
+          @endpoint ||= SPARQL::Client.new(Rails.configuration.endpoint['sparql'])
         end
       end
 

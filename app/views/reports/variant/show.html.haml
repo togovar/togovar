@@ -1,9 +1,10 @@
 = content_for :head do
-  = javascript_include_tag '/stanza/assets/components/webcomponentsjs/webcomponents-loader.js'
+  - stanza_url = Rails.configuration.endpoint['stanza'] || '/stanza'
+  = javascript_include_tag "#{stanza_url}/assets/components/webcomponentsjs/webcomponents-loader.js"
 
-  = link_tag rel: 'import', href: "/stanza/#{@header[:stanza][0]}/"
+  = link_tag rel: 'import', href: "#{stanza_url}/#{@header[:stanza][0]}/"
   - @stanzas.each do |stanza|
-    = link_tag rel: 'import', href: "/stanza/#{stanza[0]}/"
+    = link_tag rel: 'import', href: "#{stanza_url}/#{stanza[0]}/"
 
 %header#DetailHeader
   .title-wrapper
