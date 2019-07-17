@@ -5,13 +5,14 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-gem 'rails', '~> 5.2', '>= 5.2.2'
+gem 'rails', '~> 5.2', '>= 5.2.3'
 
 # infrastructure
 gem 'foreman', '~> 0.84.0'
 gem 'puma', '~> 3.7'
 gem 'rack-cors', '~> 1.0'
 gem 'unicorn', '~> 5.4'
+gem 'unicorn-worker-killer', '~> 0.4.4'
 
 # elasticsearch
 gem 'elasticsearch-dsl', '~> 0.1.6'
@@ -32,6 +33,7 @@ gem 'webpacker', '~> 3.5'
 
 # utility
 gem 'action_args', '~> 2.2'
+gem 'dotenv-rails', '~> 2.7'
 gem 'gtm_rails', '~> 0.5.0'
 gem 'kaminari', '~> 1.0'
 gem 'linkeddata', '~> 3.0'
@@ -69,11 +71,9 @@ group :test do
 end
 
 group :deployment do
-  gem 'capistrano', '~> 3.10', require: false
-  gem 'capistrano-bundler', '~> 1.3', require: false
-  gem 'capistrano-rails', '~> 1.3', require: false
+  gem 'capistrano', '~> 3.11', require: false
+  gem 'capistrano-bundler', '~> 1.6', require: false
+  gem 'capistrano-rails', '~> 1.4', require: false
   gem 'capistrano-rbenv', '~> 2.1', require: false
-  gem 'capistrano-sidekiq', '~> 1.0', require: false
-  gem 'capistrano3-puma', '~> 3.1', require: false
   gem 'capistrano3-unicorn', '~> 0.2.1', require: false
 end
