@@ -16,6 +16,8 @@ class StoreManager {
       rowCount: 0,
       appStatus: 'preparing'
     };
+
+    window.addEventListener('popstate', this.popstate.bind(this));
   }
 
   ready(callback) {
@@ -110,11 +112,15 @@ class StoreManager {
   }
 
   setSearchCondition(key, values) {
+    this.setSearchConditions({[key]: values});
+  }
+  setSearchConditions(conditions, fromHistory) {
     const lastCondition = JSON.stringify(this.store.searchConditions);
-    this.store.searchConditions[key] = values;
+    for (const conditionKey in conditions) {
+      this.store.searchConditions[conditionKey] = conditions[conditionKey];
+    }
 
-    this.reflectSearchConditionToURI();
-
+    if (!fromHistory) this.reflectSearchConditionToURI();
     if (this.isReady && lastCondition !== JSON.stringify(this.store.searchConditions)) {
       this.setData('numberOfRecords', 0);
       this.setData('offset', 0);
@@ -180,6 +186,11 @@ class StoreManager {
     Object.assign(this.URIParameters, diffConditions);
 
     window.history.pushState(this.URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this.URIParameters)}`);
+  }
+
+  popstate(e) {
+    const URIParameters = $.deparam(window.location.search.substr(1));
+    this.setSearchConditions(URIParameters, true);
   }
 
   search(offset) {
