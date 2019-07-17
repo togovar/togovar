@@ -1,42 +1,27 @@
 module Downloads
   extend ActiveSupport::Concern
 
-  module ClassMethods
-    def download_file_path(file_name)
-      base = Rails.configuration.x.download_dir
-      File.join(base, 'release', 'current', file_name)
-    end
+  def latest_release
+    return unless (public = Rails.configuration.public_dir).present?
 
-    def downloads_list
-      base = 'chr_%<chromosome>s_%<data>s.tsv.gz'
-      Array(1..22).map(&:to_s).concat(%w[X Y MT]).map do |chr|
-        hash = { chr: chr }
-        %i[frequency molecular_annotation].each do |x|
-          file_name = format(base, chromosome: chr, data: x)
-          path      = download_file_path(file_name)
-          hash[x]   = {
-            label: "chr #{chr} #{x.to_s.tr('_', ' ')}",
-            file:  [{ label: '.tsv',
-                      name:  file_name,
-                      size:  FileSize.new(File.size?(path)).pretty }]
-          }
-        end
-        [chr, hash]
-      end.to_h
-    end
-
-    private
-
-    def current_release_dir
-      return unless (base = Rails.configuration.x.download_dir)
-
-      dir = File.join(base, 'release', 'current')
-
-      dir if Dir.exist? dir
-    end
+    File.readlink(File.join(public, 'release', 'current'))
   end
 
   def downloads_list
-    self.class.downloads_list
+    return [] unless (public = Rails.configuration.public_dir).present?
+
+    dir = File.join(public, 'release', 'current')
+    return [] unless Dir.exist?(dir)
+
+    Array('1'..'22').concat(%w[X Y MT]).map do |chr|
+      %i[frequency molecular_annotation].map do |type|
+        label = format('chr %s %s', chr, type)
+        file_name = format('chr_%s_%s.tsv.gz', chr, type)
+        size = FileSize.new(File.size?(File.join(dir, file_name))).pretty
+        href = File.join('public', 'release', 'current', file_name)
+
+        [type, { label: label, href: href, size: size }]
+      end.to_h.merge(chromosome: chr)
+    end
   end
 end

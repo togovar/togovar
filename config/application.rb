@@ -37,8 +37,7 @@ module TogoVar
 
     config.paths.add File.join('app', 'utils'), eager_load: true
 
-    config.x.download = true
-    config.x.download_dir = '/var/www/public'
+    config.public_dir = ENV.fetch('TOGOVAR_PUBLIC_DIR')
 
     config.elasticsearch = config_for(:elasticsearch)
     config.endpoint = config_for(:endpoint)

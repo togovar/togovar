@@ -23,16 +23,19 @@ class StaticController < ApplicationController
 
   include Downloads
 
+  CACHE_KEY_DOWNLOAD_LIST = 'public::release::list'.freeze
+  CACHE_KEY_LATEST_RELEASE = 'public::release::latest'.freeze
+
   def downloads
     if params.key?(:clear_cache)
-      Rails.logger.info('Clearing list of downloads')
-      Rails.cache.delete 'downloads'
+      Rails.logger.info('Clearing cache of release')
+
+      Rails.cache.delete CACHE_KEY_DOWNLOAD_LIST
+      Rails.cache.delete CACHE_KEY_LATEST_RELEASE
     end
 
-    @list = Rails.cache.fetch 'downloads' do
-      Rails.logger.info('Loading list of downloads')
-      downloads_list
-    end
+    @list = Rails.cache.fetch(CACHE_KEY_DOWNLOAD_LIST) { downloads_list }
+    @latest_release = Rails.cache.fetch(CACHE_KEY_LATEST_RELEASE) { latest_release }
 
     render file: "static/#{@locale}/downloads"
   end
