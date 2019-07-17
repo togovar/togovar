@@ -19,12 +19,7 @@ gem 'elasticsearch-dsl', '~> 0.1.6'
 gem 'elasticsearch-model', '~> 6.0'
 gem 'elasticsearch-rails', '~> 6.0'
 
-# redis
-gem 'redis-namespace', '~> 1.6'
-gem 'redis-rails', '~> 5.0'
-
 # javascript & stylesheet
-gem 'coffee-rails', '~> 4.2'
 gem 'haml-rails', '~> 1.0'
 gem 'jbuilder', '~> 2.5'
 gem 'js-routes', '~> 1.4'
