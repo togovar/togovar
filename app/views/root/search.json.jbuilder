@@ -77,6 +77,10 @@ json.data @result[:hits] do |variant|
   transcripts = Array(source[:transcripts])
   transcripts.each { |x| x.delete(:most_severe) }
 
+  # TODO: temporary workaround for wrong ordering of severity
+  most_severe = SequenceOntology.most_severe_consequence(*transcripts.map { |x| x[:consequences] }.flatten.uniq)
+  json.most_severe_consequence most_severe
+
   json.id source[:tgv_id].present? ? "tgv#{source[:tgv_id]}" : nil
   json.existing_variations(existing_variations)
 
@@ -99,7 +103,6 @@ json.data @result[:hits] do |variant|
     end
   end
 
-  json.most_severe_consequence source[:most_severe_consequence]
   json.sift sift
   json.polyphen polyphen
 

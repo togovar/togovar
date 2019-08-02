@@ -9,6 +9,7 @@ module TogoVar
     class Transcript
       include TogoVar::Vocabulary
 
+      # FIXME: wrong ordering of severity because of hashing
       SO_CONSEQUENCE = Hash.new { |hash, key| hash[key] = SequenceOntology.find_by_label(key) }
 
       class << self
