@@ -1,15 +1,17 @@
 !!!
 %html{lang: @locale ? @locale : 'en', data: {page: yield(:page)}}
   %head
-    %title= title(yield(:title))
-    %meta{ charset: 'utf-8' }
     - if Rails.env.production?
       - Rails.configuration.gtm.keys.each do |key|
         = google_tag_manager_script_tag(key)
-        = google_tag_manager_noscript_tag(key)
+    %title= title(yield(:title))
+    %meta{charset: 'utf-8'}
     = csrf_meta_tags
     = stylesheet_pack_tag 'application', media: 'all'
     = yield :head
   %body
+    - if Rails.env.production?
+      - Rails.configuration.gtm.keys.each do |key|
+        = google_tag_manager_noscript_tag(key)
     = render partial: 'layouts/header'
     = yield
