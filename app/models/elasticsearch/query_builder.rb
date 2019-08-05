@@ -136,19 +136,49 @@ module Elasticsearch
 
       return self if datasets.empty?
 
-      @quality_condition = Elasticsearch::DSL::Search.search do
+      query = Elasticsearch::DSL::Search.search do
         query do
-          nested do
-            path :frequencies
-            query do
+          bool do
+            should do
               bool do
-                must { terms 'frequencies.source': datasets }
-                must { match 'frequencies.filter': 'PASS' }
+                must_not do
+                  exists field: 'frequencies'
+                end
+              end
+            end
+            unless datasets.empty?
+              should do
+                nested do
+                  path :frequencies
+                  query do
+                    bool do
+                      should do
+                        bool do
+                          must_not do
+                            terms 'frequencies.source': datasets
+                          end
+                        end
+                      end
+                      should do
+                        bool do
+                          must { terms 'frequencies.source': datasets }
+                          must { match 'frequencies.filter': 'PASS' }
+                        end
+                      end
+                    end
+                  end
+                end
               end
             end
           end
         end
       end.to_hash[:query]
+
+      @quality_condition = if query[:bool][:should].size == 1
+                             query[:bool][:should].first
+                           else
+                             query
+                           end
 
       self
     end
