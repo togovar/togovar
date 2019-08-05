@@ -15,6 +15,8 @@ class SequenceOntology
       CONSEQUENCES_IN_ORDER.each do |so|
         return so.id if so_label.include?(so.id)
       end
+
+      nil
     end
   end
 
