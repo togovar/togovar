@@ -132,37 +132,24 @@ module Elasticsearch
     def quality(datasets)
       @quality_condition = nil
 
-      datasets &= %i[jga_ngs hgvd tommo exac]
+      filter_sources = datasets & %i[jga_ngs hgvd tommo exac]
 
-      return self if datasets.empty?
+      return self if filter_sources.empty?
 
-      query = Elasticsearch::DSL::Search.search do
+      @quality_condition = Elasticsearch::DSL::Search.search do
         query do
           bool do
-            should do
-              bool do
-                must_not do
-                  exists field: 'frequencies'
-                end
-              end
-            end
-            unless datasets.empty?
+            if datasets.include?(:clinvar)
               should do
-                nested do
-                  path :frequencies
-                  query do
-                    bool do
-                      should do
+                bool do
+                  must_not do
+                    nested do
+                      path :frequencies
+                      query do
                         bool do
-                          must_not do
-                            terms 'frequencies.source': datasets
+                          must do
+                            exists field: 'frequencies'
                           end
-                        end
-                      end
-                      should do
-                        bool do
-                          must { terms 'frequencies.source': datasets }
-                          must { match 'frequencies.filter': 'PASS' }
                         end
                       end
                     end
@@ -170,15 +157,30 @@ module Elasticsearch
                 end
               end
             end
+            if (x = (datasets & %i[jga_snp])).present?
+              should do
+                nested do
+                  path :frequencies
+                  query do
+                    terms 'frequencies.source': x
+                  end
+                end
+              end
+            end
+            should do
+              nested do
+                path :frequencies
+                query do
+                  bool do
+                    must { terms 'frequencies.source': filter_sources }
+                    must { term 'frequencies.filter': 'PASS' }
+                  end
+                end
+              end
+            end
           end
         end
       end.to_hash[:query]
-
-      @quality_condition = if query[:bool][:should].size == 1
-                             query[:bool][:should].first
-                           else
-                             query
-                           end
 
       self
     end
