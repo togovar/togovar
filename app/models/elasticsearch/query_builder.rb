@@ -224,6 +224,9 @@ module Elasticsearch
 
             interpretations = values.map { |x| Form::ClinicalSignificance.find_by_param_name(x).key }.compact
 
+            # TODO: remove this code for new index data
+            interpretations = interpretations.map { |x| x.to_s.gsub('_', ' ') }
+
             break if interpretations.empty?
 
             should do

@@ -160,7 +160,9 @@ module TogoVar
                     c.rcv = r[:rcv]
                     c.medgen = r[:medgen]
                     c.condition = r[:condition]
-                    c.interpretations = r[:interpretation].split(/[\/,]/).map(&:strip).map(&:downcase)
+                    c.interpretations = r[:interpretation]
+                                          .split(/[\/,]/)
+                                          .map { |x| x.strip.downcase.gsub(' ', '_') }
                   end
                 end
 
