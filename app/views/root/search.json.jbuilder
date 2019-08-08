@@ -57,9 +57,6 @@ json.data @result[:hits] do |variant|
 
   frequencies = Array(source[:frequencies]).each do |x|
     x[:source] = x[:source].downcase.tr('-', '_')
-    if x[:filter]
-      x[:filter] = Array(x[:filter]).select { |y| y.casecmp('pass').zero? }.present? ? 'PASS' : nil
-    end
   end
 
   sift = Array(source[:transcripts]).map { |x| x[:sift] }.compact.min
