@@ -113,7 +113,7 @@ export default class ResultsView {
   }
 
   searchStatus(status) {
-    this.status.textContent = `The number of available data  is ${status.available.toLocaleString()} out of ${status.filtered.toLocaleString()} which is filtered with ${status.total.toLocaleString()} all data.`;
+    this.status.textContent = `The number of available data is ${status.available.toLocaleString()} out of ${status.filtered.toLocaleString()}.`;
     if (status.filtered === 0) {
       this.elm.classList.add('-not-found');
     } else {
