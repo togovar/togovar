@@ -23,7 +23,7 @@ class StoreManager {
   ready(callback) {
     Promise
       .all([
-        fetch('./assets/searchConditionsMaster.json')
+        fetch('./assets/search_conditions.json')
           .then(response => response.json())
       ])
       .then(responses => {
