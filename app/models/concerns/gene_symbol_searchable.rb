@@ -8,41 +8,75 @@ module GeneSymbolSearchable
 
     config = Rails.configuration.elasticsearch
 
-    settings index: {
-      number_of_shards: config.dig('indices', 'gene_symbols', 'number_of_shards') || 1,
-      number_of_replicas: config.dig('indices', 'gene_symbols', 'number_of_replicas') || 0,
+    settings = {
+      index: {
+        number_of_shards: config.dig('indices', 'gene_symbols', 'number_of_shards') || 1,
+        number_of_replicas: config.dig('indices', 'gene_symbols', 'number_of_replicas') || 0
+      },
       analysis: {
+        analyzer: {
+          symbol_search_analyzer: {
+            type: :custom,
+            tokenizer: :whitespace,
+            filter: :lowercase
+          },
+          symbol_suggest_analyzer: {
+            type: :custom,
+            tokenizer: :whitespace,
+            filter: %i[lowercase edge_ngram_filter]
+          }
+        },
         filter: {
-          symbol_edge_ngram_filter: {
-            type: 'edge_ngram',
+          edge_ngram_filter: {
+            type: :edge_ngram,
             min_gram: 3,
             max_gram: 20
           }
         },
-        analyzer: {
-          symbol_index_analyzer: {
-            type: 'custom',
-            tokenizer: 'whitespace',
-            filter: %w[lowercase symbol_edge_ngram_filter]
-          },
-          symbol_search_analyzer: {
-            type: 'custom',
-            tokenizer: 'whitespace',
-            filter: %w[lowercase]
+        normalizer: {
+          lowercase: {
+            type: :custom,
+            filter: :lowercase
           }
         }
       }
-    } do
+    }
+
+    settings settings do
       mapping dynamic: false do
         indexes :gene_id, type: :keyword
         indexes :symbol,
-                type: :text,
-                analyzer: 'symbol_index_analyzer',
+                type: :keyword,
                 fields: {
-                  raw: { type: :keyword }
+                  search: {
+                    type: :text,
+                    analyzer: :symbol_search_analyzer
+                  },
+                  suggest: {
+                    type: :text,
+                    analyzer: :symbol_suggest_analyzer
+                  },
+                  lowercase: {
+                    type: :keyword,
+                    normalizer: :lowercase
+                  }
                 }
-        indexes :symbol_source, type: :keyword
-        indexes :alias_of, type: :keyword
+        indexes :symbol_source,
+                type: :keyword,
+                fields: {
+                  lowercase: {
+                    type: :keyword,
+                    normalizer: :lowercase
+                  }
+                }
+        indexes :alias_of,
+                type: :keyword,
+                fields: {
+                  lowercase: {
+                    type: :keyword,
+                    normalizer: :lowercase
+                  }
+                }
       end
     end
   end

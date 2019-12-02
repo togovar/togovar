@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Elasticsearch
   class QueryBuilder
     include Elasticsearch::DSL
@@ -20,24 +18,24 @@ module Elasticsearch
 
       return self if term.blank?
 
-      @term_condition = case term.delete(' ')
-                        when /^tgv\d+(,tgv\d+)*$/
-                          tgv_condition(term)
-                        when /^rs\d+(,rs\d+)*$/i
-                          rs_condition(term)
-                        when /^(\d+|[XY]|MT):\d+(,(\d+|[XY]|MT):\d+)*$/
-                          position_condition(term)
-                        when /^(\d+|[XY]|MT):\d+-\d+(,(\d+|[XY]|MT):\d+-\d+)*$/
-                          region_condition(term)
-                        else
-                          if (results = GeneSymbol.search(term).results).total.positive?
-                            symbol = results.reject { |x| x.dig(:_source, :alias_of) }.map { |x| x.dig(:_source, :symbol) }.uniq
-                            symbol_roots = results.map { |x| x.dig(:_source, :alias_of) }.compact
-                            gene_condition(*symbol.concat(symbol_roots))
-                          else
-                            disease_condition(term)
-                          end
-                        end
+      @term_condition = begin
+        case term.delete(' ')
+        when /^tgv\d+(,tgv\d+)*$/
+          tgv_condition(term)
+        when /^rs\d+(,rs\d+)*$/i
+          rs_condition(term)
+        when /^(\d+|[XY]|MT):\d+(,(\d+|[XY]|MT):\d+)*$/
+          position_condition(term)
+        when /^(\d+|[XY]|MT):\d+-\d+(,(\d+|[XY]|MT):\d+-\d+)*$/
+          region_condition(term)
+        else
+          if (t = GeneSymbol.exact_match(term))
+            gene_condition(t)
+          else
+            disease_condition(term)
+          end
+        end
+      end
 
       self
     end
@@ -552,13 +550,13 @@ module Elasticsearch
       query.to_hash[:query]
     end
 
-    def gene_condition(*terms)
+    def gene_condition(term)
       query = Elasticsearch::DSL::Search.search do
         query do
           nested do
             path :transcripts
             query do
-              terms 'transcripts.symbol': terms
+              match 'transcripts.symbol': term
             end
           end
         end
@@ -573,7 +571,11 @@ module Elasticsearch
           nested do
             path :conditions
             query do
-              match 'conditions.condition': term
+              if (t = Disease.exact_match(term))
+                match 'conditions.condition': t
+              else
+                match 'conditions.condition.search': term
+              end
             end
           end
         end

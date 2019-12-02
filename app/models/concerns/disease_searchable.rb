@@ -8,43 +8,60 @@ module DiseaseSearchable
 
     config = Rails.configuration.elasticsearch
 
-    settings index: {
-      number_of_shards: config.dig('indices', 'diseases', 'number_of_shards') || 1,
-      number_of_replicas: config.dig('indices', 'diseases', 'number_of_replicas') || 0,
+    settings = {
+      index: {
+        number_of_shards: config.dig('indices', 'diseases', 'number_of_shards') || 1,
+        number_of_replicas: config.dig('indices', 'diseases', 'number_of_replicas') || 0
+      },
       analysis: {
-        normalizer: {
-          lowercase_normalizer: {
-            type: 'custom',
-            filter: %w[lowercase]
-          }
-        },
         analyzer: {
-          trigram_analyzer: {
-            tokenizer: 'trigram'
+          condition_search_analyzer: {
+            type: :custom,
+            tokenizer: :standard,
+            filter: :lowercase
+          },
+          condition_suggest_analyzer: {
+            type: :custom,
+            tokenizer: :standard,
+            filter: %i[min_length lowercase edge_ngram_filter]
           }
         },
-        tokenizer: {
-          trigram: {
-            type: 'ngram',
+        filter: {
+          min_length: {
+            type: :length,
+            min: 3
+          },
+          edge_ngram_filter: {
+            type: :edge_ngram,
             min_gram: 3,
-            max_gram: 3,
-            token_chars: %w[letter digit]
+            max_gram: 20
+          }
+        },
+        normalizer: {
+          lowercase: {
+            type: :custom,
+            filter: :lowercase
           }
         }
       }
-    } do
+    }
+
+    settings settings do
       mapping dynamic: false do
         indexes :term,
                 type: :keyword,
-                normalizer: 'lowercase_normalizer',
                 fields: {
-                  simple: {
-                    type: 'text',
-                    analyzer: 'simple'
+                  search: {
+                    type: :text,
+                    analyzer: :condition_search_analyzer
                   },
-                  trigram: {
-                    type: 'text',
-                    analyzer: 'trigram_analyzer'
+                  suggest: {
+                    type: :text,
+                    analyzer: :condition_suggest_analyzer
+                  },
+                  lowercase: {
+                    type: :keyword,
+                    normalizer: :lowercase
                   }
                 }
       end

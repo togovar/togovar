@@ -2,7 +2,7 @@ class RootController < ApplicationController
   protect_from_forgery except: %i[suggest list]
 
   def suggest
-    term = params.permit(:term)[:term]
+    term = suggest_params[:term]
 
     respond_to do |format|
       format.json do
@@ -24,6 +24,7 @@ class RootController < ApplicationController
 
   def search
     @param = Form::VariantSearchParameters.new(search_params)
+    @term = @param.term
 
     respond_to do |format|
       format.json do
@@ -40,8 +41,17 @@ class RootController < ApplicationController
               aggs: {}
             }
           else
+            if HGVS.match?(@term)
+              HGVS.extract_location(@term) do |term, error, warning|
+                @error = error
+                @warning = warning
+                @notice = "Translate HGVS representation \"#{@term}\" to \"#{term}\"" unless @term == term
+                @term = term
+              end
+            end
+
             aggs = @param.stat? ? Variant.search(builder.stat_query).aggregations : {}
-            response = Variant.search(builder.build, request_cache: !@param.term.present?)
+            response = Variant.search(builder.build, request_cache: !@term.present?)
 
             {
               filtered_total: response.raw_response['hits']['total'],
@@ -70,7 +80,7 @@ class RootController < ApplicationController
 
       builder.start_only = @param.start_only?
 
-      builder.term(@param.term) if @param.term.present?
+      builder.term(@term) if @term.present?
 
       builder.from = @param.offset
       builder.size = @param.limit
@@ -106,8 +116,11 @@ class RootController < ApplicationController
     end
   end
 
-  # @return [ActionController::Parameters] parameters
   def search_params
     Form::VariantSearchParameters.permit(params)
+  end
+
+  def suggest_params
+    params.permit(:term, :format)
   end
 end

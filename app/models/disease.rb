@@ -4,26 +4,37 @@ class Disease
   end
 
   class << self
-    # @param [String] term
+    # @param [String] query
     # @return [Elasticsearch::Model::Response] response
-    def suggest(term)
-      query = {
-        size: 100,
-        query: {
-          bool: {
-            must: [
-              {
-                multi_match: {
-                  query: term,
-                  fields: %w[term^10 term.simple^5 term.trigram]
-                }
-              }
-            ]
-          }
-        }
-      }
+    def suggest(query)
+      body = ::Elasticsearch::DSL::Search.search do
+        query do
+          bool do
+            should do
+              match 'term.search': { query: query, boost: 2 }
+            end
+            should do
+              match 'term.suggest': query
+            end
+          end
+        end
+      end
 
-      Elasticsearch.search(query)
+      Elasticsearch.search(body)
+    end
+
+    # @param [String] query
+    # @return [Elasticsearch::Model::Response] response
+    def exact_match(query)
+      body = ::Elasticsearch::DSL::Search.search do
+        query do
+          match 'term.lowercase': query.downcase
+        end
+      end
+
+      results = Elasticsearch.search(body).results
+
+      results.map { |x| x.dig(:_source, :term) }.first if results.total.positive?
     end
   end
 end

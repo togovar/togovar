@@ -12,6 +12,21 @@ module VariantSearchable
       index: {
         number_of_shards: config.dig('indices', 'variants', 'number_of_shards') || 1,
         number_of_replicas: config.dig('indices', 'variants', 'number_of_replicas') || 0
+      },
+      analysis: {
+        analyzer: {
+          condition_search_analyzer: {
+            type: :custom,
+            tokenizer: :standard,
+            filter: :lowercase
+          }
+        },
+        normalizer: {
+          lowercase: {
+            type: :custom,
+            filter: :lowercase
+          }
+        }
       }
     }
 
@@ -55,7 +70,18 @@ module VariantSearchable
           indexes :vcv, type: :keyword
           indexes :rcv, type: :keyword
           indexes :medgen, type: :keyword
-          indexes :condition, type: :keyword
+          indexes :condition,
+                  type: :keyword,
+                  fields: {
+                    search: {
+                      type: :text,
+                      analyzer: :condition_search_analyzer
+                    },
+                    lowercase: {
+                      type: :keyword,
+                      normalizer: :lowercase
+                    }
+                  }
           indexes :interpretations, type: :keyword
         end
 
