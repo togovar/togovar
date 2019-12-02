@@ -11,9 +11,9 @@ module TogoVar
   class CLI < Thor
     namespace :togovar
 
-    register(Convert, 'convert', 'convert [COMMAND]', 'convert tools')
-    register(Elasticsearch, 'elasticsearch', 'elasticsearch [COMMAND]', 'elasticsearch tools')
-    register(Virtuoso, 'virtuoso', 'virtuoso [COMMAND]', 'virtuoso tools')
+    register(Tasks::Convert, 'convert', 'convert [COMMAND]', 'convert tools')
+    register(Tasks::Elasticsearch, 'elasticsearch', 'elasticsearch [COMMAND]', 'elasticsearch tools')
+    register(Tasks::Virtuoso, 'virtuoso', 'virtuoso [COMMAND]', 'virtuoso tools')
   end
 end
 

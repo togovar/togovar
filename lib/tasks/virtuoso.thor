@@ -2,11 +2,11 @@ require 'rdf'
 require 'thor'
 require 'thor/group'
 
-module TogoVar
+module Tasks
   class Virtuoso < Thor
     include Thor::Actions
 
-    namespace 'togovar virtuoso'
+    namespace :virtuoso
 
     desc 'load [name = variant|condition.clinvar|...]', 'load RDF'
 

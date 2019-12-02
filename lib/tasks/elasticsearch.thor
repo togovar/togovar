@@ -1,12 +1,11 @@
 require 'awesome_print'
+require 'elasticsearch/model'
 require 'faraday'
 require 'thor'
-require 'elasticsearch/model'
 
-module TogoVar
+module Tasks
   class Elasticsearch < Thor
-
-    namespace 'togovar elasticsearch'
+    namespace :elasticsearch
 
     desc 'health', 'health check'
 

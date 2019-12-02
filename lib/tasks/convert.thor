@@ -1,10 +1,10 @@
 require 'thor'
 
-module TogoVar
+module Tasks
   class Convert < Thor
     include Thor::Actions
 
-    namespace 'togovar convert'
+    namespace :convert
 
     desc 'vep2es <VEP_FILE>', 'convert VEP annotation to Elasticsearch index'
     option :output, aliases: '-o', type: :string, default: 'out', desc: 'path to output directory'
