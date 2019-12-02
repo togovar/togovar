@@ -223,7 +223,7 @@ export default class Karyotype {
       .then(response => response.text())
       .then(tsv => {
         this.geneMap = this.parseGeneMap(tsv);
-        this.maxLength = Math.max(...this.geneMap.map(chromosome => chromosome[chromosome.length - 1].end));
+        // this.maxLength = Math.max(...this.geneMap.map(chromosome => chromosome[chromosome.length - 1].end));
         this.drawChromosome(this.geneMap);
       });
 

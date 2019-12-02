@@ -247,6 +247,12 @@ class StoreManager {
         this.setData('statisticsType', json.statistics.type);
         this.setData('statisticsConsequence', json.statistics.consequence);
 
+        this.setData('searchMessages', {
+          error: json.error,
+          warning: json.warning,
+          notice: json.notice
+        });
+
         this.fetching = false;
         this.notify('offset');
         this.setData('appStatus', 'normal');

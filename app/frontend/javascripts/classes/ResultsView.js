@@ -11,11 +11,14 @@ export default class ResultsView {
     this.rows = [];
     this.lastScroll = 0;
     this.status = this.elm.querySelector('header.header > .status');
+    this.messages = this.elm.querySelector('#Messages');
+
     StoreManager.bind('searchStatus', this);
     StoreManager.bind('searchResults', this);
     StoreManager.bind('columns', this);
     StoreManager.bind('offset', this);
     StoreManager.bind('karyotype', this);
+    StoreManager.bind('searchMessages', this);
     $(document).on('keydown.resultview', this.keydown.bind(this));
 
     this.elm.querySelector('.tablecontainer').insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
@@ -112,8 +115,22 @@ export default class ResultsView {
     StoreManager.setData('displayingRegionsOnChromosome', displayingRegions2);
   }
 
+  searchMessages(messages) {
+    this.messages.innerHTML = '';
+
+    if (messages.notice) {
+      this.messages.innerHTML += `<div class="notice">${messages.notice}</div>`;
+    }
+    if (messages.warning) {
+      this.messages.innerHTML += `<div class="warning">${messages.warning}</div>`;
+    }
+    if (messages.error) {
+      this.messages.innerHTML += `<div class="error">${messages.error}</div>`;
+    }
+  }
+
   searchStatus(status) {
-    this.status.textContent = `The number of available data is ${status.available.toLocaleString()} out of ${status.filtered.toLocaleString()}.`;
+    this.status.textContent = `The number of available variations is ${status.available.toLocaleString()} out of ${status.filtered.toLocaleString()}.`;
     if (status.filtered === 0) {
       this.elm.classList.add('-not-found');
     } else {

@@ -168,7 +168,7 @@ export default class SearchConditionController {
         html += `
         <li class="item${item === undefined ? ' -disabled' : ''}" data-value="${item ? item.term : ''}" data-alias="${item && item.alias_of ? item.alias_of : ''}">
           ${item ? `${
-            `<span class="main">${item.term}</span>` + (item.alias_of ? `<span class="sub">${item.alias_of}</span>` : '')
+            `<span class="main">${item.alias_of ? item.alias_of : item.term}</span>` + (item.alias_of ? `<span class="sub">alias: ${item.term}</span>` : '')
           }` : ''}
         </li>
         `;

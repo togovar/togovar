@@ -109,3 +109,7 @@ json.data @result[:hits] do |variant|
 
   json.transcripts transcripts
 end
+
+json.error @error if @error.present?
+json.warning @warning if @warning.present?
+json.notice @notice if @notice.present?
