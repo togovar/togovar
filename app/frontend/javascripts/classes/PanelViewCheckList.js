@@ -46,7 +46,6 @@ export default class PanelViewCheckList extends PanelView {
           this.inputsValues[key].value.textContent = '0';
         }
       }
-      this.inputsValues.all.value.textContent = StoreManager.getData('searchStatus').filtered.toLocaleString();
     }
   }
 
