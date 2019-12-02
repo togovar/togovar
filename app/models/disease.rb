@@ -1,7 +1,5 @@
 class Disease
-  module Elasticsearch
-    include DiseaseSearchable
-  end
+  include Searchable::Disease
 
   class << self
     # @param [String] query
@@ -20,7 +18,7 @@ class Disease
         end
       end
 
-      Elasticsearch.search(body)
+      search(body)
     end
 
     # @param [String] query
@@ -32,7 +30,7 @@ class Disease
         end
       end
 
-      results = Elasticsearch.search(body).results
+      results = search(body).results
 
       results.map { |x| x.dig(:_source, :term) }.first if results.total.positive?
     end

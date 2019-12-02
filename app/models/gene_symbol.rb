@@ -1,9 +1,7 @@
 require 'weakref'
 
 class GeneSymbol
-  module Elasticsearch
-    include GeneSymbolSearchable
-  end
+  include Searchable::GeneSymbol
 
   class << self
     # @param [String] query
@@ -25,7 +23,7 @@ class GeneSymbol
         end
       end
 
-      Elasticsearch.search(body)
+      search(body)
     end
 
     # @param [String] query
@@ -37,33 +35,33 @@ class GeneSymbol
         end
       end
 
-      results = Elasticsearch.search(body).results
+      results = search(body).results
 
       results.map { |x| x.dig(:_source, :symbol) }.first if results.total.positive?
     end
 
     # @param [String] query
     # @return [Elasticsearch::Model::Response] response
-    def search(query)
-      body = ::Elasticsearch::DSL::Search.search do
-        query do
-          bool do
-            must do
-              match 'symbol.lowercase': { query: query.downcase }
-            end
-            must do
-              bool do
-                must_not do
-                  exists field: :alias_of
-                end
-              end
-            end
-          end
-        end
-      end
-
-      Elasticsearch.search(body)
-    end
+    # def search(query)
+    #   body = ::Elasticsearch::DSL::Search.search do
+    #     query do
+    #       bool do
+    #         must do
+    #           match 'symbol.lowercase': { query: query.downcase }
+    #         end
+    #         must do
+    #           bool do
+    #             must_not do
+    #               exists field: :alias_of
+    #             end
+    #           end
+    #         end
+    #       end
+    #     end
+    #   end
+    #
+    #   search(body)
+    # end
 
     # @param [String] query
     # @return [Array<String>]
@@ -78,7 +76,7 @@ class GeneSymbol
         end
       end
 
-      synonyms = Elasticsearch.search(body).results.map { |x| x.dig(:_source, :symbol) }.compact
+      synonyms = search(body).results.map { |x| x.dig(:_source, :symbol) }.compact
 
       ref = WeakRef.new(synonyms)
       ObjectSpace.define_finalizer(synonyms, proc { @synonym_cache.delete(synonyms) if @synonym_cache[synonyms] == ref })
