@@ -24,6 +24,8 @@ module Elasticsearch
           tgv_condition(term)
         when /^rs\d+(,rs\d+)*$/i
           rs_condition(term)
+        when /^(\d+|[XY]|MT):\d+:(\w+)>(\w+)$/
+          position_allele_condition(term)
         when /^(\d+|[XY]|MT):\d+(,(\d+|[XY]|MT):\d+)*$/
           position_condition(term)
         when /^(\d+|[XY]|MT):\d+-\d+(,(\d+|[XY]|MT):\d+-\d+)*$/
@@ -483,6 +485,40 @@ module Elasticsearch
                   else
                     must { range(:start) { lte pos.to_i } }
                     must { range(:stop) { gte pos.to_i } }
+                  end
+                end
+              end
+            end
+          end
+        end
+      end.to_hash[:query]
+
+      if query[:bool][:should].size == 1
+        query[:bool][:should].first
+      else
+        query
+      end
+    end
+
+    def position_allele_condition(term)
+      positions = term.split(/[\s,]/)
+      start_only = @start_only
+
+      query = Elasticsearch::DSL::Search.search do
+        query do
+          bool do
+            positions.each do |x|
+              chr, pos, allele = x.split(':')
+              should do
+                bool do
+                  must { match chromosome: chr }
+                  if start_only
+                    must { match start: pos.to_i }
+                  else
+                    must { range(:start) { lte pos.to_i } }
+                    must { range(:stop) { gte pos.to_i } }
+                    must { match reference: allele.split('>')[0] } if allele.present?
+                    must { match alternative: allele.split('>')[1] } if allele.present?
                   end
                 end
               end
