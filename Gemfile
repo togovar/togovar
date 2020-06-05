@@ -5,10 +5,10 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-gem 'rails', '~> 5.2', '>= 5.2.3'
+gem 'rails', '~> 6.0', '>= 6.0.3.1'
 
 # infrastructure
-gem 'foreman', '~> 0.84.0'
+gem 'foreman', '~> 0.87.1'
 gem 'puma', '~> 3.7'
 gem 'rack-cors', '~> 1.0'
 gem 'unicorn', '~> 5.4'
