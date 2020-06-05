@@ -15,9 +15,9 @@ gem 'unicorn', '~> 5.4'
 gem 'unicorn-worker-killer', '~> 0.4.4'
 
 # elasticsearch
-gem 'elasticsearch-dsl', '~> 0.1.6'
-gem 'elasticsearch-model', '~> 6.0'
-gem 'elasticsearch-rails', '~> 6.0'
+gem 'elasticsearch-dsl', '~> 0.1.9'
+gem 'elasticsearch-model', '~> 7.1'
+gem 'elasticsearch-rails', '~> 7.1'
 
 # javascript & stylesheet
 gem 'haml-rails', '~> 1.0'
