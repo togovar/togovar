@@ -44,6 +44,9 @@ gem 'uglifier', '>= 1.3.0'
 # development, debug
 gem 'pry-rails', '~> 0.3.6'
 
+# bio science
+gem 'bio-vcf', github: 'pjotrp/bioruby-vcf'
+
 group :development, :test do
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'elasticsearch-extensions', '~> 0.0.31'

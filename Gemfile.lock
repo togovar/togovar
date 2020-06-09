@@ -1,3 +1,9 @@
+GIT
+  remote: https://github.com/pjotrp/bioruby-vcf.git
+  revision: bb9a3f9c10ffbd0304690bbca001ad775f6ea54e
+  specs:
+    bio-vcf (0.9.3)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -483,6 +489,7 @@ DEPENDENCIES
   awesome_print
   better_errors (~> 2.5)
   better_errors-pry (~> 1.0)
+  bio-vcf!
   byebug
   capistrano (~> 3.11)
   capistrano-bundler (~> 1.6)
