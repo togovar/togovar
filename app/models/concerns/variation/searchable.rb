@@ -51,8 +51,8 @@ module Variation::Searchable
           indexes :polyphen, type: :float
         end
         indexes :clinvar, type: :object do
-          indexes :vcv, type: :keyword
-          indexes :rcv, type: :keyword
+          indexes :variation_id, type: :long
+          indexes :allele_id, type: :long
           indexes :medgen, type: :keyword
           indexes :interpretation, type: :keyword
           indexes :condition, {
