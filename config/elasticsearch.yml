@@ -1,26 +1,12 @@
 defaults: &defaults
-  host: localhost:9200
-  user: elastic
-  password: changeme
-
-  indices:
-    variants:
-      number_of_replicas: 0
-      number_of_shards: 6
-    gene_symbols:
-      number_of_replicas: 0
-      number_of_shards: 1
-    diseases:
-      number_of_replicas: 0
-      number_of_shards: 1
+  host: <%= ENV.fetch('TOGOVAR_ELASTICSEARCH_HOST') { 'localhost:9200' } %>
 
 development:
   <<: *defaults
+  log: true
 
 test:
   <<: *defaults
-  host: localhost:9250
 
 production:
   <<: *defaults
-  host: elasticsearch:9200

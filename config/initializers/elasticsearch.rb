@@ -1,4 +1,3 @@
-if File.exist?(File.join('config', 'elasticsearch.yml'))
-  config = YAML.load_file(File.join('config', 'elasticsearch.yml'))[Rails.env].symbolize_keys
+if Rails.configuration.respond_to?(:elasticsearch) && (config = Rails.configuration.elasticsearch).present?
   Elasticsearch::Model.client = Elasticsearch::Client.new(config)
 end
