@@ -13,6 +13,7 @@ end
 module TogoVar::IO
   class VCF
     class << self
+      require 'togo_var/io/vcf/clinvar'
       require 'togo_var/io/vcf/vep'
 
       # @param [Symbol] format
@@ -22,6 +23,10 @@ module TogoVar::IO
         if format == :vep
           class << reader
             include VEP
+          end
+        elsif format == :clinvar
+          class << reader
+            include Clinvar
           end
         end
 
