@@ -1,103 +1,64 @@
-require 'awesome_print'
-require 'elasticsearch/model'
-require 'faraday'
+require_relative '../../config/application'
 require 'thor'
+
+Rails.application.initialize! unless Rails.application.initialized?
 
 module Tasks
   class Elasticsearch < Thor
     namespace :elasticsearch
 
-    desc 'health', 'health check'
+    desc 'health', 'Check cluster health'
 
     def health
-      require_relative '../../config/environment'
-
       ap ::Elasticsearch::Model.client.cluster.health
     end
 
-    desc 'init', 'initialize elasticsearch for TogoVar'
+    desc 'init', 'Initialize and create all indices'
 
     def init
-      require_relative '../../config/environment'
-
       set_template_replica
 
-      create 'variant'
-      create 'gene_symbol'
-      create 'disease'
+      %w[variation gene_symbol disease].each { |x| create_index x }
     end
 
-    desc 'create [name = variant|gene_symbol|disease]', 'create index'
+    desc 'create_index', 'Create index'
 
-    def create(name)
-      require_relative '../../config/environment'
-
-      model = name.camelize.safe_constantize
-
-      unless model
-        STDERR.puts "Model #{name} not found."
+    def create_index(name)
+      unless (model = name.camelize.safe_constantize)
+        warn "Class not found: #{name}"
         return
       end
 
-      hash = {
-        "#{name}": {
-          mappings: model::Elasticsearch.mappings.to_hash,
-          settings: model::Elasticsearch.settings.to_hash
-        }
-      }
-      puts JSON.pretty_generate(hash)
-
-      if yes? "Index #{name} will be created with these settings. Are you sure? [y/n]"
-        model::Elasticsearch.__elasticsearch__.create_index!
-      else
-        STDERR.puts 'Aborted.'
-      end
-    end
-
-    desc 'delete [name = variant|gene_symbol|disease]', 'delete index'
-
-    def delete(name)
-      require_relative '../../config/environment'
-
-      model = name.camelize.safe_constantize
-
-      unless model
-        STDERR.puts "Model #{name} not found."
+      unless model.respond_to?(:__elasticsearch__)
+        warn "#{model} is not a model for elasticsearch."
         return
       end
 
-      if yes? "Index #{name} will be deleted. Are you sure? [y/n]"
-        model::Elasticsearch.__elasticsearch__.delete_index!
-      else
-        STDERR.puts 'Aborted.'
-      end
+      model.__elasticsearch__.create_index!
     end
 
-    def self.banner(task, namespace = false, subcommand = true)
-      super
+    desc 'delete_index', 'Delete index'
+
+    def delete_index(name)
+      unless (model = name.camelize.safe_constantize)
+        warn "Class not found: #{name}"
+        return
+      end
+
+      unless model.respond_to?(:__elasticsearch__)
+        warn "#{model} is not a elasticsearch model."
+        return
+      end
+
+      model.__elasticsearch__.delete_index! if yes? "Delete #{model.index_name}. Are you sure? [y/n]"
     end
 
     private
 
-    def connection
-      @connection ||= begin
-        url = Rails.configuration.elasticsearch['host']
-
-        ::Faraday::Connection.new url.match?(/^https?:\/\//) ? url : "http://#{url}"
-      end
-    end
-
-    def request(method, path, body, header)
-      response = connection.run_request method, path, (body ? MultiJson.dump(body) : nil), header
-
-      puts response.body
-      puts
-    end
-
     def set_template_replica
-      header = {
-        'Content-Type': 'application/json'
-      }
+      method = ::Elasticsearch::API::HTTP_PUT
+      path = '_template/replica'
+      params = {}
       body = {
         template: '*',
         settings: {
@@ -105,8 +66,11 @@ module Tasks
           number_of_replicas: 0
         }
       }
+      headers = {
+        'Content-Type': 'application/json'
+      }
 
-      request :put, '/_template/replica', body, header
+      ::Elasticsearch::Model.client.perform_request(method, path, params, body, headers)
     end
   end
 end
