@@ -1,6 +1,4 @@
 class Variant
-  include Searchable::Variant
-
   class << self
     # @param [Hash] query
     # @return [Elasticsearch::Model::Response] response
