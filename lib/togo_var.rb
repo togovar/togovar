@@ -1,9 +1,11 @@
 module TogoVar
   module IO
+    module VEP
+      require 'togo_var/io/vep/vcf'
+    end
     require 'togo_var/io/multi_g_zip_reader'
     require 'togo_var/io/ndjson'
     require 'togo_var/io/vcf'
-    require 'togo_var/io/vep'
   end
 
   module Models
@@ -13,5 +15,9 @@ module TogoVar
     require 'togo_var/models/gene_symbol'
     require 'togo_var/models/transcript'
     require 'togo_var/models/variant'
+  end
+
+  module Util
+    require 'togo_var/util/variation'
   end
 end
