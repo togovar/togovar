@@ -1,8 +1,5 @@
 module TogoVar
   module IO
-    module VEP
-      require 'togo_var/io/vep/vcf'
-    end
     require 'togo_var/io/multi_g_zip_reader'
     require 'togo_var/io/ndjson'
     require 'togo_var/io/vcf'

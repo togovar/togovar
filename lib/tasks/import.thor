@@ -15,9 +15,9 @@ module Tasks
 
       Variation.set_refresh_interval(-1)
 
-      TogoVar::IO::VEP::VCF.new(path).each do |record, i|
-        array_of_action_data << TogoVar::IO::VEP::VCF.update_action(record)
-        array_of_action_data << TogoVar::IO::VEP::VCF.data(record).merge(doc_as_upsert: true)
+      (reader = TogoVar::IO::VCF.new(path)).each do |record, i|
+        array_of_action_data << reader.update_action(record)
+        array_of_action_data << reader.data(record).merge(doc_as_upsert: true)
 
         next unless (i % 10_000).zero?
 
