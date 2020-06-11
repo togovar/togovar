@@ -10,6 +10,11 @@ module BioVcf
     def to_refsnp_location
       TogoVar::Util::Variation.vcf_to_refsnp_location(pos, ref, alt.first)
     end
+
+    # @return [Array]
+    def to_faldo_location
+      TogoVar::Util::Variation.vcf_to_faldo_location(chrom, pos, ref, alt.first)
+    end
   end
 end
 

@@ -1,13 +1,4 @@
 module TogoVar::DataSource::VEP
-  CONSEQUENCE_KEYS = %w[Allele Consequence IMPACT SYMBOL Gene Feature_type Feature BIOTYPE EXON INTRON HGVSc HGVSp
-                      cDNA_position CDS_position Protein_position Amino_acids Codons Existing_variation DISTANCE
-                      STRAND FLAGS VARIANT_CLASS SYMBOL_SOURCE HGNC_ID SIFT PolyPhen HGVS_OFFSET HGVSg CLIN_SIG
-                      SOMATIC PHENO].freeze
-
-  CHROM_INDEX = ('1'..'22').to_a.concat(%w[X Y MT]).zip((1..25)).to_h
-
-  REAL_NUMBER_REGEX = /[+-]?(?:\d+\.?\d*|\.\d+)/
-
   module ElasticsearchExtension
     # @return [Hash]
     def update_action

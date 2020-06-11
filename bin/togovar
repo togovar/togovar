@@ -9,6 +9,13 @@ module TogoVar
   class CLI < Thor
     namespace :togovar
 
+    class << self
+      def exit_on_failure?
+        true
+      end
+    end
+
+    register(Tasks::Convert, 'convert', 'convert [COMMAND]', 'Commands for convert')
     register(Tasks::Elasticsearch, 'elasticsearch', 'elasticsearch [COMMAND]', 'Commands for elasticsearch')
     register(Tasks::Import, 'import', 'import [COMMAND]', 'Commands for import')
   end
