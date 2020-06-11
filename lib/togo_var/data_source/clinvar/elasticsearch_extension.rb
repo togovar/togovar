@@ -1,21 +1,21 @@
-module TogoVar::IO::VCF::Clinvar
+module TogoVar::DataSource::Clinvar
   module ElasticsearchExtension
-    # @param [BioVcf::VcfRecord] record
+    attr_accessor :record
+
     # @return [Hash]
-    def update_action(record)
+    def update_action
       {
         update: {
           _index: 'variation',
-          _id: Digest::SHA512.hexdigest("#{record.chrom}-#{record.pos}-#{record.ref}-#{record.alt.first}")
+          _id: Digest::SHA512.hexdigest("#{@record.chrom}-#{@record.pos}-#{@record.ref}-#{@record.alt.first}")
         }
       }
     end
 
-    # @param [BioVcf::VcfRecord] record
     # @return [Hash]
-    def data(record)
-      variation_id = record.info['VariantID']
-      allele_id = record.info['ALLELEID']
+    def data
+      variation_id = @record.info['VariantID']
+      allele_id = @record.info['ALLELEID']
 
       return nil if variation_id.blank? && allele_id.blank?
 
@@ -28,9 +28,5 @@ module TogoVar::IO::VCF::Clinvar
         }
       }
     end
-  end
-
-  def self.included(mod)
-    include ElasticsearchExtension
   end
 end

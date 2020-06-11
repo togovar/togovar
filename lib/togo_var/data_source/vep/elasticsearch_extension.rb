@@ -1,4 +1,4 @@
-module TogoVar::IO::VCF::VEP
+module TogoVar::DataSource::VEP
   CONSEQUENCE_KEYS = %w[Allele Consequence IMPACT SYMBOL Gene Feature_type Feature BIOTYPE EXON INTRON HGVSc HGVSp
                       cDNA_position CDS_position Protein_position Amino_acids Codons Existing_variation DISTANCE
                       STRAND FLAGS VARIANT_CLASS SYMBOL_SOURCE HGNC_ID SIFT PolyPhen HGVS_OFFSET HGVSg CLIN_SIG
@@ -9,21 +9,19 @@ module TogoVar::IO::VCF::VEP
   REAL_NUMBER_REGEX = /[+-]?(?:\d+\.?\d*|\.\d+)/
 
   module ElasticsearchExtension
-    # @param [BioVcf::VcfRecord] record
     # @return [Hash]
-    def update_action(record)
+    def update_action
       {
         update: {
           _index: 'variation',
-          _id: Digest::SHA512.hexdigest("#{record.chrom}-#{record.pos}-#{record.ref}-#{record.alt.first}")
+          _id: Digest::SHA512.hexdigest("#{@record.chrom}-#{@record.pos}-#{@record.ref}-#{@record.alt.first}")
         }
       }
     end
 
-    # @param [BioVcf::VcfRecord] record
     # @return [Hash]
-    def data(record)
-      consequences = Array(record.info['CSQ']).map { |x| CONSEQUENCE_KEYS.zip(x.split('|')).to_h }
+    def data
+      consequences = Array(@record.info['CSQ']).map { |x| CONSEQUENCE_KEYS.zip(x.split('|')).to_h }
       variant_class = consequences.map { |x| x['VARIANT_CLASS'] }.uniq
 
       raise "Failed to obtain variant class" if variant_class.size.zero?
@@ -35,24 +33,24 @@ module TogoVar::IO::VCF::VEP
                .uniq
                .filter { |x| x.match?(/^rs\d+$/) }
 
-      start, stop, ref, alt = record.to_tgv_representation
+      start, stop, ref, alt = @record.to_refsnp_location
 
       {
         doc: {
-          id: record.id == '.' ? nil : Integer(record.id.sub(/^tgv/, '')),
+          id: @record.id == '.' ? nil : Integer(@record.id.sub(/^tgv/, '')),
           type: variant_class.first,
           chromosome: {
-            index: CHROM_INDEX[record.chrom],
-            label: record.chrom
+            index: CHROM_INDEX[@record.chrom],
+            label: @record.chrom
           },
           start: start,
           stop: stop,
           reference: ref,
           alternative: alt,
           vcf: {
-            position: record.pos,
-            reference: record.ref,
-            alternative: record.alt.first
+            position: @record.pos,
+            reference: @record.ref,
+            alternative: @record.alt.first
           },
           xref: xref.map do |x|
             {
@@ -80,9 +78,5 @@ module TogoVar::IO::VCF::VEP
         }.compact
       }
     end
-  end
-
-  def self.included(mod)
-    include ElasticsearchExtension
   end
 end

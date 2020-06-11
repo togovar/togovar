@@ -10,31 +10,43 @@ module Tasks
 
     desc 'vep', 'Import VEP annotations into elasticsearch'
 
-    def vep(path)
-      array_of_action_data = []
-
+    def vep(filename)
       Variation.set_refresh_interval(-1)
 
-      (reader = TogoVar::IO::VCF.new(path)).each do |record, i|
-        array_of_action_data << reader.update_action(record)
-        array_of_action_data << reader.data(record).merge(doc_as_upsert: true)
+      builder = TogoVar::Elasticsearch::BulkDataBuilder.for(:vep)
+      buffer = []
 
-        next unless (i % 10_000).zero?
+      TogoVar::IO::VCF.new(filename).each do |record|
+        if record.alt.size > 1
+          warn 'Skipped multi allelic variation: '\
+               "id = #{record.id}, pos = #{record.pos}, ref = #{record.ref}, alt = #{record.alt}"
+          next
+        end
+
+        builder.record = record
+        buffer << builder.update_action
+        buffer << builder.data.merge(doc_as_upsert: true)
+
+        next unless (record.record_number % 10_000).zero?
 
         response = Variation.es.bulk(body: array_of_action_data)
-        puts "#{i} - took: #{response['took']}, errors: #{response['errors'].inspect}}"
+        warn "#{record.record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}}"
 
-        array_of_action_data = []
+        buffer = []
       rescue StandardError => e
-        pp record
+        headers = record&.header&.lines&.size
+        records = record&.record_number
+        fields = record&.fields
+        warn "Line: #{headers + records}" if headers && records
+        warn "Fields: #{fields.to_s}" if fields
         raise e
       end
 
-      if array_of_action_data.present?
+      if buffer.present?
         response = Variation.es.bulk(body: array_of_action_data)
-        puts "Remnants - took: #{response['took']}, errors: #{response['errors'].inspect}, items: #{response['items']&.size}"
+        warn "Remnants - took: #{response['took']}, errors: #{response['errors'].inspect}}"
       end
-
+    ensure
       Variation.set_refresh_interval
     end
   end

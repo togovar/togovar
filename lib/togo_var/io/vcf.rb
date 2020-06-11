@@ -3,8 +3,11 @@ require 'bio-vcf/vcffile'
 
 module BioVcf
   class VcfRecord
-    # @return [Array<Array>] Array of [start, stop, ref, alt] for each alternative alleles
-    def to_tgv_representation
+    attr_reader :fields
+    attr_accessor :record_number
+
+    # @return [Array] Array of [start, stop, ref, alt] for each alternative alleles
+    def to_refsnp_location
       TogoVar::Util::Variation.vcf_to_refsnp_location(pos, ref, alt.first)
     end
   end
@@ -12,48 +15,41 @@ end
 
 module TogoVar::IO
   class VCF
-    class << self
-      require 'togo_var/io/vcf/clinvar'
-      require 'togo_var/io/vcf/vep'
-
-      # @param [Symbol] format
-      def for(path, format)
-        reader = self.new(path)
-
-        if format == :vep
-          class << reader
-            include VEP
-          end
-        elsif format == :clinvar
-          class << reader
-            include Clinvar
-          end
-        end
-
-        reader
-      end
+    def initialize(filename)
+      @filename = filename
     end
 
-    def initialize(path)
-      @reader = BioVcf::VCFfile.new(file: path, is_gz: path.match?(/\.gz$/))
-    end
-
-    def each(&_block)
+    def each
       return enum_for(:each) unless block_given?
 
-      @record_num = 0
+      io = if @filename.match?(/\.gz$/)
+             MultiGZipReader.open(@filename)
+           else
+             File.open(@filename)
+           end
 
-      @reader.each do |record|
-        @header ||= record.header
+      header = BioVcf::VcfHeader.new
 
-        raise 'Multi allelic variation' if record.alt.size > 1
+      record_number = 0
 
-        yield record, (@record_num += 1)
+      io.each_line do |line|
+        line.chomp!
+
+        if line =~ /^##fileformat=/
+          header.add(line)
+          next
+        end
+        if line =~ /^#/
+          header.add(line)
+          next
+        end
+
+        fields = BioVcf::VcfLine.parse(line)
+        rec = BioVcf::VcfRecord.new(fields, header)
+        rec.record_number = (record_number += 1)
+
+        yield rec
       end
-    end
-
-    def headers
-      (@header ||= @reader.each.first&.header)&.lines
     end
   end
 end
