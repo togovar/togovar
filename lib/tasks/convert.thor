@@ -27,10 +27,10 @@ module Tasks
         raise ArgumentError, "Unknown format: #{options[:output]}"
       end
 
-      gzip = Zlib::GzipWriter.open(output_filename % (file_index = 1))
-      file = writer.new(gzip)
-
       inside(directory, verbose: false) do
+        gzip = Zlib::GzipWriter.open(output_filename % (file_index = 1))
+        file = writer.new(gzip)
+
         begin
           TogoVar::IO::VCF.new(input_filename).each do |record|
             if record.alt.size > 1
