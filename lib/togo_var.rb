@@ -1,9 +1,6 @@
 module TogoVar
   module DataSource
     module Clinvar
-      module API
-        require 'togo_var/data_source/clinvar/api/client'
-      end
       require 'togo_var/data_source/clinvar/elasticsearch_extension'
     end
 
@@ -28,18 +25,8 @@ module TogoVar
 
   module IO
     require 'togo_var/io/multi_g_zip_reader'
-    # require 'togo_var/io/ndjson'
     require 'togo_var/io/vcf'
   end
-
-  # module Models
-  #   require 'togo_var/models/condition'
-  #   require 'togo_var/models/disease'
-  #   require 'togo_var/models/frequency'
-  #   require 'togo_var/models/gene_symbol'
-  #   require 'togo_var/models/transcript'
-  #   require 'togo_var/models/variant'
-  # end
 
   module RDF
     require 'togo_var/rdf/formatter'
