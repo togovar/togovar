@@ -8,24 +8,23 @@ module Tasks
   class Import < Thor
     namespace :import
 
-    desc 'vep', 'Import VEP annotations into elasticsearch'
+    desc 'vep', 'Import VEP annotations (VCF) into elasticsearch'
 
     def vep(filename)
       Variation.set_refresh_interval(-1)
 
-      builder = TogoVar::Elasticsearch::BulkDataBuilder.for(:vep)
+      BioVcf::VcfRecord.include(TogoVar::Ndjson::Formatter::VEP)
+
       buffer = []
 
-      TogoVar::IO::VCF.new(filename).each do |record|
+      TogoVar::VCF.new(filename).each do |record|
         if record.alt.size > 1
           warn 'Skipped multi allelic variation: '\
-               "id = #{record.id}, pos = #{record.pos}, ref = #{record.ref}, alt = #{record.alt}"
-          next
+                   "id = #{record.id}, pos = #{record.pos}, ref = #{record.ref}, alt = #{record.alt}"
+        else
+          buffer << record.update_action
+          buffer << record.data.merge(doc_as_upsert: true)
         end
-
-        builder.record = record
-        buffer << builder.update_action
-        buffer << builder.data.merge(doc_as_upsert: true)
 
         next unless (record.record_number % 10_000).zero?
 
