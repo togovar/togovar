@@ -28,7 +28,7 @@ module Tasks
 
         next unless (record.record_number % 10_000).zero?
 
-        response = Variation.es.bulk(body: array_of_action_data)
+        response = Variation.es.bulk(body: buffer)
         warn "#{record.record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}}"
 
         buffer = []
@@ -42,7 +42,7 @@ module Tasks
       end
 
       if buffer.present?
-        response = Variation.es.bulk(body: array_of_action_data)
+        response = Variation.es.bulk(body: buffer)
         warn "Remnants - took: #{response['took']}, errors: #{response['errors'].inspect}}"
       end
     ensure
