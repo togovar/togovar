@@ -1,8 +1,10 @@
 {
-  "name": "TogoVar",
+  "name": "togo_var",
   "private": true,
   "dependencies": {
+    "@babel/preset-react": "^7.10.1",
     "@rails/webpacker": "5.1.1",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "bootstrap-reboot": "^4.3.1",
     "bourbon": "^5.1.0",
     "expose-loader": "^0.7.5",
@@ -11,9 +13,11 @@
     "jquery-deparam": "^0.5.3",
     "jquery-ui-dist": "^1.12.1",
     "popper.js": "^1.14.6",
-    "rails-erb-loader": "^5.5.0"
+    "postcss-cssnext": "^3.1.0",
+    "prop-types": "^15.7.2",
+    "rails-erb-loader": "^5.5.2"
   },
   "devDependencies": {
-    "webpack-dev-server": "3.1.11"
+    "webpack-dev-server": "3.11.0"
   }
 }
