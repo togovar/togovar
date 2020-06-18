@@ -9,9 +9,10 @@ module Tasks
     namespace :import
 
     desc 'vep', 'Import VEP annotations (VCF) into elasticsearch'
+    option :batch, aliases: '-b', type: :boolean, desc: 'do not change refresh interval'
 
     def vep(filename)
-      Variation.set_refresh_interval(-1)
+      Variation.set_refresh_interval(-1) unless options[:batch]
 
       BioVcf::VcfRecord.include(TogoVar::Ndjson::Formatter::VEP)
 
@@ -20,7 +21,7 @@ module Tasks
       TogoVar::VCF.new(filename).each do |record|
         if record.alt.size > 1
           warn 'Skipped multi allelic variation: '\
-                   "id = #{record.id}, pos = #{record.pos}, ref = #{record.ref}, alt = #{record.alt}"
+               "id = #{record.id}, pos = #{record.pos}, ref = #{record.ref}, alt = #{record.alt}"
         else
           buffer << record.update_action
           buffer << record.data.merge(doc_as_upsert: true)
@@ -29,7 +30,7 @@ module Tasks
         next unless (record.record_number % 10_000).zero?
 
         response = Variation.es.bulk(body: buffer)
-        warn "#{record.record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}}"
+        warn "#{record.record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}"
 
         buffer = []
       rescue StandardError => e
@@ -43,10 +44,10 @@ module Tasks
 
       if buffer.present?
         response = Variation.es.bulk(body: buffer)
-        warn "Remnants - took: #{response['took']}, errors: #{response['errors'].inspect}}"
+        warn "Remnants - took: #{response['took']}, errors: #{response['errors'].inspect}"
       end
     ensure
-      Variation.set_refresh_interval
+      Variation.set_refresh_interval unless options[:batch]
     end
   end
 end
