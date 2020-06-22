@@ -23,9 +23,9 @@ module TogoVar
             statements << [bn, TGV.filter, x.match?(/^pass$/i) ? 'PASS' : x]
           end
 
-          statements << [bn, TGV.alleleCount, Integer(info['AC'] || info['AC_Adj'])]
-          statements << [bn, TGV.alleleNumber, Integer(info['AN'] || info['AN_Adj'])]
-          statements << [bn, TGV.alleleFrequency, Float(info['AF'] || info['AF_Adj'])]
+          statements << [bn, TGV.alleleCount, Integer(info['AC'] || info['AC_Adj'] || 0)]
+          statements << [bn, TGV.alleleNumber, Integer(info['AN'] || info['AN_Adj'] || 0)]
+          statements << [bn, TGV.alleleFrequency, Float(info['AF'] || info['AF_Adj'] || 0)]
 
           if (v = info['AAC']).present?
             statements << [bn, TGV.homozygousAlternativeAlleleCount, Integer(v)]
