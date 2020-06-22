@@ -5,6 +5,7 @@ module BioVcf
   class VcfRecord
     attr_reader :fields
     attr_accessor :record_number
+    attr_accessor :source
 
     # @return [Array] Array of [start, stop, ref, alt] for each alternative alleles
     def to_refsnp_location
@@ -15,8 +16,9 @@ end
 
 module TogoVar
   class VCF
-    def initialize(filename)
+    def initialize(filename, **options)
       @filename = filename
+      @source = options.delete(:source)
     end
 
     def each
@@ -47,6 +49,7 @@ module TogoVar
         fields = BioVcf::VcfLine.parse(line)
         rec = BioVcf::VcfRecord.new(fields, header)
         rec.record_number = (record_number += 1)
+        rec.source = @source
 
         yield rec
       end
