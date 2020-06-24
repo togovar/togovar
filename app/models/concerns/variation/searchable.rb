@@ -20,7 +20,7 @@ class Variation
         mapping dynamic: :strict do
           indexes :id, type: :long
           indexes :type, type: :keyword
-          indexes :chromosome, type: :nested do
+          indexes :chromosome do
             indexes :index, type: :integer
             indexes :label, type: :keyword
           end
@@ -28,7 +28,7 @@ class Variation
           indexes :stop, type: :integer
           indexes :reference, type: :keyword
           indexes :alternative, type: :keyword
-          indexes :vcf, type: :nested do
+          indexes :vcf do
             indexes :position, type: :integer
             indexes :reference, type: :keyword
             indexes :alternative, type: :keyword
@@ -52,7 +52,7 @@ class Variation
             indexes :sift, type: :float
             indexes :polyphen, type: :float
           end
-          indexes :clinvar, type: :object do
+          indexes :clinvar do
             indexes :variation_id, type: :long
             indexes :allele_id, type: :long
             indexes :medgen, type: :keyword
@@ -71,12 +71,12 @@ class Variation
             indexes :source, type: :keyword
             indexes :filter, type: :keyword
             indexes :quality, type: :float
-            indexes :allele, type: :object do
+            indexes :allele do
               indexes :count, type: :long
               indexes :number, type: :long
               indexes :frequency, type: :float
             end
-            indexes :genotype, type: :object do
+            indexes :genotype do
               indexes :alt_homo_count, type: :long
               indexes :hetero_count, type: :long
               indexes :ref_homo_count, type: :long
