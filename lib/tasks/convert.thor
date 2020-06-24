@@ -46,7 +46,7 @@ module Tasks
         BioVcf::VcfRecord.include(include_module)
 
         output_filename = "#{DateTime.now.strftime('%Y%m%d_%H%M%S_')}"\
-                          "#{File.basename(filename, File.extname(filename))}.%d.nt.gz".freeze
+                          "#{File.basename(filename, (ext = File.extname(filename)).match?(/\.\d+/) ? '' : ext)}.%d.nt.gz".freeze
         writer = RDF::Writer.for(:ntriples)
       else
         raise ArgumentError, "Unknown format: #{options[:output]}"
