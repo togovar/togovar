@@ -16,9 +16,12 @@ module Tasks
 
       BioVcf::VcfRecord.include(TogoVar::Ndjson::Formatter::VEP)
 
+      record_number = 0
       buffer = []
 
       TogoVar::VCF.new(filename).each do |record|
+        record_number = record.record_number
+
         if record.alt.size > 1
           warn 'Skipped multi allelic variation: '\
                "id = #{record.id}, pos = #{record.pos}, ref = #{record.ref}, alt = #{record.alt}"
@@ -29,7 +32,15 @@ module Tasks
 
         next unless (record.record_number % 10_000).zero?
 
-        response = Variation.es.bulk(body: buffer)
+        retry_count = 0
+        response = begin
+                     Variation.es.bulk(body: buffer)
+                   rescue Faraday::Error => e
+                     raise e if (retry_count += 1) > 5
+                     warn "#{record.record_number} - retry after #{2**retry_count} seconds"
+                     sleep 2**retry_count
+                     retry
+                   end
         warn "#{record.record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}"
 
         buffer = []
@@ -44,7 +55,7 @@ module Tasks
 
       if buffer.present?
         response = Variation.es.bulk(body: buffer)
-        warn "Remnants - took: #{response['took']}, errors: #{response['errors'].inspect}"
+        warn "#{record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}"
       end
     ensure
       Variation.set_refresh_interval unless options[:batch]
