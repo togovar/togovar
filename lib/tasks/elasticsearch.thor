@@ -18,7 +18,7 @@ module Tasks
     def init
       set_template_replica
 
-      %w[variation gene_symbol disease].each { |x| create_index x }
+      %w[variation].each { |x| create_index x }
     end
 
     desc 'set_template_replica', 'Make settings for replica template smallest'
