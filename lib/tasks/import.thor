@@ -12,19 +12,19 @@ module Tasks
     option :batch, aliases: '-b', type: :boolean, desc: 'do not change refresh interval'
 
     def vep(filename)
-      import(filename, TogoVar::Ndjson::Formatter::VEP, Variation)
+      import(filename, TogoVar::Ndjson::Formatter::VEP, 10_000, Variation)
     end
 
     desc 'clinvar', 'Import ClinVar VCF into elasticsearch'
     option :batch, aliases: '-b', type: :boolean, desc: 'do not change refresh interval'
 
     def clinvar(filename)
-      import(filename, TogoVar::Ndjson::Formatter::ClinVar, Variation)
+      import(filename, TogoVar::Ndjson::Formatter::ClinVar, 1_000, Variation)
     end
 
     private
 
-    def import(filename, formatter, *indices)
+    def import(filename, formatter, bulk_size, *indices)
       BioVcf::VcfRecord.include(formatter)
 
       record_number = 0
@@ -43,7 +43,7 @@ module Tasks
           buffer << record.data.merge(doc_as_upsert: true)
         end
 
-        next unless (record_number % 10_000).zero?
+        next unless (record_number % bulk_size).zero?
 
         response = bulk_request(buffer, record_number)
         warn "#{record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}"
@@ -60,6 +60,9 @@ module Tasks
       if buffer.present?
         response = bulk_request(buffer, record_number)
         warn "#{record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}"
+        if response['errors'] && (items = response['items']).present?
+          warn items.find { |x| x.dig('update', 'error') }&.dig('update', 'error')
+        end
       end
     ensure
       indices.map { |x| x.set_refresh_interval } unless options[:batch]
@@ -72,7 +75,7 @@ module Tasks
         ::Elasticsearch::Model.client.bulk(body: data)
       rescue Faraday::Error => e
         raise e if (retry_count += 1) > 5
-        warn "#{record_number} - retry after #{2 ** retry_count} seconds"
+        warn "#{record_number} - #{e.message} / retry after #{2 ** retry_count} seconds"
         sleep 2 ** retry_count
         retry
       end
