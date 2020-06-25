@@ -12,12 +12,25 @@ module Tasks
     option :batch, aliases: '-b', type: :boolean, desc: 'do not change refresh interval'
 
     def vep(filename)
-      Variation.set_refresh_interval(-1) unless options[:batch]
+      import(filename, TogoVar::Ndjson::Formatter::VEP, Variation)
+    end
 
-      BioVcf::VcfRecord.include(TogoVar::Ndjson::Formatter::VEP)
+    desc 'clinvar', 'Import ClinVar VCF into elasticsearch'
+    option :batch, aliases: '-b', type: :boolean, desc: 'do not change refresh interval'
+
+    def clinvar(filename)
+      import(filename, TogoVar::Ndjson::Formatter::ClinVar, Variation)
+    end
+
+    private
+
+    def import(filename, formatter, *indices)
+      BioVcf::VcfRecord.include(formatter)
 
       record_number = 0
       buffer = []
+
+      indices.map { |x| x.set_refresh_interval(-1) } unless options[:batch]
 
       TogoVar::VCF.new(filename).each do |record|
         record_number = record.record_number
@@ -30,35 +43,39 @@ module Tasks
           buffer << record.data.merge(doc_as_upsert: true)
         end
 
-        next unless (record.record_number % 10_000).zero?
+        next unless (record_number % 10_000).zero?
 
-        retry_count = 0
-        response = begin
-                     Variation.es.bulk(body: buffer)
-                   rescue Faraday::Error => e
-                     raise e if (retry_count += 1) > 5
-                     warn "#{record.record_number} - retry after #{2**retry_count} seconds"
-                     sleep 2**retry_count
-                     retry
-                   end
-        warn "#{record.record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}"
+        response = bulk_request(buffer, record_number)
+        warn "#{record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}"
 
         buffer = []
       rescue StandardError => e
-        headers = record&.header&.lines&.size
-        records = record&.record_number
+        headers = record&.header&.lines&.size || 0
         fields = record&.fields
-        warn "Line: #{headers + records}" if headers && records
+        warn "Line: #{headers + record_number}"
         warn "Fields: #{fields.to_s}" if fields
         raise e
       end
 
       if buffer.present?
-        response = Variation.es.bulk(body: buffer)
+        response = bulk_request(buffer, record_number)
         warn "#{record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}"
       end
     ensure
-      Variation.set_refresh_interval unless options[:batch]
+      indices.map { |x| x.set_refresh_interval } unless options[:batch]
+    end
+
+    def bulk_request(data, record_number = nil)
+      retry_count = 0
+
+      begin
+        ::Elasticsearch::Model.client.bulk(body: data)
+      rescue Faraday::Error => e
+        raise e if (retry_count += 1) > 5
+        warn "#{record_number} - retry after #{2 ** retry_count} seconds"
+        sleep 2 ** retry_count
+        retry
+      end
     end
   end
 end
