@@ -22,6 +22,13 @@ module Tasks
       import(filename, TogoVar::Ndjson::Formatter::ClinVar, 1_000, Variation)
     end
 
+    desc 'frequency', 'Import VCF that consists of allele count, allele number and allele frequency into elasticsearch'
+    option :batch, aliases: '-b', type: :boolean, desc: 'do not change refresh interval'
+
+    def frequency(filename)
+      import(filename, TogoVar::Ndjson::Formatter::Frequency, 1_000, Variation)
+    end
+
     private
 
     def import(filename, formatter, bulk_size, *indices)
