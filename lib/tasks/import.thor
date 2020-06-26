@@ -55,9 +55,7 @@ module Tasks
 
         next unless (record_number % bulk_size).zero?
 
-        response = bulk_request(buffer, record_number)
-        warn "#{record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}"
-
+        bulk_request(buffer, record_number)
         buffer = []
       rescue StandardError => e
         headers = record&.header&.lines&.size || 0
@@ -67,13 +65,7 @@ module Tasks
         raise e
       end
 
-      if buffer.present?
-        response = bulk_request(buffer, record_number)
-        warn "#{record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}"
-        if response['errors'] && (items = response['items']).present?
-          warn items.find { |x| x.dig('update', 'error') }&.dig('update', 'error')
-        end
-      end
+      bulk_request(buffer, record_number) if buffer.present?
     ensure
       indices.map { |x| x.set_refresh_interval } unless options[:batch]
     end
@@ -81,7 +73,7 @@ module Tasks
     def bulk_request(data, record_number = nil)
       retry_count = 0
 
-      begin
+      response = begin
         ::Elasticsearch::Model.client.bulk(body: data)
       rescue Faraday::Error => e
         raise e if (retry_count += 1) > 5
@@ -89,6 +81,13 @@ module Tasks
         sleep 2 ** retry_count
         retry
       end
+
+      warn "#{record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}"
+      if response['errors'] && (items = response['items']).present?
+        warn items.find { |x| x.dig('update', 'error') }&.dig('update', 'error')
+      end
+
+      response
     end
   end
 end
