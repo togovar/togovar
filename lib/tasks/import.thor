@@ -50,7 +50,7 @@ module Tasks
                "id = #{record.id}, pos = #{record.pos}, ref = #{record.ref}, alt = #{record.alt}"
         else
           buffer << record.update_action
-          buffer << record.data.merge(doc_as_upsert: true)
+          buffer << record.data
         end
 
         next unless (record_number % bulk_size).zero?

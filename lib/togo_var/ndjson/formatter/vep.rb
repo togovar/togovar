@@ -29,6 +29,7 @@ module TogoVar
           start, stop, ref, alt = to_refsnp_location
 
           {
+            doc_as_upsert: true,
             doc: {
               id: id == '.' ? nil : Integer(id.sub(/^tgv/, '')),
               type: variant_class.first,

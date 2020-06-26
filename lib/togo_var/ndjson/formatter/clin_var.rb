@@ -15,6 +15,7 @@ module TogoVar
         # @return [Hash]
         def data
           {
+            doc_as_upsert: true,
             doc: {
               clinvar: {
                 variation_id: Integer(id),
