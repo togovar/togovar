@@ -28,18 +28,16 @@ module TogoVar
               lang: 'painless',
               params: {
                 doc: {
-                  frequency: {
-                    source: source,
-                    filter: filter == '.' ? nil : filter.split(';').map { |x| x.match?(/^pass$/i) ? 'PASS' : x }.presence,
-                    quality: qual,
-                    allele: {
-                      count: Integer(info['AC'] || info['AC_Adj'] || 0),
-                      number: Integer(info['AN'] || info['AN_Adj'] || 0),
-                      frequency: Integer(info['AF'] || info['AF_Adj'] || 0)
-                    },
-                    genotype: genotype
-                  }.compact
-                }
+                  source: source,
+                  filter: filter == '.' ? nil : filter.split(';').map { |x| x.match?(/^pass$/i) ? 'PASS' : x }.presence,
+                  quality: qual,
+                  allele: {
+                    count: Integer(info['AC'] || info['AC_Adj'] || 0),
+                    number: Integer(info['AN'] || info['AN_Adj'] || 0),
+                    frequency: Integer(info['AF'] || info['AF_Adj'] || 0)
+                  },
+                  genotype: genotype
+                }.compact
               }
             }
           }
