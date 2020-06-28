@@ -34,7 +34,7 @@ module TogoVar
                   allele: {
                     count: Integer(info['AC'] || info['AC_Adj'] || 0),
                     number: Integer(info['AN'] || info['AN_Adj'] || 0),
-                    frequency: Integer(info['AF'] || info['AF_Adj'] || 0)
+                    frequency: Float(info['AF'] || info['AF_Adj'] || 0)
                   },
                   genotype: genotype
                 }.compact
