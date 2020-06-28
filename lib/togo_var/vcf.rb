@@ -12,6 +12,17 @@ module BioVcf
       TogoVar::Util::Variation.vcf_to_refsnp_location(pos, ref, alt.first)
     end
   end
+
+  class VcfRecordInfo
+    module BugFix
+      def [](key)
+        split_fields unless @h
+        super
+      end
+    end
+
+    prepend BugFix
+  end
 end
 
 module TogoVar
