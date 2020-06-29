@@ -45,7 +45,7 @@ module TogoVar
             next unless ac || an || af
 
             statements << [bn, SIO['SIO_000028'], (p = ::RDF::Node.new)] # has_part
-            statements << [p, ::RDF::Vocab::RDFS.label, source_label(key)]
+            statements << [p, ::RDF::Vocab::RDFS.label, population_label(key)]
             statements << [p, TGV.alleleCount, Integer(ac)] if ac.present?
             statements << [p, TGV.alleleNumber, Integer(an)] if an.present?
             statements << [p, TGV.alleleFrequency, Float(af)] if af.present?
