@@ -24,7 +24,7 @@ module Tasks
 
     desc 'frequency', 'Import VCF that consists of allele count, allele number and allele frequency into elasticsearch'
     option :source, banner: 'KEY', aliases: '-s', type: :string, required: true,
-           enum: %w[gemj_10k jga_ngs jga_snp exac hgvd tommo_3.5k tommo_4.7k gnomad],
+           enum: %w[exac gem_j_wga gnomad hgvd jga_ngs jga_snp tommo],
            desc: 'Set dataset name to be assigned to dc:source'
     option :batch, aliases: '-b', type: :boolean, desc: 'do not change refresh interval'
 

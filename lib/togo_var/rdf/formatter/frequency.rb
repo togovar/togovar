@@ -56,14 +56,27 @@ module TogoVar
 
         def source_label(source)
           case source.to_s
-          when 'gemj_10k'
-            'GEMJ 10K'
+          when 'exac'
+            'ExAC'
+          when 'gem_j_wga'
+            'GEM-J WGA'
+          when 'gnomad'
+            'gnomAD'
+          when 'hgvd'
+            'HGVD'
           when 'jga_ngs'
             'JGA-NGS'
           when 'jga_snp'
             'JGA-SNP'
-          when 'exac'
-            'ExAC'
+          when 'tommo'
+            '4.7KJPN'
+          else
+            raise ArgumentError, "Unknown source: #{source}"
+          end
+        end
+
+        def population_label(key)
+          case key.to_s
           when 'AFR'
             'African/African American'
           when 'AMR'
@@ -78,16 +91,8 @@ module TogoVar
             'South Asian'
           when 'OTH'
             'Other'
-          when 'hgvd'
-            'HGVD'
-          when 'tommo_3.5k'
-            '3.5K JPN'
-          when 'tommo_4.7k'
-            '4.7K JPN'
-          when 'gnomad'
-            'gnomAD'
           else
-            raise ArgumentError, "Unknown source: #{source}"
+            raise ArgumentError, "Unknown key: #{key}"
           end
         end
       end
