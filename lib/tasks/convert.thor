@@ -26,7 +26,7 @@ module Tasks
 
     desc 'frequency FILE', 'convert VCF that consists of allele count, allele number and allele frequency to another format'
     option :source, banner: 'KEY', aliases: '-s', type: :string, required: true,
-           enum: %w[exac gem_j_wga gnomad hgvd jga_ngs jga_snp tommo],
+           enum: %w[exac gem_j_wga gnomad hgvd jga_ngs jga_snp tommo_4.7kjpn],
            desc: 'Set dataset name to be assigned to dc:source'
     option :output, banner: 'FORMAT', aliases: '-o', type: :string, enum: %i[ntriples], default: 'ntriples', desc: 'Set output format'
     option :directory, aliases: '-d', type: :string, desc: 'Set output directory, use current directory if not given'

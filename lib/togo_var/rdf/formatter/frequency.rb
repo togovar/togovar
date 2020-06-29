@@ -68,8 +68,8 @@ module TogoVar
             'JGA-NGS'
           when 'jga_snp'
             'JGA-SNP'
-          when 'tommo'
-            '4.7KJPN'
+          when 'tommo_4.7kjpn'
+            'ToMMo 4.7KJPN'
           else
             raise ArgumentError, "Unknown source: #{source}"
           end
