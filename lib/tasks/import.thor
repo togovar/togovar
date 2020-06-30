@@ -34,7 +34,17 @@ module Tasks
 
     private
 
+    def disable_logging
+      return unless defined?(Rails) &&
+        Rails.configuration.respond_to?(:elasticsearch) &&
+        (config = Rails.configuration.elasticsearch).present?
+
+      ::Elasticsearch::Model.client = ::Elasticsearch::Client.new(config.merge(log: false))
+    end
+
     def import(filename, formatter, bulk_size, *indices)
+      disable_logging
+
       BioVcf::VcfRecord.include(formatter)
 
       record_number = 0
