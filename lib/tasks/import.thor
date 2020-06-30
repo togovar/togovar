@@ -74,13 +74,13 @@ module Tasks
       retry_count = 0
 
       response = begin
-        ::Elasticsearch::Model.client.bulk(body: data)
-      rescue Faraday::Error => e
-        raise e if (retry_count += 1) > 5
-        warn "#{record_number} - #{e.message} / retry after #{2 ** retry_count} seconds"
-        sleep 2 ** retry_count
-        retry
-      end
+                   ::Elasticsearch::Model.client.bulk(body: data)
+                 rescue Faraday::Error => e
+                   raise e if (retry_count += 1) > 5
+                   warn "#{record_number} - #{e.message} / retry after #{2 ** retry_count} seconds"
+                   sleep 2 ** retry_count
+                   retry
+                 end
 
       warn "#{record_number} - took: #{response['took']}, errors: #{response['errors'].inspect}"
       if response['errors'] && (items = response['items']).present?
