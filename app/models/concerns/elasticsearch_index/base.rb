@@ -4,8 +4,20 @@ module ElasticsearchIndex
 
     module ClassMethods
       # @return [Integer] number of total records
-      def count
-        es.count(index: index_name).dig('count')
+      def count(arguments = {})
+        arguments.merge!(index: index_name)
+
+        __elasticsearch__.client.count(arguments)&.dig('count')
+      end
+
+      def find(*id)
+        query = Elasticsearch::DSL::Search.search do
+          query do
+            terms id: id
+          end
+        end
+
+        __elasticsearch__.search(query)
       end
 
       # @param [String,Integer] interval -1 to disable soft commit, nil to reset setting
@@ -22,7 +34,7 @@ module ElasticsearchIndex
           'Content-Type': 'application/json'
         }
 
-        es.perform_request(method, path, params, body, headers)
+        __elasticsearch__.client.perform_request(method, path, params, body, headers)
       end
 
       # @return [Elasticsearch::Transport::Client] elasticsearch client

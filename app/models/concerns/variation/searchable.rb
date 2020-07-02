@@ -1,6 +1,5 @@
 class Variation
   module Searchable
-
     extend ActiveSupport::Concern
     include ElasticsearchIndex::Base
 
@@ -83,6 +82,54 @@ class Variation
             end
           end
         end
+      end
+    end
+
+    module ClassMethods
+      # @return [Hash]
+      def cardinality
+        return @cardinality if @cardinality
+
+        query = Elasticsearch::DSL::Search.search do
+          size 0
+          aggregation :types do
+            cardinality do
+              field :type
+            end
+          end
+          aggregation :clinvar_interpretations do
+            cardinality do
+              field :'clinvar.interpretation'
+            end
+          end
+          aggregation :vep_consequences do
+            nested do
+              path :vep
+              aggregation :vep_consequences do
+                cardinality do
+                  field :'vep.consequence'
+                end
+              end
+            end
+          end
+          aggregation :frequency_sources do
+            nested do
+              path :frequency
+              aggregation :frequency_sources do
+                cardinality do
+                  field :'frequency.source'
+                end
+              end
+            end
+          end
+        end
+
+        response = __elasticsearch__.search(query)
+
+        @cardinality = response.aggregations
+                         .map { |k, v| [k, v.key?('doc_count') ? v[k]['value'] : v['value']] }
+                         .to_h
+                         .symbolize_keys
       end
     end
   end

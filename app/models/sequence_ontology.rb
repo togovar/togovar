@@ -13,7 +13,7 @@ class SequenceOntology
     # @param [Array<String>] so_label
     def most_severe_consequence(*so_label)
       CONSEQUENCES_IN_ORDER.each do |so|
-        return so.id if so_label.include?(so.id)
+        return so.id if so_label.include?(so.label)
       end
 
       nil

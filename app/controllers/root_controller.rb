@@ -8,14 +8,14 @@ class RootController < ApplicationController
       format.json do
         @response = if term && term.length >= 3
                       {
-                        gene: GeneSymbol.suggest(term).results,
-                        disease: Disease.suggest(term).results
+                        gene: Gene.suggest(term),
+                        disease: Disease.suggest(term)
                       }
                     else
                       Hash.new { [] }
                     end
 
-        render 'suggest', formats: 'json', handlers: 'jbuilder'
+        render 'suggest', formats: :json, handlers: 'jbuilder'
       end
     end
   end
@@ -50,14 +50,11 @@ class RootController < ApplicationController
               end
             end
 
-            aggs = @param.stat? ? Variant.search(builder.stat_query).aggregations : {}
-            response = Variant.search(builder.build, request_cache: !@term.present?)
-
+            response = Variation.search(builder.build, request_cache: !@term.present?)
             {
-              filtered_total: response.raw_response['hits']['total'],
-              hits: response.raw_response['hits']['hits']
-                      .map { |hit| Elasticsearch::Model::Response::Result.new(hit) },
-              aggs: aggs
+              filtered_total: Variation.count(body: builder.build.slice(:query)),
+              results: response.records.results,
+              aggs: @param.stat? ? Variation.search(builder.stat_query).aggregations : {}
             }
           end
         rescue StandardError => e
@@ -67,7 +64,7 @@ class RootController < ApplicationController
           {}
         end
 
-        render 'search', formats: 'json', handlers: 'jbuilder'
+        render 'search', formats: :json, handlers: 'jbuilder'
       end
     end
   end
