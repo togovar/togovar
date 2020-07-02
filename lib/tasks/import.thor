@@ -72,8 +72,7 @@ module Tasks
           warn 'Skipped multi allelic variation: '\
                "id = #{record.id}, pos = #{record.pos}, ref = #{record.ref}, alt = #{record.alt}"
         else
-          buffer << record.update_action
-          buffer << record.data
+          buffer.push(*row.requests)
         end
 
         next unless (record_number % bulk_size).zero?
@@ -118,8 +117,7 @@ module Tasks
       csv.each do |row|
         record_number = csv.lineno - 1
 
-        buffer << row.update_action
-        buffer << row.data
+        buffer.push(*row.requests)
 
         next unless (record_number % bulk_size).zero?
 

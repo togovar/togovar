@@ -2,8 +2,13 @@ module TogoVar
   module Ndjson
     module Formatter
       module Frequency
+        # @return [Array<Hash>]
+        def requests
+          [action_and_meta_data, optional_source]
+        end
+
         # @return [Hash]
-        def update_action
+        def action_and_meta_data
           {
             update: {
               _index: 'variation',
@@ -13,7 +18,7 @@ module TogoVar
         end
 
         # @return [Hash]
-        def data
+        def optional_source
           genotype = {
             alt_homo_count: (v = info['AAC']).present? ? Integer(v) : nil,
             hetero_count: (v = info['ARC']).present? ? Integer(v) : nil,

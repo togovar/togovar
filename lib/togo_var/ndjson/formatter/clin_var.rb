@@ -2,8 +2,13 @@ module TogoVar
   module Ndjson
     module Formatter
       module ClinVar
+        # @return [Array<Hash>]
+        def requests
+          [action_and_meta_data, optional_source]
+        end
+
         # @return [Hash]
-        def update_action
+        def action_and_meta_data
           {
             update: {
               _index: 'variation',
@@ -13,7 +18,7 @@ module TogoVar
         end
 
         # @return [Hash]
-        def data
+        def optional_source
           {
             doc_as_upsert: true,
             doc: {

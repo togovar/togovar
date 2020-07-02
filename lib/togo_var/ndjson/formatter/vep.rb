@@ -2,8 +2,13 @@ module TogoVar
   module Ndjson
     module Formatter
       module VEP
+        # @return [Array<Hash>]
+        def requests
+          [action_and_meta_data, optional_source]
+        end
+
         # @return [Hash]
-        def update_action
+        def action_and_meta_data
           {
             update: {
               _index: 'variation',
@@ -13,7 +18,7 @@ module TogoVar
         end
 
         # @return [Hash]
-        def data
+        def optional_source
           consequences = Array(info['CSQ']).map { |x| CONSEQUENCE_KEYS.zip(x.split('|')).to_h }
           variant_class = consequences.map { |x| x['VARIANT_CLASS'] }.uniq
 
