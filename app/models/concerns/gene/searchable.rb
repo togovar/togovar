@@ -44,7 +44,7 @@ class Gene
 
       settings settings do
         mapping dynamic: :strict do
-          indexes :id, type: :integer
+          indexes :hgnc_id, type: :integer
           indexes :symbol,
                   type: :keyword,
                   fields: {
@@ -61,27 +61,10 @@ class Gene
                       normalizer: :lowercase
                     }
                   }
+          indexes :approved, type: :boolean
+          indexes :alias_of, type: :keyword
           indexes :name, type: :keyword
           indexes :location, type: :keyword
-          indexes :alias, type: :nested do
-            indexes :symbol,
-                    type: :keyword,
-                    fields: {
-                      search: {
-                        type: :text,
-                        analyzer: :symbol_search_analyzer
-                      },
-                      suggest: {
-                        type: :text,
-                        analyzer: :symbol_suggest_analyzer
-                      },
-                      lowercase: {
-                        type: :keyword,
-                        normalizer: :lowercase
-                      }
-                    }
-            indexes :name, type: :keyword
-          end
           indexes :family, type: :nested do
             indexes :id, type: :integer
             indexes :name, type: :keyword
@@ -91,59 +74,24 @@ class Gene
     end
 
     module ClassMethods
-      # @return [Hash]
-      def synonyms(id)
-        return unless id
-
-        query = Elasticsearch::DSL::Search.search do
-          query do
-            match id: id
-          end
-        end
-
-        result = __elasticsearch__.search(query).results.first.to_h
-
-        result.dig('_source', 'alias')&.map { |x| x['symbol'] }
+      def find(_id)
+        raise NotImplementedError
       end
 
-      # @param [String] query
+      # @param [String] keyword
       # @return [Elasticsearch::Model::Response] response
-      def suggest(term)
+      def suggest(keyword)
         query = ::Elasticsearch::DSL::Search.search do
           query do
             bool do
               should do
-                match 'symbol.lowercase': { query: term.downcase, boost: 3 }
+                match 'symbol.lowercase': { query: keyword.downcase, boost: 3 }
               end
               should do
-                match 'symbol.search': { query: term, boost: 2 }
+                match 'symbol.search': { query: keyword, boost: 2 }
               end
               should do
-                match 'symbol.suggest': { query: term }
-              end
-              should do
-                nested do
-                  path :alias
-                  query do
-                    match 'alias.symbol.lowercase': { query: term.downcase, boost: 3 }
-                  end
-                end
-              end
-              should do
-                nested do
-                  path :alias
-                  query do
-                    match 'alias.symbol.search': { query: term, boost: 2 }
-                  end
-                end
-              end
-              should do
-                nested do
-                  path :alias
-                  query do
-                    match 'alias.symbol.suggest': { query: term }
-                  end
-                end
+                match 'symbol.suggest': { query: keyword }
               end
             end
           end
@@ -152,24 +100,28 @@ class Gene
         __elasticsearch__.search(query)
       end
 
-      # @param [String] term
+      # @return [Hash]
+      def synonyms(hgnc_id)
+        return unless hgnc_id
+
+        query = Elasticsearch::DSL::Search.search do
+          query do
+            match hgnc_id: hgnc_id
+          end
+        end
+
+        __elasticsearch__.search(query).results
+          .reject { |x| x.dig('_source', 'approved') }
+          .map { |x| x.dig('_source', 'symbol') }
+          .compact
+      end
+
+      # @param [String] keyword
       # @return [Elasticsearch::Model::Response] response
-      def exact_match(term)
+      def exact_match(keyword)
         query = ::Elasticsearch::DSL::Search.search do
           query do
-            bool do
-              should do
-                match 'symbol.lowercase': term.downcase
-              end
-              should do
-                nested do
-                  path :alias
-                  query do
-                    match 'alias.symbol.lowercase': term.downcase
-                  end
-                end
-              end
-            end
+            match 'symbol.lowercase': keyword.downcase
           end
         end
 
