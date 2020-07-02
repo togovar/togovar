@@ -40,6 +40,9 @@ json.statistics do
   end
 end
 
+synonyms = Hash.new { |hash, key| hash[key] = Gene.synonyms(key) }
+conditions = Hash.new { |hash, key| hash[key] = Disease.find(key).results.map { |x| x.dig('_source', 'name') } }
+
 json.data @result[:results] do |result|
   variation = result[:_source].deep_symbolize_keys
 
@@ -60,7 +63,7 @@ json.data @result[:results] do |result|
                  .filter { |x| x.dig(:symbol, :source) == 'HGNC' && x[:hgnc_id] }
                  .map { |x| { name: x.dig(:symbol, :label), id: x[:hgnc_id] } }
                  .uniq
-                 .map { |x| { name: x[:name], id: x[:id], synonyms: Gene.synonyms(x[:id]) }.compact }
+                 .map { |x| { name: x[:name], id: x[:id], synonyms: synonyms[x[:id]] }.compact }
                  .presence
 
   json.external_link do
@@ -71,7 +74,7 @@ json.data @result[:results] do |result|
   json.significance do
     interpretations = Array(variation.dig(:clinvar, :interpretation))
     json.interpretations interpretations.map { |x| Form::ClinicalSignificance[x.tr(' ', '_').to_sym]&.param_name }.presence
-    json.condition Disease.find(*variation.dig(:clinvar, :medgen)).results.map { |x| x['_source'].slice('id', 'name') }.presence
+    json.condition variation.dig(:clinvar, :medgen)&.map { |x| conditions[x] }
   end
 
   vep = Array(variation[:vep])

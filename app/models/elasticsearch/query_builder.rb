@@ -33,8 +33,7 @@ module Elasticsearch
                           if (t = Gene.exact_match(term))
                             gene_condition(t)
                           else
-                            # TODO: implement me
-                            # disease_condition(term)
+                            disease_condition(term)
                           end
                         end
 
@@ -215,15 +214,10 @@ module Elasticsearch
               end
             end
 
-            interpretations = values.map { |x| Form::ClinicalSignificance.find_by_param_name(x).key }.compact
-
-            # TODO: remove this code for new index data
-            interpretations = interpretations.map { |x| x.to_s.gsub('_', ' ') }
-
-            break if interpretations.empty?
-
-            should do
-              terms 'clinvar.interpretation': interpretations
+            if (interpretations = values.map { |x| Form::ClinicalSignificance.find_by_param_name(x).key }).present?
+              should do
+                terms 'clinvar.interpretation': interpretations
+              end
             end
           end
         end
@@ -587,24 +581,22 @@ module Elasticsearch
       query.to_hash[:query]
     end
 
-    # TODO: update to accept MedGen CUI
-    # def disease_condition(term)
-    #   query = Elasticsearch::DSL::Search.search do
-    #     query do
-    #       nested do
-    #         path :conditions
-    #         query do
-    #           if (t = Disease.exact_match(term))
-    #             match 'conditions.condition': t
-    #           else
-    #             match 'conditions.condition.search': term
-    #           end
-    #         end
-    #       end
-    #     end
-    #   end
-    #
-    #   query.to_hash[:query]
-    # end
+    def disease_condition(term)
+      medgen = if (t = Disease.exact_match(term)).present?
+                 [t[:id]]
+               elsif (ts = Disease.condition_search(term)).present?
+                 ts.map(&:id)
+               end
+
+      return if medgen.empty?
+
+      query = Elasticsearch::DSL::Search.search do
+        query do
+          terms 'clinvar.medgen': medgen
+        end
+      end
+
+      query.to_hash[:query]
+    end
   end
 end

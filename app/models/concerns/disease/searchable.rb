@@ -86,21 +86,31 @@ class Disease
           end
         end
 
-        search(query)
+        __elasticsearch__.search(query)
       end
 
-      # @param [String] term
-      # @return [Elasticsearch::Model::Response] response
-      def exact_match(term)
-        body = ::Elasticsearch::DSL::Search.search do
+      # @param [String] keyword
+      # @return [Hash]
+      def exact_match(keyword)
+        query = ::Elasticsearch::DSL::Search.search do
           query do
-            match 'name.lowercase': term.downcase
+            match 'name.lowercase': keyword.downcase
           end
         end
 
-        results = search(body).results
+        (r = __elasticsearch__.search(query).results.first) ? r['_source'].slice('id', 'name') : {}
+      end
 
-        results.map { |x| x.dig(:_source, :name) }.first if results.total.positive?
+      # @param [String] keyword
+      # @return [Hash]
+      def condition_search(keyword)
+        query = ::Elasticsearch::DSL::Search.search do
+          query do
+            match 'name.search': keyword.downcase
+          end
+        end
+
+        __elasticsearch__.search(query).results.map { |x| x['_source'].slice('id', 'name') }
       end
     end
   end
