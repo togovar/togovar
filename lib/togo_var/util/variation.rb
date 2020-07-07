@@ -49,10 +49,12 @@ module TogoVar
           if ref.length == alt.length && ref.length == 1 # SNV
             statements << [bn_location, FALDO.position, start]
             statements << [bn_location, FALDO.reference, HCO[chrom] / 'GRCh37']
+          elsif ref.length == 1 && ref[0] == alt[0] # insertion
+            statements << [bn_location, FALDO.after, start]
+            statements << [bn_location, FALDO.before, stop]
+            statements << [bn_location, FALDO.reference, HCO[chrom] / 'GRCh37']
           else
-            statements << [bn_location, ::RDF.type, FALDO.Region]
-
-            statements << [bn_location, FALDO.end, (bn_begin = ::RDF::Node.new)]
+            statements << [bn_location, FALDO.start, (bn_begin = ::RDF::Node.new)]
             statements << [bn_begin, ::RDF.type, FALDO.ExactPosition]
             statements << [bn_begin, FALDO.position, start]
             statements << [bn_begin, FALDO.reference, HCO[chrom] / 'GRCh37']

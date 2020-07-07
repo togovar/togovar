@@ -30,12 +30,12 @@ module TogoVar
             statements.concat(location)
           end
 
-          _, _, ref, alt = to_refsnp_location
-          statements << [s, M2R['reference_allele'], ref || '']
-          statements << [s, M2R['alternative_allele'], alt || '']
+          _, _, snp_ref, snp_alt = to_refsnp_location
+          statements << [s, M2R['reference_allele'], snp_ref || '']
+          statements << [s, M2R['alternative_allele'], snp_alt || '']
 
           statements << [s, M2R['referece_allele_vcf'], ref]
-          statements << [s, M2R['alternative_allele_vcf'], alt]
+          statements << [s, M2R['alternative_allele_vcf'], alt.first]
 
           consequences.flat_map { |x| x['Existing_variation'].split('&') }
             .reject(&:blank?)
