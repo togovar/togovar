@@ -12,7 +12,8 @@ module TogoVar
           {
             update: {
               _index: 'variation',
-              _id: Digest::SHA512.hexdigest("#{chrom}-#{pos}-#{ref}-#{alt.first}")
+              _id: Digest::SHA512.hexdigest("#{chrom}-#{pos}-#{ref}-#{alt.first}"),
+              retry_on_conflict: 3
             }
           }
         end

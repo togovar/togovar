@@ -12,7 +12,8 @@ module TogoVar
           {
             update: {
               _index: 'gene',
-              _id: Digest::SHA512.hexdigest("#{field(:hgnc_id)}/#{symbol}")
+              _id: Digest::SHA512.hexdigest("#{field(:hgnc_id)}/#{symbol}"),
+              retry_on_conflict: 3
             }
           }
         end

@@ -12,7 +12,8 @@ module TogoVar
           {
             update: {
               _index: 'disease',
-              _id: Digest::SHA512.hexdigest(field(:cui))
+              _id: Digest::SHA512.hexdigest(field(:cui)),
+              retry_on_conflict: 3
             }
           }
         end
