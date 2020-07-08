@@ -77,7 +77,7 @@ module Tasks
             raise e
           end
         ensure
-          file.close
+          file&.close
         end
       end
     end
