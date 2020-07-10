@@ -187,7 +187,7 @@ module Elasticsearch
 
       @type_condition = Elasticsearch::DSL::Search.search do
         query do
-          terms type: keys
+          terms type: keys.map { |x| SequenceOntology.find(x)&.label }.compact
         end
       end.to_hash[:query]
 
@@ -236,7 +236,7 @@ module Elasticsearch
           nested do
             path :vep
             query do
-              terms 'vep.consequence': values
+              terms 'vep.consequence': values.map { |x| SequenceOntology.find(x)&.label }.compact
             end
           end
         end

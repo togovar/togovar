@@ -1,6 +1,7 @@
 json.scroll do
   json.offset @param.offset
   json.limit @param.limit
+  json.max_rows 10_000
 end
 
 json.statistics do
@@ -41,49 +42,66 @@ json.statistics do
 end
 
 synonyms = Hash.new { |hash, key| hash[key] = Gene.synonyms(key) }
-conditions = Hash.new { |hash, key| hash[key] = Disease.find(key).results.map { |x| x.dig('_source', 'name') } }
+conditions = Hash.new { |hash, key| hash[key] = Disease.find(key).results.first&.dig('_source', 'name') }
 
 json.data @result[:results] do |result|
   variation = result[:_source].deep_symbolize_keys
 
-  json.id variation[:id].present? ? "tgv#{variation[:tgv_id]}" : nil
+  if (v = variation[:id]).present?
+    json.id "tgv#{v}"
+  end
 
   json.type SequenceOntology.find_by_label(variation[:type])&.id
 
   json.chromosome variation.dig(:chromosome, :label)
   json.start variation[:start]
   json.stop variation[:stop]
-  json.reference variation[:reference]
-  json.alternative variation[:alternative]
+  json.reference variation[:reference].presence || ''
+  json.alternative variation[:alternative].presence || ''
 
-  dbsnp = Array(variation[:xref]).filter { |x| x[:source] = 'dbSNP' }.map { |x| x[:id] }
-  json.existing_variations dbsnp.presence
-
-  json.symbols Array(variation[:vep])
-                 .filter { |x| x.dig(:symbol, :source) == 'HGNC' && x[:hgnc_id] }
-                 .map { |x| { name: x.dig(:symbol, :label), id: x[:hgnc_id] } }
-                 .uniq
-                 .map { |x| { name: x[:name], id: x[:id], synonyms: synonyms[x[:id]] }.compact }
-                 .presence
-
-  json.external_link do
-    json.dbsnp dbsnp.presence
-    json.clinvar variation.dig(:clinvar, :variation_id)
+  if (dbsnp = Array(variation[:xref]).filter { |x| x[:source] = 'dbSNP' }.map { |x| x[:id] }).present?
+    json.existing_variations dbsnp
   end
 
-  json.significance do
-    interpretations = Array(variation.dig(:clinvar, :interpretation))
-    json.interpretations interpretations.map { |x| Form::ClinicalSignificance[x.tr(' ', '_').to_sym]&.param_name }.presence
-    json.condition variation.dig(:clinvar, :medgen)&.map { |x| conditions[x] }
+  symbols = Array(variation[:vep])
+              .filter { |x| x.dig(:symbol, :source) == 'HGNC' && x[:hgnc_id] }
+              .map { |x| { name: x.dig(:symbol, :label), id: x[:hgnc_id] } }
+              .uniq
+              .map { |x| { name: x[:name], id: x[:id], synonyms: synonyms[x[:id]] }.compact }
+
+  if symbols.present?
+    json.symbols symbols
+  end
+
+  clinvar = (v = variation.dig(:clinvar, :variation_id)) ? ['VCV%09d' % v] : nil
+
+  external_link = {
+    dbsnp: dbsnp.presence,
+    clinvar: clinvar
+  }.compact
+
+  if external_link.present?
+    json.external_link external_link
+  end
+
+  interpretations = Array(variation.dig(:clinvar, :interpretation))
+    .map { |x| Form::ClinicalSignificance[x.tr(' ', '_').to_sym]&.param_name }
+
+  significance = Array(variation.dig(:clinvar, :medgen)&.map { |x| conditions[x] }).zip(interpretations).map { |a, b| { condition: a, interpretations: [b] } }
+  if significance.present?
+    json.significance significance
   end
 
   vep = Array(variation[:vep])
   json.most_severe_consequence SequenceOntology.most_severe_consequence(*vep.flat_map { |x| x[:consequence] }.uniq)
   json.sift vep.map { |x| x[:sift] }.compact.min
   json.polyphen vep.map { |x| x[:polyphen] }.compact.max
-  json.transcripts vep.presence
+  vep.each do |x|
+    x[:consequence] = x[:consequence].map { |y| SequenceOntology.find_by_label(y)&.id }
+  end
+  json.transcripts vep.map(&:compact).presence
 
-  json.frequencies Array(variation[:frequency]).presence
+  json.frequencies Array(variation[:frequency]).map(&:compact).presence
 end
 
 json.error @error if @error.present?
