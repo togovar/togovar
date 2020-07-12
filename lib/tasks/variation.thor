@@ -14,7 +14,7 @@ module Tasks
     def add_clinvar_annotation
       disable_logging
 
-      Variation.set_refresh_interval(-1)
+      ::Variation.set_refresh_interval(-1)
 
       batch_size = 500
       total = 0
@@ -40,7 +40,7 @@ module Tasks
         bulk_request(body, record_number: total)
       end
     ensure
-      Variation.set_refresh_interval
+      ::Variation.set_refresh_interval
     end
 
     private
