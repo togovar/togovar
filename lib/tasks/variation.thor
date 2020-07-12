@@ -33,7 +33,7 @@ module Tasks
                     .map { |r| r.to_h.slice(:variation_id, :condition, :interpretation, :medgen).transform_values(&:object) }
                     .group_by { |r| r[:variation_id] }
 
-        merged = indices.map { |k, v| v.merge(annotation: results[k]) }
+        merged = indices.map { |k, v| v.merge(annotation: results[k] || []) }
 
         body = merged.flat_map { |x| bulk_body(x) }
 
