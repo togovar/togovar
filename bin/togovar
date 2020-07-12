@@ -18,6 +18,7 @@ module TogoVar
     register(Tasks::Convert, 'convert', 'convert [COMMAND]', 'Commands for convert')
     register(Tasks::Elasticsearch, 'elasticsearch', 'elasticsearch [COMMAND]', 'Commands for elasticsearch')
     register(Tasks::Import, 'import', 'import [COMMAND]', 'Commands for import')
+    register(Tasks::Variation, 'variation', 'variation [COMMAND]', 'Commands for variation')
   end
 end
 

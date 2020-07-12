@@ -56,15 +56,15 @@ class Variation
             indexes :allele_id, type: :long
             indexes :medgen, type: :keyword
             indexes :interpretation, type: :keyword
-            # indexes :condition, {
-            #   type: :text,
-            #   analyzer: :standard,
-            #   fields: {
-            #     raw: {
-            #       type: :keyword
-            #     }
-            #   }
-            # }
+            indexes :condition, {
+              type: :text,
+              analyzer: :standard,
+              fields: {
+                raw: {
+                  type: :keyword
+                }
+              }
+            }
           end
           indexes :frequency, type: :nested do
             indexes :source, type: :keyword

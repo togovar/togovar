@@ -26,15 +26,6 @@ module TogoVar
               clinvar: {
                 variation_id: Integer(id),
                 allele_id: info['ALLELEID']&.presence,
-                medgen: Array(info['CLNDISDB'])
-                          .filter { |x| x.match?(/^MedGen:/) }
-                          .map { |x| x.split(':').last }
-                          .uniq
-                          .presence,
-                interpretation: Array(info['CLNSIG'])
-                                  .flat_map { |x| x.split('/') }
-                                  .map { |x| x.gsub('_', ' ').strip.downcase }
-                                  .presence
               }.compact
             }
           }
