@@ -54,7 +54,7 @@ module TogoVar
             statements << [bn_location, FALDO.before, stop]
             statements << [bn_location, FALDO.reference, HCO[chrom] / 'GRCh37']
           else
-            statements << [bn_location, FALDO.start, (bn_begin = ::RDF::Node.new)]
+            statements << [bn_location, FALDO.begin, (bn_begin = ::RDF::Node.new)]
             statements << [bn_begin, ::RDF.type, FALDO.ExactPosition]
             statements << [bn_begin, FALDO.position, start]
             statements << [bn_begin, FALDO.reference, HCO[chrom] / 'GRCh37']
