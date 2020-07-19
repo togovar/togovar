@@ -26,6 +26,7 @@ gem 'sass-rails', '~> 5.0'
 gem 'webpacker', '~> 5.1', '>= 5.1.1'
 
 # utility
+gem 'awesome_print', '~> 1.8'
 gem 'action_args', '~> 2.2'
 gem 'dotenv-rails', '~> 2.7'
 gem 'gtm_rails', '~> 0.5.0'
@@ -46,7 +47,6 @@ gem 'bio-vcf', github: 'pjotrp/bioruby-vcf'
 gem 'pry-rails', '~> 0.3.6'
 
 group :development do
-  gem 'awesome_print', '~> 1.8'
   gem 'better_errors', '~> 2.5'
   gem 'better_errors-pry', '~> 1.0'
   gem 'capistrano', '~> 3.11', require: false
