@@ -9,7 +9,8 @@
   .LayoutMain
     #SearchView
       .searchform
-        %input#search-field.searchinput{placeholder: 'Search for disease or gene symbol or rs...', type: 'text'}/
+        %label{for: 'search-field', hidden: ''} Keyword
+        %input#search-field.searchinput{type: 'text', title: 'keyword', placeholder: 'Search for disease or gene symbol or rs...'}/
         %button.searchbutton
       %dl.searchexamples
         %dt Disease
@@ -91,11 +92,13 @@
           .content
             .range-selector
               .input
-                %input.from{max: '1', min: '0', step: '0.01', type: 'number', value: '0.000'}>/
+                %label{for: 'lower-range', hidden: ''} Keyword
+                %input.from{id: 'lower-range', type: 'number', max: '1', min: '0', step: '0.01', value: '0.000'}>/
                 \~
-                %input.to{max: '1', min: '0', step: '0.01', type: 'number', value: '1.000'}/
-                %label
-                  %input.invert{type: 'checkbox'}>/
+                %label{for: 'upper-range', hidden: ''} Keyword
+                %input.to{id: 'upper-range', type: 'number', max: '1', min: '0', step: '0.01', value: '1.000'}/
+                %label{for: 'invert'}
+                  %input.invert{id: 'invert', type: 'checkbox'}>/
                   Invert range
               .meter
                 .barcontainer
@@ -117,17 +120,17 @@
                   .from
                   .to
               .match
-                %label
-                  %input.all{name: 'match', type: 'radio', value: 'all'}>/
+                %label{for: 'match-all'}
+                  %input.all{id: 'match-all', name: 'match', type: 'radio', value: 'all'}>/
                   for all datasets
-                %label
-                  %input.any{checked: 'checked', name: 'match', type: 'radio', value: 'any'}>/
+                %label{for: 'match-any'}
+                  %input.any{id: 'match-any', name: 'match', type: 'radio', value: 'any', checked: 'checked'}>/
                   for any dataset
         %section#FilterVariantCallingQuality.panel-view
           %h3.title Variant calling quality
           .content
-            %label.label
-              %input{checked: 'checked', type: 'checkbox'}>/
+            %label.label{for: 'variant-calling-quality'}
+              %input{id: 'variant-calling-quality', type: 'checkbox', checked: 'checked'}>/
               Exclude filtered out variants in all datasets
         %section#FilterVariantType.panel-view
           %h3.title Variant type
