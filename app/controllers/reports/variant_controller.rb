@@ -5,9 +5,8 @@ module Reports
 
       params = {
         tgv_id: id,
-        sparql: config['sparql'].presence,
-        sparqlist: config['sparqlist'].presence,
-        base_url: config['stanza'].presence
+        ep: config['sparql'].presence,
+        sparqlist: config['sparqlist'].presence
       }.compact
 
       search = config['search'].presence
@@ -20,7 +19,7 @@ module Reports
         ['variant_other_overlapping_variants', 'Other overlapping variant(s)', params.merge(search_api: search).compact],
         ['variant_frequency', 'Frequency', params],
         ['variant_clinvar', 'Clinical Significance', params],
-        ['variant_jbrowse', 'Genomic context', params.merge(assembly: 'GRCh37', jbrowse: jbrowse).compact],
+        ['variant_jbrowse', 'Genomic context', params.merge(assembly: 'GRCh37', jbrowse: jbrowse, margin: 50).compact],
         ['variant_gene', 'Gene', params.merge(assembly: 'GRCh37')],
         ['variant_transcript', 'Transcripts', params.merge(assembly: 'GRCh37')],
         ['variant_publication', 'Publications', params]
