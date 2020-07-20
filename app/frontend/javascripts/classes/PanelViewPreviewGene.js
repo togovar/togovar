@@ -20,9 +20,9 @@ export default class PanelViewPreviewGene extends PanelView {
   update() {
     let html = '';
     this.elm.classList.add('-notfound');
-    if (StoreManager.getData('selectedRow') !== undefined !== undefined) {
+    if (StoreManager.getData('selectedRow') !== undefined) {
       const record = StoreManager.getSelectedRecord();
-      if (record) {
+      if (record && record.symbols) {
         for (const symbol of record.symbols) {
           html += `
             <tbody>

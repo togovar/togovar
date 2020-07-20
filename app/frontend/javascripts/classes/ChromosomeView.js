@@ -1,17 +1,17 @@
+/* global $ */
+
 import StoreManager from "./StoreManager.js";
 
 const WIDTH = 12;
 const PADDING = 5;
 
 export default class ChromosomeView {
-
   /* @param elm:HTMLElement
    * @param no:Number Chromosome number
    * @param map:Array Position data
    * @param maxLength:Number Max length of chromosomes
    */
   constructor(elm, no, map, maxLength) {
-    return;
     this.no = no;
     this.map = map;
     this.elm = elm;
@@ -28,7 +28,7 @@ export default class ChromosomeView {
       </div>
     `;
 
-    this.filteredRegion = this.elm.querySelector('.lower > .filteredregion');
+    this.filteredRegion = this.elm.querySelector('.lower > .filteredregion'); // TODO:
     this.displayRegion = this.elm.querySelector('.lower > .displayregion');
     this.selectedRegion = this.elm.querySelector('.lower > .selectedregion');
 
@@ -102,20 +102,37 @@ export default class ChromosomeView {
 
     for (const subBand of this.map) {
       html += `
-        <g class="subband" data-band="${subBand.band}" data-sub-band="${subBand.subBand}" data-start="${subBand.start}" data-end="${subBand.end}" >
-          <title>${subBand.subBand}</title>
-          <rect class="subbandrect ${subBand.stainType}" x="0" y="${PADDING + subBand.start * rate}" height="${(subBand.end - subBand.start) * rate}" width="${WIDTH}" />
-        </g>
-      `;
+      <g
+        class="subband"
+        data-band="${subBand.band}"
+        data-sub-band="${subBand.subBand}"
+        data-start="${subBand.start}"
+        data-end="${subBand.end}"
+        >
+        <title>${subBand.subBand}</title>
+        <rect
+          class="subbandrect ${subBand.stainType}"
+          x="0"
+          y="${PADDING + subBand.start * rate}"
+          height="${(subBand.end - subBand.start) * rate}"
+          width="${WIDTH}"
+        />
+      </g>`;
     }
 
     // draw bands
     for (const band of lowMap) {
       html += `
-        <g class="band" data-band="${band.band}" data-start="${band.start}" data-end="${band.end}" transform="translate(${WIDTH + 4.5}, ${PADDING + band.start * rate - .5})">
-          <text x="8" y="${(band.end - band.start) * rate * 0.5 + 3}" class="bandtext">${band.band}</text>
-          <path d="M0,1 V${(band.end - band.start) * rate - 1} M0,${Math.round((band.end - band.start) * rate * 0.5)} H8" class="line" />
-        </g>
+      <g
+        class="band"
+        data-band="${band.band}"
+        data-start="${band.start}"
+        data-end="${band.end}"
+        transform="translate(${WIDTH + 4.5}, ${PADDING + band.start * rate - .5})"
+        >
+        <text x="8" y="${(band.end - band.start) * rate * 0.5 + 3}" class="bandtext">${band.band}</text>
+        <path d="M0,1 V${(band.end - band.start) * rate - 1} M0,${Math.round((band.end - band.start) * rate * 0.5)} H8" class="line" />
+      </g>
       `;
     }
     this.svg.innerHTML = html + '</g>';
@@ -125,22 +142,14 @@ export default class ChromosomeView {
     // bands
     this.svg.querySelectorAll('g.band').forEach(g => {
       $(g).on('click', e => {
-        StoreManager.setData('region__', {
-          chromosome: this.no,
-          start: e.delegateTarget.dataset.start,
-          end: e.delegateTarget.dataset.end
-        });
+        StoreManager.setSearchCondition('term', `${this.no}:${e.delegateTarget.dataset.start}-${e.delegateTarget.dataset.end}`);
       });
     });
 
     // sub bands
     this.svg.querySelectorAll('g.subband').forEach(g => {
       $(g).on('click', e => {
-        StoreManager.setData('region__', {
-          chromosome: this.no,
-          start: e.delegateTarget.dataset.start,
-          end: e.delegateTarget.dataset.end
-        });
+        StoreManager.setSearchCondition('term', `${this.no}:${e.delegateTarget.dataset.start}-${e.delegateTarget.dataset.end}`);
       });
     });
   }

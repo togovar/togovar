@@ -25,20 +25,20 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
         record = StoreManager.getSelectedRecord(),
         list = [];
       if (record && record.external_link) {
+        // resSNP
         if (record.external_link.dbsnp) {
           list.push({
             title: 'refSNP',
             content: `<ul>${(() => record.external_link.dbsnp.map(rs => `<li><a href="http://identifiers.org/dbsnp/${rs}" class="hyper-text -external" target="_blank">${rs}</a></li>`).join(''))()}</ul>`
           });
         }
-
+        // ClinVar
         if (record.external_link.clinvar) {
           list.push({
             title: 'ClinVar',
             content: `<ul>${(() => record.external_link.clinvar.map(vcv => `<li><a href="https://www.ncbi.nlm.nih.gov/clinvar/variation/${parseInt(vcv.replace('VCV', ''))}" class="hyper-text -external" target="_blank">${vcv}</a></li>`).join(''))()}</ul>`
           });
         }
-
         if (list.length > 0) {
           html = `
             <tbody>

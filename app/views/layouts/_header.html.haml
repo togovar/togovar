@@ -1,11 +1,10 @@
 - active = yield(:active)
 
 %header#GlobalHeader
-  %h1.heading<>
+  %h1.heading
     = link_to root_path, class: 'link' do
       = image_pack_tag('media/images/logotype.svg', alt: 'TogoVar', class: 'logotype')
-    %span.summary
-      A comprehensive Japanese genetic variation database
+    %span.summary A comprehensive Japanese genetic variation database
 
   %navigation.menus
     %ul.menu.navigation

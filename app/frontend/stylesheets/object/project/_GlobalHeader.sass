@@ -9,13 +9,15 @@ $WIDTH_LOGO: 380px
   box-shadow: 0 2px 2px rgba(black, .2)
   width: 100%
   min-width: $WIDTH_MIN
-  top: 0
+  top: $HEIGHT_NBDC_COMMON_HEADER
   z-index: $Z_INDEX_GLOBAL_HEADER
 
   > .heading
     display: inline-block
 
     > .link
+      text-decoration: none
+
       > .logotype
         width: 101px
         height: 31px
@@ -80,6 +82,8 @@ $WIDTH_LOGO: 380px
           > .link
             color: $COLOR_KEY_DEEP
             text-decoration: none
+
+    > .config
 
     > .languageswitcher
       > .language

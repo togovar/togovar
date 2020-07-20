@@ -1,9 +1,9 @@
 /*global $ */
-import {PAGE, COLUMNS, PREVIEWS, FILTERS} from "../global.js";
+
+import {PAGE, COLUMNS} from "../global.js";
 import StoreManager from "./StoreManager.js";
 
 export default class Configuration {
-
   constructor(elm) {
     this.elm = elm;
     this.bg = elm.querySelector('.bg');
@@ -34,8 +34,6 @@ export default class Configuration {
   // initialize
   initHome() {
     StoreManager.bind('columns', this);
-    StoreManager.bind('filterPanels', this);
-    StoreManager.bind('previewPanels', this);
 
     document.querySelector('#GlobalHeader > .menus > .config > .menu-button').addEventListener('click', () => {
       this.open();
@@ -50,16 +48,6 @@ export default class Configuration {
         constant: COLUMNS,
         storeKey: 'columns',
         container: document.getElementById('ConfSortColumns')
-      },
-      {
-        constant: PREVIEWS,
-        storeKey: 'previewPanels',
-        container: document.getElementById('ConfSortPreviews')
-      },
-      {
-        constant: FILTERS,
-        storeKey: 'filterPanels',
-        container: document.getElementById('ConfSortFilters')
       }
     ];
 
@@ -97,19 +85,5 @@ export default class Configuration {
       this.elm.querySelector(`#ConfSortColumns > li > label > input[value="${column.id}"]`).checked = column.isUsed;
     }
     localStorage.setItem('columns', JSON.stringify(columns));
-  }
-
-  filterPanels(filters) {
-    for (const filter of filters) {
-      this.elm.querySelector(`#ConfSortFilters > li > label > input[value="${filter.id}"]`).checked = filter.isUsed;
-    }
-    localStorage.setItem('filterPanels', JSON.stringify(filters));
-  }
-
-  previewPanels(previews) {
-    for (const preview of previews) {
-      this.elm.querySelector(`#ConfSortPreviews > li > label > input[value="${preview.id}"]`).checked = preview.isUsed;
-    }
-    localStorage.setItem('previewPanels', JSON.stringify(previews));
   }
 }

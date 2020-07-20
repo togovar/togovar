@@ -10,12 +10,10 @@ import Configuration from '../javascripts/classes/Configuration.js';
 import SelectedRowIndicator from '../javascripts/classes/SelectedRowIndicator.js';
 import Karyotype from '../javascripts/classes/Karyotype.js';
 import ActivityIndicator from '../javascripts/classes/ActivityIndicator.js';
-
 import PanelViewCheckList from '../javascripts/classes/PanelViewCheckList.js';
-import PanelViewFilterAlternativeAlleleFrequency from '../javascripts/classes/PanelViewFIlterAlternativeAlleleFrequency.js';
-import PanelViewFilterVariantCallingQuality from '../javascripts/classes/PanelViewFIlterVariantCallingQuality.js';
-import PanelViewFilterConsequence from '../javascripts/classes/PanelViewFIlterConsequence.js';
-
+import PanelViewFilterAlternativeAlleleFrequency from '../javascripts/classes/PanelViewFilterAlternativeAlleleFrequency.js';
+import PanelViewFilterVariantCallingQuality from '../javascripts/classes/PanelViewFilterVariantCallingQuality.js';
+import PanelViewFilterConsequence from '../javascripts/classes/PanelViewFilterConsequence.js';
 import PanelViewPreviewGene from '../javascripts/classes/PanelViewPreviewGene.js';
 import PreviewToVariantReport from '../javascripts/classes/PreviewToVariantReport.js';
 import PanelViewPreviewExternalLinks from '../javascripts/classes/PanelViewPreviewExternalLinks.js';

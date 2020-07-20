@@ -18,10 +18,12 @@ $COLOR_REF: #249EB3
 $COLOR_ALT: #FF6682
 
 $COLOR_DATASET_JGA: $COLOR_KEY
-$COLOR_DATASET_3_5KJPN: #C78198
+$COLOR_DATASET_3_5KJPN: #abe03f
 $COLOR_DATASET_HGVD: #005B80
-$COLOR_DATASET_MGEND: #005B80
-$COLOR_DATASET_EXAC: #628C00
+$COLOR_DATASET_MGEND: $COLOR_DATASET_HGVD
+$COLOR_DATASET_GEM_J: #DC2828
+$COLOR_DATASET_BBJ: #FF993F
+$COLOR_DATASET_FOREIGN: #94928d
 
 $COLOR_SIGN_SAFE: #24D636
 $COLOR_SIGN_NORMAL: #9DCF3A
@@ -40,9 +42,14 @@ $PADDING_SIDEBAR_SIDE: 15px
 $PADDING_PANEL_VIEW: 10px
 $WIDTH_MIN: 900px
 $WIDTH_SIDEBAR: 300px
+//$HEIGHT_NBDC_COMMON_HEADER: 24px
+//$HEIGHT_NBDC_COMMON_FOOTER: 24px
+$HEIGHT_NBDC_COMMON_HEADER: 0px
+$HEIGHT_NBDC_COMMON_FOOTER: 0px
 $HEIGHT_NAVIGATION_ITEM: 20px
 $HEIGHT_GLOBAL_MENU: 50px
-$HEIGHT_BOTTOM_DRAWER: 0
+$HEIGHT_BOTTOM_DRAWER: 30px
+//$HEIGHT_BOTTOM_DRAWER: 0px
 $HEIGHT_BOTTOM_DRAWER_OPENED: 400px
 
 $Z_INDEX_ROW_INDICATOR: 1
@@ -56,11 +63,16 @@ $GUI_DURATION: .2s
 $TRANSITION_DURATION: .5s
 
 // charactor
+$CHAR_TIMES: "\f00d"
+$CHAR_INFO_CIRCLE: "\f05a"
 $CHAR_ARROW_RIGHT: "\f061"
 $CHAR_ARROW_DOWN: "\f063"
+$CHAR_EXCRAMATION_TRIANGLE: "\f071"
 $CHAR_EXTERNAL_LINK: "\f08e"
 $CHAR_ARROW_CIRCLE_RIGHT: "\f0a9"
 $CHAR_WRENCH: "\f0ad"
+$CHAR_DATASET: "\E800"
+
 
 @mixin sprite($width, $height, $x, $y)
   background-image: url('~images/csssprite.png')
@@ -69,9 +81,9 @@ $CHAR_WRENCH: "\f0ad"
   background-size: 200px 60px
 
 @font-face
-  font-family: 'FontAwesome'
-  src: url('#{$fa-font-path}/fontawesome-webfont.eot')
-  src: url('#{$fa-font-path}/fontawesome-webfont.eot') format('embedded-opentype'), url('#{$fa-font-path}/fontawesome-webfont.woff2') format('woff2'), url('#{$fa-font-path}/fontawesome-webfont.woff') format('woff'), url('#{$fa-font-path}/fontawesome-webfont.ttf') format('truetype'), url('#{$fa-font-path}/fontawesome-webfont.svg') format('svg')
+  font-family: 'fontello'
+  src: url('~fonts/fontello.eot')
+  src: url('~fonts/fontello.eot') format('embedded-opentype'), url('~fonts/fontello.woff2') format('woff2'), url('~fonts/fontello.woff') format('woff'), url('~fonts/fontello.ttf') format('truetype'), url('~fonts/fontello.svg') format('svg')
 
 html
   height: 100%
@@ -81,7 +93,7 @@ body
   font-family: 'Roboto Condensed', sans-serif
   color: $COLOR_BLACK
   height: 100%
-  padding-top: $HEIGHT_GLOBAL_MENU
+  padding-top: $HEIGHT_GLOBAL_MENU + $HEIGHT_NBDC_COMMON_HEADER !important
   -moz-osx-font-smoothing: grayscale
   -webkit-font-smoothing: antialiased
 

@@ -1,27 +1,30 @@
 /*global $ */
-import StoreManager from "./StoreManager.js";
 
-const NUMBER_OF_SUGGESTS = 10;
+import StoreManager from "./StoreManager.js";
+import {PATH} from "../global.js";
+
+const NUMBER_OF_SUGGESTS = 10; // TODO: Config
 const SUGGEST_LABELS = {
   gene: 'Gene symbol',
   disease: 'Disease name'
-};
+}
 const KEY_INCREMENT = {
-  ArrowUp: {x: 0, y: -1},
-  ArrowDown: {x: 0, y: 1},
-  ArrowLeft: {x: -1, y: 0},
-  ArrowRight: {x: 1, y: 0}
+  ArrowUp: { x: 0, y: -1 },
+  ArrowDown: { x: 0, y: 1 },
+  ArrowLeft: { x: -1, y: 0 },
+  ArrowRight: { x: 1, y: 0 }
 };
 
 export default class SearchConditionController {
 
   constructor(elm) {
+    // reference
     this.elm = elm;
     this.field = elm.querySelector('#search-field');
     this.button = elm.querySelector('.searchform > .searchbutton');
     this.suggestView = elm.querySelector('.suggest-view');
     this.suggesting = false;
-
+    // events
     StoreManager.bind('searchConditions', this);
     this.field.addEventListener('keydown', this.keydown.bind(this));
     this.field.addEventListener('keyup', this.keyup.bind(this));
@@ -34,7 +37,7 @@ export default class SearchConditionController {
         this.button.dispatchEvent(new Event('click'));
       }, true);
     });
-
+    // value
     const term = StoreManager.getSearchCondition('term');
     if (term) this.field.value = term;
   }
@@ -65,12 +68,18 @@ export default class SearchConditionController {
       this.suggesting = false;
       this.suggestView.innerHTML = '';
       this.search();
-    } else if (this.suggesting && (e.key === 'Escape' || this.field.value.length < 3)) { // cancel
+    } else if (
+      this.suggesting &&
+      (
+        e.key === 'Escape' ||
+        this.field.value.length < 3
+      )
+    ) {
       this.suggesting = false;
       this.suggestView.innerHTML = '';
       this.lastValue = '';
     } else if (this.field.value.length >= 3 && this.field.value !== this.lastValue) {
-      fetch(`/suggest?term=${this.field.value}`)
+      fetch(`${PATH}/suggest?term=${this.field.value}`)
         .then(response => response.json())
         .then(json => this.suggest(json));
     }
@@ -78,7 +87,7 @@ export default class SearchConditionController {
 
   blur() {
     setTimeout(() => {
-      if (this.suggesting) { // cancel
+      if (this.suggesting) {
         this.suggesting = false;
         this.suggestView.innerHTML = '';
         this.lastValue = '';
@@ -92,7 +101,7 @@ export default class SearchConditionController {
 
   suggestPositionShift(increment) {
     if (this.suggestPosition.x === -1 && this.suggestPosition.y === -1) {
-      switch (true) {
+      switch(true) {
         case increment.y === -1:
           this.suggestPosition = {x: 0, y: -1};
           break;
@@ -142,7 +151,7 @@ export default class SearchConditionController {
   suggest(data) {
     this.suggesting = true;
     this.lastValue = this.field.value;
-    this.suggestPosition = {x: -1, y: -1};
+    this.suggestPosition = { x: -1, y: -1 };
 
     let max = Math.max(...Object.keys(data).map(key => data[key].length));
     max = max < NUMBER_OF_SUGGESTS ? max : NUMBER_OF_SUGGESTS;

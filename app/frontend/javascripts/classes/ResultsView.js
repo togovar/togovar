@@ -1,8 +1,10 @@
 /*global $ */
+
 import StoreManager from "./StoreManager.js";
 import ResultsRowView from "./ResultsRowView.js";
 import ScrollBar from "./ScrollBar.js";
-import {TR_HEIGHT, COLUMNS} from '../global.js';
+import {TR_HEIGHT, COMMON_FOOTER_HEIGHT, COLUMNS} from '../global.js';
+
 
 export default class ResultsView {
 
@@ -28,7 +30,6 @@ export default class ResultsView {
 
     this.tbody = this.elm.querySelector('.tablecontainer > table.results-view > tbody');
 
-    // update scroll range if resized
     window.addEventListener('resize', this.resize.bind(this));
     window.dispatchEvent(new Event('resize'));
 
@@ -43,13 +44,11 @@ export default class ResultsView {
 
   resize() {
     const
-      maxRowCount = Math.floor((window.innerHeight - this.tbody.getBoundingClientRect().top - StoreManager.getData('karyotype').height) / TR_HEIGHT),
+      maxRowCount = Math.floor((window.innerHeight - this.tbody.getBoundingClientRect().top - StoreManager.getData('karyotype').height - COMMON_FOOTER_HEIGHT - 2) / TR_HEIGHT),
       numberOfRecords = StoreManager.getData('numberOfRecords'),
       offset = StoreManager.getData('offset'),
       rowCount = Math.min(maxRowCount, numberOfRecords);
-
     StoreManager.setData('rowCount', rowCount);
-
     if (this.rows.length < rowCount) {
       for (let i = this.rows.length; i < rowCount; i++) {
         const tr = new ResultsRowView(i);
@@ -72,10 +71,8 @@ export default class ResultsView {
 
   scroll(e) {
     e.stopPropagation();
-
     const
       totalHeight = StoreManager.getData('numberOfRecords') * TR_HEIGHT;
-
     let
       availableScrollY = totalHeight - StoreManager.getData('rowCount') * TR_HEIGHT,
       wheelScroll;
@@ -119,15 +116,17 @@ export default class ResultsView {
     this.messages.innerHTML = '';
 
     if (messages.notice) {
-      this.messages.innerHTML += `<div class="notice">${messages.notice}</div>`;
+      this.messages.innerHTML += `<div class="message -notice">${messages.notice}</div>`;
     }
     if (messages.warning) {
-      this.messages.innerHTML += `<div class="warning">${messages.warning}</div>`;
+      this.messages.innerHTML += `<div class="message -warning">${messages.warning}</div>`;
     }
     if (messages.error) {
-      this.messages.innerHTML += `<div class="error">${messages.error}</div>`;
+      this.messages.innerHTML += `<div class="message -error">${messages.error}</div>`;
     }
   }
+
+  // bindings ///////////////////////////
 
   searchStatus(status) {
     this.status.textContent = `The number of available variations is ${status.available.toLocaleString()} out of ${status.filtered.toLocaleString()}.`;
@@ -150,10 +149,9 @@ export default class ResultsView {
     for (let i = 0; i < columns.length; i++) {
       const column = columns[i];
       this.stylesheet.sheet.insertRule(`
-        .tablecontainer > table.results-view th.${column.id}, .tablecontainer > table.results-view td.${column.id} {
-          display: ${column.isUsed ? 'table-cell' : 'none'}
-        }
-      `, i);
+      .tablecontainer > table.results-view th.${column.id}, .tablecontainer > table.results-view td.${column.id} {
+        display: ${column.isUsed ? 'table-cell' : 'none'}
+      }`, i);
     }
   }
 

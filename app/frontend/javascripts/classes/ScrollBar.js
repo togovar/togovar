@@ -1,4 +1,5 @@
 /*global $ */
+
 import StoreManager from "./StoreManager.js";
 import {TR_HEIGHT} from '../global.js';
 
@@ -70,20 +71,16 @@ export default class ScrollBar {
       offsetHeight = offset * TR_HEIGHT,
       displayHeight = rowCount * TR_HEIGHT,
       displayRate = displayHeight / totalHeight;
-
     let
       barHeight = Math.ceil(displayHeight * displayRate);
-      barHeight = barHeight < MIN_HEIGHT ? MIN_HEIGHT : barHeight;
-
+    barHeight = barHeight < MIN_HEIGHT ? MIN_HEIGHT : barHeight;
     const
       availableHeight = displayHeight - barHeight * 0,
       availableRate = availableHeight / totalHeight,
       barTop = Math.ceil(offsetHeight * availableRate);
-
     this.bar.style.height = `${barHeight}px`;
     this.bar.style.top = `${barTop}px`;
     this.prepareRelease();
-
     if (rowCount === 0 || numberOfRecords === rowCount) {
       this.bar.classList.add('-disabled');
     } else {

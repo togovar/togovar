@@ -2,6 +2,7 @@ $HEIGHT_BIT: 2px
 $HEIGHT_BIT_SHIFT: $HEIGHT_BIT + 1px
 
 .frequency-graph
+  //margin-bottom: -4px
   > .dataset
     display: inline-block
     width: 9px
@@ -28,15 +29,17 @@ $HEIGHT_BIT_SHIFT: $HEIGHT_BIT + 1px
     &[data-dataset="jga_ngs"], &[data-dataset="jga_snp"]
       background-color: $COLOR_DATASET_JGA
 
-    &[data-dataset="tommo"]
+    &[data-dataset="tommo_4.7kjpn"]
       background-color: $COLOR_DATASET_3_5KJPN
 
     &[data-dataset="hgvd"]
       background-color: $COLOR_DATASET_HGVD
 
+    &[data-dataset="gem_j_wga"]
+      background-color: $COLOR_DATASET_GEM_J
+
     &[data-dataset="exac"]
-      //margin-left: 4px
-      background-color: $COLOR_DATASET_EXAC
+      background-color: $COLOR_DATASET_FOREIGN
 
     &[data-frequency="na"]
       background-color: rgba($COLOR_LIGHT_GRAY, .6)
@@ -72,6 +75,8 @@ $HEIGHT_BIT_SHIFT: $HEIGHT_BIT + 1px
       &:before
         height: #{$HEIGHT_BIT_SHIFT - 1px}
 
+    &[data-frequency="≥0.5"]
+
 .frequency-detail
   width: 100%
 
@@ -85,10 +90,16 @@ $HEIGHT_BIT_SHIFT: $HEIGHT_BIT + 1px
       > td
         line-height: 18px
 
+        &:first-child
+          font-weight: bold
+
         .dataset-icon
           display: inline-block
           vertical-align: middle
           margin-right: .2em
+
+          > .properties
+            width: inherit
 
         &.alt, &.total, &.frequency
           text-align: right

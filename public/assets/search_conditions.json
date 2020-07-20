@@ -11,40 +11,53 @@
     "type": "array",
     "items": [
       {
+        "id": "gem_j_wga",
+        "label": "GEM-J WGA",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
         "id": "jga_ngs",
         "label": "JGA NGS",
         "type": "boolean",
-        "default": "1"
+        "default": "1",
+        "has_freq": true
       },
       {
         "id": "jga_snp",
         "label": "JGA SNP",
         "type": "boolean",
-        "default": "1"
+        "default": "1",
+        "has_freq": true
       },
       {
-        "id": "tommo",
-        "label": "3.5KJPN",
+        "id": "tommo_4.7kjpn",
+        "label": "ToMMo 4.7KJPN",
         "type": "boolean",
-        "default": "1"
+        "default": "1",
+        "has_freq": true
       },
       {
         "id": "hgvd",
         "label": "HGVD",
         "type": "boolean",
-        "default": "1"
+        "default": "1",
+        "has_freq": true
       },
       {
         "id": "exac",
         "label": "ExAC",
         "type": "boolean",
-        "default": "1"
+        "default": "1",
+        "has_freq": true
       },
       {
         "id": "clinvar",
-        "label": "Clinvar",
+        "label": "ClinVar",
         "type": "boolean",
-        "default": "1"
+        "default": "1",
+        "has_freq": false
       }
     ]
   },
@@ -160,7 +173,7 @@
       },
       {
         "id": "LB",
-        "label": "likely benign",
+        "label": "Likely benign",
         "type": "boolean",
         "default": "1"
       },

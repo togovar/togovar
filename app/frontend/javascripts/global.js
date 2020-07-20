@@ -1,5 +1,8 @@
 export const PAGE = document.getElementsByTagName('html')[0].dataset.page;
 export const TR_HEIGHT = 27;
+export const COMMON_HEADER_HEIGHT = 30;
+export const COMMON_FOOTER_HEIGHT = 22;
+export const PATH = process.env.TOGOVAR_APP_HOST || 'https://togovar.biosciencedbc.jp';
 
 export const COLUMNS = [
   {label: 'TogoVar ID', id: 'togovar_id'},
@@ -15,26 +18,6 @@ export const COLUMNS = [
   {label: 'Clinical significance', id: 'clinical_significance'}
 ];
 
-export const PREVIEWS = [
-  {id: 'Gene', label: 'Genes'},
-  {id: 'ExternalLinks', label: 'External Links'},
-  {id: 'AlternativeAlleleFrequencies', label: 'Alternative allele frequencies'},
-  {id: 'Consequence', label: 'Consequence'},
-  {id: 'ClinicalSignificance', label: 'Clinical significance'}
-];
-
-export const FILTERS = [
-  {id: 'Datasets', label: 'Dataset'},
-  {id: 'AlternativeAlleleFrequency', label: 'Alternative allele frequency'},
-  {id: 'VariantCallingQuality', label: 'Variant calling quality'},
-  {id: 'VariantType', label: 'Variant type'},
-  {id: 'ClinicalSignificance', label: 'Clinical significance'},
-  {id: 'Consequence', label: 'Consequence'},
-  {id: 'SIFT', label: 'SIFT'},
-  {id: 'PolyPhen', label: 'PolyPhen'}
-];
-
 export function strIns(str, idx, val) {
-  var res = str.slice(0, idx) + val + str.slice(idx);
-  return res;
+  return str.slice(0, idx) + val + str.slice(idx);
 }

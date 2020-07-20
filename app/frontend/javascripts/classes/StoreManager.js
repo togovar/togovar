@@ -1,23 +1,23 @@
 /*global $ */
+import {PATH} from "../global.js";
 
 const LIMIT = 100;
 
 class StoreManager {
-
   constructor() {
-    this.isReady = false;
-    this.URIParameters = $.deparam(window.location.search.substr(1));
-    this.bindings = {};
-    this.fetching = false;
-    this.store = {
+    this._isReady = false;
+    this._URIParameters = $.deparam(window.location.search.substr(1));
+    this._bindings = {};
+    this._fetching = false;
+    this._store = {
       searchResults: [],
       numberOfRecords: 0,
       offset: 0,
       rowCount: 0,
       appStatus: 'preparing'
     };
-
-    window.addEventListener('popstate', this.popstate.bind(this));
+    // events
+    window.addEventListener('popstate', this._popstate.bind(this));
   }
 
   ready(callback) {
@@ -29,32 +29,32 @@ class StoreManager {
       .then(responses => {
         Object.freeze(responses[0]);
         this.setData('searchConditionsMaster', responses[0]);
-        this.store.searchConditions = this.extractSearchCondition(this.URIParameters);
+        this._store.searchConditions = this._extractSearchCondition(this._URIParameters);
         callback();
-        this.isReady = true;
-        this.search(0);
+        this._isReady = true;
+        this._search(0);
       });
   }
 
   getData(key) {
-    return this.copy(this.store[key]);
+    return this._copy(this._store[key]);
   }
 
   getSelectedRecord() {
-    if (this.store.selectedRow !== undefined) {
-      return this.store.searchResults[this.store.offset + this.store.selectedRow];
+    if (this._store.selectedRow !== undefined) {
+      return this._store.searchResults[this._store.offset + this._store.selectedRow];
     } else {
       return null;
     }
   }
 
   getRecordByIndex(index) {
-    if (this.store.offset + index < this.store.numberOfRecords) {
-      const record = this.store.searchResults[this.store.offset + index];
+    if (this._store.offset + index < this._store.numberOfRecords) {
+      const record = this._store.searchResults[this._store.offset + index];
       if (record) {
-        return this.copy(record);
+        return this._copy(record);
       } else {
-        this.search(this.store.offset + index);
+        this._search(this._store.offset + index);
         this.setData('appStatus', 'loading');
         return 'loading';
       }
@@ -65,42 +65,42 @@ class StoreManager {
 
   setData(key, value) {
     const
-      isUndefined = this.store[key] === undefined,
+      isUndefined = this._store[key] === undefined,
       isMutated = typeof value === 'object' ?
-        JSON.stringify(this.store[key]) !== JSON.stringify(value) :
-        this.store[key] != value;
+        JSON.stringify(this._store[key]) !== JSON.stringify(value) :
+        this._store[key] != value;
     if (isUndefined || isMutated) {
-      this.store[key] = this.copy(value);
-      this.notify(key);
+      this._store[key] = this._copy(value);
+      this._notify(key);
     }
   }
 
   setResults(records, offset) {
     for (let i = 0; i < records.length; i++) {
-      this.store.searchResults[offset + i] = records[i];
+      this._store.searchResults[offset + i] = records[i];
     }
-    this.notify('searchResults');
+    this._notify('searchResults');
   }
 
-  notify(key) {
-    if (this.bindings[key]) {
-      for (const watcher of this.bindings[key]) {
-        let value = this.store[key];
-        const copy = this.copy(value);
+  _notify(key) {
+    if (this._bindings[key]) {
+      for (const watcher of this._bindings[key]) {
+        let value = this._store[key];
+        const copy = this._copy(value);
         watcher[key](copy);
       }
     }
   }
 
   bind(key, target) {
-    if (this.bindings[key] === undefined) {
-      this.bindings[key] = [target];
+    if (this._bindings[key] === undefined) {
+      this._bindings[key] = [target];
     } else {
-      this.bindings[key].push(target);
+      this._bindings[key].push(target);
     }
   }
 
-  copy(value) {
+  _copy(value) {
     switch (true) {
       case Array.isArray(value):
         return JSON.parse(JSON.stringify(value));
@@ -112,38 +112,56 @@ class StoreManager {
   }
 
   setSearchCondition(key, values) {
-    this.setSearchConditions({[key]: values});
+    this._setSearchConditions({[key]: values});
   }
-  setSearchConditions(conditions, fromHistory) {
-    const lastCondition = JSON.stringify(this.store.searchConditions);
-    for (const conditionKey in conditions) {
-      this.store.searchConditions[conditionKey] = conditions[conditionKey];
-    }
 
-    if (!fromHistory) this.reflectSearchConditionToURI();
-    if (this.isReady && lastCondition !== JSON.stringify(this.store.searchConditions)) {
+  _setSearchConditions(conditions, fromHistory) {
+    for (const conditionKey in conditions) {
+      this._store.searchConditions[conditionKey] = conditions[conditionKey];
+    }
+    if (!fromHistory) this._reflectSearchConditionToURI();
+    if (this._isReady) {
       this.setData('numberOfRecords', 0);
       this.setData('offset', 0);
       this.setData('rowCount', 0);
-      this.store.searchResults = [];
+      this._store.searchResults = [];
       this.setResults([], 0);
-
-      this.notify('searchConditions');
-
+      this._notify('searchConditions');
       this.setData('appStatus', 'searching');
-      this.search(0);
+      this._search(0);
     }
   }
 
+  resetSearchConditions() {
+    const searchConditionsMaster = this.getData('searchConditionsMaster'), resetConditions = {};
+    for (const condition of searchConditionsMaster) {
+      switch (condition.type) {
+        case 'string':
+        case 'boolean':
+          if (condition.id !== 'term') resetConditions[condition.id] = condition.default;
+          break;
+        case 'array': {
+          const temp = {};
+          for (const item of condition.items) {
+            temp[item.id] = item.default;
+          }
+          resetConditions[condition.id] = temp;
+        }
+          break;
+      }
+    }
+    this._setSearchConditions(resetConditions);
+  }
+
   getSearchCondition(key) {
-    return this.copy(this.store.searchConditions[key]);
+    return this._copy(this._store.searchConditions[key]);
   }
 
   getSearchConditionMaster(key) {
     return this.getData('searchConditionsMaster').find(condition => condition.id === key);
   }
 
-  extractSearchCondition(condition) {
+  _extractSearchCondition(condition) {
     const searchConditionsMaster = this.getData('searchConditionsMaster');
 
     const diffConditions = {};
@@ -176,36 +194,34 @@ class StoreManager {
     return diffConditions;
   }
 
-  reflectSearchConditionToURI() {
+  _reflectSearchConditionToURI() {
     const master = this.getData('searchConditionsMaster');
-    const diffConditions = this.extractSearchCondition(this.store.searchConditions);
+    const diffConditions = this._extractSearchCondition(this._store.searchConditions);
     for (const condition of master) {
-      delete this.URIParameters[condition.id];
+      delete this._URIParameters[condition.id];
     }
-
-    Object.assign(this.URIParameters, diffConditions);
-
-    window.history.pushState(this.URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this.URIParameters)}`);
+    Object.assign(this._URIParameters, diffConditions);
+    window.history.pushState(this._URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this._URIParameters)}`);
   }
 
-  popstate(e) {
+  _popstate(e) {
     const URIParameters = $.deparam(window.location.search.substr(1));
-    this.setSearchConditions(URIParameters, true);
+    this._setSearchConditions(URIParameters, true);
   }
 
-  search(offset) {
-    if (this.fetching === true) {
+  _search(offset) {
+    if (this._fetching === true) {
       return;
     }
-
-    this.fetching = true;
+    const lastConditions = JSON.stringify(this._store.searchConditions);
+    this._fetching = true;
     let path;
-    if (this.URIParameters.path === 'local') {
+    if (this._URIParameters.path === 'local') {
       if (offset === 0) {
         path = 'results.json';
       }
     } else {
-      path = `/search?offset=${offset - offset % LIMIT}&${$.param(this.extractSearchCondition(this.store.searchConditions))}`;
+      path = `${PATH}/search?offset=${offset - offset % LIMIT}&${$.param(this._extractSearchCondition(this._store.searchConditions))}`;
     }
     fetch(path)
       .catch(e => {
@@ -239,12 +255,18 @@ class StoreManager {
           total: json.statistics.total
         });
 
+        // results
         this.setData('numberOfRecords', this.getData('searchStatus').available);
         this.setResults(json.data, json.scroll.offset);
 
+        // statistics
+        // dataset
         this.setData('statisticsDataset', json.statistics.dataset);
+        // significance
         this.setData('statisticsSignificance', json.statistics.significance);
+        // total_variant_type
         this.setData('statisticsType', json.statistics.type);
+        // consequence
         this.setData('statisticsConsequence', json.statistics.consequence);
 
         this.setData('searchMessages', {
@@ -253,9 +275,13 @@ class StoreManager {
           notice: json.notice
         });
 
-        this.fetching = false;
-        this.notify('offset');
+        this._fetching = false;
+        this._notify('offset');
         this.setData('appStatus', 'normal');
+
+        if (lastConditions !== JSON.stringify(this._store.searchConditions)) {
+          this._setSearchConditions({});
+        }
       });
   }
 }

@@ -91,6 +91,8 @@
         &:last-child
           padding-right: 6px
 
+        > .frequency-graph
+
       &:hover
         background-color: rgba($COLOR_SELECTED, .2)
 
@@ -104,25 +106,3 @@
 
       &.-out-of-range
         display: none
-
-#Messages
-  div
-    padding: 0.5em 14px
-
-  ul
-    margin-bottom: 0 !important
-
-  .error
-    color: $COLOR_SIGN_DANGEROUS
-    border-color: $COLOR_SIGN_DANGEROUS
-    background-color: lighten($COLOR_SIGN_DANGEROUS, 30%)
-
-  .warning
-    color: $COLOR_SIGN_WARNING
-    border-color: $COLOR_SIGN_WARNING
-    background-color: lighten($COLOR_SIGN_WARNING, 45%)
-
-  .notice
-    color: $COLOR_SIGN_NORMAL
-    border-color: $COLOR_SIGN_NORMAL
-    background-color: lighten($COLOR_SIGN_NORMAL, 42%)

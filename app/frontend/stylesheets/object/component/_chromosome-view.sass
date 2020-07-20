@@ -60,32 +60,31 @@ $WIDTH_BAND_LABEL: 32px
       filter: drop-shadow(0 4px 4px rgba(black, .5))
       transition: width $GUI_DURATION, left $GUI_DURATION
 
-      // TODO: webpack fails to compile
-      //> .subband
-      //  > .subbandrect
-      //    &.acen
-      //      fill: url(~#chromosome-acen)
-      //
-      //    &.gneg
-      //      fill: url(~#chromosome-gneg)
-      //
-      //    &.gpos25
-      //      fill: url(~#chromosome-gpos25)
-      //
-      //    &.gpos50
-      //      fill: url(~#chromosome-gpos50)
-      //
-      //    &.gpos75
-      //      fill: url(~#chromosome-gpos75)
-      //
-      //    &.gpos100
-      //      fill: url(~#chromosome-gpos100)
-      //
-      //    &.gvar
-      //      fill: url(~#chromosome-gpos100)
-      //
-      //    &.stalk
-      //      fill: url(~#chromosome-stalk)
+      > .subband
+        > .subbandrect
+          &.acen
+            fill: url(#chromosome-acen)
+
+          &.gneg
+            fill: url(#chromosome-gneg)
+
+          &.gpos25
+            fill: url(#chromosome-gpos25)
+
+          &.gpos50
+            fill: url(#chromosome-gpos50)
+
+          &.gpos75
+            fill: url(#chromosome-gpos75)
+
+          &.gpos100
+            fill: url(#chromosome-gpos100)
+
+          &.gvar
+            fill: url(#chromosome-gpos100)
+
+          &.stalk
+            fill: url(#chromosome-stalk)
 
       > .band
         > .bandtext

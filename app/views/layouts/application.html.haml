@@ -6,8 +6,11 @@
         = google_tag_manager_script_tag(key)
     %title= title(yield(:title))
     %meta{charset: 'utf-8'}
+    %meta{content: 'text/html; charset=UTF-8', http: {equiv: 'Content-Type'}}
+    %meta{content: 'width=device-width, initial-scale=1', name: 'viewport'}
     = csrf_meta_tags
     = stylesheet_pack_tag 'application', media: 'all'
+    = javascript_pack_tag 'application'
     = yield :head
   %body
     - if Rails.env.production?

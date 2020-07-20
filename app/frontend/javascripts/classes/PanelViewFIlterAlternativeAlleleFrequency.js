@@ -1,12 +1,12 @@
 /*global $ */
+
 import PanelView from "./PanelView.js";
 import StoreManager from "./StoreManager.js";
 
 export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView {
-
   constructor(elm) {
     super(elm, 'frequency');
-
+    // references
     const rangeSelector = this.elm.querySelector('.content > .range-selector');
     this.from = rangeSelector.querySelector('.input > input.from');
     this.to = rangeSelector.querySelector('.input > input.to');
@@ -19,30 +19,30 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
     this.sliderTo = this.slider.querySelector('.to');
     this.all = rangeSelector.querySelector('.match > label > .all');
     this.any = rangeSelector.querySelector('.match > label > .any');
-
+    // default
     this.conditionMaster = StoreManager.getSearchConditionMaster(this.kind);
     const condition = this.getFrequency();
     this.from.value = condition.from;
     this.to.value = condition.to;
     this.invert.checked = condition.invert === '1';
     this.all.checked = condition.match === 'all';
-    this.changeFilter({});
-
+    this._changeFilter({});
+    // events
     StoreManager.bind('searchConditions', this);
     this.from.addEventListener('change', e => {
-      this.changeFilter({from: e.target.value + ''});
+      this._changeFilter({from: e.target.value + ''});
     });
     this.to.addEventListener('change', e => {
-      this.changeFilter({to: e.target.value + ''});
+      this._changeFilter({to: e.target.value + ''});
     });
     this.invert.addEventListener('change', e => {
-      this.changeFilter({invert: e.target.checked ? '1' : '0'});
+      this._changeFilter({invert: e.target.checked ? '1' : '0'});
     });
     this.all.addEventListener('change', e => {
-      this.changeFilter({match: e.target.checked ? 'all' : 'any'});
+      this._changeFilter({match: e.target.checked ? 'all' : 'any'});
     });
     this.any.addEventListener('change', e => {
-      this.changeFilter({match: e.target.checked ? 'any' : 'all'});
+      this._changeFilter({match: e.target.checked ? 'any' : 'all'});
     });
     $('.meter > .slider > *', rangeSelector).draggable({
       axis: 'x',
@@ -54,10 +54,10 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
   drag(e, ui) {
     switch (true) {
       case e.target.classList.contains('from'):
-        this.changeFilter({from: Math.ceil((ui.position.left / this.sliderWidth) * 100) * 0.01});
+        this._changeFilter({from: Math.ceil((ui.position.left / this.sliderWidth) * 100) * 0.01});
         break;
       case e.target.classList.contains('to'):
-        this.changeFilter({to: Math.floor(((ui.position.left - 8) / this.sliderWidth) * 100) * 0.01});
+        this._changeFilter({to: Math.floor(((ui.position.left - 8) / this.sliderWidth) * 100) * 0.01});
         break;
     }
   }
@@ -71,7 +71,7 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
     return condition;
   }
 
-  changeFilter(newCondition) {
+  _changeFilter(newCondition) {
     switch (true) {
       case newCondition.from !== undefined:
         if (this.to.value <= newCondition.from) {
@@ -94,13 +94,13 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
   searchConditions(conditions) {
     const condition = conditions.frequency;
     if (condition === undefined) return;
-
+    // values
     this.from.value = condition.from;
     this.to.value = condition.to;
-
+    // slider
     this.sliderFrom.style.left = `${this.sliderWidth * this.from.value}px`;
     this.sliderTo.style.left = `${this.sliderWidth * this.to.value + 8}px`;
-
+    // meter
     if (condition.invert === '1') {
       this.barPrimary.style.left = '0%';
       this.barPrimary.style.width = `${condition.from * 100}%`;
@@ -112,9 +112,10 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
       this.barPrimary.style.width = `${(condition.to - condition.from) * 100}%`;
       this.barSecondary.style.display = 'none';
     }
-
+    // invert
     this.invert.checked = condition.invert === '1';
-
+    // match
     this.all.checked = condition.match === 'all';
+    this.any.checked = condition.match === 'any';
   }
 }

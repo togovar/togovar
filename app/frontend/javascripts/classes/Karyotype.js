@@ -7,7 +7,7 @@ const DEFAULT = {
   isOpened: false,
   isShowBand: true,
   height: HEIGHTS[0],
-  reference: 'GRCh37',
+  reference: 'GRCh37', // TODO:
   chromosomes: {
     '1': {
       selected: true,
@@ -181,16 +181,11 @@ const DEFAULT = {
 };
 
 export default class Karyotype {
-
   constructor(elm) {
-
     this.elm = elm;
     this.isReady = false;
     this.chromosomes = this.elm.querySelector('.content > .chromosomes');
     this.chromosomeViews;
-    this.selectChromosome = document.getElementById('KariotypeSelectChromosome');
-    this.inputRegionStart = document.getElementById('KariotypeInputRegionStart');
-    this.inputRegionEnd = document.getElementById('KariotypeInputRegionEnd');
 
     // initial settings
     let karyotype = localStorage.getItem('karyotype');
@@ -198,12 +193,12 @@ export default class Karyotype {
     else karyotype = DEFAULT;
     StoreManager.setData('karyotype', karyotype);
 
+    // events
     StoreManager.bind('karyotype', this);
-    StoreManager.bind('region__', this);
 
     this.elm.querySelector('.header').addEventListener('click', () => {
       const karyotype = StoreManager.getData('karyotype');
-      this.changeKaryotype({
+      this._changeKaryotype({
         isOpened: !karyotype.isOpened,
         height: karyotype.isOpened ? HEIGHTS[0] : HEIGHTS[1]
       });
@@ -213,17 +208,17 @@ export default class Karyotype {
     const buttons = this.elm.querySelectorAll('#KariotypeSwitchBandVisibility > .button');
     buttons.forEach(button => {
       button.addEventListener('click', e => {
-        this.changeKaryotype({isShowBand: e.target.dataset.value === 'show'});
+        this._changeKaryotype({isShowBand: e.target.dataset.value === 'show'});
       });
     });
-    this.bandShowButton = Array.from(buttons).filter(elm => elm.dataset.value === 'show')[0];
-    this.bandHideButton = Array.from(buttons).filter(elm => elm.dataset.value === 'hide')[0];
+    this._bandShowButton = Array.from(buttons).filter(elm => elm.dataset.value === 'show')[0];
+    this._bandHideButton = Array.from(buttons).filter(elm => elm.dataset.value === 'hide')[0];
 
     fetch(`./assets/${karyotype.reference}.tsv`)
       .then(response => response.text())
       .then(tsv => {
         this.geneMap = this.parseGeneMap(tsv);
-        // this.maxLength = Math.max(...this.geneMap.map(chromosome => chromosome[chromosome.length - 1].end));
+        this.maxLength = Math.max(...this.geneMap.map(chromosome => chromosome[chromosome.length - 1].end));
         this.drawChromosome(this.geneMap);
       });
 
@@ -260,7 +255,7 @@ export default class Karyotype {
     }
   }
 
-  changeKaryotype(params) {
+  _changeKaryotype(params) {
     const karyotype = StoreManager.getData('karyotype');
     for (const key in params) {
       karyotype[key] = params[key];
@@ -277,19 +272,12 @@ export default class Karyotype {
     }
     if (karyotype.isShowBand) {
       this.elm.classList.add('-show-band-label');
-      this.bandShowButton.classList.add('-current');
-      this.bandHideButton.classList.remove('-current');
+      this._bandShowButton.classList.add('-current');
+      this._bandHideButton.classList.remove('-current');
     } else {
       this.elm.classList.remove('-show-band-label');
-      this.bandShowButton.classList.remove('-current');
-      this.bandHideButton.classList.add('-current');
+      this._bandShowButton.classList.remove('-current');
+      this._bandHideButton.classList.add('-current');
     }
   }
-
-  region__(region) {
-    this.selectChromosome.value = region.chromosome;
-    this.inputRegionStart.value = region.start;
-    this.inputRegionEnd.value = region.end;
-  }
-
 }

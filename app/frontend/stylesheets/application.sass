@@ -1,21 +1,25 @@
 $fa-font-path: "~font-awesome/fonts"
+@import "~font-awesome/scss/font-awesome"
 
-@import "~bourbon/core/bourbon"
+@import "bourbon/bourbon"
 
 // foundation
-@import "~bootstrap-reboot"
+@import "foundation/bootstrap-reboot"
+@import "~bootstrap-reboot/dist/reboot"
 @import "foundation/base"
 
-@import "layouts/layout"
+@import "layout/layout"
 
 // components
 @import "object/component/above-headline"
+@import "object/component/button-view"
 @import "object/component/checklist-values"
 @import "object/component/chromosome-position"
 @import "object/component/chromosome-view"
 @import "object/component/clinical-significance"
 @import "object/component/common-document"
 @import "object/component/css-sprite"
+@import "object/component/dataset-icon"
 @import "object/component/drawer-view"
 @import "object/component/form-parts"
 @import "object/component/frequency"
@@ -41,6 +45,7 @@ $fa-font-path: "~font-awesome/fonts"
 @import "object/project/Configuration"
 @import "object/project/DetailHeader"
 @import "object/project/GlobalHeader"
+@import "object/project/Messages"
 @import "object/project/ResultsView"
 @import "object/project/SearchView"
 @import "object/project/SideBar"

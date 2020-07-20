@@ -2,7 +2,6 @@ import StoreManager from "./StoreManager.js";
 import {TR_HEIGHT} from '../global.js';
 
 export default class SelectedRowIndicator {
-
   constructor(elm) {
     this.elm = elm;
     StoreManager.bind('selectedRow', this);
