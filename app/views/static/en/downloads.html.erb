@@ -9,35 +9,35 @@
     </header>
     <div class="contents">
       <section class="section">
-        <p class="body">TogoVar data are available at the links below. Please see
-          <a href="/public/release/current/README.txt">README.txt</a>
-          for more information.
-        </p>
-        <table class="table">
-          <caption>Latest release: <%= @latest_release %></caption>
-          <thead>
-          <tr>
-            <th scope="col">Chromosome</th>
-            <th scope="col">Variation frequency</th>
-            <th scope="col">Molecular annotation</th>
-          </tr>
-          </thead>
-          <tbody>
-          <% @list.each do |x| %>
-            <tr>
-              <th scope="row"><%= x[:chromosome] %></th>
-              <td>
-                chr <%= x[:chromosome] %> frequency
-                [<a href="<%= x[:frequency][:href] %>">.tsv</a>] (<%= x[:frequency][:size] %>)
-              </td>
-              <td>
-                chr <%= x[:chromosome] %> molecular annotation
-                [<a href="<%= x[:molecular_annotation][:href] %>">.tsv</a>] (<%= x[:molecular_annotation][:size] %>)
-              </td>
-            </tr>
-          <% end %>
-          </tbody>
-        </table>
+        <p class="body">TogoVar data is downloadable at the links below.</p>
+        <ul>
+          <li>
+            <a href="/downloads/gem_j_wga/">Variant frequencies of GEM Japan Whole Genome Aggregation (GEM-J WGA) panel
+              [VCF format]</a>
+            <p>
+              The GEM-J WGA panel is a variant frequency dataset of a Japanese general population, which was obtained by
+              joint variant calling of whole genome sequence (WGS) data collected from 7,609 individuals across Japan.
+              The WGS data is also available in a controlled access manner.
+              They are the result of
+              <a target="_blank" class="hyper-text -external" href="https://www.amed.go.jp/en/aboutus/collaboration/ga4gh_gem_japan.html">the
+                GEnome Medical alliance Japan (GEM Japan) project.</a>
+              <a href="/doc/datasets/gem_j_wga">[More about the dataset]</a>
+              <a href="/downloads/gem_j_wga/">[Download of the dataset]</a></p>
+          </li>
+          <li><a href="/downloads/release/current">Variant frequencies of datasets except GEM-J WGA (i.e. JGA-NGS,
+            JGA-SNP, 4.7KJPN, HGVD and ExAC) [tab-separated format]</a>
+            <p>
+              <a href="/doc/datasets/jga_ngs">JGA-NGS</a> and <a href="/doc/datasets/jga_snp">JGA-SNP</a> are obtained
+              by aggregating individual-level genomic data that have
+              been registered in
+              <a target="_blank" href="https://humandbs.biosciencedbc.jp/en/">the NBDC Human Database</a>
+              /
+              <a target="_blank" href="https://www.ddbj.nig.ac.jp/jga/index-e.html">Japanese Genotype-phenotype Archive
+                (JGA)</a>. <a href="/doc/datasets">[More about the datasets]</a>
+              <a href="/downloads/release/current">[Download of the datasets]</a>
+            </p>
+        </ul>
+
       </section>
     </div>
   </article>
