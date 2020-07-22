@@ -87,7 +87,11 @@ json.data @result[:results] do |result|
   interpretations = Array(variation.dig(:clinvar, :interpretation))
     .map { |x| Form::ClinicalSignificance[x.tr(' ', '_').to_sym]&.param_name }
 
-  significance = Array(variation.dig(:clinvar, :medgen)&.map { |x| conditions[x] }).zip(interpretations).map { |a, b| { condition: a, interpretations: [b] } }
+  significance = Array(variation.dig(:clinvar, :medgen))
+                   .map.with_index { |x, i| x ? conditions[x] : variation.dig(:clinvar, :condition, i) }
+                   .zip(interpretations)
+                   .map { |a, b| { condition: a, interpretations: [b] } }
+
   if significance.present?
     json.significance significance
   end
