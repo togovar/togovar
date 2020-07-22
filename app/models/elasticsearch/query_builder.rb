@@ -127,7 +127,7 @@ module Elasticsearch
     def quality(datasets)
       @quality_condition = nil
 
-      filter_sources = datasets & %i[jga_ngs hgvd tommo exac]
+      filter_sources = datasets & %i[exac gem_j_wga jga_ngs jga_snp tommo_4.7kjpn]
 
       return self if filter_sources.empty?
 
@@ -148,7 +148,7 @@ module Elasticsearch
                 end
               end
             end
-            if (x = (datasets & %i[jga_snp])).present?
+            if (x = (datasets & %i[hgvd])).present?
               should do
                 nested do
                   path :frequency
