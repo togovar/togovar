@@ -1,24 +1,47 @@
 {
   "name": "togo_var",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "",
   "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "NODE_ENV=development webpack-dev-server --mode=development",
+    "build": "NODE_ENV=production webpack -p --mode production",
+    "build:dev": "NODE_ENV=development webpack -d --mode development"
+  },
   "dependencies": {
-    "@babel/preset-react": "^7.10.1",
-    "@rails/webpacker": "5.1.1",
-    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-    "bootstrap-reboot": "^4.3.1",
-    "bourbon": "^5.1.0",
-    "dotenv": "^8.2.0",
-    "expose-loader": "^0.7.5",
+    "bootstrap": "^4.5.0",
+    "bourbon": "^7.0.0",
     "font-awesome": "^4.7.0",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.1",
     "jquery-deparam": "^0.5.3",
-    "jquery-ui-dist": "^1.12.1",
-    "popper.js": "^1.14.6",
-    "postcss-cssnext": "^3.1.0",
-    "prop-types": "^15.7.2",
-    "rails-erb-loader": "^5.5.2"
+    "jquery-ui": "^1.12.1",
+    "popper.js": "^1.16.1"
   },
   "devDependencies": {
-    "webpack-dev-server": "3.11.0"
+    "@babel/core": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "babel-loader": "^8.1.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^6.0.3",
+    "css-loader": "^4.0.0",
+    "ejs-html-loader": "^4.0.1",
+    "ejs-plain-loader": "^1.4.1",
+    "eslint": "^7.5.0",
+    "file-loader": "^6.0.0",
+    "html-loader": "^1.1.0",
+    "html-webpack-plugin": "^4.3.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.14.1",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "sass-loader": "^9.0.2",
+    "style-loader": "^1.2.1",
+    "webpack": "^4.44.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0",
+    "webpack-manifest-plugin": "^2.2.0",
+    "webpack-merge": "^5.0.9"
   }
 }
