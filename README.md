@@ -1,24 +1,52 @@
-# README
+# TogoVar
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+TogoVar (NBDC's integrated database of Japanese genomic variation) is a database that has collected and organized genome 
+sequence differences between individuals (variants) in the Japanese population and disease information associated with 
+them.
 
-Things you may want to cover:
+## Docker
 
-* Ruby version
+See [togovar-docker](https://github.com/togovar/togovar-docker) for details.
 
-* System dependencies
+## Prerequisites
 
-* Configuration
+* ruby 2.7
+* node.js v12.x (LTS)
 
-* Database creation
+## Configuration
 
-* Database initialization
+## Development
 
-* How to run the test suite
+### Backend
 
-* Services (job queues, cache servers, search engines, etc.)
+1. First install dependencies:
 
-* Deployment instructions
+    ```sh
+    bundle install
+    ```
 
-* ...
+1. Start development server on `localhost:3000`
+
+    ```sh
+    rails server
+    ```
+
+### Frontend
+
+1. First install dependencies:
+
+    ```sh
+    yarn install
+    ```
+
+1. Start development server on `localhost:8080`
+
+    ```sh
+    yarn start
+    ```
+
+If you would like to create a development build
+
+```sh
+yarn build:dev
+```
