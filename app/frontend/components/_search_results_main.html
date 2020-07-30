@@ -1,0 +1,195 @@
+<main class="LayoutMainAside" id="SearchResultsMain">
+  <div class="LayoutMain">
+    <div id="SearchView">
+      <div class="searchform">
+        <input class="searchinput" id="search-field" placeholder="Search for disease or gene symbol or rs..."
+               type="text">
+        <button class="searchbutton"></button>
+      </div>
+      <dl class="searchexamples">
+        <dt>Disease</dt>
+        <dd>Breast-ovarian cancer, familial 2</dd>
+      </dl>
+      <dl class="searchexamples">
+        <dt>Gene</dt>
+        <dd>ALDH2</dd>
+      </dl>
+      <dl class="searchexamples">
+        <dt>refSNP</dt>
+        <dd>rs114202595</dd>
+      </dl>
+      <dl class="searchexamples">
+        <dt>TogoVar</dt>
+        <dd>tgv421843</dd>
+      </dl>
+      <dl class="searchexamples">
+        <dt>Position(GRCh37/hg19)</dt>
+        <dd>16:48258198</dd>
+      </dl>
+      <dl class="searchexamples">
+        <dt>Region(GRCh37/hg19)</dt>
+        <dd>10:73270743-73376976</dd>
+      </dl>
+      <div class="suggest-view"></div>
+    </div>
+    <div id="ResultsView">
+      <header class="header">
+        <h2 class="heading">Results</h2>
+        <div class="status"></div>
+      </header>
+      <div id="Messages"></div>
+      <div class="tablecontainer">
+        <table class="results-view">
+          <thead>
+          <tr></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="row-indicator" id="RowIndicator"></div>
+    </div>
+  </div>
+  <div class="LayoutAside">
+    <aside id="SideBar">
+      <div class="sidebarcontent" id="Previews">
+        <h2 class="title">Preview</h2>
+        <section class="panel-view -cannotcollapse -emphasize" id="PreviewToVariantReport">
+          <h3 class="title">
+            <a class="hyper-text -internal" href="variant.html">Detailed variant report page</a>
+          </h3>
+        </section>
+        <section class="panel-view" id="PreviewGene">
+          <h3 class="title">Genes</h3>
+          <div class="content">
+            <table class="right-headline">
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="panel-view" id="PreviewExternalLinks">
+          <h3 class="title">External links</h3>
+          <div class="content">
+            <table class="right-headline">
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="panel-view" id="PreviewAlternativeAlleleFrequencies">
+          <h3 class="title">Alternative allele frequencies</h3>
+          <div class="content">
+            <table class="frequency-detail">
+              <thead>
+              <tr>
+                <th>Dataset</th>
+                <th>Alt</th>
+                <th>Total</th>
+                <th>Frequency</th>
+              </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="panel-view" id="PreviewConsequence">
+          <h3 class="title">Consequence</h3>
+          <div class="content"></div>
+        </section>
+        <section class="panel-view" id="PreviewClinicalSignificance">
+          <h3 class="title">Clinical significance</h3>
+          <div class="content"></div>
+        </section>
+      </div>
+      <div class="sidebarcontent" id="Filters">
+        <h2 class="title">
+          Filters
+          <button class="button-view">Reset</button>
+        </h2>
+        <section class="panel-view" id="FilterDatasets">
+          <h3 class="title">Dataset</h3>
+          <div class="content">
+            <ul class="checklist-values"></ul>
+          </div>
+        </section>
+        <section class="panel-view" id="FilterAlternativeAlleleFrequency">
+          <h3 class="title">Alternative allele frequency</h3>
+          <div class="content">
+            <div class="range-selector">
+              <div class="input"><input class="from" max="1" min="0" step="0.01" type="number" value="0.000">~
+                <input class="to" max="1" min="0" step="0.01" type="number" value="1.000">
+                <label><input class="invert" type="checkbox">Invert range
+                </label>
+              </div>
+              <div class="meter">
+                <div class="barcontainer">
+                  <div class="bar -primary"></div>
+                  <div class="bar -secondary"></div>
+                </div>
+                <div class="ruler">
+                  <div class="scale">0.0</div>
+                  <div class="scale">0.1</div>
+                  <div class="scale">0.2</div>
+                  <div class="scale">0.3</div>
+                  <div class="scale">0.4</div>
+                  <div class="scale">0.5</div>
+                  <div class="scale">0.6</div>
+                  <div class="scale">0.7</div>
+                  <div class="scale">0.8</div>
+                  <div class="scale">0.9</div>
+                  <div class="scale">1.0</div>
+                </div>
+                <div class="slider">
+                  <div class="from"></div>
+                  <div class="to"></div>
+                </div>
+              </div>
+              <div class="match">
+                <label><input class="all" name="match" type="radio" value="all">for all datasets
+                </label>
+                <label><input checked="checked" class="any" name="match" type="radio" value="any">for any dataset
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="panel-view" id="FilterVariantCallingQuality">
+          <h3 class="title">Variant calling quality</h3>
+          <div class="content">
+            <label class="label"><input checked="checked" type="checkbox">Exclude filtered out variants in all datasets
+            </label>
+          </div>
+        </section>
+        <section class="panel-view" id="FilterVariantType">
+          <h3 class="title">Variant type</h3>
+          <div class="content">
+            <ul class="checklist-values"></ul>
+          </div>
+        </section>
+        <section class="panel-view" id="FilterClinicalSignificance">
+          <h3 class="title">Clinical significance</h3>
+          <div class="content">
+            <ul class="checklist-values"></ul>
+          </div>
+        </section>
+        <section class="panel-view" id="FilterConsequence">
+          <h3 class="title">Consequence</h3>
+          <div class="content">
+            <ul class="checklist-values"></ul>
+          </div>
+        </section>
+        <section class="panel-view" id="FilterSIFT">
+          <h3 class="title">SIFT</h3>
+          <div class="content">
+            <ul class="checklist-values"></ul>
+          </div>
+        </section>
+        <section class="panel-view" id="FilterPolyPhen">
+          <h3 class="title">PolyPhen</h3>
+          <div class="content">
+            <ul class="checklist-values"></ul>
+          </div>
+        </section>
+      </div>
+    </aside>
+  </div>
+</main>

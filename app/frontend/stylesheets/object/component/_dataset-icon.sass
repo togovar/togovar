@@ -1,0 +1,76 @@
+.dataset-icon
+  height: 18px
+  font-family: fontello
+  position: relative
+
+  &:before
+    content: $CHAR_DATASET
+    margin-right: 2px
+    position: relative
+    left: 2px
+    display: inline-block
+    height: 18px
+
+  > .properties
+    font-size: 10px
+    display: inline-flex
+    flex-direction: column
+    justify-content: center
+    font-family: "Roboto Condensed"
+    font-weight: lighter
+    line-height: 9px
+    position: relative
+    left: -2px
+    top: -1px
+    vertical-align: middle
+    height: 20px
+    transform: scale(.9)
+
+    &::before, &::after
+      display: block
+      height: 10px
+  // color
+  &[data-dataset="jga_ngs"], &[data-dataset="jga_snp"]
+    &:before
+      color: $COLOR_DATASET_JGA
+
+  &[data-dataset="tommo_4.7kjpn"]
+    &:before
+      color: $COLOR_DATASET_3_5KJPN
+
+  &[data-dataset="hgvd"], &[data-dataset="mgend"]
+    &:before
+      color: $COLOR_DATASET_HGVD
+
+  &[data-dataset="gem_j_wga"]
+    &:before
+      color: $COLOR_DATASET_GEM_J
+
+  &[data-dataset="bbj"]
+    &:before
+      color: $COLOR_DATASET_BBJ
+
+  &[data-dataset="clinvar"], &[data-dataset="exac"], &[data-dataset="gnomad"]
+    &:before
+      color: $COLOR_DATASET_FOREIGN
+  // Disease
+  &[data-dataset="clinvar"], &[data-dataset="mgend"]
+    > .properties
+      &::before
+        color: $COLOR_SIGN_DANGEROUS
+        content: "Disease"
+  // WGS
+  &[data-dataset="tommo_4.7kjpn"], &[data-dataset="gem_j_wga"]
+    > .properties
+      &::after
+        content: "WGS"
+  // WES
+  &[data-dataset="jga_ngs"], &[data-dataset="hgvd"], &[data-dataset="exac"]
+    > .properties
+      &::after
+        content: "WES"
+  // SNP
+  &[data-dataset="jga_snp"], &[data-dataset="bbj"]
+    > .properties
+      &::after
+        content: "SNP"
