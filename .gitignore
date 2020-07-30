@@ -4,32 +4,33 @@
 # or operating system, you probably want to add a global ignore instead:
 #   git config --global core.excludesfile '~/.gitignore_global'
 
-# Ignore bundler config.
+# Ignore env file
+.env
+
+# Ignore bundler config
 /.bundle
-/vendor/bundle
 
-# Ignore config
-/config/elasticsearch.yml
-/config/endpoint.yml
-/config/virtuoso.yml
-
-# Ignore compiled assets
-/public/assets
-
-# Ignore all logfiles and tempfiles.
+# Ignore all logfiles and tempfiles
 /log/*
 /tmp/*
 !/log/.keep
 !/tmp/.keep
-
-/node_modules
 /yarn-error.log
 
-.byebug_history
-/public/packs
-/public/packs-test
+# Ignore vendor libraries
 /node_modules
-yarn-debug.log*
-.yarn-integrity
+/vendor/bundle
 
-.env
+# frontend
+.cache/
+coverage/
+dist/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
