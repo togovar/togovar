@@ -87,7 +87,7 @@ let common = {
 
 let config;
 
-if (process.env.ENV || process.env.NODE_ENV === 'production') {
+if ((process.env.ENV || process.env.NODE_ENV) === 'production') {
   const TerserJSPlugin = require('terser-webpack-plugin');
   const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
