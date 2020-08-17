@@ -28,6 +28,9 @@ import PanelViewPreviewAlternativeAlleleFrequencies from './javascripts/classes/
 import PanelViewPreviewConsequence from './javascripts/classes/PanelViewPreviewConsequence.js';
 import PanelViewPreviewClinicalSignificance from './javascripts/classes/PanelViewPreviewClinicalSignificance.js';
 
+// Load the favicon
+import '!file-loader?name=[name].[ext]!./images/favicon.svg';
+
 let isReady =
   document.readyState === 'complete' ||
   (document.readyState !== 'loading' &&
