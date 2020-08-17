@@ -9,6 +9,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const DotenvWebpack = require('dotenv-webpack');
+const GoogleTagManagerPlugin = require('webpack-google-tag-manager-plugin');
 
 let common = {
   entry: {
@@ -114,6 +115,15 @@ if ((process.env.ENV || process.env.NODE_ENV) === 'production') {
       ],
     },
   });
+
+  const GMT_ID = process.env.TOGOVAR_FRONTEND_GTM_ID;
+  if (GMT_ID) {
+    GMT_ID.split(',').forEach(id => {
+      config.plugins.push(new GoogleTagManagerPlugin({
+        id: id,
+      }));
+    });
+  }
 } else {
   config = merge(common, {
     mode: 'development',
