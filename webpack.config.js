@@ -8,6 +8,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const DotenvWebpack = require('dotenv-webpack');
 
 let common = {
   entry: {
@@ -82,6 +83,7 @@ let common = {
     new MiniCssExtractPlugin({
       filename: 'css/[name]-[contenthash].css',
     }),
+    new DotenvWebpack(),
   ],
 };
 
