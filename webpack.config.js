@@ -61,18 +61,21 @@ let common = {
           name: '[name]-[contenthash].[ext]',
         },
       },
+      {
+        test: /\.(csv|tsv)$/,
+        loader: 'csv-loader',
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.json$/,
+        type: 'javascript/auto',
+        loader: 'json-loader',
+        exclude: /node_modules/,
+      },
     ],
   },
   plugins: [
     new CleanWebpackPlugin(),
-    new CopyPlugin({
-      patterns: [
-        {
-          from: 'app/frontend/assets',
-          to: 'assets',
-        },
-      ],
-    }),
     new webpack.ProvidePlugin({
       $: "jquery/dist/jquery",
     }),
