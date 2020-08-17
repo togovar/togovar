@@ -101,7 +101,13 @@ if ((process.env.ENV || process.env.NODE_ENV) === 'production') {
     mode: 'production',
     optimization: {
       minimizer: [
-        new TerserJSPlugin({}),
+        new TerserJSPlugin({
+          terserOptions: {
+            output: {
+              comments: false,
+            },
+          },
+        }),
         new OptimizeCSSAssetsPlugin({
           cssProcessor: require('cssnano'),
           cssProcessorPluginOptions: {
