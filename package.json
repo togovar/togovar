@@ -7,9 +7,9 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "start": "NODE_ENV=development webpack-dev-server --mode=development",
-    "build": "NODE_ENV=production webpack -p --mode production",
-    "build:dev": "NODE_ENV=development webpack -d --mode development"
+    "start": "NODE_ENV=development webpack-dev-server --config=app/frontend/config/webpack.config.dev.js --mode=development",
+    "build": "NODE_ENV=production webpack --config=app/frontend/config/webpack.config.prod.js -p --mode production",
+    "build:dev": "NODE_ENV=development webpack --config=app/frontend/config/webpack.config.dev.js -d --mode development"
   },
   "dependencies": {
     "bootstrap": "^4.5.0",
