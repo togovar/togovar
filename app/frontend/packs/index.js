@@ -1,4 +1,4 @@
-import "./stylesheets/main.sass";
+import "../stylesheets/main.sass";
 
 import 'jquery'
 import 'jquery-ui/ui/widget'
@@ -8,28 +8,28 @@ import 'jquery-ui/ui/widgets/draggable'
 import 'jquery-ui/ui/widgets/mouse'
 import 'jquery-deparam'
 
-import {PAGE} from './javascripts/global.js';
-import StoreManager from './javascripts/classes/StoreManager.js';
-import SearchConditionController from './javascripts/classes/SearchConditionController.js';
-import ResultsView from './javascripts/classes/ResultsView.js';
-import SideBar from './javascripts/classes/SideBar.js';
-import Configuration from './javascripts/classes/Configuration.js';
-import SelectedRowIndicator from './javascripts/classes/SelectedRowIndicator.js';
-import Karyotype from './javascripts/classes/Karyotype.js';
-import ActivityIndicator from './javascripts/classes/ActivityIndicator.js';
-import PanelViewCheckList from './javascripts/classes/PanelViewCheckList.js';
-import PanelViewFilterAlternativeAlleleFrequency from './javascripts/classes/PanelViewFilterAlternativeAlleleFrequency.js';
-import PanelViewFilterVariantCallingQuality from './javascripts/classes/PanelViewFilterVariantCallingQuality.js';
-import PanelViewFilterConsequence from './javascripts/classes/PanelViewFilterConsequence.js';
-import PanelViewPreviewGene from './javascripts/classes/PanelViewPreviewGene.js';
-import PreviewToVariantReport from './javascripts/classes/PreviewToVariantReport.js';
-import PanelViewPreviewExternalLinks from './javascripts/classes/PanelViewPreviewExternalLinks.js';
-import PanelViewPreviewAlternativeAlleleFrequencies from './javascripts/classes/PanelViewPreviewAlternativeAlleleFrequencies.js';
-import PanelViewPreviewConsequence from './javascripts/classes/PanelViewPreviewConsequence.js';
-import PanelViewPreviewClinicalSignificance from './javascripts/classes/PanelViewPreviewClinicalSignificance.js';
+import {PAGE} from '../javascripts/global.js';
+import StoreManager from '../javascripts/classes/StoreManager.js';
+import SearchConditionController from '../javascripts/classes/SearchConditionController.js';
+import ResultsView from '../javascripts/classes/ResultsView.js';
+import SideBar from '../javascripts/classes/SideBar.js';
+import Configuration from '../javascripts/classes/Configuration.js';
+import SelectedRowIndicator from '../javascripts/classes/SelectedRowIndicator.js';
+import Karyotype from '../javascripts/classes/Karyotype.js';
+import ActivityIndicator from '../javascripts/classes/ActivityIndicator.js';
+import PanelViewCheckList from '../javascripts/classes/PanelViewCheckList.js';
+import PanelViewFilterAlternativeAlleleFrequency from '../javascripts/classes/PanelViewFilterAlternativeAlleleFrequency.js';
+import PanelViewFilterVariantCallingQuality from '../javascripts/classes/PanelViewFilterVariantCallingQuality.js';
+import PanelViewFilterConsequence from '../javascripts/classes/PanelViewFilterConsequence.js';
+import PanelViewPreviewGene from '../javascripts/classes/PanelViewPreviewGene.js';
+import PreviewToVariantReport from '../javascripts/classes/PreviewToVariantReport.js';
+import PanelViewPreviewExternalLinks from '../javascripts/classes/PanelViewPreviewExternalLinks.js';
+import PanelViewPreviewAlternativeAlleleFrequencies from '../javascripts/classes/PanelViewPreviewAlternativeAlleleFrequencies.js';
+import PanelViewPreviewConsequence from '../javascripts/classes/PanelViewPreviewConsequence.js';
+import PanelViewPreviewClinicalSignificance from '../javascripts/classes/PanelViewPreviewClinicalSignificance.js';
 
 // Load the favicon
-import '!file-loader?name=[name].[ext]!./images/favicon.svg';
+import '!file-loader?name=[name].[ext]!../images/favicon.svg';
 
 let isReady =
   document.readyState === 'complete' ||

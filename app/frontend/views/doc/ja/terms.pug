@@ -1,0 +1,247 @@
+extend ../../layouts/application
+
+append variables
+  - locals.currentPage = "terms";
+  - locals.language = "ja";
+  - locals.title = "Terms | TogoVar";
+
+block head
+  each css in htmlWebpackPlugin.files.css
+    link(href=css, rel="stylesheet")
+
+block content
+  main
+    article.common-document
+      header.header
+        h2.title 利用条件
+      .contents
+        section.section
+          p.body
+            | 当データベース(以下、データベース)は、
+            a.hyper-text.-external(target='_blank', href='http://opendatacommons.org/licenses/odbl/1.0/')
+              | Open Database License(ODbL)
+            | の下で利用可能です。
+          p.body あなたは自由に
+          ul.unordered-list
+            li
+              strong 共有:
+              |  データベースを複製、頒布及び利用することができます。
+            li
+              strong 創作:
+              |  データベースから著作物を製作することができます。
+            li
+              strong 翻案:
+              |  データベースへの改変、変形及び加工ができます。
+          p.body あなたの従うべき条件は以下の通りです。
+          ul.unordered-list
+            li
+              strong 表示:
+              |  あなたはデータベースを公衆利用する場合、又はデータベースから著作物を製作する場合にはODbLで指定された方式に従い、帰属（クレジット）表示をしなければなりません。データベースを利用若しくは再頒布する場合、又はデータベースから著作物を製作する場合、あなたは、あなたのデータベースのライセンスを他者に対して明示するとともに、原データベース上のあらゆる通告を保持しておく必要があります。
+            li
+              strong 継承:
+              |  あなたは、本データベースの翻案版、又は翻案版データベースから製作した著作物を公開利用する場合、その翻案版データベースもODbLに基づき提供しなければなりません。
+            li
+              strong キープ・オープン:
+              |  あなたは、データベース、又はデータベースの翻案版を再頒布する場合、それらに制限をかける技術的手段（DRMなど）を用いることができます。ただし、あなたは、当該手段を使用していないバージョンも再頒布しなければなりません。
+          p.body データベースに取り込まれた各データ（コンテンツ）の利用にあたっては、下記のデータの輩出元のライセンスに従ってください。
+          ul.unordered-list
+            li
+              | Colil:
+              |
+              a(target='_blank', href='http://colil.dbcls.jp/portal/') http://colil.dbcls.jp/portal/
+            li
+              | ExAC:
+              |
+              a(target='_blank', href='http://exac.broadinstitute.org/terms') http://exac.broadinstitute.org/terms
+            li
+              | GEM-J WGA:
+              |
+              a(target='_blank', href='/doc/ja/datasets/gem_j_wga#terms')
+                | http://togovar.biosciencedbc.jp/doc/ja/datasets/gem_j_wga#terms
+            li
+              | HGNC:
+              |
+              a(target='_blank', href='https://www.genenames.org/about/') https://www.genenames.org/about/
+            li
+              | HGVD:
+              |
+              a(target='_blank', href='http://www.hgvd.genome.med.kyoto-u.ac.jp/about.html')
+                | http://www.hgvd.genome.med.kyoto-u.ac.jp/about.html
+            li
+              | LitVar:
+              |
+              a(target='_blank', href='https://www.ncbi.nlm.nih.gov/home/about/policies/')
+                | https://www.ncbi.nlm.nih.gov/home/about/policies/
+            li
+              | ToMMo 4.7KJPN Allele Frequency Panel:
+              |
+              a(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/202001/help/conditions-of-use')
+                | https://jmorp.megabank.tohoku.ac.jp/202001/help/conditions-of-use
+            li
+              | PubTatorCentral:
+              |
+              a(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/README.txt')
+                | ftp://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/README.txt
+            li
+              | JGA-NGS dataset:
+              |
+              a(href='/doc/ja/datasets/jga_ngs') https://togovar.biosciencedbc.jp/doc/ja/datasets/jga_ngs
+            li
+              | JGA-SNP dataset:
+              |
+              a(href='/doc/ja/datasets/jga_snp') https://togovar.biosciencedbc.jp/doc/ja/datasets/jga_snp
+          p.body
+            | 上記は
+            a(target='_blank', href='https://opendatacommons.org/licenses/odbl/summary/') 一般の人に読みやすいようにした要約
+            | です。日本語訳は
+            a(target='_blank', href='https://wiki.openstreetmap.org/wiki/OSMFJ/ODbL/1.0/summary')
+              | OpenStreetMap Japan(OSMJ)による日本語試訳
+            | を参考にしました。
+            br
+            | 適用される実際のライセンス条件については、
+            a(target='_blank', href='http://opendatacommons.org/licenses/odbl/1.0/')
+              | ODbL 1.0ライセンス契約の全文
+            | （OSMJによる日本語試訳は
+            a(target='_blank', href='https://docs.google.com/file/d/0BxvlrTvfS0RAN01oZ1dJa3g0aUU/edit') こちら
+            | )を参照してください。
+            br
+            | また、帰属表示は
+            a(href='#credit') 帰属（クレジット）表示例
+            | を参考にしてください。
+            br
+            | ライセンス表示は、
+            a(href='#license') ODbLライセンスの採用例
+            | の表記を参考にしてください。
+
+        section.section
+          h3#credit.sectiontitle 帰属（クレジット）の表示例
+          ol.ordered-list
+            li
+              h4.heading TogoVarデータベースの利用に対する引用方法
+              .subsection
+                h5.subheading TogoVarデータベース全体を引用する場合
+                .body
+                  | TogoVar [Internet]. Tokyo: National Bioscience Database Center, Japan Science and Technology Agency
+                  | (Japan); 2018 - [cited YYYY Mmm DD]. Available from:
+                  |
+                  a(href='https://togovar.biosciencedbc.jp') https://togovar.biosciencedbc.jp
+              .subsection
+                h5.subheading TogoVarの特定の変異(tgv47264307)を引用する場合の例
+                .body
+                  | Variant [Internet]. Tokyo: National Bioscience Database Center, Japan Science and Technology Agency
+                  | (Japan); [2018] - . TogoVarID tgv47264307; [cited YYYY Mmm DD]. Available from:
+                  |
+                  a(href='https://togovar.biosciencedbc.jp/variant/tgv47264307')
+                    | https://togovar.biosciencedbc.jp/variant/tgv47264307
+            li
+              h4.heading TogoVarデータベースに取り込まれた各データ（コンテンツ）の引用方法
+              .body 利用するコンテンツに応じて以下の引用をしてください。正式には各コンテンツの利用条件を参照ください。
+              .subsection
+                h5.subheading
+                  | Colil
+                  | [利用条件:
+                  |
+                  a(target='_blank', href='http://colil.dbcls.jp/portal/') http://colil.dbcls.jp/portal/
+                .body
+                  | T. Fujiwara and Y. Yamamoto, "Colil: a database and search service for citation contexts in the life
+                  | sciences domain.", Journal of Biomedical Semantics, 6:38 (19 October 2015).
+                  | doi:10.1186/s13326-015-0037-x
+              .subsection
+                h5.subheading
+                  | ExAC [利用条件:
+                  |
+                  a(target='_blank', href='http://exac.broadinstitute.org/about') http://exac.broadinstitute.org/about
+                  | ]
+                .body
+                  | Lek, M., Karczewski, K. J., Minikel, E. V., Samocha, K. E., Banks, E., Fennell, T., … Consortium,
+                  | E. A. (2016). Analysis of protein-coding genetic variation in 60,706 humans. Nature, 536(7616),
+                  | 285-291.
+                  a(target='_blank', href='http://doi.org/10.1038/nature19057') http://doi.org/10.1038/nature19057
+              .subsection
+                h5.subheading
+                  | GEM Japan Whole Genome Aggregation (GEM-J WGA)
+                  | [利用条件:
+                  |
+                  a(target='_blank', href='/doc/datasets/gem_j_wga')
+                    | https://togovar.biosciencedbc.jp/doc/datasets/gem_j_wga
+                  | ]
+                .body
+                  a(href='/doc/datasets/gem_j_wga') "GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel"
+                  | . Japan:
+                  a.hyper-text.-external(target='_blank', href='https://www.amed.go.jp/en/aboutus/collaboration/ga4gh_gem_japan.html')
+                    | GEnome Medical alliance Japan Project (GEM-J)
+                  | . Available from:
+                  |
+                  a.hyper-text.-external(target='_blank', href='/doc/datasets/gem_j_wga')
+                    | https://togovar.biosciencedbc.jp/doc/datasets/gem_j_wga
+                  | .
+              .subsection
+                h5.subheading
+                  | HGVD Release Version 2.30 (2017/08/02) [利用条件:
+                  |
+                  a(target='_blank', href='http://www.hgvd.genome.med.kyoto-u.ac.jp/about.html')
+                    | http://www.hgvd.genome.med.kyoto-u.ac.jp/about.html
+                  | ]
+                .body
+                  | K. Higasa et al. "Human genetic variation database, a reference database of genetic variations in
+                  | the Japanese population" J Hum Genet 61:547-553, 2016, doi: 10.1038/jhg.2016.12
+              .subsection
+                h5.subheading
+                  | ToMMo 4.7KJPN Allele Frequency Panel (4.7KJPN)
+                  | [利用条件:
+                  |
+                  a(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/202001/help/conditions-of-use')
+                    | https://jmorp.megabank.tohoku.ac.jp/202001/help/conditions-of-use
+                  | ]
+                .body
+                  | Tadaka et al., jMorp: Japanese Multi Omics Reference Panel, Nucleic Acids Research. 2018 Jan
+                  | 4;46(D1):D551-D557. doi:
+                  |
+                  a(target='_blank', href='https://doi.org/10.1093/nar/gkx978')
+                    | https://doi.org/10.1038/s41439-019-0059-5
+              .subsection
+                h5.subheading
+                  | JGA-NGS dataset [利用条件:
+                  |
+                  a(href='/doc/datasets/jga_ngs') https://togovar.biosciencedbc.jp/doc/datasets/jga_ngs
+                  | ]
+                .body
+                  | Variant set aggregated from NGS data in NBDC Human Database/JGA [Internet]. Tokyo: National
+                  | Bioscience Database Center (NBDC), Japan Science and Technology Agency (Japan); [2018] - .
+                  | JGA-NGS dataset; [cited YYYY Mmm DD]. Available from:
+                  |
+                  a(href='/doc/datasets/jga_ngs') https://togovar.biosciencedbc.jp/doc/datasets/jga_ngs
+              .subsection
+                h5.subheading
+                  | JGA-SNP dataset [利用条件:
+                  |
+                  a(href='https://togovar.biosciencedbc.jp/doc/datasets/jga_snp')
+                    | https://togovar.biosciencedbc.jp/doc/datasets/jga_snp
+                  | ]
+                .body
+                  | Variant set aggregated from SNP-chip data in NBDC Human Database/JGA [Internet]. Tokyo: National
+                  | Bioscience Database Center (NBDC), Japan Science and Technology Agency (Japan); [2018] - . JGA-SNP
+                  | dataset; [cited YYYY Mmm DD]. Available from:
+                  |
+                  a(href='https://togovar.biosciencedbc.jp/doc/datasets/jga_ngs')
+                    | https://togovar.biosciencedbc.jp/doc/datasets/jga_ngs
+              .subsection
+                h5.subheading
+                  | PubTatorCentral [利用条件:
+                  |
+                  a(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/README.txt')
+                    | ftp://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/README.txt
+                  | ]
+                .body
+                  | Wei CH et. al., PubTator: a Web-based text mining tool for assisting Biocuration, Nucleic acids
+                  | research, 2013, 41 (W1): W518-W522. doi: 10.1093/nar/gkt44
+
+        section.section
+          h3#license.sectiontitle ODbLライセンスの採用例
+          ul.unordered-list
+            li
+              a(target='_blank', href='https://www.openstreetmap.org/copyright/') Open Street Map
+            li
+              a(target='_blank', href='http://farmsubsidy.openspending.org/legal/') Farm Subsidy
+            li
+              a(target='_blank', href='https://opencorporates.com/info/licence') Open Corporates

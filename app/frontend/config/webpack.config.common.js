@@ -7,8 +7,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-module.exports = {
-  entry: './app/frontend/index.js',
+const config = {
+  entry: {
+    main: './app/frontend/packs/index.js',
+    report: './app/frontend/packs/report/index.js',
+  },
   output: {
     path: path.resolve(__dirname, '../../../dist'),
     filename: 'js/[name]-[contenthash].js',
@@ -16,6 +19,10 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /\.pug$/,
+        use: 'pug-loader',
+      },
       {
         test: /\.js$/,
         loader: 'babel-loader',
@@ -65,7 +72,14 @@ module.exports = {
       $: "jquery/dist/jquery",
     }),
     new HtmlWebpackPlugin({
-      template: "app/frontend/index.html",
+      template: "app/frontend/views/index.pug",
+      filename: "index.html",
+      inject: false,
+    }),
+    new HtmlWebpackPlugin({
+      template: "app/frontend/views/variant/index.pug",
+      filename: "variant/index.html",
+      inject: false,
     }),
     new MiniCssExtractPlugin({
       filename: 'css/[name]-[contenthash].css',
@@ -74,3 +88,34 @@ module.exports = {
     new DotenvWebpack(),
   ],
 };
+
+const pages = [
+  'about',
+  'contact',
+  'datasets',
+  'datasets/analysis',
+  'datasets/gem_j_wga',
+  'datasets/jga_ngs',
+  'datasets/jga_snp',
+  'downloads',
+  'help',
+  'history',
+  'policy',
+  'terms',
+];
+
+pages.forEach(function (name) {
+  config.plugins.push(new HtmlWebpackPlugin({
+      template: `app/frontend/views/doc/ja/${name}.pug`,
+      filename: `doc/ja/${name}/index.html`,
+      inject: false,
+    }),
+    new HtmlWebpackPlugin({
+      template: `app/frontend/views/doc/en/${name}.pug`,
+      filename: `doc/${name}/index.html`,
+      inject: false,
+    }),
+  );
+});
+
+module.exports = config;

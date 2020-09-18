@@ -1,4 +1,4 @@
-const merge = require('webpack-merge');
+const {merge} = require('webpack-merge');
 const commonConfig = require('./webpack.config.common');
 
 const GoogleTagManagerPlugin = require('webpack-google-tag-manager-plugin');

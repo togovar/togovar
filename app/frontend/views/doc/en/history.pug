@@ -1,0 +1,69 @@
+extend ../../layouts/application
+
+append variables
+  - locals.currentPage = "history";
+  - locals.language = "en";
+  - locals.title = "History | TogoVar";
+
+block head
+  each css in htmlWebpackPlugin.files.css
+    link(href=css, rel="stylesheet")
+
+block content
+  main
+    article.common-document
+      header.header
+        h2.title Update history
+      .contents
+        section.section
+          h3.sectiontitle 2020/7/27
+          ul.unordered-list
+            li
+              strong Datasets:
+              |  The new dataset,
+              |
+              a(href='/doc/datasets/gem_j_wga') GEM-Japan Whole Genome Aggregation (GEM-J WGA)
+              | , was added. Additionally, ToMMo 3.5KJPN was updated to ToMMo 4.7KJPN (
+              a.hyper-text.-external(href='https://jmorp.megabank.tohoku.ac.jp/202001/downloads#variant')
+                | ToMMo 4.7KJPN Allele Frequency Panel
+              | ). ClinVar information was also updated.
+            li
+              strong Usability:
+              |  You can search the variants on Karyotype image.
+          h3.sectiontitle 2019/7/25
+          ul.unordered-list
+            li
+              strong Keyword search:
+              |  You can search TogoVar by an alias name of HGNC Gene Symbol (e.g. PD-1, p53).
+            li
+              strong Filters:
+              |  You can specify either all or any of datasets of your choice as a target when searching by
+              | an alternative allele frequency.
+            li
+              strong Filters:
+              |  You can filter variants by Consequence value, SIFT and/or Polyphen score.
+            li
+              strong Filters:
+              |  You can hide and show low quality variants.
+            li
+              strong Datasets:
+              |  ToMMo 3.5KJPN was updated to Ver.2 (
+              a.hyper-text.-external(href='https://jmorp.megabank.tohoku.ac.jp/201905/downloads/') ToMMo 3.5KJPNv2 Allele Frequency Panel
+              | ). ClinVar, Variant Effect Predictor (VEP) and Ensembl were updated as well. See
+              |
+              a(href='/doc/datasets') Datasets
+              |  for detail.
+            li
+              strong Usability:
+              |  You can choose the data items to display at the Configuration menu.
+            li
+              strong Usability:
+              |  The user interface was refined for easier use.
+          h3.sectiontitle 2018/6/7
+          ul.unordered-list
+            li
+              | TogoVar has been released. See
+              |
+              a.hyper-text.-external(href='https://www.eurekalert.org/pub_releases/2018-07/jsat-jr071018.php')
+                |a EurekAlert! press release
+              |  for detail.

@@ -1,0 +1,64 @@
+extend ../../layouts/application
+
+append variables
+  - locals.currentPage = "history";
+  - locals.language = "ja";
+  - locals.title = "History | TogoVar";
+
+block head
+  each css in htmlWebpackPlugin.files.css
+    link(href=css, rel="stylesheet")
+
+block content
+  main
+    article.common-document
+      header.header
+        h2.title 更新履歴
+      .contents
+        section.section
+          h3.sectiontitle 2020/7/27
+          ul.unordered-list
+            li
+              strong Datasets:
+              |  新たなデータセットとしてGEM-J WGA (
+              a(href='https://togovar.biosciencedbc.jp/doc/ja/datasets/gem_j_wga') GEM-Japan Whole Genome Aggregation
+              | )を追加し、ToMMo 3.5KJPNをToMMo 4.7KJPN (
+              a(href='https://jmorp.megabank.tohoku.ac.jp/202001/downloads#variant')
+                | ToMMo 4.7KJPN Allele Frequency Panel
+              | )に更新しました。また、ClinVarも更新しました。
+            li
+              strong Usability:
+              |  Karyotypeによる検索ができるようになりました。
+          h3.sectiontitle 2019/7/25
+          ul.unordered-list
+            li
+              strong Keyword search:
+              |  HGNC Gene Symbolの別名(例：PD-1、p53)で検索できるようになりました。
+            li
+              strong Filters:
+              |  Alternative allele frequencyを検索条件にする場合に、検索対象としてユーザーが選択した「全てのDataset」または「いずれかのDataset」のどちらかを指定できるようになりました。
+            li
+              strong Filters:
+              |  Consequence、SIFT、Polyphenの値でファセット検索可能になりました。
+            li
+              strong Filters:
+              |  低品質のバリアントを非表示にできるようになりました。
+            li
+              strong Datasets:
+              |  ToMMo 3.5KJPNをVer.2 (
+              a(href='https://jmorp.megabank.tohoku.ac.jp/201905/downloads/') ToMMo 3.5KJPNv2 Allele Frequency Panel
+              | )に更新しました。ClinVar、Variant Effect Predictor (VEP)も更新しました。詳細は
+              a(href='/doc/ja/datasets') Datasets
+              | を参照ください。
+            li
+              strong Usability:
+              |  Configurationメニューで表示項目の選択ができるようになりました。
+            li
+              strong Usability:
+              |  ユーザーインターフェースを改善して使いやすくしました。
+          h3.sectiontitle 2018/6/7
+          ul.unordered-list
+            li
+              | TogoVarの公開を開始しました。詳細は
+              a(href='https://www.jst.go.jp/pr/announce/20180607/index.html') プレスリリース
+              | を参照ください。

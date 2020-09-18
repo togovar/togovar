@@ -1,0 +1,52 @@
+extend ../../layouts/application
+
+append variables
+  - locals.currentPage = "downloads";
+  - locals.language = "en";
+  - locals.title = "Downloads | TogoVar";
+
+block head
+  each css in htmlWebpackPlugin.files.css
+    link(href=css, rel="stylesheet")
+
+block content
+  main
+    article.common-document
+      header.header
+        h2.title Downloads
+      .contents
+        section.section
+          p.body TogoVar data is downloadable at the links below.
+          ul
+            li
+              a(href='/downloads/gem_j_wga/')
+                | Variant frequencies of GEM Japan Whole Genome Aggregation (GEM-J WGA) panel [VCF format]
+              p
+                | The GEM-J WGA panel is a variant frequency dataset of a Japanese general population, which was
+                | obtained by joint variant calling of whole genome sequence (WGS) data collected from 7,609 individuals
+                | across Japan. The WGS data is also available in a controlled access manner. They are the result of
+                |
+                a.hyper-text.-external(target='_blank', href='https://www.amed.go.jp/en/aboutus/collaboration/ga4gh_gem_japan.html')
+                  | the GEnome Medical alliance Japan (GEM Japan) project.
+                a(href='/doc/datasets/gem_j_wga') [More about the dataset]
+                a(href='https://togovar.biosciencedbc.jp//downloads/gem_j_wga/') [Download of the dataset]
+            li
+              a(href='/downloads/release/current')
+                | Variant frequencies of datasets except GEM-J WGA (i.e. JGA-NGS, JGA-SNP, 4.7KJPN, HGVD and ExAC)
+                | [tab-separated format]
+              p
+                a(href='/doc/datasets/jga_ngs') JGA-NGS
+                |  and
+                |
+                a(href='/doc/datasets/jga_snp') JGA-SNP
+                |  are obtained by aggregating individual-level genomic data that have been registered in
+                |
+                a.hyper-text.-external(target='_blank', href='https://humandbs.biosciencedbc.jp/en/') the NBDC Human Database
+                |  /
+                |
+                a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index-e.html')
+                  | Japanese Genotype-phenotype Archive (JGA)
+                | .
+                |
+                a(href='/doc/datasets') [More about the datasets]
+                a(href='https://togovar.biosciencedbc.jp//downloads/release/current') [Download of the datasets]

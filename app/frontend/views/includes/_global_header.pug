@@ -1,0 +1,41 @@
+- const navLink = (page) => `/doc/${locals.language && locals.language !== "en" ? `${locals.language}/${page}` : page}`
+
+header#GlobalHeader
+  h1.heading
+    a.link(href="/")
+      img.logotype(src=require("../../images/logotype.svg").default alt="TOGO VAR")
+    span.summary A comprehensive Japanese genetic variation database
+
+  navigation.menus
+    ul.menu.navigation
+      li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^home/)})
+        a.link(href="/") Home
+      li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^datasets/)})
+        a.link(href=navLink("datasets")) Datasets
+      li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^downloads/)})
+        a.link(href=navLink("downloads")) Downloads
+      li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^terms/)})
+        a.link(href=navLink("terms")) Terms
+      li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^contact/)})
+        a.link(href=navLink("contact")) Contact
+      li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^about/)})
+        a.link(href=navLink("about")) About
+      li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^help/)})
+        a.link(href=navLink("help")) Help
+
+    if locals.currentPage === "home"
+      ul.menu.config
+        li.menu-button Configuration
+    else if locals.currentPage === "variant"
+    else
+      ul.menu.languageswitcher
+        li.language.menu-button(class={"-current": locals.language === "ja"} data-language="ja" title="日本語")
+          if locals.language === "ja"
+            | ja
+          else
+            a.link(href=`/doc/ja/${locals.currentPage}`) ja
+        li.language.menu-button(class={"-current": locals.language === "en"} data-language="en" title="English")
+          if locals.language === "en"
+            | en
+          else
+            a.link(href=`/doc/${locals.currentPage}`) en
