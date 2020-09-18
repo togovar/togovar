@@ -7,9 +7,15 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "start": "NODE_ENV=development webpack-dev-server --config=app/frontend/config/webpack.config.dev.js --mode=development",
-    "build": "NODE_ENV=production webpack --config=app/frontend/config/webpack.config.prod.js -p --mode production",
-    "build:dev": "NODE_ENV=development webpack --config=app/frontend/config/webpack.config.dev.js -d --mode development"
+    "build": "cross-env NODE_ENV=production webpack --config app/frontend/config/webpack.config.prod.js --color -p --progress --hide-modules --display-optimization-bailout",
+    "lint": "yarn lint:js && yarn lint:css",
+    "lint:css": "stylelint app/frontend/stylesheets/**/*.sass",
+    "lint:eslint": "eslint --ignore-path .gitignore --ignore-pattern app/frontend/server",
+    "lint:js": "yarn lint:eslint app/frontend",
+    "lint:staged": "lint-staged",
+    "start": "cross-env NODE_ENV=development node app/frontend/server",
+    "start:prod": "cross-env NODE_ENV=production node app/frontend/server",
+    "start:production": "yarn build && yarn start:prod"
   },
   "dependencies": {
     "bootstrap": "^4.5.0",
