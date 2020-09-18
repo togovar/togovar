@@ -12,6 +12,7 @@ See [togovar-docker](https://github.com/togovar/togovar-docker) for details.
 
 * ruby 2.7
 * node.js v12.x (LTS)
+    - yarn
 
 ## Configuration
 
@@ -22,13 +23,13 @@ See [togovar-docker](https://github.com/togovar/togovar-docker) for details.
 1. First install dependencies:
 
     ```sh
-    bundle install
+    $ bundle install
     ```
 
 1. Start development server on `localhost:3000`
 
     ```sh
-    rails server
+    $ rails server
     ```
 
 ### Frontend
@@ -36,17 +37,31 @@ See [togovar-docker](https://github.com/togovar/togovar-docker) for details.
 1. First install dependencies:
 
     ```sh
-    yarn install
+    $ yarn install
     ```
 
-1. Start development server on `localhost:8080`
+1. Start development server on `localhost:8000`
 
     ```sh
-    yarn start
+    $ yarn start
     ```
 
-If you would like to create a development build
+Other commands
 
-```sh
-yarn build:dev
-```
+* Static code analysis for js and css
+
+    ```sh
+    $ yarn list
+    ```
+
+* Start production server
+
+    ```sh
+    $ start:production
+    ```
+
+* Build distribution files
+
+    ```sh
+    $ yarn build
+    ```
