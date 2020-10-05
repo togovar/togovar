@@ -1,7 +1,7 @@
 /*global $ */
 
 import StoreManager from "./StoreManager.js";
-import {PATH} from "../global.js";
+import {API_URL} from "../global.js";
 
 const NUMBER_OF_SUGGESTS = 10; // TODO: Config
 const SUGGEST_LABELS = {
@@ -79,7 +79,7 @@ export default class SearchConditionController {
       this.suggestView.innerHTML = '';
       this.lastValue = '';
     } else if (this.field.value.length >= 3 && this.field.value !== this.lastValue) {
-      fetch(`${PATH}/suggest?term=${this.field.value}`)
+      fetch(`${API_URL}/suggest?term=${this.field.value}`)
         .then(response => response.json())
         .then(json => this.suggest(json));
     }

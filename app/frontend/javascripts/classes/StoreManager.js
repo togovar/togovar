@@ -1,5 +1,5 @@
 /*global $ */
-import {PATH} from "../global.js";
+import {API_URL} from "../global.js";
 
 const LIMIT = 100;
 
@@ -21,19 +21,14 @@ class StoreManager {
   }
 
   ready(callback) {
-    Promise
-      .all([
-        fetch('./assets/search_conditions.json')
-          .then(response => response.json())
-      ])
-      .then(responses => {
-        Object.freeze(responses[0]);
-        this.setData('searchConditionsMaster', responses[0]);
-        this._store.searchConditions = this._extractSearchCondition(this._URIParameters);
-        callback();
-        this._isReady = true;
-        this._search(0);
-      });
+    const json = require('../../assets/search_conditions.json');
+
+    Object.freeze(json);
+    this.setData('searchConditionsMaster', json);
+    this._store.searchConditions = this._extractSearchCondition(this._URIParameters);
+    callback();
+    this._isReady = true;
+    this._search(0);
   }
 
   getData(key) {
@@ -221,7 +216,7 @@ class StoreManager {
         path = 'results.json';
       }
     } else {
-      path = `${PATH}/search?offset=${offset - offset % LIMIT}&${$.param(this._extractSearchCondition(this._store.searchConditions))}`;
+      path = `${API_URL}/search?offset=${offset - offset % LIMIT}&${$.param(this._extractSearchCondition(this._store.searchConditions))}`;
     }
     fetch(path)
       .catch(e => {

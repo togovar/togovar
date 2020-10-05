@@ -38,15 +38,13 @@ module TogoVar
             }.compact
           }
 
-          alias_symbol = field(:alias_symbol).presence&.sub('"', '')&.split('|').presence
-          alias_name = field(:alias_name)&.sub('"', '')&.split('|').presence
+          alias_symbol = field(:alias_symbol).presence&.sub('"', '')&.split('|')
 
-          aliases = if alias_symbol && alias_name
-                      alias_symbol.zip(alias_name).map do |symbol, name|
+          aliases = if alias_symbol.present?
+                      alias_symbol.map do |symbol|
                         approved.deep_merge doc: {
                           symbol: symbol,
                           approved: false,
-                          name: name,
                           alias_of: approved_symbol
                         }.compact
                       end

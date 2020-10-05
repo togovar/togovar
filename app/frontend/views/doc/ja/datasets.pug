@@ -1,0 +1,277 @@
+extend ../../layouts/application
+
+append variables
+  - locals.currentPage = "datasets";
+  - locals.language = "ja";
+  - locals.title = "Datasets | TogoVar";
+
+block head
+  each css in htmlWebpackPlugin.files.css
+    link(href=css, rel="stylesheet")
+
+block content
+  main
+    article.common-document
+      header.header
+        h2.title TogoVar収録データセット一覧
+      .contents
+        section.section
+          h3.sectiontitle
+            | NBDCヒトデータベース群
+            sup ∗1
+            | へ個人毎のデータ
+            sup ∗2
+            | の利用申請が可能なバリアント頻度データ
+          p データ利用申請するには「含まれる制限公開データセット」のリンクをクリックしてください。
+          table.table
+            thead
+              tr
+                th 頻度データセット名
+                th(style='white-space: nowrap;') 解析手法
+                th(style='white-space: nowrap;') 対象集団
+                th(style='white-space: nowrap;') 健常者
+                th(style='white-space: nowrap;') 罹患者
+                th(style='white-space: nowrap;') サンプル数
+                th(style='white-space: nowrap;')
+                  | バリアント数
+                  br
+                  | (座位数)
+                th 含まれる制限公開データセット
+            tbody
+              //tr
+                td
+                  a(href="/doc/ja/datasets/bbj_riken") BBJ-RIKEN
+                td._align-left SNP-Chip
+                td Japanese
+                td._align-center
+                td._align-center
+                td._align-center
+                td._align-center
+                td._align-center
+              tr
+                td
+                  a(href="/doc/ja/datasets/gem_j_wga") GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel
+                td._align-left WGS
+                td 日本人
+                td._align-center ✔
+                td._align-center
+                td._align-center
+                  span(style='margin-left:15px;') 7,609
+                td._align-center
+                  | 95,863,463
+                  br
+                  | (90,280,248)
+                td._align-center
+                  a(href="/doc/ja/datasets/gem_j_wga#jga_datasets") 6データセット
+              tr
+                td
+                  a(href="/doc/ja/datasets/jga_ngs") JGA-NGS
+                td._align-left WES
+                td 日本人
+                td._align-center ✔
+                td._align-center ✔
+                td._align-center
+                  span(style='margin-left:20px;') 125
+                td._align-center
+                  span(style='margin-left:4px;') 4,679,025
+                td._align-center
+                  a(href="/doc/ja/datasets/jga_ngs#jga_datasets") 7データセット
+              tr
+                td
+                  a(href="/doc/ja/datasets/jga_snp") JGA-SNP
+                td._align-left SNP-Chip
+                td 日本人
+                td._align-center ✔
+                td._align-center ✔
+                td._align-center 183,884
+                td._align-center
+                  span(style='margin-left:4px;') 1,249,724
+                td._align-center
+                  a(href="/doc/ja/datasets/jga_snp#jga_datasets") 3データセット
+          p.notice
+            | ∗1：
+            a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
+              | Japanese Genotype-phenotype Archive (JGA)
+            |  /
+            |
+            a.hyper-text.-external(target='_blank', href='https://www.biobank.amed.go.jp/itc/agd/index.html')
+              | AMED Genome group sharing Database (AGD)
+            br
+            | ∗2：fastq/bam/celファイルやgenotype data一覧など
+        section.section
+          h3.sectiontitle その他のバリアントデータ
+          table.table._column-span-all
+            thead
+              tr
+                th データベース名
+                th(style='white-space: nowrap;') 解析手法
+                th(style='white-space: nowrap;') 対象集団
+                th(style='white-space: nowrap;') 健常者
+                th(style='white-space: nowrap;') 罹患者
+                th(style='white-space: nowrap;') サンプル数
+                th
+                  | バリアント数
+                  br
+                  | (座位数)
+                th 作成者
+                th
+                  | バージョン/
+                  br
+                  | 最終更新日
+            tbody
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/') ClinVar
+                td._align-center —
+                td._align-left 複数
+                td._align-center
+                td._align-center ✔
+                td._align-center —
+                td._align-center 674,792
+                td NCBI
+                td 2020/06/04
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='http://exac.broadinstitute.org/downloads')
+                    | Exome Aggregation Consortium (ExAC)
+                td._align-left WES
+                td._align-left 複数
+                td._align-center ✔
+                td._align-center ✔
+                td._align-center
+                  span(style='margin-left:3px;') 60,706
+                td._align-center
+                  | 10,195,872
+                  br
+                  | (9,362,319)
+                td Broad Institute
+                td Release 1 (2017/02/27)
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='http://www.hgvd.genome.med.kyoto-u.ac.jp/download.html')
+                    | Human Genetic Variation Database (HGVD)
+                td._align-left WES
+                td._align-left 日本人
+                td._align-center ✔
+                td._align-center
+                td._align-center
+                  span(style='margin-left:10px;') 1,208
+                td._align-center
+                  span(style='margin-left:10px;') 554,461
+                  br
+                  span(style='margin-left: 20px;') (501,556)
+                td 京都大学
+                td
+                  | Version 2.30
+                  br
+                  | (2017/08/02)
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/202001/downloads/#variant')
+                    | ToMMo 4.7KJPN Allele Frequency Panel(4.7KJPN)
+                td._align-left WGS
+                td._align-left 日本人
+                td._align-center ✔
+                td._align-center
+                td._align-center
+                  span(style='margin-left:10px;') 4,773
+                td._align-center
+                  | 74,494,394
+                  br
+                  | (70,101,710)
+                td 東北メディカル・メガバンク機構
+                td v20190826
+          p.notice
+            | 注1：ClinVarは
+            a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/') VCFファイル
+            | に含まれるGRCh37上の位置が決定しているバリアントのみを掲載しています。
+            br
+            | 注2：4.7KJPNの内訳は、SNV (Autosome、chrX(PAR1+PAR2+XTR)、chrMT)とINDEL (Autosome、chrX(PAR1+PAR2+XTR))です。
+            | 詳細は
+            a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/202001/variants/statistics')
+              | Summary of ToMMo 4.7KJPN
+            | をご覧ください。
+        section.section
+          h3.sectiontitle バリアント以外のデータ
+          table.table
+            thead
+              tr
+                th データベース名
+                th バージョン/最終更新日
+                th 内容
+                th 作成者
+            tbody
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='ftp://ftp.dbcls.jp/colil') Colil
+                td 2019/01/25
+                td 生命科学分野の文献間の引用関係の情報
+                td DBCLS
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh37.p13')
+                    | GRCh37.p13
+                td 2013/06/28
+                td ヒトゲノムリファレンス配列
+                td GRC
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/tsv/hgnc_complete_set.txt')
+                    | HGNC symbol report
+                td 2020/03/30
+                td 遺伝子シンボルや関連リソースの情報
+                td HGNC
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/CBBresearch/Lu/Demo/LitVar/')
+                    | LitVar
+                td APIで取得
+                td バリアント名が出現する文献情報
+                td NCBI
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral')
+                    | PubTatorCentral
+                td 2020/05/09
+                td バリアント名が出現する文献情報
+                td NCBI
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='http://togogenome.org/') TogoGenome
+                td._align-center —
+                td ゲノムに関する包括的な情報
+                td DBCLS
+        section.section
+          h3.sectiontitle データ加工に利用したツール
+          table.table
+            thead
+              tr
+                th ツール名
+                th バージョン
+                th 内容
+                th 作成者
+            tbody
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='https://samtools.github.io/bcftools/') bcftools
+                td._align-center —
+                td Indelの正規化とmultiallelicバリアントのbiallelicバリアントへの分割
+                td Genome Research Ltd.
+              tr
+                td
+                  a(href="/doc/ja/datasets/analysis") BioReT
+                td._align-center —
+                td NGSデータからバリアントを特定するツール群を一括実行
+                td
+                  a.hyper-text.-external(target='_blank', href='https://amelieff.jp/') アメリエフ
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/index.html')
+                    | Variant Effect Predictor (VEP)
+                td Ensembl rel. 100
+                td
+                  | バリアントに
+                  a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/script/vep_cache.html#cache_content')
+                    | アノテーション（遺伝子名、Consequence等）
+                  | を付加
+                td EMBL-EBI

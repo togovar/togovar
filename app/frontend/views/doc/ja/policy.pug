@@ -1,0 +1,30 @@
+extend ../../layouts/application
+
+append variables
+  - locals.currentPage = "policy";
+  - locals.language = "ja";
+  - locals.title = "Policy | TogoVar";
+
+block head
+  each css in htmlWebpackPlugin.files.css
+    link(href=css, rel="stylesheet")
+
+block content
+  main
+    article.common-document
+      header.header
+        h2.title サイトポリシー
+      .contents
+        section.section
+          h3.sectiontitle 本サイトについて
+          p.body
+            | 本サイトは、ライフサイエンスデータベース統合推進事業を実施している、国立研究開発法人科学技術振興機構バイオサイエンスデータベースセンター（以下、「NBDC」といいます。）が運営・管理しています。
+
+        section.section
+          h3.sectiontitle サイトポリシーについて
+          p.body
+            | 本サイトのサイトポリシーは、
+            a.hyper-text.-external(target='_blank', href='https://biosciencedbc.jp/sitepolicies/') NBDCのサイトポリシー
+            | に準拠致します。また、
+            a(href='/doc/ja/terms') 利用条件のページ
+            | に記載のある項目については、このサイトのポリシーが優先されます。

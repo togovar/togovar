@@ -73,17 +73,16 @@ $CHAR_ARROW_CIRCLE_RIGHT: "\f0a9"
 $CHAR_WRENCH: "\f0ad"
 $CHAR_DATASET: "\E800"
 
-
 @mixin sprite($width, $height, $x, $y)
-  background-image: url('~images/csssprite.png')
+  background-image: url('../images/csssprite.png')
   background-repeat: no-repeat
   background-position: #{-$x} #{-$y}
   background-size: 200px 60px
 
 @font-face
   font-family: 'fontello'
-  src: url('~fonts/fontello.eot')
-  src: url('~fonts/fontello.eot') format('embedded-opentype'), url('~fonts/fontello.woff2') format('woff2'), url('~fonts/fontello.woff') format('woff'), url('~fonts/fontello.ttf') format('truetype'), url('~fonts/fontello.svg') format('svg')
+  src: url('../fonts/fontello.eot')
+  src: url('../fonts/fontello.eot') format('embedded-opentype'), url('../fonts/fontello.woff2') format('woff2'), url('../fonts/fontello.woff') format('woff'), url('../fonts/fontello.ttf') format('truetype'), url('../fonts/fontello.svg') format('svg')
 
 html
   height: 100%

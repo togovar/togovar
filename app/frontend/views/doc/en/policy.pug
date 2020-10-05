@@ -1,0 +1,34 @@
+extend ../../layouts/application
+
+append variables
+  - locals.currentPage = "policy";
+  - locals.language = "en";
+  - locals.title = "Policy | TogoVar";
+
+block head
+  each css in htmlWebpackPlugin.files.css
+    link(href=css, rel="stylesheet")
+
+block content
+  main
+    article.common-document
+      header.header
+        h2.title Site Policies
+      .contents
+        section.section
+          h3.sectiontitle About This Website
+          p.body
+            | This website is operated and managed by the National Bioscience Database Center ("NBDC") of the Japan
+            | Science and Technology Agency (“JST”).
+
+        section.section
+          h3.sectiontitle About Site Policies
+          p.body
+            | Site policies, including link, copyright, prohibited uses, disclaimer, personal information, transfer of
+            | the services of this website, general clauses and continuous improvement, conform to
+            |
+            a(target='_blank', href='https://biosciencedbc.jp/en/sitepolicies') NBDC Site Policies
+            | . Policies written in
+            |
+            a(href='/doc/terms') the Terms page
+            |  are prior to the NBDC Site Policies.

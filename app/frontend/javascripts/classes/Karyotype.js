@@ -214,22 +214,19 @@ export default class Karyotype {
     this._bandShowButton = Array.from(buttons).filter(elm => elm.dataset.value === 'show')[0];
     this._bandHideButton = Array.from(buttons).filter(elm => elm.dataset.value === 'hide')[0];
 
-    fetch(`./assets/${karyotype.reference}.tsv`)
-      .then(response => response.text())
-      .then(tsv => {
-        this.geneMap = this.parseGeneMap(tsv);
-        this.maxLength = Math.max(...this.geneMap.map(chromosome => chromosome[chromosome.length - 1].end));
-        this.drawChromosome(this.geneMap);
-      });
+    const tsv = require(`../../assets/${karyotype.reference}.tsv`);
+
+    this.geneMap = this.parseGeneMap(tsv);
+    this.maxLength = Math.max(...this.geneMap.map(chromosome => chromosome[chromosome.length - 1].end));
+    this.drawChromosome(this.geneMap);
 
     this.karyotype(StoreManager.getData('karyotype'));
   }
 
   parseGeneMap(tsv) {
     const geneMap = [];
-    const positions = tsv.split('\n').map(row => row.split('\t'));
     for (const chromosomeKey of CHROMOSOME_KEYS) {
-      const chromosome = positions.filter(position => position[0] === `chr${chromosomeKey}`);
+      const chromosome = tsv.filter(position => position[0] === `chr${chromosomeKey}`);
       geneMap.push(chromosome.map(position => {
         return {
           start: parseInt(position[1]),

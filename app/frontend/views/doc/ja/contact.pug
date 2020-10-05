@@ -1,0 +1,21 @@
+extend ../../layouts/application
+
+append variables
+  - locals.currentPage = "contact";
+  - locals.language = "ja";
+  - locals.title = "Contact | TogoVar";
+
+block head
+  each css in htmlWebpackPlugin.files.css
+    link(href=css, rel="stylesheet")
+
+block content
+  main
+    article.common-document
+      header.header
+        h2.title お問い合わせ
+      .contents
+        section.section
+          p.body 我々のサービスに対しての問題や質問またはご提案がございましたら、e-mailにてお知らせ下さい。
+          p.body togovar [at] biosciencedbc [dot] jp
+          p.body データを再利用する、または、ご提供いただける研究者の方々からのご連絡もお待ちしております。

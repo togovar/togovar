@@ -1,0 +1,68 @@
+extend ../layouts/application
+
+append variables
+  - locals.currentPage = "variant";
+
+block head
+  script(src="https://togovar.biosciencedbc.jp/stanza/assets/components/webcomponentsjs/webcomponents-loader.js")
+  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_header/")
+  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_summary/")
+  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_other_overlapping_variants/")
+  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_frequency/")
+  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_clinvar/")
+  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_jbrowse/")
+  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_gene/")
+  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_transcript/")
+  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_publication/")
+  each css in htmlWebpackPlugin.files.css.filter(x => x.match(/^\/css\/main-/))
+    link(href=css, rel="stylesheet")
+  each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/report-/))
+    script(type="text/javascript", src=js)
+
+block content
+  header#DetailHeader
+    .title-wrapper
+      p.pagetype Variant report
+      h2.title.report_id
+
+    .title-wrapper
+      #_stanza_0
+
+  main#ReportMain.LayoutReport
+    section.stanza-view
+      #_stanza_1.stanza
+
+    section.stanza-view
+      h3.title
+        | Other overlapping variants
+      #_stanza_2.stanza
+
+    section.stanza-view
+      h3.title
+        | Frequency
+      #_stanza_3.stanza
+
+    section.stanza-view
+      h3.title
+        | Clinical Significance
+      #_stanza_4.stanza
+
+    section.stanza-view
+      h3.title
+        | Genomic context
+      #_stanza_5.stanza
+
+    section.stanza-view
+      h3.title
+        | Gene
+      #_stanza_6.stanza
+
+    section.stanza-view
+      h3.title
+        | Transcripts
+      #_stanza_7.stanza
+
+    section.stanza-view
+      h3.title
+        | Publications
+      #_stanza_8.stanza

@@ -1,0 +1,579 @@
+extend ../../layouts/application
+
+append variables
+  - locals.currentPage = "help";
+  - locals.language = "en";
+  - locals.title = "Help | TogoVar";
+
+block head
+  each css in htmlWebpackPlugin.files.css
+    link(href=css, rel="stylesheet")
+
+block content
+  main
+    article.common-document
+      header.header
+        h2.title Help
+      .contents
+        section.section
+          ul.page-index
+            li.category
+              h3.categorytitle TogoVar in general
+              ul.categorylist
+                li.item.-question
+                  a.link(href='#g1') What are the objectives and utilities of TogoVar?
+                li.item.-question
+                  a.link(href='#g2') Can I use TogoVar in-house?
+            li.category
+              h3.categorytitle About the terms of use
+              ul.categorylist
+                li.item.-question
+                  a.link(href='#t1') Can I use the TogoVar for free?
+                li.item.-question
+                  a.link(href='#t2') How to cite the TogoVar database in my publication?
+                li.item.-question
+                  a.link(href='#t3') Can I use it for commercial purposes?
+            li.category
+              h3.categorytitle About the data collected in TogoVar
+              ul.categorylist
+                li.item.-question
+                  a.link(href='#d1') Can I retrieve phenotype information on an individual level?
+                li.item.-question
+                  a.link(href='#d2') Are the data linked with information about gene expression and proteins?
+                li.item.-question
+                  a.link(href='#d3')
+                    | What software is used for detecting variants and how you manage the
+                    | quality?
+                li.item.-question
+                  a.link(href='#d4') What are the targeted variant types for TogoVar?
+                li.item.-question
+                  a.link(href='#d5') How do you calculate the Consequence value?
+                li.item.-question
+                  a.link(href='#d6') What are SIFT and PolyPhen?
+                li.item.-question
+                  a.link(href='#d7') How do you calculate the value of Clinical significance?
+            li.category
+              h3.categorytitle About the TogoVar search system
+              ul.categorylist
+                li.item.-question
+                  a.link(href='#s1')
+                    | What does the frequency indicator in the Frequency column of the search
+                    | results represent?
+                li.item.-question
+                  a.link(href='#s2')
+                    | For each variant type, how is the position, reference and alternative allele
+                    | described respectively?
+                li.item.-question
+                  a.link(href='#s3') In TogoVar, how is the variant described?
+
+      .contents
+        section.section
+          h3.sectiontitle TogoVar in general
+          #g1.question-answer
+            h4.question What are the objectives and utilities of TogoVar?
+            .answer
+              p
+                | NGS technologies have enabled large-scale genome sequencing to capture variants at low frequencies.
+                | However,
+                | existing databases do not contain sufficient variant frequency data for Japanese populations.
+                | To address this problem, TogoVar seeks to provide a reliable frequency information by assembling variant
+                | information from the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA) and public Japanese
+                | genomic
+                | variation data.
+              p
+                | In addition, since the reference human genome sequence can be updated, the genomic position may vary for
+                | the
+                | same variant if it refers to a different genome build. Thus, in our database, a unique ID is
+                | assigned to the same variant, thereby preventing the need to convert the positional information of the
+                | variant
+                | among different reference sequences, as done by researchers.
+          #g2.question-answer
+            h4.question Can I use TogoVar in-house?
+            .answer
+              p
+                | A Docker image will be released. We request your patience.
+
+        section.section
+          h3.sectiontitle About the terms of use
+          #t1.question-answer
+            h4.question Can I use the TogoVar for free?
+            .answer
+              p
+                | You can use the TogoVar service for free. For the use of the database, refer to the
+                |
+                a(href='/doc/terms') Terms
+                | .
+          #t2.question-answer
+            h4.question How to cite the TogoVar database in my publication?
+            .answer
+              p
+                | Refer to the attribution (credit) display examples in
+                |
+                a(href='/doc/terms') Terms
+                | .
+          #t3.question-answer
+            h4.question Can I use it for commercial purposes?
+            .answer
+              p
+                | You are free to browse the TogoVar websites and use the docker images to be released for commercial
+                | purposes.
+                | For data created by third parties and imported in TogoVar, please follow the terms of use of each
+                | organization.
+                | For more details, refer to
+                |
+                a(href='/doc/terms') Terms
+                | .
+
+        section.section
+          h3.sectiontitle About the data collected in TogoVar
+          #d1.question-answer
+            h4.question Can I retrieve phenotype information on an individual level?
+            .answer
+              p
+                | TogoVar database does not keep private information, and we do not currently provide phenotype information
+                | for each individual. For more details about phenotype information, please directly contact the research
+                | groups
+                | described in the
+                |
+                a(href='/doc/datasets/jga_ngs') JGA-NGS dataset
+                |  and
+                |
+                a(href='/doc/datasets/jga_snp') JGA-SNP dataset
+                | .
+          #d2.question-answer
+            h4.question Are the data linked with information about gene expression and proteins?
+            .answer
+              p
+                | Not yet but planned.
+          #d3.question-answer
+            h4.question What software is used for detecting variants and how you manage the quality?
+            .answer
+              p
+                | Refer to
+                |
+                a(href='/doc/datasets/analysis') How JGA dataset was generated
+                | .
+          #d4.question-answer
+            h4.question What are the targeted variant types for TogoVar?
+            .answer
+              p
+                | There are five targeted variant types for TogoVar: SNV, Insertion, Deletion, Indel, and Substitution. Of
+                |
+                a.hyper-text.-external(target='_blank', href='http://varnomen.hgvs.org/bg-material/simple/#types-of-variants')
+                  | 5 types that HGVS enumerated as the types of variants
+                | , Duplication is classified as Insertion, and Indels, for which the lengths of Insertion and Deletion
+                | are the same, are classified as Substitution. To identify the type of the variant,
+                |
+                a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/vep')
+                  | Variant Effect Predictor (VEP)
+                |  is used.
+          #d5.question-answer
+            h4.question How do you calculate the Consequence value?
+            .answer
+              p
+                | The value of variant consequence in
+                |
+                a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/predicted_data.html#consequences')
+                  | Variant Effect Predictor (VEP)
+                |  is displayed. If there are multiple transcripts for a single variant, only the most critical
+                | consequence may be displayed.
+          #d6.question-answer
+            h4.question What are SIFT and PolyPhen?
+            .answer
+              p
+                | Both SIFT and PolyPhen are scores which indicate the predicted effects on the protein function when an
+                | amino acid sequence undergoes alteration due to a variant. Values calculated through
+                |
+                a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html')
+                  | Variant Effect Predictor (VEP)
+                |  are displayed. The meaning of each icon is as follows.
+              ul.unordered-list._margin-bottom._align-left
+                li
+                  strong SIFT
+                  br
+                  div
+                    .variant-function._width_5em._align-center(data-function='D') &lt; 0.05
+                    span._margin-left Deleterious
+                  div
+                    .variant-function._width_5em._align-center(data-function='T') &ge; 0.05
+                    span._margin-left Tolerated
+                li
+                  strong PolyPhen
+                  br
+                  div
+                    .variant-function._width_5em._align-center(data-function='PROBD') &gt; 0.908
+                    span._margin-left Probably Damaging
+                  div
+                    .variant-function._width_5em._align-center(data-function='POSSD') &gt; 0.446
+                    span._margin-left Possibly Damaging
+                  div
+                    .variant-function._width_5em._align-center(data-function='B') &le; 0.446
+                    span._margin-left Benign
+                  div
+                    .variant-function._width_5em._align-center(data-function='U') &nbsp;
+                    span._margin-left Unknown
+          #d7.question-answer
+            h4.question How do you calculate the value of Clinical significance?
+            .answer
+              p
+                | The value of
+                |
+                a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv')
+                  | clinical significance in ClinVar
+                |  is displayed.
+
+        section.section
+          h3.sectiontitle About the TogoVar search system
+          #s1.question-answer._column-span-all
+            h4.question
+              | What does the frequency indicator in the Frequency column of the search results
+              | represent?
+            .answer
+              p
+                | The frequency indicator represents the alternative allele frequency for each dataset. The color of the
+                | frequency meter corresponds to the color allocated to the dataset. The data availability or frequency
+                | value is represented on a 9-point scale.
+              ._flex._break-avoid
+                ._padding-right-large
+                  .frequency-graph._margin-bottom
+                    .dataset(data-frequency='na')
+                    span._margin-left Not Available
+                  .frequency-graph._margin-bottom
+                    .dataset(data-frequency='monomorphic')
+                    span._margin-left Monomorphic (REF)
+                  .frequency-graph._margin-bottom
+                    .dataset(data-frequency='singleton')
+                    span._margin-left Singleton
+                  .frequency-graph._margin-bottom
+                    .dataset(data-frequency='&lt;0.0001')
+                    span._margin-left &lt; 0.0001
+                  .frequency-graph._margin-bottom
+                    .dataset(data-frequency='&lt;0.001')
+                    span._margin-left &lt; 0.001
+                  .frequency-graph._margin-bottom
+                    .dataset(data-frequency='&lt;0.01')
+                    span._margin-left &lt; 0.01
+                  .frequency-graph._margin-bottom
+                    .dataset(data-frequency='&lt;0.05')
+                    span._margin-left &lt; 0.05
+                  .frequency-graph._margin-bottom
+                    .dataset(data-frequency='&lt;0.5')
+                    span._margin-left &lt; 0.5
+                  .frequency-graph._margin-bottom
+                    .dataset(data-frequency='&ge;0.5')
+                    span._margin-left &ge; 0.5
+                div
+                  .frequency-graph._margin-bottom
+                    .dataset(data-dataset='gem_j_wga')
+                    span._margin-left GEM-J WGA
+                  .frequency-graph._margin-bottom
+                    .dataset(data-dataset='jga_ngs')
+                    span._margin-left JGA-NGS
+                  .frequency-graph._margin-bottom
+                    .dataset(data-dataset='jga_snp')
+                    span._margin-left JGA-SNP
+                  .frequency-graph._margin-bottom
+                    .dataset(data-dataset='tommo_4.7kjpn')
+                    span._margin-left ToMMo 4.7KJPN
+                  .frequency-graph._margin-bottom
+                    .dataset(data-dataset='hgvd')
+                    span._margin-left HGVD
+                  .frequency-graph._margin-bottom
+                    .dataset(data-dataset='exac')
+                    span._margin-left ExAC
+          #s2.question-answer._column-span-all
+            h4.question
+              | For each variant type, how is the position, reference and alternative allele described respectively?
+            .answer
+              p
+                | An example for each variant type is shown below. Note that the position of the first base in the
+                | chromosome is 1.
+              table.results-view
+                thead
+                  tr
+                    th
+                      p Variant Type
+                    th
+                      p ID
+                    th
+                      p Position
+                    th
+                      p Ref / Alt
+                    th
+                      p Description
+                tbody
+                  tr
+                    td
+                      .variant-type SNV
+                    td
+                      a(target='_blank', href='/variant/tgv41') tgv41
+                    td
+                      .chromosome-position
+                        .chromosome 1
+                        .coordinate 13116
+                    td
+                      .ref-alt
+                        span.ref T
+                        span.arrow
+                        span.alt G
+                    td The 13116th base T in Chromosome 1 was replaced by G.
+                  tr
+                    td
+                      .variant-type Ins
+                    td
+                      a(target='_blank', href='/variant/tgv1019') tgv1019
+                    td
+                      .chromosome-position
+                        .chromosome 1
+                        .coordinate 138646
+                    td
+                      .ref-alt
+                        span.ref
+                        span.arrow
+                        span.alt A
+                    td A base A was inserted between the 138646th and 138647th bases in Chromosome 1.
+                  tr
+                    td
+                      .variant-type Del
+                    td
+                      a(target='_blank', href='/variant/tgv63') tgv63
+                    td
+                      .chromosome-position
+                        .chromosome 1
+                        .coordinate 13486
+                    td
+                      .ref-alt
+                        span.ref GC
+                        span.arrow
+                        span.alt
+                    td The 13486th and 13487th bases, GC, in Chromosome 1 were deleted.
+                  tr
+                    td
+                      .variant-type Indel
+                    td
+                      a(target='_blank', href='/variant/tgv1537710') tgv1537710
+                    td
+                      .chromosome-position
+                        .chromosome 1
+                        .coordinate 53676691
+                    td
+                      .ref-alt
+                        span.ref C
+                        span.arrow
+                        span.alt TA
+                    td
+                      | The 53676691st base C in Chromosome 1 was deleted and TA was inserted in its place.
+                  tr
+                    td
+                      .variant-type Substitution
+                    td
+                      a(target='_blank', href='/variant/tgv675673') tgv675673
+                    td
+                      .chromosome-position
+                        .chromosome 1
+                        .coordinate 21889705
+                    td
+                      .ref-alt
+                        span.ref AC
+                        span.arrow
+                        span.alt CA
+                    td
+                      | The 21889705th bases, AC, in Chromosome 1 were deleted and CA were inserted in their place.
+          #s3.question-answer._column-span-all
+            h4.question In TogoVar, how is the variant described?
+            .answer
+              p
+                | A. In TogoVar a variant is identified as a set of its genomic position, reference and alternative
+                | allele and human genome build. Examples of variant notations in TogoVar, dbSNP,
+                |
+                a.hyper-text.-external(target='_blank', href='https://samtools.github.io/hts-specs/VCFv4.2.pdf') VCF
+                |  and
+                |
+                a.hyper-text.-external(target='_blank', href='http://varnomen.hgvs.org/bg-material/simple/#types-of-variants')
+                  | HGVS
+                |  are shown below.
+              table.results-view
+                thead
+                  tr.groupingrow
+                    th(colspan='2')
+                    th(colspan='4')
+                      p TogoVar
+                    th(colspan='4')
+                      p dbSNP
+                    th(colspan='4')
+                      p VCF
+                    th
+                      p HGVS
+                  tr
+                    th
+                    th.separator
+                    th
+                      p ID
+                    th
+                      p Position
+                    th
+                      p Ref / Alt
+                    th.separator
+                    th
+                      p ID
+                    th
+                      p Position(GRCh37)
+                    th
+                      p Alleles
+                    th.separator
+                    th
+                      p Position
+                    th
+                      p Ref
+                    th
+                      p Alt
+                    th.separator
+                    th
+                tbody
+                  tr
+                    td(rowspan='2')
+                      .variant-type SNV
+                    td.separator(rowspan='2')
+                    td
+                      a(target='_blank', href='/variant/tgv30913364') tgv30913364
+                    td(rowspan='2')
+                      .chromosome-position
+                        .chromosome 7
+                        .coordinate 127254587
+                    td
+                      .ref-alt
+                        span.ref G
+                        span.arrow
+                        span.alt A
+                    td.separator(rowspan='2')
+                    td(rowspan='2')
+                      a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs114202595')
+                        | rs114202595
+                    td(rowspan='2') chr7:127254587
+                    td G&gt;A
+                    td.separator(rowspan='2')
+                    td(rowspan='2') 7:127254587
+                    td G
+                    td A
+                    td.separator(rowspan='2')
+                    td 7:g.127254587:G&gt;A
+                  tr
+                    td
+                      a(target='_blank', href='/variant/tgv30913365') tgv30913365
+                    td
+                      .ref-alt
+                        span.ref G
+                        span.arrow
+                        span.alt T
+                    td G&gt;T
+                    td G
+                    td T
+                    td 7:g.127254587:G&gt;T
+                  tr
+                    td
+                      .variant-type Ins
+                    td.separator
+                    td
+                      a(target='_blank', href='/variant/tgv1019') tgv1019
+                    td
+                      .chromosome-position
+                        .chromosome 1
+                        .coordinate 138646
+                    td
+                      .ref-alt
+                        span.ref
+                        span.arrow
+                        span.alt A
+                    td.separator
+                    td
+                      a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs761725800')
+                        | rs761725800
+                    td chr1:138646
+                    td dupA
+                    td.separator
+                    td 1:138646
+                    td C
+                    td CA
+                    td.separator
+                    td 1:g.138646_138647insA
+                  tr
+                    td
+                      .variant-type Del
+                    td.separator
+                    td
+                      a(target='_blank', href='/variant/tgv63') tgv63
+                    td
+                      .chromosome-position
+                        .chromosome 1
+                        .coordinate 13486
+                    td
+                      .ref-alt
+                        span.ref GC
+                        span.arrow
+                        span.alt
+                    td.separator
+                    td
+                      a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs780379327')
+                        | rs780379327
+                    td chr1:13486-13487
+                    td delGC
+                    td.separator
+                    td 1:13485
+                    td AGC
+                    td A
+                    td.separator
+                    td 1:g.13486_13487del
+                  tr
+                    td
+                      .variant-type Indel
+                    td.separator
+                    td
+                      a(target='_blank', href='/variant/tgv1537710') tgv1537710
+                    td
+                      .chromosome-position
+                        .chromosome 1
+                        .coordinate 53676691
+                    td
+                      .ref-alt
+                        span.ref C
+                        span.arrow
+                        span.alt TA
+                    td.separator
+                    td
+                      a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs1057517525')
+                        | rs1057517525
+                    td chr1:53676691
+                    td delCinsTA
+                    td.separator
+                    td 1:53676691
+                    td C
+                    td TA
+                    td.separator
+                    td 1:g.53676691delinsTA
+                  tr
+                    td
+                      .variant-type Substitution
+                    td.separator
+                    td
+                      a(target='_blank', href='/variant/tgv675673') tgv675673
+                    td
+                      .chromosome-position
+                        .chromosome 1
+                        .coordinate 21889705
+                    td
+                      .ref-alt
+                        span.ref AC
+                        span.arrow
+                        span.alt CA
+                    td.separator
+                    td
+                      a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs786204530')
+                        | rs786204530
+                    td chr1:21889705-21889706
+                    td AC&gt;CA
+                    td.separator
+                    td 1:21889705
+                    td AC
+                    td CA
+                    td.separator
+                    td 1:g.21889705_21889706delinsCA
