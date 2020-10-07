@@ -23,11 +23,11 @@ module Elasticsearch
                           tgv_condition(term)
                         when /^rs\d+(,rs\d+)*$/i
                           rs_condition(term)
-                        when /^(\d+|[XY]|MT):\d+:(\w+)>(\w+)$/
+                        when /^(\d+|[XY]|MT):\d+:(\w+)>(\w+)(,(\d+|[XY]|MT):\d+:(\w+)>(\w+))*$/
                           position_allele_condition(term)
-                        when /^(\d+|[XY]|MT):\d+(,(\d+|[XY]|MT):\d+)*$/
+                        when /^(\d+|[XY]|MT):\d+(:[^,]+)?(,(\d+|[XY]|MT):\d+(:[^,]+)?)*$/
                           position_condition(term)
-                        when /^(\d+|[XY]|MT):\d+-\d+(,(\d+|[XY]|MT):\d+-\d+)*$/
+                        when /^(\d+|[XY]|MT):\d+-\d+(:[^,]+)?(,(\d+|[XY]|MT):\d+-\d+(:[^,]+)?)*$/
                           region_condition(term)
                         else
                           if (t = Gene.exact_match(term))
