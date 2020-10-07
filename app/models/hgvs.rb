@@ -1,5 +1,5 @@
 class HGVS
-  ENSEMBL_URL = 'https://grch37.rest.ensembl.org'.freeze
+  ENSEMBL_URL = 'http://grch37.rest.ensembl.org'.freeze
 
   API = '/variant_recoder/human/%s'.freeze
 
