@@ -30,17 +30,22 @@ class HGVS
         if json.is_a?(Hash) && json['error'].present?
           Rails.logger.error('HGVS') { json['error'] }
           [term, json['error']]
-        elsif (m = json.dig(0, 'hgvsg', 0)&.match(HGVSG))
-          chr = Integer(m[1]&.slice(0..1))
-          start = m[26]
-          stop = m[27]
-          allele = m[28]
+        elsif (hgvsg = json.dig(0, 'hgvsg').filter { |x| x.match?(HGVSG) }).present?
+          pos = hgvsg.map do |x|
+            m = x.match(HGVSG)
+            chr = Integer(m[1]&.slice(0..1))
+            start = m[26]
+            stop = m[27]
+            allele = m[28]
 
-          if stop
-            ["#{chr}:#{start}-#{stop}", nil, json.dig(0, 'warnings', 0)]
-          else
-            ["#{chr}:#{start}:#{allele}", nil, json.dig(0, 'warnings', 0)]
+            if stop
+              "#{chr}:#{start}-#{stop}"
+            else
+              "#{chr}:#{start}:#{allele}"
+            end
           end
+
+          [pos.join(','), nil, json.dig(0, 'warnings', 0)]
         else
           [term]
         end
@@ -52,7 +57,7 @@ class HGVS
         [term, '500 Internal Server Error']
       end
 
-      yield result
+      yield result if block_given?
 
       result
     end
