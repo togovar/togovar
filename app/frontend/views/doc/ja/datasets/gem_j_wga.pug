@@ -51,23 +51,23 @@ block content
             tbody
               tr
                 th#autosomes._nowrap(headers='chrom') 常染色体
-                td._align-right(headers='snvs_total autosomes')
+                td(headers='snvs_total autosomes')
                   span 76,768,387
-                td._align-right(headers='snvs_novel autosomes')
+                td(headers='snvs_novel autosomes')
                   span 35,660,425
-                td._align-right(headers='indels_total autosomes')
+                td(headers='indels_total autosomes')
                   span 10,202,908
-                td._align-right(headers='indels_novel autosomes')
+                td(headers='indels_novel autosomes')
                   span 4,152,671
               tr
                 th#x_chrom._nowrap(headers='chrom') X 染色体
-                td._align-right(headers='snvs_total x_chrom')
+                td(headers='snvs_total x_chrom')
                   span 2,898,518
-                td._align-right(headers='snvs_novel x_chrom')
+                td(headers='snvs_novel x_chrom')
                   span 1,420,888
-                td._align-right(headers='indels_total x_chrom')
+                td(headers='indels_total x_chrom')
                   span 410,435
-                td._align-right(headers='indels_novel x_chrom')
+                td(headers='indels_novel x_chrom')
                   span 164,077
           p.body ※ dbSNP152に記載がないものを新規としてカウント
 
@@ -185,7 +185,8 @@ block content
                 td(headers='data_provider') バイオバンクジャパン
               tr
                 td._align-center._nowrap(headers='dataset_id')
-                  | AGDD_00000000005
+                  a.hyper-text.-external(target='_blank', href='https://ddbj.nig.ac.jp/agd/viewer/view/study/AGDS_00000000005')
+                  | AGDS_00000000005
                   br
                   | (
                   a.hyper-text.-external(target='_blank', href='https://gr-sharingdbs.biosciencedbc.jp/agd0008-v1') agd0008
@@ -234,7 +235,7 @@ block content
                   | JGAD00000000339
                   br
                   | (
-                  a.hyper-text.-external(target='_blank', href='https://humandbs.biosciencedbc.jp/') hum0184
+                  a.hyper-text.-external(target='_blank', href='https://humandbs.biosciencedbc.jp/hum0184-v1') hum0184
                   | )
                 td(headers='study_title') 日本人全ゲノムデータベースの構築
                 td(headers='participants') 一般住民

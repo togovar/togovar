@@ -65,6 +65,8 @@ block content
                     | described respectively?
                 li.item.-question
                   a.link(href='#s3') In TogoVar, how is the variant described?
+                li.item.-question
+                  a.link(href='#s4') Can I search by HGVS description (e.g. ALDH2:p.Glu504Lys)?
 
       .contents
         section.section
@@ -577,3 +579,17 @@ block content
                     td CA
                     td.separator
                     td 1:g.21889705_21889706delinsCA
+          #s4.question-answer._column-span-all
+            h4.question
+              | Q: Can I search by
+              a.hyper-text.-external(target='_blank', href='https://varnomen.hgvs.org/') HGVS description
+              | (e.g. ALDH2:p.Glu504Lys)?
+            .answer
+              p
+                |Yes. HGVSc (e.g.
+                a(target='_blank', href='/?term=ALDH2%3Ac.1510G%3EA') ALDH2:c.1510G>A
+                |) and HGVSp (e.g.
+                a(target='_blank', href='/?term=ALDH2%3Ap.Glu504Lys') ALDH2:p.Glu504Lys
+                |) are acceptable. Variant Recorder is used to convert an HGVS description to a GRCh37 position.
+                a.hyper-text.-external(target='_blank', href='https://m.ensembl.org/info/docs/tools/vep/recoder/index.html') Variant Recorder
+                |is used to convert an HGVS description to a GRCh37 position.
