@@ -39,7 +39,7 @@ class HGVS
             allele = m[28]
 
             if stop
-              "#{chr}:#{start}-#{stop}"
+              "#{chr}:#{start}-#{stop}:#{allele}"
             else
               "#{chr}:#{start}:#{allele}"
             end
