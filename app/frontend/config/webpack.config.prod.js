@@ -1,6 +1,7 @@
 const {merge} = require('webpack-merge');
 const commonConfig = require('./webpack.config.common');
 
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const GoogleTagManagerPlugin = require('webpack-google-tag-manager-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const TerserJSPlugin = require('terser-webpack-plugin');
@@ -16,6 +17,9 @@ if (GMT_ID) {
 
 module.exports = merge(commonConfig, {
     mode: 'production',
+    plugins: [
+      new CleanWebpackPlugin()
+    ],
     optimization: {
       minimizer: [
         new TerserJSPlugin({
