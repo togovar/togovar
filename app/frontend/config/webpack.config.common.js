@@ -11,6 +11,7 @@ const config = {
   entry: {
     main: './app/frontend/packs/index.js',
     report: './app/frontend/packs/report/index.js',
+    api: './app/frontend/packs/api/index.js',
   },
   output: {
     path: path.resolve(__dirname, '../../../dist'),
@@ -64,6 +65,13 @@ const config = {
         loader: 'json-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.ya?ml$/,
+        use: [
+          { loader: 'json-loader' },
+          { loader: 'yaml-loader' }
+        ]
+      },
     ],
   },
   plugins: [
@@ -79,6 +87,11 @@ const config = {
     new HtmlWebpackPlugin({
       template: "app/frontend/views/variant/index.pug",
       filename: "variant/index.html",
+      inject: false,
+    }),
+    new HtmlWebpackPlugin({
+      template: "app/frontend/views/api/index.pug",
+      filename: "api/index.html",
       inject: false,
     }),
     new MiniCssExtractPlugin({
