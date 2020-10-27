@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
 
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const DotenvWebpack = require('dotenv-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
@@ -75,7 +74,6 @@ const config = {
     ],
   },
   plugins: [
-    new CleanWebpackPlugin(),
     new webpack.ProvidePlugin({
       $: "jquery/dist/jquery",
     }),
