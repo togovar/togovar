@@ -1,0 +1,23 @@
+openapi: 3.0.0
+
+servers:
+  - description: NBDC
+    url: https://togovar.biosciencedbc.jp/api
+
+info:
+  title: TogoVar API
+  version: 1.0.0
+  description: Specifications for TogoVar API
+
+tags:
+  - name: users
+    description: Operations available to all users
+
+paths:
+  /:
+    get:
+      tags:
+        - users
+      responses:
+        '200':
+          description: OK
