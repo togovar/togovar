@@ -1,5 +1,6 @@
 const path = require('path');
 const express = require('express');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
@@ -25,6 +26,11 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
 
   app.use(middleware);
   app.use(webpackHotMiddleware(compiler));
+
+  // proxy
+  app.use('/stanza', createProxyMiddleware({ target: 'http://localhost:8080' }));
+
+  // serve static assets under /dist
   app.use(publicPath, express.static(outputPath));
 
   // Since webpackDevMiddleware uses memory-fs internally to store build
