@@ -30,6 +30,7 @@ import PanelViewPreviewClinicalSignificance from '../javascripts/classes/PanelVi
 
 // Load the favicon
 import '!file-loader?name=[name].[ext]!../images/favicon.svg';
+import '!file-loader?name=[name].[ext]!../assets/togovar.jsonld';
 
 let isReady =
   document.readyState === 'complete' ||
