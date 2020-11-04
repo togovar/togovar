@@ -10,6 +10,7 @@ if (GMT_ID) {
   GMT_ID.split(',').forEach(id => {
     commonConfig.plugins.push(new GoogleTagManagerPlugin({
       id: id,
+      dataLayerName: 'dataLayer', // workaround for https://github.com/timjorjev/webpack-google-tag-manager-plugin/issues/1
     }));
   });
 }
