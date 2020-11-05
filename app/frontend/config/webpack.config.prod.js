@@ -16,33 +16,31 @@ if (GMT_ID) {
 }
 
 module.exports = merge(commonConfig, {
-    mode: 'production',
-    plugins: [
-      new CleanWebpackPlugin()
-    ],
-    optimization: {
-      minimizer: [
-        new TerserJSPlugin({
-          terserOptions: {
-            output: {
-              comments: false,
-            },
+  mode: 'production',
+  plugins: [
+    new CleanWebpackPlugin()
+  ],
+  optimization: {
+    minimizer: [
+      new TerserJSPlugin({
+        terserOptions: {
+          output: {
+            comments: false,
           },
-        }),
-        new OptimizeCSSAssetsPlugin({
-          cssProcessor: require('cssnano'),
-          cssProcessorPluginOptions: {
-            preset: [
-              'default',
-              {
-                discardComments: {
-                  removeAll: true,
-                },
+        },
+      }),
+      new OptimizeCSSAssetsPlugin({
+        cssProcessor: require('cssnano'),
+        cssProcessorPluginOptions: {
+          preset: [
+            'default', {
+              discardComments: {
+                removeAll: true,
               },
-            ],
-          },
-        }),
-      ],
-    },
-  }
-);
+            },
+          ],
+        },
+      }),
+    ],
+  },
+});
