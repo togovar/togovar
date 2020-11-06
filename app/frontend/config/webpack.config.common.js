@@ -88,6 +88,16 @@ const config = {
       inject: false,
     }),
     new HtmlWebpackPlugin({
+      template: "app/frontend/views/gene/index.pug",
+      filename: "gene/index.html",
+      inject: false,
+    }),
+    new HtmlWebpackPlugin({
+      template: "app/frontend/views/disease/index.pug",
+      filename: "disease/index.html",
+      inject: false,
+    }),
+    new HtmlWebpackPlugin({
       template: "app/frontend/views/api/index.pug",
       filename: "api/index.html",
       inject: false,
