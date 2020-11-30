@@ -4,6 +4,36 @@ module API
   class SearchController < ApplicationController
     include Executable
 
+    module BackwardCompatibility
+      FILTER_PARAMETERS = %w[term quality stat dataset frequency type significance consequence sift polyphen].freeze
+
+      # @return [ActionController::Parameters]
+      def variation_params
+        return super unless include_filters?
+
+        @variation_params ||= params.permit :term, :quality, :stat, dataset: {}, frequency: {}, type: {},
+                                            significance: {}, consequence: {}, sift: {}, polyphen: {}
+      end
+
+      # @return [Array] [result, status]
+      def search_variation
+        return super unless include_filters?
+
+        params = variation_params
+
+        service = VariationSearchService::WithQueryParameters.new(params.to_h, debug: params.key?(:debug))
+
+        execute(service).tap { |r, _| r.update(debug: service.debug) if params.key?(:debug) }
+      end
+
+      private
+
+      def include_filters?
+        (params.each_key.to_a & FILTER_PARAMETERS).present?
+      end
+    end
+    prepend BackwardCompatibility
+
     wrap_parameters name: :body, format: :json
 
     def variation
