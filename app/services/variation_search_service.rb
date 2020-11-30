@@ -7,6 +7,7 @@ class VariationSearchService
   # @param [Hash] params The request parameters
   # @param [Hash] options
   # @option options [Hash] :headers The request header
+  # @option options [Boolean] :debug
   def initialize(params, **options)
     @params = params
     @options = options
