@@ -60,7 +60,7 @@ class VariationSearchService
   end
 
   def schema(version)
-    if (path = spec_path(version)).match?(/\.erb$/)
+    if (path = spec_path(version).to_s).match?(/\.erb$/)
       YAML.safe_load(ERB.new(File.read(path)).result)
     else
       YAML.load_file(path)
