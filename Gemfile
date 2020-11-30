@@ -3,51 +3,32 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.7.1'
 
+# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 6.0.3', '>= 6.0.3.4'
-
-# infrastructure
+# Use Puma as the app server
 gem 'puma', '~> 4.1'
-gem 'rack-cors', '~> 1.1', '>= 1.1.1'
-gem 'unicorn', '~> 5.7'
+# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+# gem 'jbuilder', '~> 2.7'
+# Use Active Model has_secure_password
+# gem 'bcrypt', '~> 3.1.7'
 
-# caching
+# Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.2', require: false
 
-# utility
-gem 'awesome_print', '~> 1.8'
-gem 'dotenv-rails', '~> 2.7'
-gem 'jbuilder', '~> 2.7'
-gem 'linkeddata', '~> 3.0'
-gem 'settingslogic', '~> 2.0'
-
-# elasticsearch (need to list after kaminari to enable pagination)
-gem 'elasticsearch-dsl', '~> 0.1.9'
-gem 'elasticsearch-model', '~> 7.1'
-gem 'elasticsearch-rails', '~> 7.1'
-
-# bio science
-gem 'bio-vcf', github: 'pjotrp/bioruby-vcf'
-
-# console
-gem 'pry-rails', '~> 0.3.6'
-
-group :development do
-  gem 'better_errors', '~> 2.5'
-  gem 'better_errors-pry', '~> 1.0'
-  gem 'listen', '~> 3.2'
-  gem 'spring'
-  gem 'spring-watcher-listen', '~> 2.0.0'
-  gem 'web-console', '~> 4.0'
-end
-
-group :test do
-  gem 'rspec', '~> 3.7'
-  gem 'rspec-rails', '~> 3.7'
-end
+# Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
+# gem 'rack-cors'
 
 group :development, :test do
-  gem 'byebug', platforms: %i[mri mingw x64_mingw]
+  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+end
+
+group :development do
+  gem 'listen', '~> 3.2'
+  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
+  gem 'spring'
+  gem 'spring-watcher-listen', '~> 2.0.0'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-# gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
