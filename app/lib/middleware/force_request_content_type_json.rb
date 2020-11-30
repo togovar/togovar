@@ -6,7 +6,9 @@ class ForceRequestContentTypeJson
   end
 
   def call(env)
-    env['CONTENT_TYPE'] = 'application/json' if env['CONTENT_TYPE'] == 'application/x-www-form-urlencoded'
+    type = env['CONTENT_TYPE']
+
+    env['CONTENT_TYPE'] = 'application/json' if type.blank? || type == 'application/x-www-form-urlencoded'
 
     @app.call(env)
   end
