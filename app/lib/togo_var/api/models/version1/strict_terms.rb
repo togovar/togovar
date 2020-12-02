@@ -5,19 +5,13 @@ module TogoVar
     module Models
       module Version1
         class StrictTerms < NonStrictTerms
-          class << self
-            def inherited(subclass)
-              super
+          validate do
+            @terms.each do |term|
+              next if acceptable_terms.include? term
 
-              subclass.validate lambda {
-                @terms.each do |term|
-                  next if acceptable_terms.include? term
-
-                  list = acceptable_terms.to_sentence(CommonOptions::SENTENCE_OR_CONNECTORS)
-                  errors.add(:terms, "must consist of '#{list}'")
-                  break
-                end
-              }
+              list = acceptable_terms.to_sentence(CommonOptions::SENTENCE_OR_CONNECTORS)
+              errors.add(:terms, "must consist of '#{list}'")
+              break
             end
           end
 
