@@ -21,6 +21,7 @@ gem 'pry-rails', '~> 0.3.9'
 
 # utility
 gem 'dotenv-rails', '~> 2.7', '>= 2.7.6'
+gem 'jbuilder', '~> 2.10', '>= 2.10.1'
 gem 'rails_pretty_json_rednerer', '~> 0.1.0'
 
 # elasticsearch
