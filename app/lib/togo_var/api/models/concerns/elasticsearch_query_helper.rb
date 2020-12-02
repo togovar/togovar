@@ -13,7 +13,7 @@ module TogoVar
             Elasticsearch::DSL::Search.search do
               query do
                 bool do
-                  must_not hash.fetch(:query) { {} }
+                  must_not hash.fetch(:query, {})
                 end
               end
             end

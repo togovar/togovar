@@ -22,13 +22,13 @@ module TogoVar
           def initialize(*args)
             super
 
-            hash = @args.first.dup
+            arg = @args.first
 
-            @field = hash.delete(:field)
-            @gte = hash.delete(:gte)
-            @gt = hash.delete(:gt)
-            @lte = hash.delete(:lte)
-            @lt = hash.delete(:lt)
+            @field = arg[:field]
+            @gte = arg[:gte]
+            @gt = arg[:gt]
+            @lte = arg[:lte]
+            @lt = arg[:lt]
           end
 
           def to_hash
