@@ -22,7 +22,7 @@ module TogoVar
                   end
                 end
               end
-            end.to_hash[:query]
+            end
 
             (@relation == 'ne' ? negate(q) : q).to_hash[:query]
           end
