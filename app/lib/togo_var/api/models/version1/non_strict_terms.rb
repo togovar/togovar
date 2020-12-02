@@ -27,10 +27,10 @@ module TogoVar
           def initialize(*args)
             super
 
-            hash = @args.first.dup
+            arg = @args.first
 
-            @relation = hash.delete(:relation)
-            @terms = Array(hash.delete(:terms))
+            @relation = arg[:relation]
+            @terms = Array(arg[:terms])
           end
 
           # All subclass must implement this method

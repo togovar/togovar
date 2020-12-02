@@ -50,11 +50,11 @@ module TogoVar
           def initialize(*args)
             super
 
-            hash = @args.first.dup
+            hash = @args.first || {}
 
-            @query = hash.delete(:query)
-            @limit = hash.delete(:limit)&.to_i || Defaults::LIMIT
-            @offset = (offset = hash.delete(:offset)).is_a?(Array) ? offset : offset&.to_i
+            @query = hash.fetch(:query, {})
+            @limit = hash.fetch(:limit, Defaults::LIMIT).to_i
+            @offset = (offset = hash[:offset]).is_a?(Array) ? offset : offset&.to_i
           end
 
           # @return [Array]
@@ -85,16 +85,16 @@ module TogoVar
               hash.update(search_after: [offset[0].to_i, offset[1].to_i, offset[2].to_s, offset[3].to_s])
             end
 
-            hash
+            hash.compact
           end
 
           class Query < Base
             validate { errors.add(:args, 'must be an array of a component') unless args.size == 1 }
             validate { errors.add(:args, 'contains objects other than Hash') unless args.all? { |x| x.is_a?(Hash) } }
-            validate { errors.add(:args, 'contains unexpected component') unless args.first.size == 1 }
+            validate { errors.add(:args, 'contains unexpected component') if args.first.size > 1 }
             validate do
               key, _value = extract_component
-              next if acceptable_components.key?(key.to_sym)
+              next if key.nil? || (key.present? && acceptable_components.key?(key.to_sym))
 
               list = acceptable_components.keys.to_sentence(CommonOptions::SENTENCE_OR_CONNECTORS)
               errors.add(:args, "must consist of '#{list}'")
@@ -104,7 +104,7 @@ module TogoVar
             def models
               @models ||= begin
                             key, value = extract_component
-                            return [] unless (klass = acceptable_components[key.to_sym])
+                            return [] unless key.present? && (klass = acceptable_components[key.to_sym])
 
                             [{ key.to_sym => klass < Bool ? klass.new(*value) : klass.new(value) }]
                           end
