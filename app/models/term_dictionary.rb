@@ -19,6 +19,10 @@ class TermDictionary
       find_by(:key, key)
     end
 
+    def find_by_label(label)
+      find_by(:label, label)
+    end
+
     private
 
     def terms

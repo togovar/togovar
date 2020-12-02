@@ -6,13 +6,15 @@ module API
 
     module BackwardCompatibility
       FILTER_PARAMETERS = %w[term quality stat dataset frequency type significance consequence sift polyphen].freeze
+      private_constant :FILTER_PARAMETERS
 
       # @return [ActionController::Parameters]
       def variation_params
         return super unless include_filters?
 
-        @variation_params ||= params.permit :term, :quality, :stat, dataset: {}, frequency: {}, type: {},
-                                            significance: {}, consequence: {}, sift: {}, polyphen: {}
+        @variation_params ||= params.permit :term, :quality, :stat, :debug,
+                                            dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {},
+                                            sift: {}, polyphen: {}
       end
 
       # @return [Array] [result, status]
