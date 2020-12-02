@@ -1,7 +1,7 @@
 openapi: 3.0.3
 
 servers:
-  - url: <%= "#{ENV['TOGOVAR_APP_BASE_URL']}/api" %>
+  - url: <%= "#{ENV['TOGOVAR_BASE_URL']}/api" %>
 
 info:
   title: TogoVar API
@@ -22,7 +22,198 @@ paths:
         $ref: '#/components/requestBodies/SearchVariation'
       responses:
         '200':
-          description: OK
+          description: >
+            `OK`
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scroll:
+                    type: object
+                    properties:
+                      offset:
+                        type: integer
+                      limit:
+                        type: integer
+                      max_rows:
+                        type: integer
+
+                  statistics:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      filtered:
+                        type: integer
+                      dataset:
+                        type: object
+                        properties:
+                          dataset_name:
+                            type: integer
+                      type:
+                        type: object
+                        properties:
+                          so_term:
+                            type: integer
+                      significance:
+                        type: object
+                        properties:
+                          significance_key:
+                            type: integer
+                      consequence:
+                        type: object
+                        properties:
+                          so_term:
+                            type: integer
+
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                        chromosome:
+                          type: string
+                        start:
+                          type: integer
+                        stop:
+                          type: integer
+                        reference:
+                          type: string
+                        alternative:
+                          type: string
+                        most_severe_consequence:
+                          type: string
+                        sift:
+                          type: number
+                        polyphen:
+                          type: number
+                        existing_variations:
+                          type: array
+                          items:
+                            type: string
+                        external_link:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              db_name:
+                                type: array
+                                items:
+                                  type: string
+                        significance:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              condition:
+                                type: string
+                              interpretations:
+                                type: array
+                                items:
+                                  type: string
+                        transcripts:
+                          type: object
+                          properties:
+                            transcript_id:
+                              type: string
+                            gene_id:
+                              type: string
+                            consequence:
+                              type: array
+                              items:
+                                type: string
+                            sift:
+                              type: number
+                            polyphen:
+                              type: number
+                            hgnc_id:
+                              type: integer
+                            symbol:
+                              type: object
+                              properties:
+                                source:
+                                  type: string
+                                label:
+                                  type: string
+                            hgvs_p:
+                              type: string
+                            hgvs_c:
+                              type: string
+                            hgvs_g:
+                              type: string
+                        frequencies:
+                          type: object
+                          properties:
+                            source:
+                              type: string
+                            filter:
+                              type: array
+                              items:
+                                type: string
+                            quality:
+                              type: number
+                            allele:
+                              type: object
+                              properties:
+                                number:
+                                  type: integer
+                                count:
+                                  type: integer
+                                frequency:
+                                  type: number
+                            genotype:
+                              type: object
+                              properties:
+                                ref_homo_count:
+                                  type: integer
+                                hetero_count:
+                                  type: integer
+                                alt_homo_count:
+                                  type: integer
+
+        '400':
+          description: >
+            `Bad Request`<br/>
+            Your query contains grammatical mistakes. See errors in the response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+
+        '500':
+          description: >
+            `Internal Server Error`<br/>
+            Unexpected errors occurred.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+
+        '501':
+          description: >
+            `Not Implemented`<br/>
+            Responder for given mime type are not inplemented.
+            Provide the correct accept header (e.g. `Accept: application/json`).
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Not implemented
 
 components:
   parameters:
