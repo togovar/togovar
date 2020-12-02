@@ -10,18 +10,12 @@ module TogoVar
           attr_reader :relation
           attr_reader :terms
 
-          class << self
-            def inherited(subclass)
-              super
+          validates :terms, :relation, presence: true
+          validate do
+            next if acceptable_relations.include? @relation
 
-              subclass.validates :terms, :relation, presence: true
-              subclass.validate do
-                next if acceptable_relations.include? @relation
-
-                list = acceptable_relations.to_sentence(CommonOptions::SENTENCE_OR_CONNECTORS)
-                errors.add(:relation, "must be one of '#{list}'")
-              end
-            end
+            list = acceptable_relations.to_sentence(CommonOptions::SENTENCE_OR_CONNECTORS)
+            errors.add(:relation, "must be one of '#{list}'")
           end
 
           def initialize(*args)
