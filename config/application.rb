@@ -39,5 +39,9 @@ module TogoVar
     config.api_only = true
 
     config.middleware.insert_before ActionDispatch::Static, ::Middleware::ForceRequestContentTypeJson
+
+    config.elasticsearch = config_for(:elasticsearch)
+    config.endpoint = config_for(:endpoint)
+    config.virtuoso = config_for(:virtuoso)
   end
 end
