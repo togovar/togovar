@@ -23,10 +23,7 @@ class VariationSearchService
     # remember to validate before obtaining debug information
     validate || raise_error
 
-    # TODO: return search result
-    query
-
-    {}
+    ResponseFormatter.new(@params[:body], search, @errors).format
   end
 
   private
@@ -46,17 +43,12 @@ class VariationSearchService
   end
 
   def spec
-    @spec ||= begin
-                params = @params.dup
-                body = params.delete(:body)
-
-                TogoVar::API::Spec::Validator.new schema(params.fetch(:version, '1')),
-                                                  method: :post,
-                                                  path: '/search/variation',
-                                                  parameters: params,
-                                                  headers: @options.fetch(:headers, {}),
-                                                  body: body
-              end
+    @spec ||= TogoVar::API::Spec::Validator.new schema(@params.fetch(:version, '1')),
+                                                method: :post,
+                                                path: '/search/variation',
+                                                parameters: @params,
+                                                headers: @options.fetch(:headers, {}),
+                                                body: @params[:body]
   end
 
   def schema(version)
@@ -80,7 +72,31 @@ class VariationSearchService
     @model ||= TogoVar::API::VariationSearch.new(@params[:body]).model
   end
 
+  def search
+    {
+      filtered_total: Variation.count(body: query.slice(:query)),
+      results: Variation.search(query).records.results,
+      aggs: paging? ? {} : Variation.search(stat_query).aggregations
+    }
+  end
+
   def query
-    model.to_hash.tap { |q| debug[:query] = q if @options[:debug] }
+    @query ||= model.to_hash.tap { |q| debug[:query] = q if @options[:debug] }
+  end
+
+  def paging?
+    (offset = @params[:body][:offset]).present? && (offset != 0 || offset.is_a?(Array))
+  end
+
+  def stat_query
+    @stat_query ||= begin
+                      hash = query.dup
+                      hash.update size: 0
+                      hash.delete :from
+                      hash.delete :sort
+                      hash.merge!(Variation::QueryHelper.statistics)
+
+                      hash.tap { |h| debug[:stat_query] = h if @options[:debug] }
+                    end
   end
 end

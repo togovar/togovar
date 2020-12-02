@@ -6,4 +6,8 @@ Rails.application.routes.draw do
   namespace :api do
     match 'search/variation', via: %w[get post]
   end
+
+  # backward compatibility
+  get 'suggest', to: 'root#suggest'
+  get 'search', to: 'api/search#variation'
 end

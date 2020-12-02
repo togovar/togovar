@@ -236,7 +236,7 @@ module Elasticsearch
           nested do
             path :vep
             query do
-              terms 'vep.consequence': values.map { |x| SequenceOntology.find(x)&.label }.compact
+              terms 'vep.consequence': values.map { |x| SequenceOntology.find(x)&.key }.compact
             end
           end
         end
@@ -329,7 +329,7 @@ module Elasticsearch
       query.delete(:from)
       query.delete(:sort)
 
-      query.merge(aggregations)
+      query.merge(Variation::QueryHelper.statistics)
     end
 
     def build

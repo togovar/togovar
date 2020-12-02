@@ -53,40 +53,22 @@ class SequenceOntology < TermDictionary
   end
   include VariationConsequence
 
-  CONSEQUENCES_IN_ORDER = [SO_0001893,
-                           SO_0001574,
-                           SO_0001575,
-                           SO_0001587,
-                           SO_0001589,
-                           SO_0001578,
-                           SO_0002012,
-                           SO_0001889,
-                           SO_0001821,
-                           SO_0001822,
-                           SO_0001583,
-                           SO_0001818,
-                           SO_0001630,
-                           SO_0001626,
-                           SO_0002019,
-                           SO_0001567,
-                           SO_0001819,
-                           SO_0001580,
-                           SO_0001620,
-                           SO_0001623,
-                           SO_0001624,
-                           SO_0001792,
-                           SO_0001627,
-                           SO_0001621,
-                           SO_0001619,
-                           SO_0001631,
-                           SO_0001632,
-                           SO_0001895,
-                           SO_0001892,
-                           SO_0001782,
-                           SO_0001894,
-                           SO_0001891,
-                           SO_0001907,
-                           SO_0001566,
-                           SO_0001906,
+  CONSEQUENCES_IN_ORDER = [SO_0001893, SO_0001574, SO_0001575, SO_0001587, SO_0001589, SO_0001578, SO_0002012,
+                           SO_0001889, SO_0001821, SO_0001822, SO_0001583, SO_0001818, SO_0001630, SO_0001626,
+                           SO_0002019, SO_0001567, SO_0001819, SO_0001580, SO_0001620, SO_0001623, SO_0001624,
+                           SO_0001792, SO_0001627, SO_0001621, SO_0001619, SO_0001631, SO_0001632, SO_0001895,
+                           SO_0001892, SO_0001782, SO_0001894, SO_0001891, SO_0001907, SO_0001566, SO_0001906,
                            SO_0001628].freeze
+
+  class << self
+    def most_severe_consequence(*keys)
+      keys = keys.map(&:to_sym).uniq
+
+      CONSEQUENCES_IN_ORDER.each do |so|
+        return so if keys.include?(so.key)
+      end
+
+      nil
+    end
+  end
 end
