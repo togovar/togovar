@@ -38,6 +38,6 @@ module TogoVar
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
-    config.middleware.insert_before ActionDispatch::Static, ForceRequestContentTypeJson
+    config.middleware.insert_before ActionDispatch::Static, ::Middleware::ForceRequestContentTypeJson
   end
 end
