@@ -17,12 +17,12 @@ module TogoVar
           def initialize(*args)
             super
 
-            hash = @args.first.dup
+            arg = @args.first.dup
 
-            @dataset = hash.delete(:dataset)
-            @frequency = hash.delete(:frequency)
-            @count = hash.delete(:count)
-            @filtered = hash.delete(:filtered)
+            @dataset = arg[:dataset]
+            @frequency = arg[:frequency]
+            @count = arg[:count]
+            @filtered = arg[:filtered]
           end
 
           # @return [Array]

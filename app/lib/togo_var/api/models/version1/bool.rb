@@ -28,8 +28,8 @@ module TogoVar
           def initialize(*args)
             super
 
-            options = @args.last.is_a?(Hash) ? @args.pop.dup : {}
-            @operator = options.delete(:operator)
+            options = @args.last.is_a?(Hash) ? @args.pop : {}
+            @operator = options[:operator]
           end
 
           # @return [Array]

@@ -28,9 +28,9 @@ module TogoVar
           def initialize(*args)
             super
 
-            hash = @args.first.dup
+            arg = @args.first
 
-            @name = hash.delete(:name)
+            @name = arg[:name]
           end
 
           def to_hash
