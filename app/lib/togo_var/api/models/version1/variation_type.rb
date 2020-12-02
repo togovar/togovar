@@ -16,14 +16,14 @@ module TogoVar
             validate
 
             terms = @terms
-                      .map { |x| (SequenceOntology.find(x) || SequenceOntology.find_by_key(x))&.key }
+                      .map { |x| (SequenceOntology.find(x) || SequenceOntology.find_by_key(x))&.label }
                       .compact
 
             q = Elasticsearch::DSL::Search.search do
               query do
                 terms type: terms
               end
-            end.to_hash[:query]
+            end
 
             (@relation == 'ne' ? negate(q) : q).to_hash[:query]
           end
