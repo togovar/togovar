@@ -1,4 +1,4 @@
-class TopPageLayoutManager { 
+class TopPageLayoutManager {
 
   constructor() {
   }
