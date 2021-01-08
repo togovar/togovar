@@ -2,6 +2,7 @@ import PanelView from "./PanelView.js";
 import StoreManager from "./StoreManager.js";
 
 export default class PanelViewPreviewConsequence extends PanelView {
+
   constructor(elm) {
     super(elm, 'frenquecies');
     StoreManager.bind('selectedRow', this);
@@ -23,6 +24,7 @@ export default class PanelViewPreviewConsequence extends PanelView {
     if (StoreManager.getData('selectedRow') !== undefined) {
       const record = StoreManager.getSelectedRecord();
       if (record && record.transcripts && record.transcripts.length > 0) {
+        // consequence の取り出し
         let accessions = record.transcripts.map( transcript => transcript.consequence ).reduce((first, second) => first.concat(second) );
         accessions = Array.from(new Set(accessions));
         const master = StoreManager.getSearchConditionMaster('consequence');
@@ -33,4 +35,5 @@ export default class PanelViewPreviewConsequence extends PanelView {
     }
     this._content.innerHTML = html;
   }
+
 }

@@ -11,7 +11,9 @@ export default class PanelView {
     // collapse event
     elm.querySelector('.title').addEventListener('click', () => {
       elm.classList.toggle('-collapsed');
+      // localStorage にうめる
       window.localStorage.setItem(this.localStorageKey, elm.classList.contains('-collapsed') ? 'collapsed' : '');
     })
+
   }
 }

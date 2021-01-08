@@ -21,14 +21,22 @@ class StoreManager {
   }
 
   ready(callback) {
-    const json = require('../../assets/search_conditions.json');
-
-    Object.freeze(json);
-    this.setData('searchConditionsMaster', json);
-    this._store.searchConditions = this._extractSearchCondition(this._URIParameters);
-    callback();
-    this._isReady = true;
-    this._search(0);
+    Promise
+      .all([
+        fetch('../../assets/search_conditions.json')
+          .then(response => response.json())
+      ])
+      .then(responses => {
+        // 検索条件のマスターデータ
+        Object.freeze(responses[0]); // 変更不可にする
+        this.setData('searchConditionsMaster', responses[0]);
+        // 検索条件定義
+        this._store.searchConditions = this._extractSearchCondition(this._URIParameters);
+        callback();
+        this._isReady = true;
+        // 初回の検索結果取得
+        this._search(0);
+      });
   }
 
   getData(key) {
@@ -49,6 +57,7 @@ class StoreManager {
       if (record) {
         return this._copy(record);
       } else {
+        // 取得できていないレコードの取得
         this._search(this._store.offset + index);
         this.setData('appStatus', 'loading');
         return 'loading';
@@ -59,6 +68,7 @@ class StoreManager {
   }
 
   setData(key, value) {
+    // 当該データを持っていないか、当該データが不一致であれば、データをセット
     const
       isUndefined = this._store[key] === undefined,
       isMutated = typeof value === 'object' ?
@@ -70,14 +80,18 @@ class StoreManager {
     }
   }
 
+  // 検索結果は、特殊であるため専用メソッドを用意
   setResults(records, offset) {
+    // オフセット位置に結果をセット
     for (let i = 0; i < records.length; i++) {
       this._store.searchResults[offset + i] = records[i];
     }
+    // 通知
     this._notify('searchResults');
   }
 
   _notify(key) {
+    // 通知
     if (this._bindings[key]) {
       for (const watcher of this._bindings[key]) {
         let value = this._store[key];
@@ -96,7 +110,7 @@ class StoreManager {
   }
 
   _copy(value) {
-    switch (true) {
+    switch (true) { // 値渡し
       case Array.isArray(value):
         return JSON.parse(JSON.stringify(value));
       case typeof value === 'object':
@@ -106,6 +120,9 @@ class StoreManager {
     }
   }
 
+  // 検索条件 *******************************************
+  
+  // 検索条件は、特殊であるため専用メソッドを用意
   setSearchCondition(key, values) {
     this._setSearchConditions({[key]: values});
   }
@@ -114,14 +131,19 @@ class StoreManager {
     for (const conditionKey in conditions) {
       this._store.searchConditions[conditionKey] = conditions[conditionKey];
     }
+    // URIパラメータに反映
     if (!fromHistory) this._reflectSearchConditionToURI();
+    // 検索条件として成立していれば、検索開始
     if (this._isReady) {
+      // リセット
       this.setData('numberOfRecords', 0);
       this.setData('offset', 0);
       this.setData('rowCount', 0);
       this._store.searchResults = [];
       this.setResults([], 0);
+      // 通知
       this._notify('searchConditions');
+      // 検索
       this.setData('appStatus', 'searching');
       this._search(0);
     }
@@ -156,9 +178,10 @@ class StoreManager {
     return this.getData('searchConditionsMaster').find(condition => condition.id === key);
   }
 
+  // デフォルト値と異なる検索条件を抽出
   _extractSearchCondition(condition) {
     const searchConditionsMaster = this.getData('searchConditionsMaster');
-
+    // 差異
     const diffConditions = {};
     for (let conditionKey in condition) {
       const conditionMaster = searchConditionsMaster.find(condition => condition.id === conditionKey);
@@ -189,23 +212,31 @@ class StoreManager {
     return diffConditions;
   }
 
+  // URIパラメータをアドレスバーに反映
   _reflectSearchConditionToURI() {
     const master = this.getData('searchConditionsMaster');
     const diffConditions = this._extractSearchCondition(this._store.searchConditions);
+    // 一旦パラメータ削除
     for (const condition of master) {
       delete this._URIParameters[condition.id];
     }
+    // パラメータの合成
     Object.assign(this._URIParameters, diffConditions);
+    // URIパラメータに反映
     window.history.pushState(this._URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this._URIParameters)}`);
   }
 
+  // ヒストリーが変更されたら、URL変数を取得し検索条件を更新
   _popstate(e) {
     const URIParameters = $.deparam(window.location.search.substr(1));
     this._setSearchConditions(URIParameters, true);
   }
 
+
+  // 検索 *******************************************
   _search(offset) {
     if (this._fetching === true) {
+      // 検索中であれば実行せず
       return;
     }
     const lastConditions = JSON.stringify(this._store.searchConditions);
@@ -274,6 +305,7 @@ class StoreManager {
         this._notify('offset');
         this.setData('appStatus', 'normal');
 
+        // もし検索中に検索条件が変われば、再検索
         if (lastConditions !== JSON.stringify(this._store.searchConditions)) {
           this._setSearchConditions({});
         }
