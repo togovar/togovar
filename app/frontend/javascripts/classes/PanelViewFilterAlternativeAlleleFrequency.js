@@ -1,9 +1,9 @@
 /*global $ */
-
 import PanelView from "./PanelView.js";
 import StoreManager from "./StoreManager.js";
 
 export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView {
+
   constructor(elm) {
     super(elm, 'frequency');
     // references
@@ -19,7 +19,7 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
     this.sliderTo = this.slider.querySelector('.to');
     this.all = rangeSelector.querySelector('.match > label > .all');
     this.any = rangeSelector.querySelector('.match > label > .any');
-    // default
+    // デフォルト値
     this.conditionMaster = StoreManager.getSearchConditionMaster(this.kind);
     const condition = this.getFrequency();
     this.from.value = condition.from;
@@ -64,15 +64,17 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
 
   getFrequency() {
     let condition = StoreManager.getSearchCondition('frequency');
+    // 頻度フィルタが定義されていなければマスタから生成
     condition = condition ? condition : this.conditionMaster.items.reduce((acc, item) => Object.assign(acc, {[item.id]: item.default}), {});
     for (const item of this.conditionMaster.items) {
+      // 頻度フィルタの各項をみて、値がなければマスタのデフォルト値を使用
       condition[item.id] = condition[item.id] ? condition[item.id] : this.conditionMaster.items.find(frequency => frequency.id === item.id).default;
     }
     return condition;
   }
 
   _changeFilter(newCondition) {
-    switch (true) {
+    switch (true) { // 上限下限が入れ違わないよう調整
       case newCondition.from !== undefined:
         if (this.to.value <= newCondition.from) {
           newCondition.from = (parseFloat(this.to.value) - 0.001) + '';

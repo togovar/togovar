@@ -1,34 +1,646 @@
-main#SearchResultsMain.LayoutMainAside
-  .LayoutMain
-    #SearchView
-      .searchform
-        input#search-field.searchinput(placeholder='Search for disease or gene symbol or rs...', type='text')
-        button.searchbutton
-      dl.searchexamples
-        dt Disease
-        dd Breast-ovarian cancer, familial 2
-      dl.searchexamples
-        dt Gene
-        dd ALDH2
-      dl.searchexamples
-        dt refSNP
-        dd rs114202595
-      dl.searchexamples
-        dt TogoVar
-        dd tgv421843
-      dl.searchexamples
-        dt HGVSc
-        dd NM_000690:c.1510G&gt;A
-      dl.searchexamples
-        dt HGVSp
-        dd ALDH2:p.Glu504Lys
-      dl.searchexamples
-        dt Position(GRCh37/hg19)
-        dd 16:48258198
-      dl.searchexamples
-        dt Region(GRCh37/hg19)
-        dd 10:73270743-73376976
+#SearchInputView.module-tabs-view
+  nav.tabscontainer
+    ul
+      li(data-target="SimpleSearchView") Simple search
+      li(data-target="AdvancedSearchView").-current Advanced search
+      li(data-target="SearchHistoryView") Search history
+
+  .sectionscontainer
+
+    #SimpleSearchView.section
+      .search-form-ivew
+        .searchform
+          input#search-field.searchinput(type="text" placeholder="Search for disease or gene symbol or rs...")
+          button.searchbutton
+        dl.searchexamples
+          dt Disease
+          dd Breast-ovarian cancer, familial 2
+        dl.searchexamples
+          dt Gene
+          dd ALDH2
+        dl.searchexamples
+          dt refSNP
+          dd rs114202595
+        dl.searchexamples
+          dt TogoVar
+          dd tgv421843
+        dl.searchexamples
+          dt Position(GRCh37/hg19)
+          dd 16:48258198
+        dl.searchexamples
+          dt Region(GRCh37/hg19)
+          dd 10:73270743-73376976
       .suggest-view
+
+    #AdvancedSearchView.section.-current
+      .search-form-ivew
+        .searchform
+          input#advanced-search-field.searchinput(type="text" placeholder="Search for disease or gene symbol or rs...")
+          button.searchbutton
+      .module-tabs-view.-depth1.collapse-view(data-collapse-id="advanced-search")
+        a.collapsebutton
+        nav.tabscontainer
+          .collupsebutton
+          ul
+            li(data-target="AdvancedSearchBuilderView") Builder
+            li(data-target="AdvancedSearchDatasetsView").-current Datasets
+
+        .sectionscontainer.collapsecontent
+          #AdvancedSearchBuilderView.section
+            .inner
+              .buildersection
+                .advanced-search-group-view
+                  .menu
+                    .logical-operator-switch
+                      a.operator.-current(data-operator="and") AND
+                      a.operator(data-operator="or") OR
+                    .filling
+                    .deletebutton Delete
+                  .container
+                    .advanced-search-conditino-view(data-operator="equal" data-classification="disease")
+                      .classification Disease
+                      .operator
+                      .value
+                        input(type="text" placeholder="Disease name")
+                      .deletebutton
+                        
+
+              .conditionssection
+                p conditions
+          #AdvancedSearchDatasetsView.section.-current
+            .tablecontainer
+              table
+                thead
+                  tr
+                    th Data Set
+                    th Frequency|Count
+                    th Variant calling quality
+                tbody
+                  tr.checklist-values
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="")
+                        .dataset-icon(data-dataset="gem_j_wga")
+                          .properties                  
+                        p JEM-J WGA
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")
+
+                  tr.checklist-values
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="jga_ngs")
+                        .dataset-icon(data-dataset="jga_ngs")
+                          .properties                  
+                        p JGA NGS
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")
+                  tr.checklist-values
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="jga_snp")
+                        .dataset-icon(data-dataset="jga_snp")
+                          .properties                  
+                        p JGA SNP
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")
+
+                  tr.checklist-values
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="tommo_4.7kjpn")
+                        .dataset-icon(data-dataset="tommo_4.7kjpn")
+                          .properties                  
+                        p ToMMo 4.7KJPN
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")
+
+                  tr.checklist-values
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="hgvd")
+                        .dataset-icon(data-dataset="hgvd")
+                          .properties                  
+                        p  HGVD
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")
+
+                  tr.checklist-values
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="exac")
+                        .dataset-icon(data-dataset="exac")
+                          .properties                  
+                        p ExAC
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")
+                  tr.checklist-values
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="clinvar")
+                        .dataset-icon(data-dataset="clinvar")
+                          .properties                  
+                        p ClinVar
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")
+                  tr(data-depth="0").checklist-values.-nested.-haschildren.-opened
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="BBJ")
+                        .dataset-icon(data-dataset="BBJ")
+                          .properties                  
+                        p BBJ
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")
+                  tr(data-depth="1").checklist-values.-nested.-haschildren.-opened
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="BBJ")
+                        //- .dataset-icon(data-dataset="BBJ")
+                          .properties                  
+                        p Certain infections and parastic diseases
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")
+                  tr(data-depth="2").checklist-values.-nested
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="clinvar")
+                        //- .dataset-icon(data-dataset="clinvar")
+                        //-   .properties                  
+                        p Plumonary tuberclouds
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")
+                  tr(data-depth="2").checklist-values.-nested
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="BBJ")
+                        //- .dataset-icon(data-dataset="BBJ")
+                        //-   .properties                  
+                        p.-leveltwo Chronic hepatitis B
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")
+                  tr(data-depth="2").checklist-values.-nested
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="BBJ")
+                        //- .dataset-icon(data-dataset="BBJ")
+                        //-   .properties                  
+                        p Chronic hepatitis C
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")
+                  tr(data-depth="1").checklist-values.-haschildren.-nested.-closed
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="BBJ")
+                        //- .dataset-icon(data-dataset="BBJ")
+                        //-   .properties                  
+                        p Neoplams
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")
+                  tr(data-depth="1").-haschildren.checklist-values.-nested.-closed
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="BBJ")
+                        //- .dataset-icon(data-dataset="BBJ")
+                        //-   .properties                  
+                        p Diseases of the blood and blood-forming organs and certain disorders involving the immune mechanism
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")
+                  tr(data-depth="1").-haschildren.checklist-values.-nested.-closed
+                    td.dataset.item
+                      label.label
+                        input(type="checkbox" value="BBJ")
+                        //- .dataset-icon(data-dataset="BBJ")
+                        //-   .properties                  
+                        p Endocrine,nutritional and metabolic diseases
+                    td.frequencyandcount
+                      .range-selector
+                        .input
+                          input.from(type="number" value="0.000" min=0 max=1 step=0.01)
+                          | 〜
+                          input.to(type="number" value="1.000" min=0 max=1 step=0.01)
+                        .meter
+                          .barcontainer
+                            .bar.-primary
+                            .bar.-secondary
+                          .ruler
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                            .scale
+                          .slider
+                            .from
+                            .to                      
+                        label
+                          input(type="checkbox" value="")
+                          p Invert range
+                    td.variantcallingquality
+                      input(type="checkbox" value="")                      
+    #SearchHistoryView.section
+      p History
+
+
+main#SearchResultsView.LayoutMainAside
+  .LayoutMain
     #ResultsView
       header.header
         h2.heading Results

@@ -5,6 +5,7 @@ import StoreManager from "./StoreManager.js";
 const DECIMAL_DIGIT = 4;
 
 export default class PanelViewPreviewAlternativeAlleleFrequencies extends PanelView {
+
   constructor(elm) {
     super(elm, 'frenquecies');
     StoreManager.bind('selectedRow', this);
@@ -59,9 +60,11 @@ export default class PanelViewPreviewAlternativeAlleleFrequencies extends PanelV
           if (dataset.has_freq) {
             const frequency = record.frequencies ? record.frequencies.find(frequency => frequency.source === dataset.id) : null;
             if (frequency) {
+              // 頻度情報があれば頻度情報を表示
               this._datasets[dataset.id].alt.textContent = frequency.allele.count.toLocaleString();
               this._datasets[dataset.id].total.textContent = frequency.allele.number.toLocaleString();
               if ((frequency.allele.frequency + '').length > DECIMAL_DIGIT + 2) {
+                // 規定の桁数より大きい少数の場合、規定の少数に丸める。0になる場合は指数で表示
                 const numOfDigits = (frequency.allele.frequency + '').length;
                 const integerized = ((frequency.allele.frequency * 10 ** numOfDigits) + '').padStart(numOfDigits, '0');
                 const rounded = Math.round(parseFloat(integerized.slice(0, DECIMAL_DIGIT) + '.' + integerized.slice(DECIMAL_DIGIT)));
@@ -80,4 +83,5 @@ export default class PanelViewPreviewAlternativeAlleleFrequencies extends PanelV
       }
     }
   }
+
 }

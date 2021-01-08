@@ -2,6 +2,7 @@ import PanelView from "./PanelView.js";
 import StoreManager from "./StoreManager.js";
 
 export default class PanelViewPreviewClinicalSignificance extends PanelView {
+
   constructor(elm) {
     super(elm, 'clinicalSignificance');
     StoreManager.bind('selectedRow', this);
@@ -27,7 +28,7 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
           significance.interpretations ?
             significance.interpretations.map(interpretation => `<dd><div class="clinical-significance" data-sign="${interpretation}"></div>${master.items.find(item => item.id === interpretation).label}</dd>`).join('') :
             ''
-        }</dl>`).join('');
+          }</dl>`).join('');
         this.elm.classList.remove('-notfound');
       }
     } else {
@@ -35,4 +36,5 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
     }
     this.content.innerHTML = html;
   }
+
 }
