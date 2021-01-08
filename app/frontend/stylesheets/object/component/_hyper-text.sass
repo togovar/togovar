@@ -5,16 +5,13 @@
       display: inline-block
       margin-left: .25em
       color: lighten($COLOR_GRAY, 10)
-
   &:hover:after
     color: $COLOR_KEY
-
   &.-internal
     &:not([href=""])
       &:after
         content: $CHAR_ARROW_CIRCLE_RIGHT
         font-size: .8em
-
   &.-external
     &:not([href=""])
       &:after

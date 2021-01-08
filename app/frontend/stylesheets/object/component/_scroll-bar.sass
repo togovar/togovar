@@ -4,7 +4,6 @@
   right: 0
   width: 16px
   height: calc(100% - 96px)
-
   > .bar
     position: absolute
     width: 8px
@@ -15,10 +14,9 @@
     background-color: rgba($COLOR_GRAY, .5)
     opacity: 1
     transition: background-color $GUI_DURATION
-
     > .indicator
       position: absolute
-      background-color: $COLOR_KEY_DEEP
+      background-color: $COLOR_KEY_DARK1
       color: white
       font-size: 12px
       line-height: 18px
@@ -30,40 +28,31 @@
       opacity: 0
       pointer-events: none
       transition: opacity $TRANSITION_DURATION
-
       &:after
         content: ""
         display: block
         position: absolute
-        border-left: solid 9px $COLOR_KEY_DEEP
+        border-left: solid 9px $COLOR_KEY_DARK1
         border-top: solid 4px transparent
         border-bottom: solid 4px transparent
         top: 5px
         right: -7px
-
       > .position
         font-weight: bold
-
       > .total
         opacity: .75
-
         &:before
           content: "/ "
-
     &.-disabled
       display: none
-
     &.ui-draggable-dragging
       cursor: grabbing
-      background-color: rgba($COLOR_KEY_DEEP, .5)
-
+      background-color: rgba($COLOR_KEY_DARK1, .5)
   &:hover
     > .bar
-      background-color: rgba($COLOR_KEY_DEEP, .5)
-
+      background-color: rgba($COLOR_KEY_DARK1, .5)
       > .indicator
         opacity: 1
-
   &.-dragging
     > .bar
       > .indicator

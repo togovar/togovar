@@ -7,48 +7,38 @@ $PADDING_SIDE: 14px
   display: flex
   font-size: 14px
   line-height: 24px
-
   > .column
     + .column
       border-left: solid 1px $COLOR_SEPARATOR_SUB
-
     > .title
-      color: $COLOR_KEY_DEEP
+      color: $COLOR_KEY_DARK1
       font-size: 12px
       font-weight: normal
       line-height: 16px
       margin: 4px 0 0
       padding: 5px $PADDING_SIDE 0
-
     > .list
       margin-bottom: 10px
       padding-left: 0
       list-style: none
-
       > .item
         cursor: pointer
         padding: 0 $PADDING_SIDE
         height: 26px
         cursor: pointer
         transition: background-color $GUI_DURATION
-
         &:first-child
           padding-top: 4px
           height: 30px
-
         &:hover
           background-color: rgba($COLOR_SELECTED, .2)
-
         &.-disabled
           cursor: auto
-
           &:hover
             background-color: inherit
-
         > .sub
           padding-left: .5em
           color: rgba($COLOR_BLACK, .5)
           font-size: 12px
-
         &.-selected
           background-color: rgba($COLOR_SELECTED, 1)

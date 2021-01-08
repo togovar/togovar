@@ -1,0 +1,49 @@
+$PADDING_VERTICAL: 4px
+$HEIGHT: 30px
+$HEIGHT_INNER: $HEIGHT - ($PADDING_VERTICAL * 2)
+$CORNER_RADIUS: 3px
+
+.advanced-search-conditino-view
+  border-radius: $CORNER_RADIUS
+  background-color: lighten($COLOR_KEY, 20%)
+  color: $COLOR_BLACK
+  font-size: 14px
+  display: flex
+  box-shadow: 0 1px 1px rgba(black, .3)
+  padding: $PADDING_VERTICAL 8px $PADDING_VERTICAL 0
+  > .classification
+    background-color: $COLOR_BLACK
+    color: white
+    line-height: $HEIGHT
+    padding: 0 6px 0 8px
+    border-radius: $CORNER_RADIUS 0 0 $CORNER_RADIUS
+    cursor: grab
+    margin: #{-$PADDING_VERTICAL} 8px #{-$PADDING_VERTICAL} 0
+    font-weight: bold
+  > .operator
+    width: $HEIGHT_INNER
+    height: $HEIGHT_INNER
+    border: solid 1px rgba(black, .2)
+    border-radius: $CORNER_RADIUS
+    margin-right: 8px
+    position: relative
+    cursor: pointer
+    &:before, &:after
+      content: ""
+      display: block
+      position: absolute
+    &:before
+      width: 8px
+      height: 2px
+      top: 7px
+      left: 6px
+      background-color: rgba(black, .6)
+      box-shadow: 0 4px rgba(black, .6)
+  > .value
+    > input[type="text"]
+      padding: 0 8px
+      //box-sizing: border-box
+      line-height: $HEIGHT_INNER - 2px
+      border: solid 1px $COLOR_KEY_DARK3
+      border-radius: 2px
+  > .deletebutton

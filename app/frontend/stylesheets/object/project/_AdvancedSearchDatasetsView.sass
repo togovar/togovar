@@ -1,0 +1,140 @@
+#AdvancedSearchDatasetsView
+  padding: 14px $PADDING_SIDE 14px
+  background-color: $COLOR_KEY
+  color: $COLOR_BLACK
+  >.tablecontainer
+    background-color: white
+    >table
+      width: 100%
+      > thead
+        font-size: 12px
+        font-weight: bold
+        border-bottom: 2px solid $COLOR_GRAY
+        > tr > th
+          padding: 10px 10px 5px 10px
+          margin-bottom: 0
+      > tbody
+        > .checklist-values
+          height: 22px
+          border-bottom: 1px solid $COLOR_LIGHT_GRAY
+          padding: 3px 10px
+          > .dataset
+            width: 50%
+            padding: 0px 10px
+          > .item
+            display: inline-flex
+            height: 22px
+            > label
+              display: flex
+              align-items: center
+              margin-bottom: 0
+              position: relative
+              > .dataset-icon
+                display: flex
+                width: 30px
+                >.properties
+                  left: 2px
+              > p
+                padding-left: $PADDING_SIDE
+                margin-bottom: 0px
+                width: 500px
+          &[data-depth="1"]
+            > .dataset
+              > .label
+                > p
+                  position: absolute
+                  left: 43px + $PADDING_SIDE
+          &[data-depth="2"]
+            > .dataset
+              > .label
+                > p
+                  position: absolute
+                  left: 43px + $PADDING_SIDE + $PADDING_SIDE
+                  font-weight: normal
+          // &.-haschildren
+          &.-nested
+            border-bottom: 1px dashed $COLOR_LIGHT_GRAY
+          &.-opened
+            > td
+              > label
+                > p
+                  position: relative
+                  &:before
+                    content: ""
+                    display: block
+                    position: absolute
+                    top: 6px
+                    left: 6px
+                    width: 5px
+                    height: 5px
+                    border-top: 1px solid $COLOR_BLACK
+                    border-right: 1px solid $COLOR_BLACK
+                    transform: translateX(-50%) rotate(135deg)
+          &.-closed
+            > td
+              > label
+                > p
+                  position: relative
+                  &:before
+                    content: ""
+                    display: block
+                    position: absolute
+                    top: 6px
+                    left: 6px
+                    width: 5px
+                    height: 5px
+                    border-top: 1px solid $COLOR_BLACK
+                    border-right: 1px solid $COLOR_BLACK
+                    transform: translateX(-50%) rotate(45deg)
+          > .frequencyandcount
+            width: 40%
+            min-width: 490px
+            padding: 0px 10px
+            > .range-selector
+              display: flex
+              height: 22px
+              > .input
+                align-items: center
+                > input
+                  width: 52px
+                  height: 17px
+                  text-align: center
+                & .from
+                  margin-right: 5px
+                & .to
+                  margin-left: 5px
+              > .meter
+                width: 240px
+                padding: 2px 8px
+                > .barcontainer
+                  top: 4px
+                > .ruler
+                  top: -4px
+                  padding-bottom: 0
+                  border-top: solid 1px lighten($COLOR_GRAY, 15%) 
+                  > .scale
+                    top: 0px
+                  > .scale:before
+                    content: ""
+                    border-left: solid 1px lighten($COLOR_GRAY, 15%)
+                    height: 16px
+                    top: -8px
+              > label
+                height: 22px
+                display: flex
+                align-items: center
+                margin: 0
+                padding: 0px 10px
+                > p
+                  font: size 12px
+                  font-weight: bold
+                  margin-bottom: 0
+          > .variantcallingquality
+            position: relative
+            height: 22px
+            width: 10%
+            min-width: 130px
+            padding: 0px 10px
+            > input
+              position: relative
+              top: 2px

@@ -2,7 +2,6 @@
   height: 18px
   font-family: fontello
   position: relative
-
   &:before
     content: $CHAR_DATASET
     margin-right: 2px
@@ -10,7 +9,6 @@
     left: 2px
     display: inline-block
     height: 18px
-
   > .properties
     font-size: 10px
     display: inline-flex
@@ -25,7 +23,6 @@
     vertical-align: middle
     height: 20px
     transform: scale(.9)
-
     &::before, &::after
       display: block
       height: 10px
@@ -33,23 +30,18 @@
   &[data-dataset="jga_ngs"], &[data-dataset="jga_snp"]
     &:before
       color: $COLOR_DATASET_JGA
-
   &[data-dataset="tommo_4.7kjpn"]
     &:before
       color: $COLOR_DATASET_3_5KJPN
-
   &[data-dataset="hgvd"], &[data-dataset="mgend"]
     &:before
       color: $COLOR_DATASET_HGVD
-
   &[data-dataset="gem_j_wga"]
     &:before
       color: $COLOR_DATASET_GEM_J
-
   &[data-dataset="bbj"]
     &:before
       color: $COLOR_DATASET_BBJ
-
   &[data-dataset="clinvar"], &[data-dataset="exac"], &[data-dataset="gnomad"]
     &:before
       color: $COLOR_DATASET_FOREIGN

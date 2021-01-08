@@ -12,10 +12,8 @@ $WIDTH_BAND_LABEL: 32px
   position: relative
   text-align: left
   transition: width $GUI_DURATION
-
   > .upper
     height: $HEIGHT_UPPER
-
     > .no
       text-align: center
       font-size: 12px
@@ -29,29 +27,23 @@ $WIDTH_BAND_LABEL: 32px
       position: relative
       left: ($WIDTH_VIEW - $SIZE_NUMBER) * .5
       transition: left $GUI_DURATION
-
   > .lower
     position: relative
-
     > .filteredregion, > .displayregion, > .selectedregion
       position: absolute
       width: $WIDTH_INDICATOR1
       left: ($WIDTH_VIEW - $WIDTH_INDICATOR1) * .5
       opacity: 0
       transition: opacity $GUI_DURATION, height $GUI_DURATION, top $GUI_DURATION, left $GUI_DURATION
-
       &.-shown
         opacity: 1
-
     > .filteredregion
       background-color: rgba($COLOR_SELECTED, .4)
-
     > .displayregion
       border: solid 1px $COLOR_SELECTED
       border-radius: 2px
       width: $WIDTH_INDICATOR2
       left: ($WIDTH_VIEW - $WIDTH_INDICATOR2) * .5
-
     > .chromosome
       width: $WIDTH_CHROMOSOME
       display: block
@@ -59,63 +51,47 @@ $WIDTH_BAND_LABEL: 32px
       left: ($WIDTH_VIEW - $WIDTH_CHROMOSOME) * .5
       filter: drop-shadow(0 4px 4px rgba(black, .5))
       transition: width $GUI_DURATION, left $GUI_DURATION
-
       > .subband
         > .subbandrect
           &.acen
             fill: url(#chromosome-acen)
-
           &.gneg
             fill: url(#chromosome-gneg)
-
           &.gpos25
             fill: url(#chromosome-gpos25)
-
           &.gpos50
             fill: url(#chromosome-gpos50)
-
           &.gpos75
             fill: url(#chromosome-gpos75)
-
           &.gpos100
             fill: url(#chromosome-gpos100)
-
           &.gvar
             fill: url(#chromosome-gpos100)
-
           &.stalk
             fill: url(#chromosome-stalk)
-
       > .band
         > .bandtext
           font-size: 12px
           line-height: 12px
           fill: white
-
         > .line
           stroke: white
           stroke-width: .5px
           fill: transparent
-
     > .selectedregion
       background-color: rgba($COLOR_SELECTED, .15)
       border-radius: 1px
-
 .-show-band-label
   .chromosome-view
     width: $WIDTH_VIEW + $WIDTH_BAND_LABEL
-
     > .upper
       > .no
         left: ($WIDTH_VIEW + $WIDTH_BAND_LABEL - $SIZE_NUMBER) * .5
-
     > .lower
       > .filteredregion, > .displayregion, > .selectedregion
         left: ($WIDTH_VIEW + $WIDTH_BAND_LABEL - $WIDTH_INDICATOR1) * .5
-
       > .displayregion
         left: ($WIDTH_VIEW + $WIDTH_BAND_LABEL - $WIDTH_INDICATOR2) * .5
-
       > .chromosome
         width: $WIDTH_CHROMOSOME + $WIDTH_BAND_LABEL
         left: ($WIDTH_VIEW + $WIDTH_BAND_LABEL - $WIDTH_CHROMOSOME) * .5

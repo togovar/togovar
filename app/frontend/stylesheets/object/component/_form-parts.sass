@@ -3,10 +3,8 @@ $HEIGHT: 20px
 .form-parts
   > *
     display: inline-block
-
   > .label
     margin-right: .5em
-
   > .togglebuttons
     display: inline-block
     height: $HEIGHT
@@ -15,7 +13,6 @@ $HEIGHT: 20px
     background-color: $COLOR_LIGHT_GRAY
     padding: 1px
     margin-left: -2px
-
     > .button
       display: inline-block
       line-height: 18px
@@ -25,26 +22,22 @@ $HEIGHT: 20px
       cursor: pointer
       border-radius: 9px
       transition: background-color $GUI_DURATION, color $GUI_DURATION, border $GUI_DURATION, box-shadow $GUI_DURATION, line-height $GUI_DURATION
-
       &:hover
-        color: $COLOR_KEY_DARK
-
+        color: $COLOR_KEY_DARK3
       &.-current
         background-color: white
-        color: $COLOR_KEY_DEEP
+        color: $COLOR_KEY_DARK1
         border: solid 1px $COLOR_KEY
         line-height: 16px
         box-shadow: 0 1px 2px rgba(black, .2)
-
   > .select
     height: $HEIGHT - 2px
     line-height: 1
     border: none
-
   > .input
     height: $HEIGHT - 2px
     line-height: 1
     border-radius: $HEIGHT * 0.5
     border: none
-    padding: 0 8px
+    padding: 0px 8px
     box-shadow: 0 1px 1px rgba(0, 0, 0, .3) inset
