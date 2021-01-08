@@ -9,16 +9,14 @@
   opacity: 0
   pointer-events: none
   transition: opacity $TRANSITION_DURATION
-
   > .bg
-    background: radial-gradient(ellipse at center, rgba($COLOR_KEY, .3) 10%, rgba($COLOR_KEY, .2) 60%, rgba($COLOR_KEY_DARK, .1) 120%)
+    background: radial-gradient(ellipse at center, rgba($COLOR_KEY, .3) 10%, rgba($COLOR_KEY, .2) 60%, rgba($COLOR_KEY_DARK3, .1) 120%)
     width: 100%
     height: 100%
     position: absolute
     top: 0
     left: 0
     transition: background $TRANSITION_DURATION
-
   > .plate
     background-color: white
     width: 800px
@@ -29,34 +27,27 @@
     max-height: calc(100% - 50px)
     overflow-y: auto
     border-radius: 5px
-
     > .header
       padding: 12px $PADDING_SIDE 8px
       border-bottom: solid .5px $COLOR_SEPARATOR
       margin-bottom: 0
-
     > .container
       padding: 8px $PADDING_SIDE 12px
-
       > table
         width: 100%
         font-size: 12px
         line-height: 16px
-
         > tbody
           > tr
             > th, > td
               padding: 4px 0
-
             > th
               vertical-align: top
               text-align: right
               padding-right: 1em
               white-space: nowrap
-
               &:after
                 content: ":"
-
             > td
               > .group
                 margin-bottom: 0
@@ -64,18 +55,14 @@
                 margin-block-start: 0
                 margin-block-end: 0
                 padding-inline-start: 0
-
                 > li
                   display: inline-block
                   margin-bottom: 2px
                   margin-right: 1em
-
                   > label
                     margin-bottom: 0
-
   &.-shown
     opacity: 1
     pointer-events: auto
-
     > .bg
-      background: radial-gradient(ellipse at center, rgba($COLOR_KEY, .3) 10%, rgba($COLOR_KEY, .7) 60%, rgba($COLOR_KEY_DARK, .9) 120%)
+      background: radial-gradient(ellipse at center, rgba($COLOR_KEY, .3) 10%, rgba($COLOR_KEY, .7) 60%, rgba($COLOR_KEY_DARK3, .9) 120%)

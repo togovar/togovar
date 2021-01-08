@@ -14,43 +14,35 @@
     font-size: 10px
     font-weight: bold
     vertical-align: top
-
   &[data-sign="P"]:before
     color: $COLOR_SIGN_DANGEROUS
     border-color: $COLOR_SIGN_DANGEROUS
     background-color: lighten($COLOR_SIGN_DANGEROUS, 30%)
-
   &[data-sign="LP"]:before
     color: $COLOR_SIGN_WARNING
     border-color: $COLOR_SIGN_WARNING
     background-color: lighten($COLOR_SIGN_WARNING, 45%)
-
   &[data-sign="US"]:before
     color: $COLOR_SIGN_UNKNOWN
     border-color: $COLOR_SIGN_UNKNOWN
     background-color: lighten($COLOR_SIGN_UNKNOWN, 35%)
-
   &[data-sign="LB"]:before
     color: $COLOR_SIGN_NORMAL
     border-color: $COLOR_SIGN_NORMAL
     background-color: lighten($COLOR_SIGN_NORMAL, 42%)
-
   &[data-sign="B"]:before
     color: $COLOR_SIGN_SAFE
     border-color: $COLOR_SIGN_SAFE
     background-color: lighten($COLOR_SIGN_SAFE, 45%)
-
   &[data-sign="CI"]:before
     color: $COLOR_SIGN_MODIFIER
     border-color: $COLOR_SIGN_MODIFIER
     background-color: lighten($COLOR_SIGN_MODIFIER, 30%)
-
   &[data-sign="DR"], &[data-sign="A"], &[data-sign="RF"], &[data-sign="PR"], &[data-sign="AF"], &[data-sign="O"]
     &:before
       color: $COLOR_SIGN_OTHER
       border-color: $COLOR_SIGN_OTHER
       background-color: lighten($COLOR_SIGN_OTHER, 60%)
-
   &[data-sign="NP"]:before, &[data-sign="AN"]:before
     color: $COLOR_BLACK
     border-color: $COLOR_GRAY

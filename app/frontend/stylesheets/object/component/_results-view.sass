@@ -4,15 +4,12 @@
   line-height: 18px
   border-right: solid $PADDING_SIDE white
   width: 100%
-
   > thead
     > tr
       border-bottom: solid 2px $COLOR_BLACK
       height: 36px
-
       > th
         position: relative
-
         > p
           position: absolute
           transform-origin: 0 100%
@@ -20,19 +17,15 @@
           bottom: -17px
           left: 9px
           font-size: 12px
-
         &.separator
           border-bottom: solid 2px white
-
           &:before
             content: ""
             width: 28px
             display: block
-
       &.groupingrow
         border-bottom: none
         height: 4px
-
         > th
           > p
             bottom: -51px
@@ -42,18 +35,15 @@
             padding-bottom: 15px
             left: 0px
             font-weight: normal
-
   > tbody
     > tr
       border-bottom: solid 1px $COLOR_SEPARATOR
       transition: background $GUI_DURATION
       height: 27px
-
       > td
         min-width: 2em
         padding: 2px 10px 2px 6px
         transition: background $GUI_DURATION
-
         &[data-remains]:after
           content: "+" attr(data-remains)
           display: inline-block
@@ -65,15 +55,12 @@
           padding: 0 4px
           margin-left: 4px
           vertical-align: middle
-
         &[data-remains="0"]:after, &[data-remains=""]:after
           display: none
-
         &.separator
           border-bottom: solid 1px white
           position: relative
           color: $COLOR_KEY
-
           &:before
             content: ""
             display: block
@@ -87,22 +74,19 @@
         > .consequence-item, > .dataset-icon, > .clinical-significance, > .variant-function
           display: inline-block
           vertical-align: middle
-
         &:last-child
           padding-right: 6px
 
         > .frequency-graph
+          //position: relative
 
       &:hover
         background-color: rgba($COLOR_SELECTED, .2)
-
       &.-selected
         background-color: rgba($COLOR_SELECTED, .4)
-
       &.-loading
         > td
-          background: url('../images/loading.gif') no-repeat 50% 50%, rgba(black, .05)
+          background: url(../images/loading.gif) no-repeat 50% 50%, rgba(black, .05)
           background-size: 30px 10px
-
       &.-out-of-range
         display: none

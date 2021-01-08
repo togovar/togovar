@@ -1,0 +1,27 @@
+.collapse-view
+  .collapsebutton
+    cursor: pointer
+    position: absolute
+    transition: top $GUI_DURATION
+    &:before
+      content: ""
+      display: block
+      width: 7px
+      height: 7px
+      border-top-width: .1rem
+      border-left-width: .1rem
+      border-style: solid
+      border-color: #fff
+      border-right: none
+      border-bottom: none
+      transform: rotate(45deg)
+      transition: transform $GUI_DURATION
+
+  .collapsecontent
+
+  &.-collapsed
+    .collapsebutton
+      &:before
+        transform: rotate(225deg)
+    .collapsecontent
+      display: none

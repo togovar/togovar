@@ -4,14 +4,12 @@
   box-shadow: 0 2px 2px rgba(black, .3)
   font-size: 12px
   position: relative
-
   > .title
     margin-bottom: 0
     padding: 8px $PADDING_PANEL_VIEW 6px
     border-bottom: solid 1px $COLOR_SEPARATOR
     font-size: 14px
     line-height: 16px
-
     &:after
       content: ""
       display: block
@@ -24,7 +22,6 @@
       right: 12px
       top: 13px
       transition: transform $GUI_DURATION, top $GUI_DURATION
-
   > .close
     position: absolute
     width: 16px
@@ -32,23 +29,17 @@
     top: 8px
     right: 7px
     cursor: pointer
-
   > .content
     padding: 6px $PADDING_PANEL_VIEW 10px
-
   + .panel-view
     margin-top: 5px
-
   label
     margin-bottom: 0
-
   &.-cannotcollapse
     > .title
       cursor: inherit
-
       &:after
         display: none
-
   &.-notfound
     &:after
       content: "Not found"
@@ -57,34 +48,26 @@
       color: $COLOR_GRAY
       margin: -8px 0 0
       padding-bottom: 10px
-
   &.-collapsed
     > .title
       border-bottom: none
-
       &:after
         transform: rotate(225deg)
         top: 10px
-
     > .content
       display: none
-
     &.-notfound
       &:after
         content: ""
         display: none
-
   &.-emphasize
     background: $GRADIENT_HEADING
     transition: background-color $GUI_DURATION
-
     &.-disable
       color: white
       background: $GRADIENT_HEADING_DISABLE
-
     &:hover
-      background-color: $COLOR_KEY_DEEP
-
+      background-color: $COLOR_KEY_DARK1
     > .title
       > a, span
         color: white
@@ -92,7 +75,6 @@
         padding: 8px $PADDING_PANEL_VIEW 6px
         margin: -8px #{-$PADDING_PANEL_VIEW} -6px
         display: block
-
         &.hyper-text
           &:after
             color: white

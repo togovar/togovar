@@ -1,17 +1,13 @@
 $SIZE: 30px
 
-#SearchView
-  background-color: desaturate(lighten($COLOR_KEY, 18%), 8%)
-  padding: 14px $PADDING_SIDE 10px
-
+.search-form-ivew
   > .searchform
     margin-bottom: 4px
-
     > .searchinput
       width: calc(100% - #{$SIZE - 2px})
       line-height: $SIZE
       height: $SIZE
-      border: solid 1px $COLOR_KEY_DEEP
+      border: solid 1px $COLOR_KEY_DARK2
       border-radius: $SIZE * 0.5
       margin-left: -3px
       padding: 0 12px
@@ -19,40 +15,34 @@ $SIZE: 30px
       font-size: 12px
       outline: none
       opacity: .9
-
       &:focus
         opacity: 1
-
     > .searchbutton
       width: $SIZE
       height: $SIZE
-      border: solid 1px $COLOR_KEY_DEEP
+      border: solid 1px $COLOR_KEY_DARK1
       border-radius: 100%
       margin-right: -4px
       position: relative
       background-color: white
       box-shadow: 0 1px 1px rgba(black, 0.2)
-
       &:before, &:after
         content: ""
         display: block
         position: absolute
-
       &:before
         width: 12px
         height: 12px
-        border: solid 2px $COLOR_KEY_DEEP
+        border: solid 2px $COLOR_KEY_DARK1
         border-radius: 6px
         top: 6px
         left: 6px
-
       &:after
         height: 5px
-        border-left: solid 2px $COLOR_KEY_DEEP
+        border-left: solid 2px $COLOR_KEY_DARK1
         transform: rotate(-45deg)
         top: 16px
         left: 17px
-
   > .searchexamples
     font-size: 12px
     line-height: 16px
@@ -62,30 +52,16 @@ $SIZE: 30px
     border-radius: 8px
     cursor: pointer
     transition: background-color $GUI_DURATION, box-shadow $GUI_DURATION
-
     > dt, > dd
       display: inline-block
       margin-bottom: 0
+      color: white
       transition: color $GUI_DURATION
-
     > dt
       font-weight: normal
-      color: rgba(black, .4)
-
+      opacity: .6
       &:after
         content: ":"
-
     > dd
-      color: $COLOR_BLACK
-
     &:hover
-      background-color: $COLOR_KEY_DEEP
-      box-shadow: 0 1px 0px rgba(black, .4)
-
-      > dt, > dd
-        color: white
-
-  > .suggest-view
-    position: absolute
-    top: 94px + $HEIGHT_NBDC_COMMON_HEADER
-    left: 21px
+      background-color: $COLOR_KEY_DARK2

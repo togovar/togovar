@@ -1,6 +1,5 @@
 #Messages
   padding-right: 10px
-
   > .message
     padding: 4px 6px 4px 20px
     border-width: 1px
@@ -8,34 +7,27 @@
     border-radius: 4px
     margin-bottom: 4px
     position: relative
-
     &:before
       font-family: "FontAwesome"
       position: absolute
       top: 50%
       transform: translateY(-50%)
       left: 6px
-
     &.-error
       border-color: darken($COLOR_SIGN_DANGEROUS, 2%)
       background-color: lighten($COLOR_SIGN_DANGEROUS, 30%)
-
       &:before
         content: $CHAR_TIMES
         color: darken($COLOR_SIGN_DANGEROUS, 2%)
-
     &.-warning
       border-color: darken($COLOR_SIGN_WARNING, 2%)
       background-color: lighten($COLOR_SIGN_WARNING, 45%)
-
       &:before
         content: $CHAR_EXCRAMATION_TRIANGLE
         color: darken($COLOR_SIGN_WARNING, 2%)
-
     &.-notice
       border-color: darken($COLOR_SIGN_NORMAL, 2%)
       background-color: lighten($COLOR_SIGN_NORMAL, 42%)
-
       &:before
         content: $CHAR_INFO_CIRCLE
         color: darken($COLOR_SIGN_NORMAL, 2%)
