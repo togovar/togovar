@@ -21,22 +21,33 @@ class StoreManager {
   }
 
   ready(callback) {
-    Promise
-      .all([
-        fetch('../../assets/search_conditions.json')
-          .then(response => response.json())
-      ])
-      .then(responses => {
-        // 検索条件のマスターデータ
-        Object.freeze(responses[0]); // 変更不可にする
-        this.setData('searchConditionsMaster', responses[0]);
-        // 検索条件定義
-        this._store.searchConditions = this._extractSearchCondition(this._URIParameters);
-        callback();
-        this._isReady = true;
-        // 初回の検索結果取得
-        this._search(0);
-      });
+    const json = require('../../assets/search_conditions.json');
+    // 検索条件のマスターデータ
+    Object.freeze(json);
+    this.setData('searchConditionsMaster', json);
+    // 検索条件定義
+    this._store.searchConditions = this._extractSearchCondition(this._URIParameters);
+    callback();
+    this._isReady = true;
+    // 初回の検索結果取得
+    this._search(0);
+
+    //Promise
+    //  .all([
+    //    fetch('../../assets/search_conditions.json')
+    //      .then(response => response.json())
+    //  ])
+    //  .then(responses => {
+    //    // 検索条件のマスターデータ
+    //    Object.freeze(responses[0]); // 変更不可にする
+    //    this.setData('searchConditionsMaster', responses[0]);
+    //    // 検索条件定義
+    //    this._store.searchConditions = this._extractSearchCondition(this._URIParameters);
+    //    callback();
+    //    this._isReady = true;
+    //    // 初回の検索結果取得
+    //    this._search(0);
+    //  });
   }
 
   getData(key) {
