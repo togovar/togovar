@@ -216,13 +216,17 @@ export default class Karyotype {
     this._bandHideButton = Array.from(buttons).filter(elm => elm.dataset.value === 'hide')[0];
 
     // 染色体座標データ
-    fetch(`./assets/${karyotype.reference}.tsv`)
-      .then(response => response.text())
-      .then(tsv => {
-        this.geneMap = this.parseGeneMap(tsv);
-        this.maxLength = Math.max(...this.geneMap.map(chromosome => chromosome[chromosome.length - 1].end));
-        this.drawChromosome(this.geneMap);
-      });
+    const tsv = require(`../../assets/${karyotype.reference}.tsv`);
+    this.geneMap = this.parseGeneMap(tsv);
+    this.maxLength = Math.max(...this.geneMap.map(chromosome => chromosome[chromosome.length - 1].end));
+    this.drawChromosome(this.geneMap);
+    //fetch(`./assets/${karyotype.reference}.tsv`)
+    //  .then(response => response.text())
+    //  .then(tsv => {
+    //    this.geneMap = this.parseGeneMap(tsv);
+    //    this.maxLength = Math.max(...this.geneMap.map(chromosome => chromosome[chromosome.length - 1].end));
+    //    this.drawChromosome(this.geneMap);
+    //  });
 
     // ストアの情報を反映
     this.karyotype(StoreManager.getData('karyotype'));
@@ -231,10 +235,11 @@ export default class Karyotype {
   // TSVから総位置データ取り出し
   parseGeneMap(tsv) {
     const geneMap = [];
-    const positions = tsv.split('\n').map(row => row.split('\t'));
+    //const positions = tsv.split('\n').map(row => row.split('\t'));
     for (const chromosomeKey of CHROMOSOME_KEYS) {
       // 染色体ごとの位置データ
-      const chromosome = positions.filter(position => position[0] === `chr${chromosomeKey}`);
+      const chromosome = tsv.filter(position => position[0] === `chr${chromosomeKey}`);
+      //const chromosome = positions.filter(position => position[0] === `chr${chromosomeKey}`);
       // データ整形
       geneMap.push(chromosome.map(position => {
         return {
