@@ -17,10 +17,16 @@ import Configuration from '../javascripts/classes/Configuration.js';
 import SelectedRowIndicator from '../javascripts/classes/SelectedRowIndicator.js';
 import Karyotype from '../javascripts/classes/Karyotype.js';
 import ActivityIndicator from '../javascripts/classes/ActivityIndicator.js';
+import ModuleTabsView from '../javascripts/classes/ModuleTabsView.js';
+import CollapseViewManager from '../javascripts/classes/CollapseViewManager.js';
+import TopPageLayoutManager from '../javascripts/classes/TopPageLayoutManager.js';
+// PanelViews
+// PanelViews: Filters
 import PanelViewCheckList from '../javascripts/classes/PanelViewCheckList.js';
 import PanelViewFilterAlternativeAlleleFrequency from '../javascripts/classes/PanelViewFilterAlternativeAlleleFrequency.js';
 import PanelViewFilterVariantCallingQuality from '../javascripts/classes/PanelViewFilterVariantCallingQuality.js';
 import PanelViewFilterConsequence from '../javascripts/classes/PanelViewFilterConsequence.js';
+// PanelViews: Variant preview
 import PanelViewPreviewGene from '../javascripts/classes/PanelViewPreviewGene.js';
 import PreviewToVariantReport from '../javascripts/classes/PreviewToVariantReport.js';
 import PanelViewPreviewExternalLinks from '../javascripts/classes/PanelViewPreviewExternalLinks.js';
@@ -52,6 +58,8 @@ function init() {
 
   new ActivityIndicator(document.getElementById('ActivityIndicator'));
 
+  new CollapseViewManager();
+
   switch (PAGE) {
     case 'home':
       initHome();
@@ -63,12 +71,19 @@ function init() {
 
 function initHome() {
   StoreManager.ready(() => {
-    new SearchConditionController(document.getElementById('SearchView'));
+    // 検索窓
+    new SearchConditionController(document.getElementById('SimpleSearchView'));
+    // モジュールタブメニュー
+    document.querySelectorAll('.module-tabs-view').forEach(elm => {
+      new ModuleTabsView(elm);
+    });
 
+    // 検索結果表示画面
     new ResultsView(document.getElementById('ResultsView'));
 
+    // サイドバー
     new SideBar(document.getElementById('SideBar'));
-
+    // aside 要素の準備（フィルター）
     new PanelViewCheckList(document.getElementById('FilterDatasets'), 'dataset', 'statisticsDataset');
     new PanelViewFilterAlternativeAlleleFrequency(document.getElementById('FilterAlternativeAlleleFrequency'));
     new PanelViewFilterVariantCallingQuality(document.getElementById('FilterVariantCallingQuality'));
@@ -77,14 +92,16 @@ function initHome() {
     new PanelViewFilterConsequence(document.getElementById('FilterConsequence'));
     new PanelViewCheckList(document.getElementById('FilterSIFT'), 'sift');
     new PanelViewCheckList(document.getElementById('FilterPolyPhen'), 'polyphen');
-
+    // aside 要素の準備（バリアントプレビュー）
     new PanelViewPreviewGene(document.getElementById('PreviewGene'));
     new PreviewToVariantReport(document.getElementById('PreviewToVariantReport'));
     new PanelViewPreviewExternalLinks(document.getElementById('PreviewExternalLinks'));
     new PanelViewPreviewAlternativeAlleleFrequencies(document.getElementById('PreviewAlternativeAlleleFrequencies'));
     new PanelViewPreviewConsequence(document.getElementById('PreviewConsequence'));
     new PanelViewPreviewClinicalSignificance(document.getElementById('PreviewClinicalSignificance'));
-
+    // インジケータ
     new SelectedRowIndicator(document.getElementById('RowIndicator'));
+    // レイアウトマネージャ
+    TopPageLayoutManager.init();
   });
 }
