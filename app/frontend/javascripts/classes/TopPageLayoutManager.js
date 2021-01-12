@@ -15,7 +15,7 @@ class TopPageLayoutManager {
 
   update() {
     const drawerHeight = window.innerHeight - this._drawerView.offsetTop;
-    this._SearchResultsView.style.height = `calc(100vh - ${this._GlobalHeaderHeight + this._SearchInputView.clientHeight + drawerHeight}px)`
+    this._SearchResultsView.style.height = `calc(100vh - ${this._GlobalHeaderHeight + this._SearchInputView.clientHeight + drawerHeight}px)`;
   }
 
 }
