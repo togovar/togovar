@@ -30,9 +30,6 @@ export default class ResultsView {
     this.tbody = this.elm.querySelector('.tablecontainer > table.results-view > tbody');
 
     // スクロール制御
-    // リサイズされたらスクロール領域の更新
-    window.addEventListener('resize', this.resize.bind(this));
-    window.dispatchEvent(new Event('resize'));
     // スクロールイベント
     const mousewheelevent = 'onwheel' in document ? 'wheel' : 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
     this.tbody.addEventListener(mousewheelevent, this.scroll.bind(this));
@@ -44,7 +41,7 @@ export default class ResultsView {
     this.columns(StoreManager.getData('columns'));
   }
 
-  resize() {
+  updateDisplaySize() {
     // 表示数
     const
       maxRowCount = Math.floor((window.innerHeight - this.tbody.getBoundingClientRect().top - StoreManager.getData('karyotype').height - COMMON_FOOTER_HEIGHT - 2) / TR_HEIGHT),
@@ -142,7 +139,7 @@ export default class ResultsView {
   }
 
   searchResults(results) {
-    this.resize();
+    this.updateDisplaySize();
   }
 
   // カラムの表示／非表示
@@ -203,7 +200,7 @@ export default class ResultsView {
   }
 
   karyotype(karyotype) {
-    this.resize();
+    this.updateDisplaySize();
   }
 
 }

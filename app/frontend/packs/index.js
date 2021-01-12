@@ -77,7 +77,7 @@ function initHome() {
     });
 
     // 検索結果表示画面
-    new ResultsView(document.getElementById('ResultsView'));
+    const resultView = new ResultsView(document.getElementById('ResultsView'));
 
     // サイドバー
     new SideBar(document.getElementById('SideBar'));
@@ -99,10 +99,10 @@ function initHome() {
     new PanelViewPreviewClinicalSignificance(document.getElementById('PreviewClinicalSignificance'));
     // インジケータ
     new SelectedRowIndicator(document.getElementById('RowIndicator'));
-    // レイアウトマネージャ
-    TopPageLayoutManager.init();
     // 開閉
     const elm = document.querySelector('#AdvancedSearchView .collapse-view');
     new CollapseView(elm);
+    // レイアウトマネージャ
+    TopPageLayoutManager.init([resultView]);
   });
 }
