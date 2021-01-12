@@ -1,12 +1,9 @@
 import TopPageLayoutManager from "./TopPageLayoutManager.js";
 
-export default class CollapseViewManager {
+export default class CollapseView {
 
-  constructor() {
-    //this.elm = elm;
-    document.querySelectorAll('.collapse-view').forEach(collapseView => {
-      this.setup(collapseView);
-    });
+  constructor(elm) {
+    this.setup(elm);
   }
 
   setup(collapseView) {

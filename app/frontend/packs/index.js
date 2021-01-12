@@ -18,7 +18,7 @@ import SelectedRowIndicator from '../javascripts/classes/SelectedRowIndicator.js
 import Karyotype from '../javascripts/classes/Karyotype.js';
 import ActivityIndicator from '../javascripts/classes/ActivityIndicator.js';
 import ModuleTabsView from '../javascripts/classes/ModuleTabsView.js';
-import CollapseViewManager from '../javascripts/classes/CollapseViewManager.js';
+import CollapseView from '../javascripts/classes/CollapseView.js';
 import TopPageLayoutManager from '../javascripts/classes/TopPageLayoutManager.js';
 // PanelViews
 // PanelViews: Filters
@@ -57,8 +57,6 @@ function init() {
   new Karyotype(document.getElementById('Karyotype'));
 
   new ActivityIndicator(document.getElementById('ActivityIndicator'));
-
-  new CollapseViewManager();
 
   switch (PAGE) {
     case 'home':
@@ -103,5 +101,8 @@ function initHome() {
     new SelectedRowIndicator(document.getElementById('RowIndicator'));
     // レイアウトマネージャ
     TopPageLayoutManager.init();
+    // 開閉
+    const elm = document.querySelector('#AdvancedSearchView .collapse-view');
+    new CollapseView(elm);
   });
 }
