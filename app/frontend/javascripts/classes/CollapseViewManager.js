@@ -1,4 +1,4 @@
-
+import TopPageLayoutManager from "./TopPageLayoutManager.js";
 
 export default class CollapseViewManager {
 
@@ -21,6 +21,10 @@ export default class CollapseViewManager {
       collapseView.classList.toggle('-collapsed');
       // set status in localStorage
       window.localStorage.setItem(collapseId, collapseView.classList.contains('-collapsed') ? 'collapsed' : '');
+      // update layout
+      if (collapseView.dataset.collapseId === 'advanced-search') {
+        TopPageLayoutManager.update();
+      }
     });
   }
   
