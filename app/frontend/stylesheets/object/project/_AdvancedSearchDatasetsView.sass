@@ -2,10 +2,14 @@
   padding: 14px $PADDING_SIDE 14px
   background-color: $COLOR_KEY
   color: $COLOR_BLACK
-  >.tablecontainer
+  font-size: 12px 
+  > .tablecontainer
     background-color: white
-    >table
+    overflow: auto
+    max-height: 324px
+    > table
       width: 100%
+      white-space: nowrap
       > thead
         font-size: 12px
         font-weight: bold
@@ -14,12 +18,17 @@
           padding: 10px 10px 5px 10px
           margin-bottom: 0
       > tbody
-        > .checklist-values
-          height: 22px
+        > tr
+          //height: 22px
           border-bottom: 1px solid $COLOR_SEPARATOR
           padding: 3px 10px
+          > td
+            > .dataset
+              padding: 0px 10px
+              > .label
+                display: flex
           > .dataset
-            width: 50%
+            //width: 50%
             padding: 0px 10px
           > .item
             display: inline-flex
@@ -32,7 +41,7 @@
               > .dataset-icon
                 display: flex
                 width: 30px
-                >.properties
+                > .properties
                   left: 2px
               > p
                 padding-left: $PADDING_SIDE
@@ -51,7 +60,6 @@
                   position: absolute
                   left: 43px + $PADDING_SIDE + $PADDING_SIDE
                   font-weight: normal
-          // &.-haschildren
           &.-nested
             border-bottom: 1px dotted $COLOR_SEPARATOR
           &.-opened

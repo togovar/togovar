@@ -76,13 +76,15 @@
                     th Frequency|Count
                     th Variant calling quality
                 tbody
-                  tr.checklist-values
-                    td.dataset.item
-                      label.label
-                        input(type="checkbox" value="")
-                        .dataset-icon(data-dataset="gem_j_wga")
-                          .properties                  
-                        p JEM-J WGA
+                  tr
+                    td
+                      .dataset
+                        label.label
+                          input(type="checkbox" value="")
+                          .dataset-icon(data-dataset="gem_j_wga")
+                            .properties
+                    td.datasetlabel
+                      | JEM-J WGA
                     td.frequencyandcount
                       .range-selector
                         .input
@@ -107,7 +109,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
@@ -119,7 +121,7 @@
                       label.label
                         input(type="checkbox" value="jga_ngs")
                         .dataset-icon(data-dataset="jga_ngs")
-                          .properties                  
+                          .properties
                         p JGA NGS
                     td.frequencyandcount
                       .range-selector
@@ -145,7 +147,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
@@ -156,7 +158,7 @@
                       label.label
                         input(type="checkbox" value="jga_snp")
                         .dataset-icon(data-dataset="jga_snp")
-                          .properties                  
+                          .properties
                         p JGA SNP
                     td.frequencyandcount
                       .range-selector
@@ -182,7 +184,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
@@ -194,7 +196,7 @@
                       label.label
                         input(type="checkbox" value="tommo_4.7kjpn")
                         .dataset-icon(data-dataset="tommo_4.7kjpn")
-                          .properties                  
+                          .properties
                         p ToMMo 4.7KJPN
                     td.frequencyandcount
                       .range-selector
@@ -220,7 +222,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
@@ -232,7 +234,7 @@
                       label.label
                         input(type="checkbox" value="hgvd")
                         .dataset-icon(data-dataset="hgvd")
-                          .properties                  
+                          .properties
                         p  HGVD
                     td.frequencyandcount
                       .range-selector
@@ -258,7 +260,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
@@ -270,7 +272,7 @@
                       label.label
                         input(type="checkbox" value="exac")
                         .dataset-icon(data-dataset="exac")
-                          .properties                  
+                          .properties
                         p ExAC
                     td.frequencyandcount
                       .range-selector
@@ -296,7 +298,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
@@ -307,7 +309,7 @@
                       label.label
                         input(type="checkbox" value="clinvar")
                         .dataset-icon(data-dataset="clinvar")
-                          .properties                  
+                          .properties
                         p ClinVar
                     td.frequencyandcount
                       .range-selector
@@ -333,7 +335,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
@@ -344,7 +346,7 @@
                       label.label
                         input(type="checkbox" value="BBJ")
                         .dataset-icon(data-dataset="BBJ")
-                          .properties                  
+                          .properties
                         p BBJ
                     td.frequencyandcount
                       .range-selector
@@ -370,7 +372,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
@@ -381,7 +383,7 @@
                       label.label
                         input(type="checkbox" value="BBJ")
                         //- .dataset-icon(data-dataset="BBJ")
-                          .properties                  
+                          .properties
                         p Certain infections and parastic diseases
                     td.frequencyandcount
                       .range-selector
@@ -407,7 +409,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
@@ -418,7 +420,7 @@
                       label.label
                         input(type="checkbox" value="clinvar")
                         //- .dataset-icon(data-dataset="clinvar")
-                        //-   .properties                  
+                        //-   .properties
                         p Plumonary tuberclouds
                     td.frequencyandcount
                       .range-selector
@@ -444,7 +446,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
@@ -455,7 +457,7 @@
                       label.label
                         input(type="checkbox" value="BBJ")
                         //- .dataset-icon(data-dataset="BBJ")
-                        //-   .properties                  
+                        //-   .properties
                         p.-leveltwo Chronic hepatitis B
                     td.frequencyandcount
                       .range-selector
@@ -481,7 +483,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
@@ -492,7 +494,7 @@
                       label.label
                         input(type="checkbox" value="BBJ")
                         //- .dataset-icon(data-dataset="BBJ")
-                        //-   .properties                  
+                        //-   .properties
                         p Chronic hepatitis C
                     td.frequencyandcount
                       .range-selector
@@ -518,7 +520,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
@@ -529,7 +531,7 @@
                       label.label
                         input(type="checkbox" value="BBJ")
                         //- .dataset-icon(data-dataset="BBJ")
-                        //-   .properties                  
+                        //-   .properties
                         p Neoplams
                     td.frequencyandcount
                       .range-selector
@@ -555,7 +557,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
@@ -566,7 +568,7 @@
                       label.label
                         input(type="checkbox" value="BBJ")
                         //- .dataset-icon(data-dataset="BBJ")
-                        //-   .properties                  
+                        //-   .properties
                         p Diseases of the blood and blood-forming organs and certain disorders involving the immune mechanism
                     td.frequencyandcount
                       .range-selector
@@ -592,7 +594,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
@@ -603,7 +605,7 @@
                       label.label
                         input(type="checkbox" value="BBJ")
                         //- .dataset-icon(data-dataset="BBJ")
-                        //-   .properties                  
+                        //-   .properties
                         p Endocrine,nutritional and metabolic diseases
                     td.frequencyandcount
                       .range-selector
@@ -629,7 +631,7 @@
                             .scale
                           .slider
                             .from
-                            .to                      
+                            .to
                         label
                           input(type="checkbox" value="")
                           p Invert range
