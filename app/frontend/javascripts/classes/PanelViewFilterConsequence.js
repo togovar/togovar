@@ -1,3 +1,4 @@
+import CollapseView from "./CollapseView.js";
 import PanelView from "./PanelView.js";
 import StoreManager from "./StoreManager.js";
 
@@ -12,12 +13,8 @@ export default class PanelViewFilterConsequence extends PanelView {
     const grouping = StoreManager.getSearchConditionMaster('consequence_grouping').items;
     // GUIの生成
     this._createGUI(conditionMaster, grouping);
-    // accordion
-    this.elm.querySelectorAll('.-haschildren > .accordionbutton').forEach(elm => {
-      elm.addEventListener('click', () => {
-        elm.parentNode.classList.toggle('-opened');
-      })
-    });
+    // collapse menu
+    elm.querySelectorAll('.collapse-view').forEach(collapseView => new CollapseView(collapseView) );
     // references
     const condition = StoreManager.getSearchCondition(this.kind);
     this._inputsValues = {};
@@ -51,7 +48,7 @@ export default class PanelViewFilterConsequence extends PanelView {
     // accordion
     this.elm.querySelectorAll('.-haschildren > .accordionbutton').forEach(elm => {
       elm.addEventListener('click', () => {
-        elm.parentNode.classList.toggle('-opened');
+        elm.parentNode.classList.toggle('-collapsed');
       })
     });
     // references
@@ -85,7 +82,7 @@ export default class PanelViewFilterConsequence extends PanelView {
     html += grouping.map(group => this.render(conditionMaster, group)).join('');
     this.elm.querySelector('.content > .checklist-values').insertAdjacentHTML('beforeend', html);
     // transcript variant は開く
-    this.elm.querySelector('.content > .checklist-values > .item:nth-child(3)').classList.add('-opened');
+    this.elm.querySelector('.content > .checklist-values > .item:nth-child(3)').classList.remove('-collapsed');
   }
 
   render(conditionMaster, item) {
@@ -93,15 +90,15 @@ export default class PanelViewFilterConsequence extends PanelView {
     item = hasChildren ? item : conditionMaster.items.find(condition => condition.id === item);
 
     return `
-      <li class="item${hasChildren ? ' -haschildren' : ''}">
-        ${hasChildren ? '<div class="accordionbutton"></div>' : ''}
+      <li class="item${hasChildren ? ' collapse-view -hierarchic -collapsed' : ''}">
+        ${hasChildren ? '<div class="collapsebutton"></div>' : ''}
         <label class="label">
           <input type="checkbox" value="${item.id ? item.id : item.label}" data-has-children="${item.items ? 'true' : 'false'}" checked>
           ${item.label}
         </label>
         <span class="value"></span>
         ${hasChildren ? `
-        <ul class="checklist-values">
+        <ul class="checklist-values collapsecontent">
           ${item.items.map(item => this.render(conditionMaster, item)).join('')}
         </ul>
         ` : ''}
@@ -125,7 +122,6 @@ export default class PanelViewFilterConsequence extends PanelView {
     values = values.concat(accumulator);
     return values;
   }
-
 
   // フィルターの変更
   _changeFilter(e) {
