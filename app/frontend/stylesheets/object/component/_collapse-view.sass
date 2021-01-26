@@ -1,4 +1,5 @@
 .collapse-view
+  position: relative
   > .collapsebutton
     cursor: pointer
     position: absolute
@@ -25,8 +26,6 @@
 
   &.-hierarchic
     > .collapsebutton
-      left: 2px
-      top: 6px
       &:before
         transform: rotate(90deg)
         border-top: 4px solid transparent
@@ -38,3 +37,10 @@
       > .collapsebutton
         &:before
           transform: rotate(0deg)
+    &.-unstructured
+      &[data-collapse-depth="1"]
+        margin-left: 12px
+      &[data-collapse-depth="2"]
+        margin-left: 24px
+      &[data-collapse-depth="3"]
+        margin-left: 36px
