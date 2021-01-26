@@ -1,8 +1,8 @@
 $PADDING_METER: 8px
 .range-selector
+  label
+    margin: 0
   > .input
-    margin-bottom: 8px
-    margin-top: 2px
     text-align: center
     > input
       display: inline-block
@@ -19,7 +19,7 @@ $PADDING_METER: 8px
       margin-left: 8px
       margin-bottom: 0
   > .meter
-    padding: 0 $PADDING_METER 8px
+    padding: 0 $PADDING_METER
     position: relative
     > .barcontainer
       width: 100%
@@ -33,9 +33,6 @@ $PADDING_METER: 8px
         height: 8px
         width: 100%
     > .ruler
-      border-top: solid 1px $COLOR_GRAY
-      margin-top: 4px
-      padding-bottom: 14px
       position: relative
       > .scale
         position: absolute
@@ -44,7 +41,7 @@ $PADDING_METER: 8px
         text-align: center
         width: 20px
         left: calc(0% - 10px)
-        top: 6px
+        top: 2px
         &:nth-child(2)
           left: calc(10% - 10px)
         &:nth-child(3)
@@ -67,9 +64,9 @@ $PADDING_METER: 8px
           left: calc(100% - 10px)
         &:before
           content: ""
-          border-left: solid 1px $COLOR_GRAY
-          height: 5px
-          top: -7px
+          border-left: solid 1px $COLOR_SEPARATOR
+          height: 13px
+          top: -12px
           left: 10px
           display: block
           position: absolute
@@ -90,3 +87,21 @@ $PADDING_METER: 8px
     > label
       + label
         margin-left: 1em
+  &.-vertical
+    > .input
+      margin-bottom: 8px
+      margin-top: 2px
+    > .meter
+      top: 2px
+      > .ruler
+        padding-bottom: 14px
+    > .match
+      padding-top: 8px
+  &.-horizontal
+    display: flex
+    align-items: center
+    > *
+      + *
+        margin-left: 8px
+    > .input
+      margin: 0 -2px
