@@ -10,7 +10,6 @@ import 'jquery-deparam'
 
 import {PAGE} from '../javascripts/global.js';
 import StoreManager from '../javascripts/classes/StoreManager.js';
-import SearchConditionController from '../javascripts/classes/SearchConditionController.js';
 import ResultsView from '../javascripts/classes/ResultsView.js';
 import SideBar from '../javascripts/classes/SideBar.js';
 import Configuration from '../javascripts/classes/Configuration.js';
@@ -20,6 +19,9 @@ import ActivityIndicator from '../javascripts/classes/ActivityIndicator.js';
 import ModuleTabsView from '../javascripts/classes/ModuleTabsView.js';
 import CollapseView from '../javascripts/classes/CollapseView.js';
 import TopPageLayoutManager from '../javascripts/classes/TopPageLayoutManager.js';
+// Search
+import SearchConditionController from '../javascripts/classes/SearchConditionController.js';
+import AdvancedSearchDatasetsView from '../javascripts/classes/AdvancedSearchDatasetsView.js';
 // PanelViews
 // PanelViews: Filters
 import PanelViewCheckList from '../javascripts/classes/PanelViewCheckList.js';
@@ -71,6 +73,7 @@ function initHome() {
   StoreManager.ready(() => {
     // 検索窓
     new SearchConditionController(document.getElementById('SimpleSearchView'));
+    new AdvancedSearchDatasetsView(document.getElementById('AdvancedSearchDatasetsView'))
     // モジュールタブメニュー
     document.querySelectorAll('.module-tabs-view').forEach(elm => {
       new ModuleTabsView(elm);
