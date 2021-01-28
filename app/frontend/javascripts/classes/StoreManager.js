@@ -260,7 +260,11 @@ class StoreManager {
     } else {
       path = `${API_URL}/search?offset=${offset - offset % LIMIT}&${$.param(this._extractSearchCondition(this._store.searchConditions))}`;
     }
-    fetch(path)
+    fetch(path, {
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
       .catch(e => {
         throw Error(e);
       })
