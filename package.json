@@ -31,6 +31,7 @@
     "cross-env": "^7.0.2",
     "css-loader": "^4.0.0",
     "csv-loader": "^3.0.3",
+    "decimal.js": "^10.2.1",
     "dotenv-webpack": "^2.0.0",
     "ejs-html-loader": "^4.0.1",
     "ejs-plain-loader": "^1.4.1",
