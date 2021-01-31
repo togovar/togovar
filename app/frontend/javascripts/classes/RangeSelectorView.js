@@ -15,13 +15,12 @@ export default class RangeSelectorView {
    * @param {String} searchType 'simple' or 'advanced'
    */
   constructor(elm, min = 0, max, orientation, conditionKey, searchType) {
+    this._elm = elm;
     this._conditionKey = conditionKey;
     this._searchType = searchType;
-    //StoreManager.bind('appStatus', this);
     const ruler = (() => {
       let html = '';
       const step = new Decimal(max / RULER_NUMBER_OF_STEP);
-      console.log(step)
       for (let i = 0; i <= RULER_NUMBER_OF_STEP; i++) {
         html += `<div class="scale">${step.times(new Decimal(i)).toNumber()}</div>`;
       }
@@ -38,8 +37,7 @@ export default class RangeSelectorView {
       </div>
       <div class="meter">
         <div class="barcontainer">
-          <div class="bar -primary"></div>
-          <div class="bar -secondary"></div>
+          <div class="bar"></div>
         </div>
         <div class="ruler">${ruler}</div>
         <div class="slider">
@@ -66,8 +64,7 @@ export default class RangeSelectorView {
     this._to = input.querySelector(':scope > input.to');
     this._invert = input.querySelector(':scope > label > input.invert');
     const meter = elm.querySelector(':scope > .meter');
-    this._barPrimary = meter.querySelector(':scope > .barcontainer > .bar.-primary');
-    this._barSecondary = meter.querySelector(':scope > .barcontainer > .bar.-secondary');
+    this._bar = meter.querySelector(':scope > .barcontainer > .bar');
     this._slider = meter.querySelector(':scope > .slider');
     this._sliderWidth = this._slider.offsetWidth - 16;
     this._sliderFrom = this._slider.querySelector(':scope > .from');
@@ -83,10 +80,7 @@ export default class RangeSelectorView {
     const condition = this._getFrequency();
     switch (searchType) {
       case 'simple':
-        this._from.value = condition.from;
-        this._to.value = condition.to;
-        this._invert.checked = condition.invert === '1';
-        this._all.checked = condition.match === 'all';
+        this._updateGUI(condition);
         break;
       case 'advanced':
         break;
@@ -131,10 +125,8 @@ export default class RangeSelectorView {
 
   _getFrequency() {
     let condition = StoreManager.getSearchCondition(this._conditionKey);
-    console.log(condition);
     // if the filter condition is not defined, generate it from master.
     condition = condition ? condition : this._conditionMaster.items.reduce((acc, item) => Object.assign(acc, {[item.id]: item.default}), {});
-    console.log(condition);
     // if each items of the condition are not defined, generate them from master.items
     for (const item of this._conditionMaster.items) {
       condition[item.id] = condition[item.id] ? condition[item.id] : this._conditionMaster.items.find(frequency => frequency.id === item.id).default;
@@ -143,7 +135,6 @@ export default class RangeSelectorView {
   }
 
   _changeFilter(newCondition) {
-    console.log(newCondition);
     // ensure sliders are not interchanged
     switch (true) {
       case newCondition.from !== undefined:
@@ -166,32 +157,39 @@ export default class RangeSelectorView {
     StoreManager.setSearchCondition(this._conditionKey, condition);
   }
 
-  searchConditions(conditions) {
-    const condition = conditions[this._conditionKey];
-    if (condition === undefined) return;
+  _updateGUI(condition) {
     // values
     this._from.value = condition.from;
     this._to.value = condition.to;
     // slider
-    this._sliderFrom.style.left = `${this._sliderWidth * this._from.value}px`;
-    this._sliderTo.style.left = `${this._sliderWidth * this._to.value + 8}px`;
+    this._sliderFrom.style.left = this.fromPosition;
+    this._sliderTo.style.left = this.toPosition;
     // meter
-    if (condition.invert === '1') {
-      this._barPrimary.style.left = '0%';
-      this._barPrimary.style.width = `${condition.from * 100}%`;
-      this._barSecondary.style.display = 'block';
-      this._barSecondary.style.left = `${condition.to * 100}%`;
-      this._barSecondary.style.width = `${(1 - condition.to) * 100}%`;
-    } else {
-      this._barPrimary.style.left = `${condition.from * 100}%`;
-      this._barPrimary.style.width = `${(condition.to - condition.from) * 100}%`;
-      this._barSecondary.style.display = 'none';
-    }
+    this._bar.style.left = `${condition.from * 100}%`;
+    this._bar.style.width = `${(condition.to - condition.from) * 100}%`;
     // invert
     this._invert.checked = condition.invert === '1';
+    if (condition.invert === '1') {
+      this._elm.classList.add('-inverting');
+    } else {
+      this._elm.classList.remove('-inverting');
+    }
     // match
     this._all.checked = condition.match === 'all';
     this._any.checked = condition.match === 'any';
+  }
+
+  searchConditions(conditions) {
+    const condition = conditions[this._conditionKey];
+    if (condition === undefined) return;
+    this._updateGUI(condition);
+  }
+
+  get fromPosition() {
+    return `${this._sliderWidth * this._from.value}px`;
+  }
+  get toPosition() {
+    return `${this._sliderWidth * this._to.value + 8}px`;
   }
 
 }
