@@ -1,4 +1,5 @@
-import StoreManager from "./StoreManager.js";
+import StoreManager from './StoreManager.js';
+import Decimal from 'decimal.js';
 
 const RULER_NUMBER_OF_STEP = 10;
 
@@ -19,10 +20,10 @@ export default class RangeSelectorView {
     //StoreManager.bind('appStatus', this);
     const ruler = (() => {
       let html = '';
-      const step = Math.round(max * 1000 / RULER_NUMBER_OF_STEP);
+      const step = new Decimal(max / RULER_NUMBER_OF_STEP);
       console.log(step)
       for (let i = 0; i <= RULER_NUMBER_OF_STEP; i++) {
-        html += `<div class="scale">${(step * i) * 0.001}</div>`;
+        html += `<div class="scale">${step.times(new Decimal(i)).toNumber()}</div>`;
       }
       return html;
     })();
