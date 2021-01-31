@@ -10,6 +10,13 @@
     > table
       width: 100%
       white-space: nowrap
+      > thead, > tbody
+        > tr
+          > th, >td
+            &:first-child
+              width: 100px
+              width: 80px
+              padding-right: 0
       > thead
         font-size: 12px
         font-weight: bold
@@ -21,6 +28,8 @@
         > tr
           border-bottom: 1px solid $COLOR_SEPARATOR
           padding: 3px 10px
+          &:last-child
+            border-bottom: none
           > td
             padding-left: 10px
             padding-right: 10px
@@ -38,6 +47,7 @@
                     width: 15px
             > .datasetlabel
               position: relative
+              margin-left: -8px
               > .collapsebutton
                 left: -8px
                 top: 6px

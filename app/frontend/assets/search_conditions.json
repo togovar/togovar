@@ -623,7 +623,7 @@
     "id": "adv_frequency",
     "label": "Alternative allele frequency",
     "type": "array",
-    "item": [
+    "items": [
       {
         "dataset": "gem_j_wga",
         "frequency": {
