@@ -1,5 +1,5 @@
 $PADDING_METER: 8px
-.range-selector
+.range-selector-view
   label
     margin: 0
   > .input
@@ -29,7 +29,7 @@ $PADDING_METER: 8px
       > .bar
         position: absolute
         top: 0
-        background-color: $COLOR_KEY
+        background-color: $COLOR_KEY_DARK1
         height: 8px
         width: 100%
     > .ruler
@@ -64,7 +64,7 @@ $PADDING_METER: 8px
           left: calc(100% - 10px)
         &:before
           content: ""
-          border-left: solid 1px $COLOR_SEPARATOR
+          border-left: dotted 1px $COLOR_SEPARATOR
           height: 13px
           top: -16px
           left: 10px
@@ -126,3 +126,9 @@ $PADDING_METER: 8px
         margin-left: 8px
     > .input
       margin: 0 -2px
+  &.-inverting
+    > .meter
+      > .barcontainer
+        background-color: $COLOR_KEY_DARK1
+        > .bar
+          background-color: $COLOR_LIGHT_GRAY

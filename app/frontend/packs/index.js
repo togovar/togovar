@@ -104,8 +104,8 @@ function initHome() {
     new SelectedRowIndicator(document.getElementById('RowIndicator'));
     // 開閉
     const elm = document.querySelector('#AdvancedSearchView .collapse-view');
-    new CollapseView(elm);
     // レイアウトマネージャ
     TopPageLayoutManager.init([resultView]);
+    new CollapseView(elm);
   });
 }

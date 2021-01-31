@@ -618,5 +618,68 @@
         "default": "1"
       }
     ]
+  },
+  {
+    "id": "adv_frequency",
+    "label": "Alternative allele frequency",
+    "type": "array",
+    "item": [
+      {
+        "dataset": "gem_j_wga",
+        "frequency": {
+          "gte": 0,
+          "lte": 1
+        },
+        "filtered": false
+      },
+      {
+        "dataset": "jga_ngs",
+        "frequency": {
+          "gte": 0,
+          "lte": 1
+        },
+        "filtered": false
+      },
+      {
+        "dataset": "jga_snp",
+        "frequency": {
+          "gte": 0,
+          "lte": 1
+        },
+        "filtered": false
+      },
+      {
+        "dataset": "tommo_4.7kjpn",
+        "frequency": {
+          "gte": 0,
+          "lte": 1
+        },
+        "filtered": false
+      },
+      {
+        "dataset": "hgvd",
+        "frequency": {
+          "gte": 0,
+          "lte": 1
+        },
+        "filtered": false
+      },
+      {
+        "dataset": "exac",
+        "frequency": {
+          "gte": 0,
+          "lte": 1
+        },
+        "filtered": false
+      },
+      {
+        "dataset": "clinvar",
+        "frequency": {
+          "gte": 0,
+          "lte": 1
+        },
+        "filtered": false
+      }
+    ]
   }
 ]
