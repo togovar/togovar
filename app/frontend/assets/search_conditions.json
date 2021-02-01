@@ -625,60 +625,88 @@
     "type": "array",
     "items": [
       {
-        "dataset": "gem_j_wga",
-        "frequency": {
-          "gte": 0,
-          "lte": 1
-        },
-        "filtered": false
+        "id": "gem_j_wga",
+        "label": "GEM-J WGA",
+        "type": "object",
+        "default": {
+          "frequency": {
+            "gte": 0,
+            "lte": 1
+          },
+          "filtered": false
+        }
       },
       {
-        "dataset": "jga_ngs",
-        "frequency": {
-          "gte": 0,
-          "lte": 1
-        },
-        "filtered": false
+        "id": "jga_ngs",
+        "label": "JGA NGS",
+        "type": "object",
+        "default": {
+          "frequency": {
+            "gte": 0,
+            "lte": 1
+          },
+          "filtered": false
+        }
       },
       {
-        "dataset": "jga_snp",
-        "frequency": {
-          "gte": 0,
-          "lte": 1
-        },
-        "filtered": false
+        "id": "jga_snp",
+        "label": "JGA SNP",
+        "type": "object",
+        "default": {
+          "frequency": {
+            "gte": 0,
+            "lte": 1
+          },
+          "filtered": false
+        }
       },
       {
-        "dataset": "tommo_4.7kjpn",
-        "frequency": {
-          "gte": 0,
-          "lte": 1
-        },
-        "filtered": false
+        "id": "tommo_4.7kjpn",
+        "label": "ToMMo 4.7KJPN",
+        "type": "object",
+        "default": {
+          "frequency": {
+            "gte": 0,
+            "lte": 1
+          },
+          "filtered": false
+        }
       },
       {
-        "dataset": "hgvd",
-        "frequency": {
-          "gte": 0,
-          "lte": 1
-        },
-        "filtered": false
+        "id": "hgvd",
+        "label": "HGVD",
+        "type": "object",
+        "default": {
+          "frequency": {
+            "gte": 0,
+            "lte": 1
+          },
+          "filtered": false
+        }
       },
       {
-        "dataset": "exac",
-        "frequency": {
-          "gte": 0,
-          "lte": 1
-        },
-        "filtered": false
+        "id": "exac",
+        "label": "ExAC",
+        "type": "object",
+        "default": {
+          "frequency": {
+            "gte": 0,
+            "lte": 1
+          },
+          "filtered": false
+        }
       },
       {
-        "dataset": "clinvar",
-        "frequency": {
-          "gte": 0,
-          "lte": 1
-        },
-        "filtered": false
+        "id": "clinvar",
+        "label": "ClinVar",
+        "type": "object",
+        "default": {
+          "frequency": {
+            "gte": 0,
+            "lte": 1
+          },
+          "filtered": false
+        }
       }
     ]
   }
