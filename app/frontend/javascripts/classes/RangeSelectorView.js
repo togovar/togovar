@@ -8,21 +8,22 @@ export default class RangeSelectorView {
   /**
    * 
    * @param {HTMLElement} parentNode 
+   * @param {Object} delegate
    * @param {Number} min
    * @param {Number} max
    * @param {String} orientation 'horizontal' or 'vertical'
-   * @param {String} conditionKey
    * @param {String} searchType 'simple' or 'advanced'
    */
-  constructor(elm, min = 0, max, orientation, conditionKey, searchType) {
+  constructor(elm, delegate, min = 0, max, orientation, searchType) {
     this._elm = elm;
-    this._conditionKey = conditionKey;
+    this._delegate = delegate;
+    this._orientation = orientation;
     this._searchType = searchType;
     const ruler = (() => {
       let html = '';
       const step = new Decimal(max / RULER_NUMBER_OF_STEP);
       for (let i = 0; i <= RULER_NUMBER_OF_STEP; i++) {
-        html += `<div class="scale">${step.times(new Decimal(i)).toNumber()}</div>`;
+        html += `<div class="scale">${orientation === 'vertical' ? step.times(new Decimal(i)).toNumber() : ''}</div>`;
       }
       return html;
     })();
@@ -76,34 +77,26 @@ export default class RangeSelectorView {
     }
 
     // default values
-    this._conditionMaster = StoreManager.getSearchConditionMaster(this._conditionKey);
-    const condition = this._getFrequency();
-    switch (searchType) {
-      case 'simple':
-        this._updateGUI(condition);
-        break;
-      case 'advanced':
-        break;
-    }
-    this._changeFilter({});
+    this._changeParameter({});
 
     // events
-    StoreManager.bind('searchConditions', this);
     this._from.addEventListener('change', e => {
-      this._changeFilter({from: e.target.value + ''});
+      this._changeParameter({from: e.target.value + ''});
     });
     this._to.addEventListener('change', e => {
-      this._changeFilter({to: e.target.value + ''});
+      this._changeParameter({to: e.target.value + ''});
     });
     this._invert.addEventListener('change', e => {
-      this._changeFilter({invert: e.target.checked ? '1' : '0'});
+      this._changeParameter({invert: e.target.checked ? '1' : '0'});
     });
-    this._all.addEventListener('change', e => {
-      this._changeFilter({match: e.target.checked ? 'all' : 'any'});
-    });
-    this._any.addEventListener('change', e => {
-      this._changeFilter({match: e.target.checked ? 'any' : 'all'});
-    });
+    if (match) {
+      this._all.addEventListener('change', e => {
+        this._changeParameter({match: e.target.checked ? 'all' : 'any'});
+      });
+      this._any.addEventListener('change', e => {
+        this._changeParameter({match: e.target.checked ? 'any' : 'all'});
+      });
+    }
     $('.slider > *', meter).draggable({
       axis: 'x',
       containment: this._slider,
@@ -115,26 +108,15 @@ export default class RangeSelectorView {
   _drag(e, ui) {
     switch (true) {
       case e.target.classList.contains('from'):
-        this._changeFilter({from: Math.ceil((ui.position.left / this._sliderWidth) * 100) * 0.01});
+        this._changeParameter({from: Math.ceil((ui.position.left / this._sliderWidth) * 100) * 0.01});
         break;
       case e.target.classList.contains('to'):
-        this._changeFilter({to: Math.floor(((ui.position.left - 8) / this._sliderWidth) * 100) * 0.01});
+        this._changeParameter({to: Math.floor(((ui.position.left - 8) / this._sliderWidth) * 100) * 0.01});
         break;
     }
   }
 
-  _getFrequency() {
-    let condition = StoreManager.getSearchCondition(this._conditionKey);
-    // if the filter condition is not defined, generate it from master.
-    condition = condition ? condition : this._conditionMaster.items.reduce((acc, item) => Object.assign(acc, {[item.id]: item.default}), {});
-    // if each items of the condition are not defined, generate them from master.items
-    for (const item of this._conditionMaster.items) {
-      condition[item.id] = condition[item.id] ? condition[item.id] : this._conditionMaster.items.find(frequency => frequency.id === item.id).default;
-    }
-    return condition;
-  }
-
-  _changeFilter(newCondition) {
+  _changeParameter(newCondition) {
     // ensure sliders are not interchanged
     switch (true) {
       case newCondition.from !== undefined:
@@ -149,15 +131,11 @@ export default class RangeSelectorView {
         break;
     }
 
-    // set store
-    const condition = this._getFrequency();
-    for (const key in newCondition) {
-      condition[key] = newCondition[key];
-    }
-    StoreManager.setSearchCondition(this._conditionKey, condition);
+    // feedback
+    this._delegate.changeParameter(newCondition);
   }
 
-  _updateGUI(condition) {
+  updateGUIWithCondition(condition) {
     // values
     this._from.value = condition.from;
     this._to.value = condition.to;
@@ -175,14 +153,10 @@ export default class RangeSelectorView {
       this._elm.classList.remove('-inverting');
     }
     // match
-    this._all.checked = condition.match === 'all';
-    this._any.checked = condition.match === 'any';
-  }
-
-  searchConditions(conditions) {
-    const condition = conditions[this._conditionKey];
-    if (condition === undefined) return;
-    this._updateGUI(condition);
+    if (this._searchType === 'simple') {
+      this._all.checked = condition.match === 'all';
+      this._any.checked = condition.match === 'any';
+    }
   }
 
   get fromPosition() {

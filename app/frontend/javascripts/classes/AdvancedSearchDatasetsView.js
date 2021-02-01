@@ -38,10 +38,11 @@ export default class AdvancedSearchDatasetsView {
             <input type="checkbox" value="">
           </div>
         </td>
-      </tr>
-      `;
-    }).join('')}
-    `;
+      </tr>`;
+    }).join('')}`;
+    tbody.querySelectorAll('.range-selector-view').forEach((elm, index) => {
+      //new RangeSelectorView(elm, 0, 1, 'horizontal', 'adv_frequency', 'advanced');
+    });
     console.log(  )
 
     this._conditionMaster = StoreManager.getSearchConditionMaster('adv_frequency');
