@@ -1,9 +1,8 @@
 #SearchInputView.module-tabs-view
   nav.tabscontainer
     ul
-      li(data-target="SimpleSearchView") Simple search
-      li(data-target="AdvancedSearchView").-current Advanced search
-      li(data-target="SearchHistoryView") Search history
+      li(data-tab-group="tab-group-type-of-search" data-target="SimpleSearchView") Simple search
+      li(data-tab-group="tab-group-type-of-search" data-target="AdvancedSearchView") Advanced search
 
   .sectionscontainer
 
@@ -32,7 +31,7 @@
           dd 10:73270743-73376976
       .suggest-view
 
-    #AdvancedSearchView.section.-current
+    #AdvancedSearchView.section
       .search-form-ivew
         .searchform
           input#advanced-search-field.searchinput(type="text" placeholder="Search for disease or gene symbol or rs...")
@@ -42,32 +41,33 @@
         nav.tabscontainer
           .collupsebutton
           ul
-            li(data-target="AdvancedSearchBuilderView") Builder
-            li(data-target="AdvancedSearchDatasetsView").-current Datasets
+            //- li(data-target="AdvancedSearchBuilderView") Builder
+            li(data-tab-group="tab-group-type-of-advanced-search" data-target="AdvancedSearchDatasetsView") Datasets
+            //- li(data-target="SearchHistoryView") Search history
 
         .sectionscontainer.collapsecontent
-          #AdvancedSearchBuilderView.section
-            .inner
-              .buildersection
-                .advanced-search-group-view
-                  .menu
-                    .logical-operator-switch
-                      a.operator.-current(data-operator="and") AND
-                      a.operator(data-operator="or") OR
-                    .filling
-                    .deletebutton Delete
-                  .container
-                    .advanced-search-conditino-view(data-operator="equal" data-classification="disease")
-                      .classification Disease
-                      .operator
-                      .value
-                        input(type="text" placeholder="Disease name")
-                      .deletebutton
+          //- #AdvancedSearchBuilderView.section
+          //-   .inner
+          //-     .buildersection
+          //-       .advanced-search-group-view
+          //-         .menu
+          //-           .logical-operator-switch
+          //-             a.operator.-current(data-operator="and") AND
+          //-             a.operator(data-operator="or") OR
+          //-           .filling
+          //-           .deletebutton Delete
+          //-         .container
+          //-           .advanced-search-conditino-view(data-operator="equal" data-classification="disease")
+          //-             .classification Disease
+          //-             .operator
+          //-             .value
+          //-               input(type="text" placeholder="Disease name")
+          //-             .deletebutton
                         
 
-              .conditionssection
-                p conditions
-          #AdvancedSearchDatasetsView.section.-current
+          //-     .conditionssection
+          //-       p conditions
+          #AdvancedSearchDatasetsView.section
             .tablecontainer
               table
                 thead
@@ -702,8 +702,8 @@
                     td
                       .variantcallingquality
                         input(type="checkbox" value="")                      
-    #SearchHistoryView.section
-      p History
+          //- #SearchHistoryView.section
+          //-   p History
 
 
 main#SearchResultsView.LayoutMainAside

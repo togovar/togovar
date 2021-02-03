@@ -15,7 +15,7 @@ export default class RangeSelectorView {
    * @param {String} searchType 'simple' or 'advanced'
    */
   constructor(elm, delegate, min = 0, max, orientation, searchType) {
-    this._elm = elm;
+    this.elm = elm;
     this._delegate = delegate;
     this._orientation = orientation;
     this._searchType = searchType;
@@ -132,7 +132,7 @@ export default class RangeSelectorView {
     }
 
     // feedback
-    this._delegate.changeParameter(newCondition);
+    this._delegate.changeParameter(newCondition, this);
   }
 
   updateGUIWithCondition(condition) {
@@ -148,9 +148,9 @@ export default class RangeSelectorView {
     // invert
     this._invert.checked = condition.invert === '1';
     if (condition.invert === '1') {
-      this._elm.classList.add('-inverting');
+      this.elm.classList.add('-inverting');
     } else {
-      this._elm.classList.remove('-inverting');
+      this.elm.classList.remove('-inverting');
     }
     // match
     if (this._searchType === 'simple') {

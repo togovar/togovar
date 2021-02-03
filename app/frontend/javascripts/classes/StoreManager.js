@@ -120,6 +120,9 @@ class StoreManager {
   setSearchCondition(key, values) {
     this._setSearchConditions({[key]: values});
   }
+  setAdvancedSearchCondition(key, values) {
+    this._setSearchConditions({[key]: values});
+  }
 
   _setSearchConditions(conditions, fromHistory) {
     for (const conditionKey in conditions) {
