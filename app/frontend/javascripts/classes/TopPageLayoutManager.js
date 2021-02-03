@@ -4,6 +4,7 @@ class TopPageLayoutManager {
   }
 
   init(targets) {
+    this._isReady = true;
     this.targets = targets;
     // reference
     this._GlobalHeaderHeight = document.getElementById('GlobalHeader').clientHeight;
@@ -18,6 +19,7 @@ class TopPageLayoutManager {
   }
 
   update() {
+    if (!this._isReady) return;
     const drawerHeight = window.innerHeight - this._drawerView.offsetTop;
     this._SearchResultsView.style.height = `calc(100vh - ${this._GlobalHeaderHeight + this._SearchInputView.clientHeight + drawerHeight}px)`;
     this.targets.forEach(target => target.updateDisplaySize() );

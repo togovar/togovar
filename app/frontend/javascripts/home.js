@@ -39,10 +39,6 @@ export function initHome() {
     // 検索窓
     new SearchConditionController(document.getElementById('SimpleSearchView'));
     new AdvancedSearchDatasetsView(document.getElementById('AdvancedSearchDatasetsView'))
-    // モジュールタブメニュー
-    document.querySelectorAll('.module-tabs-view').forEach(elm => {
-      new ModuleTabsView(elm);
-    });
     // change search mode
     const body = document.getElementsByTagName('body')[0];
     console.log(body);
@@ -51,6 +47,10 @@ export function initHome() {
         console.log(e.target.dataset.target)
         body.dataset.searchMode = e.target.dataset.target;
       })
+    });
+    // モジュールタブメニュー
+    document.querySelectorAll('.module-tabs-view').forEach(elm => {
+      new ModuleTabsView(elm);
     });
 
     // 検索結果表示画面
