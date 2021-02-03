@@ -1,3 +1,5 @@
+import TopPageLayoutManager from "./TopPageLayoutManager.js";
+
 export default class ModuleTabsView {
 
   constructor(elm) {
@@ -14,8 +16,10 @@ export default class ModuleTabsView {
         // select tab
         e.target.classList.add('-current');
         e.target.target.classList.add('-current');
-        // set local storage
+        // set status in localStorage
         window.localStorage.setItem(e.target.dataset.tabGroup, e.target.dataset.target);
+        // update layout
+        TopPageLayoutManager.update();
       })
     })
 

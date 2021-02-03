@@ -4,6 +4,7 @@ export default class SideBar {
 
   constructor(elm) {
     this._elm = elm;
+    this._body = document.getElementsByTagName('body')[0];
     // イベント
     StoreManager.bind('selectedRow', this);
     // スクロールバーを隠す
@@ -25,11 +26,11 @@ export default class SideBar {
 
   selectedRow(index) {
     if (index === undefined) {
-      // フィルターを表示
-      this._elm.classList.remove('-rowselected');
+      // show filters
+      this._body.classList.remove('-rowselected');
     } else {
-      // プレビューを表示
-      this._elm.classList.add('-rowselected');
+      // show previews
+      this._body.classList.add('-rowselected');
     }
   }
 
