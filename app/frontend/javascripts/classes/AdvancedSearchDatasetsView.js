@@ -7,10 +7,12 @@ export default class AdvancedSearchDatasetsView {
   constructor(elm) {
     // generate
     console.log(elm)
+    this._conditionMaster = StoreManager.getSearchConditionMaster('adv_frequency');
+    console.log(this._conditionMaster)
     const datasetMaster = StoreManager.getSearchConditionMaster('dataset');
     const tbody = elm.querySelector(':scope > .tablecontainer > table > tbody');
     tbody.innerHTML = `
-    ${datasetMaster.items.map(item => {
+    ${this._conditionMaster.items.map(item => {
       return `
       <tr>
         <td>
@@ -30,7 +32,7 @@ export default class AdvancedSearchDatasetsView {
         </td>
         <td>
           <div class="frequencyandcount">
-            <div class="range-selector-view"></div>
+            <div class="range-selector-view" data-dataset="${item.id}"></div>
           </div>
         </td>
         <td>
@@ -40,18 +42,36 @@ export default class AdvancedSearchDatasetsView {
         </td>
       </tr>`;
     }).join('')}`;
-    tbody.querySelectorAll('.range-selector-view').forEach((elm, index) => {
-      //new RangeSelectorView(elm, 0, 1, 'horizontal', 'adv_frequency', 'advanced');
+    this._rangeSelectorViews = tbody.querySelectorAll('.range-selector-view');
+    this._rangeSelectorViews.forEach((elm, index) => {
+      new RangeSelectorView(elm, this, 0, 1, 'horizontal', 'advanced');
     });
-    console.log(  )
+    console.log(this._rangeSelectorViews)
 
-    this._conditionMaster = StoreManager.getSearchConditionMaster('adv_frequency');
-    console.log(this._conditionMaster)
+
+    // events
+    StoreManager.bind('searchConditions', this);
 
     // collapse
     elm.querySelectorAll('.collapse-view').forEach(elm => {
       new CollapseView(elm);
     });
+  }
+
+  changeParameter(newCondition, target) {
+    console.log(newCondition)
+    console.log(target.elm.dataset.dataset)
+    //const condition = this._getConditionFromStore();
+    //for (const key in newCondition) {
+    //  condition[key] = newCondition[key];
+    //}
+    //StoreManager.setSearchCondition(this.kind, condition);
+  }
+
+  searchConditions(conditions) {
+    const condition = conditions[this.kind];
+    if (condition === undefined) return;
+    this._rangeSelectorView.updateGUIWithCondition(condition);
   }
 
 }
