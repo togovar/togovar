@@ -41,10 +41,8 @@ export function initHome() {
     new AdvancedSearchDatasetsView(document.getElementById('AdvancedSearchDatasetsView'))
     // change search mode
     const body = document.getElementsByTagName('body')[0];
-    console.log(body);
     document.querySelectorAll('#SearchInputView > .tabscontainer > ul > li').forEach(elm => {
       elm.addEventListener('click', e => {
-        console.log(e.target.dataset.target)
         body.dataset.searchMode = e.target.dataset.target;
       })
     });

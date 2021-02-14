@@ -113,6 +113,7 @@ export default class ResultsView {
   }
 
   searchMessages(messages) {
+    console.log(messages)
     this.messages.innerHTML = '';
 
     if (messages.notice) {
