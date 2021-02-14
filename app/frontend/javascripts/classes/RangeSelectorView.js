@@ -67,7 +67,7 @@ export default class RangeSelectorView {
     const meter = elm.querySelector(':scope > .meter');
     this._bar = meter.querySelector(':scope > .barcontainer > .bar');
     this._slider = meter.querySelector(':scope > .slider');
-    this._sliderWidth = this._slider.offsetWidth - 16;
+    //this._sliderWidth = this._slider.offsetWidth - 16;
     this._sliderFrom = this._slider.querySelector(':scope > .from');
     this._sliderTo = this._slider.querySelector(':scope > .to');
     const match = elm.querySelector(':scope > .match');
@@ -75,6 +75,7 @@ export default class RangeSelectorView {
       this._all = match.querySelector(':scope > label > .all');
       this._any = match.querySelector(':scope > label > .any');
     }
+
 
     // default values
     this._changeParameter({});
@@ -106,12 +107,13 @@ export default class RangeSelectorView {
   }
 
   _drag(e, ui) {
+    Decimal.precision = 3;
     switch (true) {
       case e.target.classList.contains('from'):
-        this._changeParameter({from: Math.ceil((ui.position.left / this._sliderWidth) * 100) * 0.01});
+        this._changeParameter({from: Decimal.div(ui.position.left, this._sliderWidth).toNumber()});
         break;
       case e.target.classList.contains('to'):
-        this._changeParameter({to: Math.floor(((ui.position.left - 8) / this._sliderWidth) * 100) * 0.01});
+        this._changeParameter({to: Decimal.div(ui.position.left - 8, this._sliderWidth).toNumber()});
         break;
     }
   }
@@ -159,6 +161,9 @@ export default class RangeSelectorView {
     }
   }
 
+  get _sliderWidth() {
+    return this._slider.offsetWidth - 16;
+  }
   get fromPosition() {
     return `${this._sliderWidth * this._from.value}px`;
   }

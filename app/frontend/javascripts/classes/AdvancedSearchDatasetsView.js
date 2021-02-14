@@ -9,7 +9,6 @@ export default class AdvancedSearchDatasetsView {
     console.log(elm)
     this._conditionMaster = StoreManager.getSearchConditionMaster('adv_frequency');
     console.log(this._conditionMaster)
-    const datasetMaster = StoreManager.getSearchConditionMaster('dataset');
     const tbody = elm.querySelector(':scope > .tablecontainer > table > tbody');
     tbody.innerHTML = `
     ${this._conditionMaster.items.map(item => {
@@ -46,11 +45,9 @@ export default class AdvancedSearchDatasetsView {
     this._rangeSelectorViews.forEach((elm, index) => {
       new RangeSelectorView(elm, this, 0, 1, 'horizontal', 'advanced');
     });
-    console.log(this._rangeSelectorViews)
-
 
     // events
-    StoreManager.bind('searchConditions', this);
+    StoreManager.bind('advancedSearchConditions', this);
 
     // collapse
     elm.querySelectorAll('.collapse-view').forEach(elm => {
@@ -59,19 +56,40 @@ export default class AdvancedSearchDatasetsView {
   }
 
   changeParameter(newCondition, target) {
-    console.log(newCondition)
-    console.log(target.elm.dataset.dataset)
-    //const condition = this._getConditionFromStore();
-    //for (const key in newCondition) {
-    //  condition[key] = newCondition[key];
-    //}
-    //StoreManager.setSearchCondition(this.kind, condition);
+    const condition = this._getConditionFromStore();
+    Object.keys(newCondition).forEach(key => {
+      switch (key) {
+        case 'from':
+          condition[target.elm.dataset.dataset].frequency.gte = newCondition[key];
+          break;
+        case 'to':
+          condition[target.elm.dataset.dataset].frequency.lte = newCondition[key];
+          break;
+        case 'invert':
+          //condition[target.elm.dataset.dataset].frequency.gte = newCondition[key];
+          break;
+      }
+    });
+    console.log(condition)
+    StoreManager.setAdvancedSearchCondition('adv_frequency', condition);
   }
 
-  searchConditions(conditions) {
-    const condition = conditions[this.kind];
+  advancedSearchConditions(conditions) {
+    console.log(conditions)
+    const condition = conditions['adv_frequency'];
     if (condition === undefined) return;
     this._rangeSelectorView.updateGUIWithCondition(condition);
+  }
+
+  _getConditionFromStore() {
+    let condition = StoreManager.getSearchCondition(this.kind);
+    // if the condition is undefined, generate it from master
+    condition = condition ? condition : this._conditionMaster.items.reduce((acc, item) => Object.assign(acc, {[item.id]: item.default}), {});
+    // if each items of the condition are not defined, generate them from master
+    for (const item of this._conditionMaster.items) {
+      condition[item.id] = condition[item.id] ? condition[item.id] : this._conditionMaster.items.find(frequency => frequency.id === item.id).default;
+    }
+    return condition;
   }
 
 }

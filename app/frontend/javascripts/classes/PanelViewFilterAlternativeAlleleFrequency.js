@@ -35,7 +35,7 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
 
   _getConditionFromStore() {
     let condition = StoreManager.getSearchCondition(this.kind);
-    // if the condition is undefined, generate it from master.
+    // if the condition is undefined, generate it from master
     condition = condition ? condition : this._conditionMaster.items.reduce((acc, item) => Object.assign(acc, {[item.id]: item.default}), {});
     // if each items of the condition are not defined, generate them from master
     for (const item of this._conditionMaster.items) {
