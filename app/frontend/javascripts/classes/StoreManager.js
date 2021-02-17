@@ -135,78 +135,14 @@ class StoreManager {
     // console.log(this._store)
     // console.log(this._store.advancedSearchConditions)
     this._store.advancedSearchConditions[key] = values;
-    return;
     // URIパラメータに反映 TODO:
     // if (!fromHistory) this._reflectSearchConditionToURI();
     // 検索条件として成立していれば、検索開始
     if (!this._isReady) return;
-
-    if (this._fetching === true) return;
-    // extract diff
-    const conditions = this._extractAdvancedSearchCondition(key, values);
-    if (conditions.length === 0) return;
-
-    // リセット
-    this.setData('numberOfRecords', 0);
-    this.setData('offset', 0);
-    this.setData('rowCount', 0);
-    this._store.searchResults = [];
-    this.setResults([], 0);
-    // 通知
-    this._notify('advancedSearchConditions');
-    // 検索
+    this._notify('searchAdvancedConditions');
     this.setData('appStatus', 'searching');
-    this._fetching = true;
-    let path = `${API_URL}/api/search/variation`;
-    fetch(path, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      method: 'POST',
-      mode: 'cors',
-      body: JSON.stringify({
-        query: {
-          or: conditions
-        }
-      })
-    })
-    .then(response => response.json())
-    .then(json => {
-      console.log(json)
-      // status
-      this.setData('searchStatus', {
-        available: Math.min(json.statistics.filtered, json.scroll.max_rows),
-        filtered: json.statistics.filtered,
-        total: json.statistics.total
-      });
+    this._search(0, true);
 
-      // results
-      this.setData('numberOfRecords', this.getData('searchStatus').available);
-      this.setResults(json.data, json.scroll.offset);
-
-      // statistics
-      // dataset
-      this.setData('statisticsDataset', json.statistics.dataset);
-      // significance
-      this.setData('statisticsSignificance', json.statistics.significance);
-      // total_variant_type
-      this.setData('statisticsType', json.statistics.type);
-      // consequence
-      this.setData('statisticsConsequence', json.statistics.consequence);
-
-      this.setData('searchMessages', {
-        error: json.error,
-        warning: json.warning,
-        notice: json.notice
-      });
-
-      this._fetching = false;
-      this._notify('offset');
-      this.setData('appStatus', 'normal');
-      console.log(this)
-
-    })
   }
 
   _setSearchConditions(conditions, fromHistory) {
@@ -218,15 +154,7 @@ class StoreManager {
     if (!fromHistory) this._reflectSearchConditionToURI();
     // 検索条件として成立していれば、検索開始
     if (this._isReady) {
-      // リセット
-      // this.setData('numberOfRecords', 0);
-      // this.setData('offset', 0);
-      // this.setData('rowCount', 0);
-      // this._store.searchResults = [];
-      // this.setResults([], 0);
-      // 通知
       this._notify('searchConditions');
-      // 検索
       this.setData('appStatus', 'searching');
       this._search(0, true);
     }
@@ -295,30 +223,45 @@ class StoreManager {
     return diffConditions;
   }
 
-  _extractAdvancedSearchCondition(key = 'adv_frequency', values) {
-    console.log(key, values)
+  _extractAdvancedSearchCondition(conditions) {
+    console.log(conditions)
     const searchConditionsMaster = this.getData('searchConditionsMaster');
-    console.log(searchConditionsMaster)
-    const conditionMaster = searchConditionsMaster.find(condition => condition.id === key)
+    const conditionMaster = searchConditionsMaster.find(condition => condition.id === 'adv_frequency'); // TODO: 暫定的にデータセットだけに対応
     console.log(conditionMaster)
     const diffConditions = [];
-    for (const dataset in values) {
-      const datasetDefault = conditionMaster.items.find(item => item.id === dataset).default;
-      console.log(datasetDefault)
-      if ( Object.keys(values[dataset].frequency).some(key_ => datasetDefault.frequency[key_] === undefined || datasetDefault.frequency[key_] !== values[dataset].frequency[key_]) ) {
-        console.log(diffConditions)
-        diffConditions.push({
-          frequency: {
-            dataset: {
-              name: dataset
-            },
-            frequency: values[dataset].frequency
-          }
-        })
+
+    Object.keys(conditions).forEach(key => {
+      const condition = conditions[key];
+      console.log(key, condition);
+      switch (key) {
+        case 'adv_frequency': {
+          Object.keys(condition).forEach(datasetKey => {
+            console.log(datasetKey, condition[datasetKey])
+            console.log(condition[datasetKey].frequency)
+            const datasetDefault = conditionMaster.items.find(item => item.id === datasetKey).default;
+            console.log(datasetDefault.frequency)
+            const isUnmatch = Object.keys(condition[datasetKey].frequency).some(conditionKey => {
+              const defaultValue = datasetDefault.frequency[conditionKey];
+              return defaultValue === undefined || defaultValue !== condition[datasetKey].frequency[conditionKey];
+            });
+            if (isUnmatch) {
+              diffConditions.push({
+                frequency: {
+                  dataset: {
+                    name: datasetKey
+                  },
+                  frequency: condition[datasetKey].frequency
+                }
+              })
+            }
+          })
+        }
+          break;
       }
-    }
-    console.log(diffConditions)
-    return {[key]: diffConditions};
+    });
+
+    return diffConditions
+
   }
 
   // URIパラメータをアドレスバーに反映
@@ -353,6 +296,7 @@ class StoreManager {
     console.log('searchMode:', this._store.searchMode)
 
     // dont execute if search is in progress
+    console.log('fetching:', this._fetching)
     if (this._fetching === true) return;
 
     // reset
@@ -367,6 +311,7 @@ class StoreManager {
     // retain search conditions
     const lastConditions = JSON.stringify(this._store.searchConditions); // TODO:
 
+    console.log('!!!')
     this._fetching = true;
     let method, path, body = '';
     if (this._URIParameters.path === 'local') {
@@ -384,9 +329,9 @@ class StoreManager {
           break;
         case 'advanced': {
           method = 'POST';
-          console.log(this._extractAdvancedSearchCondition())
           path = `${API_URL}/api/search/variation`;
-          const conditions = this._extractAdvancedSearchCondition();
+          const conditions = this._extractAdvancedSearchCondition( this._store.advancedSearchConditions );
+          console.log( conditions )
           const query = conditions.length > 0
             ? {
               or: conditions
@@ -463,6 +408,7 @@ class StoreManager {
         this._fetching = false;
         this._notify('offset');
         this.setData('appStatus', 'normal');
+        console.log(json, this._fetching)
 
         // もし検索中に検索条件が変われば、再検索
         if (lastConditions !== JSON.stringify(this._store.searchConditions)) {
