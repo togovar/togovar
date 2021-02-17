@@ -19,6 +19,7 @@ class StoreManager {
     };
     // events
     window.addEventListener('popstate', this._popstate.bind(this));
+    this.bind('searchMode', this);
   }
 
   ready(callback) {
@@ -31,8 +32,8 @@ class StoreManager {
     this._store.advancedSearchConditions = {};
     callback();
     this._isReady = true;
-    // 初回の検索結果取得
-    this._search(0);
+    // // 初回の検索結果取得
+    // this._search(0);
   }
 
   getData(key) {
@@ -54,7 +55,7 @@ class StoreManager {
         return this._copy(record);
       } else {
         // 取得できていないレコードの取得
-        this._search(this._store.offset + index);
+        // this._search(this._store.offset + index);
         this.setData('appStatus', 'loading');
         return 'loading';
       }
@@ -74,6 +75,7 @@ class StoreManager {
       this._store[key] = this._copy(value);
       this._notify(key);
     }
+    // 個別の処理
   }
 
   // 検索結果は、特殊であるため専用メソッドを用意
@@ -86,8 +88,9 @@ class StoreManager {
     this._notify('searchResults');
   }
 
+  // notify bound objects
+  // used in 'setData()' or directory
   _notify(key) {
-    // 通知
     // console.log(key)
     if (this._bindings[key]) {
       for (const watcher of this._bindings[key]) {
@@ -146,6 +149,7 @@ class StoreManager {
     this.setData('numberOfRecords', 0);
     this.setData('offset', 0);
     this.setData('rowCount', 0);
+    console.log('!!!')
     this._store.searchResults = [];
     this.setResults([], 0);
     // 通知
@@ -206,6 +210,7 @@ class StoreManager {
   }
 
   _setSearchConditions(conditions, fromHistory) {
+    console.log(conditions, fromHistory)
     for (const conditionKey in conditions) {
       this._store.searchConditions[conditionKey] = conditions[conditionKey];
     }
@@ -217,13 +222,14 @@ class StoreManager {
       this.setData('numberOfRecords', 0);
       this.setData('offset', 0);
       this.setData('rowCount', 0);
+      console.log('!!!')
       this._store.searchResults = [];
       this.setResults([], 0);
       // 通知
       this._notify('searchConditions');
       // 検索
       this.setData('appStatus', 'searching');
-      this._search(0);
+      // this._search(0);
     }
   }
 
@@ -245,6 +251,7 @@ class StoreManager {
           break;
       }
     }
+    console.log('****')
     this._setSearchConditions(resetConditions);
   }
 
@@ -317,7 +324,6 @@ class StoreManager {
 
   // URIパラメータをアドレスバーに反映
   _reflectSearchConditionToURI() {
-    console.log( this._searchMode )
     const master = this.getData('searchConditionsMaster');
     const diffConditions = this._extractSearchCondition(this._store.searchConditions);
     // 一旦パラメータ削除
@@ -333,12 +339,14 @@ class StoreManager {
   // ヒストリーが変更されたら、URL変数を取得し検索条件を更新
   _popstate(e) {
     const URIParameters = $.deparam(window.location.search.substr(1));
+    console.log('****')
     this._setSearchConditions(URIParameters, true);
   }
 
 
   // 検索 *******************************************
   _search(offset) {
+    console.log('_search', offset)
     if (this._fetching === true) {
       // 検索中であれば実行せず
       return;
@@ -415,18 +423,23 @@ class StoreManager {
 
         // もし検索中に検索条件が変われば、再検索
         if (lastConditions !== JSON.stringify(this._store.searchConditions)) {
+          console.log('****')
           this._setSearchConditions({});
         }
       });
   }
 
-  get _searchMode() {
-    if (this._body === undefined) {
-      this._body = document.getElementsByTagName('body')[0];
+  // Bindings *******************************************
+  searchMode(mode) {
+    if (this._lastSearchMode !== mode) {
+      this._lastSearchMode = mode;
+      // start search
+      this.setData('appStatus', 'searching');
+      this._search(0);
     }
-    console.log( this._body )
-    return { SimpleSearchView: 'simple', AdvancedSearchView: 'advanced' }[this._body.dataset.searchMode];
+
   }
+
 }
 
 export default new StoreManager();
