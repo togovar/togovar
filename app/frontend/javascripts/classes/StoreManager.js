@@ -55,7 +55,7 @@ class StoreManager {
         return this._copy(record);
       } else {
         // 取得できていないレコードの取得
-        // this._search(this._store.offset + index);
+        this._search(this._store.offset + index);
         this.setData('appStatus', 'loading');
         return 'loading';
       }
@@ -135,6 +135,7 @@ class StoreManager {
     // console.log(this._store)
     // console.log(this._store.advancedSearchConditions)
     this._store.advancedSearchConditions[key] = values;
+    return;
     // URIパラメータに反映 TODO:
     // if (!fromHistory) this._reflectSearchConditionToURI();
     // 検索条件として成立していれば、検索開始
@@ -149,7 +150,6 @@ class StoreManager {
     this.setData('numberOfRecords', 0);
     this.setData('offset', 0);
     this.setData('rowCount', 0);
-    console.log('!!!')
     this._store.searchResults = [];
     this.setResults([], 0);
     // 通知
@@ -219,17 +219,16 @@ class StoreManager {
     // 検索条件として成立していれば、検索開始
     if (this._isReady) {
       // リセット
-      this.setData('numberOfRecords', 0);
-      this.setData('offset', 0);
-      this.setData('rowCount', 0);
-      console.log('!!!')
-      this._store.searchResults = [];
-      this.setResults([], 0);
+      // this.setData('numberOfRecords', 0);
+      // this.setData('offset', 0);
+      // this.setData('rowCount', 0);
+      // this._store.searchResults = [];
+      // this.setResults([], 0);
       // 通知
       this._notify('searchConditions');
       // 検索
       this.setData('appStatus', 'searching');
-      // this._search(0);
+      this._search(0, true);
     }
   }
 
@@ -251,7 +250,6 @@ class StoreManager {
           break;
       }
     }
-    console.log('****')
     this._setSearchConditions(resetConditions);
   }
 
@@ -297,9 +295,10 @@ class StoreManager {
     return diffConditions;
   }
 
-  _extractAdvancedSearchCondition(key, values) {
+  _extractAdvancedSearchCondition(key = 'adv_frequency', values) {
     console.log(key, values)
     const searchConditionsMaster = this.getData('searchConditionsMaster');
+    console.log(searchConditionsMaster)
     const conditionMaster = searchConditionsMaster.find(condition => condition.id === key)
     console.log(conditionMaster)
     const diffConditions = [];
@@ -339,32 +338,76 @@ class StoreManager {
   // ヒストリーが変更されたら、URL変数を取得し検索条件を更新
   _popstate(e) {
     const URIParameters = $.deparam(window.location.search.substr(1));
-    console.log('****')
     this._setSearchConditions(URIParameters, true);
   }
 
 
   // 検索 *******************************************
-  _search(offset) {
-    console.log('_search', offset)
-    if (this._fetching === true) {
-      // 検索中であれば実行せず
-      return;
+  /**
+   * 
+   * @param {Number} offset 
+   * @param {Boolean} isFirstTime 
+   */
+  _search(offset, isFirstTime = false) {
+    console.log('_search', offset, isFirstTime);
+    console.log('searchMode:', this._store.searchMode)
+
+    // dont execute if search is in progress
+    if (this._fetching === true) return;
+
+    // reset
+    if (isFirstTime) {
+      this.setData('numberOfRecords', 0);
+      this.setData('offset', 0);
+      this.setData('rowCount', 0);
+      this._store.searchResults = [];
+      this.setResults([], 0);
     }
-    const lastConditions = JSON.stringify(this._store.searchConditions);
+
+    // retain search conditions
+    const lastConditions = JSON.stringify(this._store.searchConditions); // TODO:
+
     this._fetching = true;
-    let path;
+    let method, path, body = '';
     if (this._URIParameters.path === 'local') {
       if (offset === 0) {
         path = 'results.json';
       }
     } else {
-      path = `${API_URL}/search?offset=${offset - offset % LIMIT}&${$.param(this._extractSearchCondition(this._store.searchConditions))}`;
+      switch (this._store.searchMode) {
+        case 'simple': {
+          method = 'GET';
+          const conditions = $.param(this._extractSearchCondition(this._store.searchConditions));
+          console.log(conditions)
+          path = `${API_URL}/search?offset=${offset - offset % LIMIT}${conditions ? '&' + conditions : ''}`;
+        }
+          break;
+        case 'advanced': {
+          method = 'POST';
+          console.log(this._extractAdvancedSearchCondition())
+          path = `${API_URL}/api/search/variation`;
+          const conditions = this._extractAdvancedSearchCondition();
+          const query = conditions.length > 0
+            ? {
+              or: conditions
+            }
+            : {};
+          body = JSON.stringify({
+            query: query,
+            offset: this._store.offset
+          });
+        }
+          break;
+      }
     }
     fetch(path, {
       headers: {
+        'Content-Type': 'application/json',
         'Accept': 'application/json'
-      }
+      },
+      method: method,
+      mode: 'cors',
+      body: body
     })
       .catch(e => {
         throw Error(e);
@@ -423,7 +466,6 @@ class StoreManager {
 
         // もし検索中に検索条件が変われば、再検索
         if (lastConditions !== JSON.stringify(this._store.searchConditions)) {
-          console.log('****')
           this._setSearchConditions({});
         }
       });
@@ -435,7 +477,7 @@ class StoreManager {
       this._lastSearchMode = mode;
       // start search
       this.setData('appStatus', 'searching');
-      this._search(0);
+      this._search(0, true);
     }
 
   }
