@@ -25,6 +25,8 @@ import PanelViewPreviewAlternativeAlleleFrequencies from '../javascripts/classes
 import PanelViewPreviewConsequence from '../javascripts/classes/PanelViewPreviewConsequence.js';
 import PanelViewPreviewClinicalSignificance from '../javascripts/classes/PanelViewPreviewClinicalSignificance.js';
 
+let body;
+
 export function initHome() {
   StoreManager.setData('offset', 0);
   StoreManager.setData('selectedRow', undefined);
@@ -36,21 +38,6 @@ export function initHome() {
   new ActivityIndicator(document.getElementById('ActivityIndicator'));
 
   StoreManager.ready(() => {
-    // 検索窓
-    new SearchConditionController(document.getElementById('SimpleSearchView'));
-    new AdvancedSearchDatasetsView(document.getElementById('AdvancedSearchDatasetsView'))
-    // change search mode
-    const body = document.getElementsByTagName('body')[0];
-    document.querySelectorAll('#SearchInputView > .tabscontainer > ul > li').forEach(elm => {
-      elm.addEventListener('click', e => {
-        body.dataset.searchMode = e.target.dataset.target;
-      })
-    });
-    // モジュールタブメニュー
-    document.querySelectorAll('.module-tabs-view').forEach(elm => {
-      new ModuleTabsView(elm);
-    });
-
     // 検索結果表示画面
     const resultView = new ResultsView(document.getElementById('ResultsView'));
 
@@ -79,6 +66,27 @@ export function initHome() {
     // 開閉
     const elm = document.querySelector('#AdvancedSearchView .collapse-view');
     new CollapseView(elm);
+
+    // 検索窓
+    new SearchConditionController(document.getElementById('SimpleSearchView'));
+    new AdvancedSearchDatasetsView(document.getElementById('AdvancedSearchDatasetsView'))
+    // change search mode
+    body = document.getElementsByTagName('body')[0];
+    document.querySelectorAll('#SearchInputView > .tabscontainer > ul > li').forEach(elm => {
+      elm.addEventListener('click', e => changeSearchMode(e.target.dataset.target));
+    });
+    // モジュールタブメニュー
+    document.querySelectorAll('.module-tabs-view').forEach(elm => {
+      new ModuleTabsView(elm);
+    });
+
   });
 
+}
+
+function changeSearchMode(searchViewName) {
+  const searchMode = { SimpleSearchView: 'simple', AdvancedSearchView: 'advanced' }[searchViewName];
+  console.log('changeSearchMode', searchMode)
+  body.dataset.searchMode = searchMode;
+  StoreManager.setData('searchMode', searchMode);
 }
