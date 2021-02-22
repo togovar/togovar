@@ -313,6 +313,13 @@ class StoreManager {
 
     console.log('!!!')
     this._fetching = true;
+    const options = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      mode: 'cors'
+    }
     let method, path, body = '';
     if (this._URIParameters.path === 'local') {
       if (offset === 0) {
@@ -321,14 +328,13 @@ class StoreManager {
     } else {
       switch (this._store.searchMode) {
         case 'simple': {
-          method = 'GET';
           const conditions = $.param(this._extractSearchCondition(this._store.searchConditions));
           console.log(conditions)
           path = `${API_URL}/search?offset=${offset - offset % LIMIT}${conditions ? '&' + conditions : ''}`;
+          options.method = 'GET';
         }
           break;
         case 'advanced': {
-          method = 'POST';
           path = `${API_URL}/api/search/variation`;
           const conditions = this._extractAdvancedSearchCondition( this._store.advancedSearchConditions );
           console.log( conditions )
@@ -337,7 +343,8 @@ class StoreManager {
               or: conditions
             }
             : {};
-          body = JSON.stringify({
+          options.method = 'POST';
+          options.body = JSON.stringify({
             query: query,
             offset: this._store.offset
           });
@@ -345,15 +352,7 @@ class StoreManager {
           break;
       }
     }
-    fetch(path, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      method: method,
-      mode: 'cors',
-      body: body
-    })
+    fetch(path, options)
       .catch(e => {
         throw Error(e);
       })
