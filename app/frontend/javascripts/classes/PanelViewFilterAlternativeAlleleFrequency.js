@@ -13,7 +13,7 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
     const condition = this._getConditionFromStore();
 
     this._rangeSelectorView = new RangeSelectorView(elm.querySelector('.range-selector-view'), this, 0, 1, 'vertical', 'simple');
-    this._rangeSelectorView.updateGUIWithCondition(condition);
+    this._rangeSelectorView.updateGUIWithConditionV1(condition);
 
     // events
     StoreManager.bind('searchConditions', this);
@@ -30,7 +30,7 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
   searchConditions(conditions) {
     const condition = conditions[this.kind];
     if (condition === undefined) return;
-    this._rangeSelectorView.updateGUIWithCondition(condition);
+    this._rangeSelectorView.updateGUIWithConditionV1(condition);
   }
 
   _getConditionFromStore() {

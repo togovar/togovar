@@ -76,7 +76,6 @@ export default class RangeSelectorView {
       this._any = match.querySelector(':scope > label > .any');
     }
 
-
     // default values
     this._changeParameter({});
 
@@ -101,12 +100,12 @@ export default class RangeSelectorView {
     $('.slider > *', meter).draggable({
       axis: 'x',
       containment: this._slider,
-      drag: this._drag.bind(this)
+      stop: this._dragEnd.bind(this)
     });
 
   }
 
-  _drag(e, ui) {
+  _dragEnd(e, ui) {
     Decimal.precision = 3;
     switch (true) {
       case e.target.classList.contains('from'):
@@ -137,7 +136,7 @@ export default class RangeSelectorView {
     this._delegate.changeParameter(newCondition, this);
   }
 
-  updateGUIWithCondition(condition) {
+  updateGUIWithConditionV1(condition) {
     // values
     this._from.value = condition.from;
     this._to.value = condition.to;
@@ -159,6 +158,15 @@ export default class RangeSelectorView {
       this._all.checked = condition.match === 'all';
       this._any.checked = condition.match === 'any';
     }
+  }
+
+  updateGUIWithConditionV2(condition) {
+    const convertedCondition = {
+      from: condition.frequency.gte,
+      to: condition.frequency.lte,
+      invert: 0
+    };
+    this.updateGUIWithConditionV1(convertedCondition);
   }
 
   get _sliderWidth() {

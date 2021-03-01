@@ -41,10 +41,15 @@ export default class AdvancedSearchDatasetsView {
         </td>
       </tr>`;
     }).join('')}`;
-    this._rangeSelectorViews = tbody.querySelectorAll('.range-selector-view');
-    this._rangeSelectorViews.forEach((elm, index) => {
-      new RangeSelectorView(elm, this, 0, 1, 'horizontal', 'advanced');
+    this._rangeSelectorViews = {};
+    tbody.querySelectorAll('.range-selector-view').forEach(elm => {
+      this._rangeSelectorViews[elm.dataset.dataset] = new RangeSelectorView(elm, this, 0, 1, 'horizontal', 'advanced');
     });
+    // this._rangeSelectorViews = tbody.querySelectorAll('.range-selector-view');
+    // this._rangeSelectorViews.forEach(elm => {
+    //   new RangeSelectorView(elm, this, 0, 1, 'horizontal', 'advanced');
+    // });
+    console.log( this._rangeSelectorViews )
 
     // events
     StoreManager.bind('advancedSearchConditions', this);
@@ -75,10 +80,15 @@ export default class AdvancedSearchDatasetsView {
   }
 
   advancedSearchConditions(conditions) {
-    console.log(conditions)
     const condition = conditions['adv_frequency'];
+    console.log(condition)
     if (condition === undefined) return;
-    this._rangeSelectorView.updateGUIWithCondition(condition);
+    for (const rangeDatasetKey in this._rangeSelectorViews) {
+      console.log(rangeDatasetKey)
+      const thatCondition = condition[rangeDatasetKey];
+      console.log(thatCondition)
+      this._rangeSelectorViews[rangeDatasetKey].updateGUIWithConditionV2(thatCondition);
+    }
   }
 
   _getConditionFromStore() {

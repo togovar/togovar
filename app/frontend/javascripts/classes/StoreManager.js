@@ -139,10 +139,9 @@ class StoreManager {
     // if (!fromHistory) this._reflectSearchConditionToURI();
     // 検索条件として成立していれば、検索開始
     if (!this._isReady) return;
-    this._notify('searchAdvancedConditions');
+    this._notify('advancedSearchConditions');
     this.setData('appStatus', 'searching');
     this._search(0, true);
-
   }
 
   _setSearchConditions(conditions, fromHistory) {
