@@ -70,17 +70,13 @@
         "id": "from",
         "label": "From",
         "type": "range",
-        "default": 0,
-        "gte": 0,
-        "lte": 1
+        "default": 0
       },
       {
         "id": "to",
         "label": "To",
         "type": "range",
-        "default": 1,
-        "gte": 0,
-        "lte": 1
+        "default": 1
       },
       {
         "id": "invert",
@@ -629,10 +625,9 @@
         "label": "GEM-J WGA",
         "type": "object",
         "default": {
-          "frequency": {
-            "gte": 0,
-            "lte": 1
-          },
+          "from": 0,
+          "to": 1,
+          "invert": false,
           "filtered": false
         }
       },
@@ -641,10 +636,9 @@
         "label": "JGA NGS",
         "type": "object",
         "default": {
-          "frequency": {
-            "gte": 0,
-            "lte": 1
-          },
+          "from": 0,
+          "to": 1,
+          "invert": false,
           "filtered": false
         }
       },
@@ -653,10 +647,9 @@
         "label": "JGA SNP",
         "type": "object",
         "default": {
-          "frequency": {
-            "gte": 0,
-            "lte": 1
-          },
+          "from": 0,
+          "to": 1,
+          "invert": false,
           "filtered": false
         }
       },
@@ -665,10 +658,9 @@
         "label": "ToMMo 4.7KJPN",
         "type": "object",
         "default": {
-          "frequency": {
-            "gte": 0,
-            "lte": 1
-          },
+          "from": 0,
+          "to": 1,
+          "invert": false,
           "filtered": false
         }
       },
@@ -677,10 +669,9 @@
         "label": "HGVD",
         "type": "object",
         "default": {
-          "frequency": {
-            "gte": 0,
-            "lte": 1
-          },
+          "from": 0,
+          "to": 1,
+          "invert": false,
           "filtered": false
         }
       },
@@ -689,10 +680,9 @@
         "label": "ExAC",
         "type": "object",
         "default": {
-          "frequency": {
-            "gte": 0,
-            "lte": 1
-          },
+          "from": 0,
+          "to": 1,
+          "invert": false,
           "filtered": false
         }
       },
@@ -701,10 +691,9 @@
         "label": "ClinVar",
         "type": "object",
         "default": {
-          "frequency": {
-            "gte": 0,
-            "lte": 1
-          },
+          "from": 0,
+          "to": 1,
+          "invert": false,
           "filtered": false
         }
       }

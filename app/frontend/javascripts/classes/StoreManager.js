@@ -235,23 +235,52 @@ class StoreManager {
       switch (key) {
         case 'adv_frequency': {
           Object.keys(condition).forEach(datasetKey => {
-            console.log(datasetKey, condition[datasetKey])
-            console.log(condition[datasetKey].frequency)
             const datasetDefault = conditionMaster.items.find(item => item.id === datasetKey).default;
-            console.log(datasetDefault.frequency)
-            const isUnmatch = Object.keys(condition[datasetKey].frequency).some(conditionKey => {
-              const defaultValue = datasetDefault.frequency[conditionKey];
-              return defaultValue === undefined || defaultValue !== condition[datasetKey].frequency[conditionKey];
+            console.log(condition[datasetKey])
+            const isUnmatch = Object.keys(condition[datasetKey]).some(conditionKey => {
+              const defaultValue = datasetDefault[conditionKey];
+              return defaultValue === undefined || defaultValue !== condition[datasetKey][conditionKey];
             });
             if (isUnmatch) {
-              diffConditions.push({
-                frequency: {
-                  dataset: {
-                    name: datasetKey
-                  },
-                  frequency: condition[datasetKey].frequency
-                }
-              })
+              // process dataset frequencies for advanced search
+              if (condition[datasetKey].invert === '1') {
+                diffConditions.push({
+                  frequency: {
+                    dataset: {
+                      name: datasetKey
+                    },
+                    frequency: {
+                      gte: 0,
+                      lte: condition[datasetKey].from
+                    },
+                    filtered: true
+                  }
+                }, {
+                  frequency: {
+                    dataset: {
+                      name: datasetKey
+                    },
+                    frequency: {
+                      gte: condition[datasetKey].to,
+                      lte: 1
+                    },
+                    filtered: true
+                  }
+                });
+              } else {
+                diffConditions.push({
+                  frequency: {
+                    dataset: {
+                      name: datasetKey
+                    },
+                    frequency: {
+                      gte: condition[datasetKey].from,
+                      lte: condition[datasetKey].to
+                    },
+                    filtered: true
+                  }
+                });
+              }
             }
           })
         }

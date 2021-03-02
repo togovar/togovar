@@ -45,11 +45,6 @@ export default class AdvancedSearchDatasetsView {
     tbody.querySelectorAll('.range-selector-view').forEach(elm => {
       this._rangeSelectorViews[elm.dataset.dataset] = new RangeSelectorView(elm, this, 0, 1, 'horizontal', 'advanced');
     });
-    // this._rangeSelectorViews = tbody.querySelectorAll('.range-selector-view');
-    // this._rangeSelectorViews.forEach(elm => {
-    //   new RangeSelectorView(elm, this, 0, 1, 'horizontal', 'advanced');
-    // });
-    console.log( this._rangeSelectorViews )
 
     // events
     StoreManager.bind('advancedSearchConditions', this);
@@ -62,20 +57,9 @@ export default class AdvancedSearchDatasetsView {
 
   changeParameter(newCondition, target) {
     const condition = this._getConditionFromStore();
-    Object.keys(newCondition).forEach(key => {
-      switch (key) {
-        case 'from':
-          condition[target.elm.dataset.dataset].frequency.gte = newCondition[key];
-          break;
-        case 'to':
-          condition[target.elm.dataset.dataset].frequency.lte = newCondition[key];
-          break;
-        case 'invert':
-          //condition[target.elm.dataset.dataset].frequency.gte = newCondition[key];
-          break;
-      }
-    });
-    console.log(condition)
+    for (const key in newCondition) {
+      condition[target.elm.dataset.dataset][key] = newCondition[key];
+    }
     StoreManager.setAdvancedSearchCondition('adv_frequency', condition);
   }
 
@@ -83,11 +67,10 @@ export default class AdvancedSearchDatasetsView {
     const condition = conditions['adv_frequency'];
     console.log(condition)
     if (condition === undefined) return;
+    // reflect changes in the slider
     for (const rangeDatasetKey in this._rangeSelectorViews) {
-      console.log(rangeDatasetKey)
       const thatCondition = condition[rangeDatasetKey];
-      console.log(thatCondition)
-      this._rangeSelectorViews[rangeDatasetKey].updateGUIWithConditionV2(thatCondition);
+      this._rangeSelectorViews[rangeDatasetKey].updateGUIWithCondition(thatCondition);
     }
   }
 
