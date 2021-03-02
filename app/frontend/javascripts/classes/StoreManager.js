@@ -27,13 +27,11 @@ class StoreManager {
     // 検索条件のマスターデータ
     Object.freeze(json);
     this.setData('searchConditionsMaster', json);
-    // 検索条件定義
+    // restore search conditions from URL parameters
     this._store.searchConditions = this._extractSearchCondition(this._URIParameters);
-    this._store.advancedSearchConditions = {};
+    this._store.advancedSearchConditions = {}; // TODO:
     callback();
     this._isReady = true;
-    // // 初回の検索結果取得
-    // this._search(0);
   }
 
   getData(key) {
@@ -126,11 +124,11 @@ class StoreManager {
   setSearchCondition(key, values) {
     this._setSearchConditions({[key]: values});
   }
-  setAdvancedSearchCondition(key, values) {
+  setAdvancedSearchCondition(key, values, fromHistory) {
     console.log(key, values)
     this._store.advancedSearchConditions[key] = values;
     // URIパラメータに反映 TODO:
-    // if (!fromHistory) this._reflectSearchConditionToURI();
+    if (!fromHistory) this._reflectAdvancedSearchConditionToURI();
     // 検索条件として成立していれば、検索開始
     if (!this._isReady) return;
     this._notify('advancedSearchConditions');
@@ -238,36 +236,38 @@ class StoreManager {
             if (isUnmatch) {
               console.log(condition[datasetKey])
               // process dataset frequencies for advanced search
+              const dataset = { name: datasetKey };
               if (condition[datasetKey].invert === '1') {
-                diffConditions.push({
-                  frequency: {
-                    dataset: {
-                      name: datasetKey
-                    },
-                    frequency: {
-                      gte: 0,
-                      lte: condition[datasetKey].from
-                    },
-                    filtered: condition[datasetKey].filtered
+                diffConditions.push(
+                  {
+                    or: [
+                      {
+                        frequency: {
+                          dataset,
+                          frequency: {
+                            gte: 0,
+                            lte: condition[datasetKey].from
+                          },
+                          filtered: condition[datasetKey].filtered
+                        }
+                      },
+                      {
+                        frequency: {
+                          dataset,
+                          frequency: {
+                            gte: condition[datasetKey].to,
+                            lte: 1
+                          },
+                          filtered: condition[datasetKey].filtered
+                        }
+                      }
+                    ]
                   }
-                }, {
-                  frequency: {
-                    dataset: {
-                      name: datasetKey
-                    },
-                    frequency: {
-                      gte: condition[datasetKey].to,
-                      lte: 1
-                    },
-                    filtered: condition[datasetKey].filtered
-                  }
-                });
+                );
               } else {
                 diffConditions.push({
                   frequency: {
-                    dataset: {
-                      name: datasetKey
-                    },
+                    dataset,
                     frequency: {
                       gte: condition[datasetKey].from,
                       lte: condition[datasetKey].to
@@ -287,11 +287,11 @@ class StoreManager {
 
   }
 
-  // URIパラメータをアドレスバーに反映
+  // update uri parameters
   _reflectSearchConditionToURI() {
     const master = this.getData('searchConditionsMaster');
     const diffConditions = this._extractSearchCondition(this._store.searchConditions);
-    // 一旦パラメータ削除
+    // remove uri parameters temporally
     for (const condition of master) {
       delete this._URIParameters[condition.id];
     }
@@ -300,6 +300,18 @@ class StoreManager {
     // URIパラメータに反映
     window.history.pushState(this._URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this._URIParameters)}`);
   }
+  _reflectAdvancedSearchConditionToURI() {
+    console.log('_reflectAdvancedSearchConditionToURI *********')
+    const diffConditions = this._extractAdvancedSearchCondition(this._store.advancedSearchConditions);
+    console.log(diffConditions);
+    console.log(this._URIParameters);
+  }
+
+  // _buildAdvancedSearchQuery(conditions) {
+  //   return conditions.length === 0
+  //     ? {}
+  //     : {and: }
+  // }
 
   // ヒストリーが変更されたら、URL変数を取得し検索条件を更新
   _popstate(e) {
@@ -360,7 +372,7 @@ class StoreManager {
           path = `${API_URL}/api/search/variation`;
           const conditions = this._extractAdvancedSearchCondition( this._store.advancedSearchConditions );
           const query = conditions.length > 0
-            ? {or: conditions}
+            ? {and: conditions}
             : {};
           options.method = 'POST';
           options.body = JSON.stringify({
