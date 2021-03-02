@@ -32,10 +32,10 @@
       .suggest-view
 
     #AdvancedSearchView.section
-      .search-form-ivew
-        .searchform
-          input#advanced-search-field.searchinput(type="text" placeholder="Search for disease or gene symbol or rs...")
-          button.searchbutton
+      //- .search-form-ivew
+      //-   .searchform
+      //-     input#advanced-search-field.searchinput(type="text" placeholder="Search for disease or gene symbol or rs...")
+      //-     button.searchbutton
       .module-tabs-view.-depth1.collapse-view(data-collapse-id="advanced-search")
         a.collapsebutton
         nav.tabscontainer
@@ -756,7 +756,8 @@ main#SearchResultsView.LayoutMainAside
           .content
       #Filters.sidebarcontent
         h2.title
-          | Filters
+          span.simple Statistics / Filters
+          span.advanced Statistics
           button.button-view Reset
         section#FilterDatasets.panel-view
           h3.title Dataset

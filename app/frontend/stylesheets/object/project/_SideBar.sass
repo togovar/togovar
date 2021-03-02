@@ -20,10 +20,18 @@
       font-size: 18px
       font-weight: bold
       margin-bottom: 0
+      > .simple
+        body[data-search-mode="advanced"] &
+          display: none
+      > .advanced
+        body[data-search-mode="simple"] &
+          display: none
       > .button-view
         font-size: 12px
         float: right
         top: 5px
+        body[data-search-mode="advanced"] &
+          display: none
     + .sidebarcontent
       margin-left: 25px
   body.-rowselected &

@@ -104,6 +104,9 @@ body
   -webkit-font-smoothing: antialiased
   [data-page="home"] &
     overflow: hidden
+  &[data-search-mode="advanced"]
+    #FilterAlternativeAlleleFrequency, #FilterVariantCallingQuality, #FilterSIFT, #FilterPolyPhen
+      display: none
 
 [draggable=true]
   -khtml-user-drag: element
