@@ -133,7 +133,7 @@ export default class RangeSelectorView {
     }
 
     // feedback
-    this._delegate.changeParameter(newCondition, this);
+    this._delegate.changeParameter(newCondition, this.elm.dataset ? this.elm.dataset.dataset : '');
   }
 
   updateGUIWithCondition(condition) {
