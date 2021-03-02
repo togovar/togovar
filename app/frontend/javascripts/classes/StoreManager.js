@@ -236,7 +236,7 @@ class StoreManager {
             if (isUnmatch) {
               console.log(condition[datasetKey])
               // process dataset frequencies for advanced search
-              const dataset = { name: datasetKey };
+              const dataset = {name: datasetKey};
               if (condition[datasetKey].invert === '1') {
                 diffConditions.push(
                   {
@@ -295,6 +295,7 @@ class StoreManager {
     for (const condition of master) {
       delete this._URIParameters[condition.id];
     }
+    this._URIParameters.mode ='simple';
     // パラメータの合成
     Object.assign(this._URIParameters, diffConditions);
     // URIパラメータに反映
@@ -305,13 +306,18 @@ class StoreManager {
     const diffConditions = this._extractAdvancedSearchCondition(this._store.advancedSearchConditions);
     console.log(diffConditions);
     console.log(this._URIParameters);
+    console.log( this._buildAdvancedSearchQuery(diffConditions) )
+    this._URIParameters = this._buildAdvancedSearchQuery(diffConditions);
+    this._URIParameters.mode ='advanced';
+    console.log(this._URIParameters);
+    window.history.pushState(this._URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this._URIParameters)}`);
   }
 
-  // _buildAdvancedSearchQuery(conditions) {
-  //   return conditions.length === 0
-  //     ? {}
-  //     : {and: }
-  // }
+  _buildAdvancedSearchQuery(conditions) {
+    return conditions.length === 0
+      ? {}
+      : {and: conditions};
+  }
 
   // ヒストリーが変更されたら、URL変数を取得し検索条件を更新
   _popstate(e) {
@@ -371,12 +377,9 @@ class StoreManager {
         case 'advanced': {
           path = `${API_URL}/api/search/variation`;
           const conditions = this._extractAdvancedSearchCondition( this._store.advancedSearchConditions );
-          const query = conditions.length > 0
-            ? {and: conditions}
-            : {};
           options.method = 'POST';
           options.body = JSON.stringify({
-            query: query,
+            query: this._buildAdvancedSearchQuery(conditions),
             offset: this._store.offset
           });
         }
