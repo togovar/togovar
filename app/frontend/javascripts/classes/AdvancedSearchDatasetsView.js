@@ -17,7 +17,6 @@ export default class AdvancedSearchDatasetsView {
         <td>
           <div class="dataset">
             <label class="label">
-              <input type="checkbox" value="">
               <div class="dataset-icon" data-dataset="${item.id}">
                 <div class="properties"></div>
               </div>
@@ -35,9 +34,7 @@ export default class AdvancedSearchDatasetsView {
           </div>
         </td>
         <td>
-          <div class="variantcallingquality">
-            <input type="checkbox" value="">
-          </div>
+          <input type="checkbox" value="exclude" data-dataset="${item.id}">
         </td>
       </tr>`;
     }).join('')}`;
@@ -48,6 +45,10 @@ export default class AdvancedSearchDatasetsView {
 
     // events
     StoreManager.bind('advancedSearchConditions', this);
+    // event: filter
+    tbody.querySelectorAll(':scope > tr > td:nth-child(4) > input[type="checkbox"]').forEach(elm => {
+      elm.addEventListener('change', e => this.changeParameter({filtered: e.target.checked}, e.target.dataset.dataset) );
+    });
 
     // collapse
     elm.querySelectorAll('.collapse-view').forEach(elm => {
@@ -55,10 +56,10 @@ export default class AdvancedSearchDatasetsView {
     });
   }
 
-  changeParameter(newCondition, target) {
+  changeParameter(newCondition, dataset) {
     const condition = this._getConditionFromStore();
     for (const key in newCondition) {
-      condition[target.elm.dataset.dataset][key] = newCondition[key];
+      condition[dataset][key] = newCondition[key];
     }
     StoreManager.setAdvancedSearchCondition('adv_frequency', condition);
   }

@@ -242,6 +242,7 @@ class StoreManager {
               return defaultValue === undefined || defaultValue !== condition[datasetKey][conditionKey];
             });
             if (isUnmatch) {
+              console.log(condition[datasetKey])
               // process dataset frequencies for advanced search
               if (condition[datasetKey].invert === '1') {
                 diffConditions.push({
@@ -253,7 +254,7 @@ class StoreManager {
                       gte: 0,
                       lte: condition[datasetKey].from
                     },
-                    filtered: true
+                    filtered: condition[datasetKey].filtered
                   }
                 }, {
                   frequency: {
@@ -264,7 +265,7 @@ class StoreManager {
                       gte: condition[datasetKey].to,
                       lte: 1
                     },
-                    filtered: true
+                    filtered: condition[datasetKey].filtered
                   }
                 });
               } else {
@@ -277,7 +278,7 @@ class StoreManager {
                       gte: condition[datasetKey].from,
                       lte: condition[datasetKey].to
                     },
-                    filtered: true
+                    filtered: condition[datasetKey].filtered
                   }
                 });
               }
