@@ -10,7 +10,6 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
 
     // default values
     this._conditionMaster = StoreManager.getSearchConditionMaster(this.kind);
-    console.log(this._conditionMaster)
     const condition = this._getConditionFromStore();
 
     this._rangeSelectorView = new RangeSelectorView(elm.querySelector('.range-selector-view'), this, 0, 1, 'vertical', 'simple');

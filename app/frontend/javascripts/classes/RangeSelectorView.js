@@ -29,9 +29,9 @@ export default class RangeSelectorView {
     })();
     elm.innerHTML = `
       <div class="input">
-        <input class="from" max="1" min="0" step="0.01" type="number" value="0.000">
+        <input class="from" max="1" min="0" step="0.01" type="number" value="0">
         ~
-        <input class="to" max="1" min="0" step="0.01" type="number" value="1.000">
+        <input class="to" max="1" min="0" step="0.01" type="number" value="1">
         <label>
           <input class="invert" type="checkbox">Invert range
         </label>
@@ -81,9 +81,12 @@ export default class RangeSelectorView {
 
     // events
     this._from.addEventListener('change', e => {
+      console.log(typeof e.target.value)
+      e.target.value = parseFloat(e.target.value) < 0 ? 0 : e.target.value;
       this._changeParameter({from: e.target.value + ''});
     });
     this._to.addEventListener('change', e => {
+      e.target.value = parseFloat(e.target.value) > 1 ? 1 : e.target.value;
       this._changeParameter({to: e.target.value + ''});
     });
     this._invert.addEventListener('change', e => {
