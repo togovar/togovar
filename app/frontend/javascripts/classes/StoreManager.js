@@ -91,14 +91,10 @@ class StoreManager {
   // notify bound objects
   // used in 'setData()' or directory
   _notify(key) {
-    // console.log(key)
     if (this._bindings[key]) {
       for (const watcher of this._bindings[key]) {
-        // console.log(this._store)
         let value = this._store[key];
-        // console.log(value)
         const copy = this._copy(value);
-        // console.log(copy)
         watcher[key](copy);
       }
     }
@@ -132,8 +128,6 @@ class StoreManager {
   }
   setAdvancedSearchCondition(key, values) {
     console.log(key, values)
-    // console.log(this._store)
-    // console.log(this._store.advancedSearchConditions)
     this._store.advancedSearchConditions[key] = values;
     // URIパラメータに反映 TODO:
     // if (!fromHistory) this._reflectSearchConditionToURI();
@@ -358,7 +352,6 @@ class StoreManager {
       switch (this._store.searchMode) {
         case 'simple': {
           const conditions = $.param(this._extractSearchCondition(this._store.searchConditions));
-          console.log(conditions)
           path = `${API_URL}/search?offset=${offset - offset % LIMIT}${conditions ? '&' + conditions : ''}`;
           options.method = 'GET';
         }
@@ -366,11 +359,8 @@ class StoreManager {
         case 'advanced': {
           path = `${API_URL}/api/search/variation`;
           const conditions = this._extractAdvancedSearchCondition( this._store.advancedSearchConditions );
-          console.log( conditions )
           const query = conditions.length > 0
-            ? {
-              or: conditions
-            }
+            ? {or: conditions}
             : {};
           options.method = 'POST';
           options.body = JSON.stringify({
@@ -436,9 +426,8 @@ class StoreManager {
         this._fetching = false;
         this._notify('offset');
         this.setData('appStatus', 'normal');
-        console.log(json, this._fetching)
 
-        // もし検索中に検索条件が変われば、再検索
+        // if the search conditions change during the search, re-search
         if (lastConditions !== JSON.stringify(this._store.searchConditions)) {
           this._setSearchConditions({});
         }

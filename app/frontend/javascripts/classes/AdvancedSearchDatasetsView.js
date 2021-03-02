@@ -6,9 +6,7 @@ export default class AdvancedSearchDatasetsView {
 
   constructor(elm) {
     // generate
-    console.log(elm)
     this._conditionMaster = StoreManager.getSearchConditionMaster('adv_frequency');
-    console.log(this._conditionMaster)
     const tbody = elm.querySelector(':scope > .tablecontainer > table > tbody');
     tbody.innerHTML = `
     ${this._conditionMaster.items.map(item => {
@@ -66,7 +64,6 @@ export default class AdvancedSearchDatasetsView {
 
   advancedSearchConditions(conditions) {
     const condition = conditions['adv_frequency'];
-    console.log(condition)
     if (condition === undefined) return;
     // reflect changes in the slider
     for (const rangeDatasetKey in this._rangeSelectorViews) {
