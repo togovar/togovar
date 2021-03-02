@@ -136,7 +136,7 @@ export default class RangeSelectorView {
     this._delegate.changeParameter(newCondition, this);
   }
 
-  updateGUIWithConditionV1(condition) {
+  updateGUIWithCondition(condition) {
     // values
     this._from.value = condition.from;
     this._to.value = condition.to;
@@ -158,15 +158,6 @@ export default class RangeSelectorView {
       this._all.checked = condition.match === 'all';
       this._any.checked = condition.match === 'any';
     }
-  }
-
-  updateGUIWithConditionV2(condition) {
-    const convertedCondition = {
-      from: condition.frequency.gte,
-      to: condition.frequency.lte,
-      invert: 0
-    };
-    this.updateGUIWithConditionV1(convertedCondition);
   }
 
   get _sliderWidth() {
