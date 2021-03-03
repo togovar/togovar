@@ -2,6 +2,7 @@
 import {API_URL} from "../global.js";
 
 const LIMIT = 100;
+const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
 
 class StoreManager {
 
@@ -23,13 +24,25 @@ class StoreManager {
   }
 
   ready(callback) {
+    console.log('ready')
+    // get master data of conditions
     const json = require('../../assets/search_conditions.json');
-    // 検索条件のマスターデータ
     Object.freeze(json);
     this.setData('searchConditionsMaster', json);
     // restore search conditions from URL parameters
-    this._store.searchConditions = this._extractSearchCondition(this._URIParameters);
-    this._store.advancedSearchConditions = {}; // TODO:
+    console.log(this._URIParameters)
+    const searchMode = this._URIParameters.mode ? this._URIParameters.mode : DEFAULT_SEARCH_MODE;
+    console.log(searchMode)
+    let simpleSearchCondition = {}, advancedSearchCondition = {};
+    [simpleSearchCondition, advancedSearchCondition][searchMode === 'simple' ? 0 : 1] = 123;
+    switch (searchMode) {
+      case 'simple': simpleSearchCondition = this._URIParameters; break;
+      case 'advanced': simpleSearchCondition = this._URIParameters; break;
+    }
+    console.log(simpleSearchCondition, advancedSearchCondition)
+    this._store.searchConditions = this._extractSearchCondition(simpleSearchCondition);
+    this._store.advancedSearchConditions = {advancedSearchCondition};
+    // this.setData('searchMode', searchMode);
     callback();
     this._isReady = true;
   }
@@ -82,7 +95,6 @@ class StoreManager {
     for (let i = 0; i < records.length; i++) {
       this._store.searchResults[offset + i] = records[i];
     }
-    // 通知
     this._notify('searchResults');
   }
 
@@ -125,9 +137,9 @@ class StoreManager {
     this._setSearchConditions({[key]: values});
   }
   setAdvancedSearchCondition(key, values, fromHistory) {
-    console.log(key, values)
+    // TODO: シンプルサーチと挙動合わせる
     this._store.advancedSearchConditions[key] = values;
-    // URIパラメータに反映 TODO:
+    // URIパラメータに反映
     if (!fromHistory) this._reflectAdvancedSearchConditionToURI();
     // 検索条件として成立していれば、検索開始
     if (!this._isReady) return;
@@ -183,7 +195,7 @@ class StoreManager {
   // デフォルト値と異なる検索条件を抽出
   _extractSearchCondition(condition) {
     const searchConditionsMaster = this.getData('searchConditionsMaster');
-    // extract diff
+    // extraction of differences from master data
     const diffConditions = {};
     for (let conditionKey in condition) {
       const conditionMaster = searchConditionsMaster.find(condition => condition.id === conditionKey);
@@ -218,23 +230,19 @@ class StoreManager {
     console.log(conditions)
     const searchConditionsMaster = this.getData('searchConditionsMaster');
     const conditionMaster = searchConditionsMaster.find(condition => condition.id === 'adv_frequency'); // TODO: 暫定的にデータセットだけに対応
-    console.log(conditionMaster)
     const diffConditions = [];
-
+    // extraction of differences from master data
     Object.keys(conditions).forEach(key => {
       const condition = conditions[key];
-      console.log(key, condition);
       switch (key) {
         case 'adv_frequency': {
           Object.keys(condition).forEach(datasetKey => {
             const datasetDefault = conditionMaster.items.find(item => item.id === datasetKey).default;
-            console.log(condition[datasetKey])
             const isUnmatch = Object.keys(condition[datasetKey]).some(conditionKey => {
               const defaultValue = datasetDefault[conditionKey];
               return defaultValue === undefined || defaultValue !== condition[datasetKey][conditionKey];
             });
             if (isUnmatch) {
-              console.log(condition[datasetKey])
               // process dataset frequencies for advanced search
               const dataset = {name: datasetKey};
               if (condition[datasetKey].invert === '1') {
@@ -282,9 +290,7 @@ class StoreManager {
           break;
       }
     });
-
     return diffConditions
-
   }
 
   // update uri parameters
@@ -295,21 +301,18 @@ class StoreManager {
     for (const condition of master) {
       delete this._URIParameters[condition.id];
     }
+    console.log('hogeeeeeeee')
+    console.debug()
     this._URIParameters.mode ='simple';
-    // パラメータの合成
+    // synthesize parameters
     Object.assign(this._URIParameters, diffConditions);
-    // URIパラメータに反映
     window.history.pushState(this._URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this._URIParameters)}`);
   }
   _reflectAdvancedSearchConditionToURI() {
-    console.log('_reflectAdvancedSearchConditionToURI *********')
     const diffConditions = this._extractAdvancedSearchCondition(this._store.advancedSearchConditions);
-    console.log(diffConditions);
-    console.log(this._URIParameters);
-    console.log( this._buildAdvancedSearchQuery(diffConditions) )
     this._URIParameters = this._buildAdvancedSearchQuery(diffConditions);
+    console.log('fugaaaaaaaaa')
     this._URIParameters.mode ='advanced';
-    console.log(this._URIParameters);
     window.history.pushState(this._URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this._URIParameters)}`);
   }
 
@@ -352,7 +355,6 @@ class StoreManager {
     // retain search conditions
     const lastConditions = JSON.stringify(this._store.searchConditions); // TODO:
 
-    console.log('!!!')
     this._fetching = true;
     const options = {
       headers: {
@@ -361,12 +363,14 @@ class StoreManager {
       },
       mode: 'cors'
     }
-    let method, path, body = '';
+    let path;
     if (this._URIParameters.path === 'local') {
       if (offset === 0) {
         path = 'results.json';
       }
     } else {
+      console.log(this._store.searchMode) // advanced
+      console.log(this._store.searchMode == 'advanced')
       switch (this._store.searchMode) {
         case 'simple': {
           const conditions = $.param(this._extractSearchCondition(this._store.searchConditions));
@@ -451,8 +455,14 @@ class StoreManager {
 
   // Bindings *******************************************
   searchMode(mode) {
+    console.log(mode)
+    console.log(this._store.searchMode)
     if (this._lastSearchMode !== mode) {
       this._lastSearchMode = mode;
+      document.getElementsByTagName('body')[0].dataset.searchMode = mode;
+      // TODO: 変更前の検索モードの検索条件の保存?
+      // TODO: 検索条件のコンバート?
+      // TODO: 検索条件のクリア（あるいは復帰）
       // start search
       this.setData('appStatus', 'searching');
       this._search(0, true);
