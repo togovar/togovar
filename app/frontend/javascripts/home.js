@@ -71,7 +71,6 @@ export function initHome() {
     new SearchConditionController(document.getElementById('SimpleSearchView'));
     new AdvancedSearchDatasetsView(document.getElementById('AdvancedSearchDatasetsView'))
     // change search mode
-    body = document.getElementsByTagName('body')[0];
     document.querySelectorAll('#SearchInputView > .tabscontainer > ul > li').forEach(elm => {
       elm.addEventListener('click', e => changeSearchMode(e.target.dataset.target));
     });
@@ -85,8 +84,10 @@ export function initHome() {
 }
 
 function changeSearchMode(searchViewName) {
-  const searchMode = { SimpleSearchView: 'simple', AdvancedSearchView: 'advanced' }[searchViewName];
-  console.log('changeSearchMode', searchMode)
-  body.dataset.searchMode = searchMode;
+  const searchMode = {
+    SimpleSearchView: 'simple',
+    AdvancedSearchView: 'advanced'
+  }[searchViewName];
+  console.log(searchMode)
   StoreManager.setData('searchMode', searchMode);
 }
