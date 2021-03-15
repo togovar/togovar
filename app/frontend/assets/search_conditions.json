@@ -685,17 +685,6 @@
           "invert": false,
           "filtered": false
         }
-      },
-      {
-        "id": "clinvar",
-        "label": "ClinVar",
-        "type": "object",
-        "default": {
-          "from": 0,
-          "to": 1,
-          "invert": false,
-          "filtered": false
-        }
       }
     ]
   }

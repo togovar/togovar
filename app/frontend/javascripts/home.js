@@ -28,6 +28,7 @@ import PanelViewPreviewClinicalSignificance from '../javascripts/classes/PanelVi
 let body;
 
 export function initHome() {
+  
   StoreManager.setData('offset', 0);
   StoreManager.setData('selectedRow', undefined);
 
@@ -69,6 +70,7 @@ export function initHome() {
 
     // 検索窓
     new SearchConditionController(document.getElementById('SimpleSearchView'));
+    // return;
     new AdvancedSearchDatasetsView(document.getElementById('AdvancedSearchDatasetsView'))
     // change search mode
     document.querySelectorAll('#SearchInputView > .tabscontainer > ul > li').forEach(elm => {
@@ -88,6 +90,5 @@ function changeSearchMode(searchViewName) {
     SimpleSearchView: 'simple',
     AdvancedSearchView: 'advanced'
   }[searchViewName];
-  console.log(searchMode)
   StoreManager.setData('searchMode', searchMode);
 }
