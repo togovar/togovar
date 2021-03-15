@@ -7,7 +7,7 @@ const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
 class StoreManager {
 
   constructor() {
-    window.__s = StoreManager;
+    window.__s = this;
     this._isReady = false;
     this._URIParameters = $.deparam(window.location.search.substr(1));
     this._bindings = {};
@@ -38,9 +38,7 @@ class StoreManager {
         simpleSearchCondition = this._extractSearchCondition(this._URIParameters);
         break;
       case 'advanced':
-        console.log( this._convertAdvancedRangeToSimpleRange(this._URIParameters) )
-        advancedSearchCondition = this._extractAdvancedSearchCondition(this._URIParameters);
-        console.log(advancedSearchCondition)
+        Object.assign(advancedSearchCondition, this._convertAdvancedRangeToSimpleRange(this._URIParameters));
         delete advancedSearchCondition.mode;
         break;
     }
@@ -155,7 +153,6 @@ class StoreManager {
   }
 
   _setSearchConditions(conditions, fromHistory) {
-    console.log('_setSearchConditions', conditions, fromHistory)
     for (const conditionKey in conditions) {
       this._store.searchConditions[conditionKey] = conditions[conditionKey];
     }
@@ -193,6 +190,9 @@ class StoreManager {
   getSearchCondition(key) {
     return this._copy(this._store.searchConditions[key]);
   }
+  getAdvancedSearchCondition(key) {
+    return this._copy(this._store.advancedSearchConditions[key]);
+  }
 
   getSearchConditionMaster(key) {
     return this.getData('searchConditionsMaster').find(condition => condition.id === key);
@@ -200,7 +200,6 @@ class StoreManager {
 
   // デフォルト値と異なる検索条件を抽出
   _extractSearchCondition(condition) {
-    console.log('_extractSearchCondition', condition);
     const searchConditionsMaster = this.getData('searchConditionsMaster');
     // extraction of differences from master data
     const diffConditions = {};
@@ -234,14 +233,12 @@ class StoreManager {
   }
 
   _extractAdvancedSearchCondition(conditions) {
-    console.log('_extractAdvancedSearchCondition', conditions)
     const searchConditionsMaster = this.getData('searchConditionsMaster');
     const conditionMaster = searchConditionsMaster.find(condition => condition.id === 'adv_frequency'); // TODO: 暫定的にデータセットだけに対応
     const diffConditions = [];
     // extraction of differences from master data
     Object.keys(conditions).forEach(key => {
       const condition = conditions[key];
-      console.log(key, condition)
       switch (key) {
         case 'adv_frequency': {
           diffConditions.push(...this._convertSimpleRangeToSimpleAdvanced(condition));
@@ -341,11 +338,8 @@ class StoreManager {
    * @param {Boolean} isFirstTime 
    */
   _search(offset, isFirstTime = false) {
-    console.log('_search', offset, isFirstTime);
-    console.log('searchMode:', this._store.searchMode)
 
     // dont execute if search is in progress
-    console.log('fetching:', this._fetching)
     if (this._fetching === true) return;
 
     // reset
@@ -478,7 +472,6 @@ class StoreManager {
   }
 
   _convertAdvancedRangeToSimpleRange(advancedConditions) {
-    console.log('_convertAdvancedRangeToSimpleRange', advancedConditions);
     if (advancedConditions.and) {
       const frequencies = {};
       advancedConditions.and.forEach(condition => {
@@ -492,7 +485,6 @@ class StoreManager {
             }
             break;
           case 'or': {
-            console.log( condition.or )
             const frequency = {
               invert: true,
               filtered: eval(condition.or[0].frequency.filtered)
@@ -509,11 +501,12 @@ class StoreManager {
             break;
         }
       })
-      return frequencies;
+      return {adv_frequency: frequencies};
+    } else {
+      return {};
     }
   }
   _convertSimpleRangeToSimpleAdvanced(simpleConditions) {
-    console.log('_convertSimpleRangeToSimpleAdvanced', simpleConditions);
     const advancedConditions = [];
     Object.keys(simpleConditions).forEach(datasetKey => {
       // process dataset frequencies for advanced search

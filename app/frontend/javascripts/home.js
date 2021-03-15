@@ -90,6 +90,5 @@ function changeSearchMode(searchViewName) {
     SimpleSearchView: 'simple',
     AdvancedSearchView: 'advanced'
   }[searchViewName];
-  console.log(searchMode)
   StoreManager.setData('searchMode', searchMode);
 }

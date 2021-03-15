@@ -5,6 +5,9 @@ import RangeSelectorView from "./RangeSelectorView.js";
 export default class AdvancedSearchDatasetsView {
 
   constructor(elm) {
+
+    this.kind = 'adv_frequency';
+
     // generate
     this._conditionMaster = StoreManager.getSearchConditionMaster('adv_frequency');
     const tbody = elm.querySelector(':scope > .tablecontainer > table > tbody');
@@ -32,14 +35,18 @@ export default class AdvancedSearchDatasetsView {
           </div>
         </td>
         <td>
-          <input type="checkbox" value="exclude" data-dataset="${item.id}">
+          <input class="exclude" type="checkbox" value="exclude" data-dataset="${item.id}">
         </td>
       </tr>`;
     }).join('')}`;
+    const conditions = this._getConditionsFromStore();
+    this._filteredInputs = {};
+    tbody.querySelectorAll('input.exclude[type="checkbox"]').forEach(input => this._filteredInputs[input.dataset.dataset] = input);
     this._rangeSelectorViews = {};
     tbody.querySelectorAll('.range-selector-view').forEach(elm => {
       this._rangeSelectorViews[elm.dataset.dataset] = new RangeSelectorView(elm, this, 0, 1, 'horizontal', 'advanced');
     });
+    this._update(conditions);
 
     // events
     StoreManager.bind('advancedSearchConditions', this);
@@ -55,7 +62,7 @@ export default class AdvancedSearchDatasetsView {
   }
 
   changeParameter(newCondition, dataset) {
-    const condition = this._getConditionFromStore();
+    const condition = this._getConditionsFromStore();
     for (const key in newCondition) {
       condition[dataset][key] = newCondition[key];
     }
@@ -66,14 +73,18 @@ export default class AdvancedSearchDatasetsView {
     const condition = conditions['adv_frequency'];
     if (condition === undefined) return;
     // reflect changes in the slider
-    for (const rangeDatasetKey in this._rangeSelectorViews) {
-      const thatCondition = condition[rangeDatasetKey];
-      this._rangeSelectorViews[rangeDatasetKey].updateGUIWithCondition(thatCondition);
+    this._update(condition);
+  }
+
+  _update(conditions) {
+    for (const dataset in this._rangeSelectorViews) {
+      this._rangeSelectorViews[dataset].updateGUIWithCondition(conditions[dataset]);
+      this._filteredInputs[dataset].checked = conditions[dataset].filtered === '1' || conditions[dataset].filtered === true;
     }
   }
 
-  _getConditionFromStore() {
-    let condition = StoreManager.getSearchCondition(this.kind);
+  _getConditionsFromStore() {
+    let condition = StoreManager.getAdvancedSearchCondition(this.kind);
     // if the condition is undefined, generate it from master
     condition = condition ? condition : this._conditionMaster.items.reduce((acc, item) => Object.assign(acc, {[item.id]: item.default}), {});
     // if each items of the condition are not defined, generate them from master
