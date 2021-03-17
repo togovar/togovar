@@ -9,7 +9,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --config app/frontend/config/webpack.config.prod.js --color -p --progress --hide-modules --display-optimization-bailout",
     "lint": "yarn lint:js && yarn lint:css",
-    "lint:css": "stylelint app/frontend/stylesheets/**/*.sass",
+    "lint:css": "stylelint app/frontend/stylesheets/**/*.{css,scss,sass}",
     "lint:eslint": "eslint --ignore-path .gitignore --ignore-pattern app/frontend/server",
     "lint:js": "yarn lint:eslint app/frontend",
     "lint:staged": "lint-staged",
