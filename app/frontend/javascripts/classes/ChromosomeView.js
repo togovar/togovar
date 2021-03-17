@@ -1,4 +1,3 @@
-/* global $ */
 import StoreManager from "./StoreManager.js";
 
 const WIDTH = 12;

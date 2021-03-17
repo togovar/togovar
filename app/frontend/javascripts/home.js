@@ -25,8 +25,6 @@ import PanelViewPreviewAlternativeAlleleFrequencies from '../javascripts/classes
 import PanelViewPreviewConsequence from '../javascripts/classes/PanelViewPreviewConsequence.js';
 import PanelViewPreviewClinicalSignificance from '../javascripts/classes/PanelViewPreviewClinicalSignificance.js';
 
-let body;
-
 export function initHome() {
   
   StoreManager.setData('offset', 0);

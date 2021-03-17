@@ -1,4 +1,3 @@
-/*global $ */
 import {API_URL} from "../global.js";
 
 const LIMIT = 100;
@@ -233,8 +232,8 @@ class StoreManager {
   }
 
   _extractAdvancedSearchCondition(conditions) {
-    const searchConditionsMaster = this.getData('searchConditionsMaster');
-    const conditionMaster = searchConditionsMaster.find(condition => condition.id === 'adv_frequency'); // TODO: 暫定的にデータセットだけに対応
+    // const searchConditionsMaster = this.getData('searchConditionsMaster');
+    // const conditionMaster = searchConditionsMaster.find(condition => condition.id === 'adv_frequency'); // TODO: 暫定的にデータセットだけに対応
     const diffConditions = [];
     // extraction of differences from master data
     Object.keys(conditions).forEach(key => {
@@ -325,7 +324,7 @@ class StoreManager {
   }
 
   // ヒストリーが変更されたら、URL変数を取得し検索条件を更新
-  _popstate(e) {
+  _popstate(_e) {
     const URIParameters = $.deparam(window.location.search.substr(1));
     this._setSearchConditions(URIParameters, true);
   }

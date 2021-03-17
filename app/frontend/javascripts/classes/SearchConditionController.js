@@ -1,5 +1,3 @@
-/*global $ */
-
 import StoreManager from "./StoreManager.js";
 import {API_URL} from "../global.js";
 

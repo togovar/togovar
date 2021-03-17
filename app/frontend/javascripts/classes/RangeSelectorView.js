@@ -1,4 +1,3 @@
-import StoreManager from './StoreManager.js';
 import Decimal from 'decimal.js';
 
 const RULER_NUMBER_OF_STEP = 10;
@@ -7,14 +6,14 @@ export default class RangeSelectorView {
 
   /**
    * 
-   * @param {HTMLElement} parentNode 
+   * @param {HTMLElement} elm
    * @param {Object} delegate
-   * @param {Number} min
+   * @param {Number} _min
    * @param {Number} max
    * @param {String} orientation 'horizontal' or 'vertical'
    * @param {String} searchType 'simple' or 'advanced'
    */
-  constructor(elm, delegate, min = 0, max, orientation, searchType) {
+  constructor(elm, delegate, _min = 0, max, orientation, searchType) {
     this.elm = elm;
     this._delegate = delegate;
     this._orientation = orientation;

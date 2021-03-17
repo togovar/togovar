@@ -1,4 +1,3 @@
-/*global $ */
 import {PAGE, COLUMNS} from "../global.js";
 import StoreManager from "./StoreManager.js";
 

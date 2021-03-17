@@ -1,4 +1,3 @@
-/*global $ */
 import StoreManager from "./StoreManager.js";
 import {TR_HEIGHT} from '../global.js';
 

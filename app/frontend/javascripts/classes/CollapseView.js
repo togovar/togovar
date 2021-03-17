@@ -10,7 +10,7 @@ export default class CollapseView {
     if (collapseView.classList.contains('-terminal')) return;
 
     // collapse event
-    collapseView.querySelector('.collapsebutton').addEventListener('click', e => {
+    collapseView.querySelector('.collapsebutton').addEventListener('click', _e => {
       collapseView.classList.toggle('-collapsed');
       // unstructured case
       if (collapseView.classList.contains('-unstructured')) {
@@ -35,7 +35,7 @@ export default class CollapseView {
       let parentNode = collapseView;
       while (parentNode.tagName !== 'TR') {
         parentNode = parentNode.parentNode;
-      };
+      }
       ancestors[depth] = parentNode;
       let nextTR = parentNode.nextSibling;
       while (nextTR !== null) {

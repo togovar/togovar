@@ -1,4 +1,3 @@
-/*global $ */
 import PanelView from "./PanelView.js";
 import RangeSelectorView from "./RangeSelectorView.js";
 import StoreManager from "./StoreManager.js";

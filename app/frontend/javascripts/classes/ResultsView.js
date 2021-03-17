@@ -1,4 +1,3 @@
-/*global $ */
 import StoreManager from "./StoreManager.js";
 import ResultsRowView from "./ResultsRowView.js";
 import ScrollBar from "./ScrollBar.js";
@@ -139,7 +138,7 @@ export default class ResultsView {
     }
   }
 
-  searchResults(results) {
+  searchResults(_results) {
     this.updateDisplaySize();
   }
 
@@ -200,7 +199,7 @@ export default class ResultsView {
     StoreManager.setData('selectedRow', shiftIndex);
   }
 
-  karyotype(karyotype) {
+  karyotype(_karyotype) {
     this.updateDisplaySize();
   }
 
