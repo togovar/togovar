@@ -27,6 +27,7 @@ import PanelViewPreviewExternalLinks from '../javascripts/classes/PanelViewPrevi
 import PanelViewPreviewAlternativeAlleleFrequencies from '../javascripts/classes/PanelViewPreviewAlternativeAlleleFrequencies.js';
 import PanelViewPreviewConsequence from '../javascripts/classes/PanelViewPreviewConsequence.js';
 import PanelViewPreviewClinicalSignificance from '../javascripts/classes/PanelViewPreviewClinicalSignificance.js';
+import TippyBox from '../javascripts/classes/TippyBox.js';
 
 // Load the favicon
 import '!file-loader?name=[name].[ext]!../images/favicon.svg';
@@ -85,5 +86,7 @@ function initHome() {
     new PanelViewPreviewClinicalSignificance(document.getElementById('PreviewClinicalSignificance'));
 
     new SelectedRowIndicator(document.getElementById('RowIndicator'));
+
+    new TippyBox(document.getElementById('tooltiptemplate'));
   });
 }
