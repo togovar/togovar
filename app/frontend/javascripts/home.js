@@ -24,6 +24,7 @@ import PanelViewPreviewExternalLinks from '../javascripts/classes/PanelViewPrevi
 import PanelViewPreviewAlternativeAlleleFrequencies from '../javascripts/classes/PanelViewPreviewAlternativeAlleleFrequencies.js';
 import PanelViewPreviewConsequence from '../javascripts/classes/PanelViewPreviewConsequence.js';
 import PanelViewPreviewClinicalSignificance from '../javascripts/classes/PanelViewPreviewClinicalSignificance.js';
+import TippyBox from '../javascripts/classes/TippyBox.js';
 
 export function initHome() {
   
@@ -78,6 +79,8 @@ export function initHome() {
     document.querySelectorAll('.module-tabs-view').forEach(elm => {
       new ModuleTabsView(elm);
     });
+    // ツールチップ
+    new TippyBox(document.getElementById('tooltiptemplate'));
 
   });
 
