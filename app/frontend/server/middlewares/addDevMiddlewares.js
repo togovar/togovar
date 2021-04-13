@@ -1,4 +1,6 @@
 const path = require('path');
+const express = require('express');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
@@ -19,15 +21,24 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
     webpackConfig.output.publicPath,
   );
 
+  const publicPath = webpackConfig.output.publicPath || '/';
+  const outputPath = webpackConfig.output.path || path.resolve(process.cwd(), 'dist');
+
   app.use(middleware);
   app.use(webpackHotMiddleware(compiler));
+
+  // proxy
+  app.use('/stanza', createProxyMiddleware({ target: 'http://localhost:8080' }));
+
+  // serve static assets under /dist
+  app.use(publicPath, express.static(outputPath));
 
   // Since webpackDevMiddleware uses memory-fs internally to store build
   // artifacts, we use it instead
   const fs = middleware.fileSystem;
 
-  app.get('/variant/:id', (req, res) => {
-    fs.readFile(path.resolve(compiler.outputPath, 'variant', 'index.html'), (err, file) => {
+  app.get('/:report(variant|gene|disease)/:id', (req, res) => {
+    fs.readFile(path.resolve(compiler.outputPath, req.params.report, 'index.html'), (err, file) => {
       if (err) {
         res.sendStatus(404);
       } else {

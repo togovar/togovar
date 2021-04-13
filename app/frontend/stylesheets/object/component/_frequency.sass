@@ -2,7 +2,6 @@ $HEIGHT_BIT: 2px
 $HEIGHT_BIT_SHIFT: $HEIGHT_BIT + 1px
 
 .frequency-graph
-  //margin-bottom: -4px
   > .dataset
     display: inline-block
     width: 9px
@@ -10,109 +9,84 @@ $HEIGHT_BIT_SHIFT: $HEIGHT_BIT + 1px
     border: solid 1px rgba($COLOR_GRAY, .25)
     position: relative
     margin-right: 1px
-    background-color: $COLOR_KEY_DEEP
+    background-color: $COLOR_KEY_DARK1
     vertical-align: middle
-
     &:before, &:after
       content: ""
       display: block
       position: absolute
       width: 7px
       background-color: white
-
     &:after
       opacity: .75
       height: 1px
       top: 1px
       box-shadow: 0 $HEIGHT_BIT_SHIFT white, 0 #{$HEIGHT_BIT_SHIFT * 2} white, 0 #{$HEIGHT_BIT_SHIFT * 3} white, 0 #{$HEIGHT_BIT_SHIFT * 4} white, 0 #{$HEIGHT_BIT_SHIFT * 5} white
-
     &[data-dataset="jga_ngs"], &[data-dataset="jga_snp"]
       background-color: $COLOR_DATASET_JGA
-
     &[data-dataset="tommo_4.7kjpn"]
       background-color: $COLOR_DATASET_3_5KJPN
-
     &[data-dataset="hgvd"]
       background-color: $COLOR_DATASET_HGVD
-
     &[data-dataset="gem_j_wga"]
       background-color: $COLOR_DATASET_GEM_J
-
     &[data-dataset="exac"]
+      //margin-left: 4px
       background-color: $COLOR_DATASET_FOREIGN
-
     &[data-frequency="na"]
       background-color: rgba($COLOR_LIGHT_GRAY, .6)
-
       &:after
         display: none
-
     &[data-frequency="monomorphic"]
       &:before
         height: #{$HEIGHT_BIT_SHIFT * 7 - 3px}
-
     &[data-frequency="singleton"]
       &:before
         height: #{$HEIGHT_BIT_SHIFT * 6 - 1px}
-
     &[data-frequency="<0.0001"]
       &:before
         height: #{$HEIGHT_BIT_SHIFT * 5 - 1px}
-
     &[data-frequency="<0.001"]
       &:before
         height: #{$HEIGHT_BIT_SHIFT * 4 - 1px}
-
     &[data-frequency="<0.01"]
       &:before
         height: #{$HEIGHT_BIT_SHIFT * 3 - 1px}
-
     &[data-frequency="<0.05"]
       &:before
         height: #{$HEIGHT_BIT_SHIFT * 2 - 1px}
-
     &[data-frequency="<0.5"]
       &:before
         height: #{$HEIGHT_BIT_SHIFT - 1px}
-
     &[data-frequency="≥0.5"]
 
 .frequency-detail
   width: 100%
-
   > thead
     > tr
       > th
         @extend .panel-view-heading
-
   > tbody
     > tr
       > td
         line-height: 18px
-
         &:first-child
           font-weight: bold
-
         .dataset-icon
           display: inline-block
           vertical-align: middle
           margin-right: .2em
-
           > .properties
             width: inherit
-
         &.alt, &.total, &.frequency
           text-align: right
-
         &.alt
           font-weight: bold
           color: $COLOR_ALT
-
           &:after
             content: "/"
             font-size: 10px
             color: $COLOR_BLACK
             margin-left: .5em
-
         &.frequency
           font-weight: bold

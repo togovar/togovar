@@ -1,6 +1,8 @@
+const webpack = require('webpack');
 const {merge} = require('webpack-merge');
 const commonConfig = require('./webpack.config.common');
 
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const GoogleTagManagerPlugin = require('webpack-google-tag-manager-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const TerserJSPlugin = require('terser-webpack-plugin');
@@ -16,30 +18,36 @@ if (GMT_ID) {
 }
 
 module.exports = merge(commonConfig, {
-    mode: 'production',
-    optimization: {
-      minimizer: [
-        new TerserJSPlugin({
-          terserOptions: {
-            output: {
-              comments: false,
-            },
+  mode: 'production',
+  plugins: [
+    new CleanWebpackPlugin(),
+    new webpack.DefinePlugin({
+      'process.env': {
+        TOGOVAR_FRONTEND_API_URL: JSON.stringify(process.env.TOGOVAR_FRONTEND_API_URL),
+      },
+    }),
+  ],
+  optimization: {
+    minimizer: [
+      new TerserJSPlugin({
+        terserOptions: {
+          output: {
+            comments: false,
           },
-        }),
-        new OptimizeCSSAssetsPlugin({
-          cssProcessor: require('cssnano'),
-          cssProcessorPluginOptions: {
-            preset: [
-              'default',
-              {
-                discardComments: {
-                  removeAll: true,
-                },
+        },
+      }),
+      new OptimizeCSSAssetsPlugin({
+        cssProcessor: require('cssnano'),
+        cssProcessorPluginOptions: {
+          preset: [
+            'default', {
+              discardComments: {
+                removeAll: true,
               },
-            ],
-          },
-        }),
-      ],
-    },
-  }
-);
+            },
+          ],
+        },
+      }),
+    ],
+  },
+});

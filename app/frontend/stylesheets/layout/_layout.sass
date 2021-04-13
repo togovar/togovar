@@ -1,16 +1,23 @@
 .LayoutMainAside
   display: flex
   height: calc(100% - #{$HEIGHT_BOTTOM_DRAWER + $HEIGHT_NBDC_COMMON_FOOTER})
-
   > .LayoutMain
     width: calc(100% - #{$WIDTH_SIDEBAR})
-
+    transition: width $GUI_DURATION
+    body[data-search-mode="AdvancedSearchView"] &
+      width: calc(100% - 0px)
+    body.-rowselected &
+      width: calc(100% - #{$WIDTH_SIDEBAR})
   > .LayoutAside
     width: $WIDTH_SIDEBAR
-    background-color: $COLOR_KEY_DARK
+    background-color: $COLOR_KEY_DARK3
     overflow-x: hidden
     position: relative
     box-shadow: 2px 0 2px rgba(black, .2) inset
+    body[data-search-mode="AdvancedSearchView"] &
+      width: 0px
+    body.-rowselected &
+      width: $WIDTH_SIDEBAR
 
 .LayoutReport
   padding: 16px $PADDING_SIDE $PADDING_SIDE

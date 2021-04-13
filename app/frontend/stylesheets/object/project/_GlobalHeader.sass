@@ -8,29 +8,23 @@ $WIDTH_LOGO: 394px
   padding: 10px $PADDING_SIDE
   box-shadow: 0 2px 2px rgba(black, .2)
   width: 100%
-  min-width: $WIDTH_MIN
   top: $HEIGHT_NBDC_COMMON_HEADER
   z-index: $Z_INDEX_GLOBAL_HEADER
-
   > .heading
     display: inline-block
     position: relative
     top: -2px
-
     > .link
       text-decoration: none
-
       > .logotype
         width: 101px
         height: 31px
         position: relative
         left: -5px
         margin-right: .3rem
-
     > .summary
       font-size: 12px
       font-weight: normal
-
   > .menus
     position: absolute
     right: 0
@@ -41,7 +35,6 @@ $WIDTH_LOGO: 394px
     text-align: right
     white-space: nowrap
     overflow-x: auto
-
     &:before, &:after
       content: ""
       display: block
@@ -49,15 +42,12 @@ $WIDTH_LOGO: 394px
       height: $HEIGHT_GLOBAL_MENU
       position: fixed
       top: 0
-
     &:before
       left: $WIDTH_LOGO
       background: linear-gradient(to right, white, rgba(white, 0))
-
     &:after
       right: 0
       background: linear-gradient(to left, white, rgba(white, 0))
-
     > .menu
       display: inline-block
       padding: #{$PADDING_RIGHT_ELEMENTS - 1px} 0
@@ -65,30 +55,34 @@ $WIDTH_LOGO: 394px
       margin-left: $PADDING_SIDE - 8px
       padding-left: $PADDING_SIDE - 5px
       margin-bottom: 0
-
       &:first-child
         border-left: none
-
     > .navigation
       > .item
         > .link
           color: $COLOR_BLACK
           text-decoration: none
           line-height: $HEIGHT_NAVIGATION_ITEM
-
         &.-current
           > .link
-            color: $COLOR_KEY_DEEP
-
+            color: $COLOR_KEY_DARK1
         &:hover
           > .link
-            color: $COLOR_KEY_DEEP
+            color: $COLOR_KEY_DARK1
             text-decoration: none
-
     > .config
-
-    > .languageswitcher
-      > .language
-        width: $HEIGHT_NAVIGATION_ITEM
-        text-align: center
-        padding: 0
+    > .switcher
+      height: $HEIGHT-GLOBAL-MENU
+      padding-top: 0
+      >.switchername
+        margin: 0
+        font-size: 10px
+        color: $COLOR_KEY_DARK1
+        text-align: left
+        position: relative
+        top: 5px
+        left: 5px
+      > .switchpulldown
+        font-family: 'Roboto Condensed', sans-serif
+        color: $COLOR_BLACK
+        border: none

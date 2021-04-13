@@ -17,6 +17,11 @@
 !/tmp/.keep
 /yarn-error.log
 
+# Ignore pidfiles, but keep the directory.
+/tmp/pids/*
+!/tmp/pids/
+!/tmp/pids/.keep
+
 # Ignore vendor libraries
 /node_modules
 /vendor/bundle
@@ -27,11 +32,8 @@ coverage/
 dist/
 public/packs
 
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# history
+.byebug_history
+
+# Ignore master key for decrypting credentials and more.
+/config/master.key

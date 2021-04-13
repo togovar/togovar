@@ -1,7 +1,6 @@
 #ResultsView
   padding: 10px $PADDING_SIDE $PADDING_SIDE
   position: relative
-
   &.-not-found:after
     content: "Not found"
     text-align: center
@@ -9,28 +8,23 @@
     font-size: 14px
     line-height: 64px
     color: $COLOR_GRAY
-
   > .header
     white-space: nowrap
     position: relative
-
     > .heading
       display: inline-block
       font-size: 16px
       margin-right: 8px
       margin-bottom: -2px
-
     > .status
       display: inline-block
       font-size: 12px
-
   > .tablecontainer
     overflow-x: auto
     overflow-y: hidden
     margin-top: -20px
     margin-right: -$PADDING_SIDE
     padding-bottom: 20px
-
     > .results-view
       > thead
         > tr

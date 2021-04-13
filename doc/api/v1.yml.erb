@@ -1,0 +1,848 @@
+openapi: 3.0.3
+
+servers:
+  - url: <%= "#{ENV['TOGOVAR_BASE_URL']}/api" %>
+
+info:
+  title: TogoVar API
+  version: "0.9"
+  description: TogoVar API version 0.9 specification
+
+tags:
+  - name: search
+
+paths:
+  /search/variation:
+    post:
+      tags:
+        - search
+      parameters:
+        - $ref: '#/components/parameters/Pretty'
+      requestBody:
+        $ref: '#/components/requestBodies/SearchVariation'
+      responses:
+        '200':
+          description: >
+            `OK`
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scroll:
+                    type: object
+                    properties:
+                      offset:
+                        type: integer
+                      limit:
+                        type: integer
+                      max_rows:
+                        type: integer
+
+                  statistics:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      filtered:
+                        type: integer
+                      dataset:
+                        type: object
+                        properties:
+                          dataset_name:
+                            type: integer
+                      type:
+                        type: object
+                        properties:
+                          so_term:
+                            type: integer
+                      significance:
+                        type: object
+                        properties:
+                          significance_key:
+                            type: integer
+                      consequence:
+                        type: object
+                        properties:
+                          so_term:
+                            type: integer
+
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                        chromosome:
+                          type: string
+                        start:
+                          type: integer
+                        stop:
+                          type: integer
+                        reference:
+                          type: string
+                        alternative:
+                          type: string
+                        most_severe_consequence:
+                          type: string
+                        sift:
+                          type: number
+                        polyphen:
+                          type: number
+                        existing_variations:
+                          type: array
+                          items:
+                            type: string
+                        external_link:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              db_name:
+                                type: array
+                                items:
+                                  type: string
+                        significance:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              condition:
+                                type: string
+                              interpretations:
+                                type: array
+                                items:
+                                  type: string
+                        transcripts:
+                          type: object
+                          properties:
+                            transcript_id:
+                              type: string
+                            gene_id:
+                              type: string
+                            consequence:
+                              type: array
+                              items:
+                                type: string
+                            sift:
+                              type: number
+                            polyphen:
+                              type: number
+                            hgnc_id:
+                              type: integer
+                            symbol:
+                              type: object
+                              properties:
+                                source:
+                                  type: string
+                                label:
+                                  type: string
+                            hgvs_p:
+                              type: string
+                            hgvs_c:
+                              type: string
+                            hgvs_g:
+                              type: string
+                        frequencies:
+                          type: object
+                          properties:
+                            source:
+                              type: string
+                            filter:
+                              type: array
+                              items:
+                                type: string
+                            quality:
+                              type: number
+                            allele:
+                              type: object
+                              properties:
+                                number:
+                                  type: integer
+                                count:
+                                  type: integer
+                                frequency:
+                                  type: number
+                            genotype:
+                              type: object
+                              properties:
+                                ref_homo_count:
+                                  type: integer
+                                hetero_count:
+                                  type: integer
+                                alt_homo_count:
+                                  type: integer
+
+        '400':
+          description: >
+            `Bad Request`<br/>
+            Your query contains grammatical mistakes. See errors in the response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+
+        '500':
+          description: >
+            `Internal Server Error`<br/>
+            Unexpected errors occurred.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+
+        '501':
+          description: >
+            `Not Implemented`<br/>
+            Responder for given mime type are not inplemented.
+            Provide the correct accept header (e.g. `Accept: application/json`).
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Not implemented
+
+components:
+  parameters:
+    Pretty:
+      in: query
+      name: pretty
+      description: If set, response body will be nicely formatted.
+      schema:
+        type: boolean
+        nullable: true
+
+  requestBodies:
+    SearchVariation:
+      description: Schema for searching variation
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              version:
+                type: string
+                description: (Optional) Set version number if you would like to use old version.
+                enum:
+                  - "1"
+              query:
+                oneOf:
+                  - $ref: '#/components/schemas/VariationType'
+                  - $ref: '#/components/schemas/VariationConsequence'
+                  - $ref: '#/components/schemas/VariationFrequency'
+                  - $ref: '#/components/schemas/ClinicalSignificance'
+                  - $ref: '#/components/schemas/GeneSymbol'
+                  - $ref: '#/components/schemas/Disease'
+                  - $ref: '#/components/schemas/And'
+                  - $ref: '#/components/schemas/Or'
+              limit:
+                type: integer
+                description: (Optional) Default is 100.
+                minimum: 0
+                maximum: 1000
+              offset:
+                oneOf:
+                  - type: integer
+                    minimum: 0
+                    maximum: 10000
+                  - type: array
+                    description: >
+                      Set [{chromosome}, {position}, {reference}, {alternative}] in case you would like to
+                      paginate over 10,000 records. {reference} and {alternative} can be ommited.
+                    minItems: 2
+                    maxItems: 4
+                    items:
+                      type: string
+
+          examples:
+            Example1:
+              $ref: '#/components/examples/SearchVariation-1'
+            Example2:
+              $ref: '#/components/examples/SearchVariation-2'
+            Example3:
+              $ref: '#/components/examples/SearchVariation-3'
+            Example4:
+              $ref: '#/components/examples/SearchVariation-4'
+
+  schemas:
+    VariationType:
+      type: object
+      additionalProperties: false
+      required:
+        - type
+      properties:
+        type:
+          type: object
+          additionalProperties: false
+          required:
+            - relation
+            - terms
+          properties:
+            relation:
+              type: string
+              description: >
+                Available values
+                 * `eq` - Equals to any of term in the list
+                 * `ne` - Not equals to all of term in the list
+              enum:
+                - eq
+                - ne
+
+            terms:
+              type: array
+              items:
+                type: string
+                description: >
+                  Available values
+                   * `SO_0001483` | `snv` - SNV
+                   * `SO_0000667` | `ins` - insertion
+                   * `SO_0000159` | `del` - deletion
+                   * `SO_1000032` | `indel` - indel
+                   * `SO_1000002` | `sub` - substitution
+                enum:
+                  - SO_0001483
+                  - SO_0000667
+                  - SO_0000159
+                  - SO_1000032
+                  - SO_1000002
+                  - snv
+                  - ins
+                  - del
+                  - indel
+                  - sub
+
+    VariationConsequence:
+      type: object
+      additionalProperties: false
+      required:
+        - consequence
+      properties:
+        consequence:
+          type: object
+          additionalProperties: false
+          required:
+            - relation
+            - terms
+          properties:
+            relation:
+              type: string
+              description: >
+                Available values
+                 * `eq` - Equals to any of term in the list
+                 * `ne` - Not equals to all of term in the list
+              enum:
+                - eq
+                - ne
+
+            terms:
+              type: array
+              items:
+                type: string
+                description: >
+                  Both SO terms and its label are acceptable
+                   * `SO_0001893` - transcript_ablation
+                   * `SO_0001574` - splice_acceptor_variant
+                   * `SO_0001575` - splice_donor_variant
+                   * `SO_0001587` - stop_gained
+                   * `SO_0001589` - frameshift_variant
+                   * `SO_0001578` - stop_lost
+                   * `SO_0002012` - start_lost
+                   * `SO_0001889` - transcript_amplification
+                   * `SO_0001821` - inframe_insertion
+                   * `SO_0001822` - inframe_deletion
+                   * `SO_0001583` - missense_variant
+                   * `SO_0001818` - protein_altering_variant
+                   * `SO_0001630` - splice_region_variant
+                   * `SO_0001626` - incomplete_terminal_codon_variant
+                   * `SO_0002019` - start_retained_variant
+                   * `SO_0001567` - stop_retained_variant
+                   * `SO_0001819` - synonymous_variant
+                   * `SO_0001580` - coding_sequence_variant
+                   * `SO_0001620` - mature_miRNA_variant
+                   * `SO_0001623` - 5_prime_UTR_variant
+                   * `SO_0001624` - 3_prime_UTR_variant
+                   * `SO_0001792` - non_coding_transcript_exon_variant
+                   * `SO_0001627` - intron_variant
+                   * `SO_0001621` - NMD_transcript_variant
+                   * `SO_0001619` - non_coding_transcript_variant
+                   * `SO_0001631` - upstream_gene_variant
+                   * `SO_0001632` - downstream_gene_variant
+                   * `SO_0001895` - TFBS_ablation
+                   * `SO_0001892` - TFBS_amplification
+                   * `SO_0001782` - TF_binding_site_variant
+                   * `SO_0001894` - regulatory_region_ablation
+                   * `SO_0001891` - regulatory_region_amplification
+                   * `SO_0001907` - feature_elongation
+                   * `SO_0001566` - regulatory_region_variant
+                   * `SO_0001906` - feature_truncation
+                   * `SO_0001628` - intergenic_variant
+
+                  see [this documentation](https://ensembl.org/info/genome/variation/prediction/predicted_data.html) for details
+
+                enum:
+                  - SO_0001893
+                  - SO_0001574
+                  - SO_0001575
+                  - SO_0001587
+                  - SO_0001589
+                  - SO_0001578
+                  - SO_0002012
+                  - SO_0001889
+                  - SO_0001821
+                  - SO_0001822
+                  - SO_0001583
+                  - SO_0001818
+                  - SO_0001630
+                  - SO_0001626
+                  - SO_0002019
+                  - SO_0001567
+                  - SO_0001819
+                  - SO_0001580
+                  - SO_0001620
+                  - SO_0001623
+                  - SO_0001624
+                  - SO_0001792
+                  - SO_0001627
+                  - SO_0001621
+                  - SO_0001619
+                  - SO_0001631
+                  - SO_0001632
+                  - SO_0001895
+                  - SO_0001892
+                  - SO_0001782
+                  - SO_0001894
+                  - SO_0001891
+                  - SO_0001907
+                  - SO_0001566
+                  - SO_0001906
+                  - SO_0001628
+                  - transcript_ablation
+                  - splice_acceptor_variant
+                  - splice_donor_variant
+                  - stop_gained
+                  - frameshift_variant
+                  - stop_lost
+                  - start_lost
+                  - transcript_amplification
+                  - inframe_insertion
+                  - inframe_deletion
+                  - missense_variant
+                  - protein_altering_variant
+                  - splice_region_variant
+                  - incomplete_terminal_codon_variant
+                  - start_retained_variant
+                  - stop_retained_variant
+                  - synonymous_variant
+                  - coding_sequence_variant
+                  - mature_miRNA_variant
+                  - 5_prime_UTR_variant
+                  - 3_prime_UTR_variant
+                  - non_coding_transcript_exon_variant
+                  - intron_variant
+                  - NMD_transcript_variant
+                  - non_coding_transcript_variant
+                  - upstream_gene_variant
+                  - downstream_gene_variant
+                  - TFBS_ablation
+                  - TFBS_amplification
+                  - TF_binding_site_variant
+                  - regulatory_region_ablation
+                  - regulatory_region_amplification
+                  - feature_elongation
+                  - regulatory_region_variant
+                  - feature_truncation
+                  - intergenic_variant
+
+    VariationFrequency:
+      type: object
+      additionalProperties: false
+      required:
+        - frequency
+      properties:
+        frequency:
+          type: object
+          additionalProperties: false
+          required:
+            - frequency
+          oneOf:
+            - type: object
+              additionalProperties: false
+              required:
+                - frequency
+              properties:
+                dataset:
+                  $ref: '#/components/schemas/Dataset'
+                frequency:
+                  $ref: '#/components/schemas/Range'
+                filtered:
+                  type: boolean
+                  description: if `true`, exclude variations with a FILTER flag other than PASS
+
+            - type: object
+              additionalProperties: false
+              required:
+                - count
+              properties:
+                dataset:
+                  $ref: '#/components/schemas/Dataset'
+                count:
+                  $ref: '#/components/schemas/Range'
+                filtered:
+                  type: boolean
+                  description: if `true`, exclude variations with a FILTER flag other than PASS
+
+    ClinicalSignificance:
+      type: object
+      additionalProperties: false
+      required:
+        - significance
+      properties:
+        significance:
+          type: object
+          additionalProperties: false
+          required:
+            - relation
+            - terms
+          properties:
+            relation:
+              type: string
+              description: >
+                Available values
+                 * `eq` - Equals to any of term in the list
+                 * `ne` - Not equals to all of term in the list
+              enum:
+                - eq
+                - ne
+
+            terms:
+              type: array
+              items:
+                type: string
+                description: >
+                  Both short keys and its label are acceptable
+                   * `NC` - not_in_clinvar
+                   * `P`  - pathogenic
+                   * `LP` - likely_pathogenic
+                   * `US` - uncertain_significance
+                   * `LB` - likely_benign
+                   * `B`  - benign
+                   * `CI` - conflicting_interpretations_of_pathogenicity
+                   * `DR` - drug_response
+                   * `A`  - association
+                   * `RF` - risk_factor
+                   * `PR` - protective
+                   * `AF` - affects
+                   * `O`  - other
+                   * `NP` - not_provided
+                   * `AN` - association_not_found
+                enum:
+                  - NC
+                  - P
+                  - LP
+                  - US
+                  - LB
+                  - B
+                  - CI
+                  - DR
+                  - A
+                  - RF
+                  - PR
+                  - AF
+                  - O
+                  - NP
+                  - AN
+                  - not_in_clinvar
+                  - pathogenic
+                  - likely_pathogenic
+                  - uncertain_significance
+                  - likely_benign
+                  - benign
+                  - conflicting_interpretations_of_pathogenicity
+                  - drug_response
+                  - association
+                  - risk_factor
+                  - protective
+                  - affects
+                  - other
+                  - not_provided
+                  - association_not_found
+
+    GeneSymbol:
+      type: object
+      additionalProperties: false
+      required:
+        - gene_symbol
+      properties:
+        gene_symbol:
+          type: object
+          additionalProperties: false
+          required:
+            - relation
+            - terms
+          properties:
+            relation:
+              type: string
+              description: >
+                Available values
+                 * `eq` - Equals to any of term in the list
+                 * `ne` - Not equals to all of term in the list
+              enum:
+                - eq
+                - ne
+
+            terms:
+              type: array
+              items:
+                type: string
+                description: Gene symbol (Approved symbol or aliases)
+
+    Disease:
+      type: object
+      additionalProperties: false
+      required:
+        - disease
+      properties:
+        disease:
+          type: object
+          additionalProperties: false
+          required:
+            - relation
+            - terms
+          properties:
+            relation:
+              type: string
+              description: >
+                Available values
+                 * `eq` - Equals to any of term in the list
+                 * `ne` - Not equals to all of term in the list
+                 * `contains` - Contains any of term in the list
+                 * `not_contains` - Not contains all of term in the list
+              enum:
+                - eq
+                - ne
+                - contains
+                - not_contains
+
+            terms:
+              type: array
+              items:
+                type: string
+
+    Dataset:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: >
+            Available values
+             * `jga_ngs` - <a target="_blank" href="https://togovar.biosciencedbc.jp/doc/datasets/jga_ngs">Japanese Genotype-phenotype Archive (JGA)</a>
+             * `jga_snp` - <a target="_blank" href="https://togovar.biosciencedbc.jp/doc/datasets/jga_snp">SNP-chip data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA)</a>
+             * `hgvd` - <a target="_blank" href="http://www.hgvd.genome.med.kyoto-u.ac.jp">Human Genetic Variation Database (HGVD)</a>
+             * `tommo_4.7kjpn` - <a target="_blank" href="https://jmorp.megabank.tohoku.ac.jp/202001/">ToMMo 4.7KJPN Allele Frequency Panel</a>
+             * `gem_j_wga` - <a target="_blank" href="https://togovar.biosciencedbc.jp/doc/datasets/gem_j_wga">GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel</a>
+             * `exac` - <a target="_blank" href="http://exac.broadinstitute.org">Exome Aggregation Consortium (ExAC)</a>
+             * `gnomad` - <a target="_blank" href="https://gnomad.broadinstitute.org">The Genome Aggregation Database (gnomAD)</a>
+          enum:
+            - jga_ngs
+            - jga_snp
+            - hgvd
+            - tommo_4.7kjpn
+            - gem_j_wga
+            - exac
+            - gnomad
+
+    Range:
+      description: >
+        Available keys
+         * `gte` - Greater than or equal to
+         * `te` - Greater than
+         * `lte` - Less than or equal to
+         * `le` - Less than
+      oneOf:
+        - type: object
+          description: Both-closed<br/>(a, b) = {x | a &le; x &le; b}
+          additionalProperties: false
+          required:
+            - gte
+            - lte
+          properties:
+            gte:
+              type: number
+            lte:
+              type: number
+        - type: object
+          description: Both-open<br/>(a, b) = {x | a &lt; x &lt; b}
+          additionalProperties: false
+          required:
+            - gt
+            - lt
+          properties:
+            gt:
+              type: number
+            lt:
+              type: number
+        - type: object
+          description: Left-open, right-closed<br/>(a, b) = {x | a &lt; x &le; b}
+          additionalProperties: false
+          required:
+            - gt
+            - lte
+          properties:
+            gt:
+              type: number
+            lte:
+              type: number
+        - type: object
+          description: Left-closed, right-open<br/>(a, b) = {x | a &le; x &lt; b}
+          additionalProperties: false
+          required:
+            - gte
+            - lt
+          properties:
+            gte:
+              type: number
+            lt:
+              type: number
+        - type: object
+          description: Left-closed, right-unbounded<br/>(a, +&infin;) = {x | x &ge; a}
+          additionalProperties: false
+          required:
+            - gte
+          properties:
+            gte:
+              type: number
+        - type: object
+          description: Left-open, right-unbounded<br/>(a, +&infin;) = {x | x &gt; a}
+          additionalProperties: false
+          required:
+            - gt
+          properties:
+            gt:
+              type: number
+        - type: object
+          description: Right-closed, left-unbounded<br/>(-&infin;, b) = {x | x &le; b}
+          additionalProperties: false
+          required:
+            - lte
+          properties:
+            lte:
+              type: number
+        - type: object
+          description: Right-open, left-unbounded<br/>(-&infin;, b) = {x | x &lt; b}
+          additionalProperties: false
+          required:
+            - lt
+          properties:
+            lt:
+              type: number
+
+    And:
+      type: object
+      additionalProperties: false
+      required:
+        - and
+      properties:
+        and:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            oneOf:
+              - $ref: '#/components/schemas/VariationType'
+              - $ref: '#/components/schemas/VariationConsequence'
+              - $ref: '#/components/schemas/VariationFrequency'
+              - $ref: '#/components/schemas/ClinicalSignificance'
+              - $ref: '#/components/schemas/GeneSymbol'
+              - $ref: '#/components/schemas/Disease'
+              - $ref: '#/components/schemas/And'
+              - $ref: '#/components/schemas/Or'
+
+    Or:
+      type: object
+      additionalProperties: false
+      required:
+        - or
+      properties:
+        or:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            oneOf:
+              - $ref: '#/components/schemas/VariationType'
+              - $ref: '#/components/schemas/VariationConsequence'
+              - $ref: '#/components/schemas/VariationFrequency'
+              - $ref: '#/components/schemas/ClinicalSignificance'
+              - $ref: '#/components/schemas/GeneSymbol'
+              - $ref: '#/components/schemas/Disease'
+              - $ref: '#/components/schemas/And'
+              - $ref: '#/components/schemas/Or'
+
+  examples:
+    SearchVariation-1:
+      summary: List variations whose class is any of insertion, deletion and indel.
+      value:
+        query:
+          type:
+            relation: eq
+            terms:
+              - ins
+              - del
+              - indel
+
+    SearchVariation-2:
+      summary: List variations exists on Aldehyde Dehydrogenase 2 family member (ALDH2).
+      value:
+        query:
+          gene_symbol:
+            relation: eq
+            terms:
+              - ALDH2
+
+    SearchVariation-3:
+      summary: List variations ranges from 0.05 to 0.95 in frequency in JGA-NGS.
+      value:
+        query:
+          or:
+            - frequency:
+                dataset:
+                  name: jga_ngs
+                frequency:
+                  gte: 0
+                  lte: 0.05
+                filtered: true
+            - frequency:
+                dataset:
+                  name: jga_ngs
+                frequency:
+                  gte: 0.95
+                  lte: 1.0
+                filtered: true
+
+    SearchVariation-4:
+      summary: Paginate result over 10,000 records.
+      value:
+        query:
+          after:
+            - "12"
+            - "112204719"
+            - G
+            - A
+          limit: 1000

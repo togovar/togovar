@@ -1,5 +1,3 @@
-/*global $ */
-
 import StoreManager from "./StoreManager.js";
 import {API_URL} from "../global.js";
 
@@ -21,7 +19,7 @@ export default class SearchConditionController {
     // reference
     this.elm = elm;
     this.field = elm.querySelector('#search-field');
-    this.button = elm.querySelector('.searchform > .searchbutton');
+    this.button = elm.querySelector('.search-form-ivew > .searchform > .searchbutton');
     this.suggestView = elm.querySelector('.suggest-view');
     this.suggesting = false;
     // events

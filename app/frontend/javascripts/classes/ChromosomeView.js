@@ -1,17 +1,17 @@
-/* global $ */
-
 import StoreManager from "./StoreManager.js";
 
 const WIDTH = 12;
 const PADDING = 5;
 
 export default class ChromosomeView {
+
   /* @param elm:HTMLElement
    * @param no:Number Chromosome number
    * @param map:Array Position data
    * @param maxLength:Number Max length of chromosomes
    */
   constructor(elm, no, map, maxLength) {
+    //return;
     this.no = no;
     this.map = map;
     this.elm = elm;
@@ -28,10 +28,12 @@ export default class ChromosomeView {
       </div>
     `;
 
-    this.filteredRegion = this.elm.querySelector('.lower > .filteredregion'); // TODO:
-    this.displayRegion = this.elm.querySelector('.lower > .displayregion');
-    this.selectedRegion = this.elm.querySelector('.lower > .selectedregion');
+    // 参照
+    this.filteredRegion = this.elm.querySelector('.lower > .filteredregion'); // TODO: フィルターで得られた範囲
+    this.displayRegion = this.elm.querySelector('.lower > .displayregion'); // 表示領域
+    this.selectedRegion = this.elm.querySelector('.lower > .selectedregion'); // 検索条件に region がある場合
 
+    // 粒度の粗いマップ
     const lowMap = map.reduce((acc, subBand) => {
       if (acc.length === 0 || acc[acc.length - 1].band !== subBand.band) {
         acc.push({
@@ -46,6 +48,7 @@ export default class ChromosomeView {
       }
     }, []);
 
+    // 染色体の描画
     this.length = map[map.length - 1].end;
     this.svg = this.elm.querySelector('svg.chromosome');
     const
@@ -100,6 +103,7 @@ export default class ChromosomeView {
       </defs>
     `;
 
+    // draw subbands (drawing area)
     for (const subBand of this.map) {
       html += `
       <g
@@ -120,7 +124,7 @@ export default class ChromosomeView {
       </g>`;
     }
 
-    // draw bands
+    // draw bands (text area)
     for (const band of lowMap) {
       html += `
       <g
@@ -137,12 +141,19 @@ export default class ChromosomeView {
     }
     this.svg.innerHTML = html + '</g>';
 
+    // イベント
     StoreManager.bind('displayingRegionsOnChromosome', this);
 
     // bands
     this.svg.querySelectorAll('g.band').forEach(g => {
       $(g).on('click', e => {
         StoreManager.setSearchCondition('term', `${this.no}:${e.delegateTarget.dataset.start}-${e.delegateTarget.dataset.end}`);
+        // Karyotype 上の座標編集フィールドが廃止になったため、不要
+        //StoreManager.setData('region__', {
+        //  chromosome: this.no,
+        //  start: e.delegateTarget.dataset.start,
+        //  end: e.delegateTarget.dataset.end
+        //});
       });
     });
 
@@ -150,12 +161,19 @@ export default class ChromosomeView {
     this.svg.querySelectorAll('g.subband').forEach(g => {
       $(g).on('click', e => {
         StoreManager.setSearchCondition('term', `${this.no}:${e.delegateTarget.dataset.start}-${e.delegateTarget.dataset.end}`);
+        // Karyotype 上の座標編集フィールドが廃止になったため、不要
+        //StoreManager.setData('region__', {
+        //  chromosome: this.no,
+        //  start: e.delegateTarget.dataset.start,
+        //  end: e.delegateTarget.dataset.end
+        //});
       });
     });
   }
 
   displayingRegionsOnChromosome(displayingRegions) {
     if (displayingRegions[this.no]) {
+      // 表示領域をハイライト
       this.displayRegion.classList.add('-shown');
       const
         displayRegion = displayingRegions[this.no],
@@ -168,4 +186,5 @@ export default class ChromosomeView {
       this.displayRegion.classList.remove('-shown');
     }
   }
+
 }

@@ -70,17 +70,13 @@
         "id": "from",
         "label": "From",
         "type": "range",
-        "default": 0,
-        "gte": 0,
-        "lte": 1
+        "default": 0
       },
       {
         "id": "to",
         "label": "To",
         "type": "range",
-        "default": 1,
-        "gte": 0,
-        "lte": 1
+        "default": 1
       },
       {
         "id": "invert",
@@ -616,6 +612,79 @@
         "label": "Unknown",
         "type": "boolean",
         "default": "1"
+      }
+    ]
+  },
+  {
+    "id": "adv_frequency",
+    "label": "Alternative allele frequency",
+    "type": "array",
+    "items": [
+      {
+        "id": "gem_j_wga",
+        "label": "GEM-J WGA",
+        "type": "object",
+        "default": {
+          "from": 0,
+          "to": 1,
+          "invert": false,
+          "filtered": false
+        }
+      },
+      {
+        "id": "jga_ngs",
+        "label": "JGA NGS",
+        "type": "object",
+        "default": {
+          "from": 0,
+          "to": 1,
+          "invert": false,
+          "filtered": false
+        }
+      },
+      {
+        "id": "jga_snp",
+        "label": "JGA SNP",
+        "type": "object",
+        "default": {
+          "from": 0,
+          "to": 1,
+          "invert": false,
+          "filtered": false
+        }
+      },
+      {
+        "id": "tommo_4.7kjpn",
+        "label": "ToMMo 4.7KJPN",
+        "type": "object",
+        "default": {
+          "from": 0,
+          "to": 1,
+          "invert": false,
+          "filtered": false
+        }
+      },
+      {
+        "id": "hgvd",
+        "label": "HGVD",
+        "type": "object",
+        "default": {
+          "from": 0,
+          "to": 1,
+          "invert": false,
+          "filtered": false
+        }
+      },
+      {
+        "id": "exac",
+        "label": "ExAC",
+        "type": "object",
+        "default": {
+          "from": 0,
+          "to": 1,
+          "invert": false,
+          "filtered": false
+        }
       }
     ]
   }

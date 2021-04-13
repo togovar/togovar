@@ -1,0 +1,99 @@
+global:
+  webcomponents: /stanza/assets/components/webcomponentsjs/webcomponents-loader.js
+
+variant:
+  id: tgv_id
+
+  base_options:
+    ep: https://togovar.biosciencedbc.jp/sparql
+    sparqlist: https://togovar.biosciencedbc.jp/sparqlist
+
+  stanza:
+    - name: variant_header
+      url: https://togovar.biosciencedbc.jp/stanza/variant_header/
+      options:
+      dom: "#variant_header"
+    - name: variant_summary
+      url: https://togovar.biosciencedbc.jp/stanza/variant_summary/
+      options:
+      dom: "#variant_summary"
+    - name: variant_other_overlapping_variants
+      url: https://togovar.biosciencedbc.jp/stanza/variant_other_overlapping_variants/
+      options:
+        search_api: https://togovar.biosciencedbc.jp/search
+      dom: "#variant_other_overlapping_variants"
+    - name: variant_frequency
+      url: https://togovar.biosciencedbc.jp/stanza/variant_frequency/
+      options:
+      dom: "#variant_frequency"
+    - name: variant_clinvar
+      url: https://togovar.biosciencedbc.jp/stanza/variant_clinvar/
+      options:
+      dom: "#variant_clinvar"
+    - name: variant_jbrowse
+      url: https://togovar.biosciencedbc.jp/stanza/variant_jbrowse/
+      options:
+        assembly: GRCh37
+        jbrowse: https://togovar.biosciencedbc.jp/jbrowse
+        margin: 50
+      dom: "#variant_jbrowse"
+    - name: variant_gene
+      url: https://togovar.biosciencedbc.jp/stanza/variant_gene/
+      options:
+        assembly: GRCh37
+      dom: "#variant_gene"
+    - name: variant_transcript
+      url: https://togovar.biosciencedbc.jp/stanza/variant_transcript/
+      options:
+        assembly: GRCh37
+      dom: "#variant_transcript"
+    - name: variant_publication
+      url: https://togovar.biosciencedbc.jp/stanza/variant_publication/
+      options:
+      dom: "#variant_publication"
+
+gene:
+  id:
+
+  base_options:
+    ep: https://togovar.biosciencedbc.jp/sparql
+    sparqlist: https://togovar.biosciencedbc.jp/sparqlist
+
+  stanza:
+    - name: gene_base
+      url: https://togovar.biosciencedbc.jp/stanza/gene_base/
+      options:
+      dom: "#gene_base"
+    - name: gene_jbrowse
+      url: https://togovar.biosciencedbc.jp/stanza/gene_jbrowse/
+      options:
+      dom: "#gene_jbrowse"
+    - name: gene_variant
+      url: https://togovar.biosciencedbc.jp/stanza/gene_variant/
+      options:
+      dom: "#gene_variant"
+    - name: gene_publication
+      url: https://togovar.biosciencedbc.jp/stanza/gene_publication/
+      options:
+      dom: "#gene_publication"
+
+disease:
+  id:
+
+  base_options:
+    ep: https://togovar.biosciencedbc.jp/sparql
+    sparqlist: https://togovar.biosciencedbc.jp/sparqlist
+
+  stanza:
+    - name: disease_base
+      url: https://togovar.biosciencedbc.jp/stanza/disease_base/
+      options:
+      dom: "#disease_base"
+    - name: disease_variant
+      url: https://togovar.biosciencedbc.jp/stanza/disease_variant/
+      options:
+      dom: "#disease_variant"
+    - name: disease_publication
+      url: https://togovar.biosciencedbc.jp/stanza/disease_publication/
+      options:
+      dom: "#disease_publication"

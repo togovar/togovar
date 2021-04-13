@@ -1,9 +1,11 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,700,900')
 
 // color
-$COLOR_KEY: #46B9CC
-$COLOR_KEY_DEEP: #249EB3
-$COLOR_KEY_DARK: #256D80
+$COLOR_KEY: #62D5D9
+$COLOR_KEY_DARK1: #249EB3
+$COLOR_KEY_DARK2: #1D7C8F
+$COLOR_KEY_DARK3: #256D80
+
 $COLOR_SELECTED: #FFDD00
 $COLOR_DISABLE_DEEP: #808080
 $COLOR_DISABLE: #999999
@@ -33,7 +35,7 @@ $COLOR_SIGN_MODIFIER: #C654FF
 $COLOR_SIGN_OTHER: #9C8200
 $COLOR_SIGN_UNKNOWN: $COLOR_GRAY
 
-$GRADIENT_HEADING: linear-gradient(to right, $COLOR_KEY_DEEP, $COLOR_KEY)
+$GRADIENT_HEADING: linear-gradient(to right, $COLOR_KEY_DARK1, $COLOR_KEY)
 $GRADIENT_HEADING_DISABLE: linear-gradient(to right, $COLOR_DISABLE_DEEP, $COLOR_DISABLE)
 
 // geometry
@@ -73,12 +75,18 @@ $CHAR_ARROW_CIRCLE_RIGHT: "\f0a9"
 $CHAR_WRENCH: "\f0ad"
 $CHAR_DATASET: "\E800"
 
+
 @mixin sprite($width, $height, $x, $y)
   background-image: url('../images/csssprite.png')
   background-repeat: no-repeat
   background-position: #{-$x} #{-$y}
   background-size: 200px 60px
 
+
+@font-face
+  font-family: 'FontAwesome'
+  src: url('../fonts/fontawesome-webfont.eot')
+  src: url('../fonts/fontawesome-webfont.eot') format('embedded-opentype'), url('../fonts/fontawesome-webfont.woff2') format('woff2'), url('../fonts/fontawesome-webfont.woff') format('woff'), url('../fonts/fontawesome-webfont.ttf') format('truetype'), url('../fonts/fontawesome-webfont.svg') format('svg')
 @font-face
   font-family: 'fontello'
   src: url('../fonts/fontello.eot')
@@ -86,7 +94,6 @@ $CHAR_DATASET: "\E800"
 
 html
   height: 100%
-
 body
   font-size: 10px
   font-family: 'Roboto Condensed', sans-serif
@@ -95,30 +102,32 @@ body
   padding-top: $HEIGHT_GLOBAL_MENU + $HEIGHT_NBDC_COMMON_HEADER !important
   -moz-osx-font-smoothing: grayscale
   -webkit-font-smoothing: antialiased
-
   [data-page="home"] &
     overflow: hidden
+  &[data-search-mode="advanced"]
+    #FilterAlternativeAlleleFrequency, #FilterVariantCallingQuality, #FilterSIFT, #FilterPolyPhen
+      display: none
 
 [draggable=true]
   -khtml-user-drag: element
 
 a
-  color: $COLOR_KEY_DARK
-
+  color: $COLOR_KEY_DARK3
   &:link
-    color: $COLOR_KEY_DARK
+    color: $COLOR_KEY_DARK3
     text-decoration: underline
-
   &:active, &:hover
-    color: $COLOR_KEY_DEEP
+    color: $COLOR_KEY_DARK1
 
 label
   > input
     margin-right: .3em
 
+input[type="radio"], input[type="checkbox"]
+  vertical-align: middle
+
 .unimplemented
   color: red
   margin-bottom: 0
-
   &:before
     content: "unimplemented: "

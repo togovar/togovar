@@ -29,6 +29,7 @@ header#GlobalHeader
       ul.menu.config
         li.menu-button Configuration
     else if locals.currentPage === "variant"
+    else if locals.currentPage === "api"
     else
       ul.menu.languageswitcher
         li.language.menu-button(class={"-current": locals.language === "ja"} data-language="ja" title="日本語")

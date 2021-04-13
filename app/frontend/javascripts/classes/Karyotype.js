@@ -181,7 +181,9 @@ const DEFAULT = {
 };
 
 export default class Karyotype {
+
   constructor(elm) {
+
     this.elm = elm;
     this.isReady = false;
     this.chromosomes = this.elm.querySelector('.content > .chromosomes');
@@ -190,12 +192,12 @@ export default class Karyotype {
     // initial settings
     let karyotype = localStorage.getItem('karyotype');
     if (karyotype) karyotype = JSON.parse(karyotype);
-    else karyotype = DEFAULT;
+    else karyotype = DEFAULT; // デフォルト値作成
     StoreManager.setData('karyotype', karyotype);
 
     // events
     StoreManager.bind('karyotype', this);
-
+    // ビューの開閉
     this.elm.querySelector('.header').addEventListener('click', () => {
       const karyotype = StoreManager.getData('karyotype');
       this._changeKaryotype({
@@ -204,9 +206,8 @@ export default class Karyotype {
       });
       return false;
     });
-
-    const buttons = this.elm.querySelectorAll('#KariotypeSwitchBandVisibility > .button');
-    buttons.forEach(button => {
+    // 設定関係
+    const buttons = this.elm.querySelectorAll('#KariotypeSwitchBandVisibility > .button');buttons.forEach(button => {
       button.addEventListener('click', e => {
         this._changeKaryotype({isShowBand: e.target.dataset.value === 'show'});
       });
@@ -214,19 +215,32 @@ export default class Karyotype {
     this._bandShowButton = Array.from(buttons).filter(elm => elm.dataset.value === 'show')[0];
     this._bandHideButton = Array.from(buttons).filter(elm => elm.dataset.value === 'hide')[0];
 
+    // 染色体座標データ
     const tsv = require(`../../assets/${karyotype.reference}.tsv`);
-
     this.geneMap = this.parseGeneMap(tsv);
     this.maxLength = Math.max(...this.geneMap.map(chromosome => chromosome[chromosome.length - 1].end));
     this.drawChromosome(this.geneMap);
+    //fetch(`./assets/${karyotype.reference}.tsv`)
+    //  .then(response => response.text())
+    //  .then(tsv => {
+    //    this.geneMap = this.parseGeneMap(tsv);
+    //    this.maxLength = Math.max(...this.geneMap.map(chromosome => chromosome[chromosome.length - 1].end));
+    //    this.drawChromosome(this.geneMap);
+    //  });
 
+    // ストアの情報を反映
     this.karyotype(StoreManager.getData('karyotype'));
   }
 
+  // TSVから総位置データ取り出し
   parseGeneMap(tsv) {
     const geneMap = [];
+    //const positions = tsv.split('\n').map(row => row.split('\t'));
     for (const chromosomeKey of CHROMOSOME_KEYS) {
+      // 染色体ごとの位置データ
       const chromosome = tsv.filter(position => position[0] === `chr${chromosomeKey}`);
+      //const chromosome = positions.filter(position => position[0] === `chr${chromosomeKey}`);
+      // データ整形
       geneMap.push(chromosome.map(position => {
         return {
           start: parseInt(position[1]),
@@ -240,6 +254,7 @@ export default class Karyotype {
     return geneMap;
   }
 
+  // 染色体の描画
   drawChromosome(geneMap) {
     this.chromosomeViews = [];
     this.chromosomes.innerHTML = CHROMOSOME_KEYS.map(key => `<div id="chromosome${key}" class="chromosome-view"></div>`).join('');
@@ -252,6 +267,7 @@ export default class Karyotype {
     }
   }
 
+  // 核型の設定変更
   _changeKaryotype(params) {
     const karyotype = StoreManager.getData('karyotype');
     for (const key in params) {
@@ -261,12 +277,15 @@ export default class Karyotype {
     localStorage.setItem('karyotype', JSON.stringify(karyotype));
   }
 
+  // 核型の設定変更後に呼ばれる
   karyotype(karyotype) {
+    // 開閉
     if (karyotype.isOpened) {
       document.getElementsByTagName('body')[0].classList.add('-drawer-opened');
     } else {
       document.getElementsByTagName('body')[0].classList.remove('-drawer-opened');
     }
+    // バンドの表示
     if (karyotype.isShowBand) {
       this.elm.classList.add('-show-band-label');
       this._bandShowButton.classList.add('-current');
@@ -276,5 +295,9 @@ export default class Karyotype {
       this._bandShowButton.classList.remove('-current');
       this._bandHideButton.classList.add('-current');
     }
+    // リファレンスゲノム
+    // 染色体の選択
+    // 染色体の範囲の選択
   }
+
 }

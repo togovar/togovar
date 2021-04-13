@@ -10,82 +10,65 @@
     color: white
     padding: 27px 0 10px
     min-width: $WIDTH_MIN - $PADDING_SIDE - $PADDING_SIDE
-
     > .title
       font-size: 21px
       line-height: 27px
       +content-width
-
   > .contents
     font-size: 14px
     line-height: 1.8
     padding: 24px 0 36px
     +content-width
-
     + .contents
       margin-top: -36px
-
     > .section
       padding: 24px 0
-
       &:last-child
         padding-bottom: 60px
         position: relative
-
         &:after
           content: ""
           display: block
           position: absolute
           width: calc(100% + 8px)
           height: 2px
-          background-color: $COLOR_KEY_DEEP
+          background-color: $COLOR_KEY_DARK1
           bottom: 0
           left: -4px
-
       > .sectiontitle
         font-size: 18px
-        color: $COLOR_KEY_DARK
+        color: $COLOR_KEY_DARK3
         position: relative
-
         &:before, &:after
           content: ""
           display: block
           position: absolute
-
       .table
         width: 100%
         font-size: 14px
         line-height: 1.2
-
         th, td
           padding: 4px 4px
-
         > thead
           > tr
             border-bottom: solid 1px $COLOR_BLACK
-
         > tbody
           > tr
             border-bottom: solid 1px rgba($COLOR_BLACK, .4)
-
         > tfoot
           > tr
             border-top: solid 1px $COLOR_BLACK
-
       .notice
         font-size: 12px
         line-height: 1.4
         margin-top: 8px
-
       .unordered-list
         list-style: none
         padding-inline-start: 0
-
         > li
           line-height: 1.6
           padding: 4px 0 4px 1em
           position: relative
-
           &:before
             content: ""
             display: block
@@ -96,16 +79,13 @@
             position: absolute
             left: .2em
             top: .85em
-
       .ordered-list
         counter-reset: section
         list-style: none
         padding-inline-start: 0
-
         > li
           position: relative
           padding: 4px 0 4px 2em
-
           &:before
             counter-increment: section
             content: counter(section)
@@ -121,24 +101,19 @@
             left: 0
             top: 6px
             font-weight: bold
-
           + li
             margin-top: 1em
-
           > .heading
             font-size: 14px
             line-height: 1.6
-            color: $COLOR_KEY_DEEP
-
+            color: $COLOR_KEY_DARK1
           .subsection
             padding-top: .5em
             line-height: 1.4
-
             > .subheading
               font-size: 12px
               line-height: 1.2
               color: $COLOR_BLACK
-
       .variant-function
         line-height: 18px
 
@@ -152,10 +127,8 @@
         word-break: break-all
         hyphens: auto
         text-align: justify
-
         > .sectiontitle
           column-span: all
-
         .subsection
           break-inside: avoid
 

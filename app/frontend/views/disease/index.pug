@@ -1,0 +1,29 @@
+extend ../layouts/application
+
+append variables
+  - locals.currentPage = "disease";
+
+block head
+  each css in htmlWebpackPlugin.files.css.filter(x => x.match(/^\/css\/main-/))
+    link(href=css, rel="stylesheet")
+  each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/report-/))
+    script(type="text/javascript", src=js)
+
+block content
+  header#DetailHeader
+    .title-wrapper
+      p.pagetype Disease report
+      h2.title.report_id
+
+  main#ReportMain.LayoutReport
+    section.stanza-view
+      h3.title
+      #disease_base.stanza
+
+    section.stanza-view
+      h3.title
+      #disease_variant.stanza
+
+    section.stanza-view
+      h3.title
+      #disease_publication.stanza

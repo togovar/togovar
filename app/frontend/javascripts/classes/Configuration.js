@@ -1,9 +1,8 @@
-/*global $ */
-
 import {PAGE, COLUMNS} from "../global.js";
 import StoreManager from "./StoreManager.js";
 
 export default class Configuration {
+
   constructor(elm) {
     this.elm = elm;
     this.bg = elm.querySelector('.bg');
@@ -35,17 +34,20 @@ export default class Configuration {
   initHome() {
     StoreManager.bind('columns', this);
 
+    // コンフィグ開く
     document.querySelector('#GlobalHeader > .menus > .config > .menu-button').addEventListener('click', () => {
       this.open();
     });
-
+    // コンフィグ閉じる
     this.bg.addEventListener('click', () => {
       this.close();
     });
 
+    // 設定項目
     const CONFIGURES = [
-      {
+      { // column
         constant: COLUMNS,
+        //localStrageKey: 'columns',
         storeKey: 'columns',
         container: document.getElementById('ConfSortColumns')
       }
@@ -57,15 +59,16 @@ export default class Configuration {
       if (stored) {
         stored = JSON.parse(stored);
       } else {
-        // use defaults
+        // デフォルト値作成
         stored = configure.constant.map(item => {
           const newItem = Object.assign({}, item);
           newItem.isUsed = true;
           return newItem;
         });
       }
-
+      // 生成
       configure.container.innerHTML = stored.map(item => `<li><label><input type="checkbox" value="${item.id}"${item.isUsed ? ' checked' : ''}>${item.label}</label></li>`).join('');
+      // input イベント
       configure.container.querySelectorAll('li > label > input').forEach(input => {
         input.addEventListener('change', e => {
           const stored = StoreManager.getData(configure.storeKey);
@@ -86,4 +89,5 @@ export default class Configuration {
     }
     localStorage.setItem('columns', JSON.stringify(columns));
   }
+
 }

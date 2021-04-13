@@ -9,7 +9,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --config app/frontend/config/webpack.config.prod.js --color -p --progress --hide-modules --display-optimization-bailout",
     "lint": "yarn lint:js && yarn lint:css",
-    "lint:css": "stylelint app/frontend/stylesheets/**/*.sass",
+    "lint:css": "stylelint app/frontend/stylesheets/**/*.{css,scss,sass}",
     "lint:eslint": "eslint --ignore-path .gitignore --ignore-pattern app/frontend/server",
     "lint:js": "yarn lint:eslint app/frontend",
     "lint:staged": "lint-staged",
@@ -31,6 +31,7 @@
     "cross-env": "^7.0.2",
     "css-loader": "^4.0.0",
     "csv-loader": "^3.0.3",
+    "decimal.js": "^10.2.1",
     "dotenv-webpack": "^2.0.0",
     "ejs-html-loader": "^4.0.1",
     "ejs-plain-loader": "^1.4.1",
@@ -52,16 +53,20 @@
     "popper.js": "^1.16.1",
     "pug": "^3.0.0",
     "pug-loader": "^2.4.0",
+    "rails-erb-loader": "^5.5.2",
     "sass-loader": "^9.0.2",
     "style-loader": "^1.2.1",
     "tippy.js": "^6.3.1",
+    "swagger-ui": "^3.36.0",
     "webpack": "^4.44.0",
     "webpack-cli": "^3.3.12",
     "webpack-google-tag-manager-plugin": "^1.0.3",
     "webpack-manifest-plugin": "^2.2.0",
-    "webpack-merge": "^5.0.9"
+    "webpack-merge": "^5.0.9",
+    "yaml-loader": "^0.6.0"
   },
   "devDependencies": {
+    "http-proxy-middleware": "^1.0.6",
     "ngrok": "^3.2.7",
     "stylelint": "^13.6.1",
     "stylelint-config-recommended": "^3.0.0",

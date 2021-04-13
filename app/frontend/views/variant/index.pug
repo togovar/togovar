@@ -4,16 +4,6 @@ append variables
   - locals.currentPage = "variant";
 
 block head
-  script(src="https://togovar.biosciencedbc.jp/stanza/assets/components/webcomponentsjs/webcomponents-loader.js")
-  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_header/")
-  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_summary/")
-  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_other_overlapping_variants/")
-  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_frequency/")
-  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_clinvar/")
-  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_jbrowse/")
-  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_gene/")
-  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_transcript/")
-  link(rel="import" href="https://togovar.biosciencedbc.jp/stanza/variant_publication/")
   each css in htmlWebpackPlugin.files.css.filter(x => x.match(/^\/css\/main-/))
     link(href=css, rel="stylesheet")
   each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/report-/))
@@ -26,43 +16,43 @@ block content
       h2.title.report_id
 
     .title-wrapper
-      #_stanza_0
+      #variant_header
 
   main#ReportMain.LayoutReport
     section.stanza-view
-      #_stanza_1.stanza
+      #variant_summary.stanza
 
     section.stanza-view
       h3.title
         | Other overlapping variants
-      #_stanza_2.stanza
+      #variant_other_overlapping_variants.stanza
 
     section.stanza-view
       h3.title
         | Frequency
-      #_stanza_3.stanza
+      #variant_frequency.stanza
 
     section.stanza-view
       h3.title
         | Clinical Significance
-      #_stanza_4.stanza
+      #variant_clinvar.stanza
 
     section.stanza-view
       h3.title
         | Genomic context
-      #_stanza_5.stanza
+      #variant_jbrowse.stanza
 
     section.stanza-view
       h3.title
         | Gene
-      #_stanza_6.stanza
+      #variant_gene.stanza
 
     section.stanza-view
       h3.title
         | Transcripts
-      #_stanza_7.stanza
+      #variant_transcript.stanza
 
     section.stanza-view
       h3.title
         | Publications
-      #_stanza_8.stanza
+      #variant_publication.stanza
