@@ -35,3 +35,36 @@ function init() {
       break;
   }
 }
+<<<<<<< HEAD
+=======
+
+function initHome() {
+  StoreManager.ready(() => {
+    new SearchConditionController(document.getElementById('SearchView'));
+
+    new ResultsView(document.getElementById('ResultsView'));
+
+    new SideBar(document.getElementById('SideBar'));
+
+    new PanelViewCheckList(document.getElementById('FilterDatasets'), 'dataset', 'statisticsDataset');
+    new PanelViewFilterAlternativeAlleleFrequency(document.getElementById('FilterAlternativeAlleleFrequency'));
+    new PanelViewFilterVariantCallingQuality(document.getElementById('FilterVariantCallingQuality'));
+    new PanelViewCheckList(document.getElementById('FilterVariantType'), 'type', 'statisticsType');
+    new PanelViewCheckList(document.getElementById('FilterClinicalSignificance'), 'significance', 'statisticsSignificance');
+    new PanelViewFilterConsequence(document.getElementById('FilterConsequence'));
+    new PanelViewCheckList(document.getElementById('FilterSIFT'), 'sift');
+    new PanelViewCheckList(document.getElementById('FilterPolyPhen'), 'polyphen');
+
+    new PanelViewPreviewGene(document.getElementById('PreviewGene'));
+    new PreviewToVariantReport(document.getElementById('PreviewToVariantReport'));
+    new PanelViewPreviewExternalLinks(document.getElementById('PreviewExternalLinks'));
+    new PanelViewPreviewAlternativeAlleleFrequencies(document.getElementById('PreviewAlternativeAlleleFrequencies'));
+    new PanelViewPreviewConsequence(document.getElementById('PreviewConsequence'));
+    new PanelViewPreviewClinicalSignificance(document.getElementById('PreviewClinicalSignificance'));
+
+    new SelectedRowIndicator(document.getElementById('RowIndicator'));
+
+    new TippyBox(document.getElementById('tooltiptemplate'));
+  });
+}
+>>>>>>> 020bed9 (add tooltip)
