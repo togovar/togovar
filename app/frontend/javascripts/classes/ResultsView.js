@@ -22,10 +22,10 @@ export default class ResultsView {
     $(document).on('keydown.resultview', this.keydown.bind(this));
     // スクロールバーの生成
     this.elm.querySelector('.tablecontainer').insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
-    new ScrollBar( this.elm.querySelector('.scroll-bar') );
-    // ヘッダの生成
-    this.elm.querySelector('.tablecontainer > table.results-view > thead > tr').innerHTML = COLUMNS.map(column => `<th class="${column.id}"><p>${column.label}</p></th>`).join('');
-    // ボディの参照
+    new ScrollBar(this.elm.querySelector('.scroll-bar'));
+    // ヘッダ+ ヘッダのツールチップ用のデータ設定
+    this.elm.querySelector('.tablecontainer > table.results-view > thead > tr').innerHTML = COLUMNS.map(column => `<th class="${column.id}"><p data-tooltip="${column.tooltip}"data-link="${column.link}">${column.label}</p></th>`).join('');
+
     this.tbody = this.elm.querySelector('.tablecontainer > table.results-view > tbody');
 
     // スクロール制御
