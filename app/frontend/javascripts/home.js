@@ -79,9 +79,8 @@ export function initHome() {
     document.querySelectorAll('.module-tabs-view').forEach(elm => {
       new ModuleTabsView(elm);
     });
-    // ツールチップ
-    new TippyBox(document.getElementById('tooltiptemplate'));
-
+    // Tooltip
+    new TippyBox();
   });
 
 }
