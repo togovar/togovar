@@ -1,0 +1,56 @@
+[
+  {
+    "id": "table-header-togovar_id",
+    "content": "Unset",
+    "url": "#"
+  },
+  {
+    "id": "table-header-refsnp_id",
+    "content": "Unset"
+  },
+  {
+    "id": "table-header-position",
+    "content": "Unset",
+    "url": "#"
+  },
+  {
+    "id": "table-header-ref_alt",
+    "content": "Unset",
+    "url": "#"
+  },
+  {
+    "id": "table-header-type",
+    "content": "Unset",
+    "url": "#"
+  },
+  {
+    "id": "table-header-gene",
+    "content": "Unset",
+    "url": "#"
+  },
+  {
+    "id": "table-header-alt_frequency",
+    "content": "The indicator represents the alternative allele frequency for each dataset.",
+    "url": "doc/help#s1"
+  },
+  {
+    "id": "table-header-consequence",
+    "content": "The value of variant consequence in Variant Effect Predictor (VEP).",
+    "url": "/doc/help#d5"
+  },
+  {
+    "id": "table-header-sift",
+    "content": "Scores which indicate the predicted effects on the protein function when an amino acid sequence undergoes alteration due to a variant.",
+    "url": "/doc/help#d6"
+  },
+  {
+    "id": "table-header-polyphen",
+    "content": "Scores which indicate the predicted effects on the protein function when an amino acid sequence undergoes alteration due to a variant.",
+    "url": "/doc/help#d6"
+  },
+  {
+    "id": "table-header-clinical_significance",
+    "content": "Value of clinical significance calculated in ClinVar.",
+    "url": "/doc/help#d7"
+  }
+]
