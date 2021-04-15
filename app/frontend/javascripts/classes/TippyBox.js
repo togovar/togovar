@@ -5,7 +5,7 @@ export default class TippyBox {
     const tooltipElements = document.querySelectorAll("[data-tooltip-id]"),
       data = this.getData();
 
-    [].forEach.call(tooltipElements, (HTMLElement) => {
+    tooltipElements.forEach((HTMLElement) => {
       HTMLElement.addEventListener(
         "mouseover",
         this.setTooltip(HTMLElement, data)
@@ -34,7 +34,7 @@ export default class TippyBox {
         duration: [400],
         interactive: true,
         theme: "black",
-        placement: "top",
+        placement: "right",
         appendTo: document.body,
         maxWidth: "15rem",
         delay: [2, 300],
