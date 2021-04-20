@@ -17,7 +17,7 @@ export default class TippyBox {
   getData() {
     const json = require("../../assets/tooltips.json");
     Object.freeze(json);
-
+    
     return json;
   }
   // Set tooltip with tippy.js plugin
@@ -34,7 +34,7 @@ export default class TippyBox {
         duration: [400],
         interactive: true,
         theme: "black",
-        placement: "right",
+        placement: "top",
         appendTo: document.body,
         maxWidth: "15rem",
         delay: [2, 300],
