@@ -11,10 +11,11 @@ module TogoVar
             validate
 
             terms = @terms
+            relation = @relation
 
             q = Elasticsearch::DSL::Search.search do
               query do
-                terms case @relation
+                terms case relation
                       when 'eq'
                         { 'clinvar.condition.raw': terms }
                       when 'contain'
@@ -25,7 +26,7 @@ module TogoVar
               end
             end
 
-            (%w[ne not_contain].include?(@relation) ? negate(q) : q).to_hash[:query]
+            (%w[ne not_contain].include?(relation) ? negate(q) : q).to_hash[:query]
           end
 
           protected
