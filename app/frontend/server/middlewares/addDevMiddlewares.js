@@ -28,7 +28,13 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
   app.use(webpackHotMiddleware(compiler));
 
   // proxy
-  app.use('/stanza', createProxyMiddleware({ target: 'http://localhost:8080' }));
+  const proxyOptions = {
+    target: 'http://localhost:8080',
+    pathRewrite: {
+      '^/stanza/': '/',
+    },
+  };
+  app.use('/stanza', createProxyMiddleware(proxyOptions));
 
   // serve static assets under /dist
   app.use(publicPath, express.static(outputPath));
