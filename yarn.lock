@@ -11789,9 +11789,9 @@ toggle-selection@^1.0.6:
     yeoman-environment "^2.10.3"
     yeoman-generator "^4.12.0"
 
-togovar-stanza@togovar/stanza#295a78fdc2edd15d2bd5c213f3cc1f2bfa03e38c:
+togovar-stanza@togovar/stanza#22d089b48b2d2a8c9f2faf7f65ffabde7859851d:
   version "0.0.1"
-  resolved "https://codeload.github.com/togovar/stanza/tar.gz/295a78fdc2edd15d2bd5c213f3cc1f2bfa03e38c"
+  resolved "https://codeload.github.com/togovar/stanza/tar.gz/22d089b48b2d2a8c9f2faf7f65ffabde7859851d"
   dependencies:
     togostanza "github:togostanza/togostanza"
 
