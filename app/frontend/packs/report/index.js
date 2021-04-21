@@ -2,13 +2,7 @@ import 'jquery'
 
 const config = require('../../config/stanza.yaml')
 
-const webcomponentsjs = config.global?.webcomponents;
-
 $(function () {
-  if (webcomponentsjs) {
-    $('head').append($(`<script src="${webcomponentsjs}"></script>`));
-  }
-
   initialize();
 });
 
@@ -26,11 +20,11 @@ const initialize = function () {
 };
 
 const appendStanzaTag = function (config, base_options) {
-  const name = config.name;
+  const id = config.id;
   const dom = config.dom;
 
-  if (!name) {
-    console.error("Missing required key: 'name'");
+  if (!id) {
+    console.error("Missing required key: 'id'");
     return;
   }
 
@@ -39,6 +33,6 @@ const appendStanzaTag = function (config, base_options) {
     return;
   }
 
-  $('head').append($(`<link rel="import" href="${config.url}" />`))
-  $(`${dom}`).append($(`<togostanza-${name}></togostanza-${name}>`).attr(base_options || {}).attr(config.options || {}));
+  $('head').append($(`<script type="module" src="/stanza/${config.id}.js" async></script>`));
+  $(`${dom}`).append($(`<togostanza-${id}></togostanza-${id}>`).attr(base_options || {}).attr(config.options || {}));
 };
