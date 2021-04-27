@@ -41,32 +41,26 @@
         nav.tabscontainer
           .collupsebutton
           ul
-            //- li(data-target="AdvancedSearchBuilderView") Builder
+            li(data-tab-group="tab-group-type-of-advanced-search" data-target="AdvancedSearchBuilderView") Builder
             li(data-tab-group="tab-group-type-of-advanced-search" data-target="AdvancedSearchDatasetsView") Datasets
             //- li(data-target="SearchHistoryView") Search history
 
         .sectionscontainer.collapsecontent
-          //- #AdvancedSearchBuilderView.section
-          //-   .inner
-          //-     .buildersection
-          //-       .advanced-search-group-view
-          //-         .menu
-          //-           .logical-operator-switch
-          //-             a.operator.-current(data-operator="and") AND
-          //-             a.operator(data-operator="or") OR
-          //-           .filling
-          //-           .deletebutton Delete
-          //-         .container
-          //-           .advanced-search-conditino-view(data-operator="equal" data-classification="disease")
-          //-             .classification Disease
-          //-             .operator
-          //-             .value
-          //-               input(type="text" placeholder="Disease name")
-          //-             .deletebutton
+          #AdvancedSearchBuilderView.section
+            .inner
+              .buildersection
+                .advanced-search-group-view
+                  .logical-operator-switch
+                    a.operator(data-operator="and")
+                  .container
+                    .advanced-search-conditino-view(data-operator="equal" data-classification="disease")
+                      .classification Disease
+                      .operator
+                      .value
+                        input(type="text" placeholder="Disease name")
+                      .deletebutton
                         
 
-          //-     .conditionssection
-          //-       p conditions
           #AdvancedSearchDatasetsView.section
             .tablecontainer
               table

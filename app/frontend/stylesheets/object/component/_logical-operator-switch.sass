@@ -1,9 +1,28 @@
 .logical-operator-switch
-  font-weight: bold
   > .operator
+    padding: .2em .4em
+    border-radius: .75em
+    color: $COLOR_KEY_DARK3
     cursor: pointer
-    opacity: .3
-    + .operator
-      margin-left: .5em
-    &.-current
-      opacity: 1
+    &[data-operator="and"], &[data-operator="or"]
+      &::before
+        font-family: fontello
+        font-size: 1.4em
+        vertical-align: middle
+        display: inline-block
+        width: 1.15em
+        letter-spacing: -1em
+      &::after
+        font-weight: bold
+    &[data-operator="and"]
+      &::before
+        content: $CHAR_LOGICAL_OP_OUTLINE + $CHAR_LOGICAL_OP_AND
+      &::after
+        content: "AND"
+    &[data-operator="or"]
+      &::before
+        content: $CHAR_LOGICAL_OP_OUTLINE + $CHAR_LOGICAL_OP_OR
+      &::after
+        content: "OR"
+    &:hover
+      background-color: $COLOR_KEY_DARK2
