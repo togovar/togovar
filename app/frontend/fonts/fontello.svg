@@ -1,12 +1,18 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns="http://www.w3.org/2000/svg">
-<metadata>Copyright (C) 2020 by original authors @ fontello.com</metadata>
+<metadata>Copyright (C) 2021 by original authors @ fontello.com</metadata>
 <defs>
 <font id="fontello" horiz-adv-x="1000" >
 <font-face font-family="fontello" font-weight="400" font-stretch="normal" units-per-em="1000" ascent="850" descent="-150" />
 <missing-glyph horiz-adv-x="1000" />
-<glyph glyph-name="dataset" unicode="&#xe800;" d="M500 20c-260 0-470 70-470 170v-170c0-100 210-170 470-170 260 0 470 70 470 170v160c0-90-210-160-470-160z m0 260c-260 0-470 80-470 170v-170c0-90 210-170 470-170 260 0 470 70 470 170v170c0-90-210-170-470-170z m0 570c-260 0-470-70-470-170v-130c0-90 210-170 470-170 260 0 470 70 470 170v130c0 100-210 170-470 170z" horiz-adv-x="1000" />
+<glyph glyph-name="dataset" unicode="&#xe800;" d="M967 183v-166c0-92-209-167-467-167s-467 75-467 167v166c0-92 209-166 467-166s467 74 467 166z m-467 100c-258 0-467 75-467 167v-167c0-92 209-166 467-166s467 74 467 166v167c0-92-209-167-467-167z m0 567c-258 0-467-75-467-167v-133c0-92 209-167 467-167s467 75 467 167v133c0 92-209 167-467 167z" horiz-adv-x="1000" />
+
+<glyph glyph-name="logical-op-and" unicode="&#xe801;" d="M500 558a277 277 0 0 1 0-416z m0-416a277 277 0 0 1 0 416z" horiz-adv-x="1000" />
+
+<glyph glyph-name="logical-op-or" unicode="&#xe802;" d="M969 350a280 280 0 0 0-469-208 281 281 0 1 0 0 416 280 280 0 0 0 469-208z" horiz-adv-x="1000" />
+
+<glyph glyph-name="logical-op-outline" unicode="&#xe803;" d="M688 662a306 306 0 0 1-188-65 306 306 0 0 1-188 65 312 312 0 0 1 0-624 306 306 0 0 1 188 65 306 306 0 0 1 188-65 312 312 0 0 1 0 624z m-188-474a243 243 0 0 0 0 324 243 243 0 0 0 0-324z m-438 162a251 251 0 0 0 250 250 244 244 0 0 0 141-50 308 308 0 0 1 0-410 244 244 0 0 0-141-45 251 251 0 0 0-250 255z m626-250a244 244 0 0 0-141 45 308 308 0 0 1 0 410 244 244 0 0 0 141 45 250 250 0 1 0 0-500z" horiz-adv-x="1000" />
 </font>
 </defs>
 </svg>

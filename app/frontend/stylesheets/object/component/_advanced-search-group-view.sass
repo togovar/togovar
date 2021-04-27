@@ -2,33 +2,14 @@ $PADDING: 6px
 
 .advanced-search-group-view
   border: solid 1px $COLOR_KEY_DARK3
-  border-radius: 4px
-  > .menu
-    background-color: $COLOR_KEY_DARK3
-    display: flex
-    font-size: 12px
-    line-height: 16px
-    padding: 0 $PADDING
-    > .filling
-      flex-grow: 1
-    > .deletebutton
-      position: relative
-      padding-left: 13px
-      cursor: pointer
-      &:before, &:after
-        content: ""
-        position: absolute
-        width: 8px
-        height: 8px
-        border-top: solid 1px #fff
-        left: 0
-      &:before
-        top: 6px
-        transform: rotate(45deg)
-      &:after
-        top: 1px
-        transform: rotate(135deg)
+  background-color: white
+  position: relative
+  padding: 3px 3px 3px 16px
+  box-shadow: $SHADOW_DEPTH1
+  > .logical-operator-switch
+    position: absolute
+    top: 1px
+    left: 18px
+    transform: rotate(90deg)
+    transform-origin: 0% 0%
   > .container
-    background-color: #fff
-    padding: $PADDING
-    border-radius: 0 0 4px 4px
