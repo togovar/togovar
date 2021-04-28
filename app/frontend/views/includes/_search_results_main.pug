@@ -53,14 +53,90 @@
                   .logical-operator-switch
                     a.operator(data-operator="and")
                   .container
-                    .advanced-search-conditino-view(data-operator="equal" data-classification="disease")
-                      .classification Disease
+                    .advanced-search-condition-view(data-operator="equal" data-classification="variant-type")
+                      .classification
                       .operator
-                      .value
-                        input(type="text" placeholder="Disease name")
-                      .deletebutton
-                        
+                      .values
+                        .value SNV
+                    .advanced-search-condition-view(data-operator="not-equal" data-classification="variant-type")
+                      .classification
+                      .operator
+                      .values
+                        .value Insertion
+                    .advanced-search-condition-view(data-classification="alternative-allele-frequency" data-dataset="gem_j_wga")
+                      .classification
+                      .operator
+                      .values
+                        .value GEM-J WGA
+                        .numeralvalue
+                          span.graph
+                            span.bar
+                          span.text 0.1 ~ 1
+                        small.smalltext Exclude filtered out variants
 
+                    .advanced-search-group-view
+                      .logical-operator-switch
+                        a.operator(data-operator="or")
+                      .container
+                        .advanced-search-condition-view(data-classification="alternative-allele-frequency" data-dataset="jga_ngs")
+                          .classification
+                          .operator
+                          .values
+                            .value JGA NGS
+                            .numeralvalue
+                              span.graph
+                                span.bar(style="left: 50%; width: 20%")
+                              span.text 0.1 ~ 1
+                            small.smalltext Exclude filtered out variants
+                        .advanced-search-condition-view(data-classification="alternative-allele-frequency" data-dataset="tommo_4.7kjpn")
+                          .classification
+                          .operator
+                          .values
+                            .value ToMMo 4.7KJPN
+                            .numeralvalue
+                              span.graph
+                                span.bar
+                              span.text 0.1 ~ 1
+                            small.smalltext Exclude filtered out variants
+                        .advanced-search-condition-view(data-classification="alternative-allele-count" data-dataset="hgvd")
+                          .classification
+                          .operator
+                          .values
+                            .value HGVD
+                            .numeralvalue
+                              span.text 0.1 &lt;
+                            small.smalltext Exclude filtered out variants
+                        .advanced-search-condition-view(data-classification="alternative-allele-count" data-dataset="bbj")
+                          .classification
+                          .operator
+                          .values
+                            .value BBJ
+                            .numeralvalue
+                              span.text 0.1 &lt;
+                            small.smalltext Exclude filtered out variants
+                        .advanced-search-condition-view(data-classification="alternative-allele-count" data-dataset="gnomad")
+                          .classification
+                          .operator
+                          .values
+                            .value gnomAD
+                            .numeralvalue
+                              span.text 0.1 &lt;
+                            small.smalltext Exclude filtered out variants
+                        .advanced-search-condition-view(data-operator="equal" data-classification="consequence")
+                          .classification
+                          .operator
+                          .values
+                            .value Splice acceptor variant
+                    .advanced-search-condition-view(data-operator="equal" data-classification="gene")
+                      .classification
+                      .operator
+                      .values
+                        .value ALDH2
+                    .advanced-search-condition-view(data-operator="equal" data-classification="disease")
+                      .classification
+                      .operator
+                      .values
+                        .value cancer
           #AdvancedSearchDatasetsView.section
             .tablecontainer
               table

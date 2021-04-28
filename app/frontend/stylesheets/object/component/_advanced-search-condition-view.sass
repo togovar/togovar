@@ -1,0 +1,164 @@
+$HEIGHT: 24px
+$HEIGHT_OPERATOR: 16px
+$HEIGHT_VALUE: 18px
+$PADDING_VALUES: ($HEIGHT - $HEIGHT_VALUE) / 2
+$CORNER_RADIUS: $HEIGHT / 2
+
+.advanced-search-condition-view
+  margin-bottom: 3px
+  border-radius: $CORNER_RADIUS
+  color: $COLOR_BLACK
+  font-size: 12px
+  display: flex
+  box-shadow: 0 1px 1px rgba(black, .3)
+  > .classification
+    background-color: $COLOR_BLACK
+    color: white
+    line-height: $HEIGHT
+    padding: 0 0 0 $CORNER_RADIUS
+    width: 160px
+    border-radius: $CORNER_RADIUS 0 0 $CORNER_RADIUS
+    cursor: grab
+    font-weight: bold
+  > .values
+    background-color: #F0F0EF
+    flex-grow: 1
+    padding: $PADDING_VALUES $CORNER_RADIUS $PADDING_VALUES 6px
+    border-radius: 0 $CORNER_RADIUS $CORNER_RADIUS 0
+    display: flex
+    align-items: center
+    > .value
+      line-height: 18px
+      padding: 0 #{$HEIGHT_VALUE * .5}
+      background-color: white
+      border: solid 1px $COLOR_KEY_DARK2
+      border-radius: $HEIGHT_VALUE * .5
+      font-weight: bold
+    > .numeralvalue
+      margin-left: 8px
+      width: 120px
+      height: $HEIGHT_VALUE
+      padding: 2px 0
+      display: flex
+      align-items: center
+      > .graph
+        display: inline-block
+        border: solid 1px white
+        box-shadow: 0 0 0 1px $COLOR_GRAY
+        padding: 1px
+        background-color: white
+        width: 54px
+        height: 100%
+        position: relative
+        margin-right: 4px
+        > .bar
+          position: absolute
+          background-color: $COLOR_KEY_DARK2
+          width: 100%
+          height: 100%
+          top: 0
+          left: 0
+      > .text
+        font-weight: bold
+  &[data-operator="equal"], &[data-operator="not-equal"]
+    > .operator
+      margin: #{($HEIGHT - $HEIGHT_OPERATOR) / 2} #{-$HEIGHT_OPERATOR / 2}
+      background-color: $COLOR_KEY_DARK2
+      width: $HEIGHT_OPERATOR
+      height: $HEIGHT_OPERATOR
+      border-radius: 3px
+      position: relative
+      cursor: pointer
+      &::before, &::after
+        content: ""
+        display: block
+        position: absolute
+      &::before
+        width: 8px
+        height: 2px
+        top: 5px
+        left: 4px
+        background-color: white
+        box-shadow: 0 4px white
+    > .values
+      padding-left: 16px
+  &[data-operator="not-equal"]
+    opacity: .5
+    > .operator
+      &::after
+        height: 12px
+        border-left: solid 2px white
+        transform: rotate(-20deg)
+        top: 2px
+        left: 6.5px
+  &[data-classification="variant-type"]
+    > .classification::before
+      content: "Variant type"
+  &[data-classification="alternative-allele-frequency"], &[data-classification="alternative-allele-count"]
+    > .values
+      > .value
+        min-width: 120px
+        &::before
+          font-family: fontello
+          content: $CHAR_DATASET
+          margin-right: 4px
+    &[data-dataset="jga_ngs"], &[data-dataset="jga_snp"]
+      > .values
+        > .value
+          border-color: $COLOR_DATASET_JGA
+          background-color: lighten($COLOR_DATASET_JGA, 35%)
+          &::before
+            color: $COLOR_DATASET_JGA
+    &[data-dataset="tommo_4.7kjpn"]
+      > .values
+        > .value
+          border-color: $COLOR_DATASET_3_5KJPN
+          background-color: lighten($COLOR_DATASET_3_5KJPN, 35%)
+          &::before
+            color: $COLOR_DATASET_3_5KJPN
+    &[data-dataset="hgvd"], &[data-dataset="mgend"]
+      > .values
+        > .value
+          border-color: $COLOR_DATASET_HGVD
+          background-color: lighten($COLOR_DATASET_HGVD, 70%)
+          &::before
+            color: $COLOR_DATASET_HGVD
+    &[data-dataset="gem_j_wga"]
+      > .values
+        > .value
+          border-color: $COLOR_DATASET_GEM_J
+          background-color: lighten($COLOR_DATASET_GEM_J, 45%)
+          &::before
+            color: $COLOR_DATASET_GEM_J
+    &[data-dataset="bbj"]
+      > .values
+        > .value
+          border-color: $COLOR_DATASET_BBJ
+          background-color: lighten($COLOR_DATASET_BBJ, 35%)
+          &::before
+            color: $COLOR_DATASET_BBJ
+    &[data-dataset="clinvar"], &[data-dataset="exac"], &[data-dataset="gnomad"]
+      > .values
+        > .value
+          border-color: $COLOR_DATASET_FOREIGN
+          background-color: lighten($COLOR_DATASET_FOREIGN, 40%)
+          &::before
+            color: $COLOR_DATASET_FOREIGN
+  &[data-classification="alternative-allele-frequency"]
+    > .classification::before
+      content: "Alternative allele frequency"
+  &[data-classification="alternative-allele-count"]
+    > .classification::before
+      content: "Alternative allele count"
+  &[data-classification="consequence"]
+    > .classification::before
+      content: "Consequence"
+  &[data-classification="gene"]
+    > .classification::before
+      content: "Gene symbol"
+  &[data-classification="disease"]
+    > .classification::before
+      content: "Disease"
+
+
+      
