@@ -11,6 +11,10 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     origins '*'
 
+    resource '/search',
+             headers: %w[Origin Authorization Accept Content-Type],
+             methods: %i[get post head]
+
     resource '/api/*',
              headers: %w[Origin Authorization Accept Content-Type],
              methods: %i[get post head]
