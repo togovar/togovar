@@ -27,6 +27,8 @@ import PanelViewPreviewClinicalSignificance from '../javascripts/classes/PanelVi
 import TippyBox from '../javascripts/classes/TippyBox.js';
 
 export function initHome() {
+
+  setUserAgent();
   
   StoreManager.setData('offset', 0);
   StoreManager.setData('selectedRow', undefined);
@@ -91,4 +93,15 @@ function changeSearchMode(searchViewName) {
     AdvancedSearchView: 'advanced'
   }[searchViewName];
   StoreManager.setData('searchMode', searchMode);
+}
+
+function setUserAgent() {
+  const ua = window.navigator.userAgent.toLowerCase();
+  let os = '';
+  console.log(ua)
+  switch (true) {
+    case ua.indexOf('windows nt') !== -1: os = 'windows'; break;
+    case ua.indexOf('mac os x') !== -1: os = 'mac'; break;
+  }
+  document.querySelector('html').dataset.os = os;
 }
