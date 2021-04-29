@@ -123,42 +123,42 @@ $CORNER_RADIUS: $HEIGHT / 2
       > .values
         > .value
           border-color: $COLOR_DATASET_JGA
-          background-color: lighten($COLOR_DATASET_JGA, 35%)
+          background-color: $COLOR_DATASET_JGA_LIGHT
           &::before
             color: $COLOR_DATASET_JGA
     &[data-dataset="tommo_4.7kjpn"]
       > .values
         > .value
           border-color: $COLOR_DATASET_3_5KJPN
-          background-color: lighten($COLOR_DATASET_3_5KJPN, 35%)
+          background-color: $COLOR_DATASET_3_5KJPN_LIGHT
           &::before
             color: $COLOR_DATASET_3_5KJPN
     &[data-dataset="hgvd"], &[data-dataset="mgend"]
       > .values
         > .value
           border-color: $COLOR_DATASET_HGVD
-          background-color: lighten($COLOR_DATASET_HGVD, 70%)
+          background-color: $COLOR_DATASET_HGVD_LIGHT
           &::before
             color: $COLOR_DATASET_HGVD
     &[data-dataset="gem_j_wga"]
       > .values
         > .value
           border-color: $COLOR_DATASET_GEM_J
-          background-color: lighten($COLOR_DATASET_GEM_J, 45%)
+          background-color: $COLOR_DATASET_GEM_J_LIGHT
           &::before
             color: $COLOR_DATASET_GEM_J
     &[data-dataset="bbj"]
       > .values
         > .value
           border-color: $COLOR_DATASET_BBJ
-          background-color: lighten($COLOR_DATASET_BBJ, 35%)
+          background-color: $COLOR_DATASET_BBJ_LIGHT
           &::before
             color: $COLOR_DATASET_BBJ
     &[data-dataset="clinvar"], &[data-dataset="exac"], &[data-dataset="gnomad"]
       > .values
         > .value
           border-color: $COLOR_DATASET_FOREIGN
-          background-color: lighten($COLOR_DATASET_FOREIGN, 40%)
+          background-color: $COLOR_DATASET_FOREIGN_LIGHT
           &::before
             color: $COLOR_DATASET_FOREIGN
   &[data-classification="alternative-allele-frequency"]
@@ -167,6 +167,54 @@ $CORNER_RADIUS: $HEIGHT / 2
   &[data-classification="alternative-allele-count"]
     > .classification::before
       content: "Alternative allele count"
+  &[data-classification="clinical-significance"]
+    > .classification::before
+      content: "Clinical significance"
+    > .values
+      > .value
+        &::before
+          content: attr(data-sign)
+          margin-right: 3px
+        &[data-sign="P"]
+          border-color: $COLOR_SIGN_DANGEROUS
+          background-color: $COLOR_SIGN_DANGEROUS_LIGHT
+          &::before
+            color: $COLOR_SIGN_DANGEROUS
+        &[data-sign="LP"]
+          border-color: $COLOR_SIGN_WARNING
+          background-color: $COLOR_SIGN_WARNING_LIGHT
+          &::before
+            color: $COLOR_SIGN_WARNING
+        &[data-sign="US"]
+          border-color: $COLOR_SIGN_UNKNOWN
+          background-color: $COLOR_SIGN_UNKNOWN_LIGHT
+          &::before
+            color: $COLOR_SIGN_UNKNOWN
+        &[data-sign="LB"]
+          border-color: $COLOR_SIGN_NORMAL
+          background-color: $COLOR_SIGN_NORMAL_LIGHT
+          &::before
+            color: $COLOR_SIGN_NORMAL
+        &[data-sign="B"]
+          border-color: $COLOR_SIGN_SAFE
+          background-color: $COLOR_SIGN_SAFE_LIGHT
+          &::before
+            color: $COLOR_SIGN_SAFE
+        &[data-sign="CI"]
+          border-color: $COLOR_SIGN_MODIFIER
+          background-color: $COLOR_SIGN_MODIFIER_LIGHT
+          &::before
+            color: $COLOR_SIGN_MODIFIER
+        &[data-sign="DR"], &[data-sign="A"], &[data-sign="RF"], &[data-sign="PR"], &[data-sign="AF"], &[data-sign="O"]
+          border-color: $COLOR_SIGN_OTHER
+          background-color: $COLOR_SIGN_OTHER_LIGHT
+          &::before
+            color: $COLOR_SIGN_OTHER
+        &[data-sign="NP"], &[data-sign="AN"]
+          border-color: $COLOR_GRAY
+          background-color: white
+          &::before
+            color: $COLOR_GRAY
   &[data-classification="consequence"]
     > .classification::before
       content: "Consequence"
