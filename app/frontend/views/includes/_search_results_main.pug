@@ -58,11 +58,13 @@
                       .operator
                       .values
                         .value SNV
+                      .editbutton Edit
                     .advanced-search-condition-view(data-operator="not-equal" data-classification="variant-type")
                       .classification
                       .operator
                       .values
                         .value Insertion
+                      .editbutton Edit
                     .advanced-search-condition-view(data-classification="alternative-allele-frequency" data-dataset="gem_j_wga")
                       .classification
                       .operator
@@ -73,6 +75,7 @@
                             span.bar
                           span.text 0.1 ~ 1
                         small.smalltext Exclude filtered out variants
+                      .editbutton Edit
                     .advanced-search-group-view
                       .logical-operator-switch
                         a.operator(data-operator="or")
@@ -87,6 +90,7 @@
                                 span.bar(style="left: 50%; width: 20%")
                               span.text 0.1 ~ 1
                             small.smalltext Exclude filtered out variants
+                          .editbutton Edit
                         .advanced-search-condition-view(data-classification="alternative-allele-frequency" data-dataset="tommo_4.7kjpn")
                           .classification
                           .operator
@@ -97,6 +101,7 @@
                                 span.bar
                               span.text 0.1 ~ 1
                             small.smalltext Exclude filtered out variants
+                          .editbutton Edit
                         .advanced-search-condition-view(data-classification="alternative-allele-count" data-dataset="hgvd")
                           .classification
                           .operator
@@ -105,6 +110,7 @@
                             .numeralvalue
                               span.text 0.1 &lt;
                             small.smalltext Exclude filtered out variants
+                          .editbutton Edit
                         .advanced-search-condition-view(data-classification="alternative-allele-count" data-dataset="bbj")
                           .classification
                           .operator
@@ -113,6 +119,7 @@
                             .numeralvalue
                               span.text 0.1 &lt;
                             small.smalltext Exclude filtered out variants
+                          .editbutton Edit
                         .advanced-search-condition-view(data-classification="alternative-allele-count" data-dataset="gnomad")
                           .classification
                           .operator
@@ -121,27 +128,90 @@
                             .numeralvalue
                               span.text 0.1 &lt;
                             small.smalltext Exclude filtered out variants
+                          .editbutton Edit
                         .advanced-search-condition-view(data-operator="equal" data-classification="consequence")
                           .classification
                           .operator
                           .values
                             .value Splice acceptor variant
+                          .editbutton Edit
                     .advanced-search-condition-view(data-operator="equal" data-classification="gene")
                       .classification
                       .operator
                       .values
                         .value ALDH2
+                      .editbutton Edit
                     .advanced-search-condition-view(data-operator="equal" data-classification="disease")
                       .classification
                       .operator
                       .values
                         .value cancer
-                  nav.toolbar
+                      .editbutton Edit
+                  nav.advanced-search-toolbar
                     ul
-                      li
+                      li.-haschild
                         p Add condition
                         ul
                           li
+                            p Variant type
+                            small.shortcut
+                              span.char.-command
+                              | 1
+                          li
+                            p Alternative allele frequency
+                            small.shortcut
+                              span.char.-command
+                              | 2
+                          li
+                            p Alternative allele count
+                            small.shortcut
+                              span.char.-command
+                              | 3
+                          li
+                            p Consequence
+                            small.shortcut
+                              span.char.-command
+                              | 4
+                          li
+                            p Gene symbol
+                            small.shortcut
+                              span.char.-command
+                              | 5
+                          li
+                            p Disease
+                            small.shortcut
+                              span.char.-command
+                              | 6
+                      li.-disabled
+                        p
+                          | Group
+                          small.shortcut
+                            span.char.-command
+                            | G
+                      li.-disabled
+                        p
+                          | Ungroup
+                          small.shortcut
+                            span.char.-command
+                            span.char.-shift
+                            | G
+                      li.-disabled
+                        p
+                          | Copy
+                          small.shortcut
+                            span.char.-command
+                            | C
+                      li.-disabled
+                        p
+                          | Edit
+                          small.shortcut
+                            span.char.-command
+                            | E
+                      li.-disabled
+                        p
+                          | Delete
+                          small.shortcut Delete
+
           #AdvancedSearchDatasetsView.section
             .tablecontainer
               table
