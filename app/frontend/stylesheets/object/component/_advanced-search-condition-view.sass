@@ -6,10 +6,15 @@ $CORNER_RADIUS: $HEIGHT / 2
 
 .advanced-search-condition-view
   margin-bottom: 3px
+  padding-right: 8px
   border-radius: $CORNER_RADIUS
   color: $COLOR_BLACK
+  background-color: #F0F0EF
   font-size: 12px
   display: flex
+  align-items: center
+  border-radius: $CORNER_RADIUS
+  height: $HEIGHT
   box-shadow: 0 1px 1px rgba(black, .3)
   > .classification
     background-color: $COLOR_BLACK
@@ -21,13 +26,12 @@ $CORNER_RADIUS: $HEIGHT / 2
     cursor: grab
     font-weight: bold
   > .values
-    background-color: #F0F0EF
     flex-grow: 1
     padding: $PADDING_VALUES $CORNER_RADIUS $PADDING_VALUES 6px
-    border-radius: 0 $CORNER_RADIUS $CORNER_RADIUS 0
     display: flex
     align-items: center
     > .value
+      height: 18px
       line-height: 18px
       padding: 0 #{$HEIGHT_VALUE * .5}
       background-color: white
@@ -60,6 +64,19 @@ $CORNER_RADIUS: $HEIGHT / 2
           left: 0
       > .text
         font-weight: bold
+  > .editbutton
+    color: white
+    background-color: $COLOR_KEY_DARK1
+    font-size: 10px
+    height: 14px
+    line-height: 14px
+    padding: 0 7px
+    border-radius: 3px
+    font-weight: bold
+    opacity: .5
+    cursor: pointer
+    &:hover
+      opacity: 1
   &[data-operator="equal"], &[data-operator="not-equal"]
     > .operator
       margin: #{($HEIGHT - $HEIGHT_OPERATOR) / 2} #{-$HEIGHT_OPERATOR / 2}
@@ -87,7 +104,7 @@ $CORNER_RADIUS: $HEIGHT / 2
     > .operator
       &::after
         height: 12px
-        border-left: solid 2px white
+        border-left: solid 1px white
         transform: rotate(-20deg)
         top: 2px
         left: 6.5px
