@@ -10,7 +10,8 @@ import CollapseView from '../javascripts/classes/CollapseView.js';
 import TopPageLayoutManager from '../javascripts/classes/TopPageLayoutManager.js';
 // Search
 import SearchConditionController from '../javascripts/classes/SearchConditionController.js';
-import AdvancedSearchDatasetsView from '../javascripts/classes/AdvancedSearchDatasetsView.js';
+import AdvancedSearchBuilderView from '../javascripts/classes/AdvancedSearchBuilderView.js';
+// import AdvancedSearchDatasetsView from '../javascripts/classes/AdvancedSearchDatasetsView.js';
 // PanelViews
 // PanelViews: Filters
 import PanelViewCheckList from '../javascripts/classes/PanelViewCheckList.js';
@@ -71,8 +72,8 @@ export function initHome() {
 
     // 検索窓
     new SearchConditionController(document.getElementById('SimpleSearchView'));
-    // return;
-    new AdvancedSearchDatasetsView(document.getElementById('AdvancedSearchDatasetsView'))
+    new AdvancedSearchBuilderView(document.getElementById('AdvancedSearchBuilderView'))
+    // new AdvancedSearchDatasetsView(document.getElementById('AdvancedSearchDatasetsView'))
     // change search mode
     document.querySelectorAll('#SearchInputView > .tabscontainer > ul > li').forEach(elm => {
       elm.addEventListener('click', e => changeSearchMode(e.target.dataset.target));
