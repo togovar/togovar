@@ -15,3 +15,14 @@ $PADDING: 6px
     transform-origin: 0% 0%
   .advanced-search-group-view
     margin: 4px -5px 4px 0
+  &[data-number-of-child="0"], &[data-number-of-child="1"]
+    > .logical-operator-switch
+      visibility: hidden
+  &.-root
+    &[data-number-of-child="0"]
+      &::before
+        content: "emptymessage Please add a search condition from below menu"
+        display: block
+        text-align: center
+        color: $COLOR_BLACK
+        line-height: 24px
