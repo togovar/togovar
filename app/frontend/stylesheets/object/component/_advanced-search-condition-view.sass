@@ -108,10 +108,10 @@ $CORNER_RADIUS: $HEIGHT / 2
         transform: rotate(-20deg)
         top: 2px
         left: 6.5px
-  &[data-classification="variant-type"]
+  &[data-classification="type"]
     > .classification::before
       content: "Variant type"
-  &[data-classification="alternative-allele-frequency"], &[data-classification="alternative-allele-count"]
+  &[data-classification="frequency"], &[data-classification="count"]
     > .values
       > .value
         min-width: 120px
@@ -161,13 +161,13 @@ $CORNER_RADIUS: $HEIGHT / 2
           background-color: $COLOR_DATASET_FOREIGN_LIGHT
           &::before
             color: $COLOR_DATASET_FOREIGN
-  &[data-classification="alternative-allele-frequency"]
+  &[data-classification="frequency"]
     > .classification::before
       content: "Alternative allele frequency"
-  &[data-classification="alternative-allele-count"]
+  &[data-classification="count"]
     > .classification::before
       content: "Alternative allele count"
-  &[data-classification="clinical-significance"]
+  &[data-classification="significance"]
     > .classification::before
       content: "Clinical significance"
     > .values
@@ -218,7 +218,7 @@ $CORNER_RADIUS: $HEIGHT / 2
   &[data-classification="consequence"]
     > .classification::before
       content: "Consequence"
-  &[data-classification="gene"]
+  &[data-classification="gene_symbol"]
     > .classification::before
       content: "Gene symbol"
   &[data-classification="disease"]
