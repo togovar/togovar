@@ -1,8 +1,11 @@
+import Condition from './Condition.js';
 
 export default class ConditionGroup {
 
-  constructor(parentNode, logicalOperator = 'and', contents = [], isRoot = false) {
+  constructor(delegate, parentNode, logicalOperator = 'and', contents = [], isRoot = false) {
+
     console.log( parentNode, logicalOperator, contents, isRoot )
+    this._delegate = delegate;
     this._logicalOperator = logicalOperator;
     this._contents = contents;
 
@@ -29,6 +32,10 @@ export default class ConditionGroup {
     const toolbar = document.createElement('nav');
     this._elm.insertAdjacentElement('beforeend', toolbar);
     return toolbar;
+  }
+
+  addCondition(type) {
+    this._contents.push(new Condition(this._delegate, this._container, type));
   }
 
 }

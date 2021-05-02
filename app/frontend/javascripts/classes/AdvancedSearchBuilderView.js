@@ -8,7 +8,8 @@ export default class AdvancedSearchBuilderView {
     console.log(elm)
 
     const inner = elm.querySelector(':scope > .inner');
-    this._rootGroup = new ConditionGroup(inner, 'and', [], true);
+    this._rootGroup = new ConditionGroup(this, inner, 'and', [], true);
+    this._selectingCondition = this._rootGroup;
 
     // toolbar
     new AdvancedSearchToolbar(this._rootGroup.maketToolbar(), this);
@@ -17,8 +18,20 @@ export default class AdvancedSearchBuilderView {
     StoreManager.bind('advancedSearchConditions', this);
   }
 
-  _addCondition(condition) {
+
+  // public methods
+
+  select(condition) {
     console.log(condition)
+  }
+
+
+  // private methods
+
+  _addCondition(condition) {
+    // 
+    console.log(condition)
+    this._selectingCondition.addCondition(condition);
   }
 
   _group() {
