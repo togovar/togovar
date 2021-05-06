@@ -14,16 +14,20 @@ $PADDING_SIDE: $HEIGHT_ADVANCED_SEARCH_CONDITION * .5
         margin: 0
         padding: 4px $PADDING_SIDE
         font-size: 14px
+        line-height:  30px
         > li
           display: inline-block
           line-height: 18px
+          margin-right: 12px
+          &:last-child
+            margin-right: 0
           > label
             margin-bottom: 0
             font-weight: bold
-          + li
-            margin-left: 8px
+            > .clinical-significance
+              display: inline-block
   > .buttons
-    padding: 2px 0 3px
+    padding: 3px 0 4px
     text-align: center
     > .button-view
       display: inline-block

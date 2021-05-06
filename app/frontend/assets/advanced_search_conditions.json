@@ -289,63 +289,63 @@
       "type": "enum",
       "values": [
         {
-          "value": "not_in_clinvar",
+          "value": "NC",
           "label": "Not in Clinvar"
         },
         {
-          "value": "pathogenic",
+          "value": "P",
           "label": "Pathogenic"
         },
         {
-          "value": "likely_pathogenic",
+          "value": "LP",
           "label": "Likely pathogenic"
         },
         {
-          "value": "uncertain_significance",
+          "value": "US",
           "label": "Uncertain significance"
         },
         {
-          "value": "likely_benign",
+          "value": "LB",
           "label": "Likely benign"
         },
         {
-          "value": "benign",
+          "value": "B",
           "label": "Benign"
         },
         {
-          "value": "conflicting_interpretations_of_pathogenicity",
+          "value": "CI",
           "label": "Conflicting interpretations of pathogenicity"
         },
         {
-          "value": "drug_response",
+          "value": "DR",
           "label": "Drug response"
         },
         {
-          "value": "association",
+          "value": "A",
           "label": "Association"
         },
         {
-          "value": "risk_factor",
+          "value": "RF",
           "label": "Risk factor"
         },
         {
-          "value": "protective",
+          "value": "PR",
           "label": "Protective"
         },
         {
-          "value": "affects",
+          "value": "AF",
           "label": "Affects"
         },
         {
-          "value": "other",
+          "value": "O",
           "label": "Other"
         },
         {
-          "value": "not_provided",
+          "value": "NP",
           "label": "Not provided"
         },
         {
-          "value": "association_not_found",
+          "value": "AN",
           "label": "Association not found"
         }
       ]
