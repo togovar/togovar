@@ -88,18 +88,24 @@ $CORNER_RADIUS: $HEIGHT / 2
       height: 0
       overflow: hidden
       transition: height $GUI_DURATION
+  > .bg
+    background: $BACKDROP_BG
+    position: fixed
+    width: 100vw
+    height: 100vh
+    top: 0
+    left: 0
+    opacity: 0
+    pointer-events: none
+    transition: opacity $TRANSITION_DURATION
   &.-editing
     > .body
       z-index: $Z_INDEX_EDITING_CONDITION + 1
       > .editor
         height: auto
     > .bg
-      position: fixed
-      width: 100vw
-      height: 100vh
-      top: 0
-      left: 0
-      background-color: rgba(pink, .5)
+      pointer-events: auto
+      opacity: 1
       z-index: $Z_INDEX_EDITING_CONDITION
   &[data-operator="equal"], &[data-operator="not-equal"]
     > .body
