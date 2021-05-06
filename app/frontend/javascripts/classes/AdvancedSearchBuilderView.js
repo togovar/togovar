@@ -6,7 +6,6 @@ import {ADVANCED_CONDITIONS} from '../global.js';
 export default class AdvancedSearchBuilderView {
 
   constructor(elm) {
-    console.log(elm)
 
     const inner = elm.querySelector(':scope > .inner');
     this._rootGroup = new ConditionGroupView(this, inner, 'and', [], true);
@@ -29,7 +28,6 @@ export default class AdvancedSearchBuilderView {
   // private methods
 
   _addCondition(condition) {
-    // 
     console.log(condition)
     this._selectingCondition.addCondition(condition);
   }
