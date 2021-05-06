@@ -1,4 +1,4 @@
-import ConditionEditorView from './ConditionEditorView.js';
+import ConditionValues from './ConditionValues.js';
 import {ADVANCED_CONDITIONS} from '../global.js';
 
 export default class ConditionView {
@@ -12,6 +12,7 @@ export default class ConditionView {
     this._elm.classList.add('advanced-search-condition-view');
     this._elm.classList.add('-editing');
     this._elm.dataset.classification = type;
+    this._elm.dataset.operator = 'equal';
     this._elm.innerHTML = `
     <div class="body">
       <div class="summary">
@@ -31,11 +32,21 @@ export default class ConditionView {
     this._values = body.querySelector(':scope > .summary > .values');
     this._editor = body.querySelector(':scope > .advanced-search-condition-editor-view');
 
-    this._makeEditor();
+    new ConditionValues(this);
   }
 
-  _makeEditor() {
-    new ConditionEditorView(this, this._editor, this._conditionType);
+  // accessor
+
+  get type() {
+    return this._conditionType;
+  }
+
+  get valuesElement() {
+    return this._values;
+  }
+
+  get editorElement() {
+    return this._editor;
   }
 
 }

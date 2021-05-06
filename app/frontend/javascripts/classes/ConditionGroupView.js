@@ -23,8 +23,6 @@ export default class ConditionGroupView {
     this._logicalOperatorSwitch = this._elm.querySelector(':scope > .logical-operator-switch');
     this._container = this._elm.querySelector(':scope > .container');
 
-    console.log(this._logicalOperatorSwitch)
-    console.log(this._container)
     this._logicalOperatorSwitch.dataset.operator = this._logicalOperator;
 
   }
