@@ -3,12 +3,17 @@
   border: none
   line-height: 1.6
   border-radius: .8em
-  box-shadow: 0 2px 2px rgba(0, 0, 0, .3)
+  box-shadow: 0 2px 1px rgba(0, 0, 0, .3)
   position: relative
   background: linear-gradient(to bottom, $COLOR_KEY, $COLOR_KEY_DARK1)
   color: white
   font-weight: bold
   cursor: pointer
+  &.-negative
+    background: linear-gradient(to bottom, $COLOR_DISABLE, $COLOR_DISABLE_DEEP)
+  &.-disabled
+    opacity: .4
+    pointer-events: none
   &:hover
-    transform: translateY(1px)
-    box-shadow: 0 1px 1px rgba(0, 0, 0, .5)
+    transform: translateY(.5px)
+    box-shadow: 0 1px 0px rgba(0, 0, 0, .5)

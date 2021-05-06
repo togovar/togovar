@@ -1,6 +1,6 @@
-import Condition from './Condition.js';
+import ConditionView from './ConditionView.js';
 
-export default class ConditionGroup {
+export default class ConditionGroupView {
 
   constructor(delegate, parentNode, logicalOperator = 'and', contents = [], isRoot = false) {
 
@@ -13,7 +13,7 @@ export default class ConditionGroup {
     this._elm = document.createElement('div');
     this._elm.classList.add('advanced-search-group-view');
     if (isRoot) this._elm.classList.add('-root');
-    this._elm.dataset.numberOfChild = contents.length;
+    this._elm.dataset.numberOfChild = this._contents.length;
     this._elm.innerHTML = 
     `<div class="logical-operator-switch"></div>
     <div class="container"></div>`;
@@ -25,6 +25,7 @@ export default class ConditionGroup {
 
     console.log(this._logicalOperatorSwitch)
     console.log(this._container)
+    this._logicalOperatorSwitch.dataset.operator = this._logicalOperator;
 
   }
 
@@ -35,7 +36,8 @@ export default class ConditionGroup {
   }
 
   addCondition(type) {
-    this._contents.push(new Condition(this._delegate, this._container, type));
+    this._contents.push(new ConditionView(this._delegate, this._container, type));
+    this._elm.dataset.numberOfChild = this._contents.length;
   }
 
 }
