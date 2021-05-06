@@ -1,6 +1,7 @@
 import StoreManager from './StoreManager.js';
-import ConditionGroup from './ConditionGroup.js';
+import ConditionGroupView from './ConditionGroupView.js';
 import AdvancedSearchToolbar from './AdvancedSearchToolbar.js';
+import {ADVANCED_CONDITIONS} from '../global.js';
 
 export default class AdvancedSearchBuilderView {
 
@@ -8,11 +9,11 @@ export default class AdvancedSearchBuilderView {
     console.log(elm)
 
     const inner = elm.querySelector(':scope > .inner');
-    this._rootGroup = new ConditionGroup(this, inner, 'and', [], true);
+    this._rootGroup = new ConditionGroupView(this, inner, 'and', [], true);
     this._selectingCondition = this._rootGroup;
 
     // toolbar
-    new AdvancedSearchToolbar(this._rootGroup.maketToolbar(), this);
+    new AdvancedSearchToolbar(this, this._rootGroup.maketToolbar());
 
     // events
     StoreManager.bind('advancedSearchConditions', this);
@@ -24,7 +25,6 @@ export default class AdvancedSearchBuilderView {
   select(condition) {
     console.log(condition)
   }
-
 
   // private methods
 

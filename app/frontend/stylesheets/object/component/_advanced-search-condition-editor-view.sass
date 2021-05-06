@@ -1,0 +1,29 @@
+$PADDING_SIDE: $HEIGHT_ADVANCED_SEARCH_CONDITION * .5
+
+.advanced-search-condition-editor-view
+  border-top: solid 1px $COLOR_SEPARATOR
+  color: $COLOR_BLACK
+  > .sections
+    border-bottom: solid 1px $COLOR_SEPARATOR
+    > section
+      > header
+        padding: 0 $PADDING_SIDE
+        background-color: #cdcdcc
+        font-weight: bold
+      > .checkboxes
+        margin: 0
+        padding: 4px $PADDING_SIDE
+        font-size: 14px
+        > li
+          display: inline-block
+          line-height: 18px
+          > label
+            margin-bottom: 0
+            font-weight: bold
+          + li
+            margin-left: 8px
+  > .buttons
+    padding: 2px 0 3px
+    text-align: center
+    > .button-view
+      display: inline-block
