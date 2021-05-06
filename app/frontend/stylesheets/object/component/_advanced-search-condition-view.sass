@@ -136,11 +136,6 @@ $CORNER_RADIUS: $HEIGHT / 2
             transform: rotate(-20deg)
             top: 2px
             left: 6.5px
-  // &[data-classification="type"]
-  //   > .body
-  //     > .summary
-  //       > .classification::before
-  //         content: "Variant type"
   &[data-classification="frequency"], &[data-classification="count"]
     > .body
       > .summary
@@ -193,81 +188,51 @@ $CORNER_RADIUS: $HEIGHT / 2
               background-color: $COLOR_DATASET_FOREIGN_LIGHT
               &::before
                 color: $COLOR_DATASET_FOREIGN
-  // &[data-classification="frequency"]
-  //   > .body
-  //     > .summary
-  //       > .classification::before
-  //         content: "Alternative allele frequency"
-  // &[data-classification="count"]
-  //   > .body
-  //     > .summary
-  //       > .classification::before
-  //         content: "Alternative allele count"
   &[data-classification="significance"]
     > .body
       > .summary
-        // > .classification::before
-        //   content: "Clinical significance"
         > .values
           > .value
             &::before
-              content: attr(data-sign)
+              content: attr(data-value)
               margin-right: 3px
-            &[data-sign="P"]
+            &[data-value="P"]
               border-color: $COLOR_SIGN_DANGEROUS
               background-color: $COLOR_SIGN_DANGEROUS_LIGHT
               &::before
                 color: $COLOR_SIGN_DANGEROUS
-            &[data-sign="LP"]
+            &[data-value="LP"]
               border-color: $COLOR_SIGN_WARNING
               background-color: $COLOR_SIGN_WARNING_LIGHT
               &::before
                 color: $COLOR_SIGN_WARNING
-            &[data-sign="US"]
+            &[data-value="US"]
               border-color: $COLOR_SIGN_UNKNOWN
               background-color: $COLOR_SIGN_UNKNOWN_LIGHT
               &::before
                 color: $COLOR_SIGN_UNKNOWN
-            &[data-sign="LB"]
+            &[data-value="LB"]
               border-color: $COLOR_SIGN_NORMAL
               background-color: $COLOR_SIGN_NORMAL_LIGHT
               &::before
                 color: $COLOR_SIGN_NORMAL
-            &[data-sign="B"]
+            &[data-value="B"]
               border-color: $COLOR_SIGN_SAFE
               background-color: $COLOR_SIGN_SAFE_LIGHT
               &::before
                 color: $COLOR_SIGN_SAFE
-            &[data-sign="CI"]
+            &[data-value="CI"]
               border-color: $COLOR_SIGN_MODIFIER
               background-color: $COLOR_SIGN_MODIFIER_LIGHT
               &::before
                 color: $COLOR_SIGN_MODIFIER
-            &[data-sign="DR"], &[data-sign="A"], &[data-sign="RF"], &[data-sign="PR"], &[data-sign="AF"], &[data-sign="O"]
+            &[data-value="DR"], &[data-value="A"], &[data-value="RF"], &[data-value="PR"], &[data-value="AF"], &[data-value="O"]
               border-color: $COLOR_SIGN_OTHER
               background-color: $COLOR_SIGN_OTHER_LIGHT
               &::before
                 color: $COLOR_SIGN_OTHER
-            &[data-sign="NP"], &[data-sign="AN"]
+            &[data-value="NP"], &[data-value="AN"], &[data-value="NC"]
               border-color: $COLOR_GRAY
               background-color: white
               &::before
                 color: $COLOR_GRAY
-  // &[data-classification="consequence"]
-  //   > .body
-  //     > .summary
-  //       > .classification::before
-  //         content: "Consequence"
-  // &[data-classification="gene_symbol"]
-  //   > .body
-  //     > .summary
-  //       > .classification::before
-  //         content: "Gene symbol"
-  // &[data-classification="disease"]
-  //   > .body
-  //     > .summary
-  //       > .classification::before
-  //         content: "Disease"
-
-
-      

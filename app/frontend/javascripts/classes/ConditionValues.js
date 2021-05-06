@@ -18,7 +18,10 @@ export default class ConditionValues {
     this._sections = conditionView.editorElement.querySelector(':scope > .sections');
 
     switch (conditionView.type) {
-      case 'type': this._makeCheckboxesEditor(); break;
+      case 'type':
+      case 'significance':
+        this._makeCheckboxesEditor();
+      break;
     }
 
   }
@@ -26,12 +29,14 @@ export default class ConditionValues {
   _makeCheckboxesEditor() {
 
     // HTML
+    const type = this._conditionView.type;
+    const master = ADVANCED_CONDITIONS[type];
     this._sections.innerHTML = `
     <section>
-      <header>Select variant type</header>
-      <ul class="checkboxes">${ADVANCED_CONDITIONS['type'].values.map(value => `
+      <header>Select them</header>
+      <ul class="checkboxes">${master.values.map(value => `
       <li>
-        <label><input type="checkbox" value="${value.value}" data-label="${value.label}">${value.label}</label>
+        <label><input type="checkbox" value="${value.value}" data-label="${value.label}"${type === 'significance' ? ` data-sign="${value.value}"` : ''}>${type === 'significance' ? `<span class="clinical-significance" data-sign="${value.value}"></span>` : ''}${value.label}</label>
       </li>`).join('')}</ul>
     </section>
     `;
@@ -42,7 +47,6 @@ export default class ConditionValues {
     // attach events
     this._checkboxes.forEach(checkbox => {
       checkbox.addEventListener('change', () => {
-        console.log(checkbox)
         this._updateCheckboxesEditor();
       });
     });
