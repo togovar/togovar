@@ -3,9 +3,10 @@ import {ADVANCED_CONDITIONS} from '../global.js';
 
 export default class ConditionView {
 
-  constructor(delegate, parentNode, type) {
+  constructor(delegate, parent, parentNode, type) {
 
     this._conditionType = type;
+    this._parent = parent;
 
     // make HTML
     this._elm = document.createElement('div');
@@ -29,11 +30,27 @@ export default class ConditionView {
     // reference
     this._delegate = delegate;
     const body = this._elm.querySelector(':scope > .body');
-    this._values = body.querySelector(':scope > .summary > .values');
+    const summary = body.querySelector(':scope > .summary');
+    this._values = summary.querySelector(':scope > .values');
     this._editor = body.querySelector(':scope > .advanced-search-condition-editor-view');
+
+    // events
+    summary.querySelector(':scope > .editbutton').addEventListener('click', () => this._elm.classList.add('-editing'));
 
     new ConditionValues(this);
   }
+
+
+  // public methods
+
+  doneEditing() {
+    this._elm.classList.remove('-editing');
+  }
+
+  remove() {
+    this._parent.removeCondition(this);
+  }
+
 
   // accessor
 
@@ -47,6 +64,10 @@ export default class ConditionView {
 
   get editorElement() {
     return this._editor;
+  }
+
+  get elm() {
+    return this._elm;
   }
 
 }

@@ -11,20 +11,48 @@ export default class ConditionValues {
     conditionView.editorElement.innerHTML = `
     <div class="sections"></div>
     <div class="buttons">
-      <div class="button-view -disabled">OK</div>
-      <div class="button-view -negative">Cancel</div>
+      <button class="button-view -disabled">OK</button>
+      <button class="button-view -negative">Cancel</button>
     </div>
     `;
-    this._sections = conditionView.editorElement.querySelector(':scope > .sections');
 
+    // references
+    this._sections = conditionView.editorElement.querySelector(':scope > .sections');
+    const buttons = conditionView.editorElement.querySelector(':scope > .buttons');
+    this._okButton = buttons.querySelector(':scope > .button-view:nth-child(1)');
+
+    // events
+    this._okButton.addEventListener('click', () => this._clickOkButton());
+    buttons.querySelector(':scope > .button-view:nth-child(2)').addEventListener('click', () => this._clickCancelButton());
+
+    // initialization by types
     switch (conditionView.type) {
       case 'type':
       case 'significance':
         this._makeCheckboxesEditor();
+        this._evaluate = this._evaluateCheckboxesEditor;
       break;
     }
 
   }
+
+
+  // common methods
+
+  _clickOkButton() {
+    this._conditionView.doneEditing();
+  }
+
+  _clickCancelButton() {
+    if (this._evaluate()) {
+      this._conditionView.doneEditing();
+    } else {
+      this._conditionView.remove();
+    }
+  }
+
+
+  // checkbox type
 
   _makeCheckboxesEditor() {
 
@@ -42,7 +70,7 @@ export default class ConditionValues {
     `;
 
     // references
-    this._checkboxes = this._sections.querySelectorAll(':scope > section > ul > li > label > input');
+    this._checkboxes = Array.from(this._sections.querySelectorAll(':scope > section > ul > li > label > input'));
 
     // attach events
     this._checkboxes.forEach(checkbox => {
@@ -73,7 +101,18 @@ export default class ConditionValues {
     });
 
     // evaluation
+    if (this._evaluate()) {
+      console.log('ok')
+      this._okButton.classList.remove('-disabled');
+    } else {
+      console.log('boooo')
+      this._okButton.classList.add('-disabled');
+    }
 
+  }
+
+  _evaluateCheckboxesEditor() {
+    return this._checkboxes.some(checkbox => checkbox.checked);
   }
 
 }

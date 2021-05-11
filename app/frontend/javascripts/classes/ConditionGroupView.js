@@ -34,8 +34,23 @@ export default class ConditionGroupView {
   }
 
   addCondition(type) {
-    this._contents.push(new ConditionView(this._delegate, this._container, type));
+    this._contents.push(new ConditionView(this._delegate, this, this._container, type));
     this._elm.dataset.numberOfChild = this._contents.length;
+  }
+
+  removeCondition(conditionView) {
+    console.log(this._contents)
+    console.log( this._contents.indexOf(conditionView) )
+    const position = this._contents.indexOf(conditionView);
+    this._contents.splice(position, 1);
+    this._elm.removeChild(conditionView.elm);
+  }
+
+
+  // accessor
+
+  get elm() {
+    return this._elm;
   }
 
 }
