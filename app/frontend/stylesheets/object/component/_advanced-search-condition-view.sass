@@ -83,7 +83,7 @@ $CORNER_RADIUS: $HEIGHT / 2
         cursor: pointer
         &:hover
           opacity: 1
-    > .editor
+    > .advanced-search-condition-editor-view
       background-color: white
       height: 0
       overflow: hidden
@@ -101,7 +101,11 @@ $CORNER_RADIUS: $HEIGHT / 2
   &.-editing
     > .body
       z-index: $Z_INDEX_EDITING_CONDITION + 1
-      > .editor
+      > .summary
+        > .editbutton
+          opacity: 0
+          pointer-events: none
+      > .advanced-search-condition-editor-view
         height: auto
     > .bg
       pointer-events: auto
