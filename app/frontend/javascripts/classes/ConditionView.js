@@ -3,15 +3,22 @@ import {ADVANCED_CONDITIONS} from '../global.js';
 
 export default class ConditionView {
 
-  constructor(delegate, parent, parentNode, type) {
+  /**
+   * 
+   * @param {AdvancedSearchBuilderView} builder 
+   * @param {*} parent 
+   * @param {HTMLElement} parentNode 
+   * @param {String} type 
+   */
+  constructor(builder, parent, parentNode, type) {
 
     this._conditionType = type;
     this._parent = parent;
+    this._isFirstTime = true;
 
     // make HTML
     this._elm = document.createElement('div');
     this._elm.classList.add('advanced-search-condition-view');
-    this._elm.classList.add('-editing');
     this._elm.dataset.classification = type;
     this._elm.dataset.operator = 'equal';
     this._elm.innerHTML = `
@@ -28,16 +35,20 @@ export default class ConditionView {
     parentNode.insertAdjacentElement('beforeend', this._elm);
 
     // reference
-    this._delegate = delegate;
+    this._builder = builder;
     const body = this._elm.querySelector(':scope > .body');
     const summary = body.querySelector(':scope > .summary');
     this._values = summary.querySelector(':scope > .values');
     this._editor = body.querySelector(':scope > .advanced-search-condition-editor-view');
+    this._conditionValues = new ConditionValues(this);
 
     // events
-    summary.querySelector(':scope > .editbutton').addEventListener('click', () => this._elm.classList.add('-editing'));
-
-    new ConditionValues(this);
+    const editButton = summary.querySelector(':scope > .editbutton');
+    editButton.addEventListener('click', () => {
+      this._elm.classList.add('-editing');
+      this._conditionValues.start();
+    });
+    editButton.dispatchEvent(new Event('click'));
   }
 
 
@@ -45,9 +56,14 @@ export default class ConditionView {
 
   doneEditing() {
     this._elm.classList.remove('-editing');
+    this._isFirstTime = false;
+    console.log(this._builder)
+    this._builder.changeCondition();
   }
 
   remove() {
+    console.log(this)
+    delete this._conditionValues;
     this._parent.removeCondition(this);
   }
 
@@ -68,6 +84,19 @@ export default class ConditionView {
 
   get elm() {
     return this._elm;
+  }
+
+  get isFirstTime() {
+    return this._isFirstTime;
+  }
+
+  get query() {
+    return {
+      [this._conditionType]: {
+        relation: 'eq',
+        terms: Array.from(this._values.querySelectorAll(':scope > .value')).map(value => value.dataset.value)
+      }
+    }
   }
 
 }
