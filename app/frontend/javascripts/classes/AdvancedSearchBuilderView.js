@@ -1,7 +1,8 @@
 import StoreManager from './StoreManager.js';
 import ConditionGroupView from './ConditionGroupView.js';
 import AdvancedSearchToolbar from './AdvancedSearchToolbar.js';
-import {ADVANCED_CONDITIONS} from '../global.js';
+// import {ADVANCED_CONDITIONS} from '../global.js';
+import {API_URL} from "../global.js";
 
 export default class AdvancedSearchBuilderView {
 
@@ -23,6 +24,27 @@ export default class AdvancedSearchBuilderView {
 
   select(condition) {
     console.log(condition)
+  }
+
+  changeCondition() {
+    const query = this._rootGroup.query;
+    const options = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        query
+      })
+    }
+    const path = `${API_URL}/api/search/variation`;
+    fetch(path, options)
+      .then(response => response.json())
+      .then(json => {
+        console.log(json)
+      })
   }
 
   // private methods

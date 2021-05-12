@@ -2,10 +2,10 @@ import ConditionView from './ConditionView.js';
 
 export default class ConditionGroupView {
 
-  constructor(delegate, parentNode, logicalOperator = 'and', contents = [], isRoot = false) {
+  constructor(builder, parentNode, logicalOperator = 'and', contents = [], isRoot = false) {
 
     console.log( parentNode, logicalOperator, contents, isRoot )
-    this._delegate = delegate;
+    this._builder = builder;
     this._logicalOperator = logicalOperator;
     this._contents = contents;
 
@@ -34,16 +34,15 @@ export default class ConditionGroupView {
   }
 
   addCondition(type) {
-    this._contents.push(new ConditionView(this._delegate, this, this._container, type));
+    this._contents.push(new ConditionView(this._builder, this, this._container, type));
     this._elm.dataset.numberOfChild = this._contents.length;
   }
 
   removeCondition(conditionView) {
-    console.log(this._contents)
-    console.log( this._contents.indexOf(conditionView) )
     const position = this._contents.indexOf(conditionView);
     this._contents.splice(position, 1);
-    this._elm.removeChild(conditionView.elm);
+    this._container.removeChild(conditionView.elm);
+    this._elm.dataset.numberOfChild = this._contents.length;
   }
 
 
@@ -51,6 +50,15 @@ export default class ConditionGroupView {
 
   get elm() {
     return this._elm;
+  }
+
+  get query() {
+    console.log(this._contents)
+    if (this._contents.length === 1) {
+      return this._contents[0].query;
+    } else {
+      return {[this._logicalOperator]: this._contents.map(contents => contents.query)};
+    }
   }
 
 }

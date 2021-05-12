@@ -37,22 +37,36 @@ export default class ConditionValues {
   }
 
 
-  // common methods
+  // public methods
+
+  start() {
+    // save values
+    this._lastValues = Array.from(this._conditionView.valuesElement.querySelectorAll(':scope > .value')).map(value => value.dataset.value);
+    console.log( this._lastValues )
+  }
+
+
+  // private methods
 
   _clickOkButton() {
+    // 
     this._conditionView.doneEditing();
   }
 
   _clickCancelButton() {
-    if (this._evaluate()) {
-      this._conditionView.doneEditing();
-    } else {
+    if (this._conditionView.isFirstTime) {
+      // delete for the first time 
       this._conditionView.remove();
+    } else {
+      // otherwise, revert to the previous state 
+      this._checkboxes.forEach(checkbox => {
+        const value = this._lastValues.find(value => value === checkbox.value);
+        checkbox.checked = value !== undefined;
+      });
+      this._updateCheckboxesEditor();
+      this._conditionView.doneEditing();
     }
   }
-
-
-  // checkbox type
 
   _makeCheckboxesEditor() {
 
