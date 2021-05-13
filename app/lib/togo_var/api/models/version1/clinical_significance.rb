@@ -18,12 +18,12 @@ module TogoVar
             validate
 
             terms = @terms
-                      .map { |x| (::ClinicalSignificance.find(x.upcase) || ::ClinicalSignificance.find_by_key(x))&.key }
+                      .map { |x| (::ClinicalSignificance.find(x.upcase) || ::ClinicalSignificance.find_by_key(x))&.label&.downcase }
                       .compact
 
             q = Elasticsearch::DSL::Search.search do
               query do
-                terms type: terms
+                terms 'clinvar.interpretation': terms
               end
             end
 
