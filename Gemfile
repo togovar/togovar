@@ -9,7 +9,7 @@ gem 'rails', '~> 6.0', '>= 6.0.3.3'
 
 # infrastructure
 gem 'foreman', '~> 0.87.1'
-gem 'puma', '~> 3.7'
+gem 'puma', '~> 4.3'
 gem 'rack-cors', '~> 1.0'
 gem 'unicorn', '~> 5.4'
 gem 'unicorn-worker-killer', '~> 0.4.4'
