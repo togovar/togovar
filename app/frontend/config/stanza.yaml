@@ -2,8 +2,8 @@ variant:
   id: tgv_id
 
   base_options:
-    ep: https://togovar.biosciencedbc.jp/sparql
-    sparqlist: https://togovar.biosciencedbc.jp/sparqlist
+    ep: https://togovar-dev.biosciencedbc.jp/sparql
+    sparqlist: https://togovar-dev.biosciencedbc.jp/sparqlist
 
   stanza:
     - id: variant-header
@@ -25,11 +25,21 @@ variant:
     - id: variant-clinvar
       dom: "#variant-clinvar"
 
+    - id: variant-gwas
+      dom: "#variant-gwas"
+      options:
+        data-url: https://togovar-dev.biosciencedbc.jp/sparqlist/api/variant_gwas?ep=https%3A%2F%2Ftogovar-dev.biosciencedbc.jp%2Fsparql&tgv_id={{tgv_id}}
+        data-type: json
+        padding: 0
+        page-size-option: 10,20,50,100
+        page-slider: false
+        columns: [{"id":"rs_id","label":"rs id"}, {"id":"variant_and_risk_allele","label":"variant and risk allele"}, {"id":"raf","label":"RAF"}, {"id":"p_value","label":"P Value"}, {"id":"odds_ratio","label":"OR"}, {"id":"ci_text","label":"CI"}, {"id":"beta","label":"Beta"}, {"id":"mapped_trait","label":"Trait(s)","link":"mapped_trait_uri"}, {"id":"pubmed_id","label":"PubMed ID","link":"pubmed_uri"}, {"id":"study_detail","label":"Study Details","link":"study"}, {"id":"initial_sample_size","label":"Discovery sample description"}, {"id":"replication_sample_size","label":"Replication sample description"}]
+
     - id: variant-genomic-context
       dom: "#variant-genomic-context"
       options:
         assembly: GRCh37
-        jbrowse: https://togovar.biosciencedbc.jp/jbrowse
+        jbrowse: https://togovar-dev.biosciencedbc.jp/jbrowse
         margin: 50
 
     - id: variant-gene
@@ -49,8 +59,8 @@ gene:
   id:
 
   base_options:
-    ep: https://togovar.biosciencedbc.jp/sparql
-    sparqlist: https://togovar.biosciencedbc.jp/sparqlist
+    ep: https://togovar-dev.biosciencedbc.jp/sparql
+    sparqlist: https://togovar-dev.biosciencedbc.jp/sparqlist
 
   stanza:
     - id: gene_base
@@ -69,8 +79,8 @@ disease:
   id:
 
   base_options:
-    ep: https://togovar.biosciencedbc.jp/sparql
-    sparqlist: https://togovar.biosciencedbc.jp/sparqlist
+    ep: https://togovar-dev.biosciencedbc.jp/sparql
+    sparqlist: https://togovar-dev.biosciencedbc.jp/sparqlist
 
   stanza:
     - id: disease_base
