@@ -1,4 +1,3 @@
-const webpack = require('webpack');
 const {merge} = require('webpack-merge');
 const commonConfig = require('./webpack.config.common');
 
@@ -20,11 +19,6 @@ module.exports = merge(commonConfig, {
   mode: 'production',
   plugins: [
     new CleanWebpackPlugin(),
-    new webpack.DefinePlugin({
-      'process.env': {
-        TOGOVAR_FRONTEND_API_URL: JSON.stringify(process.env.TOGOVAR_FRONTEND_API_URL),
-      },
-    }),
   ],
   optimization: {
     minimizer: [

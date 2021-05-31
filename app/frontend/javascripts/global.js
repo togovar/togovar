@@ -2,7 +2,7 @@ export const PAGE = document.getElementsByTagName('html')[0].dataset.page;
 export const TR_HEIGHT = 27;
 export const COMMON_HEADER_HEIGHT = 30;
 export const COMMON_FOOTER_HEIGHT = 22;
-export const API_URL = process.env.TOGOVAR_FRONTEND_API_URL || 'https://togovar.biosciencedbc.jp';
+export const API_URL = process.env.TOGOVAR_FRONTEND_URL || 'https://togovar.biosciencedbc.jp';
 
 export const COLUMNS = [
   {label: 'TogoVar ID', id: 'togovar_id'},

@@ -2,8 +2,8 @@ variant:
   id: tgv_id
 
   base_options:
-    ep: https://togovar.biosciencedbc.jp/sparql
-    sparqlist: https://togovar.biosciencedbc.jp/sparqlist
+    ep: $TOGOVAR_STANZA_SPARQL_URL
+    sparqlist: $TOGOVAR_STANZA_SPARQLIST_URL
 
   stanza:
     - id: variant-header
@@ -17,7 +17,7 @@ variant:
     - id: variant-other-overlapping-variants
       dom: "#variant-other-overlapping-variants"
       options:
-        search_api: https://togovar.biosciencedbc.jp/search
+        search_api: $TOGOVAR_STANZA_SEARCH_API_URL
 
     - id: variant-frequency
       dom: "#variant-frequency"
@@ -29,7 +29,7 @@ variant:
       dom: "#variant-genomic-context"
       options:
         assembly: GRCh37
-        jbrowse: https://togovar.biosciencedbc.jp/jbrowse
+        jbrowse: $TOGOVAR_STANZA_JBROWSE_URL
         margin: 50
 
     - id: variant-gene
@@ -49,8 +49,8 @@ gene:
   id:
 
   base_options:
-    ep: https://togovar.biosciencedbc.jp/sparql
-    sparqlist: https://togovar.biosciencedbc.jp/sparqlist
+    ep: $TOGOVAR_STANZA_SPARQL_URL
+    sparqlist: $TOGOVAR_STANZA_SPARQLIST_URL
 
   stanza:
     - id: gene_base
@@ -69,8 +69,8 @@ disease:
   id:
 
   base_options:
-    ep: https://togovar.biosciencedbc.jp/sparql
-    sparqlist: https://togovar.biosciencedbc.jp/sparqlist
+    ep: $TOGOVAR_STANZA_SPARQL_URL
+    sparqlist: $TOGOVAR_STANZA_SPARQLIST_URL
 
   stanza:
     - id: disease_base
