@@ -42,6 +42,7 @@ const formatOption = function (config) {
         const url = new URL(value);
 
         url.search = [...url.searchParams]
+          .filter(x => x[1])
           .map(x => [x[0], encodeURIComponent(x[1])].join('='))
           .join('&');
 
