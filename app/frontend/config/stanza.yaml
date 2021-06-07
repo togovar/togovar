@@ -25,6 +25,42 @@ variant:
     - id: variant-clinvar
       dom: "#variant-clinvar"
 
+    - id: pagination-table
+      dom: "#variant-gwas"
+      src: https://togostanza.github.io/metastanza/pagination-table.js
+      options:
+        data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/variant_gwas?ep=${TOGOVAR_STANZA_SPARQL_URL}&tgv_id=${tgv_id}
+        data-type: json
+        padding: 0
+        page-size-option: 10,20,50,100
+        page-slider: false
+        columns:
+          - id: variant_and_risk_allele
+            label: rs# and risk allele
+          - id: raf
+            label: RAF
+          - id: p_value
+            label: P-Value
+          - id: odds_ratio
+            label: OR
+          - id: ci_text
+            label: CI
+          - id: beta
+            label: Beta
+          - id: mapped_trait
+            label: Trait(s)
+            link: mapped_trait_uri
+          - id: pubmed_id
+            label: PubMed ID
+            link: pubmed_uri
+          - id: study_detail
+            label: Study Details
+            link: study
+          - id: initial_sample_size
+            label: Discovery sample description
+          - id: replication_sample_size
+            label: Replication sample description
+
     - id: variant-genomic-context
       dom: "#variant-genomic-context"
       options:
