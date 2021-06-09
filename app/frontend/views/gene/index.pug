@@ -8,6 +8,8 @@ block head
     link(href=css, rel="stylesheet")
   each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/report-/))
     script(type="text/javascript", src=js)
+  // Stanza theme
+  link(href="https://togostanza.github.io/togostanza-themes/contrib/togovar.css", rel="stylesheet")
 
 block content
   header#DetailHeader
