@@ -1,5 +1,5 @@
 $HEIGHT: $HEIGHT_ADVANCED_SEARCH_CONDITION
-$HEIGHT_OPERATOR: 16px
+$HEIGHT_RELATION: 16px
 $HEIGHT_VALUE: 18px
 $PADDING_VALUES: ($HEIGHT - $HEIGHT_VALUE) / 2
 $CORNER_RADIUS: $HEIGHT / 2
@@ -111,14 +111,14 @@ $CORNER_RADIUS: $HEIGHT / 2
       pointer-events: auto
       opacity: 1
       z-index: $Z_INDEX_EDITING_CONDITION
-  &[data-operator="equal"], &[data-operator="not-equal"]
+  &[data-relation="eq"], &[data-relation="ne"]
     > .body
       > .summary
-        > .operator
-          margin: #{($HEIGHT - $HEIGHT_OPERATOR) / 2} #{-$HEIGHT_OPERATOR / 2}
-          background-color: $COLOR_KEY_DARK2
-          width: $HEIGHT_OPERATOR
-          height: $HEIGHT_OPERATOR
+        > .relation
+          margin: #{($HEIGHT - $HEIGHT_RELATION) / 2} #{-$HEIGHT_RELATION / 2}
+          background-color: $COLOR_KEY_DARK1
+          width: $HEIGHT_RELATION
+          height: $HEIGHT_RELATION
           border-radius: 3px
           position: relative
           cursor: pointer
@@ -135,11 +135,13 @@ $CORNER_RADIUS: $HEIGHT / 2
             box-shadow: 0 4px white
         > .values
           padding-left: 16px
-  &[data-operator="not-equal"]
+  &[data-relation="ne"]
     > .body
       > .summary
-        opacity: .5
-        > .operator
+        > .classification
+          background-color: $COLOR_DISABLE_DEEP
+        > .relation
+          background-color: $COLOR_DISABLE
           &::after
             height: 12px
             border-left: solid 1px white

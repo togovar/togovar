@@ -20,12 +20,12 @@ export default class ConditionView {
     this._elm = document.createElement('div');
     this._elm.classList.add('advanced-search-condition-view');
     this._elm.dataset.classification = type;
-    this._elm.dataset.operator = 'equal';
+    this._elm.dataset.relation = 'eq';
     this._elm.innerHTML = `
     <div class="body">
       <div class="summary">
         <div class="classification">${ADVANCED_CONDITIONS[type].label}</div>
-        <div class="operator"></div>
+        <div class="relation"></div>
         <div class="values"></div>
         <div class="editbutton">Edit</div>
       </div>
@@ -43,6 +43,9 @@ export default class ConditionView {
     this._conditionValues = new ConditionValues(this);
 
     // events
+    // switch logical operation
+    summary.querySelector(':scope > .relation').addEventListener('click', () => this._elm.dataset.relation = {eq: 'ne', ne: 'eq'}[this._elm.dataset.relation]);
+    // switch edit mode
     const editButton = summary.querySelector(':scope > .editbutton');
     editButton.addEventListener('click', () => {
       this._elm.classList.add('-editing');
@@ -93,7 +96,7 @@ export default class ConditionView {
   get query() {
     return {
       [this._conditionType]: {
-        relation: 'eq',
+        relation: this._elm.dataset.relation,
         terms: Array.from(this._values.querySelectorAll(':scope > .value')).map(value => value.dataset.value)
       }
     }
