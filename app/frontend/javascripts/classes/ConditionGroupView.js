@@ -6,7 +6,6 @@ export default class ConditionGroupView {
 
     console.log( parentNode, logicalOperator, contents, isRoot )
     this._builder = builder;
-    this._logicalOperator = logicalOperator;
     this._contents = contents;
 
     // make HTML
@@ -23,8 +22,13 @@ export default class ConditionGroupView {
     this._logicalOperatorSwitch = this._elm.querySelector(':scope > .logical-operator-switch');
     this._container = this._elm.querySelector(':scope > .container');
 
-    this._logicalOperatorSwitch.dataset.operator = this._logicalOperator;
+    this._logicalOperatorSwitch.dataset.operator = logicalOperator;
 
+    // event
+    this._logicalOperatorSwitch.addEventListener('click', e => {
+      e.stopPropagation();
+      this._logicalOperatorSwitch.dataset.operator = {and: 'or', or: 'and'}[this._logicalOperatorSwitch.dataset.operator];
+    });
   }
 
   maketToolbar() {
@@ -57,7 +61,7 @@ export default class ConditionGroupView {
     if (this._contents.length === 1) {
       return this._contents[0].query;
     } else {
-      return {[this._logicalOperator]: this._contents.map(contents => contents.query)};
+      return {[this._logicalOperatorSwitch.dataset.operator]: this._contents.map(contents => contents.query)};
     }
   }
 
