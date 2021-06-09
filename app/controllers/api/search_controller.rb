@@ -5,7 +5,7 @@ module API
     include Executable
 
     module BackwardCompatibility
-      FILTER_PARAMETERS = %w[term quality stat dataset frequency type significance consequence sift polyphen limit offset].freeze
+      FILTER_PARAMETERS = %w[term quality stat dataset frequency type significance consequence sift polyphen].freeze
       private_constant :FILTER_PARAMETERS
 
       # @return [ActionController::Parameters]
@@ -55,7 +55,7 @@ module API
     # @return [ActionController::Parameters]
     # noinspection RubyYardReturnMatch
     def variation_params
-      @variation_params ||= params.permit(:debug, :pretty, body: {})
+      @variation_params ||= params.permit(:debug, :pretty, :version, :limit, :offset, query: {}, body: {})
     end
 
     # @return [Array] [result, status]
