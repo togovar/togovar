@@ -41,6 +41,7 @@ variant:
             label: RAF
           - id: p_value
             label: P-Value
+            type: number
           - id: odds_ratio
             label: OR
           - id: ci_text
