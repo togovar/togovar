@@ -44,7 +44,10 @@ export default class ConditionView {
 
     // events
     // switch logical operation
-    summary.querySelector(':scope > .relation').addEventListener('click', () => this._elm.dataset.relation = {eq: 'ne', ne: 'eq'}[this._elm.dataset.relation]);
+    summary.querySelector(':scope > .relation').addEventListener('click', e => {
+      e.stopPropagation();
+      this._elm.dataset.relation = {eq: 'ne', ne: 'eq'}[this._elm.dataset.relation];
+    });
     // switch edit mode
     const editButton = summary.querySelector(':scope > .editbutton');
     editButton.addEventListener('click', () => {
