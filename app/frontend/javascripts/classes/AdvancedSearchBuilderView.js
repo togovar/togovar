@@ -28,6 +28,8 @@ export default class AdvancedSearchBuilderView {
 
   changeCondition() {
     const query = this._rootGroup.query;
+    StoreManager.setAd__vancedSearchCondition(query);
+    return;
     const options = {
       headers: {
         'Content-Type': 'application/json',

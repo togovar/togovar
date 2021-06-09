@@ -31,18 +31,19 @@ class StoreManager {
     this.setData('searchConditionsMaster', json);
     // restore search conditions from URL parameters
     const searchMode = this._URIParameters.mode ? this._URIParameters.mode : DEFAULT_SEARCH_MODE;
-    let simpleSearchCondition = {}, advancedSearchCondition = {};
+    let simpleSearchConditions = {}, advancedSearchConditions = {}, setAd__vancedSearchConditions = {};
     switch (searchMode) {
       case 'simple':
-        simpleSearchCondition = this._extractSearchCondition(this._URIParameters);
+        simpleSearchConditions = this._extractSearchCondition(this._URIParameters);
         break;
       case 'advanced':
-        Object.assign(advancedSearchCondition, this._convertAdvancedRangeToSimpleRange(this._URIParameters));
-        delete advancedSearchCondition.mode;
+        Object.assign(advancedSearchConditions, this._convertAdvancedRangeToSimpleRange(this._URIParameters));
+        delete advancedSearchConditions.mode;
         break;
     }
-    this._store.searchConditions = simpleSearchCondition;
-    this._store.advancedSearchConditions = advancedSearchCondition;
+    this._store.searchConditions = simpleSearchConditions;
+    this._store.advancedSearchConditions = advancedSearchConditions;
+    this._store.ad__vancedSearchConditions = setAd__vancedSearchConditions;
     callback();
     this._isReady = true;
     this._search(0, true);
@@ -147,6 +148,17 @@ class StoreManager {
     // 検索条件として成立していれば、検索開始
     if (!this._isReady) return;
     this._notify('advancedSearchConditions');
+    this.setData('appStatus', 'searching');
+    this._search(0, true);
+  }
+  // in Advanced Search, search criteria are received as queries, not key values.
+  setAd__vancedSearchCondition(conditions, fromHistory) {
+    if (!this._isReady) return;
+    console.log(conditions)
+    this._store.ad__vancedSearchConditions = conditions;
+    // convert queries to URL parameters
+    if (!fromHistory) this._reflectAd__vancedSearchConditionToURI();
+    this._notify('ad__vancedSearchConditions');
     this.setData('appStatus', 'searching');
     this._search(0, true);
   }
@@ -316,6 +328,8 @@ class StoreManager {
     this._URIParameters.mode ='advanced';
     window.history.pushState(this._URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this._URIParameters)}`);
   }
+  _reflectAd__vancedSearchConditionToURI() {
+  }
 
   _buildAdvancedSearchQuery(conditions) {
     return conditions.length === 0
@@ -367,6 +381,7 @@ class StoreManager {
         path = 'results.json';
       }
     } else {
+      console.log(this._store.searchMode)
       switch (this._store.searchMode) {
         case 'simple': {
           const conditions = $.param(this._extractSearchCondition(this._store.searchConditions));
@@ -376,15 +391,24 @@ class StoreManager {
           break;
         case 'advanced': {
           path = `${API_URL}/api/search/variation`;
-          const conditions = this._extractAdvancedSearchCondition( this._store.advancedSearchConditions );
           options.method = 'POST';
           options.body = JSON.stringify({
-            query: this._buildAdvancedSearchQuery(conditions),
+            query: this._store.ad__vancedSearchConditions,
             offset: this._store.offset
           });
         }
           break;
-      }
+        // case 'advanced': {
+        //   path = `${API_URL}/api/search/variation`;
+        //   const conditions = this._extractAdvancedSearchCondition( this._store.advancedSearchConditions );
+        //   options.method = 'POST';
+        //   options.body = JSON.stringify({
+        //     query: this._buildAdvancedSearchQuery(conditions),
+        //     offset: this._store.offset
+        //   });
+        // }
+        //   break;
+        }
     }
     fetch(path, options)
       .catch(e => {
