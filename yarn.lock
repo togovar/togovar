@@ -1340,6 +1340,11 @@
     estree-walker "^2.0.1"
     picomatch "^2.2.2"
 
+"@simonwep/selection-js@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@simonwep/selection-js/-/selection-js-2.1.1.tgz#69eadef1965413bf30c6b8c08e1a69648ac8687c"
+  integrity sha512-hejHGSMzQZkSTw38KhvdrFezJjQGwF0th7xAV8Q/s7ENuhcO/+vbfvr6J9s627RmD9R8jfqxdUjklir2gRQTkQ==
+
 "@stylelint/postcss-css-in-js@^0.37.1":
   version "0.37.2"
   resolved "https://registry.yarnpkg.com/@stylelint/postcss-css-in-js/-/postcss-css-in-js-0.37.2.tgz#7e5a84ad181f4234a2480803422a47b8749af3d2"

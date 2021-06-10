@@ -1,6 +1,7 @@
 import StoreManager from './StoreManager.js';
 import ConditionGroupView from './ConditionGroupView.js';
 import AdvancedSearchToolbar from './AdvancedSearchToolbar.js';
+import AdvancedSearchSelection from './AdvancedSearchSelection.js';
 // import {ADVANCED_CONDITIONS} from '../global.js';
 import {API_URL} from "../global.js";
 
@@ -17,6 +18,9 @@ export default class AdvancedSearchBuilderView {
 
     // events
     StoreManager.bind('advancedSearchConditions', this);
+
+    // select conditions
+    new AdvancedSearchSelection(this._rootGroup.elm);
   }
 
 
