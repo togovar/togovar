@@ -25,6 +25,7 @@
   "dependencies": {
     "@babel/core": "^7.10.5",
     "@babel/preset-env": "^7.10.4",
+    "@simonwep/selection-js": "^2.1.1",
     "babel-loader": "^8.1.0",
     "bootstrap": "^4.5.0",
     "bourbon": "^7.0.0",
