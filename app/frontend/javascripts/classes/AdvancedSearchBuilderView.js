@@ -13,7 +13,7 @@ export default class AdvancedSearchBuilderView {
     this._selectingCondition = this._rootGroup;
 
     // toolbar
-    new AdvancedSearchToolbar(this, this._rootGroup.maketToolbar());
+    this._toolbar = new AdvancedSearchToolbar(this, this._rootGroup.maketToolbar());
 
     // events
     StoreManager.bind('advancedSearchConditions', this);
@@ -28,26 +28,14 @@ export default class AdvancedSearchBuilderView {
 
   changeCondition() {
     const query = this._rootGroup.query;
-    StoreManager.setAd__vancedSearchCondition(query);
-    return;
-    const options = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      method: 'POST',
-      mode: 'cors',
-      body: JSON.stringify({
-        query
-      })
-    }
-    const path = `${API_URL}/api/search/variation`;
-    fetch(path, options)
-      .then(response => response.json())
-      .then(json => {
-        console.log(json)
-      })
+    this._toolbar.canSearch(Object.keys(query).length > 0);
   }
+
+  search() {
+    const query = this._rootGroup.query;
+    StoreManager.setAd__vancedSearchCondition(query);
+  }
+
 
   // private methods
 

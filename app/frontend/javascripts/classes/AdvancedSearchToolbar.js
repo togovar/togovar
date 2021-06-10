@@ -54,9 +54,19 @@ export default class AdvancedSearchToolbar {
         <p>${command.label}<small class="shortcut"><span class="char -command"></span>${String.fromCharCode(...command.shortcut)}</small></p>
       </li>
       `).join('')}
+      <li class="buttoncontainer">
+        <button class="button-view -disabled">
+          <span>Search</span>
+          <small class="shortcut"><span class="char -command"></span>S</small>
+        </button>
+      </li>
     </ul>
     `;
 
+    // references
+    this._searchButton = toolbar.querySelector(':scope > ul > .buttoncontainer > .button-view');
+
+    // events
     toolbar.querySelectorAll('.command').forEach(command => {
       command.addEventListener('click', () => {
         switch (command.dataset.command) {
@@ -69,6 +79,17 @@ export default class AdvancedSearchToolbar {
         }
       });
     });
+    this._searchButton.addEventListener('click', () => {
+      this._delegate.search();
+    });
+  }
+
+
+  // public methods
+
+  canSearch(can) {
+    if (can) this._searchButton.classList.remove('-disabled');
+    else this._searchButton.classList.add('-disabled');
   }
 
 }
