@@ -135,6 +135,10 @@ gene:
 
     - id: gene-jbrowse
       dom: "#gene-jbrowse"
+      options:
+        assembly: GRCh37
+        jbrowse: $TOGOVAR_STANZA_JBROWSE_URL
+        margin: 200
 
     - id: gene-variant
       dom: "#gene-variant"
