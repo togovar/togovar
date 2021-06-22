@@ -90,6 +90,9 @@ gene:
     sparqlist: $TOGOVAR_STANZA_SPARQLIST_URL
 
   stanza:
+    - id: gene-header
+      dom: "#gene-header"
+
     - id: gene-base
       dom: "#gene-base"
 

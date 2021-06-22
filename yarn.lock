@@ -12652,13 +12652,15 @@ toggle-selection@^1.0.6:
     yeoman-environment "^2.10.3"
     yeoman-generator "^4.12.0"
 
-"togovar-stanza@link:../togovar-stanza":
-  version "0.0.0"
-  uid ""
-
-togovar-stanza@togovar/stanza#22d089b48b2d2a8c9f2faf7f65ffabde7859851d:
+togovar-stanza@biosciencedbc/togovar-develop-stanza#96013616196af561257ce1b8b35a48762a60cba0:
   version "0.0.1"
-  resolved "https://codeload.github.com/togovar/stanza/tar.gz/22d089b48b2d2a8c9f2faf7f65ffabde7859851d"
+  resolved "https://codeload.github.com/biosciencedbc/togovar-develop-stanza/tar.gz/96013616196af561257ce1b8b35a48762a60cba0"
+  dependencies:
+    togostanza "github:togostanza/togostanza"
+
+togovar-stanza@biosciencedbc/togovar-develop-stanza#c1c02a0bf2456f3a67b5e1de0e6a0dab2a2bb5fa:
+  version "0.0.1"
+  resolved "https://codeload.github.com/biosciencedbc/togovar-develop-stanza/tar.gz/c1c02a0bf2456f3a67b5e1de0e6a0dab2a2bb5fa"
   dependencies:
     togostanza "github:togostanza/togostanza"
 
