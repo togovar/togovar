@@ -2,18 +2,20 @@ import SelectionArea from '@simonwep/selection-js';
 
 export default class AdvancedSearchSelection {
 
-  constructor(area) {
+  constructor(area, delegate) {
     console.log( area )
     console.log( SelectionArea )
+    this._delegate = delegate;
     this._selectionArea = new SelectionArea({
       class: 'selection-area',
-      boundaries: ['#AdvancedSearchBuilderView > .inner > .advanced-search-group-view.-root > .container'],
-      selectables: ['#AdvancedSearchBuilderView > .inner > .advanced-search-group-view.-root > .container .advanced-search-group-view', '#AdvancedSearchBuilderView > .inner > .advanced-search-group-view.-root > .container .advanced-search-condition-view'],
+      boundaries: ['#AdvancedSearchBuilderView'],
+      selectables: [
+        '#AdvancedSearchBuilderView > .inner > .advanced-search-group-view.-root > .container .advanced-search-group-view',
+        '#AdvancedSearchBuilderView > .inner > .advanced-search-group-view.-root > .container .advanced-search-condition-view'
+      ],
       startareas: ['html'],
       overlap: 'invert',
-      singleTap: {
-        allow: false
-      }
+      singleTap: {allow: false}
     });
     console.log( this._selectionArea )
 
@@ -22,6 +24,7 @@ export default class AdvancedSearchSelection {
       //   console.log(store)
       // })
       .on('start', ({store, event}) => {
+        document.body.dataset.dragging = true;
         if (!event.ctrlKey && !event.metaKey) {
           // Unselect all elements
           for (const el of store.stored) {
@@ -44,7 +47,9 @@ export default class AdvancedSearchSelection {
       })
       .on('stop', (e) => {
         console.log(e)
+        document.body.dataset.dragging = false;
         this._selectionArea.keepSelection();
+        this._delegate.select(e.store.selected);
       });
   }
   

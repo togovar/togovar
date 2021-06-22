@@ -18,6 +18,7 @@ export default class ConditionView {
 
     // make HTML
     this._elm = document.createElement('div');
+    this._elm.delegate = this;
     this._elm.classList.add('advanced-search-condition-view');
     this._elm.dataset.classification = type;
     this._elm.dataset.relation = 'eq';
