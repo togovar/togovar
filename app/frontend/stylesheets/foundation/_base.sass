@@ -135,6 +135,8 @@ body
   &[data-search-mode="advanced"]
     #FilterAlternativeAlleleFrequency, #FilterVariantCallingQuality, #FilterSIFT, #FilterPolyPhen
       display: none
+  &[data-dragging="true"]
+    user-select: none
 
 [draggable=true]
   -khtml-user-drag: element

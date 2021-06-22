@@ -1,3 +1,5 @@
+$OPACITY_DISABLED: .5
+
 .advanced-search-toolbar
   margin: 4px 0 -1px -14px
   padding: 2px 6px
@@ -37,11 +39,13 @@
       &:hover
         > p
           background-color: $COLOR_KEY_DARK1
-      &.-disabled
-        opacity: .5
-        pointer-events: none
+      // &.-disabled
+      //   opacity: $OPACITY_DISABLED
+      //   pointer-events: none
       &.-haschild
         position: relative
+        body[data-dragging="true"] &
+          pointer-events: none
         > p
           &::after
             content: ""
@@ -80,9 +84,20 @@
             transform: translateY(0)
             > li
               padding: 4px 8px
+      &.command
+        opacity: $OPACITY_DISABLED
+        pointer-events: none
+        &.-enabled
+          opacity: 1
+          pointer-events: auto
+        &[data-command="group"]
+          #AdvancedSearchBuilderView[data-selected-multiple-conditions="true"] &
+            opacity: 1
+            pointer-events: auto
       &.buttoncontainer
         flex-grow: 1
         text-align: right
         > .button-view
           position: relative
           top: 1px
+
