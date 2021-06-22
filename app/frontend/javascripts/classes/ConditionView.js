@@ -43,14 +43,19 @@ export default class ConditionView {
     this._conditionValues = new ConditionValues(this);
 
     // events
+    // this._elm.addEventListener('click', e => e.stopImmediatePropagation());
+    // this._elm.addEventListener('mouseup', e => e.stopImmediatePropagation());
     // switch logical operation
     summary.querySelector(':scope > .relation').addEventListener('click', e => {
-      e.stopPropagation();
+      e.stopImmediatePropagation();
+      // e.preventDefault();
       this._elm.dataset.relation = {eq: 'ne', ne: 'eq'}[this._elm.dataset.relation];
     });
     // switch edit mode
     const editButton = summary.querySelector(':scope > .editbutton');
-    editButton.addEventListener('click', () => {
+    editButton.addEventListener('click', e => {
+      e.stopImmediatePropagation();
+      // e.preventDefault();
       this._elm.classList.add('-editing');
       this._conditionValues.start();
     });
