@@ -66,7 +66,7 @@
     "style-loader": "^1.2.1",
     "swagger-ui": "^3.36.0",
     "tippy.js": "^6.3.1",
-    "togovar-stanza": "togovar/stanza#22d089b48b2d2a8c9f2faf7f65ffabde7859851d",
+    "togovar-stanza": "biosciencedbc/togovar-develop-stanza#96013616196af561257ce1b8b35a48762a60cba0",
     "webpack": "^4.44.0",
     "webpack-cli": "^3.3.12",
     "webpack-google-tag-manager-plugin": "^1.0.3",
