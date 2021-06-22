@@ -98,6 +98,14 @@ $CORNER_RADIUS: $HEIGHT / 2
     opacity: 0
     pointer-events: none
     transition: opacity $TRANSITION_DURATION
+  &.-selected
+    > .body
+      > .summary
+        background-color: $COLOR_SELECTED_LIGHT
+        > .classification
+          background-color: $COLOR_SELECTED
+          color: $COLOR_BLACK
+
   &.-editing
     > .body
       z-index: $Z_INDEX_EDITING_CONDITION + 1
