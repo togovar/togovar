@@ -1,8 +1,8 @@
-$PADDING: 6px
+$PADDING: 8px
 
 .advanced-search-group-view
   padding: 0 0 0 14px
-  margin-bottom: 4px
+  margin-bottom: $PADDING
   border: solid 1px $COLOR_KEY_DARK3
   background-color: white
   position: relative
@@ -14,9 +14,9 @@ $PADDING: 6px
     transform: rotate(90deg)
     transform-origin: 0% 0%
   > .container
-    padding: 4px 4px 1px 4px
+    padding: $PADDING $PADDING 1px $PADDING
   .advanced-search-group-view
-    margin: 4px -5px 4px 0
+    margin: $PADDING #{-$PADDING - 1px} $PADDING 0
   &[data-number-of-child="0"], &[data-number-of-child="1"]
     > .logical-operator-switch
       visibility: hidden
