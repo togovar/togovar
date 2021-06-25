@@ -1,22 +1,23 @@
 import ConditionView from './ConditionView.js';
+import ConditionItemView from './ConditionItemView.js';
+import {conditionItemType} from '../definition.js';
 
-export default class ConditionGroupView {
+export default class ConditionGroupView extends ConditionView {
 
-  constructor(builder, parentNode, logicalOperator = 'and', contents = [], isRoot = false) {
-
+  constructor(builder, parent, parentNode, logicalOperator = 'and', contents = [], isRoot = false) {
     console.log( parentNode, logicalOperator, contents, isRoot )
-    this._builder = builder;
+
+    super(builder, parent, parentNode);
+
     this._contents = contents;
 
     // make HTML
-    this._elm = document.createElement('div');
     this._elm.classList.add('advanced-search-group-view');
     if (isRoot) this._elm.classList.add('-root');
     this._elm.dataset.numberOfChild = this._contents.length;
     this._elm.innerHTML = 
     `<div class="logical-operator-switch"></div>
     <div class="container"></div>`;
-    parentNode.insertAdjacentElement('beforeend', this._elm);
 
     // reference
     this._logicalOperatorSwitch = this._elm.querySelector(':scope > .logical-operator-switch');
@@ -38,7 +39,7 @@ export default class ConditionGroupView {
   }
 
   addCondition(type) {
-    this._contents.push(new ConditionView(this._builder, this, this._container, type));
+    this._contents.push(new ConditionItemView(this._builder, this, this._container, type));
     this._elm.dataset.numberOfChild = this._contents.length;
   }
 
@@ -49,12 +50,16 @@ export default class ConditionGroupView {
     this._elm.dataset.numberOfChild = this._contents.length;
   }
 
+  select() {
+    // this._elm.classList
+  }
+
+  deselect() {
+
+  }
+
 
   // accessor
-
-  get elm() {
-    return this._elm;
-  }
 
   get query() {
     console.log(this._contents)
@@ -63,6 +68,10 @@ export default class ConditionGroupView {
     } else {
       return {[this._logicalOperatorSwitch.dataset.operator]: this._contents.map(contents => contents.query)};
     }
+  }
+
+  get type() {
+    return conditionItemType.group;
   }
 
 }

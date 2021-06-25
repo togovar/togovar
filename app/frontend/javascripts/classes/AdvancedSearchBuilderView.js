@@ -4,16 +4,16 @@ import AdvancedSearchToolbar from './AdvancedSearchToolbar.js';
 import AdvancedSearchSelection from './AdvancedSearchSelection.js';
 // import {ADVANCED_CONDITIONS} from '../global.js';
 // import {API_URL} from "../global.js";
+import {conditionItemType} from '../definition.js';
 
 export default class AdvancedSearchBuilderView {
 
   constructor(elm) {
 
     this._elm = elm;
-    console.log(elm)
     const inner = elm.querySelector(':scope > .inner');
-    this._rootGroup = new ConditionGroupView(this, inner, 'and', [], true);
-    this._selectingCondition = this._rootGroup;
+    this._rootGroup = new ConditionGroupView(this, undefined, inner, 'and', [], true);
+    this._selectingConditions = [this._rootGroup];
 
     // status
     this._elm.dataset.selectedMultipleConditions = false;
@@ -31,9 +31,19 @@ export default class AdvancedSearchBuilderView {
 
   // public methods
 
-  select(elements) {
-    console.log(elements)
-    this._elm.dataset.selectedMultipleConditions = elements.length > 1;
+  select(conditions) {
+    console.log(conditions)
+    // change status
+    this._elm.dataset.selectedMultipleConditions = conditions.length > 1;
+    // deselect
+    for (const selectingCondition of this._selectingConditions) {
+      selectingCondition.deselect();
+    }
+  }
+
+  deselect(conditions) {
+    console.log(conditions)
+
   }
 
   changeCondition() {
@@ -41,37 +51,48 @@ export default class AdvancedSearchBuilderView {
     this._toolbar.canSearch(Object.keys(query).length > 0);
   }
 
+  group() {
+    console.log('_group')
+    // this._selectingConditions
+    console.log( this._rootGroup.elm.childNodes )
+  }
+
+  ungroup() {
+    console.log('_ungroup')
+  }
+
+  copy() {
+    console.log('_copy')
+  }
+
+  edit() {
+    console.log('_edit')
+  }
+
+  delete() {
+    console.log('_delete')
+  }
+
   search() {
     const query = this._rootGroup.query;
     StoreManager.setAd__vancedSearchCondition(query);
   }
 
+  addCondition(condition) {
+    console.log(condition)
+    const selectingCondition = this._selectingConditions[0];
+    console.log(selectingCondition)
+    switch(selectingCondition.type) {
+      case conditionItemType.condition:
+        console.log('TODO: ')
+        break;
+      case conditionItemType.group:
+        selectingCondition.addCondition(condition);
+        break;
+    }
+  }
+
 
   // private methods
-
-  _addCondition(condition) {
-    console.log(condition)
-    this._selectingCondition.addCondition(condition);
-  }
-
-  _group() {
-    console.log('_group')
-  }
-
-  _ungroup() {
-    console.log('_ungroup')
-  }
-
-  _copy() {
-    console.log('_copy')
-  }
-
-  _edit() {
-    console.log('_edit')
-  }
-
-  _delete() {
-    console.log('_delete')
-  }
 
 }

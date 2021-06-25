@@ -1,5 +1,5 @@
 import {ADVANCED_CONDITIONS} from '../global.js';
-
+import {conditionItemType} from '../definition.js';
 
 export default class ConditionValues {
 
@@ -127,6 +127,13 @@ export default class ConditionValues {
 
   _evaluateCheckboxesEditor() {
     return this._checkboxes.some(checkbox => checkbox.checked);
+  }
+
+
+  // accessor
+
+  get type() {
+    return conditionItemType.condition;
   }
 
 }
