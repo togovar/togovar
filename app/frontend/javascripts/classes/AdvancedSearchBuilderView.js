@@ -31,7 +31,7 @@ export default class AdvancedSearchBuilderView {
 
   // public methods
 
-  select(conditions) {
+  selectConditions(conditions) {
     console.log(conditions)
     // change status
     this._elm.dataset.selectedMultipleConditions = conditions.length > 1;
@@ -41,8 +41,16 @@ export default class AdvancedSearchBuilderView {
 
   }
 
-  deselect(conditions) {
+  deselectConditions(conditions) {
     console.log(conditions)
+  }
+
+  addConditions(conditions) {
+
+  }
+
+  removeConditions(conditions) {
+
   }
 
   changeCondition() {

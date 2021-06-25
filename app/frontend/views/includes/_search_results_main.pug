@@ -48,72 +48,72 @@
         .sectionscontainer.collapsecontent
           #AdvancedSearchBuilderView.section
             .inner
-              //- .advanced-search-group-view.-root(data-number-of-child="0")
+              //- .advanced-search-condition-group-view.-root(data-number-of-child="0")
                 //- p.emptymessage Please add a search condition from below menu
                 //- .logical-operator-switch(data-operator="and")
                 //- .container
 
-                  //- .advanced-search-condition-view(data-operator="equal" data-classification="variant-type")
+                  //- .advanced-search-condition-item-view(data-operator="equal" data-classification="variant-type")
                   //-   .classification
                   //-   .operator
                   //-   .values
                   //-     .value SNV
                   //-   .editbutton Edit
-                  //- .advanced-search-condition-view(data-operator="not-equal" data-classification="variant-type")
+                  //- .advanced-search-condition-item-view(data-operator="not-equal" data-classification="variant-type")
                   //-   .classification
                   //-   .operator
                   //-   .values
                   //-     .value Insertion
                   //-   .editbutton Edit
-                  //- .advanced-search-condition-view(data-operator="equal" data-classification="clinical-significance")
+                  //- .advanced-search-condition-item-view(data-operator="equal" data-classification="clinical-significance")
                   //-   .classification
                   //-   .operator
                   //-   .values
                   //-     .value(data-sign="P") Pathogenic
                   //-   .editbutton Edit
-                  //- .advanced-search-condition-view(data-operator="equal" data-classification="clinical-significance")
+                  //- .advanced-search-condition-item-view(data-operator="equal" data-classification="clinical-significance")
                   //-   .classification
                   //-   .operator
                   //-   .values
                   //-     .value(data-sign="LP") Likely pathogenic
                   //-   .editbutton Edit
-                  //- .advanced-search-condition-view(data-operator="equal" data-classification="clinical-significance")
+                  //- .advanced-search-condition-item-view(data-operator="equal" data-classification="clinical-significance")
                   //-   .classification
                   //-   .operator
                   //-   .values
                   //-     .value(data-sign="US") Uncertain significance
                   //-   .editbutton Edit
-                  //- .advanced-search-condition-view(data-operator="equal" data-classification="clinical-significance")
+                  //- .advanced-search-condition-item-view(data-operator="equal" data-classification="clinical-significance")
                   //-   .classification
                   //-   .operator
                   //-   .values
                   //-     .value(data-sign="LB") Likely benign
                   //-   .editbutton Edit
-                  //- .advanced-search-condition-view(data-operator="equal" data-classification="clinical-significance")
+                  //- .advanced-search-condition-item-view(data-operator="equal" data-classification="clinical-significance")
                   //-   .classification
                   //-   .operator
                   //-   .values
                   //-     .value(data-sign="B") Benign
                   //-   .editbutton Edit
-                  //- .advanced-search-condition-view(data-operator="equal" data-classification="clinical-significance")
+                  //- .advanced-search-condition-item-view(data-operator="equal" data-classification="clinical-significance")
                   //-   .classification
                   //-   .operator
                   //-   .values
                   //-     .value(data-sign="CI") Conflicting...
                   //-   .editbutton Edit
-                  //- .advanced-search-condition-view(data-operator="equal" data-classification="clinical-significance")
+                  //- .advanced-search-condition-item-view(data-operator="equal" data-classification="clinical-significance")
                   //-   .classification
                   //-   .operator
                   //-   .values
                   //-     .value(data-sign="DR") Drug response
                   //-   .editbutton Edit
-                  //- .advanced-search-condition-view(data-operator="equal" data-classification="clinical-significance")
+                  //- .advanced-search-condition-item-view(data-operator="equal" data-classification="clinical-significance")
                   //-   .classification
                   //-   .operator
                   //-   .values
                   //-     .value(data-sign="NP") Not provided
                   //-   .editbutton Edit
-                  //- .advanced-search-condition-view(data-classification="alternative-allele-frequency" data-dataset="gem_j_wga")
+                  //- .advanced-search-condition-item-view(data-classification="alternative-allele-frequency" data-dataset="gem_j_wga")
                   //-   .classification
                   //-   .operator
                   //-   .values
@@ -124,11 +124,11 @@
                   //-       span.text 0.1 ~ 1
                   //-     small.smalltext Exclude filtered out variants
                   //-   .editbutton Edit
-                  //- .advanced-search-group-view
+                  //- .advanced-search-condition-group-view
                   //-   .logical-operator-switch
                   //-     a.operator(data-operator="or")
                   //-   .container
-                  //-     .advanced-search-condition-view(data-classification="alternative-allele-frequency" data-dataset="jga_ngs")
+                  //-     .advanced-search-condition-item-view(data-classification="alternative-allele-frequency" data-dataset="jga_ngs")
                   //-       .classification
                   //-       .operator
                   //-       .values
@@ -139,7 +139,7 @@
                   //-           span.text 0.1 ~ 1
                   //-         small.smalltext Exclude filtered out variants
                   //-       .editbutton Edit
-                  //-     .advanced-search-condition-view(data-classification="alternative-allele-frequency" data-dataset="tommo_4.7kjpn")
+                  //-     .advanced-search-condition-item-view(data-classification="alternative-allele-frequency" data-dataset="tommo_4.7kjpn")
                   //-       .classification
                   //-       .operator
                   //-       .values
@@ -150,7 +150,7 @@
                   //-           span.text 0.1 ~ 1
                   //-         small.smalltext Exclude filtered out variants
                   //-       .editbutton Edit
-                  //-     .advanced-search-condition-view(data-classification="alternative-allele-count" data-dataset="hgvd")
+                  //-     .advanced-search-condition-item-view(data-classification="alternative-allele-count" data-dataset="hgvd")
                   //-       .classification
                   //-       .operator
                   //-       .values
@@ -159,7 +159,7 @@
                   //-           span.text 0.1 &lt;
                   //-         small.smalltext Exclude filtered out variants
                   //-       .editbutton Edit
-                  //-     .advanced-search-condition-view(data-classification="alternative-allele-count" data-dataset="bbj")
+                  //-     .advanced-search-condition-item-view(data-classification="alternative-allele-count" data-dataset="bbj")
                   //-       .classification
                   //-       .operator
                   //-       .values
@@ -168,7 +168,7 @@
                   //-           span.text 0.1 &lt;
                   //-         small.smalltext Exclude filtered out variants
                   //-       .editbutton Edit
-                  //-     .advanced-search-condition-view(data-classification="alternative-allele-count" data-dataset="gnomad")
+                  //-     .advanced-search-condition-item-view(data-classification="alternative-allele-count" data-dataset="gnomad")
                   //-       .classification
                   //-       .operator
                   //-       .values
@@ -177,19 +177,19 @@
                   //-           span.text 0.1 &lt;
                   //-         small.smalltext Exclude filtered out variants
                   //-       .editbutton Edit
-                  //-     .advanced-search-condition-view(data-operator="equal" data-classification="consequence")
+                  //-     .advanced-search-condition-item-view(data-operator="equal" data-classification="consequence")
                   //-       .classification
                   //-       .operator
                   //-       .values
                   //-         .value Splice acceptor variant
                   //-       .editbutton Edit
-                  //- .advanced-search-condition-view(data-operator="equal" data-classification="gene")
+                  //- .advanced-search-condition-item-view(data-operator="equal" data-classification="gene")
                   //-   .classification
                   //-   .operator
                   //-   .values
                   //-     .value ALDH2
                   //-   .editbutton Edit
-                  //- .advanced-search-condition-view(data-operator="equal" data-classification="disease")
+                  //- .advanced-search-condition-item-view(data-operator="equal" data-classification="disease")
                   //-   .classification
                   //-   .operator
                   //-   .values

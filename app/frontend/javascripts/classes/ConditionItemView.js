@@ -19,7 +19,7 @@ export default class ConditionItemView extends ConditionView {
     this._isFirstTime = true;
 
     // make HTML
-    this._elm.classList.add('advanced-search-condition-view');
+    this._elm.classList.add('advanced-search-condition-item-view');
     this._elm.dataset.classification = type;
     this._elm.dataset.relation = 'eq';
     this._elm.innerHTML = `

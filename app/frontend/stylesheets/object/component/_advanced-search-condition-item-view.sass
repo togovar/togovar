@@ -4,7 +4,7 @@ $HEIGHT_VALUE: 18px
 $PADDING_VALUES: ($HEIGHT - $HEIGHT_VALUE) / 2
 $CORNER_RADIUS: $HEIGHT / 2
 
-.advanced-search-condition-view
+.advanced-search-condition-item-view
   margin-bottom: 3px
   position: relative
   > .body
@@ -150,11 +150,13 @@ $CORNER_RADIUS: $HEIGHT / 2
             left: 6.5px
   &.-selected
     > .body
+      border: solid 1px $COLOR_SELECTED
+      margin: -1px
       > .summary
-        background-color: $COLOR_SELECTED_LIGHT
+        // background-color: $COLOR_SELECTED_LIGHT
         > .classification
-          background-color: $COLOR_SELECTED
-          color: $COLOR_BLACK
+          // background-color: $COLOR_SELECTED
+          // color: $COLOR_BLACK
   &[data-classification="frequency"], &[data-classification="count"]
     > .body
       > .summary
