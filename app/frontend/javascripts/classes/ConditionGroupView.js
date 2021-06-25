@@ -50,13 +50,13 @@ export default class ConditionGroupView extends ConditionView {
     this._elm.dataset.numberOfChild = this._contents.length;
   }
 
-  select() {
-    // this._elm.classList
-  }
+  // select() {
+  //   // this._elm.classList
+  // }
 
-  deselect() {
+  // deselect() {
 
-  }
+  // }
 
 
   // accessor

@@ -25,11 +25,11 @@ export default class ConditionItemView {
   // public methods
 
   select() {
-
+    this._elm.classList.add('-selected');
   }
 
   deselect() {
-    
+    this._elm.classList.remove('-selected');
   }
 
   remove() {

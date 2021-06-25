@@ -25,7 +25,7 @@ export default class AdvancedSearchBuilderView {
     StoreManager.bind('advancedSearchConditions', this);
 
     // select conditions
-    new AdvancedSearchSelection(this._rootGroup.elm, this);
+    this._selection = new AdvancedSearchSelection(this._rootGroup.elm, this);
   }
 
 
@@ -36,14 +36,13 @@ export default class AdvancedSearchBuilderView {
     // change status
     this._elm.dataset.selectedMultipleConditions = conditions.length > 1;
     // deselect
-    for (const selectingCondition of this._selectingConditions) {
-      selectingCondition.deselect();
-    }
+    this._deselectAllConditions();
+    // select
+
   }
 
   deselect(conditions) {
     console.log(conditions)
-
   }
 
   changeCondition() {
@@ -81,6 +80,9 @@ export default class AdvancedSearchBuilderView {
   addCondition(condition) {
     console.log(condition)
     const selectingCondition = this._selectingConditions[0];
+    this._deselectAllConditions();
+    // deselect
+    this.deselect(this._selectingConditions);
     console.log(selectingCondition)
     switch(selectingCondition.type) {
       case conditionItemType.condition:
@@ -94,5 +96,13 @@ export default class AdvancedSearchBuilderView {
 
 
   // private methods
+
+  _deselectAllConditions() {
+    for (const selectingCondition of this._selectingConditions) {
+      selectingCondition.deselect();
+    }
+    this._selectingConditions = [];
+    this._selection.deselectAllConditions();
+  }
 
 }
