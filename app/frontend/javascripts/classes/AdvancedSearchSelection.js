@@ -60,6 +60,10 @@ export default class AdvancedSearchSelection {
 
   }
 
+  deselectAllConditions() {
+    this._selectionArea.clearSelection();
+  }
+
 
   // private methods
   

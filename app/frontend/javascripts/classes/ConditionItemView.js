@@ -72,13 +72,13 @@ export default class ConditionItemView extends ConditionView {
     this._builder.changeCondition();
   }
 
-  select() {
+  // select() {
 
-  }
+  // }
 
-  deselect() {
+  // deselect() {
     
-  }
+  // }
 
   remove() {
     console.log(this)
