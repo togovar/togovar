@@ -1,8 +1,5 @@
-$PADDING: 8px
-
 .advanced-search-group-view
-  padding: 0 0 0 14px
-  margin-bottom: $PADDING
+  margin-bottom: var(--padding-group)
   border: solid 1px $COLOR_KEY_DARK3
   background-color: white
   position: relative
@@ -14,13 +11,17 @@ $PADDING: 8px
     transform: rotate(90deg)
     transform-origin: 0% 0%
   > .container
-    padding: $PADDING $PADDING 1px $PADDING
+    padding: var(--padding-group) var(--padding-group) 1px var(--padding-group)
   .advanced-search-group-view
-    margin: $PADDING #{-$PADDING - 1px} $PADDING 0
+    margin: var(--padding-group) calc(-var(--padding-group) - 1px) var(--padding-group) 0
   &[data-number-of-child="0"], &[data-number-of-child="1"]
     > .logical-operator-switch
       visibility: hidden
+  &.-selected
+    border-color: $COLOR_SELECTED
+    background-color: $COLOR_SELECTED_LIGHT
   &.-root
+    padding: 0 0 0 calc(var(--height-toolbar) + 1px)
     &[data-number-of-child="0"]
       &::before
         content: "Please add a search condition from below menu"
@@ -29,4 +30,5 @@ $PADDING: 8px
         color: $COLOR_BLACK
         line-height: 12px
         position: relative
-        top: 7px
+        top: 10px
+        height: 18px

@@ -70,12 +70,12 @@ export default class AdvancedSearchToolbar {
     toolbar.querySelectorAll('.command').forEach(command => {
       command.addEventListener('click', () => {
         switch (command.dataset.command) {
-          case 'add-condition': this._delegate._addCondition(command.dataset.condition); break;
-          case 'group': this._delegate._group(); break;
-          case 'ungroup': this._delegate._ungroup(); break;
-          case 'copy': this._delegate._copy(); break;
-          case 'edit': this._delegate._edit(); break;
-          case 'delete': this._delegate._delete(); break;
+          case 'add-condition': this._delegate.addCondition(command.dataset.condition); break;
+          case 'group': this._delegate.group(); break;
+          case 'ungroup': this._delegate.ungroup(); break;
+          case 'copy': this._delegate.copy(); break;
+          case 'edit': this._delegate.edit(); break;
+          case 'delete': this._delegate.delete(); break;
         }
       });
     });

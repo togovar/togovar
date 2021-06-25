@@ -49,9 +49,19 @@ export default class AdvancedSearchSelection {
         console.log(e)
         document.body.dataset.dragging = false;
         this._selectionArea.keepSelection();
-        this._delegate.select(e.store.selected);
+        this._delegate.select(e.store.selected.delegate);
       });
   }
+
+
+  // public methods
+
+  getSelectingItems() {
+
+  }
+
+
+  // private methods
   
   _selectiong(store) {
     store.changed.added.forEach(el => {
