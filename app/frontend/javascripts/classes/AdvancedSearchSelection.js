@@ -1,17 +1,23 @@
 import SelectionArea from '@simonwep/selection-js';
+import AdvancedSearchBuilderView from './AdvancedSearchBuilderView';
 
 export default class AdvancedSearchSelection {
 
-  constructor(area, delegate) {
+  /**
+   * 
+   * @param {*} area 
+   * @param {AdvancedSearchBuilderView} builder 
+   */
+  constructor(area, builder) {
     console.log( area )
     console.log( SelectionArea )
-    this._delegate = delegate;
+    this._builder = builder;
     this._selectionArea = new SelectionArea({
       class: 'selection-area',
       boundaries: ['#AdvancedSearchBuilderView'],
       selectables: [
-        '#AdvancedSearchBuilderView > .inner > .advanced-search-group-view.-root > .container .advanced-search-group-view',
-        '#AdvancedSearchBuilderView > .inner > .advanced-search-group-view.-root > .container .advanced-search-condition-view'
+        '#AdvancedSearchBuilderView > .inner > .advanced-search-condition-group-view.-root > .container .advanced-search-condition-group-view',
+        '#AdvancedSearchBuilderView > .inner > .advanced-search-condition-group-view.-root > .container .advanced-search-condition-item-view'
       ],
       startareas: ['html'],
       overlap: 'invert',
@@ -49,7 +55,7 @@ export default class AdvancedSearchSelection {
         console.log(e)
         document.body.dataset.dragging = false;
         this._selectionArea.keepSelection();
-        this._delegate.select(e.store.selected.delegate);
+        this._builder.selectConditions(e.store.selected.builder);
       });
   }
 

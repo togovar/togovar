@@ -12,7 +12,7 @@ export default class ConditionGroupView extends ConditionView {
     this._contents = contents;
 
     // make HTML
-    this._elm.classList.add('advanced-search-group-view');
+    this._elm.classList.add('advanced-search-condition-group-view');
     if (isRoot) this._elm.classList.add('-root');
     this._elm.dataset.numberOfChild = this._contents.length;
     this._elm.innerHTML = 
@@ -39,7 +39,9 @@ export default class ConditionGroupView extends ConditionView {
   }
 
   addCondition(type) {
-    this._contents.push(new ConditionItemView(this._builder, this, this._container, type));
+    const condition = new ConditionItemView(this._builder, this, this._container, type);
+    this._contents.push(condition);
+    this._builder.selectConditions(condition);
     this._elm.dataset.numberOfChild = this._contents.length;
   }
 
