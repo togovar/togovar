@@ -11,8 +11,8 @@ export default class AdvancedSearchBuilderView {
   constructor(elm) {
 
     this._elm = elm;
-    const inner = elm.querySelector(':scope > .inner');
-    this._rootGroup = new ConditionGroupView(this, undefined, inner, 'and', [], true);
+    this._container = elm.querySelector(':scope > .inner');
+    this._rootGroup = new ConditionGroupView(this, this, 'and', [], true);
 
     // status
     this._elm.dataset.selectedMultipleConditions = false;
@@ -30,14 +30,10 @@ export default class AdvancedSearchBuilderView {
 
   // public methods
 
-  selectConditions(conditions, deselectExistingConditions = false) {
-    console.log(conditions)
+  selectConditionViews(conditionViews) {
+    console.log(conditionViews)
     // change status
-    this._elm.dataset.selectedMultipleConditions = conditions.length > 1;
-    // deselect
-    if (deselectExistingConditions) this._selection.deselectAllConditions();
-    // select
-    this._selection.addConditions(conditions);
+    this._elm.dataset.selectedMultipleConditions = conditionViews.length > 1;
   }
 
   deselectConditions(conditions) {
@@ -60,7 +56,11 @@ export default class AdvancedSearchBuilderView {
 
   group() {
     console.log('_group')
-    console.log( this._rootGroup.elm.childNodes )
+    const conditionViews = this._selection.getSelectingConditionViews();
+    console.log(conditionViews[0])
+    const parentView = conditionViews[0].parentView;
+    parentView.addGroup(conditionViews);
+    this.changeCondition();
   }
 
   ungroup() {
@@ -85,11 +85,10 @@ export default class AdvancedSearchBuilderView {
   }
 
   // add search condition to the currently selected layer
-  addCondition(condition) {
-    console.log(condition)
+  addCondition(conditionType) {
 
     // get selecting condition
-    const selectingConditions = this._selection.getSelectingConditions();
+    const selectingConditions = this._selection.getSelectingConditionViews();
     const selectingCondition = selectingConditions.length > 0 ? selectingConditions[0] : this._rootGroup;
     console.log(selectingCondition)
     
@@ -103,7 +102,7 @@ export default class AdvancedSearchBuilderView {
         console.log('TODO: ')
         break;
       case conditionItemType.group:
-        newConditionView = selectingCondition.addCondition(condition);
+        newConditionView = selectingCondition.addCondition(conditionType);
         break;
     }
   }
@@ -111,5 +110,11 @@ export default class AdvancedSearchBuilderView {
 
   // private methods
 
+
+  // accessor
+
+  get container() {
+    return this._container;
+  }
 
 }

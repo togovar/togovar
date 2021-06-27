@@ -1,25 +1,23 @@
-import {ADVANCED_CONDITIONS} from '../global.js';
+// import {ADVANCED_CONDITIONS} from '../global.js';
 
 export default class ConditionItemView {
 
   /**
    * 
    * @param {AdvancedSearchBuilderView} builder 
-   * @param {*} parent 
-   * @param {HTMLElement} parentNode 
+   * @param {ConditionItemView | ConditionGroupView} parentView 
    */
-  constructor(builder, parent, parentNode) {
-    console.log(builder, parent, parentNode)
+  constructor(builder, parentView) {
+    console.log(builder, parentView)
 
     this._builder = builder;
-    this._parent = parent;
+    this._parentView = parentView;
 
     // make HTML
     this._elm = document.createElement('div');
     this._elm.classList.add('advanced-search-condition-view');
     this._elm.delegate = this;
-    // this._elm.classList.add('-selected');
-    parentNode.insertAdjacentElement('beforeend', this._elm);
+    parentView.container.insertAdjacentElement('beforeend', this._elm);
 
     // event
     this._elm.addEventListener('click', () => {
@@ -47,8 +45,18 @@ export default class ConditionItemView {
 
   // accessor
 
+  /**
+   * @return {HTMLElement}
+   */
   get elm() {
     return this._elm;
+  }
+
+  /**
+   * @return {ConditionItemView | ConditionGroupView}
+   */
+  get parentView() {
+    return this._parentView;
   }
 
 }
