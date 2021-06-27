@@ -17,7 +17,7 @@ export default class ConditionItemView {
     this._elm = document.createElement('div');
     this._elm.classList.add('advanced-search-condition-view');
     this._elm.delegate = this;
-    parentView.container.insertAdjacentElement('beforeend', this._elm);
+    parentView.container.append(this._elm);
 
     // event
     this._elm.addEventListener('click', () => {
