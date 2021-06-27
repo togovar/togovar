@@ -23,7 +23,7 @@ export default class ConditionGroupView extends ConditionView {
 
     // contents
     for (const conditionView of conditionViews) {
-      this._container.insertAdjacentElement('beforeend', conditionView.elm);
+      this._container.append(conditionView.elm);
     }
 
     // logical operator
@@ -38,7 +38,7 @@ export default class ConditionGroupView extends ConditionView {
 
   maketToolbar() {
     const toolbar = document.createElement('nav');
-    this._elm.insertAdjacentElement('beforeend', toolbar);
+    this._elm.append(toolbar);
     return toolbar;
   }
 
