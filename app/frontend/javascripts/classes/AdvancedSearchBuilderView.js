@@ -54,6 +54,7 @@ export default class AdvancedSearchBuilderView {
 
   changeCondition() {
     const query = this._rootGroup.query;
+    console.log(query)
     this._toolbar.canSearch(Object.keys(query).length > 0);
   }
 
@@ -89,7 +90,6 @@ export default class AdvancedSearchBuilderView {
 
     // get selecting condition
     const selectingConditions = this._selection.getSelectingConditions();
-    console.log(selectingConditions)
     const selectingCondition = selectingConditions.length > 0 ? selectingConditions[0] : this._rootGroup;
     console.log(selectingCondition)
     
@@ -97,12 +97,13 @@ export default class AdvancedSearchBuilderView {
     this._selection.deselectAllConditions();
 
     // add
+    let newConditionView;
     switch(selectingCondition.type) {
       case conditionItemType.condition:
         console.log('TODO: ')
         break;
       case conditionItemType.group:
-        selectingCondition.addCondition(condition);
+        newConditionView = selectingCondition.addCondition(condition);
         break;
     }
   }
