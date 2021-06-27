@@ -1,5 +1,5 @@
 .advanced-search-condition-group-view
-  margin-bottom: var(--padding-group)
+  margin: 0 calc(var(--padding-group) * -1 - 1px) 3px 0
   border: solid 1px $COLOR_KEY_DARK3
   background-color: white
   position: relative
@@ -11,9 +11,9 @@
     transform: rotate(90deg)
     transform-origin: 0% 0%
   > .container
-    padding: var(--padding-group) var(--padding-group) 1px var(--padding-group)
-  .advanced-search-condition-group-view
-    margin: var(--padding-group) calc(-var(--padding-group) - 1px) var(--padding-group) 0
+    padding: var(--padding-group) var(--padding-group) var(--padding-group) 22px
+  // .advanced-search-condition-group-view
+  //   margin: var(--padding-group) calc(-var(--padding-group) - 1px) var(--padding-group) 0
   &[data-number-of-child="0"], &[data-number-of-child="1"]
     > .logical-operator-switch
       visibility: hidden

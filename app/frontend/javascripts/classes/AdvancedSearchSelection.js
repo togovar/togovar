@@ -55,23 +55,14 @@ export default class AdvancedSearchSelection {
         console.log(e)
         document.body.dataset.dragging = false;
         this._selectionArea.keepSelection();
-        this._builder.selectConditions(e.store.selected.builder);
+        this._builder.selectConditionViews(e.store.selected.map(el => el.delegate));
       });
   }
 
 
   // public methods
 
-  addConditions(conditions) {
-    console.log(conditions)
-    for (const condition of conditions) {
-      console.log(condition)
-      condition.select();
-      this._selectionArea.select(condition.elm);
-    }
-  }
-
-  getSelectingConditions() {
+  getSelectingConditionViews() {
     return this._selectionArea.getSelection().map(el => el.delegate);
   }
 
@@ -85,16 +76,6 @@ export default class AdvancedSearchSelection {
 
 
   // private methods
-  
-  // _selecting(store) {
-  //   store.changed.added.forEach(el => {
-  //     console.log(el.classList.contains('-editing'))
-  //     if (!el.classList.contains('-editing')) {
-  //       el.classList.add('-selected');
-  //     }
-  //   });
-  //   store.changed.removed.forEach(el => el.classList.remove('-selected'));
-  // }
 
 
 }

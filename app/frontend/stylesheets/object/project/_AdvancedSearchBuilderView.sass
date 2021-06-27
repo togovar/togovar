@@ -1,7 +1,12 @@
 #AdvancedSearchBuilderView
-  padding: 14px $PADDING_SIDE 14px
-  // > .inner
-  //   > .buildersection
-  --padding-group: 8px
+  --padding-group: 6px
   --height-toolbar: 14px
+  padding: 14px $PADDING_SIDE 14px
+  > .inner
+    .advanced-search-condition-item-view
+      + .advanced-search-condition-group-view
+        margin-top: 5px
+    .advanced-search-condition-group-view
+      + .advanced-search-condition-item-view
+        margin-top: 5px
   

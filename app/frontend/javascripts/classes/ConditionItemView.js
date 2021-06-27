@@ -7,25 +7,25 @@ export default class ConditionItemView extends ConditionView {
   /**
    * 
    * @param {AdvancedSearchBuilderView} builder 
-   * @param {*} parent 
-   * @param {HTMLElement} parentNode 
-   * @param {String} type 
+   * @param {*} parentView
+   * @param {String} conditionType 
    */
-  constructor(builder, parent, parentNode, type) {
+  constructor(builder, parentView, conditionType) {
+    console.log(builder, parentView, conditionType);
 
-    super(builder, parent, parentNode);
+    super(builder, parentView);
 
-    this._conditionType = type;
+    this._conditionType = conditionType;
     this._isFirstTime = true;
 
     // make HTML
     this._elm.classList.add('advanced-search-condition-item-view');
-    this._elm.dataset.classification = type;
+    this._elm.dataset.classification = conditionType;
     this._elm.dataset.relation = 'eq';
     this._elm.innerHTML = `
     <div class="body">
       <div class="summary">
-        <div class="classification">${ADVANCED_CONDITIONS[type].label}</div>
+        <div class="classification">${ADVANCED_CONDITIONS[conditionType].label}</div>
         <div class="relation"></div>
         <div class="values"></div>
         <div class="editbutton">Edit</div>

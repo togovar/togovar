@@ -4,15 +4,15 @@ import {conditionItemType} from '../definition.js';
 
 export default class ConditionGroupView extends ConditionView {
 
-  constructor(builder, parent, parentNode, logicalOperator = 'and', contents = [], isRoot = false) {
-    console.log( parentNode, logicalOperator, contents, isRoot )
+  constructor(builder, parentView, logicalOperator = 'and', conditionViews = [], isRoot = false) {
+    console.log( parentView, logicalOperator, conditionViews, isRoot )
 
-    super(builder, parent, parentNode);
+    super(builder, parentView);
 
     // make HTML
     this._elm.classList.add('advanced-search-condition-group-view');
     if (isRoot) this._elm.classList.add('-root');
-    this._elm.dataset.numberOfChild = contents.length;
+    this._elm.dataset.numberOfChild = conditionViews.length;
     this._elm.innerHTML = 
     `<div class="logical-operator-switch"></div>
     <div class="container"></div>`;
@@ -21,6 +21,12 @@ export default class ConditionGroupView extends ConditionView {
     this._logicalOperatorSwitch = this._elm.querySelector(':scope > .logical-operator-switch');
     this._container = this._elm.querySelector(':scope > .container');
 
+    // contents
+    for (const conditionView of conditionViews) {
+      this._container.insertAdjacentElement('beforeend', conditionView.elm);
+    }
+
+    // logical operator
     this._logicalOperatorSwitch.dataset.operator = logicalOperator;
 
     // event
@@ -36,10 +42,19 @@ export default class ConditionGroupView extends ConditionView {
     return toolbar;
   }
 
-  addCondition(type) {
-    const conditionView = new ConditionItemView(this._builder, this, this._container, type);
+  addCondition(conditionType) {
+    const conditionView = new ConditionItemView(this._builder, this, conditionType);
     this._elm.dataset.numberOfChild = this._numberOfChild;
     return conditionView; 
+  }
+
+  /**
+   * 
+   * @param {Array} conditionViews 
+   */
+  addGroup(conditionViews) {
+    const conditionGroupView = new ConditionGroupView(this._builder, this, 'or', conditionViews);
+    console.log(conditionGroupView)
   }
 
   removeCondition(conditionView) {
@@ -69,6 +84,10 @@ export default class ConditionGroupView extends ConditionView {
 
   get type() {
     return conditionItemType.group;
+  }
+
+  get container() {
+    return this._container;
   }
 
   get _numberOfChild() {
