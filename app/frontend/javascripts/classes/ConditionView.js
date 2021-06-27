@@ -16,8 +16,9 @@ export default class ConditionItemView {
 
     // make HTML
     this._elm = document.createElement('div');
+    this._elm.classList.add('advanced-search-condition-view');
     this._elm.delegate = this;
-    this._elm.classList.add('-selected');
+    // this._elm.classList.add('-selected');
     parentNode.insertAdjacentElement('beforeend', this._elm);
 
     // event

@@ -9,12 +9,10 @@ export default class ConditionGroupView extends ConditionView {
 
     super(builder, parent, parentNode);
 
-    this._contents = contents;
-
     // make HTML
     this._elm.classList.add('advanced-search-condition-group-view');
     if (isRoot) this._elm.classList.add('-root');
-    this._elm.dataset.numberOfChild = this._contents.length;
+    this._elm.dataset.numberOfChild = contents.length;
     this._elm.innerHTML = 
     `<div class="logical-operator-switch"></div>
     <div class="container"></div>`;
@@ -39,17 +37,14 @@ export default class ConditionGroupView extends ConditionView {
   }
 
   addCondition(type) {
-    const condition = new ConditionItemView(this._builder, this, this._container, type);
-    this._contents.push(condition);
-    this._builder.selectConditions([condition], true);
-    this._elm.dataset.numberOfChild = this._contents.length;
+    const conditionView = new ConditionItemView(this._builder, this, this._container, type);
+    this._elm.dataset.numberOfChild = this._numberOfChild;
+    return conditionView; 
   }
 
   removeCondition(conditionView) {
-    const position = this._contents.indexOf(conditionView);
-    this._contents.splice(position, 1);
     this._container.removeChild(conditionView.elm);
-    this._elm.dataset.numberOfChild = this._contents.length;
+    this._elm.dataset.numberOfChild = this._numberOfChild;
   }
 
   // select() {
@@ -64,16 +59,20 @@ export default class ConditionGroupView extends ConditionView {
   // accessor
 
   get query() {
-    console.log(this._contents)
-    if (this._contents.length === 1) {
-      return this._contents[0].query;
+    const children = Array.from(this._container.querySelectorAll(':scope > .advanced-search-condition-view'));
+    if (this._numberOfChild === 1) {
+      return children[0].delegate.query;
     } else {
-      return {[this._logicalOperatorSwitch.dataset.operator]: this._contents.map(contents => contents.query)};
+      return {[this._logicalOperatorSwitch.dataset.operator]: children.map(el => el.delegate.query)};
     }
   }
 
   get type() {
     return conditionItemType.group;
+  }
+
+  get _numberOfChild() {
+    return this._container.querySelectorAll(':scope > .advanced-search-condition-view').length;
   }
 
 }

@@ -67,8 +67,6 @@ export default class ConditionItemView extends ConditionView {
   doneEditing() {
     this._elm.classList.remove('-editing');
     this._isFirstTime = false;
-    console.log(this._builder)
-    this._builder.changeCondition();
     this._builder.changeCondition();
   }
 
