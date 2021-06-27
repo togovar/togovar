@@ -1,5 +1,5 @@
 import SelectionArea from '@simonwep/selection-js';
-import AdvancedSearchBuilderView from './AdvancedSearchBuilderView';
+// import AdvancedSearchBuilderView from './AdvancedSearchBuilderView';
 
 export default class AdvancedSearchSelection {
 
@@ -62,26 +62,39 @@ export default class AdvancedSearchSelection {
 
   // public methods
 
-  getSelectingItems() {
+  addConditions(conditions) {
+    console.log(conditions)
+    for (const condition of conditions) {
+      console.log(condition)
+      condition.select();
+      this._selectionArea.select(condition.elm);
+    }
+  }
 
+  getSelectingConditions() {
+    return this._selectionArea.getSelection().map(el => el.delegate);
   }
 
   deselectAllConditions() {
+    for (const el of this._selectionArea.getSelection()) {
+      console.log(el)
+      el.delegate.deselect();
+    }
     this._selectionArea.clearSelection();
   }
 
 
   // private methods
   
-  _selectiong(store) {
-    store.changed.added.forEach(el => {
-      console.log(el.classList.contains('-editing'))
-      if (!el.classList.contains('-editing')) {
-        el.classList.add('-selected');
-      }
-    });
-    store.changed.removed.forEach(el => el.classList.remove('-selected'));
-  }
+  // _selecting(store) {
+  //   store.changed.added.forEach(el => {
+  //     console.log(el.classList.contains('-editing'))
+  //     if (!el.classList.contains('-editing')) {
+  //       el.classList.add('-selected');
+  //     }
+  //   });
+  //   store.changed.removed.forEach(el => el.classList.remove('-selected'));
+  // }
 
 
 }

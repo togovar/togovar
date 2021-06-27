@@ -13,7 +13,6 @@ export default class AdvancedSearchBuilderView {
     this._elm = elm;
     const inner = elm.querySelector(':scope > .inner');
     this._rootGroup = new ConditionGroupView(this, undefined, inner, 'and', [], true);
-    this._selectingConditions = [this._rootGroup];
 
     // status
     this._elm.dataset.selectedMultipleConditions = false;
@@ -31,14 +30,14 @@ export default class AdvancedSearchBuilderView {
 
   // public methods
 
-  selectConditions(conditions) {
+  selectConditions(conditions, deselectExistingConditions = false) {
     console.log(conditions)
     // change status
     this._elm.dataset.selectedMultipleConditions = conditions.length > 1;
     // deselect
-    this._deselectAllConditions();
+    if (deselectExistingConditions) this._selection.deselectAllConditions();
     // select
-
+    this._selection.addConditions(conditions);
   }
 
   deselectConditions(conditions) {
@@ -60,7 +59,6 @@ export default class AdvancedSearchBuilderView {
 
   group() {
     console.log('_group')
-    // this._selectingConditions
     console.log( this._rootGroup.elm.childNodes )
   }
 
@@ -85,13 +83,20 @@ export default class AdvancedSearchBuilderView {
     StoreManager.setAd__vancedSearchCondition(query);
   }
 
+  // add search condition to the currently selected layer
   addCondition(condition) {
     console.log(condition)
-    const selectingCondition = this._selectingConditions[0];
-    this._deselectAllConditions();
-    // deselect
-    this.deselect(this._selectingConditions);
+
+    // get selecting condition
+    const selectingConditions = this._selection.getSelectingConditions();
+    console.log(selectingConditions)
+    const selectingCondition = selectingConditions.length > 0 ? selectingConditions[0] : this._rootGroup;
     console.log(selectingCondition)
+    
+    // release exist conditions
+    this._selection.deselectAllConditions();
+
+    // add
     switch(selectingCondition.type) {
       case conditionItemType.condition:
         console.log('TODO: ')
@@ -105,12 +110,5 @@ export default class AdvancedSearchBuilderView {
 
   // private methods
 
-  _deselectAllConditions() {
-    for (const selectingCondition of this._selectingConditions) {
-      selectingCondition.deselect();
-    }
-    this._selectingConditions = [];
-    this._selection.deselectAllConditions();
-  }
 
 }

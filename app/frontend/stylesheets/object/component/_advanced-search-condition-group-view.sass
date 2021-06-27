@@ -19,9 +19,9 @@
       visibility: hidden
   &.-selected
     border-color: $COLOR_SELECTED
-    background-color: $COLOR_SELECTED_LIGHT
+    // background-color: $COLOR_SELECTED_LIGHT
   &.-root
-    padding: 0 0 0 calc(var(--height-toolbar) + 1px)
+    padding-bottom: calc(var(--height-toolbar) + 1px)
     &[data-number-of-child="0"]
       &::before
         content: "Please add a search condition from below menu"
