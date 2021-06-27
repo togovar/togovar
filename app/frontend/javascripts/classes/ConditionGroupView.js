@@ -41,7 +41,7 @@ export default class ConditionGroupView extends ConditionView {
   addCondition(type) {
     const condition = new ConditionItemView(this._builder, this, this._container, type);
     this._contents.push(condition);
-    this._builder.selectConditions(condition);
+    this._builder.selectConditions([condition], true);
     this._elm.dataset.numberOfChild = this._contents.length;
   }
 

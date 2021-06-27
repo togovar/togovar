@@ -19,6 +19,12 @@ export default class ConditionItemView {
     this._elm.delegate = this;
     this._elm.classList.add('-selected');
     parentNode.insertAdjacentElement('beforeend', this._elm);
+
+    // event
+    this._elm.addEventListener('click', () => {
+      console.log('click', this)
+      
+    });
   }
 
 
