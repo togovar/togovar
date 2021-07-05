@@ -61,14 +61,13 @@ export default class PanelViewPreviewAlternativeAlleleFrequencies extends PanelV
             if (frequency) {
               this._datasets[dataset.id].alt.textContent = frequency.allele.count.toLocaleString();
               this._datasets[dataset.id].total.textContent = frequency.allele.number.toLocaleString();
-              if ((frequency.allele.frequency + '').length > DECIMAL_DIGIT + 2) {
-                const numOfDigits = (frequency.allele.frequency + '').length;
-                const integerized = ((frequency.allele.frequency * 10 ** numOfDigits) + '').padStart(numOfDigits, '0');
-                const rounded = Math.round(parseFloat(integerized.slice(0, DECIMAL_DIGIT) + '.' + integerized.slice(DECIMAL_DIGIT)));
-                const floated = rounded / 10 ** DECIMAL_DIGIT;
-                this._datasets[dataset.id].frequency.textContent = floated > 0 ? floated : frequency.allele.frequency.toExponential(DECIMAL_DIGIT - 1);
-              } else {
-                this._datasets[dataset.id].frequency.textContent = strIns((Math.round(frequency.allele.frequency * 10 ** DECIMAL_DIGIT) + '').padStart(DECIMAL_DIGIT + 1, '0'), -DECIMAL_DIGIT, '.');
+              switch (true) {
+                case (frequency.allele.frequency === 0 || frequency.allele.frequency === 1):
+                  this._datasets[dataset.id].frequency.textContent = frequency.allele.frequency;
+                  break;
+                default:
+                  this._datasets[dataset.id].frequency.textContent = frequency.allele.frequency.toExponential(3);
+                  break;
               }
             } else {
               this._datasets[dataset.id].alt.textContent = '';
