@@ -66,7 +66,7 @@ export default class PanelViewPreviewAlternativeAlleleFrequencies extends PanelV
                   this._datasets[dataset.id].frequency.textContent = frequency.allele.frequency;
                   break;
                 default:
-                  this._datasets[dataset.id].frequency.textContent = frequency.allele.frequency.toExponential(3);
+                  this._datasets[dataset.id].frequency.textContent = frequency.allele.frequency.toExponential(2);
                   break;
               }
             } else {
