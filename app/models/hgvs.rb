@@ -27,10 +27,15 @@ class HGVS
         json = JSON.parse(response.body)
         Rails.logger.debug('HGVS') { json.to_json }
 
+        hgvsg = json.map { |x| x.filter { |_, v| v.is_a?(Hash) }.map { |_, v| v['hgvsg'] } }
+                    .flatten
+                    .uniq
+                    .filter { |x| x.match?(HGVSG) }
+
         if json.is_a?(Hash) && json['error'].present?
           Rails.logger.error('HGVS') { json['error'] }
           [term, json['error']]
-        elsif (hgvsg = json.dig(0, 'hgvsg').filter { |x| x.match?(HGVSG) }).present?
+        elsif hgvsg.present?
           pos = hgvsg.map do |x|
             m = x.match(HGVSG)
             chr = Integer(m[1]&.slice(0..1))
@@ -50,10 +55,10 @@ class HGVS
           [term]
         end
       rescue Faraday::ClientError => e
-        Rails.logger.error(e)
+        Rails.logger.error('HGVS') { e }
         [term, "#{e.response&.status} #{e.response&.reason_phrase}"]
       rescue StandardError => e
-        Rails.logger.error(e)
+        Rails.logger.error('HGVS') { e }
         [term, '500 Internal Server Error']
       end
 
