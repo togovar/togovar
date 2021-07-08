@@ -9536,6 +9536,15 @@ postcss-import@^14.0.1:
     read-cache "^1.0.0"
     resolve "^1.1.7"
 
+postcss-import@^14.0.2:
+  version "14.0.2"
+  resolved "https://registry.yarnpkg.com/postcss-import/-/postcss-import-14.0.2.tgz#60eff77e6be92e7b67fe469ec797d9424cae1aa1"
+  integrity sha512-BJ2pVK4KhUyMcqjuKs9RijV5tatNzNa73e/32aBVE/ejYPe37iH+6vAu9WvqUkB5OAYgLHzbSvzHnorybJCm9g==
+  dependencies:
+    postcss-value-parser "^4.0.0"
+    read-cache "^1.0.0"
+    resolve "^1.1.7"
+
 postcss-initial@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/postcss-initial/-/postcss-initial-2.0.0.tgz#72715f7336e0bb79351d99ee65c4a253a8441ba4"
@@ -12596,9 +12605,9 @@ toggle-selection@^1.0.6:
   resolved "https://registry.yarnpkg.com/toggle-selection/-/toggle-selection-1.0.6.tgz#6e45b1263f2017fa0acc7d89d78b15b8bf77da32"
   integrity sha1-bkWxJj8gF/oKzH2J14sVuL932jI=
 
-"togostanza@github:togostanza/togostanza":
-  version "3.0.0-beta.18"
-  resolved "https://codeload.github.com/togostanza/togostanza/tar.gz/6d8931aa8be76befdbfc26d256626c4d0ec6d6b9"
+"togostanza@github:togostanza/togostanza#v3.0.0-beta.19":
+  version "3.0.0-beta.19"
+  resolved "https://codeload.github.com/togostanza/togostanza/tar.gz/fd2ba159d9486073360ac07d8054e78db853bd4f"
   dependencies:
     "@popperjs/core" "^2.6.0"
     "@primer/octicons" "^11.0.0"
@@ -12652,17 +12661,9 @@ toggle-selection@^1.0.6:
     yeoman-environment "^2.10.3"
     yeoman-generator "^4.12.0"
 
-togovar-stanza@biosciencedbc/togovar-develop-stanza#96013616196af561257ce1b8b35a48762a60cba0:
-  version "0.0.1"
-  resolved "https://codeload.github.com/biosciencedbc/togovar-develop-stanza/tar.gz/96013616196af561257ce1b8b35a48762a60cba0"
-  dependencies:
-    togostanza "github:togostanza/togostanza"
-
-togovar-stanza@biosciencedbc/togovar-develop-stanza#c1c02a0bf2456f3a67b5e1de0e6a0dab2a2bb5fa:
-  version "0.0.1"
-  resolved "https://codeload.github.com/biosciencedbc/togovar-develop-stanza/tar.gz/c1c02a0bf2456f3a67b5e1de0e6a0dab2a2bb5fa"
-  dependencies:
-    togostanza "github:togostanza/togostanza"
+"togovar-stanza@link:../togovar-develop-stanza":
+  version "0.0.0"
+  uid ""
 
 toidentifier@1.0.0:
   version "1.0.0"
