@@ -92,6 +92,8 @@ gene:
   stanza:
     - id: gene-header
       dom: "#gene-header"
+      options:
+        togostanza-menu-placement: none
 
     - id: gene-base
       dom: "#gene-base"
