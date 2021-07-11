@@ -24,6 +24,7 @@ export default class ConditionGroupView extends ConditionView {
     // contents
     for (const conditionView of conditionViews) {
       this._container.append(conditionView.elm);
+      conditionView.parentView = this;
     }
 
     // logical operator
@@ -55,6 +56,7 @@ export default class ConditionGroupView extends ConditionView {
   addGroup(conditionViews) {
     const conditionGroupView = new ConditionGroupView(this._builder, this, 'or', conditionViews);
     console.log(conditionGroupView)
+    return conditionGroupView;
   }
 
   removeCondition(conditionView) {

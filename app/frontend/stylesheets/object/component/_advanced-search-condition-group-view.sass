@@ -18,8 +18,16 @@
     > .logical-operator-switch
       visibility: hidden
   &.-selected
-    border-color: $COLOR_SELECTED
-    // background-color: $COLOR_SELECTED_LIGHT
+    &::after
+      content: ""
+      display: block
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+      border: solid 2px $COLOR_SELECTED
+      pointer-events: none
   &.-root
     padding-bottom: calc(var(--height-toolbar) + 1px)
     &[data-number-of-child="0"]

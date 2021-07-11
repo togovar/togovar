@@ -63,7 +63,8 @@ export default class AdvancedSearchBuilderView {
     const conditionViews = this._selection.getSelectingConditionViews();
     console.log(conditionViews[0])
     const parentView = conditionViews[0].parentView;
-    parentView.addGroup(conditionViews);
+    const conditionGroupView = parentView.addGroup(conditionViews);
+    this._selection.selectConditionViews([conditionGroupView], true);
     this.changeCondition();
   }
 
@@ -115,6 +116,10 @@ export default class AdvancedSearchBuilderView {
 
 
   // accessor
+
+  get elm() {
+    return this._elm;
+  }
 
   get container() {
     return this._container;

@@ -55,6 +55,16 @@ export default class AdvancedSearchSelection {
         console.log(e)
         document.body.dataset.dragging = false;
         this._selectionArea.keepSelection();
+        // filter only top-level items
+        const minDepth = this._selectionArea.getSelection().reduce((minDepth, el) => {
+          const depth = el.delegate.depth;
+          return minDepth > depth ? depth : minDepth;
+        }, 9999);
+        ([...this._selectionArea.getSelection()]).forEach(el => {
+          const depth = el.delegate.depth;
+          if (depth > minDepth) this._selectionArea.deselect(el);
+        });
+        console.log(this._selectionArea.getSelection())
         this._builder.selectedConditionViews(e.store.selected.map(el => el.delegate));
       });
   }
