@@ -34,7 +34,7 @@ export default class AdvancedSearchSelection {
         if (!event.ctrlKey && !event.metaKey) {
           // Unselect all elements
           for (const el of store.stored) {
-              el.classList.remove('-selected');
+              el.delegate.deselect();
           }
           // Clear previous selection
           this._selectionArea.clearSelection();
@@ -43,19 +43,19 @@ export default class AdvancedSearchSelection {
       .on('move', ({store: {changed: {added, removed}}}) => {
         // Add a custom class to the elements that where selected.
         for (const el of added) {
-          el.classList.add('-selected');
+          el.delegate.select();
         }
         // Remove the class from elements that where removed
         // since the last selection
         for (const el of removed) {
-          el.classList.remove('-selected');
+          el.delegate.deselect();
         }
       })
       .on('stop', (e) => {
         console.log(e)
         document.body.dataset.dragging = false;
         this._selectionArea.keepSelection();
-        this._builder.selectConditionViews(e.store.selected.map(el => el.delegate));
+        this._builder.selectedConditionViews(e.store.selected.map(el => el.delegate));
       });
   }
 
@@ -73,6 +73,36 @@ export default class AdvancedSearchSelection {
     }
     this._selectionArea.clearSelection();
   }
+
+  /**
+   * @param {Array} conditionViews
+   * @param {Boolean} deselectSelecting
+   */
+  selectConditionViews(conditionViews, deselectSelecting = true) {
+    console.log(conditionViews, deselectSelecting)
+    if (deselectSelecting) {
+      for (const el of this._selectionArea.getSelection()) {
+        console.log(el);
+        el.delegate.deselect();
+      }
+      this._selectionArea.clearSelection();
+    }
+    // this._selectionArea
+    for (const conditionView of conditionViews) {
+      conditionView.select();
+      this._selectionArea.select(conditionView.elm);
+    }
+    this._selectionArea.keepSelection();
+    console.log(this._selectionArea.getSelection())
+  }
+
+  deselectConditionViews(conditionViews) {
+    console.log(conditionViews)
+    for (const conditionView of conditionViews) {
+      this._selectionArea.deselect(conditionView.elm);
+    }
+    console.log(this._selectionArea.getSelection())
+  }  
 
 
   // private methods

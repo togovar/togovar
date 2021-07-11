@@ -7,7 +7,7 @@ export default class ConditionGroupView extends ConditionView {
   constructor(builder, parentView, logicalOperator = 'and', conditionViews = [], isRoot = false) {
     console.log( parentView, logicalOperator, conditionViews, isRoot )
 
-    super(builder, parentView);
+    super('group', builder, parentView);
 
     // make HTML
     this._elm.classList.add('advanced-search-condition-group-view');

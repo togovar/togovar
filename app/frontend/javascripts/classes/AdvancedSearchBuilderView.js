@@ -30,13 +30,17 @@ export default class AdvancedSearchBuilderView {
 
   // public methods
 
-  selectConditionViews(conditionViews) {
+  /**
+   * 
+   * @param {Array} conditionViews
+   */
+  selectedConditionViews(conditionViews) {
     console.log(conditionViews)
     // change status
     this._elm.dataset.selectedMultipleConditions = conditionViews.length > 1;
   }
 
-  deselectConditions(conditions) {
+  deselectedConditions(conditions) {
     console.log(conditions)
   }
 
@@ -88,21 +92,20 @@ export default class AdvancedSearchBuilderView {
   addCondition(conditionType) {
 
     // get selecting condition
-    const selectingConditions = this._selection.getSelectingConditionViews();
-    const selectingCondition = selectingConditions.length > 0 ? selectingConditions[0] : this._rootGroup;
-    console.log(selectingCondition)
+    const selectingConditionViews = this._selection.getSelectingConditionViews();
+    const selectingConditionView = selectingConditionViews.length > 0 ? selectingConditionViews[0] : this._rootGroup;
     
     // release exist conditions
     this._selection.deselectAllConditions();
 
     // add
     let newConditionView;
-    switch(selectingCondition.type) {
+    switch(selectingConditionView.type) {
       case conditionItemType.condition:
         console.log('TODO: ')
         break;
       case conditionItemType.group:
-        newConditionView = selectingCondition.addCondition(conditionType);
+        newConditionView = selectingConditionView.addCondition(conditionType);
         break;
     }
   }
@@ -115,6 +118,10 @@ export default class AdvancedSearchBuilderView {
 
   get container() {
     return this._container;
+  }
+
+  get selection() {
+    return this._selection;
   }
 
 }

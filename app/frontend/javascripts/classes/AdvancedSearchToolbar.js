@@ -68,7 +68,8 @@ export default class AdvancedSearchToolbar {
 
     // events
     toolbar.querySelectorAll('.command').forEach(command => {
-      command.addEventListener('click', () => {
+      command.addEventListener('click', e => {
+        e.stopImmediatePropagation();
         switch (command.dataset.command) {
           case 'add-condition': this._delegate.addCondition(command.dataset.condition); break;
           case 'group': this._delegate.group(); break;
