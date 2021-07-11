@@ -81,4 +81,23 @@ export default class ConditionItemView {
     return this._parentView;
   }
 
+  /**
+   * @param {parentView} conditionGroupView
+   */
+  set parentView(parentView) {
+    this._parentView = parentView;
+  }
+
+  get depth() {
+    let parentView = this.parentView;
+    console.log('****', this.elm, parentView)
+    let depth = 0;
+    while (parentView) {
+      parentView = parentView.parentView;
+      if (parentView) depth++;
+      console.log(parentView?.elm, depth)
+    }
+    return depth;
+  }
+
 }

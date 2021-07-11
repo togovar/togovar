@@ -150,7 +150,6 @@ $CORNER_RADIUS: $HEIGHT / 2
             top: 2px
             left: 6.5px
   &.-selected
-    // margin: -1px -1px -4px -1px
     &::after
       content: ""
       display: block
@@ -162,14 +161,6 @@ $CORNER_RADIUS: $HEIGHT / 2
       border: solid 2px $COLOR_SELECTED
       border-radius: $CORNER_RADIUS
       pointer-events: none
-    > .body
-      // border: solid 1px $COLOR_SELECTED
-      // margin: -1px
-      > .summary
-        // background-color: $COLOR_SELECTED_LIGHT
-        > .classification
-          // background-color: $COLOR_SELECTED
-          // color: $COLOR_BLACK
   &[data-classification="frequency"], &[data-classification="count"]
     > .body
       > .summary
