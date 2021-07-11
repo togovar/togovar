@@ -22,8 +22,8 @@ export default class ConditionValues {
     this._okButton = buttons.querySelector(':scope > .button-view:nth-child(1)');
 
     // events
-    this._okButton.addEventListener('click', () => this._clickOkButton());
-    buttons.querySelector(':scope > .button-view:nth-child(2)').addEventListener('click', () => this._clickCancelButton());
+    this._okButton.addEventListener('click', this._clickOkButton.bind(this));
+    buttons.querySelector(':scope > .button-view:nth-child(2)').addEventListener('click', this._clickCancelButton.bind(this));
 
     // initialization by types
     switch (conditionView.type) {
@@ -48,12 +48,14 @@ export default class ConditionValues {
 
   // private methods
 
-  _clickOkButton() {
+  _clickOkButton(e) {
+    e.stopImmediatePropagation();
     // 
     this._conditionView.doneEditing();
   }
 
-  _clickCancelButton() {
+  _clickCancelButton(e) {
+    e.stopImmediatePropagation();
     if (this._conditionView.isFirstTime) {
       // delete for the first time 
       this._conditionView.remove();

@@ -13,7 +13,7 @@ export default class ConditionItemView extends ConditionView {
   constructor(builder, parentView, conditionType) {
     console.log(builder, parentView, conditionType);
 
-    super(builder, parentView);
+    super('item', builder, parentView);
 
     this._conditionType = conditionType;
     this._isFirstTime = true;
@@ -42,19 +42,28 @@ export default class ConditionItemView extends ConditionView {
     this._conditionValues = new ConditionValues(this);
 
     // events
-    // this._elm.addEventListener('click', e => e.stopImmediatePropagation());
-    // this._elm.addEventListener('mouseup', e => e.stopImmediatePropagation());
+    // select/deselect
+    summary.addEventListener('click', e => {
+      e.stopImmediatePropagation();
+      if (e.shiftKey) {
+        if (this.isSelecting) {
+          builder.selection.deselectConditionViews([this]);
+        } else {
+          builder.selection.selectConditionViews([this], false);
+        }
+      } else {
+        builder.selection.selectConditionViews([this], true);
+      }
+    });
     // switch logical operation
     summary.querySelector(':scope > .relation').addEventListener('click', e => {
       e.stopImmediatePropagation();
-      // e.preventDefault();
       this._elm.dataset.relation = {eq: 'ne', ne: 'eq'}[this._elm.dataset.relation];
     });
     // switch edit mode
     const editButton = summary.querySelector(':scope > .editbutton');
     editButton.addEventListener('click', e => {
       e.stopImmediatePropagation();
-      // e.preventDefault();
       this._elm.classList.add('-editing');
       this._conditionValues.start();
     });
