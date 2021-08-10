@@ -138,8 +138,8 @@ gene:
           - id: replication_sample_size
             label: Replication sample description
 
-    - id: gene-jbrowse
-      dom: "#gene-jbrowse"
+    - id: gene-genomic-context
+      dom: "#gene-genomic-context"
       options:
         assembly: GRCh37
         jbrowse: $TOGOVAR_STANZA_JBROWSE_URL
