@@ -30,9 +30,12 @@ export default class ConditionGroupView extends ConditionView {
     // logical operator
     this._logicalOperatorSwitch.dataset.operator = logicalOperator;
 
-    // event
+    // events
+    // select/deselect
+    this._elm.addEventListener('click', this._toggleSelecting.bind(this));
+    // switch logical operator
     this._logicalOperatorSwitch.addEventListener('click', e => {
-      e.stopPropagation();
+      e.stopImmediatePropagation();
       this._logicalOperatorSwitch.dataset.operator = {and: 'or', or: 'and'}[this._logicalOperatorSwitch.dataset.operator];
     });
   }

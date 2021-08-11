@@ -33,11 +33,7 @@ export default class AdvancedSearchSelection {
         document.body.dataset.dragging = true;
         if (!event.ctrlKey && !event.metaKey) {
           // Unselect all elements
-          for (const el of store.stored) {
-              el.delegate.deselect();
-          }
-          // Clear previous selection
-          this._selectionArea.clearSelection();
+          this.deselectAllConditions();
         }
       })
       .on('move', ({store: {changed: {added, removed}}}) => {
@@ -55,6 +51,7 @@ export default class AdvancedSearchSelection {
         console.log(e)
         document.body.dataset.dragging = false;
         this._selectionArea.keepSelection();
+        console.log(...this._selectionArea.getSelection())
         // filter only top-level items
         const minDepth = this._selectionArea.getSelection().reduce((minDepth, el) => {
           const depth = el.delegate.depth;
@@ -64,7 +61,7 @@ export default class AdvancedSearchSelection {
           const depth = el.delegate.depth;
           if (depth > minDepth) this._selectionArea.deselect(el);
         });
-        console.log(this._selectionArea.getSelection())
+        console.log(...this._selectionArea.getSelection())
         this._builder.selectedConditionViews(e.store.selected.map(el => el.delegate));
       });
   }
@@ -90,13 +87,7 @@ export default class AdvancedSearchSelection {
    */
   selectConditionViews(conditionViews, deselectSelecting = true) {
     console.log(conditionViews, deselectSelecting)
-    if (deselectSelecting) {
-      for (const el of this._selectionArea.getSelection()) {
-        console.log(el);
-        el.delegate.deselect();
-      }
-      this._selectionArea.clearSelection();
-    }
+    if (deselectSelecting) this.deselectAllConditions();
     // this._selectionArea
     for (const conditionView of conditionViews) {
       conditionView.select();

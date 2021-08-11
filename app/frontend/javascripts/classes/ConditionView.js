@@ -42,6 +42,23 @@ export default class ConditionItemView {
   }
 
 
+  // private methods
+
+  _toggleSelecting(e) {
+    console.log(e)
+    e.stopImmediatePropagation();
+    if (e.shiftKey) {
+      if (this.isSelecting) {
+        this._builder.selection.deselectConditionViews([this]);
+      } else {
+        this._builder.selection.selectConditionViews([this], false);
+      }
+    } else {
+      this._builder.selection.selectConditionViews([this], true);
+    }
+  }
+
+
   // public methods
 
   select() {
