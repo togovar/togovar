@@ -22,6 +22,11 @@ export default class AdvancedSearchBuilderView {
 
     // events
     StoreManager.bind('advancedSearchConditions', this);
+    this._elm.addEventListener('click', e => {
+      console.log(e, 'click')
+      e.stopImmediatePropagation();
+      this._selection.deselectAllConditions();
+    });
 
     // select conditions
     this._selection = new AdvancedSearchSelection(this._rootGroup.elm, this);

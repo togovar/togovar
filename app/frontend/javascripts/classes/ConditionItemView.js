@@ -42,19 +42,13 @@ export default class ConditionItemView extends ConditionView {
     this._conditionValues = new ConditionValues(this);
 
     // events
-    // select/deselect
-    summary.addEventListener('click', e => {
+    // stop propagation
+    this._elm.addEventListener('click', e => {
+      console.log('void')
       e.stopImmediatePropagation();
-      if (e.shiftKey) {
-        if (this.isSelecting) {
-          builder.selection.deselectConditionViews([this]);
-        } else {
-          builder.selection.selectConditionViews([this], false);
-        }
-      } else {
-        builder.selection.selectConditionViews([this], true);
-      }
     });
+    // select/deselect
+    summary.addEventListener('click', this._toggleSelecting.bind(this));
     // switch logical operation
     summary.querySelector(':scope > .relation').addEventListener('click', e => {
       e.stopImmediatePropagation();
