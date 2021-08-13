@@ -22,11 +22,7 @@ export default class AdvancedSearchBuilderView {
 
     // events
     StoreManager.bind('advancedSearchConditions', this);
-    this._elm.addEventListener('click', e => {
-      console.log(e, 'click')
-      e.stopImmediatePropagation();
-      this._selection.deselectAllConditions();
-    });
+    this._defineEvents();
 
     // select conditions
     this._selection = new AdvancedSearchSelection(this._rootGroup.elm, this);
@@ -119,6 +115,18 @@ export default class AdvancedSearchBuilderView {
 
   // private methods
 
+  _defineEvents() {
+    let downX, downY;
+    this._elm.addEventListener('mousedown', e => {
+      [downX, downY] = [e.x, e.y];
+    });
+    this._elm.addEventListener('click', e => {
+      if (Math.abs(downX - e.x) > 2 || Math.abs(downY - e.y) > 2) return;
+      e.stopImmediatePropagation();
+      this._selection.deselectAllConditions();
+    });
+
+  }
 
   // accessor
 

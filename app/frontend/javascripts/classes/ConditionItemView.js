@@ -11,7 +11,7 @@ export default class ConditionItemView extends ConditionView {
    * @param {String} conditionType 
    */
   constructor(builder, parentView, conditionType) {
-    console.log(builder, parentView, conditionType);
+    // console.log(builder, parentView, conditionType);
 
     super('item', builder, parentView);
 
