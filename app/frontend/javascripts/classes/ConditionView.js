@@ -8,7 +8,7 @@ export default class ConditionItemView {
    * @param {ConditionItemView | ConditionGroupView} parentView 
    */
   constructor(type, builder, parentView) {
-    console.log(type, builder, parentView)
+    // console.log(type, builder, parentView)
 
     this._builder = builder;
     this._parentView = parentView;

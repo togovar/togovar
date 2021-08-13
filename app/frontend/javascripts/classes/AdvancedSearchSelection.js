@@ -23,8 +23,10 @@ export default class AdvancedSearchSelection {
       overlap: 'invert',
       singleTap: {allow: false}
     });
+    this._selectionArea.disable();
     console.log( this._selectionArea )
 
+    /*
     this._selectionArea
       // .on('beforestart', ({store, event}) => {
       //   console.log(store)
@@ -64,6 +66,7 @@ export default class AdvancedSearchSelection {
         console.log(...this._selectionArea.getSelection())
         this._builder.selectedConditionViews(e.store.selected.map(el => el.delegate));
       });
+    */
   }
 
 
