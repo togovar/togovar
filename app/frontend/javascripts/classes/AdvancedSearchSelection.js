@@ -73,7 +73,12 @@ export default class AdvancedSearchSelection {
   // public methods
 
   getSelectingConditionViews() {
-    return this._selectionArea.getSelection().map(el => el.delegate);
+    const conditionEls = this._selectionArea.getSelection();
+    if (conditionEls.length > 0) { // sort
+      const siblingEls = Array.from(conditionEls[0].parentNode.childNodes);
+      conditionEls.sort((el1, el2) => siblingEls.indexOf(el1) - siblingEls.indexOf(el2));
+    }
+    return conditionEls.map(el => el.delegate);
   }
 
   deselectAllConditions() {
