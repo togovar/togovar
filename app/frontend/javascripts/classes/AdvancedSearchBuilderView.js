@@ -12,7 +12,7 @@ export default class AdvancedSearchBuilderView {
 
     this._elm = elm;
     this._container = elm.querySelector(':scope > .inner');
-    this._rootGroup = new ConditionGroupView(this, this, 'and', [], true);
+    this._rootGroup = new ConditionGroupView(this, this, 'and', [], null, true);
 
     // status
     this._elm.dataset.selectedMultipleConditions = false;
@@ -61,10 +61,28 @@ export default class AdvancedSearchBuilderView {
 
   group() {
     console.log('_group')
+    // 選択された要素の回想内の順番取得
     const conditionViews = this._selection.getSelectingConditionViews();
     console.log(conditionViews[0])
-    const parentView = conditionViews[0].parentView;
-    const conditionGroupView = parentView.addGroup(conditionViews);
+    const parentGroupView = conditionViews[0].parentView;
+    const siblingViews = parentGroupView.childViews;
+    console.log(siblingViews)
+    let position = 9999, referenceElm = null;
+    conditionViews.forEach(view => {
+      const index = siblingViews.indexOf(view);
+      if (index < position) {
+        position = index;
+        referenceElm = view.elm;
+      }
+    });
+    console.log(referenceElm)
+    // const positions = conditionViews.map(view => siblingViews.indexOf(view));
+    // console.log(positions)
+    // const position = Math.min(...positions);
+    // console.log(position)
+
+
+    const conditionGroupView = parentGroupView.addGroup(conditionViews, referenceElm);
     this._selection.selectConditionViews([conditionGroupView], true);
     this.changeCondition();
   }
