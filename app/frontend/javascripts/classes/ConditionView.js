@@ -6,9 +6,11 @@ export default class ConditionItemView {
    * 
    * @param {AdvancedSearchBuilderView} builder 
    * @param {ConditionItemView | ConditionGroupView} parentView 
+   * @param {Node} referenceElm
    */
-  constructor(type, builder, parentView) {
-    // console.log(type, builder, parentView)
+  constructor(type, builder, parentView, referenceElm) {
+    // console.log(type, builder, parentView, referenceElm)
+    console.log(referenceElm)
 
     this._builder = builder;
     this._parentView = parentView;
@@ -17,7 +19,7 @@ export default class ConditionItemView {
     this._elm = document.createElement('div');
     this._elm.classList.add('advanced-search-condition-view');
     this._elm.delegate = this;
-    parentView.container.append(this._elm);
+    parentView.container.insertBefore(this._elm, referenceElm);
 
     // event
     // let eventTarget;

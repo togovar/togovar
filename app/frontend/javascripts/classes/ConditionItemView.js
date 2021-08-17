@@ -8,12 +8,13 @@ export default class ConditionItemView extends ConditionView {
    * 
    * @param {AdvancedSearchBuilderView} builder 
    * @param {*} parentView
-   * @param {String} conditionType 
+   * @param {String} conditionType
+   * @param {Node} referenceElm
    */
-  constructor(builder, parentView, conditionType) {
+  constructor(builder, parentView, conditionType, referenceElm = null) {
     // console.log(builder, parentView, conditionType);
 
-    super('item', builder, parentView);
+    super('item', builder, parentView, referenceElm);
 
     this._conditionType = conditionType;
     this._isFirstTime = true;

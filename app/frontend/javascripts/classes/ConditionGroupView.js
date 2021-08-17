@@ -4,10 +4,19 @@ import {conditionItemType} from '../definition.js';
 
 export default class ConditionGroupView extends ConditionView {
 
-  constructor(builder, parentView, logicalOperator = 'and', conditionViews = [], isRoot = false) {
-    console.log( parentView, logicalOperator, conditionViews, isRoot )
+  /**
+   * 
+   * @param {AdvancedSearchBuilderView} builder 
+   * @param {*} parentView
+   * @param {String} logicalOperator
+   * @param {Array} conditionViews
+   * @param {Node} referenceElm
+   * @param {Boolean} isRoot
+   */
+  constructor(builder, parentView, logicalOperator = 'and', conditionViews = [], referenceElm = null, isRoot = false) {
+    console.log( parentView, logicalOperator, conditionViews, referenceElm, isRoot )
 
-    super('group', builder, parentView);
+    super('group', builder, parentView, referenceElm);
 
     // make HTML
     this._elm.classList.add('advanced-search-condition-group-view');
@@ -47,7 +56,7 @@ export default class ConditionGroupView extends ConditionView {
   }
 
   addCondition(conditionType) {
-    const conditionView = new ConditionItemView(this._builder, this, conditionType);
+    const conditionView = new ConditionItemView(this._builder, this, conditionType, null);
     this._elm.dataset.numberOfChild = this._numberOfChild;
     return conditionView; 
   }
@@ -55,9 +64,10 @@ export default class ConditionGroupView extends ConditionView {
   /**
    * 
    * @param {Array} conditionViews 
+   * @param {Node} referenceElm 
    */
-  addGroup(conditionViews) {
-    const conditionGroupView = new ConditionGroupView(this._builder, this, 'or', conditionViews);
+  addGroup(conditionViews, referenceElm) {
+    const conditionGroupView = new ConditionGroupView(this._builder, this, 'or', conditionViews, referenceElm);
     console.log(conditionGroupView)
     return conditionGroupView;
   }
@@ -93,6 +103,10 @@ export default class ConditionGroupView extends ConditionView {
 
   get container() {
     return this._container;
+  }
+
+  get childViews() {
+    return Array.from(this._container.childNodes).map(el => el.delegate);
   }
 
   get _numberOfChild() {
