@@ -44,7 +44,6 @@ export default class ConditionItemView extends ConditionView {
     // events
     // stop propagation
     this._elm.addEventListener('click', e => {
-      console.log('void')
       e.stopImmediatePropagation();
     });
     // select/deselect

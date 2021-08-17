@@ -97,14 +97,17 @@ export default class AdvancedSearchSelection {
       this._selectionArea.select(conditionView.elm);
     }
     this._selectionArea.keepSelection();
+    this._builder.selectedConditionViews(this._selectionArea.getSelection().map(el => el.delegate));
     console.log(this._selectionArea.getSelection())
   }
 
   deselectConditionViews(conditionViews) {
     console.log(conditionViews)
     for (const conditionView of conditionViews) {
+      conditionView.deselect();
       this._selectionArea.deselect(conditionView.elm);
     }
+    this._builder.selectedConditionViews(this._selectionArea.getSelection().map(el => el.delegate));
     console.log(this._selectionArea.getSelection())
   }  
 
