@@ -37,8 +37,14 @@ export default class AdvancedSearchBuilderView {
    */
   selectedConditionViews(conditionViews) {
     console.log(conditionViews)
+
     // change status
-    this._elm.dataset.selectedMultipleConditions = conditionViews.length > 1;
+    // can group
+    this._elm.dataset.canGroup = conditionViews.length > 1;
+    // can ungroup
+    let canUngroup = false;
+    if (conditionViews.length === 1) canUngroup = conditionViews[0].type === conditionItemType.group;
+    this._elm.dataset.canUngroup = canUngroup;
   }
 
   deselectedConditions(conditions) {
@@ -60,14 +66,11 @@ export default class AdvancedSearchBuilderView {
   }
 
   group() {
-    console.log('_group')
-    // 選択された要素の回想内の順番取得
     const conditionViews = this._selection.getSelectingConditionViews();
-    console.log(conditionViews[0])
     const parentGroupView = conditionViews[0].parentView;
+    // insert position
     const siblingViews = parentGroupView.childViews;
-    console.log(siblingViews)
-    let position = 9999, referenceElm = null;
+    let position = Infinity, referenceElm = null;
     conditionViews.forEach(view => {
       const index = siblingViews.indexOf(view);
       if (index < position) {
@@ -75,20 +78,18 @@ export default class AdvancedSearchBuilderView {
         referenceElm = view.elm;
       }
     });
-    console.log(referenceElm)
-    // const positions = conditionViews.map(view => siblingViews.indexOf(view));
-    // console.log(positions)
-    // const position = Math.min(...positions);
-    // console.log(position)
-
-
-    const conditionGroupView = parentGroupView.addGroup(conditionViews, referenceElm);
+    // add new gropu
+    const conditionGroupView = parentGroupView.addNewConditionGroup(conditionViews, referenceElm);
     this._selection.selectConditionViews([conditionGroupView], true);
     this.changeCondition();
   }
 
   ungroup() {
-    console.log('_ungroup')
+    const conditionViews = this._selection.getSelectingConditionViews();
+    // deselect selecting group
+    this._selection.deselectConditionViews(conditionViews);
+    // ungroup
+    conditionViews[0].ungroup();
   }
 
   copy() {
@@ -125,7 +126,7 @@ export default class AdvancedSearchBuilderView {
         console.log('TODO: ')
         break;
       case conditionItemType.group:
-        newConditionView = selectingConditionView.addCondition(conditionType);
+        newConditionView = selectingConditionView.addNewConditionItem(conditionType);
         break;
     }
   }

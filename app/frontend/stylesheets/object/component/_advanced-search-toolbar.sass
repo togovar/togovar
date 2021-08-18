@@ -91,7 +91,11 @@ $OPACITY_DISABLED: .5
           opacity: 1
           pointer-events: auto
         &[data-command="group"]
-          #AdvancedSearchBuilderView[data-selected-multiple-conditions="true"] &, #AdvancedSearchBuilderView[data-can-group="true"] &
+          #AdvancedSearchBuilderView[data-can-group="true"] &
+            opacity: 1
+            pointer-events: auto
+        &[data-command="ungroup"]
+          #AdvancedSearchBuilderView[data-can-ungroup="true"] &
             opacity: 1
             pointer-events: auto
       &.buttoncontainer
