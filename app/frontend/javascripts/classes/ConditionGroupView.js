@@ -16,7 +16,7 @@ export default class ConditionGroupView extends ConditionView {
   constructor(builder, parentView, logicalOperator = 'and', conditionViews = [], referenceElm = null, isRoot = false) {
     console.log( parentView, logicalOperator, conditionViews, referenceElm, isRoot )
 
-    super('group', builder, parentView, referenceElm);
+    super(conditionItemType.group, builder, parentView, referenceElm);
 
     // make HTML
     this._elm.classList.add('advanced-search-condition-group-view');
@@ -55,10 +55,14 @@ export default class ConditionGroupView extends ConditionView {
     return toolbar;
   }
 
-  addCondition(conditionType) {
-    const conditionView = new ConditionItemView(this._builder, this, conditionType, null);
+  /**
+   * 
+   * @param {String} conditionType 
+   */
+  addNewConditionItem(conditionType, referenceElm = null) {
+    const conditionView = new ConditionItemView(this._builder, this, conditionType, referenceElm);
     this._elm.dataset.numberOfChild = this._numberOfChild;
-    return conditionView; 
+    return conditionView;
   }
 
   /**
@@ -66,15 +70,41 @@ export default class ConditionGroupView extends ConditionView {
    * @param {Array} conditionViews 
    * @param {Node} referenceElm 
    */
-  addGroup(conditionViews, referenceElm) {
+  addNewConditionGroup(conditionViews, referenceElm) {
     const conditionGroupView = new ConditionGroupView(this._builder, this, 'or', conditionViews, referenceElm);
-    console.log(conditionGroupView)
     return conditionGroupView;
   }
 
-  removeCondition(conditionView) {
+  /**
+   * 
+   */
+  ungroup() {
+    const conditionViews = Array.from(this._container.querySelectorAll(':scope > .advanced-search-condition-view'));
+    this.parentView.addConditionViews(conditionViews, this.elm);
+    this.remove();
+  }
+
+  /**
+   * 
+   * @param {Array} conditionViews 
+   * @param {Node} referenceElm 
+   */
+  addConditionViews(conditionViews, referenceElm) {
+    console.log(conditionViews, referenceElm)
+    for (const view of conditionViews) {
+      this._container.insertBefore(view, referenceElm);
+    }
+  }
+
+  /**
+   * 
+   * @param {ConditionItemView | ConditionGroupView} conditionView 
+   */
+  removeConditionView(conditionView) {
+    console.log(conditionView)
     this._container.removeChild(conditionView.elm);
     this._elm.dataset.numberOfChild = this._numberOfChild;
+    // TODO: もし属する条件が2未満になれば、グループ解除し削除
   }
 
   // select() {
@@ -95,10 +125,6 @@ export default class ConditionGroupView extends ConditionView {
     } else {
       return {[this._logicalOperatorSwitch.dataset.operator]: children.map(el => el.delegate.query)};
     }
-  }
-
-  get type() {
-    return conditionItemType.group;
   }
 
   get container() {

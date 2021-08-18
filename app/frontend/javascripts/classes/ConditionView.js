@@ -10,8 +10,10 @@ export default class ConditionItemView {
    */
   constructor(type, builder, parentView, referenceElm) {
     // console.log(type, builder, parentView, referenceElm)
+    // console.log(type)
     console.log(referenceElm)
 
+    this._type = type;
     this._builder = builder;
     this._parentView = parentView;
 
@@ -73,7 +75,7 @@ export default class ConditionItemView {
 
   remove() {
     console.log(this)
-    this._parent.removeCondition(this);
+    this.parentView.removeConditionView(this);
   }
 
 
@@ -84,6 +86,13 @@ export default class ConditionItemView {
    */
   get elm() {
     return this._elm;
+  }
+
+  /**
+   * @return {Number}
+   */
+  get type() {
+    return this._type;
   }
 
   /**
