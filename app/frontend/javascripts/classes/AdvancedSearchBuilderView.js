@@ -14,9 +14,6 @@ export default class AdvancedSearchBuilderView {
     this._container = elm.querySelector(':scope > .inner');
     this._rootGroup = new ConditionGroupView(this, this, 'and', [], null, true);
 
-    // status
-    this._elm.dataset.selectedMultipleConditions = false;
-
     // toolbar
     this._toolbar = new AdvancedSearchToolbar(this, this._rootGroup.maketToolbar());
 

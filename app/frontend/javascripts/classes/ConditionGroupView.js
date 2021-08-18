@@ -41,7 +41,7 @@ export default class ConditionGroupView extends ConditionView {
 
     // events
     // select/deselect
-    this._elm.addEventListener('click', this._toggleSelecting.bind(this));
+    if (!isRoot) this._elm.addEventListener('click', this._toggleSelecting.bind(this));
     // switch logical operator
     this._logicalOperatorSwitch.addEventListener('click', e => {
       e.stopImmediatePropagation();
