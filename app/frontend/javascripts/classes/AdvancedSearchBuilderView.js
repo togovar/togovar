@@ -36,6 +36,8 @@ export default class AdvancedSearchBuilderView {
     console.log(conditionViews)
 
     // change status
+    // can delete
+    this._elm.dataset.canDelete = conditionViews.length > 0;
     // can group
     this._elm.dataset.canGroup = conditionViews.length > 1;
     // can ungroup
@@ -44,17 +46,17 @@ export default class AdvancedSearchBuilderView {
     this._elm.dataset.canUngroup = canUngroup;
   }
 
-  deselectedConditions(conditions) {
-    console.log(conditions)
-  }
+  // deselectedConditions(conditions) {
+  //   console.log(conditions)
+  // }
 
-  addConditions(conditions) {
+  // addConditions(conditions) {
 
-  }
+  // }
 
-  removeConditions(conditions) {
+  // removeConditions(conditions) {
 
-  }
+  // }
 
   changeCondition() {
     const query = this._rootGroup.query;

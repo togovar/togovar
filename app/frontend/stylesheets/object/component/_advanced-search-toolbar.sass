@@ -98,6 +98,10 @@ $OPACITY_DISABLED: .5
           #AdvancedSearchBuilderView[data-can-ungroup="true"] &
             opacity: 1
             pointer-events: auto
+        &[data-command="delete"]
+          #AdvancedSearchBuilderView[data-can-delete="true"] &
+            opacity: 1
+            pointer-events: auto
       &.buttoncontainer
         flex-grow: 1
         text-align: right
