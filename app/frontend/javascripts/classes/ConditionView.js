@@ -49,7 +49,6 @@ export default class ConditionItemView {
   // private methods
 
   _toggleSelecting(e) {
-    console.log(e)
     e.stopImmediatePropagation();
     if (e.shiftKey) {
       if (this.isSelecting) {
@@ -76,6 +75,7 @@ export default class ConditionItemView {
   remove() {
     console.log(this)
     this.parentView.removeConditionView(this);
+    delete this;
   }
 
 

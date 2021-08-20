@@ -20,6 +20,7 @@ export default class ConditionGroupView extends ConditionView {
 
     // make HTML
     this._elm.classList.add('advanced-search-condition-group-view');
+    this._isRoot = isRoot;
     if (isRoot) this._elm.classList.add('-root');
     this._elm.dataset.numberOfChild = conditionViews.length;
     this._elm.innerHTML = 
@@ -47,7 +48,12 @@ export default class ConditionGroupView extends ConditionView {
       e.stopImmediatePropagation();
       this._logicalOperatorSwitch.dataset.operator = {and: 'or', or: 'and'}[this._logicalOperatorSwitch.dataset.operator];
     });
+    // mutation
+    this._mutationObserver = this._defineObserveConditions();
   }
+
+
+  // public methods
 
   maketToolbar() {
     const toolbar = document.createElement('nav');
@@ -61,7 +67,6 @@ export default class ConditionGroupView extends ConditionView {
    */
   addNewConditionItem(conditionType, referenceElm = null) {
     const conditionView = new ConditionItemView(this._builder, this, conditionType, referenceElm);
-    this._elm.dataset.numberOfChild = this._numberOfChild;
     return conditionView;
   }
 
@@ -101,10 +106,13 @@ export default class ConditionGroupView extends ConditionView {
    * @param {ConditionItemView | ConditionGroupView} conditionView 
    */
   removeConditionView(conditionView) {
-    console.log(conditionView)
+    console.log(this, conditionView)
     this._container.removeChild(conditionView.elm);
-    this._elm.dataset.numberOfChild = this._numberOfChild;
-    // TODO: もし属する条件が2未満になれば、グループ解除し削除
+  }
+
+  remove() {
+    this._mutationObserver.disconnect();
+    super.remove();
   }
 
   // select() {
@@ -114,6 +122,35 @@ export default class ConditionGroupView extends ConditionView {
   // deselect() {
 
   // }
+
+
+  // private methods
+
+  _defineObserveConditions() {
+    const config = {attributes: false, childList: true, subtree: false};
+    const callback = function (mutationsList, observer) {
+      console.log(mutationsList, observer)
+      for(const mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+          const numberOfChild = this._numberOfChild;
+          console.log(this._container)
+          console.log(this._container.querySelectorAll(':scope > .advanced-search-condition-view'))
+          console.log(numberOfChild)
+          this._elm.dataset.numberOfChild = numberOfChild;
+          // TODO: もし属する条件が2未満になれば、グループ解除し削除
+          // mutation.addNodes
+          // mutation.removeNodes
+          if (!this._isRoot && numberOfChild <= 1) {
+            console.log('グループ解除');
+            this.ungroup();
+          }
+        }
+      }
+    }
+    const observer = new MutationObserver(callback.bind(this));
+    observer.observe(this._container, config);
+    return observer;
+  }
 
 
   // accessor
