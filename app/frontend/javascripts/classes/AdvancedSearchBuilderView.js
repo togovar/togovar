@@ -89,18 +89,26 @@ export default class AdvancedSearchBuilderView {
     this._selection.deselectConditionViews(conditionViews);
     // ungroup
     conditionViews[0].ungroup();
+    this.changeCondition();
   }
 
   copy() {
     console.log('_copy')
+    this.changeCondition();
   }
 
   edit() {
     console.log('_edit')
+    this.changeCondition();
   }
 
   delete() {
     console.log('_delete')
+    const conditionViews = this._selection.getSelectingConditionViews();
+    for (const view of conditionViews) {
+      view.remove();
+    }
+    this.changeCondition();
   }
 
   search() {
