@@ -15,7 +15,7 @@ export default class ConditionItemView {
 
     this._type = type;
     this._builder = builder;
-    this._parentView = parentView;
+    // this._parentView = parentView;
 
     // make HTML
     this._elm = document.createElement('div');
@@ -106,7 +106,7 @@ export default class ConditionItemView {
    * @return {ConditionItemView | ConditionGroupView}
    */
   get parentView() {
-    return this._parentView;
+    return this.elm.parentNode.closest('.advanced-search-condition-view').delegate;
   }
 
   /**

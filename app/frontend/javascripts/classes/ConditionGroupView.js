@@ -106,7 +106,6 @@ export default class ConditionGroupView extends ConditionView {
    * @param {ConditionItemView | ConditionGroupView} conditionView 
    */
   removeConditionView(conditionView) {
-    console.log(this, conditionView)
     this._container.removeChild(conditionView.elm);
   }
 

@@ -83,7 +83,6 @@ export default class AdvancedSearchSelection {
 
   deselectAllConditions() {
     for (const el of this._selectionArea.getSelection()) {
-      console.log(el)
       el.delegate.deselect();
     }
     this._selectionArea.clearSelection();
