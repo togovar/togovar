@@ -26,11 +26,17 @@ export default class ConditionValues {
     buttons.querySelector(':scope > .button-view:nth-child(2)').addEventListener('click', this._clickCancelButton.bind(this));
 
     // initialization by types
+    console.log('conditionType:', conditionView.conditionType)
     switch (conditionView.conditionType) {
       case 'type':
       case 'significance':
         this._makeCheckboxesEditor();
         this._evaluate = this._evaluateCheckboxesEditor;
+      break;
+      case 'consequence':
+      console.log( ADVANCED_CONDITIONS[conditionView.conditionType] )
+      console.log('consequence')
+
       break;
     }
 
