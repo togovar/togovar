@@ -9,8 +9,6 @@ export default class AdvancedSearchSelection {
    * @param {AdvancedSearchBuilderView} builder 
    */
   constructor(area, builder) {
-    console.log( area )
-    console.log( SelectionArea )
     this._builder = builder;
     this._selectionArea = new SelectionArea({
       class: 'selection-area',
@@ -24,7 +22,6 @@ export default class AdvancedSearchSelection {
       singleTap: {allow: false}
     });
     this._selectionArea.disable();
-    console.log( this._selectionArea )
 
     /*
     this._selectionArea

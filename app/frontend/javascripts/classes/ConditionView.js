@@ -10,8 +10,6 @@ export default class ConditionItemView {
    */
   constructor(type, builder, parentView, referenceElm) {
     // console.log(type, builder, parentView, referenceElm)
-    // console.log(type)
-    console.log(referenceElm)
 
     this._type = type;
     this._builder = builder;

@@ -14,7 +14,7 @@ export default class ConditionGroupView extends ConditionView {
    * @param {Boolean} isRoot
    */
   constructor(builder, parentView, logicalOperator = 'and', conditionViews = [], referenceElm = null, isRoot = false) {
-    console.log( parentView, logicalOperator, conditionViews, referenceElm, isRoot )
+    // console.log( parentView, logicalOperator, conditionViews, referenceElm, isRoot )
 
     super(conditionItemType.group, builder, parentView, referenceElm);
 
@@ -132,17 +132,9 @@ export default class ConditionGroupView extends ConditionView {
       for(const mutation of mutationsList) {
         if (mutation.type === 'childList') {
           const numberOfChild = this._numberOfChild;
-          console.log(this._container)
-          console.log(this._container.querySelectorAll(':scope > .advanced-search-condition-view'))
-          console.log(numberOfChild)
           this._elm.dataset.numberOfChild = numberOfChild;
-          // TODO: もし属する条件が2未満になれば、グループ解除し削除
-          // mutation.addNodes
-          // mutation.removeNodes
-          if (!this._isRoot && numberOfChild <= 1) {
-            console.log('グループ解除');
-            this.ungroup();
-          }
+          // if the number of child is less than 2, ungroup
+          if (!this._isRoot && numberOfChild <= 1)  this.ungroup();
         }
       }
     }
