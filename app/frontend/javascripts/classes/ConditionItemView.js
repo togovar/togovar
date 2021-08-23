@@ -60,7 +60,7 @@ export default class ConditionItemView extends ConditionView {
     editButton.addEventListener('click', e => {
       e.stopImmediatePropagation();
       this._elm.classList.add('-editing');
-      this._conditionValues.start();
+      this._conditionValues.startToEditCondition();
     });
     editButton.dispatchEvent(new Event('click'));
   }
