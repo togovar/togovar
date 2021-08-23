@@ -6,8 +6,8 @@ export default class ConditionValueEditorCheckboxes {
 
     // HTML
     const master = ADVANCED_CONDITIONS[conditionType];
-    console.log(values.sections)
     const section = document.createElement('section');
+    section.classList.add('checkboxes-editor-view');
     section.innerHTML = `
       <header>Select them</header>
       <ul class="checkboxes">${master.values.map(value => `
