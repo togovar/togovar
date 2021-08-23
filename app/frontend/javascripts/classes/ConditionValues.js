@@ -1,4 +1,5 @@
 import ConditionValueEditorCheckboxes from './ConditionValueEditorCheckboxes.js';
+import ConditionValueEditorColumns from './ConditionValueEditorColumns.js';
 import {ADVANCED_CONDITIONS} from '../global.js';
 import {conditionItemType} from '../definition.js';
 
@@ -35,8 +36,7 @@ export default class ConditionValues {
         this._editors.push(new ConditionValueEditorCheckboxes(this, this._conditionView.conditionType));
       break;
       case 'consequence':
-        console.log( ADVANCED_CONDITIONS[conditionView.conditionType] )
-        console.log('consequence')
+        this._editors.push(new ConditionValueEditorColumns(this, this._conditionView.conditionType));
       break;
     }
 
