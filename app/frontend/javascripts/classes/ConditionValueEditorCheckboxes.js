@@ -2,7 +2,7 @@ import {ADVANCED_CONDITIONS} from '../global.js';
 
 export default class ConditionValueEditorCheckboxes {
 
-  constructor(values, conditionType) {
+  constructor(valuesView, conditionType) {
 
     // HTML
     const master = ADVANCED_CONDITIONS[conditionType];
@@ -21,16 +21,16 @@ export default class ConditionValueEditorCheckboxes {
           </label>
         </li>`).join('')}
       </ul>`;
-    values.sections.append(section);
+    valuesView.sections.append(section);
 
     // references
-    this._values = values;
+    this._valuesView = valuesView;
     this._checkboxes = Array.from(section.querySelectorAll(':scope > ul > li > label > input'));
 
     // attach events
     this._checkboxes.forEach(checkbox => {
       checkbox.addEventListener('change', () => {
-        this._updateCheckboxesEditor();
+        this._update();
       });
     });
 
@@ -40,7 +40,7 @@ export default class ConditionValueEditorCheckboxes {
   // public methods
 
   keepLastValues() {
-    this._lastValues = Array.from(this._values.conditionView.valuesElement.querySelectorAll(':scope > .value')).map(value => value.dataset.value);
+    this._lastValues = Array.from(this._valuesView.conditionView.valuesElement.querySelectorAll(':scope > .value')).map(value => value.dataset.value);
     console.log( this._lastValues )
   }
 
@@ -49,16 +49,16 @@ export default class ConditionValueEditorCheckboxes {
       const value = this._lastValues.find(value => value === checkbox.value);
       checkbox.checked = value !== undefined;
     });
-    this._updateCheckboxesEditor();
+    this._update();
   }
 
 
   // private methods
 
-  _updateCheckboxesEditor() {
+  _update() {
 
     // operation
-    const valuesElement = this._values.conditionView.valuesElement;
+    const valuesElement = this._valuesView.conditionView.valuesElement;
     const valueViews = Array.from(valuesElement.querySelectorAll(':scope > .value'));
     this._checkboxes.forEach(checkbox => {
       const elm = valueViews.find(elm => elm.dataset.value === checkbox.value);
@@ -76,7 +76,7 @@ export default class ConditionValueEditorCheckboxes {
     });
 
     // validation
-    this._values.update(this._validate());
+    this._valuesView.update(this._validate());
   }
 
   _validate() {
