@@ -1,6 +1,7 @@
 .columns-editor-view
   > .body
     display: flex
+    overflow: auto
     > .columns
       display: flex
       > ul
@@ -9,7 +10,7 @@
         border-right: solid 1px $COLOR_SEPARATOR
         > li
           padding-left: 12px
-          padding-right: 20px
+          padding-right: 18px
           position: relative
           list-style: none
           font-size: 14px
@@ -27,7 +28,10 @@
             border-color: transparent transparent transparent $COLOR_BLACK
             opacity: .2
             transition: opacity $GUI_DURATION
-          &:hover, &.-selected
+            cursor: pointer
+            &:hover
+              opacity: 1
+          &.-selected
             > .arrow
               opacity: 1
           > label
@@ -40,17 +44,5 @@
       padding: 4px 12px
       font-size: 12px
       line-height: 1.5
-
-
-
-    > li
-      display: inline-block
-      line-height: 18px
-      margin-right: 12px
-      &:last-child
-        margin-right: 0
-      > label
-        margin-bottom: 0
-        font-weight: bold
-        > .clinical-significance
-          display: inline-block
+      min-width: 200px
+      flex-basis: 200px
