@@ -90,18 +90,12 @@ export default class ConditionValueEditorColumns {
         // add/remove condition
         for (const item of ul.querySelectorAll(':scope > li > label > input')) {
           item.addEventListener('change', e => {
-
             // change status
             const li = e.target.closest('li');
             const value = this._data.find(datum => datum.id == li.dataset.id);
-            console.log(li, value)
             value.checked = e.target.checked;
-            
             // if it has children, aggregate child items
             if (li.dataset.children) this._updateChildren(li.dataset.id, e.target.checked);
-            // if (li.dataset.parent) this._updateParent(li.dataset.id, e.target.checked);
-            // if (li.dataset.children) this._updateChildren(li);
-            // if (li.dataset.parent) this._updateParent(li);
             this._update(li.dataset.id);
           });
         }
@@ -111,7 +105,10 @@ export default class ConditionValueEditorColumns {
             const item = e.target.closest('li');
             // release selecting item, and remove subdirectory
             item.parentNode.querySelector(':scope > .-selected')?.classList.remove('-selected');
-            item.parentNode.nextElementSibling?.parentNode.removeChild(item.parentNode.nextElementSibling);
+            const depth = parseInt(item.parentNode.dataset.depth);
+            for (const ul of item.closest('.columns').querySelectorAll(':scope > ul')) {
+              if (parseInt(ul.dataset.depth) > depth) ul.parentNode.removeChild(ul); 
+            }
             // select, and drill down
             item.classList.add('-selected');
             this._drawColumn(parseInt(e.target.dataset.id));
@@ -132,7 +129,6 @@ export default class ConditionValueEditorColumns {
   }
 
   _updateChildren(id, checked) {
-
     // reflect
     if (!this._selectionDependedOnParent) return;
     const children = this._data.filter(datum => datum.parent == id);
@@ -140,17 +136,6 @@ export default class ConditionValueEditorColumns {
       child.checked = checked;
       this._updateChildren(child.id, checked);
     });
-
-    // if (!this._selectionDependedOnParent) return;
-    // const checked = parentItem.querySelector(':scope > label > input').checked;
-    // const ul = parentItem.parentNode;
-    // const childUl = ul.nextElementSibling;
-    // if (childUl) {
-    //   for (const childItem of childUl.querySelectorAll(':scope > li')) {
-    //     childItem.querySelector(':scope > label > input').checked = checked;
-    //     if (childItem.dataset.children) this._updateChildren(childItem);
-    //   }
-    // }
   }
 
   _updateParent(id) {
@@ -167,7 +152,6 @@ export default class ConditionValueEditorColumns {
           return false;
         }
       });
-      console.log(siblingValues)
       const parentValue = this._data.find(datum => datum.id == value.parent);
       const parentCheckbox = this._columns.querySelector(`li[data-id="${value.parent}"] > label > input`);
       switch (true) {
@@ -260,7 +244,7 @@ export default class ConditionValueEditorColumns {
   }
 
   _validate() {
-    return this._checkboxes.some(checkbox => checkbox.checked);
+    // return this._checkboxes.some(checkbox => checkbox.checked);
   }
 
 }
