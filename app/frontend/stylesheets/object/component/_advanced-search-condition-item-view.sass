@@ -19,20 +19,22 @@ $CORNER_RADIUS: $HEIGHT / 2
       background-color: #F0F0EF
       font-size: 12px
       display: flex
-      align-items: center
-      height: $HEIGHT
+      align-items: stretch
+      min-height: $HEIGHT
       > .classification
         background-color: $COLOR_BLACK
         color: white
         line-height: $HEIGHT
         padding: 0 0 0 $CORNER_RADIUS
         width: 160px
+        min-width: 160px
         cursor: grab
         font-weight: bold
       > .values
         flex-grow: 1
         padding: $PADDING_VALUES $CORNER_RADIUS $PADDING_VALUES 6px
         display: flex
+        flex-wrap: wrap
         align-items: center
         > .value
           height: 18px
@@ -42,8 +44,7 @@ $CORNER_RADIUS: $HEIGHT / 2
           border: solid 1px $COLOR_KEY_DARK2
           border-radius: $HEIGHT_VALUE * .5
           font-weight: bold
-          + .value
-            margin-left: 3px
+          margin-right: 2px
         > .numeralvalue
           margin-left: 8px
           width: 120px
@@ -74,6 +75,8 @@ $CORNER_RADIUS: $HEIGHT / 2
         color: white
         background-color: $COLOR_KEY_DARK1
         font-size: 10px
+        position: relative
+        top: 5px
         height: 14px
         line-height: 14px
         padding: 0 7px
@@ -119,6 +122,7 @@ $CORNER_RADIUS: $HEIGHT / 2
           margin: #{($HEIGHT - $HEIGHT_RELATION) / 2} #{-$HEIGHT_RELATION / 2}
           background-color: $COLOR_KEY_DARK1
           width: $HEIGHT_RELATION
+          min-width: $HEIGHT_RELATION
           height: $HEIGHT_RELATION
           border-radius: 3px
           position: relative

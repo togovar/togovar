@@ -66,6 +66,7 @@ export default class ConditionValues {
   // private methods
 
   _clickOkButton(e) {
+    console.log(e)
     e.stopImmediatePropagation();
     // 
     this._conditionView.doneEditing();

@@ -71,6 +71,7 @@ export default class AdvancedSearchSelection {
 
   getSelectingConditionViews() {
     const conditionEls = this._selectionArea.getSelection();
+    console.log(conditionEls)
     if (conditionEls.length > 0) { // sort
       const siblingEls = Array.from(conditionEls[0].parentNode.childNodes);
       conditionEls.sort((el1, el2) => siblingEls.indexOf(el1) - siblingEls.indexOf(el2));

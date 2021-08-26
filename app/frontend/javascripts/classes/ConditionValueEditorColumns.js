@@ -38,15 +38,17 @@ export default class ConditionValueEditorColumns {
 
   keepLastValues() {
     // this._lastValues = Array.from(this._values.conditionView.valuesElement.querySelectorAll(':scope > .value')).map(value => value.dataset.value);
+    this._lastValues = this._data.filter(datum => datum.value && datum.checked).map(datum => datum.value);
     console.log( this._lastValues )
   }
 
   restore() {
-    this._checkboxes.forEach(checkbox => {
-      const value = this._lastValues.find(value => value === checkbox.value);
-      checkbox.checked = value !== undefined;
-    });
-    this._updateCheckboxesEditor();
+    // this._checkboxes.forEach(checkbox => {
+    //   const value = this._lastValues.find(value => value === checkbox.value);
+    //   checkbox.checked = value !== undefined;
+    // });
+    this._data.forEach(datum => datum.checked = this._lastValues.indexOf(datum.value) !== -1);
+    this._update();
   }
 
 
@@ -138,42 +140,45 @@ export default class ConditionValueEditorColumns {
     });
   }
 
-  _updateParent(id) {
+  _updateIndeterminate() {
 
-    // change status of parent checkbox
-    const value = this._data.find(datum => datum.id == id);
-    let numberOfChecked = 0;
-    if (value.parent !== undefined) {
-      const siblingValues = this._data.filter(datum => {
-        if (datum.parent === value.parent) {
-          numberOfChecked += datum.checked || (datum.indeterminate ?? 0);
-          return true;
+    const checkLeaves = (datum) => {
+      if (!datum.children) return;
+      let numberOfChecked = 0;
+      datum.children.forEach(child => {
+        const childDatum = this._data.find(datum => datum.id === child);
+        if (childDatum.children) {
+          numberOfChecked += checkLeaves(childDatum);
         } else {
-          return false;
+          numberOfChecked += childDatum.checked;
         }
       });
-      const parentValue = this._data.find(datum => datum.id == value.parent);
-      const parentCheckbox = this._columns.querySelector(`li[data-id="${value.parent}"] > label > input`);
+      let checked, indeterminate;
       switch (true) {
         case numberOfChecked === 0:
-          parentCheckbox.checked = false;
-          parentCheckbox.indeterminate = false;
-          parentValue.indeterminate = false;
+          checked = false;
+          indeterminate = false;
           break;
-        case numberOfChecked === siblingValues.length:
-          parentCheckbox.checked = true;
-          parentCheckbox.indeterminate = false;
-          parentValue.indeterminate = false;
+        case numberOfChecked === datum.children.length:
+          checked = true;
+          indeterminate = false;
           break;
         default:
-          parentCheckbox.checked = false;
-          parentCheckbox.indeterminate = true;
-          parentValue.indeterminate = true;
+          checked = false;
+          indeterminate = true;
+          break;
       }
-
-      // recursion
-      if (parentValue.parent) this._updateParent(parentValue.id);
+      const checkbox = this._columns.querySelector(`li[data-id="${datum.id}"] > label > input`);
+      if (checkbox) {
+        checkbox.checked = checked;
+        checkbox.indeterminate = indeterminate;
+      }
+      return checked || indeterminate;
     }
+
+    // top level
+    const topLevelNodes = this._data.filter(datum => datum.parent === undefined);
+    topLevelNodes.forEach(datum => checkLeaves(datum));
   }
 
   _update(id) {
@@ -184,67 +189,34 @@ export default class ConditionValueEditorColumns {
       if (item) item.checked = datum.checked;
     });
     // update selection status of upper hierarchy
-    this._updateParent(id);
+    this._updateIndeterminate();
 
+    // update values
+    const valuesElement = this._valuesView.conditionView.valuesElement;
+    const valueViews = Array.from(valuesElement.querySelectorAll(':scope > .value'));
+    this._data.forEach(datum => {
+      if (!datum.value) return;
+      const elm = valueViews.find(elm => elm.dataset.value === datum.value);
+      if (datum.checked) {
+        if (elm === undefined) {
+          // add value element
+          valuesElement.insertAdjacentHTML('beforeend', `<span class="value" data-value="${datum.value}">${datum.label}</span>`);
+        }
+      } else {
+        if (elm) {
+          // remove value element
+          valuesElement.removeChild(elm);
+        }
+      }
+      
+    });
 
-    // データ上の反映
-
-    // aggregate checked elements
-    // const checkedItems = [];
-    // this._columns.querySelectorAll('li').forEach(li => {
-    //   if (li.querySelector(':scope > label > input').checked) {
-    //     if (li.dataset.value) checkedItems.push({value: li.dataset.value, label: li.querySelector(':scope > label > span').textContent});
-    //     // 子を持ち、かつ子がレンダリングされていない場合
-    //     if (this._selectionDependedOnParent && li.dataset.children) {
-    //       if (!li.parentNode.nextElementSibling) {
-    //         this._aggregateChildren(checkedItems, parseInt(li.dataset.id));
-    //       }
-    //     }
-    //   }
-    // });
-    // console.log(checkedItems)
-
-
-
-
-    // operation
-    // const valuesElement = this._valuesView.conditionView.valuesElement;
-    // const valueViews = Array.from(valuesElement.querySelectorAll(':scope > .value'));
-    // this._checkboxes.forEach(checkbox => {
-    //   const elm = valueViews.find(elm => elm.dataset.value === checkbox.value);
-    //   if (checkbox.checked) {
-    //     if (elm === undefined) {
-    //       // add value element
-    //       valuesElement.insertAdjacentHTML('beforeend', `<span class="value" data-value="${checkbox.value}">${checkbox.dataset.label}</span>`);
-    //     }
-    //   } else {
-    //     if (elm) {
-    //       // remove value element
-    //       valuesElement.removeChild(elm);
-    //     }
-    //   }
-    // });
-
-    // // validation
-    // this._valuesView.update(this._validate());
-  }
-
-  _aggregateChildren(payload, parentId) {
-    console.log(parentId)
-    console.log(...payload)
-    console.log(this._data)
-    console.log(this._data.find(value => value.id === parentId))
-    const children = this._data.find(value => value.id === parentId).children;
-    console.log(children)
-    children?.forEach(id => {
-      const item = this._data.find(value => value.id === id);
-      if (item.value) payload.push({value: item.value, label: item.label});
-      item.children?.forEach(id => this._aggregateChildren(payload, id));
-    })
+    // validation
+    this._valuesView.update(this._validate());
   }
 
   _validate() {
-    // return this._checkboxes.some(checkbox => checkbox.checked);
+    return Array.from(this._columns.querySelectorAll('li[data-value] > label > input')).some(checkbox => checkbox.checked);
   }
 
 }
