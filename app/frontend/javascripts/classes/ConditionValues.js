@@ -38,6 +38,13 @@ export default class ConditionValues {
       case 'consequence':
         this._editors.push(new ConditionValueEditorColumns(this, this._conditionView.conditionType));
       break;
+      case 'gene_symbol':
+      break;
+      case 'disease':
+        this._editors.push(new ConditionValueEditorColumns(this, this._conditionView.conditionType));
+      break;
+      case 'dataset':
+      break;
     }
 
   }
