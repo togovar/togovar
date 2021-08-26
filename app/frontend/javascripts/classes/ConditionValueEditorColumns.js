@@ -23,9 +23,7 @@ export default class ConditionValueEditorColumns {
       <header>Select ${conditionType}</header>
       <div class="body">
         <div class="columns"></div>
-        <div class="description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-
-        </div>
+        <div class="description"></div>
       </div>`;
     valuesView.sections.append(section);
     this._columns = section.querySelector(':scope > .body > .columns');
@@ -37,16 +35,11 @@ export default class ConditionValueEditorColumns {
   // public methods
 
   keepLastValues() {
-    // this._lastValues = Array.from(this._values.conditionView.valuesElement.querySelectorAll(':scope > .value')).map(value => value.dataset.value);
     this._lastValues = this._data.filter(datum => datum.value && datum.checked).map(datum => datum.value);
     console.log( this._lastValues )
   }
 
   restore() {
-    // this._checkboxes.forEach(checkbox => {
-    //   const value = this._lastValues.find(value => value === checkbox.value);
-    //   checkbox.checked = value !== undefined;
-    // });
     this._data.forEach(datum => datum.checked = this._lastValues.indexOf(datum.value) !== -1);
     this._update();
   }
@@ -116,6 +109,8 @@ export default class ConditionValueEditorColumns {
             this._drawColumn(parseInt(e.target.dataset.id));
           });
         }
+
+        this._update();
       });
   }
 
