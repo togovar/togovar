@@ -57,7 +57,7 @@ export default class ConditionValueEditorCheckboxes {
 
   _update() {
 
-    // operation
+    // update values
     const valuesElement = this._valuesView.conditionView.valuesElement;
     const valueViews = Array.from(valuesElement.querySelectorAll(':scope > .value'));
     this._checkboxes.forEach(checkbox => {
