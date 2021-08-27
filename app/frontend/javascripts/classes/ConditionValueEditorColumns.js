@@ -168,7 +168,8 @@ export default class ConditionValueEditorColumns {
                 // ad ids to parent datum
                 if (parentId) {
                   const parentDatum = this._data.find(datum => datum.id == parentId);
-                  parentDatum.children.push(...(data.map(datum => datum.id)));
+                  parentDatum.children.push(...(newData.map(datum => datum.id)));
+                  console.log(parentDatum)
                 }
                 resolve(newData);
               });
@@ -192,9 +193,11 @@ export default class ConditionValueEditorColumns {
   }
 
   _updateIndeterminate() {
-    if (!this._selectionDependedOnParent) return;
+    // if (!this._selectionDependedOnParent) return;
+
     const checkLeaves = (datum) => {
-      if (!datum.children) return;
+      if (!datum.children || datum.children.length === 0) return;
+      console.log(datum)
       let numberOfChecked = 0;
       datum.children.forEach(child => {
         const childDatum = this._data.find(datum => datum.id === child);
