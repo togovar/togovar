@@ -1,6 +1,6 @@
 import ConditionView from './ConditionView.js';
 import ConditionItemView from './ConditionItemView.js';
-import {conditionItemType} from '../definition.js';
+import {CONDITION_ITEM_TYPE} from '../definition.js';
 
 export default class ConditionGroupView extends ConditionView {
 
@@ -16,7 +16,7 @@ export default class ConditionGroupView extends ConditionView {
   constructor(builder, parentView, logicalOperator = 'and', conditionViews = [], referenceElm = null, isRoot = false) {
     // console.log( parentView, logicalOperator, conditionViews, referenceElm, isRoot )
 
-    super(conditionItemType.group, builder, parentView, referenceElm);
+    super(CONDITION_ITEM_TYPE.group, builder, parentView, referenceElm);
 
     // make HTML
     this._elm.classList.add('advanced-search-condition-group-view');

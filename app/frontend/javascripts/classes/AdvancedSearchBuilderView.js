@@ -4,7 +4,7 @@ import AdvancedSearchToolbar from './AdvancedSearchToolbar.js';
 import AdvancedSearchSelection from './AdvancedSearchSelection.js';
 // import {ADVANCED_CONDITIONS} from '../global.js';
 // import {API_URL} from "../global.js";
-import {conditionItemType} from '../definition.js';
+import {CONDITION_ITEM_TYPE} from '../definition.js';
 
 export default class AdvancedSearchBuilderView {
 
@@ -42,7 +42,7 @@ export default class AdvancedSearchBuilderView {
     this._elm.dataset.canGroup = conditionViews.length > 1;
     // can ungroup
     let canUngroup = false;
-    if (conditionViews.length === 1) canUngroup = conditionViews[0].type === conditionItemType.group;
+    if (conditionViews.length === 1) canUngroup = conditionViews[0].type === CONDITION_ITEM_TYPE.group;
     this._elm.dataset.canUngroup = canUngroup;
   }
 
@@ -130,11 +130,11 @@ export default class AdvancedSearchBuilderView {
     // add
     let newConditionView;
     switch(selectingConditionView.type) {
-      case conditionItemType.condition:
+      case CONDITION_ITEM_TYPE.condition:
         console.log('TODO: ')
         // TODO: コンディションを選択していた場合に、その後ろに新規条件を追加
         break;
-      case conditionItemType.group:
+      case CONDITION_ITEM_TYPE.group:
         newConditionView = selectingConditionView.addNewConditionItem(conditionType);
         break;
     }

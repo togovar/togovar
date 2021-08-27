@@ -1,6 +1,6 @@
 // import { response } from 'express';
 import {ADVANCED_CONDITIONS} from '../global.js';
-// import {ADVANCED_CONDITIONS} from '../definition';
+import {CONDITION_TYPE} from '../definition.js';
 
 const SELECTION_DEPENDED_ON_PARENT = {
   consequence: true,
@@ -54,11 +54,10 @@ export default class ConditionValueEditorColumns {
 
   _prepareData() {
     switch (this._conditionType) {
-      case 'consequence':
+      case CONDITION_TYPE.consequence:
+      case CONDITION_TYPE.dataset:
         return ADVANCED_CONDITIONS[this._conditionType].values.map(value => Object.assign({checked: false}, value));
-      case 'disease':
-        return [];
-      case 'dataset':
+      case CONDITION_TYPE.disease:
         return [];
     }
   }
@@ -84,6 +83,7 @@ export default class ConditionValueEditorColumns {
             >
               <label>
                 <input type="checkbox">
+                ${this._conditionType === CONDITION_TYPE.dataset ? `<span class="dataset-icon" data-dataset="${item.value}"></span>` : ''}
                 <span>${item.label}</span>
               </label>
               ${item.children === undefined ? '' : `<div class="arrow" data-id="${item.id}"></div>`}
@@ -139,10 +139,11 @@ export default class ConditionValueEditorColumns {
     return new Promise((resolve, reject) => {
       // TODO: alt allele, consequence と disease で、取り方が変わる
       switch (this._conditionType) {
-        case 'consequence':
+        case CONDITION_TYPE.consequence:
+        case CONDITION_TYPE.dataset:
           resolve(this._data.filter(datum => datum.parent == parentId));
           break;
-        case 'disease': {
+        case CONDITION_TYPE.disease: {
           let filtered = this._data.filter(datum => datum.parent === parentId);
           if (filtered.length) {
             resolve(filtered);
@@ -175,8 +176,6 @@ export default class ConditionValueEditorColumns {
               });
           }
         }
-          break;
-        case 'dataset':
           break;
       }
     });

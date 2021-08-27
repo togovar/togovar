@@ -394,38 +394,45 @@
     "dataset": {
       "label": "Alternative allele frequency/count",
       "type": "peculiar",
-      "sources": [
+      "values": [
         {
+          "id": 1,
           "value": "jga_ngs",
           "label": "JGA NGS",
           "description": "Japanese Genotype-phenotype Archive"
         },
         {
+          "id": 2,
           "value": "jga_snp",
           "label": "JGA SNP",
           "description": "SNP-chip data in the NBDC Human Database/Japanese Genotype-phenotype Archive"
         },
         {
+          "id": 3,
           "value": "hgvd",
           "label": "HGVD",
           "description": "Human Genetic Variation Database"
         },
         {
+          "id": 4,
           "value": "tommo_4.7kjpn",
           "label": "ToMMo 4.7KJPN",
           "description": "ToMMo 4.7KJPN Allele Frequency Panel"
         },
         {
+          "id": 5,
           "value": "gem_j_wga",
           "label": "GEM-J WGA",
           "description": "GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel"
         },
         {
+          "id": 6,
           "value": "exac",
           "label": "ExAC",
           "description": "Exome Aggregation Consortium"
         },
         {
+          "id": 7,
           "value": "gnomad",
           "label": "gnomAD",
           "description": "The Genome Aggregation Database"

@@ -1,7 +1,7 @@
 import ConditionView from './ConditionView.js';
 import ConditionValues from './ConditionValues.js';
 import {ADVANCED_CONDITIONS} from '../global.js';
-import {conditionItemType} from '../definition.js';
+import {CONDITION_ITEM_TYPE} from '../definition.js';
 
 export default class ConditionItemView extends ConditionView {
 
@@ -15,7 +15,7 @@ export default class ConditionItemView extends ConditionView {
   constructor(builder, parentView, conditionType, referenceElm = null) {
     // console.log(builder, parentView, conditionType);
 
-    super(conditionItemType.condition, builder, parentView, referenceElm);
+    super(CONDITION_ITEM_TYPE.condition, builder, parentView, referenceElm);
 
     this._conditionType = conditionType;
     this._isFirstTime = true;
