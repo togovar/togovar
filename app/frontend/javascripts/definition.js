@@ -1,5 +1,5 @@
 
-export const conditionType = {
+export const CONDITION_TYPE = {
   term: 'term',
   dataset: 'dataset',
   frequency: 'frequency',
@@ -11,10 +11,10 @@ export const conditionType = {
   sift: 'sift',
   polyphen: 'polyphen',
   adv_frequency: 'adv_frequency',
-  adv_frequency: 'adv_frequency',
+  disease: 'disease',
 }
 
-export const conditionItemType = {
+export const CONDITION_ITEM_TYPE = {
   condition: 0,
   group: 1,
 }

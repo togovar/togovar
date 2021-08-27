@@ -1,7 +1,7 @@
 import ConditionValueEditorCheckboxes from './ConditionValueEditorCheckboxes.js';
 import ConditionValueEditorColumns from './ConditionValueEditorColumns.js';
-import {ADVANCED_CONDITIONS} from '../global.js';
-import {conditionItemType} from '../definition.js';
+// import {ADVANCED_CONDITIONS} from '../global.js';
+import {CONDITION_TYPE} from '../definition.js';
 
 export default class ConditionValues {
 
@@ -31,19 +31,18 @@ export default class ConditionValues {
     // TODO: conditionType は ADVANCED_CONDITIONS[conditionView.conditionType].type を参照して処理をスイッチさせたい
     console.log('conditionType:', conditionView.conditionType)
     switch (conditionView.conditionType) {
-      case 'type':
-      case 'significance':
+      case CONDITION_TYPE.type:
+      case CONDITION_TYPE.significance:
         this._editors.push(new ConditionValueEditorCheckboxes(this, this._conditionView.conditionType));
       break;
-      case 'consequence':
+      case CONDITION_TYPE.consequence:
+      case CONDITION_TYPE.dataset:
         this._editors.push(new ConditionValueEditorColumns(this, this._conditionView.conditionType));
       break;
-      case 'gene_symbol':
+      case CONDITION_TYPE.gene_symbol:
       break;
-      case 'disease':
+      case CONDITION_TYPE.disease:
         this._editors.push(new ConditionValueEditorColumns(this, this._conditionView.conditionType));
-      break;
-      case 'dataset':
       break;
     }
 
@@ -96,9 +95,9 @@ export default class ConditionValues {
 
   // accessor
 
-  get type() {
-    return conditionItemType.condition;
-  }
+  // get type() {
+  //   return CONDITION_ITEM_TYPE.condition;
+  // }
 
   get conditionView() {
     return this._conditionView;
