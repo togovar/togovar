@@ -23,7 +23,7 @@ variant:
       dom: "#variant-frequency"
 
     - id: variant-clinvar
-      dom: "#variant-clinvar"
+      dom: "#variant-clinvar"      
 
     - id: pagination-table
       dom: "#variant-gwas"
@@ -98,7 +98,7 @@ gene:
     - id: gene-base
       dom: "#gene-base"
 
-    - id: gene-clinvar
+    - id: pagination-table
       dom: "#gene-clinvar"
 
     - id: pagination-table
@@ -152,18 +152,49 @@ gene:
       dom: "#gene-publication"
 
 disease:
-  id:
+  id: medgen_cid
 
   base_options:
     ep: $TOGOVAR_STANZA_SPARQL_URL
     sparqlist: $TOGOVAR_STANZA_SPARQLIST_URL
 
   stanza:
-    - id: disease_base
-      dom: "#disease_base"
+    - id: disease-header
+      dom: "#disease-header"
 
-    - id: disease_variant
-      dom: "#disease_variant"
+    - id: hash-table
+      dom: "#disease-base"
+      src: https://togostanza.github.io/metastanza/hash-table.js
+      options:
+        data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/disease_base?ep=${TOGOVAR_STANZA_SPARQL_URL}&medgen_cid=${medgen_cid}
+        data-type: json
+        padding: 0
+        columns:
+          - id: label
+            label: Title
+          - id: definition
+            label: Definition
 
-    - id: disease_publication
-      dom: "#disease_publication"
+    - id: pagination-table
+      dom: "#disease-clinvar"
+      src: https://togostanza.github.io/metastanza/pagination-table.js
+      options:
+        data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/disease_clinvar?ep=${TOGOVAR_STANZA_SPARQL_URL}&medgen_cid=${medgen_cid}
+        data-type: json
+        padding: 0
+        page-size-option: 10,20,50,100
+        page-slider: false
+
+    - id: pagination-table
+      dom: "#disease-gwas"
+      src: https://togostanza.github.io/metastanza/pagination-table.js
+      options:
+        data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/disease_gwas?ep=${TOGOVAR_STANZA_SPARQL_URL}&medgen_cid=${medgen_cid}
+        data-type: json
+        padding: 0
+        page-size-option: 10,20,50,100
+        page-slider: false
+ 
+
+    - id: disease-publication
+      dom: "#disease-publication"
