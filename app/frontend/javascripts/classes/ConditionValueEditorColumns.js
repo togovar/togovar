@@ -1,16 +1,21 @@
+// import { response } from 'express';
 import {ADVANCED_CONDITIONS} from '../global.js';
+// import {ADVANCED_CONDITIONS} from '../definition';
 
 const SELECTION_DEPENDED_ON_PARENT = {
   consequence: true,
   disease: false,
 }
+const DISEASE_API = {
+  PATH: 'https://togovar-dev.biosciencedbc.jp/sparqlist/api/advanced_search_disease_selector',
+  KEY: 'mesh_in'
+};
 
 export default class ConditionValueEditorColumns {
 
   constructor(valuesView, conditionType) {
 
     this._conditionType = conditionType;
-    // this._data = ADVANCED_CONDITIONS[conditionType];
     this._data = this._prepareData();
     console.log(this._data)
     this._selectionDependedOnParent = SELECTION_DEPENDED_ON_PARENT[conditionType];
@@ -26,8 +31,9 @@ export default class ConditionValueEditorColumns {
         <div class="description"></div>
       </div>`;
     valuesView.sections.append(section);
-    this._columns = section.querySelector(':scope > .body > .columns');
-    this._description = section.querySelector(':scope > .body > .description');
+    this._body = section.querySelector(':scope > .body');
+    this._columns = this._body.querySelector(':scope > .columns');
+    this._description = this._body.querySelector(':scope > .description');
     this._drawColumn();
   }
 
@@ -36,7 +42,6 @@ export default class ConditionValueEditorColumns {
 
   keepLastValues() {
     this._lastValues = this._data.filter(datum => datum.value && datum.checked).map(datum => datum.value);
-    console.log( this._lastValues )
   }
 
   restore() {
@@ -51,27 +56,31 @@ export default class ConditionValueEditorColumns {
     switch (this._conditionType) {
       case 'consequence':
         return ADVANCED_CONDITIONS[this._conditionType].values.map(value => Object.assign({checked: false}, value));
+      case 'disease':
+        return [];
+      case 'dataset':
+        return [];
     }
   }
 
-  _drawColumn(id) {
-    this._getItems(id)
+  _drawColumn(parentId) {
+    this._getItems(parentId)
       .then(items => {
 
         console.log(items)
 
         // make HTML
-        const ul = document.createElement('ul');
-        ul.dataset.depth = this._columns.querySelectorAll(':scope > ul').length;
-        this._columns.append(ul);
-        ul.innerHTML = `
+        const column = document.createElement('div');
+        column.classList.add('column');
+        column.dataset.depth = this._columns.querySelectorAll(':scope > .column').length;
+        this._columns.append(column);
+        column.innerHTML = `
+        <ul>
           ${items.map(item => {
             return `<li
               ${item.id ? `data-id="${item.id}"` : ''}
               ${item.value ? `data-value="${item.value}"` : ''}
-              ${item.description ? `data-description="${item.description}"` : ''}
               ${item.parent ? `data-parent="${item.parent}"` : ''}
-              ${item.children ? `data-children="${item.children}"` : ''}
             >
               <label>
                 <input type="checkbox">
@@ -79,47 +88,94 @@ export default class ConditionValueEditorColumns {
               </label>
               ${item.children === undefined ? '' : `<div class="arrow" data-id="${item.id}"></div>`}
             </li>`;
-          }).join('')}`;
+          }).join('')}
+        </ul>`;
 
         // attach events
         // add/remove condition
-        for (const item of ul.querySelectorAll(':scope > li > label > input')) {
+        for (const item of column.querySelectorAll(':scope > ul > li > label > input')) {
           item.addEventListener('change', e => {
             // change status
             const li = e.target.closest('li');
-            const value = this._data.find(datum => datum.id == li.dataset.id);
-            value.checked = e.target.checked;
+            const datum = this._data.find(datum => datum.id == li.dataset.id);
+            datum.checked = e.target.checked;
             // if it has children, aggregate child items
-            if (li.dataset.children) this._updateChildren(li.dataset.id, e.target.checked);
-            this._update(li.dataset.id);
+            if (datum.children) this._updateChildren(datum.id, e.target.checked);
+            this._update(datum.id);
           });
         }
         // drill down
-        for (const item of ul.querySelectorAll(':scope > li > .arrow')) {
+        for (const item of column.querySelectorAll(':scope > ul > li > .arrow')) {
           item.addEventListener('click', e => {
             const item = e.target.closest('li');
             // release selecting item, and remove subdirectory
             item.parentNode.querySelector(':scope > .-selected')?.classList.remove('-selected');
-            const depth = parseInt(item.parentNode.dataset.depth);
-            for (const ul of item.closest('.columns').querySelectorAll(':scope > ul')) {
-              if (parseInt(ul.dataset.depth) > depth) ul.parentNode.removeChild(ul); 
+            const depth = parseInt(item.closest('.column').dataset.depth);
+            for (const column of item.closest('.columns').querySelectorAll(':scope > .column')) {
+              if (parseInt(column.dataset.depth) > depth) column.parentNode.removeChild(column); 
             }
             // select, and drill down
             item.classList.add('-selected');
-            this._drawColumn(parseInt(e.target.dataset.id));
+            this._drawColumn(e.target.dataset.id);
           });
         }
-
         this._update();
+
+        // scroll
+        const left = this._body.scrollWidth - this._body.clientWidth;
+        if (left > 0) {
+          this._body.scrollTo({
+            top: 0,
+            left: left,
+            behavior: 'smooth'
+          });
+        };
+
+
       });
   }
 
-  _getItems(id) {
+  _getItems(parentId) {
     return new Promise((resolve, reject) => {
       // TODO: alt allele, consequence と disease で、取り方が変わる
       switch (this._conditionType) {
         case 'consequence':
-          resolve(this._data.filter(value => value.parent === id));
+          resolve(this._data.filter(datum => datum.parent == parentId));
+          break;
+        case 'disease': {
+          let filtered = this._data.filter(datum => datum.parent === parentId);
+          if (filtered.length) {
+            resolve(filtered);
+          } else {
+            fetch(`${DISEASE_API.PATH}${parentId ? `?${DISEASE_API.KEY}=${parentId}` : ''}`)
+              .then(response => response.json())
+              .then(data => {
+                const newData = data.map(datum => {
+                  const label = datum.label.indexOf('|') === -1
+                    ? datum.label
+                    : datum.label.substr(0, datum.label.indexOf('|'));
+                  const newDatum = {
+                    id: datum.categoryId,
+                    label,
+                    value: label,
+                    checked: false
+                  };
+                  if (parentId) newDatum.parent = parentId;
+                  if (datum.hasChild) newDatum.children = [];
+                  return newDatum;
+                });
+                this._data.push(...newData);
+                // ad ids to parent datum
+                if (parentId) {
+                  const parentDatum = this._data.find(datum => datum.id == parentId);
+                  parentDatum.children.push(...(data.map(datum => datum.id)));
+                }
+                resolve(newData);
+              });
+          }
+        }
+          break;
+        case 'dataset':
           break;
       }
     });
@@ -136,7 +192,7 @@ export default class ConditionValueEditorColumns {
   }
 
   _updateIndeterminate() {
-
+    if (!this._selectionDependedOnParent) return;
     const checkLeaves = (datum) => {
       if (!datum.children) return;
       let numberOfChecked = 0;
