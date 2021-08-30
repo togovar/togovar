@@ -6,9 +6,9 @@
 
   .sectionscontainer
 
-    #SimpleSearchView.section
-      .search-field-ivew
-        .searchform
+    #SimpleSearchView.search-field-ivew.section
+      .fieldcontainer
+        .field
           input#search-field.searchinput(type="text" placeholder="Search for disease or gene symbol or rs...")
           button.searchbutton
         dl.searchexamples
@@ -33,7 +33,7 @@
 
     #AdvancedSearchView.section
       //- .search-field-ivew
-      //-   .searchform
+      //-   .field
       //-     input#advanced-search-field.searchinput(type="text" placeholder="Search for disease or gene symbol or rs...")
       //-     button.searchbutton
       .module-tabs-view.-depth1.collapse-view(data-collapse-id="advanced-search")
