@@ -71,7 +71,7 @@ export function initHome() {
     new CollapseView(elm);
 
     // 検索窓
-    new SearchConditionController(document.getElementById('SimpleSearchView'));
+    new SearchConditionController();
     new AdvancedSearchBuilderView(document.getElementById('AdvancedSearchBuilderView'))
     // new AdvancedSearchDatasetsView(document.getElementById('AdvancedSearchDatasetsView'))
     // change search mode

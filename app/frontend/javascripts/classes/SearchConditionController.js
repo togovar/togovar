@@ -5,15 +5,19 @@ import SearchFieldView from "./SearchFieldView.js";
 
 export default class SearchConditionController {
 
-  constructor(elm) {
-    console.log(elm)
+  constructor() {
 
-    this._searchFieldView = new SearchFieldView(elm);
+    const elm = document.getElementById('SimpleSearchView');
+    this._searchFieldView = new SearchFieldView(
+      this,
+      elm,
+      ['gene', 'disease']
+    );
 
     // reference
     // this.elm = elm;
     // this.field = elm.querySelector('#search-field');
-    // this.button = elm.querySelector('.search-field-ivew > .searchform > .searchbutton');
+    // this.button = elm.querySelector('.search-field-ivew > .field > .searchbutton');
     // this.suggestView = elm.querySelector('.suggest-view');
     // this.suggesting = false;
     // events
@@ -22,7 +26,7 @@ export default class SearchConditionController {
     // this.field.addEventListener('keyup', this.keyup.bind(this));
     // this.field.addEventListener('blur', this.blur.bind(this));
     // this.button.addEventListener('click', this.search.bind(this));
-    this.elm.querySelectorAll('.searchexamples').forEach(dl => {
+    elm.querySelectorAll('.searchexamples').forEach(dl => {
       dl.addEventListener('click', e => {
         e.stopPropagation();
         this.field.value = dl.querySelector('dd').textContent;
@@ -39,13 +43,16 @@ export default class SearchConditionController {
   // }
 
 
-  search() {
-    StoreManager.setSearchCondition('term', this.field.value);
+  search(value) {
+    console.log(value)
+    StoreManager.setSearchCondition('term', value);
   }
 
   searchConditions(searchConditions) {
     if (searchConditions.term) {
-      this.field.value = searchConditions.term;
+      console.log(searchConditions.term)
+      this._searchFieldView.setTerm(searchConditions.term);
+      // this.field.value = searchConditions.term;
     }
   }
 

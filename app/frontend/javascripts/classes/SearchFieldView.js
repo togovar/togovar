@@ -14,11 +14,14 @@ const KEY_INCREMENT = {
 
 export default class SearchFieldView {
 
-  constructor(elm) {
+  constructor(delegate, elm, suggestDictionaries) {
+
+    this._delegate = delegate;
     // reference
-    this._field = elm.querySelector('#search-field');
-    const button = elm.querySelector('.search-field-ivew > .searchform > .searchbutton');
-    this._suggestView = elm.querySelector('.suggest-view');
+    const field = elm.querySelector(':scope > .fieldcontainer > .field');
+    this._field = field.querySelector(':scope > input[type="text"]');
+    const button = field.querySelector(':scope > .searchbutton');
+    this._suggestView = elm.querySelector(':scope > .suggest-view');
     this._suggesting = false;
     // events
     // StoreManager.bind('searchConditions', this);
@@ -34,8 +37,8 @@ export default class SearchFieldView {
     //   }, true);
     // });
     // value
-    const term = StoreManager.getSearchCondition('term');
-    if (term) this._field.value = term;    
+    // const term = StoreManager.getSearchCondition('term');
+    // if (term) this._field.value = term;    
   }
 
   // private methods
@@ -137,14 +140,15 @@ export default class SearchFieldView {
   }
 
   _search() {
-    StoreManager.setSearchCondition('term', this._field.value);
+    this._delegate.search(this._field.value)
+    // StoreManager.setSearchCondition('term', this._field.value);
   }
 
-  searchConditions(searchConditions) {
-    if (searchConditions.term) {
-      this._field.value = searchConditions.term;
-    }
-  }
+  // searchConditions(searchConditions) {
+  //   if (searchConditions.term) {
+  //     this._field.value = searchConditions.term;
+  //   }
+  // }
 
   _suggest(data) {
     this._suggesting = true;
@@ -196,6 +200,13 @@ export default class SearchFieldView {
         });
       }
     });
+  }
+
+
+  // public method
+
+  setTerm(term) {
+    console.log(term);
   }
 
 }
