@@ -21,25 +21,16 @@ export default class SearchFieldView {
     // reference
     const field = elm.querySelector(':scope > .fieldcontainer > .field');
     this._field = field.querySelector(':scope > input[type="text"]');
-    const button = field.querySelector(':scope > .searchbutton');
+    this._button = field.querySelector(':scope > .searchbutton');
     this._suggestView = elm.querySelector(':scope > .suggest-view');
     this._suggesting = false;
     // events
     this._field.addEventListener('keydown', this._keydown.bind(this));
     this._field.addEventListener('keyup', this._keyup.bind(this));
     this._field.addEventListener('blur', this._blur.bind(this));
-    button.addEventListener('click', this._search.bind(this));
-    // elm.querySelectorAll('.searchexamples').forEach(dl => {
-    //   dl.addEventListener('click', e => {
-    //     e.stopPropagation();
-    //     this._field.value = dl.querySelector('dd').textContent;
-    //     button.dispatchEvent(new Event('click'));
-    //   }, true);
-    // });
-    // value
-    // const term = StoreManager.getSearchCondition('term');
-    // if (term) this._field.value = term;    
+    this._button.addEventListener('click', this._search.bind(this));
   }
+
 
   // private methods
 
@@ -136,7 +127,7 @@ export default class SearchFieldView {
   }
 
   _search() {
-    this._delegate.search(this._field.value)
+    this._delegate.search(this._field.value);
   }
 
   _suggest(data) {
@@ -194,8 +185,9 @@ export default class SearchFieldView {
 
   // public method
 
-  setTerm(term) {
-    console.log(term);
+  setTerm(term, excute = false) {
+    this._field.value = term;
+    if (excute) this._button.dispatchEvent(new Event('click'));
   }
 
 }
