@@ -17,6 +17,7 @@ export default class SearchFieldView {
   constructor(delegate, elm, suggestDictionaries) {
 
     this._delegate = delegate;
+    this._suggestLabels = Object.fromEntries(new Map(suggestDictionaries.map(dict => [dict, SUGGEST_LABELS[dict]])));
     // reference
     const field = elm.querySelector(':scope > .fieldcontainer > .field');
     this._field = field.querySelector(':scope > input[type="text"]');
@@ -162,7 +163,7 @@ export default class SearchFieldView {
     let html = '';
     for (let i = 0; i < this.suggestList.length; i++) {
       const column = this.suggestList[i];
-      html += `<div class="column"><h3 class="title">${SUGGEST_LABELS[columnTypes[i]]}</h3><ul class="list">`;
+      html += `<div class="column"><h3 class="title">${this._suggestLabels[columnTypes[i]]}</h3><ul class="list">`;
       for (const item of column) {
         html += `
         <li class="item${item === undefined ? ' -disabled' : ''}" data-value="${item ? item.term : ''}" data-alias="${item && item.alias_of ? item.alias_of : ''}">
