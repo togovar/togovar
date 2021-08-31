@@ -24,7 +24,6 @@ export default class SearchFieldView {
     this._suggestView = elm.querySelector(':scope > .suggest-view');
     this._suggesting = false;
     // events
-    // StoreManager.bind('searchConditions', this);
     this._field.addEventListener('keydown', this._keydown.bind(this));
     this._field.addEventListener('keyup', this._keyup.bind(this));
     this._field.addEventListener('blur', this._blur.bind(this));
@@ -96,10 +95,6 @@ export default class SearchFieldView {
     }, 250);
   }
 
-  // suggestPositionElement() {
-  //   return this._suggestView.querySelector(`.column:nth-child(${this.suggestPosition.x + 1}) > .list > .item:nth-child(${this.suggestPosition.y + 1})`);
-  // }
-
   _suggestPositionShift(increment) {
     if (this.suggestPosition.x === -1 && this.suggestPosition.y === -1) {
       switch(true) {
@@ -141,14 +136,7 @@ export default class SearchFieldView {
 
   _search() {
     this._delegate.search(this._field.value)
-    // StoreManager.setSearchCondition('term', this._field.value);
   }
-
-  // searchConditions(searchConditions) {
-  //   if (searchConditions.term) {
-  //     this._field.value = searchConditions.term;
-  //   }
-  // }
 
   _suggest(data) {
     this._suggesting = true;
