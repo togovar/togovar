@@ -19,8 +19,7 @@ export default class SearchConditionController {
     elm.querySelectorAll('.searchexamples').forEach(dl => {
       dl.addEventListener('click', e => {
         e.stopPropagation();
-        this.field.value = dl.querySelector('dd').textContent;
-        this.button.dispatchEvent(new Event('click'));
+        this._searchFieldView.setTerm(dl.querySelector('dd').textContent, true);
       }, true);
     });
     // value
@@ -29,13 +28,11 @@ export default class SearchConditionController {
   }
 
   search(value) {
-    console.log(value)
     StoreManager.setSearchCondition('term', value);
   }
 
   searchConditions(searchConditions) {
     if (searchConditions.term) {
-      console.log(searchConditions.term)
       this._searchFieldView.setTerm(searchConditions.term);
     }
   }
