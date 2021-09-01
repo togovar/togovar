@@ -28,6 +28,10 @@ export default class AdvancedSearchBuilderView {
 
   // public methods
 
+  advancedSearchConditions(values) {
+    console.log(values)
+  }
+
   /**
    * 
    * @param {Array} conditionViews

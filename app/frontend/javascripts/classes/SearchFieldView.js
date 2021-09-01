@@ -20,20 +20,23 @@ export default class SearchFieldView {
     this._suggestLabels = Object.fromEntries(new Map(suggestDictionaries.map(dict => [dict, SUGGEST_LABELS[dict]])));
     // make HTML
     elm.innerHTML = `
-    <div class="fieldcontainer">
-      <div class="field">
-        <input type="text" placeholder="${placeholder}">
-        <button></button>
+    <div class="search-field-view">
+      <div class="fieldcontainer">
+        <div class="field">
+          <input type="text" placeholder="${placeholder}">
+          <button></button>
+        </div>
       </div>
-    </div>
-    <div class="examples"></div>
-    <div class="suggest-view"></div>`;
+      <div class="examples"></div>
+      <div class="suggest-view"></div>
+    </div>`;
     // reference
-    const field = elm.querySelector(':scope > .fieldcontainer > .field');
+    const view = elm.querySelector(':scope > .search-field-view');
+    const field = view.querySelector(':scope > .fieldcontainer > .field');
     this._field = field.querySelector(':scope > input[type="text"]');
     this._button = field.querySelector(':scope > button');
-    this._examples = elm.querySelector(':scope > .examples');
-    this._suggestView = elm.querySelector(':scope > .suggest-view');
+    this._examples = view.querySelector(':scope > .examples');
+    this._suggestView = view.querySelector(':scope > .suggest-view');
     this._suggesting = false;
     // events
     this._field.addEventListener('keydown', this._keydown.bind(this));
