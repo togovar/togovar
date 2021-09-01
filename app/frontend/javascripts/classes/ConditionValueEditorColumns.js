@@ -15,11 +15,11 @@ export default class ConditionValueEditorColumns {
 
   constructor(valuesView, conditionType) {
 
+    this._valuesView = valuesView;
     this._conditionType = conditionType;
     this._data = this._prepareData();
     console.log(this._data)
     this._selectionDependedOnParent = SELECTION_DEPENDED_ON_PARENT[conditionType];
-    this._valuesView = valuesView;
 
     // HTML
     const section = document.createElement('section');
