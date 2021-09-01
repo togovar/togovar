@@ -6,6 +6,7 @@ export default class ConditionValueEditorTextField {
   constructor(valuesView, conditionType) {
     console.log(valuesView, conditionType)
 
+    this._valuesView = valuesView;
     this._conditionType = conditionType;
 
     // HTML
@@ -42,8 +43,8 @@ export default class ConditionValueEditorTextField {
     this._update();
   }
 
-  search(term) {
-    console.log(term)
+  search() {
+    this._update();
   }
 
 
