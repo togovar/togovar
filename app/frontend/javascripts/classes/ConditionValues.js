@@ -31,7 +31,7 @@ export default class ConditionValues {
     // initialization by types
     // TODO: conditionType は ADVANCED_CONDITIONS[conditionView.conditionType].type を参照して処理をスイッチさせたい
     console.log('conditionType:', conditionView.conditionType)
-    console.log(CONDITION_TYPE.gene_symbol)
+    console.log(CONDITION_TYPE.disease)
     switch (conditionView.conditionType) {
       case CONDITION_TYPE.type:
       case CONDITION_TYPE.significance:
@@ -45,7 +45,11 @@ export default class ConditionValues {
         this._editors.push(new ConditionValueEditorTextField(this, this._conditionView.conditionType));
       break;
       case CONDITION_TYPE.disease:
-        this._editors.push(new ConditionValueEditorColumns(this, this._conditionView.conditionType));
+        this._editors.push(
+          new ConditionValueEditorTextField(this, this._conditionView.conditionType),
+          new ConditionValueEditorColumns(this, this._conditionView.conditionType)
+        );
+        console.log(this._editors)
       break;
     }
 
