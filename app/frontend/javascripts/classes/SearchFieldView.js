@@ -14,14 +14,25 @@ const KEY_INCREMENT = {
 
 export default class SearchFieldView {
 
-  constructor(delegate, elm, suggestDictionaries) {
+  constructor(delegate, elm, placeholder, suggestDictionaries) {
 
     this._delegate = delegate;
     this._suggestLabels = Object.fromEntries(new Map(suggestDictionaries.map(dict => [dict, SUGGEST_LABELS[dict]])));
+    // make HTML
+    elm.innerHTML = `
+    <div class="fieldcontainer">
+      <div class="field">
+        <input type="text" placeholder="${placeholder}">
+        <button></button>
+      </div>
+    </div>
+    <div class="examples"></div>
+    <div class="suggest-view"></div>`;
     // reference
     const field = elm.querySelector(':scope > .fieldcontainer > .field');
     this._field = field.querySelector(':scope > input[type="text"]');
-    this._button = field.querySelector(':scope > .searchbutton');
+    this._button = field.querySelector(':scope > button');
+    this._examples = elm.querySelector(':scope > .examples');
     this._suggestView = elm.querySelector(':scope > .suggest-view');
     this._suggesting = false;
     // events
@@ -184,6 +195,11 @@ export default class SearchFieldView {
 
 
   // public method
+
+  setExamples(examples) {
+    this._examples.innerHTML = examples.map(example => `<dl><dt>${example.key}</dt><dd>${example.value}</dd></dl>`).join('');
+    return this._examples.querySelectorAll('dl');
+  }
 
   setTerm(term, excute = false) {
     this._field.value = term;
