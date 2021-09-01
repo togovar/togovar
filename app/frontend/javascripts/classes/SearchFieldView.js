@@ -92,13 +92,13 @@ export default class SearchFieldView {
   }
 
   _blur() {
-    // setTimeout(() => {
-    //   if (this._suggesting) {
-    //     this._suggesting = false;
-    //     this._suggestView.innerHTML = '';
-    //     this.lastValue = '';
-    //   }
-    // }, 250);
+    setTimeout(() => {
+      if (this._suggesting) {
+        this._suggesting = false;
+        this._suggestView.innerHTML = '';
+        this.lastValue = '';
+      }
+    }, 250);
   }
 
   _suggestPositionShift(increment) {
