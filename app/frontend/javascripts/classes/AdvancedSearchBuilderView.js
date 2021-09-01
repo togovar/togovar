@@ -112,6 +112,7 @@ export default class AdvancedSearchBuilderView {
     for (const view of conditionViews) {
       view.remove();
     }
+    this._selection.deselectConditionViews(conditionViews);
     this.changeCondition();
   }
 

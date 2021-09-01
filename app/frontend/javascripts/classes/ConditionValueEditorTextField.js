@@ -57,24 +57,6 @@ export default class ConditionValueEditorTextField {
     const valuesElement = this._valuesView.conditionView.valuesElement;
     valuesElement.innerHTML = `<span class="value" data-value="${term}">${term}</span>`;
 
-    // const valueViews = Array.from(valuesElement.querySelectorAll(':scope > .value'));
-    // this._data.forEach(datum => {
-    //   if (!datum.value) return;
-    //   const elm = valueViews.find(elm => elm.dataset.value === datum.value);
-    //   if (datum.checked) {
-    //     if (elm === undefined) {
-    //       // add value element
-    //       valuesElement.insertAdjacentHTML('beforeend', `<span class="value" data-value="${datum.value}">${datum.label}</span>`);
-    //     }
-    //   } else {
-    //     if (elm) {
-    //       // remove value element
-    //       valuesElement.removeChild(elm);
-    //     }
-    //   }
-      
-    // });
-
     // validation
     this._valuesView.update(this._validate());
   }
