@@ -23,6 +23,8 @@ export default class ConditionItemView extends ConditionView {
     // make HTML
     this._elm.classList.add('advanced-search-condition-item-view');
     this._elm.dataset.classification = conditionType;
+    // this._elm.dataset.relation = conditionType === 'disease' ? 'eq' : 'eq';
+    // TODO: 疾患は contains?
     this._elm.dataset.relation = 'eq';
     this._elm.innerHTML = `
     <div class="body">
@@ -53,6 +55,8 @@ export default class ConditionItemView extends ConditionView {
     // switch logical operation
     summary.querySelector(':scope > .relation').addEventListener('click', e => {
       e.stopImmediatePropagation();
+      // TODO: どうやら、contains, not_contains のトグルらしい
+      // if (this._elm.dataset.relation === 'contains') return;
       this._elm.dataset.relation = {eq: 'ne', ne: 'eq'}[this._elm.dataset.relation];
     });
     // switch edit mode
@@ -114,7 +118,7 @@ export default class ConditionItemView extends ConditionView {
         relation: this._elm.dataset.relation,
         terms: Array.from(this._values.querySelectorAll(':scope > .value')).map(value => value.dataset.value)
       }
-    }
+    };
   }
 
 }
