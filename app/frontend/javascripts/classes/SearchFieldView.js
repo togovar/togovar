@@ -17,7 +17,7 @@ export default class SearchFieldView {
   constructor(delegate, elm, placeholder, suggestDictionaries) {
 
     this._delegate = delegate;
-    this._suggestLabels = Object.fromEntries(new Map(suggestDictionaries.map(dict => [dict, SUGGEST_LABELS[dict]])));
+    this._suggestDictionaries = suggestDictionaries;
     // make HTML
     elm.innerHTML = `
     <div class="search-field-view">
@@ -92,13 +92,13 @@ export default class SearchFieldView {
   }
 
   _blur() {
-    setTimeout(() => {
-      if (this._suggesting) {
-        this._suggesting = false;
-        this._suggestView.innerHTML = '';
-        this.lastValue = '';
-      }
-    }, 250);
+    // setTimeout(() => {
+    //   if (this._suggesting) {
+    //     this._suggesting = false;
+    //     this._suggestView.innerHTML = '';
+    //     this.lastValue = '';
+    //   }
+    // }, 250);
   }
 
   _suggestPositionShift(increment) {
@@ -149,39 +149,37 @@ export default class SearchFieldView {
     this.lastValue = this._field.value;
     this.suggestPosition = { x: -1, y: -1 };
 
-    let max = Math.max(...Object.keys(data).map(key => data[key].length));
+    let max = Math.max(...this._suggestDictionaries.map(key => data[key].length));
     max = max < NUMBER_OF_SUGGESTS ? max : NUMBER_OF_SUGGESTS;
 
-    this.suggestList = [];
-    const columnTypes = [];
+    this.suggestList = {};
     for (const key in data) {
-      const column = [];
-      if (data[key].length > 0) {
-        for (let i = 0; i < max; i++) {
-          column.push(data[key][i]);
+      if (this._suggestDictionaries.indexOf(key) !== -1) {
+        const column = [];
+        if (data[key].length > 0) {
+          for (let i = 0; i < max; i++) {
+            column.push(data[key][i]);
+          }
+          this.suggestList[key] = column;
         }
-        this.suggestList.push(column);
-        columnTypes.push(key);
       }
     }
 
-    let html = '';
-    for (let i = 0; i < this.suggestList.length; i++) {
-      const column = this.suggestList[i];
-      html += `<div class="column"><h3 class="title">${this._suggestLabels[columnTypes[i]]}</h3><ul class="list">`;
-      for (const item of column) {
-        html += `
-        <li class="item${item === undefined ? ' -disabled' : ''}" data-value="${item ? item.term : ''}" data-alias="${item && item.alias_of ? item.alias_of : ''}">
-          ${item ? `${
-            `<span class="main">${item.alias_of ? item.alias_of : item.term}</span>` + (item.alias_of ? `<span class="sub">alias: ${item.term}</span>` : '')
-          }` : ''}
-        </li>
-        `;
-      }
-      html += '</ul></div>';
-    }
-
-    this._suggestView.innerHTML = html;
+    this._suggestView.innerHTML = Object.keys(this.suggestList).map(key => {
+      const column = this.suggestList[key];
+      return `<div class="column">
+        <h3 class="title">${SUGGEST_LABELS[key]}</h3>
+        <ul class="list">
+          ${column.map(item => {
+            return `<li class="item${item === undefined ? ' -disabled' : ''}" data-value="${item ? item.term : ''}" data-alias="${item && item.alias_of ? item.alias_of : ''}">
+              ${item ? `${
+                `<span class="main">${item.alias_of ? item.alias_of : item.term}</span>` + (item.alias_of ? `<span class="sub">alias: ${item.term}</span>` : '')
+              }` : ''}
+            </li>`;
+          }).join('')}
+        </ul>
+      </div>`;
+    }).join('');
 
     this._suggestView.querySelectorAll('.column > .list > .item').forEach(item => {
       if (!item.classList.contains('-disabled')) {
@@ -207,6 +205,10 @@ export default class SearchFieldView {
   setTerm(term, excute = false) {
     this._field.value = term;
     if (excute) this._button.dispatchEvent(new Event('click'));
+  }
+
+  get value() {
+    return this._field.value;
   }
 
 }

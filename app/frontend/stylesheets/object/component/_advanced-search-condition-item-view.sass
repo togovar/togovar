@@ -12,7 +12,7 @@ $CORNER_RADIUS: $HEIGHT / 2
     background-color: white
     box-shadow: 0 1px 1px rgba(black, .3)
     position: relative
-    overflow: hidden
+    // overflow: hidden
     > .summary
       padding-right: 8px
       color: $COLOR_BLACK
@@ -21,6 +21,7 @@ $CORNER_RADIUS: $HEIGHT / 2
       display: flex
       align-items: stretch
       min-height: $HEIGHT
+      border-radius: $CORNER_RADIUS
       > .classification
         background-color: $COLOR_BLACK
         color: white
@@ -30,6 +31,8 @@ $CORNER_RADIUS: $HEIGHT / 2
         min-width: 188px
         cursor: grab
         font-weight: bold
+        border-top-left-radius: $CORNER_RADIUS
+        border-bottom-left-radius: $CORNER_RADIUS
       > .values
         flex-grow: 1
         padding: $PADDING_VALUES $CORNER_RADIUS $PADDING_VALUES 6px
@@ -87,11 +90,14 @@ $CORNER_RADIUS: $HEIGHT / 2
         &:hover
           opacity: 1
     > .advanced-search-condition-editor-view
+      display: none
       border-top: none
       background-color: white
       height: 0
-      overflow: hidden
+      // overflow: hidden
       transition: height $GUI_DURATION
+      border-bottom-left-radius: $CORNER_RADIUS
+      border-bottom-right-radius: $CORNER_RADIUS
   > .bg
     background: $BACKDROP_BG
     position: fixed
@@ -106,10 +112,13 @@ $CORNER_RADIUS: $HEIGHT / 2
     > .body
       z-index: $Z_INDEX_EDITING_CONDITION + 1
       > .summary
+        > .classification
+          border-bottom-left-radius: 0
         > .editbutton
           opacity: 0
           pointer-events: none
       > .advanced-search-condition-editor-view
+        display: block
         height: auto
     > .bg
       pointer-events: auto
