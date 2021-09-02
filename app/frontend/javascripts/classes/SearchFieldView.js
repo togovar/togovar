@@ -68,8 +68,8 @@ export default class SearchFieldView {
     e.preventDefault();
     if (e.key === 'Enter') {
       if (this._suggesting && this.suggestPosition.x !== -1 && this.suggestPosition.y !== -1) {
-        this._field.value = this.suggestList[this.suggestPosition.x][this.suggestPosition.y].alias_of ||
-          this.suggestList[this.suggestPosition.x][this.suggestPosition.y].term;
+        this._field.value = this._suggestList[this.suggestPosition.x][this.suggestPosition.y].alias_of ||
+          this._suggestList[this.suggestPosition.x][this.suggestPosition.y].term;
       }
       this._suggesting = false;
       this._suggestView.innerHTML = '';
@@ -124,20 +124,20 @@ export default class SearchFieldView {
 
     switch (true) {
       case increment.y === -1:
-        this.suggestPosition.y = this.suggestPosition.y < 0 ? this.suggestList[0].length - 1 : this.suggestPosition.y;
+        this.suggestPosition.y = this.suggestPosition.y < 0 ? this._suggestList[0].length - 1 : this.suggestPosition.y;
         break;
       case increment.y === 1:
-        this.suggestPosition.y = this.suggestPosition.y >= this.suggestList[0].length ? 0 : this.suggestPosition.y;
+        this.suggestPosition.y = this.suggestPosition.y >= this._suggestList[0].length ? 0 : this.suggestPosition.y;
         break;
       case increment.x === -1:
-        this.suggestPosition.x = this.suggestPosition.x < 0 ? this.suggestList.length - 1 : this.suggestPosition.x;
+        this.suggestPosition.x = this.suggestPosition.x < 0 ? this._suggestList.length - 1 : this.suggestPosition.x;
         break;
       case increment.x === 1:
-        this.suggestPosition.x = this.suggestPosition.x >= this.suggestList.length ? 0 : this.suggestPosition.x;
+        this.suggestPosition.x = this.suggestPosition.x >= this._suggestList.length ? 0 : this.suggestPosition.x;
         break;
     }
 
-    if (this.suggestList[this.suggestPosition.x][this.suggestPosition.y] === undefined) this._suggestPositionShift(increment);
+    if (this._suggestList[this.suggestPosition.x][this.suggestPosition.y] === undefined) this._suggestPositionShift(increment);
   }
 
   _search() {
@@ -152,22 +152,25 @@ export default class SearchFieldView {
     let max = Math.max(...this._suggestDictionaries.map(key => data[key].length));
     max = max < NUMBER_OF_SUGGESTS ? max : NUMBER_OF_SUGGESTS;
 
-    this.suggestList = {};
-    for (const key in data) {
+    const dictionaries = [];
+    this._suggestList = [];
+    Object.keys(data).forEach((key, index) => {
       if (this._suggestDictionaries.indexOf(key) !== -1) {
-        const column = [];
         if (data[key].length > 0) {
+          dictionaries.push(key);
+          const column = [];
           for (let i = 0; i < max; i++) {
             column.push(data[key][i]);
           }
-          this.suggestList[key] = column;
+          this._suggestList[index] = column;
         }
       }
-    }
+    });
 
-    this._suggestView.innerHTML = Object.keys(this.suggestList).map(key => {
-      const column = this.suggestList[key];
-      return `<div class="column">
+    this._suggestView.innerHTML = dictionaries.map((key, index) => {
+      const column = this._suggestList[index];
+      return `
+      <div class="column">
         <h3 class="title">${SUGGEST_LABELS[key]}</h3>
         <ul class="list">
           ${column.map(item => {
