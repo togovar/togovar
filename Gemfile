@@ -47,7 +47,7 @@ gem 'bio-vcf', github: 'pjotrp/bioruby-vcf'
 gem 'pry-rails', '~> 0.3.6'
 
 group :development do
-  gem 'better_errors', '~> 2.5'
+  gem 'better_errors', '~> 2.8'
   gem 'better_errors-pry', '~> 1.0'
   gem 'capistrano', '~> 3.11', require: false
   gem 'capistrano-bundler', '~> 1.6', require: false
