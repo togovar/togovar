@@ -70,7 +70,7 @@ GEM
     awesome_print (1.8.0)
     bcp47 (0.3.3)
       i18n
-    better_errors (2.7.1)
+    better_errors (2.8.0)
       coderay (>= 1.0.0)
       erubi (>= 1.0.0)
       rack (>= 0.9.0)
@@ -127,7 +127,7 @@ GEM
       multi_json
     equivalent-xml (0.6.0)
       nokogiri (>= 1.4.3)
-    erubi (1.9.0)
+    erubi (1.10.0)
     erubis (2.7.0)
     execjs (2.7.0)
     factory_bot (4.11.1)
@@ -472,7 +472,7 @@ PLATFORMS
 DEPENDENCIES
   action_args (~> 2.2)
   awesome_print (~> 1.8)
-  better_errors (~> 2.5)
+  better_errors (~> 2.8)
   better_errors-pry (~> 1.0)
   bio-vcf!
   byebug
