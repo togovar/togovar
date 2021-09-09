@@ -98,7 +98,7 @@ gene:
     - id: gene-base
       dom: "#gene-base"
 
-    - id: pagination-table
+    - id: gene-clinvar
       dom: "#gene-clinvar"
 
     - id: pagination-table
