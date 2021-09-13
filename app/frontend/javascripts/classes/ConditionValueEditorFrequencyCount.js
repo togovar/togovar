@@ -2,6 +2,9 @@ import RangeSelectorView from "./RangeSelectorView.js";
 import {CONDITION_TYPE} from '../definition.js';
 
 let id = 0;
+const DEFAULT_CONDITION = {
+  from: 0, to: 1, invert: false
+};
 
 export default class ConditionValueEditorFrequencyCount {
 
@@ -38,6 +41,7 @@ export default class ConditionValueEditorFrequencyCount {
     const rangeSelectorView = section.querySelector('.range-selector-view');
     this._rangeSelectorViews = new RangeSelectorView(rangeSelectorView, this, 0, 1, 'horizontal', 'advanced');
     console.log(this._rangeSelectorViews)
+    this._rangeSelectorView.updateGUIWithCondition(DEFAULT_CONDITION);
 
 
   }
@@ -46,8 +50,8 @@ export default class ConditionValueEditorFrequencyCount {
   // public methods
 
   changeParameter(newCondition, dataset) {
+    if (!this._rangeSelectorViews) return;
     console.log(newCondition, dataset)
-    console.log(this._rangeSelectorViews)
     this._rangeSelectorViews.updateGUIWithCondition(newCondition);
   }
 
