@@ -14,6 +14,7 @@ export default class RangeSelectorView {
    * @param {String} searchType 'simple' or 'advanced'
    */
   constructor(elm, delegate, _min = 0, max, orientation, searchType) {
+    console.log(_min = 0, max, orientation, searchType)
     this.elm = elm;
     this._delegate = delegate;
     this._orientation = orientation;
@@ -22,7 +23,7 @@ export default class RangeSelectorView {
       let html = '';
       const step = new Decimal(max / RULER_NUMBER_OF_STEP);
       for (let i = 0; i <= RULER_NUMBER_OF_STEP; i++) {
-        html += `<div class="scale">${orientation === 'vertical' ? step.times(new Decimal(i)).toNumber() : ''}</div>`;
+        html += `<div class="scale">${step.times(new Decimal(i)).toNumber()}</div>`;
       }
       return html;
     })();
@@ -66,7 +67,6 @@ export default class RangeSelectorView {
     const meter = elm.querySelector(':scope > .meter');
     this._bar = meter.querySelector(':scope > .barcontainer > .bar');
     this._slider = meter.querySelector(':scope > .slider');
-    this._sliderWidth = this._slider.offsetWidth - 16;
     this._sliderFrom = this._slider.querySelector(':scope > .from');
     this._sliderTo = this._slider.querySelector(':scope > .to');
     const match = elm.querySelector(':scope > .match');
@@ -75,35 +75,41 @@ export default class RangeSelectorView {
       this._any = match.querySelector(':scope > label > .any');
     }
 
-    // default values
-    this._changeParameter({});
+    setTimeout(() => {
 
-    // events
-    this._from.addEventListener('change', e => {
-      console.log(typeof e.target.value)
-      e.target.value = parseFloat(e.target.value) < 0 ? 0 : e.target.value;
-      this._changeParameter({from: e.target.value + ''});
-    });
-    this._to.addEventListener('change', e => {
-      e.target.value = parseFloat(e.target.value) > 1 ? 1 : e.target.value;
-      this._changeParameter({to: e.target.value + ''});
-    });
-    this._invert.addEventListener('change', e => {
-      this._changeParameter({invert: e.target.checked ? '1' : '0'});
-    });
-    if (match) {
-      this._all.addEventListener('change', e => {
-        this._changeParameter({match: e.target.checked ? 'all' : 'any'});
+      this._sliderWidth = this._slider.offsetWidth - 16;
+
+      // events
+      this._from.addEventListener('change', e => {
+        console.log(typeof e.target.value)
+        e.target.value = parseFloat(e.target.value) < 0 ? 0 : e.target.value;
+        this._changeParameter({from: e.target.value + ''});
       });
-      this._any.addEventListener('change', e => {
-        this._changeParameter({match: e.target.checked ? 'any' : 'all'});
+      this._to.addEventListener('change', e => {
+        e.target.value = parseFloat(e.target.value) > 1 ? 1 : e.target.value;
+        this._changeParameter({to: e.target.value + ''});
       });
-    }
-    $('.slider > *', meter).draggable({
-      axis: 'x',
-      containment: this._slider,
-      stop: this._dragEnd.bind(this)
-    });
+      this._invert.addEventListener('change', e => {
+        this._changeParameter({invert: e.target.checked ? '1' : '0'});
+      });
+      if (match) {
+        this._all.addEventListener('change', e => {
+          this._changeParameter({match: e.target.checked ? 'all' : 'any'});
+        });
+        this._any.addEventListener('change', e => {
+          this._changeParameter({match: e.target.checked ? 'any' : 'all'});
+        });
+      }
+      $('.slider > *', meter).draggable({
+        axis: 'x',
+        containment: this._slider,
+        stop: this._dragEnd.bind(this)
+      });
+      
+      // default values
+      this._changeParameter({});
+
+    }, 100);
 
   }
 
@@ -120,6 +126,7 @@ export default class RangeSelectorView {
   }
 
   _changeParameter(newCondition) {
+    console.log(newCondition);
     // ensure sliders are not interchanged
     switch (true) {
       case newCondition.from !== undefined:
@@ -139,6 +146,7 @@ export default class RangeSelectorView {
   }
 
   updateGUIWithCondition(condition) {
+    console.log(condition);
     // values
     this._from.value = condition.from;
     this._to.value = condition.to;
