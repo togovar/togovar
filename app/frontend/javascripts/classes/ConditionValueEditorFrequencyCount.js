@@ -39,8 +39,7 @@ export default class ConditionValueEditorFrequencyCount {
     this._body = section.querySelector(':scope > .body');
 
     const rangeSelectorView = section.querySelector('.range-selector-view');
-    this._rangeSelectorViews = new RangeSelectorView(rangeSelectorView, this, 0, 1, 'horizontal', 'advanced');
-    console.log(this._rangeSelectorViews)
+    this._rangeSelectorView = new RangeSelectorView(rangeSelectorView, this, 0, 1, 'horizontal', 'advanced');
     this._rangeSelectorView.updateGUIWithCondition(DEFAULT_CONDITION);
 
 
@@ -50,9 +49,9 @@ export default class ConditionValueEditorFrequencyCount {
   // public methods
 
   changeParameter(newCondition, dataset) {
-    if (!this._rangeSelectorViews) return;
+    if (!this._rangeSelectorView) return;
     console.log(newCondition, dataset)
-    this._rangeSelectorViews.updateGUIWithCondition(newCondition);
+    this._rangeSelectorView.updateGUIWithCondition(newCondition);
   }
 
   keepLastValues() {

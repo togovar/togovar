@@ -148,16 +148,16 @@ export default class RangeSelectorView {
   updateGUIWithCondition(condition) {
     console.log(condition);
     // values
-    this._from.value = condition.from;
-    this._to.value = condition.to;
+    if (condition.from) this._from.value = condition.from;
+    if (condition.to) this._to.value = condition.to;
     // slider
     this._sliderFrom.style.left = this.fromPosition;
     this._sliderTo.style.left = this.toPosition;
     // meter
-    this._bar.style.left = `${condition.from * 100}%`;
-    this._bar.style.width = `${(condition.to - condition.from) * 100}%`;
+    this._bar.style.left = `${this._from.value * 100}%`;
+    this._bar.style.width = `${(this._to.value - this._from.value) * 100}%`;
     // invert
-    this._invert.checked = condition.invert === '1' || condition.invert === true;
+    if (condition.invert) this._invert.checked = condition.invert === '1' || condition.invert === true;
     if (this._invert.checked) {
       this.elm.classList.add('-inverting');
     } else {
