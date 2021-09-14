@@ -3,7 +3,7 @@ import {CONDITION_TYPE} from '../definition.js';
 
 let id = 0;
 const DEFAULT_CONDITION = {
-  from: 0, to: 1, invert: false
+  from: 0, to: 1, invert: '0'
 };
 
 export default class ConditionValueEditorFrequencyCount {
@@ -17,7 +17,7 @@ export default class ConditionValueEditorFrequencyCount {
 
     // HTML
     const section = document.createElement('section');
-    section.classList.add('text-field-editor-view');
+    section.classList.add('frequency-count-editor-view');
     section.innerHTML = `
       <header>Select ${conditionType}</header>
       <div class="body">
