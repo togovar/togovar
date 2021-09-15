@@ -21,17 +21,28 @@ export default class ConditionValueEditorFrequencyCount {
     section.innerHTML = `
       <header>Select ${conditionType}</header>
       <div class="body">
-        <section class="frequency">
+        <section class="frequency switching -current">
           <label>
-            <input type="radio" name="${name}">
+            <input type="radio" name="${name}" checked>
             <span>Frequency<span>
           </label>
-          <div class="range-selector-view"></div>
+          <div class="range-selector-view input"></div>
         </section>
-        <section class="count">
+        <section class="count switching">
           <label>
             <input type="radio" name="${name}">
             <span>Count<span>
+          </label>
+          <div class="input">
+            <input class="from" min="0" step="1" type="number">
+            ~
+            <input class="to" min="0" step="1" type="number">
+          </div>
+        </section>
+        <section>
+          <label>
+            <input type="checkbox">
+            <span>Exclude filtered out variants<span>
           </label>
         </section>
       </div>`;
