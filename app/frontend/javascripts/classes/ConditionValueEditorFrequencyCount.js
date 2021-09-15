@@ -17,6 +17,7 @@ export default class ConditionValueEditorFrequencyCount {
 
     this._valuesView = valuesView;
     this._conditionType = conditionType;
+    this._condition = Object.assign({}, DEFAULT_CONDITION);
     this._mode = MODE.FREQUENCY;
     const name = `ConditionValueEditorFrequencyCount${id++}`;
 
@@ -57,7 +58,7 @@ export default class ConditionValueEditorFrequencyCount {
     // set range selector
     const rangeSelectorView = section.querySelector('.range-selector-view');
     this._rangeSelectorView = new RangeSelectorView(rangeSelectorView, this, 0, 1, 'horizontal', 'advanced');
-    this._rangeSelectorView.updateGUIWithCondition(DEFAULT_CONDITION);
+    this._rangeSelectorView.updateGUIWithCondition(this._condition);
 
     // events: switch mode
     const switchingElements = section.querySelectorAll(':scope > .body > .switching');
@@ -78,6 +79,8 @@ export default class ConditionValueEditorFrequencyCount {
       }
     }
 
+    this._update();
+
   }
 
 
@@ -85,8 +88,11 @@ export default class ConditionValueEditorFrequencyCount {
 
   changeParameter(newCondition, dataset) {
     if (!this._rangeSelectorView) return;
-    console.log(newCondition, dataset)
+    for (const key in newCondition) {
+      this._condition[key] = newCondition[key];
+    }
     this._rangeSelectorView.updateGUIWithCondition(newCondition);
+    this._update();
   }
 
   keepLastValues() {
@@ -107,10 +113,32 @@ export default class ConditionValueEditorFrequencyCount {
 
   _update() {
 
-    // update value
-    // const term = this._searchFieldView.value;
     const valuesElement = this._valuesView.conditionView.valuesElement;
-    // valuesElement.innerHTML = `<span class="value" data-value="${term}">${term}</span>`;
+    let frequencyCountValueView = valuesElement.querySelector(':scope > .frequency-count-value-view');
+    // make view
+    if (!frequencyCountValueView) {
+      frequencyCountValueView = document.createElement('div');
+      frequencyCountValueView.classList.add('frequency-count-value-view');
+      frequencyCountValueView.innerHTML = `
+      <div class="frequencygraph">
+        <div class="bar"></div>
+      </div>
+      <div class="range">
+        <span class="from"></span> ~ <span class="to"></span>
+      </div>
+      <p class="filtered">Exclude filtered out variants</p>
+      `
+      valuesElement.append(frequencyCountValueView);
+      this._fcvvBar = frequencyCountValueView.querySelector(':scope > .frequencygraph > .bar');
+      this._fcvvFrom = frequencyCountValueView.querySelector(':scope > .range > .from');
+      this._fcvvTo = frequencyCountValueView.querySelector(':scope > .range > .to');
+    }
+
+    // update value
+    this._fcvvBar.style.left = this._condition.from * 100 + '%';
+    this._fcvvBar.style.width = (this._condition.to - this._condition.from) * 100 + '%';
+    this._fcvvFrom.textContent = this._condition.from;
+    this._fcvvTo.textContent = this._condition.to;
 
     // validation
     this._valuesView.update(this._validate());
