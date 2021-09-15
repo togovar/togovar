@@ -151,8 +151,8 @@ export default class RangeSelectorView {
     if (condition.from) this._from.value = condition.from;
     if (condition.to) this._to.value = condition.to;
     // slider
-    this._sliderFrom.style.left = this.fromPosition;
-    this._sliderTo.style.left = this.toPosition;
+    this._sliderFrom.style.left = this._fromPosition;
+    this._sliderTo.style.left = this._toPosition;
     // meter
     this._bar.style.left = `${this._from.value * 100}%`;
     this._bar.style.width = `${(this._to.value - this._from.value) * 100}%`;
@@ -173,10 +173,10 @@ export default class RangeSelectorView {
   // get _sliderWidth() {
   //   return this._slider.offsetWidth - 16;
   // }
-  get fromPosition() {
+  get _fromPosition() {
     return `${this._sliderWidth * this._from.value}px`;
   }
-  get toPosition() {
+  get _toPosition() {
     return `${this._sliderWidth * this._to.value + 8}px`;
   }
 
