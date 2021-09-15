@@ -47,6 +47,10 @@ export default class ConditionValueEditorTextField {
     this._update();
   }
 
+  get isValid() {
+    return this._searchFieldView.value !== '';
+  }
+
 
   // private methods
 
@@ -62,7 +66,7 @@ export default class ConditionValueEditorTextField {
   }
 
   _validate() {
-    return this._searchFieldView.value !== '';
+    return this.isValid;
   }
 
 }

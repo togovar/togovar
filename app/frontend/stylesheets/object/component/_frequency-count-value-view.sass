@@ -2,7 +2,8 @@
   position: absolute
   display: flex
   align-items: center
-  left: 142px  
+  left: 142px
+  white-space: nowrap
   > .frequencygraph
     width: 52px
     height: 12px
@@ -22,6 +23,9 @@
   > .filtered
     margin: 0
     font-size: 10px
+  &[data-mode="count"]
+    > .frequencygraph
+      visibility: hidden
 
 [data-value="jga_ngs"], [data-value="jga_snp"]
   + .frequency-count-value-view

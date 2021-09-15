@@ -52,6 +52,9 @@ export default class ConditionValueEditorCheckboxes {
     this._update();
   }
 
+  get isValid() {
+    return this._checkboxes.some(checkbox => checkbox.checked);
+  }
 
   // private methods
 
@@ -80,7 +83,7 @@ export default class ConditionValueEditorCheckboxes {
   }
 
   _validate() {
-    return this._checkboxes.some(checkbox => checkbox.checked);
+    return this.isValid;
   }
 
 }
