@@ -32,7 +32,7 @@ variant:
         data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/variant_gwas?ep=${TOGOVAR_STANZA_SPARQL_URL}&tgv_id=${tgv_id}
         data-type: json
         padding: 0
-        page-size-option: 10,20,50,100
+        page-size-option: 5,10,20,50,100
         page-slider: false
         columns:
           - id: variant_and_risk_allele
@@ -40,7 +40,7 @@ variant:
           - id: raf
             label: RAF
           - id: p_value
-            label: P-Value
+            label: P-value
             type: number
           - id: odds_ratio
             label: OR
@@ -51,11 +51,12 @@ variant:
           - id: mapped_trait
             label: Trait(s)
             link: mapped_trait_uri
+            escape: false
           - id: pubmed_id
             label: PubMed ID
             link: pubmed_uri
           - id: study_detail
-            label: Study Details
+            label: Study accession
             link: study
           - id: initial_sample_size
             label: Discovery sample description
@@ -127,6 +128,7 @@ gene:
           - id: mapped_trait
             label: Trait(s)
             link: mapped_trait_uri
+            escape: false
           - id: pubmed_id
             label: PubMed ID
             link: pubmed_uri
@@ -184,7 +186,23 @@ disease:
         padding: 0
         page-size-option: 10,20,50,100
         page-slider: false
-
+        columns:
+          - id: tgv_id
+            label: TogoVar ID
+            escape: false
+          - id: title
+            label: Title
+            link: clinvar
+          - id: interpretation
+            label: Clinical significance
+            escape: false
+          - id: review_status
+            label: Review status
+            escape: false
+          - id: last_evaluated
+            label: Last evaluated
+          - id: condition
+            label: Condition(s)
     - id: pagination-table
       dom: "#disease-gwas"
       src: https://togostanza.github.io/metastanza/pagination-table.js
@@ -194,7 +212,5 @@ disease:
         padding: 0
         page-size-option: 10,20,50,100
         page-slider: false
- 
-
     - id: disease-publication
       dom: "#disease-publication"
