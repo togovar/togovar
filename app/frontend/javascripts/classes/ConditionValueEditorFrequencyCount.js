@@ -121,7 +121,8 @@ export default class ConditionValueEditorFrequencyCount {
       frequencyCountValueView.classList.add('frequency-count-value-view');
       frequencyCountValueView.innerHTML = `
       <div class="frequencygraph">
-        <div class="bar"></div>
+        <div class="bar -bar1"></div>
+        <div class="bar -bar2"></div>
       </div>
       <div class="range">
         <span class="from"></span> ~ <span class="to"></span>
@@ -129,14 +130,23 @@ export default class ConditionValueEditorFrequencyCount {
       <p class="filtered">Exclude filtered out variants</p>
       `
       valuesElement.append(frequencyCountValueView);
-      this._fcvvBar = frequencyCountValueView.querySelector(':scope > .frequencygraph > .bar');
+      this._fcvvBar1 = frequencyCountValueView.querySelector(':scope > .frequencygraph > .bar.-bar1');
+      this._fcvvBar2 = frequencyCountValueView.querySelector(':scope > .frequencygraph > .bar.-bar2');
       this._fcvvFrom = frequencyCountValueView.querySelector(':scope > .range > .from');
       this._fcvvTo = frequencyCountValueView.querySelector(':scope > .range > .to');
     }
 
     // update value
-    this._fcvvBar.style.left = this._condition.from * 100 + '%';
-    this._fcvvBar.style.width = (this._condition.to - this._condition.from) * 100 + '%';
+    if (this._condition.invert === '0') {
+      this._fcvvBar1.style.left = this._condition.from * 100 + '%';
+      this._fcvvBar1.style.width = (this._condition.to - this._condition.from) * 100 + '%';
+      this._fcvvBar2.style.width = '0%';
+    } else {
+      this._fcvvBar1.style.left = '0%';
+      this._fcvvBar1.style.width = this._condition.from * 100 + '%';
+      this._fcvvBar2.style.left = this._condition.to * 100 + '%';
+      this._fcvvBar2.style.width = (1 - this._condition.to) * 100 + '%';
+    }
     this._fcvvFrom.textContent = this._condition.from;
     this._fcvvTo.textContent = this._condition.to;
 
