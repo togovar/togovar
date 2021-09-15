@@ -1,7 +1,7 @@
 import ConditionView from './ConditionView.js';
 import ConditionValues from './ConditionValues.js';
 import {ADVANCED_CONDITIONS} from '../global.js';
-import {CONDITION_ITEM_TYPE} from '../definition.js';
+import {CONDITION_TYPE, CONDITION_ITEM_TYPE} from '../definition.js';
 
 export default class ConditionItemView extends ConditionView {
 
@@ -113,12 +113,56 @@ export default class ConditionItemView extends ConditionView {
   }
 
   get query() {
-    return {
-      [this._conditionType]: {
-        relation: this._elm.dataset.relation,
-        terms: Array.from(this._values.querySelectorAll(':scope > .value')).map(value => value.dataset.value)
+    if (this._conditionType === CONDITION_TYPE.dataset) {
+      const value = this._values.querySelector(':scope > .value');
+      const frequencyCountValueView = this._values.querySelector(':scope > .frequency-count-value-view');
+      const dataset = {name: value.dataset.value};
+      const filtered = true;
+      if (frequencyCountValueView.mode === 'frequency' && frequencyCountValueView.invert) {
+        return {
+          or: [
+            {
+              frequency: {
+                dataset,
+                frequency: {
+                  gte: 0,
+                  lte: Number(frequencyCountValueView.dataset.from)
+                },
+                filtered
+              }
+            },
+            {
+              frequency: {
+                dataset,
+                frequency: {
+                  gte: Number(frequencyCountValueView.dataset.to),
+                  lte: 1
+                },
+                filtered
+              }
+            }
+          ]
+        }
+      } else {
+        return {
+          frequency: {
+            dataset,
+            [frequencyCountValueView.dataset.mode]: {
+              gte: Number(frequencyCountValueView.dataset.from),
+              lte: Number(frequencyCountValueView.dataset.to)
+            },
+            filtered
+          }
+        }
       }
-    };
+    } else {
+      return {
+        [this._conditionType]: {
+          relation: this._elm.dataset.relation,
+          terms: Array.from(this._values.querySelectorAll(':scope > .value')).map(value => value.dataset.value)
+        }
+      };
+    }
   }
 
 }

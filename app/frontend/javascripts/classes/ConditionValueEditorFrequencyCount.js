@@ -70,6 +70,7 @@ export default class ConditionValueEditorFrequencyCount {
           else el.classList.remove('-current');
         }
         this._mode = e.target.value;
+        this._update();
       });
       if (input.value === MODE.frequency) {
         requestAnimationFrame(() => {
@@ -96,16 +97,20 @@ export default class ConditionValueEditorFrequencyCount {
   }
 
   keepLastValues() {
-    // this._lastValue = this._searchFieldView.value;
+    this._lastValue = this._condition;
   }
 
   restore() {
-    // this._searchFieldView.setTerm(this._lastValue);
+    this._condition = this._lastValue;
     this._update();
   }
 
   search() {
     this._update();
+  }
+
+  get isValid() {
+    return true;
   }
 
 
@@ -136,6 +141,11 @@ export default class ConditionValueEditorFrequencyCount {
       this._fcvvTo = frequencyCountValueView.querySelector(':scope > .range > .to');
     }
 
+    // set value
+    frequencyCountValueView.dataset.mode = this._mode;
+    frequencyCountValueView.dataset.from = this._condition.from;
+    frequencyCountValueView.dataset.to = this._condition.to;
+    frequencyCountValueView.dataset.invert = this._condition.invert;
     // update value
     if (this._condition.invert === '0') {
       this._fcvvBar1.style.left = this._condition.from * 100 + '%';
@@ -155,7 +165,7 @@ export default class ConditionValueEditorFrequencyCount {
   }
 
   _validate() {
-    // return this._searchFieldView.value !== '';
+    return true;
   }
 
 }

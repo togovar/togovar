@@ -274,6 +274,13 @@ export default class ConditionValueEditorColumns {
   }
 
   _validate() {
+    return this._isValid;
+  }
+
+
+  // public
+
+  get isValid() {
     return Array.from(this._columns.querySelectorAll('li[data-value] > label > input')).some(checkbox => checkbox.checked);
   }
 
