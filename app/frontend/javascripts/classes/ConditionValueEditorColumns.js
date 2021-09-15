@@ -238,8 +238,13 @@ export default class ConditionValueEditorColumns {
 
     // reflect check status in DOM
     this._data.forEach(datum => {
-      const item = this._columns.querySelector(`li[data-id="${datum.id}"] > label > input`);
-      if (item) item.checked = datum.checked;
+      const checkbox = this._columns.querySelector(`li[data-id="${datum.id}"] > label > input`);
+      if (this._conditionType === CONDITION_TYPE.dataset) {
+        datum.checked = datum.id == id;
+        checkbox.checked = datum.checked;
+      } else {
+        if (checkbox) checkbox.checked = datum.checked;
+      }
     });
     // update selection status of upper hierarchy
     this._updateIndeterminate();
@@ -253,7 +258,7 @@ export default class ConditionValueEditorColumns {
       if (datum.checked) {
         if (elm === undefined) {
           // add value element
-          valuesElement.insertAdjacentHTML('beforeend', `<span class="value" data-value="${datum.value}">${datum.label}</span>`);
+          valuesElement.insertAdjacentHTML('afterBegin', `<span class="value" data-value="${datum.value}">${datum.label}</span>`);
         }
       } else {
         if (elm) {

@@ -39,6 +39,7 @@ $CORNER_RADIUS: $HEIGHT / 2
         display: flex
         flex-wrap: wrap
         align-items: center
+        position: relative
         > .value
           height: 18px
           line-height: 18px
@@ -174,7 +175,7 @@ $CORNER_RADIUS: $HEIGHT / 2
       border: solid 2px $COLOR_SELECTED
       border-radius: $CORNER_RADIUS
       pointer-events: none
-  &[data-classification="frequency"], &[data-classification="count"]
+  &[data-classification="dataset"]
     > .body
       > .summary
         > .values
@@ -184,44 +185,32 @@ $CORNER_RADIUS: $HEIGHT / 2
               font-family: fontello
               content: $CHAR_DATASET
               margin-right: 4px
-        &[data-dataset="jga_ngs"], &[data-dataset="jga_snp"]
-          > .values
-            > .value
+            &[data-value="jga_ngs"], &[data-value="jga_snp"]
               border-color: $COLOR_DATASET_JGA
               background-color: $COLOR_DATASET_JGA_LIGHT
               &::before
                 color: $COLOR_DATASET_JGA
-        &[data-dataset="tommo_4.7kjpn"]
-          > .values
-            > .value
+            &[data-value="tommo_4.7kjpn"]
               border-color: $COLOR_DATASET_3_5KJPN
               background-color: $COLOR_DATASET_3_5KJPN_LIGHT
               &::before
                 color: $COLOR_DATASET_3_5KJPN
-        &[data-dataset="hgvd"], &[data-dataset="mgend"]
-          > .values
-            > .value
+            &[data-value="hgvd"], &[data-value="mgend"]
               border-color: $COLOR_DATASET_HGVD
               background-color: $COLOR_DATASET_HGVD_LIGHT
               &::before
                 color: $COLOR_DATASET_HGVD
-        &[data-dataset="gem_j_wga"]
-          > .values
-            > .value
+            &[data-value="gem_j_wga"]
               border-color: $COLOR_DATASET_GEM_J
               background-color: $COLOR_DATASET_GEM_J_LIGHT
               &::before
                 color: $COLOR_DATASET_GEM_J
-        &[data-dataset="bbj"]
-          > .values
-            > .value
+            &[data-value="bbj"]
               border-color: $COLOR_DATASET_BBJ
               background-color: $COLOR_DATASET_BBJ_LIGHT
               &::before
                 color: $COLOR_DATASET_BBJ
-        &[data-dataset="clinvar"], &[data-dataset="exac"], &[data-dataset="gnomad"]
-          > .values
-            > .value
+            &[data-value="clinvar"], &[data-value="exac"], &[data-value="gnomad"]
               border-color: $COLOR_DATASET_FOREIGN
               background-color: $COLOR_DATASET_FOREIGN_LIGHT
               &::before

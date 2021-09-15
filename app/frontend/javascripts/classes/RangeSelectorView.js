@@ -126,7 +126,6 @@ export default class RangeSelectorView {
   }
 
   _changeParameter(newCondition) {
-    console.log(newCondition);
     // ensure sliders are not interchanged
     switch (true) {
       case newCondition.from !== undefined:
@@ -146,7 +145,6 @@ export default class RangeSelectorView {
   }
 
   updateGUIWithCondition(condition) {
-    console.log(condition);
     // values
     if (condition.from) this._from.value = condition.from;
     if (condition.to) this._to.value = condition.to;
