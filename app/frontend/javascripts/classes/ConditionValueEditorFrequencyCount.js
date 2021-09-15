@@ -5,6 +5,10 @@ let id = 0;
 const DEFAULT_CONDITION = {
   from: 0, to: 1, invert: '0'
 };
+const MODE = {
+  frequency: 'frequency',
+  count: 'count'
+}
 
 export default class ConditionValueEditorFrequencyCount {
 
@@ -13,6 +17,7 @@ export default class ConditionValueEditorFrequencyCount {
 
     this._valuesView = valuesView;
     this._conditionType = conditionType;
+    this._mode = MODE.FREQUENCY;
     const name = `ConditionValueEditorFrequencyCount${id++}`;
 
     // HTML
@@ -21,16 +26,16 @@ export default class ConditionValueEditorFrequencyCount {
     section.innerHTML = `
       <header>Select ${conditionType}</header>
       <div class="body">
-        <section class="frequency switching -current">
+        <section class="frequency switching" data-mode="${MODE.frequency}">
           <label>
-            <input type="radio" name="${name}" checked>
+            <input type="radio" name="${name}" value="${MODE.frequency}">
             <span>Frequency<span>
           </label>
           <div class="range-selector-view input"></div>
         </section>
-        <section class="count switching">
+        <section class="count switching" data-mode="${MODE.count}">
           <label>
-            <input type="radio" name="${name}">
+            <input type="radio" name="${name}" value="${MODE.count}">
             <span>Count<span>
           </label>
           <div class="input">
@@ -49,10 +54,29 @@ export default class ConditionValueEditorFrequencyCount {
     valuesView.sections.append(section);
     this._body = section.querySelector(':scope > .body');
 
+    // set range selector
     const rangeSelectorView = section.querySelector('.range-selector-view');
     this._rangeSelectorView = new RangeSelectorView(rangeSelectorView, this, 0, 1, 'horizontal', 'advanced');
     this._rangeSelectorView.updateGUIWithCondition(DEFAULT_CONDITION);
 
+    // events: switch mode
+    const switchingElements = section.querySelectorAll(':scope > .body > .switching');
+    for (const el of switchingElements) {
+      const input = el.querySelector(':scope > label > input');
+      input.addEventListener('change', e => {
+        for (const el of switchingElements) {
+          if (el.dataset.mode === e.target.value) el.classList.add('-current');
+          else el.classList.remove('-current');
+        }
+        this._mode = e.target.value;
+      });
+      if (input.value === MODE.frequency) {
+        requestAnimationFrame(() => {
+          input.dispatchEvent(new Event('change'));
+          input.checked = true;
+        });
+      }
+    }
 
   }
 
