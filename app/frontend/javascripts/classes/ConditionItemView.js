@@ -117,8 +117,8 @@ export default class ConditionItemView extends ConditionView {
       const value = this._values.querySelector(':scope > .value');
       const frequencyCountValueView = this._values.querySelector(':scope > .frequency-count-value-view');
       const dataset = {name: value.dataset.value};
-      const filtered = true;
-      if (frequencyCountValueView.mode === 'frequency' && frequencyCountValueView.invert) {
+      const filtered = frequencyCountValueView.dataset.filtered === 'true' ? true : false;
+      if (frequencyCountValueView.dataset.mode === 'frequency' && frequencyCountValueView.dataset.invert === '1') {
         return {
           or: [
             {
