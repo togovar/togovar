@@ -144,13 +144,13 @@ export default class ConditionItemView extends ConditionView {
           ]
         }
       } else {
+        const values = {};
+        if (frequencyCountValueView.dataset.from !== '') values.gte = Number(frequencyCountValueView.dataset.from);
+        if (frequencyCountValueView.dataset.to !== '') values.lte = Number(frequencyCountValueView.dataset.to);
         return {
           frequency: {
             dataset,
-            [frequencyCountValueView.dataset.mode]: {
-              gte: Number(frequencyCountValueView.dataset.from),
-              lte: Number(frequencyCountValueView.dataset.to)
-            },
+            [frequencyCountValueView.dataset.mode]: values,
             filtered
           }
         }

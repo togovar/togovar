@@ -1,9 +1,13 @@
 import RangeSelectorView from "./RangeSelectorView.js";
-import {CONDITION_TYPE} from '../definition.js';
 
 let id = 0;
 const DEFAULT_CONDITION = {
-  from: 0, to: 1, invert: '0'
+  frequency: {
+    from: 0, to: 1, invert: '0'
+  },
+  count: {
+    from: null, to: null
+  }
 };
 const MODE = {
   frequency: 'frequency',
@@ -17,8 +21,12 @@ export default class ConditionValueEditorFrequencyCount {
 
     this._valuesView = valuesView;
     this._conditionType = conditionType;
-    this._condition = Object.assign({}, DEFAULT_CONDITION);
-    this._mode = MODE.FREQUENCY;
+    this._condition = {
+      frequency: Object.assign({}, DEFAULT_CONDITION.frequency),
+      count: Object.assign({}, DEFAULT_CONDITION.count)
+    };
+    // this._condition = Object.assign({}, DEFAULT_CONDITION.frequency);
+    this._mode = MODE.frequency;
     const name = `ConditionValueEditorFrequencyCount${id++}`;
 
     // HTML
@@ -58,10 +66,10 @@ export default class ConditionValueEditorFrequencyCount {
     // set range selector
     const rangeSelectorView = section.querySelector('.range-selector-view');
     this._rangeSelectorView = new RangeSelectorView(rangeSelectorView, this, 0, 1, 'horizontal', 'advanced');
-    this._rangeSelectorView.updateGUIWithCondition(this._condition);
+    this._rangeSelectorView.updateGUIWithCondition(this._condition.frequency);
 
-    // events: switch mode
     const switchingElements = section.querySelectorAll(':scope > .body > .switching');
+    // events: switch mode
     for (const el of switchingElements) {
       const input = el.querySelector(':scope > label > input');
       input.addEventListener('change', e => {
@@ -79,29 +87,33 @@ export default class ConditionValueEditorFrequencyCount {
         });
       }
     }
+    // event: count
+    Array.from(switchingElements).find(el => el.classList.contains('count')).querySelectorAll(':scope > .input > input').forEach(input => input.addEventListener('change', e => {
+      this._condition.count[e.target.className] = e.target.value;
+      this._update();
+    }));
 
     this._update();
-
   }
 
 
   // public methods
 
-  changeParameter(newCondition, dataset) {
+  changeParameter(newCondition) {
     if (!this._rangeSelectorView) return;
     for (const key in newCondition) {
-      this._condition[key] = newCondition[key];
+      this._condition.frequency[key] = newCondition[key];
     }
     this._rangeSelectorView.updateGUIWithCondition(newCondition);
     this._update();
   }
 
   keepLastValues() {
-    this._lastValue = this._condition;
+    this._lastValue = this._condition[this._mode];
   }
 
   restore() {
-    this._condition = this._lastValue;
+    this._condition[this._mode] = this._lastValue;
     this._update();
   }
 
@@ -110,7 +122,7 @@ export default class ConditionValueEditorFrequencyCount {
   }
 
   get isValid() {
-    return true;
+    return this._validate();
   }
 
 
@@ -120,6 +132,7 @@ export default class ConditionValueEditorFrequencyCount {
 
     const valuesElement = this._valuesView.conditionView.valuesElement;
     let frequencyCountValueView = valuesElement.querySelector(':scope > .frequency-count-value-view');
+
     // make view
     if (!frequencyCountValueView) {
       frequencyCountValueView = document.createElement('div');
@@ -143,29 +156,34 @@ export default class ConditionValueEditorFrequencyCount {
 
     // set value
     frequencyCountValueView.dataset.mode = this._mode;
-    frequencyCountValueView.dataset.from = this._condition.from;
-    frequencyCountValueView.dataset.to = this._condition.to;
-    frequencyCountValueView.dataset.invert = this._condition.invert;
+    frequencyCountValueView.dataset.from = this._condition[this._mode].from ?? '';
+    frequencyCountValueView.dataset.to = this._condition[this._mode].to ?? '';
+    frequencyCountValueView.dataset.invert = this._condition[this._mode].invert ?? '';
     // update value
-    if (this._condition.invert === '0') {
-      this._fcvvBar1.style.left = this._condition.from * 100 + '%';
-      this._fcvvBar1.style.width = (this._condition.to - this._condition.from) * 100 + '%';
-      this._fcvvBar2.style.width = '0%';
-    } else {
-      this._fcvvBar1.style.left = '0%';
-      this._fcvvBar1.style.width = this._condition.from * 100 + '%';
-      this._fcvvBar2.style.left = this._condition.to * 100 + '%';
-      this._fcvvBar2.style.width = (1 - this._condition.to) * 100 + '%';
+    if (this._mode === MODE.frequency) {
+      if (this._condition[this._mode].invert === '0') {
+        this._fcvvBar1.style.left = this._condition[this._mode].from * 100 + '%';
+        this._fcvvBar1.style.width = (this._condition[this._mode].to - this._condition[this._mode].from) * 100 + '%';
+        this._fcvvBar2.style.width = '0%';
+      } else {
+        this._fcvvBar1.style.left = '0%';
+        this._fcvvBar1.style.width = this._condition[this._mode].from * 100 + '%';
+        this._fcvvBar2.style.left = this._condition[this._mode].to * 100 + '%';
+        this._fcvvBar2.style.width = (1 - this._condition[this._mode].to) * 100 + '%';
+      }
     }
-    this._fcvvFrom.textContent = this._condition.from;
-    this._fcvvTo.textContent = this._condition.to;
+    this._fcvvFrom.textContent = this._condition[this._mode].from;
+    this._fcvvTo.textContent = this._condition[this._mode].to;
 
     // validation
     this._valuesView.update(this._validate());
   }
 
   _validate() {
-    return true;
+    Object.keys(this._condition[this._mode]).some(key => {
+      return this._condition[this._mode][key] !== null;
+    })
+    return Object.keys(this._condition[this._mode]).some(key => this._condition[this._mode][key] !== null);
   }
 
 }
