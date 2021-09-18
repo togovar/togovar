@@ -129,8 +129,7 @@ export default class ConditionValueEditorColumns {
             left: left,
             behavior: 'smooth'
           });
-        };
-
+        }
 
       });
   }
@@ -173,6 +172,10 @@ export default class ConditionValueEditorColumns {
                   console.log(parentDatum)
                 }
                 resolve(newData);
+              })
+              .catch(error => {
+                console.error(error);
+                reject(error);
               });
           }
         }
