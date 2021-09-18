@@ -53,22 +53,22 @@ export default class ConditionValueEditorFrequencyCount {
             <input class="to" min="0" step="1" type="number">
           </div>
         </section>
-        <section>
+        <section class="filtered">
           <label>
-            <input type="checkbox">
+            <input type="checkbox" checked>
             <span>Exclude filtered out variants<span>
           </label>
         </section>
       </div>`;
     valuesView.sections.append(section);
-    this._body = section.querySelector(':scope > .body');
+    const body = section.querySelector(':scope > .body');
 
     // set range selector
     const rangeSelectorView = section.querySelector('.range-selector-view');
     this._rangeSelectorView = new RangeSelectorView(rangeSelectorView, this, 0, 1, 'horizontal', 'advanced');
     this._rangeSelectorView.updateGUIWithCondition(this._condition.frequency);
 
-    const switchingElements = section.querySelectorAll(':scope > .body > .switching');
+    const switchingElements = body.querySelectorAll(':scope > .switching');
     // events: switch mode
     for (const el of switchingElements) {
       const input = el.querySelector(':scope > label > input');
@@ -92,8 +92,14 @@ export default class ConditionValueEditorFrequencyCount {
       this._condition.count[e.target.className] = e.target.value;
       this._update();
     }));
+    // event: filtered
+    this._filtered = body.querySelector(':scope > .filtered > label > input');
+    this._filtered.addEventListener('change', () => {
+      this._update();
+    });
+    this._filtered.dispatchEvent(new Event('change'));
 
-    this._update();
+    //this._update();
   }
 
 
@@ -159,6 +165,7 @@ export default class ConditionValueEditorFrequencyCount {
     frequencyCountValueView.dataset.from = this._condition[this._mode].from ?? '';
     frequencyCountValueView.dataset.to = this._condition[this._mode].to ?? '';
     frequencyCountValueView.dataset.invert = this._condition[this._mode].invert ?? '';
+    frequencyCountValueView.dataset.filtered = this._filtered.checked ? true : false;
     // update value
     if (this._mode === MODE.frequency) {
       if (this._condition[this._mode].invert === '0') {
