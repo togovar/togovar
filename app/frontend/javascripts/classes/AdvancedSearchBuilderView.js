@@ -40,14 +40,22 @@ export default class AdvancedSearchBuilderView {
     console.log(conditionViews)
 
     // change status
+    let canUngroup = false;
+    let canCopy = false;
+    if (conditionViews.length === 1) {
+      canUngroup = conditionViews[0].type === CONDITION_ITEM_TYPE.group; 
+      canCopy = conditionViews[0].type === CONDITION_ITEM_TYPE.condition;      
+    }
     // can delete
     this._elm.dataset.canDelete = conditionViews.length > 0;
     // can group
     this._elm.dataset.canGroup = conditionViews.length > 1;
     // can ungroup
-    let canUngroup = false;
-    if (conditionViews.length === 1) canUngroup = conditionViews[0].type === CONDITION_ITEM_TYPE.group;
     this._elm.dataset.canUngroup = canUngroup;
+    // can copy
+    this._elm.dataset.canCopy = canCopy;
+    // can edit
+    // TODO:
   }
 
   // deselectedConditions(conditions) {
@@ -98,6 +106,9 @@ export default class AdvancedSearchBuilderView {
 
   copy() {
     console.log('_copy')
+    const selectingConditionViews = this._selection.getSelectingConditionViews();
+    console.log(selectingConditionViews)
+    // TODO:
     this.changeCondition();
   }
 
@@ -123,7 +134,6 @@ export default class AdvancedSearchBuilderView {
 
   // add search condition to the currently selected layer
   addCondition(conditionType) {
-    console.log(conditionType)
 
     // get selecting condition
     const selectingConditionViews = this._selection.getSelectingConditionViews();
@@ -143,6 +153,7 @@ export default class AdvancedSearchBuilderView {
         newConditionView = selectingConditionView.addNewConditionItem(conditionType);
         break;
     }
+    console.log(newConditionView);
   }
 
 

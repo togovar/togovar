@@ -20,16 +20,16 @@ export default class AdvancedSearchToolbar {
         label: 'Ungroup',
         shortcut: [16, 71]
       },
-      {
-        command: 'copy',
-        label: 'Copy',
-        shortcut: [67]
-      },
-      {
-        command: 'edit',
-        label: 'Edit',
-        shortcut: [69]
-      },
+      // {
+      //   command: 'copy',
+      //   label: 'Copy',
+      //   shortcut: [67]
+      // },
+      // {
+      //   command: 'edit',
+      //   label: 'Edit',
+      //   shortcut: [69]
+      // },
       {
         command: 'delete',
         label: 'Delete',

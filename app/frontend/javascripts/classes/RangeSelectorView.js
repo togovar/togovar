@@ -14,7 +14,7 @@ export default class RangeSelectorView {
    * @param {String} searchType 'simple' or 'advanced'
    */
   constructor(elm, delegate, _min = 0, max, orientation, searchType) {
-    console.log(_min = 0, max, orientation, searchType)
+
     this.elm = elm;
     this._delegate = delegate;
     this._orientation = orientation;
@@ -81,7 +81,6 @@ export default class RangeSelectorView {
 
       // events
       this._from.addEventListener('change', e => {
-        console.log(typeof e.target.value)
         e.target.value = parseFloat(e.target.value) < 0 ? 0 : e.target.value;
         this._changeParameter({from: e.target.value + ''});
       });
