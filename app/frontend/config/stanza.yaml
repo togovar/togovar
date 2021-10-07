@@ -109,16 +109,30 @@ gene:
         data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/gene_gwas?ep=${TOGOVAR_STANZA_SPARQL_URL}&hgnc_id=${hgnc_id}
         data-type: json
         padding: 0
-        page-size-option: 10,20,50,100
+        custom-css-url: https://togovar-dev.biosciencedbc.jp/stanza/variant-summary.css
+        page-size-option: 5,10,20,50,100
         page-slider: false
         columns:
+          - id: tgv_id
+            label: TogoVar ID
+            link: tgv_link
           - id: variant_and_risk_allele
             label: rs# and risk allele
+          - id: position
+            label: Position
+            escape: false
+          - id: ref_alt
+            label: Ref/Alt
+            escape: false
+          - id: alt_freq
+            label: Alt freq. of GEM-J WGA
+            type: number
+            significant-digits: true
+            exponent-digits: true
           - id: raf
             label: RAF
           - id: p_value
-            label: P-Value
-            type: number
+            label: P-value
           - id: odds_ratio
             label: OR
           - id: ci_text
@@ -133,7 +147,7 @@ gene:
             label: PubMed ID
             link: pubmed_uri
           - id: study_detail
-            label: Study details
+            label: Study accession
             link: study
           - id: initial_sample_size
             label: Discovery sample description
@@ -183,13 +197,14 @@ disease:
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/disease_clinvar?ep=${TOGOVAR_STANZA_SPARQL_URL}&medgen_cid=${medgen_cid}
         data-type: json
+        custom-css-url: https://togovar-dev.biosciencedbc.jp/stanza/variant-summary.css
         padding: 0
         page-size-option: 10,20,50,100
         page-slider: false
         columns:
           - id: tgv_id
             label: TogoVar ID
-            escape: false
+            link: variant_view
           - id: title
             label: Title
             link: clinvar
@@ -212,5 +227,32 @@ disease:
         padding: 0
         page-size-option: 10,20,50,100
         page-slider: false
+        columns:
+          - id: variant_and_risk_allele
+            label: rs# and risk allele
+          - id: raf
+            label: RAF
+          - id: p-value
+            label: P-value
+          - id: odds_ratio
+            label: OR
+          - id: ci_text
+            label: CI
+          - id: beta
+            label: Beta
+          - id: mapped_trait
+            label: Trait(s)
+            link: mapped_trait_uri
+          - id: pubmed_id
+            label: PubMed ID
+            link: pubmed_uri
+          - id: study_detail
+            label: Study accession
+            link: study
+          - id: initial_sample_size
+            label: Discovery sample description
+          - id: replication_sample_size
+            label: Replication sample description
+
     - id: disease-publication
       dom: "#disease-publication"
