@@ -131,8 +131,12 @@ gene:
             exponent-digits: true
           - id: raf
             label: RAF
+            type: number
           - id: p_value
             label: P-value
+            type: number
+            significant-digits: true
+            exponent-digits: true
           - id: odds_ratio
             label: OR
           - id: ci_text
@@ -151,8 +155,10 @@ gene:
             link: study
           - id: initial_sample_size
             label: Discovery sample description
+            line-clamp: 3
           - id: replication_sample_size
             label: Replication sample description
+            line-clamp: 3
 
     - id: gene-genomic-context
       dom: "#gene-genomic-context"
