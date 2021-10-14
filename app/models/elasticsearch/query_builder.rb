@@ -127,7 +127,7 @@ module Elasticsearch
     def quality(datasets)
       @quality_condition = nil
 
-      filter_sources = datasets & %i[exac gem_j_wga jga_ngs jga_snp tommo_4.7kjpn]
+      filter_sources = datasets & %i[gem_j_wga jga_ngs jga_snp tommo gnomad_exomes gnomad_genomes]
 
       return self if filter_sources.empty?
 
