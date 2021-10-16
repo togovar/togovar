@@ -50,7 +50,6 @@ variant:
             label: Beta
           - id: mapped_trait
             label: Trait(s)
-            link: mapped_trait_uri
             escape: false
           - id: pubmed_id
             label: PubMed ID
@@ -109,7 +108,7 @@ gene:
         data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/gene_gwas?ep=${TOGOVAR_STANZA_SPARQL_URL}&hgnc_id=${hgnc_id}
         data-type: json
         padding: 0
-        custom-css-url: https://togovar-dev.biosciencedbc.jp/stanza/variant-summary.css
+        custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css
         page-size-option: 5,10,20,50,100
         page-slider: false
         columns:
@@ -118,6 +117,7 @@ gene:
             link: tgv_link
           - id: variant_and_risk_allele
             label: rs# and risk allele
+            link: rs_uri
           - id: position
             label: Position
             escape: false
@@ -127,25 +127,25 @@ gene:
           - id: alt_freq
             label: Alt freq. of GEM-J WGA
             type: number
-            significant-digits: true
-            exponent-digits: true
+            significant-digits: 4
+            exponent-digits: 4
           - id: raf
             label: RAF
-            type: number
+            significant-digits: 4
           - id: p_value
             label: P-value
             type: number
-            significant-digits: true
-            exponent-digits: true
+            significant-digits: 4
+            exponent-digits: 4
           - id: odds_ratio
             label: OR
+            significant-digits: 4
           - id: ci_text
             label: CI
           - id: beta
             label: Beta
           - id: mapped_trait
             label: Trait(s)
-            link: mapped_trait_uri
             escape: false
           - id: pubmed_id
             label: PubMed ID
@@ -203,14 +203,14 @@ disease:
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/disease_clinvar?ep=${TOGOVAR_STANZA_SPARQL_URL}&medgen_cid=${medgen_cid}
         data-type: json
-        custom-css-url: https://togovar-dev.biosciencedbc.jp/stanza/variant-summary.css
+        custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css
         padding: 0
         page-size-option: 10,20,50,100
         page-slider: false
         columns:
           - id: tgv_id
             label: TogoVar ID
-            link: variant_view
+            link: tgv_link
           - id: title
             label: Title
             link: clinvar
@@ -236,10 +236,14 @@ disease:
         columns:
           - id: variant_and_risk_allele
             label: rs# and risk allele
+            escape: false
           - id: raf
             label: RAF
-          - id: p-value
+          - id: p_value
             label: P-value
+            type: number
+            significant-digits: 4
+            exponent-digits: 4
           - id: odds_ratio
             label: OR
           - id: ci_text
@@ -248,7 +252,7 @@ disease:
             label: Beta
           - id: mapped_trait
             label: Trait(s)
-            link: mapped_trait_uri
+            escape: false
           - id: pubmed_id
             label: PubMed ID
             link: pubmed_uri
@@ -257,8 +261,10 @@ disease:
             link: study
           - id: initial_sample_size
             label: Discovery sample description
+            line-clamp: 3
           - id: replication_sample_size
             label: Replication sample description
+            line-clamp: 3
 
     - id: disease-publication
       dom: "#disease-publication"
