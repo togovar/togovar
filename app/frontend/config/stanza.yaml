@@ -23,7 +23,7 @@ variant:
       dom: "#variant-frequency"
 
     - id: variant-clinvar
-      dom: "#variant-clinvar"      
+      dom: "#variant-clinvar"
 
     - id: pagination-table
       dom: "#variant-gwas"
