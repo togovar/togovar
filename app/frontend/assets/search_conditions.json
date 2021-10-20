@@ -32,8 +32,8 @@
         "has_freq": true
       },
       {
-        "id": "tommo_4.7kjpn",
-        "label": "ToMMo 4.7KJPN",
+        "id": "tommo",
+        "label": "ToMMo 8.3k JPN",
         "type": "boolean",
         "default": "1",
         "has_freq": true
@@ -46,8 +46,15 @@
         "has_freq": true
       },
       {
-        "id": "exac",
-        "label": "ExAC",
+        "id": "gnomad_genomes",
+        "label": "gnomAD genomes",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
+        "id": "gnomad_exomes",
+        "label": "gnomAD exomes",
         "type": "boolean",
         "default": "1",
         "has_freq": true
