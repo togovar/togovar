@@ -75,8 +75,10 @@ export default class ResultsRowView {
   }
 
   prepareTableData() {
-
     this.tr.innerHTML = ResultsRowView.template;
+    this._columnNodes = new Map(COLUMNS.map(column => [column.id, this.tr.querySelector(`:scope > .${column.id}`)]));
+    
+
     this.tdTGVAnchor = this.tr.querySelector(':scope > .tgv_id > a');
     this.tdRS = this.tr.querySelector(':scope > .rs');
     this.tdRSAnchor = this.tdRS.querySelector('a');
