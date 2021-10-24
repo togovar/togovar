@@ -79,7 +79,6 @@ export default class ResultsRowView {
     this._columnNodes = new Map(COLUMNS.map(column => [column.id, this.tr.querySelector(`:scope > .${column.id}`)]));
     
 
-    this.tdTGVAnchor = this.tr.querySelector(':scope > .tgv_id > a');
     this.tdRS = this.tr.querySelector(':scope > .rs');
     this.tdRSAnchor = this.tdRS.querySelector('a');
     const tdPosition = this.tr.querySelector(':scope > .chr_position > .chromosome-position');
@@ -127,17 +126,14 @@ export default class ResultsRowView {
     this.tr.classList.remove('-loading');
     this.tr.classList.remove('-out-of-range');
     for (const column of COLUMNS) {
+      const node = this._columnNodes.get(column.id);
       switch (column.id) {
         case 'tgv_id': // tgv
-        {
-          if (result.id) {
-            this.tdTGVAnchor.href = `/variant/${result.id}`;
-            this.tdTGVAnchor.textContent = result.id;
-          } else {
-            this.tdTGVAnchor.href = '';
-            this.tdTGVAnchor.textContent = '';
-          }
-        }
+          node.innerHTML = `<a
+            href="${result.id ? `/variant/${result.id}` : ''}"
+            class="hyper-text -internal"
+            target="_blank"
+          >${result.id ? result.id : ''}</a>`;
           break;
         case 'rs': // refSNP
         {
