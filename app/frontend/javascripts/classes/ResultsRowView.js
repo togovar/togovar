@@ -11,8 +11,8 @@ export default class ResultsRowView {
     if (!template) {
       template = COLUMNS.map(column => {
         return {
-          tgv_id: '<td class="tgv_id"><a href="" class="hyper-text -internal" target="_blank"></a></td>',
-          rs: '<td class="rs" data-remains=""><a href="" target="_blank" class="hyper-text -external"></a></td>',
+          tgv_id: '<td class="tgv_id"></td>',
+          rs: '<td class="rs""></td>',
           chr_position: '<td class="chr_position"><div class="chromosome-position"><div class="chromosome"></div><div class="coordinate"></div></div></td>',
           ref_alt: '<td class="ref_alt"><div class="ref-alt"><span class="ref" data-sum=""></span><span class="arrow"></span><span class="alt" data-sum=""><span class="sum"></span></span></div></td>',
           variant_type: '<td class="variant_type"><div class="variant-type"></div></td>',
@@ -79,8 +79,7 @@ export default class ResultsRowView {
     this._columnNodes = new Map(COLUMNS.map(column => [column.id, this.tr.querySelector(`:scope > .${column.id}`)]));
     
 
-    this.tdRS = this.tr.querySelector(':scope > .rs');
-    this.tdRSAnchor = this.tdRS.querySelector('a');
+
     const tdPosition = this.tr.querySelector(':scope > .chr_position > .chromosome-position');
     this.tdPositionChromosome = tdPosition.querySelector(':scope > .chromosome');
     this.tdPositionCoordinate = tdPosition.querySelector(':scope > .coordinate');
@@ -137,15 +136,22 @@ export default class ResultsRowView {
           break;
         case 'rs': // refSNP
         {
+          let remains, href, text;
           if (result.existing_variations) {
-            this.tdRS.dataset.remains = result.existing_variations.length - 1;
-            this.tdRSAnchor.href = `http://identifiers.org/dbsnp/${result.existing_variations[0]}`;
-            this.tdRSAnchor.textContent = `${result.existing_variations[0]}`;
+            remains = result.existing_variations.length - 1;
+            href = `http://identifiers.org/dbsnp/${result.existing_variations[0]}`;
+            text = `${result.existing_variations[0]}`;
           } else {
-            this.tdRS.dataset.remains = 0;
-            this.tdRSAnchor.href = '';
-            this.tdRSAnchor.textContent = '';
+            remains = 0;
+            href = '';
+            text = '';
           }
+          node.dataset.remains = remains;
+          node.innerHTML = `<a
+            href="${href}"
+            target="_blank"
+            class="hyper-text -external"
+          >${text}</a>`;
         }
           break;
         case 'chr_position': // position
