@@ -3,6 +3,7 @@ import StoreManager from "./StoreManager.js";
 import ChromosomePositionView from "./ChromosomePositionView.js";
 import RefAltView from "./RefAltView.js";
 import FrequencyGraphView from "./FrequencyGraphView.js";
+import VariantFunction from "./VariantFunction.js";
 
 let template;
 
@@ -20,10 +21,10 @@ export default class ResultsRowView {
           symbol: '<td class="symbol not-what-it-looks-like" data-remains=""></td>',
           allele_freq: '<td class="allele_freq not-what-it-looks-like"></td>',
           consequence: '<td class="consequence" data-remains=""></td>',
+          sift_value: '<td class="sift_value" data-remains=""></td>',
+          polyphen2_value: '<td class="polyphen2_value" data-remains=""></td>',
 
 
-          sift_value: '<td class="sift_value" data-remains=""><div class="variant-function" data-function=""></div></td>',
-          polyphen2_value: '<td class="polyphen2_value" data-remains=""><div class="variant-function" data-function=""></div></td>',
           clinical_significance: '<td class="clinical_significance" data-remains=""><!--<div class="dataset-icon -none" data-dataset="mgend"></div>--><div href="" class="clinical-significance" data-sign=""></div><a></a></td>'
         }[column.id];
       }).join('');
@@ -72,13 +73,11 @@ export default class ResultsRowView {
     this._chr_position = new ChromosomePositionView(this._columnNodes.get('chr_position'));
     this._ref_alt = new RefAltView(this._columnNodes.get('ref_alt'));
     this._allele_freq = new FrequencyGraphView(this._columnNodes.get('allele_freq'));
+    this._sift_value = new VariantFunction(this._columnNodes.get('sift_value'), 'sift_value');
+    this._polyphen2_value = new VariantFunction(this._columnNodes.get('polyphen2_value'), 'polyphen2_value');
 
 
 
-    this.tdSift = this.tr.querySelector(':scope > .sift_value');
-    this.tdSiftFunction = this.tdSift.querySelector(':scope > .variant-function');
-    this.tdPolyphen = this.tr.querySelector(':scope > .polyphen2_value');
-    this.tdPolyphenFunction = this.tdPolyphen.querySelector(':scope > .variant-function');
     this.tdClinical = this.tr.querySelector(':scope > .clinical_significance');
     this.tdClinicalSign = this.tdClinical.querySelector(':scope > .clinical-significance');
     this.tdClinicalAnchor = this.tdClinical.querySelector(':scope > a');
@@ -183,42 +182,19 @@ export default class ResultsRowView {
         }
           break;
         case 'sift_value': {
-          const sifts = result.transcripts.filter(x => Number.isFinite(x.sift));
-          if (sifts.length > 0) {
-            this.tdSift.dataset.remains = sifts.length - 1;
-            this.tdSiftFunction.textContent = result.sift;
-            this.tdSiftFunction.dataset.function = result.sift >= .05 ? 'T' : 'D';
-          } else {
-            this.tdSift.dataset.remains = 0;
-            this.tdSiftFunction.textContent = '';
-            this.tdSiftFunction.dataset.function = '';
-          }
+          this._sift_value.setValue(result.sift);
+          const sifts = result.transcripts?.filter(x => Number.isFinite(x.sift));
+          let remains = 0;
+          if (sifts.length > 0) remains = sifts.length - 1;
+          node.dataset.remains = remains;
         }
           break;
         case 'polyphen2_value': {
-          const polyphens = result.transcripts.filter(x => Number.isFinite(x.polyphen));
-          if (polyphens.length > 0) {
-            this.tdPolyphen.dataset.remains = polyphens.length - 1;
-            this.tdPolyphenFunction.textContent = result.polyphen;
-            switch (true) {
-              case result.polyphen > .908:
-                this.tdPolyphenFunction.dataset.function = 'PROBD';
-                break;
-              case result.polyphen > .446:
-                this.tdPolyphenFunction.dataset.function = 'POSSD';
-                break;
-              case result.polyphen >= 0:
-                this.tdPolyphenFunction.dataset.function = 'B';
-                break;
-              default:
-                this.tdPolyphenFunction.dataset.function = 'U';
-                break;
-            }
-          } else {
-            this.tdPolyphen.dataset.remains = 0;
-            this.tdPolyphenFunction.textContent = '';
-            this.tdPolyphenFunction.dataset.function = '';
-          }
+          this._polyphen2_value.setValue(result.polyphen);
+          const polyphens = result.transcripts?.filter(x => Number.isFinite(x.polyphen));
+          let remains = 0;
+          if (polyphens.length > 0) remains = polyphens.length - 1;
+          node.dataset.remains = remains;
         }
           break;
         case 'clinical_significance': {
