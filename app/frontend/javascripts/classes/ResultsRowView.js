@@ -12,14 +12,7 @@ export default class ResultsRowView {
   static get template() {
     if (!template) {
       template = COLUMNS.map(column => {
-        const notWhatItLooksLikes = ['symbol', 'allele_freq', 'clinical_significance']; 
-        return `<td class="${
-          column.id
-        }${
-          notWhatItLooksLikes.indexOf(column.id) !== -1
-            ? ' not-what-it-looks-like'
-            : ''
-        }"></td>`;
+        return `<td class="not-what-it-looks-like ${column.id}"></td>`;
       }).join('');
     }
     return template;
@@ -95,17 +88,23 @@ export default class ResultsRowView {
     this.tr.classList.remove('-out-of-range');
     for (const column of COLUMNS) {
       const node = this._columnNodes.get(column.id);
+      let text = '<span class="taking">-</span>';
       switch (column.id) {
         case 'tgv_id': // tgv
+          let href = '';
+          if (result.id) {
+            href = `/variant/${result.id}`;
+            text = result.id;
+          }
           node.innerHTML = `<a
-            href="${result.id ? `/variant/${result.id}` : ''}"
+            href="${href}"
             class="hyper-text -internal"
             target="_blank"
-          >${result.id ? result.id : ''}</a>`;
+          >${text}</a>`;
           break;
         case 'rs': // refSNP
         {
-          let remains = 0, href = '', text = '';
+          let remains = 0, href = '';
           if (result.existing_variations) {
             remains = result.existing_variations.length - 1;
             href = `http://identifiers.org/dbsnp/${result.existing_variations[0]}`;
@@ -133,7 +132,7 @@ export default class ResultsRowView {
           break;
         case 'symbol': // gene symbol
         {
-          let remains = 0, href = '', text = '', taking = '';
+          let remains = 0, href = '', taking = '';
           if (result.symbols && result.symbols.length) {
             remains = result.symbols.length - 1;
             href = `http://identifiers.org/hgnc/${result.symbols[0].id}`;
@@ -158,7 +157,7 @@ export default class ResultsRowView {
           this._allele_freq.setValues(result.frequencies);
           break;
         case 'consequence': {
-          let remains = 0, text = '';
+          let remains = 0;
           if (result.most_severe_consequence) {
             const master = StoreManager.getSearchConditionMaster('consequence');
             const consequences = [...new Set(result.transcripts.filter(trans => trans.consequence).map(trans => trans.consequence).flat())];
@@ -187,7 +186,7 @@ export default class ResultsRowView {
           break;
         case 'clinical_significance': {
           const master = StoreManager.getSearchConditionMaster('significance');
-          let remains = 0, text = '', sign = '', signLabel = '';
+          let remains = 0, sign = '', signLabel = '';
           if (result.significance && result.significance.length) {
             remains = result.significance.length - 1;
             sign = result.significance[0].interpretations[0];
