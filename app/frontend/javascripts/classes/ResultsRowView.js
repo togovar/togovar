@@ -18,9 +18,9 @@ export default class ResultsRowView {
           chr_position: '<td class="chr_position"></td>',
           ref_alt: '<td class="ref_alt"></td>',
           variant_type: '<td class="variant_type"></td>',
+          symbol: '<td class="symbol not-what-it-looks-like" data-remains=""></td>',
 
 
-          symbol: '<td class="symbol" data-remains=""><a href="" class="hyper-text -internal" target="_blank"></a></td>',
           allele_freq: (() => {
             const master = StoreManager.getSearchConditionMaster('dataset');
             return `
@@ -88,8 +88,6 @@ export default class ResultsRowView {
 
 
 
-    this.tdGene = this.tr.querySelector(':scope > .symbol');
-    this.tdGeneAnchor = this.tdGene.querySelector(':scope > a');
     this.tdFrequencies = {};
     this.tr.querySelectorAll('td.allele_freq > .frequency-graph > .dataset').forEach(elm => this.tdFrequencies[elm.dataset.dataset] = elm);
     this.tdConsequence = this.tr.querySelector(':scope > .consequence');
@@ -137,15 +135,11 @@ export default class ResultsRowView {
           break;
         case 'rs': // refSNP
         {
-          let remains, href, text;
+          let remains = 0, href = '', text = '';
           if (result.existing_variations) {
             remains = result.existing_variations.length - 1;
             href = `http://identifiers.org/dbsnp/${result.existing_variations[0]}`;
             text = `${result.existing_variations[0]}`;
-          } else {
-            remains = 0;
-            href = '';
-            text = '';
           }
           node.dataset.remains = remains;
           node.innerHTML = `<a
@@ -164,21 +158,30 @@ export default class ResultsRowView {
         case 'variant_type': // variant type
         {
           const master = StoreManager.getSearchConditionMaster('type').items;
-          node.innerHTML = `<div class="variant-type">${master.find(type => type.id === result.type).label}</div>`;
+          node.innerHTML = `<span class="variant-type">${master.find(type => type.id === result.type).label}</span>`;
         }
           break;
         case 'symbol': // gene symbol
         {
+          let remains = 0, href = '', text = '', taking = '';
           if (result.symbols && result.symbols.length) {
-            this.tdGene.dataset.remains = result.symbols.length - 1;
-            this.tdGeneAnchor.href = `http://identifiers.org/hgnc/${result.symbols[0].id}`;
-            // TODO:
-            this.tdGeneAnchor.textContent = result.symbols[0].name;
+            remains = result.symbols.length - 1;
+            href = `http://identifiers.org/hgnc/${result.symbols[0].id}`;
+            text = result.symbols[0].name;
+            taking = result.symbols.map((symbol, index) => {
+              return index === 0
+                ? ''
+                :  `<span class="taking -zero">,<a href="http://identifiers.org/hgnc/${symbol.id}">${symbol.name}</a></span>`;
+            }).join('');
           } else {
-            this.tdGene.dataset.remains = 0;
-            this.tdGeneAnchor.href = '';
-            this.tdGeneAnchor.textContent = '';
+            remains = 0;
           }
+          node.dataset.remains = remains;
+          node.innerHTML = `<a
+            href="${href}"
+            target="_blank"
+            class="hyper-text -internal"
+          >${text}</a>${taking}`;
         }
           break;
         case 'allele_freq': {
