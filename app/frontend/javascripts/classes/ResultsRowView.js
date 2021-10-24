@@ -1,5 +1,6 @@
 import {COLUMNS} from '../global.js';
 import StoreManager from "./StoreManager.js";
+import ChromosomePositionView from "./ChromosomePositionView.js";
 
 const REF_ALT_SHOW_LENGTH = 4;
 
@@ -13,7 +14,9 @@ export default class ResultsRowView {
         return {
           tgv_id: '<td class="tgv_id"></td>',
           rs: '<td class="rs""></td>',
-          chr_position: '<td class="chr_position"><div class="chromosome-position"><div class="chromosome"></div><div class="coordinate"></div></div></td>',
+          chr_position: '<td class="chr_position"></td>',
+
+          
           ref_alt: '<td class="ref_alt"><div class="ref-alt"><span class="ref" data-sum=""></span><span class="arrow"></span><span class="alt" data-sum=""><span class="sum"></span></span></div></td>',
           variant_type: '<td class="variant_type"><div class="variant-type"></div></td>',
           symbol: '<td class="symbol" data-remains=""><a href="" class="hyper-text -internal" target="_blank"></a></td>',
@@ -57,7 +60,7 @@ export default class ResultsRowView {
   }
 
   offset() {
-    this.update();
+    this._update();
   }
 
   selectedRow(index) {
@@ -71,18 +74,18 @@ export default class ResultsRowView {
   }
 
   rowCount() {
-    this.update();
+    this._update();
   }
 
   prepareTableData() {
     this.tr.innerHTML = ResultsRowView.template;
     this._columnNodes = new Map(COLUMNS.map(column => [column.id, this.tr.querySelector(`:scope > .${column.id}`)]));
     
+    // chr_position
+    this._chr_position = new ChromosomePositionView(this._columnNodes.get('chr_position'));
 
 
-    const tdPosition = this.tr.querySelector(':scope > .chr_position > .chromosome-position');
-    this.tdPositionChromosome = tdPosition.querySelector(':scope > .chromosome');
-    this.tdPositionCoordinate = tdPosition.querySelector(':scope > .coordinate');
+
     const tdRefAlt = this.tr.querySelector(':scope > .ref_alt > .ref-alt');
     this.tdRefAltRef = tdRefAlt.querySelector(':scope > .ref');
     this.tdRefAltAlt = tdRefAlt.querySelector(':scope > .alt');
@@ -102,7 +105,7 @@ export default class ResultsRowView {
     this.tdClinicalAnchor = this.tdClinical.querySelector(':scope > a');
   }
 
-  update() {
+  _update() {
     if (StoreManager.getData('rowCount') <= this.index) {
       this.tr.classList.add('-out-of-range');
       return
@@ -156,8 +159,7 @@ export default class ResultsRowView {
           break;
         case 'chr_position': // position
         {
-          this.tdPositionChromosome.textContent = result.chromosome;
-          this.tdPositionCoordinate.textContent = result.start;
+          this._chr_position.setValues(result.chromosome, result.start);
         }
           break;
         case 'ref_alt': // ref alt
