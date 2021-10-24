@@ -3,7 +3,43 @@ import StoreManager from "./StoreManager.js";
 
 const REF_ALT_SHOW_LENGTH = 4;
 
+let template;
+
 export default class ResultsRowView {
+
+  static get template() {
+    if (!template) {
+      template = COLUMNS.map(column => {
+        return {
+          tgv_id: '<td class="tgv_id"><a href="" class="hyper-text -internal" target="_blank"></a></td>',
+          rs: '<td class="rs" data-remains=""><a href="" target="_blank" class="hyper-text -external"></a></td>',
+          chr_position: '<td class="chr_position"><div class="chromosome-position"><div class="chromosome"></div><div class="coordinate"></div></div></td>',
+          ref_alt: '<td class="ref_alt"><div class="ref-alt"><span class="ref" data-sum=""></span><span class="arrow"></span><span class="alt" data-sum=""><span class="sum"></span></span></div></td>',
+          variant_type: '<td class="variant_type"><div class="variant-type"></div></td>',
+          symbol: '<td class="symbol" data-remains=""><a href="" class="hyper-text -internal" target="_blank"></a></td>',
+          allele_freq: (() => {
+            const master = StoreManager.getSearchConditionMaster('dataset');
+            return `
+                <td class="allele_freq">
+                  <div class="frequency-graph">
+                    ${master.items.map(dataset => {
+                      return dataset.has_freq
+                        ? `<div class="dataset" data-dataset="${dataset.id}" data-frequency=""></div>`
+                        : '';
+                    }).join('')}
+                  </div>
+                </td>`;
+          })(),
+          consequence: '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>',
+          sift_value: '<td class="sift_value" data-remains=""><div class="variant-function" data-function=""></div></td>',
+          polyphen2_value: '<td class="polyphen2_value" data-remains=""><div class="variant-function" data-function=""></div></td>',
+          clinical_significance: '<td class="clinical_significance" data-remains=""><!--<div class="dataset-icon -none" data-dataset="mgend"></div>--><div href="" class="clinical-significance" data-sign=""></div><a></a></td>'
+        }[column.id];
+      }).join('');
+    }
+    return template;
+  }
+
   constructor(index) {
     this.index = index;
     this.selected = false;
@@ -39,83 +75,31 @@ export default class ResultsRowView {
   }
 
   prepareTableData() {
-    let html = '';
-    for (const column of COLUMNS) {
-      switch (column.id) {
-        case 'tgv_id': // tgv
-          html += '<td class="togovar_id"><a href="" class="hyper-text -internal" target="_blank"></a></td>';
-          break;
-        case 'rs': // refSNP
-          html += `<td class="refsnp_id" data-remains=""><a href="" target="_blank" class="hyper-text -external"></a></td>`;
-          break;
-        case 'chr_position': // position
-          html += `<td class="position"><div class="chromosome-position"><div class="chromosome"></div><div class="coordinate"></div></div></td>`;
-          break;
-        case 'ref_alt': // ref alt
-          html += `<td class="ref_alt"><div class="ref-alt"><span class="ref" data-sum=""></span><span class="arrow"></span><span class="alt" data-sum=""><span class="sum"></span></span></div></td>`;
-          break;
-        case 'variant_type': // variant type
-          html += `<td class="type"><div class="variant-type"></div></td>`;
-          break;
-        case 'symbol': // gene symbol
-          html += '<td class="gene" data-remains=""><a href="" class="hyper-text -internal" target="_blank"></a></td>';
-          break;
-        case 'allele_freq': // frequency
-        {
-          const master = StoreManager.getSearchConditionMaster('dataset');
-          html += `
-              <td class="alt_frequency">
-                <div class="frequency-graph">
-                  ${master.items.map(dataset => {
-            if (dataset.id === 'gnomad' || dataset.id === 'mgend' || dataset.id === 'clinvar') {
-              return '';
-            } else {
-              return `<div class="dataset" data-dataset="${dataset.id}" data-frequency=""></div>`;
-            }
-          }).join('')}
-                </div>
-              </td>`;
-        }
-          break;
-        case 'consequence': // consequence
-          html += '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>';
-          break;
-        case 'sift_value': // SIFT
-          html += '<td class="sift" data-remains=""><div class="variant-function" data-function=""></div></td>';
-          break;
-        case 'polyphen2_value': // PolyPhen
-          html += '<td class="polyphen" data-remains=""><div class="variant-function" data-function=""></div></td>';
-          break;
-        case 'clinical_significance': // clinical significance
-          html += '<td class="clinical_significance" data-remains=""><!--<div class="dataset-icon -none" data-dataset="mgend"></div>--><div href="" class="clinical-significance" data-sign=""></div><a></a></td>';
-          break;
-      }
-    }
-    this.tr.innerHTML = html;
-    this.tdTGVAnchor = this.tr.querySelector('td.togovar_id > a');
-    this.tdRS = this.tr.querySelector('td.refsnp_id');
+
+    this.tr.innerHTML = ResultsRowView.template;
+    this.tdTGVAnchor = this.tr.querySelector(':scope > .tgv_id > a');
+    this.tdRS = this.tr.querySelector(':scope > .rs');
     this.tdRSAnchor = this.tdRS.querySelector('a');
-    const tdPosition = this.tr.querySelector('td.position > .chromosome-position');
-    this.tdPositionChromosome = tdPosition.querySelector('.chromosome');
-    this.tdPositionCoordinate = tdPosition.querySelector('.coordinate');
-    const tdRefAlt = this.tr.querySelector('td.ref_alt > .ref-alt');
-    this.tdRefAltRef = tdRefAlt.querySelector('.ref');
-    this.tdRefAltAlt = tdRefAlt.querySelector('.alt');
-    this.tdType = this.tr.querySelector('td.type > .variant-type');
-    this.tdGene = this.tr.querySelector('td.gene');
-    this.tdGeneAnchor = this.tdGene.querySelector('a');
+    const tdPosition = this.tr.querySelector(':scope > .chr_position > .chromosome-position');
+    this.tdPositionChromosome = tdPosition.querySelector(':scope > .chromosome');
+    this.tdPositionCoordinate = tdPosition.querySelector(':scope > .coordinate');
+    const tdRefAlt = this.tr.querySelector(':scope > .ref_alt > .ref-alt');
+    this.tdRefAltRef = tdRefAlt.querySelector(':scope > .ref');
+    this.tdRefAltAlt = tdRefAlt.querySelector(':scope > .alt');
+    this.tdType = this.tr.querySelector(':scope > .variant_type > .variant-type');
+    this.tdGene = this.tr.querySelector(':scope > .symbol');
+    this.tdGeneAnchor = this.tdGene.querySelector(':scope > a');
     this.tdFrequencies = {};
-    this.tr.querySelectorAll('td.alt_frequency > .frequency-graph > .dataset').forEach(elm => this.tdFrequencies[elm.dataset.dataset] = elm);
-    this.tdConsequence = this.tr.querySelector('td.consequence');
-    this.tdConsequenceItem = this.tdConsequence.querySelector('.consequence-item');
-    this.tdSift = this.tr.querySelector('td.sift');
-    this.tdSiftFunction = this.tdSift.querySelector('.variant-function');
-    this.tdPolyphen = this.tr.querySelector('td.polyphen');
-    this.tdPolyphenFunction = this.tdPolyphen.querySelector('.variant-function');
-    this.tdClinical = this.tr.querySelector('td.clinical_significance');
-    this.tdClinicalSign = this.tdClinical.querySelector('.clinical-significance');
-    //this.tdClinicalAnchor = this.tdClinical.querySelector('a.hyper-text.-internal');
-    this.tdClinicalAnchor = this.tdClinical.querySelector('a');
+    this.tr.querySelectorAll('td.allele_freq > .frequency-graph > .dataset').forEach(elm => this.tdFrequencies[elm.dataset.dataset] = elm);
+    this.tdConsequence = this.tr.querySelector(':scope > .consequence');
+    this.tdConsequenceItem = this.tdConsequence.querySelector(':scope > .consequence-item');
+    this.tdSift = this.tr.querySelector(':scope > .sift_value');
+    this.tdSiftFunction = this.tdSift.querySelector(':scope > .variant-function');
+    this.tdPolyphen = this.tr.querySelector(':scope > .polyphen2_value');
+    this.tdPolyphenFunction = this.tdPolyphen.querySelector(':scope > .variant-function');
+    this.tdClinical = this.tr.querySelector(':scope > .clinical_significance');
+    this.tdClinicalSign = this.tdClinical.querySelector(':scope > .clinical-significance');
+    this.tdClinicalAnchor = this.tdClinical.querySelector(':scope > a');
   }
 
   update() {
