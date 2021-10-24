@@ -12,19 +12,14 @@ export default class ResultsRowView {
   static get template() {
     if (!template) {
       template = COLUMNS.map(column => {
-        return {
-          tgv_id: '<td class="tgv_id"></td>',
-          rs: '<td class="rs""></td>',
-          chr_position: '<td class="chr_position"></td>',
-          ref_alt: '<td class="ref_alt"></td>',
-          variant_type: '<td class="variant_type"></td>',
-          symbol: '<td class="symbol not-what-it-looks-like" data-remains></td>',
-          allele_freq: '<td class="allele_freq not-what-it-looks-like"></td>',
-          consequence: '<td class="consequence" data-remains></td>',
-          sift_value: '<td class="sift_value" data-remains></td>',
-          polyphen2_value: '<td class="polyphen2_value" data-remains></td>',
-          clinical_significance: '<td class="clinical_significance not-what-it-looks-like" data-remains></td>'
-        }[column.id];
+        const notWhatItLooksLikes = ['symbol', 'allele_freq', 'clinical_significance']; 
+        return `<td class="${
+          column.id
+        }${
+          notWhatItLooksLikes.indexOf(column.id) !== -1
+            ? ' not-what-it-looks-like'
+            : ''
+        }"></td>`;
       }).join('');
     }
     return template;
