@@ -19,9 +19,9 @@ export default class ResultsRowView {
           variant_type: '<td class="variant_type"></td>',
           symbol: '<td class="symbol not-what-it-looks-like" data-remains=""></td>',
           allele_freq: '<td class="allele_freq not-what-it-looks-like"></td>',
+          consequence: '<td class="consequence" data-remains=""></td>',
 
 
-          consequence: '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>',
           sift_value: '<td class="sift_value" data-remains=""><div class="variant-function" data-function=""></div></td>',
           polyphen2_value: '<td class="polyphen2_value" data-remains=""><div class="variant-function" data-function=""></div></td>',
           clinical_significance: '<td class="clinical_significance" data-remains=""><!--<div class="dataset-icon -none" data-dataset="mgend"></div>--><div href="" class="clinical-significance" data-sign=""></div><a></a></td>'
@@ -75,8 +75,6 @@ export default class ResultsRowView {
 
 
 
-    this.tdConsequence = this.tr.querySelector(':scope > .consequence');
-    this.tdConsequenceItem = this.tdConsequence.querySelector(':scope > .consequence-item');
     this.tdSift = this.tr.querySelector(':scope > .sift_value');
     this.tdSiftFunction = this.tdSift.querySelector(':scope > .variant-function');
     this.tdPolyphen = this.tr.querySelector(':scope > .polyphen2_value');
@@ -173,15 +171,15 @@ export default class ResultsRowView {
           this._allele_freq.setValues(result.frequencies);
           break;
         case 'consequence': {
+          let remains = 0, text = '';
           if (result.most_severe_consequence) {
             const master = StoreManager.getSearchConditionMaster('consequence');
-            const unique = [...new Set(result.transcripts.reduce((accumulator, transcript) => accumulator.concat(transcript.consequences), []))];
-            this.tdConsequence.dataset.remains = unique.length - 1;
-            this.tdConsequenceItem.textContent = master.items.find(consequence => consequence.id === result.most_severe_consequence).label;
-          } else {
-            this.tdConsequence.dataset.remains = 0;
-            this.tdConsequenceItem.textContent = '';
+            const consequences = [...new Set(result.transcripts.filter(trans => trans.consequence).map(trans => trans.consequence).flat())];
+            remains = consequences.length - 1;
+            text = master.items.find(consequence => consequence.id === result.most_severe_consequence).label;
           }
+          node.dataset.remains = remains;
+          node.innerHTML = `<span class="consequence-item">${text}</span>`;
         }
           break;
         case 'sift_value': {
