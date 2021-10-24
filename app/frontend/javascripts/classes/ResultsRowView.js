@@ -48,7 +48,7 @@ export default class ResultsRowView {
         case 'rs': // refSNP
           html += `<td class="refsnp_id" data-remains=""><a href="" target="_blank" class="hyper-text -external"></a></td>`;
           break;
-        case 'position': // position
+        case 'chr_position': // position
           html += `<td class="position"><div class="chromosome-position"><div class="chromosome"></div><div class="coordinate"></div></div></td>`;
           break;
         case 'ref_alt': // ref alt
@@ -60,7 +60,7 @@ export default class ResultsRowView {
         case 'symbol': // gene symbol
           html += '<td class="gene" data-remains=""><a href="" class="hyper-text -internal" target="_blank"></a></td>';
           break;
-        case 'freq': // frequency
+        case 'allele_freq': // frequency
         {
           const master = StoreManager.getSearchConditionMaster('dataset');
           html += `
@@ -166,7 +166,7 @@ export default class ResultsRowView {
           }
         }
           break;
-        case 'position': // position
+        case 'chr_position': // position
         {
           this.tdPositionChromosome.textContent = result.chromosome;
           this.tdPositionCoordinate.textContent = result.start;
@@ -204,7 +204,7 @@ export default class ResultsRowView {
           }
         }
           break;
-        case 'freq': {
+        case 'allele_freq': {
           const master = StoreManager.getSearchConditionMaster('dataset');
           for (const dataset of master.items) {
             if (!dataset.has_freq) continue;

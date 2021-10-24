@@ -26,7 +26,12 @@ export default class ResultsView {
     this.elm.querySelector('.tablecontainer').insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
     new ScrollBar(this.elm.querySelector('.scroll-bar'));
 
-    this.elm.querySelector('.tablecontainer > table.results-view > thead > tr').innerHTML = COLUMNS.map(column => `<th class="${column.id}"><p>${column.label}</p></th>`).join('');
+    this.elm.querySelector('.tablecontainer > table.results-view > thead > tr').innerHTML = COLUMNS.map(column => `<th class="${column.id}">
+      <p class="not-what-it-looks-like">
+        <span class="looking">${column.label}</span>
+        <span class="taking">${column.header}</span>
+      </p>
+    </th>`).join('');
 
     this.tbody = this.elm.querySelector('.tablecontainer > table.results-view > tbody');
 

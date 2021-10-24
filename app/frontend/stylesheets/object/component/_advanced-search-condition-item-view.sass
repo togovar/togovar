@@ -1,0 +1,265 @@
+$HEIGHT: $HEIGHT_ADVANCED_SEARCH_CONDITION
+$HEIGHT_RELATION: 16px
+$HEIGHT_VALUE: 18px
+$PADDING_VALUES: ($HEIGHT - $HEIGHT_VALUE) / 2
+$CORNER_RADIUS: $HEIGHT / 2
+
+.advanced-search-condition-item-view
+  margin-bottom: 3px
+  position: relative
+  > .body
+    border-radius: $CORNER_RADIUS
+    background-color: white
+    box-shadow: 0 1px 1px rgba(black, .3)
+    position: relative
+    // overflow: hidden
+    > .summary
+      padding-right: 8px
+      color: $COLOR_BLACK
+      background-color: #F0F0EF
+      font-size: 12px
+      display: flex
+      align-items: stretch
+      min-height: $HEIGHT
+      border-radius: $CORNER_RADIUS
+      > .classification
+        background-color: $COLOR_BLACK
+        color: white
+        line-height: $HEIGHT
+        padding: 0 0 0 $CORNER_RADIUS
+        width: 188px
+        min-width: 188px
+        cursor: grab
+        font-weight: bold
+        border-top-left-radius: $CORNER_RADIUS
+        border-bottom-left-radius: $CORNER_RADIUS
+      > .values
+        flex-grow: 1
+        padding: $PADDING_VALUES $CORNER_RADIUS $PADDING_VALUES 6px
+        display: flex
+        flex-wrap: wrap
+        align-items: center
+        position: relative
+        > .value
+          height: 18px
+          line-height: 18px
+          padding: 0 #{$HEIGHT_VALUE * .5}
+          background-color: white
+          border: solid 1px $COLOR_KEY_DARK2
+          border-radius: $HEIGHT_VALUE * .5
+          font-weight: bold
+          margin-right: 2px
+        > .numeralvalue
+          margin-left: 8px
+          width: 120px
+          height: $HEIGHT_VALUE
+          padding: 2px 0
+          display: flex
+          align-items: center
+          > .graph
+            display: inline-block
+            border: solid 1px white
+            box-shadow: 0 0 0 1px $COLOR_GRAY
+            padding: 1px
+            background-color: white
+            width: 54px
+            height: 100%
+            position: relative
+            margin-right: 4px
+            > .bar
+              position: absolute
+              background-color: $COLOR_KEY_DARK2
+              width: 100%
+              height: 100%
+              top: 0
+              left: 0
+          > .text
+            font-weight: bold
+      > .editbutton
+        color: white
+        background-color: $COLOR_KEY_DARK1
+        font-size: 10px
+        position: relative
+        top: 5px
+        height: 14px
+        line-height: 14px
+        padding: 0 7px
+        border-radius: 3px
+        font-weight: bold
+        opacity: .5
+        cursor: pointer
+        &:hover
+          opacity: 1
+    > .advanced-search-condition-editor-view
+      display: none
+      border-top: none
+      background-color: white
+      height: 0
+      // overflow: hidden
+      transition: height $GUI_DURATION
+      border-bottom-left-radius: $CORNER_RADIUS
+      border-bottom-right-radius: $CORNER_RADIUS
+  > .bg
+    background: $BACKDROP_BG
+    position: fixed
+    width: 100vw
+    height: 100vh
+    top: 0
+    left: 0
+    opacity: 0
+    pointer-events: none
+    transition: opacity $TRANSITION_DURATION
+  &.-editing
+    > .body
+      z-index: $Z_INDEX_EDITING_CONDITION + 1
+      > .summary
+        > .classification
+          border-bottom-left-radius: 0
+        > .editbutton
+          opacity: 0
+          pointer-events: none
+      > .advanced-search-condition-editor-view
+        display: block
+        height: auto
+    > .bg
+      pointer-events: auto
+      opacity: 1
+      z-index: $Z_INDEX_EDITING_CONDITION
+  &[data-relation="eq"], &[data-relation="ne"]
+    > .body
+      > .summary
+        > .relation
+          margin: #{($HEIGHT - $HEIGHT_RELATION) / 2} #{-$HEIGHT_RELATION / 2}
+          background-color: $COLOR_KEY_DARK1
+          width: $HEIGHT_RELATION
+          min-width: $HEIGHT_RELATION
+          height: $HEIGHT_RELATION
+          border-radius: 3px
+          position: relative
+          cursor: pointer
+          &::before, &::after
+            content: ""
+            display: block
+            position: absolute
+          &::before
+            width: 8px
+            height: 2px
+            top: 5px
+            left: 4px
+            background-color: white
+            box-shadow: 0 4px white
+        > .values
+          padding-left: 16px
+  &[data-relation="ne"]
+    > .body
+      > .summary
+        > .classification
+          background-color: $COLOR_DISABLE_DEEP
+        > .relation
+          background-color: $COLOR_DISABLE
+          &::after
+            height: 12px
+            border-left: solid 1px white
+            transform: rotate(-20deg)
+            top: 2px
+            left: 6.5px
+  &.-selected
+    &::after
+      content: ""
+      display: block
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+      border: solid 2px $COLOR_SELECTED
+      border-radius: $CORNER_RADIUS
+      pointer-events: none
+  &[data-classification="dataset"]
+    > .body
+      > .summary
+        > .values
+          > .value
+            min-width: 120px
+            &::before
+              font-family: fontello
+              content: $CHAR_DATASET
+              margin-right: 4px
+            &[data-value="jga_ngs"], &[data-value="jga_snp"]
+              border-color: $COLOR_DATASET_JGA
+              background-color: $COLOR_DATASET_JGA_LIGHT
+              &::before
+                color: $COLOR_DATASET_JGA
+            &[data-value="tommo_4.7kjpn"]
+              border-color: $COLOR_DATASET_TOMMO
+              background-color: $COLOR_DATASET_TOMMO_LIGHT
+              &::before
+                color: $COLOR_DATASET_TOMMO
+            &[data-value="hgvd"], &[data-value="mgend"]
+              border-color: $COLOR_DATASET_HGVD
+              background-color: $COLOR_DATASET_HGVD_LIGHT
+              &::before
+                color: $COLOR_DATASET_HGVD
+            &[data-value="gem_j_wga"]
+              border-color: $COLOR_DATASET_GEM_J
+              background-color: $COLOR_DATASET_GEM_J_LIGHT
+              &::before
+                color: $COLOR_DATASET_GEM_J
+            &[data-value="bbj"]
+              border-color: $COLOR_DATASET_BBJ
+              background-color: $COLOR_DATASET_BBJ_LIGHT
+              &::before
+                color: $COLOR_DATASET_BBJ
+            &[data-value="clinvar"], &[data-value="exac"], &[data-value="gnomad"]
+              border-color: $COLOR_DATASET_FOREIGN
+              background-color: $COLOR_DATASET_FOREIGN_LIGHT
+              &::before
+                color: $COLOR_DATASET_FOREIGN
+  &[data-classification="significance"]
+    > .body
+      > .summary
+        > .values
+          > .value
+            &::before
+              content: attr(data-value)
+              margin-right: 3px
+            &[data-value="P"]
+              border-color: $COLOR_SIGN_DANGEROUS
+              background-color: $COLOR_SIGN_DANGEROUS_LIGHT
+              &::before
+                color: $COLOR_SIGN_DANGEROUS
+            &[data-value="LP"]
+              border-color: $COLOR_SIGN_WARNING
+              background-color: $COLOR_SIGN_WARNING_LIGHT
+              &::before
+                color: $COLOR_SIGN_WARNING
+            &[data-value="US"]
+              border-color: $COLOR_SIGN_UNKNOWN
+              background-color: $COLOR_SIGN_UNKNOWN_LIGHT
+              &::before
+                color: $COLOR_SIGN_UNKNOWN
+            &[data-value="LB"]
+              border-color: $COLOR_SIGN_NORMAL
+              background-color: $COLOR_SIGN_NORMAL_LIGHT
+              &::before
+                color: $COLOR_SIGN_NORMAL
+            &[data-value="B"]
+              border-color: $COLOR_SIGN_SAFE
+              background-color: $COLOR_SIGN_SAFE_LIGHT
+              &::before
+                color: $COLOR_SIGN_SAFE
+            &[data-value="CI"]
+              border-color: $COLOR_SIGN_MODIFIER
+              background-color: $COLOR_SIGN_MODIFIER_LIGHT
+              &::before
+                color: $COLOR_SIGN_MODIFIER
+            &[data-value="DR"], &[data-value="A"], &[data-value="RF"], &[data-value="PR"], &[data-value="AF"], &[data-value="O"]
+              border-color: $COLOR_SIGN_OTHER
+              background-color: $COLOR_SIGN_OTHER_LIGHT
+              &::before
+                color: $COLOR_SIGN_OTHER
+            &[data-value="NP"], &[data-value="AN"], &[data-value="NC"]
+              border-color: $COLOR_GRAY
+              background-color: white
+              &::before
+                color: $COLOR_GRAY

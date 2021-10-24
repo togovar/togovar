@@ -3,19 +3,19 @@ export const TR_HEIGHT = 27;
 export const COMMON_HEADER_HEIGHT = 30;
 export const COMMON_FOOTER_HEIGHT = 22;
 export const API_URL = process.env.TOGOVAR_FRONTEND_API_URL || 'https://togovar.biosciencedbc.jp';
-
+  
 export const COLUMNS = [
-  {id: 'tgv_id', label: 'TogoVar ID', },
-  {id: 'rs', label: 'RefSNP ID', },
-  {id: 'position', label: 'Position', },
-  {id: 'ref_alt', label: 'Ref / Alt', },
-  {id: 'variant_type', label: 'Type', },
-  {id: 'symbol', label: 'Gene', },
-  {id: 'freq', label: 'Alt frequency', },
-  {id: 'consequence', label: 'Consequence', },
-  {id: 'sift_value', label: 'SIFT', },
-  {id: 'polyphen2_value', label: 'PolyPhen', },
-  {id: 'clinical_significance', label: 'Clinical significance', }
+  {id: 'tgv_id', label: 'TogoVar ID', header: 'tgv_id'},
+  {id: 'rs', label: 'RefSNP ID', header: 'rs'},
+  {id: 'chr_position', label: 'Position', header: 'chr_position'},
+  {id: 'ref_alt', label: 'Ref / Alt', header: 'ref_alt'},
+  {id: 'variant_type', label: 'Type', header: 'variant_type'},
+  {id: 'symbol', label: 'Gene', header: 'symbol'},
+  {id: 'allele_freq', label: 'Alt frequency', header: 'allele_freq'},
+  {id: 'consequence', label: 'Consequence', header: 'consequence'},
+  {id: 'sift_value', label: 'SIFT', header: 'sift_value'},
+  {id: 'polyphen2_value', label: 'PolyPhen', header: 'polyphen2_value'},
+  {id: 'clinical_significance', label: 'Clinical significance', header: 'clinical_significance'}
 ];
 
 /*
