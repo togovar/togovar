@@ -21,10 +21,11 @@ class StoreManager {
   }
 
   ready(callback) {
-    const json = require('../../assets/search_conditions.json');
+    const master = require('../../assets/master.json');
+    const searchConditionsMaster = master.search_conditions_master;
 
-    Object.freeze(json);
-    this.setData('searchConditionsMaster', json);
+    Object.freeze(searchConditionsMaster);
+    this.setData('searchConditionsMaster', searchConditionsMaster);
     this._store.searchConditions = this._extractSearchCondition(this._URIParameters);
     callback();
     this._isReady = true;
