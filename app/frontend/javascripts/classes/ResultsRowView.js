@@ -1,6 +1,7 @@
 import {COLUMNS} from '../global.js';
 import StoreManager from "./StoreManager.js";
 import ChromosomePositionView from "./ChromosomePositionView.js";
+import RefAltView from "./RefAltView.js";
 
 const REF_ALT_SHOW_LENGTH = 4;
 
@@ -15,9 +16,9 @@ export default class ResultsRowView {
           tgv_id: '<td class="tgv_id"></td>',
           rs: '<td class="rs""></td>',
           chr_position: '<td class="chr_position"></td>',
+          ref_alt: '<td class="ref_alt"></td>',
 
-          
-          ref_alt: '<td class="ref_alt"><div class="ref-alt"><span class="ref" data-sum=""></span><span class="arrow"></span><span class="alt" data-sum=""><span class="sum"></span></span></div></td>',
+
           variant_type: '<td class="variant_type"><div class="variant-type"></div></td>',
           symbol: '<td class="symbol" data-remains=""><a href="" class="hyper-text -internal" target="_blank"></a></td>',
           allele_freq: (() => {
@@ -81,14 +82,11 @@ export default class ResultsRowView {
     this.tr.innerHTML = ResultsRowView.template;
     this._columnNodes = new Map(COLUMNS.map(column => [column.id, this.tr.querySelector(`:scope > .${column.id}`)]));
     
-    // chr_position
     this._chr_position = new ChromosomePositionView(this._columnNodes.get('chr_position'));
+    this._ref_alt = new RefAltView(this._columnNodes.get('ref_alt'));
 
 
 
-    const tdRefAlt = this.tr.querySelector(':scope > .ref_alt > .ref-alt');
-    this.tdRefAltRef = tdRefAlt.querySelector(':scope > .ref');
-    this.tdRefAltAlt = tdRefAlt.querySelector(':scope > .alt');
     this.tdType = this.tr.querySelector(':scope > .variant_type > .variant-type');
     this.tdGene = this.tr.querySelector(':scope > .symbol');
     this.tdGeneAnchor = this.tdGene.querySelector(':scope > a');
@@ -158,21 +156,10 @@ export default class ResultsRowView {
         }
           break;
         case 'chr_position': // position
-        {
           this._chr_position.setValues(result.chromosome, result.start);
-        }
           break;
         case 'ref_alt': // ref alt
-        {
-          const refalt = {
-            ref: result.reference ? result.reference : '',
-            alt: result.alternative ? result.alternative : ''
-          }
-          this.tdRefAltRef.textContent = refalt.ref.substr(0, REF_ALT_SHOW_LENGTH) + (refalt.ref.length > REF_ALT_SHOW_LENGTH ? '...' : '');
-          this.tdRefAltRef.dataset.sum = refalt.ref.length;
-          this.tdRefAltAlt.textContent = refalt.alt.substr(0, REF_ALT_SHOW_LENGTH) + (refalt.alt.length > REF_ALT_SHOW_LENGTH ? '...' : '');
-          this.tdRefAltAlt.dataset.sum = refalt.alt.length;
-        }
+          this._ref_alt.setValues(result);
           break;
         case 'variant_type': // variant type
         {

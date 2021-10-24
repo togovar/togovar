@@ -3,9 +3,8 @@ $COLOR_ALT_BG: desaturate(lighten($COLOR_ALT, 24%), 10%)
 
 .ref-alt
   font-weight: bold
-  display: flex
 
-  > .ref, > .alt
+  .ref, .alt
     display: inline-block
     line-height: 18px
     height: 18px
@@ -30,7 +29,7 @@ $COLOR_ALT_BG: desaturate(lighten($COLOR_ALT, 24%), 10%)
       &:after
         display: none
 
-  > .ref
+  .ref
     border-left: solid 1px $COLOR_REF
     border-top: solid 1px $COLOR_REF
     border-bottom: solid 1px $COLOR_REF
@@ -44,7 +43,7 @@ $COLOR_ALT_BG: desaturate(lighten($COLOR_ALT, 24%), 10%)
     &[data-sum]:after
       background-color: $COLOR_REF
 
-  > .alt
+  .alt
     border-right: solid 1px $COLOR_ALT
     border-top: solid 1px $COLOR_ALT
     border-bottom: solid 1px $COLOR_ALT
@@ -56,8 +55,9 @@ $COLOR_ALT_BG: desaturate(lighten($COLOR_ALT, 24%), 10%)
 
     &[data-sum]:after
       background-color: $COLOR_ALT
+  
 
-  > .arrow
+  .arrow
     position: relative
 
     &:before, &:after
