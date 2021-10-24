@@ -42,10 +42,10 @@ export default class ResultsRowView {
     let html = '';
     for (const column of COLUMNS) {
       switch (column.id) {
-        case 'togovar_id': // tgv
+        case 'tgv_id': // tgv
           html += '<td class="togovar_id"><a href="" class="hyper-text -internal" target="_blank"></a></td>';
           break;
-        case 'refsnp_id': // refSNP
+        case 'rs': // refSNP
           html += `<td class="refsnp_id" data-remains=""><a href="" target="_blank" class="hyper-text -external"></a></td>`;
           break;
         case 'position': // position
@@ -54,13 +54,13 @@ export default class ResultsRowView {
         case 'ref_alt': // ref alt
           html += `<td class="ref_alt"><div class="ref-alt"><span class="ref" data-sum=""></span><span class="arrow"></span><span class="alt" data-sum=""><span class="sum"></span></span></div></td>`;
           break;
-        case 'type': // variant type
+        case 'variant_type': // variant type
           html += `<td class="type"><div class="variant-type"></div></td>`;
           break;
-        case 'gene': // gene symbol
+        case 'symbol': // gene symbol
           html += '<td class="gene" data-remains=""><a href="" class="hyper-text -internal" target="_blank"></a></td>';
           break;
-        case 'alt_frequency': // frequency
+        case 'freq': // frequency
         {
           const master = StoreManager.getSearchConditionMaster('dataset');
           html += `
@@ -80,10 +80,10 @@ export default class ResultsRowView {
         case 'consequence': // consequence
           html += '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>';
           break;
-        case 'sift': // SIFT
+        case 'sift_value': // SIFT
           html += '<td class="sift" data-remains=""><div class="variant-function" data-function=""></div></td>';
           break;
-        case 'polyphen': // PolyPhen
+        case 'polyphen2_value': // PolyPhen
           html += '<td class="polyphen" data-remains=""><div class="variant-function" data-function=""></div></td>';
           break;
         case 'clinical_significance': // clinical significance
@@ -142,7 +142,7 @@ export default class ResultsRowView {
     this.tr.classList.remove('-out-of-range');
     for (const column of COLUMNS) {
       switch (column.id) {
-        case 'togovar_id': // tgv
+        case 'tgv_id': // tgv
         {
           if (result.id) {
             this.tdTGVAnchor.href = `/variant/${result.id}`;
@@ -153,7 +153,7 @@ export default class ResultsRowView {
           }
         }
           break;
-        case 'refsnp_id': // refSNP
+        case 'rs': // refSNP
         {
           if (result.existing_variations) {
             this.tdRS.dataset.remains = result.existing_variations.length - 1;
@@ -184,13 +184,13 @@ export default class ResultsRowView {
           this.tdRefAltAlt.dataset.sum = refalt.alt.length;
         }
           break;
-        case 'type': // variant type
+        case 'variant_type': // variant type
         {
           const master = StoreManager.getSearchConditionMaster('type').items;
           this.tdType.textContent = master.find(type => type.id === result.type).label;
         }
           break;
-        case 'gene': // gene symbol
+        case 'symbol': // gene symbol
         {
           if (result.symbols && result.symbols.length) {
             this.tdGene.dataset.remains = result.symbols.length - 1;
@@ -204,7 +204,7 @@ export default class ResultsRowView {
           }
         }
           break;
-        case 'alt_frequency': {
+        case 'freq': {
           const master = StoreManager.getSearchConditionMaster('dataset');
           for (const dataset of master.items) {
             if (!dataset.has_freq) continue;
@@ -256,7 +256,7 @@ export default class ResultsRowView {
           }
         }
           break;
-        case 'sift': {
+        case 'sift_value': {
           const sifts = result.transcripts.filter(x => Number.isFinite(x.sift));
           if (sifts.length > 0) {
             this.tdSift.dataset.remains = sifts.length - 1;
@@ -269,7 +269,7 @@ export default class ResultsRowView {
           }
         }
           break;
-        case 'polyphen': {
+        case 'polyphen2_value': {
           const polyphens = result.transcripts.filter(x => Number.isFinite(x.polyphen));
           if (polyphens.length > 0) {
             this.tdPolyphen.dataset.remains = polyphens.length - 1;
