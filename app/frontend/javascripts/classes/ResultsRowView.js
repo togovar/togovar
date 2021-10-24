@@ -257,8 +257,8 @@ export default class ResultsRowView {
         }
           break;
         case 'sift': {
-          const sifts = result.transcripts.filter(x => Number.isFinite(x.sift));
-          if (sifts.length > 0) {
+          const sifts = result.transcripts?.filter(x => Number.isFinite(x.sift));
+          if (sifts && sifts.length > 0) {
             this.tdSift.dataset.remains = sifts.length - 1;
             this.tdSiftFunction.textContent = result.sift;
             this.tdSiftFunction.dataset.function = result.sift >= .05 ? 'T' : 'D';
@@ -270,8 +270,8 @@ export default class ResultsRowView {
         }
           break;
         case 'polyphen': {
-          const polyphens = result.transcripts.filter(x => Number.isFinite(x.polyphen));
-          if (polyphens.length > 0) {
+          const polyphens = result.transcripts?.filter(x => Number.isFinite(x.polyphen));
+          if (polyphens && polyphens.length > 0) {
             this.tdPolyphen.dataset.remains = polyphens.length - 1;
             this.tdPolyphenFunction.textContent = result.polyphen;
             switch (true) {
