@@ -28,17 +28,15 @@ $HEIGHT_BIT_SHIFT: $HEIGHT_BIT + 1px
 
     &[data-dataset="jga_ngs"], &[data-dataset="jga_snp"]
       background-color: $COLOR_DATASET_JGA
-
-    &[data-dataset="tommo_4.7kjpn"]
-      background-color: $COLOR_DATASET_3_5KJPN
-
+    &[data-dataset="tommo"]
+      background-color: $COLOR_DATASET_TOMMO
     &[data-dataset="hgvd"]
       background-color: $COLOR_DATASET_HGVD
 
     &[data-dataset="gem_j_wga"]
       background-color: $COLOR_DATASET_GEM_J
-
-    &[data-dataset="exac"]
+    &[data-dataset="gnomad_genomes"], &[data-dataset="gnomad_exomes"]
+      //margin-left: 4px
       background-color: $COLOR_DATASET_FOREIGN
 
     &[data-frequency="na"]
