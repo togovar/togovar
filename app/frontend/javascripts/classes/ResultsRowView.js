@@ -2,8 +2,7 @@ import {COLUMNS} from '../global.js';
 import StoreManager from "./StoreManager.js";
 import ChromosomePositionView from "./ChromosomePositionView.js";
 import RefAltView from "./RefAltView.js";
-
-const REF_ALT_SHOW_LENGTH = 4;
+import FrequencyGraphView from "./FrequencyGraphView.js";
 
 let template;
 
@@ -19,21 +18,9 @@ export default class ResultsRowView {
           ref_alt: '<td class="ref_alt"></td>',
           variant_type: '<td class="variant_type"></td>',
           symbol: '<td class="symbol not-what-it-looks-like" data-remains=""></td>',
+          allele_freq: '<td class="allele_freq not-what-it-looks-like"></td>',
 
 
-          allele_freq: (() => {
-            const master = StoreManager.getSearchConditionMaster('dataset');
-            return `
-                <td class="allele_freq">
-                  <div class="frequency-graph">
-                    ${master.items.map(dataset => {
-                      return dataset.has_freq
-                        ? `<div class="dataset" data-dataset="${dataset.id}" data-frequency=""></div>`
-                        : '';
-                    }).join('')}
-                  </div>
-                </td>`;
-          })(),
           consequence: '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>',
           sift_value: '<td class="sift_value" data-remains=""><div class="variant-function" data-function=""></div></td>',
           polyphen2_value: '<td class="polyphen2_value" data-remains=""><div class="variant-function" data-function=""></div></td>',
@@ -84,12 +71,10 @@ export default class ResultsRowView {
     
     this._chr_position = new ChromosomePositionView(this._columnNodes.get('chr_position'));
     this._ref_alt = new RefAltView(this._columnNodes.get('ref_alt'));
+    this._allele_freq = new FrequencyGraphView(this._columnNodes.get('allele_freq'));
 
 
 
-
-    this.tdFrequencies = {};
-    this.tr.querySelectorAll('td.allele_freq > .frequency-graph > .dataset').forEach(elm => this.tdFrequencies[elm.dataset.dataset] = elm);
     this.tdConsequence = this.tr.querySelector(':scope > .consequence');
     this.tdConsequenceItem = this.tdConsequence.querySelector(':scope > .consequence-item');
     this.tdSift = this.tr.querySelector(':scope > .sift_value');
@@ -184,45 +169,8 @@ export default class ResultsRowView {
           >${text}</a>${taking}`;
         }
           break;
-        case 'allele_freq': {
-          const master = StoreManager.getSearchConditionMaster('dataset');
-          for (const dataset of master.items) {
-            if (!dataset.has_freq) continue;
-            const frequency = result.frequencies ? result.frequencies.find(frequency => frequency.source === dataset.id) : undefined;
-            let frequencyValue;
-            if (frequency) {
-              switch (true) {
-                case frequency.allele.count == 1:
-                  frequencyValue = 'singleton';
-                  break;
-                case frequency.allele.frequency >= .5:
-                  frequencyValue = '≥0.5';
-                  break;
-                case frequency.allele.frequency > .05:
-                  frequencyValue = '<0.5';
-                  break;
-                case frequency.allele.frequency > .01:
-                  frequencyValue = '<0.05';
-                  break;
-                case frequency.allele.frequency > .001:
-                  frequencyValue = '<0.01';
-                  break;
-                case frequency.allele.frequency > .0001:
-                  frequencyValue = '<0.001';
-                  break;
-                case frequency.allele.frequency > 0:
-                  frequencyValue = '<0.0001';
-                  break;
-                default:
-                  frequencyValue = 'monomorphic';
-                  break;
-              }
-            } else {
-              frequencyValue = 'na';
-            }
-            this.tdFrequencies[dataset.id].dataset.frequency = frequencyValue;
-          }
-        }
+        case 'allele_freq':
+          this._allele_freq.setValues(result.frequencies);
           break;
         case 'consequence': {
           if (result.most_severe_consequence) {
