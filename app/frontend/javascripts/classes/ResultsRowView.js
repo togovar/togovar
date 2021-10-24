@@ -17,9 +17,9 @@ export default class ResultsRowView {
           rs: '<td class="rs""></td>',
           chr_position: '<td class="chr_position"></td>',
           ref_alt: '<td class="ref_alt"></td>',
+          variant_type: '<td class="variant_type"></td>',
 
 
-          variant_type: '<td class="variant_type"><div class="variant-type"></div></td>',
           symbol: '<td class="symbol" data-remains=""><a href="" class="hyper-text -internal" target="_blank"></a></td>',
           allele_freq: (() => {
             const master = StoreManager.getSearchConditionMaster('dataset');
@@ -87,7 +87,7 @@ export default class ResultsRowView {
 
 
 
-    this.tdType = this.tr.querySelector(':scope > .variant_type > .variant-type');
+
     this.tdGene = this.tr.querySelector(':scope > .symbol');
     this.tdGeneAnchor = this.tdGene.querySelector(':scope > a');
     this.tdFrequencies = {};
@@ -164,7 +164,7 @@ export default class ResultsRowView {
         case 'variant_type': // variant type
         {
           const master = StoreManager.getSearchConditionMaster('type').items;
-          this.tdType.textContent = master.find(type => type.id === result.type).label;
+          node.innerHTML = `<div class="variant-type">${master.find(type => type.id === result.type).label}</div>`;
         }
           break;
         case 'symbol': // gene symbol
