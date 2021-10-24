@@ -18,14 +18,12 @@ export default class ResultsRowView {
           chr_position: '<td class="chr_position"></td>',
           ref_alt: '<td class="ref_alt"></td>',
           variant_type: '<td class="variant_type"></td>',
-          symbol: '<td class="symbol not-what-it-looks-like" data-remains=""></td>',
+          symbol: '<td class="symbol not-what-it-looks-like" data-remains></td>',
           allele_freq: '<td class="allele_freq not-what-it-looks-like"></td>',
-          consequence: '<td class="consequence" data-remains=""></td>',
-          sift_value: '<td class="sift_value" data-remains=""></td>',
-          polyphen2_value: '<td class="polyphen2_value" data-remains=""></td>',
-
-
-          clinical_significance: '<td class="clinical_significance" data-remains=""><!--<div class="dataset-icon -none" data-dataset="mgend"></div>--><div href="" class="clinical-significance" data-sign=""></div><a></a></td>'
+          consequence: '<td class="consequence" data-remains></td>',
+          sift_value: '<td class="sift_value" data-remains></td>',
+          polyphen2_value: '<td class="polyphen2_value" data-remains></td>',
+          clinical_significance: '<td class="clinical_significance not-what-it-looks-like" data-remains></td>'
         }[column.id];
       }).join('');
     }
@@ -70,17 +68,12 @@ export default class ResultsRowView {
     this.tr.innerHTML = ResultsRowView.template;
     this._columnNodes = new Map(COLUMNS.map(column => [column.id, this.tr.querySelector(`:scope > .${column.id}`)]));
     
+    // classes
     this._chr_position = new ChromosomePositionView(this._columnNodes.get('chr_position'));
     this._ref_alt = new RefAltView(this._columnNodes.get('ref_alt'));
     this._allele_freq = new FrequencyGraphView(this._columnNodes.get('allele_freq'));
     this._sift_value = new VariantFunction(this._columnNodes.get('sift_value'), 'sift_value');
     this._polyphen2_value = new VariantFunction(this._columnNodes.get('polyphen2_value'), 'polyphen2_value');
-
-
-
-    this.tdClinical = this.tr.querySelector(':scope > .clinical_significance');
-    this.tdClinicalSign = this.tdClinical.querySelector(':scope > .clinical-significance');
-    this.tdClinicalAnchor = this.tdClinical.querySelector(':scope > a');
   }
 
   _update() {
@@ -198,16 +191,20 @@ export default class ResultsRowView {
         }
           break;
         case 'clinical_significance': {
+          const master = StoreManager.getSearchConditionMaster('significance');
+          let remains = 0, text = '', sign = '', signLabel = '';
           if (result.significance && result.significance.length) {
-            this.tdClinical.dataset.remains = result.significance.length - 1;
-            this.tdClinicalSign.dataset.sign = result.significance[0].interpretations[0];
-            this.tdClinicalAnchor.textContent = result.significance[0].condition;
-          } else {
-            this.tdClinical.dataset.remains = 0;
-            this.tdClinicalSign.dataset.sign = '';
-            this.tdClinicalAnchor.textContent = '';
+            remains = result.significance.length - 1;
+            sign = result.significance[0].interpretations[0];
+            text = result.significance[0].condition;
+            signLabel = `<span class="taking">${master.items.find(masterSign => masterSign.id === sign).label}:</span>`;
           }
-        }
+          node.dataset.remains = remains;
+          node.innerHTML = `<span
+            class="clinical-significance"
+            data-sign="${sign}"
+            >${signLabel}${text}</span>`;
+          }
           break;
       }
     }
