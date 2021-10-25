@@ -86,6 +86,9 @@ const config = {
     }),
     new ManifestPlugin(),
     new DotenvWebpack(),
+    new webpack.DefinePlugin({
+      TOGOVAR_FRONTEND_API_URL: JSON.stringify(process.env.TOGOVAR_FRONTEND_API_URL),
+    }),
   ],
 };
 
