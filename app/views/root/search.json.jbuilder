@@ -64,8 +64,8 @@ json.data @result[:results] do |result|
   end
 
   symbols = Array(variation[:vep])
-              .filter { |x| x.dig(:symbol, :source) == 'HGNC' && x[:hgnc_id] }
-              .map { |x| { name: x.dig(:symbol, :label), id: x[:hgnc_id] } }
+              .filter { |x| x.dig(:symbol, :label) == 'HGNC' && x[:hgnc_id] } # FIXME label <-> source
+              .map { |x| { name: x.dig(:symbol, :source), id: x[:hgnc_id] } } # FIXME label <-> source
               .uniq
               .map { |x| { name: x[:name], id: x[:id], synonyms: synonyms[x[:id]] }.compact }
 
@@ -102,7 +102,7 @@ json.data @result[:results] do |result|
   json.polyphen vep.map { |x| x[:polyphen] }.compact.max
   vep.each do |x|
     x[:consequence] = x[:consequence].map { |y| SequenceOntology.find_by_label(y)&.id }
-    x[:symbol] = if x[:symbol] && x.dig(:symbol, :label) == 'HGNC' # FIXME
+    x[:symbol] = if x[:symbol] && x.dig(:symbol, :label) == 'HGNC' # FIXME label <-> source
                    { source: x.dig(:symbol, :label), label: x.dig(:symbol, :source) }
                  end
   end
