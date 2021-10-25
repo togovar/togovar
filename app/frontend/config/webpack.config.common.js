@@ -88,6 +88,7 @@ const config = {
     new DotenvWebpack(),
     new webpack.DefinePlugin({
       TOGOVAR_FRONTEND_API_URL: JSON.stringify(process.env.TOGOVAR_FRONTEND_API_URL),
+      TOGOVAR_ENDPOINT_STANZA: JSON.stringify(process.env.TOGOVAR_ENDPOINT_STANZA),
     }),
   ],
 };
