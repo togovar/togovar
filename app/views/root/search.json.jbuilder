@@ -85,7 +85,7 @@ json.data @result[:results] do |result|
   end
 
   interpretations = Array(variation.dig(:clinvar, :interpretation))
-    .map { |x| Form::ClinicalSignificance[x.tr(' ', '_').to_sym]&.param_name }
+                      .map { |x| Form::ClinicalSignificance[x.tr(' ', '_').to_sym]&.param_name }
 
   significance = Array(variation.dig(:clinvar, :medgen))
                    .map.with_index { |x, i| x ? conditions[x] : variation.dig(:clinvar, :condition, i) }
@@ -102,6 +102,9 @@ json.data @result[:results] do |result|
   json.polyphen vep.map { |x| x[:polyphen] }.compact.max
   vep.each do |x|
     x[:consequence] = x[:consequence].map { |y| SequenceOntology.find_by_label(y)&.id }
+    x[:symbol] = if x[:symbol] && x.dig(:symbol, :label) == 'HGNC' # FIXME
+                   { source: x.dig(:symbol, :label), label: x.dig(:symbol, :source) }
+                 end
   end
   json.transcripts vep.map(&:compact).presence
 
