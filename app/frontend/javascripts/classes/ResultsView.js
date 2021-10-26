@@ -27,10 +27,7 @@ export default class ResultsView {
     new ScrollBar(this.elm.querySelector('.scroll-bar'));
 
     this.elm.querySelector('.tablecontainer > table.results-view > thead > tr').innerHTML = COLUMNS.map(column => `<th class="${column.id}">
-      <p class="not-what-it-looks-like">
-        <span class="looking">${column.label}</span>
-        <span class="taking">${column.header}</span>
-      </p>
+      <p>${column.label}</p>
     </th>`).join('');
 
     this.tbody = this.elm.querySelector('.tablecontainer > table.results-view > tbody');
