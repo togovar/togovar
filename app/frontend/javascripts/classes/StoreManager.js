@@ -167,9 +167,11 @@ class StoreManager {
         switch (conditionMaster.type) {
           case 'array': {
             const filtered = {};
-            for (const item in condition[conditionKey]) {
-              if (condition[conditionKey][item] !== conditionMaster.items.find(condition => condition.id === item).default) {
-                filtered[item] = condition[conditionKey][item];
+            for (const itemKey in condition[conditionKey]) {
+              const itemValue = condition[conditionKey][itemKey];
+              const masterItem = conditionMaster.items.find(condition => condition.id === itemKey);
+              if (masterItem && itemValue !== masterItem.default) {
+                filtered[itemKey] = condition[conditionKey][itemKey];
               }
             }
             if (Object.keys(filtered).length > 0) {
