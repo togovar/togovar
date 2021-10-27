@@ -127,7 +127,7 @@ module Elasticsearch
     def quality(datasets)
       @quality_condition = nil
 
-      filter_sources = datasets & %i[exac gem_j_wga jga_ngs jga_snp tommo_4.7kjpn]
+      filter_sources = datasets & %i[gem_j_wga jga_ngs jga_snp tommo gnomad_exomes gnomad_genomes]
 
       return self if filter_sources.empty?
 
@@ -567,10 +567,10 @@ module Elasticsearch
             query do
               bool do
                 must do
-                  match 'vep.symbol.source': 'HGNC'
+                  match 'vep.symbol.label': 'HGNC' # FIXME
                 end
                 must do
-                  terms 'vep.symbol.label': [term]
+                  terms 'vep.symbol.source': [term] # FIXME
                 end
               end
             end

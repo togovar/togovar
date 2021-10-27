@@ -1,5 +1,5 @@
 worker_processes Integer(ENV['WEB_CONCURRENCY'] || 8)
-timeout 60
+timeout 180
 preload_app true
 
 stderr_path File.expand_path('log/unicorn_stderr.log', ENV['RAILS_ROOT'])
