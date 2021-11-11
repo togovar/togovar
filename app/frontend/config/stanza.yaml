@@ -37,6 +37,7 @@ variant:
         columns:
           - id: variant_and_risk_allele
             label: rs# and risk allele
+            link: rs_uri
           - id: raf
             label: RAF
           - id: p_value
@@ -48,6 +49,8 @@ variant:
             label: CI
           - id: beta
             label: Beta
+          - id: beta_unit
+            label: Beta unit
           - id: mapped_trait
             label: Trait(s)
             escape: false
@@ -59,8 +62,10 @@ variant:
             link: study
           - id: initial_sample_size
             label: Discovery sample description
+            line-clamp: 3
           - id: replication_sample_size
             label: Replication sample description
+            line-clamp: 3
 
     - id: variant-genomic-context
       dom: "#variant-genomic-context"
@@ -98,8 +103,37 @@ gene:
     - id: gene-base
       dom: "#gene-base"
 
-    - id: gene-clinvar
+    - id: pagination-table
       dom: "#gene-clinvar"
+      src: https://togostanza.github.io/metastanza/pagination-table.js
+      options:
+        data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/gene_clinvar?ep=${TOGOVAR_STANZA_SPARQL_URL}&hgnc_id=${hgnc_id}
+        data-type: sparql-results-json
+        custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css
+        padding: 0
+        page-size-option: 10,20,50,100
+        page-slider: false
+        columns:
+          - id: tgv_id
+            label: TogoVar ID
+            link: tgv_link
+          - id: position
+            label: Position
+            escape: false
+          - id: title
+            label: Title
+            link: clinvar
+          - id: interpretation
+            label: Clinical significance
+            escape: false
+          - id: review_status
+            label: Review status
+            escape: false
+          - id: last_evaluated
+            label: Last evaluated
+          - id: condition
+            label: Condition(s)
+            link: medgen
 
     - id: pagination-table
       dom: "#gene-gwas"
@@ -128,22 +162,31 @@ gene:
             label: Alt freq. of GEM-J WGA
             type: number
             significant-digits: 4
-            exponent-digits: 4
+            exponent-digits: 3
           - id: raf
             label: RAF
+            type: number
             significant-digits: 4
+            exponent-digits: 3
           - id: p_value
             label: P-value
             type: number
-            significant-digits: 4
-            exponent-digits: 4
+            significant-digits: 1
+            exponent-digits: 0
           - id: odds_ratio
             label: OR
+            type: number
             significant-digits: 4
+            exponent-digits: 3
           - id: ci_text
             label: CI
           - id: beta
             label: Beta
+            type: number
+            significant-digits: 1
+            exponent-digits: 0
+          - id: beta_unit
+            label: Beta unit
           - id: mapped_trait
             label: Trait(s)
             escape: false
@@ -224,6 +267,7 @@ disease:
             label: Last evaluated
           - id: condition
             label: Condition(s)
+
     - id: pagination-table
       dom: "#disease-gwas"
       src: https://togostanza.github.io/metastanza/pagination-table.js
@@ -231,25 +275,25 @@ disease:
         data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/disease_gwas?ep=${TOGOVAR_STANZA_SPARQL_URL}&medgen_cid=${medgen_cid}
         data-type: json
         padding: 0
-        page-size-option: 10,20,50,100
+        page-size-option: 5,10,20,50,100
         page-slider: false
         columns:
           - id: variant_and_risk_allele
             label: rs# and risk allele
             escape: false
+            line-clamp: 3
           - id: raf
             label: RAF
           - id: p_value
             label: P-value
-            type: number
-            significant-digits: 4
-            exponent-digits: 4
           - id: odds_ratio
             label: OR
           - id: ci_text
             label: CI
           - id: beta
             label: Beta
+          - id: beta_unit
+            label: Beta unit
           - id: mapped_trait
             label: Trait(s)
             escape: false
