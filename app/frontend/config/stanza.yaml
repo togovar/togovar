@@ -108,7 +108,7 @@ gene:
       src: https://togostanza.github.io/metastanza/pagination-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/gene_clinvar?ep=${TOGOVAR_STANZA_SPARQL_URL}&hgnc_id=${hgnc_id}
-        data-type: sparql-results-json
+        data-type: json
         custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css
         padding: 0
         page-size-option: 10,20,50,100
