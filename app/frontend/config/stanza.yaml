@@ -111,7 +111,7 @@ gene:
         data-type: json
         custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css
         padding: 0
-        page-size-option: 10,20,50,100
+        page-size-option: 5,10,20,50,100
         page-slider: false
         columns:
           - id: tgv_id
@@ -248,7 +248,7 @@ disease:
         data-type: json
         custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css
         padding: 0
-        page-size-option: 10,20,50,100
+        page-size-option: 5,10,20,50,100
         page-slider: false
         columns:
           - id: tgv_id
