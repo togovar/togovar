@@ -119,7 +119,6 @@ gene:
             link: tgv_link
           - id: position
             label: Position
-            escape: false
           - id: title
             label: Title
             link: clinvar
