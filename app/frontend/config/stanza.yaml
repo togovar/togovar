@@ -39,28 +39,38 @@ variant:
           - id: variant_and_risk_allele
             label: rs# and risk allele
             link: rs_uri
+            line-clamp: 3
           - id: raf
             label: RAF
+            line-clamp: 3
           - id: p_value
             label: P-value
             type: number
+            line-clamp: 3
           - id: odds_ratio
             label: OR
+            line-clamp: 3
           - id: ci_text
             label: CI
+            line-clamp: 3
           - id: beta
             label: Beta
+            line-clamp: 3
           - id: beta_unit
             label: Beta unit
+            line-clamp: 3
           - id: mapped_trait
             label: Trait(s)
             escape: false
+            line-clamp: 3
           - id: pubmed_id
             label: PubMed ID
             link: pubmed_uri
+            line-clamp: 3
           - id: study_detail
             label: Study accession
             link: study
+            line-clamp: 3
           - id: initial_sample_size
             label: Discovery sample description
             line-clamp: 3
@@ -119,22 +129,29 @@ gene:
           - id: tgv_id
             label: TogoVar ID
             link: tgv_link
+            line-clamp: 3
           - id: position
             label: Position
+            line-clamp: 3
           - id: title
             label: Title
             link: clinvar
+            line-clamp: 3
           - id: interpretation
             label: Clinical significance
             escape: false
+            line-clamp: 3
           - id: review_status
             label: Review status
             escape: false
+            line-clamp: 3
           - id: last_evaluated
             label: Last evaluated
+            line-clamp: 3
           - id: condition
             label: Condition(s)
             link: medgen
+            line-clamp: 3
 
     - id: pagination-table
       dom: "#gene-gwas"
@@ -151,53 +168,67 @@ gene:
           - id: tgv_id
             label: TogoVar ID
             link: tgv_link
+            line-clamp: 3
           - id: variant_and_risk_allele
             label: rs# and risk allele
             link: rs_uri
+            line-clamp: 3
           - id: position
             label: Position
             escape: false
+            line-clamp: 3
           - id: ref_alt
             label: Ref/Alt
             escape: false
+            line-clamp: 3
           - id: alt_freq
             label: Alt freq. of GEM-J WGA
             type: number
             significant-digits: 4
             exponent-digits: 3
+            line-clamp: 3
           - id: raf
             label: RAF
             type: number
             significant-digits: 4
             exponent-digits: 3
+            line-clamp: 3
           - id: p_value
             label: P-value
             type: number
             significant-digits: 1
             exponent-digits: 0
+            line-clamp: 3
           - id: odds_ratio
             label: OR
             type: number
             significant-digits: 4
             exponent-digits: 3
+            line-clamp: 3
           - id: ci_text
             label: CI
+            line-clamp: 3
           - id: beta
             label: Beta
             type: number
             significant-digits: 1
             exponent-digits: 0
+            line-clamp: 3
           - id: beta_unit
             label: Beta unit
+            line-clamp: 3
           - id: mapped_trait
             label: Trait(s)
             escape: false
+            line-clamp: 3
           - id: pubmed_id
             label: PubMed ID
             link: pubmed_uri
+            line-clamp: 3
           - id: study_detail
             label: Study accession
             link: study
+            line-clamp: 3
           - id: initial_sample_size
             label: Discovery sample description
             line-clamp: 3
@@ -258,19 +289,25 @@ disease:
           - id: tgv_id
             label: TogoVar ID
             link: tgv_link
+            line-clamp: 3
           - id: title
             label: Title
             link: clinvar
+            line-clamp: 3
           - id: interpretation
             label: Clinical significance
             escape: false
+            line-clamp: 3
           - id: review_status
             label: Review status
             escape: false
+            line-clamp: 3
           - id: last_evaluated
             label: Last evaluated
+            line-clamp: 3
           - id: condition
             label: Condition(s)
+            line-clamp: 3
 
     - id: pagination-table
       dom: "#disease-gwas"
@@ -289,25 +326,34 @@ disease:
             line-clamp: 3
           - id: raf
             label: RAF
+            line-clamp: 3
           - id: p_value
             label: P-value
+            line-clamp: 3
           - id: odds_ratio
             label: OR
+            line-clamp: 3
           - id: ci_text
             label: CI
+            line-clamp: 3
           - id: beta
             label: Beta
+            line-clamp: 3
           - id: beta_unit
             label: Beta unit
+            line-clamp: 3
           - id: mapped_trait
             label: Trait(s)
             escape: false
+            line-clamp: 3
           - id: pubmed_id
             label: PubMed ID
             link: pubmed_uri
+            line-clamp: 3
           - id: study_detail
             label: Study accession
             link: study
+            line-clamp: 3
           - id: initial_sample_size
             label: Discovery sample description
             line-clamp: 3
