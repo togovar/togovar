@@ -567,10 +567,10 @@ module Elasticsearch
             query do
               bool do
                 must do
-                  terms 'vep.symbol.source': 'HGNC'
+                  match 'vep.symbol.source': 'HGNC'
                 end
                 must do
-                  match 'vep.symbol.label': [term]
+                  terms 'vep.symbol.label': [term]
                 end
               end
             end
