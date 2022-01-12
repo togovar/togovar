@@ -16,4 +16,13 @@ export default class ConditionValueEditor {
     this._body = this._el.querySelector(':scope > .body');
   }
 
+  get _valuesEl() {
+    return this._valuesView.conditionView.valuesElement;
+  }
+
+  get _valueViews() {
+    const valueViews = Array.from(this._valuesEl.querySelectorAll(':scope > .value'));
+    return valueViews;
+  }  
+
 }

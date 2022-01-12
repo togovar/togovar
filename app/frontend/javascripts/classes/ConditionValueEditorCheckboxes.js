@@ -60,19 +60,17 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
   _update() {
 
     // update values
-    const valuesElement = this._valuesView.conditionView.valuesElement;
-    const valueViews = Array.from(valuesElement.querySelectorAll(':scope > .value'));
     this._checkboxes.forEach(checkbox => {
-      const elm = valueViews.find(elm => elm.dataset.value === checkbox.value);
+      const elm = this._valueViews.find(elm => elm.dataset.value === checkbox.value);
       if (checkbox.checked) {
         if (elm === undefined) {
           // add value element
-          valuesElement.insertAdjacentHTML('beforeend', `<span class="value" data-value="${checkbox.value}">${checkbox.dataset.label}</span>`);
+          this._valuesEl.insertAdjacentHTML('beforeend', `<span class="value" data-value="${checkbox.value}">${checkbox.dataset.label}</span>`);
         }
       } else {
         if (elm) {
           // remove value element
-          valuesElement.removeChild(elm);
+          this._valuesEl.removeChild(elm);
         }
       }
     });

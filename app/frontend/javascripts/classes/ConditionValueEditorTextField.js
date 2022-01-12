@@ -53,8 +53,7 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
 
     // update value
     const term = this._searchFieldView.value;
-    const valuesElement = this._valuesView.conditionView.valuesElement;
-    valuesElement.innerHTML = `<span class="value" data-value="${term}">${term}</span>`;
+    this._valuesEl.innerHTML = `<span class="value" data-value="${term}">${term}</span>`;
 
     // validation
     this._valuesView.update(this._validate());

@@ -250,21 +250,18 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     this._updateIndeterminate();
 
     // update values
-    const valuesElement = this._valuesView.conditionView.valuesElement;
-    // const valueViews = Array.from(valuesElement.querySelectorAll(':scope > .value'));
-    const valueViews = this._valueViews;
     this._data.forEach(datum => {
       if (!datum.value) return;
-      const elm = valueViews.find(elm => elm.dataset.value === datum.value);
+      const elm = this._valueViews.find(elm => elm.dataset.value === datum.value);
       if (datum.checked) {
         if (elm === undefined) {
           // add value element
-          valuesElement.insertAdjacentHTML('afterBegin', `<span class="value" data-value="${datum.value}"><span class="inner">${datum.label}</span></span>`);
+          this._valuesEl.insertAdjacentHTML('afterBegin', `<span class="value" data-value="${datum.value}"><span class="inner">${datum.label}</span></span>`);
         }
       } else {
         if (elm) {
           // remove value element
-          valuesElement.removeChild(elm);
+          this._valuesEl.removeChild(elm);
         }
       }
       
@@ -280,13 +277,6 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
 
   get _isValid() {
     return this._valueViews.length > 0;
-  }  
-
-
-  get _valueViews() {
-    const valuesElement = this._valuesView.conditionView.valuesElement;
-    const valueViews = Array.from(valuesElement.querySelectorAll(':scope > .value'));
-    return valueViews;
-  }  
-
+  }
+  
 }
