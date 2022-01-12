@@ -31,45 +31,41 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     const name = `ConditionValueEditorFrequencyCount${id++}`;
 
     // HTML
-    const section = document.createElement('section');
-    section.classList.add('frequency-count-editor-view');
-    section.innerHTML = `
-      <header>Select ${conditionType}</header>
-      <div class="body">
-        <section class="frequency switching" data-mode="${MODE.frequency}">
-          <label>
-            <input type="radio" name="${name}" value="${MODE.frequency}">
-            <span>Frequency<span>
-          </label>
-          <div class="range-selector-view input"></div>
-        </section>
-        <section class="count switching" data-mode="${MODE.count}">
-          <label>
-            <input type="radio" name="${name}" value="${MODE.count}">
-            <span>Count<span>
-          </label>
-          <div class="input">
-            <input class="from" min="0" step="1" type="number">
-            ~
-            <input class="to" min="0" step="1" type="number">
-          </div>
-        </section>
-        <section class="filtered">
-          <label>
-            <input type="checkbox" checked>
-            <span>Exclude filtered out variants<span>
-          </label>
-        </section>
-      </div>`;
-    valuesView.sections.append(section);
-    const body = section.querySelector(':scope > .body');
+    this._createElement('frequency-count-editor-view', `
+    <header>Select ${conditionType}</header>
+    <div class="body">
+      <section class="frequency switching" data-mode="${MODE.frequency}">
+        <label>
+          <input type="radio" name="${name}" value="${MODE.frequency}">
+          <span>Frequency<span>
+        </label>
+        <div class="range-selector-view input"></div>
+      </section>
+      <section class="count switching" data-mode="${MODE.count}">
+        <label>
+          <input type="radio" name="${name}" value="${MODE.count}">
+          <span>Count<span>
+        </label>
+        <div class="input">
+          <input class="from" min="0" step="1" type="number">
+          ~
+          <input class="to" min="0" step="1" type="number">
+        </div>
+      </section>
+      <section class="filtered">
+        <label>
+          <input type="checkbox" checked>
+          <span>Exclude filtered out variants<span>
+        </label>
+      </section>
+    </div>`);
 
     // set range selector
-    const rangeSelectorView = section.querySelector('.range-selector-view');
+    const rangeSelectorView = this._el.querySelector('.range-selector-view');
     this._rangeSelectorView = new RangeSelectorView(rangeSelectorView, this, 0, 1, 'horizontal', 'advanced');
     this._rangeSelectorView.updateGUIWithCondition(this._condition.frequency);
 
-    const switchingElements = body.querySelectorAll(':scope > .switching');
+    const switchingElements = this._body.querySelectorAll(':scope > .switching');
     // events: switch mode
     for (const el of switchingElements) {
       const input = el.querySelector(':scope > label > input');
@@ -94,7 +90,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       this._update();
     }));
     // event: filtered
-    this._filtered = body.querySelector(':scope > .filtered > label > input');
+    this._filtered = this._body.querySelector(':scope > .filtered > label > input');
     this._filtered.addEventListener('change', () => {
       this._update();
     });

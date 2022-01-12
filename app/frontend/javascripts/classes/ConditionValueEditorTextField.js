@@ -9,13 +9,9 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
     super(valuesView, conditionType);
 
     // HTML
-    const section = document.createElement('section');
-    section.classList.add('text-field-editor-view');
-    section.innerHTML = `
-      <header>Select ${conditionType}</header>
-      <div class="body"></div>`;
-    valuesView.sections.append(section);
-    this._body = section.querySelector(':scope > .body');
+    this._createElement('text-field-editor-view', `
+    <header>Select ${conditionType}</header>
+    <div class="body"></div>`);
     this._searchFieldView = new SearchFieldView(
       this,
       this._body,

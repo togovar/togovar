@@ -9,26 +9,22 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
 
     // HTML
     const master = ADVANCED_CONDITIONS[conditionType];
-    const section = document.createElement('section');
-    section.classList.add('checkboxes-editor-view');
-    section.dataset.conditionType = conditionType;
-    section.innerHTML = `
-      <header>Select them</header>
-      <ul class="checkboxes">${master.values.map(value => `
-        <li>
-          <label><input
-            type="checkbox"
-            value="${value.value}"
-            data-label="${value.label}"
-            ${conditionType === 'significance' ? `data-sign="${value.value}"` : ''}>
-              ${conditionType === 'significance' ? `<span class="clinical-significance" data-sign="${value.value}"></span>` : ''}${value.label}
-          </label>
-        </li>`).join('')}
-      </ul>`;
-    valuesView.sections.append(section);
+    this._createElement('checkboxes-editor-view', `
+    <header>Select them</header>
+    <ul class="checkboxes body">${master.values.map(value => `
+      <li>
+        <label><input
+          type="checkbox"
+          value="${value.value}"
+          data-label="${value.label}"
+          ${conditionType === 'significance' ? `data-sign="${value.value}"` : ''}>
+            ${conditionType === 'significance' ? `<span class="clinical-significance" data-sign="${value.value}"></span>` : ''}${value.label}
+        </label>
+      </li>`).join('')}
+    </ul>`);
 
     // references
-    this._checkboxes = Array.from(section.querySelectorAll(':scope > ul > li > label > input'));
+    this._checkboxes = Array.from(this._el.querySelectorAll(':scope > ul > li > label > input'));
 
     // attach events
     this._checkboxes.forEach(checkbox => {

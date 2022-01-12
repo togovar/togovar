@@ -23,16 +23,12 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     this._selectionDependedOnParent = SELECTION_DEPENDED_ON_PARENT[conditionType];
 
     // HTML
-    const section = document.createElement('section');
-    section.classList.add('columns-editor-view');
-    section.innerHTML = `
-      <header>Select ${conditionType}</header>
-      <div class="body">
-        <div class="columns"></div>
-        <div class="description"></div>
-      </div>`;
-    valuesView.sections.append(section);
-    this._body = section.querySelector(':scope > .body');
+    this._createElement('columns-editor-view', `
+    <header>Select ${conditionType}</header>
+    <div class="body">
+      <div class="columns"></div>
+      <div class="description"></div>
+    </div>`);
     this._columns = this._body.querySelector(':scope > .columns');
     this._description = this._body.querySelector(':scope > .description');
     this._drawColumn();
@@ -255,7 +251,8 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
 
     // update values
     const valuesElement = this._valuesView.conditionView.valuesElement;
-    const valueViews = Array.from(valuesElement.querySelectorAll(':scope > .value'));
+    // const valueViews = Array.from(valuesElement.querySelectorAll(':scope > .value'));
+    const valueViews = this._valueViews;
     this._data.forEach(datum => {
       if (!datum.value) return;
       const elm = valueViews.find(elm => elm.dataset.value === datum.value);
@@ -281,11 +278,15 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     return this._isValid;
   }
 
+  get _isValid() {
+    return this._valueViews.length > 0;
+  }  
 
-  // public
 
-  get isValid() {
-    return Array.from(this._columns.querySelectorAll('li[data-value] > label > input')).some(checkbox => checkbox.checked);
-  }
+  get _valueViews() {
+    const valuesElement = this._valuesView.conditionView.valuesElement;
+    const valueViews = Array.from(valuesElement.querySelectorAll(':scope > .value'));
+    return valueViews;
+  }  
 
 }
