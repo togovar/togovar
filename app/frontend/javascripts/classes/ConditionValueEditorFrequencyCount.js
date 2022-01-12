@@ -135,8 +135,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
 
     console.log(this)
 
-    const valuesElement = this._valuesView.conditionView.valuesElement;
-    let frequencyCountValueView = valuesElement.querySelector(':scope > .frequency-count-value-view');
+    let frequencyCountValueView = this._valuesEl.querySelector(':scope > .frequency-count-value-view');
 
     // make view
     if (!frequencyCountValueView) {
@@ -152,7 +151,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       </div>
       <p class="filtered">Exclude filtered out variants</p>
       `
-      valuesElement.append(frequencyCountValueView);
+      this._valuesEl.append(frequencyCountValueView);
       this._fcvvBar1 = frequencyCountValueView.querySelector(':scope > .frequencygraph > .bar.-bar1');
       this._fcvvBar2 = frequencyCountValueView.querySelector(':scope > .frequencygraph > .bar.-bar2');
       this._fcvvFrom = frequencyCountValueView.querySelector(':scope > .range > .from');
