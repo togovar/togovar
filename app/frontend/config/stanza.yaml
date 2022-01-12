@@ -290,6 +290,10 @@ disease:
             label: TogoVar ID
             link: tgv_link
             line-clamp: 3
+          - id: position
+            label: Position
+            escape: false
+            line-clamp: 3
           - id: title
             label: Title
             link: clinvar
