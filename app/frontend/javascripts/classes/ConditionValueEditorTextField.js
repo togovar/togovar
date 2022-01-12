@@ -1,13 +1,12 @@
+import ConditionValueEditor from "./ConditionValueEditor.js";
 import SearchFieldView from './SearchFieldView.js';
 import {CONDITION_TYPE} from '../definition.js';
 
-export default class ConditionValueEditorTextField {
+export default class ConditionValueEditorTextField extends ConditionValueEditor {
 
   constructor(valuesView, conditionType) {
-    console.log(valuesView, conditionType)
 
-    this._valuesView = valuesView;
-    this._conditionType = conditionType;
+    super(valuesView, conditionType);
 
     // HTML
     const section = document.createElement('section');

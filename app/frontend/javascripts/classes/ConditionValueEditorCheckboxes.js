@@ -1,8 +1,11 @@
+import ConditionValueEditor from "./ConditionValueEditor.js";
 import {ADVANCED_CONDITIONS} from '../global.js';
 
-export default class ConditionValueEditorCheckboxes {
+export default class ConditionValueEditorCheckboxes extends ConditionValueEditor {
 
   constructor(valuesView, conditionType) {
+
+    super(valuesView, conditionType);
 
     // HTML
     const master = ADVANCED_CONDITIONS[conditionType];
@@ -25,7 +28,6 @@ export default class ConditionValueEditorCheckboxes {
     valuesView.sections.append(section);
 
     // references
-    this._valuesView = valuesView;
     this._checkboxes = Array.from(section.querySelectorAll(':scope > ul > li > label > input'));
 
     // attach events

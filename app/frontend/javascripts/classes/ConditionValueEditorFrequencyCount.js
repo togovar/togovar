@@ -1,4 +1,6 @@
+import ConditionValueEditor from "./ConditionValueEditor.js";
 import RangeSelectorView from "./RangeSelectorView.js";
+import FrequencyCountValueView from "./FrequencyCountValueView.js";
 
 let id = 0;
 const DEFAULT_CONDITION = {
@@ -14,13 +16,12 @@ const MODE = {
   count: 'count'
 }
 
-export default class ConditionValueEditorFrequencyCount {
+export default class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
 
   constructor(valuesView, conditionType) {
-    console.log(valuesView, conditionType)
 
-    this._valuesView = valuesView;
-    this._conditionType = conditionType;
+    super(valuesView, conditionType);
+
     this._condition = {
       frequency: Object.assign({}, DEFAULT_CONDITION.frequency),
       count: Object.assign({}, DEFAULT_CONDITION.count)
@@ -135,6 +136,8 @@ export default class ConditionValueEditorFrequencyCount {
   // private methods
 
   _update() {
+
+    console.log(this)
 
     const valuesElement = this._valuesView.conditionView.valuesElement;
     let frequencyCountValueView = valuesElement.querySelector(':scope > .frequency-count-value-view');
