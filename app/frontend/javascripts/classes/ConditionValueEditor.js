@@ -16,6 +16,40 @@ export default class ConditionValueEditor {
     this._body = this._el.querySelector(':scope > .body');
   }
 
+  /**
+   * 
+   * @param {string} value 
+   * @param {string} label 
+   * @param {boolean} isOnly 
+   */
+  _addValueView(value, label, isOnly = false) {
+    console.log(value, label, isOnly);
+    let valueView;
+    // find value view
+    if (isOnly) {
+      valueView = this._valuesEl.querySelector('.value');
+      if (valueView) {
+        valueView.dataset.value = value;
+        valueView.querySelector('.inner').textContent = label;
+      }
+    } else {
+      valueView = this._valuesEl.querySelector(`.value[data-value="${value}"]`);
+    }
+    // if no view is found, create a new one
+    if (!valueView) {
+      valueView = document.createElement('span');
+      valueView.classList.add('value', 'condition-item-value-view');
+      valueView.dataset.value = value;
+      valueView.innerHTML = `<span class="inner">${label}</span>`;
+      this._valuesEl.append(valueView);
+    }
+    return valueView;
+  }
+
+  // _enterValueView(value, isExist) {
+
+  // }
+
   get _valuesEl() {
     return this._valuesView.conditionView.valuesElement;
   }
@@ -23,6 +57,6 @@ export default class ConditionValueEditor {
   get _valueViews() {
     const valueViews = Array.from(this._valuesEl.querySelectorAll(':scope > .value'));
     return valueViews;
-  }  
+  }
 
 }
