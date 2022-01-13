@@ -133,8 +133,6 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
 
   _update() {
 
-    console.log(this)
-
     let frequencyCountValueView = this._valuesEl.querySelector(':scope > .frequency-count-value-view');
 
     // make view
@@ -185,9 +183,6 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
   }
 
   _validate() {
-    Object.keys(this._condition[this._mode]).some(key => {
-      return this._condition[this._mode][key] !== null;
-    })
     return Object.keys(this._condition[this._mode]).some(key => this._condition[this._mode][key] !== null);
   }
 

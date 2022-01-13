@@ -46,6 +46,10 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     this._update();
   }
 
+  get isValid() {
+    return this._valueViews.length > 0;
+  }
+
 
   // private methods
 
@@ -272,11 +276,7 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
   }
 
   _validate() {
-    return this._isValid;
+    return this.isValid;
   }
 
-  get _isValid() {
-    return this._valueViews.length > 0;
-  }
-  
 }
