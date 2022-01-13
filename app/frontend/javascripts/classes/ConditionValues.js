@@ -69,13 +69,15 @@ export default class ConditionValues {
 
   update(isValid) {
     if (this._conditionView.conditionType === CONDITION_TYPE.dataset) {
-      isValid = this._editors.every(editor => editor.isValid);
+      isValid = this._editors.every(editor => {
+        return editor.isValid
+      });
     }
     if (isValid) {
-      console.log('ok')
+      console.log('accept')
       this._okButton.classList.remove('-disabled');
     } else {
-      console.log('boooo')
+      console.log('reject')
       this._okButton.classList.add('-disabled');
     }
   }
