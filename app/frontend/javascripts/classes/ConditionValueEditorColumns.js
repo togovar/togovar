@@ -256,17 +256,10 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     // update values
     this._data.forEach(datum => {
       if (!datum.value) return;
-      const elm = this._valueViews.find(elm => elm.dataset.value === datum.value);
       if (datum.checked) {
-        if (elm === undefined) {
-          // add value element
-          this._valuesEl.insertAdjacentHTML('afterBegin', `<span class="value" data-value="${datum.value}"><span class="inner">${datum.label}</span></span>`);
-        }
+        this._addValueView(datum.value, datum.label);
       } else {
-        if (elm) {
-          // remove value element
-          this._valuesEl.removeChild(elm);
-        }
+        this._removeValueView(datum.value);
       }
       
     });
