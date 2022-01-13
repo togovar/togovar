@@ -40,15 +40,6 @@ $CORNER_RADIUS: $HEIGHT / 2
         flex-wrap: wrap
         align-items: center
         position: relative
-        > .value
-          height: 18px
-          line-height: 18px
-          padding: 0 #{$HEIGHT_VALUE * .5}
-          background-color: white
-          border: solid 1px $COLOR_KEY_DARK2
-          border-radius: $HEIGHT_VALUE * .5
-          font-weight: bold
-          margin-right: 2px
         > .numeralvalue
           margin-left: 8px
           width: 120px
@@ -175,91 +166,3 @@ $CORNER_RADIUS: $HEIGHT / 2
       border: solid 2px $COLOR_SELECTED
       border-radius: $CORNER_RADIUS
       pointer-events: none
-  &[data-classification="dataset"]
-    > .body
-      > .summary
-        > .values
-          > .value
-            min-width: 120px
-            &::before
-              font-family: fontello
-              content: $CHAR_DATASET
-              margin-right: 4px
-            &[data-value="jga_ngs"], &[data-value="jga_snp"]
-              border-color: $COLOR_DATASET_JGA
-              background-color: $COLOR_DATASET_JGA_LIGHT
-              &::before
-                color: $COLOR_DATASET_JGA
-            &[data-value="tommo_4.7kjpn"]
-              border-color: $COLOR_DATASET_3_5KJPN
-              background-color: $COLOR_DATASET_3_5KJPN_LIGHT
-              &::before
-                color: $COLOR_DATASET_3_5KJPN
-            &[data-value="hgvd"], &[data-value="mgend"]
-              border-color: $COLOR_DATASET_HGVD
-              background-color: $COLOR_DATASET_HGVD_LIGHT
-              &::before
-                color: $COLOR_DATASET_HGVD
-            &[data-value="gem_j_wga"]
-              border-color: $COLOR_DATASET_GEM_J
-              background-color: $COLOR_DATASET_GEM_J_LIGHT
-              &::before
-                color: $COLOR_DATASET_GEM_J
-            &[data-value="bbj"]
-              border-color: $COLOR_DATASET_BBJ
-              background-color: $COLOR_DATASET_BBJ_LIGHT
-              &::before
-                color: $COLOR_DATASET_BBJ
-            &[data-value="clinvar"], &[data-value="exac"], &[data-value="gnomad"]
-              border-color: $COLOR_DATASET_FOREIGN
-              background-color: $COLOR_DATASET_FOREIGN_LIGHT
-              &::before
-                color: $COLOR_DATASET_FOREIGN
-  &[data-classification="significance"]
-    > .body
-      > .summary
-        > .values
-          > .value
-            &::before
-              content: attr(data-value)
-              margin-right: 3px
-            &[data-value="P"]
-              border-color: $COLOR_SIGN_DANGEROUS
-              background-color: $COLOR_SIGN_DANGEROUS_LIGHT
-              &::before
-                color: $COLOR_SIGN_DANGEROUS
-            &[data-value="LP"]
-              border-color: $COLOR_SIGN_WARNING
-              background-color: $COLOR_SIGN_WARNING_LIGHT
-              &::before
-                color: $COLOR_SIGN_WARNING
-            &[data-value="US"]
-              border-color: $COLOR_SIGN_UNKNOWN
-              background-color: $COLOR_SIGN_UNKNOWN_LIGHT
-              &::before
-                color: $COLOR_SIGN_UNKNOWN
-            &[data-value="LB"]
-              border-color: $COLOR_SIGN_NORMAL
-              background-color: $COLOR_SIGN_NORMAL_LIGHT
-              &::before
-                color: $COLOR_SIGN_NORMAL
-            &[data-value="B"]
-              border-color: $COLOR_SIGN_SAFE
-              background-color: $COLOR_SIGN_SAFE_LIGHT
-              &::before
-                color: $COLOR_SIGN_SAFE
-            &[data-value="CI"]
-              border-color: $COLOR_SIGN_MODIFIER
-              background-color: $COLOR_SIGN_MODIFIER_LIGHT
-              &::before
-                color: $COLOR_SIGN_MODIFIER
-            &[data-value="DR"], &[data-value="A"], &[data-value="RF"], &[data-value="PR"], &[data-value="AF"], &[data-value="O"]
-              border-color: $COLOR_SIGN_OTHER
-              background-color: $COLOR_SIGN_OTHER_LIGHT
-              &::before
-                color: $COLOR_SIGN_OTHER
-            &[data-value="NP"], &[data-value="AN"], &[data-value="NC"]
-              border-color: $COLOR_GRAY
-              background-color: white
-              &::before
-                color: $COLOR_GRAY
