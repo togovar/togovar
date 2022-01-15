@@ -114,7 +114,7 @@ export default class ConditionItemView extends ConditionView {
 
   get query() {
     if (this._conditionType === CONDITION_TYPE.dataset) {
-      const value = this._values.querySelector(':scope > .value');
+      const value = this._values.querySelector(':scope > .condition-item-value-view');
       const frequencyCountValueView = this._values.querySelector(':scope > .frequency-count-value-view');
       const dataset = {name: value.dataset.value};
       const filtered = frequencyCountValueView.dataset.filtered === 'true' ? true : false;
@@ -159,7 +159,7 @@ export default class ConditionItemView extends ConditionView {
       return {
         [this._conditionType]: {
           relation: this._elm.dataset.relation,
-          terms: Array.from(this._values.querySelectorAll(':scope > .value')).map(value => value.dataset.value)
+          terms: Array.from(this._values.querySelectorAll(':scope > .condition-item-value-view')).map(value => value.dataset.value)
         }
       };
     }
