@@ -1,4 +1,4 @@
-import ConditionItemValueView from './ConditionItemValueView.js';
+import ConditionItemValueView from '../components/ConditionItemValueView';
 
 export default class ConditionValueEditor {
 
@@ -43,9 +43,9 @@ export default class ConditionValueEditor {
       // valueView.dataset.value = value;
       // valueView.dataset.conditionType = this._conditionType;
       // valueView.innerHTML = `<span class="inner">${label}</span>`;
-      
-      console.log(ConditionItemValueView)
-      valueView = new ConditionItemValueView();
+      // valueView = new ConditionItemValueView();
+      valueView = document.createElement('condition-item-value-view');
+      // valueView.classList.add('condition-item-value-view')
       this._valuesElement.append(valueView);
     }
     return valueView;
