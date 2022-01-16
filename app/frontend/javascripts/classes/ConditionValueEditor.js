@@ -1,3 +1,5 @@
+import ConditionItemValueView from './ConditionItemValueView.js';
+
 export default class ConditionValueEditor {
 
   constructor(valuesView, conditionType) {
@@ -36,11 +38,14 @@ export default class ConditionValueEditor {
     }
     // if no view is found, create a new one
     if (!valueView) {
-      valueView = document.createElement('span');
-      valueView.classList.add('condition-item-value-view');
-      valueView.dataset.value = value;
-      valueView.dataset.conditionType = this._conditionType;
-      valueView.innerHTML = `<span class="inner">${label}</span>`;
+      // valueView = document.createElement('span');
+      // valueView.classList.add('condition-item-value-view');
+      // valueView.dataset.value = value;
+      // valueView.dataset.conditionType = this._conditionType;
+      // valueView.innerHTML = `<span class="inner">${label}</span>`;
+      
+      console.log(ConditionItemValueView)
+      valueView = new ConditionItemValueView();
       this._valuesElement.append(valueView);
     }
     return valueView;
