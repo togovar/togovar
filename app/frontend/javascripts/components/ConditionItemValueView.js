@@ -22,7 +22,7 @@ export class ConditionItemValueView extends LitElement {
 
   // Render the UI as a function of component state
   render() {
-    return html`<p>Hello, ${this.name}!</p>`;
+    return html`<span class="inner">Hello, ${this.name}!</span>`;
   }
 }
 customElements.define('condition-item-value-view', ConditionItemValueView);
