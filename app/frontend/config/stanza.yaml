@@ -277,6 +277,9 @@ disease:
             label: Title
           - id: definition
             label: Definition
+          - id: links
+            label: Links
+            escape: false
 
     - id: pagination-table
       dom: "#disease-clinvar"
