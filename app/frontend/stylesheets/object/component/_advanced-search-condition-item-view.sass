@@ -35,7 +35,7 @@ $CORNER_RADIUS: $HEIGHT / 2
         border-bottom-left-radius: $CORNER_RADIUS
       > .values
         flex-grow: 1
-        padding: $PADDING_VALUES $CORNER_RADIUS $PADDING_VALUES 6px
+        padding: var(--padding-advanced-search-values) $CORNER_RADIUS var(--padding-advanced-search-values) 6px
         display: flex
         flex-wrap: wrap
         align-items: center
@@ -43,7 +43,7 @@ $CORNER_RADIUS: $HEIGHT / 2
         > .numeralvalue
           margin-left: 8px
           width: 120px
-          height: $HEIGHT_VALUE
+          height: var(--height-advanced-search-value)
           padding: 2px 0
           display: flex
           align-items: center
