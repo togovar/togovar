@@ -28,13 +28,13 @@ export default class ConditionValueEditor {
     let valueView;
     // find value view
     if (isOnly) {
-      valueView = this._valuesElement.querySelector('.condition-item-value-view');
+      valueView = this._valuesElement.querySelector('condition-item-value-view');
       if (valueView) {
         valueView.dataset.value = value;
         valueView.querySelector('.inner').textContent = label;
       }
     } else {
-      valueView = this._valuesElement.querySelector(`.condition-item-value-view[data-value="${value}"]`);
+      valueView = this._valuesElement.querySelector(`condition-item-value-view[data-value="${value}"]`);
     }
     // if no view is found, create a new one
     if (!valueView) {
@@ -45,6 +45,9 @@ export default class ConditionValueEditor {
       // valueView.innerHTML = `<span class="inner">${label}</span>`;
       // valueView = new ConditionItemValueView();
       valueView = document.createElement('condition-item-value-view');
+      valueView.label = label;
+      valueView.conditionType = this._conditionType;
+      valueView.value = value;
       // valueView.classList.add('condition-item-value-view')
       this._valuesElement.append(valueView);
     }
@@ -52,7 +55,7 @@ export default class ConditionValueEditor {
   }
 
   _removeValueView(value) {
-    const valueView = this._valuesElement.querySelector(`.condition-item-value-view[data-value="${value}"]`);
+    const valueView = this._valuesElement.querySelector(`condition-item-value-view[data-value="${value}"]`);
     if (valueView) {
       valueView.remove();
     }
@@ -63,7 +66,7 @@ export default class ConditionValueEditor {
   }
 
   get _valueViews() {
-    const valueViews = Array.from(this._valuesElement.querySelectorAll(':scope > .condition-item-value-view'));
+    const valueViews = Array.from(this._valuesElement.querySelectorAll(':scope > condition-item-value-view'));
     return valueViews;
   }
 
