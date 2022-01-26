@@ -16,7 +16,7 @@ export class ConditionItemValueView extends LitElement {
   :host > .inner {
     height: 18px;
     line-height: 18px;
-    padding: 0 calc(var(--height-container) - var(--height) * .5);
+    padding: 0 10px;
     background-color: white;
     border: solid 1px var(--color-key-dark1);
     border-radius: calc(var(--height) * .5);
@@ -26,61 +26,60 @@ export class ConditionItemValueView extends LitElement {
   :host([data-condition-type="dataset"]) > .inner {
     min-width: 120px;
   }
-  /*
   :host([data-condition-type="dataset"]) > .inner::before {
     font-family: fontello;
-    content: $CHAR_DATASET;
+    content: var(--char-dataset);
     margin-right: 4px;
   }
-  :host([data-condition-type="jga_ngs"]) > .inner,
-  :host([data-condition-type="jga_snp"]) > .inner {
-    border-color: $COLOR_DATASET_JGA;
-    background-color: $COLOR_DATASET_JGA_LIGHT;
+  :host([data-value="jga_ngs"]) > .inner,
+  :host([data-value="jga_snp"]) > .inner {
+    border-color: var(--color-dataset-jga);
+    background-color: var(--color-dataset-jga-light);
   }
-  :host([data-condition-type="jga_ngs"]) > .inner::before,
-  :host([data-condition-type="jga_snp"]) > .inner::before {
-    color: $COLOR_DATASET_JGA;
+  :host([data-value="jga_ngs"]) > .inner::before,
+  :host([data-value="jga_snp"]) > .inner::before {
+    color: var(--color-dataset-jga);
   }
-  :host([data-condition-type="tommo_4.7kjpn"]) > .inner {
-    border-color: $COLOR_DATASET_3_5KJPN;
-    background-color: $COLOR_DATASET_3_5KJPN_LIGHT;
+  :host([data-value="tommo_4.7kjpn"]) > .inner {
+    border-color: var(--color-dataset-tommo);
+    background-color: var(--color-dataset-tommo-light);
   }
-  :host([data-condition-type="tommo_4.7kjpn"]) > .inner::before {
-    color: $COLOR_DATASET_3_5KJPN;
+  :host([data-value="tommo_4.7kjpn"]) > .inner::before {
+    color: var(--color-dataset-tommo);
   }
-  :host([data-condition-type="hgvd"]) > .inner,
-  :host([data-condition-type="mgend"]) > .inner {
-    border-color: $COLOR_DATASET_HGVD;
-    background-color: $COLOR_DATASET_HGVD_LIGHT;
+  :host([data-value="hgvd"]) > .inner,
+  :host([data-value="mgend"]) > .inner {
+    border-color: var(--color-dataset-hgvd);
+    background-color: var(--color-dataset-hgvd-light);
   }
-  :host([data-condition-type="hgvd"]) > .inner::before,
-  :host([data-condition-type="mgend"]) > .inner::before {
-    color: $COLOR_DATASET_HGVD;
+  :host([data-value="hgvd"]) > .inner::before,
+  :host([data-value="mgend"]) > .inner::before {
+    color: var(--color-dataset-hgvd);
   }
-  :host([data-condition-type="gem_j_wga"]) > .inner {
-    border-color: $COLOR_DATASET_GEM_J;
-    background-color: $COLOR_DATASET_GEM_J_LIGHT;
+  :host([data-value="gem_j_wga"]) > .inner {
+    border-color: var(--color-dataset-gemj);
+    background-color: var(--color-dataset-gemj-light);
   }
-  :host([data-condition-type="gem_j_wga"]) > .inner::before {
-    color: $COLOR_DATASET_GEM_J;
+  :host([data-value="gem_j_wga"]) > .inner::before {
+    color: var(--color-dataset-gemj);
   }
-  :host([data-condition-type="bbj"]) > .inner {
-    border-color: $COLOR_DATASET_BBJ;
-    background-color: $COLOR_DATASET_BBJ_LIGHT;
+  :host([data-value="bbj"]) > .inner {
+    border-color: var(--color-dataset-bbj);
+    background-color: var(--color-dataset-bbj-light);
   }
-  :host([data-condition-type="bbj"]) > .inner::before {
-    color: $COLOR_DATASET_BBJ;
+  :host([data-value="bbj"]) > .inner::before {
+    color: var(--color-dataset-bbj);
   }
-  :host([data-condition-type="clinvar"]) > .inner,
-  :host([data-condition-type="exac"]) > .inner,
-  :host([data-condition-type="gnomad"]) > .inner {
-    border-color: $COLOR_DATASET_FOREIGN;
-    background-color: $COLOR_DATASET_FOREIGN_LIGHT;
+  :host([data-value="clinvar"]) > .inner,
+  :host([data-value="exac"]) > .inner,
+  :host([data-value="gnomad"]) > .inner {
+    border-color: var(--color-dataset-foreign);
+    background-color: var(--color-dataset-foreign-light);
   }
-  :host([data-condition-type="clinvar"]) > .inner::before,
-  :host([data-condition-type="exac"]) > .inner::before,
-  :host([data-condition-type="gnomad"]) > .inner::before {
-    color: $COLOR_DATASET_FOREIGN;
+  :host([data-value="clinvar"]) > .inner::before,
+  :host([data-value="exac"]) > .inner::before,
+  :host([data-value="gnomad"]) > .inner::before {
+    color: var(--color-dataset-foreign);
   }
   :host([data-condition-type="significance"]) > .inner::before {
     margin-right: 4px;
@@ -90,52 +89,52 @@ export class ConditionItemValueView extends LitElement {
     top: -1px;
   }
   :host([data-condition-type="significance"][data-value="P"]) > .inner {
-    border-color: $COLOR_SIGN_DANGEROUS;
-    background-color: $COLOR_SIGN_DANGEROUS_LIGHT;
+    border-color: var(--color-sign-dangerous);
+    background-color: var(--color-sign-dangerous-light);
   }
   :host([data-condition-type="significance"][data-value="P"]) > .inner::before {
     content: "P";
-    color: $COLOR_SIGN_DANGEROUS;
+    color: var(--color-sign-dangerous);
   }
   :host([data-condition-type="significance"][data-value="LP"]) > .inner {
-    border-color: $COLOR_SIGN_WARNING;
-    background-color: $COLOR_SIGN_WARNING_LIGHT;
+    border-color: var(--color-sign-warning);
+    background-color: var(--color-sign-warning-light);
   }
   :host([data-condition-type="significance"][data-value="LP"]) > .inner::before {
     content: "LP";
-    color: $COLOR_SIGN_WARNING;
+    color: var(--color-sign-warning);
   }
   :host([data-condition-type="significance"][data-value="US"]) > .inner {
-    border-color: $COLOR_SIGN_UNKNOWN;
-    background-color: $COLOR_SIGN_UNKNOWN_LIGHT;
+    border-color: var(--color-sign-unknown);
+    background-color: var(--color-sign-unknown-light);
   }
   :host([data-condition-type="significance"][data-value="US"]) > .inner::before {
     content: "US";
-    color: $COLOR_SIGN_UNKNOWN;
+    color: var(--color-sign-unknown);
   }
   :host([data-condition-type="significance"][data-value="LB"]) > .inner {
-    border-color: $COLOR_SIGN_NORMAL;
-    background-color: $COLOR_SIGN_NORMAL_LIGHT;
+    border-color: var(--color-sign-normal);
+    background-color: var(--color-sign-normal-light);
   }
   :host([data-condition-type="significance"][data-value="LB"]) > .inner::before {
     content: "LB";
-    color: $COLOR_SIGN_NORMAL;
+    color: var(--color-sign-normal);
   }
   :host([data-condition-type="significance"][data-value="B"]) > .inner {
-    border-color: $COLOR_SIGN_SAFE;
-    background-color: $COLOR_SIGN_SAFE_LIGHT;
+    border-color: var(--color-sign-safe);
+    background-color: var(--color-sign-safe-light);
   }
   :host([data-condition-type="significance"][data-value="B"]) > .inner::before {
     content: "B";
-    color: $COLOR_SIGN_SAFE;
+    color: var(--color-sign-safe);
   }
   :host([data-condition-type="significance"][data-value="CI"]) > .inner {
-    border-color: $COLOR_SIGN_MODIFIER;
-    background-color: $COLOR_SIGN_MODIFIER_LIGHT;
+    border-color: var(--color-sign-modifier);
+    background-color: var(--color-sign-modifier-light);
   }
   :host([data-condition-type="significance"][data-value="CI"]) > .inner::before {
     content: "CI";
-    color: $COLOR_SIGN_MODIFIER;
+    color: var(--color-sign-modifier);
   }
   :host([data-condition-type="significance"][data-value="DR"]) > .inner,
   :host([data-condition-type="significance"][data-value="A"]) > .inner,
@@ -143,8 +142,8 @@ export class ConditionItemValueView extends LitElement {
   :host([data-condition-type="significance"][data-value="PR"]) > .inner,
   :host([data-condition-type="significance"][data-value="AF"]) > .inner,
   :host([data-condition-type="significance"][data-value="O"]) > .inner {
-    border-color: $COLOR_SIGN_OTHER;
-    background-color: $COLOR_SIGN_OTHER_LIGHT;
+    border-color: var(--color-sign-other);
+    background-color: var(--color-sign-other-light);
   }
   :host([data-condition-type="significance"][data-value="DR"]) > .inner::before,
   :host([data-condition-type="significance"][data-value="A"]) > .inner::before,
@@ -152,7 +151,7 @@ export class ConditionItemValueView extends LitElement {
   :host([data-condition-type="significance"][data-value="PR"]) > .inner::before,
   :host([data-condition-type="significance"][data-value="AF"]) > .inner::before,
   :host([data-condition-type="significance"][data-value="O"]) > .inner::before {
-    color: $COLOR_SIGN_OTHER;
+    color: var(--color-sign-other);
   }
   :host([data-condition-type="significance"][data-value="DR"]) > .inner::before {
     content: "DR";
@@ -173,15 +172,15 @@ export class ConditionItemValueView extends LitElement {
     content: "O";
   }
   :host([data-condition-type="significance"][data-value="NP"]) > .inner,
-  :host([data-condition-type="significance"][data-value="AF"]) > .inner,
-  :host([data-condition-type="significance"][data-value="O"]) > .inner {
-    border-color: $COLOR_GRAY;
+  :host([data-condition-type="significance"][data-value="AN"]) > .inner,
+  :host([data-condition-type="significance"][data-value="NC"]) > .inner {
+    border-color: var(--color-gray);
     background-color: white;
   }
   :host([data-condition-type="significance"][data-value="NP"]) > .inner::before,
   :host([data-condition-type="significance"][data-value="AN"]) > .inner::before,
   :host([data-condition-type="significance"][data-value="NC"]) > .inner::before {
-    color: $COLOR_GRAY;
+    color: var(--color-gray);
   }
   :host([data-condition-type="significance"][data-value="NP"]) > .inner::before {
     content: "NP";
@@ -191,12 +190,8 @@ export class ConditionItemValueView extends LitElement {
   }
   :host([data-condition-type="significance"][data-value="NC"]) > .inner::before {
     content: "NC";
-  } */
+  }
   `;
-
-  // static get styles() {
-	// 	return [Style];
-  // }
 
   constructor() {
     super();
