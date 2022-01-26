@@ -5,6 +5,7 @@ $PADDING_VALUES: ($HEIGHT - $HEIGHT_VALUE) / 2
 $CORNER_RADIUS: $HEIGHT / 2
 
 .advanced-search-condition-item-view
+  --padding-values-vertical: calc((var(--height-advanced-search-condition-values-container) - var(--height-advanced-search-condition-value)) * .5)
   margin-bottom: 3px
   position: relative
   > .body
@@ -35,8 +36,8 @@ $CORNER_RADIUS: $HEIGHT / 2
         border-bottom-left-radius: $CORNER_RADIUS
       > .values
         flex-grow: 1
-        padding: var(--padding-advanced-search-values) $CORNER_RADIUS var(--padding-advanced-search-values) 6px
-        display: flex
+        padding: var(--padding-values-vertical) $CORNER_RADIUS var(--padding-values-vertical) 6px
+        // display: flex
         flex-wrap: wrap
         align-items: center
         position: relative
