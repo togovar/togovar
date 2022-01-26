@@ -38,17 +38,10 @@ export default class ConditionValueEditor {
     }
     // if no view is found, create a new one
     if (!valueView) {
-      // valueView = document.createElement('span');
-      // valueView.classList.add('condition-item-value-view');
-      // valueView.dataset.value = value;
-      // valueView.dataset.conditionType = this._conditionType;
-      // valueView.innerHTML = `<span class="inner">${label}</span>`;
-      // valueView = new ConditionItemValueView();
       valueView = document.createElement('condition-item-value-view');
       valueView.label = label;
       valueView.conditionType = this._conditionType;
       valueView.value = value;
-      // valueView.classList.add('condition-item-value-view')
       this._valuesElement.append(valueView);
     }
     return valueView;

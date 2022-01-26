@@ -1,6 +1,5 @@
 import {LitElement, css, html} from 'lit';
-console.log(css)
-console.log(customElements)
+import FrequencyCountValueView from './FrequencyCountValueView';
 // import Style from '../../stylesheets/foundation/_variables.scss';
 
 export class ConditionItemValueView extends LitElement {
@@ -10,12 +9,17 @@ export class ConditionItemValueView extends LitElement {
   // Define scoped styles right with your component, in plain CSS
   static styles = css`
   :host {
-    --height-container: var(--height-advanced-search-condition);
-    --height: 18px;
+    --height-container: var(--height-advanced-search-condition-values-container);
+    --height: var(--height-advanced-search-condition-value);
+    display: inline-block;
+  }
+  :host([data-condition-type="dataset"]) {
+    display: block;
+    position: relative;
   }
   :host > .inner {
-    height: 18px;
-    line-height: 18px;
+    height: var(--height);
+    line-height: 1;
     padding: 0 10px;
     background-color: white;
     border: solid 1px var(--color-key-dark1);
@@ -195,7 +199,6 @@ export class ConditionItemValueView extends LitElement {
 
   constructor() {
     super();
-    console.log(this)
     // Declare reactive properties
     this.label;
     this.conditionType;
@@ -206,11 +209,18 @@ export class ConditionItemValueView extends LitElement {
   render() {
     this.dataset.conditionType = this.conditionType;
     this.dataset.value = this.value;
+    let option = '';
+    console.log(this.conditionType)
+    if (this.conditionType == 'dataset') {
+      option = html`<frequency-count-value-view></frequency-count-value-view>`;
+    }
     return html`<span
       class="inner"
       data-condition-type="${this.conditionType}"
       data-value="${this.value}"
-    >${this.label}</span>`;
+    >${this.label}</span>
+    ${option}
+    `;
   }
 }
 customElements.define('condition-item-value-view', ConditionItemValueView);
