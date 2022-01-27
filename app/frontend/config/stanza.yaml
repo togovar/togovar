@@ -338,18 +338,30 @@ disease:
             line-clamp: 3
           - id: raf
             label: RAF
+            type: number
+            significant-digits: 4
+            exponent-digits: 3
             line-clamp: 3
           - id: p_value
             label: P-value
+            type: number
+            significant-digits: 1
+            exponent-digits: 0
             line-clamp: 3
           - id: odds_ratio
             label: OR
+            type: number
+            significant-digits: 4
+            exponent-digits: 3
             line-clamp: 3
           - id: ci_text
             label: CI
             line-clamp: 3
           - id: beta
             label: Beta
+            type: number
+            significant-digits: 1
+            exponent-digits: 0
             line-clamp: 3
           - id: beta_unit
             label: Beta unit
