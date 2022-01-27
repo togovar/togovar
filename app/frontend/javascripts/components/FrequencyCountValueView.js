@@ -53,41 +53,28 @@ export class FrequencyCountValueView extends LitElement {
   :host([data-filtered="false"]) > .filtered {
     visibility: hidden;
   }
-  [data-value="jga_ngs"] + :host() {
-    border: solid 2px red;
+  :host([data-value="jga_ngs"]) > .frequencygraph > .bar,
+  :host([data-value="jga_snp"]) > .frequencygraph > .bar {
+    background-color:var(--color-dataset-jga);
   }
-  /*
-[data-value="jga_ngs"], [data-value="jga_snp"]
-  + .frequency-count-value-view
-    > .frequencygraph
-      > .bar
-        background-color: $COLOR_DATASET_JGA
-[data-value="tommo_4.7kjpn"]
-  + .frequency-count-value-view
-    > .frequencygraph
-      > .bar
-        background-color: $COLOR_DATASET_3_5KJPN
-[data-value="hgvd"], [data-value="mgend"]
-  + .frequency-count-value-view
-    > .frequencygraph
-      > .bar
-        background-color: $COLOR_DATASET_HGVD
-[data-value="gem_j_wga"]
-  + .frequency-count-value-view
-    > .frequencygraph
-      > .bar
-        background-color: $COLOR_DATASET_GEM_J
-[data-value="bbj"]
-  + .frequency-count-value-view
-    > .frequencygraph
-      > .bar
-        background-color: $COLOR_DATASET_BBJ
-[data-value="clinvar"], [data-value="exac"], [data-value="gnomad"]
-  + .frequency-count-value-view
-    > .frequencygraph
-      > .bar
-        background-color: $COLOR_DATASET_FOREIGN
-        */
+  :host([data-value="tommo_4.7kjpn"]) > .frequencygraph > .bar {
+    background-color:var(--color-dataset-tommo);
+  }
+  :host([data-value="hgvd"]) > .frequencygraph > .bar,
+  :host([data-value="mgend"]) > .frequencygraph > .bar {
+    background-color:var(--color-dataset-hgvd);
+  }
+  :host([data-value="gem_j_wga"]) > .frequencygraph > .bar {
+    background-color:var(--color-dataset-gemj);
+  }
+  :host([data-value="bbj"]) > .frequencygraph > .bar {
+    background-color:var(--color-dataset-bbj);
+  }
+  :host([data-value="clinvar"]) > .frequencygraph > .bar,
+  :host([data-value="exac"]) > .frequencygraph > .bar,
+  :host([data-value="gnomad"]) > .frequencygraph > .bar {
+    background-color:var(--color-dataset-foreign);
+  }
   `;
 
   constructor() {
