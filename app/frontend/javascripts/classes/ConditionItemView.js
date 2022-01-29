@@ -113,53 +113,18 @@ export default class ConditionItemView extends ConditionView {
   }
 
   get query() {
+    const values = Array.from(this._values.querySelectorAll(':scope > condition-item-value-view'));
     if (this._conditionType === CONDITION_TYPE.dataset) {
-      const value = this._values.querySelector(':scope > .condition-item-value-view');
-      const frequencyCountValueView = this._values.querySelector(':scope > .frequency-count-value-view');
-      const dataset = {name: value.dataset.value};
-      const filtered = frequencyCountValueView.dataset.filtered === 'true' ? true : false;
-      if (frequencyCountValueView.dataset.mode === 'frequency' && frequencyCountValueView.dataset.invert === '1') {
-        return {
-          or: [
-            {
-              frequency: {
-                dataset,
-                frequency: {
-                  gte: 0,
-                  lte: Number(frequencyCountValueView.dataset.from)
-                },
-                filtered
-              }
-            },
-            {
-              frequency: {
-                dataset,
-                frequency: {
-                  gte: Number(frequencyCountValueView.dataset.to),
-                  lte: 1
-                },
-                filtered
-              }
-            }
-          ]
-        }
-      } else {
-        const values = {};
-        if (frequencyCountValueView.dataset.from !== '') values.gte = Number(frequencyCountValueView.dataset.from);
-        if (frequencyCountValueView.dataset.to !== '') values.lte = Number(frequencyCountValueView.dataset.to);
-        return {
-          frequency: {
-            dataset,
-            [frequencyCountValueView.dataset.mode]: values,
-            filtered
-          }
-        }
-      }
+      // if the condition type is dataset, special conditional expression is needed
+      const queries = values.map(view => view.shadowRoot.querySelector('frequency-count-value-view').queryValue);
+      return queries.length <= 1
+        ? queries[0]
+        : {or: queries};
     } else {
       return {
         [this._conditionType]: {
           relation: this._elm.dataset.relation,
-          terms: Array.from(this._values.querySelectorAll(':scope > .condition-item-value-view')).map(value => value.dataset.value)
+          terms: values.map(value => value.value)
         }
       };
     }

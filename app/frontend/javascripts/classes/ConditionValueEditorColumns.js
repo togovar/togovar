@@ -67,8 +67,6 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     this._getItems(parentId)
       .then(items => {
 
-        console.log(items)
-
         // make HTML
         const column = document.createElement('div');
         column.classList.add('column');

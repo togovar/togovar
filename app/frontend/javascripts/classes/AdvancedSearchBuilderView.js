@@ -72,7 +72,6 @@ export default class AdvancedSearchBuilderView {
 
   changeCondition() {
     const query = this._rootGroup.query;
-    console.log(query)
     this._toolbar.canSearch(Object.keys(query).length > 0);
   }
 
