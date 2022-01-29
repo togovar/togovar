@@ -53,26 +53,26 @@ export class FrequencyCountValueView extends LitElement {
   :host([data-filtered="false"]) > .filtered {
     visibility: hidden;
   }
-  :host([data-value="jga_ngs"]) > .frequencygraph > .bar,
-  :host([data-value="jga_snp"]) > .frequencygraph > .bar {
+  :host([data-dataset="jga_ngs"]) > .frequencygraph > .bar,
+  :host([data-dataset="jga_snp"]) > .frequencygraph > .bar {
     background-color:var(--color-dataset-jga);
   }
-  :host([data-value="tommo_4.7kjpn"]) > .frequencygraph > .bar {
+  :host([data-dataset="tommo_4.7kjpn"]) > .frequencygraph > .bar {
     background-color:var(--color-dataset-tommo);
   }
-  :host([data-value="hgvd"]) > .frequencygraph > .bar,
-  :host([data-value="mgend"]) > .frequencygraph > .bar {
+  :host([data-dataset="hgvd"]) > .frequencygraph > .bar,
+  :host([data-dataset="mgend"]) > .frequencygraph > .bar {
     background-color:var(--color-dataset-hgvd);
   }
-  :host([data-value="gem_j_wga"]) > .frequencygraph > .bar {
+  :host([data-dataset="gem_j_wga"]) > .frequencygraph > .bar {
     background-color:var(--color-dataset-gemj);
   }
-  :host([data-value="bbj"]) > .frequencygraph > .bar {
+  :host([data-dataset="bbj"]) > .frequencygraph > .bar {
     background-color:var(--color-dataset-bbj);
   }
-  :host([data-value="clinvar"]) > .frequencygraph > .bar,
-  :host([data-value="exac"]) > .frequencygraph > .bar,
-  :host([data-value="gnomad"]) > .frequencygraph > .bar {
+  :host([data-dataset="clinvar"]) > .frequencygraph > .bar,
+  :host([data-dataset="exac"]) > .frequencygraph > .bar,
+  :host([data-dataset="gnomad"]) > .frequencygraph > .bar {
     background-color:var(--color-dataset-foreign);
   }
   `;
@@ -135,6 +135,48 @@ export class FrequencyCountValueView extends LitElement {
     }
     
     super.update();
+  }
+
+  get queryValue() {
+    const dataset = {name: this.dataset.dataset};
+    const filtered = this.filtered === 'true' ? true : false;
+    if (this.invert === '1') {
+      return {
+        or: [
+          {
+            frequency: {
+              dataset,
+              frequency: {
+                gte: 0,
+                lte: this.from
+              },
+              filtered
+            }
+          },
+          {
+            frequency: {
+              dataset,
+              frequency: {
+                gte: this.to,
+                lte: 1
+              },
+              filtered
+            }
+          }
+        ]
+      }
+    } else {
+      const values = {};
+      if (this.from !== '') values.gte = this.from;
+      if (this.to !== '') values.lte = this.to;
+      return {
+        frequency: {
+          dataset,
+          [this.mode]: values,
+          filtered
+        }
+      }
+    }
   }
 
   // update() {

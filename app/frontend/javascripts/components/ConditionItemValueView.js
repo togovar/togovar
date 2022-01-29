@@ -210,9 +210,8 @@ export class ConditionItemValueView extends LitElement {
     this.dataset.conditionType = this.conditionType;
     this.dataset.value = this.value;
     let option = '';
-    console.log(this.conditionType)
     if (this.conditionType == 'dataset') {
-      option = html`<frequency-count-value-view data-value="${this.value}"></frequency-count-value-view>`;
+      option = html`<frequency-count-value-view data-dataset="${this.value}"></frequency-count-value-view>`;
     }
     return html`<span
       class="inner"
@@ -222,5 +221,6 @@ export class ConditionItemValueView extends LitElement {
     ${option}
     `;
   }
+  
 }
 customElements.define('condition-item-value-view', ConditionItemValueView);
