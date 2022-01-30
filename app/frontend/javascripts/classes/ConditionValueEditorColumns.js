@@ -233,17 +233,12 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     topLevelNodes.forEach(datum => checkLeaves(datum));
   }
 
-  _update(id) {
+  _update() {
 
     // reflect check status in DOM
     this._data.forEach(datum => {
       const checkbox = this._columns.querySelector(`li[data-id="${datum.id}"] > label > input`);
-      // if (this._conditionType === CONDITION_TYPE.dataset) {
-      //   datum.checked = datum.id == id;
-      //   checkbox.checked = datum.checked;
-      // } else {
       if (checkbox) checkbox.checked = datum.checked;
-      // }
     });
     // update selection status of upper hierarchy
     this._updateIndeterminate();
