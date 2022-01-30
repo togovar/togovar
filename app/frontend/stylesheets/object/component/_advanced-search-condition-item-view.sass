@@ -13,7 +13,6 @@ $CORNER_RADIUS: $HEIGHT / 2
     background-color: white
     box-shadow: 0 1px 1px rgba(black, .3)
     position: relative
-    // overflow: hidden
     > .summary
       padding-right: 8px
       color: $COLOR_BLACK
@@ -37,57 +36,30 @@ $CORNER_RADIUS: $HEIGHT / 2
       > .values
         flex-grow: 1
         padding: var(--padding-values-vertical) $CORNER_RADIUS var(--padding-values-vertical) 6px
-        // display: flex
         flex-wrap: wrap
         align-items: center
         position: relative
-        > .numeralvalue
-          margin-left: 8px
-          width: 120px
-          height: var(--height-advanced-search-value)
-          padding: 2px 0
-          display: flex
-          align-items: center
-          > .graph
-            display: inline-block
-            border: solid 1px white
-            box-shadow: 0 0 0 1px $COLOR_GRAY
-            padding: 1px
-            background-color: white
-            width: 54px
-            height: 100%
-            position: relative
-            margin-right: 4px
-            > .bar
-              position: absolute
-              background-color: $COLOR_KEY_DARK2
-              width: 100%
-              height: 100%
-              top: 0
-              left: 0
-          > .text
-            font-weight: bold
-      > .editbutton
-        color: white
-        background-color: $COLOR_KEY_DARK1
-        font-size: 10px
-        position: relative
-        top: 5px
-        height: 14px
-        line-height: 14px
-        padding: 0 7px
-        border-radius: 3px
-        font-weight: bold
-        opacity: .5
-        cursor: pointer
-        &:hover
-          opacity: 1
+      > .buttons
+        display: flex
+        > button
+          border: none
+          padding: 0 4px
+          opacity: .4
+          &:hover
+            opacity: 1
+          &::before
+            font-family: fontello
+        > .edit
+          &::before
+            content: var(--char-edit)
+        > .delete
+          &::before
+            content: var(--char-delete)
     > .advanced-search-condition-editor-view
       display: none
       border-top: none
       background-color: white
       height: 0
-      // overflow: hidden
       transition: height $GUI_DURATION
       border-bottom-left-radius: $CORNER_RADIUS
       border-bottom-right-radius: $CORNER_RADIUS
@@ -107,7 +79,7 @@ $CORNER_RADIUS: $HEIGHT / 2
       > .summary
         > .classification
           border-bottom-left-radius: 0
-        > .editbutton
+        > .buttons
           opacity: 0
           pointer-events: none
       > .advanced-search-condition-editor-view

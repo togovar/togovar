@@ -86,9 +86,7 @@ export default class ConditionValues {
   // private methods
 
   _clickOkButton(e) {
-    console.log(e)
     e.stopImmediatePropagation();
-    // 
     this._conditionView.doneEditing();
   }
 
@@ -98,7 +96,7 @@ export default class ConditionValues {
       // delete for the first time 
       this._conditionView.remove();
     } else {
-      // otherwise, revert to the previous state 
+      // otherwise, revert to the previous state
       for (const editor of this._editors) {
         editor.restore();
       }

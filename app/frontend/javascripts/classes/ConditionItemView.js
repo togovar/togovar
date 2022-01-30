@@ -13,7 +13,6 @@ export default class ConditionItemView extends ConditionView {
    * @param {Node} referenceElm
    */
   constructor(builder, parentView, conditionType, referenceElm = null) {
-    // console.log(builder, parentView, conditionType);
 
     super(CONDITION_ITEM_TYPE.condition, builder, parentView, referenceElm);
 
@@ -33,6 +32,10 @@ export default class ConditionItemView extends ConditionView {
         <div class="relation"></div>
         <div class="values"></div>
         <div class="editbutton">Edit</div>
+        <div class="buttons">
+          <button class="edit" title="Edit"></button>
+          <button class="delete" title="Delete"></button>
+        </div>
       </div>
       <div class="advanced-search-condition-editor-view"></div>
     </div>
@@ -59,14 +62,21 @@ export default class ConditionItemView extends ConditionView {
       // if (this._elm.dataset.relation === 'contains') return;
       this._elm.dataset.relation = {eq: 'ne', ne: 'eq'}[this._elm.dataset.relation];
     });
-    // switch edit mode
-    const editButton = summary.querySelector(':scope > .editbutton');
-    editButton.addEventListener('click', e => {
-      e.stopImmediatePropagation();
-      this._elm.classList.add('-editing');
-      this._conditionValues.startToEditCondition();
-    });
-    editButton.dispatchEvent(new Event('click'));
+    // buttons
+    for (const button of summary.querySelectorAll(':scope > .buttons > button')) {
+      button.addEventListener('click', e => {
+        e.stopImmediatePropagation();
+        switch (e.target.className) {
+          case 'edit':
+            this._elm.classList.add('-editing');
+            this._conditionValues.startToEditCondition();
+            break;
+          case 'delete':
+            break;
+        }
+      });
+    }
+    summary.querySelector(':scope > .buttons > button.edit').dispatchEvent(new Event('click'));
   }
 
 
