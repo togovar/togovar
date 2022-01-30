@@ -37,7 +37,6 @@ export default class AdvancedSearchBuilderView {
    * @param {Array} conditionViews
    */
   selectedConditionViews(conditionViews) {
-    console.log(conditionViews)
 
     // change status
     let canUngroup = false;
@@ -116,9 +115,13 @@ export default class AdvancedSearchBuilderView {
     this.changeCondition();
   }
 
-  delete() {
+  /**
+   * 
+   * @param {Array<ConditionView>} views 
+   */
+  delete(views) {
     console.log('_delete')
-    const conditionViews = this._selection.getSelectingConditionViews();
+    const conditionViews = views ?? this._selection.getSelectingConditionViews();
     for (const view of conditionViews) {
       view.remove();
     }

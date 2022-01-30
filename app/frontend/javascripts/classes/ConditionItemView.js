@@ -31,7 +31,6 @@ export default class ConditionItemView extends ConditionView {
         <div class="classification">${ADVANCED_CONDITIONS[conditionType].label}</div>
         <div class="relation"></div>
         <div class="values"></div>
-        <div class="editbutton">Edit</div>
         <div class="buttons">
           <button class="edit" title="Edit"></button>
           <button class="delete" title="Delete"></button>
@@ -72,6 +71,7 @@ export default class ConditionItemView extends ConditionView {
             this._conditionValues.startToEditCondition();
             break;
           case 'delete':
+            this._builder.delete([this])
             break;
         }
       });
@@ -97,7 +97,6 @@ export default class ConditionItemView extends ConditionView {
   // }
 
   remove() {
-    console.log(this)
     delete this._conditionValues;
     super.remove();
     // this._parent.removeConditionView(this);
