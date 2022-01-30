@@ -19,7 +19,6 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     super(valuesView, conditionType);
 
     this._data = this._prepareData();
-    console.log(this._data)
     this._selectionDependedOnParent = SELECTION_DEPENDED_ON_PARENT[conditionType];
 
     // HTML
@@ -168,7 +167,6 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
                 if (parentId) {
                   const parentDatum = this._data.find(datum => datum.id == parentId);
                   parentDatum.children.push(...(newData.map(datum => datum.id)));
-                  console.log(parentDatum)
                 }
                 resolve(newData);
               })
@@ -198,7 +196,6 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
 
     const checkLeaves = (datum) => {
       if (!datum.children || datum.children.length === 0) return;
-      console.log(datum)
       let numberOfChecked = 0;
       datum.children.forEach(child => {
         const childDatum = this._data.find(datum => datum.id === child);

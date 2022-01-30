@@ -31,7 +31,6 @@ export default class ConditionValues {
 
     // initialization by types
     // TODO: conditionType は ADVANCED_CONDITIONS[conditionView.conditionType].type を参照して処理をスイッチさせたい
-    console.log('conditionType:', conditionView.conditionType)
     switch (conditionView.conditionType) {
       case CONDITION_TYPE.type:
       case CONDITION_TYPE.significance:
@@ -74,10 +73,8 @@ export default class ConditionValues {
       });
     }
     if (isValid) {
-      console.log('accept')
       this._okButton.classList.remove('-disabled');
     } else {
-      console.log('reject')
       this._okButton.classList.add('-disabled');
     }
   }
