@@ -1,12 +1,12 @@
 import {LitElement, css, html} from 'lit';
-const DEFAULT_CONDITION = {
-  frequency: {
-    from: 0, to: 1, invert: '0'
-  },
-  count: {
-    from: null, to: null
-  }
-};
+// const DEFAULT_CONDITION = {
+//   frequency: {
+//     from: 0, to: 1, invert: '0'
+//   },
+//   count: {
+//     from: null, to: null
+//   }
+// };
 const MODE = {
   frequency: 'frequency',
   count: 'count'
