@@ -99,7 +99,6 @@ function changeSearchMode(searchViewName) {
 function setUserAgent() {
   const ua = window.navigator.userAgent.toLowerCase();
   let os = '';
-  console.log(ua)
   switch (true) {
     case ua.indexOf('windows nt') !== -1: os = 'windows'; break;
     case ua.indexOf('mac os x') !== -1: os = 'mac'; break;

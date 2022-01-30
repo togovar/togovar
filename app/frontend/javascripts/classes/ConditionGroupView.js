@@ -14,7 +14,6 @@ export default class ConditionGroupView extends ConditionView {
    * @param {Boolean} isRoot
    */
   constructor(builder, parentView, logicalOperator = 'and', conditionViews = [], referenceElm = null, isRoot = false) {
-    // console.log( parentView, logicalOperator, conditionViews, referenceElm, isRoot )
 
     super(CONDITION_ITEM_TYPE.group, builder, parentView, referenceElm);
 
@@ -95,7 +94,6 @@ export default class ConditionGroupView extends ConditionView {
    * @param {Node} referenceElm 
    */
   addConditionViews(conditionViews, referenceElm) {
-    console.log(conditionViews, referenceElm)
     for (const view of conditionViews) {
       this._container.insertBefore(view, referenceElm);
     }
