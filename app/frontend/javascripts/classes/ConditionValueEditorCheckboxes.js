@@ -39,8 +39,7 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
   // public methods
 
   keepLastValues() {
-    this._lastValues = Array.from(this._valuesView.conditionView.valuesElement.querySelectorAll(':scope > .value')).map(value => value.dataset.value);
-    console.log( this._lastValues )
+    this._lastValues = Array.from(this._valuesView.conditionView.valuesElement.querySelectorAll(':scope > condition-item-value-view')).map(value => value.value);
   }
 
   restore() {
