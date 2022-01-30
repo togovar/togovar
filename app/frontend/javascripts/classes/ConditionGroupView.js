@@ -125,7 +125,7 @@ export default class ConditionGroupView extends ConditionView {
 
   _defineObserveConditions() {
     const config = {attributes: false, childList: true, subtree: false};
-    const callback = function (mutationsList, observer) {
+    const callback = function (mutationsList) {
       for(const mutation of mutationsList) {
         if (mutation.type === 'childList') {
           const numberOfChild = this._numberOfChild;
