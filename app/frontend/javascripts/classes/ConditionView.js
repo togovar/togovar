@@ -9,7 +9,6 @@ export default class ConditionItemView {
    * @param {Node} referenceElm
    */
   constructor(type, builder, parentView, referenceElm) {
-    // console.log(type, builder, parentView, referenceElm)
 
     this._type = type;
     this._builder = builder;
@@ -28,18 +27,11 @@ export default class ConditionItemView {
     //   eventTarget = this._elm;
     //   break;
     //   case 'item':
-    //   console.log(this._elm)
-    //   console.log(this._elm.querySelector(':scope'))
-    //   console.log(this._elm.querySelector(':scope > .body'))
-    //   console.log(this._elm.querySelector(':scope > .body > .summary'))
     //   eventTarget = this._elm.querySelector(':scope > .body > .summary');
     //   break;
     // }
-    // console.log(eventTarget)
     // eventTarget.addEventListener('click', e => {
     //   e.stopPropagation();
-    //   console.log('click', this, e)
-      
     // });
   }
 
@@ -71,7 +63,6 @@ export default class ConditionItemView {
   }
 
   remove() {
-    console.log(this)
     this.parentView.removeConditionView(this);
     delete this;
   }
@@ -116,12 +107,10 @@ export default class ConditionItemView {
 
   get depth() {
     let parentView = this.parentView;
-    console.log('****', this.elm, parentView)
     let depth = 0;
     while (parentView) {
       parentView = parentView.parentView;
       if (parentView) depth++;
-      console.log(parentView?.elm, depth)
     }
     return depth;
   }

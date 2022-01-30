@@ -24,7 +24,6 @@ class StoreManager {
   }
 
   ready(callback) {
-    console.log('ready')
     // get master data of conditions
     const json = require('../../assets/search_conditions.json');
     Object.freeze(json);
