@@ -253,6 +253,8 @@ disease:
   stanza:
     - id: disease-header
       dom: "#disease-header"
+      options:
+        togostanza-menu-placement: none
 
     - id: hash-table
       dom: "#disease-base"
