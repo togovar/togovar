@@ -42,19 +42,22 @@ variant:
             line-clamp: 3
           - id: raf
             label: RAF
+            sprintf: %-9.3e
             line-clamp: 3
           - id: p_value
             label: P-value
-            type: number
+            sprintf: %-9.0e
             line-clamp: 3
           - id: odds_ratio
             label: OR
+            sprintf: %-9.3e
             line-clamp: 3
           - id: ci_text
             label: CI
             line-clamp: 3
           - id: beta
             label: Beta
+            sprintf: %-9.3e
             line-clamp: 3
           - id: beta_unit
             label: Beta unit
