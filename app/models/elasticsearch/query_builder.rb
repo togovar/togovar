@@ -356,7 +356,7 @@ module Elasticsearch
 
       query[:size] = @size
       query[:from] = @from unless @from.zero?
-      query[:sort] = %w[chromosome.index vcf.position vcf.reference vcf.alternative] if @sort
+      query[:sort] = %w[chromosome.index vcf.position vcf.reference vcf.alternate] if @sort
 
       query
     end
