@@ -1,5 +1,6 @@
 import deparam from 'deparam.js';
 import {API_URL} from "../global.js";
+import {mixin} from './StoreManagerMixin.js';
 
 const LIMIT = 100;
 const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
@@ -7,7 +8,7 @@ const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
 class StoreManager {
 
   constructor() {
-    window.__s = this;
+    window.__s = this; // set global variable for monitering
     this._isReady = false;
     this._URIParameters = deparam(window.location.search.substr(1));
     this._bindings = {};
@@ -30,7 +31,7 @@ class StoreManager {
     Object.freeze(json);
     this.setData('searchConditionsMaster', json);
     // restore search conditions from URL parameters
-    const searchMode = this._URIParameters.mode ? this._URIParameters.mode : DEFAULT_SEARCH_MODE;
+    const searchMode = this._URIParameters.mode ?? DEFAULT_SEARCH_MODE;
     let simpleSearchConditions = {}, advancedSearchConditions = {}, setAd__vancedSearchConditions = {};
     switch (searchMode) {
       case 'simple':
@@ -580,5 +581,9 @@ class StoreManager {
   }
 
 }
+
+Object.assign(StoreManager.prototype, mixin);
+console.log(StoreManager.prototype)
+console.log(mixin)
 
 export default new StoreManager();
