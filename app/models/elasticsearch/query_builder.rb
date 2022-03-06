@@ -457,7 +457,7 @@ module Elasticsearch
                     must { match start: pos.to_i }
                   else
                     must { range(:start) { lte pos.to_i } }
-                    must { range(:stop) { gte pos.to_i } }
+                    must { range(:stop) { gt pos.to_i } }
                   end
                 end
               end
