@@ -108,7 +108,11 @@ class StoreManager {
       for (const watcher of this._bindings[key]) {
         let value = this._store[key];
         const copy = this._copy(value);
-        watcher[key](copy);
+        if (typeof watcher[key] === 'function') {
+          watcher[key](copy);
+        } else {
+          console.warn(`This binding has no corresponding function.`, watcher, key);
+        }
       }
     }
   }
@@ -143,7 +147,7 @@ class StoreManager {
   setAdvancedSearchCondition(key, values, fromHistory) {
     if (!this._isReady) return;
     // TODO: シンプルサーチと挙動合わせる
-    this._store.advancedSearchConditions[key] = values;
+    if (key) this._store.advancedSearchConditions[key] = values;
     // URIパラメータに反映
     if (!fromHistory) this._reflectAdvancedSearchConditionToURI();
     // 検索条件として成立していれば、検索開始
@@ -384,7 +388,6 @@ class StoreManager {
         path = 'results.json';
       }
     } else {
-      console.log(this._store.searchMode)
       switch (this._store.searchMode) {
         case 'simple': {
           const conditions = $.param(this._extractSearchCondition(this._store.searchConditions));
@@ -489,7 +492,7 @@ class StoreManager {
           this.setSearchCondition({});
           break;
         case 'advanced':
-          this.setAdvancedSearchCondition({});
+          this.setAdvancedSearchCondition();
           break;
       }
       // start search
