@@ -28,9 +28,9 @@ export default class AdvancedSearchBuilderView {
 
   // public methods
 
-  // advancedSearchConditions(values) {
-  //   console.log(values)
-  // }
+  advancedSearchConditions(values) {
+    console.log(values)
+  }
 
   /**
    * 
