@@ -31,18 +31,15 @@ class StoreManager {
     this.setData('searchConditionsMaster', json);
     // restore search conditions from URL parameters
     const searchMode = this._URIParameters.mode ?? DEFAULT_SEARCH_MODE;
-    let simpleSearchConditions = {}, advancedSearchConditions = {}, setAd__vancedSearchConditions = {};
+    let simpleSearchConditions = {}, setAd__vancedSearchConditions = {};
     switch (searchMode) {
       case 'simple':
         simpleSearchConditions = this._extractSearchCondition(this._URIParameters);
         break;
       case 'advanced':
-        Object.assign(advancedSearchConditions, this._convertAdvancedRangeToSimpleRange(this._URIParameters));
-        delete advancedSearchConditions.mode;
         break;
     }
     this._store.searchConditions = simpleSearchConditions;
-    this._store.advancedSearchConditions = advancedSearchConditions;
     this._store.ad__vancedSearchConditions = setAd__vancedSearchConditions;
     callback();
     this._isReady = true;
@@ -143,18 +140,6 @@ class StoreManager {
     if (!this._isReady) return;
     this._setSearchConditions({[key]: values});
   }
-  setAdvancedSearchCondition(key, values, fromHistory) {
-    if (!this._isReady) return;
-    // TODO: シンプルサーチと挙動合わせる
-    if (key) this._store.advancedSearchConditions[key] = values;
-    // URIパラメータに反映
-    if (!fromHistory) this._reflectAdvancedSearchConditionToURI();
-    // 検索条件として成立していれば、検索開始
-    if (!this._isReady) return;
-    this._notify('advancedSearchConditions');
-    this.setData('appStatus', 'searching');
-    this._search(0, true);
-  }
   // in Advanced Search, search criteria are received as queries, not key values.
   setAd__vancedSearchCondition(conditions, fromHistory) {
     if (!this._isReady) return;
@@ -162,7 +147,7 @@ class StoreManager {
     this._store.ad__vancedSearchConditions = conditions;
     // convert queries to URL parameters
     if (!fromHistory) this._reflectAd__vancedSearchConditionToURI();
-    this._notify('ad__vancedSearchConditions');
+    this._notify('advancedSearchConditions');
     this.setData('appStatus', 'searching');
     this._search(0, true);
   }
@@ -205,9 +190,6 @@ class StoreManager {
   getSearchCondition(key) {
     return this._copy(this._store.searchConditions[key]);
   }
-  getAdvancedSearchCondition(key) {
-    return this._copy(this._store.advancedSearchConditions[key]);
-  }
 
   getSearchConditionMaster(key) {
     return this.getData('searchConditionsMaster').find(condition => condition.id === key);
@@ -247,75 +229,6 @@ class StoreManager {
     return diffConditions;
   }
 
-  _extractAdvancedSearchCondition(conditions) {
-    // const searchConditionsMaster = this.getData('searchConditionsMaster');
-    // const conditionMaster = searchConditionsMaster.find(condition => condition.id === 'adv_frequency'); // TODO: 暫定的にデータセットだけに対応
-    const diffConditions = [];
-    // extraction of differences from master data
-    Object.keys(conditions).forEach(key => {
-      const condition = conditions[key];
-      switch (key) {
-        case 'adv_frequency': {
-          diffConditions.push(...this._convertSimpleRangeToSimpleAdvanced(condition));
-          /*
-            Object.keys(condition).forEach(datasetKey => {
-              const datasetDefault = conditionMaster.items.find(item => item.id === datasetKey).default;
-              const isUnmatch = Object.keys(condition[datasetKey]).some(conditionKey => {
-                const defaultValue = datasetDefault[conditionKey];
-                return defaultValue === undefined || defaultValue !== condition[datasetKey][conditionKey];
-              });
-              if (isUnmatch) {
-                // process dataset frequencies for advanced search
-                const dataset = {name: datasetKey};
-                if (condition[datasetKey].invert === '1') {
-                  diffConditions.push(
-                    {
-                      or: [
-                        {
-                          frequency: {
-                            dataset,
-                            frequency: {
-                              gte: 0,
-                              lte: condition[datasetKey].from
-                            },
-                            filtered: condition[datasetKey].filtered
-                          }
-                        },
-                        {
-                          frequency: {
-                            dataset,
-                            frequency: {
-                              gte: condition[datasetKey].to,
-                              lte: 1
-                            },
-                            filtered: condition[datasetKey].filtered
-                          }
-                        }
-                      ]
-                    }
-                  );
-                } else {
-                  diffConditions.push({
-                    frequency: {
-                      dataset,
-                      frequency: {
-                        gte: condition[datasetKey].from,
-                        lte: condition[datasetKey].to
-                      },
-                      filtered: condition[datasetKey].filtered
-                    }
-                  });
-                }
-              }
-            })
-          */
-        }
-          break;
-      }
-    });
-    return diffConditions
-  }
-
   // update uri parameters
   _reflectSearchConditionToURI() {
     const diffConditions = this._extractSearchCondition(this._store.searchConditions);
@@ -324,12 +237,6 @@ class StoreManager {
     this._URIParameters.mode ='simple';
     // synthesize parameters
     Object.assign(this._URIParameters, diffConditions);
-    window.history.pushState(this._URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this._URIParameters)}`);
-  }
-  _reflectAdvancedSearchConditionToURI() {
-    const diffConditions = this._extractAdvancedSearchCondition(this._store.advancedSearchConditions);
-    this._URIParameters = this._buildAdvancedSearchQuery(diffConditions);
-    this._URIParameters.mode ='advanced';
     window.history.pushState(this._URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this._URIParameters)}`);
   }
   _reflectAd__vancedSearchConditionToURI() {
@@ -401,16 +308,6 @@ class StoreManager {
           });
         }
           break;
-        // case 'advanced': {
-        //   path = `${API_URL}/api/search/variation`;
-        //   const conditions = this._extractAdvancedSearchCondition( this._store.advancedSearchConditions );
-        //   options.method = 'POST';
-        //   options.body = JSON.stringify({
-        //     query: this._buildAdvancedSearchQuery(conditions),
-        //     offset: this._store.offset
-        //   });
-        // }
-        //   break;
         }
     }
     fetch(path, options)
@@ -489,7 +386,7 @@ class StoreManager {
           this.setSearchCondition({});
           break;
         case 'advanced':
-          this.setAdvancedSearchCondition();
+          this.setAd__vancedSearchCondition();
           break;
       }
       // start search
@@ -497,93 +394,8 @@ class StoreManager {
     }
   }
 
-  _convertAdvancedRangeToSimpleRange(advancedConditions) {
-    if (advancedConditions.and) {
-      const frequencies = {};
-      advancedConditions.and.forEach(condition => {
-        switch (Object.keys(condition)[0]) {
-          case 'frequency':
-            frequencies[condition.frequency.dataset.name] = {
-              from: parseFloat(condition.frequency.frequency.gte),
-              to: parseFloat(condition.frequency.frequency.lte),
-              invert: false,
-              filtered: eval(condition.frequency.filtered)
-            }
-            break;
-          case 'or': {
-            const frequency = {
-              invert: true,
-              filtered: eval(condition.or[0].frequency.filtered)
-            }
-            condition.or.forEach(subCondition => {
-              if (subCondition.frequency.frequency.gte === '0') {
-                frequency.from = parseFloat(subCondition.frequency.frequency.lte);
-              } else {
-                frequency.to = parseFloat(subCondition.frequency.frequency.gte);
-              }
-            });
-            frequencies[condition.or[0].frequency.dataset.name] = frequency;
-          }
-            break;
-        }
-      })
-      return {adv_frequency: frequencies};
-    } else {
-      return {};
-    }
-  }
-  _convertSimpleRangeToSimpleAdvanced(simpleConditions) {
-    const advancedConditions = [];
-    Object.keys(simpleConditions).forEach(datasetKey => {
-      // process dataset frequencies for advanced search
-      const dataset = {name: datasetKey};
-      if (simpleConditions[datasetKey].invert === '1') {
-        advancedConditions.push(
-          {
-            or: [
-              {
-                frequency: {
-                  dataset,
-                  frequency: {
-                    gte: 0,
-                    lte: simpleConditions[datasetKey].from
-                  },
-                  filtered: simpleConditions[datasetKey].filtered
-                }
-              },
-              {
-                frequency: {
-                  dataset,
-                  frequency: {
-                    gte: simpleConditions[datasetKey].to,
-                    lte: 1
-                  },
-                  filtered: simpleConditions[datasetKey].filtered
-                }
-              }
-            ]
-          }
-        );
-      } else {
-        advancedConditions.push({
-          frequency: {
-            dataset,
-            frequency: {
-              gte: simpleConditions[datasetKey].from,
-              lte: simpleConditions[datasetKey].to
-            },
-            filtered: simpleConditions[datasetKey].filtered
-          }
-        });
-      }
-    });
-    return advancedConditions;
-  }
-
 }
 
 Object.assign(StoreManager.prototype, mixin);
-console.log(StoreManager.prototype)
-console.log(mixin)
 
 export default new StoreManager();
