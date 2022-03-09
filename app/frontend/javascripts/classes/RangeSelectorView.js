@@ -75,40 +75,36 @@ export default class RangeSelectorView {
       this._any = match.querySelector(':scope > label > .any');
     }
 
-    setTimeout(() => {
+    this._sliderWidth = this._slider.offsetWidth - 16;
 
-      this._sliderWidth = this._slider.offsetWidth - 16;
-
-      // events
-      this._from.addEventListener('change', e => {
-        e.target.value = parseFloat(e.target.value) < 0 ? 0 : e.target.value;
-        this._changeParameter({from: e.target.value + ''});
+    // events
+    this._from.addEventListener('change', e => {
+      e.target.value = parseFloat(e.target.value) < 0 ? 0 : e.target.value;
+      this._changeParameter({from: e.target.value + ''});
+    });
+    this._to.addEventListener('change', e => {
+      e.target.value = parseFloat(e.target.value) > 1 ? 1 : e.target.value;
+      this._changeParameter({to: e.target.value + ''});
+    });
+    this._invert.addEventListener('change', e => {
+      this._changeParameter({invert: e.target.checked ? '1' : '0'});
+    });
+    if (match) {
+      this._all.addEventListener('change', e => {
+        this._changeParameter({match: e.target.checked ? 'all' : 'any'});
       });
-      this._to.addEventListener('change', e => {
-        e.target.value = parseFloat(e.target.value) > 1 ? 1 : e.target.value;
-        this._changeParameter({to: e.target.value + ''});
+      this._any.addEventListener('change', e => {
+        this._changeParameter({match: e.target.checked ? 'any' : 'all'});
       });
-      this._invert.addEventListener('change', e => {
-        this._changeParameter({invert: e.target.checked ? '1' : '0'});
-      });
-      if (match) {
-        this._all.addEventListener('change', e => {
-          this._changeParameter({match: e.target.checked ? 'all' : 'any'});
-        });
-        this._any.addEventListener('change', e => {
-          this._changeParameter({match: e.target.checked ? 'any' : 'all'});
-        });
-      }
-      $('.slider > *', meter).draggable({
-        axis: 'x',
-        containment: this._slider,
-        stop: this._dragEnd.bind(this)
-      });
-      
-      // default values
-      this._changeParameter({});
-
-    }, 100);
+    }
+    $('.slider > *', meter).draggable({
+      axis: 'x',
+      containment: this._slider,
+      stop: this._dragEnd.bind(this)
+    });
+    
+    // default values
+    this._changeParameter({});
 
   }
 
