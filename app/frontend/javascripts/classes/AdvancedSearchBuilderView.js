@@ -129,7 +129,7 @@ export default class AdvancedSearchBuilderView {
 
   search() {
     const query = this._rootGroup.query;
-    StoreManager.setAd__vancedSearchCondition(query);
+    StoreManager.setAdvancedSearchCondition(query);
   }
 
   // add search condition to the currently selected layer
