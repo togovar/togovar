@@ -5,6 +5,13 @@ const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
 
 export const mixin = {
 
+  initSearchCondition() {
+    this._URIParameters = $.deparam(window.location.search.substr(1));
+    // events
+    window.addEventListener('popstate', this._popstate.bind(this));
+    this.bind('searchMode', this);
+  },
+
   readySearch(callback) {
     // get master data of conditions
     const json = require('../../assets/search_conditions.json');
@@ -18,23 +25,14 @@ export const mixin = {
         simpleSearchConditions = this._extractSearchCondition(this._URIParameters);
         break;
       case 'advanced':
-        Object.assign(advancedSearchConditions, this._convertAdvancedRangeToSimpleRange(this._URIParameters));
-        delete advancedSearchConditions.mode;
         break;
     }
     this._store.searchConditions = simpleSearchConditions;
     this._store.advancedSearchConditions = advancedSearchConditions;
     this._store.ad__vancedSearchConditions = setAd__vancedSearchConditions;
     callback();
-    this._isReady = true;
+    this._isReadySearch = true;
     this._search(0, true);
-  },
-
-  initSearchCondition() {
-    this._URIParameters = $.deparam(window.location.search.substr(1));
-    // events
-    window.addEventListener('popstate', this._popstate.bind(this));
-    this.bind('searchMode', this);
   },
 
 
@@ -42,18 +40,18 @@ export const mixin = {
   
   // 検索条件は、特殊であるため専用メソッドを用意
   setSearchCondition(key, values) {
-    if (!this._isReady) return;
+    if (!this._isReadySearch) return;
     this._setSearchConditions({[key]: values});
   },
 
   setAdvancedSearchCondition(key, values, fromHistory) {
-    if (!this._isReady) return;
+    if (!this._isReadySearch) return;
     // TODO: シンプルサーチと挙動合わせる
     if (key) this._store.advancedSearchConditions[key] = values;
     // URIパラメータに反映
     if (!fromHistory) this._reflectAdvancedSearchConditionToURI();
     // 検索条件として成立していれば、検索開始
-    if (!this._isReady) return;
+    if (!this._isReadySearch) return;
     this._notify('advancedSearchConditions');
     this.setData('appStatus', 'searching');
     this._search(0, true);
@@ -61,7 +59,7 @@ export const mixin = {
 
   // in Advanced Search, search criteria are received as queries, not key values.
   setAd__vancedSearchCondition(conditions, fromHistory) {
-    if (!this._isReady) return;
+    if (!this._isReadySearch) return;
     console.log(conditions)
     this._store.ad__vancedSearchConditions = conditions;
     // convert queries to URL parameters
@@ -78,7 +76,7 @@ export const mixin = {
     // URIパラメータに反映
     if (!fromHistory) this._reflectSearchConditionToURI();
     // 検索条件として成立していれば、検索開始
-    if (this._isReady) {
+    if (this._isReadySearch) {
       this._notify('searchConditions');
       this.setData('appStatus', 'searching');
       this._search(0, true);
@@ -343,42 +341,6 @@ export const mixin = {
     }
   },
 
-  _convertAdvancedRangeToSimpleRange(advancedConditions) {
-    if (advancedConditions.and) {
-      const frequencies = {};
-      advancedConditions.and.forEach(condition => {
-        switch (Object.keys(condition)[0]) {
-          case 'frequency':
-            frequencies[condition.frequency.dataset.name] = {
-              from: parseFloat(condition.frequency.frequency.gte),
-              to: parseFloat(condition.frequency.frequency.lte),
-              invert: false,
-              filtered: eval(condition.frequency.filtered)
-            }
-            break;
-          case 'or': {
-            const frequency = {
-              invert: true,
-              filtered: eval(condition.or[0].frequency.filtered)
-            }
-            condition.or.forEach(subCondition => {
-              if (subCondition.frequency.frequency.gte === '0') {
-                frequency.from = parseFloat(subCondition.frequency.frequency.lte);
-              } else {
-                frequency.to = parseFloat(subCondition.frequency.frequency.gte);
-              }
-            });
-            frequencies[condition.or[0].frequency.dataset.name] = frequency;
-          }
-            break;
-        }
-      })
-      return {adv_frequency: frequencies};
-    } else {
-      return {};
-    }
-  },
-  
   _convertSimpleRangeToSimpleAdvanced(simpleConditions) {
     const advancedConditions = [];
     Object.keys(simpleConditions).forEach(datasetKey => {
