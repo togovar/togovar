@@ -18,7 +18,7 @@ export default class AdvancedSearchBuilderView {
     this._toolbar = new AdvancedSearchToolbar(this, this._rootGroup.maketToolbar());
 
     // events
-    StoreManager.bind('advancedSearchConditions', this);
+    StoreManager.bind('ad__vancedSearchConditions', this);
     this._defineEvents();
 
     // select conditions
@@ -28,7 +28,7 @@ export default class AdvancedSearchBuilderView {
 
   // public methods
 
-  advancedSearchConditions(values) {
+  ad__vancedSearchConditions(values) {
     console.log(values)
   }
 
@@ -129,7 +129,7 @@ export default class AdvancedSearchBuilderView {
 
   search() {
     const query = this._rootGroup.query;
-    StoreManager.setAdvancedSearchCondition(query);
+    StoreManager.setAd__vancedSearchCondition(query);
   }
 
   // add search condition to the currently selected layer
