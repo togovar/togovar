@@ -1,9 +1,34 @@
 import {API_URL} from "../global.js";
 
-const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
 const LIMIT = 100;
+const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
 
 export const mixin = {
+
+  readySearch(callback) {
+    // get master data of conditions
+    const json = require('../../assets/search_conditions.json');
+    Object.freeze(json);
+    this.setData('searchConditionsMaster', json);
+    // restore search conditions from URL parameters
+    const searchMode = this._URIParameters.mode ?? DEFAULT_SEARCH_MODE;
+    let simpleSearchConditions = {}, advancedSearchConditions = {}, setAd__vancedSearchConditions = {};
+    switch (searchMode) {
+      case 'simple':
+        simpleSearchConditions = this._extractSearchCondition(this._URIParameters);
+        break;
+      case 'advanced':
+        Object.assign(advancedSearchConditions, this._convertAdvancedRangeToSimpleRange(this._URIParameters));
+        delete advancedSearchConditions.mode;
+        break;
+    }
+    this._store.searchConditions = simpleSearchConditions;
+    this._store.advancedSearchConditions = advancedSearchConditions;
+    this._store.ad__vancedSearchConditions = setAd__vancedSearchConditions;
+    callback();
+    this._isReady = true;
+    this._search(0, true);
+  },
 
   initSearchCondition() {
     this._URIParameters = $.deparam(window.location.search.substr(1));
@@ -12,89 +37,47 @@ export const mixin = {
     this.bind('searchMode', this);
   },
 
-  readySearch(callback) {
-    // get master data of conditions
-    const json = require('../../assets/search_conditions.json');
-    Object.freeze(json);
-    this.setData('searchConditionsMaster', json);
-    // restore search conditions from URL parameters
-    console.log(this._URIParameters.mode)
-    const searchMode = this._URIParameters.mode ?? DEFAULT_SEARCH_MODE;
-    let simpleSearchConditions = {}, setAdvancedSearchConditions = {};
-    switch (searchMode) {
-      case 'simple':
-        simpleSearchConditions = this._extractSearchCondition(this._URIParameters);
-        break;
-      case 'advanced':
-        break;
-    }
-    this._store.searchConditions = simpleSearchConditions;
-    this._store.advancedSearchConditions = setAdvancedSearchConditions;
-    callback();
-    this._isReady = true;
-    this._search(0, true);
-  },
-
-  // ヒストリーが変更されたら、URL変数を取得し検索条件を更新
-  _popstate(_e) {
-    console.log(_e)
-    const URIParameters = $.deparam(window.location.search.substr(1));
-    this._setSearchConditions(URIParameters, true);
-  },
-
-  // Bindings *******************************************
-  searchMode(mode) {
-    if (this._lastSearchMode !== mode) {
-      this._lastSearchMode = mode;
-      document.getElementsByTagName('body')[0].dataset.searchMode = mode;
-      // TODO: 変更前の検索モードの検索条件の保存?
-      // TODO: 検索条件のコンバート?
-      // TODO: 検索条件のクリア（あるいは復帰）
-      switch (mode) {
-        case 'simple':
-          this.setSearchCondition({});
-          break;
-        case 'advanced':
-          this.setAdvancedSearchCondition();
-          break;
-      }
-      // start search
-      this.setData('appStatus', 'searching');
-    }
-  },
 
   // 検索条件 *******************************************
   
   // 検索条件は、特殊であるため専用メソッドを用意
   setSearchCondition(key, values) {
     if (!this._isReady) return;
-    console.log(key, values);
-    console.log( this._URIParameters.mode )
     this._setSearchConditions({[key]: values});
   },
 
-  // in Advanced Search, search criteria are received as queries, not key values.
-  setAdvancedSearchCondition(conditions, fromHistory) {
+  setAdvancedSearchCondition(key, values, fromHistory) {
     if (!this._isReady) return;
-    console.log(conditions)
-    this._store.advancedSearchConditions = conditions;
-    // convert queries to URL parameters
+    // TODO: シンプルサーチと挙動合わせる
+    if (key) this._store.advancedSearchConditions[key] = values;
+    // URIパラメータに反映
     if (!fromHistory) this._reflectAdvancedSearchConditionToURI();
+    // 検索条件として成立していれば、検索開始
+    if (!this._isReady) return;
     this._notify('advancedSearchConditions');
     this.setData('appStatus', 'searching');
     this._search(0, true);
   },
 
+  // in Advanced Search, search criteria are received as queries, not key values.
+  setAd__vancedSearchCondition(conditions, fromHistory) {
+    if (!this._isReady) return;
+    console.log(conditions)
+    this._store.ad__vancedSearchConditions = conditions;
+    // convert queries to URL parameters
+    if (!fromHistory) this._reflectAd__vancedSearchConditionToURI();
+    this._notify('ad__vancedSearchConditions');
+    this.setData('appStatus', 'searching');
+    this._search(0, true);
+  },
+
   _setSearchConditions(conditions, fromHistory) {
-    console.log(conditions, fromHistory)
-    console.log( this._URIParameters.mode )
     for (const conditionKey in conditions) {
       this._store.searchConditions[conditionKey] = conditions[conditionKey];
     }
     // URIパラメータに反映
     if (!fromHistory) this._reflectSearchConditionToURI();
     // 検索条件として成立していれば、検索開始
-    console.log( this._URIParameters.mode )
     if (this._isReady) {
       this._notify('searchConditions');
       this.setData('appStatus', 'searching');
@@ -125,6 +108,10 @@ export const mixin = {
 
   getSearchCondition(key) {
     return this._copy(this._store.searchConditions[key]);
+  },
+
+  getAdvancedSearchCondition(key) {
+    return this._copy(this._store.advancedSearchConditions[key]);
   },
 
   getSearchConditionMaster(key) {
@@ -165,9 +152,25 @@ export const mixin = {
     return diffConditions;
   },
 
+  _extractAdvancedSearchCondition(conditions) {
+    // const searchConditionsMaster = this.getData('searchConditionsMaster');
+    // const conditionMaster = searchConditionsMaster.find(condition => condition.id === 'adv_frequency'); // TODO: 暫定的にデータセットだけに対応
+    const diffConditions = [];
+    // extraction of differences from master data
+    Object.keys(conditions).forEach(key => {
+      const condition = conditions[key];
+      switch (key) {
+        case 'adv_frequency': {
+          diffConditions.push(...this._convertSimpleRangeToSimpleAdvanced(condition));
+        }
+        break;
+      }
+    });
+    return diffConditions
+  },
+
   // update uri parameters
   _reflectSearchConditionToURI() {
-    console.log('_reflectSearchConditionToURI')
     const diffConditions = this._extractSearchCondition(this._store.searchConditions);
     // remove uri parameters temporally
     this._URIParameters = {};
@@ -176,14 +179,27 @@ export const mixin = {
     Object.assign(this._URIParameters, diffConditions);
     window.history.pushState(this._URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this._URIParameters)}`);
   },
-  
+
   _reflectAdvancedSearchConditionToURI() {
+    const diffConditions = this._extractAdvancedSearchCondition(this._store.advancedSearchConditions);
+    this._URIParameters = this._buildAdvancedSearchQuery(diffConditions);
+    this._URIParameters.mode ='advanced';
+    window.history.pushState(this._URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this._URIParameters)}`);
+  },
+
+  _reflectAd__vancedSearchConditionToURI() {
   },
 
   _buildAdvancedSearchQuery(conditions) {
     return conditions.length === 0
       ? {}
       : {and: conditions};
+  },
+
+  // ヒストリーが変更されたら、URL変数を取得し検索条件を更新
+  _popstate(_e) {
+    const URIParameters = $.deparam(window.location.search.substr(1));
+    this._setSearchConditions(URIParameters, true);
   },
 
 
@@ -235,7 +251,7 @@ export const mixin = {
           path = `${API_URL}/api/search/variation`;
           options.method = 'POST';
           options.body = JSON.stringify({
-            query: this._store.advancedSearchConditions,
+            query: this._store.ad__vancedSearchConditions,
             offset: this._store.offset
           });
         }
@@ -267,7 +283,6 @@ export const mixin = {
       })
       .then(response => response.json())
       .then(json => {
-        console.log(json)
         // status
         this.setData('searchStatus', {
           available: Math.min(json.statistics.filtered, json.scroll.max_rows),
@@ -304,6 +319,112 @@ export const mixin = {
           this._setSearchConditions({});
         }
       });
+  },
+
+
+  // Bindings *******************************************
+  searchMode(mode) {
+    if (this._lastSearchMode !== mode) {
+      this._lastSearchMode = mode;
+      document.getElementsByTagName('body')[0].dataset.searchMode = mode;
+      // TODO: 変更前の検索モードの検索条件の保存?
+      // TODO: 検索条件のコンバート?
+      // TODO: 検索条件のクリア（あるいは復帰）
+      switch (mode) {
+        case 'simple':
+          this.setSearchCondition({});
+          break;
+        case 'advanced':
+          this.setAdvancedSearchCondition();
+          break;
+      }
+      // start search
+      this.setData('appStatus', 'searching');
+    }
+  },
+
+  _convertAdvancedRangeToSimpleRange(advancedConditions) {
+    if (advancedConditions.and) {
+      const frequencies = {};
+      advancedConditions.and.forEach(condition => {
+        switch (Object.keys(condition)[0]) {
+          case 'frequency':
+            frequencies[condition.frequency.dataset.name] = {
+              from: parseFloat(condition.frequency.frequency.gte),
+              to: parseFloat(condition.frequency.frequency.lte),
+              invert: false,
+              filtered: eval(condition.frequency.filtered)
+            }
+            break;
+          case 'or': {
+            const frequency = {
+              invert: true,
+              filtered: eval(condition.or[0].frequency.filtered)
+            }
+            condition.or.forEach(subCondition => {
+              if (subCondition.frequency.frequency.gte === '0') {
+                frequency.from = parseFloat(subCondition.frequency.frequency.lte);
+              } else {
+                frequency.to = parseFloat(subCondition.frequency.frequency.gte);
+              }
+            });
+            frequencies[condition.or[0].frequency.dataset.name] = frequency;
+          }
+            break;
+        }
+      })
+      return {adv_frequency: frequencies};
+    } else {
+      return {};
+    }
+  },
+  
+  _convertSimpleRangeToSimpleAdvanced(simpleConditions) {
+    const advancedConditions = [];
+    Object.keys(simpleConditions).forEach(datasetKey => {
+      // process dataset frequencies for advanced search
+      const dataset = {name: datasetKey};
+      if (simpleConditions[datasetKey].invert === '1') {
+        advancedConditions.push(
+          {
+            or: [
+              {
+                frequency: {
+                  dataset,
+                  frequency: {
+                    gte: 0,
+                    lte: simpleConditions[datasetKey].from
+                  },
+                  filtered: simpleConditions[datasetKey].filtered
+                }
+              },
+              {
+                frequency: {
+                  dataset,
+                  frequency: {
+                    gte: simpleConditions[datasetKey].to,
+                    lte: 1
+                  },
+                  filtered: simpleConditions[datasetKey].filtered
+                }
+              }
+            ]
+          }
+        );
+      } else {
+        advancedConditions.push({
+          frequency: {
+            dataset,
+            frequency: {
+              gte: simpleConditions[datasetKey].from,
+              lte: simpleConditions[datasetKey].to
+            },
+            filtered: simpleConditions[datasetKey].filtered
+          }
+        });
+      }
+    });
+    return advancedConditions;
   }
 
 }
