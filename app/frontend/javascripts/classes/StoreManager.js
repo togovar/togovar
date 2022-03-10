@@ -1,6 +1,5 @@
 import {mixin} from './StoreManagerMixin.js';
 
-
 class StoreManager {
 
   constructor() {
