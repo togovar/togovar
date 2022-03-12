@@ -16,10 +16,10 @@ export const mixin = {
     // get master data of conditions
     const json = require('../../assets/search_conditions.json');
     Object.freeze(json);
-    this.setData('searchConditionsMaster', json);
+    this.setData('simpleSearchConditionsMaster', json);
     // restore search conditions from URL parameters
     const searchMode = this._URIParameters.mode ?? DEFAULT_SEARCH_MODE;
-    let simpleSearchConditions = {}, setAd__vancedSearchConditions = {};
+    let simpleSearchConditions = {}, ad__vancedSearchConditions = {};
     switch (searchMode) {
       case 'simple':
         simpleSearchConditions = this._extractSearchCondition(this._URIParameters);
@@ -27,8 +27,8 @@ export const mixin = {
       case 'advanced':
         break;
     }
-    this._store.searchConditions = simpleSearchConditions;
-    this._store.ad__vancedSearchConditions = setAd__vancedSearchConditions;
+    this._store.simpleSearchConditions = simpleSearchConditions;
+    this._store.ad__vancedSearchConditions = ad__vancedSearchConditions;
     callback();
     this._isReadySearch = true;
     this._search(0, true);
@@ -38,9 +38,9 @@ export const mixin = {
   // 検索条件 *******************************************
   
   // 検索条件は、特殊であるため専用メソッドを用意
-  setSearchCondition(key, values) {
+  setSimpleSearchCondition(key, values) {
     if (!this._isReadySearch) return;
-    this._setSearchConditions({[key]: values});
+    this._setSimpleSearchConditions({[key]: values});
   },
 
   // in Advanced Search, search criteria are received as queries, not key values.
@@ -56,23 +56,23 @@ export const mixin = {
     this._search(0, true);
   },
 
-  _setSearchConditions(conditions, fromHistory) {
+  _setSimpleSearchConditions(conditions, fromHistory) {
     for (const conditionKey in conditions) {
-      this._store.searchConditions[conditionKey] = conditions[conditionKey];
+      this._store.simpleSearchConditions[conditionKey] = conditions[conditionKey];
     }
     // URIパラメータに反映
     if (!fromHistory) this._reflectSearchConditionToURI();
     // 検索条件として成立していれば、検索開始
     if (this._isReadySearch) {
-      this._notify('searchConditions');
+      this._notify('simpleSearchConditions');
       this.setData('appStatus', 'searching');
       this._search(0, true);
     }
   },
 
-  resetSearchConditions() {
-    const searchConditionsMaster = this.getData('searchConditionsMaster'), resetConditions = {};
-    for (const condition of searchConditionsMaster) {
+  resetSimpleSearchConditions() {
+    const simpleSearchConditionsMaster = this.getData('simpleSearchConditionsMaster'), resetConditions = {};
+    for (const condition of simpleSearchConditionsMaster) {
       switch (condition.type) {
         case 'string':
         case 'boolean':
@@ -88,11 +88,11 @@ export const mixin = {
           break;
       }
     }
-    this._setSearchConditions(resetConditions);
+    this._setSimpleSearchConditions(resetConditions);
   },
 
   getSearchCondition(key) {
-    return this._copy(this._store.searchConditions[key]);
+    return this._copy(this._store.simpleSearchConditions[key]);
   },
 
   // getAdvancedSearchCondition(key) {
@@ -100,16 +100,16 @@ export const mixin = {
   // },
 
   getSearchConditionMaster(key) {
-    return this.getData('searchConditionsMaster').find(condition => condition.id === key);
+    return this.getData('simpleSearchConditionsMaster').find(condition => condition.id === key);
   },
 
   // デフォルト値と異なる検索条件を抽出
   _extractSearchCondition(condition) {
-    const searchConditionsMaster = this.getData('searchConditionsMaster');
+    const simpleSearchConditionsMaster = this.getData('simpleSearchConditionsMaster');
     // extraction of differences from master data
     const diffConditions = {};
     for (let conditionKey in condition) {
-      const conditionMaster = searchConditionsMaster.find(condition => condition.id === conditionKey);
+      const conditionMaster = simpleSearchConditionsMaster.find(condition => condition.id === conditionKey);
       if (conditionMaster) {
         switch (conditionMaster.type) {
           case 'array': {
@@ -139,7 +139,7 @@ export const mixin = {
 
   // update uri parameters
   _reflectSearchConditionToURI() {
-    const diffConditions = this._extractSearchCondition(this._store.searchConditions);
+    const diffConditions = this._extractSearchCondition(this._store.simpleSearchConditions);
     // remove uri parameters temporally
     this._URIParameters = {};
     this._URIParameters.mode ='simple';
@@ -156,7 +156,7 @@ export const mixin = {
   // ヒストリーが変更されたら、URL変数を取得し検索条件を更新
   _popstate(_e) {
     const URIParameters = $.deparam(window.location.search.substr(1));
-    this._setSearchConditions(URIParameters, true);
+    this._setSimpleSearchConditions(URIParameters, true);
   },
 
 
@@ -181,7 +181,7 @@ export const mixin = {
     }
 
     // retain search conditions
-    const lastConditions = JSON.stringify(this._store.searchConditions); // TODO:
+    const lastConditions = JSON.stringify(this._store.simpleSearchConditions); // TODO:
 
     this._fetching = true;
     const options = {
@@ -199,7 +199,7 @@ export const mixin = {
     } else {
       switch (this._store.searchMode) {
         case 'simple': {
-          const conditions = $.param(this._extractSearchCondition(this._store.searchConditions));
+          const conditions = $.param(this._extractSearchCondition(this._store.simpleSearchConditions));
           path = `${API_URL}/search?offset=${offset - offset % LIMIT}${conditions ? '&' + conditions : ''}`;
           options.method = 'GET';
         }
@@ -272,8 +272,8 @@ export const mixin = {
         this.setData('appStatus', 'normal');
 
         // if the search conditions change during the search, re-search
-        if (lastConditions !== JSON.stringify(this._store.searchConditions)) {
-          this._setSearchConditions({});
+        if (lastConditions !== JSON.stringify(this._store.simpleSearchConditions)) {
+          this._setSimpleSearchConditions({});
         }
       });
   },
@@ -289,7 +289,7 @@ export const mixin = {
       // TODO: 検索条件のクリア（あるいは復帰）
       switch (mode) {
         case 'simple':
-          this.setSearchCondition({});
+          this.setSimpleSearchCondition({});
           break;
         case 'advanced':
           this.setAd__vancedSearchCondition();

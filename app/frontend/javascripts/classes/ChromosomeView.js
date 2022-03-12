@@ -147,7 +147,7 @@ export default class ChromosomeView {
     // bands
     this.svg.querySelectorAll('g.band').forEach(g => {
       $(g).on('click', e => {
-        StoreManager.setSearchCondition('term', `${this.no}:${e.delegateTarget.dataset.start}-${e.delegateTarget.dataset.end}`);
+        StoreManager.setSimpleSearchCondition('term', `${this.no}:${e.delegateTarget.dataset.start}-${e.delegateTarget.dataset.end}`);
         // Karyotype 上の座標編集フィールドが廃止になったため、不要
         //StoreManager.setData('region__', {
         //  chromosome: this.no,
@@ -160,7 +160,7 @@ export default class ChromosomeView {
     // sub bands
     this.svg.querySelectorAll('g.subband').forEach(g => {
       $(g).on('click', e => {
-        StoreManager.setSearchCondition('term', `${this.no}:${e.delegateTarget.dataset.start}-${e.delegateTarget.dataset.end}`);
+        StoreManager.setSimpleSearchCondition('term', `${this.no}:${e.delegateTarget.dataset.start}-${e.delegateTarget.dataset.end}`);
         // Karyotype 上の座標編集フィールドが廃止になったため、不要
         //StoreManager.setData('region__', {
         //  chromosome: this.no,
