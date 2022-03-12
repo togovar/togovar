@@ -9,7 +9,7 @@ import ModuleTabsView from '../javascripts/classes/ModuleTabsView.js';
 import CollapseView from '../javascripts/classes/CollapseView.js';
 import TopPageLayoutManager from '../javascripts/classes/TopPageLayoutManager.js';
 // Search
-import SearchConditionController from '../javascripts/classes/SearchConditionController.js';
+import SimpleSearchView from './classes/SimpleSearchView.js';
 import AdvancedSearchBuilderView from '../javascripts/classes/AdvancedSearchBuilderView.js';
 // PanelViews
 // PanelViews: Filters
@@ -70,7 +70,7 @@ export function initHome() {
     new CollapseView(elm);
 
     // 検索窓
-    new SearchConditionController();
+    new SimpleSearchView();
     new AdvancedSearchBuilderView(document.getElementById('AdvancedSearchBuilderView'))
     // change search mode
     document.querySelectorAll('#SearchInputView > .tabscontainer > ul > li').forEach(elm => {
