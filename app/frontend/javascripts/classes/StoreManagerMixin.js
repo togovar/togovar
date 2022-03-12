@@ -6,6 +6,7 @@ const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
 export const mixin = {
 
   initSearchCondition() {
+    this._isReady = false;
     this._URIParameters = $.deparam(window.location.search.substr(1));
     // events
     window.addEventListener('popstate', this._popstate.bind(this));
@@ -19,16 +20,16 @@ export const mixin = {
     this.setData('simpleSearchConditionsMaster', json);
     // restore search conditions from URL parameters
     const searchMode = this._URIParameters.mode ?? DEFAULT_SEARCH_MODE;
-    let simpleSearchConditions = {}, ad__vancedSearchConditions = {};
+    const simpleSearchConditions = {}, advancedSearchConditions = {};
     switch (searchMode) {
       case 'simple':
-        simpleSearchConditions = this._extractSearchCondition(this._URIParameters);
+        Object.assign(simpleSearchConditions, this._extractSearchCondition(this._URIParameters));
         break;
       case 'advanced':
         break;
     }
     this._store.simpleSearchConditions = simpleSearchConditions;
-    this._store.ad__vancedSearchConditions = ad__vancedSearchConditions;
+    this._store.advancedSearchConditions = advancedSearchConditions;
     callback();
     this._isReadySearch = true;
     this._search(0, true);
@@ -44,14 +45,14 @@ export const mixin = {
   },
 
   // in Advanced Search, search criteria are received as queries, not key values.
-  setAd__vancedSearchCondition(conditions, fromHistory) {
+  setAdvancedSearchCondition(conditions, fromHistory) {
     console.log(conditions, fromHistory)
     if (!this._isReadySearch) return;
     console.log(conditions)
-    this._store.ad__vancedSearchConditions = conditions;
+    this._store.advancedSearchConditions = conditions;
     // convert queries to URL parameters
-    if (!fromHistory) this._reflectAd__vancedSearchConditionToURI();
-    this._notify('ad__vancedSearchConditions');
+    if (!fromHistory) this._reflectAdvancedSearchConditionToURI();
+    this._notify('advancedSearchConditions');
     this.setData('appStatus', 'searching');
     this._search(0, true);
   },
@@ -148,7 +149,7 @@ export const mixin = {
     window.history.pushState(this._URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this._URIParameters)}`);
   },
 
-  _reflectAd__vancedSearchConditionToURI() {
+  _reflectAdvancedSearchConditionToURI() {
     this._URIParameters.mode ='advanced';
     window.history.pushState(this._URIParameters, '', `${window.location.origin}${window.location.pathname}?${$.param(this._URIParameters)}`);
   },
@@ -208,7 +209,7 @@ export const mixin = {
           path = `${API_URL}/api/search/variation`;
           options.method = 'POST';
           options.body = JSON.stringify({
-            query: this._store.ad__vancedSearchConditions,
+            query: this._store.advancedSearchConditions,
             offset: this._store.offset
           });
         }
@@ -292,7 +293,7 @@ export const mixin = {
           this.setSimpleSearchCondition({});
           break;
         case 'advanced':
-          this.setAd__vancedSearchCondition();
+          this.setAdvancedSearchCondition();
           break;
       }
       // start search

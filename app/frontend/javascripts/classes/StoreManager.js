@@ -4,7 +4,6 @@ class StoreManager {
 
   constructor() {
     window.__s = this; // set global variable for monitering
-    this._isReady = false;
     this._bindings = {};
     this._fetching = false;
     this._store = {
