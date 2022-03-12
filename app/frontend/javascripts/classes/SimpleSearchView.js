@@ -1,6 +1,5 @@
 import StoreManager from "./StoreManager.js";
 import SearchFieldView from "./SearchFieldView.js";
-// import {API_URL} from "../global.js";
 
 const EXAMPLES = [
   {
