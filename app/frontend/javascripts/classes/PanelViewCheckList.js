@@ -7,7 +7,7 @@ export default class PanelViewCheckList extends PanelView {
     super(elm, type);
     this._statisticsType = statisticsType;
     // 検索条件マスター
-    const conditionMaster = StoreManager.getData('searchConditionsMaster').find(condition => condition.id === this.kind);
+    const conditionMaster = StoreManager.getData('simpleSearchConditionsMaster').find(condition => condition.id === this.kind);
     // GUIの生成
     this._createGUI(conditionMaster);
     // references
@@ -27,7 +27,7 @@ export default class PanelViewCheckList extends PanelView {
     for (const key in this._inputsValues) {
       this._inputsValues[key].input.addEventListener('change', this._changeFilter.bind(this));
     }
-    StoreManager.bind('searchConditions', this);
+    StoreManager.bind('simpleSearchConditions', this);
     StoreManager.bind(this._statisticsType, this);
     // 統計情報の更新
     this[this._statisticsType] = values => {
@@ -124,15 +124,15 @@ export default class PanelViewCheckList extends PanelView {
         checked[key] = this._inputsValues[key].input.checked ? '1' : '0';
       }
     }
-    StoreManager.setSearchCondition(this.kind, checked);
+    StoreManager.setSimpleSearchCondition(this.kind, checked);
   }
 
   // フィルターを更新すると呼ばれる
-  searchConditions(searchConditions) {
+  simpleSearchConditions(conditions) {
     let isAll = 0;
-    for (const key in searchConditions[this.kind]) {
-      this._inputsValues[key].input.checked = searchConditions[this.kind][key] !== '0';
-      isAll += searchConditions[this.kind][key] === '0';
+    for (const key in conditions[this.kind]) {
+      this._inputsValues[key].input.checked = conditions[this.kind][key] !== '0';
+      isAll += conditions[this.kind][key] === '0';
     }
     this._inputsValues.all.input.checked = isAll === 0;
   }
