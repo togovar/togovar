@@ -1,3 +1,4 @@
+import deparam from 'deparam.js';
 import {API_URL} from "../global.js";
 
 const LIMIT = 100;
@@ -7,7 +8,7 @@ export const mixin = {
 
   initSearchCondition() {
     this._isReady = false;
-    this._URIParameters = $.deparam(window.location.search.substr(1));
+    this._URIParameters = deparam(window.location.search.substr(1));
     // events
     window.addEventListener('popstate', this._popstate.bind(this));
     this.bind('searchMode', this);
@@ -156,7 +157,7 @@ export const mixin = {
 
   // ヒストリーが変更されたら、URL変数を取得し検索条件を更新
   _popstate(_e) {
-    const URIParameters = $.deparam(window.location.search.substr(1));
+    const URIParameters = deparam(window.location.search.substr(1));
     this._setSimpleSearchConditions(URIParameters, true);
   },
 
