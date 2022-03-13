@@ -1,6 +1,5 @@
 import ConditionValueEditor from "./ConditionValueEditor.js";
 import RangeSelectorView from "./RangeSelectorView.js";
-// import FrequencyCountValueView from "./FrequencyCountValueView.js";
 
 let id = 0;
 const DEFAULT_CONDITION = {
