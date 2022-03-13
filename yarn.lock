@@ -4466,6 +4466,14 @@ delegates@^1.0.0:
   resolved "https://registry.yarnpkg.com/delegates/-/delegates-1.0.0.tgz#84c6e159b81904fdca59a0ef44cd870d31250f9a"
   integrity sha1-hMbhWbgZBP3KWaDvRM2HDTElD5o=
 
+deparam.js@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/deparam.js/-/deparam.js-3.0.5.tgz#93f98de9b04ec17d9c3d420d3592a6d208dec083"
+  integrity sha512-dtLq8AV54U2z7Gwg/fry4whpbAwLP38wjwofpK5uQbFMqUKkfgPlHM/sp6WPmIwBRbx7lsgDZ6nvAyDsigk7pw==
+  dependencies:
+    is-number "^7.0.0"
+    is-object "^1.0.2"
+
 depd@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.2.tgz#9bcd52e14c097763e749b274c4346ed2e560b5a9"
@@ -7144,6 +7152,11 @@ is-object@^1.0.1:
   resolved "https://registry.yarnpkg.com/is-object/-/is-object-1.0.1.tgz#8952688c5ec2ffd6b03ecc85e769e02903083470"
   integrity sha1-iVJojF7C/9awPsyF52ngKQMINHA=
 
+is-object@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/is-object/-/is-object-1.0.2.tgz#a56552e1c665c9e950b4a025461da87e72f86fcf"
+  integrity sha512-2rRIahhZr2UWb45fIOuvZGpFtz0TyOZLf32KxBbSoUCeZR495zCKlWUKKUByk3geS2eAs7ZAABt0Y/Rx0GiQGA==
+
 is-path-cwd@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/is-path-cwd/-/is-path-cwd-2.2.0.tgz#67d43b82664a7b5191fd9119127eb300048a9fdb"
@@ -7402,11 +7415,6 @@ jake@^10.6.1:
     chalk "^2.4.2"
     filelist "^1.0.1"
     minimatch "^3.0.4"
-
-jquery-deparam@^0.5.3:
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/jquery-deparam/-/jquery-deparam-0.5.3.tgz#51f937c448175445499081b87bf32b241b1e2693"
-  integrity sha1-Ufk3xEgXVEVJkIG4e/MrJBseJpM=
 
 jquery-ui@^1.12.1:
   version "1.12.1"
