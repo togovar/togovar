@@ -54,7 +54,12 @@ json.data @result[:results] do |result|
   json.type SequenceOntology.find_by_label(variation[:type])&.id
 
   json.chromosome variation.dig(:chromosome, :label)
-  json.start variation[:start]
+  json.start(case variation[:type]
+             when 'SNV', 'Indel', 'MNV'
+               variation[:start] + 1
+             else
+               variation[:start]
+             end)
   json.stop variation[:stop]
   json.reference variation[:reference].presence || ''
   json.alternative variation[:alternative].presence || ''
