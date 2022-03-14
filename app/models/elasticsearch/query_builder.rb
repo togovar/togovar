@@ -443,34 +443,8 @@ module Elasticsearch
 
     def position_condition(term)
       positions = term.split(/[\s,]/)
-      start_only = @start_only
 
-      query = Elasticsearch::DSL::Search.search do
-        query do
-          bool do
-            positions.each do |x|
-              chr, pos = x.split(':')
-              should do
-                bool do
-                  must { match 'chromosome.label': chr }
-                  if start_only
-                    must { match start: pos.to_i }
-                  else
-                    must { range(:start) { lte pos.to_i } }
-                    must { range(:stop) { gt pos.to_i } }
-                  end
-                end
-              end
-            end
-          end
-        end
-      end.to_hash[:query]
-
-      if query[:bool][:should].size == 1
-        query[:bool][:should].first
-      else
-        query
-      end
+      region_condition(positions.map { |p| chr, pos = p.split(':'); "#{chr}:#{pos}-#{pos}" }.join(','))
     end
 
     def position_allele_condition(term)
@@ -486,10 +460,10 @@ module Elasticsearch
                 bool do
                   must { match 'chromosome.label': chr }
                   if start_only
-                    must { match start: pos.to_i }
+                    must { match start: pos.to_i - 1 }
                   else
-                    must { range(:start) { lte pos.to_i } }
-                    must { range(:stop) { gte pos.to_i } }
+                    must { range(:start) { lte pos.to_i - 1 } }
+                    must { range(:stop) { gt pos.to_i } }
                     must { match reference: allele.split('>')[0] } if allele.present?
                     must { match alternative: allele.split('>')[1] } if allele.present?
                   end
@@ -522,29 +496,37 @@ module Elasticsearch
                   must do
                     bool do
                       should do
-                        range :start do
-                          gte start.to_i
-                          lte stop.to_i
+                        bool do
+                          must { range(:start) { lte start.to_i - 1 } }
+                          must { range(:stop) { gte stop.to_i } }
                         end
                       end
                       should do
-                        range :stop do
-                          gte start.to_i
-                          lte stop.to_i
+                        bool do
+                          must { range(:start) { gte start.to_i - 1 } }
+                          must { range(:stop) { lt stop.to_i } }
+                        end
+                      end
+                      should do
+                        bool do
+                          must { range(:start) { lt start.to_i - 1 } }
+                          must do
+                            range(:stop) do
+                              gte start.to_i - 1
+                              lte stop.to_i
+                            end
+                          end
                         end
                       end
                       should do
                         bool do
                           must do
-                            range :start do
-                              lte start.to_i
+                            range(:start) do
+                              gte start.to_i - 1
+                              lte stop.to_i
                             end
                           end
-                          must do
-                            range :stop do
-                              gte stop.to_i
-                            end
-                          end
+                          must { range(:stop) { gt start.to_i } }
                         end
                       end
                     end
