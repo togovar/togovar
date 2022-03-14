@@ -449,36 +449,8 @@ module Elasticsearch
 
     def position_allele_condition(term)
       positions = term.split(/[\s,]/)
-      start_only = @start_only
 
-      query = Elasticsearch::DSL::Search.search do
-        query do
-          bool do
-            positions.each do |x|
-              chr, pos, allele = x.split(':')
-              should do
-                bool do
-                  must { match 'chromosome.label': chr }
-                  if start_only
-                    must { match start: pos.to_i - 1 }
-                  else
-                    must { range(:start) { lte pos.to_i - 1 } }
-                    must { range(:stop) { gt pos.to_i } }
-                    must { match reference: allele.split('>')[0] } if allele.present?
-                    must { match alternative: allele.split('>')[1] } if allele.present?
-                  end
-                end
-              end
-            end
-          end
-        end
-      end.to_hash[:query]
-
-      if query[:bool][:should].size == 1
-        query[:bool][:should].first
-      else
-        query
-      end
+      region_condition(positions.map { |p| chr, pos, allele = p.split(':'); "#{chr}:#{pos}-#{pos}:#{allele}" }.join(','))
     end
 
     def region_condition(term)
@@ -488,11 +460,16 @@ module Elasticsearch
         query do
           bool do
             positions.each do |x|
-              chr, pos = x.split(':')
+              chr, pos, allele = x.split(':')
               start, stop = pos.split('-')
               should do
                 bool do
                   must { match 'chromosome.label': chr }
+                  if allele.present?
+                    ref, alt = allele.split('>')
+                    must { match reference: ref } if ref.present?
+                    must { match alternate: alt } if alt.present?
+                  end
                   must do
                     bool do
                       should do
