@@ -512,7 +512,7 @@ module Elasticsearch
                           must { range(:start) { lt start.to_i - 1 } }
                           must do
                             range(:stop) do
-                              gte start.to_i - 1
+                              gt start.to_i - 1
                               lte stop.to_i
                             end
                           end
@@ -523,7 +523,7 @@ module Elasticsearch
                           must do
                             range(:start) do
                               gte start.to_i - 1
-                              lte stop.to_i
+                              lt stop.to_i
                             end
                           end
                           must { range(:stop) { gt start.to_i } }
