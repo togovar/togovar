@@ -5,7 +5,7 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-gem 'rails', '~> 6.0', '>= 6.0.3.3'
+gem 'rails', '~> 6.0', '>= 6.0.3.5'
 
 # infrastructure
 gem 'foreman', '~> 0.87.1'
