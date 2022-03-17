@@ -69,8 +69,5 @@
     "webpack-dev-middleware": "^3.7.2",
     "webpack-dev-server": "^3.11.0",
     "webpack-hot-middleware": "^2.25.0"
-  },
-  "resolutions": {
-    "is-svg": "4.3.0"
   }
 }
