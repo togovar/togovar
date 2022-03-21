@@ -61,7 +61,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
 
     // set range selector
     const rangeSelectorView = this._el.querySelector('.range-selector-view');
-    this._rangeSelectorView = new RangeSelectorView(rangeSelectorView, this, 0, 1, 'horizontal', 'advanced');
+    this._rangeSelectorView = new RangeSelectorView(rangeSelectorView, this, 1, 'horizontal', 'advanced');
     this._rangeSelectorView.updateGUIWithCondition(this._condition.frequency);
 
     const switchingElements = this._body.querySelectorAll(':scope > .switching');
