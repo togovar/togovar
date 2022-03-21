@@ -1,5 +1,5 @@
 import deparam from 'deparam.js';
-import {API_URL} from "../global.js";
+import {API_URL} from '../global.js';
 
 const LIMIT = 100;
 const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
@@ -8,6 +8,7 @@ export const mixin = {
 
   initSearchCondition() {
     this._isReady = false;
+    this._fetching = false;
     this._URIParameters = deparam(window.location.search.substr(1));
     // events
     window.addEventListener('popstate', this._popstate.bind(this));
@@ -37,10 +38,10 @@ export const mixin = {
   },
 
 
-  // 検索条件 *******************************************
+  // Search condition *******************************************
   
-  // 検索条件は、特殊であるため専用メソッドを用意
   setSimpleSearchCondition(key, values) {
+    // console.log(key, values)
     if (!this._isReadySearch) return;
     this._setSimpleSearchConditions({[key]: values});
   },
@@ -162,7 +163,7 @@ export const mixin = {
   },
 
 
-  // 検索 *******************************************
+  // Search *******************************************
   /**
    * 
    * @param {Number} offset 
