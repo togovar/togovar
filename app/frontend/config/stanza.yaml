@@ -34,7 +34,7 @@ variant:
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        togostanza-menu-placement: none
+        togostanza-menu-placement: true
         columns:
           - id: variant_and_risk_allele
             label: rs# and risk allele
@@ -127,7 +127,7 @@ gene:
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        togostanza-menu-placement: none
+        togostanza-menu-placement: true
         columns:
           - id: tgv_id
             label: TogoVar ID
@@ -170,7 +170,7 @@ gene:
         custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css
         page-size-option: 5,10,20,50,100
         page-slider: false
-        togostanza-menu-placement: none
+        togostanza-menu-placement: true
         columns:
           - id: tgv_id
             label: TogoVar ID
@@ -266,7 +266,7 @@ disease:
         data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/disease_base?ep=${TOGOVAR_STANZA_SPARQL_URL}&medgen_cid=${medgen_cid}
         data-type: json
         padding: 0
-        togostanza-menu-placement: none
+        togostanza-menu-placement: true
         columns:
           - id: label
             label: Title
@@ -286,7 +286,7 @@ disease:
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        togostanza-menu-placement: none
+        togostanza-menu-placement: true
         columns:
           - id: tgv_id
             label: TogoVar ID
@@ -325,7 +325,7 @@ disease:
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        togostanza-menu-placement: none
+        togostanza-menu-placement: true
         columns:
           - id: variant_and_risk_allele
             label: rs# and risk allele
