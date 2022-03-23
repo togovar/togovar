@@ -24,7 +24,7 @@ export default class SearchFieldView {
       <div class="fieldcontainer">
         <div class="field">
           <input type="text" title="${placeholder}" placeholder="${placeholder}">
-          <button></button>
+          <button>Search</button>
         </div>
       </div>
       <div class="examples"></div>
