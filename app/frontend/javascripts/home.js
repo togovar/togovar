@@ -67,8 +67,8 @@ export function initHome() {
     // レイアウトマネージャ
     TopPageLayoutManager.init([resultView]);
     // 開閉
-    const elm = document.querySelector('#AdvancedSearchView .collapse-view');
-    new CollapseView(elm);
+    // const elm = document.querySelector('#AdvancedSearchView .collapse-view');
+    // new CollapseView(elm);
 
     // 検索窓
     new SearchConditionController();
