@@ -23,7 +23,7 @@ export default class SearchFieldView {
     <div class="search-field-view">
       <div class="fieldcontainer">
         <div class="field">
-          <input type="text" placeholder="${placeholder}">
+          <input type="text" title="${placeholder}" placeholder="${placeholder}">
           <button></button>
         </div>
       </div>
