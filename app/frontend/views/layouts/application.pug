@@ -1,7 +1,8 @@
 block variables
+- var lang = locals.language ? locals.language : "en"
 
 doctype html
-html(data-page=locals.currentPage, lang=locals.language)
+html(data-page=locals.currentPage, lang=lang)
   head
     title= locals.title ? locals.title : "TogoVar"
     meta(charset="utf-8")
