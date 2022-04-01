@@ -14,22 +14,34 @@ block head
 block content
   header#DetailHeader
     .title-wrapper
-      p.pagetype Gene report
-      h2.title.report_id
+      #gene-header.stanza
 
   main#ReportMain.LayoutReport
     section.stanza-view
       h3.title
-      #gene_base.stanza
+      #gene-base.stanza
 
     section.stanza-view
       h3.title
-      #gene_jbrowse.stanza
+        | Clinical significance
+      #gene-clinvar.stanza
 
     section.stanza-view
       h3.title
-      #gene_variant.stanza
+        | Genome-wide association study
+      #gene-gwas.stanza
 
     section.stanza-view
       h3.title
-      #gene_publication.stanza
+        | Genomic context
+      #gene-genomic-context.stanza
+
+    section.stanza-view
+      h3.title
+        | Variants
+      #gene-variant.stanza
+
+    section.stanza-view
+      h3.title
+        | Publications
+      #gene-publication.stanza
