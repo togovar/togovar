@@ -1,0 +1,29 @@
+.frequency-count-editor-view
+  > .body
+    padding: 5px 10px
+    > section
+      + section
+        margin-top: 5px
+      &.switching
+        > label
+          > span
+            font-weight: bold
+        > .input
+          opacity: .4
+          pointer-events: none
+        &.-current
+          > .input
+            opacity: 1
+            pointer-events: auto
+      &.frequency
+        > .range-selector-view
+          > .input
+            > label
+              position: absolute
+              left: 368px
+      &.count
+        > .input
+          > input
+            width: 5em
+            margin-right: 3px
+            +input-number

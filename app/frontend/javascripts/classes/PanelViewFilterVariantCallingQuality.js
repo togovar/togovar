@@ -2,6 +2,7 @@ import PanelView from "./PanelView.js";
 import StoreManager from "./StoreManager.js";
 
 export default class PanelViewFilterVariantCallingQuality extends PanelView {
+
   constructor(elm) {
     super(elm, 'quality');
     StoreManager.bind('searchConditions', this);
@@ -21,4 +22,5 @@ export default class PanelViewFilterVariantCallingQuality extends PanelView {
       this.checkbox.checked = conditions.quality === '1';
     }
   }
+
 }

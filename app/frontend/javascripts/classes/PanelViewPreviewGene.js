@@ -42,4 +42,5 @@ export default class PanelViewPreviewGene extends PanelView {
     }
     this.table.innerHTML = html;
   }
+
 }

@@ -1,0 +1,47 @@
+extend ../layouts/application
+
+append variables
+  - locals.currentPage = "gene";
+
+block head
+  each css in htmlWebpackPlugin.files.css.filter(x => x.match(/^\/css\/main-/))
+    link(href=css, rel="stylesheet")
+  each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/report-/))
+    script(type="text/javascript", src=js)
+  // Stanza theme
+  link(href="https://togostanza.github.io/togostanza-themes/contrib/togovar.css", rel="stylesheet")
+
+block content
+  header#DetailHeader
+    .title-wrapper
+      #gene-header.stanza
+
+  main#ReportMain.LayoutReport
+    section.stanza-view
+      h3.title
+      #gene-base.stanza
+
+    section.stanza-view
+      h3.title
+        | Clinical significance
+      #gene-clinvar.stanza
+
+    section.stanza-view
+      h3.title
+        | Genome-wide association study
+      #gene-gwas.stanza
+
+    section.stanza-view
+      h3.title
+        | Genomic context
+      #gene-genomic-context.stanza
+
+    section.stanza-view
+      h3.title
+        | Variants
+      #gene-variant.stanza
+
+    section.stanza-view
+      h3.title
+        | Publications
+      #gene-publication.stanza

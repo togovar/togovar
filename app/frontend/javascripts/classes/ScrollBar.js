@@ -1,5 +1,3 @@
-/*global $ */
-
 import StoreManager from "./StoreManager.js";
 import {TR_HEIGHT} from '../global.js';
 
@@ -23,6 +21,7 @@ export default class ScrollBar {
     this.total = this.bar.querySelector('.total');
     this.timeoutId;
 
+    // イベント
     StoreManager.bind('offset', this);
     StoreManager.bind('numberOfRecords', this);
     StoreManager.bind('rowCount', this);
@@ -32,6 +31,7 @@ export default class ScrollBar {
       cursor: 'grab',
       drag: this.drag.bind(this)
     });
+
   }
 
   drag(e, ui) {
@@ -67,9 +67,9 @@ export default class ScrollBar {
       offset = StoreManager.getData('offset'),
       rowCount = StoreManager.getData('rowCount'),
       numberOfRecords = StoreManager.getData('numberOfRecords'),
-      totalHeight = numberOfRecords * TR_HEIGHT,
-      offsetHeight = offset * TR_HEIGHT,
-      displayHeight = rowCount * TR_HEIGHT,
+      totalHeight = numberOfRecords * TR_HEIGHT, // 全体の高さ
+      offsetHeight = offset * TR_HEIGHT, // オフセット量
+      displayHeight = rowCount * TR_HEIGHT, // 表示領域
       displayRate = displayHeight / totalHeight;
     let
       barHeight = Math.ceil(displayHeight * displayRate);
@@ -97,4 +97,5 @@ export default class ScrollBar {
   release() {
     this.elm.classList.remove('-dragging');
   }
+
 }

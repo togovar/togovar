@@ -1,0 +1,67 @@
+#AdvancedSearchDatasetsView
+  padding: 14px $PADDING_SIDE 14px
+  background-color: $COLOR_KEY
+  color: $COLOR_BLACK
+  font-size: 12px 
+  > .tablecontainer
+    background-color: white
+    overflow: auto
+    max-height: 324px
+    > table
+      width: 100%
+      white-space: nowrap
+      > thead, > tbody
+        > tr
+          > th, >td
+            &:first-child
+              width: 100px
+              width: 80px
+              padding-right: 0
+      > thead
+        font-size: 12px
+        font-weight: bold
+        border-bottom: 2px solid $COLOR_GRAY
+        > tr > th
+          padding: 10px 10px 5px 10px
+          margin-bottom: 0
+      > tbody
+        > tr
+          border-bottom: 1px solid $COLOR_SEPARATOR
+          padding: 3px 10px
+          &:last-child
+            border-bottom: none
+          > td
+            padding-left: 10px
+            padding-right: 10px
+            font-size: 12px
+            > *
+              line-height: 22px
+            > .dataset
+              > .label
+                display: flex
+                font-weight: bold
+                align-items: center
+                margin: 0
+                > .dataset-icon
+                  &:before
+                    width: 15px
+            > .datasetlabel
+              position: relative
+              margin-left: -8px
+              > .collapsebutton
+                left: -8px
+                top: 6px
+              > p
+                margin: 0
+                font-weight: bold
+              &.collapse-view.collapsecontent
+                > p
+                  font-style: italic
+                &.-terminal
+                  > p
+                    font-weight: normal
+            > .frequencyandcount
+              > .range-selector
+                > .meter
+                  width: 240px
+

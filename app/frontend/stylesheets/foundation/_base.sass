@@ -1,10 +1,13 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,700,900')
 
 // color
-$COLOR_KEY: #46B9CC
-$COLOR_KEY_DEEP: #249EB3
-$COLOR_KEY_DARK: #256D80
+$COLOR_KEY: #62D5D9
+$COLOR_KEY_DARK1: #249EB3
+$COLOR_KEY_DARK2: #1D7C8F
+$COLOR_KEY_DARK3: #256D80
+
 $COLOR_SELECTED: #FFDD00
+$COLOR_SELECTED_LIGHT: #FDFAE5
 $COLOR_DISABLE_DEEP: #808080
 $COLOR_DISABLE: #999999
 
@@ -23,19 +26,31 @@ $COLOR_DATASET_TOMMO: #ABE03F
 $COLOR_DATASET_TOMMO_LIGHT: lighten($COLOR_DATASET_TOMMO, 35%)
 $COLOR_DATASET_HGVD: #005B80
 $COLOR_DATASET_MGEND: $COLOR_DATASET_HGVD
+$COLOR_DATASET_HGVD_LIGHT: lighten($COLOR_DATASET_HGVD, 70%)
 $COLOR_DATASET_GEM_J: #DC2828
+$COLOR_DATASET_GEM_J_LIGHT: lighten($COLOR_DATASET_GEM_J, 45%)
 $COLOR_DATASET_BBJ: #FF993F
+$COLOR_DATASET_BBJ_LIGHT: lighten($COLOR_DATASET_BBJ, 35%)
 $COLOR_DATASET_FOREIGN: #94928d
+$COLOR_DATASET_FOREIGN_LIGHT: lighten($COLOR_DATASET_FOREIGN, 40%)
 
 $COLOR_SIGN_SAFE: #24D636
+$COLOR_SIGN_SAFE_LIGHT: lighten($COLOR_SIGN_SAFE, 45%)
 $COLOR_SIGN_NORMAL: #9DCF3A
+$COLOR_SIGN_NORMAL_LIGHT: lighten($COLOR_SIGN_NORMAL, 42%)
 $COLOR_SIGN_WARNING: #FFAE00
+$COLOR_SIGN_WARNING_LIGHT: lighten($COLOR_SIGN_WARNING, 45%)
 $COLOR_SIGN_DANGEROUS: #FF5A54
+$COLOR_SIGN_DANGEROUS_LIGHT: lighten($COLOR_SIGN_DANGEROUS, 30%)
 $COLOR_SIGN_MODIFIER: #C654FF
+$COLOR_SIGN_MODIFIER_LIGHT: lighten($COLOR_SIGN_MODIFIER, 30%)
 $COLOR_SIGN_OTHER: #9C8200
+$COLOR_SIGN_OTHER_LIGHT: lighten($COLOR_SIGN_OTHER, 60%)
 $COLOR_SIGN_UNKNOWN: $COLOR_GRAY
+$COLOR_SIGN_UNKNOWN_LIGHT: lighten($COLOR_SIGN_UNKNOWN, 35%)
 
-$GRADIENT_HEADING: linear-gradient(to right, $COLOR_KEY_DEEP, $COLOR_KEY)
+$GRADIENT_HEADING: linear-gradient(to right, $COLOR_KEY_DARK1, $COLOR_KEY)
+$GRADIENT_HEADING_SEMITRANSPARENT: linear-gradient(to right, rgba($COLOR_KEY_DARK1, .9), rgba($COLOR_KEY, .9))
 $GRADIENT_HEADING_DISABLE: linear-gradient(to right, $COLOR_DISABLE_DEEP, $COLOR_DISABLE)
 
 // geometry
@@ -53,18 +68,32 @@ $HEIGHT_GLOBAL_MENU: 50px
 $HEIGHT_BOTTOM_DRAWER: 30px
 //$HEIGHT_BOTTOM_DRAWER: 0px
 $HEIGHT_BOTTOM_DRAWER_OPENED: 400px
+$HEIGHT_ADVANCED_SEARCH_CONDITION: 24px
 
-$Z_INDEX_ROW_INDICATOR: 1
-$Z_INDEX_GLOBAL_HEADER: 2
-$Z_INDEX_SUGGEST_VIEW: 2
-$Z_INDEX_DRAWER: 3
-$Z_INDEX_CONFIGURATION: 4
-$Z_INDEX_ACTIVITY_INDICATOR: 5
+$Z_INDEX_BASE: 10000
+$Z_INDEX_ROW_INDICATOR: $Z_INDEX_BASE + 1
+$Z_INDEX_ADVANCED_SEARCH_MENU: $Z_INDEX_BASE + 1
+$Z_INDEX_DETAIL_HEADER: $Z_INDEX_BASE + 1
+$Z_INDEX_GLOBAL_HEADER: $Z_INDEX_BASE + 2
+$Z_INDEX_SUGGEST_VIEW: $Z_INDEX_BASE + 2
+$Z_INDEX_DRAWER: $Z_INDEX_BASE + 3
+$Z_INDEX_CONFIGURATION: $Z_INDEX_BASE + 4
+$Z_INDEX_EDITING_CONDITION: $Z_INDEX_BASE + 4
+$Z_INDEX_ACTIVITY_INDICATOR: $Z_INDEX_BASE + 5
 
+:root
+
+$BACKDROP_BG: radial-gradient(ellipse at center, rgba($COLOR_KEY, .6) 10%, rgba($COLOR_KEY, .8) 60%, rgba($COLOR_KEY_DARK3, 1) 120%)
+
+// time
 $GUI_DURATION: .2s
 $TRANSITION_DURATION: .5s
 
+// effect
+$SHADOW_DEPTH1: 0 1px 1px rgba(black, .3)
+
 // charactor
+// FontAwesome
 $CHAR_TIMES: "\f00d"
 $CHAR_INFO_CIRCLE: "\f05a"
 $CHAR_ARROW_RIGHT: "\f061"
@@ -73,7 +102,11 @@ $CHAR_EXCRAMATION_TRIANGLE: "\f071"
 $CHAR_EXTERNAL_LINK: "\f08e"
 $CHAR_ARROW_CIRCLE_RIGHT: "\f0a9"
 $CHAR_WRENCH: "\f0ad"
+// fontello
 $CHAR_DATASET: "\E800"
+$CHAR_LOGICAL_OP_AND: "\E801"
+$CHAR_LOGICAL_OP_OR: "\E802"
+$CHAR_LOGICAL_OP_OUTLINE: "\E803"
 
 @mixin sprite($width, $height, $x, $y)
   background-image: url('../images/csssprite.png')
@@ -81,6 +114,20 @@ $CHAR_DATASET: "\E800"
   background-position: #{-$x} #{-$y}
   background-size: 200px 60px
 
+@mixin input-number
+  display: inline-block
+  text-align: right
+  line-height: 18px
+  padding: 0 0 0 8px
+  border-radius: 9px
+  border: solid 1px $COLOR_GRAY
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .2) inset
+  outline: none
+
+@font-face
+  font-family: 'FontAwesome'
+  src: url('../fonts/fontawesome-webfont.eot')
+  src: url('../fonts/fontawesome-webfont.eot') format('embedded-opentype'), url('../fonts/fontawesome-webfont.woff2') format('woff2'), url('../fonts/fontawesome-webfont.woff') format('woff'), url('../fonts/fontawesome-webfont.ttf') format('truetype'), url('../fonts/fontawesome-webfont.svg') format('svg')
 @font-face
   font-family: 'fontello'
   src: url('../fonts/fontello.eot')
@@ -88,39 +135,42 @@ $CHAR_DATASET: "\E800"
 
 html
   height: 100%
-
 body
   font-size: 10px
   font-family: 'Roboto Condensed', sans-serif
   color: $COLOR_BLACK
-  height: 100%
+  // height: 100%
   padding-top: $HEIGHT_GLOBAL_MENU + $HEIGHT_NBDC_COMMON_HEADER !important
   -moz-osx-font-smoothing: grayscale
   -webkit-font-smoothing: antialiased
-
   [data-page="home"] &
     overflow: hidden
+  &[data-search-mode="advanced"]
+    #FilterAlternativeAlleleFrequency, #FilterVariantCallingQuality, #FilterSIFT, #FilterPolyPhen
+      display: none
+  &[data-dragging="true"]
+    user-select: none
 
 [draggable=true]
   -khtml-user-drag: element
 
 a
-  color: $COLOR_KEY_DARK
-
+  color: $COLOR_KEY_DARK3
   &:link
-    color: $COLOR_KEY_DARK
+    color: $COLOR_KEY_DARK3
     text-decoration: underline
-
   &:active, &:hover
-    color: $COLOR_KEY_DEEP
+    color: $COLOR_KEY_DARK1
 
 label
   > input
     margin-right: .3em
 
+input[type="radio"], input[type="checkbox"]
+  vertical-align: middle
+
 .unimplemented
   color: red
   margin-bottom: 0
-
   &:before
     content: "unimplemented: "

@@ -2,27 +2,23 @@ $HEIGHT_CHROMOSOME_CONTAINER: $HEIGHT_BOTTOM_DRAWER_OPENED - $HEIGHT_BOTTOM_DRAW
 $TOP_CHROMOSOME: 10px
 $BOTTOM_CHROMOSOME: 16px
 
-#Karyotype
+.drawer-view
   width: 100%
   position: fixed
-  bottom: 0
   background-color: $COLOR_BLACK
   color: white
   cursor: pointer
   z-index: $Z_INDEX_DRAWER
-  transform: translateY($HEIGHT_CHROMOSOME_CONTAINER)
-  transition: transform $TRANSITION_DURATION
-
+  bottom: $HEIGHT_BOTTOM_DRAWER - $HEIGHT_BOTTOM_DRAWER_OPENED
+  transition: bottom $TRANSITION_DURATION
   .-drawer-opened &
-    transform: translateY(0)
-
+    bottom: 0
   > .header
     padding: 0 #{$PADDING_SIDE - 2px}
     line-height: $HEIGHT_BOTTOM_DRAWER
     height: $HEIGHT_BOTTOM_DRAWER
     border-top: solid 1px rgba(white, .4)
     border-bottom: solid 1px rgba(black, .2)
-
     > .mark
       display: inline-block
       width: 14px
@@ -30,7 +26,6 @@ $BOTTOM_CHROMOSOME: 16px
       position: relative
       vertical-align: middle
       margin-right: .2em
-
       &:before, &:after
         content: ""
         display: block
@@ -38,24 +33,18 @@ $BOTTOM_CHROMOSOME: 16px
         position: absolute
         border-top: solid 1.5px white
         transition: transform $TRANSITION_DURATION, width $TRANSITION_DURATION
-
       &:after
         transform: translate(5px, 4px) rotate(45deg)
-
         .-drawer-opened &
           width: 11px
           transform: translate(2px, 4px) rotate(225deg)
-
       &:before
         transform: translate(-1px, 4px) rotate(135deg)
-
         .-drawer-opened &
           width: 11px
           transform: translate(2px, 4px) rotate(-45deg)
-
     > .heading
       display: inline-block
-
   > .configuration
     position: absolute
     top: 5px
@@ -68,32 +57,24 @@ $BOTTOM_CHROMOSOME: 16px
     text-align: right
     white-space: nowrap
     overflow-x: auto
-
     .-drawer-opened &
       pointer-events: auto
       opacity: 1
-
     > .form-parts
       display: inline-block
-
       + .form-parts
         margin-left: .75em
-
       > .togglebuttons
         background-color: rgba(black, .5)
-
         > .button
           &:hover
             color: $COLOR_KEY
-
       > .select
         background-color: rgba(black, .5)
         color: white
-
   > .content
     position: relative
     overflow: hidden
-
     > .chromosomes
       padding: $TOP_CHROMOSOME $PADDING_SIDE $BOTTOM_CHROMOSOME
       height: $HEIGHT_CHROMOSOME_CONTAINER - $TOP_CHROMOSOME - $BOTTOM_CHROMOSOME
@@ -101,7 +82,6 @@ $BOTTOM_CHROMOSOME: 16px
       white-space: nowrap
       overflow-x: auto
       box-sizing: content-box
-
       > .chromosome-view
         display: inline-block
         vertical-align: top

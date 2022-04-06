@@ -3,11 +3,18 @@
   "env": {
     "es6": true,
     "browser": true,
+    "jquery" : true,
     "node": true
   },
-  "rules": {},
+  "rules": {
+    "no-unused-vars": [
+      "error", {
+        "argsIgnorePattern": "^_"
+      }
+    ]
+  },
   "parserOptions": {
-    "ecmaVersion": 2018,
+    "ecmaVersion": 2020,
     "sourceType": "module"
   },
   "globals": {

@@ -14,6 +14,8 @@ header#GlobalHeader
         a.link(href=navLink("datasets")) Datasets
       li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^downloads/)})
         a.link(href=navLink("downloads")) Downloads
+      li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^api/)})
+        a.link(href="/api") API
       li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^terms/)})
         a.link(href=navLink("terms")) Terms
       li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^contact/)})
@@ -29,6 +31,7 @@ header#GlobalHeader
       ul.menu.config
         li.menu-button Configuration
     else if locals.currentPage === "variant"
+    else if locals.currentPage === "api"
     else
       ul.menu.languageswitcher
         li.language.menu-button(class={"-current": locals.language === "ja"} data-language="ja" title="日本語")

@@ -6,37 +6,29 @@
   list-style: none
   column-count: 2
   column-gap: 4em
-
   > .category
     break-inside: avoid
-
     + .category
       margin-top: 12px
-
     > .categorytitle
       font-size: 16px
       margin-bottom: 0
       line-height: 20px
       padding: 4px 0
-
     > .categorylist
       list-style: none
       padding-inline-start: 0
-
       > .item
         font-size: 14px
         line-height: 18px
         padding: 4px 0
         position: relative
         overflow: hidden
-
         > .link
           text-decoration: none
           color: $COLOR_BLACK
-
           &:hover
             color: $COLOR_KEY
-
           &:after
             content: $CHAR_ARROW_DOWN
             font-family: FontAwesome
@@ -47,10 +39,8 @@
             opacity: .8
             transform: rotate(-45deg)
             display: inline-block
-
         &.-question
           padding-left: 20px
-
           > .link
             &:before
               content: "Q"
@@ -59,7 +49,7 @@
               height: 16px
               line-height: 16px
               border-radius: 8px
-              background-color: $COLOR_KEY_DEEP
+              background-color: $COLOR_KEY_DARK1
               color: white
               text-align: center
               position: absolute

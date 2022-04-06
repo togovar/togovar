@@ -1,24 +1,105 @@
 import 'jquery'
 
-$(function () {
-  const id = window.location.pathname.split('/').pop();
-  const base_options = {
-    tgv_id: id,
-    ep: TOGOVAR_ENDPOINT_SPARQL,
-    sparqlist: TOGOVAR_ENDPOINT_SPARQLIST,
-  };
-  const stanza = [
-    $('<togostanza-variant_header></togostanza-variant_header>').attr(base_options),
-    $('<togostanza-variant_summary></togostanza-variant_summary>').attr(base_options),
-    $('<togostanza-variant_other_overlapping_variants></togostanza-variant_other_overlapping_variants>').attr(base_options).attr({search_api: TOGOVAR_ENDPOINT_SEARCH}),
-    $('<togostanza-variant_frequency></togostanza-variant_frequency>').attr(base_options),
-    $('<togostanza-variant_clinvar></togostanza-variant_clinvar>').attr(base_options),
-    $('<togostanza-variant_jbrowse></togostanza-variant_jbrowse>').attr(base_options).attr({assembly: "GRCh37", jbrowse: TOGOVAR_ENDPOINT_JBROWSE, margin: "50"}),
-    $('<togostanza-variant_gene></togostanza-variant_gene>').attr(base_options),
-    $('<togostanza-variant_transcript></togostanza-variant_transcript>').attr(base_options),
-    $('<togostanza-variant_publication></togostanza-variant_publication>').attr(base_options),
-  ];
+const ENV = {
+  'TOGOVAR_STANZA_SPARQL_URL': process.env.TOGOVAR_STANZA_SPARQL_URL,
+  'TOGOVAR_STANZA_SPARQLIST_URL': process.env.TOGOVAR_STANZA_SPARQLIST_URL,
+  'TOGOVAR_STANZA_SEARCH_API_URL': process.env.TOGOVAR_STANZA_SEARCH_API_URL,
+  'TOGOVAR_STANZA_JBROWSE_URL': process.env.TOGOVAR_STANZA_JBROWSE_URL,
+};
+
+const STANZA_PATH = process.env.TOGOVAR_FRONTEND_STANZA_URL || '/stanza';
+
+const config = (function (obj) {
+  const replace_recursive = function (obj) {
+    if (typeof obj === 'string' && obj.includes('$')) {
+      for (const match of [...obj.matchAll(/(\$([A-Z_]+)|\${([A-Z_]+)})/g)]) {
+        const key = match[2] || match[3];
+        const value = ENV[key] || '';
+        obj = obj.replace(match[0], value);
+      }
+    } else if (Array.isArray(obj)) {
+      obj = obj.map(x => replace_recursive(x));
+    } else if (obj && typeof obj === 'object') {
+      for (const [key, value] of Object.entries(obj)) {
+        obj[key] = replace_recursive(value);
+      }
+    }
+
+    return obj;
+  }
+
+  return replace_recursive(obj);
+})(require('../../config/stanza.yaml'));
+
+const formatOption = function (config) {
+  const buf = {};
+
+  if (config) {
+    for (const [key, value] of Object.entries(config)) {
+      if (value && typeof value === 'object') {
+        buf[key] = JSON.stringify(value);
+      } else if (typeof value === 'string' && value.match(/^https?:\/\//)) {
+        const url = new URL(value);
+
+        url.search = [...url.searchParams]
+          .filter(x => x[1])
+          .map(x => [x[0], encodeURIComponent(x[1])].join('='))
+          .join('&');
+
+        buf[key] = url.href;
+      } else {
+        buf[key] = value;
+      }
+    }
+  }
+
+  return buf;
+}
+
+const appendStanzaTag = function (config, base_options) {
+  const id = config.id;
+  const dom = config.dom;
+
+  if (!id) {
+    console.error("Missing required key: 'id'");
+    return;
+  }
+
+  if (!dom) {
+    console.error("Missing required key: 'dom'");
+    return;
+  }
+
+  const src = config.src || `${STANZA_PATH}/${config.id}.js`;
+  const options = formatOption(config.options);
+
+  $('head').append($(`<script type="module" src="${src}" async></script>`));
+  $(`${dom}`).append($(`<togostanza-${id}></togostanza-${id}>`).attr(base_options || {}).attr(options || {}));
+};
+
+const initialize = function () {
+  const [report, id] = window.location.pathname.split('/').slice(-2);
+
+  const base_options = config[report]?.base_options || {};
+  const stanzas = config[report]?.stanza || [];
+
+  const id_key = config[report]?.id || 'id';
+  base_options[id_key] = id;
 
   $('.report_id').html(id);
-  stanza.forEach((value, index, array) => $(`#_stanza_${index}`).append(value));
+
+  stanzas.forEach(stanza => {
+    if (stanza.options) {
+      for (const [key, value] of Object.entries(stanza.options)) {
+        if (typeof value === 'string' && value.includes('$')) {
+          stanza.options[key] = value.replaceAll(new RegExp(`\\$(${id_key}|{${id_key}})`, 'g'), id);
+        }
+      }
+    }
+    appendStanzaTag(stanza, base_options)
+  });
+};
+
+$(function () {
+  initialize();
 });

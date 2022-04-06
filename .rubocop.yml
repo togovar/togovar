@@ -1,2 +1,26 @@
 AllCops:
   TargetRubyVersion: 2.7
+
+Layout/BeginEndAlignment:
+  EnforcedStyleAlignWith: begin
+
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented_relative_to_receiver
+
+Metrics/AbcSize:
+  IgnoredMethods:
+    - to_hash
+
+Metrics/MethodLength:
+  ExcludedMethods:
+    - to_hash
+  CountAsOne:
+    - array
+    - hash
+    - heredoc
+
+Style/AccessorGrouping:
+  EnforcedStyle: separated
+
+Style/Documentation:
+  Enabled: false
