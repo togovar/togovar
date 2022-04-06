@@ -20,7 +20,6 @@ gem 'haml-rails', '~> 2.0'
 gem 'jbuilder', '~> 2.5'
 gem 'js-routes', '~> 1.4'
 gem 'sass-rails', '~> 5.0'
-gem 'webpacker', '~> 5.1', '>= 5.1.1'
 
 # utility
 gem 'dotenv-rails', '~> 2.7', '>= 2.7.6'
