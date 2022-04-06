@@ -19,7 +19,7 @@ gem 'turbolinks', '~> 5' # TODO: purge
 gem 'uglifier', '>= 1.3.0'
 
 # frontend
-gem 'haml-rails', '~> 1.0'
+gem 'haml-rails', '~> 2.0'
 gem 'jbuilder', '~> 2.5'
 gem 'js-routes', '~> 1.4'
 gem 'sass-rails', '~> 5.0'
