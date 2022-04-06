@@ -3,7 +3,7 @@ const path = require('path');
 
 const DotenvWebpack = require('dotenv-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ManifestPlugin = require('webpack-manifest-plugin');
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const config = {
@@ -120,7 +120,7 @@ const config = {
     new MiniCssExtractPlugin({
       filename: 'css/[name]-[contenthash].css',
     }),
-    new ManifestPlugin(),
+    new WebpackManifestPlugin(),
     new DotenvWebpack(),
     new webpack.DefinePlugin({
       TOGOVAR_FRONTEND_API_URL: JSON.stringify(process.env.TOGOVAR_FRONTEND_API_URL || "https://togovar.biosciencedbc.jp"),

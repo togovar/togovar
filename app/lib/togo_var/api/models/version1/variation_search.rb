@@ -75,7 +75,7 @@ module TogoVar
                 by :'chromosome.index'
                 by :'vcf.position'
                 by :'vcf.reference'
-                by :'vcf.alternative'
+                by :'vcf.alternate'
               end
               size limit
               from offset if offset.is_a?(Numeric)

@@ -45,7 +45,7 @@ class VariationSearchService
   def spec
     @spec ||= TogoVar::API::Spec::Validator.new schema(@params.fetch(:version, '1')),
                                                 method: :post,
-                                                path: '/search/variation',
+                                                path: '/search/variant',
                                                 parameters: @params,
                                                 headers: @options.fetch(:headers, {}),
                                                 body: @params[:body]

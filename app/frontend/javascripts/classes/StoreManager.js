@@ -392,7 +392,7 @@ class StoreManager {
         }
           break;
         case 'advanced': {
-          path = `${API_URL}/api/search/variation`;
+          path = `${API_URL}/api/search/variant`;
           options.method = 'POST';
           options.body = JSON.stringify({
             query: this._store.ad__vancedSearchConditions,
@@ -401,7 +401,7 @@ class StoreManager {
         }
           break;
         // case 'advanced': {
-        //   path = `${API_URL}/api/search/variation`;
+        //   path = `${API_URL}/api/search/variant`;
         //   const conditions = this._extractAdvancedSearchCondition( this._store.advancedSearchConditions );
         //   options.method = 'POST';
         //   options.body = JSON.stringify({

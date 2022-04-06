@@ -3,10 +3,10 @@
 class SequenceOntology < TermDictionary
   module VariationClass
     SO_0001483 = TermDictionary::Term.new('SO_0001483', :snv, 'SNV')
-    SO_0000667 = TermDictionary::Term.new('SO_0000667', :ins, 'insertion')
-    SO_0000159 = TermDictionary::Term.new('SO_0000159', :del, 'deletion')
-    SO_1000032 = TermDictionary::Term.new('SO_1000032', :indel, 'indel')
-    SO_1000002 = TermDictionary::Term.new('SO_1000002', :sub, 'substitution')
+    SO_0000667 = TermDictionary::Term.new('SO_0000667', :ins, 'Insertion')
+    SO_0000159 = TermDictionary::Term.new('SO_0000159', :del, 'Deletion')
+    SO_1000032 = TermDictionary::Term.new('SO_1000032', :indel, 'Indel')
+    SO_1000002 = TermDictionary::Term.new('SO_1000002', :sub, 'MNV')
   end
   include VariationClass
     def find_by_label(label)
@@ -79,6 +79,12 @@ class SequenceOntology < TermDictionary
                            SO_0001628].freeze
 
   class << self
+    def find_by_label(label)
+      constants.select do |sym|
+        sym.to_s.starts_with?('SO_') && const_get(sym).label == label
+      end.map(&method(:const_get)).first
+    end
+
     def most_severe_consequence(*keys)
       keys = keys.map(&:to_sym).uniq
 
