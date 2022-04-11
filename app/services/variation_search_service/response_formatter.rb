@@ -108,7 +108,7 @@ class VariationSearchService
         json.start variation[:start]
         json.stop variation[:stop]
         json.reference variation[:reference].presence || ''
-        json.alternative variation[:alternative].presence || ''
+        json.alternate variation[:alternate].presence || ''
 
         if (dbsnp = Array(variation[:xref]).filter { |x| x[:source] = 'dbSNP' }.map { |x| x[:id] }).present?
           json.existing_variations dbsnp

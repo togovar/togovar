@@ -26,7 +26,7 @@ class Variation
           indexes :start, type: :integer
           indexes :stop, type: :integer
           indexes :reference, type: :keyword
-          indexes :alternative, type: :keyword # TODO rename to alternate
+          indexes :alternate, type: :keyword
           indexes :vcf do
             indexes :position, type: :integer
             indexes :reference, type: :keyword
