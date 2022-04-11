@@ -1,0 +1,162 @@
+:host(.values)
+  background: red
+  .inner
+    border: solid 2px orange
+
+condition-item-value-view
+    border: solid 2px green
+condition-item-value-view
+.inner
+  border: solid 2px blue
+
+.condition-item-value-view
+  > .inner
+    height: 18px
+    line-height: 18px
+    padding: 0 #{$HEIGHT_VALUE * .5}
+    background-color: white
+    border: solid 1px $COLOR_KEY_DARK2
+    border-radius: $HEIGHT_VALUE * .5
+    font-weight: bold
+    margin-right: 2px
+  &[data-condition-type="dataset"]
+    > .inner
+      min-width: 120px
+      &::before
+        font-family: fontello
+        content: $CHAR_DATASET
+        margin-right: 4px
+    &[data-value="jga_ngs"], &[data-value="jga_snp"]
+      > .inner
+        border-color: $COLOR_DATASET_JGA
+        background-color: $COLOR_DATASET_JGA_LIGHT
+        &::before
+          color: $COLOR_DATASET_JGA
+    &[data-value="tommo_4.7kjpn"]
+      > .inner
+        border-color: $COLOR_DATASET_3_5KJPN
+        background-color: $COLOR_DATASET_3_5KJPN_LIGHT
+        &::before
+          color: $COLOR_DATASET_3_5KJPN
+    &[data-value="hgvd"], &[data-value="mgend"]
+      > .inner
+        border-color: $COLOR_DATASET_HGVD
+        background-color: $COLOR_DATASET_HGVD_LIGHT
+        &::before
+          color: $COLOR_DATASET_HGVD
+    &[data-value="gem_j_wga"]
+      > .inner
+        border-color: $COLOR_DATASET_GEM_J
+        background-color: $COLOR_DATASET_GEM_J_LIGHT
+        &::before
+          color: $COLOR_DATASET_GEM_J
+    &[data-value="bbj"]
+      > .inner
+        border-color: $COLOR_DATASET_BBJ
+        background-color: $COLOR_DATASET_BBJ_LIGHT
+        &::before
+          color: $COLOR_DATASET_BBJ
+    &[data-value="clinvar"], &[data-value="exac"], &[data-value="gnomad"]
+      > .inner
+        border-color: $COLOR_DATASET_FOREIGN
+        background-color: $COLOR_DATASET_FOREIGN_LIGHT
+        &::before
+          color: $COLOR_DATASET_FOREIGN
+  &[data-condition-type="significance"]
+    > .inner
+      &::before
+        margin-right: 4px
+        margin-left: -2px
+        font-size: 10px
+        position: relative
+        top: -1px
+    &[data-value="P"]
+      > .inner
+        border-color: $COLOR_SIGN_DANGEROUS
+        background-color: $COLOR_SIGN_DANGEROUS_LIGHT
+        &::before
+          content: "P"
+          color: $COLOR_SIGN_DANGEROUS
+    &[data-value="LP"]
+      > .inner
+        border-color: $COLOR_SIGN_WARNING
+        background-color: $COLOR_SIGN_WARNING_LIGHT
+        &::before
+          content: "LP"
+          color: $COLOR_SIGN_WARNING
+    &[data-value="US"]
+      > .inner
+        border-color: $COLOR_SIGN_UNKNOWN
+        background-color: $COLOR_SIGN_UNKNOWN_LIGHT
+        &::before
+          content: "US"
+          color: $COLOR_SIGN_UNKNOWN
+    &[data-value="LB"]
+      > .inner
+        border-color: $COLOR_SIGN_NORMAL
+        background-color: $COLOR_SIGN_NORMAL_LIGHT
+        &::before
+          content: "LB"
+          color: $COLOR_SIGN_NORMAL
+    &[data-value="B"]
+      > .inner
+        border-color: $COLOR_SIGN_SAFE
+        background-color: $COLOR_SIGN_SAFE_LIGHT
+        &::before
+          content: "B"
+          color: $COLOR_SIGN_SAFE
+    &[data-value="CI"]
+      > .inner
+        border-color: $COLOR_SIGN_MODIFIER
+        background-color: $COLOR_SIGN_MODIFIER_LIGHT
+        &::before
+          content: "CI"
+          color: $COLOR_SIGN_MODIFIER
+    &[data-value="DR"], &[data-value="A"], &[data-value="RF"], &[data-value="PR"], &[data-value="AF"], &[data-value="O"]
+      > .inner
+        border-color: $COLOR_SIGN_OTHER
+        background-color: $COLOR_SIGN_OTHER_LIGHT
+        &::before
+          color: $COLOR_SIGN_OTHER
+    &[data-value="DR"]
+      > .inner
+        &::before
+          content: "DR"
+    &[data-value="A"]
+      > .inner
+        &::before
+          content: "A"
+    &[data-value="RF"]
+      > .inner
+        &::before
+          content: "RF"
+    &[data-value="PR"]
+      > .inner
+        &::before
+          content: "PR"
+    &[data-value="AF"]
+      > .inner
+        &::before
+          content: "AF"
+    &[data-value="O"]
+      > .inner
+        &::before
+          content: "O"
+    &[data-value="NP"], &[data-value="AN"], &[data-value="NC"]
+      > .inner
+        border-color: $COLOR_GRAY
+        background-color: white
+        &::before
+          color: $COLOR_GRAY
+    &[data-value="NP"]
+      > .inner
+        &::before
+          content: "NP"
+    &[data-value="AN"]
+      > .inner
+        &::before
+          content: "AN"
+    &[data-value="NC"]
+      > .inner
+        &::before
+          content: "NC"
