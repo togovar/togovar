@@ -133,7 +133,7 @@ export default class AdvancedSearchBuilderView {
   }
 
   // add search condition to the currently selected layer
-  addCondition(conditionType) {
+  addCondition(_conditionType) {
 
     // get selecting condition
     const selectingConditionViews = this._selection.getSelectingConditionViews();
@@ -143,17 +143,15 @@ export default class AdvancedSearchBuilderView {
     this._selection.deselectAllConditions();
 
     // add
-    let newConditionView;
+    // let newConditionView;
     switch(selectingConditionView.type) {
       case CONDITION_ITEM_TYPE.condition:
-        console.log('TODO: ')
         // TODO: コンディションを選択していた場合に、その後ろに新規条件を追加
         break;
       case CONDITION_ITEM_TYPE.group:
-        newConditionView = selectingConditionView.addNewConditionItem(conditionType);
+        // newConditionView = selectingConditionView.addNewConditionItem(conditionType);
         break;
     }
-    console.log(newConditionView);
   }
 
 

@@ -154,7 +154,6 @@ class StoreManager {
   // in Advanced Search, search criteria are received as queries, not key values.
   setAd__vancedSearchCondition(conditions, fromHistory) {
     if (!this._isReady) return;
-    console.log(conditions)
     this._store.ad__vancedSearchConditions = conditions;
     // convert queries to URL parameters
     if (!fromHistory) this._reflectAd__vancedSearchConditionToURI();
@@ -383,7 +382,6 @@ class StoreManager {
         path = 'results.json';
       }
     } else {
-      console.log(this._store.searchMode)
       switch (this._store.searchMode) {
         case 'simple': {
           const conditions = $.param(this._extractSearchCondition(this._store.searchConditions));

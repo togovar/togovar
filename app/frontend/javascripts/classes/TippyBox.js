@@ -41,7 +41,7 @@ export default class TippyBox {
         offset: this.offset(el),
       });
     } catch (err) {
-      console.log(
+      console.error(
         `Failed to set the tooltip for item with a data-tooltip id of [${id}].\nCheck if there is corresponding data in tooltips.JSON`
       );
     }
