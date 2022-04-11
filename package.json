@@ -42,6 +42,7 @@
     "ejs-html-loader": "^4.0.1",
     "ejs-plain-loader": "^1.4.1",
     "eslint": "^7.5.0",
+    "eslint-config-prettier": "^8.5.0",
     "express": "^4.17.1",
     "file-loader": "^6.0.0",
     "font-awesome": "^4.7.0",

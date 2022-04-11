@@ -1,14 +1,27 @@
 {
-  "extends": "eslint:recommended",
+  "extends": [
+    "eslint:recommended",
+    "prettier"
+  ],
   "env": {
     "es6": true,
     "browser": true,
-    "jquery" : true,
+    "jquery": true,
     "node": true
   },
   "rules": {
+    "no-console": [
+      "error",
+      {
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
+    ],
     "no-unused-vars": [
-      "error", {
+      "error",
+      {
         "argsIgnorePattern": "^_"
       }
     ]
@@ -18,7 +31,11 @@
     "sourceType": "module"
   },
   "globals": {
-    "Atomics": "readonly",
-    "SharedArrayBuffer": "readonly"
+    "TOGOVAR_FRONTEND_API_URL": "readonly",
+    "TOGOVAR_STANZA_SPARQL_URL": "readonly",
+    "TOGOVAR_STANZA_SPARQLIST_URL": "readonly",
+    "TOGOVAR_STANZA_SEARCH_API_URL": "readonly",
+    "TOGOVAR_STANZA_JBROWSE_URL": "readonly",
+    "TOGOVAR_FRONTEND_STANZA_URL": "readonly"
   }
 }
