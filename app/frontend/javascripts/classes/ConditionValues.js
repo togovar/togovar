@@ -31,7 +31,6 @@ export default class ConditionValues {
 
     // initialization by types
     // TODO: conditionType は ADVANCED_CONDITIONS[conditionView.conditionType].type を参照して処理をスイッチさせたい
-    console.log('conditionType:', conditionView.conditionType)
     switch (conditionView.conditionType) {
       case CONDITION_TYPE.type:
       case CONDITION_TYPE.significance:
@@ -69,13 +68,13 @@ export default class ConditionValues {
 
   update(isValid) {
     if (this._conditionView.conditionType === CONDITION_TYPE.dataset) {
-      isValid = this._editors.every(editor => editor.isValid);
+      isValid = this._editors.every(editor => {
+        return editor.isValid
+      });
     }
     if (isValid) {
-      console.log('ok')
       this._okButton.classList.remove('-disabled');
     } else {
-      console.log('boooo')
       this._okButton.classList.add('-disabled');
     }
   }
@@ -84,9 +83,7 @@ export default class ConditionValues {
   // private methods
 
   _clickOkButton(e) {
-    console.log(e)
     e.stopImmediatePropagation();
-    // 
     this._conditionView.doneEditing();
   }
 
@@ -96,7 +93,7 @@ export default class ConditionValues {
       // delete for the first time 
       this._conditionView.remove();
     } else {
-      // otherwise, revert to the previous state 
+      // otherwise, revert to the previous state
       for (const editor of this._editors) {
         editor.restore();
       }

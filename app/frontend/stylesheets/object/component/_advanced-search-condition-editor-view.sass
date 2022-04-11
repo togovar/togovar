@@ -1,13 +1,12 @@
-$PADDING_SIDE: $HEIGHT_ADVANCED_SEARCH_CONDITION * .5
-
 .advanced-search-condition-editor-view
+  --padding-side: calc(var(--height-advanced-search-condition-values-container) * .5)
   border-top: solid 1px $COLOR_SEPARATOR
   color: $COLOR_BLACK
   > .sections
     border-bottom: solid 1px $COLOR_SEPARATOR
     > section
       > header
-        padding: 0 $PADDING_SIDE
+        padding: 0 var(--padding-side)
         background-color: #cdcdcc
         font-weight: bold
       > .checkboxes-editor-view

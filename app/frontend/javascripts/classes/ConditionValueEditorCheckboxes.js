@@ -1,31 +1,30 @@
+import ConditionValueEditor from "./ConditionValueEditor.js";
 import {ADVANCED_CONDITIONS} from '../global.js';
 
-export default class ConditionValueEditorCheckboxes {
+export default class ConditionValueEditorCheckboxes extends ConditionValueEditor {
 
   constructor(valuesView, conditionType) {
 
+    super(valuesView, conditionType);
+
     // HTML
     const master = ADVANCED_CONDITIONS[conditionType];
-    const section = document.createElement('section');
-    section.classList.add('checkboxes-editor-view');
-    section.innerHTML = `
-      <header>Select them</header>
-      <ul class="checkboxes">${master.values.map(value => `
-        <li>
-          <label><input
-            type="checkbox"
-            value="${value.value}"
-            data-label="${value.label}"
-            ${conditionType === 'significance' ? `data-sign="${value.value}"` : ''}>
-              ${conditionType === 'significance' ? `<span class="clinical-significance" data-sign="${value.value}"></span>` : ''}${value.label}
-          </label>
-        </li>`).join('')}
-      </ul>`;
-    valuesView.sections.append(section);
+    this._createElement('checkboxes-editor-view', `
+    <header>Select them</header>
+    <ul class="checkboxes body">${master.values.map(value => `
+      <li>
+        <label><input
+          type="checkbox"
+          value="${value.value}"
+          data-label="${value.label}"
+          ${conditionType === 'significance' ? `data-sign="${value.value}"` : ''}>
+            ${conditionType === 'significance' ? `<span class="clinical-significance" data-sign="${value.value}"></span>` : ''}${value.label}
+        </label>
+      </li>`).join('')}
+    </ul>`);
 
     // references
-    this._valuesView = valuesView;
-    this._checkboxes = Array.from(section.querySelectorAll(':scope > ul > li > label > input'));
+    this._checkboxes = Array.from(this._el.querySelectorAll(':scope > ul > li > label > input'));
 
     // attach events
     this._checkboxes.forEach(checkbox => {
@@ -40,8 +39,7 @@ export default class ConditionValueEditorCheckboxes {
   // public methods
 
   keepLastValues() {
-    this._lastValues = Array.from(this._valuesView.conditionView.valuesElement.querySelectorAll(':scope > .value')).map(value => value.dataset.value);
-    console.log( this._lastValues )
+    this._lastValues = Array.from(this._valuesView.conditionView.valuesElement.querySelectorAll(':scope > condition-item-value-view')).map(value => value.value);
   }
 
   restore() {
@@ -61,20 +59,11 @@ export default class ConditionValueEditorCheckboxes {
   _update() {
 
     // update values
-    const valuesElement = this._valuesView.conditionView.valuesElement;
-    const valueViews = Array.from(valuesElement.querySelectorAll(':scope > .value'));
     this._checkboxes.forEach(checkbox => {
-      const elm = valueViews.find(elm => elm.dataset.value === checkbox.value);
       if (checkbox.checked) {
-        if (elm === undefined) {
-          // add value element
-          valuesElement.insertAdjacentHTML('beforeend', `<span class="value" data-value="${checkbox.value}">${checkbox.dataset.label}</span>`);
-        }
+        this._addValueView(checkbox.value, checkbox.dataset.label);
       } else {
-        if (elm) {
-          // remove value element
-          valuesElement.removeChild(elm);
-        }
+        this._removeValueView(checkbox.value);
       }
     });
 

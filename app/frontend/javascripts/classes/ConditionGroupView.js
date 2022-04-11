@@ -14,7 +14,6 @@ export default class ConditionGroupView extends ConditionView {
    * @param {Boolean} isRoot
    */
   constructor(builder, parentView, logicalOperator = 'and', conditionViews = [], referenceElm = null, isRoot = false) {
-    // console.log( parentView, logicalOperator, conditionViews, referenceElm, isRoot )
 
     super(CONDITION_ITEM_TYPE.group, builder, parentView, referenceElm);
 
@@ -95,7 +94,6 @@ export default class ConditionGroupView extends ConditionView {
    * @param {Node} referenceElm 
    */
   addConditionViews(conditionViews, referenceElm) {
-    console.log(conditionViews, referenceElm)
     for (const view of conditionViews) {
       this._container.insertBefore(view, referenceElm);
     }
@@ -127,8 +125,7 @@ export default class ConditionGroupView extends ConditionView {
 
   _defineObserveConditions() {
     const config = {attributes: false, childList: true, subtree: false};
-    const callback = function (mutationsList, observer) {
-      console.log(mutationsList, observer)
+    const callback = function (mutationsList) {
       for(const mutation of mutationsList) {
         if (mutation.type === 'childList') {
           const numberOfChild = this._numberOfChild;

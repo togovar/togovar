@@ -1,3 +1,4 @@
+import ConditionValueEditor from "./ConditionValueEditor.js";
 // import { response } from 'express';
 import {ADVANCED_CONDITIONS} from '../global.js';
 import {CONDITION_TYPE} from '../definition.js';
@@ -11,27 +12,22 @@ const DISEASE_API = {
   KEY: 'mesh_in'
 };
 
-export default class ConditionValueEditorColumns {
+export default class ConditionValueEditorColumns extends ConditionValueEditor {
 
   constructor(valuesView, conditionType) {
 
-    this._valuesView = valuesView;
-    this._conditionType = conditionType;
+    super(valuesView, conditionType);
+
     this._data = this._prepareData();
-    console.log(this._data)
     this._selectionDependedOnParent = SELECTION_DEPENDED_ON_PARENT[conditionType];
 
     // HTML
-    const section = document.createElement('section');
-    section.classList.add('columns-editor-view');
-    section.innerHTML = `
-      <header>Select ${conditionType}</header>
-      <div class="body">
-        <div class="columns"></div>
-        <div class="description"></div>
-      </div>`;
-    valuesView.sections.append(section);
-    this._body = section.querySelector(':scope > .body');
+    this._createElement('columns-editor-view', `
+    <header>Select ${conditionType}</header>
+    <div class="body">
+      <div class="columns"></div>
+      <div class="description"></div>
+    </div>`);
     this._columns = this._body.querySelector(':scope > .columns');
     this._description = this._body.querySelector(':scope > .description');
     this._drawColumn();
@@ -47,6 +43,10 @@ export default class ConditionValueEditorColumns {
   restore() {
     this._data.forEach(datum => datum.checked = this._lastValues.indexOf(datum.value) !== -1);
     this._update();
+  }
+
+  get isValid() {
+    return this._valueViews.length > 0;
   }
 
 
@@ -65,8 +65,6 @@ export default class ConditionValueEditorColumns {
   _drawColumn(parentId) {
     this._getItems(parentId)
       .then(items => {
-
-        console.log(items)
 
         // make HTML
         const column = document.createElement('div');
@@ -169,7 +167,6 @@ export default class ConditionValueEditorColumns {
                 if (parentId) {
                   const parentDatum = this._data.find(datum => datum.id == parentId);
                   parentDatum.children.push(...(newData.map(datum => datum.id)));
-                  console.log(parentDatum)
                 }
                 resolve(newData);
               })
@@ -199,7 +196,6 @@ export default class ConditionValueEditorColumns {
 
     const checkLeaves = (datum) => {
       if (!datum.children || datum.children.length === 0) return;
-      console.log(datum)
       let numberOfChecked = 0;
       datum.children.forEach(child => {
         const childDatum = this._data.find(datum => datum.id === child);
@@ -237,37 +233,23 @@ export default class ConditionValueEditorColumns {
     topLevelNodes.forEach(datum => checkLeaves(datum));
   }
 
-  _update(id) {
+  _update() {
 
     // reflect check status in DOM
     this._data.forEach(datum => {
       const checkbox = this._columns.querySelector(`li[data-id="${datum.id}"] > label > input`);
-      if (this._conditionType === CONDITION_TYPE.dataset) {
-        datum.checked = datum.id == id;
-        checkbox.checked = datum.checked;
-      } else {
-        if (checkbox) checkbox.checked = datum.checked;
-      }
+      if (checkbox) checkbox.checked = datum.checked;
     });
     // update selection status of upper hierarchy
     this._updateIndeterminate();
 
     // update values
-    const valuesElement = this._valuesView.conditionView.valuesElement;
-    const valueViews = Array.from(valuesElement.querySelectorAll(':scope > .value'));
     this._data.forEach(datum => {
       if (!datum.value) return;
-      const elm = valueViews.find(elm => elm.dataset.value === datum.value);
       if (datum.checked) {
-        if (elm === undefined) {
-          // add value element
-          valuesElement.insertAdjacentHTML('afterBegin', `<span class="value" data-value="${datum.value}">${datum.label}</span>`);
-        }
+        this._addValueView(datum.value, datum.label);
       } else {
-        if (elm) {
-          // remove value element
-          valuesElement.removeChild(elm);
-        }
+        this._removeValueView(datum.value);
       }
       
     });
@@ -277,14 +259,7 @@ export default class ConditionValueEditorColumns {
   }
 
   _validate() {
-    return this._isValid;
-  }
-
-
-  // public
-
-  get isValid() {
-    return Array.from(this._columns.querySelectorAll('li[data-value] > label > input')).some(checkbox => checkbox.checked);
+    return this.isValid;
   }
 
 }

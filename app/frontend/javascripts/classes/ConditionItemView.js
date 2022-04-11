@@ -13,7 +13,6 @@ export default class ConditionItemView extends ConditionView {
    * @param {Node} referenceElm
    */
   constructor(builder, parentView, conditionType, referenceElm = null) {
-    // console.log(builder, parentView, conditionType);
 
     super(CONDITION_ITEM_TYPE.condition, builder, parentView, referenceElm);
 
@@ -32,7 +31,10 @@ export default class ConditionItemView extends ConditionView {
         <div class="classification">${ADVANCED_CONDITIONS[conditionType].label}</div>
         <div class="relation"></div>
         <div class="values"></div>
-        <div class="editbutton">Edit</div>
+        <div class="buttons">
+          <button class="edit" title="Edit"></button>
+          <button class="delete" title="Delete"></button>
+        </div>
       </div>
       <div class="advanced-search-condition-editor-view"></div>
     </div>
@@ -59,14 +61,22 @@ export default class ConditionItemView extends ConditionView {
       // if (this._elm.dataset.relation === 'contains') return;
       this._elm.dataset.relation = {eq: 'ne', ne: 'eq'}[this._elm.dataset.relation];
     });
-    // switch edit mode
-    const editButton = summary.querySelector(':scope > .editbutton');
-    editButton.addEventListener('click', e => {
-      e.stopImmediatePropagation();
-      this._elm.classList.add('-editing');
-      this._conditionValues.startToEditCondition();
-    });
-    editButton.dispatchEvent(new Event('click'));
+    // buttons
+    for (const button of summary.querySelectorAll(':scope > .buttons > button')) {
+      button.addEventListener('click', e => {
+        e.stopImmediatePropagation();
+        switch (e.target.className) {
+          case 'edit':
+            this._elm.classList.add('-editing');
+            this._conditionValues.startToEditCondition();
+            break;
+          case 'delete':
+            this._builder.delete([this])
+            break;
+        }
+      });
+    }
+    summary.querySelector(':scope > .buttons > button.edit').dispatchEvent(new Event('click'));
   }
 
 
@@ -87,7 +97,6 @@ export default class ConditionItemView extends ConditionView {
   // }
 
   remove() {
-    console.log(this)
     delete this._conditionValues;
     super.remove();
     // this._parent.removeConditionView(this);
@@ -113,53 +122,18 @@ export default class ConditionItemView extends ConditionView {
   }
 
   get query() {
+    const values = Array.from(this._values.querySelectorAll(':scope > condition-item-value-view'));
     if (this._conditionType === CONDITION_TYPE.dataset) {
-      const value = this._values.querySelector(':scope > .value');
-      const frequencyCountValueView = this._values.querySelector(':scope > .frequency-count-value-view');
-      const dataset = {name: value.dataset.value};
-      const filtered = frequencyCountValueView.dataset.filtered === 'true' ? true : false;
-      if (frequencyCountValueView.dataset.mode === 'frequency' && frequencyCountValueView.dataset.invert === '1') {
-        return {
-          or: [
-            {
-              frequency: {
-                dataset,
-                frequency: {
-                  gte: 0,
-                  lte: Number(frequencyCountValueView.dataset.from)
-                },
-                filtered
-              }
-            },
-            {
-              frequency: {
-                dataset,
-                frequency: {
-                  gte: Number(frequencyCountValueView.dataset.to),
-                  lte: 1
-                },
-                filtered
-              }
-            }
-          ]
-        }
-      } else {
-        const values = {};
-        if (frequencyCountValueView.dataset.from !== '') values.gte = Number(frequencyCountValueView.dataset.from);
-        if (frequencyCountValueView.dataset.to !== '') values.lte = Number(frequencyCountValueView.dataset.to);
-        return {
-          frequency: {
-            dataset,
-            [frequencyCountValueView.dataset.mode]: values,
-            filtered
-          }
-        }
-      }
+      // if the condition type is dataset, special conditional expression is needed
+      const queries = values.map(view => view.shadowRoot.querySelector('frequency-count-value-view').queryValue);
+      return queries.length <= 1
+        ? queries[0]
+        : {or: queries};
     } else {
       return {
         [this._conditionType]: {
           relation: this._elm.dataset.relation,
-          terms: Array.from(this._values.querySelectorAll(':scope > .value')).map(value => value.dataset.value)
+          terms: values.map(value => value.value)
         }
       };
     }

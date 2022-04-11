@@ -86,6 +86,8 @@ $OPACITY_DISABLED: .5
             transform: translateY(0)
             > li
               padding: 4px 8px
+              &[data-condition="disease"] // TODO: 疾患が実装されたら削除
+                display: none
       &.command
         opacity: $OPACITY_DISABLED
         pointer-events: none

@@ -6,7 +6,6 @@ import 'jquery-ui/ui/data'
 import 'jquery-ui/ui/scroll-parent'
 import 'jquery-ui/ui/widgets/draggable'
 import 'jquery-ui/ui/widgets/mouse'
-import 'jquery-deparam'
 
 import {PAGE} from '../javascripts/global.js';
 import {initHome} from '../javascripts/home.js';

@@ -28,16 +28,15 @@ export default class AdvancedSearchBuilderView {
 
   // public methods
 
-  advancedSearchConditions(values) {
-    console.log(values)
-  }
+  // advancedSearchConditions(values) {
+  //   console.log(values)
+  // }
 
   /**
    * 
    * @param {Array} conditionViews
    */
   selectedConditionViews(conditionViews) {
-    console.log(conditionViews)
 
     // change status
     let canUngroup = false;
@@ -72,7 +71,6 @@ export default class AdvancedSearchBuilderView {
 
   changeCondition() {
     const query = this._rootGroup.query;
-    console.log(query)
     this._toolbar.canSearch(Object.keys(query).length > 0);
   }
 
@@ -104,22 +102,24 @@ export default class AdvancedSearchBuilderView {
     this.changeCondition();
   }
 
-  copy() {
-    console.log('_copy')
-    const selectingConditionViews = this._selection.getSelectingConditionViews();
-    console.log(selectingConditionViews)
-    // TODO:
-    this.changeCondition();
-  }
+  // copy() {
+  //   console.log('_copy')
+  //   const selectingConditionViews = this._selection.getSelectingConditionViews();
+  //   // TODO:
+  //   this.changeCondition();
+  // }
 
-  edit() {
-    console.log('_edit')
-    this.changeCondition();
-  }
+  // edit() {
+  //   console.log('_edit')
+  //   this.changeCondition();
+  // }
 
-  delete() {
-    console.log('_delete')
-    const conditionViews = this._selection.getSelectingConditionViews();
+  /**
+   * 
+   * @param {Array<ConditionView>} views 
+   */
+  delete(views) {
+    const conditionViews = views ?? this._selection.getSelectingConditionViews();
     for (const view of conditionViews) {
       view.remove();
     }

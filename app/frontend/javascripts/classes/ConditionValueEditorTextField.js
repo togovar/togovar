@@ -1,22 +1,17 @@
+import ConditionValueEditor from "./ConditionValueEditor.js";
 import SearchFieldView from './SearchFieldView.js';
 import {CONDITION_TYPE} from '../definition.js';
 
-export default class ConditionValueEditorTextField {
+export default class ConditionValueEditorTextField extends ConditionValueEditor {
 
   constructor(valuesView, conditionType) {
-    console.log(valuesView, conditionType)
 
-    this._valuesView = valuesView;
-    this._conditionType = conditionType;
+    super(valuesView, conditionType);
 
     // HTML
-    const section = document.createElement('section');
-    section.classList.add('text-field-editor-view');
-    section.innerHTML = `
-      <header>Select ${conditionType}</header>
-      <div class="body"></div>`;
-    valuesView.sections.append(section);
-    this._body = section.querySelector(':scope > .body');
+    this._createElement('text-field-editor-view', `
+    <header>Select ${conditionType}</header>
+    <div class="body"></div>`);
     this._searchFieldView = new SearchFieldView(
       this,
       this._body,
@@ -58,8 +53,7 @@ export default class ConditionValueEditorTextField {
 
     // update value
     const term = this._searchFieldView.value;
-    const valuesElement = this._valuesView.conditionView.valuesElement;
-    valuesElement.innerHTML = `<span class="value" data-value="${term}">${term}</span>`;
+    this._addValueView(term, term, true);
 
     // validation
     this._valuesView.update(this._validate());
