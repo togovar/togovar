@@ -180,7 +180,7 @@ export default class ResultsRowView {
           {
             const refalt = {
               ref: result.reference ? result.reference : '',
-              alt: result.alternative ? result.alternative : ''
+              alt: result.alternate ? result.alternate : ''
             }
             this.tdRefAltRef.textContent = refalt.ref.substr(0, REF_ALT_SHOW_LENGTH) + (refalt.ref.length > REF_ALT_SHOW_LENGTH ? '...' : '');
             this.tdRefAltRef.dataset.sum = refalt.ref.length;
