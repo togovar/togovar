@@ -2,8 +2,7 @@ variant:
   id: tgv_id
 
   base_options:
-    ep: $TOGOVAR_STANZA_SPARQL_URL
-    sparqlist: $TOGOVAR_STANZA_SPARQLIST_URL
+    sparqlist: $TOGOVAR_STANZA_SPARQLIST
 
   stanza:
     - id: variant-header
@@ -17,7 +16,7 @@ variant:
     - id: variant-other-overlapping-variants
       dom: "#variant-other-overlapping-variants"
       options:
-        search_api: $TOGOVAR_STANZA_SEARCH_API_URL
+        search_api: $TOGOVAR_STANZA_SEARCH
 
     - id: variant-frequency
       dom: "#variant-frequency"
@@ -29,12 +28,11 @@ variant:
       dom: "#variant-gwas"
       src: https://togostanza.github.io/metastanza/pagination-table.js
       options:
-        data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/variant_gwas?ep=${TOGOVAR_STANZA_SPARQL_URL}&tgv_id=${tgv_id}
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/variant_gwas?tgv_id=${tgv_id}
         data-type: json
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        togostanza-menu-placement: true
         columns:
           - id: variant_and_risk_allele
             label: rs# and risk allele
@@ -85,7 +83,7 @@ variant:
       dom: "#variant-genomic-context"
       options:
         assembly: GRCh37
-        jbrowse: $TOGOVAR_STANZA_JBROWSE_URL
+        jbrowse: $TOGOVAR_STANZA_JBROWSE
         margin: 50
 
     - id: variant-gene
@@ -105,8 +103,7 @@ gene:
   id: hgnc_id
 
   base_options:
-    ep: $TOGOVAR_STANZA_SPARQL_URL
-    sparqlist: $TOGOVAR_STANZA_SPARQLIST_URL
+    sparqlist: $TOGOVAR_STANZA_SPARQLIST
 
   stanza:
     - id: gene-header
@@ -114,20 +111,19 @@ gene:
       options:
         togostanza-menu-placement: none
 
-    - id: gene-base
-      dom: "#gene-base"
+    - id: gene-summary
+      dom: "#gene-summary"
 
     - id: pagination-table
       dom: "#gene-clinvar"
       src: https://togostanza.github.io/metastanza/pagination-table.js
       options:
-        data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/gene_clinvar?ep=${TOGOVAR_STANZA_SPARQL_URL}&hgnc_id=${hgnc_id}
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/gene_clinvar?hgnc_id=${hgnc_id}
         data-type: json
         custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        togostanza-menu-placement: true
         columns:
           - id: tgv_id
             label: TogoVar ID
@@ -164,13 +160,12 @@ gene:
       dom: "#gene-gwas"
       src: https://togostanza.github.io/metastanza/pagination-table.js
       options:
-        data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/gene_gwas?ep=${TOGOVAR_STANZA_SPARQL_URL}&hgnc_id=${hgnc_id}
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/gene_gwas?hgnc_id=${hgnc_id}
         data-type: json
         padding: 0
         custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css
         page-size-option: 5,10,20,50,100
         page-slider: false
-        togostanza-menu-placement: true
         columns:
           - id: tgv_id
             label: TogoVar ID
@@ -237,7 +232,7 @@ gene:
       dom: "#gene-genomic-context"
       options:
         assembly: GRCh37
-        jbrowse: $TOGOVAR_STANZA_JBROWSE_URL
+        jbrowse: $TOGOVAR_STANZA_JBROWSE
         margin: 200
 
     - id: gene-variant
@@ -250,8 +245,7 @@ disease:
   id: medgen_cid
 
   base_options:
-    ep: $TOGOVAR_STANZA_SPARQL_URL
-    sparqlist: $TOGOVAR_STANZA_SPARQLIST_URL
+    sparqlist: $TOGOVAR_STANZA_SPARQLIST
 
   stanza:
     - id: disease-header
@@ -260,13 +254,12 @@ disease:
         togostanza-menu-placement: none
 
     - id: hash-table
-      dom: "#disease-base"
+      dom: "#disease-summary"
       src: https://togostanza.github.io/metastanza/hash-table.js
       options:
-        data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/disease_base?ep=${TOGOVAR_STANZA_SPARQL_URL}&medgen_cid=${medgen_cid}
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/disease_summary?medgen_cid=${medgen_cid}
         data-type: json
         padding: 0
-        togostanza-menu-placement: true
         columns:
           - id: label
             label: Title
@@ -280,13 +273,12 @@ disease:
       dom: "#disease-clinvar"
       src: https://togostanza.github.io/metastanza/pagination-table.js
       options:
-        data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/disease_clinvar?ep=${TOGOVAR_STANZA_SPARQL_URL}&medgen_cid=${medgen_cid}
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/disease_clinvar?medgen_cid=${medgen_cid}
         data-type: json
         custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        togostanza-menu-placement: true
         columns:
           - id: tgv_id
             label: TogoVar ID
@@ -320,12 +312,11 @@ disease:
       dom: "#disease-gwas"
       src: https://togostanza.github.io/metastanza/pagination-table.js
       options:
-        data-url: ${TOGOVAR_STANZA_SPARQLIST_URL}/api/disease_gwas?ep=${TOGOVAR_STANZA_SPARQL_URL}&medgen_cid=${medgen_cid}
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/disease_gwas?medgen_cid=${medgen_cid}
         data-type: json
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        togostanza-menu-placement: true
         columns:
           - id: variant_and_risk_allele
             label: rs# and risk allele
