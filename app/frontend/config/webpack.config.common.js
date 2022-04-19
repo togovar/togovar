@@ -1,10 +1,12 @@
 const webpack = require('webpack');
 const path = require('path');
 
-const DotenvWebpack = require('dotenv-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+const env = require('dotenv').config().parsed || {};
+Object.assign(process.env, env);
 
 const config = {
   entry: {
@@ -121,14 +123,13 @@ const config = {
       filename: 'css/[name]-[contenthash].css',
     }),
     new WebpackManifestPlugin(),
-    new DotenvWebpack(),
     new webpack.DefinePlugin({
-      TOGOVAR_FRONTEND_API_URL: JSON.stringify(process.env.TOGOVAR_FRONTEND_API_URL || "https://togovar.biosciencedbc.jp"),
-      TOGOVAR_ENDPOINT_SPARQL: JSON.stringify(process.env.TOGOVAR_ENDPOINT_SPARQL || "https://togovar.biosciencedbc.jp/sparql"),
-      TOGOVAR_ENDPOINT_SPARQLIST: JSON.stringify(process.env.TOGOVAR_ENDPOINT_SPARQLIST || "https://togovar.biosciencedbc.jp/sparqlist"),
-      TOGOVAR_ENDPOINT_SEARCH: JSON.stringify(process.env.TOGOVAR_ENDPOINT_SEARCH || "https://togovar.biosciencedbc.jp/search"),
-      TOGOVAR_ENDPOINT_JBROWSE: JSON.stringify(process.env.TOGOVAR_ENDPOINT_JBROWSE || "https://togovar.biosciencedbc.jp/jbrowse"),
-      TOGOVAR_ENDPOINT_STANZA: JSON.stringify(process.env.TOGOVAR_ENDPOINT_STANZA || "https://togovar.biosciencedbc.jp/stanza"),
+      TOGOVAR_FRONTEND_API_URL: JSON.stringify(process.env.TOGOVAR_FRONTEND_API_URL),
+      TOGOVAR_FRONTEND_STANZA_URL: JSON.stringify(process.env.TOGOVAR_FRONTEND_STANZA_URL),
+      TOGOVAR_ENDPOINT_SPARQL: JSON.stringify(process.env.TOGOVAR_ENDPOINT_SPARQL),
+      TOGOVAR_ENDPOINT_SPARQLIST: JSON.stringify(process.env.TOGOVAR_ENDPOINT_SPARQLIST),
+      TOGOVAR_ENDPOINT_SEARCH: JSON.stringify(process.env.TOGOVAR_ENDPOINT_SEARCH),
+      TOGOVAR_ENDPOINT_JBROWSE: JSON.stringify(process.env.TOGOVAR_ENDPOINT_JBROWSE),
     }),
   ],
 };
