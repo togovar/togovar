@@ -9,10 +9,10 @@ module TogoVar
             jga_ngs
             jga_snp
             hgvd
-            tommo_4.7kjpn
+            tommo
             gem_j_wga
-            exac
-            gnomad
+            gnomad_genomes
+            gnomad_exomes
           ].freeze
 
           attr_reader :name
