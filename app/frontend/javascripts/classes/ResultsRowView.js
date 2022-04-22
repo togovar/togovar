@@ -198,8 +198,7 @@ export default class ResultsRowView {
           {
             if (result.symbols && result.symbols.length) {
               this.tdGene.dataset.remains = result.symbols.length - 1;
-              this.tdGeneAnchor.href = `http://identifiers.org/hgnc/${result.symbols[0].id}`;
-              // TODO: 本当のリンク先は、遺伝子ビュー
+              this.tdGeneAnchor.href = `/gene/${result.symbols[0].id}`;
               this.tdGeneAnchor.textContent = result.symbols[0].name;
             } else {
               this.tdGene.dataset.remains = 0;
