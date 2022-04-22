@@ -139,9 +139,8 @@ class VariationSearchService
                             .map { |x| Form::ClinicalSignificance[x.tr(' ', '_').to_sym]&.param_name }
 
         significance = Array(variation.dig(:clinvar, :medgen))
-                         .map.with_index { |x, i| x ? conditions[x] : variation.dig(:clinvar, :condition, i) }
-                         .zip(interpretations)
-                         .map { |a, b| { condition: a, interpretations: [b] } }
+                         .zip(interpretations).map
+                         .with_index { |x, i| { medgen: x[0], condition: x[0].present? ? conditions[x[0]] : variation.dig(:clinvar, :condition, i), interpretations: [x[1]] } }
 
         if significance.present?
           json.significance significance
