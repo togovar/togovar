@@ -3,7 +3,8 @@ const commonConfig = require('./webpack.config.common');
 
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const GoogleTagManagerPlugin = require('webpack-google-tag-manager-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+
 const TerserJSPlugin = require('terser-webpack-plugin');
 
 const GMT_ID = process.env.TOGOVAR_FRONTEND_GTM_ID;
@@ -30,9 +31,8 @@ module.exports = merge(commonConfig, {
           },
         },
       }),
-      new OptimizeCSSAssetsPlugin({
-        cssProcessor: require('cssnano'),
-        cssProcessorPluginOptions: {
+      new CssMinimizerPlugin({
+        minimizerOptions: {
           preset: [
             'default', {
               discardComments: {
