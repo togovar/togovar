@@ -41,16 +41,13 @@ export const mixin = {
   // Search condition *******************************************
   
   setSimpleSearchCondition(key, values) {
-    // console.log(key, values)
     if (!this._isReadySearch) return;
     this._setSimpleSearchConditions({[key]: values});
   },
 
   // in Advanced Search, search criteria are received as queries, not key values.
   setAdvancedSearchCondition(conditions, fromHistory) {
-    console.log(conditions, fromHistory)
     if (!this._isReadySearch) return;
-    console.log(conditions)
     this._store.advancedSearchConditions = conditions;
     // convert queries to URL parameters
     if (!fromHistory) this._reflectAdvancedSearchConditionToURI();

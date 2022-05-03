@@ -13,7 +13,6 @@ export default class RangeSelectorView {
    * @param {String} searchType 'simple' or 'advanced'
    */
   constructor(elm, delegate, max, orientation, searchType) {
-    console.log(elm, delegate, max, orientation, searchType)
 
     this.elm = elm;
     this._delegate = delegate;
@@ -142,7 +141,6 @@ export default class RangeSelectorView {
   }
 
   updateGUIWithCondition(condition) {
-    console.log(condition);
     window.requestAnimationFrame(() => {
       // values
       if (condition.from) this._from.value = condition.from;
@@ -179,10 +177,6 @@ export default class RangeSelectorView {
   }
 
   get _sliderWidth() {
-    console.log(this._slider.offsetWidth)
-    console.log(this._slider.getBoundingClientRect())
-    console.log( window.getComputedStyle(this._slider).getPropertyValue('width') )
-    
     return this._slider.offsetWidth - 16;
   }
 
