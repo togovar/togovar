@@ -415,9 +415,9 @@
         },
         {
           "id": 4,
-          "value": "tommo_4.7kjpn",
-          "label": "ToMMo 4.7KJPN",
-          "description": "ToMMo 4.7KJPN Allele Frequency Panel"
+          "value": "tommo",
+          "label": "ToMMo 8.3KJPN",
+          "description": "ToMMo 8.3KJPN Allele Frequency Panel"
         },
         {
           "id": 5,
@@ -427,15 +427,15 @@
         },
         {
           "id": 6,
-          "value": "exac",
-          "label": "ExAC",
-          "description": "Exome Aggregation Consortium"
+          "value": "gnomad_genomes",
+          "label": "gnomAD genomes",
+          "description": ""
         },
         {
           "id": 7,
-          "value": "gnomad",
-          "label": "gnomAD",
-          "description": "The Genome Aggregation Database"
+          "value": "gnomad_exomes",
+          "label": "gnomAD exomes",
+          "description": ""
         }
       ]
     }
