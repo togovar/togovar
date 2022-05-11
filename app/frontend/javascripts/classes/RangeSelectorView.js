@@ -28,9 +28,9 @@ export default class RangeSelectorView {
     })();
     elm.innerHTML = `
       <div class="input">
-        <input class="from" max="1" min="0" step="0.01" type="number" value="0">
+        <input class="from" max="1" min="0" step="0.01" type="number" value="0" title="Lower limit">
         ~
-        <input class="to" max="1" min="0" step="0.01" type="number" value="1">
+        <input class="to" max="1" min="0" step="0.01" type="number" value="1" title="Upper limit">
         <label>
           <input class="invert" type="checkbox">Invert range
         </label>
