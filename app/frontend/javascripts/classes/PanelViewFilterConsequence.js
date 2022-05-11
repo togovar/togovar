@@ -33,7 +33,7 @@ export default class PanelViewFilterConsequence extends PanelView {
     for (const key in this._inputsValues) {
       this._inputsValues[key].input.addEventListener('change', this._changeFilter.bind(this));
     }
-    StoreManager.bind('searchConditions', this);
+    StoreManager.bind('simpleSearchConditions', this);
     StoreManager.bind('statisticsConsequence', this);
   }
 
@@ -155,7 +155,7 @@ export default class PanelViewFilterConsequence extends PanelView {
         checked[key] = this._inputsValues[key].input.checked ? '1' : '0';
       }
     }
-    StoreManager.setSearchCondition(KIND_OF_CONDITION, checked);
+    StoreManager.setSimpleSearchCondition(KIND_OF_CONDITION, checked);
   }
 
   updateNestedCheckboxes() {
@@ -169,9 +169,9 @@ export default class PanelViewFilterConsequence extends PanelView {
   }
 
   // フィルターを更新すると呼ばれる
-  searchConditions(searchConditions) {
-    for (const key in searchConditions[KIND_OF_CONDITION]) {
-      this._inputsValues[key].input.checked = searchConditions[KIND_OF_CONDITION][key] !== '0';
+  simpleSearchConditions(conditions) {
+    for (const key in conditions[KIND_OF_CONDITION]) {
+      this._inputsValues[key].input.checked = conditions[KIND_OF_CONDITION][key] !== '0';
     }
     this.updateNestedCheckboxes();
   }

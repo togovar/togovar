@@ -8,12 +8,11 @@ export default class RangeSelectorView {
    * 
    * @param {HTMLElement} elm
    * @param {Object} delegate
-   * @param {Number} _min
    * @param {Number} max
    * @param {String} orientation 'horizontal' or 'vertical'
    * @param {String} searchType 'simple' or 'advanced'
    */
-  constructor(elm, delegate, _min = 0, max, orientation, searchType) {
+  constructor(elm, delegate, max, orientation, searchType) {
 
     this.elm = elm;
     this._delegate = delegate;
@@ -29,9 +28,9 @@ export default class RangeSelectorView {
     })();
     elm.innerHTML = `
       <div class="input">
-        <input class="from" max="1" min="0" step="0.01" type="number" value="0">
+        <input class="from" max="1" min="0" step="0.01" type="number" value="0" title="Lower limit">
         ~
-        <input class="to" max="1" min="0" step="0.01" type="number" value="1">
+        <input class="to" max="1" min="0" step="0.01" type="number" value="1" title="Upper limit">
         <label>
           <input class="invert" type="checkbox">Invert range
         </label>
@@ -75,10 +74,9 @@ export default class RangeSelectorView {
       this._any = match.querySelector(':scope > label > .any');
     }
 
-    setTimeout(() => {
-
-      this._sliderWidth = this._slider.offsetWidth - 16;
-
+    window.requestAnimationFrame(() => {
+      // this._sliderWidth = this._slider.offsetWidth - 16;
+  
       // events
       this._from.addEventListener('change', e => {
         e.target.value = parseFloat(e.target.value) < 0 ? 0 : e.target.value;
@@ -106,9 +104,8 @@ export default class RangeSelectorView {
       });
       
       // default values
-      this._changeParameter({});
-
-    }, 100);
+      // this._changeParameter({});
+    });
 
   }
 
@@ -144,27 +141,29 @@ export default class RangeSelectorView {
   }
 
   updateGUIWithCondition(condition) {
-    // values
-    if (condition.from) this._from.value = condition.from;
-    if (condition.to) this._to.value = condition.to;
-    // slider
-    this._sliderFrom.style.left = this._fromPosition;
-    this._sliderTo.style.left = this._toPosition;
-    // meter
-    this._bar.style.left = `${this._from.value * 100}%`;
-    this._bar.style.width = `${(this._to.value - this._from.value) * 100}%`;
-    // invert
-    if (condition.invert) this._invert.checked = condition.invert === '1' || condition.invert === true;
-    if (this._invert.checked) {
-      this.elm.classList.add('-inverting');
-    } else {
-      this.elm.classList.remove('-inverting');
-    }
-    // match
-    if (this._searchType === 'simple') {
-      this._all.checked = condition.match === 'all';
-      this._any.checked = condition.match === 'any';
-    }
+    window.requestAnimationFrame(() => {
+      // values
+      if (condition.from) this._from.value = condition.from;
+      if (condition.to) this._to.value = condition.to;
+      // slider
+      this._sliderFrom.style.left = this._fromPosition;
+      this._sliderTo.style.left = this._toPosition;
+      // meter
+      this._bar.style.left = `${this._from.value * 100}%`;
+      this._bar.style.width = `${(this._to.value - this._from.value) * 100}%`;
+      // invert
+      if (condition.invert) this._invert.checked = condition.invert === '1' || condition.invert === true;
+      if (this._invert.checked) {
+        this.elm.classList.add('-inverting');
+      } else {
+        this.elm.classList.remove('-inverting');
+      }
+      // match
+      if (this._searchType === 'simple') {
+        this._all.checked = condition.match === 'all';
+        this._any.checked = condition.match === 'any';
+      }
+    });
   }
 
   // get _sliderWidth() {
@@ -175,6 +174,10 @@ export default class RangeSelectorView {
   }
   get _toPosition() {
     return `${this._sliderWidth * this._to.value + 8}px`;
+  }
+
+  get _sliderWidth() {
+    return this._slider.offsetWidth - 16;
   }
 
 }

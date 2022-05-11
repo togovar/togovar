@@ -18,7 +18,7 @@ export default class SideBar {
   _setupResetButton() {
     const resetButton = this._elm.querySelector('#Filters > .title > .button-view');
     resetButton.addEventListener('click', () => {
-      StoreManager.resetSearchConditions();
+      StoreManager.resetSimpleSearchConditions();
     });
   }
 
