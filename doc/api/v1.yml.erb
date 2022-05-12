@@ -1,7 +1,7 @@
 openapi: 3.0.3
 
 servers:
-  - url: <%= "#{ENV['TOGOVAR_FRONTEND_URL']}/api" %>
+  - url: <%= "#{ENV['TOGOVAR_FRONTEND_API_URL']}/api" %>
 
 info:
   title: TogoVar API
@@ -19,7 +19,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/Pretty'
       requestBody:
-        $ref: '#/components/requestBodies/SearchVariation'
+        $ref: '#/components/requestBodies/SearchVariant'
       responses:
         '200':
           description: >
@@ -226,8 +226,8 @@ components:
         nullable: true
 
   requestBodies:
-    SearchVariation:
-      description: Schema for searching variation
+    SearchVariant:
+      description: Schema for searching variant
       content:
         application/json:
           schema:
@@ -241,9 +241,9 @@ components:
                   - "1"
               query:
                 oneOf:
-                  - $ref: '#/components/schemas/VariationType'
-                  - $ref: '#/components/schemas/VariationConsequence'
-                  - $ref: '#/components/schemas/VariationFrequency'
+                  - $ref: '#/components/schemas/VariantType'
+                  - $ref: '#/components/schemas/VariantConsequence'
+                  - $ref: '#/components/schemas/VariantFrequency'
                   - $ref: '#/components/schemas/ClinicalSignificance'
                   - $ref: '#/components/schemas/GeneSymbol'
                   - $ref: '#/components/schemas/Disease'
@@ -270,16 +270,16 @@ components:
 
           examples:
             Example1:
-              $ref: '#/components/examples/SearchVariation-1'
+              $ref: '#/components/examples/SearchVariant-1'
             Example2:
-              $ref: '#/components/examples/SearchVariation-2'
+              $ref: '#/components/examples/SearchVariant-2'
             Example3:
-              $ref: '#/components/examples/SearchVariation-3'
+              $ref: '#/components/examples/SearchVariant-3'
             Example4:
-              $ref: '#/components/examples/SearchVariation-4'
+              $ref: '#/components/examples/SearchVariant-4'
 
   schemas:
-    VariationType:
+    VariantType:
       type: object
       additionalProperties: false
       required:
@@ -325,7 +325,7 @@ components:
                   - indel
                   - sub
 
-    VariationConsequence:
+    VariantConsequence:
       type: object
       additionalProperties: false
       required:
@@ -467,7 +467,7 @@ components:
                   - feature_truncation
                   - intergenic_variant
 
-    VariationFrequency:
+    VariantFrequency:
       type: object
       additionalProperties: false
       required:
@@ -490,7 +490,7 @@ components:
                   $ref: '#/components/schemas/Range'
                 filtered:
                   type: boolean
-                  description: if `true`, exclude variations with a FILTER flag other than PASS
+                  description: if `true`, exclude variants with a FILTER flag other than PASS
 
             - type: object
               additionalProperties: false
@@ -503,7 +503,7 @@ components:
                   $ref: '#/components/schemas/Range'
                 filtered:
                   type: boolean
-                  description: if `true`, exclude variations with a FILTER flag other than PASS
+                  description: if `true`, exclude variants with a FILTER flag other than PASS
 
     ClinicalSignificance:
       type: object
@@ -765,9 +765,9 @@ components:
           items:
             type: object
             oneOf:
-              - $ref: '#/components/schemas/VariationType'
-              - $ref: '#/components/schemas/VariationConsequence'
-              - $ref: '#/components/schemas/VariationFrequency'
+              - $ref: '#/components/schemas/VariantType'
+              - $ref: '#/components/schemas/VariantConsequence'
+              - $ref: '#/components/schemas/VariantFrequency'
               - $ref: '#/components/schemas/ClinicalSignificance'
               - $ref: '#/components/schemas/GeneSymbol'
               - $ref: '#/components/schemas/Disease'
@@ -786,9 +786,9 @@ components:
           items:
             type: object
             oneOf:
-              - $ref: '#/components/schemas/VariationType'
-              - $ref: '#/components/schemas/VariationConsequence'
-              - $ref: '#/components/schemas/VariationFrequency'
+              - $ref: '#/components/schemas/VariantType'
+              - $ref: '#/components/schemas/VariantConsequence'
+              - $ref: '#/components/schemas/VariantFrequency'
               - $ref: '#/components/schemas/ClinicalSignificance'
               - $ref: '#/components/schemas/GeneSymbol'
               - $ref: '#/components/schemas/Disease'
@@ -796,8 +796,8 @@ components:
               - $ref: '#/components/schemas/Or'
 
   examples:
-    SearchVariation-1:
-      summary: List variations whose class is any of insertion, deletion and indel.
+    SearchVariant-1:
+      summary: List variants whose class is any of insertion, deletion and indel.
       value:
         query:
           type:
@@ -807,8 +807,8 @@ components:
               - del
               - indel
 
-    SearchVariation-2:
-      summary: List variations exists on Aldehyde Dehydrogenase 2 family member (ALDH2).
+    SearchVariant-2:
+      summary: List variants exists on Aldehyde Dehydrogenase 2 family member (ALDH2).
       value:
         query:
           gene_symbol:
@@ -816,8 +816,8 @@ components:
             terms:
               - ALDH2
 
-    SearchVariation-3:
-      summary: List variations ranges from 0.05 to 0.95 in frequency in JGA-NGS.
+    SearchVariant-3:
+      summary: List variants ranges from 0.05 to 0.95 in frequency in JGA-NGS.
       value:
         query:
           or:
@@ -836,7 +836,7 @@ components:
                   lte: 1.0
                 filtered: true
 
-    SearchVariation-4:
+    SearchVariant-4:
       summary: Paginate result over 10,000 records.
       value:
         query:
