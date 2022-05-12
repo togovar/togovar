@@ -241,6 +241,8 @@ components:
                   - "1"
               query:
                 oneOf:
+                  - $ref: '#/components/schemas/ID'
+                  - $ref: '#/components/schemas/Position'
                   - $ref: '#/components/schemas/VariantType'
                   - $ref: '#/components/schemas/VariantConsequence'
                   - $ref: '#/components/schemas/VariantFrequency'
@@ -279,6 +281,57 @@ components:
               $ref: '#/components/examples/SearchVariant-4'
 
   schemas:
+    ID:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+      properties:
+        id:
+          type: array
+          items:
+            type: string
+            description: tgv ID
+
+    Position:
+      type: object
+      additionalProperties: false
+      required:
+        - choromosome
+        - position
+      properties:
+        choromosome:
+          type: string
+          description: chromosome name
+          enum:
+            - "1"
+            - "2"
+            - "3"
+            - "4"
+            - "5"
+            - "6"
+            - "7"
+            - "8"
+            - "9"
+            - "10"
+            - "11"
+            - "12"
+            - "13"
+            - "14"
+            - "15"
+            - "16"
+            - "17"
+            - "18"
+            - "19"
+            - "20"
+            - "21"
+            - "22"
+            - X
+            - Y
+            - MT
+        position:
+          $ref: '#/components/schemas/Range'
+
     VariantType:
       type: object
       additionalProperties: false
@@ -765,6 +818,8 @@ components:
           items:
             type: object
             oneOf:
+              - $ref: '#/components/schemas/ID'
+              - $ref: '#/components/schemas/Position'
               - $ref: '#/components/schemas/VariantType'
               - $ref: '#/components/schemas/VariantConsequence'
               - $ref: '#/components/schemas/VariantFrequency'
@@ -786,6 +841,8 @@ components:
           items:
             type: object
             oneOf:
+              - $ref: '#/components/schemas/ID'
+              - $ref: '#/components/schemas/Position'
               - $ref: '#/components/schemas/VariantType'
               - $ref: '#/components/schemas/VariantConsequence'
               - $ref: '#/components/schemas/VariantFrequency'
