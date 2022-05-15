@@ -28,9 +28,9 @@ export default class AdvancedSearchBuilderView {
 
   // public methods
 
-  // advancedSearchConditions(values) {
-  //   console.log(values)
-  // }
+  advancedSearchConditions(values) {
+    console.log(values)
+  }
 
   /**
    * 
@@ -129,7 +129,7 @@ export default class AdvancedSearchBuilderView {
 
   search() {
     const query = this._rootGroup.query;
-    StoreManager.setAd__vancedSearchCondition(query);
+    StoreManager.setAdvancedSearchCondition(query);
   }
 
   // add search condition to the currently selected layer
@@ -146,14 +146,12 @@ export default class AdvancedSearchBuilderView {
     let newConditionView;
     switch(selectingConditionView.type) {
       case CONDITION_ITEM_TYPE.condition:
-        console.log('TODO: ')
         // TODO: コンディションを選択していた場合に、その後ろに新規条件を追加
         break;
       case CONDITION_ITEM_TYPE.group:
         newConditionView = selectingConditionView.addNewConditionItem(conditionType);
         break;
     }
-    console.log(newConditionView);
   }
 
 

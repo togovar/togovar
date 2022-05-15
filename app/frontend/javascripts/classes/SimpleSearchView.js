@@ -1,6 +1,5 @@
 import StoreManager from "./StoreManager.js";
 import SearchFieldView from "./SearchFieldView.js";
-// import {API_URL} from "../global.js";
 
 const EXAMPLES = [
   {
@@ -29,7 +28,7 @@ const EXAMPLES = [
   }
 ]
 
-export default class SearchConditionController {
+export default class SimpleSearchView {
 
   constructor() {
 
@@ -42,7 +41,7 @@ export default class SearchConditionController {
     );
 
     // events
-    StoreManager.bind('searchConditions', this);
+    StoreManager.bind('simpleSearchConditions', this);
     // value
     const term = StoreManager.getSearchCondition('term');
     if (term) this._searchFieldView.setTerm(term);
@@ -59,12 +58,12 @@ export default class SearchConditionController {
   }
 
   search(value) {
-    StoreManager.setSearchCondition('term', value);
+    StoreManager.setSimpleSearchCondition('term', value);
   }
 
-  searchConditions(searchConditions) {
-    if (searchConditions.term) {
-      this._searchFieldView.setTerm(searchConditions.term);
+  simpleSearchConditions(conditions) {
+    if (conditions.term) {
+      this._searchFieldView.setTerm(conditions.term);
     }
   }
 
