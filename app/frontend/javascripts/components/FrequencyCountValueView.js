@@ -57,7 +57,7 @@ export class FrequencyCountValueView extends LitElement {
   :host([data-dataset="jga_snp"]) > .frequencygraph > .bar {
     background-color:var(--color-dataset-jga);
   }
-  :host([data-dataset="tommo_4.7kjpn"]) > .frequencygraph > .bar {
+  :host([data-dataset="tommo"]) > .frequencygraph > .bar {
     background-color:var(--color-dataset-tommo);
   }
   :host([data-dataset="hgvd"]) > .frequencygraph > .bar,
