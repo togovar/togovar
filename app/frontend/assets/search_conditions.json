@@ -662,7 +662,7 @@
       },
       {
         "id": "tommo",
-        "label": "ToMMo 4.7KJPN",
+        "label": "ToMMo 8.3KJPN",
         "type": "object",
         "default": {
           "from": 0,
