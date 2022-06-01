@@ -12,12 +12,17 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
     const condition = this._getConditionFromStore();
 
     const rangeSlider = document.createElement("range-slider");
-    rangeSlider.setAttribute("min", 0);
-    rangeSlider.setAttribute("max", 1);
-    rangeSlider.setAttribute("step", 0.05);
+    rangeSlider.step = 0.005;
+    rangeSlider.value1 = condition.from;
+    rangeSlider.value2 = condition.to;
+
+    rangeSlider.addEventListener("range-changed", (e) => {
+      e.stopPropagation();
+      this.changeParameter({ from: +e.detail.from, to: +e.detail.to });
+    });
 
     this.elm.querySelector(".range-selector-view").appendChild(rangeSlider);
-    // this._rangeSelectorView = new RangeSelectorView(elm.querySelector('.range-selector-view'), this, 1, 'vertical', 'simple');
+    this._rangeSelectorView = rangeSlider; //new RangeSelectorView(elm.querySelector('.range-selector-view'), this, 1, 'vertical', 'simple');
     // this._rangeSelectorView.updateGUIWithCondition(condition);
 
     // events
@@ -35,7 +40,7 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
   simpleSearchConditions(conditions) {
     const condition = conditions[this.kind];
     if (condition === undefined) return;
-    this._rangeSelectorView.updateGUIWithCondition(condition);
+    // this._rangeSelectorView.updateGUIWithCondition(condition);
   }
 
   _getConditionFromStore() {
