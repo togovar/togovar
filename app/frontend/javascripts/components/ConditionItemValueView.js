@@ -44,11 +44,11 @@ export class ConditionItemValueView extends LitElement {
   :host([data-value="jga_snp"]) > .inner::before {
     color: var(--color-dataset-jga);
   }
-  :host([data-value="tommo_4.7kjpn"]) > .inner {
+  :host([data-value="tommo"]) > .inner {
     border-color: var(--color-dataset-tommo);
     background-color: var(--color-dataset-tommo-light);
   }
-  :host([data-value="tommo_4.7kjpn"]) > .inner::before {
+  :host([data-value="tommo"]) > .inner::before {
     color: var(--color-dataset-tommo);
   }
   :host([data-value="hgvd"]) > .inner,

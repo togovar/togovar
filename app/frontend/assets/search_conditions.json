@@ -661,8 +661,8 @@
         }
       },
       {
-        "id": "tommo_4.7kjpn",
-        "label": "ToMMo 4.7KJPN",
+        "id": "tommo",
+        "label": "ToMMo 8.3KJPN",
         "type": "object",
         "default": {
           "from": 0,
