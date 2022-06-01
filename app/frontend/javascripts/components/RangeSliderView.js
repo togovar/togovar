@@ -75,14 +75,14 @@ input[type="range"] {
   
   input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    height: 1.7em;
+    height: 1.5em;
     width: 0.3em;
     background-color: transparent;
     border-top: solid 1px rgba(0, 0, 0, 0.5);
     border-bottom: solid 1px rgba(0, 0, 0, 0.5);
     cursor: col-resize;
     pointer-events: auto;
-    margin-top: -9px;
+    margin-top: -8px;
   }
   
   input[type="range"]:active::-webkit-slider-thumb {
@@ -94,31 +94,33 @@ input[type="range"] {
 <style data="slider-track-style"></style>
 <div class="wrapper">
 
-<div class="input">
-    <input class="from" type="number"  title="Lower limit">
-~
-    <input class="to"type="number" title="Upper limit">
-    <label>
-        <input class="invert" type="checkbox">Invert range
-    </label>
-</div>
-<div class="meter">
-    <div class="meter-container">
-        <div class="slider-track" id="slider-track"></div>
-        <input
-            type="range"
-            name="slider-1"
-            id="slider-1"
-
-        />
-        <input
-        type="range"
-        name="slider-2"
-        id="slider-2"
-
-        />
+    <div class="input">
+        <input class="from" type="number"  title="Lower limit">
+    ~
+        <input class="to"type="number" title="Upper limit">
+        <label>
+            <input class="invert" type="checkbox">Invert range
+        </label>
     </div>
-</div>
+    <div class="meter">
+        <div class="meter-container">
+            <div class="slider-track" id="slider-track" part="slider-track"></div>
+            <input
+                part = "slider"
+                type="range"
+                name="slider-1"
+                id="slider-1"
+
+            />
+            <input
+            part = "slider"
+            type="range"
+            name="slider-2"
+            id="slider-2"
+
+            />
+        </div>
+    </div>
 </div>
 
 `;
@@ -220,9 +222,9 @@ class RangeSlider extends HTMLElement {
     const percentVal2 = (val2 * 100) / (this.max - this.min);
 
     if (!this.invert) {
-      this.sliderTrack.style.background = `linear-gradient(90deg, rgb(200, 200, 200) 0%, rgb(200, 200, 200) calc(${percentVal1}% + 2px), rgb(0,20,200) ${percentVal1}%,   rgb(0,20,200) ${percentVal2}%, rgb(200, 200, 200) ${percentVal2}%,  rgb(200, 200, 200) 100% )`;
+      this.sliderTrack.style.background = `linear-gradient(90deg, rgb(200, 200, 200) 0%, rgb(200, 200, 200) ${percentVal1}% , rgb(0,20,200) ${percentVal1}%,   rgb(0,20,200) ${percentVal2}%, rgb(200, 200, 200) ${percentVal2}%,  rgb(200, 200, 200) 100% )`;
     } else {
-      this.sliderTrack.style.background = `linear-gradient(90deg, rgb(0,20,200) 0%, rgb(0,20,200) calc(${percentVal1}% + 2px), rgb(200, 200, 200) ${percentVal1}%,  rgb(200, 200, 200) ${percentVal2}%, rgb(0,20,200) ${percentVal2}%,  rgb(0,20,200) 100% )`;
+      this.sliderTrack.style.background = `linear-gradient(90deg, rgb(0,20,200) 0%, rgb(0,20,200) ${percentVal1}%, rgb(200, 200, 200) ${percentVal1}%,  rgb(200, 200, 200) ${percentVal2}%, rgb(0,20,200) ${percentVal2}%,  rgb(0,20,200) 100% )`;
     }
 
     this._drawThumbs();
@@ -234,7 +236,7 @@ class RangeSlider extends HTMLElement {
         "style[data='slider-track-style']"
       ).innerHTML = `#slider-1::-webkit-slider-thumb {
             border-right: 1px solid rgba(0, 0, 0, 0.5);
-           
+            transform: translateX(-3px);
         }
         #slider-2::-webkit-slider-thumb {
             border-left: 1px solid rgba(0, 0, 0, 0.5);
@@ -246,7 +248,7 @@ class RangeSlider extends HTMLElement {
         "style[data='slider-track-style']"
       ).innerHTML = `#slider-2::-webkit-slider-thumb {
             border-right: 1px solid rgba(0, 0, 0, 0.5);
-            
+            transform: translateX(-3px);
         }
         #slider-1::-webkit-slider-thumb {
             border-left: 1px solid rgba(0, 0, 0, 0.5);
