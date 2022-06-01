@@ -309,7 +309,7 @@ class RangeSlider extends HTMLElement {
   }
 
   _fireEvent(detail) {
-    const event = new CustomEvent("state-changed", {
+    const event = new CustomEvent("range-changed", {
       bubbles: true,
       detail: detail,
     });
