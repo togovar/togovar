@@ -15,21 +15,33 @@ searchTypeSimple.innerHTML = `
 
 template.innerHTML = `
 <style data="slider-style">
+
 .wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     gap: 1rem;
+
 }
 .input {
     margin-right: auto;
+    font-size: 10px;
+    font-family: 'Roboto', sans-serif;
 }
 
 input[type='number'] {
-    width: 2.5rem;
-    border-radius: 1rem;
+    width: 5em;
     text-align: center;
+    line-height: 18px;
+    outline: none;
+    box-shadow: 0 1px 1px rgb(0 0 0 / 20%) inset;
+    border: solid 1px #94928D;
+    padding: 0 0 0 8px;
+    border-radius: 9px;
+    text-align: right;
+    font-size: 1em;
+    
 }
 
 .meter {
@@ -39,8 +51,9 @@ input[type='number'] {
 .meter-container {
     display: flex;
     flex-direction: column;
-    align-content: center;
+    align-items: center;
     position: relative;
+
 }
 input[type="range"] {
     -webkit-appearance: none;
@@ -54,40 +67,25 @@ input[type="range"] {
   }
   
   .slider-track {
-    width: calc(100% - 0.3em);
-    height: 5px;
-    border-radius: 5px;
-    background: linear-gradient(
-      90deg,
-      rgb(200, 200, 200) 0%,
-      rgb(200, 200, 200) 20%,
-      rgb(0, 20, 200) 20%,
-      rgb(0, 20, 200) 50%,
-      rgb(200, 200, 200) 50%,
-      rgb(200, 200, 200) 100%
-    );
+    width: calc(100% - 3px);
+    height: 8px;
   }
   
   input[type="range"]::-webkit-slider-runnable-track {
     -webkit-appearance: none;
-    height: 5px;
+    height: 8px;
   }
   
   input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    height: 1.5em;
-    width: 0.3em;
+    height: 1em;
+    width: 3px;
     background-color: transparent;
     border-top: solid 1px rgba(0, 0, 0, 0.5);
     border-bottom: solid 1px rgba(0, 0, 0, 0.5);
     cursor: col-resize;
     pointer-events: auto;
-    margin-top: -8px;
-  }
-  
-  input[type="range"]:active::-webkit-slider-thumb {
-    background-color: #fff;
-    border: 3px solid #3264fe;
+    margin-top: -0.2em;
   }
 
 </style>
@@ -95,9 +93,9 @@ input[type="range"] {
 <div class="wrapper">
 
     <div class="input">
-        <input class="from" type="number"  title="Lower limit">
+        <input class="from" type="number" part="limit-input" title="Lower limit">
     ~
-        <input class="to"type="number" title="Upper limit">
+        <input class="to"type="number" part="limit-input" title="Upper limit">
         <label>
             <input class="invert" type="checkbox">Invert range
         </label>
@@ -231,16 +229,23 @@ class RangeSlider extends HTMLElement {
   }
 
   _drawThumbs() {
+    const val1 = Math.min(this.slider1.value, this.slider2.value);
+    const val2 = Math.max(this.slider1.value, this.slider2.value);
+    const percentVal1 = (val1 * 100) / (this.max - this.min);
+    const percentVal2 = (val2 * 100) / (this.max - this.min);
+
+    const thumbWidth = 3;
+
     if (+this.slider1.value < +this.slider2.value) {
       this.shadowRoot.querySelector(
         "style[data='slider-track-style']"
       ).innerHTML = `#slider-1::-webkit-slider-thumb {
             border-right: 1px solid rgba(0, 0, 0, 0.5);
-            transform: translateX(-3px);
+            transform: translateX(-1.5px);
         }
         #slider-2::-webkit-slider-thumb {
             border-left: 1px solid rgba(0, 0, 0, 0.5);
-            
+            transform: translateX(1.5px)
         }
         `;
     } else {
@@ -248,11 +253,11 @@ class RangeSlider extends HTMLElement {
         "style[data='slider-track-style']"
       ).innerHTML = `#slider-2::-webkit-slider-thumb {
             border-right: 1px solid rgba(0, 0, 0, 0.5);
-            transform: translateX(-3px);
+            transform: translateX(-1.5px);
         }
         #slider-1::-webkit-slider-thumb {
             border-left: 1px solid rgba(0, 0, 0, 0.5);
-           
+            transform: translateX(1.5px)
         }
         `;
     }
