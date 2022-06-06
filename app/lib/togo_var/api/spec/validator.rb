@@ -50,7 +50,7 @@ module TogoVar
         end
 
         def validate_request_body!
-          operation&.validate_request_body(request_headers[:content_type], request_body)
+          operation.validate_request_body(request_headers['Content-Type'], request_body)
         rescue OpenAPIParser::OpenAPIError => e
           errors << e.message.gsub('"', "'")
           raise e
@@ -79,11 +79,11 @@ module TogoVar
         end
 
         def request_parameters
-          @options[:parameters] || {}
+          @request_parameters ||= (@options[:parameters] || {}).with_indifferent_access
         end
 
         def request_headers
-          @options[:headers] || {}
+          @request_headers ||= (@options[:headers] || {}).with_indifferent_access
         end
 
         def request_body
