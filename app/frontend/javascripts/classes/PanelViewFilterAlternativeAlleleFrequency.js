@@ -15,6 +15,7 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
     rangeSlider.step = 0.005;
     rangeSlider.value1 = condition.from;
     rangeSlider.value2 = condition.to;
+    rangeSlider.searchType = "simple";
 
     rangeSlider.addEventListener("range-changed", (e) => {
       e.stopPropagation();

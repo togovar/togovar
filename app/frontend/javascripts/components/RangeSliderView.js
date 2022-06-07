@@ -1,29 +1,30 @@
 const template = document.createElement("template");
-
 const searchTypeSimple = document.createElement("div");
 searchTypeSimple.className = "match";
 searchTypeSimple.innerHTML = `
 <label>
-          <input class="all" name="match" type="radio" value="all">
-          for all datasets
-        </label>
-        <label>
-          <input class="any" checked="checked" name="match" type="radio" value="any">
-          for any dataset
-        </label>
+  <input class="all" name="match" type="radio" value="all">
+  for all datasets
+</label>
+<label>
+  <input class="any" checked="checked" name="match" type="radio" value="any">
+  for any dataset
+</label>
 `;
 
 template.innerHTML = `
 <style data="slider-style">
+:host {
+    --slider-color: #249EB3;
+    --light-gray: #EAEAE9;
+}
 
 .wrapper {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 1rem;
-
+    flex-wrap: wrap;
+    gap: 1em;
 }
+
 .input {
     margin-right: auto;
     font-size: 10px;
@@ -41,11 +42,34 @@ input[type='number'] {
     border-radius: 9px;
     text-align: right;
     font-size: 1em;
-    
 }
 
 .meter {
     width: 100%;
+    z-index: 1;
+    height: 1.5em;
+}
+
+.ruler {
+    position: relative;
+    font-size: 0.8em;
+}
+
+.ruler>.scale{
+    position: absolute;
+    z-index: 10;
+    line-height: 1;
+    transform: translateY(13px)
+}
+
+.scale::before {
+    content: "";
+    border-left: dotted 1px rgba(0, 0, 0, 0.3);
+    height: 14px;
+    top: -16px;
+    left: 0.5em;
+    display: block;
+    position: absolute;
 }
 
 .meter-container {
@@ -53,8 +77,8 @@ input[type='number'] {
     flex-direction: column;
     align-items: center;
     position: relative;
-
 }
+
 input[type="range"] {
     -webkit-appearance: none;
     line-height: 1em;
@@ -64,19 +88,19 @@ input[type="range"] {
     margin: auto;
     background-color: transparent;
     pointer-events: none;
-  }
+}
   
-  .slider-track {
+.slider-track {
     width: calc(100% - 3px);
     height: 8px;
-  }
+}
   
-  input[type="range"]::-webkit-slider-runnable-track {
+input[type="range"]::-webkit-slider-runnable-track {
     -webkit-appearance: none;
     height: 8px;
-  }
+}
   
-  input[type="range"]::-webkit-slider-thumb {
+input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     height: 1em;
     width: 3px;
@@ -86,7 +110,11 @@ input[type="range"] {
     cursor: col-resize;
     pointer-events: auto;
     margin-top: -0.2em;
-  }
+}
+
+input[type="checkbox"] {
+  vertical-align: middle; 
+}
 
 </style>
 <style data="slider-track-style"></style>
@@ -101,23 +129,23 @@ input[type="range"] {
         </label>
     </div>
     <div class="meter">
-        <div class="meter-container">
-            <div class="slider-track" id="slider-track" part="slider-track"></div>
-            <input
-                part = "slider"
-                type="range"
-                name="slider-1"
-                id="slider-1"
-
-            />
-            <input
+      <div class="meter-container">
+        <div class="slider-track" id="slider-track" part="slider-track">
+          <div class="ruler"></div> 
+        </div>
+        <input
+            part = "slider"
+            type="range"
+            name="slider-1"
+            id="slider-1"
+        />
+        <input
             part = "slider"
             type="range"
             name="slider-2"
             id="slider-2"
-
-            />
-        </div>
+        />
+      </div>
     </div>
 </div>
 
@@ -132,9 +160,9 @@ class RangeSlider extends HTMLElement {
       "value1",
       "value2",
       "orientation",
-      "search-type",
       "invert",
       "simple-search",
+      "ruler-number-of-steps",
     ];
   }
 
@@ -144,27 +172,25 @@ class RangeSlider extends HTMLElement {
     const initState = {
       from: 0,
       to: 1,
-      searchType: "simple",
       invert: false,
       min: 0,
       max: 1,
       step: 0.05,
       simpleSearch: "any",
+      rulerNumberOfSteps: 10,
     };
+
     this.state = initState;
 
     this.root = this.getRootNode();
     this.attachShadow({ mode: "open" });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
-    this.shadowRoot.appendChild(searchTypeSimple.cloneNode(true));
-
     this.slider1 = this.shadowRoot.querySelector("#slider-1");
     this.slider2 = this.shadowRoot.querySelector("#slider-2");
     this.sliderTrack = this.shadowRoot.querySelector("#slider-track");
     this.from = this.shadowRoot.querySelector(".from");
     this.to = this.shadowRoot.querySelector(".to");
     this.invertChk = this.shadowRoot.querySelector(".invert");
-    this.simpleSearchDiv = this.shadowRoot.querySelector(".match");
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -172,8 +198,8 @@ class RangeSlider extends HTMLElement {
       case "min":
         this.slider1.min = newValue;
         this.slider2.min = newValue;
-        this.from.max = newValue;
-        this.to.max = newValue;
+        this.from.min = newValue;
+        this.to.min = newValue;
         break;
       case "max":
         this.slider1.max = newValue;
@@ -188,21 +214,18 @@ class RangeSlider extends HTMLElement {
         this.to.step = newValue;
         break;
       case "value1":
-        this.slider1.value = newValue;
+        this.slider1.value = parseFloat(newValue).toFixed(3);
         break;
       case "value2":
-        this.slider2.value = newValue;
+        this.slider2.value = parseFloat(newValue).toFixed(3);
         break;
       case "invert":
         this.invertChk.checked = newValue === "true";
         break;
-      case "search-type":
-        if (newValue === "simple") {
-          this.simpleSearchDiv.style.display = "block";
-        } else {
-          this.simpleSearchDiv.style.display = "none";
-        }
-
+      case "ruler-number-of-steps":
+        this.state.rulerNumberOfSteps = newValue;
+        this._reRenderRuler();
+        break;
       case "simple-search":
         this.simpleSearch = newValue;
     }
@@ -210,6 +233,23 @@ class RangeSlider extends HTMLElement {
     this._fillSlider();
   }
 
+  _reRenderRuler() {
+    const ruler = this.shadowRoot.querySelector(".ruler");
+    ruler.innerHTML = "";
+    const rulerNumberOfSteps = parseInt(this.state.rulerNumberOfSteps);
+    const min = parseFloat(this.state.min);
+    const max = parseFloat(this.state.max);
+    const step = (max - min) / rulerNumberOfSteps;
+    for (let i = 0; i <= rulerNumberOfSteps; i++) {
+      const scale = document.createElement("div");
+      scale.className = "scale";
+      scale.innerText = (min + i * step).toFixed(1);
+      scale.style.left = `calc(${(i * 100) / rulerNumberOfSteps}% - 0.5em - ${
+        i / rulerNumberOfSteps
+      } * 1px)`;
+      ruler.appendChild(scale);
+    }
+  }
   _fillSlider() {
     const val1 = Math.min(this.slider1.value, this.slider2.value);
     const val2 = Math.max(this.slider1.value, this.slider2.value);
@@ -220,22 +260,15 @@ class RangeSlider extends HTMLElement {
     const percentVal2 = (val2 * 100) / (this.max - this.min);
 
     if (!this.invert) {
-      this.sliderTrack.style.background = `linear-gradient(90deg, rgb(200, 200, 200) 0%, rgb(200, 200, 200) ${percentVal1}% , rgb(0,20,200) ${percentVal1}%,   rgb(0,20,200) ${percentVal2}%, rgb(200, 200, 200) ${percentVal2}%,  rgb(200, 200, 200) 100% )`;
+      this.sliderTrack.style.background = `linear-gradient(90deg, var(--light-gray) 0%, var(--light-gray) ${percentVal1}% , var(--slider-color) ${percentVal1}%,   var(--slider-color) ${percentVal2}%, var(--light-gray) ${percentVal2}%,  var(--light-gray) 100% )`;
     } else {
-      this.sliderTrack.style.background = `linear-gradient(90deg, rgb(0,20,200) 0%, rgb(0,20,200) ${percentVal1}%, rgb(200, 200, 200) ${percentVal1}%,  rgb(200, 200, 200) ${percentVal2}%, rgb(0,20,200) ${percentVal2}%,  rgb(0,20,200) 100% )`;
+      this.sliderTrack.style.background = `linear-gradient(90deg, var(--slider-color) 0%, var(--slider-color) ${percentVal1}%, var(--light-gray) ${percentVal1}%,  var(--light-gray) ${percentVal2}%, var(--slider-color) ${percentVal2}%,  var(--slider-color) 100% )`;
     }
 
     this._drawThumbs();
   }
 
   _drawThumbs() {
-    const val1 = Math.min(this.slider1.value, this.slider2.value);
-    const val2 = Math.max(this.slider1.value, this.slider2.value);
-    const percentVal1 = (val1 * 100) / (this.max - this.min);
-    const percentVal2 = (val2 * 100) / (this.max - this.min);
-
-    const thumbWidth = 3;
-
     if (+this.slider1.value < +this.slider2.value) {
       this.shadowRoot.querySelector(
         "style[data='slider-track-style']"
@@ -281,11 +314,11 @@ class RangeSlider extends HTMLElement {
   get orientation() {
     return this.getAttribute("orientation");
   }
-  get searchType() {
-    return this.getAttribute("search-type");
-  }
   get invert() {
     return this.getAttribute("invert") === "true";
+  }
+  get rulerNumberOfSteps() {
+    return this.getAttribute("ruler-number-of-steps");
   }
 
   set min(value) {
@@ -306,9 +339,26 @@ class RangeSlider extends HTMLElement {
   set orientation(value) {
     this.setAttribute("orientation", value);
   }
-  set searchType(value) {
-    this.setAttribute("search-type", value);
+  set rulerNumberOfSteps(value) {
+    this.setAttribute("ruler-number-of-steps", value);
   }
+  set searchType(value) {
+    // do not expose this to the user
+    if (value === "simple") {
+      this.shadowRoot
+        .querySelector(".wrapper")
+        .appendChild(searchTypeSimple.cloneNode(true));
+      this.simpleSearchDiv = this.shadowRoot.querySelector(".match");
+      this.simpleSearchDiv.addEventListener("click", (e) => {
+        if (e.target.tagName === "INPUT") {
+          this.simpleSearch = e.target.value;
+          this.state.simpleSearch = e.target.value;
+          this._fireEvent(this.state);
+        }
+      });
+    }
+  }
+
   set invert(value) {
     this.setAttribute("invert", value);
   }
@@ -318,6 +368,7 @@ class RangeSlider extends HTMLElement {
       bubbles: true,
       detail: detail,
     });
+    console.log(detail);
     this.dispatchEvent(event);
   }
 
@@ -328,7 +379,7 @@ class RangeSlider extends HTMLElement {
     this.value1 = this.getAttribute("value1") || 0;
     this.value2 = this.getAttribute("value2") || 1;
     this.orientation = this.getAttribute("orientation") || "horizontal";
-    this.searchType = this.getAttribute("search-type") || "simple";
+
     this.invert = this.getAttribute("invert") === "true";
     this.simpleSearch = this.getAttribute("simple-search") || "any";
 
@@ -337,9 +388,10 @@ class RangeSlider extends HTMLElement {
     this.state.step = this.step;
     this.state.from = Math.min(+this.value1, +this.value2);
     this.state.to = Math.max(+this.value1, +this.value2);
-    this.state.searchType = this.searchType;
     this.state.invert = this.invert;
     this.state.simpleSearch = this.simpleSearch;
+
+    this.rulerNumberOfSteps = 10;
 
     this.slider1.addEventListener("input", (e) => {
       this.value1 = +e.target.value;
@@ -408,17 +460,8 @@ class RangeSlider extends HTMLElement {
       this._fireEvent(this.state);
     });
 
-    if (this.simpleSearch) {
-      this.simpleSearchDiv.addEventListener("click", (e) => {
-        if (e.target.tagName === "INPUT") {
-          this.simpleSearch = e.target.value;
-          this.state.simpleSearch = e.target.value;
-          this._fireEvent(this.state);
-        }
-      });
-    }
-
     this._fillSlider();
+    this._reRenderRuler();
   }
 
   disconnectedCallback() {
