@@ -19,7 +19,7 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
 
     rangeSlider.addEventListener("range-changed", (e) => {
       e.stopPropagation();
-      this.changeParameter({ from: +e.detail.from, to: +e.detail.to });
+      this.changeParameter(e.detail);
     });
 
     this.elm.querySelector(".range-selector-view").appendChild(rangeSlider);
