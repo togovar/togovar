@@ -161,7 +161,7 @@ class RangeSlider extends HTMLElement {
       "value2",
       "orientation",
       "invert",
-      "simple-search",
+      "match",
       "ruler-number-of-steps",
     ];
   }
@@ -170,13 +170,13 @@ class RangeSlider extends HTMLElement {
     super();
 
     const initState = {
-      from: 0,
-      to: 1,
-      invert: false,
+      from: "0",
+      to: "1",
+      invert: "0",
       min: 0,
       max: 1,
       step: 0.05,
-      simpleSearch: "any",
+      match: "any",
       rulerNumberOfSteps: 10,
     };
 
@@ -226,8 +226,8 @@ class RangeSlider extends HTMLElement {
         this.state.rulerNumberOfSteps = newValue;
         this._reRenderRuler();
         break;
-      case "simple-search":
-        this.simpleSearch = newValue;
+      case "match":
+        this.match = newValue;
     }
 
     this._fillSlider();
@@ -351,8 +351,8 @@ class RangeSlider extends HTMLElement {
       this.simpleSearchDiv = this.shadowRoot.querySelector(".match");
       this.simpleSearchDiv.addEventListener("click", (e) => {
         if (e.target.tagName === "INPUT") {
-          this.simpleSearch = e.target.value;
-          this.state.simpleSearch = e.target.value;
+          this.match = e.target.value;
+          this.state.match = e.target.value;
           this._fireEvent(this.state);
         }
       });
@@ -364,11 +364,20 @@ class RangeSlider extends HTMLElement {
   }
 
   _fireEvent(detail) {
+    const filteredState = Object.fromEntries(
+      Object.entries(detail).filter(
+        (key) =>
+          key[0] !== "rulerNumberOfSteps" &&
+          key[0] !== "step" &&
+          key[0] !== "min" &&
+          key[0] !== "max"
+      )
+    );
     const event = new CustomEvent("range-changed", {
       bubbles: true,
-      detail: detail,
+      detail: filteredState,
     });
-    console.log(detail);
+    console.log(filteredState);
     this.dispatchEvent(event);
   }
 
@@ -381,22 +390,22 @@ class RangeSlider extends HTMLElement {
     this.orientation = this.getAttribute("orientation") || "horizontal";
 
     this.invert = this.getAttribute("invert") === "true";
-    this.simpleSearch = this.getAttribute("simple-search") || "any";
+    this.match = this.getAttribute("simple-search") || "any";
 
     this.state.min = this.min;
     this.state.max = this.max;
     this.state.step = this.step;
-    this.state.from = Math.min(+this.value1, +this.value2);
-    this.state.to = Math.max(+this.value1, +this.value2);
-    this.state.invert = this.invert;
-    this.state.simpleSearch = this.simpleSearch;
+    this.state.from = "" + Math.min(+this.value1, +this.value2);
+    this.state.to = "" + Math.max(+this.value1, +this.value2);
+    this.state.invert = this.invert ? "1" : "0";
+    this.state.match = this.match;
 
     this.rulerNumberOfSteps = 10;
 
     this.slider1.addEventListener("input", (e) => {
       this.value1 = +e.target.value;
-      this.state.from = Math.min(+this.slider1.value, +this.slider2.value);
-      this.state.to = Math.max(+this.slider1.value, +this.slider2.value);
+      this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
+      this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
 
       this._fillSlider.call(this);
     });
@@ -408,8 +417,8 @@ class RangeSlider extends HTMLElement {
     this.slider2.addEventListener("input", (e) => {
       this.value2 = +e.target.value;
 
-      this.state.from = Math.min(+this.slider1.value, +this.slider2.value);
-      this.state.to = Math.max(+this.slider1.value, +this.slider2.value);
+      this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
+      this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
 
       this._fillSlider.call(this);
     });
@@ -427,8 +436,8 @@ class RangeSlider extends HTMLElement {
         this.slider2.value = +e.target.value;
       }
 
-      this.state.from = Math.min(+this.slider1.value, +this.slider2.value);
-      this.state.to = Math.max(+this.slider1.value, +this.slider2.value);
+      this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
+      this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
       this._fillSlider.call(this);
     });
 
@@ -444,8 +453,8 @@ class RangeSlider extends HTMLElement {
       } else {
         this.slider1.value = +e.target.value;
       }
-      this.state.from = Math.min(+this.slider1.value, +this.slider2.value);
-      this.state.to = Math.max(+this.slider1.value, +this.slider2.value);
+      this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
+      this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
 
       this._fillSlider.call(this);
     });
@@ -456,7 +465,7 @@ class RangeSlider extends HTMLElement {
 
     this.invertChk.addEventListener("change", (e) => {
       this.invert = e.target.checked;
-      this.state.invert = e.target.checked;
+      this.state.invert = this.invert ? "1" : "0";
       this._fireEvent(this.state);
     });
 
