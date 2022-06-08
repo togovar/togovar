@@ -1,5 +1,43 @@
 $PADDING_METER: 8px
 .range-selector-view
+  .slider-wrapper
+    position: relative
+    width: 100px
+    background-color: #f0f0f0
+    padding: 5px
+    .container
+      position: relative
+      width: 100%
+      height: 10px
+      border: 1px solid black
+      margin-top: 0
+      >input[type="range"]
+        -webkit-appearance: none
+        -moz-appearance: none
+        appearance: none
+        width: 100%
+        outlite: none
+        position: absolute
+        margin: auto
+        top: 0
+        bottom: 0
+        background-color: transparent
+        pointer-events: none
+      >.slider-track
+        width: 100%
+        height: 5px
+        background-color: #d5d5d5
+        position: absolute
+        margin: auto
+        border-radius: 5px
+        
+
+
+
+
+
+
+
   label
     margin: 0
   > .input
