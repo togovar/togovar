@@ -63,30 +63,8 @@ range-slider::part(slider)
 range-slider::part(match)
   text-align: center
    margin-left: 1em
+range-slider::part(scale-vertical)
+  transform: rotate(90deg) translateX(-2em)
+  &::before
+    transform: rotate(90deg) translate(15px,-2em)
 
-  &.-vertical
-    > .input
-      margin-bottom: 8px
-      margin-top: 2px
-    > .meter
-      top: 2px
-      > .ruler
-        padding-bottom: 14px
-    > .match
-      padding-top: 8px
-  &.-horizontal
-    display: flex
-    align-items: center
-    > *
-      + *
-        margin-left: 8px
-    > .input
-      margin: 0 -2px
-    > .meter
-      width: 240px
-  &.-inverting
-    > .meter
-      > .barcontainer
-        background-color: $COLOR_KEY_DARK1
-        > .bar
-          background-color: $COLOR_LIGHT_GRAY

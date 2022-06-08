@@ -19,6 +19,10 @@ input[type="range"]::-webkit-slider-runnable-track {
     -webkit-appearance: none;
     height: 8px;
 }
+
+.-vertical {
+  transform: rotate(-90deg);
+}
   
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -143,6 +147,15 @@ class RangeSlider extends HTMLElement {
         break;
       case "match":
         this.match = newValue;
+        break;
+      case "orientation":
+        if (newValue === "vertical") {
+          this.shadowRoot.querySelector(".meter").classList.add("-vertical");
+        } else {
+          this.shadowRoot.querySelector(".meter").classList.remove("-vertical");
+        }
+        this._reRenderRuler();
+        break;
     }
 
     this._fillSlider();
@@ -159,6 +172,7 @@ class RangeSlider extends HTMLElement {
       const scale = document.createElement("div");
       scale.className = "scale";
       scale.part = "scale";
+      scale.part.add(`scale-${this.orientation}`);
       scale.innerText = (min + i * step).toFixed(1);
       scale.style.left = `calc(${(i * 100) / rulerNumberOfSteps}% - 0.5em`;
       ruler.appendChild(scale);
