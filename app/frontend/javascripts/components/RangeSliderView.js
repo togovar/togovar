@@ -14,10 +14,6 @@ searchTypeSimple.innerHTML = `
 
 template.innerHTML = `
 <style data="slider-style">
-:host {
-    --slider-color: #249EB3;
-    --light-gray: #EAEAE9;
-}
 
 .wrapper {
     display: flex;
@@ -26,28 +22,27 @@ template.innerHTML = `
 }
 
 .input {
-    margin-right: auto;
     font-size: 10px;
     font-family: 'Roboto', sans-serif;
 }
 
 input[type='number'] {
     width: 5em;
-    text-align: center;
     line-height: 18px;
     outline: none;
     box-shadow: 0 1px 1px rgb(0 0 0 / 20%) inset;
-    border: solid 1px #94928D;
+    border: solid 1px var(--color-gray);
     padding: 0 0 0 8px;
     border-radius: 9px;
-    text-align: right;
+    text-align: left;
     font-size: 1em;
 }
 
 .meter {
-    width: 100%;
+    width: 240px;
     z-index: 1;
     height: 1.5em;
+    margin-top: 0.5em;
 }
 
 .ruler {
@@ -244,9 +239,7 @@ class RangeSlider extends HTMLElement {
       const scale = document.createElement("div");
       scale.className = "scale";
       scale.innerText = (min + i * step).toFixed(1);
-      scale.style.left = `calc(${(i * 100) / rulerNumberOfSteps}% - 0.5em - ${
-        i / rulerNumberOfSteps
-      } * 1px)`;
+      scale.style.left = `calc(${(i * 100) / rulerNumberOfSteps}% - 0.5em`;
       ruler.appendChild(scale);
     }
   }
@@ -260,9 +253,9 @@ class RangeSlider extends HTMLElement {
     const percentVal2 = (val2 * 100) / (this.max - this.min);
 
     if (!this.invert) {
-      this.sliderTrack.style.background = `linear-gradient(90deg, var(--light-gray) 0%, var(--light-gray) ${percentVal1}% , var(--slider-color) ${percentVal1}%,   var(--slider-color) ${percentVal2}%, var(--light-gray) ${percentVal2}%,  var(--light-gray) 100% )`;
+      this.sliderTrack.style.background = `linear-gradient(90deg, var(--color-light-gray) 0%, var(--color-light-gray) ${percentVal1}% , var(--color-mutation-ref) ${percentVal1}%,   var(--color-mutation-ref) ${percentVal2}%, var(--color-light-gray) ${percentVal2}%,  var(--color-light-gray) 100% )`;
     } else {
-      this.sliderTrack.style.background = `linear-gradient(90deg, var(--slider-color) 0%, var(--slider-color) ${percentVal1}%, var(--light-gray) ${percentVal1}%,  var(--light-gray) ${percentVal2}%, var(--slider-color) ${percentVal2}%,  var(--slider-color) 100% )`;
+      this.sliderTrack.style.background = `linear-gradient(90deg, var(--color-mutation-ref) 0%, var(--color-mutation-ref) ${percentVal1}%, var(--color-light-gray) ${percentVal1}%,  var(--color-light-gray) ${percentVal2}%, var(--color-mutation-ref) ${percentVal2}%,  var(--color-mutation-ref) 100% )`;
     }
 
     this._drawThumbs();
@@ -364,20 +357,15 @@ class RangeSlider extends HTMLElement {
   }
 
   _fireEvent(detail) {
-    const filteredState = Object.fromEntries(
-      Object.entries(detail).filter(
-        (key) =>
-          key[0] !== "rulerNumberOfSteps" &&
-          key[0] !== "step" &&
-          key[0] !== "min" &&
-          key[0] !== "max"
-      )
+    const eventKeys = ["from", "to", "match", "invert"];
+    const eventData = Object.fromEntries(
+      Object.entries(detail).filter((key) => eventKeys.includes(key[0]))
     );
     const event = new CustomEvent("range-changed", {
       bubbles: true,
-      detail: filteredState,
+      detail: eventData,
     });
-    console.log(filteredState);
+
     this.dispatchEvent(event);
   }
 
