@@ -66,11 +66,14 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     const rangeSlider = document.createElement("range-slider");
     rangeSlider.step = 0.005;
     rangeSlider.searchType = "advanced";
+    rangeSlider.addEventListener("range-changed", (e) => {
+      e.stopPropagation();
+      this.changeParameter(e.detail);
+    });
 
     this._el.querySelector(".range-selector-view").appendChild(rangeSlider);
 
-    this._rangeSelectorView = rangeSlider; // new RangeSelectorView(rangeSelectorView, this, 1, 'horizontal', 'advanced');
-    // this._rangeSelectorView.updateGUIWithCondition(this._condition.frequency);
+    this._rangeSelectorView = rangeSlider;
 
     const switchingElements = this._body.querySelectorAll(
       ":scope > .switching"
@@ -132,7 +135,6 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     for (const key in newCondition) {
       this._condition.frequency[key] = newCondition[key];
     }
-    this._rangeSelectorView.updateGUIWithCondition(newCondition);
     this._update();
   }
 
