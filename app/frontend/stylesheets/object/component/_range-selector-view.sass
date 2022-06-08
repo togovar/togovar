@@ -1,144 +1,69 @@
 $PADDING_METER: 8px
-.range-selector-view
-  .slider-wrapper
-    position: relative
-    width: 100px
-    background-color: #f0f0f0
-    padding: 5px
-    .container
-      position: relative
-      width: 100%
-      height: 10px
-      border: 1px solid black
-      margin-top: 0
-      >input[type="range"]
-        -webkit-appearance: none
-        -moz-appearance: none
-        appearance: none
-        width: 100%
-        outlite: none
-        position: absolute
-        margin: auto
-        top: 0
-        bottom: 0
-        background-color: transparent
-        pointer-events: none
-      >.slider-track
-        width: 100%
-        height: 5px
-        background-color: #d5d5d5
-        position: absolute
-        margin: auto
-        border-radius: 5px
-        
 
+range-slider::part(wrapper)
+  display: flex
+  flex-wrap: wrap
+  row-gap: 1em
+  column-gap: 2em
+range-slider::part(label)
+  margin: 0
+range-slider::part(meter)
+  width: 100%
+  max-width: 250px
+  z-index: 1
+  height: 1.5em
+  margin-top: 0.5em
+  padding: 0 $PADDING_METER
+  position: relative
+range-slider::part(div-input)
+  text-align: center
+range-slider::part(checkbox)
+  vertical-align: middle
+range-slider::part(num-input)
+  width: 5em
+  margin-right: 3px
+  font-size: inherit
+  +input-number
+range-slider::part(checkbox-label)
+  margin-left: 8px
+  margin-bottom: 0
+range-slider::part(ruler)
+  position: relative
+  font-size: 0.8em
+range-slider::part(scale)
+  position: absolute
+  z-index: 10
+  line-height: 1
+  transform: translateY(13px)
+  &::before
+    content: ""
+    border-left: dotted 1px $COLOR_SEPARATOR
+    height: 14px
+    top: -16px
+    left: 0.5em
+    display: block
+    position: absolute
+range-slider::part(meter-container)
+  display: flex
+  flex-direction: column
+  align-items: center
+  position: relative
+range-slider::part(slider-track)
+  width: calc(100% - 3px)
+  height: 8px
+range-slider::part(slider)
+  -webkit-appearance: none
+  line-height: 1em
+  appearance: none
+  width: 100%
+  position: absolute
+  margin: auto
+  background-color: transparent
+  pointer-events: none
+range-slider::part(match)
+  text-align: center
+   margin-left: 1em
 
-
-
-
-
-
-  label
-    margin: 0
-  > .input
-    text-align: center
-    > input
-      width: 5em
-      margin-right: 3px
-      +input-number
-    > label
-      margin-left: 8px
-      margin-bottom: 0
-  > .meter
-    padding: 0 $PADDING_METER
-    position: relative
-    > .barcontainer
-      width: 100%
-      height: 8px
-      background-color: $COLOR_LIGHT_GRAY
-      position: relative
-      > .bar
-        position: absolute
-        top: 0
-        background-color: $COLOR_KEY_DARK1
-        height: 8px
-        width: 100%
-    > .ruler
-      position: relative
-      > .scale
-        position: absolute
-        font-size: 10px
-        line-height: 10px
-        text-align: center
-        width: 20px
-        left: calc(0% - 10px)
-        top: 6px
-        &:nth-child(2)
-          left: calc(10% - 10px)
-        &:nth-child(3)
-          left: calc(20% - 10px)
-        &:nth-child(4)
-          left: calc(30% - 10px)
-        &:nth-child(5)
-          left: calc(40% - 10px)
-        &:nth-child(6)
-          left: calc(50% - 10px)
-        &:nth-child(7)
-          left: calc(60% - 10px)
-        &:nth-child(8)
-          left: calc(70% - 10px)
-        &:nth-child(9)
-          left: calc(80% - 10px)
-        &:nth-child(10)
-          left: calc(90% - 10px)
-        &:nth-child(11)
-          left: calc(100% - 10px)
-        &:before
-          content: ""
-          border-left: dotted 1px $COLOR_SEPARATOR
-          height: 13px
-          top: -16px
-          left: 10px
-          display: block
-          position: absolute
-    > .slider
-      width: 100%
-      height: 8px
-      position: absolute
-      top: 0
-      left: 0
-      > *
-        position: absolute
-        width: 8px
-        height: 16px
-        top: -4px
-        cursor: col-resize
-        &::before, &::after
-          content: ""
-          display: block
-          position: absolute
-          width: 3px
-          height: 16px
-        &::after
-          border-top: solid 1px rgba(black, .5)
-          border-bottom: solid 1px rgba(black, .5)
-      > .from
-        transform: translateX(1px)
-        &::before
-          border-right: solid 1px rgba(black, .5)
-          right: 0
-        &::after
-          right: 0
-      > .to
-        left: calc(100% - 8px)
-        &::before
-          border-left: solid 1px rgba(black, .5)
-          left: 0
-  > .match
-    text-align: center
-    > label
-      + label
-        margin-left: 1em
   &.-vertical
     > .input
       margin-bottom: 8px
