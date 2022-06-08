@@ -1,5 +1,4 @@
 import ConditionValueEditor from "./ConditionValueEditor.js";
-// import RangeSelectorView from "./RangeSelectorView.js";
 import "../components/RangeSliderView.js";
 
 let id = 0;
