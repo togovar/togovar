@@ -24,7 +24,7 @@ export class FrequencyCountValueView extends LitElement {
     }
     :host > .frequencygraph {
       width: 100px;
-      height: 12px;
+      height: 8px;
       background-color: var(--color-light-gray);
       border: solid 1px white;
       position: relative;
