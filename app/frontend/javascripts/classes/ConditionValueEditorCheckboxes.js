@@ -10,7 +10,7 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
     // HTML
     const master = ADVANCED_CONDITIONS[conditionType];
     this._createElement('checkboxes-editor-view', `
-    <header>Select them</header>
+    <header>Select ${conditionType}</header>
     <ul class="checkboxes body">${master.values.map(value => `
       <li>
         <label><input
@@ -21,7 +21,11 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
             ${conditionType === 'significance' ? `<span class="clinical-significance" data-sign="${value.value}"></span>` : ''}${value.label}
         </label>
       </li>`).join('')}
-    </ul>`);
+    </ul>
+    <footer>
+      <button class="button-view">Select all</button>
+      <button class="button-view">Clear all</button>
+    </footer>`);
 
     // references
     this._checkboxes = Array.from(this._el.querySelectorAll(':scope > ul > li > label > input'));
@@ -32,6 +36,12 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
         this._update();
       });
     });
+    this._el.querySelectorAll(':scope > footer > button').forEach((button, index) => {
+      button.addEventListener('click', () => {
+        this._checkboxes.forEach(checkbox => checkbox.checked = !index);
+        this._update();
+      })
+    })
 
   }
 
