@@ -10,14 +10,14 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
 
     // HTML
     this._createElement('text-field-editor-view', `
-    <header>Select ${conditionType}</header>
+    <header>Search for ${conditionType.replace('_', ' ')}</header>
     <div class="body"></div>`);
     this._searchFieldView = new SearchFieldView(
       this,
       this._body,
       {
-        [CONDITION_TYPE.gene_symbol]: 'Search for gene symbol',
-        [CONDITION_TYPE.disease]: 'Search for disease',
+        [CONDITION_TYPE.gene_symbol]: 'BLACA2',
+        [CONDITION_TYPE.disease]: 'Breast-ovarian cancer, familial 2',
       }[conditionType],
       [{
         [CONDITION_TYPE.gene_symbol]: 'gene',
