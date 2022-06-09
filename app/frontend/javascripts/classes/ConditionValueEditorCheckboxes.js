@@ -12,7 +12,7 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
     this._createElement('checkboxes-editor-view', `
     <header>Select ${conditionType}</header>
     <ul class="checkboxes body">${master.values.map(value => `
-      <li>
+      <li data-value="${value.value}">
         <label><input
           type="checkbox"
           value="${value.value}"
@@ -26,6 +26,11 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
       <button class="button-view">Select all</button>
       <button class="button-view">Clear all</button>
     </footer>`);
+    
+    // delete 'not in clinver'
+    if (conditionType === 'significance') {
+      this._el.querySelector('li[data-value="NC"]').remove();
+    }
 
     // references
     this._checkboxes = Array.from(this._el.querySelectorAll(':scope > ul > li > label > input'));
