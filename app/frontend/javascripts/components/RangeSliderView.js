@@ -325,85 +325,98 @@ class RangeSlider extends HTMLElement {
 
     this.rulerNumberOfSteps = 10;
 
-    this.shadowRoot.querySelector(".meter").addEventListener("mouseup", (e) => {
-      if (e.target && e.target.nodeName === "INPUT") {
-        this._fireEvent(this.state);
-      }
-    });
+    this.shadowRoot
+      .querySelector(".meter")
+      .addEventListener("mouseup", this._meterMouseUp);
 
-    this.slider1.addEventListener("input", (e) => {
-      this.value1 = +e.target.value;
-      this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
-      this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
+    this.slider1.addEventListener("input", this._slider1Input);
 
-      this._fillSlider.call(this);
-    });
+    this.slider2.addEventListener("input", this._slider2Input);
 
-    this.slider2.addEventListener("input", (e) => {
-      this.value2 = +e.target.value;
+    this.from.addEventListener("input", this._fromInput);
 
-      this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
-      this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
+    this.from.addEventListener("change", this._fromToChange);
 
-      this._fillSlider.call(this);
-    });
+    this.to.addEventListener("input", this._toInput);
 
-    this.from.addEventListener("input", (e) => {
-      const slider1Val = +this.slider1.value;
-      const slider2Val = +this.slider2.value;
+    this.to.addEventListener("change", this._fromToChange);
 
-      if (slider1Val < slider2Val) {
-        this.slider1.value = +e.target.value;
-      } else {
-        this.slider2.value = +e.target.value;
-      }
-
-      this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
-      this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
-      this._fillSlider.call(this);
-    });
-
-    this.from.addEventListener("change", () => {
-      this._fireEvent(this.state);
-    });
-
-    this.to.addEventListener("input", (e) => {
-      const slider1Val = +this.slider1.value;
-      const slider2Val = +this.slider2.value;
-      if (slider2Val > slider1Val) {
-        this.slider2.value = +e.target.value;
-      } else {
-        this.slider1.value = +e.target.value;
-      }
-      this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
-      this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
-
-      this._fillSlider.call(this);
-    });
-
-    this.to.addEventListener("change", () => {
-      this._fireEvent(this.state);
-    });
-
-    this.invertChk.addEventListener("change", (e) => {
-      this.invert = e.target.checked;
-      this.state.invert = this.invert ? "1" : "0";
-      this._fireEvent(this.state);
-    });
+    this.invertChk.addEventListener("change", this._invertChange);
 
     this._fillSlider();
     this._reRenderRuler();
   }
 
+  _meterMouseUp = (e) => {
+    if (e.target && e.target.nodeName === "INPUT") {
+      this._fireEvent(this.state);
+    }
+  };
+
+  _slider1Input = (e) => {
+    this.value1 = +e.target.value;
+    this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
+    this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
+
+    this._fillSlider.call(this);
+  };
+  _slider2Input = (e) => {
+    this.value2 = +e.target.value;
+    this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
+    this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
+
+    this._fillSlider.call(this);
+  };
+  _fromInput = (e) => {
+    const slider1Val = +this.slider1.value;
+    const slider2Val = +this.slider2.value;
+
+    if (slider1Val < slider2Val) {
+      this.slider1.value = +e.target.value;
+    } else {
+      this.slider2.value = +e.target.value;
+    }
+
+    this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
+    this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
+    this._fillSlider.call(this);
+  };
+
+  _toInput = (e) => {
+    const slider1Val = +this.slider1.value;
+    const slider2Val = +this.slider2.value;
+    if (slider2Val > slider1Val) {
+      this.slider2.value = +e.target.value;
+    } else {
+      this.slider1.value = +e.target.value;
+    }
+    this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
+    this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
+
+    this._fillSlider.call(this);
+  };
+
+  _fromToChange = () => {
+    this._fireEvent(this.state);
+  };
+
+  _invertChange = (e) => {
+    this.invert = e.target.checked;
+    this.state.invert = this.invert ? "1" : "0";
+    this._fireEvent(this.state);
+  };
+
   disconnectedCallback() {
-    this.shadowRoot.querySelector(".meter").removeEventListener("mouseup");
-    this.slider1.removeEventListener("input");
-    this.slider2.removeEventListener("input");
-    this.from.removeEventListener("input");
-    this.from.removeEventListener("change");
-    this.to.removeEventListener("input");
-    this.to.removeEventListener("cnahge");
-    this.invertChk.removeEventListener("change");
+    this.shadowRoot
+      .querySelector(".meter")
+      .removeEventListener("mouseup", this._meterMouseUp);
+    this.slider1.removeEventListener("input", this._slider1Input);
+    this.slider2.removeEventListener("input", this._slider2Input);
+    this.from.removeEventListener("input", this._fromInput);
+    this.to.removeEventListener("input", this._toInput);
+    this.from.removeEventListener("change", this._fromToChange);
+    this.to.removeEventListener("cnahge", this._fromToChange);
+    this.invertChk.removeEventListener("change", this._invertChange);
   }
 }
 
