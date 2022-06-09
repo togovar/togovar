@@ -13,7 +13,6 @@ export default class ConditionItemView extends ConditionView {
    * @param {Node} referenceElm
    */
   constructor(builder, parentView, conditionType, referenceElm = null) {
-    console.log(builder, parentView, conditionType, referenceElm)
 
     super(CONDITION_ITEM_TYPE.condition, builder, parentView, referenceElm);
 
