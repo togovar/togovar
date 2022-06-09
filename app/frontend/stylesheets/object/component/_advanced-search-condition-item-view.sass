@@ -33,9 +33,13 @@ $CORNER_RADIUS: $HEIGHT / 2
         font-weight: bold
         border-top-left-radius: $CORNER_RADIUS
         border-bottom-left-radius: $CORNER_RADIUS
+      > .relation
+        margin: #{($HEIGHT - $HEIGHT_RELATION) / 2} #{-$HEIGHT_RELATION / 2}
+        width: $HEIGHT_RELATION
+        min-width: $HEIGHT_RELATION
       > .values
         flex-grow: 1
-        padding: var(--padding-values-vertical) $CORNER_RADIUS var(--padding-values-vertical) 6px
+        padding: var(--padding-values-vertical) $CORNER_RADIUS var(--padding-values-vertical) 16px
         flex-wrap: wrap
         align-items: center
         position: relative
@@ -93,10 +97,7 @@ $CORNER_RADIUS: $HEIGHT / 2
     > .body
       > .summary
         > .relation
-          margin: #{($HEIGHT - $HEIGHT_RELATION) / 2} #{-$HEIGHT_RELATION / 2}
           background-color: $COLOR_KEY_DARK1
-          width: $HEIGHT_RELATION
-          min-width: $HEIGHT_RELATION
           height: $HEIGHT_RELATION
           border-radius: 3px
           position: relative
@@ -113,8 +114,6 @@ $CORNER_RADIUS: $HEIGHT / 2
             left: 4px
             background-color: white
             box-shadow: 0 4px white
-        > .values
-          padding-left: 16px
   &[data-relation="ne"]
     > .body
       > .summary
