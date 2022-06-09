@@ -11,7 +11,6 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
     const condition = this._getConditionFromStore();
 
     const rangeSlider = document.createElement("range-slider");
-    rangeSlider.step = 0.005;
     rangeSlider.value1 = condition.from;
     rangeSlider.value2 = condition.to;
     rangeSlider.searchType = "simple";
