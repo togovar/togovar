@@ -110,6 +110,7 @@ class RangeSlider extends HTMLElement {
     this.from = this.shadowRoot.querySelector(".from");
     this.to = this.shadowRoot.querySelector(".to");
     this.invertChk = this.shadowRoot.querySelector(".invert");
+    this._meter = this.shadowRoot.querySelector(".meter");
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -150,9 +151,9 @@ class RangeSlider extends HTMLElement {
         break;
       case "orientation":
         if (newValue === "vertical") {
-          this.shadowRoot.querySelector(".meter").classList.add("-vertical");
+          this._meter.classList.add("-vertical");
         } else {
-          this.shadowRoot.querySelector(".meter").classList.remove("-vertical");
+          this._meter.classList.remove("-vertical");
         }
         this._reRenderRuler();
         break;
@@ -273,11 +274,9 @@ class RangeSlider extends HTMLElement {
   set searchType(value) {
     // do not expose this to the user
     if (value === "simple") {
-      this.shadowRoot
-        .querySelector(".wrapper")
-        .appendChild(searchTypeSimple.cloneNode(true));
-      this.simpleSearchDiv = this.shadowRoot.querySelector(".match");
-      this.simpleSearchDiv.addEventListener("click", (e) => {
+      this.shadowRoot.querySelector(".wrapper").appendChild(searchTypeSimple);
+      const simpleSearchDiv = this.shadowRoot.querySelector(".match");
+      simpleSearchDiv.addEventListener("click", (e) => {
         if (e.target.tagName === "INPUT") {
           this.match = e.target.value;
           this.state.match = e.target.value;
