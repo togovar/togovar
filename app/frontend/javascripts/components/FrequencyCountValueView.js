@@ -41,9 +41,44 @@ export class FrequencyCountValueView extends LitElement {
 
     :host > .frequencygraph > .bar {
       position: absolute;
-      background-color: var(--color-key-dark3);
       height: 100%;
     }
+
+    :host([data-dataset="jga_ngs"]) > .frequencygraph > .bar {
+      background-color: var(--color-dataset-jga);
+    }
+    :host([data-dataset="jga_ngs"]) > .frequencygraph {
+      background-color: var(--color-dataset-jga-light);
+    }
+
+    :host([data-dataset="hgvd"]) > .frequencygraph > .bar {
+      background-color: var(--color-dataset-hgvd);
+    }
+    :host([data-dataset="hgvd"]) > .frequencygraph {
+      background-color: var(--color-dataset-hgvd-light);
+    }
+
+    :host([data-dataset="jga_snp"]) > .frequencygraph > .bar {
+      background-color: var(--color-dataset-jga);
+    }
+    :host([data-dataset="jga_snp"]) > .frequencygraph {
+      background-color: var(--color-dataset-jga-light);
+    }
+
+    :host([data-dataset="tommo"]) > .frequencygraph > .bar {
+      background-color: var(--color-dataset-tommo);
+    }
+    :host([data-dataset="tommo"]) > .frequencygraph {
+      background-color: var(--color-dataset-tommo-light);
+    }
+
+    :host([data-dataset="gem_j_wga"]) > .frequencygraph > .bar {
+      background-color: var(--color-dataset-gemj);
+    }
+    :host([data-dataset="gem_j_wga"]) > .frequencygraph {
+      background-color: var(--color-dataset-gemj-light);
+    }
+
     :host > .range {
       margin-right: 8px;
     }
@@ -62,7 +97,7 @@ export class FrequencyCountValueView extends LitElement {
       visibility: hidden;
     }
     :host > .frequencygraph > .bar {
-      background-color: var(--color-key-dark1);
+      background-color: #94928d;
     }
   `;
 
