@@ -1,5 +1,6 @@
 import deparam from "deparam.js";
 import { API_URL } from "../global.js";
+import { debounce } from "../utils/debounce.js";
 
 const LIMIT = 100;
 const DEFAULT_SEARCH_MODE = "simple"; // 'simple' or 'advanced';
@@ -202,128 +203,135 @@ export const mixin = {
    * @param {Number} offset
    * @param {Boolean} isFirstTime
    */
+
   _search(offset, isFirstTime = false) {
-    // dont execute if search is in progress
-    if (this._fetching === true) {
-      this._store._abortController.abort("newSearchStarted");
-      this._store._abortController = new AbortController();
-      this._fetching = false;
-    }
-
-    // reset
-    if (isFirstTime) {
-      this.setData("numberOfRecords", 0);
-      this.setData("offset", 0);
-      this.setData("rowCount", 0);
-      this._store.searchResults = [];
-      this.setResults([], 0);
-    }
-
-    // retain search conditions
-    const lastConditions = JSON.stringify(this._store.simpleSearchConditions); // TODO:
-
-    this._fetching = true;
-    const options = {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      mode: "cors",
-      signal: this._store._abortController.signal,
-    };
-    let path;
-    if (this._URIParameters.path === "local") {
-      if (offset === 0) {
-        path = "results.json";
-      }
-    } else {
-      switch (this._store.searchMode) {
-        case "simple":
-          {
-            const conditions = $.param(
-              this._extractSearchCondition(this._store.simpleSearchConditions)
-            );
-            path = `${API_URL}/search?offset=${offset - (offset % LIMIT)}${
-              conditions ? "&" + conditions : ""
-            }`;
-            options.method = "GET";
-          }
-          break;
-        case "advanced":
-          {
-            path = `${API_URL}/api/search/variant`;
-            options.method = "POST";
-            options.body = JSON.stringify({
-              query: this._store.advancedSearchConditions,
-              offset: this._store.offset,
-            });
-          }
-          break;
-      }
-    }
-    fetch(path, options)
-      .catch((e) => {
-        throw Error(e);
-      })
-      .then((response) => {
-        if (response.ok) {
-          return response;
-        }
-        switch (response.status) {
-          case 400:
-            throw Error("INVALID_TOKEN");
-          case 401:
-            throw Error("UNAUTHORIZED");
-          case 500:
-            throw Error("INTERNAL_SERVER_ERROR");
-          case 502:
-            throw Error("BAD_GATEWAY");
-          case 404:
-            throw Error("NOT_FOUND");
-          default:
-            throw Error("UNHANDLED_ERROR");
-        }
-      })
-      .then((response) => response.json())
-      .then((json) => {
-        // status
-        this.setData("searchStatus", {
-          available: Math.min(json.statistics.filtered, json.scroll.max_rows),
-          filtered: json.statistics.filtered,
-          total: json.statistics.total,
-        });
-
-        // results
-        this.setData("numberOfRecords", this.getData("searchStatus").available);
-        this.setResults(json.data, json.scroll.offset);
-
-        // statistics
-        // dataset
-        this.setData("statisticsDataset", json.statistics.dataset);
-        // significance
-        this.setData("statisticsSignificance", json.statistics.significance);
-        // total_variant_type
-        this.setData("statisticsType", json.statistics.type);
-        // consequence
-        this.setData("statisticsConsequence", json.statistics.consequence);
-
-        this.setData("searchMessages", {
-          error: json.error,
-          warning: json.warning,
-          notice: json.notice,
-        });
-
+    return debounce((offset, isFirstTime) => {
+      // dont execute if search is in progress
+      if (this._fetching === true) {
+        this._store._abortController.abort("newSearchStarted");
+        this._store._abortController = new AbortController();
         this._fetching = false;
-        this._notify("offset");
-        this.setData("appStatus", "normal");
+      }
 
-        // if the search conditions change during the search, re-search
-        if (
-          lastConditions !== JSON.stringify(this._store.simpleSearchConditions)
-        ) {
-          this._setSimpleSearchConditions({});
+      // reset
+      if (isFirstTime) {
+        this.setData("numberOfRecords", 0);
+        this.setData("offset", 0);
+        this.setData("rowCount", 0);
+        this._store.searchResults = [];
+        this.setResults([], 0);
+      }
+
+      // retain search conditions
+      const lastConditions = JSON.stringify(this._store.simpleSearchConditions); // TODO:
+
+      this._fetching = true;
+      const options = {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        mode: "cors",
+        signal: this._store._abortController.signal,
+      };
+      let path;
+      if (this._URIParameters.path === "local") {
+        if (offset === 0) {
+          path = "results.json";
         }
-      });
+      } else {
+        switch (this._store.searchMode) {
+          case "simple":
+            {
+              const conditions = $.param(
+                this._extractSearchCondition(this._store.simpleSearchConditions)
+              );
+              path = `${API_URL}/search?offset=${offset - (offset % LIMIT)}${
+                conditions ? "&" + conditions : ""
+              }`;
+              options.method = "GET";
+            }
+            break;
+          case "advanced":
+            {
+              path = `${API_URL}/api/search/variant`;
+              options.method = "POST";
+              options.body = JSON.stringify({
+                query: this._store.advancedSearchConditions,
+                offset: this._store.offset,
+              });
+            }
+            break;
+        }
+      }
+      fetch(path, options)
+        .catch((e) => {
+          throw Error(e);
+        })
+        .then((response) => {
+          if (response.ok) {
+            return response;
+          }
+          switch (response.status) {
+            case 400:
+              throw Error("INVALID_TOKEN");
+            case 401:
+              throw Error("UNAUTHORIZED");
+            case 500:
+              throw Error("INTERNAL_SERVER_ERROR");
+            case 502:
+              throw Error("BAD_GATEWAY");
+            case 404:
+              throw Error("NOT_FOUND");
+            default:
+              throw Error("UNHANDLED_ERROR");
+          }
+        })
+        .then((response) => response.json())
+        .then((json) => {
+          // status
+          this.setData("searchStatus", {
+            available: Math.min(json.statistics.filtered, json.scroll.max_rows),
+            filtered: json.statistics.filtered,
+            total: json.statistics.total,
+          });
+
+          // results
+          this.setData(
+            "numberOfRecords",
+            this.getData("searchStatus").available
+          );
+          this.setResults(json.data, json.scroll.offset);
+
+          // statistics
+          // dataset
+          this.setData("statisticsDataset", json.statistics.dataset);
+          // significance
+          this.setData("statisticsSignificance", json.statistics.significance);
+          // total_variant_type
+          this.setData("statisticsType", json.statistics.type);
+          // consequence
+          this.setData("statisticsConsequence", json.statistics.consequence);
+
+          this.setData("searchMessages", {
+            error: json.error,
+            warning: json.warning,
+            notice: json.notice,
+          });
+
+          this._fetching = false;
+          this._notify("offset");
+          this.setData("appStatus", "normal");
+
+          // if the search conditions change during the search, re-search
+          if (
+            lastConditions !==
+            JSON.stringify(this._store.simpleSearchConditions)
+          ) {
+            this._setSimpleSearchConditions({});
+          }
+        });
+    })(offset, isFirstTime);
   },
 
   // Bindings *******************************************
