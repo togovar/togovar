@@ -22,6 +22,7 @@ gem 'js-routes', '~> 1.4'
 gem 'sass-rails', '~> 5.0'
 
 # utility
+gem 'active_interaction', '~> 4.1'
 gem 'dotenv-rails', '~> 2.7', '>= 2.7.6'
 gem 'rails_pretty_json_rednerer', '~> 0.1.0'
 
