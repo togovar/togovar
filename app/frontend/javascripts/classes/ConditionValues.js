@@ -3,12 +3,10 @@ import ConditionValueEditorColumns from './ConditionValueEditorColumns.js';
 import ConditionValueEditorTextField from './ConditionValueEditorTextField.js';
 import ConditionValueEditorFrequencyCount from './ConditionValueEditorFrequencyCount.js';
 // import {ADVANCED_CONDITIONS} from '../global.js';
-import {CONDITION_TYPE} from '../definition.js';
+import { CONDITION_TYPE } from '../definition.js';
 
 export default class ConditionValues {
-
   constructor(conditionView) {
-
     this._conditionView = conditionView;
     this._editors = [];
 
@@ -21,41 +19,76 @@ export default class ConditionValues {
       </div>`;
 
     // references
-    this._sections = conditionView.editorElement.querySelector(':scope > .sections');
-    const buttons = conditionView.editorElement.querySelector(':scope > .buttons');
-    this._okButton = buttons.querySelector(':scope > .button-view:nth-child(1)');
+    this._sections =
+      conditionView.editorElement.querySelector(':scope > .sections');
+    const buttons =
+      conditionView.editorElement.querySelector(':scope > .buttons');
+    this._okButton = buttons.querySelector(
+      ':scope > .button-view:nth-child(1)'
+    );
 
     // events
     this._okButton.addEventListener('click', this._clickOkButton.bind(this));
-    buttons.querySelector(':scope > .button-view:nth-child(2)').addEventListener('click', this._clickCancelButton.bind(this));
+    buttons
+      .querySelector(':scope > .button-view:nth-child(2)')
+      .addEventListener('click', this._clickCancelButton.bind(this));
 
     // initialization by types
     // TODO: conditionType は ADVANCED_CONDITIONS[conditionView.conditionType].type を参照して処理をスイッチさせたい
     switch (conditionView.conditionType) {
       case CONDITION_TYPE.type:
       case CONDITION_TYPE.significance:
-        this._editors.push(new ConditionValueEditorCheckboxes(this, this._conditionView.conditionType));
-      break;
+        this._editors.push(
+          new ConditionValueEditorCheckboxes(
+            this,
+            this._conditionView.conditionType
+          )
+        );
+        break;
       case CONDITION_TYPE.consequence:
-        this._editors.push(new ConditionValueEditorColumns(this, this._conditionView.conditionType));
-      break;
+        this._editors.push(
+          new ConditionValueEditorColumns(
+            this,
+            this._conditionView.conditionType
+          )
+        );
+        break;
       case CONDITION_TYPE.dataset:
-        this._editors.push(new ConditionValueEditorColumns(this, this._conditionView.conditionType));
-        this._editors.push(new ConditionValueEditorFrequencyCount(this, this._conditionView.conditionType));
-      break;
+        this._editors.push(
+          new ConditionValueEditorColumns(
+            this,
+            this._conditionView.conditionType
+          )
+        );
+        this._editors.push(
+          new ConditionValueEditorFrequencyCount(
+            this,
+            this._conditionView.conditionType
+          )
+        );
+        break;
       case CONDITION_TYPE.gene_symbol:
-        this._editors.push(new ConditionValueEditorTextField(this, this._conditionView.conditionType));
-      break;
+        this._editors.push(
+          new ConditionValueEditorTextField(
+            this,
+            this._conditionView.conditionType
+          )
+        );
+        break;
       case CONDITION_TYPE.disease:
         this._editors.push(
-          new ConditionValueEditorTextField(this, this._conditionView.conditionType),
-          new ConditionValueEditorColumns(this, this._conditionView.conditionType)
+          new ConditionValueEditorTextField(
+            this,
+            this._conditionView.conditionType
+          ),
+          new ConditionValueEditorColumns(
+            this,
+            this._conditionView.conditionType
+          )
         );
-      break;
+        break;
     }
-
   }
-
 
   // public methods
 
@@ -68,8 +101,8 @@ export default class ConditionValues {
 
   update(isValid) {
     if (this._conditionView.conditionType === CONDITION_TYPE.dataset) {
-      isValid = this._editors.every(editor => {
-        return editor.isValid
+      isValid = this._editors.every((editor) => {
+        return editor.isValid;
       });
     }
     if (isValid) {
@@ -78,7 +111,6 @@ export default class ConditionValues {
       this._okButton.classList.add('-disabled');
     }
   }
-
 
   // private methods
 
@@ -90,7 +122,7 @@ export default class ConditionValues {
   _clickCancelButton(e) {
     e.stopImmediatePropagation();
     if (this._conditionView.isFirstTime) {
-      // delete for the first time 
+      // delete for the first time
       this._conditionView.remove();
     } else {
       // otherwise, revert to the previous state
@@ -100,7 +132,6 @@ export default class ConditionValues {
       this._conditionView.doneEditing();
     }
   }
-
 
   // accessor
 
@@ -115,5 +146,4 @@ export default class ConditionValues {
   get sections() {
     return this._sections;
   }
-
 }

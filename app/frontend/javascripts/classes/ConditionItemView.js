@@ -1,19 +1,17 @@
 import ConditionView from './ConditionView.js';
 import ConditionValues from './ConditionValues.js';
-import {ADVANCED_CONDITIONS} from '../global.js';
-import {CONDITION_TYPE, CONDITION_ITEM_TYPE} from '../definition.js';
+import { ADVANCED_CONDITIONS } from '../global.js';
+import { CONDITION_TYPE, CONDITION_ITEM_TYPE } from '../definition.js';
 
 export default class ConditionItemView extends ConditionView {
-
   /**
-   * 
-   * @param {AdvancedSearchBuilderView} builder 
+   *
+   * @param {AdvancedSearchBuilderView} builder
    * @param {*} parentView
    * @param {String} conditionType
    * @param {Node} referenceElm
    */
   constructor(builder, parentView, conditionType, referenceElm = null) {
-
     super(CONDITION_ITEM_TYPE.condition, builder, parentView, referenceElm);
 
     this._conditionType = conditionType;
@@ -44,26 +42,35 @@ export default class ConditionItemView extends ConditionView {
     const body = this._elm.querySelector(':scope > .body');
     const summary = body.querySelector(':scope > .summary');
     this._values = summary.querySelector(':scope > .values');
-    this._editor = body.querySelector(':scope > .advanced-search-condition-editor-view');
+    this._editor = body.querySelector(
+      ':scope > .advanced-search-condition-editor-view'
+    );
     this._conditionValues = new ConditionValues(this);
 
     // events
     // stop propagation
-    this._elm.addEventListener('click', e => {
+    this._elm.addEventListener('click', (e) => {
       e.stopImmediatePropagation();
     });
     // select/deselect
     summary.addEventListener('click', this._toggleSelecting.bind(this));
     // switch logical operation
-    summary.querySelector(':scope > .relation').addEventListener('click', e => {
-      e.stopImmediatePropagation();
-      // TODO: どうやら、contains, not_contains のトグルらしい
-      // if (this._elm.dataset.relation === 'contains') return;
-      this._elm.dataset.relation = {eq: 'ne', ne: 'eq'}[this._elm.dataset.relation];
-    });
+    summary
+      .querySelector(':scope > .relation')
+      .addEventListener('click', (e) => {
+        e.stopImmediatePropagation();
+        // TODO: どうやら、contains, not_contains のトグルらしい
+        // if (this._elm.dataset.relation === 'contains') return;
+        this._elm.dataset.relation = { eq: 'ne', ne: 'eq' }[
+          this._elm.dataset.relation
+        ];
+        this.doneEditing();
+      });
     // buttons
-    for (const button of summary.querySelectorAll(':scope > .buttons > button')) {
-      button.addEventListener('click', e => {
+    for (const button of summary.querySelectorAll(
+      ':scope > .buttons > button'
+    )) {
+      button.addEventListener('click', (e) => {
         e.stopImmediatePropagation();
         switch (e.target.className) {
           case 'edit':
@@ -71,14 +78,15 @@ export default class ConditionItemView extends ConditionView {
             this._conditionValues.startToEditCondition();
             break;
           case 'delete':
-            this._builder.delete([this])
+            this._builder.delete([this]);
             break;
         }
       });
     }
-    summary.querySelector(':scope > .buttons > button.edit').dispatchEvent(new Event('click'));
+    summary
+      .querySelector(':scope > .buttons > button.edit')
+      .dispatchEvent(new Event('click'));
   }
-
 
   // public methods
 
@@ -93,7 +101,7 @@ export default class ConditionItemView extends ConditionView {
   // }
 
   // deselect() {
-    
+
   // }
 
   remove() {
@@ -101,7 +109,6 @@ export default class ConditionItemView extends ConditionView {
     super.remove();
     // this._parent.removeConditionView(this);
   }
-
 
   // accessor
 
@@ -122,21 +129,23 @@ export default class ConditionItemView extends ConditionView {
   }
 
   get query() {
-    const values = Array.from(this._values.querySelectorAll(':scope > condition-item-value-view'));
+    const values = Array.from(
+      this._values.querySelectorAll(':scope > condition-item-value-view')
+    );
     if (this._conditionType === CONDITION_TYPE.dataset) {
       // if the condition type is dataset, special conditional expression is needed
-      const queries = values.map(view => view.shadowRoot.querySelector('frequency-count-value-view').queryValue);
-      return queries.length <= 1
-        ? queries[0]
-        : {or: queries};
+      const queries = values.map(
+        (view) =>
+          view.shadowRoot.querySelector('frequency-count-value-view').queryValue
+      );
+      return queries.length <= 1 ? queries[0] : { or: queries };
     } else {
       return {
         [this._conditionType]: {
           relation: this._elm.dataset.relation,
-          terms: values.map(value => value.value)
-        }
+          terms: values.map((value) => value.value),
+        },
       };
     }
   }
-
 }
