@@ -5,6 +5,8 @@ Rails.application.routes.draw do
 
   namespace :api do
     match 'search/variant', via: %w[get post]
+    match 'search/disease', via: %w[get post]
+    match 'inspect/disease', via: %w[get post]
   end
 
   # backward compatibility

@@ -50,11 +50,36 @@ module API
       end
     end
 
+    def disease
+      params = disease_params.to_h
+
+      respond_to do |format|
+        format.html { render plain: 'Not implemented', content_type: 'text/plain', status: :not_implemented }
+        format.json do
+          renderer = params.key?(:pretty) ? :pretty_json : :json
+
+          action = SearchDisease.run(params)
+          if action.valid?
+            render renderer => action.result
+          else
+            render renderer => { errors: action.errors.full_messages }, status: :bad_request
+          end
+        end
+      end
+    rescue StandardError => e
+      Rails.logger.error(self.class) { e }
+      render json: { errors: ['Internal server error'] }, status: :internal_server_error
+    end
+
     private
 
     # @return [ActionController::Parameters]
     def variant_params
       @variant_params ||= params.permit(:debug, :pretty, :version, :limit, :offset, query: {}, body: {})
+    end
+
+    def disease_params
+      params.permit(:pretty, :term, body: {})
     end
 
     # @return [Array] [result, status]
