@@ -1,16 +1,16 @@
-import StoreManager from "./StoreManager.js";
-import ConditionGroupView from "./ConditionGroupView.js";
-import AdvancedSearchToolbar from "./AdvancedSearchToolbar.js";
-import AdvancedSearchSelection from "./AdvancedSearchSelection.js";
+import StoreManager from './StoreManager.js';
+import ConditionGroupView from './ConditionGroupView.js';
+import AdvancedSearchToolbar from './AdvancedSearchToolbar.js';
+import AdvancedSearchSelection from './AdvancedSearchSelection.js';
 // import {ADVANCED_CONDITIONS} from '../global.js';
 // import {API_URL} from "../global.js";
-import { CONDITION_ITEM_TYPE } from "../definition.js";
+import { CONDITION_ITEM_TYPE } from '../definition.js';
 
 export default class AdvancedSearchBuilderView {
   constructor(elm) {
     this._elm = elm;
-    this._container = elm.querySelector(":scope > .inner");
-    this._rootGroup = new ConditionGroupView(this, this, "and", [], null, true);
+    this._container = elm.querySelector(':scope > .inner');
+    this._rootGroup = new ConditionGroupView(this, this, 'and', [], null, true);
 
     // toolbar
     this._toolbar = new AdvancedSearchToolbar(
@@ -19,7 +19,7 @@ export default class AdvancedSearchBuilderView {
     );
 
     // events
-    StoreManager.bind("advancedSearchConditions", this);
+    StoreManager.bind('advancedSearchConditions', this);
     this._defineEvents();
 
     // select conditions
@@ -70,7 +70,14 @@ export default class AdvancedSearchBuilderView {
 
   changeCondition() {
     const query = this._rootGroup.query;
-    this._toolbar.canSearch(Object.keys(query).length > 0);
+    //this._toolbar.canSearch(Object.keys(query).length > 0);
+    if (this.canSearch(query)) {
+      this.search();
+    }
+  }
+
+  canSearch(query) {
+    return Object.keys(query).length > 0;
   }
 
   group() {
@@ -167,10 +174,10 @@ export default class AdvancedSearchBuilderView {
 
   _defineEvents() {
     let downX, downY;
-    this._elm.addEventListener("mousedown", (e) => {
+    this._elm.addEventListener('mousedown', (e) => {
       [downX, downY] = [e.x, e.y];
     });
-    this._elm.addEventListener("click", (e) => {
+    this._elm.addEventListener('click', (e) => {
       if (Math.abs(downX - e.x) > 2 || Math.abs(downY - e.y) > 2) return;
       e.stopImmediatePropagation();
       this._selection.deselectAllConditions();
