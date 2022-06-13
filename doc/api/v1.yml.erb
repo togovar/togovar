@@ -5,11 +5,8 @@ servers:
 
 info:
   title: TogoVar API
-  version: "0.9"
-  description: TogoVar API version 0.9 specification
-
-tags:
-  - name: search
+  version: "0.9.1"
+  description: TogoVar API version 0.9.1 specification
 
 paths:
   /search/variant:
@@ -27,155 +24,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  scroll:
-                    type: object
-                    properties:
-                      offset:
-                        type: integer
-                      limit:
-                        type: integer
-                      max_rows:
-                        type: integer
-
-                  statistics:
-                    type: object
-                    properties:
-                      total:
-                        type: integer
-                      filtered:
-                        type: integer
-                      dataset:
-                        type: object
-                        properties:
-                          dataset_name:
-                            type: integer
-                      type:
-                        type: object
-                        properties:
-                          so_term:
-                            type: integer
-                      significance:
-                        type: object
-                        properties:
-                          significance_key:
-                            type: integer
-                      consequence:
-                        type: object
-                        properties:
-                          so_term:
-                            type: integer
-
-                  data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        type:
-                          type: string
-                        chromosome:
-                          type: string
-                        start:
-                          type: integer
-                        stop:
-                          type: integer
-                        reference:
-                          type: string
-                        alternative:
-                          type: string
-                        most_severe_consequence:
-                          type: string
-                        sift:
-                          type: number
-                        polyphen:
-                          type: number
-                        existing_variations:
-                          type: array
-                          items:
-                            type: string
-                        external_link:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              db_name:
-                                type: array
-                                items:
-                                  type: string
-                        significance:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              condition:
-                                type: string
-                              interpretations:
-                                type: array
-                                items:
-                                  type: string
-                        transcripts:
-                          type: object
-                          properties:
-                            transcript_id:
-                              type: string
-                            gene_id:
-                              type: string
-                            consequence:
-                              type: array
-                              items:
-                                type: string
-                            sift:
-                              type: number
-                            polyphen:
-                              type: number
-                            hgnc_id:
-                              type: integer
-                            symbol:
-                              type: object
-                              properties:
-                                source:
-                                  type: string
-                                label:
-                                  type: string
-                            hgvs_p:
-                              type: string
-                            hgvs_c:
-                              type: string
-                            hgvs_g:
-                              type: string
-                        frequencies:
-                          type: object
-                          properties:
-                            source:
-                              type: string
-                            filter:
-                              type: array
-                              items:
-                                type: string
-                            quality:
-                              type: number
-                            allele:
-                              type: object
-                              properties:
-                                number:
-                                  type: integer
-                                count:
-                                  type: integer
-                                frequency:
-                                  type: number
-                            genotype:
-                              type: object
-                              properties:
-                                ref_homo_count:
-                                  type: integer
-                                hetero_count:
-                                  type: integer
-                                alt_homo_count:
-                                  type: integer
-
+                $ref: '#/components/definitions/SearchVariant'
         '400':
           description: >
             `Bad Request`<br/>
@@ -183,13 +32,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  errors:
-                    type: array
-                    items:
-                      type: string
-
+                $ref: '#/components/definitions/Error'
         '500':
           description: >
             `Internal Server Error`<br/>
@@ -197,13 +40,173 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  errors:
-                    type: array
-                    items:
-                      type: string
+                $ref: '#/components/definitions/Error'
+        '501':
+          description: >
+            `Not Implemented`<br/>
+            Responder for given mime type are not inplemented.
+            Provide the correct accept header (e.g. `Accept: application/json`).
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Not implemented
 
+  /search/disease:
+    get:
+      tags:
+        - search
+      parameters:
+        - $ref: '#/components/parameters/Pretty'
+        - $ref: '#/components/parameters/Term'
+      responses:
+        '200':
+          description: >
+            `OK`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/SuggestDisease'
+        '400':
+          description: >
+            `Bad Request`<br/>
+            Your query contains grammatical mistakes. See errors in the response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/Error'
+        '500':
+          description: >
+            `Internal Server Error`<br/>
+            Unexpected errors occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/Error'
+        '501':
+          description: >
+            `Not Implemented`<br/>
+            Responder for given mime type are not inplemented.
+            Provide the correct accept header (e.g. `Accept: application/json`).
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Not implemented
+    post:
+      tags:
+        - search
+      parameters:
+        - $ref: '#/components/parameters/Pretty'
+      requestBody:
+        $ref: '#/components/requestBodies/SearchDisease'
+      responses:
+        '200':
+          description: >
+            `OK`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/SuggestDisease'
+        '400':
+          description: >
+            `Bad Request`<br/>
+            Your query contains grammatical mistakes. See errors in the response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/Error'
+        '500':
+          description: >
+            `Internal Server Error`<br/>
+            Unexpected errors occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/Error'
+        '501':
+          description: >
+            `Not Implemented`<br/>
+            Responder for given mime type are not inplemented.
+            Provide the correct accept header (e.g. `Accept: application/json`).
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Not implemented
+
+  /inspect/disease:
+    get:
+      tags:
+        - inspect
+      parameters:
+        - $ref: '#/components/parameters/Pretty'
+        - $ref: '#/components/parameters/Node'
+      responses:
+        '200':
+          description: >
+            `OK`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/InspectDisease'
+        '400':
+          description: >
+            `Bad Request`<br/>
+            Your query contains grammatical mistakes. See errors in the response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/Error'
+        '500':
+          description: >
+            `Internal Server Error`<br/>
+            Unexpected errors occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/Error'
+        '501':
+          description: >
+            `Not Implemented`<br/>
+            Responder for given mime type are not inplemented.
+            Provide the correct accept header (e.g. `Accept: application/json`).
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Not implemented
+    post:
+      tags:
+        - inspect
+      parameters:
+        - $ref: '#/components/parameters/Pretty'
+      requestBody:
+        $ref: '#/components/requestBodies/InspectDisease'
+      responses:
+        '200':
+          description: >
+            `OK`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/InspectDisease'
+        '400':
+          description: >
+            `Bad Request`<br/>
+            Your query contains grammatical mistakes. See errors in the response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/Error'
+        '500':
+          description: >
+            `Internal Server Error`<br/>
+            Unexpected errors occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/Error'
         '501':
           description: >
             `Not Implemented`<br/>
@@ -225,6 +228,24 @@ components:
         type: boolean
         nullable: true
 
+    Node:
+      in: query
+      name: node
+      description: A node ID (MONDO)
+      schema:
+        type: string
+      required: false
+      example: MONDO_0045024
+
+    Term:
+      in: query
+      name: term
+      description: A term to search
+      schema:
+        type: string
+      required: true
+      example: breast ovarian cancer
+
   requestBodies:
     SearchVariant:
       description: Schema for searching variant
@@ -242,7 +263,7 @@ components:
               query:
                 oneOf:
                   - $ref: '#/components/schemas/ID'
-                  - $ref: '#/components/schemas/Position'
+                  - $ref: '#/components/schemas/Location'
                   - $ref: '#/components/schemas/VariantType'
                   - $ref: '#/components/schemas/VariantConsequence'
                   - $ref: '#/components/schemas/VariantFrequency'
@@ -269,7 +290,6 @@ components:
                     maxItems: 4
                     items:
                       type: string
-
           examples:
             Example1:
               $ref: '#/components/examples/SearchVariant-1'
@@ -279,6 +299,40 @@ components:
               $ref: '#/components/examples/SearchVariant-3'
             Example4:
               $ref: '#/components/examples/SearchVariant-4'
+            Example5:
+              $ref: '#/components/examples/SearchVariant-5'
+            Example6:
+              $ref: '#/components/examples/SearchVariant-6'
+            Example7:
+              $ref: '#/components/examples/SearchVariant-7'
+
+    SearchDisease:
+      description: Schema for searching disease
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              term:
+                type: string
+                description: A term to search
+                required: true
+                example: breast ovarian cancer
+
+    InspectDisease:
+      description: Schema for inspecting disease
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              node:
+                type: string
+                description: A node ID (MONDO)
+                required: false
+                example: MONDO_0045024
 
   schemas:
     ID:
@@ -293,44 +347,52 @@ components:
             type: string
             description: tgv ID
 
-    Position:
+    Location:
       type: object
       additionalProperties: false
       required:
-        - choromosome
-        - position
+        - location
       properties:
-        choromosome:
-          type: string
-          description: chromosome name
-          enum:
-            - "1"
-            - "2"
-            - "3"
-            - "4"
-            - "5"
-            - "6"
-            - "7"
-            - "8"
-            - "9"
-            - "10"
-            - "11"
-            - "12"
-            - "13"
-            - "14"
-            - "15"
-            - "16"
-            - "17"
-            - "18"
-            - "19"
-            - "20"
-            - "21"
-            - "22"
-            - X
-            - Y
-            - MT
-        position:
-          $ref: '#/components/schemas/Range'
+        location:
+          type: object
+          additionalProperties: false
+          required:
+            - chromosome
+            - position
+          properties:
+            chromosome:
+              type: string
+              description: chromosome name
+              enum:
+                - "1"
+                - "2"
+                - "3"
+                - "4"
+                - "5"
+                - "6"
+                - "7"
+                - "8"
+                - "9"
+                - "10"
+                - "11"
+                - "12"
+                - "13"
+                - "14"
+                - "15"
+                - "16"
+                - "17"
+                - "18"
+                - "19"
+                - "20"
+                - "21"
+                - "22"
+                - X
+                - Y
+                - MT
+            position:
+              oneOf:
+                - type: integer
+                - $ref: '#/components/schemas/Range'
 
     VariantType:
       type: object
@@ -819,7 +881,7 @@ components:
             type: object
             oneOf:
               - $ref: '#/components/schemas/ID'
-              - $ref: '#/components/schemas/Position'
+              - $ref: '#/components/schemas/Location'
               - $ref: '#/components/schemas/VariantType'
               - $ref: '#/components/schemas/VariantConsequence'
               - $ref: '#/components/schemas/VariantFrequency'
@@ -842,7 +904,7 @@ components:
             type: object
             oneOf:
               - $ref: '#/components/schemas/ID'
-              - $ref: '#/components/schemas/Position'
+              - $ref: '#/components/schemas/Location'
               - $ref: '#/components/schemas/VariantType'
               - $ref: '#/components/schemas/VariantConsequence'
               - $ref: '#/components/schemas/VariantFrequency'
@@ -851,6 +913,236 @@ components:
               - $ref: '#/components/schemas/Disease'
               - $ref: '#/components/schemas/And'
               - $ref: '#/components/schemas/Or'
+
+  definitions:
+    SearchVariant:
+      type: object
+      properties:
+        scroll:
+          type: object
+          properties:
+            offset:
+              type: integer
+            limit:
+              type: integer
+            max_rows:
+              type: integer
+
+        statistics:
+          type: object
+          properties:
+            total:
+              type: integer
+            filtered:
+              type: integer
+            dataset:
+              type: object
+              properties:
+                dataset_name:
+                  type: integer
+            type:
+              type: object
+              properties:
+                so_term:
+                  type: integer
+            significance:
+              type: object
+              properties:
+                significance_key:
+                  type: integer
+            consequence:
+              type: object
+              properties:
+                so_term:
+                  type: integer
+
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              type:
+                type: string
+              chromosome:
+                type: string
+              start:
+                type: integer
+              stop:
+                type: integer
+              reference:
+                type: string
+              alternative:
+                type: string
+              most_severe_consequence:
+                type: string
+              sift:
+                type: number
+              polyphen:
+                type: number
+              existing_variations:
+                type: array
+                items:
+                  type: string
+              external_link:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    db_name:
+                      type: array
+                      items:
+                        type: string
+              significance:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    condition:
+                      type: string
+                    interpretations:
+                      type: array
+                      items:
+                        type: string
+              transcripts:
+                type: object
+                properties:
+                  transcript_id:
+                    type: string
+                  gene_id:
+                    type: string
+                  consequence:
+                    type: array
+                    items:
+                      type: string
+                  sift:
+                    type: number
+                  polyphen:
+                    type: number
+                  hgnc_id:
+                    type: integer
+                  symbol:
+                    type: object
+                    properties:
+                      source:
+                        type: string
+                      label:
+                        type: string
+                  hgvs_p:
+                    type: string
+                  hgvs_c:
+                    type: string
+                  hgvs_g:
+                    type: string
+              frequencies:
+                type: object
+                properties:
+                  source:
+                    type: string
+                  filter:
+                    type: array
+                    items:
+                      type: string
+                  quality:
+                    type: number
+                  allele:
+                    type: object
+                    properties:
+                      number:
+                        type: integer
+                      count:
+                        type: integer
+                      frequency:
+                        type: number
+                  genotype:
+                    type: object
+                    properties:
+                      ref_homo_count:
+                        type: integer
+                      hetero_count:
+                        type: integer
+                      alt_homo_count:
+                        type: integer
+
+    InspectDisease:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            example: MONDO_0045024
+          cui:
+            type: string
+            example: null
+          label:
+            type: string
+            example: cancer or benign tumor
+          root:
+            type: boolean
+            example: false
+          leaf:
+            type: boolean
+            example: false
+          parents:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: MONDO_0000001
+                cui:
+                  type: string
+                  example: null
+                label:
+                  type: string
+                  example: disease or disorder
+                root:
+                  type: boolean
+                  example: true
+          children:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: MONDO_0021074
+                cui:
+                  type: string
+                  example: C0032927
+                label:
+                  type: string
+                  example: Precancerous condition
+                leaf:
+                  type: boolean
+                  example: false
+
+    SuggestDisease:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            example: MONDO_0045024
+          cui:
+            type: string
+            example: null
+          label:
+            type: string
+            example: cancer or benign tumor
+
+    Error:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+            example: "error message"
 
   examples:
     SearchVariant-1:
@@ -865,7 +1157,7 @@ components:
               - indel
 
     SearchVariant-2:
-      summary: List variants exists on Aldehyde Dehydrogenase 2 family member (ALDH2).
+      summary: List variants exist on Aldehyde Dehydrogenase 2 family member (ALDH2).
       value:
         query:
           gene_symbol:
@@ -874,7 +1166,7 @@ components:
               - ALDH2
 
     SearchVariant-3:
-      summary: List variants ranges from 0.05 to 0.95 in frequency in JGA-NGS.
+      summary: List variants range from 0.05 to 0.95 in frequency in JGA-NGS.
       value:
         query:
           or:
@@ -903,3 +1195,29 @@ components:
             - G
             - A
           limit: 1000
+
+    SearchVariant-5:
+      summary: List variants by identifiers (tgv, rs)
+      value:
+        query:
+          id:
+            - tgv421843
+            - rs114202595
+
+    SearchVariant-6:
+      summary: List variants exist on an exact position
+      value:
+        query:
+          location:
+            chromosome: "16"
+            position: 48258198
+
+    SearchVariant-7:
+      summary: List variants exist in a certain range
+      value:
+        query:
+          location:
+            chromosome: "10"
+            position:
+              gte: 73270743
+              lte: 73376976
