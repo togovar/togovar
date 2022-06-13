@@ -10,7 +10,7 @@ module Tasks
     desc 'health', 'Check cluster health'
 
     def health
-      ap ::Elasticsearch::Model.client.cluster.health
+      pp ::Elasticsearch::Model.client.cluster.health
     end
 
     desc 'init', 'Initialize and create all indices'
