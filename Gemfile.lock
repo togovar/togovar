@@ -43,6 +43,9 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
+    active_interaction (4.1.0)
+      activemodel (>= 5, < 8)
+      activesupport (>= 5, < 8)
     activejob (6.0.4.7)
       activesupport (= 6.0.4.7)
       globalid (>= 0.3.6)
@@ -455,6 +458,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  active_interaction (~> 4.1)
   better_errors (~> 2.9, >= 2.9.1)
   better_errors-pry (~> 1.0, >= 1.0.3)
   bio-vcf!
