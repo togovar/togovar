@@ -1,54 +1,59 @@
 // color
-$COLOR_KEY: #62D5D9;
+$COLOR_KEY: #62d5d9;
 $COLOR_KEY_DARK1: #117f93;
 $COLOR_KEY_DARK2: #0f6272;
 $COLOR_KEY_DARK3: #125263;
 
-$COLOR_SELECTED: #FFDD00;
-$COLOR_SELECTED_LIGHT: #FDFAE5;
+$COLOR_SELECTED: #ffdd00;
+$COLOR_SELECTED_LIGHT: #fdfae5;
 $COLOR_DISABLE_DEEP: #808080;
 $COLOR_DISABLE: #999999;
 
 $COLOR_BLACK: #444;
-$COLOR_GRAY: #94928D;
+$COLOR_GRAY: #94928d;
 $COLOR_LIGHT_GRAY: lighten($COLOR_GRAY, 35%);
-$COLOR_SEPARATOR: rgba(0, 0, 0, .3);
-$COLOR_SEPARATOR_SUB: rgba(0, 0, 0, .2);
+$COLOR_DARKER_GRAY: #dbdbdb;
+$COLOR_SEPARATOR: rgba(0, 0, 0, 0.3);
+$COLOR_SEPARATOR_SUB: rgba(0, 0, 0, 0.2);
 
-$COLOR_REF: #249EB3;
-$COLOR_ALT: #FF6682;
+$COLOR_REF: #249eb3;
+$COLOR_ALT: #ff6682;
 
 $COLOR_DATASET_JGA: $COLOR_KEY;
 $COLOR_DATASET_JGA_LIGHT: lighten($COLOR_DATASET_JGA, 35%);
-$COLOR_DATASET_3_5KJPN: #ABE03F;
+$COLOR_DATASET_3_5KJPN: #abe03f;
 $COLOR_DATASET_3_5KJPN_LIGHT: lighten($COLOR_DATASET_3_5KJPN, 35%);
-$COLOR_DATASET_HGVD: #005B80;
+$COLOR_DATASET_HGVD: #005b80;
 $COLOR_DATASET_MGEND: $COLOR_DATASET_HGVD;
 $COLOR_DATASET_HGVD_LIGHT: lighten($COLOR_DATASET_HGVD, 70%);
-$COLOR_DATASET_GEM_J: #DC2828;
+$COLOR_DATASET_GEM_J: #dc2828;
 $COLOR_DATASET_GEM_J_LIGHT: lighten($COLOR_DATASET_GEM_J, 45%);
-$COLOR_DATASET_BBJ: #FF993F;
+$COLOR_DATASET_BBJ: #ff993f;
 $COLOR_DATASET_BBJ_LIGHT: lighten($COLOR_DATASET_BBJ, 35%);
 $COLOR_DATASET_FOREIGN: #94928d;
 $COLOR_DATASET_FOREIGN_LIGHT: lighten($COLOR_DATASET_FOREIGN, 40%);
 
-$COLOR_SIGN_SAFE: #24D636;
+$COLOR_SIGN_SAFE: #24d636;
 $COLOR_SIGN_SAFE_LIGHT: lighten($COLOR_SIGN_SAFE, 45%);
-$COLOR_SIGN_NORMAL: #9DCF3A;
+$COLOR_SIGN_NORMAL: #9dcf3a;
 $COLOR_SIGN_NORMAL_LIGHT: lighten($COLOR_SIGN_NORMAL, 42%);
-$COLOR_SIGN_WARNING: #FFAE00;
+$COLOR_SIGN_WARNING: #ffae00;
 $COLOR_SIGN_WARNING_LIGHT: lighten($COLOR_SIGN_WARNING, 45%);
-$COLOR_SIGN_DANGEROUS: #FF5A54;
+$COLOR_SIGN_DANGEROUS: #ff5a54;
 $COLOR_SIGN_DANGEROUS_LIGHT: lighten($COLOR_SIGN_DANGEROUS, 30%);
-$COLOR_SIGN_MODIFIER: #C654FF;
+$COLOR_SIGN_MODIFIER: #c654ff;
 $COLOR_SIGN_MODIFIER_LIGHT: lighten($COLOR_SIGN_MODIFIER, 30%);
-$COLOR_SIGN_OTHER: #9C8200;
+$COLOR_SIGN_OTHER: #9c8200;
 $COLOR_SIGN_OTHER_LIGHT: lighten($COLOR_SIGN_OTHER, 60%);
 $COLOR_SIGN_UNKNOWN: $COLOR_GRAY;
 $COLOR_SIGN_UNKNOWN_LIGHT: lighten($COLOR_SIGN_UNKNOWN, 35%);
 
 $GRADIENT_HEADING: linear-gradient(to right, $COLOR_KEY_DARK1, $COLOR_KEY);
-$GRADIENT_HEADING_DISABLE: linear-gradient(to right, $COLOR_DISABLE_DEEP, $COLOR_DISABLE);
+$GRADIENT_HEADING_DISABLE: linear-gradient(
+  to right,
+  $COLOR_DISABLE_DEEP,
+  $COLOR_DISABLE
+);
 
 // geometry
 $PADDING_SIDE: 18px;
@@ -76,30 +81,35 @@ $Z_INDEX_CONFIGURATION: 4;
 $Z_INDEX_EDITING_CONDITION: 4;
 $Z_INDEX_ACTIVITY_INDICATOR: 5;
 
-$BACKDROP_BG: radial-gradient(ellipse at center, rgba($COLOR_KEY, .6) 10%, rgba($COLOR_KEY, .8) 60%, rgba($COLOR_KEY_DARK3, 1) 120%);
+$BACKDROP_BG: radial-gradient(
+  ellipse at center,
+  rgba($COLOR_KEY, 0.6) 10%,
+  rgba($COLOR_KEY, 0.8) 60%,
+  rgba($COLOR_KEY_DARK3, 1) 120%
+);
 
 // time
-$GUI_DURATION: .2s;
-$TRANSITION_DURATION: .5s;
+$GUI_DURATION: 0.2s;
+$TRANSITION_DURATION: 0.5s;
 
 // effect
-$SHADOW_DEPTH1: 0 1px 1px rgba(black, .3);
+$SHADOW_DEPTH1: 0 1px 1px rgba(black, 0.3);
 
 // charactor
 // FontAwesome
-$CHAR_TIMES: "\f00d";
-$CHAR_INFO_CIRCLE: "\f05a";
-$CHAR_ARROW_RIGHT: "\f061";
-$CHAR_ARROW_DOWN: "\f063";
-$CHAR_EXCRAMATION_TRIANGLE: "\f071";
-$CHAR_EXTERNAL_LINK: "\f08e";
-$CHAR_ARROW_CIRCLE_RIGHT: "\f0a9";
-$CHAR_WRENCH: "\f0ad";
+$CHAR_TIMES: '\f00d';
+$CHAR_INFO_CIRCLE: '\f05a';
+$CHAR_ARROW_RIGHT: '\f061';
+$CHAR_ARROW_DOWN: '\f063';
+$CHAR_EXCRAMATION_TRIANGLE: '\f071';
+$CHAR_EXTERNAL_LINK: '\f08e';
+$CHAR_ARROW_CIRCLE_RIGHT: '\f0a9';
+$CHAR_WRENCH: '\f0ad';
 // fontello
-$CHAR_DATASET: "\E800";
-$CHAR_LOGICAL_OP_AND: "\E801";
-$CHAR_LOGICAL_OP_OR: "\E802";
-$CHAR_LOGICAL_OP_OUTLINE: "\E803";
+$CHAR_DATASET: '\E800';
+$CHAR_LOGICAL_OP_AND: '\E801';
+$CHAR_LOGICAL_OP_OR: '\E802';
+$CHAR_LOGICAL_OP_OUTLINE: '\E803';
 
 :root {
   // color
@@ -110,6 +120,7 @@ $CHAR_LOGICAL_OP_OUTLINE: "\E803";
   --color-black: #{$COLOR_BLACK};
   --color-gray: #{$COLOR_GRAY};
   --color-light-gray: #{$COLOR_LIGHT_GRAY};
+  --color-darker-gray: #{$COLOR_DARKER_GRAY};
   --color-selected: #{$COLOR_SELECTED};
   --color-selected-light: #{$COLOR_SELECTED_LIGHT};
   --color-disable: #{$COLOR_DISABLE};
@@ -147,29 +158,29 @@ $CHAR_LOGICAL_OP_OUTLINE: "\E803";
   --color-sign-other-light: #{$COLOR_SIGN_OTHER_LIGHT};
   --color-sign-unknown: #{$COLOR_SIGN_UNKNOWN};
   --color-sign-unknown-light: #{$COLOR_SIGN_UNKNOWN_LIGHT};
-  
+
   // geometric
   --height-advanced-search-condition-values-container: 24px;
   --height-advanced-search-condition-value: 18px;
 
   // charactor
   // FontAwesome
-  --char-TIMES: "\f00d";
-  --char-INFO_CIRCLE: "\f05a";
-  --char-ARROW_RIGHT: "\f061";
-  --char-ARROW_DOWN: "\f063";
-  --char-EXCRAMATION_TRIANGLE: "\f071";
-  --char-EXTERNAL_LINK: "\f08e";
-  --char-ARROW_CIRCLE_RIGHT: "\f0a9";
-  --char-WRENCH: "\f0ad";
+  --char-TIMES: '\f00d';
+  --char-INFO_CIRCLE: '\f05a';
+  --char-ARROW_RIGHT: '\f061';
+  --char-ARROW_DOWN: '\f063';
+  --char-EXCRAMATION_TRIANGLE: '\f071';
+  --char-EXTERNAL_LINK: '\f08e';
+  --char-ARROW_CIRCLE_RIGHT: '\f0a9';
+  --char-WRENCH: '\f0ad';
   // fontello
-  --char-dataset: "\E800";
-  --char-logical-op-and: "\E801";
-  --char-logical-op-or: "\E802";
-  --char-logical-op-outline: "\E803";
-  --char-edit: "\E804";
-  --char-delete: "\E805";
-  --char-group: "\E806";
-  --char-ungroup: "\E807";
-  --char-copy: "\E808";
+  --char-dataset: '\E800';
+  --char-logical-op-and: '\E801';
+  --char-logical-op-or: '\E802';
+  --char-logical-op-outline: '\E803';
+  --char-edit: '\E804';
+  --char-delete: '\E805';
+  --char-group: '\E806';
+  --char-ungroup: '\E807';
+  --char-copy: '\E808';
 }

@@ -1,4 +1,4 @@
-import { LitElement, css, html } from "lit";
+import { LitElement, css, html } from 'lit'
 // const DEFAULT_CONDITION = {
 //   frequency: {
 //     from: 0, to: 1, invert: '0'
@@ -8,9 +8,9 @@ import { LitElement, css, html } from "lit";
 //   }
 // };
 const MODE = {
-  frequency: "frequency",
-  count: "count",
-};
+  frequency: 'frequency',
+  count: 'count',
+}
 
 export class FrequencyCountValueView extends LitElement {
   static styles = css`
@@ -24,19 +24,16 @@ export class FrequencyCountValueView extends LitElement {
     }
     :host > .frequencygraph {
       width: 100px;
-      height: 8px;
-      background-color: var(--color-light-gray);
-      border: solid 1px white;
+      height: 3.5px;
+      background-color: var(--color-darker-gray);
       position: relative;
       margin-right: 4px;
-      box-shadow: 0 0 0 1px var(--color-separator);
     }
     :host > .frequencygraph > .scale {
       position: absolute;
-      top: 0;
-      bottom: 0;
-      border-left: dotted 1px var(--color-separator);
-      opacity: 0.5;
+      top: -1px;
+      bottom: -1px;
+      border-left: dotted 0.5px var(--color-separator);
     }
 
     :host > .frequencygraph > .bar {
@@ -44,39 +41,24 @@ export class FrequencyCountValueView extends LitElement {
       height: 100%;
     }
 
-    :host([data-dataset="jga_ngs"]) > .frequencygraph > .bar {
+    :host([data-dataset='jga_ngs']) > .frequencygraph > .bar {
       background-color: var(--color-dataset-jga);
     }
-    :host([data-dataset="jga_ngs"]) > .frequencygraph {
-      background-color: var(--color-dataset-jga-light);
-    }
 
-    :host([data-dataset="hgvd"]) > .frequencygraph > .bar {
+    :host([data-dataset='hgvd']) > .frequencygraph > .bar {
       background-color: var(--color-dataset-hgvd);
     }
-    :host([data-dataset="hgvd"]) > .frequencygraph {
-      background-color: var(--color-dataset-hgvd-light);
-    }
 
-    :host([data-dataset="jga_snp"]) > .frequencygraph > .bar {
+    :host([data-dataset='jga_snp']) > .frequencygraph > .bar {
       background-color: var(--color-dataset-jga);
     }
-    :host([data-dataset="jga_snp"]) > .frequencygraph {
-      background-color: var(--color-dataset-jga-light);
-    }
 
-    :host([data-dataset="tommo"]) > .frequencygraph > .bar {
+    :host([data-dataset='tommo']) > .frequencygraph > .bar {
       background-color: var(--color-dataset-tommo);
     }
-    :host([data-dataset="tommo"]) > .frequencygraph {
-      background-color: var(--color-dataset-tommo-light);
-    }
 
-    :host([data-dataset="gem_j_wga"]) > .frequencygraph > .bar {
+    :host([data-dataset='gem_j_wga']) > .frequencygraph > .bar {
       background-color: var(--color-dataset-gemj);
-    }
-    :host([data-dataset="gem_j_wga"]) > .frequencygraph {
-      background-color: var(--color-dataset-gemj-light);
     }
 
     :host > .range {
@@ -90,25 +72,25 @@ export class FrequencyCountValueView extends LitElement {
       margin: 0;
       font-size: 10px;
     }
-    :host([data-mode="count"]) > .frequencygraph {
+    :host([data-mode='count']) > .frequencygraph {
       visibility: hidden;
     }
-    :host([data-filtered="false"]) > .filtered {
+    :host([data-filtered='false']) > .filtered {
       visibility: hidden;
     }
     :host > .frequencygraph > .bar {
-      background-color: #94928d;
+      background-color: var(--color-gray);
     }
-  `;
+  `
 
   constructor() {
-    super();
+    super()
     // Declare reactive properties
-    this.mode; // 'frequency' or 'count'
-    this.from;
-    this.to;
-    this.invert;
-    this.filtered;
+    this.mode // 'frequency' or 'count'
+    this.from
+    this.to
+    this.invert
+    this.filtered
   }
 
   render() {
@@ -124,18 +106,18 @@ export class FrequencyCountValueView extends LitElement {
       <p class="filtered" ?hidden=${!this.filtered}>
         Exclude filtered out variants
       </p>
-    `;
+    `
   }
 
   firstUpdated() {
-    this._bars = this.shadowRoot.querySelectorAll(".bar");
-    const _frequencyGraph = this.shadowRoot.querySelector(".frequencygraph");
-    const scale = document.createElement("div");
-    scale.classList.add("scale");
+    this._bars = this.shadowRoot.querySelectorAll('.bar')
+    const _frequencyGraph = this.shadowRoot.querySelector('.frequencygraph')
+    const scale = document.createElement('div')
+    scale.classList.add('scale')
     for (let i = 0; i <= 10; i++) {
-      const newScale = scale.cloneNode();
-      newScale.style.left = `calc(${i * 10 + "%"} - ${i / 10}px)`;
-      _frequencyGraph.appendChild(newScale);
+      const newScale = scale.cloneNode()
+      newScale.style.left = `calc(${i * 10 + '%'} - ${i / 10}px)`
+      _frequencyGraph.appendChild(newScale)
     }
   }
 
@@ -148,34 +130,34 @@ export class FrequencyCountValueView extends LitElement {
    * @param {Boolean} filtered
    */
   setValues(mode, from, to, invert, filtered) {
-    this.mode = mode;
-    this.from = from;
-    this.to = to;
-    this.invert = invert;
-    this.filtered = filtered;
-    this.dataset.mode = mode;
+    this.mode = mode
+    this.from = from
+    this.to = to
+    this.invert = invert
+    this.filtered = filtered
+    this.dataset.mode = mode
 
     // update value
     if (this.mode === MODE.frequency) {
-      if (this.invert === "0") {
-        this._bars[0].style.left = this.from * 100 + "%";
-        this._bars[0].style.width = (this.to - this.from) * 100 + "%";
-        this._bars[1].style.width = "0%";
+      if (this.invert === '0') {
+        this._bars[0].style.left = this.from * 100 + '%'
+        this._bars[0].style.width = (this.to - this.from) * 100 + '%'
+        this._bars[1].style.width = '0%'
       } else {
-        this._bars[0].style.left = "0%";
-        this._bars[0].style.width = this.from * 100 + "%";
-        this._bars[1].style.left = this.to * 100 + "%";
-        this._bars[1].style.width = (1 - this.to) * 100 + "%";
+        this._bars[0].style.left = '0%'
+        this._bars[0].style.width = this.from * 100 + '%'
+        this._bars[1].style.left = this.to * 100 + '%'
+        this._bars[1].style.width = (1 - this.to) * 100 + '%'
       }
     }
 
-    super.update();
+    super.update()
   }
 
   get queryValue() {
-    const dataset = { name: this.dataset.dataset };
-    const filtered = this.filtered === "true" ? true : false;
-    if (this.invert === "1") {
+    const dataset = { name: this.dataset.dataset }
+    const filtered = this.filtered === 'true' ? true : false
+    if (this.invert === '1') {
       return {
         or: [
           {
@@ -199,18 +181,18 @@ export class FrequencyCountValueView extends LitElement {
             },
           },
         ],
-      };
+      }
     } else {
-      const values = {};
-      if (this.from !== "") values.gte = this.from;
-      if (this.to !== "") values.lte = this.to;
+      const values = {}
+      if (this.from !== '') values.gte = this.from
+      if (this.to !== '') values.lte = this.to
       return {
         frequency: {
           dataset,
           [this.mode]: values,
           filtered,
         },
-      };
+      }
     }
   }
 
@@ -219,4 +201,4 @@ export class FrequencyCountValueView extends LitElement {
   //   console.log(arguments)
   // }
 }
-customElements.define("frequency-count-value-view", FrequencyCountValueView);
+customElements.define('frequency-count-value-view', FrequencyCountValueView)
