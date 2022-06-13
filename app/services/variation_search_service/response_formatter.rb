@@ -105,6 +105,7 @@ class VariationSearchService
         json.type SequenceOntology.find_by_label(variation[:type])&.id
 
         json.chromosome variation.dig(:chromosome, :label)
+        json.position variation.dig(:vcf, :position)
         json.start variation[:start]
         json.stop variation[:stop]
         json.reference variation[:reference].presence || ''
