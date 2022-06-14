@@ -71,7 +71,6 @@ export default class AdvancedSearchToolbar {
     `;
 
     // references
-    // this._searchButton = toolbar.querySelector(':scope > ul > .buttoncontainer > .button-view');
 
     // events
     toolbar.querySelectorAll('.command').forEach((command) => {
@@ -99,16 +98,11 @@ export default class AdvancedSearchToolbar {
         }
       });
     });
-    // this._searchButton.addEventListener('click', () => {
-    //   this._delegate.search();
-    // });
   }
 
   // public methods
 
   canSearch(can) {
-    console.trace('canSearch');
-    console.log('canSearch', can);
     if (can) this._searchButton.classList.remove('-disabled');
     else this._searchButton.classList.add('-disabled');
   }
