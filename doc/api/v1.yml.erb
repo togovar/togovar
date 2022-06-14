@@ -52,13 +52,13 @@ paths:
                 type: string
                 example: Not implemented
 
-  /search/disease:
+  /search/gene:
     get:
       tags:
         - search
       parameters:
         - $ref: '#/components/parameters/Pretty'
-        - $ref: '#/components/parameters/Term'
+        - $ref: '#/components/parameters/GeneTerm'
       responses:
         '200':
           description: >
@@ -66,7 +66,90 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/SuggestDisease'
+                $ref: '#/components/definitions/SearchGene'
+        '400':
+          description: >
+            `Bad Request`<br/>
+            Your query contains grammatical mistakes. See errors in the response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/Error'
+        '500':
+          description: >
+            `Internal Server Error`<br/>
+            Unexpected errors occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/Error'
+        '501':
+          description: >
+            `Not Implemented`<br/>
+            Responder for given mime type are not inplemented.
+            Provide the correct accept header (e.g. `Accept: application/json`).
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Not implemented
+    post:
+      tags:
+        - search
+      parameters:
+        - $ref: '#/components/parameters/Pretty'
+      requestBody:
+        $ref: '#/components/requestBodies/SearchGene'
+      responses:
+        '200':
+          description: >
+            `OK`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/SearchGene'
+        '400':
+          description: >
+            `Bad Request`<br/>
+            Your query contains grammatical mistakes. See errors in the response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/Error'
+        '500':
+          description: >
+            `Internal Server Error`<br/>
+            Unexpected errors occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/Error'
+        '501':
+          description: >
+            `Not Implemented`<br/>
+            Responder for given mime type are not inplemented.
+            Provide the correct accept header (e.g. `Accept: application/json`).
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Not implemented
+
+  /search/disease:
+    get:
+      tags:
+        - search
+      parameters:
+        - $ref: '#/components/parameters/Pretty'
+        - $ref: '#/components/parameters/DiseaseTerm'
+      responses:
+        '200':
+          description: >
+            `OK`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/SearchDisease'
         '400':
           description: >
             `Bad Request`<br/>
@@ -107,7 +190,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/SuggestDisease'
+                $ref: '#/components/definitions/SearchDisease'
         '400':
           description: >
             `Bad Request`<br/>
@@ -141,7 +224,7 @@ paths:
         - inspect
       parameters:
         - $ref: '#/components/parameters/Pretty'
-        - $ref: '#/components/parameters/Node'
+        - $ref: '#/components/parameters/DiseaseMondo'
       responses:
         '200':
           description: >
@@ -228,16 +311,25 @@ components:
         type: boolean
         nullable: true
 
-    Node:
+    DiseaseMondo:
       in: query
       name: node
-      description: A node ID (MONDO)
+      description: A node ID
       schema:
         type: string
       required: false
       example: MONDO_0045024
 
-    Term:
+    GeneTerm:
+      in: query
+      name: term
+      description: A term to search
+      schema:
+        type: string
+      required: true
+      example: ALDH2
+
+    DiseaseTerm:
       in: query
       name: term
       description: A term to search
@@ -268,7 +360,7 @@ components:
                   - $ref: '#/components/schemas/VariantConsequence'
                   - $ref: '#/components/schemas/VariantFrequency'
                   - $ref: '#/components/schemas/ClinicalSignificance'
-                  - $ref: '#/components/schemas/GeneSymbol'
+                  - $ref: '#/components/schemas/Gene'
                   - $ref: '#/components/schemas/Disease'
                   - $ref: '#/components/schemas/And'
                   - $ref: '#/components/schemas/Or'
@@ -306,6 +398,20 @@ components:
             Example7:
               $ref: '#/components/examples/SearchVariant-7'
 
+    SearchGene:
+      description: Schema for searching gene
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              term:
+                type: string
+                description: A term to search
+                required: true
+                example: ALDH2
+
     SearchDisease:
       description: Schema for searching disease
       content:
@@ -330,7 +436,7 @@ components:
             properties:
               node:
                 type: string
-                description: A node ID (MONDO)
+                description: A node ID
                 required: false
                 example: MONDO_0045024
 
@@ -696,13 +802,13 @@ components:
                   - not_provided
                   - association_not_found
 
-    GeneSymbol:
+    Gene:
       type: object
       additionalProperties: false
       required:
-        - gene_symbol
+        - gene
       properties:
-        gene_symbol:
+        gene:
           type: object
           additionalProperties: false
           required:
@@ -722,8 +828,8 @@ components:
             terms:
               type: array
               items:
-                type: string
-                description: Gene symbol (Approved symbol or aliases)
+                type: integer
+                description: HGNC ID
 
     Disease:
       type: object
@@ -744,18 +850,15 @@ components:
                 Available values
                  * `eq` - Equals to any of term in the list
                  * `ne` - Not equals to all of term in the list
-                 * `contains` - Contains any of term in the list
-                 * `not_contains` - Not contains all of term in the list
               enum:
                 - eq
                 - ne
-                - contains
-                - not_contains
 
             terms:
               type: array
               items:
                 type: string
+                description: MedGen ID
 
     Dataset:
       type: object
@@ -886,7 +989,7 @@ components:
               - $ref: '#/components/schemas/VariantConsequence'
               - $ref: '#/components/schemas/VariantFrequency'
               - $ref: '#/components/schemas/ClinicalSignificance'
-              - $ref: '#/components/schemas/GeneSymbol'
+              - $ref: '#/components/schemas/Gene'
               - $ref: '#/components/schemas/Disease'
               - $ref: '#/components/schemas/And'
               - $ref: '#/components/schemas/Or'
@@ -909,7 +1012,7 @@ components:
               - $ref: '#/components/schemas/VariantConsequence'
               - $ref: '#/components/schemas/VariantFrequency'
               - $ref: '#/components/schemas/ClinicalSignificance'
-              - $ref: '#/components/schemas/GeneSymbol'
+              - $ref: '#/components/schemas/Gene'
               - $ref: '#/components/schemas/Disease'
               - $ref: '#/components/schemas/And'
               - $ref: '#/components/schemas/Or'
@@ -1065,6 +1168,39 @@ components:
                       alt_homo_count:
                         type: integer
 
+    SearchGene:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            example: 404
+          symbol:
+            type: string
+            example: ALDH2
+          name:
+            type: string
+            example: aldehyde dehydrogenase 2 family member
+          alias_of:
+            type: string
+            example: null
+
+    SearchDisease:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            example: MONDO_0045024
+          cui:
+            type: string
+            example: null
+          label:
+            type: string
+            example: cancer or benign tumor
+
     InspectDisease:
       type: array
       items:
@@ -1120,21 +1256,6 @@ components:
                   type: boolean
                   example: false
 
-    SuggestDisease:
-      type: array
-      items:
-        type: object
-        properties:
-          id:
-            type: string
-            example: MONDO_0045024
-          cui:
-            type: string
-            example: null
-          label:
-            type: string
-            example: cancer or benign tumor
-
     Error:
       type: object
       properties:
@@ -1157,15 +1278,32 @@ components:
               - indel
 
     SearchVariant-2:
-      summary: List variants exist on Aldehyde Dehydrogenase 2 family member (ALDH2).
+      summary: List variants by identifiers (tgv, rs)
       value:
         query:
-          gene_symbol:
-            relation: eq
-            terms:
-              - ALDH2
+          id:
+            - tgv421843
+            - rs114202595
 
     SearchVariant-3:
+      summary: List variants exist on an exact position
+      value:
+        query:
+          location:
+            chromosome: "16"
+            position: 48258198
+
+    SearchVariant-4:
+      summary: List variants exist in a certain range
+      value:
+        query:
+          location:
+            chromosome: "10"
+            position:
+              gte: 73270743
+              lte: 73376976
+
+    SearchVariant-5:
       summary: List variants range from 0.05 to 0.95 in frequency in JGA-NGS.
       value:
         query:
@@ -1185,7 +1323,25 @@ components:
                   lte: 1.0
                 filtered: true
 
-    SearchVariant-4:
+    SearchVariant-6:
+      summary: List variants exist on ALDH2 (Aldehyde Dehydrogenase 2 family member).
+      value:
+        query:
+          gene:
+            relation: eq
+            terms:
+              - 404
+
+    SearchVariant-7:
+      summary: List variants associated with C2675520 (Breast-ovarian cancer, familial 2).
+      value:
+        query:
+          disease:
+            relation: eq
+            terms:
+              - C2675520
+
+    SearchVariant-8:
       summary: Paginate result over 10,000 records.
       value:
         query:
@@ -1195,29 +1351,3 @@ components:
             - G
             - A
           limit: 1000
-
-    SearchVariant-5:
-      summary: List variants by identifiers (tgv, rs)
-      value:
-        query:
-          id:
-            - tgv421843
-            - rs114202595
-
-    SearchVariant-6:
-      summary: List variants exist on an exact position
-      value:
-        query:
-          location:
-            chromosome: "16"
-            position: 48258198
-
-    SearchVariant-7:
-      summary: List variants exist in a certain range
-      value:
-        query:
-          location:
-            chromosome: "10"
-            position:
-              gte: 73270743
-              lte: 73376976

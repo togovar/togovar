@@ -11,7 +11,7 @@ module TogoVar
                                     consequence: VariationConsequence,
                                     frequency: VariationFrequency,
                                     significance: ClinicalSignificance,
-                                    gene_symbol: GeneSymbol,
+                                    gene: Gene,
                                     disease: Disease,
                                     and: And,
                                     or: Or }.freeze

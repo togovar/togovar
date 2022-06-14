@@ -8,7 +8,6 @@ module API
       FILTER_PARAMETERS = %w[term quality stat dataset frequency type significance consequence sift polyphen].freeze
       private_constant :FILTER_PARAMETERS
 
-      # @return [ActionController::Parameters]
       def variant_params
         return super unless include_filters?
 
@@ -50,32 +49,22 @@ module API
       end
     end
 
+    def gene
+      search_action gene_params.to_h, SearchGene
+    end
+
     def disease
-      params = disease_params.to_h
-
-      respond_to do |format|
-        format.html { render plain: 'Not implemented', content_type: 'text/plain', status: :not_implemented }
-        format.json do
-          renderer = params.key?(:pretty) ? :pretty_json : :json
-
-          action = SearchDisease.run(params)
-          if action.valid?
-            render renderer => action.result
-          else
-            render renderer => { errors: action.errors.full_messages }, status: :bad_request
-          end
-        end
-      end
-    rescue StandardError => e
-      Rails.logger.error(self.class) { e }
-      render json: { errors: ['Internal server error'] }, status: :internal_server_error
+      search_action disease_params.to_h, SearchDisease
     end
 
     private
 
-    # @return [ActionController::Parameters]
     def variant_params
       @variant_params ||= params.permit(:debug, :pretty, :version, :limit, :offset, query: {}, body: {})
+    end
+
+    def gene_params
+      params.permit(:pretty, :term, body: {})
     end
 
     def disease_params
@@ -89,6 +78,25 @@ module API
       service = VariationSearchService.new(params.to_h, headers: request_headers, debug: params.key?(:debug))
 
       execute(service).tap { |r, _| r.update(debug: service.debug) if params.key?(:debug) }
+    end
+
+    def search_action(params, action)
+      respond_to do |format|
+        format.html { render plain: 'Not implemented', content_type: 'text/plain', status: :not_implemented }
+        format.json do
+          renderer = params.key?(:pretty) ? :pretty_json : :json
+
+          action = action.run(params)
+          if action.valid?
+            render renderer => action.result
+          else
+            render renderer => { errors: action.errors.full_messages }, status: :bad_request
+          end
+        end
+      end
+    rescue StandardError => e
+      Rails.logger.error(self.class) { e }
+      render json: { errors: ['Internal server error'] }, status: :internal_server_error
     end
   end
 end

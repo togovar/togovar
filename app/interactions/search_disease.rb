@@ -17,7 +17,13 @@ class SearchDisease < ActiveInteraction::Base
           }
         }
       },
-      sort: %w[_score mondo]
+      sort: %w[_score mondo],
+      highlight: {
+        fields: {
+          'label.search': {}
+        }
+      },
+      size: 100
     }
 
     DiseaseMondo.search(query).results.map do |r|
@@ -25,6 +31,7 @@ class SearchDisease < ActiveInteraction::Base
         id: r.dig(:_source, :mondo),
         cui: r.dig(:_source, :cui),
         label: r.dig(:_source, :label),
+        highlight: r.dig(:highlight, :'label.search')&.first
       }
     end
   end
