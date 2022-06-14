@@ -4,7 +4,7 @@ module TogoVar
   module API
     module Models
       module Version1
-        class GeneSymbol < NonStrictTerms
+        class Gene < NonStrictTerms
           def to_hash
             validate
 
@@ -13,12 +13,9 @@ module TogoVar
             q = Elasticsearch::DSL::Search.search do
               query do
                 nested do
-                  path 'vep.symbol'
+                  path 'vep'
                   query do
-                    bool do
-                      must { match 'vep.symbol.source': 'HGNC' }
-                      must { terms 'vep.symbol.label': terms }
-                    end
+                    terms 'vep.hgnc_id': terms
                   end
                 end
               end

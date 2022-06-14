@@ -5,11 +5,13 @@ module TogoVar
     module Models
       module Version1
         class VariationSearch < Base
-          ACCEPTABLE_COMPONENTS = { type: VariationType,
+          ACCEPTABLE_COMPONENTS = { id: Id,
+                                    location: Location,
+                                    type: VariationType,
                                     consequence: VariationConsequence,
                                     frequency: VariationFrequency,
                                     significance: ClinicalSignificance,
-                                    gene_symbol: GeneSymbol,
+                                    gene: Gene,
                                     disease: Disease,
                                     and: And,
                                     or: Or }.freeze

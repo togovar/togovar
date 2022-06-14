@@ -31,7 +31,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
 
     // HTML
     this._createElement('frequency-count-editor-view', `
-    <header>Select ${conditionType}</header>
+    <header>Specify range</header>
     <div class="body">
       <section class="frequency switching" data-mode="${MODE.frequency}">
         <label>
