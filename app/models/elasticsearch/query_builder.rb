@@ -356,7 +356,7 @@ module Elasticsearch
 
       query[:size] = @size
       query[:from] = @from unless @from.zero?
-      query[:sort] = %w[chromosome.index vcf.position vcf.reference vcf.alternative] if @sort
+      query[:sort] = %w[chromosome.index vcf.position vcf.reference vcf.alternate] if @sort
 
       query
     end
@@ -443,68 +443,14 @@ module Elasticsearch
 
     def position_condition(term)
       positions = term.split(/[\s,]/)
-      start_only = @start_only
 
-      query = Elasticsearch::DSL::Search.search do
-        query do
-          bool do
-            positions.each do |x|
-              chr, pos = x.split(':')
-              should do
-                bool do
-                  must { match 'chromosome.label': chr }
-                  if start_only
-                    must { match start: pos.to_i }
-                  else
-                    must { range(:start) { lte pos.to_i } }
-                    must { range(:stop) { gte pos.to_i } }
-                  end
-                end
-              end
-            end
-          end
-        end
-      end.to_hash[:query]
-
-      if query[:bool][:should].size == 1
-        query[:bool][:should].first
-      else
-        query
-      end
+      region_condition(positions.map { |p| chr, pos = p.split(':'); "#{chr}:#{pos}-#{pos}" }.join(','))
     end
 
     def position_allele_condition(term)
       positions = term.split(/[\s,]/)
-      start_only = @start_only
 
-      query = Elasticsearch::DSL::Search.search do
-        query do
-          bool do
-            positions.each do |x|
-              chr, pos, allele = x.split(':')
-              should do
-                bool do
-                  must { match 'chromosome.label': chr }
-                  if start_only
-                    must { match start: pos.to_i }
-                  else
-                    must { range(:start) { lte pos.to_i } }
-                    must { range(:stop) { gte pos.to_i } }
-                    must { match reference: allele.split('>')[0] } if allele.present?
-                    must { match alternative: allele.split('>')[1] } if allele.present?
-                  end
-                end
-              end
-            end
-          end
-        end
-      end.to_hash[:query]
-
-      if query[:bool][:should].size == 1
-        query[:bool][:should].first
-      else
-        query
-      end
+      region_condition(positions.map { |p| chr, pos, allele = p.split(':'); "#{chr}:#{pos}-#{pos}:#{allele}" }.join(','))
     end
 
     def region_condition(term)
@@ -514,37 +460,50 @@ module Elasticsearch
         query do
           bool do
             positions.each do |x|
-              chr, pos = x.split(':')
+              chr, pos, allele = x.split(':')
               start, stop = pos.split('-')
               should do
                 bool do
                   must { match 'chromosome.label': chr }
+                  if allele.present?
+                    ref, alt = allele.split('>')
+                    must { match reference: ref } if ref.present?
+                    must { match alternate: alt } if alt.present?
+                  end
                   must do
                     bool do
                       should do
-                        range :start do
-                          gte start.to_i
-                          lte stop.to_i
+                        bool do
+                          must { range(:start) { lte start.to_i - 1 } }
+                          must { range(:stop) { gte stop.to_i } }
                         end
                       end
                       should do
-                        range :stop do
-                          gte start.to_i
-                          lte stop.to_i
+                        bool do
+                          must { range(:start) { gte start.to_i - 1 } }
+                          must { range(:stop) { lt stop.to_i } }
+                        end
+                      end
+                      should do
+                        bool do
+                          must { range(:start) { lt start.to_i - 1 } }
+                          must do
+                            range(:stop) do
+                              gt start.to_i - 1
+                              lte stop.to_i
+                            end
+                          end
                         end
                       end
                       should do
                         bool do
                           must do
-                            range :start do
-                              lte start.to_i
+                            range(:start) do
+                              gte start.to_i - 1
+                              lt stop.to_i
                             end
                           end
-                          must do
-                            range :stop do
-                              gte stop.to_i
-                            end
-                          end
+                          must { range(:stop) { gt start.to_i } }
                         end
                       end
                     end

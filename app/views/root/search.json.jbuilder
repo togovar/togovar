@@ -54,10 +54,10 @@ json.data @result[:results] do |result|
   json.type SequenceOntology.find_by_label(variation[:type])&.id
 
   json.chromosome variation.dig(:chromosome, :label)
-  json.start variation[:start]
-  json.stop variation[:stop]
+  json.start variation[:start] + 1
+  json.stop variation[:stop] + 1
   json.reference variation[:reference].presence || ''
-  json.alternative variation[:alternative].presence || ''
+  json.alternative variation[:alternate].presence || ''
 
   if (dbsnp = Array(variation[:xref]).filter { |x| x[:source] = 'dbSNP' }.map { |x| x[:id] }).present?
     json.existing_variations dbsnp

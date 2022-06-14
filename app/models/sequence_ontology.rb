@@ -5,6 +5,19 @@ class SequenceOntology
     end
 
     def find_by_label(label)
+      label = case label
+              when 'Deletion'
+                'deletion'
+              when 'Insertion'
+                'insertion'
+              when 'Indel'
+                'indel'
+              when 'MNV'
+                'substitution'
+              else
+                label
+              end
+
       constants.select do |sym|
         sym.to_s.starts_with?('SO_') && const_get(sym).label == label
       end.map(&method(:const_get)).first

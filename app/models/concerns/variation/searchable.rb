@@ -6,7 +6,7 @@ class Variation
     included do
       include Elasticsearch::Model
 
-      index_name :variation
+      index_name :variant
 
       settings = {
         index: {
@@ -26,17 +26,19 @@ class Variation
           indexes :start, type: :integer
           indexes :stop, type: :integer
           indexes :reference, type: :keyword
-          indexes :alternative, type: :keyword
+          indexes :alternative, type: :keyword # TODO rename to alternate
           indexes :vcf do
             indexes :position, type: :integer
             indexes :reference, type: :keyword
-            indexes :alternative, type: :keyword
+            indexes :alternate, type: :keyword
           end
           indexes :xref, type: :nested do
             indexes :source, type: :keyword
             indexes :id, type: :keyword
           end
+          indexes :most_severe_consequence, type: :keyword
           indexes :vep, type: :nested do
+            indexes :consequence_type, type: :keyword
             indexes :transcript_id, type: :keyword
             indexes :consequence, type: :keyword
             indexes :gene_id, type: :keyword
