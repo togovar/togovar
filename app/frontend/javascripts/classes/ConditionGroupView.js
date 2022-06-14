@@ -55,13 +55,13 @@ export default class ConditionGroupView extends ConditionView {
       this._logicalOperatorSwitch.dataset.operator = { and: 'or', or: 'and' }[
         this._logicalOperatorSwitch.dataset.operator
       ];
-      this.doneEditing();
+      this._doneEditing();
     });
     // mutation
     this._mutationObserver = this._defineObserveConditions();
   }
 
-  doneEditing() {
+  _doneEditing() {
     this._builder.changeCondition();
   }
 
