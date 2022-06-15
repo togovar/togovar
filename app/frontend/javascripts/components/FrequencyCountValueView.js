@@ -29,11 +29,18 @@ export class FrequencyCountValueView extends LitElement {
       position: relative;
       margin-right: 4px;
     }
+
     :host > .frequencygraph > .scale {
       position: absolute;
       top: -1px;
       bottom: -1px;
       border-left: dotted 0.5px var(--color-separator);
+    }
+
+    @media (-webkit-min-device-pixel-ratio: 2) {
+      :host > .frequencygraph > .scale {
+        border-left: dotted 1px var(--color-separator);
+      }
     }
 
     :host > .frequencygraph > .bar {
