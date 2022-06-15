@@ -1,4 +1,4 @@
-import { mixin } from "./StoreManagerMixin.js";
+import { mixin } from './StoreManagerMixin.js';
 
 class StoreManager {
   constructor() {
@@ -9,7 +9,7 @@ class StoreManager {
       numberOfRecords: 0,
       offset: 0,
       rowCount: 0,
-      appStatus: "preparing",
+      appStatus: 'preparing',
       _abortController: new AbortController(),
     };
 
@@ -38,11 +38,11 @@ class StoreManager {
       } else {
         // 取得できていないレコードの取得
         this._search(this._store.offset + index);
-        this.setData("appStatus", "loading");
-        return "loading";
+        this.setData('appStatus', 'loading');
+        return 'loading';
       }
     } else {
-      return "out of range";
+      return 'out of range';
     }
   }
 
@@ -50,7 +50,7 @@ class StoreManager {
     // 当該データを持っていないか、当該データが不一致であれば、データをセット
     const isUndefined = this._store[key] === undefined,
       isMutated =
-        typeof value === "object"
+        typeof value === 'object'
           ? JSON.stringify(this._store[key]) !== JSON.stringify(value)
           : this._store[key] != value;
     if (isUndefined || isMutated) {
@@ -66,7 +66,7 @@ class StoreManager {
     for (let i = 0; i < records.length; i++) {
       this._store.searchResults[offset + i] = records[i];
     }
-    this._notify("searchResults");
+    this._notify('searchResults');
   }
 
   // notify bound objects
@@ -76,7 +76,7 @@ class StoreManager {
       for (const watcher of this._bindings[key]) {
         let value = this._store[key];
         const copy = this._copy(value);
-        if (typeof watcher[key] === "function") {
+        if (typeof watcher[key] === 'function') {
           watcher[key](copy);
         } else {
           console.warn(
@@ -103,7 +103,7 @@ class StoreManager {
     ) {
       case Array.isArray(value):
         return JSON.parse(JSON.stringify(value));
-      case typeof value === "object":
+      case typeof value === 'object':
         return Object.assign({}, value);
       default:
         return value;
