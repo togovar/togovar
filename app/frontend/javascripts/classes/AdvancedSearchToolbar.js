@@ -34,6 +34,8 @@ export default class AdvancedSearchToolbar {
         shortcut: [46],
       },
     ];
+
+    console.log(ADVANCED_CONDITIONS);
     toolbar.innerHTML = `
     <ul>
       <li class="-haschild">
