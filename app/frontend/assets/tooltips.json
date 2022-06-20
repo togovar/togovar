@@ -1,56 +1,51 @@
 [
   {
     "id": "table-header-togovar_id",
-    "content": "Unset",
-    "url": "#"
+    "content": "TogoVar identifier assigned to variants observed in Japanese populations"
   },
   {
     "id": "table-header-refsnp_id",
-    "content": "Unset"
+    "content": "RefSNP (rs) identifier of dbSNP"
   },
   {
     "id": "table-header-position",
-    "content": "Unset",
-    "url": "#"
+    "content": "Chromosomal position"
   },
   {
     "id": "table-header-ref_alt",
-    "content": "Unset",
-    "url": "#"
+    "content": "Reference and alternative allele"
   },
   {
     "id": "table-header-type",
-    "content": "Unset",
-    "url": "#"
+    "content": "Variant type (SNV, insertion, deletion, indel or substitution)"
   },
   {
     "id": "table-header-gene",
-    "content": "Unset",
-    "url": "#"
+    "content": "The HUGO Gene Nomenclature Committee (HGNC) gene symbol"
   },
   {
     "id": "table-header-alt_frequency",
-    "content": "The indicator represents the alternative allele frequency for each dataset.",
+    "content": "Frequency indicator representing alternative allele frequencies",
     "url": "doc/help#s1"
   },
   {
     "id": "table-header-consequence",
-    "content": "The value of variant consequence in Variant Effect Predictor (VEP).",
+    "content": "Variant consequence detected by Variant Effect Predictor (VEP)",
     "url": "/doc/help#d5"
   },
   {
     "id": "table-header-sift",
-    "content": "Scores which indicate the predicted effects on the protein function when an amino acid sequence undergoes alteration due to a variant.",
+    "content": "Prediction of functional effects of a nonsynonymous variant by the Sorting Intolerant From Tolerant (SIFT) program",
     "url": "/doc/help#d6"
   },
   {
     "id": "table-header-polyphen",
-    "content": "Scores which indicate the predicted effects on the protein function when an amino acid sequence undergoes alteration due to a variant.",
+    "content": "Prediction of functional effects of a nonsynonymous variant by the PolyPhen-2 (Polymorphism Phenotyping v2) program",
     "url": "/doc/help#d6"
   },
   {
     "id": "table-header-clinical_significance",
-    "content": "Value of clinical significance calculated in ClinVar.",
+    "content": "Clinical significance provided by ClinVar",
     "url": "/doc/help#d7"
   }
 ]
