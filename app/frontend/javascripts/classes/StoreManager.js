@@ -1,7 +1,6 @@
-import {mixin} from './StoreManagerMixin.js';
+import { mixin } from './StoreManagerMixin.js';
 
 class StoreManager {
-
   constructor() {
     window.__s = this; // set global variable for monitering
     this._bindings = {};
@@ -10,8 +9,10 @@ class StoreManager {
       numberOfRecords: 0,
       offset: 0,
       rowCount: 0,
-      appStatus: 'preparing'
+      appStatus: 'preparing',
+      _abortController: new AbortController(),
     };
+
     this.initSearchCondition();
   }
 
@@ -21,7 +22,9 @@ class StoreManager {
 
   getSelectedRecord() {
     if (this._store.selectedRow !== undefined) {
-      return this._store.searchResults[this._store.offset + this._store.selectedRow];
+      return this._store.searchResults[
+        this._store.offset + this._store.selectedRow
+      ];
     } else {
       return null;
     }
@@ -45,11 +48,11 @@ class StoreManager {
 
   setData(key, value) {
     // 当該データを持っていないか、当該データが不一致であれば、データをセット
-    const
-      isUndefined = this._store[key] === undefined,
-      isMutated = typeof value === 'object' ?
-        JSON.stringify(this._store[key]) !== JSON.stringify(value) :
-        this._store[key] != value;
+    const isUndefined = this._store[key] === undefined,
+      isMutated =
+        typeof value === 'object'
+          ? JSON.stringify(this._store[key]) !== JSON.stringify(value)
+          : this._store[key] != value;
     if (isUndefined || isMutated) {
       this._store[key] = this._copy(value);
       this._notify(key);
@@ -76,7 +79,11 @@ class StoreManager {
         if (typeof watcher[key] === 'function') {
           watcher[key](copy);
         } else {
-          console.warn(`This binding has no corresponding function.`, watcher, key);
+          console.warn(
+            `This binding has no corresponding function.`,
+            watcher,
+            key
+          );
         }
       }
     }
@@ -91,7 +98,9 @@ class StoreManager {
   }
 
   _copy(value) {
-    switch (true) { // 値渡し
+    switch (
+      true // 値渡し
+    ) {
       case Array.isArray(value):
         return JSON.parse(JSON.stringify(value));
       case typeof value === 'object':
@@ -100,7 +109,6 @@ class StoreManager {
         return value;
     }
   }
-
 }
 
 Object.assign(StoreManager.prototype, mixin);

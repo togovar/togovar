@@ -4,18 +4,19 @@ import AdvancedSearchToolbar from './AdvancedSearchToolbar.js';
 import AdvancedSearchSelection from './AdvancedSearchSelection.js';
 // import {ADVANCED_CONDITIONS} from '../global.js';
 // import {API_URL} from "../global.js";
-import {CONDITION_ITEM_TYPE} from '../definition.js';
+import { CONDITION_ITEM_TYPE } from '../definition.js';
 
 export default class AdvancedSearchBuilderView {
-
   constructor(elm) {
-
     this._elm = elm;
     this._container = elm.querySelector(':scope > .inner');
     this._rootGroup = new ConditionGroupView(this, this, 'and', [], null, true);
 
     // toolbar
-    this._toolbar = new AdvancedSearchToolbar(this, this._rootGroup.maketToolbar());
+    this._toolbar = new AdvancedSearchToolbar(
+      this,
+      this._rootGroup.maketToolbar()
+    );
 
     // events
     StoreManager.bind('advancedSearchConditions', this);
@@ -25,25 +26,23 @@ export default class AdvancedSearchBuilderView {
     this._selection = new AdvancedSearchSelection(this._rootGroup.elm, this);
   }
 
-
   // public methods
 
   advancedSearchConditions(values) {
-    console.log(values)
+    console.log(values);
   }
 
   /**
-   * 
+   *
    * @param {Array} conditionViews
    */
   selectedConditionViews(conditionViews) {
-
     // change status
     let canUngroup = false;
     let canCopy = false;
     if (conditionViews.length === 1) {
-      canUngroup = conditionViews[0].type === CONDITION_ITEM_TYPE.group; 
-      canCopy = conditionViews[0].type === CONDITION_ITEM_TYPE.condition;      
+      canUngroup = conditionViews[0].type === CONDITION_ITEM_TYPE.group;
+      canCopy = conditionViews[0].type === CONDITION_ITEM_TYPE.condition;
     }
     // can delete
     this._elm.dataset.canDelete = conditionViews.length > 0;
@@ -71,7 +70,14 @@ export default class AdvancedSearchBuilderView {
 
   changeCondition() {
     const query = this._rootGroup.query;
-    this._toolbar.canSearch(Object.keys(query).length > 0);
+    //this._toolbar.canSearch(Object.keys(query).length > 0);
+    if (this.canSearch(query)) {
+      this.search();
+    }
+  }
+
+  canSearch(query) {
+    return Object.keys(query).length > 0;
   }
 
   group() {
@@ -79,8 +85,9 @@ export default class AdvancedSearchBuilderView {
     const parentGroupView = conditionViews[0].parentView;
     // insert position
     const siblingViews = parentGroupView.childViews;
-    let position = Infinity, referenceElm = null;
-    conditionViews.forEach(view => {
+    let position = Infinity,
+      referenceElm = null;
+    conditionViews.forEach((view) => {
       const index = siblingViews.indexOf(view);
       if (index < position) {
         position = index;
@@ -88,7 +95,10 @@ export default class AdvancedSearchBuilderView {
       }
     });
     // add new gropu
-    const conditionGroupView = parentGroupView.addNewConditionGroup(conditionViews, referenceElm);
+    const conditionGroupView = parentGroupView.addNewConditionGroup(
+      conditionViews,
+      referenceElm
+    );
     this._selection.selectConditionViews([conditionGroupView], true);
     this.changeCondition();
   }
@@ -115,11 +125,12 @@ export default class AdvancedSearchBuilderView {
   // }
 
   /**
-   * 
-   * @param {Array<ConditionView>} views 
+   *
+   * @param {Array<ConditionView>} views
    */
   delete(views) {
-    const conditionViews = views ?? this._selection.getSelectingConditionViews();
+    const conditionViews =
+      views ?? this._selection.getSelectingConditionViews();
     for (const view of conditionViews) {
       view.remove();
     }
@@ -129,45 +140,48 @@ export default class AdvancedSearchBuilderView {
 
   search() {
     const query = this._rootGroup.query;
+
     StoreManager.setAdvancedSearchCondition(query);
   }
 
   // add search condition to the currently selected layer
   addCondition(conditionType) {
-
     // get selecting condition
-    const selectingConditionViews = this._selection.getSelectingConditionViews();
-    const selectingConditionView = selectingConditionViews.length > 0 ? selectingConditionViews[0] : this._rootGroup;
-    
+    const selectingConditionViews =
+      this._selection.getSelectingConditionViews();
+    const selectingConditionView =
+      selectingConditionViews.length > 0
+        ? selectingConditionViews[0]
+        : this._rootGroup;
+
     // release exist conditions
     this._selection.deselectAllConditions();
 
     // add
     let newConditionView;
-    switch(selectingConditionView.type) {
+    switch (selectingConditionView.type) {
       case CONDITION_ITEM_TYPE.condition:
         // TODO: コンディションを選択していた場合に、その後ろに新規条件を追加
         break;
       case CONDITION_ITEM_TYPE.group:
-        newConditionView = selectingConditionView.addNewConditionItem(conditionType);
+        newConditionView =
+          selectingConditionView.addNewConditionItem(conditionType);
         break;
     }
   }
-
 
   // private methods
 
   _defineEvents() {
     let downX, downY;
-    this._elm.addEventListener('mousedown', e => {
+    this._elm.addEventListener('mousedown', (e) => {
       [downX, downY] = [e.x, e.y];
     });
-    this._elm.addEventListener('click', e => {
+    this._elm.addEventListener('click', (e) => {
       if (Math.abs(downX - e.x) > 2 || Math.abs(downY - e.y) > 2) return;
       e.stopImmediatePropagation();
       this._selection.deselectAllConditions();
     });
-
   }
 
   // accessor
@@ -183,5 +197,4 @@ export default class AdvancedSearchBuilderView {
   get selection() {
     return this._selection;
   }
-
 }
