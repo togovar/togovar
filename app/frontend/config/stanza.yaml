@@ -235,7 +235,7 @@ gene:
         jbrowse: $TOGOVAR_STANZA_JBROWSE
         margin: 200
 
-    - id: gene-variant
+    - id: scroll-table
       dom: "#gene-variant"
       src: https://togostanza.github.io/metastanza/scroll-table.js
       options:
