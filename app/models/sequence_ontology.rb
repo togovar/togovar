@@ -9,24 +9,25 @@ class SequenceOntology < TermDictionary
     SO_1000002 = TermDictionary::Term.new('SO_1000002', :sub, 'MNV')
   end
   include VariationClass
-    def find_by_label(label)
-      label = case label
-              when 'Deletion'
-                'deletion'
-              when 'Insertion'
-                'insertion'
-              when 'Indel'
-                'indel'
-              when 'MNV'
-                'substitution'
-              else
-                label
-              end
 
-      constants.select do |sym|
-        sym.to_s.starts_with?('SO_') && const_get(sym).label == label
-      end.map(&method(:const_get)).first
-    end
+  def find_by_label(label)
+    label = case label
+            when 'Deletion'
+              'deletion'
+            when 'Insertion'
+              'insertion'
+            when 'Indel'
+              'indel'
+            when 'MNV'
+              'substitution'
+            else
+              label
+            end
+
+    constants.select do |sym|
+      sym.to_s.starts_with?('SO_') && const_get(sym).label == label
+    end.map(&method(:const_get)).first
+  end
 
   module VariationConsequence
     SO_0001893 = TermDictionary::Term.new('SO_0001893', :transcript_ablation, 'Transcript ablation')
@@ -79,6 +80,14 @@ class SequenceOntology < TermDictionary
                            SO_0001628].freeze
 
   class << self
+    def all
+      @all ||= constants.filter_map { |x| const_get(x) if x.to_s.starts_with?('SO_') }
+    end
+
+    def find_by_key(key)
+      all.find { |x| x.key == key || x.key.to_s == key.to_s }
+    end
+
     def find_by_label(label)
       constants.select do |sym|
         sym.to_s.starts_with?('SO_') && const_get(sym).label == label

@@ -1,5 +1,4 @@
 class VariationSearchService
-  # @deprecated This class remains only for backwards compatibility
   class ResponseFormatter
     def initialize(param, result, error = [], warning = [], notice = [])
       @param = param
@@ -9,7 +8,7 @@ class VariationSearchService
       @notice = notice
     end
 
-    def format
+    def to_hash
       JSON.parse(to_json.target!)
     end
 

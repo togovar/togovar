@@ -60,7 +60,7 @@ module API
     private
 
     def variant_params
-      @variant_params ||= params.permit(:debug, :pretty, :version, :limit, :offset, query: {}, body: {})
+      @variant_params ||= params.permit(:debug, :pretty, :version, :formatter, :limit, :offset, query: {}, body: {})
     end
 
     def gene_params

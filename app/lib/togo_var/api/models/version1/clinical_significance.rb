@@ -18,7 +18,7 @@ module TogoVar
             validate
 
             terms = @terms
-                      .map { |x| (::ClinicalSignificance.find(x.upcase) || ::ClinicalSignificance.find_by_key(x))&.label&.downcase }
+                      .map { |x| (::ClinicalSignificance.find_by_id(x) || ::ClinicalSignificance.find_by_key(x))&.label&.downcase }
                       .compact
 
             q = Elasticsearch::DSL::Search.search do

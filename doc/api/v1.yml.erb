@@ -352,6 +352,11 @@ components:
                 description: (Optional) Set version number if you would like to use old version.
                 enum:
                   - "1"
+              formatter:
+                type: string
+                description: (Optional) Formatter for response data.
+                enum:
+                  - "html"
               query:
                 oneOf:
                   - $ref: '#/components/schemas/ID'
