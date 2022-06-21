@@ -237,6 +237,47 @@ gene:
 
     - id: gene-variant
       dom: "#gene-variant"
+      src: https://togostanza.github.io/metastanza/scroll-table.js
+      options:
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/gene_variant?hgnc_id=${hgnc_id}
+        data-type: json
+        custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css
+        height: 500
+        page-size: 100
+        columns:
+          - id: id
+            label: TogoVar ID
+            escape: false
+          - id: dbsnp
+            label: RefSNP ID
+            escape: false
+          - id: position
+            label: Position
+            escape: false
+          - id: ref_alt
+            label: Ref / Alt
+            escape: false
+          - id: type
+            label: Type
+            escape: false
+          - id: symbols
+            label: Gene
+            escape: false
+          - id: frequencies
+            label: Alt frequency
+            escape: false
+          - id: consequence
+            label: Consequence
+            escape: false
+          - id: sift
+            label: SIFT
+            escape: false
+          - id: polyphen
+            label: PolyPhen
+            escape: false
+          - id: significance
+            label: Clinical significance
+            escape: false
 
     - id: gene-publication
       dom: "#gene-publication"
