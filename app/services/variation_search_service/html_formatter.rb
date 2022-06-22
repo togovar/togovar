@@ -161,7 +161,7 @@ class VariationSearchService
     end
 
     def significance(result)
-      interpretations = Array(variation.dig(:clinvar, :interpretation))
+      interpretations = Array(result.dig(:clinvar, :interpretation))
                           .map { |x| x.split(/[,\/]\s*/).map { |y| ClinicalSignificance.find_by_id(y.tr(' ', '_').to_sym)&.key } }
 
       items = Array(result.dig(:clinvar, :medgen))
