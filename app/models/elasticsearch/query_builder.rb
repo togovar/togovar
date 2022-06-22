@@ -214,7 +214,7 @@ module Elasticsearch
               end
             end
 
-            if (interpretations = values.map { |x| Form::ClinicalSignificance.find_by_param_name(x).key }).present?
+            if (interpretations = values.filter_map { |x| Form::ClinicalSignificance.find_by_param_name(x)&.label&.downcase }).present?
               should do
                 terms 'clinvar.interpretation': interpretations
               end
