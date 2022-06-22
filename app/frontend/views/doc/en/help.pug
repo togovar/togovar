@@ -8,6 +8,8 @@ append variables
 block head
   each css in htmlWebpackPlugin.files.css
     link(href=css, rel="stylesheet")
+  each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/main-/))
+    script(type="text/javascript", src=js)
 
 block content
   main
@@ -243,52 +245,54 @@ block content
                 | value is represented on a 9-point scale.
               ._flex._break-avoid
                 ._padding-right-large
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='na')
-                    span._margin-left Not Available
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='monomorphic')
-                    span._margin-left Monomorphic (REF)
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='singleton')
-                    span._margin-left Singleton
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.0001')
-                    span._margin-left &lt; 0.0001
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.001')
-                    span._margin-left &lt; 0.001
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.01')
-                    span._margin-left &lt; 0.01
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.05')
-                    span._margin-left &lt; 0.05
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.5')
-                    span._margin-left &lt; 0.5
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&ge;0.5')
-                    span._margin-left &ge; 0.5
-                div
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='gem_j_wga')
-                    span._margin-left GEM-J WGA
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='jga_ngs')
-                    span._margin-left JGA-NGS
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='jga_snp')
-                    span._margin-left JGA-SNP
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='tommo')
-                    span._margin-left ToMMo 8.3KJPN
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='hgvd')
-                    span._margin-left HGVD
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='exac')
-                    span._margin-left ExAC
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="na")
+                  | &nbsp; Not Available
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="monomorphic")
+                  | &nbsp; Monomorphic (REF)
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="undefined" data-count="1")
+                  | &nbsp; Singleton
+                ._padding-right-large
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.0001")
+                  | &nbsp; &lt; 0.0001
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.001")
+                  | &nbsp; &lt; 0.001
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.01")
+                  | &nbsp; &lt; 0.01
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.05")
+                  | &nbsp; &lt; 0.05
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.5")
+                  | &nbsp; &lt; 0.5
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; ≥ 0.5
+                ._padding-right-large
+                  logarithmized-block-graph-frequency-view(data-dataset="gem_j_wga" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; GEM-J WGA
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="jga_ngs" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; JGA-NGS
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="jga_snp" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; JGA-SNP
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="tommo" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; ToMMo 8.3KJPN
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="hgvd" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; HGVD
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="gnomad_genomes" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; gnomAD genomes
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="gnomad_exomes" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; gnomAD exomes
+
           #s2.question-answer._column-span-all
             h4.question
               | For each variant type, how is the position, reference and alternative allele described respectively?

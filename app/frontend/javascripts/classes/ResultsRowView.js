@@ -78,18 +78,6 @@ export default class ResultsRowView {
               </td>`;
           }
           break;
-          html += `
-          <td class="alt_frequency">
-            <div class="frequency-graph">
-              ${master.items.map(dataset => {
-                if (dataset.id === 'gnomad' || dataset.id === 'mgend' || dataset.id === 'clinvar') {
-                  return '';
-                } else {
-                  return `<div class="dataset" data-dataset="${dataset.id}" data-frequency=""></div>`;
-                }
-              }).join('')}
-            </div>
-          </td>`;
     case 'consequence': // consequence
           html += '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>';
           break;
@@ -101,7 +89,6 @@ export default class ResultsRowView {
           break;
         case 'clinical_significance': // clinical significance
           html += '<td class="clinical_significance" data-remains=""><!--<div class="dataset-icon -none" data-dataset="mgend"></div>--><div href="" class="clinical-significance" data-sign=""></div><a></a></td>';
-          //html += '<td class="clinical_significance" data-remains=""><!--<div class="dataset-icon -none" data-dataset="mgend"></div>--><div href="" class="clinical-significance" data-sign=""></div><a href="" class="hyper-text -internal" target="_blank"></a></td>';
         break;
       }
     }
@@ -128,7 +115,6 @@ export default class ResultsRowView {
     this.tdPolyphenFunction = this.tdPolyphen.querySelector('.variant-function');
     this.tdClinical = this.tr.querySelector('td.clinical_significance');
     this.tdClinicalSign = this.tdClinical.querySelector('.clinical-significance');
-    //this.tdClinicalAnchor = this.tdClinical.querySelector('a.hyper-text.-internal');
     this.tdClinicalAnchor = this.tdClinical.querySelector('a');
   }
 
@@ -225,39 +211,6 @@ export default class ResultsRowView {
             for (const dataset of master.items) {
               if (!dataset.has_freq) continue;
               const frequency = result.frequencies ? result.frequencies.find(frequency => frequency.source === dataset.id) : undefined;
-              // let frequencyValue;
-              // if (frequency) {
-              //   console.log(frequency)
-              //   switch (true) {
-              //     case frequency.allele.count == 1:
-              //       frequencyValue = 'singleton';
-              //       break;
-              //     case frequency.allele.frequency >= .5:
-              //       frequencyValue = '≥0.5';
-              //       break;
-              //     case frequency.allele.frequency > .05:
-              //       frequencyValue = '<0.5';
-              //       break;
-              //     case frequency.allele.frequency > .01:
-              //       frequencyValue = '<0.05';
-              //       break;
-              //     case frequency.allele.frequency > .001:
-              //       frequencyValue = '<0.01';
-              //       break;
-              //     case frequency.allele.frequency > .0001:
-              //       frequencyValue = '<0.001';
-              //       break;
-              //     case frequency.allele.frequency > 0:
-              //       frequencyValue = '<0.0001';
-              //       break;
-              //     default:
-              //       frequencyValue = 'monomorphic';
-              //       break;
-              //   }
-              // } else {
-              //   frequencyValue = 'na';
-              // }
-              // // this.tdFrequencies[dataset.id].dataset.frequency = frequencyValue;
               this.tdFrequencies[dataset.id].frequency = frequency;
             }
           }

@@ -13,6 +13,7 @@ import {initHome} from '../javascripts/home.js';
 // Load the favicon
 import '!file-loader?name=[name].[ext]!../images/favicon.svg';
 import '!file-loader?name=[name].[ext]!../assets/togovar.jsonld';
+import '!file-loader?name=js/components/[name].[ext]!../javascripts/components/LogarithmizedBlockGraphFrequencyView.js';
 
 let isReady =
   document.readyState === 'complete' ||
