@@ -173,7 +173,7 @@ export default class ResultsRowView {
         case 'position': // position
           {
             this.tdPositionChromosome.textContent = result.chromosome;
-            this.tdPositionCoordinate.textContent = result.start;
+            this.tdPositionCoordinate.textContent = result.position;
           }
           break;
         case 'ref_alt': // ref alt
