@@ -1,5 +1,6 @@
 import {COLUMNS} from '../global.js';
-import StoreManager from "./StoreManager.js";
+import StoreManager from './StoreManager.js';
+import LogarithmizedBlockGraphFrequencyView from '../components/LogarithmizedBlockGraphFrequencyView';
 
 const REF_ALT_SHOW_LENGTH = 4;
 
@@ -64,21 +65,32 @@ export default class ResultsRowView {
         case 'alt_frequency': // frequency
           {
             const master = StoreManager.getSearchConditionMaster('dataset');
-            html += `
-              <td class="alt_frequency">
-                <div class="frequency-graph">
-                  ${master.items.map(dataset => {
-                    if (dataset.id === 'gnomad' || dataset.id === 'mgend' || dataset.id === 'clinvar') {
-                      return '';
-                    } else {
-                      return `<div class="dataset" data-dataset="${dataset.id}" data-frequency=""></div>`;
-                    }
-                  }).join('')}
-                </div>
+            html += `<td class="alt_frequency">
+              ${master.items.map(dataset => {
+                if (!dataset.has_freq) return '';
+                return `
+                <logarithmized-block-graph-frequency-view
+                  data-dataset="${dataset.id}"
+                  data-direction="vertical"
+                ></logarithmized-block-graph-frequency-view>
+                `;
+              }).join('')}
               </td>`;
           }
           break;
-        case 'consequence': // consequence
+          html += `
+          <td class="alt_frequency">
+            <div class="frequency-graph">
+              ${master.items.map(dataset => {
+                if (dataset.id === 'gnomad' || dataset.id === 'mgend' || dataset.id === 'clinvar') {
+                  return '';
+                } else {
+                  return `<div class="dataset" data-dataset="${dataset.id}" data-frequency=""></div>`;
+                }
+              }).join('')}
+            </div>
+          </td>`;
+    case 'consequence': // consequence
           html += '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>';
           break;
         case 'sift': // SIFT
@@ -107,7 +119,7 @@ export default class ResultsRowView {
     this.tdGene = this.tr.querySelector('td.gene');
     this.tdGeneAnchor = this.tdGene.querySelector('a');
     this.tdFrequencies = {};
-    this.tr.querySelectorAll('td.alt_frequency > .frequency-graph > .dataset').forEach(elm => this.tdFrequencies[elm.dataset.dataset] = elm);
+    this.tr.querySelectorAll('td.alt_frequency > logarithmized-block-graph-frequency-view').forEach(elm => this.tdFrequencies[elm.dataset.dataset] = elm);
     this.tdConsequence = this.tr.querySelector('td.consequence');
     this.tdConsequenceItem = this.tdConsequence.querySelector('.consequence-item');
     this.tdSift = this.tr.querySelector('td.sift');
@@ -213,38 +225,40 @@ export default class ResultsRowView {
             for (const dataset of master.items) {
               if (!dataset.has_freq) continue;
               const frequency = result.frequencies ? result.frequencies.find(frequency => frequency.source === dataset.id) : undefined;
-              let frequencyValue;
-              if (frequency) {
-                switch (true) {
-                  case frequency.allele.count == 1:
-                    frequencyValue = 'singleton';
-                    break;
-                  case frequency.allele.frequency >= .5:
-                    frequencyValue = '≥0.5';
-                    break;
-                  case frequency.allele.frequency > .05:
-                    frequencyValue = '<0.5';
-                    break;
-                  case frequency.allele.frequency > .01:
-                    frequencyValue = '<0.05';
-                    break;
-                  case frequency.allele.frequency > .001:
-                    frequencyValue = '<0.01';
-                    break;
-                  case frequency.allele.frequency > .0001:
-                    frequencyValue = '<0.001';
-                    break;
-                  case frequency.allele.frequency > 0:
-                    frequencyValue = '<0.0001';
-                    break;
-                  default:
-                    frequencyValue = 'monomorphic';
-                    break;
-                }
-              } else {
-                frequencyValue = 'na';
-              }
-              this.tdFrequencies[dataset.id].dataset.frequency = frequencyValue;
+              // let frequencyValue;
+              // if (frequency) {
+              //   console.log(frequency)
+              //   switch (true) {
+              //     case frequency.allele.count == 1:
+              //       frequencyValue = 'singleton';
+              //       break;
+              //     case frequency.allele.frequency >= .5:
+              //       frequencyValue = '≥0.5';
+              //       break;
+              //     case frequency.allele.frequency > .05:
+              //       frequencyValue = '<0.5';
+              //       break;
+              //     case frequency.allele.frequency > .01:
+              //       frequencyValue = '<0.05';
+              //       break;
+              //     case frequency.allele.frequency > .001:
+              //       frequencyValue = '<0.01';
+              //       break;
+              //     case frequency.allele.frequency > .0001:
+              //       frequencyValue = '<0.001';
+              //       break;
+              //     case frequency.allele.frequency > 0:
+              //       frequencyValue = '<0.0001';
+              //       break;
+              //     default:
+              //       frequencyValue = 'monomorphic';
+              //       break;
+              //   }
+              // } else {
+              //   frequencyValue = 'na';
+              // }
+              // // this.tdFrequencies[dataset.id].dataset.frequency = frequencyValue;
+              this.tdFrequencies[dataset.id].frequency = frequency;
             }
           }
           break;
