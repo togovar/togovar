@@ -43,7 +43,7 @@ export default class SimpleSearchView {
     // events
     StoreManager.bind('simpleSearchConditions', this);
     // value
-    const term = StoreManager.getSearchCondition('term');
+    const term = StoreManager.getSimpleSearchCondition('term');
     if (term) this._searchFieldView.setTerm(term);
 
     // examples

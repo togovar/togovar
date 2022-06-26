@@ -24,8 +24,7 @@ export const mixin = {
     this.setData('simpleSearchConditionsMaster', json);
     // restore search conditions from URL parameters
     const searchMode = this._URIParameters.mode ?? DEFAULT_SEARCH_MODE;
-    const simpleSearchConditions = {},
-      advancedSearchConditions = {};
+    const simpleSearchConditions = {}, advancedSearchConditions = {};
     switch (searchMode) {
       case 'simple':
         Object.assign(
@@ -103,7 +102,7 @@ export const mixin = {
     this._setSimpleSearchConditions(resetConditions);
   },
 
-  getSearchCondition(key) {
+  getSimpleSearchCondition(key) {
     return this._copy(this._store.simpleSearchConditions[key]);
   },
 
@@ -111,7 +110,7 @@ export const mixin = {
   //   return this._copy(this._store.advancedSearchConditions[key]);
   // },
 
-  getSearchConditionMaster(key) {
+  getSimpleSearchConditionMaster(key) {
     return this.getData('simpleSearchConditionsMaster').find(
       (condition) => condition.id === key
     );
