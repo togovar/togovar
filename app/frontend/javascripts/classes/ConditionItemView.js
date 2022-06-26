@@ -132,7 +132,7 @@ export default class ConditionItemView extends ConditionView {
       this._values.querySelectorAll(':scope > condition-item-value-view')
     );
     if (this._conditionType === CONDITION_TYPE.dataset) {
-      // if the condition type is dataset, special conditional expression is needed
+      // if the condition type is 'dataset', special conditional expression is needed
       const queries = values.map(
         (view) =>
           view.shadowRoot.querySelector('frequency-count-value-view').queryValue
