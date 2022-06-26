@@ -17,9 +17,7 @@ module TogoVar
           def to_hash
             validate
 
-            terms = @terms
-                      .map { |x| (::ClinicalSignificance.find(x.upcase) || ::ClinicalSignificance.find_by_key(x))&.label&.downcase }
-                      .compact
+            terms = @terms.filter_map { |x| (::ClinicalSignificance.find_by_id(x) || ::ClinicalSignificance.find_by_key(x))&.label&.downcase }
 
             q = Elasticsearch::DSL::Search.search do
               query do

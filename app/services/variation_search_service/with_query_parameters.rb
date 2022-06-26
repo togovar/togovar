@@ -26,7 +26,7 @@ class VariationSearchService
     def execute
       clear_all
 
-      ResponseFormatter.new(param, search, @error, @warning, @notice).format
+      ResponseFormatter.new(param, search, @error, @warning, @notice).to_hash
     end
 
     private

@@ -1,5 +1,4 @@
 class VariationSearchService
-  # @deprecated This class remains only for backwards compatibility
   class ResponseFormatter
     def initialize(param, result, error = [], warning = [], notice = [])
       @param = param
@@ -9,7 +8,7 @@ class VariationSearchService
       @notice = notice
     end
 
-    def format
+    def to_hash
       JSON.parse(to_json.target!)
     end
 
@@ -137,11 +136,11 @@ class VariationSearchService
         end
 
         interpretations = Array(variation.dig(:clinvar, :interpretation))
-                            .map { |x| Form::ClinicalSignificance[x.tr(' ', '_').to_sym]&.param_name }
+                            .map { |x| x.split(/[,\/]\s*/).map { |y| ClinicalSignificance.find_by_id(y.tr(' ', '_').to_sym)&.key } }
 
         significance = Array(variation.dig(:clinvar, :medgen))
                          .zip(interpretations).map
-                         .with_index { |x, i| { medgen: x[0], condition: x[0].present? ? conditions[x[0]] : variation.dig(:clinvar, :condition, i), interpretations: [x[1]] } }
+                         .with_index { |x, i| { medgen: x[0], condition: x[0].present? ? conditions[x[0]] : variation.dig(:clinvar, :condition, i), interpretations: x[1] } }
 
         if significance.present?
           json.significance significance

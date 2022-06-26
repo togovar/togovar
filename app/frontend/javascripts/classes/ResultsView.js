@@ -1,11 +1,9 @@
-import StoreManager from "./StoreManager.js";
-import ResultsRowView from "./ResultsRowView.js";
-import ScrollBar from "./ScrollBar.js";
+import StoreManager from './StoreManager.js';
+import ResultsRowView from './ResultsRowView.js';
+import ScrollBar from './ScrollBar.js';
 import { TR_HEIGHT, COMMON_FOOTER_HEIGHT, COLUMNS } from '../global.js';
 
-
 export default class ResultsView {
-
   constructor(elm) {
     this.elm = elm;
     this.rows = [];
@@ -21,16 +19,30 @@ export default class ResultsView {
     StoreManager.bind('searchMessages', this);
     $(document).on('keydown.resultview', this.keydown.bind(this));
     // スクロールバーの生成
-    this.elm.querySelector('.tablecontainer').insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
+    this.elm
+      .querySelector('.tablecontainer')
+      .insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
     new ScrollBar(this.elm.querySelector('.scroll-bar'));
     // ヘッダ+ ヘッダのツールチップ用のデータ設定
-    this.elm.querySelector('.tablecontainer > table.results-view > thead > tr').innerHTML = COLUMNS.map(column => `<th class="${column.id}"><p data-tooltip-id="table-header-${column.id}">${column.label}</p></th>`).join('');
+    this.elm.querySelector(
+      '.tablecontainer > table.results-view > thead > tr'
+    ).innerHTML = COLUMNS.map(
+      (column) =>
+        `<th class="${column.id}"><p data-tooltip-id="table-header-${column.id}">${column.label}</p></th>`
+    ).join('');
 
-    this.tbody = this.elm.querySelector('.tablecontainer > table.results-view > tbody');
+    this.tbody = this.elm.querySelector(
+      '.tablecontainer > table.results-view > tbody'
+    );
 
     // スクロール制御
     // スクロールイベント
-    const mousewheelevent = 'onwheel' in document ? 'wheel' : 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
+    const mousewheelevent =
+      'onwheel' in document
+        ? 'wheel'
+        : 'onmousewheel' in document
+        ? 'mousewheel'
+        : 'DOMMouseScroll';
     this.tbody.addEventListener(mousewheelevent, this.scroll.bind(this));
 
     // カラムの表示を制御するためのスタイルシート
@@ -42,8 +54,14 @@ export default class ResultsView {
 
   updateDisplaySize() {
     // 表示数
-    const
-      maxRowCount = Math.floor((window.innerHeight - this.tbody.getBoundingClientRect().top - StoreManager.getData('karyotype').height - COMMON_FOOTER_HEIGHT - 2) / TR_HEIGHT),
+    const maxRowCount = Math.floor(
+        (window.innerHeight -
+          this.tbody.getBoundingClientRect().top -
+          StoreManager.getData('karyotype').height -
+          COMMON_FOOTER_HEIGHT -
+          2) /
+          TR_HEIGHT
+      ),
       numberOfRecords = StoreManager.getData('numberOfRecords'),
       offset = StoreManager.getData('offset'),
       rowCount = Math.min(maxRowCount, numberOfRecords);
@@ -57,13 +75,15 @@ export default class ResultsView {
       }
     }
     // オフセット量の調整
-    const
-      onScreen = numberOfRecords - offset,
+    const onScreen = numberOfRecords - offset,
       belowSpace = maxRowCount - onScreen;
-    if (belowSpace > 0) { // 隙間ができてしまい
-      if (offset >= belowSpace) { // 上の隙間の方が大きい場合、差分をオフセットにセット
+    if (belowSpace > 0) {
+      // 隙間ができてしまい
+      if (offset >= belowSpace) {
+        // 上の隙間の方が大きい場合、差分をオフセットにセット
         StoreManager.setData('offset', offset - belowSpace);
-      } else { // 下の隙間が大きい場合、オフセット量をゼロに
+      } else {
+        // 下の隙間が大きい場合、オフセット量をゼロに
         StoreManager.setData('offset', 0);
       }
     }
@@ -71,10 +91,9 @@ export default class ResultsView {
 
   scroll(e) {
     e.stopPropagation();
-    const
-      totalHeight = StoreManager.getData('numberOfRecords') * TR_HEIGHT;
-    let
-      availableScrollY = totalHeight - StoreManager.getData('rowCount') * TR_HEIGHT,
+    const totalHeight = StoreManager.getData('numberOfRecords') * TR_HEIGHT;
+    let availableScrollY =
+        totalHeight - StoreManager.getData('rowCount') * TR_HEIGHT,
       wheelScroll;
     availableScrollY = availableScrollY < 0 ? 0 : availableScrollY;
     // 縦方向にスクロールしていない場合スルー
@@ -82,7 +101,8 @@ export default class ResultsView {
     // ホイールのスクロール量
     wheelScroll = this.lastScroll + e.deltaY;
     wheelScroll = wheelScroll < 0 ? 0 : wheelScroll;
-    wheelScroll = wheelScroll > availableScrollY ? availableScrollY : wheelScroll;
+    wheelScroll =
+      wheelScroll > availableScrollY ? availableScrollY : wheelScroll;
     if (wheelScroll === this.lastScroll) return;
     // スクロール量決定
     this.lastScroll = wheelScroll;
@@ -94,7 +114,8 @@ export default class ResultsView {
   offset(offset) {
     this.lastScroll = offset * TR_HEIGHT;
     // 染色体位置
-    const displayingRegions1 = {}, displayingRegions2 = {};
+    const displayingRegions1 = {},
+      displayingRegions2 = {};
     for (let i = 0; i <= StoreManager.getData('rowCount') - 1; i++) {
       const record = StoreManager.getRecordByIndex(i);
       if (displayingRegions1[record.chromosome] === undefined) {
@@ -105,8 +126,8 @@ export default class ResultsView {
     for (const key in displayingRegions1) {
       displayingRegions2[key] = {
         start: Math.min(...displayingRegions1[key]),
-        end: Math.max(...displayingRegions1[key])
-      }
+        end: Math.max(...displayingRegions1[key]),
+      };
     }
     StoreManager.setData('displayingRegionsOnChromosome', displayingRegions2);
   }
@@ -125,11 +146,11 @@ export default class ResultsView {
     }
   }
 
-  
   // bindings ///////////////////////////
 
   searchStatus(status) {
-    this.status.textContent = `The number of available variations is ${status.available.toLocaleString()} out of ${status.filtered.toLocaleString()}.`;
+    this.status.innerHTML = `The number of available variations is ${status.available.toLocaleString()} out of <span class="bigger">${status.filtered.toLocaleString()}</span>.`;
+    // this.status.textContent = `The number of available variations is ${status.available.toLocaleString()} out of ${status.filtered.toLocaleString()}.`;
     if (status.filtered === 0) {
       this.elm.classList.add('-not-found');
     } else {
@@ -150,10 +171,15 @@ export default class ResultsView {
     // スタイルの追加
     for (let i = 0; i < columns.length; i++) {
       const column = columns[i];
-      this.stylesheet.sheet.insertRule(`
-      .tablecontainer > table.results-view th.${column.id}, .tablecontainer > table.results-view td.${column.id} {
-        display: ${ column.isUsed ? 'table-cell' : 'none' }
-      }`, i);
+      this.stylesheet.sheet.insertRule(
+        `
+      .tablecontainer > table.results-view th.${
+        column.id
+      }, .tablecontainer > table.results-view td.${column.id} {
+        display: ${column.isUsed ? 'table-cell' : 'none'}
+      }`,
+        i
+      );
     }
   }
 
@@ -174,22 +200,21 @@ export default class ResultsView {
   }
 
   shiftSelectedRow(value) {
-    let
-      currentIndex = StoreManager.getData('selectedRow'),
+    let currentIndex = StoreManager.getData('selectedRow'),
       shiftIndex = currentIndex + value,
       rowCount = StoreManager.getData('rowCount'),
       offset = StoreManager.getData('offset'),
       numberOfRecords = StoreManager.getData('numberOfRecords');
     if (shiftIndex < 0) {
-      shiftIndex = 0
+      shiftIndex = 0;
       if (offset > 0) {
         // 上にスクロール
         offset--;
         StoreManager.setData('offset', offset);
       }
-    } else if (shiftIndex > (rowCount - 1)) {
+    } else if (shiftIndex > rowCount - 1) {
       shiftIndex = rowCount - 1;
-      if ((offset + shiftIndex) < (numberOfRecords - 1)) {
+      if (offset + shiftIndex < numberOfRecords - 1) {
         // 下にスクロール
         offset++;
         StoreManager.setData('offset', offset);
@@ -201,5 +226,4 @@ export default class ResultsView {
   karyotype(_karyotype) {
     this.updateDisplaySize();
   }
-
 }

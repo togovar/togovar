@@ -311,15 +311,6 @@ components:
         type: boolean
         nullable: true
 
-    DiseaseMondo:
-      in: query
-      name: node
-      description: A node ID
-      schema:
-        type: string
-      required: false
-      example: MONDO_0045024
-
     GeneTerm:
       in: query
       name: term
@@ -338,6 +329,15 @@ components:
       required: true
       example: breast ovarian cancer
 
+    DiseaseMondo:
+      in: query
+      name: node
+      description: A node ID
+      schema:
+        type: string
+      required: false
+      example: MONDO_0003582
+
   requestBodies:
     SearchVariant:
       description: Schema for searching variant
@@ -352,6 +352,11 @@ components:
                 description: (Optional) Set version number if you would like to use old version.
                 enum:
                   - "1"
+              formatter:
+                type: string
+                description: (Optional) Formatter for response data.
+                enum:
+                  - "html"
               query:
                 oneOf:
                   - $ref: '#/components/schemas/ID'
@@ -438,7 +443,7 @@ components:
                 type: string
                 description: A node ID
                 required: false
-                example: MONDO_0045024
+                example: MONDO_0003582
 
   schemas:
     ID:
@@ -1185,6 +1190,9 @@ components:
           alias_of:
             type: string
             example: null
+          highlight:
+            type: string
+            example: <em>ALDH2</em>
 
     SearchDisease:
       type: array
@@ -1193,13 +1201,16 @@ components:
         properties:
           id:
             type: string
-            example: MONDO_0045024
+            example: MONDO_0003582
           cui:
             type: string
-            example: null
+            example: C0677776
           label:
             type: string
-            example: cancer or benign tumor
+            example: Hereditary breast and ovarian cancer syndrome
+          highlight:
+            type: string
+            example: Hereditary <em>breast</em> and <em>ovarian</em> <em>cancer</em> syndrome
 
     InspectDisease:
       type: array
@@ -1208,13 +1219,13 @@ components:
         properties:
           id:
             type: string
-            example: MONDO_0045024
+            example: MONDO_0003582
           cui:
             type: string
-            example: null
+            example: C0677776
           label:
             type: string
-            example: cancer or benign tumor
+            example: Hereditary breast and ovarian cancer syndrome
           root:
             type: boolean
             example: false
@@ -1228,16 +1239,16 @@ components:
               properties:
                 id:
                   type: string
-                  example: MONDO_0000001
+                  example: MONDO_0016248
                 cui:
                   type: string
-                  example: null
+                  example: CN201036
                 label:
                   type: string
-                  example: disease or disorder
+                  example: Familial ovarian cancer
                 root:
                   type: boolean
-                  example: true
+                  example: false
           children:
             type: array
             items:
@@ -1245,16 +1256,16 @@ components:
               properties:
                 id:
                   type: string
-                  example: MONDO_0021074
+                  example: MONDO_0012933
                 cui:
                   type: string
-                  example: C0032927
+                  example: C2675520
                 label:
                   type: string
-                  example: Precancerous condition
+                  example: Breast-ovarian cancer, familial 2
                 leaf:
                   type: boolean
-                  example: false
+                  example: true
 
     Error:
       type: object

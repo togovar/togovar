@@ -23,7 +23,11 @@ class VariationSearchService
     # remember to validate before obtaining debug information
     validate || raise_error
 
-    ResponseFormatter.new(@params[:body], search, @errors).format
+    if @params[:formatter] === 'html'
+      HtmlFormatter.new(@params[:body], search).to_hash
+    else
+      ResponseFormatter.new(@params[:body], search, @errors).to_hash
+    end
   end
 
   private
@@ -85,7 +89,7 @@ class VariationSearchService
   end
 
   def paging?
-    (offset = @params[:body][:offset]).present? && (offset != 0 || offset.is_a?(Array))
+    (offset = @params.dig(:body, :offset)).present? && (offset != 0 || offset.is_a?(Array))
   end
 
   def stat_query
