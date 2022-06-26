@@ -70,15 +70,16 @@ export default class AdvancedSearchBuilderView {
 
   changeCondition() {
     const query = this._rootGroup.query;
-    //this._toolbar.canSearch(Object.keys(query).length > 0);
-    if (this.canSearch(query)) {
-      this.search();
-    }
+    console.log(query)
+    this.search();
+    //this._toolbar._canSearch(Object.keys(query).length > 0);
+    // if (this._canSearch(query)) {
+    // }
   }
 
-  canSearch(query) {
-    return Object.keys(query).length > 0;
-  }
+  // _canSearch(query) {
+  //   return Object.keys(query).length > 0;
+  // }
 
   group() {
     const conditionViews = this._selection.getSelectingConditionViews();
@@ -139,6 +140,7 @@ export default class AdvancedSearchBuilderView {
   }
 
   search() {
+    console.log(this._rootGroup)
     const query = this._rootGroup.query;
 
     StoreManager.setAdvancedSearchCondition(query);
