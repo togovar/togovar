@@ -255,11 +255,12 @@ export const mixin = {
           case 'advanced':
             {
               path = `${API_URL}/api/search/variant`;
+              const body = {offset: this._store.offset};
+              if (Object.keys(this._store.advancedSearchConditions).length > 0) {
+                body.query = this._store.advancedSearchConditions;
+              }
               options.method = 'POST';
-              options.body = JSON.stringify({
-                query: this._store.advancedSearchConditions,
-                offset: this._store.offset,
-              });
+              options.body = JSON.stringify(body);
             }
             break;
         }
