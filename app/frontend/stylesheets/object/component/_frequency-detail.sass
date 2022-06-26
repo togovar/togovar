@@ -1,0 +1,30 @@
+.frequency-detail
+  width: 100%
+  > thead
+    > tr
+      > th
+        @extend .panel-view-heading
+  > tbody
+    > tr
+      > td
+        line-height: 18px
+        &:first-child
+          font-weight: bold
+        .dataset-icon
+          display: inline-block
+          vertical-align: middle
+          margin-right: .2em
+          > .properties
+            width: inherit
+        &.alt, &.total, &.frequency
+          text-align: right
+        &.alt
+          font-weight: bold
+          color: $COLOR_ALT
+          &:after
+            content: "/"
+            font-size: 10px
+            color: $COLOR_BLACK
+            margin-left: .5em
+        &.frequency
+          font-weight: bold

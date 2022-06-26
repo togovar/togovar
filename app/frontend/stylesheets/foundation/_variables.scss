@@ -4,8 +4,9 @@ $COLOR_KEY_DARK1: #117f93;
 $COLOR_KEY_DARK2: #0f6272;
 $COLOR_KEY_DARK3: #125263;
 
-$COLOR_SELECTED: #ffdd00;
-$COLOR_SELECTED_LIGHT: #fdfae5;
+$COLOR_SELECTED: #FFDD00;
+$COLOR_SELECTED_LIGHT: #FDFAE5;
+$COLOR_SINGLETON: lighten($COLOR_SELECTED, 35%);
 $COLOR_DISABLE_DEEP: #808080;
 $COLOR_DISABLE: #999999;
 
@@ -21,9 +22,9 @@ $COLOR_ALT: #ff6682;
 
 $COLOR_DATASET_JGA: $COLOR_KEY;
 $COLOR_DATASET_JGA_LIGHT: lighten($COLOR_DATASET_JGA, 35%);
-$COLOR_DATASET_3_5KJPN: #abe03f;
-$COLOR_DATASET_3_5KJPN_LIGHT: lighten($COLOR_DATASET_3_5KJPN, 35%);
-$COLOR_DATASET_HGVD: #005b80;
+$COLOR_DATASET_TOMMO: #88cb00;
+$COLOR_DATASET_TOMMO_LIGHT: lighten($COLOR_DATASET_TOMMO, 35%);
+$COLOR_DATASET_HGVD: #005B80;
 $COLOR_DATASET_MGEND: $COLOR_DATASET_HGVD;
 $COLOR_DATASET_HGVD_LIGHT: lighten($COLOR_DATASET_HGVD, 70%);
 $COLOR_DATASET_GEM_J: #dc2828;
@@ -49,11 +50,8 @@ $COLOR_SIGN_UNKNOWN: $COLOR_GRAY;
 $COLOR_SIGN_UNKNOWN_LIGHT: lighten($COLOR_SIGN_UNKNOWN, 35%);
 
 $GRADIENT_HEADING: linear-gradient(to right, $COLOR_KEY_DARK1, $COLOR_KEY);
-$GRADIENT_HEADING_DISABLE: linear-gradient(
-  to right,
-  $COLOR_DISABLE_DEEP,
-  $COLOR_DISABLE
-);
+$GRADIENT_HEADING_SEMITRANSPARENT: linear-gradient(to right, rgba($COLOR_KEY_DARK1, .9), rgba($COLOR_KEY, .9));
+$GRADIENT_HEADING_DISABLE: linear-gradient(to right, $COLOR_DISABLE_DEEP, $COLOR_DISABLE);
 
 // geometry
 $PADDING_SIDE: 18px;
@@ -72,14 +70,16 @@ $HEIGHT_BOTTOM_DRAWER: 30px;
 $HEIGHT_BOTTOM_DRAWER_OPENED: 400px;
 $HEIGHT_ADVANCED_SEARCH_CONDITION: 24px;
 
-$Z_INDEX_ROW_INDICATOR: 1;
-$Z_INDEX_ADVANCED_SEARCH_MENU: 1;
-$Z_INDEX_GLOBAL_HEADER: 2;
-$Z_INDEX_SUGGEST_VIEW: 2;
-$Z_INDEX_DRAWER: 3;
-$Z_INDEX_CONFIGURATION: 4;
-$Z_INDEX_EDITING_CONDITION: 4;
-$Z_INDEX_ACTIVITY_INDICATOR: 5;
+$Z_INDEX_BASE: 10000;
+$Z_INDEX_ROW_INDICATOR: $Z_INDEX_BASE + 1;
+$Z_INDEX_ADVANCED_SEARCH_MENU: $Z_INDEX_BASE + 1;
+$Z_INDEX_DETAIL_HEADER: $Z_INDEX_BASE + 1;
+$Z_INDEX_GLOBAL_HEADER: $Z_INDEX_BASE + 2;
+$Z_INDEX_SUGGEST_VIEW: $Z_INDEX_BASE + 2;
+$Z_INDEX_DRAWER: $Z_INDEX_BASE + 3;
+$Z_INDEX_CONFIGURATION: $Z_INDEX_BASE + 4;
+$Z_INDEX_EDITING_CONDITION: $Z_INDEX_BASE + 4;
+$Z_INDEX_ACTIVITY_INDICATOR: $Z_INDEX_BASE + 5;
 
 $BACKDROP_BG: radial-gradient(
   ellipse at center,
@@ -123,6 +123,7 @@ $CHAR_LOGICAL_OP_OUTLINE: '\E803';
   --color-darker-gray: #{$COLOR_DARKER_GRAY};
   --color-selected: #{$COLOR_SELECTED};
   --color-selected-light: #{$COLOR_SELECTED_LIGHT};
+  --color-singleton: #{$COLOR_SINGLETON};
   --color-disable: #{$COLOR_DISABLE};
   --color-disable-deep: #{$COLOR_DISABLE_DEEP};
   --color-separator: #{$COLOR_SEPARATOR};
@@ -131,14 +132,14 @@ $CHAR_LOGICAL_OP_OUTLINE: '\E803';
   --color-mutation-ref: #{$COLOR_REF};
   --color-mutation-alt: #{$COLOR_ALT};
   // color: datasets
-  --color-dataset-jga: #{$COLOR_DATASET_JGA};
-  --color-dataset-jga-light: #{$COLOR_DATASET_JGA_LIGHT};
-  --color-dataset-tommo: #{$COLOR_DATASET_3_5KJPN};
-  --color-dataset-tommo-light: #{$COLOR_DATASET_3_5KJPN_LIGHT};
-  --color-dataset-hgvd: #{$COLOR_DATASET_HGVD};
-  --color-dataset-hgvd-light: #{$COLOR_DATASET_HGVD_LIGHT};
   --color-dataset-gemj: #{$COLOR_DATASET_GEM_J};
   --color-dataset-gemj-light: #{$COLOR_DATASET_GEM_J_LIGHT};
+  --color-dataset-jga: #{$COLOR_DATASET_JGA};
+  --color-dataset-jga-light: #{$COLOR_DATASET_JGA_LIGHT};
+  --color-dataset-tommo: #{$COLOR_DATASET_TOMMO};
+  --color-dataset-tommo-light: #{$COLOR_DATASET_TOMMO_LIGHT};
+  --color-dataset-hgvd: #{$COLOR_DATASET_HGVD};
+  --color-dataset-hgvd-light: #{$COLOR_DATASET_HGVD_LIGHT};
   --color-dataset-bbj: #{$COLOR_DATASET_BBJ};
   --color-dataset-bbj-light: #{$COLOR_DATASET_BBJ_LIGHT};
   --color-dataset-foreign: #{$COLOR_DATASET_FOREIGN};
