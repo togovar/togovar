@@ -52,6 +52,7 @@ export const mixin = {
 
   // in Advanced Search, search criteria are received as queries, not key values.
   setAdvancedSearchCondition(conditions, fromHistory) {
+    console.log(conditions)
     if (!this._isReadySearch) return;
     this._store.advancedSearchConditions = conditions;
     // convert queries to URL parameters
