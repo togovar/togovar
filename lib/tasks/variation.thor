@@ -109,8 +109,9 @@ module Tasks
         DEFINE sql:select-option "order"
 
         PREFIX dct: <http://purl.org/dc/terms/>
-        PREFIX cvo:  <http://purl.jp/bio/10/clinvar/>
+        PREFIX cvo: <http://purl.jp/bio/10/clinvar/>
         PREFIX clinvar_variation: <http://ncbi.nlm.nih.gov/clinvar/variation/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
         SELECT DISTINCT ?variation_id ?condition ?interpretation ?medgen
         FROM <http://togovar.biosciencedbc.jp/clinvar>
@@ -122,7 +123,7 @@ module Tasks
             cvo:interpreted_record/cvo:rcv_list/cvo:rcv_accession ?_rcv .
 
           ?_rcv cvo:interpretation ?interpretation ;
-            cvo:interpreted_condition ?_interpreted_condition .
+            cvo:interpreted_condition_list/cvo:interpreted_condition ?_interpreted_condition .
 
           ?_interpreted_condition rdfs:label ?condition .
 
@@ -162,7 +163,7 @@ module Tasks
       [
         {
           update: {
-            _index: 'variation',
+            _index: 'variant',
             _id: hash[:_id],
             retry_on_conflict: 3
           }
@@ -171,10 +172,14 @@ module Tasks
           doc_as_upsert: true,
           doc: {
             clinvar: {
-              medgen: hash[:annotation].map { |r| r[:medgen] },
-              interpretation: hash[:annotation].map { |r| r[:interpretation].downcase },
-              condition: hash[:annotation].map { |r| r[:condition] }
-            }.compact
+              conditions: hash[:annotation].map do |r|
+                {
+                  medgen: r[:medgen],
+                  interpretation: r[:interpretation]&.split(/[\/,]\s*/)&.map(&:downcase),
+                  condition: r[:condition]
+                }
+              end
+            }
           }
         }
       ]
