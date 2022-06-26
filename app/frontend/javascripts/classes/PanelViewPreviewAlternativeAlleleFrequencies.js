@@ -11,7 +11,7 @@ export default class PanelViewPreviewAlternativeAlleleFrequencies extends PanelV
     StoreManager.bind('selectedRow', this);
     StoreManager.bind('offset', this);
     const tbody = this.elm.querySelector('.frequency-detail > tbody');
-    this._master = StoreManager.getSearchConditionMaster('dataset').items;
+    this._master = StoreManager.getSimpleSearchConditionMaster('dataset').items;
     // make DOM
     tbody.innerHTML = this._master.map(dataset => {
       if (dataset.has_freq) {

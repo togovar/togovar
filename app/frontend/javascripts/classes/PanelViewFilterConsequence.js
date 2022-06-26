@@ -9,14 +9,14 @@ export default class PanelViewFilterConsequence extends PanelView {
   constructor(elm) {
     super(elm, 'consequence');
     // 検索条件マスター
-    const conditionMaster = StoreManager.getSearchConditionMaster(this.kind);
-    const grouping = StoreManager.getSearchConditionMaster('consequence_grouping').items;
+    const conditionMaster = StoreManager.getSimpleSearchConditionMaster(this.kind);
+    const grouping = StoreManager.getSimpleSearchConditionMaster('consequence_grouping').items;
     // GUIの生成
     this._createGUI(conditionMaster, grouping);
     // collapse menu
     elm.querySelectorAll('.collapse-view').forEach(collapseView => new CollapseView(collapseView) );
     // references
-    const condition = StoreManager.getSearchCondition(this.kind);
+    const condition = StoreManager.getSimpleSearchCondition(this.kind);
     this._inputsValues = {};
     this.elm.querySelectorAll('.content > .checklist-values input').forEach(input => {
       this._inputsValues[input.value] = {
@@ -52,7 +52,7 @@ export default class PanelViewFilterConsequence extends PanelView {
       })
     });
     // references
-    const condition = StoreManager.getSearchCondition(this.kind);
+    const condition = StoreManager.getSimpleSearchCondition(this.kind);
     console.log(condition)
     this._inputsValues = {};
     this.elm.querySelectorAll('.content > .checklist-values input').forEach(input => {

@@ -7,7 +7,7 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
     super(elm, "frequency");
 
     // default values
-    this._conditionMaster = StoreManager.getSearchConditionMaster(this.kind);
+    this._conditionMaster = StoreManager.getSimpleSearchConditionMaster(this.kind);
     const condition = this._getConditionFromStore();
 
     const rangeSlider = document.createElement("range-slider");
@@ -41,7 +41,7 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
   }
 
   _getConditionFromStore() {
-    let condition = StoreManager.getSearchCondition(this.kind);
+    let condition = StoreManager.getSimpleSearchCondition(this.kind);
     // if the condition is undefined, generate it from master
     condition = condition
       ? condition
