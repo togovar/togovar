@@ -25,9 +25,14 @@ class Variation
           filter exists: { field: :clinvar }
         end
 
-        aggregation :interpretations do
-          terms field: 'clinvar.interpretation',
-                size: cardinality[:clinvar_interpretations]
+        aggregation :conditions do
+          nested do
+            path 'clinvar.conditions'
+            aggregation :interpretations do
+              terms field: 'clinvar.conditions.interpretation',
+                    size: cardinality[:clinvar_interpretations]
+            end
+          end
         end
 
         aggregation :frequency do

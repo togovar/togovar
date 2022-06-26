@@ -21,7 +21,12 @@ module TogoVar
 
             q = Elasticsearch::DSL::Search.search do
               query do
-                terms 'clinvar.interpretation': terms
+                nested do
+                  path 'clinvar.conditions'
+                  query do
+                    terms 'clinvar.conditions.interpretation': terms
+                  end
+                end
               end
             end
 

@@ -161,14 +161,13 @@ class VariationSearchService
     end
 
     def significance(result)
-      interpretations = Array(result.dig(:clinvar, :interpretation))
-                          .map { |x| x.split(/[,\/]\s*/).map { |y| ClinicalSignificance.find_by_id(y.tr(' ', '_').to_sym)&.key } }
+      return if (items = Array(result.dig(:clinvar, :conditions))).blank?
 
-      items = Array(result.dig(:clinvar, :medgen))
-                .zip(interpretations)
-                .map.with_index { |x, i| { medgen: x[0], condition: x[0].present? ? conditions[x[0]] : result.dig(:clinvar, :condition, i), interpretations: x[1] } }
-
-      return if (item = items.first).blank?
+      item = {
+        condition: items.first[:condition],
+        interpretations: Array(items.first[:interpretation]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(' ', '_').to_sym)&.key },
+        medgen: items.first[:medgen]
+      }
 
       %Q[<div class="clinical_significance"#{ %Q[ data-remains="#{items.size - 1}"] if items.size > 1 }><div href="" class="clinical-significance" data-sign="#{item.dig(:interpretations, 0)}"></div><a>#{item[:condition]}</a></div>]
     end

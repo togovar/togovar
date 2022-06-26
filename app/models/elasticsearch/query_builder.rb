@@ -216,7 +216,12 @@ module Elasticsearch
 
             if (interpretations = values.filter_map { |x| Form::ClinicalSignificance.find_by_param_name(x)&.label&.downcase }).present?
               should do
-                terms 'clinvar.interpretation': interpretations
+                nested do
+                  path 'clinvar.conditions'
+                  query do
+                    terms 'clinvar.conditions.interpretation': interpretations
+                  end
+                end
               end
             end
           end
@@ -390,9 +395,16 @@ module Elasticsearch
           filter exists: { field: :clinvar }
         end
 
-        aggregation :interpretations do
-          terms field: 'clinvar.interpretation', size: Variation.cardinality[:clinvar_interpretations]
+        aggregation :conditions do
+          nested do
+            path 'clinvar.conditions'
+            aggregation :interpretations do
+              terms field: 'clinvar.conditions.interpretation',
+                    size: Variation.cardinality[:clinvar_interpretations]
+            end
+          end
         end
+
 
         aggregation :frequency do
           nested do

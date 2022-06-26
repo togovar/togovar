@@ -72,7 +72,7 @@ class VariationSearchService
         unless (c = @result[:filtered_total] - @result[:aggs].dig(:clinvar_total, :doc_count)).zero?
           json.set! 'NC', c
         end
-        Array(@result[:aggs].dig(:interpretations, :buckets)).each do |x|
+        Array(@result[:aggs].dig(:conditions, :interpretations, :buckets)).each do |x|
           if (s = Form::ClinicalSignificance[x[:key].tr(' ', '_').to_sym])
             json.set! s.param_name, x[:doc_count]
           end
@@ -135,12 +135,13 @@ class VariationSearchService
           json.external_link external_link
         end
 
-        interpretations = Array(variation.dig(:clinvar, :interpretation))
-                            .map { |x| x.split(/[,\/]\s*/).map { |y| ClinicalSignificance.find_by_id(y.tr(' ', '_').to_sym)&.key } }
-
-        significance = Array(variation.dig(:clinvar, :medgen))
-                         .zip(interpretations).map
-                         .with_index { |x, i| { medgen: x[0], condition: x[0].present? ? conditions[x[0]] : variation.dig(:clinvar, :condition, i), interpretations: x[1] } }
+        significance = Array(variation.dig(:clinvar, :conditions)).map do |x|
+          {
+            condition: x[:condition],
+            interpretations: Array(x[:interpretation]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(' ', '_').to_sym)&.key },
+            medgen: x[:medgen]
+          }
+        end
 
         if significance.present?
           json.significance significance

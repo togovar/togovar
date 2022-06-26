@@ -12,6 +12,21 @@ class Variation
         index: {
           number_of_shards: ENV.fetch('TOGOVAR_INDEX_VARIATION_NUMBER_OF_SHARDS') { 1 },
           number_of_replicas: ENV.fetch('TOGOVAR_INDEX_VARIATION_NUMBER_OF_REPLICAS') { 0 }
+        },
+        analysis: {
+          analyzer: {
+            search_analyzer: {
+              type: :custom,
+              tokenizer: :standard,
+              filter: %i[lowercase]
+            }
+          },
+          normalizer: {
+            lowercase: {
+              type: :custom,
+              filter: :lowercase
+            }
+          }
         }
       }
 
@@ -56,17 +71,19 @@ class Variation
           indexes :clinvar do
             indexes :variation_id, type: :long
             indexes :allele_id, type: :long
-            indexes :medgen, type: :keyword
-            indexes :interpretation, type: :keyword
-            indexes :condition, {
-              type: :text,
-              analyzer: :standard,
-              fields: {
-                raw: {
-                  type: :keyword
+            indexes :conditions, type: :nested do
+              indexes :medgen, type: :keyword
+              indexes :interpretation, type: :keyword
+              indexes :condition, {
+                type: :text,
+                analyzer: :search_analyzer,
+                fields: {
+                  raw: {
+                    type: :keyword
+                  }
                 }
               }
-            }
+            end
           end
           indexes :frequency, type: :nested do
             indexes :source, type: :keyword
@@ -100,8 +117,13 @@ class Variation
             end
           end
           aggregation :clinvar_interpretations do
-            cardinality do
-              field :'clinvar.interpretation'
+            nested do
+              path 'clinvar.conditions'
+              aggregation :clinvar_interpretations do
+                cardinality do
+                  field :'clinvar.conditions.interpretation'
+                end
+              end
             end
           end
           aggregation :vep_consequences do
@@ -129,7 +151,7 @@ class Variation
         response = __elasticsearch__.search(query)
 
         @cardinality = response.aggregations
-                         .map { |k, v| [k, v.key?('doc_count') ? v[k]['value'] : v['value']] }
+                         .map { |k, v| [k, v.key?('value') ? v['value'] : v[k]['value']] }
                          .to_h
                          .symbolize_keys
       end
