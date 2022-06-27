@@ -265,9 +265,6 @@ export const mixin = {
         }
       }
       fetch(path, options)
-        .catch((e) => {
-          throw Error(e);
-        })
         .then((response) => {
           if (response.ok) {
             return response;
@@ -329,6 +326,13 @@ export const mixin = {
             JSON.stringify(this._store.simpleSearchConditions)
           ) {
             this._setSimpleSearchConditions({});
+          }
+        })
+        .catch((e) => {
+          if (e.name === 'AbortError') {
+            console.warn('User aborted the request');
+          } else {
+            throw Error(e);
           }
         });
     })(offset, isFirstTime);
