@@ -5,14 +5,31 @@ module TogoVar
     module Models
       module Version1
         class Disease < NonStrictTerms
+          def initialize(*args)
+            super
+
+            arg = @args.first
+
+            @sub_concepts = [true, false].include?(arg[:sub_concepts]) ? arg[:sub_concepts] : true
+          end
+
           def to_hash
             validate
 
-            terms = @terms
+            terms = if @sub_concepts
+                      @terms + DiseaseMondo.sub_concepts(@terms.first)
+                    else
+                      @terms
+                    end
 
             q = Elasticsearch::DSL::Search.search do
               query do
-                terms 'clinvar.medgen': terms
+                nested do
+                  path 'clinvar.conditions'
+                  query do
+                    terms 'clinvar.conditions.medgen': terms
+                  end
+                end
               end
             end
 

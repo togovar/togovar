@@ -858,12 +858,15 @@ components:
               enum:
                 - eq
                 - ne
-
             terms:
               type: array
               items:
                 type: string
                 description: MedGen ID
+            sub_concepts:
+              type: boolean
+              description: "Include all descendant nodes in the Mondo Disease Ontology (default: true)"
+              example: true
 
     Dataset:
       type: object

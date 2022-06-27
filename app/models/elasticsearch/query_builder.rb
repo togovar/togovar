@@ -563,7 +563,12 @@ module Elasticsearch
 
       query = Elasticsearch::DSL::Search.search do
         query do
-          terms 'clinvar.medgen': medgen
+          nested do
+            path 'clinvar.conditions'
+            query do
+              terms 'clinvar.conditions.medgen': medgen
+            end
+          end
         end
       end
 
