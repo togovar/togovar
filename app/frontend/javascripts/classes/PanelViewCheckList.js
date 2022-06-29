@@ -11,7 +11,7 @@ export default class PanelViewCheckList extends PanelView {
     // GUIの生成
     this._createGUI(conditionMaster);
     // references
-    const condition = StoreManager.getSearchCondition(this.kind);
+    const condition = StoreManager.getSimpleSearchCondition(this.kind);
     this._inputsValues = {};
     this.elm.querySelectorAll('.content > .checklist-values > .item > .label > input').forEach(input => {
       this._inputsValues[input.value] = {

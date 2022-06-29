@@ -27,7 +27,7 @@ export default class PanelViewPreviewConsequence extends PanelView {
         // consequence の取り出し
         let accessions = record.transcripts.map( transcript => transcript.consequence ).reduce((first, second) => first.concat(second) );
         accessions = Array.from(new Set(accessions));
-        const master = StoreManager.getSearchConditionMaster('consequence');
+        const master = StoreManager.getSimpleSearchConditionMaster('consequence');
         const consequences = accessions.map(accession => master.items.find(consequence => consequence.id === accession));
         html = consequences.map(consequence => `<dl class="above-headline"><dt>${consequence.label}</dt><dd>${consequence.description}</dd></dl>`).join('');
         this.elm.classList.remove('-notfound');

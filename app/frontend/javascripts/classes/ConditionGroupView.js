@@ -175,15 +175,18 @@ export default class ConditionGroupView extends ConditionView {
         ':scope > .advanced-search-condition-view'
       )
     );
-    if (this._numberOfChild === 1) {
-      return children[0].delegate.query;
-    } else {
-      return {
-        [this._logicalOperatorSwitch.dataset.operator]: children.map(
-          (el) => el.delegate.query
-        ),
-      };
-    }
+    switch (this._numberOfChild) {
+      case 0:
+        return {};
+      case 1:
+        return children[0].delegate.query;
+      default:
+        return {
+          [this._logicalOperatorSwitch.dataset.operator]: children.map(
+            (el) => el.delegate.query
+          ),
+        };
+      }
   }
 
   get container() {

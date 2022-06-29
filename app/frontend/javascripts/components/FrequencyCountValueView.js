@@ -163,7 +163,6 @@ export class FrequencyCountValueView extends LitElement {
 
   get queryValue() {
     const dataset = { name: this.dataset.dataset }
-    const filtered = this.filtered === 'true' ? true : false
     if (this.invert === '1') {
       return {
         or: [
@@ -174,7 +173,7 @@ export class FrequencyCountValueView extends LitElement {
                 gte: 0,
                 lte: this.from,
               },
-              filtered,
+              filtered: this.filtered,
             },
           },
           {
@@ -184,7 +183,7 @@ export class FrequencyCountValueView extends LitElement {
                 gte: this.to,
                 lte: 1,
               },
-              filtered,
+              filtered: this.filtered,
             },
           },
         ],
@@ -197,7 +196,7 @@ export class FrequencyCountValueView extends LitElement {
         frequency: {
           dataset,
           [this.mode]: values,
-          filtered,
+          filtered: this.filtered,
         },
       }
     }

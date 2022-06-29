@@ -1,11 +1,10 @@
-import {COLUMNS} from '../global.js';
+import { COLUMNS } from '../global.js';
 import StoreManager from './StoreManager.js';
 import LogarithmizedBlockGraphFrequencyView from '../components/LogarithmizedBlockGraphFrequencyView';
 
 const REF_ALT_SHOW_LENGTH = 4;
 
 export default class ResultsRowView {
-
   constructor(index) {
     this.index = index;
     this.selected = false;
@@ -45,7 +44,8 @@ export default class ResultsRowView {
     for (const column of COLUMNS) {
       switch (column.id) {
         case 'togovar_id': // tgv
-          html += '<td class="togovar_id"><a href="" class="hyper-text -internal" target="_blank"></a></td>';
+          html +=
+            '<td class="togovar_id"><a href="" class="hyper-text -internal" target="_blank"></a></td>';
           break;
         case 'refsnp_id': // refSNP
           html += `<td class="refsnp_id" data-remains=""><a href="" target="_blank" class="hyper-text -external"></a></td>`;
@@ -60,43 +60,53 @@ export default class ResultsRowView {
           html += `<td class="type"><div class="variant-type"></div></td>`;
           break;
         case 'gene': // gene symbol
-          html += '<td class="gene" data-remains=""><a href="" class="hyper-text -internal" target="_blank"></a></td>';
+          html +=
+            '<td class="gene" data-remains=""><a href="" class="hyper-text -internal" target="_blank"></a></td>';
           break;
         case 'alt_frequency': // frequency
           {
-            const master = StoreManager.getSearchConditionMaster('dataset');
+            const master =
+              StoreManager.getSimpleSearchConditionMaster('dataset');
             html += `<td class="alt_frequency">
-              ${master.items.map(dataset => {
-                if (!dataset.has_freq) return '';
-                return `
+              ${master.items
+                .map((dataset) => {
+                  if (!dataset.has_freq) return '';
+                  return `
                 <logarithmized-block-graph-frequency-view
                   data-dataset="${dataset.id}"
                   data-direction="vertical"
                 ></logarithmized-block-graph-frequency-view>
                 `;
-              }).join('')}
+                })
+                .join('')}
               </td>`;
           }
           break;
-    case 'consequence': // consequence
-          html += '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>';
+        case 'consequence': // consequence
+          html +=
+            '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>';
           break;
         case 'sift': // SIFT
-          html += '<td class="sift" data-remains=""><div class="variant-function" data-function=""></div></td>';
+          html +=
+            '<td class="sift" data-remains=""><div class="variant-function" data-function=""></div></td>';
           break;
         case 'polyphen': // PolyPhen
-          html += '<td class="polyphen" data-remains=""><div class="variant-function" data-function=""></div></td>';
+          html +=
+            '<td class="polyphen" data-remains=""><div class="variant-function" data-function=""></div></td>';
           break;
         case 'clinical_significance': // clinical significance
-          html += '<td class="clinical_significance" data-remains=""><!--<div class="dataset-icon -none" data-dataset="mgend"></div>--><div href="" class="clinical-significance" data-sign=""></div><a></a></td>';
-        break;
+          html +=
+            '<td class="clinical_significance" data-remains=""><!--<div class="dataset-icon -none" data-dataset="mgend"></div>--><div href="" class="clinical-significance" data-sign=""></div><a></a></td>';
+          break;
       }
     }
     this.tr.innerHTML = html;
     this.tdTGVAnchor = this.tr.querySelector('td.togovar_id > a');
     this.tdRS = this.tr.querySelector('td.refsnp_id');
     this.tdRSAnchor = this.tdRS.querySelector('a');
-    const tdPosition = this.tr.querySelector('td.position > .chromosome-position');
+    const tdPosition = this.tr.querySelector(
+      'td.position > .chromosome-position'
+    );
     this.tdPositionChromosome = tdPosition.querySelector('.chromosome');
     this.tdPositionCoordinate = tdPosition.querySelector('.coordinate');
     const tdRefAlt = this.tr.querySelector('td.ref_alt > .ref-alt');
@@ -106,15 +116,23 @@ export default class ResultsRowView {
     this.tdGene = this.tr.querySelector('td.gene');
     this.tdGeneAnchor = this.tdGene.querySelector('a');
     this.tdFrequencies = {};
-    this.tr.querySelectorAll('td.alt_frequency > logarithmized-block-graph-frequency-view').forEach(elm => this.tdFrequencies[elm.dataset.dataset] = elm);
+    this.tr
+      .querySelectorAll(
+        'td.alt_frequency > logarithmized-block-graph-frequency-view'
+      )
+      .forEach((elm) => (this.tdFrequencies[elm.dataset.dataset] = elm));
     this.tdConsequence = this.tr.querySelector('td.consequence');
-    this.tdConsequenceItem = this.tdConsequence.querySelector('.consequence-item');
+    this.tdConsequenceItem =
+      this.tdConsequence.querySelector('.consequence-item');
     this.tdSift = this.tr.querySelector('td.sift');
     this.tdSiftFunction = this.tdSift.querySelector('.variant-function');
     this.tdPolyphen = this.tr.querySelector('td.polyphen');
-    this.tdPolyphenFunction = this.tdPolyphen.querySelector('.variant-function');
+    this.tdPolyphenFunction =
+      this.tdPolyphen.querySelector('.variant-function');
     this.tdClinical = this.tr.querySelector('td.clinical_significance');
-    this.tdClinicalSign = this.tdClinical.querySelector('.clinical-significance');
+    this.tdClinicalSign = this.tdClinical.querySelector(
+      '.clinical-significance'
+    );
     this.tdClinicalAnchor = this.tdClinical.querySelector('a');
   }
 
@@ -122,7 +140,7 @@ export default class ResultsRowView {
     if (StoreManager.getData('rowCount') <= this.index) {
       // 表示領域外であれば非表示
       this.tr.classList.add('-out-of-range');
-      return
+      return;
     }
     // レコード取得
     const result = StoreManager.getRecordByIndex(this.index);
@@ -135,7 +153,7 @@ export default class ResultsRowView {
     if (result === 'out of range') {
       this.tr.classList.remove('-loading');
       this.tr.classList.add('-out-of-range');
-      return
+      return;
     }
     if (this.tr.classList.contains('-loading')) {
       this.prepareTableData();
@@ -178,18 +196,25 @@ export default class ResultsRowView {
           {
             const refalt = {
               ref: result.reference ? result.reference : '',
-              alt: result.alternate ? result.alternate : ''
-            }
-            this.tdRefAltRef.textContent = refalt.ref.substr(0, REF_ALT_SHOW_LENGTH) + (refalt.ref.length > REF_ALT_SHOW_LENGTH ? '...' : '');
+              alt: result.alternate ? result.alternate : '',
+            };
+            this.tdRefAltRef.textContent =
+              refalt.ref.substr(0, REF_ALT_SHOW_LENGTH) +
+              (refalt.ref.length > REF_ALT_SHOW_LENGTH ? '...' : '');
             this.tdRefAltRef.dataset.sum = refalt.ref.length;
-            this.tdRefAltAlt.textContent = refalt.alt.substr(0, REF_ALT_SHOW_LENGTH) + (refalt.alt.length > REF_ALT_SHOW_LENGTH ? '...' : '');
+            this.tdRefAltAlt.textContent =
+              refalt.alt.substr(0, REF_ALT_SHOW_LENGTH) +
+              (refalt.alt.length > REF_ALT_SHOW_LENGTH ? '...' : '');
             this.tdRefAltAlt.dataset.sum = refalt.alt.length;
           }
           break;
         case 'type': // variant type
           {
-            const master = StoreManager.getSearchConditionMaster('type').items;
-            this.tdType.textContent = master.find(type => type.id === result.type).label;
+            const master =
+              StoreManager.getSimpleSearchConditionMaster('type').items;
+            this.tdType.textContent = master.find(
+              (type) => type.id === result.type
+            ).label;
           }
           break;
         case 'gene': // gene symbol
@@ -207,10 +232,15 @@ export default class ResultsRowView {
           break;
         case 'alt_frequency':
           {
-            const master = StoreManager.getSearchConditionMaster('dataset');
+            const master =
+              StoreManager.getSimpleSearchConditionMaster('dataset');
             for (const dataset of master.items) {
               if (!dataset.has_freq) continue;
-              const frequency = result.frequencies ? result.frequencies.find(frequency => frequency.source === dataset.id) : undefined;
+              const frequency = result.frequencies
+                ? result.frequencies.find(
+                    (frequency) => frequency.source === dataset.id
+                  )
+                : undefined;
               this.tdFrequencies[dataset.id].frequency = frequency;
             }
           }
@@ -218,10 +248,22 @@ export default class ResultsRowView {
         case 'consequence':
           {
             if (result.most_severe_consequence) {
-              const master = StoreManager.getSearchConditionMaster('consequence');
-              const unique = [...new Set(result.transcripts.reduce((accumulator, transcript) => accumulator.concat(transcript.consequences), []))];
+              const master =
+                StoreManager.getSimpleSearchConditionMaster('consequence');
+              const unique = [
+                ...new Set(
+                  result.transcripts.reduce(
+                    (accumulator, transcript) =>
+                      accumulator.concat(transcript.consequences),
+                    []
+                  )
+                ),
+              ];
               this.tdConsequence.dataset.remains = unique.length - 1;
-              this.tdConsequenceItem.textContent = master.items.find(consequence => consequence.id === result.most_severe_consequence).label;
+              this.tdConsequenceItem.textContent = master.items.find(
+                (consequence) =>
+                  consequence.id === result.most_severe_consequence
+              ).label;
             } else {
               this.tdConsequence.dataset.remains = 0;
               this.tdConsequenceItem.textContent = '';
@@ -230,11 +272,14 @@ export default class ResultsRowView {
           break;
         case 'sift':
           {
-            const sifts = result.transcripts?.filter(x => Number.isFinite(x.sift));
+            const sifts = result.transcripts?.filter((x) =>
+              Number.isFinite(x.sift)
+            );
             if (sifts && sifts.length > 0) {
               this.tdSift.dataset.remains = sifts.length - 1;
               this.tdSiftFunction.textContent = result.sift;
-              this.tdSiftFunction.dataset.function = result.sift >= .05 ? 'T' : 'D';
+              this.tdSiftFunction.dataset.function =
+                result.sift >= 0.05 ? 'T' : 'D';
             } else {
               this.tdSift.dataset.remains = 0;
               this.tdSiftFunction.textContent = '';
@@ -244,15 +289,17 @@ export default class ResultsRowView {
           break;
         case 'polyphen':
           {
-            const polyphens = result.transcripts?.filter(x => Number.isFinite(x.polyphen));
+            const polyphens = result.transcripts?.filter((x) =>
+              Number.isFinite(x.polyphen)
+            );
             if (polyphens && polyphens.length > 0) {
               this.tdPolyphen.dataset.remains = polyphens.length - 1;
               this.tdPolyphenFunction.textContent = result.polyphen;
               switch (true) {
-                case result.polyphen > .908:
+                case result.polyphen > 0.908:
                   this.tdPolyphenFunction.dataset.function = 'PROBD';
                   break;
-                case result.polyphen > .446:
+                case result.polyphen > 0.446:
                   this.tdPolyphenFunction.dataset.function = 'POSSD';
                   break;
                 case result.polyphen >= 0:
@@ -273,8 +320,10 @@ export default class ResultsRowView {
           {
             if (result.significance && result.significance.length) {
               this.tdClinical.dataset.remains = result.significance.length - 1;
-              this.tdClinicalSign.dataset.sign = result.significance[0].interpretations[0];
-              this.tdClinicalAnchor.textContent = result.significance[0].condition;
+              this.tdClinicalSign.dataset.sign =
+                result.significance[0].interpretations[0];
+              this.tdClinicalAnchor.textContent =
+                result.significance[0].condition;
             } else {
               this.tdClinical.dataset.remains = 0;
               this.tdClinicalSign.dataset.sign = '';
@@ -285,5 +334,4 @@ export default class ResultsRowView {
       }
     }
   }
-
 }

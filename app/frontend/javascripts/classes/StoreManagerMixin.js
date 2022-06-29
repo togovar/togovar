@@ -24,8 +24,7 @@ export const mixin = {
     this.setData('simpleSearchConditionsMaster', json);
     // restore search conditions from URL parameters
     const searchMode = this._URIParameters.mode ?? DEFAULT_SEARCH_MODE;
-    const simpleSearchConditions = {},
-      advancedSearchConditions = {};
+    const simpleSearchConditions = {}, advancedSearchConditions = {};
     switch (searchMode) {
       case 'simple':
         Object.assign(
@@ -102,7 +101,7 @@ export const mixin = {
     this._setSimpleSearchConditions(resetConditions);
   },
 
-  getSearchCondition(key) {
+  getSimpleSearchCondition(key) {
     return this._copy(this._store.simpleSearchConditions[key]);
   },
 
@@ -110,7 +109,7 @@ export const mixin = {
   //   return this._copy(this._store.advancedSearchConditions[key]);
   // },
 
-  getSearchConditionMaster(key) {
+  getSimpleSearchConditionMaster(key) {
     return this.getData('simpleSearchConditionsMaster').find(
       (condition) => condition.id === key
     );
@@ -255,19 +254,17 @@ export const mixin = {
           case 'advanced':
             {
               path = `${API_URL}/api/search/variant`;
+              const body = {offset: this._store.offset};
+              if (Object.keys(this._store.advancedSearchConditions).length > 0) {
+                body.query = this._store.advancedSearchConditions;
+              }
               options.method = 'POST';
-              options.body = JSON.stringify({
-                query: this._store.advancedSearchConditions,
-                offset: this._store.offset,
-              });
+              options.body = JSON.stringify(body);
             }
             break;
         }
       }
       fetch(path, options)
-        .catch((e) => {
-          throw Error(e);
-        })
         .then((response) => {
           if (response.ok) {
             return response;
@@ -329,6 +326,13 @@ export const mixin = {
             JSON.stringify(this._store.simpleSearchConditions)
           ) {
             this._setSimpleSearchConditions({});
+          }
+        })
+        .catch((e) => {
+          if (e.name === 'AbortError') {
+            console.warn('User aborted the request');
+          } else {
+            throw Error(e);
           }
         });
     })(offset, isFirstTime);

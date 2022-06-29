@@ -28,9 +28,9 @@ export default class AdvancedSearchBuilderView {
 
   // public methods
 
-  advancedSearchConditions(values) {
-    console.log(values);
-  }
+  // advancedSearchConditions(values) {
+  //   console.log(values);
+  // }
 
   /**
    *
@@ -70,14 +70,7 @@ export default class AdvancedSearchBuilderView {
 
   changeCondition() {
     const query = this._rootGroup.query;
-    //this._toolbar.canSearch(Object.keys(query).length > 0);
-    if (this.canSearch(query)) {
-      this.search();
-    }
-  }
-
-  canSearch(query) {
-    return Object.keys(query).length > 0;
+    this.search();
   }
 
   group() {
