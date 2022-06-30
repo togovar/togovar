@@ -7,7 +7,7 @@ import ConditionValueEditorLocation from './ConditionValueEditorLocation.js';
 import { CONDITION_TYPE } from '../definition.js';
 
 export default class ConditionValues {
-  constructor(conditionView) {
+  constructor(conditionView, defaultValues) {
     this._conditionView = conditionView;
     this._editors = [];
 
@@ -92,7 +92,8 @@ export default class ConditionValues {
         this._editors.push(
           new ConditionValueEditorLocation(
             this,
-            this._conditionView.conditionType
+            this._conditionView.conditionType,
+            defaultValues
           )
         );
         break;

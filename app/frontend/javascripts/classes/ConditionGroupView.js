@@ -77,11 +77,12 @@ export default class ConditionGroupView extends ConditionView {
    *
    * @param {String} conditionType
    */
-  addNewConditionItem(conditionType, referenceElm = null) {
+  addNewConditionItem(conditionType, options, referenceElm = null) {
     const conditionView = new ConditionItemView(
       this._builder,
       this,
       conditionType,
+      options,
       referenceElm
     );
     return conditionView;

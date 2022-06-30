@@ -11,7 +11,7 @@ const OPTIONS = [
 ];
 
 export default class ConditionValueEditorLocation extends ConditionValueEditor {
-  constructor(valuesView, conditionType) {
+  constructor(valuesView, conditionType, defaultValues) {
     super(valuesView, conditionType);
 
     // HTML
@@ -60,6 +60,14 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     });
 
     this._karyotype = StoreManager.getData('karyotype');
+
+    // default values
+    if (defaultValues) {
+      this._chr.value = defaultValues.chr;
+      this._start.value = +defaultValues.start;
+      this._end.value = +defaultValues.end;
+      this._update();
+    }
   }
 
   // public methods
@@ -90,7 +98,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
   // private methods
 
   _update(e) {
-    if (e.target === this._chr) {
+    if (e?.target === this._chr) {
       // reset input
       const reference = this._karyotype.reference;
       const region =
