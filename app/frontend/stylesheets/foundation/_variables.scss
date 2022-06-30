@@ -12,6 +12,7 @@ $COLOR_DISABLE: #999999;
 
 $COLOR_BLACK: #444;
 $COLOR_GRAY: #94928d;
+$COLOR_PALE_GRAY: lighten($COLOR_GRAY, 45%);
 $COLOR_LIGHT_GRAY: lighten($COLOR_GRAY, 35%);
 $COLOR_DARKER_GRAY: #dbdbdb;
 $COLOR_SEPARATOR: rgba(0, 0, 0, 0.3);
@@ -119,6 +120,7 @@ $CHAR_LOGICAL_OP_OUTLINE: '\E803';
   --color-key-dark3: #{$COLOR_KEY_DARK3};
   --color-black: #{$COLOR_BLACK};
   --color-gray: #{$COLOR_GRAY};
+  --color-pale-gray: #{$COLOR_PALE_GRAY};
   --color-light-gray: #{$COLOR_LIGHT_GRAY};
   --color-darker-gray: #{$COLOR_DARKER_GRAY};
   --color-selected: #{$COLOR_SELECTED};
