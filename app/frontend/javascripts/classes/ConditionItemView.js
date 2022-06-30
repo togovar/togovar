@@ -131,20 +131,40 @@ export default class ConditionItemView extends ConditionView {
     const values = Array.from(
       this._values.querySelectorAll(':scope > condition-item-value-view')
     );
-    if (this._conditionType === CONDITION_TYPE.dataset) {
-      // if the condition type is 'dataset', special conditional expression is needed
-      const queries = values.map(
-        (view) =>
-          view.shadowRoot.querySelector('frequency-count-value-view').queryValue
-      );
-      return queries.length <= 1 ? queries[0] : { or: queries };
-    } else {
-      return {
-        [this._conditionType]: {
-          relation: this._elm.dataset.relation,
-          terms: values.map((value) => value.value),
-        },
-      };
+    switch (this._conditionType) {
+      case CONDITION_TYPE.dataset: {
+        const queries = values.map(
+          (view) =>
+            view.shadowRoot.querySelector('frequency-count-value-view')
+              .queryValue
+        );
+        return queries.length <= 1 ? queries[0] : { or: queries };
+      }
+
+      case CONDITION_TYPE.location: {
+        const value = values[0].value;
+        let [chromosome, position] = value.split(':');
+        position = position.split('-');
+        if (position.length === 1) {
+          position = +position[0];
+        } else {
+          position = {
+            gte: +position[0],
+            lte: +position[1],
+          };
+        }
+        return {
+          location: { chromosome, position },
+        };
+      }
+
+      default:
+        return {
+          [this._conditionType]: {
+            relation: this._elm.dataset.relation,
+            terms: values.map((value) => value.value),
+          },
+        };
     }
   }
 }
