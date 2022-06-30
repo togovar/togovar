@@ -391,6 +391,10 @@
       "label": "Disease",
       "type": "text"
     },
+    "location": {
+      "label": "Location",
+      "type": "peculiar"
+    },
     "dataset": {
       "label": "Alternative allele frequency/count",
       "type": "peculiar",

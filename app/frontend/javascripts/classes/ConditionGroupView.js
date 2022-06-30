@@ -186,7 +186,7 @@ export default class ConditionGroupView extends ConditionView {
             (el) => el.delegate.query
           ),
         };
-      }
+    }
   }
 
   get container() {
