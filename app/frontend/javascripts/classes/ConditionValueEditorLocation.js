@@ -22,7 +22,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     <div class="body">
       <div class="row">
         <label class="chromosome">
-          <span class="label">Chr:</span>
+          <span class="label">Chr.</span>
           <span class="form">
             <select>
               ${OPTIONS.map(
@@ -30,12 +30,12 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
               ).join('')}
             </select>
           </span>
+          <span class="label">&nbsp;:&nbsp;&nbsp;</span>
         </label>
         <label class="position">
-          <span class="label"></span>
-          <span class="form">
+          <span class="form range-inputs-view">
             <input class="start" type="number" min="0" placeholder="0">
-            <span class="inter">-</span>
+            <span class="line"></span>
             <input class="end" type="number" min="0">
           </span>
         </label>
