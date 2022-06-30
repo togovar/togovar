@@ -1,12 +1,13 @@
+import StoreManager from './StoreManager.js';
 import ConditionValueEditor from './ConditionValueEditor.js';
-import ConditionItemValueView from '../components/ConditionItemValueView';
+import '../components/ConditionItemValueView';
 import { CONDITION_TYPE } from '../definition.js';
 
 const OPTIONS = [
   '',
   ...[...Array(22)].map((_, index) => index + 1 + ''),
-  'x',
-  'y',
+  'X',
+  'Y',
 ];
 
 export default class ConditionValueEditorLocation extends ConditionValueEditor {
@@ -33,9 +34,9 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
         <label class="position">
           <span class="label"></span>
           <span class="form">
-            <input class="start" type="number">
+            <input class="start" type="number" min="0" placeholder="0">
             <span class="inter">-</span>
-            <input class="end" type="number">
+            <input class="end" type="number" min="0">
           </span>
         </label>
       </div>
@@ -53,10 +54,12 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
 
     // attach events
     [this._chr, ...inputs].forEach((input) => {
-      input.addEventListener('change', () => {
-        this._update();
+      input.addEventListener('change', (e) => {
+        this._update(e);
       });
     });
+
+    this._karyotype = StoreManager.getData('karyotype');
   }
 
   // public methods
@@ -86,7 +89,20 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
 
   // private methods
 
-  _update() {
+  _update(e) {
+    if (e.target === this._chr) {
+      // reset input
+      const reference = this._karyotype.reference;
+      const region =
+        this._karyotype.chromosomes[this._chr.value].region[reference];
+      this._start.max = region[1];
+      this._end.max = region[1];
+      this._end.placeholder = region[1];
+      if (this._start.value > region[1]) this._start.value = region[1];
+      if (this._end.value > region[1]) this._end.value = region[1];
+    }
+
+    // update value
     const valueView = this._valueViews[0];
     if (this.isValid) {
       const value = `${this._chr.value}:${this._start.value}${
