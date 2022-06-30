@@ -78,7 +78,7 @@ export default class AdvancedSearchToolbar {
         e.stopImmediatePropagation();
         switch (command.dataset.command) {
           case 'add-condition':
-            this._delegate.addCondition(command.dataset.condition);
+            this._delegate.addCondition(command.dataset.condition, e.detail);
             break;
           case 'group':
             this._delegate.group();

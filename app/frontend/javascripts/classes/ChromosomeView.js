@@ -1,10 +1,9 @@
-import StoreManager from "./StoreManager.js";
+import StoreManager from './StoreManager.js';
 
 const WIDTH = 12;
 const PADDING = 5;
 
 export default class ChromosomeView {
-
   /* @param elm:HTMLElement
    * @param no:Number Chromosome number
    * @param map:Array Position data
@@ -39,7 +38,7 @@ export default class ChromosomeView {
         acc.push({
           band: subBand.band,
           start: subBand.start,
-          end: subBand.end
+          end: subBand.end,
         });
         return acc;
       } else {
@@ -51,8 +50,10 @@ export default class ChromosomeView {
     // 染色体の描画
     this.length = map[map.length - 1].end;
     this.svg = this.elm.querySelector('svg.chromosome');
-    const
-      chromosomeAreaHeight = elm.offsetHeight - elm.querySelector('.upper').offsetHeight - PADDING * 2,
+    const chromosomeAreaHeight =
+        elm.offsetHeight -
+        elm.querySelector('.upper').offsetHeight -
+        PADDING * 2,
       chromosomeHeight = chromosomeAreaHeight * (this.length / maxLength),
       rate = chromosomeHeight / this.length;
     this.svg.style.height = `${chromosomeHeight + PADDING * 2}px`;
@@ -132,10 +133,16 @@ export default class ChromosomeView {
         data-band="${band.band}"
         data-start="${band.start}"
         data-end="${band.end}"
-        transform="translate(${WIDTH + 4.5}, ${PADDING + band.start * rate - .5})"
+        transform="translate(${WIDTH + 4.5}, ${
+        PADDING + band.start * rate - 0.5
+      })"
         >
-        <text x="8" y="${(band.end - band.start) * rate * 0.5 + 3}" class="bandtext">${band.band}</text>
-        <path d="M0,1 V${(band.end - band.start) * rate - 1} M0,${Math.round((band.end - band.start) * rate * 0.5)} H8" class="line" />
+        <text x="8" y="${
+          (band.end - band.start) * rate * 0.5 + 3
+        }" class="bandtext">${band.band}</text>
+        <path d="M0,1 V${(band.end - band.start) * rate - 1} M0,${Math.round(
+        (band.end - band.start) * rate * 0.5
+      )} H8" class="line" />
       </g>
       `;
     }
@@ -145,46 +152,67 @@ export default class ChromosomeView {
     StoreManager.bind('displayingRegionsOnChromosome', this);
 
     // bands
-    this.svg.querySelectorAll('g.band').forEach(g => {
-      $(g).on('click', e => {
-        StoreManager.setSimpleSearchCondition('term', `${this.no}:${e.delegateTarget.dataset.start}-${e.delegateTarget.dataset.end}`);
-        // Karyotype 上の座標編集フィールドが廃止になったため、不要
-        //StoreManager.setData('region__', {
-        //  chromosome: this.no,
-        //  start: e.delegateTarget.dataset.start,
-        //  end: e.delegateTarget.dataset.end
-        //});
+    this.svg.querySelectorAll('g.band').forEach((g) => {
+      $(g).on('click', (e) => {
+        this._selectBand(
+          this.no,
+          e.delegateTarget.dataset.start,
+          e.delegateTarget.dataset.end
+        );
       });
     });
 
     // sub bands
-    this.svg.querySelectorAll('g.subband').forEach(g => {
-      $(g).on('click', e => {
-        StoreManager.setSimpleSearchCondition('term', `${this.no}:${e.delegateTarget.dataset.start}-${e.delegateTarget.dataset.end}`);
-        // Karyotype 上の座標編集フィールドが廃止になったため、不要
-        //StoreManager.setData('region__', {
-        //  chromosome: this.no,
-        //  start: e.delegateTarget.dataset.start,
-        //  end: e.delegateTarget.dataset.end
-        //});
+    this.svg.querySelectorAll('g.subband').forEach((g) => {
+      $(g).on('click', (e) => {
+        this._selectBand(
+          this.no,
+          e.delegateTarget.dataset.start,
+          e.delegateTarget.dataset.end
+        );
       });
     });
+  }
+
+  _selectBand(chr, start, end) {
+    switch (StoreManager.getData('searchMode')) {
+      case 'simple':
+        StoreManager.setSimpleSearchCondition('term', `${chr}:${start}-${end}`);
+        break;
+      case 'advanced':
+        document
+          .getElementById('AdvancedSearchBuilderView')
+          .querySelector(
+            ':scope > .inner > .advanced-search-condition-group-view.-root > .advanced-search-toolbar > ul > li > ul > li[data-condition="location"]'
+          )
+          .dispatchEvent(
+            new CustomEvent('click', { detail: { chr, start, end } })
+          );
+
+        break;
+    }
+    // Karyotype 上の座標編集フィールドが廃止になったため、不要
+    //StoreManager.setData('region__', {
+    //  chromosome: this.no,
+    //  start: e.delegateTarget.dataset.start,
+    //  end: e.delegateTarget.dataset.end
+    //});
   }
 
   displayingRegionsOnChromosome(displayingRegions) {
     if (displayingRegions[this.no]) {
       // 表示領域をハイライト
       this.displayRegion.classList.add('-shown');
-      const
-        displayRegion = displayingRegions[this.no],
+      const displayRegion = displayingRegions[this.no],
         chromosomeAreaHeight = this.svg.clientHeight - PADDING * 2,
         rate = chromosomeAreaHeight / this.length,
         regionHeight = displayRegion.end - displayRegion.start;
-      this.displayRegion.style.top = `${Math.floor(PADDING + displayRegion.start * rate)}px`;
+      this.displayRegion.style.top = `${Math.floor(
+        PADDING + displayRegion.start * rate
+      )}px`;
       this.displayRegion.style.height = `${Math.ceil(regionHeight * rate)}px`;
     } else {
       this.displayRegion.classList.remove('-shown');
     }
   }
-
 }

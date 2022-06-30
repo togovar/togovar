@@ -9,9 +9,16 @@ export default class ConditionItemView extends ConditionView {
    * @param {AdvancedSearchBuilderView} builder
    * @param {*} parentView
    * @param {String} conditionType
+   * @param {Object} options  default data
    * @param {Node} referenceElm
    */
-  constructor(builder, parentView, conditionType, referenceElm = null) {
+  constructor(
+    builder,
+    parentView,
+    conditionType,
+    options,
+    referenceElm = null
+  ) {
     super(CONDITION_ITEM_TYPE.condition, builder, parentView, referenceElm);
 
     this._conditionType = conditionType;
@@ -20,7 +27,8 @@ export default class ConditionItemView extends ConditionView {
     // make HTML
     this._elm.classList.add('advanced-search-condition-item-view');
     this._elm.dataset.classification = conditionType;
-    this._elm.dataset.relation = conditionType === 'dataset' ? '' : 'eq';
+    this._elm.dataset.relation =
+      conditionType === 'dataset' || conditionType === 'location' ? '' : 'eq';
     // TODO: 疾患は contains?
     this._elm.innerHTML = `
     <div class="body">
@@ -44,7 +52,7 @@ export default class ConditionItemView extends ConditionView {
     this._editor = body.querySelector(
       ':scope > .advanced-search-condition-editor-view'
     );
-    this._conditionValues = new ConditionValues(this);
+    this._conditionValues = new ConditionValues(this, options);
 
     // events
     // stop propagation
