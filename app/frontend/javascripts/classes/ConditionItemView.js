@@ -20,7 +20,7 @@ export default class ConditionItemView extends ConditionView {
     // make HTML
     this._elm.classList.add('advanced-search-condition-item-view');
     this._elm.dataset.classification = conditionType;
-    this._elm.dataset.relation = (conditionType === 'dataset') ? '' : 'eq';
+    this._elm.dataset.relation = conditionType === 'dataset' ? '' : 'eq';
     // TODO: 疾患は contains?
     this._elm.innerHTML = `
     <div class="body">

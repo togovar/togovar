@@ -1,4 +1,3 @@
-
 export const CONDITION_TYPE = {
   term: 'term',
   dataset: 'dataset',
@@ -13,9 +12,10 @@ export const CONDITION_TYPE = {
   adv_frequency: 'adv_frequency',
   disease: 'disease',
   gene_symbol: 'gene_symbol',
-}
+  location: 'location',
+};
 
 export const CONDITION_ITEM_TYPE = {
   condition: 0,
   group: 1,
-}
+};
