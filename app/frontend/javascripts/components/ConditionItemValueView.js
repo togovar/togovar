@@ -3,9 +3,6 @@ import FrequencyCountValueView from './FrequencyCountValueView'; // for embeddin
 // import Style from '../../stylesheets/foundation/_variables.scss';
 
 export default class ConditionItemValueView extends LitElement {
-  // static properties = {
-  //   name: {},
-  // };
   // Define scoped styles right with your component, in plain CSS
   static styles = css`
     :host {

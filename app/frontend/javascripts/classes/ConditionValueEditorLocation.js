@@ -17,7 +17,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     this._createElement(
       'location-editor-view',
       `
-    <header>Search for location</header>
+    <header>Set location</header>
     <div class="body">
       <div class="row">
         <label class="chromosome">
@@ -75,10 +75,13 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
   }
 
   get isValid() {
-    const isValid =
-      this._chr.value !== '' && (this._start.value || this._end.value);
-    return isValid;
-    // return this._searchFieldView.value !== '';
+    if (this._chr.value === '') {
+      return false;
+    } else if (this._start.value && this._end.value) {
+      return this._start.value < this._end.value;
+    } else {
+      return this._start.value || this._end.value;
+    }
   }
 
   // private methods
@@ -99,11 +102,6 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     } else {
       this._removeValueView();
     }
-
-    return;
-    // update value
-    const term = this._searchFieldView.value;
-    this._addValueView(term, term, true);
 
     // validation
     this._valuesView.update(this._validate());
