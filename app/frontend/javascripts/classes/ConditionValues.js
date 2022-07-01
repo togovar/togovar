@@ -2,11 +2,12 @@ import ConditionValueEditorCheckboxes from './ConditionValueEditorCheckboxes.js'
 import ConditionValueEditorColumns from './ConditionValueEditorColumns.js';
 import ConditionValueEditorTextField from './ConditionValueEditorTextField.js';
 import ConditionValueEditorFrequencyCount from './ConditionValueEditorFrequencyCount.js';
+import ConditionValueEditorLocation from './ConditionValueEditorLocation.js';
 // import {ADVANCED_CONDITIONS} from '../global.js';
 import { CONDITION_TYPE } from '../definition.js';
 
 export default class ConditionValues {
-  constructor(conditionView) {
+  constructor(conditionView, defaultValues) {
     this._conditionView = conditionView;
     this._editors = [];
 
@@ -84,6 +85,15 @@ export default class ConditionValues {
           new ConditionValueEditorColumns(
             this,
             this._conditionView.conditionType
+          )
+        );
+        break;
+      case CONDITION_TYPE.location:
+        this._editors.push(
+          new ConditionValueEditorLocation(
+            this,
+            this._conditionView.conditionType,
+            defaultValues
           )
         );
         break;

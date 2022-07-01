@@ -1,11 +1,8 @@
-import { LitElement, css, html } from "lit";
-import FrequencyCountValueView from "./FrequencyCountValueView"; // for embedding
+import { LitElement, css, html } from 'lit';
+import FrequencyCountValueView from './FrequencyCountValueView'; // for embedding
 // import Style from '../../stylesheets/foundation/_variables.scss';
 
-export class ConditionItemValueView extends LitElement {
-  // static properties = {
-  //   name: {},
-  // };
+export default class ConditionItemValueView extends LitElement {
   // Define scoped styles right with your component, in plain CSS
   static styles = css`
     :host {
@@ -15,7 +12,7 @@ export class ConditionItemValueView extends LitElement {
       --height: var(--height-advanced-search-condition-value);
       display: inline-block;
     }
-    :host([data-condition-type="dataset"]) {
+    :host([data-condition-type='dataset']) {
       display: block;
       position: relative;
     }
@@ -29,199 +26,205 @@ export class ConditionItemValueView extends LitElement {
       font-weight: bold;
       margin-right: 2px;
     }
-    :host([data-condition-type="dataset"]) > .inner {
+    :host([data-condition-type='dataset']) > .inner {
       min-width: 120px;
     }
-    :host([data-condition-type="dataset"]) > .inner::before {
+    :host([data-condition-type='dataset']) > .inner::before {
       font-family: fontello;
       content: var(--char-dataset);
       margin-right: 4px;
     }
-    :host([data-value="jga_ngs"]) > .inner,
-    :host([data-value="jga_snp"]) > .inner {
+    :host([data-value='jga_ngs']) > .inner,
+    :host([data-value='jga_snp']) > .inner {
       border-color: var(--color-dataset-jga);
       background-color: var(--color-dataset-jga-light);
     }
-    :host([data-value="jga_ngs"]) > .inner::before,
-    :host([data-value="jga_snp"]) > .inner::before {
+    :host([data-value='jga_ngs']) > .inner::before,
+    :host([data-value='jga_snp']) > .inner::before {
       color: var(--color-dataset-jga);
     }
-    :host([data-value="tommo"]) > .inner {
+    :host([data-value='tommo']) > .inner {
       border-color: var(--color-dataset-tommo);
       background-color: var(--color-dataset-tommo-light);
     }
-    :host([data-value="tommo"]) > .inner::before {
+    :host([data-value='tommo']) > .inner::before {
       color: var(--color-dataset-tommo);
     }
-    :host([data-value="hgvd"]) > .inner,
-    :host([data-value="mgend"]) > .inner {
+    :host([data-value='hgvd']) > .inner,
+    :host([data-value='mgend']) > .inner {
       border-color: var(--color-dataset-hgvd);
       background-color: var(--color-dataset-hgvd-light);
     }
-    :host([data-value="hgvd"]) > .inner::before,
-    :host([data-value="mgend"]) > .inner::before {
+    :host([data-value='hgvd']) > .inner::before,
+    :host([data-value='mgend']) > .inner::before {
       color: var(--color-dataset-hgvd);
     }
-    :host([data-value="gem_j_wga"]) > .inner {
+    :host([data-value='gem_j_wga']) > .inner {
       border-color: var(--color-dataset-gemj);
       background-color: var(--color-dataset-gemj-light);
     }
-    :host([data-value="gem_j_wga"]) > .inner::before {
+    :host([data-value='gem_j_wga']) > .inner::before {
       color: var(--color-dataset-gemj);
     }
-    :host([data-value="bbj"]) > .inner {
+    :host([data-value='bbj']) > .inner {
       border-color: var(--color-dataset-bbj);
       background-color: var(--color-dataset-bbj-light);
     }
-    :host([data-value="bbj"]) > .inner::before {
+    :host([data-value='bbj']) > .inner::before {
       color: var(--color-dataset-bbj);
     }
-    :host([data-value="clinvar"]) > .inner,
-    :host([data-value="exac"]) > .inner,
-    :host([data-value="gnomad"]) > .inner {
+    :host([data-value='clinvar']) > .inner,
+    :host([data-value='exac']) > .inner,
+    :host([data-value='gnomad']) > .inner {
       border-color: var(--color-dataset-foreign);
       background-color: var(--color-dataset-foreign-light);
     }
-    :host([data-value="clinvar"]) > .inner::before,
-    :host([data-value="exac"]) > .inner::before,
-    :host([data-value="gnomad"]) > .inner::before {
+    :host([data-value='clinvar']) > .inner::before,
+    :host([data-value='exac']) > .inner::before,
+    :host([data-value='gnomad']) > .inner::before {
       color: var(--color-dataset-foreign);
     }
-    :host([data-condition-type="significance"]) > .inner::before {
+    :host([data-condition-type='significance']) > .inner::before {
       margin-right: 4px;
       margin-left: -2px;
       font-size: 10px;
       position: relative;
       top: -1px;
     }
-    :host([data-condition-type="significance"][data-value="P"]) > .inner {
+    :host([data-condition-type='significance'][data-value='P']) > .inner {
       border-color: var(--color-sign-dangerous);
       background-color: var(--color-sign-dangerous-light);
     }
-    :host([data-condition-type="significance"][data-value="P"])
+    :host([data-condition-type='significance'][data-value='P'])
       > .inner::before {
-      content: "P";
+      content: 'P';
       color: var(--color-sign-dangerous);
     }
-    :host([data-condition-type="significance"][data-value="LP"]) > .inner {
+    :host([data-condition-type='significance'][data-value='LP']) > .inner {
       border-color: var(--color-sign-warning);
       background-color: var(--color-sign-warning-light);
     }
-    :host([data-condition-type="significance"][data-value="LP"])
+    :host([data-condition-type='significance'][data-value='LP'])
       > .inner::before {
-      content: "LP";
+      content: 'LP';
       color: var(--color-sign-warning);
     }
-    :host([data-condition-type="significance"][data-value="US"]) > .inner {
+    :host([data-condition-type='significance'][data-value='US']) > .inner {
       border-color: var(--color-sign-unknown);
       background-color: var(--color-sign-unknown-light);
     }
-    :host([data-condition-type="significance"][data-value="US"])
+    :host([data-condition-type='significance'][data-value='US'])
       > .inner::before {
-      content: "US";
+      content: 'US';
       color: var(--color-sign-unknown);
     }
-    :host([data-condition-type="significance"][data-value="LB"]) > .inner {
+    :host([data-condition-type='significance'][data-value='LB']) > .inner {
       border-color: var(--color-sign-normal);
       background-color: var(--color-sign-normal-light);
     }
-    :host([data-condition-type="significance"][data-value="LB"])
+    :host([data-condition-type='significance'][data-value='LB'])
       > .inner::before {
-      content: "LB";
+      content: 'LB';
       color: var(--color-sign-normal);
     }
-    :host([data-condition-type="significance"][data-value="B"]) > .inner {
+    :host([data-condition-type='significance'][data-value='B']) > .inner {
       border-color: var(--color-sign-safe);
       background-color: var(--color-sign-safe-light);
     }
-    :host([data-condition-type="significance"][data-value="B"])
+    :host([data-condition-type='significance'][data-value='B'])
       > .inner::before {
-      content: "B";
+      content: 'B';
       color: var(--color-sign-safe);
     }
-    :host([data-condition-type="significance"][data-value="CI"]) > .inner {
+    :host([data-condition-type='significance'][data-value='CI']) > .inner {
       border-color: var(--color-sign-modifier);
       background-color: var(--color-sign-modifier-light);
     }
-    :host([data-condition-type="significance"][data-value="CI"])
+    :host([data-condition-type='significance'][data-value='CI'])
       > .inner::before {
-      content: "CI";
+      content: 'CI';
       color: var(--color-sign-modifier);
     }
-    :host([data-condition-type="significance"][data-value="DR"]) > .inner,
-    :host([data-condition-type="significance"][data-value="A"]) > .inner,
-    :host([data-condition-type="significance"][data-value="RF"]) > .inner,
-    :host([data-condition-type="significance"][data-value="PR"]) > .inner,
-    :host([data-condition-type="significance"][data-value="AF"]) > .inner,
-    :host([data-condition-type="significance"][data-value="O"]) > .inner {
+    :host([data-condition-type='significance'][data-value='DR']) > .inner,
+    :host([data-condition-type='significance'][data-value='A']) > .inner,
+    :host([data-condition-type='significance'][data-value='RF']) > .inner,
+    :host([data-condition-type='significance'][data-value='PR']) > .inner,
+    :host([data-condition-type='significance'][data-value='AF']) > .inner,
+    :host([data-condition-type='significance'][data-value='O']) > .inner {
       border-color: var(--color-sign-other);
       background-color: var(--color-sign-other-light);
     }
-    :host([data-condition-type="significance"][data-value="DR"])
+    :host([data-condition-type='significance'][data-value='DR'])
       > .inner::before,
-    :host([data-condition-type="significance"][data-value="A"])
+    :host([data-condition-type='significance'][data-value='A'])
       > .inner::before,
-    :host([data-condition-type="significance"][data-value="RF"])
+    :host([data-condition-type='significance'][data-value='RF'])
       > .inner::before,
-    :host([data-condition-type="significance"][data-value="PR"])
+    :host([data-condition-type='significance'][data-value='PR'])
       > .inner::before,
-    :host([data-condition-type="significance"][data-value="AF"])
+    :host([data-condition-type='significance'][data-value='AF'])
       > .inner::before,
-    :host([data-condition-type="significance"][data-value="O"])
+    :host([data-condition-type='significance'][data-value='O'])
       > .inner::before {
       color: var(--color-sign-other);
     }
-    :host([data-condition-type="significance"][data-value="DR"])
+    :host([data-condition-type='significance'][data-value='DR'])
       > .inner::before {
-      content: "DR";
+      content: 'DR';
     }
-    :host([data-condition-type="significance"][data-value="A"])
+    :host([data-condition-type='significance'][data-value='A'])
       > .inner::before {
-      content: "A";
+      content: 'A';
     }
-    :host([data-condition-type="significance"][data-value="RF"])
+    :host([data-condition-type='significance'][data-value='RF'])
       > .inner::before {
-      content: "RF";
+      content: 'RF';
     }
-    :host([data-condition-type="significance"][data-value="PR"])
+    :host([data-condition-type='significance'][data-value='PR'])
       > .inner::before {
-      content: "PR";
+      content: 'PR';
     }
-    :host([data-condition-type="significance"][data-value="AF"])
+    :host([data-condition-type='significance'][data-value='AF'])
       > .inner::before {
-      content: "AF";
+      content: 'AF';
     }
-    :host([data-condition-type="significance"][data-value="O"])
+    :host([data-condition-type='significance'][data-value='O'])
       > .inner::before {
-      content: "O";
+      content: 'O';
     }
-    :host([data-condition-type="significance"][data-value="NP"]) > .inner,
-    :host([data-condition-type="significance"][data-value="AN"]) > .inner,
-    :host([data-condition-type="significance"][data-value="NC"]) > .inner {
+    :host([data-condition-type='significance'][data-value='NP']) > .inner,
+    :host([data-condition-type='significance'][data-value='AN']) > .inner,
+    :host([data-condition-type='significance'][data-value='NC']) > .inner {
       border-color: var(--color-gray);
       background-color: white;
     }
-    :host([data-condition-type="significance"][data-value="NP"])
+    :host([data-condition-type='significance'][data-value='NP'])
       > .inner::before,
-    :host([data-condition-type="significance"][data-value="AN"])
+    :host([data-condition-type='significance'][data-value='AN'])
       > .inner::before,
-    :host([data-condition-type="significance"][data-value="NC"])
+    :host([data-condition-type='significance'][data-value='NC'])
       > .inner::before {
       color: var(--color-gray);
     }
-    :host([data-condition-type="significance"][data-value="NP"])
+    :host([data-condition-type='significance'][data-value='NP'])
       > .inner::before {
-      content: "NP";
+      content: 'NP';
     }
-    :host([data-condition-type="significance"][data-value="AN"])
+    :host([data-condition-type='significance'][data-value='AN'])
       > .inner::before {
-      content: "AN";
+      content: 'AN';
     }
-    :host([data-condition-type="significance"][data-value="NC"])
+    :host([data-condition-type='significance'][data-value='NC'])
       > .inner::before {
-      content: "NC";
+      content: 'NC';
     }
   `;
+
+  static properties = {
+    label: { type: 'string' },
+    conditionType: { type: 'string' },
+    value: { type: 'string' },
+  };
 
   constructor() {
     super();
@@ -236,8 +239,8 @@ export class ConditionItemValueView extends LitElement {
     this.dataset.conditionType = this.conditionType;
     this.dataset.value = this.value;
 
-    let option = "";
-    if (this.conditionType == "dataset") {
+    let option = '';
+    if (this.conditionType == 'dataset') {
       option = html`<frequency-count-value-view
         data-dataset="${this.value}"
       ></frequency-count-value-view>`;
@@ -251,4 +254,5 @@ export class ConditionItemValueView extends LitElement {
       ${option} `;
   }
 }
-customElements.define("condition-item-value-view", ConditionItemValueView);
+
+customElements.define('condition-item-value-view', ConditionItemValueView);

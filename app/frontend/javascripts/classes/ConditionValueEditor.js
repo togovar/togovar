@@ -1,12 +1,9 @@
 import ConditionItemValueView from '../components/ConditionItemValueView';
 
 export default class ConditionValueEditor {
-
   constructor(valuesView, conditionType) {
-
     this._valuesView = valuesView;
     this._conditionType = conditionType;
-
   }
 
   _createElement(className, html) {
@@ -19,36 +16,37 @@ export default class ConditionValueEditor {
   }
 
   /**
-   * 
-   * @param {string} value 
-   * @param {string} label 
-   * @param {boolean} isOnly 
+   *
+   * @param {string} value
+   * @param {string} label
+   * @param {boolean} isOnly
    */
   _addValueView(value, label, isOnly = false) {
-    let valueView;
     // find value view
-    if (isOnly) {
-      valueView = this._valuesElement.querySelector('condition-item-value-view');
-      if (valueView) {
-        valueView.dataset.value = value;
-        valueView.querySelector('.inner').textContent = label;
-      }
-    } else {
-      valueView = this._valuesElement.querySelector(`condition-item-value-view[data-value="${value}"]`);
-    }
+    const selector = isOnly ? '' : `[data-value="${value}"]`;
+    let valueView = this._valuesElement.querySelector(
+      `condition-item-value-view${selector}`
+    );
     // if no view is found, create a new one
     if (!valueView) {
       valueView = document.createElement('condition-item-value-view');
-      valueView.label = label;
       valueView.conditionType = this._conditionType;
-      valueView.value = value;
       this._valuesElement.append(valueView);
     }
+    valueView.label = label;
+    valueView.value = value;
     return valueView;
   }
 
+  /**
+   *
+   * @param {string} value
+   */
   _removeValueView(value) {
-    const valueView = this._valuesElement.querySelector(`condition-item-value-view[data-value="${value}"]`);
+    const selector = value ? `[data-value="${value}"]` : '';
+    const valueView = this._valuesElement.querySelector(
+      `condition-item-value-view${selector}`
+    );
     if (valueView) {
       valueView.remove();
     }
@@ -59,8 +57,9 @@ export default class ConditionValueEditor {
   }
 
   get _valueViews() {
-    const valueViews = Array.from(this._valuesElement.querySelectorAll(':scope > condition-item-value-view'));
+    const valueViews = Array.from(
+      this._valuesElement.querySelectorAll(':scope > condition-item-value-view')
+    );
     return valueViews;
   }
-
 }

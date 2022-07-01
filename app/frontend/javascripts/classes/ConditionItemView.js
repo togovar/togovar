@@ -9,9 +9,16 @@ export default class ConditionItemView extends ConditionView {
    * @param {AdvancedSearchBuilderView} builder
    * @param {*} parentView
    * @param {String} conditionType
+   * @param {Object} options  default data
    * @param {Node} referenceElm
    */
-  constructor(builder, parentView, conditionType, referenceElm = null) {
+  constructor(
+    builder,
+    parentView,
+    conditionType,
+    options,
+    referenceElm = null
+  ) {
     super(CONDITION_ITEM_TYPE.condition, builder, parentView, referenceElm);
 
     this._conditionType = conditionType;
@@ -20,7 +27,8 @@ export default class ConditionItemView extends ConditionView {
     // make HTML
     this._elm.classList.add('advanced-search-condition-item-view');
     this._elm.dataset.classification = conditionType;
-    this._elm.dataset.relation = (conditionType === 'dataset') ? '' : 'eq';
+    this._elm.dataset.relation =
+      conditionType === 'dataset' || conditionType === 'location' ? '' : 'eq';
     // TODO: 疾患は contains?
     this._elm.innerHTML = `
     <div class="body">
@@ -44,7 +52,7 @@ export default class ConditionItemView extends ConditionView {
     this._editor = body.querySelector(
       ':scope > .advanced-search-condition-editor-view'
     );
-    this._conditionValues = new ConditionValues(this);
+    this._conditionValues = new ConditionValues(this, options);
 
     // events
     // stop propagation
@@ -131,20 +139,40 @@ export default class ConditionItemView extends ConditionView {
     const values = Array.from(
       this._values.querySelectorAll(':scope > condition-item-value-view')
     );
-    if (this._conditionType === CONDITION_TYPE.dataset) {
-      // if the condition type is 'dataset', special conditional expression is needed
-      const queries = values.map(
-        (view) =>
-          view.shadowRoot.querySelector('frequency-count-value-view').queryValue
-      );
-      return queries.length <= 1 ? queries[0] : { or: queries };
-    } else {
-      return {
-        [this._conditionType]: {
-          relation: this._elm.dataset.relation,
-          terms: values.map((value) => value.value),
-        },
-      };
+    switch (this._conditionType) {
+      case CONDITION_TYPE.dataset: {
+        const queries = values.map(
+          (view) =>
+            view.shadowRoot.querySelector('frequency-count-value-view')
+              .queryValue
+        );
+        return queries.length <= 1 ? queries[0] : { or: queries };
+      }
+
+      case CONDITION_TYPE.location: {
+        const value = values[0].value;
+        let [chromosome, position] = value.split(':');
+        position = position.split('-');
+        if (position.length === 1) {
+          position = +position[0];
+        } else {
+          position = {
+            gte: +position[0],
+            lte: +position[1],
+          };
+        }
+        return {
+          location: { chromosome, position },
+        };
+      }
+
+      default:
+        return {
+          [this._conditionType]: {
+            relation: this._elm.dataset.relation,
+            terms: values.map((value) => value.value),
+          },
+        };
     }
   }
 }

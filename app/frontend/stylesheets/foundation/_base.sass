@@ -58,8 +58,29 @@ label
   > input
     margin-right: .3em
 
-input[type="radio"], input[type="checkbox"]
-  vertical-align: middle
+input
+  &[type="radio"], &[type="checkbox"]
+    vertical-align: middle
+
+input
+  &[type="text"], &[type="email"], &[type="password"], &[type="number"]
+    --font-size: 12px
+    font-size: var(--font-size)
+    display: inline-block
+    line-height: var(--height-inline)
+    padding: 0 .75em
+    // padding: 0 0 0 8px
+    border-radius: calc(var(--height-inline) * .5)
+    border: solid 1px var(--color-gray)
+    box-shadow: 0 1px 1px rgb(0 0 0 / 20%) inset
+    outline: none
+  &[type="number"]
+    padding-right: .25em
+    text-align: right
+select
+  display: inline-block
+  height: var(--height-inline)
+  line-height: var(--height-inline)
 
 .unimplemented
   color: red
