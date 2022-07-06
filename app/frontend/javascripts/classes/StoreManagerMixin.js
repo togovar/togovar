@@ -24,7 +24,8 @@ export const mixin = {
     this.setData('simpleSearchConditionsMaster', json);
     // restore search conditions from URL parameters
     const searchMode = this._URIParameters.mode ?? DEFAULT_SEARCH_MODE;
-    const simpleSearchConditions = {}, advancedSearchConditions = {};
+    const simpleSearchConditions = {},
+      advancedSearchConditions = {};
     switch (searchMode) {
       case 'simple':
         Object.assign(
@@ -254,8 +255,11 @@ export const mixin = {
           case 'advanced':
             {
               path = `${API_URL}/api/search/variant`;
-              const body = {offset: this._store.offset};
-              if (Object.keys(this._store.advancedSearchConditions).length > 0) {
+              const body = { offset: this._store.offset };
+              if (
+                this._store.advancedSearchConditions &&
+                Object.keys(this._store.advancedSearchConditions).length > 0
+              ) {
                 body.query = this._store.advancedSearchConditions;
               }
               options.method = 'POST';
