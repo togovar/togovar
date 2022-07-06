@@ -36,7 +36,7 @@ class VariationSearchService
     end
 
     def stat_query
-      builder.stat_query.tap { |q| debug[:stat] = q if @options[:debug] }
+      builder.stat_query.tap { |q| debug[:stat_query] = q if @options[:debug] }
     end
 
     def query
