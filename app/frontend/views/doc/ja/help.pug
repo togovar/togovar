@@ -61,6 +61,10 @@ block content
                   a.link(href='#s3') TogoVarでは、どのようにバリアントを表記していますか。
                 li.item.-question
                   a.link(href='#s4') Human Genome Variation Society (HGVS) 表記 (例：ALDH2:p.Glu504Lys) で検索できますか。
+                li.item.-question
+                  a.link(href='#s5') Advanced searchでできることは何ですか。
+                li.item.-question
+                  a.link(href='#s6') 日本人集団とその他の集団で代替アレル頻度が異なるバリアントを検索できますか。
 
       .contents
         section.section
@@ -193,52 +197,54 @@ block content
                 | 各データセットにおけるAlternative allele頻度を表現しています。頻度メータの色はデータセットに割り当てられた色に対応しています。データの有無や頻度の値を９段階で表現しています。
               ._flex._break-avoid
                 ._padding-right-large
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='na')
-                    span._margin-left Not Available
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='monomorphic')
-                    span._margin-left Monomorphic (REF)
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='singleton')
-                    span._margin-left Singleton
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.0001')
-                    span._margin-left &lt; 0.0001
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.001')
-                    span._margin-left &lt; 0.001
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.01')
-                    span._margin-left &lt; 0.01
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.05')
-                    span._margin-left &lt; 0.05
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.5')
-                    span._margin-left &lt; 0.5
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&ge;0.5')
-                    span._margin-left &ge; 0.5
-                div
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='gem_j_wga')
-                    span._margin-left GEM-J WGA
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='jga_ngs')
-                    span._margin-left JGA-NGS
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='jga_snp')
-                    span._margin-left JGA-SNP
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='tommo')
-                    span._margin-left ToMMo #{ TOMMO_VERSION }KJPN
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='hgvd')
-                    span._margin-left HGVD
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='exac')
-                    span._margin-left ExAC
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="na")
+                  | &nbsp; Not Available
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="monomorphic")
+                  | &nbsp; Monomorphic (REF)
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="undefined" data-count="1")
+                  | &nbsp; Singleton
+                ._padding-right-large
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.0001")
+                  | &nbsp; &lt; 0.0001
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.001")
+                  | &nbsp; &lt; 0.001
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.01")
+                  | &nbsp; &lt; 0.01
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.05")
+                  | &nbsp; &lt; 0.05
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.5")
+                  | &nbsp; &lt; 0.5
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; ≥ 0.5
+                ._padding-right-large
+                  logarithmized-block-graph-frequency-view(data-dataset="gem_j_wga" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; GEM-J WGA
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="jga_ngs" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; JGA-NGS
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="jga_snp" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; JGA-SNP
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="tommo" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; ToMMo 8.3KJPN
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="hgvd" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; HGVD
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="gnomad_genomes" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; gnomAD genomes
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="gnomad_exomes" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; gnomAD exomes
+
           #s2.question-answer._column-span-all
             h4.question バリアントタイプごとにPosition、Ref、Altはそれぞれどのように記述されますか。
             .answer
@@ -534,3 +540,21 @@ block content
                 | )で検索可能です。
                 a.hyper-text.-external(target='_blank', href='https://m.ensembl.org/info/docs/tools/vep/recoder/index.html') Variant Recorder
                 | でHGVS表記をGRCh37座標に変換します。
+          #s5.question-answer._column-span-all
+            h4.question
+              a.hyper-text.-external(target='_blank', href='/?mode=advanced') Advanced search
+              | でできることは何でしょうか。
+            .answer
+              p
+                |代替アレル頻度やClinical significanceなどの検索条件をANDやORで結合したクエリーを作成できます。使い方は、
+                a.link(href='#s6') Q:日本人集団とその他の集団で代替アレル頻度が異なるバリアントを検索できますか
+                |をご覧ください。
+          #s6.question-answer._column-span-all
+            h4.question 日本人集団とその他の集団で代替アレル頻度が異なるバリアントを検索できますか。
+            .answer
+              p
+                |はい。
+                a.hyper-text.-external(target='_blank', href='/?mode=advanced') Advanced search
+                |による検索手順は
+                a(target='_blank', href='https://docs.google.com/document/d/1koUGuQFjF9W2NF4zCaPg7-xvbSKyEjGHmpBGb5layrs/edit') 日本人集団とgnomADの間で代替アレル頻度差のあるバリアントの検索方法
+                | をご覧ください。
