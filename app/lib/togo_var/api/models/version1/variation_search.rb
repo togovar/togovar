@@ -67,12 +67,24 @@ module TogoVar
           def to_hash
             validate
 
-            query = models.first[:query]
+            query = Elasticsearch::DSL::Search.search do
+              query do
+                bool do
+                  must do
+                    exists field: :type
+                  end
+                  if (q = models.first[:query].to_hash).present?
+                    must q
+                  end
+                end
+              end
+            end.to_hash[:query]
+
             limit = @limit
             offset = @offset
 
             hash = Elasticsearch::DSL::Search.search do
-              query query if query.present?
+              query query
               sort do
                 by :'chromosome.index'
                 by :'vcf.position'
