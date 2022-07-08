@@ -1,15 +1,16 @@
 import { LitElement, css, html } from 'lit';
 import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+
 const DISEASE_ADVANCED_SUGGEST_URL = `https://togovar-stg.biosciencedbc.jp/api/search/disease?term=`;
 
-export class ConditionTextSearch extends LitElement {
+export default class ConditionTextSearch extends LitElement {
   static properties = {
-    _value: { type: String, attribute: true, state: true },
+    _value: { type: String, state: true },
     searchFor: { type: String, attribute: false },
   };
 
-  constructor(el, searchFor = 'diseases', placeholder = 'Common cold') {
+  constructor(searchFor = 'diseases', placeholder = 'Common cold') {
     super(arguments);
     //declare reactive properties
     this._value = '';
@@ -17,7 +18,6 @@ export class ConditionTextSearch extends LitElement {
     this.selectedId = '';
     this.searchFor = searchFor;
     this.suggestions = [];
-    el.appendChild(this);
   }
 
   keepLastValues() {}
@@ -37,9 +37,19 @@ export class ConditionTextSearch extends LitElement {
 
   _select(suggestion) {
     this.selectedId = suggestion.id;
-    console.log('selected', suggestion.label);
+
     this._value = suggestion.label;
     this.renderRoot.querySelector("input[type='text']").value = this._value;
+    this.dispatchEvent(
+      new CustomEvent('new-suggestion-selected', {
+        detail: {
+          suggestion,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
+
     this._resetSuggestions();
   }
 
@@ -76,7 +86,6 @@ export class ConditionTextSearch extends LitElement {
               @input="${this._keyup}"
             />
             <button>Search</button>
-            <condition-disease-advanced-search></condition-disease-advanced-search>
           </div>
         </div>
         <div class="examples"></div>
@@ -104,4 +113,4 @@ export class ConditionTextSearch extends LitElement {
   }
 }
 
-customElements.define('condition-text-search', ConditionTextSearch);
+customElements.define('condition-disease-text-search', ConditionTextSearch);
