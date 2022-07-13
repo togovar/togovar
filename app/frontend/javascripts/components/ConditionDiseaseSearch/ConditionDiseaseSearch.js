@@ -18,6 +18,7 @@ export class ConditionDiseaseSearch extends LitElement {
     super();
     el.appendChild(this);
     this.data = [];
+    this.diseaseId = '';
   }
 
   keepLastValues() {}
