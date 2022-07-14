@@ -28,28 +28,15 @@ export default class CondDiseaseOntologyView extends LitElement {
       align-items: center;
       height: 400px;
     }
-    .search-field-view-content > div {
+
+    .cards-container {
       max-height: 400px;
       overflow-y: auto;
-    }
-    .ontology-parents {
-      width: 20rem;
       display: flex;
+      gap: 7px;
       flex-direction: column;
       justify-content: start;
       align-items: center;
-    }
-    .ontology-card {
-      width: 20rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: start;
-      align-items: center;
-    }
-    .parent {
-      margin: 0.5em;
-      width: 100%;
-      text-align: center;
     }
   `;
 
@@ -85,6 +72,15 @@ export default class CondDiseaseOntologyView extends LitElement {
     return;
   }
 
+  shouldUpdate(changed) {
+    if (Array.from(changed.keys()).includes('data') && changed.get('data')) {
+      const changedData = changed.get('data');
+      console.log('changedData', changedData);
+      console.log(this.querySelector(`#${changedData.id}`));
+    }
+    return true;
+  }
+
   constructor() {
     super(arguments);
     //declare reactive properties
@@ -98,20 +94,39 @@ export default class CondDiseaseOntologyView extends LitElement {
     return html`
       <div class="search-field-view">
         <h2>Advanced Search</h2>
-        ${!this.data || this.loading || !Object.keys(this.data).length
-          ? html`<div>Loading...</div>`
+        ${!this.data || !Object.keys(this.data).length
+          ? (this.loading && html`<div>Loading...</div>`) ||
+            (this.error && html`<div>Error</div>`)
           : html`<div class="search-field-view-content">
-              <div class="ontology-parents">
+              <div class="cards-container">
                 ${this.data.parents.map(
-                  (parent) => html` <ontology-card .data=${parent} /> `
+                  (parent) =>
+                    html`
+                      <ontology-card
+                        id="${parent.id}"
+                        .data=${parent}
+                        @card_selected=${(e) => this._fetchData(e.detail.id)}
+                      />
+                    `
                 )}
               </div>
-              <div class="ontology-card">
-                <ontology-card .data=${this.data} selected />
+              <div class="cards-container main">
+                <ontology-card
+                  id="${this.data.id}"
+                  .data=${this.data}
+                  selected
+                />
               </div>
-              <div class="ontology-children">
+              <div class="cards-container">
                 ${this.data.children.map(
-                  (child) => html` <ontology-card .data=${child} /> `
+                  (child) =>
+                    html`
+                      <ontology-card
+                        .data=${child}
+                        id="${child.id}"
+                        @card_selected=${(e) => this._fetchData(e.detail.id)}
+                      />
+                    `
                 )}
               </div>
             </div>`}
