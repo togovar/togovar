@@ -33,7 +33,6 @@ export class OntologyCard extends LitElement {
   }
 
   _handleClick() {
-    this.selected = true;
     this.dispatchEvent(
       new CustomEvent('card_selected', { detail: { id: this.data.id } })
     );
