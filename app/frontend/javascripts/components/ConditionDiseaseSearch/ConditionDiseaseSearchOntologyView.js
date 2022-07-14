@@ -111,48 +111,48 @@ export default class CondDiseaseOntologyView extends LitElement {
     return;
   }
 
-  requestUpdate(name, oldValue) {
-    if (name === 'data') {
-      const newValue = this[name];
-      if (newValue) {
-        const ids = newValue.parents
-          .map((p) => p.id)
-          .concat(newValue.id)
-          .concat(newValue.children.map((c) => c.id));
+  // requestUpdate(name, oldValue) {
+  //   if (name === 'data') {
+  //     const newValue = this[name];
+  //     if (newValue) {
+  //       const ids = newValue.parents
+  //         .map((p) => p.id)
+  //         .concat(newValue.id)
+  //         .concat(newValue.children.map((c) => c.id));
 
-        const intersect = intersection(ids);
-        const oldParentsIds = oldValue.parents.map((p) => p.id);
-        const oldChildrenIds = oldValue.children.map((c) => c.id);
-        this.parents.enter = intersect.enter.filter(
-          (item) => !oldParentsIds.includes(item)
-        );
-        this.parents.exit = intersect.exit.filter(
-          (item) => !oldParentsIds.includes(item)
-        );
-        this.children.enter = intersect.enter.filter(
-          (item) => !oldChildrenIds.includes(item)
-        );
-        this.children.exit = intersect.exit.filter(
-          (item) => !oldChildrenIds.includes(item)
-        );
+  //       const intersect = intersection(ids);
+  //       const oldParentsIds = oldValue.parents.map((p) => p.id);
+  //       const oldChildrenIds = oldValue.children.map((c) => c.id);
+  //       this.parents.enter = intersect.enter.filter(
+  //         (item) => !oldParentsIds.includes(item)
+  //       );
+  //       this.parents.exit = intersect.exit.filter(
+  //         (item) => !oldParentsIds.includes(item)
+  //       );
+  //       this.children.enter = intersect.enter.filter(
+  //         (item) => !oldChildrenIds.includes(item)
+  //       );
+  //       this.children.exit = intersect.exit.filter(
+  //         (item) => !oldChildrenIds.includes(item)
+  //       );
 
-        const exitNodes = this.querySelectorAll('ontology-card').filter(
-          (node) => intersect.exit.includes(node.id)
-        );
-        this._exitNodes(exitNodes);
-      }
-    }
-    return super.requestUpdate(name, oldValue);
-  }
+  //       const exitNodes = this.querySelectorAll('ontology-card').filter(
+  //         (node) => intersect.exit.includes(node.id)
+  //       );
+  //       this._exitNodes(exitNodes);
+  //     }
+  //   }
+  //   return super.requestUpdate(name, oldValue);
+  // }
 
-  _exitNodes(nodeList) {
-    nodeList.forEach((node) => {
-      node.addEventListener('transitionend', () => {
-        node.remove();
-      });
-      node.classList.add('exit');
-    });
-  }
+  // _exitNodes(nodeList) {
+  //   nodeList.forEach((node) => {
+  //     node.addEventListener('transitionend', () => {
+  //       node.remove();
+  //     });
+  //     node.classList.add('exit');
+  //   });
+  // }
 
   // shouldUpdate(changed) {
   //   console.log('shouldUpdate', changed);
