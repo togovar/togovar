@@ -67,7 +67,7 @@ export const mixin = {
         conditions[conditionKey];
     }
     // URIパラメータに反映
-    if (!fromHistory) this._reflectSearchConditionToURI();
+    if (!fromHistory) this._reflectSimpleSearchConditionToURI();
     // 検索条件として成立していれば、検索開始
     if (this._isReadySearch) {
       this._notify('simpleSearchConditions');
@@ -162,7 +162,7 @@ export const mixin = {
   },
 
   // update uri parameters
-  _reflectSearchConditionToURI() {
+  _reflectSimpleSearchConditionToURI() {
     const diffConditions = this._extractSearchCondition(
       this._store.simpleSearchConditions
     );
