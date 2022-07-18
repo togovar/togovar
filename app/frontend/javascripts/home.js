@@ -108,9 +108,9 @@ export function initHome() {
     document
       .querySelectorAll('#SearchInputView > .tabscontainer > ul > li')
       .forEach((elm) => {
-        elm.addEventListener('click', (e) =>
-          changeSearchMode(e.target.dataset.target)
-        );
+        elm.addEventListener('click', (e) => {
+          StoreManager.setData('searchMode', e.target.dataset.target);
+        });
       });
     // モジュールタブメニュー
     document.querySelectorAll('.module-tabs-view').forEach((elm) => {
@@ -119,10 +119,6 @@ export function initHome() {
     // Tooltip
     new TippyBox();
   });
-}
-
-function changeSearchMode(mode) {
-  StoreManager.setData('searchMode', mode);
 }
 
 function setUserAgent() {
