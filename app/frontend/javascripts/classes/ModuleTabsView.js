@@ -32,11 +32,17 @@ export default class ModuleTabsView {
     });
 
     // default
-    const storedTab = window.localStorage.getItem(tabs[0].dataset.tabGroup);
+    // if bound to URL params, URL params are preferred
+    let storedTab = window.localStorage.getItem(tabs[0].dataset.tabGroup);
+    const boundUrlParam = elm.dataset.boundUrlParam;
+    if (elm.dataset.boundUrlParam) {
+      const param = new URL(window.location).searchParams.get(boundUrlParam);
+      storedTab = param ?? storedTab;
+    }
     let selectedTab = tabs[0];
     if (storedTab) {
       const foundTab = tabs.find((tab) => tab.dataset.target === storedTab);
-      selectedTab = foundTab ? foundTab : selectedTab;
+      selectedTab = foundTab ?? selectedTab;
     }
     selectedTab.dispatchEvent(new Event('click'));
   }
