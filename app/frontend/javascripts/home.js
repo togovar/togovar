@@ -112,7 +112,6 @@ export function initHome() {
           changeSearchMode(e.target.dataset.target)
         );
       });
-    console.log('home.js');
     // モジュールタブメニュー
     document.querySelectorAll('.module-tabs-view').forEach((elm) => {
       new ModuleTabsView(elm);
