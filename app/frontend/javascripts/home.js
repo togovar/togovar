@@ -27,9 +27,8 @@ import PanelViewPreviewClinicalSignificance from '../javascripts/classes/PanelVi
 import TippyBox from '../javascripts/classes/TippyBox.js';
 
 export function initHome() {
-
   setUserAgent();
-  
+
   StoreManager.setData('offset', 0);
   StoreManager.setData('selectedRow', undefined);
 
@@ -46,21 +45,52 @@ export function initHome() {
     // サイドバー
     new SideBar(document.getElementById('SideBar'));
     // aside 要素の準備（フィルター）
-    new PanelViewCheckList(document.getElementById('FilterDatasets'), 'dataset', 'statisticsDataset');
-    new PanelViewFilterAlternativeAlleleFrequency(document.getElementById('FilterAlternativeAlleleFrequency'));
-    new PanelViewFilterVariantCallingQuality(document.getElementById('FilterVariantCallingQuality'));
-    new PanelViewCheckList(document.getElementById('FilterVariantType'), 'type', 'statisticsType');
-    new PanelViewCheckList(document.getElementById('FilterClinicalSignificance'), 'significance', 'statisticsSignificance');
-    new PanelViewFilterConsequence(document.getElementById('FilterConsequence'));
+    new PanelViewCheckList(
+      document.getElementById('FilterDatasets'),
+      'dataset',
+      'statisticsDataset'
+    );
+    new PanelViewFilterAlternativeAlleleFrequency(
+      document.getElementById('FilterAlternativeAlleleFrequency')
+    );
+    new PanelViewFilterVariantCallingQuality(
+      document.getElementById('FilterVariantCallingQuality')
+    );
+    new PanelViewCheckList(
+      document.getElementById('FilterVariantType'),
+      'type',
+      'statisticsType'
+    );
+    new PanelViewCheckList(
+      document.getElementById('FilterClinicalSignificance'),
+      'significance',
+      'statisticsSignificance'
+    );
+    new PanelViewFilterConsequence(
+      document.getElementById('FilterConsequence')
+    );
     new PanelViewCheckList(document.getElementById('FilterSIFT'), 'sift');
-    new PanelViewCheckList(document.getElementById('FilterPolyPhen'), 'polyphen');
+    new PanelViewCheckList(
+      document.getElementById('FilterPolyPhen'),
+      'polyphen'
+    );
     // aside 要素の準備（バリアントプレビュー）
     new PanelViewPreviewGene(document.getElementById('PreviewGene'));
-    new PreviewToVariantReport(document.getElementById('PreviewToVariantReport'));
-    new PanelViewPreviewExternalLinks(document.getElementById('PreviewExternalLinks'));
-    new PanelViewPreviewAlternativeAlleleFrequencies(document.getElementById('PreviewAlternativeAlleleFrequencies'));
-    new PanelViewPreviewConsequence(document.getElementById('PreviewConsequence'));
-    new PanelViewPreviewClinicalSignificance(document.getElementById('PreviewClinicalSignificance'));
+    new PreviewToVariantReport(
+      document.getElementById('PreviewToVariantReport')
+    );
+    new PanelViewPreviewExternalLinks(
+      document.getElementById('PreviewExternalLinks')
+    );
+    new PanelViewPreviewAlternativeAlleleFrequencies(
+      document.getElementById('PreviewAlternativeAlleleFrequencies')
+    );
+    new PanelViewPreviewConsequence(
+      document.getElementById('PreviewConsequence')
+    );
+    new PanelViewPreviewClinicalSignificance(
+      document.getElementById('PreviewClinicalSignificance')
+    );
     // インジケータ
     new SelectedRowIndicator(document.getElementById('RowIndicator'));
     // レイアウトマネージャ
@@ -71,35 +101,41 @@ export function initHome() {
 
     // 検索窓
     new SimpleSearchView();
-    new AdvancedSearchBuilderView(document.getElementById('AdvancedSearchBuilderView'))
+    new AdvancedSearchBuilderView(
+      document.getElementById('AdvancedSearchBuilderView')
+    );
     // change search mode
-    document.querySelectorAll('#SearchInputView > .tabscontainer > ul > li').forEach(elm => {
-      elm.addEventListener('click', e => changeSearchMode(e.target.dataset.target));
-    });
+    document
+      .querySelectorAll('#SearchInputView > .tabscontainer > ul > li')
+      .forEach((elm) => {
+        elm.addEventListener('click', (e) =>
+          changeSearchMode(e.target.dataset.target)
+        );
+      });
+    console.log('home.js');
     // モジュールタブメニュー
-    document.querySelectorAll('.module-tabs-view').forEach(elm => {
+    document.querySelectorAll('.module-tabs-view').forEach((elm) => {
       new ModuleTabsView(elm);
     });
     // Tooltip
     new TippyBox();
   });
-
 }
 
-function changeSearchMode(searchViewName) {
-  const searchMode = {
-    SimpleSearchView: 'simple',
-    AdvancedSearchView: 'advanced'
-  }[searchViewName];
-  StoreManager.setData('searchMode', searchMode);
+function changeSearchMode(mode) {
+  StoreManager.setData('searchMode', mode);
 }
 
 function setUserAgent() {
   const ua = window.navigator.userAgent.toLowerCase();
   let os = '';
   switch (true) {
-    case ua.indexOf('windows nt') !== -1: os = 'windows'; break;
-    case ua.indexOf('mac os x') !== -1: os = 'mac'; break;
+    case ua.indexOf('windows nt') !== -1:
+      os = 'windows';
+      break;
+    case ua.indexOf('mac os x') !== -1:
+      os = 'mac';
+      break;
   }
   document.querySelector('html').dataset.os = os;
 }
