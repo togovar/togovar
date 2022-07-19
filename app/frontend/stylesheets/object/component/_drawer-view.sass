@@ -7,7 +7,6 @@ $BOTTOM_CHROMOSOME: 16px
   position: fixed
   background-color: $COLOR_BLACK
   color: white
-  cursor: pointer
   z-index: $Z_INDEX_DRAWER
   bottom: $HEIGHT_BOTTOM_DRAWER - $HEIGHT_BOTTOM_DRAWER_OPENED
   transition: bottom $TRANSITION_DURATION
@@ -19,6 +18,7 @@ $BOTTOM_CHROMOSOME: 16px
     height: $HEIGHT_BOTTOM_DRAWER
     border-top: solid 1px rgba(white, .4)
     border-bottom: solid 1px rgba(black, .2)
+    cursor: pointer
     > .mark
       display: inline-block
       width: 14px
