@@ -151,26 +151,36 @@ export default class ChromosomeView {
     // イベント
     StoreManager.bind('displayingRegionsOnChromosome', this);
 
-    // bands
-    this.svg.querySelectorAll('g.band').forEach((g) => {
-      $(g).on('click', (e) => {
-        this._selectBand(
-          this.no,
-          e.delegateTarget.dataset.start,
-          e.delegateTarget.dataset.end
-        );
+    // sub bands
+    const subbands = Array.from(this.svg.querySelectorAll('g.subband'));
+    subbands.forEach((subband) => {
+      subband.addEventListener('click', () => {
+        this._selectBand(this.no, subband.dataset.start, subband.dataset.end);
       });
     });
 
-    // sub bands
-    this.svg.querySelectorAll('g.subband').forEach((g) => {
-      $(g).on('click', (e) => {
-        this._selectBand(
-          this.no,
-          e.delegateTarget.dataset.start,
-          e.delegateTarget.dataset.end
+    // bands
+    this.svg.querySelectorAll('g.band').forEach((band) => {
+      if (band.dataset.start) {
+        const [start, end] = [+band.dataset.start, +band.dataset.end];
+        const includesSubbands = subbands.filter(
+          (subband) =>
+            start <= +subband.dataset.start && +subband.dataset.end <= end
         );
-      });
+        band.addEventListener('click', () => {
+          this._selectBand(this.no, band.dataset.start, band.dataset.end);
+        });
+        band.addEventListener('mouseenter', () => {
+          includesSubbands.forEach((subband) =>
+            subband.classList.add('-hover')
+          );
+        });
+        band.addEventListener('mouseleave', () => {
+          includesSubbands.forEach((subband) =>
+            subband.classList.remove('-hover')
+          );
+        });
+      }
     });
   }
 
