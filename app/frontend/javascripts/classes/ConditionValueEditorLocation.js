@@ -89,10 +89,10 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
   get isValid() {
     if (this._chr.value === '') {
       return false;
-    } else if (this._start.value && this._end.value) {
-      return this._start.value < this._end.value;
+    } else if (this._start.value !== '' && this._end.value !== '') {
+      return +this._start.value < +this._end.value;
     } else {
-      return this._start.value || this._end.value;
+      return this._start.value !== '' || this._end.value !== '';
     }
   }
 
