@@ -60,47 +60,47 @@ export default class ChromosomeView {
     let html = `
       <defs>
         <lineargradient id="chromosome-gneg">
-        <stop offset="0" stop-color="#A6A6A6"/>
-        <stop offset="0.33" stop-color="#FFFFFF"/>
-        <stop offset="0.67" stop-color="#FFFFFF"/>
-        <stop offset="1" stop-color="#A6A6A6"/>
-      </lineargradient>
-      <lineargradient id="chromosome-gpos25">
-        <stop offset="0" stop-color="#B39BB3"/>
-        <stop offset="0.33" stop-color="#EDCEED"/>
-        <stop offset="0.67" stop-color="#EDCEED"/>
-        <stop offset="1" stop-color="#B39BB3"/>
-      </lineargradient>
-      <lineargradient id="chromosome-gpos50">
-        <stop offset="0" stop-color="#AB78AB"/>
-        <stop offset="0.33" stop-color="#DA9CDA"/>
-        <stop offset="0.67" stop-color="#DA9CDA"/>
-        <stop offset="1" stop-color="#AB78AB"/>
-      </lineargradient>
-      <lineargradient id="chromosome-gpos75">
-        <stop offset="0" stop-color="#9C539C"/>
-        <stop offset="0.33" stop-color="#C86BC8"/>
-        <stop offset="0.67" stop-color="#C86BC8"/>
-        <stop offset="1" stop-color="#9C539C"/>
-      </lineargradient>
-      <lineargradient id="chromosome-gpos100">
-        <stop offset="0" stop-color="#8F2B8F"/>
-        <stop offset="0.33" stop-color="#B53AB5"/>
-        <stop offset="0.67" stop-color="#B53AB5"/>
-        <stop offset="1" stop-color="#8F2B8F"/>
-      </lineargradient>
-      <lineargradient id="chromosome-stalk">
-        <stop offset="0" stop-color="#6e6e6e"/>
-        <stop offset="0.33" stop-color="#8F8F8F"/>
-        <stop offset="0.67" stop-color="#8F8F8F"/>
-        <stop offset="1" stop-color="#6e6e6e"/>
-      </lineargradient>
-      <lineargradient id="chromosome-acen">
-        <stop offset="0" stop-color="#383838"/>
-        <stop offset="0.33" stop-color="#444444"/>
-        <stop offset="0.67" stop-color="#444444"/>
-        <stop offset="1" stop-color="#383838"/>
-      </lineargradient>
+          <stop offset="0" stop-color="#A6A6A6"/>
+          <stop offset="0.33" stop-color="#FFFFFF"/>
+          <stop offset="0.67" stop-color="#FFFFFF"/>
+          <stop offset="1" stop-color="#A6A6A6"/>
+        </lineargradient>
+        <lineargradient id="chromosome-gpos25">
+          <stop offset="0" stop-color="#B39BB3"/>
+          <stop offset="0.33" stop-color="#EDCEED"/>
+          <stop offset="0.67" stop-color="#EDCEED"/>
+          <stop offset="1" stop-color="#B39BB3"/>
+        </lineargradient>
+        <lineargradient id="chromosome-gpos50">
+          <stop offset="0" stop-color="#AB78AB"/>
+          <stop offset="0.33" stop-color="#DA9CDA"/>
+          <stop offset="0.67" stop-color="#DA9CDA"/>
+          <stop offset="1" stop-color="#AB78AB"/>
+        </lineargradient>
+        <lineargradient id="chromosome-gpos75">
+          <stop offset="0" stop-color="#9C539C"/>
+          <stop offset="0.33" stop-color="#C86BC8"/>
+          <stop offset="0.67" stop-color="#C86BC8"/>
+          <stop offset="1" stop-color="#9C539C"/>
+        </lineargradient>
+        <lineargradient id="chromosome-gpos100">
+          <stop offset="0" stop-color="#8F2B8F"/>
+          <stop offset="0.33" stop-color="#B53AB5"/>
+          <stop offset="0.67" stop-color="#B53AB5"/>
+          <stop offset="1" stop-color="#8F2B8F"/>
+        </lineargradient>
+        <lineargradient id="chromosome-stalk">
+          <stop offset="0" stop-color="#6e6e6e"/>
+          <stop offset="0.33" stop-color="#8F8F8F"/>
+          <stop offset="0.67" stop-color="#8F8F8F"/>
+          <stop offset="1" stop-color="#6e6e6e"/>
+        </lineargradient>
+        <lineargradient id="chromosome-acen">
+          <stop offset="0" stop-color="#383838"/>
+          <stop offset="0.33" stop-color="#444444"/>
+          <stop offset="0.67" stop-color="#444444"/>
+          <stop offset="1" stop-color="#383838"/>
+        </lineargradient>
       </defs>
     `;
 
@@ -118,8 +118,8 @@ export default class ChromosomeView {
         <rect
           class="subbandrect ${subBand.stainType}"
           x="0"
-          y="${PADDING + subBand.start * rate}"
-          height="${(subBand.end - subBand.start) * rate}"
+          y="${Math.floor(PADDING + subBand.start * rate)}"
+          height="${Math.ceil((subBand.end - subBand.start) * rate)}"
           width="${WIDTH}"
         />
       </g>`;
