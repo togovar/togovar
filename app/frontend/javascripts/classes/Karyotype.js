@@ -33,7 +33,8 @@ const DEFAULT = {
   isOpened: false,
   isShowBand: true,
   height: HEIGHTS[0],
-  reference: 'GRCh37', // TODO:
+  reference: 'GRCh37', // TODO:,
+  version: 1,
   chromosomes: {
     1: {
       selected: true,
@@ -222,7 +223,8 @@ export default class Karyotype {
 
     // initial settings
     let karyotype = localStorage.getItem('karyotype');
-    if (karyotype) karyotype = JSON.parse(karyotype);
+    if (karyotype && karyotype.version && karyotype.version === DEFAULT.version)
+      karyotype = JSON.parse(karyotype);
     else karyotype = DEFAULT; // デフォルト値作成
     StoreManager.setData('karyotype', karyotype);
 

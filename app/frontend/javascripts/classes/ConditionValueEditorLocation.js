@@ -8,6 +8,7 @@ const OPTIONS = [
   ...[...Array(22)].map((_, index) => index + 1 + ''),
   'X',
   'Y',
+  'MT',
 ];
 
 export default class ConditionValueEditorLocation extends ConditionValueEditor {
@@ -34,9 +35,9 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
         </label>
         <label class="position">
           <span class="form range-inputs-view">
-            <input class="start" type="number" min="0" placeholder="0">
+            <input class="start" type="number" min="1" placeholder="1">
             <span class="line"></span>
-            <input class="end" type="number" min="0">
+            <input class="end" type="number" min="1">
           </span>
         </label>
       </div>
