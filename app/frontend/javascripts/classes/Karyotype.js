@@ -26,6 +26,7 @@ const CHROMOSOME_KEYS = [
   '22',
   'X',
   'Y',
+  'MT',
 ];
 const HEIGHTS = [0, 400];
 const DEFAULT = {
@@ -200,6 +201,13 @@ const DEFAULT = {
       region: {
         GRCh37: [0, 59373566],
         GRCh38: [0, 57227415],
+      },
+    },
+    MT: {
+      selected: true,
+      region: {
+        GRCh37: [0, 16558],
+        GRCh38: [0, 16558],
       },
     },
   },
