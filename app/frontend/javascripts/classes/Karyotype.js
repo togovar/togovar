@@ -222,10 +222,10 @@ export default class Karyotype {
     this.chromosomeViews;
 
     // initial settings
-    let karyotype = localStorage.getItem('karyotype');
-    if (karyotype && karyotype.version && karyotype.version === DEFAULT.version)
-      karyotype = JSON.parse(karyotype);
-    else karyotype = DEFAULT; // デフォルト値作成
+    let karyotype = JSON.parse(localStorage.getItem('karyotype'));
+    if (!karyotype || karyotype.version !== DEFAULT.version) {
+      karyotype = DEFAULT;
+    }
     StoreManager.setData('karyotype', karyotype);
 
     // events
