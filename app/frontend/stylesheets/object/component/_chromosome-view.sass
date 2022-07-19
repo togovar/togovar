@@ -52,8 +52,10 @@ $WIDTH_BAND_LABEL: 32px
       filter: drop-shadow(0 4px 4px rgba(black, .5))
       transition: width $GUI_DURATION, left $GUI_DURATION
       > .subband
+        cursor: pointer
         > .subbandrect
           fill: url(#chromosome-gneg)
+          transition: fill $GUI_DURATION
           &.acen
             fill: url(#chromosome-acen)
           // &.gneg
@@ -70,7 +72,11 @@ $WIDTH_BAND_LABEL: 32px
             fill: url(#chromosome-gpos100)
           &.stalk
             fill: url(#chromosome-stalk)
+        &:hover, &.-hover
+          > .subbandrect
+            fill: $COLOR_SELECTED
       > .band
+        cursor: pointer
         > .bandtext
           font-size: 12px
           line-height: 12px
@@ -79,6 +85,12 @@ $WIDTH_BAND_LABEL: 32px
           stroke: white
           stroke-width: .5px
           fill: transparent
+        &:hover
+          > .bandtext
+            fill: $COLOR_SELECTED
+          > .line
+            stroke: $COLOR_SELECTED
+
     > .selectedregion
       background-color: rgba($COLOR_SELECTED, .15)
       border-radius: 1px
