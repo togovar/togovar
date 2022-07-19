@@ -214,7 +214,7 @@ export default class ResultsRowView {
               StoreManager.getSimpleSearchConditionMaster('type').items;
             this.tdType.textContent = master.find(
               (type) => type.id === result.type
-            ).label;
+            )?.label;
           }
           break;
         case 'gene': // gene symbol
