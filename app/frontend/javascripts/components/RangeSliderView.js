@@ -182,8 +182,6 @@ class RangeSlider extends HTMLElement {
   _fillSlider() {
     const val1 = Math.min(this.slider1.value, this.slider2.value);
     const val2 = Math.max(this.slider1.value, this.slider2.value);
-    this.from.value = val1;
-    this.to.value = val2;
 
     const percentVal1 = (val1 * 100) / (this.max - this.min);
     const percentVal2 = (val2 * 100) / (this.max - this.min);
@@ -354,18 +352,20 @@ class RangeSlider extends HTMLElement {
 
   _slider1Input = (e) => {
     this.value1 = +e.target.value;
-    this.state.from = Math.min(+this.slider1.value, +this.slider2.value);
-    this.state.to = Math.max(+this.slider1.value, +this.slider2.value);
-
-    this._fillSlider.call(this);
+    this._slideInput();
   };
   _slider2Input = (e) => {
     this.value2 = +e.target.value;
+    this._slideInput();
+  };
+  _slideInput() {
     this.state.from = Math.min(+this.slider1.value, +this.slider2.value);
     this.state.to = Math.max(+this.slider1.value, +this.slider2.value);
+    this.from.value = this.state.from;
+    this.to.value = this.state.to;
 
     this._fillSlider.call(this);
-  };
+  }
   _fromInput = (e) => {
     const slider1Val = +this.slider1.value;
     const slider2Val = +this.slider2.value;
