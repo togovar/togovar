@@ -1,13 +1,11 @@
 {
-  presets: [
+  "presets": [
     [
-      '@babel/preset-env',
+      "@babel/preset-env",
       {
-        modules: false
+        "modules": false
       }
     ]
   ],
-  "plugins": [
-    "@babel/plugin-proposal-class-properties"
-  ]
+  "plugins": ["@babel/plugin-proposal-class-properties"]
 }
