@@ -27,6 +27,7 @@ $WIDTH_BAND_LABEL: 32px
       position: relative
       left: ($WIDTH_VIEW - $SIZE_NUMBER) * .5
       transition: left $GUI_DURATION
+      cursor: pointer
   > .lower
     position: relative
     > .filteredregion, > .displayregion, > .selectedregion
@@ -82,6 +83,10 @@ $WIDTH_BAND_LABEL: 32px
             fill: $COLOR_SELECTED
       > .band
         cursor: pointer
+        [data-is-selecting-chromosome="true"] &
+          opacity: .3
+        &:hover, &.-selected
+          opacity: 1
         > .bandtext
           font-size: 12px
           line-height: 12px
