@@ -56,7 +56,7 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
       });
     });
     this._el
-      .querySelectorAll(':scope > footer > button')
+      .querySelectorAll(':scope > .buttons > button')
       .forEach((button, index) => {
         button.addEventListener('click', () => {
           this._checkboxes.forEach((checkbox) => (checkbox.checked = !index));
