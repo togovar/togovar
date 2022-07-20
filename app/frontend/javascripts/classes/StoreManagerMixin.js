@@ -24,7 +24,8 @@ export const mixin = {
     this.setData('simpleSearchConditionsMaster', json);
     // restore search conditions from URL parameters
     const searchMode = this._URIParameters.mode ?? DEFAULT_SEARCH_MODE;
-    const simpleSearchConditions = {}, advancedSearchConditions = {};
+    const simpleSearchConditions = {},
+      advancedSearchConditions = {};
     switch (searchMode) {
       case 'simple':
         Object.assign(
@@ -66,7 +67,7 @@ export const mixin = {
         conditions[conditionKey];
     }
     // URIパラメータに反映
-    if (!fromHistory) this._reflectSearchConditionToURI();
+    if (!fromHistory) this._reflectSimpleSearchConditionToURI();
     // 検索条件として成立していれば、検索開始
     if (this._isReadySearch) {
       this._notify('simpleSearchConditions');
@@ -161,7 +162,7 @@ export const mixin = {
   },
 
   // update uri parameters
-  _reflectSearchConditionToURI() {
+  _reflectSimpleSearchConditionToURI() {
     const diffConditions = this._extractSearchCondition(
       this._store.simpleSearchConditions
     );
@@ -254,8 +255,11 @@ export const mixin = {
           case 'advanced':
             {
               path = `${API_URL}/api/search/variant`;
-              const body = {offset: this._store.offset};
-              if (Object.keys(this._store.advancedSearchConditions).length > 0) {
+              const body = { offset: this._store.offset };
+              if (
+                this._store.advancedSearchConditions &&
+                Object.keys(this._store.advancedSearchConditions).length > 0
+              ) {
                 body.query = this._store.advancedSearchConditions;
               }
               options.method = 'POST';

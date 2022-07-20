@@ -1,12 +1,12 @@
-#SearchInputView.module-tabs-view
+#SearchInputView.module-tabs-view(data-bound-url-param="mode")
   nav.tabscontainer
     ul
-      li(data-tab-group="tab-group-type-of-search" data-target="SimpleSearchView") Simple search
-      li(data-tab-group="tab-group-type-of-search" data-target="AdvancedSearchView") Advanced search
+      li(data-tab-group="tab-group-type-of-search" data-target="simple") Simple search
+      li(data-tab-group="tab-group-type-of-search" data-target="advanced") Advanced search
 
   .sectionscontainer
 
-    #SimpleSearchView.section
+    #SimpleSearchView.section(data-tab-id="simple")
       //- .fieldcontainer
       //-   .field
       //-     input.searchinput(type="text" placeholder="Search for disease or gene symbol or rs...")
@@ -31,7 +31,7 @@
       //-     dd 10:73270743-73376976
       //- .suggest-view
 
-    #AdvancedSearchView.section.collapse-view
+    #AdvancedSearchView.section.collapse-view(data-tab-id="advanced")
       //- a.collapsebutton
       .collapsecontent
         #AdvancedSearchBuilderView.section

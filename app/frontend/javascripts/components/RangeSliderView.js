@@ -1,7 +1,7 @@
-const template = document.createElement("template");
-const searchTypeSimple = document.createElement("div");
-searchTypeSimple.className = "match";
-searchTypeSimple.part = "match";
+const template = document.createElement('template');
+const searchTypeSimple = document.createElement('div');
+searchTypeSimple.className = 'match';
+searchTypeSimple.part = 'match';
 searchTypeSimple.innerHTML = `
 <label part="match label">
   <input class="all" name="match" type="radio" value="all">
@@ -73,15 +73,15 @@ input[type="range"]::-webkit-slider-thumb {
 class RangeSlider extends HTMLElement {
   static get observedAttributes() {
     return [
-      "min",
-      "max",
-      "step",
-      "value1",
-      "value2",
-      "orientation",
-      "invert",
-      "match",
-      "ruler-number-of-steps",
+      'min',
+      'max',
+      'step',
+      'value1',
+      'value2',
+      'orientation',
+      'invert',
+      'match',
+      'ruler-number-of-steps',
     ];
   }
 
@@ -89,71 +89,71 @@ class RangeSlider extends HTMLElement {
     super();
 
     const initState = {
-      from: "0",
-      to: "1",
-      invert: "0",
+      from: '0',
+      to: '1',
+      invert: '0',
       min: 0,
       max: 1,
       step: 0.05,
-      match: "any",
+      match: 'any',
       rulerNumberOfSteps: 10,
     };
 
     this.state = initState;
 
     this.root = this.getRootNode();
-    this.attachShadow({ mode: "open" });
+    this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
-    this.slider1 = this.shadowRoot.querySelector("#slider-1");
-    this.slider2 = this.shadowRoot.querySelector("#slider-2");
-    this.sliderTrack = this.shadowRoot.querySelector("#slider-track");
-    this.from = this.shadowRoot.querySelector(".from");
-    this.to = this.shadowRoot.querySelector(".to");
-    this.invertChk = this.shadowRoot.querySelector(".invert");
-    this._meter = this.shadowRoot.querySelector(".meter");
+    this.slider1 = this.shadowRoot.querySelector('#slider-1');
+    this.slider2 = this.shadowRoot.querySelector('#slider-2');
+    this.sliderTrack = this.shadowRoot.querySelector('#slider-track');
+    this.from = this.shadowRoot.querySelector('.from');
+    this.to = this.shadowRoot.querySelector('.to');
+    this.invertChk = this.shadowRoot.querySelector('.invert');
+    this._meter = this.shadowRoot.querySelector('.meter');
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
     switch (name) {
-      case "min":
+      case 'min':
         this.slider1.min = newValue;
         this.slider2.min = newValue;
         this.from.min = newValue;
         this.to.min = newValue;
         break;
-      case "max":
+      case 'max':
         this.slider1.max = newValue;
         this.slider2.max = newValue;
         this.from.max = newValue;
         this.to.max = newValue;
         break;
-      case "step":
+      case 'step':
         this.slider1.step = newValue;
         this.slider2.step = newValue;
         this.from.step = newValue;
         this.to.step = newValue;
         break;
-      case "value1":
+      case 'value1':
         this.slider1.value = parseFloat(newValue).toFixed(3);
         break;
-      case "value2":
+      case 'value2':
         this.slider2.value = parseFloat(newValue).toFixed(3);
         break;
-      case "invert":
-        this.invertChk.checked = newValue === "true";
+      case 'invert':
+        this.invertChk.checked = newValue === 'true';
         break;
-      case "ruler-number-of-steps":
+      case 'ruler-number-of-steps':
         this.state.rulerNumberOfSteps = newValue;
         this._reRenderRuler();
         break;
-      case "match":
+      case 'match':
         this.match = newValue;
         break;
-      case "orientation":
-        if (newValue === "vertical") {
-          this._meter.classList.add("-vertical");
+      case 'orientation':
+        if (newValue === 'vertical') {
+          this._meter.classList.add('-vertical');
         } else {
-          this._meter.classList.remove("-vertical");
+          this._meter.classList.remove('-vertical');
         }
         this._reRenderRuler();
         break;
@@ -163,16 +163,16 @@ class RangeSlider extends HTMLElement {
   }
 
   _reRenderRuler() {
-    const ruler = this.shadowRoot.querySelector(".ruler");
-    ruler.innerHTML = "";
+    const ruler = this.shadowRoot.querySelector('.ruler');
+    ruler.innerHTML = '';
     const rulerNumberOfSteps = parseInt(this.state.rulerNumberOfSteps);
     const min = parseFloat(this.state.min);
     const max = parseFloat(this.state.max);
     const step = (max - min) / rulerNumberOfSteps;
     for (let i = 0; i <= rulerNumberOfSteps; i++) {
-      const scale = document.createElement("div");
-      scale.className = "scale";
-      scale.part = "scale";
+      const scale = document.createElement('div');
+      scale.className = 'scale';
+      scale.part = 'scale';
       scale.part.add(`scale-${this.orientation}`);
       scale.innerText = (min + i * step).toFixed(1);
       scale.style.left = `calc(${(i * 100) / rulerNumberOfSteps}% - 0.5em`;
@@ -226,58 +226,58 @@ class RangeSlider extends HTMLElement {
   }
 
   get min() {
-    return this.getAttribute("min");
+    return this.getAttribute('min');
   }
   get max() {
-    return this.getAttribute("max");
+    return this.getAttribute('max');
   }
   get step() {
-    return this.getAttribute("step");
+    return this.getAttribute('step');
   }
   get value1() {
-    return this.getAttribute("value1");
+    return this.getAttribute('value1');
   }
   get value2() {
-    return this.getAttribute("value2");
+    return this.getAttribute('value2');
   }
   get orientation() {
-    return this.getAttribute("orientation");
+    return this.getAttribute('orientation');
   }
   get invert() {
-    return this.getAttribute("invert") === "true";
+    return this.getAttribute('invert') === 'true';
   }
   get rulerNumberOfSteps() {
-    return this.getAttribute("ruler-number-of-steps");
+    return this.getAttribute('ruler-number-of-steps');
   }
 
   set min(value) {
-    this.setAttribute("min", value);
+    this.setAttribute('min', value);
   }
   set max(value) {
-    this.setAttribute("max", value);
+    this.setAttribute('max', value);
   }
   set step(value) {
-    this.setAttribute("step", value);
+    this.setAttribute('step', value);
   }
   set value1(value) {
-    this.setAttribute("value1", value);
+    this.setAttribute('value1', value);
   }
   set value2(value) {
-    this.setAttribute("value2", value);
+    this.setAttribute('value2', value);
   }
   set orientation(value) {
-    this.setAttribute("orientation", value);
+    this.setAttribute('orientation', value);
   }
   set rulerNumberOfSteps(value) {
-    this.setAttribute("ruler-number-of-steps", value);
+    this.setAttribute('ruler-number-of-steps', value);
   }
   set searchType(value) {
     // do not expose this to the user
-    if (value === "simple") {
-      this.shadowRoot.querySelector(".wrapper").appendChild(searchTypeSimple);
-      const simpleSearchDiv = this.shadowRoot.querySelector(".match");
-      simpleSearchDiv.addEventListener("click", (e) => {
-        if (e.target.tagName === "INPUT") {
+    if (value === 'simple') {
+      this.shadowRoot.querySelector('.wrapper').appendChild(searchTypeSimple);
+      const simpleSearchDiv = this.shadowRoot.querySelector('.match');
+      simpleSearchDiv.addEventListener('click', (e) => {
+        if (e.target.tagName === 'INPUT') {
           this.match = e.target.value;
           this.state.match = e.target.value;
           this._fireEvent(this.state);
@@ -287,15 +287,15 @@ class RangeSlider extends HTMLElement {
   }
 
   set invert(value) {
-    this.setAttribute("invert", value);
+    this.setAttribute('invert', value);
   }
 
   _fireEvent(detail) {
-    const eventKeys = ["from", "to", "match", "invert"];
+    const eventKeys = ['from', 'to', 'match', 'invert'];
     const eventData = Object.fromEntries(
       Object.entries(detail).filter((key) => eventKeys.includes(key[0]))
     );
-    const event = new CustomEvent("range-changed", {
+    const event = new CustomEvent('range-changed', {
       bubbles: true,
       detail: eventData,
     });
@@ -304,65 +304,65 @@ class RangeSlider extends HTMLElement {
   }
 
   connectedCallback() {
-    this.min = this.getAttribute("min") || 0;
-    this.max = this.getAttribute("max") || 1;
-    this.step = this.getAttribute("step") || 0.05;
-    this.value1 = this.getAttribute("value1") || 0;
-    this.value2 = this.getAttribute("value2") || 1;
-    this.orientation = this.getAttribute("orientation") || "horizontal";
+    this.min = this.getAttribute('min') || 0;
+    this.max = this.getAttribute('max') || 1;
+    this.step = this.getAttribute('step') || 0.05;
+    this.value1 = this.getAttribute('value1') || 0;
+    this.value2 = this.getAttribute('value2') || 1;
+    this.orientation = this.getAttribute('orientation') || 'horizontal';
 
-    this.invert = this.getAttribute("invert") === "true";
-    this.match = this.getAttribute("simple-search") || "any";
+    this.invert = this.getAttribute('invert') === 'true';
+    this.match = this.getAttribute('simple-search') || 'any';
 
     this.state.min = this.min;
     this.state.max = this.max;
     this.state.step = this.step;
-    this.state.from = "" + Math.min(+this.value1, +this.value2);
-    this.state.to = "" + Math.max(+this.value1, +this.value2);
-    this.state.invert = this.invert ? "1" : "0";
+    this.state.from = Math.min(+this.value1, +this.value2);
+    this.state.to = Math.max(+this.value1, +this.value2);
+    this.state.invert = this.invert ? '1' : '0';
     this.state.match = this.match;
 
     this.rulerNumberOfSteps = 10;
 
     this.shadowRoot
-      .querySelector(".meter")
-      .addEventListener("mouseup", this._meterMouseUp);
+      .querySelector('.meter')
+      .addEventListener('mouseup', this._meterMouseUp);
 
-    this.slider1.addEventListener("input", this._slider1Input);
+    this.slider1.addEventListener('input', this._slider1Input);
 
-    this.slider2.addEventListener("input", this._slider2Input);
+    this.slider2.addEventListener('input', this._slider2Input);
 
-    this.from.addEventListener("input", this._fromInput);
+    this.from.addEventListener('input', this._fromInput);
 
-    this.from.addEventListener("change", this._fromToChange);
+    this.from.addEventListener('change', this._fromToChange);
 
-    this.to.addEventListener("input", this._toInput);
+    this.to.addEventListener('input', this._toInput);
 
-    this.to.addEventListener("change", this._fromToChange);
+    this.to.addEventListener('change', this._fromToChange);
 
-    this.invertChk.addEventListener("change", this._invertChange);
+    this.invertChk.addEventListener('change', this._invertChange);
 
     this._fillSlider();
     this._reRenderRuler();
   }
 
   _meterMouseUp = (e) => {
-    if (e.target && e.target.nodeName === "INPUT") {
+    if (e.target && e.target.nodeName === 'INPUT') {
       this._fireEvent(this.state);
     }
   };
 
   _slider1Input = (e) => {
     this.value1 = +e.target.value;
-    this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
-    this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
+    this.state.from = Math.min(+this.slider1.value, +this.slider2.value);
+    this.state.to = Math.max(+this.slider1.value, +this.slider2.value);
 
     this._fillSlider.call(this);
   };
   _slider2Input = (e) => {
     this.value2 = +e.target.value;
-    this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
-    this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
+    this.state.from = Math.min(+this.slider1.value, +this.slider2.value);
+    this.state.to = Math.max(+this.slider1.value, +this.slider2.value);
 
     this._fillSlider.call(this);
   };
@@ -376,8 +376,8 @@ class RangeSlider extends HTMLElement {
       this.slider2.value = +e.target.value;
     }
 
-    this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
-    this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
+    this.state.from = Math.min(+this.slider1.value, +this.slider2.value);
+    this.state.to = Math.max(+this.slider1.value, +this.slider2.value);
     this._fillSlider.call(this);
   };
 
@@ -389,8 +389,8 @@ class RangeSlider extends HTMLElement {
     } else {
       this.slider1.value = +e.target.value;
     }
-    this.state.from = "" + Math.min(+this.slider1.value, +this.slider2.value);
-    this.state.to = "" + Math.max(+this.slider1.value, +this.slider2.value);
+    this.state.from = Math.min(+this.slider1.value, +this.slider2.value);
+    this.state.to = Math.max(+this.slider1.value, +this.slider2.value);
 
     this._fillSlider.call(this);
   };
@@ -401,22 +401,22 @@ class RangeSlider extends HTMLElement {
 
   _invertChange = (e) => {
     this.invert = e.target.checked;
-    this.state.invert = this.invert ? "1" : "0";
+    this.state.invert = this.invert ? '1' : '0';
     this._fireEvent(this.state);
   };
 
   disconnectedCallback() {
     this.shadowRoot
-      .querySelector(".meter")
-      .removeEventListener("mouseup", this._meterMouseUp);
-    this.slider1.removeEventListener("input", this._slider1Input);
-    this.slider2.removeEventListener("input", this._slider2Input);
-    this.from.removeEventListener("input", this._fromInput);
-    this.to.removeEventListener("input", this._toInput);
-    this.from.removeEventListener("change", this._fromToChange);
-    this.to.removeEventListener("cnahge", this._fromToChange);
-    this.invertChk.removeEventListener("change", this._invertChange);
+      .querySelector('.meter')
+      .removeEventListener('mouseup', this._meterMouseUp);
+    this.slider1.removeEventListener('input', this._slider1Input);
+    this.slider2.removeEventListener('input', this._slider2Input);
+    this.from.removeEventListener('input', this._fromInput);
+    this.to.removeEventListener('input', this._toInput);
+    this.from.removeEventListener('change', this._fromToChange);
+    this.to.removeEventListener('cnahge', this._fromToChange);
+    this.invertChk.removeEventListener('change', this._invertChange);
   }
 }
 
-customElements.define("range-slider", RangeSlider);
+customElements.define('range-slider', RangeSlider);
