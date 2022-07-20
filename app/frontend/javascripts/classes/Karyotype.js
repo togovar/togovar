@@ -213,6 +213,7 @@ const DEFAULT = {
     },
   },
 };
+const REGEXP = new RegExp(/([1-9]|1\d|2[0-2]|X|Y|MT):(\d+)-?(\d+)?/);
 
 export default class Karyotype {
   constructor(elm) {
@@ -230,6 +231,8 @@ export default class Karyotype {
 
     // events
     StoreManager.bind('karyotype', this);
+    StoreManager.bind('simpleSearchConditions', this);
+    StoreManager.bind('advancedSearchConditions', this);
     // ビューの開閉
     this.elm.querySelector('.header').addEventListener('click', () => {
       const karyotype = StoreManager.getData('karyotype');
@@ -353,5 +356,58 @@ export default class Karyotype {
     // リファレンスゲノム
     // 染色体の選択
     // 染色体の範囲の選択
+  }
+
+  simpleSearchConditions(conditions) {
+    const result = REGEXP.exec(conditions.term);
+    if (result) {
+      const location = { chromosome: result[1] };
+      if (result[3]) {
+        if (+result[2] > +result[3]) return;
+        location.position = { gte: +result[2], lte: +result[3] };
+      } else {
+        location.position = +result[2];
+      }
+      this._updateLocations([location]);
+    } else {
+      this._updateLocations([]);
+    }
+  }
+  advancedSearchConditions(conditions) {
+    const locations = [];
+    const takeOutLocations = (conditions) => {
+      Object.keys(conditions).forEach((key) => {
+        switch (key) {
+          case 'or':
+          case 'and':
+            conditions[key].forEach((condition) => takeOutLocations(condition));
+            break;
+          case 'location':
+            locations.push(conditions[key]);
+            break;
+        }
+      });
+    };
+    takeOutLocations(conditions);
+    this._updateLocations(locations);
+  }
+  _updateLocations(locations) {
+    this.elm.dataset.isSelectingChromosome = locations.length > 0;
+    if (locations.length === 0) return;
+    const collectedLocations = {};
+    locations.forEach((location) => {
+      if (!collectedLocations[location.chromosome])
+        collectedLocations[location.chromosome] = { positions: [] };
+      collectedLocations[location.chromosome].positions.push(
+        typeof location.position === 'number'
+          ? [location.position, location.position]
+          : [location.position.gte, location.position.lte]
+      );
+    });
+    this.chromosomeViews.forEach((chromosomeView) => {
+      chromosomeView.updateSelectedPositions(
+        collectedLocations[chromosomeView.no]?.positions ?? []
+      );
+    });
   }
 }

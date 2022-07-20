@@ -11,13 +11,13 @@ export default class ChromosomeView {
    */
   constructor(elm, no, map, maxLength) {
     //return;
-    this.no = no;
-    this.map = map;
-    this.elm = elm;
+    this._no = no;
+    this._map = map;
+    this._elm = elm;
 
-    this.elm.innerHTML = `
+    this._elm.innerHTML = `
       <div class="upper">
-        <p class="no">${this.no}</p>
+        <p class="no">${this._no}</p>
       </div>
       <div class="lower">
         <div class="selectedregion"></div>
@@ -28,9 +28,9 @@ export default class ChromosomeView {
     `;
 
     // 参照
-    this.filteredRegion = this.elm.querySelector('.lower > .filteredregion'); // TODO: フィルターで得られた範囲
-    this.displayRegion = this.elm.querySelector('.lower > .displayregion'); // 表示領域
-    this.selectedRegion = this.elm.querySelector('.lower > .selectedregion'); // 検索条件に region がある場合
+    this._filteredRegion = this._elm.querySelector('.lower > .filteredregion'); // TODO: フィルターで得られた範囲
+    this._displayRegion = this._elm.querySelector('.lower > .displayregion'); // 表示領域
+    this._selectedRegion = this._elm.querySelector('.lower > .selectedregion'); // 検索条件に region がある場合
 
     // 粒度の粗いマップ
     const lowMap = map.reduce((acc, subBand) => {
@@ -49,7 +49,7 @@ export default class ChromosomeView {
 
     // 染色体の描画
     this.length = map[map.length - 1].end;
-    this.svg = this.elm.querySelector('svg.chromosome');
+    this.svg = this._elm.querySelector('svg.chromosome');
     const chromosomeAreaHeight =
         elm.offsetHeight -
         elm.querySelector('.upper').offsetHeight -
@@ -105,7 +105,7 @@ export default class ChromosomeView {
     `;
 
     // draw subbands (drawing area)
-    for (const subBand of this.map) {
+    for (const subBand of this._map) {
       html += `
       <g
         class="subband"
@@ -148,27 +148,28 @@ export default class ChromosomeView {
     }
     this.svg.innerHTML = html + '</g>';
 
-    // イベント
+    // event
     StoreManager.bind('displayingRegionsOnChromosome', this);
 
     // sub bands
-    const subbands = Array.from(this.svg.querySelectorAll('g.subband'));
-    subbands.forEach((subband) => {
+    this._subbands = Array.from(this.svg.querySelectorAll('g.subband'));
+    this._subbands.forEach((subband) => {
       subband.addEventListener('click', () => {
-        this._selectBand(this.no, subband.dataset.start, subband.dataset.end);
+        this._selectBand(this._no, subband.dataset.start, subband.dataset.end);
       });
     });
 
     // bands
-    this.svg.querySelectorAll('g.band').forEach((band) => {
+    this._bands = this.svg.querySelectorAll('g.band');
+    this._bands.forEach((band) => {
       if (band.dataset.start) {
         const [start, end] = [+band.dataset.start, +band.dataset.end];
-        const includesSubbands = subbands.filter(
+        const includesSubbands = this._subbands.filter(
           (subband) =>
             start <= +subband.dataset.start && +subband.dataset.end <= end
         );
         band.addEventListener('click', () => {
-          this._selectBand(this.no, band.dataset.start, band.dataset.end);
+          this._selectBand(this._no, band.dataset.start, band.dataset.end);
         });
         band.addEventListener('mouseenter', () => {
           includesSubbands.forEach((subband) =>
@@ -203,26 +204,45 @@ export default class ChromosomeView {
     }
     // Karyotype 上の座標編集フィールドが廃止になったため、不要
     //StoreManager.setData('region__', {
-    //  chromosome: this.no,
+    //  chromosome: this._no,
     //  start: e.delegateTarget.dataset.start,
     //  end: e.delegateTarget.dataset.end
     //});
   }
 
   displayingRegionsOnChromosome(displayingRegions) {
-    if (displayingRegions[this.no]) {
+    if (displayingRegions[this._no]) {
       // 表示領域をハイライト
-      this.displayRegion.classList.add('-shown');
-      const displayRegion = displayingRegions[this.no],
+      this._displayRegion.classList.add('-shown');
+      const displayRegion = displayingRegions[this._no],
         chromosomeAreaHeight = this.svg.clientHeight - PADDING * 2,
         rate = chromosomeAreaHeight / this.length,
         regionHeight = displayRegion.end - displayRegion.start;
-      this.displayRegion.style.top = `${Math.floor(
+      this._displayRegion.style.top = `${Math.floor(
         PADDING + displayRegion.start * rate
       )}px`;
-      this.displayRegion.style.height = `${Math.ceil(regionHeight * rate)}px`;
+      this._displayRegion.style.height = `${Math.ceil(regionHeight * rate)}px`;
     } else {
-      this.displayRegion.classList.remove('-shown');
+      this._displayRegion.classList.remove('-shown');
     }
+  }
+
+  updateSelectedPositions(positions) {
+    this._subbands.forEach((subband) => {
+      const [start, end] = [+subband.dataset.start, +subband.dataset.end];
+      let intersection = 0;
+      positions.forEach((position) => {
+        intersection +=
+          (position[0] <= start && end <= position[0]) ||
+          (position[1] <= start && end <= position[1]) ||
+          (position[0] <= start && end <= position[1]);
+      });
+      if (intersection > 0) subband.classList.add('-selected');
+      else subband.classList.remove('-selected');
+    });
+  }
+
+  get no() {
+    return this._no;
   }
 }

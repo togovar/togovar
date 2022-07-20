@@ -53,6 +53,10 @@ $WIDTH_BAND_LABEL: 32px
       transition: width $GUI_DURATION, left $GUI_DURATION
       > .subband
         cursor: pointer
+        [data-is-selecting-chromosome="true"] &
+          opacity: .3
+        &.-selected
+          opacity: 1
         > .subbandrect
           fill: url(#chromosome-gneg)
           transition: fill $GUI_DURATION
@@ -73,6 +77,7 @@ $WIDTH_BAND_LABEL: 32px
           &.stalk
             fill: url(#chromosome-stalk)
         &:hover, &.-hover
+          opacity: 1
           > .subbandrect
             fill: $COLOR_SELECTED
       > .band
