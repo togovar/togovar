@@ -48,15 +48,15 @@ export default class ChromosomeView {
     }, []);
 
     // 染色体の描画
-    this.length = map[map.length - 1].end;
-    this.svg = this._elm.querySelector('svg.chromosome');
+    this._length = map[map.length - 1].end;
+    this._svg = this._elm.querySelector('svg.chromosome');
     const chromosomeAreaHeight =
         elm.offsetHeight -
         elm.querySelector('.upper').offsetHeight -
         PADDING * 2,
-      chromosomeHeight = chromosomeAreaHeight * (this.length / maxLength),
-      rate = chromosomeHeight / this.length;
-    this.svg.style.height = `${chromosomeHeight + PADDING * 2}px`;
+      chromosomeHeight = chromosomeAreaHeight * (this._length / maxLength),
+      rate = chromosomeHeight / this._length;
+    this._svg.style.height = `${chromosomeHeight + PADDING * 2}px`;
     let html = `
       <defs>
         <lineargradient id="chromosome-gneg">
@@ -146,13 +146,20 @@ export default class ChromosomeView {
       </g>
       `;
     }
-    this.svg.innerHTML = html + '</g>';
+    this._svg.innerHTML = html + '</g>';
 
     // event
     StoreManager.bind('displayingRegionsOnChromosome', this);
 
+    // whole
+    this._elm
+      .querySelector(':scope > .upper > .no')
+      .addEventListener('click', () => {
+        this._selectBand(this._no, 1, this._length);
+      });
+
     // sub bands
-    this._subbands = Array.from(this.svg.querySelectorAll('g.subband'));
+    this._subbands = Array.from(this._svg.querySelectorAll('g.subband'));
     this._subbands.forEach((subband) => {
       subband.addEventListener('click', () => {
         this._selectBand(this._no, subband.dataset.start, subband.dataset.end);
@@ -160,7 +167,7 @@ export default class ChromosomeView {
     });
 
     // bands
-    this._bands = this.svg.querySelectorAll('g.band');
+    this._bands = this._svg.querySelectorAll('g.band');
     this._bands.forEach((band) => {
       if (band.dataset.start) {
         const [start, end] = [+band.dataset.start, +band.dataset.end];
@@ -183,6 +190,8 @@ export default class ChromosomeView {
         });
       }
     });
+
+    this._svg.querySelector;
   }
 
   _selectBand(chr, start, end) {
@@ -215,8 +224,8 @@ export default class ChromosomeView {
       // 表示領域をハイライト
       this._displayRegion.classList.add('-shown');
       const displayRegion = displayingRegions[this._no],
-        chromosomeAreaHeight = this.svg.clientHeight - PADDING * 2,
-        rate = chromosomeAreaHeight / this.length,
+        chromosomeAreaHeight = this._svg.clientHeight - PADDING * 2,
+        rate = chromosomeAreaHeight / this._length,
         regionHeight = displayRegion.end - displayRegion.start;
       this._displayRegion.style.top = `${Math.floor(
         PADDING + displayRegion.start * rate
@@ -232,14 +241,30 @@ export default class ChromosomeView {
       const [start, end] = [+subband.dataset.start, +subband.dataset.end];
       let intersection = 0;
       positions.forEach((position) => {
-        intersection +=
-          (position[0] <= start && end <= position[0]) ||
-          (position[1] <= start && end <= position[1]) ||
-          (position[0] <= start && end <= position[1]);
+        intersection += this._intersection(position, [start, end]);
       });
       if (intersection > 0) subband.classList.add('-selected');
       else subband.classList.remove('-selected');
     });
+    this._bands.forEach((band) => {
+      const [start, end] = [+band.dataset.start, +band.dataset.end];
+      let intersection = 0;
+      positions.forEach((position) => {
+        intersection += this._intersection(position, [start, end]);
+      });
+      if (intersection > 0) band.classList.add('-selected');
+      else band.classList.remove('-selected');
+    });
+  }
+
+  _intersection(range1, range2) {
+    return range1[0] <= range2[1] && range2[1] <= range1[1];
+    // return (
+    //   (range1[0] <= range2[0] && range2[1] <= range1[0]) ||
+    //   (range1[1] <= range2[0] && range2[1] <= range1[1]) ||
+    //   (range1[0] <= range2[0] && range2[1] <= range1[1])
+    // );
+    // TODO: 精度が低い
   }
 
   get no() {
