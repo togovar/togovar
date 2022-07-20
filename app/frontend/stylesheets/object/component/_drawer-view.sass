@@ -21,28 +21,20 @@ $BOTTOM_CHROMOSOME: 16px
     cursor: pointer
     > .mark
       display: inline-block
-      width: 14px
-      height: 14px
       position: relative
       vertical-align: middle
-      margin-right: .2em
-      &:before, &:after
-        content: ""
-        display: block
-        width: 8px
-        position: absolute
-        border-top: solid 1.5px white
-        transition: transform $TRANSITION_DURATION, width $TRANSITION_DURATION
-      &:after
-        transform: translate(5px, 4px) rotate(45deg)
-        .-drawer-opened &
-          width: 11px
-          transform: translate(2px, 4px) rotate(225deg)
-      &:before
-        transform: translate(-1px, 4px) rotate(135deg)
-        .-drawer-opened &
-          width: 11px
-          transform: translate(2px, 4px) rotate(-45deg)
+      margin-right: .7em
+      margin-top: -.8em
+      width: 7px
+      height: 7px
+      border-top: solid 1px white
+      border-left: solid 1px white
+      transform: rotate(45deg)
+      transition: transform 0.2s, top 0.2s
+      transform: rotate(225deg)
+      .-drawer-opened &
+        transform: rotate(45deg)
+        margin-top: -.3em
     > .heading
       display: inline-block
   > .configuration
