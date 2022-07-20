@@ -1,8 +1,38 @@
 import { LitElement, css, html } from 'lit';
 import './OntologyCard';
-import { intersection } from '../../utils/intersection';
+import { directive } from 'lit-html';
 
 const DISEASE_ADVANCED_SEARCH_URL = `https://togovar-stg.biosciencedbc.jp/api/inspect/disease?node=`;
+
+const flip = directive((options = { duration: 300 }, onfinish) => (part) => {
+  const firstElement = part.committer.element;
+  // Don't animate first render
+  if (!firstElement.isConnected) {
+    return;
+  }
+  // Capture render position before update
+  const first = firstElement.getBoundingClientRect();
+  // Nodes may be re-used so identify via a key.
+  const container = firstElement.parentNode;
+  const key = firstElement.getAttribute('key');
+  requestAnimationFrame(() => {
+    // Find matching element.
+    const lastElement = container.querySelector(`[key="${key}"]`);
+    if (!lastElement) {
+      return;
+    }
+    // Capture render position after update
+    const last = lastElement.getBoundingClientRect();
+    // Calculate deltas and animate if something changed.
+    const topChange = first.top - last.top;
+    if (topChange !== 0) {
+      lastElement.animate(
+        [{ transform: `translate(${topChange}px, ${topChange}px)` }, {}],
+        options
+      ).onfinish = onfinish;
+    }
+  });
+});
 
 export default class CondDiseaseOntologyView extends LitElement {
   static get properties() {
@@ -15,7 +45,10 @@ export default class CondDiseaseOntologyView extends LitElement {
       data: {
         type: Object,
         state: true,
-        hasChanged(oldValue, newValue) {},
+        hasChanged(newVal, oldVal) {
+          console.log('hasChanged', oldVal, newVal);
+          this.children = newVal.children;
+        },
       },
       children: {
         type: Array,
@@ -111,70 +144,17 @@ export default class CondDiseaseOntologyView extends LitElement {
     return;
   }
 
-  // requestUpdate(name, oldValue) {
-  //   if (name === 'data') {
-  //     const newValue = this[name];
-  //     if (newValue) {
-  //       const ids = newValue.parents
-  //         .map((p) => p.id)
-  //         .concat(newValue.id)
-  //         .concat(newValue.children.map((c) => c.id));
+  duration = 1000;
 
-  //       const intersect = intersection(ids);
-  //       const oldParentsIds = oldValue.parents.map((p) => p.id);
-  //       const oldChildrenIds = oldValue.children.map((c) => c.id);
-  //       this.parents.enter = intersect.enter.filter(
-  //         (item) => !oldParentsIds.includes(item)
-  //       );
-  //       this.parents.exit = intersect.exit.filter(
-  //         (item) => !oldParentsIds.includes(item)
-  //       );
-  //       this.children.enter = intersect.enter.filter(
-  //         (item) => !oldChildrenIds.includes(item)
-  //       );
-  //       this.children.exit = intersect.exit.filter(
-  //         (item) => !oldChildrenIds.includes(item)
-  //       );
-
-  //       const exitNodes = this.querySelectorAll('ontology-card').filter(
-  //         (node) => intersect.exit.includes(node.id)
-  //       );
-  //       this._exitNodes(exitNodes);
-  //     }
+  // rotate() {
+  //   // async/debounce the animation
+  //   if (!this._scheduled) {
+  //     this._scheduled = setTimeout(() => {
+  //       this._scheduled = undefined;
+  //       shuffleArray(this.items);
+  //       this.requestUpdate();
+  //     }, this.duration);
   //   }
-  //   return super.requestUpdate(name, oldValue);
-  // }
-
-  // _exitNodes(nodeList) {
-  //   nodeList.forEach((node) => {
-  //     node.addEventListener('transitionend', () => {
-  //       node.remove();
-  //     });
-  //     node.classList.add('exit');
-  //   });
-  // }
-
-  // shouldUpdate(changed) {
-  //   console.log('shouldUpdate', changed);
-  //   if (
-  //     changed.has('data') &&
-  //     changed.get('data') &&
-  //     Object.keys(changed.get('data')).length
-  //   ) {
-  //     const changedData = changed.get('data');
-  //     console.log('changedData', changedData);
-  //     const ids = changedData.parents
-  //       .map((p) => p.label)
-  //       .concat(changedData.label)
-  //       .concat(changedData.children.map((c) => c.label));
-
-  //     console.log(intersection(ids));
-  //     //     const changedData = changed.get('data');
-  //     //     console.log('changedData', changedData);
-  //     //     console.log(this.querySelector(`#${changedData.id}`));
-  //     //   }
-  //   }
-  //   return true;
   // }
 
   render() {
@@ -190,6 +170,8 @@ export default class CondDiseaseOntologyView extends LitElement {
                   (parent) =>
                     html`
                       <ontology-card
+                        key="${parent.id}"
+                        ...=${flip({ duration: this.duration }, () => {})}
                         id="${parent.id}"
                         .data=${parent}
                         @card_selected=${(e) => this._fetchData(e.detail.id)}
@@ -209,6 +191,10 @@ export default class CondDiseaseOntologyView extends LitElement {
                   (child) =>
                     html`
                       <ontology-card
+                        key="${parent.id}"
+                        ...=${flip({ duration: this.duration }, () =>
+                          this.rotate()
+                        )}
                         .data=${child}
                         id="${child.id}"
                         @card_selected=${(e) => this._fetchData(e.detail.id)}

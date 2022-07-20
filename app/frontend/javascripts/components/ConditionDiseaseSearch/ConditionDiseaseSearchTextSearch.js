@@ -21,6 +21,7 @@ export default class ConditionTextSearch extends LitElement {
   }
 
   keepLastValues() {}
+
   connectedCallback() {
     super.connectedCallback();
   }
