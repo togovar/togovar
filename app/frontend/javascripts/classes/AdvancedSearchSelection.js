@@ -2,11 +2,10 @@ import SelectionArea from '@simonwep/selection-js';
 // import AdvancedSearchBuilderView from './AdvancedSearchBuilderView';
 
 export default class AdvancedSearchSelection {
-
   /**
-   * 
-   * @param {*} area 
-   * @param {AdvancedSearchBuilderView} builder 
+   *
+   * @param {*} area
+   * @param {AdvancedSearchBuilderView} builder
    */
   constructor(area, builder) {
     this._builder = builder;
@@ -15,11 +14,11 @@ export default class AdvancedSearchSelection {
       boundaries: ['#AdvancedSearchBuilderView'],
       selectables: [
         '#AdvancedSearchBuilderView > .inner > .advanced-search-condition-group-view.-root > .container .advanced-search-condition-group-view',
-        '#AdvancedSearchBuilderView > .inner > .advanced-search-condition-group-view.-root > .container .advanced-search-condition-item-view'
+        '#AdvancedSearchBuilderView > .inner > .advanced-search-condition-group-view.-root > .container .advanced-search-condition-item-view',
       ],
       startareas: ['html'],
       overlap: 'invert',
-      singleTap: {allow: false}
+      singleTap: { allow: false },
     });
     this._selectionArea.disable();
 
@@ -66,16 +65,18 @@ export default class AdvancedSearchSelection {
     */
   }
 
-
   // public methods
 
   getSelectingConditionViews() {
     const conditionEls = this._selectionArea.getSelection();
-    if (conditionEls.length > 0) { // sort
+    if (conditionEls.length > 0) {
+      // sort
       const siblingEls = Array.from(conditionEls[0].parentNode.childNodes);
-      conditionEls.sort((el1, el2) => siblingEls.indexOf(el1) - siblingEls.indexOf(el2));
+      conditionEls.sort(
+        (el1, el2) => siblingEls.indexOf(el1) - siblingEls.indexOf(el2)
+      );
     }
-    return conditionEls.map(el => el.delegate);
+    return conditionEls.map((el) => el.delegate);
   }
 
   deselectAllConditions() {
@@ -92,12 +93,15 @@ export default class AdvancedSearchSelection {
   selectConditionViews(conditionViews, deselectSelecting = true) {
     if (deselectSelecting) this.deselectAllConditions();
     // this._selectionArea
+    console.log(this.getSelectingConditionViews());
     for (const conditionView of conditionViews) {
       conditionView.select();
       this._selectionArea.select(conditionView.elm);
     }
     this._selectionArea.keepSelection();
-    this._builder.selectedConditionViews(this._selectionArea.getSelection().map(el => el.delegate));
+    this._builder.selectedConditionViews(
+      this._selectionArea.getSelection().map((el) => el.delegate)
+    );
   }
 
   deselectConditionViews(conditionViews) {
@@ -105,11 +109,10 @@ export default class AdvancedSearchSelection {
       conditionView.deselect();
       this._selectionArea.deselect(conditionView.elm);
     }
-    this._builder.selectedConditionViews(this._selectionArea.getSelection().map(el => el.delegate));
-  }  
-
+    this._builder.selectedConditionViews(
+      this._selectionArea.getSelection().map((el) => el.delegate)
+    );
+  }
 
   // private methods
-
-
 }

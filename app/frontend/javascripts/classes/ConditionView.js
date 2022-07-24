@@ -1,15 +1,13 @@
 // import {ADVANCED_CONDITIONS} from '../global.js';
 
 export default class ConditionItemView {
-
   /**
-   * 
-   * @param {AdvancedSearchBuilderView} builder 
-   * @param {ConditionItemView | ConditionGroupView} parentView 
+   *
+   * @param {AdvancedSearchBuilderView} builder
+   * @param {ConditionItemView | ConditionGroupView} parentView
    * @param {Node} referenceElm
    */
   constructor(type, builder, parentView, referenceElm) {
-
     this._type = type;
     this._builder = builder;
     // this._parentView = parentView;
@@ -35,22 +33,26 @@ export default class ConditionItemView {
     // });
   }
 
-
   // private methods
 
   _toggleSelecting(e) {
     e.stopImmediatePropagation();
-    if (e.shiftKey) {
-      if (this.isSelecting) {
-        this._builder.selection.deselectConditionViews([this]);
-      } else {
-        this._builder.selection.selectConditionViews([this], false);
-      }
+    if (this.isSelecting) {
+      this._builder.selection.deselectConditionViews([this]);
     } else {
-      this._builder.selection.selectConditionViews([this], true);
+      this._builder.selection.selectConditionViews([this], false);
     }
-  }
 
+    // if (e.shiftKey) {
+    //   if (this.isSelecting) {
+    //     this._builder.selection.deselectConditionViews([this]);
+    //   } else {
+    //     this._builder.selection.selectConditionViews([this], false);
+    //   }
+    // } else {
+    //   this._builder.selection.selectConditionViews([this], true);
+    // }
+  }
 
   // public methods
 
@@ -66,7 +68,6 @@ export default class ConditionItemView {
     this.parentView.removeConditionView(this);
     delete this;
   }
-
 
   // accessor
 
@@ -95,7 +96,8 @@ export default class ConditionItemView {
    * @return {ConditionItemView | ConditionGroupView}
    */
   get parentView() {
-    return this.elm.parentNode.closest('.advanced-search-condition-view').delegate;
+    return this.elm.parentNode.closest('.advanced-search-condition-view')
+      .delegate;
   }
 
   /**
@@ -114,5 +116,4 @@ export default class ConditionItemView {
     }
     return depth;
   }
-
 }
