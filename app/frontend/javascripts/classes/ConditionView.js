@@ -38,9 +38,9 @@ export default class ConditionItemView {
   _toggleSelecting(e) {
     e.stopImmediatePropagation();
     if (this.isSelecting) {
-      this._builder.selection.deselectConditionViews([this]);
+      this._builder.selection.deselectConditionView(this);
     } else {
-      this._builder.selection.selectConditionViews([this], false);
+      this._builder.selection.selectConditionView(this, false);
     }
 
     // if (e.shiftKey) {

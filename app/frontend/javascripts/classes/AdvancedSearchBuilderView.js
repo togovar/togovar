@@ -37,6 +37,7 @@ export default class AdvancedSearchBuilderView {
    * @param {Array} conditionViews
    */
   selectedConditionViews(conditionViews) {
+    console.log(conditionViews);
     // change status
     let canUngroup = false;
     let canCopy = false;
@@ -92,14 +93,16 @@ export default class AdvancedSearchBuilderView {
       conditionViews,
       referenceElm
     );
-    this._selection.selectConditionViews([conditionGroupView], true);
+    this._selection.selectConditionView(conditionGroupView, true);
     this.changeCondition();
   }
 
   ungroup() {
     const conditionViews = this._selection.getSelectingConditionViews();
     // deselect selecting group
-    this._selection.deselectConditionViews(conditionViews);
+    conditionViews.forEach((conditionView) => {
+      this._selection.deselectConditionView(conditionView);
+    });
     // ungroup
     conditionViews[0].ungroup();
     this.changeCondition();
@@ -126,8 +129,8 @@ export default class AdvancedSearchBuilderView {
       views ?? this._selection.getSelectingConditionViews();
     for (const view of conditionViews) {
       view.remove();
+      this._selection.deselectConditionView(view);
     }
-    this._selection.deselectConditionViews(conditionViews);
     this.changeCondition();
   }
 
