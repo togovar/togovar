@@ -90,25 +90,22 @@ export default class AdvancedSearchSelection {
    * @param {Array} conditionViews
    * @param {Boolean} deselectSelecting
    */
-  selectConditionViews(conditionViews, deselectSelecting = true) {
+  selectConditionView(conditionView, deselectSelecting = true) {
     if (deselectSelecting) this.deselectAllConditions();
     // this._selectionArea
     console.log(this.getSelectingConditionViews());
-    for (const conditionView of conditionViews) {
-      conditionView.select();
-      this._selectionArea.select(conditionView.elm);
-    }
+    // checks if an already selected element is a sibling element
+    conditionView.select();
+    this._selectionArea.select(conditionView.elm);
     this._selectionArea.keepSelection();
     this._builder.selectedConditionViews(
       this._selectionArea.getSelection().map((el) => el.delegate)
     );
   }
 
-  deselectConditionViews(conditionViews) {
-    for (const conditionView of conditionViews) {
-      conditionView.deselect();
-      this._selectionArea.deselect(conditionView.elm);
-    }
+  deselectConditionView(conditionView) {
+    conditionView.deselect();
+    this._selectionArea.deselect(conditionView.elm);
     this._builder.selectedConditionViews(
       this._selectionArea.getSelection().map((el) => el.delegate)
     );
