@@ -37,7 +37,6 @@ export default class AdvancedSearchBuilderView {
    * @param {Array} conditionViews
    */
   selectedConditionViews(conditionViews) {
-    console.log(conditionViews);
     // change status
     let canUngroup = false;
     let canCopy = false;
@@ -48,7 +47,9 @@ export default class AdvancedSearchBuilderView {
     // can delete
     this._elm.dataset.canDelete = conditionViews.length > 0;
     // can group
-    this._elm.dataset.canGroup = conditionViews.length > 1;
+    this._elm.dataset.canGroup =
+      conditionViews.length > 1 &&
+      conditionViews[0].siblingElms.length > conditionViews.length;
     // can ungroup
     this._elm.dataset.canUngroup = canUngroup;
     // can copy
