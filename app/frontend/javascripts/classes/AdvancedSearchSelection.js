@@ -95,7 +95,7 @@ export default class AdvancedSearchSelection {
 
     // checks if an already selected element is a sibling element
     const existingConditionViews = this.getSelectingConditionViews();
-    const siblings = [...conditionView.elm.parentNode.childNodes];
+    const siblings = conditionView.siblingElms;
     existingConditionViews.forEach((view) => {
       if (siblings.indexOf(view.elm) === -1) this.deselectConditionView(view);
     });

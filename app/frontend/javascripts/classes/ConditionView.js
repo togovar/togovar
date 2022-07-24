@@ -78,6 +78,10 @@ export default class ConditionItemView {
     return this._elm;
   }
 
+  get siblingElms() {
+    return [...this._elm.parentNode.childNodes];
+  }
+
   /**
    * @return {Number}
    */
