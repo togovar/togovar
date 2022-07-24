@@ -92,9 +92,14 @@ export default class AdvancedSearchSelection {
    */
   selectConditionView(conditionView, deselectSelecting = true) {
     if (deselectSelecting) this.deselectAllConditions();
-    // this._selectionArea
-    console.log(this.getSelectingConditionViews());
+
     // checks if an already selected element is a sibling element
+    const existingConditionViews = this.getSelectingConditionViews();
+    const siblings = [...conditionView.elm.parentNode.childNodes];
+    existingConditionViews.forEach((view) => {
+      if (siblings.indexOf(view.elm) === -1) this.deselectConditionView(view);
+    });
+
     conditionView.select();
     this._selectionArea.select(conditionView.elm);
     this._selectionArea.keepSelection();
