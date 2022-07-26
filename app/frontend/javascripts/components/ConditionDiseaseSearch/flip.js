@@ -34,6 +34,7 @@ class Flip extends AsyncDirective {
       ...options,
     };
 
+    console.log('part', part);
     if (this.element !== part.element) {
       this.element = part.element;
       requestAnimationFrame(() => {
@@ -54,6 +55,7 @@ class Flip extends AsyncDirective {
     Promise.resolve().then(() => this.prepareToFlip());
   }
 
+  // instantly after dom update by $repeat
   prepareToFlip() {
     // when repeat removes the element from the DOM, it will be added to disconnectedRects
     // and when it is connected (into another div), it will search for it in disconnectedRects and use it as first position
@@ -80,9 +82,13 @@ class Flip extends AsyncDirective {
         // position: 'relative', transform: 'translate(0px, 0px)'
       },
       () => {
+        if (this.clone) {
+          console.log('removing clone');
+          this.clone.remove();
+        }
         this.element.removeAttribute('style');
         // return element to its parent
-        newParent.appendChild(this.element);
+        // newParent.appendChild(this.element);
         // this.cardContainer.appendChild(this.element);
         this.boundingRect = this.element.getBoundingClientRect();
       }
@@ -91,7 +97,7 @@ class Flip extends AsyncDirective {
 
   applyStyles(styleMap) {
     for (const property in styleMap) {
-      this.element.style[property] = styleMap[property];
+      this.clone.style[property] = styleMap[property];
     }
   }
 
@@ -112,14 +118,25 @@ class Flip extends AsyncDirective {
       return;
     }
 
+    // create clone and append it to top level
+
+    this.clone = this.element.cloneNode(true);
+
+    for (let i in this.element.properties) {
+      this.clone[i] = this.element[i];
+    }
+    this.clone.__data = this.element.__data;
+
+    this.container.appendChild(this.clone);
+
     const filteredListener = (event) => {
-      if (event.target === this.element) {
+      if (event.target === this.clone) {
         listener(event);
-        this.element.removeEventListener('transitionend', filteredListener);
+        this.clone.removeEventListener('transitionend', filteredListener);
       }
     };
 
-    this.element.addEventListener('transitionend', filteredListener);
+    this.clone.addEventListener('transitionend', filteredListener);
 
     //this.container.appendChild(this.element);
 
@@ -136,8 +153,6 @@ class Flip extends AsyncDirective {
 
     // 2. append the element to the parent's parent
     // 3. apply the translate to the element with position:absolute
-
-    this.container.appendChild(this.element);
 
     this.applyStyles({
       ...firstStyleMap,
@@ -172,10 +187,9 @@ class Flip extends AsyncDirective {
         opacity: '0.5',
       },
       () => {
-        console.log('removing element', this.element);
+        this.clone.remove();
         this.element.remove();
         disconnectedRects.delete(this.id);
-        parentDivs.delete(this.id);
       },
       true
     );
@@ -190,7 +204,6 @@ class Flip extends AsyncDirective {
     this.boundingRect = this.element.getBoundingClientRect();
     if (typeof this.id !== 'undefined') {
       disconnectedRects.set(this.id, this.boundingRect);
-      parentDivs.set(this.id, this.element.parentElement);
       requestAnimationFrame(() => {
         if (disconnectedRects.has(this.id)) {
           this.remove();
