@@ -22,6 +22,15 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     <header>Set location</header>
     <div class="body">
       <div class="row">
+        <label>
+          <input type="radio" name="range-or-position" value="range" checked> Range
+        </label>
+        &nbsp;&nbsp;
+        <label>
+          <input type="radio" name="range-or-position" value="position"> Position
+        </label>
+      </div>
+      <div class="row">
         <label class="chromosome">
           <span class="label">Chr.</span>
           <span class="form">
@@ -34,7 +43,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
           <span class="label">&nbsp;:&nbsp;&nbsp;</span>
         </label>
         <label class="position">
-          <span class="form range-inputs-view">
+          <span class="form range-inputs-view" data-type="range">
             <input class="start" type="number" min="1" placeholder="1">
             <span class="line"></span>
             <input class="end" type="number" min="1">
@@ -45,15 +54,26 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     );
 
     // references
-    const row = this._el.querySelector(':scope > .body > .row');
-    this._chr = row.querySelector(':scope > .chromosome > .form > select');
+    const rows = this._el.querySelectorAll(':scope > .body > .row');
+    this._chr = rows[1].querySelector(':scope > .chromosome > .form > select');
+    this._rangeInputView = rows[1].querySelector(
+      ':scope > .position > .range-inputs-view'
+    );
     const inputs = Array.from(
-      row.querySelectorAll(':scope > .position > .form > input')
+      this._rangeInputView.querySelectorAll(':scope > input')
     );
     this._start = inputs.find((input) => input.classList.contains('start'));
     this._end = inputs.find((input) => input.classList.contains('end'));
 
     // attach events
+    this._el
+      .querySelectorAll(':scope > .body > .row:nth-child(1) > label > input')
+      .forEach((input) => {
+        input.addEventListener('change', (e) => {
+          this._rangeInputView.dataset.type = e.target.value;
+          this._update();
+        });
+      });
     [this._chr, ...inputs].forEach((input) => {
       input.addEventListener('change', (e) => {
         this._update(e);
@@ -87,18 +107,27 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
   }
 
   get isValid() {
+    // this._rangeInputView.dataset.type === 'range'
     if (this._chr.value === '') {
       return false;
-    } else if (this._start.value !== '' && this._end.value !== '') {
-      return +this._start.value < +this._end.value;
     } else {
-      return this._start.value !== '' || this._end.value !== '';
+      switch (this._rangeInputView.dataset.type) {
+        case 'range':
+          return (
+            this._start.value !== '' &&
+            this._end.value !== '' &&
+            +this._start.value < +this._end.value
+          );
+        case 'position':
+          return this._start.value !== '';
+      }
     }
   }
 
   // private methods
 
   _update(e) {
+    // if chromosome changed, change ranges
     if (e?.target === this._chr) {
       // reset input
       const reference = this._karyotype.reference;
@@ -115,8 +144,10 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     const valueView = this._valueViews[0];
     if (this.isValid) {
       const value = `${this._chr.value}:${this._start.value}${
-        this._start.value && this._end.value ? '-' : ''
-      }${this._end.value}`;
+        this._rangeInputView.dataset.type === 'position'
+          ? ''
+          : `-${this._end.value}`
+      }`;
       if (valueView) {
         //update
         valueView.label = value;
