@@ -71,33 +71,28 @@ export default class CondDiseaseOntologyView extends LitElement {
       padding: 10px;
     }
     .search-field-view-content {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      height: 400px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-gap: 1em;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
     }
 
     .cards-container {
-      max-height: 400px;
+      position: relative;
+      height: 400px;
       overflow-y: auto;
       display: flex;
-      gap: 7px;
       flex-direction: column;
-      justify-content: start;
-      align-items: center;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 7px;
     }
-    .exit {
-      animation-duration: 1s;
-      animation-name: slideout;
-    }
-    @keyframes slideout {
-      from {
-        opacity: 1;
-      }
-      to {
-        opacity: 0.1;
-      }
+
+    ontology-card {
+      display: block;
+      position: relative;
     }
   `;
 
@@ -143,42 +138,12 @@ export default class CondDiseaseOntologyView extends LitElement {
     return;
   }
 
-  duration = 1000;
-
-  flip(firstStyleMap, lastStyleMap, listener, removing) {
-    console.log('this', this.getBoundingClientRect());
-    const previous = this.boundingRect;
-    this.boundingRect = this.getBoundingClientRect();
-    const deltaX = previous.x - this.boundingRect.x;
-    const deltaY = previous.y - this.boundingRect.y;
-    if (!deltaX && !deltaY && !removing) {
-      return;
-    }
-    const filteredListener = (event) => {
-      if (event.target === this) {
-        listener(event);
-        this.removeEventListener('transitionend', filteredListener);
-      }
-    };
-    this.addEventListener('transitionend', filteredListener);
-    const translate = `translate(${deltaX}px, ${deltaY}px)`;
-    this.applyStyles({
-      ...firstStyleMap,
-      transform: `${translate} ${firstStyleMap.transform ?? ''}`,
-    });
-    requestAnimationFrame(() => {
-      const transition = `transform ${this.options.duration}ms ${this.options.timingFunction} ${this.options.delay}ms`;
-      this.applyStyles({
-        ...lastStyleMap,
-        transition,
-        transform: `${removing ? `${translate} ` : ''}${
-          lastStyleMap.transform ?? ''
-        }`,
-      });
-    });
-  }
-
   render() {
+    const options = {
+      duration: 1000,
+      timingFunction: 'ease-out', // 'steps(5, end)'
+    };
+
     return html`
       <div class="search-field-view">
         <h2>Advanced Search</h2>
@@ -186,37 +151,46 @@ export default class CondDiseaseOntologyView extends LitElement {
           ? (this.loading && html`<div>Loading...</div>`) ||
             (this.error && html`<div>Error</div>`)
           : html`<div class="search-field-view-content">
-              <div class="cards-container">
+              <div class="cards-container parents" id="parents">
                 ${repeat(
                   this.data.parents,
-                  (i) => i.id,
-                  (i) =>
+                  (parent) => parent.id,
+                  (parent) =>
                     html`<ontology-card
-                      key="${i.id}"
-                      ${flip()}
-                      .data=${i}
+                      key="${parent.id}"
+                      ${flip({ id: parent.id, options })}
+                      .data=${parent}
                       @card_selected=${(e) => this._fetchData(e.detail.id)}
                     />`
                 )}
               </div>
-              <div class="cards-container main">
-                <ontology-card
-                  id="${this.data.id}"
-                  .data=${this.data}
-                  selected
-                />
+              <div class="cards-container main" id="main">
+                ${repeat(
+                  [this.data],
+                  (data) => data.id,
+                  (data) => html`
+                    <ontology-card
+                      key="${data.id}"
+                      id="${data.id}"
+                      .data=${data}
+                      ${flip({ id: data.id, options })}
+                    />
+                  `
+                )}
               </div>
-              <div class="cards-container">
-                ${this.data.children.map(
-                  (child) =>
-                    html`
-                      <ontology-card
-                        key="${parent.id}"
-                        .data=${child}
-                        id="${child.id}"
-                        @card_selected=${(e) => this._fetchData(e.detail.id)}
-                      />
-                    `
+              <div class="cards-container children" id="children">
+                ${repeat(
+                  this.data.children,
+                  (child) => child.id,
+                  (child) => html`
+                    <ontology-card
+                      key="${child.id}"
+                      .data=${child}
+                      id="${child.id}"
+                      ${flip({ id: child.id, options })}
+                      @card_selected=${(e) => this._fetchData(e.detail.id)}
+                    />
+                  `
                 )}
               </div>
             </div>`}
