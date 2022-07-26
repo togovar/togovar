@@ -1,28 +1,116 @@
 {
   "conditions": {
-    "type": {
-      "label": "Variant type",
+    "dataset": {
+      "label": "Alternative allele frequency/count",
+      "type": "peculiar",
+      "values": [
+        {
+          "id": 1,
+          "value": "jga_ngs",
+          "label": "JGA NGS",
+          "description": "Japanese Genotype-phenotype Archive"
+        },
+        {
+          "id": 2,
+          "value": "jga_snp",
+          "label": "JGA SNP",
+          "description": "SNP-chip data in the NBDC Human Database/Japanese Genotype-phenotype Archive"
+        },
+        {
+          "id": 3,
+          "value": "hgvd",
+          "label": "HGVD",
+          "description": "Human Genetic Variation Database"
+        },
+        {
+          "id": 4,
+          "value": "tommo",
+          "label": "ToMMo 8.3KJPN",
+          "description": "ToMMo 8.3KJPN Allele Frequency Panel"
+        },
+        {
+          "id": 5,
+          "value": "gem_j_wga",
+          "label": "GEM-J WGA",
+          "description": "GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel"
+        },
+        {
+          "id": 6,
+          "value": "gnomad_genomes",
+          "label": "gnomAD genomes",
+          "description": ""
+        },
+        {
+          "id": 7,
+          "value": "gnomad_exomes",
+          "label": "gnomAD exomes",
+          "description": ""
+        }
+      ]
+    },
+    "significance": {
+      "label": "Clinical significance",
       "type": "enumeration",
       "values": [
         {
-          "value": "snv",
-          "label": "SNV"
+          "value": "NC",
+          "label": "Not in Clinvar"
         },
         {
-          "value": "ins",
-          "label": "Insertion"
+          "value": "P",
+          "label": "Pathogenic"
         },
         {
-          "value": "del",
-          "label": "Deletion"
+          "value": "LP",
+          "label": "Likely pathogenic"
         },
         {
-          "value": "indel",
-          "label": "Indel"
+          "value": "US",
+          "label": "Uncertain significance"
         },
         {
-          "value": "sub",
-          "label": "Substitution"
+          "value": "LB",
+          "label": "Likely benign"
+        },
+        {
+          "value": "B",
+          "label": "Benign"
+        },
+        {
+          "value": "CI",
+          "label": "Conflicting interpretations of pathogenicity"
+        },
+        {
+          "value": "DR",
+          "label": "Drug response"
+        },
+        {
+          "value": "A",
+          "label": "Association"
+        },
+        {
+          "value": "RF",
+          "label": "Risk factor"
+        },
+        {
+          "value": "PR",
+          "label": "Protective"
+        },
+        {
+          "value": "AF",
+          "label": "Affects"
+        },
+        {
+          "value": "O",
+          "label": "Other"
+        },
+        {
+          "value": "NP",
+          "label": "Not provided"
+        },
+        {
+          "value": "AN",
+          "label": "Association not found"
         }
       ]
     },
@@ -317,131 +405,43 @@
         }
       ]
     },
-    "gene_symbol": {
-      "label": "Gene symbol",
-      "type": "text"
-    },
-    "significance": {
-      "label": "Clinical significance",
-      "type": "enumeration",
-      "values": [
-        {
-          "value": "NC",
-          "label": "Not in Clinvar"
-        },
-        {
-          "value": "P",
-          "label": "Pathogenic"
-        },
-        {
-          "value": "LP",
-          "label": "Likely pathogenic"
-        },
-        {
-          "value": "US",
-          "label": "Uncertain significance"
-        },
-        {
-          "value": "LB",
-          "label": "Likely benign"
-        },
-        {
-          "value": "B",
-          "label": "Benign"
-        },
-        {
-          "value": "CI",
-          "label": "Conflicting interpretations of pathogenicity"
-        },
-        {
-          "value": "DR",
-          "label": "Drug response"
-        },
-        {
-          "value": "A",
-          "label": "Association"
-        },
-        {
-          "value": "RF",
-          "label": "Risk factor"
-        },
-        {
-          "value": "PR",
-          "label": "Protective"
-        },
-        {
-          "value": "AF",
-          "label": "Affects"
-        },
-        {
-          "value": "O",
-          "label": "Other"
-        },
-        {
-          "value": "NP",
-          "label": "Not provided"
-        },
-        {
-          "value": "AN",
-          "label": "Association not found"
-        }
-      ]
-    },
     "disease": {
       "label": "Disease",
       "type": "text"
     },
-    "dataset": {
-      "label": "Alternative allele frequency/count",
-      "type": "peculiar",
-      "values": [
-        {
-          "id": 1,
-          "value": "jga_ngs",
-          "label": "JGA NGS",
-          "description": "Japanese Genotype-phenotype Archive"
-        },
-        {
-          "id": 2,
-          "value": "jga_snp",
-          "label": "JGA SNP",
-          "description": "SNP-chip data in the NBDC Human Database/Japanese Genotype-phenotype Archive"
-        },
-        {
-          "id": 3,
-          "value": "hgvd",
-          "label": "HGVD",
-          "description": "Human Genetic Variation Database"
-        },
-        {
-          "id": 4,
-          "value": "tommo",
-          "label": "ToMMo 8.3KJPN",
-          "description": "ToMMo 8.3KJPN Allele Frequency Panel"
-        },
-        {
-          "id": 5,
-          "value": "gem_j_wga",
-          "label": "GEM-J WGA",
-          "description": "GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel"
-        },
-        {
-          "id": 6,
-          "value": "gnomad_genomes",
-          "label": "gnomAD genomes",
-          "description": ""
-        },
-        {
-          "id": 7,
-          "value": "gnomad_exomes",
-          "label": "gnomAD exomes",
-          "description": ""
-        }
-      ]
+    "gene_symbol": {
+      "label": "Gene symbol",
+      "type": "text"
     },
     "location": {
       "label": "Location",
       "type": "peculiar"
+    },
+    "type": {
+      "label": "Variant type",
+      "type": "enumeration",
+      "values": [
+        {
+          "value": "snv",
+          "label": "SNV"
+        },
+        {
+          "value": "ins",
+          "label": "Insertion"
+        },
+        {
+          "value": "del",
+          "label": "Deletion"
+        },
+        {
+          "value": "indel",
+          "label": "Indel"
+        },
+        {
+          "value": "sub",
+          "label": "Substitution"
+        }
+      ]
     }
   }
 }
