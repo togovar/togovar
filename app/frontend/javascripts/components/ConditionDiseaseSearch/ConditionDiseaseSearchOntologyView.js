@@ -1,4 +1,4 @@
-import { LitElement, css, html } from 'lit';
+import { LitElement, css, html, nothing } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 
 import { flip } from './flip';
@@ -155,27 +155,33 @@ export default class CondDiseaseOntologyView extends LitElement {
                 ${repeat(
                   this.data.parents,
                   (parent) => parent.id,
-                  (parent) =>
-                    html`<ontology-card
+                  (parent) => {
+                    return html`<ontology-card
                       key="${parent.id}"
+                      id="${parent.id}"
                       ${flip({ id: parent.id, options })}
                       .data=${parent}
                       @card_selected=${(e) => this._fetchData(e.detail.id)}
-                    />`
+                      selected
+                    />`;
+                  }
                 )}
               </div>
               <div class="cards-container main" id="main">
                 ${repeat(
                   [this.data],
                   (data) => data.id,
-                  (data) => html`
-                    <ontology-card
-                      key="${data.id}"
-                      id="${data.id}"
-                      .data=${data}
-                      ${flip({ id: data.id, options })}
-                    />
-                  `
+                  (data) => {
+                    return html`
+                      <ontology-card
+                        key="${data.id}"
+                        id="${data.id}"
+                        .data=${data}
+                        ${flip({ id: data.id, options })}
+                        selected
+                      />
+                    `;
+                  }
                 )}
               </div>
               <div class="cards-container children" id="children">
@@ -189,6 +195,7 @@ export default class CondDiseaseOntologyView extends LitElement {
                       id="${child.id}"
                       ${flip({ id: child.id, options })}
                       @card_selected=${(e) => this._fetchData(e.detail.id)}
+                      selected
                     />
                   `
                 )}
