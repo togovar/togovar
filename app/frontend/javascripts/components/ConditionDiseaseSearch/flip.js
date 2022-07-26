@@ -121,6 +121,7 @@ class Flip extends AsyncDirective {
     // create clone and append it to top level
 
     this.clone = this.element.cloneNode(true);
+    this.element.style.opacity = 0;
 
     for (let i in this.element.properties) {
       this.clone[i] = this.element[i];
