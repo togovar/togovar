@@ -79,7 +79,7 @@ block content
           #g2.question-answer
             h4.question 動画を使った説明はありますか。
             .answer
-              p                 
+              p
                 a(href='https://togotv.dbcls.jp/') TogoTV
                 | をご覧ください。TogoVarに関する動画は
                 a(href='https://togotv.dbcls.jp/result.html?type=manual&page=1&query=TogoVar') こちら
@@ -553,8 +553,59 @@ block content
             h4.question 日本人集団とその他の集団で代替アレル頻度が異なるバリアントを検索できますか。
             .answer
               p
-                |はい。
+                | はい。
                 a.hyper-text.-external(target='_blank', href='/?mode=advanced') Advanced search
-                |による検索手順は
-                a(target='_blank', href='https://docs.google.com/document/d/1koUGuQFjF9W2NF4zCaPg7-xvbSKyEjGHmpBGb5layrs/edit') 日本人集団とgnomADの間で代替アレル頻度差のあるバリアントの検索方法
-                | をご覧ください。
+                | による検索が可能です。
+                p
+                | 代替アレル頻度の比較対象のバリアントは以下の通りです。
+                ul
+                  li 日本人集団はGEM-J WGAまたは8.3KJPNのいずれかに含まれるバリアント
+                  li gnomADはgnomaAD genomesまたはexomesのいずれかに含まれるバリアント
+                p
+                | 日本人集団の代替アレル頻度が0.3以上、gnomAD集団は0.05以下のバリアントを検索します。
+                ol
+                  li 画面上部のAdvanced searchタブを選択します。
+                    img(src=require("../../../images/help-image1.png").default alt="help-image1")
+                  li Add conditionメニューからAlternative allele frequency/countを選択します。
+                    img(src=require("../../../images/help-image2.png").default alt="help-image2")
+                  li 以下の画面でデータセット(GEM-J WGA)と代替アレル頻度(>=0.3)を指定します。代替アレル数でも指定できます。
+                    img(src=require("../../../images/help-image3.png").default alt="help-image3")
+                  li OKボタンを押下します。検索条件が設定されました。
+                    img(src=require("../../../images/help-image4.png").default alt="help-image4")
+                  li 同様の手順でデータセットToMMo 8.3KJPN、gnomAD genomes、gnomAD exomesについても検索条件を設定します。
+                    img(src=require("../../../images/help-image5.png").default alt="help-image5")
+                  li 日本人集団（GEM-J WGAとToMMo 8.3KJPN)の検索条件をOR結合にします。
+                    ol.lower-latin
+                      li SHIFTを押下したしたまGEM-J WGAとToMMo 8.3KJPNを選択します。選択状態では黄枠が表示されます。
+                        img(src=require("../../../images/help-image6.png").default alt="help-image6")
+                      li Groupメニューを選択します。選択した２つがOR条件になります。なお、AND条件に変更する場合は、左端のORアイコンをクリックします。
+                        img(src=require("../../../images/help-image7.png").default alt="help-image7")
+                      li 同様にgnomAD genomesとgnomAD exomesもOR条件にします。
+                        img(src=require("../../../images/help-image8.png").default alt="help-image8")
+                p
+                | 最終的には以下の検索条件になります。
+                p
+                | ((freq(GEM-J WGA) >= 0.3) OR (freq(ToMMo 8.3KJPN) >= 0.3))
+                br
+                |  AND
+                br
+                |  (freq(gnomAD genomes) <= 0.05) OR (freq(gnomAD exomes) <= 0.05))
+                p
+                | 検索条件が変更される度に検索が自動的に実行され、条件に合致するバリアントの一覧が表示されます。
+                img(src=require("../../../images/help-image9.png").default alt="help-image9")
+                p
+                | メニューの機能
+                ul
+                  li Add condition: 検索条件を追加する
+                  li Group: 選択された検索条件(黄枠表示)をOR条件で結合します。ORアイコンをクリックするとAND結合に変更できます。
+                  li Ungroup：Groupとは反対の操作です。
+                  li Delete:選択した 検索条件を削除します。
+                p
+                | アイコンの機能
+                ul
+                  li
+                    img(src=require("../../../images/help-pencil.png").default alt="help-pencil")
+                    | ：検索条件を編集します。
+                  li
+                    img(src=require("../../../images/help-cross.png").default alt="help-cross")
+                    | ：検索条件を編集します。
