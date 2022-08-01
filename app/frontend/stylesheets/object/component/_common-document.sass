@@ -71,36 +71,36 @@
           position: relative
           &:before
             content: ""
-            display: block
+            display: inline-block
             width: 5px
             height: 5px
             border-radius: 100%
             background-color: $COLOR_KEY
-            position: absolute
-            left: .2em
-            top: .85em
+            position: relative
+            left: -7px
+            top: -3px
       .ordered-list
-        counter-reset: section
+        counter-reset: item
         list-style: none
         padding-inline-start: 0
         > li
           position: relative
           padding: 4px 0 4px 2em
           &:before
-            counter-increment: section
-            content: counter(section)
+            content: counters(item, ".") " "
+            counter-increment: item
             position: absolute
             display: block
-            width: 18px
             height: 18px
             line-height: 18px
             text-align: center
-            border-radius: 100%
+            border-radius: 9px
             background-color: $COLOR_KEY
             color: white
-            left: 0
-            top: 6px
+            right: calc( 100% - 21px )
+            top: 7px
             font-weight: bold
+            padding: 0 6px
           + li
             margin-top: 1em
           > .heading
@@ -116,6 +116,8 @@
               color: $COLOR_BLACK
       .variant-function
         line-height: 18px
+      img
+        max-width: 100%
 
     &.-two-columns
       > .section
