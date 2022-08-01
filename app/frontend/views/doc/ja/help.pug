@@ -558,16 +558,17 @@ block content
                 | による検索が可能です。
                 p
                 | 代替アレル頻度の比較対象のバリアントは以下の通りです。
-                ul
+                ul.unordered-list
                   li 日本人集団はGEM-J WGAまたは8.3KJPNのいずれかに含まれるバリアント
                   li gnomADはgnomaAD genomesまたはexomesのいずれかに含まれるバリアント
                 p
                 | 日本人集団の代替アレル頻度が0.3以上、gnomAD集団は0.05以下のバリアントを検索します。
-                ol
+                ol.ordered-list
                   li 画面上部のAdvanced searchタブを選択します。
                     img(src=require("../../../images/help-image1.png").default alt="help-image1")
                   li Add conditionメニューからAlternative allele frequency/countを選択します。
-                    img(src=require("../../../images/help-image2.png").default alt="help-image2")
+                    p
+                      img(src=require("../../../images/help-image2.png").default alt="help-image2" width="241")
                   li 以下の画面でデータセット(GEM-J WGA)と代替アレル頻度(>=0.3)を指定します。代替アレル数でも指定できます。
                     img(src=require("../../../images/help-image3.png").default alt="help-image3")
                   li OKボタンを押下します。検索条件が設定されました。
@@ -575,7 +576,7 @@ block content
                   li 同様の手順でデータセットToMMo 8.3KJPN、gnomAD genomes、gnomAD exomesについても検索条件を設定します。
                     img(src=require("../../../images/help-image5.png").default alt="help-image5")
                   li 日本人集団（GEM-J WGAとToMMo 8.3KJPN)の検索条件をOR結合にします。
-                    ol.lower-latin
+                    ol.ordered-list
                       li SHIFTを押下したしたまGEM-J WGAとToMMo 8.3KJPNを選択します。選択状態では黄枠が表示されます。
                         img(src=require("../../../images/help-image6.png").default alt="help-image6")
                       li Groupメニューを選択します。選択した２つがOR条件になります。なお、AND条件に変更する場合は、左端のORアイコンをクリックします。
@@ -595,17 +596,17 @@ block content
                 img(src=require("../../../images/help-image9.png").default alt="help-image9")
                 p
                 | メニューの機能
-                ul
+                ul.unordered-list
                   li Add condition: 検索条件を追加する
                   li Group: 選択された検索条件(黄枠表示)をOR条件で結合します。ORアイコンをクリックするとAND結合に変更できます。
                   li Ungroup：Groupとは反対の操作です。
                   li Delete:選択した 検索条件を削除します。
                 p
                 | アイコンの機能
-                ul
+                ul.unordered-list
                   li
                     img(src=require("../../../images/help-pencil.png").default alt="help-pencil")
                     | ：検索条件を編集します。
                   li
                     img(src=require("../../../images/help-cross.png").default alt="help-cross")
-                    | ：検索条件を編集します。
+                    | ：検索条件を削除します。

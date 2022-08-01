@@ -630,17 +630,18 @@ block content
                 a.hyper-text.-external(target='_blank', href='/?mode=advanced')  Advanced search
                 p
                 | Variant sets for comparison of alternative allele frequencies are as follows:
-                ul
+                ul.unordered-list
                   li For Japanese populations, variants included in either GEM-J WGA or 8.3KJPN
                   li For gnomAD populations,  variants included in either gnomAD genomes or gnomAD exomes
                 p
                 | We will search for variants with alternative allele frequencies greater than 0.3 for Japanese populations and less than 0.05 for gnomAD populations.
-                ol
+                ol.ordered-list
                   li Select the Advanced search tab at the top of
                     a.hyper-text.-external(target='_blank', href='https://togovar-stg.biosciencedbc.jp')  the home page.
                     img(src=require("../../../images/help-image1.png").default alt="help-image1")
                   li Select the Alternative allele frequency/count at the Add condition menu.
-                    img(src=require("../../../images/help-image2.png").default alt="help-image2")
+                    p
+                      img(src=require("../../../images/help-image2.png").default alt="help-image2" width="241")
                   li Specify a dataset (GEM-J WGA) and an alternative allele frequency (>= 0.3). You can also specify the number of alternative alleles.
                     img(src=require("../../../images/help-image3.png").default alt="help-image3")
                   li Click the OK button. The search criteria have been set.
@@ -648,7 +649,7 @@ block content
                   li In the same procedures, enter search criteria for the datasets ToMMo 8.3KJPN, gnomAD genomes, and gnomAD exomes.
                     img(src=require("../../../images/help-image5.png").default alt="help-image5")
                   li Join the search criteria for Japanese populations, GEM-J WGA and ToMMo 8.3KJPN, with the OR operator.
-                    ol.lower-latin
+                    ol.ordered-list
                       li Holding the SHIFT key down, select the search criteria for GEM-J WGA and ToMMo 8.3KJPN. The selected criteria are enclosed with a yellow frame.
                         img(src=require("../../../images/help-image6.png").default alt="help-image6")
                       li Select the Group menu. The selected criteria are joined with the OR operator. To change to the AND operator, click the OR icon.
@@ -668,14 +669,14 @@ block content
                 img(src=require("../../../images/help-image9.png").default alt="help-image9")
                 p
                 | Menu function
-                ul
+                ul.unordered-list
                   li Add condition: Add a search criteria to the query builder.
                   li Group: Combine selected search criteria (indicated by yellow frame) with OR operators. Note: click the OR icon to change to the AND operator.
                   li Ungroup: Separate joined criteria. Reverse operation of the Group menu.
                   li Delete: Delete selected search criteria indicated by yellow frame
                 p
                 | Icon function
-                ul
+                ul.unordered-list
                   li
                     img(src=require("../../../images/help-pencil.png").default alt="help-pencil")
                     | ：Edit search criteria
