@@ -39,8 +39,8 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
           <span class="label">&nbsp;:&nbsp;&nbsp;</span>
         </label>
         <label class="position">
-          <span class="form range-inputs-view" data-type="range">
-            <input class="start" type="number" min="1" placeholder="1">
+          <span class="form range-inputs-view" data-type="region">
+            <input class="start" type="number" min="1">
             <span class="line"></span>
             <input class="end" type="number" min="1">
           </span>
@@ -60,6 +60,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     );
     this._start = inputs.find((input) => input.classList.contains('start'));
     this._end = inputs.find((input) => input.classList.contains('end'));
+    this._isWhole = false;
 
     // attach events
     this._el
@@ -122,17 +123,32 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
   // private methods
 
   _update(e) {
+    const reference = this._karyotype.reference;
+    const end =
+      this._karyotype.chromosomes[this._chr.value]?.region[reference][1];
     // if chromosome changed, change ranges
     if (e?.target === this._chr) {
       // reset input
-      const reference = this._karyotype.reference;
-      const region =
-        this._karyotype.chromosomes[this._chr.value].region[reference];
-      this._start.max = region[1];
-      this._end.max = region[1];
-      this._end.placeholder = region[1];
-      if (this._start.value > region[1]) this._start.value = region[1];
-      if (this._end.value > region[1]) this._end.value = region[1];
+      this._start.max = end;
+      this._end.max = end;
+      if (this._isWhole) this._end.value = end;
+      if (this._start.value === '') {
+        this._start.value = 1;
+        this._isWhole = true;
+      } else if (this._start.value > end) {
+        this._start.value = end;
+      }
+      if (this._end.value === '') {
+        this._end.value = end;
+        this._isWhole = true;
+      } else if (this._end.value > end) {
+        this._end.value = end;
+        this._isWhole = true;
+      }
+    } else {
+      if (this._end.value < end) {
+        this._isWhole = false;
+      }
     }
 
     // update value
