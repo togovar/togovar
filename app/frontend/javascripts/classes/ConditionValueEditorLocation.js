@@ -23,11 +23,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     <div class="body">
       <div class="row">
         <label>
-          <input type="radio" name="range-or-position" value="range" checked> Range
-        </label>
-        &nbsp;&nbsp;
-        <label>
-          <input type="radio" name="range-or-position" value="position"> Position
+          <input type="checkbox" name="range-or-position" value="single_position"> Single position
         </label>
       </div>
       <div class="row">
@@ -67,12 +63,12 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
 
     // attach events
     this._el
-      .querySelectorAll(':scope > .body > .row:nth-child(1) > label > input')
-      .forEach((input) => {
-        input.addEventListener('change', (e) => {
-          this._rangeInputView.dataset.type = e.target.value;
-          this._update();
-        });
+      .querySelector(':scope > .body > .row:nth-child(1) > label > input')
+      .addEventListener('change', (e) => {
+        this._rangeInputView.dataset.type = e.target.checked
+          ? 'single_position'
+          : 'region';
+        this._update();
       });
     [this._chr, ...inputs].forEach((input) => {
       input.addEventListener('change', (e) => {
@@ -107,18 +103,17 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
   }
 
   get isValid() {
-    // this._rangeInputView.dataset.type === 'range'
     if (this._chr.value === '') {
       return false;
     } else {
       switch (this._rangeInputView.dataset.type) {
-        case 'range':
+        case 'region':
           return (
             this._start.value !== '' &&
             this._end.value !== '' &&
             +this._start.value < +this._end.value
           );
-        case 'position':
+        case 'single_position':
           return this._start.value !== '';
       }
     }
@@ -144,7 +139,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     const valueView = this._valueViews[0];
     if (this.isValid) {
       const value = `${this._chr.value}:${this._start.value}${
-        this._rangeInputView.dataset.type === 'position'
+        this._rangeInputView.dataset.type === 'single_position'
           ? ''
           : `-${this._end.value}`
       }`;
