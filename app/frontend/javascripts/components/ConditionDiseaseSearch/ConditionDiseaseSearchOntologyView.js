@@ -4,6 +4,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { flip } from './flip';
 
 import './OntologyCard';
+import '../ErrorModal';
 
 const DISEASE_ADVANCED_SEARCH_URL = `https://togovar-stg.biosciencedbc.jp/api/inspect/disease?node=`;
 
@@ -74,9 +75,23 @@ export default class CondDiseaseOntologyView extends LitElement {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       grid-gap: 1em;
-      margin: 0 auto;
+
       position: relative;
       overflow: hidden;
+    }
+
+    #pre-parents {
+      position: absolute;
+      left: -400px;
+      top: 0;
+      width: 1px;
+    }
+
+    #post-children {
+      position: absolute;
+      right: -400px;
+      top: 0;
+      width: 1px;
     }
 
     .cards-container {
@@ -86,7 +101,6 @@ export default class CondDiseaseOntologyView extends LitElement {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      justify-content: center;
       gap: 7px;
     }
 
@@ -123,7 +137,8 @@ export default class CondDiseaseOntologyView extends LitElement {
         this.data = json;
       })
       .catch((err) => {
-        this.error = true;
+        console.log('error fetching');
+        this.error = err.message;
       })
       .finally(() => {
         this.loading = false;
@@ -140,7 +155,7 @@ export default class CondDiseaseOntologyView extends LitElement {
 
   render() {
     const options = {
-      duration: 1000,
+      duration: 5000,
       timingFunction: 'ease-out', // 'steps(5, end)'
     };
 
@@ -149,7 +164,7 @@ export default class CondDiseaseOntologyView extends LitElement {
         <h2>Advanced Search</h2>
         ${!this.data || !Object.keys(this.data).length
           ? (this.loading && html`<div>Loading...</div>`) ||
-            (this.error && html`<div>Error</div>`)
+            (this.error && html`<error-modal errorMessage="${this.error}" />`)
           : html`<div class="search-field-view-content">
               <div class="cards-container parents" id="parents">
                 ${repeat(
@@ -159,9 +174,9 @@ export default class CondDiseaseOntologyView extends LitElement {
                     return html`<ontology-card
                       key="${parent.id}"
                       id="${parent.id}"
-                      ${flip({ id: parent.id, options })}
                       .data=${parent}
                       @card_selected=${(e) => this._fetchData(e.detail.id)}
+                      ${flip({ id: parent.id, options })}
                       selected
                     />`;
                   }
@@ -191,10 +206,10 @@ export default class CondDiseaseOntologyView extends LitElement {
                   (child) => html`
                     <ontology-card
                       key="${child.id}"
-                      .data=${child}
                       id="${child.id}"
-                      ${flip({ id: child.id, options })}
+                      .data=${child}
                       @card_selected=${(e) => this._fetchData(e.detail.id)}
+                      ${flip({ id: child.id, options })}
                       selected
                     />
                   `
