@@ -1,5 +1,5 @@
 import { directive, AsyncDirective } from 'lit/async-directive.js';
-import { nothing } from 'lit';
+import { noChange, nothing } from 'lit';
 
 const disconnectedRects = new Map();
 const parentDivs = new Map();
@@ -34,13 +34,12 @@ class Flip extends AsyncDirective {
       ...options,
     };
 
-    console.log('part', part);
     if (this.element !== part.element) {
       this.element = part.element;
       requestAnimationFrame(() => {
         // parent new
 
-        this.parent = this.element.parentElement || this.element.getRootNode();
+        this.parent = this.element.parentElement;
       });
     }
     // memorize boundingRect before element updates
@@ -53,6 +52,7 @@ class Flip extends AsyncDirective {
 
     // the timing on which LitElement batches its updates, to capture the "last" frame of our animation.
     Promise.resolve().then(() => this.prepareToFlip());
+    return noChange;
   }
 
   // instantly after dom update by $repeat
@@ -77,13 +77,13 @@ class Flip extends AsyncDirective {
       {
         // left: this.boundingRect.left - parentRect.left + 'px',
         // top: this.boundingRect.right - parentRect.top + 'px',
+        cursorEvents: 'none',
       },
       {
         // position: 'relative', transform: 'translate(0px, 0px)'
       },
       () => {
         if (this.clone) {
-          console.log('removing clone');
           this.clone.remove();
         }
         this.element.removeAttribute('style');
@@ -177,16 +177,11 @@ class Flip extends AsyncDirective {
 
   remove() {
     // append element to its last known parent back
-    //this.parent.append(this.element);
+    //
     // and flip animate its removal.
     this.flip(
       {},
-      {
-        display: 'block',
-        marginBottom: '7px',
-        transform: 'translate(0,2000%)',
-        opacity: '0.5',
-      },
+      {},
       () => {
         this.clone.remove();
         this.element.remove();
@@ -203,11 +198,25 @@ class Flip extends AsyncDirective {
     }
 
     this.boundingRect = this.element.getBoundingClientRect();
+
+    if (this.parent.getAttribute('id') === 'parents') {
+      this.container.querySelector('#pre-parents').appendChild(this.element);
+    } else if (this.parent.getAttribute('id') === 'children') {
+      this.container.querySelector('#post-children').appendChild(this.element);
+    }
+
     if (typeof this.id !== 'undefined') {
       disconnectedRects.set(this.id, this.boundingRect);
       requestAnimationFrame(() => {
         if (disconnectedRects.has(this.id)) {
-          this.remove();
+          //this.parent.append(this.element);
+
+          this.parent.append(this.element);
+          this.flip({}, {}, () => {
+            this.clone.remove();
+            this.element.remove();
+            disconnectedRects.delete(this.id);
+          });
         }
       });
     }
