@@ -8,6 +8,8 @@ append variables
 block head
   each css in htmlWebpackPlugin.files.css
     link(href=css, rel="stylesheet")
+  each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/main-/))
+    script(type="text/javascript", src=js)
 
 block content
   main
@@ -577,7 +579,7 @@ block content
                     img(src=require("../../../images/help-image5.png").default alt="help-image5")
                   li 日本人集団（GEM-J WGAとToMMo 8.3KJPN)の検索条件をOR結合にします。
                     ol.ordered-list
-                      li SHIFTを押下したしたまGEM-J WGAとToMMo 8.3KJPNを選択します。選択状態では黄枠が表示されます。
+                      li GEM-J WGAとToMMo 8.3KJPNの検索条件をクリックして選択します。選択状態では黄枠で囲まれます。
                         img(src=require("../../../images/help-image6.png").default alt="help-image6")
                       li Groupメニューを選択します。選択した２つがOR条件になります。なお、AND条件に変更する場合は、左端のORアイコンをクリックします。
                         img(src=require("../../../images/help-image7.png").default alt="help-image7")
@@ -586,20 +588,20 @@ block content
                 p
                 | 最終的には以下の検索条件になります。
                 p
-                | ((freq(GEM-J WGA) >= 0.3) OR (freq(ToMMo 8.3KJPN) >= 0.3))
+                | ((freq(GEM-J WGA) &amp;gt;= 0.3) OR (freq(ToMMo 8.3KJPN) &amp;gt;= 0.3))
                 br
                 |  AND
                 br
-                |  (freq(gnomAD genomes) <= 0.05) OR (freq(gnomAD exomes) <= 0.05))
+                |  (freq(gnomAD genomes) &amp;lt;= 0.05) OR (freq(gnomAD exomes) &amp;lt;= 0.05))
                 p
-                | 検索条件が変更される度に検索が自動的に実行され、条件に合致するバリアントの一覧が表示されます。
+                | 検索条件が変更される度に検索が自動的に実行され、条件に合致するバリアントの一覧が更新されます。
                 img(src=require("../../../images/help-image9.png").default alt="help-image9")
                 p
                 | メニューの機能
                 ul.unordered-list
-                  li Add condition: 検索条件を追加する
+                  li Add condition: 検索条件を追加します。
                   li Group: 選択された検索条件(黄枠表示)をOR条件で結合します。ORアイコンをクリックするとAND結合に変更できます。
-                  li Ungroup：Groupとは反対の操作です。
+                  li Ungroup：結合された検索条件を分離します。Groupとは反対の操作です。
                   li Delete:選択した 検索条件を削除します。
                 p
                 | アイコンの機能
