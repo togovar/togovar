@@ -8,12 +8,10 @@
   opacity: 0
   transition: opacity $GUI_DURATION, top $GUI_DURATION
   z-index: $Z_INDEX_ROW_INDICATOR
-
   &:before, &:after
     content: ""
     display: block
     position: absolute
-
   &:before
     border-left: solid 9px black
     border-top: solid 8px transparent
@@ -21,14 +19,10 @@
     top: 6px
     filter: blur(1px)
     opacity: .4
-
   &:after
     border-left: solid 9px lighten($COLOR_SELECTED, 30%)
     border-top: solid 8px transparent
     border-bottom: solid 8px transparent
     top: 5px
-
   &.-shown
     opacity: 1
-
-

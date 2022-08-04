@@ -1,0 +1,64 @@
+// Theme for tippy
+.tippy-box
+    &[data-theme~='black']
+        margin: 0
+        background-color: $COLOR_BLACK
+        color: white
+        border: 1px solid white
+        border-radius: 1em
+        padding: 0.4rem 0.6rem
+        white-space: none
+    .content
+        margin: 0
+        .url
+            text-decoration: underline
+            color: white
+            font-weight: bolder
+            padding-left: 0.2rem
+    &[data-animation='fade'][data-state='hidden']
+        opacity: 0
+    .tippy-arrow
+        width: 5px
+        height: 2px
+        color: $COLOR_BLACK
+        &:before
+            content: ""
+            position: absolute
+            border-color: transparent
+            border-style: solid
+    &[data-placement^=top]
+        .tippy-arrow
+            bottom: 0
+            &:before
+                bottom: -10px
+                border-left: 2px solid transparent
+                border-right: 2px solid transparent
+                border-top: 9px solid $COLOR_BLACK
+                transform-origin: center top
+    &[data-placement^=bottom]
+        .tippy-arrow
+            top: 0
+            &:before
+                top: -10px
+                border-left: 2px solid transparent
+                border-right: 2px solid transparent
+                border-bottom: 9px solid $COLOR_BLACK
+                transform-origin: center bottom
+    &[data-placement^=left]
+        .tippy-arrow
+            right: 0
+            &:before
+                right: -10px
+                border-bottom: 2px solid transparent
+                border-top: 2px solid transparent
+                border-left: 9px solid $COLOR_BLACK
+                transform-origin: center left
+    &[data-placement^=right]
+        .tippy-arrow
+            left: 0
+            &:before
+                left: -10px
+                border-bottom: 2px solid transparent
+                border-top: 2px solid transparent
+                border-right: 9px solid $COLOR_BLACK
+                transform-origin: center right

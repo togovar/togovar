@@ -14,7 +14,7 @@ module Queryable
     # @param [Hash] options :endpoint, :method, :protocol, :headers, :read_timeout
     # @see SPARQL::Client
     def query(sparql, **options)
-      ep     = options.delete(:endpoint) || Endpoint.url
+      ep     = options.delete(:endpoint) || Rails.configuration.endpoint['sparql']
       digest = Digest::MD5.hexdigest(sparql)
 
       arr = ["started query for #{ep} at #{Time.now}",

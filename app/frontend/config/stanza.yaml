@@ -1,0 +1,408 @@
+variant:
+  id: tgv_id
+
+  base_options:
+    sparqlist: $TOGOVAR_STANZA_SPARQLIST
+
+  stanza:
+    - id: variant-header
+      dom: "#variant-header"
+      options:
+        togostanza-menu-placement: none
+
+    - id: variant-summary
+      dom: "#variant-summary"
+
+    - id: variant-other-overlapping-variants
+      dom: "#variant-other-overlapping-variants"
+      options:
+        search_api: $TOGOVAR_STANZA_SEARCH
+
+    - id: variant-frequency
+      dom: "#variant-frequency"
+
+    - id: variant-clinvar
+      dom: "#variant-clinvar"
+
+    - id: pagination-table
+      dom: "#variant-gwas"
+      src: https://togostanza.github.io/metastanza/pagination-table.js
+      options:
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/variant_gwas?tgv_id=${tgv_id}
+        data-type: json
+        custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20220803
+        padding: 0
+        page-size-option: 5,10,20,50,100
+        page-slider: false
+        columns:
+          - id: variant_and_risk_allele
+            label: rs# and risk allele
+            link: rs_uri
+            line-clamp: 3
+          - id: raf
+            label: RAF
+            sprintf: %-9.3e
+            line-clamp: 3
+          - id: p_value
+            label: P-value
+            sprintf: %-9.0e
+            line-clamp: 3
+          - id: odds_ratio
+            label: OR
+            sprintf: %-9.3e
+            line-clamp: 3
+          - id: ci_text
+            label: CI
+            line-clamp: 3
+          - id: beta
+            label: Beta
+            sprintf: %-9.3e
+            line-clamp: 3
+          - id: beta_unit
+            label: Beta unit
+            line-clamp: 3
+          - id: mapped_trait
+            label: Trait(s)
+            escape: false
+            line-clamp: 3
+          - id: pubmed_id
+            label: PubMed ID
+            link: pubmed_uri
+            line-clamp: 3
+          - id: study_detail
+            label: Study accession
+            link: study
+            line-clamp: 3
+          - id: initial_sample_size
+            label: Discovery sample description
+            line-clamp: 3
+          - id: replication_sample_size
+            label: Replication sample description
+            line-clamp: 3
+
+    - id: variant-genomic-context
+      dom: "#variant-genomic-context"
+      options:
+        assembly: GRCh37
+        jbrowse: $TOGOVAR_STANZA_JBROWSE
+        margin: 50
+
+    - id: variant-gene
+      dom: "#variant-gene"
+      options:
+        assembly: GRCh37
+
+    - id: variant-transcript
+      dom: "#variant-transcript"
+      options:
+        assembly: GRCh37
+
+    - id: variant-publication
+      dom: "#variant-publication"
+
+gene:
+  id: hgnc_id
+
+  base_options:
+    sparqlist: $TOGOVAR_STANZA_SPARQLIST
+
+  stanza:
+    - id: gene-header
+      dom: "#gene-header"
+      options:
+        togostanza-menu-placement: none
+
+    - id: gene-summary
+      dom: "#gene-summary"
+
+    - id: pagination-table
+      dom: "#gene-clinvar"
+      src: https://togostanza.github.io/metastanza/pagination-table.js
+      options:
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/gene_clinvar?hgnc_id=${hgnc_id}
+        data-type: json
+        custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20220803
+        padding: 0
+        page-size-option: 5,10,20,50,100
+        page-slider: false
+        columns:
+          - id: tgv_id
+            label: TogoVar ID
+            link: tgv_link
+            line-clamp: 3
+          - id: rs_id
+            label: rs#
+            link: rs_id_link
+            line-clamp: 3
+          - id: position
+            label: Position
+            line-clamp: 3
+          - id: title
+            label: Title
+            link: clinvar
+            line-clamp: 3
+          - id: interpretation
+            label: Clinical significance
+            escape: false
+            line-clamp: 3
+          - id: review_status
+            label: Review status
+            escape: false
+            line-clamp: 3
+          - id: last_evaluated
+            label: Last evaluated
+            line-clamp: 3
+          - id: condition
+            label: Condition(s)
+            link: medgen
+            line-clamp: 3
+
+    - id: pagination-table
+      dom: "#gene-gwas"
+      src: https://togostanza.github.io/metastanza/pagination-table.js
+      options:
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/gene_gwas?hgnc_id=${hgnc_id}
+        data-type: json
+        padding: 0
+        custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20220803
+        page-size-option: 5,10,20,50,100
+        page-slider: false
+        columns:
+          - id: tgv_id
+            label: TogoVar ID
+            link: tgv_link
+            line-clamp: 3
+          - id: variant_and_risk_allele
+            label: rs# and risk allele
+            link: rs_uri
+            line-clamp: 3
+          - id: position
+            label: Position
+            escape: false
+            line-clamp: 3
+          - id: ref_alt
+            label: Ref/Alt
+            escape: false
+            line-clamp: 3
+          - id: alt_freq
+            label: Alt freq. of GEM-J WGA
+            sprintf: %-9.3e
+            line-clamp: 3
+          - id: raf
+            label: RAF
+            sprintf: %-9.3e
+            line-clamp: 3
+          - id: p_value
+            label: P-value
+            sprintf: %-9.0e
+            line-clamp: 3
+          - id: odds_ratio
+            label: OR
+            sprintf: %-9.3e
+            line-clamp: 3
+          - id: ci_text
+            label: CI
+            line-clamp: 3
+          - id: beta
+            label: Beta
+            sprintf: %-9.3e
+            line-clamp: 3
+          - id: beta_unit
+            label: Beta unit
+            line-clamp: 3
+          - id: mapped_trait
+            label: Trait(s)
+            escape: false
+            line-clamp: 3
+          - id: pubmed_id
+            label: PubMed ID
+            link: pubmed_uri
+            line-clamp: 3
+          - id: study_detail
+            label: Study accession
+            link: study
+            line-clamp: 3
+          - id: initial_sample_size
+            label: Discovery sample description
+            line-clamp: 3
+          - id: replication_sample_size
+            label: Replication sample description
+            line-clamp: 3
+
+    - id: gene-genomic-context
+      dom: "#gene-genomic-context"
+      options:
+        assembly: GRCh37
+        jbrowse: $TOGOVAR_STANZA_JBROWSE
+        margin: 200
+
+    - id: scroll-table
+      dom: "#gene-variant"
+      src: https://togostanza.github.io/metastanza/scroll-table.js
+      options:
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/gene_variant?hgnc_id=${hgnc_id}
+        data-type: json
+        custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20220803
+        height: 500
+        page-size: 100
+        columns:
+          - id: id
+            label: TogoVar ID
+            escape: false
+          - id: dbsnp
+            label: RefSNP ID
+            escape: false
+          - id: position
+            label: Position
+            escape: false
+          - id: ref_alt
+            label: Ref / Alt
+            escape: false
+          - id: type
+            label: Type
+            escape: false
+          - id: symbols
+            label: Gene
+            escape: false
+          - id: frequencies
+            label: Alt frequency
+            escape: false
+          - id: consequence
+            label: Consequence
+            escape: false
+          - id: sift
+            label: SIFT
+            escape: false
+          - id: polyphen
+            label: PolyPhen
+            escape: false
+          - id: significance
+            label: Clinical significance
+            escape: false
+
+    - id: gene-publication
+      dom: "#gene-publication"
+
+disease:
+  id: medgen_cid
+
+  base_options:
+    sparqlist: $TOGOVAR_STANZA_SPARQLIST
+
+  stanza:
+    - id: disease-header
+      dom: "#disease-header"
+      options:
+        togostanza-menu-placement: none
+
+    - id: hash-table
+      dom: "#disease-summary"
+      src: https://togostanza.github.io/metastanza/hash-table.js
+      options:
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/disease_summary?medgen_cid=${medgen_cid}
+        data-type: json
+        custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20220803
+        padding: 0
+        columns:
+          - id: label
+            label: Title
+          - id: definition
+            label: Definition
+          - id: links
+            label: Links
+            escape: false
+
+    - id: pagination-table
+      dom: "#disease-clinvar"
+      src: https://togostanza.github.io/metastanza/pagination-table.js
+      options:
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/disease_clinvar?medgen_cid=${medgen_cid}
+        data-type: json
+        custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20220803
+        padding: 0
+        page-size-option: 5,10,20,50,100
+        page-slider: false
+        columns:
+          - id: tgv_id
+            label: TogoVar ID
+            link: tgv_link
+            line-clamp: 3
+          - id: rs_id
+            label: rs#
+            link: rs_id_link
+            line-clamp: 3
+          - id: position
+            label: Position
+            escape: false
+            line-clamp: 3
+          - id: title
+            label: Title
+            link: clinvar
+            line-clamp: 3
+          - id: interpretation
+            label: Clinical significance
+            escape: false
+            line-clamp: 3
+          - id: review_status
+            label: Review status
+            escape: false
+            line-clamp: 3
+          - id: last_evaluated
+            label: Last evaluated
+            line-clamp: 3
+
+    - id: pagination-table
+      dom: "#disease-gwas"
+      src: https://togostanza.github.io/metastanza/pagination-table.js
+      options:
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/disease_gwas?medgen_cid=${medgen_cid}
+        data-type: json
+        custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20220803
+        padding: 0
+        page-size-option: 5,10,20,50,100
+        page-slider: false
+        columns:
+          - id: variant_and_risk_allele
+            label: rs# and risk allele
+            escape: false
+            line-clamp: 3
+          - id: raf
+            label: RAF
+            sprintf: %-9.3e
+            line-clamp: 3
+          - id: p_value
+            label: P-value
+            sprintf: %-9.0e
+            line-clamp: 3
+          - id: odds_ratio
+            label: OR
+            sprintf: %-9.3e
+            line-clamp: 3
+          - id: ci_text
+            label: CI
+            line-clamp: 3
+          - id: beta
+            label: Beta
+            sprintf: %-9.3e
+            line-clamp: 3
+          - id: beta_unit
+            label: Beta unit
+            line-clamp: 3
+          - id: mapped_trait
+            label: Trait(s)
+            escape: false
+            line-clamp: 3
+          - id: pubmed_id
+            label: PubMed ID
+            link: pubmed_uri
+            line-clamp: 3
+          - id: study_detail
+            label: Study accession
+            link: study
+            line-clamp: 3
+          - id: initial_sample_size
+            label: Discovery sample description
+            line-clamp: 3
+          - id: replication_sample_size
+            label: Replication sample description
+            line-clamp: 3

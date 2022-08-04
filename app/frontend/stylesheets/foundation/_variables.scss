@@ -1,0 +1,190 @@
+// color
+$COLOR_KEY: #62d5d9;
+$COLOR_KEY_DARK1: #117f93;
+$COLOR_KEY_DARK2: #0f6272;
+$COLOR_KEY_DARK3: #125263;
+
+$COLOR_SELECTED: #FFDD00;
+$COLOR_SELECTED_LIGHT: #FDFAE5;
+$COLOR_SINGLETON: lighten($COLOR_SELECTED, 35%);
+$COLOR_DISABLE_DEEP: #808080;
+$COLOR_DISABLE: #999999;
+
+$COLOR_BLACK: #444;
+$COLOR_GRAY: #94928d;
+$COLOR_PALE_GRAY: lighten($COLOR_GRAY, 45%);
+$COLOR_LIGHT_GRAY: lighten($COLOR_GRAY, 35%);
+$COLOR_DARKER_GRAY: #dbdbdb;
+$COLOR_SEPARATOR: rgba(0, 0, 0, 0.3);
+$COLOR_SEPARATOR_SUB: rgba(0, 0, 0, 0.2);
+
+$COLOR_REF: #249eb3;
+$COLOR_ALT: #ff6682;
+
+$COLOR_DATASET_JGA: $COLOR_KEY;
+$COLOR_DATASET_JGA_LIGHT: lighten($COLOR_DATASET_JGA, 35%);
+$COLOR_DATASET_TOMMO: #88cb00;
+$COLOR_DATASET_TOMMO_LIGHT: lighten($COLOR_DATASET_TOMMO, 50%);
+$COLOR_DATASET_HGVD: #005B80;
+$COLOR_DATASET_MGEND: $COLOR_DATASET_HGVD;
+$COLOR_DATASET_HGVD_LIGHT: lighten($COLOR_DATASET_HGVD, 70%);
+$COLOR_DATASET_GEM_J: #dc2828;
+$COLOR_DATASET_GEM_J_LIGHT: lighten($COLOR_DATASET_GEM_J, 45%);
+$COLOR_DATASET_BBJ: #ff993f;
+$COLOR_DATASET_BBJ_LIGHT: lighten($COLOR_DATASET_BBJ, 35%);
+$COLOR_DATASET_FOREIGN: #94928d;
+$COLOR_DATASET_FOREIGN_LIGHT: lighten($COLOR_DATASET_FOREIGN, 40%);
+
+$COLOR_SIGN_SAFE: #24d636;
+$COLOR_SIGN_SAFE_LIGHT: lighten($COLOR_SIGN_SAFE, 45%);
+$COLOR_SIGN_NORMAL: #9dcf3a;
+$COLOR_SIGN_NORMAL_LIGHT: lighten($COLOR_SIGN_NORMAL, 42%);
+$COLOR_SIGN_WARNING: #ffae00;
+$COLOR_SIGN_WARNING_LIGHT: lighten($COLOR_SIGN_WARNING, 45%);
+$COLOR_SIGN_DANGEROUS: #ff5a54;
+$COLOR_SIGN_DANGEROUS_LIGHT: lighten($COLOR_SIGN_DANGEROUS, 30%);
+$COLOR_SIGN_MODIFIER: #c654ff;
+$COLOR_SIGN_MODIFIER_LIGHT: lighten($COLOR_SIGN_MODIFIER, 30%);
+$COLOR_SIGN_OTHER: #9c8200;
+$COLOR_SIGN_OTHER_LIGHT: lighten($COLOR_SIGN_OTHER, 60%);
+$COLOR_SIGN_UNKNOWN: $COLOR_GRAY;
+$COLOR_SIGN_UNKNOWN_LIGHT: lighten($COLOR_SIGN_UNKNOWN, 35%);
+
+$GRADIENT_HEADING: linear-gradient(to right, $COLOR_KEY_DARK1, $COLOR_KEY);
+$GRADIENT_HEADING_SEMITRANSPARENT: linear-gradient(to right, rgba($COLOR_KEY_DARK1, .9), rgba($COLOR_KEY, .9));
+$GRADIENT_HEADING_DISABLE: linear-gradient(to right, $COLOR_DISABLE_DEEP, $COLOR_DISABLE);
+
+// geometry
+$PADDING_SIDE: 18px;
+$PADDING_SIDEBAR_SIDE: 15px;
+$PADDING_PANEL_VIEW: 10px;
+$WIDTH_MIN: 900px;
+$WIDTH_SIDEBAR: 300px;
+//$HEIGHT_NBDC_COMMON_HEADER: 24px;
+//$HEIGHT_NBDC_COMMON_FOOTER: 24px;
+$HEIGHT_NBDC_COMMON_HEADER: 0px;
+$HEIGHT_NBDC_COMMON_FOOTER: 0px;
+$HEIGHT_NAVIGATION_ITEM: 20px;
+$HEIGHT_GLOBAL_MENU: 50px;
+$HEIGHT_BOTTOM_DRAWER: 30px;
+//$HEIGHT_BOTTOM_DRAWER: 0px;
+$HEIGHT_BOTTOM_DRAWER_OPENED: 400px;
+$HEIGHT_ADVANCED_SEARCH_CONDITION: 24px;
+
+$Z_INDEX_BASE: 10000;
+$Z_INDEX_ROW_INDICATOR: $Z_INDEX_BASE + 100;
+$Z_INDEX_ADVANCED_SEARCH_MENU: $Z_INDEX_BASE + 100;
+$Z_INDEX_DETAIL_HEADER: $Z_INDEX_BASE + 100;
+$Z_INDEX_GLOBAL_HEADER: $Z_INDEX_BASE + 200;
+$Z_INDEX_SUGGEST_VIEW: $Z_INDEX_BASE + 200;
+$Z_INDEX_DRAWER: $Z_INDEX_BASE + 300;
+$Z_INDEX_CONFIGURATION: $Z_INDEX_BASE + 400;
+$Z_INDEX_EDITING_CONDITION: $Z_INDEX_BASE + 400;
+$Z_INDEX_ACTIVITY_INDICATOR: $Z_INDEX_BASE + 500;
+
+$BACKDROP_BG: radial-gradient(
+  ellipse at center,
+  rgba($COLOR_KEY, 0.6) 10%,
+  rgba($COLOR_KEY, 0.8) 60%,
+  rgba($COLOR_KEY_DARK3, 1) 120%
+);
+
+// time
+$GUI_DURATION: 0.2s;
+$TRANSITION_DURATION: 0.5s;
+
+// effect
+$SHADOW_DEPTH1: 0 1px 1px rgba(black, 0.3);
+
+// charactor
+// FontAwesome
+$CHAR_TIMES: '\f00d';
+$CHAR_INFO_CIRCLE: '\f05a';
+$CHAR_ARROW_RIGHT: '\f061';
+$CHAR_ARROW_DOWN: '\f063';
+$CHAR_EXCRAMATION_TRIANGLE: '\f071';
+$CHAR_EXTERNAL_LINK: '\f08e';
+$CHAR_ARROW_CIRCLE_RIGHT: '\f0a9';
+$CHAR_WRENCH: '\f0ad';
+// fontello
+$CHAR_DATASET: '\E800';
+$CHAR_LOGICAL_OP_AND: '\E801';
+$CHAR_LOGICAL_OP_OR: '\E802';
+$CHAR_LOGICAL_OP_OUTLINE: '\E803';
+
+:root {
+  // color
+  --color-key: #{$COLOR_KEY};
+  --color-key-dark1: #{$COLOR_KEY_DARK1};
+  --color-key-dark2: #{$COLOR_KEY_DARK2};
+  --color-key-dark3: #{$COLOR_KEY_DARK3};
+  --color-black: #{$COLOR_BLACK};
+  --color-gray: #{$COLOR_GRAY};
+  --color-pale-gray: #{$COLOR_PALE_GRAY};
+  --color-light-gray: #{$COLOR_LIGHT_GRAY};
+  --color-darker-gray: #{$COLOR_DARKER_GRAY};
+  --color-selected: #{$COLOR_SELECTED};
+  --color-selected-light: #{$COLOR_SELECTED_LIGHT};
+  --color-singleton: #{$COLOR_SINGLETON};
+  --color-disable: #{$COLOR_DISABLE};
+  --color-disable-deep: #{$COLOR_DISABLE_DEEP};
+  --color-separator: #{$COLOR_SEPARATOR};
+  --color-separator-sub: #{$COLOR_SEPARATOR_SUB};
+  // color: mutation
+  --color-mutation-ref: #{$COLOR_REF};
+  --color-mutation-alt: #{$COLOR_ALT};
+  // color: datasets
+  --color-dataset-gemj: #{$COLOR_DATASET_GEM_J};
+  --color-dataset-gemj-light: #{$COLOR_DATASET_GEM_J_LIGHT};
+  --color-dataset-jga: #{$COLOR_DATASET_JGA};
+  --color-dataset-jga-light: #{$COLOR_DATASET_JGA_LIGHT};
+  --color-dataset-tommo: #{$COLOR_DATASET_TOMMO};
+  --color-dataset-tommo-light: #{$COLOR_DATASET_TOMMO_LIGHT};
+  --color-dataset-hgvd: #{$COLOR_DATASET_HGVD};
+  --color-dataset-hgvd-light: #{$COLOR_DATASET_HGVD_LIGHT};
+  --color-dataset-bbj: #{$COLOR_DATASET_BBJ};
+  --color-dataset-bbj-light: #{$COLOR_DATASET_BBJ_LIGHT};
+  --color-dataset-foreign: #{$COLOR_DATASET_FOREIGN};
+  --color-dataset-foreign-light: #{$COLOR_DATASET_FOREIGN_LIGHT};
+  // color: significance
+  --color-sign-safe: #{$COLOR_SIGN_SAFE};
+  --color-sign-safe-light: #{$COLOR_SIGN_SAFE_LIGHT};
+  --color-sign-normal: #{$COLOR_SIGN_NORMAL};
+  --color-sign-normal-light: #{$COLOR_SIGN_NORMAL_LIGHT};
+  --color-sign-warning: #{$COLOR_SIGN_WARNING};
+  --color-sign-warning-light: #{$COLOR_SIGN_WARNING_LIGHT};
+  --color-sign-dangerous: #{$COLOR_SIGN_DANGEROUS};
+  --color-sign-dangerous-light: #{$COLOR_SIGN_DANGEROUS_LIGHT};
+  --color-sign-modifier: #{$COLOR_SIGN_MODIFIER};
+  --color-sign-modifier-light: #{$COLOR_SIGN_MODIFIER_LIGHT};
+  --color-sign-other: #{$COLOR_SIGN_OTHER};
+  --color-sign-other-light: #{$COLOR_SIGN_OTHER_LIGHT};
+  --color-sign-unknown: #{$COLOR_SIGN_UNKNOWN};
+  --color-sign-unknown-light: #{$COLOR_SIGN_UNKNOWN_LIGHT};
+
+  // geometric
+  --height-inline: 18px;
+  --height-advanced-search-condition-values-container: 24px;
+  --height-advanced-search-condition-value: 18px;
+
+  // charactor
+  // FontAwesome
+  --char-TIMES: '\f00d';
+  --char-INFO_CIRCLE: '\f05a';
+  --char-ARROW_RIGHT: '\f061';
+  --char-ARROW_DOWN: '\f063';
+  --char-EXCRAMATION_TRIANGLE: '\f071';
+  --char-EXTERNAL_LINK: '\f08e';
+  --char-ARROW_CIRCLE_RIGHT: '\f0a9';
+  --char-WRENCH: '\f0ad';
+  // fontello
+  --char-dataset: '\E800';
+  --char-logical-op-and: '\E801';
+  --char-logical-op-or: '\E802';
+  --char-logical-op-outline: '\E803';
+  --char-edit: '\E804';
+  --char-delete: '\E805';
+  --char-group: '\E806';
+  --char-ungroup: '\E807';
+  --char-copy: '\E808';
+}

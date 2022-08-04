@@ -8,6 +8,8 @@ append variables
 block head
   each css in htmlWebpackPlugin.files.css
     link(href=css, rel="stylesheet")
+  each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/main-/))
+    script(type="text/javascript", src=js)
 
 block content
   main
@@ -67,6 +69,11 @@ block content
                   a.link(href='#s3') In TogoVar, how is the variant described?
                 li.item.-question
                   a.link(href='#s4') Can I search by HGVS description (e.g. ALDH2:p.Glu504Lys)?
+                li.item.-question
+                  a.link(href='#s5') What can I do with the Advanced search?
+                li.item.-question
+                  a.link(href='#s6') Can I search for variants with different alternative allele frequencies between Japanese and other populations?
+
 
       .contents
         section.section
@@ -92,7 +99,7 @@ block content
           #g2.question-answer
             h4.question Do you have videos that explain TogoVar?
             .answer
-              p 
+              p
                 | See
                 |
                 a(href='https://togotv.dbcls.jp/en/') TogoTV
@@ -243,52 +250,54 @@ block content
                 | value is represented on a 9-point scale.
               ._flex._break-avoid
                 ._padding-right-large
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='na')
-                    span._margin-left Not Available
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='monomorphic')
-                    span._margin-left Monomorphic (REF)
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='singleton')
-                    span._margin-left Singleton
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.0001')
-                    span._margin-left &lt; 0.0001
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.001')
-                    span._margin-left &lt; 0.001
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.01')
-                    span._margin-left &lt; 0.01
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.05')
-                    span._margin-left &lt; 0.05
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.5')
-                    span._margin-left &lt; 0.5
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&ge;0.5')
-                    span._margin-left &ge; 0.5
-                div
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='gem_j_wga')
-                    span._margin-left GEM-J WGA
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='jga_ngs')
-                    span._margin-left JGA-NGS
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='jga_snp')
-                    span._margin-left JGA-SNP
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='tommo_4.7kjpn')
-                    span._margin-left ToMMo 4.7KJPN
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='hgvd')
-                    span._margin-left HGVD
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='exac')
-                    span._margin-left ExAC
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="na")
+                  | &nbsp; Not Available
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="monomorphic")
+                  | &nbsp; Monomorphic (REF)
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="undefined" data-count="1")
+                  | &nbsp; Singleton
+                ._padding-right-large
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.0001")
+                  | &nbsp; &lt; 0.0001
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.001")
+                  | &nbsp; &lt; 0.001
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.01")
+                  | &nbsp; &lt; 0.01
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.05")
+                  | &nbsp; &lt; 0.05
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.5")
+                  | &nbsp; &lt; 0.5
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; ≥ 0.5
+                ._padding-right-large
+                  logarithmized-block-graph-frequency-view(data-dataset="gem_j_wga" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; GEM-J WGA
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="jga_ngs" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; JGA-NGS
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="jga_snp" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; JGA-SNP
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="tommo" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; ToMMo 8.3KJPN
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="hgvd" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; HGVD
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="gnomad_genomes" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; gnomAD genomes
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="gnomad_exomes" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; gnomAD exomes
+
           #s2.question-answer._column-span-all
             h4.question
               | For each variant type, how is the position, reference and alternative allele described respectively?
@@ -600,3 +609,77 @@ block content
                 |
                 a.hyper-text.-external(target='_blank', href='https://m.ensembl.org/info/docs/tools/vep/recoder/index.html') Variant Recorder
                 | is used to convert an HGVS description to a GRCh37 position.
+          #s5.question-answer._column-span-all
+            h4.question
+              | Q: What can I do with the
+              |
+              a.hyper-text.-external(target='_blank', href='/?mode=advanced') Advanced search
+              | ?
+            .answer
+              p
+                |You can build a query with an alternative allele frequency, clinical significance,
+                | and other search criteria combined with the AND and/or OR operator. See
+                a.link(href='#s6') "Q: Can I search for variants with different alternative allele frequencies between Japanese and other populations?"
+                |
+                |for usage.
+          #s6.question-answer._column-span-all
+            h4.question Can I search for variants with different alternative allele frequencies between Japanese and other populations?
+            .answer
+              p
+                | Yes. You can search by
+                a.hyper-text.-external(target='_blank', href='/?mode=advanced')  Advanced search
+                p
+                | Variant sets for comparison of alternative allele frequencies are as follows:
+                ul.unordered-list
+                  li For Japanese populations, variants included in either GEM-J WGA or 8.3KJPN
+                  li For gnomAD populations,  variants included in either gnomAD genomes or gnomAD exomes
+                p
+                | We will search for variants with an alternative allele frequency greater than 0.3 for Japanese populations and less than 0.05 for gnomAD populations.
+                ol.ordered-list
+                  li Select the Advanced search tab at the top of
+                    a.hyper-text.-external(target='_blank', href='https://togovar-stg.biosciencedbc.jp')  the home page.
+                    img(src=require("../../../images/help-image1.png").default alt="help-image1")
+                  li Select the Alternative allele frequency/count at the Add condition menu.
+                    p
+                      img(src=require("../../../images/help-image2.png").default alt="help-image2" width="241")
+                  li Specify a dataset (GEM-J WGA) and an alternative allele frequency (>= 0.3). You can also specify the number of alternative alleles.
+                    img(src=require("../../../images/help-image3.png").default alt="help-image3")
+                  li Click the OK button. The search criteria has been set.
+                    img(src=require("../../../images/help-image4.png").default alt="help-image4")
+                  li In the same procedures, enter search criteria for the datasets, ToMMo 8.3KJPN, gnomAD genomes and gnomAD exomes.
+                    img(src=require("../../../images/help-image5.png").default alt="help-image5")
+                  li Join the search criteria for Japanese populations, GEM-J WGA and ToMMo 8.3KJPN, with the OR operator.
+                    ol.ordered-list
+                      li Select the search criteria for GEM-J WGA and ToMMo 8.3KJPN. The selected criteria is enclosed by yellow borders.
+                        img(src=require("../../../images/help-image6.png").default alt="help-image6")
+                      li Select the Group menu. The selected criteria are joined with the OR operator. To change to the AND operator, click the OR icon.
+                        img(src=require("../../../images/help-image7.png").default alt="help-image7")
+                  li In the same procedures, the search criteria for the gnomAD genomes and gnomAD exomes are joined with the OR operator.
+                    img(src=require("../../../images/help-image8.png").default alt="help-image8")
+                p
+                | The final search criteria is as follows:
+                p
+                | ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo 8.3KJPN) &gt;= 0.3))
+                br
+                | AND
+                br
+                | (freq(gnomAD genomes) &lt;= 0.05) OR (freq(gnomAD exomes) &lt;= 0.05))
+                p
+                | Each time search criteria is changed, the search is automatically executed and a list of variants that match the criteria is refreshed.
+                img(src=require("../../../images/help-image9.png").default alt="help-image9")
+                p
+                | Functions in the menu bar
+                ul.unordered-list
+                  li Add condition: Add search criteria to the query builder.
+                  li Group: Combine selected search criteria indicated by yellow borders with the OR operators. Note: click the OR icon to change to the AND operator.
+                  li Ungroup: Separate joined search criteria. This is a reverse operation of the Group menu.
+                  li Delete: Delete selected search criteria indicated by yellow borders.
+                p
+                | Meaning of the icons
+                ul.unordered-list
+                  li
+                    img(src=require("../../../images/help-pencil.png").default alt="help-pencil")
+                    | ：Edit search criteria
+                  li
+                    img(src=require("../../../images/help-cross.png").default alt="help-cross")
+                    | ：Delete search criteria

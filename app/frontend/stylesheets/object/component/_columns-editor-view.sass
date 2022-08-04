@@ -1,0 +1,53 @@
+.columns-editor-view
+  > .body
+    padding: 0 !important
+    display: flex
+    overflow: auto
+    > .columns
+      display: flex
+      > .column
+        padding: 4px 0
+        max-height: 200px
+        overflow-y: auto
+        border-right: solid 1px $COLOR_SEPARATOR
+        > ul
+          margin: 0
+          padding: 0
+          > li
+            padding-left: 12px
+            padding-right: 18px
+            position: relative
+            list-style: none
+            font-size: 14px
+            line-height: 24px
+            white-space: nowrap
+            > .arrow
+              display: block
+              position: absolute
+              top: 7px
+              right: 6px
+              width: 0
+              height: 0
+              border-style: solid
+              border-width: 4px 0 4px 6px
+              border-color: transparent transparent transparent $COLOR_BLACK
+              opacity: .2
+              transition: opacity $GUI_DURATION
+              cursor: pointer
+              &:hover
+                opacity: 1
+            &.-selected
+              > .arrow
+                opacity: 1
+            > label
+              margin-bottom: 0
+              > input
+                vertical-align: middle
+              > span
+                font-weight: bold
+    // > .description
+    //   padding: 4px 12px
+    //   font-size: 12px
+    //   line-height: 1.5
+    //   min-width: 200px
+    //   flex-basis: 200px

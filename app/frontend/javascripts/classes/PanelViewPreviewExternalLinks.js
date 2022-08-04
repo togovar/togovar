@@ -51,4 +51,5 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
     }
     this.table.innerHTML = html;
   }
+
 }

@@ -13,5 +13,6 @@ export default class PanelView {
       elm.classList.toggle('-collapsed');
       window.localStorage.setItem(this.localStorageKey, elm.classList.contains('-collapsed') ? 'collapsed' : '');
     })
+
   }
 }

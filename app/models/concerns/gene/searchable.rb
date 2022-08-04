@@ -24,6 +24,17 @@ class Gene
               type: :custom,
               tokenizer: :whitespace,
               filter: %i[lowercase edge_ngram_filter]
+            },
+            symbol_ngram_analyzer: {
+              filter: %i[lowercase],
+              tokenizer: :symbol_ngram_tokenizer
+            }
+          },
+          tokenizer: {
+            symbol_ngram_tokenizer: {
+              type: :edge_ngram,
+              min_gram: 3,
+              max_gram: 10
             }
           },
           filter: {
@@ -59,7 +70,11 @@ class Gene
                     lowercase: {
                       type: :keyword,
                       normalizer: :lowercase
-                    }
+                    },
+                    ngram_search: {
+                      type: :text,
+                      analyzer: :symbol_ngram_analyzer
+                    },
                   }
           indexes :approved, type: :boolean
           indexes :alias_of, type: :keyword
@@ -111,9 +126,9 @@ class Gene
         end
 
         __elasticsearch__.search(query).results
-          .reject { |x| x.dig('_source', 'approved') }
-          .map { |x| x.dig('_source', 'symbol') }
-          .compact
+                         .reject { |x| x.dig('_source', 'approved') }
+                         .map { |x| x.dig('_source', 'symbol') }
+                         .compact
       end
 
       # @param [String] keyword

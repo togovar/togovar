@@ -1,0 +1,51 @@
+[
+  {
+    "id": "table-header-togovar_id",
+    "content": "TogoVar identifier assigned to variants observed in Japanese populations"
+  },
+  {
+    "id": "table-header-refsnp_id",
+    "content": "RefSNP (rs) identifier of dbSNP"
+  },
+  {
+    "id": "table-header-position",
+    "content": "Chromosomal position"
+  },
+  {
+    "id": "table-header-ref_alt",
+    "content": "Reference and alternative allele"
+  },
+  {
+    "id": "table-header-type",
+    "content": "Variant type (SNV, insertion, deletion, indel or substitution)"
+  },
+  {
+    "id": "table-header-gene",
+    "content": "The HUGO Gene Nomenclature Committee (HGNC) gene symbol"
+  },
+  {
+    "id": "table-header-alt_frequency",
+    "content": "Frequency indicator representing alternative allele frequencies",
+    "url": "doc/help#s1"
+  },
+  {
+    "id": "table-header-consequence",
+    "content": "Variant consequence detected by Variant Effect Predictor (VEP)",
+    "url": "/doc/help#d5"
+  },
+  {
+    "id": "table-header-sift",
+    "content": "Prediction of functional effects of a nonsynonymous variant by the Sorting Intolerant From Tolerant (SIFT) program",
+    "url": "/doc/help#d6"
+  },
+  {
+    "id": "table-header-polyphen",
+    "content": "Prediction of functional effects of a nonsynonymous variant by the PolyPhen-2 (Polymorphism Phenotyping v2) program",
+    "url": "/doc/help#d6"
+  },
+  {
+    "id": "table-header-clinical_significance",
+    "content": "Clinical significance provided by ClinVar",
+    "url": "/doc/help#d7"
+  }
+]

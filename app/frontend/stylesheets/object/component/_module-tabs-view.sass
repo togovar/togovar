@@ -1,0 +1,46 @@
+.module-tabs-view
+  background-color: $COLOR_KEY_DARK2
+  color: #FFF
+  > .tabscontainer
+    > ul
+      margin: 0
+      padding: 4px $PADDING_SIDE 0
+      > li
+        display: inline-block
+        font-size: 14px
+        font-weight: bold
+        line-height: 24px
+        padding: 2px 12px 0
+        opacity: .7
+        border-radius: 3px 3px 0 0
+        cursor: pointer
+        transition: background-color $GUI_DURATION, opacity $GUI_DURATION
+        &.-current, &:hover
+          background-color: $COLOR_KEY_DARK1
+          opacity: 1
+  > .sectionscontainer
+    background-color: $COLOR_KEY_DARK1
+    > .section
+      visibility: hidden
+      position: absolute
+      &.-current
+        visibility: inherit
+        position: inherit
+  &.-depth1
+    background-color: $COLOR_KEY_DARK1
+    > .tabscontainer
+      > ul
+        > li
+          &.-current, &:hover
+            background-color: $COLOR_KEY
+    > .sectionscontainer
+      background-color: $COLOR_KEY
+
+  &.collapse-view
+    position: relative
+    > .collapsebutton
+      top: 16px
+      left: 5px
+    &.-collapsed
+      .collapsebutton
+        top: 13px

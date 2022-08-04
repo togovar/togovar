@@ -1,0 +1,118 @@
+$OPACITY_DISABLED: .5
+
+.advanced-search-toolbar
+  margin: 0 0 calc(var(--height-toolbar) * -1 - 1px) 0
+  padding: 2px 6px
+  background-color: $COLOR_KEY_DARK3
+  color: white
+  font-size: 12px
+  line-height: 14px
+  > ul
+    margin: 0
+    display: flex
+    list-style: none
+    padding-left: 0
+    white-space: nowrap
+    > li
+      > p
+        padding: 4px 8px 3px
+        margin-bottom: 0
+        cursor: pointer
+        transition: background-color $GUI_DURATION
+      .shortcut
+        background-color: white
+        color: $COLOR_KEY_DARK3
+        font-weight: bold
+        font-size: 10px
+        height: 12px
+        line-height: 12px
+        padding: 0 3px
+        border-radius: 2px
+        margin-left: 4px
+        display: none // TODO:
+        > .char
+          &.-command
+            &::before
+              [data-os="mac"] &
+                content: "⌘"
+              [data-os="windows"] &
+                font-weight: normal
+                content: "ctrl "
+      &:hover
+        > p
+          background-color: $COLOR_KEY_DARK1
+      // &.-disabled
+      //   opacity: $OPACITY_DISABLED
+      //   pointer-events: none
+      &.-haschild
+        position: relative
+        body[data-dragging="true"] &
+          pointer-events: none
+        > p
+          &::after
+            content: ""
+            display: inline-block
+            border-style: solid
+            border-width: 4px 3px 0 3px
+            border-color: white transparent transparent transparent
+            vertical-align: middle
+            margin-left: 4px
+        > ul
+          position: absolute
+          pointer-events: none
+          background-color: $COLOR_KEY_DARK3
+          opacity: 0
+          z-index: $Z_INDEX_ADVANCED_SEARCH_MENU
+          transform: translateY(-10px)
+          transition: opacity $GUI_DURATION, transform $GUI_DURATION
+          padding: 0 0 2px
+          white-space: nowrap
+          list-style: none
+          > li
+            cursor: pointer
+            transition: background-color $GUI_DURATION
+            display: flex
+            align-items: center
+            > p
+              margin-bottom: 0
+              padding-right: 8px
+              flex-grow: 1
+            &:hover
+              background-color: $COLOR_KEY_DARK1
+        &:hover
+          > ul
+            pointer-events: auto
+            opacity: 1
+            transform: translateY(0)
+            > li
+              padding: 4px 8px
+              &[data-condition="disease"] // TODO: 疾患が実装されたら削除
+                display: none
+      &.command
+        opacity: $OPACITY_DISABLED
+        pointer-events: none
+        &.-enabled
+          opacity: 1
+          pointer-events: auto
+        &[data-command="group"]
+          #AdvancedSearchBuilderView[data-can-group="true"] &
+            opacity: 1
+            pointer-events: auto
+        &[data-command="ungroup"]
+          #AdvancedSearchBuilderView[data-can-ungroup="true"] &
+            opacity: 1
+            pointer-events: auto
+        &[data-command="copy"]
+          #AdvancedSearchBuilderView[data-can-copy="true"] &
+            opacity: 1
+            pointer-events: auto
+        &[data-command="delete"]
+          #AdvancedSearchBuilderView[data-can-delete="true"] &
+            opacity: 1
+            pointer-events: auto
+      &.buttoncontainer
+        flex-grow: 1
+        text-align: right
+        > .button-view
+          position: relative
+          top: 1px

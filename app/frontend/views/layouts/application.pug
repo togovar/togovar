@@ -1,11 +1,12 @@
 block variables
+- var lang = locals.language ? locals.language : "en"
+- var TOMMO_VERSION = "8.3"
 
 doctype html
-html(data-page=locals.currentPage, lang=locals.language)
+html(data-page=locals.currentPage, lang=lang)
   head
     title= locals.title ? locals.title : "TogoVar"
     meta(charset="utf-8")
-    meta(content="text/html; charset=UTF-8" http-equiv="Content-Type")
     meta(name="viewport" content="width=device-width, initial-scale=1")
     link(rel="icon" href="/favicon.svg" type="image/svg+xml")
     block head
