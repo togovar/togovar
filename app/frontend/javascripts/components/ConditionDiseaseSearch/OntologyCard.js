@@ -32,9 +32,15 @@ export class OntologyCard extends LitElement {
     this._skipKeys = ['label', 'children', 'parents', 'leaf'];
   }
 
-  _handleClick() {
+  _handleClick(e) {
+    e.stopPropagation();
+    // TODO remove console.log
+    console.log('clicked', this.data.id);
     this.dispatchEvent(
-      new CustomEvent('card_selected', { detail: { id: this.data.id } })
+      new CustomEvent('card_selected', {
+        detail: { id: this.data.id },
+        composed: true,
+      })
     );
   }
 

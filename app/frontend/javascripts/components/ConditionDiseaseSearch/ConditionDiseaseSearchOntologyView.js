@@ -1,44 +1,22 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 
-import { flip } from './flip';
+import { ref, createRef } from 'lit/directives/ref.js';
+
+// import { flip } from './flip';
 
 import './OntologyCard';
 import '../ErrorModal';
+import './ConditionDiseaseSearchColumn';
+import CondDiseaseColumn from './ConditionDiseaseSearchColumn';
 
 const DISEASE_ADVANCED_SEARCH_URL = `https://togovar-stg.biosciencedbc.jp/api/inspect/disease?node=`;
 
-// const flip = directive((options = { duration: 300 }, onfinish) => (part) => {
-//   const firstElement = part.committer.element;
-//   // Don't animate first render
-//   if (!firstElement.isConnected) {
-//     return;
-//   }
-//   // Capture render position before update
-//   const first = firstElement.getBoundingClientRect();
-//   // Nodes may be re-used so identify via a key.
-//   const container = firstElement.parentNode;
-//   const key = firstElement.getAttribute('key');
-//   requestAnimationFrame(() => {
-//     // Find matching element.
-//     const lastElement = container.querySelector(`[key="${key}"]`);
-//     if (!lastElement) {
-//       return;
-//     }
-//     // Capture render position after update
-//     const last = lastElement.getBoundingClientRect();
-//     // Calculate deltas and animate if something changed.
-//     const topChange = first.top - last.top;
-//     if (topChange !== 0) {
-//       lastElement.animate(
-//         [{ transform: `translate(${topChange}px, ${topChange}px)` }, {}],
-//         options
-//       ).onfinish = onfinish;
-//     }
-//   });
-// });
-
 export default class CondDiseaseOntologyView extends LitElement {
+  containerRef = createRef();
+  nColumns = 3;
+  movement = '';
+
   static get properties() {
     return {
       diseaseId: {
@@ -87,6 +65,31 @@ export default class CondDiseaseOntologyView extends LitElement {
       width: 1px;
     }
 
+    .clip {
+      display: block;
+      width: 100%;
+      height: 300px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .flex {
+      position: absolute;
+      width: 100%;
+      height: 200px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .flex > div {
+      background-color: aqua;
+      width: 100px;
+      height: 200px;
+      cursor: pointer;
+    }
+
     #post-children {
       position: absolute;
       right: -400px;
@@ -120,6 +123,7 @@ export default class CondDiseaseOntologyView extends LitElement {
     this.current = {};
     this.children = {};
     this.parents = {};
+    this.addEventListener('card_selected', this._handleCardSelected);
   }
 
   _fetchData(id) {
@@ -145,12 +149,100 @@ export default class CondDiseaseOntologyView extends LitElement {
       });
   }
 
+  onClickRight = (e) => {
+    const flex = this.containerRef.value;
+    this.movement = 'left';
+    const newDiv = document.createElement('div');
+    const deltaWidth =
+      (flex.lastElementChild.getBoundingClientRect().x -
+        flex.firstElementChild.getBoundingClientRect().x) /
+      (this.nColumns - 1);
+
+    flex.style.width = `${flex.getBoundingClientRect().width + deltaWidth}px`;
+
+    flex.append(newDiv);
+    flex.style.transition = 'ease transform 1s';
+
+    flex.style.transform = `translate(${-deltaWidth}px,0)`;
+  };
+
+  onClickLeft = (e) => {
+    const flex = this.containerRef.value;
+    this.movement = 'right';
+    const deltaWidth =
+      (flex.lastElementChild.getBoundingClientRect().x -
+        flex.firstElementChild.getBoundingClientRect().x) /
+      (this.nColumns - 1);
+
+    const newDiv = new CondDiseaseColumn(); //document.createElement('ontology-column');
+    newDiv.nodes = flex.style.width = `${
+      flex.getBoundingClientRect().width + deltaWidth
+    }px`;
+
+    flex.prepend(newDiv);
+
+    flex.style.transform = `translate(${-deltaWidth}px,0)`;
+
+    requestAnimationFrame(() => {
+      flex.style.transition = 'ease transform 1s';
+      flex.style.transform = `translate(0,0)`;
+    });
+  };
+
+  _init() {
+    const flex = this.containerRef.value;
+    let divLast = this.containerRef.value.lastElementChild;
+    let divFirst = this.containerRef.value.firstElementChild;
+
+    divLast.addEventListener('click', this.onClickRight);
+    divFirst.addEventListener('click', this.onClickLeft);
+
+    flex.addEventListener('transitionend', () => {
+      divFirst.removeEventListener('click', this.onClickLeft);
+      divLast.removeEventListener('click', this.onClickRight);
+
+      if (this.movement === 'right') {
+        flex.lastElementChild.remove();
+      } else if (this.movement === 'left') {
+        flex.firstElementChild.remove();
+      }
+
+      flex.style = '';
+      divFirst = flex.firstElementChild;
+      divLast = flex.lastElementChild;
+      divFirst.addEventListener('click', this.onClickLeft);
+      divLast.addEventListener('click', this.onClickRight);
+    });
+  }
+
   set diseaseId(id) {
     this._fetchData(id);
   }
 
+  updated() {
+    if (
+      !this.loading &&
+      !this.error &&
+      this.data &&
+      Object.keys(this.data).length
+    ) {
+      console.log(this.data);
+      this._init();
+    }
+  }
+
   keepLastValues() {
     return;
+  }
+
+  _handleCardSelected(e) {
+    e.stopPropagation();
+    console.log('_handleCardSelected', e.detail.id);
+    this.diseaseId = e.detail.id;
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener('card_selected', this._handleCardSelected);
   }
 
   render() {
@@ -165,55 +257,22 @@ export default class CondDiseaseOntologyView extends LitElement {
         ${!this.data || !Object.keys(this.data).length
           ? (this.loading && html`<div>Loading...</div>`) ||
             (this.error && html`<error-modal errorMessage="${this.error}" />`)
-          : html`<div class="search-field-view-content">
-              <div class="cards-container parents" id="parents">
-                ${repeat(
-                  this.data.parents,
-                  (parent) => parent.id,
-                  (parent) => {
-                    return html`<ontology-card
-                      key="${parent.id}"
-                      id="${parent.id}"
-                      .data=${parent}
-                      @card_selected=${(e) => this._fetchData(e.detail.id)}
-                      ${flip({ id: parent.id, options })}
-                      selected
-                    />`;
-                  }
-                )}
-              </div>
-              <div class="cards-container main" id="main">
-                ${repeat(
-                  [this.data],
-                  (data) => data.id,
-                  (data) => {
-                    return html`
-                      <ontology-card
-                        key="${data.id}"
-                        id="${data.id}"
-                        .data=${data}
-                        ${flip({ id: data.id, options })}
-                        selected
-                      />
-                    `;
-                  }
-                )}
-              </div>
-              <div class="cards-container children" id="children">
-                ${repeat(
-                  this.data.children,
-                  (child) => child.id,
-                  (child) => html`
-                    <ontology-card
-                      key="${child.id}"
-                      id="${child.id}"
-                      .data=${child}
-                      @card_selected=${(e) => this._fetchData(e.detail.id)}
-                      ${flip({ id: child.id, options })}
-                      selected
-                    />
-                  `
-                )}
+          : html`<div class="clip">
+              <div class="flex" ${ref(this.containerRef)} >
+              <ontology-column .nodes=${this.data?.parents || []}
+              @card_selected="${this._handleCardSelected}" >
+                     </ontology-column>
+                
+                <ontology-column .nodes=${[
+                  this.data,
+                ]} selected /></ontology-column>
+
+                <ontology-column .nodes=${
+                  this.data?.children || []
+                } @card_selected="${this._handleCardSelected}"
+            /></ontology-column>
+               
+               
               </div>
             </div>`}
       </div>
