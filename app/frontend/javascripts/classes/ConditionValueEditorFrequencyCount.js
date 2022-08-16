@@ -66,6 +66,8 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     // set range selector
     const rangeSlider = document.createElement('range-slider');
     rangeSlider.searchType = 'advanced';
+    rangeSlider.sliderStep = 0.01;
+    rangeSlider.inputStep = 0.05;
     rangeSlider.addEventListener('range-changed', (e) => {
       e.stopPropagation();
       this.changeParameter(e.detail);
