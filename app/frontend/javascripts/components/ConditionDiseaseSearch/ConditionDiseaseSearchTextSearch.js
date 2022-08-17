@@ -2,7 +2,7 @@ import { LitElement, css, html } from 'lit';
 import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
-const DISEASE_ADVANCED_SUGGEST_URL = `https://togovar-stg.biosciencedbc.jp/api/search/disease?term=`;
+const DISEASE_ADVANCED_SUGGEST_URL = `https://togovar-dev.biosciencedbc.jp/api/search/disease?term=`;
 
 export default class ConditionTextSearch extends LitElement {
   static properties = {

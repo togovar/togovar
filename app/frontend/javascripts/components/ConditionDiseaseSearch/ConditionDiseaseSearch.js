@@ -24,6 +24,7 @@ export class ConditionDiseaseSearch extends LitElement {
   keepLastValues() {}
   newSuggestionSelected(e) {
     this.diseaseId = e.detail.suggestion.id;
+
     this.requestUpdate();
   }
 
@@ -33,7 +34,7 @@ export class ConditionDiseaseSearch extends LitElement {
         @new-suggestion-selected=${this.newSuggestionSelected}
       ></condition-disease-text-search>
       <condition-disease-ontology-view
-        disease-id="${this.diseaseId}"
+        ._id="${this.diseaseId}"
       ></condition-disease-ontology-view>
     `;
   }

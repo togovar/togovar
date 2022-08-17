@@ -1,15 +1,42 @@
 import { LitElement, html, css } from 'lit';
 
 export class OntologyCard extends LitElement {
-  static get properties() {
+  static properties() {
     return {
-      data: { type: Object, attribute: true },
+      data: { type: Object, state: true },
       selected: { type: Boolean, attribute: true },
-      id: { type: String, attribute: true },
+      hidden: { type: Boolean, attribute: true },
+      id: { type: String, attribute: true, reflect: true },
+      mode: {
+        type: String,
+        state: true,
+      },
     };
   }
 
+  shouldUpdate() {
+    if (this.data.id === 'dummy') {
+      this.hidden = true;
+    } else {
+      this.hidden = false;
+    }
+    return true;
+  }
+
+  constructor() {
+    super();
+    this.data = {};
+    this.hidden = false;
+    this.selected = false;
+    this.mode = '';
+    this._skipKeys = ['label', 'children', 'parents', 'leaf'];
+  }
+
   static styles = css`
+    :host {
+      display: block;
+    }
+
     .ontology-card {
       width: 20rem;
       padding: 10px;
@@ -19,39 +46,26 @@ export class OntologyCard extends LitElement {
       cursor: pointer;
       box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
     }
+
     .selected {
       background-color: #f0f0f0;
       border-color: rgb(17, 127, 147);
     }
+
+    .hidden {
+      visibility: hidden;
+    }
   `;
-
-  constructor() {
-    super();
-    this.data = {};
-    this.selected = false;
-    this._skipKeys = ['label', 'children', 'parents', 'leaf'];
-  }
-
-  _handleClick(e) {
-    e.stopPropagation();
-    // TODO remove console.log
-    console.log('clicked', this.data.id);
-    this.dispatchEvent(
-      new CustomEvent('card_selected', {
-        detail: { id: this.data.id },
-        composed: true,
-      })
-    );
-  }
 
   render() {
     return html`
       <div
-        class="ontology-card ${this.selected ? 'selected' : ''}"
-        @click="${this._handleClick}"
+        class="ontology-card ${this.selected ? 'selected' : ''} ${this.hidden
+          ? 'hidden'
+          : ''}"
       >
         <div class="ontology-card-header">
-          <h3>${this.data ? this.data.label : '...'}</h3>
+          <h3>${this.data?.label || '...'}</h3>
           ${this.selected
             ? html`
                 <table>
