@@ -1,290 +1,240 @@
-import { LitElement, css, html, nothing } from 'lit';
-import { repeat } from 'lit/directives/repeat.js';
-
-import { ref, createRef } from 'lit/directives/ref.js';
-
-// import { flip } from './flip';
-
 import './OntologyCard';
 import '../ErrorModal';
 import './ConditionDiseaseSearchColumn';
-import CondDiseaseColumn from './ConditionDiseaseSearchColumn';
 
-const DISEASE_ADVANCED_SEARCH_URL = `https://togovar-stg.biosciencedbc.jp/api/inspect/disease?node=`;
+// import { Task } from '@lit-labs/task';
+import { LitElement, html, css } from 'lit';
+import { ref, createRef } from 'lit/directives/ref.js';
 
-export default class CondDiseaseOntologyView extends LitElement {
-  containerRef = createRef();
+import { repeat } from 'lit/directives/repeat.js';
+
+import axios from 'axios';
+
+class Container extends LitElement {
   nColumns = 3;
+  flexRef = createRef();
+  clipRef = createRef();
+  nodeRef = createRef();
   movement = '';
+  flexWidth = 0;
+  deltaWidth = 0;
+  nodeWidth = 0;
+  gap = 0;
+
+  static styles = css`
+  :host {
+    font-size: 10px;
+    display: block;
+    height: 100%
+    position: relative;
+  
+  }
+
+
+  .clip {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .flex {
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+`;
+
+  constructor() {
+    super();
+    this._id = '';
+
+    this.loading = false;
+    this._columns = ['parents', 'hero', 'children'];
+    this.data = {};
+    this.dataColumns = {
+      _parents: [],
+      parents: [],
+      hero: [],
+      children: [],
+      _children: [],
+    };
+  }
 
   static get properties() {
     return {
-      diseaseId: {
-        type: String,
-        attribute: 'disease-id',
-        reflect: true,
-      },
-      data: {
-        type: Object,
-        state: true,
-      },
-      children: {
-        type: Array,
-        state: true,
-      },
-      parents: {
-        type: Object,
-        state: true,
-      },
-      current: {
-        type: Object,
-        state: true,
-      },
+      data: { type: Object, state: true },
       loading: { type: Boolean, state: true },
-      error: { type: Boolean, state: true },
+      _id: { type: String, attribute: '_id' },
+      _columns: { type: Array, state: true },
     };
   }
 
-  static styles = css`
-    .search-field-view {
-      padding: 10px;
-    }
-    .search-field-view-content {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-gap: 1em;
-
-      position: relative;
-      overflow: hidden;
-    }
-
-    #pre-parents {
-      position: absolute;
-      left: -400px;
-      top: 0;
-      width: 1px;
-    }
-
-    .clip {
-      display: block;
-      width: 100%;
-      height: 300px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .flex {
-      position: absolute;
-      width: 100%;
-      height: 200px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .flex > div {
-      background-color: aqua;
-      width: 100px;
-      height: 200px;
-      cursor: pointer;
-    }
-
-    #post-children {
-      position: absolute;
-      right: -400px;
-      top: 0;
-      width: 1px;
-    }
-
-    .cards-container {
-      position: relative;
-      height: 400px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 7px;
-    }
-
-    ontology-card {
-      display: block;
-      position: relative;
-    }
-  `;
-
-  constructor() {
-    super(arguments);
-    //declare reactive properties
-    this.diseaseId = '';
-    this.loading = false;
-    this.error = false;
-    this.data = null;
-    this.current = {};
-    this.children = {};
-    this.parents = {};
-    this.addEventListener('card_selected', this._handleCardSelected);
-  }
-
-  _fetchData(id) {
-    const url = DISEASE_ADVANCED_SEARCH_URL + id;
-
-    this.loading = true;
-    fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-    })
-      .then((res) => res.json())
-      .then((json) => {
-        this.data = json;
-      })
-      .catch((err) => {
-        console.log('error fetching');
-        this.error = err.message;
-      })
-      .finally(() => {
-        this.loading = false;
-      });
-  }
-
-  onClickRight = (e) => {
-    const flex = this.containerRef.value;
-    this.movement = 'left';
-    const newDiv = document.createElement('div');
-    const deltaWidth =
-      (flex.lastElementChild.getBoundingClientRect().x -
-        flex.firstElementChild.getBoundingClientRect().x) /
-      (this.nColumns - 1);
-
-    flex.style.width = `${flex.getBoundingClientRect().width + deltaWidth}px`;
-
-    flex.append(newDiv);
-    flex.style.transition = 'ease transform 1s';
-
-    flex.style.transform = `translate(${-deltaWidth}px,0)`;
-  };
-
-  onClickLeft = (e) => {
-    const flex = this.containerRef.value;
-    this.movement = 'right';
-    const deltaWidth =
-      (flex.lastElementChild.getBoundingClientRect().x -
-        flex.firstElementChild.getBoundingClientRect().x) /
-      (this.nColumns - 1);
-
-    const newDiv = new CondDiseaseColumn(); //document.createElement('ontology-column');
-    newDiv.nodes = flex.style.width = `${
-      flex.getBoundingClientRect().width + deltaWidth
-    }px`;
-
-    flex.prepend(newDiv);
-
-    flex.style.transform = `translate(${-deltaWidth}px,0)`;
-
-    requestAnimationFrame(() => {
-      flex.style.transition = 'ease transform 1s';
-      flex.style.transform = `translate(0,0)`;
+  set _id(id) {
+    this.API.get(`/disease?node=${id}`).then(({ data }) => {
+      this.data = data;
     });
-  };
+  }
 
-  _init() {
-    const flex = this.containerRef.value;
-    let divLast = this.containerRef.value.lastElementChild;
-    let divFirst = this.containerRef.value.firstElementChild;
+  refMap = new Map();
 
-    divLast.addEventListener('click', this.onClickRight);
-    divFirst.addEventListener('click', this.onClickLeft);
+  API = axios.create({
+    baseURL: 'https://togovar-dev.biosciencedbc.jp/api/inspect',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  });
 
-    flex.addEventListener('transitionend', () => {
-      divFirst.removeEventListener('click', this.onClickLeft);
-      divLast.removeEventListener('click', this.onClickRight);
+  // _apiTask = new Task(
+  //   this,
+  //   async (_id) => {
+  //     const { data } = await this.API.get(`/disease?node=${_id}`);
 
-      if (this.movement === 'right') {
-        flex.lastElementChild.remove();
-      } else if (this.movement === 'left') {
-        flex.firstElementChild.remove();
+  //     this.data = data;
+
+  //     return data;
+  //   },
+  //   () => this._id
+  // );
+
+  // TODO memorize scroll position inside column before transition
+
+  willUpdate(changedProperties) {
+    if (changedProperties.has('data')) {
+      if (changedProperties.get('data')) {
+        if (changedProperties.get('data').id !== this.data.id) {
+          this.dataColumns._parents = changedProperties.get('data')
+            ?.parents || [{ id: 'dummy', label: 'dummy' }];
+          this.dataColumns._children = changedProperties.get('data')
+            ?.children || [{ id: 'dummy', label: 'dummy' }];
+
+          this.dataColumns.hero = [this.data];
+
+          this.dataColumns.parents = this.data?.parents || [];
+          this.dataColumns.children = this.data?.children || [];
+        }
       }
-
-      flex.style = '';
-      divFirst = flex.firstElementChild;
-      divLast = flex.lastElementChild;
-      divFirst.addEventListener('click', this.onClickLeft);
-      divLast.addEventListener('click', this.onClickRight);
-    });
+    }
   }
 
-  set diseaseId(id) {
-    this._fetchData(id);
+  // firstUpdated() {
+  //   this.API.get(`/disease?node=${this._id}`).then(({ data }) => {
+  //     this.data = data;
+  //   });
+  // }
+
+  _handleClick(e) {
+    if (e.target?.role === 'parents' || e.target?.role === 'children') {
+      this._id = e.detail.id;
+
+      this.API.get(`/disease?node=${this._id}`).then(({ data }) => {
+        if (e.detail.role === 'children') {
+          this.movement = 'left';
+          this._columns = ['_parents', 'parents', 'hero', 'children'];
+        } else if (e.detail.role === 'parents') {
+          this.movement = 'right';
+          this._columns = ['parents', 'hero', 'children', '_children'];
+        }
+
+        this.data = data;
+      });
+    }
+  }
+
+  shouldUpdate(changed) {
+    if (changed.has('_columns')) {
+      this.nodeWidth =
+        this.nodeRef.value?.getBoundingClientRect().width -
+          (this.nodeRef.value?.getBoundingClientRect().right -
+            this.clipRef.value?.getBoundingClientRect().right) || 0;
+      this.gap =
+        (this.clipRef.value?.getBoundingClientRect().width -
+          this.nodeWidth * 3) /
+        2;
+
+      this.flexWidth =
+        this._columns.length === 4
+          ? this.nodeWidth * this._columns.length +
+            (this._columns.length - 1) * this.gap +
+            'px'
+          : '100%';
+
+      this.deltaWidth = this.nodeWidth + this.gap;
+    }
+    return true;
   }
 
   updated() {
-    if (
-      !this.loading &&
-      !this.error &&
-      this.data &&
-      Object.keys(this.data).length
-    ) {
-      console.log(this.data);
-      this._init();
+    let animate;
+
+    if (this.movement === 'left') {
+      animate = this.flexRef.value.animate(
+        [
+          { transform: 'translateX(0)' },
+          {
+            transform: `translateX(${-this.deltaWidth}px)`,
+          },
+        ],
+        {
+          duration: 1000,
+          easing: 'ease-out',
+        }
+      );
+    } else if (this.movement === 'right') {
+      animate = this.flexRef.value.animate(
+        [
+          {
+            transform: `translateX(${-this.deltaWidth}px)`,
+          },
+          { transform: 'translateX(0)' },
+        ],
+        {
+          duration: 1000,
+          easing: 'ease-out',
+        }
+      );
+    }
+    if (animate) {
+      animate.onfinish = () => {
+        this.movement = '';
+        this._columns = ['parents', 'hero', 'children'];
+
+        this.requestUpdate();
+      };
     }
   }
 
-  keepLastValues() {
-    return;
-  }
-
-  _handleCardSelected(e) {
-    e.stopPropagation();
-    console.log('_handleCardSelected', e.detail.id);
-    this.diseaseId = e.detail.id;
-  }
-
-  disconnectedCallback() {
-    this.removeEventListener('card_selected', this._handleCardSelected);
-  }
-
   render() {
-    const options = {
-      duration: 5000,
-      timingFunction: 'ease-out', // 'steps(5, end)'
-    };
-
     return html`
-      <div class="search-field-view">
-        <h2>Advanced Search</h2>
-        ${!this.data || !Object.keys(this.data).length
-          ? (this.loading && html`<div>Loading...</div>`) ||
-            (this.error && html`<error-modal errorMessage="${this.error}" />`)
-          : html`<div class="clip">
-              <div class="flex" ${ref(this.containerRef)} >
-              <ontology-column .nodes=${this.data?.parents || []}
-              @card_selected="${this._handleCardSelected}" >
-                     </ontology-column>
-                
-                <ontology-column .nodes=${[
-                  this.data,
-                ]} selected /></ontology-column>
-
-                <ontology-column .nodes=${
-                  this.data?.children || []
-                } @card_selected="${this._handleCardSelected}"
-            /></ontology-column>
-               
-               
-              </div>
-            </div>`}
+      <div class="clip" ${ref(this.clipRef)}>
+        <div
+          class="flex"
+          @column-click="${this._handleClick}"
+          style="width: ${this.flexWidth}"
+          ${ref(this.flexRef)}
+        >
+          ${repeat(
+            this._columns,
+            (column) => column,
+            (column) => {
+              return html`
+                <ontology-column
+                  .role="${column}"
+                  .nodes="${this.dataColumns[column].length
+                    ? this.dataColumns[column]
+                    : [{ id: 'dummy', label: 'dummy' }]}"
+                  ${ref(this.nodeRef)}
+                />
+              `;
+            }
+          )}
+        </div>
       </div>
     `;
   }
-
-  _createElement() {
-    console.log('createElement');
-  }
 }
 
-customElements.define(
-  'condition-disease-ontology-view',
-  CondDiseaseOntologyView
-);
+customElements.define('condition-disease-ontology-view', Container);

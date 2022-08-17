@@ -1,31 +1,57 @@
-import { LitElement, css, html } from 'lit';
+import { LitElement, css, html, nothing } from 'lit';
 
 import { repeat } from 'lit/directives/repeat.js';
-import { flipColumn } from './flipColumn';
+
+import { flip } from './flipColumn';
 
 import './OntologyCard';
 
-export default class CondDiseaseColumn extends LitElement {
+const rects = new Map();
+
+export default class Column extends LitElement {
   static styles = css`
-    .column {
+    :host {
       display: block;
-      height: 200px;
-      width: 100px
-      background-color: #333;
+      position: relative;
+    }
+
+    .column {
       display: flex;
+      height: 100%;
       flex-direction: column;
+      justify-content: flex-start;
       align-items: flex-start;
-      justify-content: center;
+      gap: 10px;
+      position: relative;
+      overflow-y: auto;
     }
   `;
+
   static get properties() {
     return {
       nodes: { type: Array, state: true },
+      role: { type: String, attribute: true, reflect: true },
     };
   }
-  constructor() {
-    super();
+  constructor(role) {
+    super(...arguments);
     this.nodes = [];
+    this.role = role || '';
+  }
+
+  _handleClick(e) {
+    if (e.target.tagName === 'ONTOLOGY-CARD') {
+      this.dispatchEvent(
+        new CustomEvent('column-click', {
+          detail: {
+            id: e.target.id,
+            role: this.role,
+          },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    }
   }
 
   render() {
@@ -34,10 +60,11 @@ export default class CondDiseaseColumn extends LitElement {
       timingFunction: 'ease-out', // 'steps(5, end)'
     };
 
-    console.log(this.nodes);
-
     return html`
-      <div class="column">
+      <div
+        class="column"
+        @click="${this.nodes[0].id === 'dummy' ? null : this._handleClick}"
+      >
         ${this.nodes.length
           ? html`
               ${repeat(
@@ -48,16 +75,16 @@ export default class CondDiseaseColumn extends LitElement {
                     key="${node.id}"
                     id="${node.id}"
                     .data=${node}
-                    ${flipColumn({ duration: 1000 }, () => {})}
+                    ${flip({ id: node.id, role: this.role, options })}
                     selected
                   />`;
                 }
               )}
             `
-          : html``}
+          : nothing}
       </div>
     `;
   }
 }
 
-customElements.define('ontology-column', CondDiseaseColumn);
+customElements.define('ontology-column', Column);

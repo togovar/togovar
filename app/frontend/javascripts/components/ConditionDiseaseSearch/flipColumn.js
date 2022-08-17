@@ -1,74 +1,131 @@
 import { directive, AsyncDirective } from 'lit/async-directive.js';
 import { noChange, nothing } from 'lit';
 
+let previousRole;
+const disconnectedRects = new Map();
 class Flip extends AsyncDirective {
   parent;
   element;
   boundingRect;
   id;
+  changedToHero = false;
 
-  update(part, [{ id = undefined, options = {} } = {}]) {
-    const firstElement = part.element;
-    // Don't animate first render
-    if (!firstElement.isConnected) {
+  // render() {
+  //   return nothing;
+  // }
+
+  update(part, [{ id = undefined, role = '', options = {} } = {}]) {
+    this.id = id;
+    this.options = {
+      ...this.options,
+      ...options,
+    };
+
+    if (!previousRole) {
+      previousRole = role;
+    }
+
+    if (previousRole && previousRole !== 'hero' && role === 'hero') {
+      previousRole = role;
+      this.changedToHero = true;
+    }
+
+    if (this.element !== part.element) {
+      this.element = part.element;
+      requestAnimationFrame(() => {
+        this.parent =
+          this.element.parentElement ||
+          this.element.shadowRoot.getRootNode().host;
+      });
+    }
+    // memorize boundingRect before element updates
+    if (this.boundingRect) {
+      this.boundingRect = this.element.getBoundingClientRect();
+    }
+
+    // the timing on which LitElement batches its updates, to capture the "last" frame of our animation.
+    Promise.resolve().then(() => this.prepareToFlip());
+    return noChange;
+  }
+
+  prepareToFlip() {
+    if (!this.boundingRect) {
+      this.boundingRect = disconnectedRects.has(this.id)
+        ? disconnectedRects.get(this.id)
+        : this.element.getBoundingClientRect();
+      disconnectedRects.delete(this.id);
+    }
+    this.flip();
+  }
+
+  flip(listener, removing) {
+    const previous = this.boundingRect;
+
+    // current position
+    this.boundingRect = this.element.getBoundingClientRect();
+
+    const deltaY = previous.y - this.boundingRect.y;
+    if (!deltaY && !removing) {
       return;
     }
-    // Capture render position before update
-    const first = firstElement.getBoundingClientRect();
-    // Nodes may be re-used so identify via a key.
-    const container = firstElement.parentNode;
-    const key = firstElement.getAttribute('key');
-    requestAnimationFrame(() => {
-      // Find matching element.
-      const lastElement = container.querySelector(`[key="${key}"]`);
-      if (!lastElement) {
-        return;
+
+    const filteredListener = (event) => {
+      if (event.target === this.element) {
+        listener(event);
+        this.element.removeEventListener('transitionend', filteredListener);
       }
-      // Capture render position after update
-      const last = lastElement.getBoundingClientRect();
-      // Calculate deltas and animate if something changed.
-      const topChange = first.top - last.top;
-      if (topChange !== 0) {
-        lastElement.animate(
-          [{ transform: `translateY(${topChange}px)` }, {}],
-          options
-        ).onfinish = onfinish;
+    };
+
+    this.element.addEventListener('transitionend', filteredListener);
+
+    this.element.animate(
+      [
+        {
+          transform: `translate(0, ${deltaY}px)`,
+        },
+        {
+          transform: `translate(0,0)`,
+        },
+      ],
+      {
+        duration: 1000,
+        easing: 'ease-out',
       }
-    });
+    );
+  }
+
+  // TODO whan changed
+  disconnected() {
+    //this.boundingRect = this.element.getBoundingClientRect();
+    disconnectedRects.set(this.id, this.boundingRect);
+
+    if (typeof this.id !== 'undefined') {
+      requestAnimationFrame(() => {
+        this.parent.append(this.element);
+        this.changedToHero = false;
+      });
+
+      this.element.animate(
+        [
+          {
+            opacity: 1,
+          },
+          {
+            opacity: 0,
+          },
+        ],
+        {
+          duration: 1000,
+          easing: 'ease-out',
+        }
+      ).onfinish = () => {
+        if (disconnectedRects.has(this.id)) {
+          disconnectedRects.delete(this.id);
+        }
+        this.element.remove();
+      };
+    }
   }
 }
 
-export const flipColumn = directive(Flip);
-
-// export const flipColumn = directive(
-//   (options = { duration: 300 }, onfinish) =>
-//     (part) => {
-//       const firstElement = part.committer.element;
-//       // Don't animate first render
-//       if (!firstElement.isConnected) {
-//         return;
-//       }
-//       // Capture render position before update
-//       const first = firstElement.getBoundingClientRect();
-//       // Nodes may be re-used so identify via a key.
-//       const container = firstElement.parentNode;
-//       const key = firstElement.getAttribute('key');
-//       requestAnimationFrame(() => {
-//         // Find matching element.
-//         const lastElement = container.querySelector(`[key="${key}"]`);
-//         if (!lastElement) {
-//           return;
-//         }
-//         // Capture render position after update
-//         const last = lastElement.getBoundingClientRect();
-//         // Calculate deltas and animate if something changed.
-//         const topChange = first.top - last.top;
-//         if (topChange !== 0) {
-//           lastElement.animate(
-//             [{ transform: `translateY(${topChange}px)` }, {}],
-//             options
-//           ).onfinish = onfinish;
-//         }
-//       });
-//     }
-// );
+export const flip = directive(Flip);
