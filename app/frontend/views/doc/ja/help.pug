@@ -8,6 +8,8 @@ append variables
 block head
   each css in htmlWebpackPlugin.files.css
     link(href=css, rel="stylesheet")
+  each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/main-/))
+    script(type="text/javascript", src=js)
 
 block content
   main
@@ -61,6 +63,10 @@ block content
                   a.link(href='#s3') TogoVarでは、どのようにバリアントを表記していますか。
                 li.item.-question
                   a.link(href='#s4') Human Genome Variation Society (HGVS) 表記 (例：ALDH2:p.Glu504Lys) で検索できますか。
+                li.item.-question
+                  a.link(href='#s5') Advanced searchでできることは何ですか。
+                li.item.-question
+                  a.link(href='#s6') 日本人集団とその他の集団で代替アレル頻度が異なるバリアントを検索できますか。
 
       .contents
         section.section
@@ -75,7 +81,7 @@ block content
           #g2.question-answer
             h4.question 動画を使った説明はありますか。
             .answer
-              p                 
+              p
                 a(href='https://togotv.dbcls.jp/') TogoTV
                 | をご覧ください。TogoVarに関する動画は
                 a(href='https://togotv.dbcls.jp/result.html?type=manual&page=1&query=TogoVar') こちら
@@ -87,20 +93,20 @@ block content
             .answer
               p
                 | すべて無償での利用が可能です。データベースの利用については、
-                a(href='./terms.html') Terms
+                a(href='./terms') Terms
                 | のページを参照してください。
           #t2.question-answer
             h4.question TogoVarデータベースを論文で引用するにはどうすれば良いでしょうか。
             .answer
               p
-                a(href='./terms.html') Terms
+                a(href='./terms') Terms
                 | のクレジットの表示例を参考にしてください。
           #t3.question-answer
             h4.question 商用利用は可能でしょうか。
             .answer
               p
                 | TogoVarのwebサイトの閲覧や公開予定のdockerイメージは商用利用可能です。TogoVarが取り込んでいる第三者作成データに関してはそれそれの利用条件に従ってください。詳しくは
-                a(href='./terms.html') Terms
+                a(href='./terms') Terms
                 | をご覧ください。
 
         section.section
@@ -193,52 +199,54 @@ block content
                 | 各データセットにおけるAlternative allele頻度を表現しています。頻度メータの色はデータセットに割り当てられた色に対応しています。データの有無や頻度の値を９段階で表現しています。
               ._flex._break-avoid
                 ._padding-right-large
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='na')
-                    span._margin-left Not Available
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='monomorphic')
-                    span._margin-left Monomorphic (REF)
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='singleton')
-                    span._margin-left Singleton
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.0001')
-                    span._margin-left &lt; 0.0001
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.001')
-                    span._margin-left &lt; 0.001
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.01')
-                    span._margin-left &lt; 0.01
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.05')
-                    span._margin-left &lt; 0.05
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&lt;0.5')
-                    span._margin-left &lt; 0.5
-                  .frequency-graph._margin-bottom
-                    .dataset(data-frequency='&ge;0.5')
-                    span._margin-left &ge; 0.5
-                div
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='gem_j_wga')
-                    span._margin-left GEM-J WGA
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='jga_ngs')
-                    span._margin-left JGA-NGS
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='jga_snp')
-                    span._margin-left JGA-SNP
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='tommo_4.7kjpn')
-                    span._margin-left ToMMo 4.7KJPN
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='hgvd')
-                    span._margin-left HGVD
-                  .frequency-graph._margin-bottom
-                    .dataset(data-dataset='exac')
-                    span._margin-left ExAC
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="na")
+                  | &nbsp; Not Available
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="monomorphic")
+                  | &nbsp; Monomorphic (REF)
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="undefined" data-count="1")
+                  | &nbsp; Singleton
+                ._padding-right-large
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.0001")
+                  | &nbsp; &lt; 0.0001
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.001")
+                  | &nbsp; &lt; 0.001
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.01")
+                  | &nbsp; &lt; 0.01
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.05")
+                  | &nbsp; &lt; 0.05
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.5")
+                  | &nbsp; &lt; 0.5
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; ≥ 0.5
+                ._padding-right-large
+                  logarithmized-block-graph-frequency-view(data-dataset="gem_j_wga" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; GEM-J WGA
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="jga_ngs" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; JGA-NGS
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="jga_snp" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; JGA-SNP
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="tommo" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; ToMMo 8.3KJPN
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="hgvd" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; HGVD
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="gnomad_genomes" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; gnomAD genomes
+                  br
+                  logarithmized-block-graph-frequency-view(data-dataset="gnomad_exomes" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; gnomAD exomes
+
           #s2.question-answer._column-span-all
             h4.question バリアントタイプごとにPosition、Ref、Altはそれぞれどのように記述されますか。
             .answer
@@ -534,3 +542,73 @@ block content
                 | )で検索可能です。
                 a.hyper-text.-external(target='_blank', href='https://m.ensembl.org/info/docs/tools/vep/recoder/index.html') Variant Recorder
                 | でHGVS表記をGRCh37座標に変換します。
+          #s5.question-answer._column-span-all
+            h4.question
+              a.hyper-text.-external(target='_blank', href='/?mode=advanced') Advanced search
+              | でできることは何でしょうか。
+            .answer
+              p
+                |代替アレル頻度やClinical significanceなどの検索条件をANDやORで結合したクエリーを作成できます。使い方は、
+                a.link(href='#s6') Q:日本人集団とその他の集団で代替アレル頻度が異なるバリアントを検索できますか
+                |をご覧ください。
+          #s6.question-answer._column-span-all
+            h4.question 日本人集団とその他の集団で代替アレル頻度が異なるバリアントを検索できますか。
+            .answer
+              p
+                | はい。
+                a.hyper-text.-external(target='_blank', href='/?mode=advanced') Advanced search
+                | による検索が可能です。
+                p
+                | 代替アレル頻度の比較対象のバリアントは以下の通りです。
+                ul.unordered-list
+                  li 日本人集団はGEM-J WGAまたは8.3KJPNのいずれかに含まれるバリアント
+                  li gnomADはgnomaAD genomesまたはexomesのいずれかに含まれるバリアント
+                p
+                | 日本人集団の代替アレル頻度が0.3以上、gnomAD集団は0.05以下のバリアントを検索します。
+                ol.ordered-list
+                  li 画面上部のAdvanced searchタブを選択します。
+                    img(src=require("../../../images/help-image1.png").default alt="help-image1")
+                  li Add conditionメニューからAlternative allele frequency/countを選択します。
+                    p
+                      img(src=require("../../../images/help-image2.png").default alt="help-image2" width="241")
+                  li 以下の画面でデータセット(GEM-J WGA)と代替アレル頻度(>=0.3)を指定します。代替アレル数でも指定できます。
+                    img(src=require("../../../images/help-image3.png").default alt="help-image3")
+                  li OKボタンを押下します。検索条件が設定されました。
+                    img(src=require("../../../images/help-image4.png").default alt="help-image4")
+                  li 同様の手順でデータセットToMMo 8.3KJPN、gnomAD genomes、gnomAD exomesについても検索条件を設定します。
+                    img(src=require("../../../images/help-image5.png").default alt="help-image5")
+                  li 日本人集団（GEM-J WGAとToMMo 8.3KJPN)の検索条件をOR結合にします。
+                    ol.ordered-list
+                      li GEM-J WGAとToMMo 8.3KJPNの検索条件をクリックして選択します。選択状態では黄枠で囲まれます。
+                        img(src=require("../../../images/help-image6.png").default alt="help-image6")
+                      li Groupメニューを選択します。選択した２つがOR条件になります。なお、AND条件に変更する場合は、左端のORアイコンをクリックします。
+                        img(src=require("../../../images/help-image7.png").default alt="help-image7")
+                      li 同様にgnomAD genomesとgnomAD exomesもOR条件にします。
+                        img(src=require("../../../images/help-image8.png").default alt="help-image8")
+                p
+                | 最終的には以下の検索条件になります。
+                p
+                | ((freq(GEM-J WGA) &amp;gt;= 0.3) OR (freq(ToMMo 8.3KJPN) &amp;gt;= 0.3))
+                br
+                |  AND
+                br
+                |  (freq(gnomAD genomes) &amp;lt;= 0.05) OR (freq(gnomAD exomes) &amp;lt;= 0.05))
+                p
+                | 検索条件が変更される度に検索が自動的に実行され、条件に合致するバリアントの一覧が更新されます。
+                img(src=require("../../../images/help-image9.png").default alt="help-image9")
+                p
+                | メニューの機能
+                ul.unordered-list
+                  li Add condition: 検索条件を追加します。
+                  li Group: 選択された検索条件(黄枠表示)をOR条件で結合します。ORアイコンをクリックするとAND結合に変更できます。
+                  li Ungroup：結合された検索条件を分離します。Groupとは反対の操作です。
+                  li Delete:選択した 検索条件を削除します。
+                p
+                | アイコンの機能
+                ul.unordered-list
+                  li
+                    img(src=require("../../../images/help-pencil.png").default alt="help-pencil")
+                    | ：検索条件を編集します。
+                  li
+                    img(src=require("../../../images/help-cross.png").default alt="help-cross")
+                    | ：検索条件を削除します。

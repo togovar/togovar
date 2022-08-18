@@ -4,14 +4,12 @@ $COLOR_ALT_BG: desaturate(lighten($COLOR_ALT, 24%), 10%)
 .ref-alt
   font-weight: bold
   display: flex
-
   > .ref, > .alt
     display: inline-block
     line-height: 18px
     height: 18px
     padding: 0 6px
     vertical-align: middle
-
     &[data-sum]
       &:after
         color: white
@@ -25,11 +23,9 @@ $COLOR_ALT_BG: desaturate(lighten($COLOR_ALT, 24%), 10%)
         margin: 0 -3px 4px 3px
         position: relative
         content: attr(data-sum) "bp"
-
     &[data-sum="0"], &[data-sum="1"], &[data-sum="2"], &[data-sum="3"], &[data-sum="4"]
       &:after
         display: none
-
   > .ref
     border-left: solid 1px $COLOR_REF
     border-top: solid 1px $COLOR_REF
@@ -40,10 +36,8 @@ $COLOR_ALT_BG: desaturate(lighten($COLOR_ALT, 24%), 10%)
     background-color: $COLOR_REF_BG
     position: relative
     padding-right: 4px
-
     &[data-sum]:after
       background-color: $COLOR_REF
-
   > .alt
     border-right: solid 1px $COLOR_ALT
     border-top: solid 1px $COLOR_ALT
@@ -53,25 +47,20 @@ $COLOR_ALT_BG: desaturate(lighten($COLOR_ALT, 24%), 10%)
     color: $COLOR_ALT
     background-color: $COLOR_ALT_BG
     padding-left: 9px
-
     &[data-sum]:after
       background-color: $COLOR_ALT
-
   > .arrow
     position: relative
-
     &:before, &:after
       content: ""
       display: inline-block
       position: absolute
-
     &:before
       border-top: 9px solid transparent
       border-bottom: 9px solid transparent
       border-left: 6px solid $COLOR_REF
       top: 0px
       right: -6px
-
     &:after
       border-top: 8px solid transparent
       border-bottom: 8px solid transparent

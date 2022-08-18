@@ -16,6 +16,7 @@ module TogoVar
     end
 
     register(Tasks::Convert, 'convert', 'convert [COMMAND]', 'Commands for convert')
+    register(Tasks::DiseaseMondo, 'disease_mondo', 'disease_mondo [COMMAND]', 'Commands for mondo')
     register(Tasks::Elasticsearch, 'elasticsearch', 'elasticsearch [COMMAND]', 'Commands for elasticsearch')
     register(Tasks::Import, 'import', 'import [COMMAND]', 'Commands for import')
     register(Tasks::Variation, 'variation', 'variation [COMMAND]', 'Commands for variation')

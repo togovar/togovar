@@ -1,0 +1,31 @@
+.logical-operator-switch
+  padding: .1em .3em
+  border-radius: .75em
+  line-height: 1
+  color: $COLOR_KEY_DARK3
+  cursor: pointer
+  &[data-operator="and"], &[data-operator="or"]
+    &::before
+      font-family: fontello
+      font-size: 1.4em
+      vertical-align: middle
+      display: inline-block
+      width: 1.15em
+      letter-spacing: -1em
+    &::after
+      font-weight: bold
+      bottom: -.1em
+      position: relative
+  &[data-operator="and"]
+    &::before
+      content: $CHAR_LOGICAL_OP_OUTLINE + $CHAR_LOGICAL_OP_AND
+    &::after
+      content: "AND"
+  &[data-operator="or"]
+    &::before
+      content: $CHAR_LOGICAL_OP_OUTLINE + $CHAR_LOGICAL_OP_OR
+    &::after
+      content: "OR"
+  &:hover
+    color: white
+    background-color: $COLOR_KEY_DARK3

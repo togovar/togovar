@@ -1,0 +1,65 @@
+.checkboxes-editor-view
+  > .buttons
+    padding: 4px var(--padding-side)
+    border-bottom: dotted 1px $COLOR_SEPARATOR_SUB
+  > .checkboxes
+    margin: 0
+    font-size: 14px
+    line-height: 24px
+    > li
+      display: inline-block
+      line-height: 18px
+      margin-right: 12px
+      &:last-child
+        margin-right: 0
+      > label
+        margin-bottom: 0
+        font-weight: bold
+        > .clinical-significance
+          display: inline-block
+  &[data-condition-type="significance"]
+    > .checkboxes
+      display: grid
+      row-gap: 3px
+      > li[data-value="P"]
+        grid-column: 1 / 2
+        grid-row: 1 / 2
+      > li[data-value="LP"]
+        grid-column: 1 / 2
+        grid-row: 2 / 3
+      > li[data-value="US"]
+        grid-column: 1 / 2
+        grid-row: 3 / 4
+      > li[data-value="LB"]
+        grid-column: 1 / 2
+        grid-row: 4 / 5
+      > li[data-value="B"]
+        grid-column: 1 / 2
+        grid-row: 5 / 6
+      > li[data-value="CI"]
+        grid-column: 1 / 2
+        grid-row: 6 / 7
+      > li[data-value="DB"]
+        grid-column: 2 / 3
+        grid-row: 1 / 2
+      > li[data-value="A"]
+        grid-column: 2 / 3
+        grid-row: 2 / 3
+      > li[data-value="RF"]
+        grid-column: 2 / 3
+        grid-row: 3 / 4
+      > li[data-value="PR"]
+        grid-column: 2 / 3
+        grid-row: 4 / 5
+      > li[data-value="AF"]
+        grid-column: 2 / 3
+        grid-row: 5 / 6
+      > li[data-value="O"]
+        grid-column: 2 / 3
+        grid-row: 6 / 7
+      > li[data-value="NP"]
+        grid-column: 3 / 4
+        grid-row: 1 / 2
+      > li[data-value="AN"]
+        grid-column: 3 / 4
+        grid-row: 2 / 3

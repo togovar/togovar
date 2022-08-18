@@ -214,9 +214,14 @@ module Elasticsearch
               end
             end
 
-            if (interpretations = values.map { |x| Form::ClinicalSignificance.find_by_param_name(x).key }).present?
+            if (interpretations = values.filter_map { |x| Form::ClinicalSignificance.find_by_param_name(x)&.label&.downcase }).present?
               should do
-                terms 'clinvar.interpretation': interpretations
+                nested do
+                  path 'clinvar.conditions'
+                  query do
+                    terms 'clinvar.conditions.interpretation': interpretations
+                  end
+                end
               end
             end
           end
@@ -236,7 +241,7 @@ module Elasticsearch
           nested do
             path :vep
             query do
-              terms 'vep.consequence': values.map { |x| SequenceOntology.find(x)&.label }.compact
+              terms 'vep.consequence': values.map { |x| SequenceOntology.find(x)&.key }.compact
             end
           end
         end
@@ -329,7 +334,7 @@ module Elasticsearch
       query.delete(:from)
       query.delete(:sort)
 
-      query.merge(aggregations)
+      query.merge(Variation::QueryHelper.statistics)
     end
 
     def build
@@ -390,9 +395,16 @@ module Elasticsearch
           filter exists: { field: :clinvar }
         end
 
-        aggregation :interpretations do
-          terms field: 'clinvar.interpretation', size: Variation.cardinality[:clinvar_interpretations]
+        aggregation :conditions do
+          nested do
+            path 'clinvar.conditions'
+            aggregation :interpretations do
+              terms field: 'clinvar.conditions.interpretation',
+                    size: Variation.cardinality[:clinvar_interpretations]
+            end
+          end
         end
+
 
         aggregation :frequency do
           nested do
@@ -547,11 +559,16 @@ module Elasticsearch
                  ts.map(&:id)
                end
 
-      return if medgen.empty?
+      return if medgen.blank?
 
       query = Elasticsearch::DSL::Search.search do
         query do
-          terms 'clinvar.medgen': medgen
+          nested do
+            path 'clinvar.conditions'
+            query do
+              terms 'clinvar.conditions.medgen': medgen
+            end
+          end
         end
       end
 

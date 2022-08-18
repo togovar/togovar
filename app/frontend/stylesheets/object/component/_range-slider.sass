@@ -1,0 +1,70 @@
+$PADDING_METER: 8px
+
+range-slider::part(wrapper)
+  display: flex
+  flex-wrap: wrap
+  row-gap: 1em
+  column-gap: 2em
+range-slider::part(label)
+  margin: 0
+range-slider::part(meter)
+  width: 100%
+  max-width: 250px
+  z-index: 1
+  height: 1.5em
+  margin-top: 0.5em
+  padding: 0 $PADDING_METER
+  position: relative
+range-slider::part(div-input)
+  text-align: center
+range-slider::part(checkbox)
+  vertical-align: middle
+range-slider::part(num-input)
+  width: 5em
+  margin-right: 3px
+  font-size: inherit
+  +input-number
+range-slider::part(checkbox-label)
+  margin-left: 8px
+  margin-bottom: 0
+range-slider::part(ruler)
+  position: relative
+  font-size: 0.8em
+range-slider::part(scale)
+  position: absolute
+  z-index: 10
+  line-height: 1
+  transform: translateY(13px)
+  &::before
+    content: ""
+    border-left: dotted 1px $COLOR_SEPARATOR
+    height: 14px
+    top: -16px
+    left: 0.5em
+    display: block
+    position: absolute
+range-slider::part(meter-container)
+  display: flex
+  flex-direction: column
+  align-items: center
+  position: relative
+range-slider::part(slider-track)
+  width: calc(100% - 3px)
+  height: 8px
+range-slider::part(slider)
+  -webkit-appearance: none
+  line-height: 1em
+  appearance: none
+  width: 100%
+  position: absolute
+  margin: auto
+  background-color: transparent
+  pointer-events: none
+range-slider::part(match)
+  text-align: center
+   margin-left: 1em
+range-slider::part(scale-vertical)
+  transform: rotate(90deg) translateX(-2em)
+  &::before
+    transform: rotate(90deg) translate(15px,-2em)
+

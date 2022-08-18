@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    title TogoVar API
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    link(rel="icon" href="/favicon.svg" type="image/svg+xml")
+    each css in htmlWebpackPlugin.files.css.filter(x => x.match(/^\/css\/main-/))
+      link(href=css, rel="stylesheet")
+    each css in htmlWebpackPlugin.files.css.filter(x => x.match(/^\/css\/api-/))
+      link(href=css, rel="stylesheet")
+
+  body
+    - locals.currentPage = "api";
+    include ../includes/_global_header
+    div#swagger
+
+    each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/api-/))
+      script(type="text/javascript", src=js)

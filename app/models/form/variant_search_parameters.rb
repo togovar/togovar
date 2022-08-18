@@ -11,26 +11,7 @@ require_relative 'type'
 module Form
   # see doc/spec_for_search_query.md
   class VariantSearchParameters
-    class << self
-      def permit(params)
-        params.permit(:term,
-                      :quality,
-                      :offset,
-                      :limit,
-                      :stat,
-                      :debug,
-                      :start_only,
-                      :format,
-                      dataset: Form::Dataset.parameters,
-                      frequency: Form::Frequency.parameters,
-                      type: Form::Type.parameters,
-                      significance: Form::ClinicalSignificance.parameters,
-                      consequence: Form::Consequence.parameters,
-                      sift: Form::Sift.parameters,
-                      polyphen: Form::Polyphen.parameters)
-      end
-    end
-
+    attr_writer :term
     attr_reader :dataset
     attr_reader :frequency
     attr_reader :quality
@@ -64,6 +45,10 @@ module Form
       @stat = params.fetch(:stat, '1')
       @debug = params.key?(:debug)
       @start_only = params.key?(:start_only)
+    end
+
+    def [](symbol_or_string)
+      instance_variable_get("@#{symbol_or_string}")
     end
 
     def debug?

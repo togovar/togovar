@@ -1,0 +1,72 @@
+$SIZE: 30px
+
+.search-field-view
+  position: relative
+  > .fieldcontainer
+    > .field
+      margin-bottom: 4px
+      > input[type="text"]
+        width: calc(100% - #{$SIZE - 2px})
+        line-height: $SIZE
+        height: $SIZE
+        border: solid 1px $COLOR_KEY_DARK2
+        border-radius: $SIZE * 0.5
+        margin-left: -3px
+        padding: 0 12px
+        vertical-align: top
+        font-size: 12px
+        outline: none
+        opacity: .9
+        &:focus
+          opacity: 1
+      > button
+        width: $SIZE
+        height: $SIZE
+        border: solid 1px $COLOR_KEY_DARK1
+        border-radius: 100%
+        margin-right: -4px
+        position: relative
+        background-color: white
+        text-indent: -9999px
+        box-shadow: 0 1px 1px rgba(black, 0.2)
+        &:before, &:after
+          content: ""
+          display: block
+          position: absolute
+        &:before
+          width: 12px
+          height: 12px
+          border: solid 2px $COLOR_KEY_DARK1
+          border-radius: 6px
+          top: 6px
+          left: 6px
+        &:after
+          height: 5px
+          border-left: solid 2px $COLOR_KEY_DARK1
+          transform: rotate(-45deg)
+          top: 16px
+          left: 17px
+  > .examples
+    > dl
+      font-size: 12px
+      line-height: 16px
+      margin-bottom: 0
+      padding: 0 .5em
+      display: inline-block
+      border-radius: 8px
+      cursor: pointer
+      transition: background-color $GUI_DURATION, box-shadow $GUI_DURATION
+      > dt, > dd
+        display: inline-block
+        margin-bottom: 0
+        color: white
+        transition: color $GUI_DURATION
+      > dt
+        font-weight: normal
+        opacity: .6
+        &:after
+          content: ":"
+      &:hover
+        background-color: $COLOR_KEY_DARK2
+  > .suggest-view
+    position: absolute

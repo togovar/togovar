@@ -6,31 +6,24 @@
         vertical-align: top
         padding-top: 2px
         padding-bottom: 2px
-
       > th
         text-align: right
         padding-right: .5em
         @extend .panel-view-heading
-
         &:after
           content: ":"
-
       &:first-child
         > th, > td
           padding-top: 6px
-
       &:last-child
         > th, > td
           padding-bottom: 6px
-
       > td
         > ul
           margin-bottom: 0
           padding-block-start: 0
           padding-inline-start: 0
-
           > li
             display: block
-
     + tbody
       border-top: solid 1px $COLOR_SEPARATOR_SUB
