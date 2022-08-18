@@ -11,6 +11,7 @@ require_relative 'type'
 module Form
   # see doc/spec_for_search_query.md
   class VariantSearchParameters
+    attr_writer :term
     attr_reader :dataset
     attr_reader :frequency
     attr_reader :quality

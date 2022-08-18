@@ -98,8 +98,8 @@ class VariationSearchService
     def search
       return empty_result if BINARY_FILTERS.map { |x| param.selected_none?(x) }.any?
 
-      term = hgvs_notation_to_location(param.term)
-      res = Variation.search((q = query), request_cache: !term.present?)
+      param.term = hgvs_notation_to_location(param.term)
+      res = Variation.search((q = query), request_cache: !param.term.present?)
 
       {
         filtered_total: Variation.count(body: q.slice(:query)),
@@ -109,11 +109,12 @@ class VariationSearchService
     end
 
     def hgvs_notation_to_location(term)
+      return if term.blank?
       return term unless HGVS.match?(term)
 
       HGVS.extract_location(term) do |t, e, w|
-        @error << e
-        @warning << w
+        @error << e if e.present?
+        @warning << w if w.present?
         @notice << "Translate HGVS representation '#{term}' to '#{t}'" unless term == t
         term = t
       end
