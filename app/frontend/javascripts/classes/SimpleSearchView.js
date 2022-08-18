@@ -25,6 +25,14 @@ const EXAMPLES = [
   {
     key: 'Region(GRCh37/hg19)',
     value: '10:73270743-73376976'
+  },
+  {
+    key: 'HGVSc',
+    value: 'NM_000690:c.1510G>A'
+  },
+  {
+    key: 'HGVSp',
+    value: 'ALDH2:p.Glu504Lys'
   }
 ]
 
