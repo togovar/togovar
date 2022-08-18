@@ -559,7 +559,7 @@ module Elasticsearch
                  ts.map(&:id)
                end
 
-      return if medgen.empty?
+      return if medgen.blank?
 
       query = Elasticsearch::DSL::Search.search do
         query do
