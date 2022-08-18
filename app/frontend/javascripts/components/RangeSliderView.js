@@ -75,7 +75,8 @@ class RangeSlider extends HTMLElement {
     return [
       'min',
       'max',
-      'step',
+      'input-step',
+      'slider-step',
       'value1',
       'value2',
       'orientation',
@@ -94,7 +95,8 @@ class RangeSlider extends HTMLElement {
       invert: '0',
       min: 0,
       max: 1,
-      step: 0.05,
+      'input-step': 0.05,
+      'slider-step': 0.01,
       match: 'any',
       rulerNumberOfSteps: 10,
     };
@@ -127,9 +129,11 @@ class RangeSlider extends HTMLElement {
         this.from.max = newValue;
         this.to.max = newValue;
         break;
-      case 'step':
+      case 'slider-step':
         this.slider1.step = newValue;
         this.slider2.step = newValue;
+        break;
+      case 'input-step':
         this.from.step = newValue;
         this.to.step = newValue;
         break;
@@ -254,8 +258,11 @@ class RangeSlider extends HTMLElement {
   set max(value) {
     this.setAttribute('max', value);
   }
-  set step(value) {
-    this.setAttribute('step', value);
+  set sliderStep(value) {
+    this.setAttribute('slider-step', value);
+  }
+  set inputStep(value) {
+    this.setAttribute('input-step', value);
   }
   set value1(value) {
     this.setAttribute('value1', value);
@@ -304,7 +311,7 @@ class RangeSlider extends HTMLElement {
   connectedCallback() {
     this.min = this.getAttribute('min') || 0;
     this.max = this.getAttribute('max') || 1;
-    this.step = this.getAttribute('step') || 0.05;
+    this.step = this.getAttribute('step') || 0.01;
     this.value1 = this.getAttribute('value1') || 0;
     this.value2 = this.getAttribute('value2') || 1;
     this.orientation = this.getAttribute('orientation') || 'horizontal';

@@ -1,30 +1,34 @@
-import PanelView from "./PanelView.js";
-import StoreManager from "./StoreManager.js";
-import "../components/RangeSliderView.js";
+import PanelView from './PanelView.js';
+import StoreManager from './StoreManager.js';
+import '../components/RangeSliderView.js';
 
 export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView {
   constructor(elm) {
-    super(elm, "frequency");
+    super(elm, 'frequency');
 
     // default values
-    this._conditionMaster = StoreManager.getSimpleSearchConditionMaster(this.kind);
+    this._conditionMaster = StoreManager.getSimpleSearchConditionMaster(
+      this.kind
+    );
     const condition = this._getConditionFromStore();
 
-    const rangeSlider = document.createElement("range-slider");
+    const rangeSlider = document.createElement('range-slider');
     rangeSlider.value1 = condition.from;
     rangeSlider.value2 = condition.to;
-    rangeSlider.searchType = "simple";
+    rangeSlider.sliderStep = 0.01;
+    rangeSlider.inputStep = 0.05;
+    rangeSlider.searchType = 'simple';
 
-    rangeSlider.addEventListener("range-changed", (e) => {
+    rangeSlider.addEventListener('range-changed', (e) => {
       e.stopPropagation();
       this.changeParameter(e.detail);
     });
 
-    this.elm.querySelector(".range-selector-view").appendChild(rangeSlider);
+    this.elm.querySelector('.range-selector-view').appendChild(rangeSlider);
     this._rangeSelectorView = rangeSlider;
 
     // events
-    StoreManager.bind("simpleSearchConditions", this);
+    StoreManager.bind('simpleSearchConditions', this);
   }
 
   changeParameter(newCondition) {
