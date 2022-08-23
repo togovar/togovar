@@ -6,11 +6,11 @@ import { flip } from './flipColumn';
 
 import './OntologyCard';
 
-const rects = new Map();
-
 export default class Column extends LitElement {
   static styles = css`
     :host {
+      flex-grow: 1;
+      flex-basis: 0;
       display: block;
       position: relative;
     }
@@ -19,24 +19,30 @@ export default class Column extends LitElement {
       display: flex;
       height: 100%;
       flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-start;
-      gap: 10px;
+      gap: 6px;
       position: relative;
       overflow-y: auto;
+      overflow-x: hidden;
     }
   `;
 
   static get properties() {
     return {
       nodes: { type: Array, state: true },
-      role: { type: String, attribute: true, reflect: true },
+      role: { type: String, state: true },
+      heroId: {
+        type: String,
+        state: true,
+      },
+      scrolledHeroRect: { type: Object, state: true },
     };
   }
-  constructor(role) {
+  constructor() {
     super(...arguments);
     this.nodes = [];
-    this.role = role || '';
+    this.heroId = undefined;
+    this.role = '';
+    this.scrolledHeroRect = null;
   }
 
   _handleClick(e) {
@@ -46,6 +52,7 @@ export default class Column extends LitElement {
           detail: {
             id: e.target.id,
             role: this.role,
+            rect: e.target.getBoundingClientRect(),
           },
           bubbles: true,
           composed: true,
@@ -70,13 +77,27 @@ export default class Column extends LitElement {
               ${repeat(
                 this.nodes,
                 (node) => node.id,
-                (node) => {
+                (node, index) => {
                   return html`<ontology-card
                     key="${node.id}"
                     id="${node.id}"
                     .data=${node}
-                    ${flip({ id: node.id, role: this.role, options })}
-                    selected
+                    .mode=${this.role}
+                    .prevRect=${this.scrolledHeroRect}
+                    .order=${this.nodes.length === 1
+                      ? 'single'
+                      : index === 0
+                      ? 'first'
+                      : index === this.nodes.length - 1
+                      ? 'last'
+                      : 'mid'}
+                    ${flip({
+                      id: node.id,
+                      heroId: this.heroId,
+                      role: this.role,
+                      scrolledHeroRect: this.scrolledHeroRect,
+                      options,
+                    })}
                   />`;
                 }
               )}

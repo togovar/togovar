@@ -1,12 +1,11 @@
-import './OntologyCard';
 import '../ErrorModal';
-import './ConditionDiseaseSearchColumn';
 
-// import { Task } from '@lit-labs/task';
 import { LitElement, html, css } from 'lit';
 import { ref, createRef } from 'lit/directives/ref.js';
 
 import { repeat } from 'lit/directives/repeat.js';
+
+import './ConditionDiseaseSearchColumn';
 
 import axios from 'axios';
 
@@ -20,6 +19,8 @@ class Container extends LitElement {
   deltaWidth = 0;
   nodeWidth = 0;
   gap = 0;
+  animate = null;
+  scrolledRect = null;
 
   static styles = css`
   :host {
@@ -39,10 +40,10 @@ class Container extends LitElement {
   }
 
   .flex {
-    height: 100%;
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
+      height: 100%;
+      display: flex;
+      flex-direction: row;
+      
   }
 
 `;
@@ -50,7 +51,6 @@ class Container extends LitElement {
   constructor() {
     super();
     this._id = '';
-
     this.loading = false;
     this._columns = ['parents', 'hero', 'children'];
     this.data = {};
@@ -67,15 +67,9 @@ class Container extends LitElement {
     return {
       data: { type: Object, state: true },
       loading: { type: Boolean, state: true },
-      _id: { type: String, attribute: '_id' },
+      _id: { type: String, attribute: 'id' },
       _columns: { type: Array, state: true },
     };
-  }
-
-  set _id(id) {
-    this.API.get(`/disease?node=${id}`).then(({ data }) => {
-      this.data = data;
-    });
   }
 
   refMap = new Map();
@@ -88,6 +82,11 @@ class Container extends LitElement {
     },
   });
 
+  set _id(id) {
+    this.API.get(`/disease?node=${id}`).then(({ data }) => {
+      this.data = data;
+    });
+  }
   // _apiTask = new Task(
   //   this,
   //   async (_id) => {
@@ -100,46 +99,71 @@ class Container extends LitElement {
   //   () => this._id
   // );
 
-  // TODO memorize scroll position inside column before transition
-
   willUpdate(changedProperties) {
     if (changedProperties.has('data')) {
       if (changedProperties.get('data')) {
-        if (changedProperties.get('data').id !== this.data.id) {
+        if (this.data.id && changedProperties.get('data').id !== this.data.id) {
+          // parents before update
+          console.log('will Update!');
           this.dataColumns._parents = changedProperties.get('data')
             ?.parents || [{ id: 'dummy', label: 'dummy' }];
+          // children before update
           this.dataColumns._children = changedProperties.get('data')
             ?.children || [{ id: 'dummy', label: 'dummy' }];
 
-          this.dataColumns.hero = [this.data];
+          if (this._columns.length === 4) {
+            let movement;
+            if (this._columns.includes('_parents')) {
+              movement = 'left';
+            } else if (this._columns.includes('_children')) {
+              movement = 'right';
+            } else {
+              movement = '';
+            }
 
+            // hero before update
+            if (movement === 'left') {
+              this.dataColumns.hero = this.dataColumns._children;
+            } else if (movement === 'right') {
+              this.dataColumns.hero = this.dataColumns._parents;
+            }
+          } else {
+            this.dataColumns.hero = [this.data];
+          }
+
+          //parents after update
           this.dataColumns.parents = this.data?.parents || [];
+          //children after update
           this.dataColumns.children = this.data?.children || [];
         }
       }
     }
   }
 
-  // firstUpdated() {
-  //   this.API.get(`/disease?node=${this._id}`).then(({ data }) => {
-  //     this.data = data;
-  //   });
-  // }
+  firstUpdated() {
+    this.API.get(`/disease?node=${this._id}`).then(({ data }) => {
+      this.data = data;
+    });
+  }
 
   _handleClick(e) {
     if (e.target?.role === 'parents' || e.target?.role === 'children') {
-      this._id = e.detail.id;
+      this.scrolledRect = e.detail?.rect || null;
 
-      this.API.get(`/disease?node=${this._id}`).then(({ data }) => {
+      this.API.get(`/disease?node=${e.detail.id}`).then(({ data }) => {
         if (e.detail.role === 'children') {
           this.movement = 'left';
+
           this._columns = ['_parents', 'parents', 'hero', 'children'];
         } else if (e.detail.role === 'parents') {
           this.movement = 'right';
+
           this._columns = ['parents', 'hero', 'children', '_children'];
         }
 
-        this.data = data;
+        this.updateComplete.then(() => {
+          this.data = data;
+        });
       });
     }
   }
@@ -168,10 +192,8 @@ class Container extends LitElement {
   }
 
   updated() {
-    let animate;
-
     if (this.movement === 'left') {
-      animate = this.flexRef.value.animate(
+      this.animate = this.flexRef.value.animate(
         [
           { transform: 'translateX(0)' },
           {
@@ -179,12 +201,12 @@ class Container extends LitElement {
           },
         ],
         {
-          duration: 1000,
+          duration: 500,
           easing: 'ease-out',
         }
       );
     } else if (this.movement === 'right') {
-      animate = this.flexRef.value.animate(
+      this.animate = this.flexRef.value.animate(
         [
           {
             transform: `translateX(${-this.deltaWidth}px)`,
@@ -192,17 +214,17 @@ class Container extends LitElement {
           { transform: 'translateX(0)' },
         ],
         {
-          duration: 1000,
+          duration: 500,
           easing: 'ease-out',
         }
       );
     }
-    if (animate) {
-      animate.onfinish = () => {
+
+    if (this.animate) {
+      this.animate.onfinish = () => {
         this.movement = '';
         this._columns = ['parents', 'hero', 'children'];
-
-        this.requestUpdate();
+        this.animate = null;
       };
     }
   }
@@ -227,7 +249,9 @@ class Container extends LitElement {
                     ? this.dataColumns[column]
                     : [{ id: 'dummy', label: 'dummy' }]}"
                   ${ref(this.nodeRef)}
-                />
+                  .heroId="${column === 'hero' ? this.data.id : undefined}"
+                  .scrolledHeroRect="${this.scrolledRect}"
+                ></ontology-column>
               `;
             }
           )}
