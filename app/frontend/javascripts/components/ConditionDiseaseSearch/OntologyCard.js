@@ -2,7 +2,7 @@ import { LitElement, html, css, nothing } from 'lit';
 import { ref, createRef } from 'lit/directives/ref.js';
 
 export class OntologyCard extends LitElement {
-  static properties() {
+  static get properties() {
     return {
       data: { type: Object, state: true },
       hidden: { type: Boolean, attribute: true },
@@ -50,6 +50,7 @@ export class OntologyCard extends LitElement {
       position: relative;
       --connector-line: 1px solid #ccc;
       --selected-bg-color: #f0f0f0;
+      --default-bg-color: white;
       --selected-border-color: rgb(17, 127, 147);
     }
 
@@ -297,7 +298,7 @@ export class OntologyCard extends LitElement {
     }
   `;
 
-  willUpdate() {
+  willUpdate(prevParams) {
     if (this.mode === 'hero') {
       if (this.data.leaf) {
         this.leftConnectorClassName = '-hero-left';
@@ -313,6 +314,7 @@ export class OntologyCard extends LitElement {
       this.rightConnectorClassName = `-${this.mode}-${this.order}`;
     }
 
+    this.prevMode = prevParams.get('mode');
     if (this.data.id === 'dummy') {
       this.leftConnectorClassName = '';
       this.rightConnectorClassName = '';
@@ -320,29 +322,36 @@ export class OntologyCard extends LitElement {
   }
 
   updated() {
+    const animProps = {
+      duration: 500,
+      easing: 'ease-out',
+    };
+
+    let animation = [
+      {
+        height: `${this.prevRect?.height || 0}px`,
+        overflow: 'hidden',
+      },
+      {
+        height: `${this.cardRef?.value.getBoundingClientRect().height || 0}px`,
+      },
+    ];
+
     if (this.mode === 'hero') {
-      this.cardRef.value.animate(
-        [
-          {
-            height: `${this.prevRect?.height || 0}px`,
-            backgroundColor: 'white',
-            overflow: 'hidden',
-          },
-          {
-            height: `${
-              this.cardRef?.value.getBoundingClientRect().height || 0
-            }px`,
-            backgroundColor: getComputedStyle(
-              this.cardRef.value
-            ).getPropertyValue('--selected-bg-color'),
-          },
-        ],
-        {
-          duration: 500,
-          easing: 'ease-out',
-        }
-      );
+      animation[0].backgroundColor = this.defaultBgColor;
+      animation[1].backgroundColor = this.selectedBgColor;
     }
+
+    this.cardRef.value.animate(animation, animProps);
+  }
+
+  firstUpdated() {
+    this.defaultBgColor = getComputedStyle(this.cardRef.value).getPropertyValue(
+      '--default-bg-color'
+    );
+    this.selectedBgColor = getComputedStyle(
+      this.cardRef.value
+    ).getPropertyValue('--selected-bg-color');
   }
 
   render() {
