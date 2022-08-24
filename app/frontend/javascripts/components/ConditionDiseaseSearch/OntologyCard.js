@@ -59,7 +59,7 @@ export class OntologyCard extends LitElement {
       content: '';
       width: 100%;
       height: 1px;
-      border-top: var(--connector-line);
+      border-bottom: var(--connector-line);
       top: min(50%, 15px);
       box-sizing: border-box;
     }
@@ -71,7 +71,7 @@ export class OntologyCard extends LitElement {
       height: 0px;
       border: 8px solid transparent;
       border-left: 8px solid #ccc;
-      top: min(50%, 15px);
+      top: min(50%, 16px);
       right: 0;
       transform: translate(50%, -50%) scaleY(0.5);
       box-sizing: border-box;
@@ -84,7 +84,7 @@ export class OntologyCard extends LitElement {
       content: '';
       width: 100%;
       height: 1px;
-      border-top: var(--connector-line);
+      border-bottom: var(--connector-line);
       top: min(50%, 15px);
       box-sizing: border-box;
     }
@@ -96,7 +96,7 @@ export class OntologyCard extends LitElement {
       height: 0px;
       border: 8px solid transparent;
       border-left: 8px solid #ccc;
-      top: min(50%, 15px);
+      top: min(50%, 16px);
       right: 0;
       transform: translate(50%, -50%) scaleY(0.5);
       box-sizing: border-box;
