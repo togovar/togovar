@@ -404,8 +404,8 @@ class RangeSlider extends HTMLElement {
     this.slider1.value = Math.min(this.state.from, this.state.to);
     this.slider2.value = Math.max(this.state.to, this.state.to);
 
-    this.from.value = this.state.from.toExponential(1);
-    this.to.value = this.state.to.toExponential(1);
+    this.from.value = this.state.from;
+    this.to.value = this.state.to;
 
     this._fillSlider.call(this);
   }
