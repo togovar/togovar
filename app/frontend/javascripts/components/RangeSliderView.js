@@ -251,7 +251,6 @@ class RangeSlider extends HTMLElement {
   get rulerNumberOfSteps() {
     return this.getAttribute('ruler-number-of-steps');
   }
-
   set min(value) {
     this.setAttribute('min', value);
   }
@@ -380,10 +379,6 @@ class RangeSlider extends HTMLElement {
 
     this.rulerNumberOfSteps = 10;
 
-    this.shadowRoot
-      .querySelector('.meter')
-      .addEventListener('mouseup', this._meterMouseUp);
-
     this.slider1.addEventListener('input', this._slider1Input);
 
     this.slider2.addEventListener('input', this._slider2Input);
@@ -397,12 +392,6 @@ class RangeSlider extends HTMLElement {
     this._fillSlider();
     this._reRenderRuler();
   }
-
-  _meterMouseUp = (e) => {
-    if (e.target && e.target.nodeName === 'INPUT') {
-      this._fireEvent(this.state);
-    }
-  };
 
   _slider1Input = (e) => {
     this.state.from = e.target.value;
@@ -434,9 +423,6 @@ class RangeSlider extends HTMLElement {
   };
 
   disconnectedCallback() {
-    this.shadowRoot
-      .querySelector('.meter')
-      .removeEventListener('mouseup', this._meterMouseUp);
     this.slider1.removeEventListener('input', this._slider1Input);
     this.slider2.removeEventListener('input', this._slider2Input);
     this.from.removeEventListener('change', this._fromChange);
