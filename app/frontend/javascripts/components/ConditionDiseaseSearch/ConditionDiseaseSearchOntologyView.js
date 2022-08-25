@@ -51,6 +51,7 @@ class Container extends LitElement {
     this.loading = false;
     this._columns = ['parents', 'hero', 'children'];
     this.data = {};
+    this.loadingDone = function () {};
     this.dataColumns = {
       _parents: [],
       parents: [],
@@ -64,6 +65,7 @@ class Container extends LitElement {
     return {
       data: { type: Object, state: true },
       loading: { type: Boolean, state: true },
+      loadingDone: { type: Function },
       _id: { type: String, attribute: 'id' },
       _columns: { type: Array, state: true },
     };
@@ -80,21 +82,14 @@ class Container extends LitElement {
   });
 
   set _id(id) {
+    this._loadingStarted();
     this.API.get(`/disease?node=${id}`).then(({ data }) => {
       this.data = data;
+
+      // when data fetched, call loadingDone()
+      this._loadingEnded();
     });
   }
-  // _apiTask = new Task(
-  //   this,
-  //   async (_id) => {
-  //     const { data } = await this.API.get(`/disease?node=${_id}`);
-
-  //     this.data = data;
-
-  //     return data;
-  //   },
-  //   () => this._id
-  // );
 
   willUpdate(changedProperties) {
     if (changedProperties.has('data')) {
@@ -143,11 +138,26 @@ class Container extends LitElement {
     });
   }
 
+  _loadingStarted() {
+    this.dispatchEvent(
+      new CustomEvent('loading-started', { bubbles: true, composed: true })
+    );
+  }
+
+  _loadingEnded() {
+    this.dispatchEvent(
+      new CustomEvent('loading-ended', { bubbles: true, composed: true })
+    );
+  }
+
   _handleClick(e) {
     if (e.target?.role === 'parents' || e.target?.role === 'children') {
       this.scrolledRect = e.detail?.rect || null;
 
+      this._loadingStarted();
+
       this.API.get(`/disease?node=${e.detail.id}`).then(({ data }) => {
+        this._loadingEnded();
         if (e.detail.role === 'children') {
           this.movement = 'left';
 
