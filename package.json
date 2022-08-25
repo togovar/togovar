@@ -7,20 +7,15 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "build": "npm run build:prod && npm run build:stanza",
-    "build:prod": "cross-env NODE_ENV=production webpack --config app/frontend/config/webpack.config.prod.js --color --progress",
-    "build:stanza": "pwd=\"$(pwd)\"; cd stanza && npx togostanza build --output-path \"${pwd}/dist/stanza\"",
+    "build": "cross-env NODE_ENV=production webpack --config app/frontend/config/webpack.config.prod.js --color --progress",
+    "start": "cross-env NODE_ENV=development node app/frontend/server",
+    "start:prod": "npm run build && npm run start:prod",
     "forever:start": "npm run build && cross-env NODE_ENV=production forever app/frontend/server",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:css": "stylelint app/frontend/stylesheets/**/*.{css,scss,sass}",
     "lint:eslint": "eslint --ignore-path .gitignore --ignore-pattern app/frontend/server",
     "lint:js": "npm run lint:eslint app/frontend",
-    "lint:staged": "lint-staged",
-    "start": "npm-run-all -p start:dev start:stanza",
-    "start:production": "npm run build && npm run start:prod",
-    "start:dev": "cross-env NODE_ENV=development node app/frontend/server",
-    "start:prod": "cross-env NODE_ENV=production node app/frontend/server",
-    "start:stanza": "cd stanza && npx togostanza serve"
+    "lint:staged": "lint-staged"
   },
   "dependencies": {
     "@babel/core": "^7.10.5",
