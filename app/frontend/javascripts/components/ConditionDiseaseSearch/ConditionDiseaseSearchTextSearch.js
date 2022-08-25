@@ -1,4 +1,4 @@
-import { LitElement, css, html, nothing } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { Task } from '@lit-labs/task';
@@ -16,7 +16,7 @@ export default class ConditionTextSearch extends LitElement {
 
   constructor(searchFor = 'diseases', placeholder = 'Common cold') {
     super(arguments);
-    //declare reactive properties
+
     this._value = '';
     this.placeholder = placeholder;
     this.selectedId = '';
@@ -41,12 +41,6 @@ export default class ConditionTextSearch extends LitElement {
       },
       () => this._value
     );
-  }
-
-  keepLastValues() {}
-
-  connectedCallback() {
-    super.connectedCallback();
   }
 
   _keyup(e) {
@@ -125,7 +119,6 @@ export default class ConditionTextSearch extends LitElement {
                 this.showSuggestions = true;
               }}"
             />
-            <button>Search</button>
           </div>
         </div>
 
