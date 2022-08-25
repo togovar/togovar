@@ -24,6 +24,10 @@ export default class Column extends LitElement {
       overflow-y: auto;
       overflow-x: hidden;
     }
+
+    ontology-card:last-child {
+      margin-bottom: 10px;
+    }
   `;
 
   static get properties() {
