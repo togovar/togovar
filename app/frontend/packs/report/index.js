@@ -7,7 +7,7 @@ const ENV = {
   'TOGOVAR_STANZA_JBROWSE': TOGOVAR_ENDPOINT_JBROWSE || '/jbrowse',
 };
 
-const STANZA_PATH = TOGOVAR_FRONTEND_STANZA_URL || '/stanza';
+const STANZA_PATH = TOGOVAR_FRONTEND_STANZA_URL || 'https://togovar.github.io/stanza';
 
 const config = (function (obj) {
   const replace_recursive = function (obj) {
