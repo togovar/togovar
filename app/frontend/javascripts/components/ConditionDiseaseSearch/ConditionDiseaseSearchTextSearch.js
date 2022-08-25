@@ -12,6 +12,7 @@ export default class ConditionTextSearch extends LitElement {
   static properties = {
     _value: { type: String, state: true },
     searchFor: { type: String, attribute: false },
+    showSuggestions: { type: Boolean, state: true },
   };
 
   constructor(searchFor = 'diseases', placeholder = 'Common cold') {
@@ -52,10 +53,6 @@ export default class ConditionTextSearch extends LitElement {
   _select(suggestion) {
     this.selectedId = suggestion.id;
 
-    this._value = suggestion.label;
-
-    this.inputRef.value.value = this._value;
-
     this.dispatchEvent(
       new CustomEvent('new-suggestion-selected', {
         detail: {
@@ -67,11 +64,7 @@ export default class ConditionTextSearch extends LitElement {
       })
     );
 
-    this._resetSuggestions();
-  }
-
-  _resetSuggestions() {
-    this.suggestions = [];
+    this.showSuggestions = false;
   }
 
   _getSearchSuggestions() {
@@ -86,6 +79,7 @@ export default class ConditionTextSearch extends LitElement {
         this.suggestions = json;
       });
   }
+
   willUpdate(changed) {
     if (changed.has('_value')) {
       if (this._value.length >= 3) {
