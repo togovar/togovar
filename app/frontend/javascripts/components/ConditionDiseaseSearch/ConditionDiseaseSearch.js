@@ -26,48 +26,25 @@ export class ConditionDiseaseSearch extends LitElement {
     this.diseaseId = '';
   }
 
-  keepLastValues() {}
   newSuggestionSelected(e) {
-    this.diseaseId = e.detail.suggestion.id;
+    this.diseaseId = e.detail.id;
 
+    this._changeDiseaseEventHadnler(e);
     this.requestUpdate();
   }
 
-  /**
-   *
-   * @param {string} value
-   * @param {string} label
-   * @param {boolean} isOnly
-   */
-  _addValueView(value, label, isOnly = false) {
-    // find value view
-    const selector = isOnly ? '' : `[data-value="${value}"]`;
-    let valueView = this._valuesElement.querySelector(
-      `condition-item-value-view${selector}`
+  _changeDiseaseEventHadnler(e) {
+    e.stopPropagation();
+    this.dispatchEvent(
+      new CustomEvent('disease-selected', {
+        detail: {
+          id: e.detail.id,
+          label: e.detail.label,
+        },
+        bubbles: true,
+        composed: true,
+      })
     );
-    // if no view is found, create a new one
-    if (!valueView) {
-      valueView = document.createElement('condition-item-value-view');
-      valueView.conditionType = this._conditionType;
-      this._valuesElement.append(valueView);
-    }
-    valueView.label = label;
-    valueView.value = value;
-    return valueView;
-  }
-
-  /**
-   *
-   * @param {string} value
-   */
-  _removeValueView(value) {
-    const selector = value ? `[data-value="${value}"]` : '';
-    const valueView = this._valuesElement.querySelector(
-      `condition-item-value-view${selector}`
-    );
-    if (valueView) {
-      valueView.remove();
-    }
   }
 
   render() {
@@ -77,6 +54,7 @@ export class ConditionDiseaseSearch extends LitElement {
       ></condition-disease-text-search>
       <condition-disease-ontology-view
         ._id="${this.diseaseId}"
+        @disease-selected="${this._changeDiseaseEventHadnler}"
       ></condition-disease-ontology-view>
     `;
   }

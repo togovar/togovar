@@ -161,6 +161,17 @@ class Container extends LitElement {
           this._columns = ['parents', 'hero', 'children', '_children'];
         }
 
+        this.dispatchEvent(
+          new CustomEvent('disease-selected', {
+            detail: {
+              id: data.id,
+              label: data.label,
+            },
+            bubbles: true,
+            composed: true,
+          })
+        );
+
         this.updateComplete.then(() => {
           this.data = data;
         });
