@@ -1,9 +1,10 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { initialState, Task } from '@lit-labs/task';
+import { Task } from '@lit-labs/task';
 import { ref, createRef } from 'lit/directives/ref.js';
 import axios from 'axios';
+import { debounce } from '../../utils/debounce';
 
 const DISEASE_ADVANCED_SUGGEST_URL = `https://togovar-dev.biosciencedbc.jp/api/search/disease?term=`;
 
@@ -116,7 +117,7 @@ export default class ConditionTextSearch extends LitElement {
               title="${this.searchFor}"
               placeholder="${this.placeholder}"
               value="${this._value}"
-              @input="${this._keyup}"
+              @input="${debounce(this._keyup, 300)}"
               @focusout="${() => {
                 this.showSuggestions = false;
               }}"
@@ -134,13 +135,25 @@ export default class ConditionTextSearch extends LitElement {
                 <div class="column">
                   <h3 class="title">${this.searchFor}</h3>
                   ${this._apiTask.render({
-                    pending: () => html` <span>Loading...</span> `,
-                    error: () => html` <span>Error</span> `,
+                    pending: () =>
+                      html` <div class="loading"><span></span></div> `,
+                    error: (error) =>
+                      html`
+                        <div class="error"><span>${error.message}</span></div>
+                      `,
                     complete: ({ data }) => {
-                      const suggestions = data;
+                      let num = 0;
+                      for (let d in data) {
+                        num++;
+                      }
+                      if (!num) {
+                        return html`<div class="empty">
+                          <span>No suggestions was found</span>
+                        </div>`;
+                      }
                       return html`
                         <ul class="list">
-                          ${map(suggestions, (suggestion) => {
+                          ${map(data, (suggestion) => {
                             return html`<li
                               class="item"
                               @mousedown="${() => this._select(suggestion)}"
