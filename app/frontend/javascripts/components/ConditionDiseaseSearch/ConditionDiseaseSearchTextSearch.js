@@ -1,7 +1,9 @@
-import { LitElement, css, html } from 'lit';
+import { LitElement, css, html, nothing } from 'lit';
 import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { initialState, Task } from '@lit-labs/task';
 import { ref, createRef } from 'lit/directives/ref.js';
+import axios from 'axios';
 
 const DISEASE_ADVANCED_SUGGEST_URL = `https://togovar-dev.biosciencedbc.jp/api/search/disease?term=`;
 
@@ -9,7 +11,6 @@ export default class ConditionTextSearch extends LitElement {
   static properties = {
     _value: { type: String, state: true },
     searchFor: { type: String, attribute: false },
-    showSuggestions: { type: Boolean, state: true },
   };
 
   constructor(searchFor = 'diseases', placeholder = 'Common cold') {
@@ -23,6 +24,22 @@ export default class ConditionTextSearch extends LitElement {
     this.showSuggestions = false;
     this.inputRef = createRef();
     this.suggestionListRef = createRef();
+    this._apiTask = new Task(
+      this,
+      (value) => {
+        if (value.length >= 3) {
+          this.showSuggestions = true;
+          return axios.get(`${DISEASE_ADVANCED_SUGGEST_URL}${value}`, {
+            headers: {
+              'Content-type': 'application/json',
+              Accept: 'application/json',
+            },
+          });
+        }
+        return Promise.resolve(() => (this.showSuggestions = false));
+      },
+      () => this._value
+    );
   }
 
   keepLastValues() {}
@@ -34,14 +51,6 @@ export default class ConditionTextSearch extends LitElement {
   _keyup(e) {
     if (e.target && e.target.nodeName === 'INPUT') {
       this._value = e.target.value;
-
-      if (this._value.length >= 3) {
-        this._getSearchSuggestions();
-      }
-
-      if (this._value.length < 3) {
-        this._resetSuggestions();
-      }
     }
   }
 
@@ -82,6 +91,15 @@ export default class ConditionTextSearch extends LitElement {
         this.suggestions = json;
       });
   }
+  willUpdate(changed) {
+    if (changed.has('_value')) {
+      if (this._value.length >= 3) {
+        this.showSuggestions = true;
+      } else {
+        this.showSuggestions = false;
+      }
+    }
+  }
 
   createRenderRoot() {
     return this;
@@ -110,25 +128,35 @@ export default class ConditionTextSearch extends LitElement {
           </div>
         </div>
 
-        <div class="suggest-view" ${ref(this.suggestionListRef)}>
-          ${this.suggestions.length > 0 && this.showSuggestions
-            ? html`
+        ${this.showSuggestions
+          ? html`
+              <div class="suggest-view" ${ref(this.suggestionListRef)}>
                 <div class="column">
                   <h3 class="title">${this.searchFor}</h3>
-                  <ul class="list">
-                    ${map(this.suggestions, (suggestion) => {
-                      return html`<li
-                        class="item"
-                        @mousedown="${() => this._select(suggestion)}"
-                      >
-                        ${unsafeHTML(suggestion.highlight)}
-                      </li>`;
-                    })}
-                  </ul>
+                  ${this._apiTask.render({
+                    pending: () => html` <span>Loading...</span> `,
+                    error: () => html` <span>Error</span> `,
+                    complete: ({ data }) => {
+                      const suggestions = data;
+                      return html`
+                        <ul class="list">
+                          ${map(suggestions, (suggestion) => {
+                            return html`<li
+                              class="item"
+                              @mousedown="${() => this._select(suggestion)}"
+                            >
+                              ${unsafeHTML(suggestion.highlight)}
+                            </li>`;
+                          })}
+                        </ul>
+                      `;
+                    },
+                  })}
+                  </div>
                 </div>
-              `
-            : ''}
-        </div>
+              </div>
+            `
+          : nothing}
       </div>
     `;
   }

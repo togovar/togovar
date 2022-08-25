@@ -38,8 +38,9 @@ export class OntologyCard extends LitElement {
     this.mode = '';
     this.order = '';
     this.prevRect = { x: 0, y: 0, width: 0, height: 0 };
-    this._skipKeys = ['label', 'children', 'parents', 'leaf'];
+    this._skipKeys = ['label', 'children', 'parents', 'leaf', 'root'];
     this.cardRef = createRef();
+    this._leftCoinnector = createRef;
     this.leftConnectorClassName = '';
     this.rightConnectorClassName = '';
   }
