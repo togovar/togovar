@@ -53,6 +53,7 @@ export default class Column extends LitElement {
     if (e.target.tagName === 'ONTOLOGY-CARD') {
       // only if clicked on the card itself, not on connector div
       if (!e.path[0].classList.contains('connector')) {
+        // dispatch event to load new data by id
         this.dispatchEvent(
           new CustomEvent('column-click', {
             detail: {
