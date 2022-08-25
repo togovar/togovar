@@ -55,7 +55,8 @@ export default class ConditionTextSearch extends LitElement {
     this.dispatchEvent(
       new CustomEvent('new-suggestion-selected', {
         detail: {
-          suggestion,
+          id: suggestion.id,
+          label: suggestion.label,
         },
         bubbles: true,
         composed: true,

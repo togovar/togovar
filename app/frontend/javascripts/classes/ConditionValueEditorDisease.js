@@ -21,10 +21,13 @@ export default class ConditionValueEditorDisease extends ConditionValueEditor {
       this._body.querySelector('condition-disease-search') ||
       new ConditionDiseaseSearch(this._body);
 
-    this._conditionElem.addEventListener('condition-changed', (e) => {
+    this._conditionElem.addEventListener('disease-selected', (e) => {
       e.stopPropagation();
       const { id, label } = e.detail;
+
       this._data = { id, label };
+
+      this._update();
     });
   }
 
