@@ -31,9 +31,7 @@ class Container extends LitElement {
   
   }
 
-
   .clip {
-    width: 100%;
     height: 200px;
     overflow: hidden;
     position: relative;
@@ -43,7 +41,6 @@ class Container extends LitElement {
       height: 100%;
       display: flex;
       flex-direction: row;
-      
   }
 
 `;
