@@ -70,11 +70,8 @@ export class ConditionDiseaseSearch extends LitElement {
       <div class="container" style="position: relative;">
         ${this.loading
           ? html`
-              <div
-                class="loading"
-                style="position: absolute; width:100%; height:100%; opacity: 0.5;"
-              >
-                <span>Loading...</span>
+              <div class="loading">
+                <span></span>
               </div>
             `
           : nothing}
