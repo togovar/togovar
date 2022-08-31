@@ -41,7 +41,7 @@ export default class ConditionValueEditorDisease extends ConditionValueEditor {
   }
 
   get isValid() {
-    return true;
+    return !!this._data.id;
   }
 
   keepLastValues() {
