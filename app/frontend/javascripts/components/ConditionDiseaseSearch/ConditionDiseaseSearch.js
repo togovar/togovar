@@ -29,30 +29,15 @@ export class ConditionDiseaseSearch extends LitElement {
     this._timer = null;
   }
 
-  newSuggestionSelected(e) {
-    this.diseaseId = e.detail.id;
-    e.stopPropagation();
-    this.dispatchEvent(
-      new CustomEvent('disease-selected', {
-        detail: {
-          id: e.detail.id,
-          label: e.detail.label,
-        },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
   _changeDiseaseEventHadnler(e) {
     e.stopPropagation();
-    //this.noUpd = true;
     this.diseaseId = e.detail.id;
     this.dispatchEvent(
       new CustomEvent('disease-selected', {
         detail: {
           id: e.detail.id,
           label: e.detail.label,
+          cui: e.detail.cui,
         },
         bubbles: true,
         composed: true,
@@ -80,7 +65,7 @@ export class ConditionDiseaseSearch extends LitElement {
   render() {
     return html`
       <condition-disease-text-search
-        @new-suggestion-selected=${this.newSuggestionSelected}
+        @new-suggestion-selected=${this._changeDiseaseEventHadnler}
       ></condition-disease-text-search>
       <div class="container" style="position: relative;">
         ${this.loading

@@ -39,6 +39,7 @@ export default class Column extends LitElement {
         state: true,
       },
       scrolledHeroRect: { type: Object, state: true },
+      animationOptions: { type: Object, state: true },
     };
   }
   constructor() {
@@ -47,6 +48,7 @@ export default class Column extends LitElement {
     this.heroId = undefined;
     this.role = '';
     this.scrolledHeroRect = null;
+    this.animationOptions = {};
   }
 
   _handleClick(e) {
@@ -70,11 +72,6 @@ export default class Column extends LitElement {
   }
 
   render() {
-    const options = {
-      duration: 5000,
-      timingFunction: 'ease-out', // 'steps(5, end)'
-    };
-
     return html`
       <div
         class="column"
@@ -104,7 +101,7 @@ export default class Column extends LitElement {
                       heroId: this.heroId,
                       role: this.role,
                       scrolledHeroRect: this.scrolledHeroRect,
-                      options,
+                      options: this.animationOptions,
                     })}
                   />`;
                 }

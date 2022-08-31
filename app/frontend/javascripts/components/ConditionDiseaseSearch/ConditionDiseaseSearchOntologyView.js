@@ -198,6 +198,7 @@ class Container extends LitElement {
               detail: {
                 id: data.id,
                 label: data.label,
+                cui: data.cui,
               },
               bubbles: true,
               composed: true,
@@ -268,6 +269,7 @@ class Container extends LitElement {
                   ${ref(this.nodeRef)}
                   .heroId="${column === 'hero' ? this.data.id : undefined}"
                   .scrolledHeroRect="${this.scrolledRect}"
+                  .animationOptions="${this.animationOptions}"
                 ></ontology-column>
               `;
             }

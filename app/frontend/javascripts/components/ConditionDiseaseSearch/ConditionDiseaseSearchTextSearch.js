@@ -58,6 +58,7 @@ export default class ConditionTextSearch extends LitElement {
         detail: {
           id: suggestion.id,
           label: suggestion.label,
+          cui: suggestion.cui,
         },
         bubbles: true,
         composed: true,
