@@ -31,13 +31,23 @@ export class ConditionDiseaseSearch extends LitElement {
 
   newSuggestionSelected(e) {
     this.diseaseId = e.detail.id;
-
-    this._changeDiseaseEventHadnler(e);
-    this.requestUpdate();
+    e.stopPropagation();
+    this.dispatchEvent(
+      new CustomEvent('disease-selected', {
+        detail: {
+          id: e.detail.id,
+          label: e.detail.label,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
   _changeDiseaseEventHadnler(e) {
     e.stopPropagation();
+    //this.noUpd = true;
+    this.diseaseId = e.detail.id;
     this.dispatchEvent(
       new CustomEvent('disease-selected', {
         detail: {
@@ -52,7 +62,6 @@ export class ConditionDiseaseSearch extends LitElement {
 
   _loadingStartedHandler(e) {
     e.stopPropagation();
-    //this.loading = true;
 
     this._timer = setTimeout(() => {
       this.loading = true;
