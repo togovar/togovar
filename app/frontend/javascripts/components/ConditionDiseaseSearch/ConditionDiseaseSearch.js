@@ -79,7 +79,6 @@ export class ConditionDiseaseSearch extends LitElement {
             `
           : nothing}
         <condition-disease-ontology-view
-          .loadingDone="${this.loadingDone}"
           ._id="${this.diseaseId}"
           @disease-selected="${this._changeDiseaseEventHadnler}"
           @loading-started="${this._loadingStartedHandler}"
