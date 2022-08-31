@@ -50,7 +50,7 @@ export class OntologyCard extends LitElement {
       display: block;
       position: relative;
       --connector-line: 1px solid #ccc;
-      --selected-bg-color: #f0f0f0;
+      --selected-bg-color: white;
       --default-bg-color: white;
       --selected-border-color: rgb(17, 127, 147);
     }
@@ -251,10 +251,9 @@ export class OntologyCard extends LitElement {
     .ontology-card {
       padding: 6px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 8px;
       background-color: #fff;
       cursor: pointer;
-      box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
       position: relative;
       width: min(80%, 20rem);
       max-width: 30rem;
@@ -296,6 +295,16 @@ export class OntologyCard extends LitElement {
 
     .hidden {
       visibility: hidden;
+    }
+
+    p.note {
+      margin: 0;
+      color: #94928d;
+    }
+
+    .table-container {
+      max-height: 5em;
+      overflow-y: auto;
     }
   `;
 
@@ -370,20 +379,29 @@ export class OntologyCard extends LitElement {
             <h3>${this.data?.label || '...'}</h3>
             ${this.mode === 'hero'
               ? html`
-                  <table>
-                    <tbody>
-                      ${Object.keys(this.data)
-                        .filter((key) => !this._skipKeys.includes(key))
-                        .map((key) => {
-                          return html`
-                            <tr>
-                              <td class="key">${key}</td>
-                              <td class="data">${this.data[key]}</td>
-                            </tr>
-                          `;
-                        })}
-                    </tbody>
-                  </table>
+                  <div class="table-container">
+                    <table>
+                      <tbody>
+                        ${Object.keys(this.data)
+                          .filter((key) => !this._skipKeys.includes(key))
+                          .map((key) => {
+                            return html`
+                              <tr>
+                                <td class="key">${key}</td>
+                                <td class="data">${this.data[key]}</td>
+                              </tr>
+                            `;
+                          })}
+                      </tbody>
+                    </table>
+                  </div>
+                  ${!this.data.cui
+                    ? html`
+                        <p class="note">
+                          This disease cannot be added as a search condition
+                        </p>
+                      `
+                    : nothing}
                 `
               : nothing}
           </div>
