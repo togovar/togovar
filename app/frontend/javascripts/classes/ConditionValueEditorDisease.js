@@ -23,9 +23,9 @@ export default class ConditionValueEditorDisease extends ConditionValueEditor {
 
     this._conditionElem.addEventListener('disease-selected', (e) => {
       e.stopPropagation();
-      const { id, label } = e.detail;
+      const { cui, label } = e.detail;
 
-      this._data = { id, label };
+      this._data = { id: cui, label };
 
       this._update();
     });
