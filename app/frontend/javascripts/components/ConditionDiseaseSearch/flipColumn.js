@@ -72,11 +72,6 @@ class Flip extends AsyncDirective {
       disconnectedRects.delete(this.id);
     }
 
-    // if (!this.boundingRect) {
-    //   console.log("element", this.element);
-    //   console.log("bounding rect", this.element.getBoundingClientRect());
-    // }
-
     this.flip();
   }
 
@@ -118,10 +113,7 @@ class Flip extends AsyncDirective {
           width: `${this.boundingRect.width}px`,
         },
       ],
-      {
-        duration: 500,
-        easing: 'ease-out',
-      }
+      this.options
     );
     // }
   }
@@ -142,10 +134,7 @@ class Flip extends AsyncDirective {
           }px)`,
         },
       ],
-      {
-        duration: 500,
-        easing: 'ease-out',
-      }
+      this.options
     ).onfinish = () => {
       if (disconnectedRects.has(this.id)) {
         disconnectedRects.delete(this.id);
