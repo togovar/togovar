@@ -21,6 +21,13 @@ class Container extends LitElement {
   gap = 0;
   animate = null;
   scrolledRect = null;
+  API = axios.create({
+    baseURL: 'https://togovar-dev.biosciencedbc.jp/api/inspect',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  });
 
   static styles = css`
   :host {
@@ -59,6 +66,10 @@ class Container extends LitElement {
       children: [],
       _children: [],
     };
+    this.animationOptions = {
+      duration: 500,
+      timingFunction: 'ease-in-out',
+    };
   }
 
   static get properties() {
@@ -67,28 +78,23 @@ class Container extends LitElement {
       loading: { type: Boolean, state: true },
       loadingDone: { type: Function },
       _id: { type: String, attribute: 'id' },
-      _columns: { type: Array, state: true },
+      _columns: {
+        type: Array,
+        state: true,
+      },
     };
   }
 
-  refMap = new Map();
-
-  API = axios.create({
-    baseURL: 'https://togovar-dev.biosciencedbc.jp/api/inspect',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-  });
-
   set _id(id) {
-    this._loadingStarted();
-    this.API.get(`/disease?node=${id}`).then(({ data }) => {
-      this.data = data;
+    if (this.data?.id !== id) {
+      this._loadingStarted();
+      this.API.get(`/disease?node=${id}`).then(({ data }) => {
+        this.data = data;
 
-      // when data fetched, call loadingDone()
-      this._loadingEnded();
-    });
+        // when data fetched, call loadingDone()
+        this._loadingEnded();
+      });
+    }
   }
 
   willUpdate(changedProperties) {
@@ -96,7 +102,6 @@ class Container extends LitElement {
       if (changedProperties.get('data')) {
         if (this.data.id && changedProperties.get('data').id !== this.data.id) {
           // parents before update
-          console.log('will Update!');
           this.dataColumns._parents = changedProperties.get('data')
             ?.parents || [{ id: 'dummy', label: 'dummy' }];
           // children before update
@@ -130,6 +135,25 @@ class Container extends LitElement {
         }
       }
     }
+    if (changedProperties.has('_columns')) {
+      this.nodeWidth =
+        this.nodeRef.value?.getBoundingClientRect().width -
+          (this.nodeRef.value?.getBoundingClientRect().right -
+            this.clipRef.value?.getBoundingClientRect().right) || 0;
+      this.gap =
+        (this.clipRef.value?.getBoundingClientRect().width -
+          this.nodeWidth * 3) /
+        2;
+
+      this.flexWidth =
+        this._columns.length === 4
+          ? this.nodeWidth * this._columns.length +
+            (this._columns.length - 1) * this.gap +
+            'px'
+          : '100%';
+
+      this.deltaWidth = this.nodeWidth + this.gap;
+    }
   }
 
   firstUpdated() {
@@ -158,55 +182,30 @@ class Container extends LitElement {
 
       this.API.get(`/disease?node=${e.detail.id}`).then(({ data }) => {
         this._loadingEnded();
-        if (e.detail.role === 'children') {
-          this.movement = 'left';
-
-          this._columns = ['_parents', 'parents', 'hero', 'children'];
-        } else if (e.detail.role === 'parents') {
-          this.movement = 'right';
-
-          this._columns = ['parents', 'hero', 'children', '_children'];
-        }
-
-        this.dispatchEvent(
-          new CustomEvent('disease-selected', {
-            detail: {
-              id: data.id,
-              label: data.label,
-            },
-            bubbles: true,
-            composed: true,
-          })
-        );
-
+        this.data = data;
         this.updateComplete.then(() => {
-          this.data = data;
+          if (e.detail.role === 'children') {
+            this.movement = 'left';
+
+            this._columns = ['_parents', 'parents', 'hero', 'children'];
+          } else if (e.detail.role === 'parents') {
+            this.movement = 'right';
+
+            this._columns = ['parents', 'hero', 'children', '_children'];
+          }
+          this.dispatchEvent(
+            new CustomEvent('disease-selected', {
+              detail: {
+                id: data.id,
+                label: data.label,
+              },
+              bubbles: true,
+              composed: true,
+            })
+          );
         });
       });
     }
-  }
-
-  shouldUpdate(changed) {
-    if (changed.has('_columns')) {
-      this.nodeWidth =
-        this.nodeRef.value?.getBoundingClientRect().width -
-          (this.nodeRef.value?.getBoundingClientRect().right -
-            this.clipRef.value?.getBoundingClientRect().right) || 0;
-      this.gap =
-        (this.clipRef.value?.getBoundingClientRect().width -
-          this.nodeWidth * 3) /
-        2;
-
-      this.flexWidth =
-        this._columns.length === 4
-          ? this.nodeWidth * this._columns.length +
-            (this._columns.length - 1) * this.gap +
-            'px'
-          : '100%';
-
-      this.deltaWidth = this.nodeWidth + this.gap;
-    }
-    return true;
   }
 
   updated() {
