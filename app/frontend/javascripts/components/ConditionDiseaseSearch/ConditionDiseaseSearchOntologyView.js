@@ -7,7 +7,7 @@ import { repeat } from 'lit/directives/repeat.js';
 
 import './ConditionDiseaseSearchColumn';
 
-import axios from 'axios';
+import { cachedAxios } from '../../utils/cachedAxios';
 
 class Container extends LitElement {
   nColumns = 3;
@@ -21,13 +21,7 @@ class Container extends LitElement {
   gap = 0;
   animate = null;
   scrolledRect = null;
-  API = axios.create({
-    baseURL: 'https://togovar-dev.biosciencedbc.jp/api/inspect',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-  });
+  API = new cachedAxios('https://togovar-dev.biosciencedbc.jp/api/inspect');
 
   static styles = css`
   :host {
@@ -70,6 +64,7 @@ class Container extends LitElement {
       duration: 500,
       easing: 'ease-in-out',
     };
+    this._cache = new Map();
   }
 
   static get properties() {

@@ -5,6 +5,7 @@ import { Task } from '@lit-labs/task';
 import { ref, createRef } from 'lit/directives/ref.js';
 import axios from 'axios';
 import { debounce } from '../../utils/debounce';
+import { cachedAxios, cashedAxios } from '../../utils/cachedAxios';
 
 const DISEASE_ADVANCED_SUGGEST_URL = `https://togovar-dev.biosciencedbc.jp/api/search/disease?term=`;
 
@@ -26,17 +27,13 @@ export default class ConditionTextSearch extends LitElement {
     this.showSuggestions = false;
     this.inputRef = createRef();
     this.suggestionListRef = createRef();
+    this.API = new cachedAxios(DISEASE_ADVANCED_SUGGEST_URL);
     this._apiTask = new Task(
       this,
       (value) => {
         if (value.length >= 3) {
           this.showSuggestions = true;
-          return axios.get(`${DISEASE_ADVANCED_SUGGEST_URL}${value}`, {
-            headers: {
-              'Content-type': 'application/json',
-              Accept: 'application/json',
-            },
-          });
+          return this.API.get(value);
         }
         return Promise.resolve(() => (this.showSuggestions = false));
       },
