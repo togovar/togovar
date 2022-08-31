@@ -305,7 +305,7 @@ export class OntologyCard extends LitElement {
     }
 
     .table-container {
-      max-height: 5em;
+      max-height: 10rem;
       overflow-y: auto;
     }
   `;
