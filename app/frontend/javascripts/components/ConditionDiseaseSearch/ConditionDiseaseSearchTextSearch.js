@@ -3,9 +3,8 @@ import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { Task } from '@lit-labs/task';
 import { ref, createRef } from 'lit/directives/ref.js';
-import axios from 'axios';
 import { debounce } from '../../utils/debounce';
-import { cachedAxios, cashedAxios } from '../../utils/cachedAxios';
+import { cachedAxios } from '../../utils/cachedAxios';
 
 const DISEASE_ADVANCED_SUGGEST_URL = `https://togovar-dev.biosciencedbc.jp/api/search/disease?term=`;
 
