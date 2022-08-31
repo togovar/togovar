@@ -25,9 +25,18 @@ export default class ConditionValueEditorDisease extends ConditionValueEditor {
       e.stopPropagation();
       const { cui, label } = e.detail;
 
-      this._data = { id: cui, label };
+      // if no cui in the data, do not add it to search conditions
+      if (cui) {
+        this._data = { id: cui, label };
 
-      this._update();
+        this._addValueView(this._data.id, this._data.label, true);
+
+        this._update();
+      } else {
+        this._removeValueView(this._data.id);
+        this._data = { id: null, label: null };
+        this._update();
+      }
     });
   }
 
@@ -49,7 +58,6 @@ export default class ConditionValueEditorDisease extends ConditionValueEditor {
   }
 
   _update() {
-    this._addValueView(this._data.id, this._data.label, true);
     this._valuesView.update(this._validate());
   }
 }
