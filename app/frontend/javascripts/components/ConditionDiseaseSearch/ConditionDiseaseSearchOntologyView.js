@@ -68,7 +68,7 @@ class Container extends LitElement {
     };
     this.animationOptions = {
       duration: 500,
-      timingFunction: 'ease-in-out',
+      easing: 'ease-in-out',
     };
   }
 
@@ -218,10 +218,7 @@ class Container extends LitElement {
             transform: `translateX(${-this.deltaWidth}px)`,
           },
         ],
-        {
-          duration: 500,
-          easing: 'ease-out',
-        }
+        this.animationOptions
       );
     } else if (this.movement === 'right') {
       this.animate = this.flexRef.value.animate(
@@ -231,10 +228,7 @@ class Container extends LitElement {
           },
           { transform: 'translateX(0)' },
         ],
-        {
-          duration: 500,
-          easing: 'ease-out',
-        }
+        this.animationOptions
       );
     }
 
