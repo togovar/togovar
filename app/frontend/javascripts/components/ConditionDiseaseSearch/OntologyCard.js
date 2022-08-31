@@ -291,6 +291,8 @@ export class OntologyCard extends LitElement {
     .selected {
       background-color: var(--selected-bg-color);
       border-color: var(--selected-border-color);
+      padding-left: 10px;
+      padding-right: 10px;
     }
 
     .hidden {
