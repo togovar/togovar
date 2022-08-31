@@ -121,7 +121,7 @@ export default class ConditionTextSearch extends LitElement {
           ? html`
               <div class="suggest-view" ${ref(this.suggestionListRef)}>
                 <div class="column">
-                  <h3 class="title">${this.searchFor}</h3>
+                  
                   ${this._apiTask.render({
                     pending: () =>
                       html` <div class="loading"><span></span></div> `,
