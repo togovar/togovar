@@ -1,6 +1,11 @@
 import axios from 'axios';
-
+/** Cached axios */
 export class cachedAxios {
+  /**
+   * Create cached axios instance
+   * @param {string} baseURL - base URL.
+   * @param {number} maxCacheSize - maximum cache entries number. After reaching this treshold, oldest entries will be deleted from cache.
+   */
   constructor(baseURL, maxCacheSize = 100) {
     this.axios = axios.create({
       baseURL,
@@ -13,6 +18,11 @@ export class cachedAxios {
     this.cache = new Map();
   }
 
+  /**
+   *
+   * @param {string} url - url part bo be fetched. Fetched url will be  baseURL + url
+   * @returns {object} {data} - response data
+   */
   get(url) {
     if (this.cache.has(url)) {
       return Promise.resolve(this.cache.get(url));
