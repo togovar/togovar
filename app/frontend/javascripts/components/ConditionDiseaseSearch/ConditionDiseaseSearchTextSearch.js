@@ -9,46 +9,41 @@ import { cachedAxios } from '../../utils/cachedAxios';
 const DISEASE_ADVANCED_SUGGEST_URL = `https://togovar-dev.biosciencedbc.jp/api/search/disease?term=`;
 
 export default class ConditionTextSearch extends LitElement {
+  suggestions = [];
+  inputRef = createRef();
+  suggestionListRef = createRef();
+  API = new cachedAxios(DISEASE_ADVANCED_SUGGEST_URL);
+  apiTask = new Task(
+    this,
+    (value) => {
+      if (value.length >= 3) {
+        this.showSuggestions = true;
+        return this.API.get(value);
+      }
+      return Promise.resolve(() => (this.showSuggestions = false));
+    },
+    () => this.value
+  );
+
   static properties = {
-    _value: { type: String, state: true },
-    searchFor: { type: String, attribute: false },
+    value: { type: String, state: true },
     showSuggestions: { type: Boolean, state: true },
   };
 
-  constructor(searchFor = 'diseases', placeholder = 'Common cold') {
-    super(arguments);
-
-    this._value = '';
+  constructor(placeholder = 'Enter disease name') {
+    super();
+    this.value = '';
     this.placeholder = placeholder;
-    this.selectedId = '';
-    this.searchFor = searchFor;
-    this.suggestions = [];
     this.showSuggestions = false;
-    this.inputRef = createRef();
-    this.suggestionListRef = createRef();
-    this.API = new cachedAxios(DISEASE_ADVANCED_SUGGEST_URL);
-    this._apiTask = new Task(
-      this,
-      (value) => {
-        if (value.length >= 3) {
-          this.showSuggestions = true;
-          return this.API.get(value);
-        }
-        return Promise.resolve(() => (this.showSuggestions = false));
-      },
-      () => this._value
-    );
   }
 
   _keyup(e) {
     if (e.target && e.target.nodeName === 'INPUT') {
-      this._value = e.target.value;
+      this.value = e.target.value;
     }
   }
 
   _select(suggestion) {
-    this.selectedId = suggestion.id;
-
     this.dispatchEvent(
       new CustomEvent('new-suggestion-selected', {
         detail: {
@@ -65,7 +60,7 @@ export default class ConditionTextSearch extends LitElement {
   }
 
   _getSearchSuggestions() {
-    const result = fetch(DISEASE_ADVANCED_SUGGEST_URL + this._value, {
+    const result = fetch(DISEASE_ADVANCED_SUGGEST_URL + this.value, {
       headers: {
         'Content-type': 'application/json',
         Accept: 'application/json',
@@ -78,8 +73,8 @@ export default class ConditionTextSearch extends LitElement {
   }
 
   willUpdate(changed) {
-    if (changed.has('_value')) {
-      if (this._value.length >= 3) {
+    if (changed.has('value')) {
+      if (this.value.length >= 3) {
         this.showSuggestions = true;
       } else {
         this.showSuggestions = false;
@@ -99,9 +94,8 @@ export default class ConditionTextSearch extends LitElement {
             <input
               ${ref(this.inputRef)}
               type="text"
-              title="${this.searchFor}"
               placeholder="${this.placeholder}"
-              value="${this._value}"
+              value="${this.value}"
               @input="${debounce(this._keyup, 300)}"
               @focusout="${() => {
                 this.showSuggestions = false;
@@ -118,7 +112,7 @@ export default class ConditionTextSearch extends LitElement {
               <div class="suggest-view" ${ref(this.suggestionListRef)}>
                 <div class="column">
                   
-                  ${this._apiTask.render({
+                  ${this.apiTask.render({
                     pending: () =>
                       html` <div class="loading"><span></span></div> `,
                     error: (error) =>

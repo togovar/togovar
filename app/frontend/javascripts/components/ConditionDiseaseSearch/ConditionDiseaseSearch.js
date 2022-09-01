@@ -4,6 +4,8 @@ import './ConditionDiseaseSearchOntologyView.js';
 import './ConditionDiseaseSearchTextSearch.js';
 
 export class ConditionDiseaseSearch extends LitElement {
+  _timer = null;
+
   static get properties() {
     return {
       diseaseId: {
@@ -26,7 +28,6 @@ export class ConditionDiseaseSearch extends LitElement {
     this.data = [];
     this.diseaseId = '';
     this.loading = false;
-    this._timer = null;
   }
 
   _changeDiseaseEventHadnler(e) {
@@ -67,14 +68,13 @@ export class ConditionDiseaseSearch extends LitElement {
       <condition-disease-text-search
         @new-suggestion-selected=${this._changeDiseaseEventHadnler}
       ></condition-disease-text-search>
-      <div class="container" style="position: relative;">
+      <div class="container">
         ${this.loading
-          ? html`
-              <div class="loading">
-                <span></span>
-              </div>
-            `
+          ? html`<div class="loading">
+              <span></span>
+            </div>`
           : nothing}
+
         <condition-disease-ontology-view
           ._id="${this.diseaseId}"
           @disease-selected="${this._changeDiseaseEventHadnler}"

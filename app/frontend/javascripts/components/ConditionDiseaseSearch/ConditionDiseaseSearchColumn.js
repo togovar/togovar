@@ -43,7 +43,7 @@ export default class Column extends LitElement {
     };
   }
   constructor() {
-    super(...arguments);
+    super();
     this.nodes = [];
     this.heroId = undefined;
     this.role = '';
