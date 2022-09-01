@@ -10,7 +10,6 @@ import './ConditionDiseaseSearchColumn';
 import { cachedAxios } from '../../utils/cachedAxios';
 
 class Container extends LitElement {
-  nColumns = 3;
   flexRef = createRef();
   clipRef = createRef();
   nodeRef = createRef();
@@ -22,6 +21,17 @@ class Container extends LitElement {
   animate = null;
   scrolledRect = null;
   API = new cachedAxios('https://togovar-dev.biosciencedbc.jp/api/inspect');
+  dataColumns = {
+    _parents: [],
+    parents: [],
+    hero: [],
+    children: [],
+    _children: [],
+  };
+  animationOptions = {
+    duration: 500,
+    easing: 'ease-in-out',
+  };
 
   static styles = css`
   :host {
@@ -49,29 +59,13 @@ class Container extends LitElement {
   constructor() {
     super();
     this._id = '';
-    this.loading = false;
     this._columns = ['parents', 'hero', 'children'];
     this.data = {};
-    this.loadingDone = function () {};
-    this.dataColumns = {
-      _parents: [],
-      parents: [],
-      hero: [],
-      children: [],
-      _children: [],
-    };
-    this.animationOptions = {
-      duration: 500,
-      easing: 'ease-in-out',
-    };
-    this._cache = new Map();
   }
 
   static get properties() {
     return {
       data: { type: Object, state: true },
-      loading: { type: Boolean, state: true },
-      loadingDone: { type: Function },
       _id: { type: String, attribute: 'id' },
       _columns: {
         type: Array,
@@ -86,7 +80,6 @@ class Container extends LitElement {
       this.API.get(`/disease?node=${id}`).then(({ data }) => {
         this.data = data;
 
-        // when data fetched, call loadingDone()
         this._loadingEnded();
       });
     }
