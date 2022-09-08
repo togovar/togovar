@@ -42,7 +42,6 @@
     "eslint-config-prettier": "^8.5.0",
     "express": "^4.17.1",
     "file-loader": "^6.0.0",
-    "font-awesome": "^4.7.0",
     "forever": "^3.0.4",
     "html-loader": "^1.1.0",
     "html-webpack-plugin": "^4.3.0",
