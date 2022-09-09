@@ -5,8 +5,9 @@ import { Task } from '@lit-labs/task';
 import { ref, createRef } from 'lit/directives/ref.js';
 import { debounce } from '../../utils/debounce';
 import { cachedAxios } from '../../utils/cachedAxios';
+import { API_URL } from '../../global';
 
-const DISEASE_ADVANCED_SUGGEST_URL = `https://togovar-dev.biosciencedbc.jp/api/search/disease?term=`;
+const DISEASE_ADVANCED_SUGGEST_URL = `${API_URL}/api/search/disease?term=`;
 
 export default class ConditionTextSearch extends LitElement {
   suggestions = [];
@@ -49,7 +50,6 @@ export default class ConditionTextSearch extends LitElement {
         detail: {
           id: suggestion.id,
           label: suggestion.label,
-          cui: suggestion.cui,
         },
         bubbles: true,
         composed: true,

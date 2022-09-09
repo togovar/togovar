@@ -84,7 +84,7 @@ export class OntologyCard extends LitElement {
       height: 0px;
       border: 8px solid transparent;
       border-left: 8px solid #ccc;
-      top: min(50%, 16px);
+      top: min(50%, 15px);
       right: 0;
       transform: translate(50%, -50%) scaleY(0.5);
       box-sizing: border-box;
@@ -267,7 +267,7 @@ export class OntologyCard extends LitElement {
       height: 0px;
       border: 8px solid transparent;
       border-left: 8px solid #ccc;
-      top: min(50%, 16px);
+      top: min(50%, 15px);
       left: 0;
       transform: translate(-50%, -50%) scaleY(0.5);
       box-sizing: border-box;
@@ -339,22 +339,24 @@ export class OntologyCard extends LitElement {
       easing: 'ease-out',
     };
 
-    let animation = [
-      {
-        height: `${this.prevRect?.height || 0}px`,
-        overflow: 'hidden',
-      },
-      {
-        height: `${this.cardRef?.value.getBoundingClientRect().height || 0}px`,
-      },
-    ];
-
     if (this.mode === 'hero') {
+      let animation = [
+        {
+          height: `${this.prevRect?.height || 0}px`,
+          overflow: 'hidden',
+        },
+        {
+          height: `${
+            this.cardRef?.value.getBoundingClientRect().height || 0
+          }px`,
+        },
+      ];
+
       animation[0].backgroundColor = this.defaultBgColor;
       animation[1].backgroundColor = this.selectedBgColor;
-    }
 
-    this.cardRef.value.animate(animation, animProps);
+      this.cardRef.value.animate(animation, animProps);
+    }
   }
 
   firstUpdated() {
@@ -397,13 +399,6 @@ export class OntologyCard extends LitElement {
                       </tbody>
                     </table>
                   </div>
-                  ${!this.data.cui
-                    ? html`
-                        <p class="note">
-                          This disease cannot be added as a search condition
-                        </p>
-                      `
-                    : nothing}
                 `
               : nothing}
           </div>
