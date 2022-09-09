@@ -23,11 +23,10 @@ export default class ConditionValueEditorDisease extends ConditionValueEditor {
 
     this._conditionElem.addEventListener('disease-selected', (e) => {
       e.stopPropagation();
-      const { cui, label } = e.detail;
+      const { id, label } = e.detail;
 
-      // if no cui in the data, do not add it to search conditions
-      if (cui) {
-        this._data = { id: cui, label };
+      if (id) {
+        this._data = { id, label };
 
         this._addValueView(this._data.id, this._data.label, true);
 

@@ -38,7 +38,6 @@ export class ConditionDiseaseSearch extends LitElement {
         detail: {
           id: e.detail.id,
           label: e.detail.label,
-          cui: e.detail.cui,
         },
         bubbles: true,
         composed: true,

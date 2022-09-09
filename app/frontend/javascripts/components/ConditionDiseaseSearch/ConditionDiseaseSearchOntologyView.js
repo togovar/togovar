@@ -8,6 +8,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import './ConditionDiseaseSearchColumn';
 
 import { cachedAxios } from '../../utils/cachedAxios';
+import { API_URL } from '../../global';
 
 class Container extends LitElement {
   flexRef = createRef();
@@ -20,7 +21,7 @@ class Container extends LitElement {
   gap = 0;
   animate = null;
   scrolledRect = null;
-  API = new cachedAxios('https://togovar-dev.biosciencedbc.jp/api/inspect');
+  API = new cachedAxios(`${API_URL}/api/inspect`);
   dataColumns = {
     _parents: [],
     parents: [],
@@ -186,7 +187,6 @@ class Container extends LitElement {
               detail: {
                 id: data.id,
                 label: data.label,
-                cui: data.cui,
               },
               bubbles: true,
               composed: true,
