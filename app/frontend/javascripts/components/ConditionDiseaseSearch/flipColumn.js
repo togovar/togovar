@@ -31,12 +31,14 @@ class Flip extends AsyncDirective {
     this.heroId = heroId;
     this.scrolledHeroRect = scrolledHeroRect;
 
-    if (this.role === 'hero' && this.id !== this.heroId) {
+    if (
+      this.role === 'hero' &&
+      this.id !== this.heroId &&
+      this.id !== 'dummy'
+    ) {
       // then remove the element from the DOM with animation
-      requestAnimationFrame(() => {
-        this.boundingRect = { y: 0, x: 0, width: 0, height: 0 };
-        this.remove();
-      });
+      disconnectedRects.set(this.id, part.getBoundingClientRect());
+      this.remove();
     }
 
     if (this.role !== 'hero' && !disconnectedRects.has(this.id)) {
@@ -80,10 +82,9 @@ class Flip extends AsyncDirective {
 
     if (this.id === this.heroId) {
       previous = this.scrolledHeroRect;
-      this.boundingRect = this.element.parentElement.getBoundingClientRect();
-    } else {
-      this.boundingRect = this.element.getBoundingClientRect();
     }
+
+    this.boundingRect = this.element.getBoundingClientRect();
 
     const deltaY = (previous?.y || 0) - (this.boundingRect?.y || 0);
 
@@ -104,13 +105,9 @@ class Flip extends AsyncDirective {
       [
         {
           transform: `translate(0, ${deltaY}px)`,
-          position: this.id === this.heroId ? 'absolute' : 'relative',
-          width: `${this.boundingRect.width}px`,
         },
         {
           transform: `translate(0,0)`,
-          position: this.id === this.heroId ? 'absolute' : 'relative',
-          width: `${this.boundingRect.width}px`,
         },
       ],
       this.options
@@ -144,6 +141,10 @@ class Flip extends AsyncDirective {
   }
 
   disconnected() {
+    if (this.role === 'hero') {
+      this.remove();
+    }
+
     this.boundingRect = this.element.getBoundingClientRect();
     if (typeof this.id !== 'undefined') {
       disconnectedRects.set(this.id, this.boundingRect);
