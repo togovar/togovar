@@ -1,23 +1,28 @@
-import {API_URL} from "../global.js";
+import { API_URL } from '../global.js';
 
 const NUMBER_OF_SUGGESTS = 10; // TODO: Config
 const SUGGEST_LABELS = {
   gene: 'Gene symbol',
-  disease: 'Disease name'
-}
+  disease: 'Disease name',
+};
 const KEY_INCREMENT = {
   ArrowUp: { x: 0, y: -1 },
   ArrowDown: { x: 0, y: 1 },
   ArrowLeft: { x: -1, y: 0 },
-  ArrowRight: { x: 1, y: 0 }
+  ArrowRight: { x: 1, y: 0 },
 };
 
 export default class SearchFieldView {
-
-  constructor(delegate, elm, placeholder, suggestDictionaries) {
-
+  constructor(
+    delegate,
+    elm,
+    placeholder,
+    suggestDictionaries,
+    hideSuggestions = false
+  ) {
     this._delegate = delegate;
     this._suggestDictionaries = suggestDictionaries;
+    this._hideSuggestions = hideSuggestions;
     // make HTML
     elm.innerHTML = `
     <div class="search-field-view">
@@ -45,17 +50,24 @@ export default class SearchFieldView {
     this._button.addEventListener('click', this._search.bind(this));
   }
 
-
   // private methods
 
   _keydown(e) {
     if (this._suggesting) {
       if (KEY_INCREMENT[e.code]) {
-        let item = this._suggestView.querySelector(`.column:nth-child(${this.suggestPosition.x + 1}) > .list > .item:nth-child(${this.suggestPosition.y + 1})`);
+        let item = this._suggestView.querySelector(
+          `.column:nth-child(${
+            this.suggestPosition.x + 1
+          }) > .list > .item:nth-child(${this.suggestPosition.y + 1})`
+        );
         if (item) item.classList.remove('-selected');
 
         this._suggestPositionShift(KEY_INCREMENT[e.code]);
-        item = this._suggestView.querySelector(`.column:nth-child(${this.suggestPosition.x + 1}) > .list > .item:nth-child(${this.suggestPosition.y + 1})`);
+        item = this._suggestView.querySelector(
+          `.column:nth-child(${
+            this.suggestPosition.x + 1
+          }) > .list > .item:nth-child(${this.suggestPosition.y + 1})`
+        );
         item.classList.add('-selected');
 
         e.preventDefault();
@@ -67,27 +79,35 @@ export default class SearchFieldView {
   _keyup(e) {
     e.preventDefault();
     if (e.key === 'Enter') {
-      if (this._suggesting && this.suggestPosition.x !== -1 && this.suggestPosition.y !== -1) {
-        this._field.value = this._suggestList[this.suggestPosition.x][this.suggestPosition.y].alias_of ||
-          this._suggestList[this.suggestPosition.x][this.suggestPosition.y].term;
+      if (
+        this._suggesting &&
+        this.suggestPosition.x !== -1 &&
+        this.suggestPosition.y !== -1
+      ) {
+        this._field.value =
+          this._suggestList[this.suggestPosition.x][this.suggestPosition.y]
+            .alias_of ||
+          this._suggestList[this.suggestPosition.x][this.suggestPosition.y]
+            .term;
       }
       this._suggesting = false;
       this._suggestView.innerHTML = '';
       this._search();
     } else if (
       this._suggesting &&
-      (
-        e.key === 'Escape' ||
-        this._field.value.length < 3
-      )
+      (e.key === 'Escape' || this._field.value.length < 3)
     ) {
       this._suggesting = false;
       this._suggestView.innerHTML = '';
       this.lastValue = '';
-    } else if (this._field.value.length >= 3 && this._field.value !== this.lastValue) {
+    } else if (
+      !this._hideSuggestions &&
+      this._field.value.length >= 3 &&
+      this._field.value !== this.lastValue
+    ) {
       fetch(`${API_URL}/suggest?term=${this._field.value}`)
-        .then(response => response.json())
-        .then(json => this._suggest(json));
+        .then((response) => response.json())
+        .then((json) => this._suggest(json));
     }
   }
 
@@ -103,18 +123,18 @@ export default class SearchFieldView {
 
   _suggestPositionShift(increment) {
     if (this.suggestPosition.x === -1 && this.suggestPosition.y === -1) {
-      switch(true) {
+      switch (true) {
         case increment.y === -1:
-          this.suggestPosition = {x: 0, y: -1};
+          this.suggestPosition = { x: 0, y: -1 };
           break;
         case increment.y === 1:
-          this.suggestPosition = {x: 0, y: 0};
+          this.suggestPosition = { x: 0, y: 0 };
           break;
         case increment.x === -1:
-          this.suggestPosition = {x: 0, y: 0};
+          this.suggestPosition = { x: 0, y: 0 };
           break;
         case increment.x === 1:
-          this.suggestPosition = {x: -1, y: 0};
+          this.suggestPosition = { x: -1, y: 0 };
           break;
       }
     } else {
@@ -124,20 +144,36 @@ export default class SearchFieldView {
 
     switch (true) {
       case increment.y === -1:
-        this.suggestPosition.y = this.suggestPosition.y < 0 ? this._suggestList[0].length - 1 : this.suggestPosition.y;
+        this.suggestPosition.y =
+          this.suggestPosition.y < 0
+            ? this._suggestList[0].length - 1
+            : this.suggestPosition.y;
         break;
       case increment.y === 1:
-        this.suggestPosition.y = this.suggestPosition.y >= this._suggestList[0].length ? 0 : this.suggestPosition.y;
+        this.suggestPosition.y =
+          this.suggestPosition.y >= this._suggestList[0].length
+            ? 0
+            : this.suggestPosition.y;
         break;
       case increment.x === -1:
-        this.suggestPosition.x = this.suggestPosition.x < 0 ? this._suggestList.length - 1 : this.suggestPosition.x;
+        this.suggestPosition.x =
+          this.suggestPosition.x < 0
+            ? this._suggestList.length - 1
+            : this.suggestPosition.x;
         break;
       case increment.x === 1:
-        this.suggestPosition.x = this.suggestPosition.x >= this._suggestList.length ? 0 : this.suggestPosition.x;
+        this.suggestPosition.x =
+          this.suggestPosition.x >= this._suggestList.length
+            ? 0
+            : this.suggestPosition.x;
         break;
     }
 
-    if (this._suggestList[this.suggestPosition.x][this.suggestPosition.y] === undefined) this._suggestPositionShift(increment);
+    if (
+      this._suggestList[this.suggestPosition.x][this.suggestPosition.y] ===
+      undefined
+    )
+      this._suggestPositionShift(increment);
   }
 
   _search() {
@@ -149,7 +185,9 @@ export default class SearchFieldView {
     this.lastValue = this._field.value;
     this.suggestPosition = { x: -1, y: -1 };
 
-    let max = Math.max(...this._suggestDictionaries.map(key => data[key].length));
+    let max = Math.max(
+      ...this._suggestDictionaries.map((key) => data[key].length)
+    );
     max = max < NUMBER_OF_SUGGESTS ? max : NUMBER_OF_SUGGESTS;
 
     const dictionaries = [];
@@ -167,41 +205,64 @@ export default class SearchFieldView {
       }
     });
 
-    this._suggestView.innerHTML = dictionaries.map((key, index) => {
-      const column = this._suggestList[index];
-      return `
+    this._suggestView.innerHTML = dictionaries
+      .map((key, index) => {
+        const column = this._suggestList[index];
+        return `
       <div class="column">
         <h3 class="title">${SUGGEST_LABELS[key]}</h3>
         <ul class="list">
-          ${column.map(item => {
-            return `<li class="item${item === undefined ? ' -disabled' : ''}" data-value="${item ? item.term : ''}" data-alias="${item && item.alias_of ? item.alias_of : ''}">
-              ${item ? `${
-                `<span class="main">${item.alias_of ? item.alias_of : item.term}</span>` + (item.alias_of ? `<span class="sub">alias: ${item.term}</span>` : '')
-              }` : ''}
+          ${column
+            .map((item) => {
+              return `<li class="item${
+                item === undefined ? ' -disabled' : ''
+              }" data-value="${item ? item.term : ''}" data-alias="${
+                item && item.alias_of ? item.alias_of : ''
+              }">
+              ${
+                item
+                  ? `${
+                      `<span class="main">${
+                        item.alias_of ? item.alias_of : item.term
+                      }</span>` +
+                      (item.alias_of
+                        ? `<span class="sub">alias: ${item.term}</span>`
+                        : '')
+                    }`
+                  : ''
+              }
             </li>`;
-          }).join('')}
+            })
+            .join('')}
         </ul>
       </div>`;
-    }).join('');
+      })
+      .join('');
 
-    this._suggestView.querySelectorAll('.column > .list > .item').forEach(item => {
-      if (!item.classList.contains('-disabled')) {
-        $(item).on('click', e => {
-          e.stopPropagation();
-          this._field.value = e.currentTarget.dataset.alias || e.currentTarget.dataset.value;
-          this._suggesting = false;
-          this._suggestView.innerHTML = '';
-          this._search();
-        });
-      }
-    });
+    this._suggestView
+      .querySelectorAll('.column > .list > .item')
+      .forEach((item) => {
+        if (!item.classList.contains('-disabled')) {
+          $(item).on('click', (e) => {
+            e.stopPropagation();
+            this._field.value =
+              e.currentTarget.dataset.alias || e.currentTarget.dataset.value;
+            this._suggesting = false;
+            this._suggestView.innerHTML = '';
+            this._search();
+          });
+        }
+      });
   }
-
 
   // public method
 
   setExamples(examples) {
-    this._examples.innerHTML = examples.map(example => `<dl><dt>${example.key}</dt><dd>${example.value}</dd></dl>`).join('');
+    this._examples.innerHTML = examples
+      .map(
+        (example) => `<dl><dt>${example.key}</dt><dd>${example.value}</dd></dl>`
+      )
+      .join('');
     return this._examples.querySelectorAll('dl');
   }
 
@@ -213,5 +274,4 @@ export default class SearchFieldView {
   get value() {
     return this._field.value;
   }
-
 }

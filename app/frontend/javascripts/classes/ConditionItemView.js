@@ -28,7 +28,11 @@ export default class ConditionItemView extends ConditionView {
     this._elm.classList.add('advanced-search-condition-item-view');
     this._elm.dataset.classification = conditionType;
     this._elm.dataset.relation =
-      conditionType === 'dataset' || conditionType === 'location' ? '' : 'eq';
+      conditionType === 'dataset' ||
+      conditionType === 'location' ||
+      conditionType === 'id'
+        ? ''
+        : 'eq';
     // TODO: 疾患は contains?
     this._elm.innerHTML = `
     <div class="body">
@@ -163,6 +167,13 @@ export default class ConditionItemView extends ConditionView {
         }
         return {
           location: { chromosome, position },
+        };
+      }
+
+      case CONDITION_TYPE.variant_id: {
+        const value = values[0].value;
+        return {
+          id: [value],
         };
       }
 

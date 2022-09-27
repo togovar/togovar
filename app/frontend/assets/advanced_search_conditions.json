@@ -409,8 +409,12 @@
       "label": "Disease",
       "type": "text"
     },
-    "gene_symbol": {
+    "gene": {
       "label": "Gene symbol",
+      "type": "text"
+    },
+    "id": {
+      "label": "Variant id",
       "type": "text"
     },
     "location": {
