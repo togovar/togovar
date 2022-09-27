@@ -16,10 +16,8 @@ export default class Column extends LitElement {
     }
 
     .column {
-      display: flex;
       height: 100%;
-      flex-direction: column;
-      gap: 6px;
+
       position: relative;
       overflow-y: auto;
       overflow-x: hidden;

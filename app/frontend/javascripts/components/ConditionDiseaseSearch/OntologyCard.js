@@ -258,6 +258,7 @@ export class OntologyCard extends LitElement {
       width: min(80%, 20rem);
       max-width: 30rem;
       box-sizing: border-box;
+      margin-bottom: 6px;
     }
 
     .children-arrow:before {
@@ -277,6 +278,7 @@ export class OntologyCard extends LitElement {
     h3 {
       display: inline;
     }
+
     .card-container {
       display: flex;
       flex-direction: row;
@@ -291,17 +293,10 @@ export class OntologyCard extends LitElement {
     .selected {
       background-color: var(--selected-bg-color);
       border-color: var(--selected-border-color);
-      padding-left: 10px;
-      padding-right: 10px;
     }
 
     .hidden {
       visibility: hidden;
-    }
-
-    p.note {
-      margin: 0;
-      color: #94928d;
     }
 
     .table-container {
