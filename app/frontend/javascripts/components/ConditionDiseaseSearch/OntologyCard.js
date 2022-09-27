@@ -261,6 +261,10 @@ export class OntologyCard extends LitElement {
       margin-bottom: 6px;
     }
 
+    .ontology-card:hover {
+      filter: brightness(0.98);
+    }
+
     .children-arrow:before {
       position: absolute;
       content: '';
