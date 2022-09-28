@@ -113,10 +113,7 @@ export default class SearchFieldView {
         },
       })
         .then((response) => response.json())
-        .then((json) => {
-          console.log('fetched data', json);
-          return this._suggest(json);
-        });
+        .then((json) => this._suggest(json));
     }
   }
 
