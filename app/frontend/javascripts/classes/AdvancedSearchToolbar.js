@@ -35,7 +35,6 @@ export default class AdvancedSearchToolbar {
       },
     ];
 
-    console.log(ADVANCED_CONDITIONS);
     toolbar.innerHTML = `
     <ul>
       <li class="-haschild">
