@@ -4,7 +4,7 @@ import { repeat } from 'lit/directives/repeat.js';
 
 import { flip } from './flipColumn';
 
-import './OntologyCard';
+import './ConditionDiseaseSearchOntologyCard';
 
 export default class Column extends LitElement {
   static styles = css`
