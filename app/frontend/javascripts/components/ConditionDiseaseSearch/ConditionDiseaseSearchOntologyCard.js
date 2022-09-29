@@ -1,5 +1,4 @@
 import { LitElement, html, css, nothing, unsafeCSS } from 'lit';
-import fonts from './fonts.css';
 import { ref, createRef } from 'lit/directives/ref.js';
 
 const KEYS_MAP = {
