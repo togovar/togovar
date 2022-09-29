@@ -1,5 +1,17 @@
-import { LitElement, html, css, nothing } from 'lit';
+import { LitElement, html, css, nothing, unsafeCSS } from 'lit';
+import fonts from './fonts.css';
 import { ref, createRef } from 'lit/directives/ref.js';
+
+const KEYS_MAP = {
+  id: {
+    text: 'MONDO',
+    link: 'http://purl.obolibrary.org/obo/',
+  },
+  cui: {
+    text: 'MedGen',
+    link: 'https://www.ncbi.nlm.nih.gov/medgen/',
+  },
+};
 
 export class OntologyCard extends LitElement {
   static get properties() {
@@ -252,13 +264,30 @@ export class OntologyCard extends LitElement {
     }
 
     h3 {
-      display: inline;
+      display: inline-block;
+      text-transform: lowercase;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    h3:first-letter {
+      text-transform: uppercase;
     }
 
     .card-container {
       display: flex;
       flex-direction: row;
       justify-content: center;
+    }
+
+    .hyper-text {
+      color: var(--color-key-dark3);
+      text-decoration: underline;
+    }
+
+    .hyper-text:active,
+    .hyper-text:hover {
+      color: var(--color-key-dark1);
     }
 
     .connector {
@@ -277,6 +306,7 @@ export class OntologyCard extends LitElement {
 
     .table-container {
       max-height: 10rem;
+      margin-top: 0.3em;
       overflow-y: auto;
     }
   `;
@@ -362,8 +392,17 @@ export class OntologyCard extends LitElement {
                           .map((key) => {
                             return html`
                               <tr>
-                                <td class="key">${key}</td>
-                                <td class="data">${this.data[key]}</td>
+                                <td class="key">${KEYS_MAP[key].text}:</td>
+                                <td class="data">
+                                  <a
+                                    class="hyper-text -external"
+                                    href="${KEYS_MAP[key].link}${this.data[
+                                      key
+                                    ]}"
+                                    target="_blank"
+                                    >${this.data[key]}</a
+                                  >
+                                </td>
                               </tr>
                             `;
                           })}
