@@ -77,20 +77,6 @@ export class OntologyCard extends LitElement {
       box-sizing: border-box;
     }
 
-    .-hero-left:after {
-      position: absolute;
-      content: '';
-      width: 0px;
-      height: 0px;
-      border: 8px solid transparent;
-      border-left: 8px solid #ccc;
-      top: min(50%, 15px);
-      right: 0;
-      transform: translate(50%, -50%) scaleY(0.5);
-      box-sizing: border-box;
-      z-index: 9;
-    }
-
     .-children-first:before {
       position: absolute;
       z-index: 9;
@@ -265,20 +251,6 @@ export class OntologyCard extends LitElement {
       filter: brightness(0.98);
     }
 
-    .children-arrow:before {
-      position: absolute;
-      content: '';
-      width: 0px;
-      height: 0px;
-      border: 8px solid transparent;
-      border-left: 8px solid #ccc;
-      top: min(50%, 15px);
-      left: 0;
-      transform: translate(-50%, -50%) scaleY(0.5);
-      box-sizing: border-box;
-      z-index: 9;
-    }
-
     h3 {
       display: inline;
     }
@@ -376,7 +348,7 @@ export class OntologyCard extends LitElement {
           class="ontology-card ${this.hidden ? 'hidden' : ''} ${this.mode ===
           'hero'
             ? 'selected'
-            : ''} ${this.mode === 'children' ? 'children-arrow' : ''}"
+            : ''}"
         >
           <div class="ontology-card-header">
             <h3>${this.data?.label || '...'}</h3>
