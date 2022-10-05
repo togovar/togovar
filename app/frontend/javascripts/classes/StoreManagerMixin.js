@@ -335,14 +335,17 @@ export const mixin = {
         })
         .catch((e) => {
           const body = document.querySelector('body');
-          const modalWindow = new ModalWindow(body, 'Some error!');
+          const modalWindow = new ModalWindow(body, e.message);
           modalWindow.show();
 
           body.addEventListener('click', (e) => {
             if (e.target !== modalWindow.messageArea) {
               modalWindow.hide();
+              body.removeEventListener('click', clickHandler);
             }
           });
+          body.addEventListener('click', clickHandler);
+
           if (e.name === 'AbortError') {
             console.warn('User aborted the request');
           } else {
