@@ -1,6 +1,7 @@
 import deparam from 'deparam.js';
 import { API_URL } from '../global.js';
 import { debounce } from '../utils/debounce.js';
+import { ModalWindow } from '../components/ModalWindow.js';
 
 const LIMIT = 100;
 const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
@@ -333,6 +334,15 @@ export const mixin = {
           }
         })
         .catch((e) => {
+          const body = document.querySelector('body');
+          const modalWindow = new ModalWindow(body, 'Some error!');
+          modalWindow.show();
+
+          body.addEventListener('click', (e) => {
+            if (e.target !== modalWindow.messageArea) {
+              modalWindow.hide();
+            }
+          });
           if (e.name === 'AbortError') {
             console.warn('User aborted the request');
           } else {
