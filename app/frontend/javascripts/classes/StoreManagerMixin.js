@@ -338,12 +338,12 @@ export const mixin = {
           const modalWindow = new ModalWindow(body, e.message);
           modalWindow.show();
 
-          body.addEventListener('click', (e) => {
+         const clickHandler = (e) => {
             if (e.target !== modalWindow.messageArea) {
               modalWindow.hide();
               body.removeEventListener('click', clickHandler);
             }
-          });
+          }
           body.addEventListener('click', clickHandler);
 
           if (e.name === 'AbortError') {
