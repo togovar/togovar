@@ -59,66 +59,87 @@ export default class SearchFieldView {
     this._suggesting = false;
 
     // events
-    this._field.addEventListener('keydown', this._keydown.bind(this));
-    this._field.addEventListener('keyup', this._keyup.bind(this));
-    this._field.addEventListener('blur', this._blur.bind(this));
+    this._field.addEventListener('keydown', this._itemSelect.bind(this));
+    this._field.addEventListener(
+      'keyup',
+      this._suggestDecisionAndShowHide.bind(this)
+    );
+    // this._field.addEventListener('blur', this._blur.bind(this));
     this._button.addEventListener('click', this._search.bind(this));
   }
 
   // private methods
 
   //現在表示エリア外の際のnth-childが取れない問題が出ている
-  _keydown(e) {
+  _itemSelect(e) {
     if (this._suggesting && KEY_INCREMENT[e.code]) {
       let item = this._suggestView.querySelector(
-        `.column:nth-child(${
-          this._suggestPosition.x + 1
-        }) > .list > .item:nth-child(${this._suggestPosition.y + 1})`
+        `.column:nth-child(${this._suggestPosition.x + 1})
+        > .list
+        > .item:nth-child(${this._suggestPosition.y + 1})`
       );
       if (item) item.classList.remove('-selected');
 
+      // console.log(this._suggestPosition.x, this._suggestPosition.y);
+      // if (this._suggestPosition.x !== -1 && this._suggestPosition.y !== -1) {
       this._suggestPositionShift(KEY_INCREMENT[e.code]);
       item = this._suggestView.querySelector(
-        `.column:nth-child(${
-          this._suggestPosition.x + 1
-        }) > .list > .item:nth-child(${this._suggestPosition.y + 1})`
+        `.column:nth-child(${this._suggestPosition.x + 1})
+        > .list
+        > .item:nth-child(${this._suggestPosition.y + 1})`
       );
       item.classList.add('-selected');
-
-      e.preventDefault();
-      return false;
+      // }
+      // e.preventDefault();
+      // return false;
     }
   }
 
-  _keyup(e) {
-    e.preventDefault();
+  _suggestDecisionAndShowHide(e) {
+    // e.preventDefault();
 
     if (e.key === 'Enter') {
-      if (
-        this._suggesting &&
-        this._suggestPosition.x !== -1 &&
-        this._suggestPosition.y !== -1
-      ) {
-        this._field.value =
-          this._suggestList[this._suggestPosition.x][this._suggestPosition.y]
-            .alias_of ||
-          this._suggestList[this._suggestPosition.x][this._suggestPosition.y]
-            .term;
-      }
-      this._suggesting = false;
-      this._suggestView.innerHTML = '';
-      this._search();
-    } else if (
+      this._suggestDecision();
+    } else {
+      this._suggestHide(e);
+      this._suggestShow();
+    }
+  }
+
+  _suggestDecision() {
+    const selectWithCursor =
       this._suggesting &&
-      (e.key === 'Escape' || this._field.value.length < 3)
-    ) {
+      this._suggestPosition.x !== -1 &&
+      this._suggestPosition.y !== -1;
+
+    if (selectWithCursor) {
+      this._field.value =
+        this._suggestList[this._suggestPosition.x][this._suggestPosition.y]
+          .alias_of ||
+        this._suggestList[this._suggestPosition.x][this._suggestPosition.y]
+          .term;
+    }
+    this._suggesting = false;
+    this._suggestView.innerHTML = '';
+    this._search();
+  }
+
+  _suggestHide(e) {
+    const hideSuggest =
+      this._suggesting && (e.key === 'Escape' || this._field.value.length < 3);
+
+    if (hideSuggest) {
       this._suggesting = false;
       this._suggestView.innerHTML = '';
       this.lastValue = '';
-    } else if (
-      this._field.value.length >= 3 &&
-      this._field.value !== this.lastValue
-    ) {
+    }
+  }
+
+  _suggestShow() {
+    const showSuggest =
+      this._field.value.length >= 3 && this._field.value !== this.lastValue;
+
+    if (showSuggest) {
       fetch(`${this._queryURL}${this._field.value}`, {
         method: 'GET',
         headers: {
@@ -132,15 +153,15 @@ export default class SearchFieldView {
   }
 
   // where are you blurring?
-  _blur() {
-    setTimeout(() => {
-      if (this._suggesting) {
-        this._suggesting = false;
-        this._suggestView.innerHTML = '';
-        this.lastValue = '';
-      }
-    }, 250);
-  }
+  // _blur() {
+  //   setTimeout(() => {
+  //     if (this._suggesting) {
+  //       this._suggesting = false;
+  //       this._suggestView.innerHTML = '';
+  //       this.lastValue = '';
+  //     }
+  //   }, 250);
+  // }
 
   _suggestPositionShift(incrementOfXY) {
     this._initialChangeOfSuggestPosition(incrementOfXY);
