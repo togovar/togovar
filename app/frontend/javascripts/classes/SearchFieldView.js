@@ -15,38 +15,49 @@ const KEY_INCREMENT = {
 };
 
 export default class SearchFieldView {
+  /**
+   * @param {Object} _delegate - SimpleSearchView Object ?
+   * @param {Element} _elm - SimpleSearchView Element
+   * @param {String} _placeholder - placeholder for gene, disease
+   * @param {Array} _suggestDictionaries - ['gene', 'disease']
+   * @param {URL} _queryURL
+   * @param {String | Undefined} _conditionType - 'gene' or 'disease' or undefined
+   */
   constructor(
-    delegate,
-    elm,
-    placeholder,
-    suggestDictionaries,
-    queryURL = `${API_URL}/suggest?term=`,
-    conditionType
+    _delegate,
+    _elm,
+    _placeholder,
+    _suggestDictionaries,
+    _queryURL = `${API_URL}/suggest?term=`,
+    _conditionType
   ) {
-    this._delegate = delegate;
-    this._queryURL = queryURL;
-    this._suggestDictionaries = suggestDictionaries;
-    this._conditionType = conditionType;
+    this._delegate = _delegate;
+    this._queryURL = _queryURL;
+    this._suggestDictionaries = _suggestDictionaries;
+    this._conditionType = _conditionType;
+
     // make HTML
-    elm.innerHTML = `
+    _elm.innerHTML = `
     <div class="search-field-view">
       <div class="fieldcontainer">
         <div class="field">
-          <input type="text" title="${placeholder}" placeholder="${placeholder}">
+          <input type="text" title="${_placeholder}" placeholder="${_placeholder}">
           <button>Search</button>
         </div>
       </div>
       <div class="examples"></div>
       <div class="suggest-view"></div>
     </div>`;
+
     // reference
-    const view = elm.querySelector(':scope > .search-field-view');
+    const view = _elm.querySelector(':scope > .search-field-view');
     const field = view.querySelector(':scope > .fieldcontainer > .field');
     this._field = field.querySelector(':scope > input[type="text"]');
     this._button = field.querySelector(':scope > button');
     this._examples = view.querySelector(':scope > .examples');
     this._suggestView = view.querySelector(':scope > .suggest-view');
     this._suggesting = false;
+
     // events
     this._field.addEventListener('keydown', this._keydown.bind(this));
     this._field.addEventListener('keyup', this._keyup.bind(this));
@@ -56,42 +67,42 @@ export default class SearchFieldView {
 
   // private methods
 
+  //現在表示エリア外の際のnth-childが取れない問題が出ている
   _keydown(e) {
-    if (this._suggesting) {
-      if (KEY_INCREMENT[e.code]) {
-        let item = this._suggestView.querySelector(
-          `.column:nth-child(${
-            this.suggestPosition.x + 1
-          }) > .list > .item:nth-child(${this.suggestPosition.y + 1})`
-        );
-        if (item) item.classList.remove('-selected');
+    if (this._suggesting && KEY_INCREMENT[e.code]) {
+      let item = this._suggestView.querySelector(
+        `.column:nth-child(${
+          this._suggestPosition.x + 1
+        }) > .list > .item:nth-child(${this._suggestPosition.y + 1})`
+      );
+      if (item) item.classList.remove('-selected');
 
-        this._suggestPositionShift(KEY_INCREMENT[e.code]);
-        item = this._suggestView.querySelector(
-          `.column:nth-child(${
-            this.suggestPosition.x + 1
-          }) > .list > .item:nth-child(${this.suggestPosition.y + 1})`
-        );
-        item.classList.add('-selected');
+      this._suggestPositionShift(KEY_INCREMENT[e.code]);
+      item = this._suggestView.querySelector(
+        `.column:nth-child(${
+          this._suggestPosition.x + 1
+        }) > .list > .item:nth-child(${this._suggestPosition.y + 1})`
+      );
+      item.classList.add('-selected');
 
-        e.preventDefault();
-        return false;
-      }
+      e.preventDefault();
+      return false;
     }
   }
 
   _keyup(e) {
     e.preventDefault();
+
     if (e.key === 'Enter') {
       if (
         this._suggesting &&
-        this.suggestPosition.x !== -1 &&
-        this.suggestPosition.y !== -1
+        this._suggestPosition.x !== -1 &&
+        this._suggestPosition.y !== -1
       ) {
         this._field.value =
-          this._suggestList[this.suggestPosition.x][this.suggestPosition.y]
+          this._suggestList[this._suggestPosition.x][this._suggestPosition.y]
             .alias_of ||
-          this._suggestList[this.suggestPosition.x][this.suggestPosition.y]
+          this._suggestList[this._suggestPosition.x][this._suggestPosition.y]
             .term;
       }
       this._suggesting = false;
@@ -120,6 +131,7 @@ export default class SearchFieldView {
     }
   }
 
+  // where are you blurring?
   _blur() {
     setTimeout(() => {
       if (this._suggesting) {
@@ -130,61 +142,60 @@ export default class SearchFieldView {
     }, 250);
   }
 
-  _suggestPositionShift(increment) {
-    if (this.suggestPosition.x === -1 && this.suggestPosition.y === -1) {
-      switch (true) {
-        case increment.y === -1:
-          this.suggestPosition = { x: 0, y: -1 };
-          break;
-        case increment.y === 1:
-          this.suggestPosition = { x: 0, y: 0 };
-          break;
-        case increment.x === -1:
-          this.suggestPosition = { x: 0, y: 0 };
-          break;
-        case increment.x === 1:
-          this.suggestPosition = { x: -1, y: 0 };
-          break;
-      }
-    } else {
-      this.suggestPosition.x += increment.x;
-      this.suggestPosition.y += increment.y;
-    }
+  _suggestPositionShift(incrementOfXY) {
+    this._initialChangeOfSuggestPosition(incrementOfXY);
+    this._changeSuggestPositionOnReturn(incrementOfXY);
 
-    switch (true) {
-      case increment.y === -1:
-        this.suggestPosition.y =
-          this.suggestPosition.y < 0
-            ? this._suggestList[0].length - 1
-            : this.suggestPosition.y;
-        break;
-      case increment.y === 1:
-        this.suggestPosition.y =
-          this.suggestPosition.y >= this._suggestList[0].length
-            ? 0
-            : this.suggestPosition.y;
-        break;
-      case increment.x === -1:
-        this.suggestPosition.x =
-          this.suggestPosition.x < 0
-            ? this._suggestList.length - 1
-            : this.suggestPosition.x;
-        break;
-      case increment.x === 1:
-        this.suggestPosition.x =
-          this.suggestPosition.x >= this._suggestList.length
-            ? 0
-            : this.suggestPosition.x;
-        break;
-    }
-
-    // console.log('this.suggestPosition.y', this.suggestPosition.y);
     // if (
-    //   this._suggestList[this.suggestPosition.x][this.suggestPosition.y] ===
+    //   this._suggestList[this._suggestPosition.x][this._suggestPosition.y] ===
     //   undefined
     // ) {
     //   this._suggestPositionShift(increment);
     // }
+  }
+
+  _keyDirection(incrementOfXY) {
+    return {
+      arrowUp: incrementOfXY.y === -1,
+      arrowDown: incrementOfXY.y === 1,
+      arrowLeft: incrementOfXY.x === -1,
+      arrowRight: incrementOfXY.x === 1,
+    };
+  }
+
+  _initialChangeOfSuggestPosition(incrementOfXY) {
+    if (this._suggestPosition.x === -1 && this._suggestPosition.y === -1) {
+      switch (true) {
+        case this._keyDirection(incrementOfXY).arrowUp:
+          return (this._suggestPosition = { x: 0, y: -1 });
+        case this._keyDirection(incrementOfXY).arrowDown:
+          return (this._suggestPosition = { x: 0, y: 0 });
+        case this._keyDirection(incrementOfXY).arrowLeft:
+          return (this._suggestPosition = { x: 0, y: 0 });
+        case this._keyDirection(incrementOfXY).arrowRight:
+          return (this._suggestPosition = { x: -1, y: 0 });
+      }
+    } else {
+      this._suggestPosition.x += incrementOfXY.x;
+      this._suggestPosition.y += incrementOfXY.y;
+    }
+  }
+
+  _changeSuggestPositionOnReturn(incrementOfXY) {
+    switch (true) {
+      case this._keyDirection(incrementOfXY).arrowUp:
+        if (this._suggestPosition.y < 0)
+          return (this._suggestPosition.y = this._suggestList[0].length - 1);
+      case this._keyDirection(incrementOfXY).arrowDown:
+        if (this._suggestPosition.y >= this._suggestList[0].length)
+          return (this._suggestPosition.y = 0);
+      case this._keyDirection(incrementOfXY).arrowLeft:
+        if (this._suggestPosition.x < 0)
+          return (this._suggestPosition.x = this._suggestList.length - 1);
+      case this._keyDirection(incrementOfXY).arrowRight:
+        if (this._suggestPosition.x >= this._suggestList.length)
+          return (this._suggestPosition.x = 0);
+    }
   }
 
   _search() {
@@ -194,7 +205,7 @@ export default class SearchFieldView {
   _suggest(data) {
     this._suggesting = true;
     this.lastValue = this._field.value;
-    this.suggestPosition = { x: -1, y: -1 };
+    this._suggestPosition = { x: -1, y: -1 };
 
     let max;
 

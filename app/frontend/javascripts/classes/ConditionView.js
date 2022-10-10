@@ -2,10 +2,10 @@
 
 export default class ConditionItemView {
   /**
-   *
-   * @param {AdvancedSearchBuilderView} builder
-   * @param {ConditionItemView | ConditionGroupView} parentView
-   * @param {Node} referenceElm
+   * @param {Number} type - what number???
+   * @param {AdvancedSearchBuilderView} builder - Static Object(_container, _elm, _rootGroup, _selection, _toolbar)
+   * @param {ConditionItemView | ConditionGroupView} parentView - Dynamic Object(_builder, _container, _elm, _logicalOperatorSwitch, _mutationObserver, _type)
+   * @param {Node} referenceElm - what's this? null??
    */
   constructor(type, builder, parentView, referenceElm) {
     this._type = type;

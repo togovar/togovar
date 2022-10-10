@@ -171,7 +171,7 @@ export default class ConditionItemView extends ConditionView {
         return {
           gene: {
             relation: this._elm.dataset.relation,
-            terms: [parseInt(value)],
+            terms: [+value],
           },
         };
       }
