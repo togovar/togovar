@@ -36,6 +36,10 @@ export default class SearchFieldView {
     this._suggestDictionaries = _suggestDictionaries;
     this._conditionType = _conditionType;
 
+    this._suggesting = false;
+    this._isSimpleSearch = true;
+    this._suggestPosition = { x: -1, y: -1 };
+
     // make HTML
     _elm.innerHTML = `
     <div class="search-field-view">
@@ -56,7 +60,6 @@ export default class SearchFieldView {
     this._button = field.querySelector(':scope > button');
     this._examples = view.querySelector(':scope > .examples');
     this._suggestView = view.querySelector(':scope > .suggest-view');
-    this._suggesting = false;
 
     // events
     this._field.addEventListener('keydown', this._itemSelect.bind(this));
@@ -70,12 +73,10 @@ export default class SearchFieldView {
 
   // private methods
 
-  //現在表示エリア外の際のnth-childが取れない問題が出ている
   _itemSelect(e) {
     if (this._suggesting && KEY_INCREMENT[e.code]) {
       this._suggestPositionShift(KEY_INCREMENT[e.code]);
 
-      // console.log('this._suggestPosition', this._suggestPosition);
       let item = this._suggestView.querySelector(
         `.column:nth-child(${this._suggestPosition.x + 1})
         > .list
@@ -85,18 +86,10 @@ export default class SearchFieldView {
       if (item)
         this._suggestView
           .querySelectorAll('.column>.list .item')
-          .forEach((item) => item.classList.remove('-selected')); //item.classList.remove('-selected');
+          .forEach((item) => item.classList.remove('-selected'));
 
-      // console.log(this._suggestPosition.x, this._suggestPosition.y);
-      // if (this._suggestPosition.x !== -1 && this._suggestPosition.y !== -1) {
-
-      // item = this._suggestView.querySelector(
-      //   `.column:nth-child(${this._suggestPosition.x + 1})
-      //   > .list
-      //   > .item:nth-child(${this._suggestPosition.y + 1})`
-      // );
       item.classList.add('-selected');
-      // }
+
       // e.preventDefault();
       // return false;
     }
@@ -171,7 +164,6 @@ export default class SearchFieldView {
   // }
 
   _suggestPositionShift(incrementOfXY) {
-    // console.log(incrementOfXY);
     this._initializeAndChangeSuggestPosition(incrementOfXY);
     this._changeSuggestPositionOnReturn();
 
@@ -196,24 +188,28 @@ export default class SearchFieldView {
           return (this._suggestPosition = { x: -1, y: 0 });
       }
     } else {
-      // console.log(
-      //   'this._suggestPosition.y += incrementOfXY.y',
-      //   this._suggestPosition.y + incrementOfXY.y
-      // );
       this._suggestPosition.x += incrementOfXY.x;
       this._suggestPosition.y += incrementOfXY.y;
     }
   }
 
   _changeSuggestPositionOnReturn() {
+    let lengthY, lengthX;
+    if (this._isSimpleSearch) {
+      lengthY = this._suggestList[0].length;
+      lengthX = this._suggestList.length;
+    } else {
+      lengthY = this._suggestList.length;
+      lengthX = 1;
+    }
     switch (true) {
       case this._suggestPosition.y < 0:
-        return (this._suggestPosition.y = this._suggestList[0].length - 1);
-      case this._suggestPosition.y >= this._suggestList[0].length:
+        return (this._suggestPosition.y = lengthY - 1);
+      case this._suggestPosition.y >= lengthY:
         return (this._suggestPosition.y = 0);
       case this._suggestPosition.x < 0:
-        return (this._suggestPosition.x = this._suggestList.length - 1);
-      case this._suggestPosition.x >= this._suggestList.length:
+        return (this._suggestPosition.x = lengthX - 1);
+      case this._suggestPosition.x >= lengthX:
         return (this._suggestPosition.x = 0);
     }
   }
@@ -225,15 +221,15 @@ export default class SearchFieldView {
   _suggest(data) {
     this._suggesting = true;
     this.lastValue = this._field.value;
-    this._suggestPosition = { x: -1, y: -1 };
 
     let max;
 
     const dictionaries = [];
     this._suggestList = [];
 
+    this._isSimpleSearch = !Array.isArray(data);
     // if we are querying with simple search, API returns an object {gene:..., disease:...}, if searching disease / gene, it returns an array [{id:..., label:..., highlight:...}, ...]
-    if (!Array.isArray(data)) {
+    if (this._isSimpleSearch) {
       max = Math.max(
         ...this._suggestDictionaries.map((key) => data[key].length)
       );
@@ -303,7 +299,7 @@ export default class SearchFieldView {
     } else {
       //diseaseの内容になっているので、geneでも使用できるように変更する
       max = Math.min(data.length, NUMBER_OF_SUGGESTS);
-      this._suggestList = data;
+      this._suggestList = data.slice(0, max);
       this._suggestView.innerHTML = `
       <div class="column">
         <h3 class="title">Disease</h3>
