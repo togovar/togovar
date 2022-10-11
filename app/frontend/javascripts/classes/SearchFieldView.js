@@ -302,6 +302,7 @@ export default class SearchFieldView {
           }
         });
     } else {
+      //diseaseの内容になっているので、geneでも使用できるように変更する
       max = Math.min(data.length, NUMBER_OF_SUGGESTS);
       this._suggestList = data;
       this._suggestView.innerHTML = `

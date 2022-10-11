@@ -18,7 +18,7 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
       this,
       this._body,
       {
-        [CONDITION_TYPE.gene_symbol]: 'BLACA2',
+        [CONDITION_TYPE.gene_symbol]: 'BRCA2',
         [CONDITION_TYPE.disease]: 'Breast-ovarian cancer, familial 2',
       }[conditionType],
       [
