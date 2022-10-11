@@ -73,21 +73,28 @@ export default class SearchFieldView {
   //現在表示エリア外の際のnth-childが取れない問題が出ている
   _itemSelect(e) {
     if (this._suggesting && KEY_INCREMENT[e.code]) {
+      this._suggestPositionShift(KEY_INCREMENT[e.code]);
+
+      // console.log('this._suggestPosition', this._suggestPosition);
       let item = this._suggestView.querySelector(
         `.column:nth-child(${this._suggestPosition.x + 1})
         > .list
         > .item:nth-child(${this._suggestPosition.y + 1})`
       );
-      if (item) item.classList.remove('-selected');
+
+      if (item)
+        this._suggestView
+          .querySelectorAll('.column>.list .item')
+          .forEach((item) => item.classList.remove('-selected')); //item.classList.remove('-selected');
 
       // console.log(this._suggestPosition.x, this._suggestPosition.y);
       // if (this._suggestPosition.x !== -1 && this._suggestPosition.y !== -1) {
-      this._suggestPositionShift(KEY_INCREMENT[e.code]);
-      item = this._suggestView.querySelector(
-        `.column:nth-child(${this._suggestPosition.x + 1})
-        > .list
-        > .item:nth-child(${this._suggestPosition.y + 1})`
-      );
+
+      // item = this._suggestView.querySelector(
+      //   `.column:nth-child(${this._suggestPosition.x + 1})
+      //   > .list
+      //   > .item:nth-child(${this._suggestPosition.y + 1})`
+      // );
       item.classList.add('-selected');
       // }
       // e.preventDefault();
@@ -164,8 +171,9 @@ export default class SearchFieldView {
   // }
 
   _suggestPositionShift(incrementOfXY) {
-    this._initialChangeOfSuggestPosition(incrementOfXY);
-    this._changeSuggestPositionOnReturn(incrementOfXY);
+    // console.log(incrementOfXY);
+    this._initializeAndChangeSuggestPosition(incrementOfXY);
+    this._changeSuggestPositionOnReturn();
 
     // if (
     //   this._suggestList[this._suggestPosition.x][this._suggestPosition.y] ===
@@ -175,47 +183,38 @@ export default class SearchFieldView {
     // }
   }
 
-  _keyDirection(incrementOfXY) {
-    return {
-      arrowUp: incrementOfXY.y === -1,
-      arrowDown: incrementOfXY.y === 1,
-      arrowLeft: incrementOfXY.x === -1,
-      arrowRight: incrementOfXY.x === 1,
-    };
-  }
-
-  _initialChangeOfSuggestPosition(incrementOfXY) {
+  _initializeAndChangeSuggestPosition(incrementOfXY) {
     if (this._suggestPosition.x === -1 && this._suggestPosition.y === -1) {
       switch (true) {
-        case this._keyDirection(incrementOfXY).arrowUp:
+        case KEY_INCREMENT.ArrowUp.y === incrementOfXY.y:
           return (this._suggestPosition = { x: 0, y: -1 });
-        case this._keyDirection(incrementOfXY).arrowDown:
+        case KEY_INCREMENT.ArrowDown.y === incrementOfXY.y:
           return (this._suggestPosition = { x: 0, y: 0 });
-        case this._keyDirection(incrementOfXY).arrowLeft:
+        case KEY_INCREMENT.ArrowLeft.x === incrementOfXY.x:
           return (this._suggestPosition = { x: 0, y: 0 });
-        case this._keyDirection(incrementOfXY).arrowRight:
+        case KEY_INCREMENT.ArrowRight.x === incrementOfXY.x:
           return (this._suggestPosition = { x: -1, y: 0 });
       }
     } else {
+      // console.log(
+      //   'this._suggestPosition.y += incrementOfXY.y',
+      //   this._suggestPosition.y + incrementOfXY.y
+      // );
       this._suggestPosition.x += incrementOfXY.x;
       this._suggestPosition.y += incrementOfXY.y;
     }
   }
 
-  _changeSuggestPositionOnReturn(incrementOfXY) {
+  _changeSuggestPositionOnReturn() {
     switch (true) {
-      case this._keyDirection(incrementOfXY).arrowUp:
-        if (this._suggestPosition.y < 0)
-          return (this._suggestPosition.y = this._suggestList[0].length - 1);
-      case this._keyDirection(incrementOfXY).arrowDown:
-        if (this._suggestPosition.y >= this._suggestList[0].length)
-          return (this._suggestPosition.y = 0);
-      case this._keyDirection(incrementOfXY).arrowLeft:
-        if (this._suggestPosition.x < 0)
-          return (this._suggestPosition.x = this._suggestList.length - 1);
-      case this._keyDirection(incrementOfXY).arrowRight:
-        if (this._suggestPosition.x >= this._suggestList.length)
-          return (this._suggestPosition.x = 0);
+      case this._suggestPosition.y < 0:
+        return (this._suggestPosition.y = this._suggestList[0].length - 1);
+      case this._suggestPosition.y >= this._suggestList[0].length:
+        return (this._suggestPosition.y = 0);
+      case this._suggestPosition.x < 0:
+        return (this._suggestPosition.x = this._suggestList.length - 1);
+      case this._suggestPosition.x >= this._suggestList.length:
+        return (this._suggestPosition.x = 0);
     }
   }
 
