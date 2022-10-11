@@ -98,10 +98,16 @@ export default class SearchFieldView {
   _suggestDecisionAndShowHide(e) {
     // e.preventDefault();
 
+    const hideSuggest =
+      this._suggesting && (e.key === 'Escape' || this._field.value.length < 3);
+    const showSuggest =
+      this._field.value.length >= 3 && this._field.value !== this.lastValue;
+
     if (e.key === 'Enter') {
       this._suggestDecision();
-    } else {
-      this._suggestHide(e);
+    } else if (hideSuggest) {
+      this._suggestHide();
+    } else if (showSuggest) {
       this._suggestShow();
     }
   }
@@ -124,32 +130,22 @@ export default class SearchFieldView {
     this._search();
   }
 
-  _suggestHide(e) {
-    const hideSuggest =
-      this._suggesting && (e.key === 'Escape' || this._field.value.length < 3);
-
-    if (hideSuggest) {
-      this._suggesting = false;
-      this._suggestView.innerHTML = '';
-      this.lastValue = '';
-    }
+  _suggestHide() {
+    this._suggesting = false;
+    this._suggestView.innerHTML = '';
+    this.lastValue = '';
   }
 
   _suggestShow() {
-    const showSuggest =
-      this._field.value.length >= 3 && this._field.value !== this.lastValue;
-
-    if (showSuggest) {
-      fetch(`${this._queryURL}${this._field.value}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      })
-        .then((response) => response.json())
-        .then((json) => this._suggest(json));
-    }
+    fetch(`${this._queryURL}${this._field.value}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    })
+      .then((response) => response.json())
+      .then((json) => this._suggest(json));
   }
 
   // where are you blurring?
