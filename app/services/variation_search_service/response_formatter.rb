@@ -156,7 +156,18 @@ class VariationSearchService
         end
         json.transcripts vep.map(&:compact).presence
 
-        json.frequencies Array(variation[:frequency]).map(&:compact).presence
+        frequencies = Array(variation[:frequency]).map(&:compact)
+        frequencies.each do |x|
+          if x[:frequency].blank?
+            x[:frequency] = begin
+                              Float(x[:count]) / Float(x[:number])
+                            rescue
+                              0
+                            end
+          end
+        end
+
+        json.frequencies frequencies.presence
       end
     end
   end
