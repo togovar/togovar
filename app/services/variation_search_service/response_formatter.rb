@@ -158,12 +158,12 @@ class VariationSearchService
 
         frequencies = Array(variation[:frequency]).map(&:compact)
         frequencies.each do |x|
-          if x[:frequency].blank?
-            x[:frequency] = begin
-                              Float(x[:count]) / Float(x[:number])
-                            rescue
-                              0
-                            end
+          if x[:allele].present? && x.dig(:allele, :frequency).blank?
+            x[:allele][:frequency] = begin
+                                       Float(x.dig(:allele, :count)) / Float(x.dig(:allele, :number))
+                                     rescue
+                                       0
+                                     end
           end
         end
 
