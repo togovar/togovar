@@ -167,7 +167,7 @@ class VariationSearchService
           end
         end
 
-        json.frequencies frequencies.presence
+        json.frequencies frequencies
       end
     end
   end
