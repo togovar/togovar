@@ -296,11 +296,7 @@ export default class SearchFieldView {
       //diseaseの内容になっているので、geneでも使用できるように変更する
       max = Math.min(data.length, NUMBER_OF_SUGGESTS);
       this._suggestList = data.slice(0, max);
-      this._suggestView.innerHTML = `
-      <div class="column">
-        <h3 class="title">Disease</h3>
-      </div>
-      `;
+      this._suggestView.innerHTML = `<div class="column"></div>`;
       const ul = document.createElement('ul');
       ul.className = 'list';
       if (max !== 0) {
