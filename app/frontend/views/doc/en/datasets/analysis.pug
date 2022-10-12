@@ -11,49 +11,10 @@ block head
 
 block content
   main
-    article.common-document
-      header.header
-        h2.title How JGA dataset was generated
-      .contents
-        section.section
-          h3.sectiontitle JGA-NGS
-          p.body._margin-bottom
-            | Analysis pipeline software (
-            a(target='_blank', href='http://amelieff.jp/english/') Amelieff
-            |  BioReT Ver.3.3.1.1) that can execute the following group of analysis tools was used.
-          table.table
-            thead
-              tr
-                td Tool name
-                td Version
-            tbody
-              tr
-                td qcleaner
-                td 4.1.0
-              tr
-                td SAM tools
-                td 1.6
-              tr
-                td FastQC
-                td 0.11.5
-              tr
-                td calcCoverage
-                td 1.7
-              tr
-                td BWA
-                td 0.7.16a
-              tr
-                td igvtools
-                td 2.3.98
-              tr
-                td Picard
-                td 2.13.2
-              tr
-                td GATK
-                td 3.8.0-ge9d806836
-              tr
-                td SnpEff
-                td v4.3_core
-              tr
-                td bedtools
-                td 2.13.3
+    case TOGOVAR_FRONTEND_REFERENCE
+      when 'GRCh37'
+        include analysis_grch37
+      when 'GRCh38'
+        include analysis_grch38
+      default
+        // none
