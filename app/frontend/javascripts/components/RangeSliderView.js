@@ -311,7 +311,6 @@ class RangeSlider extends HTMLElement {
   connectedCallback() {
     this.min = this.getAttribute('min') || 0;
     this.max = this.getAttribute('max') || 1;
-    this.step = this.getAttribute('step') || 0.01;
     this.value1 = this.getAttribute('value1') || 0;
     this.value2 = this.getAttribute('value2') || 1;
     this.orientation = this.getAttribute('orientation') || 'horizontal';
@@ -321,7 +320,7 @@ class RangeSlider extends HTMLElement {
 
     this.state.min = this.min;
     this.state.max = this.max;
-    this.state.step = this.step;
+    this.state.step = this.getAttribute('step') || 0.01;
     this.state.from = Math.min(+this.value1, +this.value2);
     this.state.to = Math.max(+this.value1, +this.value2);
     this.state.invert = this.invert ? '1' : '0';

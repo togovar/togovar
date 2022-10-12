@@ -97,7 +97,6 @@ export default class SearchFieldView {
 
   _suggestDecisionAndShowHide(e) {
     // e.preventDefault();
-
     const hideSuggest =
       this._suggesting && (e.key === 'Escape' || this._field.value.length < 3);
     const showSuggest =
@@ -146,7 +145,7 @@ export default class SearchFieldView {
       },
     })
       .then((response) => response.json())
-      .then((json) => this._suggest(json));
+      .then((json) => this._createSuggestList(json));
   }
 
   _focusIsNotArea() {
@@ -192,7 +191,7 @@ export default class SearchFieldView {
 
   _changeSuggestPositionOnReturn() {
     let lengthY, lengthX;
-    if (this._isSimpleSearch) {
+    if (this._isSimpleSearch && this._suggestList.length) {
       lengthY = this._suggestList[0].length;
       lengthX = this._suggestList.length;
     } else {
@@ -215,38 +214,20 @@ export default class SearchFieldView {
     this._delegate.search();
   }
 
-  _suggest(data) {
+  _createSuggestList(data) {
     this._suggesting = true;
     this.lastValue = this._field.value;
     this._suggestPosition = { x: -1, y: -1 };
-
-    let max;
-
-    const dictionaries = [];
+    this._dictionaries = [];
     this._suggestList = [];
-
     this._isSimpleSearch = !Array.isArray(data);
-    // if we are querying with simple search, API returns an object {gene:..., disease:...}, if searching disease / gene, it returns an array [{id:..., label:..., highlight:...}, ...]
+
+    // if we are querying with simple search, API returns an object {gene:..., disease:...}
+    // if searching disease / gene, it returns an array[{ id:..., label:..., highlight:...}, ...]
     if (this._isSimpleSearch) {
-      max = Math.max(
-        ...this._suggestDictionaries.map((key) => data[key].length)
-      );
-      max = Math.min(max, NUMBER_OF_SUGGESTS);
+      this._creagteSuggestList(data);
 
-      Object.keys(data).forEach((key, index) => {
-        if (this._suggestDictionaries.indexOf(key) !== -1) {
-          if (data[key].length > 0) {
-            dictionaries.push(key);
-            const column = [];
-            for (let i = 0; i < max; i++) {
-              column.push(data[key][i]);
-            }
-            this._suggestList[index] = column;
-          }
-        }
-      });
-
-      this._suggestView.innerHTML = dictionaries
+      this._suggestView.innerHTML = this._dictionaries
         .map((key, index) => {
           const column = this._suggestList[index];
           return `
@@ -258,13 +239,14 @@ export default class SearchFieldView {
               return `
               <li class="item${item === undefined ? ' -disabled' : ''}"
                 data-value="${item ? item.term : ''}"
+                data-value="${console.log(item.alias_of)}"
                 data-alias="${item && item.alias_of ? item.alias_of : ''}">
                 ${
                   item
                     ? `${
                         `<span class="main">${
                           item.alias_of ? item.alias_of : item.term
-                        }</span>` +
+                        }</span >` +
                         (item.alias_of
                           ? `<span class="sub">alias: ${item.term}</span>`
                           : '')
@@ -283,7 +265,7 @@ export default class SearchFieldView {
         .querySelectorAll('.column > .list > .item')
         .forEach((item) => {
           if (!item.classList.contains('-disabled')) {
-            $(item).on('click', (e) => {
+            item.addEventListener('click', (e) => {
               e.stopPropagation();
               this._field.value =
                 e.currentTarget.dataset.alias || e.currentTarget.dataset.value;
@@ -295,13 +277,13 @@ export default class SearchFieldView {
         });
     } else {
       //for gene & disease
-      max = Math.min(data.length, NUMBER_OF_SUGGESTS);
-      this._suggestList = data.slice(0, max);
+      this._creagteSuggestList(data);
       this._suggestView.innerHTML = `<div class="column"></div>`;
       const ul = document.createElement('ul');
       ul.className = 'list';
-      if (max !== 0) {
-        for (let i = 0; i < max; i++) {
+
+      if (this._suggestLength(data) !== 0) {
+        for (let i = 0; i < this._suggestLength(data); i++) {
           const item = data[i];
           const li = document.createElement('li');
           li.className = 'item';
@@ -311,6 +293,14 @@ export default class SearchFieldView {
               ? item.symbol
               : item.id;
           li.innerHTML = item.highlight;
+
+          // if (item.alias_of) {
+          //   const spanSub = document.createElement('span');
+          //   spanSub.className = 'sub';
+          //   spanSub.textContent = item.alias_of;
+          //   li.append(spanSub);
+          // }
+
           ul.appendChild(li);
         }
 
@@ -328,6 +318,36 @@ export default class SearchFieldView {
         ul.innerHTML = `<li class="item -disabled">No results found</li>`;
       }
       this._suggestView.querySelector('.column').appendChild(ul);
+    }
+  }
+
+  _suggestLength(data) {
+    if (this._isSimpleSearch) {
+      const maxLengthOfContent = Math.max(
+        ...this._suggestDictionaries.map((key) => data[key].length)
+      );
+      return Math.min(maxLengthOfContent, NUMBER_OF_SUGGESTS);
+    } else {
+      return Math.min(data.length, NUMBER_OF_SUGGESTS);
+    }
+  }
+
+  _creagteSuggestList(data) {
+    if (this._isSimpleSearch) {
+      Object.keys(data).forEach((key, index) => {
+        // if (this._suggestDictionaries.indexOf(key) !== -1) {
+        if (data[key].length > 0) {
+          this._dictionaries.push(key);
+          const column = [];
+          for (let i = 0; i < this._suggestLength(data); i++) {
+            column.push(data[key][i]);
+          }
+          this._suggestList[index] = column;
+        }
+        // }
+      });
+    } else {
+      this._suggestList = data.slice(0, this._suggestLength(data));
     }
   }
 
