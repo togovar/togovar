@@ -20,7 +20,7 @@ export default class SearchFieldView {
    * @param {Element} _elm - SimpleSearchView Element
    * @param {String} _placeholder - placeholder for gene, disease
    * @param {Array} _suggestDictionaries - ['gene', 'disease']
-   * @param {URL} _queryURL
+   * @param {URL} _queryURL - API
    * @param {String | Undefined} _conditionType - 'gene' or 'disease' or undefined
    */
   constructor(
@@ -38,7 +38,6 @@ export default class SearchFieldView {
 
     this._suggesting = false;
     this._isSimpleSearch = true;
-    this._suggestPosition = { x: -1, y: -1 };
 
     // make HTML
     _elm.innerHTML = `
@@ -67,7 +66,7 @@ export default class SearchFieldView {
       'keyup',
       this._suggestDecisionAndShowHide.bind(this)
     );
-    // this._field.addEventListener('blur', this._blur.bind(this));
+    this._field.addEventListener('blur', this._focusIsNotArea.bind(this));
     this._button.addEventListener('click', this._search.bind(this));
   }
 
@@ -90,6 +89,7 @@ export default class SearchFieldView {
 
       item.classList.add('-selected');
 
+      // What are you doing?
       // e.preventDefault();
       // return false;
     }
@@ -103,12 +103,13 @@ export default class SearchFieldView {
     const showSuggest =
       this._field.value.length >= 3 && this._field.value !== this.lastValue;
 
-    if (e.key === 'Enter') {
-      this._suggestDecision();
-    } else if (hideSuggest) {
-      this._suggestHide();
-    } else if (showSuggest) {
-      this._suggestShow();
+    switch (true) {
+      case e.key === 'Enter':
+        return this._suggestDecision();
+      case hideSuggest:
+        return this._suggestHide();
+      case showSuggest:
+        return this._suggestShow();
     }
   }
 
@@ -148,21 +149,21 @@ export default class SearchFieldView {
       .then((json) => this._suggest(json));
   }
 
-  // where are you blurring?
-  // _blur() {
-  //   setTimeout(() => {
-  //     if (this._suggesting) {
-  //       this._suggesting = false;
-  //       this._suggestView.innerHTML = '';
-  //       this.lastValue = '';
-  //     }
-  //   }, 250);
-  // }
+  _focusIsNotArea() {
+    setTimeout(() => {
+      if (this._suggesting) {
+        this._suggesting = false;
+        this._suggestView.innerHTML = '';
+        this.lastValue = '';
+      }
+    }, 250);
+  }
 
   _suggestPositionShift(incrementOfXY) {
     this._initializeAndChangeSuggestPosition(incrementOfXY);
     this._changeSuggestPositionOnReturn();
 
+    // What are you doing?
     // if (
     //   this._suggestList[this._suggestPosition.x][this._suggestPosition.y] ===
     //   undefined
@@ -217,6 +218,7 @@ export default class SearchFieldView {
   _suggest(data) {
     this._suggesting = true;
     this.lastValue = this._field.value;
+    this._suggestPosition = { x: -1, y: -1 };
 
     let max;
 
@@ -253,24 +255,23 @@ export default class SearchFieldView {
         <ul class="list">
           ${column
             .map((item) => {
-              return `<li class="item${
-                item === undefined ? ' -disabled' : ''
-              }" data-value="${item ? item.term : ''}" data-alias="${
-                item && item.alias_of ? item.alias_of : ''
-              }">
-              ${
-                item
-                  ? `${
-                      `<span class="main">${
-                        item.alias_of ? item.alias_of : item.term
-                      }</span>` +
-                      (item.alias_of
-                        ? `<span class="sub">alias: ${item.term}</span>`
-                        : '')
-                    }`
-                  : ''
-              }
-            </li>`;
+              return `
+              <li class="item${item === undefined ? ' -disabled' : ''}"
+                data-value="${item ? item.term : ''}"
+                data-alias="${item && item.alias_of ? item.alias_of : ''}">
+                ${
+                  item
+                    ? `${
+                        `<span class="main">${
+                          item.alias_of ? item.alias_of : item.term
+                        }</span>` +
+                        (item.alias_of
+                          ? `<span class="sub">alias: ${item.term}</span>`
+                          : '')
+                      }`
+                    : ''
+                }
+              </li>`;
             })
             .join('')}
         </ul>
@@ -293,7 +294,7 @@ export default class SearchFieldView {
           }
         });
     } else {
-      //diseaseの内容になっているので、geneでも使用できるように変更する
+      //for gene & disease
       max = Math.min(data.length, NUMBER_OF_SUGGESTS);
       this._suggestList = data.slice(0, max);
       this._suggestView.innerHTML = `<div class="column"></div>`;
