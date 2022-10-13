@@ -86,11 +86,9 @@ export default class SearchFieldView {
         this._suggestView
           .querySelectorAll('.column>.list .item')
           .forEach((item) => item.classList.remove('-selected'));
-
       item.classList.add('-selected');
 
-      // What are you doing?
-      // e.preventDefault();
+      e.preventDefault();
       // return false;
     }
   }
@@ -171,7 +169,7 @@ export default class SearchFieldView {
     //   this._suggestList[this._suggestPosition.x][this._suggestPosition.y] ===
     //   undefined
     // ) {
-    //   this._suggestPositionShift(increment);
+    //   this._suggestPositionShift(incrementOfXY);
     // }
   }
 
