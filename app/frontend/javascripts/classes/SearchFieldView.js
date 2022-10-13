@@ -225,7 +225,7 @@ export default class SearchFieldView {
     // if we are querying with simple search, API returns an object {gene:..., disease:...}
     // if searching disease / gene, it returns an array[{ id:..., label:..., highlight:...}, ...]
     if (this._isSimpleSearch) {
-      this._creagteSuggestList(data);
+      this._suggestData(data);
 
       this._suggestView.innerHTML = this._dictionaries
         .map((key, index) => {
@@ -275,8 +275,9 @@ export default class SearchFieldView {
           }
         });
     } else {
-      //for gene & disease
-      this._creagteSuggestList(data);
+      //for Advanced search of gene & disease
+      this._suggestData(data);
+
       this._suggestView.innerHTML = `<div class="column"></div>`;
       const ul = document.createElement('ul');
       ul.className = 'list';
@@ -331,7 +332,7 @@ export default class SearchFieldView {
     }
   }
 
-  _creagteSuggestList(data) {
+  _suggestData(data) {
     if (this._isSimpleSearch) {
       Object.keys(data).forEach((key, index) => {
         // if (this._suggestDictionaries.indexOf(key) !== -1) {
