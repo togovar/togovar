@@ -239,7 +239,6 @@ export default class SearchFieldView {
               return `
               <li class="item${item === undefined ? ' -disabled' : ''}"
                 data-value="${item ? item.term : ''}"
-                data-value="${console.log(item.alias_of)}"
                 data-alias="${item && item.alias_of ? item.alias_of : ''}">
                 ${
                   item
@@ -294,12 +293,12 @@ export default class SearchFieldView {
               : item.id;
           li.innerHTML = item.highlight;
 
-          // if (item.alias_of) {
-          //   const spanSub = document.createElement('span');
-          //   spanSub.className = 'sub';
-          //   spanSub.textContent = item.alias_of;
-          //   li.append(spanSub);
-          // }
+          if (item.alias_of) {
+            const spanSub = document.createElement('span');
+            spanSub.className = 'sub';
+            spanSub.textContent = item.alias_of;
+            li.append(spanSub);
+          }
 
           ul.appendChild(li);
         }
