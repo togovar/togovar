@@ -119,11 +119,15 @@ export default class SearchFieldView {
       this._suggestPosition.y !== -1;
 
     if (selectWithCursor) {
-      this._field.value =
-        this._suggestList[this._suggestPosition.x][this._suggestPosition.y]
-          .alias_of ||
-        this._suggestList[this._suggestPosition.x][this._suggestPosition.y]
-          .term;
+      if (this._isSimpleSearch) {
+        this._field.value =
+          this._suggestList[this._suggestPosition.x][this._suggestPosition.y]
+            .alias_of ||
+          this._suggestList[this._suggestPosition.x][this._suggestPosition.y]
+            .term;
+      } else {
+        this._field.value = this._suggestList[this._suggestPosition.y].symbol;
+      }
     }
     this._suggesting = false;
     this._suggestView.innerHTML = '';
@@ -300,7 +304,6 @@ export default class SearchFieldView {
             spanSub.textContent = item.alias_of;
             li.append(spanSub);
           }
-
           ul.appendChild(li);
         }
 
