@@ -1,5 +1,5 @@
 $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * .5
-$WIDTH_LOGO: 394px
+$WIDTH_LOGO: 470px
 
 #GlobalHeader
   height: $HEIGHT_GLOBAL_MENU
@@ -11,7 +11,7 @@ $WIDTH_LOGO: 394px
   top: $HEIGHT_NBDC_COMMON_HEADER
   z-index: $Z_INDEX_GLOBAL_HEADER
   > .heading
-    display: inline-block
+    display: flex
     position: relative
     top: -2px
     > .link
@@ -23,8 +23,62 @@ $WIDTH_LOGO: 394px
         left: -5px
         margin-right: .3rem
     > .summary
+      padding-top: 8px
       font-size: 12px
       font-weight: normal
+    > .dropdown
+      position: relative
+      padding-top: 6px
+      padding-left: 8px
+      font-size: 14px
+      font-weight: normal
+      > .select
+        padding-left: 10px
+        line-height: 20px
+        box-shadow: none
+        transition: 300ms
+        &:hover
+          opacity: 0.9
+          transform: none
+        > .selected
+          position: relative
+          top: 1px
+        > .caret
+          position: relative
+          top: 12px
+          left: 5px
+          border-left: 4px solid transparent
+          border-right: 4px solid transparent
+          border-top: 5px solid white
+          border-radius: 2px
+          transition: 300ms
+          // transform: rotate(180deg)
+      > .list
+        // display: none
+        // opacity: 0
+        padding: 3px 0 3px
+        background-color: white
+        list-style: none
+        transition: 200ms
+        cursor: pointer
+        > .item
+          padding-right: 10px
+          &:before
+            content: var(--char-CHECK)
+            font-family: FontAwesome
+            position: relative
+            left: -4px
+            padding-left: 10px
+            color: var(--color-key-dark2)
+            opacity: 0
+          &:hover
+            background-color: var(--color-selected-light)
+        > .active
+          &:before
+            opacity: 1
+      // > .list-open
+      //   display: block
+      //   opacity: 1
   > .menus
     position: absolute
     right: 0
