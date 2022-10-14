@@ -125,6 +125,8 @@ export default class SearchFieldView {
             .term;
       } else {
         this._field.value = this._suggestList[this._suggestPosition.y].symbol;
+        this._field.dataset.value =
+          this._suggestList[this._suggestPosition.y].id;
       }
     }
     this._suggesting = false;
@@ -306,7 +308,6 @@ export default class SearchFieldView {
         }
 
         ul.addEventListener('click', (e) => {
-          // if (e.target && e.target.dataset.value) {
           this._field.value =
             e.target.dataset.label || e.target.parentElement.dataset.label; // text field value, i.e. "label"
           this._field.dataset.value =
@@ -314,7 +315,6 @@ export default class SearchFieldView {
           this._suggesting = false;
           this._suggestView.innerHTML = '';
           this._search();
-          // }
         });
       } else {
         ul.innerHTML = `<li class="item -disabled">No results found</li>`;
@@ -370,15 +370,7 @@ export default class SearchFieldView {
   }
 
   get value() {
-    // console.log(`${this._queryURL}pretty=true&term=ALDH2`);
-    // console.log(this.lastValue);
-    // fetch(`https://togovar.biosciencedbc.jp/api/search/gene?term=ALDH2`)
-    //   .then((response) => response.json())
-    //   .then((json) => console.log(json));
-    console.log(this._field.value);
-    return this._field.value;
-    // return this._field.value;
-    // return this._field.dataset.value;
+    return this._field.dataset.value;
   }
 
   get label() {
