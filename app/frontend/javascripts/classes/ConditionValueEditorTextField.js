@@ -2,18 +2,24 @@ import ConditionValueEditor from './ConditionValueEditor.js';
 import SearchFieldView from './SearchFieldView.js';
 import { CONDITION_TYPE } from '../definition.js';
 import { API_URL } from '../global.js';
+
 export default class ConditionValueEditorTextField extends ConditionValueEditor {
+  /**
+   * @param {Object} valuesView - ConditionType Object?(_conditionView, _editors _okButton, _sections)
+   * @param {String} conditionType - "gene" or "disease"?
+   */
+
   constructor(valuesView, conditionType) {
     super(valuesView, conditionType);
-
     this._conditionType = conditionType;
+
     // HTML
     this._createElement(
       'text-field-editor-view',
-      `
-    <header>Search for ${conditionType.replace('_', ' ')}</header>
-    <div class="body"></div>`
+      `<header>Search for ${conditionType.replace('_', ' ')}</header>
+      <div class="body"></div>`
     );
+
     this._searchFieldView = new SearchFieldView(
       this,
       this._body,
@@ -21,12 +27,10 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
         [CONDITION_TYPE.gene_symbol]: 'BRCA2',
         [CONDITION_TYPE.disease]: 'Breast-ovarian cancer, familial 2',
       }[conditionType],
-      [
-        {
-          [CONDITION_TYPE.gene_symbol]: 'gene',
-          [CONDITION_TYPE.disease]: 'disease',
-        }[conditionType],
-      ],
+      {
+        [CONDITION_TYPE.gene_symbol]: 'gene',
+        [CONDITION_TYPE.disease]: 'disease',
+      }[conditionType],
       `${API_URL}/api/search/${conditionType}?term=`,
       conditionType
     );

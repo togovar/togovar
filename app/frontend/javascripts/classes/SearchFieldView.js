@@ -306,14 +306,15 @@ export default class SearchFieldView {
         }
 
         ul.addEventListener('click', (e) => {
-          e.stopPropagation();
-          if (e.target && e.target.dataset.value) {
-            this._field.value = e.target.dataset.label; // text field value, i.e. "label"
-            this._field.dataset.value = e.target.dataset.value; // text dataset value for query, i.e. "value"
-            this._suggesting = false;
-            this._suggestView.innerHTML = '';
-            this._search();
-          }
+          // if (e.target && e.target.dataset.value) {
+          this._field.value =
+            e.target.dataset.label || e.target.parentElement.dataset.label; // text field value, i.e. "label"
+          this._field.dataset.value =
+            e.target.dataset.value || e.target.parentElement.dataset.value; // text dataset value for query, i.e. "value"
+          this._suggesting = false;
+          this._suggestView.innerHTML = '';
+          this._search();
+          // }
         });
       } else {
         ul.innerHTML = `<li class="item -disabled">No results found</li>`;
@@ -369,7 +370,15 @@ export default class SearchFieldView {
   }
 
   get value() {
-    return this._field.dataset.value;
+    // console.log(`${this._queryURL}pretty=true&term=ALDH2`);
+    // console.log(this.lastValue);
+    // fetch(`https://togovar.biosciencedbc.jp/api/search/gene?term=ALDH2`)
+    //   .then((response) => response.json())
+    //   .then((json) => console.log(json));
+    console.log(this._field.value);
+    return this._field.value;
+    // return this._field.value;
+    // return this._field.dataset.value;
   }
 
   get label() {
