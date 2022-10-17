@@ -1,7 +1,6 @@
 import deparam from 'deparam.js';
 import { API_URL } from '../global.js';
 import { debounce } from '../utils/debounce.js';
-// import { ModalWindow } from '../components/ModalWindow.js';
 
 const LIMIT = 100;
 const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
@@ -334,18 +333,6 @@ export const mixin = {
           }
         })
         .catch((err) => {
-          // const body = document.querySelector('body');
-          // const modalWindow = new ModalWindow(body, error.message);
-          // modalWindow.show();
-
-          // const clickHandler = (e) => {
-          //   if (e.target !== modalWindow.messageArea) {
-          //     modalWindow.hide();
-          //     body.removeEventListener('click', clickHandler);
-          //   }
-          // };
-          // body.addEventListener('click', clickHandler);
-
           const error = err.name === 'Error' ? err.message : null;
           this.setData('searchMessages', { error });
 
