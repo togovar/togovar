@@ -1,7 +1,7 @@
 import deparam from 'deparam.js';
 import { API_URL } from '../global.js';
 import { debounce } from '../utils/debounce.js';
-import { ModalWindow } from '../components/ModalWindow.js';
+// import { ModalWindow } from '../components/ModalWindow.js';
 
 const LIMIT = 100;
 const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
@@ -276,17 +276,17 @@ export const mixin = {
           }
           switch (response.status) {
             case 400:
-              throw Error('INVALID_TOKEN');
+              throw new Error('INVALID_TOKEN');
             case 401:
-              throw Error('UNAUTHORIZED');
+              throw new Error('UNAUTHORIZED');
             case 500:
-              throw Error('INTERNAL_SERVER_ERROR');
+              throw new Error('INTERNAL_SERVER_ERROR');
             case 502:
-              throw Error('BAD_GATEWAY');
+              throw new Error('BAD_GATEWAY');
             case 404:
-              throw Error('NOT_FOUND');
+              throw new Error('NOT_FOUND');
             default:
-              throw Error('UNHANDLED_ERROR');
+              throw new Error('UNHANDLED_ERROR');
           }
         })
         .then((response) => response.json())
@@ -333,23 +333,26 @@ export const mixin = {
             this._setSimpleSearchConditions({});
           }
         })
-        .catch((e) => {
-          const body = document.querySelector('body');
-          const modalWindow = new ModalWindow(body, e.message);
-          modalWindow.show();
+        .catch((err) => {
+          // const body = document.querySelector('body');
+          // const modalWindow = new ModalWindow(body, error.message);
+          // modalWindow.show();
 
-         const clickHandler = (e) => {
-            if (e.target !== modalWindow.messageArea) {
-              modalWindow.hide();
-              body.removeEventListener('click', clickHandler);
-            }
-          }
-          body.addEventListener('click', clickHandler);
+          // const clickHandler = (e) => {
+          //   if (e.target !== modalWindow.messageArea) {
+          //     modalWindow.hide();
+          //     body.removeEventListener('click', clickHandler);
+          //   }
+          // };
+          // body.addEventListener('click', clickHandler);
 
-          if (e.name === 'AbortError') {
+          const error = err.name === 'Error' ? err.message : null;
+          this.setData('searchMessages', { error });
+
+          if (err.name === 'AbortError') {
             console.warn('User aborted the request');
           } else {
-            throw Error(e);
+            throw new Error(err);
           }
         });
     })(offset, isFirstTime);
