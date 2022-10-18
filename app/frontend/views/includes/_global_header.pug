@@ -6,13 +6,15 @@ header#GlobalHeader
       img.logotype(src=require("../../images/logotype.svg").default alt="TOGO VAR")
     span.summary A comprehensive Japanese genetic variation database
 
-    .dropdown
-      .button-view.select
+    .dropdown-view
+      .select
         span.selected GRCh38
         span.caret
       ul.list
-        li.item CRCh37
-        li.item.active CRCh38
+        li.item
+          a.link GRCh37
+        li.item
+          a.link.active GRCh38
 
   .menus
     ul.menu.navigation
