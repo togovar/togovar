@@ -6,6 +6,7 @@ $COLOR_KEY_DARK3: #125263;
 
 $COLOR_SELECTED: #ffdd00;
 $COLOR_SELECTED_LIGHT: #fdfae5;
+$COLOR_SELECTED_HOVER: rgba($COLOR_SELECTED, 0.2);
 $COLOR_SINGLETON: lighten($COLOR_SELECTED, 35%);
 $COLOR_DISABLE_DEEP: #808080;
 $COLOR_DISABLE: #999999;
@@ -132,6 +133,7 @@ $CHAR_LOGICAL_OP_OUTLINE: '\E803';
   --color-light-gray: #{$COLOR_LIGHT_GRAY};
   --color-darker-gray: #{$COLOR_DARKER_GRAY};
   --color-selected: #{$COLOR_SELECTED};
+  --color-selected-hover: #{$COLOR_SELECTED_HOVER};
   --color-selected-light: #{$COLOR_SELECTED_LIGHT};
   --color-singleton: #{$COLOR_SINGLETON};
   --color-disable: #{$COLOR_DISABLE};
