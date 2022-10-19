@@ -1,11 +1,8 @@
 
 .dropdown-view
-  padding-top: 6px
-  padding-left: 8px
   font-size: 14px
   > .selected
     margin: 0
-    padding: 0 .7em
     border-radius: 10px
     background: linear-gradient(to bottom, var(--color-key-dark1), var(--color-key-dark3))
     color: white
@@ -14,48 +11,36 @@
     &:after
       content: var(--char-CARET-DOWN)
       font-family: FontAwesome
-      position: relative
-      left: 5px
-      padding-right: 2px
-      color: white
-      font-size: .7rem
     &:hover
       opacity: 0.9
-  > #click
+  > #DropdownSelect
     display: none
-    &:checked ~ .selected:after
+    &:checked ~ .selected::after
       content: var(--char-CARET-UP)
-      color: white
       top: -1px
-    &:checked ~ .hidden_show
+    &:checked ~ .hiddenshow
       opacity: 1
-  > .hidden_show
+  > .hiddenshow
     opacity: 0
     transition: 0.2s
   > .list
-    margin: 0
-    padding: 3px 0 3px
-    background-color: white
     list-style: none
+    background-color: white
     box-shadow: 0 2px 2px rgba(0, 0, 0, .8)
     font-weight: normal
     cursor: pointer
     > .item
-      > .link
-        display: block
-        text-decoration: none
-        &:before
-          content: var(--char-CHECK)
-          font-family: FontAwesome
-          position: relative
-          top: -1px
-          left: -4px
-          padding-left: 10px
-          color: var(--color-key-dark2)
-          font-size: .6rem
-          opacity: 0
-        &:hover
-          background-color: var(--color-selected-hover)
-      > .active
-        &:before
-          opacity: 1
+    > .item > .link
+      display: block
+      text-decoration: none
+      &:before
+        content: var(--char-CHECK)
+        font-family: FontAwesome
+        color: var(--color-key-dark2)
+        font-size: .6rem
+        opacity: 0
+      &:hover
+        background-color: var(--color-selected-hover)
+    > .item > .-active
+      &:before
+        opacity: 1
