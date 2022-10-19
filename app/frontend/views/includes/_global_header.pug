@@ -7,10 +7,9 @@ header#GlobalHeader
     span.summary A comprehensive Japanese genetic variation database
 
     .dropdown-view
-      .select
-        span.selected GRCh38
-        span.caret
-      ul.list
+      input#click(type="checkbox")
+      label.selected(for="click") GRCh38
+      ul.list.hidden_show
         li.item
           a.link GRCh37
         li.item
