@@ -26,6 +26,23 @@ $WIDTH_LOGO: 470px
       padding-top: 8px
       font-size: 12px
       font-weight: normal
+    > .dropdown-view
+      padding-top: 6px
+      padding-left: 8px
+      > .selected
+        padding: 0 .7em
+      > .selected::after
+        position: relative
+        left: 5px
+        padding-right: 2px
+        font-size: .7rem
+      > .list
+        padding: 3px 0 3px
+      > .list > .item > .link::before
+        position: relative
+        top: -1px
+        left: -4px
+        padding-left: 10px
   > .menus
     position: absolute
     right: 0
