@@ -30,17 +30,18 @@
     font-weight: normal
     cursor: pointer
     > .item
-    > .item > .link
-      display: block
-      text-decoration: none
-      &:before
-        content: var(--char-CHECK)
-        font-family: FontAwesome
-        color: var(--color-key-dark2)
-        font-size: .6rem
-        opacity: 0
-      &:hover
-        background-color: var(--color-selected-hover)
-    > .item > .-active
-      &:before
-        opacity: 1
+      > .link
+        display: block
+        text-decoration: none
+        &:before
+          content: var(--char-CHECK)
+          font-family: FontAwesome
+          color: var(--color-key-dark2)
+          font-size: .6rem
+          opacity: 0
+        &:hover
+          background-color: var(--color-selected-hover)
+    > .item
+      > .-active
+        &:before
+          opacity: 1
