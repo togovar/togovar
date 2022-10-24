@@ -1,54 +1,64 @@
 
 .dropdown-view
-  position: relative
   font-size: 14px
-  > .selected
-    margin: 0
-    border: none
-    border-radius: 10px
-    background: linear-gradient(to bottom, var(--color-key-dark1), var(--color-key-dark3))
-    color: white
-    line-height: 20px
-    z-index: 10
-    cursor: pointer
-    &:after
-      content: var(--char-CARET-DOWN)
-      font-family: FontAwesome
-  > .hiddenshow
-    position: relative
-    top: -25px
-    opacity: 0
-    // opacity: 0.9
-    transition: 0.2s
-    transform: translateY(-4px)
-    &:hover
-      opacity: 1
-      transform: translateY(0)
-    > .list
+  .select
+    pasition: relative
+    > .button
       position: relative
-      top: 27px
       margin: 0
-      padding: 0
-      list-style: none
-      background-color: white
-      box-shadow: 0 2px 2px rgba(0, 0, 0, .8)
-      font-weight: normal
+      border: none
+      border-radius: 10px
+      background: linear-gradient(to bottom, var(--color-key-dark1), var(--color-key-dark3))
+      color: white
+      line-height: 20px
+      transition: 0.2s
       cursor: pointer
-      > .item
-        > .link
-          display: block
-          text-decoration: none
-          padding-left: 5px
-          &:before
-            content: var(--char-CHECK)
-            font-family: FontAwesome
-            color: var(--color-key-dark2)
-            padding-right: 3px
-            font-size: .6rem
-            opacity: 0
-          &:hover
-            background-color: var(--color-selected-hover)
-      > .item
-        > .-active
-          &:before
-            opacity: 1
+      &:hover
+        opacity: 0.9
+      &:after
+        content: var(--char-CARET-DOWN)
+        font-family: FontAwesome
+    > .selectshow
+      position: relative
+      top:-20px
+      height: 20px
+      cursor: pointer
+      &:hover
+        > .list
+          pointer-events: auto
+          opacity: 1
+          transform: translateY(0)
+      > .list
+        pointer-events: none
+        position: relative
+        top: 20px
+        margin: 0
+        padding-top: 20px
+        list-style: none
+        background-color: white
+        box-shadow: 0 2px 2px rgba(0, 0, 0, .8)
+        font-weight: normal
+        white-space: nowrap
+        cursor: pointer
+        opacity: 0
+        transform: translateY(-20px)
+        transition: 1m
+        // &:hover
+
+        > .item
+          > .link
+            display: block
+            text-decoration: none
+            padding-right: 5px
+            &:before
+              content: var(--char-CHECK)
+              font-family: FontAwesome
+              color: var(--color-key-dark2)
+              font-size: .6rem
+              opacity: 0
+            &:hover
+              background-color: var(--color-selected-hover)
+        > .item
+          > .-active
+            &:before
+              opacity: 1
