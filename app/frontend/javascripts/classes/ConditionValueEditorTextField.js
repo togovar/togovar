@@ -1,31 +1,40 @@
-import ConditionValueEditor from "./ConditionValueEditor.js";
+import ConditionValueEditor from './ConditionValueEditor.js';
 import SearchFieldView from './SearchFieldView.js';
-import {CONDITION_TYPE} from '../definition.js';
+import { CONDITION_TYPE } from '../definition.js';
+import { API_URL } from '../global.js';
 
 export default class ConditionValueEditorTextField extends ConditionValueEditor {
+  /**
+   * @param {Object} valuesView - ConditionType Object?(_conditionView, _editors _okButton, _sections)
+   * @param {String} conditionType - "gene" or "disease"?
+   */
 
   constructor(valuesView, conditionType) {
-
     super(valuesView, conditionType);
+    this._conditionType = conditionType;
 
     // HTML
-    this._createElement('text-field-editor-view', `
-    <header>Search for ${conditionType.replace('_', ' ')}</header>
-    <div class="body"></div>`);
+    this._createElement(
+      'text-field-editor-view',
+      `<header>Search for ${conditionType.replace('_', ' ')}</header>
+      <div class="body"></div>`
+    );
+
     this._searchFieldView = new SearchFieldView(
       this,
       this._body,
       {
-        [CONDITION_TYPE.gene_symbol]: 'BLACA2',
+        [CONDITION_TYPE.gene_symbol]: 'BRCA2',
         [CONDITION_TYPE.disease]: 'Breast-ovarian cancer, familial 2',
       }[conditionType],
-      [{
+      {
         [CONDITION_TYPE.gene_symbol]: 'gene',
         [CONDITION_TYPE.disease]: 'disease',
-      }[conditionType]]
+      }[conditionType],
+      `${API_URL}/api/search/${conditionType}?term=`,
+      conditionType
     );
   }
-
 
   // public methods
 
@@ -46,14 +55,14 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
     return this._searchFieldView.value !== '';
   }
 
-
   // private methods
 
   _update() {
-
     // update value
-    const term = this._searchFieldView.value;
-    this._addValueView(term, term, true);
+    const value = this._searchFieldView.value;
+    const label = this._searchFieldView.label;
+
+    this._addValueView(value, label, true);
 
     // validation
     this._valuesView.update(this._validate());
@@ -62,5 +71,4 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
   _validate() {
     return this.isValid;
   }
-
 }
