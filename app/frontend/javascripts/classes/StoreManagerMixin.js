@@ -275,17 +275,17 @@ export const mixin = {
           }
           switch (response.status) {
             case 400:
-              throw Error('INVALID_TOKEN');
+              throw new Error('INVALID_TOKEN');
             case 401:
-              throw Error('UNAUTHORIZED');
+              throw new Error('UNAUTHORIZED');
             case 500:
-              throw Error('INTERNAL_SERVER_ERROR');
+              throw new Error('INTERNAL_SERVER_ERROR');
             case 502:
-              throw Error('BAD_GATEWAY');
+              throw new Error('BAD_GATEWAY');
             case 404:
-              throw Error('NOT_FOUND');
+              throw new Error('NOT_FOUND');
             default:
-              throw Error('UNHANDLED_ERROR');
+              throw new Error('UNHANDLED_ERROR');
           }
         })
         .then((response) => response.json())
@@ -332,11 +332,14 @@ export const mixin = {
             this._setSimpleSearchConditions({});
           }
         })
-        .catch((e) => {
-          if (e.name === 'AbortError') {
+        .catch((err) => {
+          const error = err.name === 'Error' ? err.message : null;
+          this.setData('searchMessages', { error });
+
+          if (err.name === 'AbortError') {
             console.warn('User aborted the request');
           } else {
-            throw Error(e);
+            throw new Error(err);
           }
         });
     })(offset, isFirstTime);
@@ -354,8 +357,10 @@ export const mixin = {
         case 'simple':
           this.setSimpleSearchCondition({});
           break;
-        case 'advanced':
-          this.setAdvancedSearchCondition();
+        case 'advanced': {
+          const condition = this._store.advancedSearchConditions;
+          this.setAdvancedSearchCondition(condition);
+        }
           break;
       }
       // start search

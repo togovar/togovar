@@ -170,8 +170,20 @@ export default class ConditionItemView extends ConditionView {
         };
       }
 
+      case CONDITION_TYPE.gene_symbol: {
+        const value = values[0].value;
+        return {
+          gene: {
+            relation: this._elm.dataset.relation,
+            terms: [+value],
+          },
+        };
+      }
+
       case CONDITION_TYPE.variant_id: {
         const value = values[0].value;
+        //valueがとれていない undefined
+        console.log(values[0]);
         return {
           id: [value],
         };

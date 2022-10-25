@@ -1,4 +1,5 @@
 import { API_URL } from '../global.js';
+import { CONDITION_TYPE } from '../definition.js';
 
 const NUMBER_OF_SUGGESTS = 10; // TODO: Config
 const SUGGEST_LABELS = {
@@ -13,105 +14,148 @@ const KEY_INCREMENT = {
 };
 
 export default class SearchFieldView {
+  /**
+   * @param {Object} _delegate - SimpleSearchView Object ?
+   * @param {Element} _elm - SimpleSearchView Element
+   * @param {String} _placeholder - placeholder for gene, disease
+   * @param {Array} _suggestDictionaries - ['gene', 'disease']
+   * @param {URL} _queryURL - API
+   * @param {String | Undefined} _conditionType - 'gene' or 'disease' or undefined
+   */
   constructor(
-    delegate,
-    elm,
-    placeholder,
-    suggestDictionaries,
-    hideSuggestions = false
+    _delegate,
+    _elm,
+    _placeholder,
+    _suggestDictionaries,
+    _queryURL = `${API_URL}/suggest?term=`,
+    _conditionType,
+    _hideSuggestions = false
   ) {
-    this._delegate = delegate;
-    this._suggestDictionaries = suggestDictionaries;
-    this._hideSuggestions = hideSuggestions;
+    this._delegate = _delegate;
+    this._queryURL = _queryURL;
+    this._suggestDictionaries = _suggestDictionaries;
+    this._conditionType = _conditionType;
+    this._hideSuggestions = _hideSuggestions;
+
+    this._suggesting = false;
+    this._isSimpleSearch = true;
+
     // make HTML
-    elm.innerHTML = `
+    _elm.innerHTML = `
     <div class="search-field-view">
       <div class="fieldcontainer">
         <div class="field">
-          <input type="text" title="${placeholder}" placeholder="${placeholder}">
+          <input type="text" title="${_placeholder}" placeholder="${_placeholder}">
           <button>Search</button>
         </div>
       </div>
       <div class="examples"></div>
       <div class="suggest-view"></div>
     </div>`;
+
     // reference
-    const view = elm.querySelector(':scope > .search-field-view');
+    const view = _elm.querySelector(':scope > .search-field-view');
     const field = view.querySelector(':scope > .fieldcontainer > .field');
     this._field = field.querySelector(':scope > input[type="text"]');
     this._button = field.querySelector(':scope > button');
     this._examples = view.querySelector(':scope > .examples');
     this._suggestView = view.querySelector(':scope > .suggest-view');
-    this._suggesting = false;
+
     // events
-    this._field.addEventListener('keydown', this._keydown.bind(this));
-    this._field.addEventListener('keyup', this._keyup.bind(this));
-    this._field.addEventListener('blur', this._blur.bind(this));
+    this._field.addEventListener('keydown', this._itemSelect.bind(this));
+    this._field.addEventListener(
+      'keyup',
+      this._suggestDecisionAndShowHide.bind(this)
+    );
+    this._field.addEventListener('blur', this._focusIsNotArea.bind(this));
     this._button.addEventListener('click', this._search.bind(this));
   }
 
   // private methods
 
-  _keydown(e) {
-    if (this._suggesting) {
-      if (KEY_INCREMENT[e.code]) {
-        let item = this._suggestView.querySelector(
-          `.column:nth-child(${
-            this.suggestPosition.x + 1
-          }) > .list > .item:nth-child(${this.suggestPosition.y + 1})`
-        );
-        if (item) item.classList.remove('-selected');
+  _itemSelect(e) {
+    if (this._suggesting && KEY_INCREMENT[e.code]) {
+      this._suggestPositionShift(KEY_INCREMENT[e.code]);
 
-        this._suggestPositionShift(KEY_INCREMENT[e.code]);
-        item = this._suggestView.querySelector(
-          `.column:nth-child(${
-            this.suggestPosition.x + 1
-          }) > .list > .item:nth-child(${this.suggestPosition.y + 1})`
-        );
-        item.classList.add('-selected');
+      let item = this._suggestView.querySelector(
+        `.column:nth-child(${this._suggestPosition.x + 1})
+        > .list
+        > .item:nth-child(${this._suggestPosition.y + 1})`
+      );
 
-        e.preventDefault();
-        return false;
-      }
+      if (item)
+        this._suggestView
+          .querySelectorAll('.column>.list .item')
+          .forEach((item) => item.classList.remove('-selected'));
+      item.classList.add('-selected');
+
+      e.preventDefault();
+      // return false;
     }
   }
 
-  _keyup(e) {
-    e.preventDefault();
-    if (e.key === 'Enter') {
-      if (
-        this._suggesting &&
-        this.suggestPosition.x !== -1 &&
-        this.suggestPosition.y !== -1
-      ) {
-        this._field.value =
-          this._suggestList[this.suggestPosition.x][this.suggestPosition.y]
-            .alias_of ||
-          this._suggestList[this.suggestPosition.x][this.suggestPosition.y]
-            .term;
-      }
-      this._suggesting = false;
-      this._suggestView.innerHTML = '';
-      this._search();
-    } else if (
-      this._suggesting &&
-      (e.key === 'Escape' || this._field.value.length < 3)
-    ) {
-      this._suggesting = false;
-      this._suggestView.innerHTML = '';
-      this.lastValue = '';
-    } else if (
+  _suggestDecisionAndShowHide(e) {
+    // e.preventDefault();
+    const hideSuggest =
+      this._suggesting && (e.key === 'Escape' || this._field.value.length < 3);
+    const showSuggest =
       !this._hideSuggestions &&
       this._field.value.length >= 3 &&
-      this._field.value !== this.lastValue
-    ) {
-      fetch(`${API_URL}/suggest?term=${this._field.value}`)
-        .then((response) => response.json())
-        .then((json) => this._suggest(json));
+      this._field.value !== this.lastValue;
+
+    switch (true) {
+      case e.key === 'Enter':
+        return this._suggestDecision();
+      case hideSuggest:
+        return this._suggestHide();
+      case showSuggest:
+        return this._suggestShow();
     }
   }
 
-  _blur() {
+  _suggestDecision() {
+    const selectWithCursor =
+      this._suggesting &&
+      this._suggestPosition.x !== -1 &&
+      this._suggestPosition.y !== -1;
+
+    if (selectWithCursor) {
+      if (this._isSimpleSearch) {
+        this._field.value =
+          this._suggestList[this._suggestPosition.x][this._suggestPosition.y]
+            .alias_of ||
+          this._suggestList[this._suggestPosition.x][this._suggestPosition.y]
+            .term;
+      } else {
+        this._field.value = this._suggestList[this._suggestPosition.y].symbol;
+        this._field.dataset.value =
+          this._suggestList[this._suggestPosition.y].id;
+      }
+    }
+    this._suggesting = false;
+    this._suggestView.innerHTML = '';
+    this._search();
+  }
+
+  _suggestHide() {
+    this._suggesting = false;
+    this._suggestView.innerHTML = '';
+    this.lastValue = '';
+  }
+
+  _suggestShow() {
+    fetch(`${this._queryURL}${this._field.value}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    })
+      .then((response) => response.json())
+      .then((json) => this._createSuggestList(json));
+  }
+
+  _focusIsNotArea() {
     setTimeout(() => {
       if (this._suggesting) {
         this._suggesting = false;
@@ -121,138 +165,195 @@ export default class SearchFieldView {
     }, 250);
   }
 
-  _suggestPositionShift(increment) {
-    if (this.suggestPosition.x === -1 && this.suggestPosition.y === -1) {
+  _suggestPositionShift(incrementOfXY) {
+    this._initializeAndChangeSuggestPosition(incrementOfXY);
+    this._changeSuggestPositionOnReturn();
+
+    // What are you doing?
+    // if (
+    //   this._suggestList[this._suggestPosition.x][this._suggestPosition.y] ===
+    //   undefined
+    // ) {
+    //   this._suggestPositionShift(incrementOfXY);
+    // }
+  }
+
+  _initializeAndChangeSuggestPosition(incrementOfXY) {
+    if (this._suggestPosition.x === -1 && this._suggestPosition.y === -1) {
       switch (true) {
-        case increment.y === -1:
-          this.suggestPosition = { x: 0, y: -1 };
-          break;
-        case increment.y === 1:
-          this.suggestPosition = { x: 0, y: 0 };
-          break;
-        case increment.x === -1:
-          this.suggestPosition = { x: 0, y: 0 };
-          break;
-        case increment.x === 1:
-          this.suggestPosition = { x: -1, y: 0 };
-          break;
+        case KEY_INCREMENT.ArrowUp.y === incrementOfXY.y:
+          return (this._suggestPosition = { x: 0, y: -1 });
+        case KEY_INCREMENT.ArrowDown.y === incrementOfXY.y:
+          return (this._suggestPosition = { x: 0, y: 0 });
+        case KEY_INCREMENT.ArrowLeft.x === incrementOfXY.x:
+          return (this._suggestPosition = { x: 0, y: 0 });
+        case KEY_INCREMENT.ArrowRight.x === incrementOfXY.x:
+          return (this._suggestPosition = { x: -1, y: 0 });
       }
     } else {
-      this.suggestPosition.x += increment.x;
-      this.suggestPosition.y += increment.y;
+      this._suggestPosition.x += incrementOfXY.x;
+      this._suggestPosition.y += incrementOfXY.y;
     }
+  }
 
+  _changeSuggestPositionOnReturn() {
+    let lengthY, lengthX;
+    if (this._isSimpleSearch && this._suggestList.length) {
+      lengthY = this._suggestList[0].length;
+      lengthX = this._suggestList.length;
+    } else {
+      lengthY = this._suggestList.length;
+      lengthX = 1;
+    }
     switch (true) {
-      case increment.y === -1:
-        this.suggestPosition.y =
-          this.suggestPosition.y < 0
-            ? this._suggestList[0].length - 1
-            : this.suggestPosition.y;
-        break;
-      case increment.y === 1:
-        this.suggestPosition.y =
-          this.suggestPosition.y >= this._suggestList[0].length
-            ? 0
-            : this.suggestPosition.y;
-        break;
-      case increment.x === -1:
-        this.suggestPosition.x =
-          this.suggestPosition.x < 0
-            ? this._suggestList.length - 1
-            : this.suggestPosition.x;
-        break;
-      case increment.x === 1:
-        this.suggestPosition.x =
-          this.suggestPosition.x >= this._suggestList.length
-            ? 0
-            : this.suggestPosition.x;
-        break;
+      case this._suggestPosition.y < 0:
+        return (this._suggestPosition.y = lengthY - 1);
+      case this._suggestPosition.y >= lengthY:
+        return (this._suggestPosition.y = 0);
+      case this._suggestPosition.x < 0:
+        return (this._suggestPosition.x = lengthX - 1);
+      case this._suggestPosition.x >= lengthX:
+        return (this._suggestPosition.x = 0);
     }
-
-    if (
-      this._suggestList[this.suggestPosition.x][this.suggestPosition.y] ===
-      undefined
-    )
-      this._suggestPositionShift(increment);
   }
 
   _search() {
-    this._delegate.search(this._field.value);
+    this._delegate.search();
   }
 
-  _suggest(data) {
+  _createSuggestList(data) {
     this._suggesting = true;
     this.lastValue = this._field.value;
-    this.suggestPosition = { x: -1, y: -1 };
-
-    let max = Math.max(
-      ...this._suggestDictionaries.map((key) => data[key].length)
-    );
-    max = max < NUMBER_OF_SUGGESTS ? max : NUMBER_OF_SUGGESTS;
-
-    const dictionaries = [];
+    this._suggestPosition = { x: -1, y: -1 };
+    this._dictionaries = [];
     this._suggestList = [];
-    Object.keys(data).forEach((key, index) => {
-      if (this._suggestDictionaries.indexOf(key) !== -1) {
-        if (data[key].length > 0) {
-          dictionaries.push(key);
-          const column = [];
-          for (let i = 0; i < max; i++) {
-            column.push(data[key][i]);
-          }
-          this._suggestList[index] = column;
-        }
-      }
-    });
+    this._isSimpleSearch = !Array.isArray(data);
 
-    this._suggestView.innerHTML = dictionaries
-      .map((key, index) => {
-        const column = this._suggestList[index];
-        return `
+    // if we are querying with simple search, API returns an object {gene:..., disease:...}
+    // if searching disease / gene, it returns an array[{ id:..., label:..., highlight:...}, ...]
+    if (this._isSimpleSearch) {
+      this._suggestData(data);
+
+      this._suggestView.innerHTML = this._dictionaries
+        .map((key, index) => {
+          const column = this._suggestList[index];
+          return `
       <div class="column">
         <h3 class="title">${SUGGEST_LABELS[key]}</h3>
         <ul class="list">
           ${column
             .map((item) => {
-              return `<li class="item${
-                item === undefined ? ' -disabled' : ''
-              }" data-value="${item ? item.term : ''}" data-alias="${
-                item && item.alias_of ? item.alias_of : ''
-              }">
-              ${
-                item
-                  ? `${
-                      `<span class="main">${
-                        item.alias_of ? item.alias_of : item.term
-                      }</span>` +
-                      (item.alias_of
-                        ? `<span class="sub">alias: ${item.term}</span>`
-                        : '')
-                    }`
-                  : ''
-              }
-            </li>`;
+              return `
+              <li class="item${item === undefined ? ' -disabled' : ''}"
+                data-value="${item ? item.term : ''}"
+                data-alias="${item && item.alias_of ? item.alias_of : ''}">
+                ${
+                  item
+                    ? `${
+                        `<span class="main">${
+                          item.alias_of ? item.alias_of : item.term
+                        }</span >` +
+                        (item.alias_of
+                          ? `<span class="sub">alias: ${item.term}</span>`
+                          : '')
+                      }`
+                    : ''
+                }
+              </li>`;
             })
             .join('')}
         </ul>
       </div>`;
-      })
-      .join('');
+        })
+        .join('');
 
-    this._suggestView
-      .querySelectorAll('.column > .list > .item')
-      .forEach((item) => {
-        if (!item.classList.contains('-disabled')) {
-          $(item).on('click', (e) => {
-            e.stopPropagation();
-            this._field.value =
-              e.currentTarget.dataset.alias || e.currentTarget.dataset.value;
-            this._suggesting = false;
-            this._suggestView.innerHTML = '';
-            this._search();
-          });
+      this._suggestView
+        .querySelectorAll('.column > .list > .item')
+        .forEach((item) => {
+          if (!item.classList.contains('-disabled')) {
+            item.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this._field.value =
+                e.currentTarget.dataset.alias || e.currentTarget.dataset.value;
+              this._suggesting = false;
+              this._suggestView.innerHTML = '';
+              this._search();
+            });
+          }
+        });
+    } else {
+      //for Advanced search of gene & disease
+      this._suggestData(data);
+
+      this._suggestView.innerHTML = `<div class="column"></div>`;
+      const ul = document.createElement('ul');
+      ul.className = 'list';
+
+      if (this._suggestLength(data) !== 0) {
+        for (let i = 0; i < this._suggestLength(data); i++) {
+          const item = data[i];
+          const li = document.createElement('li');
+          li.className = 'item';
+          li.dataset.value = item.id;
+          li.dataset.label =
+            this._conditionType === CONDITION_TYPE.gene_symbol
+              ? item.symbol
+              : item.id;
+          li.innerHTML = item.highlight;
+
+          if (item.alias_of) {
+            const spanSub = document.createElement('span');
+            spanSub.className = 'sub';
+            spanSub.textContent = item.alias_of;
+            li.append(spanSub);
+          }
+          ul.appendChild(li);
         }
+
+        ul.addEventListener('click', (e) => {
+          this._field.value =
+            e.target.dataset.label || e.target.parentElement.dataset.label; // text field value, i.e. "label"
+          this._field.dataset.value =
+            e.target.dataset.value || e.target.parentElement.dataset.value; // text dataset value for query, i.e. "value"
+          this._suggesting = false;
+          this._suggestView.innerHTML = '';
+          this._search();
+        });
+      } else {
+        ul.innerHTML = `<li class="item -disabled">No results found</li>`;
+      }
+      this._suggestView.querySelector('.column').appendChild(ul);
+    }
+  }
+
+  _suggestLength(data) {
+    if (this._isSimpleSearch) {
+      const maxLengthOfContent = Math.max(
+        ...this._suggestDictionaries.map((key) => data[key].length)
+      );
+      return Math.min(maxLengthOfContent, NUMBER_OF_SUGGESTS);
+    } else {
+      return Math.min(data.length, NUMBER_OF_SUGGESTS);
+    }
+  }
+
+  _suggestData(data) {
+    if (this._isSimpleSearch) {
+      Object.keys(data).forEach((key, index) => {
+        // if (this._suggestDictionaries.indexOf(key) !== -1) {
+        if (data[key].length > 0) {
+          this._dictionaries.push(key);
+          const column = [];
+          for (let i = 0; i < this._suggestLength(data); i++) {
+            column.push(data[key][i]);
+          }
+          this._suggestList[index] = column;
+        }
+        // }
       });
+    } else {
+      this._suggestList = data.slice(0, this._suggestLength(data));
+    }
   }
 
   // public method
@@ -272,6 +373,10 @@ export default class SearchFieldView {
   }
 
   get value() {
+    return this._field.dataset.value;
+  }
+
+  get label() {
     return this._field.value;
   }
 }
