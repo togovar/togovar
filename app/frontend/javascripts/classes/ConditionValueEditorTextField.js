@@ -34,8 +34,7 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
         [CONDITION_TYPE.disease]: 'disease',
       }[conditionType],
       `${API_URL}/api/search/${conditionType}?term=`,
-      conditionType,
-      conditionType === CONDITION_TYPE.variant_id
+      conditionType
     );
   }
 

@@ -28,14 +28,12 @@ export default class SearchFieldView {
     _placeholder,
     _suggestDictionaries,
     _queryURL = `${API_URL}/suggest?term=`,
-    _conditionType,
-    _hideSuggestions = false
+    _conditionType
   ) {
     this._delegate = _delegate;
     this._queryURL = _queryURL;
     this._suggestDictionaries = _suggestDictionaries;
     this._conditionType = _conditionType;
-    this._hideSuggestions = _hideSuggestions;
 
     this._suggesting = false;
     this._isSimpleSearch = true;
@@ -99,9 +97,9 @@ export default class SearchFieldView {
     const hideSuggest =
       this._suggesting && (e.key === 'Escape' || this._field.value.length < 3);
     const showSuggest =
-      !this._hideSuggestions &&
       this._field.value.length >= 3 &&
-      this._field.value !== this.lastValue;
+      this._field.value !== this.lastValue &&
+      this._conditionType !== CONDITION_TYPE.variant_id;
 
     switch (true) {
       case e.key === 'Enter':
@@ -132,6 +130,11 @@ export default class SearchFieldView {
           this._suggestList[this._suggestPosition.y].id;
       }
     }
+
+    if (this._conditionType === CONDITION_TYPE.variant_id) {
+      this._field.dataset.value = this._field.value;
+    }
+
     this._suggesting = false;
     this._suggestView.innerHTML = '';
     this._search();

@@ -182,8 +182,6 @@ export default class ConditionItemView extends ConditionView {
 
       case CONDITION_TYPE.variant_id: {
         const value = values[0].value;
-        //valueがとれていない undefined
-        console.log(values[0]);
         return {
           id: [value],
         };
