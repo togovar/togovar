@@ -11,7 +11,7 @@ export const CONDITION_TYPE = {
   polyphen: 'polyphen',
   adv_frequency: 'adv_frequency',
   disease: 'disease',
-  gene_symbol: 'gene_symbol',
+  gene_symbol: 'gene',
   location: 'location',
 };
 

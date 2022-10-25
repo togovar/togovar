@@ -409,7 +409,7 @@
       "label": "Disease",
       "type": "text"
     },
-    "gene_symbol": {
+    "gene": {
       "label": "Gene symbol",
       "type": "text"
     },
