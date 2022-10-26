@@ -1,6 +1,6 @@
 block variables
-- var lang = locals.language ? locals.language : "en"
-- var TOMMO_VERSION = "8.3"
+  include ../includes/_globals
+  - lang = locals.language ? locals.language : "en";
 
 doctype html
 html(data-page=locals.currentPage, lang=lang)

@@ -23,7 +23,13 @@ const config = {
     rules: [
       {
         test: /\.pug$/,
-        use: 'pug-loader',
+        use: {
+          loader: 'pug-loader',
+          options: {
+            globals: ["GLOBALS"],
+            pretty: true,
+          }
+        }
       },
       {
         test: /\.js$/,
