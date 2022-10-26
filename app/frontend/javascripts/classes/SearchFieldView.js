@@ -6,7 +6,6 @@ const SUGGEST_LABELS = {
   gene: 'Gene symbol',
   disease: 'Disease name',
 };
-
 const KEY_INCREMENT = {
   ArrowUp: { x: 0, y: -1 },
   ArrowDown: { x: 0, y: 1 },
@@ -98,7 +97,9 @@ export default class SearchFieldView {
     const hideSuggest =
       this._suggesting && (e.key === 'Escape' || this._field.value.length < 3);
     const showSuggest =
-      this._field.value.length >= 3 && this._field.value !== this.lastValue;
+      this._field.value.length >= 3 &&
+      this._field.value !== this.lastValue &&
+      this._conditionType !== CONDITION_TYPE.variant_id;
 
     switch (true) {
       case e.key === 'Enter':
@@ -129,6 +130,11 @@ export default class SearchFieldView {
           this._suggestList[this._suggestPosition.y].id;
       }
     }
+
+    if (this._conditionType === CONDITION_TYPE.variant_id) {
+      this._field.dataset.value = this._field.value;
+    }
+
     this._suggesting = false;
     this._suggestView.innerHTML = '';
     this._search();
