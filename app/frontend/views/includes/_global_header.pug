@@ -7,14 +7,21 @@ header#GlobalHeader
     span.summary A comprehensive Japanese genetic variation database
 
     .dropdown-view
-      button.button GRCh38
+      button.button #{TOGOVAR_FRONTEND_REFERENCE}
       .selectshow
         ul.list
           li.item
-            a.link(href="http://grch37.togovar.org/") GRCh37
+            case TOGOVAR_FRONTEND_REFERENCE
+              when 'GRCh37'
+                a.link.-active GRCh37
+              when 'GRCh38'
+                a.link(href="http://grch37.togovar.org/") GRCh37
           li.item
-            a.link.-active(href="http://grch38.togovar.org/") GRCh38
-
+            case TOGOVAR_FRONTEND_REFERENCE
+              when 'GRCh37'
+                a.link(href="http://grch38.togovar.org/") GRCh38
+              when 'GRCh38'
+                a.link.-active GRCh38
   .menus
     ul.menu.navigation
       li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^home/)})
