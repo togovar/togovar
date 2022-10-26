@@ -20,6 +20,8 @@ variant:
 
     - id: variant-frequency
       dom: "#variant-frequency"
+      options:
+        assembly: $TOGOVAR_FRONTEND_REFERENCE
 
     - id: variant-clinvar
       dom: "#variant-clinvar"
