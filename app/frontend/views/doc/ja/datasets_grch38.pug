@@ -1,6 +1,6 @@
 article.common-document
   header.header
-    h2.title TogoVar収録データセット一覧
+    h2.title TogoVar収録データセット一覧 (GRCh38)
   .contents
     section.section
       h3.sectiontitle
@@ -15,14 +15,12 @@ article.common-document
           tr
             th 頻度データセット名
             th(style='white-space: nowrap;') 解析手法
+            th Liftover GRCh37
             th(style='white-space: nowrap;') 対象集団
             th(style='white-space: nowrap;') 健常者
             th(style='white-space: nowrap;') 罹患者
             th(style='white-space: nowrap;') サンプル数
-            th(style='white-space: nowrap;')
-              | バリアント数
-              br
-              | (座位数)
+            th(style='white-space: nowrap;') アレル数
             th 含まれる制限公開データセット
         tbody
           //tr
@@ -39,40 +37,41 @@ article.common-document
             td
               a(href="/doc/ja/datasets/gem_j_wga") GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel
             td._align-left WGS
+            td._align-center ✔
             td 日本人
             td._align-center ✔
             td._align-center
             td._align-center
               span(style='margin-left:15px;') 7,609
             td._align-center
-              | 95,863,463
-              br
-              | (90,280,248)
+              | 94,961,154
             td._align-center
               a(href="/doc/ja/datasets/gem_j_wga#jga_datasets") 6データセット
           tr
             td
               a(href="/doc/ja/datasets/jga_ngs") JGA-NGS
             td._align-left WES
+            td._align-center ✔
             td 日本人
             td._align-center ✔
             td._align-center ✔
             td._align-center
               span(style='margin-left:20px;') 125
             td._align-center
-              span(style='margin-left:4px;') 4,679,025
+              span(style='margin-left:4px;') 4,624,124
             td._align-center
               a(href="/doc/ja/datasets/jga_ngs#jga_datasets") 7データセット
           tr
             td
               a(href="/doc/ja/datasets/jga_snp") JGA-SNP
             td._align-left SNP-Chip
+            td._align-center ✔
             td 日本人
             td._align-center ✔
             td._align-center ✔
             td._align-center 183,884
             td._align-center
-              span(style='margin-left:4px;') 1,249,724
+              span(style='margin-left:4px;') 1,244,838
             td._align-center
               a(href="/doc/ja/datasets/jga_snp#jga_datasets") 3データセット
       p.notice
@@ -92,14 +91,13 @@ article.common-document
           tr
             th データベース名
             th(style='white-space: nowrap;') 解析手法
+            th Liftover GRCh37
             th(style='white-space: nowrap;') 対象集団
             th(style='white-space: nowrap;') 健常者
             th(style='white-space: nowrap;') 罹患者
             th(style='white-space: nowrap;') サンプル数
             th
               | アレル数
-              br
-              | (座位数)
             th 作成者
             th
               | バージョン/
@@ -110,56 +108,43 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/') ClinVar
             td._align-center —
+            td._align-center
             td._align-left 複数
             td._align-center
             td._align-center ✔
             td._align-center —
             td._align-center
-              span(style='margin-left:15px;') 788,993
+              span(style='margin-left:15px;') 1,117,487
             td NCBI
-            td 2021
-          tr
-            td
-              a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads')
-                | Genome Aggregation Database (gnomAD) exomes
-            td._align-left WES
-            td._align-left 複数
-            td._align-center ✔
-            td._align-center ✔
-            td._align-center
-              span(style='margin-left:0px;') 125,748
-            td._align-center
-              | 17,209,972
-            td Broad Institute
-            td v2.1.1
+            td 2022/09/01
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads')
                 | Genome Aggregation Database (gnomAD) genomes
             td._align-left WGS
+            td._align-center
             td._align-left 複数
             td._align-center ✔
             td._align-center ✔
             td._align-center
-              span(style='margin-left:3px;') 15,708
+              span(style='margin-left:3px;') 76,156
             td._align-center
-              | 261,942,336
+              | 759,302,267
             td Broad Institute
-            td v2.1.1
+            td v3.1.2
           tr
             td
               a.hyper-text.-external(target='_blank', href='http://www.hgvd.genome.med.kyoto-u.ac.jp/download.html')
                 | Human Genetic Variation Database (HGVD)
             td._align-left WES
+            td._align-center ✔
             td._align-left 日本人
             td._align-center ✔
             td._align-center
             td._align-center
               span(style='margin-left:10px;') 1,208
             td._align-center
-              span(style='margin-left:12px;') 554,461
-              br
-              span(style='margin-left:12px;') (501,556)
+              span(style='margin-left:20px;') 549,623
             td 京都大学
             td
               | Version 2.30
@@ -167,30 +152,25 @@ article.common-document
               | (2017/08/02)
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/202001/downloads/#variant')
+              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-14kjpn-20211208r2-af_snvindelall')
                 | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN Allele Frequency Panel(#{ GLOBALS.TOMMO_VERSION }KJPN)
             td._align-left WGS
+            td._align-center
             td._align-left 日本人
             td._align-center ✔
             td._align-center
             td._align-center
-              span(style='margin-left:10px;') 8,380
+              span(style='margin-left:-3px;') 約14,000
             td._align-center
-              | 95,085,851
-              br
-              | (79,359,228)
+              | 133,757,499
             td 東北メディカル・メガバンク機構
-            td v202109
+            td v20211208r2
       p.notice
         | 注1：ClinVarは
-        a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/') VCFファイル
-        | に含まれるGRCh37上の位置が決定しているバリアントのみを掲載しています。
+        a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/') VCFファイル
+        | に含まれるGRCh38上の位置が決定しているバリアントのみを掲載しています。
         br
         | 注2：#{ GLOBALS.TOMMO_VERSION }KJPNの内訳は、SNV (Autosome、chrX(PAR1+PAR2+XTR)、chrMT)とINDEL (Autosome、chrX(PAR1+PAR2+XTR))です。
-        | 詳細は
-        a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/202001/variants/statistics')
-          | Summary of ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN
-        | をご覧ください。
     section.section
       h3.sectiontitle バリアント以外のデータ
       table.table
@@ -209,16 +189,16 @@ article.common-document
             td DBCLS
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh37.p13')
-                | GRCh37.p13
-            td 2013/06/28
+              a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh38.p13')
+                | GRCh38.p13
+            td 2019/03/01
             td ヒトゲノムリファレンス配列
             td GRC
           tr
             td
               a.hyper-text.-external(target='_blank', href='ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/tsv/hgnc_complete_set.txt')
                 | HGNC symbol report
-            td 2021
+            td 2022/09/16
             td 遺伝子シンボルや関連リソースの情報
             td HGNC
           tr
@@ -232,7 +212,7 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/')
                 | PubTator Central
-            td 2021
+            td 2022/09/20
             td バリアント名が出現する文献情報
             td NCBI
           tr
@@ -268,7 +248,7 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/index.html')
                 | Variant Effect Predictor (VEP)
-            td Ensembl rel. 104
+            td Ensembl rel. 107
             td
               | バリアントに
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/script/vep_cache.html#cache_content')

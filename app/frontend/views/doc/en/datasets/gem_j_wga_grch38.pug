@@ -29,38 +29,13 @@ article.common-document
         a.hyper-text.-external(target='_blank', href='https://www.amed.go.jp/en/aboutus/collaboration/ga4gh_gem_japan.html')
           | the
           | GEnome Medical alliance Japan (GEM Japan) project
-        |  promoted by the Agency for Medical Research and
-        |           Development (AMED).
+        |  promoted by the Agency for Medical Research and Development (AMED).
+        br
+        | Note that the GRCh37-based data was lifted over to GRCh38 by using CrossMap.
       ul.unordered-list
-        li Version/last update: 2020/07/27
+        li GRCh37 version/last update: 2020/07/27
         li Sample size: 7,609
-        li Number of variant loci: 90,280,248
-
-      table.table._column-span-all
-        thead
-          tr
-            th#chrom(rowspan='2')
-            th#snvs(colspan='2') SNVs
-            th#indels(colspan='2') INDELs
-          tr
-            th#snvs_total(headers='snvs') Total
-            th#snvs_novel(headers='snvs') Novel
-            th#indels_total(headers='indels') Total
-            th#indels_novel(headers='indels') Novel
-        tbody
-          tr
-            td._nowrap(headers='chrom') Autosomes
-            td(headers='snvs snvs_total') 76,768,387
-            td(headers='snvs snvs_novel') 35,660,425
-            td(headers='indels indels_total') 10,202,908
-            td(headers='indels indels_novel') 4,152,671
-          tr
-            td._nowrap(headers='chrom') X Chromosome
-            td(headers='snvs snvs_total') 2,898,518
-            td(headers='snvs snvs_novel') 1,420,888
-            td(headers='indels indels_total') 410,435
-            td(headers='indels indels_novel') 164,077
-      p.body Note: Novel variants were not registered in dbSNP152.
+        li Number of alternative alleles after the liftover from GRCh37 to GRCh38：94,961,154
 
     section.section
       h3.sectiontitle Terms of use
@@ -110,7 +85,7 @@ article.common-document
           | . Available from:
           |
           a(href='/doc/datasets/gem_j_wga')
-            | https://togovar.biosciencedbc.jp/doc/datasets/gem_j_wga
+            | https://grch38.togovar.org/doc/datasets/gem_j_wga
           | .
 
     section.section

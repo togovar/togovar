@@ -58,11 +58,11 @@ const EXAMPLES = (() => {
         },
         {
           key: 'Position(GRCh38)',
-          value: '16:48258198'
+          value: '16:48224287'
         },
         {
           key: 'Region(GRCh38)',
-          value: '10:73270743-73376976'
+          value: '10:71510986-71617219'
         },
         {
           key: 'HGVSc',
