@@ -13,12 +13,13 @@ article.common-document
         a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index-e.html')
           | Japanese Genotype-phenotype Archive (JGA)
         | . All JGA data for which an approval for creating secondary data has been obtained are to be aggregated.
-        | Note that no variants with 5 alternative alleles or less are included.
+        | Note that no variants with 5 alternative alleles or less are included. The GRCh37-based data was lifted over to GRCh38 by using CrossMap.
       ul.unordered-list
         li Version/Last updated: 2018/06/01
         li Sample size: 183,884
-        li Number of detected variants: 1,966,919
+        li Number of detected variants (alternative alleles): 1,966,919
         li Number of variants after the exclusion: 1,249,724
+        li Number of variants variants after the liftover from GRCh37 to GRCh38： 1,244,838
 
     section.section
       h3.sectiontitle Terms of use
@@ -63,15 +64,16 @@ article.common-document
               a(target='_blank', href='https://humandbs.biosciencedbc.jp/en/')
                 | NBDC Human Database
               | /
-              a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index-e.html') JGA
-              |  [Internet]. Tokyo: Japan Science and Technology Agency (Japan), National Bioscience Database
-              | Center; [2018] - . JGA-SNP dataset; [cited YYYY Mmm DD]. Available from:
+              a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html') JGA
+              |  [Internet]. Kashiwa: Database Center for Life Science, Joint Support-Center for Data Science Research,
               |
-              a(href='https://togovar.biosciencedbc.jp/doc/datasets/jga_snp')
-                | https://togovar.biosciencedbc.jp/doc/datasets/jga_snp
+              | Research Organization of Information and Systems; [2018] - . JGA-SNP dataset; [cited YYYY Mmm DD]. Available from:
+              |
+              a(href='https://grch38.togovar.org/doc/datasets/jga_snp')
+                | https://grch38.togovar.org/doc/datasets/jga_snp
 
     section.section
-      h3.sectiontitle Included controlled-access datasets
+      h3#jga_datasets.sectiontitle Included controlled-access datasets
       p
         | By specifying the JGAID, you can apply for data use to
         |

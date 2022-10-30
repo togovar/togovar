@@ -19,44 +19,13 @@ article.common-document
         | による共同研究の成果です。詳しくは
         a.hyper-text.-external(target='_blank', href='https://www.amed.go.jp/aboutus/collaboration/ga4gh_gem_japan.html') プレスリリース
         | をご覧ください。
+        br
+        | なお、GRCh38のデータはCrossMapを用いてGRCh37のデータをリフトオーバして作成しました。
       ul.unordered-list
         li バージョン/最終更新日：2020/07/27
         li サンプル数：7,609
-        li バリアント座位数：90,280,248
+        li GRCh37データをGRCh38にリフトオーバした後の代替アレル数：94,961,154
       a#terms
-      table.table._column-span-all
-        thead
-          tr
-            th#chrom(rowspan='2')
-            th#snvs._align-left(colspan='2') SNV
-            th#indels._align-left(colspan='2') INDEL
-          tr
-            th#snvs_total._align-left(headers='snvs total') 総数
-            th#snvs_novel._align-left(headers='snvs novel') 新規数
-            th#indels_total._align-left(headers='indels total') 総数
-            th#indels_novel._align-left(headers='indels novel') 新規数
-        tbody
-          tr
-            th#autosomes._nowrap(headers='chrom') 常染色体
-            td(headers='snvs_total autosomes')
-              span 76,768,387
-            td(headers='snvs_novel autosomes')
-              span 35,660,425
-            td(headers='indels_total autosomes')
-              span 10,202,908
-            td(headers='indels_novel autosomes')
-              span 4,152,671
-          tr
-            th#x_chrom._nowrap(headers='chrom') X 染色体
-            td(headers='snvs_total x_chrom')
-              span 2,898,518
-            td(headers='snvs_novel x_chrom')
-              span 1,420,888
-            td(headers='indels_total x_chrom')
-              span 410,435
-            td(headers='indels_novel x_chrom')
-              span 164,077
-      p.body ※ dbSNP152に記載がないものを新規としてカウント
 
     section.section
       h3.sectiontitle 利用条件
@@ -102,7 +71,7 @@ article.common-document
             | Medical alliance Japan Project (GEM-J)
           | . Available from:
           |
-          a(href='/doc/datasets/gem_j_wga') https://togovar.biosciencedbc.jp/doc/datasets/gem_j_wga
+          a(href='/doc/datasets/gem_j_wga') https://grch38.togovar.org/doc/datasets/gem_j_wga
           | .
 
     section.section

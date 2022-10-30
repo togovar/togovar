@@ -9,12 +9,14 @@ article.common-document
         | /
         a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
           | Japanese Genotype-phenotype Archive (JGA)
-        | に登録されている個人レベルのSNPチップデータから検出したバリアントを集約した頻度データです。２次データ作成の許諾が得られたJGAデータの全てが集約対象です。なお、Alternative allele数が5以下のバリアントは含まれていません。
+        | に登録されている個人レベルのSNPチップデータから検出したバリアントを集約した頻度データです。２次データ作成の許諾が得られたJGAデータの全てが集約対象です。
+        | なお、Alternative allele数が5以下のバリアントは含まれていません。GRCh38のデータはCrossMapを用いてGRCh37のデータをリフトオーバして作成しています。
       ul.unordered-list
         li バージョン/最終更新日：2018/06/01
         li サンプルサイズ：183,884
-        li 検出バリアント数：1,966,919
+        li 検出バリアント（代替アレル）数：1,966,919
         li 除外後バリアント数：1,249,724
+        li GRCh37データをGRCh38にリフトオーバーした後のバリアント数：1,244,838
 
     section.section
       h3.sectiontitle 利用条件
@@ -46,11 +48,12 @@ article.common-document
               a(target='_blank', href='https://humandbs.biosciencedbc.jp/') NBDCヒトデータベース
               | /
               a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html') JGA
-              |  [Internet]. Tokyo: Japan Science and Technology Agency (Japan), National Bioscience Database
-              | Center; [2018] - . JGA-SNP dataset; [cited YYYY Mmm DD]. Available from:
+              |  [Internet]. Kashiwa: Database Center for Life Science, Joint Support-Center for Data Science Research,
               |
-              a(href='https://togovar.biosciencedbc.jp/doc/datasets/jga_snp')
-                | https://togovar.biosciencedbc.jp/doc/datasets/jga_snp
+              | Research Organization of Information and Systems; [2018] - . JGA-SNP dataset; [cited YYYY Mmm DD]. Available from:
+              |
+              a(href='https://grch38.togovar.org/doc/datasets/jga_snp')
+                | https://grch38.togovar.org/doc/datasets/jga_snp
 
     section.section
       h3#jga_datasets.sectiontitle 含まれる制限公開データセット一覧
