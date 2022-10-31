@@ -5,11 +5,7 @@ import ConditionValueEditorFrequencyCount from './ConditionValueEditorFrequencyC
 import ConditionValueEditorLocation from './ConditionValueEditorLocation.js';
 // import {ADVANCED_CONDITIONS} from '../global.js';
 import { CONDITION_TYPE } from '../definition.js';
-import { ConditionDiseaseSearch } from '../components/ConditionDiseaseSearch/ConditionDiseaseSearch.js';
-import ConditionValueEditorDisease from './ConditionValueEditorDisease.js';
 
-const DISEASE_API_URL =
-  'https://togovar-stg.biosciencedbc.jp/api/search/disease?term=';
 export default class ConditionValues {
   constructor(conditionView, defaultValues) {
     this._conditionView = conditionView;
@@ -90,12 +86,15 @@ export default class ConditionValues {
         break;
       case CONDITION_TYPE.disease:
         this._editors.push(
-          new ConditionValueEditorDisease(
+          new ConditionValueEditorTextField(
+            this,
+            this._conditionView.conditionType
+          ),
+          new ConditionValueEditorColumns(
             this,
             this._conditionView.conditionType
           )
         );
-
         break;
       case CONDITION_TYPE.location:
         this._editors.push(
