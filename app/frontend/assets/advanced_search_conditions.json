@@ -413,6 +413,10 @@
       "label": "Gene symbol",
       "type": "text"
     },
+    "id": {
+      "label": "Variant id",
+      "type": "text"
+    },
     "location": {
       "label": "Location",
       "type": "peculiar"

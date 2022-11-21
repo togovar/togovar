@@ -80,6 +80,14 @@ export default class ConditionValues {
           )
         );
         break;
+      case CONDITION_TYPE.variant_id:
+        this._editors.push(
+          new ConditionValueEditorTextField(
+            this,
+            this._conditionView.conditionType
+          )
+        );
+        break;
       case CONDITION_TYPE.disease:
         this._editors.push(
           new ConditionValueEditorDisease(

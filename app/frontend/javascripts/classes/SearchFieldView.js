@@ -5,7 +5,6 @@ const SUGGEST_LABELS = {
   gene: 'Gene symbol',
   disease: 'Disease name',
 };
-
 const KEY_INCREMENT = {
   ArrowUp: { x: 0, y: -1 },
   ArrowDown: { x: 0, y: 1 },
@@ -53,27 +52,43 @@ export default class SearchFieldView {
 
   // private methods
 
-  _keydown(e) {
-    if (this._suggesting) {
-      if (KEY_INCREMENT[e.code]) {
-        let item = this._suggestView.querySelector(
-          `.column:nth-child(${
-            this.suggestPosition.x + 1
-          }) > .list > .item:nth-child(${this.suggestPosition.y + 1})`
-        );
-        if (item) item.classList.remove('-selected');
+  _itemSelect(e) {
+    if (this._suggesting && KEY_INCREMENT[e.code]) {
+      this._suggestPositionShift(KEY_INCREMENT[e.code]);
 
-        this._suggestPositionShift(KEY_INCREMENT[e.code]);
-        item = this._suggestView.querySelector(
-          `.column:nth-child(${
-            this.suggestPosition.x + 1
-          }) > .list > .item:nth-child(${this.suggestPosition.y + 1})`
-        );
-        item.classList.add('-selected');
+      let item = this._suggestView.querySelector(
+        `.column:nth-child(${this._suggestPosition.x + 1})
+        > .list
+        > .item:nth-child(${this._suggestPosition.y + 1})`
+      );
 
-        e.preventDefault();
-        return false;
-      }
+      if (item)
+        this._suggestView
+          .querySelectorAll('.column>.list .item')
+          .forEach((item) => item.classList.remove('-selected'));
+      item.classList.add('-selected');
+
+      e.preventDefault();
+      // return false;
+    }
+  }
+
+  _suggestDecisionAndShowHide(e) {
+    // e.preventDefault();
+    const hideSuggest =
+      this._suggesting && (e.key === 'Escape' || this._field.value.length < 3);
+    const showSuggest =
+      this._field.value.length >= 3 &&
+      this._field.value !== this.lastValue &&
+      this._conditionType !== CONDITION_TYPE.variant_id;
+
+    switch (true) {
+      case e.key === 'Enter':
+        return this._suggestDecision();
+      case hideSuggest:
+        return this._suggestHide();
+      case showSuggest:
+        return this._suggestShow();
     }
   }
 
@@ -115,6 +130,32 @@ export default class SearchFieldView {
         .then((response) => response.json())
         .then((json) => this._suggest(json));
     }
+
+    if (this._conditionType === CONDITION_TYPE.variant_id) {
+      this._field.dataset.value = this._field.value;
+    }
+
+    this._suggesting = false;
+    this._suggestView.innerHTML = '';
+    this._search();
+  }
+
+  _suggestHide() {
+    this._suggesting = false;
+    this._suggestView.innerHTML = '';
+    this.lastValue = '';
+  }
+
+  _suggestShow() {
+    fetch(`${this._queryURL}${this._field.value}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    })
+      .then((response) => response.json())
+      .then((json) => this._createSuggestList(json));
   }
 
   _blur() {
