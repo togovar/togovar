@@ -1,11 +1,17 @@
 class HGVS
-  ENSEMBL_URL = 'http://grch37.rest.ensembl.org'.freeze
+  ENSEMBL_URL = if ENV['TOGOVAR_FRONTEND_REFERENCE'] == 'GRCh37'
+                  'https://grch37.rest.ensembl.org'.freeze
+                else
+                  'https://rest.ensembl.org'.freeze
+                end
 
   API = '/variant_recoder/human/%s'.freeze
 
-  HGVSG = /^NC_0000((01\.10)|(02\.11)|(03\.11)|(04\.11)|(05\.9)|(06\.11)|(07\.13)|(08\.10)|(09\.11)|(10\.10)|(11\.9)|(12\.11)|(13\.10)|(14\.8)|(15\.9)|(16\.9)|(17\.10)|(18\.9)|(19\.9)|(20\.10)|(21\.8)|(22\.10)|(23\.10)|(24\.9)):g\.(\d+)_?(\d+)?(.+)/.freeze # GRCh37 only
+  HGVSG = /^NC_(\d{6})\.\d+:g\.(\d+)_?(\d+)?(.+)/.freeze
 
   HGVS = /.+:[cgmnpr]\..+/.freeze
+
+  class UnknownSequenceError < StandardError; end
 
   class << self
     def match?(term)
@@ -38,10 +44,20 @@ class HGVS
         elsif hgvsg.present?
           pos = hgvsg.map do |x|
             m = x.match(HGVSG)
-            chr = Integer(m[1]&.slice(0..1))
-            start = m[26]
-            stop = m[27]
-            allele = m[28]
+            chr = if (1..22).cover?((n = Integer(m[1])))
+                    n
+                  elsif n == 23
+                    'X'
+                  elsif n == 24
+                    'Y'
+                  elsif n == 12920
+                    'MT'
+                  else
+                    raise UnknownSequenceError, "Failed to parse HGVSg representation: #{x}"
+                  end
+            start = m[2]
+            stop = m[3]
+            allele = m[4]
 
             if stop
               "#{chr}:#{start}-#{stop}:#{allele}"
@@ -57,6 +73,9 @@ class HGVS
       rescue Faraday::ClientError => e
         Rails.logger.error('HGVS') { e }
         [term, "#{e.response&.status} #{e.response&.reason_phrase}"]
+      rescue UnknownSequenceError => e
+        Rails.logger.error('HGVS') { e }
+        [term, e.message]
       rescue StandardError => e
         Rails.logger.error('HGVS') { e }
         [term, '500 Internal Server Error']

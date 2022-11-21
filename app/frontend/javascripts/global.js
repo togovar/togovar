@@ -5,7 +5,18 @@ export const COMMON_FOOTER_HEIGHT = 22;
 export const API_URL =
   TOGOVAR_FRONTEND_API_URL || 'https://togovar.biosciencedbc.jp';
 export const ADVANCED_CONDITIONS = Object.freeze(
-  require('../assets/advanced_search_conditions.json').conditions
+  ((reference) => {
+    switch (reference) {
+      case 'GRCh37':
+        return require('../assets/GRCh37/advanced_search_conditions.json')
+          .conditions;
+      case 'GRCh38':
+        return require('../assets/GRCh38/advanced_search_conditions.json')
+          .conditions;
+      default:
+        return [];
+    }
+  })(TOGOVAR_FRONTEND_REFERENCE)
 );
 
 export const COLUMNS = [
