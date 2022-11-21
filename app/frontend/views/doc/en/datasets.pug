@@ -11,10 +11,280 @@ block head
 
 block content
   main
-    case TOGOVAR_FRONTEND_REFERENCE
-      when 'GRCh37'
-        include datasets_grch37
-      when 'GRCh38'
-        include datasets_grch38
-      default
-        // none
+    article.common-document
+      header.header
+        h2.title TogoVar datasets
+      .contents
+        section.section
+          h3.sectiontitle
+            | Variant frequencies for which you can apply for use of individual-level data
+            sup ∗1
+            |  to the NBDC human databases
+            sup ∗2
+          p
+            | Click the links at the Included controlled-access datasets to apply for use of individual-level data
+          table.table
+            thead
+              tr
+                th Variant dataset name
+                th Analysis method
+                th Target population
+                th Healthy subjects
+                th Affected subjects
+                th Sample size
+                th
+                  | Number of variants
+                  br
+                  | (# of sites)
+                th Included controlled-access datasets
+            tbody
+              //tr
+                td
+                  a(href="/doc/datasets/bbj_riken") BBJ-RIKEN
+                td._align-left SNP-Chip
+                td Japanese
+                td._align-center
+                td._align-center
+                td._align-center
+                td._align-center
+                td._align-center
+              tr
+                td
+                  a(href="/doc/datasets/gem_j_wga") GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel
+                td._align-left WGS
+                td Japanese
+                td._align-center ✔
+                td._align-center
+                td._align-center
+                  span(style='margin-left:15px;') 7,609
+                td._align-center
+                  | 95,863,463
+                  br
+                  | (90,280,248)
+                td._align-center
+                  a(href="/doc/datasets/gem_j_wga#jga_datasets") 6 datasets
+              tr
+                td
+                  a(href="/doc/datasets/jga_ngs") JGA-NGS
+                td._align-left WES
+                td Japanese
+                td._align-center ✔
+                td._align-center ✔
+                td._align-center
+                  span(style='margin-left:20px;') 125
+                td._align-center
+                  | 4,679,025
+                  br
+                td._align-center
+                  a(href="/doc/datasets/jga_ngs#jga_datasets") 7 datasets
+              tr
+                td
+                  a(href="/doc/datasets/jga_snp") JGA-SNP
+                td._align-left SNP-Chip
+                td Japanese
+                td._align-center ✔
+                td._align-center ✔
+                td._align-center 183,884
+                td._align-center 1,249,724
+                td._align-center
+                  a(href="/doc/datasets/jga_snp#jga_datasets") 3 datasets
+          p.notice
+            | ∗1：fastq/bam/cel files and/or lists of genotype data etc.
+            br
+            | ∗2：
+            a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
+              | Japanese Genotype-phenotype Archive (JGA)
+            |  /
+            |
+            a.hyper-text.-external(target='_blank', href='https://www.biobank.amed.go.jp/itc/agd/index.html')
+              | AMED Genome group sharing Database (AGD)
+        section.section
+          h3.sectiontitle Other variant datasets
+          table.table._column-span-all
+            thead
+              tr
+                th Variant dataset name
+                th Analysis method
+                th Target population
+                th Healthy subjects
+                th Affected subjects
+                th Sample size
+                th
+                  | Number of alleles
+                  br
+                  | (# of sites)
+                th Author
+                th Version/Last updated
+            tbody
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/xml/clinvar_variation/')
+                    | ClinVar
+                td._align-center -
+                td._align-left Mixed
+                td._align-center
+                td._align-center ✔
+                td._align-center —
+                td._align-center
+                  span(style='margin-left:15px;') 788,993
+                td NCBI
+                td 2021
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads')
+                    | Genome Aggregation Database (gnomAD) exomes
+                td._align-left WES
+                td._align-left Mixed
+                td._align-center ✔
+                td._align-center ✔
+                td._align-center
+                  span(style='margin-left:0px;') 125,748
+                td._align-center
+                  | 17,209,972
+                td Broad Institute
+                td v2.1.1
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads')
+                    | Genome Aggregation Database (gnomAD) genomes
+                td._align-left WGS
+                td._align-left Mixed
+                td._align-center ✔
+                td._align-center ✔
+                td._align-center
+                  span(style='margin-left:3px;') 15,708
+                td._align-center
+                  | 261,942,336
+                td Broad Institute
+                td v2.1.1
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='http://www.hgvd.genome.med.kyoto-u.ac.jp/download.html')
+                    | Human Genetic Variation Database (HGVD)
+                td._align-left WES
+                td._align-left Japanese
+                td._align-center ✔
+                td._align-center
+                td._align-center
+                  span(style='margin-left:10px;') 1,208
+                td._align-center
+                  span(style='margin-left:12px;') 554,461
+                  br
+                  span(style='margin-left:12px;') (501,556)
+                td Kyoto University
+                td
+                  | Version 2.30
+                  br
+                  | (2017/08/02)
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/202001/downloads/#variant')
+                    | ToMMo #{ TOMMO_VERSION }KJPN Allele Frequency Panel(#{ TOMMO_VERSION }KJPN)
+                td._align-left WGS
+                td._align-left Japanese
+                td._align-center ✔
+                td._align-center
+                td._align-center
+                  span(style='margin-left:10px;') 8,380
+                td._align-center
+                  | 95,085,851
+                  br
+                  | (79,359,228)
+                td Tohoku Medical Megabank Organization
+                td v202109
+          p.notice
+            | Note 1: TogoVar contains ClinVar variants only in
+            |
+            a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/') the VCF file
+            | , GRCh37 positions of which were determined.
+            br
+            | Note 2 : #{ TOMMO_VERSION }KJPN consists of SNVs (Autosome, chrX(PAR1+PAR2+XTR) and chrMT) and INDELs (Autosome and
+            | chrX(PAR1+PAR2+XTR)). See
+            |
+            a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/202001/variants/statistics')
+              | Summary of ToMMo #{ TOMMO_VERSION }KJPN
+            | .
+        section.section
+          h3.sectiontitle
+            | Non-variant datasets
+          table.table
+            thead
+              tr
+                th Dataset name
+                th Version/Last update
+                th Description
+                th Author
+            tbody
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='ftp://ftp.dbcls.jp/colil') Colil
+                td Obtained by API
+                td Information on citation relationships in life sciences literature
+                td DBCLS
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh37.p13')
+                    | GRCh37.p13
+                td 2013/06/28
+                td Human genome reference sequence
+                td GRC
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/tsv/hgnc_complete_set.txt')
+                    | HGNC symbol report
+                td 2021
+                td Approved human gene nomenclature and associated gene information
+                td HGNC
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/CBBresearch/Lu/Demo/LitVar/')
+                    | LitVar
+                td Obtained by API
+                td Information on papers in which the names of variants appear
+                td NCBI
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/') PubTator Central
+                td 2021
+                td Information on papers in which the names of variants appear
+                td NCBI
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='http://togogenome.org/') TogoGenome
+                td ‐
+                td Comprehensive information on genomes
+                td DBCLS
+        section.section
+          h3.sectiontitle Tools for data processing
+          table.table
+            thead
+              tr
+                th Name
+                th Ver.
+                th Description
+                th Author
+            tbody
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='https://samtools.github.io/bcftools/') bcftools
+                td
+                td Normalize indels and split multiallelic sites into biallelic variants
+                td Genome Research Ltd.
+              tr
+                td
+                  a(href="/doc/datasets/analysis") BioReT
+                td ‐
+                td Execute programs for variant discovery from NGS data in proper order
+                td
+                  a.hyper-text.-external(target='_blank', href='https://amelieff.jp/') Amelieff
+              tr
+                td
+                  a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/index.html')
+                    | Variant Effect Predictor (VEP)
+                td Ensembl release 104
+                td
+                  | Add
+                  a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/script/vep_cache.html#cache_content')
+                    | annotations like gene names or consequences
+                  |  to variants
+                td EMBL-EBI

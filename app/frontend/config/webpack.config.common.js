@@ -23,13 +23,7 @@ const config = {
     rules: [
       {
         test: /\.pug$/,
-        use: {
-          loader: 'pug-loader',
-          options: {
-            globals: ["GLOBALS"],
-            pretty: true,
-          }
-        }
+        use: 'pug-loader',
       },
       {
         test: /\.js$/,
@@ -131,7 +125,6 @@ const config = {
     new WebpackManifestPlugin(),
     new webpack.DefinePlugin({
       TOGOVAR_FRONTEND_API_URL: JSON.stringify(process.env.TOGOVAR_FRONTEND_API_URL),
-      TOGOVAR_FRONTEND_REFERENCE: JSON.stringify(process.env.TOGOVAR_FRONTEND_REFERENCE),
       TOGOVAR_FRONTEND_STANZA_URL: JSON.stringify(process.env.TOGOVAR_FRONTEND_STANZA_URL),
       TOGOVAR_ENDPOINT_SPARQL: JSON.stringify(process.env.TOGOVAR_ENDPOINT_SPARQL),
       TOGOVAR_ENDPOINT_SPARQLIST: JSON.stringify(process.env.TOGOVAR_ENDPOINT_SPARQLIST),

@@ -54,8 +54,6 @@ block content
                   a.link(href='#d6') What are SIFT and PolyPhen?
                 li.item.-question
                   a.link(href='#d7') How do you calculate the value of Clinical significance?
-                li.item.-question
-                  a.link(href='#d8')  Was a liftover tool used for generating variant data?
             li.category
               h3.categorytitle About the TogoVar search system
               ul.categorylist
@@ -75,8 +73,7 @@ block content
                   a.link(href='#s5') What can I do with the Advanced search?
                 li.item.-question
                   a.link(href='#s6') Can I search for variants with different alternative allele frequencies between Japanese and other populations?
-                li.item.-question
-                  a.link(href='#s7') Can I search for variants by both positions on GRCh38 and GRCh37?
+
 
       .contents
         section.section
@@ -239,11 +236,6 @@ block content
                 a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv')
                   | clinical significance in ClinVar
                 |  is displayed.
-          #d8.question-answer
-            h4.question Was a liftover tool used for generating variant data?
-            .answer
-              p
-                | Yes. We used CrossMap to lift over the GRCh37 dataset to GRCh38 when no variant dataset detected by using the GRCh38 genome reference was available.
 
         section.section
           h3.sectiontitle About the TogoVar search system
@@ -691,9 +683,3 @@ block content
                   li
                     img(src=require("../../../images/help-cross.png").default alt="help-cross")
                     | ：Delete search criteria
-          #s7.question-answer._column-span-all
-            h4.question Can I search for variants by both positions on GRCh38 and GRCh37?
-            .answer
-              p
-              | Yes. The version number of the reference sequence is displayed at the header. Click the version number to switch to the other.
-              img(src=require("../../../images/help-image10.png").default alt="help-image10")

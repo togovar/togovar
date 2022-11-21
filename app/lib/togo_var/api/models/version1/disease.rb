@@ -16,8 +16,11 @@ module TogoVar
           def to_hash
             validate
 
-            terms = @sub_concepts ? @terms.map { |x| [x, DiseaseMondo.sub_concepts(x)] }.flatten.uniq : @terms
-            terms = terms.map { |x| x.start_with?('MONDO_') ? DiseaseMondo.mondo2cui(x) : x }.flatten.uniq
+            terms = if @sub_concepts
+                      @terms + DiseaseMondo.sub_concepts(@terms.first)
+                    else
+                      @terms
+                    end
 
             q = Elasticsearch::DSL::Search.search do
               query do

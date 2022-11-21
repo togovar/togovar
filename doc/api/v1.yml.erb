@@ -402,10 +402,6 @@ components:
               $ref: '#/components/examples/SearchVariant-6'
             Example7:
               $ref: '#/components/examples/SearchVariant-7'
-            Example8:
-              $ref: '#/components/examples/SearchVariant-8'
-            Example9:
-              $ref: '#/components/examples/SearchVariant-9'
 
     SearchGene:
       description: Schema for searching gene
@@ -866,10 +862,10 @@ components:
               type: array
               items:
                 type: string
-                description: MedGen ID or Mondo ID
+                description: MedGen ID
             sub_concepts:
               type: boolean
-              description: "Include diseases of subordinate concepts in the Mondo Disease Ontology (default: true)"
+              description: "Include all descendant nodes in the Mondo Disease Ontology (default: true)"
               example: true
 
     Dataset:
@@ -1360,15 +1356,6 @@ components:
               - C2675520
 
     SearchVariant-8:
-      summary: List variants associated with MONDO_0003582 (hereditary breast ovarian cancer syndrome).
-      value:
-        query:
-          disease:
-            relation: eq
-            terms:
-              - MONDO_0003582
-
-    SearchVariant-9:
       summary: Paginate result over 10,000 records.
       value:
         query:

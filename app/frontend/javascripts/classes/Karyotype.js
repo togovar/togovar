@@ -261,7 +261,7 @@ export default class Karyotype {
     )[0];
 
     // 染色体座標データ
-    const tsv = require(`../../assets/${karyotype.reference}/karyotype.tsv`);
+    const tsv = require(`../../assets/${karyotype.reference}.tsv`);
     this.geneMap = this.parseGeneMap(tsv);
     this.maxLength = Math.max(
       ...this.geneMap.map((chromosome) => chromosome[chromosome.length - 1].end)

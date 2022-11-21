@@ -11,10 +11,239 @@ block head
 
 block content
   main
-    case TOGOVAR_FRONTEND_REFERENCE
-      when 'GRCh37'
-        include gem_j_wga_grch37
-      when 'GRCh38'
-        include gem_j_wga_grch38
-      default
-        // none
+    article.common-document
+      header.header
+        h2.title GEM Japan Whole Genome Aggregation (GEM-J WGA)パネル
+      .contents
+        section.section
+          h3.sectiontitle 概要
+          p.body
+            | 日本各地から収集した7,609人分の全ゲノム配列情報(Whole Genome Sequence: WGS)を解析して得られた日本人一般集団のバリアント頻度データセットです。全ゲノム配列情報も制限公開データとして利用可能です。国立研究開発法人日本医療研究開発機構(AMED)が推進する
+            a.hyper-text.-external(target='_blank', href='https://www.amed.go.jp/aboutus/collaboration/ga4gh_gem_japan.html')
+              | GEnome Medical alliance Japan（GEM Japan, ジェムジャパン）プロジェクト
+            | の一環として実施された、
+            a.hyper-text.-external(target='_blank', href='https://www.megabank.tohoku.ac.jp/') 東北大学東北メディカル・メガバンク機構（ToMMo)
+            | 、
+            a.hyper-text.-external(target='_blank', href='http://iwate-megabank.org/') 岩手医科大学いわて東北メディカル・メガバンク機構（IMM）
+            | 、
+            a.hyper-text.-external(target='_blank', href='https://www.riken.jp/') 理化学研究所
+            | および
+            a.hyper-text.-external(target='_blank', href='https://www.ims.u-tokyo.ac.jp/imsut/jp/index.html') 東京大学医科学研究所
+            | による共同研究の成果です。詳しくは
+            a.hyper-text.-external(target='_blank', href='https://www.amed.go.jp/aboutus/collaboration/ga4gh_gem_japan.html') プレスリリース
+            | をご覧ください。
+          ul.unordered-list
+            li バージョン/最終更新日：2020/07/27
+            li サンプル数：7,609
+            li バリアント座位数：90,280,248
+          a#terms
+          table.table._column-span-all
+            thead
+              tr
+                th#chrom(rowspan='2')
+                th#snvs._align-left(colspan='2') SNV
+                th#indels._align-left(colspan='2') INDEL
+              tr
+                th#snvs_total._align-left(headers='snvs total') 総数
+                th#snvs_novel._align-left(headers='snvs novel') 新規数
+                th#indels_total._align-left(headers='indels total') 総数
+                th#indels_novel._align-left(headers='indels novel') 新規数
+            tbody
+              tr
+                th#autosomes._nowrap(headers='chrom') 常染色体
+                td(headers='snvs_total autosomes')
+                  span 76,768,387
+                td(headers='snvs_novel autosomes')
+                  span 35,660,425
+                td(headers='indels_total autosomes')
+                  span 10,202,908
+                td(headers='indels_novel autosomes')
+                  span 4,152,671
+              tr
+                th#x_chrom._nowrap(headers='chrom') X 染色体
+                td(headers='snvs_total x_chrom')
+                  span 2,898,518
+                td(headers='snvs_novel x_chrom')
+                  span 1,420,888
+                td(headers='indels_total x_chrom')
+                  span 410,435
+                td(headers='indels_novel x_chrom')
+                  span 164,077
+          p.body ※ dbSNP152に記載がないものを新規としてカウント
+
+        section.section
+          h3.sectiontitle 利用条件
+          .subsection
+            p.body
+              a(rel='license', href='http://creativecommons.org/licenses/by/4.0/deed.ja')
+                img(alt='クリエイティブ・コモンズ・ライセンス', style='border-width:0', src='https://i.creativecommons.org/l/by/4.0/88x31.png')
+              br
+              a(href='https://www.amed.go.jp/aboutus/collaboration/ga4gh_gem_japan.html')
+                | GEnome Medical alliance Japan（GEM Japan, ジェムジャパン）プロジェクト
+              |  作『
+              a(href='/doc/ja/datasets/gem_j_wga')
+                | GEM Japan Whole Genome Aggregation (GEM-J WGA)パネル
+              | 』は
+              a(rel='license', href='http://creativecommons.org/licenses/by/4.0/deed.ja')
+                | クリエイティブ・コモンズ 表示 4.0 国際 ライセンス
+              | で提供されています。なお、追加条件として、研究参加者を特定する⾏為および研究参加者に接触・連絡する⾏為を禁⽌します。また、データについていかなる保証および責任を負いません。
+              a(rel='license', href='https://creativecommons.org/licenses/by/4.0/legalcode.ja')
+                | クリエイティブ・コモンズ 表示 4.0 国際 ライセンス 第5条 無保証および責任制限
+              | に準拠します。
+            h4.subheading ライセンスおよびクレジット表示例
+            p.body
+              a(href='/doc/datasets/gem_j_wga') "GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel"
+              |  by
+              |
+              a(target='_blank', href='https://www.amed.go.jp/en/aboutus/collaboration/ga4gh_gem_japan.html')
+                | GEnome Medical alliance Japan Project (GEM-J)
+              |  is licensed under
+              |
+              a(target='_blank', href='https://creativecommons.org/licenses/by/4.0/')
+                | CC BY 4.0
+              | . See also
+              |
+              a(href='/doc/datasets/gem_j_wga#terms') additional terms of use
+              | .
+            h4.subheading 論文等での引用例
+            p.body
+              a(href='/doc/datasets/gem_j_wga') "GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel"
+              | . Japan:
+              |
+              a(target='_blank', href='https://www.amed.go.jp/en/aboutus/collaboration/ga4gh_gem_japan.html')
+                | GEnome
+                | Medical alliance Japan Project (GEM-J)
+              | . Available from:
+              |
+              a(href='/doc/datasets/gem_j_wga') https://togovar.biosciencedbc.jp/doc/datasets/gem_j_wga
+              | .
+
+        section.section
+          h3.sectiontitle 頻度データダウンロード
+          p.body
+            a(href='/downloads/gem_j_wga/') VCFファイルをダウンロード
+            | できます。
+
+        section.section
+          h3.sectiontitle 解析の結果得られたデータ
+          a#jga_datasets
+          p.body
+            | データセットの利用を希望される場合は、
+            a.hyper-text.-external(target='_blank', href='https://gr-sharingdbs.biosciencedbc.jp/agd-data-use') AMEDゲノム制限共有データベースに利用申請
+            | してください。
+          a#gem_j_datasets
+          table.table._column-span-all
+            thead
+              tr
+                th データセットID
+                th AGD
+                th 研究題目
+                th ファイルフォーマット
+                th サンプル数
+            tbody
+              tr
+                td._align-center(colspan='2') 公開準備中
+                td GEM Japan Whole Genome Aggregation (GEM-J WGA) パネルの作成
+                td VCF
+                td._align-center 7,609
+
+        section.section
+          h3.sectiontitle 頻度データ作成に用いられたデータセット一覧
+          p
+            | 以下のデータセットの利用を希望される場合、データセットIDがJGADで始まるデータセットは
+            a.hyper-text.-external(target='_blank', href='https://humandbs.biosciencedbc.jp/data-use') NBDCヒトデータベースに利用申請
+            | を、AGDDから始まるデータセットは
+            a.hyper-text.-external(target='_blank', href='https://gr-sharingdbs.biosciencedbc.jp/agd-data-use') AMEDゲノム制限共有データベースに利用申請
+            | してください。
+          a#gem_j_original_datasets
+          table.table._column-span-all
+            thead
+              tr._align-center
+                th#dataset_id
+                  | データセットID
+                  br
+                  | (ヒトDB)
+                th#study_title 研究題目
+                th#participants 対象集団
+                th#sample_size サンプル数
+                th#data_provider データ提供元
+            tfoot
+              tr
+                th#total_table._align-center(headers='dataset_id study_title participants', colspan='3') 合計
+                th#total_number._align-right(headers='sample_size') 7,609
+            tbody
+              tr
+                td._align-center._nowrap(headers='dataset_id')
+                  a.hyper-text.-external(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000220')
+                    | JGAD000220
+                  br
+                  | (
+                  a.hyper-text.-external(target='_blank', href='https://humandbs.biosciencedbc.jp/hum0014-v21') hum0014
+                  | )
+                td(headers='study_title') オーダーメイド医療の実現プログラム
+                td(headers='participants') 2003年から2007年度にバイオバンク・ジャパンに登録された47疾患
+                td._align-right(headers='sample_size') 768
+                td(headers='data_provider') バイオバンクジャパン
+              tr
+                td._align-center._nowrap(headers='dataset_id')
+                  | AGDS_00000000005
+                  br
+                  | (
+                  a.hyper-text.-external(target='_blank', href='https://gr-sharingdbs.biosciencedbc.jp/agd0008-v1') agd0008
+                  | )
+                td(headers='study_title') バイオバンク・ジャパンの運営・管理と個別化医療の実現に向けた疾患バイオマーカー探索
+                td(headers='participants') 心筋梗塞、胃がん（非腫瘍組織）、認知症
+                td._align-right(headers='sample_size') 2,089
+                td(headers='data_providers') バイオバンクジャパン
+              tr
+                td._align-center._nowrap(headers='dataset_id')
+                  a.hyper-text.-external(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000117')
+                    | JGAD000117
+                  br
+                  | (
+                  a.hyper-text.-external(target='_blank', href='https://humandbs.biosciencedbc.jp/hum0103-v2') hum0103
+                  | )
+                td(headers='study_title') 日本人の胆道がんにおけるゲノム変異を探索する
+                td(headers='participants') 胆道がん(非腫瘍組織)
+                td._align-right(headers='sample_size') 17
+                td(headers='data_providers') 理化学研究所
+              tr
+                td._align-center._nowrap(headers='dataset_id')
+                  a.hyper-text.-external(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000228')
+                    | JGAD000228
+                  br
+                  | (
+                  a.hyper-text.-external(target='_blank', href='https://humandbs.biosciencedbc.jp/hum0158-v2') hum0158
+                  | )
+                td(headers='study_title') 日本人の肝臓がんにおけるゲノム変異を探索する
+                td(headers='participants') 肝臓がん(非腫瘍組織)
+                td._align-right(headers='sample_size') 220
+                td(headers='data_providers') 理化学研究所
+              tr
+                td._align-center._nowrap(headers='dataset_id')
+                  a.hyper-text.-external(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000223')
+                    | JGAD000233
+                  br
+                  | (
+                  a.hyper-text.-external(target='_blank', href='https://humandbs.biosciencedbc.jp/hum0160-v1') hum0160
+                  | )
+                td(headers='study_title') 日本人の食道がんにおけるゲノム変異を探索する
+                td(headers='participants') 食道がん(非腫瘍組織)
+                td._align-right(headers='sample_size') 20
+                td(headers='data_providers') 理化学研究所
+              tr
+                td._align-center._nowrap(headers='dataset_id')
+                  a.hyper-text.-external(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000338')
+                    | JGAD000338
+                  br
+                  a.hyper-text.-external(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000339')
+                    | JGAD000339
+                  br
+                  | (
+                  a.hyper-text.-external(target='_blank', href='https://humandbs.biosciencedbc.jp/hum0184-v1') hum0184
+                  | )
+                td(headers='study_title') 日本人全ゲノムデータベースの構築
+                td(headers='participants') 一般住民
+                td._align-right(headers='sample_size') 4,495
+                td(headers='data_providers') 東北メディカル・メガバンク機構
+          p.body ※variant calling前のデータであり、解析後のデータは現在公開準備中です。また、サンプル数は今回の解析に用いられたサンプル数であり、登録されたサンプル数とは異なります。

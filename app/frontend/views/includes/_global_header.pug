@@ -6,22 +6,6 @@ header#GlobalHeader
       img.logotype(src=require("../../images/logotype.svg").default alt="TOGO VAR")
     span.summary A comprehensive Japanese genetic variation database
 
-    .dropdown-view
-      button.button #{TOGOVAR_FRONTEND_REFERENCE}
-      .selectshow
-        ul.list
-          li.item
-            case TOGOVAR_FRONTEND_REFERENCE
-              when 'GRCh37'
-                a.link.-active GRCh37
-              when 'GRCh38'
-                a.link(href="http://grch37.togovar.org/") GRCh37
-          li.item
-            case TOGOVAR_FRONTEND_REFERENCE
-              when 'GRCh37'
-                a.link(href="http://grch38.togovar.org/") GRCh38
-              when 'GRCh38'
-                a.link.-active GRCh38
   .menus
     ul.menu.navigation
       li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^home/)})
