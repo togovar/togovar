@@ -23,7 +23,7 @@ input[type="range"]::-webkit-slider-runnable-track {
 .-vertical {
   transform: rotate(-90deg);
 }
-  
+
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     height: 1em;
@@ -50,7 +50,7 @@ input[type="range"]::-webkit-slider-thumb {
     <div class="meter" part="meter">
       <div class="meter-container" part="meter-container">
         <div class="slider-track" id="slider-track" part="slider-track">
-          <div class="ruler" part="ruler"></div> 
+          <div class="ruler" part="ruler"></div>
         </div>
         <input
             part = "slider"
