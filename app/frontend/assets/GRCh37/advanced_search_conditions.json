@@ -39,12 +39,6 @@
           "value": "gnomad_genomes",
           "label": "gnomAD genomes",
           "description": ""
-        },
-        {
-          "id": 7,
-          "value": "gnomad_exomes",
-          "label": "gnomAD exomes",
-          "description": ""
         }
       ]
     },
