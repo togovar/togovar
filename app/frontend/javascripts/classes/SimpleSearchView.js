@@ -1,37 +1,43 @@
-import StoreManager from "./StoreManager.js";
-import SearchFieldView from "./SearchFieldView.js";
+import StoreManager from './StoreManager.js';
+import SearchFieldView from './SearchFieldView.js';
 
 const EXAMPLES = [
   {
     key: 'Disease',
-    value: 'Breast-ovarian cancer, familial 2'
+    value: 'Breast-ovarian cancer, familial 2',
   },
   {
     key: 'Gene',
-    value: 'ALDH2'
+    value: 'ALDH2',
   },
   {
     key: 'refSNP',
-    value: 'rs114202595'
+    value: 'rs114202595',
   },
   {
     key: 'TogoVar',
-    value: 'tgv421843'
+    value: 'tgv421843',
   },
   {
     key: 'Position(GRCh37/hg19)',
-    value: '16:48258198'
+    value: '16:48258198',
   },
   {
     key: 'Region(GRCh37/hg19)',
-    value: '10:73270743-73376976'
-  }
-]
+    value: '10:73270743-73376976',
+  },
+  {
+    key: 'HGVSc',
+    value: 'NM_000690:c.1510G>A',
+  },
+  {
+    key: 'HGVSp',
+    value: 'ALDH2:p.Glu504Lys',
+  },
+];
 
 export default class SimpleSearchView {
-
   constructor() {
-
     const elm = document.getElementById('SimpleSearchView');
     this._searchFieldView = new SearchFieldView(
       this,
@@ -47,14 +53,19 @@ export default class SimpleSearchView {
     if (term) this._searchFieldView.setTerm(term);
 
     // examples
-    this._searchFieldView.setExamples(EXAMPLES)
-      .forEach(dl => {
-        dl.addEventListener('click', e => {
+    this._searchFieldView.setExamples(EXAMPLES).forEach((dl) => {
+      dl.addEventListener(
+        'click',
+        (e) => {
           e.stopPropagation();
-          this._searchFieldView.setTerm(dl.querySelector('dd').textContent, true);
-        }, true);
-      });
-
+          this._searchFieldView.setTerm(
+            dl.querySelector('dd').textContent,
+            true
+          );
+        },
+        true
+      );
+    });
   }
 
   search(value) {
@@ -66,5 +77,4 @@ export default class SimpleSearchView {
       this._searchFieldView.setTerm(conditions.term);
     }
   }
-
 }
