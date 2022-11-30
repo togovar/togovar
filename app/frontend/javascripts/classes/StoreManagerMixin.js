@@ -146,7 +146,7 @@ export const mixin = {
                   condition[conditionKey][item] !==
                   conditionMaster.items.find(
                     (condition) => condition.id === item
-                  ).default
+                  )?.default
                 ) {
                   filtered[item] = condition[conditionKey][item];
                 }
