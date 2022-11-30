@@ -23,7 +23,7 @@ input[type="range"]::-webkit-slider-runnable-track {
 .-vertical {
   transform: rotate(-90deg);
 }
-  
+
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     height: 1em;
@@ -50,7 +50,7 @@ input[type="range"]::-webkit-slider-thumb {
     <div class="meter" part="meter">
       <div class="meter-container" part="meter-container">
         <div class="slider-track" id="slider-track" part="slider-track">
-          <div class="ruler" part="ruler"></div> 
+          <div class="ruler" part="ruler"></div>
         </div>
         <input
             part = "slider"
@@ -311,7 +311,6 @@ class RangeSlider extends HTMLElement {
   connectedCallback() {
     this.min = this.getAttribute('min') || 0;
     this.max = this.getAttribute('max') || 1;
-    this.step = this.getAttribute('step') || 0.01;
     this.value1 = this.getAttribute('value1') || 0;
     this.value2 = this.getAttribute('value2') || 1;
     this.orientation = this.getAttribute('orientation') || 'horizontal';
@@ -372,6 +371,7 @@ class RangeSlider extends HTMLElement {
 
     this.state.min = this.min;
     this.state.max = this.max;
+    this.state.step = this.getAttribute('step') || 0.01;
     this.state.from = Math.min(+this.value1, +this.value2);
     this.state.to = Math.max(+this.value1, +this.value2);
     this.state.invert = this.getAttribute('invert') === 'true';
