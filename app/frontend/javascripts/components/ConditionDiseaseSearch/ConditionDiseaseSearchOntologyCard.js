@@ -1,4 +1,4 @@
-import { LitElement, html, css, nothing, unsafeCSS } from 'lit';
+import { LitElement, html, css, nothing } from 'lit';
 import { ref, createRef } from 'lit/directives/ref.js';
 
 const KEYS_MAP = {
