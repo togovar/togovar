@@ -86,7 +86,11 @@ export default class ConditionTextSearch extends LitElement {
         this._select(this.suggestData[this.currentSuggestionIndex]);
         break;
       case 'Escape':
-        this._hideSuggestions();
+        if (this.showSuggestions) {
+          this._hideSuggestions();
+        } else {
+          this.showSuggestions = true;
+        }
         break;
       default:
         break;
