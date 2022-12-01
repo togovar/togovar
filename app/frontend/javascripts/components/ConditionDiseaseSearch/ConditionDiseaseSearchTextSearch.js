@@ -10,7 +10,6 @@ import { API_URL } from '../../global';
 const DISEASE_ADVANCED_SUGGEST_URL = `${API_URL}/api/search/disease?term=`;
 
 export default class ConditionTextSearch extends LitElement {
-  suggestions = [];
   inputRef = createRef();
   suggestionListRef = createRef();
   API = new cachedAxios(DISEASE_ADVANCED_SUGGEST_URL);
@@ -19,7 +18,10 @@ export default class ConditionTextSearch extends LitElement {
     (value) => {
       if (value.length >= 3) {
         this.showSuggestions = true;
-        return this.API.get(value);
+
+        return this.API.get(value).then(
+          (data) => (this.suggestData = data.data)
+        );
       }
       return Promise.resolve(() => (this.showSuggestions = false));
     },
@@ -29,6 +31,11 @@ export default class ConditionTextSearch extends LitElement {
   static properties = {
     value: { type: String, state: true },
     showSuggestions: { type: Boolean, state: true },
+    currentSuggestionIndex: { type: Number, state: true },
+    suggestData: {
+      type: Array,
+      state: true,
+    },
   };
 
   constructor(placeholder = 'Enter disease name') {
@@ -36,6 +43,9 @@ export default class ConditionTextSearch extends LitElement {
     this.value = '';
     this.placeholder = placeholder;
     this.showSuggestions = false;
+    this.currentSuggestionIndex = -1;
+    this.suggestData = null;
+    this.highlightIndex = -1;
   }
 
   _keyup(e) {
@@ -59,19 +69,6 @@ export default class ConditionTextSearch extends LitElement {
     this.showSuggestions = false;
   }
 
-  _getSearchSuggestions() {
-    const result = fetch(DISEASE_ADVANCED_SUGGEST_URL + this.value, {
-      headers: {
-        'Content-type': 'application/json',
-        Accept: 'application/json',
-      },
-    })
-      .then((result) => result.json())
-      .then((json) => {
-        this.suggestions = json;
-      });
-  }
-
   willUpdate(changed) {
     if (changed.has('value')) {
       if (this.value.length >= 3) {
@@ -80,10 +77,39 @@ export default class ConditionTextSearch extends LitElement {
         this.showSuggestions = false;
       }
     }
+    if (changed.has('suggestData') && this.suggestData?.length) {
+      this.currentSuggestionIndex = -1;
+    }
+    if (changed.has('currentSuggestionIndex')) {
+      if (this.suggestData?.length) {
+        if (this.currentSuggestionIndex > this.suggestData?.length - 1) {
+          this.currentSuggestionIndex = 0;
+        }
+        if (this.currentSuggestionIndex < 0) {
+          this.currentSuggestionIndex = this.suggestData.length - 1;
+        }
+      }
+    }
   }
 
   createRenderRoot() {
     return this;
+  }
+
+  _handleUpDownKeys(e) {
+    switch (e.key) {
+      case 'ArrowUp':
+        this.currentSuggestionIndex--;
+        break;
+      case 'ArrowDown':
+        this.currentSuggestionIndex++;
+        break;
+      case 'Enter':
+        this._select(this.suggestData[this.currentSuggestionIndex]);
+        break;
+      default:
+        break;
+    }
   }
 
   render() {
@@ -103,6 +129,8 @@ export default class ConditionTextSearch extends LitElement {
               @focusin="${() => {
                 this.showSuggestions = true;
               }}"
+              @click="${() => (this.currentSuggestionIndex = -1)}"
+              @keydown="${this._handleUpDownKeys}"
             />
           </div>
         </div>
@@ -119,21 +147,20 @@ export default class ConditionTextSearch extends LitElement {
                       html`
                         <div class="error"><span>${error.message}</span></div>
                       `,
-                    complete: ({ data }) => {
-                      let num = 0;
-                      for (let d in data) {
-                        num++;
-                      }
-                      if (!num) {
+                    complete: () => {
+                      if (!this.suggestData?.length) {
                         return html`<div class="empty">
                           <span>No suggestions was found</span>
                         </div>`;
                       }
                       return html`
                         <ul class="list">
-                          ${map(data, (suggestion) => {
+                          ${map(this.suggestData, (suggestion, index) => {
                             return html`<li
-                              class="item"
+                              class="item ${this.currentSuggestionIndex ===
+                              index
+                                ? '-selected'
+                                : ''}"
                               @mousedown="${() => this._select(suggestion)}"
                             >
                               ${unsafeHTML(suggestion.highlight)}
