@@ -7,6 +7,7 @@ import { debounce } from '../../utils/debounce';
 import { cachedAxios } from '../../utils/cachedAxios';
 import { API_URL } from '../../global';
 import { scrollMeUp } from './scrollMeUp';
+
 const DISEASE_ADVANCED_SUGGEST_URL = `${API_URL}/api/search/disease?term=`;
 
 export default class ConditionTextSearch extends LitElement {
@@ -68,33 +69,6 @@ export default class ConditionTextSearch extends LitElement {
     this.showSuggestions = false;
   }
 
-  willUpdate(changed) {
-    if (changed.has('value')) {
-      if (this.value.length >= 3) {
-        this.showSuggestions = true;
-      } else {
-        this.showSuggestions = false;
-      }
-    }
-    if (changed.has('suggestData') && this.suggestData?.length) {
-      this.currentSuggestionIndex = -1;
-    }
-    if (changed.has('currentSuggestionIndex')) {
-      if (this.suggestData?.length) {
-        if (this.currentSuggestionIndex > this.suggestData?.length - 1) {
-          this.currentSuggestionIndex = 0;
-        }
-        if (this.currentSuggestionIndex < 0) {
-          this.currentSuggestionIndex = this.suggestData.length - 1;
-        }
-      }
-    }
-  }
-
-  createRenderRoot() {
-    return this;
-  }
-
   _handleUpDownKeys(e) {
     switch (e.key) {
       case 'ArrowUp':
@@ -111,6 +85,33 @@ export default class ConditionTextSearch extends LitElement {
     }
   }
 
+  willUpdate(changed) {
+    if (changed.has('value')) {
+      if (this.value.length >= 3) {
+        this.showSuggestions = true;
+      } else {
+        this.showSuggestions = false;
+      }
+    }
+    if (changed.has('suggestData') && this.suggestData?.length) {
+      this.currentSuggestionIndex = -1;
+    }
+    if (changed.has('currentSuggestionIndex') && this.showSuggestions) {
+      if (this.suggestData?.length) {
+        if (this.currentSuggestionIndex > this.suggestData?.length - 1) {
+          this.currentSuggestionIndex = 0;
+        }
+        if (this.currentSuggestionIndex < 0) {
+          this.currentSuggestionIndex = this.suggestData.length - 1;
+        }
+      }
+    }
+  }
+
+  createRenderRoot() {
+    return this;
+  }
+
   render() {
     return html`
       <div class="search-field-view">
@@ -123,6 +124,7 @@ export default class ConditionTextSearch extends LitElement {
               value="${this.value}"
               @input="${debounce(this._keyup, 300)}"
               @focusout="${() => {
+                this.currentSuggestionIndex = -1;
                 this.showSuggestions = false;
               }}"
               @focusin="${() => {

@@ -2,7 +2,7 @@ import { directive, AsyncDirective } from 'lit/async-directive.js';
 
 class ScrollMeUp extends AsyncDirective {
   update(part, [selected]) {
-    if (selected) {
+    if (selected && part.element.parentElement) {
       this._scrollParentToChild(part.element.parentElement, part.element);
     }
   }
