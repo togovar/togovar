@@ -11,6 +11,15 @@ $PADDING_SIDE: 14px
   > .column
     + .column
       border-left: solid 1px $COLOR_SEPARATOR_SUB
+    > .title
+      color: $COLOR_KEY_DARK1
+      font-size: 12px
+      font-weight: normal
+      line-height: 16px
+      margin: 4px 0 0
+      padding: 5px $PADDING_SIDE 0
+      &:first-letter 
+        text-transform: capitalize
     > .empty
       padding: 0 $PADDING_SIDE
       height: 5rem
@@ -42,7 +51,6 @@ $PADDING_SIDE: 14px
       margin: 10px 0
       padding-left: 0
       list-style: none
-      max-height: 20vh
       overflow-y: auto
       > .item
         cursor: pointer
@@ -82,3 +90,4 @@ $PADDING_SIDE: 14px
           width: 100%
           height: 100%
           background: url(../images/loading.gif) no-repeat 50% 50%
+
