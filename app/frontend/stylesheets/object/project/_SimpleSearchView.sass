@@ -1,8 +1,15 @@
+$SIZE: 30px
+
 #SimpleSearchView
   > .search-field-view
     > .fieldcontainer, > .examples
       display: none
+    > .fieldcontainer >.field
+      >input[type="text"]
+        width: calc(100% - #{$SIZE - 3px})
+        margin-left: -3px
   &.-current
+    .text-field-editor-view
     > .search-field-view
       padding: 14px $PADDING_SIDE 14px
       > .fieldcontainer, > .examples
@@ -11,4 +18,4 @@
       // > .examples
       > .suggest-view
         top: 43px
-        left: 25px
+        left: 23px
