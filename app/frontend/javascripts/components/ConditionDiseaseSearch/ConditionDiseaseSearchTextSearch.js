@@ -6,12 +6,11 @@ import { ref, createRef } from 'lit/directives/ref.js';
 import { debounce } from '../../utils/debounce';
 import { cachedAxios } from '../../utils/cachedAxios';
 import { API_URL } from '../../global';
-
+import { scrollMeUp } from './scrollMeUp';
 const DISEASE_ADVANCED_SUGGEST_URL = `${API_URL}/api/search/disease?term=`;
 
 export default class ConditionTextSearch extends LitElement {
   inputRef = createRef();
-  suggestionListRef = createRef();
   API = new cachedAxios(DISEASE_ADVANCED_SUGGEST_URL);
   apiTask = new Task(
     this,
@@ -137,7 +136,7 @@ export default class ConditionTextSearch extends LitElement {
 
         ${this.showSuggestions
           ? html`
-              <div class="suggest-view" ${ref(this.suggestionListRef)}>
+              <div class="suggest-view" >
                 <div class="column">
                   
                   ${this.apiTask.render({
@@ -162,6 +161,9 @@ export default class ConditionTextSearch extends LitElement {
                                 ? '-selected'
                                 : ''}"
                               @mousedown="${() => this._select(suggestion)}"
+                              ${scrollMeUp(
+                                this.currentSuggestionIndex === index
+                              )}
                             >
                               ${unsafeHTML(suggestion.highlight)}
                             </li>`;
