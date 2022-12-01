@@ -66,7 +66,12 @@ export default class ConditionTextSearch extends LitElement {
       })
     );
 
+    this._hideSuggestions();
+  }
+
+  _hideSuggestions() {
     this.showSuggestions = false;
+    this.currentSuggestionIndex = -1;
   }
 
   _handleUpDownKeys(e) {
@@ -79,6 +84,9 @@ export default class ConditionTextSearch extends LitElement {
         break;
       case 'Enter':
         this._select(this.suggestData[this.currentSuggestionIndex]);
+        break;
+      case 'Escape':
+        this._hideSuggestions();
         break;
       default:
         break;
@@ -123,10 +131,7 @@ export default class ConditionTextSearch extends LitElement {
               placeholder="${this.placeholder}"
               value="${this.value}"
               @input="${debounce(this._keyup, 300)}"
-              @focusout="${() => {
-                this.currentSuggestionIndex = -1;
-                this.showSuggestions = false;
-              }}"
+              @focusout="${this._hideSuggestions}"
               @focusin="${() => {
                 this.showSuggestions = true;
               }}"
