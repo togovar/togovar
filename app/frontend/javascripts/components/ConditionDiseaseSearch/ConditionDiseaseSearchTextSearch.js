@@ -160,7 +160,7 @@ export default class ConditionTextSearch extends LitElement {
                     complete: () => {
                       if (!this.suggestData?.length) {
                         return html`<div class="empty">
-                          <span>No suggestions was found</span>
+                          <span>No suggestions were found</span>
                         </div>`;
                       }
                       return html`
