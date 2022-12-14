@@ -5,7 +5,6 @@ import ConditionValueEditorFrequencyCount from './ConditionValueEditorFrequencyC
 import ConditionValueEditorLocation from './ConditionValueEditorLocation.js';
 // import {ADVANCED_CONDITIONS} from '../global.js';
 import { CONDITION_TYPE } from '../definition.js';
-import { ConditionDiseaseSearch } from '../components/ConditionDiseaseSearch/ConditionDiseaseSearch.js';
 import ConditionValueEditorDisease from './ConditionValueEditorDisease.js';
 
 const DISEASE_API_URL =
