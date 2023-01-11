@@ -53,6 +53,13 @@
         "has_freq": true
       },
       {
+        "id": "gnomad_exomes",
+        "label": "gnomAD exomes",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
         "id": "clinvar",
         "label": "ClinVar",
         "type": "boolean",
