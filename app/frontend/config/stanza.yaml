@@ -20,6 +20,8 @@ variant:
 
     - id: variant-frequency
       dom: "#variant-frequency"
+      options:
+        assembly: $TOGOVAR_FRONTEND_REFERENCE
 
     - id: variant-clinvar
       dom: "#variant-clinvar"
@@ -83,19 +85,15 @@ variant:
     - id: variant-genomic-context
       dom: "#variant-genomic-context"
       options:
-        assembly: GRCh37
+        assembly: $TOGOVAR_FRONTEND_REFERENCE
         jbrowse: $TOGOVAR_STANZA_JBROWSE
         margin: 50
 
     - id: variant-gene
       dom: "#variant-gene"
-      options:
-        assembly: GRCh37
 
     - id: variant-transcript
       dom: "#variant-transcript"
-      options:
-        assembly: GRCh37
 
     - id: variant-publication
       dom: "#variant-publication"
@@ -232,7 +230,7 @@ gene:
     - id: gene-genomic-context
       dom: "#gene-genomic-context"
       options:
-        assembly: GRCh37
+        assembly: $TOGOVAR_FRONTEND_REFERENCE
         jbrowse: $TOGOVAR_STANZA_JBROWSE
         margin: 200
 

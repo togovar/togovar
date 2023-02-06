@@ -19,7 +19,16 @@ export const mixin = {
 
   readySearch(callback) {
     // get master data of conditions
-    const json = require('../../assets/search_conditions.json');
+    const json = ((reference) => {
+      switch (reference) {
+        case 'GRCh37':
+          return require('../../assets/GRCh37/search_conditions.json');
+        case 'GRCh38':
+          return require('../../assets/GRCh38/search_conditions.json');
+        default:
+          return [];
+      }
+    })(TOGOVAR_FRONTEND_REFERENCE);
     Object.freeze(json);
     this.setData('simpleSearchConditionsMaster', json);
     // restore search conditions from URL parameters
@@ -137,7 +146,7 @@ export const mixin = {
                   condition[conditionKey][item] !==
                   conditionMaster.items.find(
                     (condition) => condition.id === item
-                  ).default
+                  )?.default
                 ) {
                   filtered[item] = condition[conditionKey][item];
                 }

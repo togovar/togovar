@@ -1,0 +1,112 @@
+article.common-document
+  header.header
+    h2.title JGA-SNPデータセット
+  .contents
+    section.section
+      h3.sectiontitle 概要
+      p.body
+        a(target='_blank', href='https://humandbs.biosciencedbc.jp/') NBDCヒトデータベース
+        | /
+        a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
+          | Japanese Genotype-phenotype Archive (JGA)
+        | に登録されている個人レベルのSNPチップデータから検出したバリアントを集約した頻度データです。２次データ作成の許諾が得られたJGAデータの全てが集約対象です。
+        | なお、Alternative allele数が5以下のバリアントは含まれていません。GRCh38のデータはCrossMapを用いてGRCh37のデータをリフトオーバして作成しています。
+      ul.unordered-list
+        li バージョン/最終更新日：2018/06/01
+        li サンプルサイズ：183,884
+        li 検出バリアント（代替アレル）数：1,966,919
+        li 除外後バリアント数：1,249,724
+        li GRCh37データをGRCh38にリフトオーバーした後のバリアント数：1,244,838
+
+    section.section
+      h3.sectiontitle 利用条件
+      .subsection
+        h4.heading データ利用者の権利
+        p.body
+          a(target='_blank', href='https://humandbs.biosciencedbc.jp/guidelines/data-sharing-guidelines') NBDCヒトデータ共有ガイドライン
+          | の5-2. データ利用者の権利の5-2-1. 非制限公開データに準拠します。
+        ol.ordered-list
+          li データ利用者は、『NBDCヒトデータベース』のデータを利用した研究成果をデータ利用者の責務を遵守する限り自由に発表できる。
+          li データ利用者は、『NBDCヒトデータベース』のデータを利用した研究結果をもとにした知的財産権をデータ利用者の責務を遵守する限り自由に取得できる。
+      .subsection
+        h4.heading データ利用者の責務
+        p.body
+          | NBDCヒトデータ共有ガイドラインの「5-3. データ利用者の責務」の「5-3-1. 非制限公開データ」を準用します。再配布に関しては、制限公開データを二次加工したデータであるため、制限公開データのルールを適用します。
+        ol.ordered-list
+          li データ利用に際してのデータの品質・内容・科学的妥当性については、利用者の責任と判断のもとで活用すること。
+          li
+            | データ利用者は、下記の事項を遵守すること。
+            ul.unordered-list
+              li 研究利用への限定
+              li 個人同定の禁止
+              li 再配布の禁止
+          li
+            | 公衆利用（例：データを利用して論文等で発表する場合など）の際は以下の引用を付与してください。
+            p
+              | Variant dataset aggregated from SNP-chip data in
+              |
+              a(target='_blank', href='https://humandbs.biosciencedbc.jp/') NBDCヒトデータベース
+              | /
+              a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html') JGA
+              |  [Internet]. Kashiwa: Database Center for Life Science, Joint Support-Center for Data Science Research,
+              |
+              | Research Organization of Information and Systems; [2018] - . JGA-SNP dataset; [cited YYYY Mmm DD]. Available from:
+              |
+              a(href='https://grch38.togovar.org/doc/datasets/jga_snp')
+                | https://grch38.togovar.org/doc/datasets/jga_snp
+
+    section.section
+      h3#jga_datasets.sectiontitle 含まれる制限公開データセット一覧
+      p
+        | データセットIDを指定して
+        a.hyper-text.-external(target='_blank', href='https://humandbs.biosciencedbc.jp/data-use')
+          | NBDCヒトデータベースにデータ利用申請
+        | できます。
+      table.table._column-span-all
+        thead
+          tr
+            th データセットID
+            th ヒトDB
+            th 研究題目
+            th 対象集団
+            th サンプル数
+            th データ提供者
+        tbody
+          tr
+            td
+              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000123')
+                | JGAD000123
+            td
+              a(target='_blank', href='https://humandbs.biosciencedbc.jp/hum0014-v8') hum0014
+            td オーダーメイド医療の実現プログラム
+            td 健常者及び罹患者
+            td._align-right 182,557
+            td 久保 充明 (BBJ)
+          tr
+            td
+              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000018')
+                | JGAD000018
+            td
+              a(target='_blank', href='https://humandbs.biosciencedbc.jp/hum0028-v1') hum0028
+            td オーダーメイド医療の実現プログラム
+            td 健常者
+            td._align-right 908
+            td 久保 充明 (BBJ)
+          tr
+            td
+              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000130')
+                | JGAD000130
+                br
+              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000131')
+                | JGAD000131
+            td
+              a(target='_blank', href='https://humandbs.biosciencedbc.jp/hum0082-v2') hum0082
+            td 日本人健常者におけるゲノム全域のSNP解析
+            td 健常者
+            td._align-right 419
+            td 徳永 勝士
+        tfoot
+          tr
+            th._align-center(colspan='4') 合計
+            th._align-right 183,884
+            th

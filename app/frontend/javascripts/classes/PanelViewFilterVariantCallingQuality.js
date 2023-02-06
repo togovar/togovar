@@ -11,6 +11,9 @@ export default class PanelViewFilterVariantCallingQuality extends PanelView {
     // event
     this.checkbox.addEventListener('change', this.change.bind(this));
     this.checkbox.dispatchEvent(new Event('change'));
+    // initial condition
+    const condition = StoreManager.getSimpleSearchCondition(this.kind);
+    this.checkbox.checked = condition === undefined;
   }
 
   change(e) {
