@@ -354,8 +354,10 @@ export const mixin = {
         case 'simple':
           this.setSimpleSearchCondition({});
           break;
-        case 'advanced':
-          this.setAdvancedSearchCondition();
+        case 'advanced': {
+          const condition = this._store.advancedSearchConditions;
+          this.setAdvancedSearchCondition(condition);
+        }
           break;
       }
       // start search
