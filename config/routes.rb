@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     match 'search/gene', via: %w[get post]
     match 'search/disease', via: %w[get post]
     match 'inspect/disease', via: %w[get post]
+    post 'download/variant'
   end
 
   # backward compatibility

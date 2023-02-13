@@ -26,31 +26,11 @@ paths:
               schema:
                 $ref: '#/components/definitions/SearchVariant'
         '400':
-          description: >
-            `Bad Request`<br/>
-            Your query contains grammatical mistakes. See errors in the response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/definitions/Error'
+          $ref: '#/components/responses/bad_request'
         '500':
-          description: >
-            `Internal Server Error`<br/>
-            Unexpected errors occurred.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/definitions/Error'
+          $ref: '#/components/responses/internal_server_error'
         '501':
-          description: >
-            `Not Implemented`<br/>
-            Responder for given mime type are not inplemented.
-            Provide the correct accept header (e.g. `Accept: application/json`).
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: Not implemented
+          $ref: '#/components/responses/not_implemented'
 
   /search/gene:
     get:
@@ -301,6 +281,33 @@ paths:
                 type: string
                 example: Not implemented
 
+  /download/variant:
+    post:
+      tags:
+        - download
+      requestBody:
+        $ref: '#/components/requestBodies/SearchVariant'
+      responses:
+        '200':
+          description: >
+            `OK`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/definitions/DownloadVariant'
+            text/csv:
+              schema:
+                type: string
+            text/plain:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/bad_request'
+        '500':
+          $ref: '#/components/responses/internal_server_error'
+        '501':
+          $ref: '#/components/responses/not_implemented'
+
 components:
   parameters:
     Pretty:
@@ -448,6 +455,34 @@ components:
                 description: A node ID
                 required: false
                 example: MONDO_0003582
+
+  responses:
+    bad_request:
+      description: >
+        `Bad Request`<br/>
+        Your query contains grammatical mistakes. See errors in the response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/definitions/Error'
+    internal_server_error:
+      description: >
+        `Internal Server Error`<br/>
+        Unexpected errors occurred.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/definitions/Error'
+    not_implemented:
+      description: >
+        `Not Implemented`<br/>
+        Responder for given mime type are not inplemented.
+        Provide the correct accept header (e.g. `Accept: application/json`).
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: Not implemented
 
   schemas:
     ID:
@@ -1180,6 +1215,134 @@ components:
                       alt_homo_count:
                         type: integer
 
+    DownloadVariant:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              tgv_id:
+                type: string
+              rs:
+                type: array
+                items:
+                  type: string
+              chromosome:
+                type: string
+              position:
+                type: integer
+              reference:
+                type: string
+              alternative:
+                type: string
+              symbol:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  id:
+                    type: string
+                  synonyms:
+                    type: array
+                    items:
+                      type: string
+              transcript_id:
+                type: array
+                items:
+                  type: string
+              consequence:
+                type: array
+                items:
+                  type: string
+              sift_prediction:
+                type: string
+              sift_value:
+                type: number
+              polyphen2_prediction:
+                type: string
+              polyphen_value:
+                type: number
+              jga_ngs_allele_alt:
+                type: number
+              jga_ngs_allele_total:
+                type: number
+              jga_ngs_alt_allele_freq:
+                type: number
+              jga_ngs_qc_status:
+                type: array
+                items:
+                  type: string
+              jga_snp_allele_alt:
+                type: number
+              jga_snp_allele_total:
+                type: number
+              jga_snp_alt_allele_freq:
+                type: number
+              jga_snp_genotype_alt_alt:
+                type: number
+              jga_snp_genotype_ref_alt:
+                type: number
+              jga_snp_genotype_ref_ref:
+                type: number
+              jga_snp_qc_status:
+                type: array
+                items:
+                  type: string
+              tommo_allele_alt:
+                type: number
+              tommo_allele_total:
+                type: number
+              tommo_alt_allele_freq:
+                type: number
+              tommo_qc_status:
+                type: array
+                items:
+                  type: string
+              hgvd_allele_alt:
+                type: number
+              hgvd_allele_total:
+                type: number
+              hgvd_alt_allele_freq:
+                type: number
+              hgvd_qc_status:
+                type: array
+                items:
+                  type: string
+              gem_j_wga_allele_alt:
+                type: number
+              gem_j_wga_allele_total:
+                type: number
+              gem_j_wga_alt_allele_freq:
+                type: number
+              gem_j_wga_qc_status:
+                type: array
+                items:
+                  type: string
+<% if ENV['TOGOVAR_FRONTEND_REFERENCE'] == 'GRCh38' %>
+              gnomad_exomes_allele_alt:
+                type: number
+              gnomad_exomes_allele_total:
+                type: number
+              gnomad_exomes_alt_allele_freq:
+                type: number
+              gnomad_exomes_qc_status:
+                type: array
+                items:
+                  type: string
+<% end %>
+              gnomad_genomes_allele_alt:
+                type: number
+              gnomad_genomes_allele_total:
+                type: number
+              gnomad_genomes_alt_allele_freq:
+                type: number
+              gnomad_genomes_qc_status:
+                type: array
+                items:
+                  type: string
+
     SearchGene:
       type: array
       items:
@@ -1372,7 +1535,7 @@ components:
       summary: Paginate result over 10,000 records.
       value:
         query:
-          after:
+          offset:
             - "12"
             - "112204719"
             - G
