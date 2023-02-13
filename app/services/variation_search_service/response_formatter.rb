@@ -152,7 +152,8 @@ class VariationSearchService
         json.sift vep.map { |x| x[:sift] }.compact.min
         json.polyphen vep.map { |x| x[:polyphen] }.compact.max
         vep.each do |x|
-          x[:consequence] = x[:consequence].map { |y| SequenceOntology.find_by_key(y)&.id }
+          consequences = x[:consequence].map { |x| SequenceOntology.find_by_key(x) }
+          x[:consequence] = (SequenceOntology::CONSEQUENCES_IN_ORDER & consequences).map { |y| y.id }
         end
         json.transcripts vep.map(&:compact).presence
 

@@ -21,7 +21,7 @@ class VariationSearchService
     debug.clear
 
     # remember to validate before obtaining debug information
-    validate || raise_error
+    validate
 
     if @params[:formatter] === 'html'
       HtmlFormatter.new(@params[:body], search).to_hash
@@ -30,21 +30,25 @@ class VariationSearchService
     end
   end
 
-  private
-
   def validate
-    @spec_no_errors = spec.validate
-    @model_no_errors = model.validate
+    valid_spec = spec.validate
+    valid_model = model.validate
 
     debug[:model] = model.nested_debugs if @options[:debug]
 
-    @spec_no_errors && @model_no_errors
+    raise Errors::APIValidationError.new('API validation error', errors: spec.errors) unless valid_spec
+    raise Errors::QueryParseError.new('Query parse error', errors: model.full_messages) unless valid_model
   end
 
-  def raise_error
-    raise Errors::APIValidationError.new('API validation error', errors: spec.errors) unless @spec_no_errors
-    raise Errors::QueryParseError.new('Query parse error', errors: model.full_messages) unless @model_no_errors
+  def results
+    Variation.search(query).records.results
   end
+
+  def total
+    Variation.count(body: query.slice(:query))
+  end
+
+  private
 
   def spec
     @spec ||= TogoVar::API::Spec::Validator.new schema(@params.fetch(:version, '1')),
@@ -78,8 +82,8 @@ class VariationSearchService
 
   def search
     {
-      filtered_total: Variation.count(body: query.slice(:query)),
-      results: Variation.search(query).records.results,
+      filtered_total: total,
+      results: results,
       aggs: paging? ? {} : Variation.search(stat_query).aggregations
     }
   end
