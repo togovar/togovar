@@ -1,5 +1,3 @@
-import ConditionItemValueView from '../components/ConditionItemValueView';
-
 export default class ConditionValueEditor {
   constructor(valuesView, conditionType) {
     this._valuesView = valuesView;
