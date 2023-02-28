@@ -166,6 +166,16 @@ export default class ConditionItemView extends ConditionView {
         };
       }
 
+      case CONDITION_TYPE.gene_symbol: {
+        const value = values[0].value;
+        return {
+          gene: {
+            relation: this._elm.dataset.relation,
+            terms: [+value],
+          },
+        };
+      }
+
       default:
         return {
           [this._conditionType]: {
