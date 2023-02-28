@@ -89,12 +89,10 @@ export default class SearchFieldView {
       item.classList.add('-selected');
 
       e.preventDefault();
-      // return false;
     }
   }
 
   _suggestDecisionAndShowHide(e) {
-    // e.preventDefault();
     const hideSuggest =
       this._suggesting && (e.key === 'Escape' || this._field.value.length < 3);
     const showSuggest =
@@ -165,14 +163,6 @@ export default class SearchFieldView {
   _suggestPositionShift(incrementOfXY) {
     this._initializeAndChangeSuggestPosition(incrementOfXY);
     this._changeSuggestPositionOnReturn();
-
-    // What are you doing?
-    // if (
-    //   this._suggestList[this._suggestPosition.x][this._suggestPosition.y] ===
-    //   undefined
-    // ) {
-    //   this._suggestPositionShift(incrementOfXY);
-    // }
   }
 
   _initializeAndChangeSuggestPosition(incrementOfXY) {
@@ -337,7 +327,6 @@ export default class SearchFieldView {
   _suggestData(data) {
     if (this._isSimpleSearch) {
       Object.keys(data).forEach((key, index) => {
-        // if (this._suggestDictionaries.indexOf(key) !== -1) {
         if (data[key].length > 0) {
           this._dictionaries.push(key);
           const column = [];
@@ -346,7 +335,6 @@ export default class SearchFieldView {
           }
           this._suggestList[index] = column;
         }
-        // }
       });
     } else {
       this._suggestList = data.slice(0, this._suggestLength(data));
