@@ -11,16 +11,24 @@
   > .header
     white-space: nowrap
     position: relative
-    > .heading
-      display: inline-block
-      font-size: 16px
-      margin-right: 8px
-      margin-bottom: -2px
-    > .status
-      display: inline-block
-      font-size: 12px
-      > .bigger
+    display: flex
+    justify-content: space-between
+    > .left-header
+      > .heading
+        display: inline-block
         font-size: 16px
+        margin-right: 8px
+        margin-bottom: -2px
+      > .status
+        display: inline-block
+        font-size: 12px
+        > .bigger
+          font-size: 16px
+    > .right-header
+      > .button-view
+        top:4px
+        height: 16px
+        z-index: $Z_INDEX_BASE
   > .tablecontainer
     overflow-x: auto
     overflow-y: hidden

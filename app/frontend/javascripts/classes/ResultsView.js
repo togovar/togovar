@@ -8,7 +8,9 @@ export default class ResultsView {
     this.elm = elm;
     this.rows = [];
     this.lastScroll = 0;
-    this.status = this.elm.querySelector('header.header > .status');
+    this.status = this.elm.querySelector(
+      'header.header > .left-header > .status'
+    );
     this.messages = this.elm.querySelector('#Messages');
 
     StoreManager.bind('searchStatus', this);
