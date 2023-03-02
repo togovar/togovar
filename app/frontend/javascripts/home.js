@@ -6,8 +6,9 @@ import SelectedRowIndicator from '../javascripts/classes/SelectedRowIndicator.js
 import Karyotype from '../javascripts/classes/Karyotype.js';
 import ActivityIndicator from '../javascripts/classes/ActivityIndicator.js';
 import ModuleTabsView from '../javascripts/classes/ModuleTabsView.js';
-import CollapseView from '../javascripts/classes/CollapseView.js';
+// import CollapseView from '../javascripts/classes/CollapseView.js';
 import TopPageLayoutManager from '../javascripts/classes/TopPageLayoutManager.js';
+import Download from '../javascripts/classes/Download.js';
 // Search
 import SimpleSearchView from './classes/SimpleSearchView.js';
 import AdvancedSearchBuilderView from '../javascripts/classes/AdvancedSearchBuilderView.js';
@@ -37,6 +38,8 @@ export function initHome() {
   new Karyotype(document.getElementById('Karyotype'));
 
   new ActivityIndicator(document.getElementById('ActivityIndicator'));
+
+  new Download(document.getElementById('Download'));
 
   StoreManager.readySearch(() => {
     // 検索結果表示画面
