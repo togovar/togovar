@@ -180,6 +180,19 @@ $CHAR_LOGICAL_OP_OUTLINE: '\E803';
   --height-advanced-search-condition-values-container: 24px;
   --height-advanced-search-condition-value: 18px;
 
+  // z-index
+  --z-index-base: 10000;
+  --z-index-row-indicator: var(--z-index-base) + 100;
+  --z-index-advanced-search-menu: var(--z-index-base) + 100;
+  --z-index-detail-header: var(--z-index-base) + 100;
+  --z-index-module-tabs-view: var(--z-index-base) + 200;
+  --z-index-global-header: var(--z-index-base) + 200;
+  --z-index-suggest-view: var(--z-index-base) + 200;
+  --z-index-drawer: var(--z-index-base) + 300;
+  --z-index-configuration: var(--z-index-base) + 400;
+  --z-index-editing-condition: var(--z-index-base) + 400;
+  --z-index-activity-indicator: var(--z-index-base) + 500;
+
   // charactor
   // FontAwesome
   --char-TIMES: '\f00d';
