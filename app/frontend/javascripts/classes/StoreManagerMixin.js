@@ -222,14 +222,14 @@ export const mixin = {
 
   _search(offset, isFirstTime = false) {
     return debounce((offset, isFirstTime) => {
-      // dont execute if search is in progress
+      // If search is in progress, abort previous request and create a new AbortController
       if (this._fetching === true) {
         this._store._abortController.abort('newSearchStarted');
         this._store._abortController = new AbortController();
         this._fetching = false;
       }
 
-      // reset
+      // Reset search results
       if (isFirstTime) {
         this.setData('numberOfRecords', 0);
         this.setData('offset', 0);
@@ -238,10 +238,13 @@ export const mixin = {
         this.setResults([], 0);
       }
 
-      // retain search conditions
+      // Retain search conditions
       const lastConditions = JSON.stringify(this._store.simpleSearchConditions); // TODO:
 
+      // Set fetching flag to true
       this._fetching = true;
+
+      // Set options for fetch request
       const options = {
         headers: {
           'Content-Type': 'application/json',
@@ -250,6 +253,8 @@ export const mixin = {
         mode: 'cors',
         signal: this._store._abortController.signal,
       };
+
+      // Set path for fetch request
       let path;
       if (this._URIParameters.path === 'local') {
         if (offset === 0) {
@@ -268,6 +273,7 @@ export const mixin = {
               options.method = 'GET';
             }
             break;
+
           case 'advanced':
             {
               path = `${API_URL}/api/search/variant`;
@@ -284,81 +290,80 @@ export const mixin = {
             break;
         }
       }
-      fetch(path, options)
-        .then((response) => {
-          if (response.ok) {
-            return response;
-          }
-          switch (response.status) {
-            case 400:
-              throw new Error('INVALID_TOKEN');
-            case 401:
-              throw new Error('UNAUTHORIZED');
-            case 500:
-              throw new Error('INTERNAL_SERVER_ERROR');
-            case 502:
-              throw new Error('BAD_GATEWAY');
-            case 404:
-              throw new Error('NOT_FOUND');
-            default:
-              throw new Error('UNHANDLED_ERROR');
-          }
-        })
-        .then((response) => response.json())
-        .then((json) => {
-          // status
-          this.setData('searchStatus', {
-            available: Math.min(json.statistics.filtered, json.scroll.max_rows),
-            filtered: json.statistics.filtered,
-            total: json.statistics.total,
-          });
 
-          // results
-          this.setData(
-            'numberOfRecords',
-            this.getData('searchStatus').available
-          );
-          this.setResults(json.data, json.scroll.offset);
-
-          // statistics
-          // dataset
-          this.setData('statisticsDataset', json.statistics.dataset);
-          // significance
-          this.setData('statisticsSignificance', json.statistics.significance);
-          // total_variant_type
-          this.setData('statisticsType', json.statistics.type);
-          // consequence
-          this.setData('statisticsConsequence', json.statistics.consequence);
-
-          this.setData('searchMessages', {
-            error: json.error,
-            warning: json.warning,
-            notice: json.notice,
-          });
-
-          this._fetching = false;
-          this._notify('offset');
-          this.setData('appStatus', 'normal');
-
-          // if the search conditions change during the search, re-search
-          if (
-            lastConditions !==
-            JSON.stringify(this._store.simpleSearchConditions)
-          ) {
-            this._setSimpleSearchConditions({});
-          }
-        })
-        .catch((err) => {
-          const error = err.name === 'Error' ? err.message : null;
-          this.setData('searchMessages', { error });
-
-          if (err.name === 'AbortError') {
-            console.warn('User aborted the request');
-          } else {
-            throw new Error(err);
-          }
-        });
+      // Fetch data from server
+      this._fetchData(path, options, lastConditions);
     })(offset, isFirstTime);
+  },
+
+  async _fetchData(path, options, lastConditions) {
+    try {
+      const response = await fetch(path, options);
+      if (!response.ok) {
+        throw new Error(this._getErrorType(response.status));
+      }
+      const json = await response.json();
+      this._setDataFromJson(json, lastConditions);
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        console.warn('User aborted the request');
+        return;
+      }
+      const error = err instanceof Error ? err.message : null;
+      this.setData('searchMessages', { error });
+      throw err;
+    }
+  },
+
+  _getErrorType(status) {
+    switch (status) {
+      case 400:
+        return 'INVALID_TOKEN';
+      case 401:
+        return 'UNAUTHORIZED';
+      case 500:
+        return 'INTERNAL_SERVER_ERROR';
+      case 502:
+        return 'BAD_GATEWAY';
+      case 404:
+        return 'NOT_FOUND';
+      default:
+        return 'UNHANDLED_ERROR';
+    }
+  },
+
+  _setDataFromJson(json, lastConditions) {
+    // status
+    this.setData('searchStatus', {
+      available: Math.min(json.statistics.filtered, json.scroll.max_rows),
+      filtered: json.statistics.filtered,
+      total: json.statistics.total,
+    });
+
+    // results
+    this.setData('numberOfRecords', this.getData('searchStatus').available);
+    this.setResults(json.data, json.scroll.offset);
+
+    // statistics
+    this.setData('statisticsDataset', json.statistics.dataset); // dataset
+    this.setData('statisticsSignificance', json.statistics.significance); // significance
+    this.setData('statisticsType', json.statistics.type); // total_variant_type
+    this.setData('statisticsConsequence', json.statistics.consequence); // consequence
+
+    this.setData('searchMessages', {
+      error: json.error,
+      warning: json.warning,
+      notice: json.notice,
+    });
+
+    this._fetching = false;
+    this._notify('offset');
+    this.setData('appStatus', 'normal');
+
+    // if the search conditions change during the search, re-search
+    if (lastConditions !== JSON.stringify(this._store.simpleSearchConditions)) {
+      this._setSimpleSearchConditions({});
+    }
   },
 
   // Bindings *******************************************
