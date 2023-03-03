@@ -145,16 +145,21 @@ export default class SearchFieldView {
     this.lastValue = '';
   }
 
-  _suggestShow() {
-    fetch(`${this._queryURL}${this._field.value}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-    })
-      .then((response) => response.json())
-      .then((json) => this._createSuggestList(json));
+  async _suggestShow() {
+    try {
+      const response = await fetch(`${this._queryURL}${this._field.value}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      });
+      const json = await response.json();
+      this._createSuggestList(json);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   _focusIsNotArea() {
