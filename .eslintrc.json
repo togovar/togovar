@@ -10,7 +10,7 @@
     "no-console": [
       "error",
       {
-        "allow": ["warn", "error"]
+        "allow": ["log", "warn", "error"]
       }
     ],
     "no-unused-vars": [

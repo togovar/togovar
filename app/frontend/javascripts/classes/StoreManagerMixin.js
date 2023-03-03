@@ -31,10 +31,12 @@ export const mixin = {
     })(TOGOVAR_FRONTEND_REFERENCE);
     Object.freeze(json);
     this.setData('simpleSearchConditionsMaster', json);
+
     // restore search conditions from URL parameters
-    const searchMode = this._URIParameters.mode ?? DEFAULT_SEARCH_MODE;
-    const simpleSearchConditions = {},
+    const searchMode = this._URIParameters.mode ?? DEFAULT_SEARCH_MODE,
+      simpleSearchConditions = {},
       advancedSearchConditions = {};
+
     switch (searchMode) {
       case 'simple':
         Object.assign(
@@ -42,9 +44,11 @@ export const mixin = {
           this._extractSearchCondition(this._URIParameters)
         );
         break;
+
       case 'advanced':
         break;
     }
+
     this._store.simpleSearchConditions = simpleSearchConditions;
     this._store.advancedSearchConditions = advancedSearchConditions;
     callback();
@@ -90,6 +94,7 @@ export const mixin = {
         'simpleSearchConditionsMaster'
       ),
       resetConditions = {};
+
     for (const condition of simpleSearchConditionsMaster) {
       switch (condition.type) {
         case 'string':
@@ -97,6 +102,7 @@ export const mixin = {
           if (condition.id !== 'term')
             resetConditions[condition.id] = condition.default;
           break;
+
         case 'array':
           {
             const temp = {};
@@ -156,6 +162,7 @@ export const mixin = {
               }
             }
             break;
+
           case 'boolean':
           case 'string':
             {
@@ -284,17 +291,17 @@ export const mixin = {
           }
           switch (response.status) {
             case 400:
-              throw Error('INVALID_TOKEN');
+              throw new Error('INVALID_TOKEN');
             case 401:
-              throw Error('UNAUTHORIZED');
+              throw new Error('UNAUTHORIZED');
             case 500:
-              throw Error('INTERNAL_SERVER_ERROR');
+              throw new Error('INTERNAL_SERVER_ERROR');
             case 502:
-              throw Error('BAD_GATEWAY');
+              throw new Error('BAD_GATEWAY');
             case 404:
-              throw Error('NOT_FOUND');
+              throw new Error('NOT_FOUND');
             default:
-              throw Error('UNHANDLED_ERROR');
+              throw new Error('UNHANDLED_ERROR');
           }
         })
         .then((response) => response.json())
@@ -341,11 +348,14 @@ export const mixin = {
             this._setSimpleSearchConditions({});
           }
         })
-        .catch((e) => {
-          if (e.name === 'AbortError') {
+        .catch((err) => {
+          const error = err.name === 'Error' ? err.message : null;
+          this.setData('searchMessages', { error });
+
+          if (err.name === 'AbortError') {
             console.warn('User aborted the request');
           } else {
-            throw Error(e);
+            throw new Error(err);
           }
         });
     })(offset, isFirstTime);
@@ -363,10 +373,11 @@ export const mixin = {
         case 'simple':
           this.setSimpleSearchCondition({});
           break;
-        case 'advanced': {
-          const condition = this._store.advancedSearchConditions;
-          this.setAdvancedSearchCondition(condition);
-        }
+        case 'advanced':
+          {
+            const condition = this._store.advancedSearchConditions;
+            this.setAdvancedSearchCondition(condition);
+          }
           break;
       }
       // start search
