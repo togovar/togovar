@@ -38,7 +38,7 @@ export default class TippyBox {
         placement: 'top',
         appendTo: document.body,
         maxWidth: '15rem',
-        delay: [2, 300],
+        delay: [300, 300],
         offset: this.offset(el),
         zIndex: 10100,
       });
