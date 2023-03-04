@@ -18,8 +18,14 @@ main#SearchResultsView.LayoutMainAside
         .left-header
           h2.heading Results
           .status
-        .right-header
-          button#Download.button-view Download
+        ul.right-header
+          li.download-text Download
+          li
+            button#DownloadJson.button-view JSON
+          li
+            button#DownloadCsv.button-view CSV
+          li
+            button#DownloadTsv.button-view TSV
       #Messages
       .tablecontainer
         table.results-view

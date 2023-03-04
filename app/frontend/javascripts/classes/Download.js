@@ -1,12 +1,15 @@
+const DOWNLOAD_API_URL = 'https://stg-grch37.togovar.org';
+
 export default class Download {
-  constructor(trigger) {
+  constructor(trigger, accept, filetype) {
     this.trigger = trigger;
-    this.path = 'https://stg-grch37.togovar.org/api/download/variant';
+    this.filetype = filetype;
+    this.path = `${DOWNLOAD_API_URL}/api/download/variant`;
     this.options = {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
+        'Content-Type': accept,
+        Accept: accept,
       },
       body: JSON.stringify({
         query: {
@@ -15,7 +18,6 @@ export default class Download {
             position: 48258198,
           },
         },
-        limit: 1,
       }),
       mode: 'cors',
     };
@@ -27,14 +29,14 @@ export default class Download {
 
   async downloadFile() {
     try {
-      const response = await fetch(this.path, this.options);
+      const response = await fetch(this.path, this.options, this.filetype);
       if (!response.ok) {
         throw new Error('Failed to download file');
       }
       const blobUrl = URL.createObjectURL(await response.blob());
       const link = document.createElement('a');
       link.href = blobUrl;
-      link.download = 'togovar.json';
+      link.download = `togovar.${this.filetype}`;
       link.click();
       URL.revokeObjectURL(blobUrl);
     } catch (error) {
