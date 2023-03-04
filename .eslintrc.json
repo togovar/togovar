@@ -26,6 +26,7 @@
     "sourceType": "module"
   },
   "globals": {
+    "TOGOVAR_FRONTEND_REFERENCE": "readonly",
     "TOGOVAR_FRONTEND_API_URL": "readonly",
     "TOGOVAR_STANZA_SPARQL_URL": "readonly",
     "TOGOVAR_STANZA_SPARQLIST_URL": "readonly",
