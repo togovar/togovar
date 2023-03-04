@@ -25,10 +25,15 @@
         > .bigger
           font-size: 16px
     > .right-header
-      > .button-view
-        top:4px
-        height: 16px
-        z-index: var(--z-index-base)
+      position: relative
+      top:4px
+      height: 16px
+      list-style: none
+      display: flex
+      gap: 5px
+      z-index: var(--z-index-base)
+      > .download-text
+        font-weight: bold
   > .tablecontainer
     overflow-x: auto
     overflow-y: hidden
