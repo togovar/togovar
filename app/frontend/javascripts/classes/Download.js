@@ -1,3 +1,4 @@
+import StoreManager from './StoreManager.js';
 const DOWNLOAD_API_URL = 'https://stg-grch37.togovar.org';
 
 export default class Download {
@@ -12,10 +13,22 @@ export default class Download {
         Accept: accept,
       },
       body: JSON.stringify({
+        // query: {
+        //   location: {
+        //     chromosome: '16',
+        //     position: 48258198,
+        //   },
+        // },
+        // query: {
+        //   id: ['tgv421843', 'rs114202595'],
+        // },
         query: {
           location: {
-            chromosome: '16',
-            position: 48258198,
+            chromosome: '10',
+            position: {
+              gte: 73270743,
+              lte: 73376976,
+            },
           },
         },
       }),
@@ -25,6 +38,10 @@ export default class Download {
     this.trigger.addEventListener('click', () => {
       this.downloadFile();
     });
+  }
+
+  test() {
+    console.log(StoreManager);
   }
 
   async downloadFile() {
