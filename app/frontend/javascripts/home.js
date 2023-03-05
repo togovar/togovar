@@ -39,17 +39,18 @@ export function initHome() {
 
   new ActivityIndicator(document.getElementById('ActivityIndicator'));
 
-  new Download(
-    document.getElementById('DownloadJson'),
-    'application/json',
-    'json'
-  );
-  new Download(document.getElementById('DownloadCsv'), 'text/csv', 'csv');
-  new Download(document.getElementById('DownloadTsv'), 'text/plain', 'tsv');
-
   StoreManager.readySearch(() => {
     // 検索結果表示画面
     const resultView = new ResultsView(document.getElementById('ResultsView'));
+
+    // Download
+    new Download(
+      document.getElementById('DownloadJson'),
+      'application/json',
+      'json'
+    ).test();
+    new Download(document.getElementById('DownloadCsv'), 'text/csv', 'csv');
+    new Download(document.getElementById('DownloadTsv'), 'text/plain', 'tsv');
 
     // サイドバー
     new SideBar(document.getElementById('SideBar'));
