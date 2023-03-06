@@ -1,15 +1,15 @@
 import StoreManager from './StoreManager.js';
-const DOWNLOAD_API_URL = 'https://stg-grch37.togovar.org';
+import { API_URL } from '../global.js';
 
 export default class Download {
   constructor(trigger, accept, filetype) {
     this.trigger = trigger;
     this.filetype = filetype;
-    this.path = `${DOWNLOAD_API_URL}/api/download/variant`;
+    this.path = `${API_URL}/api/download/variant`;
     this.options = {
       method: 'POST',
       headers: {
-        'Content-Type': accept,
+        'Content-Type': 'application/json',
         Accept: accept,
       },
       body: { query: {} },
