@@ -12,65 +12,45 @@ export default class Download {
         'Content-Type': accept,
         Accept: accept,
       },
+      body: { query: {} },
       mode: 'cors',
     };
 
-    this.switchDisplayWithTabs();
-
-    this.trigger.addEventListener('click', () => {
-      this.downloadFile();
-    });
-
-    this._existConditions = StoreManager._store.advancedSearchConditions;
-    // this.testDisplay();
+    this._switchDisplayWithTabs();
+    this.trigger.addEventListener('click', this._downloadFile.bind(this));
   }
 
-  // testDisplay() {
-  //   if (
-  //     Object.keys(StoreManager._store.advancedSearchConditions).length === 0
-  //   ) {
-  //     console.log(
-  //       Object.keys(StoreManager._store.advancedSearchConditions).length
-  //     );
-  //     this.trigger.classList.add('-disabled');
-  //   } else {
-  //     this.trigger.classList.remove('-disabled');
-  //   }
-  // }
+  static switchDisplayWithConditions() {
+    const buttonGroupEl = document.querySelectorAll(
+      '.right-header > li > button'
+    );
+    const conditions = StoreManager._store.advancedSearchConditions;
+    const hasConditions = Object.keys(conditions).length > 0;
+    buttonGroupEl.forEach((button) => {
+      button.classList.toggle('-disabled', !hasConditions);
+    });
+  }
 
-  switchDisplayWithTabs() {
+  _switchDisplayWithTabs() {
     const tabs = document.querySelectorAll('[data-tab-group]');
     tabs.forEach((tab) => {
       tab.addEventListener('click', () => {
         const selectTab = tab.getAttribute('data-target');
         const downloadGroupEl = document.querySelector('.right-header');
-        if (selectTab === 'simple') {
-          downloadGroupEl.setAttribute('style', 'display: none');
-        } else {
-          downloadGroupEl.removeAttribute('style');
-        }
+        downloadGroupEl.style.display = selectTab === 'simple' ? 'none' : '';
       });
     });
   }
 
-  _downloadquery() {
-    this.options.body = {
-      query: {},
-    };
-
-    if (
-      StoreManager._URIParameters.mode === 'advanced' &&
-      StoreManager._store.advancedSearchConditions &&
-      Object.keys(StoreManager._store.advancedSearchConditions).length > 0
-    ) {
+  _downloadQuery() {
+    if (StoreManager._URIParameters.mode === 'advanced') {
       this.options.body.query = StoreManager._store.advancedSearchConditions;
+      this.options.body = JSON.stringify(this.options.body);
     }
-
-    this.options.body = JSON.stringify(this.options.body);
   }
 
-  async downloadFile() {
-    this._downloadquery();
+  async _downloadFile() {
+    this._downloadQuery();
     try {
       const response = await fetch(this.path, this.options, this.filetype);
       if (!response.ok) {
