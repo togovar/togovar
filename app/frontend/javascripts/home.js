@@ -48,7 +48,7 @@ export function initHome() {
       document.getElementById('DownloadJson'),
       'application/json',
       'json'
-    ).test();
+    );
     new Download(document.getElementById('DownloadCsv'), 'text/csv', 'csv');
     new Download(document.getElementById('DownloadTsv'), 'text/plain', 'tsv');
 

@@ -12,26 +12,6 @@ export default class Download {
         'Content-Type': accept,
         Accept: accept,
       },
-      body: JSON.stringify({
-        // query: {
-        //   location: {
-        //     chromosome: '16',
-        //     position: 48258198,
-        //   },
-        // },
-        // query: {
-        //   id: ['tgv421843', 'rs114202595'],
-        // },
-        query: {
-          location: {
-            chromosome: '10',
-            position: {
-              gte: 73270743,
-              lte: 73376976,
-            },
-          },
-        },
-      }),
       mode: 'cors',
     };
 
@@ -40,11 +20,36 @@ export default class Download {
     });
   }
 
-  test() {
-    console.log(StoreManager);
+  _downloadquery() {
+    this.options.body = {
+      query: {
+        gene: {
+          relation: 'eq',
+          terms: [404],
+        },
+      },
+    };
+
+    switch (StoreManager._URIParameters.mode) {
+      case 'simple':
+        break;
+
+      case 'advanced':
+        if (
+          StoreManager._store.advancedSearchConditions &&
+          Object.keys(StoreManager._store.advancedSearchConditions).length > 0
+        ) {
+          this.options.body.query =
+            StoreManager._store.advancedSearchConditions;
+        }
+        break;
+    }
+
+    this.options.body = JSON.stringify(this.options.body);
   }
 
   async downloadFile() {
+    this._downloadquery();
     try {
       const response = await fetch(this.path, this.options, this.filetype);
       if (!response.ok) {
@@ -58,7 +63,6 @@ export default class Download {
       URL.revokeObjectURL(blobUrl);
     } catch (error) {
       console.error(error);
-      throw error;
     }
   }
 }
