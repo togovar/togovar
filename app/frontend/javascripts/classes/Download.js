@@ -15,34 +15,55 @@ export default class Download {
       mode: 'cors',
     };
 
+    this.switchDisplayWithTabs();
+
     this.trigger.addEventListener('click', () => {
       this.downloadFile();
+    });
+
+    this._existConditions = StoreManager._store.advancedSearchConditions;
+    // this.testDisplay();
+  }
+
+  // testDisplay() {
+  //   if (
+  //     Object.keys(StoreManager._store.advancedSearchConditions).length === 0
+  //   ) {
+  //     console.log(
+  //       Object.keys(StoreManager._store.advancedSearchConditions).length
+  //     );
+  //     this.trigger.classList.add('-disabled');
+  //   } else {
+  //     this.trigger.classList.remove('-disabled');
+  //   }
+  // }
+
+  switchDisplayWithTabs() {
+    const tabs = document.querySelectorAll('[data-tab-group]');
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const selectTab = tab.getAttribute('data-target');
+        const downloadGroupEl = document.querySelector('.right-header');
+        if (selectTab === 'simple') {
+          downloadGroupEl.setAttribute('style', 'display: none');
+        } else {
+          downloadGroupEl.removeAttribute('style');
+        }
+      });
     });
   }
 
   _downloadquery() {
     this.options.body = {
-      query: {
-        gene: {
-          relation: 'eq',
-          terms: [404],
-        },
-      },
+      query: {},
     };
 
-    switch (StoreManager._URIParameters.mode) {
-      case 'simple':
-        break;
-
-      case 'advanced':
-        if (
-          StoreManager._store.advancedSearchConditions &&
-          Object.keys(StoreManager._store.advancedSearchConditions).length > 0
-        ) {
-          this.options.body.query =
-            StoreManager._store.advancedSearchConditions;
-        }
-        break;
+    if (
+      StoreManager._URIParameters.mode === 'advanced' &&
+      StoreManager._store.advancedSearchConditions &&
+      Object.keys(StoreManager._store.advancedSearchConditions).length > 0
+    ) {
+      this.options.body.query = StoreManager._store.advancedSearchConditions;
     }
 
     this.options.body = JSON.stringify(this.options.body);
