@@ -1,6 +1,7 @@
 import deparam from 'deparam.js';
 import { API_URL } from '../global.js';
 import { debounce } from '../utils/debounce.js';
+import Download from './Download.js';
 
 const LIMIT = 100;
 const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
@@ -340,6 +341,7 @@ export const mixin = {
           ) {
             this._setSimpleSearchConditions({});
           }
+          Download.switchDisplayWithConditions();
         })
         .catch((e) => {
           if (e.name === 'AbortError') {
@@ -363,10 +365,11 @@ export const mixin = {
         case 'simple':
           this.setSimpleSearchCondition({});
           break;
-        case 'advanced': {
-          const condition = this._store.advancedSearchConditions;
-          this.setAdvancedSearchCondition(condition);
-        }
+        case 'advanced':
+          {
+            const condition = this._store.advancedSearchConditions;
+            this.setAdvancedSearchCondition(condition);
+          }
           break;
       }
       // start search
