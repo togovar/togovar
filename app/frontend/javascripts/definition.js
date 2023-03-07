@@ -12,6 +12,7 @@ export const CONDITION_TYPE = {
   adv_frequency: 'adv_frequency',
   disease: 'disease',
   gene_symbol: 'gene',
+  variant_id: 'id',
   location: 'location',
 };
 

@@ -49,6 +49,7 @@ export default class ConditionValues {
           )
         );
         break;
+
       case CONDITION_TYPE.consequence:
         this._editors.push(
           new ConditionValueEditorColumns(
@@ -57,6 +58,7 @@ export default class ConditionValues {
           )
         );
         break;
+
       case CONDITION_TYPE.dataset:
         this._editors.push(
           new ConditionValueEditorColumns(
@@ -71,6 +73,7 @@ export default class ConditionValues {
           )
         );
         break;
+
       case CONDITION_TYPE.gene_symbol:
         this._editors.push(
           new ConditionValueEditorTextField(
@@ -79,6 +82,16 @@ export default class ConditionValues {
           )
         );
         break;
+
+      case CONDITION_TYPE.variant_id:
+        this._editors.push(
+          new ConditionValueEditorTextField(
+            this,
+            this._conditionView.conditionType
+          )
+        );
+        break;
+
       case CONDITION_TYPE.disease:
         this._editors.push(
           new ConditionValueEditorDisease(
@@ -86,8 +99,8 @@ export default class ConditionValues {
             this._conditionView.conditionType
           )
         );
-
         break;
+
       case CONDITION_TYPE.location:
         this._editors.push(
           new ConditionValueEditorLocation(
