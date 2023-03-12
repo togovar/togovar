@@ -101,7 +101,7 @@ export default class SearchFieldView {
       this._conditionType !== CONDITION_TYPE.variant_id;
 
     switch (true) {
-      case e.key === 'Enter':
+      case e.key === 'Enter' && this._suggestPosition.y !== -1:
         return this._suggestDecision();
       case hideSuggest:
         return this._suggestHide();
