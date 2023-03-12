@@ -99,7 +99,7 @@ export default class SearchFieldView {
       this._field.value.length >= 3 && this._field.value !== this.lastValue;
 
     switch (true) {
-      case e.key === 'Enter':
+      case e.key === 'Enter' && this._suggestPosition.y !== -1:
         return this._suggestDecision();
       case hideSuggest:
         return this._suggestHide();
