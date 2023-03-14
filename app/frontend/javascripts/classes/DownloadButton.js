@@ -20,7 +20,6 @@ export default class DownloadButton {
       mode: 'cors',
     };
 
-    this.#switchDisplayWithTabs();
     this.#trigger.addEventListener('click', this.#downloadFile.bind(this));
   }
 
@@ -33,20 +32,9 @@ export default class DownloadButton {
     });
   }
 
-  #switchDisplayWithTabs() {
-    const tabs = document.querySelectorAll('[data-tab-group]');
-    tabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        const selectTab = tab.getAttribute('data-target');
-        const downloadGroupEl = document.querySelector('.right');
-        downloadGroupEl.style.display = selectTab === 'simple' ? 'none' : '';
-      });
-    });
-  }
-
   #downloadQuery() {
     this.#options.body = { query: {} };
-    if (StoreManager._URIParameters.mode === 'advanced') {
+    if (document.body.getAttribute('data-search-mode') === 'advanced') {
       this.#options.body.query = StoreManager._store.advancedSearchConditions;
       this.#options.body = JSON.stringify(this.#options.body);
     }
