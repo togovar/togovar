@@ -1,8 +1,8 @@
 $HEIGHT: $HEIGHT_ADVANCED_SEARCH_CONDITION
 $HEIGHT_RELATION: 16px
 $HEIGHT_VALUE: 18px
-$PADDING_VALUES: ($HEIGHT - $HEIGHT_VALUE) / 2
-$CORNER_RADIUS: $HEIGHT / 2
+$PADDING_VALUES: calc(($HEIGHT - $HEIGHT_VALUE) / 2)
+$CORNER_RADIUS: calc($HEIGHT / 2)
 
 .advanced-search-condition-item-view
   --padding-values-vertical: calc((var(--height-advanced-search-condition-values-container) - var(--height-advanced-search-condition-value)) * .5)
@@ -34,7 +34,7 @@ $CORNER_RADIUS: $HEIGHT / 2
         border-top-left-radius: $CORNER_RADIUS
         border-bottom-left-radius: $CORNER_RADIUS
       > .relation
-        margin: #{($HEIGHT - $HEIGHT_RELATION) / 2} #{-$HEIGHT_RELATION / 2}
+        margin: #{calc(($HEIGHT - $HEIGHT-RELATION) / 2)} #{calc(-1 * $HEIGHT-RELATION / 2)}
         width: $HEIGHT_RELATION
         min-width: $HEIGHT_RELATION
       > .values
