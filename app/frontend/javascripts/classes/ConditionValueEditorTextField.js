@@ -24,12 +24,14 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
       this,
       this._body,
       {
-        [CONDITION_TYPE.gene_symbol]: 'BRCA2',
         [CONDITION_TYPE.disease]: 'Breast-ovarian cancer, familial 2',
+        [CONDITION_TYPE.gene_symbol]: 'BRCA2',
+        [CONDITION_TYPE.variant_id]: 'rs1489251879',
       }[conditionType],
       {
-        [CONDITION_TYPE.gene_symbol]: 'gene',
         [CONDITION_TYPE.disease]: 'disease',
+        [CONDITION_TYPE.gene_symbol]: 'gene',
+        [CONDITION_TYPE.variant_id]: 'variant',
       }[conditionType],
       `${API_URL}/api/search/${conditionType}?term=`,
       conditionType

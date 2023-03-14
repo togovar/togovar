@@ -7,8 +7,8 @@ import ConditionValueEditorLocation from './ConditionValueEditorLocation.js';
 import { CONDITION_TYPE } from '../definition.js';
 import ConditionValueEditorDisease from './ConditionValueEditorDisease.js';
 
-const DISEASE_API_URL =
-  'https://togovar-stg.biosciencedbc.jp/api/search/disease?term=';
+// const DISEASE_API_URL =
+//   'https://togovar-stg.biosciencedbc.jp/api/search/disease?term=';
 export default class ConditionValues {
   constructor(conditionView, defaultValues) {
     this._conditionView = conditionView;
@@ -49,6 +49,7 @@ export default class ConditionValues {
           )
         );
         break;
+
       case CONDITION_TYPE.consequence:
         this._editors.push(
           new ConditionValueEditorColumns(
@@ -57,6 +58,7 @@ export default class ConditionValues {
           )
         );
         break;
+
       case CONDITION_TYPE.dataset:
         this._editors.push(
           new ConditionValueEditorColumns(
@@ -71,6 +73,16 @@ export default class ConditionValues {
           )
         );
         break;
+
+      case CONDITION_TYPE.disease:
+        this._editors.push(
+          new ConditionValueEditorDisease(
+            this,
+            this._conditionView.conditionType
+          )
+        );
+        break;
+
       case CONDITION_TYPE.gene_symbol:
         this._editors.push(
           new ConditionValueEditorTextField(
@@ -79,15 +91,16 @@ export default class ConditionValues {
           )
         );
         break;
-      case CONDITION_TYPE.disease:
+
+      case CONDITION_TYPE.variant_id:
         this._editors.push(
-          new ConditionValueEditorDisease(
+          new ConditionValueEditorTextField(
             this,
             this._conditionView.conditionType
           )
         );
-
         break;
+
       case CONDITION_TYPE.location:
         this._editors.push(
           new ConditionValueEditorLocation(
