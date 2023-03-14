@@ -96,7 +96,9 @@ export default class SearchFieldView {
     const hideSuggest =
       this._suggesting && (e.key === 'Escape' || this._field.value.length < 3);
     const showSuggest =
-      this._field.value.length >= 3 && this._field.value !== this.lastValue;
+      this._field.value.length >= 3 &&
+      this._field.value !== this.lastValue &&
+      this._conditionType !== CONDITION_TYPE.variant_id;
 
     switch (true) {
       case e.key === 'Enter':
@@ -127,6 +129,11 @@ export default class SearchFieldView {
           this._suggestList[this._suggestPosition.y].id;
       }
     }
+
+    if (this._conditionType === CONDITION_TYPE.variant_id) {
+      this._field.dataset.value = this._field.value;
+    }
+
     this._suggesting = false;
     this._suggestView.innerHTML = '';
     this._search();
@@ -138,16 +145,21 @@ export default class SearchFieldView {
     this.lastValue = '';
   }
 
-  _suggestShow() {
-    fetch(`${this._queryURL}${this._field.value}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-    })
-      .then((response) => response.json())
-      .then((json) => this._createSuggestList(json));
+  async _suggestShow() {
+    try {
+      const response = await fetch(`${this._queryURL}${this._field.value}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      });
+      const json = await response.json();
+      this._createSuggestList(json);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   _focusIsNotArea() {
