@@ -1,7 +1,7 @@
 import deparam from 'deparam.js';
 import { API_URL } from '../global.js';
 import { debounce } from '../utils/debounce.js';
-import Download from './Download.js';
+import DownloadButton from './DownloadButton.js';
 
 const LIMIT = 100;
 const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
@@ -341,7 +341,7 @@ export const mixin = {
           ) {
             this._setSimpleSearchConditions({});
           }
-          Download.switchDisplayWithConditions();
+          DownloadButton.switchDisplayWithConditions();
         })
         .catch((e) => {
           if (e.name === 'AbortError') {

@@ -8,7 +8,7 @@ import ActivityIndicator from '../javascripts/classes/ActivityIndicator.js';
 import ModuleTabsView from '../javascripts/classes/ModuleTabsView.js';
 // import CollapseView from '../javascripts/classes/CollapseView.js';
 import TopPageLayoutManager from '../javascripts/classes/TopPageLayoutManager.js';
-import Download from '../javascripts/classes/Download.js';
+import DownloadButton from './classes/DownloadButton.js';
 // Search
 import SimpleSearchView from './classes/SimpleSearchView.js';
 import AdvancedSearchBuilderView from '../javascripts/classes/AdvancedSearchBuilderView.js';
@@ -44,13 +44,21 @@ export function initHome() {
     const resultView = new ResultsView(document.getElementById('ResultsView'));
 
     // Download
-    new Download(
+    new DownloadButton(
       document.getElementById('DownloadJson'),
       'application/json',
       'json'
     );
-    new Download(document.getElementById('DownloadCsv'), 'text/csv', 'csv');
-    new Download(document.getElementById('DownloadTsv'), 'text/plain', 'tsv');
+    new DownloadButton(
+      document.getElementById('DownloadCsv'),
+      'text/csv',
+      'csv'
+    );
+    new DownloadButton(
+      document.getElementById('DownloadTsv'),
+      'text/plain',
+      'tsv'
+    );
 
     // サイドバー
     new SideBar(document.getElementById('SideBar'));
