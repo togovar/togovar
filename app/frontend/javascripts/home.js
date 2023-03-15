@@ -44,21 +44,9 @@ export function initHome() {
     const resultView = new ResultsView(document.getElementById('ResultsView'));
 
     // Download
-    new DownloadButton(
-      document.getElementById('DownloadJson'),
-      'application/json',
-      'json'
-    );
-    new DownloadButton(
-      document.getElementById('DownloadCsv'),
-      'text/csv',
-      'csv'
-    );
-    new DownloadButton(
-      document.getElementById('DownloadTsv'),
-      'text/plain',
-      'tsv'
-    );
+    new DownloadButton(document.getElementById('DownloadJson'));
+    new DownloadButton(document.getElementById('DownloadCsv'));
+    new DownloadButton(document.getElementById('DownloadTsv'));
 
     // サイドバー
     new SideBar(document.getElementById('SideBar'));
