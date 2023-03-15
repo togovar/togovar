@@ -23,15 +23,6 @@ export default class DownloadButton {
     this.#trigger.addEventListener('click', this.#downloadFile.bind(this));
   }
 
-  static switchDisplayWithConditions() {
-    const buttonGroupEl = document.querySelectorAll('.right > li > button');
-    const conditions = StoreManager._store.advancedSearchConditions;
-    const hasConditions = Object.keys(conditions).length > 0;
-    buttonGroupEl.forEach((button) => {
-      button.classList.toggle('-disabled', !hasConditions);
-    });
-  }
-
   #downloadQuery() {
     this.#options.body = { query: {} };
     if (document.body.getAttribute('data-search-mode') === 'advanced') {
