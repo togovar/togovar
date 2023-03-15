@@ -7,15 +7,15 @@ export default class DownloadButton {
   #path;
   #options;
 
-  constructor(trigger, accept, filetype) {
+  constructor(trigger) {
     this.#trigger = trigger;
-    this.#filetype = filetype;
+    this.#filetype = trigger.dataset.filetype;
     this.#path = `${API_URL}/api/download/variant`;
     this.#options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Accept: accept,
+        Accept: trigger.dataset.accept,
       },
       mode: 'cors',
     };
