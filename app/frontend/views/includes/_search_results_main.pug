@@ -21,11 +21,11 @@ main#SearchResultsView.LayoutMainAside
         ul.right
           li.text Download
           li
-            button#DownloadJson.button-view.-disabled JSON
+            button#DownloadJson.button-view.-disabled(data-filetype="application/json" data-accept="json") JSON
           li
-            button#DownloadCsv.button-view.-disabled CSV
+            button#DownloadCsv.button-view.-disabled(data-filetype="text/csv" data-accept="csv") CSV
           li
-            button#DownloadTsv.button-view.-disabled TSV
+            button#DownloadTsv.button-view.-disabled(data-filetype="text/plain" data-accept="tsv") TSV
       #Messages
       .tablecontainer
         table.results-view
