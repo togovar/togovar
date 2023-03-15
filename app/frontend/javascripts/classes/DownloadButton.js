@@ -26,7 +26,9 @@ export default class DownloadButton {
   #downloadQuery() {
     this.#options.body = { query: {} };
     if (document.body.getAttribute('data-search-mode') === 'advanced') {
-      this.#options.body.query = StoreManager._store.advancedSearchConditions;
+      this.#options.body.query = StoreManager.getData(
+        'advancedSearchConditions'
+      );
       this.#options.body = JSON.stringify(this.#options.body);
     }
   }
