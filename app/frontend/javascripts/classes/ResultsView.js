@@ -25,11 +25,11 @@ export default class ResultsView {
     new ScrollBar(this.elm.querySelector('.scroll-bar'));
     // ヘッダ+ ヘッダのツールチップ用のデータ設定
     this.elm.querySelector(
-      '.tablecontainer > table.results-view > thead > tr'
-    ).innerHTML = COLUMNS.map(
+      '.tablecontainer > table.results-view > thead'
+    ).innerHTML = `<tr>${COLUMNS.map(
       (column) =>
         `<th class="${column.id}"><p data-tooltip-id="table-header-${column.id}">${column.label}</p></th>`
-    ).join('');
+    ).join('')}</tr>`;
 
     this.tbody = this.elm.querySelector(
       '.tablecontainer > table.results-view > tbody'
