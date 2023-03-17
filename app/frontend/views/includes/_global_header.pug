@@ -1,9 +1,10 @@
 - const navLink = (page) => `/doc/${locals.language && locals.language !== "en" ? `${locals.language}/${page}` : page}`
 
 header#GlobalHeader
-  h1.heading
-    a.link(href="/")
-      img.logotype(src=require("../../images/logotype.svg").default alt="TOGO VAR")
+  .left
+    h1.heading
+      a.link(href="/")
+        img.logotype(src=require("../../images/logotype.svg").default alt="TOGO VAR")
     span.summary A comprehensive Japanese genetic variation database
 
     .dropdown-view
