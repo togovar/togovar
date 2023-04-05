@@ -360,7 +360,11 @@ module Elasticsearch
               end
 
       query[:size] = @size
-      query[:from] = @from unless @from.zero?
+      if @from.is_a?(Array)
+        query[:search_after] = [@from[0].to_i, @from[1].to_i, @from[2].to_s, @from[3].to_s]
+      else
+        query[:from] = @from unless @from.zero?
+      end
       query[:sort] = %w[chromosome.index vcf.position vcf.reference vcf.alternate] if @sort
 
       query
