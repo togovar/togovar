@@ -96,7 +96,7 @@ export default class ResultsRowView {
           break;
         case 'clinical_significance': // clinical significance
           html +=
-            '<td class="clinical_significance" data-remains=""><!--<div class="dataset-icon -none" data-dataset="mgend"></div>--><div href="" class="clinical-significance" data-sign=""></div><a class="hyper-text -internal"></a></td>';
+            '<td class="clinical_significance" data-remains=""><!--<div class="dataset-icon -none" data-dataset="mgend"></div>--><div href="" class="clinical-significance" data-sign=""></div><a class="hyper-text -internal" target="_blank"></a></td>';
           break;
       }
     }
@@ -332,6 +332,7 @@ export default class ResultsRowView {
               this.tdClinical.dataset.remains = 0;
               this.tdClinicalSign.dataset.sign = '';
               this.tdClinicalAnchor.textContent = '';
+              this.tdClinicalAnchor.setAttribute('href', '');
             }
           }
           break;
