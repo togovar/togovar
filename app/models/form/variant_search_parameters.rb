@@ -39,7 +39,7 @@ module Form
       @sift = Form::Sift.defaults.merge(params.fetch(:sift, {}))
       @polyphen = Form::Polyphen.defaults.merge(params.fetch(:polyphen, {}))
 
-      @offset = params.fetch(:offset, '0').to_i.between(0, 10_000)
+      @offset = params[:offset].is_a?(Array) ? params[:offset] : params.fetch(:offset, '0').to_i.between(0, 10_000)
       @limit = params.fetch(:limit, '100').to_i.between(0, 100)
 
       @stat = params.fetch(:stat, '1')

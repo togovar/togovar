@@ -8,6 +8,7 @@ module API
 
     class QueryError < StandardError; end
 
+    # GET /api/download/variant(.:format)
     # POST /api/download/variant(.:format)
     def variant
       respond_to do |format|
@@ -48,20 +49,26 @@ module API
 
     private
 
-    def variant_params
-      params.permit(query: {})
-    end
-
     def search_params
-      params = variant_params.to_h
-      params.delete(:offset)
-      params.delete(:limit)
+      query = if request.get?
+                params.permit :term, :quality, :debug, :offset, :limit,
+                              dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {}, sift: {}, polyphen: {}
+              else
+                params.permit query: {}
+              end.to_h
 
-      params.merge(body: params)
+      query.delete(:offset)
+      query.delete(:limit)
+
+      query.merge(body: query)
     end
 
     def validate_query
-      service = VariationSearchService.new(search_params, debug: true)
+      service = if request.get?
+                  VariationSearchService::WithQueryParameters.new(search_params)
+                else
+                  VariationSearchService.new(search_params)
+                end
 
       service.validate
 
@@ -101,7 +108,13 @@ module API
           params[:offset] = params[:body][:offset] = offset if offset.present?
           params[:limit] = params[:body][:limit] = 1_000
 
-          break if (res = VariationSearchService.new(params).results.to_a).blank?
+          service = if request.get?
+                      VariationSearchService::WithQueryParameters.new(params)
+                    else
+                      VariationSearchService.new(params)
+                    end
+
+          break if (res = service.results.to_a).blank?
 
           yielder << res
 

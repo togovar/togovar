@@ -29,6 +29,20 @@ class VariationSearchService
       ResponseFormatter.new(param, search, @error, @warning, @notice).to_hash
     end
 
+    def query
+      builder.build.tap { |q| debug[:query] = q if @options[:debug] }
+    end
+
+    def validate; end
+
+    def results
+      Variation.search(query).records.results
+    end
+
+    def total
+      Variation.count(body: query.slice(:query))
+    end
+
     private
 
     def clear_all
@@ -37,10 +51,6 @@ class VariationSearchService
 
     def stat_query
       builder.stat_query.tap { |q| debug[:stat_query] = q if @options[:debug] }
-    end
-
-    def query
-      builder.build.tap { |q| debug[:query] = q if @options[:debug] }
     end
 
     def param
