@@ -357,7 +357,15 @@ export const mixin = {
     // for Download button
     const hasConditions =
       Object.keys(this._store.advancedSearchConditions).length > 0;
-    document.body.toggleAttribute('data-has-conditions', hasConditions);
+    switch (this._store.searchMode) {
+      case 'simple':
+        if (this._store.simpleSearchConditions.term) {
+          document.body.setAttribute('data-has-conditions', true);
+        }
+        break;
+      case 'advanced':
+        document.body.toggleAttribute('data-has-conditions', hasConditions);
+    }
   },
 
   // Bindings *******************************************

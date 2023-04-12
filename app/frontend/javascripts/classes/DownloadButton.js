@@ -5,13 +5,21 @@ export default class DownloadButton {
   #trigger;
   #filetype;
   #path;
-  #options;
+  #simpleOptions;
+  #advancedOptions;
 
   constructor(trigger) {
     this.#trigger = trigger;
     this.#filetype = trigger.dataset.filetype;
     this.#path = `${API_URL}/api/download/variant`;
-    this.#options = {
+    this.#simpleOptions = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: trigger.dataset.accept,
+      },
+    };
+    this.#advancedOptions = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -23,20 +31,36 @@ export default class DownloadButton {
     this.#trigger.addEventListener('click', this.#downloadFile.bind(this));
   }
 
-  #downloadQuery() {
-    this.#options.body = { query: {} };
-    if (document.body.getAttribute('data-search-mode') === 'advanced') {
-      this.#options.body.query = StoreManager.getData(
-        'advancedSearchConditions'
-      );
-      this.#options.body = JSON.stringify(this.#options.body);
-    }
+  #downloadQueryBody() {
+    this.#advancedOptions.body = { query: {} };
+    this.#advancedOptions.body.query = StoreManager.getData(
+      'advancedSearchConditions'
+    );
+    this.#advancedOptions.body = JSON.stringify(this.#advancedOptions.body);
   }
 
   async #downloadFile() {
-    this.#downloadQuery();
     try {
-      const response = await fetch(this.#path, this.#options, this.#filetype);
+      let response;
+      switch (StoreManager.getData('searchMode')) {
+        case 'simple':
+          response = await fetch(
+            `${this.#path}?term=${
+              StoreManager.getData('simpleSearchConditions').term
+            }`,
+            this.#simpleOptions
+          );
+          break;
+
+        case 'advanced':
+          this.#downloadQueryBody();
+          response = await fetch(
+            this.#path,
+            this.#advancedOptions,
+            this.#filetype
+          );
+          break;
+      }
       if (!response.ok) {
         throw new Error('Failed to download file');
       }
