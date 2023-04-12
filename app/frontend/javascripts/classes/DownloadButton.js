@@ -54,11 +54,7 @@ export default class DownloadButton {
 
         case 'advanced':
           this.#downloadQueryBody();
-          response = await fetch(
-            this.#path,
-            this.#advancedOptions,
-            this.#filetype
-          );
+          response = await fetch(this.#path, this.#advancedOptions);
           break;
       }
       if (!response.ok) {
