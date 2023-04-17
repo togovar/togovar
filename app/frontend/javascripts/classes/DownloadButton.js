@@ -31,12 +31,9 @@ export default class DownloadButton {
     this.#trigger.addEventListener('click', this.#downloadFile.bind(this));
   }
 
-  #downloadQueryBody() {
-    this.#advancedOptions.body = { query: {} };
-    this.#advancedOptions.body.query = StoreManager.getData(
-      'advancedSearchConditions'
-    );
-    this.#advancedOptions.body = JSON.stringify(this.#advancedOptions.body);
+  #advancedDownloadQueryBody() {
+    const query = StoreManager.getData('advancedSearchConditions');
+    this.#advancedOptions.body = JSON.stringify({ query });
   }
 
   async #downloadFile() {
@@ -53,7 +50,7 @@ export default class DownloadButton {
           break;
 
         case 'advanced':
-          this.#downloadQueryBody();
+          this.#advancedDownloadQueryBody();
           response = await fetch(this.#path, this.#advancedOptions);
           break;
       }
