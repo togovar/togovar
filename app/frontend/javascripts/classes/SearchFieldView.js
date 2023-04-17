@@ -92,6 +92,8 @@ export default class SearchFieldView {
   }
 
   _suggestDecisionAndShowHide(e) {
+    const decisionSuggest = e.key === 'Enter' && this._suggestPosition.y !== -1;
+    const fieldValueIsEmpty = e.key === 'Enter' && this._field.value === '';
     const hideSuggest =
       this._suggesting && (e.key === 'Escape' || this._field.value.length < 3);
     const showSuggest =
@@ -100,8 +102,10 @@ export default class SearchFieldView {
       this._conditionType !== CONDITION_TYPE.variant_id;
 
     switch (true) {
-      case e.key === 'Enter' && this._suggestPosition.y !== -1:
+      case decisionSuggest:
         return this._suggestDecision();
+      case fieldValueIsEmpty:
+        return this._search();
       case hideSuggest:
         return this._suggestHide();
       case showSuggest:
