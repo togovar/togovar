@@ -358,7 +358,6 @@ export const mixin = {
     switch (this._store.searchMode) {
       case 'simple':
         if (this._store.simpleSearchConditions.term) {
-          console.log(this._store.simpleSearchConditions.term);
           document.body.setAttribute('data-has-conditions', true);
         }
         break;
