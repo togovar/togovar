@@ -194,9 +194,7 @@ export const mixin = {
     window.history.pushState(
       this._URIParameters,
       '',
-      `${window.location.origin}${window.location.pathname}?${$.param(
-        this._URIParameters
-      )}`
+      `${window.location.origin}${window.location.pathname}?mode=advanced`
     );
   },
 

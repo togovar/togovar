@@ -1,4 +1,3 @@
-import { API_URL } from '../global.js';
 import { CONDITION_TYPE } from '../definition.js';
 
 const NUMBER_OF_SUGGESTS = 10; // TODO: Config
@@ -16,9 +15,9 @@ const KEY_INCREMENT = {
 
 export default class SearchFieldView {
   /**
-   * @param {Object} _delegate - SimpleSearchView Object ?
-   * @param {Element} _elm - SimpleSearchView Element
-   * @param {String} _placeholder - placeholder for gene, disease
+   * @param {Object} _delegate - SimpleSearchView or ConditionValueEditorTextField Object
+   * @param {Element} _elm - Parent element of the search-field-view
+   * @param {String} _placeholder
    * @param {Array} _suggestDictionaries - ['gene', 'disease']
    * @param {URL} _queryURL - API
    * @param {String | Undefined} _conditionType - 'gene' or 'disease' or undefined
@@ -28,7 +27,7 @@ export default class SearchFieldView {
     _elm,
     _placeholder,
     _suggestDictionaries,
-    _queryURL = `${API_URL}/suggest?term=`,
+    _queryURL,
     _conditionType
   ) {
     this._delegate = _delegate;

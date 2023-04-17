@@ -5,13 +5,12 @@ import { API_URL } from '../global.js';
 
 export default class ConditionValueEditorTextField extends ConditionValueEditor {
   /**
-   * @param {Object} valuesView - ConditionType Object?(_conditionView, _editors _okButton, _sections)
-   * @param {String} conditionType - "gene" or "disease"?
+   * @param {Object} valuesView - ConditionValues Object(_conditionView, _editors _okButton, _sections)
+   * @param {String} conditionType - "gene" or "disease" or "variant"
    */
 
   constructor(valuesView, conditionType) {
     super(valuesView, conditionType);
-    this._conditionType = conditionType;
 
     // HTML
     this._createElement(
