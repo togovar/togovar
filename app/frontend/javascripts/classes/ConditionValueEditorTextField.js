@@ -41,7 +41,7 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
   // public methods
 
   keepLastValues() {
-    this._lastValue = this._searchFieldView.value;
+    this._lastValue = this._searchFieldView.label;
   }
 
   restore() {
