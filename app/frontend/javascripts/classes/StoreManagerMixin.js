@@ -355,16 +355,18 @@ export const mixin = {
       this._setSimpleSearchConditions({});
     }
     // for Download button
-    const hasConditions =
-      Object.keys(this._store.advancedSearchConditions).length > 0;
     switch (this._store.searchMode) {
       case 'simple':
         if (this._store.simpleSearchConditions.term) {
+          console.log(this._store.simpleSearchConditions.term);
           document.body.setAttribute('data-has-conditions', true);
         }
         break;
       case 'advanced':
-        document.body.toggleAttribute('data-has-conditions', hasConditions);
+        document.body.toggleAttribute(
+          'data-has-conditions',
+          Object.keys(this._store.advancedSearchConditions).length > 0
+        );
     }
   },
 
