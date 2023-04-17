@@ -113,8 +113,7 @@ export default class SimpleSearchView {
   }
 
   search() {
-    const label = this._searchFieldView.label;
-    StoreManager.setSimpleSearchCondition('term', label);
+    StoreManager.setSimpleSearchCondition('term', this._searchFieldView.label);
   }
 
   simpleSearchConditions(conditions) {
