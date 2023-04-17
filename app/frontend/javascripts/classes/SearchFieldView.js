@@ -93,7 +93,7 @@ export default class SearchFieldView {
 
   _suggestDecisionAndShowHide(e) {
     const decisionSuggest = e.key === 'Enter' && this._suggestPosition.y !== -1;
-    const fieldValueIsEmpty = e.key === 'Enter' && this._field.value === '';
+    const fieldValueIsEmpty = this._field.value === '';
     const hideSuggest =
       this._suggesting && (e.key === 'Escape' || this._field.value.length < 3);
     const showSuggest =
