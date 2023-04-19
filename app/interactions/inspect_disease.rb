@@ -31,7 +31,7 @@ class InspectDisease < ActiveInteraction::Base
           label: 'Disease or disorder',
           root: true,
         }
-      elsif (x = DiseaseMondo.search(query: { match: { mondo: parent } }).results.first)
+      elsif (x = DiseaseMondo.search(query: { match: { mondo: parent } }, size: 100).results.first)
         {
           id: (id = x.dig(:_source, :mondo)),
           cui: x.dig(:_source, :cui),
@@ -40,7 +40,7 @@ class InspectDisease < ActiveInteraction::Base
       end
     end.compact
 
-    children = DiseaseMondo.search(query: { match: { parent: node || 'MONDO_0000001' } }, sort: 'mondo').results.map do |r|
+    children = DiseaseMondo.search(query: { match: { parent: node || 'MONDO_0000001' } }, sort: 'mondo', size: 100).results.map do |r|
       {
         id: (id = r.dig(:_source, :mondo)),
         cui: r.dig(:_source, :cui),
