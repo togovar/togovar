@@ -54,7 +54,12 @@ module API
                 params.permit :term, :quality, :debug, :offset, :limit,
                               dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {}, sift: {}, polyphen: {}
               else
-                params.permit query: {}
+                if params.key?(:query)
+                  params.permit query: {}
+                else
+                  body = request.body.tap(&:rewind).read
+                  JSON.parse(body).with_indifferent_access
+                end
               end.to_h
 
       query.delete(:offset)
@@ -93,6 +98,7 @@ module API
     def set_header(content_type)
       response.headers['X-Accel-Buffering'] = 'no'
       response.headers['Cache-Control'] = 'no-cache'
+      response.headers['Content-Disposition'] = 'attachment'
       response.headers['Content-Type'] = content_type if content_type.present?
       response.headers['Last-Modified'] = Time.now.httpdate.to_s
       response.headers.delete('Content-Length')
