@@ -5,66 +5,50 @@ export default class DownloadButton {
   #trigger;
   #filetype;
   #path;
-  #simpleOptions;
-  #advancedOptions;
 
   constructor(trigger) {
     this.#trigger = trigger;
     this.#filetype = trigger.dataset.filetype;
     this.#path = `${API_URL}/api/download/variant`;
-    this.#simpleOptions = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: trigger.dataset.accept,
-      },
-    };
-    this.#advancedOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: trigger.dataset.accept,
-      },
-      mode: 'cors',
-    };
 
-    this.#trigger.addEventListener('click', this.#downloadFile.bind(this));
+    this.#trigger.addEventListener(
+      'click',
+      this.#downloadFile.bind(this, this.#filetype)
+    );
   }
 
-  #advancedDownloadQueryBody() {
-    const query = StoreManager.getData('advancedSearchConditions');
-    this.#advancedOptions.body = JSON.stringify({ query });
-  }
-
-  async #downloadFile() {
-    try {
-      let response;
-      switch (StoreManager.getData('searchMode')) {
-        case 'simple':
-          response = await fetch(
-            `${this.#path}?term=${
-              StoreManager.getData('simpleSearchConditions').term
-            }`,
-            this.#simpleOptions
-          );
-          break;
-
-        case 'advanced':
-          this.#advancedDownloadQueryBody();
-          response = await fetch(this.#path, this.#advancedOptions);
-          break;
-      }
-      if (!response.ok) {
-        throw new Error('Failed to download file');
-      }
-      const blobUrl = URL.createObjectURL(await response.blob());
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = `togovar.${this.#filetype}`;
-      link.click();
-      URL.revokeObjectURL(blobUrl);
-    } catch (error) {
-      console.error(error);
+  #downloadFile(type) {
+    switch (StoreManager.getData('searchMode')) {
+      case 'simple':
+        return this.#downloadFromSimpleSearch(type);
+      case 'advanced':
+        return this.#downloadFromAdvancedSearch(type);
     }
+  }
+
+  #downloadFromSimpleSearch(type) {
+    const query = StoreManager.getData('simpleSearchConditions').term;
+    const anchor = document.createElement('a');
+    anchor.href = `${this.#path}.${type}?term=${query}`;
+    anchor.click();
+  }
+
+  #downloadFromAdvancedSearch(type) {
+    const body = { query: StoreManager.getData('advancedSearchConditions') };
+    const form = document.createElement('form');
+    form.action = `${this.#path}.${type}`;
+    form.method = 'post';
+    form.enctype = 'text/plain';
+    form.setAttribute('style', 'display: none;');
+    const input = document.createElement('input');
+    input.setAttribute(
+      'name',
+      JSON.stringify(body).slice(0, -1) + ', "dummy": "'
+    );
+    input.setAttribute('value', '"}');
+    form.appendChild(input);
+    document.body.appendChild(form);
+
+    form.submit();
   }
 }
