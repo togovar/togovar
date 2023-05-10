@@ -55,7 +55,7 @@ module API
                               dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {}, sift: {}, polyphen: {}, column: {}
               else
                 if params.key?(:query)
-                  params.permit query: {}, columns: []
+                  params.permit query: {}, column: []
                 else
                   body = request.body.tap(&:rewind).read
                   JSON.parse(body).with_indifferent_access
