@@ -52,10 +52,10 @@ module API
     def search_params
       query = if request.get?
                 params.permit :term, :quality, :debug, :offset, :limit,
-                              dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {}, sift: {}, polyphen: {}
+                              dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {}, sift: {}, polyphen: {}, column: {}
               else
                 if params.key?(:query)
-                  params.permit query: {}
+                  params.permit query: {}, columns: []
                 else
                   body = request.body.tap(&:rewind).read
                   JSON.parse(body).with_indifferent_access
@@ -66,6 +66,16 @@ module API
       query.delete(:limit)
 
       query.merge(body: query)
+    end
+
+    def output_columns
+      columns = %i[id rs position ref_alt type gene frequency consequence sift polyphen condition]
+
+      if request.get?
+        columns - (search_params[:column].presence || {}).select { |_, v| v == '0' }.keys.map(&:to_sym)
+      else
+        search_params[:column].present? ? Array(search_params[:column]).map(&:to_sym) : columns
+      end
     end
 
     def validate_query
@@ -212,8 +222,6 @@ module API
                      .uniq
                      .map { |x| { name: x[:name], id: x[:id], synonyms: synonyms[x[:id]] }.compact }
                 end
-      transcripts = vep.map { |x| x[:transcript_id] }.compact
-      transcripts = transcripts.join(ITEMS_SEPARATOR) if type == :csv
 
       consequences = vep.flat_map { |x| x[:consequence] }
                         .uniq
@@ -223,25 +231,33 @@ module API
 
       sift = vep.map { |x| x[:sift] }.compact.min
       polyphen = vep.map { |x| x[:polyphen] }.compact.max
+      conditions = if (conditions = result.dig(:clinvar, :conditions)).present?
+                     if type == :csv
+                       conditions.map { |x| "#{x[:condition]}=#{x[:interpretation].join('|').presence || '-'}" }.join(ITEMS_SEPARATOR)
+                     else
+                       conditions.map { |x| [x[:condition], x[:interpretation]] }.to_h
+                     end
+                   end
 
-      {
-        tgv_id: id,
-        rs: dbsnp.presence,
-        chromosome: result.dig(:chromosome, :label),
-        position: result.dig(:vcf, :position),
-        reference: "#{result[:reference]}",
-        alternate: "#{result[:alternate]}",
-        symbol: symbols.presence,
-        transcript_id: transcripts.presence,
-        consequence: consequences.presence,
-        sift_prediction: sift ? Sift.find_by_value(sift).label : nil,
-        sift_value: sift,
-        polyphen2_prediction: polyphen ? Polyphen.find_by_value(polyphen).label : nil,
-        polyphen2_value: polyphen
-      }
+      columns = output_columns
+      data = {}
+      data.merge!(tgv_id: id) if columns.include?(:id)
+      data.merge!(rs: dbsnp.presence) if columns.include?(:rs)
+      data.merge!(chromosome: result.dig(:chromosome, :label), position: result.dig(:vcf, :position)) if columns.include?(:position)
+      data.merge!(reference: "#{result[:reference]}", alternate: "#{result[:alternate]}") if columns.include?(:ref_alt)
+      data.merge!(type: "#{result[:type]}") if columns.include?(:type)
+      data.merge!(gene: symbols.presence) if columns.include?(:gene)
+      data.merge!(consequence: consequences.presence) if columns.include?(:consequence)
+      data.merge!(sift_prediction: sift ? Sift.find_by_value(sift).label : nil, sift_value: sift) if columns.include?(:sift)
+      data.merge!(polyphen2_prediction: polyphen ? Polyphen.find_by_value(polyphen).label : nil, polyphen2_value: polyphen) if columns.include?(:polyphen)
+      data.merge!(condition: conditions) if columns.include?(:condition)
+
+      data
     end
 
     def frequencies(result, type = :json)
+      return {} unless output_columns.include?(:frequency)
+
       frequencies = Array(result[:frequency]).map(&:compact)
 
       frequencies.each do |x|

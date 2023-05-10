@@ -394,6 +394,25 @@ components:
                     maxItems: 4
                     items:
                       type: string
+              column:
+                type: array
+                description: >
+                  This option is only valid for the download API.
+                items:
+                  type: string
+                  enum:
+                    - id
+                    - rs
+                    - position
+                    - ref_alt
+                    - type
+                    - gene
+                    - frequency
+                    - consequence
+                    - sift
+                    - polyphen
+                    - condition
+
           examples:
             Example1:
               $ref: '#/components/examples/SearchVariant-1'
