@@ -35,27 +35,25 @@ class Container extends LitElement {
   };
 
   static styles = css`
-  :host {
-    font-size: 10px;
-    display: block;
-    height: 100%
-    position: relative;
-  
-  }
+    :host {
+      font-size: 10px;
+      display: block;
+      height: 100%;
+      position: relative;
+    }
 
-  .clip {
-    height: 200px;
-    overflow: hidden;
-    position: relative;
-  }
+    .clip {
+      height: 200px;
+      overflow: hidden;
+      position: relative;
+    }
 
-  .flex {
+    .flex {
       height: 100%;
       display: flex;
       flex-direction: row;
-  }
-
-`;
+    }
+  `;
 
   constructor() {
     super();
@@ -75,18 +73,16 @@ class Container extends LitElement {
     };
   }
 
-  set _id(id) {
-    if (this.data?.id !== id) {
+  willUpdate(changedProperties) {
+    if (changedProperties.has('_id') && this.data?.id !== this._id) {
       this._loadingStarted();
-      this.API.get(`/disease?node=${id}`).then(({ data }) => {
+      this.API.get(`/disease?node=${this._id}`).then(({ data }) => {
         this.data = data;
 
         this._loadingEnded();
       });
     }
-  }
 
-  willUpdate(changedProperties) {
     if (changedProperties.has('data')) {
       if (changedProperties.get('data')) {
         if (this.data.id && changedProperties.get('data').id !== this.data.id) {
@@ -143,12 +139,6 @@ class Container extends LitElement {
 
       this.deltaWidth = this.nodeWidth + this.gap;
     }
-  }
-
-  firstUpdated() {
-    this.API.get(`/disease?node=${this._id}`).then(({ data }) => {
-      this.data = data;
-    });
   }
 
   _loadingStarted() {
