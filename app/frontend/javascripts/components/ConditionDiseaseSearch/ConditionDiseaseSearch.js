@@ -26,7 +26,7 @@ export class ConditionDiseaseSearch extends LitElement {
     );
 
     this.data = [];
-    this.diseaseId = 'MONDO_0000001';
+    this.diseaseId = '';
     this.loading = false;
   }
 
