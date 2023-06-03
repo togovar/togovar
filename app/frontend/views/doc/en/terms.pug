@@ -54,45 +54,53 @@ block content
             | contents, follow the licenses of the following data distributors.
           ul.unordered-list
             li
+              | ClinVar:
+              |
+              a(target='_blank', href='https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/') https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/
+            li
               | Colil:
               |
-              a(target='_blank', href='http://colil.dbcls.jp/portal/') http://colil.dbcls.jp/portal/
+              a(target='_blank', href='https://colil.dbcls.jp/portal/') https://colil.dbcls.jp/portal/
             li
               | GEM-J WGA:
               |
-              a(target='_blank', href='/doc/datasets/gem_j_wga#terms') https://togovar.org/doc/datasets/gem_j_wga#terms
+              a(target='_blank', href='/doc/ja/datasets/gem_j_wga#terms') http://togovar.org/doc/ja/datasets/gem_j_wga#terms
             li
               | gnomAD:
               |
               a(target='_blank', href='https://gnomad.broadinstitute.org/terms') https://gnomad.broadinstitute.org/terms
             li
+              | GWAS Catalog:
+              |
+              a(target='_blank', href='https://www.ebi.ac.uk/gwas/docs/about') https://www.ebi.ac.uk/gwas/docs/about
+            li
               | HGNC:
               |
-              a(target='_blank', href='https://www.genenames.org/about') https://www.genenames.org/about
+              a(target='_blank', href='https://www.genenames.org/about/license/') https://www.genenames.org/about/license/
             li
               | HGVD:
               |
               a(target='_blank', href='http://www.hgvd.genome.med.kyoto-u.ac.jp/about.html') http://www.hgvd.genome.med.kyoto-u.ac.jp/about.html
             li
+              | JGA-NGS dataset:
+              |
+              a(href='/doc/ja/datasets/jga_ngs') https://togovar.org/doc/ja/datasets/jga_ngs
+            li
+              | JGA-SNP dataset:
+              |
+              a(href='/doc/ja/datasets/jga_snp') https://togovar.org/doc/ja/datasets/jga_snp
+            li
               | LitVar:
               |
-              a(target='_blank', href='https://www.ncbi.nlm.nih.gov/home/about/policies') https://www.ncbi.nlm.nih.gov/home/about/policies
-            li
-              | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN Allele Frequency Panel:
-              |
-              a(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/help/conditions-of-use') https://jmorp.megabank.tohoku.ac.jp/help/conditions-of-use
+              a(target='_blank', href='https://www.ncbi.nlm.nih.gov/home/about/policies/') https://www.ncbi.nlm.nih.gov/home/about/policies/
             li
               | PubTator Central:
               |
               a(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/README.txt') https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/README.txt
             li
-              | JGA-NGS dataset:
+              | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN Allele Frequency Panel:
               |
-              a(href='/doc/datasets/jga_ngs') https://togovar.org/doc/datasets/jga_ngs
-            li
-              | JGA-SNP dataset:
-              |
-              a(href='/doc/datasets/jga_snp') https://togovar.org/doc/datasets/jga_snp
+              a(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/help/conditions-of-use') https://jmorp.megabank.tohoku.ac.jp/help/conditions-of-use
           p.body
             | This is
             |
@@ -115,24 +123,23 @@ block content
           ol.ordered-list
             li
               h4.heading How to cite the use of the TogoVar database
+              .body Please cite the following article.
               .subsection
-                h5.subheading If you want to cite the entire TogoVar database
-                .body
-                  | TogoVar [Internet]. Kashiwa: Database Center for Life Science, Joint Support-Center for Data Science Research,
-                  |
-                  | Research Organization of Information and Systems
-                  | (Japan); 2018 - [cited YYYY Mmm DD]. Available from:
-                  |
-                  a(href='/') https://togovar.org
-              .subsection
-                h5.subheading If you want to cite specific variants (tgv47264307) of TogoVar
-                .body
-                  | Variant [Internet]. Kashiwa: Database Center for Life Science, Joint Support-Center for Data Science Research,
-                  |
-                  | Research Organization of Information and Systems
-                  | (Japan); [2018] - . TogoVarID tgv47264307; [cited YYYY Mmm DD]. Available from:
-                  |
-                  a(href='/variant/tgv47264307') https://togovar.org/variant/tgv47264307
+              | Mitsuhashi N, Toyo-Oka L, Katayama T, Kawashima M, Kawashima S, Miyazaki K, Takagi T. TogoVar: A comprehensive Japanese genetic variation database. Hum Genome Var. 2022 Dec 12;9(1):44.
+              | doi:
+              |
+              a(target="_blank", href=" https://doi.org/10.1038/s41439-022-00222-9") 10.1038/s41439-022-00222-9
+              | .
+              |
+              | PMID:
+              |
+              a(target="_blank", href="https://pubmed.ncbi.nlm.nih.gov/36509753/") 36509753
+              | ;
+              |
+              | PMCID:
+              |
+              a(target="_blank", href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9744889/") PMC9744889
+              | .
             li
               h4.heading How to cite data (content) that has been imported into the TogoVar database
               .body
@@ -140,7 +147,21 @@ block content
                 | refer to the terms of use for each content.
               .subsection
                 h5.subheading
-                  | Colil [Terms of use:
+                  | ClinVar
+                  | [Terms of use:
+                  |
+                  a(target='_blank', href='https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/')
+                    | https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/
+                  | ]
+                .body
+                  | Landrum MJ, Chitipiralla S, Brown GR, et al. ClinVar: improvements to accessing data. Nucleic Acids Res. 2020;48(D1):D835-D844. doi:10.1093/nar/gkz972
+                  |
+                  a(target='_blank', href='https://doi.org/10.1093/nar/gkz972')
+                    | https://doi.org/10.1093/nar/gkz972
+              .subsection
+                h5.subheading
+                  | Colil
+                  | [Terms of use:
                   |
                   a(target='_blank', href='http://colil.dbcls.jp/portal/index_en.html')
                     | http://colil.dbcls.jp/portal/index_en.html
@@ -153,7 +174,25 @@ block content
                     | https://doi.org/10.1186/s13326-015-0037-x
               .subsection
                 h5.subheading
-                  | gnomAD [Terms of use:
+                  | GEM Japan Whole Genome Aggregation (GEM-J WGA)
+                  | [Terms of use:
+                  |
+                  a(target='_blank', href='/doc/datasets/gem_j_wga')
+                    | https://togovar.org/doc/datasets/gem_j_wga
+                  | ]
+                .body
+                  a(href='/doc/datasets/gem_j_wga') "GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel"
+                  | . Japan:
+                  a.hyper-text.-external(target='_blank', href='https://www.amed.go.jp/en/aboutus/collaboration/ga4gh_gem_japan.html')
+                    | GEnome Medical alliance Japan Project (GEM-J)
+                  | . Available from:
+                  |
+                  a.hyper-text.-external(target='_blank', href='/doc/datasets/gem_j_wga')
+                    | https://togovar.org/doc/datasets/gem_j_wga
+                  | .
+              .subsection
+                h5.subheading
+                  | gnomAD [利用条件:
                   |
                   a(target='_blank', href='https://gnomad.broadinstitute.org/about')
                     | https://gnomad.broadinstitute.org/about
@@ -166,25 +205,32 @@ block content
                     | https://doi.org/10.1038/s41586-020-2308-7
               .subsection
                 h5.subheading
-                  | GEM Japan Whole Genome Aggregation (GEM-J WGA) [Terms of use:
+                  | GWAS Catalog [利用条件:
                   |
-                  a(target='_blank', href='/doc/datasets/gem_j_wga')
-                    | https://togovar.org/doc/datasets/gem_j_wga
+                  a(target='_blank', href='https://www.ebi.ac.uk/gwas/docs/about')
+                    | https://www.ebi.ac.uk/gwas/docs/about
                   | ]
                 .body
-                  a(href='/doc/datasets/gem_j_wga') "GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel"
-                  | . Japan:
+                  | Sollis E, Mosaku A, Abid A, et al. The NHGRI-EBI GWAS Catalog: knowledgebase and deposition resource.
+                  | Nucleic Acids Res. 2023;51(D1):D977-D985.
                   |
-                  a.hyper-text.-external(target='_blank', href='https://www.amed.go.jp/en/aboutus/collaboration/ga4gh_gem_japan.html')
-                    | GEnome Medical alliance Japan Project (GEM-J)
-                  | . Available from:
-                  |
-                  a.hyper-text.-external(target='_blank', href='/doc/datasets/gem_j_wga')
-                    | https://togovar.org/doc/datasets/gem_j_wga
-                  | .
+                  a(target='_blank', href='https://doi.org/10.1093/nar/gkac1010')
+                    | https://doi.org/10.1093/nar/gkac1010
               .subsection
                 h5.subheading
-                  | HGVD Release Version 2.30 (2017/08/02) [Terms of use:
+                  | HGNC [利用条件:
+                  |
+                  a(target='_blank', href='https://www.genenames.org/about/license/')
+                    | https://www.genenames.org/about/license/
+                  | ]
+                .body
+                  | Seal RL, Braschi B, Gray K, et al. Genenames.org: the HGNC resources in 2023. Nucleic Acids Res. 2023;51(D1):D1003-D1009.
+                  |
+                  a(target='_blank', href='https://doi.org/10.1093/nar/gkac888')
+                    | https://doi.org/10.1093/nar/gkac888
+              .subsection
+                h5.subheading
+                  | HGVD Release Version 2.30 (2017/08/02) [利用条件:
                   |
                   a(target='_blank', href='http://www.hgvd.genome.med.kyoto-u.ac.jp/about.html')
                     | http://www.hgvd.genome.med.kyoto-u.ac.jp/about.html
@@ -197,20 +243,46 @@ block content
                     | https://doi.org/10.1038/jhg.2016.12
               .subsection
                 h5.subheading
-                  | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN Allele Frequency Panel (#{ GLOBALS.TOMMO_VERSION }KJPN) [Terms of use:
+                  | JGA-NGS dataset [利用条件:
                   |
-                  a(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/help/conditions-of-use')
-                    | https://jmorp.megabank.tohoku.ac.jp/help/conditions-of-use
+                  a(href='/doc/datasets/jga_ngs') https://togovar.org/doc/datasets/jga_ngs
                   | ]
                 .body
-                  | Tadaka et al., "jMorp updates in 2020: large enhancement of multi-omics data resources on the general
-                  | Japanese population", Nucleic Acids Research. 2021 Jan 8;49(D1):D536-D544.
+                  | Variant set aggregated from NGS data in NBDC Human Database/JGA [Internet]. Tokyo: National
+                  | Bioscience Database Center (NBDC), Japan Science and Technology Agency (Japan); [2018] - .
+                  | JGA-NGS dataset; [cited YYYY Mmm DD]. Available from:
                   |
-                  a(target='_blank', href='https://doi.org/10.1093/nar/gkaa1034')
-                    | https://doi.org/10.1093/nar/gkaa1034
+                  a(href='/doc/datasets/jga_ngs') https://togovar.org/doc/datasets/jga_ngs
               .subsection
                 h5.subheading
-                  | PubTator Central [Terms of use:
+                  | JGA-SNP dataset [利用条件:
+                  |
+                  a(href='https://togovar.org/doc/datasets/jga_snp')
+                    | https://togovar.org/doc/datasets/jga_snp
+                  | ]
+                .body
+                  | Variant set aggregated from SNP-chip data in NBDC Human Database/JGA [Internet]. Tokyo: National
+                  | Bioscience Database Center (NBDC), Japan Science and Technology Agency (Japan); [2018] - . JGA-SNP
+                  | dataset; [cited YYYY Mmm DD]. Available from:
+                  |
+                  a(href='https://togovar.org/doc/datasets/jga_ngs')
+                    | https://togovar.org/doc/datasets/jga_ngs
+              .subsection
+                h5.subheading
+                  | LitVar [利用条件:
+                  |
+                  a(target='_blank', href='https://www.ncbi.nlm.nih.gov/home/about/policies/')
+                    | https://www.ncbi.nlm.nih.gov/home/about/policies/
+                  | ]
+                .body
+                  | Allot A, Peng Y, Wei CH, Lee K, Phan L, Lu Z. LitVar: a semantic search engine for linking genomic variant data in PubMed and PMC.
+                  | Nucleic Acids Res. 2018;46(W1):W530-W536.
+                  |
+                  a(target='_blank', href='https://doi.org/10.1093/nar/gky355')
+                    | https://doi.org/10.1093/nar/gky355
+              .subsection
+                h5.subheading
+                  | PubTator Central [利用条件:
                   |
                   a(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/README.txt')
                     | https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/README.txt
@@ -223,35 +295,22 @@ block content
                     | https://doi.org/10.1093/nar/gkz389
               .subsection
                 h5.subheading
-                  | JGA-NGS dataset [Terms of use:
+                  | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN Allele Frequency Panel (#{ GLOBALS.TOMMO_VERSION }KJPN)
+                  | [利用条件:
                   |
-                  a(href='/doc/datasets/jga_ngs') https://togovar.org/doc/datasets/jga_ngs
+                  a(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/help/conditions-of-use')
+                    | https://jmorp.megabank.tohoku.ac.jp/help/conditions-of-use
                   | ]
                 .body
-                  | Variant set aggregated from NGS data in NBDC Human Database/JGA [Internet]. Tokyo: Japan Science and
-                  | Technology Agency (Japan), National Bioscience Database Center; [2018] - . JGA-NGS dataset;
-                  | [cited YYYY Mmm DD]. Available from:
+                  | Tadaka et al., "jMorp updates in 2020: large enhancement of multi-omics data resources on the general
+                  | Japanese population", Nucleic Acids Research. 2021 Jan 8;49(D1):D536-D544.
                   |
-                  a(href='/doc/datasets/jga_ngs') https://togovar.org/doc/datasets/jga_ngs
-              .subsection
-                h5.subheading
-                  | JGA-SNP dataset [Terms of use:
-                  |
-                  a(href='/doc/datasets/jga_snp') https://togovar.org/doc/datasets/jga_snp
-                  | ]
-                .body
-                  | Variant set aggregated from SNP-chip data in NBDC Human Database/JGA [Internet]. Tokyo: Japan
-                  | Science and Technology Agency (Japan), National Bioscience Database Center; [2018] - . JGA-SNP
-                  | dataset; [cited YYYY Mmm DD]. Available from:
-                  |
-                  a(href='/doc/datasets/jga_ngs') https://togovar.org/doc/datasets/jga_ngs
-
+                  a(target='_blank', href='https://doi.org/10.1093/nar/gkaa1034')
+                    | https://doi.org/10.1093/nar/gkaa1034
         section.section
           h3#license.sectiontitle Examples of ODbL license usage
           ul.unordered-list
             li
               a(target='_blank', href='https://www.openstreetmap.org/copyright/en') Open Street Map
-            li
-              a(target='_blank', href='http://farmsubsidy.openspending.org/legal/') Farm Subsidy
             li
               a(target='_blank', href='https://opencorporates.com/legal/licence') Open Corporates
