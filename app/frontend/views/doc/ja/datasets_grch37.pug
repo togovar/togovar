@@ -86,7 +86,7 @@ article.common-document
         br
         | ∗2：fastq/bam/celファイルやgenotype data一覧など
     section.section
-      h3.sectiontitle その他のバリアントデータ
+      h3.sectiontitle その他のバリアント頻度データ
       table.table._column-span-all
         thead
           tr
@@ -106,18 +106,6 @@ article.common-document
               br
               | 最終更新日
         tbody
-          tr
-            td
-              a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/') ClinVar
-            td._align-center —
-            td._align-left 複数
-            td._align-center
-            td._align-center ✔
-            td._align-center —
-            td._align-center
-              span(style='margin-left:15px;') 788,993
-            td NCBI
-            td 2021
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads')
@@ -182,13 +170,9 @@ article.common-document
             td 東北メディカル・メガバンク機構
             td v202109
       p.notice
-        | 注1：ClinVarは
-        a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/') VCFファイル
-        | に含まれるGRCh37上の位置が決定しているバリアントのみを掲載しています。
-        br
-        | 注2：#{ GLOBALS.TOMMO_VERSION }KJPNの内訳は、SNV (Autosome、chrX(PAR1+PAR2+XTR)、chrMT)とINDEL (Autosome、chrX(PAR1+PAR2+XTR))です。
+        | 注：#{ GLOBALS.TOMMO_VERSION }KJPNの内訳は、SNV (Autosome、chrX(PAR1+PAR2+XTR)、chrMT)とINDEL (Autosome、chrX(PAR1+PAR2+XTR))です。
     section.section
-      h3.sectiontitle バリアント以外のデータ
+      h3.sectiontitle バリアント頻度以外のデータ
       table.table
         thead
           tr
@@ -210,6 +194,13 @@ article.common-document
             td 2013/06/28
             td ヒトゲノムリファレンス配列
             td GRC
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://www.ebi.ac.uk/gwas/')
+                | GWAS Catalog
+            td 2022/09/16
+            td ゲノムワイド関連解析(GWAS)情報
+            td NHGRI-EBI
           tr
             td
               a.hyper-text.-external(target='_blank', href='ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/tsv/hgnc_complete_set.txt')
@@ -237,6 +228,10 @@ article.common-document
             td._align-center —
             td ゲノムに関する包括的な情報
             td DBCLS
+      p.notice
+        | 注：ClinVarはGRCh37上の位置が決定しているバリアントのみを含む
+        a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/') VCFファイル
+        | からデータを取得しています。
     section.section
       h3.sectiontitle データ加工に利用したツール
       table.table
