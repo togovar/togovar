@@ -1,4 +1,15 @@
-import axios from 'axios';
+import Axios from 'axios';
+import { setupCache } from 'axios-cache-interceptor';
+
+export const axios = setupCache(
+  Axios.create({
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  })
+);
+
 /** Cached axios */
 export class cachedAxios {
   /**
@@ -7,7 +18,7 @@ export class cachedAxios {
    * @param {number} maxCacheSize - maximum cache entries number. After reaching this treshold, oldest entries will be deleted from cache.
    */
   constructor(baseURL, maxCacheSize = 100) {
-    this.axios = axios.create({
+    this.axios = Axios.create({
       baseURL,
       headers: {
         'Content-Type': 'application/json',
