@@ -2,6 +2,11 @@ import { LitElement, html, nothing } from 'lit';
 
 import './ConditionDiseaseSearchOntologyView.js';
 import './ConditionDiseaseSearchTextSearch.js';
+import '../Common/SearchField/SearchField.js';
+
+import { API_URL } from '../../global';
+
+const suggestAPI = `${API_URL}/api/search/disease`;
 
 export class ConditionDiseaseSearch extends LitElement {
   _timer = null;
@@ -64,9 +69,11 @@ export class ConditionDiseaseSearch extends LitElement {
 
   render() {
     return html`
-      <condition-disease-text-search
+      <search-field
         @new-suggestion-selected=${this._changeDiseaseEventHadnler}
-      ></condition-disease-text-search>
+        suggestAPIURL="${suggestAPI}"
+        suggestAPIQueryParam="term"
+      ></search-field>
       <div class="container">
         ${this.loading
           ? html`<div class="loading">
