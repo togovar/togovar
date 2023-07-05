@@ -1,7 +1,5 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
-import SearchFieldView from './SearchFieldView.js';
-import { CONDITION_TYPE } from '../definition.js';
-import { API_URL } from '../global.js';
+import SearchField from '../components/Common/SearchField/SearchField.js';
 
 export default class ConditionValueEditorTextField extends ConditionValueEditor {
   /**
@@ -19,21 +17,23 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
       <div class="body"></div>`
     );
 
-    this._searchFieldView = new SearchFieldView(
-      this,
-      this._body,
+    this._searchFieldView = new SearchField(
       {
-        [CONDITION_TYPE.disease]: 'Breast-ovarian cancer, familial 2',
-        [CONDITION_TYPE.gene_symbol]: 'BRCA2',
-        [CONDITION_TYPE.variant_id]: 'rs1489251879',
-      }[conditionType],
-      {
-        [CONDITION_TYPE.disease]: 'disease',
-        [CONDITION_TYPE.gene_symbol]: 'gene',
-        [CONDITION_TYPE.variant_id]: 'variant',
-      }[conditionType],
-      `${API_URL}/api/search/${conditionType}?term=`,
-      conditionType
+        suggestAPIURL: 'https://grch37.togovar.org/api/search/gene',
+        suggestAPIQueryParam: 'term',
+      },
+      'gene',
+      { id: 'id', value: 'symbol' },
+      this._body
+    );
+
+    const handleSuggestSelect = () => {
+      this._update();
+    };
+
+    this._searchFieldView.addEventListener(
+      'new-suggestion-selected',
+      handleSuggestSelect
     );
   }
 
