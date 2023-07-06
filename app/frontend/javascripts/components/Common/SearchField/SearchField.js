@@ -2,7 +2,7 @@ import { LitElement, html, nothing } from 'lit';
 import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { Task } from '@lit-labs/task';
-import { ref, createRef, Ref } from 'lit/directives/ref.js';
+import { ref, createRef } from 'lit/directives/ref.js';
 import { debounce } from '../../../utils/debounce';
 import { axios } from '../../../utils/cachedAxios';
 import { scrollMeUp } from './scrollMeUp';
@@ -199,14 +199,6 @@ export default class SearchField extends LitElement {
     }
   }
 
-  get value() {
-    return this.value;
-  }
-
-  get label() {
-    return this.label;
-  }
-
   setTerm(term) {
     this.label = term;
   }
@@ -285,3 +277,32 @@ export default class SearchField extends LitElement {
 }
 
 customElements.define('search-field', SearchField);
+
+/**
+ * Lit:
+ * <search-field>
+ * </search-field>
+ *
+ * value == input text
+ *
+ * const searchField = new SearchField(this._body) <-- in the JS
+ * searchField.value <-- value of the text
+ *
+ * Add suggestions:
+ * Lit:
+ * <search-field>
+ *   <suggestions-element></suggestions-element> <-- use Context for text entered
+ * </search-field>
+ *
+ * if element is there,
+ *
+ * inside SearchField:
+ * render() {
+ *   return html`
+ *    <div class="search-field-view">
+ *     <input .../>
+ *     <slot> </slot> <-- how to pass here?
+ *    </div>
+ *   `
+ * }
+ */

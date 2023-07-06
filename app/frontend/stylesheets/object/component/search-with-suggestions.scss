@@ -1,0 +1,14 @@
+:host {
+  position: relative;
+}
+
+.suggestions-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  > suggestions-list {
+    display: block;
+  }
+}

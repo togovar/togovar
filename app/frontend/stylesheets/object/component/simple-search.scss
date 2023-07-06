@@ -1,0 +1,25 @@
+$SIZE: 30px;
+
+@use '../../foundation/_variables.scss' as *;
+
+.fieldcontainer {
+  > .field {
+    margin-bottom: 4px;
+    > input[type='text'] {
+      box-sizing: border-box;
+      width: 100%;
+      line-height: $SIZE;
+      height: $SIZE;
+      border: solid 1px $COLOR_KEY_DARK2;
+      border-radius: $SIZE * 0.5;
+      padding: 0 12px;
+      vertical-align: top;
+      font-size: 12px;
+      outline: none;
+      opacity: 0.9;
+      &:focus {
+        opacity: 1;
+      }
+    }
+  }
+}
