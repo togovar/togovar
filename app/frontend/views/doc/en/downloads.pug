@@ -16,37 +16,73 @@ block content
         h2.title Downloads
       .contents
         section.section
-          p.body TogoVar data is downloadable at the links below.
+          h3.sectiontitle
+            | All variants in TogoVar
           ul
             li
-              a(href='/downloads/gem_j_wga/')
-                | Variant frequencies of GEM Japan Whole Genome Aggregation (GEM-J WGA) panel [VCF format]
-              p
-                | The GEM-J WGA panel is a variant frequency dataset of a Japanese general population, which was
-                | obtained by joint variant calling of whole genome sequence (WGS) data collected from 7,609 individuals
-                | across Japan. The WGS data is also available in a controlled access manner. They are the result of
-                |
-                a.hyper-text.-external(target='_blank', href='https://www.amed.go.jp/en/aboutus/collaboration/ga4gh_gem_japan.html')
-                  | the GEnome Medical alliance Japan (GEM Japan) project.
-                a(href='/doc/datasets/gem_j_wga') [More about the dataset]
-                a(href='/downloads/gem_j_wga/') [Download of the dataset]
+              | Allele frequencies
+              ul
+                li
+                  | GRCh38：
+                  a(href='/downloads/release/current/grch38/frequency') tab-separated text
+                  |
+                  | |
+                  |
+                  a(href='/downloads/release/current/grch38/README.txt') README
+                li
+                  | GRCh37：
+                  a(href='/downloads/release/current/grch37/frequency') tab-separated text
+                  |
+                  | |
+                  |
+                  a(href='/downloads/release/current/grch37/README.txt') README
             li
-              a(href='/downloads/release/current')
-                | Variant frequencies of datasets except GEM-J WGA (i.e. JGA-NGS, JGA-SNP, #{ GLOBALS.TOMMO_VERSION }KJPN, HGVD and gnomAD)
-                | [tab-separated format]
-              p
-                a(href='/doc/datasets/jga_ngs') JGA-NGS
-                |  and
-                |
-                a(href='/doc/datasets/jga_snp') JGA-SNP
-                |  are obtained by aggregating individual-level genomic data that have been registered in
-                |
-                a.hyper-text.-external(target='_blank', href='https://humandbs.biosciencedbc.jp/en/') the NBDC Human Database
-                |  /
-                |
-                a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index-e.html')
-                  | Japanese Genotype-phenotype Archive (JGA)
-                | .
-                |
-                a(href='/doc/datasets') [More about the datasets]
-                a(href='/downloads/release/current') [Download of the datasets]
+              | Molecular annotations
+              ul
+                li
+                  | GRCh38：
+                  a(href='/downloads/release/current/grch38/molecular_annotation') tab-separated text
+                  |
+                  | |
+                  |
+                  a(href='/downloads/release/current/grch38/README.txt') README
+                li
+                  | GRCh37：
+                  a(href='/downloads/release/current/grch37/molecular_annotation') tab-separated text
+                  |
+                  | |
+                  |
+                  a(href='/downloads/release/current/grch37/README.txt') README
+            p
+            | Last updated：2022/11/1
+        section.section
+          h3.sectiontitle
+            | Original files from depositors (some datasets)
+          ul
+            li
+              | Variant frequencies of GEM Japan Whole Genome Aggregation (GEM-J WGA) panel
+              ul
+                li
+                  | Allele frequencies
+                ul
+                  li
+                    | GRCh38 (liftover from GRCh37)：
+                    a(href='/downloads/gem_j_wga/grch38') VCF format
+                    |
+                    | |
+                    |
+                    a(href='/downloads/release/current/grch38/README.txt') README
+                  li
+                    | GRCh37：
+                    a(href='/downloads/gem_j_wga/grch38') VCF format
+                    |
+                    | |
+                    |
+                    a(href='/downloads/release/current/grch37/README.txt') README
+            p
+            | Last updated：2021/11/29
+            br
+            | See
+            a(href='/doc/datasets/gem_j_wga') the GEM-J WGA dataset page
+            |
+            | for more about the dataset.
