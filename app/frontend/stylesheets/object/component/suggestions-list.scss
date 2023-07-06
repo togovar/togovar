@@ -1,0 +1,50 @@
+@use '../../foundation/_variables.scss' as *;
+
+:host {
+  z-index: $Z_INDEX_SUGGEST_VIEW;
+  color: $COLOR_BLACK;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  background-color: white;
+}
+
+.list {
+  margin: 10px 0;
+  padding-left: 0;
+  list-style: none;
+  overflow-y: auto;
+  max-height: 200px;
+  > .item {
+    cursor: pointer;
+    padding: 0 $PADDING_SIDE;
+    line-height: 26px;
+    cursor: pointer;
+    transition: background-color $GUI_DURATION;
+    > em {
+      background-color: var(--color-suggest);
+      font-style: normal;
+    }
+    &:first-child {
+      padding-top: 4px;
+    }
+    &:hover {
+      background-color: rgba($COLOR_SELECTED, 0.2);
+    }
+
+    &.-disabled {
+      cursor: auto;
+      &:hover {
+        background-color: inherit;
+      }
+    }
+    > .sub {
+      padding-left: 0.5em;
+      color: rgba($COLOR_BLACK, 0.5);
+      font-size: 12px;
+    }
+
+    &.-selected {
+      background-color: rgba($COLOR_SELECTED, 1);
+    }
+  }
+}
