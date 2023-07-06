@@ -3,6 +3,7 @@ import { LitElement, html, nothing } from 'lit';
 import './ConditionDiseaseSearchOntologyView.js';
 import './ConditionDiseaseSearchTextSearch.js';
 import '../Common/SearchField/SearchField.js';
+import '../Common/SearchField/SearchFieldWithSuggestions';
 
 import { API_URL } from '../../global';
 
@@ -67,13 +68,21 @@ export class ConditionDiseaseSearch extends LitElement {
     }
   }
 
+  // <search-field
+  //       @new-suggestion-selected=${this._changeDiseaseEventHadnler}
+  //       suggestAPIURL="${suggestAPI}"
+  //       suggestAPIQueryParam="term"
+  //     ></search-field>
+
   render() {
     return html`
-      <search-field
-        @new-suggestion-selected=${this._changeDiseaseEventHadnler}
-        suggestAPIURL="${suggestAPI}"
-        suggestAPIQueryParam="term"
-      ></search-field>
+      <search-field-with-suggestions
+        .suggestAPIURL="${suggestAPI}"
+        .suggestAPIQueryParam="${'term'}"
+        .options="${{ value: 'id', label: 'name' }}"
+        @new-suggestion-selected="${this._changeDiseaseEventHadnler}"
+      ></search-field-with-suggestions>
+
       <div class="container">
         ${this.loading
           ? html`<div class="loading">

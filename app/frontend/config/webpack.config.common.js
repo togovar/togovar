@@ -26,10 +26,10 @@ const config = {
         use: {
           loader: 'pug-loader',
           options: {
-            globals: ["GLOBALS"],
+            globals: ['GLOBALS'],
             pretty: true,
-          }
-        }
+          },
+        },
       },
       {
         test: /\.js$/,
@@ -37,9 +37,20 @@ const config = {
         exclude: /node_modules/,
       },
       {
-        test: /\.(sa|sc|c)ss$/,
+        test: /\.(sa|c)ss$/,
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.scss$/,
         use: [
-          MiniCssExtractPlugin.loader,
+          {
+            loader: 'lit-scss-loader',
+            options: {
+              minify: true,
+            },
+          },
+          'extract-loader',
           'css-loader',
           'sass-loader',
         ],
@@ -74,10 +85,7 @@ const config = {
       },
       {
         test: /\.ya?ml$/,
-        use: [
-          { loader: 'json-loader' },
-          { loader: 'yaml-loader' }
-        ]
+        use: [{ loader: 'json-loader' }, { loader: 'yaml-loader' }],
       },
       {
         test: /\.ya?ml\.erb$/,
@@ -89,40 +97,42 @@ const config = {
           {
             loader: 'rails-erb-loader',
             options: {
-              runner: (/^win/.test(process.platform) ? 'ruby ' : '') + 'bin/rails runner'
-            }
-          }
-        ]
-      }
+              runner:
+                (/^win/.test(process.platform) ? 'ruby ' : '') +
+                'bin/rails runner',
+            },
+          },
+        ],
+      },
     ],
   },
   plugins: [
     new webpack.ProvidePlugin({
-      $: "jquery/dist/jquery",
+      $: 'jquery/dist/jquery',
     }),
     new HtmlWebpackPlugin({
-      template: "app/frontend/views/index.pug",
-      filename: "index.html",
+      template: 'app/frontend/views/index.pug',
+      filename: 'index.html',
       inject: false,
     }),
     new HtmlWebpackPlugin({
-      template: "app/frontend/views/variant/index.pug",
-      filename: "variant/index.html",
+      template: 'app/frontend/views/variant/index.pug',
+      filename: 'variant/index.html',
       inject: false,
     }),
     new HtmlWebpackPlugin({
-      template: "app/frontend/views/gene/index.pug",
-      filename: "gene/index.html",
+      template: 'app/frontend/views/gene/index.pug',
+      filename: 'gene/index.html',
       inject: false,
     }),
     new HtmlWebpackPlugin({
-      template: "app/frontend/views/disease/index.pug",
-      filename: "disease/index.html",
+      template: 'app/frontend/views/disease/index.pug',
+      filename: 'disease/index.html',
       inject: false,
     }),
     new HtmlWebpackPlugin({
-      template: "app/frontend/views/api/index.pug",
-      filename: "api/index.html",
+      template: 'app/frontend/views/api/index.pug',
+      filename: 'api/index.html',
       inject: false,
     }),
     new MiniCssExtractPlugin({
@@ -130,13 +140,27 @@ const config = {
     }),
     new WebpackManifestPlugin(),
     new webpack.DefinePlugin({
-      TOGOVAR_FRONTEND_API_URL: JSON.stringify(process.env.TOGOVAR_FRONTEND_API_URL),
-      TOGOVAR_FRONTEND_REFERENCE: JSON.stringify(process.env.TOGOVAR_FRONTEND_REFERENCE),
-      TOGOVAR_FRONTEND_STANZA_URL: JSON.stringify(process.env.TOGOVAR_FRONTEND_STANZA_URL),
-      TOGOVAR_ENDPOINT_SPARQL: JSON.stringify(process.env.TOGOVAR_ENDPOINT_SPARQL),
-      TOGOVAR_ENDPOINT_SPARQLIST: JSON.stringify(process.env.TOGOVAR_ENDPOINT_SPARQLIST),
-      TOGOVAR_ENDPOINT_SEARCH: JSON.stringify(process.env.TOGOVAR_ENDPOINT_SEARCH),
-      TOGOVAR_ENDPOINT_JBROWSE: JSON.stringify(process.env.TOGOVAR_ENDPOINT_JBROWSE),
+      TOGOVAR_FRONTEND_API_URL: JSON.stringify(
+        process.env.TOGOVAR_FRONTEND_API_URL
+      ),
+      TOGOVAR_FRONTEND_REFERENCE: JSON.stringify(
+        process.env.TOGOVAR_FRONTEND_REFERENCE
+      ),
+      TOGOVAR_FRONTEND_STANZA_URL: JSON.stringify(
+        process.env.TOGOVAR_FRONTEND_STANZA_URL
+      ),
+      TOGOVAR_ENDPOINT_SPARQL: JSON.stringify(
+        process.env.TOGOVAR_ENDPOINT_SPARQL
+      ),
+      TOGOVAR_ENDPOINT_SPARQLIST: JSON.stringify(
+        process.env.TOGOVAR_ENDPOINT_SPARQLIST
+      ),
+      TOGOVAR_ENDPOINT_SEARCH: JSON.stringify(
+        process.env.TOGOVAR_ENDPOINT_SEARCH
+      ),
+      TOGOVAR_ENDPOINT_JBROWSE: JSON.stringify(
+        process.env.TOGOVAR_ENDPOINT_JBROWSE
+      ),
     }),
   ],
 };
@@ -157,7 +181,8 @@ const pages = [
 ];
 
 pages.forEach(function (name) {
-  config.plugins.push(new HtmlWebpackPlugin({
+  config.plugins.push(
+    new HtmlWebpackPlugin({
       template: `app/frontend/views/doc/ja/${name}.pug`,
       filename: `doc/ja/${name}/index.html`,
       inject: false,
@@ -166,7 +191,7 @@ pages.forEach(function (name) {
       template: `app/frontend/views/doc/en/${name}.pug`,
       filename: `doc/${name}/index.html`,
       inject: false,
-    }),
+    })
   );
 });
 
