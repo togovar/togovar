@@ -47,56 +47,19 @@ export default class SearchFieldSimple extends LitElement {
     }
   }
 
-  // #handleKeyDown(e) {
-  //   if (
-  //     e.key === 'Enter' ||
-  //     e.key === 'ArrowUp' ||
-  //     e.key === 'ArrowDown' ||
-  //     e.key === 'Escape' ||
-  //     e.key === 'ArrowLeft' ||
-  //     e.key === 'ArrowRight'
-  //   ) {
-  //     this.dispatchEvent(
-  //       new KeyboardEvent('keydown', {
-  //         key: e.key,
-  //         bubbles: true,
-  //         composed: true,
-  //       })
-  //     );
-  //   }
-
-  //   return;
-  // }
-
   #handleInput() {
     this.value = this.#inputRef.value.value;
 
     this.dispatchEvent(
       new InputEvent('change', {
-        data: this.#inputRef.value.value,
+        data: this.value,
         bubbles: true,
         composed: true,
       })
     );
   }
 
-  #handleFocusIn() {
-    this.dispatchEvent(
-      new FocusEvent('focusin', { bubbles: true, composed: true })
-    );
-  }
-
-  #handleFocusOut() {
-    this.dispatchEvent(
-      new FocusEvent('focusout', { bubbles: true, composed: true })
-    );
-  }
-
-  #handleClick() {
-    this.dispatchEvent(
-      new MouseEvent('click', { bubbles: true, composed: true })
-    );
-  }
+  // TODO remove event re-dispatching because standard events are already dispatched by the input field
 
   render() {
     return html` <div class="search-field-view">
@@ -108,9 +71,6 @@ export default class SearchFieldSimple extends LitElement {
             placeholder="${this.placeholder}"
             value="${this.value}"
             @input="${debounce(this.#handleInput, 300)}"
-            @focusout="${this.#handleFocusOut}"
-            @focusin="${this.#handleFocusIn}"
-            @click="${this.#handleClick}"
           />
         </div>
       </div>
