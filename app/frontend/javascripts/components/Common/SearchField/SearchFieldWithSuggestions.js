@@ -9,7 +9,7 @@ import Styles from '../../../../stylesheets/object/component/search-with-suggest
  * @typedef SearchFieldOptions
  * @type {object}
  * @property {string} valueKey - what to map to the .value (usually "id")
- * @property {string} label - what to map to the .label
+ * @property {string} labelKey - what to map to the .label
  */
 
 export default class SearchElementWithSuggestions extends LitElement {
@@ -48,11 +48,9 @@ export default class SearchElementWithSuggestions extends LitElement {
     this.element = element;
     this.suggestAPIURL = suggestAPIURL;
     this.suggestAPIQueryParam = suggestAPIQueryParam;
-    this.value = '';
+    this.value = null;
+    this.label = '';
     this.options = options;
-
-    this['options-valueKey'] = options?.valueKey;
-    this['options-label'] = options?.label;
 
     this.suggestData = [];
     this.showSuggestions = false;
@@ -124,7 +122,6 @@ export default class SearchElementWithSuggestions extends LitElement {
     }
 
     if (changed.has('currentSuggestionIndex') && this.showSuggestions) {
-      console.log('will update');
       if (this.suggestData?.length) {
         if (this.currentSuggestionIndex > this.suggestData?.length - 1) {
           this.currentSuggestionIndex = 0;
@@ -167,13 +164,14 @@ export default class SearchElementWithSuggestions extends LitElement {
   };
 
   #select = (suggestion) => {
-    this.value = suggestion[this.options.value];
-    this.label = suggestion[this.options.label];
+    this.value = suggestion[this.options.valueKey];
+    this.label = suggestion[this.options.labelKey];
+
     this.dispatchEvent(
       new CustomEvent('new-suggestion-selected', {
         detail: {
-          id: suggestion[this.options.value],
-          label: suggestion[this.options.label],
+          id: suggestion[this.options.valueKey],
+          label: suggestion[this.options.labelKey],
         },
         bubbles: true,
         composed: true,
@@ -216,6 +214,7 @@ export default class SearchElementWithSuggestions extends LitElement {
         @focusin=${this.#handleFocusIn}
         @focusout=${this.#handleFocusOut}
         @keydown=${this.#handleUpDownKeys}
+        placeholder=${this.placeholder}
       ></search-field-simple>
       <div class="suggestions-container">
         ${this.suggestData &&
