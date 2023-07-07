@@ -11,6 +11,8 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
   constructor(valuesView, conditionType) {
     super(valuesView, conditionType);
 
+    console.log('conditionType', conditionType);
+
     // HTML
     this._createElement(
       'text-field-editor-view',
@@ -23,7 +25,7 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
       'https://grch37.togovar.org/api/search/gene',
       'term',
       this._body,
-      { id: 'id', value: 'symbol' }
+      { valueKey: 'id', labelKey: 'symbol' }
     );
 
     // new SearchField(
@@ -36,7 +38,7 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
     //   this._body
     // );
 
-    const handleSuggestSelect = () => {
+    const handleSuggestSelect = (e) => {
       this._update();
     };
 
@@ -71,6 +73,8 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
     // update value
     const value = this._searchFieldView.value;
     const label = this._searchFieldView.label;
+
+    console.log({ value, label });
 
     this._addValueView(value, label, true);
 
