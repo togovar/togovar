@@ -73,7 +73,8 @@ export class ConditionDiseaseSearch extends LitElement {
       <search-field-with-suggestions
         .suggestAPIURL="${suggestAPI}"
         .suggestAPIQueryParam="${'term'}"
-        .options="${{ value: 'id', label: 'label' }}"
+        .options="${{ valueKey: 'id', labelKey: 'label' }}"
+        placeholder="Type disease name"
         @new-suggestion-selected="${this._changeDiseaseEventHadnler}"
       ></search-field-with-suggestions>
 
