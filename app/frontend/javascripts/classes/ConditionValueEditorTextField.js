@@ -1,5 +1,4 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
-// import SearchField from '../components/Common/SearchField/SearchField.js';
 import SearchFieldWithSuggestions from '../components/Common/SearchField/SearchFieldWithSuggestions.js';
 
 export default class ConditionValueEditorTextField extends ConditionValueEditor {
@@ -10,8 +9,6 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
 
   constructor(valuesView, conditionType) {
     super(valuesView, conditionType);
-
-    console.log('conditionType', conditionType);
 
     // HTML
     this._createElement(
@@ -25,7 +22,7 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
       'https://grch37.togovar.org/api/search/gene',
       'term',
       this._body,
-      { valueKey: 'id', labelKey: 'symbol' }
+      { valueMappings: { valueKey: 'id', labelKey: 'symbol' } }
     );
 
     // new SearchField(
