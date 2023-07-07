@@ -1,5 +1,8 @@
 import { CONDITION_TYPE } from '../definition.js';
 
+import '../components/Common/SearchField/SearchFieldWithSuggestions.js';
+
+// TODO this whole component except for examples can be replaced with SearchFieldWithSuggestions (?)
 const NUMBER_OF_SUGGESTS = 10; // TODO: Config
 const SUGGEST_LABELS = {
   gene: 'Gene symbol',
@@ -45,6 +48,7 @@ export default class SearchFieldView {
         <div class="field">
           <input type="text" title="${_placeholder}" placeholder="${_placeholder}">
           <button>Search</button>
+          <search-field-with-suggestions placeholder="${_placeholder}"></search-field-with-suggestions>
         </div>
       </div>
       <div class="examples"></div>
