@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import Styles from '../../../../stylesheets/object/component/suggestions-list.scss';
@@ -18,6 +18,8 @@ export default class SuggestionsList extends LitElement {
       itemIdKey: { type: String, attribute: 'item-id-key' },
       /** What of an item to map to dispatched event's detail.label */
       itemLabelKey: { type: String, attribute: 'item-label-key' },
+      /** Column title in case of Simple search */
+      title: { type: String, attribute: 'title' },
     };
   }
 
@@ -31,6 +33,7 @@ export default class SuggestionsList extends LitElement {
     this.highlightedSuggestionIndex = -1;
     this.itemIdKey = '';
     this.itemLabelKey = '';
+    this.title = '';
   }
 
   #handleSelect(item) {
@@ -45,6 +48,7 @@ export default class SuggestionsList extends LitElement {
 
   render() {
     return html`
+      ${this.title ? html`<h3 class="title">${this.title}</h3>` : nothing}
       <ul class="list">
         ${this.suggestData.length === 0
           ? html`<li class="item -empty">No results</li>`
@@ -66,10 +70,6 @@ export default class SuggestionsList extends LitElement {
       </ul>
     `;
   }
-
-  //   createRenderRoot() {
-  //     return this;
-  //   }
 }
 
 customElements.define('suggestions-list', SuggestionsList);

@@ -1,7 +1,7 @@
 import StoreManager from './StoreManager.js';
-import SearchFieldView from './SearchFieldView.js';
+// import SearchFieldView from './SearchFieldView.js';
 import { API_URL } from '../global.js';
-
+import SearchFieldWithSuggestions from '../components/Common/SearchField/SearchFieldWithSuggestions.js';
 const EXAMPLES = (() => {
   switch (TOGOVAR_FRONTEND_REFERENCE) {
     case 'GRCh37':
@@ -79,16 +79,27 @@ const EXAMPLES = (() => {
   }
 })();
 
+// TODO here!!! not in the SearchFieldView!
 export default class SimpleSearchView {
   constructor() {
     const elm = document.getElementById('SimpleSearchView');
-    this._searchFieldView = new SearchFieldView(
-      this,
-      elm,
+    this._searchFieldView = new SearchFieldWithSuggestions(
       'Search for disease or gene symbol or rs...',
-      ['gene', 'disease'],
-      `${API_URL}/suggest?term=`
+      `${API_URL}/suggest`,
+      'term',
+      elm,
+      {
+        valueMappings: { valueKey: 'term', labelKey: 'term' },
+        titleMappings: { gene: 'Gene names', disease: 'Disease names' },
+      }
     );
+    // new SearchFieldView(
+    //   this,
+    //   elm,
+    //   'Search for disease or gene symbol or rs...',
+    //   ['gene', 'disease'],
+    //   `${API_URL}/suggest?term=`
+    // );
 
     // events
     StoreManager.bind('simpleSearchConditions', this);
