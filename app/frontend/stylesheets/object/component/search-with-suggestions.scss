@@ -1,5 +1,6 @@
 :host {
   position: relative;
+  display: block;
 }
 
 .suggestions-container {
@@ -7,7 +8,6 @@
   top: 100%;
   left: 0;
   display: flex;
-  flex-direction: column;
   > suggestions-list {
     display: block;
   }
