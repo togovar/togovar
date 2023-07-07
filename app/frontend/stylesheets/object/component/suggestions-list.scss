@@ -7,6 +7,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   background-color: white;
   max-width: 50%;
+  min-width: fit-content;
 }
 
 .list {
@@ -46,6 +47,12 @@
 
     &.-selected {
       background-color: rgba($COLOR_SELECTED, 1);
+    }
+
+    &.-empty {
+      padding: 0.5rem;
+      text-align: center;
+      color: rgba($COLOR_BLACK, 0.5);
     }
   }
 }

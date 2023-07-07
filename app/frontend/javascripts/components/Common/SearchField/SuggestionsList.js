@@ -46,21 +46,23 @@ export default class SuggestionsList extends LitElement {
   render() {
     return html`
       <ul class="list">
-        ${repeat(
-          this.suggestData,
-          (item) => item[this.itemIdKey],
-          (item, index) => html`
-            <li
-              class="item ${this.highlightedSuggestionIndex === index
-                ? '-selected'
-                : ''}"
-              @mousedown="${() => this.#handleSelect(item)}"
-              ${scrollMeUp(this.highlightedSuggestionIndex === index)}
-            >
-              ${unsafeHTML(item?.highlight || item?.[this.itemLabelKey])}
-            </li>
-          `
-        )}
+        ${this.suggestData.length === 0
+          ? html`<li class="item -empty">No results</li>`
+          : repeat(
+              this.suggestData,
+              (item) => item[this.itemIdKey],
+              (item, index) => html`
+                <li
+                  class="item ${this.highlightedSuggestionIndex === index
+                    ? '-selected'
+                    : ''}"
+                  @mousedown="${() => this.#handleSelect(item)}"
+                  ${scrollMeUp(this.highlightedSuggestionIndex === index)}
+                >
+                  ${unsafeHTML(item?.highlight || item?.[this.itemLabelKey])}
+                </li>
+              `
+            )}
       </ul>
     `;
   }

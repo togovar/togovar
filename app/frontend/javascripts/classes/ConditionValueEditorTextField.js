@@ -1,5 +1,6 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
-import SearchField from '../components/Common/SearchField/SearchField.js';
+// import SearchField from '../components/Common/SearchField/SearchField.js';
+import SearchFieldWithSuggestions from '../components/Common/SearchField/SearchFieldWithSuggestions.js';
 
 export default class ConditionValueEditorTextField extends ConditionValueEditor {
   /**
@@ -17,15 +18,23 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
       <div class="body"></div>`
     );
 
-    this._searchFieldView = new SearchField(
-      {
-        suggestAPIURL: 'https://grch37.togovar.org/api/search/gene',
-        suggestAPIQueryParam: 'term',
-      },
-      'gene',
-      { id: 'id', value: 'symbol' },
-      this._body
+    this._searchFieldView = new SearchFieldWithSuggestions(
+      'Type a gene symbol or name',
+      'https://grch37.togovar.org/api/search/gene',
+      'term',
+      this._body,
+      { id: 'id', value: 'symbol' }
     );
+
+    // new SearchField(
+    //   {
+    //     suggestAPIURL: 'https://grch37.togovar.org/api/search/gene',
+    //     suggestAPIQueryParam: 'term',
+    //   },
+    //   'gene',
+    //   { id: 'id', value: 'symbol' },
+    //   this._body
+    // );
 
     const handleSuggestSelect = () => {
       this._update();
