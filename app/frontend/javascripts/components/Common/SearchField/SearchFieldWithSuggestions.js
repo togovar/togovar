@@ -86,6 +86,8 @@ export default class SearchElementWithSuggestions extends LitElement {
       state: true,
     },
     options: { type: Object, state: true },
+    'options-value-key': { type: String, attribute: 'options-value-key' },
+    'options-label-key': { type: String, attribute: 'options-label-key' },
     placeholder: { type: String, attribute: 'placeholder' },
     suggestAPIURL: {
       type: String,
@@ -130,6 +132,13 @@ export default class SearchElementWithSuggestions extends LitElement {
           this.currentSuggestionIndex = this.suggestData.length - 1;
         }
       }
+    }
+
+    if (changed.has('options-value-key') || changed.has('options-label-key')) {
+      this.options = {
+        valueKey: this['options-value-key'],
+        labelKey: this['options-label-key'],
+      };
     }
   }
 
