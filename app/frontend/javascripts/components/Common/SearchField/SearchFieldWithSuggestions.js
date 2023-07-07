@@ -188,6 +188,11 @@ export default class SearchElementWithSuggestions extends LitElement {
 
   #handleInput(e) {
     this.term = e.data;
+
+    if (this.term.length < 3) {
+      this.#hideSuggestions();
+      this.suggestData = [];
+    }
   }
 
   #handleClick() {
@@ -195,7 +200,9 @@ export default class SearchElementWithSuggestions extends LitElement {
   }
 
   #handleFocusIn() {
-    this.showSuggestions = true;
+    if (this.term.length > 3) {
+      this.showSuggestions = true;
+    }
   }
 
   #handleFocusOut() {
