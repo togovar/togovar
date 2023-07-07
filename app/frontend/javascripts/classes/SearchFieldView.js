@@ -1,5 +1,5 @@
 import { CONDITION_TYPE } from '../definition.js';
-
+import { html } from 'lit';
 import '../components/Common/SearchField/SearchFieldWithSuggestions.js';
 
 // TODO this whole component except for examples can be replaced with SearchFieldWithSuggestions (?)
@@ -46,9 +46,13 @@ export default class SearchFieldView {
     <div class="search-field-view">
       <div class="fieldcontainer">
         <div class="field">
-          <input type="text" title="${_placeholder}" placeholder="${_placeholder}">
+          <input type="text" title="${_placeholder}" placeholder="${_placeholder}" >
           <button>Search</button>
-          <search-field-with-suggestions placeholder="${_placeholder}"></search-field-with-suggestions>
+          <search-field-with-suggestions placeholder="${_placeholder}" suggest-api-url="${
+      this._queryURL
+    }" suggest-api-query-param="term" options-title-mappings="${JSON.stringify(
+      JSON.stringify(SUGGEST_LABELS)
+    ).replaceAll(`"`, `'`)}"></search-field-with-suggestions>
         </div>
       </div>
       <div class="examples"></div>
