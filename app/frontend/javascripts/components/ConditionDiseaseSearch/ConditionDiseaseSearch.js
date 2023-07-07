@@ -32,7 +32,7 @@ export class ConditionDiseaseSearch extends LitElement {
     );
 
     this.data = [];
-    this.diseaseId = '';
+    this.diseaseId = 'MONDO_0000001';
     this.loading = false;
   }
 
@@ -67,12 +67,6 @@ export class ConditionDiseaseSearch extends LitElement {
       this._timer = null;
     }
   }
-
-  // <search-field
-  //       @new-suggestion-selected=${this._changeDiseaseEventHadnler}
-  //       suggestAPIURL="${suggestAPI}"
-  //       suggestAPIQueryParam="term"
-  //     ></search-field>
 
   render() {
     return html`
