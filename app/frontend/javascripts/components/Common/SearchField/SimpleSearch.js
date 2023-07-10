@@ -83,7 +83,7 @@ export default class SimpleSearch extends LitElement {
           }}
         ></search-field-with-suggestions>
 
-        <search-button></search-button>
+        <search-button @click=${() => this.search(this.value)}></search-button>
       </div>
       <search-field-examples
         .examples=${this.examples}
