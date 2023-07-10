@@ -2,6 +2,8 @@ import StoreManager from './StoreManager.js';
 // import SearchFieldView from './SearchFieldView.js';
 import { API_URL } from '../global.js';
 import SearchFieldWithSuggestions from '../components/Common/SearchField/SearchFieldWithSuggestions.js';
+import SimpleSearch from '../components/Common/SearchField/SimpleSearch.js';
+
 const EXAMPLES = (() => {
   switch (TOGOVAR_FRONTEND_REFERENCE) {
     case 'GRCh37':
@@ -83,17 +85,24 @@ const EXAMPLES = (() => {
 export default class SimpleSearchView {
   constructor() {
     const elm = document.getElementById('SimpleSearchView');
-    this._searchFieldView = new SearchFieldWithSuggestions(
-      'Search for disease or gene symbol or rs...',
-      `${API_URL}/suggest`,
-      'term',
+
+    this._searchFieldView = new SimpleSearch(
       elm,
-      {
-        valueMappings: { valueKey: 'term', labelKey: 'term' },
-        titleMappings: { gene: 'Gene names', disease: 'Disease names' },
-      },
+      `${API_URL}/suggest`,
+      'Search for disease or gene symbol or rs...',
       EXAMPLES
     );
+    // this._searchFieldView = new SearchFieldWithSuggestions(
+    //   'Search for disease or gene symbol or rs...',
+    //   `${API_URL}/suggest`,
+    //   'term',
+    //   elm,
+    //   {
+    //     valueMappings: { valueKey: 'term', labelKey: 'term' },
+    //     titleMappings: { gene: 'Gene names', disease: 'Disease names' },
+    //   },
+    //   EXAMPLES
+    // );
     // new SearchFieldView(
     //   this,
     //   elm,
