@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit';
 import './SearchFieldWithSuggestions';
 import './SearchFieldExamples';
+import './SearchButton';
 import StoreManager from '../../../classes/StoreManager';
 
 export default class SimpleSearch extends LitElement {
@@ -79,6 +80,7 @@ export default class SimpleSearch extends LitElement {
         @example-selected=${this.#handleExampleSelected}
       >
       </search-field-examples>
+      <search-button></search-button>
     `;
   }
 }
