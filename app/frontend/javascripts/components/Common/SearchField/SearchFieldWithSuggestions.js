@@ -11,8 +11,8 @@ import Styles from '../../../../stylesheets/object/component/search-with-suggest
  * @property {object} valueMappings - what from suggestion to map to the .value and .label
  * @property {string} valueMappings.valueKey - what to map to the .value (usually "id")
  * @property {string} valueMappings.labelKey - what to map to the .label
- * @property {object} titleMappings - how to map to the suggestion title
- *
+ * @property {{[key: string]: string}} titleMappings - how to map to the suggestion title
+ * @property {{key: string, value:string}[]} examples - examples to show in the suggestions list
  */
 
 export default class SearchElementWithSuggestions extends LitElement {
@@ -31,7 +31,17 @@ export default class SearchElementWithSuggestions extends LitElement {
         this.showSuggestions = true;
 
         const { data } = await axios.get(this.#getSuggestURL(term));
-        return (this.suggestData = data);
+        let dataToReturn;
+
+        // Make suggestion data same format for simple & gene etc search
+        if (Array.isArray(data)) {
+          dataToReturn = { data: data };
+          this.#suggestionKeysArray = ['data'];
+        } else {
+          dataToReturn = data;
+          this.#suggestionKeysArray = Object.keys(data);
+        }
+        return (this.suggestData = dataToReturn);
       }
       return Promise.resolve(() => (this.showSuggestions = false));
     },
@@ -68,7 +78,7 @@ export default class SearchElementWithSuggestions extends LitElement {
     this.suggestData = [];
     this.showSuggestions = false;
     this.currentSuggestionIndex = -1;
-    this.currentSuggestionColumnIndex = -1;
+    this.currentSuggestionColumnIndex = 0;
 
     this['options-value-key'] = '';
     this['options-label-key'] = '';
@@ -165,15 +175,14 @@ export default class SearchElementWithSuggestions extends LitElement {
         ...this.#searchFieldOptions,
         titleMappings: this.options.titleMappings,
       };
-      this.#suggestionKeysArray = Object.keys(this.options.titleMappings);
     }
+
     if (changed.has('options-title-mappings')) {
       if (this['options-title-mappings']) {
         const titleMappings = JSON.parse(
           JSON.parse(this['options-title-mappings'].replaceAll("'", '"'))
         );
         this.#searchFieldOptions.titleMappings = titleMappings;
-        this.#suggestionKeysArray = Object.keys(titleMappings);
       }
     }
   }
@@ -213,29 +222,48 @@ export default class SearchElementWithSuggestions extends LitElement {
         break;
       case 'ArrowUp':
         if (this.currentSuggestionIndex - 1 < 0) {
-          this.currentSuggestionIndex = this.suggestData.length - 1;
+          this.currentSuggestionIndex =
+            this.suggestData[
+              this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
+            ].length - 1;
           return;
         }
         this.currentSuggestionIndex--;
         break;
       case 'ArrowDown':
-        if (this.currentSuggestionIndex + 1 > this.suggestData?.length - 1) {
+        console.log('this.currentSuggestionIndex', this.currentSuggestionIndex);
+        console.log('this.#suggestionsKeysArray', this.#suggestionKeysArray);
+        console.log(
+          'this.currentSuggestionColumnIndex',
+          this.currentSuggestionColumnIndex
+        );
+        console.log(
+          `this.suggestData[
+          this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
+        ]`,
+          this.suggestData[
+            this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
+          ]
+        );
+        if (
+          this.currentSuggestionIndex + 1 >
+          this.suggestData[
+            this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
+          ].length -
+            1
+        ) {
           this.currentSuggestionIndex = 0;
           return;
         }
         this.currentSuggestionIndex++;
         break;
       case 'Enter':
-        if (Array.isArray(this.suggestData) && this.suggestData.length > 0) {
-          this.#select(this.suggestData[this.currentSuggestionIndex]);
-        } else if (!Array.isArray(this.suggestData) && this.suggestData) {
-          // if suggestData is from Simple search, it is an object
-          this.#select(
-            this.suggestData[
-              this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
-            ][this.currentSuggestionIndex]
-          );
-        }
+        this.#select(
+          this.suggestData[
+            this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
+          ][this.currentSuggestionIndex]
+        );
+
         break;
       case 'Escape':
         if (this.showSuggestions) {
@@ -281,7 +309,7 @@ export default class SearchElementWithSuggestions extends LitElement {
 
   #handleClick() {
     this.currentSuggestionIndex = -1;
-    this.currentSuggestionColumnIndex = -1;
+    this.currentSuggestionColumnIndex = 0;
   }
 
   #handleFocusIn() {
@@ -306,22 +334,8 @@ export default class SearchElementWithSuggestions extends LitElement {
         placeholder=${this.placeholder}
       ></search-field-simple>
       <div class="suggestions-container">
-        ${this.suggestData &&
-        Array.isArray(this.suggestData) &&
-        this.showSuggestions
-          ? html`
-              <suggestions-list
-                .suggestData=${this.suggestData}
-                .highlightedSuggestionIndex="${this.currentSuggestionIndex}"
-                .itemIdKey=${'id'}
-                @suggestion-selected=${this.#handleSuggestionSelected}
-              ></suggestions-list>
-            `
-          : nothing}
         <!-- If it is simple search search box, then suggestions is an object -->
-        ${this.suggestData &&
-        !Array.isArray(this.suggestData) &&
-        this.showSuggestions
+        ${this.suggestData && this.showSuggestions
           ? html`
               ${map(this.#suggestionKeysArray, (key, keyIndex) => {
                 return html`
@@ -333,7 +347,7 @@ export default class SearchElementWithSuggestions extends LitElement {
                       : -1}"
                     .itemIdKey=${'term'}
                     .itemLabelKey=${'term'}
-                    title=${this.#searchFieldOptions?.titleMappings[key]}
+                    title=${this.#searchFieldOptions?.titleMappings?.[key]}
                     @suggestion-selected=${this.#select}
                   ></suggestions-list>
                 `;
