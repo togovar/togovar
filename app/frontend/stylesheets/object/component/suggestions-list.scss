@@ -1,15 +1,5 @@
 @use '../../foundation/_variables.scss' as *;
 
-:host {
-  z-index: $Z_INDEX_SUGGEST_VIEW;
-  color: $COLOR_BLACK;
-  font-size: 14px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  background-color: white;
-  max-width: 50%;
-  min-width: fit-content;
-}
-
 .title {
   color: $COLOR_KEY_DARK1;
   font-size: 12px;
