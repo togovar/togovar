@@ -1,8 +1,10 @@
 import { LitElement, html } from 'lit';
 import './SearchFieldWithSuggestions';
 import './SearchFieldExamples';
-import './SearchButton';
+import './SimpleSearchButton';
 import StoreManager from '../../../classes/StoreManager';
+
+import Styles from '../../../../stylesheets/object/component/simple-search.scss';
 
 export default class SimpleSearch extends LitElement {
   static get properties() {
@@ -14,6 +16,10 @@ export default class SimpleSearch extends LitElement {
       suggestAPIURL: { type: String },
       suggestAPIQueryParam: { type: String },
     };
+  }
+
+  static get styles() {
+    return [Styles];
   }
 
   constructor(elm, suggestAPIURL, placeholder = 'Search', examples = []) {
@@ -58,29 +64,32 @@ export default class SimpleSearch extends LitElement {
 
   render() {
     return html`
-      <search-field-with-suggestions
-        exportparts="input-field"
-        .term="${this.value}"
-        .suggestAPIURL=${this.suggestAPIURL}
-        .suggestAPIQueryParam=${'term'}
-        .placeholder=${this.placeholder}
-        .hideSuggestions=${this.hideSuggestions}
-        .options=${{
-          valueMappings: { valueKey: 'term', labelKey: 'term' },
-          titleMappings: { gene: 'Gene names', disease: 'Disease names' },
-        }}
-        @new-suggestion-selected=${this.#handleSuggestionEnter}
-        @search-term-enter=${this.#handleTermEnter}
-        @input=${() => {
-          this.hideSuggestions = false;
-        }}
-      ></search-field-with-suggestions>
+      <div class="simple-search-container">
+        <search-field-with-suggestions
+          exportparts="input-field"
+          .term="${this.value}"
+          .suggestAPIURL=${this.suggestAPIURL}
+          .suggestAPIQueryParam=${'term'}
+          .placeholder=${this.placeholder}
+          .hideSuggestions=${this.hideSuggestions}
+          .options=${{
+            valueMappings: { valueKey: 'term', labelKey: 'term' },
+            titleMappings: { gene: 'Gene names', disease: 'Disease names' },
+          }}
+          @new-suggestion-selected=${this.#handleSuggestionEnter}
+          @search-term-enter=${this.#handleTermEnter}
+          @input=${() => {
+            this.hideSuggestions = false;
+          }}
+        ></search-field-with-suggestions>
+
+        <search-button></search-button>
+      </div>
       <search-field-examples
         .examples=${this.examples}
         @example-selected=${this.#handleExampleSelected}
       >
       </search-field-examples>
-      <search-button></search-button>
     `;
   }
 }

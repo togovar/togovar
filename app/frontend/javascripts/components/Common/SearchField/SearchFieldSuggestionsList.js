@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import Styles from '../../../../stylesheets/object/component/suggestions-list.scss';
+import Styles from '../../../../stylesheets/object/component/search-field-suggestions-list.scss';
 import { scrollMeUp } from './scrollMeUp';
 
 export default class SuggestionsList extends LitElement {
@@ -72,4 +72,4 @@ export default class SuggestionsList extends LitElement {
   }
 }
 
-customElements.define('suggestions-list', SuggestionsList);
+customElements.define('search-field-suggestions-list', SuggestionsList);

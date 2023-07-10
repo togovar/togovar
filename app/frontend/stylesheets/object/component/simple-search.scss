@@ -1,26 +1,12 @@
-$SIZE: 30px;
+.simple-search-container {
+  display: flex;
+  gap: 1em;
+  align-items: center;
 
-@use '../../foundation/_variables.scss' as *;
-
-.fieldcontainer {
-  > .field {
-    margin-bottom: 4px;
-    > input[type='text'] {
-      box-sizing: border-box;
-      width: 100%;
-      line-height: $SIZE;
-      height: $SIZE;
-      border: solid 1px $COLOR_KEY_DARK2;
-      border-radius: $SIZE * 0.5;
-      padding: 0 12px;
-      vertical-align: top;
-      font-size: 12px;
-      outline: none;
-      opacity: 0.9;
-      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
-      &:focus {
-        opacity: 1;
-      }
-    }
+  > search-button {
+    width: fit-content;
+  }
+  > search-field-with-suggestions {
+    flex: 1;
   }
 }

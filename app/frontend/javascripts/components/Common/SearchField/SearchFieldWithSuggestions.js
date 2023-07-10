@@ -4,9 +4,9 @@ import { Task } from '@lit-labs/task';
 import { axios } from '../../../utils/cachedAxios';
 
 import './SearchFieldSimple';
-import './SuggestionsList';
+import './SearchFieldSuggestionsList';
 
-import Styles from '../../../../stylesheets/object/component/search-with-suggestions.scss';
+import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
 
 /**
  * @typedef SearchFieldOptions
@@ -327,7 +327,7 @@ export default class SearchElementWithSuggestions extends LitElement {
           ? html`
               ${map(this.#suggestionKeysArray, (key, keyIndex) => {
                 return html`
-                  <suggestions-list
+                  <search-field-suggestions-list
                     .suggestData=${this.suggestData[key]}
                     .highlightedSuggestionIndex="${keyIndex ===
                     this.currentSuggestionColumnIndex
@@ -337,7 +337,7 @@ export default class SearchElementWithSuggestions extends LitElement {
                     .itemLabelKey=${'term'}
                     title=${this.#searchFieldOptions?.titleMappings?.[key]}
                     @suggestion-selected=${this.#handleSuggestionSelected}
-                  ></suggestions-list>
+                  ></search-field-suggestions-list>
                 `;
               })}
             `
