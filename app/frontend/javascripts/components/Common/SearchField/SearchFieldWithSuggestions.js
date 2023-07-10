@@ -112,7 +112,7 @@ export default class SearchElementWithSuggestions extends LitElement {
   static properties = {
     value: { type: String, state: true },
     label: { type: String, state: true },
-    term: { type: String, state: true },
+    term: { type: String },
     showSuggestions: { type: Boolean, state: true },
     currentSuggestionIndex: { type: Number, state: true },
     currentSuggestionColumnIndex: { type: Number, state: true },
@@ -237,20 +237,6 @@ export default class SearchElementWithSuggestions extends LitElement {
         this.currentSuggestionIndex--;
         break;
       case 'ArrowDown':
-        console.log('this.currentSuggestionIndex', this.currentSuggestionIndex);
-        console.log('this.#suggestionsKeysArray', this.#suggestionKeysArray);
-        console.log(
-          'this.currentSuggestionColumnIndex',
-          this.currentSuggestionColumnIndex
-        );
-        console.log(
-          `this.suggestData[
-          this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
-        ]`,
-          this.suggestData[
-            this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
-          ]
-        );
         if (
           this.currentSuggestionIndex + 1 >
           this.suggestData[
@@ -264,11 +250,15 @@ export default class SearchElementWithSuggestions extends LitElement {
         this.currentSuggestionIndex++;
         break;
       case 'Enter':
-        this.#select(
-          this.suggestData[
-            this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
-          ][this.currentSuggestionIndex]
-        );
+        if (this.showSuggestions) {
+          this.#select(
+            this.suggestData[
+              this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
+            ][this.currentSuggestionIndex]
+          );
+        } else {
+          // perform Search
+        }
 
         break;
       case 'Escape':
@@ -329,8 +319,6 @@ export default class SearchElementWithSuggestions extends LitElement {
   }
 
   render() {
-    console.log('render', this.suggestData);
-    console.log('this.suggestionKeysArray', this.#suggestionKeysArray);
     return html`<search-field-simple
         @change=${this.#handleInput}
         @click=${this.#handleClick}
@@ -338,12 +326,14 @@ export default class SearchElementWithSuggestions extends LitElement {
         @focusout=${this.#handleFocusOut}
         @keydown=${this.#handleUpDownKeys}
         placeholder=${this.placeholder}
+        value=${this.term}
       ></search-field-simple>
       <div class="suggestions-container">
         <!-- If it is simple search search box, then suggestions is an object -->
         ${this.suggestData && this.showSuggestions
           ? html`
               ${map(this.#suggestionKeysArray, (key, keyIndex) => {
+                console.log('this.suggestData[key]', this.suggestData[key]);
                 return html`
                   <suggestions-list
                     .suggestData=${this.suggestData[key]}
@@ -364,10 +354,16 @@ export default class SearchElementWithSuggestions extends LitElement {
       ${this.examples
         ? html`<div class="examples">
             <search-field-examples
+              @example-selected=${this.#handleExampleClick}
               .examples=${this.examples}
             ></search-field-examples>
           </div> `
         : nothing}`;
+  }
+
+  #handleExampleClick(e) {
+    this.term = e.detail.value;
+    this.showSuggestions = false;
   }
 
   setTerm(term) {
