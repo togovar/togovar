@@ -83,8 +83,9 @@ select
   height: var(--height-inline)
   line-height: var(--height-inline)
 
-::placeholder
+::placeholder, *::part(input-field)::placeholder
   color: $COLOR_GRAY
+  font-family: 'Roboto Condensed', sans-serif
 
 .unimplemented
   color: red
