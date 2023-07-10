@@ -1,0 +1,41 @@
+@use '../../foundation/_variables.scss' as *;
+:host {
+  display: flex;
+  gap: 0.2em;
+  flex-wrap: wrap;
+  align-items: center;
+  height: fit-content;
+  padding: 10px;
+}
+dl {
+  font-size: 12px;
+  line-height: 16px;
+  margin-bottom: 0;
+  padding: 0 0.5em;
+  display: inline-block;
+  margin-block-start: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color $GUI_DURATION, box-shadow $GUI_DURATION;
+  > dt,
+  > dd {
+    display: inline-block;
+    margin-bottom: 0;
+    color: white;
+    transition: color $GUI_DURATION;
+  }
+
+  > dt {
+    font-weight: normal;
+    opacity: 0.6;
+    &:after {
+      content: ':';
+    }
+  }
+  > dd {
+    margin-inline-start: 0.2em;
+  }
+  &:hover {
+    background-color: $COLOR_KEY_DARK2;
+  }
+}

@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { debounce } from '../../../utils/debounce';
+// import { debounce } from '../../../utils/debounce';
 import { ref, createRef } from 'lit/directives/ref.js';
 import SimpleSearchStyle from '../../../../stylesheets/object/component/simple-search.scss';
 
@@ -47,8 +47,8 @@ export default class SearchFieldSimple extends LitElement {
     }
   }
 
-  #handleInput() {
-    this.value = this.#inputRef.value.value;
+  #handleInput(e) {
+    this.value = e.target.value;
 
     this.dispatchEvent(
       new InputEvent('change', {
@@ -59,7 +59,11 @@ export default class SearchFieldSimple extends LitElement {
     );
   }
 
-  // TODO remove event re-dispatching because standard events are already dispatched by the input field
+  willUpdate(changed) {
+    if (changed.has('value') && this.#inputRef.value) {
+      this.#inputRef.value.value = this.value;
+    }
+  }
 
   render() {
     return html` <div class="search-field-view">
@@ -69,17 +73,12 @@ export default class SearchFieldSimple extends LitElement {
             ${ref(this.#inputRef)}
             type="text"
             placeholder="${this.placeholder}"
-            value="${this.value}"
-            @input="${debounce(this.#handleInput, 300)}"
+            @input=${this.#handleInput}
           />
         </div>
       </div>
     </div>`;
   }
-
-  //   renderRoot() {
-  //     return this;
-  //   }
 }
 
 customElements.define('search-field-simple', SearchFieldSimple);
