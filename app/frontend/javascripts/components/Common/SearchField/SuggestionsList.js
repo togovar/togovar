@@ -50,7 +50,7 @@ export default class SuggestionsList extends LitElement {
     return html`
       ${this.title ? html`<h3 class="title">${this.title}</h3>` : nothing}
       <ul class="list">
-        ${this.suggestData.length === 0
+        ${!this.suggestData || this.suggestData.length === 0
           ? html`<li class="item -empty">No results</li>`
           : repeat(
               this.suggestData,
