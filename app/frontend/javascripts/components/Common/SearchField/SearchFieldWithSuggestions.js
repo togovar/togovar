@@ -3,6 +3,8 @@ import { Task } from '@lit-labs/task';
 import { axios } from '../../../utils/cachedAxios';
 import './SearchFieldSimple';
 import './SuggestionsList';
+import './SearchFieldExamples';
+
 import { map } from 'lit/directives/map.js';
 import Styles from '../../../../stylesheets/object/component/search-with-suggestions.scss';
 /**
@@ -12,7 +14,7 @@ import Styles from '../../../../stylesheets/object/component/search-with-suggest
  * @property {string} valueMappings.valueKey - what to map to the .value (usually "id")
  * @property {string} valueMappings.labelKey - what to map to the .label
  * @property {{[key: string]: string}} titleMappings - how to map to the suggestion title
- * @property {{key: string, value:string}[]} examples - examples to show in the suggestions list
+ * @property {{key: string, value: string}[]} examples - examples to show in the suggestions list
  */
 
 export default class SearchElementWithSuggestions extends LitElement {
@@ -54,13 +56,15 @@ export default class SearchElementWithSuggestions extends LitElement {
    * @param {string} suggestAPIQueryParam - Query parameter to be used for the API call
    * @param {HTMLElement} element - HTML element to which the search field is attached
    * @param {SearchFieldOptions} options - Options for the search field
+   * @param {{key: string, value:string}[]} examples - Examples to show in the suggestions list
    */
   constructor(
     placeholder,
     suggestAPIURL,
     suggestAPIQueryParam,
     element,
-    options
+    options,
+    examples
   ) {
     super();
 
@@ -72,6 +76,7 @@ export default class SearchElementWithSuggestions extends LitElement {
     this.label = '';
     this.term = '';
     this.options = options;
+    this.examples = examples;
 
     this.#searchFieldOptions = options;
 
@@ -122,6 +127,7 @@ export default class SearchElementWithSuggestions extends LitElement {
       type: String,
       attribute: 'options-title-mappings',
     },
+    examples: { type: Array },
     columnsTitleMapping: { type: Object },
     placeholder: { type: String, attribute: 'placeholder' },
     suggestAPIURL: {
@@ -354,7 +360,14 @@ export default class SearchElementWithSuggestions extends LitElement {
               })}
             `
           : nothing}
-      </div> `;
+      </div>
+      ${this.examples
+        ? html`<div class="examples">
+            <search-field-examples
+              .examples=${this.examples}
+            ></search-field-examples>
+          </div> `
+        : nothing}`;
   }
 
   setTerm(term) {

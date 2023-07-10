@@ -91,7 +91,8 @@ export default class SimpleSearchView {
       {
         valueMappings: { valueKey: 'term', labelKey: 'term' },
         titleMappings: { gene: 'Gene names', disease: 'Disease names' },
-      }
+      },
+      EXAMPLES
     );
     // new SearchFieldView(
     //   this,
@@ -108,19 +109,19 @@ export default class SimpleSearchView {
     if (term) this._searchFieldView.setTerm(term);
 
     // examples
-    this._searchFieldView.setExamples(EXAMPLES).forEach((dl) => {
-      dl.addEventListener(
-        'click',
-        (e) => {
-          e.stopPropagation();
-          this._searchFieldView.setTerm(
-            dl.querySelector('dd').textContent,
-            true
-          );
-        },
-        true
-      );
-    });
+    // this._searchFieldView.setExamples(EXAMPLES).forEach((dl) => {
+    //   dl.addEventListener(
+    //     'click',
+    //     (e) => {
+    //       e.stopPropagation();
+    //       this._searchFieldView.setTerm(
+    //         dl.querySelector('dd').textContent,
+    //         true
+    //       );
+    //     },
+    //     true
+    //   );
+    // });
   }
 
   search() {
