@@ -2,9 +2,9 @@ import { LitElement, html, nothing } from 'lit';
 import { map } from 'lit/directives/map.js';
 import { Task } from '@lit-labs/task';
 import { axios } from '../../../utils/cachedAxios';
+
 import './SearchFieldSimple';
 import './SuggestionsList';
-import './SearchFieldExamples';
 
 import Styles from '../../../../stylesheets/object/component/search-with-suggestions.scss';
 
@@ -320,9 +320,9 @@ export default class SearchElementWithSuggestions extends LitElement {
         @keydown=${this.#handleUpDownKeys}
         placeholder=${this.placeholder}
         value=${this.term}
+        exportparts="input-field"
       ></search-field-simple>
       <div class="suggestions-container">
-        <!-- If it is simple search search box, then suggestions is an object -->
         ${this.suggestData && this.showSuggestions && !this.hideSuggestions
           ? html`
               ${map(this.#suggestionKeysArray, (key, keyIndex) => {
