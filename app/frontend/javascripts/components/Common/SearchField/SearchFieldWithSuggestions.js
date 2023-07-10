@@ -327,17 +327,20 @@ export default class SearchElementWithSuggestions extends LitElement {
           ? html`
               ${map(this.#suggestionKeysArray, (key, keyIndex) => {
                 return html`
-                  <search-field-suggestions-list
-                    .suggestData=${this.suggestData[key]}
-                    .highlightedSuggestionIndex="${keyIndex ===
-                    this.currentSuggestionColumnIndex
-                      ? this.currentSuggestionIndex
-                      : -1}"
-                    .itemIdKey=${'term'}
-                    .itemLabelKey=${'term'}
-                    title=${this.#searchFieldOptions?.titleMappings?.[key]}
-                    @suggestion-selected=${this.#handleSuggestionSelected}
-                  ></search-field-suggestions-list>
+                  <div class="suggestions-column">
+                    <search-field-suggestions-list
+                      .suggestData=${this.suggestData[key]}
+                      .highlightedSuggestionIndex="${keyIndex ===
+                      this.currentSuggestionColumnIndex
+                        ? this.currentSuggestionIndex
+                        : -1}"
+                      .itemIdKey=${'term'}
+                      .itemLabelKey=${'term'}
+                      title=${this.#searchFieldOptions?.titleMappings?.[key]}
+                      @suggestion-selected=${this.#handleSuggestionSelected}
+                    ></search-field-suggestions-list>
+                    <div class="suggestions-column"></div>
+                  </div>
                 `;
               })}
             `
