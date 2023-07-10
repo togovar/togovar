@@ -1,12 +1,14 @@
 import { LitElement, html, nothing } from 'lit';
+import { map } from 'lit/directives/map.js';
 import { Task } from '@lit-labs/task';
 import { axios } from '../../../utils/cachedAxios';
 import './SearchFieldSimple';
 import './SuggestionsList';
 import './SearchFieldExamples';
 
-import { map } from 'lit/directives/map.js';
 import Styles from '../../../../stylesheets/object/component/search-with-suggestions.scss';
+import StoreManager from '../../../classes/StoreManager';
+
 /**
  * @typedef SearchFieldOptions
  * @type {object}
@@ -14,7 +16,6 @@ import Styles from '../../../../stylesheets/object/component/search-with-suggest
  * @property {string} valueMappings.valueKey - what to map to the .value (usually "id")
  * @property {string} valueMappings.labelKey - what to map to the .label
  * @property {{[key: string]: string}} titleMappings - how to map to the suggestion title
- * @property {{key: string, value: string}[]} examples - examples to show in the suggestions list
  */
 
 export default class SearchElementWithSuggestions extends LitElement {
@@ -26,12 +27,10 @@ export default class SearchElementWithSuggestions extends LitElement {
   /** @type {string[]} */
   #suggestionKeysArray = [];
 
-  #examplePressed = false;
-
   #apiTask = new Task(
     this,
     async (term) => {
-      if (term.length >= 3 && !this.#examplePressed) {
+      if (term.length >= 3) {
         this.showSuggestions = true;
 
         const { data } = await axios.get(this.#getSuggestURL(term));
@@ -65,34 +64,29 @@ export default class SearchElementWithSuggestions extends LitElement {
     suggestAPIURL,
     suggestAPIQueryParam,
     element,
-    options,
-    examples
+    options
   ) {
     super();
 
-    this.placeholder = placeholder;
-    this.element = element;
-    this.suggestAPIURL = suggestAPIURL;
-    this.suggestAPIQueryParam = suggestAPIQueryParam;
     this.value = null;
     this.label = '';
-    this.term = '';
-    this.options = options;
-    this.examples = examples;
-
-    this.#searchFieldOptions = options;
-
-    this.suggestData = [];
     this.showSuggestions = false;
     this.currentSuggestionIndex = -1;
     this.currentSuggestionColumnIndex = 0;
+    this.options = options;
+    this.suggestData = [];
 
-    this['options-value-key'] = '';
-    this['options-label-key'] = '';
-    this['options-title-mappings'] = '';
+    this.term = '';
+    this.hideSuggestions = false;
 
-    if (this.element) {
-      this.element.appendChild(this);
+    this.placeholder = placeholder;
+    this.suggestAPIURL = suggestAPIURL;
+    this.suggestAPIQueryParam = suggestAPIQueryParam;
+
+    this.#searchFieldOptions = options;
+
+    if (element) {
+      element.appendChild(this);
       if (this.suggestAPIQueryParam) {
         this.#getSuggestURL = (text) => {
           const url = new URL(this.suggestAPIURL);
@@ -114,23 +108,18 @@ export default class SearchElementWithSuggestions extends LitElement {
   static properties = {
     value: { type: String, state: true },
     label: { type: String, state: true },
-    term: { type: String },
     showSuggestions: { type: Boolean, state: true },
     currentSuggestionIndex: { type: Number, state: true },
     currentSuggestionColumnIndex: { type: Number, state: true },
+    options: { type: Object, state: true },
     suggestData: {
       type: Array,
       state: true,
     },
-    options: { type: Object, state: true },
-    'options-value-key': { type: String, attribute: 'options-value-key' },
-    'options-label-key': { type: String, attribute: 'options-label-key' },
-    'options-title-mappings': {
-      type: String,
-      attribute: 'options-title-mappings',
-    },
-    examples: { type: Array },
-    columnsTitleMapping: { type: Object },
+
+    term: { type: String },
+    hideSuggestions: { type: Boolean },
+
     placeholder: { type: String, attribute: 'placeholder' },
     suggestAPIURL: {
       type: String,
@@ -165,39 +154,26 @@ export default class SearchElementWithSuggestions extends LitElement {
         ...this.options,
       };
     }
-
-    if (changed.has('options-value-key') || changed.has('options-label-key')) {
-      if (this['options-label-key'] || this['options-value-key']) {
-        this.#searchFieldOptions = {
-          ...this.#searchFieldOptions,
-          valueMappings: {
-            valueKey: this['options-value-key'],
-            labelKey: this['options-label-key'],
-          },
-        };
-      }
-    }
-
-    if (changed.has('options') && this.options.titleMappings) {
-      this.#searchFieldOptions = {
-        ...this.#searchFieldOptions,
-        titleMappings: this.options.titleMappings,
-      };
-    }
-
-    if (changed.has('options-title-mappings')) {
-      if (this['options-title-mappings']) {
-        const titleMappings = JSON.parse(
-          JSON.parse(this['options-title-mappings'].replaceAll("'", '"'))
-        );
-        this.#searchFieldOptions.titleMappings = titleMappings;
-      }
-    }
   }
 
   #hideSuggestions = () => {
     this.showSuggestions = false;
   };
+
+  #handleStepThroughColumns() {
+    if (
+      this.currentSuggestionIndex >
+      this.suggestData[
+        this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
+      ].length -
+        1
+    ) {
+      this.currentSuggestionIndex =
+        this.suggestData[
+          this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
+        ].length - 1;
+    }
+  }
 
   #handleUpDownKeys = (e) => {
     if (
@@ -214,9 +190,11 @@ export default class SearchElementWithSuggestions extends LitElement {
         if (this.currentSuggestionColumnIndex - 1 < 0) {
           this.currentSuggestionColumnIndex =
             this.#suggestionKeysArray.length - 1;
+
           return;
         }
         this.currentSuggestionColumnIndex--;
+        this.#handleStepThroughColumns();
         break;
       case 'ArrowRight':
         if (
@@ -227,6 +205,7 @@ export default class SearchElementWithSuggestions extends LitElement {
           return;
         }
         this.currentSuggestionColumnIndex++;
+        this.#handleStepThroughColumns();
         break;
       case 'ArrowUp':
         if (this.currentSuggestionIndex - 1 < 0) {
@@ -252,14 +231,16 @@ export default class SearchElementWithSuggestions extends LitElement {
         this.currentSuggestionIndex++;
         break;
       case 'Enter':
-        if (this.showSuggestions) {
+        if (this.showSuggestions && this.currentSuggestionIndex !== -1) {
           this.#select(
             this.suggestData[
               this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
             ][this.currentSuggestionIndex]
           );
         } else {
-          // perform Search
+          //
+          this.#hideSuggestions();
+          this.#handleEnterKey();
         }
 
         break;
@@ -274,6 +255,18 @@ export default class SearchElementWithSuggestions extends LitElement {
         break;
     }
   };
+
+  #handleEnterKey() {
+    this.dispatchEvent(
+      new CustomEvent('search-term-enter', {
+        detail: {
+          term: this.term,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
 
   #select = (suggestion) => {
     this.value = suggestion[this.#searchFieldOptions.valueMappings.valueKey];
@@ -297,7 +290,6 @@ export default class SearchElementWithSuggestions extends LitElement {
   };
 
   #handleInput(e) {
-    this.#examplePressed = false;
     this.term = e.data;
 
     if (this.term.length < 3) {
@@ -307,13 +299,11 @@ export default class SearchElementWithSuggestions extends LitElement {
   }
 
   #handleClick() {
-    this.#examplePressed = false;
     this.currentSuggestionIndex = -1;
     this.currentSuggestionColumnIndex = 0;
   }
 
   #handleFocusIn() {
-    this.#examplePressed = false;
     if (this.term.length > 3) {
       this.showSuggestions = true;
     }
@@ -321,11 +311,6 @@ export default class SearchElementWithSuggestions extends LitElement {
 
   #handleFocusOut() {
     this.#hideSuggestions();
-  }
-
-  #handleExampleClick(e) {
-    this.#examplePressed = true;
-    this.term = e.detail.value;
   }
 
   render() {
@@ -340,7 +325,7 @@ export default class SearchElementWithSuggestions extends LitElement {
       ></search-field-simple>
       <div class="suggestions-container">
         <!-- If it is simple search search box, then suggestions is an object -->
-        ${this.suggestData && this.showSuggestions
+        ${this.suggestData && this.showSuggestions && !this.hideSuggestions
           ? html`
               ${map(this.#suggestionKeysArray, (key, keyIndex) => {
                 return html`
@@ -359,15 +344,7 @@ export default class SearchElementWithSuggestions extends LitElement {
               })}
             `
           : nothing}
-      </div>
-      ${this.examples
-        ? html`<div class="examples">
-            <search-field-examples
-              @example-selected=${this.#handleExampleClick}
-              .examples=${this.examples}
-            ></search-field-examples>
-          </div> `
-        : nothing}`;
+      </div> `;
   }
 
   setTerm(term) {
@@ -376,6 +353,10 @@ export default class SearchElementWithSuggestions extends LitElement {
 
   setExamples(examples) {
     return [];
+  }
+
+  search() {
+    StoreManager.setSimpleSearchCondition('term', this.label);
   }
 }
 
