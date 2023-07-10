@@ -1,0 +1,32 @@
+@use '../../foundation/_variables.scss' as *;
+
+$SIZE: 30px;
+
+button {
+  border-radius: 50%;
+  background-color: $COLOR_KEY_DARK2;
+  border: none;
+  width: $SIZE;
+  height: $SIZE;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  outline: none;
+  &:hover {
+    background-color: $COLOR_KEY_DARK1;
+  }
+  &:active {
+    background-color: $COLOR_KEY_DARK3;
+  }
+  &:disabled {
+    background-color: $COLOR_KEY_DARK2;
+    cursor: auto;
+  }
+  > svg {
+    width: 16px;
+    height: 16px;
+    fill: white;
+    margin: 0;
+    padding: 0;
+  }
+}

@@ -70,6 +70,7 @@ export default class SearchFieldSimple extends LitElement {
       <div class="fieldcontainer">
         <div class="field">
           <input
+            part="input-field"
             ${ref(this.#inputRef)}
             type="text"
             placeholder="${this.placeholder}"

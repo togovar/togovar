@@ -6,25 +6,24 @@ import StoreManager from '../../../classes/StoreManager';
 export default class SimpleSearch extends LitElement {
   static get properties() {
     return {
+      hideSuggestions: { type: Boolean, state: true },
       value: { type: String },
       placeholder: { type: String, attribute: 'placeholder' },
       examples: { type: Array },
       suggestAPIURL: { type: String },
       suggestAPIQueryParam: { type: String },
-      hideSuggestions: { type: Boolean, state: true },
     };
   }
 
   constructor(elm, suggestAPIURL, placeholder = 'Search', examples = []) {
     super();
+    this.hideSuggestions = true;
 
     this.value = '';
     this.placeholder = placeholder;
     this.examples = examples;
     this.suggestAPIQueryParam = 'term';
     this.suggestAPIURL = suggestAPIURL;
-
-    this.hideSuggestions = true;
 
     if (elm) {
       elm.appendChild(this);
@@ -59,6 +58,7 @@ export default class SimpleSearch extends LitElement {
   render() {
     return html`
       <search-field-with-suggestions
+        exportparts="input-field"
         .term="${this.value}"
         .suggestAPIURL=${this.suggestAPIURL}
         .suggestAPIQueryParam=${'term'}
