@@ -26,10 +26,12 @@ export default class SearchElementWithSuggestions extends LitElement {
   /** @type {string[]} */
   #suggestionKeysArray = [];
 
+  #examplePressed = false;
+
   #apiTask = new Task(
     this,
     async (term) => {
-      if (term.length >= 3) {
+      if (term.length >= 3 && !this.#examplePressed) {
         this.showSuggestions = true;
 
         const { data } = await axios.get(this.#getSuggestURL(term));
@@ -295,6 +297,7 @@ export default class SearchElementWithSuggestions extends LitElement {
   };
 
   #handleInput(e) {
+    this.#examplePressed = false;
     this.term = e.data;
 
     if (this.term.length < 3) {
@@ -304,11 +307,13 @@ export default class SearchElementWithSuggestions extends LitElement {
   }
 
   #handleClick() {
+    this.#examplePressed = false;
     this.currentSuggestionIndex = -1;
     this.currentSuggestionColumnIndex = 0;
   }
 
   #handleFocusIn() {
+    this.#examplePressed = false;
     if (this.term.length > 3) {
       this.showSuggestions = true;
     }
@@ -316,6 +321,11 @@ export default class SearchElementWithSuggestions extends LitElement {
 
   #handleFocusOut() {
     this.#hideSuggestions();
+  }
+
+  #handleExampleClick(e) {
+    this.#examplePressed = true;
+    this.term = e.detail.value;
   }
 
   render() {
@@ -333,7 +343,6 @@ export default class SearchElementWithSuggestions extends LitElement {
         ${this.suggestData && this.showSuggestions
           ? html`
               ${map(this.#suggestionKeysArray, (key, keyIndex) => {
-                console.log('this.suggestData[key]', this.suggestData[key]);
                 return html`
                   <suggestions-list
                     .suggestData=${this.suggestData[key]}
@@ -344,7 +353,7 @@ export default class SearchElementWithSuggestions extends LitElement {
                     .itemIdKey=${'term'}
                     .itemLabelKey=${'term'}
                     title=${this.#searchFieldOptions?.titleMappings?.[key]}
-                    @suggestion-selected=${this.#select}
+                    @suggestion-selected=${this.#handleSuggestionSelected}
                   ></suggestions-list>
                 `;
               })}
@@ -359,11 +368,6 @@ export default class SearchElementWithSuggestions extends LitElement {
             ></search-field-examples>
           </div> `
         : nothing}`;
-  }
-
-  #handleExampleClick(e) {
-    this.term = e.detail.value;
-    this.showSuggestions = false;
   }
 
   setTerm(term) {
