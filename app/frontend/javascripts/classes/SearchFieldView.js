@@ -1,5 +1,4 @@
 import { CONDITION_TYPE } from '../definition.js';
-import { html } from 'lit';
 import '../components/Common/SearchField/SearchFieldWithSuggestions.js';
 
 // TODO this whole component except for examples can be replaced with SearchFieldWithSuggestions (?)
