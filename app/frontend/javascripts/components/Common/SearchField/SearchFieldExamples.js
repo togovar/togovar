@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 
 import { map } from 'lit/directives/map.js';
 
+import Styles from '../../../../stylesheets/object/component/simple-search-examples.scss';
 /** @typedef {Array<{key: string, value: string}>} ExamplesArray  */
 
 export default class SearchFieldExamples extends LitElement {
@@ -15,6 +16,10 @@ export default class SearchFieldExamples extends LitElement {
     return {
       examples: { type: Array },
     };
+  }
+
+  static get styles() {
+    return [Styles];
   }
 
   #handleClick(example) {
