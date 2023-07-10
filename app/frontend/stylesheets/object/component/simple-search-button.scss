@@ -3,30 +3,37 @@
 $SIZE: 30px;
 
 button {
-  border-radius: 50%;
-  background-color: $COLOR_KEY_DARK2;
-  border: none;
   width: $SIZE;
   height: $SIZE;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-  outline: none;
-  &:hover {
-    background-color: $COLOR_KEY_DARK1;
+  border: solid 1px $COLOR_KEY_DARK1;
+  border-radius: 100%;
+  margin-right: -4px;
+  position: relative;
+  background-color: white;
+  text-indent: -9999px;
+  box-shadow: 0 1px 1px rgba(black, 0.2);
+
+  &:before,
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
   }
-  &:active {
-    background-color: $COLOR_KEY_DARK3;
+
+  &:before {
+    width: 12px;
+    height: 12px;
+    border: solid 2px $COLOR_KEY_DARK1;
+    border-radius: 6px;
+    top: 6px;
+    left: 6px;
   }
-  &:disabled {
-    background-color: $COLOR_KEY_DARK2;
-    cursor: auto;
-  }
-  > svg {
-    width: 16px;
-    height: 16px;
-    fill: white;
-    margin: 0;
-    padding: 0;
+
+  &:after {
+    height: 5px;
+    border-left: solid 2px $COLOR_KEY_DARK1;
+    transform: rotate(-45deg);
+    top: 16px;
+    left: 17px;
   }
 }
