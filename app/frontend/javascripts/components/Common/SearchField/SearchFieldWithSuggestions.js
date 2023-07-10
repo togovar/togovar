@@ -7,7 +7,6 @@ import './SuggestionsList';
 import './SearchFieldExamples';
 
 import Styles from '../../../../stylesheets/object/component/search-with-suggestions.scss';
-import StoreManager from '../../../classes/StoreManager';
 
 /**
  * @typedef SearchFieldOptions
@@ -57,7 +56,6 @@ export default class SearchElementWithSuggestions extends LitElement {
    * @param {string} suggestAPIQueryParam - Query parameter to be used for the API call
    * @param {HTMLElement} element - HTML element to which the search field is attached
    * @param {SearchFieldOptions} options - Options for the search field
-   * @param {{key: string, value:string}[]} examples - Examples to show in the suggestions list
    */
   constructor(
     placeholder,
@@ -349,14 +347,6 @@ export default class SearchElementWithSuggestions extends LitElement {
 
   setTerm(term) {
     this.label = term;
-  }
-
-  setExamples(examples) {
-    return [];
-  }
-
-  search() {
-    StoreManager.setSimpleSearchCondition('term', this.label);
   }
 }
 
