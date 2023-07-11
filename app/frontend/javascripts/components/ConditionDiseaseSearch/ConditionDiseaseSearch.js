@@ -66,6 +66,11 @@ export class ConditionDiseaseSearch extends LitElement {
     }
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    this.setAttribute('id', 'ConditionDiseaseSearch');
+  }
+
   render() {
     return html`
       <search-field-with-suggestions
