@@ -1,6 +1,5 @@
 import { LitElement, css, html } from 'lit';
-import FrequencyCountValueView from './FrequencyCountValueView'; // for embedding
-// import Style from '../../stylesheets/foundation/_variables.scss';
+import './FrequencyCountValueView'; // for embedding
 
 export default class ConditionItemValueView extends LitElement {
   // Define scoped styles right with your component, in plain CSS
@@ -221,17 +220,17 @@ export default class ConditionItemValueView extends LitElement {
   `;
 
   static properties = {
-    label: { type: 'string' },
-    conditionType: { type: 'string' },
-    value: { type: 'string' },
+    label: { type: String },
+    conditionType: { type: String },
+    value: { type: String },
   };
 
   constructor() {
     super();
     // Declare reactive properties
-    this.label;
-    this.conditionType;
-    this.value;
+    this.label = '';
+    this.conditionType = '';
+    this.value = '';
   }
 
   // Render the UI as a function of component state

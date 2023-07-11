@@ -1,7 +1,6 @@
 import StoreManager from './StoreManager.js';
 // import SearchFieldView from './SearchFieldView.js';
 import { API_URL } from '../global.js';
-import SearchFieldWithSuggestions from '../components/Common/SearchField/SearchFieldWithSuggestions.js';
 import SimpleSearch from '../components/Common/SearchField/SimpleSearch.js';
 
 const EXAMPLES = (() => {
@@ -92,45 +91,12 @@ export default class SimpleSearchView {
       'Search for disease or gene symbol or rs...',
       EXAMPLES
     );
-    // this._searchFieldView = new SearchFieldWithSuggestions(
-    //   'Search for disease or gene symbol or rs...',
-    //   `${API_URL}/suggest`,
-    //   'term',
-    //   elm,
-    //   {
-    //     valueMappings: { valueKey: 'term', labelKey: 'term' },
-    //     titleMappings: { gene: 'Gene names', disease: 'Disease names' },
-    //   },
-    //   EXAMPLES
-    // );
-    // new SearchFieldView(
-    //   this,
-    //   elm,
-    //   'Search for disease or gene symbol or rs...',
-    //   ['gene', 'disease'],
-    //   `${API_URL}/suggest?term=`
-    // );
 
     // events
     StoreManager.bind('simpleSearchConditions', this);
     // value
     const term = StoreManager.getSimpleSearchCondition('term');
     if (term) this._searchFieldView.setTerm(term);
-
-    // examples
-    // this._searchFieldView.setExamples(EXAMPLES).forEach((dl) => {
-    //   dl.addEventListener(
-    //     'click',
-    //     (e) => {
-    //       e.stopPropagation();
-    //       this._searchFieldView.setTerm(
-    //         dl.querySelector('dd').textContent,
-    //         true
-    //       );
-    //     },
-    //     true
-    //   );
-    // });
   }
 
   search() {

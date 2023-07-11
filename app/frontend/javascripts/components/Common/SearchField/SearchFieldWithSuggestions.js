@@ -7,6 +7,7 @@ import './SearchFieldSimple';
 import './SearchFieldSuggestionsList';
 
 import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
+import { debounce } from '../../../utils/debounce';
 
 /**
  * @typedef SearchFieldOptions
@@ -314,7 +315,7 @@ export default class SearchElementWithSuggestions extends LitElement {
 
   render() {
     return html`<search-field-simple
-        @change=${this.#handleInput}
+        @change=${debounce(this.#handleInput, 300)}
         @click=${this.#handleClick}
         @focusin=${this.#handleFocusIn}
         @focusout=${this.#handleFocusOut}

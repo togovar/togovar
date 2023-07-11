@@ -69,7 +69,9 @@ export default class SuggestionsList extends LitElement {
                 >
                   ${unsafeHTML(item?.highlight || item?.[this.itemLabelKey])}
                   ${this.subTextKey && item?.[this.subTextKey]
-                    ? html`<span class="sub">${item[this.subTextKey]}</span>`
+                    ? html`<span class="sub"
+                        >alias: ${item[this.subTextKey]}</span
+                      >`
                     : nothing}
                 </li>
               `
