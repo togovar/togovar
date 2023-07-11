@@ -28,9 +28,11 @@
       background-color: var(--color-suggest);
       font-style: normal;
     }
+
     &:first-child {
       padding-top: 4px;
     }
+
     &:hover {
       background-color: rgba($COLOR_SELECTED, 0.2);
     }

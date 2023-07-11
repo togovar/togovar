@@ -14,6 +14,7 @@ import Styles from '../../../../stylesheets/object/component/search-field-with-s
  * @property {object} valueMappings - what from suggestion to map to the .value and .label
  * @property {string} valueMappings.valueKey - what to map to the .value (usually "id")
  * @property {string} valueMappings.labelKey - what to map to the .label
+ * @property {string} valueMappings.aliasOfKey - what to map to the .subText
  * @property {{[key: string]: string}} titleMappings - how to map to the suggestion title
  */
 
@@ -327,7 +328,7 @@ export default class SearchElementWithSuggestions extends LitElement {
           ? html`
               ${map(this.#suggestionKeysArray, (key, keyIndex) => {
                 return html`
-                  <div class="suggestions-column">
+                  <div class="column">
                     <search-field-suggestions-list
                       .suggestData=${this.suggestData[key]}
                       .highlightedSuggestionIndex="${keyIndex ===
@@ -336,10 +337,11 @@ export default class SearchElementWithSuggestions extends LitElement {
                         : -1}"
                       .itemIdKey=${'term'}
                       .itemLabelKey=${'term'}
+                      .subTextKey=${this.#searchFieldOptions?.valueMappings
+                        ?.aliasOfKey}
                       title=${this.#searchFieldOptions?.titleMappings?.[key]}
                       @suggestion-selected=${this.#handleSuggestionSelected}
                     ></search-field-suggestions-list>
-                    <div class="suggestions-column"></div>
                   </div>
                 `;
               })}

@@ -73,7 +73,11 @@ export default class SimpleSearch extends LitElement {
           .placeholder=${this.placeholder}
           .hideSuggestions=${this.hideSuggestions}
           .options=${{
-            valueMappings: { valueKey: 'term', labelKey: 'term' },
+            valueMappings: {
+              valueKey: 'term',
+              labelKey: 'term',
+              aliasOfKey: 'alias_of',
+            },
             titleMappings: { gene: 'Gene names', disease: 'Disease names' },
           }}
           @new-suggestion-selected=${this.#handleSuggestionEnter}
