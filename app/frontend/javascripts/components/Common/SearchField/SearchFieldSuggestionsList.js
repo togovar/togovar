@@ -18,6 +18,8 @@ export default class SuggestionsList extends LitElement {
       itemIdKey: { type: String, attribute: 'item-id-key' },
       /** What of an item to map to dispatched event's detail.label */
       itemLabelKey: { type: String, attribute: 'item-label-key' },
+      /** If there is alias_of -kind of data, where in data to see for it */
+      subTextKey: { type: String, attribute: 'sub-text-key' },
       /** Column title in case of Simple search */
       title: { type: String, attribute: 'title' },
     };
@@ -30,9 +32,11 @@ export default class SuggestionsList extends LitElement {
   constructor() {
     super();
     this.suggestData = [];
+
     this.highlightedSuggestionIndex = -1;
     this.itemIdKey = '';
     this.itemLabelKey = '';
+    this.subTextKey = '';
     this.title = '';
   }
 
@@ -64,6 +68,9 @@ export default class SuggestionsList extends LitElement {
                   ${scrollMeUp(this.highlightedSuggestionIndex === index)}
                 >
                   ${unsafeHTML(item?.highlight || item?.[this.itemLabelKey])}
+                  ${this.subTextKey && item?.[this.subTextKey]
+                    ? html`<span class="sub">${item[this.subTextKey]}</span>`
+                    : nothing}
                 </li>
               `
             )}
