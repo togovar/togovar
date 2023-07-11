@@ -22,7 +22,13 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
       'https://grch37.togovar.org/api/search/gene',
       'term',
       this._body,
-      { valueMappings: { valueKey: 'id', labelKey: 'symbol' } }
+      {
+        valueMappings: {
+          valueKey: 'id',
+          labelKey: 'symbol',
+          aliasOfKey: 'alias_of',
+        },
+      }
     );
 
     // new SearchField(
