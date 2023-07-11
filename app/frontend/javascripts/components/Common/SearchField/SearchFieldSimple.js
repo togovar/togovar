@@ -1,5 +1,4 @@
 import { LitElement, html } from 'lit';
-// import { debounce } from '../../../utils/debounce';
 import { ref, createRef } from 'lit/directives/ref.js';
 import SimpleSearchStyle from '../../../../stylesheets/object/component/search-field-simple.scss';
 
