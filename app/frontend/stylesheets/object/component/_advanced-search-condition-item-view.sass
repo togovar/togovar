@@ -21,7 +21,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2)
       display: flex
       align-items: stretch
       min-height: $HEIGHT
-      border-radius: 0 $CORNER_RADIUS
+      border-radius: $CORNER_RADIUS
       > .classification
         background-color: $COLOR_BLACK
         color: white
@@ -81,6 +81,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2)
     > .body
       z-index: $Z_INDEX_EDITING_CONDITION + 1
       > .summary
+        border-radius: $CORNER_RADIUS $CORNER_RADIUS 0
         > .classification
           border-bottom-left-radius: 0
         > .buttons
