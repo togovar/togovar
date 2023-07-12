@@ -61,7 +61,7 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
               value: id,
               label: id,
             };
-            this._update(false);
+            this._update(false, true);
 
             this._searchFieldView.value = '';
           }
@@ -73,7 +73,7 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
   // public methods
 
   keepLastValues() {
-    this._lastValue = this._searchFieldView.label;
+    this._lastValue = this._searchFieldView.term || '';
   }
 
   restore() {
@@ -91,10 +91,15 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
 
   // private methods
 
-  _update(isOnly = true) {
+  _update(isOnly = true, showDeleteButton = false) {
     // update value
 
-    this._addValueView(this._data.value, this._data.label, isOnly);
+    this._addValueView(
+      this._data.value,
+      this._data.label,
+      isOnly,
+      showDeleteButton
+    );
 
     // validation
     this._valuesView.update(this._validate());
