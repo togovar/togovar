@@ -58,6 +58,10 @@ export default class SearchFieldSimple extends LitElement {
     );
   }
 
+  setTerm(term) {
+    this.value = term;
+  }
+
   willUpdate(changed) {
     if (changed.has('value') && this.#inputRef.value) {
       this.#inputRef.value.value = this.value;
