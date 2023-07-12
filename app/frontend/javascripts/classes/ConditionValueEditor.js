@@ -2,6 +2,16 @@ export default class ConditionValueEditor {
   constructor(valuesView, conditionType) {
     this._valuesView = valuesView;
     this._conditionType = conditionType;
+
+    this._valuesView.conditionView.elm.addEventListener(
+      'delete-condition-item',
+      this.#handleDeleteValue.bind(this)
+    );
+  }
+
+  #handleDeleteValue(e) {
+    e.stopPropagation();
+    this._removeValueView(e.detail);
   }
 
   _createElement(className, html) {
@@ -19,7 +29,7 @@ export default class ConditionValueEditor {
    * @param {string} label
    * @param {boolean} isOnly
    */
-  _addValueView(value, label, isOnly = false) {
+  _addValueView(value, label, isOnly = false, showDeleteButton = false) {
     // find value view
     const selector = isOnly ? '' : `[data-value="${value}"]`;
     let valueView = this._valuesElement.querySelector(
@@ -29,6 +39,8 @@ export default class ConditionValueEditor {
     if (!valueView) {
       valueView = document.createElement('condition-item-value-view');
       valueView.conditionType = this._conditionType;
+      valueView.deleteButton = showDeleteButton;
+
       this._valuesElement.append(valueView);
     }
     valueView.label = label;
