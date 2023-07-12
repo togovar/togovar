@@ -1,4 +1,4 @@
-import { LitElement, css, html } from 'lit';
+import { LitElement, css, html, nothing } from 'lit';
 import './FrequencyCountValueView'; // for embedding
 
 export default class ConditionItemValueView extends LitElement {
@@ -217,12 +217,31 @@ export default class ConditionItemValueView extends LitElement {
       > .inner::before {
       content: 'NC';
     }
+    button.delete {
+      border-radius: 50%;
+      border: none;
+      color: var(--color-gray);
+      cursor: pointer;
+      position: relative;
+      font-family: fontello;
+      background-color: transparent;
+      padding: 0;
+      margin-left: 0.2em;
+      margin-right: -0.5em;
+    }
+    button.delete:before {
+      display: block;
+      content: var(--char-delete);
+      width: 1em;
+      height: 1em;
+    }
   `;
 
   static properties = {
     label: { type: String },
     conditionType: { type: String },
     value: { type: String },
+    deleteButton: { type: Boolean },
   };
 
   constructor() {
@@ -231,6 +250,17 @@ export default class ConditionItemValueView extends LitElement {
     this.label = '';
     this.conditionType = '';
     this.value = '';
+
+    this.deleteButton = false;
+  }
+
+  #handleDelete() {
+    this.dispatchEvent(
+      new CustomEvent('delete-condition-item', {
+        detail: this.value,
+        bubbles: true,
+      })
+    );
   }
 
   // Render the UI as a function of component state
@@ -248,7 +278,9 @@ export default class ConditionItemValueView extends LitElement {
         class="inner"
         data-condition-type="${this.conditionType}"
         data-value="${this.value}"
-        >${this.label}</span
+        >${this.label}${this.deleteButton
+          ? html`<button class="delete" @click=${this.#handleDelete}></button>`
+          : nothing}</span
       >
       ${option} `;
   }
