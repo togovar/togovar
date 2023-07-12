@@ -181,9 +181,9 @@ export default class ConditionItemView extends ConditionView {
       }
 
       case CONDITION_TYPE.variant_id: {
-        const value = values[0].value;
+        const ids = values.map(({ value }) => value);
         return {
-          id: [value],
+          id: ids,
         };
       }
 
