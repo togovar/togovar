@@ -37,6 +37,9 @@ export default class ConditionItemView {
 
   _toggleSelecting(e) {
     e.stopImmediatePropagation();
+    const ifEditing = this._elm.classList.contains('-editing');
+    if (ifEditing) return;
+
     if (this.isSelecting) {
       this._builder.selection.deselectConditionView(this);
     } else {
