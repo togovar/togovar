@@ -218,6 +218,7 @@ export default class ConditionItemValueView extends LitElement {
       content: 'NC';
     }
     button.delete {
+      display: none;
       border-radius: 50%;
       border: none;
       color: var(--color-gray);
@@ -230,7 +231,6 @@ export default class ConditionItemValueView extends LitElement {
       margin-right: -0.5em;
     }
     button.delete:before {
-      display: block;
       content: var(--char-delete);
       width: 1em;
       height: 1em;
@@ -280,7 +280,11 @@ export default class ConditionItemValueView extends LitElement {
         data-condition-type="${this.conditionType}"
         data-value="${this.value}"
         >${this.label}${this.deleteButton
-          ? html`<button class="delete" @click=${this.#handleDelete}></button>`
+          ? html`<button
+              class="delete"
+              part="delete-tag-btn"
+              @click=${this.#handleDelete}
+            ></button>`
           : nothing}</span
       >
       ${option} `;
