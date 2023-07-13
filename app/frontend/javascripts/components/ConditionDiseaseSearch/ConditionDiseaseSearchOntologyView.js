@@ -35,27 +35,25 @@ class Container extends LitElement {
   };
 
   static styles = css`
-  :host {
-    font-size: 10px;
-    display: block;
-    height: 100%
-    position: relative;
-  
-  }
+    :host {
+      font-size: 10px;
+      display: block;
+      height: 100%;
+      position: relative;
+    }
 
-  .clip {
-    height: 200px;
-    overflow: hidden;
-    position: relative;
-  }
+    .clip {
+      height: 200px;
+      overflow: hidden;
+      position: relative;
+    }
 
-  .flex {
+    .flex {
       height: 100%;
       display: flex;
       flex-direction: row;
-  }
-
-`;
+    }
+  `;
 
   constructor() {
     super();

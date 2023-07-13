@@ -68,14 +68,18 @@ export default class SearchElementWithSuggestions extends LitElement {
   ) {
     super();
 
+    /** value of the selected suggestion */
     this.value = null;
+    /** label of selected suggestion */
     this.label = '';
+
     this.showSuggestions = false;
     this.currentSuggestionIndex = -1;
     this.currentSuggestionColumnIndex = 0;
     this.options = options;
     this.suggestData = [];
 
+    /** currently entered text */
     this.term = '';
     this.hideSuggestions = false;
 
