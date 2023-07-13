@@ -35,11 +35,13 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
           }
         );
 
+      /** Add condition-item-value-view with selected suggestion data */
       const handleSuggestSelect = (e) => {
-        this._data = {
-          value: e.detail.id,
-          label: e.detail.label,
-        };
+        const value = e.detail.id;
+        const label = e.detail.label;
+
+        this._addValueView(value, label, true, false);
+
         this._update();
       };
 
@@ -57,11 +59,8 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
           const id = this._searchFieldView.value;
 
           if (this._searchFieldView.value.trim().length > 0) {
-            this._data = {
-              value: id,
-              label: id,
-            };
-            this._update(false, true);
+            this._addValueView(id, id, false, true);
+            this._update();
 
             this._searchFieldView.value = '';
           }
@@ -86,21 +85,14 @@ export default class ConditionValueEditorTextField extends ConditionValueEditor 
   }
 
   get isValid() {
-    return this._searchFieldView.value !== '';
+    /** Valid only if there are some condition-item-value-view 's in the valuesView */
+    return this._valueViews.length > 0;
   }
 
   // private methods
 
-  _update(isOnly = true, showDeleteButton = false) {
-    // update value
-
-    this._addValueView(
-      this._data.value,
-      this._data.label,
-      isOnly,
-      showDeleteButton
-    );
-
+  /** Update is OK button is disabled on not */
+  _update() {
     // validation
     this._valuesView.update(this._validate());
   }
