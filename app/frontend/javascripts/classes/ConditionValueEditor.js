@@ -12,6 +12,7 @@ export default class ConditionValueEditor {
   #handleDeleteValue(e) {
     e.stopPropagation();
     this._removeValueView(e.detail);
+    this._valuesView.update();
   }
 
   _createElement(className, html) {
