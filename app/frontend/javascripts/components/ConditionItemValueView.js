@@ -254,7 +254,8 @@ export default class ConditionItemValueView extends LitElement {
     this.deleteButton = false;
   }
 
-  #handleDelete() {
+  #handleDelete(e) {
+    e.stopPropagation();
     this.dispatchEvent(
       new CustomEvent('delete-condition-item', {
         detail: this.value,
