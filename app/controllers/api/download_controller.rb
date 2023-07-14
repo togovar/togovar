@@ -50,22 +50,24 @@ module API
     private
 
     def search_params
-      query = if request.get?
-                params.permit :term, :quality, :debug, :offset, :limit,
-                              dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {}, sift: {}, polyphen: {}, column: {}
-              else
-                if params.key?(:query)
-                  params.permit query: {}, column: []
-                else
-                  body = request.body.tap(&:rewind).read
-                  JSON.parse(body).with_indifferent_access
-                end
-              end.to_h
+      @search_params ||= begin
+                           query = if request.get?
+                                     params.permit :term, :quality, :debug, :offset, :limit,
+                                                   dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {}, sift: {}, polyphen: {}, column: {}
+                                   else
+                                     if params.key?(:query)
+                                       params.permit query: {}, column: []
+                                     else
+                                       body = request.body.tap(&:rewind).read
+                                       JSON.parse(body).with_indifferent_access
+                                     end
+                                   end.to_h
 
-      query.delete(:offset)
-      query.delete(:limit)
+                           query.delete(:offset)
+                           query.delete(:limit)
 
-      query.merge(body: query)
+                           query.merge(body: query)
+                         end
     end
 
     def output_columns
@@ -139,11 +141,13 @@ module API
           last = res.last
 
           offset = [
-            last&.dig(:_source, :chromosome, :label),
-            last&.dig(:_source, :vcf, :position)&.to_s,
-            last&.dig(:_source, :vcf, :reference),
-            last&.dig(:_source, :vcf, :alternate)
+            last&.dig(:_source, :chromosome, :index)&.to_i,
+            last&.dig(:_source, :vcf, :position)&.to_i,
+            last&.dig(:_source, :vcf, :reference)&.to_s,
+            last&.dig(:_source, :vcf, :alternate)&.to_s
           ].compact
+
+          break if offset.size != 4
         end
       end
     end
