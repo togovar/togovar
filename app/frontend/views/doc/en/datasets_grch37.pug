@@ -86,7 +86,7 @@ article.common-document
         a.hyper-text.-external(target='_blank', href='https://www.biobank.amed.go.jp/itc/agd/index.html')
           | AMED Genome group sharing Database (AGD)
     section.section
-      h3.sectiontitle Other variant datasets
+      h3.sectiontitle Other variant frequency datasets
       table.table._column-span-all
         thead
           tr
@@ -103,19 +103,6 @@ article.common-document
             th Author
             th Version/Last updated
         tbody
-          tr
-            td
-              a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/xml/clinvar_variation/')
-                | ClinVar
-            td._align-center -
-            td._align-left Mixed
-            td._align-center
-            td._align-center ✔
-            td._align-center —
-            td._align-center
-              span(style='margin-left:15px;') 788,993
-            td NCBI
-            td 2021
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads')
@@ -180,16 +167,11 @@ article.common-document
             td Tohoku Medical Megabank Organization
             td v202109
       p.notice
-        | Note 1: TogoVar contains ClinVar variants only in
-        |
-        a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/') the VCF file
-        | , GRCh37 positions of which were determined.
-        br
-        | Note 2 : #{ GLOBALS.TOMMO_VERSION }KJPN consists of SNVs (Autosome, chrX(PAR1+PAR2+XTR) and chrMT) and INDELs (Autosome and
+        | Note: #{ GLOBALS.TOMMO_VERSION }KJPN consists of SNVs (Autosome, chrX(PAR1+PAR2+XTR) and chrMT) and INDELs (Autosome and
         | chrX(PAR1+PAR2+XTR)).
     section.section
       h3.sectiontitle
-        | Non-variant datasets
+        | Non-variant frequency datasets
       table.table
         thead
           tr
@@ -198,6 +180,12 @@ article.common-document
             th Description
             th Author
         tbody
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/') ClinVar
+            td 2022/09/01
+            td Clinical significance of variants
+            td NCBI
           tr
             td
               a.hyper-text.-external(target='_blank', href='ftp://ftp.dbcls.jp/colil') Colil
@@ -211,6 +199,13 @@ article.common-document
             td 2013/06/28
             td Human genome reference sequence
             td GRC
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://www.ebi.ac.uk/gwas/')
+                | GWAS Catalog
+            td 2022/09/16
+            td Catalog of human genome-wide association studies
+            td NHGRI-EBI
           tr
             td
               a.hyper-text.-external(target='_blank', href='ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/tsv/hgnc_complete_set.txt')
@@ -237,6 +232,11 @@ article.common-document
             td ‐
             td Comprehensive information on genomes
             td DBCLS
+      p.notice
+        | Note: TogoVar obtained ClinVar variants from
+        |
+        a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/') the VCF file
+        | that contains only variants for which GRCh38 positions were determined.
     section.section
       h3.sectiontitle Tools for data processing
       table.table

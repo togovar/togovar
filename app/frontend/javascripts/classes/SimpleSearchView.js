@@ -20,7 +20,7 @@ const EXAMPLES = (() => {
         },
         {
           key: 'TogoVar',
-          value: 'tgv421843',
+          value: 'tgv56616325'
         },
         {
           key: 'Position(GRCh37/hg19)',
@@ -55,7 +55,7 @@ const EXAMPLES = (() => {
         },
         {
           key: 'TogoVar',
-          value: 'tgv421843',
+          value: 'tgv56616325'
         },
         {
           key: 'Position(GRCh38)',
