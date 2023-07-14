@@ -232,8 +232,7 @@ export default class ConditionItemValueView extends LitElement {
     }
     button.delete:before {
       content: var(--char-delete);
-      width: 1em;
-      height: 1em;
+      font-size: 0.8em;
     }
   `;
 
