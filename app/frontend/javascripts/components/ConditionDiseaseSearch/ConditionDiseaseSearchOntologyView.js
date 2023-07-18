@@ -156,6 +156,19 @@ class Container extends LitElement {
   }
 
   _loadingEnded() {
+    if (this.data.id) {
+      this.dispatchEvent(
+        new CustomEvent('disease-selected', {
+          detail: {
+            id: this.data.id,
+            label: this.data.label,
+          },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    }
+
     this.dispatchEvent(
       new CustomEvent('loading-ended', { bubbles: true, composed: true })
     );
@@ -168,8 +181,8 @@ class Container extends LitElement {
       this._loadingStarted();
 
       this.API.get(`/disease?node=${e.detail.id}`).then(({ data }) => {
-        this._loadingEnded();
         this.data = data;
+        this._loadingEnded();
         this.updateComplete.then(() => {
           if (e.detail.role === 'children') {
             this.movement = 'left';
@@ -180,16 +193,6 @@ class Container extends LitElement {
 
             this._columns = ['parents', 'hero', 'children', '_children'];
           }
-          this.dispatchEvent(
-            new CustomEvent('disease-selected', {
-              detail: {
-                id: data.id,
-                label: data.label,
-              },
-              bubbles: true,
-              composed: true,
-            })
-          );
         });
       });
     }
