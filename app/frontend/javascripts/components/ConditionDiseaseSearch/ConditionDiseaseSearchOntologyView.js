@@ -153,7 +153,7 @@ class Container extends LitElement {
         new CustomEvent('disease-selected', {
           detail: {
             id: this.data.id,
-            label: this.data.label,
+            label: this.data.label[0].toUpperCase() + this.data.label.slice(1),
           },
           bubbles: true,
           composed: true,
