@@ -12,6 +12,6 @@ Rails.application.routes.draw do
   end
 
   # backward compatibility
-  get 'suggest', to: 'root#suggest'
+  get 'suggest', to: 'suggest#index'
   get 'search', to: 'api/search#variant'
 end

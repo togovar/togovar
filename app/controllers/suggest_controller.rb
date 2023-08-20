@@ -1,5 +1,5 @@
-class RootController < ApplicationController
-  def suggest
+class SuggestController < ApplicationController
+  def index
     term = suggest_params[:term]
 
     respond_to do |format|
