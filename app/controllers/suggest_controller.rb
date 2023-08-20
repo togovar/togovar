@@ -1,22 +1,17 @@
 class SuggestController < ApplicationController
   def index
-    term = suggest_params[:term]
+    action = SuggestTerms.run(term: suggest_params[:term])
 
-    respond_to do |format|
-      format.json do
-        @response = if term && term.length >= 3
-                      {
-                        gene: Gene.suggest(term),
-                        disease: Disease.suggest(term)
-                      }
-                    else
-                      Hash.new { [] }
-                    end
-
-        render 'suggest', formats: :json, handlers: 'jbuilder'
+    if action.valid?
+      respond_to do |format|
+        format.json { render json: action.result }
       end
+    else
+      render json: { errors: action.errors.full_messages }, status: :bad_request
     end
   end
+
+  private
 
   def suggest_params
     params.permit(:term, :format)
