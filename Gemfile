@@ -44,19 +44,14 @@ group :development do
   gem 'better_errors', '~> 2.9', '>= 2.9.1'
   gem 'better_errors-pry', '~> 1.0', '>= 1.0.3'
   gem 'listen', '~> 3.2'
+  gem 'pry-byebug', '~> 3.10', '>= 3.10.1'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'web-console', '~> 4.1'
 end
 
-group :test do
-  gem 'rspec', '~> 3.7'
-  gem 'rspec-rails', '~> 3.7'
-end
-
 group :development, :test do
-  gem 'byebug', platforms: %i[mri mingw x64_mingw]
-  gem 'pry-byebug', '~> 3.9'
+  gem 'rspec-rails', '~> 5.1', '>= 5.1.2'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
