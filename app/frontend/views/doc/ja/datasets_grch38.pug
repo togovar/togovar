@@ -139,21 +139,21 @@ article.common-document
               | (2017/08/02)
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-14kjpn-20211208r2-af_snvindelall')
-                | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN Allele Frequency Panel(#{ GLOBALS.TOMMO_VERSION }KJPN)
+              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-54kjpn-20230626-af_snvindelall')
+                | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN-SNV/INDEL Allele Frequency Panel(#{ GLOBALS.TOMMO_VERSION }KJPN)
             td._align-left WGS
             td._align-center
             td._align-left 日本人
             td._align-center ✔
             td._align-center
             td._align-center
-              span(style='margin-left:-3px;') 約14,000
+              span(style='margin-left:-3px;') 54,302
             td._align-center
-              | 133,757,499
+              | Simplesearch検索結果を記入する
             td 東北メディカル・メガバンク機構
-            td v20211208r2
+            td v20230626
       p.notice
-        | 注：#{ GLOBALS.TOMMO_VERSION }KJPNの内訳は、SNV (Autosome、chrX(PAR1+PAR2+XTR)、chrMT)とINDEL (Autosome、chrX(PAR1+PAR2+XTR))です。
+        | 注：#{ GLOBALS.TOMMO_VERSION }KJPNのautosome、ChrX_PAR2、ChrX_PAR3およびmitochondriaを含みます。
     section.section
       h3.sectiontitle バリアント頻度以外のデータ
       table.table
@@ -167,7 +167,7 @@ article.common-document
           tr
             td
               a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/') ClinVar
-            td 2022/09/01
+            td 2023/8/7
             td バリアントの臨床的意義
             td NCBI
           tr
@@ -187,14 +187,14 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://www.ebi.ac.uk/gwas/')
                 | GWAS Catalog
-            td 2022/09/16
+            td 2023/09/05
             td ゲノムワイド関連解析(GWAS)情報
             td NHGRI-EBI
           tr
             td
               a.hyper-text.-external(target='_blank', href='ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/tsv/hgnc_complete_set.txt')
                 | HGNC symbol report
-            td 2022/09/16
+            td 2023/09/05
             td 遺伝子シンボルや関連リソースの情報
             td HGNC
           tr
@@ -208,7 +208,7 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/')
                 | PubTator Central
-            td 2022/09/20
+            td 2023/09/03
             td バリアント名が出現する文献情報
             td NCBI
           tr
@@ -218,7 +218,7 @@ article.common-document
             td ゲノムに関する包括的な情報
             td DBCLS
       p.notice
-        | 注：ClinVarはGRCh37上の位置が決定しているバリアントのみを含む
+        | 注：ClinVarはGRCh38上の位置が決定しているバリアントのみを含む
         a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/') VCFファイル
         | からデータを取得しています。
     section.section
@@ -248,7 +248,7 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/index.html')
                 | Variant Effect Predictor (VEP)
-            td Ensembl rel. 107
+            td Ensembl rel. 110
             td
               | バリアントに
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/script/vep_cache.html#cache_content')
