@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: classes/AdvancedSearchSelection.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: classes/AdvancedSearchSelection.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import SelectionArea from '@simonwep/selection-js';
+// import AdvancedSearchBuilderView from './AdvancedSearchBuilderView';
+
+export default class AdvancedSearchSelection {
+  /**
+   *
+   * @param {*} area
+   * @param {AdvancedSearchBuilderView} builder
+   */
+  constructor(area, builder) {
+    this._builder = builder;
+    this._selectionArea = new SelectionArea({
+      class: 'selection-area',
+      boundaries: ['#AdvancedSearchBuilderView'],
+      selectables: [
+        '#AdvancedSearchBuilderView > .inner > .advanced-search-condition-group-view.-root > .container .advanced-search-condition-group-view',
+        '#AdvancedSearchBuilderView > .inner > .advanced-search-condition-group-view.-root > .container .advanced-search-condition-item-view',
+      ],
+      startareas: ['html'],
+      overlap: 'invert',
+      singleTap: { allow: false },
+    });
+    this._selectionArea.disable();
+
+    /*
+    this._selectionArea
+      // .on('beforestart', ({store, event}) => {
+      //   console.log(store)
+      // })
+      .on('start', ({store, event}) => {
+        document.body.dataset.dragging = true;
+        if (!event.ctrlKey &amp;&amp; !event.metaKey) {
+          // Unselect all elements
+          this.deselectAllConditions();
+        }
+      })
+      .on('move', ({store: {changed: {added, removed}}}) => {
+        // Add a custom class to the elements that where selected.
+        for (const el of added) {
+          el.delegate.select();
+        }
+        // Remove the class from elements that where removed
+        // since the last selection
+        for (const el of removed) {
+          el.delegate.deselect();
+        }
+      })
+      .on('stop', (e) => {
+        console.log(e)
+        document.body.dataset.dragging = false;
+        this._selectionArea.keepSelection();
+        console.log(...this._selectionArea.getSelection())
+        // filter only top-level items
+        const minDepth = this._selectionArea.getSelection().reduce((minDepth, el) => {
+          const depth = el.delegate.depth;
+          return minDepth > depth ? depth : minDepth;
+        }, 9999);
+        ([...this._selectionArea.getSelection()]).forEach(el => {
+          const depth = el.delegate.depth;
+          if (depth > minDepth) this._selectionArea.deselect(el);
+        });
+        console.log(...this._selectionArea.getSelection())
+        this._builder.selectedConditionViews(e.store.selected.map(el => el.delegate));
+      });
+    */
+  }
+
+  // public methods
+
+  getSelectingConditionViews() {
+    const conditionEls = this._selectionArea.getSelection();
+    if (conditionEls.length > 0) {
+      // sort
+      const siblingEls = Array.from(conditionEls[0].parentNode.childNodes);
+      conditionEls.sort(
+        (el1, el2) => siblingEls.indexOf(el1) - siblingEls.indexOf(el2)
+      );
+    }
+    return conditionEls.map((el) => el.delegate);
+  }
+
+  deselectAllConditions() {
+    for (const el of this._selectionArea.getSelection()) {
+      el.delegate.deselect();
+    }
+    this._selectionArea.clearSelection();
+  }
+
+  /**
+   * @param {Array} conditionViews
+   * @param {Boolean} deselectSelecting
+   */
+  selectConditionView(conditionView, deselectSelecting = true) {
+    if (deselectSelecting) this.deselectAllConditions();
+
+    // checks if an already selected element is a sibling element
+    const existingConditionViews = this.getSelectingConditionViews();
+    const siblings = conditionView.siblingElms;
+    existingConditionViews.forEach((view) => {
+      if (siblings.indexOf(view.elm) === -1) this.deselectConditionView(view);
+    });
+
+    conditionView.select();
+    this._selectionArea.select(conditionView.elm);
+    this._selectionArea.keepSelection();
+    this._builder.selectedConditionViews(
+      this._selectionArea.getSelection().map((el) => el.delegate)
+    );
+  }
+
+  deselectConditionView(conditionView) {
+    conditionView.deselect();
+    this._selectionArea.deselect(conditionView.elm);
+    this._builder.selectedConditionViews(
+      this._selectionArea.getSelection().map((el) => el.delegate)
+    );
+  }
+
+  // private methods
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="cachedAxios.html">cachedAxios</a></li><li><a href="module.exports_module.exports.html">exports</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_addValueView">_addValueView</a></li><li><a href="global.html#_removeValueView">_removeValueView</a></li><li><a href="global.html#_update">_update</a></li><li><a href="global.html#addConditionViews">addConditionViews</a></li><li><a href="global.html#addNewConditionGroup">addNewConditionGroup</a></li><li><a href="global.html#addNewConditionItem">addNewConditionItem</a></li><li><a href="global.html#delete">delete</a></li><li><a href="global.html#elm">elm</a></li><li><a href="global.html#highlightedSuggestionIndex">highlightedSuggestionIndex</a></li><li><a href="global.html#isSelecting">isSelecting</a></li><li><a href="global.html#itemIdKey">itemIdKey</a></li><li><a href="global.html#itemLabelKey">itemLabelKey</a></li><li><a href="global.html#parentView">parentView</a></li><li><a href="global.html#removeConditionView">removeConditionView</a></li><li><a href="global.html#selectConditionView">selectConditionView</a></li><li><a href="global.html#selectedConditionViews">selectedConditionViews</a></li><li><a href="global.html#subTextKey">subTextKey</a></li><li><a href="global.html#suggestData">suggestData</a></li><li><a href="global.html#title">title</a></li><li><a href="global.html#type">type</a></li><li><a href="global.html#ungroup">ungroup</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed Sep 13 2023 10:36:47 GMT+0900 (Japan Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
