@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/Common/SearchField/SearchFieldWithSuggestions.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/Common/SearchField/SearchFieldWithSuggestions.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { LitElement, html, nothing } from 'lit';
+import { map } from 'lit/directives/map.js';
+import { Task } from '@lit-labs/task';
+import { axios } from '../../../utils/cachedAxios';
+
+import './SearchFieldSimple';
+import './SearchFieldSuggestionsList';
+
+import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
+import { debounce } from '../../../utils/debounce';
+
+/**
+ * @typedef SearchFieldOptions
+ * @type {object}
+ * @property {object} valueMappings - what from suggestion to map to the .value and .label
+ * @property {string} valueMappings.valueKey - what to map to the .value (usually "id")
+ * @property {string} valueMappings.labelKey - what to map to the .label
+ * @property {string} valueMappings.aliasOfKey - what to map to the .subText
+ * @property {{[key: string]: string}} titleMappings - how to map to the suggestion title
+ */
+
+export default class SearchElementWithSuggestions extends LitElement {
+  #getSuggestURL = (text) => text;
+
+  /** @type {SearchFieldOptions} */
+  #searchFieldOptions = {};
+
+  /** @type {string[]} */
+  #suggestionKeysArray = [];
+
+  #apiTask = new Task(
+    this,
+    async (term) => {
+      if (term.length >= 3) {
+        this.showSuggestions = true;
+
+        const { data } = await axios.get(this.#getSuggestURL(term));
+        let dataToReturn;
+
+        // Make suggestion data same format for simple &amp; gene etc search
+        if (Array.isArray(data)) {
+          dataToReturn = { data: data };
+          this.#suggestionKeysArray = ['data'];
+        } else {
+          dataToReturn = data;
+          this.#suggestionKeysArray = Object.keys(data);
+        }
+        return (this.suggestData = dataToReturn);
+      }
+      return Promise.resolve(() => (this.showSuggestions = false));
+    },
+    () => this.term
+  );
+
+  /**
+   * @param {string} placeholder - Placeholder text
+   * @param {string} suggestAPIURL - URL to fetch suggestions from
+   * @param {string} suggestAPIQueryParam - Query parameter to be used for the API call
+   * @param {HTMLElement} element - HTML element to which the search field is attached
+   * @param {SearchFieldOptions} options - Options for the search field
+   */
+  constructor(
+    placeholder,
+    suggestAPIURL,
+    suggestAPIQueryParam,
+    element,
+    options
+  ) {
+    super();
+
+    /** value of the selected suggestion */
+    this.value = null;
+    /** label of selected suggestion */
+    this.label = '';
+
+    this.showSuggestions = false;
+    this.currentSuggestionIndex = -1;
+    this.currentSuggestionColumnIndex = 0;
+    this.options = options;
+    this.suggestData = [];
+
+    /** currently entered text */
+    this.term = '';
+    this.hideSuggestions = false;
+
+    this.placeholder = placeholder;
+    this.suggestAPIURL = suggestAPIURL;
+    this.suggestAPIQueryParam = suggestAPIQueryParam;
+
+    this.#searchFieldOptions = options;
+
+    if (element) {
+      element.appendChild(this);
+      if (this.suggestAPIQueryParam) {
+        this.#getSuggestURL = (text) => {
+          const url = new URL(this.suggestAPIURL);
+          url.searchParams.set(this.suggestAPIQueryParam, text);
+          return url.toString();
+        };
+      } else {
+        this.#getSuggestURL = (text) => {
+          return `${this.suggestAPIURL}/${text}`;
+        };
+      }
+    }
+  }
+
+  static get styles() {
+    return [Styles];
+  }
+
+  static properties = {
+    value: { type: String, state: true },
+    label: { type: String, state: true },
+    showSuggestions: { type: Boolean, state: true },
+    currentSuggestionIndex: { type: Number, state: true },
+    currentSuggestionColumnIndex: { type: Number, state: true },
+    options: { type: Object, state: true },
+    suggestData: {
+      type: Array,
+      state: true,
+    },
+
+    term: { type: String },
+    hideSuggestions: { type: Boolean },
+
+    placeholder: { type: String, attribute: 'placeholder' },
+    suggestAPIURL: {
+      type: String,
+      attribute: 'suggest-api-url',
+      reflect: true,
+    },
+    suggestAPIQueryParam: {
+      type: String,
+      attribute: 'suggest-api-query-param',
+      reflect: true,
+    },
+  };
+
+  willUpdate(changed) {
+    if (changed.has('suggestAPIURL') &amp;&amp; this.suggestAPIURL) {
+      if (this.suggestAPIQueryParam) {
+        this.#getSuggestURL = (text) => {
+          const url = new URL(this.suggestAPIURL);
+          url.searchParams.set(this.suggestAPIQueryParam, text);
+          return url.toString();
+        };
+      } else {
+        this.#getSuggestURL = (text) => {
+          return `${this.suggestAPIURL}/${text}`;
+        };
+      }
+    }
+
+    if (changed.has('options') &amp;&amp; this.options) {
+      this.#searchFieldOptions = {
+        ...this.#searchFieldOptions,
+        ...this.options,
+      };
+    }
+  }
+
+  #hideSuggestions = () => {
+    this.showSuggestions = false;
+  };
+
+  #handleStepThroughColumns() {
+    if (
+      this.currentSuggestionIndex >
+      this.suggestData[
+        this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
+      ].length -
+        1
+    ) {
+      this.currentSuggestionIndex =
+        this.suggestData[
+          this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
+        ].length - 1;
+    }
+  }
+
+  #handleUpDownKeys = (e) => {
+    if (
+      e.key === 'ArrowUp' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'ArrowLeft' ||
+      e.key === 'ArrowRight'
+    ) {
+      e.preventDefault();
+    }
+
+    switch (e.key) {
+      case 'ArrowLeft':
+        if (this.currentSuggestionColumnIndex - 1 &lt; 0) {
+          this.currentSuggestionColumnIndex =
+            this.#suggestionKeysArray.length - 1;
+
+          return;
+        }
+        this.currentSuggestionColumnIndex--;
+        this.#handleStepThroughColumns();
+        break;
+      case 'ArrowRight':
+        if (
+          this.currentSuggestionColumnIndex + 1 >
+          this.#suggestionKeysArray.length - 1
+        ) {
+          this.currentSuggestionColumnIndex = 0;
+          return;
+        }
+        this.currentSuggestionColumnIndex++;
+        this.#handleStepThroughColumns();
+        break;
+      case 'ArrowUp':
+        if (this.currentSuggestionIndex - 1 &lt; 0) {
+          this.currentSuggestionIndex =
+            this.suggestData[
+              this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
+            ].length - 1;
+          return;
+        }
+        this.currentSuggestionIndex--;
+        break;
+      case 'ArrowDown':
+        if (
+          this.currentSuggestionIndex + 1 >
+          this.suggestData[
+            this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
+          ].length -
+            1
+        ) {
+          this.currentSuggestionIndex = 0;
+          return;
+        }
+        this.currentSuggestionIndex++;
+        break;
+      case 'Enter':
+        if (this.showSuggestions &amp;&amp; this.currentSuggestionIndex !== -1) {
+          this.#select(
+            this.suggestData[
+              this.#suggestionKeysArray[this.currentSuggestionColumnIndex]
+            ][this.currentSuggestionIndex]
+          );
+        } else {
+          //
+          this.#hideSuggestions();
+          this.#handleEnterKey();
+        }
+
+        break;
+      case 'Escape':
+        if (this.showSuggestions) {
+          this.#hideSuggestions();
+        } else {
+          this.showSuggestions = true;
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  #handleEnterKey() {
+    this.dispatchEvent(
+      new CustomEvent('search-term-enter', {
+        detail: {
+          term: this.term,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  #select = (suggestion) => {
+    this.value = suggestion[this.#searchFieldOptions.valueMappings.valueKey];
+    this.label = suggestion[this.#searchFieldOptions.valueMappings.labelKey];
+
+    this.dispatchEvent(
+      new CustomEvent('new-suggestion-selected', {
+        detail: {
+          id: suggestion[this.#searchFieldOptions.valueMappings.valueKey],
+          label: suggestion[this.#searchFieldOptions.valueMappings.labelKey],
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
+    this.#hideSuggestions();
+  };
+
+  #handleSuggestionSelected = (e) => {
+    this.#select(e.detail);
+  };
+
+  #handleInput(e) {
+    this.term = e.data;
+
+    if (this.term.length &lt; 3) {
+      this.#hideSuggestions();
+      this.suggestData = [];
+    }
+  }
+
+  #handleClick() {
+    this.currentSuggestionIndex = -1;
+    this.currentSuggestionColumnIndex = 0;
+  }
+
+  #handleFocusIn() {
+    if (this.term.length > 3) {
+      this.showSuggestions = true;
+    }
+  }
+
+  #handleFocusOut() {
+    this.#hideSuggestions();
+  }
+
+  render() {
+    return html`&lt;search-field-simple
+        @change=${debounce(this.#handleInput, 300)}
+        @click=${this.#handleClick}
+        @focusin=${this.#handleFocusIn}
+        @focusout=${this.#handleFocusOut}
+        @keydown=${this.#handleUpDownKeys}
+        placeholder=${this.placeholder}
+        value=${this.term}
+        exportparts="input-field"
+      >&lt;/search-field-simple>
+      &lt;div class="suggestions-container">
+        ${this.suggestData &amp;&amp; this.showSuggestions &amp;&amp; !this.hideSuggestions
+          ? html`
+              ${map(this.#suggestionKeysArray, (key, keyIndex) => {
+                return html`
+                  &lt;div class="column">
+                    &lt;search-field-suggestions-list
+                      .suggestData=${this.suggestData[key]}
+                      .highlightedSuggestionIndex="${keyIndex ===
+                      this.currentSuggestionColumnIndex
+                        ? this.currentSuggestionIndex
+                        : -1}"
+                      .itemIdKey=${'term'}
+                      .itemLabelKey=${'term'}
+                      .subTextKey=${this.#searchFieldOptions?.valueMappings
+                        ?.aliasOfKey}
+                      title=${this.#searchFieldOptions?.titleMappings?.[key]}
+                      @suggestion-selected=${this.#handleSuggestionSelected}
+                    >&lt;/search-field-suggestions-list>
+                  &lt;/div>
+                `;
+              })}
+            `
+          : nothing}
+      &lt;/div> `;
+  }
+
+  setTerm(term) {
+    this.label = term;
+  }
+}
+
+customElements.define(
+  'search-field-with-suggestions',
+  SearchElementWithSuggestions
+);
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="cachedAxios.html">cachedAxios</a></li><li><a href="module.exports_module.exports.html">exports</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_addValueView">_addValueView</a></li><li><a href="global.html#_removeValueView">_removeValueView</a></li><li><a href="global.html#_update">_update</a></li><li><a href="global.html#addConditionViews">addConditionViews</a></li><li><a href="global.html#addNewConditionGroup">addNewConditionGroup</a></li><li><a href="global.html#addNewConditionItem">addNewConditionItem</a></li><li><a href="global.html#delete">delete</a></li><li><a href="global.html#elm">elm</a></li><li><a href="global.html#highlightedSuggestionIndex">highlightedSuggestionIndex</a></li><li><a href="global.html#isSelecting">isSelecting</a></li><li><a href="global.html#itemIdKey">itemIdKey</a></li><li><a href="global.html#itemLabelKey">itemLabelKey</a></li><li><a href="global.html#parentView">parentView</a></li><li><a href="global.html#removeConditionView">removeConditionView</a></li><li><a href="global.html#selectConditionView">selectConditionView</a></li><li><a href="global.html#selectedConditionViews">selectedConditionViews</a></li><li><a href="global.html#subTextKey">subTextKey</a></li><li><a href="global.html#suggestData">suggestData</a></li><li><a href="global.html#title">title</a></li><li><a href="global.html#type">type</a></li><li><a href="global.html#ungroup">ungroup</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed Sep 13 2023 10:36:47 GMT+0900 (Japan Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

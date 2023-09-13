@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: classes/ConditionView.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: classes/ConditionView.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// import {ADVANCED_CONDITIONS} from '../global.js';
+
+export default class ConditionItemView {
+  /**
+   * @param {Number} type - what number???
+   * @param {AdvancedSearchBuilderView} builder - Static Object(_container, _elm, _rootGroup, _selection, _toolbar)
+   * @param {ConditionItemView | ConditionGroupView} parentView - Dynamic Object(_builder, _container, _elm, _logicalOperatorSwitch, _mutationObserver, _type)
+   * @param {Node} referenceElm - what's this? null??
+   */
+  constructor(type, builder, parentView, referenceElm) {
+    this._type = type;
+    this._builder = builder;
+    // this._parentView = parentView;
+
+    // make HTML
+    this._elm = document.createElement('div');
+    this._elm.classList.add('advanced-search-condition-view');
+    this._elm.delegate = this;
+    parentView.container.insertBefore(this._elm, referenceElm);
+
+    // event
+    // let eventTarget;
+    // switch (type) {
+    //   case 'group':
+    //   eventTarget = this._elm;
+    //   break;
+    //   case 'item':
+    //   eventTarget = this._elm.querySelector(':scope > .body > .summary');
+    //   break;
+    // }
+    // eventTarget.addEventListener('click', e => {
+    //   e.stopPropagation();
+    // });
+  }
+
+  // private methods
+
+  _toggleSelecting(e) {
+    e.stopImmediatePropagation();
+    const ifEditing = this._elm.classList.contains('-editing');
+    if (ifEditing) return;
+
+    if (this.isSelecting) {
+      this._builder.selection.deselectConditionView(this);
+    } else {
+      this._builder.selection.selectConditionView(this, false);
+    }
+
+    // if (e.shiftKey) {
+    //   if (this.isSelecting) {
+    //     this._builder.selection.deselectConditionViews([this]);
+    //   } else {
+    //     this._builder.selection.selectConditionViews([this], false);
+    //   }
+    // } else {
+    //   this._builder.selection.selectConditionViews([this], true);
+    // }
+  }
+
+  // public methods
+
+  select() {
+    this._elm.classList.add('-selected');
+  }
+
+  deselect() {
+    this._elm.classList.remove('-selected');
+  }
+
+  remove() {
+    this.parentView.removeConditionView(this);
+    delete this;
+  }
+
+  // accessor
+
+  /**
+   * @return {HTMLElement}
+   */
+  get elm() {
+    return this._elm;
+  }
+
+  get siblingElms() {
+    return [...this._elm.parentNode.childNodes];
+  }
+
+  /**
+   * @return {Number}
+   */
+  get type() {
+    return this._type;
+  }
+
+  /**
+   * @return {Boolean}
+   */
+  get isSelecting() {
+    return this._elm.classList.contains('-selected');
+  }
+
+  /**
+   * @return {ConditionItemView | ConditionGroupView}
+   */
+  get parentView() {
+    return this.elm.parentNode.closest('.advanced-search-condition-view')
+      .delegate;
+  }
+
+  /**
+   * @param {parentView} conditionGroupView
+   */
+  set parentView(parentView) {
+    this._parentView = parentView;
+  }
+
+  get depth() {
+    let parentView = this.parentView;
+    let depth = 0;
+    while (parentView) {
+      parentView = parentView.parentView;
+      if (parentView) depth++;
+    }
+    return depth;
+  }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="cachedAxios.html">cachedAxios</a></li><li><a href="module.exports_module.exports.html">exports</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_addValueView">_addValueView</a></li><li><a href="global.html#_removeValueView">_removeValueView</a></li><li><a href="global.html#_update">_update</a></li><li><a href="global.html#addConditionViews">addConditionViews</a></li><li><a href="global.html#addNewConditionGroup">addNewConditionGroup</a></li><li><a href="global.html#addNewConditionItem">addNewConditionItem</a></li><li><a href="global.html#delete">delete</a></li><li><a href="global.html#elm">elm</a></li><li><a href="global.html#highlightedSuggestionIndex">highlightedSuggestionIndex</a></li><li><a href="global.html#isSelecting">isSelecting</a></li><li><a href="global.html#itemIdKey">itemIdKey</a></li><li><a href="global.html#itemLabelKey">itemLabelKey</a></li><li><a href="global.html#parentView">parentView</a></li><li><a href="global.html#removeConditionView">removeConditionView</a></li><li><a href="global.html#selectConditionView">selectConditionView</a></li><li><a href="global.html#selectedConditionViews">selectedConditionViews</a></li><li><a href="global.html#subTextKey">subTextKey</a></li><li><a href="global.html#suggestData">suggestData</a></li><li><a href="global.html#title">title</a></li><li><a href="global.html#type">type</a></li><li><a href="global.html#ungroup">ungroup</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed Sep 13 2023 10:36:47 GMT+0900 (Japan Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
