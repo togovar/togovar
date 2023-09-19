@@ -82,7 +82,7 @@ article.common-document
           | Japanese Genotype-phenotype Archive (JGA)
         |  /
         |
-        a.hyper-text.-external(target='_blank', href='https://www.biobank.amed.go.jp/itc/agd/index.html')
+        a.hyper-text.-external(target='_blank', href='https://gr-sharingdbs.biosciencedbc.jp/agd')
           | AMED Genome group sharing Database (AGD)
     section.section
       h3.sectiontitle Other variant frequency datasets
@@ -102,7 +102,7 @@ article.common-document
         tbody
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads')
+              a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads#v3')
                 | Genome Aggregation Database (gnomAD) genomes
             td._align-left WGS
             td._align-center
@@ -114,7 +114,7 @@ article.common-document
             td._align-center
               | 759,302,267
             td Broad Institute
-            td v3.1.2
+            td v3.1.1
           tr
             td
               a.hyper-text.-external(target='_blank', href='http://www.hgvd.genome.med.kyoto-u.ac.jp/download.html')
@@ -135,7 +135,7 @@ article.common-document
               | (2017/08/02)
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-14kjpn-20211208r2-af_snvindelall')
+              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-54kjpn-20230626-af_snvindelall')
                 | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN Allele Frequency Panel(#{ GLOBALS.TOMMO_VERSION }KJPN)
             td._align-left WGS
             td._align-center
@@ -143,13 +143,13 @@ article.common-document
             td._align-center ✔
             td._align-center
             td._align-center
-              span(style='margin-left:10px;') approx. 14,000
+              span(style='margin-left:10px;') 54,302
             td._align-center
-              | 133,757,499
+              | TO_BE_FILLED
             td Tohoku Medical Megabank Organization
-            td v20211208r2
+            td v20230626
       p.notice
-        | Note 2 : #{ GLOBALS.TOMMO_VERSION }KJPN consists of SNVs (Autosome, chrX(PAR1+PAR2+XTR) and chrMT) and INDELs (Autosome and
+        | Note: #{ GLOBALS.TOMMO_VERSION }KJPN consists of SNVs (Autosome, chrX(PAR1+PAR2+XTR) and chrMT) and INDELs (Autosome and
         | chrX(PAR1+PAR2+XTR)).
     section.section
       h3.sectiontitle
@@ -164,13 +164,13 @@ article.common-document
         tbody
           tr
             td
-              a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/') ClinVar
-            td 2022/09/01
+              a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/clinvar/') ClinVar
+            td 2023/09/11
             td Clinical significance of variants
             td NCBI
           tr
             td
-              a.hyper-text.-external(target='_blank', href='ftp://ftp.dbcls.jp/colil') Colil
+              a.hyper-text.-external(target='_blank', href='https://ftp.dbcls.jp/colil') Colil
             td Obtained by API
             td Information on citation relationships in life sciences literature
             td DBCLS
@@ -178,34 +178,41 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh38.p13')
                 | GRCh38.p13
-            td 2019/3/1
+            td 2019/03/01
             td Human genome reference sequence
             td GRC
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://www.ebi.ac.uk/gwas/')
+              a.hyper-text.-external(target='_blank', href='https://www.ebi.ac.uk/gwas/docs/file-downloads')
                 | GWAS Catalog
-            td 2022/09/16
+            td 2023/09/05
             td Catalog of human genome-wide association studies
             td NHGRI-EBI
           tr
             td
-              a.hyper-text.-external(target='_blank', href='ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/tsv/hgnc_complete_set.txt')
+              a.hyper-text.-external(target='_blank', href='https://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/hgnc_complete_set.txt')
                 | HGNC symbol report
-            td 2022/9/16
+            td 2023/09/05
             td Approved human gene nomenclature and associated gene information
             td HGNC
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/CBBresearch/Lu/Demo/LitVar/')
+              a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/research/litvar2/api')
                 | LitVar
             td Obtained by API
             td Information on papers in which the names of variants appear
             td NCBI
           tr
             td
+              a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pubmed/')
+                | PubMed
+            td 2023/09/01
+            td Information on papers
+            td NCBI
+          tr
+            td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/') PubTator Central
-            td 2022/9/20
+            td 2023/09/03
             td Information on papers in which the names of variants appear
             td NCBI
           tr
@@ -217,7 +224,7 @@ article.common-document
       p.notice
         | Note: TogoVar obtained ClinVar variants from
         |
-        a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/') the VCF file
+        a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/') the VCF file
         | that contains only variants for which GRCh38 positions were determined.
     section.section
       h3.sectiontitle Tools for data processing
@@ -233,7 +240,7 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://samtools.github.io/bcftools/') bcftools
             td
-            td Normalize indels and split multiallelic sites into biallelic variants
+            td Split multiallelic sites into biallelic variants
             td Genome Research Ltd.
           tr
             td
@@ -246,9 +253,10 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/index.html')
                 | Variant Effect Predictor (VEP)
-            td Ensembl release 107
+            td Ensembl release 110
             td
               | Add
+              |
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/script/vep_cache.html#cache_content')
                 |
                 | annotations like gene names or consequences
