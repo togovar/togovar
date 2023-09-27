@@ -4,14 +4,14 @@ import { ADVANCED_CONDITIONS } from '../global.js';
 import { CONDITION_TYPE, CONDITION_ITEM_TYPE } from '../definition.js';
 
 /**
- * Class to create a condition item view.
+ * Class for editing and deleting conditions
  * Create an instance with {@link ConditionGroupView}
  * @extends ConditionView
  */
 class ConditionItemView extends ConditionView {
   /**
-   * @param {AdvancedSearchBuilderView} builder
-   * @param {ConditionGroupView} parentView
+   * @param {AdvancedSearchBuilderView} builder- ????
+   * @param {ConditionGroupView} parentView - ??????
    * @param {string} conditionType - dataset, significance, consequence, disease, gene, id, location, type
    * @param {0|1} conditionItemType ConditionItemView represents "0", ConditionGroupView represents "1".
    * @param {Node} referenceElm - Where?????
@@ -103,10 +103,33 @@ class ConditionItemView extends ConditionView {
 
     window.addEventListener('keydown', this._keydownEscapeEvent);
 
-    // When first selecting from pulldown????
+    // what????
     summary
       .querySelector(':scope > .buttons > button.edit')
       .dispatchEvent(new Event('click'));
+  }
+
+  // private methods
+  /** @private */
+  _keydownEscapeEvent = this._keydownEscape.bind(this);
+  /**
+   * Exit the edit screen with esckey. remove() for the first time, doneEditing() for editing
+   * @private */
+  _keydownEscape(e) {
+    if (
+      e.key === 'Escape' &&
+      this._conditionValues &&
+      this._isFirstTime === true
+    ) {
+      this.remove();
+      window.removeEventListener('keydown', this._keydownEscapeEvent);
+    } else if (
+      e.key === 'Escape' &&
+      this._conditionValues &&
+      this._isFirstTime === false
+    ) {
+      this.doneEditing();
+    }
   }
 
   // public methods
@@ -124,24 +147,6 @@ class ConditionItemView extends ConditionView {
   remove() {
     delete this._conditionValues;
     super.remove();
-  }
-
-  _keydownEscapeEvent = this._keydownEscape.bind(this);
-  _keydownEscape(e) {
-    if (
-      e.key === 'Escape' &&
-      this._conditionValues &&
-      this._isFirstTime === true
-    ) {
-      this.remove();
-      window.removeEventListener('keydown', this._keydownEscapeEvent);
-    } else if (
-      e.key === 'Escape' &&
-      this._conditionValues &&
-      this._isFirstTime === false
-    ) {
-      this.doneEditing();
-    }
   }
 
   // accessor
