@@ -3,25 +3,31 @@ import ConditionValues from './ConditionValues.js';
 import { ADVANCED_CONDITIONS } from '../global.js';
 import { CONDITION_TYPE, CONDITION_ITEM_TYPE } from '../definition.js';
 
-export default class ConditionItemView extends ConditionView {
+/**
+ * Class to create a condition item view.
+ * Create an instance with {@link ConditionGroupView}
+ * @extends ConditionView
+ */
+class ConditionItemView extends ConditionView {
   /**
-   *
    * @param {AdvancedSearchBuilderView} builder
-   * @param {*} parentView
-   * @param {String} conditionType
-   * @param {Object} options  default data
-   * @param {Node} referenceElm
+   * @param {ConditionGroupView} parentView
+   * @param {string} conditionType - dataset, significance, consequence, disease, gene, id, location, type
+   * @param {0|1} conditionItemType ConditionItemView represents "0", ConditionGroupView represents "1".
+   * @param {Node} referenceElm - Where?????
    */
   constructor(
     builder,
     parentView,
     conditionType,
-    options,
+    conditionItemType,
     referenceElm = null
   ) {
     super(CONDITION_ITEM_TYPE.condition, builder, parentView, referenceElm);
-
+    /** @property {string} _conditionType - condition type (gene, id, dataset, location, etc.) Where is source of this? */
     this._conditionType = conditionType;
+
+    /** @property {boolean} _isFirstTime - whether this is the first time to edit. (Relates to whether the element is deleted with the cancel button) */
     this._isFirstTime = true;
 
     // make HTML
@@ -33,7 +39,6 @@ export default class ConditionItemView extends ConditionView {
       conditionType === 'location'
         ? ''
         : 'eq';
-    // TODO: 疾患は contains?
     this._elm.innerHTML = `
     <div class="body">
       <div class="summary">
@@ -52,11 +57,14 @@ export default class ConditionItemView extends ConditionView {
     // reference
     const body = this._elm.querySelector(':scope > .body');
     const summary = body.querySelector(':scope > .summary');
-    this._values = summary.querySelector(':scope > .values');
-    this._editor = body.querySelector(
+    /** @property {HTMLDivElement} _valuesEl - div.values */
+    this._valuesEl = summary.querySelector(':scope > .values');
+    /** @property {HTMLDivElement} _editorEl - div.advanced-search-condition-editor-view */
+    this._editorEl = body.querySelector(
       ':scope > .advanced-search-condition-editor-view'
     );
-    this._conditionValues = new ConditionValues(this, options);
+    /** @property {ConditionValues} _conditionValues */
+    this._conditionValues = new ConditionValues(this, conditionItemType);
 
     // events
     // stop propagation
@@ -65,19 +73,16 @@ export default class ConditionItemView extends ConditionView {
     });
     // select/deselect
     summary.addEventListener('click', this._toggleSelecting.bind(this));
-    // switch logical operation
+    // toggle logical operation
     summary
       .querySelector(':scope > .relation')
       .addEventListener('click', (e) => {
         e.stopImmediatePropagation();
-        // TODO: どうやら、contains, not_contains のトグルらしい
-        // if (this._elm.dataset.relation === 'contains') return;
         this._elm.dataset.relation = { eq: 'ne', ne: 'eq' }[
           this._elm.dataset.relation
         ];
-        this.doneEditing();
       });
-    // buttons
+    //  Edit and delete button settings
     for (const button of summary.querySelectorAll(
       ':scope > .buttons > button'
     )) {
@@ -87,6 +92,7 @@ export default class ConditionItemView extends ConditionView {
           case 'edit':
             this._elm.classList.add('-editing');
             this._conditionValues.startToEditCondition();
+            window.addEventListener('keydown', this._keydownEscapeEvent);
             break;
           case 'delete':
             this._builder.delete([this]);
@@ -94,58 +100,89 @@ export default class ConditionItemView extends ConditionView {
         }
       });
     }
+
+    window.addEventListener('keydown', this._keydownEscapeEvent);
+
+    // When first selecting from pulldown????
     summary
       .querySelector(':scope > .buttons > button.edit')
       .dispatchEvent(new Event('click'));
   }
 
   // public methods
-
+  /** Exit from editscreen and search for condition
+   * @public */
   doneEditing() {
     this._elm.classList.remove('-editing');
     this._isFirstTime = false;
     this._builder.changeCondition();
   }
 
-  // select() {
-
-  // }
-
-  // deselect() {
-
-  // }
-
+  /**
+   * Used in _clickCancelButton of {@link ConditionValues}
+   * @public */
   remove() {
     delete this._conditionValues;
     super.remove();
-    // this._parent.removeConditionView(this);
+  }
+
+  _keydownEscapeEvent = this._keydownEscape.bind(this);
+  _keydownEscape(e) {
+    if (
+      e.key === 'Escape' &&
+      this._conditionValues &&
+      this._isFirstTime === true
+    ) {
+      this.remove();
+      window.removeEventListener('keydown', this._keydownEscapeEvent);
+    } else if (
+      e.key === 'Escape' &&
+      this._conditionValues &&
+      this._isFirstTime === false
+    ) {
+      this.doneEditing();
+    } else {
+      console.log('チェック');
+    }
   }
 
   // accessor
-
+  /** conditionType(gene, id, dataset, location, etc.)
+   * @type {string} */
   get conditionType() {
     return this._conditionType;
   }
 
+  /** div.values
+   *  @type {HTMLDivElement} */
   get valuesElement() {
-    return this._values;
+    return this._valuesEl;
   }
 
+  /** div.advanced-search-condition-editor-view
+   *  @type {HTMLDivElement} */
   get editorElement() {
-    return this._editor;
+    return this._editorEl;
   }
 
+  /** @type {boolean} */
   get isFirstTime() {
     return this._isFirstTime;
   }
 
+  /**
+   * Create each advanced search query
+   * @see {@link https://grch38.togovar.org/api} -  Schemas
+   * @type {Object}
+   */
   get query() {
-    const values = Array.from(
-      this._values.querySelectorAll(':scope > condition-item-value-view')
+    const valueElements = Array.from(
+      this._valuesEl.querySelectorAll(':scope > condition-item-value-view')
     );
+
     switch (this._conditionType) {
       case CONDITION_TYPE.dataset: {
-        const queries = values.map(
+        const queries = valueElements.map(
           (view) =>
             view.shadowRoot.querySelector('frequency-count-value-view')
               .queryValue
@@ -154,7 +191,7 @@ export default class ConditionItemView extends ConditionView {
       }
 
       case CONDITION_TYPE.location: {
-        const value = values[0].value;
+        const value = valueElements[0].value;
         let [chromosome, position] = value.split(':');
         position = position.split('-');
         if (position.length === 1) {
@@ -171,17 +208,18 @@ export default class ConditionItemView extends ConditionView {
       }
 
       case CONDITION_TYPE.gene_symbol: {
-        const value = values[0].value;
+        const queryId = valueElements[0].value;
         return {
           gene: {
             relation: this._elm.dataset.relation,
-            terms: [+value],
+            terms: [Number(queryId)],
           },
         };
       }
 
+      //Create a new array ids by extracting the values of the value property from each element in valueElements
       case CONDITION_TYPE.variant_id: {
-        const ids = values.map(({ value }) => value);
+        const ids = valueElements.map(({ value }) => value);
         return {
           id: ids,
         };
@@ -191,9 +229,11 @@ export default class ConditionItemView extends ConditionView {
         return {
           [this._conditionType]: {
             relation: this._elm.dataset.relation,
-            terms: values.map((value) => value.value),
+            terms: valueElements.map((value) => value.value),
           },
         };
     }
   }
 }
+
+export default ConditionItemView;
