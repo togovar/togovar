@@ -141,8 +141,6 @@ class ConditionItemView extends ConditionView {
       this._isFirstTime === false
     ) {
       this.doneEditing();
-    } else {
-      console.log('チェック');
     }
   }
 
