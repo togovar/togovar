@@ -3,18 +3,16 @@ import ConditionValues from './ConditionValues.js';
 import { ADVANCED_CONDITIONS } from '../global.js';
 import { CONDITION_TYPE, CONDITION_ITEM_TYPE } from '../definition.js';
 
-/**
- * Class for editing and deleting conditions
+/** Class for editing and deleting conditions
  * Create an instance with {@link ConditionGroupView}
- * @extends ConditionView
- */
+ * @extends ConditionView */
 class ConditionItemView extends ConditionView {
   /**
-   * @param {AdvancedSearchBuilderView} builder- ????
-   * @param {ConditionGroupView} parentView - ??????
+   * @param {AdvancedSearchBuilderView} builder - AdvancedSearchBuilderView is a class that operates the search condition builder. Called when the search conditions change.
+   * @param {ConditionGroupView} parentView - ConditonGroupView that contains ConditoinItemView
    * @param {string} conditionType - dataset, significance, consequence, disease, gene, id, location, type
    * @param {0|1} conditionItemType ConditionItemView represents "0", ConditionGroupView represents "1".
-   * @param {Node} referenceElm - Where?????
+   * @param {Node} referenceElm -
    */
   constructor(
     builder,
@@ -24,7 +22,7 @@ class ConditionItemView extends ConditionView {
     referenceElm = null
   ) {
     super(CONDITION_ITEM_TYPE.condition, builder, parentView, referenceElm);
-    /** @property {string} _conditionType - condition type (gene, id, dataset, location, etc.) Where is source of this? */
+    /** @property {string} _conditionType - condition type (gene, id, dataset, location, etc.) */
     this._conditionType = conditionType;
 
     /** @property {boolean} _isFirstTime - whether this is the first time to edit. (Relates to whether the element is deleted with the cancel button) */
@@ -103,7 +101,7 @@ class ConditionItemView extends ConditionView {
 
     window.addEventListener('keydown', this._keydownEscapeEvent);
 
-    // what????
+    // Automatically enter editing state upon initialization
     summary
       .querySelector(':scope > .buttons > button.edit')
       .dispatchEvent(new Event('click'));
@@ -112,8 +110,7 @@ class ConditionItemView extends ConditionView {
   // private methods
   /** @private */
   _keydownEscapeEvent = this._keydownEscape.bind(this);
-  /**
-   * Exit the edit screen with esckey. remove() for the first time, doneEditing() for editing
+  /** Exit the edit screen with esckey. remove() for the first time, doneEditing() for editing
    * @private */
   _keydownEscape(e) {
     if (
@@ -173,11 +170,9 @@ class ConditionItemView extends ConditionView {
     return this._isFirstTime;
   }
 
-  /**
-   * Create each advanced search query
+  /** Create each advanced search query
    * @see {@link https://grch38.togovar.org/api} -  Schemas
-   * @type {Object}
-   */
+   * @type {Object} */
   get query() {
     const valueElements = Array.from(
       this._valuesEl.querySelectorAll(':scope > condition-item-value-view')
