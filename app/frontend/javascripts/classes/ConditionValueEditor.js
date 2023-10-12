@@ -11,17 +11,14 @@
 class ConditionValueEditor {
   /**
    * @param {ConditionValues} valuesView
-   * @param {string} conditionType - dataset, significance, consequence, disease, gene, id, location, type */
-  constructor(valuesView, conditionType) {
+   * @param {ConditionItemView} conditionView */
+  constructor(valuesView, conditionView) {
     /** @property {ConditionValues} valuesView */
     this._valuesView = valuesView;
+    /** @property {ConditionItemView} conditionView */
+    this._conditionView = conditionView;
     /** @property {string} conditionType */
-    this._conditionType = conditionType;
-
-    this._valuesView.conditionView.elm.addEventListener(
-      'delete-condition-item',
-      this.#handleDeleteValue.bind(this)
-    );
+    this._conditionType = conditionView.conditionType;
   }
 
   //protected methods
@@ -84,20 +81,6 @@ class ConditionValueEditor {
     );
     if (valueView) {
       valueView.remove();
-    }
-  }
-
-  //private methods
-  /** Delete value when button.delete is pressed on edit screen
-   * Use the update function for this._valuesView and change it so that if isFirstTime === true and the length is 0, the ok button cannot be pressed.
-   * isFirstTime is a private class, so it is not a good idea to use it.
-   * @private
-   * @param {Event} e */
-  #handleDeleteValue(e) {
-    e.stopPropagation();
-    this._removeValueView(e.detail);
-    if (this._valuesView._conditionView._isFirstTime) {
-      this._valuesView.update(this._valueViews.length > 0);
     }
   }
 

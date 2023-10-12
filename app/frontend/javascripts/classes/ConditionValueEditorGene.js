@@ -6,9 +6,9 @@ import { API_URL } from '../global.js';
 class ConditionValueEditorGene extends ConditionValueEditor {
   /**
    * @param {ConditionValues} valuesView
-   * @param {String} conditionType - "gene" */
-  constructor(valuesView, conditionType) {
-    super(valuesView, conditionType);
+   * @param {ConditionItemView} conditionView */
+  constructor(valuesView, conditionView) {
+    super(valuesView, conditionView);
     /** @property {number} _value - value of the selected suggestion */
     this._value;
     /** @property {string} _label - label of the selected suggestion */
@@ -17,14 +17,14 @@ class ConditionValueEditorGene extends ConditionValueEditor {
     // HTML
     this._createElement(
       'text-field-editor-view',
-      `<header>Search for ${conditionType}</header>
+      `<header>Search for ${this._conditionType}</header>
       <div class="body"></div>`
     );
 
     /** @property {HTMLDivElement} _searchFieldView - CustomElement */
     this._searchFieldView = new SearchFieldWithSuggestions(
       'BRCA2',
-      `${API_URL}/api/search/${conditionType}`,
+      `${API_URL}/api/search/${this._conditionType}`,
       'term',
       this._body,
       {
@@ -64,19 +64,19 @@ class ConditionValueEditorGene extends ConditionValueEditor {
     this._value = e.detail.id;
     this._label = e.detail.label;
     this._addValueView(this._value, this._label, true, false);
-    this._update();
+    this.#update();
   };
 
   /** Change whether okbutton can be pressed
    * @private */
-  _update() {
-    this._valuesView.update(this._validate());
+  #update() {
+    this._valuesView.update(this.#validate());
   }
 
   /** Whether you can press the ok button
    * @private
    * @returns {boolean} */
-  _validate() {
+  #validate() {
     return this.isValid;
   }
 

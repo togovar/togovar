@@ -49,58 +49,40 @@ class ConditionValues {
       case CONDITION_TYPE.type:
       case CONDITION_TYPE.significance:
         this._editors.push(
-          new ConditionValueEditorCheckboxes(
-            this,
-            this._conditionView.conditionType
-          )
+          new ConditionValueEditorCheckboxes(this, this._conditionView)
         );
         break;
 
       case CONDITION_TYPE.consequence:
         this._editors.push(
-          new ConditionValueEditorColumns(
-            this,
-            this._conditionView.conditionType
-          )
+          new ConditionValueEditorColumns(this, this._conditionView)
         );
         break;
 
       case CONDITION_TYPE.dataset:
         this._editors.push(
-          new ConditionValueEditorColumns(
-            this,
-            this._conditionView.conditionType
-          )
+          new ConditionValueEditorColumns(this, this._conditionView)
         );
         this._editors.push(
-          new ConditionValueEditorFrequencyCount(
-            this,
-            this._conditionView.conditionType
-          )
+          new ConditionValueEditorFrequencyCount(this, this._conditionView)
         );
         break;
 
       case CONDITION_TYPE.disease:
         this._editors.push(
-          new ConditionValueEditorDisease(
-            this,
-            this._conditionView.conditionType
-          )
+          new ConditionValueEditorDisease(this, this._conditionView)
         );
         break;
 
       case CONDITION_TYPE.gene_symbol:
         this._editors.push(
-          new ConditionValueEditorGene(this, this._conditionView.conditionType)
+          new ConditionValueEditorGene(this, this._conditionView)
         );
         break;
 
       case CONDITION_TYPE.variant_id:
         this._editors.push(
-          new ConditionValueEditorVariantID(
-            this,
-            this._conditionView.conditionType
-          )
+          new ConditionValueEditorVariantID(this, this._conditionView)
         );
         break;
 
@@ -108,7 +90,7 @@ class ConditionValues {
         this._editors.push(
           new ConditionValueEditorLocation(
             this,
-            this._conditionView.conditionType,
+            this._conditionView,
             defaultValues
           )
         );
@@ -145,14 +127,8 @@ class ConditionValues {
    * @param {MouseEvent} e - click event */
   _clickOkButton(e) {
     e.stopImmediatePropagation();
-    if (
-      !this._conditionView.isFirstTime &&
-      !this._conditionView._values.hasChildNodes()
-    ) {
-      this._conditionView.remove();
-    } else {
-      this._conditionView.doneEditing();
-    }
+
+    this._conditionView.doneEditing();
   }
 
   /** When isFirstTime is true, remove conditionView. Otherwise, revert to the state before editing.

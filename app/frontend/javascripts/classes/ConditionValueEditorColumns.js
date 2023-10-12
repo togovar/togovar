@@ -13,18 +13,21 @@ const DISEASE_API = {
 };
 
 export default class ConditionValueEditorColumns extends ConditionValueEditor {
-  constructor(valuesView, conditionType) {
-    super(valuesView, conditionType);
+  /**
+   * @param {ConditionValues} valuesView
+   * @param {ConditionItemView} conditionView */
+  constructor(valuesView, conditionView) {
+    super(valuesView, conditionView);
 
     this._data = this._prepareData();
     this._selectionDependedOnParent =
-      SELECTION_DEPENDED_ON_PARENT[conditionType];
+      SELECTION_DEPENDED_ON_PARENT[this._conditionType];
 
     // HTML
     this._createElement(
       'columns-editor-view',
       `
-    <header>Select ${conditionType}</header>
+    <header>Select ${this._conditionType}</header>
     <div class="body">
       <div class="columns"></div>
       <div class="description"></div>

@@ -12,8 +12,12 @@ const OPTIONS = [
 ];
 
 export default class ConditionValueEditorLocation extends ConditionValueEditor {
-  constructor(valuesView, conditionType, defaultValues) {
-    super(valuesView, conditionType);
+  /**
+   * @param {ConditionValues} valuesView
+   * @param {ConditionItemView} conditionView
+   * @param {0|1} defaultValues ConditionItemView represents "0", ConditionGroupView represents "1". */
+  constructor(valuesView, conditionView, defaultValues) {
+    super(valuesView, conditionView);
 
     // HTML
     this._createElement(
