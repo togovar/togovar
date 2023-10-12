@@ -45,6 +45,7 @@ class ConditionValues {
       .addEventListener('click', this._clickCancelButton.bind(this));
 
     /** initialization by types */
+    // TODO: conditionType は ADVANCED_CONDITIONS[conditionView.conditionType].type を参照して処理をスイッチさせたい
     switch (conditionView.conditionType) {
       case CONDITION_TYPE.type:
       case CONDITION_TYPE.significance:
