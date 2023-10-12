@@ -3,7 +3,7 @@ import { map } from 'lit/directives/map.js';
 import { Task } from '@lit-labs/task';
 import { axios } from '../../../utils/cachedAxios';
 
-import './SearchFieldSimple';
+import './SearchFieldOnly';
 import './SearchFieldSuggestionsList';
 
 import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
@@ -318,7 +318,7 @@ export default class SearchElementWithSuggestions extends LitElement {
   }
 
   render() {
-    return html`<search-field-simple
+    return html`<search-field-only
         @change=${debounce(this.#handleInput, 300)}
         @click=${this.#handleClick}
         @focusin=${this.#handleFocusIn}
@@ -327,7 +327,7 @@ export default class SearchElementWithSuggestions extends LitElement {
         placeholder=${this.placeholder}
         value=${this.term}
         exportparts="input-field"
-      ></search-field-simple>
+      ></search-field-only>
       <div class="suggestions-container">
         ${this.suggestData && this.showSuggestions && !this.hideSuggestions
           ? html`
