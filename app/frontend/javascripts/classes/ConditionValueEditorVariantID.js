@@ -5,14 +5,14 @@ import SearchFieldOnly from '../components/Common/SearchField/SearchFieldOnly.js
 class ConditionValueEditorVariantID extends ConditionValueEditor {
   /**
    * @param {ConditionValues} valuesView - _cancelButton{HTMLButtonElement}, _conditionView{ConditionItemView}, _editors{ConditionValueEditorVariantID[]}, _okButton{HTMLButtonElement}, _sections{HTMLDivElement}
-   * @param {String} conditionType - "id" */
-  constructor(valuesView, conditionType) {
-    super(valuesView, conditionType);
+   * @param {ConditionItemView} conditionView */
+  constructor(valuesView, conditionView) {
+    super(valuesView, conditionView);
 
     // HTML
     this._createElement(
       'text-field-editor-view',
-      `<header>Search for ${conditionType}</header>
+      `<header>Search for ${this._conditionType}</header>
       <div class="body"></div>`
     );
 
@@ -25,11 +25,16 @@ class ConditionValueEditorVariantID extends ConditionValueEditor {
 
         if (this._searchFieldView.value.trim().length > 0) {
           this._addValueView(id, id, false, true);
-          this._update();
+          this.#update();
           this._searchFieldView.value = '';
         }
       }
     });
+
+    this._valuesView.conditionView.elm.addEventListener(
+      'delete-condition-item',
+      this.#handleDeleteValue.bind(this)
+    );
   }
 
   // public methods
@@ -48,22 +53,31 @@ class ConditionValueEditorVariantID extends ConditionValueEditor {
   // private methods
   /** Change whether okbutton can be pressed
    * @private */
-  _update() {
-    this._valuesView.update(this._validate());
+  #update() {
+    this._valuesView.update(this.#validate());
   }
 
   /** Whether you can press the ok button
    * @private
    * @returns {boolean} */
-  _validate() {
+  #validate() {
     return this.isValid;
   }
 
+  /** Delete value and _update when value's button.delete is pressed on edit screen
+   * @private
+   * @param {Event} e */
+  #handleDeleteValue(e) {
+    e.stopPropagation();
+    this._removeValueView(e.detail);
+    this.#update();
+  }
+
   //accessor
-  /** In the case of variant ID, you can press the ok button at any time even if there is no condition-item-value-view.
+  /** Valid if there is a node in div.values
    * @type {boolean} */
   get isValid() {
-    return true;
+    return this._conditionView.valuesElement.hasChildNodes();
   }
 }
 
