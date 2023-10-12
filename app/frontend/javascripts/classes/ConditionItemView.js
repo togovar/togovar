@@ -12,8 +12,7 @@ class ConditionItemView extends ConditionView {
    * @param {ConditionGroupView} parentView - ConditonGroupView that contains ConditoinItemView
    * @param {string} conditionType - dataset, significance, consequence, disease, gene, id, location, type
    * @param {0|1} conditionItemType ConditionItemView represents "0", ConditionGroupView represents "1".
-   * @param {Node} referenceElm -
-   */
+   * @param {Node} referenceElm */
   constructor(
     builder,
     parentView,
@@ -24,7 +23,6 @@ class ConditionItemView extends ConditionView {
     super(CONDITION_ITEM_TYPE.condition, builder, parentView, referenceElm);
     /** @property {string} _conditionType - condition type (gene, id, dataset, location, etc.) */
     this._conditionType = conditionType;
-
     /** @property {boolean} _isFirstTime - whether this is the first time to edit. (Relates to whether the element is deleted with the cancel button) */
     this._isFirstTime = true;
 
@@ -90,7 +88,7 @@ class ConditionItemView extends ConditionView {
           case 'edit':
             this._elm.classList.add('-editing');
             this._conditionValues.startToEditCondition();
-            window.addEventListener('keydown', this._keydownEscapeEvent);
+            window.addEventListener('keydown', this.#keydownEscapeEvent);
             break;
           case 'delete':
             this._builder.delete([this]);
@@ -99,39 +97,16 @@ class ConditionItemView extends ConditionView {
       });
     }
 
-    window.addEventListener('keydown', this._keydownEscapeEvent);
+    window.addEventListener('keydown', this.#keydownEscapeEvent);
 
-    // Automatically enter editing state upon initialization
+    // Automatically enters editing state when instance is created
     summary
       .querySelector(':scope > .buttons > button.edit')
       .dispatchEvent(new Event('click'));
   }
 
-  // private methods
-  /** @private */
-  _keydownEscapeEvent = this._keydownEscape.bind(this);
-  /** Exit the edit screen with esckey. remove() for the first time, doneEditing() for editing
-   * @private */
-  _keydownEscape(e) {
-    if (
-      e.key === 'Escape' &&
-      this._conditionValues &&
-      this._isFirstTime === true
-    ) {
-      this.remove();
-      window.removeEventListener('keydown', this._keydownEscapeEvent);
-    } else if (
-      e.key === 'Escape' &&
-      this._conditionValues &&
-      this._isFirstTime === false
-    ) {
-      this.doneEditing();
-    }
-  }
-
   // public methods
-  /** Exit from editscreen and search for condition
-   * @public */
+  /** Exit from editscreen and search for condition */
   doneEditing() {
     this._elm.classList.remove('-editing');
     this._isFirstTime = false;
@@ -139,11 +114,32 @@ class ConditionItemView extends ConditionView {
   }
 
   /**
-   * Used in _clickCancelButton of {@link ConditionValues}
-   * @public */
+   * Used in _clickCancelButton of {@link ConditionValues} */
   remove() {
     delete this._conditionValues;
     super.remove();
+  }
+
+  // private methods
+  /** @private */
+  #keydownEscapeEvent = this.#keydownEscape.bind(this);
+  /** Exit the edit screen with esckey. remove() for the first time, doneEditing() for editing
+   * @private */
+  #keydownEscape(e) {
+    if (
+      e.key === 'Escape' &&
+      this._conditionValues &&
+      this._isFirstTime === true
+    ) {
+      this.remove();
+      window.removeEventListener('keydown', this.#keydownEscapeEvent);
+    } else if (
+      e.key === 'Escape' &&
+      this._conditionValues &&
+      this._isFirstTime === false
+    ) {
+      this.doneEditing();
+    }
   }
 
   // accessor
