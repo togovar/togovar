@@ -127,7 +127,6 @@ class ConditionValues {
    * @param {MouseEvent} e - click event */
   _clickOkButton(e) {
     e.stopImmediatePropagation();
-
     this._conditionView.doneEditing();
   }
 
