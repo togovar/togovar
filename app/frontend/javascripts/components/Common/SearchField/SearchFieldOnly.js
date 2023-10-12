@@ -1,8 +1,8 @@
 import { LitElement, html } from 'lit';
 import { ref, createRef } from 'lit/directives/ref.js';
-import SimpleSearchStyle from '../../../../stylesheets/object/component/search-field-simple.scss';
+import SimpleSearchStyle from '../../../../stylesheets/object/component/search-field-only.scss';
 
-export default class SearchFieldSimple extends LitElement {
+export default class SearchFieldOnly extends LitElement {
   #inputRef = createRef();
   static get properties() {
     return {
@@ -85,4 +85,4 @@ export default class SearchFieldSimple extends LitElement {
   }
 }
 
-customElements.define('search-field-simple', SearchFieldSimple);
+customElements.define('search-field-only', SearchFieldOnly);
