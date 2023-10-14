@@ -1,6 +1,6 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
 import SearchFieldWithSuggestions from '../components/Common/SearchField/SearchFieldWithSuggestions.js';
-import SearchFieldSimple from '../components/Common/SearchField/SearchFieldSimple.js';
+import SearchFieldSimple from '../components/Common/SearchField/SearchFieldOnly.js';
 
 export default class ConditionValueEditorTextField extends ConditionValueEditor {
   /**
