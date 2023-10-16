@@ -48,9 +48,8 @@ class SearchFieldOnly extends LitElement {
     this.value = term;
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    addEventListener('select-example', this._handleExampleClick.bind(this));
+  firstUpdated() {
+    this.addEventListener('select-example', this._handleExampleClick);
   }
 
   /** update input value */
