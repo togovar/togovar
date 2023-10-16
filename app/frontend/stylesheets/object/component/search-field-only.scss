@@ -3,23 +3,48 @@ $SIZE: 30px;
 @use '../../foundation/_variables.scss' as *;
 
 .fieldcontainer {
+  box-sizing: border-box;
   > .field {
-    padding: 0;
-    > input[type='search'] {
-      box-sizing: border-box;
-      width: 100%;
-      line-height: $SIZE;
-      height: $SIZE;
-      border: solid 1px $COLOR_KEY_DARK2;
-      border-radius: $SIZE * 0.5;
-      padding: 0 12px;
-      vertical-align: top;
-      font-size: 12px;
-      outline: none;
-      opacity: 0.9;
-      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
-      &:focus {
-        opacity: 1;
+    margin-bottom: 4px;
+    position: relative;
+    height: $SIZE;
+
+    > .input-form {
+      > .searchfield[type='text'] {
+        width: 100%;
+        line-height: $SIZE;
+        border: solid 1px $COLOR_KEY_DARK2;
+        border-radius: $SIZE * 0.5;
+        padding: 0 12px;
+        vertical-align: center;
+        font-size: 12px;
+        outline: none;
+        opacity: 0.9;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
+        &:focus {
+          opacity: 1;
+        }
+      }
+
+      > .delete {
+        position: absolute;
+        top: 6px;
+        right: -2px;
+        color: var(--color-gray);
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+
+        &:after {
+          font-family: fontello;
+          content: var(--char-delete);
+          position: absolute;
+          font-size: 1.2rem;
+        }
+      }
+
+      .searchfield:not(:valid) ~ .delete {
+        display: none;
       }
     }
   }
