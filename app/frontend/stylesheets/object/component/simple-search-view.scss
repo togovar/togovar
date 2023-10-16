@@ -1,11 +1,8 @@
 .simple-search-container {
   display: flex;
-  gap: 0.25em;
+  gap: 1.9rem;
   align-items: center;
 
-  > search-button {
-    width: fit-content;
-  }
   > search-field-with-suggestions {
     flex: 1;
   }

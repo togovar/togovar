@@ -72,6 +72,7 @@ class SearchFieldOnly extends LitElement {
    * @private
    * @param {KeyboardEvent} e */
   _handleInput(e) {
+    e.preventDefault();
     this.value = e.target.value;
     this.dispatchEvent(
       new InputEvent('input-change', {
@@ -82,17 +83,36 @@ class SearchFieldOnly extends LitElement {
     );
   }
 
+  _handleForm(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  }
+
+  _handleSeachButtonClick() {
+    this.dispatchEvent(new MouseEvent('input-change'));
+  }
+
   render() {
     return html` <div class="search-field-view">
       <div class="fieldcontainer">
         <div class="field">
-          <input
-            part="input-field"
-            ${ref(this._inputRef)}
-            type="search"
-            .placeholder=${this.placeholder}
-            @input=${this._handleInput}
-          />
+          <form class="input-form" @keydown=${this._handleForm}>
+            <input
+              class="searchfield"
+              part="input-field"
+              ${ref(this._inputRef)}
+              type="text"
+              .placeholder=${this.placeholder}
+              @input=${this._handleInput}
+              required
+            />
+            <button
+              class="delete"
+              type="reset"
+              @click=${this._handleSeachButtonClick}
+            ></button>
+          </form>
         </div>
       </div>
     </div>`;
