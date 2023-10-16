@@ -97,10 +97,8 @@ class SimpleSearchView extends LitElement {
 
   /** @property {string} _value - value of suggestion */
   @state() _value;
-
   /** @property {string} _term - Input value */
   @state() _term;
-
   /** @property {boolean} _hideSuggestions - Whether to hide suggestions */
   @state() _hideSuggestions = true;
 
@@ -128,6 +126,7 @@ class SimpleSearchView extends LitElement {
     this._hideSuggestions = true;
     this._value = e.detail.value;
     this._term = e.detail.value;
+    this._search(e.detail.value);
 
     this.dispatchEvent(
       new CustomEvent('select-example', {
@@ -136,8 +135,6 @@ class SimpleSearchView extends LitElement {
         composed: true,
       })
     );
-
-    this._search(e.detail.value);
   }
 
   /** Put input value in this._term
@@ -163,11 +160,9 @@ class SimpleSearchView extends LitElement {
       <div class="simple-search-container">
         <search-field-with-suggestions
           exportparts="input-field"
-          .term=${this._value}
+          .placeholder=${'Search for disease or gene symbol or rs...'}
           .suggestAPIURL=${`${API_URL}/suggest`}
           .suggestAPIQueryParam=${'term'}
-          .placeholder=${'Search for disease or gene symbol or rs...'}
-          .hideSuggestions=${this._hideSuggestions}
           .options=${{
             valueMappings: {
               valueKey: 'term',
@@ -176,6 +171,8 @@ class SimpleSearchView extends LitElement {
             },
             titleMappings: { gene: 'Gene names', disease: 'Disease names' },
           }}
+          .term=${this._term}
+          .hideSuggestions=${this._hideSuggestions}
           @new-suggestion-selected=${this._handleSuggestionEnter}
           @search-term-enter=${this._handleTermEnter}
           @imput-term=${this._inputTerm}

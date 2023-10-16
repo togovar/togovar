@@ -74,10 +74,10 @@ export class ConditionDiseaseSearch extends LitElement {
   render() {
     return html`
       <search-field-with-suggestions
-        .suggestAPIURL="${suggestAPI}"
+        .suggestAPIURL=${suggestAPI}
         .suggestAPIQueryParam="${'term'}"
         .options="${{ valueMappings: { valueKey: 'id', labelKey: 'label' } }}"
-        placeholder="Type disease name"
+        .placeholder=${'Type disease name'}
         @new-suggestion-selected="${this._changeDiseaseEventHadnler}"
       ></search-field-with-suggestions>
 
