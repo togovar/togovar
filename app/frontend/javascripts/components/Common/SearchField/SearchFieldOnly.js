@@ -89,7 +89,7 @@ class SearchFieldOnly extends LitElement {
           <input
             part="input-field"
             ${ref(this._inputRef)}
-            type="text"
+            type="search"
             .placeholder=${this.placeholder}
             @input=${this._handleInput}
           />
