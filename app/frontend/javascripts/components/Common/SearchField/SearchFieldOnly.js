@@ -38,6 +38,7 @@ class SearchFieldOnly extends LitElement {
     if (element) {
       element.appendChild(this);
     }
+    this.addEventListener('select-example', this._handleExampleClick);
   }
 
   @property({ type: String }) placeholder;
@@ -46,10 +47,6 @@ class SearchFieldOnly extends LitElement {
   /** Once the branch related to condition is merged, it will no longer be used */
   setTerm(term) {
     this.value = term;
-  }
-
-  firstUpdated() {
-    this.addEventListener('select-example', this._handleExampleClick);
   }
 
   /** update input value */
