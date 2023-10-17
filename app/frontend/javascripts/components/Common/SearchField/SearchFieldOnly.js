@@ -38,7 +38,6 @@ class SearchFieldOnly extends LitElement {
     if (element) {
       element.appendChild(this);
     }
-    this.addEventListener('select-example', this._handleExampleClick);
   }
 
   @property({ type: String }) placeholder;
@@ -57,13 +56,6 @@ class SearchFieldOnly extends LitElement {
   }
 
   /**
-   * @private
-   * @param {CustomEvent} e select-example (SimpleSearchView _handleExampleSelected) */
-  _handleExampleClick(e) {
-    this._inputRef.value.value = e.detail;
-  }
-
-  /**
    * See {@link SearchFieldtWithSuggestions _handleInput}
    * @private
    * @param {KeyboardEvent} e */
@@ -79,14 +71,19 @@ class SearchFieldOnly extends LitElement {
     );
   }
 
+  /** Control the normal behavior when pressing enter
+   * @private
+   * @param {KeyboardEvent} e */
   _handleForm(e) {
     if (e.key === 'Enter') {
       e.preventDefault();
     }
   }
 
+  /** Fires an event when the cross button is pressed
+   * @private */
   _handleSeachButtonClick() {
-    this.dispatchEvent(new MouseEvent('input-change'));
+    this.dispatchEvent(new MouseEvent('input-reset'));
   }
 
   render() {

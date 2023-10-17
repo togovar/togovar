@@ -127,14 +127,6 @@ class SimpleSearchView extends LitElement {
     this._value = e.detail.value;
     this._term = e.detail.value;
     this._search(e.detail.value);
-
-    this.dispatchEvent(
-      new CustomEvent('select-example', {
-        detail: e.detail.value,
-        bubbles: true,
-        composed: true,
-      })
-    );
   }
 
   /** Put input value in this._term

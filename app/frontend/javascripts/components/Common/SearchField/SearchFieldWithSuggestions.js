@@ -321,6 +321,13 @@ class SearchFieldtWithSuggestions extends LitElement {
     this._hideSuggestions();
   }
 
+  /** Hide suggestions and empty input when input is reset
+   * @private */
+  _handleInputReset() {
+    this.term = '';
+    this._hideSuggestions();
+  }
+
   render() {
     return html`
       <search-field-only
@@ -332,6 +339,7 @@ class SearchFieldtWithSuggestions extends LitElement {
         @focusin=${this._handleFocusIn}
         @focusout=${this._handleFocusOut}
         @keydown=${this._handleUpDownKeys}
+        @input-reset=${this._handleInputReset}
       ></search-field-only>
       <div class="suggestions-container">
         ${this.suggestData && this.showSuggestions && !this.hideSuggestions
