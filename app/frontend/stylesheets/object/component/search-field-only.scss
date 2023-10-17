@@ -6,11 +6,11 @@ $SIZE: 30px;
   box-sizing: border-box;
   > .field {
     margin-bottom: 4px;
-    position: relative;
     height: $SIZE;
 
     > .input-form {
       > .searchfield[type='text'] {
+        box-sizing: border-box;
         width: 100%;
         line-height: $SIZE;
         border: solid 1px $COLOR_KEY_DARK2;
@@ -29,7 +29,7 @@ $SIZE: 30px;
       > .delete {
         position: absolute;
         top: 6px;
-        right: -2px;
+        right: 23px;
         color: var(--color-gray);
         border: none;
         background-color: transparent;
