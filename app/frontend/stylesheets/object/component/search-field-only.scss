@@ -5,6 +5,7 @@ $SIZE: 30px;
 .fieldcontainer {
   box-sizing: border-box;
   > .field {
+    position: relative;
     margin-bottom: 4px;
     height: $SIZE;
 
