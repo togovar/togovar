@@ -19,8 +19,11 @@ const MODE = {
 };
 
 export default class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
-  constructor(valuesView, conditionType) {
-    super(valuesView, conditionType);
+  /**
+   * @param {ConditionValues} valuesView
+   * @param {ConditionItemView} conditionView */
+  constructor(valuesView, conditionView) {
+    super(valuesView, conditionView);
 
     this._condition = {
       frequency: Object.assign({}, DEFAULT_CONDITION.frequency),

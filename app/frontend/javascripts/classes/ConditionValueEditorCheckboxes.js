@@ -2,15 +2,18 @@ import ConditionValueEditor from './ConditionValueEditor.js';
 import { ADVANCED_CONDITIONS } from '../global.js';
 
 export default class ConditionValueEditorCheckboxes extends ConditionValueEditor {
-  constructor(valuesView, conditionType) {
-    super(valuesView, conditionType);
+  /**
+   * @param {ConditionValues} valuesView
+   * @param {ConditionItemView} conditionView */
+  constructor(valuesView, conditionView) {
+    super(valuesView, conditionView);
 
     // HTML
-    const master = ADVANCED_CONDITIONS[conditionType];
+    const master = ADVANCED_CONDITIONS[this._conditionType];
     this._createElement(
       'checkboxes-editor-view',
       `
-    <header>Select ${conditionType}</header>
+    <header>Select ${this._conditionType}</header>
     <div class="buttons">
       <button class="button-view -weak">Select all</button>
       <button class="button-view -weak">Clear all</button>
@@ -24,10 +27,12 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
           value="${value.value}"
           data-label="${value.label}"
           ${
-            conditionType === 'significance' ? `data-sign="${value.value}"` : ''
+            this._conditionType === 'significance'
+              ? `data-sign="${value.value}"`
+              : ''
           }>
             ${
-              conditionType === 'significance'
+              this._conditionType === 'significance'
                 ? `<span class="clinical-significance" data-sign="${value.value}"></span>`
                 : ''
             }${value.label}
@@ -40,7 +45,7 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
     );
 
     // delete 'not in clinver'
-    if (conditionType === 'significance') {
+    if (this._conditionType === 'significance') {
       this._el.querySelector('li[data-value="NC"]').remove();
     }
 
