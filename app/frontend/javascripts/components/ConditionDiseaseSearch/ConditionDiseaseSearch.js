@@ -74,7 +74,7 @@ export class ConditionDiseaseSearch extends LitElement {
   render() {
     return html`
       <search-field-with-suggestions
-        .suggestAPIURL="${suggestAPI}"
+        .suggestAPIURL=${suggestAPI}
         .suggestAPIQueryParam="${'term'}"
         .options="${{ valueMappings: { valueKey: 'id', labelKey: 'label' } }}"
         placeholder="Breast-ovarian cancer, familial 2"

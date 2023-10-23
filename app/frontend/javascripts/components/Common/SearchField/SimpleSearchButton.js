@@ -12,7 +12,7 @@ export default class SearchButton extends LitElement {
   }
 
   render() {
-    return html`<button class="btn">Search</button>`;
+    return html`<button class="btn"></button>`;
   }
 }
 

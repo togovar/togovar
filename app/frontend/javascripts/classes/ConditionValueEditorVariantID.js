@@ -1,5 +1,5 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
-import SearchFieldOnly from '../components/Common/SearchField/SearchFieldOnly.js';
+import SearchField from '../components/Common/SearchField/SearchField.js';
 
 /** Variant ID editing screen */
 class ConditionValueEditorVariantID extends ConditionValueEditor {
@@ -17,7 +17,7 @@ class ConditionValueEditorVariantID extends ConditionValueEditor {
     );
 
     /** @property {HTMLDivElement} _searchFieldView - CustomElement */
-    this._searchFieldView = new SearchFieldOnly(this._body, 'rs1489251879');
+    this._searchFieldView = new SearchField(this._body, 'rs1489251879');
 
     this._searchFieldView.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
