@@ -1,11 +1,11 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ref, createRef } from 'lit/directives/ref.js';
-import SimpleSearchStyle from '../../../../stylesheets/object/component/search-field-only.scss';
+import SimpleSearchStyle from '../../../../stylesheets/object/component/search-field.scss';
 import './SimpleSearchView';
 
 /** Class to create a only search field */
-@customElement('search-field-only')
+@customElement('search-field')
 class SearchFieldOnly extends LitElement {
   static styles = [SimpleSearchStyle];
   _inputRef = createRef();
@@ -42,11 +42,6 @@ class SearchFieldOnly extends LitElement {
 
   @property({ type: String }) placeholder;
   @property({ type: String }) value;
-
-  /** Once the branch related to condition is merged, it will no longer be used */
-  setTerm(term) {
-    this.value = term;
-  }
 
   /** update input value */
   willUpdate(changed) {

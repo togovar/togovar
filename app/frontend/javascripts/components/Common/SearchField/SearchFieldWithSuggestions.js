@@ -4,7 +4,7 @@ import { map } from 'lit/directives/map.js';
 import { Task } from '@lit-labs/task';
 import { axios } from '../../../utils/cachedAxios';
 
-import './SearchFieldOnly';
+import './SearchField';
 import './SearchFieldSuggestionsList';
 
 import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
@@ -81,11 +81,6 @@ class SearchFieldtWithSuggestions extends LitElement {
 
   /** @property {string[]} _suggestionKeysArray - suggest content key */
   @state({ type: Array }) _suggestionKeysArray = [];
-
-  /** Once the branch related to condition is merged, it will no longer be used */
-  setTerm(term) {
-    this.value = term;
-  }
 
   /**
    * @private
@@ -330,7 +325,7 @@ class SearchFieldtWithSuggestions extends LitElement {
 
   render() {
     return html`
-      <search-field-only
+      <search-field
         exportparts="input-field"
         value=${this.term}
         .placeholder=${this.placeholder}
@@ -340,7 +335,7 @@ class SearchFieldtWithSuggestions extends LitElement {
         @focusout=${this._handleFocusOut}
         @keydown=${this._handleUpDownKeys}
         @input-reset=${this._handleInputReset}
-      ></search-field-only>
+      ></search-field>
       <div class="suggestions-container">
         ${this.suggestData && this.showSuggestions && !this.hideSuggestions
           ? html`
