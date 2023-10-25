@@ -102,10 +102,20 @@ class SimpleSearchView extends LitElement {
   /** @property {boolean} _hideSuggestions - Whether to hide suggestions */
   @state() _hideSuggestions = true;
 
-  /** Search using StoreManager's setSimpleSearchCondition
+  /** Search using StoreManager's setSimpleSearchCondition. And add regex about chromosome.
    * @private
    * @param {string} term - value to search for */
   _search(term) {
+    const chromosomePattern = /([1-9]|1[0-9]|2[0-2]|X|Y|M|MT):\d+/i;
+
+    if (chromosomePattern.test(term)) {
+      term = term.replace(/Chr|ch|Cr|cs/i, '').toUpperCase();
+
+      if (term.includes('M:')) {
+        term = term.replace('M:', 'MT:');
+      }
+    }
+
     StoreManager.setSimpleSearchCondition('term', term);
   }
 
