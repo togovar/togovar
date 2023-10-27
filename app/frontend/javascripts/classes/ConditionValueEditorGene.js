@@ -46,8 +46,12 @@ class ConditionValueEditorGene extends ConditionValueEditor {
   /** Retain value when changing to edit screen
    * See {@link ConditionValues} startToEditCondition */
   keepLastValues() {
-    this._lastValue = this._value || '';
-    this._lastLabel = this._label || '';
+    let valueView = this._valuesElement.querySelector(
+      'condition-item-value-view'
+    );
+
+    this._lastValue = valueView?.value || '';
+    this._lastLabel = valueView?.label || '';
   }
 
   /** If the cancel button is pressed when isFirstTime is false, restore the value before editing
