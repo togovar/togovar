@@ -126,20 +126,17 @@ class ConditionItemView extends ConditionView {
   /** Exit the edit screen with esckey. remove() for the first time, doneEditing() for editing
    * @private */
   #keydownEscape(e) {
-    if (
-      e.key === 'Escape' &&
-      this._conditionValues &&
-      this._isFirstTime === true
-    ) {
+    if (e.key !== 'Escape' || !this._conditionValues) return;
+
+    if (this._isFirstTime) {
       this.remove();
-      window.removeEventListener('keydown', this.#keydownEscapeEvent);
-    } else if (
-      e.key === 'Escape' &&
-      this._conditionValues &&
-      this._isFirstTime === false
-    ) {
+    } else {
+      for (const editor of this._conditionValues.editors) {
+        editor.restore();
+      }
       this.doneEditing();
     }
+    window.removeEventListener('keydown', this.#keydownEscapeEvent);
   }
 
   // accessor
