@@ -1,13 +1,12 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ref, createRef } from 'lit/directives/ref.js';
-import SimpleSearchStyle from '../../../../stylesheets/object/component/search-field.scss';
-import './SimpleSearchView';
+import Style from '../../../../stylesheets/object/component/search-field.scss';
 
 /** Class to create a only search field */
 @customElement('search-field')
 class SearchField extends LitElement {
-  static styles = [SimpleSearchStyle];
+  static styles = [Style];
   _inputRef = createRef();
 
   /**
@@ -43,12 +42,28 @@ class SearchField extends LitElement {
   @property({ type: String }) placeholder;
   @property({ type: String }) value;
 
+  /** Put a value into input when loaded */
+  connectedCallback() {
+    super.connectedCallback();
+    window.addEventListener('load', this._handleLoad);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('load', this._handleLoad);
+  }
+
   /** update input value */
   willUpdate(changed) {
     if (changed.has('value') && this._inputRef.value) {
       this._inputRef.value.value = this.value;
     }
   }
+
+  /** If url has a value, put the value in input (simple search)
+   * @private */
+  _handleLoad = () => {
+    this._inputRef.value.value = this.value;
+  };
 
   /**
    * See {@link SearchFieldtWithSuggestions _handleInput}
@@ -77,7 +92,7 @@ class SearchField extends LitElement {
 
   /** Fires an event when the cross button is pressed
    * @private */
-  _handleSeachButtonClick() {
+  _handleResetClick() {
     this.dispatchEvent(new MouseEvent('input-reset'));
   }
 
@@ -98,7 +113,7 @@ class SearchField extends LitElement {
             <button
               class="delete"
               type="reset"
-              @click=${this._handleSeachButtonClick}
+              @click=${this._handleResetClick}
             ></button>
           </form>
         </div>

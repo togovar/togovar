@@ -149,7 +149,6 @@ class SimpleSearchView extends LitElement {
   /** Search input value with Enter
    * @private */
   _handleTermEnter() {
-    console.log(this._term);
     this._search(this._term);
   }
   /** Search input value with Search button
