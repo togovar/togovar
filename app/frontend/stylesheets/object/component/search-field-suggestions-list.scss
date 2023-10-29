@@ -21,7 +21,7 @@
 
   > .item {
     cursor: pointer;
-    padding: 0 14px;
+    padding: 0 $PADDING_SIDE;
     height: 24px;
     line-height: 24px;
     transition: background-color $GUI_DURATION;
