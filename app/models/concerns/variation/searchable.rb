@@ -133,6 +133,26 @@ class Variation
                          .to_h
                          .symbolize_keys
       end
+
+      def default_condition
+        Elasticsearch::DSL::Search.search do
+          query do
+            bool do
+              should do
+                exists field: :clinvar
+              end
+              should do
+                nested do
+                  path 'frequency'
+                  query do
+                    exists field: :frequency
+                  end
+                end
+              end
+            end
+          end
+        end.to_hash[:query]
+      end
     end
   end
 end

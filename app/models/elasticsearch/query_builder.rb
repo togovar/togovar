@@ -373,11 +373,7 @@ module Elasticsearch
     private
 
     def default_condition
-      Elasticsearch::DSL::Search.search do
-        query do
-          exists field: :type
-        end
-      end.to_hash[:query]
+      Variation.default_condition
     end
 
     def aggregations

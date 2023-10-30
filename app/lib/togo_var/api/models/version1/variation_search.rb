@@ -70,9 +70,7 @@ module TogoVar
             query = Elasticsearch::DSL::Search.search do
               query do
                 bool do
-                  must do
-                    exists field: :type
-                  end
+                  must Variation.default_condition
                   if (q = models.first[:query].to_hash).present?
                     must q
                   end
