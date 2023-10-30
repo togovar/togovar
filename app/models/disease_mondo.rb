@@ -19,20 +19,20 @@ class DiseaseMondo
             WHERE {
               #{mondo ? %[VALUES ?mondo { <http://purl.obolibrary.org/obo/#{node}> }] : %[VALUES ?cui { "#{node}" }] }
 
-              #{'GRAPH <http://togovar.biosciencedbc.jp/medgen> {
+              #{'GRAPH <http://togovar.org/medgen> {
                   ?medgen dct:identifier ?cui ;
                           mo:mgconso ?mgconso .
                   ?mgconso dct:source mo:MONDO ;
                            rdfs:seeAlso ?mondo .
                 }' unless mondo}
 
-              GRAPH <http://togovar.biosciencedbc.jp/mondo> {
+              GRAPH <http://togovar.org/mondo> {
                 ?descendants rdfs:subClassOf+ ?mondo .
               }
             }
           }
 
-          GRAPH <http://togovar.biosciencedbc.jp/medgen> {
+          GRAPH <http://togovar.org/medgen> {
             ?mgconso dct:source mo:MONDO ;
                      rdfs:seeAlso ?descendants .
             ?medgen dct:identifier ?cui ;
