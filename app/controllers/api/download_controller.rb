@@ -21,7 +21,7 @@ module API
           errors, status = validate_query
           render(json: { errors: errors }, status: status) and return if errors.present?
 
-          set_header('application/json; charset=UTF-8')
+          set_header('application/json; charset=utf-8')
           output_json
         end
 
@@ -29,7 +29,7 @@ module API
           errors, status = validate_query
           render(plain: errors.join("\n"), status: status) and return if errors.present?
 
-          set_header('text/csv; charset=UTF-8')
+          set_header('text/csv; charset=utf-8')
           output_csv
         end
 
@@ -37,7 +37,7 @@ module API
           errors, status = validate_query
           render(plain: errors.join("\n"), status: status) and return if errors.present?
 
-          set_header('text/tab-separated-values; charset=UTF-8')
+          set_header('text/tab-separated-values; charset=utf-8')
           output_csv("\t")
         end
       end
@@ -71,7 +71,7 @@ module API
     end
 
     def output_columns
-      columns = %i[id rs position ref_alt type gene frequency consequence sift polyphen condition]
+      columns = %i[id rs position ref_alt type gene frequency consequence sift polyphen condition alphamisssense]
 
       if request.get?
         columns - (search_params[:column].presence || {}).select { |_, v| v == '0' }.keys.map(&:to_sym)
@@ -171,7 +171,7 @@ module API
           end
         end
       end
-
+    ensure
       response.stream.write "\n  ]\n}"
     end
 
@@ -235,6 +235,7 @@ module API
 
       sift = vep.map { |x| x[:sift] }.compact.min
       polyphen = vep.map { |x| x[:polyphen] }.compact.max
+      alpha_misssense = vep.map { |x| x[:alpha_misssense] }.compact.max
       conditions = if (conditions = result.dig(:clinvar, :conditions)).present?
                      if type == :csv
                        conditions.map { |x| "#{x[:condition]}=#{x[:interpretation].join('|').presence || '-'}" }.join(ITEMS_SEPARATOR)
@@ -245,16 +246,33 @@ module API
 
       columns = output_columns
       data = {}
-      data.merge!(tgv_id: id) if columns.include?(:id)
-      data.merge!(rs: dbsnp.presence) if columns.include?(:rs)
-      data.merge!(chromosome: result.dig(:chromosome, :label), position: result.dig(:vcf, :position)) if columns.include?(:position)
-      data.merge!(reference: "#{result[:reference]}", alternate: "#{result[:alternate]}") if columns.include?(:ref_alt)
-      data.merge!(type: "#{result[:type]}") if columns.include?(:type)
-      data.merge!(gene: symbols.presence) if columns.include?(:gene)
-      data.merge!(consequence: consequences.presence) if columns.include?(:consequence)
-      data.merge!(sift_prediction: sift ? Sift.find_by_value(sift).label : nil, sift_value: sift) if columns.include?(:sift)
-      data.merge!(polyphen2_prediction: polyphen ? Polyphen.find_by_value(polyphen).label : nil, polyphen2_value: polyphen) if columns.include?(:polyphen)
-      data.merge!(condition: conditions) if columns.include?(:condition)
+      data[:tgv_id] = id if columns.include?(:id)
+      data[:rs] = dbsnp.presence if columns.include?(:rs)
+      if columns.include?(:position)
+        data[:chromosome] = result.dig(:chromosome, :label)
+        suffix = ENV.fetch('TOGOVAR_REFERENCE', nil)
+        data["position#{"_#{suffix.downcase}" if suffix}"] = result.dig(:vcf, :position)
+      end
+      if columns.include?(:ref_alt)
+        data[:reference] = result[:reference]
+        data[:alternate] = result[:alternate]
+      end
+      data[:type] = result[:type] if columns.include?(:type)
+      data[:gene] = symbols.presence if columns.include?(:gene)
+      data[:consequence] = consequences.presence if columns.include?(:consequence)
+      data[:condition] = conditions if columns.include?(:condition)
+      if columns.include?(:sift)
+        data[:sift_qualitative_prediction] = sift ? Sift.find_by_value(sift).label : nil
+        data[:sift_score] = sift
+      end
+      if columns.include?(:polyphen)
+        data[:polyphen2_qualitative_prediction] = polyphen ? Polyphen.find_by_value(polyphen).label : nil
+        data[:polyphen2_score] = polyphen
+      end
+      if columns.include?(:alphamisssense)
+        data[:alphamissense_pathogenicity] = alpha_misssense ? AlphaMisssense.find_by_value(alpha_misssense).label : nil
+        data[:alphamissense_score] = alpha_misssense
+      end
 
       data
     end
@@ -270,7 +288,7 @@ module API
         end
       end
 
-      sources = case ENV['TOGOVAR_FRONTEND_REFERENCE']
+      sources = case ENV['TOGOVAR_REFERENCE']
                 when 'GRCh37'
                   %w[jga_ngs jga_snp tommo hgvd gem_j_wga gnomad_exomes gnomad_genomes]
                 else
