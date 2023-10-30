@@ -144,7 +144,7 @@ const config = {
         process.env.TOGOVAR_FRONTEND_API_URL
       ),
       TOGOVAR_FRONTEND_REFERENCE: JSON.stringify(
-        process.env.TOGOVAR_FRONTEND_REFERENCE
+        process.env.TOGOVAR_REFERENCE
       ),
       TOGOVAR_FRONTEND_STANZA_URL: JSON.stringify(
         process.env.TOGOVAR_FRONTEND_STANZA_URL

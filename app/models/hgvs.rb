@@ -1,5 +1,5 @@
 class HGVS
-  ENSEMBL_URL = if ENV['TOGOVAR_FRONTEND_REFERENCE'] == 'GRCh37'
+  ENSEMBL_URL = if ENV['TOGOVAR_REFERENCE'] == 'GRCh37'
                   'https://grch37.rest.ensembl.org'.freeze
                 else
                   'https://rest.ensembl.org'.freeze
