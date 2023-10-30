@@ -316,11 +316,12 @@ class SearchFieldtWithSuggestions extends LitElement {
     this._hideSuggestions();
   }
 
-  /** Hide suggestions and empty input when input is reset
+  /** Hide suggestions and empty input when input is reset. input-reset event for simple search
    * @private */
   _handleInputReset() {
     this.term = '';
     this._hideSuggestions();
+    this.dispatchEvent(new CustomEvent('input-reset'));
   }
 
   render() {
