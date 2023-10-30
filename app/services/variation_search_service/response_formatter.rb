@@ -137,7 +137,7 @@ class VariationSearchService
 
         significance = Array(variation.dig(:clinvar, :conditions)).map do |x|
           {
-            condition: x[:condition],
+            condition: conditions[x[:medgen]],
             interpretations: Array(x[:interpretation]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(' ', '_').to_sym)&.key },
             medgen: x[:medgen]
           }
@@ -151,6 +151,7 @@ class VariationSearchService
         json.most_severe_consequence SequenceOntology.most_severe_consequence(*vep.flat_map { |x| x[:consequence] })&.id
         json.sift vep.map { |x| x[:sift] }.compact.min
         json.polyphen vep.map { |x| x[:polyphen] }.compact.max
+        json.alphamissense vep.map { |x| x[:alpha_missense] }.compact.max # TODO: rename to alphamissense
         vep.each do |x|
           consequences = x[:consequence].map { |x| SequenceOntology.find_by_key(x) }
           x[:consequence] = (SequenceOntology::CONSEQUENCES_IN_ORDER & consequences).map { |y| y.id }
