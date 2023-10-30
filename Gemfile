@@ -8,7 +8,7 @@ ruby '2.7.1'
 gem 'rails', '~> 6.0.3', '>= 6.0.3.4'
 
 # middleware
-gem 'puma', '~> 4.1'
+gem 'puma', '~> 5.6'
 gem 'rack-cors', '~> 1.1', '>= 1.1.1'
 gem 'unicorn', '~> 5.7'
 
