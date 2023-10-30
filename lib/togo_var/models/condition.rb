@@ -15,7 +15,7 @@ module TogoVar
             PREFIX vcv: <http://identifiers.org/clinvar:>
 
             SELECT DISTINCT ?vcv ?rcv ?condition ?interpretation ?medgen
-            FROM <http://togovar.biosciencedbc.jp/graph/clinvar>
+            FROM <http://togovar.org/graph/clinvar>
             WHERE {
               VALUES ?_vcv { %s }
               ?_vcv cvo:interpreted_record/cvo:rcv_list/cvo:rcv_accession ?_rcv ;

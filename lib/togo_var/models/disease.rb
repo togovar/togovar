@@ -20,7 +20,7 @@ module TogoVar
               PREFIX vcv: <http://identifiers.org/clinvar:>
 
               SELECT DISTINCT ?condition
-              FROM <http://togovar.biosciencedbc.jp/graph/clinvar>
+              FROM <http://togovar.org/graph/clinvar>
               WHERE {
                 ?vcv cvo:interpreted_record/cvo:rcv_list/cvo:rcv_accession/cvo:interpreted_condition/cvo:type_rcv_interpreted_condition ?condition .
               }
