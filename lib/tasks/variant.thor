@@ -2,45 +2,63 @@ require_relative '../../config/application'
 require 'benchmark'
 require 'thor'
 require 'togo_var'
+require 'digest/sha2'
 
 Rails.application.initialize! unless Rails.application.initialized?
 
 module Tasks
-  class Variation < Thor
-    namespace :variation
+  class Variant < Thor
+    namespace :variant
 
-    desc 'add_clinvar_annotation', 'Add ClinVar annotations collected by SPARQL'
+    desc 'generate_clinvar_annotation', 'ClinVar annotations collected by SPARQL'
 
-    def add_clinvar_annotation
+    def generate_clinvar_annotation(output_prefix)
       disable_logging
 
-      ::Variation.set_refresh_interval(-1)
+      TogoVar::Ndjson::Writer.open(output_prefix) do |writer|
+        batch_size = 500
+        total = 0
+        search_after = nil
 
-      batch_size = 500
-      total = 0
-      search_after = nil
+        (0..(total_count / batch_size.to_f).to_i).each do
+          indices = fetch_indices(size: batch_size, search_after: search_after, record_number: total)
+                      .results
+                      .map { |r| r.slice(:_id, :_source) }
+                      .map { |r| [r.dig(:_source, :clinvar, :variation_id), r] }
+                      .to_h
 
-      (0..(total_count / batch_size.to_f).to_i).each do
-        indices = fetch_indices(size: batch_size, search_after: search_after, record_number: total).results
-                    .map { |r| r.slice(:_id, :_source) }
-                    .map { |r| [r.dig(:_source, :clinvar, :variation_id), r] }
-                    .to_h
+          total += indices.size
+          search_after = indices.keys.sort.last
 
-        total += indices.size
-        search_after = indices.keys.sort.last
+          results = fetch_annotations(*indices.keys, record_number: total)
+                      .map { |r| r.to_h.slice(:variation_id, :interpretation, :medgen).transform_values(&:object) }
+                      .group_by { |r| r[:variation_id] }
 
-        results = fetch_annotations(*indices.keys, record_number: total)
-                    .map { |r| r.to_h.slice(:variation_id, :condition, :interpretation, :medgen).transform_values(&:object) }
-                    .group_by { |r| r[:variation_id] }
+          merged = indices.map { |k, v| v.merge(annotation: results[k] || []) }
 
-        merged = indices.map { |k, v| v.merge(annotation: results[k] || []) }
-
-        body = merged.flat_map { |x| bulk_body(x) }
-
-        bulk_request(body, record_number: total)
+          merged.each do |x|
+            writer.write({
+                           update: {
+                             _index: 'variant',
+                             _id: x[:_id],
+                             retry_on_conflict: 3
+                           }
+                         },
+                         {
+                           doc: {
+                             clinvar: {
+                               conditions: x[:annotation].map do |r|
+                                 {
+                                   medgen: r[:medgen],
+                                   interpretation: r[:interpretation]&.split(/[,;\/]\s*/)&.map(&:downcase),
+                                 }
+                               end
+                             }
+                           }
+                         })
+          end
+        end
       end
-    ensure
-      ::Variation.set_refresh_interval
     end
 
     private
@@ -80,7 +98,7 @@ module Tasks
         sort do
           by 'clinvar.variation_id', order: 'asc'
         end
-        _source include: ['clinvar.variation_id']
+        _source includes: ['clinvar.variation_id']
         size size
       end
 
@@ -113,8 +131,8 @@ module Tasks
         PREFIX clinvar_variation: <http://ncbi.nlm.nih.gov/clinvar/variation/>
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-        SELECT DISTINCT ?variation_id ?condition ?interpretation ?medgen
-        FROM <http://togovar.biosciencedbc.jp/clinvar>
+        SELECT DISTINCT ?variation_id ?interpretation ?medgen
+        FROM <http://togovar.org/clinvar>
         WHERE {
           VALUES ?variation { #{variation_id.map { |x| "clinvar_variation:#{x}" }.join(' ')} }
 
@@ -125,13 +143,10 @@ module Tasks
           ?_rcv cvo:interpretation ?interpretation ;
             cvo:interpreted_condition_list/cvo:interpreted_condition ?_interpreted_condition .
 
-          ?_interpreted_condition rdfs:label ?condition .
+          ?_interpreted_condition dct:source ?db ;
+            dct:identifier ?medgen .
 
-          OPTIONAL {
-            ?_interpreted_condition dct:source ?db ;
-              dct:identifier ?medgen .
-            FILTER( ?db IN ("MedGen") )
-          }
+          FILTER( ?db IN ("MedGen") )
         }
       SPARQL
 
@@ -156,53 +171,7 @@ module Tasks
     end
 
     def endpoint
-      @endpoint = SPARQL::Client.new(Rails.configuration.endpoint['sparql'])
-    end
-
-    def bulk_body(hash)
-      [
-        {
-          update: {
-            _index: 'variant',
-            _id: hash[:_id],
-            retry_on_conflict: 3
-          }
-        },
-        {
-          doc_as_upsert: true,
-          doc: {
-            clinvar: {
-              conditions: hash[:annotation].map do |r|
-                {
-                  medgen: r[:medgen],
-                  interpretation: r[:interpretation]&.split(/[\/,]\s*/)&.map(&:downcase),
-                  condition: r[:condition]
-                }
-              end
-            }
-          }
-        }
-      ]
-    end
-
-    def bulk_request(data, record_number: nil)
-      retry_count = 0
-
-      response = begin
-                   ::Elasticsearch::Model.client.bulk(body: data)
-                 rescue Faraday::Error => e
-                   raise e if (retry_count += 1) > 5
-                   warn "#{record_number} - #{e.message} / retry after #{2 ** retry_count} seconds"
-                   sleep 2 ** retry_count
-                   retry
-                 end
-
-      warn "#{record_number} - indexing took: #{response['took']}, errors: #{response['errors'].inspect}"
-      if response['errors'] && (items = response['items']).present?
-        warn items.find { |x| x.dig('update', 'error') }&.dig('update', 'error')
-      end
-
-      response
+      @endpoint ||= SPARQL::Client.new(Rails.configuration.endpoint['sparql'])
     end
   end
 end
