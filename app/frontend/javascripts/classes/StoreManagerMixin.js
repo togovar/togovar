@@ -1,6 +1,7 @@
 import deparam from 'deparam.js';
 import { API_URL } from '../global.js';
 import { debounce } from '../utils/debounce.js';
+import _ from 'lodash';
 
 const LIMIT = 100;
 const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
@@ -17,7 +18,7 @@ export const mixin = {
     this.bind('searchMode', this);
   },
 
-  readySearch(callback) {
+  readyInitialSearch(callback) {
     // get master data of conditions
     const json = ((reference) => {
       switch (reference) {
@@ -212,9 +213,11 @@ export const mixin = {
    */
 
   _search(offset, isFirstTime = false) {
-    return debounce((offset, isFirstTime) => {
+    console.trace();
+    return _.debounce((offset, isFirstTime) => {
       // If search is in progress, abort previous request and create a new AbortController
       if (this._fetching === true) {
+        return;
         this._store._abortController.abort('newSearchStarted');
         this._store._abortController = new AbortController();
         this._fetching = false;
@@ -230,7 +233,7 @@ export const mixin = {
       }
 
       // Retain search conditions
-      const lastConditions = JSON.stringify(this._store.simpleSearchConditions); // TODO:
+      const lastConditions = JSON.stringify(this._store.simpleSearchConditions); // TODO: support advanced search
 
       // Set fetching flag to true
       this._fetching = true;
@@ -289,6 +292,7 @@ export const mixin = {
   async _fetchData(path, options, lastConditions) {
     try {
       const response = await fetch(path, options);
+      this._fetching = false;
       if (!response.ok) {
         throw new Error(this._getErrorType(response.status));
       }

@@ -39,7 +39,7 @@ export function initHome() {
 
   new ActivityIndicator(document.getElementById('ActivityIndicator'));
 
-  StoreManager.readySearch(() => {
+  StoreManager.readyInitialSearch(() => {
     // 検索結果表示画面
     const resultView = new ResultsView(document.getElementById('ResultsView'));
 
