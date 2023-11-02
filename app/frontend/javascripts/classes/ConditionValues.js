@@ -159,6 +159,12 @@ class ConditionValues {
   get sections() {
     return this._sections;
   }
+
+  /**
+   * @type {ConditionValueEditorCheckboxes[]|ConditionValueEditorColumns[]|ConditionValueEditorFrequencyCount[]|ConditionValueEditorDisease[]|ConditionValueEditorTextField[]} */
+  get editors() {
+    return this._editors;
+  }
 }
 
 export default ConditionValues;

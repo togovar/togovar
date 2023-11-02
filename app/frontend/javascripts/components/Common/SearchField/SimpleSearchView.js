@@ -98,7 +98,7 @@ class SimpleSearchView extends LitElement {
   /** @property {string} _value - value of suggestion */
   @state() _value;
   /** @property {string} _term - Input value */
-  @state() _term;
+  @state() _term = StoreManager.getSimpleSearchCondition('term');
   /** @property {boolean} _hideSuggestions - Whether to hide suggestions */
   @state() _hideSuggestions = true;
 
@@ -149,6 +149,7 @@ class SimpleSearchView extends LitElement {
   /** Search input value with Enter
    * @private */
   _handleTermEnter() {
+    if (this._term === undefined) return;
     this._search(this._term);
   }
   /** Search input value with Search button
@@ -179,6 +180,7 @@ class SimpleSearchView extends LitElement {
           @search-term-enter=${this._handleTermEnter}
           @imput-term=${this._inputTerm}
           @input=${() => (this._hideSuggestions = false)}
+          @input-reset=${() => (this._term = '')}
         ></search-field-with-suggestions>
 
         <search-button @click=${this._handleSeachButtonClick}></search-button>
