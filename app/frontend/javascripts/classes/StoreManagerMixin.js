@@ -229,7 +229,7 @@ export const mixin = {
         this.setData('offset', 0);
         this.setData('rowCount', 0);
         this._store.searchResults = [];
-        this.setResults([], 0);
+        this._setResults([], 0);
       }
 
       // Retain search conditions
@@ -327,6 +327,7 @@ export const mixin = {
   },
 
   _setDataFromJson(json, lastConditions) {
+    console.log(json);
     // status
     this.setData('searchStatus', {
       available: Math.min(json.statistics.filtered, json.scroll.max_rows),
@@ -336,7 +337,7 @@ export const mixin = {
 
     // results
     this.setData('numberOfRecords', this.getData('searchStatus').available);
-    this.setResults(json.data, json.scroll.offset);
+    this._setResults(json.data, json.scroll.offset);
 
     // statistics
     this.setData('statisticsDataset', json.statistics.dataset); // dataset

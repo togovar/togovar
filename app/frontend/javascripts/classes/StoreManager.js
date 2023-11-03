@@ -61,7 +61,73 @@ class StoreManager {
   }
 
   // 検索結果は、特殊であるため専用メソッドを用意
-  setResults(records, offset) {
+  /**
+   *
+   * @param {object} records
+   * @param {object[]} records.data
+   * @param {object} records.scroll
+   * @param {number} records.scroll.offset
+   * @param {number} records.scroll.limit
+   * @param {number} records.scroll.max_rows
+   * @param {object} records.statistics
+   * @param {object} records.statistics.consequence
+   * @param {number} records.statistics.consequence.SO_0001567
+   * @param {number} records.statistics.consequence.SO_0001574
+   * @param {number} records.statistics.consequence.SO_0001575
+   * @param {number} records.statistics.consequence.SO_0001578
+   * @param {number} records.statistics.consequence.SO_0001580
+   * @param {number} records.statistics.consequence.SO_0001583
+   * @param {number} records.statistics.consequence.SO_0001587
+   * @param {number} records.statistics.consequence.SO_0001589
+   * @param {number} records.statistics.consequence.SO_0001619
+   * @param {number} records.statistics.consequence.SO_0001620
+   * @param {number} records.statistics.consequence.SO_0001621
+   * @param {number} records.statistics.consequence.SO_0001623
+   * @param {number} records.statistics.consequence.SO_0001624
+   * @param {number} records.statistics.consequence.SO_0001626
+   * @param {number} records.statistics.consequence.SO_0001627
+   * @param {number} records.statistics.consequence.SO_0001628
+   * @param {number} records.statistics.consequence.SO_0001630
+   * @param {number} records.statistics.consequence.SO_0001782
+   * @param {number} records.statistics.consequence.SO_0001792
+   * @param {number} records.statistics.consequence.SO_0001818
+   * @param {number} records.statistics.consequence.SO_0001822
+   * @param {number} records.statistics.consequence.SO_0001892
+   * @param {number} records.statistics.consequence.SO_0001893
+   * @param {number} records.statistics.consequence.SO_0001895
+   * @param {number} records.statistics.consequence.SO_0002012
+   * @param {number} records.statistics.consequence.SO_0002019
+   * @param {object} records.statistics.dataset
+   * @param {number} records.statistics.filtered
+   * @param {object} records.statistics.significance
+   * @param {number} records.statistics.significance.A
+   * @param {number} records.statistics.significance.AF
+   * @param {number} records.statistics.significance.AN
+   * @param {number} records.statistics.significance.B
+   * @param {number} records.statistics.significance.CI
+   * @param {number} records.statistics.significance.DR
+   * @param {number} records.statistics.significance.LB
+   * @param {number} records.statistics.significance.LP
+   * @param {number} records.statistics.significance.NC
+   * @param {number} records.statistics.significance.NP
+   * @param {number} records.statistics.significance.O
+   * @param {number} records.statistics.significance.P
+   * @param {number} records.statistics.significance.PR
+   * @param {number} records.statistics.significance.RF
+   * @param {number} records.statistics.significance.US
+   * @param {number} records.statistics.significance.US
+   * @param {number} records.statistics.total
+   * @param {object} records.statistics.type
+   * @param {number} records.statistics.type.SO_0000159
+   * @param {number} records.statistics.type.SO_0000667
+   * @param {number} records.statistics.type.SO_0001483
+   * @param {number} records.statistics.type.SO_1000002
+   * @param {number} records.statistics.type.SO_1000032
+   * @param {number} offset
+   *
+   */
+  _setResults(records, offset) {
+    console.log(records, offset);
     // オフセット位置に結果をセット
     for (let i = 0; i < records.length; i++) {
       this._store.searchResults[offset + i] = records[i];
