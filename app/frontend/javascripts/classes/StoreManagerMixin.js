@@ -214,14 +214,7 @@ export const mixin = {
 
   _search(offset, isFirstTime = false) {
     return _.debounce((offset, isFirstTime) => {
-      // If search is in progress, abort previous request and create a new AbortController
-      if (this._fetching === true) {
-        // TODO: support delay processing
-        return;
-        this._store._abortController.abort('newSearchStarted');
-        this._store._abortController = new AbortController();
-        this._fetching = false;
-      }
+      if (this._fetching === true) return;
 
       // Reset search results
       if (isFirstTime) {
