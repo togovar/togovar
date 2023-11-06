@@ -25,8 +25,8 @@
         {
           "id": 4,
           "value": "tommo",
-          "label": "ToMMo 14KJPN",
-          "description": "ToMMo 14KJPN Allele Frequency Panel"
+          "label": "ToMMo 54KJPN",
+          "description": "ToMMo 54KJPN-SNV/INDEL Allele Frequency Panel (v20230626)"
         },
         {
           "id": 5,
@@ -407,13 +407,13 @@
       "label": "Gene symbol",
       "type": "text"
     },
-    "id": {
-      "label": "Variant ID",
-      "type": "text"
-    },
     "location": {
       "label": "Location",
       "type": "peculiar"
+    },
+    "id": {
+      "label": "Variant ID",
+      "type": "text"
     },
     "type": {
       "label": "Variant type",
