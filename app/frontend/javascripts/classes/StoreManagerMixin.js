@@ -327,7 +327,6 @@ export const mixin = {
   },
 
   _setDataFromJson(json, lastConditions) {
-    console.log(json);
     // status
     this.setData('searchStatus', {
       available: Math.min(json.statistics.filtered, json.scroll.max_rows),
