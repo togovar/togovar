@@ -292,7 +292,6 @@ export const mixin = {
   async _fetchData(path, options, lastConditions) {
     try {
       const response = await fetch(path, options);
-      this._fetching = false;
       if (!response.ok) {
         throw new Error(this._getErrorType(response.status));
       }
@@ -305,6 +304,7 @@ export const mixin = {
       }
       const error = err instanceof Error ? err.message : null;
       this.setData('searchMessages', { error });
+      this._fetching = false;
       throw err;
     }
   },

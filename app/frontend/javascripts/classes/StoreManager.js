@@ -62,8 +62,11 @@ class StoreManager {
 
   // store search results
   _setResults(records, offset) {
-    this._store.searchResults.splice(offset, records.length, ...records);
+    for (let i = 0; i < records.length; i++) {
+      this._store.searchResults[offset + i] = records[i];
+    }
     this._notify('searchResults');
+    this._fetching = false;
   }
 
   // notify bound objects
