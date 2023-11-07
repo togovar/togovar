@@ -60,13 +60,13 @@ class StoreManager {
     // 個別の処理
   }
 
-  // 検索結果は、特殊であるため専用メソッドを用意
-  setResults(records, offset) {
-    // オフセット位置に結果をセット
+  // store search results
+  _setResults(records, offset) {
     for (let i = 0; i < records.length; i++) {
       this._store.searchResults[offset + i] = records[i];
     }
     this._notify('searchResults');
+    this._fetching = false;
   }
 
   // notify bound objects

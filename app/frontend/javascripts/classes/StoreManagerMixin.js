@@ -1,6 +1,6 @@
 import deparam from 'deparam.js';
 import { API_URL } from '../global.js';
-import { debounce } from '../utils/debounce.js';
+import _ from 'lodash';
 
 const LIMIT = 100;
 const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
@@ -17,7 +17,7 @@ export const mixin = {
     this.bind('searchMode', this);
   },
 
-  readySearch(callback) {
+  readyInitialSearch(callback) {
     // get master data of conditions
     const json = ((reference) => {
       switch (reference) {
@@ -212,13 +212,8 @@ export const mixin = {
    */
 
   _search(offset, isFirstTime = false) {
-    return debounce((offset, isFirstTime) => {
-      // If search is in progress, abort previous request and create a new AbortController
-      if (this._fetching === true) {
-        this._store._abortController.abort('newSearchStarted');
-        this._store._abortController = new AbortController();
-        this._fetching = false;
-      }
+    return _.debounce((offset, isFirstTime) => {
+      if (this._fetching === true) return;
 
       // Reset search results
       if (isFirstTime) {
@@ -226,11 +221,11 @@ export const mixin = {
         this.setData('offset', 0);
         this.setData('rowCount', 0);
         this._store.searchResults = [];
-        this.setResults([], 0);
+        this._setResults([], 0);
       }
 
       // Retain search conditions
-      const lastConditions = JSON.stringify(this._store.simpleSearchConditions); // TODO:
+      const lastConditions = JSON.stringify(this._store.simpleSearchConditions); // TODO: support advanced search
 
       // Set fetching flag to true
       this._fetching = true;
@@ -301,6 +296,7 @@ export const mixin = {
       }
       const error = err instanceof Error ? err.message : null;
       this.setData('searchMessages', { error });
+      this._fetching = false;
       throw err;
     }
   },
@@ -332,7 +328,7 @@ export const mixin = {
 
     // results
     this.setData('numberOfRecords', this.getData('searchStatus').available);
-    this.setResults(json.data, json.scroll.offset);
+    this._setResults(json.data, json.scroll.offset);
 
     // statistics
     this.setData('statisticsDataset', json.statistics.dataset); // dataset
