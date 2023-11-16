@@ -1,5 +1,7 @@
 import { CONDITION_TYPE } from '../definition.js';
+import '../components/Common/SearchField/SearchFieldWithSuggestions.js';
 
+// TODO this whole component except for examples can be replaced with SearchFieldWithSuggestions (?)
 const NUMBER_OF_SUGGESTS = 10; // TODO: Config
 const SUGGEST_LABELS = {
   gene: 'Gene symbol',
@@ -43,8 +45,13 @@ export default class SearchFieldView {
     <div class="search-field-view">
       <div class="fieldcontainer">
         <div class="field">
-          <input type="text" title="${_placeholder}" placeholder="${_placeholder}">
+          <input type="text" title="${_placeholder}" placeholder="${_placeholder}" >
           <button>Search</button>
+          <search-field-with-suggestions placeholder="${_placeholder}" suggest-api-url="${
+      this._queryURL
+    }" suggest-api-query-param="term" options-title-mappings="${JSON.stringify(
+      JSON.stringify(SUGGEST_LABELS)
+    ).replaceAll(`"`, `'`)}"></search-field-with-suggestions>
         </div>
       </div>
       <div class="examples"></div>

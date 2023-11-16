@@ -414,7 +414,7 @@
       "type": "text"
     },
     "id": {
-      "label": "Variant id",
+      "label": "Variant ID",
       "type": "text"
     },
     "location": {

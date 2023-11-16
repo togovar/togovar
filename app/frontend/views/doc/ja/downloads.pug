@@ -16,31 +16,78 @@ block content
         h2.title Downloads
       .contents
         section.section
-          p.body TogoVarデータは以下のリンクからダウンロード可能です。
+          h3.sectiontitle
+            | TogoVarの全バリアントデータ
           ul
             li
-              a(href='/downloads/gem_j_wga/')
-                | GEM Japan Whole Genome Aggregation (GEM-J WGA) パネルの頻度情報 (VCFフォーマット)
-              p
-                | 日本各地から収集した7,609人分の全ゲノム配列情報(Whole Genome Sequence: WGS) をバリアント検知して得られた
-                | 日本人一般集団の大規模バリアント頻度データセットです。全ゲノム配列情報も制限公開データとして利用可能です。
-                | 国立研究開発法人日本医療研究開発機構(AMED)が推進するGEnome Medical alliance Japan（GEM Japan, ジェムジャパン）
-                | プロジェクトの一環として実施されました。
-                a(href='/doc/ja/datasets/gem_j_wga') [詳細]
-                a(href='/downloads/gem_j_wga') [ダウンロード]
+              | アレル頻度
+              ul
+                li
+                  | GRCh38：
+                  a(href='/downloads/release/current/grch38/frequency/vcf') VCF形式
+                  |
+                  | |
+                  |
+                  a(href='/downloads/release/current/grch38/frequency/tsv') タブ区切りテキスト
+                  |
+                  | (
+                  a(href='/downloads/release/current/grch38/frequency/tsv/README.txt') README
+                  | )
+                li
+                  | GRCh37：
+                  a(href='/downloads/release/current/grch37/frequency/vcf') VCF形式
+                  |
+                  | |
+                  |
+                  a(href='/downloads/release/current/grch37/frequency/tsv') タブ区切りテキスト
+                  |
+                  | (
+                  a(href='/downloads/release/current/grch37/frequency/tsv/README.txt') README
+                  | )
             li
-              a(href='/downloads/release/current')
-                | GEM-J WGA以外のバリアントの頻度情報 (JGA-NGS, JGA-SNP, ExAC, #{ GLOBALS.TOMMO_VERSION }KJPN, HGVD)(タブ区切りフォーマット)
-              p
-                a(href='/doc/ja/datasets/jga_ngs') JGA-NGS
-                | と
-                a(href='/doc/ja/datasets/jga_snp') JGA-SNP
-                | は、
-                a.hyper-text.-external(target='_blank', href='https://humandbs.biosciencedbc.jp/') NBDCヒトデータベース
-                |  /
-                |
-                a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index-e.html')
-                  | Japanese Genotype-phenotype Archive (JGA)
-                | に登録されている個人レベルのゲノムデータを集約した頻度データです。
-                a(href='/doc/ja/datasets') [詳細]
-                a(href='/downloads/release/current') [ダウンロード]
+              | アノテーション
+              ul
+                li
+                  | GRCh38：
+                  a(href='/downloads/release/current/grch38/annotation') タブ区切りテキスト
+                  |
+                  | (
+                  a(href='/downloads/release/current/grch38/annotation/README.txt') README
+                  | )
+                li
+                  | GRCh37：
+                  a(href='/downloads/release/current/grch37/annotation') タブ区切りテキスト
+                  |
+                  | (
+                  a(href='/downloads/release/current/grch37/annotation/README.txt') README
+                  | )
+            br
+            p
+            | 最終更新日：2023/11/9
+            br
+            | アレル頻度は、
+            |
+            a(href='/doc/ja/datasets/') データセット
+            | ごとに集計されました。
+        section.section
+          h3.sectiontitle
+            | 寄託者から提供されたオリジナルファイル（一部のデータセット）
+          ul
+            li
+              | GEM Japan Whole Genome Aggregation (GEM-J WGA) パネル
+              ul
+                li
+                  | アレル頻度
+                ul
+                  li
+                    | GRCh38 (liftover from GRCh37)：
+                    a(href='/downloads/gem_j_wga/grch38') VCF形式
+                  li
+                    | GRCh37：
+                    a(href='/downloads/gem_j_wga/grch37') VCF形式
+            p
+            | 最終更新日：2021/11/29
+            br
+            | データセットの詳細は、
+            a(href='/doc/ja/datasets/gem_j_wga') GEM-J WGAのページ
+            | をご覧ください。

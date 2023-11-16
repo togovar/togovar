@@ -71,7 +71,7 @@ module TogoVar
                   bool do
                     must do
                       range :start do
-                        send(gt_or_gte.to_sym, from - 1)
+                        send(gt_or_gte.to_sym, from)
                       end
                     end
                     must do
@@ -86,8 +86,8 @@ module TogoVar
                   bool do
                     should do
                       range :start do
-                        send(gt_or_gte.to_sym, from - 1)
-                        send(lt_or_lte.to_sym, to - 1)
+                        send(gt_or_gte.to_sym, from)
+                        send(lt_or_lte.to_sym, to)
                       end
                     end
                     should do
@@ -103,7 +103,7 @@ module TogoVar
                   bool do
                     must do
                       range :start do
-                        lte from - 1
+                        lte from
                       end
                     end
                     must do
@@ -128,7 +128,7 @@ module TogoVar
           def right_open_range(gt_or_gte, from)
             proc do
               range :stop do
-                send(gt_or_gte.to_sym, from - 1)
+                send(gt_or_gte.to_sym, from)
               end
             end
           end

@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  root to: 'application#index'
-
   namespace :api do
     match 'search/variant', via: %w[get post]
     match 'search/gene', via: %w[get post]
@@ -12,6 +10,6 @@ Rails.application.routes.draw do
   end
 
   # backward compatibility
-  get 'suggest', to: 'root#suggest'
+  get 'suggest', to: 'suggest#index'
   get 'search', to: 'api/search#variant'
 end

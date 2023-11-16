@@ -1,0 +1,25 @@
+@use '../../foundation/_variables.scss' as *;
+
+:host {
+  position: relative;
+  display: block;
+}
+
+.suggestions-container {
+  position: absolute;
+  top: 100%;
+  left: 14px;
+  display: flex;
+  z-index: $Z_INDEX_SUGGEST_VIEW;
+  color: $COLOR_BLACK;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  background-color: white;
+  max-width: 50%;
+  min-width: fit-content;
+  > .column {
+    + .column {
+      border-left: solid 1px $COLOR_SEPARATOR_SUB;
+    }
+  }
+}

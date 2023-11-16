@@ -17,7 +17,7 @@ module TogoVar
               PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
               SELECT DISTINCT (replace(str(?id), "http://identifiers.org/hgnc/HGNC:", "") AS ?id) ?symbol ?synonym
-              FROM <http://togovar.biosciencedbc.jp/graph/hgnc>
+              FROM <http://togovar.org/graph/hgnc>
               WHERE {
                 VALUES ?id { #{slice.map { |x| x.hgnc_id ? "hgnc:#{x.hgnc_id}" : nil }.compact.join(' ')} }
                 ?id rdfs:label ?symbol .

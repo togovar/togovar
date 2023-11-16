@@ -1,7 +1,11 @@
 import { LitElement, html, nothing } from 'lit';
 
 import './ConditionDiseaseSearchOntologyView.js';
-import './ConditionDiseaseSearchTextSearch.js';
+import '../Common/SearchField/SearchFieldWithSuggestions';
+
+import { API_URL } from '../../global';
+
+const suggestAPI = `${API_URL}/api/search/disease`;
 
 export class ConditionDiseaseSearch extends LitElement {
   _timer = null;
@@ -62,11 +66,21 @@ export class ConditionDiseaseSearch extends LitElement {
     }
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    this.setAttribute('id', 'ConditionDiseaseSearch');
+  }
+
   render() {
     return html`
-      <condition-disease-text-search
-        @new-suggestion-selected=${this._changeDiseaseEventHadnler}
-      ></condition-disease-text-search>
+      <search-field-with-suggestions
+        .suggestAPIURL=${suggestAPI}
+        .suggestAPIQueryParam="${'term'}"
+        .options="${{ valueMappings: { valueKey: 'id', labelKey: 'label' } }}"
+        placeholder="Breast-ovarian cancer, familial 2"
+        @new-suggestion-selected="${this._changeDiseaseEventHadnler}"
+      ></search-field-with-suggestions>
+
       <div class="container">
         ${this.loading
           ? html`<div class="loading">

@@ -34,10 +34,11 @@ class Flip extends AsyncDirective {
     if (
       this.role === 'hero' &&
       this.id !== this.heroId &&
+      this.id !== 'MONDO_0000001' &&
       this.id !== 'dummy'
     ) {
       // then remove the element from the DOM with animation
-      disconnectedRects.set(this.id, part.getBoundingClientRect());
+      disconnectedRects.set(this.id, part.element.getBoundingClientRect());
       this.remove();
     }
 

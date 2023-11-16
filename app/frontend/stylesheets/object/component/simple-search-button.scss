@@ -1,0 +1,41 @@
+@use '../../foundation/_variables.scss' as *;
+
+$SIZE: 30px;
+
+button {
+  display: block;
+  width: $SIZE;
+  height: $SIZE;
+  border: solid 1px $COLOR_KEY_DARK1;
+  border-radius: 100%;
+  margin-right: -4px;
+  position: relative;
+  background-color: white;
+  box-shadow: 0 1px 1px rgba(black, 0.2);
+  cursor: pointer;
+
+  &:before,
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    box-sizing: border-box;
+  }
+
+  &:before {
+    width: 12px;
+    height: 12px;
+    border: solid 2px $COLOR_KEY_DARK1;
+    border-radius: 6px;
+    top: 6px;
+    left: 6px;
+  }
+
+  &:after {
+    height: 5px;
+    border-left: solid 2px $COLOR_KEY_DARK1;
+    transform: rotate(-45deg);
+    top: 16px;
+    left: 17px;
+  }
+}

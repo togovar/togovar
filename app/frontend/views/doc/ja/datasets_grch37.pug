@@ -81,7 +81,7 @@ article.common-document
           | Japanese Genotype-phenotype Archive (JGA)
         |  /
         |
-        a.hyper-text.-external(target='_blank', href='https://www.biobank.amed.go.jp/itc/agd/index.html')
+        a.hyper-text.-external(target='_blank', href='https://gr-sharingdbs.biosciencedbc.jp/agd')
           | AMED Genome group sharing Database (AGD)
         br
         | ∗2：fastq/bam/celファイルやgenotype data一覧など
@@ -108,7 +108,7 @@ article.common-document
         tbody
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads')
+              a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads#v2')
                 | Genome Aggregation Database (gnomAD) exomes
             td._align-left WES
             td._align-left 複数
@@ -122,7 +122,7 @@ article.common-document
             td v2.1.1
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads')
+              a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads#v2')
                 | Genome Aggregation Database (gnomAD) genomes
             td._align-left WGS
             td._align-left 複数
@@ -155,8 +155,8 @@ article.common-document
               | (2017/08/02)
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/202001/downloads/#variant')
-                | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN Allele Frequency Panel(#{ GLOBALS.TOMMO_VERSION }KJPN)
+              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-8.3kjpn-20200831-af_snvindelall')
+                | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN-SNP/INDEL Allele Frequency Panel(#{ GLOBALS.TOMMO_VERSION }KJPN)
             td._align-left WGS
             td._align-left 日本人
             td._align-center ✔
@@ -168,9 +168,9 @@ article.common-document
               br
               | (79,359,228)
             td 東北メディカル・メガバンク機構
-            td v202109
+            td v20200831
       p.notice
-        | 注：#{ GLOBALS.TOMMO_VERSION }KJPNの内訳は、SNV (Autosome、chrX(PAR1+PAR2+XTR)、chrMT)とINDEL (Autosome、chrX(PAR1+PAR2+XTR))です。
+        | 注：#{ GLOBALS.TOMMO_VERSION }KJPNの内訳はSNV(Autosome、chrX(PAR1+PAR2+XTR)およびchrMT)ならびにINDEL(AutosomeおよびchrX(PAR1+PAR2+XTR))です。
     section.section
       h3.sectiontitle バリアント頻度以外のデータ
       table.table
@@ -183,7 +183,13 @@ article.common-document
         tbody
           tr
             td
-              a.hyper-text.-external(target='_blank', href='ftp://ftp.dbcls.jp/colil') Colil
+              a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/clinvar/') ClinVar
+            td 2023/09/11
+            td バリアントの臨床的意義
+            td NCBI
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://ftp.dbcls.jp/colil') Colil
             td APIで取得
             td 生命科学分野の文献間の引用関係の情報
             td DBCLS
@@ -196,30 +202,37 @@ article.common-document
             td GRC
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://www.ebi.ac.uk/gwas/')
+              a.hyper-text.-external(target='_blank', href='https://www.ebi.ac.uk/gwas/docs/file-downloads')
                 | GWAS Catalog
-            td 2022/09/16
+            td 2023/09/05
             td ゲノムワイド関連解析(GWAS)情報
             td NHGRI-EBI
           tr
             td
-              a.hyper-text.-external(target='_blank', href='ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/tsv/hgnc_complete_set.txt')
+              a.hyper-text.-external(target='_blank', href='https://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/hgnc_complete_set.txt')
                 | HGNC symbol report
-            td 2022/9/16
+            td 2023/09/05
             td 遺伝子シンボルや関連リソースの情報
             td HGNC
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/CBBresearch/Lu/Demo/LitVar/')
+              a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/research/litvar2/api')
                 | LitVar
             td APIで取得
             td バリアント名が出現する文献情報
             td NCBI
           tr
             td
+              a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pubmed/')
+                | PubMed
+            td 2023/09/01
+            td 文献情報
+            td NCBI
+          tr
+            td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/')
                 | PubTator Central
-            td 2022/9/20
+            td 2023/09/03
             td バリアント名が出現する文献情報
             td NCBI
           tr
@@ -230,7 +243,7 @@ article.common-document
             td DBCLS
       p.notice
         | 注：ClinVarはGRCh37上の位置が決定しているバリアントのみを含む
-        a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/') VCFファイル
+        a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/') VCFファイル
         | からデータを取得しています。
     section.section
       h3.sectiontitle データ加工に利用したツール
@@ -246,7 +259,7 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://samtools.github.io/bcftools/') bcftools
             td._align-center —
-            td Indelの正規化とmultiallelicバリアントのbiallelicバリアントへの分割
+            td multiallelicバリアントのbiallelicバリアントへの分割
             td Genome Research Ltd.
           tr
             td
@@ -259,7 +272,7 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/index.html')
                 | Variant Effect Predictor (VEP)
-            td Ensembl rel. 107
+            td Ensembl rel. 110
             td
               | バリアントに
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/script/vep_cache.html#cache_content')

@@ -10,7 +10,7 @@ import ModuleTabsView from '../javascripts/classes/ModuleTabsView.js';
 import TopPageLayoutManager from '../javascripts/classes/TopPageLayoutManager.js';
 import DownloadButton from './classes/DownloadButton.js';
 // Search
-import SimpleSearchView from './classes/SimpleSearchView.js';
+import SimpleSearchView from './components/Common/SearchField/SimpleSearchView.js';
 import AdvancedSearchBuilderView from '../javascripts/classes/AdvancedSearchBuilderView.js';
 // PanelViews
 // PanelViews: Filters
@@ -39,7 +39,7 @@ export function initHome() {
 
   new ActivityIndicator(document.getElementById('ActivityIndicator'));
 
-  StoreManager.readySearch(() => {
+  StoreManager.readyInitialSearch(() => {
     // 検索結果表示画面
     const resultView = new ResultsView(document.getElementById('ResultsView'));
 

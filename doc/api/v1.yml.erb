@@ -409,9 +409,10 @@ components:
                     - gene
                     - frequency
                     - consequence
+                    - condition
                     - sift
                     - polyphen
-                    - condition
+                    - alphamissense
 
           examples:
             Example1:
@@ -936,11 +937,11 @@ components:
           type: string
           description: >
             Available values
-             * `jga_ngs` - <a target="_blank" href="https://togovar.biosciencedbc.jp/doc/datasets/jga_ngs">Japanese Genotype-phenotype Archive (JGA)</a>
-             * `jga_snp` - <a target="_blank" href="https://togovar.biosciencedbc.jp/doc/datasets/jga_snp">SNP-chip data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA)</a>
+             * `jga_ngs` - <a target="_blank" href="https://togovar.org/doc/datasets/jga_ngs">Japanese Genotype-phenotype Archive (JGA)</a>
+             * `jga_snp` - <a target="_blank" href="https://togovar.org/doc/datasets/jga_snp">SNP-chip data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA)</a>
              * `hgvd` - <a target="_blank" href="http://www.hgvd.genome.med.kyoto-u.ac.jp">Human Genetic Variation Database (HGVD)</a>
              * `tommo` - <a target="_blank" href="https://jmorp.megabank.tohoku.ac.jp/202001/">ToMMo 8.3KJPN Allele Frequency Panel</a>
-             * `gem_j_wga` - <a target="_blank" href="https://togovar.biosciencedbc.jp/doc/datasets/gem_j_wga">GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel</a>
+             * `gem_j_wga` - <a target="_blank" href="https://togovar.org/doc/datasets/gem_j_wga">GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel</a>
              * `gnomad_genomes` - <a target="_blank" href="https://gnomad.broadinstitute.org">The Genome Aggregation Database (gnomAD Genomes)</a>
              * `gnomad_exomes` - <a target="_blank" href="https://gnomad.broadinstitute.org">The Genome Aggregation Database (gnomAD Exomes)</a>
           enum:
@@ -1250,13 +1251,15 @@ components:
                   type: string
               chromosome:
                 type: string
-              position:
+              position<%= "_#{ENV.fetch('TOGOVAR_REFERENCE').downcase}" %>>:
                 type: integer
               reference:
                 type: string
-              alternative:
+              alternate:
                 type: string
-              symbol:
+              type:
+                type: string
+              gene:
                 type: object
                 properties:
                   name:
@@ -1267,21 +1270,25 @@ components:
                     type: array
                     items:
                       type: string
-              transcript_id:
-                type: array
-                items:
-                  type: string
               consequence:
                 type: array
                 items:
                   type: string
-              sift_prediction:
+              condition:
+                type: array
+                items:
+                  type: object
+              sift_qualitative_prediction:
                 type: string
-              sift_value:
+              sift_score:
                 type: number
-              polyphen2_prediction:
+              polyphen2_qualitative_prediction:
                 type: string
-              polyphen_value:
+              polyphen_score:
+                type: number
+              alphamissense_pathogenicity:
+                type: string
+              alphamissense_score:
                 type: number
               jga_ngs_allele_alt:
                 type: number
@@ -1339,7 +1346,17 @@ components:
                 type: array
                 items:
                   type: string
-<% if ENV['TOGOVAR_FRONTEND_REFERENCE'] == 'GRCh37' %>
+              gnomad_genomes_allele_alt:
+                type: number
+              gnomad_genomes_allele_total:
+                type: number
+              gnomad_genomes_alt_allele_freq:
+                type: number
+              gnomad_genomes_qc_status:
+                type: array
+                items:
+                  type: string
+<% if ENV['TOGOVAR_REFERENCE'] == 'GRCh37' %>
               gnomad_exomes_allele_alt:
                 type: number
               gnomad_exomes_allele_total:
@@ -1351,16 +1368,6 @@ components:
                 items:
                   type: string
 <% end %>
-              gnomad_genomes_allele_alt:
-                type: number
-              gnomad_genomes_allele_total:
-                type: number
-              gnomad_genomes_alt_allele_freq:
-                type: number
-              gnomad_genomes_qc_status:
-                type: array
-                items:
-                  type: string
 
     SearchGene:
       type: array

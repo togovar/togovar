@@ -3,6 +3,12 @@ module ElasticsearchIndex
     extend ActiveSupport::Concern
 
     module ClassMethods
+      def create_index_body(pretty: false)
+        hash = { settings: settings.to_hash, mappings: mappings.to_hash }
+
+        pretty ? JSON.pretty_generate(hash) : hash.to_json
+      end
+
       # @return [Integer] number of total records
       def count(arguments = {})
         arguments.merge!(index: index_name)

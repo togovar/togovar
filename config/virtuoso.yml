@@ -4,7 +4,7 @@ defaults: &defaults
   port: 1111
   user: dba
   password:
-  base_url: <%= ENV.fetch('RDF_BASE_URI') { 'http://togovar.biosciencedbc.jp' } %>
+  base_url: <%= ENV.fetch('RDF_BASE_URI') { 'http://togovar.org' } %>
   load_dir: <%= "#{ENV.fetch('LOAD_DIR') { '/' }}load" %>
 
 development:

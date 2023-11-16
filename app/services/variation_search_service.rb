@@ -14,6 +14,10 @@ class VariationSearchService
 
     @debug = {}
     @errors = {}
+
+    if @params[:body] && @params[:offset]&.respond_to?(:to_i)
+      @params[:body][:offset] = @params[:offset].to_i
+    end
   end
 
   # @return [Hash]

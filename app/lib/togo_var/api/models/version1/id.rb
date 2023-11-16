@@ -12,7 +12,7 @@ module TogoVar
           def initialize(*args)
             super
 
-            @id = @args.first
+            @id = Array(@args).flatten
           end
 
           def to_hash

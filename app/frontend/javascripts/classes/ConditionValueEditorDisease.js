@@ -3,8 +3,11 @@ import ConditionValueEditor from './ConditionValueEditor.js';
 import { ConditionDiseaseSearch } from '../components/ConditionDiseaseSearch/ConditionDiseaseSearch.js';
 
 export default class ConditionValueEditorDisease extends ConditionValueEditor {
-  constructor(valuesView, conditionType) {
-    super(valuesView, conditionType);
+  /**
+   * @param {ConditionValues} valuesView
+   * @param {ConditionItemView} conditionView */
+  constructor(valuesView, conditionView) {
+    super(valuesView, conditionView);
 
     this._data = { id: null, label: null };
 
@@ -12,7 +15,7 @@ export default class ConditionValueEditorDisease extends ConditionValueEditor {
     this._createElement(
       'disease-editor-view',
       `
-    <header>Select ${conditionType}</header>
+    <header>Select ${this._conditionType}</header>
     <div class="body"></div>
     `
     );

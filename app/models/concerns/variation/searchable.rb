@@ -10,29 +10,15 @@ class Variation
 
       settings = {
         index: {
-          number_of_shards: ENV.fetch('TOGOVAR_INDEX_VARIATION_NUMBER_OF_SHARDS') { 1 },
-          number_of_replicas: ENV.fetch('TOGOVAR_INDEX_VARIATION_NUMBER_OF_REPLICAS') { 0 }
-        },
-        analysis: {
-          analyzer: {
-            search_analyzer: {
-              type: :custom,
-              tokenizer: :standard,
-              filter: %i[lowercase]
-            }
-          },
-          normalizer: {
-            lowercase: {
-              type: :custom,
-              filter: :lowercase
-            }
-          }
+          number_of_shards: (ENV.fetch('TOGOVAR_INDEX_VARIANT_NUMBER_OF_SHARDS') { 1 }).to_i,
+          number_of_replicas: (ENV.fetch('TOGOVAR_INDEX_VARIANT_NUMBER_OF_REPLICAS') { 0 }).to_i
         }
       }
 
       settings settings do
         mapping dynamic: :strict do
           indexes :id, type: :long
+          indexes :active, type: :boolean
           indexes :type, type: :keyword
           indexes :chromosome do
             indexes :index, type: :integer
@@ -67,6 +53,7 @@ class Variation
             indexes :hgvs_g, type: :keyword
             indexes :sift, type: :float
             indexes :polyphen, type: :float
+            indexes :alpha_missense, type: :float # TODO: rename to alphamissense
           end
           indexes :clinvar do
             indexes :variation_id, type: :long
@@ -74,15 +61,6 @@ class Variation
             indexes :conditions, type: :nested do
               indexes :medgen, type: :keyword
               indexes :interpretation, type: :keyword
-              indexes :condition, {
-                type: :text,
-                analyzer: :search_analyzer,
-                fields: {
-                  raw: {
-                    type: :keyword
-                  }
-                }
-              }
             end
           end
           indexes :frequency, type: :nested do
@@ -154,6 +132,26 @@ class Variation
                          .map { |k, v| [k, v.key?('value') ? v['value'] : v[k]['value']] }
                          .to_h
                          .symbolize_keys
+      end
+
+      def default_condition
+        Elasticsearch::DSL::Search.search do
+          query do
+            bool do
+              should do
+                exists field: :clinvar
+              end
+              should do
+                nested do
+                  path 'frequency'
+                  query do
+                    exists field: :frequency
+                  end
+                end
+              end
+            end
+          end
+        end.to_hash[:query]
       end
     end
   end

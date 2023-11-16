@@ -26,7 +26,7 @@ module Queryable
         begin
           result = Rails.cache.fetch(digest, expires_in: 1.month) do
             options = DEFAULT_OPTIONS.merge(options.slice(*ACCEPTABLE_KEYS))
-            client  = SPARQL::Client.new(ep, options)
+            client  = SPARQL::Client.new(ep, **options)
             client.query(sparql, content_type: SPARQL::Client::RESULT_JSON)
           end
         rescue StandardError => se

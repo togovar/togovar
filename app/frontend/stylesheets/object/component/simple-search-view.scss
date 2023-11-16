@@ -1,0 +1,9 @@
+.simple-search-container {
+  display: flex;
+  gap: 0.2rem;
+  align-items: center;
+
+  > search-field-with-suggestions {
+    flex: 1;
+  }
+}

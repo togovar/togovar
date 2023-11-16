@@ -373,11 +373,7 @@ module Elasticsearch
     private
 
     def default_condition
-      Elasticsearch::DSL::Search.search do
-        query do
-          exists field: :type
-        end
-      end.to_hash[:query]
+      Variation.default_condition
     end
 
     def aggregations
@@ -490,22 +486,22 @@ module Elasticsearch
                     bool do
                       should do
                         bool do
-                          must { range(:start) { lte start.to_i - 1 } }
+                          must { range(:start) { lte start.to_i } }
                           must { range(:stop) { gte stop.to_i } }
                         end
                       end
                       should do
                         bool do
-                          must { range(:start) { gte start.to_i - 1 } }
-                          must { range(:stop) { lt stop.to_i } }
+                          must { range(:start) { gte start.to_i } }
+                          must { range(:stop) { lte stop.to_i } }
                         end
                       end
                       should do
                         bool do
-                          must { range(:start) { lt start.to_i - 1 } }
+                          must { range(:start) { lte start.to_i } }
                           must do
                             range(:stop) do
-                              gt start.to_i - 1
+                              gte start.to_i
                               lte stop.to_i
                             end
                           end
@@ -515,8 +511,8 @@ module Elasticsearch
                         bool do
                           must do
                             range(:start) do
-                              gte start.to_i - 1
-                              lt stop.to_i
+                              gte start.to_i
+                              lte stop.to_i
                             end
                           end
                           must { range(:stop) { gt start.to_i } }

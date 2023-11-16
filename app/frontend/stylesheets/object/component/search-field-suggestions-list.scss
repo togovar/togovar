@@ -1,0 +1,63 @@
+@use '../../foundation/_variables.scss' as *;
+
+.title {
+  color: $COLOR_KEY_DARK1;
+  font-size: 12px;
+  font-weight: normal;
+  line-height: 16px;
+  margin: 4px 0 0;
+  padding: 5px $PADDING_SIDE 0;
+  &:first-letter {
+    text-transform: capitalize;
+  }
+}
+
+.list {
+  margin: 10px 0;
+  padding-left: 0;
+  list-style: none;
+  overflow-y: scroll;
+  max-height: 300px;
+
+  > .item {
+    cursor: pointer;
+    padding: 0 $PADDING_SIDE;
+    height: 24px;
+    line-height: 24px;
+    transition: background-color $GUI_DURATION;
+    > em {
+      background-color: var(--color-suggest);
+      font-style: normal;
+    }
+
+    &:first-child {
+      padding-top: 4px;
+    }
+
+    &:hover {
+      background-color: rgba($COLOR_SELECTED, 0.2);
+    }
+
+    &.-disabled {
+      cursor: auto;
+      &:hover {
+        background-color: inherit;
+      }
+    }
+    > .sub {
+      padding-left: 0.5em;
+      color: rgba($COLOR_BLACK, 0.5);
+      font-size: 12px;
+    }
+
+    &.-selected {
+      background-color: rgba($COLOR_SELECTED, 1);
+    }
+
+    &.-empty {
+      padding: 0.5rem;
+      text-align: center;
+      color: rgba($COLOR_BLACK, 0.5);
+    }
+  }
+}
