@@ -80,6 +80,10 @@ export function initHome() {
       document.getElementById('FilterPolyPhen'),
       'polyphen'
     );
+    new PanelViewCheckList(
+      document.getElementById('FilterAlphaMissense'),
+      'alpha_missense'
+    );
     // aside 要素の準備（バリアントプレビュー）
     new PanelViewPreviewGene(document.getElementById('PreviewGene'));
     new PreviewToVariantReport(

@@ -44,6 +44,11 @@
     "url": "/doc/help#d6"
   },
   {
+    "id": "table-header-alpha_missense",
+    "content": "AlphaMissense",
+    "url": "/doc/help#d6"
+  },
+  {
     "id": "table-header-clinical_significance",
     "content": "Clinical significance provided by ClinVar",
     "url": "/doc/help#d7"
