@@ -3,16 +3,20 @@ export const TR_HEIGHT = 27;
 export const COMMON_HEADER_HEIGHT = 30;
 export const COMMON_FOOTER_HEIGHT = 22;
 export const API_URL = TOGOVAR_FRONTEND_API_URL || 'https://togovar.org';
-export const ADVANCED_CONDITIONS = Object.freeze(((reference) => {
-  switch (reference) {
-    case 'GRCh37':
-      return (require('../assets/GRCh37/advanced_search_conditions.json')).conditions;
-    case 'GRCh38':
-      return (require('../assets/GRCh38/advanced_search_conditions.json')).conditions;
-    default:
-      return [];
-  }
-})(TOGOVAR_FRONTEND_REFERENCE));
+export const ADVANCED_CONDITIONS = Object.freeze(
+  ((reference) => {
+    switch (reference) {
+      case 'GRCh37':
+        return require('../assets/GRCh37/advanced_search_conditions.json')
+          .conditions;
+      case 'GRCh38':
+        return require('../assets/GRCh38/advanced_search_conditions.json')
+          .conditions;
+      default:
+        return [];
+    }
+  })(TOGOVAR_FRONTEND_REFERENCE)
+);
 
 export const COLUMNS = [
   { label: 'TogoVar ID', id: 'togovar_id' },
@@ -25,6 +29,7 @@ export const COLUMNS = [
   { label: 'Consequence', id: 'consequence' },
   { label: 'SIFT', id: 'sift' },
   { label: 'PolyPhen', id: 'polyphen' },
+  { label: 'AlphaMissense', id: 'alpha_missense' },
   { label: 'Clinical significance', id: 'clinical_significance' },
 ];
 

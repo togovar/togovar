@@ -614,5 +614,30 @@
         "default": "1"
       }
     ]
+  },
+  {
+    "id": "alpha_missense",
+    "label": "AlphaMissense",
+    "type": "array",
+    "items": [
+      {
+        "id": "LP",
+        "label": "Likely pathogenic",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "AMBIGUOUS",
+        "label": "Ambiguous",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "LB",
+        "label": "Likely benign",
+        "type": "boolean",
+        "default": "1"
+      }
+    ]
   }
 ]

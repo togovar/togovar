@@ -1,6 +1,6 @@
 import { COLUMNS } from '../global.js';
 import StoreManager from './StoreManager.js';
-import LogarithmizedBlockGraphFrequencyView from '../components/LogarithmizedBlockGraphFrequencyView';
+// import LogarithmizedBlockGraphFrequencyView from '../components/LogarithmizedBlockGraphFrequencyView';
 
 const REF_ALT_SHOW_LENGTH = 4;
 
@@ -94,6 +94,10 @@ export default class ResultsRowView {
           html +=
             '<td class="polyphen" data-remains=""><div class="variant-function" data-function=""></div></td>';
           break;
+        case 'alpha_missense': // AlphaMissense
+          html +=
+            '<td class="alpha_missense" data-remains=""><div class="variant-function" data-function=""></div></td>';
+          break;
         case 'clinical_significance': // clinical significance
           html +=
             '<td class="clinical_significance" data-remains=""><!--<div class="dataset-icon -none" data-dataset="mgend"></div>--><div href="" class="clinical-significance" data-sign=""></div><a class="hyper-text -internal" target="_blank"></a></td>';
@@ -121,14 +125,22 @@ export default class ResultsRowView {
         'td.alt_frequency > logarithmized-block-graph-frequency-view'
       )
       .forEach((elm) => (this.tdFrequencies[elm.dataset.dataset] = elm));
+    // Consequence
     this.tdConsequence = this.tr.querySelector('td.consequence');
     this.tdConsequenceItem =
       this.tdConsequence.querySelector('.consequence-item');
+    // SIFT
     this.tdSift = this.tr.querySelector('td.sift');
     this.tdSiftFunction = this.tdSift.querySelector('.variant-function');
+    // PolyPhen
     this.tdPolyphen = this.tr.querySelector('td.polyphen');
     this.tdPolyphenFunction =
       this.tdPolyphen.querySelector('.variant-function');
+    // AlphaMissense
+    this.tdAlphaMissense = this.tr.querySelector('td.alpha_missense');
+    this.tdAlphaMissenseFunction =
+    this.tdAlphaMissense.querySelector('.variant-function');
+    // Clinical significance
     this.tdClinical = this.tr.querySelector('td.clinical_significance');
     this.tdClinicalSign = this.tdClinical.querySelector(
       '.clinical-significance'
@@ -317,6 +329,32 @@ export default class ResultsRowView {
             }
           }
           break;
+          case 'alpha_missense':
+            {
+              const alphaMissenses = result.transcripts?.filter((x) =>
+                Number.isFinite(x.alpha_missense)
+              );
+              if (alphaMissenses && alphaMissenses.length > 0) {
+                this.tdAlphaMissense.dataset.remains = alphaMissenses.length - 1;
+                this.tdAlphaMissenseFunction.textContent = result.alphamissense;
+                switch (true) {
+                  case result.alphamissense < 0.34:
+                    this.tdAlphaMissenseFunction.dataset.function = 'LB';
+                    break;
+                  case result.alphamissense > 0.564:
+                    this.tdAlphaMissenseFunction.dataset.function = 'LP';
+                    break;
+                  default:
+                    this.tdAlphaMissenseFunction.dataset.function = 'AMBIGUOUS';
+                    break;
+                }
+              } else {
+                this.tdAlphaMissense.dataset.remains = 0;
+                this.tdAlphaMissenseFunction.textContent = '';
+                this.tdAlphaMissenseFunction.dataset.function = '';
+              }
+            }
+            break;
         case 'clinical_significance':
           {
             if (result.significance && result.significance.length) {
@@ -325,10 +363,7 @@ export default class ResultsRowView {
                 result.significance[0].interpretations[0];
               this.tdClinicalAnchor.textContent =
                 result.significance[0].condition;
-              this.tdClinicalAnchor.setAttribute(
-                'href',
-                `/disease/${result.significance[0].medgen}`
-              );
+              this.tdClinicalAnchor.setAttribute('href', `/disease/${result.significance[0].medgen}`);
             } else {
               this.tdClinical.dataset.remains = 0;
               this.tdClinicalSign.dataset.sign = '';
