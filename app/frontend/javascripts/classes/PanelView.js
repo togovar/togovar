@@ -14,7 +14,7 @@
 class PanelView {
   /**
    * @param {Element} elm - Panel element section.panel-view
-   * @param {string} kind - Panel name (dataset, ferequency, quality, type, significance, consequence, shift, polyphen, alpha_missense) */
+   * @param {string} kind - Panel id (dataset, ferequency, quality, type, significance, consequence, shift, polyphen, alpha_missense) */
   constructor(elm, kind) {
     this.elm = elm;
     this.kind = kind;
