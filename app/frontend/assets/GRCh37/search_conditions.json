@@ -585,7 +585,7 @@
       },
       {
         "id": "T",
-        "label": "tolerated",
+        "label": "Tolerated",
         "type": "boolean",
         "default": "1"
       }
