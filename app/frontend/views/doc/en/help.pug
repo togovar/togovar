@@ -51,11 +51,11 @@ block content
                 li.item.-question
                   a.link(href='#d5') How do you calculate the Consequence value?
                 li.item.-question
-                  a.link(href='#d6') What are SIFT and PolyPhen?
+                  a.link(href='#d6') What are SIFT, PolyPhen and AlphaMissense?
                 li.item.-question
                   a.link(href='#d7') How do you calculate the value of Clinical significance?
                 li.item.-question
-                  a.link(href='#d8')  Was a liftover tool used for generating variant data?
+                  a.link(href='#d8') Was a liftover tool used for generating variant data?
             li.category
               h3.categorytitle About the TogoVar search system
               ul.categorylist
@@ -196,15 +196,19 @@ block content
                 |  is displayed. If there are multiple transcripts for a single variant, only the most critical
                 | consequence may be displayed.
           #d6.question-answer
-            h4.question What are SIFT and PolyPhen?
+            h4.question What are SIFT, Polyphen and AlphaMissense?
             .answer
               p
-                | Both SIFT and PolyPhen are scores which indicate the predicted effects on the protein function when an
+                | SIFT, PolyPhen and AlphaMissense are scores which indicate the predicted effects on the protein function when an
                 | amino acid sequence undergoes alteration due to a variant. Values calculated through
                 |
                 a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html')
                   | Variant Effect Predictor (VEP)
-                |  are displayed. The meaning of each icon is as follows.
+                | are displayed. For AlphaMissense, please see
+                |
+                a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/docs/tools/vep/script/vep_plugins.html#alphamissense')
+                  | VEP Plugins.
+                | The following icons indicate the threshold scores for qualitative predictions.
               ul.unordered-list._margin-bottom._align-left
                 li
                   strong SIFT
@@ -237,10 +241,10 @@ block content
                     .variant-function._width_5em._align-center(data-function='LP') &gt; 0.564
                     span._margin-left Likely pathogenic
                   div
-                    .variant-function._width_5em._align-center(data-function='AMBIGUOUS') &nbsp;
+                    .variant-function._width_5em._align-center(data-function='AMBIGUOUS') &ge; 0.340
                     span._margin-left Ambiguous
                   div
-                    .variant-function._width_5em._align-center(data-function='LB') &lt; 0.34
+                    .variant-function._width_5em._align-center(data-function='LB') &lt; 0.340
                     span._margin-left Likely benign
           #d7.question-answer
             h4.question How do you calculate the value of Clinical significance?
