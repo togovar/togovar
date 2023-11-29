@@ -317,6 +317,42 @@ module Elasticsearch
       self
     end
 
+    def alphamissense(*values)
+      @alphamissense_condition = nil
+
+      values &= [:LB, :A, :LP]
+
+      return self if values.empty?
+
+      @alphamissense_condition = Elasticsearch::DSL::Search.search do
+        query do
+          nested do
+            path :vep
+            query do
+              bool do
+                values.each do |x|
+                  should do
+                    range 'vep.alpha_missense' do
+                      if x == :LP
+                        gt 0.564
+                      elsif x == :A
+                        gte 0.34
+                        lte 0.564
+                      elsif x == :LB
+                        lt 0.34
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end.to_hash[:query]
+
+      self
+    end
+
     def limit(size)
       @size = size
       self
@@ -350,6 +386,7 @@ module Elasticsearch
       conditions << @consequence_condition
       conditions << @sift_condition
       conditions << @polyphen_condition
+      conditions << @alphamissense_condition
 
       conditions.compact!
 

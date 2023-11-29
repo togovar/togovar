@@ -5,7 +5,7 @@ module API
     include Executable
 
     module BackwardCompatibility
-      FILTER_PARAMETERS = %w[term quality stat dataset frequency type significance consequence sift polyphen].freeze
+      FILTER_PARAMETERS = %w[term quality stat dataset frequency type significance consequence sift polyphen alphamissense].freeze
       private_constant :FILTER_PARAMETERS
 
       def variant_params
@@ -13,7 +13,7 @@ module API
 
         @variant_params ||= params.permit :term, :quality, :limit, :offset, :stat, :debug,
                                           dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {},
-                                          sift: {}, polyphen: {}
+                                          sift: {}, polyphen: {}, alphamissense: {}
       end
 
       # @return [Array] [result, status]

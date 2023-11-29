@@ -57,7 +57,7 @@ class VariationSearchService
       @param ||= Form::VariantSearchParameters.new(@params)
     end
 
-    BINARY_FILTERS = %i[dataset type significance consequence sift polyphen].freeze
+    BINARY_FILTERS = %i[dataset type significance consequence sift polyphen alphamissense].freeze
 
     def builder
       @builder ||= begin
@@ -86,7 +86,7 @@ class VariationSearchService
 
                        builder.quality(param.selected_items(:dataset)) if param.quality == '1'
 
-                       %i[type significance consequence sift polyphen].each do |x|
+                       %i[type significance consequence sift polyphen alphamissense].each do |x|
                          unless param.selected_all?(x)
                            builder.send(x, *param.selected_items(x))
                          end
