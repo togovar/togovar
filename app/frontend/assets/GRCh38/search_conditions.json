@@ -229,7 +229,7 @@
       },
       {
         "id": "AN",
-        "label": "Association_not found",
+        "label": "Association not found",
         "type": "boolean",
         "default": "1"
       }
