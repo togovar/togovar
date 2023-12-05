@@ -73,8 +73,8 @@ class VariationSearchService
           json.set! 'NC', c
         end
         Array(@result[:aggs].dig(:conditions, :interpretations, :buckets)).each do |x|
-          if (s = Form::ClinicalSignificance[x[:key].tr(' ', '_').to_sym])
-            json.set! s.param_name, x[:doc_count]
+          if (s = ClinicalSignificance.find_by_id(x[:key].tr(',', '').tr(' ', '_')))
+            json.set! s.key, x[:doc_count]
           end
         end
       end
@@ -138,12 +138,23 @@ class VariationSearchService
         significance = Array(variation.dig(:clinvar, :conditions)).map do |x|
           {
             condition: conditions[x[:medgen]],
-            interpretations: Array(x[:interpretation]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(' ', '_').to_sym)&.key },
-            medgen: x[:medgen]
+            interpretations: Array(x[:interpretation]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(',', '').tr(' ', '_').to_sym)&.key },
+            medgen: x[:medgen],
+            submission_count: x[:submission_count]
           }
         end
 
         if significance.present?
+          significance.sort! do |a, b|
+            comp = ClinicalSignificance.find_by_key(a.dig(:interpretations, 0))&.index <=> ClinicalSignificance.find_by_key(b.dig(:interpretations, 0))&.index
+            next comp unless comp.zero?
+
+            comp = b[:submission_count] <=> a[:submission_count]
+            next comp unless comp.zero?
+
+            a[:condition] <=> b[:condition]
+          end
+
           json.significance significance
         end
 

@@ -10,7 +10,7 @@ require_relative 'sift'
 require_relative 'type'
 
 module Form
-  # see doc/spec_for_search_query.md
+  # TODO: refactor Form module
   class VariantSearchParameters
     attr_writer :term
     attr_reader :dataset

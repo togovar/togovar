@@ -214,7 +214,7 @@ module Elasticsearch
               end
             end
 
-            if (interpretations = values.filter_map { |x| Form::ClinicalSignificance.find_by_param_name(x)&.label&.downcase }).present?
+            if (interpretations = values.filter_map { |x| ClinicalSignificance.find_by_key(x)&.label&.downcase }).present?
               should do
                 nested do
                   path 'clinvar.conditions'
