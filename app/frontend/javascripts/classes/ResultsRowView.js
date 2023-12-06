@@ -156,7 +156,6 @@ export default class ResultsRowView {
     }
     // レコード取得
     const result = StoreManager.getRecordByIndex(this.index);
-    // console.log(this, result);
     if (result === 'loading') {
       this.tr.classList.add('-loading');
       this.tr.classList.remove('-out-of-range');

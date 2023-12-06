@@ -1,7 +1,9 @@
 import ConditionView from './ConditionView.js';
 import ConditionValues from './ConditionValues.js';
+import StoreManager from "./StoreManager.js";
 import { ADVANCED_CONDITIONS } from '../global.js';
 import { CONDITION_TYPE, CONDITION_ITEM_TYPE } from '../definition.js';
+import { keyDownEvent } from '../utils/KeyDownEvent.js';
 
 /** Class for editing and deleting conditions
  * Create an instance with {@link ConditionGroupView}
@@ -77,6 +79,9 @@ class ConditionItemView extends ConditionView {
         this._elm.dataset.relation = { eq: 'ne', ne: 'eq' }[
           this._elm.dataset.relation
         ];
+        if (!StoreManager.getData('showModal')) {
+          this._builder.changeCondition();
+        }
       });
     //  Edit and delete button settings
     for (const button of summary.querySelectorAll(
@@ -88,6 +93,7 @@ class ConditionItemView extends ConditionView {
           case 'edit':
             this._elm.classList.add('-editing');
             this._conditionValues.startToEditCondition();
+            StoreManager.setData('showModal', true)
             window.addEventListener('keydown', this.#keydownEscapeEvent);
             break;
           case 'delete':
@@ -111,6 +117,8 @@ class ConditionItemView extends ConditionView {
     this._elm.classList.remove('-editing');
     this._isFirstTime = false;
     this._builder.changeCondition();
+    StoreManager.setData('showModal', false);
+    window.removeEventListener('keydown', this.#keydownEscapeEvent);
   }
 
   /**
@@ -118,6 +126,8 @@ class ConditionItemView extends ConditionView {
   remove() {
     delete this._conditionValues;
     super.remove();
+    StoreManager.setData('showModal', false);
+    window.removeEventListener('keydown', this.#keydownEscapeEvent);
   }
 
   // private methods
@@ -126,17 +136,18 @@ class ConditionItemView extends ConditionView {
   /** Exit the edit screen with esckey. remove() for the first time, doneEditing() for editing
    * @private */
   #keydownEscape(e) {
-    if (e.key !== 'Escape' || !this._conditionValues) return;
+    if (e.key !== 'Escape' || !this._conditionValues || !StoreManager.getData('showModal')) return;
 
-    if (this._isFirstTime) {
-      this.remove();
-    } else {
-      for (const editor of this._conditionValues.editors) {
-        editor.restore();
+    if (keyDownEvent("showModal")) {
+      if (this._isFirstTime) {
+        this.remove();
+      } else {
+        for (const editor of this._conditionValues.editors) {
+          editor.restore();
+        }
+        this.doneEditing();
       }
-      this.doneEditing();
     }
-    window.removeEventListener('keydown', this.#keydownEscapeEvent);
   }
 
   // accessor
@@ -199,7 +210,7 @@ class ConditionItemView extends ConditionView {
       }
 
       case CONDITION_TYPE.gene_symbol: {
-        const queryId = valueElements[0].value;
+        const queryId = valueElements[0]?.value;
         return {
           gene: {
             relation: this._elm.dataset.relation,
