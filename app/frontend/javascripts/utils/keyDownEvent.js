@@ -3,13 +3,13 @@ import StoreManager from '../classes/StoreManager.js';
 export function keyDownEvent(storeName) {
   switch (storeName) {
     case 'showModal':
-      if (StoreManager.getData('showSuggest')) {
+      if (!StoreManager.getData('showSuggest')) {
         return true;
       }
-      return false;
+    return false;
 
     case 'selectedRow':
-      if (StoreManager.getData('showModal')) {
+      if (!StoreManager.getData('showModal')) {
         return true;
       }
       return false;
