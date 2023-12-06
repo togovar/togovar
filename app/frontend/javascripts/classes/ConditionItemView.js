@@ -27,6 +27,8 @@ class ConditionItemView extends ConditionView {
     this._conditionType = conditionType;
     /** @property {boolean} _isFirstTime - whether this is the first time to edit. (Relates to whether the element is deleted with the cancel button) */
     this._isFirstTime = true;
+     /** @property {boolean} _keepLastRelation - Save equal and negative conditions for canceling */
+    this._keepLastRelation = "eq"
 
     // make HTML
     this._elm.classList.add('advanced-search-condition-item-view');
@@ -80,6 +82,7 @@ class ConditionItemView extends ConditionView {
           this._elm.dataset.relation
         ];
         if (!StoreManager.getData('showModal')) {
+          this._keepLastRelation = this._elm.dataset.relation
           this._builder.changeCondition();
         }
       });
@@ -144,6 +147,7 @@ class ConditionItemView extends ConditionView {
       } else {
         for (const editor of this._conditionValues.editors) {
           editor.restore();
+          this._elm.dataset.relation = this._keepLastRelation
         }
         this.doneEditing();
       }
@@ -172,6 +176,11 @@ class ConditionItemView extends ConditionView {
   /** @type {boolean} */
   get isFirstTime() {
     return this._isFirstTime;
+  }
+
+  /** @type {string} */
+  get keepLastRelation() {
+    return this._keepLastRelation;
   }
 
   /** Create each advanced search query

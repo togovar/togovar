@@ -1,6 +1,6 @@
 // import {ADVANCED_CONDITIONS} from '../global.js';
 
-export default class ConditionItemView {
+export default class ConditionView {
   /**
    * @param {Number} type - what number???
    * @param {AdvancedSearchBuilderView} builder - Static Object(_container, _elm, _rootGroup, _selection, _toolbar)
