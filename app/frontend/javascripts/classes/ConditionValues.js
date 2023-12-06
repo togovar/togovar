@@ -143,6 +143,7 @@ class ConditionValues {
       // otherwise, revert to the previous state
       for (const editor of this._editors) {
         editor.restore();
+        this._conditionView._elm.dataset.relation = this._conditionView.keepLastRelation
       }
       this._conditionView.doneEditing();
     }
