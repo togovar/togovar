@@ -14,20 +14,22 @@ export default class Configuration {
     }
   }
 
-  open() {
-    this.elm.classList.add('-shown');
-    $(document).on('keyup.conf', this.typeEscape.bind(this));
-  }
-
   typeEscape(e) {
     if (e.key === 'Escape') {
       this.close();
     }
   }
 
+  open() {
+    this.elm.classList.add('-shown');
+    StoreManager.setData('showModal', true)
+    document.addEventListener('keyup', this.typeEscape.bind(this));
+  }
+
   close() {
     this.elm.classList.remove('-shown');
-    $(document).off('keyup.conf');
+    StoreManager.setData('showModal', false)
+    document.removeEventListener('keyup', this.typeEscape.bind(this));
   }
 
   // initialize
