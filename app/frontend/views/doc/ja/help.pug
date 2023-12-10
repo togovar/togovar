@@ -157,13 +157,10 @@ block content
             h4.question SIFT、PolyPhen、AlphaMissenseとは何ですか。
             .answer
               p
-                | バリアントによってアミノ酸配列が変化する場合、それがタンパク質の機能に与える影響を予測したものです。
+                | SIFT、PolyPhenおよびAlphaMissenseはアミノ酸配列が変更された際のタンパク質の機能への影響を予測します。これらのプログラムは
                 a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html')
                   | Variant Effect Predictor (VEP)
-                | で計算した値を表示しています。AlphaMissenseについては、
-                a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/docs/tools/vep/script/vep_plugins.html#alphamissense')
-                  | VEP Plugins
-                | を参照ください。以下のアイコンは定性的予測値に対するスコアの閾値を示しています。
+                | を使用して計算しました。以下のアイコンは定性的予測に使用される閾値スコアを表しています。
               ul.unordered-list._margin-bottom._align-left
                 li
                   strong SIFT
@@ -174,6 +171,10 @@ block content
                   div
                     .variant-function._width_5em._align-center(data-function='T') &ge; 0.05
                     span._margin-left Tolerated
+                  span このスコアはアミノ酸の置換が許容される確率を正規化して示したものです。スコアがゼロに近い場合、その置換が有害である可能性が高いと考えられます。このスコアに基づいて定性的な予測が行われます。
+                    | 0.05未満のスコアを持つ置換は「有害 (Deleterious)」と分類され、それ以外のスコアは「容認 (Tolerated)」とされます。詳細は
+                  a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html#sift') SIFT in Pathogenicity prediction of Ensembl Variation
+                  | を参照ください。
                 li
                   strong PolyPhen
                   br
@@ -189,6 +190,10 @@ block content
                   div
                     .variant-function._width_5em._align-center(data-function='U') &nbsp;
                     span._margin-left Unknown
+                  span 推定偽陽性率（FPR）が5%以下の事後確率スコアを持つバリアントは、「Probably Damaging (おそらく有害)」と予測されます。
+                    | FPRが10%以下の場合は「Possible Damaging (有害の可能性あり)」とされ、FPRが10%を超えるバリアントは「良性 (Begign)」と分類されます。詳細は
+                  a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html#polyphen') Polyphen in Pathogenicity prediction of Ensembl Variation
+                  | を参照ください。
                 li
                   strong AlphaMissense
                   br
@@ -201,6 +206,9 @@ block content
                   div
                     .variant-function._width_5em._align-center(data-function='LB') &lt; 0.340
                     span._margin-left Likely benign
+                  span 「Likely pathogenic（おそらく病原性あり）」と 「Likely benign"（おそらく良性）」のスコアの閾値は、それぞれ病原性および良性のClinVarバリアントを90%の精度で分類できるように選ばれました。詳細は
+                  a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/docs/tools/vep/script/vep_plugins.html#alphamissense') AlphaMissense in VEP Plugins
+                  | を参照ください。
           #d7.question-answer
             h4.question Clinical Significanceの値はどのように計算していますか。
             .answer
