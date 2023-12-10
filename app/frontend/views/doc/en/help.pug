@@ -277,8 +277,20 @@ block content
             h4.question Was a liftover tool used for generating variant data?
             .answer
               p
-                | Yes. We used CrossMap to lift over the GRCh37 dataset to GRCh38 when no variant dataset detected by using the GRCh38 genome reference was available.
-
+                | Yes. Some of the GRCh38 datasets have been created by lifting over their GRCh37 datasets.
+                | Please refer to 
+                a.hyper-text.-external(target='_blank', href='https://grch38.togovar.org/doc/datasets')
+                  |
+                  | the Liftover GRCh37 column in the TogoVar datasets (GRCh38) page
+                | for the target datasets. A liftover tool
+                |
+                a.hyper-text.-external(target='_blank', href='https://github.com/informationsea/transanno')
+                  | transanno
+                | has been used since the release on November 16, 2023.
+                |
+                a.hyper-text.-external(target='_blank', href='https://crossmap.sourceforge.net/')
+                  | CrossMap 
+                | was used until the release on July 14, 2023.
         section.section
           h3.sectiontitle About the TogoVar search system
           #s1.question-answer._column-span-all
