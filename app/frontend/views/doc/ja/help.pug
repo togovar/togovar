@@ -220,7 +220,16 @@ block content
             h4.question バリアントデータ作成時にリフトオーバツールを利用しましたか。
             .answer
               p
-                | はい。GRCh38ゲノムリファレンスを用いて検出されたバリアントデータセットがない場合、CrossMapを用いてGRCh37データセットをGRCh38にリフトオーバーしています。
+                | はい。一部のGRCh38データセットは、そのGRCh37データセットをリフトオーバして作成しました。対象データセットは
+                a.hyper-text.-external(target='_blank', href='https://grch38.togovar.org/doc/ja/datasets')
+                  | TogoVar収録データセット一覧 (GRCh38)のLiftover GRCh37
+                |を参照ください。リフトオーバツールは
+                a.hyper-text.-external(target='_blank', href='https://github.com/informationsea/transanno')
+                  |transanno
+                | を利用しました。2023/7/14リリースまでは
+                a.hyper-text.-external(target='_blank', href='https://crossmap.sourceforge.net/')
+                  | CrossMap
+                | を利用しました。
 
         section.section
           h3.sectiontitle TogoVarの検索システムに関して
