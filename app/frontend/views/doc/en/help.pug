@@ -199,16 +199,12 @@ block content
             h4.question What are SIFT, Polyphen and AlphaMissense?
             .answer
               p
-                | SIFT, PolyPhen and AlphaMissense are scores which indicate the predicted effects on the protein function when an
-                | amino acid sequence undergoes alteration due to a variant. Values calculated through
+                | SIFT, PolyPhen, and AlphaMissense predict the impact of variants on protein function when an amino acid sequence is altered.
+                | These programs were performed using
                 |
                 a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html')
                   | Variant Effect Predictor (VEP)
-                | are displayed. For AlphaMissense, please see
-                |
-                a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/docs/tools/vep/script/vep_plugins.html#alphamissense')
-                  | VEP Plugins.
-                | The following icons indicate the threshold scores for qualitative predictions.
+                | . The icons below represent the threshold scores used for qualitative predictions.
               ul.unordered-list._margin-bottom._align-left
                 li
                   strong SIFT
@@ -219,6 +215,14 @@ block content
                   div
                     .variant-function._width_5em._align-center(data-function='T') &ge; 0.05
                     span._margin-left Tolerated
+                  span The score represents the normalized probability of an amino acid change being tolerated. Scores closer to zero indicate a higher likelihood of the change being deleterious.
+                    |
+                    | The qualitative prediction is based on this score. Substitutions with a score less than 0.05 are classified as "Deleterious", while all others are considered "Tolerated". See
+                    |
+                  a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html#sift') SIFT in Pathogenicity prediction of Ensembl Variation
+                  |
+                  | for details.
+
                 li
                   strong PolyPhen
                   br
@@ -234,6 +238,13 @@ block content
                   div
                     .variant-function._width_5em._align-center(data-function='U') &nbsp;
                     span._margin-left Unknown
+                  span Variants are predicted as "Probably Damaging" if they have posterior probability scores indicating an estimated false positive rate (FPR) of 5% or below.
+                    |
+                    | Those with FPRs at or below 10% are "Possibly Damaging", while variants with FPRs above 10% are classified as "Benign". See
+                    |
+                  a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html#polyphen') Polyphen in Pathogenicity prediction of Ensembl Variation
+                  |
+                  | for details.
                 li
                   strong AlphaMissense
                   br
@@ -246,6 +257,13 @@ block content
                   div
                     .variant-function._width_5em._align-center(data-function='LB') &lt; 0.340
                     span._margin-left Likely benign
+                  span The score thresholds for "Likely pathogenic" and "Likely benign" were chosen to classify pathogenic and benign ClinVar variants with 90% precision, respectively. See
+                    |
+                    |
+                  a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/docs/tools/vep/script/vep_plugins.html#alphamissense') AlphaMissense in VEP Plugins
+                  |
+                  | for details.
+
           #d7.question-answer
             h4.question How do you calculate the value of Clinical significance?
             .answer
