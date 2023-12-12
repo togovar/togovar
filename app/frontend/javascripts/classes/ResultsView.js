@@ -2,7 +2,7 @@ import StoreManager from './StoreManager.js';
 import ResultsRowView from './ResultsRowView.js';
 import ScrollBar from './ScrollBar.js';
 import { TR_HEIGHT, COMMON_FOOTER_HEIGHT, COLUMNS } from '../global.js';
-import { keyDownEvent } from '../utils/KeyDownEvent.js';
+import { keyDownEvent } from '../utils/keyDownEvent.js';
 
 export default class ResultsView {
   constructor(elm) {

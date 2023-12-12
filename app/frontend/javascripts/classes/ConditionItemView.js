@@ -3,7 +3,7 @@ import ConditionValues from './ConditionValues.js';
 import StoreManager from "./StoreManager.js";
 import { ADVANCED_CONDITIONS } from '../global.js';
 import { CONDITION_TYPE, CONDITION_ITEM_TYPE } from '../definition.js';
-import { keyDownEvent } from '../utils/KeyDownEvent.js';
+import { keyDownEvent } from '../utils/keyDownEvent.js';
 
 /** Class for editing and deleting conditions
  * Create an instance with {@link ConditionGroupView}
