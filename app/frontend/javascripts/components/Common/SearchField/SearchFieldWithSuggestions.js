@@ -158,7 +158,6 @@ class SearchFieldtWithSuggestions extends LitElement {
   _handleUpDownKeys = (e) => {
     if (!this.showSuggestions) {
       StoreManager.setData('showSuggest', false)
-      return;
     }
 
     if (
