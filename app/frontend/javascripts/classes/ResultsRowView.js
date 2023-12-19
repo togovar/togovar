@@ -23,7 +23,7 @@ const CLINICAL_SIGNIFICANCE_ORDER = [
   'AF',
   'O',
   'NP',
-  'AN'
+  'AN',
 ];
 
 export default class ResultsRowView {
@@ -304,6 +304,72 @@ export default class ResultsRowView {
             }
           }
           break;
+        case 'clinical_significance':
+          {
+            if (result.significance && result.significance.length) {
+              this.tdClinicalSign.dataset.value =
+                result.significance[0].interpretations[0];
+              this.tdClinicalAnchor.textContent =
+                result.significance[0].condition;
+              this.tdClinicalAnchor.setAttribute(
+                'href',
+                `/disease/${result.significance[0].medgen}`
+              );
+
+              if (result.significance.length > 1) {
+                const circlesEl = document.createElement('div');
+                const significancesFlat = result.significance
+                  .flatMap((significance) => significance.interpretations)
+                  .slice(1);
+
+                const sortedSignificances = significancesFlat.sort((a, b) => {
+                  return (
+                    CLINICAL_SIGNIFICANCE_ORDER.indexOf(a) -
+                    CLINICAL_SIGNIFICANCE_ORDER.indexOf(b)
+                  );
+                });
+
+                sortedSignificances.forEach((value) => {
+                  const circleEl = document.createElement('span');
+                  circleEl.dataset.value = value;
+                  circleEl.classList.add('clinical-significance');
+                  circlesEl.appendChild(circleEl);
+                });
+                this.tdClinicalAnchor.appendChild(circlesEl);
+              }
+            } else {
+              this.tdClinicalSign.dataset.sign = '';
+              this.tdClinicalAnchor.textContent = '';
+              this.tdClinicalAnchor.setAttribute('href', '');
+            }
+          }
+          break;
+        case 'alpha_missense':
+          {
+            const alphaMissenses = result.transcripts?.filter((x) =>
+              Number.isFinite(x.alpha_missense)
+            );
+            if (alphaMissenses && alphaMissenses.length > 0) {
+              this.tdAlphaMissense.dataset.remains = alphaMissenses.length - 1;
+              this.tdAlphaMissenseFunction.textContent = result.alphamissense;
+              switch (true) {
+                case result.alphamissense < 0.34:
+                  this.tdAlphaMissenseFunction.dataset.function = 'LB';
+                  break;
+                case result.alphamissense > 0.564:
+                  this.tdAlphaMissenseFunction.dataset.function = 'LP';
+                  break;
+                default:
+                  this.tdAlphaMissenseFunction.dataset.function = 'AMBIGUOUS';
+                  break;
+              }
+            } else {
+              this.tdAlphaMissense.dataset.remains = 0;
+              this.tdAlphaMissenseFunction.textContent = '';
+              this.tdAlphaMissenseFunction.dataset.function = '';
+            }
+          }
+          break;
         case 'sift':
           {
             const sifts = result.transcripts?.filter((x) =>
@@ -347,72 +413,6 @@ export default class ResultsRowView {
               this.tdPolyphen.dataset.remains = 0;
               this.tdPolyphenFunction.textContent = '';
               this.tdPolyphenFunction.dataset.function = '';
-            }
-          }
-          break;
-        case 'alpha_missense':
-          {
-            const alphaMissenses = result.transcripts?.filter((x) =>
-              Number.isFinite(x.alpha_missense)
-            );
-            if (alphaMissenses && alphaMissenses.length > 0) {
-              this.tdAlphaMissense.dataset.remains = alphaMissenses.length - 1;
-              this.tdAlphaMissenseFunction.textContent = result.alphamissense;
-              switch (true) {
-                case result.alphamissense < 0.34:
-                  this.tdAlphaMissenseFunction.dataset.function = 'LB';
-                  break;
-                case result.alphamissense > 0.564:
-                  this.tdAlphaMissenseFunction.dataset.function = 'LP';
-                  break;
-                default:
-                  this.tdAlphaMissenseFunction.dataset.function = 'AMBIGUOUS';
-                  break;
-              }
-            } else {
-              this.tdAlphaMissense.dataset.remains = 0;
-              this.tdAlphaMissenseFunction.textContent = '';
-              this.tdAlphaMissenseFunction.dataset.function = '';
-            }
-          }
-          break;
-        case 'clinical_significance':
-          {
-            if (result.significance && result.significance.length) {
-              this.tdClinicalSign.dataset.value =
-                result.significance[0].interpretations[0];
-              this.tdClinicalAnchor.textContent =
-                result.significance[0].condition;
-              this.tdClinicalAnchor.setAttribute(
-                'href',
-                `/disease/${result.significance[0].medgen}`
-              );
-
-              if (result.significance.length > 1) {
-                const circlesEl = document.createElement('div');
-                const significancesFlat = result.significance
-                  .flatMap((significance) => significance.interpretations)
-                  .slice(1);
-
-                const sortedSignificances = significancesFlat.sort((a, b) => {
-                  return (
-                    CLINICAL_SIGNIFICANCE_ORDER.indexOf(a) -
-                    CLINICAL_SIGNIFICANCE_ORDER.indexOf(b)
-                  );
-                });
-
-                sortedSignificances.forEach((value) => {
-                  const circleEl = document.createElement('span');
-                  circleEl.dataset.value = value;
-                  circleEl.classList.add('clinical-significance');
-                  circlesEl.appendChild(circleEl);
-                });
-                this.tdClinicalAnchor.appendChild(circlesEl);
-              }
-            } else {
-              this.tdClinicalSign.dataset.sign = '';
-              this.tdClinicalAnchor.textContent = '';
-              this.tdClinicalAnchor.setAttribute('href', '');
             }
           }
           break;
