@@ -27,10 +27,10 @@ export const COLUMNS = [
   { label: 'Gene', id: 'gene' },
   { label: 'Alt frequency', id: 'alt_frequency' },
   { label: 'Consequence', id: 'consequence' },
+  { label: 'Clinical significance', id: 'clinical_significance' },
+  { label: 'AlphaMissense', id: 'alpha_missense' },
   { label: 'SIFT', id: 'sift' },
   { label: 'PolyPhen', id: 'polyphen' },
-  { label: 'AlphaMissense', id: 'alpha_missense' },
-  { label: 'Clinical significance', id: 'clinical_significance' },
 ];
 
 export function strIns(str, idx, val) {

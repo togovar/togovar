@@ -49,9 +49,9 @@ block content
                 li.item.-question
                   a.link(href='#d5') Consequenceの値はどのように計算していますか。
                 li.item.-question
-                  a.link(href='#d6') SIFT、PolyPhen、AlphaMissenseとは何ですか。
+                  a.link(href='#d6') Clinical Significanceの値はどのように計算していますか。
                 li.item.-question
-                  a.link(href='#d7') Clinical Significanceの値はどのように計算していますか。
+                  a.link(href='#d7') AlphaMissense、SIFT、PolyPhenとは何ですか。
                 li.item.-question
                   a.link(href='#d8') バリアントデータ作成時にリフトオーバツールを利用しましたか。
             li.category
@@ -154,14 +154,37 @@ block content
                   | Variant Effect Predictor (VEP)のvariant consequence
                 | の値を表示しています。１バリアントに対応するトランスクリプトが複数ある場合は、一番重大なconsequenceのみを表示している場合があります。
           #d6.question-answer
-            h4.question SIFT、PolyPhen、AlphaMissenseとは何ですか。
+            h4.question Clinical Significanceの値はどのように計算していますか。
             .answer
               p
-                | SIFT、PolyPhenおよびAlphaMissenseはアミノ酸配列が変更された際のタンパク質の機能への影響を予測します。これらのプログラムは
+                a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv')
+                  | ClinVarのclinical significance
+                | の値を表示しています。
+
+          #d7.question-answer
+            h4.question AlphaMissense、SIFT、PolyPhenとは何ですか。
+            .answer
+              p
+                | AlphaMissense、SIFTおよびPolyPhenはアミノ酸配列が変更された際のタンパク質の機能への影響を予測します。これらのプログラムは
                 a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html')
                   | Variant Effect Predictor (VEP)
                 | を使用して計算しました。以下のアイコンは定性的予測に使用される閾値スコアを表しています。
               ul.unordered-list._margin-bottom._align-left
+                li
+                  strong AlphaMissense
+                  br
+                  div
+                    .variant-function._width_5em._align-center(data-function='LP') &gt; 0.564
+                    span._margin-left Likely pathogenic
+                  div
+                    .variant-function._width_5em._align-center(data-function='AMBIGUOUS') &ge; 0.340
+                    span._margin-left Ambiguous
+                  div
+                    .variant-function._width_5em._align-center(data-function='LB') &lt; 0.340
+                    span._margin-left Likely benign
+                  span 「Likely pathogenic（おそらく病原性あり）」と 「Likely benign"（おそらく良性）」のスコアの閾値は、それぞれ病原性および良性のClinVarバリアントを90%の精度で分類できるように選ばれました。詳細は
+                  a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/docs/tools/vep/script/vep_plugins.html#alphamissense') AlphaMissense in VEP Plugins
+                  | を参照ください。
                 li
                   strong SIFT
                   br
@@ -194,28 +217,6 @@ block content
                     | FPRが10%以下の場合は「Possible Damaging (有害の可能性あり)」とされ、FPRが10%を超えるバリアントは「良性 (Begign)」と分類されます。詳細は
                   a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html#polyphen') Polyphen in Pathogenicity prediction of Ensembl Variation
                   | を参照ください。
-                li
-                  strong AlphaMissense
-                  br
-                  div
-                    .variant-function._width_5em._align-center(data-function='LP') &gt; 0.564
-                    span._margin-left Likely pathogenic
-                  div
-                    .variant-function._width_5em._align-center(data-function='AMBIGUOUS') &ge; 0.340
-                    span._margin-left Ambiguous
-                  div
-                    .variant-function._width_5em._align-center(data-function='LB') &lt; 0.340
-                    span._margin-left Likely benign
-                  span 「Likely pathogenic（おそらく病原性あり）」と 「Likely benign"（おそらく良性）」のスコアの閾値は、それぞれ病原性および良性のClinVarバリアントを90%の精度で分類できるように選ばれました。詳細は
-                  a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/docs/tools/vep/script/vep_plugins.html#alphamissense') AlphaMissense in VEP Plugins
-                  | を参照ください。
-          #d7.question-answer
-            h4.question Clinical Significanceの値はどのように計算していますか。
-            .answer
-              p
-                a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv')
-                  | ClinVarのclinical significance
-                | の値を表示しています。
           #d8.question-answer
             h4.question バリアントデータ作成時にリフトオーバツールを利用しましたか。
             .answer
