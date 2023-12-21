@@ -25,15 +25,10 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
         <label><input
           type="checkbox"
           value="${value.value}"
-          data-label="${value.label}"
-          ${
-            this._conditionType === 'significance'
-              ? `data-sign="${value.value}"`
-              : ''
-          }>
+          data-label="${value.label}">
             ${
               this._conditionType === 'significance'
-                ? `<span class="clinical-significance" data-sign="${value.value}"></span>`
+                ? `<span class="clinical-significance" data-value="${value.value}"></span>`
                 : ''
             }${value.label}
         </label>

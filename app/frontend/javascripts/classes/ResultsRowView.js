@@ -358,7 +358,7 @@ export default class ResultsRowView {
           {
             if (result.significance && result.significance.length) {
               this.tdClinical.dataset.remains = result.significance.length - 1;
-              this.tdClinicalSign.dataset.sign =
+              this.tdClinicalSign.dataset.value =
                 result.significance[0].interpretations[0];
               this.tdClinicalAnchor.textContent =
                 result.significance[0].condition;
