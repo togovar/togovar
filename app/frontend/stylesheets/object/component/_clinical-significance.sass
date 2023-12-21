@@ -1,6 +1,5 @@
 .clinical-significance
   &:before
-    content: attr(data-sign) ""
     width: 18px
     line-height: 18px
     height: 18px
@@ -14,36 +13,67 @@
     font-size: 10px
     font-weight: bold
     vertical-align: top
-  &[data-sign="P"]:before
+  &[data-value="P"]:before, &[data-value="LOWP"]:before
+    content: "P"
+  &[data-value="LP"]:before, &[data-value="LOWLP"]:before
+    content: "LP"
+  &[data-value="P"]:before, &[data-value="LP"]:before
     color: $COLOR_SIGN_DANGEROUS
     border-color: $COLOR_SIGN_DANGEROUS
     background-color: $COLOR_SIGN_DANGEROUS_LIGHT
-  &[data-sign="LP"]:before
+  &[data-value="LOWP"]:before, &[data-value="LOWLP"]:before
+    color: $COLOR_SIGN_LOWDANGEROUS
+    border-color: $COLOR_SIGN_LOWDANGEROUS
+    background-color: $COLOR_SIGN_LOWDANGEROUS_LIGHT
+  &[data-value="ERA"]:before, &[data-value="LRA"]:before, &[data-value="URA"]:before
+    content: "RA"
     color: $COLOR_SIGN_WARNING
     border-color: $COLOR_SIGN_WARNING
     background-color: $COLOR_SIGN_WARNING_LIGHT
-  &[data-sign="US"]:before
+  &[data-value="US"]:before
+    content: "US"
     color: $COLOR_SIGN_UNKNOWN
     border-color: $COLOR_SIGN_UNKNOWN
     background-color: $COLOR_SIGN_UNKNOWN_LIGHT
-  &[data-sign="LB"]:before
+  &[data-value="LB"]:before
+    content: "LB"
     color: $COLOR_SIGN_NORMAL
     border-color: $COLOR_SIGN_NORMAL
     background-color: $COLOR_SIGN_NORMAL_LIGHT
-  &[data-sign="B"]:before
+  &[data-value="B"]:before
+    content: "B"
     color: $COLOR_SIGN_SAFE
     border-color: $COLOR_SIGN_SAFE
     background-color: $COLOR_SIGN_SAFE_LIGHT
-  &[data-sign="CI"]:before
+  &[data-value="CI"]:before
+    content: "CI"
     color: $COLOR_SIGN_MODIFIER
     border-color: $COLOR_SIGN_MODIFIER
     background-color: $COLOR_SIGN_MODIFIER_LIGHT
-  &[data-sign="DR"], &[data-sign="A"], &[data-sign="RF"], &[data-sign="PR"], &[data-sign="AF"], &[data-sign="O"]
+  &[data-value="DR"]:before
+    content: "DR"
+  &[data-value="CS"]:before
+    content: "CS"
+  &[data-value="RF"]:before
+    content: "RF"
+  &[data-value="A"]:before
+    content: "A"
+  &[data-value="PR"]:before
+    content: "PR"
+  &[data-value="AF"]:before
+    content: "AF"
+  &[data-value="DR"], &[data-value="CS"], &[data-value="RF"], &[data-value="A"], &[data-value="PR"], &[data-value="AF"]
     &:before
       color: $COLOR_SIGN_OTHER
       border-color: $COLOR_SIGN_OTHER
       background-color: $COLOR_SIGN_OTHER_LIGHT
-  &[data-sign="NC"]:before, &[data-sign="NP"]:before, &[data-sign="AN"]:before
+  &[data-value="O"]:before
+    content: "O"
+  &[data-value="NP"]:before
+    content: "NP"
+  &[data-value="AN"]:before
+    content: "AN"
+  &[data-value="O"]:before, &[data-value="NP"]:before, &[data-value="AN"]:before
     color: $COLOR_GRAY
     border-color: $COLOR_GRAY
     background-color: white
