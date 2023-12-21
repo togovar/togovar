@@ -59,6 +59,26 @@
           "label": "Likely pathogenic"
         },
         {
+          "value": "LOWP",
+          "label": "Pathogenic, Low penetrance"
+        },
+        {
+          "value": "LOWLP",
+          "label": "Likely pathogenic, Low penetrance"
+        },
+        {
+          "value": "ERA",
+          "label": "Established risk allele"
+        },
+        {
+          "value": "LRA",
+          "label": "Likely risk allele"
+        },
+        {
+          "value": "URA",
+          "label": "Uncertain risk allele"
+        },
+        {
           "value": "US",
           "label": "Uncertain significance"
         },
@@ -79,12 +99,16 @@
           "label": "Drug response"
         },
         {
-          "value": "A",
-          "label": "Association"
+          "value": "CS",
+          "label": "Confers sensitivity"
         },
         {
           "value": "RF",
           "label": "Risk factor"
+        },
+        {
+          "value": "A",
+          "label": "Association"
         },
         {
           "value": "PR",
