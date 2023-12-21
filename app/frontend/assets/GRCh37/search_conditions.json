@@ -169,13 +169,13 @@
         "default": "1"
       },
       {
-        "id": "LOWP",
+        "id": "PLP",
         "label": "Pathogenic, Low penetrance",
         "type": "boolean",
         "default": "1"
       },
       {
-        "id": "LOWLP",
+        "id": "LPLP",
         "label": "Likely pathogenic, Low penetrance",
         "type": "boolean",
         "default": "1"
