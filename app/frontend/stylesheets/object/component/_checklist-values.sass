@@ -13,17 +13,19 @@
     position: relative
   > .item
     padding: 2px $PADDING_PANEL_VIEW
-    position: relative
-    display: block
+    display: flex
+    justify-content: space-between
+    align-items: center
     > .label
+      display: flex
+      align-items: center
+      gap: 0.3rem
       margin-bottom: 0
-      line-height: 18px
+      line-height: 14px
       font-weight: bold
-      float: left
       > .dataset-icon, > .variant-icon, > .clinical-significance, > .variant-function
         display: inline-block
         vertical-align: middle
-        margin-right: 3px
         margin-left: -3px
       > .dataset-icon
         #FilterDatasets &
@@ -39,6 +41,7 @@
       float: right
       line-height: 18px
     &.collapse-view
+      display: block
       > .collapsebutton
         left: 3px
         top: 7px
