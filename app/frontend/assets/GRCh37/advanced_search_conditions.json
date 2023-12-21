@@ -65,11 +65,11 @@
           "label": "Likely pathogenic"
         },
         {
-          "value": "LOWP",
+          "value": "PLP",
           "label": "Pathogenic, Low penetrance"
         },
         {
-          "value": "LOWLP",
+          "value": "LPLP",
           "label": "Likely pathogenic, Low penetrance"
         },
         {

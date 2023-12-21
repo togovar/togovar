@@ -103,8 +103,8 @@
     content: 'LP';
   }
 
-  &[data-value='LOWP'],
-  &[data-value='LOWLP'] {
+  &[data-value='PLP'],
+  &[data-value='LPLP'] {
     border-color: var(--color-sign-lowdangerous);
     background-color: var(--color-sign-lowdangerous-light);
     &::before {
@@ -112,10 +112,10 @@
       color: var(--color-sign-lowdangerous);
     }
   }
-  &[data-value='LOWP']::before {
+  &[data-value='PLP']::before {
     content: 'P';
   }
-  &[data-value='LOWLP']::before {
+  &[data-value='LPLP']::before {
     content: 'LP';
   }
 
