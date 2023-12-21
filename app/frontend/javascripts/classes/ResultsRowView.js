@@ -100,7 +100,7 @@ export default class ResultsRowView {
           break;
         case 'clinical_significance': // clinical significance
           html +=
-            '<td class="clinical_significance" data-remains=""><!--<div class="dataset-icon -none" data-dataset="mgend"></div>--><div href="" class="clinical-significance" data-sign=""></div><a class="hyper-text -internal" target="_blank"></a></td>';
+            '<td class="clinical_significance"><div href="" class="clinical-significance"></div><a class="hyper-text -internal" target="_blank"></a></td>';
           break;
       }
     }
@@ -139,7 +139,7 @@ export default class ResultsRowView {
     // AlphaMissense
     this.tdAlphaMissense = this.tr.querySelector('td.alpha_missense');
     this.tdAlphaMissenseFunction =
-    this.tdAlphaMissense.querySelector('.variant-function');
+      this.tdAlphaMissense.querySelector('.variant-function');
     // Clinical significance
     this.tdClinical = this.tr.querySelector('td.clinical_significance');
     this.tdClinicalSign = this.tdClinical.querySelector(
@@ -328,43 +328,59 @@ export default class ResultsRowView {
             }
           }
           break;
-          case 'alpha_missense':
-            {
-              const alphaMissenses = result.transcripts?.filter((x) =>
-                Number.isFinite(x.alpha_missense)
-              );
-              if (alphaMissenses && alphaMissenses.length > 0) {
-                this.tdAlphaMissense.dataset.remains = alphaMissenses.length - 1;
-                this.tdAlphaMissenseFunction.textContent = result.alphamissense;
-                switch (true) {
-                  case result.alphamissense < 0.34:
-                    this.tdAlphaMissenseFunction.dataset.function = 'LB';
-                    break;
-                  case result.alphamissense > 0.564:
-                    this.tdAlphaMissenseFunction.dataset.function = 'LP';
-                    break;
-                  default:
-                    this.tdAlphaMissenseFunction.dataset.function = 'AMBIGUOUS';
-                    break;
-                }
-              } else {
-                this.tdAlphaMissense.dataset.remains = 0;
-                this.tdAlphaMissenseFunction.textContent = '';
-                this.tdAlphaMissenseFunction.dataset.function = '';
+        case 'alpha_missense':
+          {
+            const alphaMissenses = result.transcripts?.filter((x) =>
+              Number.isFinite(x.alpha_missense)
+            );
+            if (alphaMissenses && alphaMissenses.length > 0) {
+              this.tdAlphaMissense.dataset.remains = alphaMissenses.length - 1;
+              this.tdAlphaMissenseFunction.textContent = result.alphamissense;
+              switch (true) {
+                case result.alphamissense < 0.34:
+                  this.tdAlphaMissenseFunction.dataset.function = 'LB';
+                  break;
+                case result.alphamissense > 0.564:
+                  this.tdAlphaMissenseFunction.dataset.function = 'LP';
+                  break;
+                default:
+                  this.tdAlphaMissenseFunction.dataset.function = 'AMBIGUOUS';
+                  break;
               }
+            } else {
+              this.tdAlphaMissense.dataset.remains = 0;
+              this.tdAlphaMissenseFunction.textContent = '';
+              this.tdAlphaMissenseFunction.dataset.function = '';
             }
-            break;
+          }
+          break;
         case 'clinical_significance':
           {
             if (result.significance && result.significance.length) {
-              this.tdClinical.dataset.remains = result.significance.length - 1;
               this.tdClinicalSign.dataset.value =
                 result.significance[0].interpretations[0];
               this.tdClinicalAnchor.textContent =
                 result.significance[0].condition;
-              this.tdClinicalAnchor.setAttribute('href', `/disease/${result.significance[0].medgen}`);
+              this.tdClinicalAnchor.setAttribute(
+                'href',
+                `/disease/${result.significance[0].medgen}`
+              );
+
+              if (result.significance.length > 1) {
+                const circlesEl = document.createElement('div');
+                const significancesFlat = result.significance
+                  .slice(1)
+                  .flatMap((significance) => significance.interpretations);
+
+                significancesFlat.forEach((value) => {
+                  const circleEl = document.createElement('span');
+                  circleEl.dataset.value = value;
+                  circleEl.classList.add('clinical-significance');
+                  circlesEl.appendChild(circleEl);
+                });
+                this.tdClinicalAnchor.appendChild(circlesEl);
+              }
             } else {
-              this.tdClinical.dataset.remains = 0;
               this.tdClinicalSign.dataset.sign = '';
               this.tdClinicalAnchor.textContent = '';
               this.tdClinicalAnchor.setAttribute('href', '');

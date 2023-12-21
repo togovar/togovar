@@ -70,7 +70,6 @@
             transform: rotate(-20deg) translateY(-6px)
             top: 50%
             left: 18px
-
         > .consequence-item, > .dataset-icon, > .clinical-significance, > .variant-function
           display: inline-block
           vertical-align: middle
@@ -90,3 +89,17 @@
           background-size: 30px 10px
       &.-out-of-range
         display: none
+
+      > td.clinical_significance > a.hyper-text > div
+        display: inline-block
+        padding: 0 5px
+
+        > span.clinical-significance::before
+          display: inline-block
+          width: 15px
+          height: 15px
+          line-height: 15px
+          font-size: 8px
+          border-radius: 50%
+          margin-right: -3px
+          vertical-align: middle
