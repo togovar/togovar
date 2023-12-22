@@ -1,32 +1,118 @@
 @use '../../foundation/_variables.scss' as *;
 
-//Clinical significance
-[data-condition-type='significance'] {
-  &::before {
-    margin-right: 4px;
-    margin-left: -2px;
-    font-size: 10px;
-    position: relative;
-    top: -1px;
+:host {
+  --height-container: var(--height-advanced-search-condition-values-container);
+  --height: var(--height-advanced-search-condition-value);
+  display: inline-block;
+  > .inner {
+    height: var(--height);
+    line-height: 1;
+    padding: 0 10px;
+    background-color: white;
+    border: solid 1px var(--color-key-dark1);
+    border-radius: calc(var(--height) * 0.5);
+    font-weight: bold;
+    margin-right: 2px;
   }
+}
 
-  &[data-value='P'],
-  &[data-value='LP'] {
+//core dataset
+:host([data-condition-type='dataset']) {
+  display: block;
+  position: relative;
+  > .inner {
+    min-width: 120px;
+    &::before {
+      font-family: fontello, sans-serif;
+      content: var(--char-dataset);
+      margin-right: 4px;
+    }
+  }
+}
+//core significance
+:host([data-condition-type='significance']) {
+  > .inner {
+    &::before {
+      margin-right: 4px;
+      margin-left: -2px;
+      font-size: 10px;
+      position: relative;
+      top: -1px;
+    }
+  }
+}
+
+//dataset
+:host([data-condition-type='dataset'][data-value='jga_ngs']),
+:host([data-condition-type='dataset'][data-value='jga_snp']) {
+  > .inner {
+    border-color: var(--color-dataset-jga);
+    background-color: var(--color-dataset-jga-light);
+    &::before {
+      color: var(--color-dataset-jga);
+    }
+  }
+}
+:host([data-condition-type='dataset'][data-value='hgvd']) {
+  > .inner {
+    border-color: var(--color-dataset-hgvd);
+    background-color: var(--color-dataset-hgvd-light);
+    &::before {
+      color: var(--color-dataset-hgvd);
+    }
+  }
+}
+:host([data-condition-type='dataset'][data-value='tommo']) {
+  > .inner {
+    border-color: var(--color-dataset-tommo);
+    background-color: var(--color-dataset-tommo-light);
+    &::before {
+      color: var(--color-dataset-tommo);
+    }
+  }
+}
+:host([data-condition-type='dataset'][data-value='gem_j_wga']) {
+  > .inner {
+    border-color: var(--color-dataset-gemj);
+    background-color: var(--color-dataset-gemj-light);
+    &::before {
+      color: var(--color-dataset-gemj);
+    }
+  }
+}
+:host([data-condition-type='dataset'][data-value='gnomad_genomes']) {
+  > .inner {
+    border-color: var(--color-dataset-foreign);
+    background-color: var(--color-dataset-foreign-light);
+    &::before {
+      color: var(--color-dataset-foreign);
+    }
+  }
+}
+
+//Clinical significance
+:host([data-condition-type='significance'][data-value='P']) {
+  > .inner {
     border-color: var(--color-sign-dangerous);
     background-color: var(--color-sign-dangerous-light);
     &::before {
+      content: 'P';
       color: var(--color-sign-dangerous);
     }
   }
-  &[data-value='P']::before {
-    content: 'P';
+}
+:host([data-condition-type='significance'][data-value='LP']) {
+  > .inner {
+    border-color: var(--color-sign-dangerous);
+    background-color: var(--color-sign-dangerous-light);
+    &::before {
+      content: 'LP';
+      color: var(--color-sign-dangerous);
+    }
   }
-  &[data-value='LP']::before {
-    content: 'LP';
-  }
-
-  &[data-value='PLP'],
-  &[data-value='LPLP'] {
+}
+:host([data-condition-type='significance'][data-value='PLP']) {
+  > .inner {
     border-color: var(--color-sign-lowdangerous);
     background-color: var(--color-sign-lowdangerous-light);
     &::before {
@@ -34,16 +120,19 @@
       color: var(--color-sign-lowdangerous);
     }
   }
-  &[data-value='PLP']::before {
-    content: 'P';
+}
+:host([data-condition-type='significance'][data-value='LPLP']) {
+  > .inner {
+    border-color: var(--color-sign-lowdangerous);
+    background-color: var(--color-sign-lowdangerous-light);
+    &::before {
+      content: 'LP';
+      color: var(--color-sign-lowdangerous);
+    }
   }
-  &[data-value='LPLP']::before {
-    content: 'LP';
-  }
-
-  &[data-value='ERA'],
-  &[data-value='LRA'],
-  &[data-value='URA'] {
+}
+:host([data-condition-type='significance'][data-value='ERA']) {
+  > .inner {
     border-color: var(--color-sign-warning);
     background-color: var(--color-sign-warning-light);
     &::before {
@@ -51,8 +140,29 @@
       color: var(--color-sign-warning);
     }
   }
-
-  &[data-value='US'] {
+}
+:host([data-condition-type='significance'][data-value='LRA']) {
+  > .inner {
+    border-color: var(--color-sign-warning);
+    background-color: var(--color-sign-warning-light);
+    &::before {
+      content: 'RA';
+      color: var(--color-sign-warning);
+    }
+  }
+}
+:host([data-condition-type='significance'][data-value='URA']) {
+  > .inner {
+    border-color: var(--color-sign-warning);
+    background-color: var(--color-sign-warning-light);
+    &::before {
+      content: 'RA';
+      color: var(--color-sign-warning);
+    }
+  }
+}
+:host([data-condition-type='significance'][data-value='US']) {
+  > .inner {
     border-color: var(--color-sign-unknown);
     background-color: var(--color-sign-unknown-light);
     &::before {
@@ -60,8 +170,9 @@
       color: var(--color-sign-unknown);
     }
   }
-
-  &[data-value='LB'] {
+}
+:host([data-condition-type='significance'][data-value='LB']) {
+  > .inner {
     border-color: var(--color-sign-normal);
     background-color: var(--color-sign-normal-light);
     &::before {
@@ -69,8 +180,9 @@
       color: var(--color-sign-normal);
     }
   }
-
-  &[data-value='B'] {
+}
+:host([data-condition-type='significance'][data-value='B']) {
+  > .inner {
     border-color: var(--color-sign-safe);
     background-color: var(--color-sign-safe-light);
     &::before {
@@ -78,8 +190,9 @@
       color: var(--color-sign-safe);
     }
   }
-
-  &[data-value='CI'] {
+}
+:host([data-condition-type='significance'][data-value='CI']) {
+  > .inner {
     border-color: var(--color-sign-modifier);
     background-color: var(--color-sign-modifier-light);
     &::before {
@@ -87,54 +200,95 @@
       color: var(--color-sign-modifier);
     }
   }
-
-  &[data-value='DR'],
-  &[data-value='CS'],
-  &[data-value='A'],
-  &[data-value='RF'],
-  &[data-value='PR'],
-  &[data-value='AF'] {
+}
+:host([data-condition-type='significance'][data-value='DR']) {
+  > .inner {
     border-color: var(--color-sign-other);
     background-color: var(--color-sign-other-light);
     &::before {
+      content: 'DR';
       color: var(--color-sign-other);
     }
   }
-  &[data-value='DR']::before {
-    content: 'DR';
+}
+:host([data-condition-type='significance'][data-value='CS']) {
+  > .inner {
+    border-color: var(--color-sign-other);
+    background-color: var(--color-sign-other-light);
+    &::before {
+      content: 'CS';
+      color: var(--color-sign-other);
+    }
   }
-  &[data-value='CS']::before {
-    content: 'CS';
+}
+:host([data-condition-type='significance'][data-value='RF']) {
+  > .inner {
+    border-color: var(--color-sign-other);
+    background-color: var(--color-sign-other-light);
+    &::before {
+      content: 'RF';
+      color: var(--color-sign-other);
+    }
   }
-  &[data-value='A']::before {
-    content: 'A';
+}
+:host([data-condition-type='significance'][data-value='A']) {
+  > .inner {
+    border-color: var(--color-sign-other);
+    background-color: var(--color-sign-other-light);
+    &::before {
+      content: 'A';
+      color: var(--color-sign-other);
+    }
   }
-  &[data-value='RF']::before {
-    content: 'RF';
+}
+:host([data-condition-type='significance'][data-value='PR']) {
+  > .inner {
+    border-color: var(--color-sign-other);
+    background-color: var(--color-sign-other-light);
+    &::before {
+      content: 'PR';
+      color: var(--color-sign-other);
+    }
   }
-  &[data-value='PR']::before {
-    content: 'PR';
+}
+:host([data-condition-type='significance'][data-value='AF']) {
+  > .inner {
+    border-color: var(--color-sign-other);
+    background-color: var(--color-sign-other-light);
+    &::before {
+      content: 'AF';
+      color: var(--color-sign-other);
+    }
   }
-  &[data-value='AF']::before {
-    content: 'AF';
-  }
-
-
-  &[data-value='O'], &[data-value='NP'], &[data-value='AN']{
+}
+:host([data-condition-type='significance'][data-value='O']) {
+  > .inner {
     border-color: var(--color-gray);
     background-color: white;
     &::before {
-      color: var(--color-gray);
+      content: 'O';
+      border-color: var(--color-gray);
     }
   }
-  &[data-value='O']::before {
-    content: 'O';
+}
+:host([data-condition-type='significance'][data-value='NP']) {
+  > .inner {
+    border-color: var(--color-gray);
+    background-color: white;
+    &::before {
+      content: 'NP';
+      border-color: var(--color-gray);
+    }
   }
-  &[data-value='NP']::before {
-    content: 'NP';
-  }
-  &[data-value='AN']::before {
-    content: 'AN';
+}
+:host([data-condition-type='significance'][data-value='AN']) {
+  > .inner {
+    border-color: var(--color-gray);
+    background-color: white;
+    &::before {
+      content: 'AN';
+      border-color: var(--color-gray);
+    }
   }
 }
 
