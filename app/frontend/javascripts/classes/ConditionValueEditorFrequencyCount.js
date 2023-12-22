@@ -107,7 +107,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       .querySelectorAll(':scope > .input > input')
       .forEach((input) =>
         input.addEventListener('change', (e) => {
-          this._condition.count[e.target.className] = e.target.value;
+          this._condition.count[e.target.className] = Number(e.target.value);
           this._update();
         })
       );
