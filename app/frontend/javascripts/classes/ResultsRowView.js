@@ -3,6 +3,28 @@ import StoreManager from './StoreManager.js';
 // import LogarithmizedBlockGraphFrequencyView from '../components/LogarithmizedBlockGraphFrequencyView';
 
 const REF_ALT_SHOW_LENGTH = 4;
+const CLINICAL_SIGNIFICANCE_ORDER = [
+  'P',
+  'LP',
+  'PLP',
+  'LPLP',
+  'ERA',
+  'LRA',
+  'URA',
+  'US',
+  'LB',
+  'B',
+  'CI',
+  'DR',
+  'CS',
+  'RF',
+  'A',
+  'PR',
+  'AF',
+  'O',
+  'NP',
+  'AN'
+];
 
 export default class ResultsRowView {
   constructor(index) {
@@ -369,10 +391,17 @@ export default class ResultsRowView {
               if (result.significance.length > 1) {
                 const circlesEl = document.createElement('div');
                 const significancesFlat = result.significance
-                  .slice(1)
-                  .flatMap((significance) => significance.interpretations);
+                  .flatMap((significance) => significance.interpretations)
+                  .slice(1);
 
-                significancesFlat.forEach((value) => {
+                const sortedSignificances = significancesFlat.sort((a, b) => {
+                  return (
+                    CLINICAL_SIGNIFICANCE_ORDER.indexOf(a) -
+                    CLINICAL_SIGNIFICANCE_ORDER.indexOf(b)
+                  );
+                });
+
+                sortedSignificances.forEach((value) => {
                   const circleEl = document.createElement('span');
                   circleEl.dataset.value = value;
                   circleEl.classList.add('clinical-significance');
