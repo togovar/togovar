@@ -253,6 +253,8 @@ module Elasticsearch
     def sift(*values)
       @sift_condition = nil
 
+      values &= [:N, :D, :T]
+
       return self if values.empty?
 
       @sift_condition = Elasticsearch::DSL::Search.search do
@@ -263,11 +265,21 @@ module Elasticsearch
               bool do
                 values.each do |x|
                   should do
-                    range 'vep.sift' do
-                      if x == :D
-                        lt 0.05
-                      elsif x == :T
-                        gte 0.05
+                    if x == :N
+                      bool do
+                        must_not do
+                          exists do
+                            field 'vep.sift'
+                          end
+                        end
+                      end
+                    else
+                      range 'vep.sift' do
+                        if x == :D
+                          lt 0.05
+                        else
+                          gte 0.05
+                        end
                       end
                     end
                   end
@@ -284,7 +296,7 @@ module Elasticsearch
     def polyphen(*values)
       @polyphen_condition = nil
 
-      values &= [:PROBD, :POSSD, :B]
+      values &= [:N, :PROBD, :POSSD, :B, :U]
 
       return self if values.empty?
 
@@ -296,14 +308,28 @@ module Elasticsearch
               bool do
                 values.each do |x|
                   should do
-                    range 'vep.polyphen' do
-                      if x == :PROBD
-                        gt 0.908
-                      elsif x == :POSSD
-                        gt 0.446
-                        lte 0.908
-                      elsif x == :B
-                        lte 0.446
+                    if x == :N
+                      bool do
+                        must_not do
+                          exists do
+                            field 'vep.polyphen'
+                          end
+                        end
+                      end
+                    else
+                      range 'vep.polyphen' do
+                        case x
+                        when :PROBD
+                          gt 0.908
+                        when :POSSD
+                          lte 0.908
+                          gt 0.446
+                        when :B
+                          lte 0.446
+                          gte 0
+                        else
+                          lt 0
+                        end
                       end
                     end
                   end
@@ -320,7 +346,7 @@ module Elasticsearch
     def alphamissense(*values)
       @alphamissense_condition = nil
 
-      values &= [:LB, :A, :LP]
+      values &= [:N, :LP, :A, :LB]
 
       return self if values.empty?
 
@@ -332,14 +358,24 @@ module Elasticsearch
               bool do
                 values.each do |x|
                   should do
-                    range 'vep.alpha_missense' do
-                      if x == :LP
-                        gt 0.564
-                      elsif x == :A
-                        gte 0.34
-                        lte 0.564
-                      elsif x == :LB
-                        lt 0.34
+                    if x == :N
+                      bool do
+                        must_not do
+                          exists do
+                            field 'vep.alphamissense'
+                          end
+                        end
+                      end
+                    else
+                      range 'vep.alphamissense' do
+                        if x == :LP
+                          gt 0.564
+                        elsif x == :A
+                          gte 0.34
+                          lte 0.564
+                        else
+                          lt 0.34
+                        end
                       end
                     end
                   end
