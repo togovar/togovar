@@ -1,6 +1,6 @@
 import { COLUMNS } from '../global.js';
 import StoreManager from './StoreManager.js';
-// import LogarithmizedBlockGraphFrequencyView from '../components/LogarithmizedBlockGraphFrequencyView';
+import '../components/LogarithmizedBlockGraphFrequencyView';
 
 const REF_ALT_SHOW_LENGTH = 4;
 
