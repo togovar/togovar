@@ -100,7 +100,7 @@ export default class ResultsRowView {
           break;
         case 'clinical_significance': // clinical significance
           html +=
-            '<td class="clinical_significance"><div href="" class="clinical-significance"></div><a class="hyper-text -internal" target="_blank"></a></td>';
+            '<td class="clinical_significance" data-remains=""><div href="" class="clinical-significance" data-value=""></div><a class="hyper-text -internal" target="_blank"></a></td>';
           break;
       }
     }
@@ -285,6 +285,7 @@ export default class ResultsRowView {
         case 'clinical_significance':
           {
             if (result.significance && result.significance.length) {
+              this.tdClinical.dataset.remains = result.significance.length - 1;
               this.tdClinicalSign.dataset.value =
                 result.significance[0].interpretations[0];
               this.tdClinicalAnchor.textContent =
@@ -293,23 +294,9 @@ export default class ResultsRowView {
                 'href',
                 `/disease/${result.significance[0].medgen}`
               );
-
-              if (result.significance.length > 1) {
-                const circlesEl = document.createElement('div');
-                const significancesFlat = result.significance
-                  .slice(1)
-                  .flatMap((significance) => significance.interpretations);
-
-                significancesFlat.forEach((value) => {
-                  const circleEl = document.createElement('span');
-                  circleEl.dataset.value = value;
-                  circleEl.classList.add('clinical-significance');
-                  circlesEl.appendChild(circleEl);
-                });
-                this.tdClinicalAnchor.appendChild(circlesEl);
-              }
             } else {
-              this.tdClinicalSign.dataset.sign = '';
+              this.tdClinical.dataset.remains = 0;
+              this.tdClinicalSign.dataset.value = '';
               this.tdClinicalAnchor.textContent = '';
               this.tdClinicalAnchor.setAttribute('href', '');
             }
