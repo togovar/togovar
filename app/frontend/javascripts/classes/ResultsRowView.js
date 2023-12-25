@@ -86,21 +86,21 @@ export default class ResultsRowView {
           html +=
             '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>';
           break;
-        case 'sift': // SIFT
-          html +=
-            '<td class="sift" data-remains=""><div class="variant-function" data-function=""></div></td>';
-          break;
-        case 'polyphen': // PolyPhen
-          html +=
-            '<td class="polyphen" data-remains=""><div class="variant-function" data-function=""></div></td>';
-          break;
-        case 'alphamissense': // AlphaMissense
-          html +=
-            '<td class="alphamissense" data-remains=""><div class="variant-function" data-function=""></div></td>';
-          break;
         case 'clinical_significance': // clinical significance
           html +=
             '<td class="clinical_significance" data-remains=""><div href="" class="clinical-significance" data-value=""></div><a class="hyper-text -internal" target="_blank"></a></td>';
+          break;
+        case 'alphamissense': // AlphaMissense
+          html +=
+            '<td class="alphamissense"><div class="variant-function" data-function=""></div></td>';
+          break;
+        case 'sift': // SIFT
+          html +=
+            '<td class="sift"><div class="variant-function" data-function=""></div></td>';
+          break;
+        case 'polyphen': // PolyPhen
+          html +=
+            '<td class="polyphen"><div class="variant-function" data-function=""></div></td>';
           break;
       }
     }
@@ -250,8 +250,8 @@ export default class ResultsRowView {
               if (!dataset.has_freq) continue;
               const frequency = result.frequencies
                 ? result.frequencies.find(
-                    (frequency) => frequency.source === dataset.id
-                  )
+                  (frequency) => frequency.source === dataset.id
+                )
                 : undefined;
               this.tdFrequencies[dataset.id].frequency = frequency;
             }
@@ -308,7 +308,6 @@ export default class ResultsRowView {
               Number.isFinite(x.alphamissense)
             );
             if (alphaMissenses && alphaMissenses.length > 0) {
-              this.tdAlphaMissense.dataset.remains = alphaMissenses.length - 1;
               this.tdAlphaMissenseFunction.textContent = result.alphamissense;
               switch (true) {
                 case result.alphamissense < 0.34:
@@ -322,7 +321,6 @@ export default class ResultsRowView {
                   break;
               }
             } else {
-              this.tdAlphaMissense.dataset.remains = 0;
               this.tdAlphaMissenseFunction.textContent = '';
               this.tdAlphaMissenseFunction.dataset.function = '';
             }
@@ -334,12 +332,10 @@ export default class ResultsRowView {
               Number.isFinite(x.sift)
             );
             if (sifts && sifts.length > 0) {
-              this.tdSift.dataset.remains = sifts.length - 1;
               this.tdSiftFunction.textContent = result.sift;
               this.tdSiftFunction.dataset.function =
                 result.sift >= 0.05 ? 'T' : 'D';
             } else {
-              this.tdSift.dataset.remains = 0;
               this.tdSiftFunction.textContent = '';
               this.tdSiftFunction.dataset.function = '';
             }
@@ -351,7 +347,6 @@ export default class ResultsRowView {
               Number.isFinite(x.polyphen)
             );
             if (polyphens && polyphens.length > 0) {
-              this.tdPolyphen.dataset.remains = polyphens.length - 1;
               this.tdPolyphenFunction.textContent = result.polyphen;
               switch (true) {
                 case result.polyphen > 0.908:
@@ -368,7 +363,6 @@ export default class ResultsRowView {
                   break;
               }
             } else {
-              this.tdPolyphen.dataset.remains = 0;
               this.tdPolyphenFunction.textContent = '';
               this.tdPolyphenFunction.dataset.function = '';
             }
