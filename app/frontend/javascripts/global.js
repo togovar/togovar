@@ -28,7 +28,7 @@ export const COLUMNS = [
   { label: 'Alt frequency', id: 'alt_frequency' },
   { label: 'Consequence', id: 'consequence' },
   { label: 'Clinical significance', id: 'clinical_significance' },
-  { label: 'AlphaMissense', id: 'alpha_missense' },
+  { label: 'AlphaMissense', id: 'alphamissense' },
   { label: 'SIFT', id: 'sift' },
   { label: 'PolyPhen', id: 'polyphen' },
 ];
