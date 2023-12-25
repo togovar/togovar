@@ -72,7 +72,7 @@ export default class PanelViewCheckList extends PanelView {
       <li class="separator"><hr></li>
       `;
     }
-    if (this.kind === 'alpha_missense') {
+    if (this.kind === 'alphamissense') {
       html += `
       <li class="item">
         <label class="label">
@@ -116,7 +116,7 @@ export default class PanelViewCheckList extends PanelView {
         ${this.kind === 'significance' ? `<div class="clinical-significance" data-value="${item.id}"></div>` : ''}
         ${this.kind === 'sift' ? `<div class="variant-function _width_5em _align-center" data-function="${item.id}">${ { D: '&lt; 0.05', T: '&ge; 0.05' }[item.id] }</div>` : ''}
         ${this.kind === 'polyphen' ? `<div class="variant-function _width_5em _align-center" data-function="${item.id}">${ { PROBD: '&gt; 0.908', POSSD: '&gt; 0.446', B: '&le; 0.446', U: '&ensp;&ensp;' }[item.id] }</div>` : ''}
-        ${this.kind === 'alpha_missense' ? `<div class="variant-function _width_5em _align-center" data-function="${item.id}">${{ LP: '&gt; 0.564', A: '&ge; 0.340', LB: '&lt; 0.340' }[item.id]}</div>` : ''}
+        ${this.kind === 'alphamissense' ? `<div class="variant-function _width_5em _align-center" data-function="${item.id}">${{ LP: '&gt; 0.564', A: '&ge; 0.340', LB: '&lt; 0.340' }[item.id]}</div>` : ''}
         ${item.label}
       </label>
       <span class="value"></span>
@@ -124,7 +124,7 @@ export default class PanelViewCheckList extends PanelView {
     `).join('');
     this.elm.querySelector('.content > .checklist-values').insertAdjacentHTML('beforeend', html);
     // not検索の重複を削除
-    if (this.kind === 'significance' || this.kind === 'alpha_missense' || this.kind === 'sift' || this.kind === 'polyphen') {
+    if (this.kind === 'significance' || this.kind === 'alphamissense' || this.kind === 'sift' || this.kind === 'polyphen') {
       this.elm.querySelector('.content > .checklist-values > .item:nth-child(5)').remove();
     }
   }

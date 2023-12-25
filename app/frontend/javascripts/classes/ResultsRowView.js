@@ -94,9 +94,9 @@ export default class ResultsRowView {
           html +=
             '<td class="polyphen" data-remains=""><div class="variant-function" data-function=""></div></td>';
           break;
-        case 'alpha_missense': // AlphaMissense
+        case 'alphamissense': // AlphaMissense
           html +=
-            '<td class="alpha_missense" data-remains=""><div class="variant-function" data-function=""></div></td>';
+            '<td class="alphamissense" data-remains=""><div class="variant-function" data-function=""></div></td>';
           break;
         case 'clinical_significance': // clinical significance
           html +=
@@ -137,7 +137,7 @@ export default class ResultsRowView {
     this.tdPolyphenFunction =
       this.tdPolyphen.querySelector('.variant-function');
     // AlphaMissense
-    this.tdAlphaMissense = this.tr.querySelector('td.alpha_missense');
+    this.tdAlphaMissense = this.tr.querySelector('td.alphamissense');
     this.tdAlphaMissenseFunction =
       this.tdAlphaMissense.querySelector('.variant-function');
     // Clinical significance
@@ -302,10 +302,10 @@ export default class ResultsRowView {
             }
           }
           break;
-        case 'alpha_missense':
+        case 'alphamissense':
           {
             const alphaMissenses = result.transcripts?.filter((x) =>
-              Number.isFinite(x.alpha_missense)
+              Number.isFinite(x.alphamissense)
             );
             if (alphaMissenses && alphaMissenses.length > 0) {
               this.tdAlphaMissense.dataset.remains = alphaMissenses.length - 1;

@@ -82,7 +82,7 @@ export function initHome() {
     );
     new PanelViewCheckList(
       document.getElementById('FilterAlphaMissense'),
-      'alpha_missense'
+      'alphamissense'
     );
     // aside 要素の準備（バリアントプレビュー）
     new PanelViewPreviewGene(document.getElementById('PreviewGene'));

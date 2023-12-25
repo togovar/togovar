@@ -602,7 +602,7 @@
     ]
   },
   {
-    "id": "alpha_missense",
+    "id": "alphamissense",
     "label": "AlphaMissense",
     "type": "array",
     "items": [
