@@ -360,7 +360,7 @@ export default class ResultsRowView {
                   this.tdAlphaMissenseFunction.dataset.function = 'LP';
                   break;
                 default:
-                  this.tdAlphaMissenseFunction.dataset.function = 'AMBIGUOUS';
+                  this.tdAlphaMissenseFunction.dataset.function = 'A';
                   break;
               }
             } else {
