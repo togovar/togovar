@@ -162,10 +162,13 @@ class VariationSearchService
         json.most_severe_consequence SequenceOntology.most_severe_consequence(*vep.flat_map { |x| x[:consequence] })&.id
         json.sift vep.map { |x| x[:sift] }.compact.min
         json.polyphen vep.map { |x| x[:polyphen] }.compact.max
-        json.alphamissense vep.map { |x| x[:alpha_missense] }.compact.max # TODO: rename to alphamissense
+        json.alphamissense vep.map { |x| x[:alpha_missense] }.compact.max # TODO: rename on 2024.1
         vep.each do |x|
-          consequences = x[:consequence].map { |x| SequenceOntology.find_by_key(x) }
+          consequences = x[:consequence].map { |key| SequenceOntology.find_by_key(key) }
           x[:consequence] = (SequenceOntology::CONSEQUENCES_IN_ORDER & consequences).map { |y| y.id }
+          if (v = x.delete(:alpha_missense)) # TODO: remove on 2024.1
+            x[:alphamissense] = v
+          end
         end
         json.transcripts vep.map(&:compact).presence
 
