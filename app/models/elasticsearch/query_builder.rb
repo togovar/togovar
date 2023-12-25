@@ -362,12 +362,12 @@ module Elasticsearch
                       bool do
                         must_not do
                           exists do
-                            field 'vep.alphamissense'
+                            field 'vep.alpha_missense' # TODO: rename on 2024.1
                           end
                         end
                       end
                     else
-                      range 'vep.alphamissense' do
+                      range 'vep.alpha_missense' do # TODO: rename on 2024.1
                         if x == :LP
                           gt 0.564
                         elsif x == :A
