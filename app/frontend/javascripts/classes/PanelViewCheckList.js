@@ -65,7 +65,43 @@ export default class PanelViewCheckList extends PanelView {
       <li class="item">
         <label class="label">
           <input type="checkbox" value="NC" checked>
-          Not in ClinVar
+          Unassigned
+        </label>
+        <span class="value"></span>
+      </li>
+      <li class="separator"><hr></li>
+      `;
+    }
+    if (this.kind === 'alpha_missense') {
+      html += `
+      <li class="item">
+        <label class="label">
+          <input type="checkbox" value="N" checked>
+          Unassigned
+        </label>
+        <span class="value"></span>
+      </li>
+      <li class="separator"><hr></li>
+      `;
+    }
+    if (this.kind === 'sift') {
+      html += `
+      <li class="item">
+        <label class="label">
+          <input type="checkbox" value="N" checked>
+          Unassigned
+        </label>
+        <span class="value"></span>
+      </li>
+      <li class="separator"><hr></li>
+      `;
+    }
+    if (this.kind === 'polyphen') {
+      html += `
+      <li class="item">
+        <label class="label">
+          <input type="checkbox" value="N" checked>
+          Unassigned
         </label>
         <span class="value"></span>
       </li>
@@ -87,8 +123,8 @@ export default class PanelViewCheckList extends PanelView {
     </li>
     `).join('');
     this.elm.querySelector('.content > .checklist-values').insertAdjacentHTML('beforeend', html);
-    // clinical significance で not in clinvar の重複を削除
-    if (this.kind === 'significance') {
+    // not検索の重複を削除
+    if (this.kind === 'significance' || this.kind === 'alpha_missense' || this.kind === 'sift' || this.kind === 'polyphen') {
       this.elm.querySelector('.content > .checklist-values > .item:nth-child(5)').remove();
     }
   }
