@@ -80,7 +80,7 @@ export default class PanelViewCheckList extends PanelView {
         ${this.kind === 'significance' ? `<div class="clinical-significance" data-value="${item.id}"></div>` : ''}
         ${this.kind === 'sift' ? `<div class="variant-function _width_5em _align-center" data-function="${item.id}">${ { D: '&lt; 0.05', T: '&ge; 0.05' }[item.id] }</div>` : ''}
         ${this.kind === 'polyphen' ? `<div class="variant-function _width_5em _align-center" data-function="${item.id}">${ { PROBD: '&gt; 0.908', POSSD: '&gt; 0.446', B: '&le; 0.446', U: '&ensp;&ensp;' }[item.id] }</div>` : ''}
-        ${this.kind === 'alpha_missense' ? `<div class="variant-function _width_5em _align-center" data-function="${item.id}">${{ LP: '&gt; 0.564', AMBIGUOUS: '&ge; 0.340', LB: '&lt; 0.340' }[item.id]}</div>` : ''}
+        ${this.kind === 'alpha_missense' ? `<div class="variant-function _width_5em _align-center" data-function="${item.id}">${{ LP: '&gt; 0.564', A: '&ge; 0.340', LB: '&lt; 0.340' }[item.id]}</div>` : ''}
         ${item.label}
       </label>
       <span class="value"></span>

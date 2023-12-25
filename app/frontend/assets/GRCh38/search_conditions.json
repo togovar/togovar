@@ -613,7 +613,7 @@
         "default": "1"
       },
       {
-        "id": "AMBIGUOUS",
+        "id": "A",
         "label": "Ambiguous",
         "type": "boolean",
         "default": "1"
