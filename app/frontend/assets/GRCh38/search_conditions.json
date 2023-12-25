@@ -145,7 +145,7 @@
     "items": [
       {
         "id": "NC",
-        "label": "Not in clinvar",
+        "label": "Unassigned",
         "type": "boolean",
         "default": "1"
       },
@@ -607,6 +607,12 @@
     "type": "array",
     "items": [
       {
+        "id": "N",
+        "label": "Unassigned",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
         "id": "LP",
         "label": "Likely pathogenic",
         "type": "boolean",
@@ -632,6 +638,12 @@
     "type": "array",
     "items": [
       {
+        "id": "N",
+        "label": "Unassigned",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
         "id": "D",
         "label": "Deleterious",
         "type": "boolean",
@@ -650,6 +662,12 @@
     "label": "PolyPhen",
     "type": "array",
     "items": [
+      {
+        "id": "N",
+        "label": "Unassigned",
+        "type": "boolean",
+        "default": "1"
+      },
       {
         "id": "PROBD",
         "label": "Probably damaging",
