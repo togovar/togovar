@@ -95,26 +95,26 @@ class VariationSearchService
       conditions = Hash.new { |hash, key| hash[key] = Disease.find(key).results.first&.dig('_source', 'name') }
 
       json.data @result[:results] do |result|
-        variation = result[:_source].deep_symbolize_keys
+        variant = result[:_source].deep_symbolize_keys
 
-        if (v = variation[:id]).present?
+        if (v = variant[:id]).present?
           json.id "tgv#{v}"
         end
 
-        json.type SequenceOntology.find_by_label(variation[:type])&.id
+        json.type SequenceOntology.find_by_label(variant[:type])&.id
 
-        json.chromosome variation.dig(:chromosome, :label)
-        json.position variation.dig(:vcf, :position)
-        json.start variation[:start]
-        json.stop variation[:stop]
-        json.reference variation[:reference].presence || ''
-        json.alternate variation[:alternate].presence || ''
+        json.chromosome variant.dig(:chromosome, :label)
+        json.position variant.dig(:vcf, :position)
+        json.start variant[:start]
+        json.stop variant[:stop]
+        json.reference variant[:reference].presence || ''
+        json.alternate variant[:alternate].presence || ''
 
-        if (dbsnp = Array(variation[:xref]).filter { |x| x[:source] = 'dbSNP' }.map { |x| x[:id] }).present?
+        if (dbsnp = Array(variant[:xref]).filter { |x| x[:source] = 'dbSNP' }.map { |x| x[:id] }).present?
           json.existing_variations dbsnp
         end
 
-        symbols = Array(variation[:vep])
+        symbols = Array(variant[:vep])
                     .filter { |x| x.dig(:symbol, :source) == 'HGNC' && x[:hgnc_id] }
                     .map { |x| { name: x.dig(:symbol, :label), id: x[:hgnc_id] } }
                     .uniq
@@ -124,7 +124,7 @@ class VariationSearchService
           json.symbols symbols
         end
 
-        clinvar = (v = variation.dig(:clinvar, :variation_id)) ? ['VCV%09d' % v] : nil
+        clinvar = (v = variant.dig(:clinvar, :variation_id)) ? ['VCV%09d' % v] : nil
 
         external_link = {
           dbsnp: dbsnp.presence,
@@ -135,7 +135,7 @@ class VariationSearchService
           json.external_link external_link
         end
 
-        significance = Array(variation.dig(:clinvar, :conditions)).map do |x|
+        significance = Array(variant.dig(:clinvar, :conditions)).map do |x|
           {
             condition: conditions[x[:medgen]],
             interpretations: Array(x[:interpretation]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(',', '').tr(' ', '_').to_sym)&.key },
@@ -158,21 +158,18 @@ class VariationSearchService
           json.significance significance
         end
 
-        vep = Array(variation[:vep])
+        vep = Array(variant[:vep])
         json.most_severe_consequence SequenceOntology.most_severe_consequence(*vep.flat_map { |x| x[:consequence] })&.id
-        json.sift vep.map { |x| x[:sift] }.compact.min
-        json.polyphen vep.map { |x| x[:polyphen] }.compact.max
-        json.alphamissense vep.map { |x| x[:alpha_missense] }.compact.max # TODO: rename on 2024.1
+        json.sift variant[:sift]
+        json.polyphen variant[:polyphen]
+        json.alphamissense variant[:alphamissense]
         vep.each do |x|
           consequences = x[:consequence].map { |key| SequenceOntology.find_by_key(key) }
           x[:consequence] = (SequenceOntology::CONSEQUENCES_IN_ORDER & consequences).map { |y| y.id }
-          if (v = x.delete(:alpha_missense)) # TODO: remove on 2024.1
-            x[:alphamissense] = v
-          end
         end
         json.transcripts vep.map(&:compact).presence
 
-        frequencies = Array(variation[:frequency]).map(&:compact)
+        frequencies = Array(variant[:frequency]).map(&:compact)
         frequencies.each do |x|
           if x[:allele].present? && x.dig(:allele, :frequency).blank?
             x[:allele][:frequency] = begin

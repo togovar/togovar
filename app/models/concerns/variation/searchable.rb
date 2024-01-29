@@ -38,6 +38,9 @@ class Variation
             indexes :id, type: :keyword
           end
           indexes :most_severe_consequence, type: :keyword
+          indexes :sift, type: :float
+          indexes :polyphen, type: :float
+          indexes :alphamissense, type: :float
           indexes :vep, type: :nested do
             indexes :consequence_type, type: :keyword
             indexes :transcript_id, type: :keyword
@@ -53,7 +56,7 @@ class Variation
             indexes :hgvs_g, type: :keyword
             indexes :sift, type: :float
             indexes :polyphen, type: :float
-            indexes :alpha_missense, type: :float # TODO: rename to alphamissense
+            indexes :alphamissense, type: :float
           end
           indexes :clinvar do
             indexes :variation_id, type: :long
@@ -137,19 +140,7 @@ class Variation
       def default_condition
         Elasticsearch::DSL::Search.search do
           query do
-            bool do
-              should do
-                exists field: :clinvar
-              end
-              should do
-                nested do
-                  path 'frequency'
-                  query do
-                    exists field: :frequency
-                  end
-                end
-              end
-            end
+            match active: true
           end
         end.to_hash[:query]
       end

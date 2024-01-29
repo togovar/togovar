@@ -6,6 +6,12 @@ module Elasticsearch
     attr_accessor :size
     attr_accessor :start_only
 
+    module Datasets
+      FREQUENCY = %i[bbj_riken gem_j_wga gnomad_exomes gnomad_genomes jga_ngs jga_snp ncbn tommo]
+      FREQUENCY_WITH_FILTER = %i[bbj_riken gem_j_wga gnomad_exomes gnomad_genomes jga_ngs jga_snp ncbn tommo]
+      ALL = FREQUENCY.concat(%i[clinvar mgend])
+    end
+
     def initialize
       @from = 0
       @size = 100
@@ -41,25 +47,30 @@ module Elasticsearch
     end
 
     def dataset(names)
-      @dataset_condition = []
+      @dataset_condition = nil
 
-      return self if names.empty?
+      return self if (names & Datasets::ALL).empty?
 
-      names = names.dup
+      sources = names & Datasets::FREQUENCY
 
       query = Elasticsearch::DSL::Search.search do
         query do
           bool do
-            if names.delete(:clinvar)
+            if names.include?(:clinvar)
               should do
                 exists field: :clinvar
               end
             end
-            if names.present?
+            if names.include?(:mgend)
+              should do
+                exists field: :mgend
+              end
+            end
+            if sources.present?
               should do
                 nested do
                   path :frequency
-                  query { terms 'frequency.source': names }
+                  query { terms 'frequency.source': sources }
                 end
               end
             end
@@ -76,23 +87,23 @@ module Elasticsearch
       self
     end
 
-    def frequency(datasets, frequency_from, frequency_to, invert, all_datasets)
+    def frequency(datasets, frequency_from, frequency_to, invert = false, all_datasets = false)
       @frequency_condition = nil
-      names = datasets.dup
-      names.delete(:clinvar)
 
-      return self if names.empty?
+      sources = datasets & Datasets::FREQUENCY
+
+      return self if sources.empty?
 
       @frequency_condition = Elasticsearch::DSL::Search.search do
         query do
           bool do
-            names.each do |name|
+            sources.each do |source|
               send(all_datasets ? :must : :should) do
                 nested do
                   path :frequency
                   query do
                     bool do
-                      must { match 'frequency.source': name }
+                      must { match 'frequency.source': source }
                       if invert
                         must do
                           bool do
@@ -127,44 +138,20 @@ module Elasticsearch
     def quality(datasets)
       @quality_condition = nil
 
-      filter_sources = datasets & %i[gem_j_wga jga_ngs jga_snp tommo gnomad_exomes gnomad_genomes]
+      sources = datasets & Datasets::FREQUENCY_WITH_FILTER
 
-      return self if filter_sources.empty?
+      return self if sources.empty?
 
       @quality_condition = Elasticsearch::DSL::Search.search do
         query do
           bool do
-            if datasets.include?(:clinvar)
-              should do
-                bool do
-                  must_not do
-                    nested do
-                      path :frequency
-                      query do
-                        exists field: 'frequency'
-                      end
-                    end
-                  end
-                end
-              end
-            end
-            if (x = (datasets & %i[hgvd])).present?
-              should do
-                nested do
-                  path :frequency
-                  query do
-                    terms 'frequency.source': x
-                  end
-                end
-              end
-            end
             should do
               nested do
                 path :frequency
                 query do
                   bool do
                     must do
-                      terms 'frequency.source': filter_sources
+                      terms 'frequency.source': sources
                     end
                     must do
                       match 'frequency.filter': 'PASS'
@@ -197,14 +184,14 @@ module Elasticsearch
     def significance(*values)
       @significance_condition = nil
 
-      return self if values.empty?
+      interpretations = values.filter_map { |x| ClinicalSignificance.find_by_key(x)&.label&.downcase }
 
-      values = values.dup
+      return self if !values.include?(:NC) && interpretations.blank?
 
       @significance_condition = Elasticsearch::DSL::Search.search do
         query do
           bool do
-            if values.delete(:NC)
+            if values.include?(:NC)
               should do
                 bool do
                   must_not do
@@ -214,7 +201,7 @@ module Elasticsearch
               end
             end
 
-            if (interpretations = values.filter_map { |x| ClinicalSignificance.find_by_key(x)&.label&.downcase }).present?
+            if interpretations.present?
               should do
                 nested do
                   path 'clinvar.conditions'
@@ -234,14 +221,16 @@ module Elasticsearch
     def consequence(*values)
       @consequence_condition = nil
 
-      return self if values.empty?
+      consequence = values.filter_map { |x| SequenceOntology.find(x)&.key }
+
+      return self if consequence.empty?
 
       @consequence_condition = Elasticsearch::DSL::Search.search do
         query do
           nested do
             path :vep
             query do
-              terms 'vep.consequence': values.map { |x| SequenceOntology.find(x)&.key }.compact
+              terms 'vep.consequence': consequence
             end
           end
         end
@@ -259,28 +248,23 @@ module Elasticsearch
 
       @sift_condition = Elasticsearch::DSL::Search.search do
         query do
-          nested do
-            path :vep
-            query do
-              bool do
-                values.each do |x|
-                  should do
-                    if x == :N
-                      bool do
-                        must_not do
-                          exists do
-                            field 'vep.sift'
-                          end
-                        end
+          bool do
+            values.each do |x|
+              should do
+                if x == :N
+                  bool do
+                    must_not do
+                      exists do
+                        field 'sift'
                       end
+                    end
+                  end
+                else
+                  range 'sift' do
+                    if x == :D
+                      lt 0.05
                     else
-                      range 'vep.sift' do
-                        if x == :D
-                          lt 0.05
-                        else
-                          gte 0.05
-                        end
-                      end
+                      gte 0.05
                     end
                   end
                 end
@@ -302,35 +286,30 @@ module Elasticsearch
 
       @polyphen_condition = Elasticsearch::DSL::Search.search do
         query do
-          nested do
-            path :vep
-            query do
-              bool do
-                values.each do |x|
-                  should do
-                    if x == :N
-                      bool do
-                        must_not do
-                          exists do
-                            field 'vep.polyphen'
-                          end
-                        end
+          bool do
+            values.each do |x|
+              should do
+                if x == :N
+                  bool do
+                    must_not do
+                      exists do
+                        field 'polyphen'
                       end
+                    end
+                  end
+                else
+                  range 'polyphen' do
+                    case x
+                    when :B
+                      gte 0
+                      lte 0.446
+                    when :POSSD
+                      gt 0.446
+                      lte 0.908
+                    when :PROBD
+                      gt 0.908
                     else
-                      range 'vep.polyphen' do
-                        case x
-                        when :PROBD
-                          gt 0.908
-                        when :POSSD
-                          lte 0.908
-                          gt 0.446
-                        when :B
-                          lte 0.446
-                          gte 0
-                        else
-                          lt 0
-                        end
-                      end
+                      lt 0
                     end
                   end
                 end
@@ -352,31 +331,28 @@ module Elasticsearch
 
       @alphamissense_condition = Elasticsearch::DSL::Search.search do
         query do
-          nested do
-            path :vep
-            query do
-              bool do
-                values.each do |x|
-                  should do
-                    if x == :N
-                      bool do
-                        must_not do
-                          exists do
-                            field 'vep.alpha_missense' # TODO: rename on 2024.1
-                          end
-                        end
+          bool do
+            values.each do |x|
+              should do
+                if x == :N
+                  bool do
+                    must_not do
+                      exists do
+                        field 'alphamissense'
                       end
+                    end
+                  end
+                else
+                  range 'alphamissense' do
+                    case x
+                    when :LB
+                      gte 0
+                      lt 0.34
+                    when :A
+                      gte 0.34
+                      lte 0.564
                     else
-                      range 'vep.alpha_missense' do # TODO: rename on 2024.1
-                        if x == :LP
-                          gt 0.564
-                        elsif x == :A
-                          gte 0.34
-                          lte 0.564
-                        else
-                          lt 0.34
-                        end
-                      end
+                      gt 0.564
                     end
                   end
                 end
