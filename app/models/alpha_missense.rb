@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AlphaMisssense
+class AlphaMissense
   Prediction = Struct.new(:id, :key, :label, :index, keyword_init: true)
 
   module Predictions

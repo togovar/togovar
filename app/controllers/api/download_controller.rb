@@ -269,8 +269,8 @@ module API
         data[:polyphen2_qualitative_prediction] = polyphen ? Polyphen.find_by_value(polyphen).label : nil
         data[:polyphen2_score] = polyphen
       end
-      if columns.include?(:alphamisssense)
-        data[:alphamissense_pathogenicity] = alpha_misssense ? AlphaMisssense.find_by_value(alpha_misssense).label : nil
+      if columns.include?(:alphamissense)
+        data[:alphamissense_pathogenicity] = alpha_misssense ? AlphaMissense.find_by_value(alpha_misssense).label : nil
         data[:alphamissense_score] = alpha_misssense
       end
 

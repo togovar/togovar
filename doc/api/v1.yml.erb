@@ -372,6 +372,9 @@ components:
                   - $ref: '#/components/schemas/VariantConsequence'
                   - $ref: '#/components/schemas/VariantFrequency'
                   - $ref: '#/components/schemas/ClinicalSignificance'
+                  - $ref: '#/components/schemas/Sift'
+                  - $ref: '#/components/schemas/Polyphen'
+                  - $ref: '#/components/schemas/AlphaMissense'
                   - $ref: '#/components/schemas/Gene'
                   - $ref: '#/components/schemas/Disease'
                   - $ref: '#/components/schemas/And'
@@ -433,6 +436,10 @@ components:
               $ref: '#/components/examples/SearchVariant-8'
             Example9:
               $ref: '#/components/examples/SearchVariant-9'
+            Example10:
+              $ref: '#/components/examples/SearchVariant-10'
+            Example11:
+              $ref: '#/components/examples/SearchVariant-11'
 
     SearchGene:
       description: Schema for searching gene
@@ -866,6 +873,83 @@ components:
                   - not_provided
                   - association_not_found
 
+    Sift:
+      type: object
+      additionalProperties: false
+      required:
+        - sift
+      properties:
+        sift:
+          type: object
+          additionalProperties: false
+          required:
+            - score
+          properties:
+            score:
+              oneOf:
+                - $ref: '#/components/schemas/Range'
+                - title: Terms
+                  type: array
+                  items:
+                    type: string
+                    description: >
+                      Available values
+                       * `unassigned`
+                    enum:
+                      - unassigned
+
+    Polyphen:
+      type: object
+      additionalProperties: false
+      required:
+        - polyphen
+      properties:
+        polyphen:
+          type: object
+          additionalProperties: false
+          required:
+            - score
+          properties:
+            score:
+              oneOf:
+                - $ref: '#/components/schemas/Range'
+                - title: Terms
+                  type: array
+                  items:
+                    type: string
+                    description: >
+                      Available values
+                       * `unassigned`
+                       * `unknown`
+                    enum:
+                      - unassigned
+                      - unknown
+
+    AlphaMissense:
+      type: object
+      additionalProperties: false
+      required:
+        - alphamissense
+      properties:
+        alphamissense:
+          type: object
+          additionalProperties: false
+          required:
+            - score
+          properties:
+            score:
+              oneOf:
+                - $ref: '#/components/schemas/Range'
+                - title: Terms
+                  type: array
+                  items:
+                    type: string
+                    description: >
+                      Available values
+                       * `unassigned`
+                    enum:
+                      - unassigned
+
     Gene:
       type: object
       additionalProperties: false
@@ -1056,6 +1140,9 @@ components:
               - $ref: '#/components/schemas/VariantConsequence'
               - $ref: '#/components/schemas/VariantFrequency'
               - $ref: '#/components/schemas/ClinicalSignificance'
+              - $ref: '#/components/schemas/Sift'
+              - $ref: '#/components/schemas/Polyphen'
+              - $ref: '#/components/schemas/AlphaMissense'
               - $ref: '#/components/schemas/Gene'
               - $ref: '#/components/schemas/Disease'
               - $ref: '#/components/schemas/And'
@@ -1079,6 +1166,9 @@ components:
               - $ref: '#/components/schemas/VariantConsequence'
               - $ref: '#/components/schemas/VariantFrequency'
               - $ref: '#/components/schemas/ClinicalSignificance'
+              - $ref: '#/components/schemas/Sift'
+              - $ref: '#/components/schemas/Polyphen'
+              - $ref: '#/components/schemas/AlphaMissense'
               - $ref: '#/components/schemas/Gene'
               - $ref: '#/components/schemas/Disease'
               - $ref: '#/components/schemas/And'
@@ -1567,3 +1657,37 @@ components:
             - G
             - A
           limit: 1000
+
+    SearchVariant-10:
+      summary: List variants by prediction score
+      value:
+        query:
+          and:
+            - sift:
+                score:
+                  gte: 0
+                  lt: 0.05
+            - polyphen:
+                score:
+                  gt: 0.908
+                  lte: 1
+            - alphamissense:
+                score:
+                  gt: 0.564
+                  lte: 1
+
+    SearchVariant-11:
+      summary: List variants by prediction score unassigned or unknown
+      value:
+        query:
+          and:
+            - sift:
+                score:
+                  - unassigned
+            - polyphen:
+                score:
+                  - unassigned
+                  - unknown
+            - alphamissense:
+                score:
+                  - unassigned
