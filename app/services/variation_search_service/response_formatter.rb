@@ -161,7 +161,7 @@ class VariationSearchService
         vep = Array(variant[:vep])
         json.most_severe_consequence SequenceOntology.most_severe_consequence(*vep.flat_map { |x| x[:consequence] })&.id
         json.sift variant[:sift]
-        json.polyphen variant[:polyphen]
+        json.polyphen variant[:polyphen]&.negative? ? 'Unknown' : variant[:polyphen]
         json.alphamissense variant[:alphamissense]
         vep.each do |x|
           consequences = x[:consequence].map { |key| SequenceOntology.find_by_key(key) }
