@@ -250,8 +250,8 @@ export default class ResultsRowView {
               if (!dataset.has_freq) continue;
               const frequency = result.frequencies
                 ? result.frequencies.find(
-                  (frequency) => frequency.source === dataset.id
-                )
+                    (frequency) => frequency.source === dataset.id
+                  )
                 : undefined;
               this.tdFrequencies[dataset.id].frequency = frequency;
             }
@@ -304,10 +304,7 @@ export default class ResultsRowView {
           break;
         case 'alphamissense':
           {
-            const alphaMissenses = result.transcripts?.filter((x) =>
-              Number.isFinite(x.alphamissense)
-            );
-            if (alphaMissenses && alphaMissenses.length > 0) {
+            if (result.alphamissense) {
               this.tdAlphaMissenseFunction.textContent = result.alphamissense;
               switch (true) {
                 case result.alphamissense < 0.34:
@@ -328,10 +325,7 @@ export default class ResultsRowView {
           break;
         case 'sift':
           {
-            const sifts = result.transcripts?.filter((x) =>
-              Number.isFinite(x.sift)
-            );
-            if (sifts && sifts.length > 0) {
+            if (result.sift) {
               this.tdSiftFunction.textContent = result.sift;
               this.tdSiftFunction.dataset.function =
                 result.sift >= 0.05 ? 'T' : 'D';
@@ -343,10 +337,7 @@ export default class ResultsRowView {
           break;
         case 'polyphen':
           {
-            const polyphens = result.transcripts?.filter((x) =>
-              Number.isFinite(x.polyphen)
-            );
-            if (polyphens && polyphens.length > 0) {
+            if (result.polyphen) {
               this.tdPolyphenFunction.textContent = result.polyphen;
               switch (true) {
                 case result.polyphen > 0.908:
