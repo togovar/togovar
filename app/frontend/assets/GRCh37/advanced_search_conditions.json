@@ -50,21 +50,7 @@
     },
     "pathogenicity_prediction": {
       "label": "PathogenicityPrediction",
-      "type": "peculiar",
-      "values": [
-        {
-          "value": "alphamissense",
-          "label": "AlphaMissense"
-        },
-        {
-          "value": "sift",
-          "label": "SIFT"
-        },
-        {
-          "value": "polyphen",
-          "label": "PolyPhen"
-        }
-      ]
+      "type": "peculiar"
     },
     "significance": {
       "label": "Clinical significance",
