@@ -1,6 +1,6 @@
 import ConditionView from './ConditionView.js';
 import ConditionValues from './ConditionValues.js';
-import StoreManager from "./StoreManager.js";
+import StoreManager from './StoreManager.js';
 import { ADVANCED_CONDITIONS } from '../global.js';
 import { CONDITION_TYPE, CONDITION_ITEM_TYPE } from '../definition.js';
 import { keyDownEvent } from '../utils/keyDownEvent.js';
@@ -27,14 +27,15 @@ class ConditionItemView extends ConditionView {
     this._conditionType = conditionType;
     /** @property {boolean} _isFirstTime - whether this is the first time to edit. (Relates to whether the element is deleted with the cancel button) */
     this._isFirstTime = true;
-     /** @property {boolean} _keepLastRelation - Save equal and negative conditions for canceling */
-    this._keepLastRelation = "eq"
+    /** @property {boolean} _keepLastRelation - Save equal and negative conditions for canceling */
+    this._keepLastRelation = 'eq';
 
     // make HTML
     this._elm.classList.add('advanced-search-condition-item-view');
     this._elm.dataset.classification = conditionType;
     this._elm.dataset.relation =
       conditionType === 'dataset' ||
+      conditionType === 'pathogenicity_prediction' ||
       conditionType === 'id' ||
       conditionType === 'location'
         ? ''
@@ -82,7 +83,7 @@ class ConditionItemView extends ConditionView {
           this._elm.dataset.relation
         ];
         if (!StoreManager.getData('showModal')) {
-          this._keepLastRelation = this._elm.dataset.relation
+          this._keepLastRelation = this._elm.dataset.relation;
           this._builder.changeCondition();
         }
       });
@@ -96,7 +97,7 @@ class ConditionItemView extends ConditionView {
           case 'edit':
             this._elm.classList.add('-editing');
             this._conditionValues.startToEditCondition();
-            StoreManager.setData('showModal', true)
+            StoreManager.setData('showModal', true);
             window.addEventListener('keydown', this.#keydownEscapeEvent);
             break;
           case 'delete':
@@ -139,15 +140,20 @@ class ConditionItemView extends ConditionView {
   /** Exit the edit screen with esckey. remove() for the first time, doneEditing() for editing
    * @private */
   #keydownEscape(e) {
-    if (e.key !== 'Escape' || !this._conditionValues || !StoreManager.getData('showModal')) return;
+    if (
+      e.key !== 'Escape' ||
+      !this._conditionValues ||
+      !StoreManager.getData('showModal')
+    )
+      return;
 
-    if (keyDownEvent("showModal")) {
+    if (keyDownEvent('showModal')) {
       if (this._isFirstTime) {
         this.remove();
       } else {
         for (const editor of this._conditionValues.editors) {
           editor.restore();
-          this._elm.dataset.relation = this._keepLastRelation
+          this._elm.dataset.relation = this._keepLastRelation;
         }
         this.doneEditing();
       }
@@ -199,6 +205,12 @@ class ConditionItemView extends ConditionView {
               .queryValue
         );
         return queries.length <= 1 ? queries[0] : { or: queries };
+      }
+
+      case CONDITION_TYPE.pathogenicity_prediction: {
+        return valueElements[0].shadowRoot.querySelector(
+          'pathogenicity-value-view'
+        ).queryValue;
       }
 
       case CONDITION_TYPE.location: {

@@ -25,7 +25,8 @@ class PathogenicityRangeSlider extends LitElement {
   @query('.slider .progress') _range;
   @query('.slider .ruler') _ruler;
   @query('.slider .threshold') _threshold;
-  @queryAll('.slider > .threshold > .threshold-button') _thresholdButton;
+  @queryAll('.slider > .threshold > .threshold-line') _thresholdLines;
+  @queryAll('.slider > .threshold > .threshold-button') _thresholdButtons;
 
   firstUpdated() {
     this._handleTextInput();
@@ -59,8 +60,8 @@ class PathogenicityRangeSlider extends LitElement {
 
           if (minVal > maxVal) {
             maxVal = primaryInputs[0].value;
-            secondaryInputs[1].value = maxVal;
             primaryInputs[1].value = maxVal;
+            secondaryInputs[1].value = maxVal;
             this._range.style.right = 100 - maxVal * 100 + '%';
           }
         } else {
@@ -69,12 +70,14 @@ class PathogenicityRangeSlider extends LitElement {
 
           if (maxVal < minVal) {
             minVal = primaryInputs[1].value;
-            secondaryInputs[0].value = minVal;
             primaryInputs[0].value = minVal;
+            secondaryInputs[0].value = minVal;
             this._range.style.left = minVal * 100 + '%';
           }
         }
         this._range.style.backgroundImage = this._createGradient();
+
+        this._setAttributes(minVal, maxVal);
       });
     });
   }
@@ -98,38 +101,25 @@ class PathogenicityRangeSlider extends LitElement {
     const thresholdValues = Object.values(this.pathogenicityThreshold).map(
       (threshold) => threshold.min
     );
-    for (let i = 0; i <= thresholdValues.length - 1; i++) {
-      const thresholdScalse = document.createElement('div');
-      thresholdScalse.className = 'threshold-line';
-      thresholdScalse.style.height = `${
-        (thresholdValues.length - i) * 20 + 10
-      }px`;
-      thresholdScalse.style.left = `${thresholdValues[i] * 100}%`;
 
-      const thresholdButton = document.createElement('button');
-      thresholdButton.type = 'button';
-      thresholdButton.className = `threshold-button`;
-      thresholdButton.dataset.threshold = Object.keys(
-        this.pathogenicityThreshold
-      )[i];
-      thresholdButton.dataset.max = Object.values(this.pathogenicityThreshold)[
-        i
-      ].max;
-      thresholdButton.dataset.min = Object.values(this.pathogenicityThreshold)[
-        i
-      ].min;
-      thresholdButton.textContent = Object.keys(this.pathogenicityThreshold)[i];
+    this._thresholdLines.forEach((line, i) => {
+      line.style.height = `${(thresholdValues.length - i) * 20 + 10}px`;
+      line.style.left = `${thresholdValues[i] * 100}%`;
+    });
 
-      thresholdButton.style.left = `${thresholdValues[i] * 100}%`;
-      thresholdButton.style.top = `${(thresholdValues.length - i) * 20}px`;
+    this._thresholdButtons.forEach((button, i) => {
+      button.dataset.threshold = Object.keys(this.pathogenicityThreshold)[i];
+      button.dataset.max = Object.values(this.pathogenicityThreshold)[i].max;
+      button.dataset.min = Object.values(this.pathogenicityThreshold)[i].min;
+      button.textContent = Object.keys(this.pathogenicityThreshold)[i];
 
-      this._threshold.append(thresholdScalse);
-      this._threshold.append(thresholdButton);
-    }
+      button.style.left = `${thresholdValues[i] * 100}%`;
+      button.style.top = `${(thresholdValues.length - i) * 20}px`;
+    });
   }
 
   _handleThresholdButton = () => {
-    this._thresholdButton.forEach((button) => {
+    this._thresholdButtons.forEach((button) => {
       button.addEventListener('click', (e) => {
         const target = e.target;
         this._rangeInput[0].value = target.dataset.min;
@@ -139,6 +129,8 @@ class PathogenicityRangeSlider extends LitElement {
         this._range.style.left = target.dataset.min * 100 + '%';
         this._range.style.right = 100 - target.dataset.max * 100 + '%';
         this._range.style.backgroundImage = this._createGradient();
+
+        this._setAttributes(target.dataset.min, target.dataset.max);
       });
     });
   };
@@ -176,13 +168,28 @@ class PathogenicityRangeSlider extends LitElement {
     return `linear-gradient(to right, ${gradientCss})`;
   }
 
+  _setAttributes(minVal, maxVal) {
+    this._numberInput[0].setAttribute('value', minVal);
+    this._numberInput[1].setAttribute('value', maxVal);
+    this._rangeInput[0].setAttribute('value', minVal);
+    this._rangeInput[1].setAttribute('value', maxVal);
+
+    this.dispatchEvent(
+      new CustomEvent('set-value', {
+        detail: { minVal: minVal, maxVal: maxVal },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
   render() {
-    const createNumberInput = (className, value, title) => html`
+    const createNumberInput = (className, title, value) => html`
       <input
         type="number"
         class=${className}
-        value=${value}
         title=${title}
+        value=${value}
         min=${SLIDER_CONFIG.min}
         max=${SLIDER_CONFIG.max}
         step=${SLIDER_CONFIG.step}
@@ -202,18 +209,23 @@ class PathogenicityRangeSlider extends LitElement {
 
     return html`
       <div class="number-input">
-        ${createNumberInput('input-min', '0', 'Lower limit')}
+        ${createNumberInput('input-min', 'Lower limit', SLIDER_CONFIG.min)}
         <div class="separator">~</div>
-        ${createNumberInput('input-max', '1', 'Upper limit')}
+        ${createNumberInput('input-max', 'Upper limit', SLIDER_CONFIG.max)}
       </div>
       <div class="slider">
         <div class="progress"></div>
         <div class="ruler"></div>
-        <div class="threshold"></div>
+        <div class="threshold">
+          ${Object.entries(this.pathogenicityThreshold).map(
+            () => html`<div class="threshold-line"></div>
+              <button type="button" class="threshold-button"></button>`
+          )}
+        </div>
       </div>
       <div class="range-input">
-        ${createRangeInput('range-min', '0')}
-        ${createRangeInput('range-max', '1')}
+        ${createRangeInput('range-min', SLIDER_CONFIG.min)}
+        ${createRangeInput('range-max', SLIDER_CONFIG.max)}
       </div>
     `;
   }

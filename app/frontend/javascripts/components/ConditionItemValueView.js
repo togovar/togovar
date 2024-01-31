@@ -1,9 +1,9 @@
 import { LitElement, html, nothing } from 'lit';
 import './FrequencyCountValueView'; // for embedding
+import './PathogenicityValueView'; // for embedding
 import Style from '../../stylesheets/object/component/condition-item-value-view.scss';
 
 export default class ConditionItemValueView extends LitElement {
-  // static styles = [css`${ Style }`];
   static styles = [Style];
 
   static properties = {
@@ -43,6 +43,11 @@ export default class ConditionItemValueView extends LitElement {
       option = html`<frequency-count-value-view
         data-dataset="${this.value}"
       ></frequency-count-value-view>`;
+    }
+    if (this.conditionType == 'pathogenicity_prediction') {
+      option = html`<pathogenicity-value-view
+        data-dataset="${this.value}"
+      ></pathogenicity-value-view>`;
     }
     return html`<span
         class="inner"

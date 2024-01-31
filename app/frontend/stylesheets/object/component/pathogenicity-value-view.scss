@@ -1,0 +1,44 @@
+@use '../../foundation/_variables.scss' as *;
+
+:host {
+  position: absolute;
+  top: 0;
+  left: 142px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+:host > .pathogenicity-graph {
+  width: 100px;
+  height: 3.5px;
+  background-color: var(--color-darker-gray);
+  position: relative;
+  margin-right: 4px;
+
+  > .scale {
+    position: absolute;
+    top: -1px;
+    bottom: -1px;
+    border-left: dotted 0.5px var(--color-separator);
+  }
+}
+
+@media (-webkit-min-device-pixel-ratio: 2) {
+  :host > .pathogenicity-graph > .scale {
+    border-left: dotted 1px var(--color-separator);
+  }
+}
+
+:host > .pathogenicity-graph > .bar {
+  position: absolute;
+  height: 100%;
+  background-color: var(--color-gray);
+}
+
+:host > .range {
+  margin-right: 8px;
+}
+:host > .range > .from,
+:host > .range > .to {
+  font-weight: bold;
+}

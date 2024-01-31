@@ -1,6 +1,5 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
 import '../components/PathogenicityRangeSliderView.js';
-// import { API_URL } from '../global.js';
 
 const ALPHAMISSENSE_THRESHOLD = {
   'Likely benign': {
@@ -58,10 +57,12 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
    * @param {ConditionItemView} conditionView */
   constructor(valuesView, conditionView) {
     super(valuesView, conditionView);
-    /** @property {number} _value - value of the selected suggestion */
-    this._value;
+    /** @property {string} _dataset - value of the selected suggestion */
+    this._dataset = 'alphamissense';
     /** @property {string} _label - label of the selected suggestion */
-    this._label;
+    this._label = 'AlphaMissense';
+    /** @property {array} _value - value of the selected suggestion */
+    this._values = [0, 1];
 
     // HTML
     this._createElement(
@@ -69,23 +70,27 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
       `<header>Select pathogenicity</header>
       <div class="body">
         <ul aria-labelledby="tabs-title" role="tablist">
-          <li><a id="tab-1" href="#alphamissense">AlphaMissense</a></li>
-          <li><a id="tab-2" href="#sift">SIFT</a></li>
-          <li><a id="tab-3" href="#polyphen">PolyPhen</a></li>
+          <li><a id="tab-1" class="tab" href="#alphamissense" data-dataset="alphamissense">AlphaMissense</a></li>
+          <li><a id="tab-2" class="tab" href="#sift" data-dataset="sift">SIFT</a></li>
+          <li><a id="tab-3" class="tab" href="#polyphen" data-dataset="polyphen">PolyPhen</a></li>
         </ul>
 
         <div class="tabs-panels">
-          <div id="alphamissense" aria-labelledby="tab-1"></div>
-          <div id="sift" aria-labelledby="tab-2"></div>
-          <div id="polyphen" aria-labelledby="tab-3"></div>
+          <div id="alphamissense" aria-labelledby="tab-1" data-min-value="0" data-max-value="1"></div>
+          <div id="sift" aria-labelledby="tab-2" data-min-value="0" data-max-value="1"></div>
+          <div id="polyphen" aria-labelledby="tab-3" data-min-value="0" data-max-value="1"></div>
         </div>
       </div>`
     );
 
     const tabsContainer = this._el.querySelector('.body');
-    const tabsList = tabsContainer.querySelector('ul');
-    const tabButtons = tabsList.querySelectorAll('a');
-    const tabPanels = this._el.querySelectorAll('.tabs-panels > div');
+    this._tabsContainer = this._el.querySelector('.body');
+    const tabsList = tabsContainer.querySelector('ul[role="tablist"]');
+    this._tabsList = tabsContainer.querySelector('ul[role="tablist"]');
+    const tabButtons = tabsList.querySelectorAll('li > a.tab');
+    this._tabButtons = tabsList.querySelectorAll('li > a.tab');
+    const tabPanels = tabsContainer.querySelectorAll('.tabs-panels > div');
+    this._tabPanels = tabsContainer.querySelectorAll('.tabs-panels > div');
 
     tabButtons.forEach((tab, index) => {
       if (index === 0) {
@@ -126,37 +131,83 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
     }
 
     // =======================================
-    const alphamissenseRangeSlider = document.createElement(
-      'pathogenicity-range-slider'
-    );
-    alphamissenseRangeSlider.pathogenicityThreshold = ALPHAMISSENSE_THRESHOLD;
-    this._el
-      .querySelector('#alphamissense')
-      .appendChild(alphamissenseRangeSlider);
 
-    const siftRangeSlider = document.createElement(
-      'pathogenicity-range-slider'
-    );
-    siftRangeSlider.pathogenicityThreshold = SIFT_THRESHOLD;
-    this._el.querySelector('#sift').appendChild(siftRangeSlider);
+    this._createRangeSlider('alphamissense', ALPHAMISSENSE_THRESHOLD);
+    this._createRangeSlider('sift', SIFT_THRESHOLD);
+    this._createRangeSlider('polyphen', POLYPHEN_THRESHOLD);
 
-    const polyphenRangeSlider = document.createElement(
-      'pathogenicity-range-slider'
+    // =======================================
+
+    this.#update();
+    this._valueObserve();
+  }
+
+  _valueObserve() {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        this._values = [
+          mutation.target.dataset.minValue,
+          mutation.target.dataset.maxValue,
+        ];
+      });
+      this.#update();
+
+      document.dispatchEvent(
+        new CustomEvent('set-pathogenicity-value-view', {
+          detail: {
+            dataset: this._dataset,
+            values: this._values,
+            threshold: this._switchThresholdObject(),
+          },
+        })
+      );
+    });
+
+    this._tabPanels.forEach((panel) => {
+      observer.observe(panel, {
+        attributes: true,
+      });
+    });
+
+    this._tabsList.addEventListener('click', (e) => {
+      const tabButton = e.target.closest('ul[role="tablist"] > li > a.tab');
+      if (!tabButton) return;
+      this._dataset = tabButton.dataset.dataset;
+      this._label = tabButton.textContent;
+    });
+  }
+
+  _switchThresholdObject() {
+    switch (this._dataset) {
+      case 'alphamissense':
+        return ALPHAMISSENSE_THRESHOLD;
+      case 'sift':
+        return SIFT_THRESHOLD;
+      case 'polyphen':
+        return POLYPHEN_THRESHOLD;
+    }
+  }
+
+  _createRangeSlider(pathogenicity, pathogenicityThreshold) {
+    const thisPanel = Array.from(this._tabPanels).find(
+      (panel) => panel.id === pathogenicity
     );
-    polyphenRangeSlider.pathogenicityThreshold = POLYPHEN_THRESHOLD;
-    this._el.querySelector('#polyphen').appendChild(polyphenRangeSlider);
+    const rangeSliderEl = document.createElement('pathogenicity-range-slider');
+    rangeSliderEl.pathogenicityThreshold = pathogenicityThreshold;
+    rangeSliderEl.addEventListener('set-value', (e) => {
+      thisPanel.setAttribute('data-min-value', e.detail.minVal);
+      thisPanel.setAttribute('data-max-value', e.detail.maxVal);
+    });
+
+    thisPanel.appendChild(rangeSliderEl);
   }
 
   // public methods
   /** Retain value when changing to edit screen
    * See {@link ConditionValues} startToEditCondition */
   keepLastValues() {
-    let valueView = this._valuesElement.querySelector(
-      'condition-item-value-view'
-    );
-
-    this._lastValue = valueView?.value || '';
-    this._lastLabel = valueView?.label || '';
+    this._lastValue = this._valueViewEl.value || '';
+    this._lastLabel = this._valueViewEl?.label || '';
   }
 
   /** If the cancel button is pressed when isFirstTime is false, restore the value before editing
@@ -168,6 +219,7 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
   /** Change whether okbutton can be pressed
    * @private */
   #update() {
+    this._addValueView(this._dataset, this._label, true);
     this._valuesView.update(this.#validate());
   }
 
@@ -183,6 +235,12 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
    * @type {boolean} */
   get isValid() {
     return this._valueViews.length > 0;
+  }
+
+  get _valueViewEl() {
+    return this._valuesElement.querySelector(
+      ':scope > condition-item-value-view'
+    );
   }
 }
 

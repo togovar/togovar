@@ -41,6 +41,14 @@
     }
   }
 }
+//Pathogenicity_prediction
+:host([data-condition-type='pathogenicity_prediction']) {
+  position: relative;
+  > .inner {
+    background-color: transparent;
+    border: none;
+  }
+}
 
 //dataset
 :host([data-condition-type='dataset'][data-value='jga_ngs']),
