@@ -48,10 +48,6 @@
         }
       ]
     },
-    "pathogenicity_prediction": {
-      "label": "PathogenicityPrediction",
-      "type": "peculiar"
-    },
     "significance": {
       "label": "Clinical significance",
       "type": "enumeration",
@@ -474,6 +470,10 @@
           "label": "Substitution"
         }
       ]
+    },
+    "pathogenicity_prediction": {
+      "label": "PathogenicityPrediction",
+      "type": "peculiar"
     }
   }
 }
