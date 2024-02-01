@@ -208,9 +208,10 @@ class ConditionItemView extends ConditionView {
       }
 
       case CONDITION_TYPE.pathogenicity_prediction: {
-        return valueElements[0].shadowRoot.querySelector(
-          'pathogenicity-value-view'
-        ).queryValue;
+        const dataset = valueElements[0].dataset.value;
+        const minVal = parseFloat(valueElements[0].dataset.minValue);
+        const maxVal = parseFloat(valueElements[0].dataset.maxValue);
+        return { [dataset]: { score: { gte: minVal, lte: maxVal } } };
       }
 
       case CONDITION_TYPE.location: {

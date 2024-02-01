@@ -84,11 +84,8 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
     );
 
     const tabsContainer = this._el.querySelector('.body');
-    this._tabsContainer = this._el.querySelector('.body');
-    const tabsList = tabsContainer.querySelector('ul[role="tablist"]');
     this._tabsList = tabsContainer.querySelector('ul[role="tablist"]');
-    const tabButtons = tabsList.querySelectorAll('li > a.tab');
-    this._tabButtons = tabsList.querySelectorAll('li > a.tab');
+    const tabButtons = this._tabsList.querySelectorAll('li > a.tab');
     const tabPanels = tabsContainer.querySelectorAll('.tabs-panels > div');
     this._tabPanels = tabsContainer.querySelectorAll('.tabs-panels > div');
 
@@ -99,7 +96,7 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
       } else {
         tab.setAttribute('aria-selected', false);
         tab.setAttribute('tabindex', '-1');
-        tabPanels[index].setAttribute('hidden', true);
+        this._tabPanels[index].setAttribute('hidden', true);
       }
     });
 
@@ -130,13 +127,9 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
       clickedTab.setAttribute('tabindex', '0');
     }
 
-    // =======================================
-
     this._createRangeSlider('alphamissense', ALPHAMISSENSE_THRESHOLD);
     this._createRangeSlider('sift', SIFT_THRESHOLD);
     this._createRangeSlider('polyphen', POLYPHEN_THRESHOLD);
-
-    // =======================================
 
     this.#update();
     this._valueObserve();
@@ -144,31 +137,42 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
 
   _valueObserve() {
     const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        this._values = [
-          mutation.target.dataset.minValue,
-          mutation.target.dataset.maxValue,
-        ];
-      });
-      this.#update();
-
-      document.dispatchEvent(
-        new CustomEvent('set-pathogenicity-value-view', {
-          detail: {
-            dataset: this._dataset,
-            values: this._values,
-            threshold: this._switchThresholdObject(),
-          },
-        })
-      );
+      this._updateValuesFromMutations(mutations);
+      this._dispatchPathogenicityEvent();
     });
 
     this._tabPanels.forEach((panel) => {
-      observer.observe(panel, {
-        attributes: true,
-      });
+      observer.observe(panel, { attributes: true });
     });
 
+    this._setupTabListClickListener();
+  }
+
+  _updateValuesFromMutations(mutations) {
+    mutations.forEach((mutation) => {
+      this._values = [
+        mutation.target.dataset.minValue,
+        mutation.target.dataset.maxValue,
+      ];
+    });
+    this._valueViewEl.setAttribute('data-min-value', this._values[0]);
+    this._valueViewEl.setAttribute('data-max-value', this._values[1]);
+    this.#update();
+  }
+
+  _dispatchPathogenicityEvent() {
+    this._valueViewEl.dispatchEvent(
+      new CustomEvent('set-pathogenicity-value-view', {
+        detail: {
+          threshold: this._switchThresholdObject(),
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  _setupTabListClickListener() {
     this._tabsList.addEventListener('click', (e) => {
       const tabButton = e.target.closest('ul[role="tablist"] > li > a.tab');
       if (!tabButton) return;
@@ -178,7 +182,7 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
   }
 
   _switchThresholdObject() {
-    switch (this._dataset) {
+    switch (this._valueViewEl.value) {
       case 'alphamissense':
         return ALPHAMISSENSE_THRESHOLD;
       case 'sift':
@@ -206,21 +210,59 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
   /** Retain value when changing to edit screen
    * See {@link ConditionValues} startToEditCondition */
   keepLastValues() {
-    this._lastValue = this._valueViewEl.value || '';
-    this._lastLabel = this._valueViewEl?.label || '';
+    this._lastDataset = this._valueViewEl.value;
+    this._lastLabel = this._valueViewEl.label;
+    this._lastValues = [
+      this._valueViewEl.dataset.minValue,
+      this._valueViewEl.dataset.maxValue,
+    ];
   }
 
   /** If the cancel button is pressed when isFirstTime is false, restore the value before editing
    *  See {@link ConditionValues} _clickCancelButton */
   restore() {
-    this._addValueView(this._lastValue, this._lastLabel, true);
+    this._addPathogenicityValueView(
+      this._lastDataset,
+      this._lastLabel,
+      this._lastValues[0],
+      this._lastValues[1]
+    );
+    this._dispatchPathogenicityEvent();
   }
 
   /** Change whether okbutton can be pressed
    * @private */
   #update() {
-    this._addValueView(this._dataset, this._label, true);
+    this._addPathogenicityValueView(
+      this._dataset,
+      this._label,
+      this._values[0],
+      this._values[1]
+    );
     this._valuesView.update(this.#validate());
+  }
+
+  /** If there is only one value in the condition, update it,
+   * for multiple values, add them without duplicates. (for variant id)
+   * @protected
+   * @param {string} value - The value to add or update.
+   * @param {string} label - The label for the value.
+   * @returns {HTMLDivElement} - condition-item-value-view element. */
+  _addPathogenicityValueView(dataset, label, minVal, maxVal) {
+    let valueView = this._valuesElement.querySelector(
+      `condition-item-value-view`
+    );
+
+    if (!valueView) {
+      valueView = document.createElement('condition-item-value-view');
+      valueView.conditionType = this._conditionType;
+      this._valuesElement.append(valueView);
+    }
+    valueView.value = dataset;
+    valueView.label = label;
+    valueView.setAttribute('data-min-value', minVal);
+    valueView.setAttribute('data-max-value', maxVal);
+    return valueView;
   }
 
   /** Whether you can press the ok button

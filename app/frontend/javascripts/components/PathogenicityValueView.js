@@ -48,8 +48,12 @@ export class PathogenicityValueView extends LitElement {
   }
 
   _onDataChanged = (event) => {
-    this._dataset = event.detail.dataset;
-    this._values = event.detail.values;
+    if (event.target !== this.getRootNode().host) return;
+    this._dataset = event.target.dataset.value;
+    this._values = [
+      this.getRootNode().host.dataset.minValue,
+      this.getRootNode().host.dataset.maxValue,
+    ];
     this._threshold = event.detail.threshold;
     this._setValueBar();
   };
@@ -58,6 +62,7 @@ export class PathogenicityValueView extends LitElement {
     this._renderRuler();
     this._setValueBar();
   }
+
   _renderRuler() {
     const scale = document.createElement('div');
     scale.classList.add('scale');
@@ -94,17 +99,6 @@ export class PathogenicityValueView extends LitElement {
       .join(', ');
 
     return `linear-gradient(to right, ${gradientCss})`;
-  }
-
-  get queryValue() {
-    return {
-      [this._dataset]: {
-        score: {
-          gte: parseFloat(this._values[0]),
-          lte: parseFloat(this._values[1]),
-        },
-      },
-    };
   }
 
   render() {
