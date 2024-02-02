@@ -304,7 +304,7 @@ export default class ResultsRowView {
           break;
         case 'alphamissense':
           {
-            if (result.alphamissense) {
+            if (result.alphamissense !== null) {
               this.tdAlphaMissenseFunction.textContent = result.alphamissense;
               switch (true) {
                 case result.alphamissense < 0.34:
@@ -325,7 +325,7 @@ export default class ResultsRowView {
           break;
         case 'sift':
           {
-            if (result.sift) {
+            if (result.sift !== null) {
               this.tdSiftFunction.textContent = result.sift;
               this.tdSiftFunction.dataset.function =
                 result.sift >= 0.05 ? 'T' : 'D';
@@ -337,7 +337,7 @@ export default class ResultsRowView {
           break;
         case 'polyphen':
           {
-            if (result.polyphen) {
+            if (result.polyphen !== null) {
               this.tdPolyphenFunction.textContent = result.polyphen;
               switch (true) {
                 case result.polyphen > 0.908:
