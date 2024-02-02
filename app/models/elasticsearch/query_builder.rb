@@ -4,19 +4,19 @@ module Elasticsearch
 
     attr_accessor :from
     attr_accessor :size
-    attr_accessor :start_only
 
     module Datasets
-      FREQUENCY = %i[bbj_riken gem_j_wga gnomad_exomes gnomad_genomes jga_ngs jga_snp ncbn tommo]
-      FREQUENCY_WITH_FILTER = %i[bbj_riken gem_j_wga gnomad_exomes gnomad_genomes jga_ngs jga_snp ncbn tommo]
-      ALL = FREQUENCY.concat(%i[clinvar mgend])
+      DATASETS = ::Rails.configuration.application[:datasets]
+      private_constant :DATASETS
+      FREQUENCY_WITH_FILTER = Array(DATASETS.dig(:frequency, :filter)).map(&:to_sym)
+      FREQUENCY = FREQUENCY_WITH_FILTER + Array(DATASETS.dig(:frequency, :no_filter)).map(&:to_sym)
+      ALL = FREQUENCY + Array(DATASETS[:annotation]).map(&:to_sym)
     end
 
     def initialize
       @from = 0
       @size = 100
       @sort = true
-      @start_only = false
     end
 
     def term(term)

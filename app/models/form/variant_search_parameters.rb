@@ -47,7 +47,6 @@ module Form
 
       @stat = params.fetch(:stat, '1')
       @debug = params.key?(:debug)
-      @start_only = params.key?(:start_only)
     end
 
     def [](symbol_or_string)
@@ -60,10 +59,6 @@ module Form
 
     def stat?
       @stat != '0'
-    end
-
-    def start_only?
-      @start_only
     end
 
     def term

@@ -63,8 +63,6 @@ class VariationSearchService
       @builder ||= begin
                      builder = Elasticsearch::QueryBuilder.new
 
-                     builder.start_only = param.start_only?
-
                      builder.term(param.term) if param.term.present?
 
                      builder.from = param.offset
