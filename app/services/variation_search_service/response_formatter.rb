@@ -1,5 +1,7 @@
 class VariationSearchService
   class ResponseFormatter
+    XREF_TEMPLATE = Rails.configuration.application[:xref]
+
     def initialize(param, result, error = [], warning = [], notice = [])
       @param = param
       @result = result
@@ -97,8 +99,8 @@ class VariationSearchService
       json.data @result[:results] do |result|
         variant = result[:_source].deep_symbolize_keys
 
-        if (v = variant[:id]).present?
-          json.id "tgv#{v}"
+        if (tgv = variant[:id]).present?
+          json.id "tgv#{tgv}"
         end
 
         json.type SequenceOntology.find_by_label(variant[:type])&.id
@@ -124,12 +126,23 @@ class VariationSearchService
           json.symbols symbols
         end
 
-        clinvar = (v = variant.dig(:clinvar, :variation_id)) ? ['VCV%09d' % v] : nil
-
-        external_link = {
-          dbsnp: dbsnp.presence,
-          clinvar: clinvar
-        }.compact
+        external_link = {}
+        if dbsnp.present?
+          external_link[:dbsnp] = dbsnp.map { |x| { title: x, xref: format(XREF_TEMPLATE[:dbsnp], id: x) } }
+        end
+        if (id = variant.dig(:clinvar, :variation_id)).present?
+          external_link[:clinvar] = [{ title: 'VCV%09d' % id, xref: format(XREF_TEMPLATE[:clinvar], id: id) }]
+        end
+        if variant[:frequency]&.find { |x| x[:source] == 'tommo' }
+          query = "#{variant.dig(:chromosome, :label)}:#{variant.dig(:vcf, :position)}"
+          q = URI.encode_www_form(query: query)
+          external_link[:tommo] = [{ title: query, xref: "#{XREF_TEMPLATE[:tommo]}?#{q}" }]
+        end
+        if variant[:frequency]&.find { |x| x[:source] =~ /^gnomad/ }
+          vcf = variant[:vcf]
+          id = "#{variant.dig(:chromosome, :label)}-#{vcf[:position]}-#{vcf[:reference]}-#{vcf[:alternate]}"
+          external_link[:gnomad] = [{ title: id, xref: format(XREF_TEMPLATE[:gnomad], id: id) }]
+        end
 
         if external_link.present?
           json.external_link external_link
