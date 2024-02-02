@@ -67,7 +67,7 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
     // HTML
     this._createElement(
       'pathogenicity-editor-view',
-      `<header>Select pathogenicity</header>
+      `<header>Select prediction</header>
       <div class="body">
         <ul aria-labelledby="tabs-title" role="tablist">
           <li><a id="tab-1" class="tab" href="#alphamissense" data-dataset="alphamissense">AlphaMissense</a></li>

@@ -446,7 +446,7 @@
       "type": "peculiar"
     },
     "pathogenicity_prediction": {
-      "label": "PathogenicityPrediction",
+      "label": "Pathogenicity prediction",
       "type": "peculiar"
     },
     "type": {
