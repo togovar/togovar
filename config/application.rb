@@ -43,5 +43,7 @@ module TogoVar
     config.elasticsearch = config_for(:elasticsearch)
     config.endpoint = config_for(:endpoint)
     config.virtuoso = config_for(:virtuoso)
+
+    config.application = config_for(:application)[ENV.fetch('TOGOVAR_REFERENCE')]
   end
 end
