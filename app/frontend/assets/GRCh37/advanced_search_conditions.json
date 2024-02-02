@@ -445,6 +445,10 @@
       "label": "Location",
       "type": "peculiar"
     },
+    "pathogenicity_prediction": {
+      "label": "PathogenicityPrediction",
+      "type": "peculiar"
+    },
     "type": {
       "label": "Variant type",
       "type": "enumeration",
@@ -470,10 +474,6 @@
           "label": "Substitution"
         }
       ]
-    },
-    "pathogenicity_prediction": {
-      "label": "PathogenicityPrediction",
-      "type": "peculiar"
     }
   }
 }
