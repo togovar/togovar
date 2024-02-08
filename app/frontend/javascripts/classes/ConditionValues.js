@@ -147,14 +147,19 @@ class ConditionValues {
   _clickCancelButton(e) {
     e.stopImmediatePropagation();
     if (this._conditionView.isFirstTime) {
-      // delete for the first time
       this._conditionView.remove();
     } else {
-      // otherwise, revert to the previous state
       for (const editor of this._editors) {
         editor.restore();
-        this._conditionView._elm.dataset.relation =
-          this._conditionView.keepLastRelation;
+        if (
+          this._conditionView.conditionType !== 'dataset' &&
+          this._conditionView.conditionType !== 'pathogenicity_prediction' &&
+          this._conditionView.conditionType !== 'id' &&
+          this._conditionView.conditionType !== 'location'
+        ) {
+          this._conditionView._elm.dataset.relation =
+            this._conditionView.keepLastRelation;
+        }
       }
       this._conditionView.doneEditing();
     }
