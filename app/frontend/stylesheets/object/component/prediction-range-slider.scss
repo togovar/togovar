@@ -5,8 +5,9 @@
   margin-bottom: 30px;
   font-size: 10px;
   align-items: center;
+  gap: 5px;
 
-  input {
+  input[type='number'] {
     width: 5em;
     margin-right: 3px;
     font-size: inherit;
@@ -19,6 +20,19 @@
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
     outline: none;
   }
+
+  button.inequality-sign {
+    appearance: none;
+    font-weight: bold;
+    background-color: #117f93;
+    color: #fff;
+    height: 16px;
+    width: 16px;
+    padding: 0;
+    border-radius: 3px;
+    border: none;
+    cursor: pointer;
+  }
 }
 
 .slider {
@@ -28,7 +42,7 @@
   left: 1px;
   background: #ddd;
 
-  .progress {
+  .bar {
     height: inherit;
     position: absolute;
     left: 0%;
@@ -37,6 +51,7 @@
 
   .ruler {
     .scale {
+      list-style: none;
       position: absolute;
       top: -18px;
       font-size: 0.6rem;
@@ -89,7 +104,7 @@
 .range-input {
   position: relative;
 
-  input {
+  input[type='range'] {
     position: absolute;
     top: -5px;
     width: 100%;
@@ -111,11 +126,11 @@
     margin-top: -0.2em;
     cursor: col-resize;
   }
-  .range-min[type='range']::-webkit-slider-thumb {
+  .from[type='range']::-webkit-slider-thumb {
     transform: translateX(-3px);
     border-right: solid 1px rgba(0, 0, 0, 0.5);
   }
-  .range-max[type='range']::-webkit-slider-thumb {
+  .to[type='range']::-webkit-slider-thumb {
     transform: translateX(-1px);
     border-left: solid 1px rgba(0, 0, 0, 0.5);
   }
