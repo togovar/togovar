@@ -152,10 +152,9 @@ class ConditionValues {
       for (const editor of this._editors) {
         editor.restore();
         if (
-          this._conditionView.conditionType !== 'dataset' &&
-          this._conditionView.conditionType !== 'pathogenicity_prediction' &&
-          this._conditionView.conditionType !== 'id' &&
-          this._conditionView.conditionType !== 'location'
+          !['datgaset', 'pathogenicity_prediction', 'id', 'location'].includes(
+            this._conditionView.conditionType
+          )
         ) {
           this._conditionView._elm.dataset.relation =
             this._conditionView.keepLastRelation;
