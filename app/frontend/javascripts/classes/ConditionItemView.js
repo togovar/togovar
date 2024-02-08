@@ -33,13 +33,14 @@ class ConditionItemView extends ConditionView {
     // make HTML
     this._elm.classList.add('advanced-search-condition-item-view');
     this._elm.dataset.classification = conditionType;
-    this._elm.dataset.relation =
-      conditionType === 'dataset' ||
-      conditionType === 'pathogenicity_prediction' ||
-      conditionType === 'id' ||
-      conditionType === 'location'
-        ? ''
-        : 'eq';
+    this._elm.dataset.relation = [
+      'dataset',
+      'pathogenicity_prediction',
+      'id',
+      'location',
+    ].includes(conditionType)
+      ? ''
+      : 'eq';
     this._elm.innerHTML = `
     <div class="body">
       <div class="summary">
