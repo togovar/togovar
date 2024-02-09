@@ -110,7 +110,10 @@ export class PredictionValueView extends LitElement {
       };
     }
 
-    if (this._values[0] === this._values[1]) {
+    if (
+      this._values[0] === this._values[1] &&
+      (this._inequalitySigns[0] === 'gt' || this._inequalitySigns[1] === 'lt')
+    ) {
       return {
         [this._dataset]: {
           score: this._unassignedChecks,
