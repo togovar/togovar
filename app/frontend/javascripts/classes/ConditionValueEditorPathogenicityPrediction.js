@@ -161,10 +161,10 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
   }
 
   //accessor
-  /** You can press the ok button if there is condition-item-value-view
+  /** You can press the ok button if there are two valid values
    * @type {boolean} */
   get isValid() {
-    return this._valueViews.length > 0;
+    return this._values.filter((item) => !Number.isNaN(item)).length === 2;
   }
 }
 
