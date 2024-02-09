@@ -143,7 +143,7 @@ export default class PanelViewCheckList extends PanelView {
                   PROBD: '&gt; 0.908',
                   POSSD: '&gt; 0.446',
                   B: '&le; 0.446',
-                  U: '&ensp;&ensp;',
+                  U: 'Unknown',
                 }[item.id]
               }</div>`
             : ''
@@ -169,10 +169,7 @@ export default class PanelViewCheckList extends PanelView {
       .insertAdjacentHTML('beforeend', html);
     // not検索の重複を削除
     if (
-      this.kind === 'significance' ||
-      this.kind === 'alphamissense' ||
-      this.kind === 'sift' ||
-      this.kind === 'polyphen'
+      ['significance', 'alphamissense', 'sift', 'polyphen'].includes(this.kind)
     ) {
       this.elm
         .querySelector('.content > .checklist-values > .item:nth-child(5)')
