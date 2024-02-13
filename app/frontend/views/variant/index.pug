@@ -8,7 +8,7 @@ block head
     link(href=css, rel="stylesheet")
   each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/report-/))
     script(type="text/javascript", src=js)
-  // Stanza theme
+  // Variant theme
   link(href="https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20220803", rel="stylesheet")
 
 block content
@@ -25,41 +25,49 @@ block content
       #variant-summary.stanza
 
     section.stanza-view
-      h3.title
-        | Other overlapping variants
+      h3.title#otherOverLappingVariant
+        a.titlelink(href="#otherOverLappingVariant")
+          | Other overlapping variants
       #variant-other-overlapping-variants.stanza
 
     section.stanza-view
-      h3.title
-        | Frequency
+      h3.title#frequencyVariant
+        a.titlelink(href="#frequencyVariant")
+          | Frequency
       #variant-frequency.stanza
 
     section.stanza-view
-      h3.title
-        | Clinical significance
+      h3.title#clinvarVariant
+        a.titlelink(href="#clinvarVariant")
+          | Clinical significance
       #variant-clinvar.stanza
 
     section.stanza-view
-      h3.title
-        | Genome-wide association study
+      h3.title#gwasVariant
+        a.titlelink(href="#gwasVariant")
+          | Genome-wide association study
       #variant-gwas.stanza
 
     section.stanza-view
-      h3.title
-        | Genomic context
+      h3.title#genomicContextVariant
+        a.titlelink(href="#genomicContextVariant")
+          | Genomic context
       #variant-genomic-context.stanza
 
     section.stanza-view
-      h3.title
-        | Gene
+      h3.title#geneVariant
+        a.titlelink(href="#geneVariant")
+          | Gene
       #variant-gene.stanza
 
     section.stanza-view
-      h3.title
-        | Transcripts
+      h3.title#transcriptsVariant
+        a.titlelink(href="#transcriptsVariant")
+          | Transcripts
       #variant-transcript.stanza
 
     section.stanza-view
-      h3.title
-        | Publications
+      h3.title#publicationsVariant
+        a.titlelink(href="#publicationsVariant")
+          | Publications
       #variant-publication.stanza
