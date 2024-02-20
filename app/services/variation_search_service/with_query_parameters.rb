@@ -112,7 +112,7 @@ class VariationSearchService
       {
         filtered_total: Variation.count(body: q.slice(:query)),
         results: res.records.results,
-        aggs: param.stat? ? Variation.search(stat_query).aggregations : {}
+        aggs: param.stat? ? Variation.search(stat_query, request_cache: true).aggregations : {}
       }
     end
 
