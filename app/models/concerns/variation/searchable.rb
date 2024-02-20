@@ -59,11 +59,12 @@ class Variation
             indexes :alphamissense, type: :float
           end
           indexes :clinvar do
-            indexes :variation_id, type: :long
-            indexes :allele_id, type: :long
-            indexes :conditions, type: :nested do
+            indexes :id, type: :long
+            indexes :accession, type: :keyword
+            indexes :condition, type: :nested do
               indexes :medgen, type: :keyword
               indexes :interpretation, type: :keyword
+              indexes :submission_count, type: :integer
             end
           end
           indexes :frequency, type: :nested do

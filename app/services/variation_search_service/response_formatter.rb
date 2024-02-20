@@ -55,9 +55,7 @@ class VariationSearchService
         Array((stat = @result[:aggs]).dig(:frequency, :sources, :buckets)).each do |x|
           json.set! x[:key], x[:doc_count]
         end
-        unless (c = stat.dig(:clinvar_total, :doc_count)).zero?
-          json.clinvar c
-        end
+        json.clinvar stat.dig(:clinvar_total, :doc_count)
       end
     end
 
@@ -130,7 +128,7 @@ class VariationSearchService
         if dbsnp.present?
           external_link[:dbsnp] = dbsnp.map { |x| { title: x, xref: format(XREF_TEMPLATE[:dbsnp], id: x) } }
         end
-        if (id = variant.dig(:clinvar, :variation_id)).present?
+        if (id = variant.dig(:clinvar, :id)).present?
           external_link[:clinvar] = [{ title: 'VCV%09d' % id, xref: format(XREF_TEMPLATE[:clinvar], id: id) }]
         end
         if variant[:frequency]&.find { |x| x[:source] == 'tommo' }

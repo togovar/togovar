@@ -24,7 +24,7 @@ module Tasks
           indices = fetch_indices(size: batch_size, search_after: search_after, record_number: total)
                       .results
                       .map { |r| r.slice(:_id, :_source) }
-                      .map { |r| [r.dig(:_source, :clinvar, :variation_id), r] }
+                      .map { |r| [r.dig(:_source, :clinvar, :id), r] }
                       .to_h
 
           total += indices.size
@@ -74,7 +74,7 @@ module Tasks
     def total_count
       query = ::Elasticsearch::DSL::Search.search do
         query do
-          exists field: 'clinvar.variation_id'
+          exists field: 'clinvar.id'
         end
       end
 
@@ -93,12 +93,12 @@ module Tasks
     def fetch_indices(size: 500, search_after: nil, record_number: nil)
       query = ::Elasticsearch::DSL::Search.search do
         query do
-          exists field: 'clinvar.variation_id'
+          exists field: 'clinvar.id'
         end
         sort do
-          by 'clinvar.variation_id', order: 'asc'
+          by 'clinvar.id', order: 'asc'
         end
-        _source includes: ['clinvar.variation_id']
+        _source includes: ['clinvar.id']
         size size
       end
 
