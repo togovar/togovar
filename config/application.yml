@@ -4,7 +4,7 @@ defaults: &defaults
       dbsnp: "https://identifiers.org/dbsnp/%<id>s"
       clinvar: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/%<id>s'
       tommo: 'https://jmorp.megabank.tohoku.ac.jp/search'
-      gnomad: 'https://gnomad.broadinstitute.org/variant/%<id>s?dataset=gnomad_r3'
+      gnomad: 'https://gnomad.broadinstitute.org/variant/%<id>s?dataset=gnomad_r4'
     datasets:
       frequency:
         filter:
@@ -12,8 +12,8 @@ defaults: &defaults
           - jga_ngs
           - jga_snp
           - tommo
-          - hgvd # TODO: to be removed on 2024.1
           - gnomad_genomes
+          - gnomad_exomes
           # - bbj_riken # TODO: to be added on 2024.1
           # - ncbn # TODO: to be added on 2024.1
         no_filter:
