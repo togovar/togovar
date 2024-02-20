@@ -18,26 +18,26 @@
         },
         {
           "id": 3,
-          "value": "hgvd",
-          "label": "HGVD",
-          "description": "Human Genetic Variation Database"
-        },
-        {
-          "id": 4,
           "value": "tommo",
           "label": "ToMMo 54KJPN",
           "description": "ToMMo 54KJPN-SNV/INDEL Allele Frequency Panel (v20230626)"
         },
         {
-          "id": 5,
+          "id": 4,
           "value": "gem_j_wga",
           "label": "GEM-J WGA",
           "description": "GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel"
         },
         {
-          "id": 6,
+          "id": 5,
           "value": "gnomad_genomes",
           "label": "gnomAD genomes",
+          "description": ""
+        },
+        {
+          "id": 6,
+          "value": "gnomad_exomes",
+          "label": "gnomAD exomes",
           "description": ""
         }
       ]

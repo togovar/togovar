@@ -39,15 +39,15 @@
         "has_freq": true
       },
       {
-        "id": "hgvd",
-        "label": "HGVD",
+        "id": "gnomad_genomes",
+        "label": "gnomAD genomes",
         "type": "boolean",
         "default": "1",
         "has_freq": true
       },
       {
-        "id": "gnomad_genomes",
-        "label": "gnomAD genomes",
+        "id": "gnomad_exomes",
+        "label": "gnomAD exomes",
         "type": "boolean",
         "default": "1",
         "has_freq": true
