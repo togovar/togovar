@@ -5,14 +5,6 @@ module Elasticsearch
     attr_accessor :from
     attr_accessor :size
 
-    module Datasets
-      DATASETS = ::Rails.configuration.application[:datasets]
-      private_constant :DATASETS
-      FREQUENCY_WITH_FILTER = Array(DATASETS.dig(:frequency, :filter)).map(&:to_sym)
-      FREQUENCY = FREQUENCY_WITH_FILTER + Array(DATASETS.dig(:frequency, :no_filter)).map(&:to_sym)
-      ALL = FREQUENCY + Array(DATASETS[:annotation]).map(&:to_sym)
-    end
-
     def initialize
       @from = 0
       @size = 100
@@ -49,9 +41,9 @@ module Elasticsearch
     def dataset(names)
       @dataset_condition = nil
 
-      return self if (names & Datasets::ALL).empty?
+      return self if (names & Variation::Datasets::ALL).empty?
 
-      sources = names & Datasets::FREQUENCY
+      sources = names & Variation::Datasets::FREQUENCY
 
       query = Elasticsearch::DSL::Search.search do
         query do
@@ -90,7 +82,7 @@ module Elasticsearch
     def frequency(datasets, frequency_from, frequency_to, invert = false, all_datasets = false)
       @frequency_condition = nil
 
-      sources = datasets & Datasets::FREQUENCY
+      sources = datasets & Variation::Datasets::FREQUENCY
 
       return self if sources.empty?
 
@@ -138,7 +130,7 @@ module Elasticsearch
     def quality(datasets)
       @quality_condition = nil
 
-      sources = datasets & Datasets::FREQUENCY_WITH_FILTER
+      sources = datasets & Variation::Datasets::FREQUENCY_WITH_FILTER
 
       return self if sources.empty?
 

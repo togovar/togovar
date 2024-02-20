@@ -86,6 +86,14 @@ class Variation
       end
     end
 
+    module Datasets
+      DATASETS = ::Rails.configuration.application[:datasets]
+      private_constant :DATASETS
+      FREQUENCY_WITH_FILTER = Array(DATASETS.dig(:frequency, :filter)).map(&:to_sym)
+      FREQUENCY = FREQUENCY_WITH_FILTER + Array(DATASETS.dig(:frequency, :no_filter)).map(&:to_sym)
+      ALL = FREQUENCY + Array(DATASETS[:annotation]).map(&:to_sym)
+    end
+
     module ClassMethods
       # @return [Hash]
       def cardinality
@@ -109,33 +117,19 @@ class Variation
             end
           end
           aggregation :vep_consequences do
-            nested do
-              path :vep
-              aggregation :vep_consequences do
-                cardinality do
-                  field :'vep.consequence'
-                end
-              end
-            end
-          end
-          aggregation :frequency_sources do
-            nested do
-              path :frequency
-              aggregation :frequency_sources do
-                cardinality do
-                  field :'frequency.source'
-                end
-              end
+            cardinality do
+              field :'most_severe_consequence'
             end
           end
         end
 
-        response = __elasticsearch__.search(query)
+        response = __elasticsearch__.search(query, request_cache: true)
 
         @cardinality = response.aggregations
                          .map { |k, v| [k, v.key?('value') ? v['value'] : v[k]['value']] }
                          .to_h
                          .symbolize_keys
+                         .merge(frequency_sources: Datasets::FREQUENCY.size)
       end
 
       def default_condition
