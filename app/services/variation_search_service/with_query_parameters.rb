@@ -82,7 +82,7 @@ class VariationSearchService
                                            param.frequency[:match] == 'all')
                        end
 
-                       builder.quality(param.selected_items(:dataset)) if param.quality == '1'
+                       builder.quality(param.selected_items(:dataset)) unless param.quality == '0'
 
                        %i[type significance consequence sift polyphen alphamissense].each do |x|
                          unless param.selected_all?(x)

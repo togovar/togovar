@@ -5,11 +5,8 @@ module API
     include Executable
 
     module BackwardCompatibility
-      FILTER_PARAMETERS = %w[term quality stat dataset frequency type significance consequence sift polyphen alphamissense].freeze
-      private_constant :FILTER_PARAMETERS
-
       def variant_params
-        return super unless include_filters?
+        return super unless request.get?
 
         @variant_params ||= params.permit :term, :quality, :limit, :offset, :stat, :debug,
                                           dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {},
@@ -18,19 +15,13 @@ module API
 
       # @return [Array] [result, status]
       def search_variant
-        return super unless include_filters?
+        return super unless request.get?
 
         params = variant_params
 
         service = VariationSearchService::WithQueryParameters.new(params.to_h, debug: params.key?(:debug))
 
         execute(service).tap { |r, _| r.update(debug: service.debug) if params.key?(:debug) }
-      end
-
-      private
-
-      def include_filters?
-        (params.each_key.to_a & FILTER_PARAMETERS).present?
       end
     end
     prepend BackwardCompatibility
