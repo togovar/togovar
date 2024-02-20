@@ -4,8 +4,9 @@ class Sift
   Prediction = Struct.new(:id, :key, :label, :index, keyword_init: true)
 
   module Predictions
-    DELETERIOUS = Prediction.new(id: :deleterious, key: 'D', label: 'Deleterious', index: 0)
-    TOLERATED = Prediction.new(id: :tolerated, key: 'T', label: 'Tolerated', index: 1)
+    WITHOUT_SCORE = Prediction.new(id: :without_score, key: 'N', label: 'Without score', index: 0)
+    DELETERIOUS = Prediction.new(id: :deleterious, key: 'D', label: 'Deleterious', index: 1)
+    TOLERATED = Prediction.new(id: :tolerated, key: 'T', label: 'Tolerated', index: 2)
   end
 
   class << self
@@ -16,6 +17,8 @@ class Sift
 
     # @return [Prediction]
     def find_by_value(value)
+      return Predictions::WITHOUT_SCORE if value.blank?
+
       if value < 0.05
         Predictions::DELETERIOUS
       elsif value >= 0.05

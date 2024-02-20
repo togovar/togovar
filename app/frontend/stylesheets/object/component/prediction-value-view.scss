@@ -1,0 +1,54 @@
+@use '../../foundation/_variables.scss' as *;
+
+:host {
+  position: absolute;
+  top: 0;
+  left: 142px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+:host > .pathogenicity-graph {
+  position: relative;
+  width: 100px;
+  height: 3.5px;
+  background-color: var(--color-darker-gray);
+  margin-right: 5px;
+
+  > .ruler {
+    list-style: none;
+    > .scale {
+      position: absolute;
+      top: -1px;
+      bottom: -1px;
+      border-left: dotted 0.5px var(--color-separator);
+    }
+  }
+}
+
+@media (-webkit-min-device-pixel-ratio: 2) {
+  :host > .pathogenicity-graph > .ruler > .scale {
+    border-left: dotted 1px var(--color-separator);
+  }
+}
+
+:host > .pathogenicity-graph > .bar {
+  position: absolute;
+  height: 100%;
+  background-color: var(--color-gray);
+}
+
+:host > .range {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+
+  .text {
+    font-size: 10px;
+  }
+
+  > .from,
+  > .to {
+    font-weight: bold;
+  }
+}

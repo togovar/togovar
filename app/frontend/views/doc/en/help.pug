@@ -51,11 +51,11 @@ block content
                 li.item.-question
                   a.link(href='#d5') How do you calculate the Consequence value?
                 li.item.-question
-                  a.link(href='#d6') What are SIFT and PolyPhen?
+                  a.link(href='#d6') How do you calculate the value of Clinical significance?
                 li.item.-question
-                  a.link(href='#d7') How do you calculate the value of Clinical significance?
+                  a.link(href='#d7') What are AlphaMissense, SIFT and PolyPhen?
                 li.item.-question
-                  a.link(href='#d8')  Was a liftover tool used for generating variant data?
+                  a.link(href='#d8') Was a liftover tool used for generating variant data?
             li.category
               h3.categorytitle About the TogoVar search system
               ul.categorylist
@@ -196,16 +196,43 @@ block content
                 |  is displayed. If there are multiple transcripts for a single variant, only the most critical
                 | consequence may be displayed.
           #d6.question-answer
-            h4.question What are SIFT and PolyPhen?
+            h4.question How do you calculate the value of Clinical significance?
             .answer
               p
-                | Both SIFT and PolyPhen are scores which indicate the predicted effects on the protein function when an
-                | amino acid sequence undergoes alteration due to a variant. Values calculated through
+                | The value of
+                |
+                a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv')
+                  | clinical significance in ClinVar
+                |  is displayed.
+          #d7.question-answer
+            h4.question What are AlphaMissense, SIFT and Polyphen?
+            .answer
+              p
+                | AlphaMissense, SIFT and PolyPhen predict the impact of variants on protein function when an amino acid sequence is altered.
+                | These programs were performed using
                 |
                 a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html')
                   | Variant Effect Predictor (VEP)
-                |  are displayed. The meaning of each icon is as follows.
+                | . The icons below represent the threshold scores used for qualitative predictions.
               ul.unordered-list._margin-bottom._align-left
+                li
+                  strong AlphaMissense
+                  br
+                  div
+                    .variant-function._width_5em._align-center(data-function='LP') &gt; 0.564
+                    span._margin-left Likely pathogenic
+                  div
+                    .variant-function._width_5em._align-center(data-function='A') &ge; 0.340
+                    span._margin-left Ambiguous
+                  div
+                    .variant-function._width_5em._align-center(data-function='LB') &lt; 0.340
+                    span._margin-left Likely benign
+                  span The score thresholds for "Likely pathogenic" and "Likely benign" were chosen to classify pathogenic and benign ClinVar variants with 90% precision, respectively. See
+                    |
+                    |
+                  a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/docs/tools/vep/script/vep_plugins.html#alphamissense') AlphaMissense in VEP Plugins
+                  |
+                  | for details.
                 li
                   strong SIFT
                   br
@@ -215,6 +242,13 @@ block content
                   div
                     .variant-function._width_5em._align-center(data-function='T') &ge; 0.05
                     span._margin-left Tolerated
+                  span The score represents the normalized probability of an amino acid change being tolerated. Scores closer to zero indicate a higher likelihood of the change being deleterious.
+                    |
+                    | The qualitative prediction is based on this score. Substitutions with a score less than 0.05 are classified as "Deleterious", while all others are considered "Tolerated". See
+                    |
+                  a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html#sift') SIFT in Pathogenicity prediction of Ensembl Variation
+                  |
+                  | for details.
                 li
                   strong PolyPhen
                   br
@@ -228,23 +262,33 @@ block content
                     .variant-function._width_5em._align-center(data-function='B') &le; 0.446
                     span._margin-left Benign
                   div
-                    .variant-function._width_5em._align-center(data-function='U') &nbsp;
+                    .variant-function._width_5em._align-center(data-function='U') Unknown
                     span._margin-left Unknown
-          #d7.question-answer
-            h4.question How do you calculate the value of Clinical significance?
-            .answer
-              p
-                | The value of
-                |
-                a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv')
-                  | clinical significance in ClinVar
-                |  is displayed.
+                  span Variants are predicted as "Probably Damaging" if they have posterior probability scores indicating an estimated false positive rate (FPR) of 5% or below.
+                    |
+                    | Those with FPRs at or below 10% are "Possibly Damaging", while variants with FPRs above 10% are classified as "Benign". See
+                    |
+                  a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html#polyphen') Polyphen in Pathogenicity prediction of Ensembl Variation
+                  |
+                  | for details.
           #d8.question-answer
             h4.question Was a liftover tool used for generating variant data?
             .answer
               p
-                | Yes. We used CrossMap to lift over the GRCh37 dataset to GRCh38 when no variant dataset detected by using the GRCh38 genome reference was available.
-
+                | Yes. Some of the GRCh38 datasets have been created by lifting over their GRCh37 datasets.
+                | Please refer to
+                a.hyper-text.-external(target='_blank', href='https://grch38.togovar.org/doc/datasets')
+                  |
+                  | the Liftover GRCh37 column in the TogoVar datasets (GRCh38) page
+                | for the target datasets. A liftover tool
+                |
+                a.hyper-text.-external(target='_blank', href='https://github.com/informationsea/transanno')
+                  | transanno
+                | has been used since the release on November 16, 2023.
+                |
+                a.hyper-text.-external(target='_blank', href='https://crossmap.sourceforge.net/')
+                  | CrossMap
+                | was used until the release on July 14, 2023.
         section.section
           h3.sectiontitle About the TogoVar search system
           #s1.question-answer._column-span-all
@@ -615,8 +659,8 @@ block content
                 a(target='_blank', href='/?term=ALDH2%3Ap.Glu504Lys') ALDH2:p.Glu504Lys
                 | ) are acceptable.
                 |
-                a.hyper-text.-external(target='_blank', href='https://m.ensembl.org/info/docs/tools/vep/recoder/index.html') Variant Recorder
-                | is used to convert an HGVS description to a GRCh37 position.
+                a.hyper-text.-external(target='_blank', href='https://m.ensembl.org/info/docs/tools/vep/recoder/index.html') Variant Recoder
+                | is used to convert an HGVS description to a GRCh38/GRCh37 position.
           #s5.question-answer._column-span-all
             h4.question
               | Q: What can I do with the

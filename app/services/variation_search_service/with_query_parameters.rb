@@ -57,13 +57,11 @@ class VariationSearchService
       @param ||= Form::VariantSearchParameters.new(@params)
     end
 
-    BINARY_FILTERS = %i[dataset type significance consequence sift polyphen].freeze
+    BINARY_FILTERS = %i[dataset type significance consequence sift polyphen alphamissense].freeze
 
     def builder
       @builder ||= begin
                      builder = Elasticsearch::QueryBuilder.new
-
-                     builder.start_only = param.start_only?
 
                      builder.term(param.term) if param.term.present?
 
@@ -84,9 +82,9 @@ class VariationSearchService
                                            param.frequency[:match] == 'all')
                        end
 
-                       builder.quality(param.selected_items(:dataset)) if param.quality == '1'
+                       builder.quality(param.selected_items(:dataset)) unless param.quality == '0'
 
-                       %i[type significance consequence sift polyphen].each do |x|
+                       %i[type significance consequence sift polyphen alphamissense].each do |x|
                          unless param.selected_all?(x)
                            builder.send(x, *param.selected_items(x))
                          end
@@ -114,7 +112,7 @@ class VariationSearchService
       {
         filtered_total: Variation.count(body: q.slice(:query)),
         results: res.records.results,
-        aggs: param.stat? ? Variation.search(stat_query).aggregations : {}
+        aggs: param.stat? ? Variation.search(stat_query, request_cache: true).aggregations : {}
       }
     end
 

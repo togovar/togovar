@@ -1,5 +1,7 @@
 class VariationSearchService
   class ResponseFormatter
+    XREF_TEMPLATE = Rails.configuration.application[:xref]
+
     def initialize(param, result, error = [], warning = [], notice = [])
       @param = param
       @result = result
@@ -53,9 +55,7 @@ class VariationSearchService
         Array((stat = @result[:aggs]).dig(:frequency, :sources, :buckets)).each do |x|
           json.set! x[:key], x[:doc_count]
         end
-        unless (c = stat.dig(:clinvar_total, :doc_count)).zero?
-          json.clinvar c
-        end
+        json.clinvar stat.dig(:clinvar_total, :doc_count)
       end
     end
 
@@ -73,8 +73,8 @@ class VariationSearchService
           json.set! 'NC', c
         end
         Array(@result[:aggs].dig(:conditions, :interpretations, :buckets)).each do |x|
-          if (s = Form::ClinicalSignificance[x[:key].tr(' ', '_').to_sym])
-            json.set! s.param_name, x[:doc_count]
+          if (s = ClinicalSignificance.find_by_id(x[:key].tr(',', '').tr(' ', '_')))
+            json.set! s.key, x[:doc_count]
           end
         end
       end
@@ -95,26 +95,26 @@ class VariationSearchService
       conditions = Hash.new { |hash, key| hash[key] = Disease.find(key).results.first&.dig('_source', 'name') }
 
       json.data @result[:results] do |result|
-        variation = result[:_source].deep_symbolize_keys
+        variant = result[:_source].deep_symbolize_keys
 
-        if (v = variation[:id]).present?
-          json.id "tgv#{v}"
+        if (tgv = variant[:id]).present?
+          json.id "tgv#{tgv}"
         end
 
-        json.type SequenceOntology.find_by_label(variation[:type])&.id
+        json.type SequenceOntology.find_by_label(variant[:type])&.id
 
-        json.chromosome variation.dig(:chromosome, :label)
-        json.position variation.dig(:vcf, :position)
-        json.start variation[:start]
-        json.stop variation[:stop]
-        json.reference variation[:reference].presence || ''
-        json.alternate variation[:alternate].presence || ''
+        json.chromosome variant.dig(:chromosome, :label)
+        json.position variant.dig(:vcf, :position)
+        json.start variant[:start]
+        json.stop variant[:stop]
+        json.reference variant[:reference].presence || ''
+        json.alternate variant[:alternate].presence || ''
 
-        if (dbsnp = Array(variation[:xref]).filter { |x| x[:source] = 'dbSNP' }.map { |x| x[:id] }).present?
+        if (dbsnp = Array(variant[:xref]).filter { |x| x[:source] = 'dbSNP' }.map { |x| x[:id] }).present?
           json.existing_variations dbsnp
         end
 
-        symbols = Array(variation[:vep])
+        symbols = Array(variant[:vep])
                     .filter { |x| x.dig(:symbol, :source) == 'HGNC' && x[:hgnc_id] }
                     .map { |x| { name: x.dig(:symbol, :label), id: x[:hgnc_id] } }
                     .uniq
@@ -124,41 +124,63 @@ class VariationSearchService
           json.symbols symbols
         end
 
-        clinvar = (v = variation.dig(:clinvar, :variation_id)) ? ['VCV%09d' % v] : nil
-
-        external_link = {
-          dbsnp: dbsnp.presence,
-          clinvar: clinvar
-        }.compact
+        external_link = {}
+        if dbsnp.present?
+          external_link[:dbsnp] = dbsnp.map { |x| { title: x, xref: format(XREF_TEMPLATE[:dbsnp], id: x) } }
+        end
+        if (id = variant.dig(:clinvar, :id)).present?
+          external_link[:clinvar] = [{ title: 'VCV%09d' % id, xref: format(XREF_TEMPLATE[:clinvar], id: id) }]
+        end
+        if variant[:frequency]&.find { |x| x[:source] == 'tommo' }
+          query = "#{variant.dig(:chromosome, :label)}:#{variant.dig(:vcf, :position)}"
+          q = URI.encode_www_form(query: query)
+          external_link[:tommo] = [{ title: query, xref: "#{XREF_TEMPLATE[:tommo]}?#{q}" }]
+        end
+        if variant[:frequency]&.find { |x| x[:source] =~ /^gnomad/ }
+          vcf = variant[:vcf]
+          id = "#{variant.dig(:chromosome, :label)}-#{vcf[:position]}-#{vcf[:reference]}-#{vcf[:alternate]}"
+          external_link[:gnomad] = [{ title: id, xref: format(XREF_TEMPLATE[:gnomad], id: id) }]
+        end
 
         if external_link.present?
           json.external_link external_link
         end
 
-        significance = Array(variation.dig(:clinvar, :conditions)).map do |x|
+        significance = Array(variant.dig(:clinvar, :conditions)).map do |x|
           {
             condition: conditions[x[:medgen]],
-            interpretations: Array(x[:interpretation]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(' ', '_').to_sym)&.key },
-            medgen: x[:medgen]
+            interpretations: Array(x[:interpretation]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(',', '').tr(' ', '_').to_sym)&.key },
+            medgen: x[:medgen],
+            submission_count: x[:submission_count]
           }
         end
 
         if significance.present?
+          significance.sort! do |a, b|
+            comp = ClinicalSignificance.find_by_key(a.dig(:interpretations, 0))&.index <=> ClinicalSignificance.find_by_key(b.dig(:interpretations, 0))&.index
+            next comp unless comp.zero?
+
+            comp = b[:submission_count] <=> a[:submission_count]
+            next comp unless comp.zero?
+
+            a[:condition] <=> b[:condition]
+          end
+
           json.significance significance
         end
 
-        vep = Array(variation[:vep])
+        vep = Array(variant[:vep])
         json.most_severe_consequence SequenceOntology.most_severe_consequence(*vep.flat_map { |x| x[:consequence] })&.id
-        json.sift vep.map { |x| x[:sift] }.compact.min
-        json.polyphen vep.map { |x| x[:polyphen] }.compact.max
-        json.alphamissense vep.map { |x| x[:alpha_missense] }.compact.max # TODO: rename to alphamissense
+        json.sift variant[:sift]
+        json.polyphen variant[:polyphen]&.negative? ? 'Unknown' : variant[:polyphen]
+        json.alphamissense variant[:alphamissense]
         vep.each do |x|
-          consequences = x[:consequence].map { |x| SequenceOntology.find_by_key(x) }
+          consequences = x[:consequence].map { |key| SequenceOntology.find_by_key(key) }
           x[:consequence] = (SequenceOntology::CONSEQUENCES_IN_ORDER & consequences).map { |y| y.id }
         end
         json.transcripts vep.map(&:compact).presence
 
-        frequencies = Array(variation[:frequency]).map(&:compact)
+        frequencies = Array(variant[:frequency]).map(&:compact)
         frequencies.each do |x|
           if x[:allele].present? && x.dig(:allele, :frequency).blank?
             x[:allele][:frequency] = begin

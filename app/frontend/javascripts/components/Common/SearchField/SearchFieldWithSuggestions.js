@@ -9,6 +9,7 @@ import './SearchFieldSuggestionsList';
 
 import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
 import { debounce } from '../../../utils/debounce';
+import StoreManager from "../../../classes/StoreManager";
 
 /**
  * @typedef SearchFieldOptions
@@ -103,6 +104,8 @@ class SearchFieldtWithSuggestions extends LitElement {
           dataToReturn = data;
           this._suggestionKeysArray = Object.keys(data);
         }
+
+        StoreManager.setData('showSuggest', true)
         return (this.suggestData = dataToReturn);
       }
       return (this.showSuggestions = false);
@@ -153,6 +156,10 @@ class SearchFieldtWithSuggestions extends LitElement {
    * @param {Event} e
    * @returns {void} */
   _handleUpDownKeys = (e) => {
+    if (!this.showSuggestions) {
+      StoreManager.setData('showSuggest', false)
+    }
+
     if (
       (e.key === 'ArrowUp' ||
         e.key === 'ArrowDown' ||
@@ -230,9 +237,7 @@ class SearchFieldtWithSuggestions extends LitElement {
         break;
 
       case 'Escape':
-        if (this.showSuggestions) {
-          this._hideSuggestions();
-        }
+        this._hideSuggestions();
         break;
       default:
         break;
@@ -307,6 +312,7 @@ class SearchFieldtWithSuggestions extends LitElement {
   _handleFocusIn() {
     if (this.term?.length > 3) {
       this.showSuggestions = true;
+      StoreManager.setData('showSuggest', true)
     }
   }
 
@@ -314,6 +320,7 @@ class SearchFieldtWithSuggestions extends LitElement {
    * @private */
   _handleFocusOut() {
     this._hideSuggestions();
+    StoreManager.setData('showSuggest', false)
   }
 
   /** Hide suggestions and empty input when input is reset. input-reset event for simple search

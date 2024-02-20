@@ -1,0 +1,50 @@
+defaults: &defaults
+  GRCh38:
+    xref: &xref
+      dbsnp: "https://identifiers.org/dbsnp/%<id>s"
+      clinvar: 'https://www.ncbi.nlm.nih.gov/clinvar/variation/%<id>s'
+      tommo: 'https://jmorp.megabank.tohoku.ac.jp/search'
+      gnomad: 'https://gnomad.broadinstitute.org/variant/%<id>s?dataset=gnomad_r4'
+    datasets:
+      frequency:
+        filter:
+          - gem_j_wga
+          - jga_ngs
+          - jga_snp
+          - tommo
+          - gnomad_genomes
+          - gnomad_exomes
+          # - bbj_riken # TODO: to be added on 2024.1
+          # - ncbn # TODO: to be added on 2024.1
+        no_filter:
+      annotation:
+        - clinvar
+        # - mgend # TODO: to be added on 2024.2
+  GRCh37:
+    xref:
+      <<: *xref
+      gnomad: 'https://gnomad.broadinstitute.org/variant/%<id>s?dataset=gnomad_r2_1'
+    datasets:
+      frequency:
+        filter:
+          - gem_j_wga
+          - jga_ngs
+          - jga_snp
+          - tommo
+          - hgvd
+          - gnomad_genomes
+          - gnomad_exomes
+          # - bbj_riken # TODO: to be added on 2024.1
+        no_filter:
+      annotation:
+        - clinvar
+        # - mgend # TODO: to be added on 2024.2
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults

@@ -1,5 +1,6 @@
 require_relative 'parameter_base'
 
+require_relative 'alpha_missense'
 require_relative 'clinical_significance'
 require_relative 'consequence'
 require_relative 'dataset'
@@ -9,7 +10,7 @@ require_relative 'sift'
 require_relative 'type'
 
 module Form
-  # see doc/spec_for_search_query.md
+  # TODO: refactor Form module
   class VariantSearchParameters
     attr_writer :term
     attr_reader :dataset
@@ -20,6 +21,7 @@ module Form
     attr_reader :consequence
     attr_reader :sift
     attr_reader :polyphen
+    attr_reader :alphamissense
 
     attr_reader :offset
     attr_reader :limit
@@ -38,13 +40,13 @@ module Form
       @consequence = Form::Consequence.defaults.merge(params.fetch(:consequence, {}))
       @sift = Form::Sift.defaults.merge(params.fetch(:sift, {}))
       @polyphen = Form::Polyphen.defaults.merge(params.fetch(:polyphen, {}))
+      @alphamissense = Form::AlphaMissense.defaults.merge(params.fetch(:alphamissense, {}))
 
       @offset = params[:offset].is_a?(Array) ? params[:offset] : params.fetch(:offset, '0').to_i.between(0, 10_000)
       @limit = params.fetch(:limit, '100').to_i.between(0, 100)
 
       @stat = params.fetch(:stat, '1')
       @debug = params.key?(:debug)
-      @start_only = params.key?(:start_only)
     end
 
     def [](symbol_or_string)
@@ -59,28 +61,24 @@ module Form
       @stat != '0'
     end
 
-    def start_only?
-      @start_only
-    end
-
     def term
       @term&.strip
     end
 
     def selected_items(attr_name)
-      return nil unless %i[dataset type significance consequence sift polyphen].include?(attr_name.to_sym)
+      return nil unless %i[dataset type significance consequence sift polyphen alphamissense].include?(attr_name.to_sym)
 
       send(attr_name).select { |_, v| v == '1' }.keys
     end
 
     def selected_all?(attr_name)
-      return nil unless %i[dataset type significance consequence sift polyphen].include?(attr_name.to_sym)
+      return nil unless %i[dataset type significance consequence sift polyphen alphamissense].include?(attr_name.to_sym)
 
       send(attr_name).all? { |_, v| v == '1' }
     end
 
     def selected_any?(attr_name)
-      return nil unless %i[dataset type significance consequence sift polyphen].include?(attr_name.to_sym)
+      return nil unless %i[dataset type significance consequence sift polyphen alphamissense].include?(attr_name.to_sym)
 
       send(attr_name).any? { |_, v| v == '1' }
     end
@@ -90,7 +88,7 @@ module Form
     end
 
     def to_hash
-      %i[term dataset frequency quality type significance consequence sift polyphen].map do |name|
+      %i[term dataset frequency quality type significance consequence sift polyphen alphamissense].map do |name|
         [name, ((v = send(name)).respond_to?(:to_h) ? v.to_h : v)]
       end.to_h
     end

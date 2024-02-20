@@ -88,7 +88,7 @@ class VariationSearchService
     {
       filtered_total: total,
       results: results,
-      aggs: paging? ? {} : Variation.search(stat_query).aggregations
+      aggs: paging? ? {} : Variation.search(stat_query, request_cache: true).aggregations
     }
   end
 

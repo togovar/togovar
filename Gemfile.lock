@@ -169,10 +169,10 @@ GEM
       activesupport (>= 5.0.0)
     js-routes (1.4.14)
       railties (>= 4)
-    json-canonicalization (0.3.2)
-    json-ld (3.3.0)
+    json-canonicalization (1.0.0)
+    json-ld (3.3.1)
       htmlentities (~> 4.3)
-      json-canonicalization (~> 0.3, >= 0.3.2)
+      json-canonicalization (~> 1.0)
       link_header (~> 0.0, >= 0.0.8)
       multi_json (~> 1.15)
       rack (>= 2.2, < 4)
@@ -220,7 +220,7 @@ GEM
     listen (3.8.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
-    logger (1.5.3)
+    logger (1.6.0)
     loofah (2.21.4)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -262,8 +262,8 @@ GEM
       pry (>= 0.13, < 0.15)
     psych (5.1.1.1)
       stringio
-    public_suffix (5.0.3)
-    puma (5.6.8)
+    public_suffix (5.0.4)
+    puma (5.6.7)
       nio4r (~> 2.0)
     racc (1.7.3)
     rack (2.2.8)
@@ -402,7 +402,7 @@ GEM
       sprockets-rails (>= 2.0, < 4.0)
       tilt (>= 1.1, < 3)
     scanf (1.0.0)
-    shacl (0.4.0)
+    shacl (0.4.1)
       json-ld (~> 3.3)
       rdf (~> 3.3)
       sparql (~> 3.3)
@@ -439,7 +439,7 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
-    stringio (3.0.8)
+    stringio (3.1.0)
     sxp (1.3.0)
       matrix (~> 0.4)
       rdf (~> 3.3)
@@ -503,4 +503,4 @@ RUBY VERSION
    ruby 3.2.2p53
 
 BUNDLED WITH
-   2.1.4
+   2.4.22

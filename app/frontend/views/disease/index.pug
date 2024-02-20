@@ -21,12 +21,16 @@ block content
       h3.title
       #disease-summary.stanza
 
-    section.stanza-view
-      h3.title
-        | Clinical significance
+    section.stanza-view#clinvarDisease
+      .titlelink-wrapper
+        a.titlelink(href="#clinvarDisease")
+        h3.title
+          | Clinical significance
       #disease-clinvar.stanza
 
-    section.stanza-view
-      h3.title
-        | Genome-wide association study
+    section.stanza-view#gwasDisease
+      .titlelink-wrapper
+        a.titlelink(href="#gwasDisease")
+        h3.title
+          | Genome-wide association study
       #disease-gwas.stanza

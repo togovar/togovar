@@ -2,6 +2,7 @@ import StoreManager from './StoreManager.js';
 import ResultsRowView from './ResultsRowView.js';
 import ScrollBar from './ScrollBar.js';
 import { TR_HEIGHT, COMMON_FOOTER_HEIGHT, COLUMNS } from '../global.js';
+import { keyDownEvent } from '../utils/keyDownEvent.js';
 
 export default class ResultsView {
   constructor(elm) {
@@ -17,7 +18,7 @@ export default class ResultsView {
     StoreManager.bind('offset', this);
     StoreManager.bind('karyotype', this);
     StoreManager.bind('searchMessages', this);
-    $(document).on('keydown.resultview', this.keydown.bind(this));
+    document.addEventListener('keydown', this.keydown.bind(this));
     // スクロールバーの生成
     this.elm
       .querySelector('.tablecontainer')
@@ -186,16 +187,19 @@ export default class ResultsView {
   // 上下カーソルタイプで選択行の移動 & ESCで選択解除
   keydown(e) {
     if (StoreManager.getData('selectedRow') === undefined) return;
-    switch (e.key) {
-      case 'ArrowUp': // ↑
-        this.shiftSelectedRow(-1);
-        break;
-      case 'ArrowDown': // ↓
-        this.shiftSelectedRow(1);
-        break;
-      case 'Escape': // 選択解除
-        StoreManager.setData('selectedRow', undefined);
-        break;
+
+    if (keyDownEvent('selectedRow')) {
+      switch (e.key) {
+        case 'ArrowUp': // ↑
+          this.shiftSelectedRow(-1);
+          break;
+        case 'ArrowDown': // ↓
+          this.shiftSelectedRow(1);
+          break;
+        case 'Escape': // 選択解除
+          StoreManager.setData('selectedRow', undefined);
+          break;
+      }
     }
   }
 

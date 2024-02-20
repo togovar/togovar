@@ -4,6 +4,7 @@ import ConditionValueEditorGene from './ConditionValueEditorGene.js';
 import ConditionValueEditorVariantID from './ConditionValueEditorVariantID.js';
 import ConditionValueEditorFrequencyCount from './ConditionValueEditorFrequencyCount.js';
 import ConditionValueEditorLocation from './ConditionValueEditorLocation.js';
+import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditorPathogenicityPrediction.js';
 import ConditionValueEditorDisease from './ConditionValueEditorDisease.js';
 import { CONDITION_TYPE } from '../definition.js';
 
@@ -81,6 +82,15 @@ class ConditionValues {
         );
         break;
 
+      case CONDITION_TYPE.pathogenicity_prediction:
+        this._editors.push(
+          new ConditionValueEditorPathogenicityPrediction(
+            this,
+            this._conditionView
+          )
+        );
+        break;
+
       case CONDITION_TYPE.variant_id:
         this._editors.push(
           new ConditionValueEditorVariantID(this, this._conditionView)
@@ -137,12 +147,18 @@ class ConditionValues {
   _clickCancelButton(e) {
     e.stopImmediatePropagation();
     if (this._conditionView.isFirstTime) {
-      // delete for the first time
       this._conditionView.remove();
     } else {
-      // otherwise, revert to the previous state
       for (const editor of this._editors) {
         editor.restore();
+        if (
+          !['datgaset', 'pathogenicity_prediction', 'id', 'location'].includes(
+            this._conditionView.conditionType
+          )
+        ) {
+          this._conditionView._elm.dataset.relation =
+            this._conditionView.keepLastRelation;
+        }
       }
       this._conditionView.doneEditing();
     }

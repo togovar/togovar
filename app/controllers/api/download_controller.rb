@@ -53,7 +53,7 @@ module API
       @search_params ||= begin
                            query = if request.get?
                                      params.permit :term, :quality, :debug, :offset, :limit,
-                                                   dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {}, sift: {}, polyphen: {}, column: {}
+                                                   dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {}, sift: {}, polyphen: {}, alphamissense: {}, column: {}
                                    else
                                      if params.key?(:query)
                                        params.permit query: {}, column: []
@@ -71,7 +71,7 @@ module API
     end
 
     def output_columns
-      columns = %i[id rs position ref_alt type gene frequency consequence sift polyphen condition alphamisssense]
+      columns = %i[id rs position ref_alt type gene frequency consequence sift polyphen alphamissense condition]
 
       if request.get?
         columns - (search_params[:column].presence || {}).select { |_, v| v == '0' }.keys.map(&:to_sym)
@@ -269,8 +269,8 @@ module API
         data[:polyphen2_qualitative_prediction] = polyphen ? Polyphen.find_by_value(polyphen).label : nil
         data[:polyphen2_score] = polyphen
       end
-      if columns.include?(:alphamisssense)
-        data[:alphamissense_pathogenicity] = alpha_misssense ? AlphaMisssense.find_by_value(alpha_misssense).label : nil
+      if columns.include?(:alphamissense)
+        data[:alphamissense_pathogenicity] = alpha_misssense ? AlphaMissense.find_by_value(alpha_misssense).label : nil
         data[:alphamissense_score] = alpha_misssense
       end
 

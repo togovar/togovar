@@ -14,20 +14,22 @@ export default class Configuration {
     }
   }
 
-  open() {
-    this.elm.classList.add('-shown');
-    $(document).on('keyup.conf', this.typeEscape.bind(this));
-  }
-
   typeEscape(e) {
     if (e.key === 'Escape') {
       this.close();
     }
   }
 
+  open() {
+    this.elm.classList.add('-shown');
+    StoreManager.setData('showModal', true)
+    document.addEventListener('keyup', this.typeEscape.bind(this));
+  }
+
   close() {
     this.elm.classList.remove('-shown');
-    $(document).off('keyup.conf');
+    StoreManager.setData('showModal', false)
+    document.removeEventListener('keyup', this.typeEscape.bind(this));
   }
 
   // initialize
@@ -36,8 +38,8 @@ export default class Configuration {
 
     // コンフィグ開く
     document.querySelector('#GlobalHeader > .menus > .config > .menu-button').addEventListener('click', () => {
-      this.open();
-    });
+        this.open();
+      });
     // コンフィグ閉じる
     this.bg.addEventListener('click', () => {
       this.close();
@@ -62,7 +64,7 @@ export default class Configuration {
         // デフォルト値作成
         stored = configure.constant.map(item => {
           const newItem = Object.assign({}, item);
-          newItem.isUsed = true;
+          newItem.isUsed = newItem.id !== 'type';
           return newItem;
         });
       }
@@ -70,13 +72,13 @@ export default class Configuration {
       configure.container.innerHTML = stored.map(item => `<li><label><input type="checkbox" value="${item.id}"${item.isUsed ? ' checked' : ''}>${item.label}</label></li>`).join('');
       // input イベント
       configure.container.querySelectorAll('li > label > input').forEach(input => {
-        input.addEventListener('change', e => {
-          const stored = StoreManager.getData(configure.storeKey);
-          const item = stored.find(item => item.id === e.target.value);
-          item.isUsed = e.target.checked;
-          StoreManager.setData(configure.storeKey, stored);
-        })
-      });
+          input.addEventListener('change', e => {
+            const stored = StoreManager.getData(configure.storeKey);
+            const item = stored.find(item => item.id === e.target.value);
+            item.isUsed = e.target.checked;
+            StoreManager.setData(configure.storeKey, stored);
+          })
+        });
 
       // set to store
       StoreManager.setData(configure.storeKey, stored);

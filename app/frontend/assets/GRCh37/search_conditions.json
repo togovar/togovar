@@ -152,7 +152,7 @@
     "items": [
       {
         "id": "NC",
-        "label": "Not in clinvar",
+        "label": "Unassigned",
         "type": "boolean",
         "default": "1"
       },
@@ -165,6 +165,36 @@
       {
         "id": "LP",
         "label": "Likely pathogenic",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "PLP",
+        "label": "Pathogenic, Low penetrance",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "LPLP",
+        "label": "Likely pathogenic, Low penetrance",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "ERA",
+        "label": "Established risk allele",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "LRA",
+        "label": "Likely risk allele",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "URA",
+        "label": "Uncertain risk allele",
         "type": "boolean",
         "default": "1"
       },
@@ -199,14 +229,20 @@
         "default": "1"
       },
       {
-        "id": "A",
-        "label": "Association",
+        "id": "CS",
+        "label": "Confers sensitivity",
         "type": "boolean",
         "default": "1"
       },
       {
         "id": "RF",
         "label": "Risk factor",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "A",
+        "label": "Association",
         "type": "boolean",
         "default": "1"
       },
@@ -236,7 +272,7 @@
       },
       {
         "id": "AN",
-        "label": "Association_not found",
+        "label": "Association not found",
         "type": "boolean",
         "default": "1"
       }
@@ -573,10 +609,47 @@
     ]
   },
   {
+    "id": "alphamissense",
+    "label": "AlphaMissense",
+    "type": "array",
+    "items": [
+      {
+        "id": "N",
+        "label": "Unassigned",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "LP",
+        "label": "Likely pathogenic",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "A",
+        "label": "Ambiguous",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "LB",
+        "label": "Likely benign",
+        "type": "boolean",
+        "default": "1"
+      }
+    ]
+  },
+  {
     "id": "sift",
     "label": "SIFT",
     "type": "array",
     "items": [
+      {
+        "id": "N",
+        "label": "Unassigned",
+        "type": "boolean",
+        "default": "1"
+      },
       {
         "id": "D",
         "label": "Deleterious",
@@ -585,7 +658,7 @@
       },
       {
         "id": "T",
-        "label": "tolerated",
+        "label": "Tolerated",
         "type": "boolean",
         "default": "1"
       }
@@ -596,6 +669,12 @@
     "label": "PolyPhen",
     "type": "array",
     "items": [
+      {
+        "id": "N",
+        "label": "Unassigned",
+        "type": "boolean",
+        "default": "1"
+      },
       {
         "id": "PROBD",
         "label": "Probably damaging",

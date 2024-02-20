@@ -38,6 +38,9 @@ class Variation
             indexes :id, type: :keyword
           end
           indexes :most_severe_consequence, type: :keyword
+          indexes :sift, type: :float
+          indexes :polyphen, type: :float
+          indexes :alphamissense, type: :float
           indexes :vep, type: :nested do
             indexes :consequence_type, type: :keyword
             indexes :transcript_id, type: :keyword
@@ -53,14 +56,15 @@ class Variation
             indexes :hgvs_g, type: :keyword
             indexes :sift, type: :float
             indexes :polyphen, type: :float
-            indexes :alpha_missense, type: :float # TODO: rename to alphamissense
+            indexes :alphamissense, type: :float
           end
           indexes :clinvar do
-            indexes :variation_id, type: :long
-            indexes :allele_id, type: :long
-            indexes :conditions, type: :nested do
+            indexes :id, type: :long
+            indexes :accession, type: :keyword
+            indexes :condition, type: :nested do
               indexes :medgen, type: :keyword
               indexes :interpretation, type: :keyword
+              indexes :submission_count, type: :integer
             end
           end
           indexes :frequency, type: :nested do
@@ -80,6 +84,14 @@ class Variation
           end
         end
       end
+    end
+
+    module Datasets
+      DATASETS = ::Rails.configuration.application[:datasets]
+      private_constant :DATASETS
+      FREQUENCY_WITH_FILTER = Array(DATASETS.dig(:frequency, :filter)).map(&:to_sym)
+      FREQUENCY = FREQUENCY_WITH_FILTER + Array(DATASETS.dig(:frequency, :no_filter)).map(&:to_sym)
+      ALL = FREQUENCY + Array(DATASETS[:annotation]).map(&:to_sym)
     end
 
     module ClassMethods
@@ -105,51 +117,25 @@ class Variation
             end
           end
           aggregation :vep_consequences do
-            nested do
-              path :vep
-              aggregation :vep_consequences do
-                cardinality do
-                  field :'vep.consequence'
-                end
-              end
-            end
-          end
-          aggregation :frequency_sources do
-            nested do
-              path :frequency
-              aggregation :frequency_sources do
-                cardinality do
-                  field :'frequency.source'
-                end
-              end
+            cardinality do
+              field :'most_severe_consequence'
             end
           end
         end
 
-        response = __elasticsearch__.search(query)
+        response = __elasticsearch__.search(query, request_cache: true)
 
         @cardinality = response.aggregations
                          .map { |k, v| [k, v.key?('value') ? v['value'] : v[k]['value']] }
                          .to_h
                          .symbolize_keys
+                         .merge(frequency_sources: Datasets::FREQUENCY.size)
       end
 
       def default_condition
         Elasticsearch::DSL::Search.search do
           query do
-            bool do
-              should do
-                exists field: :clinvar
-              end
-              should do
-                nested do
-                  path 'frequency'
-                  query do
-                    exists field: :frequency
-                  end
-                end
-              end
-            end
+            match active: true
           end
         end.to_hash[:query]
       end

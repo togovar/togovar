@@ -26,7 +26,7 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
         const master = StoreManager.getSimpleSearchConditionMaster('significance');
         html = record.significance.map(significance => `<dl class="above-headline"><dt><a href="/disease/${significance.medgen}" target="_blank" class="hyper-text -internal">${significance.condition}</a></dt>${
           significance.interpretations ?
-            significance.interpretations.map(interpretation => `<dd><div class="clinical-significance" data-sign="${interpretation}"></div>${master.items.find(item => item.id === interpretation).label}</dd>`).join('') :
+            significance.interpretations.map(interpretation => `<dd><div class="clinical-significance" data-value="${interpretation}"></div>${master.items.find(item => item.id === interpretation).label}</dd>`).join('') :
             ''
           }</dl>`).join('');
         this.elm.classList.remove('-notfound');

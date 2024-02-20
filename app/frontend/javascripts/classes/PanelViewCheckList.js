@@ -1,36 +1,43 @@
-import PanelView from "./PanelView.js";
-import StoreManager from "./StoreManager.js";
+import PanelView from './PanelView.js';
+import StoreManager from './StoreManager.js';
 
 export default class PanelViewCheckList extends PanelView {
-
   constructor(elm, type, statisticsType) {
     super(elm, type);
     this._statisticsType = statisticsType;
     // 検索条件マスター
-    const conditionMaster = StoreManager.getData('simpleSearchConditionsMaster').find(condition => condition.id === this.kind);
+    const conditionMaster = StoreManager.getData(
+      'simpleSearchConditionsMaster'
+    ).find((condition) => condition.id === this.kind);
     // GUIの生成
     this._createGUI(conditionMaster);
     // references
     const condition = StoreManager.getSimpleSearchCondition(this.kind);
     this._inputsValues = {};
-    this.elm.querySelectorAll('.content > .checklist-values > .item > .label > input').forEach(input => {
-      this._inputsValues[input.value] = {
-        input: input,
-        value: input.parentNode.nextElementSibling
-      }
-      if (condition && condition[input.value]) { // チェックの初期状態
-        input.checked = condition[input.value] === '1';
-      }
-    });
+    this.elm
+      .querySelectorAll('.content > .checklist-values > .item > .label > input')
+      .forEach((input) => {
+        this._inputsValues[input.value] = {
+          input: input,
+          value: input.parentNode.nextElementSibling,
+        };
+        if (condition && condition[input.value]) {
+          // チェックの初期状態
+          input.checked = condition[input.value] === '1';
+        }
+      });
     this._changeFilter();
     // events
     for (const key in this._inputsValues) {
-      this._inputsValues[key].input.addEventListener('change', this._changeFilter.bind(this));
+      this._inputsValues[key].input.addEventListener(
+        'change',
+        this._changeFilter.bind(this)
+      );
     }
     StoreManager.bind('simpleSearchConditions', this);
     StoreManager.bind(this._statisticsType, this);
     // 統計情報の更新
-    this[this._statisticsType] = values => {
+    this[this._statisticsType] = (values) => {
       if (values) {
         let all = 0;
         for (const key in this._inputsValues) {
@@ -39,14 +46,10 @@ export default class PanelViewCheckList extends PanelView {
           this._inputsValues[key].value.textContent = count.toLocaleString();
         }
         this._inputsValues.all.value.textContent = all.toLocaleString();
-      } else {
-        // 統計値が返ってこなかった場合
-        for (const key in this._inputsValues) {
-          this._inputsValues[key].value.textContent = '0';
-        }
       }
-      this._inputsValues.all.value.textContent = StoreManager.getData('searchStatus').filtered.toLocaleString();
-    }
+      this._inputsValues.all.value.textContent =
+        StoreManager.getData('searchStatus').filtered.toLocaleString();
+    };
   }
 
   _createGUI(conditionMaster) {
@@ -65,30 +68,112 @@ export default class PanelViewCheckList extends PanelView {
       <li class="item">
         <label class="label">
           <input type="checkbox" value="NC" checked>
-          Not in ClinVar
+          Unassigned
         </label>
         <span class="value"></span>
       </li>
       <li class="separator"><hr></li>
       `;
     }
-    html += conditionMaster.items.map(item => `
+    if (this.kind === 'alphamissense') {
+      html += `
+      <li class="item">
+        <label class="label">
+          <input type="checkbox" value="N" checked>
+          Unassigned
+        </label>
+        <span class="value"></span>
+      </li>
+      <li class="separator"><hr></li>
+      `;
+    }
+    if (this.kind === 'sift') {
+      html += `
+      <li class="item">
+        <label class="label">
+          <input type="checkbox" value="N" checked>
+          Unassigned
+        </label>
+        <span class="value"></span>
+      </li>
+      <li class="separator"><hr></li>
+      `;
+    }
+    if (this.kind === 'polyphen') {
+      html += `
+      <li class="item">
+        <label class="label">
+          <input type="checkbox" value="N" checked>
+          Unassigned
+        </label>
+        <span class="value"></span>
+      </li>
+      <li class="separator"><hr></li>
+      `;
+    }
+    html += conditionMaster.items
+      .map(
+        (item) => `
     <li class="item">
       <label class="label">
         <input type="checkbox" value="${item.id}" checked>
-        ${this.kind === 'dataset' ? `<div class="dataset-icon" data-dataset="${item.id}"><div class="properties"></div></div>` : ''}
-        ${this.kind === 'significance' ? `<div class="clinical-significance" data-sign="${item.id}"></div>` : ''}
-        ${this.kind === 'sift' ? `<div class="variant-function _width_5em _align-center" data-function="${item.id}">${ { D: '&lt; 0.05', T: '≥ 0.05' }[item.id] }</div>` : ''}
-        ${this.kind === 'polyphen' ? `<div class="variant-function _width_5em _align-center" data-function="${item.id}">${ { PROBD: '&gt; 0.908', POSSD: '&gt; 0.446', B: '≤ 0.446', U: '&ensp;&ensp;' }[item.id] }</div>` : ''}
+        ${
+          this.kind === 'dataset'
+            ? `<div class="dataset-icon" data-dataset="${item.id}"><div class="properties"></div></div>`
+            : ''
+        }
+        ${
+          this.kind === 'significance'
+            ? `<div class="clinical-significance" data-value="${item.id}"></div>`
+            : ''
+        }
+        ${
+          this.kind === 'sift'
+            ? `<div class="variant-function _width_5em _align-center" data-function="${
+                item.id
+              }">${{ D: '&lt; 0.05', T: '&ge; 0.05' }[item.id]}</div>`
+            : ''
+        }
+        ${
+          this.kind === 'polyphen'
+            ? `<div class="variant-function _width_5em _align-center" data-function="${
+                item.id
+              }">${
+                {
+                  PROBD: '&gt; 0.908',
+                  POSSD: '&gt; 0.446',
+                  B: '&le; 0.446',
+                  U: 'Unknown',
+                }[item.id]
+              }</div>`
+            : ''
+        }
+        ${
+          this.kind === 'alphamissense'
+            ? `<div class="variant-function _width_5em _align-center" data-function="${
+                item.id
+              }">${
+                { LP: '&gt; 0.564', A: '&ge; 0.340', LB: '&lt; 0.340' }[item.id]
+              }</div>`
+            : ''
+        }
         ${item.label}
       </label>
       <span class="value"></span>
     </li>
-    `).join('');
-    this.elm.querySelector('.content > .checklist-values').insertAdjacentHTML('beforeend', html);
-    // clinical significance で not in clinvar の重複を削除
-    if (this.kind === 'significance') {
-      this.elm.querySelector('.content > .checklist-values > .item:nth-child(5)').remove();
+    `
+      )
+      .join('');
+    this.elm
+      .querySelector('.content > .checklist-values')
+      .insertAdjacentHTML('beforeend', html);
+    // not検索の重複を削除
+    if (
+      ['significance', 'alphamissense', 'sift', 'polyphen'].includes(this.kind)
+    ) {
+      this.elm
+        .querySelector('.content > .checklist-values > .item:nth-child(5)')
+        .remove();
     }
   }
 
@@ -131,10 +216,10 @@ export default class PanelViewCheckList extends PanelView {
   simpleSearchConditions(conditions) {
     let isAll = 0;
     for (const key in conditions[this.kind]) {
-      this._inputsValues[key].input.checked = conditions[this.kind][key] !== '0';
+      this._inputsValues[key].input.checked =
+        conditions[this.kind][key] !== '0';
       isAll += conditions[this.kind][key] === '0';
     }
     this._inputsValues.all.input.checked = isAll === 0;
   }
-
 }

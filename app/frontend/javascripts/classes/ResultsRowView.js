@@ -1,6 +1,6 @@
 import { COLUMNS } from '../global.js';
 import StoreManager from './StoreManager.js';
-import LogarithmizedBlockGraphFrequencyView from '../components/LogarithmizedBlockGraphFrequencyView';
+import '../components/LogarithmizedBlockGraphFrequencyView';
 
 const REF_ALT_SHOW_LENGTH = 4;
 
@@ -86,17 +86,21 @@ export default class ResultsRowView {
           html +=
             '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>';
           break;
+        case 'clinical_significance': // clinical significance
+          html +=
+            '<td class="clinical_significance" data-remains=""><div href="" class="clinical-significance" data-value=""></div><a class="hyper-text -internal" target="_blank"></a></td>';
+          break;
+        case 'alphamissense': // AlphaMissense
+          html +=
+            '<td class="alphamissense"><div class="variant-function" data-function=""></div></td>';
+          break;
         case 'sift': // SIFT
           html +=
-            '<td class="sift" data-remains=""><div class="variant-function" data-function=""></div></td>';
+            '<td class="sift"><div class="variant-function" data-function=""></div></td>';
           break;
         case 'polyphen': // PolyPhen
           html +=
-            '<td class="polyphen" data-remains=""><div class="variant-function" data-function=""></div></td>';
-          break;
-        case 'clinical_significance': // clinical significance
-          html +=
-            '<td class="clinical_significance" data-remains=""><!--<div class="dataset-icon -none" data-dataset="mgend"></div>--><div href="" class="clinical-significance" data-sign=""></div><a class="hyper-text -internal" target="_blank"></a></td>';
+            '<td class="polyphen"><div class="variant-function" data-function=""></div></td>';
           break;
       }
     }
@@ -121,14 +125,22 @@ export default class ResultsRowView {
         'td.alt_frequency > logarithmized-block-graph-frequency-view'
       )
       .forEach((elm) => (this.tdFrequencies[elm.dataset.dataset] = elm));
+    // Consequence
     this.tdConsequence = this.tr.querySelector('td.consequence');
     this.tdConsequenceItem =
       this.tdConsequence.querySelector('.consequence-item');
+    // SIFT
     this.tdSift = this.tr.querySelector('td.sift');
     this.tdSiftFunction = this.tdSift.querySelector('.variant-function');
+    // PolyPhen
     this.tdPolyphen = this.tr.querySelector('td.polyphen');
     this.tdPolyphenFunction =
       this.tdPolyphen.querySelector('.variant-function');
+    // AlphaMissense
+    this.tdAlphaMissense = this.tr.querySelector('td.alphamissense');
+    this.tdAlphaMissenseFunction =
+      this.tdAlphaMissense.querySelector('.variant-function');
+    // Clinical significance
     this.tdClinical = this.tr.querySelector('td.clinical_significance');
     this.tdClinicalSign = this.tdClinical.querySelector(
       '.clinical-significance'
@@ -144,7 +156,6 @@ export default class ResultsRowView {
     }
     // レコード取得
     const result = StoreManager.getRecordByIndex(this.index);
-    // console.log(this, result);
     if (result === 'loading') {
       this.tr.classList.add('-loading');
       this.tr.classList.remove('-out-of-range');
@@ -271,18 +282,54 @@ export default class ResultsRowView {
             }
           }
           break;
+        case 'clinical_significance':
+          {
+            if (result.significance && result.significance.length) {
+              this.tdClinical.dataset.remains = result.significance.length - 1;
+              this.tdClinicalSign.dataset.value =
+                result.significance[0].interpretations[0];
+              this.tdClinicalAnchor.textContent =
+                result.significance[0].condition;
+              this.tdClinicalAnchor.setAttribute(
+                'href',
+                `/disease/${result.significance[0].medgen}`
+              );
+            } else {
+              this.tdClinical.dataset.remains = 0;
+              this.tdClinicalSign.dataset.value = '';
+              this.tdClinicalAnchor.textContent = '';
+              this.tdClinicalAnchor.setAttribute('href', '');
+            }
+          }
+          break;
+        case 'alphamissense':
+          {
+            if (result.alphamissense !== null) {
+              this.tdAlphaMissenseFunction.textContent = result.alphamissense;
+              switch (true) {
+                case result.alphamissense < 0.34:
+                  this.tdAlphaMissenseFunction.dataset.function = 'LB';
+                  break;
+                case result.alphamissense > 0.564:
+                  this.tdAlphaMissenseFunction.dataset.function = 'LP';
+                  break;
+                default:
+                  this.tdAlphaMissenseFunction.dataset.function = 'A';
+                  break;
+              }
+            } else {
+              this.tdAlphaMissenseFunction.textContent = '';
+              this.tdAlphaMissenseFunction.dataset.function = '';
+            }
+          }
+          break;
         case 'sift':
           {
-            const sifts = result.transcripts?.filter((x) =>
-              Number.isFinite(x.sift)
-            );
-            if (sifts && sifts.length > 0) {
-              this.tdSift.dataset.remains = sifts.length - 1;
+            if (result.sift !== null) {
               this.tdSiftFunction.textContent = result.sift;
               this.tdSiftFunction.dataset.function =
                 result.sift >= 0.05 ? 'T' : 'D';
             } else {
-              this.tdSift.dataset.remains = 0;
               this.tdSiftFunction.textContent = '';
               this.tdSiftFunction.dataset.function = '';
             }
@@ -290,11 +337,7 @@ export default class ResultsRowView {
           break;
         case 'polyphen':
           {
-            const polyphens = result.transcripts?.filter((x) =>
-              Number.isFinite(x.polyphen)
-            );
-            if (polyphens && polyphens.length > 0) {
-              this.tdPolyphen.dataset.remains = polyphens.length - 1;
+            if (result.polyphen !== null) {
               this.tdPolyphenFunction.textContent = result.polyphen;
               switch (true) {
                 case result.polyphen > 0.908:
@@ -311,29 +354,8 @@ export default class ResultsRowView {
                   break;
               }
             } else {
-              this.tdPolyphen.dataset.remains = 0;
               this.tdPolyphenFunction.textContent = '';
               this.tdPolyphenFunction.dataset.function = '';
-            }
-          }
-          break;
-        case 'clinical_significance':
-          {
-            if (result.significance && result.significance.length) {
-              this.tdClinical.dataset.remains = result.significance.length - 1;
-              this.tdClinicalSign.dataset.sign =
-                result.significance[0].interpretations[0];
-              this.tdClinicalAnchor.textContent =
-                result.significance[0].condition;
-              this.tdClinicalAnchor.setAttribute(
-                'href',
-                `/disease/${result.significance[0].medgen}`
-              );
-            } else {
-              this.tdClinical.dataset.remains = 0;
-              this.tdClinicalSign.dataset.sign = '';
-              this.tdClinicalAnchor.textContent = '';
-              this.tdClinicalAnchor.setAttribute('href', '');
             }
           }
           break;

@@ -1,7 +1,9 @@
 import ConditionView from './ConditionView.js';
 import ConditionValues from './ConditionValues.js';
+import StoreManager from './StoreManager.js';
 import { ADVANCED_CONDITIONS } from '../global.js';
 import { CONDITION_TYPE, CONDITION_ITEM_TYPE } from '../definition.js';
+import { keyDownEvent } from '../utils/keyDownEvent.js';
 
 /** Class for editing and deleting conditions
  * Create an instance with {@link ConditionGroupView}
@@ -25,16 +27,20 @@ class ConditionItemView extends ConditionView {
     this._conditionType = conditionType;
     /** @property {boolean} _isFirstTime - whether this is the first time to edit. (Relates to whether the element is deleted with the cancel button) */
     this._isFirstTime = true;
+    /** @property {boolean} _keepLastRelation - Save equal and negative conditions for canceling */
+    this._keepLastRelation = 'eq';
 
     // make HTML
     this._elm.classList.add('advanced-search-condition-item-view');
     this._elm.dataset.classification = conditionType;
-    this._elm.dataset.relation =
-      conditionType === 'dataset' ||
-      conditionType === 'id' ||
-      conditionType === 'location'
-        ? ''
-        : 'eq';
+    this._elm.dataset.relation = [
+      'dataset',
+      'pathogenicity_prediction',
+      'id',
+      'location',
+    ].includes(conditionType)
+      ? ''
+      : 'eq';
     this._elm.innerHTML = `
     <div class="body">
       <div class="summary">
@@ -77,6 +83,10 @@ class ConditionItemView extends ConditionView {
         this._elm.dataset.relation = { eq: 'ne', ne: 'eq' }[
           this._elm.dataset.relation
         ];
+        if (!StoreManager.getData('showModal')) {
+          this._keepLastRelation = this._elm.dataset.relation;
+          this._builder.changeCondition();
+        }
       });
     //  Edit and delete button settings
     for (const button of summary.querySelectorAll(
@@ -88,6 +98,7 @@ class ConditionItemView extends ConditionView {
           case 'edit':
             this._elm.classList.add('-editing');
             this._conditionValues.startToEditCondition();
+            StoreManager.setData('showModal', true);
             window.addEventListener('keydown', this.#keydownEscapeEvent);
             break;
           case 'delete':
@@ -111,6 +122,8 @@ class ConditionItemView extends ConditionView {
     this._elm.classList.remove('-editing');
     this._isFirstTime = false;
     this._builder.changeCondition();
+    StoreManager.setData('showModal', false);
+    window.removeEventListener('keydown', this.#keydownEscapeEvent);
   }
 
   /**
@@ -118,6 +131,8 @@ class ConditionItemView extends ConditionView {
   remove() {
     delete this._conditionValues;
     super.remove();
+    StoreManager.setData('showModal', false);
+    window.removeEventListener('keydown', this.#keydownEscapeEvent);
   }
 
   // private methods
@@ -126,17 +141,24 @@ class ConditionItemView extends ConditionView {
   /** Exit the edit screen with esckey. remove() for the first time, doneEditing() for editing
    * @private */
   #keydownEscape(e) {
-    if (e.key !== 'Escape' || !this._conditionValues) return;
+    if (
+      e.key !== 'Escape' ||
+      !this._conditionValues ||
+      !StoreManager.getData('showModal')
+    )
+      return;
 
-    if (this._isFirstTime) {
-      this.remove();
-    } else {
-      for (const editor of this._conditionValues.editors) {
-        editor.restore();
+    if (keyDownEvent('showModal')) {
+      if (this._isFirstTime) {
+        this.remove();
+      } else {
+        for (const editor of this._conditionValues.editors) {
+          editor.restore();
+          this._elm.dataset.relation = this._keepLastRelation;
+        }
+        this.doneEditing();
       }
-      this.doneEditing();
     }
-    window.removeEventListener('keydown', this.#keydownEscapeEvent);
   }
 
   // accessor
@@ -163,6 +185,11 @@ class ConditionItemView extends ConditionView {
     return this._isFirstTime;
   }
 
+  /** @type {string} */
+  get keepLastRelation() {
+    return this._keepLastRelation;
+  }
+
   /** Create each advanced search query
    * @see {@link https://grch38.togovar.org/api} -  Schemas
    * @type {Object} */
@@ -179,6 +206,12 @@ class ConditionItemView extends ConditionView {
               .queryValue
         );
         return queries.length <= 1 ? queries[0] : { or: queries };
+      }
+
+      case CONDITION_TYPE.pathogenicity_prediction: {
+        return valueElements[0].shadowRoot.querySelector(
+          'prediction-value-view'
+        ).queryValue;
       }
 
       case CONDITION_TYPE.location: {
@@ -199,7 +232,7 @@ class ConditionItemView extends ConditionView {
       }
 
       case CONDITION_TYPE.gene_symbol: {
-        const queryId = valueElements[0].value;
+        const queryId = valueElements[0]?.value;
         return {
           gene: {
             relation: this._elm.dataset.relation,
