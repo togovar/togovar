@@ -9,6 +9,8 @@ module TogoVar
 
           attr_reader :score
 
+          validates :score, presence: true
+
           def initialize(*args)
             super
 
