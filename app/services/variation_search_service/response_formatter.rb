@@ -90,6 +90,8 @@ class VariationSearchService
       end
     end
 
+    CLINVAR_CONDITION_NOT_PROVIDED = 'not provided'
+
     def data(json)
       synonyms = Hash.new { |hash, key| hash[key] = Gene.synonyms(key) }
       conditions = Hash.new { |hash, key| hash[key] = Disease.find(key).results.first&.dig('_source', 'name') }
@@ -148,7 +150,7 @@ class VariationSearchService
 
         significance = Array(variant.dig(:clinvar, :conditions)).map do |x|
           {
-            condition: conditions[x[:medgen]],
+            condition: conditions[x[:medgen]] || CLINVAR_CONDITION_NOT_PROVIDED,
             interpretations: Array(x[:interpretation]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(',', '').tr(' ', '_').to_sym)&.key },
             medgen: x[:medgen],
             submission_count: x[:submission_count]
@@ -157,13 +159,23 @@ class VariationSearchService
 
         if significance.present?
           significance.sort! do |a, b|
-            comp = ClinicalSignificance.find_by_key(a.dig(:interpretations, 0))&.index <=> ClinicalSignificance.find_by_key(b.dig(:interpretations, 0))&.index
-            next comp unless comp.zero?
+            if (r = ClinicalSignificance.find_by_key(a.dig(:interpretations, 0))&.index <=>
+              ClinicalSignificance.find_by_key(b.dig(:interpretations, 0))&.index) && !r.zero?
+              next r
+            end
 
-            comp = b[:submission_count] <=> a[:submission_count]
-            next comp unless comp.zero?
+            if (r = b[:submission_count] <=> a[:submission_count]) && !r.zero?
+              next r
+            end
 
-            a[:condition] <=> b[:condition]
+            next 1 if a[:condition] == CLINVAR_CONDITION_NOT_PROVIDED
+            next -1 if b[:condition] == CLINVAR_CONDITION_NOT_PROVIDED
+
+            if (r = b[:condition] <=> a[:condition]) && !r.zero?
+              next r
+            end
+
+            a[:condition].blank? ? 1 : -1
           end
 
           json.significance significance
