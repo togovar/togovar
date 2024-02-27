@@ -106,7 +106,22 @@ article.common-document
         tbody
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads#v3')
+              a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads#v4')
+                | Genome Aggregation Database (gnomAD) exomes
+            td._align-left WES
+            td._align-center
+            td._align-left 複数
+            td._align-center ✔
+            td._align-center ✔
+            td._align-center
+              span(style='margin-left:3px;') 730,947
+            td._align-center
+              | 183,558,769
+            td Broad Institute
+            td v4.0
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads#v4')
                 | Genome Aggregation Database (gnomAD) genomes
             td._align-left WGS
             td._align-center
@@ -114,29 +129,11 @@ article.common-document
             td._align-center ✔
             td._align-center ✔
             td._align-center
-              span(style='margin-left:3px;') 76,156
+              span(style='margin-left:3px;') 76,215
             td._align-center
-              | 759,302,267
+              | 759,336,320
             td Broad Institute
-            td v3.1.2
-          tr
-            td
-              a.hyper-text.-external(target='_blank', href='http://www.hgvd.genome.med.kyoto-u.ac.jp/download.html')
-                | Human Genetic Variation Database (HGVD)
-            td._align-left WES
-            td._align-center ✔
-            td._align-left 日本人
-            td._align-center ✔
-            td._align-center
-            td._align-center
-              span(style='margin-left:10px;') 1,208
-            td._align-center
-              span(style='margin-left:20px;') 549,623
-            td 京都大学
-            td
-              | Version 2.30
-              br
-              | (2017/08/02)
+            td v4.0
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-54kjpn-20230626-af_snvindelall')
@@ -167,7 +164,7 @@ article.common-document
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/clinvar/') ClinVar
-            td 2023/09/11
+            td 2024/02/07
             td バリアントの臨床的意義
             td NCBI
           tr
@@ -218,12 +215,6 @@ article.common-document
             td 2023/09/03
             td バリアント名が出現する文献情報
             td NCBI
-          tr
-            td
-              a.hyper-text.-external(target='_blank', href='http://togogenome.org/') TogoGenome
-            td._align-center —
-            td ゲノムに関する包括的な情報
-            td DBCLS
       p.notice
         | 注：ClinVarはGRCh38上の位置が決定しているバリアントのみを含む
         a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/') VCFファイル
@@ -255,10 +246,10 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/index.html')
                 | Variant Effect Predictor (VEP)
-            td Ensembl rel. 110
+            td Ensembl rel. 111
             td
               | バリアントに
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/script/vep_cache.html#cache_content')
-                | アノテーション（遺伝子名、Consequence等）
-              | を付加
+                | 遺伝子名、Consequence、有害性予測(AlphaMissense, SIFT, PolyPhen)等
+              | をアノテーション
             td EMBL-EBI
