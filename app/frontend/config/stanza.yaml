@@ -36,7 +36,7 @@ variant:
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        no_data_message: "No data"
+        data-unavailable: "No data"
         columns:
           - id: variant_and_risk_allele
             label: rs# and risk allele
@@ -124,7 +124,7 @@ gene:
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        no_data_message: "No data"
+        data-unavailable: "No data"
         columns:
           - id: tgv_id
             label: TogoVar ID
@@ -167,7 +167,7 @@ gene:
         custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20220803
         page-size-option: 5,10,20,50,100
         page-slider: false
-        no_data_message: "No data"
+        data-unavailable: "No data"
         columns:
           - id: tgv_id
             label: TogoVar ID
@@ -323,7 +323,7 @@ disease:
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        no_data_message: "No data"
+        data-unavailable: "No data"
         columns:
           - id: tgv_id
             label: TogoVar ID
@@ -363,7 +363,7 @@ disease:
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        no_data_message: "No data"
+        data-unavailable: "No data"
         columns:
           - id: variant_and_risk_allele
             label: rs# and risk allele
