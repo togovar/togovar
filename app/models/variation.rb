@@ -40,7 +40,8 @@ class Variation
             path :frequency
             aggregation :sources do
               terms field: 'frequency.source',
-                    size: cardinality[:frequency_sources]
+                    size: cardinality[:frequency_sources],
+                    include: Variation::Datasets::FREQUENCY.map(&:to_s)
             end
           end
         end
