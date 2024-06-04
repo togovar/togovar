@@ -71,12 +71,12 @@ class Variation
             indexes :source, type: :keyword
             indexes :filter, type: :keyword
             indexes :quality, type: :float
-            indexes :allele do
+            indexes :allele do # TODO: flatten nested object
               indexes :count, type: :long
               indexes :number, type: :long
               indexes :frequency, type: :float
             end
-            indexes :genotype do
+            indexes :genotype do # TODO: flatten nested object
               indexes :alt_homo_count, type: :long
               indexes :hetero_count, type: :long
               indexes :ref_homo_count, type: :long
@@ -87,11 +87,11 @@ class Variation
     end
 
     module Datasets
-      DATASETS = ::Rails.configuration.application[:datasets]
+      DATASETS = Rails.application.config.application[:datasets]
       private_constant :DATASETS
-      FREQUENCY_WITH_FILTER = Array(DATASETS.dig(:frequency, :filter)).map(&:to_sym)
-      FREQUENCY = FREQUENCY_WITH_FILTER + Array(DATASETS.dig(:frequency, :no_filter)).map(&:to_sym)
-      ALL = FREQUENCY + Array(DATASETS[:annotation]).map(&:to_sym)
+      FREQUENCY_WITH_FILTER = Array(DATASETS[:frequency].filter_map { |x| x[:id] if x[:filter] }).map(&:to_sym)
+      FREQUENCY = FREQUENCY_WITH_FILTER + Array(DATASETS[:frequency].filter_map { |x| x[:id] unless x[:filter] }).map(&:to_sym)
+      ALL = FREQUENCY + Array(DATASETS[:annotation].filter_map { |x| x[:id] }).map(&:to_sym)
     end
 
     module ClassMethods

@@ -23,6 +23,8 @@ module Form
     attr_reader :polyphen
     attr_reader :alphamissense
 
+    attr_reader :expand_dataset
+
     attr_reader :offset
     attr_reader :limit
 
@@ -41,6 +43,8 @@ module Form
       @sift = Form::Sift.defaults.merge(params.fetch(:sift, {}))
       @polyphen = Form::Polyphen.defaults.merge(params.fetch(:polyphen, {}))
       @alphamissense = Form::AlphaMissense.defaults.merge(params.fetch(:alphamissense, {}))
+
+      @expand_dataset = params.key?(:expand_dataset)
 
       @offset = params[:offset].is_a?(Array) ? params[:offset] : params.fetch(:offset, '0').to_i.between(0, 10_000)
       @limit = params.fetch(:limit, '100').to_i.between(0, 100)
@@ -88,7 +92,7 @@ module Form
     end
 
     def to_hash
-      %i[term dataset frequency quality type significance consequence sift polyphen alphamissense].map do |name|
+      %i[term dataset frequency quality type significance consequence sift polyphen alphamissense expand_dataset].map do |name|
         [name, ((v = send(name)).respond_to?(:to_h) ? v.to_h : v)]
       end.to_h
     end

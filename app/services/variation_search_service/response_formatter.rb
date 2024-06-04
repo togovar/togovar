@@ -1,6 +1,6 @@
 class VariationSearchService
   class ResponseFormatter
-    XREF_TEMPLATE = Rails.configuration.application[:xref]
+    XREF_TEMPLATE = Rails.application.config.application[:xref]
 
     def initialize(param, result, error = [], warning = [], notice = [])
       @param = param
@@ -192,15 +192,28 @@ class VariationSearchService
         end
         json.transcripts vep.map(&:compact).presence
 
-        frequencies = Array(variant[:frequency]).map(&:compact)
-        frequencies.each do |x|
-          if x[:allele].present? && x.dig(:allele, :frequency).blank?
-            x[:allele][:frequency] = begin
-                                       Float(x.dig(:allele, :count)) / Float(x.dig(:allele, :number))
-                                     rescue
-                                       0
-                                     end
+        frequencies = Array(variant[:frequency]).filter_map do |x|
+          next if !@param[:expand_dataset] && !Variation::Datasets::FREQUENCY.include?(x[:source].to_sym)
+
+          if (af = x.dig(:allele, :frequency)).blank?
+            af = begin
+              Float(x.dig(:allele, :count)) / Float(x.dig(:allele, :number))
+            rescue
+              0
+            end
           end
+
+          {
+            source: x[:source],
+            ac: x.dig(:allele, :count),
+            an: x.dig(:allele, :number),
+            af: af,
+            aac: x.dig(:genotype, :alt_homo_count),
+            arc: x.dig(:genotype, :hetero_count),
+            rrc: x.dig(:genotype, :ref_homo_count),
+            filter: Array(x[:filter]),
+            quality: x[:quality].presence
+          }.compact
         end
 
         json.frequencies frequencies

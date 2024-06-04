@@ -1,4 +1,4 @@
-defaults: &defaults
+shared:
   GRCh38:
     xref: &xref
       dbsnp: "https://identifiers.org/dbsnp/%<id>s"
@@ -7,44 +7,385 @@ defaults: &defaults
       gnomad: 'https://gnomad.broadinstitute.org/variant/%<id>s?dataset=gnomad_r4'
     datasets:
       frequency:
-        filter:
-          - gem_j_wga
-          - jga_ngs
-          - jga_snp
-          - tommo
-          - gnomad_genomes
-          - gnomad_exomes
-          # - bbj_riken # TODO: to be added on 2024.1
-          # - ncbn # TODO: to be added on 2024.1
-        no_filter:
+        - id: gem_j_wga
+          description: "[GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel](https://togovar.org/doc/datasets/gem_j_wga)"
+          filter: true
+        - id: gnomad_genomes
+          description: "[The Genome Aggregation Database (gnomAD Genomes)](https://gnomad.broadinstitute.org)"
+          filter: true
+          groups:
+            - gnomad_genomes.afr
+            - gnomad_genomes.ami
+            - gnomad_genomes.amr
+            - gnomad_genomes.asj
+            - gnomad_genomes.eas
+            - gnomad_genomes.fin
+            - gnomad_genomes.mid
+            - gnomad_genomes.nfe
+            - gnomad_genomes.remaining
+            - gnomad_genomes.sas
+        - id: gnomad_exomes
+          description: "[The Genome Aggregation Database (gnomAD Exomes)](https://gnomad.broadinstitute.org)"
+          filter: true
+          groups:
+            - gnomad_exomes.afr
+            - gnomad_exomes.amr
+            - gnomad_exomes.asj
+            - gnomad_exomes.eas
+            - gnomad_exomes.fin
+            - gnomad_exomes.mid
+            - gnomad_exomes.nfe
+            - gnomad_exomes.remaining
+            - gnomad_exomes.sas
+        - id: jga_ngs
+          description: "[Japanese Genotype-phenotype Archive (JGA)](https://togovar.org/doc/datasets/jga_ngs)"
+          filter: true
+        - id: jga_snp
+          description: "[SNP-chip data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA)](https://togovar.org/doc/datasets/jga_snp)"
+          filter: true
+          groups:
+            - bbj_riken.mpheno1
+            - bbj_riken.mpheno1.male
+            - bbj_riken.mpheno1.female
+            - bbj_riken.mpheno2
+            - bbj_riken.mpheno2.male
+            - bbj_riken.mpheno2.female
+            - bbj_riken.mpheno3
+            - bbj_riken.mpheno3.male
+            - bbj_riken.mpheno3.female
+            - bbj_riken.mpheno4
+            - bbj_riken.mpheno4.male
+            - bbj_riken.mpheno4.female
+            - bbj_riken.mpheno5
+            - bbj_riken.mpheno5.male
+            - bbj_riken.mpheno5.female
+            - bbj_riken.mpheno6
+            - bbj_riken.mpheno6.male
+            - bbj_riken.mpheno6.female
+            - bbj_riken.mpheno7
+            - bbj_riken.mpheno7.male
+            - bbj_riken.mpheno7.female
+            - bbj_riken.mpheno8
+            - bbj_riken.mpheno8.male
+            - bbj_riken.mpheno9
+            - bbj_riken.mpheno9.female
+            - bbj_riken.mpheno10
+            - bbj_riken.mpheno10.female
+            - bbj_riken.mpheno11
+            - bbj_riken.mpheno11.female
+            - bbj_riken.mpheno12
+            - bbj_riken.mpheno12.female
+            - bbj_riken.mpheno13
+            - bbj_riken.mpheno13.male
+            - bbj_riken.mpheno13.female
+            - bbj_riken.mpheno14
+            - bbj_riken.mpheno14.male
+            - bbj_riken.mpheno14.female
+            - bbj_riken.mpheno15
+            - bbj_riken.mpheno15.male
+            - bbj_riken.mpheno15.female
+            - bbj_riken.mpheno16
+            - bbj_riken.mpheno16.male
+            - bbj_riken.mpheno16.female
+            - bbj_riken.mpheno17
+            - bbj_riken.mpheno17.male
+            - bbj_riken.mpheno17.female
+            - bbj_riken.mpheno18
+            - bbj_riken.mpheno18.male
+            - bbj_riken.mpheno18.female
+            - bbj_riken.mpheno19
+            - bbj_riken.mpheno19.male
+            - bbj_riken.mpheno19.female
+            - bbj_riken.mpheno20
+            - bbj_riken.mpheno20.male
+            - bbj_riken.mpheno20.female
+            - bbj_riken.mpheno21
+            - bbj_riken.mpheno21.male
+            - bbj_riken.mpheno21.female
+            - bbj_riken.mpheno22
+            - bbj_riken.mpheno22.male
+            - bbj_riken.mpheno22.female
+            - bbj_riken.mpheno23
+            - bbj_riken.mpheno23.male
+            - bbj_riken.mpheno23.female
+            - bbj_riken.mpheno24
+            - bbj_riken.mpheno24.male
+            - bbj_riken.mpheno24.female
+            - bbj_riken.mpheno25
+            - bbj_riken.mpheno25.male
+            - bbj_riken.mpheno25.female
+            - bbj_riken.mpheno26
+            - bbj_riken.mpheno26.male
+            - bbj_riken.mpheno26.female
+            - bbj_riken.mpheno27
+            - bbj_riken.mpheno27.male
+            - bbj_riken.mpheno27.female
+            - bbj_riken.mpheno28
+            - bbj_riken.mpheno28.male
+            - bbj_riken.mpheno28.female
+            - bbj_riken.mpheno29
+            - bbj_riken.mpheno29.male
+            - bbj_riken.mpheno29.female
+            - bbj_riken.mpheno30
+            - bbj_riken.mpheno30.male
+            - bbj_riken.mpheno30.female
+            - bbj_riken.mpheno31
+            - bbj_riken.mpheno31.male
+            - bbj_riken.mpheno31.female
+            - bbj_riken.mpheno32
+            - bbj_riken.mpheno32.male
+            - bbj_riken.mpheno32.female
+            - bbj_riken.mpheno33
+            - bbj_riken.mpheno33.male
+            - bbj_riken.mpheno33.female
+            - bbj_riken.mpheno34
+            - bbj_riken.mpheno34.male
+            - bbj_riken.mpheno34.female
+            - bbj_riken.mpheno35
+            - bbj_riken.mpheno35.male
+            - bbj_riken.mpheno35.female
+            - bbj_riken.mpheno36
+            - bbj_riken.mpheno36.male
+            - bbj_riken.mpheno36.female
+            - bbj_riken.mpheno37
+            - bbj_riken.mpheno37.male
+            - bbj_riken.mpheno37.female
+            - bbj_riken.mpheno38
+            - bbj_riken.mpheno38.male
+            - bbj_riken.mpheno38.female
+            - bbj_riken.mpheno39
+            - bbj_riken.mpheno39.male
+            - bbj_riken.mpheno39.female
+            - bbj_riken.mpheno40
+            - bbj_riken.mpheno40.male
+            - bbj_riken.mpheno40.female
+            - bbj_riken.mpheno41
+            - bbj_riken.mpheno41.female
+            - bbj_riken.mpheno42
+            - bbj_riken.mpheno42.female
+            - bbj_riken.mpheno44
+            - bbj_riken.mpheno44.male
+            - bbj_riken.mpheno44.female
+            - bbj_riken.mpheno45
+            - bbj_riken.mpheno45.male
+            - bbj_riken.mpheno45.female
+            - bbj_riken.mpheno46
+            - bbj_riken.mpheno46.male
+            - bbj_riken.mpheno46.female
+        - id: ncbn
+          description: ""
+          filter: true
+          groups:
+            - ncbn.jpn
+            - ncbn.jpn.hondo
+            - ncbn.jpn.ryukyu
+            - ncbn.acb
+            - ncbn.asw
+            - ncbn.beb
+            - ncbn.gbr
+            - ncbn.cdx
+            - ncbn.ceu
+            - ncbn.clm
+            - ncbn.esn
+            - ncbn.fin
+            - ncbn.gwd
+            - ncbn.gih
+            - ncbn.chb
+            - ncbn.chs
+            - ncbn.ibs
+            - ncbn.itu
+            - ncbn.jpt
+            - ncbn.khv
+            - ncbn.lwk
+            - ncbn.msl
+            - ncbn.mxl
+            - ncbn.pel
+            - ncbn.pur
+            - ncbn.pjl
+            - ncbn.stu
+            - ncbn.tsi
+            - ncbn.yri
+        - id: tommo
+          description: "[ToMMo 54KJPN Allele Frequency Panel](https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-54kjpn-20230626-af_snvindelall)"
+          filter: true
       annotation:
-        - clinvar
-        # - mgend # TODO: to be added on 2024.2
+        - id: clinvar
+          description: "[Clinical significance of variants](https://ftp.ncbi.nlm.nih.gov/pub/clinvar/)"
+        # - id: mgend # TODO: to be added on 2024.2
   GRCh37:
     xref:
       <<: *xref
       gnomad: 'https://gnomad.broadinstitute.org/variant/%<id>s?dataset=gnomad_r2_1'
     datasets:
       frequency:
-        filter:
-          - gem_j_wga
-          - jga_ngs
-          - jga_snp
-          - tommo
-          - hgvd
-          - gnomad_genomes
-          - gnomad_exomes
-          # - bbj_riken # TODO: to be added on 2024.1
-        no_filter:
+        - id: gem_j_wga
+          description: "[GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel](https://togovar.org/doc/datasets/gem_j_wga)"
+          filter: true
+        - id: gnomad_genomes
+          description: "[The Genome Aggregation Database (gnomAD Genomes)](https://gnomad.broadinstitute.org)"
+          filter: true
+          groups:
+            - gnomad_genomes.afr
+            - gnomad_genomes.amr
+            - gnomad_genomes.asj
+            - gnomad_genomes.eas
+            - gnomad_genomes.fin
+            - gnomad_genomes.nfe
+            - gnomad_genomes.oth
+        - id: gnomad_exomes
+          description: "[The Genome Aggregation Database (gnomAD Exomes)](https://gnomad.broadinstitute.org)"
+          filter: true
+          groups:
+            - gnomad_exomes.afr
+            - gnomad_exomes.amr
+            - gnomad_exomes.asj
+            - gnomad_exomes.eas
+            - gnomad_exomes.fin
+            - gnomad_exomes.nfe
+            - gnomad_exomes.oth
+            - gnomad_exomes.sas
+        - id: hgvd
+          description: "[Human Genetic Variation Database (HGVD)](https://www.hgvd.genome.med.kyoto-u.ac.jp)"
+          filter: true
+        - id: jga_ngs
+          description: "[Japanese Genotype-phenotype Archive (JGA)](https://togovar.org/doc/datasets/jga_ngs)"
+          filter: true
+        - id: jga_snp
+          description: "[SNP-chip data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA)](https://togovar.org/doc/datasets/jga_snp)"
+          filter: true
+          groups:
+            - bbj_riken.mpheno1
+            - bbj_riken.mpheno1.male
+            - bbj_riken.mpheno1.female
+            - bbj_riken.mpheno2
+            - bbj_riken.mpheno2.male
+            - bbj_riken.mpheno2.female
+            - bbj_riken.mpheno3
+            - bbj_riken.mpheno3.male
+            - bbj_riken.mpheno3.female
+            - bbj_riken.mpheno4
+            - bbj_riken.mpheno4.male
+            - bbj_riken.mpheno4.female
+            - bbj_riken.mpheno5
+            - bbj_riken.mpheno5.male
+            - bbj_riken.mpheno5.female
+            - bbj_riken.mpheno6
+            - bbj_riken.mpheno6.male
+            - bbj_riken.mpheno6.female
+            - bbj_riken.mpheno7
+            - bbj_riken.mpheno7.male
+            - bbj_riken.mpheno7.female
+            - bbj_riken.mpheno8
+            - bbj_riken.mpheno8.male
+            - bbj_riken.mpheno9
+            - bbj_riken.mpheno9.female
+            - bbj_riken.mpheno10
+            - bbj_riken.mpheno10.female
+            - bbj_riken.mpheno11
+            - bbj_riken.mpheno11.female
+            - bbj_riken.mpheno12
+            - bbj_riken.mpheno12.female
+            - bbj_riken.mpheno13
+            - bbj_riken.mpheno13.male
+            - bbj_riken.mpheno13.female
+            - bbj_riken.mpheno14
+            - bbj_riken.mpheno14.male
+            - bbj_riken.mpheno14.female
+            - bbj_riken.mpheno15
+            - bbj_riken.mpheno15.male
+            - bbj_riken.mpheno15.female
+            - bbj_riken.mpheno16
+            - bbj_riken.mpheno16.male
+            - bbj_riken.mpheno16.female
+            - bbj_riken.mpheno17
+            - bbj_riken.mpheno17.male
+            - bbj_riken.mpheno17.female
+            - bbj_riken.mpheno18
+            - bbj_riken.mpheno18.male
+            - bbj_riken.mpheno18.female
+            - bbj_riken.mpheno19
+            - bbj_riken.mpheno19.male
+            - bbj_riken.mpheno19.female
+            - bbj_riken.mpheno20
+            - bbj_riken.mpheno20.male
+            - bbj_riken.mpheno20.female
+            - bbj_riken.mpheno21
+            - bbj_riken.mpheno21.male
+            - bbj_riken.mpheno21.female
+            - bbj_riken.mpheno22
+            - bbj_riken.mpheno22.male
+            - bbj_riken.mpheno22.female
+            - bbj_riken.mpheno23
+            - bbj_riken.mpheno23.male
+            - bbj_riken.mpheno23.female
+            - bbj_riken.mpheno24
+            - bbj_riken.mpheno24.male
+            - bbj_riken.mpheno24.female
+            - bbj_riken.mpheno25
+            - bbj_riken.mpheno25.male
+            - bbj_riken.mpheno25.female
+            - bbj_riken.mpheno26
+            - bbj_riken.mpheno26.male
+            - bbj_riken.mpheno26.female
+            - bbj_riken.mpheno27
+            - bbj_riken.mpheno27.male
+            - bbj_riken.mpheno27.female
+            - bbj_riken.mpheno28
+            - bbj_riken.mpheno28.male
+            - bbj_riken.mpheno28.female
+            - bbj_riken.mpheno29
+            - bbj_riken.mpheno29.male
+            - bbj_riken.mpheno29.female
+            - bbj_riken.mpheno30
+            - bbj_riken.mpheno30.male
+            - bbj_riken.mpheno30.female
+            - bbj_riken.mpheno31
+            - bbj_riken.mpheno31.male
+            - bbj_riken.mpheno31.female
+            - bbj_riken.mpheno32
+            - bbj_riken.mpheno32.male
+            - bbj_riken.mpheno32.female
+            - bbj_riken.mpheno33
+            - bbj_riken.mpheno33.male
+            - bbj_riken.mpheno33.female
+            - bbj_riken.mpheno34
+            - bbj_riken.mpheno34.male
+            - bbj_riken.mpheno34.female
+            - bbj_riken.mpheno35
+            - bbj_riken.mpheno35.male
+            - bbj_riken.mpheno35.female
+            - bbj_riken.mpheno36
+            - bbj_riken.mpheno36.male
+            - bbj_riken.mpheno36.female
+            - bbj_riken.mpheno37
+            - bbj_riken.mpheno37.male
+            - bbj_riken.mpheno37.female
+            - bbj_riken.mpheno38
+            - bbj_riken.mpheno38.male
+            - bbj_riken.mpheno38.female
+            - bbj_riken.mpheno39
+            - bbj_riken.mpheno39.male
+            - bbj_riken.mpheno39.female
+            - bbj_riken.mpheno40
+            - bbj_riken.mpheno40.male
+            - bbj_riken.mpheno40.female
+            - bbj_riken.mpheno41
+            - bbj_riken.mpheno41.female
+            - bbj_riken.mpheno42
+            - bbj_riken.mpheno42.female
+            - bbj_riken.mpheno44
+            - bbj_riken.mpheno44.male
+            - bbj_riken.mpheno44.female
+            - bbj_riken.mpheno45
+            - bbj_riken.mpheno45.male
+            - bbj_riken.mpheno45.female
+            - bbj_riken.mpheno46
+            - bbj_riken.mpheno46.male
+            - bbj_riken.mpheno46.female
+        - id: tommo
+          description: "[ToMMo 8.3KJPN Allele Frequency Panel](https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-8.3kjpn-20200831-af_snvindelall)"
+          filter: true
       annotation:
-        - clinvar
-        # - mgend # TODO: to be added on 2024.2
-
-development:
-  <<: *defaults
-
-test:
-  <<: *defaults
-
-production:
-  <<: *defaults
+        - id: clinvar
+          description: "[Clinical significance of variants](https://ftp.ncbi.nlm.nih.gov/pub/clinvar/)"
+        # - id: mgend # TODO: to be added on 2024.2

@@ -27,10 +27,15 @@ class VariationSearchService
     # remember to validate before obtaining debug information
     validate
 
+    params = @params
+    if (body = @params.delete(:body))
+      params.merge!(body)
+    end
+
     if @params[:formatter] === 'html'
-      HtmlFormatter.new(@params[:body], search).to_hash
+      HtmlFormatter.new(params, search).to_hash
     else
-      ResponseFormatter.new(@params[:body], search, @errors).to_hash
+      ResponseFormatter.new(params, search, @errors).to_hash
     end
   end
 

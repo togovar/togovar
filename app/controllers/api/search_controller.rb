@@ -8,7 +8,7 @@ module API
       def variant_params
         return super unless request.get?
 
-        @variant_params ||= params.permit :term, :quality, :limit, :offset, :stat, :debug,
+        @variant_params ||= params.permit :term, :quality, :limit, :offset, :stat, :debug, :expand_dataset,
                                           dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {},
                                           sift: {}, polyphen: {}, alphamissense: {}
       end
