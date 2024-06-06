@@ -1,0 +1,151 @@
+article.common-document
+    header.header
+      h2.title National Center Biobank Network (NCBN) データセット
+    .contents
+      section.section
+        h3.sectiontitle 概要
+        p.body
+          | NCBNデータセットは、
+          a.hyper-text.-external(target='blank', href='https://ncbiobank.org/') ナショナルセンター・バイオバンクネットワーク（NCBN）
+          | が収集したがんおよび希少疾患の健常者の全ゲノムシーケンス（WGS）解析を通じて得られたアレルおよびジェノタイプの頻度です。
+          | 地域性を考慮してサンプルを収集しています。主成分分析により得られた本土および琉球クラスターのアレル頻度と遺伝子型頻度を含んでいます。
+          | また、
+          a.hyper-text.-external(target='blank', href='https://www.internationalgenome.org/') 国際1000人ゲノムプロジェクト(1KGP)
+          | のサンプルとジョイントコールしているため、日本人集団に固有または存在しないバリアントも確認できます。
+          | 詳しくは発表論文をご覧ください。なお、個人レベルの全ゲノム配列情報をNBDCヒトデータベースから制限公開しています(
+          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/hum0331-v1') hum0331
+          | )
+        ul.unordered-list
+          li バージョン/最終更新日：2024/6/20
+          li サンプル数：9,290 (日本人集団)、2,504（国際1000人ゲノムプロジェクト）
+          li バリアント数：215,729,032 (日本人集団と国際1000人ゲノムプロジェクトの合計)
+        .subsection
+          h4.heading 発表論文
+          p.body
+          | Kawai Y, Watanabe Y, Omae Y, Miyahara R, Khor S-S, Noiri E, et al. (2023)
+          | Exploring the genetic diversity of the Japanese population: Insights from a large-scale whole genome sequencing analysis. 
+          | PLoS Genet 19(12): e1010625. 
+          a(target="_blank", href="https://doi.org/10.1371/journal.pgen.1010625") https://doi.org/10.1371/journal.pgen.1010625
+          | .
+        a#terms
+
+      section.section
+        h3.sectiontitle 利用条件
+        .subsection
+          h4.heading データ利用者の権利
+          p.body
+            a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/guidelines/data-sharing-guidelines')
+              | NBDCヒトデータ共有ガイドライン
+            | の「5-2. データ利用者の権利」の「5-2-1. 非制限公開データ」に準拠します。
+          ol.ordered-list
+            li データ利用者は、『NBDCヒトデータベース』のデータを利用した研究成果をデータ利用者の責務を遵守する限り自由に発表できる。
+            li データ利用者は、『NBDCヒトデータベース』のデータを利用した研究結果をもとにした知的財産権をデータ利用者の責務を遵守する限り自由に取得できる。
+        .subsection
+          h4.heading データ利用者の責務
+          p.body
+            | NBDCヒトデータ共有ガイドラインの「5-3. データ利用者の責務」の「5-3-1. 非制限公開データ」を準用します。再配布に関しては、制限公開データを二次加工したデータであるため、制限公開データのルールを適用します。
+          ol.ordered-list
+            li データ利用に際してのデータの品質・内容・科学的妥当性については、利用者の責任と判断のもとで活用すること。
+            li
+              | データ利用者は、下記の事項を遵守すること。
+              ul.unordered-list
+                li 研究利用への限定
+                li 個人同定の禁止
+                li 再配布の禁止
+            li
+              | 公衆利用（例：データを利用して論文等で発表する場合など）の際は以下の引用を付与してください。
+              p.body
+                | Kawai Y, Watanabe Y, Omae Y, Miyahara R, Khor S-S, Noiri E, et al. (2023)
+                | Exploring the genetic diversity of the Japanese population: Insights from a large-scale whole genome sequencing analysis. 
+                | PLoS Genet 19(12): e1010625. 
+                a(target="_blank", href="https://doi.org/10.1371/journal.pgen.1010625") https://doi.org/10.1371/journal.pgen.1010625
+                | .
+      section.section
+        h3#jga_datasets.sectiontitle 含まれる制限公開データセット一覧
+        p
+          | データセットIDを指定して
+          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/data-use') NBDCヒトデータベースにデータ利用申請
+          | できます。
+        table.table._column-span-all
+          thead
+            tr
+              th データセットID
+              th ヒトDB
+              th 研究題目
+              th 対象集団
+              th サンプル数
+              th データ提供者
+          tbody
+            tr
+              td
+                a(target='_blank', href='https://humandbs.dbcls.jp/hum0331-v1#hum0331.v1.freq.v1') hum0331.v1.freq.v1
+              td
+                a(target='_blank', href='https://humandbs.dbcls.jp/hum0331-v3') hum0331
+              td Construction of control data for the promotion of genomic medicine for cancers and rare diseases
+              td healthy individuals (Japanese)
+              td._align-right 9,290
+              td Katsushi Tokunaga
+          tfoot
+            tr
+              th._align-center(colspan='4') Total
+              th._align-right 9,290
+
+      section.section
+        h3#ncbn_populations.sectiontitle 頻度を提供している集団一覧
+        p
+        | Advanced searchの「Alternative allele frequency/count」を使用すると、集団別の頻度を条件にバリアントを検索できます。
+        ul.unordered-list
+          li Mainland of Japan
+          li Ryukyu Island in Japan
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/African-Caribbean-in-Barbados-ACB") African Caribbean in Barbados [ACB]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/African-Ancestry-in-SW-USA-ASW") African Ancestry in SW USA [ASW]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Bengali-in-Bangladesh-BEB") Bengali in Bangladesh [BEB]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/British-from-England-and-Scotland-GBR") British From England and Scotland [GBR]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Chinese-Dai-in-Xishuangbanna-China-CDX") Chinese Dai in Xishuangbanna, China [CDX]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Colombian-in-Medellin-Colombia-CLM") Colombian in Medellín, Colombia [CLM]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Esan-in-Nigeria-ESN") Esan in Nigeria [ESN]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Finnish-in-Finland-FIN") Finnish in Finland [FIN]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Gambian-in-Western-Division-Mandinka-GWD") Gambian in Western Division – Mandinka [GWD]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Gujarati-Indians-in-Houston-Texas-USA-GIH") Gujarati Indians in Houston, Texas, USA [GIH]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Han-Chinese-in-Beijing-China-CHB") Han Chinese in Beijing, China [CHB]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Han-Chinese-South-CHS") Han Chinese South [CHS]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Iberian-populations-in-Spain-IBS") Iberian Populations in Spain [IBS]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Indian-Telugu-in-the-UK-ITU") Indian Telugu in the U.K. [ITU]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Japanese-in-Tokyo-Japan-JPT") Japanese in Tokyo, Japan [JPT]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Kinh-in-Ho-Chi-Minh-City-Vietnam-KHV") Kinh in Ho Chi Minh City, Vietnam [KHV]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Luhya-in-Webuye-Kenya-LWK") Luhya in Webuye, Kenya [LWK]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Mende-in-Sierra-Leone-MSL") Mende in Sierra Leone [MSL]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Mexican-Ancestry-in-Los-Angeles-CA-USA-MXL") Mexican Ancestry in Los Angeles CA USA [MXL]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Peruvian-in-Lima-Peru-PEL") Peruvian in Lima Peru [PEL]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Puerto-Rican-in-Puerto-Rico-PUR") Puerto Rican in Puerto Rico [PUR]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Punjabi-in-Lahore-Pakistan-PJL") Punjabi in Lahore, Pakistan [PJL]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Sri-Lankan-Tamil-in-the-UK-STU") Sri Lankan Tamil in the UK [STU]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Toscani-in-Italia-TSI") Toscani in Italia [TSI]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Utah-residents-CEPH-with-Northern-and-Western-European-ancestry-CEU") Utah residents (CEPH) with Northern and Western European ancestry [CEU]
+          li
+            a.hyper-text.-external(href="https://www.coriell.org/1/NHGRI/Collections/1000-Genomes-Project-Collection/Yoruba-in-Ibadan-Nigeria-YRI") Yoruba in Ibadan, Nigeria [YRI]

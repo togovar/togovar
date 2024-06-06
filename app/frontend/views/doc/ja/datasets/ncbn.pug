@@ -1,0 +1,18 @@
+extend ../../../layouts/application
+
+append variables
+  - locals.currentPage = "datasets/ncbn";
+  - locals.language = "ja";
+  - locals.title = "Datasets > NCBN | TogoVar";
+
+block head
+  each css in htmlWebpackPlugin.files.css
+    link(href=css, rel="stylesheet")
+
+block content
+  main
+    case TOGOVAR_FRONTEND_REFERENCE
+      when 'GRCh38'
+        include ncbn_grch38
+      default
+        // none

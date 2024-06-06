@@ -173,6 +173,7 @@ const pages = [
   'datasets/gem_j_wga',
   'datasets/jga_ngs',
   'datasets/jga_snp',
+  'datasets/ncbn',
   'downloads',
   'help',
   'history',
