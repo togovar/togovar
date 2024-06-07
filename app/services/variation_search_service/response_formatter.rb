@@ -150,8 +150,7 @@ class VariationSearchService
 
         significance = Array(variant.dig(:clinvar, :conditions)).map do |x|
           {
-            medgen: Array(x[:medgen]),
-            condition: Array(x[:medgen]).map { |v| conditions[v] || CLINVAR_CONDITION_NOT_PROVIDED },
+            conditions: Array(x[:medgen]).map { |v| { name: conditions[v] || CLINVAR_CONDITION_NOT_PROVIDED, medgen: v } },
             interpretations: Array(x[:interpretation]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(',', '').tr(' ', '_').to_sym)&.key },
             submission_count: x[:submission_count]
           }
