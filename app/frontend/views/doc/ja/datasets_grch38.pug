@@ -14,25 +14,15 @@ article.common-document
         thead
           tr
             th 頻度データセット名
-            th(style='white-space: nowrap;') 解析手法
-            th Liftover GRCh37
-            th(style='white-space: nowrap;') 対象集団
-            th(style='white-space: nowrap;') 健常者
-            th(style='white-space: nowrap;') 罹患者
-            th(style='white-space: nowrap;') サンプル数
-            th(style='white-space: nowrap;') アレル数
+            th(style='white-space: nowrap;')._align-center 解析手法
+            th._align-center Liftover GRCh37
+            th(style='white-space: nowrap;')._align-center 対象集団
+            th(style='white-space: nowrap;')._align-center 健常者
+            th(style='white-space: nowrap;')._align-center 罹患者
+            th(style='white-space: nowrap;')._align-center サンプル数
+            th(style='white-space: nowrap;')._align-center アレル数
             th 含まれる制限公開データセット
         tbody
-          //tr
-            td
-              a(href="/doc/ja/datasets/bbj_riken") BBJ-RIKEN
-            td._align-left SNP-Chip
-            td Japanese
-            td._align-center
-            td._align-center
-            td._align-center
-            td._align-center
-            td._align-center
           tr
             td
               a(href="/doc/ja/datasets/gem_j_wga") GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel
@@ -42,9 +32,9 @@ article.common-document
             td._align-center ✔
             td._align-center
             td._align-center
-              span(style='margin-left:15px;') 7,609
+              span(style='margin-left:35px;') 7,609
             td._align-center
-              | 94,961,154
+              span(style='margin-left:5px;') 94,961,154
             td._align-center
               a(href="/doc/ja/datasets/gem_j_wga#jga_datasets") 6データセット
           tr
@@ -56,9 +46,9 @@ article.common-document
             td._align-center ✔
             td._align-center ✔
             td._align-center
-              span(style='margin-left:20px;') 125
+              span(style='margin-left:45px;') 125
             td._align-center
-              span(style='margin-left:4px;') 4,624,124
+              span(style='margin-left:13px;') 4,624,124
             td._align-center
               a(href="/doc/ja/datasets/jga_ngs#jga_datasets") 7データセット
           tr
@@ -69,18 +59,32 @@ article.common-document
             td 日本人
             td._align-center ✔
             td._align-center ✔
-            td._align-center 183,884
             td._align-center
-              span(style='margin-left:4px;') 1,244,838
+              span(style='margin-left:25px;') 183,884
+            td._align-center
+              span(style='margin-left:13px;') 1,244,838
             td._align-center
               a(href="/doc/ja/datasets/jga_snp#jga_datasets") 3データセット
+          tr
+            td
+              a(href="/doc/ja/datasets/ncbn") National Center Biobank Network (NCBN)
+            td._align-left WGS
+            td._align-center
+            td 複数
+            td._align-center ✔
+            td._align-center
+            td._align-center
+              span(style='margin-left:-10px;') 日本人：9,290 1KGP：2,504
+            td._align-center 215,729,032
+            td._align-center
+              a(href="/doc/ja/datasets/ncbn#ncbn_datasets") 1データセット
       p.notice
         | ∗1：
         a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
           | Japanese Genotype-phenotype Archive (JGA)
         |  /
         |
-        a.hyper-text.-external(target='_blank', href='https://gr-sharingdbs.biosciencedbc.jp/agd')
+        a.hyper-text.-external(target='_blank', href='https://gr-sharingdbs.dbcls.jp/agd')
           | AMED Genome group sharing Database (AGD)
         br
         | ∗2：fastq/bam/celファイルやgenotype data一覧など
@@ -91,18 +95,16 @@ article.common-document
           tr
             th データベース名
             th(style='white-space: nowrap;') 解析手法
-            th Liftover GRCh37
-            th(style='white-space: nowrap;') 対象集団
-            th(style='white-space: nowrap;') 健常者
-            th(style='white-space: nowrap;') 罹患者
-            th(style='white-space: nowrap;') サンプル数
-            th
+            th._align-center Liftover GRCh37
+            th(style='white-space: nowrap;')._align-center 対象集団
+            th(style='white-space: nowrap;')._align-center 健常者
+            th(style='white-space: nowrap;')._align-center 罹患者
+            th(style='white-space: nowrap;')._align-center サンプル数
+            th._align-center
               | アレル数
             th 作成者
             th
-              | バージョン/
-              br
-              | 最終更新日
+              | バージョン/最終更新日
         tbody
           tr
             td
@@ -114,7 +116,7 @@ article.common-document
             td._align-center ✔
             td._align-center ✔
             td._align-center
-              span(style='margin-left:3px;') 730,947
+              span(style='margin-left:0px;') 730,947
             td._align-center
               | 183,558,769
             td Broad Institute
@@ -144,7 +146,7 @@ article.common-document
             td._align-center ✔
             td._align-center
             td._align-center
-              span(style='margin-left:-3px;') 54,302
+              span(style='margin-left:4px;') 54,302
             td._align-center
               | 262,200,990
             td 東北メディカル・メガバンク機構
@@ -164,7 +166,7 @@ article.common-document
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/clinvar/') ClinVar
-            td 2024/02/07
+            td 2024/01/08
             td バリアントの臨床的意義
             td NCBI
           tr
@@ -184,14 +186,14 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://www.ebi.ac.uk/gwas/docs/file-downloads')
                 | GWAS Catalog
-            td 2023/09/05
+            td 2024/05/28
             td ゲノムワイド関連解析(GWAS)情報
             td NHGRI-EBI
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/hgnc_complete_set.txt')
                 | HGNC symbol report
-            td 2023/09/05
+            td 2024/05/28
             td 遺伝子シンボルや関連リソースの情報
             td HGNC
           tr
@@ -205,14 +207,14 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pubmed/')
                 | PubMed
-            td 2023/09/01
+            td 2024/04/26
             td 文献情報
             td NCBI
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/')
                 | PubTator Central
-            td 2023/09/03
+            td 2024/01/04
             td バリアント名が出現する文献情報
             td NCBI
       p.notice
