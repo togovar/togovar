@@ -6,28 +6,30 @@ variant:
 
   stanza:
     - id: variant-header
-      dom: "#variant-header"
+      dom: '#variant-header'
       options:
         togostanza-menu-placement: none
 
     - id: variant-summary
-      dom: "#variant-summary"
+      dom: '#variant-summary'
 
     - id: variant-other-overlapping-variants
-      dom: "#variant-other-overlapping-variants"
+      dom: '#variant-other-overlapping-variants'
       options:
         search_api: $TOGOVAR_STANZA_SEARCH
 
     - id: variant-frequency
-      dom: "#variant-frequency"
+      dom: '#variant-frequency'
       options:
         assembly: $TOGOVAR_FRONTEND_REFERENCE
+        data-url: https://stg-grch38.togovar.org/
+        no_data_message: 'No data'
 
     - id: variant-clinvar
-      dom: "#variant-clinvar"
+      dom: '#variant-clinvar'
 
     - id: pagination-table
-      dom: "#variant-gwas"
+      dom: '#variant-gwas'
       src: https://togostanza.github.io/metastanza/pagination-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/variant_gwas?tgv_id=${tgv_id}
@@ -36,7 +38,7 @@ variant:
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        data-unavailable_message: "No data"
+        data-unavailable_message: 'No data'
         columns:
           - id: variant_and_risk_allele
             label: rs# and risk allele
@@ -84,20 +86,20 @@ variant:
             line-clamp: 3
 
     - id: variant-genomic-context
-      dom: "#variant-genomic-context"
+      dom: '#variant-genomic-context'
       options:
         assembly: $TOGOVAR_FRONTEND_REFERENCE
         jbrowse: $TOGOVAR_STANZA_JBROWSE
         margin: 50
 
     - id: variant-gene
-      dom: "#variant-gene"
+      dom: '#variant-gene'
 
     - id: variant-transcript
-      dom: "#variant-transcript"
+      dom: '#variant-transcript'
 
     - id: variant-publication
-      dom: "#variant-publication"
+      dom: '#variant-publication'
 
 gene:
   id: hgnc_id
@@ -107,15 +109,15 @@ gene:
 
   stanza:
     - id: gene-header
-      dom: "#gene-header"
+      dom: '#gene-header'
       options:
         togostanza-menu-placement: none
 
     - id: gene-summary
-      dom: "#gene-summary"
+      dom: '#gene-summary'
 
     - id: pagination-table
-      dom: "#gene-clinvar"
+      dom: '#gene-clinvar'
       src: https://togostanza.github.io/metastanza/pagination-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/gene_clinvar?hgnc_id=${hgnc_id}
@@ -124,7 +126,7 @@ gene:
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        data-unavailable_message: "No data"
+        data-unavailable_message: 'No data'
         columns:
           - id: tgv_id
             label: TogoVar ID
@@ -158,7 +160,7 @@ gene:
             line-clamp: 3
 
     - id: pagination-table
-      dom: "#gene-gwas"
+      dom: '#gene-gwas'
       src: https://togostanza.github.io/metastanza/pagination-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/gene_gwas?hgnc_id=${hgnc_id}
@@ -167,7 +169,7 @@ gene:
         custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20220803
         page-size-option: 5,10,20,50,100
         page-slider: false
-        data-unavailable_message: "No data"
+        data-unavailable_message: 'No data'
         columns:
           - id: tgv_id
             label: TogoVar ID
@@ -231,14 +233,14 @@ gene:
             line-clamp: 3
 
     - id: gene-genomic-context
-      dom: "#gene-genomic-context"
+      dom: '#gene-genomic-context'
       options:
         assembly: $TOGOVAR_FRONTEND_REFERENCE
         jbrowse: $TOGOVAR_STANZA_JBROWSE
         margin: 200
 
     - id: scroll-table
-      dom: "#gene-variant"
+      dom: '#gene-variant'
       src: https://togostanza.github.io/metastanza/scroll-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/gene_variant?hgnc_id=${hgnc_id}
@@ -282,7 +284,7 @@ gene:
             escape: false
 
     - id: gene-publication
-      dom: "#gene-publication"
+      dom: '#gene-publication'
 
 disease:
   id: medgen_cid
@@ -292,12 +294,12 @@ disease:
 
   stanza:
     - id: disease-header
-      dom: "#disease-header"
+      dom: '#disease-header'
       options:
         togostanza-menu-placement: none
 
     - id: hash-table
-      dom: "#disease-summary"
+      dom: '#disease-summary'
       src: https://togostanza.github.io/metastanza/hash-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/disease_summary?medgen_cid=${medgen_cid}
@@ -314,7 +316,7 @@ disease:
             escape: false
 
     - id: pagination-table
-      dom: "#disease-clinvar"
+      dom: '#disease-clinvar'
       src: https://togostanza.github.io/metastanza/pagination-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/disease_clinvar?medgen_cid=${medgen_cid}
@@ -323,7 +325,7 @@ disease:
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        data-unavailable_message: "No data"
+        data-unavailable_message: 'No data'
         columns:
           - id: tgv_id
             label: TogoVar ID
@@ -354,7 +356,7 @@ disease:
             line-clamp: 3
 
     - id: pagination-table
-      dom: "#disease-gwas"
+      dom: '#disease-gwas'
       src: https://togostanza.github.io/metastanza/pagination-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/disease_gwas?medgen_cid=${medgen_cid}
@@ -363,7 +365,7 @@ disease:
         padding: 0
         page-size-option: 5,10,20,50,100
         page-slider: false
-        data-unavailable_message: "No data"
+        data-unavailable_message: 'No data'
         columns:
           - id: variant_and_risk_allele
             label: rs# and risk allele
