@@ -95,7 +95,7 @@ class VariationSearchService
     end
 
     def level(count, frequency)
-      return if count.blank? || frequency.blank?
+      return 'na' if count.blank? || frequency.blank?
 
       case
       when count == 0
@@ -120,13 +120,11 @@ class VariationSearchService
     end
 
     def frequencies(result)
-      items = Dataset.all.filter_map do |dataset|
-        next unless dataset.type == :frequency
-
-        v = result.dig(:frequency)&.find { |x| x[:source] == dataset.key }
+      items = Variation::Datasets::FREQUENCY.map do |id|
+        v = result.dig(:frequency)&.find { |x| x[:source] == id }
         level = level(v&.dig(:allele, :count), v&.dig(:allele, :frequency))
 
-        %Q[<div class="dataset" data-dataset="#{dataset.label}" data-frequency="#{level}"></div>]
+        %Q[<div class="dataset" data-dataset="#{id}" data-frequency="#{level}"></div>]
       end
 
       %Q[<div class="frequency-graph">#{items.join}</div>]
@@ -162,14 +160,12 @@ class VariationSearchService
 
     def significance(result)
       return if (items = Array(result.dig(:clinvar, :conditions))).blank?
+      return if (medgen = Array(items.first[:medgen]).first).blank?
 
-      item = {
-        condition: items.first[:condition],
-        interpretations: Array(items.first[:interpretation]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(' ', '_').to_sym)&.key },
-        medgen: items.first[:medgen]
-      }
+      condition = Disease.find(medgen).results.first&.dig('_source', 'name') || CLINVAR_CONDITION_NOT_PROVIDED
+      interpretation = items.first[:interpretation].first
 
-      %Q[<div class="clinical_significance"#{ %Q[ data-remains="#{items.size - 1}"] if items.size > 1 }><div href="" class="clinical-significance" data-sign="#{item.dig(:interpretations, 0)}"></div><a>#{item[:condition]}</a></div>]
+      %Q[<div class="clinical_significance"#{ %Q[ data-remains="#{items.size - 1}"] if items.size > 1 }><div href="" class="clinical-significance" data-sign="#{interpretation}"></div><a>#{condition}</a></div>]
     end
 
     def data(json)
