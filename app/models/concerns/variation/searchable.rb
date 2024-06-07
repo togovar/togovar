@@ -61,7 +61,7 @@ class Variation
           indexes :clinvar do
             indexes :id, type: :long
             indexes :accession, type: :keyword
-            indexes :condition, type: :nested do
+            indexes :conditions, type: :nested do
               indexes :medgen, type: :keyword
               indexes :interpretation, type: :keyword
               indexes :submission_count, type: :integer
