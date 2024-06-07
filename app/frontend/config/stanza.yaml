@@ -16,7 +16,7 @@ variant:
     - id: variant-other-overlapping-variants
       dom: '#variant-other-overlapping-variants'
       options:
-        search_api: $TOGOVAR_STANZA_SEARCH
+        assembly: $TOGOVAR_FRONTEND_REFERENCE
 
     - id: variant-frequency
       dom: '#variant-frequency'
