@@ -165,21 +165,41 @@ const config = {
   ],
 };
 
-const pages = [
-  'about',
-  'contact',
-  'datasets',
-  'datasets/analysis',
-  'datasets/gem_j_wga',
-  'datasets/jga_ngs',
-  'datasets/jga_snp',
-  'datasets/ncbn',
-  'downloads',
-  'help',
-  'history',
-  'policy',
-  'terms',
-];
+const pages = function (assembly) {
+  switch (assembly) {
+    case 'GRCh37':
+      return [
+        'about',
+        'contact',
+        'datasets',
+        'datasets/analysis',
+        'datasets/gem_j_wga',
+        'datasets/jga_ngs',
+        'datasets/jga_snp',
+        'downloads',
+        'help',
+        'history',
+        'policy',
+        'terms',
+      ];
+    case 'GRCh38':
+      return [
+        'about',
+        'contact',
+        'datasets',
+        'datasets/analysis',
+        'datasets/gem_j_wga',
+        'datasets/jga_ngs',
+        'datasets/jga_snp',
+        'datasets/ncbn',
+        'downloads',
+        'help',
+        'history',
+        'policy',
+        'terms',
+      ];
+  }
+}(process.env.TOGOVAR_REFERENCE);
 
 pages.forEach(function (name) {
   config.plugins.push(
