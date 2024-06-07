@@ -1,4 +1,4 @@
-import {strIns} from '../global.js';
+import { strIns } from '../global.js';
 import PanelView from "./PanelView.js";
 import StoreManager from "./StoreManager.js";
 
@@ -61,17 +61,17 @@ export default class PanelViewPreviewAlternativeAlleleFrequencies extends PanelV
             const frequency = record.frequencies ? record.frequencies.find(frequency => frequency.source === dataset.id) : null;
             if (frequency) {
               // 頻度情報があれば頻度情報を表示
-              this._datasets[dataset.id].alt.textContent = frequency.allele.count.toLocaleString();
-              this._datasets[dataset.id].total.textContent = frequency.allele.number.toLocaleString();
-              if ((frequency.allele.frequency + '').length > DECIMAL_DIGIT + 2) {
+              this._datasets[dataset.id].alt.textContent = frequency.ac.toLocaleString();
+              this._datasets[dataset.id].total.textContent = frequency.an.toLocaleString();
+              if ((frequency.af + '').length > DECIMAL_DIGIT + 2) {
                 // 規定の桁数より大きい少数の場合、規定の少数に丸める。0になる場合は指数で表示
-                const numOfDigits = (frequency.allele.frequency + '').length;
-                const integerized = ((frequency.allele.frequency * 10 ** numOfDigits) + '').padStart(numOfDigits, '0');
+                const numOfDigits = (frequency.af + '').length;
+                const integerized = ((frequency.af * 10 ** numOfDigits) + '').padStart(numOfDigits, '0');
                 const rounded = Math.round(parseFloat(integerized.slice(0, DECIMAL_DIGIT) + '.' + integerized.slice(DECIMAL_DIGIT)));
                 const floated = rounded / 10 ** DECIMAL_DIGIT;
-                this._datasets[dataset.id].frequency.textContent = floated > 0 ? floated : frequency.allele.frequency.toExponential(DECIMAL_DIGIT - 1);
+                this._datasets[dataset.id].frequency.textContent = floated > 0 ? floated : frequency.af.toExponential(DECIMAL_DIGIT - 1);
               } else {
-                this._datasets[dataset.id].frequency.textContent = strIns((Math.round(frequency.allele.frequency * 10 ** DECIMAL_DIGIT) + '').padStart(DECIMAL_DIGIT + 1, '0'), -DECIMAL_DIGIT, '.');
+                this._datasets[dataset.id].frequency.textContent = strIns((Math.round(frequency.af * 10 ** DECIMAL_DIGIT) + '').padStart(DECIMAL_DIGIT + 1, '0'), -DECIMAL_DIGIT, '.');
               }
             } else {
               this._datasets[dataset.id].alt.textContent = '';

@@ -250,8 +250,8 @@ export default class ResultsRowView {
               if (!dataset.has_freq) continue;
               const frequency = result.frequencies
                 ? result.frequencies.find(
-                    (frequency) => frequency.source === dataset.id
-                  )
+                  (frequency) => frequency.source === dataset.id
+                )
                 : undefined;
               this.tdFrequencies[dataset.id].frequency = frequency;
             }
@@ -289,10 +289,10 @@ export default class ResultsRowView {
               this.tdClinicalSign.dataset.value =
                 result.significance[0].interpretations[0];
               this.tdClinicalAnchor.textContent =
-                result.significance[0].condition;
+                result.significance[0].conditions[0].name
               this.tdClinicalAnchor.setAttribute(
                 'href',
-                `/disease/${result.significance[0].medgen}`
+                `/disease/${result.significance[0].conditions[0].medgen}`
               );
             } else {
               this.tdClinical.dataset.remains = 0;
