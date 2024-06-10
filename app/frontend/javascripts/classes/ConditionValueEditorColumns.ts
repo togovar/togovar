@@ -362,7 +362,7 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
 
     const parent = dataNode.parent;
 
-    // if this node get checked, then, maybe all psiblings are checked too, in that case, check the parent.
+    // if this node get checked, then, maybe all siblings are checked too, in that case, check the parent.
     if (checked) {
       parent.data.checked = parent.children.every(
         (child) => child.data.checked
@@ -419,7 +419,13 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
 }
 
 function concatNodesToParent(node: HierarchyNode<DataNodeWithChecked>) {
-  if (!node.children) return;
+  if (!node.children) {
+    if (node.data.checked) {
+      return node;
+    } else {
+      return undefined;
+    }
+  }
   const children = node.children;
   const everyChildChecked = children.every((child) => child.data.checked);
 
