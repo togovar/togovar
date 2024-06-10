@@ -1,5 +1,5 @@
 import ConditionValueEditorCheckboxes from './ConditionValueEditorCheckboxes.js';
-import ConditionValueEditorColumns from './ConditionValueEditorColumns.js';
+import ConditionValueEditorColumns from './ConditionValueEditorColumns.ts';
 import ConditionValueEditorGene from './ConditionValueEditorGene.js';
 import ConditionValueEditorVariantID from './ConditionValueEditorVariantID.js';
 import ConditionValueEditorFrequencyCount from './ConditionValueEditorFrequencyCount.js';
