@@ -162,7 +162,7 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
       switch (this._conditionType) {
         case CONDITION_TYPE.consequence:
         case CONDITION_TYPE.dataset:
-          resolve(this._data.filter((datum) => datum.parent == parentId));
+          resolve(this._data.filter((datum) => datum.parent === parentId));
           break;
         case CONDITION_TYPE.disease:
           {
