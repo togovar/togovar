@@ -2,28 +2,40 @@ import ConditionValueEditor from './ConditionValueEditor.js';
 // import { response } from 'express';
 import { ADVANCED_CONDITIONS, API_URL } from '../global.js';
 import { CONDITION_TYPE } from '../definition.js';
-import { hierarchy } from 'd3-hierarchy';
+import { HierarchyNode, hierarchy } from 'd3-hierarchy';
+import ConditionValues from './ConditionValues.js';
+import ConditionItemView from './ConditionItemView.js';
 
 const SELECTION_DEPENDED_ON_PARENT = {
   consequence: true,
   disease: false,
+  dataset: true,
 };
 const DISEASE_API = {
   PATH: `${API_URL}/sparqlist/api/advanced_search_disease_selector`,
   KEY: 'mesh_in',
 };
 
+type DataNode = {
+  id: string;
+  label: string;
+  value: string;
+  children?: Array<DataNode>;
+};
+
+type DataNodeWithChecked = DataNode & {
+  checked: boolean;
+  indeterminate?: boolean;
+};
+
 export default class ConditionValueEditorColumns extends ConditionValueEditor {
   _lastValues: Array<any>;
-  _data: any;
+  _data: HierarchyNode<DataNodeWithChecked>;
   _selectionDependedOnParent: any;
-  _columns: any;
+  _columns: HTMLElement;
   _description: HTMLElement;
 
-  /**
-   * @param {ConditionValues} valuesView
-   * @param {ConditionItemView} conditionView */
-  constructor(valuesView, conditionView) {
+  constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
 
     this._data = this._prepareData();
@@ -49,13 +61,14 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
 
   keepLastValues() {
     this._lastValues = this._data
-      .filter((datum) => datum.value && datum.checked)
+      .descendants()
+      .filter((datum) => datum.data.value && datum.data.checked)
       .map((datum) => datum.value);
   }
 
   restore() {
-    this._data.forEach((datum) => {
-      datum.checked = this._lastValues.indexOf(datum.value) !== -1;
+    this._data.each((datum) => {
+      datum.data.checked = this._lastValues.indexOf(datum.data.value) !== -1;
     });
     this._update();
   }
@@ -70,9 +83,12 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     switch (this._conditionType) {
       case CONDITION_TYPE.consequence:
       case CONDITION_TYPE.dataset: {
-        const data = ADVANCED_CONDITIONS[this._conditionType].values;
-        const hierarchyData = hierarchy({
+        const data = ADVANCED_CONDITIONS[this._conditionType]
+          .values as DataNodeWithChecked[];
+        const hierarchyData = hierarchy<DataNodeWithChecked>({
           id: '-1',
+          label: 'root',
+          value: '',
           children: data,
           checked: false,
         });
@@ -82,42 +98,45 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
         return hierarchyData;
       }
 
-      case CONDITION_TYPE.disease:
-        return [];
+      // case CONDITION_TYPE.disease:
+      //   return [] as HierarchyNode<DataNode>[];
     }
   }
 
   _drawColumn(parentId?: string) {
+    console.log('parentId', parentId);
     this._getItems(parentId).then((items) => {
       // make HTML
+      console.log('items', items);
       const column = document.createElement('div');
       column.classList.add('column');
-      column.dataset.depth =
-        this._columns.querySelectorAll(':scope > .column').length;
+      column.dataset.depth = this._columns
+        .querySelectorAll(':scope > .column')
+        .length.toString();
       this._columns.append(column);
       column.innerHTML = `
         <ul>
           ${items
-            //@ts-ignore
+
             .map((item) => {
               return `<li
-              ${item.id ? `data-id="${item.id}"` : ''}
-              ${item.value ? `data-value="${item.value}"` : ''}
-              ${item.parent ? `data-parent="${item.parent}"` : ''}
+              ${item.data.id ? `data-id="${item.data.id}"` : ''}
+              ${item.data.value ? `data-value="${item.data.value}"` : ''}
+              ${item.parent ? `data-parent="${item.parent.data.id}"` : ''}
             >
               <label>
-                <input type="checkbox">
+                <input type="checkbox" value=${item.data.id}>
                 ${
                   this._conditionType === CONDITION_TYPE.dataset
-                    ? `<span class="dataset-icon" data-dataset="${item.value}"></span>`
+                    ? `<span class="dataset-icon" data-dataset="${item.data.value}"></span>`
                     : ''
                 }
-                <span>${item.label}</span>
+                <span>${item.data.label}</span>
               </label>
               ${
                 item.children === undefined
                   ? ''
-                  : `<div class="arrow" data-id="${item.id}"></div>`
+                  : `<div class="arrow" data-id="${item.data.id}"></div>`
               }
             </li>`;
             })
@@ -126,44 +145,44 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
 
       // attach events
       // add/remove condition
-      for (const item of column.querySelectorAll(
-        ':scope > ul > li > label > input'
-      )) {
-        item.addEventListener('change', (e) => {
-          // change status
-          if (!(e.target instanceof HTMLElement)) return;
+      column.addEventListener('change', (e) => {
+        const target = e.target as HTMLInputElement;
+        const checked = target.checked;
+        const nodeId = target.closest('li').dataset.id;
+        const changedNode = this._data.find((datum) => datum.data.id == nodeId);
 
-          const li = e.target.closest('li');
-          const datum = this._data.find((datum) => datum.id == li.dataset.id);
-          //@ts-ignore
-          datum.checked = e.target.checked;
-          // if it has children, aggregate child items
-          //@ts-ignore
-          if (datum.children) this._updateChildren(datum.id, e.target.checked);
-          //@ts-ignore
-          this._update(datum.id);
-        });
-      }
+        // this._updateChildren(changedNode, checked);
+
+        if (changedNode.children) this._updateChildren(changedNode, checked);
+
+        if (changedNode.parent) this._updateParents(changedNode, checked);
+
+        this._update();
+      });
+
       // drill down
       for (const item of column.querySelectorAll(':scope > ul > li > .arrow')) {
         item.addEventListener('click', (e) => {
-          //@ts-ignore
-          const item = e.target.closest('li');
+          const target = e.target as HTMLElement;
+          const item = target.closest('li');
+          const closestColumn: HTMLElement = item.closest('.column');
+          const closestColumns: HTMLElement = item.closest('.columns');
           // release selecting item, and remove subdirectory
           item.parentNode
             .querySelector(':scope > .-selected')
             ?.classList.remove('-selected');
-          const depth = parseInt(item.closest('.column').dataset.depth);
-          for (const column of item
-            .closest('.columns')
-            .querySelectorAll(':scope > .column')) {
+          const depth = parseInt(closestColumn.dataset.depth);
+          for (const column of closestColumns.querySelectorAll(
+            ':scope > .column'
+          )) {
+            //@ts-ignore
             if (parseInt(column.dataset.depth) > depth)
               column.parentNode.removeChild(column);
           }
           // select, and drill down
           item.classList.add('-selected');
-          //@ts-ignore
-          this._drawColumn(e.target.dataset.id);
+
+          this._drawColumn(target.dataset.id);
         });
       }
       this._update();
@@ -180,148 +199,248 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     });
   }
 
-  _getItems(parentId?: string) {
+  _getItems(parentId?: string): Promise<HierarchyNode<DataNodeWithChecked>[]> {
     return new Promise((resolve, reject) => {
       // TODO: alt allele, consequence と disease で、取り方が変わる
       switch (this._conditionType) {
         case CONDITION_TYPE.consequence:
-        case CONDITION_TYPE.dataset:
-          resolve(this._data.filter((datum) => datum.parent === parentId));
+        case CONDITION_TYPE.dataset: {
+          console.log(this._data.children);
+          if (!parentId) resolve(this._data.children);
+
+          const found = this._data.find((datum) => datum.data.id === parentId);
+
+          resolve(found?.children);
           break;
-        case CONDITION_TYPE.disease:
-          {
-            let filtered = this._data.filter(
-              (datum) => datum.parent === parentId
-            );
-            if (filtered.length) {
-              resolve(filtered);
-            } else {
-              fetch(
-                `${DISEASE_API.PATH}${
-                  parentId ? `?${DISEASE_API.KEY}=${parentId}` : ''
-                }`
-              )
-                .then((response) => response.json())
-                .then((data) => {
-                  const newData = data.map((datum) => {
-                    const label =
-                      datum.label.indexOf('|') === -1
-                        ? datum.label
-                        : datum.label.substr(0, datum.label.indexOf('|'));
-                    const newDatum = {
-                      id: datum.categoryId,
-                      label,
-                      value: label,
-                      checked: false,
-                    };
-                    // @ts-ignore
-                    if (parentId) newDatum.parent = parentId;
-                    // @ts-ignore
-                    if (datum.hasChild) newDatum.children = [];
-                    return newDatum;
-                  });
-                  this._data.push(...newData);
-                  // ad ids to parent datum
-                  if (parentId) {
-                    const parentDatum = this._data.find(
-                      (datum) => datum.id == parentId
-                    );
-                    parentDatum.children.push(
-                      ...newData.map((datum) => datum.id)
-                    );
-                  }
-                  resolve(newData);
-                })
-                .catch((error) => {
-                  console.error(error);
-                  reject(error);
-                });
-            }
-          }
-          break;
-      }
-    });
-  }
-
-  _updateChildren(id, checked) {
-    // reflect
-    if (!this._selectionDependedOnParent) return;
-    const children = this._data.filter((datum) => datum.parent == id);
-    children.forEach((child) => {
-      child.checked = checked;
-      this._updateChildren(child.id, checked);
-    });
-  }
-
-  _updateIndeterminate() {
-    // if (!this._selectionDependedOnParent) return;
-
-    const checkLeaves = (datum) => {
-      if (!datum.children || datum.children.length === 0) return;
-      let numberOfChecked = 0;
-
-      for (const child of datum.children) {
-        const childDatum = this._data.find((datum) => datum.id === child);
-
-        if (!childDatum) continue;
-
-        if (childDatum.children) {
-          numberOfChecked += checkLeaves(childDatum);
-        } else {
-          numberOfChecked += childDatum.checked;
         }
+        // case CONDITION_TYPE.disease:
+        //   {
+        //     let filtered = this._data.filter(
+        //       (datum) => datum.parent === parentId
+        //     );
+        //     if (filtered.length) {
+        //       resolve(filtered);
+        //     } else {
+        //       fetch(
+        //         `${DISEASE_API.PATH}${
+        //           parentId ? `?${DISEASE_API.KEY}=${parentId}` : ''
+        //         }`
+        //       )
+        //         .then((response) => response.json())
+        //         .then((data) => {
+        //           const newData = data.map((datum) => {
+        //             const label =
+        //               datum.label.indexOf('|') === -1
+        //                 ? datum.label
+        //                 : datum.label.substr(0, datum.label.indexOf('|'));
+        //             const newDatum = {
+        //               id: datum.categoryId,
+        //               label,
+        //               value: label,
+        //               checked: false,
+        //             };
+        //             // @ts-ignore
+        //             if (parentId) newDatum.parent = parentId;
+        //             // @ts-ignore
+        //             if (datum.hasChild) newDatum.children = [];
+        //             return newDatum;
+        //           });
+        //           this._data.push(...newData);
+        //           // ad ids to parent datum
+        //           if (parentId) {
+        //             const parentDatum = this._data.find(
+        //               (datum) => datum.id == parentId
+        //             );
+        //             parentDatum.children.push(
+        //               ...newData.map((datum) => datum.id)
+        //             );
+        //           }
+        //           resolve(newData);
+        //         })
+        //         .catch((error) => {
+        //           console.error(error);
+        //           reject(error);
+        //         });
+        //     }
+        //   }
+        //   break;
       }
+    });
+  }
 
-      let checked, indeterminate;
-      switch (true) {
-        case numberOfChecked === 0:
-          checked = false;
-          indeterminate = false;
-          break;
-        case numberOfChecked === datum.children.length:
-          checked = true;
-          indeterminate = false;
-          break;
-        default:
-          checked = false;
-          indeterminate = true;
-          break;
-      }
-      const checkbox = this._columns.querySelector(
-        `li[data-id="${datum.id}"] > label > input`
+  _updateChildren(node: HierarchyNode<DataNodeWithChecked>, checked: boolean) {
+    // reflect
+
+    if (!this._selectionDependedOnParent) return;
+
+    node.descendants().forEach((descendant) => {
+      descendant.data.checked = checked;
+    });
+  }
+
+  _updateIndeterminate(id?: string) {
+    if (!this._selectionDependedOnParent) return;
+
+    // const checkLeaves = (datum) => {
+    //   if (!datum.children || datum.children.length === 0) return;
+    //   let numberOfChecked = 0;
+
+    //   for (const child of datum.children) {
+    //     const childDatum = this._data.find((datum) => datum.id === child);
+
+    //     if (!childDatum) continue;
+
+    //     if (childDatum.children) {
+    //       numberOfChecked += checkLeaves(childDatum);
+    //     } else {
+    //       numberOfChecked += childDatum.data.checked;
+    //     }
+    //   }
+
+    //   let checked, indeterminate;
+    //   switch (true) {
+    //     case numberOfChecked === 0:
+    //       checked = false;
+    //       indeterminate = false;
+    //       break;
+    //     case numberOfChecked === datum.children.length:
+    //       checked = true;
+    //       indeterminate = false;
+    //       break;
+    //     default:
+    //       checked = false;
+    //       indeterminate = true;
+    //       break;
+    //   }
+    //   const checkbox: HTMLInputElement = this._columns.querySelector(
+    //     `li[data-id="${datum.id}"] > label > input`
+    //   );
+    //   if (checkbox) {
+    //     checkbox.checked = checked;
+    //     checkbox.indeterminate = indeterminate;
+    //   }
+    //   return checked || indeterminate;
+    // };
+    //
+    const node = id
+      ? this._data.find((datum) => datum.data.id === id)
+      : this._data;
+
+    if (node.parent) {
+      const parent = node.parent;
+
+      const children = parent.children;
+
+      if (!children) return;
+      const checked = children.every((child) => child.data.checked);
+
+      const indeterminate = children.some(
+        (child) => child.data.checked || child.data.indeterminate
       );
-      if (checkbox) {
-        checkbox.checked = checked;
-        checkbox.indeterminate = indeterminate;
-      }
-      return checked || indeterminate;
-    };
+
+      parent.data.checked = checked;
+      parent.data.indeterminate = !checked && !!indeterminate;
+
+      const checkbox: HTMLInputElement = this._columns.querySelector(
+        `li[data-id="${parent.data.id}"] > label > input`
+      );
+      checkbox.dataset.indeterminate = 'true';
+      checkbox.indeterminate = parent.data.indeterminate;
+    }
+
+    this._data.eachAfter((node) => {
+      const children = node.children;
+      if (!children) return;
+      const checked = children.every((child) => child.data.checked);
+
+      const indeterminate = children.some(
+        (child) => child.data.checked || child.data.indeterminate
+      );
+
+      node.data.checked = checked;
+      node.data.indeterminate = !checked && !!indeterminate;
+
+      const checkbox: HTMLInputElement = this._columns.querySelector(
+        `li[data-id="${node.data.id}"] > label > input`
+      );
+      checkbox.dataset.indeterminate = 'true';
+      checkbox.indeterminate = node.data.indeterminate;
+    });
 
     // top level
-    const topLevelNodes = this._data.filter(
-      (datum) => datum.parent === undefined
-    );
-    topLevelNodes.forEach((datum) => checkLeaves(datum));
+    // const topLevelNodes = this._data.filter(
+    //   (datum) => datum.parent === undefined
+    // );
+    // topLevelNodes.forEach((datum) => checkLeaves(datum));
+  }
+
+  /**
+  Update the parent nodes of the given node
+  */
+  _updateParents(
+    dataNode: HierarchyNode<DataNodeWithChecked>,
+    checked?: boolean
+  ) {
+    if (!this._selectionDependedOnParent) return;
+
+    if (typeof checked === 'boolean') {
+      dataNode.data.checked = checked;
+    }
+
+    if (!dataNode.parent) return;
+
+    const parent = dataNode.parent;
+
+    // if this node get checked, then, maybe all psiblings are checked too, in that case, check the parent.
+    if (checked) {
+      parent.data.checked = parent.children.every(
+        (child) => child.data.checked
+      );
+
+      parent.data.indeterminate = parent.children.some(
+        (child) => !child.data.checked || child.data.indeterminate
+      );
+
+      // if this node get unchecked, then, uncheck the parent. If any of the siblings are checked or indeterminate, then, indeterminate.
+    } else {
+      parent.data.checked = false;
+
+      parent.data.indeterminate = parent.children.some(
+        (child) => child.data.checked || child.data.indeterminate
+      );
+    }
+
+    // const checkbox: HTMLInputElement = this._columns.querySelector(
+    //   `li[data-id="${parent.data.id}"] > label > input`
+    // );
+
+    // checkbox.checked = !parent.data.indeterminate && parent.data.checked;
+    // checkbox.indeterminate = parent.data.indeterminate;
+
+    this._updateParents(parent);
   }
 
   _update() {
     // reflect check status in DOM
-    this._data.forEach((datum) => {
-      const checkbox = this._columns.querySelector(
-        `li[data-id="${datum.id}"] > label > input`
+    this._data.eachAfter((datum) => {
+      const checkbox: HTMLInputElement = this._columns.querySelector(
+        `li[data-id="${datum.data.id}"] > label > input`
       );
-      if (checkbox) checkbox.checked = datum.checked;
+      if (checkbox) {
+        checkbox.checked = !datum.data.indeterminate && datum.data.checked;
+        checkbox.indeterminate = datum.data.indeterminate;
+      }
     });
     // update selection status of upper hierarchy
-    this._updateIndeterminate();
+    // this._updateIndeterminate();
 
     // update values
-    this._data.forEach((datum) => {
-      if (!datum.value) return;
-      if (datum.checked) {
-        this._addValueView(datum.value, datum.label);
+    this._data.descendants().forEach((datum) => {
+      if (!datum.data.value) return;
+      if (datum.data.checked) {
+        this._addValueView(datum.data.value, datum.data.label);
       } else {
-        this._removeValueView(datum.value);
+        this._removeValueView(datum.data.value);
       }
     });
 
