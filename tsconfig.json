@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "es6",
+    "module": "esnext",
+    "sourceMap": true
+  },
+  "include": ["./app/frontend/javascripts/**/*"]
+}

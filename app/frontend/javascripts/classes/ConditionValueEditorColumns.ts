@@ -2,6 +2,7 @@ import ConditionValueEditor from './ConditionValueEditor.js';
 // import { response } from 'express';
 import { ADVANCED_CONDITIONS, API_URL } from '../global.js';
 import { CONDITION_TYPE } from '../definition.js';
+import { hierarchy } from 'd3-hierarchy';
 
 const SELECTION_DEPENDED_ON_PARENT = {
   consequence: true,
@@ -13,6 +14,12 @@ const DISEASE_API = {
 };
 
 export default class ConditionValueEditorColumns extends ConditionValueEditor {
+  _lastValues: Array<any>;
+  _data: any;
+  _selectionDependedOnParent: any;
+  _columns: any;
+  _description: HTMLElement;
+
   /**
    * @param {ConditionValues} valuesView
    * @param {ConditionItemView} conditionView */
@@ -47,9 +54,9 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
   }
 
   restore() {
-    this._data.forEach(
-      (datum) => (datum.checked = this._lastValues.indexOf(datum.value) !== -1)
-    );
+    this._data.forEach((datum) => {
+      datum.checked = this._lastValues.indexOf(datum.value) !== -1;
+    });
     this._update();
   }
 
@@ -62,16 +69,25 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
   _prepareData() {
     switch (this._conditionType) {
       case CONDITION_TYPE.consequence:
-      case CONDITION_TYPE.dataset:
-        return ADVANCED_CONDITIONS[this._conditionType].values.map((value) =>
-          Object.assign({ checked: false }, value)
-        );
+      case CONDITION_TYPE.dataset: {
+        const data = ADVANCED_CONDITIONS[this._conditionType].values;
+        const hierarchyData = hierarchy({
+          id: '-1',
+          children: data,
+          checked: false,
+        });
+        for (const child of hierarchyData.descendants()) {
+          child.data.checked = false;
+        }
+        return hierarchyData;
+      }
+
       case CONDITION_TYPE.disease:
         return [];
     }
   }
 
-  _drawColumn(parentId) {
+  _drawColumn(parentId?: string) {
     this._getItems(parentId).then((items) => {
       // make HTML
       const column = document.createElement('div');
@@ -82,6 +98,7 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
       column.innerHTML = `
         <ul>
           ${items
+            //@ts-ignore
             .map((item) => {
               return `<li
               ${item.id ? `data-id="${item.id}"` : ''}
@@ -114,17 +131,23 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
       )) {
         item.addEventListener('change', (e) => {
           // change status
+          if (!(e.target instanceof HTMLElement)) return;
+
           const li = e.target.closest('li');
           const datum = this._data.find((datum) => datum.id == li.dataset.id);
+          //@ts-ignore
           datum.checked = e.target.checked;
           // if it has children, aggregate child items
+          //@ts-ignore
           if (datum.children) this._updateChildren(datum.id, e.target.checked);
+          //@ts-ignore
           this._update(datum.id);
         });
       }
       // drill down
       for (const item of column.querySelectorAll(':scope > ul > li > .arrow')) {
         item.addEventListener('click', (e) => {
+          //@ts-ignore
           const item = e.target.closest('li');
           // release selecting item, and remove subdirectory
           item.parentNode
@@ -139,6 +162,7 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
           }
           // select, and drill down
           item.classList.add('-selected');
+          //@ts-ignore
           this._drawColumn(e.target.dataset.id);
         });
       }
@@ -156,7 +180,7 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     });
   }
 
-  _getItems(parentId) {
+  _getItems(parentId?: string) {
     return new Promise((resolve, reject) => {
       // TODO: alt allele, consequence と disease で、取り方が変わる
       switch (this._conditionType) {
@@ -190,7 +214,9 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
                       value: label,
                       checked: false,
                     };
+                    // @ts-ignore
                     if (parentId) newDatum.parent = parentId;
+                    // @ts-ignore
                     if (datum.hasChild) newDatum.children = [];
                     return newDatum;
                   });
@@ -233,14 +259,19 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     const checkLeaves = (datum) => {
       if (!datum.children || datum.children.length === 0) return;
       let numberOfChecked = 0;
-      datum.children.forEach((child) => {
+
+      for (const child of datum.children) {
         const childDatum = this._data.find((datum) => datum.id === child);
+
+        if (!childDatum) continue;
+
         if (childDatum.children) {
           numberOfChecked += checkLeaves(childDatum);
         } else {
           numberOfChecked += childDatum.checked;
         }
-      });
+      }
+
       let checked, indeterminate;
       switch (true) {
         case numberOfChecked === 0:

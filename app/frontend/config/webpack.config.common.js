@@ -19,6 +19,10 @@ const config = {
     filename: 'js/[name]-[contenthash].js',
     publicPath: '/',
   },
+  resolve: {
+    extensions: ['.ts', '.js', '...'],
+  },
+  devtool: 'source-map',
   module: {
     rules: [
       {
@@ -31,6 +35,7 @@ const config = {
           },
         },
       },
+      { test: /\.ts$/, loader: 'ts-loader', exclude: /node_modules/ },
       {
         test: /\.js$/,
         loader: 'babel-loader',
@@ -143,9 +148,7 @@ const config = {
       TOGOVAR_FRONTEND_API_URL: JSON.stringify(
         process.env.TOGOVAR_FRONTEND_API_URL
       ),
-      TOGOVAR_FRONTEND_REFERENCE: JSON.stringify(
-        process.env.TOGOVAR_REFERENCE
-      ),
+      TOGOVAR_FRONTEND_REFERENCE: JSON.stringify(process.env.TOGOVAR_REFERENCE),
       TOGOVAR_FRONTEND_STANZA_URL: JSON.stringify(
         process.env.TOGOVAR_FRONTEND_STANZA_URL
       ),
@@ -163,9 +166,12 @@ const config = {
       ),
     }),
   ],
+  experiments: {
+    topLevelAwait: true,
+  },
 };
 
-const pages = function (assembly) {
+const pages = (function (assembly) {
   switch (assembly) {
     case 'GRCh37':
       return [
@@ -199,7 +205,7 @@ const pages = function (assembly) {
         'terms',
       ];
   }
-}(process.env.TOGOVAR_REFERENCE);
+})(process.env.TOGOVAR_REFERENCE);
 
 pages.forEach(function (name) {
   config.plugins.push(

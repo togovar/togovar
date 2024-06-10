@@ -215,6 +215,21 @@ const DEFAULT = {
 };
 const REGEXP = new RegExp(/([1-9]|1\d|2[0-2]|X|Y|MT):(\d+)-?(\d+)?/);
 
+let karyotype = JSON.parse(localStorage.getItem('karyotype'));
+
+function initialiseKaryotype() {
+  if (!karyotype || karyotype.version !== DEFAULT.version) {
+    karyotype = DEFAULT;
+  }
+}
+
+initialiseKaryotype();
+
+console.log('karyotype.reference', karyotype.reference);
+const tsv =
+  (await import(`../../assets/${karyotype.reference}/karyotype.tsv`)).default ||
+  [];
+
 export default class Karyotype {
   constructor(elm) {
     this.elm = elm;
@@ -222,11 +237,6 @@ export default class Karyotype {
     this.chromosomes = this.elm.querySelector('.content > .chromosomes');
     this.chromosomeViews;
 
-    // initial settings
-    let karyotype = JSON.parse(localStorage.getItem('karyotype'));
-    if (!karyotype || karyotype.version !== DEFAULT.version) {
-      karyotype = DEFAULT;
-    }
     StoreManager.setData('karyotype', karyotype);
 
     // events
@@ -261,7 +271,7 @@ export default class Karyotype {
     )[0];
 
     // 染色体座標データ
-    const tsv = require(`../../assets/${karyotype.reference}/karyotype.tsv`);
+
     this.geneMap = this.parseGeneMap(tsv);
     this.maxLength = Math.max(
       ...this.geneMap.map((chromosome) => chromosome[chromosome.length - 1].end)
