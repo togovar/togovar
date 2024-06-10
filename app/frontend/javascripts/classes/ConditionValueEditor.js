@@ -61,6 +61,17 @@ class ConditionValueEditor {
     return valueView;
   }
 
+  /**
+   * Remove all valueViews.
+   * @protected
+   *
+   */
+  _clearValueViews() {
+    this._valueViews.forEach((valueView) => {
+      valueView.remove();
+    });
+  }
+
   /** Remove current valueViews and add lastValueViews. (for variant id)
    * @protected
    * @param {Array<HTMLDivElement>} lastValueViews */
