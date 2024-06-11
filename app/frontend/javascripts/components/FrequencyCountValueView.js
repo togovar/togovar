@@ -68,7 +68,8 @@ export class FrequencyCountValueView extends LitElement {
     }
 
     :host > .range {
-      margin-right: 8px;
+      margin-right: 0.6em;
+      width: 4.6em;
     }
     :host > .range > .from,
     :host > .range > .to {
