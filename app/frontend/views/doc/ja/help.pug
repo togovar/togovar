@@ -278,10 +278,17 @@ block content
                   | &nbsp; JGA-SNP
                   br
                   logarithmized-block-graph-frequency-view(data-dataset="tommo" data-logarithmized-frequency="≥0.5")
-                  | &nbsp; ToMMo 8.3KJPN
+                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
+                    | &nbsp; ToMMo 8.3KJPN
+                  else if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                    | &nbsp; ToMMo 54KJPN
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="hgvd" data-logarithmized-frequency="≥0.5")
-                  | &nbsp; HGVD
+                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
+                    logarithmized-block-graph-frequency-view(data-dataset="hgvd" data-logarithmized-frequency="≥0.5")
+                    | &nbsp; HGVD
+                    br
+                  logarithmized-block-graph-frequency-view(data-dataset="ncbn" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; NCBN
                   br
                   logarithmized-block-graph-frequency-view(data-dataset="gnomad_genomes" data-logarithmized-frequency="≥0.5")
                   | &nbsp; gnomAD genomes

@@ -51,8 +51,18 @@
 }
 
 //dataset
+:host([data-condition-type='dataset'][data-value='gem_j_wga']) {
+  > .inner {
+    border-color: var(--color-dataset-gemj);
+    background-color: var(--color-dataset-gemj-light);
+    &::before {
+      color: var(--color-dataset-gemj);
+    }
+  }
+}
 :host([data-condition-type='dataset'][data-value='jga_ngs']),
-:host([data-condition-type='dataset'][data-value='jga_snp']) {
+:host([data-condition-type='dataset'][data-value='jga_snp']),
+:host([data-condition-type='dataset'][data-value^='bbj_riken']) {
   > .inner {
     border-color: var(--color-dataset-jga);
     background-color: var(--color-dataset-jga-light);
@@ -79,16 +89,17 @@
     }
   }
 }
-:host([data-condition-type='dataset'][data-value='gem_j_wga']) {
+:host([data-condition-type='dataset'][data-value^='ncbn']) {
   > .inner {
-    border-color: var(--color-dataset-gemj);
-    background-color: var(--color-dataset-gemj-light);
+    border-color: var(--color-dataset-ncbn);
+    background-color: var(--color-dataset-ncbn-light);
     &::before {
-      color: var(--color-dataset-gemj);
+      color: var(--color-dataset-ncbn);
     }
   }
 }
-:host([data-condition-type='dataset'][data-value='gnomad_genomes']) {
+:host([data-condition-type='dataset'][data-value^='gnomad_genomes']),
+:host([data-condition-type='dataset'][data-value^='gnomad_exomes']) {
   > .inner {
     border-color: var(--color-dataset-foreign);
     background-color: var(--color-dataset-foreign-light);

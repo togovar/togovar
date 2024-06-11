@@ -46,6 +46,13 @@
         "has_freq": true
       },
       {
+        "id": "ncbn",
+        "label": "NCBN",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
         "id": "gnomad_genomes",
         "label": "gnomAD genomes",
         "type": "boolean",
@@ -96,9 +103,7 @@
         "label": "Match",
         "type": "enumeration",
         "default": "any",
-        "values": [
-          "all", "any"
-        ]
+        "values": ["all", "any"]
       }
     ]
   },
@@ -576,11 +581,7 @@
           },
           {
             "label": "Splice variant",
-            "items": [
-              "SO_0001574",
-              "SO_0001575",
-              "SO_0001630"
-            ]
+            "items": ["SO_0001574", "SO_0001575", "SO_0001630"]
           },
           "SO_0001893",
           "SO_0001889"
@@ -600,11 +601,7 @@
       },
       {
         "label": "Intergenic variant",
-        "items": [
-          "SO_0001632",
-          "SO_0001628",
-          "SO_0001631"
-        ]
+        "items": ["SO_0001632", "SO_0001628", "SO_0001631"]
       }
     ]
   },
