@@ -39,20 +39,24 @@ class ConditionItemValueView extends LitElement {
         data-dataset=${this.value}
       ></prediction-value-view>`;
     }
-    return html`<span
-        class="inner"
-        data-condition-type="${this.conditionType}"
-        data-value=${this.value}
-      >
-        ${this.label}${this.deleteButton
-          ? html`<button
-              class="delete"
-              part="delete-tag-btn"
-              @click=${this._handleDelete}
-            ></button>`
-          : nothing}</span
-      >
-      ${option} `;
+    return html`
+      <div class="condition-item-value-container">
+        <span
+          class="inner"
+          data-condition-type="${this.conditionType}"
+          data-value=${this.value}
+        >
+          ${this.label}${this.deleteButton
+            ? html`<button
+                class="delete"
+                part="delete-tag-btn"
+                @click=${this._handleDelete}
+              ></button>`
+            : nothing}</span
+        >
+        ${option}
+      </div>
+    `;
   }
 }
 
