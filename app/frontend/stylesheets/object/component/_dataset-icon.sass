@@ -36,6 +36,9 @@
   &[data-dataset="hgvd"], &[data-dataset="mgend"]
     &:before
       color: $COLOR_DATASET_HGVD
+  &[data-dataset="ncbn"]
+    &:before
+      color: $COLOR_DATASET_NCBN
   &[data-dataset="gem_j_wga"]
     &:before
       color: $COLOR_DATASET_GEM_J
@@ -52,7 +55,7 @@
         color: $COLOR_SIGN_DANGEROUS
         content: "Disease"
   // WGS
-  &[data-dataset="tommo"], &[data-dataset="gem_j_wga"], &[data-dataset="gnomad_genomes"]
+  &[data-dataset="tommo"], &[data-dataset="ncbn"], &[data-dataset="gem_j_wga"], &[data-dataset="gnomad_genomes"]
     > .properties
       &::after
         content: "WGS"

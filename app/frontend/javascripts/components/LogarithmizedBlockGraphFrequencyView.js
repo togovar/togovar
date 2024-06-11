@@ -36,6 +36,9 @@ export class LogarithmizedBlockGraphFrequencyView extends LitElement {
     :host([data-dataset='hgvd']) {
       --color-dataset: var(--color-dataset-hgvd);
     }
+    :host([data-dataset='ncbn']) {
+      --color-dataset: var(--color-dataset-ncbn);
+    }
     :host([data-dataset='bbj']) {
       --color-dataset: var(--color-dataset-bbj);
     }

@@ -48,15 +48,13 @@ export class FrequencyCountValueView extends LitElement {
       height: 100%;
     }
 
-    :host([data-dataset='jga_ngs']) > .frequencygraph > .bar {
-      background-color: var(--color-dataset-jga);
+    :host([data-dataset='gem_j_wga']) > .frequencygraph > .bar {
+      background-color: var(--color-dataset-gemj);
     }
 
-    :host([data-dataset='hgvd']) > .frequencygraph > .bar {
-      background-color: var(--color-dataset-hgvd);
-    }
-
-    :host([data-dataset='jga_snp']) > .frequencygraph > .bar {
+    :host([data-dataset='jga_ngs']) > .frequencygraph > .bar,
+    :host([data-dataset='jga_snp']) > .frequencygraph > .bar,
+    :host([data-dataset^='bbj_riken']) > .frequencygraph > .bar {
       background-color: var(--color-dataset-jga);
     }
 
@@ -64,8 +62,12 @@ export class FrequencyCountValueView extends LitElement {
       background-color: var(--color-dataset-tommo);
     }
 
-    :host([data-dataset='gem_j_wga']) > .frequencygraph > .bar {
-      background-color: var(--color-dataset-gemj);
+    :host([data-dataset='hgvd']) > .frequencygraph > .bar {
+      background-color: var(--color-dataset-hgvd);
+    }
+
+    :host([data-dataset^='ncbn']) > .frequencygraph > .bar {
+      background-color: var(--color-dataset-ncbn);
     }
 
     :host > .range {
