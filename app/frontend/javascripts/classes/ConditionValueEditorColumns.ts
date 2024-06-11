@@ -118,10 +118,8 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
   }
 
   _drawColumn(parentId?: string) {
-    console.log('parentId', parentId);
     this._getItems(parentId).then((items) => {
       // make HTML
-      console.log('items', items);
       const column = document.createElement('div');
       column.classList.add('column');
       column.dataset.depth = this._columns
@@ -141,7 +139,8 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
               <label>
                 <input type="checkbox" value=${item.data.id}>
                 ${
-                  this._conditionType === CONDITION_TYPE.dataset
+                  this._conditionType === CONDITION_TYPE.dataset &&
+                  item.depth === 1
                     ? `<span class="dataset-icon" data-dataset="${item.data.value}"></span>`
                     : ''
                 }
@@ -217,7 +216,6 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
       switch (this._conditionType) {
         case CONDITION_TYPE.consequence:
         case CONDITION_TYPE.dataset: {
-          console.log(this._data.children);
           if (!parentId) resolve(this._data.children);
 
           const found = this._data.find((datum) => datum.data.id === parentId);
@@ -290,98 +288,39 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     });
   }
 
-  _updateIndeterminate(id?: string) {
-    if (!this._selectionDependedOnParent) return;
-
-    const node = id
-      ? this._data.find((datum) => datum.data.id === id)
-      : this._data;
-
-    if (node.parent) {
-      const parent = node.parent;
-
-      const children = parent.children;
-
-      if (!children) return;
-      const checked = children.every((child) => child.data.checked);
-
-      const indeterminate = children.some(
-        (child) => child.data.checked || child.data.indeterminate
-      );
-
-      parent.data.checked = checked;
-      parent.data.indeterminate = !checked && !!indeterminate;
-
-      const checkbox: HTMLInputElement = this._columns.querySelector(
-        `li[data-id="${parent.data.id}"] > label > input`
-      );
-      checkbox.dataset.indeterminate = 'true';
-      checkbox.indeterminate = parent.data.indeterminate;
-    }
-
-    this._data.eachAfter((node) => {
-      const children = node.children;
-      if (!children) return;
-      const checked = children.every((child) => child.data.checked);
-
-      const indeterminate = children.some(
-        (child) => child.data.checked || child.data.indeterminate
-      );
-
-      node.data.checked = checked;
-      node.data.indeterminate = !checked && !!indeterminate;
-
-      const checkbox: HTMLInputElement = this._columns.querySelector(
-        `li[data-id="${node.data.id}"] > label > input`
-      );
-      checkbox.dataset.indeterminate = 'true';
-      checkbox.indeterminate = node.data.indeterminate;
-    });
-
-    // top level
-    // const topLevelNodes = this._data.filter(
-    //   (datum) => datum.parent === undefined
-    // );
-    // topLevelNodes.forEach((datum) => checkLeaves(datum));
-  }
-
   /**
   Update the parent nodes of the given node
   */
   _updateParents(
-    dataNode: HierarchyNode<DataNodeWithChecked>,
+    dataNode: HierarchyNode<DataNodeWithChecked> | undefined,
     checked?: boolean
   ) {
     if (!this._selectionDependedOnParent) return;
 
+    if (!dataNode) return;
+
     if (typeof checked === 'boolean') {
+      // clicked this node
       dataNode.data.checked = checked;
-    }
-
-    if (!dataNode.parent) return;
-
-    const parent = dataNode.parent;
-
-    // if this node get checked, then, maybe all siblings are checked too, in that case, check the parent.
-    if (checked) {
-      parent.data.checked = parent.children.every(
-        (child) => child.data.checked
-      );
-
-      parent.data.indeterminate = parent.children.some(
-        (child) => !child.data.checked || child.data.indeterminate
-      );
-
-      // if this node get unchecked, then, uncheck the parent. If any of the siblings are checked or indeterminate, then, indeterminate.
+      dataNode.data.indeterminate = false;
     } else {
-      parent.data.checked = false;
+      // clicked some descendant node
+      const numberOfChecked = dataNode.children.filter(
+        (child) => child.data.checked
+      ).length;
 
-      parent.data.indeterminate = parent.children.some(
-        (child) => child.data.checked || child.data.indeterminate
+      const everyChecked = numberOfChecked === dataNode.children.length;
+      const someButNotEveryChecked =
+        numberOfChecked > 0 && numberOfChecked < dataNode.children.length;
+      const someIndeterminate = dataNode.children.some(
+        (child) => child.data.indeterminate
       );
+
+      dataNode.data.checked = everyChecked;
+      dataNode.data.indeterminate = someIndeterminate || someButNotEveryChecked;
     }
 
-    this._updateParents(parent);
+    this._updateParents(dataNode.parent);
   }
 
   _update() {
@@ -392,7 +331,8 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
       );
       if (checkbox) {
         checkbox.checked = !datum.data.indeterminate && datum.data.checked;
-        checkbox.indeterminate = datum.data.indeterminate;
+        checkbox.indeterminate =
+          !datum.data.checked && datum.data.indeterminate;
       }
     });
     // update selection status of upper hierarchy
