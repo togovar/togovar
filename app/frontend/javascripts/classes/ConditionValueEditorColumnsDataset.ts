@@ -27,7 +27,7 @@ type DataNodeWithChecked = DataNode & {
   indeterminate?: boolean;
 };
 
-export default class ConditionValueEditorColumns extends ConditionValueEditor {
+export default class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   _lastValues: Array<any>;
   _data: HierarchyNode<DataNodeWithChecked>;
   _selectionDependedOnParent: any;
@@ -95,7 +95,6 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
 
   _prepareData() {
     switch (this._conditionType) {
-      case CONDITION_TYPE.consequence:
       case CONDITION_TYPE.dataset: {
         const data = ADVANCED_CONDITIONS[this._conditionType]
           .values as DataNodeWithChecked[];
@@ -111,9 +110,10 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
         }
         return hierarchyData;
       }
-
-      // case CONDITION_TYPE.disease:
-      //   return [] as HierarchyNode<DataNode>[];
+      default:
+        throw new Error(
+          'ConditionValueEditorColumnsDataset - Invalid condition type'
+        );
     }
   }
 

@@ -1,12 +1,13 @@
+import { CONDITION_TYPE } from '../definition.js';
 import ConditionValueEditorCheckboxes from './ConditionValueEditorCheckboxes.js';
-import ConditionValueEditorColumns from './ConditionValueEditorColumns.ts';
-import ConditionValueEditorGene from './ConditionValueEditorGene.js';
-import ConditionValueEditorVariantID from './ConditionValueEditorVariantID.js';
+import ConditionValueEditorColumns from './ConditionValueEditorColumns.js';
+import ConditionValueEditorColumnsDataset from './ConditionValueEditorColumnsDataset.ts';
+import ConditionValueEditorDisease from './ConditionValueEditorDisease.js';
 import ConditionValueEditorFrequencyCount from './ConditionValueEditorFrequencyCount.js';
+import ConditionValueEditorGene from './ConditionValueEditorGene.js';
 import ConditionValueEditorLocation from './ConditionValueEditorLocation.js';
 import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditorPathogenicityPrediction.js';
-import ConditionValueEditorDisease from './ConditionValueEditorDisease.js';
-import { CONDITION_TYPE } from '../definition.js';
+import ConditionValueEditorVariantID from './ConditionValueEditorVariantID.js';
 
 /** About the AdvancedSearch edit screen.
  * Create an instance of ConditionValueEditors */
@@ -63,7 +64,7 @@ class ConditionValues {
 
       case CONDITION_TYPE.dataset:
         this._editors.push(
-          new ConditionValueEditorColumns(this, this._conditionView)
+          new ConditionValueEditorColumnsDataset(this, this._conditionView)
         );
         this._editors.push(
           new ConditionValueEditorFrequencyCount(this, this._conditionView)
