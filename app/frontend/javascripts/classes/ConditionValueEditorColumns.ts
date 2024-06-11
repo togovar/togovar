@@ -335,14 +335,16 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
           !datum.data.checked && datum.data.indeterminate;
       }
     });
-    // update selection status of upper hierarchy
 
-    // update values
+    // update values in the value view (ellipsises at the top)
 
     this._processValuesToShowInValueView();
     this._clearValueViews();
     for (const valueViewToAdd of this._nodesToShowInValueView) {
-      this._addValueView(valueViewToAdd.data.value, valueViewToAdd.data.label);
+      this._addValueView(
+        valueViewToAdd.data.value,
+        this._getLabelForValueToShow(valueViewToAdd)
+      );
     }
 
     // validation
@@ -351,6 +353,14 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
 
   _processValuesToShowInValueView() {
     this._nodesToShowInValueView = concatNodesToParent(this._data);
+  }
+
+  /**
+   * Get the label with path to show in the value view
+   */
+  _getLabelForValueToShow(node: HierarchyNode<DataNodeWithChecked>) {
+    const [, ...path] = node.path(this._data).reverse();
+    return path.map((d) => d.data.label).join(' > ');
   }
 
   _validate() {
