@@ -225,7 +225,6 @@ function initialiseKaryotype() {
 
 initialiseKaryotype();
 
-console.log('karyotype.reference', karyotype.reference);
 const tsv =
   (await import(`../../assets/${karyotype.reference}/karyotype.tsv`)).default ||
   [];

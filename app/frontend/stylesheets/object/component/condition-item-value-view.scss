@@ -4,10 +4,15 @@
   --height-container: var(--height-advanced-search-condition-values-container);
   --height: var(--height-advanced-search-condition-value);
   display: inline-block;
-  > .inner {
-    height: var(--height);
+  > .condition-item-value-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .inner {
+    // height: var(--height);
     line-height: 1;
-    padding: 0 10px;
+    padding: 2px 10px;
     background-color: white;
     border: solid 1px var(--color-key-dark1);
     border-radius: calc(var(--height) * 0.5);
@@ -20,7 +25,7 @@
 :host([data-condition-type='dataset']) {
   display: block;
   position: relative;
-  > .inner {
+  .inner {
     min-width: 120px;
     &::before {
       font-family: fontello, sans-serif;
@@ -31,7 +36,7 @@
 }
 //core significance
 :host([data-condition-type='significance']) {
-  > .inner {
+  .inner {
     &::before {
       margin-right: 4px;
       margin-left: -2px;
@@ -44,7 +49,7 @@
 //Pathogenicity_prediction
 :host([data-condition-type='pathogenicity_prediction']) {
   position: relative;
-  > .inner {
+  .inner {
     background-color: transparent;
     border: none;
   }
@@ -72,7 +77,7 @@
   }
 }
 :host([data-condition-type='dataset'][data-value='hgvd']) {
-  > .inner {
+  .inner {
     border-color: var(--color-dataset-hgvd);
     background-color: var(--color-dataset-hgvd-light);
     &::before {
@@ -81,7 +86,7 @@
   }
 }
 :host([data-condition-type='dataset'][data-value='tommo']) {
-  > .inner {
+  .inner {
     border-color: var(--color-dataset-tommo);
     background-color: var(--color-dataset-tommo-light);
     &::before {
@@ -111,7 +116,7 @@
 
 //Clinical significance
 :host([data-condition-type='significance'][data-value='P']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-dangerous);
     background-color: var(--color-sign-dangerous-light);
     &::before {
@@ -121,7 +126,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='LP']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-dangerous);
     background-color: var(--color-sign-dangerous-light);
     &::before {
@@ -131,7 +136,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='PLP']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-lowdangerous);
     background-color: var(--color-sign-lowdangerous-light);
     &::before {
@@ -141,7 +146,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='LPLP']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-lowdangerous);
     background-color: var(--color-sign-lowdangerous-light);
     &::before {
@@ -151,7 +156,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='ERA']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-warning);
     background-color: var(--color-sign-warning-light);
     &::before {
@@ -161,7 +166,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='LRA']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-warning);
     background-color: var(--color-sign-warning-light);
     &::before {
@@ -171,7 +176,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='URA']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-warning);
     background-color: var(--color-sign-warning-light);
     &::before {
@@ -181,7 +186,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='US']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-unknown);
     background-color: var(--color-sign-unknown-light);
     &::before {
@@ -191,7 +196,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='LB']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-normal);
     background-color: var(--color-sign-normal-light);
     &::before {
@@ -201,7 +206,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='B']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-safe);
     background-color: var(--color-sign-safe-light);
     &::before {
@@ -211,7 +216,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='CI']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-modifier);
     background-color: var(--color-sign-modifier-light);
     &::before {
@@ -221,7 +226,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='DR']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-other);
     background-color: var(--color-sign-other-light);
     &::before {
@@ -231,7 +236,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='CS']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-other);
     background-color: var(--color-sign-other-light);
     &::before {
@@ -241,7 +246,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='RF']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-other);
     background-color: var(--color-sign-other-light);
     &::before {
@@ -251,7 +256,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='A']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-other);
     background-color: var(--color-sign-other-light);
     &::before {
@@ -261,7 +266,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='PR']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-other);
     background-color: var(--color-sign-other-light);
     &::before {
@@ -271,7 +276,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='AF']) {
-  > .inner {
+  .inner {
     border-color: var(--color-sign-other);
     background-color: var(--color-sign-other-light);
     &::before {
@@ -281,7 +286,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='O']) {
-  > .inner {
+  .inner {
     border-color: var(--color-gray);
     background-color: white;
     &::before {
@@ -291,7 +296,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='NP']) {
-  > .inner {
+  .inner {
     border-color: var(--color-gray);
     background-color: white;
     &::before {
@@ -301,7 +306,7 @@
   }
 }
 :host([data-condition-type='significance'][data-value='AN']) {
-  > .inner {
+  .inner {
     border-color: var(--color-gray);
     background-color: white;
     &::before {
