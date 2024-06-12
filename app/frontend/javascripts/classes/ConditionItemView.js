@@ -196,15 +196,29 @@ class ConditionItemView extends ConditionView {
   get query() {
     const valueElements = Array.from(
       this._valuesEl.querySelectorAll(':scope > condition-item-value-view')
+      // this._elm
+      //   .querySelector(':scope > .body > .summary > .values')
+      //   .querySelectorAll(':scope > condition-item-value-view')
     );
+
+    console.log('valueElements', valueElements);
 
     switch (this._conditionType) {
       case CONDITION_TYPE.dataset: {
-        const queries = valueElements.map(
-          (view) =>
+        const queries = valueElements.map((view) => {
+          const valueView = view.shadowRoot.querySelector(
+            'frequency-count-value-view'
+          );
+
+          console.log('valueView', valueView);
+          console.log('view.shadowRoot', view.shadowRoot);
+          console.log(
+            'view.shadowRoot.querySelector',
             view.shadowRoot.querySelector('frequency-count-value-view')
-              .queryValue
-        );
+          );
+          return view.shadowRoot.querySelector('frequency-count-value-view')
+            .queryValue;
+        });
         return queries.length <= 1 ? queries[0] : { or: queries };
       }
 
