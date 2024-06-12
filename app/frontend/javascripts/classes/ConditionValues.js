@@ -153,7 +153,7 @@ class ConditionValues {
       for (const editor of this._editors) {
         editor.restore();
         if (
-          !['datgaset', 'pathogenicity_prediction', 'id', 'location'].includes(
+          !['dataset', 'pathogenicity_prediction', 'id', 'location'].includes(
             this._conditionView.conditionType
           )
         ) {

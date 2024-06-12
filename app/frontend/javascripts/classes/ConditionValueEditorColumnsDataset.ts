@@ -28,7 +28,7 @@ type DataNodeWithChecked = DataNode & {
 };
 
 export default class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
-  _lastValues: Array<any>;
+  _lastValues: Array<string>;
   _data: HierarchyNode<DataNodeWithChecked>;
   _selectionDependedOnParent: any;
   _columns: HTMLElement;
@@ -60,28 +60,38 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
 
   // public methods
 
+  /**
+   * on click pencil icon in value view, save last values
+   */
   keepLastValues() {
-    this._lastValues = this._data
-      .descendants()
-      .filter((datum) => datum.data.value && datum.data.checked)
-      .map((datum) => datum.value);
+    console.log('keepLastValues');
+    this._lastValues = this._nodesToShowInValueView.map(
+      (node) => node.data.value
+    );
   }
 
+  /**
+   * Restore last values (on press Cancel button)
+   */
   restore() {
+    console.log('restore', this._lastValues);
     this._data.each((datum) => {
       datum.data.checked = this._lastValues.indexOf(datum.data.value) !== -1;
     });
+
     // get checked leave nodes
     const checkedLeaves = this._data
       .leaves()
       .filter((leaf) => leaf.data.checked);
+
+    console.log('checkedLeaves', checkedLeaves);
     const checkedLeavesParentIds: (string | number)[] = [];
 
     // update parents only for leaves that are not already updated
     for (const leaf of checkedLeaves) {
       if (checkedLeavesParentIds.includes(leaf.id)) continue;
       checkedLeavesParentIds.push(leaf.id);
-      this._updateParents(leaf);
+      this._updateParents(leaf, true);
     }
 
     this._update();
