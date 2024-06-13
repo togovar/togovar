@@ -201,21 +201,9 @@ class ConditionItemView extends ConditionView {
       //   .querySelectorAll(':scope > condition-item-value-view')
     );
 
-    console.log('valueElements', valueElements);
-
     switch (this._conditionType) {
       case CONDITION_TYPE.dataset: {
         const queries = valueElements.map((view) => {
-          const valueView = view.shadowRoot.querySelector(
-            'frequency-count-value-view'
-          );
-
-          console.log('valueView', valueView);
-          console.log('view.shadowRoot', view.shadowRoot);
-          console.log(
-            'view.shadowRoot.querySelector',
-            view.shadowRoot.querySelector('frequency-count-value-view')
-          );
           return view.shadowRoot.querySelector('frequency-count-value-view')
             .queryValue;
         });

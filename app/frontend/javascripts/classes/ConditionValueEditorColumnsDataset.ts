@@ -28,7 +28,7 @@ type DataNodeWithChecked = DataNode & {
 };
 
 export default class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
-  _lastValues: Array<string>;
+  _lastValueViews: Array<HTMLDivElement>;
   _data: HierarchyNode<DataNodeWithChecked>;
   _selectionDependedOnParent: any;
   _columns: HTMLElement;
@@ -64,28 +64,29 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
    * on click pencil icon in value view, save last values
    */
   keepLastValues() {
-    this._lastValues = this._nodesToShowInValueView.map(
-      (node) => node.data.value
-    );
+    this._lastValueViews = this._valueViews;
   }
 
   /**
    * Restore last values (on press Cancel button)
    */
   restore() {
-    // reset all checked
+    //reset all checked
     this._data.each((datum) => {
       datum.data.checked = false;
     });
 
-    for (const lastValue of this._lastValues) {
-      const node = this._data.find((d) => d.data.value === lastValue);
+    for (const lastValue of this._lastValueViews) {
+      const node = this._data.find(
+        (d) => d.data.value === lastValue.dataset['value']
+      );
       if (!node) continue;
       node.data.checked = true;
       this._updateChildren(node, true);
       this._updateParents(node, true);
     }
     this._update();
+    this._updateValueViews(this._lastValueViews);
   }
 
   get isValid() {
