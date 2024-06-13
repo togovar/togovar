@@ -1,19 +1,9 @@
 import { HierarchyNode, hierarchy } from 'd3-hierarchy';
 import { CONDITION_TYPE } from '../definition.js';
-import { ADVANCED_CONDITIONS, API_URL } from '../global.js';
+import { ADVANCED_CONDITIONS } from '../global.js';
 import ConditionItemView from './ConditionItemView.js';
 import ConditionValueEditor from './ConditionValueEditor.js';
 import ConditionValues from './ConditionValues.js';
-
-const SELECTION_DEPENDED_ON_PARENT = {
-  consequence: true,
-  disease: false,
-  dataset: true,
-};
-const DISEASE_API = {
-  PATH: `${API_URL}/sparqlist/api/advanced_search_disease_selector`,
-  KEY: 'mesh_in',
-};
 
 type DataNode = {
   id: string;
@@ -30,7 +20,6 @@ type DataNodeWithChecked = DataNode & {
 export default class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   _lastValueViews: Array<HTMLDivElement>;
   _data: HierarchyNode<DataNodeWithChecked>;
-  _selectionDependedOnParent: any;
   _columns: HTMLElement;
   _description: HTMLElement;
   _nodesToShowInValueView: Array<HierarchyNode<DataNodeWithChecked>>;
@@ -39,8 +28,6 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     super(valuesView, conditionView);
 
     this._data = this._prepareData();
-    this._selectionDependedOnParent =
-      SELECTION_DEPENDED_ON_PARENT[this._conditionType];
 
     this._nodesToShowInValueView = [];
     // HTML
@@ -60,16 +47,12 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
 
   // public methods
 
-  /**
-   * on click pencil icon in value view, save last values
-   */
+  /** on click pencil icon in value view, save last values */
   keepLastValues() {
     this._lastValueViews = this._valueViews;
   }
 
-  /**
-   * Restore last values (on press Cancel button)
-   */
+  /** Restore last values (on press Cancel button) */
   restore() {
     //reset all checked
     this._data.each((datum) => {
@@ -133,7 +116,6 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
       column.innerHTML = `
         <ul>
           ${items
-
             .map((item) => {
               return `<li
               ${item.data.id ? `data-id="${item.data.id}"` : ''}
@@ -169,7 +151,6 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
         const changedNode = this._data.find((datum) => datum.data.id == nodeId);
 
         if (changedNode.children) this._updateChildren(changedNode, checked);
-
         if (changedNode.parent) this._updateParents(changedNode, checked);
 
         this._update();
@@ -216,26 +197,14 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
 
   _getItems(parentId?: string): Promise<HierarchyNode<DataNodeWithChecked>[]> {
     return new Promise((resolve, reject) => {
-      // TODO: alt allele, consequence と disease で、取り方が変わる
-      switch (this._conditionType) {
-        case CONDITION_TYPE.consequence:
-        case CONDITION_TYPE.dataset: {
-          if (!parentId) resolve(this._data.children);
-
-          const found = this._data.find((datum) => datum.data.id === parentId);
-
-          resolve(found?.children);
-          break;
-        }
-      }
+      if (!parentId) resolve(this._data.children);
+      const found = this._data.find((datum) => datum.data.id === parentId);
+      resolve(found?.children);
     });
   }
 
   _updateChildren(node: HierarchyNode<DataNodeWithChecked>, checked: boolean) {
     // reflect
-
-    if (!this._selectionDependedOnParent) return;
-
     if (!node.children || node.children.length === 0) return;
 
     node.descendants().forEach((d) => {
@@ -243,15 +212,11 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     });
   }
 
-  /**
-  Update the parent nodes of the given node
-  */
+  /** Update the parent nodes of the given node */
   _updateParents(
     dataNode: HierarchyNode<DataNodeWithChecked> | undefined,
     checked?: boolean
   ) {
-    if (!this._selectionDependedOnParent) return;
-
     if (!dataNode) return;
 
     if (typeof checked === 'boolean') {
@@ -311,9 +276,7 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     this._nodesToShowInValueView = concatNodesToParent(this._data);
   }
 
-  /**
-   * Get the label with path to show in the value view
-   */
+  /** Get the label with path to show in the value view */
   _getLabelForValueToShow(node: HierarchyNode<DataNodeWithChecked>) {
     const [, ...path] = node.path(this._data).reverse();
     return path.map((d) => d.data.label).join(' > ');
