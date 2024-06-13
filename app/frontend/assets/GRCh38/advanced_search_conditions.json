@@ -889,103 +889,103 @@
             },
             {
               "id": "156",
-              "value": "ncbn.ceu",
-              "label": "Utah residents (CEPH) with Northern and Western European ancestry"
-            },
-            {
-              "id": "157",
               "value": "ncbn.clm",
               "label": "Colombian in Medellín, Colombia"
             },
             {
-              "id": "158",
+              "id": "157",
               "value": "ncbn.esn",
               "label": "Esan in Nigeria"
             },
             {
-              "id": "159",
+              "id": "158",
               "value": "ncbn.fin",
               "label": "Finnish in Finland"
             },
             {
-              "id": "160",
+              "id": "159",
               "value": "ncbn.gwd",
               "label": "Gambian in Western Division – Mandinka"
             },
             {
-              "id": "161",
+              "id": "160",
               "value": "ncbn.gih",
               "label": "Gujarati Indians in Houston, Texas, USA"
             },
             {
-              "id": "162",
+              "id": "161",
               "value": "ncbn.chb",
               "label": "Han Chinese in Beijing, China"
             },
             {
-              "id": "163",
+              "id": "162",
               "value": "ncbn.chs",
               "label": "Han Chinese South"
             },
             {
-              "id": "164",
+              "id": "163",
               "value": "ncbn.ibs",
               "label": "Iberian Populations in Spain"
             },
             {
-              "id": "165",
+              "id": "164",
               "value": "ncbn.itu",
               "label": "Indian Telugu in the U.K."
             },
             {
-              "id": "166",
+              "id": "165",
               "value": "ncbn.jpt",
               "label": "Japanese in Tokyo, Japan"
             },
             {
-              "id": "167",
+              "id": "166",
               "value": "ncbn.khv",
               "label": "Kinh in Ho Chi Minh City, Vietnam"
             },
             {
-              "id": "168",
+              "id": "167",
               "value": "ncbn.lwk",
               "label": "Luhya in Webuye, Kenya"
             },
             {
-              "id": "169",
+              "id": "168",
               "value": "ncbn.msl",
               "label": "Mende in Sierra Leone"
             },
             {
-              "id": "170",
+              "id": "169",
               "value": "ncbn.mxl",
               "label": "Mexican Ancestry in Los Angeles CA USA"
             },
             {
-              "id": "171",
+              "id": "170",
               "value": "ncbn.pel",
               "label": "Peruvian in Lima Peru"
             },
             {
-              "id": "172",
+              "id": "171",
               "value": "ncbn.pur",
               "label": "Puerto Rican in Puerto Rico"
             },
             {
-              "id": "173",
+              "id": "172",
               "value": "ncbn.pjl",
               "label": "Punjabi in Lahore, Pakistan"
             },
             {
-              "id": "174",
+              "id": "173",
               "value": "ncbn.stu",
               "label": "Sri Lankan Tamil in the UK"
             },
             {
-              "id": "175",
+              "id": "174",
               "value": "ncbn.tsi",
               "label": "Toscani in Italia"
+            },
+            {
+              "id": "175",
+              "value": "ncbn.ceu",
+              "label": "Utah residents (CEPH) with Northern and Western European ancestry"
             },
             {
               "id": "176",
