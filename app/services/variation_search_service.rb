@@ -46,7 +46,7 @@ class VariationSearchService
     debug[:model] = model.nested_debugs if @options[:debug]
 
     raise Errors::APIValidationError.new('API validation error', errors: spec.errors) unless valid_spec
-    raise Errors::QueryParseError.new('Query parse error', errors: model.full_messages) unless valid_model
+    raise Errors::QueryParseError.new('Query parse error', errors: model.nested_errors.full_messages) unless valid_model
   end
 
   def results
