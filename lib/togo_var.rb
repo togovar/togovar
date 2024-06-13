@@ -1,3 +1,4 @@
+# TODO: remove if unused
 module TogoVar
   CONSEQUENCE_KEYS = %w[Allele Consequence IMPACT SYMBOL Gene Feature_type Feature BIOTYPE EXON INTRON HGVSc HGVSp
                       cDNA_position CDS_position Protein_position Amino_acids Codons Existing_variation DISTANCE

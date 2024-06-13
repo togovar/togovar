@@ -122,7 +122,7 @@ class VariationSearchService
     def frequencies(result)
       items = Variation::Datasets::FREQUENCY.map do |id|
         v = result.dig(:frequency)&.find { |x| x[:source] == id }
-        level = level(v&.dig(:allele, :count), v&.dig(:allele, :frequency))
+        level = level(v[:ac], v[:af])
 
         %Q[<div class="dataset" data-dataset="#{id}" data-frequency="#{level}"></div>]
       end

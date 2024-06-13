@@ -283,44 +283,26 @@ module API
       frequencies = Array(result[:frequency]).map(&:compact)
 
       frequencies.each do |x|
-        if x[:allele].present? && x.dig(:allele, :frequency).blank?
-          x[:allele][:frequency] = Float(x.dig(:allele, :count)) / Float(x.dig(:allele, :number), exception: false) || 0
+        if x[:ac].present? && x[:an].present? && x[:af].blank?
+          x[:af] = Float(x[:ac]) / Float(x[:an])
         end
       end
 
-      sources = case ENV['TOGOVAR_REFERENCE']
-                when 'GRCh37'
-                  %w[jga_ngs jga_snp tommo hgvd gem_j_wga gnomad_exomes gnomad_genomes]
-                else
-                  %w[jga_ngs jga_snp tommo hgvd gem_j_wga gnomad_genomes]
-                end
+      frequencies = Variation::Datasets::FREQUENCY.filter_map do |source|
+        next unless (frequency = frequencies.find { |x| x[:source] == source.to_s })
 
-      frequencies = sources.map do |source|
-        frequency = frequencies.find { |x| x[:source] == source }
-
-        hash = {
-          "#{source}_allele_alt": frequency&.dig(:allele, :count),
-          "#{source}_allele_total": frequency&.dig(:allele, :number),
-          "#{source}_alt_allele_freq": frequency&.dig(:allele, :frequency)
-        }
-
-        if source == 'jga_snp'
-          total = frequency&.dig(:allele, :number)
-          alt_homo = frequency&.dig(:genotype, :alt_homo_count)
-          hetero = frequency&.dig(:genotype, :hetero_count)
-          ref_homo = total && alt_homo && hetero ? (total / 2) - alt_homo - hetero : nil
-          hash.merge!({
-                        "#{source}_genotype_alt_alt": alt_homo,
-                        "#{source}_genotype_ref_alt": hetero,
-                        "#{source}_genotype_ref_ref": ref_homo,
-                      })
-        end
-
-        filters = Array(frequency&.dig(:filter))
+        filters = Array(frequency[:filter])
         filters = filters.join(ITEMS_SEPARATOR) if type == :csv
-        hash.merge!("#{source}_qc_status": filters.presence)
 
-        hash
+        {
+          "#{source}_allele_alt": frequency[:ac],
+          "#{source}_allele_total": frequency[:an],
+          "#{source}_alt_allele_freq": frequency[:af],
+          "#{source}_genotype_alt_alt": frequency[:aac],
+          "#{source}_genotype_ref_alt": frequency[:arc],
+          "#{source}_genotype_ref_ref": frequency[:rrc],
+          "#{source}_qc_status": filters
+        }.compact
       end
 
       frequencies.inject({}) { |memo, x| memo.merge(x) }

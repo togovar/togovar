@@ -194,25 +194,11 @@ class VariationSearchService
         frequencies = Array(variant[:frequency]).filter_map do |x|
           next if !@param[:expand_dataset] && !Variation::Datasets::FREQUENCY.include?(x[:source].to_sym)
 
-          if (af = x.dig(:allele, :frequency)).blank?
-            af = begin
-              Float(x.dig(:allele, :count)) / Float(x.dig(:allele, :number))
-            rescue
-              0
-            end
+          if x[:af].blank? && x[:ac].present? && x[:an].present?
+            x[:af] = Float(x[:ac]) / Float(x[:an])
           end
 
-          {
-            source: x[:source],
-            ac: x.dig(:allele, :count),
-            an: x.dig(:allele, :number),
-            af: af,
-            aac: x.dig(:genotype, :alt_homo_count),
-            arc: x.dig(:genotype, :hetero_count),
-            rrc: x.dig(:genotype, :ref_homo_count),
-            filter: Array(x[:filter]),
-            quality: x[:quality].presence
-          }.compact
+          x.compact
         end
 
         json.frequencies frequencies

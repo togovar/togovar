@@ -100,7 +100,7 @@ module Elasticsearch
                         must do
                           bool do
                             must_not do
-                              range 'frequency.allele.frequency' do
+                              range 'frequency.af' do
                                 gte frequency_from.to_f
                                 lte frequency_to.to_f
                               end
@@ -109,7 +109,7 @@ module Elasticsearch
                         end
                       else
                         must do
-                          range 'frequency.allele.frequency' do
+                          range 'frequency.af' do
                             gte frequency_from.to_f
                             lte frequency_to.to_f
                           end

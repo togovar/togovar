@@ -1,4 +1,13 @@
 class Variation
+  module Datasets
+    DATASETS = Rails.application.config.application[:datasets]
+    private_constant :DATASETS
+
+    FREQUENCY_WITH_FILTER = Array(DATASETS[:frequency].filter_map { |x| x[:id] if x[:filter] }).map(&:to_sym)
+    FREQUENCY = Array(DATASETS[:frequency].map { |x| x[:id] }).map(&:to_sym)
+    ALL = FREQUENCY + Array(DATASETS[:annotation].filter_map { |x| x[:id] }).map(&:to_sym)
+  end
+
   include Variation::Searchable
 
   module QueryHelper

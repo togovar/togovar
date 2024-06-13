@@ -38,9 +38,9 @@ class Variation
             indexes :id, type: :keyword
           end
           indexes :most_severe_consequence, type: :keyword
-          indexes :sift, type: :float
-          indexes :polyphen, type: :float
-          indexes :alphamissense, type: :float
+          indexes :sift, type: :double
+          indexes :polyphen, type: :double
+          indexes :alphamissense, type: :double
           indexes :vep, type: :nested do
             indexes :consequence_type, type: :keyword
             indexes :transcript_id, type: :keyword
@@ -54,9 +54,9 @@ class Variation
             indexes :hgvs_c, type: :keyword
             indexes :hgvs_p, type: :keyword
             indexes :hgvs_g, type: :keyword
-            indexes :sift, type: :float
-            indexes :polyphen, type: :float
-            indexes :alphamissense, type: :float
+            indexes :sift, type: :double
+            indexes :polyphen, type: :double
+            indexes :alphamissense, type: :double
           end
           indexes :clinvar do
             indexes :id, type: :long
@@ -70,28 +70,18 @@ class Variation
           indexes :frequency, type: :nested do
             indexes :source, type: :keyword
             indexes :filter, type: :keyword
-            indexes :quality, type: :float
-            indexes :allele do # TODO: flatten nested object
-              indexes :count, type: :long
-              indexes :number, type: :long
-              indexes :frequency, type: :float
-            end
-            indexes :genotype do # TODO: flatten nested object
-              indexes :alt_homo_count, type: :long
-              indexes :hetero_count, type: :long
-              indexes :ref_homo_count, type: :long
-            end
+            indexes :quality, type: :double
+            indexes :ac, type: :long
+            indexes :an, type: :long
+            indexes :af, type: :double
+            indexes :aac, type: :long
+            indexes :arc, type: :long
+            indexes :rrc, type: :long
+            indexes :ac_hemi, type: :long
+            indexes :an_hemi, type: :long
           end
         end
       end
-    end
-
-    module Datasets
-      DATASETS = Rails.application.config.application[:datasets]
-      private_constant :DATASETS
-      FREQUENCY_WITH_FILTER = Array(DATASETS[:frequency].filter_map { |x| x[:id] if x[:filter] }).map(&:to_sym)
-      FREQUENCY = FREQUENCY_WITH_FILTER + Array(DATASETS[:frequency].filter_map { |x| x[:id] unless x[:filter] }).map(&:to_sym)
-      ALL = FREQUENCY + Array(DATASETS[:annotation].filter_map { |x| x[:id] }).map(&:to_sym)
     end
 
     module ClassMethods

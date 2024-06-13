@@ -31,8 +31,8 @@ module TogoVar
 
             model = {}
             model.update(dataset: Dataset.new(@dataset)) if @dataset
-            model.update(frequency: Range.new(@frequency.merge(field: 'frequency.allele.frequency'))) if @frequency
-            model.update(count: Range.new(@count.merge(field: 'frequency.allele.count'))) if @count
+            model.update(frequency: Range.new(@frequency.merge(field: 'frequency.af'))) if @frequency
+            model.update(count: Range.new(@count.merge(field: 'frequency.ac'))) if @count
 
             @models = [model]
           end

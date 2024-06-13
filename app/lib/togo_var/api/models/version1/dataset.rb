@@ -5,15 +5,8 @@ module TogoVar
     module Models
       module Version1
         class Dataset < Base
-          ACCEPTABLE_DATASET = %w[
-            jga_ngs
-            jga_snp
-            hgvd
-            tommo
-            gem_j_wga
-            gnomad_genomes
-            gnomad_exomes
-          ].freeze
+          DATASETS = Rails.application.config.application.dig(:datasets, :frequency)
+          ACCEPTABLE_DATASET = (DATASETS.map { |x| x[:id] } + DATASETS.filter_map { |x| x[:groups] if x[:groups] }.flatten).sort
 
           attr_reader :name
 
