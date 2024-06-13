@@ -46,13 +46,6 @@
         "has_freq": true
       },
       {
-        "id": "ncbn",
-        "label": "NCBN",
-        "type": "boolean",
-        "default": "1",
-        "has_freq": true
-      },
-      {
         "id": "gnomad_genomes",
         "label": "gnomAD genomes",
         "type": "boolean",
