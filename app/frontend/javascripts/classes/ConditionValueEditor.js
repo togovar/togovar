@@ -67,6 +67,7 @@ class ConditionValueEditor {
    *
    */
   _clearValueViews() {
+    console.log('clear value views');
     this._valueViews.forEach((valueView) => {
       valueView.remove();
     });

@@ -64,7 +64,6 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
    * on click pencil icon in value view, save last values
    */
   keepLastValues() {
-    console.log('keepLastValues');
     this._lastValues = this._nodesToShowInValueView.map(
       (node) => node.data.value
     );
@@ -74,26 +73,18 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
    * Restore last values (on press Cancel button)
    */
   restore() {
-    console.log('restore', this._lastValues);
+    // reset all checked
     this._data.each((datum) => {
-      datum.data.checked = this._lastValues.indexOf(datum.data.value) !== -1;
+      datum.data.checked = false;
     });
 
-    // get checked leave nodes
-    const checkedLeaves = this._data
-      .leaves()
-      .filter((leaf) => leaf.data.checked);
-
-    console.log('checkedLeaves', checkedLeaves);
-    const checkedLeavesParentIds: (string | number)[] = [];
-
-    // update parents only for leaves that are not already updated
-    for (const leaf of checkedLeaves) {
-      if (checkedLeavesParentIds.includes(leaf.id)) continue;
-      checkedLeavesParentIds.push(leaf.id);
-      this._updateParents(leaf, true);
+    for (const lastValue of this._lastValues) {
+      const node = this._data.find((d) => d.data.value === lastValue);
+      if (!node) continue;
+      node.data.checked = true;
+      this._updateChildren(node, true);
+      this._updateParents(node, true);
     }
-
     this._update();
   }
 
@@ -114,9 +105,11 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
           value: '',
           children: data,
           checked: false,
+          indeterminate: false,
         });
         for (const child of hierarchyData.descendants()) {
           child.data.checked = false;
+          child.data.indeterminate = false;
         }
         return hierarchyData;
       }
@@ -233,57 +226,6 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
           resolve(found?.children);
           break;
         }
-        // case CONDITION_TYPE.disease:
-        //   {
-        //     let filtered = this._data.filter(
-        //       (datum) => datum.parent === parentId
-        //     );
-        //     if (filtered.length) {
-        //       resolve(filtered);
-        //     } else {
-        //       fetch(
-        //         `${DISEASE_API.PATH}${
-        //           parentId ? `?${DISEASE_API.KEY}=${parentId}` : ''
-        //         }`
-        //       )
-        //         .then((response) => response.json())
-        //         .then((data) => {
-        //           const newData = data.map((datum) => {
-        //             const label =
-        //               datum.label.indexOf('|') === -1
-        //                 ? datum.label
-        //                 : datum.label.substr(0, datum.label.indexOf('|'));
-        //             const newDatum = {
-        //               id: datum.categoryId,
-        //               label,
-        //               value: label,
-        //               checked: false,
-        //             };
-        //             // @ts-ignore
-        //             if (parentId) newDatum.parent = parentId;
-        //             // @ts-ignore
-        //             if (datum.hasChild) newDatum.children = [];
-        //             return newDatum;
-        //           });
-        //           this._data.push(...newData);
-        //           // ad ids to parent datum
-        //           if (parentId) {
-        //             const parentDatum = this._data.find(
-        //               (datum) => datum.id == parentId
-        //             );
-        //             parentDatum.children.push(
-        //               ...newData.map((datum) => datum.id)
-        //             );
-        //           }
-        //           resolve(newData);
-        //         })
-        //         .catch((error) => {
-        //           console.error(error);
-        //           reject(error);
-        //         });
-        //     }
-        //   }
-        //   break;
       }
     });
   }
@@ -293,8 +235,10 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
 
     if (!this._selectionDependedOnParent) return;
 
-    node.descendants().forEach((descendant) => {
-      descendant.data.checked = checked;
+    if (!node.children || node.children.length === 0) return;
+
+    node.descendants().forEach((d) => {
+      d.data.checked = checked;
     });
   }
 
@@ -350,6 +294,7 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
 
     this._processValuesToShowInValueView();
     this._clearValueViews();
+
     for (const valueViewToAdd of this._nodesToShowInValueView) {
       this._addValueView(
         valueViewToAdd.data.value,

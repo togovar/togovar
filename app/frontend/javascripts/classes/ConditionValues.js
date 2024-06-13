@@ -148,8 +148,10 @@ class ConditionValues {
   _clickCancelButton(e) {
     e.stopImmediatePropagation();
     if (this._conditionView.isFirstTime) {
+      console.log('isFirstTime');
       this._conditionView.remove();
     } else {
+      console.log('NOT FirstTime');
       for (const editor of this._editors) {
         editor.restore();
         if (
