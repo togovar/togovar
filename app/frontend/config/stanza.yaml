@@ -22,7 +22,6 @@ variant:
       dom: '#variant-frequency'
       options:
         assembly: $TOGOVAR_FRONTEND_REFERENCE
-        data-url: https://stg-grch38.togovar.org/
         no_data_message: 'No data'
 
     - id: variant-clinvar
