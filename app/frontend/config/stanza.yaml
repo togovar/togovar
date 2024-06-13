@@ -22,6 +22,7 @@ variant:
       dom: '#variant-frequency'
       options:
         assembly: $TOGOVAR_FRONTEND_REFERENCE
+        data-url: $TOGOVAR_FRONTEND_API_URL
         no_data_message: 'No data'
 
     - id: variant-clinvar
