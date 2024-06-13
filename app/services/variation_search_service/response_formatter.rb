@@ -198,7 +198,17 @@ class VariationSearchService
             x[:af] = Float(x[:ac]) / Float(x[:an])
           end
 
-          x.compact
+          if x[:af].blank? && x[:ac].present? && x[:an].present?
+            x[:af] = Float(x[:ac]) / Float(x[:an])
+          end
+
+          an_hemi = x.delete(:an_hemi)
+          if (ac_hemi = x.delete(:ac_hemi))
+            x[:hemi_alt] = ac_hemi
+            x[:hemi_ref] = an_hemi - ac_hemi if an_hemi
+          end
+
+          x.compact.sort.to_h
         end
 
         json.frequencies frequencies
