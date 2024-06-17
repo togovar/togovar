@@ -39,7 +39,7 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
 
   // Since webpackDevMiddleware uses memory-fs internally to store build
   // artifacts, we use it instead
-  const fs = middleware.fileSystem;
+  const fs = middleware.context.outputFileSystem;
 
   app.get('/:report(variant|gene|disease)/:id', (req, res) => {
     fs.readFile(path.resolve(compiler.outputPath, req.params.report, 'index.html'), (err, file) => {
