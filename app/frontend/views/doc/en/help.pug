@@ -348,9 +348,10 @@ block content
                     logarithmized-block-graph-frequency-view(data-dataset="hgvd" data-logarithmized-frequency="≥0.5")
                     | &nbsp; HGVD
                     br
-                  logarithmized-block-graph-frequency-view(data-dataset="ncbn" data-logarithmized-frequency="≥0.5")
-                  | &nbsp; NCBN
-                  br
+                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                    logarithmized-block-graph-frequency-view(data-dataset="ncbn" data-logarithmized-frequency="≥0.5")
+                    | &nbsp; NCBN
+                    br
                   logarithmized-block-graph-frequency-view(data-dataset="gnomad_genomes" data-logarithmized-frequency="≥0.5")
                   | &nbsp; gnomAD genomes
                   br

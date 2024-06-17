@@ -3,7 +3,7 @@
     "dataset": {
       "label": "Alternative allele frequency/count",
       "type": "peculiar",
-      "values": [
+      "values":[
         {
           "id": "1",
           "value": "gem_j_wga",
@@ -838,7 +838,7 @@
         {
           "id": "146",
           "value": "tommo",
-          "label": "ToMMo 8.3KJNP"
+          "label": "ToMMo"
         },
         {
           "id": "147",
@@ -847,242 +847,88 @@
         },
         {
           "id": "148",
-          "value": "ncbn",
-          "label": "NCBN",
-          "children": [
-            {
-              "id": "149",
-              "value": "ncbn.jpn",
-              "label": "Japanese",
-              "children": [
-                {
-                  "id": "150",
-                  "value": "ncbn.jpn.hondo",
-                  "label": "Hondo"
-                },
-                {
-                  "id": "151",
-                  "value": "ncbn.jpn.ryukyu",
-                  "label": "Ryukyu"
-                }
-              ]
-            },
-            {
-              "id": "152",
-              "value": "ncbn.acb",
-              "label": "African Caribbean in Barbados"
-            },
-            {
-              "id": "153",
-              "value": "ncbn.asw",
-              "label": "African Ancestry in SW USA"
-            },
-            {
-              "id": "154",
-              "value": "ncbn.beb",
-              "label": "Bengali in Bangladesh"
-            },
-            {
-              "id": "155",
-              "value": "ncbn.gbr",
-              "label": "British From England and Scotland"
-            },
-            {
-              "id": "156",
-              "value": "ncbn.cdx",
-              "label": "Chinese Dai in Xishuangbanna, China"
-            },
-            {
-              "id": "157",
-              "value": "ncbn.clm",
-              "label": "Colombian in Medellín, Colombia"
-            },
-            {
-              "id": "158",
-              "value": "ncbn.esn",
-              "label": "Esan in Nigeria"
-            },
-            {
-              "id": "159",
-              "value": "ncbn.fin",
-              "label": "Finnish in Finland"
-            },
-            {
-              "id": "160",
-              "value": "ncbn.gwd",
-              "label": "Gambian in Western Division – Mandinka"
-            },
-            {
-              "id": "161",
-              "value": "ncbn.gih",
-              "label": "Gujarati Indians in Houston, Texas, USA"
-            },
-            {
-              "id": "162",
-              "value": "ncbn.chb",
-              "label": "Han Chinese in Beijing, China"
-            },
-            {
-              "id": "163",
-              "value": "ncbn.chs",
-              "label": "Han Chinese South"
-            },
-            {
-              "id": "164",
-              "value": "ncbn.ibs",
-              "label": "Iberian Populations in Spain"
-            },
-            {
-              "id": "165",
-              "value": "ncbn.itu",
-              "label": "Indian Telugu in the U.K."
-            },
-            {
-              "id": "166",
-              "value": "ncbn.jpt",
-              "label": "Japanese in Tokyo, Japan"
-            },
-            {
-              "id": "167",
-              "value": "ncbn.khv",
-              "label": "Kinh in Ho Chi Minh City, Vietnam"
-            },
-            {
-              "id": "168",
-              "value": "ncbn.lwk",
-              "label": "Luhya in Webuye, Kenya"
-            },
-            {
-              "id": "169",
-              "value": "ncbn.msl",
-              "label": "Mende in Sierra Leone"
-            },
-            {
-              "id": "170",
-              "value": "ncbn.mxl",
-              "label": "Mexican Ancestry in Los Angeles CA USA"
-            },
-            {
-              "id": "171",
-              "value": "ncbn.pel",
-              "label": "Peruvian in Lima Peru"
-            },
-            {
-              "id": "172",
-              "value": "ncbn.pur",
-              "label": "Puerto Rican in Puerto Rico"
-            },
-            {
-              "id": "173",
-              "value": "ncbn.pjl",
-              "label": "Punjabi in Lahore, Pakistan"
-            },
-            {
-              "id": "174",
-              "value": "ncbn.stu",
-              "label": "Sri Lankan Tamil in the UK"
-            },
-            {
-              "id": "175",
-              "value": "ncbn.tsi",
-              "label": "Toscani in Italia"
-            },
-            {
-              "id": "176",
-              "value": "ncbn.ceu",
-              "label": "Utah residents (CEPH) with Northern and Western European ancestry"
-            },
-            {
-              "id": "177",
-              "value": "ncbn.yri",
-              "label": "Yoruba in Ibadan, Nigeria"
-            }
-          ]
-        },
-        {
-          "id": "178",
           "value": "gnomad_genomes",
           "label": "gnomAD Genomes",
           "children": [
             {
-              "id": "179",
+              "id": "149",
               "value": "gnomad_genomes.afr",
               "label": "African/African American"
             },
             {
-              "id": "180",
+              "id": "150",
               "value": "gnomad_genomes.amr",
               "label": "Admixed American"
             },
             {
-              "id": "181",
+              "id": "151",
               "value": "gnomad_genomes.asj",
               "label": "Ashkenazi Jewish"
             },
             {
-              "id": "182",
+              "id": "152",
               "value": "gnomad_genomes.eas",
               "label": "East Asian"
             },
             {
-              "id": "183",
+              "id": "153",
               "value": "gnomad_genomes.fin",
               "label": "European (Finnish)"
             },
             {
-              "id": "184",
+              "id": "154",
               "value": "gnomad_genomes.nfe",
               "label": "European (non-Finnish)"
             },
             {
-              "id": "185",
+              "id": "155",
               "value": "gnomad_genomes.oth",
               "label": "Remaining individuals"
             }
           ]
         },
         {
-          "id": "186",
+          "id": "156",
           "value": "gnomad_exomes",
           "label": "gnomAD Exomes",
           "children": [
             {
-              "id": "187",
+              "id": "157",
               "value": "gnomad_exomes.afr",
               "label": "African/African American"
             },
             {
-              "id": "188",
+              "id": "158",
               "value": "gnomad_exomes.amr",
               "label": "Admixed American"
             },
             {
-              "id": "189",
+              "id": "159",
               "value": "gnomad_exomes.asj",
               "label": "Ashkenazi Jewish"
             },
             {
-              "id": "190",
+              "id": "160",
               "value": "gnomad_exomes.eas",
               "label": "East Asian"
             },
             {
-              "id": "191",
+              "id": "161",
               "value": "gnomad_exomes.fin",
               "label": "European (Finnish)"
             },
             {
-              "id": "192",
+              "id": "162",
               "value": "gnomad_exomes.nfe",
               "label": "European (non-Finnish)"
             },
             {
-              "id": "193",
+              "id": "163",
               "value": "gnomad_exomes.oth",
               "label": "Remaining individuals"
             },
             {
-              "id": "194",
+              "id": "164",
               "value": "gnomad_exomes.sas",
               "label": "South Asian"
             }
