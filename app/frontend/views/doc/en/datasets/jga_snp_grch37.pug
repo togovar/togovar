@@ -5,7 +5,7 @@ article.common-document
     section.section
       h3.sectiontitle Summary
       p.body
-        | JGA-SNP dataset is a frequency dataset that has aggregated variants detected from SNP-chip data in the
+        | The JGA-SNP dataset is a frequency dataset that aggregates variants detected from SNP-chip data in the
         |
         a(target='_blank', href='https://humandbs.dbcls.jp/en/')
           | NBDC Human Database
@@ -13,9 +13,15 @@ article.common-document
         a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index-e.html')
           | Japanese Genotype-phenotype Archive (JGA)
         | . All JGA data for which an approval for creating secondary data has been obtained are to be aggregated.
-        | Note that no variants with 5 alternative alleles or less are included.
+        | In June 2024, allele and genotype frequencies aggregated by sex for 45 diseases were added from SNP genotyping of 182,557 individuals, performed by
+        |
+        a.hyper-text.-external(href='https://biobankjp.org/en/') BioBank Japan
+        | and
+        |
+        a.hyper-text.-external(href='https://www.ims.riken.jp/') RIKEN
+        |. Note that variants with alternative allele counts of five or fewer are not included.
       ul.unordered-list
-        li Version/Last updated: 2018/06/01
+        li Version/Last updated: 2024/6/28
         li Sample size: 183,884
         li Number of detected variants (alternative alleles): 1,966,919
         li Number of variants after the exclusion: 1,249,724
@@ -128,7 +134,7 @@ article.common-document
             td._align-right 183,884
 
     section.section
-      h3#diseases.sectiontitle List of 45 diseases included in JGAD000123 from BioBank Japan and Riken
+      h3#diseases.sectiontitle List of 45 diseases included in JGAD000123 from BioBank Japan and RIKEN
       p
         |
         | We have published the frequencies aggregated by disease and sex for the dataset JGAD000123 in June 2024.
