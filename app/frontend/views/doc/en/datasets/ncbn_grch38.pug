@@ -5,7 +5,7 @@ article.common-document
     section.section
       h3.sectiontitle Summary
       p.body
-        | The NCBN dataset consists of  allele and genotype frequencies obtained through whole-genome sequence (WGS) analysis of healthy individuals for cancer and rare disease studies, collected by
+        | The NCBN dataset consists of  allele and genotype frequencies obtained through whole-genome sequence (WGS) analysis of control individuals for cancer and rare disease studies, collected by
         |
         a.hyper-text.-external(target='blank', href='https://ncbiobank.org/') the National Center BioBank Network (NCBN)
         |. Regional variations were taken into consideration. The dataset includes frequencies for the mainland Japanese population and the Ryukyu population, determined through PCA analysis.
@@ -68,22 +68,22 @@ article.common-document
               | Kawai Y, Watanabe Y, Omae Y, Miyahara R, Khor S-S, Noiri E, et al. (2023)
               | Exploring the genetic diversity of the Japanese population: Insights from a large-scale whole genome sequencing analysis. 
               | PLoS Genet 19(12): e1010625. 
-              a(target="_blank", href="https://doi.org/10.1371/journal.pgen.1010625") https://doi.org/10.1371/journal.pgen.1010625
+              a.hyper-text.-external(target="_blank", href="https://doi.org/10.1371/journal.pgen.1010625") https://doi.org/10.1371/journal.pgen.1010625
               | .
 
     section.section
-      h3#jga_datasets.sectiontitle Included controlled-access datasets
-      p
-        | By specifying the JGAID, you can apply for data use to
+      h3.sectiontitle Download VCF file created by the data provider [Unrestricted access]
+      .subsection
+        p.body
+        | You can download an original VCF file
         |
-        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/data-use')
-          | the NBDC Human database
-        | .
+        a.hyper-text.-external(href='https://humandbs.dbcls.jp/files/hum0331/NCBN-freeze2.sampleQC.GTfilter.freq.vcf.gz') NCBN-freeze2.sampleQC.GTfilter.freq.vcf.gz
+        |
+        | (69.24 GB) from the NBDC human database.
       table.table._column-span-all
         thead
           tr
-            th JGAID
-            th Human DB ID
+            th NBDC Human DB
             th Study title
             th Participants
             th
@@ -94,16 +94,14 @@ article.common-document
         tbody
           tr
               td
-                a(target='_blank', href='https://humandbs.dbcls.jp/en/hum0331-v1#hum0331.v1.freq.v1') hum0331.v1.freq.v1
-              td
-                a(target='_blank', href='https://humandbs.dbcls.jp/en/hum0331-v3') hum0331
+                a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/hum0331-v1#hum0331.v1.freq.v1') hum0331.v1.freq.v1
               td Construction of control data for the promotion of genomic medicine for cancers and rare diseases
               td healthy individuals (Japanese)
               td._align-right 9,290
               td Katsushi Tokunaga
           tfoot
             tr
-              th._align-center(colspan='4') Total
+              th._align-center(colspan='3') Total
               th._align-right 9,290
 
     section.section

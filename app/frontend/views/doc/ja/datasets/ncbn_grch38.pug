@@ -7,7 +7,7 @@ article.common-document
         p.body
           | NCBNデータセットは、
           a.hyper-text.-external(target='blank', href='https://ncbiobank.org/') ナショナルセンター・バイオバンクネットワーク（NCBN）
-          | が収集した、がんおよび希少疾患研究のコントロールのための健常者の全ゲノムシーケンス（WGS）解析を通じて得られたアレルおよびジェノタイプの頻度です。
+          | が収集した、がんおよび希少疾患研究のコントロール群の全ゲノムシーケンス（WGS）解析を通じて得られたアレルおよびジェノタイプの頻度です。
           | 地域性を考慮してサンプルを収集しています。主成分分析により得られた本土および琉球クラスターのアレル頻度と遺伝子型頻度を含んでいます。
           | また、
           a.hyper-text.-external(target='blank', href='https://www.internationalgenome.org/') 国際1000人ゲノムプロジェクト(1KGP)
@@ -61,16 +61,17 @@ article.common-document
                 a(target="_blank", href="https://doi.org/10.1371/journal.pgen.1010625") https://doi.org/10.1371/journal.pgen.1010625
                 | .
       section.section
-        h3#jga_datasets.sectiontitle 含まれる制限公開データセット一覧
-        p
-          | データセットIDを指定して
-          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/data-use') NBDCヒトデータベースにデータ利用申請
-          | できます。
+        h3.sectiontitle データ提供者が作成したVCFファイルをダウンロード [非制限公開データ]
+        p.body
+          | NBDCヒトデータベースからオリジナルVCFファイル
+          |
+          a(href='https://humandbs.dbcls.jp/files/hum0331/NCBN-freeze2.sampleQC.GTfilter.freq.vcf.gz') NCBN-freeze2.sampleQC.GTfilter.freq.vcf.gz
+          |
+          | (69.24 GB)をダウンロードできます。
         table.table._column-span-all
           thead
             tr
-              th データセットID
-              th ヒトDB
+              th NBDCヒトDB
               th 研究題目
               th 対象集団
               th サンプル数
@@ -79,15 +80,13 @@ article.common-document
             tr
               td
                 a(target='_blank', href='https://humandbs.dbcls.jp/hum0331-v1#hum0331.v1.freq.v1') hum0331.v1.freq.v1
-              td
-                a(target='_blank', href='https://humandbs.dbcls.jp/hum0331-v3') hum0331
               td Construction of control data for the promotion of genomic medicine for cancers and rare diseases
               td healthy individuals (Japanese)
               td._align-right 9,290
               td Katsushi Tokunaga
           tfoot
             tr
-              th._align-center(colspan='4') Total
+              th._align-center(colspan='3') Total
               th._align-right 9,290
 
       section.section
