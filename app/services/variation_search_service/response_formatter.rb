@@ -111,6 +111,12 @@ class VariationSearchService
         json.stop variant[:stop]
         json.reference variant[:reference].presence || ''
         json.alternate variant[:alternate].presence || ''
+        vcf = {
+          position: variant.dig(:vcf, :position),
+          reference: variant.dig(:vcf, :reference),
+          alternate: variant.dig(:vcf, :alternate)
+        }
+        json.vcf vcf
 
         if (dbsnp = Array(variant[:xref]).filter { |x| x[:source] = 'dbSNP' }.map { |x| x[:id] }).present?
           json.existing_variations dbsnp
