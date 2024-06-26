@@ -145,7 +145,6 @@ class VariationSearchService
           external_link[:tommo] = [{ title: query, xref: "#{XREF_TEMPLATE[:tommo]}?#{q}" }]
         end
         if variant[:frequency]&.find { |x| x[:source] =~ /^gnomad/ }
-          vcf = variant[:vcf]
           id = "#{variant.dig(:chromosome, :label)}-#{vcf[:position]}-#{vcf[:reference]}-#{vcf[:alternate]}"
           external_link[:gnomad] = [{ title: id, xref: format(XREF_TEMPLATE[:gnomad], id: id) }]
         end
