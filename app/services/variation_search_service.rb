@@ -15,8 +15,12 @@ class VariationSearchService
     @debug = {}
     @errors = {}
 
-    if @params[:body] && @params[:offset]&.respond_to?(:to_i)
-      @params[:body][:offset] = @params[:offset].to_i
+    if @params[:body] && (offset = @params[:offset]).present?
+      @params[:body][:offset] = if offset.respond_to?(:to_i)
+                                  offset.to_i
+                                else
+                                  offset
+                                end
     end
   end
 
@@ -102,7 +106,7 @@ class VariationSearchService
   end
 
   def paging?
-    (offset = @params.dig(:body, :offset)).present? && (offset != 0 || offset.is_a?(Array))
+    (offset = @params.dig(:offset)).present? && offset != 0
   end
 
   def stat_query

@@ -51,7 +51,14 @@ module API
     private
 
     def variant_params
-      @variant_params ||= params.permit(:debug, :pretty, :version, :formatter, :limit, :offset, query: {}, body: {})
+      return @variant_params if @variant_params
+
+      hash = params.permit(:debug, :pretty, :version, :formatter, :limit, :offset, query: {}, body: {})
+      if (offset = params.permit(offset: [])[:offset]).present?
+        hash.merge!(offset: offset)
+      end
+
+      hash
     end
 
     def gene_params
