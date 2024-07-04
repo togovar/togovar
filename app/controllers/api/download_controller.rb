@@ -209,7 +209,7 @@ module API
     ITEMS_SEPARATOR = ';'
 
     def molecular_annotations(result, type = :json)
-      id = (v = result[:id]).present? ? "tgv#{v}" : nil
+      id = result[:id].present? ? "tgv#{result[:id]}" : nil
       dbsnp = Array(result[:xref])
                 .filter { |x| x[:source] = 'dbSNP' }
                 .map { |x| x[:id] }
@@ -236,13 +236,19 @@ module API
       sift = vep.map { |x| x[:sift] }.compact.min
       polyphen = vep.map { |x| x[:polyphen] }.compact.max
       alpha_misssense = vep.map { |x| x[:alpha_misssense] }.compact.max
-      conditions = if (conditions = result.dig(:clinvar, :conditions)).present?
-                     if type == :csv
-                       conditions.map { |x| "#{x[:condition]}=#{x[:interpretation].join('|').presence || '-'}" }.join(ITEMS_SEPARATOR)
-                     else
-                       conditions.map { |x| [x[:condition], x[:interpretation]] }.to_h
-                     end
-                   end
+
+      conditions = Hash.new { |hash, key| hash[key] = Disease.find(key).results.first&.dig('_source', 'name') }
+      condition = Array(result.dig(:clinvar, :conditions)).map do |x|
+        {
+          conditions: Array(x[:medgen]).map { |v| { name: conditions[v] || CLINVAR_CONDITION_NOT_PROVIDED, medgen: v } },
+          interpretations: Array(x[:interpretation]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(',', '').tr(' ', '_').to_sym)&.label },
+          submission_count: x[:submission_count]
+        }
+      end
+      if type == :csv
+        condition = condition.map { |x| "#{x[:conditions].map { |y| y[:name] || '-' }.join('|')}=#{x[:interpretations].join('|').presence || '-'}" }
+                             .join(ITEMS_SEPARATOR)
+      end
 
       columns = output_columns
       data = {}
@@ -260,7 +266,7 @@ module API
       data[:type] = result[:type] if columns.include?(:type)
       data[:gene] = symbols.presence if columns.include?(:gene)
       data[:consequence] = consequences.presence if columns.include?(:consequence)
-      data[:condition] = conditions if columns.include?(:condition)
+      data[:condition] = condition if columns.include?(:condition)
       if columns.include?(:sift)
         data[:sift_qualitative_prediction] = sift ? Sift.find_by_value(sift).label : nil
         data[:sift_score] = sift
