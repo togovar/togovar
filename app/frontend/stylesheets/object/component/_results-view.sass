@@ -70,6 +70,30 @@
             transform: rotate(-20deg) translateY(-6px)
             top: 50%
             left: 18px
+        > .icon
+          &[data-remains]::before
+            content: "+" attr(data-remains)
+            display: inline-block
+            font-size: 10px
+            line-height: 14px
+            border: solid 1px $COLOR_GRAY
+            border-radius: 7px
+            background-color: lighten($COLOR_GRAY, 35%)
+            padding: 0 4px
+            margin-left: 4px
+            vertical-align: middle
+          &[data-remains="0"]::before, &[data-remains=""]::before
+            display: none
+          &[data-mgend]::after
+            content: ""
+            position: relative
+            margin-left: 6px
+            top: 3px
+            display: inline-block
+            width: 16px
+            height: 16px
+            background: url(../images/mgend-logo.png) no-repeat
+            background-size: contain
         > .consequence-item, > .dataset-icon, > .clinical-significance, > .variant-function
           display: inline-block
           vertical-align: middle

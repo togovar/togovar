@@ -88,7 +88,7 @@ export default class ResultsRowView {
           break;
         case 'clinical_significance': // clinical significance
           html +=
-            '<td class="clinical_significance" data-remains=""><div href="" class="clinical-significance" data-value=""></div><a class="hyper-text -internal" target="_blank"></a></td>';
+            '<td class="clinical_significance"><div href="" class="clinical-significance" data-value=""></div><a class="hyper-text -internal" target="_blank"></a><span class="icon" data-remains="" data-mgend=""></span></td>';
           break;
         case 'alphamissense': // AlphaMissense
           html +=
@@ -146,6 +146,7 @@ export default class ResultsRowView {
       '.clinical-significance'
     );
     this.tdClinicalAnchor = this.tdClinical.querySelector('a');
+    this.tdClinicalIcon = this.tdClinical.querySelector('.icon');
   }
 
   update() {
@@ -285,7 +286,6 @@ export default class ResultsRowView {
         case 'clinical_significance':
           {
             if (result.significance && result.significance.length) {
-              this.tdClinical.dataset.remains = result.significance.length - 1;
               this.tdClinicalSign.dataset.value =
                 result.significance[0].interpretations[0];
               this.tdClinicalAnchor.textContent =
@@ -294,11 +294,16 @@ export default class ResultsRowView {
                 'href',
                 `/disease/${result.significance[0].conditions[0].medgen}`
               );
+              this.tdClinicalIcon.dataset.remains = result.significance.length - 1;
+              if (result.significance[0].conditions[0].medgen) {
+                this.tdClinicalIcon.dataset.mgend = true;
+              }
             } else {
-              this.tdClinical.dataset.remains = 0;
               this.tdClinicalSign.dataset.value = '';
               this.tdClinicalAnchor.textContent = '';
               this.tdClinicalAnchor.setAttribute('href', '');
+              this.tdClinicalIcon.dataset.remains = 0;
+              this.tdClinicalIcon.dataset.mgend = false;
             }
           }
           break;
