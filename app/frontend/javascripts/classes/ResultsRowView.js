@@ -294,9 +294,13 @@ export default class ResultsRowView {
                 'href',
                 `/disease/${result.significance[0].conditions[0].medgen}`
               );
+
+              // TODO: 10/20にmedgenの表示があっているかを確認
               this.tdClinicalIcon.dataset.remains = result.significance.length - 1;
               if (result.significance[0].conditions[0].medgen) {
                 this.tdClinicalIcon.dataset.mgend = true;
+              } else {
+                this.tdClinicalIcon.dataset.mgend = false;
               }
             } else {
               this.tdClinicalSign.dataset.value = '';

@@ -70,6 +70,7 @@
             transform: rotate(-20deg) translateY(-6px)
             top: 50%
             left: 18px
+        // TODO: 10/20にmedgenの表示があっているかを確認
         > .icon
           &[data-remains]::before
             content: "+" attr(data-remains)
@@ -84,7 +85,7 @@
             vertical-align: middle
           &[data-remains="0"]::before, &[data-remains=""]::before
             display: none
-          &[data-mgend]::after
+          &[data-mgend="true"]::after
             content: ""
             position: relative
             margin-left: 6px

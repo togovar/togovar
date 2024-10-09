@@ -45,14 +45,18 @@
   &[data-dataset="bbj"]
     &:before
       color: $COLOR_DATASET_BBJ
-  &[data-dataset="clinvar"], &[data-dataset="gnomad_genomes"], &[data-dataset="gnomad_exomes"]
+  &[data-dataset="gnomad_genomes"], &[data-dataset="gnomad_exomes"]
     &:before
       color: $COLOR_DATASET_FOREIGN
   // Disease
-  &[data-dataset="clinvar"], &[data-dataset="mgend"]
+  // TODO: 10/20 iconの設定cntent, colorの確認
+  &[data-dataset="mgend"], &[data-dataset="clinvar"]
+    &::before
+      // content: $CHAR_DATASET iconを変更する
+      color: $COLOR_DATASET_DISEASE
     > .properties
       &::before
-        color: $COLOR_SIGN_DANGEROUS
+        color: $COLOR_DATASET_DISEASE
         content: "Disease"
   // WGS
   &[data-dataset="tommo"], &[data-dataset="ncbn"], &[data-dataset="gem_j_wga"], &[data-dataset="gnomad_genomes"]
