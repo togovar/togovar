@@ -18,6 +18,7 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
     this.update();
   }
 
+  // TODO: 10/20にこの表示で良いかを確認
   update() {
     let html = '';
     if (StoreManager.getData('selectedRow') !== undefined) {
@@ -35,10 +36,16 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
             significance.interpretations.map(interpretation => `
             <dd>
               <div class="clinical-significance" data-value="${interpretation}">
-              </div>${master.items.find(item => item.id === interpretation).label}
-            </dd>`).join('') :
+                ${master.items.find(item => item.id === interpretation).label}
+              </div>
+              <div class="disease-category">
+                <span class="mgend">${significance.conditions[0].medgen ? 'MGeND' : ''}</span>
+                <span class="clinvar">${significance.conditions[0].name ? 'ClinVar' : ''}</span>
+              </div >
+            </dd > `).join('') :
             ''
-          }</dl>`).join('');
+          }
+          </dl>`).join('');
         this.elm.classList.remove('-notfound');
       }
     } else {
