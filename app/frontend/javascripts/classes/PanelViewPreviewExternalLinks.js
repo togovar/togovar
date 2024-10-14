@@ -31,6 +31,8 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
           });
         }
 
+        // TODO: 10/20ここにMGeNDが追加されるはず。現在は内容を取得できないため、未実装
+
         // ClinVar
         if (record.external_link.clinvar) {
           record.external_link.clinvar.forEach((item) => {
@@ -57,11 +59,11 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
         html = `
                   <tbody>
                     ${list
-                      .map(
-                        (item) =>
-                          `<tr><th>${item.title}</th><td>${item.content}</td></tr>`
-                      )
-                      .join('')}
+            .map(
+              (item) =>
+                `<tr><th>${item.title}</th><td>${item.content}</td></tr>`
+            )
+            .join('')}
                   </tbody>
                 `;
         this.elm.classList.remove('-notfound');
