@@ -1,5 +1,6 @@
 import { CONDITION_TYPE } from '../definition.js';
 import ConditionValueEditorCheckboxes from './ConditionValueEditorCheckboxes.js';
+import ConditionValueEditorClinicalSignificance from "./ConditionValueEditorClinicalSignificance.js";
 import ConditionValueEditorColumns from './ConditionValueEditorColumns.js';
 import ConditionValueEditorColumnsDataset from './ConditionValueEditorColumnsDataset.ts';
 import ConditionValueEditorDisease from './ConditionValueEditorDisease.js';
@@ -18,7 +19,7 @@ class ConditionValues {
   constructor(conditionView, defaultValues) {
     /** @property {ConditionItemView} _conditionView */
     this._conditionView = conditionView;
-    /** @property {ConditionValueEditorCheckboxes[]|ConditionValueEditorColumns[]|ConditionValueEditorFrequencyCount[]|ConditionValueEditorDisease[]|ConditionValueEditorTextField[]} _editor */
+    /** @property {ConditionValueEditorCheckboxes[]|ConditionValueEditorClinicalSignificance[]|ConditionValueEditorColumns[]|ConditionValueEditorFrequencyCount[]|ConditionValueEditorDisease[]|ConditionValueEditorTextField[]} _editor */
     this._editors = [];
 
     // HTML
@@ -50,9 +51,14 @@ class ConditionValues {
     // TODO: conditionType は ADVANCED_CONDITIONS[conditionView.conditionType].type を参照して処理をスイッチさせたい
     switch (conditionView.conditionType) {
       case CONDITION_TYPE.type:
-      case CONDITION_TYPE.significance:
         this._editors.push(
           new ConditionValueEditorCheckboxes(this, this._conditionView)
+        );
+        break;
+
+      case CONDITION_TYPE.significance:
+        this._editors.push(
+          new ConditionValueEditorClinicalSignificance(this, this._conditionView)
         );
         break;
 

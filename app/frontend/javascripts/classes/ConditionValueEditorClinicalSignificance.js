@@ -1,8 +1,8 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
 import { ADVANCED_CONDITIONS } from '../global.js';
 
-/** for clinical significance, variant type */
-export default class ConditionValueEditorCheckboxes extends ConditionValueEditor {
+/** for clinical significance */
+export default class ConditionValueEditorClinicalSignificance extends ConditionValueEditor {
   /**
    * @param {ConditionValues} valuesView
    * @param {ConditionItemView} conditionView */
@@ -24,10 +24,12 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
           (value) => `
       <li data-value="${value.value}">
         <label>
-          <input
+        <input
           type="checkbox"
           value="${value.value}"
-          data-label="${value.label}">${value.label}
+          data-label="${value.label}">
+            ${`<span class="clinical-significance" data-value="${value.value}"></span>`}
+            ${value.label}
         </label>
       </li>`
         )
