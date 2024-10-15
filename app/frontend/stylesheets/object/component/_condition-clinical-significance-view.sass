@@ -1,0 +1,119 @@
+// TODO: 10/20にこのデザインでいいかを確認
+.clinical-significance-view
+  > .buttons
+    padding: 4px var(--padding-side)
+    border-bottom: dotted 1px $COLOR_SEPARATOR_SUB
+
+  > .dataset-title
+    font-size: 14px
+    font-weight: bold
+    padding-top: 2px
+    padding-left: var(--padding-side)
+    &::before
+      content: var(--char-dataset)
+      font-family: fontello
+      margin-right: 4px
+      font-size: 12px
+
+  > hr
+    margin: 0
+    border: dotted 1px $COLOR_SEPARATOR_SUB
+
+  > .checkboxes
+    margin: 0
+    font-size: 14px
+    display: grid
+    grid-template-columns: 1fr 1fr 1fr
+    row-gap: 3px
+    > li
+      display: inline-block
+      line-height: 18px
+      margin-right: 5px
+
+      &[data-source="clinvar"]
+        &[data-value="LP"]
+          grid-column: 1 / 2
+          grid-row: 2 / 3
+        &[data-value="PLP"]
+          grid-column: 1 / 2
+          grid-row: 3 / 4
+        &[data-value="LPLP"]
+          grid-column: 1 / 2
+          grid-row: 4 / 5
+        &[data-value="ERA"]
+          grid-column: 1 / 2
+          grid-row: 5 / 6
+        &[data-value="LRA"]
+          grid-column: 1 / 2
+          grid-row: 6 / 7
+        &[data-value="URA"]
+          grid-column: 1 / 2
+          grid-row: 7 / 8
+        &[data-value="US"]
+          grid-column: 2 / 3
+          grid-row: 1 / 2
+        &[data-value="LB"]
+          grid-column: 2 / 3
+          grid-row: 2 / 3
+        &[data-value="B"]
+          grid-column: 2 / 3
+          grid-row: 3 / 4
+        &[data-value="CI"]
+          grid-column: 2 / 3
+          grid-row: 4 / 5
+        &[data-value="DR"]
+          grid-column: 2 / 3
+          grid-row: 5 / 6
+        &[data-value="CS"]
+          grid-column: 2 / 3
+          grid-row: 6 / 7
+        &[data-value="RF"]
+          grid-column: 2 / 3
+          grid-row: 7 / 8
+        &[data-value="A"]
+          grid-column: 3 / 4
+          grid-row: 1 / 2
+        &[data-value="PR"]
+          grid-column: 3 / 4
+          grid-row: 2 / 3
+        &[data-value="AF"]
+          grid-column: 3 / 4
+          grid-row: 3 / 4
+        &[data-value="O"]
+          grid-column: 3 / 4
+          grid-row: 4 / 5
+        &[data-value="NP"]
+          grid-column: 3 / 4
+          grid-row: 5 / 6
+        &[data-value="AN"]
+          grid-column: 3 / 4
+          grid-row: 6 / 7
+
+      &[data-source="mgend"]
+        &[data-value="PLP"]
+          grid-column: 1 / 2
+          grid-row: 1 / 2
+        &[data-value="LP"]
+          grid-column: 1 / 2
+          grid-row: 2 / 3
+        &[data-value="US"]
+          grid-column: 1 / 2
+          grid-row: 3 / 4
+        &[data-value="LB"]
+          grid-column: 2 / 3
+          grid-row: 1 / 2
+        &[data-value="B"]
+          grid-column: 2 / 3
+          grid-row: 2 / 3
+        &[data-value="DR"]
+          grid-column: 2 / 3
+          grid-row: 3 / 4
+        &[data-value="O"]
+          grid-column: 3 / 4
+          grid-row: 1 / 2
+        &[data-value="NP"]
+          grid-column: 3 / 4
+          grid-row: 2 / 3
+
+      > label
+        font-weight: bold

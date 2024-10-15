@@ -1,28 +1,71 @@
+// TODO: 10/20 MGeNDが加わるため、下記の処理を確認する必要がある
+
 import ConditionValueEditor from './ConditionValueEditor.js';
 import { ADVANCED_CONDITIONS } from '../global.js';
+import ConditionValues from './ConditionValues.js';
+import ConditionItemView from './ConditionItemView.js';
+
+type DatasetValue = {
+  value: string;
+  label: string;
+};
+
+type Dataset = {
+  label: string;
+  type: string;
+  values: Record<'clinvar' | 'mgend', DatasetValue[]>;
+};
 
 /** for clinical significance */
 export default class ConditionValueEditorClinicalSignificance extends ConditionValueEditor {
+  _checkboxes: Array<HTMLInputElement>;
+  _lastValues: Array<string>;
+
   /**
    * @param {ConditionValues} valuesView
    * @param {ConditionItemView} conditionView */
-  constructor(valuesView, conditionView) {
+  constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
 
     // HTML
-    const master = ADVANCED_CONDITIONS[this._conditionType];
+    const dataset: Dataset = ADVANCED_CONDITIONS[this._conditionType];
+
     this._createElement(
-      'checkboxes-editor-view',
+      'clinical-significance-view',
       `
     <header>Select ${this._conditionType}</header>
     <div class="buttons">
       <button class="button-view -weak">Select all</button>
       <button class="button-view -weak">Clear all</button>
     </div>
-    <ul class="checkboxes body">${master.values
+
+    <div class="dataset-title">Clinvar</div>
+    <ul class="checkboxes body">
+      ${dataset.values.clinvar
         .map(
           (value) => `
-      <li data-value="${value.value}">
+      <li data-value="${value.value}" data-source="clinvar">
+        <label>
+        <input
+          type="checkbox"
+          value="${value.value}"
+          data-label="${value.label}">
+            ${`<span class="clinical-significance" data-value="${value.value}"></span>`}
+            ${value.label}
+        </label>
+      </li>`
+        )
+        .join('')}
+    </ul>
+
+    <hr/>
+
+    <div class="dataset-title">MGeND</div>
+    <ul class="checkboxes body">
+      ${dataset.values.mgend
+        .map(
+          (value) => `
+      <li data-value="${value.value}" data-source="mgend">
         <label>
         <input
           type="checkbox"
@@ -66,12 +109,22 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
 
   // public methods
 
+  // TODO: 10/20 MGeNDが加わるため、下記の処理を変更する必要がある
+
   keepLastValues() {
-    this._lastValues = Array.from(
-      this._valuesView.conditionView.valuesElement.querySelectorAll(
-        ':scope > condition-item-value-view'
-      )
-    ).map((value) => value.value);
+    // this._lastValues = Array.from(
+    //   this._valuesView.conditionView.valuesElement.querySelectorAll(
+    //     ':scope > condition-item-value-view'
+    //   )
+    // ).map((value) => value.value);
+
+    // this._lastValues = Array.from(
+    //   this._valuesView.conditionView.valuesElement.querySelectorAll(
+    //     ':scope > condition-item-value-view'
+    //   )
+    // ).map((value) => value.values);
+
+    console.log(this._lastValues);
   }
 
   restore() {

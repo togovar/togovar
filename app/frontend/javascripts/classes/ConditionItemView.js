@@ -251,6 +251,20 @@ class ConditionItemView extends ConditionView {
         };
       }
 
+      // TODO: 10/20
+      // https://grch38.togovar.org/api
+      // https://github.com/togovar/meeting/issues/180#issuecomment-2370455485
+      // sourceを設定するとありますが、clinvarとmgendを同時に選択することはできるのでしょうか。
+      case CONDITION_TYPE.significance: {
+        return {
+          [this._conditionType]: {
+            relation: this._elm.dataset.relation,
+            // source: 'clinvar',
+            terms: valueElements.map((value) => value.value),
+          },
+        };
+      }
+
       default:
         return {
           [this._conditionType]: {

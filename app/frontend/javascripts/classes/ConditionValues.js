@@ -1,6 +1,6 @@
 import { CONDITION_TYPE } from '../definition.js';
 import ConditionValueEditorCheckboxes from './ConditionValueEditorCheckboxes.js';
-import ConditionValueEditorClinicalSignificance from "./ConditionValueEditorClinicalSignificance.js";
+import ConditionValueEditorClinicalSignificance from "./ConditionValueEditorClinicalSignificance.ts";
 import ConditionValueEditorColumns from './ConditionValueEditorColumns.js';
 import ConditionValueEditorColumnsDataset from './ConditionValueEditorColumnsDataset.ts';
 import ConditionValueEditorDisease from './ConditionValueEditorDisease.js';
@@ -48,7 +48,6 @@ class ConditionValues {
       .addEventListener('click', this._clickCancelButton.bind(this));
 
     /** initialization by types */
-    // TODO: conditionType は ADVANCED_CONDITIONS[conditionView.conditionType].type を参照して処理をスイッチさせたい
     switch (conditionView.conditionType) {
       case CONDITION_TYPE.type:
         this._editors.push(
