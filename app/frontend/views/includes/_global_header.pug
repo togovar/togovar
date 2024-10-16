@@ -50,8 +50,10 @@ header#GlobalHeader
 
     if locals.currentPage === "home"
       ul.menu.config
-        li.menu-button Configuration
+        li.menu-button.config
     else if locals.currentPage === "variant"
+    else if locals.currentPage === "gene"
+    else if locals.currentPage === "disease"
     else if locals.currentPage === "api"
     else
       ul.menu.languageswitcher

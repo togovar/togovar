@@ -4,6 +4,11 @@
   line-height: $HEIGHT_NAVIGATION_ITEM
   border-radius: $HEIGHT_NAVIGATION_ITEM * .5
   padding: 0 8px
+  &.config
+    &::before
+      content: "\f1de"
+      font-family: 'FontAwesome'
+      font-size: 16px
   &.-current
     border: solid 1px $COLOR_KEY_DARK1
     color: $COLOR_KEY_DARK1

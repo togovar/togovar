@@ -1,4 +1,4 @@
-import {PAGE, COLUMNS} from "../global.js";
+import { PAGE, COLUMNS } from "../global.js";
 import StoreManager from "./StoreManager.js";
 
 export default class Configuration {
@@ -37,9 +37,9 @@ export default class Configuration {
     StoreManager.bind('columns', this);
 
     // コンフィグ開く
-    document.querySelector('#GlobalHeader > .menus > .config > .menu-button').addEventListener('click', () => {
-        this.open();
-      });
+    document.querySelector('#GlobalHeader > .menus > .config > .config').addEventListener('click', () => {
+      this.open();
+    });
     // コンフィグ閉じる
     this.bg.addEventListener('click', () => {
       this.close();
@@ -72,13 +72,13 @@ export default class Configuration {
       configure.container.innerHTML = stored.map(item => `<li><label><input type="checkbox" value="${item.id}"${item.isUsed ? ' checked' : ''}>${item.label}</label></li>`).join('');
       // input イベント
       configure.container.querySelectorAll('li > label > input').forEach(input => {
-          input.addEventListener('change', e => {
-            const stored = StoreManager.getData(configure.storeKey);
-            const item = stored.find(item => item.id === e.target.value);
-            item.isUsed = e.target.checked;
-            StoreManager.setData(configure.storeKey, stored);
-          })
-        });
+        input.addEventListener('change', e => {
+          const stored = StoreManager.getData(configure.storeKey);
+          const item = stored.find(item => item.id === e.target.value);
+          item.isUsed = e.target.checked;
+          StoreManager.setData(configure.storeKey, stored);
+        })
+      });
 
       // set to store
       StoreManager.setData(configure.storeKey, stored);
