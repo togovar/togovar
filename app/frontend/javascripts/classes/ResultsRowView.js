@@ -297,7 +297,13 @@ export default class ResultsRowView {
 
               // TODO: 10/20にmedgenの表示があっているかを確認
               this.tdClinicalIcon.dataset.remains = result.significance.length - 1;
-              if (result.significance[0].conditions[0].medgen) {
+
+              // Check if any medgen exists in result.significance
+              const hasMedgen = result.significance.some(significanceItem =>
+                significanceItem.conditions.some(condition => condition.medgen)
+              );
+
+              if (hasMedgen) {
                 this.tdClinicalIcon.dataset.mgend = true;
               } else {
                 this.tdClinicalIcon.dataset.mgend = false;
