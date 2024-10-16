@@ -4,17 +4,23 @@
     font-size: 14px
     line-height: 16px
     padding: 2px 0
+  // TODO: 10/20にこのデザインでいいかを確認
   > dd
     line-height: 16px
     margin-bottom: 0
+    display: flex
+    flex-wrap: wrap
+    justify-content: space-between
     > .clinical-significance
       display: inline-block
       vertical-align: middle
-    // TODO: 10/20にこのデザインでいいかを確認
+      white-space: nowrap
     > .disease-category
-      text-align: right
+      display: flex
       font-size: 12px
       font-weight: bold
+      align-self: flex-end
+      margin-left: auto
       > .mgend
         color: $COLOR_DATASET_DISEASE_MGEND
         margin-right: 5px
