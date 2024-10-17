@@ -37,7 +37,7 @@ export default class Configuration {
     StoreManager.bind('columns', this);
 
     // コンフィグ開く
-    document.querySelector('#GlobalHeader > .menus > .config > .config').addEventListener('click', () => {
+    document.querySelector('#GlobalHeader > .menus > .menu-wrapper > .config > .config').addEventListener('click', () => {
       this.open();
     });
     // コンフィグ閉じる

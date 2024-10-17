@@ -9,11 +9,10 @@
     font-weight: bold
     padding-top: 2px
     padding-left: var(--padding-side)
-    &::before
-      content: var(--char-dataset)
-      font-family: fontello
-      margin-right: 4px
-      font-size: 12px
+    &.clinvar
+      color: $COLOR_DATASET_DISEASE_CLINVAR
+    &.mgend
+      color: $COLOR_DATASET_DISEASE_MGEND
 
   > hr
     margin: 0

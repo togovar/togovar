@@ -39,8 +39,8 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
       <button class="button-view -weak">Clear all</button>
     </div>
 
-    <div class="dataset-title">Clinvar</div>
-    <ul class="checkboxes body">
+    <div class="dataset-title clinvar">Clinvar</div>
+    <ul class="checkboxes body" data-type="clinical-significance">
       ${dataset.values.clinvar
         .map(
           (value) => `
@@ -60,8 +60,8 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
 
     <hr/>
 
-    <div class="dataset-title">MGeND</div>
-    <ul class="checkboxes body">
+    <div class="dataset-title mgend">MGeND</div>
+    <ul class="checkboxes body" data-type="clinical-significance">
       ${dataset.values.mgend
         .map(
           (value) => `
