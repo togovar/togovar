@@ -39,7 +39,7 @@ article.common-document
               a(href="/doc/ja/datasets/gem_j_wga#jga_datasets") 6データセット
           tr
             td
-              a(href="/doc/ja/datasets/jga_ngs") JGA-NGS
+              a(href="/doc/ja/datasets/jga_wes") JGA-WES
             td._align-left WES
             td._align-center ✔
             td 日本人
@@ -50,7 +50,21 @@ article.common-document
             td._align-center
               span(style='margin-left:13px;') 4,624,124
             td._align-center
-              a(href="/doc/ja/datasets/jga_ngs#jga_datasets") 7データセット
+              a(href="/doc/ja/datasets/jga_wes#jga_datasets") 7データセット
+          tr
+            td
+              a(href="/doc/ja/datasets/jga_wgs") JGA-WGS
+            td._align-left WGS
+            td._align-center
+            td 日本人
+            td._align-center ✔
+            td._align-center ✔
+            td._align-center 78
+              span(style='margin-left:45px;') 
+            td._align-center
+              span(style='margin-left:13px;') 
+            td._align-center
+              a(href="/doc/ja/datasets/jga_wgs#jga_datasets") 4データセット
           tr
             td
               a(href="/doc/ja/datasets/jga_snp") JGA-SNP
@@ -120,7 +134,7 @@ article.common-document
             td._align-center
               | 183,558,769
             td Broad Institute
-            td v4.0
+            td v4.1
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads#v4')
@@ -135,7 +149,7 @@ article.common-document
             td._align-center
               | 759,336,320
             td Broad Institute
-            td v4.0
+            td v4.1
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-54kjpn-20230626-af_snvindelall')
@@ -205,6 +219,13 @@ article.common-document
             td NCBI
           tr
             td
+              a.hyper-text.-external(target='_blank', href='https://mgend.ncgm.go.jp/')
+                | MGeND
+            td 2024/03/08
+            td 日本人集団から収集されたバリアントの臨床的意義
+            td 国立国際医療研究センター (NCBN)
+          tr
+            td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pubmed/')
                 | PubMed
             td 2024/04/26
@@ -221,6 +242,8 @@ article.common-document
         | 注：ClinVarはGRCh38上の位置が決定しているバリアントのみを含む
         a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/') VCFファイル
         | からデータを取得しています。
+        br
+        | 注：MGeNDの疾患名を独自の方法でMedGenにマッピングしていますので、MGeNDに記載されている疾患名と一致しない場合があります。
     section.section
       h3.sectiontitle データ加工に利用したツール
       table.table
@@ -235,20 +258,32 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://samtools.github.io/bcftools/') bcftools
             td._align-center —
-            td multiallelicバリアントのbiallelicバリアントへの分割
+            td 多アリルサイトを２アリルバリアントに分割し、リファレンス不一致バリアントを除外して、正規化
             td Genome Research Ltd.
           tr
             td
               a(href="/doc/ja/datasets/analysis") BioReT
             td._align-center —
-            td NGSデータからバリアントを特定するツール群を一括実行
+            td JGAのWESデータから生殖細胞系のショートバリアント（SNPおよびインデル）を特定し、VCF形式でジョイントコールセットを生成
             td
               a.hyper-text.-external(target='_blank', href='https://amelieff.jp/') アメリエフ
           tr
             td
+              a.hyper-text.-external(target='_blank', href='https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels') GATK Best Practice - Germline short variant discovery (SNPs and Indels)
+            td Ver. 4
+            td JGAのWGSデータから生殖細胞系のショートバリアント（SNPおよびインデル）を特定し、VCF形式でジョイントコールセットを生成
+            td Broad Institute
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://github.com/informationsea/transanno') transanno
+            td Ver. 4
+            td バリアントのGRCh37座標をGRCh38へLiftOverするツール
+            td OKAMURA, Yasunobu
+          tr
+            td
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/index.html')
                 | Variant Effect Predictor (VEP)
-            td Ensembl rel. 111
+            td Ensembl rel. 112
             td
               | バリアントに
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/script/vep_cache.html#cache_content')

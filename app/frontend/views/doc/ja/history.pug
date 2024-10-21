@@ -16,6 +16,41 @@ block content
         h2.title 更新履歴
       .contents
         section.section
+          h3.sectiontitle 2024/11/1
+          ul.unordered-list
+            li
+              strong Datasets:
+              |
+              |
+              a.hyper-text.-external(href='https://mgend.ncgm.go.jp/') MGeND (Medical Genomics Japan Variant Database)
+              |
+              | を追加しました。
+              ul.unordered-list
+                li MGeNDは日本医療研究開発機構（AMED）
+                  a.hyper-text.-external(href='https://www.amed.go.jp/program/list/14/05/006.html') 臨床ゲノム情報統合データベース整備事業
+                  | において採択された「がん」、「希少・難治性疾患」、「感染症」、「認知症」、「難聴」分野の研究機関から提供されたゲノムバリアントおよび付随する臨床的特性を集約・統合した日本版のClinVarに相当するデータベースです。
+                  | 今後、上記疾患領域のみならず幅広い疾患領域のバリアント情報が追加される予定です。
+                li 複数の疾患データベースを用いてMGeNDの疾患名を
+                  a.hyper-text.-external(href='https://www.ncbi.nlm.nih.gov/medgen') MedGen
+                  | の語彙にマッピングしました。TogoVarに出現する疾患名はMedGenに統一していますので、各疾患のレポートページでは
+                  | 当該疾患に関係するMGeNDとClinVarのバリアントの臨床的意義を比較できます。例：
+                  a.hyper-text.-internal(href='/disease/') 【疾患ビューでMGeNDとClinVarの比較できる例を列挙する】
+            li
+              strong Datasets:
+              | 
+              a.hyper-text.-internal(href='datasets/jga_wgs') JGA-WGS
+              | データセットを新たに追加しました（GRCh38のみ）。
+              ul.unordered-list
+                li JGA-WGSは、
+                  a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/') NBDCヒトデータベース
+                  | /
+                  a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
+                  | Japanese Genotype-phenotype Archive(JGA)に登録されている全ゲノム配列を再解析して検出したバリアントを集約した頻度データです。再解析の詳細は
+                  a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/data-processing') データ加工について(NBDCヒトデータベース)
+                  | をご覧ください。
+                  li 現在JGA-WGSには４つのJGAデータセットを網羅していますが、データセット単位の頻度の閲覧には、NBDCヒトデータベースの制限公開データにアクセスするための認証が必要です。
+                  li これまでJGA-NGSとして公開していたJGAに登録された全エクソーム配列をバリアントコールした頻度データをJGA-WESという名称に変更しました。
+            
           h3.sectiontitle 2024/6/27
           ul.unordered-list
             li

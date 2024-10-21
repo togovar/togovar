@@ -16,6 +16,29 @@ block content
         h2.title Update history
       .contents
         section.section
+          h3.sectiontitle 2024/11/1
+          ul.unordered-list
+            li
+              strong Datasets:
+              |
+              | MGeND (Medical Genomics Japan Variant Database) was newly added.
+              ul.unordered-list
+                li MGeND is a database equivalent to the Japanese version of ClinVar, 
+                  | which aggregates and integrates genome variants and associated clinical characteristics provided
+                  | by research institutions in the fields of “cancer,” “rare and intractable diseases,” “infectious diseases,” “dementia,” and “hearing loss,” 
+                  | adopted by the AMED (Japan Agency for Medical Research and Development) Clinical Genomic Information Integration Database Project.
+                  | In the future, variant information from a wider range of disease areas, not limited to the aforementioned fields, will be added.
+                li Disease names in MGeND have been mapped to MedGen terminology using multiple disease databases. 
+                  | Disease names appearing in TogoVar have been standardized to MedGen, allowing users to compare the clinical significance of variants in MGeND and ClinVar on each disease report page.
+                  | Example: [List examples where comparisons between MGeND and ClinVar can be made in disease view.]
+            li
+              strong Datasets:
+              | The JGA-WGS dataset was newly added (GRCh38 only).
+              ul.unordered-list
+                li JGA-WGS is a frequency dataset that aggregates variants detected by reanalyzing whole-genome sequences registered in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA). 
+                  | For details on the reanalysis process, please refer to “Data Processing” (NBDC Human Database).
+                li Currently, JGA-WGS covers four JGA datasets. Viewing frequencies per dataset requires authentication to access controlled-data in the NBDC Human Database.
+                li The frequency data previously published as JGA-NGS, obtained from variant calling on whole-exome sequences deposited to JGA, was renamed to JGA-WES.
           h3.sectiontitle 2024/6/27
           ul.unordered-list
             li

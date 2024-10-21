@@ -1,9 +1,9 @@
 extend ../../../layouts/application
 
 append variables
-  - locals.currentPage = "datasets/jga_ngs";
-  - locals.language = "ja";
-  - locals.title = "Datasets > JGA-NGS | TogoVar";
+  - locals.currentPage = "datasets/jga_wes";
+  - locals.language = "en";
+  - locals.title = "Datasets > JGA-WES | TogoVar";
 
 block head
   each css in htmlWebpackPlugin.files.css
@@ -13,8 +13,8 @@ block content
   main
     case TOGOVAR_FRONTEND_REFERENCE
       when 'GRCh37'
-        include jga_ngs_grch37
+        include jga_wes_grch37
       when 'GRCh38'
-        include jga_ngs_grch38
+        include jga_wes_grch38
       default
         // none

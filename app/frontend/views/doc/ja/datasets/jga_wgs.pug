@@ -1,0 +1,18 @@
+extend ../../../layouts/application
+
+append variables
+  - locals.currentPage = "datasets/jga_wgs";
+  - locals.language = "ja";
+  - locals.title = "Datasets > JGA-WGS | TogoVar";
+
+block head
+  each css in htmlWebpackPlugin.files.css
+    link(href=css, rel="stylesheet")
+
+block content
+  main
+    case TOGOVAR_FRONTEND_REFERENCE
+      when 'GRCh38'
+        include jga_wgs_grch38
+      default
+        // none
