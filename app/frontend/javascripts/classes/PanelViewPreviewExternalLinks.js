@@ -31,7 +31,12 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
           });
         }
 
-        // TODO: 10/20ここにMGeNDが追加されるはず。現在は内容を取得できないため、未実装
+        // MGeND
+        if (record.external_link.mgend) {
+          record.external_link.mgend.forEach((item) => {
+            list.push(this.#createLinkList('MGeND', item.title, item.xref));
+          });
+        }
 
         // ClinVar
         if (record.external_link.clinvar) {
