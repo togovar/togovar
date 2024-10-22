@@ -88,7 +88,7 @@ export default class ResultsRowView {
           break;
         case 'clinical_significance': // clinical significance
           html +=
-            '<td class="clinical_significance"><div href="" class="clinical-significance" data-value=""></div><a class="hyper-text -internal" target="_blank"></a><span class="icon" data-remains="" data-mgend=""></span></td>';
+            '<td class="clinical_significance"><div class="clinical-significance" data-value=""></div><a class="hyper-text -internal" href="" target="_blank"></a><span class="icon" data-remains="" data-mgend=""></span></td>';
           break;
         case 'alphamissense': // AlphaMissense
           html +=
@@ -288,19 +288,29 @@ export default class ResultsRowView {
             if (result.significance && result.significance.length) {
               this.tdClinicalSign.dataset.value =
                 result.significance[0].interpretations[0];
-              this.tdClinicalAnchor.textContent =
-                result.significance[0].conditions[0].name
-              this.tdClinicalAnchor.setAttribute(
-                'href',
-                `/disease/${result.significance[0].conditions[0].medgen}`
-              );
 
               // TODO: 10/20にmedgenの表示があっているかを確認
+              if (result.significance[0].conditions[0] !== undefined) {
+                if (result.significance[0].conditions[0].name) {
+                  this.tdClinicalAnchor.textContent =
+                    result.significance[0].conditions[0].name
+                }
+
+                if (result.significance[0].conditions[0]?.medgen) {
+                  this.tdClinicalAnchor.setAttribute(
+                    'href',
+                    `/disease/${result.significance[0].conditions[0].medgen}`
+                  );
+                }
+              } else {
+                this.tdClinicalSign.textContent = "No MedGen provided"
+              }
+
               this.tdClinicalIcon.dataset.remains = result.significance.length - 1;
 
               // Check if any medgen exists in result.significance
               const hasMedgen = result.significance.some(significanceItem =>
-                significanceItem.conditions.some(condition => condition.medgen)
+                significanceItem.source === "mgend"
               );
 
               if (hasMedgen) {
