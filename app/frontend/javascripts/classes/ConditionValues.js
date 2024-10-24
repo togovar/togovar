@@ -7,7 +7,7 @@ import ConditionValueEditorDisease from './ConditionValueEditorDisease.js';
 import ConditionValueEditorFrequencyCount from './ConditionValueEditorFrequencyCount.js';
 import ConditionValueEditorGene from './ConditionValueEditorGene.js';
 import ConditionValueEditorLocation from './ConditionValueEditorLocation.js';
-import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditorPathogenicityPrediction.js';
+import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditorPathogenicityPrediction.ts';
 import ConditionValueEditorVariantID from './ConditionValueEditorVariantID.js';
 
 /** About the AdvancedSearch edit screen.
