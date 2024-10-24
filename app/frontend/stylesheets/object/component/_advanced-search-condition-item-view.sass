@@ -193,3 +193,22 @@ $CORNER_RADIUS: calc($HEIGHT / 2)
               background-color: $COLOR_DATASET_FOREIGN_LIGHT
               &::before
                 color: $COLOR_DATASET_FOREIGN
+
+  &[data-classification="significance"]
+    > .body
+      > .summary
+        > .values
+          > .mgend-wrapper
+            display: flex
+            > span
+              font-weight: bold
+              min-width: 45px
+              &.mgend
+                color: $COLOR_DATASET_DISEASE_MGEND
+          > .clinvar-wrapper
+            display: flex
+            > span
+              font-weight: bold
+              min-width: 45px
+              &.clinvar
+                color: $COLOR_DATASET_DISEASE_CLINVAR

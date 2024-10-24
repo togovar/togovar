@@ -256,13 +256,55 @@ class ConditionItemView extends ConditionView {
       // https://github.com/togovar/meeting/issues/180#issuecomment-2370455485
       // sourceを設定するとありますが、clinvarとmgendを同時に選択することはできるのでしょうか。
       case CONDITION_TYPE.significance: {
-        return {
-          [this._conditionType]: {
-            relation: this._elm.dataset.relation,
-            // source: 'clinvar',
-            terms: valueElements.map((value) => value.value),
+        const valueMgendElements = Array.from(
+          this._valuesEl.querySelectorAll(':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view')
+        );
+        const valueClinvarElements = Array.from(
+          this._valuesEl.querySelectorAll(':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view')
+        );
+
+        console.log({
+          or: [{
+            [this._conditionType]: {
+              relation: this._elm.dataset.relation,
+              source: 'mgend',
+              terms: valueMgendElements.map((value) => value.value),
+            }
           },
-        };
+          {
+            [this._conditionType]: {
+              relation: this._elm.dataset.relation,
+              source: 'clinvar',
+              terms: valueClinvarElements.map((value) => value.value),
+            }
+          },
+          ]
+        })
+
+        return {
+          or: [{
+            [this._conditionType]: {
+              relation: this._elm.dataset.relation,
+              source: 'mgend',
+              terms: valueMgendElements.map((value) => value.value),
+            }
+          },
+          {
+            [this._conditionType]: {
+              relation: this._elm.dataset.relation,
+              source: 'clinvar',
+              terms: valueClinvarElements.map((value) => value.value),
+            }
+          },
+          ]
+        }
+        // return {
+        //   [this._conditionType]: {
+        //     relation: this._elm.dataset.relation,
+        //     // source: 'clinvar',
+        //     terms: valueElements.map((value) => value.value),
+        //   },
+        // };
       }
 
       default:
