@@ -16,29 +16,47 @@ block content
         h2.title Update history
       .contents
         section.section
-          h3.sectiontitle 2024/11/1
+          h3.sectiontitle 2024/11/8
           ul.unordered-list
             li
               strong Datasets:
               |
-              | MGeND (Medical Genomics Japan Variant Database) was newly added.
+              |
+              a.hyper-text.-external(href='https://mgend.ncgm.go.jp/') MGeND (Medical Genomics Japan Variant Database)
+              |
+              | was newly added.
               ul.unordered-list
-                li MGeND is a database equivalent to the Japanese version of ClinVar, 
-                  | which aggregates and integrates genome variants and associated clinical characteristics provided
-                  | by research institutions in the fields of “cancer,” “rare and intractable diseases,” “infectious diseases,” “dementia,” and “hearing loss,” 
-                  | adopted by the AMED (Japan Agency for Medical Research and Development) Clinical Genomic Information Integration Database Project.
-                  | In the future, variant information from a wider range of disease areas, not limited to the aforementioned fields, will be added.
-                li Disease names in MGeND have been mapped to MedGen terminology using multiple disease databases. 
-                  | Disease names appearing in TogoVar have been standardized to MedGen, allowing users to compare the clinical significance of variants in MGeND and ClinVar on each disease report page.
+                li MGeND is a database of genome variants and their clinical characteristics, 
+                  | collected through
+                  a.hyper-text.-external(href='https://www.amed.go.jp/en/program/list/14/05/006.html') MGeND (Medical Genomics Japan Variant Database)
+                  |
+                  | the Clinical Genome Information Integration Database Development Project by the Japan Agency for Medical Research and Development (AMED). 
+                  | This database contains variant information for diseases such as cancer, rare and intractable diseases, infectious diseases, dementia, and hearing loss,
+                  | and can be considered the Japanese equivalent of ClinVar. 
+                li The disease names in MGeND have been aligned with the vocabulary used by MedGen, which is also employed in ClinVar. 
+                  | On each disease report page, you can compare the clinical significance of variants for the same disease between MGeND and ClinVar.
                   | Example: [List examples where comparisons between MGeND and ClinVar can be made in disease view.]
             li
               strong Datasets:
-              | The JGA-WGS dataset was newly added (GRCh38 only).
+              |
+              |
+              a.hyper-text.-internal(href='/doc/datasets/jga_wgs') The JGA-WGS dataset
+              | was newly added (GRCh38 only).
               ul.unordered-list
-                li JGA-WGS is a frequency dataset that aggregates variants detected by reanalyzing whole-genome sequences registered in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA). 
-                  | For details on the reanalysis process, please refer to “Data Processing” (NBDC Human Database).
-                li Currently, JGA-WGS covers four JGA datasets. Viewing frequencies per dataset requires authentication to access controlled-data in the NBDC Human Database.
-                li The frequency data previously published as JGA-NGS, obtained from variant calling on whole-exome sequences deposited to JGA, was renamed to JGA-WES.
+                li The JGA-WGS dataset aggregates allele frequencies and genotype counts by reanalyzing whole-genome sequence data deposited in
+                  |
+                  |
+                  a.hyper-text.-external(href='https://humandbs.dbcls.jp/en/') the NBDC Human Database
+                  | /
+                  a.hyper-text.-external(href='https://www.ddbj.nig.ac.jp/jga/index-e.html') the Japanese Genotype-phenotype Archive (JGA)
+                  | . The reference genome used is GRCh38. For more information on the reanalysis, please refer to
+                  |
+                  a.hyper-text.-external(href='https://humandbs.dbcls.jp/en/data-processing') the “Whole genome sequencing analysis data (germline)”
+                  |
+                  | on the NBDC Human Database website.
+                li The frequenies previously published as JGA-NGS, obtained from variant calling on whole-exome sequences deposited to JGA, was renamed to 
+                  a.hyper-text.-internal(href='/doc/datasets/jga_wes') JGA-WES
+                  | .
           h3.sectiontitle 2024/6/27
           ul.unordered-list
             li

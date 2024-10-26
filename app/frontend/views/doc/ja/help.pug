@@ -120,8 +120,11 @@ block content
             .answer
               p
                 | 当データベースは個人情報を保持しておらず、また、個人ごとの表現型情報は現在のところ提供はしておりません。表現型情報の詳細については、
-                a(href='./datasets/jga_ngs') JGA-NGSデータセット
-                | 及び
+                if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                  a(href='./datasets/jga_wgs') JGA-WGSデータセット
+                  | 、
+                a(href='./datasets/jga_wes') JGA-WESデータセット
+                | および
                 a(href='./datasets/jga_snp') JGA-SNPデータセット
                 | に記載されている研究グループに直接お問い合わせ下さい。
           #d2.question-answer
@@ -271,12 +274,16 @@ block content
                   logarithmized-block-graph-frequency-view(data-dataset="gem_j_wga" data-logarithmized-frequency="≥0.5")
                   | &nbsp; GEM-J WGA
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="jga_ngs" data-logarithmized-frequency="≥0.5")
-                  | &nbsp; JGA-NGS
-                  br
                   logarithmized-block-graph-frequency-view(data-dataset="jga_snp" data-logarithmized-frequency="≥0.5")
                   | &nbsp; JGA-SNP
                   br
+                  logarithmized-block-graph-frequency-view(data-dataset="jga_wes" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; JGA-WES
+                  br
+                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                    logarithmized-block-graph-frequency-view(data-dataset="jga_wgs" data-logarithmized-frequency="≥0.5")
+                    | &nbsp; JGA-WGS
+                    br
                   logarithmized-block-graph-frequency-view(data-dataset="tommo" data-logarithmized-frequency="≥0.5")
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
                     | &nbsp; ToMMo 8.3KJPN

@@ -81,19 +81,6 @@ article.common-document
               br
             td._align-center
               a(href="/doc/datasets/jga_wgs#jga_datasets") 4 datasets
-          tr
-            td
-              a(href="/doc/datasets/ncbn") National Center Biobank Network (NCBN)
-            td._align-left WGS
-            td._align-center ✔
-            td Mixed
-            td._align-center ✔
-            td._align-center
-            td._align-center
-              span(style='margin-left:9px;') JPN:9,290 1KGP:2,504
-            td._align-center 215,729,032
-            td._align-center
-              | No datasets
       p.notice
         | ∗1：fastq/bam/cel files and/or lists of genotype data etc.
         br
@@ -150,6 +137,19 @@ article.common-document
               | 759,336,320
             td Broad Institute
             td v4.1
+          tr
+            td
+              a(href="/doc/datasets/ncbn") NCBN
+            td._align-left WGS
+            td._align-center ✔
+            td Mixed
+            td._align-center ✔
+            td._align-center ✔
+            td._align-center
+              span(style='margin-left:9px;') JPN:9,290 1KGP:2,504
+            td._align-center 215,729,032
+            td National Center Biobank Network (NCBN)
+            td 2024/6/28
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-54kjpn-20230626-af_snvindelall')
@@ -221,10 +221,16 @@ article.common-document
             td NCBI
           tr
             td
+              a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/medgen') MedGen
+            td 2024/10/15
+            td Information about conditions and phenotypes related to Medical Genetics
+            td NCBI
+          tr
+            td
               a.hyper-text.-external(target='_blank', href='https://mgend.ncgm.go.jp/') MGeND
             td 2024/03/08
             td Clinical significance of variants collected from the Japanese population
-            td National Center for Global Health and Medicine (NCBN)
+            td NCGM
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pubmed/')
@@ -243,7 +249,8 @@ article.common-document
         |
         a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/') the VCF file
         | that contains only variants for which GRCh38 positions were determined.
-        | Note: Disease names in MGeND were mapped to MedGen using a proprietary method, so they may not match the disease names listed in MGeND
+        br
+        | Note: Disease names in MGeND were mapped to MedGen using a proprietary method, so they may not match the disease names listed in MGeND.
     section.section
       h3.sectiontitle Tools for data processing
       table.table

@@ -42,19 +42,6 @@ article.common-document
               a(href="/doc/ja/datasets/gem_j_wga#jga_datasets") 6データセット
           tr
             td
-              a(href="/doc/ja/datasets/jga_ngs") JGA-NGS
-            td._align-left WES
-            td 日本人
-            td._align-center ✔
-            td._align-center ✔
-            td._align-center
-              span(style='margin-left:20px;') 125
-            td._align-center
-              span(style='margin-left:4px;') 4,679,025
-            td._align-center
-              a(href="/doc/ja/datasets/jga_ngs#jga_datasets") 7データセット
-          tr
-            td
               a(href="/doc/ja/datasets/jga_snp") JGA-SNP
             td._align-left SNP-Chip
             td 日本人
@@ -65,6 +52,19 @@ article.common-document
               span(style='margin-left:4px;') 1,249,724
             td._align-center
               a(href="/doc/ja/datasets/jga_snp#jga_datasets") 3データセット
+          tr
+            td
+              a(href="/doc/ja/datasets/jga_wes") JGA-WES
+            td._align-left WES
+            td 日本人
+            td._align-center ✔
+            td._align-center ✔
+            td._align-center
+              span(style='margin-left:20px;') 125
+            td._align-center
+              span(style='margin-left:4px;') 4,679,025
+            td._align-center
+              a(href="/doc/ja/datasets/jga_wes#jga_datasets") 7データセット
       p.notice
         | ∗1：
         a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
@@ -213,11 +213,17 @@ article.common-document
             td NCBI
           tr
             td
+              a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/medgen') MedGen
+            td 2024/10/15
+            td 遺伝医学に関連する症状や表現型に関する情報を集約したポータルデータベース
+            td NCBI
+          tr
+            td
               a.hyper-text.-external(target='_blank', href='https://mgend.ncgm.go.jp/')
                 | MGeND
             td 2024/03/08
             td 日本人集団から収集されたバリアントの臨床的意義
-            td 国立国際医療研究センター (NCBN)
+            td NCGM
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pubmed/')
@@ -236,6 +242,8 @@ article.common-document
         | 注：ClinVarはGRCh37上の位置が決定しているバリアントのみを含む
         a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/') VCFファイル
         | からデータを取得しています。
+        br
+        | 注：MGeNDの疾患名を独自の方法でMedGenにマッピングしていますので、MGeNDに記載されている疾患名と一致しない場合があります。
     section.section
       h3.sectiontitle データ加工に利用したツール
       table.table
