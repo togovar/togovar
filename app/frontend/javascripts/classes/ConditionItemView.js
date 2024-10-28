@@ -252,9 +252,6 @@ class ConditionItemView extends ConditionView {
       }
 
       // TODO: 10/20
-      // https://grch38.togovar.org/api
-      // https://github.com/togovar/meeting/issues/180#issuecomment-2370455485
-      // sourceを設定するとありますが、clinvarとmgendを同時に選択することはできるのでしょうか。
       case CONDITION_TYPE.significance: {
         const valueMgendElements = Array.from(
           this._valuesEl.querySelectorAll(':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view')
@@ -263,48 +260,32 @@ class ConditionItemView extends ConditionView {
           this._valuesEl.querySelectorAll(':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view')
         );
 
-        console.log({
-          or: [{
-            [this._conditionType]: {
-              relation: this._elm.dataset.relation,
-              source: 'mgend',
-              terms: valueMgendElements.map((value) => value.value),
-            }
+        // relationがneのときはand、それ以外はor
+        const relationType = this._elm.dataset.relation === "ne" ? "and" : "or";
+        const mgendCondition = valueMgendElements.length > 0 ? {
+          [this._conditionType]: {
+            relation: this._elm.dataset.relation,
+            source: "mgend",
+            terms: valueMgendElements.map((value) => value.value),
           },
-          {
-            [this._conditionType]: {
-              relation: this._elm.dataset.relation,
-              source: 'clinvar',
-              terms: valueClinvarElements.map((value) => value.value),
-            }
-          },
-          ]
-        })
+        } : null;
 
-        return {
-          or: [{
-            [this._conditionType]: {
-              relation: this._elm.dataset.relation,
-              source: 'mgend',
-              terms: valueMgendElements.map((value) => value.value),
-            }
+        const clinvarCondition = valueClinvarElements.length > 0 ? {
+          [this._conditionType]: {
+            relation: this._elm.dataset.relation,
+            source: "clinvar",
+            terms: valueClinvarElements.map((value) => value.value),
           },
-          {
-            [this._conditionType]: {
-              relation: this._elm.dataset.relation,
-              source: 'clinvar',
-              terms: valueClinvarElements.map((value) => value.value),
-            }
-          },
-          ]
-        }
-        // return {
-        //   [this._conditionType]: {
-        //     relation: this._elm.dataset.relation,
-        //     // source: 'clinvar',
-        //     terms: valueElements.map((value) => value.value),
-        //   },
-        // };
+        } : null;
+
+        // mgendまたはclinvarが存在する場合に応じて返す内容を変化
+        const conditions = [mgendCondition, clinvarCondition].filter(Boolean);
+
+        // conditionsの中身が1つの場合は直接返し、2つの場合はor/andでラップ
+        const result = conditions.length === 1 ? conditions[0] : { [relationType]: conditions };
+
+        console.log(result);
+        return result;
       }
 
       default:
