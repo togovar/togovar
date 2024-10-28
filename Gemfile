@@ -40,17 +40,23 @@ gem 'linkeddata', '~> 3.0'
 # bio science
 gem 'bio-vcf', github: 'pjotrp/bioruby-vcf'
 
+# authorization
+gem 'omniauth-keycloak', '~> 1.5', '>= 1.5.2'
+gem 'omniauth-rails_csrf_protection', '~> 1.0', '>= 1.0.2'
+gem 'redis-rails', '~> 5.0', '>= 5.0.2'
+
 group :development do
-  gem 'better_errors', '~> 2.9', '>= 2.9.1'
-  gem 'better_errors-pry', '~> 1.0', '>= 1.0.3'
-  gem 'listen', '~> 3.2'
-  gem 'pry-byebug', '~> 3.10', '>= 3.10.1'
+  gem 'better_errors'
+  gem 'binding_of_caller'
+  gem 'listen', '~> 3.3'
+  gem "rack-reverse-proxy", require: "rack/reverse_proxy"
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'web-console', '~> 4.1'
 end
 
 group :development, :test do
+  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rspec-rails', '~> 5.1', '>= 5.1.2'
 end
 

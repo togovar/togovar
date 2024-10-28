@@ -3,6 +3,9 @@
 module API
   class DownloadController < ApplicationController
     include ActionController::Live
+    include AuthHelper
+
+    before_action :authenticate_user, only: %i[variant]
 
     MAX_DOWNLOAD_RECORDS_LIMIT = 100_000
 

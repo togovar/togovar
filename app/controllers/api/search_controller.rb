@@ -3,6 +3,7 @@
 module API
   class SearchController < ApplicationController
     include Executable
+    include AuthHelper
 
     module BackwardCompatibility
       def variant_params
@@ -25,6 +26,8 @@ module API
       end
     end
     prepend BackwardCompatibility
+
+    before_action :authenticate_user, only: %i[variant search_variant]
 
     wrap_parameters name: :body, format: :json
 

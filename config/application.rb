@@ -17,8 +17,6 @@ require 'action_view/railtie'
 # require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
-require_relative '../app/lib/middleware/force_request_content_type_json'
-
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -38,7 +36,29 @@ module TogoVar
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
-    config.middleware.insert_after Rack::Sendfile, ::Middleware::ForceRequestContentTypeJson
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::RedisStore,
+                          servers: [
+                            "redis://#{ENV.fetch('TOGOVAR_REDIS_HOST', 'localhost')}:#{ENV.fetch('TOGOVAR_REDIS_HOST', '6379')}/0/session"
+                          ],
+                          expire_after: begin
+                                          Integer(ENV.fetch('TOGOVAR_REDIS_SESSION_EXPIRE'))
+                                        rescue => e
+                                          warn "#{e.message} at #{e.backtrace.first}"
+                                          1.day
+                                        end,
+                          key: "_#{Rails.application.class.module_parent_name.underscore}_session",
+                          threadsafe: true,
+                          secure: Rails.env.production?
+
+    if Rails.env.development?
+      config.middleware.insert(0, Rack::ReverseProxy) do
+        reverse_proxy_options preserve_host: true
+        reverse_proxy %r{^/$}, 'http://localhost:8000/index.html'
+        reverse_proxy %r{^/(\?.*)$}, 'http://localhost:8000/index.html$1'
+        reverse_proxy %r{^/((css|js|images|fonts|variant|gene|disease|doc)/.*)$}, 'http://localhost:8000/$1'
+      end
+    end
 
     config.elasticsearch = config_for(:elasticsearch)
     config.endpoint = config_for(:endpoint)
