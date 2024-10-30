@@ -48,6 +48,7 @@ gem 'redis-rails', '~> 5.0', '>= 5.0.2'
 group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
+  gem 'foreman'
   gem 'listen', '~> 3.3'
   gem "rack-reverse-proxy", require: "rack/reverse_proxy"
   gem 'spring'

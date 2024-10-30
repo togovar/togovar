@@ -600,17 +600,13 @@ components:
                 type: string
                 description: >
                   Available values
-                   * `SO_0001483` | `snv` - SNV
-                   * `SO_0000667` | `ins` - insertion
-                   * `SO_0000159` | `del` - deletion
-                   * `SO_1000032` | `indel` - indel
-                   * `SO_1000002` | `sub` - substitution
+                  <% Rails.application.config.application.dig(:query_params, :type).each do |x| %>
+                  <%= "* `#{x[:key]}` - #{x[:label]}" %>
+                  <% end %>
                 enum:
-                  - SO_0001483
-                  - SO_0000667
-                  - SO_0000159
-                  - SO_1000032
-                  - SO_1000002
+                  <% Rails.application.config.application.dig(:query_params, :type).each do |x| %>
+                  <%= "- #{x[:key]}" %>
+                  <% end %>
                   - snv
                   - ins
                   - del
@@ -646,82 +642,16 @@ components:
                 type: string
                 description: >
                   Both SO terms and its label are acceptable
-                   * `SO_0001893` - transcript_ablation
-                   * `SO_0001574` - splice_acceptor_variant
-                   * `SO_0001575` - splice_donor_variant
-                   * `SO_0001587` - stop_gained
-                   * `SO_0001589` - frameshift_variant
-                   * `SO_0001578` - stop_lost
-                   * `SO_0002012` - start_lost
-                   * `SO_0001889` - transcript_amplification
-                   * `SO_0001821` - inframe_insertion
-                   * `SO_0001822` - inframe_deletion
-                   * `SO_0001583` - missense_variant
-                   * `SO_0001818` - protein_altering_variant
-                   * `SO_0001630` - splice_region_variant
-                   * `SO_0001626` - incomplete_terminal_codon_variant
-                   * `SO_0002019` - start_retained_variant
-                   * `SO_0001567` - stop_retained_variant
-                   * `SO_0001819` - synonymous_variant
-                   * `SO_0001580` - coding_sequence_variant
-                   * `SO_0001620` - mature_miRNA_variant
-                   * `SO_0001623` - 5_prime_UTR_variant
-                   * `SO_0001624` - 3_prime_UTR_variant
-                   * `SO_0001792` - non_coding_transcript_exon_variant
-                   * `SO_0001627` - intron_variant
-                   * `SO_0001621` - NMD_transcript_variant
-                   * `SO_0001619` - non_coding_transcript_variant
-                   * `SO_0001631` - upstream_gene_variant
-                   * `SO_0001632` - downstream_gene_variant
-                   * `SO_0001895` - TFBS_ablation
-                   * `SO_0001892` - TFBS_amplification
-                   * `SO_0001782` - TF_binding_site_variant
-                   * `SO_0001894` - regulatory_region_ablation
-                   * `SO_0001891` - regulatory_region_amplification
-                   * `SO_0001907` - feature_elongation
-                   * `SO_0001566` - regulatory_region_variant
-                   * `SO_0001906` - feature_truncation
-                   * `SO_0001628` - intergenic_variant
+                  <% Rails.application.config.application.dig(:query_params, :consequence).each do |x| %>
+                  <%= "* `#{x[:key]}` - #{x[:label]}" %>
+                  <% end %>
 
                   see [this documentation](https://ensembl.org/info/genome/variation/prediction/predicted_data.html) for details
 
                 enum:
-                  - SO_0001893
-                  - SO_0001574
-                  - SO_0001575
-                  - SO_0001587
-                  - SO_0001589
-                  - SO_0001578
-                  - SO_0002012
-                  - SO_0001889
-                  - SO_0001821
-                  - SO_0001822
-                  - SO_0001583
-                  - SO_0001818
-                  - SO_0001630
-                  - SO_0001626
-                  - SO_0002019
-                  - SO_0001567
-                  - SO_0001819
-                  - SO_0001580
-                  - SO_0001620
-                  - SO_0001623
-                  - SO_0001624
-                  - SO_0001792
-                  - SO_0001627
-                  - SO_0001621
-                  - SO_0001619
-                  - SO_0001631
-                  - SO_0001632
-                  - SO_0001895
-                  - SO_0001892
-                  - SO_0001782
-                  - SO_0001894
-                  - SO_0001891
-                  - SO_0001907
-                  - SO_0001566
-                  - SO_0001906
-                  - SO_0001628
+                  <% Rails.application.config.application.dig(:query_params, :consequence).each do |x| %>
+                  <%= "- #{x[:key]}" %>
+                  <% end %>
                   - transcript_ablation
                   - splice_acceptor_variant
                   - splice_donor_variant
@@ -826,52 +756,30 @@ components:
                 type: string
                 description: >
                   Both short keys and its label are acceptable
-                   * `NC` - not_in_clinvar
-                   * `P`  - pathogenic
-                   * `LP` - likely_pathogenic
-                   * `US` - uncertain_significance
-                   * `LB` - likely_benign
-                   * `B`  - benign
-                   * `CI` - conflicting_interpretations_of_pathogenicity
-                   * `DR` - drug_response
-                   * `A`  - association
-                   * `RF` - risk_factor
-                   * `PR` - protective
-                   * `AF` - affects
-                   * `O`  - other
-                   * `NP` - not_provided
-                   * `AN` - association_not_found
+                  <% Rails.application.config.application.dig(:query_params, :significance).each do |x| %>
+                  <%= "* `#{x[:key]}` - #{x[:label]}" %>
+                  <% end %>
                 enum:
-                  - NC
-                  - P
-                  - LP
-                  - US
-                  - LB
-                  - B
-                  - CI
-                  - DR
-                  - A
-                  - RF
-                  - PR
-                  - AF
-                  - O
-                  - NP
-                  - AN
-                  - not_in_clinvar
-                  - pathogenic
-                  - likely_pathogenic
-                  - uncertain_significance
-                  - likely_benign
-                  - benign
-                  - conflicting_interpretations_of_pathogenicity
-                  - drug_response
-                  - association
-                  - risk_factor
-                  - protective
-                  - affects
-                  - other
-                  - not_provided
-                  - association_not_found
+                  <% Rails.application.config.application.dig(:query_params, :significance).each do |x| %>
+                  <%= "- #{x[:key]}" %>
+                  <% end %>
+                  <% Rails.application.config.application.dig(:query_params, :significance).each do |x| %>
+                  <%= "- #{x[:id]}" %>
+                  <% end %>
+
+            source:
+              type: array
+              items:
+                type: string
+                description: >
+                  Available values
+                  <% Rails.application.config.application.dig(:datasets, :condition).each do |x| %>
+                  <%= "* `#{x[:id]}` - #{x.dig(:api, :description)}" %>
+                  <% end %>
+                enum:
+                  <% Rails.application.config.application.dig(:datasets, :condition).each do |x| %>
+                  <%= "- #{x[:id]}" %>
+                  <% end %>
 
     Sift:
       type: object
@@ -1010,6 +918,19 @@ components:
               type: boolean
               description: "Include diseases of subordinate concepts in the Mondo Disease Ontology (default: true)"
               example: true
+            source:
+              type: array
+              items:
+                type: string
+                description: >
+                  Available values
+                  <% Rails.application.config.application.dig(:datasets, :condition).each do |x| %>
+                  <%= "* `#{x[:id]}` - #{x.dig(:api, :description)}" %>
+                  <% end %>
+                enum:
+                  <% Rails.application.config.application.dig(:datasets, :condition).each do |x| %>
+                  <%= "- #{x[:id]}" %>
+                  <% end %>
 
     Dataset:
       type: object
@@ -1021,11 +942,11 @@ components:
           type: string
           description: >
             Available values
-            <% Rails.application.config.application.dig(:datasets, :frequency).each do |x| %>
-            <%= "* `#{x[:id]}`: #{x[:description]}" %>
+            <% (config = Rails.application.config.application.dig(:datasets, :frequency)).each do |x| %>
+            <%= "* `#{x[:id]}` - #{x.dig(:api, :description)}" %>
             <% end %>
           enum:
-          <% Rails.application.config.application.dig(:datasets, :frequency).each do |x| %>
+          <% (@current_user ? Variation.accessible_datasets(@current_user)[:frequency] : config).each do |x| %>
             <%= "- #{x[:id]}" %>
             <% if (groups = x[:groups]).present? %>
               <% groups.each do |g| %>

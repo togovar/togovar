@@ -4,9 +4,10 @@ class VariationSearchService
   class HtmlFormatter
     ALLELE_MAX_LENGTH = 4
 
-    def initialize(param, result)
+    def initialize(param, result, **options)
       @param = param
       @result = result
+      @options = options.dup
     end
 
     def to_hash
@@ -120,8 +121,8 @@ class VariationSearchService
     end
 
     def frequencies(result)
-      items = Variation::Datasets::FREQUENCY.map do |id|
-        v = result.dig(:frequency)&.find { |x| x[:source] == id }
+      items = Variation.frequency_datasets(@options[:user]).map do |id|
+        v = result.dig(:frequency)&.find { |x| x[:source] == id.to_s } || {}
         level = level(v[:ac], v[:af])
 
         %Q[<div class="dataset" data-dataset="#{id}" data-frequency="#{level}"></div>]

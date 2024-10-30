@@ -6,7 +6,7 @@ module Executable
   # @param [#execute] service
   # @return [Array] [result, status]
   def execute(service)
-    [service.execute, 200]
+    [service.execute, :ok]
   rescue Errors::ServiceError => e
     [{ errors: e.errors }, e.status]
   rescue StandardError => e

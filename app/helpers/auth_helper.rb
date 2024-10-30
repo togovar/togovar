@@ -31,6 +31,8 @@ module AuthHelper
     @current_user ||= begin
                         return unless (info = session.dig(:user, :info)).present?
 
+                        Rails.logger.debug('user.info') { session.dig(:user, :info) }
+
                         user = info.slice(*USER_INFO_KEYS)
 
                         status = {
@@ -54,7 +56,7 @@ module AuthHelper
 
   DATASET_NAME = ENV.fetch('TOGOVAR_KEYCLOAK_AUTH_ATTRIBUTE_NAME', nil)
   ID_REGEX = if (v = ENV.fetch('TOGOVAR_KEYCLOAK_AUTH_ATTRIBUTE_REGEX', nil)).present?
-               Regexp.compile(v)
+               Regexp.new(v)
              end
 
   def valid_dataset

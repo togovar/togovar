@@ -37,9 +37,9 @@ class VariationSearchService
     end
 
     if @params[:formatter] === 'html'
-      HtmlFormatter.new(params, search).to_hash
+      HtmlFormatter.new(params, search, user: @options[:user]).to_hash
     else
-      ResponseFormatter.new(params, search, @errors).to_hash
+      ResponseFormatter.new(params, search, @errors, user: @options[:user]).to_hash
     end
   end
 
@@ -57,7 +57,7 @@ class VariationSearchService
     Variation.search(query).records.results
   end
 
-  def total
+  def filtered_count
     Variation.count(body: query.slice(:query))
   end
 
@@ -73,11 +73,13 @@ class VariationSearchService
   end
 
   def schema(version)
-    if (path = spec_path(version).to_s).match?(/\.erb$/)
-      YAML.safe_load(ERB.new(File.read(path)).result)
-    else
-      YAML.load_file(path)
-    end
+    YAML.safe_load(ERB.new(File.read(spec_path(version).to_s)).result(get_binding))
+  end
+
+  def get_binding
+    @current_user = @options[:user] || {}
+
+    binding
   end
 
   def spec_path(version)
@@ -90,12 +92,20 @@ class VariationSearchService
   end
 
   def model
-    @model ||= TogoVar::API::VariationSearch.new(@params[:body]).model
+    @model ||= begin
+                 search = TogoVar::API::VariationSearch.new(@params[:body])
+                 search.options = { user: @options[:user] }
+
+                 Rails.logger.debug('model') { search.inspect }
+
+                 search.model
+               end
   end
 
   def search
     {
-      filtered_total: total,
+      total: Variation::QueryHelper.total(@options[:user]),
+      filtered: filtered_count,
       results: results,
       aggs: paging? ? {} : Variation.search(stat_query, request_cache: true).aggregations
     }
@@ -115,7 +125,7 @@ class VariationSearchService
                       hash.update size: 0
                       hash.delete :from
                       hash.delete :sort
-                      hash.merge!(Variation::QueryHelper.statistics)
+                      hash.merge!(Variation::QueryHelper.statistics(@options[:user]))
 
                       hash.tap { |h| debug[:stat_query] = h if @options[:debug] }
                     end

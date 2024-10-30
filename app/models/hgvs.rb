@@ -59,8 +59,6 @@ class HGVS
         end
 
         json = JSON.parse(response.body)
-        Rails.logger.debug('HGVS') { json.to_json }
-
         hgvsg = json.map { |x| x.filter { |_, v| v.is_a?(Hash) }.map { |_, v| v['hgvsg'] } }
                     .flatten
                     .uniq

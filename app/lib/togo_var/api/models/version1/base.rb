@@ -53,6 +53,7 @@ module TogoVar
           end
 
           attr_reader :args
+          attr_accessor :options
 
           def initialize(*args)
             @args = args.map { |arg| arg.is_a?(Hash) ? arg.symbolize_keys : arg }

@@ -5,28 +5,6 @@ module API
     include Executable
     include AuthHelper
 
-    module BackwardCompatibility
-      def variant_params
-        return super unless request.get?
-
-        @variant_params ||= params.permit :term, :quality, :limit, :offset, :stat, :debug, :expand_dataset,
-                                          dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {},
-                                          sift: {}, polyphen: {}, alphamissense: {}
-      end
-
-      # @return [Array] [result, status]
-      def search_variant
-        return super unless request.get?
-
-        params = variant_params
-
-        service = VariationSearchService::WithQueryParameters.new(params.to_h, debug: params.key?(:debug))
-
-        execute(service).tap { |r, _| r.update(debug: service.debug) if params.key?(:debug) }
-      end
-    end
-    prepend BackwardCompatibility
-
     before_action :authenticate_user, only: %i[variant search_variant]
 
     wrap_parameters name: :body, format: :json
@@ -36,6 +14,10 @@ module API
         format.html { render plain: 'Not implemented', content_type: 'text/plain', status: :not_implemented }
         format.json do
           @result, status = search_variant
+
+          if status == :ok && current_user.present? && !authorized?
+            status = :forbidden
+          end
 
           renderer = variant_params.key?(:pretty) ? :pretty_json : :json
           render renderer => @result, status: status
@@ -53,6 +35,28 @@ module API
 
     private
 
+    module BackwardCompatibility
+      def variant_params
+        return super unless request.get?
+
+        @variant_params ||= params.permit :term, :quality, :limit, :offset, :stat, :debug, :expand_dataset,
+                                          dataset: {}, frequency: {}, type: {}, significance: {}, consequence: {},
+                                          sift: {}, polyphen: {}, alphamissense: {}
+      end
+
+      # @return [Array] [result, status]
+      def search_variant
+        return super unless request.get?
+
+        params = variant_params
+
+        service = VariationSearchService::QueryParameters.new(params.to_h, debug: params.key?(:debug), user: current_user)
+
+        execute(service).tap { |r, _| r.update(debug: service.debug) if params.key?(:debug) }
+      end
+    end
+    prepend BackwardCompatibility
+
     def variant_params
       return @variant_params if @variant_params
 
@@ -64,21 +68,21 @@ module API
       hash
     end
 
+    # @return [Array] [result, status]
+    def search_variant
+      params = variant_params
+
+      service = VariationSearchService.new(params.to_h, headers: request_headers, debug: params.key?(:debug), user: current_user)
+
+      execute(service).tap { |r, _| r.update(debug: service.debug) if params.key?(:debug) }
+    end
+
     def gene_params
       params.permit(:pretty, :term, body: {})
     end
 
     def disease_params
       params.permit(:pretty, :term, body: {})
-    end
-
-    # @return [Array] [result, status]
-    def search_variant
-      params = variant_params
-
-      service = VariationSearchService.new(params.to_h, headers: request_headers, debug: params.key?(:debug))
-
-      execute(service).tap { |r, _| r.update(debug: service.debug) if params.key?(:debug) }
     end
 
     def search_action(params, action)

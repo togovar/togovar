@@ -57,6 +57,7 @@ module TogoVar
         reverse_proxy %r{^/$}, 'http://localhost:8000/index.html'
         reverse_proxy %r{^/(\?.*)$}, 'http://localhost:8000/index.html$1'
         reverse_proxy %r{^/((css|js|images|fonts|variant|gene|disease|doc)/.*)$}, 'http://localhost:8000/$1'
+        reverse_proxy %r{^/api$}, 'http://localhost:8000/api/index.html'
       end
     end
 

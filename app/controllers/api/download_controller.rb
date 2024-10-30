@@ -85,14 +85,14 @@ module API
 
     def validate_query
       service = if request.get?
-                  VariationSearchService::WithQueryParameters.new(search_params)
+                  VariationSearchService::QueryParameters.new(search_params, user: current_user)
                 else
-                  VariationSearchService.new(search_params)
+                  VariationSearchService.new(search_params, user: current_user)
                 end
 
       service.validate
 
-      if (total = service.total) > MAX_DOWNLOAD_RECORDS_LIMIT
+      if (total = service.filtered_count) > MAX_DOWNLOAD_RECORDS_LIMIT
         msg = 'Limit your search to less than %{limit} results. Current query returns %{total} results.' % {
           limit: ActiveSupport::NumberHelper.number_to_delimited(MAX_DOWNLOAD_RECORDS_LIMIT),
           total: ActiveSupport::NumberHelper.number_to_delimited(total)
@@ -130,9 +130,9 @@ module API
           params[:limit] = params[:body][:limit] = 1_000
 
           service = if request.get?
-                      VariationSearchService::WithQueryParameters.new(params)
+                      VariationSearchService::QueryParameters.new(params, user: current_user)
                     else
-                      VariationSearchService.new(params)
+                      VariationSearchService.new(params, user: current_user)
                     end
 
           break if (res = service.results.to_a).blank?
@@ -297,22 +297,29 @@ module API
         end
       end
 
-      frequencies = Variation::Datasets::FREQUENCY.filter_map do |source|
-        next unless (frequency = frequencies.find { |x| x[:source] == source.to_s })
+      frequencies = Variation.frequency_datasets(current_user).map do |source|
+        data = frequencies.find { |x| x[:source] == source.to_s } || {}
 
-        filters = Array(frequency[:filter])
+        filters = Array(data[:filter])
         filters = filters.join(ITEMS_SEPARATOR) if type == :csv
 
-        {
-          "#{source}_allele_alt": frequency[:ac],
-          "#{source}_allele_total": frequency[:an],
-          "#{source}_alt_allele_freq": frequency[:af],
-          "#{source}_genotype_alt_alt": frequency[:aac],
-          "#{source}_genotype_ref_alt": frequency[:arc],
-          "#{source}_genotype_ref_ref": frequency[:rrc],
-          "#{source}_qc_status": filters
-        }.compact
+        hash = if (config = Rails.application.config.application.dig(:datasets, :frequency).find { |x| x[:id] == source.to_s })
+                 config[:download].to_h { |k, v| ["#{source}_#{v}", data[k]] }.merge("#{source}_qc_status": filters)
+               else
+                 {
+                   "#{source}_allele_alt": data[:ac],
+                   "#{source}_allele_total": data[:an],
+                   "#{source}_alt_allele_freq": data[:af],
+                   "#{source}_qc_status": filters
+                 }
+               end
+
+        hash.compact! if type == :json
+
+        hash
       end
+
+      frequencies.reject!(&:blank?) if type == :json
 
       frequencies.inject({}) { |memo, x| memo.merge(x) }
     end
