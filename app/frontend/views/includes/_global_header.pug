@@ -43,6 +43,10 @@ header#GlobalHeader
         a.link(href=navLink("history")) History
       li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^help/)})
         a.link(href=navLink("help")) Help
+      li.item.menu-button
+        a(href='/auth/login') Login
+      li.item.menu-button
+        a(href='/auth/logout') Logout
 
     if locals.currentPage === "home"
       ul.menu.config
