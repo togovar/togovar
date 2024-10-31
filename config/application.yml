@@ -11,7 +11,7 @@ shared:
         - &gem_j_wga
           id: gem_j_wga
           label: GEM-J WGA
-          filter: false
+          filter: true
           api:
             description: "[GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel](https://togovar.org/doc/datasets/gem_j_wga)"
           download:
@@ -24,10 +24,18 @@ shared:
           api:
             description: "** DDBJ account required **" # TODO: description
           groups:
-            - jga_wgs.jgad000670
-            - jga_wgs.jgad000687
-            - jga_wgs.jgad000688
-            - jga_wgs.jgad000689
+            - id: jga_wgs.jgad000670
+              authorization:
+                id: jga_dataset
+            - id: jga_wgs.jgad000687
+              authorization:
+                id: jga_dataset
+            - id: jga_wgs.jgad000688
+              authorization:
+                id: jga_dataset
+            - id: jga_wgs.jgad000689
+              authorization:
+                id: jga_dataset
           download:
             ac: allele_alt
             an: allele_total
@@ -41,8 +49,6 @@ shared:
             hac: genotype_hemi_alt
             hrc: genotype_hemi_ref
             hoc: genotype_hemi_othre_alts
-          authorization:
-            id: jga_dataset
         - &jga_ngs
           id: jga_ngs
           label: JGA WES

@@ -2,20 +2,18 @@ class Variation
   include Variation::Searchable
 
   class << self
-    def all_datasets(user, groups: false)
-      datasets = accessible_datasets(user).values
-
-      datasets.map { |x| x.flat_map { |y| [y[:id]].concat(Array(groups ? y[:groups] : nil)) } }
-              .flatten
-              .map(&:to_sym)
+    def all_datasets(user, groups: false, filter: nil)
+      frequency_datasets(user, groups:, filter:).concat(condition_datasets(user))
     end
 
     def frequency_datasets(user, groups: false, filter: nil)
       datasets = accessible_datasets(user)[:frequency]
 
-      datasets.filter_map { |x| [x[:id]].concat(Array(groups ? x[:groups] : nil)) if filter.nil? || x[:filter] == filter }
-              .flatten
-              .map(&:to_sym)
+      datasets.flat_map do |dataset|
+        g = groups ? Array(dataset[:groups]).map { |x| x.is_a?(Hash) ? x[:id].to_sym : x.to_sym } : []
+
+        [dataset[:id].to_sym].concat(g) if filter.nil? || dataset[:filter] == filter
+      end.compact
     end
 
     def condition_datasets(user)
@@ -27,8 +25,25 @@ class Variation
     def accessible_datasets(user)
       authorized_datasets = Array((user || {})[:datasets]&.keys&.map(&:to_s))
 
-      Rails.application.config.application[:datasets].to_h do |k, v|
-        [k, v.reject { |x| x.key?(:authorization) && !authorized_datasets.include?(x[:authorization][:id]) }]
+      filter_hash(Rails.application.config.application[:datasets], authorized_datasets)
+    end
+
+    private
+
+    def filter_hash(hash, values)
+      return hash unless hash.is_a?(Hash)
+      return if hash.key?(:authorization) && !values.include?(hash.dig(:authorization, :id))
+
+      hash.each_with_object({}) do |(k, v), result|
+        if v.is_a?(Array)
+          arr = v.map { |x| filter_hash(x, values) }.compact
+          result[k] = arr unless arr.blank?
+        elsif v.is_a?(Hash)
+          nested = filter_hash(v, values)
+          result[k] = nested unless nested.blank?
+        else
+          result[k] = v
+        end
       end
     end
   end

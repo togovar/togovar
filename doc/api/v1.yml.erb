@@ -950,7 +950,7 @@ components:
             <%= "- #{x[:id]}" %>
             <% if (groups = x[:groups]).present? %>
               <% groups.each do |g| %>
-            <%= "- #{g}" %>
+            <%= "- #{g.is_a?(Hash) ? g[:id] : g}" %>
               <% end %>
             <% end %>
           <% end %>
