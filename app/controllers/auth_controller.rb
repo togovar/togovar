@@ -1,7 +1,7 @@
 class AuthController < ActionController::Base
   include AuthHelper
 
-  protect_from_forgery
+  protect_from_forgery with: :exception
 
   before_action :authenticate_user, only: %i[status]
 
