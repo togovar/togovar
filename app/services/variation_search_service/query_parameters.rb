@@ -92,7 +92,8 @@ class VariationSearchService
         total: Variation::QueryHelper.total(@options[:user]),
         filtered: 0,
         hits: [],
-        aggs: {}
+        aggs: {},
+        count_condition_absence: 0
       }
     end
 
@@ -106,7 +107,8 @@ class VariationSearchService
         total: Variation::QueryHelper.total(@options[:user]),
         filtered: filtered_count,
         results: res.records.results,
-        aggs: param.stat? ? Variation.search(stat_query, request_cache: true).aggregations : {}
+        aggs: param.stat? ? Variation.search(stat_query, request_cache: true).aggregations.to_hash : {},
+        count_condition_absence: Variation::QueryHelper.count_conditions_absence(builder.build)
       }
     end
 

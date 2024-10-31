@@ -76,7 +76,7 @@ class VariationSearchService
 
     def significance(json)
       json.significance do
-        unless (c = @result[:filtered] - @result[:aggs].dig(:conditions_total, :doc_count)).zero?
+        unless (c = @result[:count_condition_absence]).zero?
           json.set! 'NC', c
         end
         Array(@result[:aggs].dig(:conditions_condition, :classification, :buckets)).each do |x|

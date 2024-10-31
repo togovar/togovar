@@ -80,20 +80,6 @@ class Variation
           end
         end
 
-        aggregation :conditions_total do
-          filter exists: { field: :conditions }
-        end
-
-        aggregation :conditions_condition do
-          nested do
-            path 'conditions.condition'
-            aggregation :classification do
-              terms field: 'conditions.condition.classification',
-                    size: cardinality[:condition_classifications]
-            end
-          end
-        end
-
         aggregation :frequency do
           nested do
             path :frequency
@@ -114,9 +100,51 @@ class Variation
             end
           end
         end
+
+        aggregation :conditions_condition do
+          nested do
+            path 'conditions.condition'
+            aggregation :classification do
+              terms field: 'conditions.condition.classification',
+                    size: cardinality[:condition_classifications]
+            end
+          end
+        end
       end
     end
 
-    module_function :total, :statistics
+    def count_conditions_absence(query)
+      q = {
+        nested: {
+          path: 'conditions',
+          query: {
+            exists: {
+              field: 'conditions'
+            }
+          }
+        }
+      }
+
+      body = if query[:query].key?(:bool)
+               {
+                 query: {
+                   bool: query[:query][:bool].merge(must_not: (query.dig(:query, :bool, :must_not) || []).concat([q]))
+                 }
+               }
+             else
+               {
+                 query: {
+                   bool: {
+                     must_not: [q],
+                     must: [query[:query]]
+                   }
+                 }
+               }
+             end
+
+      Variation.count(body:)
+    end
+
+    module_function :total, :statistics, :count_conditions_absence
   end
 end

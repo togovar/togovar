@@ -105,7 +105,8 @@ class VariationSearchService
       total: Variation::QueryHelper.total(@options[:user]),
       filtered: filtered_count,
       results: results,
-      aggs: paging? ? {} : Variation.search(stat_query, request_cache: true).aggregations
+      aggs: paging? ? {} : Variation.search(stat_query, request_cache: true).aggregations,
+      count_condition_absence: Variation::QueryHelper.count_conditions_absence(model.to_hash)
     }
   end
 
