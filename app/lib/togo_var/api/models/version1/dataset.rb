@@ -6,7 +6,7 @@ module TogoVar
       module Version1
         class Dataset < Base
           DATASETS = Rails.application.config.application.dig(:datasets, :frequency)
-          ACCEPTABLE_DATASET = (DATASETS.map { |x| x[:id] } + DATASETS.filter_map { |x| x[:groups] if x[:groups] }.flatten).sort
+          ACCEPTABLE_DATASET = DATASETS.flat_map { |dataset| [dataset[:id]].concat(Array(dataset[:groups]).map { |x| x.is_a?(Hash) ? x[:id] : x }) }.compact
 
           attr_reader :name
 
