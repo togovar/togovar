@@ -39,7 +39,7 @@ module TogoVar
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use ActionDispatch::Session::RedisStore,
                           servers: [
-                            "redis://#{ENV.fetch('TOGOVAR_REDIS_HOST', 'localhost')}:#{ENV.fetch('TOGOVAR_REDIS_HOST', '6379')}/0/session"
+                            "redis://#{ENV.fetch('TOGOVAR_REDIS_HOST', 'localhost')}:#{ENV.fetch('TOGOVAR_REDIS_PORT', '6379')}/0/session"
                           ],
                           expire_after: begin
                                           Integer(ENV.fetch('TOGOVAR_REDIS_SESSION_EXPIRE'))
