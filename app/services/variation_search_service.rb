@@ -96,8 +96,6 @@ class VariationSearchService
                  search = TogoVar::API::VariationSearch.new(@params[:body])
                  search.options = { user: @options[:user] }
 
-                 Rails.logger.debug('model') { search.inspect }
-
                  search.model
                end
   end

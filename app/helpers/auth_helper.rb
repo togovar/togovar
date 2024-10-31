@@ -31,8 +31,6 @@ module AuthHelper
     @current_user ||= begin
                         return unless (info = session.dig(:user, :info)).present?
 
-                        Rails.logger.debug('user.info') { session.dig(:user, :info) }
-
                         user = info.slice(*USER_INFO_KEYS)
 
                         status = {
