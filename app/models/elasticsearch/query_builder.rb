@@ -55,7 +55,7 @@ module Elasticsearch
                     query do
                       bool do
                         must do
-                          terms 'frequency.source': v
+                          terms 'frequency.source': v.map { |x| x == :jga_wes ? :jga_ngs : x } # TODO: remove if dataset renamed
                         end
                         must do
                           match 'frequency.filter': 'PASS'
@@ -70,7 +70,7 @@ module Elasticsearch
                   nested do
                     path :frequency
                     query do
-                      terms 'frequency.source': v
+                      terms 'frequency.source': v.map { |x| x == :jga_wes ? :jga_ngs : x } # TODO: remove if dataset renamed
                     end
                   end
                 end
@@ -81,7 +81,7 @@ module Elasticsearch
                   nested do
                     path :frequency
                     query do
-                      terms 'frequency.source': v
+                      terms 'frequency.source': v.map { |x| x == :jga_wes ? :jga_ngs : x } # TODO: remove if dataset renamed
                     end
                   end
                 end
@@ -122,6 +122,9 @@ module Elasticsearch
         query do
           bool do
             sources.each do |source|
+              # TODO: remove if dataset renamed
+              source = :jga_ngs if source == :jga_wes
+
               send(all_datasets ? :must : :should) do
                 nested do
                   path :frequency
@@ -384,7 +387,6 @@ module Elasticsearch
       conditions << @term_condition
       conditions << @dataset_condition
       conditions << @frequency_condition
-      conditions << @quality_condition
       conditions << @type_condition
       conditions << @significance_condition
       conditions << @consequence_condition

@@ -61,7 +61,10 @@ class VariationSearchService
         datasets = Array(aggs.dig(:frequency, :source, :buckets)).concat(Array(aggs.dig(:condition, :source, :buckets)))
 
         datasets.each do |x|
-          json.set! x[:key], x[:doc_count] if accessible_datasets.include?(x[:key].to_sym)
+          # TODO: remove if dataset renamed
+          key = x[:key] == 'jga_ngs' ? 'jga_wes' : x[:key]
+
+          json.set! key, x[:doc_count] if accessible_datasets.include?(key.to_sym)
         end
       end
     end
@@ -210,6 +213,9 @@ class VariationSearchService
         json.transcripts vep.map(&:compact).presence
 
         frequencies = Array(variant[:frequency]).filter_map do |x|
+          # TODO: remove if dataset renamed
+          x[:source] = 'jga_wes' if x[:source] == 'jga_ngs'
+
           next unless accessible_datasets.include?(x[:source].to_sym)
 
           if x[:af].blank? && x[:ac].present? && x[:an].present?

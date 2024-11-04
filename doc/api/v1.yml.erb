@@ -1298,13 +1298,23 @@ components:
                 type: string
               alphamissense_score:
                 type: number
-              jga_ngs_allele_alt:
+              jga_wgs_allele_alt:
                 type: number
-              jga_ngs_allele_total:
+              jga_wgs_allele_total:
                 type: number
-              jga_ngs_alt_allele_freq:
+              jga_wgs_alt_allele_freq:
                 type: number
-              jga_ngs_qc_status:
+              jga_wgs_qc_status:
+                type: array
+                items:
+                  type: string
+              jga_wes_allele_alt:
+                type: number
+              jga_wes_allele_total:
+                type: number
+              jga_wes_alt_allele_freq:
+                type: number
+              jga_wes_qc_status:
                 type: array
                 items:
                   type: string
@@ -1519,20 +1529,20 @@ components:
               lte: 73376976
 
     SearchVariant-5:
-      summary: List variants range from 0.05 to 0.95 in frequency in JGA-NGS.
+      summary: List variants range from 0.05 to 0.95 in frequency in JGA-WES.
       value:
         query:
           or:
             - frequency:
                 dataset:
-                  name: jga_ngs
+                  name: jga_wes
                 frequency:
                   gte: 0
                   lte: 0.05
                 filtered: true
             - frequency:
                 dataset:
-                  name: jga_ngs
+                  name: jga_wes
                 frequency:
                   gte: 0.95
                   lte: 1.0

@@ -30,6 +30,8 @@ module TogoVar
             validate
 
             name = @name
+            # TODO: remove if dataset renamed
+            name = 'jga_ngs' if name == 'jga_wes'
 
             Elasticsearch::DSL::Search.search do
               query do

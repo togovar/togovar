@@ -49,12 +49,12 @@ shared:
             hac: genotype_hemi_alt
             hrc: genotype_hemi_ref
             hoc: genotype_hemi_othre_alts
-        - &jga_ngs
-          id: jga_ngs
+        - &jga_wes
+          id: jga_wes
           label: JGA WES
           filter: true
           api:
-            description: "[Japanese Genotype-phenotype Archive (JGA)](https://togovar.org/doc/datasets/jga_ngs)"
+            description: "[Japanese Genotype-phenotype Archive (JGA)](https://togovar.org/doc/datasets/jga_wes)"
           download:
             ac: allele_alt
             an: allele_total
@@ -627,7 +627,7 @@ shared:
     datasets:
       frequency:
         - <<: *gem_j_wga
-        - <<: *jga_ngs
+        - <<: *jga_wes
           authorization:
             id: jga_dataset
         - <<: *jga_snp

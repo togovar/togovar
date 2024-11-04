@@ -85,6 +85,7 @@ module TogoVar
                           path :frequency
                           query do
                             terms 'frequency.source': Variation.frequency_datasets(user)
+                                                               .map { |x| x == :jga_wes ? :jga_ngs : x } # TODO: remove if dataset renamed
                           end
                         end
                       end
