@@ -289,8 +289,8 @@ export default class ResultsRowView {
               this.tdClinicalSign.dataset.value =
                 result.significance[0].interpretations[0];
 
-              // TODO: 10/20にmedgenの表示があっているかを確認
               if (result.significance[0].conditions[0] !== undefined) {
+                this.tdClinicalSign.textContent = ""
                 if (result.significance[0].conditions[0].name) {
                   this.tdClinicalAnchor.textContent =
                     result.significance[0].conditions[0].name
@@ -304,6 +304,7 @@ export default class ResultsRowView {
                 }
               } else {
                 this.tdClinicalSign.textContent = "No MedGen provided"
+                this.tdClinicalAnchor.textContent = ""
               }
 
               this.tdClinicalIcon.dataset.remains = result.significance.length - 1;

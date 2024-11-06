@@ -18,7 +18,6 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
     this.update();
   }
 
-  // TODO: 10/20にこの表示で良いかを確認
   update() {
     let html = '';
     if (StoreManager.getData('selectedRow') !== undefined) {
@@ -96,8 +95,8 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
                 ${master.items.find(item => item.id === interpretation.interpretation).label}
               </div>
               <div class="disease-category">
-                <span class="mgend">${interpretation.sources.includes("mgend") ? 'MGeND' : ''}</span>
-                <span class="clinvar">${interpretation.sources.includes("clinvar") ? 'ClinVar' : ''}</span>
+                ${interpretation.sources.includes("mgend") ? '<span class="mgend">MGeND</span>' : ''}
+                ${interpretation.sources.includes("clinvar") ? '<span class="clinvar">ClinVar</span>' : ''}
               </div>
             </dd> `).join('') :
               ''

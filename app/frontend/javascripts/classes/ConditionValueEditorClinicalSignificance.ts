@@ -1,4 +1,3 @@
-// TODO: 10/20 MGeNDが加わるため、下記の処理を確認する必要がある
 import ConditionValueEditor from './ConditionValueEditor.js';
 import { ADVANCED_CONDITIONS } from '../global.js';
 import ConditionValues from './ConditionValues.js';

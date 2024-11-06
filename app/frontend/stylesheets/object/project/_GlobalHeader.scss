@@ -93,9 +93,19 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
           > li.menu-button {
             color: $COLOR_BLACK;
 
-            &.config,
-            &.login {
+            &.config {
               cursor: pointer;
+            }
+
+            &.login {
+              > a.link {
+                color: $COLOR_BLACK;
+                text-decoration: none;
+
+                &:hover {
+                  color: $COLOR_KEY_DARK1;
+                }
+              }
             }
 
             &:hover {

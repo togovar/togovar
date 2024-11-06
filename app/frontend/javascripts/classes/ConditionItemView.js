@@ -251,7 +251,6 @@ class ConditionItemView extends ConditionView {
         };
       }
 
-      // TODO: 10/20
       case CONDITION_TYPE.significance: {
         const valueMgendElements = Array.from(
           this._valuesEl.querySelectorAll(':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view')
@@ -265,7 +264,7 @@ class ConditionItemView extends ConditionView {
         const mgendCondition = valueMgendElements.length > 0 ? {
           [this._conditionType]: {
             relation: this._elm.dataset.relation,
-            source: "mgend",
+            source: ["mgend"],
             terms: valueMgendElements.map((value) => value.value),
           },
         } : null;
@@ -273,7 +272,7 @@ class ConditionItemView extends ConditionView {
         const clinvarCondition = valueClinvarElements.length > 0 ? {
           [this._conditionType]: {
             relation: this._elm.dataset.relation,
-            source: "clinvar",
+            source: ["clinvar"],
             terms: valueClinvarElements.map((value) => value.value),
           },
         } : null;
