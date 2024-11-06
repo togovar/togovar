@@ -283,7 +283,6 @@ class ConditionItemView extends ConditionView {
         // conditionsの中身が1つの場合は直接返し、2つの場合はor/andでラップ
         const result = conditions.length === 1 ? conditions[0] : { [relationType]: conditions };
 
-        console.log(result);
         return result;
       }
 
