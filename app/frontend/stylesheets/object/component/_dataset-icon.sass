@@ -27,7 +27,7 @@
       display: block
       height: 10px
   // color
-  &[data-dataset="jga_ngs"], &[data-dataset="jga_snp"]
+  &[data-dataset="jga_wgs"],&[data-dataset="jga_wes"], &[data-dataset="jga_snp"]
     &:before
       color: $COLOR_DATASET_JGA
   &[data-dataset="tommo"]
@@ -66,7 +66,7 @@
       &::after
         content: "WGS"
   // WES
-  &[data-dataset="jga_ngs"], &[data-dataset="hgvd"], &[data-dataset="gnomad_exomes"]
+  &[data-dataset="jga_wgs"],&[data-dataset="jga_wes"], &[data-dataset="hgvd"], &[data-dataset="gnomad_exomes"]
     > .properties
       &::after
         content: "WES"

@@ -23,6 +23,7 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
   _columns: HTMLElement;
   _description: HTMLElement;
   _nodesToShowInValueView: Array<HierarchyNode<DataNodeWithChecked>>;
+  _uniqueIdCounter: number;
 
   constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
@@ -30,6 +31,8 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     this._data = this._prepareData();
 
     this._nodesToShowInValueView = [];
+
+    this._uniqueIdCounter = 0;
     // HTML
     this._createElement(
       'columns-editor-view',
@@ -78,23 +81,45 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
 
   // private methods
 
-  _prepareData() {
+  // Nodeに一意のIDを追加する関数
+  private _addIdsToDataNodes(dataNodes: DataNode[]): DataNodeWithChecked[] {
+    return dataNodes.map((node) => {
+      if (!Number.isInteger(this._uniqueIdCounter)) {
+        this._uniqueIdCounter = 0; // 念のため整数で初期化
+      }
+
+      // 各ノードに一意のIDを設定
+      const newNode: DataNodeWithChecked = {
+        ...node,
+        id: `${this._uniqueIdCounter++}`,
+        checked: false,
+        indeterminate: false,
+      };
+
+      // 子ノードがある場合は再帰的に処理
+      if (newNode.children && newNode.children.length > 0) {
+        newNode.children = this._addIdsToDataNodes(newNode.children);
+      }
+      return newNode;
+    });
+  }
+
+  private _prepareData() {
     switch (this._conditionType) {
       case CONDITION_TYPE.dataset: {
         const data = ADVANCED_CONDITIONS[this._conditionType]
           .values as DataNodeWithChecked[];
+        const dataWithIds = this._addIdsToDataNodes(data);
+
         const hierarchyData = hierarchy<DataNodeWithChecked>({
           id: '-1',
           label: 'root',
           value: '',
-          children: data,
+          children: dataWithIds,
           checked: false,
           indeterminate: false,
         });
-        for (const child of hierarchyData.descendants()) {
-          child.data.checked = false;
-          child.data.indeterminate = false;
-        }
+
         return hierarchyData;
       }
       default:

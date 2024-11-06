@@ -153,47 +153,6 @@ $CORNER_RADIUS: calc($HEIGHT / 2)
       border: solid 2px $COLOR_SELECTED
       border-radius: $CORNER_RADIUS
       pointer-events: none
-  &[data-classification="dataset"]
-    > .body
-      > .summary
-        > .values
-          > .value
-            min-width: 120px
-            &::before
-              font-family: fontello
-              content: $CHAR_DATASET
-              margin-right: 4px
-            &[data-value="jga_ngs"], &[data-value="jga_snp"]
-              border-color: $COLOR_DATASET_JGA
-              background-color: $COLOR_DATASET_JGA_LIGHT
-              &::before
-                color: $COLOR_DATASET_JGA
-            &[data-value="tommo"]
-              border-color: $COLOR_DATASET_TOMMO
-              background-color: $COLOR_DATASET_TOMMO_LIGHT
-              &::before
-                color: $COLOR_DATASET_TOMMO
-            &[data-value="hgvd"], &[data-value="mgend"]
-              border-color: $COLOR_DATASET_HGVD
-              background-color: $COLOR_DATASET_HGVD_LIGHT
-              &::before
-                color: $COLOR_DATASET_HGVD
-            &[data-value="gem_j_wga"]
-              border-color: $COLOR_DATASET_GEM_J
-              background-color: $COLOR_DATASET_GEM_J_LIGHT
-              &::before
-                color: $COLOR_DATASET_GEM_J
-            &[data-value="bbj"]
-              border-color: $COLOR_DATASET_BBJ
-              background-color: $COLOR_DATASET_BBJ_LIGHT
-              &::before
-                color: $COLOR_DATASET_BBJ
-            &[data-value="clinvar"], &[data-value="exac"], &[data-value="gnomad"]
-              border-color: $COLOR_DATASET_FOREIGN
-              background-color: $COLOR_DATASET_FOREIGN_LIGHT
-              &::before
-                color: $COLOR_DATASET_FOREIGN
-
   &[data-classification="significance"]
     > .body
       > .summary

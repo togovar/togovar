@@ -18,15 +18,15 @@
         "has_freq": true
       },
       {
-        "id": "jga_ngs",
-        "label": "JGA NGS",
+        "id": "jga_wes",
+        "label": "JGA-WES",
         "type": "boolean",
         "default": "1",
         "has_freq": true
       },
       {
         "id": "jga_snp",
-        "label": "JGA SNP",
+        "label": "JGA-SNP",
         "type": "boolean",
         "default": "1",
         "has_freq": true
