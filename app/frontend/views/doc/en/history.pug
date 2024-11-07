@@ -21,6 +21,7 @@ block content
             li
               strong Datasets:
               |
+              | Clinical significance from
               |
               a.hyper-text.-external(href='https://mgend.ncgm.go.jp/') MGeND (Medical Genomics Japan Variant Database)
               |
@@ -28,12 +29,13 @@ block content
               ul.unordered-list
                 li MGeND is a database of genome variants and their clinical characteristics, 
                   | collected through
-                  a.hyper-text.-external(href='https://www.amed.go.jp/en/program/list/14/05/006.html') MGeND (Medical Genomics Japan Variant Database)
                   |
-                  | the Clinical Genome Information Integration Database Development Project by the Japan Agency for Medical Research and Development (AMED). 
-                  | This database contains variant information for diseases such as cancer, rare and intractable diseases, infectious diseases, dementia, and hearing loss,
+                  a.hyper-text.-external(href='https://www.amed.go.jp/en/program/list/14/05/006.html') the Clinical Genome Information Integration Database Development Project
+                  |
+                  | by the Japan Agency for Medical Research and Development (AMED)
+                  | . MGeND contains variant information for diseases such as cancer, rare and intractable diseases, infectious diseases, dementia, and hearing loss,
                   | and can be considered the Japanese equivalent of ClinVar. 
-                li The disease names in MGeND have been aligned with the vocabulary used by MedGen, which is also employed in ClinVar. 
+                li The disease names in MGeND have been aligned with the vocabulary defined in MedGen, which is also used in ClinVar.
                   | On each disease report page, you can compare the clinical significance of variants for the same disease between MGeND and ClinVar.
                   | Example: [List examples where comparisons between MGeND and ClinVar can be made in disease view.]
             li
@@ -43,18 +45,20 @@ block content
               a.hyper-text.-internal(href='/doc/datasets/jga_wgs') The JGA-WGS dataset
               | was newly added (GRCh38 only).
               ul.unordered-list
-                li The JGA-WGS dataset aggregates allele frequencies and genotype counts by reanalyzing whole-genome sequence data deposited in
+                li JGA-WGS aggregates allele frequencies and genotype counts by reanalyzing whole-genome sequence data deposited in
                   |
                   |
-                  a.hyper-text.-external(href='https://humandbs.dbcls.jp/en/') the NBDC Human Database
+                  a.hyper-text.-external(href='https://humandbs.dbcls.jp/en/') NBDC Human Database
                   | /
-                  a.hyper-text.-external(href='https://www.ddbj.nig.ac.jp/jga/index-e.html') the Japanese Genotype-phenotype Archive (JGA)
+                  a.hyper-text.-external(href='https://www.ddbj.nig.ac.jp/jga/index-e.html') Japanese Genotype-phenotype Archive (JGA)
                   | . The reference genome used is GRCh38. For more information on the reanalysis, please refer to
                   |
-                  a.hyper-text.-external(href='https://humandbs.dbcls.jp/en/data-processing') the “Whole genome sequencing analysis data (germline)”
+                  a.hyper-text.-external(href='https://humandbs.dbcls.jp/en/data-processing') “Whole genome sequencing analysis data (germline)”
                   |
                   | on the NBDC Human Database website.
-                li The frequenies previously published as JGA-NGS, obtained from variant calling on whole-exome sequences deposited to JGA, was renamed to 
+                li The frequencies previously published as JGA-NGS, obtained by variant calling on whole-exome sequences deposited to JGA, were renamed to
+                  |
+                  |
                   a.hyper-text.-internal(href='/doc/datasets/jga_wes') JGA-WES
                   | .
           h3.sectiontitle 2024/6/27
