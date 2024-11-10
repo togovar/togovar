@@ -269,7 +269,7 @@ module API
       data[:type] = result[:type] if columns.include?(:type)
       data[:gene] = symbols.presence if columns.include?(:gene)
       data[:consequence] = consequences.presence if columns.include?(:consequence)
-      data[:condition] = condition if columns.include?(:condition)
+      data[:condition] = condition.presence if columns.include?(:condition)
       if columns.include?(:sift)
         data[:sift_qualitative_prediction] = sift ? Sift.find_by_value(sift).label : nil
         data[:sift_score] = sift
@@ -298,19 +298,21 @@ module API
       end
 
       frequencies = Variation.frequency_datasets(current_user).map do |source|
-        data = frequencies.find { |x| x[:source] == source.to_s } || {}
+        # TODO: remove if dataset renamed
+        data = frequencies.find { |x| x[:source] == (source == :jga_wes ? :jga_ngs : source).to_s } || {}
+        # data = frequencies.find { |x| x[:source] == source.to_s } || {}
 
         filters = Array(data[:filter])
         filters = filters.join(ITEMS_SEPARATOR) if type == :csv
 
         hash = if (config = Rails.application.config.application.dig(:datasets, :frequency).find { |x| x[:id] == source.to_s })
-                 config[:download].to_h { |k, v| ["#{source}_#{v}", data[k]] }.merge("#{source}_qc_status": filters)
+                 config[:download].to_h { |k, v| ["#{source}_#{v}", data[k]] }.merge("#{source}_qc_status": filters.presence)
                else
                  {
                    "#{source}_allele_alt": data[:ac],
                    "#{source}_allele_total": data[:an],
                    "#{source}_alt_allele_freq": data[:af],
-                   "#{source}_qc_status": filters
+                   "#{source}_qc_status": filters.presence
                  }
                end
 
