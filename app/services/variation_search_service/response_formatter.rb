@@ -4,7 +4,7 @@ class VariationSearchService
 
     def initialize(param, result, error = [], warning = [], notice = [], **options)
       @param = param
-      @result = result
+      @result = result.deep_symbolize_keys
       @error = error
       @warning = warning
       @notice = notice
