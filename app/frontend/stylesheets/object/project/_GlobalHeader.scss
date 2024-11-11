@@ -99,6 +99,7 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
 
             &.login {
               > a.link {
+                min-width: 30px;
                 color: $COLOR_BLACK;
                 text-decoration: none;
 
