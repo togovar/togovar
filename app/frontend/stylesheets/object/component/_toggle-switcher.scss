@@ -1,0 +1,43 @@
+.toggleContainer {
+  width: 48px;
+  border: 2px solid $COLOR_KEY_DARK2;
+  border-radius: 20px;
+  background: $COLOR_KEY_DARK2;
+  color: #343434;
+  cursor: pointer;
+
+  a#LanguageLink {
+    display: flex;
+    justify-content: space-between;
+    text-decoration: none;
+
+    &.en {
+      span.en {
+        background-color: white;
+        box-shadow: 3px 0px 2px 1px $COLOR_KEY_DARK3;
+      }
+      span.ja {
+        color: white;
+      }
+    }
+    &.ja {
+      span.ja {
+        background-color: white;
+        box-shadow: -3px 0px 2px 1px $COLOR_KEY_DARK3;
+      }
+      span.en {
+        color: white;
+      }
+    }
+
+    span {
+      display: block;
+      text-align: center;
+      padding: 0px 6px;
+      border-radius: 20px;
+      color: $COLOR_BLACK;
+      font-size: 12px;
+      width: 23px;
+    }
+  }
+}

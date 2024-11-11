@@ -1,6 +1,6 @@
 block variables
   include ../includes/_globals
-  - lang = locals.language ? locals.language : "en";
+  //- - lang = locals.language ? locals.language : "en";
 
 doctype html
 html(data-page=locals.currentPage, lang=lang)
@@ -9,6 +9,33 @@ html(data-page=locals.currentPage, lang=lang)
     meta(charset="utf-8")
     meta(name="viewport" content="width=device-width, initial-scale=1")
     link(rel="icon" href="/favicon.svg" type="image/svg+xml")
+    script.
+      document.addEventListener('DOMContentLoaded', () => {
+      let currentLang = window.location.pathname.includes('ja') ? 'ja' : 'en';
+      let currentPage = document.documentElement.getAttribute('data-page');
+      let LanguageLink = document.getElementById('LanguageLink');
+
+      const switchLang = () => {
+        if (currentLang === 'ja') {
+          LanguageLink.href= `/doc/${currentPage}`
+          LanguageLink.classList.remove('ja');
+          LanguageLink.classList.add('en');
+        } else {
+          LanguageLink.href= `/doc/ja/${currentPage}`
+          LanguageLink.classList.remove('en');
+          LanguageLink.classList.add('ja');
+        }
+
+        window.location.href = LanguageLink.href;
+      };
+
+        if (LanguageLink) {
+          LanguageLink.addEventListener('click', (e) => {
+            switchLang();
+          });
+        }
+      })
+
     block head
   body
     include ../includes/_global_header

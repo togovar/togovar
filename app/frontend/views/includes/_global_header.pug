@@ -23,7 +23,9 @@ header#GlobalHeader
                 a.link(href="http://grch38.togovar.org/") GRCh38
               when 'GRCh38'
                 a.link.-active GRCh38
+<<<<<<< HEAD
   nav.menus
+<<<<<<< HEAD
     ul.menu.navigation
       li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^home/)})
         a.link(href="/") Home
@@ -47,23 +49,79 @@ header#GlobalHeader
         a(href='/auth/login') Login
       li.item.menu-button
         a(href='/auth/logout') Logout
+=======
+    .menu-bar
+    .menu-wrapper
+      ul.menu.navigation
+        li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^home/)})
+          a.link(href="/") Home
+        li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^datasets/)})
+          a.link(href=navLink("datasets")) Datasets
+        li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^downloads/)})
+          a.link(href=navLink("downloads")) Downloads
+        li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^api/)})
+          a.link(href="/api") API
+        li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^terms/)})
+          a.link(href=navLink("terms")) Terms
+        li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^contact/)})
+          a.link(href=navLink("contact")) Contact
+        li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^about/)})
+          a.link(href=navLink("about")) About
+        li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^history/)})
+          a.link(href=navLink("history")) History
+        li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^help/)})
+          a.link(href=navLink("help")) Help
+>>>>>>> 6fceb8b (fix language toggle)
+=======
+  .right
+    .menu-bar
+    nav.menus-view
+      .menu-wrapper
+        ul.menu.navigation
+          li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^home/)})
+            a.link(href="/") Home
+          li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^datasets/)})
+            a.link(href=navLink("datasets")) Datasets
+          li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^downloads/)})
+            a.link(href=navLink("downloads")) Downloads
+          li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^api/)})
+            a.link(href="/api") API
+          li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^terms/)})
+            a.link(href=navLink("terms")) Terms
+          li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^contact/)})
+            a.link(href=navLink("contact")) Contact
+          li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^about/)})
+            a.link(href=navLink("about")) About
+          li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^history/)})
+            a.link(href=navLink("history")) History
+          li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^help/)})
+            a.link(href=navLink("help")) Help
+>>>>>>> 94a3499 (fix menu button)
 
-    if locals.currentPage === "home"
-      ul.menu.config
-        li.menu-button.config
-    else if locals.currentPage === "variant"
-    else if locals.currentPage === "gene"
-    else if locals.currentPage === "disease"
-    else if locals.currentPage === "api"
-    else
-      ul.menu.languageswitcher
-        li.language.menu-button(class={"-current": locals.language === "ja"} data-language="ja" title="日本語")
-          if locals.language === "ja"
-            | ja
-          else
-            a.link(href=`/doc/ja/${locals.currentPage}`) ja
-        li.language.menu-button(class={"-current": locals.language === "en"} data-language="en" title="English")
-          if locals.language === "en"
-            | en
-          else
-            a.link(href=`/doc/${locals.currentPage}`) en
+        if locals.currentPage === "home"
+          ul.menu.config
+            li.menu-button.config Configuration
+            li.menu-button.login Login
+        else if locals.currentPage === "api"
+          ul.menu
+            li.menu-button.login Login
+        else if locals.currentPage === "variant"
+          ul.menu
+            li.menu-button.login Login
+        else if locals.currentPage === "gene"
+          ul.menu
+            li.menu-button.login Login
+        else if locals.currentPage === "disease"
+          ul.menu
+            li.menu-button.login Login
+        else
+          ul.menu
+            li.menu-button.languageswitcher
+              .toggleContainer
+                a#LanguageLink(class={"en": locals.language === "en" , "ja": locals.language === "ja"})
+                  span.language.en
+                    | en
+                  span.language.ja
+                    | ja
+
+            li.menu-button.login Login
