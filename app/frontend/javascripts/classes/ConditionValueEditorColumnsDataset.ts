@@ -4,6 +4,7 @@ import { ADVANCED_CONDITIONS } from '../global.js';
 import ConditionItemView from './ConditionItemView.js';
 import ConditionValueEditor from './ConditionValueEditor.js';
 import ConditionValues from './ConditionValues.js';
+import StoreManager from './StoreManager.js';
 
 type DataNode = {
   id: string;
@@ -129,7 +130,9 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     }
   }
 
-  _drawColumn(parentId?: string) {
+  async _drawColumn(parentId?: string) {
+    await StoreManager.fetchLoginStatus();
+    const isLogin = StoreManager.getData('isLogin');
     this._getItems(parentId).then((items) => {
       // make HTML
       const column = document.createElement('div');
@@ -142,27 +145,38 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
         <ul>
           ${items
             .map((item) => {
-              return `<li
-              ${item.data.id ? `data-id="${item.data.id}"` : ''}
-              ${item.data.value ? `data-value="${item.data.value}"` : ''}
-              ${item.parent ? `data-parent="${item.parent.data.id}"` : ''}
-            >
-              <label>
-                <input type="checkbox" value=${item.data.id}>
-                ${
-                  this._conditionType === CONDITION_TYPE.dataset &&
-                  item.depth === 1
-                    ? `<span class="dataset-icon" data-dataset="${item.data.value}"></span>`
-                    : ''
-                }
-                <span>${item.data.label}</span>
-              </label>
-              ${
-                item.children === undefined
-                  ? ''
-                  : `<div class="arrow" data-id="${item.data.id}"></div>`
+              let listItem = `<li`;
+
+              listItem += ` data-id="${item.data.id}"`;
+              listItem += ` data-parent="${item.parent.data.id}"`;
+              if (item.data.value) {
+                listItem += ` data-value="${item.data.value}"`;
               }
-            </li>`;
+
+              listItem += `>
+                <label>
+                  <input type="checkbox" value="${item.data.id}">`;
+
+              // dataset-icon` 追加
+              if (
+                this._conditionType === CONDITION_TYPE.dataset &&
+                item.depth === 1
+              ) {
+                listItem += `<span class="dataset-icon" data-dataset="${item.data.value}"> </span>`;
+              }
+
+              listItem += `<span>${item.data.label}</span>
+                </label>`;
+
+              // 子要素がある場合に矢印を追加
+              if (item.children !== undefined) {
+                if (!(isLogin === false && item.data.id === '1')) {
+                  listItem += `<div class="arrow" data-id="${item.data.id}"></div>`;
+                }
+              }
+
+              listItem += `</li>`;
+              return listItem;
             })
             .join('')}
         </ul>`;

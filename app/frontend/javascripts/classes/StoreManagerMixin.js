@@ -87,8 +87,8 @@ export const mixin = {
 
   resetSimpleSearchConditions() {
     const simpleSearchConditionsMaster = this.getData(
-        'simpleSearchConditionsMaster'
-      ),
+      'simpleSearchConditionsMaster'
+    ),
       resetConditions = {};
     for (const condition of simpleSearchConditionsMaster) {
       switch (condition.type) {
@@ -253,9 +253,8 @@ export const mixin = {
               const conditions = $.param(
                 this._extractSearchCondition(this._store.simpleSearchConditions)
               );
-              path = `${API_URL}/search?offset=${offset - (offset % LIMIT)}${
-                conditions ? '&' + conditions : ''
-              }`;
+              path = `${API_URL}/search?offset=${offset - (offset % LIMIT)}${conditions ? '&' + conditions : ''
+                }`;
               options.method = 'GET';
             }
             break;
@@ -318,7 +317,7 @@ export const mixin = {
     }
   },
 
-  _setDataFromJson(json, lastConditions) {
+  async _setDataFromJson(json, lastConditions) {
     // status
     this.setData('searchStatus', {
       available: Math.min(json.statistics.filtered, json.scroll.max_rows),
@@ -345,6 +344,9 @@ export const mixin = {
     this._fetching = false;
     this._notify('offset');
     this.setData('appStatus', 'normal');
+
+    // is Login
+    await this.fetchLoginStatus()
 
     // if the search conditions change during the search, re-search
     if (lastConditions !== JSON.stringify(this._store.simpleSearchConditions)) {

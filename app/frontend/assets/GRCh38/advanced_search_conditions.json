@@ -10,7 +10,25 @@
         },
         {
           "value": "jga_wgs",
-          "label": "JGA-WGS"
+          "label": "JGA-WGS",
+          "children": [
+            {
+              "value": "jga_wgs.jgad000670",
+              "label": "JGAD000670"
+            },
+            {
+              "value": "jga_wgs.jgad000687",
+              "label": "JGAD000687"
+            },
+            {
+              "value": "jga_wgs.jgad000688",
+              "label": "JGAD000688"
+            },
+            {
+              "value": "jga_wgs.jgad000689",
+              "label": "JGAD000689"
+            }
+          ]
         },
         {
           "value": "jga_wes",
