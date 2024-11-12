@@ -628,8 +628,6 @@ shared:
       frequency:
         - <<: *gem_j_wga
         - <<: *jga_wes
-          authorization:
-            id: jga_dataset
         - <<: *jga_snp
         - id: tommo
           label: ToMMo 8.3KJPN
