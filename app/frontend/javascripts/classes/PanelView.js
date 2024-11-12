@@ -1,4 +1,4 @@
-/** The core of PanelView.
+/** The core of Statistics / Filters PanelView.
  * Superclass of
  * {@link PanelViewCheckList},
  * {@link PanelViewFilterAlternativeAlleleFrequency},

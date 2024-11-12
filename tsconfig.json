@@ -3,7 +3,8 @@
     "allowJs": true,
     "target": "es6",
     "module": "esnext",
-    "sourceMap": true
+    "sourceMap": true,
+    "outDir": "./dist"
   },
   "include": ["./app/frontend/javascripts/**/*"]
 }

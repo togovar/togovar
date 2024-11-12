@@ -1,14 +1,19 @@
 import PanelView from './PanelView.js';
 import StoreManager from './StoreManager.js';
 
+/**  Dataset of Statistics / Filters
+* @param {Element} elm - Panel element section.panel-view (#FilterDatasets | #FilterVariantType | #FilterClinicalSignificance | #FilterSift | #FilterPolyphen | #FilterAlphaMissense)
+* @param {string} kind - Panel id (dataset | type | significance | sift | polyphen | alphamissense)
+* @param {string} statisticsType - (statisticsDataset | statisticsType | statisticsSignificance | undefined) */
 export default class PanelViewCheckList extends PanelView {
-  constructor(elm, type, statisticsType) {
-    super(elm, type);
+  constructor(elm, kind, statisticsType) {
+    super(elm, kind);
     this._statisticsType = statisticsType;
     // 検索条件マスター
     const conditionMaster = StoreManager.getData(
       'simpleSearchConditionsMaster'
     ).find((condition) => condition.id === this.kind);
+
     // GUIの生成
     this._createGUI(conditionMaster);
     // references
@@ -26,6 +31,7 @@ export default class PanelViewCheckList extends PanelView {
           input.checked = condition[input.value] === '1';
         }
       });
+
     this._changeFilter();
     // events
     for (const key in this._inputsValues) {
@@ -34,8 +40,10 @@ export default class PanelViewCheckList extends PanelView {
         this._changeFilter.bind(this)
       );
     }
+
     StoreManager.bind('simpleSearchConditions', this);
     StoreManager.bind(this._statisticsType, this);
+
     // 統計情報の更新
     this[this._statisticsType] = (values) => {
       if (values) {
@@ -111,52 +119,44 @@ export default class PanelViewCheckList extends PanelView {
       <li class="separator"><hr></li>
       `;
     }
+
+    // TODO: 10/20 this.kind === 'dataset でMGeNDの行が追加されるはず
     html += conditionMaster.items
       .map(
         (item) => `
     <li class="item">
       <label class="label">
         <input type="checkbox" value="${item.id}" checked>
-        ${
-          this.kind === 'dataset'
+        ${this.kind === 'dataset'
             ? `<div class="dataset-icon" data-dataset="${item.id}"><div class="properties"></div></div>`
             : ''
-        }
-        ${
-          this.kind === 'significance'
+          }
+        ${this.kind === 'significance'
             ? `<div class="clinical-significance" data-value="${item.id}"></div>`
             : ''
-        }
-        ${
-          this.kind === 'sift'
-            ? `<div class="variant-function _width_5em _align-center" data-function="${
-                item.id
-              }">${{ D: '&lt; 0.05', T: '&ge; 0.05' }[item.id]}</div>`
+          }
+        ${this.kind === 'sift'
+            ? `<div class="variant-function _width_5em _align-center" data-function="${item.id
+            }">${{ D: '&lt; 0.05', T: '&ge; 0.05' }[item.id]}</div>`
             : ''
-        }
-        ${
-          this.kind === 'polyphen'
-            ? `<div class="variant-function _width_5em _align-center" data-function="${
-                item.id
-              }">${
-                {
-                  PROBD: '&gt; 0.908',
-                  POSSD: '&gt; 0.446',
-                  B: '&le; 0.446',
-                  U: 'Unknown',
-                }[item.id]
-              }</div>`
+          }
+        ${this.kind === 'polyphen'
+            ? `<div class="variant-function _width_5em _align-center" data-function="${item.id
+            }">${{
+              PROBD: '&gt; 0.908',
+              POSSD: '&gt; 0.446',
+              B: '&le; 0.446',
+              U: 'Unknown',
+            }[item.id]
+            }</div>`
             : ''
-        }
-        ${
-          this.kind === 'alphamissense'
-            ? `<div class="variant-function _width_5em _align-center" data-function="${
-                item.id
-              }">${
-                { LP: '&gt; 0.564', A: '&ge; 0.340', LB: '&lt; 0.340' }[item.id]
-              }</div>`
+          }
+        ${this.kind === 'alphamissense'
+            ? `<div class="variant-function _width_5em _align-center" data-function="${item.id
+            }">${{ LP: '&gt; 0.564', A: '&ge; 0.340', LB: '&lt; 0.340' }[item.id]
+            }</div>`
             : ''
-        }
+          }
         ${item.label}
       </label>
       <span class="value"></span>

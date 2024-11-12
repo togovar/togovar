@@ -24,7 +24,7 @@ class ConditionValueEditor {
   //protected methods
   /** Create an element for the edit screen.
    * @protected
-   * @param {"checkboxes-editor-view"|"columns-editor-view"|"disease-editor-view"|"frequency-count-editor-view"|"location-editor-view"|"text-field-editor-view"} className
+   * @param {"checkboxes-editor-view"|"clinical-significance-view"|"columns-editor-view"|"disease-editor-view"|"frequency-count-editor-view"|"location-editor-view"|"text-field-editor-view"|"pathogenicity-editor-view"} className
    * @param {string} html - \<header>Select [ConditionType]\</header>\<div class="body">\</div> */
   _createElement(className, html) {
     this._el = document.createElement('section');

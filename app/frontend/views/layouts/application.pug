@@ -9,6 +9,63 @@ html(data-page=locals.currentPage, lang=lang)
     meta(charset="utf-8")
     meta(name="viewport" content="width=device-width, initial-scale=1")
     link(rel="icon" href="/favicon.svg" type="image/svg+xml")
+    script.
+      (async function() {
+        try {
+        if (window.location.origin === 'http://localhost:8000') return
+          const response = await fetch(`${window.location.origin}/auth/status`);
+
+          let isLogin = false;
+          if (response.status === 401 ||response.status === 403) {
+            return
+          }
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          isLogin = data.datasets.jga_dataset.granted;
+
+          const loginMenu = document.querySelector('.menu-button.login a.link');
+          if (isLogin === true) {
+            loginMenu.href = "/auth/logout";
+            loginMenu.textContent = "Logout";
+          } else {
+            loginMenu.href = "/auth/login";
+            loginMenu.textContent = "Login";
+          }
+
+        } catch (error) {
+          console.error('Error fetching auth status:', error);
+        }
+      })();
+
+      document.addEventListener('DOMContentLoaded', () => {
+      let currentLang = window.location.pathname.includes('ja') ? 'ja' : 'en';
+      let currentPage = document.documentElement.getAttribute('data-page');
+      let LanguageLink = document.getElementById('LanguageLink');
+
+      const switchLang = () => {
+        if (currentLang === 'ja') {
+          LanguageLink.href= `/doc/${currentPage}`
+          LanguageLink.classList.remove('ja');
+          LanguageLink.classList.add('en');
+        } else {
+          LanguageLink.href= `/doc/ja/${currentPage}`
+          LanguageLink.classList.remove('en');
+          LanguageLink.classList.add('ja');
+        }
+
+        window.location.href = LanguageLink.href;
+      };
+
+        if (LanguageLink) {
+          LanguageLink.addEventListener('click', (e) => {
+            switchLang();
+          });
+        }
+      })
+
     block head
   body
     include ../includes/_global_header

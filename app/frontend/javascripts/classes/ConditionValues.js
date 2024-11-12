@@ -1,12 +1,13 @@
 import { CONDITION_TYPE } from '../definition.js';
 import ConditionValueEditorCheckboxes from './ConditionValueEditorCheckboxes.js';
+import ConditionValueEditorClinicalSignificance from "./ConditionValueEditorClinicalSignificance.ts";
 import ConditionValueEditorColumns from './ConditionValueEditorColumns.js';
 import ConditionValueEditorColumnsDataset from './ConditionValueEditorColumnsDataset.ts';
 import ConditionValueEditorDisease from './ConditionValueEditorDisease.js';
 import ConditionValueEditorFrequencyCount from './ConditionValueEditorFrequencyCount.js';
 import ConditionValueEditorGene from './ConditionValueEditorGene.js';
 import ConditionValueEditorLocation from './ConditionValueEditorLocation.js';
-import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditorPathogenicityPrediction.js';
+import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditorPathogenicityPrediction.ts';
 import ConditionValueEditorVariantID from './ConditionValueEditorVariantID.js';
 
 /** About the AdvancedSearch edit screen.
@@ -18,7 +19,7 @@ class ConditionValues {
   constructor(conditionView, defaultValues) {
     /** @property {ConditionItemView} _conditionView */
     this._conditionView = conditionView;
-    /** @property {ConditionValueEditorCheckboxes[]|ConditionValueEditorColumns[]|ConditionValueEditorFrequencyCount[]|ConditionValueEditorDisease[]|ConditionValueEditorTextField[]} _editor */
+    /** @property {ConditionValueEditorCheckboxes[]|ConditionValueEditorClinicalSignificance[]|ConditionValueEditorColumns[]|ConditionValueEditorFrequencyCount[]|ConditionValueEditorDisease[]|ConditionValueEditorTextField[]} _editor */
     this._editors = [];
 
     // HTML
@@ -47,12 +48,16 @@ class ConditionValues {
       .addEventListener('click', this._clickCancelButton.bind(this));
 
     /** initialization by types */
-    // TODO: conditionType は ADVANCED_CONDITIONS[conditionView.conditionType].type を参照して処理をスイッチさせたい
     switch (conditionView.conditionType) {
       case CONDITION_TYPE.type:
-      case CONDITION_TYPE.significance:
         this._editors.push(
           new ConditionValueEditorCheckboxes(this, this._conditionView)
+        );
+        break;
+
+      case CONDITION_TYPE.significance:
+        this._editors.push(
+          new ConditionValueEditorClinicalSignificance(this, this._conditionView)
         );
         break;
 
