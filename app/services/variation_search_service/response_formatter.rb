@@ -215,6 +215,9 @@ class VariationSearchService
         frequencies = Array(variant[:frequency]).filter_map do |x|
           # TODO: remove if dataset renamed
           x[:source] = 'jga_wes' if x[:source] == 'jga_ngs'
+          if (m = x[:source].match(/^(bbj_riken\.mpheno\d+)\.all$/))
+            x[:source] = m[1]
+          end
 
           next unless accessible_datasets.include?(x[:source].to_sym)
 

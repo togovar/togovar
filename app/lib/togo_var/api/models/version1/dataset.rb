@@ -32,6 +32,7 @@ module TogoVar
             name = @name
             # TODO: remove if dataset renamed
             name = 'jga_ngs' if name == 'jga_wes'
+            name = "#{name}.all" if name.match?(/^bbj_riken.mpheno\d+$/)
 
             Elasticsearch::DSL::Search.search do
               query do
