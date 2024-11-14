@@ -63,21 +63,17 @@ class StoreManager {
 
   async fetchLoginStatus() {
     try {
-      if (window.location.origin === 'http://localhost:8000') {
-        this.setData('isLogin', true);
-        return
-      }
+      // if (window.location.origin === 'http://localhost:8000') {
+      //   this.setData('isLogin', true);
+      //   return
+      // }
       const response = await fetch(`${window.location.origin}/auth/status`);
 
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
         this.setData('isLogin', false);
-        return
+      } else if (response.status === 200 || response.status === 403) {
+        this.setData('isLogin', true);
       }
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      this.setData('isLogin', true);
       return
     } catch (error) {
       console.error('Error fetching auth status:', error);

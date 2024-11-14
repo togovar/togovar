@@ -12,19 +12,13 @@ html(data-page=locals.currentPage, lang=lang)
     script.
       (async function() {
         try {
-        if (window.location.origin === 'http://localhost:8000') return
+          //- if (window.location.origin === 'http://localhost:8000') return
           const response = await fetch(`${window.location.origin}/auth/status`);
 
           let isLogin = false;
-          if (response.status === 401 ||response.status === 403) {
-            return
+          if (response.status === 200 || response.status === 403) {
+            isLogin = true;
           }
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-
-          const data = await response.json();
-          isLogin = data.datasets.jga_dataset.granted;
 
           const loginMenu = document.querySelector('.menu-button.login a.link');
           if (isLogin === true) {
