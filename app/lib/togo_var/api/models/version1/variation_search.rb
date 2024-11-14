@@ -73,6 +73,16 @@ module TogoVar
             validate
 
             user = @options[:user]
+            source = Variation.frequency_datasets(user).map do |x| # TODO: remove if dataset renamed
+              case x.to_s
+              when 'jga_wes'
+                :jga_ngs
+              when /^bbj_riken.mpheno\d+$/
+                :"#{x}.all"
+              else
+                x
+              end
+            end
 
             query = Elasticsearch::DSL::Search.search do
               query do
@@ -84,17 +94,7 @@ module TogoVar
                         nested do
                           path :frequency
                           query do
-                            terms 'frequency.source': Variation.frequency_datasets(user)
-                                                               .map do |x|
-                              case x.to_s
-                              when 'jga_wes'
-                                :jga_ngs
-                              when /^bbj_riken.mpheno\d+$/
-                                :"#{x}.all"
-                              else
-                                x
-                              end
-                            end # TODO: remove if dataset renamed
+                            terms 'frequency.source': source
                           end
                         end
                       end
