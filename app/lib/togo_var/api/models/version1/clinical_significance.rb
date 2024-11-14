@@ -7,12 +7,11 @@ module TogoVar
         class ClinicalSignificance < StrictTerms
           self.key_name = :significance
 
-          ACCEPTABLE_TERMS = %w[
-            NC P LP US LB B CI DR A RF PR AF O NP AN
-            not_in_clinvar pathogenic likely_pathogenic uncertain_significance likely_benign benign
-            conflicting_interpretations_of_pathogenicity drug_response association risk_factor protective affects other
-            not_provided association_not_found
-          ].freeze
+          ACCEPTABLE_TERMS = Rails.application
+                                  .config
+                                  .application
+                                  .dig(:query_params, :significance)
+                                  .flat_map { |x| [x[:id], x[:key]] }
 
           def initialize(*args)
             super
