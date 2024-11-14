@@ -19,52 +19,95 @@ module TogoVar
 
             arg = @args.first
 
+            @terms = Array(arg[:terms]).filter_map { |x| (::ClinicalSignificance.find_by_id(x) || ::ClinicalSignificance.find_by_key(x))&.id.to_s }
+            @not_in = Array(arg[:terms]).delete(::ClinicalSignificance::Significances::NOT_IN_CLINVAR.id.to_s)
             @source = Array(arg[:source])
+
+            raise InvalidQuery, 'terms = ["NC"] and source are exclusive when relation = "eq"' if @relation == 'eq' && @not_in && @source.present?
           end
 
           def to_hash
             validate
 
-            terms = @terms.filter_map { |x| (::ClinicalSignificance.find_by_id(x) || ::ClinicalSignificance.find_by_key(x))&.label&.downcase }
-            sources = @source # TODO: filter
+            relation = @relation
+            terms = @terms
+            sources = @source
 
-            q = Elasticsearch::DSL::Search.search do
-              query do
-                bool do
-                  if sources.present?
-                    must do
-                      terms 'conditions.source': sources
-                    end
-                  end
-
-                  must do
-                    nested do
-                      path 'conditions.condition'
-                      query do
-                        terms 'conditions.condition.classification': terms
+            if @not_in
+              Elasticsearch::DSL::Search.search do
+                query do
+                  bool do
+                    if relation == 'eq'
+                      must_not do
+                        nested do
+                          path 'conditions'
+                          query do
+                            exists field: 'conditions'
+                          end
+                        end
+                      end
+                    else
+                      must do
+                        nested do
+                          path 'conditions'
+                          query do
+                            exists field: 'conditions'
+                          end
+                        end
+                      end
+                      if sources.present?
+                        must do
+                          nested do
+                            path 'conditions'
+                            query do
+                              terms 'conditions.source': sources
+                            end
+                          end
+                        end
                       end
                     end
                   end
                 end
               end
-            end.to_hash[:query]
+            else
+              Elasticsearch::DSL::Search.search do
+                query do
+                  bool do
+                    if sources.present?
+                      must do
+                        nested do
+                          path 'conditions'
+                          query do
+                            terms 'conditions.source': sources
+                          end
+                        end
+                      end
+                    end
 
-            q = if q[:bool][:must].size == 1
-                  q[:bool][:must].first
-                else
-                  q
-                end
+                    if terms.present?
+                      q = Elasticsearch::DSL::Search.search do
+                        query do
+                          bool do
+                            must do
+                              nested do
+                                path 'conditions.condition'
+                                query do
+                                  terms 'conditions.condition.classification': terms
+                                end
+                              end
+                            end
+                          end
+                        end
+                      end
 
-            query = Elasticsearch::DSL::Search.search do
-              query do
-                nested do
-                  path 'conditions'
-                  query q
+                      q = (relation == 'ne' ? negate(q) : q).to_hash[:query]
+
+                      must q
+                    end
+                  end
                 end
               end
             end.to_hash[:query]
-
-            @relation == 'ne' ? negate(query) : query
           end
 
           protected
