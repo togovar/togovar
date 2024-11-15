@@ -197,6 +197,21 @@ class VariationSearchService
         end
 
         significance = Array(variant[:conditions]).flat_map do |condition|
+          # TODO: remove on 2025.1
+          if condition[:source] == "mgend" && condition[:condition].blank?
+            if (f = Rails.root.join('tmp', 'mgend.vcf.gz')).exist? &&
+              (r = `zgrep '#{condition[:id]}' #{f}`).present? &&
+              (info = r.split("\n").first.split("\t")[7]).present? &&
+              (cond = info.match(/CONDITIONS=([^;]+)/)&.captures[0])
+
+              condition[:condition] = cond.split("|").filter_map do |x|
+                next if (cs = x.split(":")[2]).blank?
+
+                { classification: [cs.downcase.gsub(',', '').gsub(' ', '_')] }
+              end
+            end
+          end
+
           (condition[:condition].presence || [{}]).map do |x|
             {
               conditions: if x[:medgen].present?
