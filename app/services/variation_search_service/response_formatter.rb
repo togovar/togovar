@@ -129,7 +129,7 @@ class VariationSearchService
       next 1 if m1.present? && MEDGEN_IGNORE.include?(m1)
       next -1 if m2.present? && MEDGEN_IGNORE.include?(m2)
 
-      b[:conditions].filter_map { |x| x[:medgen] }.flatten.size <=> a[:conditions].filter_map { |x| x[:medgen] }.flatten.size || 0
+      b[:conditions]&.filter_map { |x| x[:medgen] }&.flatten&.size <=> a[:conditions]&.filter_map { |x| x[:medgen] }&.flatten&.size || 0
     end
 
     def data(json)
@@ -197,13 +197,15 @@ class VariationSearchService
         end
 
         significance = Array(variant[:conditions]).flat_map do |condition|
-          condition[:condition].map do |x|
+          (condition[:condition].presence || [{}]).map do |x|
             {
               conditions: if x[:medgen].present?
                             Array(x[:medgen]).sort(&MEDGEN_COMPARATOR)
                                              .map { |v| { name: conditions[v] || CLINVAR_CONDITION_NOT_PROVIDED, medgen: v } }
                           elsif x[:pref_name].present?
                             Array(x[:pref_name]).map { |v| { name: v } }
+                          else
+                            []
                           end,
               interpretations: Array(x[:classification]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(',', '').tr(' ', '_').to_sym)&.key },
               submission_count: x[:submission_count],
