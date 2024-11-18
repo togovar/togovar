@@ -296,11 +296,15 @@ export default class ResultsRowView {
                     result.significance[0].conditions[0].name
                 }
 
-                if (result.significance[0].conditions[0]?.medgen) {
+                if (result.significance[0].conditions[0]?.medgen !== undefined) {
                   this.tdClinicalAnchor.setAttribute(
                     'href',
                     `/disease/${result.significance[0].conditions[0].medgen}`
                   );
+                } else {
+                  this.tdClinicalSign.textContent = result.significance[0].conditions[0].name
+                  this.tdClinicalAnchor.textContent = ""
+                  this.tdClinicalAnchor.className = ""
                 }
               } else {
                 this.tdClinicalSign.textContent = "No MedGen provided"

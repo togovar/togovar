@@ -84,7 +84,7 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
           return `
         <dl class="above-headline clinical-significance">
           <dt>
-          ${data.medgen === '' ? data.name :
+          ${data.medgen === 'undefined' ? data.name :
               `<a href="/disease/${data.medgen}" target="_blank" class="hyper-text -internal">
               ${data.name}</a>`}
           </dt>
