@@ -51,16 +51,6 @@ module TogoVar
                           threadsafe: true,
                           secure: Rails.env.production?
 
-    if Rails.env.development?
-      config.middleware.insert(0, Rack::ReverseProxy) do
-        reverse_proxy_options preserve_host: true
-        reverse_proxy %r{^/$}, 'http://localhost:8000/index.html'
-        reverse_proxy %r{^/(\?.*)$}, 'http://localhost:8000/index.html$1'
-        reverse_proxy %r{^/((css|js|images|fonts|variant|gene|disease|doc)/.*)$}, 'http://localhost:8000/$1'
-        reverse_proxy %r{^/api$}, 'http://localhost:8000/api/index.html'
-      end
-    end
-
     config.elasticsearch = config_for(:elasticsearch)
     config.endpoint = config_for(:endpoint)
     config.virtuoso = config_for(:virtuoso)

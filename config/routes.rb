@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  get 'api/v1', to: 'api#v1'
+
   namespace :api do
     match 'search/variant', via: %w[get post]
     match 'search/gene', via: %w[get post]
@@ -17,4 +19,6 @@ Rails.application.routes.draw do
   # backward compatibility
   get 'suggest', to: 'suggest#index'
   get 'search', to: 'api/search#variant'
+
+  mount Rswag::Ui::Engine => 'api'
 end
