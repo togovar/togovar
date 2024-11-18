@@ -33,7 +33,7 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
           data.forEach((entry) => {
             if (entry.source === 'mgend') {
               if (entry.conditions.length === 0) {
-                entry.conditions.push({ name: 'No MedGen provided', medgen: '' });
+                entry.conditions.push({ name: 'others', medgen: '' });
               }
             }
 

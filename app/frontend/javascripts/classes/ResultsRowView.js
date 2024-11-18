@@ -307,7 +307,7 @@ export default class ResultsRowView {
                   this.tdClinicalAnchor.className = ""
                 }
               } else {
-                this.tdClinicalSign.textContent = "No MedGen provided"
+                this.tdClinicalSign.textContent = "others"
                 this.tdClinicalAnchor.textContent = ""
               }
 
