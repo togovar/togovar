@@ -45,6 +45,9 @@ gem 'omniauth-keycloak', '~> 1.5', '>= 1.5.2'
 gem 'omniauth-rails_csrf_protection', '~> 1.0', '>= 1.0.2'
 gem 'redis-rails', '~> 5.0', '>= 5.0.2'
 
+# swagger
+gem 'rswag-ui'
+
 group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
