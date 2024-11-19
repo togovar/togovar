@@ -318,11 +318,7 @@ export default class ResultsRowView {
                 significanceItem.source === "mgend"
               );
 
-              if (hasMedgen) {
-                this.tdClinicalIcon.dataset.mgend = true;
-              } else {
-                this.tdClinicalIcon.dataset.mgend = false;
-              }
+              this.tdClinicalIcon.dataset.mgend = hasMedgen;
             } else {
               this.tdClinicalSign.dataset.value = '';
               this.tdClinicalAnchor.textContent = '';
