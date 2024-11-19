@@ -34,32 +34,6 @@ html(data-page=locals.currentPage, lang=lang)
         }
       })();
 
-      document.addEventListener('DOMContentLoaded', () => {
-      let currentLang = window.location.pathname.includes('ja') ? 'ja' : 'en';
-      let currentPage = document.documentElement.getAttribute('data-page');
-      let LanguageLink = document.getElementById('LanguageLink');
-
-      const switchLang = () => {
-        if (currentLang === 'ja') {
-          LanguageLink.href= `/doc/${currentPage}`
-          LanguageLink.classList.remove('ja');
-          LanguageLink.classList.add('en');
-        } else {
-          LanguageLink.href= `/doc/ja/${currentPage}`
-          LanguageLink.classList.remove('en');
-          LanguageLink.classList.add('ja');
-        }
-
-        window.location.href = LanguageLink.href;
-      };
-
-        if (LanguageLink) {
-          LanguageLink.addEventListener('click', (e) => {
-            switchLang();
-          });
-        }
-      })
-
     block head
   body
     include ../includes/_global_header
