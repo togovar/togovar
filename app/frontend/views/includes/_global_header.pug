@@ -70,13 +70,11 @@ header#GlobalHeader
               a.link
         else
           ul.menu
-            li.menu-button.languageswitcher
-              .toggleContainer
-                a#LanguageLink(class={"en": locals.language === "en" , "ja": locals.language === "ja"})
-                  span.language.en
-                    | en
-                  span.language.ja
-                    | ja
+            li.menu-button.languageswitcher(class={"en": locals.language === "en" , "ja": locals.language === "ja"})
+              a.language.en(href=`/doc/${locals.currentPage}`)
+                | en
+              a.language.ja(href=`/doc/ja/${locals.currentPage}`)
+                | ja
 
             li.menu-button.login 
               a.link

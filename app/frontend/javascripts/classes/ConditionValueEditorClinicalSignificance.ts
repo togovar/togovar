@@ -30,9 +30,9 @@ interface ConditionItemValueViewElement extends HTMLElement {
 
 /** for clinical significance */
 export default class ConditionValueEditorClinicalSignificance extends ConditionValueEditor {
-  _checkboxes: Array<HTMLInputElement>;
-  _values: DatasetValues;
-  _lastValues: DatasetValues;
+  #checkboxes: Array<HTMLInputElement>;
+  #values: DatasetValues;
+  #lastValues: DatasetValues;
 
   /**
    * @param {ConditionValues} valuesView
@@ -54,20 +54,20 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
 
     <div class="dataset-title mgend">MGeND</div>
     <ul class="checkboxes body" data-type="clinical-significance">
-      ${this._generateCheckboxList(dataset.values.mgend, 'mgend')}
+      ${this.#generateCheckboxList(dataset.values.mgend, 'mgend')}
     </ul>
     
     <hr/>
 
     <div class="dataset-title clinvar">Clinvar</div>
     <ul class="checkboxes body" data-type="clinical-significance">
-      ${this._generateCheckboxList(dataset.values.clinvar, 'clinvar')}
+      ${this.#generateCheckboxList(dataset.values.clinvar, 'clinvar')}
     </ul>
     `
     );
 
-    this._values = { mgend: [], clinvar: [] };
-    this._lastValues = { mgend: [], clinvar: [] };
+    this.#values = { mgend: [], clinvar: [] };
+    this.#lastValues = { mgend: [], clinvar: [] };
 
     // delete 'not in clinver'
     if (this._conditionType === 'significance') {
@@ -75,16 +75,16 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
     }
 
     // references
-    this._checkboxes = Array.from(
+    this.#checkboxes = Array.from(
       this._el.querySelectorAll(':scope > ul > li > label > input')
     );
 
     // attach events
-    this._attachCheckboxEvents();
-    this._attachButtonEvents();
+    this.#attachCheckboxEvents();
+    this.#attachButtonEvents();
   }
 
-  private _generateCheckboxList(
+  #generateCheckboxList(
     values: Array<{ value: string; label: string }>,
     source: string
   ): string {
@@ -106,23 +106,23 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
       .join('');
   }
 
-  private _attachCheckboxEvents() {
-    this._checkboxes.forEach((checkbox) => {
+  #attachCheckboxEvents() {
+    this.#checkboxes.forEach((checkbox) => {
       checkbox.addEventListener('change', () => {
-        this._update();
+        this.#update();
       });
     });
   }
 
   /** "Select all" と "Clear all" ボタンにクリックイベントを追加し、
    * ボタンがクリックされた際にチェックボックスの状態を一括変更する。 */
-  private _attachButtonEvents() {
+  #attachButtonEvents() {
     this._el
       .querySelectorAll(':scope > .buttons > button')
       .forEach((button, index) => {
         button.addEventListener('click', () => {
-          this._checkboxes.forEach((checkbox) => (checkbox.checked = !index));
-          this._update();
+          this.#checkboxes.forEach((checkbox) => (checkbox.checked = !index));
+          this.#update();
         });
       });
   }
@@ -140,7 +140,7 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
       )
     ) as ConditionItemValueViewElement[];
 
-    this._lastValues = {
+    this.#lastValues = {
       mgend: valueMgendElements.map((value) => ({
         value: value.value,
         label: value.label,
@@ -153,12 +153,12 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
   }
 
   restore() {
-    this._checkboxes.forEach((checkbox) => {
+    this.#checkboxes.forEach((checkbox) => {
       // チェックボックスのデータソースに応じて、対応する配列で値を探す
       const valuesArray =
         checkbox.dataset.source === 'mgend'
-          ? this._lastValues.mgend
-          : this._lastValues.clinvar;
+          ? this.#lastValues.mgend
+          : this.#lastValues.clinvar;
 
       const datasetValue = valuesArray.find((value) => {
         return value.value === checkbox.value;
@@ -167,15 +167,15 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
       // チェックボックスの状態を過去の値に基づいて復元
       checkbox.checked = !!datasetValue; // 値が見つかった場合はチェックを入れる
     });
-    this._update();
+    this.#update();
   }
 
   // private methods
   /** チェックボックスの状態に基づいて、値の更新、重複のチェック、ラベルや要素の削除を行う
    * また、更新された値に基づいて Clinical Significance のビューを更新 */
-  private _update() {
+  #update() {
     // update values
-    this._checkboxes.forEach((checkbox) => {
+    this.#checkboxes.forEach((checkbox) => {
       const newValue = {
         value: checkbox.value,
         label: checkbox.dataset.label,
@@ -183,13 +183,13 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
 
       if (checkbox.checked) {
         // Add new value if not already exists
-        this._addUniqueValue(
+        this.#addUniqueValue(
           checkbox.dataset.source as DatasetSource,
           newValue
         );
       } else {
         // Remove value when unchecked
-        this._removeValue(
+        this.#removeValue(
           checkbox.dataset.source as DatasetSource,
           checkbox.value,
           checkbox.dataset.label
@@ -198,19 +198,19 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
     });
 
     // Update Clinical Significance View
-    this._updateClinicalSignificanceValueView();
+    this.#updateClinicalSignificanceValueView();
 
     // validation
-    this._valuesView.update(this._validate());
+    this._valuesView.update(this.#validate());
   }
 
   /** MGeNDまたはClinVarの配列に値を一意に追加 */
-  private _addUniqueValue(
+  #addUniqueValue(
     source: DatasetSource,
     newValue: { value: string; label: string }
   ) {
     const values =
-      source === 'mgend' ? this._values.mgend : this._values.clinvar;
+      source === 'mgend' ? this.#values.mgend : this.#values.clinvar;
     const exists = values.some(
       (item) => item.value === newValue.value && item.label === newValue.label
     );
@@ -222,9 +222,9 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
 
   /** 指定されたソースの配列から該当の値を削除
    * また、すべての値が削除された場合は、関連するラベルと要素も削除 */
-  private _removeValue(source: DatasetSource, value: string, label: string) {
+  #removeValue(source: DatasetSource, value: string, label: string) {
     const values =
-      source === 'mgend' ? this._values.mgend : this._values.clinvar;
+      source === 'mgend' ? this.#values.mgend : this.#values.clinvar;
     const index = values.findIndex(
       (item) => item.value === value && item.label === label
     );
@@ -234,12 +234,12 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
     }
 
     if (values.length === 0) {
-      this._removeConditionWrapper(source); // 値が全てなくなった場合の処理
+      this.#removeConditionWrapper(source); // 値が全てなくなった場合の処理
     }
   }
 
   /** 指定されたソースに関連する要素（spanやcondition-wrapper）を削除 */
-  private _removeConditionWrapper(source: DatasetSource) {
+  #removeConditionWrapper(source: DatasetSource) {
     const span = this._valuesElement.querySelector(`span.${source}`);
     const wrapper = this._valuesElement.querySelector(
       `.${source}-condition-wrapper`
@@ -251,21 +251,21 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
 
   /** Clinical Significance のビューを更新し、ラベルと対応する値を表示します。
    * 新しいラベルや条件が追加される場合、既存のものを削除してから再描画します。 */
-  private _updateClinicalSignificanceValueView() {
-    if (this._values.mgend.length > 0) {
-      this._ensureWrapperExists('mgend');
+  #updateClinicalSignificanceValueView() {
+    if (this.#values.mgend.length > 0) {
+      this.#ensureWrapperExists('mgend');
     }
-    if (this._values.clinvar.length > 0) {
-      this._ensureWrapperExists('clinvar');
+    if (this.#values.clinvar.length > 0) {
+      this.#ensureWrapperExists('clinvar');
     }
 
-    this._updateConditionViews('mgend', this._values.mgend);
-    this._updateConditionViews('clinvar', this._values.clinvar);
+    this.#updateConditionViews('mgend', this.#values.mgend);
+    this.#updateConditionViews('clinvar', this.#values.clinvar);
   }
 
   /** 指定されたデータソースに対応するラベルや条件を描画
    * 既存のビューがある場合は削除してから、新しい条件ビューを追加 */
-  private _updateConditionViews(
+  #updateConditionViews(
     source: DatasetSource,
     values: Array<{ value: string; label: string }>
   ) {
@@ -294,7 +294,7 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
   }
 
   /** 指定されたデータソースに対応するラベルとコンディションのラッパー要素が存在しない場合、作成して追加 */
-  private _ensureWrapperExists(source: DatasetSource) {
+  #ensureWrapperExists(source: DatasetSource) {
     const wrapperClass = `${source}-wrapper`;
     const conditionWrapperClass = `${source}-condition-wrapper`;
 
@@ -318,13 +318,13 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
     }
   }
 
-  _validate() {
+  #validate() {
     return this.isValid;
   }
 
   //accessor
   /** You can press the ok button if there are two valid values */
   get isValid() {
-    return this._checkboxes.some((checkbox) => checkbox.checked);
+    return this.#checkboxes.some((checkbox) => checkbox.checked);
   }
 }

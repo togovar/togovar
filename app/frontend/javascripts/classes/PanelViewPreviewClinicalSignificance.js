@@ -33,7 +33,7 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
           data.forEach((entry) => {
             if (entry.source === 'mgend') {
               if (entry.conditions.length === 0) {
-                entry.conditions.push({ name: 'No MedGen provided', medgen: '' });
+                entry.conditions.push({ name: 'others', medgen: '' });
               }
             }
 
@@ -84,7 +84,7 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
           return `
         <dl class="above-headline clinical-significance">
           <dt>
-          ${data.medgen === '' ? data.name :
+          ${data.medgen === 'undefined' ? data.name :
               `<a href="/disease/${data.medgen}" target="_blank" class="hyper-text -internal">
               ${data.name}</a>`}
           </dt>
