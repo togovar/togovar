@@ -78,13 +78,11 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
 
         // 関数の実行
         const significanceDataset = mergeByMedgen(deepClone);
-
-        //この大元をrecord.significanceとなるのがいけないとも思う
         html = significanceDataset.map(data => {
           return `
         <dl class="above-headline clinical-significance">
           <dt>
-          ${data.medgen === 'undefined' ? data.name :
+          ${data.medgen === 'undefined' || data.medgen === '' ? data.name :
               `<a href="/disease/${data.medgen}" target="_blank" class="hyper-text -internal">
               ${data.name}</a>`}
           </dt>
