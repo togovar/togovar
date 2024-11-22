@@ -31,6 +31,7 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
           const merged = {};
 
           data.forEach((entry) => {
+            // 'mgend' ソースのエントリで conditions が空の場合、デフォルト値を追加
             if (entry.source === 'mgend') {
               if (entry.conditions.length === 0) {
                 entry.conditions.push({ name: 'others', medgen: '' });
@@ -41,7 +42,7 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
               const medgen = condition.medgen;
               const medgenName = condition.name;
 
-              // MedGen IDがまだ存在しなければ初期化
+              // MedGen ID がまだ統合結果に存在しない場合、初期化
               if (!merged[medgen]) {
                 merged[medgen] = {
                   name: medgenName,
@@ -63,8 +64,8 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
             });
           });
 
-          // 最終的にSetを配列に変換して、オブジェクトから配列形式に変換
-          return Object.keys(merged).map((medgen) => ({
+          //最終的にSetを配列に変換して、オブジェクトから配列形式に変換
+          const results = Object.keys(merged).map((medgen) => ({
             medgen,
             name: merged[medgen].name,
             interpretations: Object.keys(merged[medgen].interpretations).map(
@@ -74,6 +75,41 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
               })
             ),
           }));
+
+          // return results
+          return groupAndSortByInterpretation(results)
+        }
+
+        function groupAndSortByInterpretation(data) {
+          // グループ化のためのオブジェクト
+          const grouped = {};
+
+          data.forEach(entry => {
+            // 各エントリのinterpretationsを処理
+            let interpretationKeys = [];
+            entry.interpretations.forEach(interpretationObj => {
+              interpretationKeys.push(interpretationObj.interpretation);
+            });
+
+            // interpretationKeyがまだ存在しない場合は初期化
+            if (!grouped[interpretationKeys]) {
+              grouped[interpretationKeys] = [];
+            }
+            // 現在のentryを該当するinterpretationグループに追加
+            grouped[interpretationKeys].push(entry);
+            interpretationKeys = []
+          });
+
+          // 各グループをnameでソート
+          Object.keys(grouped).forEach(key => {
+            grouped[key] = grouped[key].sort((a, b) => {
+              const nameA = a.name || ""; // 空文字列対策
+              const nameB = b.name || "";
+              return nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
+            });
+          });
+
+          return Object.values(grouped).flat();
         }
 
         // 関数の実行
