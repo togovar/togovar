@@ -9,6 +9,31 @@ html(data-page=locals.currentPage, lang=lang)
     meta(charset="utf-8")
     meta(name="viewport" content="width=device-width, initial-scale=1")
     link(rel="icon" href="/favicon.svg" type="image/svg+xml")
+    script.
+      (async function() {
+        try {
+          //- if (window.location.origin === 'http://localhost:8000') return
+          const response = await fetch(`${window.location.origin}/auth/status`);
+
+          let isLogin = false;
+          if (response.status === 200 || response.status === 403) {
+            isLogin = true;
+          }
+
+          const loginMenu = document.querySelector('.menu-button.login a.link');
+          if (isLogin === true) {
+            loginMenu.href = "/auth/logout";
+            loginMenu.textContent = "Logout";
+          } else {
+            loginMenu.href = "/auth/login";
+            loginMenu.textContent = "Login";
+          }
+
+        } catch (error) {
+          console.error('Error fetching auth status:', error);
+        }
+      })();
+
     block head
   body
     include ../includes/_global_header

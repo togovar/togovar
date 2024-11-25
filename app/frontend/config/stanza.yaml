@@ -25,6 +25,10 @@ variant:
         data-url: $TOGOVAR_FRONTEND_API_URL
         no_data_message: 'No data'
 
+    # TODO: 10/20に見直し
+    - id: variant-mgend
+      dom: '#variant-mgend'
+
     - id: variant-clinvar
       dom: '#variant-clinvar'
 
@@ -115,6 +119,10 @@ gene:
 
     - id: gene-summary
       dom: '#gene-summary'
+
+    # TODO: 10/20に見直し
+    - id: variant-mgend
+      dom: '#gene-mgend'
 
     - id: pagination-table
       dom: '#gene-clinvar'
@@ -314,6 +322,10 @@ disease:
           - id: links
             label: Links
             escape: false
+
+    # TODO: 10/20に見直し
+    - id: disease-mgend
+      dom: '#disease-mgend'
 
     - id: pagination-table
       dom: '#disease-clinvar'

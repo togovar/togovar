@@ -2,12 +2,13 @@ class VariationSearchService
   class ResponseFormatter
     XREF_TEMPLATE = Rails.application.config.application[:xref]
 
-    def initialize(param, result, error = [], warning = [], notice = [])
+    def initialize(param, result, error = [], warning = [], notice = [], **options)
       @param = param
-      @result = result
+      @result = result.deep_symbolize_keys
       @error = error
       @warning = warning
       @notice = notice
+      @options = options.dup
     end
 
     def to_hash
@@ -28,6 +29,10 @@ class VariationSearchService
 
     private
 
+    def accessible_datasets
+      @accessible_datasets ||= Variation.all_datasets(@options[:user], groups: @param[:expand_dataset])
+    end
+
     def scroll(json)
       json.scroll do
         json.offset @param[:offset] || 0
@@ -38,8 +43,8 @@ class VariationSearchService
 
     def statistics(json)
       json.statistics do
-        json.total Variation.count(body: Elasticsearch::QueryBuilder.new.build.slice(:query))
-        json.filtered @result[:filtered_total]
+        json.total @result[:total]
+        json.filtered @result[:filtered]
 
         if @result[:aggs].present?
           dataset(json)
@@ -52,16 +57,21 @@ class VariationSearchService
 
     def dataset(json)
       json.dataset do
-        Array((stat = @result[:aggs]).dig(:frequency, :sources, :buckets)).each do |x|
-          json.set! x[:key], x[:doc_count]
+        aggs = @result[:aggs]
+        datasets = Array(aggs.dig(:frequency, :source, :buckets)).concat(Array(aggs.dig(:condition, :source, :buckets)))
+
+        datasets.each do |x|
+          # TODO: remove if dataset renamed
+          key = x[:key] == 'jga_ngs' ? 'jga_wes' : x[:key]
+
+          json.set! key, x[:doc_count] if accessible_datasets.include?(key.to_sym)
         end
-        json.clinvar stat.dig(:clinvar_total, :doc_count)
       end
     end
 
     def type(json)
       json.type do
-        Array(@result[:aggs].dig(:types, :buckets)).each do |x|
+        Array(@result[:aggs].dig(:type, :buckets)).each do |x|
           json.set! SequenceOntology.find_by_label(x[:key])&.id, x[:doc_count]
         end
       end
@@ -69,10 +79,10 @@ class VariationSearchService
 
     def significance(json)
       json.significance do
-        unless (c = @result[:filtered_total] - @result[:aggs].dig(:clinvar_total, :doc_count)).zero?
+        unless (c = @result[:count_condition_absence]).zero?
           json.set! 'NC', c
         end
-        Array(@result[:aggs].dig(:conditions, :interpretations, :buckets)).each do |x|
+        Array(@result[:aggs].dig(:conditions_condition, :classification, :buckets)).each do |x|
           if (s = ClinicalSignificance.find_by_id(x[:key].tr(',', '').tr(' ', '_')))
             json.set! s.key, x[:doc_count]
           end
@@ -82,7 +92,7 @@ class VariationSearchService
 
     def consequence(json)
       json.consequence do
-        Array(@result[:aggs].dig(:vep, :consequences, :buckets)).each do |x|
+        Array(@result[:aggs].dig(:vep, :consequence, :buckets)).each do |x|
           if (c = SequenceOntology.find_by_key(x[:key]))
             json.set! c.id, x[:doc_count]
           end
@@ -91,6 +101,36 @@ class VariationSearchService
     end
 
     CLINVAR_CONDITION_NOT_PROVIDED = 'not provided'
+
+    # C3661900 = not provided
+    # CN169374 = not specified
+    MEDGEN_IGNORE = %w[C3661900 CN169374]
+
+    MEDGEN_COMPARATOR = proc do |a, b|
+      next MEDGEN_IGNORE.find_index(a) <=> MEDGEN_IGNORE.find_index(b) if [a, b].all? { |x| MEDGEN_IGNORE.include?(x) }
+      next 1 if MEDGEN_IGNORE.include?(a)
+      next -1 if MEDGEN_IGNORE.include?(b)
+      0
+    end
+
+    CONDITIONS_COMPARATOR = proc do |a, b|
+      if (r = ClinicalSignificance.find_by_key(a.dig(:interpretations, 0))&.index <=>
+        ClinicalSignificance.find_by_key(b.dig(:interpretations, 0))&.index) && !r.zero?
+        next r
+      end
+
+      if (r = b[:submission_count] <=> a[:submission_count]) && !r.zero?
+        next r
+      end
+
+      m1 = a.dig(:conditions, 0, :medgen)
+      m2 = b.dig(:conditions, 0, :medgen)
+      next MEDGEN_IGNORE.find_index(m1) <=> MEDGEN_IGNORE.find_index(m2) if [m1, m2].all? { |x| MEDGEN_IGNORE.include?(x) }
+      next 1 if m1.present? && MEDGEN_IGNORE.include?(m1)
+      next -1 if m2.present? && MEDGEN_IGNORE.include?(m2)
+
+      b[:conditions]&.filter_map { |x| x[:medgen] }&.flatten&.size <=> a[:conditions]&.filter_map { |x| x[:medgen] }&.flatten&.size || 0
+    end
 
     def data(json)
       synonyms = Hash.new { |hash, key| hash[key] = Gene.synonyms(key) }
@@ -136,8 +176,11 @@ class VariationSearchService
         if dbsnp.present?
           external_link[:dbsnp] = dbsnp.map { |x| { title: x, xref: format(XREF_TEMPLATE[:dbsnp], id: x) } }
         end
-        if (id = variant.dig(:clinvar, :id)).present?
+        if (id = variant[:conditions]&.find { |x| x[:source] == 'clinvar' }&.dig(:id)).present?
           external_link[:clinvar] = [{ title: 'VCV%09d' % id, xref: format(XREF_TEMPLATE[:clinvar], id: id) }]
+        end
+        if (id = variant[:conditions]&.find { |x| x[:source] == 'mgend' }&.dig(:id)).present?
+          external_link[:mgend] = [{ title: id, xref: format(XREF_TEMPLATE[:mgend], id: id) }]
         end
         if variant[:frequency]&.find { |x| x[:source] == 'tommo' }
           query = "#{variant.dig(:chromosome, :label)}:#{variant.dig(:vcf, :position)}"
@@ -153,36 +196,41 @@ class VariationSearchService
           json.external_link external_link
         end
 
-        significance = Array(variant.dig(:clinvar, :conditions)).map do |x|
-          {
-            conditions: Array(x[:medgen]).map { |v| { name: conditions[v] || CLINVAR_CONDITION_NOT_PROVIDED, medgen: v } },
-            interpretations: Array(x[:interpretation]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(',', '').tr(' ', '_').to_sym)&.key },
-            submission_count: x[:submission_count]
-          }
+        significance = Array(variant[:conditions]).flat_map do |condition|
+          # TODO: remove on 2025.1
+          if condition[:source] == "mgend" && condition[:condition].blank?
+            if (f = Rails.root.join('tmp', 'mgend.vcf.gz')).exist? &&
+              (r = `zgrep '#{condition[:id]}' #{f}`).present? &&
+              (info = r.split("\n").first.split("\t")[7]).present? &&
+              (cond = info.match(/CONDITIONS=([^;]+)/)&.captures[0])
+
+              condition[:condition] = cond.split("|").filter_map do |x|
+                next if (cs = x.split(":")[2]).blank?
+
+                { classification: [cs.downcase.gsub(',', '').gsub(' ', '_')] }
+              end
+            end
+          end
+
+          (condition[:condition].presence || [{}]).map do |x|
+            {
+              conditions: if x[:medgen].present?
+                            Array(x[:medgen]).sort(&MEDGEN_COMPARATOR)
+                                             .map { |v| { name: conditions[v] || CLINVAR_CONDITION_NOT_PROVIDED, medgen: v } }
+                          elsif x[:pref_name].present?
+                            Array(x[:pref_name]).map { |v| { name: v } }
+                          else
+                            []
+                          end,
+              interpretations: Array(x[:classification]).filter_map { |y| ClinicalSignificance.find_by_id(y.tr(',', '').tr(' ', '_').to_sym)&.key },
+              submission_count: x[:submission_count],
+              source: condition[:source]
+            }
+          end
         end
 
         if significance.present?
-          significance.sort! do |a, b|
-            if (r = ClinicalSignificance.find_by_key(a.dig(:interpretations, 0))&.index <=>
-              ClinicalSignificance.find_by_key(b.dig(:interpretations, 0))&.index) && !r.zero?
-              next r
-            end
-
-            if (r = b[:submission_count] <=> a[:submission_count]) && !r.zero?
-              next r
-            end
-
-            next 1 if a[:condition] == CLINVAR_CONDITION_NOT_PROVIDED
-            next -1 if b[:condition] == CLINVAR_CONDITION_NOT_PROVIDED
-
-            if (r = b[:condition] <=> a[:condition]) && !r.zero?
-              next r
-            end
-
-            a[:condition].blank? ? 1 : -1
-          end
-
-          json.significance significance
+          json.significance significance.sort(&CONDITIONS_COMPARATOR)
         end
 
         vep = Array(variant[:vep])
@@ -197,20 +245,16 @@ class VariationSearchService
         json.transcripts vep.map(&:compact).presence
 
         frequencies = Array(variant[:frequency]).filter_map do |x|
-          next if !@param[:expand_dataset] && !Variation::Datasets::FREQUENCY.include?(x[:source].to_sym)
+          # TODO: remove if dataset renamed
+          x[:source] = 'jga_wes' if x[:source] == 'jga_ngs'
+          if (m = x[:source].match(/^(bbj_riken\.mpheno\d+)\.all$/))
+            x[:source] = m[1]
+          end
+
+          next unless accessible_datasets.include?(x[:source].to_sym)
 
           if x[:af].blank? && x[:ac].present? && x[:an].present?
             x[:af] = Float(x[:ac]) / Float(x[:an])
-          end
-
-          if x[:af].blank? && x[:ac].present? && x[:an].present?
-            x[:af] = Float(x[:ac]) / Float(x[:an])
-          end
-
-          an_hemi = x.delete(:an_hemi)
-          if (ac_hemi = x.delete(:ac_hemi))
-            x[:hemi_alt] = ac_hemi
-            x[:hemi_ref] = an_hemi - ac_hemi if an_hemi
           end
 
           x.compact.sort.to_h

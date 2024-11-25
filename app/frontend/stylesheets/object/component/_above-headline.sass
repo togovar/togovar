@@ -7,9 +7,25 @@
   > dd
     line-height: 16px
     margin-bottom: 0
+    display: flex
+    flex-wrap: wrap
+    justify-content: space-between
     > .clinical-significance
       display: inline-block
       vertical-align: middle
+      white-space: nowrap
+    > .disease-category
+      display: flex
+      gap: 5px
+      font-size: 12px
+      font-weight: bold
+      align-self: flex-end
+      margin-left: auto
+      margin-right: 5px
+      > .mgend
+        color: $COLOR_DATASET_DISEASE_MGEND
+      > .clinvar
+        color: $COLOR_DATASET_DISEASE_CLINVAR
   + .above-headline
     border-top: solid 1px $COLOR_SEPARATOR
     margin-top: 8px

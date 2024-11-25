@@ -6,11 +6,12 @@ module Executable
   # @param [#execute] service
   # @return [Array] [result, status]
   def execute(service)
-    [service.execute, 200]
+    [service.execute, :ok]
   rescue Errors::ServiceError => e
     [{ errors: e.errors }, e.status]
   rescue StandardError => e
-    error { Array(e.backtrace).unshift(e.to_s).join("\n") }
+    Rails.logger.error(self.class.name) { [e.message].concat(e.backtrace).join("\n") }
+    raise e if Rails.env.development?
     [{ errors: [e.message] }, :internal_server_error]
   end
 end

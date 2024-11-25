@@ -49,10 +49,10 @@ export class FrequencyCountValueView extends LitElement {
       background-color: var(--color-dataset-gemj);
     }
 
-    :host([data-dataset='jga_ngs']) > .frequencygraph > .bar,
-    :host([data-dataset='jga_snp']) > .frequencygraph > .bar,
-    :host([data-dataset^='bbj_riken']) > .frequencygraph > .bar {
-      background-color: var(--color-dataset-jga);
+    :host([data-dataset^='jga_wgs']), :host([data-dataset='jga_wes']), :host([data-dataset='jga_snp']), :host([data-dataset^='bbj_riken']) {
+      > .frequencygraph > .bar {
+        background-color: var(--color-dataset-jga);
+      }
     }
 
     :host([data-dataset='tommo']) > .frequencygraph > .bar {

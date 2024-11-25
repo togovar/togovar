@@ -12,7 +12,6 @@ const config = {
   entry: {
     main: './app/frontend/packs/index.js',
     report: './app/frontend/packs/report/index.js',
-    api: './app/frontend/packs/api/index.js',
   },
   output: {
     path: path.resolve(__dirname, '../../../dist'),
@@ -133,11 +132,6 @@ const config = {
     new HtmlWebpackPlugin({
       template: 'app/frontend/views/disease/index.pug',
       filename: 'disease/index.html',
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
-      template: 'app/frontend/views/api/index.pug',
-      filename: 'api/index.html',
       inject: false,
     }),
     new MiniCssExtractPlugin({

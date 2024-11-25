@@ -27,7 +27,7 @@
       display: block
       height: 10px
   // color
-  &[data-dataset="jga_ngs"], &[data-dataset="jga_snp"]
+  &[data-dataset="jga_wgs"],&[data-dataset="jga_wes"], &[data-dataset="jga_snp"]
     &:before
       color: $COLOR_DATASET_JGA
   &[data-dataset="tommo"]
@@ -45,14 +45,20 @@
   &[data-dataset="bbj"]
     &:before
       color: $COLOR_DATASET_BBJ
-  &[data-dataset="clinvar"], &[data-dataset="gnomad_genomes"], &[data-dataset="gnomad_exomes"]
+  &[data-dataset="gnomad_genomes"], &[data-dataset="gnomad_exomes"]
     &:before
       color: $COLOR_DATASET_FOREIGN
   // Disease
-  &[data-dataset="clinvar"], &[data-dataset="mgend"]
+  // TODO: 10/20 iconの設定cntent, colorの確認
+  &[data-dataset="mgend"], &[data-dataset="clinvar"]
+    &::before
+      content: "\f067"
+      font-family: FontAwesome
+      color: $COLOR_DATASET_DISEASE
+      font-size: 14px
     > .properties
       &::before
-        color: $COLOR_SIGN_DANGEROUS
+        color: $COLOR_DATASET_DISEASE
         content: "Disease"
   // WGS
   &[data-dataset="tommo"], &[data-dataset="ncbn"], &[data-dataset="gem_j_wga"], &[data-dataset="gnomad_genomes"]
@@ -60,7 +66,7 @@
       &::after
         content: "WGS"
   // WES
-  &[data-dataset="jga_ngs"], &[data-dataset="hgvd"], &[data-dataset="gnomad_exomes"]
+  &[data-dataset="jga_wgs"],&[data-dataset="jga_wes"], &[data-dataset="hgvd"], &[data-dataset="gnomad_exomes"]
     > .properties
       &::after
         content: "WES"

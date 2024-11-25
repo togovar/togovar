@@ -4,6 +4,7 @@ import { ADVANCED_CONDITIONS } from '../global.js';
 import ConditionItemView from './ConditionItemView.js';
 import ConditionValueEditor from './ConditionValueEditor.js';
 import ConditionValues from './ConditionValues.js';
+import StoreManager from './StoreManager.js';
 
 type DataNode = {
   id: string;
@@ -18,18 +19,20 @@ type DataNodeWithChecked = DataNode & {
 };
 
 export default class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
-  _lastValueViews: Array<HTMLDivElement>;
-  _data: HierarchyNode<DataNodeWithChecked>;
-  _columns: HTMLElement;
-  _description: HTMLElement;
-  _nodesToShowInValueView: Array<HierarchyNode<DataNodeWithChecked>>;
+  #lastValueViews: Array<HTMLDivElement>;
+  #data: HierarchyNode<DataNodeWithChecked>;
+  #columns: HTMLElement;
+  #nodesToShowInValueView: Array<HierarchyNode<DataNodeWithChecked>>;
+  #uniqueIdCounter: number;
 
   constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
 
-    this._data = this._prepareData();
+    this.#data = this.#prepareData();
 
-    this._nodesToShowInValueView = [];
+    this.#nodesToShowInValueView = [];
+
+    this.#uniqueIdCounter = 0;
     // HTML
     this._createElement(
       'columns-editor-view',
@@ -40,36 +43,35 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
       <div class="description"></div>
     </div>`
     );
-    this._columns = this._body.querySelector(':scope > .columns');
-    this._description = this._body.querySelector(':scope > .description');
-    this._drawColumn();
+    this.#columns = this._body.querySelector(':scope > .columns');
+    this.#drawColumn();
   }
 
   // public methods
 
   /** on click pencil icon in value view, save last values */
   keepLastValues() {
-    this._lastValueViews = this._valueViews;
+    this.#lastValueViews = this._valueViews;
   }
 
   /** Restore last values (on press Cancel button) */
   restore() {
     //reset all checked
-    this._data.each((datum) => {
+    this.#data.each((datum) => {
       datum.data.checked = false;
     });
 
-    for (const lastValue of this._lastValueViews) {
-      const node = this._data.find(
+    for (const lastValue of this.#lastValueViews) {
+      const node = this.#data.find(
         (d) => d.data.value === lastValue.dataset['value']
       );
       if (!node) continue;
       node.data.checked = true;
-      this._updateChildren(node, true);
-      this._updateParents(node, true);
+      this.#updateChildren(node, true);
+      this.#updateParents(node, true);
     }
-    this._update();
-    this._updateValueViews(this._lastValueViews);
+    this.#update();
+    this._updateValueViews(this.#lastValueViews);
   }
 
   get isValid() {
@@ -78,23 +80,45 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
 
   // private methods
 
-  _prepareData() {
+  // Nodeに一意のIDを追加する関数
+  #addIdsToDataNodes(dataNodes: DataNode[]): DataNodeWithChecked[] {
+    return dataNodes.map((node) => {
+      if (!Number.isInteger(this.#uniqueIdCounter)) {
+        this.#uniqueIdCounter = 0; // 念のため整数で初期化
+      }
+
+      // 各ノードに一意のIDを設定
+      const newNode: DataNodeWithChecked = {
+        ...node,
+        id: `${this.#uniqueIdCounter++}`,
+        checked: false,
+        indeterminate: false,
+      };
+
+      // 子ノードがある場合は再帰的に処理
+      if (newNode.children && newNode.children.length > 0) {
+        newNode.children = this.#addIdsToDataNodes(newNode.children);
+      }
+      return newNode;
+    });
+  }
+
+  #prepareData() {
     switch (this._conditionType) {
       case CONDITION_TYPE.dataset: {
         const data = ADVANCED_CONDITIONS[this._conditionType]
           .values as DataNodeWithChecked[];
+        const dataWithIds = this.#addIdsToDataNodes(data);
+
         const hierarchyData = hierarchy<DataNodeWithChecked>({
           id: '-1',
           label: 'root',
           value: '',
-          children: data,
+          children: dataWithIds,
           checked: false,
           indeterminate: false,
         });
-        for (const child of hierarchyData.descendants()) {
-          child.data.checked = false;
-          child.data.indeterminate = false;
-        }
+
         return hierarchyData;
       }
       default:
@@ -104,40 +128,53 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     }
   }
 
-  _drawColumn(parentId?: string) {
-    this._getItems(parentId).then((items) => {
+  async #drawColumn(parentId?: string) {
+    await StoreManager.fetchLoginStatus();
+    const isLogin = StoreManager.getData('isLogin');
+    this.#getItems(parentId).then((items) => {
       // make HTML
       const column = document.createElement('div');
       column.classList.add('column');
-      column.dataset.depth = this._columns
+      column.dataset.depth = this.#columns
         .querySelectorAll(':scope > .column')
         .length.toString();
-      this._columns.append(column);
+      this.#columns.append(column);
       column.innerHTML = `
         <ul>
           ${items
             .map((item) => {
-              return `<li
-              ${item.data.id ? `data-id="${item.data.id}"` : ''}
-              ${item.data.value ? `data-value="${item.data.value}"` : ''}
-              ${item.parent ? `data-parent="${item.parent.data.id}"` : ''}
-            >
-              <label>
-                <input type="checkbox" value=${item.data.id}>
-                ${
-                  this._conditionType === CONDITION_TYPE.dataset &&
-                  item.depth === 1
-                    ? `<span class="dataset-icon" data-dataset="${item.data.value}"></span>`
-                    : ''
-                }
-                <span>${item.data.label}</span>
-              </label>
-              ${
-                item.children === undefined
-                  ? ''
-                  : `<div class="arrow" data-id="${item.data.id}"></div>`
+              let listItem = `<li`;
+
+              listItem += ` data-id="${item.data.id}"`;
+              listItem += ` data-parent="${item.parent.data.id}"`;
+              if (item.data.value) {
+                listItem += ` data-value="${item.data.value}"`;
               }
-            </li>`;
+
+              listItem += `>
+                <label>
+                  <input type="checkbox" value="${item.data.id}">`;
+
+              // dataset-icon` 追加
+              if (
+                this._conditionType === CONDITION_TYPE.dataset &&
+                item.depth === 1
+              ) {
+                listItem += `<span class="dataset-icon" data-dataset="${item.data.value}"> </span>`;
+              }
+
+              listItem += `<span>${item.data.label}</span>
+                </label>`;
+
+              // 子要素がある場合に矢印を追加
+              if (item.children !== undefined) {
+                if (!(isLogin === false && item.data.id === '1')) {
+                  listItem += `<div class="arrow" data-id="${item.data.id}"></div>`;
+                }
+              }
+
+              listItem += `</li>`;
+              return listItem;
             })
             .join('')}
         </ul>`;
@@ -148,12 +185,12 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
         const target = e.target as HTMLInputElement;
         const checked = target.checked;
         const nodeId = target.closest('li').dataset.id;
-        const changedNode = this._data.find((datum) => datum.data.id == nodeId);
+        const changedNode = this.#data.find((datum) => datum.data.id == nodeId);
 
-        if (changedNode.children) this._updateChildren(changedNode, checked);
-        if (changedNode.parent) this._updateParents(changedNode, checked);
+        if (changedNode.children) this.#updateChildren(changedNode, checked);
+        if (changedNode.parent) this.#updateParents(changedNode, checked);
 
-        this._update();
+        this.#update();
       });
 
       // drill down
@@ -178,10 +215,10 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
           // select, and drill down
           item.classList.add('-selected');
 
-          this._drawColumn(target.dataset.id);
+          this.#drawColumn(target.dataset.id);
         });
       }
-      this._update();
+      this.#update();
 
       // scroll
       const left = this._body.scrollWidth - this._body.clientWidth;
@@ -195,15 +232,15 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     });
   }
 
-  _getItems(parentId?: string): Promise<HierarchyNode<DataNodeWithChecked>[]> {
+  #getItems(parentId?: string): Promise<HierarchyNode<DataNodeWithChecked>[]> {
     return new Promise((resolve, reject) => {
-      if (!parentId) resolve(this._data.children);
-      const found = this._data.find((datum) => datum.data.id === parentId);
+      if (!parentId) resolve(this.#data.children);
+      const found = this.#data.find((datum) => datum.data.id === parentId);
       resolve(found?.children);
     });
   }
 
-  _updateChildren(node: HierarchyNode<DataNodeWithChecked>, checked: boolean) {
+  #updateChildren(node: HierarchyNode<DataNodeWithChecked>, checked: boolean) {
     // reflect
     if (!node.children || node.children.length === 0) return;
 
@@ -213,7 +250,7 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
   }
 
   /** Update the parent nodes of the given node */
-  _updateParents(
+  #updateParents(
     dataNode: HierarchyNode<DataNodeWithChecked> | undefined,
     checked?: boolean
   ) {
@@ -240,13 +277,13 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
       dataNode.data.indeterminate = someIndeterminate || someButNotEveryChecked;
     }
 
-    this._updateParents(dataNode.parent);
+    this.#updateParents(dataNode.parent);
   }
 
-  _update() {
+  #update() {
     // reflect check status in DOM
-    this._data.eachAfter((datum) => {
-      const checkbox: HTMLInputElement = this._columns.querySelector(
+    this.#data.eachAfter((datum) => {
+      const checkbox: HTMLInputElement = this.#columns.querySelector(
         `li[data-id="${datum.data.id}"] > label > input`
       );
       if (checkbox) {
@@ -258,31 +295,31 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
 
     // update values in the value view (ellipsises at the top)
 
-    this._processValuesToShowInValueView();
+    this.#processValuesToShowInValueView();
     this._clearValueViews();
 
-    for (const valueViewToAdd of this._nodesToShowInValueView) {
+    for (const valueViewToAdd of this.#nodesToShowInValueView) {
       this._addValueView(
         valueViewToAdd.data.value,
-        this._getLabelForValueToShow(valueViewToAdd)
+        this.#getLabelForValueToShow(valueViewToAdd)
       );
     }
 
     // validation
-    this._valuesView.update(this._validate());
+    this._valuesView.update(this.#validate());
   }
 
-  _processValuesToShowInValueView() {
-    this._nodesToShowInValueView = concatNodesToParent(this._data);
+  #processValuesToShowInValueView() {
+    this.#nodesToShowInValueView = concatNodesToParent(this.#data);
   }
 
   /** Get the label with path to show in the value view */
-  _getLabelForValueToShow(node: HierarchyNode<DataNodeWithChecked>) {
-    const [, ...path] = node.path(this._data).reverse();
+  #getLabelForValueToShow(node: HierarchyNode<DataNodeWithChecked>) {
+    const [, ...path] = node.path(this.#data).reverse();
     return path.map((d) => d.data.label).join(' > ');
   }
 
-  _validate() {
+  #validate() {
     return this.isValid;
   }
 }

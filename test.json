@@ -1,0 +1,312 @@
+{
+  "vep": {
+    "doc_count": 10275190337,
+    "consequence": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [
+        {
+          "key": "intron_variant",
+          "doc_count": 8960391935
+        },
+        {
+          "key": "non_coding_transcript_variant",
+          "doc_count": 2049935376
+        },
+        {
+          "key": "NMD_transcript_variant",
+          "doc_count": 478159980
+        },
+        {
+          "key": "intergenic_variant",
+          "doc_count": 347222075
+        },
+        {
+          "key": "3_prime_UTR_variant",
+          "doc_count": 275989940
+        },
+        {
+          "key": "missense_variant",
+          "doc_count": 209841252
+        },
+        {
+          "key": "non_coding_transcript_exon_variant",
+          "doc_count": 207239921
+        },
+        {
+          "key": "synonymous_variant",
+          "doc_count": 90578021
+        },
+        {
+          "key": "5_prime_UTR_variant",
+          "doc_count": 78896348
+        },
+        {
+          "key": "TF_binding_site_variant",
+          "doc_count": 62753121
+        },
+        {
+          "key": "splice_polypyrimidine_tract_variant",
+          "doc_count": 48659920
+        },
+        {
+          "key": "splice_region_variant",
+          "doc_count": 43352295
+        },
+        {
+          "key": "frameshift_variant",
+          "doc_count": 16790205
+        },
+        {
+          "key": "stop_gained",
+          "doc_count": 9574357
+        },
+        {
+          "key": "splice_donor_region_variant",
+          "doc_count": 8179665
+        },
+        {
+          "key": "splice_donor_variant",
+          "doc_count": 5516042
+        },
+        {
+          "key": "splice_acceptor_variant",
+          "doc_count": 5514263
+        },
+        {
+          "key": "splice_donor_5th_base_variant",
+          "doc_count": 3468888
+        },
+        {
+          "key": "inframe_deletion",
+          "doc_count": 3279305
+        },
+        {
+          "key": "inframe_insertion",
+          "doc_count": 1827257
+        },
+        {
+          "key": "start_lost",
+          "doc_count": 712085
+        },
+        {
+          "key": "coding_sequence_variant",
+          "doc_count": 628559
+        },
+        {
+          "key": "TFBS_ablation",
+          "doc_count": 625622
+        },
+        {
+          "key": "stop_lost",
+          "doc_count": 362720
+        },
+        {
+          "key": "stop_retained_variant",
+          "doc_count": 213274
+        },
+        {
+          "key": "protein_altering_variant",
+          "doc_count": 193683
+        },
+        {
+          "key": "mature_miRNA_variant",
+          "doc_count": 56092
+        },
+        {
+          "key": "incomplete_terminal_codon_variant",
+          "doc_count": 16400
+        },
+        {
+          "key": "start_retained_variant",
+          "doc_count": 10701
+        },
+        {
+          "key": "transcript_ablation",
+          "doc_count": 1052
+        },
+        {
+          "key": "coding_transcript_variant",
+          "doc_count": 1
+        }
+      ]
+    }
+  },
+  "condition": {
+    "doc_count": 3021916,
+    "source": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [
+        {
+          "key": "clinvar",
+          "doc_count": 2944685
+        },
+        {
+          "key": "mgend",
+          "doc_count": 77231
+        }
+      ]
+    }
+  },
+  "conditions_condition": {
+    "doc_count": 3977189,
+    "classification": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [
+        {
+          "key": "uncertain_significance",
+          "doc_count": 1865656
+        },
+        {
+          "key": "likely_benign",
+          "doc_count": 1156738
+        },
+        {
+          "key": "benign",
+          "doc_count": 401037
+        },
+        {
+          "key": "pathogenic",
+          "doc_count": 280440
+        },
+        {
+          "key": "likely_pathogenic",
+          "doc_count": 153210
+        },
+        {
+          "key": "not_provided",
+          "doc_count": 114109
+        },
+        {
+          "key": "conflicting_interpretations_of_pathogenicity",
+          "doc_count": 50394
+        },
+        {
+          "key": "drug_response",
+          "doc_count": 1977
+        },
+        {
+          "key": "other",
+          "doc_count": 1881
+        },
+        {
+          "key": "no_classifications_from_unflagged_records",
+          "doc_count": 1163
+        },
+        {
+          "key": "risk_factor",
+          "doc_count": 868
+        },
+        {
+          "key": "association",
+          "doc_count": 456
+        },
+        {
+          "key": "uncertain_risk_allele",
+          "doc_count": 317
+        },
+        {
+          "key": "likely_risk_allele",
+          "doc_count": 292
+        },
+        {
+          "key": "affects",
+          "doc_count": 201
+        },
+        {
+          "key": "protective",
+          "doc_count": 90
+        },
+        {
+          "key": "pathogenic_low_penetrance",
+          "doc_count": 20
+        },
+        {
+          "key": "confers_sensitivity",
+          "doc_count": 10
+        },
+        {
+          "key": "established_risk_allele",
+          "doc_count": 7
+        },
+        {
+          "key": "likely_pathogenic_low_penetrance",
+          "doc_count": 7
+        },
+        {
+          "key": "association_not_found",
+          "doc_count": 4
+        }
+      ]
+    }
+  },
+  "type": {
+    "doc_count_error_upper_bound": 0,
+    "sum_other_doc_count": 0,
+    "buckets": [
+      {
+        "key": "SNV",
+        "doc_count": 954346594
+      },
+      {
+        "key": "Deletion",
+        "doc_count": 76870848
+      },
+      {
+        "key": "Insertion",
+        "doc_count": 66473847
+      },
+      {
+        "key": "MNV",
+        "doc_count": 9719
+      },
+      {
+        "key": "Indel",
+        "doc_count": 7152
+      }
+    ]
+  },
+  "frequency": {
+    "doc_count": 17916060575,
+    "source": {
+      "doc_count_error_upper_bound": 215729032,
+      "sum_other_doc_count": 11841370015,
+      "buckets": [
+        {
+          "key": "gnomad_genomes",
+          "doc_count": 759336320
+        },
+        {
+          "key": "gnomad_genomes.afr",
+          "doc_count": 759336320
+        },
+        {
+          "key": "gnomad_genomes.ami",
+          "doc_count": 759336320
+        },
+        {
+          "key": "gnomad_genomes.amr",
+          "doc_count": 759336320
+        },
+        {
+          "key": "gnomad_genomes.asj",
+          "doc_count": 759336320
+        },
+        {
+          "key": "gnomad_genomes.eas",
+          "doc_count": 759336320
+        },
+        {
+          "key": "gnomad_genomes.fin",
+          "doc_count": 759336320
+        },
+        {
+          "key": "gnomad_genomes.mid",
+          "doc_count": 759336320
+        }
+      ]
+    }
+  }
+}

@@ -26,6 +26,7 @@ module TogoVar
           attr_reader :query
           attr_reader :limit
           attr_reader :offset
+          attr_accessor :options
 
           validates :limit, presence: true
           validates :limit, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 1_000 }
@@ -60,6 +61,7 @@ module TogoVar
             @query = hash.fetch(:query, {})
             @limit = hash.fetch(:limit, Defaults::LIMIT).to_i
             @offset = (offset = hash[:offset]).is_a?(Array) ? offset : offset&.to_i
+            @options = {}
           end
 
           # @return [Array]
@@ -70,10 +72,42 @@ module TogoVar
           def to_hash
             validate
 
+            user = @options[:user]
+            source = Variation.frequency_datasets(user).map do |x| # TODO: remove if dataset renamed
+              case x.to_s
+              when 'jga_wes'
+                :jga_ngs
+              when /^bbj_riken.mpheno\d+$/
+                :"#{x}.all"
+              else
+                x
+              end
+            end
+
             query = Elasticsearch::DSL::Search.search do
               query do
                 bool do
                   must Variation.default_condition
+                  must do
+                    bool do
+                      should do
+                        nested do
+                          path :frequency
+                          query do
+                            terms 'frequency.source': source
+                          end
+                        end
+                      end
+                      should do
+                        nested do
+                          path :conditions
+                          query do
+                            terms 'conditions.source': Variation.condition_datasets(user)
+                          end
+                        end
+                      end
+                    end
+                  end
                   if (q = models.first[:query].to_hash).present?
                     must q
                   end

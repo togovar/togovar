@@ -1,0 +1,55 @@
+.languageswitcher {
+  display: flex;
+
+  &::before {
+    content: '';
+    position: relative;
+    left: 25px;
+    width: 1px;
+    border-right: 1px solid $COLOR_KEY_DARK2;
+  }
+
+  &.en {
+    a.en {
+      background-color: $COLOR_KEY_DARK1_30;
+      color: $COLOR_KEY_DARK2;
+      border: 1px solid $COLOR_KEY_DARK2;
+      border-right: none;
+    }
+    a.ja {
+      color: $COLOR_GRAY;
+      border: 1px solid $COLOR_GRAY;
+      border-left: none;
+    }
+  }
+  &.ja {
+    a.ja {
+      background-color: $COLOR_KEY_DARK1_30;
+      color: $COLOR_KEY_DARK2;
+      border: 1px solid $COLOR_KEY_DARK2;
+      border-left: none;
+    }
+    a.en {
+      color: $COLOR_GRAY;
+      border: 1px solid $COLOR_GRAY;
+      border-right: none;
+    }
+  }
+
+  a {
+    line-height: 1.5;
+    text-align: center;
+    font-size: 12px;
+    width: 24px;
+    text-decoration: none;
+
+    &.en {
+      border-radius: 20px 0 0 20px;
+      border-right: 1px solid $COLOR_KEY_DARK2;
+    }
+
+    &.ja {
+      border-radius: 0 20px 20px 0;
+    }
+  }
+}

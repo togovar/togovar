@@ -10,6 +10,7 @@ class StoreManager {
       offset: 0,
       rowCount: 0,
       appStatus: 'preparing',
+      isLogin: false,
       _abortController: new AbortController(),
     };
 
@@ -60,6 +61,25 @@ class StoreManager {
     // 個別の処理
   }
 
+  async fetchLoginStatus() {
+    try {
+      // if (window.location.origin === 'http://localhost:8000') {
+      //   this.setData('isLogin', true);
+      //   return
+      // }
+      const response = await fetch(`${window.location.origin}/auth/status`);
+
+      if (response.status === 401) {
+        this.setData('isLogin', false);
+      } else if (response.status === 200 || response.status === 403) {
+        this.setData('isLogin', true);
+      }
+      return
+    } catch (error) {
+      console.error('Error fetching auth status:', error);
+    }
+  }
+
   // store search results
   _setResults(records, offset) {
     for (let i = 0; i < records.length; i++) {
@@ -99,7 +119,7 @@ class StoreManager {
 
   _copy(value) {
     switch (
-      true // 値渡し
+    true // 値渡し
     ) {
       case Array.isArray(value):
         return JSON.parse(JSON.stringify(value));

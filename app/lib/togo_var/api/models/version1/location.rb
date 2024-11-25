@@ -30,7 +30,7 @@ module TogoVar
                         when Hash
                           @position.with_indifferent_access
                         else
-                          raise TypeError, "Invalid value #{@position}:#{@position.class}"
+                          raise InvalidQuery, "Invalid value #{@position}:#{@position.class}"
                         end
             model.update(position: Range.new({ field: 'position' }.merge(position))) # just for validation
 

@@ -31,6 +31,13 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
           });
         }
 
+        // MGeND
+        if (record.external_link.mgend) {
+          record.external_link.mgend.forEach((item) => {
+            list.push(this.#createLinkList('MGeND', item.title, item.xref));
+          });
+        }
+
         // ClinVar
         if (record.external_link.clinvar) {
           record.external_link.clinvar.forEach((item) => {
@@ -57,11 +64,11 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
         html = `
                   <tbody>
                     ${list
-                      .map(
-                        (item) =>
-                          `<tr><th>${item.title}</th><td>${item.content}</td></tr>`
-                      )
-                      .join('')}
+            .map(
+              (item) =>
+                `<tr><th>${item.title}</th><td>${item.content}</td></tr>`
+            )
+            .join('')}
                   </tbody>
                 `;
         this.elm.classList.remove('-notfound');

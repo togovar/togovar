@@ -9,7 +9,7 @@ module Tasks
   class Gene < Thor
     namespace :gene
 
-    desc 'generate_index', 'Generate gene index (wget ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/tsv/hgnc_complete_set.txt)'
+    desc 'generate_index', 'Generate gene index (wget "https://storage.googleapis.com/public-download-files/hgnc/tsv/tsv/hgnc_complete_set.txt")'
 
     def generate_index(filename, output_prefix)
       CSV::Row.include(TogoVar::Ndjson::Formatter::Gene)

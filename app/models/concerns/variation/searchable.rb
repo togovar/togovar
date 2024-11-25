@@ -58,12 +58,13 @@ class Variation
             indexes :polyphen, type: :double
             indexes :alphamissense, type: :double
           end
-          indexes :clinvar do
-            indexes :id, type: :long
-            indexes :accession, type: :keyword
-            indexes :conditions, type: :nested do
+          indexes :conditions, type: :nested do
+            indexes :source, type: :keyword
+            indexes :id, type: :keyword
+            indexes :condition, type: :nested do
               indexes :medgen, type: :keyword
-              indexes :interpretation, type: :keyword
+              indexes :pref_name, type: :keyword
+              indexes :classification, type: :keyword
               indexes :submission_count, type: :integer
             end
           end
@@ -76,9 +77,13 @@ class Variation
             indexes :af, type: :double
             indexes :aac, type: :long
             indexes :arc, type: :long
+            indexes :aoc, type: :long
             indexes :rrc, type: :long
-            indexes :ac_hemi, type: :long
-            indexes :an_hemi, type: :long
+            indexes :roc, type: :long
+            indexes :ooc, type: :long
+            indexes :hac, type: :long
+            indexes :hrc, type: :long
+            indexes :hoc, type: :long
           end
         end
       end
@@ -87,39 +92,45 @@ class Variation
     module ClassMethods
       # @return [Hash]
       def cardinality
-        return @cardinality if @cardinality
+        Rails.cache.fetch('Variant::Searchable.cardinality') do
+          query = Elasticsearch::DSL::Search.search do
+            size 0
 
-        query = Elasticsearch::DSL::Search.search do
-          size 0
-          aggregation :types do
-            cardinality do
-              field :type
+            aggregation :types do
+              cardinality do
+                field :type
+              end
             end
-          end
-          aggregation :clinvar_interpretations do
-            nested do
-              path 'clinvar.conditions'
-              aggregation :clinvar_interpretations do
-                cardinality do
-                  field :'clinvar.conditions.interpretation'
+
+            aggregation :conditions do
+              nested do
+                path 'conditions.condition'
+                aggregation :classification do
+                  cardinality do
+                    field :'conditions.condition.classification'
+                  end
                 end
               end
             end
-          end
-          aggregation :vep_consequences do
-            cardinality do
-              field :'most_severe_consequence'
+
+            aggregation :vep_consequences do
+              cardinality do
+                field :'most_severe_consequence'
+              end
             end
           end
+
+          response = __elasticsearch__.search(query, request_cache: true)
+          aggs = response.aggregations
+
+          {
+            vep_consequences: aggs.dig(:vep_consequences, :value),
+            types: aggs.dig(:types, :value),
+            condition_classifications: aggs.dig(:conditions, :classification, :value),
+            condition_sources: Rails.application.config.application.dig(:datasets, :condition)&.size,
+            frequency_sources: Rails.application.config.application.dig(:datasets, :frequency)&.size
+          }
         end
-
-        response = __elasticsearch__.search(query, request_cache: true)
-
-        @cardinality = response.aggregations
-                         .map { |k, v| [k, v.key?('value') ? v['value'] : v[k]['value']] }
-                         .to_h
-                         .symbolize_keys
-                         .merge(frequency_sources: Datasets::FREQUENCY.size)
       end
 
       def default_condition

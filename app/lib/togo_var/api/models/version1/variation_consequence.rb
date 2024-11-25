@@ -23,6 +23,13 @@ module TogoVar
             intergenic_variant
           ].freeze
 
+          # TODO: replace by config
+          # ACCEPTABLE_TERMS = Rails.application
+          #                         .config
+          #                         .application
+          #                         .dig(:query_params, :consequence)
+          #                         .flat_map { |x| [x[:id], x[:key]] }
+
           def to_hash
             validate
 

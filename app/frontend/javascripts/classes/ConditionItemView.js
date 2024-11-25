@@ -251,6 +251,41 @@ class ConditionItemView extends ConditionView {
         };
       }
 
+      case CONDITION_TYPE.significance: {
+        const valueMgendElements = Array.from(
+          this._valuesEl.querySelectorAll(':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view')
+        );
+        const valueClinvarElements = Array.from(
+          this._valuesEl.querySelectorAll(':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view')
+        );
+
+        // relationがneのときはand、それ以外はor
+        const relationType = this._elm.dataset.relation === "ne" ? "and" : "or";
+        const mgendCondition = valueMgendElements.length > 0 ? {
+          [this._conditionType]: {
+            relation: this._elm.dataset.relation,
+            source: ["mgend"],
+            terms: valueMgendElements.map((value) => value.value),
+          },
+        } : null;
+
+        const clinvarCondition = valueClinvarElements.length > 0 ? {
+          [this._conditionType]: {
+            relation: this._elm.dataset.relation,
+            source: ["clinvar"],
+            terms: valueClinvarElements.map((value) => value.value),
+          },
+        } : null;
+
+        // mgendまたはclinvarが存在する場合に応じて返す内容を変化
+        const conditions = [mgendCondition, clinvarCondition].filter(Boolean);
+
+        // conditionsの中身が1つの場合は直接返し、2つの場合はor/andでラップ
+        const result = conditions.length === 1 ? conditions[0] : { [relationType]: conditions };
+
+        return result;
+      }
+
       default:
         return {
           [this._conditionType]: {

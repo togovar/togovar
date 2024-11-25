@@ -5,10 +5,11 @@ module Elasticsearch
     attr_accessor :from
     attr_accessor :size
 
-    def initialize
+    def initialize(**options)
       @from = 0
       @size = 100
       @sort = true
+      @options = options
     end
 
     def term(term)
@@ -38,31 +39,62 @@ module Elasticsearch
       self
     end
 
-    def dataset(names)
+    def dataset(names, filter: true)
       @dataset_condition = nil
 
-      return self if (names & Variation::Datasets::ALL).empty?
-
-      sources = names & Variation::Datasets::FREQUENCY
+      return self if (names & Variation.all_datasets(@options[:user])).empty?
 
       query = Elasticsearch::DSL::Search.search do
         query do
           bool do
-            if names.include?(:clinvar)
-              should do
-                exists field: :clinvar
+            if filter
+              if (v = names & Variation.frequency_datasets(@options[:user], filter: true)).present?
+                should do
+                  nested do
+                    path :frequency
+                    query do
+                      bool do
+                        must do
+                          terms 'frequency.source': v.map { |x| x == :jga_wes ? :jga_ngs : x } # TODO: remove if dataset renamed
+                        end
+                        must do
+                          match 'frequency.filter': 'PASS'
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+              if (v = names & Variation.frequency_datasets(@options[:user], filter: false)).present?
+                should do
+                  nested do
+                    path :frequency
+                    query do
+                      terms 'frequency.source': v.map { |x| x == :jga_wes ? :jga_ngs : x } # TODO: remove if dataset renamed
+                    end
+                  end
+                end
+              end
+            else
+              if (v = names & Variation.frequency_datasets(@options[:user])).present?
+                should do
+                  nested do
+                    path :frequency
+                    query do
+                      terms 'frequency.source': v.map { |x| x == :jga_wes ? :jga_ngs : x } # TODO: remove if dataset renamed
+                    end
+                  end
+                end
               end
             end
-            if names.include?(:mgend)
-              should do
-                exists field: :mgend
-              end
-            end
-            if sources.present?
+
+            if (v = names & Variation.condition_datasets(@options[:user])).present?
               should do
                 nested do
-                  path :frequency
-                  query { terms 'frequency.source': sources }
+                  path :conditions
+                  query do
+                    terms 'conditions.source': v
+                  end
                 end
               end
             end
@@ -82,7 +114,7 @@ module Elasticsearch
     def frequency(datasets, frequency_from, frequency_to, invert = false, all_datasets = false)
       @frequency_condition = nil
 
-      sources = datasets & Variation::Datasets::FREQUENCY
+      sources = datasets & Variation.frequency_datasets(@options[:user])
 
       return self if sources.empty?
 
@@ -90,6 +122,9 @@ module Elasticsearch
         query do
           bool do
             sources.each do |source|
+              # TODO: remove if dataset renamed
+              source = :jga_ngs if source == :jga_wes
+
               send(all_datasets ? :must : :should) do
                 nested do
                   path :frequency
@@ -127,38 +162,6 @@ module Elasticsearch
       self
     end
 
-    def quality(datasets)
-      @quality_condition = nil
-
-      sources = datasets & Variation::Datasets::FREQUENCY_WITH_FILTER
-
-      return self if sources.empty?
-
-      @quality_condition = Elasticsearch::DSL::Search.search do
-        query do
-          bool do
-            should do
-              nested do
-                path :frequency
-                query do
-                  bool do
-                    must do
-                      terms 'frequency.source': sources
-                    end
-                    must do
-                      match 'frequency.filter': 'PASS'
-                    end
-                  end
-                end
-              end
-            end
-          end
-        end
-      end.to_hash[:query]
-
-      self
-    end
-
     def type(*keys)
       @type_condition = nil
 
@@ -176,7 +179,7 @@ module Elasticsearch
     def significance(*values)
       @significance_condition = nil
 
-      interpretations = values.filter_map { |x| ClinicalSignificance.find_by_key(x)&.label&.downcase }
+      interpretations = values.filter_map { |x| ClinicalSignificance.find_by_key(x)&.label&.downcase.gsub(' ', '_') }
 
       return self if !values.include?(:NC) && interpretations.blank?
 
@@ -187,7 +190,7 @@ module Elasticsearch
               should do
                 bool do
                   must_not do
-                    exists field: :clinvar
+                    exists field: :conditions
                   end
                 end
               end
@@ -196,9 +199,9 @@ module Elasticsearch
             if interpretations.present?
               should do
                 nested do
-                  path 'clinvar.conditions'
+                  path 'conditions.condition'
                   query do
-                    terms 'clinvar.conditions.interpretation': interpretations
+                    terms 'conditions.condition.classification': interpretations
                   end
                 end
               end
@@ -374,7 +377,7 @@ module Elasticsearch
       query.delete(:from)
       query.delete(:sort)
 
-      query.merge(Variation::QueryHelper.statistics)
+      query.merge(Variation::QueryHelper.statistics(@options[:user]))
     end
 
     def build
@@ -384,7 +387,6 @@ module Elasticsearch
       conditions << @term_condition
       conditions << @dataset_condition
       conditions << @frequency_condition
-      conditions << @quality_condition
       conditions << @type_condition
       conditions << @significance_condition
       conditions << @consequence_condition
@@ -419,39 +421,43 @@ module Elasticsearch
 
     def aggregations
       Elasticsearch::DSL::Search.search do
-        aggregation :types do
+        aggregation :type do
           terms field: :type, size: Variation.cardinality[:types]
         end
 
         aggregation :vep do
           nested do
             path :vep
-            aggregation :consequences do
+            aggregation :consequence do
               terms field: 'vep.consequence', size: Variation.cardinality[:vep_consequences]
             end
           end
         end
 
-        aggregation :clinvar_total do
-          filter exists: { field: :clinvar }
-        end
-
-        aggregation :conditions do
+        aggregation :conditions_condition do
           nested do
-            path 'clinvar.conditions'
-            aggregation :interpretations do
-              terms field: 'clinvar.conditions.interpretation',
-                    size: Variation.cardinality[:clinvar_interpretations]
+            path 'conditions.condition'
+            aggregation :classification do
+              terms field: 'conditions.condition.classification',
+                    size: Variation.cardinality[:condition_classifications]
             end
           end
         end
 
-
         aggregation :frequency do
           nested do
             path :frequency
-            aggregation :sources do
+            aggregation :source do
               terms field: 'frequency.source', size: Variation.cardinality[:frequency_sources]
+            end
+          end
+        end
+
+        aggregation :condition do
+          nested do
+            path :condition
+            aggregation :source do
+              terms field: 'conditions.source', size: Variation.cardinality[:condition_sources]
             end
           end
         end
@@ -605,9 +611,9 @@ module Elasticsearch
       query = Elasticsearch::DSL::Search.search do
         query do
           nested do
-            path 'clinvar.conditions'
+            path 'conditions.condition'
             query do
-              terms 'clinvar.conditions.medgen': medgen
+              terms 'conditions.condition.medgen': medgen
             end
           end
         end
