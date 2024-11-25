@@ -14,19 +14,19 @@
           "children": [
             {
               "value": "jga_wgs.jgad000670",
-              "label": "JGAD000670"
+              "label": "Normal tissues from lung adenocarcinoma (JGAD000670)"
             },
             {
               "value": "jga_wgs.jgad000687",
-              "label": "JGAD000687"
+              "label": "Normal tissues from colorectal cancer (JGAD000687)"
             },
             {
               "value": "jga_wgs.jgad000688",
-              "label": "JGAD000688"
+              "label": "Normal tissues from hepatoblastoma (JGAD000688)"
             },
             {
               "value": "jga_wgs.jgad000689",
-              "label": "JGAD000689"
+              "label": "Normal tissues from gastrointestinal chronic inflammatory (JGAD000689)"
             }
           ]
         },
