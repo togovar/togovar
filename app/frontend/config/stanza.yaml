@@ -250,6 +250,11 @@ gene:
         jbrowse: $TOGOVAR_STANZA_JBROWSE
         margin: 200
 
+    - id: gene-protein-structure
+      dom: '#gene-protein-structure'
+      options:
+        molmil: ${TOGOVAR_FRONTEND_API_URL}/molmil/
+
     - id: scroll-table
       dom: '#gene-variant'
       src: https://togostanza.github.io/metastanza/scroll-table.js
