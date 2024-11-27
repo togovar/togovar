@@ -16,7 +16,7 @@ block content
         h2.title Update history
       .contents
         section.section
-          h3.sectiontitle 2024/11/8
+          h3.sectiontitle 2024/12/3
           ul.unordered-list
             li
               strong Datasets:
@@ -35,10 +35,11 @@ block content
                   | by the Japan Agency for Medical Research and Development (AMED).
                   | MGeND contains variant information for diseases such as cancer, rare and intractable diseases, infectious diseases, dementia, and hearing loss,
                   | and can be considered the Japanese equivalent of ClinVar. 
-                li The disease names in MGeND have been aligned with the vocabulary defined in MedGen, which is also used in ClinVar.
+                li The disease names in MGeND have been aligned with the vocabulary defined in
                   |
-                  | On each disease report page, you can compare the clinical significance of variants for the same disease between MGeND and ClinVar.
-                  | Example: [List examples where comparisons between MGeND and ClinVar can be made in disease view.]
+                  |
+                  a.hyper-text.-external(href='https://www.ncbi.nlm.nih.gov/medgen') MedGen
+                  | , which is also used in ClinVar, wherever possible.
             li
               strong Datasets:
               |
@@ -67,7 +68,14 @@ block content
               |
               | Missense variants are visualized on a 3D protein structure.
               ul.unordered-list
-                li The visualization helps you to assess the potential impact of each missense variant on a protein structure (e.g., [Link to GeneView Stanza]).
+                li The visualization helps you to assess the potential impact of each missense variant on a protein structure (e.g.,
+                  |
+                  |
+                  a.hypertext.-external(href='/gene/1097#protein-structure') BRAF:p.V600E
+                  | ,
+                  |
+                  a.hypertext.-external(href='/gene/6407#protein-structure') KRAS:p.G12D
+                  | ).
                 li You can choose from protein structures registered in
                   |
                   |
