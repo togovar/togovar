@@ -1,0 +1,159 @@
+article.common-document
+  header.header
+    h2.title JGA-WGS dataset
+  .contents
+    section.section
+      h3.sectiontitle Summary
+      p.body
+        | The JGA-WGS dataset is a frequency dataset that aggregates variants detected by reanalyzing individual-level
+        | whole genome sequence data in the
+        |
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/')
+          | NBDC Human Database
+        | /
+        a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index-e.html')
+          | Japanese Genotype-phenotype Archive (JGA)
+        | . All JGA data for which an approval for creating secondary data has been obtained are aggregated. 
+        | To view allele frequencies and genotype counts per dataset, you need an account to access the controlled-access data in the NBDC Human Database.
+        | For account registration, please see
+        |
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/data-use') Data Use (NBDC Human Database)
+        |.
+      ul.unordered-list
+        li Version/Last update: 2024/12/3
+        li Sample size: 78
+        li Number of detected variants (alternate alleles): 20,822,413
+
+    section.section
+      h3.sectiontitle Terms of use
+      .subsection
+        h4.heading Rights of Data Users
+        p.body
+          | The rights of data users shall conform to "5-2-1. Open Data" in "5-2. Rights of Data Users" listed in
+          |
+          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/guidelines/data-sharing-guidelines')
+            | the NBDC Human Data Sharing Guidelines.
+        ol.ordered-list
+          li
+            | The data user can freely present the result of the study for which data from the NBDC Human Database
+            | are used.
+          li
+            | The data user can freely acquire intellectual property rights based on the result of the study for
+            | which data from the NBDC Human Database are used.
+      .subsection
+        h4.heading Responsibilities of Data Users
+        p.body
+          | Terms of "5-3-1. Open Data" in "5-3. Responsibilities of Data Users" listed in the NBDC Human Data
+          | Sharing Guidelines shall apply with modification to the responsibilities of data users. As for
+          | redistribution of data, terms for controlled-access data shall apply because this dataset was generated
+          | by processing controlled-access data.
+        ol.ordered-list
+          li
+            | In using data, the user must take responsibility for and make judgments concerning the quality,
+            | content, and scientific validity of the data.
+          li
+            | The data user must comply with the following rules.
+            ul.unordered-list
+              li The use of data is limited to the study being undertaken.
+              li Identification of individuals is prohibited
+              li Redistribution of data is prohibited.
+          li
+            | The data user must add the following citation while using the data in public
+            | (e.g. publishing an article).
+            p
+              | Variant dataset aggregated from NGS data in
+              |
+              a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/')
+                | NBDC Human Database
+              | /
+              a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index-e.html') JGA
+              | [Internet]. Kashiwa: Database Center for Life Science, Joint Support-Center for Data Science Research,
+              |
+              | Research Organization of Information and Systems; [2024] - . JGA-WGS dataset; [cited YYYY Mmm DD]. Available from:
+              |
+              a(href='https://grch37.togovar.org/doc/datasets/jga_wgs') https://grch37.togovar.org/doc/datasets/jga_wgs
+
+    section.section
+      h3.sectiontitle Data analysis method
+      p.body
+      ol.unordered-list
+        li Explanation:
+          |
+          |
+          a(href='https://humandbs.dbcls.jp/en/whole-genome-sequencing') Whole genome sequencing analysis data (germline)
+        li Workflow Source Code (jga-analysis):
+          |
+          |
+          a(href='https://github.com/ddbj/jga-analysis') https://github.com/ddbj/jga-analysis
+
+    section.section
+      h3#jga_datasets.sectiontitle Included controlled-access datasets
+      p
+        | By specifying the JGAID, you can apply for data use to
+        |
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/data-use')
+          | the NBDC Human database
+        | .
+      table.table._column-span-all
+        thead
+          tr
+            th JGAID
+            th Human DB ID
+            th Study title
+            th Participants
+            th
+              | Sample
+              br
+              | size
+            th Data provider
+        tbody
+          tr
+            td
+              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000670')
+                | JGAD000670
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/hum0068-v3') hum0068
+            td
+              | 
+              | Cancer genomics for elucidation of molecular mechanisms of carcinogenecis and progression in lung cancer 
+            td WGS data of the matched control (germline)
+            td._align-right 21
+            td Takashi Kono
+          tr
+            td
+              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000687')
+                | JGAD000687
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/hum00201-v1') hum0201
+            td Collection and transfer of human tumor samples and research using genomic information<br>
+              Transfer of existing samples and research using genomic information<br>
+              Research of searching gene mutations in gastrointestinal chronic inflammatory diseases
+            td WGS data of the matched control (germline)
+            td._align-right 14
+            td Toshiro Sato
+          tr
+            td
+              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000688')
+                | JGAD000688
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/hum0161-v2') hum0161
+            td
+              | Genome sequencing analysis for hepatoblastoma
+            td WGS data of the matched control (germline)
+            td._align-right 33
+            td Hidewaki Nakagawa
+          tr
+            td
+              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000689')
+                | JGAD000689
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/hum0159-v2') hum0159
+            td
+              | Genome sequencing analysis for colorectal cancer
+            td WGS data of the matched control (germline)
+            td._align-right 10
+            td Hidewaki Nakagawa
+        tfoot
+          tr
+            th._align-center(colspan='4') Total
+            td._align-right 78

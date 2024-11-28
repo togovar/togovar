@@ -18,10 +18,23 @@ block content
         section.section
           p.body TogoVar（日本人ゲノム多様性統合データベース）は、日本人ゲノム配列の個人による違い（バリアント）とそれに関係する疾患情報などを収集・整理したデータベースです。
           p.body
-            | TogoVarは、研究プロジェクト横断的に集約した日本人におけるバリアントの頻度情報を提供します。利用可能な２つのデータセットである
-            a(href="/doc/ja/datasets/jga_ngs") JGA-NGS
-            | と
+            | TogoVarは、研究プロジェクト横断的に集約した日本人におけるバリアントの頻度情報を提供します。利用可能な
+            if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+              | ３
+            else
+              | ２
+            | 
+            | つのデータセットである
+            |
+            if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+              a(href='./datasets/jga_wgs') JGA-WGS
+              | 、
+            a(href='./datasets/jga_wes') JGA-WES
+            |
+            | および
+            |
             a(href="/doc/ja/datasets/jga_snp") JGA-SNP
+            |
             | は
             a(target="_blank", href="https://humandbs.dbcls.jp/") NBDCヒトデータベース
             | /

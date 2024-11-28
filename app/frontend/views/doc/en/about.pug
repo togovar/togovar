@@ -22,10 +22,21 @@ block content
             | disease information associated with them.
           p.body
             | TogoVar provides variant frequencies in the Japanese population that have been aggregated across research
-            | projects. Two available datasets,
+            | projects.
+            if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+              | Three
+            else
+              | Two
+            | 
+            | available datasets,
             |
-            a(href='/doc/datasets/jga_ngs') JGA-NGS
-            |  and
+            if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+              a(href='./datasets/jga_wgs') JGA-WGS
+              | ,
+              |
+            a(href='./datasets/jga_wes') JGA-WES
+            | ,
+            | and
             |
             a(href='/doc/datasets/jga_snp') JGA-SNP
             | , are obtained by aggregating individual genomic data that have been registered in
