@@ -25,9 +25,10 @@ variant:
         data-url: $TOGOVAR_FRONTEND_API_URL
         no_data_message: 'No data'
 
-    # TODO: 10/20に見直し
     - id: variant-mgend
       dom: '#variant-mgend'
+      options:
+        data-url: ${TOGOVAR_FRONTEND_API_URL}/api/search/variant
 
     - id: variant-clinvar
       dom: '#variant-clinvar'
@@ -120,9 +121,11 @@ gene:
     - id: gene-summary
       dom: '#gene-summary'
 
-    # TODO: 10/20に見直し
-    - id: variant-mgend
+    - id: gene-mgend
       dom: '#gene-mgend'
+      options:
+        term: ${hgnc_id}
+        data-url: ${TOGOVAR_FRONTEND_API_URL}/api/search/variant
 
     - id: pagination-table
       dom: '#gene-clinvar'
@@ -247,6 +250,11 @@ gene:
         jbrowse: $TOGOVAR_STANZA_JBROWSE
         margin: 200
 
+    - id: gene-protein-structure
+      dom: '#gene-protein-structure'
+      options:
+        molmil: ${TOGOVAR_FRONTEND_API_URL}/molmil/
+
     - id: scroll-table
       dom: '#gene-variant'
       src: https://togostanza.github.io/metastanza/scroll-table.js
@@ -323,9 +331,11 @@ disease:
             label: Links
             escape: false
 
-    # TODO: 10/20に見直し
     - id: disease-mgend
       dom: '#disease-mgend'
+      options:
+        term: ${medgen_cid}
+        data-url: ${TOGOVAR_FRONTEND_API_URL}/api/search/variant
 
     - id: pagination-table
       dom: '#disease-clinvar'

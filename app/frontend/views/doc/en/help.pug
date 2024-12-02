@@ -153,8 +153,12 @@ block content
                 | groups
                 | described in the
                 |
-                a(href='/doc/datasets/jga_ngs') JGA-NGS dataset
-                |  and
+                if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                  a(href='./datasets/jga_wgs') JGA-WGS dataset
+                  | , 
+                a(href='./datasets/jga_wes') JGA-WES dataset
+                |
+                | , and
                 |
                 a(href='/doc/datasets/jga_snp') JGA-SNP dataset
                 | .
@@ -203,7 +207,13 @@ block content
                 |
                 a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv')
                   | clinical significance in ClinVar
-                |  is displayed.
+                |
+                | and
+                |
+                a.hyper-text.-external(target='_blank', href='https://mgend.ncgm.go.jp/about?lang=en#interpretation-link')
+                  | clinical significance in MGeND
+                |
+                | are displayed.
           #d7.question-answer
             h4.question What are AlphaMissense, SIFT and Polyphen?
             .answer
@@ -332,12 +342,16 @@ block content
                   logarithmized-block-graph-frequency-view(data-dataset="gem_j_wga" data-logarithmized-frequency="≥0.5")
                   | &nbsp; GEM-J WGA
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="jga_ngs" data-logarithmized-frequency="≥0.5")
-                  | &nbsp; JGA-NGS
-                  br
                   logarithmized-block-graph-frequency-view(data-dataset="jga_snp" data-logarithmized-frequency="≥0.5")
                   | &nbsp; JGA-SNP
                   br
+                  logarithmized-block-graph-frequency-view(data-dataset="jga_wes" data-logarithmized-frequency="≥0.5")
+                  | &nbsp; JGA-WES
+                  br
+                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                    logarithmized-block-graph-frequency-view(data-dataset="jga_wgs" data-logarithmized-frequency="≥0.5")
+                    | &nbsp; JGA-WGS
+                    br
                   logarithmized-block-graph-frequency-view(data-dataset="tommo" data-logarithmized-frequency="≥0.5")
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
                     | &nbsp; ToMMo 8.3KJPN
@@ -560,7 +574,7 @@ block content
                     td chr12:111778836-111778847
                     td delA
                     td.separator
-                    td 12:111778836
+                    td 12:111778835
                     td GA
                     td G
                     td.separator

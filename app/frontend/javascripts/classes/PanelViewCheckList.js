@@ -120,7 +120,6 @@ export default class PanelViewCheckList extends PanelView {
       `;
     }
 
-    // TODO: 10/20 this.kind === 'dataset でMGeNDの行が追加されるはず
     html += conditionMaster.items
       .map(
         (item) => `

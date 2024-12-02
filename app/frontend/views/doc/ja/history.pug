@@ -16,6 +16,57 @@ block content
         h2.title 更新履歴
       .contents
         section.section
+          h3.sectiontitle 2024/12/3
+          ul.unordered-list
+            li
+              strong Datasets:
+              |
+              |
+              a.hyper-text.-external(href='https://mgend.ncgm.go.jp/') MGeND (Medical Genomics Japan Variant Database)
+              |
+              | からの臨床的意義を新たに追加しました。
+              ul.unordered-list
+                li MGeNDは日本医療研究開発機構（AMED）の
+                  a.hyper-text.-external(href='https://www.amed.go.jp/program/list/14/05/006.html') 臨床ゲノム情報統合データベース整備事業
+                  | によって収集されたゲノムバリアントおよびそれらの臨床的特性のデータベースです。
+                  | このデータベースには、がん、希少・難治性疾患、感染症、認知症、難聴といった疾患のバリアント情報が含まれており、ClinVarの日本版に相当します。
+                  | 
+                li MGeNDの疾患名をClinVarで使用している
+                  a.hyper-text.-external(href='https://www.ncbi.nlm.nih.gov/medgen') MedGen
+                  | の語彙にできる限りマッピングしました。
+            li
+              strong Datasets:
+              | 
+              a.hyper-text.-internal(href='datasets/jga_wgs') JGA-WGS
+              | データセットを新たに追加しました（GRCh38のみ）。
+              ul.unordered-list
+                li
+                  a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/') NBDCヒトデータベース
+                  | /
+                  a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html') Japanese Genotype-phenotype Archive(JGA)
+                  | に寄託された全ゲノム配列を再解析し、アレル頻度やジェノタイプ数を集約しました。参照ゲノムはGRCh38です。再解析の詳細については
+                  | NBDCヒトデータベースの
+                  a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/data-processing') 「生殖系列の全ゲノムシークエンスデータの加工」
+                  | をご覧ください。
+                li JGAに寄託された全エクソーム配列の再解析により得られたアレル頻度データセットの名称をJGA-NGSから
+                  a.hyper-text.-internal(href='/doc/ja/datasets/jga_wes') JGA-WES
+                  | に変更しました。
+            li
+              strong Gene page:
+              |
+              | ミスセンスバリアントをタンパク質の立体構造上に可視化しました。
+              ul.unordered-list
+                li ミスセンスバリアントがタンパク質の立体構造に及ぼす影響の把握を支援します（例：
+                  a.hypertext.-external(href='/gene/1097#protein-structure') BRAF:p.V600E
+                  | 、
+                  a.hypertext.-external(href='/gene/6407#protein-structure') KRAS:p.G12D
+                  | )
+                li
+                  a.hyper-text.-external(target='_blank', href='https://pdbj.org/?lang=ja') Protein Data Bank Japan (PDBj)
+                  |
+                  | に登録されている構造または
+                  a.hyper-text.-external(target='_blank', href='https://alphafold.ebi.ac.uk/') AlphaFold
+                  | で予測した構造を選択できます。なお、表示される構造にはバリアントの影響は考慮されていません。
           h3.sectiontitle 2024/6/27
           ul.unordered-list
             li

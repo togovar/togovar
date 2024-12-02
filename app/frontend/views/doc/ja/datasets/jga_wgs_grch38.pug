@@ -1,0 +1,132 @@
+article.common-document
+  header.header
+    h2.title JGA-WGSデータセット
+  .contents
+    section.section
+      h3.sectiontitle 概要
+      p.body
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/') NBDCヒトデータベース
+        | /
+        a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
+          | Japanese Genotype-phenotype Archive(JGA)
+        | に登録されている個人レベルの全ゲノム配列データを再解析して検出したバリアントを集約した頻度データです。２次データ作成の許諾が得られたJGAデータが集約対象です。
+        | なお、データセット単位のアレル頻度やジェノタイプ数を閲覧するには、NBDCヒトデータベースの制限公開データを閲覧するためのアカウントが必要です。
+        | アカウントの取得には、
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/data-use') データの利用 (NBDCヒトデータベース)
+        | を参照ください。
+
+        
+      ul.unordered-list
+        li バージョン/最終更新日：2024/12/3
+        li サンプルサイズ：78
+        li 検出バリアント（代替アレル）数：20,822,413
+
+    section.section
+      h3.sectiontitle 利用条件
+      .subsection
+        h4.heading データ利用者の権利
+        p.body
+          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/guidelines/data-sharing-guidelines')
+            | NBDCヒトデータ共有ガイドライン
+          | の「5-2. データ利用者の権利」の「5-2-1. 非制限公開データ」に準拠します。
+        ol.ordered-list
+          li データ利用者は、『NBDCヒトデータベース』のデータを利用した研究成果をデータ利用者の責務を遵守する限り自由に発表できる。
+          li データ利用者は、『NBDCヒトデータベース』のデータを利用した研究結果をもとにした知的財産権をデータ利用者の責務を遵守する限り自由に取得できる。
+      .subsection
+        h4.heading データ利用者の責務
+        p.body
+          | NBDCヒトデータ共有ガイドラインの「5-3. データ利用者の責務」の「5-3-1. 非制限公開データ」を準用します。再配布に関しては、制限公開データを二次加工したデータであるため、制限公開データのルールを適用します。
+        ol.ordered-list
+          li データ利用に際してのデータの品質・内容・科学的妥当性については、利用者の責任と判断のもとで活用すること。
+          li
+            | データ利用者は、下記の事項を遵守すること。
+            ul.unordered-list
+              li 研究利用への限定
+              li 個人同定の禁止
+              li 再配布の禁止
+          li
+            | 公衆利用（例：データを利用して論文等で発表する場合など）の際は以下の引用を付与してください。
+            p
+              | Variant dataset aggregated from NGS data in
+              |
+              a(target='_blank', href='https://humandbs.dbcls.jp/') NBDC Human Database
+              |  /
+              |
+              a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html') JGA            
+                | [Internet]. Kashiwa: Database Center for Life Science, Joint Support-Center for Data Science Research,
+              |
+              | Research Organization of Information and Systems; [2024] - . JGA-WGS dataset; [cited YYYY Mmm DD]. Available from:
+              |
+              a(href='https://grch38.togovar.org/doc/datasets/jga_wgs') https://grch38.togovar.org/doc/datasets/jga_wgs
+
+    section.section
+      h3.sectiontitle データ解析手法
+      p.body
+        a(href='https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels') GATK best practice - Germline short variant discovery (SNPs + Indels)
+        | に則り加工しております。
+        ol.unordered-list
+          li 説明：
+            |
+            |
+            a(href='https://humandbs.dbcls.jp/whole-genome-sequencing') 生殖系列（germline）の全ゲノムシークエンスデータの加工
+          li ワークフローソースコード (jga-analysis)：
+            |
+            |
+            a(href='https://github.com/ddbj/jga-analysis') https://github.com/ddbj/jga-analysis
+
+    section.section
+      h3#jga_datasets.sectiontitle 含まれる制限公開データセット一覧
+      p
+        | データセットIDを指定して
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/data-use') NBDCヒトデータベースにデータ利用申請
+        | できます。
+      table.table._column-span-all
+        thead
+          tr
+            th データセットID
+            th ヒトDB
+            th 研究題目
+            th 対象集団
+            th サンプル数
+            th データ提供者
+        tbody
+          tr
+            td
+              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000670') JGAD000670
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/hum0068-v9') hum00068
+            td ゲノム解析に基づく肺がんの発生・進展の分子機構の解明
+            td 非腫瘍組織由来検体（Germline）
+            td._align-right 21
+            td 河野 隆志
+          tr
+            td
+              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000687') JGAD000687
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/hum0201-v1') hum0201
+            td ヒト腫瘍試料の収集・分譲とゲノム情報を利用した研究<br>既存試料の分譲とゲノム情報を利用した研究<br>消化器慢性炎症性疾患における遺伝子変異の検索
+            td 非腫瘍組織由来検体（Germline）
+            td._align-right 14
+            td 佐藤 俊朗
+          tr
+            td
+              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000688') JGAD000688
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/hum0161-v2') hum0161
+            td シークエンス解析によるがんゲノム研究：肝芽腫
+            td 非腫瘍組織由来検体（Germline）
+            td._align-right 33
+            td 中川 英刀
+          tr
+            td
+              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000689') JGAD000689
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/hum0159-v2') hum0159
+            td シークエンス解析によるがんゲノム研究：大腸がん
+            td 非腫瘍組織由来検体（Germline）
+            td._align-right 10
+            td 中川 英刀
+        tfoot
+          tr
+            th._align-center(colspan='4') 合計
+            th._align-right 78

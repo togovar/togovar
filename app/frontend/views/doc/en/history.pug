@@ -16,6 +16,75 @@ block content
         h2.title Update history
       .contents
         section.section
+          h3.sectiontitle 2024/12/3
+          ul.unordered-list
+            li
+              strong Datasets:
+              |
+              | Clinical significance from
+              |
+              a.hyper-text.-external(href='https://mgend.ncgm.go.jp/') MGeND (Medical Genomics Japan Variant Database)
+              |
+              | was newly added.
+              ul.unordered-list
+                li MGeND is a database of genome variants and their clinical characteristics, 
+                  | collected through
+                  |
+                  a.hyper-text.-external(href='https://www.amed.go.jp/en/program/list/14/05/006.html') the Clinical Genome Information Integration Database Development Project
+                  |
+                  | by the Japan Agency for Medical Research and Development (AMED).
+                  | MGeND contains variant information for diseases such as cancer, rare and intractable diseases, infectious diseases, dementia, and hearing loss,
+                  | and can be considered the Japanese equivalent of ClinVar. 
+                li The disease names in MGeND have been aligned with the vocabulary defined in
+                  |
+                  |
+                  a.hyper-text.-external(href='https://www.ncbi.nlm.nih.gov/medgen') MedGen
+                  | , which is also used in ClinVar, wherever possible.
+            li
+              strong Datasets:
+              |
+              |
+              a.hyper-text.-internal(href='/doc/datasets/jga_wgs') The JGA-WGS dataset
+              | was newly added (GRCh38 only).
+              ul.unordered-list
+                li JGA-WGS aggregates allele frequencies and genotype counts by reanalyzing whole-genome sequence data deposited in
+                  |
+                  |
+                  a.hyper-text.-external(href='https://humandbs.dbcls.jp/en/') NBDC Human Database
+                  | /
+                  a.hyper-text.-external(href='https://www.ddbj.nig.ac.jp/jga/index-e.html') Japanese Genotype-phenotype Archive (JGA)
+                  | . The reference genome used is GRCh38. For more information on the reanalysis, please refer to
+                  |
+                  a.hyper-text.-external(href='https://humandbs.dbcls.jp/en/data-processing') “Whole genome sequencing analysis data (germline)”
+                  |
+                  | on the NBDC Human Database website.
+                li The frequencies previously published as JGA-NGS, obtained by variant calling on whole-exome sequences deposited to JGA, were renamed to
+                  |
+                  |
+                  a.hyper-text.-internal(href='/doc/datasets/jga_wes') JGA-WES
+                  | .
+            li
+              strong Gene page:
+              |
+              | Missense variants are visualized on a 3D protein structure.
+              ul.unordered-list
+                li The visualization helps you to assess the potential impact of each missense variant on a protein structure (e.g.,
+                  |
+                  |
+                  a.hypertext.-external(href='/gene/1097#protein-structure') BRAF:p.V600E
+                  | ,
+                  |
+                  a.hypertext.-external(href='/gene/6407#protein-structure') KRAS:p.G12D
+                  | ).
+                li You can choose from protein structures registered in
+                  |
+                  |
+                  a.hyper-text.-external(target='_blank', href='https://pdbj.org/?lang=en') Protein Data Bank Japan (PDBj)
+                  |
+                  | or those predicted by
+                  |
+                  a.hyper-text.-external(target='_blank', href='https://alphafold.ebi.ac.uk/') AlphaFold
+                  | . Please note that the displayed structures do not account for the effects of the variant.
           h3.sectiontitle 2024/6/27
           ul.unordered-list
             li
