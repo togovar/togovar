@@ -101,13 +101,18 @@ class VariationSearchService
   end
 
   def search
-    {
-      total: Variation::QueryHelper.total(@options[:user]),
-      filtered: filtered_count,
-      results: results,
-      aggs: paging? ? {} : Variation.search(stat_query, request_cache: true).aggregations,
-      count_condition_absence: Variation::QueryHelper.count_conditions_absence(model.to_hash)
-    }
+    hash = {}
+
+    if @params[:stat]
+      hash.merge!(total: Variation::QueryHelper.total(@options[:user]),
+                  filtered: filtered_count,
+                  aggs: paging? ? {} : Variation.search(stat_query, request_cache: true).aggregations,
+                  count_condition_absence: Variation::QueryHelper.count_conditions_absence(model.to_hash))
+    end
+
+    hash.merge!(results: results) if @params[:data]
+
+    hash
   end
 
   def query
