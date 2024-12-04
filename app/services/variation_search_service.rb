@@ -103,14 +103,14 @@ class VariationSearchService
   def search
     hash = {}
 
-    if @params[:stat]
+    if @params[:stat] != 0
       hash.merge!(total: Variation::QueryHelper.total(@options[:user]),
                   filtered: filtered_count,
                   aggs: paging? ? {} : Variation.search(stat_query, request_cache: true).aggregations,
                   count_condition_absence: Variation::QueryHelper.count_conditions_absence(model.to_hash))
     end
 
-    hash.merge!(results: results) if @params[:data]
+    hash.merge!(results: results) if @params[:data] != 0
 
     hash
   end

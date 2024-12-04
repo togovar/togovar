@@ -57,8 +57,6 @@ module API
     end
     prepend BackwardCompatibility
 
-    DISABLE_VALUES = %w[0 f false]
-
     def variant_params
       return @variant_params if @variant_params
 
@@ -66,11 +64,8 @@ module API
       if (offset = params.permit(offset: [])[:offset]).present?
         hash.merge!(offset: offset)
       end
-
-      hash[:data] = !DISABLE_VALUES.include?(hash[:data].to_s)
-      hash[:stat] = !DISABLE_VALUES.include?(hash[:stat].to_s)
-
-      p hash
+      hash[:stat] = Integer(hash[:stat]) if hash[:stat].present?
+      hash[:data] = Integer(hash[:data]) if hash[:data].present?
 
       hash
     end
