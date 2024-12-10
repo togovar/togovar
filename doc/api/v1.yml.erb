@@ -15,6 +15,8 @@ paths:
         - search
       parameters:
         - $ref: '#/components/parameters/Pretty'
+        - $ref: '#/components/parameters/Stat'
+        - $ref: '#/components/parameters/Data'
       requestBody:
         $ref: '#/components/requestBodies/SearchVariant'
       responses:
@@ -317,6 +319,28 @@ components:
       schema:
         type: boolean
         nullable: true
+
+    Stat:
+      in: query
+      name: stat
+      description: If set to `0`, do not collect statistics
+      schema:
+        type: integer
+        nullable: true
+        enum:
+          - 1
+          - 0
+
+    Data:
+      in: query
+      name: data
+      description: If set to `0`, do not return result records
+      schema:
+        type: integer
+        nullable: true
+        enum:
+          - 1
+          - 0
 
     GeneTerm:
       in: query

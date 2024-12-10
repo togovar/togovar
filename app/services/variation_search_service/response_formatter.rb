@@ -18,8 +18,8 @@ class VariationSearchService
     def to_json(*)
       Jbuilder.new do |json|
         scroll(json)
-        statistics(json)
-        data(json)
+        statistics(json) if @result[:aggs]
+        data(json) if @result[:results]
 
         json.error @error if @error.present?
         json.warning @warning if @warning.present?

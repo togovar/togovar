@@ -103,13 +103,18 @@ class VariationSearchService
       param.term = hgvs_notation_to_location(param.term)
       res = Variation.search(query, request_cache: !param.term.present?)
 
-      {
-        total: Variation::QueryHelper.total(@options[:user]),
-        filtered: filtered_count,
-        results: res.records.results,
-        aggs: param.stat? ? Variation.search(stat_query, request_cache: true).aggregations.to_hash : {},
-        count_condition_absence: Variation::QueryHelper.count_conditions_absence(builder.build)
-      }
+      hash = {}
+
+      if param.stat?
+        hash.merge!(total: Variation::QueryHelper.total(@options[:user]),
+                    filtered: filtered_count,
+                    aggs: param.stat? ? Variation.search(stat_query, request_cache: true).aggregations.to_hash : {},
+                    count_condition_absence: Variation::QueryHelper.count_conditions_absence(builder.build))
+      end
+
+      hash.merge!(results: res.records.results) if param.data?
+
+      hash
     end
 
     def hgvs_notation_to_location(term)
@@ -168,6 +173,7 @@ class VariationSearchService
         @limit = between(params.fetch(:limit, '100').to_i, 0, 100)
 
         @stat = params.fetch(:stat, '1')
+        @data = params.fetch(:data, '1')
         @debug = params.key?(:debug)
         @options = options
       end
@@ -180,8 +186,14 @@ class VariationSearchService
         @debug
       end
 
+      DISABLE_VALUES = %w[0 f false]
+
       def stat?
-        @stat != '0'
+        !DISABLE_VALUES.include?(@stat.to_s)
+      end
+
+      def data?
+        !DISABLE_VALUES.include?(@data.to_s)
       end
 
       def term
@@ -275,7 +287,7 @@ class VariationSearchService
         include Base
 
         ALL = Rails.application.config.application[:query_params][:frequency]
-                   .map { |x| Parameter.new(x[:id], x[:label], x[:key], x[:default]) }
+                .map { |x| Parameter.new(x[:id], x[:label], x[:key], x[:default]) }
       end
 
       class Type
