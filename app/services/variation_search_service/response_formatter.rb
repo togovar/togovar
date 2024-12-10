@@ -202,9 +202,9 @@ class VariationSearchService
             if (f = Rails.root.join('tmp', 'mgend.vcf.gz')).exist? &&
               (r = `zgrep '#{condition[:id]}' #{f}`).present? &&
               (info = r.split("\n").first.split("\t")[7]).present? &&
-              (cond = info.match(/CONDITIONS=([^;]+)/)&.captures[0])
+              (cond = info.match(/CONDITIONS=([^;]+)/)&.captures).present?
 
-              condition[:condition] = cond.split("|").filter_map do |x|
+              condition[:condition] = cond[0].split("|").filter_map do |x|
                 next if (cs = x.split(":")[2]).blank?
 
                 { classification: [cs.downcase.gsub(',', '').gsub(' ', '_')] }
