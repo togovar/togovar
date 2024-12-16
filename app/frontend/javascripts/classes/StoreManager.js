@@ -67,16 +67,23 @@ class StoreManager {
         this.setData('isLogin', true);
         return
       }
-      const response = await fetch(`${window.location.origin}/auth/status`);
+
+      const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Request timeout')), 10000)
+      );
+
+      const fetchPromise = fetch(`${window.location.origin}/auth/status`);
+
+      const response = await Promise.race([fetchPromise, timeout]);
 
       if (response.status === 401) {
         this.setData('isLogin', false);
       } else if (response.status === 200 || response.status === 403) {
         this.setData('isLogin', true);
       }
-      return
     } catch (error) {
-      console.error('Error fetching auth status:', error);
+      console.error('Error fetching auth status or timeout occurred:', error);
+      this.setData('isLogin', false);
     }
   }
 
