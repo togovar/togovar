@@ -38,3 +38,5 @@ app/frontend/docs
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+.github/act
