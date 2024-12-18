@@ -1,0 +1,23 @@
+<!doctype html><html data-page="contact" lang="en"><head><title>Contact | TogoVar</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>(async function() {
+        try {
+          if (window.location.origin === 'http://localhost:8000') return
+          const response = await fetch(`${window.location.origin}/auth/status`);
+      
+          let isLogin = false;
+          if (response.status === 200 || response.status === 403) {
+            isLogin = true;
+          }
+      
+          const loginMenu = document.querySelector('.menu-button.login a.link');
+          if (isLogin === true) {
+            loginMenu.href = "/auth/logout";
+            loginMenu.textContent = "Logout";
+          } else {
+            loginMenu.href = "/auth/login";
+            loginMenu.textContent = "Login";
+          }
+      
+        } catch (error) {
+          console.error('Error fetching auth status:', error);
+        }
+      })();</script><link href="/css/main-779eea4584c8653a5031.css" rel="stylesheet"></head><body><header id="GlobalHeader"><div class="left"><h1 class="heading"><a class="link" href="/"><img class="logotype" src="/images/logotype-9dd64508bb1747791269e1d69fc69389.svg" alt="TOGO VAR"></a></h1><span class="summary">A comprehensive Japanese genetic variation database</span><nav class="dropdown-view"><button class="button">GRCh37</button><div class="selectshow"><ul class="list"><li class="item"><a class="link -active">GRCh37</a></li><li class="item"><a class="link" href="http://grch38.togovar.org/">GRCh38</a></li></ul></div></nav></div><div class="right"><div class="menu-bar"></div><nav class="menus-view"><div class="menu-wrapper"><ul class="menu navigation"><li class="item menu-button"><a class="link" href="/">Home</a></li><li class="item menu-button"><a class="link" href="/doc/datasets">Datasets</a></li><li class="item menu-button"><a class="link" href="/doc/downloads">Downloads</a></li><li class="item menu-button"><a class="link" href="/api" target="_blank">API</a></li><li class="item menu-button"><a class="link" href="/doc/terms">Terms</a></li><li class="item menu-button -current"><a class="link" href="/doc/contact">Contact</a></li><li class="item menu-button"><a class="link" href="/doc/about">About</a></li><li class="item menu-button"><a class="link" href="/doc/history">History</a></li><li class="item menu-button"><a class="link" href="/doc/help">Help</a></li></ul><ul class="menu"><li class="menu-button languageswitcher en"><a class="language en" href="/doc/contact">en</a><a class="language ja" href="/doc/ja/contact">ja</a></li><li class="menu-button login"><a class="link"></a></li></ul></div></nav></div></header><main><article class="common-document"><header class="header"><h2 class="title">Contact us</h2></header><div class="contents"><section class="section"><p class="body">You can contact us by the contact form below to report problems, questions, or suggestions on our service.</p><p class="body"><a class="hyper-text -external" target="_blank" href="http://dbcls.rois.ac.jp/contact-en.html">Contact form to DBCLS</a></p><p class="body">Please feel free to contact us about data use for your study and data sharing of your data.</p></section></div></article></main></body></html>
