@@ -12,7 +12,7 @@ html(data-page=locals.currentPage, lang=lang)
     script.
       (async function() {
         try {
-          //- if (window.location.origin === 'http://localhost:8000') return
+          if (window.location.origin === 'http://localhost:8000') return
           const response = await fetch(`${window.location.origin}/auth/status`);
 
           let isLogin = false;
