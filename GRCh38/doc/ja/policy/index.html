@@ -1,0 +1,23 @@
+<!doctype html><html data-page="policy" lang="en"><head><title>Policy | TogoVar</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>(async function() {
+        try {
+          if (window.location.origin === 'http://localhost:8000') return
+          const response = await fetch(`${window.location.origin}/auth/status`);
+      
+          let isLogin = false;
+          if (response.status === 200 || response.status === 403) {
+            isLogin = true;
+          }
+      
+          const loginMenu = document.querySelector('.menu-button.login a.link');
+          if (isLogin === true) {
+            loginMenu.href = "/auth/logout";
+            loginMenu.textContent = "Logout";
+          } else {
+            loginMenu.href = "/auth/login";
+            loginMenu.textContent = "Login";
+          }
+      
+        } catch (error) {
+          console.error('Error fetching auth status:', error);
+        }
+      })();</script><link href="/css/main-779eea4584c8653a5031.css" rel="stylesheet"></head><body><header id="GlobalHeader"><div class="left"><h1 class="heading"><a class="link" href="/"><img class="logotype" src="/images/logotype-9dd64508bb1747791269e1d69fc69389.svg" alt="TOGO VAR"></a></h1><span class="summary">A comprehensive Japanese genetic variation database</span><nav class="dropdown-view"><button class="button">GRCh38</button><div class="selectshow"><ul class="list"><li class="item"><a class="link" href="http://grch37.togovar.org/">GRCh37</a></li><li class="item"><a class="link -active">GRCh38</a></li></ul></div></nav></div><div class="right"><div class="menu-bar"></div><nav class="menus-view"><div class="menu-wrapper"><ul class="menu navigation"><li class="item menu-button"><a class="link" href="/">Home</a></li><li class="item menu-button"><a class="link" href="/doc/ja/datasets">Datasets</a></li><li class="item menu-button"><a class="link" href="/doc/ja/downloads">Downloads</a></li><li class="item menu-button"><a class="link" href="/api" target="_blank">API</a></li><li class="item menu-button"><a class="link" href="/doc/ja/terms">Terms</a></li><li class="item menu-button"><a class="link" href="/doc/ja/contact">Contact</a></li><li class="item menu-button"><a class="link" href="/doc/ja/about">About</a></li><li class="item menu-button"><a class="link" href="/doc/ja/history">History</a></li><li class="item menu-button"><a class="link" href="/doc/ja/help">Help</a></li></ul><ul class="menu"><li class="menu-button languageswitcher ja"><a class="language en" href="/doc/policy">en</a><a class="language ja" href="/doc/ja/policy">ja</a></li><li class="menu-button login"><a class="link"></a></li></ul></div></nav></div></header><main><article class="common-document"><header class="header"><h2 class="title">サイトポリシー</h2></header><div class="contents"><section class="section"><h3 class="sectiontitle">本サイトについて</h3><p class="body">本サイトは、ライフサイエンスデータベース統合推進事業を実施している、国立研究開発法人科学技術振興機構バイオサイエンスデータベースセンター（以下、「NBDC」といいます。）が運営・管理しています。</p></section><section class="section"><h3 class="sectiontitle">サイトポリシーについて</h3><p class="body">本サイトのサイトポリシーは、<a class="hyper-text -external" target="_blank" href="https://biosciencedbc.jp/sitepolicies/">NBDCのサイトポリシー</a>に準拠致します。また、<a href="/doc/ja/terms">利用条件のページ</a>に記載のある項目については、このサイトのポリシーが優先されます。</p></section></div></article></main></body></html>

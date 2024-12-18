@@ -1,0 +1,48 @@
+{
+  "@context": "http://schema.org",
+  "@type": "DataCatalog",
+  "@id": "https://togovar.org",
+  "name": "TogoVar",
+  "description": "TogoVar (NBDC's integrated database of Japanese genomic variation) is a database that has collected and organized genome sequence differences between individuals (variants) in the Japanese population and disease information associated with them.",
+  "url": "https://togovar.org",
+  "keywords": "genomic variation, Japanese population, allele frequency, integrated database, variant annotation",
+  "provider": {
+    "@type": "Organization",
+    "name": "the National Bioscience Database Center (NBDC) of the Japan Science and Technology Agency (JST)"
+  },
+  "dataset": [
+    {
+      "@type": "Dataset",
+      "@id": "http://togovar.org/doc/datasets/jga_ngs",
+      "name": "Variant set aggregated from NGS data in NBDC Human Database/JGA",
+      "description": "JGA-NGS dataset is a frequency dataset that assembles variants detected by reanalyzing individual-level genome sequence data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA). All JGA data for which an approval for creating secondary data has been obtained are to be aggregated. Note that no variants with 5 alternative alleles or less are included.",
+      "url": "https://togovar.org/doc/datasets/jga_ngs",
+      "identifier": "JGA-NGS",
+      "keywords": "genomic variation, Japanese population, allele frequency, NGS",
+      "includedInDataCatalog": "https://togovar.org/",
+      "creator": {
+        "@type": "Organization",
+        "name": "the National Bioscience Database Center (NBDC) of the Japan Science and Technology Agency (JST)"
+      },
+      "version": "2018-06",
+      "license": "Proprietary License. See https://togovar.org/doc/datasets/jga_ngs."
+    },
+    {
+      "@type": "Dataset",
+      "@id": "http://togovar.org/doc/datasets/jga_snp",
+      "name": "Variant set aggregated from SNP-chip data in NBDC Human Database/JGA",
+      "description": "JGA-SNP dataset is a frequency dataset that has aggregated variants detected from SNP-chip data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA). All JGA data for which an approval for creating secondary data has been obtained are to be aggregated. Note that no variants with 5 alternative alleles or less are included.",
+      "url": "https://togovar.org/doc/datasets/jga_snp",
+      "identifier": "JGA-SNP",
+      "keywords": "genomic variation, Japanese population, allele frequency, SNP-chip",
+      "includedInDataCatalog": "https://togovar.org/",
+      "creator": {
+        "@type": "Organization",
+        "name": "the National Bioscience Database Center (NBDC) of the Japan Science and Technology Agency (JST)"
+      },
+      "version": "2018-06",
+      "license": "Proprietary License. See https://togovar.org/doc/datasets/jga_ngs."
+    }
+  ],
+  "license": "Open Database License (ODbL)"
+}
