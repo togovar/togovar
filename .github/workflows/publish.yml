@@ -24,7 +24,7 @@ jobs:
       - run: npm ci
 
       - run: npm run build
-        env:
+        env: &envs
           TOGOVAR_REFERENCE: ${{ vars.TOGOVAR_REFERENCE }}
           TOGOVAR_FRONTEND_API_URL: ${{ vars.TOGOVAR_FRONTEND_API_URL }}
           TOGOVAR_FRONTEND_STANZA_URL: ${{ vars.TOGOVAR_FRONTEND_STANZA_URL }}
@@ -34,7 +34,7 @@ jobs:
           TOGOVAR_ENDPOINT_JBROWSE: ${{ vars.TOGOVAR_ENDPOINT_JBROWSE }}
 
       - uses: peaceiris/actions-gh-pages@v4
-        with:
+        with: &gh-pages-options
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           destination_dir: ${{ vars.TOGOVAR_REFERENCE }}
@@ -58,16 +58,8 @@ jobs:
 
       - run: npm run build
         env:
-          TOGOVAR_REFERENCE: ${{ vars.TOGOVAR_REFERENCE }}
-          TOGOVAR_FRONTEND_API_URL: ${{ vars.TOGOVAR_FRONTEND_API_URL }}
-          TOGOVAR_FRONTEND_STANZA_URL: ${{ vars.TOGOVAR_FRONTEND_STANZA_URL }}
-          TOGOVAR_ENDPOINT_SPARQL: ${{ vars.TOGOVAR_ENDPOINT_SPARQL }}
-          TOGOVAR_ENDPOINT_SEARCH: ${{ vars.TOGOVAR_ENDPOINT_SEARCH }}
-          TOGOVAR_ENDPOINT_SPARQLIST: ${{ vars.TOGOVAR_ENDPOINT_SPARQLIST }}
-          TOGOVAR_ENDPOINT_JBROWSE: ${{ vars.TOGOVAR_ENDPOINT_JBROWSE }}
+          <<: *envs
 
       - uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          destination_dir: ${{ vars.TOGOVAR_REFERENCE }}
+          <<: *gh-pages-options
