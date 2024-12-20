@@ -24,7 +24,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/SearchVariant'
+                $ref: '#/components/schemas/SearchVariant'
         '400':
           $ref: '#/components/responses/bad_request'
         '500':
@@ -46,7 +46,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/SearchGene'
+                $ref: '#/components/schemas/SearchGene'
         '400':
           description: >
             `Bad Request`<br/>
@@ -54,7 +54,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/Error'
+                $ref: '#/components/schemas/Error'
         '500':
           description: >
             `Internal Server Error`<br/>
@@ -62,7 +62,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/Error'
+                $ref: '#/components/schemas/Error'
         '501':
           description: >
             `Not Implemented`<br/>
@@ -87,7 +87,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/SearchGene'
+                $ref: '#/components/schemas/SearchGene'
         '400':
           description: >
             `Bad Request`<br/>
@@ -95,7 +95,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/Error'
+                $ref: '#/components/schemas/Error'
         '500':
           description: >
             `Internal Server Error`<br/>
@@ -103,7 +103,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/Error'
+                $ref: '#/components/schemas/Error'
         '501':
           description: >
             `Not Implemented`<br/>
@@ -129,7 +129,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/SearchDisease'
+                $ref: '#/components/schemas/SearchDisease'
         '400':
           description: >
             `Bad Request`<br/>
@@ -137,7 +137,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/Error'
+                $ref: '#/components/schemas/Error'
         '500':
           description: >
             `Internal Server Error`<br/>
@@ -145,7 +145,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/Error'
+                $ref: '#/components/schemas/Error'
         '501':
           description: >
             `Not Implemented`<br/>
@@ -170,7 +170,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/SearchDisease'
+                $ref: '#/components/schemas/SearchDisease'
         '400':
           description: >
             `Bad Request`<br/>
@@ -178,7 +178,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/Error'
+                $ref: '#/components/schemas/Error'
         '500':
           description: >
             `Internal Server Error`<br/>
@@ -186,7 +186,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/Error'
+                $ref: '#/components/schemas/Error'
         '501':
           description: >
             `Not Implemented`<br/>
@@ -212,7 +212,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/InspectDisease'
+                $ref: '#/components/schemas/InspectDisease'
         '400':
           description: >
             `Bad Request`<br/>
@@ -220,7 +220,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/Error'
+                $ref: '#/components/schemas/Error'
         '500':
           description: >
             `Internal Server Error`<br/>
@@ -228,7 +228,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/Error'
+                $ref: '#/components/schemas/Error'
         '501':
           description: >
             `Not Implemented`<br/>
@@ -253,7 +253,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/InspectDisease'
+                $ref: '#/components/schemas/InspectDisease'
         '400':
           description: >
             `Bad Request`<br/>
@@ -261,7 +261,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/Error'
+                $ref: '#/components/schemas/Error'
         '500':
           description: >
             `Internal Server Error`<br/>
@@ -269,7 +269,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/Error'
+                $ref: '#/components/schemas/Error'
         '501':
           description: >
             `Not Implemented`<br/>
@@ -294,7 +294,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/definitions/DownloadVariant'
+                $ref: '#/components/schemas/DownloadVariant'
             text/csv:
               schema:
                 type: string
@@ -452,8 +452,9 @@ components:
               term:
                 type: string
                 description: A term to search
-                required: true
                 example: ALDH2
+            required:
+              - term
 
     SearchDisease:
       description: Schema for searching disease
@@ -466,8 +467,9 @@ components:
               term:
                 type: string
                 description: A term to search
-                required: true
                 example: breast ovarian cancer
+            required:
+              - term
 
     InspectDisease:
       description: Schema for inspecting disease
@@ -480,7 +482,6 @@ components:
               node:
                 type: string
                 description: A node ID
-                required: false
                 example: MONDO_0003582
 
   responses:
@@ -491,7 +492,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/definitions/Error'
+            $ref: '#/components/schemas/Error'
     internal_server_error:
       description: >
         `Internal Server Error`<br/>
@@ -499,7 +500,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/definitions/Error'
+            $ref: '#/components/schemas/Error'
     not_implemented:
       description: >
         `Not Implemented`<br/>
@@ -1092,7 +1093,6 @@ components:
               - $ref: '#/components/schemas/And'
               - $ref: '#/components/schemas/Or'
 
-  definitions:
     SearchVariant:
       type: object
       properties:
