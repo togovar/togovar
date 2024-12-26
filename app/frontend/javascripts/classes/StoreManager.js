@@ -76,9 +76,9 @@ class StoreManager {
 
       const response = await Promise.race([fetchPromise, timeout]);
 
-      if (response.status === 401) {
+      if (response.status === 401 || response.status === 403) {
         this.setData('isLogin', false);
-      } else if (response.status === 200 || response.status === 403) {
+      } else if (response.status === 200 ) {
         this.setData('isLogin', true);
       }
     } catch (error) {

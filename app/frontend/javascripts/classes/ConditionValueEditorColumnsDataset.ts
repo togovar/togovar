@@ -40,7 +40,6 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     <header>Select ${this._conditionType}</header>
     <div class="body">
       <div class="columns"></div>
-      <div class="description"></div>
     </div>`
     );
     this.#columns = this._body.querySelector(':scope > .columns');
@@ -129,22 +128,30 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
   }
 
   async #drawColumn(parentId?: string) {
+    // Ensure login status is fetched before proceeding
     await StoreManager.fetchLoginStatus();
     const isLogin = StoreManager.getData('isLogin');
+
+    // Fetch items and process them
     this.#getItems(parentId).then((items) => {
-      // make HTML
+      // Create a new column element
       const column = document.createElement('div');
       column.classList.add('column');
       column.dataset.depth = this.#columns
         .querySelectorAll(':scope > .column')
         .length.toString();
+
+      // Append the column to the container
       this.#columns.append(column);
+
+      // Generate HTML content for the column
       column.innerHTML = `
         <ul>
           ${items
             .map((item) => {
               let listItem = `<li`;
 
+              // Add data attributes
               listItem += ` data-id="${item.data.id}"`;
               listItem += ` data-parent="${item.parent.data.id}"`;
               if (item.data.value) {
@@ -152,25 +159,33 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
               }
 
               listItem += `>
-                <label>
-                  <input type="checkbox" value="${item.data.id}">`;
+                <label>`;
 
-              // dataset-icon` 追加
+              // Display lock icon if the user is not logged in and certain conditions are met
+              if (
+                isLogin === false &&
+                item.data.value?.includes('jga_wgs') &&
+                item.data.id !== '1'
+              ) {
+                listItem += `<span class="lock"></span>`;
+              } else {
+                listItem += `<input type="checkbox" value="${item.data.id}">`;
+              }
+
+              // Add dataset icon if applicable
               if (
                 this._conditionType === CONDITION_TYPE.dataset &&
                 item.depth === 1
               ) {
-                listItem += `<span class="dataset-icon" data-dataset="${item.data.value}"> </span>`;
+                listItem += `<span class="dataset-icon" data-dataset="${item.data.value}"></span>`;
               }
 
               listItem += `<span>${item.data.label}</span>
                 </label>`;
 
-              // 子要素がある場合に矢印を追加
+              // Add arrow icon for items with children
               if (item.children !== undefined) {
-                if (!(isLogin === false && item.data.id === '1')) {
-                  listItem += `<div class="arrow" data-id="${item.data.id}"></div>`;
-                }
+                listItem += `<div class="arrow" data-id="${item.data.id}"></div>`;
               }
 
               listItem += `</li>`;
@@ -179,32 +194,36 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
             .join('')}
         </ul>`;
 
-      // attach events
-      // add/remove condition
+      // Handle checkbox change events for adding/removing conditions
       column.addEventListener('change', (e) => {
         const target = e.target as HTMLInputElement;
         const checked = target.checked;
         const nodeId = target.closest('li').dataset.id;
         const changedNode = this.#data.find((datum) => datum.data.id == nodeId);
 
+        // Update children and parents based on the checkbox state
         if (changedNode.children) this.#updateChildren(changedNode, checked);
         if (changedNode.parent) this.#updateParents(changedNode, checked);
 
+        // Trigger a global update
         this.#update();
       });
 
-      // drill down
+      // Handle drill-down events for navigating to child elements
       for (const item of column.querySelectorAll(':scope > ul > li > .arrow')) {
         item.addEventListener('click', (e) => {
           const target = e.target as HTMLElement;
           const item = target.closest('li');
           const closestColumn: HTMLElement = item.closest('.column');
           const closestColumns: HTMLElement = item.closest('.columns');
-          // release selecting item, and remove subdirectory
+
+          // Deselect the current item and remove subdirectories
           item.parentNode
             .querySelector(':scope > .-selected')
             ?.classList.remove('-selected');
           const depth = parseInt(closestColumn.dataset.depth);
+
+          // Remove columns deeper than the current one
           for (const column of closestColumns.querySelectorAll(
             ':scope > .column'
           )) {
@@ -212,15 +231,21 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
             if (parseInt(column.dataset.depth) > depth)
               column.parentNode.removeChild(column);
           }
-          // select, and drill down
-          item.classList.add('-selected');
 
+          // Select the current item and load child items
+          item.classList.add('-selected');
           this.#drawColumn(target.dataset.id);
+
+          if (target.dataset.id === '1' && !isLogin) {
+            this.#addNoteColumn();
+          }
         });
       }
+
+      // Trigger a global update
       this.#update();
 
-      // scroll
+      // Scroll to reveal the newly added column if necessary
       const left = this._body.scrollWidth - this._body.clientWidth;
       if (left > 0) {
         this._body.scrollTo({
@@ -238,6 +263,17 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
       const found = this.#data.find((datum) => datum.data.id === parentId);
       resolve(found?.children);
     });
+  }
+
+  async #addNoteColumn() {
+    await StoreManager.fetchLoginStatus();
+    const column = document.createElement('div');
+    column.classList.add('column');
+    column.dataset.depth = 2;
+    column.innerHTML = `<div class="note">
+          <a class="link" href="/auth/login">Login</a> to select JGAD datasets
+          </div>`;
+    this.#columns.append(column);
   }
 
   #updateChildren(node: HierarchyNode<DataNodeWithChecked>, checked: boolean) {
