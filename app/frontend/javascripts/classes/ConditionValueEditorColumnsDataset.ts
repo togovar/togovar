@@ -269,7 +269,7 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     await StoreManager.fetchLoginStatus();
     const column = document.createElement('div');
     column.classList.add('column');
-    column.dataset.depth = 2;
+    column.dataset.depth = '2';
     column.innerHTML = `<div class="note">
           <a class="link" href="/auth/login">Login</a> to select JGAD datasets
           </div>`;
