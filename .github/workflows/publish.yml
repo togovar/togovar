@@ -40,6 +40,8 @@ jobs:
           destination_dir: ${{ vars.TOGOVAR_REFERENCE }}
 
   deploy_grch37:
+    needs: deploy_grch38
+
     runs-on: ubuntu-latest
 
     environment: GRCh37
