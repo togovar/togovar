@@ -270,9 +270,12 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     const column = document.createElement('div');
     column.classList.add('column');
     column.dataset.depth = '2';
-    column.innerHTML = `<div class="note">
+    column.innerHTML = `
+      <div class="messages-view">
+        <div class="note message -warning">
           <a class="link" href="/auth/login">Login</a> to select JGAD datasets
-          </div>`;
+          </div>
+      </div>`;
     this.#columns.append(column);
   }
 
