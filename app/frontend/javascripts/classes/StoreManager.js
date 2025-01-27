@@ -78,7 +78,7 @@ class StoreManager {
 
       if (response.status === 401 || response.status === 403) {
         this.setData('isLogin', false);
-      } else if (response.status === 200 ) {
+      } else if (response.status === 200) {
         this.setData('isLogin', true);
       }
     } catch (error) {
