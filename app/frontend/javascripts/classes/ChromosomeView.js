@@ -1,4 +1,5 @@
-import StoreManager from './StoreManager.js';
+import StoreManager from '../store/StoreManager.js';
+import { setSimpleSearchCondition } from "../store/searchManager.js"
 
 const WIDTH = 12;
 const PADDING = 5;
@@ -51,9 +52,9 @@ export default class ChromosomeView {
     this._length = map[map.length - 1].end;
     this._svg = this._elm.querySelector('svg.chromosome');
     const chromosomeAreaHeight =
-        elm.offsetHeight -
-        elm.querySelector('.upper').offsetHeight -
-        PADDING * 2,
+      elm.offsetHeight -
+      elm.querySelector('.upper').offsetHeight -
+      PADDING * 2,
       chromosomeHeight = chromosomeAreaHeight * (this._length / maxLength),
       rate = chromosomeHeight / this._length;
     this._svg.style.height = `${chromosomeHeight + PADDING * 2}px`;
@@ -133,16 +134,14 @@ export default class ChromosomeView {
         data-band="${band.band}"
         data-start="${band.start}"
         data-end="${band.end}"
-        transform="translate(${WIDTH + 4.5}, ${
-        PADDING + band.start * rate - 0.5
-      })"
+        transform="translate(${WIDTH + 4.5}, ${PADDING + band.start * rate - 0.5
+        })"
         >
-        <text x="8" y="${
-          (band.end - band.start) * rate * 0.5 + 3
+        <text x="8" y="${(band.end - band.start) * rate * 0.5 + 3
         }" class="bandtext">${band.band}</text>
         <path d="M0,1 V${(band.end - band.start) * rate - 1} M0,${Math.round(
-        (band.end - band.start) * rate * 0.5
-      )} H8" class="line" />
+          (band.end - band.start) * rate * 0.5
+        )} H8" class="line" />
       </g>
       `;
     }
@@ -197,7 +196,7 @@ export default class ChromosomeView {
   _selectBand(chr, start, end) {
     switch (StoreManager.getData('searchMode')) {
       case 'simple':
-        StoreManager.setSimpleSearchCondition('term', `${chr}:${start}-${end}`);
+        setSimpleSearchCondition('term', `${chr}:${start}-${end}`);
         break;
       case 'advanced':
         document

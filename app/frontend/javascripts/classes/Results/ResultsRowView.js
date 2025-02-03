@@ -1,6 +1,7 @@
-import { COLUMNS } from '../global.js';
-import StoreManager from './StoreManager.js';
-import '../components/LogarithmizedBlockGraphFrequencyView';
+import { COLUMNS } from '../../global.js';
+import StoreManager from '../../store/StoreManager.js';
+import '../../components/LogarithmizedBlockGraphFrequencyView';
+import { getSimpleSearchConditionMaster } from "../../store/searchManager.js"
 
 const REF_ALT_SHOW_LENGTH = 4;
 
@@ -15,6 +16,7 @@ export default class ResultsRowView {
     StoreManager.bind('selectedRow', this);
     StoreManager.bind('offset', this);
     StoreManager.bind('rowCount', this);
+    console.log(StoreManager)
   }
 
   click() {
@@ -23,6 +25,7 @@ export default class ResultsRowView {
 
   offset() {
     this.update();
+    console.log("offset")
   }
 
   selectedRow(index) {
@@ -37,6 +40,7 @@ export default class ResultsRowView {
 
   rowCount() {
     this.update();
+    console.log("rowCount")
   }
 
   prepareTableData() {
@@ -66,7 +70,7 @@ export default class ResultsRowView {
         case 'alt_frequency': // frequency
           {
             const master =
-              StoreManager.getSimpleSearchConditionMaster('dataset');
+              getSimpleSearchConditionMaster('dataset');
             html += `<td class="alt_frequency">
               ${master.items
                 .map((dataset) => {
@@ -150,6 +154,7 @@ export default class ResultsRowView {
   }
 
   update() {
+    console.log("update")
     if (StoreManager.getData('rowCount') <= this.index) {
       // 表示領域外であれば非表示
       this.tr.classList.add('-out-of-range');
@@ -157,6 +162,8 @@ export default class ResultsRowView {
     }
     // レコード取得
     const result = StoreManager.getRecordByIndex(this.index);
+    // console.log(this.index)
+    // console.log(result)
     if (result === 'loading') {
       this.tr.classList.add('-loading');
       this.tr.classList.remove('-out-of-range');
@@ -173,6 +180,9 @@ export default class ResultsRowView {
     }
     this.tr.classList.remove('-loading');
     this.tr.classList.remove('-out-of-range');
+
+
+
     for (const column of COLUMNS) {
       switch (column.id) {
         case 'togovar_id': // tgv
@@ -224,7 +234,7 @@ export default class ResultsRowView {
         case 'type': // variant type
           {
             const master =
-              StoreManager.getSimpleSearchConditionMaster('type').items;
+              getSimpleSearchConditionMaster('type').items;
             this.tdType.textContent = master.find(
               (type) => type.id === result.type
             )?.label;
@@ -246,7 +256,7 @@ export default class ResultsRowView {
         case 'alt_frequency':
           {
             const master =
-              StoreManager.getSimpleSearchConditionMaster('dataset');
+              getSimpleSearchConditionMaster('dataset');
             for (const dataset of master.items) {
               if (!dataset.has_freq) continue;
               const frequency = result.frequencies
@@ -262,7 +272,7 @@ export default class ResultsRowView {
           {
             if (result.most_severe_consequence) {
               const master =
-                StoreManager.getSimpleSearchConditionMaster('consequence');
+                getSimpleSearchConditionMaster('consequence');
               const unique = [
                 ...new Set(
                   result.transcripts.reduce(

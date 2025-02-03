@@ -1,4 +1,5 @@
-import StoreManager from "./StoreManager.js";
+import StoreManager from "../store/StoreManager.js";
+import { resetSimpleSearchConditions } from "../store/searchManager.js";
 
 export default class SideBar {
 
@@ -18,7 +19,7 @@ export default class SideBar {
   _setupResetButton() {
     const resetButton = this._elm.querySelector('#Filters > .title > .button-view');
     resetButton.addEventListener('click', () => {
-      StoreManager.resetSimpleSearchConditions();
+      resetSimpleSearchConditions();
     });
   }
 

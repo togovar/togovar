@@ -1,5 +1,5 @@
-import StoreManager from '../javascripts/classes/StoreManager.js';
-import ResultsView from '../javascripts/classes/ResultsView.js';
+import StoreManager from '../javascripts/store/StoreManager.js';
+import ResultsView from '../javascripts/classes/Results/ResultsView.js';
 import SideBar from '../javascripts/classes/SideBar.js';
 import Configuration from '../javascripts/classes/Configuration.js';
 import SelectedRowIndicator from '../javascripts/classes/SelectedRowIndicator.js';
@@ -27,6 +27,11 @@ import PanelViewPreviewConsequence from '../javascripts/classes/PanelViewPreview
 import PanelViewPreviewClinicalSignificance from '../javascripts/classes/PanelViewPreviewClinicalSignificance.js';
 import TippyBox from '../javascripts/classes/TippyBox.js';
 
+import qs from 'qs';
+import { extractSearchCondition } from "./store/searchManager.js"
+const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
+const _currentUrlParams = qs.parse(window.location.search.substr(1));
+
 export function initHome() {
   setUserAgent();
 
@@ -39,95 +44,14 @@ export function initHome() {
 
   new ActivityIndicator(document.getElementById('ActivityIndicator'));
 
-  StoreManager.readyInitialSearch(() => {
-    // 検索結果表示画面
-    const resultView = new ResultsView(document.getElementById('ResultsView'));
-
-    // Download
-    new DownloadButton(document.getElementById('DownloadJson'));
-    new DownloadButton(document.getElementById('DownloadCsv'));
-    new DownloadButton(document.getElementById('DownloadTsv'));
-
-    // サイドバー
-    new SideBar(document.getElementById('SideBar'));
-    // aside 要素の準備（フィルター）
-    new PanelViewCheckList(
-      document.getElementById('FilterDatasets'),
-      'dataset',
-      'statisticsDataset'
-    );
-    new PanelViewFilterAlternativeAlleleFrequency(
-      document.getElementById('FilterAlternativeAlleleFrequency')
-    );
-    new PanelViewFilterVariantCallingQuality(
-      document.getElementById('FilterVariantCallingQuality')
-    );
-    new PanelViewCheckList(
-      document.getElementById('FilterVariantType'),
-      'type',
-      'statisticsType'
-    );
-    new PanelViewCheckList(
-      document.getElementById('FilterClinicalSignificance'),
-      'significance',
-      'statisticsSignificance'
-    );
-    new PanelViewFilterConsequence(
-      document.getElementById('FilterConsequence')
-    );
-    new PanelViewCheckList(document.getElementById('FilterSIFT'), 'sift');
-    new PanelViewCheckList(
-      document.getElementById('FilterPolyPhen'),
-      'polyphen'
-    );
-    new PanelViewCheckList(
-      document.getElementById('FilterAlphaMissense'),
-      'alphamissense'
-    );
-    // aside 要素の準備（バリアントプレビュー）
-    new PanelViewPreviewGene(document.getElementById('PreviewGene'));
-    new PreviewToVariantReport(
-      document.getElementById('PreviewToVariantReport')
-    );
-    new PanelViewPreviewExternalLinks(
-      document.getElementById('PreviewExternalLinks')
-    );
-    new PanelViewPreviewAlternativeAlleleFrequencies(
-      document.getElementById('PreviewAlternativeAlleleFrequencies')
-    );
-    new PanelViewPreviewConsequence(
-      document.getElementById('PreviewConsequence')
-    );
-    new PanelViewPreviewClinicalSignificance(
-      document.getElementById('PreviewClinicalSignificance')
-    );
-    // インジケータ
-    new SelectedRowIndicator(document.getElementById('RowIndicator'));
-    // レイアウトマネージャ
-    TopPageLayoutManager.init([resultView]);
-    // 開閉
-    // const elm = document.querySelector('#AdvancedSearchView .collapse-view');
-    // new CollapseView(elm);
-
-    // 検索窓
-    new SimpleSearchView();
-    new AdvancedSearchBuilderView(
-      document.getElementById('AdvancedSearchBuilderView')
-    );
-    // change search mode
-    document
-      .querySelectorAll('#SearchInputView > .tabscontainer > ul > li')
-      .forEach((elm) => {
-        elm.addEventListener('click', (e) => {
-          StoreManager.setData('searchMode', e.target.dataset.target);
-        });
-      });
-    // モジュールタブメニュー
-    document.querySelectorAll('.module-tabs-view').forEach((elm) => {
-      new ModuleTabsView(elm);
-    });
-    // Tooltip
-    new TippyBox();
+  readyInitialSearch(() => {
+    initResultsView();
+    initDownloadButtons();
+    initSidebar();
+    initVariantPreview();
+    initSearchInputs();
+    initModuleTabs();
+    initTooltip();
   });
 }
 
@@ -143,4 +67,113 @@ function setUserAgent() {
       break;
   }
   document.querySelector('html').dataset.os = os;
+}
+
+/** 初期検索の準備を行うメソッド
+* @param {Function} callback - 準備完了時に呼び出すコールバック関数 */
+function readyInitialSearch(callback) {
+  // SimpleSearchの検索条件マスターデータを読み込む 
+  const simpleSearchConditionsMaster = ((referenceGenome) => {
+    switch (referenceGenome) {
+      case 'GRCh37':
+        return require('../assets/GRCh37/search_conditions.json');
+      case 'GRCh38':
+        return require('../assets/GRCh38/search_conditions.json');
+      default:
+        return [];
+    }
+  })(TOGOVAR_FRONTEND_REFERENCE);
+
+  Object.freeze(simpleSearchConditionsMaster);
+  StoreManager.setData('simpleSearchConditionsMaster', simpleSearchConditionsMaster);
+
+  // URLパラメータから検索条件を復元
+  const currentSearchMode = StoreManager.getData("searchMode") ?? DEFAULT_SEARCH_MODE
+  const simpleSearchConditions = {}
+  const advancedSearchConditions = {};
+
+  // // URLパラメータからシンプル検索条件を抽出
+  switch (currentSearchMode) {
+    case 'simple':
+      Object.assign(
+        simpleSearchConditions,
+        extractSearchCondition(_currentUrlParams)
+      );
+      break;
+    case 'advanced':
+      break;
+  }
+
+  // 検索条件をストアに保存
+  StoreManager.setData("simpleSearchConditions", simpleSearchConditions);
+  StoreManager.setData("advancedSearchConditions", advancedSearchConditions);
+
+  // 準備完了時のコールバックを呼び出す
+  callback();
+}
+
+// ヘルパー関数: 要素取得
+const getElement = (id) => document.getElementById(id);
+const getAllElements = (selector) => document.querySelectorAll(selector);
+
+// 検索結果画面の初期化
+function initResultsView() {
+  const resultView = new ResultsView(getElement('ResultsView'));
+  TopPageLayoutManager.init([resultView]);
+}
+
+// ダウンロードボタンの初期化
+function initDownloadButtons() {
+  ['DownloadJson', 'DownloadCsv', 'DownloadTsv'].forEach((id) => {
+    new DownloadButton(getElement(id));
+  });
+}
+
+// サイドバーの初期化
+function initSidebar() {
+  new SideBar(getElement('SideBar'));
+  new PanelViewCheckList(getElement('FilterDatasets'), 'dataset', 'statisticsDataset');
+  new PanelViewFilterAlternativeAlleleFrequency(getElement('FilterAlternativeAlleleFrequency'));
+  new PanelViewFilterVariantCallingQuality(getElement('FilterVariantCallingQuality'));
+  new PanelViewCheckList(getElement('FilterVariantType'), 'type', 'statisticsType');
+  new PanelViewCheckList(getElement('FilterClinicalSignificance'), 'significance', 'statisticsSignificance');
+  new PanelViewFilterConsequence(getElement('FilterConsequence'));
+  new PanelViewCheckList(getElement('FilterSIFT'), 'sift');
+  new PanelViewCheckList(getElement('FilterPolyPhen'), 'polyphen');
+  new PanelViewCheckList(getElement('FilterAlphaMissense'), 'alphamissense');
+}
+
+// バリアントプレビューの初期化
+function initVariantPreview() {
+  new PanelViewPreviewGene(getElement('PreviewGene'));
+  new PreviewToVariantReport(getElement('PreviewToVariantReport'));
+  new PanelViewPreviewExternalLinks(getElement('PreviewExternalLinks'));
+  new PanelViewPreviewAlternativeAlleleFrequencies(getElement('PreviewAlternativeAlleleFrequencies'));
+  new PanelViewPreviewConsequence(getElement('PreviewConsequence'));
+  new PanelViewPreviewClinicalSignificance(getElement('PreviewClinicalSignificance'));
+}
+
+// 検索窓の初期化
+function initSearchInputs() {
+  new SimpleSearchView();
+  new AdvancedSearchBuilderView(getElement('AdvancedSearchBuilderView'));
+
+  // 検索モード変更の設定
+  getAllElements('#SearchInputView > .tabscontainer > ul > li').forEach((elm) => {
+    elm.addEventListener('click', (e) => {
+      StoreManager.setData('searchMode', e.target.dataset.target);
+    });
+  });
+}
+
+// モジュールタブメニューの初期化
+function initModuleTabs() {
+  getAllElements('.module-tabs-view').forEach((elm) => {
+    new ModuleTabsView(elm);
+  });
+}
+
+// ツールチップの初期化
+function initTooltip() {
+  new TippyBox();
 }

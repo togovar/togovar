@@ -1,5 +1,6 @@
 import PanelView from './PanelView.js';
-import StoreManager from './StoreManager.js';
+import StoreManager from '../store/StoreManager.js';
+import { setSimpleSearchCondition, getSimpleSearchCondition } from "../store/searchManager.js"
 
 /**  Dataset of Statistics / Filters
 * @param {Element} elm - Panel element section.panel-view (#FilterDatasets | #FilterVariantType | #FilterClinicalSignificance | #FilterSift | #FilterPolyphen | #FilterAlphaMissense)
@@ -17,7 +18,7 @@ export default class PanelViewCheckList extends PanelView {
     // GUIの生成
     this._createGUI(conditionMaster);
     // references
-    const condition = StoreManager.getSimpleSearchCondition(this.kind);
+    const condition = getSimpleSearchCondition(this.kind);
     this._inputsValues = {};
     this.elm
       .querySelectorAll('.content > .checklist-values > .item > .label > input')
@@ -208,7 +209,7 @@ export default class PanelViewCheckList extends PanelView {
         checked[key] = this._inputsValues[key].input.checked ? '1' : '0';
       }
     }
-    StoreManager.setSimpleSearchCondition(this.kind, checked);
+    setSimpleSearchCondition(this.kind, checked);
   }
 
   // フィルターを更新すると呼ばれる

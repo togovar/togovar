@@ -4,7 +4,7 @@ import { ADVANCED_CONDITIONS } from '../global.js';
 import ConditionItemView from './ConditionItemView.js';
 import ConditionValueEditor from './ConditionValueEditor.js';
 import ConditionValues from './ConditionValues.js';
-import StoreManager from './StoreManager.js';
+import StoreManager from '../store/StoreManager.js';
 
 type DataNode = {
   id: string;

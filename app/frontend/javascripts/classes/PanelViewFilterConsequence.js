@@ -1,6 +1,7 @@
 import CollapseView from "./CollapseView.js";
 import PanelView from "./PanelView.js";
-import StoreManager from "./StoreManager.js";
+import StoreManager from "../store/StoreManager.js";
+import { setSimpleSearchCondition, getSimpleSearchCondition, getSimpleSearchConditionMaster } from "../store/searchManager.js"
 
 const KIND_OF_CONDITION = 'consequence';
 
@@ -9,14 +10,14 @@ export default class PanelViewFilterConsequence extends PanelView {
   constructor(elm) {
     super(elm, 'consequence');
     // 検索条件マスター
-    const conditionMaster = StoreManager.getSimpleSearchConditionMaster(this.kind);
-    const grouping = StoreManager.getSimpleSearchConditionMaster('consequence_grouping').items;
+    const conditionMaster = getSimpleSearchConditionMaster(this.kind);
+    const grouping = getSimpleSearchConditionMaster('consequence_grouping').items;
     // GUIの生成
     this._createGUI(conditionMaster, grouping);
     // collapse menu
-    elm.querySelectorAll('.collapse-view').forEach(collapseView => new CollapseView(collapseView) );
+    elm.querySelectorAll('.collapse-view').forEach(collapseView => new CollapseView(collapseView));
     // references
-    const condition = StoreManager.getSimpleSearchCondition(this.kind);
+    const condition = getSimpleSearchCondition(this.kind);
     this._inputsValues = {};
     this.elm.querySelectorAll('.content > .checklist-values input').forEach(input => {
       this._inputsValues[input.value] = {
@@ -155,7 +156,7 @@ export default class PanelViewFilterConsequence extends PanelView {
         checked[key] = this._inputsValues[key].input.checked ? '1' : '0';
       }
     }
-    StoreManager.setSimpleSearchCondition(KIND_OF_CONDITION, checked);
+    setSimpleSearchCondition(KIND_OF_CONDITION, checked);
   }
 
   updateNestedCheckboxes() {

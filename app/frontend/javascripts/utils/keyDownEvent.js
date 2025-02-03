@@ -1,4 +1,4 @@
-import StoreManager from '../classes/StoreManager.js';
+import StoreManager from '../store/StoreManager.js';
 
 export function keyDownEvent(storeName) {
   switch (storeName) {
@@ -6,7 +6,7 @@ export function keyDownEvent(storeName) {
       if (!StoreManager.getData('showSuggest')) {
         return true;
       }
-    return false;
+      return false;
 
     case 'selectedRow':
       if (!StoreManager.getData('showModal')) {

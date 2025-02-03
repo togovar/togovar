@@ -1,5 +1,5 @@
 import { PAGE, COLUMNS } from "../global.js";
-import StoreManager from "./StoreManager.js";
+import StoreManager from "../store/StoreManager.js";
 
 export default class Configuration {
 

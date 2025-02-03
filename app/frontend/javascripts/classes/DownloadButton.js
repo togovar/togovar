@@ -1,4 +1,4 @@
-import StoreManager from './StoreManager.js';
+import StoreManager from '../store/StoreManager.js';
 import { API_URL } from '../global.js';
 
 export default class DownloadButton {

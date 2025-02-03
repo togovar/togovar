@@ -3,7 +3,8 @@ import { customElement, state } from 'lit/decorators.js';
 import './SearchFieldWithSuggestions';
 import './SearchFieldExamples';
 import './SimpleSearchButton';
-import StoreManager from '../../../classes/StoreManager';
+// import StoreManager from '../../../store/StoreManager';
+import { setSimpleSearchCondition, getSimpleSearchCondition } from "../../../store/searchManager"
 import { API_URL } from '../../../global.js';
 
 import Styles from '../../../../stylesheets/object/component/simple-search-view.scss';
@@ -98,7 +99,7 @@ class SimpleSearchView extends LitElement {
   /** @property {string} _value - value of suggestion */
   @state() _value;
   /** @property {string} _term - Input value */
-  @state() _term = StoreManager.getSimpleSearchCondition('term');
+  @state() _term = getSimpleSearchCondition('term');
   /** @property {boolean} _hideSuggestions - Whether to hide suggestions */
   @state() _hideSuggestions = true;
 
@@ -116,7 +117,7 @@ class SimpleSearchView extends LitElement {
       }
     }
 
-    StoreManager.setSimpleSearchCondition('term', term);
+    setSimpleSearchCondition('term', term);
   }
 
   /** When selected from suggest, hide suggest, put label in this._value, search by label
@@ -167,13 +168,13 @@ class SimpleSearchView extends LitElement {
           .suggestAPIURL=${`${API_URL}/suggest`}
           .suggestAPIQueryParam=${'term'}
           .options=${{
-            valueMappings: {
-              valueKey: 'term',
-              labelKey: 'term',
-              aliasOfKey: 'alias_of',
-            },
-            titleMappings: { gene: 'Gene names', disease: 'Disease names' },
-          }}
+        valueMappings: {
+          valueKey: 'term',
+          labelKey: 'term',
+          aliasOfKey: 'alias_of',
+        },
+        titleMappings: { gene: 'Gene names', disease: 'Disease names' },
+      }}
           .term=${this._term}
           .hideSuggestions=${this._hideSuggestions}
           @new-suggestion-selected=${this._handleSuggestionEnter}

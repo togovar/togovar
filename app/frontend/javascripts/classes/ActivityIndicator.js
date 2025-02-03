@@ -1,4 +1,4 @@
-import StoreManager from "./StoreManager.js";
+import StoreManager from "../store/StoreManager.js";
 
 export default class ActivityIndicator {
 

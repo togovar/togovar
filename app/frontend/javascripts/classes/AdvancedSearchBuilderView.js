@@ -1,4 +1,4 @@
-import StoreManager from './StoreManager.js';
+import { setAdvancedSearchCondition } from "../store/searchManager.js";
 import ConditionGroupView from './ConditionGroupView.js';
 import AdvancedSearchToolbar from './AdvancedSearchToolbar.js';
 import AdvancedSearchSelection from './AdvancedSearchSelection.js';
@@ -138,7 +138,7 @@ export default class AdvancedSearchBuilderView {
   search() {
     const query = this._rootGroup.query;
 
-    StoreManager.setAdvancedSearchCondition(query);
+    setAdvancedSearchCondition(query);
   }
 
   // add search condition to the currently selected layer

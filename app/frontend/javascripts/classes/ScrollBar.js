@@ -1,4 +1,4 @@
-import StoreManager from './StoreManager.js';
+import StoreManager from '../store/StoreManager.js';
 import { TR_HEIGHT } from '../global.js';
 
 const RELEASE_DURATION = 2000;

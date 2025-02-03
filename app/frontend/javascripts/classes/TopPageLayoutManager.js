@@ -1,30 +1,47 @@
 class TopPageLayoutManager {
+  // Advanced SearchのConditionで高さが変化するため、ただしresizeで発火は変更が必要になる可能性あり
 
   constructor() {
+    this._isReady = false; // 初期化フラグ
   }
 
+  /** レイアウトマネージャーを初期化する
+   * @param {Array} targets - 表示サイズを更新するコンポーネントのリスト */
   init(targets) {
     this._isReady = true;
     this.targets = targets;
-    // reference
-    this._GlobalHeaderHeight = document.getElementById('GlobalHeader').clientHeight;
-    this._SearchInputView = document.getElementById('SearchInputView');
-    this._SearchResultsView = document.getElementById('SearchResultsView');
+
+    // パフォーマンス向上のためにDOM要素をキャッシュ
+    this._globalHeader = document.getElementById('GlobalHeader');
+    this._searchInputView = document.getElementById('SearchInputView');
+    this._searchResultsView = document.getElementById('SearchResultsView');
     this._drawerView = document.querySelector('.drawer-view');
-    
+
+    // 初回レイアウト更新
     this.update();
-    // リサイズされたらスクロール領域の更新
+
+    // ウィンドウリサイズ時にレイアウトを更新
     window.addEventListener('resize', this.update.bind(this));
-    window.dispatchEvent(new Event('resize'));
+    window.dispatchEvent(new Event('resize')); // 読み込み時にレイアウトを更新
   }
 
+  /** 検索結果エリアやターゲット要素の表示サイズを動的に更新する */
   update() {
     if (!this._isReady) return;
-    const drawerHeight = window.innerHeight - this._drawerView.offsetTop;
-    this._SearchResultsView.style.height = `calc(100vh - ${this._GlobalHeaderHeight + this._SearchInputView.clientHeight + drawerHeight}px)`;
-    this.targets.forEach(target => target.updateDisplaySize() );
-  }
 
+    const globalHeaderHeight = this._globalHeader?.clientHeight || 0;
+    const searchInputHeight = this._searchInputView?.clientHeight || 0;
+    const drawerOffsetTop = this._drawerView?.offsetTop || 0;
+    const drawerHeight = window.innerHeight - drawerOffsetTop;
+
+    // 検索結果エリアの高さを動的に調整
+    if (this._searchResultsView) {
+      this._searchResultsView.style.height = `calc(100vh - ${globalHeaderHeight + searchInputHeight + drawerHeight}px)`;
+    }
+
+    // すべてのターゲット要素の表示サイズを更新
+    this.targets.forEach(target => target.updateDisplaySize());
+  }
 }
 
 export default new TopPageLayoutManager();

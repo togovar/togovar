@@ -1,5 +1,6 @@
 import PanelView from "./PanelView.js";
-import StoreManager from "./StoreManager.js";
+import StoreManager from "../store/StoreManager.js";
+import { getSimpleSearchConditionMaster } from "../store/searchManager.js"
 
 export default class PanelViewPreviewClinicalSignificance extends PanelView {
 
@@ -23,7 +24,7 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
     if (StoreManager.getData('selectedRow') !== undefined) {
       const record = StoreManager.getSelectedRecord();
       if (record && record.significance) {
-        const master = StoreManager.getSimpleSearchConditionMaster('significance');
+        const master = getSimpleSearchConditionMaster('significance');
 
         const deepClone = structuredClone(record.significance);
 

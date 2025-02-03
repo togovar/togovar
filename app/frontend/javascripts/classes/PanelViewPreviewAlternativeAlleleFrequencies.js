@@ -1,6 +1,7 @@
 import { strIns } from '../global.js';
 import PanelView from "./PanelView.js";
-import StoreManager from "./StoreManager.js";
+import StoreManager from "../store/StoreManager.js";
+import { getSimpleSearchConditionMaster } from "../store/searchManager.js"
 
 const DECIMAL_DIGIT = 4;
 
@@ -11,7 +12,7 @@ export default class PanelViewPreviewAlternativeAlleleFrequencies extends PanelV
     StoreManager.bind('selectedRow', this);
     StoreManager.bind('offset', this);
     const tbody = this.elm.querySelector('.frequency-detail > tbody');
-    this._master = StoreManager.getSimpleSearchConditionMaster('dataset').items;
+    this._master = getSimpleSearchConditionMaster('dataset').items;
     // make DOM
     tbody.innerHTML = this._master.map(dataset => {
       if (dataset.has_freq) {

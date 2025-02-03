@@ -1,8 +1,8 @@
-import StoreManager from './StoreManager.js';
+import StoreManager from '../../store/StoreManager.js';
 import ResultsRowView from './ResultsRowView.js';
-import ScrollBar from './ScrollBar.js';
-import { TR_HEIGHT, COMMON_FOOTER_HEIGHT, COLUMNS } from '../global.js';
-import { keyDownEvent } from '../utils/keyDownEvent.js';
+import ScrollBar from './../ScrollBar.js';
+import { TR_HEIGHT, COMMON_FOOTER_HEIGHT, COLUMNS } from '../../global.js';
+import { keyDownEvent } from '../../utils/keyDownEvent.js';
 
 export default class ResultsView {
   constructor(elm) {
@@ -42,8 +42,8 @@ export default class ResultsView {
       'onwheel' in document
         ? 'wheel'
         : 'onmousewheel' in document
-        ? 'mousewheel'
-        : 'DOMMouseScroll';
+          ? 'mousewheel'
+          : 'DOMMouseScroll';
     this.tbody.addEventListener(mousewheelevent, this.scroll.bind(this));
 
     // カラムの表示を制御するためのスタイルシート
@@ -56,13 +56,13 @@ export default class ResultsView {
   updateDisplaySize() {
     // 表示数
     const maxRowCount = Math.floor(
-        (window.innerHeight -
-          this.tbody.getBoundingClientRect().top -
-          StoreManager.getData('karyotype').height -
-          COMMON_FOOTER_HEIGHT -
-          2) /
-          TR_HEIGHT
-      ),
+      (window.innerHeight -
+        this.tbody.getBoundingClientRect().top -
+        StoreManager.getData('karyotype').height -
+        COMMON_FOOTER_HEIGHT -
+        2) /
+      TR_HEIGHT
+    ),
       numberOfRecords = StoreManager.getData('numberOfRecords'),
       offset = StoreManager.getData('offset'),
       rowCount = Math.min(maxRowCount, numberOfRecords);
@@ -94,7 +94,7 @@ export default class ResultsView {
     e.stopPropagation();
     const totalHeight = StoreManager.getData('numberOfRecords') * TR_HEIGHT;
     let availableScrollY =
-        totalHeight - StoreManager.getData('rowCount') * TR_HEIGHT,
+      totalHeight - StoreManager.getData('rowCount') * TR_HEIGHT,
       wheelScroll;
     availableScrollY = availableScrollY < 0 ? 0 : availableScrollY;
     // 縦方向にスクロールしていない場合スルー
@@ -119,6 +119,8 @@ export default class ResultsView {
       displayingRegions2 = {};
     for (let i = 0; i <= StoreManager.getData('rowCount') - 1; i++) {
       const record = StoreManager.getRecordByIndex(i);
+      // console.log(record);
+      // console.log(StoreManager.getData('rowCount'))
       if (displayingRegions1[record.chromosome] === undefined) {
         displayingRegions1[record.chromosome] = [];
       }
@@ -174,9 +176,8 @@ export default class ResultsView {
       const column = columns[i];
       this.stylesheet.sheet.insertRule(
         `
-      .tablecontainer > table.results-view th.${
-        column.id
-      }, .tablecontainer > table.results-view td.${column.id} {
+      .tablecontainer > table.results-view th.${column.id
+        }, .tablecontainer > table.results-view td.${column.id} {
         display: ${column.isUsed ? 'table-cell' : 'none'}
       }`,
         i
