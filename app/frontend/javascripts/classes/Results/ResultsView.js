@@ -264,4 +264,8 @@ export default class ResultsView {
   karyotype(_karyotype) {
     this.updateDisplaySize();
   }
+
+  refreshView() {
+    this.updateDisplaySize();
+  }
 }
