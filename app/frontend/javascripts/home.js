@@ -203,10 +203,3 @@ function initModuleTabs() {
 function initTooltip() {
   new TippyBox();
 }
-
-function switchSearchMode() {
-  // 検索モード切り替え後にテーブルを強制的に再描画
-  setTimeout(() => {
-    window.dispatchEvent(new Event('resize'));
-  }, 100);
-}
