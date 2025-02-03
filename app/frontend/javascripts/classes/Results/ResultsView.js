@@ -183,7 +183,12 @@ export default class ResultsView {
       return;
     }
 
-    this.updateDisplaySize();
+    if (_results) {
+      this.updateDisplaySize();
+    } else {
+      setTimeout(() => this.searchResults(_results), 100);
+      return;
+    }
   }
 
   _validateData() {
