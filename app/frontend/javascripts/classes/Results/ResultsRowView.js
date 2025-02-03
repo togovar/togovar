@@ -1,7 +1,7 @@
 import { COLUMNS } from '../../global.js';
 import StoreManager from '../../store/StoreManager.js';
 import '../../components/LogarithmizedBlockGraphFrequencyView';
-import { getSimpleSearchConditionMaster } from "../../store/searchManager.js"
+import { getSimpleSearchConditionMaster } from '../../store/searchManager.js';
 
 const REF_ALT_SHOW_LENGTH = 4;
 
@@ -16,7 +16,6 @@ export default class ResultsRowView {
     StoreManager.bind('selectedRow', this);
     StoreManager.bind('offset', this);
     StoreManager.bind('rowCount', this);
-    console.log(StoreManager)
   }
 
   click() {
@@ -25,7 +24,6 @@ export default class ResultsRowView {
 
   offset() {
     this.update();
-    console.log("offset")
   }
 
   selectedRow(index) {
@@ -40,7 +38,6 @@ export default class ResultsRowView {
 
   rowCount() {
     this.update();
-    console.log("rowCount")
   }
 
   prepareTableData() {
@@ -69,8 +66,7 @@ export default class ResultsRowView {
           break;
         case 'alt_frequency': // frequency
           {
-            const master =
-              getSimpleSearchConditionMaster('dataset');
+            const master = getSimpleSearchConditionMaster('dataset');
             html += `<td class="alt_frequency">
               ${master.items
                 .map((dataset) => {
@@ -154,34 +150,36 @@ export default class ResultsRowView {
   }
 
   update() {
-    console.log("update")
-    if (StoreManager.getData('rowCount') <= this.index) {
-      // 表示領域外であれば非表示
-      this.tr.classList.add('-out-of-range');
-      return;
-    }
-    // レコード取得
-    const result = StoreManager.getRecordByIndex(this.index);
-    // console.log(this.index)
-    // console.log(result)
-    if (result === 'loading') {
+    if (
+      StoreManager.getData('isFetching') ||
+      StoreManager.getData('isUpdating')
+    ) {
       this.tr.classList.add('-loading');
-      this.tr.classList.remove('-out-of-range');
       this.tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
       return;
     }
-    if (result === 'out of range') {
-      this.tr.classList.remove('-loading');
+
+    const rowCount = StoreManager.getData('rowCount');
+    if (rowCount <= this.index) {
       this.tr.classList.add('-out-of-range');
+      this.tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
       return;
     }
+
+    const result = StoreManager.getRecordByIndex(this.index);
+    if (!result || result === 'loading' || result === 'out of range') {
+      this.tr.classList.add('-loading');
+      this.tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
+      return;
+    }
+
+    // データが有効な場合のみ表示を更新
     if (this.tr.classList.contains('-loading')) {
       this.prepareTableData();
     }
+
     this.tr.classList.remove('-loading');
     this.tr.classList.remove('-out-of-range');
-
-
 
     for (const column of COLUMNS) {
       switch (column.id) {
@@ -233,8 +231,7 @@ export default class ResultsRowView {
           break;
         case 'type': // variant type
           {
-            const master =
-              getSimpleSearchConditionMaster('type').items;
+            const master = getSimpleSearchConditionMaster('type').items;
             this.tdType.textContent = master.find(
               (type) => type.id === result.type
             )?.label;
@@ -255,14 +252,13 @@ export default class ResultsRowView {
           break;
         case 'alt_frequency':
           {
-            const master =
-              getSimpleSearchConditionMaster('dataset');
+            const master = getSimpleSearchConditionMaster('dataset');
             for (const dataset of master.items) {
               if (!dataset.has_freq) continue;
               const frequency = result.frequencies
                 ? result.frequencies.find(
-                  (frequency) => frequency.source === dataset.id
-                )
+                    (frequency) => frequency.source === dataset.id
+                  )
                 : undefined;
               this.tdFrequencies[dataset.id].frequency = frequency;
             }
@@ -271,8 +267,7 @@ export default class ResultsRowView {
         case 'consequence':
           {
             if (result.most_severe_consequence) {
-              const master =
-                getSimpleSearchConditionMaster('consequence');
+              const master = getSimpleSearchConditionMaster('consequence');
               const unique = [
                 ...new Set(
                   result.transcripts.reduce(
@@ -300,32 +295,36 @@ export default class ResultsRowView {
                 result.significance[0].interpretations[0];
 
               if (result.significance[0].conditions[0] !== undefined) {
-                this.tdClinicalSign.textContent = ""
+                this.tdClinicalSign.textContent = '';
                 if (result.significance[0].conditions[0].name) {
                   this.tdClinicalAnchor.textContent =
-                    result.significance[0].conditions[0].name
+                    result.significance[0].conditions[0].name;
                 }
 
-                if (result.significance[0].conditions[0]?.medgen !== undefined) {
+                if (
+                  result.significance[0].conditions[0]?.medgen !== undefined
+                ) {
                   this.tdClinicalAnchor.setAttribute(
                     'href',
                     `/disease/${result.significance[0].conditions[0].medgen}`
                   );
                 } else {
-                  this.tdClinicalSign.textContent = result.significance[0].conditions[0].name
-                  this.tdClinicalAnchor.textContent = ""
-                  this.tdClinicalAnchor.className = ""
+                  this.tdClinicalSign.textContent =
+                    result.significance[0].conditions[0].name;
+                  this.tdClinicalAnchor.textContent = '';
+                  this.tdClinicalAnchor.className = '';
                 }
               } else {
-                this.tdClinicalSign.textContent = "others"
-                this.tdClinicalAnchor.textContent = ""
+                this.tdClinicalSign.textContent = 'others';
+                this.tdClinicalAnchor.textContent = '';
               }
 
-              this.tdClinicalIcon.dataset.remains = result.significance.length - 1;
+              this.tdClinicalIcon.dataset.remains =
+                result.significance.length - 1;
 
               // Check if any medgen exists in result.significance
-              const hasMedgen = result.significance.some(significanceItem =>
-                significanceItem.source === "mgend"
+              const hasMedgen = result.significance.some(
+                (significanceItem) => significanceItem.source === 'mgend'
               );
 
               this.tdClinicalIcon.dataset.mgend = hasMedgen;

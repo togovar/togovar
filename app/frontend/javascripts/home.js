@@ -28,7 +28,7 @@ import PanelViewPreviewClinicalSignificance from '../javascripts/classes/PanelVi
 import TippyBox from '../javascripts/classes/TippyBox.js';
 
 import qs from 'qs';
-import { extractSearchCondition } from "./store/searchManager.js"
+import { extractSearchCondition } from './store/searchManager.js';
 const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
 const _currentUrlParams = qs.parse(window.location.search.substr(1));
 
@@ -70,9 +70,9 @@ function setUserAgent() {
 }
 
 /** 初期検索の準備を行うメソッド
-* @param {Function} callback - 準備完了時に呼び出すコールバック関数 */
+ * @param {Function} callback - 準備完了時に呼び出すコールバック関数 */
 function readyInitialSearch(callback) {
-  // SimpleSearchの検索条件マスターデータを読み込む 
+  // SimpleSearchの検索条件マスターデータを読み込む
   const simpleSearchConditionsMaster = ((referenceGenome) => {
     switch (referenceGenome) {
       case 'GRCh37':
@@ -85,11 +85,15 @@ function readyInitialSearch(callback) {
   })(TOGOVAR_FRONTEND_REFERENCE);
 
   Object.freeze(simpleSearchConditionsMaster);
-  StoreManager.setData('simpleSearchConditionsMaster', simpleSearchConditionsMaster);
+  StoreManager.setData(
+    'simpleSearchConditionsMaster',
+    simpleSearchConditionsMaster
+  );
 
   // URLパラメータから検索条件を復元
-  const currentSearchMode = StoreManager.getData("searchMode") ?? DEFAULT_SEARCH_MODE
-  const simpleSearchConditions = {}
+  const currentSearchMode =
+    StoreManager.getData('searchMode') ?? DEFAULT_SEARCH_MODE;
+  const simpleSearchConditions = {};
   const advancedSearchConditions = {};
 
   // // URLパラメータからシンプル検索条件を抽出
@@ -105,8 +109,8 @@ function readyInitialSearch(callback) {
   }
 
   // 検索条件をストアに保存
-  StoreManager.setData("simpleSearchConditions", simpleSearchConditions);
-  StoreManager.setData("advancedSearchConditions", advancedSearchConditions);
+  StoreManager.setData('simpleSearchConditions', simpleSearchConditions);
+  StoreManager.setData('advancedSearchConditions', advancedSearchConditions);
 
   // 準備完了時のコールバックを呼び出す
   callback();
@@ -132,11 +136,27 @@ function initDownloadButtons() {
 // サイドバーの初期化
 function initSidebar() {
   new SideBar(getElement('SideBar'));
-  new PanelViewCheckList(getElement('FilterDatasets'), 'dataset', 'statisticsDataset');
-  new PanelViewFilterAlternativeAlleleFrequency(getElement('FilterAlternativeAlleleFrequency'));
-  new PanelViewFilterVariantCallingQuality(getElement('FilterVariantCallingQuality'));
-  new PanelViewCheckList(getElement('FilterVariantType'), 'type', 'statisticsType');
-  new PanelViewCheckList(getElement('FilterClinicalSignificance'), 'significance', 'statisticsSignificance');
+  new PanelViewCheckList(
+    getElement('FilterDatasets'),
+    'dataset',
+    'statisticsDataset'
+  );
+  new PanelViewFilterAlternativeAlleleFrequency(
+    getElement('FilterAlternativeAlleleFrequency')
+  );
+  new PanelViewFilterVariantCallingQuality(
+    getElement('FilterVariantCallingQuality')
+  );
+  new PanelViewCheckList(
+    getElement('FilterVariantType'),
+    'type',
+    'statisticsType'
+  );
+  new PanelViewCheckList(
+    getElement('FilterClinicalSignificance'),
+    'significance',
+    'statisticsSignificance'
+  );
   new PanelViewFilterConsequence(getElement('FilterConsequence'));
   new PanelViewCheckList(getElement('FilterSIFT'), 'sift');
   new PanelViewCheckList(getElement('FilterPolyPhen'), 'polyphen');
@@ -148,9 +168,13 @@ function initVariantPreview() {
   new PanelViewPreviewGene(getElement('PreviewGene'));
   new PreviewToVariantReport(getElement('PreviewToVariantReport'));
   new PanelViewPreviewExternalLinks(getElement('PreviewExternalLinks'));
-  new PanelViewPreviewAlternativeAlleleFrequencies(getElement('PreviewAlternativeAlleleFrequencies'));
+  new PanelViewPreviewAlternativeAlleleFrequencies(
+    getElement('PreviewAlternativeAlleleFrequencies')
+  );
   new PanelViewPreviewConsequence(getElement('PreviewConsequence'));
-  new PanelViewPreviewClinicalSignificance(getElement('PreviewClinicalSignificance'));
+  new PanelViewPreviewClinicalSignificance(
+    getElement('PreviewClinicalSignificance')
+  );
 }
 
 // 検索窓の初期化
@@ -159,11 +183,13 @@ function initSearchInputs() {
   new AdvancedSearchBuilderView(getElement('AdvancedSearchBuilderView'));
 
   // 検索モード変更の設定
-  getAllElements('#SearchInputView > .tabscontainer > ul > li').forEach((elm) => {
-    elm.addEventListener('click', (e) => {
-      StoreManager.setData('searchMode', e.target.dataset.target);
-    });
-  });
+  getAllElements('#SearchInputView > .tabscontainer > ul > li').forEach(
+    (elm) => {
+      elm.addEventListener('click', (e) => {
+        StoreManager.setData('searchMode', e.target.dataset.target);
+      });
+    }
+  );
 }
 
 // モジュールタブメニューの初期化

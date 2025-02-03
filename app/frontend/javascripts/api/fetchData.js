@@ -3,47 +3,79 @@ import qs from 'qs';
 import _ from 'lodash';
 import { API_URL } from '../global.js';
 const LIMIT = 100;
-import { _setSimpleSearchConditions, extractSearchCondition } from "../store/searchManager.js"
+import {
+  _setSimpleSearchConditions,
+  extractSearchCondition,
+} from '../store/searchManager.js';
 
 let currentAbortController = null;
-let _currentSearchMode
+let _currentSearchMode;
+let lastRequestRanges = new Set(); // 取得済みの範囲を管理
 
 /** 検索を実行するメソッド（データ取得 & 更新）
  * @param {Number} offset - 検索開始位置
  * @param {Boolean} isFirstTime - 最初の検索かどうか */
 export const executeSearch = (() => {
   return _.debounce((offset = 0, isFirstTime = false, isAbort = false) => {
-    if (StoreManager.getData('isFetching')) return
+    // モード切り替え時のみキャンセル
+    const newSearchMode = StoreManager.getData('searchMode');
+    if (_currentSearchMode && _currentSearchMode !== newSearchMode) {
+      if (currentAbortController) {
+        currentAbortController.abort();
+      }
+      _currentSearchMode = newSearchMode;
+      isFirstTime = true;
+      lastRequestRanges.clear(); // モード切り替え時にクリア
+    } else if (!isFirstTime) {
+      // スクロール時のデータ取得判定
+      const offsetStart = offset - (offset % LIMIT);
+      const rangeKey = `${offsetStart}-${offsetStart + LIMIT}`;
 
-    _currentSearchMode = StoreManager.getData('searchMode');
+      if (StoreManager.getData('searchMode') === 'simple') {
+        // 未取得の範囲の場合のみリクエスト
+        if (!lastRequestRanges.has(rangeKey)) {
+          lastRequestRanges.add(rangeKey);
+        } else {
+          return; // 既に取得済みの範囲はスキップ
+        }
+      }
+    }
 
-    // 🔹 新しい AbortController を作成
+    _currentSearchMode = newSearchMode;
+
+    // 新しい AbortController を作成
     currentAbortController = new AbortController();
     const signal = currentAbortController.signal;
 
     // 初回検索時のデータリセット
-    if (isFirstTime) _resetSearchResults();
+    if (isFirstTime) {
+      _resetSearchResults();
+      lastRequestRanges.clear(); // リセット時にクリア
+    }
 
     // 検索条件を保存
     const previousConditions = JSON.stringify(
       StoreManager.getData('simpleSearchConditions')
-    ); // TODO: AdvancedSearchの条件も保存する
+    );
 
     // フェッチフラグを設定
     StoreManager.setData('isFetching', true);
 
     // API のエンドポイントを取得
-    const apiEndpoints = _determineSearchEndpoints(offset, isFirstTime, isAbort);
+    const apiEndpoints = _determineSearchEndpoints(
+      offset,
+      isFirstTime,
+      isAbort
+    );
 
     // API リクエストオプションを設定
     const requestOptions = _getRequestOptions(signal);
 
-    // データ取得（初回のみ2回 API コール、それ以外は1回）
+    // データ取得
     apiEndpoints?.forEach((endpoint) => {
       _fetchData(endpoint, requestOptions, previousConditions);
     });
-    // });
-  }, 0);
+  }, 100);
 })();
 
 /** 初回検索時のデータをリセット */
@@ -53,6 +85,7 @@ function _resetSearchResults() {
   StoreManager.setData('rowCount', 0);
   StoreManager.setData('isFetching', false);
   StoreManager.setData('searchResults', []);
+  lastRequestRanges.clear(); // データリセット時にクリア
 }
 
 /** 検索用 API のエンドポイントを取得
@@ -65,27 +98,31 @@ function _determineSearchEndpoints(offset, isFirstTime, isAbort) {
 
   switch (StoreManager.getData('searchMode')) {
     case 'simple': {
+      // Simple searchの場合のみLIMITでの調整を行う
+      const offsetStart = offset - (offset % LIMIT);
       conditions = qs.stringify(
         extractSearchCondition(StoreManager.getData('simpleSearchConditions'))
       );
-      basePath = `${API_URL}/search?offset=${offset - (offset % LIMIT)}${conditions ? '&' + conditions : ''
-        }`;
+      basePath = `${API_URL}/search?offset=${offsetStart}${
+        conditions ? '&' + conditions : ''
+      }`;
 
       return isAbort
         ? [`${basePath}&stat=1&data=0`]
         : isFirstTime
-          ? [`${basePath}&stat=0&data=1`, `${basePath}&stat=1&data=0`]
-          : [`${basePath}&stat=0&data=1`];
+        ? [`${basePath}&stat=0&data=1`, `${basePath}&stat=1&data=0`]
+        : [`${basePath}&stat=0&data=1`];
     }
 
     case 'advanced': {
+      // Advanced searchの場合は元のoffsetをそのまま使用
       basePath = `${API_URL}/api/search/variant`;
 
       return isAbort
         ? [`${basePath}?stat=1&data=0`]
         : isFirstTime
-          ? [`${basePath}?stat=0&data=1`, `${basePath}?stat=1&data=0`]
-          : [`${basePath}?stat=0&data=1`];
+        ? [`${basePath}?stat=0&data=1`, `${basePath}?stat=1&data=0`]
+        : [`${basePath}?stat=0&data=1`];
     }
   }
 }
@@ -105,7 +142,7 @@ function _getRequestOptions(signal) {
 
   if (StoreManager.getData('searchMode') === 'advanced') {
     options.method = 'POST';
-
+    // Advanced searchの場合は元のoffsetを使用
     const body = { offset: StoreManager.getData('offset') };
     if (
       StoreManager.getData('advancedSearchConditions') &&
@@ -131,34 +168,24 @@ async function _fetchData(endpoint, options, previousConditions) {
     }
     const jsonResponse = await response.json();
 
-    if ('data' in jsonResponse) {
-      _processSearchResults(jsonResponse);
-    }
-    if ('statistics' in jsonResponse) {
-      _processStatistics(jsonResponse);
-    }
-
-    _updateAppState(previousConditions);
-
-    if (_currentSearchMode !== StoreManager.getData('searchMode')) {
-      currentAbortController.abort();
-      StoreManager.notify('offset');
-      StoreManager.setData('isFetching', false);
-      // executeSearch(0, false, true);
-      executeSearch(0, true);
+    // 現在の検索モードと一致する場合のみ結果を処理
+    if (_currentSearchMode === StoreManager.getData('searchMode')) {
+      if ('data' in jsonResponse) {
+        _processSearchResults(jsonResponse);
+      }
+      if ('statistics' in jsonResponse) {
+        _processStatistics(jsonResponse);
+      }
     }
 
-    StoreManager.setData('isFetching', false);
-  } catch (err) {
-    console.log(err);
-    if (err.name === 'AbortError') {
-      console.warn('User aborted the request');
+    await _updateAppState(previousConditions);
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Fetch aborted');
       return;
     }
-    const error = err instanceof Error ? err.message : null;
-    StoreManager.setData('searchMessages', { error });
+    console.error('Fetch error:', error);
     StoreManager.setData('isFetching', false);
-    throw err;
   }
 }
 
@@ -210,7 +237,10 @@ function _processStatistics(json) {
  * @param {String} previousConditions - 直前の検索条件（比較用） */
 async function _updateAppState(previousConditions) {
   //検索中に条件が変更されていたら、再検索する(いらないかも)
-  if (previousConditions !== JSON.stringify(StoreManager.getData('simpleSearchConditions'))) {
+  if (
+    previousConditions !==
+    JSON.stringify(StoreManager.getData('simpleSearchConditions'))
+  ) {
     _setSimpleSearchConditions({});
   }
 
@@ -231,7 +261,6 @@ async function _updateAppState(previousConditions) {
         Object.keys(StoreManager.getData('advancedSearchConditions')).length > 0
       );
   }
-
 
   StoreManager.notify('offset');
   StoreManager.setData('appStatus', 'normal');

@@ -42,8 +42,8 @@ export default class ResultsView {
       'onwheel' in document
         ? 'wheel'
         : 'onmousewheel' in document
-          ? 'mousewheel'
-          : 'DOMMouseScroll';
+        ? 'mousewheel'
+        : 'DOMMouseScroll';
     this.tbody.addEventListener(mousewheelevent, this.scroll.bind(this));
 
     // カラムの表示を制御するためのスタイルシート
@@ -54,15 +54,20 @@ export default class ResultsView {
   }
 
   updateDisplaySize() {
+    if (StoreManager.getData('isFetching')) {
+      // フェッチ中は処理をスキップ
+      return;
+    }
+
     // 表示数
     const maxRowCount = Math.floor(
-      (window.innerHeight -
-        this.tbody.getBoundingClientRect().top -
-        StoreManager.getData('karyotype').height -
-        COMMON_FOOTER_HEIGHT -
-        2) /
-      TR_HEIGHT
-    ),
+        (window.innerHeight -
+          this.tbody.getBoundingClientRect().top -
+          StoreManager.getData('karyotype').height -
+          COMMON_FOOTER_HEIGHT -
+          2) /
+          TR_HEIGHT
+      ),
       numberOfRecords = StoreManager.getData('numberOfRecords'),
       offset = StoreManager.getData('offset'),
       rowCount = Math.min(maxRowCount, numberOfRecords);
@@ -88,13 +93,18 @@ export default class ResultsView {
         StoreManager.setData('offset', 0);
       }
     }
+
+    // 行の更新を確実に行う
+    requestAnimationFrame(() => {
+      this.rows.forEach((row) => row.update());
+    });
   }
 
   scroll(e) {
     e.stopPropagation();
     const totalHeight = StoreManager.getData('numberOfRecords') * TR_HEIGHT;
     let availableScrollY =
-      totalHeight - StoreManager.getData('rowCount') * TR_HEIGHT,
+        totalHeight - StoreManager.getData('rowCount') * TR_HEIGHT,
       wheelScroll;
     availableScrollY = availableScrollY < 0 ? 0 : availableScrollY;
     // 縦方向にスクロールしていない場合スルー
@@ -162,7 +172,29 @@ export default class ResultsView {
   }
 
   searchResults(_results) {
+    if (StoreManager.getData('isUpdating')) {
+      // データ更新中は処理を遅延
+      setTimeout(() => this.searchResults(_results), 100);
+      return;
+    }
+
+    if (!this._validateData()) {
+      console.warn('データの検証に失敗しました');
+      return;
+    }
+
     this.updateDisplaySize();
+  }
+
+  _validateData() {
+    const results = StoreManager.getData('searchResults');
+    const numberOfRecords = StoreManager.getData('numberOfRecords');
+
+    return (
+      Array.isArray(results) &&
+      typeof numberOfRecords === 'number' &&
+      numberOfRecords >= 0
+    );
   }
 
   // カラムの表示／非表示
@@ -176,8 +208,9 @@ export default class ResultsView {
       const column = columns[i];
       this.stylesheet.sheet.insertRule(
         `
-      .tablecontainer > table.results-view th.${column.id
-        }, .tablecontainer > table.results-view td.${column.id} {
+      .tablecontainer > table.results-view th.${
+        column.id
+      }, .tablecontainer > table.results-view td.${column.id} {
         display: ${column.isUsed ? 'table-cell' : 'none'}
       }`,
         i

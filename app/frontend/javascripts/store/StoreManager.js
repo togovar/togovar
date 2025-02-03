@@ -1,5 +1,9 @@
-import { _handleHistoryChange, _reflectSimpleSearchConditionToURI, setAdvancedSearchCondition } from '../store/searchManager.js';
-import { executeSearch } from '../api/fetchData.js'
+import {
+  _handleHistoryChange,
+  _reflectSimpleSearchConditionToURI,
+  setAdvancedSearchCondition,
+} from '../store/searchManager.js';
+import { executeSearch } from '../api/fetchData.js';
 
 // class StoreManager extends FormatData {
 class StoreManager {
@@ -14,6 +18,7 @@ class StoreManager {
       appStatus: 'preparing',
       isFetching: false,
       isLogin: false,
+      isUpdating: false,
     };
 
     this.initSearchCondition();
@@ -32,50 +37,56 @@ class StoreManager {
   }
 
   /** 検索結果を保存し、状態を更新する
- * @param {Array} records - 取得した検索結果データの配列
- * @param {Number} offset - 追加する検索結果の開始位置 */
+   * @param {Array} records - 取得した検索結果データの配列
+   * @param {Number} offset - 追加する検索結果の開始位置 */
   setResults(records, offset) {
-    // 既存の検索結果に新しいデータを追加
-    records?.forEach((record, index) => {
-      this._store.searchResults[offset + index] = record;
-    });
-    // console.log('records', records, 'offset', offset, 'searchResults', this.getData('searchResults'))
+    try {
+      this._store.isUpdating = true;
 
-    // 検索結果の更新を通知
-    this.notify('searchResults');
+      // 新しい配列を作成して更新
+      const updatedResults = Array(this._store.numberOfRecords).fill(null);
 
-    // データ取得中のフラグを解除
-    this.setData('isFetching', false);
+      // 既存のデータをコピー
+      this._store.searchResults.forEach((record, index) => {
+        if (record) {
+          updatedResults[index] = record;
+        }
+      });
+
+      // 新しいデータを追加
+      records?.forEach((record, index) => {
+        updatedResults[offset + index] = record;
+      });
+
+      this._store.searchResults = updatedResults;
+      this.notify('searchResults');
+    } finally {
+      this._store.isUpdating = false;
+      this.setData('isFetching', false);
+    }
   }
 
   /** 指定されたインデックスのレコードを取得
-  * レコードが存在しない場合は検索を実行し、ステータスを 'loading' に設定します。
-  * @param {number} index - 取得するレコードのインデックス
-  * @returns {*} - レコードのコピー、'loading' または 'out of range' */
+   * レコードが存在しない場合は検索を実行し、ステータスを 'loading' に設定します。
+   * @param {number} index - 取得するレコードのインデックス
+   * @returns {*} - レコードのコピー、'loading' または 'out of range' */
   getRecordByIndex(index) {
-    // console.log("a")
     const recordIndex = this._store.offset + index;
 
-    // インデックスが範囲内か確認
+    if (this._store.isUpdating) {
+      return 'loading';
+    }
+
     if (recordIndex < this._store.numberOfRecords) {
       const record = this._store.searchResults[recordIndex];
-
-      // レコードが存在する場合はコピーを返す
       if (record) {
-        // console.log('record 存在する')
         return this._copy(record);
       } else {
-        // レコードが存在しない場合は検索を実行し、ステータスを 'loading' に設定
-        // console.log('record 再検索する')
         executeSearch(this._store.offset + index);
-        this.setData('appStatus', 'loading');
         return 'loading';
       }
-    } else {
-      // インデックスが範囲外の場合
-      // console.log('record out of range')
-      return 'out of range';
     }
+    return 'out of range';
   }
 
   // どのPanelViewが呼ばれるかを判定するための関数
@@ -94,7 +105,7 @@ class StoreManager {
    * @param {*} newValue - 保存するデータ  */
   setData(key, newValue) {
     // 当該データを持っていないか、当該データが不一致であれば、データをセット
-    const isUndefined = this._store[key] === undefined
+    const isUndefined = this._store[key] === undefined;
 
     // データが変更されたか確認
     const isMutated =
@@ -113,7 +124,7 @@ class StoreManager {
     try {
       if (window.location.origin === 'http://localhost:8000') {
         this.setData('isLogin', true);
-        return
+        return;
       }
 
       const timeout = new Promise((_, reject) =>
@@ -135,7 +146,6 @@ class StoreManager {
     }
   }
 
-
   /** 指定されたキーにターゲットをバインドする
    * @param {string} key - データ変更を監視するキー
    * @param {Object} target - キー変更時に通知を受け取るオブジェクト */
@@ -150,10 +160,10 @@ class StoreManager {
   }
 
   /**  指定されたキーに関連するすべてのオブジェクトに変更を通知する
-  * @param {string} key - 変更が発生したデータのキー */
+   * @param {string} key - 変更が発生したデータのキー */
   notify(key) {
     if (this._bindings[key]) {
-      this._bindings[key].forEach(observer => {
+      this._bindings[key].forEach((observer) => {
         const valueCopy = this._copy(this._store[key]);
         if (typeof observer[key] === 'function') {
           observer[key](valueCopy);
@@ -169,8 +179,8 @@ class StoreManager {
   }
 
   /** Deep copy the provided value.
-  * @param {*} value - The value to copy.
-  * @returns {*} - The copied value. */
+   * @param {*} value - The value to copy.
+   * @returns {*} - The copied value. */
   _copy(value) {
     switch (true) {
       case Array.isArray(value):
@@ -184,34 +194,45 @@ class StoreManager {
 
   // Bindings *******************************************
   /** 検索モードを変更する
-  * @param {string} mode - 'simple' または 'advanced' */
+   * @param {string} mode - 'simple' または 'advanced' */
   searchMode(mode) {
     // 変更前の検索モードと異なる場合のみ処理
     if (this.getData('lastSearchMode') === mode) return;
 
     // 検索モードを更新
-    this.setData('lastSearchMode', mode)
+    this.setData('lastSearchMode', mode);
 
-    // body に `data-search-mode` を追加（CSS や UI の変更用）
-    document.body.dataset.searchMode = mode;
-    // TODO: 変更前の検索モードの検索条件の保存?
-    // TODO: 検索条件のコンバート?
-    // TODO: 検索条件のクリア（あるいは復帰）
-    switch (mode) {
-      case 'simple':
-        _reflectSimpleSearchConditionToURI()
-        this.notify('simpleSearchConditions');
-        this.setData('appStatus', 'searching');
-        executeSearch(0, true);
-        break;
-      case 'advanced': {
-        const condition = this.getData('advancedSearchConditions');
-        setAdvancedSearchCondition(condition);
+    // 検索モード切り替え時にリセット
+    this._store.isUpdating = true; // 更新中フラグを立てて不要な描画を防ぐ
+    try {
+      this.setData('offset', 0);
+      this.setData('selectedRow', undefined);
+      this.setData('searchResults', []);
+      this.setData('numberOfRecords', 0);
+      this.setData('rowCount', 0); // 行数もリセット
+
+      // body に `data-search-mode` を追加（CSS や UI の変更用）
+      document.body.dataset.searchMode = mode;
+
+      switch (mode) {
+        case 'simple':
+          _reflectSimpleSearchConditionToURI();
+          this.notify('simpleSearchConditions');
+          break;
+        case 'advanced':
+          {
+            const condition = this.getData('advancedSearchConditions');
+            setAdvancedSearchCondition(condition);
+          }
+          break;
       }
-        break;
+
+      // 検索を開始（モード切り替え時は必ず初回検索として扱う）
+      this.setData('appStatus', 'searching');
+      executeSearch(0, true);
+    } finally {
+      this._store.isUpdating = false;
     }
-    // 検索を開始
-    this.setData('appStatus', 'searching');
   }
 }
 
