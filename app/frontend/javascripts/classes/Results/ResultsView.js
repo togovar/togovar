@@ -42,8 +42,8 @@ export default class ResultsView {
       'onwheel' in document
         ? 'wheel'
         : 'onmousewheel' in document
-        ? 'mousewheel'
-        : 'DOMMouseScroll';
+          ? 'mousewheel'
+          : 'DOMMouseScroll';
     this.tbody.addEventListener(mousewheelevent, this.scroll.bind(this));
 
     // カラムの表示を制御するためのスタイルシート
@@ -61,13 +61,13 @@ export default class ResultsView {
 
     // 表示数
     const maxRowCount = Math.floor(
-        (window.innerHeight -
-          this.tbody.getBoundingClientRect().top -
-          StoreManager.getData('karyotype').height -
-          COMMON_FOOTER_HEIGHT -
-          2) /
-          TR_HEIGHT
-      ),
+      (window.innerHeight -
+        this.tbody.getBoundingClientRect().top -
+        StoreManager.getData('karyotype').height -
+        COMMON_FOOTER_HEIGHT -
+        2) /
+      TR_HEIGHT
+    ),
       numberOfRecords = StoreManager.getData('numberOfRecords'),
       offset = StoreManager.getData('offset'),
       rowCount = Math.min(maxRowCount, numberOfRecords);
@@ -96,7 +96,7 @@ export default class ResultsView {
 
     // 行の更新を確実に行う
     requestAnimationFrame(() => {
-      this.rows.forEach((row) => row.update());
+      this.rows.forEach((row) => row.updateTableRow());
     });
   }
 
@@ -104,7 +104,7 @@ export default class ResultsView {
     e.stopPropagation();
     const totalHeight = StoreManager.getData('numberOfRecords') * TR_HEIGHT;
     let availableScrollY =
-        totalHeight - StoreManager.getData('rowCount') * TR_HEIGHT,
+      totalHeight - StoreManager.getData('rowCount') * TR_HEIGHT,
       wheelScroll;
     availableScrollY = availableScrollY < 0 ? 0 : availableScrollY;
     // 縦方向にスクロールしていない場合スルー
@@ -171,10 +171,16 @@ export default class ResultsView {
     }
   }
 
-  searchResults(_results) {
-    if (StoreManager.getData('isUpdating')) {
-      // データ更新中は処理を遅延
-      setTimeout(() => this.searchResults(_results), 100);
+  searchResults(_results, retryCount = 0) {
+    const MAX_RETRIES = 10; // 最大リトライ回数
+
+    if (StoreManager.getData('isStoreUpdating')) {
+      if (retryCount < MAX_RETRIES) {
+        // データ更新中は処理を遅延 (最大リトライ回数を設定)
+        setTimeout(() => this.searchResults(_results, retryCount + 1), 100);
+      } else {
+        console.warn('データ更新が長すぎます。処理を中断しました');
+      }
       return;
     }
 
@@ -183,11 +189,13 @@ export default class ResultsView {
       return;
     }
 
-    if (_results) {
+    if (_results !== undefined && _results !== null) {
       this.updateDisplaySize();
+    } else if (retryCount < MAX_RETRIES) {
+      // 結果が undefined / null なら一定回数リトライ
+      setTimeout(() => this.searchResults(_results, retryCount + 1), 100);
     } else {
-      setTimeout(() => this.searchResults(_results), 100);
-      return;
+      console.warn('検索結果が取得できませんでした');
     }
   }
 
@@ -213,9 +221,8 @@ export default class ResultsView {
       const column = columns[i];
       this.stylesheet.sheet.insertRule(
         `
-      .tablecontainer > table.results-view th.${
-        column.id
-      }, .tablecontainer > table.results-view td.${column.id} {
+      .tablecontainer > table.results-view th.${column.id
+        }, .tablecontainer > table.results-view td.${column.id} {
         display: ${column.isUsed ? 'table-cell' : 'none'}
       }`,
         i

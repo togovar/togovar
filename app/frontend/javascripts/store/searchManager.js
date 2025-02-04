@@ -21,7 +21,7 @@ export function _setSimpleSearchConditions(newSearchConditions, isFromHistory) {
   });
 
   // 履歴からの呼び出しでない場合、URLパラメータを更新
-  if (!isFromHistory) _reflectSimpleSearchConditionToURI();
+  if (!isFromHistory) reflectSimpleSearchConditionToURI();
 
   StoreManager.notify('simpleSearchConditions');
   StoreManager.setData('appStatus', 'searching');
@@ -140,7 +140,7 @@ export function extractSearchCondition(currentConditions) {
 }
 
 /** 現在のSimple Searchの条件をURLパラメータに反映する */
-export function _reflectSimpleSearchConditionToURI() {
+export function reflectSimpleSearchConditionToURI() {
   // デフォルト値と異なる検索条件を抽出
   const currentConditions = StoreManager._store.simpleSearchConditions;
   const diffConditions = extractSearchCondition(currentConditions);
@@ -168,7 +168,7 @@ function _reflectAdvancedSearchConditionToURI() {
 // 動かないからチェック
 /** ブラウザの「戻る」「進む」ボタンが押されたときに検索条件を更新
 * @param {Event} event - popstate イベント */
-export function _handleHistoryChange(_e) {
+export function handleHistoryChange(_e) {
   // 現在のURLからクエリパラメータを取得
   const urlParams = qs.parse(window.location.search.substring(1));
 

@@ -15,17 +15,14 @@ export default class ResultsRowView {
     this.tr.addEventListener('click', this.click.bind(this));
     StoreManager.bind('selectedRow', this);
     StoreManager.bind('offset', this);
-    StoreManager.bind('rowCount', this);
+    // StoreManager.bind('rowCount', this);   // TODO: 必要ないようであれば削除する
   }
 
   click() {
     StoreManager.setData('selectedRow', this.selected ? undefined : this.index);
   }
 
-  offset() {
-    this.update();
-  }
-
+  // bindings ///////////////////////////
   selectedRow(index) {
     if (index === this.index) {
       this.selected = true;
@@ -36,123 +33,21 @@ export default class ResultsRowView {
     }
   }
 
-  rowCount() {
-    this.update();
+  offset() {
+    this.updateTableRow();
   }
 
-  prepareTableData() {
-    let html = '';
-    for (const column of COLUMNS) {
-      switch (column.id) {
-        case 'togovar_id': // tgv
-          html +=
-            '<td class="togovar_id"><a href="" class="hyper-text -internal" target="_blank"></a></td>';
-          break;
-        case 'refsnp_id': // refSNP
-          html += `<td class="refsnp_id" data-remains=""><a href="" target="_blank" class="hyper-text -external"></a></td>`;
-          break;
-        case 'position': // position
-          html += `<td class="position"><div class="chromosome-position"><div class="chromosome"></div><div class="coordinate"></div></div></td>`;
-          break;
-        case 'ref_alt': // ref alt
-          html += `<td class="ref_alt"><div class="ref-alt"><span class="ref" data-sum=""></span><span class="arrow"></span><span class="alt" data-sum=""><span class="sum"></span></span></div></td>`;
-          break;
-        case 'type': // variant type
-          html += `<td class="type"><div class="variant-type"></div></td>`;
-          break;
-        case 'gene': // gene symbol
-          html +=
-            '<td class="gene" data-remains=""><a href="" class="hyper-text -internal" target="_blank"></a></td>';
-          break;
-        case 'alt_frequency': // frequency
-          {
-            const master = getSimpleSearchConditionMaster('dataset');
-            html += `<td class="alt_frequency">
-              ${master.items
-                .map((dataset) => {
-                  if (!dataset.has_freq) return '';
-                  return `
-                <logarithmized-block-graph-frequency-view
-                  data-dataset="${dataset.id}"
-                  data-direction="vertical"
-                ></logarithmized-block-graph-frequency-view>
-                `;
-                })
-                .join('')}
-              </td>`;
-          }
-          break;
-        case 'consequence': // consequence
-          html +=
-            '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>';
-          break;
-        case 'clinical_significance': // clinical significance
-          html +=
-            '<td class="clinical_significance"><div class="clinical-significance" data-value=""></div><a class="hyper-text -internal" href="" target="_blank"></a><span class="icon" data-remains="" data-mgend=""></span></td>';
-          break;
-        case 'alphamissense': // AlphaMissense
-          html +=
-            '<td class="alphamissense"><div class="variant-function" data-function=""></div></td>';
-          break;
-        case 'sift': // SIFT
-          html +=
-            '<td class="sift"><div class="variant-function" data-function=""></div></td>';
-          break;
-        case 'polyphen': // PolyPhen
-          html +=
-            '<td class="polyphen"><div class="variant-function" data-function=""></div></td>';
-          break;
-      }
-    }
-    this.tr.innerHTML = html;
-    this.tdTGVAnchor = this.tr.querySelector('td.togovar_id > a');
-    this.tdRS = this.tr.querySelector('td.refsnp_id');
-    this.tdRSAnchor = this.tdRS.querySelector('a');
-    const tdPosition = this.tr.querySelector(
-      'td.position > .chromosome-position'
-    );
-    this.tdPositionChromosome = tdPosition.querySelector('.chromosome');
-    this.tdPositionCoordinate = tdPosition.querySelector('.coordinate');
-    const tdRefAlt = this.tr.querySelector('td.ref_alt > .ref-alt');
-    this.tdRefAltRef = tdRefAlt.querySelector('.ref');
-    this.tdRefAltAlt = tdRefAlt.querySelector('.alt');
-    this.tdType = this.tr.querySelector('td.type > .variant-type');
-    this.tdGene = this.tr.querySelector('td.gene');
-    this.tdGeneAnchor = this.tdGene.querySelector('a');
-    this.tdFrequencies = {};
-    this.tr
-      .querySelectorAll(
-        'td.alt_frequency > logarithmized-block-graph-frequency-view'
-      )
-      .forEach((elm) => (this.tdFrequencies[elm.dataset.dataset] = elm));
-    // Consequence
-    this.tdConsequence = this.tr.querySelector('td.consequence');
-    this.tdConsequenceItem =
-      this.tdConsequence.querySelector('.consequence-item');
-    // SIFT
-    this.tdSift = this.tr.querySelector('td.sift');
-    this.tdSiftFunction = this.tdSift.querySelector('.variant-function');
-    // PolyPhen
-    this.tdPolyphen = this.tr.querySelector('td.polyphen');
-    this.tdPolyphenFunction =
-      this.tdPolyphen.querySelector('.variant-function');
-    // AlphaMissense
-    this.tdAlphaMissense = this.tr.querySelector('td.alphamissense');
-    this.tdAlphaMissenseFunction =
-      this.tdAlphaMissense.querySelector('.variant-function');
-    // Clinical significance
-    this.tdClinical = this.tr.querySelector('td.clinical_significance');
-    this.tdClinicalSign = this.tdClinical.querySelector(
-      '.clinical-significance'
-    );
-    this.tdClinicalAnchor = this.tdClinical.querySelector('a');
-    this.tdClinicalIcon = this.tdClinical.querySelector('.icon');
-  }
+  // TODO: 必要ないようであれば削除する
+  // rowCount() {
+  //   this.updateTableRow();
+  // }
+  ///////////////////////////////////////
 
-  update() {
+  // TODO: いずれこの関数を短くして短くして整理する。
+  updateTableRow() {
     if (
       StoreManager.getData('isFetching') ||
-      StoreManager.getData('isUpdating')
+      StoreManager.getData('isStoreUpdating')
     ) {
       this.tr.classList.add('-loading');
       this.tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
@@ -175,7 +70,7 @@ export default class ResultsRowView {
 
     // データが有効な場合のみ表示を更新
     if (this.tr.classList.contains('-loading')) {
-      this.prepareTableData();
+      this.#prepareTableData();
     }
 
     this.tr.classList.remove('-loading');
@@ -257,8 +152,8 @@ export default class ResultsRowView {
               if (!dataset.has_freq) continue;
               const frequency = result.frequencies
                 ? result.frequencies.find(
-                    (frequency) => frequency.source === dataset.id
-                  )
+                  (frequency) => frequency.source === dataset.id
+                )
                 : undefined;
               this.tdFrequencies[dataset.id].frequency = frequency;
             }
@@ -396,5 +291,114 @@ export default class ResultsRowView {
           break;
       }
     }
+  }
+
+  #prepareTableData() {
+    let html = '';
+    for (const column of COLUMNS) {
+      switch (column.id) {
+        case 'togovar_id': // tgv
+          html +=
+            '<td class="togovar_id"><a href="" class="hyper-text -internal" target="_blank"></a></td>';
+          break;
+        case 'refsnp_id': // refSNP
+          html += `<td class="refsnp_id" data-remains=""><a href="" target="_blank" class="hyper-text -external"></a></td>`;
+          break;
+        case 'position': // position
+          html += `<td class="position"><div class="chromosome-position"><div class="chromosome"></div><div class="coordinate"></div></div></td>`;
+          break;
+        case 'ref_alt': // ref alt
+          html += `<td class="ref_alt"><div class="ref-alt"><span class="ref" data-sum=""></span><span class="arrow"></span><span class="alt" data-sum=""><span class="sum"></span></span></div></td>`;
+          break;
+        case 'type': // variant type
+          html += `<td class="type"><div class="variant-type"></div></td>`;
+          break;
+        case 'gene': // gene symbol
+          html +=
+            '<td class="gene" data-remains=""><a href="" class="hyper-text -internal" target="_blank"></a></td>';
+          break;
+        case 'alt_frequency': // frequency
+          {
+            const master = getSimpleSearchConditionMaster('dataset');
+            html += `<td class="alt_frequency">
+              ${master.items
+                .map((dataset) => {
+                  if (!dataset.has_freq) return '';
+                  return `
+                <logarithmized-block-graph-frequency-view
+                  data-dataset="${dataset.id}"
+                  data-direction="vertical"
+                ></logarithmized-block-graph-frequency-view>
+                `;
+                })
+                .join('')}
+              </td>`;
+          }
+          break;
+        case 'consequence': // consequence
+          html +=
+            '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>';
+          break;
+        case 'clinical_significance': // clinical significance
+          html +=
+            '<td class="clinical_significance"><div class="clinical-significance" data-value=""></div><a class="hyper-text -internal" href="" target="_blank"></a><span class="icon" data-remains="" data-mgend=""></span></td>';
+          break;
+        case 'alphamissense': // AlphaMissense
+          html +=
+            '<td class="alphamissense"><div class="variant-function" data-function=""></div></td>';
+          break;
+        case 'sift': // SIFT
+          html +=
+            '<td class="sift"><div class="variant-function" data-function=""></div></td>';
+          break;
+        case 'polyphen': // PolyPhen
+          html +=
+            '<td class="polyphen"><div class="variant-function" data-function=""></div></td>';
+          break;
+      }
+    }
+    this.tr.innerHTML = html;
+    this.tdTGVAnchor = this.tr.querySelector('td.togovar_id > a');
+    this.tdRS = this.tr.querySelector('td.refsnp_id');
+    this.tdRSAnchor = this.tdRS.querySelector('a');
+    const tdPosition = this.tr.querySelector(
+      'td.position > .chromosome-position'
+    );
+    this.tdPositionChromosome = tdPosition.querySelector('.chromosome');
+    this.tdPositionCoordinate = tdPosition.querySelector('.coordinate');
+    const tdRefAlt = this.tr.querySelector('td.ref_alt > .ref-alt');
+    this.tdRefAltRef = tdRefAlt.querySelector('.ref');
+    this.tdRefAltAlt = tdRefAlt.querySelector('.alt');
+    this.tdType = this.tr.querySelector('td.type > .variant-type');
+    this.tdGene = this.tr.querySelector('td.gene');
+    this.tdGeneAnchor = this.tdGene.querySelector('a');
+    this.tdFrequencies = {};
+    this.tr
+      .querySelectorAll(
+        'td.alt_frequency > logarithmized-block-graph-frequency-view'
+      )
+      .forEach((elm) => (this.tdFrequencies[elm.dataset.dataset] = elm));
+    // Consequence
+    this.tdConsequence = this.tr.querySelector('td.consequence');
+    this.tdConsequenceItem =
+      this.tdConsequence.querySelector('.consequence-item');
+    // SIFT
+    this.tdSift = this.tr.querySelector('td.sift');
+    this.tdSiftFunction = this.tdSift.querySelector('.variant-function');
+    // PolyPhen
+    this.tdPolyphen = this.tr.querySelector('td.polyphen');
+    this.tdPolyphenFunction =
+      this.tdPolyphen.querySelector('.variant-function');
+    // AlphaMissense
+    this.tdAlphaMissense = this.tr.querySelector('td.alphamissense');
+    this.tdAlphaMissenseFunction =
+      this.tdAlphaMissense.querySelector('.variant-function');
+    // Clinical significance
+    this.tdClinical = this.tr.querySelector('td.clinical_significance');
+    this.tdClinicalSign = this.tdClinical.querySelector(
+      '.clinical-significance'
+    );
+    this.tdClinicalAnchor = this.tdClinical.querySelector('a');
+    this.tdClinicalIcon = this.tdClinical.querySelector('.icon');
   }
 }

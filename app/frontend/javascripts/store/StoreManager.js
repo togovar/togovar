@@ -1,6 +1,6 @@
 import {
-  _handleHistoryChange,
-  _reflectSimpleSearchConditionToURI,
+  handleHistoryChange,
+  reflectSimpleSearchConditionToURI,
   setAdvancedSearchCondition,
 } from '../store/searchManager.js';
 import { executeSearch } from '../api/fetchData.js';
@@ -16,9 +16,9 @@ class StoreManager {
       offset: 0,
       rowCount: 0,
       appStatus: 'preparing',
-      isFetching: false,
       isLogin: false,
-      isUpdating: false,
+      isFetching: false,
+      isStoreUpdating: false,  // storeの更新中かどうか
     };
 
     this.initSearchCondition();
@@ -28,7 +28,7 @@ class StoreManager {
     // this._isReady = false;
     this.setData('isFetching', false);
     // events
-    window.addEventListener('popstate', _handleHistoryChange.bind(this));
+    window.addEventListener('popstate', handleHistoryChange.bind(this));
     this.bind('searchMode', this);
   }
 
@@ -41,7 +41,7 @@ class StoreManager {
    * @param {Number} offset - 追加する検索結果の開始位置 */
   setResults(records, offset) {
     try {
-      this._store.isUpdating = true;
+      this._store.isStoreUpdating = true;
 
       // 新しい配列を作成して更新
       const updatedResults = Array(this._store.numberOfRecords).fill(null);
@@ -61,7 +61,7 @@ class StoreManager {
       this._store.searchResults = updatedResults;
       this.notify('searchResults');
     } finally {
-      this._store.isUpdating = false;
+      this._store.isStoreUpdating = false;
       this.setData('isFetching', false);
     }
   }
@@ -73,7 +73,7 @@ class StoreManager {
   getRecordByIndex(index) {
     const recordIndex = this._store.offset + index;
 
-    if (this._store.isUpdating) {
+    if (this._store.isStoreUpdating) {
       return 'loading';
     }
 
@@ -203,7 +203,7 @@ class StoreManager {
     this.setData('lastSearchMode', mode);
 
     // 検索モード切り替え時にリセット
-    this._store.isUpdating = true; // 更新中フラグを立てて不要な描画を防ぐ
+    this._store.isStoreUpdating = true; // 更新中フラグを立てて不要な描画を防ぐ
     try {
       this.setData('offset', 0);
       this.setData('selectedRow', undefined);
@@ -216,7 +216,7 @@ class StoreManager {
 
       switch (mode) {
         case 'simple':
-          _reflectSimpleSearchConditionToURI();
+          reflectSimpleSearchConditionToURI();
           this.notify('simpleSearchConditions');
           break;
         case 'advanced':
@@ -231,7 +231,7 @@ class StoreManager {
       this.setData('appStatus', 'searching');
       executeSearch(0, true);
     } finally {
-      this._store.isUpdating = false;
+      this._store.isStoreUpdating = false;
     }
   }
 }

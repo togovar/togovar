@@ -16,18 +16,17 @@ let lastRequestRanges = new Set(); // 取得済みの範囲を管理
  * @param {Number} offset - 検索開始位置
  * @param {Boolean} isFirstTime - 最初の検索かどうか */
 export const executeSearch = (() => {
-  return _.debounce((offset = 0, isFirstTime = false, isAbort = false) => {
-    // モード切り替え時のみキャンセル
+  return _.debounce((offset = 0, isFirstTime = false) => {
     const newSearchMode = StoreManager.getData('searchMode');
-    if (_currentSearchMode && _currentSearchMode !== newSearchMode) {
-      if (currentAbortController) {
-        currentAbortController.abort();
-      }
+    if (!isFirstTime && _currentSearchMode !== newSearchMode) {
+      // mode切替時
+      currentAbortController.abort(); // Abort処理
       _currentSearchMode = newSearchMode;
-      isFirstTime = true;
+      isFirstTime = true;  // データリセットのため
       lastRequestRanges.clear(); // モード切り替え時にクリア
-    } else if (!isFirstTime) {
-      // スクロール時のデータ取得判定
+
+    } else {
+      // スクロール時
       const offsetStart = offset - (offset % LIMIT);
       const rangeKey = `${offsetStart}-${offsetStart + LIMIT}`;
 
@@ -41,6 +40,7 @@ export const executeSearch = (() => {
       }
     }
 
+    // 現在の検索モードを保存
     _currentSearchMode = newSearchMode;
 
     // 新しい AbortController を作成
@@ -53,19 +53,13 @@ export const executeSearch = (() => {
       lastRequestRanges.clear(); // リセット時にクリア
     }
 
-    // 検索条件を保存
-    const previousConditions = JSON.stringify(
-      StoreManager.getData('simpleSearchConditions')
-    );
-
     // フェッチフラグを設定
     StoreManager.setData('isFetching', true);
 
     // API のエンドポイントを取得
     const apiEndpoints = _determineSearchEndpoints(
       offset,
-      isFirstTime,
-      isAbort
+      isFirstTime
     );
 
     // API リクエストオプションを設定
@@ -73,7 +67,7 @@ export const executeSearch = (() => {
 
     // データ取得
     apiEndpoints?.forEach((endpoint) => {
-      _fetchData(endpoint, requestOptions, previousConditions);
+      _fetchData(endpoint, requestOptions);
     });
   }, 100);
 })();
@@ -92,7 +86,7 @@ function _resetSearchResults() {
  * @param {Number} offset - 検索開始位置
  * @param {Boolean} isFirstTime - 最初の検索かどうか
  * @returns {Array} API コール用の URL リスト */
-function _determineSearchEndpoints(offset, isFirstTime, isAbort) {
+function _determineSearchEndpoints(offset, isFirstTime) {
   let basePath;
   let conditions = '';
 
@@ -103,13 +97,10 @@ function _determineSearchEndpoints(offset, isFirstTime, isAbort) {
       conditions = qs.stringify(
         extractSearchCondition(StoreManager.getData('simpleSearchConditions'))
       );
-      basePath = `${API_URL}/search?offset=${offsetStart}${
-        conditions ? '&' + conditions : ''
-      }`;
+      basePath = `${API_URL}/search?offset=${offsetStart}${conditions ? '&' + conditions : ''
+        }`;
 
-      return isAbort
-        ? [`${basePath}&stat=1&data=0`]
-        : isFirstTime
+      return isFirstTime
         ? [`${basePath}&stat=0&data=1`, `${basePath}&stat=1&data=0`]
         : [`${basePath}&stat=0&data=1`];
     }
@@ -118,9 +109,7 @@ function _determineSearchEndpoints(offset, isFirstTime, isAbort) {
       // Advanced searchの場合は元のoffsetをそのまま使用
       basePath = `${API_URL}/api/search/variant`;
 
-      return isAbort
-        ? [`${basePath}?stat=1&data=0`]
-        : isFirstTime
+      return isFirstTime
         ? [`${basePath}?stat=0&data=1`, `${basePath}?stat=1&data=0`]
         : [`${basePath}?stat=0&data=1`];
     }
@@ -158,9 +147,8 @@ function _getRequestOptions(signal) {
 
 /** データを取得して結果を更新
  * @param {String} endpoint - API エンドポイント
- * @param {Object} options - Fetch リクエストオプション
- * @param {String} previousConditions - 直前の検索条件（比較用） */
-async function _fetchData(endpoint, options, previousConditions) {
+ * @param {Object} options - Fetch リクエストオプション */
+async function _fetchData(endpoint, options) {
   try {
     const response = await fetch(endpoint, options);
     if (!response.ok) {
@@ -178,12 +166,9 @@ async function _fetchData(endpoint, options, previousConditions) {
       }
     }
 
-    await _updateAppState(previousConditions);
+    await _updateAppState();
   } catch (error) {
-    if (error.name === 'AbortError') {
-      console.log('Fetch aborted');
-      return;
-    }
+    if (error.name === 'AbortError') return;
     console.error('Fetch error:', error);
     StoreManager.setData('isFetching', false);
   }
@@ -233,17 +218,8 @@ function _processStatistics(json) {
   StoreManager.setData('statisticsConsequence', json.statistics.consequence); // consequence
 }
 
-/** 検索状態を更新し、条件が変わっていた場合は再検索
- * @param {String} previousConditions - 直前の検索条件（比較用） */
-async function _updateAppState(previousConditions) {
-  //検索中に条件が変更されていたら、再検索する(いらないかも)
-  if (
-    previousConditions !==
-    JSON.stringify(StoreManager.getData('simpleSearchConditions'))
-  ) {
-    _setSimpleSearchConditions({});
-  }
-
+/** 検索状態を更新し、条件が変わっていた場合は再検索 */
+async function _updateAppState() {
   // is Login
   await StoreManager.fetchLoginStatus();
 
@@ -262,6 +238,6 @@ async function _updateAppState(previousConditions) {
       );
   }
 
-  StoreManager.notify('offset');
-  StoreManager.setData('appStatus', 'normal');
+  // StoreManager.notify('offset'); // 使用されれてないと思われるのでコメントアウト
+  StoreManager.setData('appStatus', 'normal'); // TODO: 変数名変更する Result画面の全体Loadingicon
 }
