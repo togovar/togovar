@@ -171,16 +171,10 @@ export default class ResultsView {
     }
   }
 
-  searchResults(_results, retryCount = 0) {
-    const MAX_RETRIES = 10; // 最大リトライ回数
-
+  searchResults(_results) {
     if (StoreManager.getData('isStoreUpdating')) {
-      if (retryCount < MAX_RETRIES) {
-        // データ更新中は処理を遅延 (最大リトライ回数を設定)
-        setTimeout(() => this.searchResults(_results, retryCount + 1), 100);
-      } else {
-        console.warn('データ更新が長すぎます。処理を中断しました');
-      }
+      // データ更新中は処理を遅延
+      setTimeout(() => this.searchResults(_results), 100);
       return;
     }
 
@@ -189,14 +183,10 @@ export default class ResultsView {
       return;
     }
 
-    if (_results !== undefined && _results !== null) {
+    // TODO: data取得と描画のタイミングをずらすために、requestAnimationFrameを使用
+    requestAnimationFrame(() => {
       this.updateDisplaySize();
-    } else if (retryCount < MAX_RETRIES) {
-      // 結果が undefined / null なら一定回数リトライ
-      setTimeout(() => this.searchResults(_results, retryCount + 1), 100);
-    } else {
-      console.warn('検索結果が取得できませんでした');
-    }
+    });
   }
 
   _validateData() {

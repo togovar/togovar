@@ -238,6 +238,6 @@ async function _updateAppState() {
       );
   }
 
-  // StoreManager.notify('offset'); // 使用されれてないと思われるのでコメントアウト
+  StoreManager.notify('offset');
   StoreManager.setData('appStatus', 'normal'); // TODO: 変数名変更する Result画面の全体Loadingicon
 }
