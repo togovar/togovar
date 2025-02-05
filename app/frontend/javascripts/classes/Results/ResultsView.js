@@ -1,5 +1,5 @@
 import StoreManager from '../../store/StoreManager.js';
-import ResultsRowView from './ResultsRowView.js';
+import ResultsRowView from './ResultsRowView.ts';
 import ScrollBar from './../ScrollBar.js';
 import { TR_HEIGHT, COMMON_FOOTER_HEIGHT, COLUMNS } from '../../global.js';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
@@ -61,13 +61,13 @@ export default class ResultsView {
 
     // 表示数
     const maxRowCount = Math.floor(
-      (window.innerHeight -
-        this.tbody.getBoundingClientRect().top -
-        StoreManager.getData('karyotype').height -
-        COMMON_FOOTER_HEIGHT -
-        2) /
-      TR_HEIGHT
-    ),
+        (window.innerHeight -
+          this.tbody.getBoundingClientRect().top -
+          StoreManager.getData('karyotype').height -
+          COMMON_FOOTER_HEIGHT -
+          2) /
+          TR_HEIGHT
+      ),
       numberOfRecords = StoreManager.getData('numberOfRecords'),
       offset = StoreManager.getData('offset'),
       rowCount = Math.min(maxRowCount, numberOfRecords);
@@ -104,7 +104,7 @@ export default class ResultsView {
     e.stopPropagation();
     const totalHeight = StoreManager.getData('numberOfRecords') * TR_HEIGHT;
     let availableScrollY =
-      totalHeight - StoreManager.getData('rowCount') * TR_HEIGHT,
+        totalHeight - StoreManager.getData('rowCount') * TR_HEIGHT,
       wheelScroll;
     availableScrollY = availableScrollY < 0 ? 0 : availableScrollY;
     // 縦方向にスクロールしていない場合スルー
@@ -184,9 +184,12 @@ export default class ResultsView {
     }
 
     // TODO: data取得と描画のタイミングをずらすために、requestAnimationFrameを使用
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       this.updateDisplaySize();
-    });
+    }, 1000);
+    // requestAnimationFrame(() => {
+    //   this.updateDisplaySize();
+    // });
   }
 
   _validateData() {
@@ -211,8 +214,9 @@ export default class ResultsView {
       const column = columns[i];
       this.stylesheet.sheet.insertRule(
         `
-      .tablecontainer > table.results-view th.${column.id
-        }, .tablecontainer > table.results-view td.${column.id} {
+      .tablecontainer > table.results-view th.${
+        column.id
+      }, .tablecontainer > table.results-view td.${column.id} {
         display: ${column.isUsed ? 'table-cell' : 'none'}
       }`,
         i
