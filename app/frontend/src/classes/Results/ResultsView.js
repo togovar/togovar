@@ -1,5 +1,5 @@
 import StoreManager from '../../store/StoreManager.js';
-import ResultsRowView from './ResultsRowView.ts';
+import { ResultsRowView } from './ResultsRowView.ts';
 import ScrollBar from './../ScrollBar.js';
 import { TR_HEIGHT, COMMON_FOOTER_HEIGHT, COLUMNS } from '../../global.js';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';

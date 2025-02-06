@@ -18,7 +18,7 @@ class StoreManager {
       appStatus: 'preparing',
       isLogin: false,
       isFetching: false,
-      isStoreUpdating: false,  // storeの更新中かどうか
+      isStoreUpdating: false, // storeの更新中かどうか
     };
 
     this.initSearchCondition();

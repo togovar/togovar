@@ -1,31 +1,31 @@
-import StoreManager from '../javascripts/store/StoreManager.js';
-import ResultsView from '../javascripts/classes/Results/ResultsView.js';
-import SideBar from '../javascripts/classes/SideBar.js';
-import Configuration from '../javascripts/classes/Configuration.js';
-import SelectedRowIndicator from '../javascripts/classes/SelectedRowIndicator.js';
-import Karyotype from '../javascripts/classes/Karyotype.js';
-import ActivityIndicator from '../javascripts/classes/ActivityIndicator.js';
-import ModuleTabsView from '../javascripts/classes/ModuleTabsView.js';
-// import CollapseView from '../javascripts/classes/CollapseView.js';
-import TopPageLayoutManager from '../javascripts/classes/TopPageLayoutManager.js';
+import StoreManager from '../src/store/StoreManager.js';
+import ResultsView from '../src/classes/Results/ResultsView.js';
+import SideBar from '../src/classes/SideBar.js';
+import Configuration from '../src/classes/Configuration.js';
+import SelectedRowIndicator from '../src/classes/SelectedRowIndicator.js';
+import Karyotype from '../src/classes/Karyotype.js';
+import ActivityIndicator from '../src/classes/ActivityIndicator.js';
+import ModuleTabsView from '../src/classes/ModuleTabsView.js';
+// import CollapseView from '../src/classes/CollapseView.js';
+import TopPageLayoutManager from '../src/classes/TopPageLayoutManager.js';
 import DownloadButton from './classes/DownloadButton.js';
 // Search
 import SimpleSearchView from './components/Common/SearchField/SimpleSearchView.js';
-import AdvancedSearchBuilderView from '../javascripts/classes/AdvancedSearchBuilderView.js';
+import AdvancedSearchBuilderView from '../src/classes/AdvancedSearchBuilderView.js';
 // PanelViews
 // PanelViews: Filters
-import PanelViewCheckList from '../javascripts/classes/PanelViewCheckList.js';
-import PanelViewFilterAlternativeAlleleFrequency from '../javascripts/classes/PanelViewFilterAlternativeAlleleFrequency.js';
-import PanelViewFilterVariantCallingQuality from '../javascripts/classes/PanelViewFilterVariantCallingQuality.js';
-import PanelViewFilterConsequence from '../javascripts/classes/PanelViewFilterConsequence.js';
+import PanelViewCheckList from '../src/classes/PanelViewCheckList.js';
+import PanelViewFilterAlternativeAlleleFrequency from '../src/classes/PanelViewFilterAlternativeAlleleFrequency.js';
+import PanelViewFilterVariantCallingQuality from '../src/classes/PanelViewFilterVariantCallingQuality.js';
+import PanelViewFilterConsequence from '../src/classes/PanelViewFilterConsequence.js';
 // PanelViews: Variant preview
-import PanelViewPreviewGene from '../javascripts/classes/PanelViewPreviewGene.js';
-import PreviewToVariantReport from '../javascripts/classes/PreviewToVariantReport.js';
-import PanelViewPreviewExternalLinks from '../javascripts/classes/PanelViewPreviewExternalLinks.js';
-import PanelViewPreviewAlternativeAlleleFrequencies from '../javascripts/classes/PanelViewPreviewAlternativeAlleleFrequencies.js';
-import PanelViewPreviewConsequence from '../javascripts/classes/PanelViewPreviewConsequence.js';
-import PanelViewPreviewClinicalSignificance from '../javascripts/classes/PanelViewPreviewClinicalSignificance.js';
-import TippyBox from '../javascripts/classes/TippyBox.js';
+import PanelViewPreviewGene from '../src/classes/PanelViewPreviewGene.js';
+import PreviewToVariantReport from '../src/classes/PreviewToVariantReport.js';
+import PanelViewPreviewExternalLinks from '../src/classes/PanelViewPreviewExternalLinks.js';
+import PanelViewPreviewAlternativeAlleleFrequencies from '../src/classes/PanelViewPreviewAlternativeAlleleFrequencies.js';
+import PanelViewPreviewConsequence from '../src/classes/PanelViewPreviewConsequence.js';
+import PanelViewPreviewClinicalSignificance from '../src/classes/PanelViewPreviewClinicalSignificance.js';
+import TippyBox from '../src/classes/TippyBox.js';
 
 import qs from 'qs';
 import { extractSearchCondition } from './store/searchManager.js';

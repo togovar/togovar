@@ -1,6 +1,6 @@
 {
   "source": {
-    "include": ["app/frontend/javascripts"],
+    "include": ["app/frontend/src"],
     "includePattern": ".+\\.js(doc|x)?$",
     "excludePattern": "(^|\\/|\\\\)_"
   },
