@@ -1,23 +1,24 @@
 import qs from 'qs';
-import { executeSearch } from '../api/fetchData.js'
+import { executeSearch } from '../api/fetchData.ts';
 import StoreManager from '../store/StoreManager';
 
 let _currentUrlParams = qs.parse(window.location.search.substring(1));
 
 /** SimpleSearchの検索条件を設定
-* @param {string} conditionKey - 設定する条件のキー
-* @param {*} conditionValue - 設定する条件の値 */
+ * @param {string} conditionKey - 設定する条件のキー
+ * @param {*} conditionValue - 設定する条件の値 */
 export function setSimpleSearchCondition(conditionKey, conditionValue) {
   _setSimpleSearchConditions({ [conditionKey]: conditionValue });
 }
 
 /** シンプル検索条件を設定し、必要に応じて検索を開始
-* @param {Object} newSearchConditions - 新しい検索条件
-* @param {boolean} isFromHistory - 履歴からの呼び出しかどうか */
+ * @param {Object} newSearchConditions - 新しい検索条件
+ * @param {boolean} isFromHistory - 履歴からの呼び出しかどうか */
 export function _setSimpleSearchConditions(newSearchConditions, isFromHistory) {
   // 検索条件を更新
   Object.keys(newSearchConditions).forEach((conditionKey) => {
-    StoreManager._store.simpleSearchConditions[conditionKey] = newSearchConditions[conditionKey];
+    StoreManager._store.simpleSearchConditions[conditionKey] =
+      newSearchConditions[conditionKey];
   });
 
   // 履歴からの呼び出しでない場合、URLパラメータを更新
@@ -30,8 +31,8 @@ export function _setSimpleSearchConditions(newSearchConditions, isFromHistory) {
 }
 
 /** AdvancedSearch検索条件を設定し、必要に応じて検索を実行
-* @param {Object} newSearchConditions - 新しい高度な検索条件
-* @param {boolean} isFromHistory - 履歴からの呼び出しかどうか */
+ * @param {Object} newSearchConditions - 新しい高度な検索条件
+ * @param {boolean} isFromHistory - 履歴からの呼び出しかどうか */
 export function setAdvancedSearchCondition(newSearchConditions, isFromHistory) {
   StoreManager._store.advancedSearchConditions = newSearchConditions;
   // convert queries to URL parameters
@@ -44,8 +45,8 @@ export function setAdvancedSearchCondition(newSearchConditions, isFromHistory) {
 
 export function resetSimpleSearchConditions() {
   const simpleSearchConditionsMaster = StoreManager.getData(
-    'simpleSearchConditionsMaster'
-  ),
+      'simpleSearchConditionsMaster'
+    ),
     resetConditions = {};
   for (const condition of simpleSearchConditionsMaster) {
     switch (condition.type) {
@@ -89,7 +90,7 @@ export function extractSearchCondition(currentConditions) {
   const masterConditions = StoreManager.getData('simpleSearchConditionsMaster');
   const diffConditions = {};
 
-  currentConditions = currentConditions ?? {}
+  currentConditions = currentConditions ?? {};
 
   Object.keys(currentConditions).forEach((conditionKey) => {
     // マスターデータから該当する条件idを検索
@@ -100,7 +101,6 @@ export function extractSearchCondition(currentConditions) {
     // 一致するスターデータが存在する場合のみ処理
     if (masterCondition) {
       switch (masterCondition.type) {
-
         case 'array': {
           const filteredArray = {};
           Object.keys(currentConditions[conditionKey]).forEach((itemKey) => {
@@ -152,7 +152,9 @@ export function reflectSimpleSearchConditionToURI() {
   Object.assign(_currentUrlParams, diffConditions);
 
   //URLを更新 (ブラウザの履歴に新しい状態を追加)
-  const newUrl = `${window.location.origin}${window.location.pathname}?${qs.stringify(_currentUrlParams)}`;
+  const newUrl = `${window.location.origin}${
+    window.location.pathname
+  }?${qs.stringify(_currentUrlParams)}`;
   window.history.pushState(_currentUrlParams, '', newUrl);
 }
 
@@ -167,7 +169,7 @@ function _reflectAdvancedSearchConditionToURI() {
 
 // 動かないからチェック
 /** ブラウザの「戻る」「進む」ボタンが押されたときに検索条件を更新
-* @param {Event} event - popstate イベント */
+ * @param {Event} event - popstate イベント */
 export function handleHistoryChange(_e) {
   // 現在のURLからクエリパラメータを取得
   const urlParams = qs.parse(window.location.search.substring(1));

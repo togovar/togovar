@@ -8,7 +8,7 @@ import {
   TypeMasterItem,
   ConsequenceMasterItem,
   Column,
-  Symbol,
+  GeneSymbol,
   Frequency,
   TdFrequencies,
   FrequencyElement,
@@ -356,7 +356,7 @@ export class ResultsRowView {
   }
 
   /* Gene */
-  #updateGene(symbols: Symbol[]) {
+  #updateGene(symbols: GeneSymbol[]) {
     if (!symbols || symbols.length === 0) {
       this.tdGene.dataset.remains = '0';
       this.tdGeneAnchor.href = '';

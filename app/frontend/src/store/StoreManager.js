@@ -3,7 +3,7 @@ import {
   reflectSimpleSearchConditionToURI,
   setAdvancedSearchCondition,
 } from '../store/searchManager.js';
-import { executeSearch } from '../api/fetchData.js';
+import { executeSearch } from '../api/fetchData.ts';
 
 // class StoreManager extends FormatData {
 class StoreManager {

@@ -1,3 +1,51 @@
+export type FetchOption = SimpleSearchFetchOption | AdvancedSearchFetchOption;
+
+type SimpleSearchFetchOption = {
+  method: 'GET';
+  headers: {
+    'Content-Type': 'application/json';
+    Accept: string;
+  };
+  mode: 'cors';
+  signal: AbortSignal;
+};
+
+type AdvancedSearchFetchOption = {
+  method: 'POST';
+  headers: {
+    'Content-Type': 'application/json';
+    Accept: 'application/json';
+  };
+  mode: 'cors';
+  signal: AbortSignal;
+  body: string;
+};
+
+export type SearchResults = {
+  data: ResultData[];
+  scroll: ScrollData;
+};
+
+export type SearchStatistics = {
+  statistics: StatisticsData;
+  scroll: ScrollData;
+};
+
+type ScrollData = {
+  limit: number;
+  max_rows: number;
+  offset: number;
+};
+
+type StatisticsData = {
+  total: number;
+  filtered: number;
+  dataset: Record<string, number>;
+  type: Record<string, number>;
+  significance: Record<string, number>;
+  consequence: Record<string, number>;
+};
+
 export type DatasetMaster = {
   items: DatasetMasterItem[];
 };
@@ -41,7 +89,7 @@ export type ResultData = {
   alternate: string;
   vcf: Vcf;
   existing_variations: string[];
-  symbols: Symbol[];
+  symbols: GeneSymbol[];
   external_link: ExternalLink;
   significance: Significance[];
   most_severe_consequence: string;
@@ -58,7 +106,7 @@ type Vcf = {
   alternate: string;
 };
 
-export type Symbol = {
+export type GeneSymbol = {
   name: string;
   id: number;
   synonyms: string[];

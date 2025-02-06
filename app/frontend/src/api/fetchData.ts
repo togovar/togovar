@@ -1,20 +1,19 @@
 import StoreManager from '../store/StoreManager';
-import qs from 'qs';
-import _ from 'lodash';
+import * as qs from 'qs';
+import * as _ from 'lodash';
 import { API_URL } from '../global.js';
 const LIMIT = 100;
 import {
   _setSimpleSearchConditions,
   extractSearchCondition,
 } from '../store/searchManager.js';
+import { FetchOption, SearchResults, SearchStatistics } from '../types';
 
 let currentAbortController = null;
-let _currentSearchMode;
+let _currentSearchMode: "simple" | "advanced" | null = null;
 let lastRequestRanges = new Set(); // 取得済みの範囲を管理
 
-/** 検索を実行するメソッド（データ取得 & 更新）
- * @param {Number} offset - 検索開始位置
- * @param {Boolean} isFirstTime - 最初の検索かどうか */
+/** 検索を実行するメソッド（データ取得 & 更新） */
 export const executeSearch = (() => {
   return _.debounce((offset = 0, isFirstTime = false) => {
     const newSearchMode = StoreManager.getData('searchMode');
@@ -78,12 +77,9 @@ function _resetSearchResults() {
   lastRequestRanges.clear(); // データリセット時にクリア
 }
 
-/** 検索用 API のエンドポイントを取得
- * @param {Number} offset - 検索開始位置
- * @param {Boolean} isFirstTime - 最初の検索かどうか
- * @returns {Array} API コール用の URL リスト */
-function _determineSearchEndpoints(offset, isFirstTime) {
-  let basePath;
+/** 検索用 API のエンドポイントを取得 */
+function _determineSearchEndpoints(offset:number, isFirstTime:boolean):string[] {
+  let basePath: string;
   let conditions = '';
 
   switch (StoreManager.getData('searchMode')) {
@@ -113,39 +109,47 @@ function _determineSearchEndpoints(offset, isFirstTime) {
   }
 }
 
-/** API リクエストのオプションを作成
- * @returns {Object} Fetch API のオプション */
-function _getRequestOptions(signal) {
-  const options = {
-    method: 'GET',
+/** API リクエストのオプションを作成 */
+function _getRequestOptions(signal: AbortSignal): FetchOption {
+  if (StoreManager.getData('searchMode') === 'simple') {
+      // Simple search のリクエストオプション
+    return {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      mode: 'cors',
+      signal: signal,
+    } ;
+  }
+
+  // Advanced search のリクエストオプション
+  const body: Partial<{ offset: number; query: any }> = {
+    offset: StoreManager.getData('offset'),
+  };
+
+  if (
+    StoreManager.getData('advancedSearchConditions') &&
+    Object.keys(StoreManager.getData('advancedSearchConditions')).length > 0
+  ) {
+    body.query = StoreManager.getData('advancedSearchConditions');
+  }
+
+  return {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
     mode: 'cors',
     signal: signal,
-  };
-
-  if (StoreManager.getData('searchMode') === 'advanced') {
-    options.method = 'POST';
-    // Advanced searchの場合は元のoffsetを使用
-    const body = { offset: StoreManager.getData('offset') };
-    if (
-      StoreManager.getData('advancedSearchConditions') &&
-      Object.keys(StoreManager.getData('advancedSearchConditions')).length > 0
-    ) {
-      body.query = StoreManager.getData('advancedSearchConditions');
-    }
-    options.body = JSON.stringify(body);
-  }
-
-  return options;
+    body: JSON.stringify(body),
+  } 
 }
 
-/** データを取得して結果を更新
- * @param {String} endpoint - API エンドポイント
- * @param {Object} options - Fetch リクエストオプション */
-async function _fetchData(endpoint, options) {
+/** データを取得して結果を更新 */
+async function _fetchData(endpoint:string, options: FetchOption) {
   try {
     const response = await fetch(endpoint, options);
     if (!response.ok) {
@@ -164,17 +168,16 @@ async function _fetchData(endpoint, options) {
     }
 
     await _updateAppState();
+    StoreManager.setData('searchMessages', "");
   } catch (error) {
     if (error.name === 'AbortError') return;
-    console.error('Fetch error:', error);
     StoreManager.setData('isFetching', false);
+    StoreManager.setData('searchMessages', { error });
   }
 }
 
-/** HTTP ステータスコードに応じたエラーメッセージを取得
- * @param {Number} statusCode - HTTP ステータスコード
- * @returns {String} エラーメッセージ */
-function _getErrorMessage(statusCode) {
+/** HTTP ステータスコードに応じたエラーメッセージを取得 */
+function _getErrorMessage(statusCode: number): string {
   const errorTypes = {
     400: 'INVALID_REQUEST',
     401: 'UNAUTHORIZED',
@@ -185,24 +188,20 @@ function _getErrorMessage(statusCode) {
   return errorTypes[statusCode] || 'UNKNOWN_ERROR';
 }
 
-/** 検索結果データをセット
- * @param {Object} jsonResponse - API レスポンスデータ */
-function _processSearchResults(json) {
+/** 検索結果データをセット */
+function _processSearchResults(json: SearchResults) {
   // results
   StoreManager.setResults(json.data, json.scroll.offset);
 }
 
-/** 統計情報をセット
- * @param {Object} jsonResponse - API レスポンスデータ */
-function _processStatistics(json) {
+/** 統計情報をセット */
+function _processStatistics(json: SearchStatistics) {
   // status
   StoreManager.setData('searchStatus', {
     available: Math.min(json.statistics.filtered, json.scroll.max_rows),
     filtered: json.statistics.filtered,
     total: json.statistics.total,
   });
-
-  // results
   StoreManager.setData(
     'numberOfRecords',
     StoreManager.getData('searchStatus').available
@@ -225,7 +224,7 @@ async function _updateAppState() {
   switch (StoreManager.getData('searchMode')) {
     case 'simple':
       if (StoreManager.getData('simpleSearchConditions').term) {
-        document.body.setAttribute('data-has-conditions', true);
+        document.body.setAttribute('data-has-conditions', "true");
       }
       break;
     case 'advanced':
@@ -235,6 +234,6 @@ async function _updateAppState() {
       );
   }
 
-  StoreManager.notify('offset');
+  StoreManager.notify('offset'); // TODO: 何を通知しているのか、確認が必要
   StoreManager.setData('appStatus', 'normal'); // TODO: 変数名変更する Result画面の全体Loadingicon
 }
