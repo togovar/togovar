@@ -1,7 +1,7 @@
 import { COLUMNS } from '../../global.js';
 import StoreManager from '../../store/StoreManager.js';
 import '../../components/LogarithmizedBlockGraphFrequencyView';
-import { getSimpleSearchConditionMaster } from '../../store/searchManager.js';
+import { getSimpleSearchConditionMaster } from '../../store/searchManager';
 import {
   ResultData,
   DatasetMasterItem,
@@ -72,8 +72,7 @@ export class ResultsRowView {
   }
 
   // bindings ///////////////////////////
-  /**
-   * 選択された行の処理
+  /** 選択された行の処理
    * @param {number} index - 選択された行のインデックス */
   selectedRow(index: number) {
     this.selected = index === this.index;

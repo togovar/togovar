@@ -1,6 +1,10 @@
 import PanelView from './PanelView.js';
 import StoreManager from '../store/StoreManager.js';
-import { setSimpleSearchCondition, getSimpleSearchCondition, getSimpleSearchConditionMaster } from "../store/searchManager.js"
+import {
+  setSimpleSearchCondition,
+  getSimpleSearchCondition,
+  getSimpleSearchConditionMaster,
+} from '../store/searchManager';
 import '../components/RangeSliderView.js';
 
 export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView {
@@ -8,9 +12,7 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
     super(elm, 'frequency');
 
     // default values
-    this._conditionMaster = getSimpleSearchConditionMaster(
-      this.kind
-    );
+    this._conditionMaster = getSimpleSearchConditionMaster(this.kind);
     const condition = this._getConditionFromStore();
 
     const rangeSlider = document.createElement('range-slider');
@@ -51,16 +53,16 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
     condition = condition
       ? condition
       : this._conditionMaster.items.reduce(
-        (acc, item) => Object.assign(acc, { [item.id]: item.default }),
-        {}
-      );
+          (acc, item) => Object.assign(acc, { [item.id]: item.default }),
+          {}
+        );
     // if each items of the condition are not defined, generate them from master
     for (const item of this._conditionMaster.items) {
       condition[item.id] = condition[item.id]
         ? condition[item.id]
         : this._conditionMaster.items.find(
-          (frequency) => frequency.id === item.id
-        ).default;
+            (frequency) => frequency.id === item.id
+          ).default;
     }
     return condition;
   }

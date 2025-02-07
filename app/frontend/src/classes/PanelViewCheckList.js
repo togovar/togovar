@@ -1,11 +1,14 @@
 import PanelView from './PanelView.js';
 import StoreManager from '../store/StoreManager.js';
-import { setSimpleSearchCondition, getSimpleSearchCondition } from "../store/searchManager.js"
+import {
+  setSimpleSearchCondition,
+  getSimpleSearchCondition,
+} from '../store/searchManager';
 
 /**  Dataset of Statistics / Filters
-* @param {Element} elm - Panel element section.panel-view (#FilterDatasets | #FilterVariantType | #FilterClinicalSignificance | #FilterSift | #FilterPolyphen | #FilterAlphaMissense)
-* @param {string} kind - Panel id (dataset | type | significance | sift | polyphen | alphamissense)
-* @param {string} statisticsType - (statisticsDataset | statisticsType | statisticsSignificance | undefined) */
+ * @param {Element} elm - Panel element section.panel-view (#FilterDatasets | #FilterVariantType | #FilterClinicalSignificance | #FilterSift | #FilterPolyphen | #FilterAlphaMissense)
+ * @param {string} kind - Panel id (dataset | type | significance | sift | polyphen | alphamissense)
+ * @param {string} statisticsType - (statisticsDataset | statisticsType | statisticsSignificance | undefined) */
 export default class PanelViewCheckList extends PanelView {
   constructor(elm, kind, statisticsType) {
     super(elm, kind);
@@ -127,36 +130,46 @@ export default class PanelViewCheckList extends PanelView {
     <li class="item">
       <label class="label">
         <input type="checkbox" value="${item.id}" checked>
-        ${this.kind === 'dataset'
+        ${
+          this.kind === 'dataset'
             ? `<div class="dataset-icon" data-dataset="${item.id}"><div class="properties"></div></div>`
             : ''
-          }
-        ${this.kind === 'significance'
+        }
+        ${
+          this.kind === 'significance'
             ? `<div class="clinical-significance" data-value="${item.id}"></div>`
             : ''
-          }
-        ${this.kind === 'sift'
-            ? `<div class="variant-function _width_5em _align-center" data-function="${item.id
-            }">${{ D: '&lt; 0.05', T: '&ge; 0.05' }[item.id]}</div>`
+        }
+        ${
+          this.kind === 'sift'
+            ? `<div class="variant-function _width_5em _align-center" data-function="${
+                item.id
+              }">${{ D: '&lt; 0.05', T: '&ge; 0.05' }[item.id]}</div>`
             : ''
-          }
-        ${this.kind === 'polyphen'
-            ? `<div class="variant-function _width_5em _align-center" data-function="${item.id
-            }">${{
-              PROBD: '&gt; 0.908',
-              POSSD: '&gt; 0.446',
-              B: '&le; 0.446',
-              U: 'Unknown',
-            }[item.id]
-            }</div>`
+        }
+        ${
+          this.kind === 'polyphen'
+            ? `<div class="variant-function _width_5em _align-center" data-function="${
+                item.id
+              }">${
+                {
+                  PROBD: '&gt; 0.908',
+                  POSSD: '&gt; 0.446',
+                  B: '&le; 0.446',
+                  U: 'Unknown',
+                }[item.id]
+              }</div>`
             : ''
-          }
-        ${this.kind === 'alphamissense'
-            ? `<div class="variant-function _width_5em _align-center" data-function="${item.id
-            }">${{ LP: '&gt; 0.564', A: '&ge; 0.340', LB: '&lt; 0.340' }[item.id]
-            }</div>`
+        }
+        ${
+          this.kind === 'alphamissense'
+            ? `<div class="variant-function _width_5em _align-center" data-function="${
+                item.id
+              }">${
+                { LP: '&gt; 0.564', A: '&ge; 0.340', LB: '&lt; 0.340' }[item.id]
+              }</div>`
             : ''
-          }
+        }
         ${item.label}
       </label>
       <span class="value"></span>

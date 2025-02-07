@@ -2,7 +2,7 @@ import {
   handleHistoryChange,
   reflectSimpleSearchConditionToURI,
   setAdvancedSearchCondition,
-} from '../store/searchManager.js';
+} from '../store/searchManager';
 import { executeSearch } from '../api/fetchData.ts';
 
 // class StoreManager extends FormatData {

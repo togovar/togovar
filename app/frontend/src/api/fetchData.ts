@@ -3,10 +3,7 @@ import * as qs from 'qs';
 import * as _ from 'lodash';
 import { API_URL } from '../global.js';
 const LIMIT = 100;
-import {
-  _setSimpleSearchConditions,
-  extractSearchCondition,
-} from '../store/searchManager.js';
+import { extractSearchCondition } from '../store/searchManager';
 import { FetchOption, SearchResults, SearchStatistics } from '../types';
 
 let currentAbortController = null;

@@ -1,3 +1,72 @@
+// -------------------------------------
+// Master Conditions
+// -------------------------------------
+export interface MasterConditions {
+  id: MasterConditionId;
+  label?: string;
+  type?: MasterConditionType;
+  default?: string;
+  items?: MasterConditionItem[];
+}
+type MasterConditionId =
+  | 'term'
+  | 'dataset'
+  | 'frequency'
+  | 'quality'
+  | 'type'
+  | 'significance'
+  | 'consequence'
+  | 'consequence_grouping'
+  | 'alphamissense'
+  | 'sift'
+  | 'polyphen';
+
+type MasterConditionType = 'array' | 'boolean' | 'string';
+
+interface MasterConditionItem {
+  id?: string;
+  label: string;
+  type?: MasterItemType;
+  default?: number | string;
+  has_freq?: boolean;
+  values?: string[];
+  description?: string;
+  items?: Array<ItemItemClass | string>;
+}
+
+type MasterItemType = 'boolean' | 'enumeration' | 'range';
+
+interface ItemItemClass {
+  label: string;
+  items: string[];
+}
+
+// -------------------------------------
+// SimpleSearch Current Conditions
+// -------------------------------------
+export type SimpleSearchCurrentConditions = {
+  mode?: SearchMode;
+  term?: string;
+  dataset?: Record<string, string>; // { "gem_j_wga": "1", ... }
+  frequency: {
+    from: number;
+    to: number;
+    invert: string;
+    match: string;
+  };
+  quality?: string;
+  type?: Record<string, string>; // { "SO_0001483": "1", ... }
+  significance?: Record<string, string>; // { "NC": "1", ... }
+  alphamissense?: Record<string, string>; // { "N": "1", "LP": "1", ... }
+  sift?: Record<string, string>; // { "N": "1", "D": "1", ... }
+  polyphen?: Record<string, string>; // { "N": "1", "PROBD": "1", ... }
+};
+
+//  -------------------------------------
+//  Search Mode
+//  -------------------------------------
+type SearchMode = 'simple' | 'advanced';
+
 export type FetchOption = SimpleSearchFetchOption | AdvancedSearchFetchOption;
 
 type SimpleSearchFetchOption = {
@@ -21,6 +90,9 @@ type AdvancedSearchFetchOption = {
   body: string;
 };
 
+//  -------------------------------------
+//  Result Data, Statistics Data
+//  -------------------------------------
 export type SearchResults = {
   data: ResultData[];
   scroll: ScrollData;

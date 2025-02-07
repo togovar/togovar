@@ -1,8 +1,7 @@
-import StoreManager from "../store/StoreManager.js";
-import { resetSimpleSearchConditions } from "../store/searchManager.js";
+import StoreManager from '../store/StoreManager.js';
+import { resetSimpleSearchConditions } from '../store/searchManager';
 
 export default class SideBar {
-
   constructor(elm) {
     this._elm = elm;
     this._body = document.getElementsByTagName('body')[0];
@@ -17,7 +16,9 @@ export default class SideBar {
   }
 
   _setupResetButton() {
-    const resetButton = this._elm.querySelector('#Filters > .title > .button-view');
+    const resetButton = this._elm.querySelector(
+      '#Filters > .title > .button-view'
+    );
     resetButton.addEventListener('click', () => {
       resetSimpleSearchConditions();
     });
@@ -34,5 +35,4 @@ export default class SideBar {
       this._body.classList.add('-rowselected');
     }
   }
-
 }

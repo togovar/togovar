@@ -28,7 +28,7 @@ import PanelViewPreviewClinicalSignificance from '../src/classes/PanelViewPrevie
 import TippyBox from '../src/classes/TippyBox.js';
 
 import qs from 'qs';
-import { extractSearchCondition } from './store/searchManager.js';
+import { extractSearchCondition } from './store/searchManager';
 const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
 const _currentUrlParams = qs.parse(window.location.search.substr(1));
 

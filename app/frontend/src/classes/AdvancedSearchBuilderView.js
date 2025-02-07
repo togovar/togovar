@@ -1,4 +1,4 @@
-import { setAdvancedSearchCondition } from "../store/searchManager.js";
+import { setAdvancedSearchCondition } from '../store/searchManager';
 import ConditionGroupView from './ConditionGroupView.js';
 import AdvancedSearchToolbar from './AdvancedSearchToolbar.js';
 import AdvancedSearchSelection from './AdvancedSearchSelection.js';

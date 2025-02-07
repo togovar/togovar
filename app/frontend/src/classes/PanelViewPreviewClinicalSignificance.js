@@ -1,9 +1,8 @@
-import PanelView from "./PanelView.js";
-import StoreManager from "../store/StoreManager.js";
-import { getSimpleSearchConditionMaster } from "../store/searchManager.js"
+import PanelView from './PanelView.js';
+import StoreManager from '../store/StoreManager.js';
+import { getSimpleSearchConditionMaster } from '../store/searchManager';
 
 export default class PanelViewPreviewClinicalSignificance extends PanelView {
-
   constructor(elm) {
     super(elm, 'clinicalSignificance');
     StoreManager.bind('selectedRow', this);
@@ -59,7 +58,9 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
                   ]);
                 } else {
                   // すでに存在する解釈にはソースを追加
-                  merged[medgen].interpretations[interpretation].add(entry.source);
+                  merged[medgen].interpretations[interpretation].add(
+                    entry.source
+                  );
                 }
               });
             });
@@ -72,23 +73,25 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
             interpretations: Object.keys(merged[medgen].interpretations).map(
               (interpretation) => ({
                 interpretation,
-                sources: Array.from(merged[medgen].interpretations[interpretation]),
+                sources: Array.from(
+                  merged[medgen].interpretations[interpretation]
+                ),
               })
             ),
           }));
 
           // return results
-          return groupAndSortByInterpretation(results)
+          return groupAndSortByInterpretation(results);
         }
 
         function groupAndSortByInterpretation(data) {
           // グループ化のためのオブジェクト
           const grouped = {};
 
-          data.forEach(entry => {
+          data.forEach((entry) => {
             // 各エントリのinterpretationsを処理
             let interpretationKeys = [];
-            entry.interpretations.forEach(interpretationObj => {
+            entry.interpretations.forEach((interpretationObj) => {
               interpretationKeys.push(interpretationObj.interpretation);
             });
 
@@ -98,15 +101,17 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
             }
             // 現在のentryを該当するinterpretationグループに追加
             grouped[interpretationKeys].push(entry);
-            interpretationKeys = []
+            interpretationKeys = [];
           });
 
           // 各グループをnameでソート
-          Object.keys(grouped).forEach(key => {
+          Object.keys(grouped).forEach((key) => {
             grouped[key] = grouped[key].sort((a, b) => {
-              const nameA = a.name || ""; // 空文字列対策
-              const nameB = b.name || "";
-              return nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
+              const nameA = a.name || ''; // 空文字列対策
+              const nameB = b.name || '';
+              return nameA.localeCompare(nameB, undefined, {
+                sensitivity: 'base',
+              });
             });
           });
 
@@ -115,28 +120,53 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
 
         // 関数の実行
         const significanceDataset = mergeByMedgen(deepClone);
-        html = significanceDataset.map(data => {
-          return `
+        html = significanceDataset
+          .map((data) => {
+            return `
         <dl class="above-headline clinical-significance">
           <dt>
-          ${data.medgen === 'undefined' || data.medgen === '' ? data.name :
-              `<a href="/disease/${data.medgen}" target="_blank" class="hyper-text -internal">
-              ${data.name}</a>`}
+          ${
+            data.medgen === 'undefined' || data.medgen === ''
+              ? data.name
+              : `<a href="/disease/${data.medgen}" target="_blank" class="hyper-text -internal">
+              ${data.name}</a>`
+          }
           </dt>
-          ${data.interpretations ?
-              data.interpretations.map(interpretation => `
+          ${
+            data.interpretations
+              ? data.interpretations
+                  .map(
+                    (interpretation) => `
             <dd>
-              <div class="clinical-significance" data-value="${interpretation.interpretation}">
-                ${master.items.find(item => item.id === interpretation.interpretation).label}
+              <div class="clinical-significance" data-value="${
+                interpretation.interpretation
+              }">
+                ${
+                  master.items.find(
+                    (item) => item.id === interpretation.interpretation
+                  ).label
+                }
               </div>
               <div class="disease-category">
-                ${interpretation.sources.includes("mgend") ? '<span class="mgend">MGeND</span>' : ''}
-                ${interpretation.sources.includes("clinvar") ? '<span class="clinvar">ClinVar</span>' : ''}
+                ${
+                  interpretation.sources.includes('mgend')
+                    ? '<span class="mgend">MGeND</span>'
+                    : ''
+                }
+                ${
+                  interpretation.sources.includes('clinvar')
+                    ? '<span class="clinvar">ClinVar</span>'
+                    : ''
+                }
               </div>
-            </dd> `).join('') :
-              ''
-            }
-          </dl>`}).join('');
+            </dd> `
+                  )
+                  .join('')
+              : ''
+          }
+          </dl>`;
+          })
+          .join('');
         this.elm.classList.remove('-notfound');
       }
     } else {
@@ -144,5 +174,4 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
     }
     this.content.innerHTML = html;
   }
-
 }
