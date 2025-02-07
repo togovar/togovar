@@ -1,4 +1,4 @@
-import StoreManager from '../src/store/StoreManager.js';
+import StoreManager from '../src/store/StoreManager';
 import ResultsView from '../src/classes/Results/ResultsView.js';
 import SideBar from '../src/classes/SideBar.js';
 import Configuration from '../src/classes/Configuration.js';

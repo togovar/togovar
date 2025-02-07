@@ -1,6 +1,6 @@
 import CollapseView from './CollapseView.js';
 import PanelView from './PanelView.js';
-import StoreManager from '../store/StoreManager.js';
+import StoreManager from '../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,

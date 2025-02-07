@@ -1,7 +1,6 @@
-import StoreManager from "../store/StoreManager.js";
+import StoreManager from '../store/StoreManager';
 
 export default class ActivityIndicator {
-
   constructor(elm) {
     this.elm = elm;
     StoreManager.bind('appStatus', this);

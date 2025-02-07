@@ -1,4 +1,4 @@
-import StoreManager from '../store/StoreManager.js';
+import StoreManager from '../store/StoreManager';
 import ChromosomeView from './ChromosomeView.js';
 
 const CHROMOSOME_KEYS = [

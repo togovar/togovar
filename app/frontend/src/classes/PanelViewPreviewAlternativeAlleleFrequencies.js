@@ -1,6 +1,6 @@
 import { strIns } from '../global.js';
 import PanelView from './PanelView.js';
-import StoreManager from '../store/StoreManager.js';
+import StoreManager from '../store/StoreManager';
 import { getSimpleSearchConditionMaster } from '../store/searchManager';
 
 const DECIMAL_DIGIT = 4;

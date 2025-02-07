@@ -1,5 +1,5 @@
-import PanelView from "./PanelView.js";
-import StoreManager from "../store/StoreManager.js";
+import PanelView from './PanelView.js';
+import StoreManager from '../store/StoreManager';
 
 export default class PanelViewPreviewGene extends PanelView {
   constructor(elm) {
@@ -29,10 +29,20 @@ export default class PanelViewPreviewGene extends PanelView {
               <tr>
                 <th>Symbol</th>
                 <td>
-                  <a href="gene/${symbol.id}" target="_blank" class="hyper-text -internal">${symbol.name}</a>
+                  <a href="gene/${
+                    symbol.id
+                  }" target="_blank" class="hyper-text -internal">${
+            symbol.name
+          }</a>
                 </td>
               </tr>
-              ${symbol.synonyms.length === 0 ? '' : `<tr><th>Alias</th><td>${symbol.synonyms.join(', ')}</td></tr>`}
+              ${
+                symbol.synonyms.length === 0
+                  ? ''
+                  : `<tr><th>Alias</th><td>${symbol.synonyms.join(
+                      ', '
+                    )}</td></tr>`
+              }
             </tbody>
           `;
 
@@ -42,5 +52,4 @@ export default class PanelViewPreviewGene extends PanelView {
     }
     this.table.innerHTML = html;
   }
-
 }

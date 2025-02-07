@@ -1,4 +1,4 @@
-import StoreManager from '../../store/StoreManager.js';
+import StoreManager from '../../store/StoreManager';
 import { ResultsRowView } from './ResultsRowView.ts';
 import ScrollBar from './../ScrollBar.js';
 import { TR_HEIGHT, COMMON_FOOTER_HEIGHT, COLUMNS } from '../../global.js';
@@ -42,8 +42,8 @@ export default class ResultsView {
       'onwheel' in document
         ? 'wheel'
         : 'onmousewheel' in document
-          ? 'mousewheel'
-          : 'DOMMouseScroll';
+        ? 'mousewheel'
+        : 'DOMMouseScroll';
     this.tbody.addEventListener(mousewheelevent, this.scroll.bind(this));
 
     // カラムの表示を制御するためのスタイルシート

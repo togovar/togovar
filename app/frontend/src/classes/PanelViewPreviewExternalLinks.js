@@ -1,5 +1,5 @@
 import PanelView from './PanelView.js';
-import StoreManager from '../store/StoreManager.js';
+import StoreManager from '../store/StoreManager';
 
 export default class PanelViewPreviewExternalLinks extends PanelView {
   constructor(elm) {
@@ -64,11 +64,11 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
         html = `
                   <tbody>
                     ${list
-            .map(
-              (item) =>
-                `<tr><th>${item.title}</th><td>${item.content}</td></tr>`
-            )
-            .join('')}
+                      .map(
+                        (item) =>
+                          `<tr><th>${item.title}</th><td>${item.content}</td></tr>`
+                      )
+                      .join('')}
                   </tbody>
                 `;
         this.elm.classList.remove('-notfound');

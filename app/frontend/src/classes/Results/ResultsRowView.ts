@@ -1,5 +1,5 @@
 import { COLUMNS } from '../../global.js';
-import StoreManager from '../../store/StoreManager.js';
+import StoreManager from '../../store/StoreManager';
 import '../../components/LogarithmizedBlockGraphFrequencyView';
 import { getSimpleSearchConditionMaster } from '../../store/searchManager';
 import {

@@ -1,4 +1,4 @@
-import StoreManager from '../store/StoreManager.js';
+import StoreManager from '../store/StoreManager';
 import { resetSimpleSearchConditions } from '../store/searchManager';
 
 export default class SideBar {

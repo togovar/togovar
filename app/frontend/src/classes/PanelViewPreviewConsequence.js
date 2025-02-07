@@ -1,5 +1,5 @@
 import PanelView from './PanelView.js';
-import StoreManager from '../store/StoreManager.js';
+import StoreManager from '../store/StoreManager';
 import { getSimpleSearchConditionMaster } from '../store/searchManager';
 
 export default class PanelViewPreviewConsequence extends PanelView {

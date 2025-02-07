@@ -1,4 +1,4 @@
-import StoreManager from '../store/StoreManager.js';
+import StoreManager from '../store/StoreManager';
 import ConditionValueEditor from './ConditionValueEditor.js';
 import '../components/ConditionItemValueView';
 import { CONDITION_TYPE } from '../definition.js';
@@ -36,8 +36,8 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
           <span class="form">
             <select>
               ${OPTIONS.map(
-        (value) => `<option value="${value}">${value}</option>`
-      ).join('')}
+                (value) => `<option value="${value}">${value}</option>`
+              ).join('')}
             </select>
           </span>
           <span class="label">&nbsp;:&nbsp;&nbsp;</span>
@@ -158,10 +158,11 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     // update value
     const valueView = this._valueViews[0];
     if (this.isValid) {
-      const value = `${this._chr.value}:${this._start.value}${this._rangeInputView.dataset.type === 'single_position'
+      const value = `${this._chr.value}:${this._start.value}${
+        this._rangeInputView.dataset.type === 'single_position'
           ? ''
           : `-${this._end.value}`
-        }`;
+      }`;
       if (valueView) {
         //update
         valueView.label = value;

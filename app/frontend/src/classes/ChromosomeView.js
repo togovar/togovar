@@ -1,4 +1,4 @@
-import StoreManager from '../store/StoreManager.js';
+import StoreManager from '../store/StoreManager';
 import { setSimpleSearchCondition } from '../store/searchManager';
 
 const WIDTH = 12;

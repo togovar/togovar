@@ -1,4 +1,4 @@
-import StoreManager from '../store/StoreManager.js';
+import StoreManager from '../store/StoreManager';
 
 export function keyDownEvent(storeName) {
   switch (storeName) {

@@ -3,24 +3,36 @@ import {
   reflectSimpleSearchConditionToURI,
   setAdvancedSearchCondition,
 } from '../store/searchManager';
-import { executeSearch } from '../api/fetchData.ts';
+import { executeSearch } from '../api/fetchData';
+import { ResultData } from '../types';
 
 // class StoreManager extends FormatData {
 class StoreManager {
-  constructor() {
-    window.__s = this; // set global variable for monitering
-    this._bindings = {};
-    this._store = {
-      searchResults: [],
-      numberOfRecords: 0,
-      offset: 0,
-      rowCount: 0,
-      appStatus: 'preparing',
-      isLogin: false,
-      isFetching: false,
-      isStoreUpdating: false, // storeの更新中かどうか
-    };
+  #bindings: Record<string, any[]> = {};
+  #store: {
+    searchResults: any[];
+    numberOfRecords: number;
+    offset: number;
+    rowCount: number;
+    appStatus: string;
+    isLogin: boolean;
+    isFetching: boolean;
+    isStoreUpdating: boolean;
+    selectedRow?: number;
+    lastSearchMode?: string;
+    advancedSearchConditions?: any;
+  } = {
+    searchResults: [],
+    numberOfRecords: 0,
+    offset: 0,
+    rowCount: 0,
+    appStatus: 'preparing',
+    isLogin: false,
+    isFetching: false,
+    isStoreUpdating: false,
+  };
 
+  constructor() {
     this.initSearchCondition();
   }
 
@@ -32,22 +44,39 @@ class StoreManager {
     this.bind('searchMode', this);
   }
 
-  getData(key) {
-    return this._copy(this._store[key]);
+  /** 指定されたキーからデータを取得する */
+  getData<T = any>(key: string): T {
+    return this._copy(this.#store[key]);
   }
 
-  /** 検索結果を保存し、状態を更新する
-   * @param {Array} records - 取得した検索結果データの配列
-   * @param {Number} offset - 追加する検索結果の開始位置 */
-  setResults(records, offset) {
+  /** 指定されたキーにデータをセットする */
+  setData<T = any>(key: string, newValue: T) {
+    // 当該データを持っていないか、当該データが不一致であれば、データをセット
+    const isUndefined = this.#store[key] === undefined;
+
+    // データが変更されたか確認
+    const isMutated =
+      typeof newValue === 'object'
+        ? JSON.stringify(this.#store[key]) !== JSON.stringify(newValue)
+        : this.#store[key] != newValue;
+
+    // データが存在しないか変更されている場合にのみセット
+    if (isUndefined || isMutated) {
+      this.#store[key] = this._copy(newValue);
+      this.notify(key);
+    }
+  }
+
+  /** 検索結果を保存し、状態を更新する */
+  setResults(records: ResultData[], offset: number) {
     try {
-      this._store.isStoreUpdating = true;
+      this.#store.isStoreUpdating = true;
 
       // 新しい配列を作成して更新
-      const updatedResults = Array(this._store.numberOfRecords).fill(null);
+      const updatedResults = Array(this.#store.numberOfRecords).fill(null);
 
       // 既存のデータをコピー
-      this._store.searchResults.forEach((record, index) => {
+      this.#store.searchResults.forEach((record, index) => {
         if (record) {
           updatedResults[index] = record;
         }
@@ -58,31 +87,29 @@ class StoreManager {
         updatedResults[offset + index] = record;
       });
 
-      this._store.searchResults = updatedResults;
+      this.#store.searchResults = updatedResults;
       this.notify('searchResults');
     } finally {
-      this._store.isStoreUpdating = false;
+      this.#store.isStoreUpdating = false;
       this.setData('isFetching', false);
     }
   }
 
   /** 指定されたインデックスのレコードを取得
-   * レコードが存在しない場合は検索を実行し、ステータスを 'loading' に設定します。
-   * @param {number} index - 取得するレコードのインデックス
-   * @returns {*} - レコードのコピー、'loading' または 'out of range' */
-  getRecordByIndex(index) {
-    const recordIndex = this._store.offset + index;
+   * レコードが存在しない場合は検索を実行し、ステータスを 'loading' に設定 */
+  getRecordByIndex(index: number) {
+    const recordIndex = this.#store.offset + index;
 
-    if (this._store.isStoreUpdating) {
+    if (this.#store.isStoreUpdating) {
       return 'loading';
     }
 
-    if (recordIndex < this._store.numberOfRecords) {
-      const record = this._store.searchResults[recordIndex];
+    if (recordIndex < this.#store.numberOfRecords) {
+      const record = this.#store.searchResults[recordIndex];
       if (record) {
         return this._copy(record);
       } else {
-        executeSearch(this._store.offset + index);
+        executeSearch(this.#store.offset + index);
         return 'loading';
       }
     }
@@ -91,32 +118,12 @@ class StoreManager {
 
   // どのPanelViewが呼ばれるかを判定するための関数
   getSelectedRecord() {
-    if (this._store.selectedRow !== undefined) {
-      return this._store.searchResults[
-        this._store.offset + this._store.selectedRow
+    if (this.#store.selectedRow !== undefined) {
+      return this.#store.searchResults[
+        this.#store.offset + this.#store.selectedRow
       ];
     } else {
       return null;
-    }
-  }
-
-  /** 指定されたキーにデータをセットする
-   * @param {string} key - データを保存するキー
-   * @param {*} newValue - 保存するデータ  */
-  setData(key, newValue) {
-    // 当該データを持っていないか、当該データが不一致であれば、データをセット
-    const isUndefined = this._store[key] === undefined;
-
-    // データが変更されたか確認
-    const isMutated =
-      typeof newValue === 'object'
-        ? JSON.stringify(this._store[key]) !== JSON.stringify(newValue)
-        : this._store[key] != newValue;
-
-    // データが存在しないか変更されている場合にのみセット
-    if (isUndefined || isMutated) {
-      this._store[key] = this._copy(newValue);
-      this.notify(key);
     }
   }
 
@@ -127,18 +134,21 @@ class StoreManager {
         return;
       }
 
-      const timeout = new Promise((_, reject) =>
+      const timeout = new Promise<Response>((_, reject) =>
         setTimeout(() => reject(new Error('Request timeout')), 10000)
       );
 
       const fetchPromise = fetch(`${window.location.origin}/auth/status`);
-
       const response = await Promise.race([fetchPromise, timeout]);
 
-      if (response.status === 401 || response.status === 403) {
-        this.setData('isLogin', false);
-      } else if (response.status === 200) {
-        this.setData('isLogin', true);
+      if (response instanceof Response) {
+        if (response.status === 401 || response.status === 403) {
+          this.setData('isLogin', false);
+        } else if (response.status === 200) {
+          this.setData('isLogin', true);
+        }
+      } else {
+        throw new Error('Invalid response type');
       }
     } catch (error) {
       console.error('Error fetching auth status or timeout occurred:', error);
@@ -146,25 +156,22 @@ class StoreManager {
     }
   }
 
-  /** 指定されたキーにターゲットをバインドする
-   * @param {string} key - データ変更を監視するキー
-   * @param {Object} target - キー変更時に通知を受け取るオブジェクト */
-  bind(key, target) {
-    if (this._bindings[key] === undefined) {
+  /** 指定されたキーにターゲットをバインドする */
+  bind<T = any>(key: string, target: T) {
+    if (this.#bindings[key] === undefined) {
       // 初めてのバインディングなら新しい配列を作成
-      this._bindings[key] = [target];
+      this.#bindings[key] = [target];
     } else {
       // すでにバインドされている場合は追加
-      this._bindings[key].push(target);
+      this.#bindings[key].push(target);
     }
   }
 
-  /**  指定されたキーに関連するすべてのオブジェクトに変更を通知する
-   * @param {string} key - 変更が発生したデータのキー */
-  notify(key) {
-    if (this._bindings[key]) {
-      this._bindings[key].forEach((observer) => {
-        const valueCopy = this._copy(this._store[key]);
+  /**  指定されたキーに関連するすべてのオブジェクトに変更を通知する */
+  notify(key: string) {
+    if (this.#bindings[key]) {
+      this.#bindings[key].forEach((observer) => {
+        const valueCopy = this._copy(this.#store[key]);
         if (typeof observer[key] === 'function') {
           observer[key](valueCopy);
         } else {
@@ -178,10 +185,8 @@ class StoreManager {
     }
   }
 
-  /** Deep copy the provided value.
-   * @param {*} value - The value to copy.
-   * @returns {*} - The copied value. */
-  _copy(value) {
+  /** Deep copy the provided value */
+  _copy<T>(value: T): T {
     switch (true) {
       case Array.isArray(value):
         return JSON.parse(JSON.stringify(value));
@@ -203,7 +208,7 @@ class StoreManager {
     this.setData('lastSearchMode', mode);
 
     // 検索モード切り替え時にリセット
-    this._store.isStoreUpdating = true; // 更新中フラグを立てて不要な描画を防ぐ
+    this.#store.isStoreUpdating = true; // 更新中フラグを立てて不要な描画を防ぐ
     try {
       this.setData('offset', 0);
       this.setData('selectedRow', undefined);
@@ -231,7 +236,7 @@ class StoreManager {
       this.setData('appStatus', 'searching');
       executeSearch(0, true);
     } finally {
-      this._store.isStoreUpdating = false;
+      this.#store.isStoreUpdating = false;
     }
   }
 }

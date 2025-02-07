@@ -1,5 +1,5 @@
-import PanelView from "./PanelView.js";
-import StoreManager from "../store/StoreManager.js";
+import PanelView from './PanelView.js';
+import StoreManager from '../store/StoreManager';
 
 export default class PreviewToVariantReport extends PanelView {
   constructor(elm) {
