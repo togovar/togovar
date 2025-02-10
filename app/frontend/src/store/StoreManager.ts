@@ -125,27 +125,39 @@ class StoreManager {
   // ------------------------------
   /** 検索結果を保存し、状態を更新する */
   setResults(records: ResultData[], offset: number) {
+    console.log('setResults開始', { recordsLength: records.length, offset });
+
+    // 更新中フラグを立てる
     this.setData('isStoreUpdating', true);
 
-    // 新しい配列を作成して更新
     const updatedResults = Array(this.getData('numberOfRecords')).fill(null);
 
-    // 既存のデータをコピー
+    // 既存データと新データの更新
     this.getData('searchResults').forEach((record, index) => {
-      if (record) updatedResults[index] = record;
+      if (record) {
+        console.log('既存データコピー', index);
+        updatedResults[index] = record;
+      }
     });
 
-    // 新しいデータを追加
     records.forEach((record, index) => {
+      console.log('新データ追加', offset + index);
       updatedResults[offset + index] = record;
     });
 
-    // 更新順序の変更
-    this.setData('isFetching', false);
+    // 更新順序の変更とログ追加
+    console.log('データ更新開始');
     this.setData('searchResults', updatedResults);
-    // searchResultsの更新を通知
+    console.log('searchResults更新完了');
+
     this.publish('searchResults');
+    console.log('searchResults通知完了');
+
+    this.setData('isFetching', false);
+    console.log('isFetching更新完了');
+
     this.setData('isStoreUpdating', false);
+    console.log('更新完了');
   }
 
   /** 指定されたインデックスのレコードを取得

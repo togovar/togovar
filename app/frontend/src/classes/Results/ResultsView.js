@@ -174,7 +174,7 @@ export default class ResultsView {
   searchResults(_results) {
     if (StoreManager.getData('isStoreUpdating')) {
       // データ更新中は処理を遅延
-      setTimeout(() => this.searchResults(_results), 100);
+      requestAnimationFrame(() => this.searchResults(_results));
       return;
     }
 
@@ -183,13 +183,12 @@ export default class ResultsView {
       return;
     }
 
-    // TODO: data取得と描画のタイミングをずらすために、requestAnimationFrameを使用
-    setTimeout(() => {
-      this.updateDisplaySize();
-    }, 1000);
-    // requestAnimationFrame(() => {
-    //   this.updateDisplaySize();
-    // });
+    // アニメーションフレームを使用して適切なタイミングで更新
+    requestAnimationFrame(() => {
+      if (!StoreManager.getData('isFetching')) {
+        this.updateDisplaySize();
+      }
+    });
   }
 
   _validateData() {

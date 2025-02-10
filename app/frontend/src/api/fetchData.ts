@@ -217,7 +217,6 @@ function _processStatistics(json: SearchStatistics) {
 
 /** 検索状態を更新し、条件が変わっていた場合は再検索 */
 async function _updateAppState() {
-  // is Login
   await StoreManager.fetchLoginStatus();
 
   // for Download button
@@ -235,11 +234,18 @@ async function _updateAppState() {
       );
   }
 
-  // 更新順序の変更
-  console.log('searchResults更新通知');
-  StoreManager.publish('searchResults'); // 明示的にsearchResultsの更新を通知
-  console.log('offset更新通知');
+  // 更新の順序を以下のように変更してみましょう
+  console.log('データ更新開始');
+
+  // まずoffsetを更新して表示位置を確定
   StoreManager.publish('offset');
-  console.log('appStatus更新');
+  console.log('offset更新完了');
+
+  // 次にデータを更新
+  StoreManager.publish('searchResults');
+  console.log('searchResults更新完了');
+
+  // 最後にステータスを更新
   StoreManager.setData('appStatus', 'normal');
+  console.log('更新完了');
 }
