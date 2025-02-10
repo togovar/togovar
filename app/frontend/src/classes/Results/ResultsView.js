@@ -124,25 +124,41 @@ export default class ResultsView {
 
   offset(offset) {
     this.lastScroll = offset * TR_HEIGHT;
+
+    // データ更新中は処理をスキップ
+    if (
+      StoreManager.getData('isStoreUpdating') ||
+      StoreManager.getData('isFetching')
+    ) {
+      return;
+    }
+
     // 染色体位置
     const displayingRegions1 = {},
       displayingRegions2 = {};
+
     for (let i = 0; i <= StoreManager.getData('rowCount') - 1; i++) {
       const record = StoreManager.getRecordByIndex(i);
-      // console.log(record);
-      // console.log(StoreManager.getData('rowCount'))
-      if (displayingRegions1[record.chromosome] === undefined) {
-        displayingRegions1[record.chromosome] = [];
+
+      // recordが実際のデータオブジェクトの場合のみ処理
+      if (record && typeof record === 'object' && record.chromosome) {
+        if (displayingRegions1[record.chromosome] === undefined) {
+          displayingRegions1[record.chromosome] = [];
+        }
+        displayingRegions1[record.chromosome].push(record.start);
       }
-      displayingRegions1[record.chromosome].push(record.start);
     }
-    for (const key in displayingRegions1) {
-      displayingRegions2[key] = {
-        start: Math.min(...displayingRegions1[key]),
-        end: Math.max(...displayingRegions1[key]),
-      };
+
+    // データが存在する場合のみ処理
+    if (Object.keys(displayingRegions1).length > 0) {
+      for (const key in displayingRegions1) {
+        displayingRegions2[key] = {
+          start: Math.min(...displayingRegions1[key]),
+          end: Math.max(...displayingRegions1[key]),
+        };
+      }
+      StoreManager.setData('displayingRegionsOnChromosome', displayingRegions2);
     }
-    StoreManager.setData('displayingRegionsOnChromosome', displayingRegions2);
   }
 
   searchMessages(messages) {
@@ -172,8 +188,12 @@ export default class ResultsView {
   }
 
   searchResults(_results) {
-    if (StoreManager.getData('isStoreUpdating')) {
-      // データ更新中は処理を遅延
+    // 更新中フラグのチェックを1回だけに
+    const isUpdating = StoreManager.getData('isStoreUpdating');
+    const isFetching = StoreManager.getData('isFetching');
+
+    if (isUpdating || isFetching) {
+      console.log('データ更新中のため遅延', { isUpdating, isFetching });
       requestAnimationFrame(() => this.searchResults(_results));
       return;
     }
@@ -183,12 +203,9 @@ export default class ResultsView {
       return;
     }
 
-    // アニメーションフレームを使用して適切なタイミングで更新
-    requestAnimationFrame(() => {
-      if (!StoreManager.getData('isFetching')) {
-        this.updateDisplaySize();
-      }
-    });
+    console.log('表示更新開始');
+    this.updateDisplaySize();
+    console.log('表示更新完了');
   }
 
   _validateData() {
