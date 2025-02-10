@@ -193,7 +193,6 @@ export default class ResultsView {
     const isFetching = StoreManager.getData('isFetching');
 
     if (isUpdating || isFetching) {
-      console.log('データ更新中のため遅延', { isUpdating, isFetching });
       requestAnimationFrame(() => this.searchResults(_results));
       return;
     }
@@ -203,9 +202,7 @@ export default class ResultsView {
       return;
     }
 
-    console.log('表示更新開始');
     this.updateDisplaySize();
-    console.log('表示更新完了');
   }
 
   _validateData() {

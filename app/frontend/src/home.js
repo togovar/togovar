@@ -29,6 +29,7 @@ import TippyBox from '../src/classes/TippyBox.js';
 
 import qs from 'qs';
 import { extractSearchCondition } from './store/searchManager';
+import { initializeApp } from './store/initializeApp';
 const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
 const _currentUrlParams = qs.parse(window.location.search.substr(1));
 
@@ -37,6 +38,8 @@ export function initHome() {
 
   StoreManager.setData('offset', 0);
   StoreManager.setData('selectedRow', undefined);
+
+  initializeApp(); // 先にURLからモードを設定
 
   new Configuration(document.getElementById('Configuration'));
 
@@ -72,7 +75,6 @@ function setUserAgent() {
 /** 初期検索の準備を行うメソッド
  * @param {Function} callback - 準備完了時に呼び出すコールバック関数 */
 function readyInitialSearch(callback) {
-  // SimpleSearchの検索条件マスターデータを読み込む
   const simpleSearchConditionsMaster = ((referenceGenome) => {
     switch (referenceGenome) {
       case 'GRCh37':
@@ -91,12 +93,11 @@ function readyInitialSearch(callback) {
   );
 
   // URLパラメータから検索条件を復元
-  const currentSearchMode =
-    StoreManager.getData('searchMode') ?? DEFAULT_SEARCH_MODE;
+  const currentSearchMode = StoreManager.getData('searchMode');
   const simpleSearchConditions = {};
   const advancedSearchConditions = {};
 
-  // // URLパラメータからシンプル検索条件を抽出
+  // URLパラメータからシンプル検索条件を抽出
   switch (currentSearchMode) {
     case 'simple':
       Object.assign(
@@ -105,14 +106,14 @@ function readyInitialSearch(callback) {
       );
       break;
     case 'advanced':
+      // advanced用の条件抽出を追加
       break;
   }
 
-  // 検索条件をストアに保存
+  // 検索条件をストアに保存（isFromHistory = trueとして設定）
   StoreManager.setData('simpleSearchConditions', simpleSearchConditions);
   StoreManager.setData('advancedSearchConditions', advancedSearchConditions);
 
-  // 準備完了時のコールバックを呼び出す
   callback();
 }
 

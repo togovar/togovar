@@ -9,6 +9,11 @@ import {
 
 let _currentUrlParams = qs.parse(window.location.search.substring(1));
 
+// 初期化処理を遅延実行
+setTimeout(() => {
+  initializeSearchMode();
+}, 0);
+
 /** デフォルト値と異なる検索条件を抽出 */
 export function extractSearchCondition(
   currentConditions: SimpleSearchCurrentConditions = {} as SimpleSearchCurrentConditions
@@ -83,11 +88,12 @@ function _setSimpleSearchConditions(
   });
   StoreManager.setData('simpleSearchConditions', updatedConditions);
 
-  // 履歴からの呼び出しでない場合、URLパラメータを更新
-  if (!isFromHistory) reflectSimpleSearchConditionToURI();
+  // 現在のモードがsimpleで、履歴からの呼び出しでない場合のみURLを更新
+  if (!isFromHistory && StoreManager.getData('searchMode') === 'simple') {
+    reflectSimpleSearchConditionToURI();
+  }
 
   StoreManager.setData('appStatus', 'searching');
-
   executeSearch(0, true);
 }
 
@@ -162,20 +168,33 @@ export function handleHistoryChange(_e) {
 // Advanced Search ----------------------------------------
 /** AdvancedSearch検索条件を設定し、必要に応じて検索を実行 */
 export function setAdvancedSearchCondition(newSearchConditions: any) {
-  // convert queries to URL parameters
-  // if (!isFromHistory) _reflectAdvancedSearchConditionToURI();
   StoreManager.setData('advancedSearchConditions', newSearchConditions);
   StoreManager.setData('appStatus', 'searching');
+
+  // URLパラメータを更新
+  _reflectAdvancedSearchConditionToURI();
 
   executeSearch(0, true);
 }
 
-// TODO: AdvancedSearchの条件をURLパラメータに反映するのは未実装、なので今後追加
-// function _reflectAdvancedSearchConditionToURI() {
-//   _currentUrlParams.mode = 'advanced';
-//   window.history.pushState(
-//     _currentUrlParams,
-//     '',
-//     `${window.location.origin}${window.location.pathname}?mode=advanced`
-//   );
-// }
+function _reflectAdvancedSearchConditionToURI() {
+  _currentUrlParams = { mode: 'advanced' };
+  window.history.pushState(
+    _currentUrlParams,
+    '',
+    `${window.location.origin}${window.location.pathname}?mode=advanced`
+  );
+}
+
+// アプリケーション初期化時
+function initializeSearchMode() {
+  const searchParams = new URLSearchParams(window.location.search);
+  const urlMode = searchParams.get('mode');
+
+  // URLのモードパラメータに基づいて検索モードを設定
+  if (urlMode === 'advanced') {
+    StoreManager.setData('searchMode', 'advanced');
+  } else {
+    StoreManager.setData('searchMode', 'simple');
+  }
+}

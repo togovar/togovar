@@ -190,7 +190,6 @@ function _getErrorMessage(statusCode: number): string {
 
 /** 検索結果データをセット */
 function _processSearchResults(json: SearchResults) {
-  console.log('json.dataをセットしました。', json.data);
   // results
   StoreManager.setResults(json.data, json.scroll.offset);
 }
@@ -234,18 +233,12 @@ async function _updateAppState() {
       );
   }
 
-  // 更新の順序を以下のように変更してみましょう
-  console.log('データ更新開始');
-
   // まずoffsetを更新して表示位置を確定
   StoreManager.publish('offset');
-  console.log('offset更新完了');
 
   // 次にデータを更新
   StoreManager.publish('searchResults');
-  console.log('searchResults更新完了');
 
   // 最後にステータスを更新
   StoreManager.setData('appStatus', 'normal');
-  console.log('更新完了');
 }
