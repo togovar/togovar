@@ -7,7 +7,7 @@ import { extractSearchCondition } from '../store/searchManager';
 import { FetchOption, SearchResults, SearchStatistics } from '../types';
 
 let currentAbortController = null;
-let _currentSearchMode: "simple" | "advanced" | null = null;
+let _currentSearchMode: 'simple' | 'advanced' | null = null;
 let lastRequestRanges = new Set(); // 取得済みの範囲を管理
 
 /** 検索を実行するメソッド（データ取得 & 更新） */
@@ -75,7 +75,10 @@ function _resetSearchResults() {
 }
 
 /** 検索用 API のエンドポイントを取得 */
-function _determineSearchEndpoints(offset:number, isFirstTime:boolean):string[] {
+function _determineSearchEndpoints(
+  offset: number,
+  isFirstTime: boolean
+): string[] {
   let basePath: string;
   let conditions = '';
 
@@ -109,7 +112,7 @@ function _determineSearchEndpoints(offset:number, isFirstTime:boolean):string[] 
 /** API リクエストのオプションを作成 */
 function _getRequestOptions(signal: AbortSignal): FetchOption {
   if (StoreManager.getData('searchMode') === 'simple') {
-      // Simple search のリクエストオプション
+    // Simple search のリクエストオプション
     return {
       method: 'GET',
       headers: {
@@ -118,7 +121,7 @@ function _getRequestOptions(signal: AbortSignal): FetchOption {
       },
       mode: 'cors',
       signal: signal,
-    } ;
+    };
   }
 
   // Advanced search のリクエストオプション
@@ -142,11 +145,11 @@ function _getRequestOptions(signal: AbortSignal): FetchOption {
     mode: 'cors',
     signal: signal,
     body: JSON.stringify(body),
-  } 
+  };
 }
 
 /** データを取得して結果を更新 */
-async function _fetchData(endpoint:string, options: FetchOption) {
+async function _fetchData(endpoint: string, options: FetchOption) {
   try {
     const response = await fetch(endpoint, options);
     if (!response.ok) {
@@ -165,7 +168,7 @@ async function _fetchData(endpoint:string, options: FetchOption) {
     }
 
     await _updateAppState();
-    StoreManager.setData('searchMessages', "");
+    StoreManager.setData('searchMessages', '');
   } catch (error) {
     if (error.name === 'AbortError') return;
     StoreManager.setData('isFetching', false);
@@ -221,7 +224,7 @@ async function _updateAppState() {
   switch (StoreManager.getData('searchMode')) {
     case 'simple':
       if (StoreManager.getData('simpleSearchConditions').term) {
-        document.body.setAttribute('data-has-conditions', "true");
+        document.body.setAttribute('data-has-conditions', 'true');
       }
       break;
     case 'advanced':
@@ -231,6 +234,6 @@ async function _updateAppState() {
       );
   }
 
-  StoreManager.notify('offset'); // TODO: 何を通知しているのか、確認が必要
+  StoreManager.publish('offset'); // TODO: 何を通知しているのか、確認が必要
   StoreManager.setData('appStatus', 'normal'); // TODO: 変数名変更する Result画面の全体Loadingicon
 }

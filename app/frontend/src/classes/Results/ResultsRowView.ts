@@ -61,8 +61,16 @@ export class ResultsRowView {
     this.index = index;
     this.selected = false;
     this.tr = this.#createTableRow();
-    StoreManager.bind('selectedRow', this);
-    StoreManager.bind('offset', this);
+
+    // `selectedRow` の変更を監視し、selectedRow() を活用
+    StoreManager.subscribe('selectedRow', this.selectedRow.bind(this));
+    // `offset` の変更を監視し、テーブル行を更新
+    StoreManager.subscribe('offset', this.updateTableRow.bind(this));
+    // `rowCount` を監視し、範囲外の行を非表示にする
+    // StoreManager.subscribe('rowCount', this.updateTableRow.bind(this));
+
+    // StoreManager.bind('selectedRow', this);
+    // StoreManager.bind('offset', this);
     // StoreManager.bind('rowCount', this);   // TODO: 必要ないようであれば削除する
   }
 
@@ -80,9 +88,9 @@ export class ResultsRowView {
   }
 
   /** オフセットが変更されたときに行を更新 */
-  offset() {
-    this.updateTableRow();
-  }
+  // offset() {
+  //   this.updateTableRow();
+  // }
 
   // TODO: 必要ないようであれば削除する
   // rowCount() {

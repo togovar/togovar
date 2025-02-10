@@ -1,3 +1,31 @@
+// ------------------------------
+// Store
+// ------------------------------
+type StoreState = {
+  karyotype: any;
+  searchMode: any;
+  simpleSearchConditionsMaster: MasterConditions[];
+  simpleSearchConditions: SimpleSearchCurrentConditions;
+  columns: Column[];
+  searchResults: ResultData[];
+  numberOfRecords: number;
+  offset: number;
+  rowCount: number;
+  appStatus: 'preparing' | 'searching' | 'normal'; //'preparing' | 'searching' | 'idle'に変更する?
+  isLogin: boolean;
+  isFetching: boolean;
+  isStoreUpdating: boolean;
+  selectedRow?: number;
+  lastSearchMode?: 'simple' | 'advanced';
+  advancedSearchConditions?: any;
+  searchMessages?: any;
+  searchStatus?: any;
+  statisticsDataset?: any;
+  statisticsSignificance?: any;
+  statisticsType?: any;
+  statisticsConsequence?: any;
+};
+
 // -------------------------------------
 // Master Conditions
 // -------------------------------------
@@ -48,7 +76,7 @@ export type SimpleSearchCurrentConditions = {
   mode?: SearchMode;
   term?: string;
   dataset?: Record<string, string>; // { "gem_j_wga": "1", ... }
-  frequency: {
+  frequency?: {
     from: number;
     to: number;
     invert: string;
