@@ -125,7 +125,6 @@ class StoreManager {
   // ------------------------------
   /** 検索結果を保存し、状態を更新する */
   setResults(records: ResultData[], offset: number) {
-    // try {
     this.setData('isStoreUpdating', true);
 
     // 新しい配列を作成して更新
@@ -141,12 +140,12 @@ class StoreManager {
       updatedResults[offset + index] = record;
     });
 
-    this.setData('searchResults', updatedResults);
-    // this.publish('searchResults');
-    // } finally {
-    this.setData('isStoreUpdating', false);
+    // 更新順序の変更
     this.setData('isFetching', false);
-    // }
+    this.setData('searchResults', updatedResults);
+    // searchResultsの更新を通知
+    this.publish('searchResults');
+    this.setData('isStoreUpdating', false);
   }
 
   /** 指定されたインデックスのレコードを取得

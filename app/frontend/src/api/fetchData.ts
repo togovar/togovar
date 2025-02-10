@@ -190,6 +190,7 @@ function _getErrorMessage(statusCode: number): string {
 
 /** 検索結果データをセット */
 function _processSearchResults(json: SearchResults) {
+  console.log('json.dataをセットしました。', json.data);
   // results
   StoreManager.setResults(json.data, json.scroll.offset);
 }
@@ -234,6 +235,11 @@ async function _updateAppState() {
       );
   }
 
-  StoreManager.publish('offset'); // TODO: 何を通知しているのか、確認が必要
-  StoreManager.setData('appStatus', 'normal'); // TODO: 変数名変更する Result画面の全体Loadingicon
+  // 更新順序の変更
+  console.log('searchResults更新通知');
+  StoreManager.publish('searchResults'); // 明示的にsearchResultsの更新を通知
+  console.log('offset更新通知');
+  StoreManager.publish('offset');
+  console.log('appStatus更新');
+  StoreManager.setData('appStatus', 'normal');
 }
