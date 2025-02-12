@@ -119,13 +119,12 @@ export class ResultsRowView {
       return this.#setLoadingState();
     }
 
-    if (this.tr.classList.contains('-loading')) {
-      this.#prepareTableData();
-    }
+    this.#prepareTableData();
 
-    this.tr.classList.remove('-loading', '-out-of-range');
     // 各カラムのデータ更新
     COLUMNS.forEach((column) => this.#updateColumnContent(column, result));
+
+    this.tr.classList.remove('-loading', '-out-of-range');
   }
 
   /**  テーブル行を作成する。
@@ -302,6 +301,8 @@ export class ResultsRowView {
       polyphen: () => this.#updatePolyphen(result.polyphen),
     };
     columnHandlers[column.id]?.();
+
+    console.log('updateColumnContent', column, result);
   }
 
   /** TogoVar ID */
