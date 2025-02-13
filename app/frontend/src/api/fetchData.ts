@@ -14,9 +14,14 @@ let lastRequestRanges = new Set(); // 取得済みの範囲を管理
 export const executeSearch = (() => {
   return _.debounce((offset = 0, isFirstTime = false) => {
     const newSearchMode = StoreManager.getData('searchMode');
+
+    // 新しい検索リクエストの前に、既存のリクエストをキャンセル
+    if (currentAbortController) {
+      currentAbortController.abort();
+    }
+
     if (_currentSearchMode && _currentSearchMode !== newSearchMode) {
       // mode切替時
-      currentAbortController.abort(); // Abort処理
       _currentSearchMode = newSearchMode;
       isFirstTime = true; // データリセットのため
       lastRequestRanges.clear(); // モード切り替え時にクリア
