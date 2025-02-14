@@ -16,7 +16,6 @@ type StoreState = {
   isFetching: boolean;
   isStoreUpdating: boolean;
   selectedRow?: number;
-  lastSearchMode?: 'simple' | 'advanced';
   advancedSearchConditions?: any;
   searchMessages?: any;
   searchStatus?: any;

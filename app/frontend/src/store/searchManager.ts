@@ -172,13 +172,13 @@ export function setAdvancedSearchCondition(newSearchConditions: any) {
   StoreManager.setData('appStatus', 'searching');
 
   // URLパラメータを更新
-  _reflectAdvancedSearchConditionToURI();
+  reflectAdvancedSearchConditionToURI();
 
   executeSearch(0, true);
 }
 
-function _reflectAdvancedSearchConditionToURI() {
-  _currentUrlParams = { mode: 'advanced' };
+export function reflectAdvancedSearchConditionToURI() {
+  _currentUrlParams.mode = 'advanced';
   window.history.pushState(
     _currentUrlParams,
     '',

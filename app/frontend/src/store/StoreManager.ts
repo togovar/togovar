@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import {
   handleHistoryChange,
   reflectSimpleSearchConditionToURI,
+  reflectAdvancedSearchConditionToURI,
   setAdvancedSearchCondition,
 } from '../store/searchManager';
 import { executeSearch } from '../api/fetchData';
@@ -208,7 +209,7 @@ class StoreManager {
       this.setData('isLogin', false);
     }
 
-    // こっちがいいのかな？
+    // TODO：以下に変更かを考える
     // try {
     //   if (window.location.origin === 'http://localhost:8000') {
     //     this.setData('isLogin', true);
@@ -236,11 +237,6 @@ class StoreManager {
   // ------------------------------
   /** 検索モードを変更 */
   searchMode(mode: SearchMode) {
-    // 変更前の検索モードと異なる場合のみ処理
-    if (this.getData('lastSearchMode') === mode) return;
-
-    // 検索モードを更新
-    this.setData('lastSearchMode', mode);
     this.setData('isStoreUpdating', true);
 
     try {
@@ -258,18 +254,9 @@ class StoreManager {
           this.publish('simpleSearchConditions');
           break;
         case 'advanced':
-          {
-            const condition = this.getData('advancedSearchConditions');
-            setAdvancedSearchCondition(condition);
-            // URLを更新する処理を追加
-            const searchParams = new URLSearchParams(window.location.search);
-            searchParams.set('mode', 'advanced');
-            window.history.pushState(
-              {},
-              '',
-              `${window.location.pathname}?${searchParams.toString()}`
-            );
-          }
+          const condition = this.getData('advancedSearchConditions');
+          setAdvancedSearchCondition(condition);
+          reflectAdvancedSearchConditionToURI();
           break;
       }
 
