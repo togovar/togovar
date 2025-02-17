@@ -10,7 +10,7 @@ import { StoreState, ResultData, SearchMode } from '../types';
 
 // class StoreManager extends FormatData {
 class StoreManager {
-  #bindings: Record<string, any[]> = {};
+  #bindings: Record<string, any[]> = {}; // TODO: いずれ削除
   #listeners = new Map<string, Set<(value: any) => void>>();
   #state: StoreState = {
     karyotype: '',
@@ -63,17 +63,6 @@ class StoreManager {
     }
   }
 
-  /** 指定されたキーにターゲットをバインドする */
-  bind<T = any>(key: string, target: T) {
-    if (this.#bindings[key] === undefined) {
-      // 初めてのバインディングなら新しい配列を作成
-      this.#bindings[key] = [target];
-    } else {
-      // すでにバインドされている場合は追加
-      this.#bindings[key].push(target);
-    }
-  }
-
   /** 変更監視を追加する
    * callcackが変更されたら、UIが更新される */
   subscribe<T extends keyof StoreState>(
@@ -93,6 +82,18 @@ class StoreManager {
   // ) {
   //   this.#listeners.get(key)?.delete(callback);
   // }
+
+  /** 指定されたキーにターゲットをバインドする */
+  // TODO: bindingsがなくなったら、以下は削除する
+  bind<T = any>(key: string, target: T) {
+    if (this.#bindings[key] === undefined) {
+      // 初めてのバインディングなら新しい配列を作成
+      this.#bindings[key] = [target];
+    } else {
+      // すでにバインドされている場合は追加
+      this.#bindings[key].push(target);
+    }
+  }
 
   /** listenersに登録されている関数を実行 */
   publish<T extends keyof StoreState>(key: T) {
@@ -188,48 +189,25 @@ class StoreManager {
         return;
       }
 
-      const timeout = new Promise<Response>((_, reject) =>
-        setTimeout(() => reject(new Error('Request timeout')), 10000)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒でリクエストを中断
+
+      const response = await fetch(`${window.location.origin}/auth/status`, {
+        signal: controller.signal,
+      }).catch(() => {
+        throw new Error('Request failed or timed out');
+      });
+
+      clearTimeout(timeoutId);
+
+      this.setData(
+        'isLogin',
+        response instanceof Response && response.status === 200
       );
-
-      const fetchPromise = fetch(`${window.location.origin}/auth/status`);
-      const response = await Promise.race([fetchPromise, timeout]);
-
-      if (response instanceof Response) {
-        if (response.status === 401 || response.status === 403) {
-          this.setData('isLogin', false);
-        } else if (response.status === 200) {
-          this.setData('isLogin', true);
-        }
-      } else {
-        throw new Error('Invalid response type');
-      }
     } catch (error) {
-      console.error('Error fetching auth status or timeout occurred:', error);
+      console.error('Error fetching auth status:', error);
       this.setData('isLogin', false);
     }
-
-    // TODO：以下に変更かを考える
-    // try {
-    //   if (window.location.origin === 'http://localhost:8000') {
-    //     this.setData('isLogin', true);
-    //     return;
-    //   }
-
-    //   const timeout = new Promise<Response>((_, reject) =>
-    //     setTimeout(() => reject(new Error('Request timeout')), 10000)
-    //   );
-
-    //   const fetchPromise = fetch(`${window.location.origin}/auth/status`);
-    //   const response = await Promise.race([fetchPromise, timeout]);
-
-    //   if (response instanceof Response) {
-    //     this.setData('isLogin', response.status === 200);
-    //   }
-    // } catch (error) {
-    //   console.error('Error fetching auth status:', error);
-    //   this.setData('isLogin', false);
-    // }
   }
 
   // ------------------------------

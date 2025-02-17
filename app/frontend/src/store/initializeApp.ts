@@ -7,9 +7,7 @@ export function initializeApp() {
   // URLのモードパラメータに基づいて検索モードを設定
   if (urlMode === 'advanced') {
     StoreManager.setData('searchMode', 'advanced');
-    console.log('searchMode', 'advanced');
   } else {
     StoreManager.setData('searchMode', 'simple');
-    console.log('searchMode', 'simple');
   }
 }

@@ -301,8 +301,6 @@ export class ResultsRowView {
       polyphen: () => this.#updatePolyphen(result.polyphen),
     };
     columnHandlers[column.id]?.();
-
-    console.log('updateColumnContent', column, result);
   }
 
   /** TogoVar ID */
