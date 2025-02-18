@@ -8,7 +8,7 @@ import {
 import { executeSearch } from '../api/fetchData';
 import { StoreState, ResultData, SearchMode } from '../types';
 
-// class StoreManager extends FormatData {
+// class storeManager extends FormatData {
 class StoreManager {
   #bindings: Record<string, any[]> = {}; // TODO: いずれ削除
   #listeners = new Map<string, Set<(value: any) => void>>();
@@ -247,4 +247,4 @@ class StoreManager {
   }
 }
 
-export default new StoreManager();
+export const storeManager = new StoreManager();

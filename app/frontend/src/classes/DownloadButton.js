@@ -1,4 +1,4 @@
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 import { API_URL } from '../global.js';
 
 export default class DownloadButton {
@@ -18,7 +18,7 @@ export default class DownloadButton {
   }
 
   #downloadFile(type) {
-    switch (StoreManager.getData('searchMode')) {
+    switch (storeManager.getData('searchMode')) {
       case 'simple':
         return this.#downloadFromSimpleSearch(type);
       case 'advanced':
@@ -27,14 +27,14 @@ export default class DownloadButton {
   }
 
   #downloadFromSimpleSearch(type) {
-    const query = StoreManager.getData('simpleSearchConditions').term;
+    const query = storeManager.getData('simpleSearchConditions').term;
     const anchor = document.createElement('a');
     anchor.href = `${this.#path}.${type}?term=${query}`;
     anchor.click();
   }
 
   #downloadFromAdvancedSearch(type) {
-    const body = { query: StoreManager.getData('advancedSearchConditions') };
+    const body = { query: storeManager.getData('advancedSearchConditions') };
     const form = document.createElement('form');
     form.action = `${this.#path}.${type}`;
     form.method = 'post';

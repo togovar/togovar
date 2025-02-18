@@ -1,12 +1,12 @@
 import PanelView from './PanelView.js';
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 import { getSimpleSearchConditionMaster } from '../store/searchManager';
 
 export default class PanelViewPreviewConsequence extends PanelView {
   constructor(elm) {
     super(elm, 'frenquecies');
-    StoreManager.bind('selectedRow', this);
-    StoreManager.bind('offset', this);
+    storeManager.bind('selectedRow', this);
+    storeManager.bind('offset', this);
     this._content = this.elm.querySelector('.content');
   }
 
@@ -21,8 +21,8 @@ export default class PanelViewPreviewConsequence extends PanelView {
   _update() {
     let html = '';
     this.elm.classList.add('-notfound');
-    if (StoreManager.getData('selectedRow') !== undefined) {
-      const record = StoreManager.getSelectedRecord();
+    if (storeManager.getData('selectedRow') !== undefined) {
+      const record = storeManager.getSelectedRecord();
       if (record && record.transcripts && record.transcripts.length > 0) {
         // consequence の取り出し
         let accessions = record.transcripts

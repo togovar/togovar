@@ -1,12 +1,12 @@
 import PanelView from './PanelView.js';
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 import { getSimpleSearchConditionMaster } from '../store/searchManager';
 
 export default class PanelViewPreviewClinicalSignificance extends PanelView {
   constructor(elm) {
     super(elm, 'clinicalSignificance');
-    StoreManager.bind('selectedRow', this);
-    StoreManager.bind('offset', this);
+    storeManager.bind('selectedRow', this);
+    storeManager.bind('offset', this);
     this.content = this.elm.querySelector('.content');
   }
 
@@ -20,8 +20,8 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
 
   update() {
     let html = '';
-    if (StoreManager.getData('selectedRow') !== undefined) {
-      const record = StoreManager.getSelectedRecord();
+    if (storeManager.getData('selectedRow') !== undefined) {
+      const record = storeManager.getSelectedRecord();
       if (record && record.significance) {
         const master = getSimpleSearchConditionMaster('significance');
 

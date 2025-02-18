@@ -1,5 +1,5 @@
 import PanelView from './PanelView.js';
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
@@ -8,7 +8,7 @@ import {
 export default class PanelViewFilterVariantCallingQuality extends PanelView {
   constructor(elm) {
     super(elm, 'quality');
-    StoreManager.bind('simpleSearchConditions', this);
+    storeManager.bind('simpleSearchConditions', this);
     // reference
     this.checkbox = this.elm.querySelector('.content > label > input');
     // event

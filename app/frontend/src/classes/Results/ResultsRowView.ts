@@ -1,5 +1,5 @@
 import { COLUMNS } from '../../global.js';
-import StoreManager from '../../store/StoreManager';
+import { storeManager } from '../../store/StoreManager';
 import '../../components/LogarithmizedBlockGraphFrequencyView';
 import { getSimpleSearchConditionMaster } from '../../store/searchManager';
 import {
@@ -63,20 +63,20 @@ export class ResultsRowView {
     this.tr = this.#createTableRow();
 
     // `selectedRow` の変更を監視し、selectedRow() を活用
-    StoreManager.subscribe('selectedRow', this.selectedRow.bind(this));
+    storeManager.subscribe('selectedRow', this.selectedRow.bind(this));
     // `offset` の変更を監視し、テーブル行を更新
-    StoreManager.subscribe('offset', this.updateTableRow.bind(this));
+    storeManager.subscribe('offset', this.updateTableRow.bind(this));
     // `rowCount` を監視し、範囲外の行を非表示にする
-    // StoreManager.subscribe('rowCount', this.updateTableRow.bind(this));
+    // storeManager.subscribe('rowCount', this.updateTableRow.bind(this));
 
-    // StoreManager.bind('selectedRow', this);
-    // StoreManager.bind('offset', this);
-    // StoreManager.bind('rowCount', this);   // TODO: 必要ないようであれば削除する
+    // storeManager.bind('selectedRow', this);
+    // storeManager.bind('offset', this);
+    // storeManager.bind('rowCount', this);   // TODO: 必要ないようであれば削除する
   }
 
   /** 行がクリックされたときに選択状態をトグル */
   click() {
-    StoreManager.setData('selectedRow', this.selected ? undefined : this.index);
+    storeManager.setData('selectedRow', this.selected ? undefined : this.index);
   }
 
   // bindings ///////////////////////////
@@ -101,19 +101,19 @@ export class ResultsRowView {
   /** テーブル行のデータを更新 */
   updateTableRow() {
     if (
-      StoreManager.getData('isFetching') ||
-      StoreManager.getData('isStoreUpdating')
+      storeManager.getData('isFetching') ||
+      storeManager.getData('isStoreUpdating')
     ) {
       return this.#setLoadingState();
     }
 
     // styleで範囲外の行(-out-of-range)は非表示
-    const rowCount = StoreManager.getData('rowCount');
+    const rowCount = storeManager.getData('rowCount');
     if (rowCount <= this.index) {
       return this.#setOutOfRangeState();
     }
 
-    const result = StoreManager.getRecordByIndex(this.index);
+    const result = storeManager.getRecordByIndex(this.index);
     // console.log(result); // TODO:ここでデータは各行取れているけれども描画できていない。tdがcolspan12のまま
     if (!result || result === 'loading' || result === 'out of range') {
       return this.#setLoadingState();

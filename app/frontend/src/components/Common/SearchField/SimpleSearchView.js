@@ -3,8 +3,11 @@ import { customElement, state } from 'lit/decorators.js';
 import './SearchFieldWithSuggestions';
 import './SearchFieldExamples';
 import './SimpleSearchButton';
-// import StoreManager from '../../../store/StoreManager';
-import { setSimpleSearchCondition, getSimpleSearchCondition } from "../../../store/searchManager"
+// import {storeManager} from '../../../store/StoreManager';
+import {
+  setSimpleSearchCondition,
+  getSimpleSearchCondition,
+} from '../../../store/searchManager';
 import { API_URL } from '../../../global.js';
 
 import Styles from '../../../../stylesheets/object/component/simple-search-view.scss';
@@ -103,7 +106,7 @@ class SimpleSearchView extends LitElement {
   /** @property {boolean} _hideSuggestions - Whether to hide suggestions */
   @state() _hideSuggestions = true;
 
-  /** Search using StoreManager's setSimpleSearchCondition. And add regex about chromosome.
+  /** Search using storeManager's setSimpleSearchCondition. And add regex about chromosome.
    * @private
    * @param {string} term - value to search for */
   _search(term) {
@@ -168,13 +171,13 @@ class SimpleSearchView extends LitElement {
           .suggestAPIURL=${`${API_URL}/suggest`}
           .suggestAPIQueryParam=${'term'}
           .options=${{
-        valueMappings: {
-          valueKey: 'term',
-          labelKey: 'term',
-          aliasOfKey: 'alias_of',
-        },
-        titleMappings: { gene: 'Gene names', disease: 'Disease names' },
-      }}
+            valueMappings: {
+              valueKey: 'term',
+              labelKey: 'term',
+              aliasOfKey: 'alias_of',
+            },
+            titleMappings: { gene: 'Gene names', disease: 'Disease names' },
+          }}
           .term=${this._term}
           .hideSuggestions=${this._hideSuggestions}
           @new-suggestion-selected=${this._handleSuggestionEnter}

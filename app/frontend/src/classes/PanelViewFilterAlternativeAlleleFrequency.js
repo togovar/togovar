@@ -1,5 +1,5 @@
 import PanelView from './PanelView.js';
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
@@ -31,7 +31,7 @@ export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView
     this._rangeSelectorView = rangeSlider;
 
     // events
-    StoreManager.bind('simpleSearchConditions', this);
+    storeManager.bind('simpleSearchConditions', this);
   }
 
   changeParameter(newCondition) {

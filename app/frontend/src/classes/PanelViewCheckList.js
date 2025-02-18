@@ -1,5 +1,5 @@
 import PanelView from './PanelView.js';
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
@@ -14,9 +14,9 @@ export default class PanelViewCheckList extends PanelView {
     super(elm, kind);
     this._statisticsType = statisticsType;
     // 検索条件マスター
-    const conditionMaster = StoreManager.getData(
-      'simpleSearchConditionsMaster'
-    ).find((condition) => condition.id === this.kind);
+    const conditionMaster = storeManager
+      .getData('simpleSearchConditionsMaster')
+      .find((condition) => condition.id === this.kind);
 
     // GUIの生成
     this._createGUI(conditionMaster);
@@ -45,8 +45,8 @@ export default class PanelViewCheckList extends PanelView {
       );
     }
 
-    StoreManager.bind('simpleSearchConditions', this);
-    StoreManager.bind(this._statisticsType, this);
+    storeManager.bind('simpleSearchConditions', this);
+    storeManager.bind(this._statisticsType, this);
 
     // 統計情報の更新
     this[this._statisticsType] = (values) => {
@@ -59,8 +59,9 @@ export default class PanelViewCheckList extends PanelView {
         }
         this._inputsValues.all.value.textContent = all.toLocaleString();
       }
-      this._inputsValues.all.value.textContent =
-        StoreManager.getData('searchStatus').filtered.toLocaleString();
+      this._inputsValues.all.value.textContent = storeManager
+        .getData('searchStatus')
+        .filtered.toLocaleString();
     };
   }
 

@@ -9,7 +9,7 @@ import './SearchFieldSuggestionsList';
 
 import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
 import { debounce } from '../../../utils/debounce';
-import StoreManager from "../../../store/StoreManager";
+import { storeManager } from '../../../store/StoreManager';
 
 /**
  * @typedef SearchFieldOptions
@@ -105,7 +105,7 @@ class SearchFieldtWithSuggestions extends LitElement {
           this._suggestionKeysArray = Object.keys(data);
         }
 
-        StoreManager.setData('showSuggest', true)
+        storeManager.setData('showSuggest', true);
         return (this.suggestData = dataToReturn);
       }
       return (this.showSuggestions = false);
@@ -142,7 +142,7 @@ class SearchFieldtWithSuggestions extends LitElement {
       this.suggestData[
         this._suggestionKeysArray[this.currentSuggestionColumnIndex]
       ]?.length -
-      1
+        1
     ) {
       this.currentSuggestionIndex =
         this.suggestData[
@@ -157,7 +157,7 @@ class SearchFieldtWithSuggestions extends LitElement {
    * @returns {void} */
   _handleUpDownKeys = (e) => {
     if (!this.showSuggestions) {
-      StoreManager.setData('showSuggest', false)
+      storeManager.setData('showSuggest', false);
     }
 
     if (
@@ -212,7 +212,7 @@ class SearchFieldtWithSuggestions extends LitElement {
           this.suggestData[
             this._suggestionKeysArray[this.currentSuggestionColumnIndex]
           ]?.length -
-          1
+            1
         ) {
           this.currentSuggestionIndex = 0;
           return;
@@ -224,7 +224,7 @@ class SearchFieldtWithSuggestions extends LitElement {
         if (this.showSuggestions && this.currentSuggestionIndex !== -1) {
           this._select(
             this.suggestData[
-            this._suggestionKeysArray[this.currentSuggestionColumnIndex]
+              this._suggestionKeysArray[this.currentSuggestionColumnIndex]
             ][this.currentSuggestionIndex]
           );
           [this.currentSuggestionIndex, this.currentSuggestionColumnIndex] = [
@@ -312,7 +312,7 @@ class SearchFieldtWithSuggestions extends LitElement {
   _handleFocusIn() {
     if (this.term?.length > 3) {
       this.showSuggestions = true;
-      StoreManager.setData('showSuggest', true)
+      storeManager.setData('showSuggest', true);
     }
   }
 
@@ -320,7 +320,7 @@ class SearchFieldtWithSuggestions extends LitElement {
    * @private */
   _handleFocusOut() {
     this._hideSuggestions();
-    StoreManager.setData('showSuggest', false)
+    storeManager.setData('showSuggest', false);
   }
 
   /** Hide suggestions and empty input when input is reset. input-reset event for simple search
@@ -346,28 +346,28 @@ class SearchFieldtWithSuggestions extends LitElement {
       ></search-field>
       <div class="suggestions-container">
         ${this.suggestData && this.showSuggestions && !this.hideSuggestions
-        ? html`
+          ? html`
               ${map(this._suggestionKeysArray, (key, keyIndex) => {
-          return html`
+                return html`
                   <div class="column">
                     <search-field-suggestions-list
                       .suggestData=${this.suggestData[key]}
                       .highlightedSuggestionIndex="${keyIndex ===
-              this.currentSuggestionColumnIndex
-              ? this.currentSuggestionIndex
-              : -1}"
+                      this.currentSuggestionColumnIndex
+                        ? this.currentSuggestionIndex
+                        : -1}"
                       .itemIdKey=${'term'}
                       .itemLabelKey=${'term'}
                       .subTextKey=${this._searchFieldOptions?.valueMappings
-              ?.aliasOfKey}
+                        ?.aliasOfKey}
                       title=${this._searchFieldOptions?.titleMappings?.[key]}
                       @suggestion-selected=${this._handleSuggestionSelected}
                     ></search-field-suggestions-list>
                   </div>
                 `;
-        })}
+              })}
             `
-        : nothing}
+          : nothing}
       </div>
     `;
   }

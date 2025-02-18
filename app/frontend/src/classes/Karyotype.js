@@ -1,4 +1,4 @@
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 import ChromosomeView from './ChromosomeView.js';
 
 const CHROMOSOME_KEYS = [
@@ -236,15 +236,15 @@ export default class Karyotype {
     this.chromosomes = this.elm.querySelector('.content > .chromosomes');
     this.chromosomeViews;
 
-    StoreManager.setData('karyotype', karyotype);
+    storeManager.setData('karyotype', karyotype);
 
     // events
-    StoreManager.bind('karyotype', this);
-    StoreManager.bind('simpleSearchConditions', this);
-    StoreManager.bind('advancedSearchConditions', this);
+    storeManager.bind('karyotype', this);
+    storeManager.bind('simpleSearchConditions', this);
+    storeManager.bind('advancedSearchConditions', this);
     // ビューの開閉
     this.elm.querySelector('.header').addEventListener('click', () => {
-      const karyotype = StoreManager.getData('karyotype');
+      const karyotype = storeManager.getData('karyotype');
       this._changeKaryotype({
         isOpened: !karyotype.isOpened,
         height: karyotype.isOpened ? HEIGHTS[0] : HEIGHTS[1],
@@ -285,7 +285,7 @@ export default class Karyotype {
     //  });
 
     // ストアの情報を反映
-    this.karyotype(StoreManager.getData('karyotype'));
+    this.karyotype(storeManager.getData('karyotype'));
   }
 
   // TSVから総位置データ取り出し
@@ -334,11 +334,11 @@ export default class Karyotype {
 
   // 核型の設定変更
   _changeKaryotype(params) {
-    const karyotype = StoreManager.getData('karyotype');
+    const karyotype = storeManager.getData('karyotype');
     for (const key in params) {
       karyotype[key] = params[key];
     }
-    StoreManager.setData('karyotype', karyotype);
+    storeManager.setData('karyotype', karyotype);
     localStorage.setItem('karyotype', JSON.stringify(karyotype));
   }
 

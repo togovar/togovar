@@ -1,4 +1,4 @@
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 import { setSimpleSearchCondition } from '../store/searchManager';
 
 const WIDTH = 12;
@@ -150,7 +150,7 @@ export default class ChromosomeView {
     this._svg.innerHTML = html + '</g>';
 
     // event
-    StoreManager.bind('displayingRegionsOnChromosome', this);
+    storeManager.bind('displayingRegionsOnChromosome', this);
 
     // whole
     this._elm
@@ -196,7 +196,7 @@ export default class ChromosomeView {
   }
 
   _selectBand(chr, start, end) {
-    switch (StoreManager.getData('searchMode')) {
+    switch (storeManager.getData('searchMode')) {
       case 'simple':
         setSimpleSearchCondition('term', `${chr}:${start}-${end}`);
         break;
@@ -213,7 +213,7 @@ export default class ChromosomeView {
         break;
     }
     // Karyotype 上の座標編集フィールドが廃止になったため、不要
-    //StoreManager.setData('region__', {
+    //storeManager.setData('region__', {
     //  chromosome: this._no,
     //  start: e.delegateTarget.dataset.start,
     //  end: e.delegateTarget.dataset.end

@@ -1,4 +1,4 @@
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 import { TR_HEIGHT } from '../global.js';
 
 const RELEASE_DURATION = 2000;
@@ -24,9 +24,9 @@ export default class ScrollBar {
     this.timeoutId;
 
     // イベント
-    StoreManager.bind('offset', this);
-    StoreManager.bind('numberOfRecords', this);
-    StoreManager.bind('rowCount', this);
+    storeManager.bind('offset', this);
+    storeManager.bind('numberOfRecords', this);
+    storeManager.bind('rowCount', this);
     $(this.bar).draggable({
       axis: 'y',
       containment: this.elm,
@@ -36,15 +36,15 @@ export default class ScrollBar {
   }
 
   drag(e, ui) {
-    const rowCount = StoreManager.getData('rowCount'),
-      numberOfRecords = StoreManager.getData('numberOfRecords'),
+    const rowCount = storeManager.getData('rowCount'),
+      numberOfRecords = storeManager.getData('numberOfRecords'),
       availableHeight = rowCount * TR_HEIGHT - this.bar.offsetHeight * 0,
       offsetRate = ui.position.top / availableHeight;
     let offset = Math.ceil(offsetRate * numberOfRecords);
     offset = offset < 0 ? 0 : offset;
     offset =
       offset + rowCount > numberOfRecords ? numberOfRecords - rowCount : offset;
-    StoreManager.setData('offset', offset);
+    storeManager.setData('offset', offset);
     this.prepareRelease();
   }
 
@@ -63,9 +63,9 @@ export default class ScrollBar {
   }
 
   update() {
-    const offset = StoreManager.getData('offset'),
-      rowCount = StoreManager.getData('rowCount'),
-      numberOfRecords = StoreManager.getData('numberOfRecords'),
+    const offset = storeManager.getData('offset'),
+      rowCount = storeManager.getData('rowCount'),
+      numberOfRecords = storeManager.getData('numberOfRecords'),
       totalHeight = numberOfRecords * TR_HEIGHT, // 全体の高さ
       offsetHeight = offset * TR_HEIGHT, // オフセット量
       displayHeight = rowCount * TR_HEIGHT, // 表示領域

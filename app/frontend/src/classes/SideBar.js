@@ -1,4 +1,4 @@
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 import { resetSimpleSearchConditions } from '../store/searchManager';
 
 export default class SideBar {
@@ -6,7 +6,7 @@ export default class SideBar {
     this._elm = elm;
     this._body = document.getElementsByTagName('body')[0];
     // イベント
-    StoreManager.bind('selectedRow', this);
+    storeManager.bind('selectedRow', this);
     // スクロールバーを隠す
     const scrollBarWidth = this._elm.offsetWidth - this._elm.clientWidth;
     this._elm.style.width = `${this._elm.offsetWidth + scrollBarWidth}px`;

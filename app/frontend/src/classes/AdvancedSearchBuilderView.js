@@ -19,7 +19,7 @@ export default class AdvancedSearchBuilderView {
     );
 
     // events
-    // StoreManager.bind('advancedSearchConditions', this);
+    // storeManager.bind('advancedSearchConditions', this);
     this._defineEvents();
 
     // select conditions

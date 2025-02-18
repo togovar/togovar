@@ -1,4 +1,4 @@
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 import ConditionValueEditor from './ConditionValueEditor.js';
 import '../components/ConditionItemValueView';
 import { CONDITION_TYPE } from '../definition.js';
@@ -81,7 +81,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
       });
     });
 
-    this._karyotype = StoreManager.getData('karyotype');
+    this._karyotype = storeManager.getData('karyotype');
 
     // default values
     if (defaultValues) {

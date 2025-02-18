@@ -1,6 +1,6 @@
 import * as qs from 'qs';
 import { executeSearch } from '../api/fetchData';
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 import {
   MasterConditions,
   MasterConditionId,
@@ -18,7 +18,7 @@ setTimeout(() => {
 export function extractSearchCondition(
   currentConditions: SimpleSearchCurrentConditions = {} as SimpleSearchCurrentConditions
 ): Record<string, unknown> {
-  const masterSearchConditions: MasterConditions[] = StoreManager.getData(
+  const masterSearchConditions: MasterConditions[] = storeManager.getData(
     'simpleSearchConditionsMaster'
   );
 
@@ -81,38 +81,38 @@ function _setSimpleSearchConditions(
 ) {
   // 検索条件を更新
   const updatedConditions = {
-    ...StoreManager.getData('simpleSearchConditions'),
+    ...storeManager.getData('simpleSearchConditions'),
   };
   Object.keys(newSearchConditions).forEach((conditionKey) => {
     updatedConditions[conditionKey] = newSearchConditions[conditionKey];
   });
-  StoreManager.setData('simpleSearchConditions', updatedConditions);
+  storeManager.setData('simpleSearchConditions', updatedConditions);
 
   // 現在のモードがsimpleで、履歴からの呼び出しでない場合のみURLを更新
-  if (!isFromHistory && StoreManager.getData('searchMode') === 'simple') {
+  if (!isFromHistory && storeManager.getData('searchMode') === 'simple') {
     reflectSimpleSearchConditionToURI();
   }
 
-  StoreManager.setData('appStatus', 'searching');
+  storeManager.setData('appStatus', 'searching');
   executeSearch(0, true);
 }
 
 /** 指定された検索条件キーに対応する現在の検索条件を取得する */
 export function getSimpleSearchCondition(key: MasterConditionId) {
-  return StoreManager.getData('simpleSearchConditions')?.[key];
+  return storeManager.getData('simpleSearchConditions')?.[key];
 }
 
 /** 指定された検索条件キーに対応するマスター検索条件を取得する */
 export function getSimpleSearchConditionMaster(key: MasterConditionId) {
-  return StoreManager.getData('simpleSearchConditionsMaster').find(
-    (condition: MasterConditions) => condition.id === key
-  );
+  return storeManager
+    .getData('simpleSearchConditionsMaster')
+    .find((condition: MasterConditions) => condition.id === key);
 }
 
 /** 現在のSimple Searchの条件をURLパラメータに反映する */
 export function reflectSimpleSearchConditionToURI() {
   // デフォルト値と異なる検索条件を抽出
-  const currentConditions = StoreManager.getData('simpleSearchConditions');
+  const currentConditions = storeManager.getData('simpleSearchConditions');
   const diffConditions = extractSearchCondition(currentConditions);
 
   //現在のURLパラメータを初期化して検索モードを設定
@@ -129,7 +129,7 @@ export function reflectSimpleSearchConditionToURI() {
 }
 
 export function resetSimpleSearchConditions() {
-  const simpleSearchConditionsMaster = StoreManager.getData(
+  const simpleSearchConditionsMaster = storeManager.getData(
       'simpleSearchConditionsMaster'
     ),
     resetConditions = {};
@@ -168,8 +168,8 @@ export function handleHistoryChange(_e) {
 // Advanced Search ----------------------------------------
 /** AdvancedSearch検索条件を設定し、必要に応じて検索を実行 */
 export function setAdvancedSearchCondition(newSearchConditions: any) {
-  StoreManager.setData('advancedSearchConditions', newSearchConditions);
-  StoreManager.setData('appStatus', 'searching');
+  storeManager.setData('advancedSearchConditions', newSearchConditions);
+  storeManager.setData('appStatus', 'searching');
 
   // URLパラメータを更新
   reflectAdvancedSearchConditionToURI();
@@ -193,8 +193,8 @@ function initializeSearchMode() {
 
   // URLのモードパラメータに基づいて検索モードを設定
   if (urlMode === 'advanced') {
-    StoreManager.setData('searchMode', 'advanced');
+    storeManager.setData('searchMode', 'advanced');
   } else {
-    StoreManager.setData('searchMode', 'simple');
+    storeManager.setData('searchMode', 'simple');
   }
 }

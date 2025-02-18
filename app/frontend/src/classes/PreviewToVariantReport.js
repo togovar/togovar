@@ -1,11 +1,11 @@
 import PanelView from './PanelView.js';
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 
 export default class PreviewToVariantReport extends PanelView {
   constructor(elm) {
     super(elm, 'dataset');
-    StoreManager.bind('selectedRow', this);
-    StoreManager.bind('offset', this);
+    storeManager.bind('selectedRow', this);
+    storeManager.bind('offset', this);
     this.title = this.elm.querySelector('.title');
   }
 
@@ -20,8 +20,8 @@ export default class PreviewToVariantReport extends PanelView {
   update() {
     let html = '';
 
-    if (StoreManager.getData('selectedRow') !== undefined) {
-      const record = StoreManager.getSelectedRecord();
+    if (storeManager.getData('selectedRow') !== undefined) {
+      const record = storeManager.getSelectedRecord();
       if (record && record.id) {
         html = `<a class="hyper-text -internal" href="/variant/${record.id}">Detailed variant report page</a>`;
 

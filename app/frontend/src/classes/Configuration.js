@@ -1,5 +1,5 @@
 import { PAGE, COLUMNS } from '../global.js';
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 
 export default class Configuration {
   constructor(elm) {
@@ -21,19 +21,19 @@ export default class Configuration {
 
   open() {
     this.elm.classList.add('-shown');
-    StoreManager.setData('showModal', true);
+    storeManager.setData('showModal', true);
     document.addEventListener('keyup', this.typeEscape.bind(this));
   }
 
   close() {
     this.elm.classList.remove('-shown');
-    StoreManager.setData('showModal', false);
+    storeManager.setData('showModal', false);
     document.removeEventListener('keyup', this.typeEscape.bind(this));
   }
 
   // initialize
   initHome() {
-    StoreManager.bind('columns', this);
+    storeManager.bind('columns', this);
 
     // コンフィグ開く
     document
@@ -86,15 +86,15 @@ export default class Configuration {
         .querySelectorAll('li > label > input')
         .forEach((input) => {
           input.addEventListener('change', (e) => {
-            const stored = StoreManager.getData(configure.storeKey);
+            const stored = storeManager.getData(configure.storeKey);
             const item = stored.find((item) => item.id === e.target.value);
             item.isUsed = e.target.checked;
-            StoreManager.setData(configure.storeKey, stored);
+            storeManager.setData(configure.storeKey, stored);
           });
         });
 
       // set to store
-      StoreManager.setData(configure.storeKey, stored);
+      storeManager.setData(configure.storeKey, stored);
     }
   }
 

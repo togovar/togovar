@@ -1,10 +1,10 @@
-import StoreManager from '../../store/StoreManager';
+import { storeManager } from '../../store/StoreManager';
 import { ResultsRowView } from './ResultsRowView.ts';
 import ScrollBar from './../ScrollBar.js';
 import { TR_HEIGHT, COMMON_FOOTER_HEIGHT, COLUMNS } from '../../global.js';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 
-export default class ResultsView {
+export class ResultsView {
   constructor(elm) {
     this.elm = elm;
     this.rows = [];
@@ -12,12 +12,12 @@ export default class ResultsView {
     this.status = this.elm.querySelector('header.header > .left > .status');
     this.messages = this.elm.querySelector('#Messages');
 
-    StoreManager.bind('searchStatus', this);
-    StoreManager.bind('searchResults', this);
-    StoreManager.bind('columns', this);
-    StoreManager.bind('offset', this);
-    StoreManager.bind('karyotype', this);
-    StoreManager.bind('searchMessages', this);
+    storeManager.bind('searchStatus', this);
+    storeManager.bind('searchResults', this);
+    storeManager.bind('columns', this);
+    storeManager.bind('offset', this);
+    storeManager.bind('karyotype', this);
+    storeManager.bind('searchMessages', this);
     document.addEventListener('keydown', this.keydown.bind(this));
     // スクロールバーの生成
     this.elm
@@ -50,11 +50,11 @@ export default class ResultsView {
     this.stylesheet = document.createElement('style');
     this.stylesheet.type = 'text/css';
     document.getElementsByTagName('head')[0].appendChild(this.stylesheet);
-    this.columns(StoreManager.getData('columns'));
+    this.columns(storeManager.getData('columns'));
   }
 
   updateDisplaySize() {
-    if (StoreManager.getData('isFetching')) {
+    if (storeManager.getData('isFetching')) {
       // フェッチ中は処理をスキップ
       return;
     }
@@ -63,15 +63,15 @@ export default class ResultsView {
     const maxRowCount = Math.floor(
         (window.innerHeight -
           this.tbody.getBoundingClientRect().top -
-          StoreManager.getData('karyotype').height -
+          storeManager.getData('karyotype').height -
           COMMON_FOOTER_HEIGHT -
           2) /
           TR_HEIGHT
       ),
-      numberOfRecords = StoreManager.getData('numberOfRecords'),
-      offset = StoreManager.getData('offset'),
+      numberOfRecords = storeManager.getData('numberOfRecords'),
+      offset = storeManager.getData('offset'),
       rowCount = Math.min(maxRowCount, numberOfRecords);
-    StoreManager.setData('rowCount', rowCount);
+    storeManager.setData('rowCount', rowCount);
     // 行が足らなければ追加
     if (this.rows.length < rowCount) {
       for (let i = this.rows.length; i < rowCount; i++) {
@@ -87,10 +87,10 @@ export default class ResultsView {
       // 隙間ができてしまい
       if (offset >= belowSpace) {
         // 上の隙間の方が大きい場合、差分をオフセットにセット
-        StoreManager.setData('offset', offset - belowSpace);
+        storeManager.setData('offset', offset - belowSpace);
       } else {
         // 下の隙間が大きい場合、オフセット量をゼロに
-        StoreManager.setData('offset', 0);
+        storeManager.setData('offset', 0);
       }
     }
 
@@ -102,9 +102,9 @@ export default class ResultsView {
 
   scroll(e) {
     e.stopPropagation();
-    const totalHeight = StoreManager.getData('numberOfRecords') * TR_HEIGHT;
+    const totalHeight = storeManager.getData('numberOfRecords') * TR_HEIGHT;
     let availableScrollY =
-        totalHeight - StoreManager.getData('rowCount') * TR_HEIGHT,
+        totalHeight - storeManager.getData('rowCount') * TR_HEIGHT,
       wheelScroll;
     availableScrollY = availableScrollY < 0 ? 0 : availableScrollY;
     // 縦方向にスクロールしていない場合スルー
@@ -119,7 +119,7 @@ export default class ResultsView {
     this.lastScroll = wheelScroll;
     // 表示行位置
     let offset = Math.ceil(this.lastScroll / TR_HEIGHT);
-    StoreManager.setData('offset', offset);
+    storeManager.setData('offset', offset);
   }
 
   offset(offset) {
@@ -127,8 +127,8 @@ export default class ResultsView {
 
     // データ更新中は処理をスキップ
     if (
-      StoreManager.getData('isStoreUpdating') ||
-      StoreManager.getData('isFetching')
+      storeManager.getData('isStoreUpdating') ||
+      storeManager.getData('isFetching')
     ) {
       return;
     }
@@ -137,8 +137,8 @@ export default class ResultsView {
     const displayingRegions1 = {},
       displayingRegions2 = {};
 
-    for (let i = 0; i <= StoreManager.getData('rowCount') - 1; i++) {
-      const record = StoreManager.getRecordByIndex(i);
+    for (let i = 0; i <= storeManager.getData('rowCount') - 1; i++) {
+      const record = storeManager.getRecordByIndex(i);
 
       // recordが実際のデータオブジェクトの場合のみ処理
       if (record && typeof record === 'object' && record.chromosome) {
@@ -157,7 +157,7 @@ export default class ResultsView {
           end: Math.max(...displayingRegions1[key]),
         };
       }
-      StoreManager.setData('displayingRegionsOnChromosome', displayingRegions2);
+      storeManager.setData('displayingRegionsOnChromosome', displayingRegions2);
     }
   }
 
@@ -189,8 +189,8 @@ export default class ResultsView {
 
   searchResults(_results) {
     // 更新中フラグのチェックを1回だけに
-    const isUpdating = StoreManager.getData('isStoreUpdating');
-    const isFetching = StoreManager.getData('isFetching');
+    const isUpdating = storeManager.getData('isStoreUpdating');
+    const isFetching = storeManager.getData('isFetching');
 
     if (isUpdating || isFetching) {
       requestAnimationFrame(() => this.searchResults(_results));
@@ -206,8 +206,8 @@ export default class ResultsView {
   }
 
   _validateData() {
-    const results = StoreManager.getData('searchResults');
-    const numberOfRecords = StoreManager.getData('numberOfRecords');
+    const results = storeManager.getData('searchResults');
+    const numberOfRecords = storeManager.getData('numberOfRecords');
 
     return (
       Array.isArray(results) &&
@@ -239,7 +239,7 @@ export default class ResultsView {
 
   // 上下カーソルタイプで選択行の移動 & ESCで選択解除
   keydown(e) {
-    if (StoreManager.getData('selectedRow') === undefined) return;
+    if (storeManager.getData('selectedRow') === undefined) return;
 
     if (keyDownEvent('selectedRow')) {
       switch (e.key) {
@@ -250,34 +250,34 @@ export default class ResultsView {
           this.shiftSelectedRow(1);
           break;
         case 'Escape': // 選択解除
-          StoreManager.setData('selectedRow', undefined);
+          storeManager.setData('selectedRow', undefined);
           break;
       }
     }
   }
 
   shiftSelectedRow(value) {
-    let currentIndex = StoreManager.getData('selectedRow'),
+    let currentIndex = storeManager.getData('selectedRow'),
       shiftIndex = currentIndex + value,
-      rowCount = StoreManager.getData('rowCount'),
-      offset = StoreManager.getData('offset'),
-      numberOfRecords = StoreManager.getData('numberOfRecords');
+      rowCount = storeManager.getData('rowCount'),
+      offset = storeManager.getData('offset'),
+      numberOfRecords = storeManager.getData('numberOfRecords');
     if (shiftIndex < 0) {
       shiftIndex = 0;
       if (offset > 0) {
         // 上にスクロール
         offset--;
-        StoreManager.setData('offset', offset);
+        storeManager.setData('offset', offset);
       }
     } else if (shiftIndex > rowCount - 1) {
       shiftIndex = rowCount - 1;
       if (offset + shiftIndex < numberOfRecords - 1) {
         // 下にスクロール
         offset++;
-        StoreManager.setData('offset', offset);
+        storeManager.setData('offset', offset);
       }
     }
-    StoreManager.setData('selectedRow', shiftIndex);
+    storeManager.setData('selectedRow', shiftIndex);
   }
 
   karyotype(_karyotype) {

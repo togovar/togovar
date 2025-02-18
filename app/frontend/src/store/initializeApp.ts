@@ -1,4 +1,4 @@
-import StoreManager from './StoreManager';
+import { storeManager } from './storeManager';
 
 export function initializeApp() {
   const searchParams = new URLSearchParams(window.location.search);
@@ -6,8 +6,8 @@ export function initializeApp() {
 
   // URLのモードパラメータに基づいて検索モードを設定
   if (urlMode === 'advanced') {
-    StoreManager.setData('searchMode', 'advanced');
+    storeManager.setData('searchMode', 'advanced');
   } else {
-    StoreManager.setData('searchMode', 'simple');
+    storeManager.setData('searchMode', 'simple');
   }
 }

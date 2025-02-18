@@ -1,11 +1,11 @@
 import PanelView from './PanelView.js';
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 
 export default class PanelViewPreviewExternalLinks extends PanelView {
   constructor(elm) {
     super(elm, 'dataset');
-    StoreManager.bind('selectedRow', this);
-    StoreManager.bind('offset', this);
+    storeManager.bind('selectedRow', this);
+    storeManager.bind('offset', this);
     this.table = this.elm.querySelector('.content > .right-headline');
   }
 
@@ -20,8 +20,8 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
   update() {
     let html = '';
     this.elm.classList.add('-notfound');
-    if (StoreManager.getData('selectedRow') !== undefined) {
-      const record = StoreManager.getSelectedRecord(),
+    if (storeManager.getData('selectedRow') !== undefined) {
+      const record = storeManager.getSelectedRecord(),
         list = [];
       if (record && record.external_link) {
         // resSNP

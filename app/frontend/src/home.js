@@ -1,5 +1,5 @@
-import StoreManager from '../src/store/StoreManager';
-import ResultsView from '../src/classes/Results/ResultsView.js';
+import { storeManager } from '../src/store/StoreManager';
+import { ResultsView } from '../src/classes/Results/ResultsView.js';
 import SideBar from '../src/classes/SideBar.js';
 import Configuration from '../src/classes/Configuration.js';
 import SelectedRowIndicator from '../src/classes/SelectedRowIndicator.js';
@@ -36,8 +36,8 @@ const _currentUrlParams = qs.parse(window.location.search.substring(1));
 export function initHome() {
   setUserAgent();
 
-  StoreManager.setData('offset', 0);
-  StoreManager.setData('selectedRow', undefined);
+  storeManager.setData('offset', 0);
+  storeManager.setData('selectedRow', undefined);
 
   initializeApp(); // 先にURLからモードを設定
 
@@ -87,13 +87,13 @@ function readyInitialSearch(callback) {
   })(TOGOVAR_FRONTEND_REFERENCE);
 
   Object.freeze(simpleSearchConditionsMaster);
-  StoreManager.setData(
+  storeManager.setData(
     'simpleSearchConditionsMaster',
     simpleSearchConditionsMaster
   );
 
   // URLパラメータから検索条件を復元
-  const currentSearchMode = StoreManager.getData('searchMode');
+  const currentSearchMode = storeManager.getData('searchMode');
   const simpleSearchConditions = {};
   const advancedSearchConditions = {};
 
@@ -111,8 +111,8 @@ function readyInitialSearch(callback) {
   }
 
   // 検索条件をストアに保存（isFromHistory = trueとして設定）
-  StoreManager.setData('simpleSearchConditions', simpleSearchConditions);
-  StoreManager.setData('advancedSearchConditions', advancedSearchConditions);
+  storeManager.setData('simpleSearchConditions', simpleSearchConditions);
+  storeManager.setData('advancedSearchConditions', advancedSearchConditions);
 
   callback();
 }
@@ -187,7 +187,7 @@ function initSearchInputs() {
   getAllElements('#SearchInputView > .tabscontainer > ul > li').forEach(
     (elm) => {
       elm.addEventListener('click', (e) => {
-        StoreManager.setData('searchMode', e.target.dataset.target);
+        storeManager.setData('searchMode', e.target.dataset.target);
       });
     }
   );

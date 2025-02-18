@@ -1,6 +1,6 @@
 import ConditionView from './ConditionView.js';
 import ConditionValues from './ConditionValues.js';
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 import { ADVANCED_CONDITIONS } from '../global.js';
 import { CONDITION_TYPE, CONDITION_ITEM_TYPE } from '../definition.js';
 import { keyDownEvent } from '../utils/keyDownEvent.js';
@@ -83,7 +83,7 @@ class ConditionItemView extends ConditionView {
         this._elm.dataset.relation = { eq: 'ne', ne: 'eq' }[
           this._elm.dataset.relation
         ];
-        if (!StoreManager.getData('showModal')) {
+        if (!storeManager.getData('showModal')) {
           this._keepLastRelation = this._elm.dataset.relation;
           this._builder.changeCondition();
         }
@@ -98,7 +98,7 @@ class ConditionItemView extends ConditionView {
           case 'edit':
             this._elm.classList.add('-editing');
             this._conditionValues.startToEditCondition();
-            StoreManager.setData('showModal', true);
+            storeManager.setData('showModal', true);
             window.addEventListener('keydown', this.#keydownEscapeEvent);
             break;
           case 'delete':
@@ -122,7 +122,7 @@ class ConditionItemView extends ConditionView {
     this._elm.classList.remove('-editing');
     this._isFirstTime = false;
     this._builder.changeCondition();
-    StoreManager.setData('showModal', false);
+    storeManager.setData('showModal', false);
     window.removeEventListener('keydown', this.#keydownEscapeEvent);
   }
 
@@ -131,7 +131,7 @@ class ConditionItemView extends ConditionView {
   remove() {
     delete this._conditionValues;
     super.remove();
-    StoreManager.setData('showModal', false);
+    storeManager.setData('showModal', false);
     window.removeEventListener('keydown', this.#keydownEscapeEvent);
   }
 
@@ -144,7 +144,7 @@ class ConditionItemView extends ConditionView {
     if (
       e.key !== 'Escape' ||
       !this._conditionValues ||
-      !StoreManager.getData('showModal')
+      !storeManager.getData('showModal')
     )
       return;
 

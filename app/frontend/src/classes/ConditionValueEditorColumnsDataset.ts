@@ -4,7 +4,7 @@ import { ADVANCED_CONDITIONS } from '../global.js';
 import ConditionItemView from './ConditionItemView.js';
 import ConditionValueEditor from './ConditionValueEditor.js';
 import ConditionValues from './ConditionValues.js';
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 
 type DataNode = {
   id: string;
@@ -129,8 +129,8 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
 
   async #drawColumn(parentId?: string) {
     // Ensure login status is fetched before proceeding
-    await StoreManager.fetchLoginStatus();
-    const isLogin = StoreManager.getData('isLogin');
+    await storeManager.fetchLoginStatus();
+    const isLogin = storeManager.getData('isLogin');
 
     // Fetch items and process them
     this.#getItems(parentId).then((items) => {
@@ -266,7 +266,7 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
   }
 
   async #addNoteColumn() {
-    await StoreManager.fetchLoginStatus();
+    await storeManager.fetchLoginStatus();
     const column = document.createElement('div');
     column.classList.add('column');
     column.dataset.depth = '2';

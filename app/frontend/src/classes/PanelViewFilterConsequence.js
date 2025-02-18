@@ -1,6 +1,6 @@
 import CollapseView from './CollapseView.js';
 import PanelView from './PanelView.js';
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
@@ -47,8 +47,8 @@ export default class PanelViewFilterConsequence extends PanelView {
         this._changeFilter.bind(this)
       );
     }
-    StoreManager.bind('simpleSearchConditions', this);
-    StoreManager.bind('statisticsConsequence', this);
+    storeManager.bind('simpleSearchConditions', this);
+    storeManager.bind('statisticsConsequence', this);
   }
 
   /*
@@ -66,7 +66,7 @@ export default class PanelViewFilterConsequence extends PanelView {
       })
     });
     // references
-    const condition = StoreManager.getSimpleSearchCondition(this.kind);
+    const condition = storeManager.getSimpleSearchCondition(this.kind);
     console.log(condition)
     this._inputsValues = {};
     this.elm.querySelectorAll('.content > .checklist-values input').forEach(input => {
@@ -234,7 +234,8 @@ export default class PanelViewFilterConsequence extends PanelView {
         }
       }
     }
-    this._inputsValues.all.value.textContent =
-      StoreManager.getData('searchStatus').filtered.toLocaleString();
+    this._inputsValues.all.value.textContent = storeManager
+      .getData('searchStatus')
+      .filtered.toLocaleString();
   }
 }

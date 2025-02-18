@@ -1,15 +1,15 @@
-import StoreManager from '../store/StoreManager';
+import { storeManager } from '../store/StoreManager';
 
 export function keyDownEvent(storeName) {
   switch (storeName) {
     case 'showModal':
-      if (!StoreManager.getData('showSuggest')) {
+      if (!storeManager.getData('showSuggest')) {
         return true;
       }
       return false;
 
     case 'selectedRow':
-      if (!StoreManager.getData('showModal')) {
+      if (!storeManager.getData('showModal')) {
         return true;
       }
       return false;
