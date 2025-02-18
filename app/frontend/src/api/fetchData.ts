@@ -131,7 +131,7 @@ function _getRequestOptions(signal: AbortSignal): FetchOption {
 
   // Advanced search のリクエストオプション
   const body: Partial<{ offset: number; query: any }> = {
-    offset: StoreManager.getData('offset'),
+    offset: _calculateOffset(StoreManager.getData('offset'), LIMIT),
   };
 
   if (
@@ -151,6 +151,12 @@ function _getRequestOptions(signal: AbortSignal): FetchOption {
     signal: signal,
     body: JSON.stringify(body),
   };
+}
+
+function _calculateOffset(offset: number, limit: number): number {
+  const roundedOffset =
+    Math.round(offset / (limit / 2)) * (limit / 2) - limit / 4;
+  return Math.max(0, roundedOffset);
 }
 
 /** データを取得して結果を更新 */
