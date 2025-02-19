@@ -167,13 +167,15 @@ async function _fetchData(endpoint: string, options: FetchOption) {
       throw new Error(_getErrorMessage(response.status));
     }
     const jsonResponse = await response.json();
+    const url = new URL(endpoint);
+    const queryParams = Object.fromEntries(url.searchParams.entries());
 
     // 現在の検索モードと一致する場合のみ結果を処理
     if (_currentSearchMode === storeManager.getData('searchMode')) {
-      if ('data' in jsonResponse) {
+      if (queryParams.data === '1') {
         _processSearchResults(jsonResponse);
       }
-      if ('statistics' in jsonResponse) {
+      if (queryParams.stat === '1') {
         _processStatistics(jsonResponse);
       }
     }
