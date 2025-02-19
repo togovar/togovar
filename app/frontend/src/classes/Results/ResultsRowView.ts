@@ -63,10 +63,14 @@ export class ResultsRowView {
     this.tr = this.#createTableRow();
 
     // `selectedRow` の変更を監視し、selectedRow() を活用
-    storeManager.bind('selectedRow', this);
+    storeManager.subscribe('selectedRow', this.selectedRow.bind(this));
     // `offset` の変更を監視し、テーブル行を更新
-    storeManager.bind('offset', this);
+    storeManager.subscribe('offset', this.updateTableRow.bind(this));
     // `rowCount` を監視し、範囲外の行を非表示にする
+    // storeManager.subscribe('rowCount', this.updateTableRow.bind(this));
+
+    // storeManager.bind('selectedRow', this);
+    // storeManager.bind('offset', this);
     // storeManager.bind('rowCount', this);   // TODO: 必要ないようであれば削除する
   }
 

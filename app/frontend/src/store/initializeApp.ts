@@ -1,4 +1,4 @@
-import { storeManager } from './StoreManager';
+import { storeManager } from './storeManager';
 
 export function initializeApp() {
   const searchParams = new URLSearchParams(window.location.search);

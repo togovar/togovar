@@ -10,7 +10,8 @@ import { StoreState, ResultData, SearchMode } from '../types';
 
 // class storeManager extends FormatData {
 class StoreManager {
-  #bindings: Record<string, any[]> = {};
+  #bindings: Record<string, any[]> = {}; // TODO: いずれ削除
+  #listeners = new Map<string, Set<(value: any) => void>>();
   #state: StoreState = {
     karyotype: '',
     searchMode: '',
@@ -35,7 +36,7 @@ class StoreManager {
     this.setData('isFetching', false);
     // events
     window.addEventListener('popstate', handleHistoryChange.bind(this));
-    this.bind('searchMode', this);
+    this.subscribe('searchMode', this.searchMode.bind(this));
   }
 
   /** 指定されたキーからデータを取得する */
@@ -62,6 +63,26 @@ class StoreManager {
     }
   }
 
+  /** 変更監視を追加する
+   * callcackが変更されたら、UIが更新される */
+  subscribe<T extends keyof StoreState>(
+    key: T,
+    callback: (value: StoreState[T]) => void
+  ) {
+    if (!this.#listeners.has(key)) {
+      this.#listeners.set(key, new Set());
+    }
+    this.#listeners.get(key)?.add(callback);
+  }
+
+  // /** 変更監視を解除する */
+  // unsubscribe<T extends keyof StoreState>(
+  //   key: T,
+  //   callback: (value: StoreState[T]) => void
+  // ) {
+  //   this.#listeners.get(key)?.delete(callback);
+  // }
+
   /** 指定されたキーにターゲットをバインドする */
   // TODO: bindingsがなくなったら、以下は削除する
   bind<T = any>(key: string, target: T) {
@@ -74,8 +95,11 @@ class StoreManager {
     }
   }
 
-  /** bindingsに登録されている関数を実行 */
+  /** listenersに登録されている関数を実行 */
   publish<T extends keyof StoreState>(key: T) {
+    this.#listeners.get(key)?.forEach((callback) => callback(this.#state[key]));
+
+    //TODO: bindingsがなくなったら、以下は削除する
     if (this.#bindings[key]) {
       this.#bindings[key].forEach((observer) => {
         const valueCopy = this._deepCopy(this.#state[key]);

@@ -181,7 +181,6 @@ async function _fetchData(endpoint: string, options: FetchOption) {
     await _updateAppState();
     storeManager.setData('searchMessages', '');
   } catch (error) {
-    console.error('Error fetching data:', error);
     if (error.name === 'AbortError') return;
     storeManager.setData('isFetching', false);
     storeManager.setData('searchMessages', { error });
