@@ -200,10 +200,13 @@ class StoreManager {
 
       clearTimeout(timeoutId);
 
-      this.setData(
-        'isLogin',
-        response instanceof Response && response.status === 200
-      );
+      if (response instanceof Response) {
+        if (response.status === 200) {
+          this.setData('isLogin', true);
+        } else {
+          console.warn(`Not logged in: Received status ${response.status}`);
+        }
+      }
     } catch (error) {
       console.error('Error fetching auth status:', error);
       this.setData('isLogin', false);

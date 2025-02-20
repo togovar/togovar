@@ -66,7 +66,7 @@ export const executeSearch = (() => {
     apiEndpoints?.forEach((endpoint) => {
       _fetchData(endpoint, requestOptions);
     });
-  }, 100);
+  }, 10);
 })();
 
 /** 初回検索時のデータをリセット */
@@ -229,8 +229,6 @@ function _processStatistics(json: SearchStatistics) {
 
 /** 検索状態を更新し、条件が変わっていた場合は再検索 */
 async function _updateAppState() {
-  await storeManager.fetchLoginStatus();
-
   // for Download button
   storeManager.getData('searchMode');
   switch (storeManager.getData('searchMode')) {

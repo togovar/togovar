@@ -129,7 +129,6 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
 
   async #drawColumn(parentId?: string) {
     // Ensure login status is fetched before proceeding
-    await storeManager.fetchLoginStatus();
     const isLogin = storeManager.getData('isLogin');
 
     // Fetch items and process them
