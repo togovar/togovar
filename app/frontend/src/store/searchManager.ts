@@ -115,11 +115,12 @@ export function reflectSimpleSearchConditionToURI() {
   const currentConditions = storeManager.getData('simpleSearchConditions');
   const diffConditions = extractSearchCondition(currentConditions);
 
-  //現在のURLパラメータを初期化して検索モードを設定
-  _currentUrlParams = { mode: 'simple' };
-
-  // 差分条件をURLパラメータに統合
-  Object.assign(_currentUrlParams, diffConditions);
+  // 現在のURLパラメータを保持しながら更新
+  _currentUrlParams = {
+    ..._currentUrlParams, // 既存のパラメータを保持
+    mode: 'simple', // modeは必ず'simple'に
+    ...diffConditions, // 新しい検索条件で上書き
+  };
 
   //URLを更新 (ブラウザの履歴に新しい状態を追加)
   const newUrl = `${window.location.origin}${
