@@ -58,6 +58,11 @@ export default class PanelViewCheckList extends PanelView {
           this._inputsValues[key].value.textContent = count.toLocaleString();
         }
         this._inputsValues.all.value.textContent = all.toLocaleString();
+      } else {
+        for (const key in this._inputsValues) {
+          this._inputsValues[key].value.textContent = 'N/A';
+        }
+        this._inputsValues.all.value.textContent = 'N/A';
       }
       this._inputsValues.all.value.textContent = storeManager
         .getData('searchStatus')
