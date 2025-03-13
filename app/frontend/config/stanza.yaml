@@ -250,6 +250,14 @@ gene:
         jbrowse: $TOGOVAR_STANZA_JBROWSE
         margin: 200
 
+    - id: gene-protein-browser
+      dom: '#gene-protein-browser'
+      options:
+        hgnc_id: ${hgnc_id}
+        togovar_target: stg-grch38
+        jpost_endpoint: https://db-dev.jpostdb.org/proxy/sparql
+        glycosmos_endpoint: https://ts.glycosmos.org/sparql
+
     - id: gene-protein-structure
       dom: '#gene-protein-structure'
       options:
