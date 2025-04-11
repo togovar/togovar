@@ -181,7 +181,16 @@ async function _fetchData(endpoint: string, options: FetchOption) {
     }
 
     await _updateAppState();
-    storeManager.setData('searchMessages', '');
+
+    if (jsonResponse.notice || jsonResponse.warning || jsonResponse.error) {
+      storeManager.setData('searchMessages', {
+        notice: jsonResponse.notice?.join?.('<br>'),
+        warning: jsonResponse.warning?.join?.('<br>'),
+        error: jsonResponse.error?.join?.('<br>'),
+      });
+    } else {
+      storeManager.setData('searchMessages', '');
+    }
   } catch (error) {
     console.error(error);
     if (error.name === 'AbortError') return;
