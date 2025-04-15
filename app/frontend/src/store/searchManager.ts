@@ -115,7 +115,7 @@ export function reflectSimpleSearchConditionToURI() {
   const currentConditions = storeManager.getData('simpleSearchConditions');
   const diffConditions = extractSearchCondition(currentConditions);
 
-  // 検索条件が空の場合やtermが空の場合は、URLパラメータをクリア
+  // termが空の場合は、URLパラメータをクリア
   if (currentConditions.term === '') {
     _currentUrlParams = { mode: 'simple' };
   } else {
