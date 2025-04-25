@@ -243,6 +243,43 @@ gene:
             label: Replication sample description
             line-clamp: 3
 
+    - id: pagination-table
+      dom: "#gene-mogplus"
+      src: https://togostanza.github.io/metastanza/pagination-table.js
+      options:
+        data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/gene_mogplus?hgnc_id=${hgnc_id}
+        data-type: json
+        custom-css-url: https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20220803
+        padding: 0
+        page-size-option: 5,10,20,50,100
+        page-slider: false
+        data-unavailable_message: 'No data'
+        columns:
+          - id: allele_grcm39
+            label: Link to MoG+
+            link: mogplus_url
+          - id: mouse_strains
+            link: mogplus_table
+            label: Mouse strains
+            escape: false
+            line-clamp: 1
+          - id: tgv_id
+            link: tgv_link
+            label: TogoVar ID
+          - id: rs
+            link: rs_link
+            label: rs#
+          - id: allele_grch38
+            label: Chr-pos-ref-alt
+          - id: consequence
+            label: Consequence
+            escape: false
+            line-clamp: 1
+          - id: clinsig
+            label: Clinical Significance
+          - id: condition
+            label: Condition
+
     - id: gene-genomic-context
       dom: '#gene-genomic-context'
       options:
