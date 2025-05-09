@@ -8,6 +8,21 @@ block head
     link(href=css, rel="stylesheet")
   each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/report-/))
     script(type="text/javascript", src=js)
+  script.
+    window.addEventListener('DOMContentLoaded', () => {
+      window.scrollTo(0, 0);
+
+      const hash = window.location.hash;
+      if (hash) {
+        setTimeout(() => {
+          const target = document.querySelector(hash);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, !{scrollDelay});
+      }
+    });
+
   // Stanza theme
   link(href="https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20220803", rel="stylesheet")
 
