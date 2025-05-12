@@ -8,6 +8,7 @@ import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
 } from '../../../store/searchManager';
+import { storeManager } from '../../../store/StoreManager';
 import { API_URL } from '../../../global.js';
 
 import Styles from '../../../../stylesheets/object/component/simple-search-view.scss';
@@ -148,6 +149,13 @@ class SimpleSearchView extends LitElement {
    * @param {CustomEvent} e - imput-term (SearchFieldWithSuggestions) */
   _inputTerm(e) {
     this._term = e.detail;
+    // 入力されたテキストを検索条件に反映する（ただし検索は実行しない）
+    const currentConditions = {
+      ...storeManager.getData('simpleSearchConditions'),
+    };
+    // 空文字列も適切に処理
+    currentConditions.term = this._term || '';
+    storeManager.setData('simpleSearchConditions', currentConditions);
   }
 
   /** Search input value with Enter
@@ -156,10 +164,21 @@ class SimpleSearchView extends LitElement {
     if (this._term === undefined) return;
     this._search(this._term);
   }
+
   /** Search input value with Search button
    * @private */
   _handleSeachButtonClick() {
-    this._search(this._term);
+    this._search(this._term || '');
+  }
+
+  /** リセットボタンが押されたときの処理 */
+  _handleInputReset() {
+    this._term = '';
+    this._value = '';
+    this._hideSuggestions = true;
+
+    // 検索条件を更新して空の検索を実行
+    setSimpleSearchCondition('term', '');
   }
 
   render() {
@@ -184,7 +203,7 @@ class SimpleSearchView extends LitElement {
           @search-term-enter=${this._handleTermEnter}
           @imput-term=${this._inputTerm}
           @input=${() => (this._hideSuggestions = false)}
-          @input-reset=${() => (this._term = '')}
+          @input-reset=${this._handleInputReset}
         ></search-field-with-suggestions>
 
         <search-button @click=${this._handleSeachButtonClick}></search-button>

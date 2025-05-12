@@ -327,6 +327,10 @@ class SearchFieldtWithSuggestions extends LitElement {
    * @private */
   _handleInputReset() {
     this.term = '';
+    this.value = '';
+    this.label = '';
+    this.showSuggestions = false;
+    this.suggestData = [];
     this._hideSuggestions();
     this.dispatchEvent(new CustomEvent('input-reset'));
   }

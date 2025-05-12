@@ -93,6 +93,10 @@ class SearchField extends LitElement {
   /** Fires an event when the cross button is pressed
    * @private */
   _handleResetClick() {
+    if (this._inputRef.value) {
+      this._inputRef.value.value = '';
+      this.value = '';
+    }
     this.dispatchEvent(new MouseEvent('input-reset'));
   }
 

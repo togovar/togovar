@@ -115,13 +115,11 @@ export function reflectSimpleSearchConditionToURI() {
   const currentConditions = storeManager.getData('simpleSearchConditions');
   const diffConditions = extractSearchCondition(currentConditions);
 
-  // termが空の場合は、URLからtermパラメータを削除
-  if (currentConditions.term === '') {
-    delete _currentUrlParams.term;
-  }
+  // 現在のterm値を保存（一時変数）
+  const currentTerm = currentConditions.term || '';
 
   // 検索条件が空の場合は、URLパラメータを完全にクリア
-  if (Object.keys(diffConditions).length === 0) {
+  if (Object.keys(diffConditions).length === 0 && currentTerm === '') {
     _currentUrlParams = {
       mode: 'simple',
     };
@@ -131,6 +129,13 @@ export function reflectSimpleSearchConditionToURI() {
       mode: 'simple',
       ...diffConditions,
     };
+
+    // 常にtermパラメータを正しく維持
+    if (currentTerm !== '') {
+      _currentUrlParams.term = currentTerm;
+    } else {
+      delete _currentUrlParams.term;
+    }
   }
 
   //URLを更新 (ブラウザの履歴に新しい状態を追加)
