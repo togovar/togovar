@@ -273,12 +273,15 @@ gene:
             label: Chr-pos-ref-alt
           - id: consequence
             label: Consequence
-            escape: false
             line-clamp: 1
+            escape: false
           - id: clinsig
-            label: Clinical Significance
+            label: Clinical significance
+            escape: false
           - id: condition
+            link: condition_link
             label: Condition
+            escape: false
 
     - id: gene-genomic-context
       dom: '#gene-genomic-context'
