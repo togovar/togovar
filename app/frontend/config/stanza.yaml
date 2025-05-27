@@ -277,10 +277,11 @@ gene:
             escape: false
           - id: clinsig
             label: Clinical significance
+            line-clamp: 1
             escape: false
           - id: condition
-            link: condition_link
             label: Condition
+            line-clamp: 1
             escape: false
 
     - id: gene-genomic-context
