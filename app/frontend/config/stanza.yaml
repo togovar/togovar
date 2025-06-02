@@ -263,6 +263,8 @@ gene:
             label: Mouse strains
             escape: false
             line-clamp: 1
+          - id: alt_match
+            label: ALT match
           - id: tgv_id
             link: tgv_link
             label: TogoVar ID
