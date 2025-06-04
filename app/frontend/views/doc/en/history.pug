@@ -16,6 +16,71 @@ block content
         h2.title Update history
       .contents
         section.section
+          h3.sectiontitle 2025/6/4
+          ul.unordered-list
+            li
+              strong Gene page:
+              |
+              |
+              a.hyper-text.-external(href='https://molossinus.brc.riken.jp/mogplus/') MoG+ (Mouse genome database with high added value)
+              | was newly added.
+              ul.unordered-list
+                li
+                  | Mappings between mouse variants in MoG+ and human variants in TogoVar are now available on gene pages (e.g.,
+                  |
+                  a.hyper-text.-internal(href='/gene/1101#mouse-variants-in-mogplus-database') BRCA2
+                  | ).
+                li The mappings are based on the
+                  |
+                  |
+                  a.hyper-text.-external(href='https://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/') UCSC Chain File (hg38ToMm39.over.chain.gz)
+                  | .
+                li You can now search for laboratory mouse strains that carry variants corresponding to human missense or pathogenic variants.
+                li MoG+ is developed and operated by
+                  |
+                  |
+                  a.hyper-text.-external(href='https://web.brc.riken.jp/en/') RIKEN BioResource Research Center
+                  | .
+            li
+              strong Gene page:
+              |
+              | Protein Browser was newly added to the gene pages.
+              ul.unordered-list
+                li  The following data are aligned along an amino acid sequence to facilitate comparison: (e.g.,
+                  |
+                  |
+                  a.hyper-text.-internal(href='/gene/1101#protein-browser') BRCA2
+                  | ):
+                  ul.unordered-list
+                    li Missense variants and their pathogenicity (Source: TogoVar)
+                    li Phosphorylation sites (Source:
+                      |
+                      |
+                      a.hyper-text.-external(href='https://jpostdb.org/') jPOST: Japan ProteOme STandard Repository/Database
+                      | )
+                    li Glycosylation sites (Source:
+                      |
+                      |
+                      a.hyper-text.-external(href='https://glycosmos.org/') GlyCosmos: Glycoscience Portal
+                      | )
+                    li Disease-associated variants (Source: UniProt)
+            li
+              strong Variant page:
+              |
+              | The URL specification method was extended.
+              ul.unordered-list
+                li By chromosome number, position, reference allele, and alternate allele:
+                  ul.unordered-list
+                    li Example:
+                      |
+                      |
+                      a.hyper-text.-internal(href='/variant/12-111803962-G-A') https://grch38.togovar.org/variant/12-111803962-G-A
+                li By dbSNP rs number:
+                  ul.unordered-list
+                    li Example:
+                      |
+                      |
+                      a.hyper-text.-internal(href='/variant/rs671') https://grch38.togovar.org/variant/rs671
           h3.sectiontitle 2024/12/3
           ul.unordered-list
             li
@@ -43,16 +108,17 @@ block content
             li
               strong Datasets:
               |
-              |
-              a.hyper-text.-internal(href='/doc/datasets/jga_wgs') The JGA-WGS dataset
-              | was newly added (GRCh38 only).
+              | Added datasets derived from JGA and renamed some of them.
               ul.unordered-list
-                li JGA-WGS aggregates allele frequencies and genotype counts by reanalyzing whole-genome sequence data deposited in
+                li We reanalyzed whole-genome sequences deposited in the
                   |
                   |
                   a.hyper-text.-external(href='https://humandbs.dbcls.jp/en/') NBDC Human Database
                   | /
                   a.hyper-text.-external(href='https://www.ddbj.nig.ac.jp/jga/index-e.html') Japanese Genotype-phenotype Archive (JGA)
+                  | , aggregated allele frequencies and genotype counts, and released them as
+                  |
+                  a.hyper-text.-internal(href='/doc/datasets/jga_wgs') JGA-WGS
                   | . The reference genome used is GRCh38. For more information on the reanalysis, please refer to
                   |
                   a.hyper-text.-external(href='https://humandbs.dbcls.jp/en/data-processing') “Whole genome sequencing analysis data (germline)”

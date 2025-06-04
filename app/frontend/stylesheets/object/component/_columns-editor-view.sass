@@ -10,6 +10,11 @@
         max-height: 200px
         overflow-y: auto
         border-right: solid 1px $COLOR_SEPARATOR
+        > .messages-view
+          margin-left: 4px
+          font-size: 12px
+          > .note
+            padding-left: 24px
         > ul
           margin: 0
           padding: 0
@@ -44,11 +49,15 @@
               margin-bottom: 0
               > input
                 vertical-align: middle
+              > .dataset-icon
+                margin-right: 4px
               > span
                 font-weight: bold
-    // > .description
-    //   padding: 4px 12px
-    //   font-size: 12px
-    //   line-height: 1.5
-    //   min-width: 200px
-    //   flex-basis: 200px
+              > .lock
+                &::before
+                  content: $CHAR_LOCK
+                  font-family: FontAwesome
+                  color: $COLOR_BLACK
+                  opacity: .4
+                  font-size: 14px
+                  margin-right: 4px

@@ -8,6 +8,20 @@ block head
     link(href=css, rel="stylesheet")
   each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/report-/))
     script(type="text/javascript", src=js)
+  script.
+    window.addEventListener('DOMContentLoaded', () => {
+      window.scrollTo(0, 0);
+
+      const hash = window.location.hash;
+      if (hash) {
+        setTimeout(() => {
+          const target = document.querySelector(hash);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, !{scrollDelay});
+      }
+    });
   // Stanza theme
   link(href="https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20220803", rel="stylesheet")
 
@@ -44,12 +58,26 @@ block content
           | Genome-wide association study
       #gene-gwas.stanza
 
+    section.stanza-view#mouse-variants-in-mogplus-database
+      .titlelink-wrapper
+        a.titlelink(href="#mouse-variants-in-mogplus-database")
+        h3.title
+          | Mouse variants in MoG+ database
+      #gene-mogplus.stanza
+
     section.stanza-view#genomic-context
       .titlelink-wrapper
         a.titlelink(href="#genomic-context")
         h3.title
           | Genomic context
       #gene-genomic-context.stanza
+
+    section.stanza-view#protein-browser
+      .titlelink-wrapper
+        a.titlelink(href="#protein-browser")
+        h3.title
+          | Protein browser
+      #gene-protein-browser.stanza
 
     section.stanza-view#protein-structure
       .titlelink-wrapper

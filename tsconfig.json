@@ -6,5 +6,5 @@
     "sourceMap": true,
     "outDir": "./dist"
   },
-  "include": ["./app/frontend/javascripts/**/*"]
+  "include": ["./app/frontend/src/**/*"]
 }
