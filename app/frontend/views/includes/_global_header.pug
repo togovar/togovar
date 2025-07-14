@@ -52,6 +52,10 @@ header#GlobalHeader
             li.menu-button.config Configuration
             li.menu-button.login 
               a.link
+        else if locals.currentPage === "404"
+          ul.menu
+            li.menu-button.login
+              a.link
         else if locals.currentPage === "variant"
           ul.menu
             li.menu-button.login 

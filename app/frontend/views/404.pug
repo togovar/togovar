@@ -1,0 +1,19 @@
+extend layouts/application
+
+append variables
+  - locals.currentPage = "404";
+  - locals.title = "404 | TogoVar";
+
+block head
+  each css in htmlWebpackPlugin.files.css
+    link(href=css, rel="stylesheet")
+
+block content
+  main
+    article.common-document
+      .contents
+        section.section
+          h3.sectiontitle
+            | 404 Not Found
+          p.body
+            | The requested URL was not found on this server.
