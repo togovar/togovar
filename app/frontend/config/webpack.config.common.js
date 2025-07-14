@@ -120,6 +120,11 @@ const config = {
       inject: false,
     }),
     new HtmlWebpackPlugin({
+      template: 'app/frontend/views/404.pug',
+      filename: '404.html',
+      inject: false,
+    }),
+    new HtmlWebpackPlugin({
       template: 'app/frontend/views/variant/index.pug',
       filename: 'variant/index.html',
       inject: false,
