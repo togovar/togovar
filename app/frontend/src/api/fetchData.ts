@@ -83,14 +83,14 @@ export const executeSearch = (() => {
         })
         .catch((error) => {
           // AbortErrorの場合はローディング状態を維持
-          if (error.name === 'AbortError') {
-            return;
-          }
-
+          if (error.name === 'AbortError') return;
           storeManager.setData('isFetching', false);
           isRequestInProgress = false;
           storeManager.setData('searchMessages', { error });
         });
+    } else {
+      storeManager.setData('isFetching', false);
+      isRequestInProgress = false;
     }
   }, 300);
 })();
