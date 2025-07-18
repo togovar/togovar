@@ -18,12 +18,9 @@ export class LogarithmizedBlockGraphFrequencyView extends LitElement {
       font-size: 0;
       background-color: white;
     }
-    :host > .display {
+    /* :host > .display {
       position: absolute;
-    }
-    :host([data-count='1']) {
-      background-color: var(--color-singleton);
-    }
+    } */
     :host([data-dataset='gem_j_wga']) {
       --color-dataset: var(--color-dataset-gemj);
     }
@@ -146,46 +143,76 @@ export class LogarithmizedBlockGraphFrequencyView extends LitElement {
       border-color: #d4d3d1;
       background-color: #f4f4f4;
     }
+    :host([data-allele-count='1']) {
+      background-color: var(--color-singleton);
+    }
+    :host([data-alternate-allele-count]) > .blocks::before {
+      content: 'H';
+      position: absolute;
+      top: -24px;
+      right: -5px;
+      background-color: var(--color-homozygote);
+      color: white;
+      font-size: 8px;
+      font-weight: bold;
+      width: 9px;
+      height: 9px;
+      text-align: center;
+      line-height: 9px;
+      z-index: 10;
+    }
   `;
 
   constructor() {
     super();
     // Declare reactive properties
     this.dataset;
-    this.count;
+    this.alleleCount;
     this.total;
     this.frequencyValue;
+    this.alternateAlleleCount;
   }
 
   render() {
-    return html` <span class="blocks"
-        ><span class="block"></span><span class="block"></span
-        ><span class="block"></span><span class="block"></span
-        ><span class="block"></span><span class="block"></span
-      ></span>
-      <span class="display"
-        >${this.dataset.dataset}:
-        &nbsp;${this.count}/${this.total}&nbsp;${this.frequencyValue}</span
-      >`;
+    return html`
+      <span class="blocks">
+        ${Array.from({ length: 6 }).map(
+          () => html`<span class="block"></span>`
+        )}
+      </span>
+      <!-- <span class="display">
+        ${this.dataset.dataset}:
+        &nbsp;${this.count}/${this.total}&nbsp;${this.frequencyValue}
+      </span> -->
+    `;
   }
 
-  firstUpdated() { }
+  firstUpdated() {}
 
-  /**
+  /** Setter for variant frequency information.
    *
-   * @param {object} frequency
-   * @param {number} frequency.an
-   * @param {number} frequency.ac
-   * @param {number} frequency.af
-   * @param {string[]} frequency.filter
-   * @param {number} frequency.quality
-   * @param {string} frequency.source
-   */
+   * This method receives a frequency object containing various metrics related to variant frequency.
+   * It updates internal dataset fields such as allele count, alternate allele count, total allele number,
+   * frequency value, and a categorized frequency label (`logarithmizedFrequency`) used for display or filtering.
+   *
+   * @param {Object} frequency - Frequency data for the variant.
+   * @param {number} frequency.ac - Allele count.
+   * @param {number} frequency.an - Total number of alleles.
+   * @param {number} frequency.af - Allele frequency (between 0 and 1).
+   * @param {number} [frequency.aac] - Alternate allele count (optional, may be used for singleton detection).
+   * @param {string[]} frequency.filter - Filters applied to the variant.
+   * @param {number} frequency.quality - Variant calling quality score.
+   * @param {string} frequency.source - Source of the frequency data. */
   set frequency(frequency) {
-    this.dataset.count = frequency?.ac;
+    this.dataset.alleleCount = frequency?.ac;
+
+    if (frequency?.aac) {
+      this.dataset.alternateAlleleCount = frequency.aac;
+    }
+
     let logarithmizedFrequency = 'na';
     if (frequency) {
-      this.count = frequency.ac;
+      this.alleleCount = frequency.ac;
       this.total = frequency.an;
       this.frequencyValue = frequency.af;
       switch (true) {
