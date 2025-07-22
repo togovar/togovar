@@ -51,19 +51,23 @@ header#GlobalHeader
           ul.menu.config
             li.menu-button.config Configuration
             li.menu-button.login 
-              a.link
+              a.link(href="/auth/login" aria-label="Login")
+        else if locals.currentPage === "404"
+          ul.menu
+            li.menu-button.login
+              a.link(href="/auth/login" aria-label="Login")
         else if locals.currentPage === "variant"
           ul.menu
             li.menu-button.login 
-              a.link
+              a.link(href="/auth/login" aria-label="Login")
         else if locals.currentPage === "gene"
           ul.menu
             li.menu-button.login 
-              a.link
+              a.link(href="/auth/login" aria-label="Login")
         else if locals.currentPage === "disease"
           ul.menu
             li.menu-button.login 
-              a.link
+              a.link(href="/auth/login" aria-label="Login")
         else
           ul.menu
             li.menu-button.languageswitcher(class={"en": locals.language === "en" , "ja": locals.language === "ja"})
@@ -73,4 +77,4 @@ header#GlobalHeader
                 | ja
 
             li.menu-button.login 
-              a.link
+              a.link(href="/auth/login" aria-label="Login")

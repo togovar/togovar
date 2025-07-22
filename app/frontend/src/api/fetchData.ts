@@ -12,7 +12,14 @@ let lastRequestRanges = new Set(); // 取得済みの範囲を管理
 
 /** 検索を実行するメソッド（データ取得 & 更新） */
 export const executeSearch = (() => {
+  let isRequestInProgress = false;
+
   return _.debounce((offset = 0, isFirstTime = false) => {
+    // 既にリクエストが進行中の場合はスキップ
+    if (isRequestInProgress && !isFirstTime) {
+      return;
+    }
+
     const newSearchMode = storeManager.getData('searchMode');
 
     // 新しい検索リクエストの前に、既存のリクエストをキャンセル
@@ -55,6 +62,7 @@ export const executeSearch = (() => {
 
     // フェッチフラグを設定
     storeManager.setData('isFetching', true);
+    isRequestInProgress = true;
 
     // API のエンドポイントを取得
     const apiEndpoints = _determineSearchEndpoints(offset, isFirstTime);
@@ -63,10 +71,28 @@ export const executeSearch = (() => {
     const requestOptions = _getRequestOptions(signal);
 
     // データ取得
-    apiEndpoints?.forEach((endpoint) => {
-      _fetchData(endpoint, requestOptions);
-    });
-  }, 10);
+    if (apiEndpoints && apiEndpoints.length > 0) {
+      Promise.all(
+        apiEndpoints.map((endpoint) => _fetchData(endpoint, requestOptions))
+      )
+        .then(() => {
+          // すべてのリクエストが完了した後にローディング状態を解除
+          storeManager.setData('isFetching', false);
+          isRequestInProgress = false;
+          _updateAppState();
+        })
+        .catch((error) => {
+          // AbortErrorの場合はローディング状態を維持
+          if (error.name === 'AbortError') return;
+          storeManager.setData('isFetching', false);
+          isRequestInProgress = false;
+          storeManager.setData('searchMessages', { error });
+        });
+    } else {
+      storeManager.setData('isFetching', false);
+      isRequestInProgress = false;
+    }
+  }, 300);
 })();
 
 /** 初回検索時のデータをリセット */
@@ -180,8 +206,6 @@ async function _fetchData(endpoint: string, options: FetchOption) {
       }
     }
 
-    await _updateAppState();
-
     if (jsonResponse.notice || jsonResponse.warning || jsonResponse.error) {
       storeManager.setData('searchMessages', {
         notice: jsonResponse.notice?.join?.('<br>'),
@@ -193,9 +217,13 @@ async function _fetchData(endpoint: string, options: FetchOption) {
     }
   } catch (error) {
     console.error(error);
-    if (error.name === 'AbortError') return;
-    storeManager.setData('isFetching', false);
-    storeManager.setData('searchMessages', { error });
+    if (error.name === 'AbortError') {
+      // AbortErrorの場合はエラーオブジェクトを投げる
+      const abortError = new Error('ABORTED');
+      abortError.name = 'AbortError';
+      throw abortError;
+    }
+    throw error;
   }
 }
 
