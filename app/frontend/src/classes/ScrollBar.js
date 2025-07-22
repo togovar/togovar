@@ -27,12 +27,19 @@ export default class ScrollBar {
     storeManager.bind('offset', this);
     storeManager.bind('numberOfRecords', this);
     storeManager.bind('rowCount', this);
-    $(this.bar).draggable({
-      axis: 'y',
-      containment: this.elm,
-      cursor: 'grab',
-      drag: this.drag.bind(this),
-    });
+
+    // デスクトップ用のドラッグ機能
+    if (window.innerWidth > 768) {
+      $(this.bar).draggable({
+        axis: 'y',
+        containment: this.elm,
+        cursor: 'grab',
+        drag: this.drag.bind(this),
+      });
+    }
+
+    // モバイル・タブレット用のタッチ対応
+    this.setupTouchEvents();
   }
 
   drag(e, ui) {
@@ -51,6 +58,11 @@ export default class ScrollBar {
   offset(offset) {
     this.position.textContent = offset + 1;
     this.update();
+
+    // モバイル・タブレットでアクティブ状態を維持
+    if (window.innerWidth <= 768 && this.elm.classList.contains('-active')) {
+      return;
+    }
   }
 
   numberOfRecords(numberOfRecords) {
@@ -96,5 +108,53 @@ export default class ScrollBar {
 
   release() {
     this.elm.classList.remove('-dragging');
+  }
+
+  setupTouchEvents() {
+    // モバイル・タブレットでもスクロールバーを表示（ただし半透明で）
+    if (window.innerWidth <= 768) {
+      this.elm.classList.add('-mobile');
+    }
+
+    // タッチイベントの設定
+    this.bar.addEventListener('touchstart', this.handleTouchStart.bind(this), {
+      passive: false,
+    });
+    this.bar.addEventListener('touchmove', this.handleTouchMove.bind(this), {
+      passive: false,
+    });
+    this.bar.addEventListener('touchend', this.handleTouchEnd.bind(this), {
+      passive: false,
+    });
+  }
+
+  handleTouchStart(e) {
+    e.preventDefault();
+    this.isDragging = true;
+    this.touchStartY = e.touches[0].clientY;
+    this.touchStartTop = parseInt(this.bar.style.top) || 0;
+    this.elm.classList.add('-dragging');
+    this.elm.classList.add('-active');
+  }
+
+  handleTouchMove(e) {
+    if (!this.isDragging) return;
+    e.preventDefault();
+
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - this.touchStartY;
+    const newTop = this.touchStartTop + deltaY;
+
+    // ドラッグ処理をシミュレート
+    const mockEvent = { position: { top: newTop } };
+    this.drag(null, mockEvent);
+  }
+
+  handleTouchEnd(e) {
+    if (!this.isDragging) return;
+    e.preventDefault();
+    this.isDragging = false;
+    this.prepareRelease();
+    this.elm.classList.remove('-active'); // 追加: ドラッグ終了時にアクティブ解除
   }
 }

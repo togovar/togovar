@@ -12,6 +12,13 @@ export class ResultsView {
     this.status = this.elm.querySelector('header.header > .left > .status');
     this.messages = this.elm.querySelector('#Messages');
 
+    // タッチスクロール用の変数
+    this.touchStartY = 0;
+    this.touchStartTime = 0;
+    this.touchLastY = 0;
+    this.isScrolling = false;
+    this.lastTouchTime = 0;
+
     storeManager.bind('searchStatus', this);
     storeManager.bind('searchResults', this);
     storeManager.bind('columns', this);
@@ -37,7 +44,26 @@ export class ResultsView {
     );
 
     // スクロール制御
-    // スクロールイベント
+    this.setupScrollEvents();
+
+    // カラムの表示を制御するためのスタイルシート
+    this.stylesheet = document.createElement('style');
+    this.stylesheet.type = 'text/css';
+    document.getElementsByTagName('head')[0].appendChild(this.stylesheet);
+    this.columns(storeManager.getData('columns'));
+
+    // this.lastScrollを初期化
+    this.updateLastScrollFromOffset();
+  }
+
+  // offsetからthis.lastScrollを更新するメソッド
+  updateLastScrollFromOffset() {
+    const currentOffset = storeManager.getData('offset') || 0;
+    this.lastScroll = currentOffset * TR_HEIGHT;
+  }
+
+  setupScrollEvents() {
+    // PC用のホイールイベント
     const mousewheelevent =
       'onwheel' in document
         ? 'wheel'
@@ -46,11 +72,194 @@ export class ResultsView {
         : 'DOMMouseScroll';
     this.tbody.addEventListener(mousewheelevent, this.scroll.bind(this));
 
-    // カラムの表示を制御するためのスタイルシート
-    this.stylesheet = document.createElement('style');
-    this.stylesheet.type = 'text/css';
-    document.getElementsByTagName('head')[0].appendChild(this.stylesheet);
-    this.columns(storeManager.getData('columns'));
+    // tablecontainerの要素を取得
+    this.tablecontainer = this.elm.querySelector('.tablecontainer');
+
+    // モバイル・タブレット用のタッチイベント（ResultsViewの範囲内のみ）
+    const touchElements = [this.tablecontainer, this.tbody];
+
+    touchElements.forEach((element) => {
+      element.addEventListener('touchstart', this.handleTouchStart.bind(this), {
+        passive: false,
+        capture: true,
+      });
+      element.addEventListener('touchmove', this.handleTouchMove.bind(this), {
+        passive: false,
+        capture: true,
+      });
+      element.addEventListener('touchend', this.handleTouchEnd.bind(this), {
+        passive: false,
+        capture: true,
+      });
+    });
+  }
+
+  handleTouchStart(e) {
+    // ResultsViewの範囲内かどうかをチェック
+    if (!this.elm.contains(e.target) && !this.elm.contains(e.currentTarget)) {
+      return;
+    }
+
+    // tablecontainerまたはtbodyで処理する
+    if (
+      e.currentTarget !== this.tablecontainer &&
+      e.currentTarget !== this.tbody
+    ) {
+      return;
+    }
+
+    if (e.touches.length !== 1) return;
+
+    this.touchStartY = e.touches[0].clientY;
+    this.touchLastY = this.touchStartY;
+    this.touchStartTime = Date.now();
+    this.lastTouchTime = this.touchStartTime; // lastTouchTimeを初期化
+    this.isScrolling = true;
+
+    // スクロールバーのドラッグ処理と同じように開始位置を記録
+    this.touchStartOffset = storeManager.getData('offset') || 0;
+
+    // ここで現在のoffsetからlastScrollを記録
+    this.lastScroll = (storeManager.getData('offset') || 0) * TR_HEIGHT;
+
+    this.initializeScrollBarPosition();
+  }
+
+  handleTouchMove(e) {
+    if (!this.isScrolling || e.touches.length !== 1) return;
+
+    // ResultsViewの範囲内かどうかをチェック
+    if (!this.elm.contains(e.target) && !this.elm.contains(e.currentTarget)) {
+      return;
+    }
+
+    // tablecontainerまたはtbodyで処理する
+    if (
+      e.currentTarget !== this.tablecontainer &&
+      e.currentTarget !== this.tbody
+    ) {
+      return;
+    }
+
+    const currentY = e.touches[0].clientY;
+
+    const totalDeltaY = currentY - this.touchStartY;
+
+    this.touchLastY = currentY;
+
+    this.handleScrollWithScrollBarFeedback(-totalDeltaY * 0.1);
+  }
+
+  handleTouchEnd(e) {
+    if (!this.isScrolling) return;
+
+    this.isScrolling = false;
+
+    // タッチ終了時にスクロールバーのアクティブ状態を解除
+    this.deactivateScrollBar();
+  }
+
+  // スクロールバーのアクティブ状態を解除
+  deactivateScrollBar() {
+    const scrollBar = this.elm.querySelector('.scroll-bar');
+    if (scrollBar) {
+      scrollBar.classList.remove('-active');
+    }
+  }
+
+  handleScroll(deltaY) {
+    const totalHeight = storeManager.getData('numberOfRecords') * TR_HEIGHT;
+    let availableScrollY =
+        totalHeight - storeManager.getData('rowCount') * TR_HEIGHT,
+      wheelScroll;
+    availableScrollY = availableScrollY < 0 ? 0 : availableScrollY;
+
+    // スクロール量の計算
+    wheelScroll = this.lastScroll + deltaY;
+    wheelScroll = wheelScroll < 0 ? 0 : wheelScroll;
+    wheelScroll =
+      wheelScroll > availableScrollY ? availableScrollY : wheelScroll;
+
+    if (wheelScroll === this.lastScroll) return;
+
+    // スクロール量決定
+    this.lastScroll = wheelScroll;
+
+    // 表示行位置
+    let offset = Math.ceil(this.lastScroll / TR_HEIGHT);
+    storeManager.setData('offset', offset);
+  }
+
+  // スクロールバーを直接操作している感覚のスクロール処理
+  handleScrollWithScrollBarFeedback(deltaY) {
+    const rowCount = storeManager.getData('rowCount');
+    const numberOfRecords = storeManager.getData('numberOfRecords');
+
+    // スクロールバーのドラッグ処理と同じように開始位置からの累積移動量を使用
+    const availableHeight = rowCount * TR_HEIGHT;
+    const offsetRate = deltaY / availableHeight;
+    let newOffset =
+      Math.ceil(offsetRate * numberOfRecords) + this.touchStartOffset;
+
+    // 境界チェック
+    newOffset = newOffset < 0 ? 0 : newOffset;
+    newOffset =
+      newOffset + rowCount > numberOfRecords
+        ? numberOfRecords - rowCount
+        : newOffset;
+
+    // lastScrollを更新
+    this.lastScroll = newOffset * TR_HEIGHT;
+
+    // スクロールバーを直接操作している感覚でoffsetを更新
+    this.updateScrollBarDirectly(newOffset);
+
+    // データ更新（遅延読み込み機能を維持）
+    storeManager.setData('offset', newOffset);
+  }
+
+  // スクロールバーの位置を初期化
+  initializeScrollBarPosition() {
+    const scrollBar = this.elm.querySelector('.scroll-bar');
+    if (scrollBar) {
+      scrollBar.classList.add('-active');
+    }
+  }
+
+  // スクロールバーを直接操作している感覚で更新
+  updateScrollBarDirectly(offset) {
+    const scrollBar = this.elm.querySelector('.scroll-bar');
+    if (!scrollBar) return;
+
+    const rowCount = storeManager.getData('rowCount');
+    const numberOfRecords = storeManager.getData('numberOfRecords');
+    const totalHeight = numberOfRecords * TR_HEIGHT;
+    const displayHeight = rowCount * TR_HEIGHT;
+    const displayRate = displayHeight / totalHeight;
+
+    // スクロールバーの高さと位置を計算
+    let barHeight = Math.ceil(displayHeight * displayRate);
+    barHeight = barHeight < 30 ? 30 : barHeight; // MIN_HEIGHT
+
+    const availableHeight = displayHeight - barHeight;
+    const availableRate = availableHeight / totalHeight;
+    const barTop = Math.ceil(offset * TR_HEIGHT * availableRate);
+
+    // スクロールバーの位置を直接更新
+    const bar = scrollBar.querySelector('.bar');
+    if (bar) {
+      bar.style.height = `${barHeight}px`;
+      bar.style.top = `${barTop}px`;
+
+      // 位置表示も更新
+      const position = bar.querySelector('.position');
+      if (position) {
+        position.textContent = offset + 1;
+      }
+    }
+
+    // アクティブ状態を維持
+    scrollBar.classList.add('-active');
   }
 
   updateDisplaySize() {
@@ -102,24 +311,9 @@ export class ResultsView {
 
   scroll(e) {
     e.stopPropagation();
-    const totalHeight = storeManager.getData('numberOfRecords') * TR_HEIGHT;
-    let availableScrollY =
-        totalHeight - storeManager.getData('rowCount') * TR_HEIGHT,
-      wheelScroll;
-    availableScrollY = availableScrollY < 0 ? 0 : availableScrollY;
     // 縦方向にスクロールしていない場合スルー
     if (e.deltaY === 0) return;
-    // ホイールのスクロール量
-    wheelScroll = this.lastScroll + e.deltaY;
-    wheelScroll = wheelScroll < 0 ? 0 : wheelScroll;
-    wheelScroll =
-      wheelScroll > availableScrollY ? availableScrollY : wheelScroll;
-    if (wheelScroll === this.lastScroll) return;
-    // スクロール量決定
-    this.lastScroll = wheelScroll;
-    // 表示行位置
-    let offset = Math.ceil(this.lastScroll / TR_HEIGHT);
-    storeManager.setData('offset', offset);
+    this.handleScroll(e.deltaY);
   }
 
   offset(offset) {
