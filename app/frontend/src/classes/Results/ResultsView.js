@@ -14,8 +14,10 @@ export class ResultsView {
 
     // タッチスクロール用の変数
     this.touchStartY = 0;
+    this.touchStartX = 0;
     this.touchStartTime = 0;
     this.touchLastY = 0;
+    this.touchLastX = 0;
     this.isScrolling = false;
     this.lastTouchTime = 0;
 
@@ -111,7 +113,9 @@ export class ResultsView {
     if (e.touches.length !== 1) return;
 
     this.touchStartY = e.touches[0].clientY;
+    this.touchStartX = e.touches[0].clientX;
     this.touchLastY = this.touchStartY;
+    this.touchLastX = this.touchStartX;
     this.touchStartTime = Date.now();
     this.lastTouchTime = this.touchStartTime; // lastTouchTimeを初期化
     this.isScrolling = true;
@@ -142,12 +146,15 @@ export class ResultsView {
     }
 
     const currentY = e.touches[0].clientY;
+    const currentX = e.touches[0].clientX;
 
     const totalDeltaY = currentY - this.touchStartY;
+    const totalDeltaX = currentX - this.touchStartX;
 
-    this.touchLastY = currentY;
-
-    this.handleScrollWithScrollBarFeedback(-totalDeltaY * 0.1);
+    if (Math.abs(totalDeltaY) > Math.abs(totalDeltaX)) {
+      this.touchLastY = currentY;
+      this.handleScrollWithScrollBarFeedback(-totalDeltaY * 0.1);
+    }
   }
 
   handleTouchEnd(e) {
