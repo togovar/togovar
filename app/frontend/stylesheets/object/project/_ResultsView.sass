@@ -60,10 +60,9 @@
           height: 64px
 // 共通の touch 対応
 
-// モバイル
-@media (max-width: 1024px)
+// タッチデバイス対応（デバイスサイズに関係なく）
+@media (hover: none) and (pointer: coarse)
   #ResultsView
-    // モバイル時のみタッチ対応
     > .tablecontainer > table > tbody > tr,
     > .tablecontainer > table > tbody > td,
     > .tablecontainer > table > tbody > td *
