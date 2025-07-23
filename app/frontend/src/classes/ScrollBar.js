@@ -29,7 +29,7 @@ export default class ScrollBar {
     storeManager.bind('rowCount', this);
 
     // デスクトップ用のドラッグ機能
-    if (window.innerWidth > 768) {
+    if (window.innerWidth > 1024) {
       $(this.bar).draggable({
         axis: 'y',
         containment: this.elm,
@@ -60,7 +60,7 @@ export default class ScrollBar {
     this.update();
 
     // モバイル・タブレットでアクティブ状態を維持
-    if (window.innerWidth <= 768 && this.elm.classList.contains('-active')) {
+    if (window.innerWidth <= 1024 && this.elm.classList.contains('-active')) {
       return;
     }
   }
@@ -112,7 +112,7 @@ export default class ScrollBar {
 
   setupTouchEvents() {
     // モバイル・タブレットでもスクロールバーを表示（ただし半透明で）
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth <= 1024) {
       this.elm.classList.add('-mobile');
     }
 
