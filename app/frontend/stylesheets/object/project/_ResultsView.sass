@@ -60,44 +60,9 @@
           height: 64px
 // 共通の touch 対応
 
-// モバイル（〜768px）
-@media (max-width: 768px)
+// モバイル
+@media (max-width: 1024px)
   #ResultsView
-    padding: 8px 10px 10px
-
-    > .header
-      flex-direction: column
-      gap: 8px
-
-      > .left
-        > .heading
-          font-size: 14px
-        > .status
-          font-size: 11px
-          > .bigger
-            font-size: 14px
-
-      > .right
-        top: 0
-        justify-content: flex-end
-
-    > .tablecontainer
-      margin-top: -15px
-      margin-right: -10px
-      padding-bottom: 15px
-
-      > .results-view
-        > thead > tr
-          height: 56px
-          > th
-            font-size: 12px
-            padding: 8px 4px
-
-        > tbody > tr
-          height: 48px
-          > td
-            font-size: 11px
-            padding: 6px 4px
     // モバイル時のみタッチ対応
     > .tablecontainer > table > tbody > tr,
     > .tablecontainer > table > tbody > td,
@@ -110,46 +75,3 @@
       pointer-events: none
     > .tablecontainer > table > tbody > td a
       pointer-events: auto
-
-// スマホ（〜480px）
-@media (max-width: 480px)
-  #ResultsView
-    padding: 6px 8px 8px
-
-    > .header > .left
-      > .heading
-        font-size: 13px
-      > .status
-        font-size: 10px
-        > .bigger
-          font-size: 13px
-
-    > .tablecontainer
-      margin-top: -12px
-      margin-right: -8px
-      padding-bottom: 12px
-
-      > .results-view
-        > thead > tr
-          height: 48px
-          > th
-            font-size: 11px
-            padding: 6px 3px
-
-        > tbody > tr
-          height: 40px
-          > td
-            font-size: 10px
-            padding: 4px 3px
-
-// タブレット（769〜1024px）
-@media (min-width: 769px) and (max-width: 1024px)
-  #ResultsView > .tablecontainer > .results-view
-    > thead > tr
-      height: 60px
-      > th
-        font-size: 13px
-    > tbody > tr
-      height: 52px
-      > td
-        font-size: 12px
