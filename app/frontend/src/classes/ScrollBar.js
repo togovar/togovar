@@ -28,8 +28,8 @@ export default class ScrollBar {
     storeManager.bind('numberOfRecords', this);
     storeManager.bind('rowCount', this);
 
-    // デスクトップ用のドラッグ機能
-    if (window.innerWidth > 1024) {
+    // デスクトップ用のドラッグ機能（マウスデバイスの場合）
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
       $(this.bar).draggable({
         axis: 'y',
         containment: this.elm,
@@ -38,7 +38,7 @@ export default class ScrollBar {
       });
     }
 
-    // モバイル・タブレット用のタッチ対応
+    // タッチデバイス用のタッチ対応
     this.setupTouchEvents();
   }
 
@@ -59,8 +59,11 @@ export default class ScrollBar {
     this.position.textContent = offset + 1;
     this.update();
 
-    // モバイル・タブレットでアクティブ状態を維持
-    if (window.innerWidth <= 1024 && this.elm.classList.contains('-active')) {
+    // タッチデバイスでアクティブ状態を維持
+    if (
+      window.matchMedia('(hover: none) and (pointer: coarse)').matches &&
+      this.elm.classList.contains('-active')
+    ) {
       return;
     }
   }
@@ -111,11 +114,6 @@ export default class ScrollBar {
   }
 
   setupTouchEvents() {
-    // モバイル・タブレットでもスクロールバーを表示（ただし半透明で）
-    if (window.innerWidth <= 1024) {
-      this.elm.classList.add('-mobile');
-    }
-
     // タッチイベントの設定
     this.bar.addEventListener('touchstart', this.handleTouchStart.bind(this), {
       passive: false,
