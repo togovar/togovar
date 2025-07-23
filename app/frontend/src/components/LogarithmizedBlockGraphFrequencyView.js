@@ -18,9 +18,6 @@ export class LogarithmizedBlockGraphFrequencyView extends LitElement {
       font-size: 0;
       background-color: white;
     }
-    /* :host > .display {
-      position: absolute;
-    } */
     :host([data-dataset='gem_j_wga']) {
       --color-dataset: var(--color-dataset-gemj);
     }
@@ -180,10 +177,6 @@ export class LogarithmizedBlockGraphFrequencyView extends LitElement {
           () => html`<span class="block"></span>`
         )}
       </span>
-      <!-- <span class="display">
-        ${this.dataset.dataset}:
-        &nbsp;${this.count}/${this.total}&nbsp;${this.frequencyValue}
-      </span> -->
     `;
   }
 
