@@ -38,7 +38,7 @@ export default class ScrollBar {
       });
     }
 
-    // タッチデバイス用のタッチ対応
+    // Touch support for touch devices
     this.setupTouchEvents();
   }
 
