@@ -12,7 +12,7 @@ export class ResultsView {
     this.status = this.elm.querySelector('header.header > .left > .status');
     this.messages = this.elm.querySelector('#Messages');
 
-    // タッチスクロール用の変数
+    // Variables for touch scrolling
     this.touchStartY = 0;
     this.touchStartX = 0;
     this.touchStartTime = 0;
