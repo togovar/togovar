@@ -21,6 +21,13 @@ export class ResultsView {
     this.isScrolling = false;
     this.lastTouchTime = 0;
 
+    // タッチ判定用の変数
+    this.touchDistance = 0;
+    this.touchDuration = 0;
+    this.isTouchDevice = false;
+    this.scrollThreshold = 10; // スクロール判定の閾値（ピクセル）
+    this.tapThreshold = 300; // タップ判定の閾値（ミリ秒）
+
     storeManager.bind('searchStatus', this);
     storeManager.bind('searchResults', this);
     storeManager.bind('columns', this);
@@ -28,6 +35,10 @@ export class ResultsView {
     storeManager.bind('karyotype', this);
     storeManager.bind('searchMessages', this);
     document.addEventListener('keydown', this.keydown.bind(this));
+
+    // タッチデバイス判定
+    this.detectTouchDevice();
+
     // スクロールバーの生成
     this.elm
       .querySelector('.tablecontainer')
@@ -56,6 +67,44 @@ export class ResultsView {
 
     // this.lastScrollを初期化
     this.updateLastScrollFromOffset();
+
+    // 初期状態のpointer-events設定
+    if (this.isTouchDevice) {
+      // タッチデバイスでは初期状態をnoneに設定
+      this.setTouchElementsPointerEvents(false);
+    } else {
+      // 非タッチデバイスではpointer-eventsを有効化
+      this.setTouchElementsPointerEvents(true);
+    }
+  }
+
+  // タッチデバイス判定
+  detectTouchDevice() {
+    this.isTouchDevice =
+      'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  }
+
+  // タッチ要素のpointer-eventsを制御
+  setTouchElementsPointerEvents(enabled) {
+    const touchElements = this.elm.querySelectorAll(
+      '.tablecontainer > table > tbody > tr, .tablecontainer > table > tbody > td, .tablecontainer > table > tbody > td *'
+    );
+
+    touchElements.forEach((element) => {
+      if (enabled) {
+        element.style.pointerEvents = 'auto';
+      } else {
+        element.style.pointerEvents = 'none';
+      }
+    });
+
+    // リンク要素は常に有効にする
+    const linkElements = this.elm.querySelectorAll(
+      '.tablecontainer > table > tbody > td a'
+    );
+    linkElements.forEach((element) => {
+      element.style.pointerEvents = 'auto';
+    });
   }
 
   // offsetからthis.lastScrollを更新するメソッド
@@ -94,6 +143,12 @@ export class ResultsView {
         capture: true,
       });
     });
+
+    // タップ処理完了イベントのリスナーを追加
+    this.tbody.addEventListener(
+      'tapCompleted',
+      this.handleTapCompleted.bind(this)
+    );
   }
 
   handleTouchStart(e) {
@@ -112,25 +167,26 @@ export class ResultsView {
 
     if (e.touches.length !== 1) return;
 
+    // 状態をリセット
+    this.isScrolling = false;
+    this.touchDistance = 0;
     this.touchStartY = e.touches[0].clientY;
     this.touchStartX = e.touches[0].clientX;
     this.touchLastY = this.touchStartY;
     this.touchLastX = this.touchStartX;
     this.touchStartTime = Date.now();
-    this.lastTouchTime = this.touchStartTime; // lastTouchTimeを初期化
-    this.isScrolling = true;
+    this.lastTouchTime = this.touchStartTime;
 
     // スクロールバーのドラッグ処理と同じように開始位置を記録
     this.touchStartOffset = storeManager.getData('offset') || 0;
-
-    // ここで現在のoffsetからlastScrollを記録
     this.lastScroll = (storeManager.getData('offset') || 0) * TR_HEIGHT;
 
-    this.initializeScrollBarPosition();
+    // タッチ開始時はpointer-eventsを有効化
+    this.setTouchElementsPointerEvents(true);
   }
 
   handleTouchMove(e) {
-    if (!this.isScrolling || e.touches.length !== 1) return;
+    if (e.touches.length !== 1) return;
 
     // ResultsViewの範囲内かどうかをチェック
     if (!this.elm.contains(e.target) && !this.elm.contains(e.currentTarget)) {
@@ -150,20 +206,64 @@ export class ResultsView {
 
     const totalDeltaY = currentY - this.touchStartY;
     const totalDeltaX = currentX - this.touchStartX;
+    this.touchDistance = Math.sqrt(
+      totalDeltaX * totalDeltaX + totalDeltaY * totalDeltaY
+    );
 
-    if (Math.abs(totalDeltaY) > Math.abs(totalDeltaX)) {
+    // スクロール判定：縦方向の移動が横方向より大きく、かつ閾値を超えた場合
+    if (
+      Math.abs(totalDeltaY) > Math.abs(totalDeltaX) &&
+      this.touchDistance > this.scrollThreshold
+    ) {
+      if (!this.isScrolling) {
+        // スクロール開始
+        this.isScrolling = true;
+        this.setTouchElementsPointerEvents(false); // スクロール中はpointer-eventsを無効化
+        this.initializeScrollBarPosition();
+      }
+
       this.touchLastY = currentY;
       this.handleScrollWithScrollBarFeedback(-totalDeltaY * 0.1);
     }
   }
 
   handleTouchEnd(e) {
-    if (!this.isScrolling) return;
+    this.touchDuration = Date.now() - this.touchStartTime;
 
+    // タップ判定：移動距離が少なく、時間が短い場合
+    if (
+      this.touchDistance < this.scrollThreshold &&
+      this.touchDuration < this.tapThreshold
+    ) {
+      // タップ処理（既存のクリックイベントが処理する）
+      this.setTouchElementsPointerEvents(true);
+    } else if (this.isScrolling) {
+      // スクロール終了
+      this.isScrolling = false;
+      this.setTouchElementsPointerEvents(false);
+      this.deactivateScrollBar();
+    } else {
+      // その他の場合
+      this.setTouchElementsPointerEvents(true);
+    }
+
+    // 状態を完全リセット
     this.isScrolling = false;
+    this.touchDistance = 0;
+    this.touchStartX = 0;
+    this.touchStartY = 0;
+    this.touchLastX = 0;
+    this.touchLastY = 0;
+    this.touchStartTime = 0;
+    this.lastTouchTime = 0;
+  }
 
-    // タッチ終了時にスクロールバーのアクティブ状態を解除
-    this.deactivateScrollBar();
+  // タップ処理完了時の処理
+  handleTapCompleted(e) {
+    if (!this.isTouchDevice) return;
+
+    // タップ処理完了後、一時的にpointer-eventsを無効化
+    this.setTouchElementsPointerEvents(false);
   }
 
   // スクロールバーのアクティブ状態を解除
@@ -313,6 +413,10 @@ export class ResultsView {
     // 行の更新を確実に行う
     requestAnimationFrame(() => {
       this.rows.forEach((row) => row.updateTableRow());
+
+      if (this.isTouchDevice) {
+        this.setTouchElementsPointerEvents(false);
+      }
     });
   }
 

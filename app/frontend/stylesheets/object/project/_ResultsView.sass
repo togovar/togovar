@@ -58,19 +58,3 @@
       > thead
         > tr
           height: 64px
-// 共通の touch 対応
-
-// タッチデバイス対応（デバイスサイズに関係なく）
-@media (hover: none) and (pointer: coarse)
-  #ResultsView
-    > .tablecontainer > table > tbody > tr,
-    > .tablecontainer > table > tbody > td,
-    > .tablecontainer > table > tbody > td *
-      touch-action: pan-x pan-y
-      user-select: none
-      -webkit-user-select: none
-      -moz-user-select: none
-      -ms-user-select: none
-      pointer-events: none
-    > .tablecontainer > table > tbody > td a
-      pointer-events: auto
