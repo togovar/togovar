@@ -114,7 +114,7 @@ export default class ScrollBar {
   }
 
   setupTouchEvents() {
-    // タッチイベントの設定
+    // Touch event setup
     this.bar.addEventListener('touchstart', this.handleTouchStart.bind(this), {
       passive: false,
     });
