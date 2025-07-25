@@ -153,6 +153,6 @@ export default class ScrollBar {
     e.preventDefault();
     this.isDragging = false;
     this.prepareRelease();
-    this.elm.classList.remove('-active'); // 追加: ドラッグ終了時にアクティブ解除
+    this.elm.classList.remove('-active'); // Added: Remove active state when drag ends
   }
 }
