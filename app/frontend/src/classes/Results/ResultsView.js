@@ -78,7 +78,7 @@ export class ResultsView {
     }
   }
 
-  // タッチデバイス判定
+  // Touch device detection
   detectTouchDevice() {
     this.isTouchDevice =
       'ontouchstart' in window || navigator.maxTouchPoints > 0;
