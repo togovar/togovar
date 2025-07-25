@@ -77,6 +77,13 @@ export class ResultsRowView {
   /** 行がクリックされたときに選択状態をトグル */
   click() {
     storeManager.setData('selectedRow', this.selected ? undefined : this.index);
+
+    // Dispatch custom event to notify tap completion
+    const tapCompletedEvent = new CustomEvent('tapCompleted', {
+      bubbles: true,
+      detail: { rowIndex: this.index },
+    });
+    this.tr.dispatchEvent(tapCompletedEvent);
   }
 
   // bindings ///////////////////////////
