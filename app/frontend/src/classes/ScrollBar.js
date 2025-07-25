@@ -28,7 +28,7 @@ export default class ScrollBar {
     storeManager.bind('numberOfRecords', this);
     storeManager.bind('rowCount', this);
 
-    // デスクトップ用のドラッグ機能（マウスデバイスの場合）
+    // Desktop drag functionality (for mouse devices)
     if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
       $(this.bar).draggable({
         axis: 'y',
