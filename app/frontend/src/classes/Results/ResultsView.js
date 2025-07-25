@@ -36,7 +36,7 @@ export class ResultsView {
     storeManager.bind('searchMessages', this);
     document.addEventListener('keydown', this.keydown.bind(this));
 
-    // タッチデバイス判定
+    // Touch device detection
     this.detectTouchDevice();
 
     // スクロールバーの生成
