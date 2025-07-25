@@ -21,7 +21,7 @@ export class ResultsView {
     this.isScrolling = false;
     this.lastTouchTime = 0;
 
-    // タッチ判定用の変数
+    // Variables for touch detection
     this.touchDistance = 0;
     this.touchDuration = 0;
     this.isTouchDevice = false;
