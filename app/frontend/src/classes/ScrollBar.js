@@ -59,7 +59,7 @@ export default class ScrollBar {
     this.position.textContent = offset + 1;
     this.update();
 
-    // タッチデバイスでアクティブ状態を維持
+    // Maintain active state on touch devices
     if (
       window.matchMedia('(hover: none) and (pointer: coarse)').matches &&
       this.elm.classList.contains('-active')
