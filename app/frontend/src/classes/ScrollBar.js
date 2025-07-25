@@ -143,7 +143,7 @@ export default class ScrollBar {
     const deltaY = currentY - this.touchStartY;
     const newTop = this.touchStartTop + deltaY;
 
-    // ドラッグ処理をシミュレート
+    // Simulate drag processing
     const mockEvent = { position: { top: newTop } };
     this.drag(null, mockEvent);
   }
