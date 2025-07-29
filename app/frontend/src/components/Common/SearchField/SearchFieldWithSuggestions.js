@@ -248,14 +248,18 @@ class SearchFieldtWithSuggestions extends LitElement {
    * @param {Object} suggestion - Symple{term, alias_of}, Gene{slias_of, highlight, id, name, symbol}
    * @private */
   _select = (suggestion) => {
-    this.value = suggestion[this._searchFieldOptions.valueMappings.valueKey];
-    this.label = suggestion[this._searchFieldOptions.valueMappings.labelKey];
+    this.value = `"${
+      suggestion[this._searchFieldOptions.valueMappings.valueKey]
+    }"`;
+    this.label = `"${
+      suggestion[this._searchFieldOptions.valueMappings.labelKey]
+    }"`;
 
     this.dispatchEvent(
       new CustomEvent('new-suggestion-selected', {
         detail: {
-          id: suggestion[this._searchFieldOptions.valueMappings.valueKey],
-          label: suggestion[this._searchFieldOptions.valueMappings.labelKey],
+          id: this.value,
+          label: this.label,
         },
         bubbles: true,
         composed: true,
