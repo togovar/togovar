@@ -5,6 +5,10 @@ import { TR_HEIGHT, COMMON_FOOTER_HEIGHT, COLUMNS } from '../../global.js';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 
 export class ResultsView {
+  static SCROLL_SENSITIVITY = 0.1; // スクロール感度の調整
+  static SCROLL_THRESHOLD = 10; // スクロール判定の閾値（ピクセル）
+  static TAP_THRESHOLD = 300; // タップ判定の閾値（ミリ秒）
+
   constructor(elm) {
     this.elm = elm;
     this.rows = [];
@@ -25,8 +29,6 @@ export class ResultsView {
     this.touchDistance = 0;
     this.touchDuration = 0;
     this.isTouchDevice = false;
-    this.scrollThreshold = 10; // スクロール判定の閾値（ピクセル）
-    this.tapThreshold = 300; // タップ判定の閾値（ミリ秒）
 
     storeManager.bind('searchStatus', this);
     storeManager.bind('searchResults', this);
@@ -213,7 +215,7 @@ export class ResultsView {
     // スクロール判定：縦方向の移動が横方向より大きく、かつ閾値を超えた場合
     if (
       Math.abs(totalDeltaY) > Math.abs(totalDeltaX) &&
-      this.touchDistance > this.scrollThreshold
+      this.touchDistance > ResultsView.SCROLL_THRESHOLD
     ) {
       if (!this.isScrolling) {
         // スクロール開始
@@ -223,7 +225,9 @@ export class ResultsView {
       }
 
       this.touchLastY = currentY;
-      this.handleScrollWithScrollBarFeedback(-totalDeltaY * 0.1);
+      this.handleScrollWithScrollBarFeedback(
+        -totalDeltaY * ResultsView.SCROLL_SENSITIVITY
+      );
     }
   }
 
@@ -232,8 +236,8 @@ export class ResultsView {
 
     // タップ判定：移動距離が少なく、時間が短い場合
     if (
-      this.touchDistance < this.scrollThreshold &&
-      this.touchDuration < this.tapThreshold
+      this.touchDistance < ResultsView.SCROLL_THRESHOLD &&
+      this.touchDuration < ResultsView.TAP_THRESHOLD
     ) {
       // タップ処理（既存のクリックイベントが処理する）
       this.setTouchElementsPointerEvents(true);
