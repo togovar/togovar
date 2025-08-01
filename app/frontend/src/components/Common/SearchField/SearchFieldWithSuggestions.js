@@ -248,11 +248,14 @@ class SearchFieldtWithSuggestions extends LitElement {
    * @param {Object} suggestion - Symple{term, alias_of}, Gene{slias_of, highlight, id, name, symbol}
    * @private */
   _select = (suggestion) => {
+    const escapeString = (str) =>
+      str.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
     this.value = `"${
-      suggestion[this._searchFieldOptions.valueMappings.valueKey]
+      escapeString(suggestion[this._searchFieldOptions.valueMappings.valueKey])
     }"`;
     this.label = `"${
-      suggestion[this._searchFieldOptions.valueMappings.labelKey]
+      escapeString(suggestion[this._searchFieldOptions.valueMappings.labelKey])
     }"`;
 
     this.dispatchEvent(
