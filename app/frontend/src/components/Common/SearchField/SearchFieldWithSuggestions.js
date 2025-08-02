@@ -27,7 +27,7 @@ import { storeManager } from '../../../store/StoreManager';
  * {@link ConditionValueEditorGene},
  * {@link ConditionValueEditorDisease} */
 @customElement('search-field-with-suggestions')
-class SearchFieldtWithSuggestions extends LitElement {
+class SearchFieldWithSuggestions extends LitElement {
   static styles = [Styles];
 
   /**
@@ -160,11 +160,9 @@ class SearchFieldtWithSuggestions extends LitElement {
       storeManager.setData('showSuggest', false);
     }
 
+    const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
     if (
-      (e.key === 'ArrowUp' ||
-        e.key === 'ArrowDown' ||
-        e.key === 'ArrowLeft' ||
-        e.key === 'ArrowRight') &&
+      arrowKeys.includes(e.key) &&
       this.showSuggestions &&
       this.currentSuggestionIndex !== -1
     ) {
@@ -248,15 +246,21 @@ class SearchFieldtWithSuggestions extends LitElement {
    * @param {Object} suggestion - Symple{term, alias_of}, Gene{slias_of, highlight, id, name, symbol}
    * @private */
   _select = (suggestion) => {
-    this.value = suggestion[this._searchFieldOptions.valueMappings.valueKey];
-    this.label = suggestion[this._searchFieldOptions.valueMappings.labelKey];
+    const escapeString = (str) =>
+      String(str || '')
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"');
+
+    const valueKey =
+      suggestion[this._searchFieldOptions.valueMappings.valueKey] || '';
+    const labelKey =
+      suggestion[this._searchFieldOptions.valueMappings.labelKey] || '';
+    this.value = `"${escapeString(valueKey)}"`;
+    this.label = `"${escapeString(labelKey)}"`;
 
     this.dispatchEvent(
       new CustomEvent('new-suggestion-selected', {
-        detail: {
-          id: suggestion[this._searchFieldOptions.valueMappings.valueKey],
-          label: suggestion[this._searchFieldOptions.valueMappings.labelKey],
-        },
+        detail: { id: this.value, label: this.label },
         bubbles: true,
         composed: true,
       })
@@ -283,12 +287,12 @@ class SearchFieldtWithSuggestions extends LitElement {
     this._select(e.detail);
   };
 
-  /** Put the characters input in this.term, (Only SimpleSearch)create imput-term event, hide suggestions if the length is less than 3, and empty suggestData
+  /** Put the characters input in this.term, (Only SimpleSearch)create input-term event, hide suggestions if the length is less than 3, and empty suggestData
    * @private */
   _handleInput(e) {
     this.term = e.data;
     this.dispatchEvent(
-      new CustomEvent('imput-term', {
+      new CustomEvent('input-term', {
         detail: e.data,
         bubbles: true,
         composed: true,
@@ -377,4 +381,4 @@ class SearchFieldtWithSuggestions extends LitElement {
   }
 }
 
-export default SearchFieldtWithSuggestions;
+export default SearchFieldWithSuggestions;

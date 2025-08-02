@@ -146,7 +146,7 @@ class SimpleSearchView extends LitElement {
 
   /** Put input value in this._term
    * @private
-   * @param {CustomEvent} e - imput-term (SearchFieldWithSuggestions) */
+   * @param {CustomEvent} e - input-term (SearchFieldWithSuggestions) */
   _inputTerm(e) {
     this._term = e.detail;
     // 入力されたテキストを検索条件に反映する（ただし検索は実行しない）
@@ -201,7 +201,7 @@ class SimpleSearchView extends LitElement {
           .hideSuggestions=${this._hideSuggestions}
           @new-suggestion-selected=${this._handleSuggestionEnter}
           @search-term-enter=${this._handleTermEnter}
-          @imput-term=${this._inputTerm}
+          @input-term=${this._inputTerm}
           @input=${() => (this._hideSuggestions = false)}
           @input-reset=${this._handleInputReset}
         ></search-field-with-suggestions>
