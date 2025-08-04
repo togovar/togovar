@@ -19,7 +19,6 @@ type DataNodeWithChecked = DataNode & {
 };
 
 const ROOT_NODE_ID = '-1';
-const JGA_WGS_DATASET_ID = '1';
 
 /**
  * A condition value editor for hierarchical dataset selection using columns layout.
@@ -220,18 +219,19 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     item: HierarchyNode<DataNodeWithChecked>,
     isLogin: boolean
   ): string {
+    const inputId = `checkbox-${item.data.id}`;
     let listItem = `<li data-id="${item.data.id}" data-parent="${item.parent.data.id}"`;
 
     if (item.data.value) {
       listItem += ` data-value="${item.data.value}"`;
     }
 
-    listItem += `><label>`;
+    listItem += `><label for="${inputId}">`;
 
     if (this.#shouldShowLockIcon(item, isLogin)) {
       listItem += `<span class="lock"></span>`;
     } else {
-      listItem += `<input type="checkbox" value="${item.data.id}">`;
+      listItem += `<input type="checkbox" id="${inputId}" value="${item.data.id}">`;
     }
 
     if (this.#shouldShowDatasetIcon(item)) {
@@ -241,7 +241,7 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     listItem += `<span>${item.data.label}</span></label>`;
 
     if (item.children !== undefined) {
-      listItem += `<div class="arrow" data-id="${item.data.id}"></div>`;
+      listItem += `<div class="arrow" data-id="${item.data.id}" data-value="${item.data.value}"></div>`;
     }
 
     listItem += `</li>`;
@@ -259,11 +259,7 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     item: HierarchyNode<DataNodeWithChecked>,
     isLogin: boolean
   ): boolean {
-    return (
-      isLogin === false &&
-      item.data.value?.includes('jga_wgs') &&
-      item.data.id !== JGA_WGS_DATASET_ID
-    );
+    return isLogin === false && item.data.value?.includes('jga_wgs.');
   }
 
   /**
@@ -273,7 +269,11 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
    * @private
    */
   #shouldShowDatasetIcon(item: HierarchyNode<DataNodeWithChecked>): boolean {
-    return this._conditionType === CONDITION_TYPE.dataset && item.depth === 1;
+    return (
+      (this._conditionType === CONDITION_TYPE.dataset ||
+        this._conditionType === CONDITION_TYPE.genotype_dataset) &&
+      item.depth === 1
+    );
   }
 
   /**
@@ -341,7 +341,7 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     listItem.classList.add('-selected');
     this.#drawColumn(target.dataset.id);
 
-    if (target.dataset.id === JGA_WGS_DATASET_ID && !isLogin) {
+    if (target.dataset.value === 'jga_wgs' && !isLogin) {
       this.#addLoginPromptColumn();
     }
   }
