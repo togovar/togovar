@@ -1,8 +1,24 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
 import '../components/RangeSliderView.js';
 
-let id = 0;
-const DEFAULT_CONDITION = {
+interface ConditionFrequency {
+  from: number;
+  to: number;
+  invert: string;
+}
+
+interface ConditionCount {
+  from: number | null;
+  to: number | null;
+}
+
+interface Condition {
+  frequency: ConditionFrequency;
+  count: ConditionCount;
+}
+
+let id: number = 0;
+const DEFAULT_CONDITION: Condition = {
   frequency: {
     from: 0,
     to: 1,
@@ -16,13 +32,21 @@ const DEFAULT_CONDITION = {
 const MODE = {
   frequency: 'frequency',
   count: 'count',
-};
+} as const;
+
+type ModeType = (typeof MODE)[keyof typeof MODE];
 
 export default class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
+  private _condition: Condition;
+  private _mode: ModeType;
+  private _rangeSelectorView: any;
+  private _filtered: HTMLInputElement;
+  private _lastValue: any;
+
   /**
    * @param {ConditionValues} valuesView
    * @param {ConditionItemView} conditionView */
-  constructor(valuesView, conditionView) {
+  constructor(valuesView: any, conditionView: any) {
     super(valuesView, conditionView);
 
     this._condition = {
@@ -67,11 +91,11 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     );
 
     // set range selector
-    const rangeSlider = document.createElement('range-slider');
+    const rangeSlider = document.createElement('range-slider') as any;
     rangeSlider.searchType = 'advanced';
     rangeSlider.sliderStep = 0.01;
     rangeSlider.inputStep = 0.05;
-    rangeSlider.addEventListener('range-changed', (e) => {
+    rangeSlider.addEventListener('range-changed', (e: any) => {
       e.stopPropagation();
       this.changeParameter(e.detail);
     });
@@ -88,16 +112,19 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       const input = el.querySelector(':scope > label > input');
       input.addEventListener('change', (e) => {
         for (const el of switchingElements) {
-          if (el.dataset.mode === e.target.value) el.classList.add('-current');
-          else el.classList.remove('-current');
+          const target = e.target as HTMLInputElement;
+          if ((el as HTMLElement).dataset.mode === target.value)
+            (el as HTMLElement).classList.add('-current');
+          else (el as HTMLElement).classList.remove('-current');
         }
-        this._mode = e.target.value;
+        const target = e.target as HTMLInputElement;
+        this._mode = target.value as ModeType;
         this._update();
       });
-      if (input.value === MODE.frequency) {
+      if ((input as HTMLInputElement).value === MODE.frequency) {
         requestAnimationFrame(() => {
           input.dispatchEvent(new Event('change'));
-          input.checked = true;
+          (input as HTMLInputElement).checked = true;
         });
       }
     }
@@ -107,7 +134,8 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       .querySelectorAll(':scope > .input > input')
       .forEach((input) =>
         input.addEventListener('change', (e) => {
-          this._condition.count[e.target.className] = Number(e.target.value);
+          this._condition.count[(e.target as HTMLInputElement).className] =
+            Number((e.target as HTMLInputElement).value);
           this._update();
         })
       );
@@ -135,64 +163,67 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
 
   // public methods
 
-  changeParameter(newCondition) {
+  changeParameter(newCondition: Partial<ConditionFrequency>): void {
     if (!this._rangeSelectorView) return;
     for (const key in newCondition) {
-      this._condition.frequency[key] = newCondition[key];
+      (this._condition.frequency as any)[key] = (newCondition as any)[key];
     }
     this._update();
   }
 
-  keepLastValues() {
+  keepLastValues(): void {
     this._lastValue = this._condition[this._mode];
   }
 
-  restore() {
+  restore(): void {
     this._condition[this._mode] = this._lastValue;
     this._update();
   }
 
-  search() {
+  search(): void {
     this._update();
   }
 
-  get isValid() {
+  get isValid(): boolean {
     return this._validate();
   }
 
   // private methods
 
-  _update() {
+  private _update(): void {
     this._statsApplyToFreqCountViews();
     // validation
     this._valuesView.update(this._validate());
   }
 
-  _statsApplyToFreqCountViews() {
+  private _statsApplyToFreqCountViews(): void {
     this._valuesElement
       .querySelectorAll(':scope > condition-item-value-view')
       .forEach((view) => {
         const freqCountView = view.shadowRoot.querySelector(
           'frequency-count-value-view'
-        );
-        if (!freqCountView) return;
+        ) as any;
+        if (!freqCountView || typeof freqCountView.setValues !== 'function')
+          return;
         freqCountView.setValues(
           this._mode,
           this._condition[this._mode].from ?? '',
           this._condition[this._mode].to ?? '',
-          this._condition[this._mode].invert ?? '',
+          this._mode === MODE.frequency
+            ? this._condition.frequency.invert ?? ''
+            : '',
           this._filtered.checked ? true : false
         );
         freqCountView.mode = this._mode;
         freqCountView.from = this._condition[this._mode].from ?? '';
-        freqCountView.top = this._condition[this._mode].top ?? '';
+        // freqCountView.top = this._condition[this._mode].top ?? '';
         freqCountView.update();
       });
   }
 
-  _validate() {
+  private _validate(): boolean {
     return Object.keys(this._condition[this._mode]).some(
-      (key) => this._condition[this._mode][key] !== null
+      (key) => (this._condition[this._mode] as any)[key] !== null
     );
   }
 }
