@@ -18,6 +18,13 @@ type DataNodeWithChecked = DataNode & {
   indeterminate?: boolean;
 };
 
+const ROOT_NODE_ID = '-1';
+const JGA_WGS_DATASET_ID = '1';
+
+/**
+ * A condition value editor for hierarchical dataset selection using columns layout.
+ * Provides functionality for selecting datasets with hierarchical drill-down navigation.
+ */
 export default class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   #lastValueViews: Array<HTMLDivElement>;
   #data: HierarchyNode<DataNodeWithChecked>;
@@ -25,15 +32,54 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
   #nodesToShowInValueView: Array<HierarchyNode<DataNodeWithChecked>>;
   #uniqueIdCounter: number;
 
+  /**
+   * Creates a new instance of ConditionValueEditorColumnsDataset.
+   * @param valuesView - The condition values view component
+   * @param conditionView - The condition item view component
+   */
   constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
 
-    this.#data = this.#prepareData();
-
+    this.#data = this.#prepareHierarchicalData();
     this.#nodesToShowInValueView = [];
-
     this.#uniqueIdCounter = 0;
-    // HTML
+
+    this.#initializeUI();
+    this.#renderInitialColumn();
+  }
+
+  /**
+   * Saves the current value views for potential restoration.
+   * Called when the user clicks the edit (pencil) icon.
+   */
+  keepLastValues(): void {
+    this.#lastValueViews = this._valueViews;
+  }
+
+  /**
+   * Restores the previously saved values and updates the UI.
+   * Called when the user presses the Cancel button.
+   */
+  restore(): void {
+    this.#resetAllCheckStates();
+    this.#restoreCheckedStates();
+    this.#updateUI();
+    this._updateValueViews(this.#lastValueViews);
+  }
+
+  /**
+   * Checks if the current selection is valid.
+   * @returns True if at least one item is selected
+   */
+  get isValid(): boolean {
+    return this._valueViews.length > 0;
+  }
+
+  /**
+   * Initializes the UI elements and structure.
+   * @private
+   */
+  #initializeUI(): void {
     this._createElement(
       'columns-editor-view',
       `
@@ -43,82 +89,66 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     </div>`
     );
     this.#columns = this._body.querySelector(':scope > .columns');
+  }
+
+  /**
+   * Renders the initial column with root level items.
+   * @private
+   */
+  #renderInitialColumn(): void {
     this.#drawColumn();
   }
 
-  // public methods
-
-  /** on click pencil icon in value view, save last values */
-  keepLastValues() {
-    this.#lastValueViews = this._valueViews;
-  }
-
-  /** Restore last values (on press Cancel button) */
-  restore() {
-    //reset all checked
-    this.#data.each((datum) => {
-      datum.data.checked = false;
-    });
-
-    for (const lastValue of this.#lastValueViews) {
-      const node = this.#data.find(
-        (d) => d.data.value === lastValue.dataset['value']
-      );
-      if (!node) continue;
-      node.data.checked = true;
-      this.#updateChildren(node, true);
-      this.#updateParents(node, true);
-    }
-    this.#update();
-    this._updateValueViews(this.#lastValueViews);
-  }
-
-  get isValid() {
-    return this._valueViews.length > 0;
-  }
-
-  // private methods
-
-  // Nodeに一意のIDを追加する関数
-  #addIdsToDataNodes(dataNodes: DataNode[]): DataNodeWithChecked[] {
+  /**
+   * Adds unique IDs to data nodes recursively.
+   * @param dataNodes - Array of data nodes to process
+   * @returns Array of data nodes with unique IDs and checked properties
+   * @private
+   */
+  #addUniqueIdsToNodes(dataNodes: DataNode[]): DataNodeWithChecked[] {
     return dataNodes.map((node) => {
       if (!Number.isInteger(this.#uniqueIdCounter)) {
-        this.#uniqueIdCounter = 0; // 念のため整数で初期化
+        this.#uniqueIdCounter = 0;
       }
 
-      // 各ノードに一意のIDを設定
-      const newNode: DataNodeWithChecked = {
+      const processedNode: DataNodeWithChecked = {
         ...node,
         id: `${this.#uniqueIdCounter++}`,
         checked: false,
         indeterminate: false,
       };
 
-      // 子ノードがある場合は再帰的に処理
-      if (newNode.children && newNode.children.length > 0) {
-        newNode.children = this.#addIdsToDataNodes(newNode.children);
+      if (processedNode.children && processedNode.children.length > 0) {
+        processedNode.children = this.#addUniqueIdsToNodes(
+          processedNode.children
+        );
       }
-      return newNode;
+
+      return processedNode;
     });
   }
 
-  #prepareData() {
+  /**
+   * Prepares the hierarchical data structure based on condition type.
+   * @returns Hierarchy node with processed data
+   * @private
+   */
+  #prepareHierarchicalData(): HierarchyNode<DataNodeWithChecked> {
     switch (this._conditionType) {
-      case CONDITION_TYPE.dataset: {
-        const data = ADVANCED_CONDITIONS[this._conditionType]
+      case CONDITION_TYPE.dataset:
+      case CONDITION_TYPE.genotype_dataset: {
+        const rawData = ADVANCED_CONDITIONS[this._conditionType]
           .values as DataNodeWithChecked[];
-        const dataWithIds = this.#addIdsToDataNodes(data);
+        const processedData = this.#addUniqueIdsToNodes(rawData);
 
-        const hierarchyData = hierarchy<DataNodeWithChecked>({
-          id: '-1',
+        return hierarchy<DataNodeWithChecked>({
+          id: ROOT_NODE_ID,
           label: 'root',
           value: '',
-          children: dataWithIds,
+          children: processedData,
           checked: false,
           indeterminate: false,
         });
-
-        return hierarchyData;
       }
       default:
         throw new Error(
@@ -127,144 +157,261 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
     }
   }
 
-  async #drawColumn(parentId?: string) {
-    // Ensure login status is fetched before proceeding
+  /**
+   * Renders a column with items from the specified parent node.
+   * @param parentId - ID of the parent node to get children from
+   * @private
+   */
+  async #drawColumn(parentId?: string): Promise<void> {
     const isLogin = storeManager.getData('isLogin');
+    const items = await this.#getChildItems(parentId);
 
-    // Fetch items and process them
-    this.#getItems(parentId).then((items) => {
-      // Create a new column element
-      const column = document.createElement('div');
-      column.classList.add('column');
-      column.dataset.depth = this.#columns
-        .querySelectorAll(':scope > .column')
-        .length.toString();
+    const column = this.#createColumnElement();
+    this.#columns.append(column);
 
-      // Append the column to the container
-      this.#columns.append(column);
+    column.innerHTML = this.#generateColumnHTML(items, isLogin);
 
-      // Generate HTML content for the column
-      column.innerHTML = `
-        <ul>
-          ${items
-            .map((item) => {
-              let listItem = `<li`;
+    this.#attachColumnEventListeners(column, isLogin);
+    this.#updateUI();
+    this.#scrollToRevealNewColumn();
+  }
 
-              // Add data attributes
-              listItem += ` data-id="${item.data.id}"`;
-              listItem += ` data-parent="${item.parent.data.id}"`;
-              if (item.data.value) {
-                listItem += ` data-value="${item.data.value}"`;
-              }
+  /**
+   * Creates a new column DOM element with appropriate attributes.
+   * @returns The created column element
+   * @private
+   */
+  #createColumnElement(): HTMLDivElement {
+    const column = document.createElement('div');
+    column.classList.add('column');
+    column.dataset.depth = this.#columns
+      .querySelectorAll(':scope > .column')
+      .length.toString();
+    return column;
+  }
 
-              listItem += `>
-                <label>`;
+  /**
+   * Generates HTML content for a column based on the provided items.
+   * @param items - Array of hierarchy nodes to render
+   * @param isLogin - Whether the user is logged in
+   * @returns HTML string for the column content
+   * @private
+   */
+  #generateColumnHTML(
+    items: HierarchyNode<DataNodeWithChecked>[],
+    isLogin: boolean
+  ): string {
+    return `
+      <ul>
+        ${items
+          .map((item) => this.#generateListItemHTML(item, isLogin))
+          .join('')}
+      </ul>`;
+  }
 
-              // Display lock icon if the user is not logged in and certain conditions are met
-              if (
-                isLogin === false &&
-                item.data.value?.includes('jga_wgs') &&
-                item.data.id !== '1'
-              ) {
-                listItem += `<span class="lock"></span>`;
-              } else {
-                listItem += `<input type="checkbox" value="${item.data.id}">`;
-              }
+  /**
+   * Generates HTML for a single list item.
+   * @param item - The hierarchy node to render
+   * @param isLogin - Whether the user is logged in
+   * @returns HTML string for the list item
+   * @private
+   */
+  #generateListItemHTML(
+    item: HierarchyNode<DataNodeWithChecked>,
+    isLogin: boolean
+  ): string {
+    let listItem = `<li data-id="${item.data.id}" data-parent="${item.parent.data.id}"`;
 
-              // Add dataset icon if applicable
-              if (
-                this._conditionType === CONDITION_TYPE.dataset &&
-                item.depth === 1
-              ) {
-                listItem += `<span class="dataset-icon" data-dataset="${item.data.value}"></span>`;
-              }
+    if (item.data.value) {
+      listItem += ` data-value="${item.data.value}"`;
+    }
 
-              listItem += `<span>${item.data.label}</span>
-                </label>`;
+    listItem += `><label>`;
 
-              // Add arrow icon for items with children
-              if (item.children !== undefined) {
-                listItem += `<div class="arrow" data-id="${item.data.id}"></div>`;
-              }
+    if (this.#shouldShowLockIcon(item, isLogin)) {
+      listItem += `<span class="lock"></span>`;
+    } else {
+      listItem += `<input type="checkbox" value="${item.data.id}">`;
+    }
 
-              listItem += `</li>`;
-              return listItem;
-            })
-            .join('')}
-        </ul>`;
+    if (this.#shouldShowDatasetIcon(item)) {
+      listItem += `<span class="dataset-icon" data-dataset="${item.data.value}"></span>`;
+    }
 
-      // Handle checkbox change events for adding/removing conditions
-      column.addEventListener('change', (e) => {
-        const target = e.target as HTMLInputElement;
-        const checked = target.checked;
-        const nodeId = target.closest('li').dataset.id;
-        const changedNode = this.#data.find((datum) => datum.data.id == nodeId);
+    listItem += `<span>${item.data.label}</span></label>`;
 
-        // Update children and parents based on the checkbox state
-        if (changedNode.children) this.#updateChildren(changedNode, checked);
-        if (changedNode.parent) this.#updateParents(changedNode, checked);
+    if (item.children !== undefined) {
+      listItem += `<div class="arrow" data-id="${item.data.id}"></div>`;
+    }
 
-        // Trigger a global update
-        this.#update();
+    listItem += `</li>`;
+    return listItem;
+  }
+
+  /**
+   * Determines if a lock icon should be shown for the item.
+   * @param item - The hierarchy node to check
+   * @param isLogin - Whether the user is logged in
+   * @returns True if lock icon should be shown
+   * @private
+   */
+  #shouldShowLockIcon(
+    item: HierarchyNode<DataNodeWithChecked>,
+    isLogin: boolean
+  ): boolean {
+    return (
+      isLogin === false &&
+      item.data.value?.includes('jga_wgs') &&
+      item.data.id !== JGA_WGS_DATASET_ID
+    );
+  }
+
+  /**
+   * Determines if a dataset icon should be shown for the item.
+   * @param item - The hierarchy node to check
+   * @returns True if dataset icon should be shown
+   * @private
+   */
+  #shouldShowDatasetIcon(item: HierarchyNode<DataNodeWithChecked>): boolean {
+    return this._conditionType === CONDITION_TYPE.dataset && item.depth === 1;
+  }
+
+  /**
+   * Attaches event listeners to the column element.
+   * @param column - The column element to attach listeners to
+   * @param isLogin - Whether the user is logged in
+   * @private
+   */
+  #attachColumnEventListeners(column: HTMLElement, isLogin: boolean): void {
+    this.#attachCheckboxEventListeners(column);
+    this.#attachArrowClickEventListeners(column, isLogin);
+  }
+
+  /**
+   * Attaches checkbox change event listeners to the column.
+   * @param column - The column element
+   * @private
+   */
+  #attachCheckboxEventListeners(column: HTMLElement): void {
+    column.addEventListener('change', (e) => {
+      const target = e.target as HTMLInputElement;
+      const checked = target.checked;
+      const nodeId = target.closest('li').dataset.id;
+      const changedNode = this.#data.find((datum) => datum.data.id === nodeId);
+
+      if (changedNode.children)
+        this.#updateChildrenCheckState(changedNode, checked);
+      if (changedNode.parent)
+        this.#updateParentCheckState(changedNode, checked);
+
+      this.#updateUI();
+    });
+  }
+
+  /**
+   * Attaches arrow click event listeners for drill-down navigation.
+   * @param column - The column element
+   * @param isLogin - Whether the user is logged in
+   * @private
+   */
+  #attachArrowClickEventListeners(column: HTMLElement, isLogin: boolean): void {
+    for (const arrow of column.querySelectorAll(':scope > ul > li > .arrow')) {
+      arrow.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        const listItem = target.closest('li');
+
+        this.#handleArrowClick(listItem, target, isLogin);
       });
+    }
+  }
 
-      // Handle drill-down events for navigating to child elements
-      for (const item of column.querySelectorAll(':scope > ul > li > .arrow')) {
-        item.addEventListener('click', (e) => {
-          const target = e.target as HTMLElement;
-          const item = target.closest('li');
-          const closestColumn: HTMLElement = item.closest('.column');
-          const closestColumns: HTMLElement = item.closest('.columns');
+  /**
+   * Handles arrow click events for navigation.
+   * @param listItem - The clicked list item
+   * @param target - The arrow element that was clicked
+   * @param isLogin - Whether the user is logged in
+   * @private
+   */
+  #handleArrowClick(
+    listItem: Element,
+    target: HTMLElement,
+    isLogin: boolean
+  ): void {
+    this.#clearSelectionAndSubColumns(listItem);
+    listItem.classList.add('-selected');
+    this.#drawColumn(target.dataset.id);
 
-          // Deselect the current item and remove subdirectories
-          item.parentNode
-            .querySelector(':scope > .-selected')
-            ?.classList.remove('-selected');
-          const depth = parseInt(closestColumn.dataset.depth);
+    if (target.dataset.id === JGA_WGS_DATASET_ID && !isLogin) {
+      this.#addLoginPromptColumn();
+    }
+  }
 
-          // Remove columns deeper than the current one
-          for (const column of closestColumns.querySelectorAll(
-            ':scope > .column'
-          )) {
-            //@ts-ignore
-            if (parseInt(column.dataset.depth) > depth)
-              column.parentNode.removeChild(column);
-          }
+  /**
+   * Clears current selection and removes sub-columns.
+   * @param listItem - The current list item
+   * @private
+   */
+  #clearSelectionAndSubColumns(listItem: Element): void {
+    const currentColumn = listItem.closest('.column') as HTMLElement;
+    const columnsContainer = listItem.closest('.columns');
 
-          // Select the current item and load child items
-          item.classList.add('-selected');
-          this.#drawColumn(target.dataset.id);
+    // Clear current selection
+    listItem.parentNode
+      .querySelector(':scope > .-selected')
+      ?.classList.remove('-selected');
 
-          if (target.dataset.id === '1' && !isLogin) {
-            this.#addNoteColumn();
-          }
-        });
+    // Remove deeper columns
+    const currentDepth = parseInt(currentColumn.dataset.depth);
+    for (const column of columnsContainer.querySelectorAll(
+      ':scope > .column'
+    )) {
+      const columnElement = column as HTMLElement;
+      if (parseInt(columnElement.dataset.depth) > currentDepth) {
+        columnElement.parentNode.removeChild(columnElement);
+      }
+    }
+  }
+
+  /**
+   * Scrolls to reveal the newly added column if necessary.
+   * @private
+   */
+  #scrollToRevealNewColumn(): void {
+    const left = this._body.scrollWidth - this._body.clientWidth;
+    if (left > 0) {
+      this._body.scrollTo({
+        top: 0,
+        left: left,
+        behavior: 'smooth',
+      });
+    }
+  }
+
+  /**
+   * Gets child items for the specified parent node.
+   * @param parentId - ID of the parent node
+   * @returns Promise resolving to array of child nodes
+   * @private
+   */
+  #getChildItems(
+    parentId?: string
+  ): Promise<HierarchyNode<DataNodeWithChecked>[]> {
+    return new Promise((resolve) => {
+      if (!parentId) {
+        resolve(this.#data.children);
+        return;
       }
 
-      // Trigger a global update
-      this.#update();
-
-      // Scroll to reveal the newly added column if necessary
-      const left = this._body.scrollWidth - this._body.clientWidth;
-      if (left > 0) {
-        this._body.scrollTo({
-          top: 0,
-          left: left,
-          behavior: 'smooth',
-        });
-      }
+      const parentNode = this.#data.find((datum) => datum.data.id === parentId);
+      resolve(parentNode?.children || []);
     });
   }
 
-  #getItems(parentId?: string): Promise<HierarchyNode<DataNodeWithChecked>[]> {
-    return new Promise((resolve, reject) => {
-      if (!parentId) resolve(this.#data.children);
-      const found = this.#data.find((datum) => datum.data.id === parentId);
-      resolve(found?.children);
-    });
-  }
-
-  async #addNoteColumn() {
+  /**
+   * Adds a column prompting the user to login for JGAD datasets.
+   * @private
+   */
+  async #addLoginPromptColumn(): Promise<void> {
     await storeManager.fetchLoginStatus();
     const column = document.createElement('div');
     column.classList.add('column');
@@ -273,53 +420,120 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
       <div class="messages-view">
         <div class="note message -warning">
           <a class="link" href="/auth/login">Login</a> to select JGAD datasets
-          </div>
+        </div>
       </div>`;
     this.#columns.append(column);
   }
 
-  #updateChildren(node: HierarchyNode<DataNodeWithChecked>, checked: boolean) {
-    // reflect
-    if (!node.children || node.children.length === 0) return;
-
-    node.descendants().forEach((d) => {
-      d.data.checked = checked;
+  /**
+   * Resets all check states in the data hierarchy.
+   * @private
+   */
+  #resetAllCheckStates(): void {
+    this.#data.each((datum) => {
+      datum.data.checked = false;
+      datum.data.indeterminate = false;
     });
   }
 
-  /** Update the parent nodes of the given node */
-  #updateParents(
+  /**
+   * Restores checked states from the last saved values.
+   * @private
+   */
+  #restoreCheckedStates(): void {
+    for (const lastValue of this.#lastValueViews) {
+      const node = this.#data.find(
+        (d) => d.data.value === lastValue.dataset['value']
+      );
+      if (!node) continue;
+
+      node.data.checked = true;
+      this.#updateChildrenCheckState(node, true);
+      this.#updateParentCheckState(node, true);
+    }
+  }
+
+  /**
+   * Updates the check state of all children nodes.
+   * @param node - The parent node
+   * @param checked - The check state to apply
+   * @private
+   */
+  #updateChildrenCheckState(
+    node: HierarchyNode<DataNodeWithChecked>,
+    checked: boolean
+  ): void {
+    if (!node.children || node.children.length === 0) return;
+
+    node.descendants().forEach((descendant) => {
+      descendant.data.checked = checked;
+      descendant.data.indeterminate = false;
+    });
+  }
+
+  /**
+   * Updates the check state of parent nodes based on children states.
+   * @param dataNode - The node whose parents should be updated
+   * @param checked - Optional explicit check state for the current node
+   * @private
+   */
+  #updateParentCheckState(
     dataNode: HierarchyNode<DataNodeWithChecked> | undefined,
     checked?: boolean
-  ) {
+  ): void {
     if (!dataNode) return;
 
     if (typeof checked === 'boolean') {
-      // clicked this node
       dataNode.data.checked = checked;
       dataNode.data.indeterminate = false;
     } else {
-      // clicked some descendant node
-      const numberOfChecked = dataNode.children.filter(
-        (child) => child.data.checked
-      ).length;
-
-      const everyChecked = numberOfChecked === dataNode.children.length;
-      const someButNotEveryChecked =
-        numberOfChecked > 0 && numberOfChecked < dataNode.children.length;
-      const someIndeterminate = dataNode.children.some(
-        (child) => child.data.indeterminate
-      );
-
-      dataNode.data.checked = everyChecked;
-      dataNode.data.indeterminate = someIndeterminate || someButNotEveryChecked;
+      this.#calculateParentCheckState(dataNode);
     }
 
-    this.#updateParents(dataNode.parent);
+    this.#updateParentCheckState(dataNode.parent);
   }
 
-  #update() {
-    // reflect check status in DOM
+  /**
+   * Calculates the check state for a parent node based on its children.
+   * @param dataNode - The parent node to calculate state for
+   * @private
+   */
+  #calculateParentCheckState(
+    dataNode: HierarchyNode<DataNodeWithChecked>
+  ): void {
+    if (!dataNode.children) return;
+
+    const checkedChildren = dataNode.children.filter(
+      (child) => child.data.checked
+    );
+    const indeterminateChildren = dataNode.children.filter(
+      (child) => child.data.indeterminate
+    );
+
+    const allChecked = checkedChildren.length === dataNode.children.length;
+    const someChecked = checkedChildren.length > 0;
+    const hasIndeterminate = indeterminateChildren.length > 0;
+
+    dataNode.data.checked = allChecked && !hasIndeterminate;
+    dataNode.data.indeterminate =
+      (someChecked && !allChecked) || hasIndeterminate;
+  }
+
+  /**
+   * Updates the entire UI including DOM elements and value views.
+   * @private
+   */
+  #updateUI(): void {
+    this.#updateCheckboxStatesInDOM();
+    this.#updateValueViews();
+    this.#validateAndUpdateValuesView();
+  }
+
+  /**
+   * Updates checkbox states in the DOM to reflect data state.
+   * @private
+   */
+  #updateCheckboxStatesInDOM(): void {
     this.#data.eachAfter((datum) => {
       const checkbox: HTMLInputElement = this.#columns.querySelector(
         `li[data-id="${datum.data.id}"] > label > input`
@@ -330,46 +544,102 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
           !datum.data.checked && datum.data.indeterminate;
       }
     });
+  }
 
-    // update values in the value view (ellipsises at the top)
-
-    this.#processValuesToShowInValueView();
+  /**
+   * Updates the value views with current selections.
+   * @private
+   */
+  #updateValueViews(): void {
+    this.#processNodesToShowInValueView();
     this._clearValueViews();
 
-    for (const valueViewToAdd of this.#nodesToShowInValueView) {
+    for (const nodeToShow of this.#nodesToShowInValueView) {
       this._addValueView(
-        valueViewToAdd.data.value,
-        this.#getLabelForValueToShow(valueViewToAdd)
+        nodeToShow.data.value,
+        this.#getLabelWithPath(nodeToShow)
       );
     }
-
-    // validation
-    this._valuesView.update(this.#validate());
   }
 
-  #processValuesToShowInValueView() {
-    this.#nodesToShowInValueView = concatNodesToParent(this.#data);
+  /**
+   * Validates the current state and updates the values view accordingly.
+   * @private
+   */
+  #validateAndUpdateValuesView(): void {
+    this._valuesView.update(this.#isCurrentStateValid());
   }
 
-  /** Get the label with path to show in the value view */
-  #getLabelForValueToShow(node: HierarchyNode<DataNodeWithChecked>) {
-    const [, ...path] = node.path(this.#data).reverse();
-    return path.map((d) => d.data.label).join(' > ');
+  /**
+   * Processes nodes to determine which should be shown in value view.
+   * @private
+   */
+  #processNodesToShowInValueView(): void {
+    this.#nodesToShowInValueView = this.#getOptimalNodesToShow(this.#data);
   }
 
-  #validate() {
+  /**
+   * Gets the optimal nodes to show in value view (parent nodes when all children are selected).
+   * @param node - The node to process
+   * @returns Array of nodes that should be displayed
+   * @private
+   */
+  #getOptimalNodesToShow(
+    node: HierarchyNode<DataNodeWithChecked>
+  ): HierarchyNode<DataNodeWithChecked>[] {
+    if (!node.children) {
+      return node.data.checked ? [node] : [];
+    }
+
+    const allChildrenChecked = node.children.every(
+      (child) => child.data.checked
+    );
+
+    if (allChildrenChecked && node.data.value) {
+      return [node];
+    } else {
+      return node.children
+        .flatMap((child) => this.#getOptimalNodesToShow(child))
+        .filter(Boolean);
+    }
+  }
+
+  /**
+   * Gets the full path label for a node to display in value view.
+   * @param node - The node to get label for
+   * @returns Formatted label with full path
+   * @private
+   */
+  #getLabelWithPath(node: HierarchyNode<DataNodeWithChecked>): string {
+    const [, ...pathNodes] = node.path(this.#data).reverse();
+    return pathNodes.map((pathNode) => pathNode.data.label).join(' > ');
+  }
+
+  /**
+   * Validates if the current state is valid.
+   * @returns True if the current state is valid
+   * @private
+   */
+  #isCurrentStateValid(): boolean {
     return this.isValid;
   }
 }
 
-function concatNodesToParent(node: HierarchyNode<DataNodeWithChecked>) {
+/**
+ * Processes hierarchy nodes to find optimal nodes for display (consolidates parent nodes when all children are selected).
+ * @param node - The root node to process
+ * @returns Array of nodes that should be displayed, or undefined if no nodes are selected
+ */
+function concatNodesToParent(
+  node: HierarchyNode<DataNodeWithChecked>
+):
+  | HierarchyNode<DataNodeWithChecked>[]
+  | HierarchyNode<DataNodeWithChecked>
+  | undefined {
   if (!node.children) {
-    if (node.data.checked) {
-      return node;
-    } else {
-      return undefined;
-    }
+    return node.data.checked ? node : undefined;
   }
+
   const children = node.children;
   const everyChildChecked = children.every((child) => child.data.checked);
 
