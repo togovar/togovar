@@ -123,9 +123,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       hemi_alt: Object.assign({}, DEFAULT_CONDITION.hemi_alt),
     };
     this.#mode =
-      this._conditionType === 'genotype_dataset'
-        ? MODE.alt_alt
-        : MODE.frequency;
+      this._conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
 
     this.#initializeComponent();
     this.#setupEventListeners();
@@ -166,7 +164,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * @returns HTML string template
    */
   #generateHTML(name: string): string {
-    if (this._conditionType === 'genotype_dataset') {
+    if (this._conditionType === 'genotype') {
       return this.#generateGenotypeHTML(name);
     }
     return this.#generateDatasetHTML(name);
@@ -312,9 +310,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
 
       // Set default selection based on condition type
       const defaultMode =
-        this._conditionType === 'genotype_dataset'
-          ? MODE.alt_alt
-          : MODE.frequency;
+        this._conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
       if (input.value === defaultMode) {
         requestAnimationFrame(() => {
           input.dispatchEvent(new Event('change'));

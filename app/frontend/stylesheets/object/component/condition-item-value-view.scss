@@ -23,7 +23,7 @@
 
 //core dataset
 :host([data-condition-type='dataset']),
-:host([data-condition-type='genotype_dataset']) {
+:host([data-condition-type='genotype']) {
   display: block;
   position: relative;
   .inner {
@@ -70,10 +70,10 @@
 :host([data-condition-type='dataset'][data-value='jga_wes']),
 :host([data-condition-type='dataset'][data-value='jga_snp']),
 :host([data-condition-type='dataset'][data-value^='bbj_riken']),
-:host([data-condition-type='genotype_dataset'][data-value^='jga_wgs']),
-:host([data-condition-type='genotype_dataset'][data-value='jga_wes']),
-:host([data-condition-type='genotype_dataset'][data-value='jga_snp']),
-:host([data-condition-type='genotype_dataset'][data-value^='bbj_riken']) {
+:host([data-condition-type='genotype'][data-value^='jga_wgs']),
+:host([data-condition-type='genotype'][data-value='jga_wes']),
+:host([data-condition-type='genotype'][data-value='jga_snp']),
+:host([data-condition-type='genotype'][data-value^='bbj_riken']) {
   .inner {
     border-color: var(--color-dataset-jga);
     background-color: var(--color-dataset-jga-light);
@@ -101,7 +101,7 @@
   }
 }
 :host([data-condition-type='dataset'][data-value^='ncbn']),
-:host([data-condition-type='genotype_dataset'][data-value^='ncbn']) {
+:host([data-condition-type='genotype'][data-value^='ncbn']) {
   .inner {
     border-color: var(--color-dataset-ncbn);
     background-color: var(--color-dataset-ncbn-light);

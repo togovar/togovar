@@ -135,7 +135,7 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
   #prepareHierarchicalData(): HierarchyNode<DataNodeWithChecked> {
     switch (this._conditionType) {
       case CONDITION_TYPE.dataset:
-      case CONDITION_TYPE.genotype_dataset: {
+      case CONDITION_TYPE.genotype: {
         const rawData = ADVANCED_CONDITIONS[this._conditionType]
           .values as DataNodeWithChecked[];
         const processedData = this.#addUniqueIdsToNodes(rawData);
@@ -271,7 +271,7 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
   #shouldShowDatasetIcon(item: HierarchyNode<DataNodeWithChecked>): boolean {
     return (
       (this._conditionType === CONDITION_TYPE.dataset ||
-        this._conditionType === CONDITION_TYPE.genotype_dataset) &&
+        this._conditionType === CONDITION_TYPE.genotype) &&
       item.depth === 1
     );
   }

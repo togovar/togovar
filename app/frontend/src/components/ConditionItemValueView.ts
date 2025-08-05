@@ -31,10 +31,7 @@ class ConditionItemValueView extends LitElement {
     }
 
     let option: TemplateResult | string = '';
-    if (
-      this.conditionType === 'dataset' ||
-      this.conditionType === 'genotype_dataset'
-    ) {
+    if (this.conditionType === 'dataset' || this.conditionType === 'genotype') {
       option = html`<frequency-count-value-view
         data-dataset="${this.value}"
       ></frequency-count-value-view>`;
