@@ -1,4 +1,4 @@
-import { LitElement, html, nothing, TemplateResult, unsafeCSS } from 'lit';
+import { LitElement, html, nothing, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import './FrequencyCountValueView'; // for embedding
 import './ConditionPathogenicityPredictionSearch/PredictionValueView'; // for embedding
@@ -6,7 +6,7 @@ import Style from '../../stylesheets/object/component/condition-item-value-view.
 
 @customElement('condition-item-value-view')
 class ConditionItemValueView extends LitElement {
-  static styles = [unsafeCSS(Style)];
+  static styles = [Style];
 
   @property({ type: String }) label: string = '';
   @property({ type: String }) conditionType: string = '';
