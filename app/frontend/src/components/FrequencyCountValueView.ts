@@ -8,9 +8,9 @@ import Style from '../../stylesheets/object/component/frequency-count-value-view
 const MODE = {
   frequency: 'frequency',
   count: 'count',
-  alt_alt: 'alt_alt',
-  alt_ref: 'alt_ref',
-  hemi_alt: 'hemi_alt',
+  alt_alt: 'aac',
+  alt_ref: 'arc',
+  hemi_alt: 'hac',
 } as const;
 
 type ModeType = (typeof MODE)[keyof typeof MODE];
@@ -21,6 +21,8 @@ type ModeType = (typeof MODE)[keyof typeof MODE];
 @customElement('frequency-count-value-view')
 export class FrequencyCountValueView extends LitElement {
   static styles = [Style];
+
+  @property({ type: String }) conditionType: 'dataset' | 'genotype';
 
   /** Display mode */
   @property({ type: String }) mode: ModeType = MODE.frequency;
@@ -89,6 +91,7 @@ export class FrequencyCountValueView extends LitElement {
 
   /**
    * Sets component values and updates display
+   * @param conditionType - Type of condition ('dataset' or 'genotype')
    * @param mode - Display mode
    * @param from - Range start value
    * @param to - Range end value
@@ -96,12 +99,14 @@ export class FrequencyCountValueView extends LitElement {
    * @param filtered - Filtering status
    */
   setValues(
+    conditionType: 'dataset' | 'genotype',
     mode: ModeType,
     from: number,
     to: number,
     invert: string,
     filtered: boolean
   ): void {
+    this.conditionType = conditionType;
     this.mode = mode;
     this.from = from;
     this.to = to;
@@ -152,73 +157,67 @@ export class FrequencyCountValueView extends LitElement {
     this._bars[1].style.width = `${(1 - this.to) * 100}%`;
   }
 
-  /**
-   * Generates query value object
-   * @returns Query parameter object
-   */
-  get queryValue(): Record<string, any> {
+  // /**
+  //  * Generates query value object
+  //  * @returns Query parameter object
+  //  */
+  get queryValue() {
     const dataset = { name: this.dataset.dataset };
 
-    if (this.invert === '1') {
-      return this._getInvertedQueryValue(dataset);
+    if (this.conditionType === 'dataset') {
+      if (this.invert === '1') {
+        return {
+          or: [
+            {
+              frequency: {
+                dataset,
+                frequency: {
+                  gte: 0,
+                  lte: this.from,
+                },
+                filtered: this.filtered,
+              },
+            },
+            {
+              frequency: {
+                dataset,
+                frequency: {
+                  gte: this.to,
+                  lte: 1,
+                },
+                filtered: this.filtered,
+              },
+            },
+          ],
+        };
+      } else {
+        const values: Record<string, number> = {};
+        if (String(this.from) !== '') values.gte = this.from;
+        if (String(this.to) !== '') values.lte = this.to;
+        return {
+          frequency: {
+            dataset,
+            [this.mode]: values,
+            filtered: this.filtered,
+          },
+        };
+      }
     } else {
-      return this._getNormalQueryValue(dataset);
+      const values: Record<string, number> = {};
+
+      if (String(this.from) !== '') values.gte = this.from;
+      if (String(this.to) !== '') values.lte = this.to;
+      return {
+        frequency: {
+          dataset,
+          genotype: {
+            key: MODE[this.mode],
+            count: values,
+          },
+          filtered: this.filtered,
+        },
+      };
     }
-  }
-
-  /**
-   * Generates query value for inverted mode
-   * @param dataset - Dataset information
-   * @returns Query object for inverted mode
-   * @private
-   */
-  private _getInvertedQueryValue(dataset: {
-    name: string;
-  }): Record<string, any> {
-    return {
-      or: [
-        {
-          frequency: {
-            dataset,
-            frequency: {
-              gte: 0,
-              lte: this.from,
-            },
-            filtered: this.filtered,
-          },
-        },
-        {
-          frequency: {
-            dataset,
-            frequency: {
-              gte: this.to,
-              lte: 1,
-            },
-            filtered: this.filtered,
-          },
-        },
-      ],
-    };
-  }
-
-  /**
-   * Generates query value for normal mode
-   * @param dataset - Dataset information
-   * @returns Query object for normal mode
-   * @private
-   */
-  private _getNormalQueryValue(dataset: { name: string }): Record<string, any> {
-    const values: Record<string, number> = {};
-
-    if (String(this.from) !== '') values.gte = this.from;
-    if (String(this.to) !== '') values.lte = this.to;
-    return {
-      frequency: {
-        dataset,
-        [this.mode]: values,
-        filtered: this.filtered,
-      },
-    };
   }
 }
 

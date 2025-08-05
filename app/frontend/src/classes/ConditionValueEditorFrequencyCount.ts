@@ -43,6 +43,7 @@ interface RangeSliderElement extends HTMLElement {
  */
 interface FrequencyCountViewElement extends Element {
   setValues(
+    conditionType: 'dataset' | 'genotype',
     mode: string,
     from: string | number,
     to: string | number,
@@ -101,6 +102,7 @@ type ModeType = (typeof MODE)[keyof typeof MODE];
  * Provides UI controls for setting frequency ranges and count ranges for variant filtering
  */
 export default class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
+  #conditionType: 'dataset' | 'genotype';
   #condition: Condition;
   #mode: ModeType;
   #rangeSelectorView: RangeSliderElement | null = null;
@@ -115,6 +117,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
   constructor(valuesView: any, conditionView: any) {
     super(valuesView, conditionView);
 
+    this.#conditionType = conditionView.conditionType;
     this.#condition = {
       frequency: Object.assign({}, DEFAULT_CONDITION.frequency),
       count: Object.assign({}, DEFAULT_CONDITION.count),
@@ -490,6 +493,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     const isFiltered = this.#filtered?.checked ?? false;
 
     freqCountView.setValues(
+      this.#conditionType,
       this.#mode,
       currentCondition.from ?? '',
       currentCondition.to ?? '',
