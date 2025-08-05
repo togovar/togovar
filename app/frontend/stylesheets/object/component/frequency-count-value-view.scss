@@ -1,0 +1,79 @@
+@use '../../foundation/_variables.scss' as *;
+
+:host {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+:host > .frequencygraph {
+  width: 100px;
+  height: 3.5px;
+  background-color: var(--color-darker-gray);
+  position: relative;
+  margin-right: 4px;
+}
+
+:host > .frequencygraph > .scale {
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  border-left: dotted 0.5px var(--color-separator);
+}
+
+@media (-webkit-min-device-pixel-ratio: 2) {
+  :host > .frequencygraph > .scale {
+    border-left: dotted 1px var(--color-separator);
+  }
+}
+
+:host > .frequencygraph > .bar {
+  position: absolute;
+  height: 100%;
+}
+
+:host([data-dataset='gem_j_wga']) > .frequencygraph > .bar {
+  background-color: var(--color-dataset-gemj);
+}
+
+:host([data-dataset^='jga_wgs']),
+:host([data-dataset='jga_wes']),
+:host([data-dataset='jga_snp']),
+:host([data-dataset^='bbj_riken']) {
+  .frequencygraph > .bar {
+    background-color: var(--color-dataset-jga);
+  }
+}
+
+:host([data-dataset='tommo']) > .frequencygraph > .bar {
+  background-color: var(--color-dataset-tommo);
+}
+
+:host([data-dataset='hgvd']) > .frequencygraph > .bar {
+  background-color: var(--color-dataset-hgvd);
+}
+
+:host([data-dataset^='ncbn']) > .frequencygraph > .bar {
+  background-color: var(--color-dataset-ncbn);
+}
+
+:host > .range {
+  margin-right: 0.6em;
+  width: 4.6em;
+}
+:host > .range > .from,
+:host > .range > .to {
+  font-weight: bold;
+}
+:host > .filtered {
+  margin: 0;
+  font-size: 10px;
+}
+:host([data-mode='count']) > .frequencygraph,
+:host([data-mode='alt_alt']) > .frequencygraph,
+:host([data-mode='alt_ref']) > .frequencygraph,
+:host([data-mode='hemi_alt']) > .frequencygraph {
+  visibility: hidden;
+}
+:host([data-filtered='false']) > .filtered {
+  visibility: hidden;
+}
