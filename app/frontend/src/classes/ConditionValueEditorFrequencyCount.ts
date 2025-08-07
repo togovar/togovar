@@ -206,9 +206,15 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    */
   #generateGenotypeHTML(name: string): string {
     const genotypeOptions = [
-      { mode: MODE.alt_alt, label: 'Alt / Alt' },
-      { mode: MODE.alt_ref, label: 'Alt / Ref' },
-      { mode: MODE.hemi_alt, label: 'Hemi_Alt' },
+      { mode: MODE.alt_alt, label: 'Alt/Alt: Number of homozygous genotypes' },
+      {
+        mode: MODE.alt_ref,
+        label: 'Alt/Ref: Number of heterozygous genotypes',
+      },
+      {
+        mode: MODE.hemi_alt,
+        label: 'Hemi_Alt: Number of hemizygous genotypes',
+      },
     ];
 
     const sections = genotypeOptions

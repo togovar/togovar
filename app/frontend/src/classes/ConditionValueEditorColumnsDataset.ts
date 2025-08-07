@@ -71,7 +71,7 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
    * @returns True if at least one item is selected
    */
   get isValid(): boolean {
-    return this._valueViews.length > 0;
+    return this.#isCurrentStateValid();
   }
 
   /**
@@ -621,33 +621,6 @@ export default class ConditionValueEditorColumnsDataset extends ConditionValueEd
    * @private
    */
   #isCurrentStateValid(): boolean {
-    return this.isValid;
-  }
-}
-
-/**
- * Processes hierarchy nodes to find optimal nodes for display (consolidates parent nodes when all children are selected).
- * @param node - The root node to process
- * @returns Array of nodes that should be displayed, or undefined if no nodes are selected
- */
-function concatNodesToParent(
-  node: HierarchyNode<DataNodeWithChecked>
-):
-  | HierarchyNode<DataNodeWithChecked>[]
-  | HierarchyNode<DataNodeWithChecked>
-  | undefined {
-  if (!node.children) {
-    return node.data.checked ? node : undefined;
-  }
-
-  const children = node.children;
-  const everyChildChecked = children.every((child) => child.data.checked);
-
-  if (everyChildChecked && node.data.value) {
-    return node;
-  } else {
-    return children
-      .flatMap((child) => concatNodesToParent(child))
-      .filter(Boolean);
+    return this._valueViews.length > 0;
   }
 }

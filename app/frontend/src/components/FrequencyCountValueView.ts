@@ -22,6 +22,7 @@ type ModeType = (typeof MODE)[keyof typeof MODE];
 export class FrequencyCountValueView extends LitElement {
   static styles = [Style];
 
+  /** Type of condition for query building ('dataset' or 'genotype') */
   @property({ type: String }) conditionType: 'dataset' | 'genotype';
 
   /** Display mode */
@@ -34,7 +35,7 @@ export class FrequencyCountValueView extends LitElement {
   @property({ type: Number }) to: number = 1;
 
   /** Invert mode flag */
-  @property({ type: String }) invert: String = '0';
+  @property({ type: String }) invert: string = '0';
 
   /** Filtering status */
   @property({ type: Boolean }) filtered: boolean = false;
@@ -157,67 +158,114 @@ export class FrequencyCountValueView extends LitElement {
     this._bars[1].style.width = `${(1 - this.to) * 100}%`;
   }
 
-  // /**
-  //  * Generates query value object
-  //  * @returns Query parameter object
-  //  */
+  /**
+   * Generates query value object based on current component state
+   * @returns Query parameter object for filtering
+   */
   get queryValue() {
     const dataset = { name: this.dataset.dataset };
 
     if (this.conditionType === 'dataset') {
-      if (this.invert === '1') {
-        return {
-          or: [
-            {
-              frequency: {
-                dataset,
-                frequency: {
-                  gte: 0,
-                  lte: this.from,
-                },
-                filtered: this.filtered,
-              },
-            },
-            {
-              frequency: {
-                dataset,
-                frequency: {
-                  gte: this.to,
-                  lte: 1,
-                },
-                filtered: this.filtered,
-              },
-            },
-          ],
-        };
-      } else {
-        const values: Record<string, number> = {};
-        if (String(this.from) !== '') values.gte = this.from;
-        if (String(this.to) !== '') values.lte = this.to;
-        return {
+      return this._buildDatasetQuery(dataset);
+    } else {
+      return this._buildGenotypeQuery(dataset);
+    }
+  }
+
+  /**
+   * Builds query object for dataset condition type
+   * @param dataset - Dataset information object
+   * @returns Query object for dataset filtering
+   * @private
+   */
+  private _buildDatasetQuery(dataset: { name: string }) {
+    if (this.invert === '1') {
+      return this._buildInvertedDatasetQuery(dataset);
+    } else {
+      return this._buildNormalDatasetQuery(dataset);
+    }
+  }
+
+  /**
+   * Builds inverted query object for dataset condition
+   * @param dataset - Dataset information object
+   * @returns Inverted query object with OR conditions
+   * @private
+   */
+  private _buildInvertedDatasetQuery(dataset: { name: string }) {
+    return {
+      or: [
+        {
           frequency: {
             dataset,
-            [this.mode]: values,
+            frequency: {
+              gte: 0,
+              lte: this.from,
+            },
             filtered: this.filtered,
           },
-        };
-      }
-    } else {
-      const values: Record<string, number> = {};
-
-      if (String(this.from) !== '') values.gte = this.from;
-      if (String(this.to) !== '') values.lte = this.to;
-      return {
-        frequency: {
-          dataset,
-          genotype: {
-            key: MODE[this.mode],
-            count: values,
-          },
-          filtered: this.filtered,
         },
-      };
-    }
+        {
+          frequency: {
+            dataset,
+            frequency: {
+              gte: this.to,
+              lte: 1,
+            },
+            filtered: this.filtered,
+          },
+        },
+      ],
+    };
+  }
+
+  /**
+   * Builds normal query object for dataset condition
+   * @param dataset - Dataset information object
+   * @returns Normal query object with range values
+   * @private
+   */
+  private _buildNormalDatasetQuery(dataset: { name: string }) {
+    const values = this._buildRangeValues();
+    return {
+      frequency: {
+        dataset,
+        [this.mode]: values,
+        filtered: this.filtered,
+      },
+    };
+  }
+
+  /**
+   * Builds query object for genotype condition type
+   * @param dataset - Dataset information object
+   * @returns Query object for genotype filtering
+   * @private
+   */
+  private _buildGenotypeQuery(dataset: { name: string }) {
+    const values = this._buildRangeValues();
+    return {
+      frequency: {
+        dataset,
+        genotype: {
+          key: MODE[this.mode],
+          count: values,
+        },
+        filtered: this.filtered,
+      },
+    };
+  }
+
+  /**
+   * Builds range values object from current from/to properties
+   * @returns Object containing gte and/or lte values
+   * @private
+   */
+  private _buildRangeValues(): Record<string, number> {
+    const values: Record<string, number> = {};
+    if (String(this.from) !== '') values.gte = this.from;
+    if (String(this.to) !== '') values.lte = this.to;
+    return values;
   }
 }
 
