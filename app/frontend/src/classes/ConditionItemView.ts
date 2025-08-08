@@ -5,10 +5,87 @@ import { ADVANCED_CONDITIONS } from '../global.js';
 import { CONDITION_TYPE, CONDITION_ITEM_TYPE } from '../definition.js';
 import { keyDownEvent } from '../utils/keyDownEvent.js';
 
+// Type definitions
+interface AdvancedSearchBuilderView {
+  changeCondition(): void;
+  delete(items: ConditionItemView[]): void;
+}
+
+interface ConditionGroupView {
+  // Add properties as needed
+}
+
+interface QueryValue {
+  [key: string]: any;
+}
+
+interface LocationQuery {
+  location: {
+    chromosome: string;
+    position: number | { gte: number; lte: number };
+  };
+}
+
+interface GeneQuery {
+  gene: {
+    relation: string;
+    terms: number[];
+  };
+}
+
+interface IdQuery {
+  id: string[];
+}
+
+interface SignificanceQuery {
+  [key: string]: {
+    relation: string;
+    source: string[];
+    terms: string[];
+  };
+}
+
+interface DefaultQuery {
+  [key: string]: {
+    relation: string;
+    terms: string[];
+  };
+}
+
+// Custom element interfaces
+interface ConditionItemValueViewElement extends Element {
+  value: string;
+}
+
+interface FrequencyCountValueViewElement extends Element {
+  queryValue: any;
+}
+
+interface PredictionValueViewElement extends Element {
+  queryValue: any;
+}
+
+type ConditionQuery =
+  | QueryValue
+  | LocationQuery
+  | GeneQuery
+  | IdQuery
+  | SignificanceQuery
+  | DefaultQuery
+  | { or: any[] }
+  | { and: any[] };
+
 /** Class for editing and deleting conditions
  * Create an instance with {@link ConditionGroupView}
  * @extends ConditionView */
 class ConditionItemView extends ConditionView {
+  private _conditionType: string;
+  private _isFirstTime: boolean;
+  private _keepLastRelation: string;
+  private _valuesEl: HTMLDivElement;
+  private _editorEl: HTMLDivElement;
+  private _conditionValues: ConditionValues;
+
   /**
    * @param {AdvancedSearchBuilderView} builder - AdvancedSearchBuilderView is a class that operates the search condition builder. Called when the search conditions change.
    * @param {ConditionGroupView} parentView - ConditonGroupView that contains ConditoinItemView
@@ -16,11 +93,11 @@ class ConditionItemView extends ConditionView {
    * @param {0|1} conditionItemType ConditionItemView represents "0", ConditionGroupView represents "1".
    * @param {Node} referenceElm */
   constructor(
-    builder,
-    parentView,
-    conditionType,
-    conditionItemType,
-    referenceElm = null
+    builder: AdvancedSearchBuilderView,
+    parentView: ConditionGroupView,
+    conditionType: string,
+    conditionItemType: 0 | 1,
+    referenceElm: Node | null = null
   ) {
     super(CONDITION_ITEM_TYPE.condition, builder, parentView, referenceElm);
     /** @property {string} _conditionType - condition type (gene, id, dataset, location, etc.) */
@@ -93,9 +170,10 @@ class ConditionItemView extends ConditionView {
     for (const button of summary.querySelectorAll(
       ':scope > .buttons > button'
     )) {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: MouseEvent) => {
         e.stopImmediatePropagation();
-        switch (e.target.className) {
+        const target = e.target as HTMLButtonElement;
+        switch (target.className) {
           case 'edit':
             this._elm.classList.add('-editing');
             this._conditionValues.startToEditCondition();
@@ -141,7 +219,7 @@ class ConditionItemView extends ConditionView {
   #keydownEscapeEvent = this.#keydownEscape.bind(this);
   /** Exit the edit screen with esckey. remove() for the first time, doneEditing() for editing
    * @private */
-  #keydownEscape(e) {
+  #keydownEscape(e: KeyboardEvent): void {
     if (
       e.key !== 'Escape' ||
       !this._conditionValues ||
@@ -194,40 +272,46 @@ class ConditionItemView extends ConditionView {
   /** Create each advanced search query
    * @see {@link https://grch38.togovar.org/api} -  Schemas
    * @type {Object} */
-  get query() {
+  get query(): ConditionQuery {
     const valueElements = Array.from(
       this._valuesEl.querySelectorAll(':scope > condition-item-value-view')
       // this._elm
       //   .querySelector(':scope > .body > .summary > .values')
       //   .querySelectorAll(':scope > condition-item-value-view')
-    );
+    ) as ConditionItemValueViewElement[];
 
     switch (this._conditionType) {
       case CONDITION_TYPE.dataset:
       case CONDITION_TYPE.genotype: {
         const queries = valueElements.map((view) => {
-          return view.shadowRoot.querySelector('frequency-count-value-view')
-            .queryValue;
+          const shadowRoot = (view as any).shadowRoot;
+          const frequencyCountElement = shadowRoot.querySelector(
+            'frequency-count-value-view'
+          ) as FrequencyCountValueViewElement;
+          return frequencyCountElement.queryValue;
         });
         return queries.length <= 1 ? queries[0] : { or: queries };
       }
 
       case CONDITION_TYPE.pathogenicity_prediction: {
-        return valueElements[0].shadowRoot.querySelector(
+        const shadowRoot = (valueElements[0] as any).shadowRoot;
+        const predictionElement = shadowRoot.querySelector(
           'prediction-value-view'
-        ).queryValue;
+        ) as PredictionValueViewElement;
+        return predictionElement.queryValue;
       }
 
       case CONDITION_TYPE.location: {
         const value = valueElements[0].value;
-        let [chromosome, position] = value.split(':');
-        position = position.split('-');
-        if (position.length === 1) {
-          position = +position[0];
+        let [chromosome, positionStr] = value.split(':');
+        let positionArray = positionStr.split('-');
+        let position: number | { gte: number; lte: number };
+        if (positionArray.length === 1) {
+          position = +positionArray[0];
         } else {
           position = {
-            gte: +position[0],
-            lte: +position[1],
+            gte: +positionArray[0],
+            lte: +positionArray[1],
           };
         }
         return {
@@ -239,7 +323,7 @@ class ConditionItemView extends ConditionView {
         const queryId = valueElements[0]?.value;
         return {
           gene: {
-            relation: this._elm.dataset.relation,
+            relation: this._elm.dataset.relation!,
             terms: [Number(queryId)],
           },
         };
@@ -247,7 +331,7 @@ class ConditionItemView extends ConditionView {
 
       //Create a new array ids by extracting the values of the value property from each element in valueElements
       case CONDITION_TYPE.variant_id: {
-        const ids = valueElements.map(({ value }) => value);
+        const ids = valueElements.map((element) => element.value);
         return {
           id: ids,
         };
@@ -258,12 +342,12 @@ class ConditionItemView extends ConditionView {
           this._valuesEl.querySelectorAll(
             ':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view'
           )
-        );
+        ) as ConditionItemValueViewElement[];
         const valueClinvarElements = Array.from(
           this._valuesEl.querySelectorAll(
             ':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view'
           )
-        );
+        ) as ConditionItemValueViewElement[];
 
         // relationがneのときはand、それ以外はor
         const relationType = this._elm.dataset.relation === 'ne' ? 'and' : 'or';
@@ -271,7 +355,7 @@ class ConditionItemView extends ConditionView {
           valueMgendElements.length > 0
             ? {
                 [this._conditionType]: {
-                  relation: this._elm.dataset.relation,
+                  relation: this._elm.dataset.relation!,
                   source: ['mgend'],
                   terms: valueMgendElements.map((value) => value.value),
                 },
@@ -282,7 +366,7 @@ class ConditionItemView extends ConditionView {
           valueClinvarElements.length > 0
             ? {
                 [this._conditionType]: {
-                  relation: this._elm.dataset.relation,
+                  relation: this._elm.dataset.relation!,
                   source: ['clinvar'],
                   terms: valueClinvarElements.map((value) => value.value),
                 },
@@ -304,7 +388,7 @@ class ConditionItemView extends ConditionView {
       default:
         return {
           [this._conditionType]: {
-            relation: this._elm.dataset.relation,
+            relation: this._elm.dataset.relation!,
             terms: valueElements.map((value) => value.value),
           },
         };

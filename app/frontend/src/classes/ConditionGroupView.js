@@ -1,5 +1,5 @@
 import ConditionView from './ConditionView.js';
-import ConditionItemView from './ConditionItemView.js';
+import ConditionItemView from './ConditionItemView.ts';
 import { CONDITION_ITEM_TYPE } from '../definition.js';
 
 export default class ConditionGroupView extends ConditionView {

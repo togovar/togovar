@@ -1,7 +1,7 @@
 import { HierarchyNode, hierarchy } from 'd3-hierarchy';
 import { CONDITION_TYPE } from '../definition.js';
 import { ADVANCED_CONDITIONS } from '../global.js';
-import ConditionItemView from './ConditionItemView.js';
+import ConditionItemView from './ConditionItemView';
 import ConditionValueEditor from './ConditionValueEditor.js';
 import ConditionValues from './ConditionValues.js';
 import { storeManager } from '../store/StoreManager';
