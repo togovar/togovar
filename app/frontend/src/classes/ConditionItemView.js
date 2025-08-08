@@ -35,6 +35,7 @@ class ConditionItemView extends ConditionView {
     this._elm.dataset.classification = conditionType;
     this._elm.dataset.relation = [
       'dataset',
+      'genotype',
       'pathogenicity_prediction',
       'id',
       'location',
@@ -202,7 +203,8 @@ class ConditionItemView extends ConditionView {
     );
 
     switch (this._conditionType) {
-      case CONDITION_TYPE.dataset: {
+      case CONDITION_TYPE.dataset:
+      case CONDITION_TYPE.genotype: {
         const queries = valueElements.map((view) => {
           return view.shadowRoot.querySelector('frequency-count-value-view')
             .queryValue;

@@ -1,10 +1,10 @@
 import { CONDITION_TYPE } from '../definition.js';
 import ConditionValueEditorCheckboxes from './ConditionValueEditorCheckboxes.js';
-import ConditionValueEditorClinicalSignificance from "./ConditionValueEditorClinicalSignificance.ts";
+import ConditionValueEditorClinicalSignificance from './ConditionValueEditorClinicalSignificance.ts';
 import ConditionValueEditorColumns from './ConditionValueEditorColumns.js';
 import ConditionValueEditorColumnsDataset from './ConditionValueEditorColumnsDataset.ts';
 import ConditionValueEditorDisease from './ConditionValueEditorDisease.js';
-import ConditionValueEditorFrequencyCount from './ConditionValueEditorFrequencyCount.js';
+import ConditionValueEditorFrequencyCount from './ConditionValueEditorFrequencyCount.ts';
 import ConditionValueEditorGene from './ConditionValueEditorGene.js';
 import ConditionValueEditorLocation from './ConditionValueEditorLocation.js';
 import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditorPathogenicityPrediction.ts';
@@ -57,7 +57,10 @@ class ConditionValues {
 
       case CONDITION_TYPE.significance:
         this._editors.push(
-          new ConditionValueEditorClinicalSignificance(this, this._conditionView)
+          new ConditionValueEditorClinicalSignificance(
+            this,
+            this._conditionView
+          )
         );
         break;
 
@@ -68,6 +71,7 @@ class ConditionValues {
         break;
 
       case CONDITION_TYPE.dataset:
+      case CONDITION_TYPE.genotype:
         this._editors.push(
           new ConditionValueEditorColumnsDataset(this, this._conditionView)
         );
@@ -126,7 +130,11 @@ class ConditionValues {
   /** Whether isValid(whether condition has a value) is true or false and okButton is disabled
    * @param {boolean} isValid - whether you can press the ok button */
   update(isValid) {
-    if (this._conditionView.conditionType === CONDITION_TYPE.dataset) {
+    if (
+      [CONDITION_TYPE.dataset, CONDITION_TYPE.genotype].includes(
+        this._conditionView.conditionType
+      )
+    ) {
       isValid = this._editors.every((editor) => {
         return editor.isValid;
       });
