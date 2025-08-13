@@ -255,8 +255,18 @@ class SearchFieldWithSuggestions extends LitElement {
       suggestion[this._searchFieldOptions.valueMappings.valueKey] || '';
     const labelKey =
       suggestion[this._searchFieldOptions.valueMappings.labelKey] || '';
-    this.value = `"${escapeString(valueKey)}"`;
-    this.label = `"${escapeString(labelKey)}"`;
+
+    // SimpleSearchの場合のみダブルクォートを付ける
+    // gene, diseaseの場合は付けない
+    const isSimpleSearch = this._suggestionKeysArray.length > 1;
+
+    if (isSimpleSearch) {
+      this.value = `"${escapeString(valueKey)}"`;
+      this.label = `"${escapeString(labelKey)}"`;
+    } else {
+      this.value = escapeString(valueKey);
+      this.label = escapeString(labelKey);
+    }
 
     this.dispatchEvent(
       new CustomEvent('new-suggestion-selected', {
