@@ -1,25 +1,34 @@
 import { CONDITION_TYPE } from '../definition.js';
 import ConditionValueEditorCheckboxes from './ConditionValueEditorCheckboxes.js';
-import ConditionValueEditorClinicalSignificance from './ConditionValueEditorClinicalSignificance.ts';
+import ConditionValueEditorClinicalSignificance from './ConditionValueEditorClinicalSignificance';
 import ConditionValueEditorColumns from './ConditionValueEditorColumns.js';
-import ConditionValueEditorColumnsDataset from './ConditionValueEditorColumnsDataset.ts';
+import ConditionValueEditorColumnsDataset from './ConditionValueEditorColumnsDataset';
 import ConditionValueEditorDisease from './ConditionValueEditorDisease.js';
-import ConditionValueEditorFrequencyCount from './ConditionValueEditorFrequencyCount.ts';
+import ConditionValueEditorFrequencyCount from './ConditionValueEditorFrequencyCount';
 import ConditionValueEditorGene from './ConditionValueEditorGene.js';
 import ConditionValueEditorLocation from './ConditionValueEditorLocation.js';
-import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditorPathogenicityPrediction.ts';
+import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditorPathogenicityPrediction';
 import ConditionValueEditorVariantID from './ConditionValueEditorVariantID.js';
+import ConditionItemView from './ConditionItemView';
 
-/** About the AdvancedSearch edit screen.
- * Create an instance of ConditionValueEditors */
+interface ConditionValueEditor {
+  keepLastValues(): void;
+  restore(): void;
+  isValid: boolean;
+}
+
+/**
+ * About the AdvancedSearch edit screen.
+ * Create an instance of ConditionValueEditors
+ */
 class ConditionValues {
-  /**
-   * @param {ConditionItemView} conditionView
-   * @param {0|1} defaultValues ConditionItemView represents "0", ConditionGroupView represents "1". */
-  constructor(conditionView, defaultValues = 0) {
-    /** @property {ConditionItemView} _conditionView */
+  private _conditionView: ConditionItemView;
+  private _editors: ConditionValueEditor[];
+  private _sections: HTMLDivElement;
+  private _okButton: HTMLButtonElement;
+
+  constructor(conditionView: ConditionItemView) {
     this._conditionView = conditionView;
-    /** @property {ConditionValueEditorCheckboxes[]|ConditionValueEditorClinicalSignificance[]|ConditionValueEditorColumns[]|ConditionValueEditorFrequencyCount[]|ConditionValueEditorDisease[]|ConditionValueEditorTextField[]} _editor */
     this._editors = [];
 
     // HTML
@@ -31,88 +40,106 @@ class ConditionValues {
       </div>`;
 
     // references
-    /** @property {HTMLDivElement} _sections - div.sections */
-    this._sections =
-      conditionView.editorElement.querySelector(':scope > .sections');
-    const buttons =
-      conditionView.editorElement.querySelector(':scope > .buttons');
-    /** @property {HTMLButtonElement} _okButton - button.button-view */
+    this._sections = conditionView.editorElement.querySelector(
+      ':scope > .sections'
+    ) as HTMLDivElement;
+    const buttons = conditionView.editorElement.querySelector(
+      ':scope > .buttons'
+    ) as HTMLElement;
     this._okButton = buttons.querySelector(
       ':scope > .button-view:nth-child(1)'
-    );
+    ) as HTMLButtonElement;
 
     // events
     this._okButton.addEventListener('click', this._clickOkButton.bind(this));
     buttons
-      .querySelector(':scope > .button-view:nth-child(2)')
+      .querySelector(':scope > .button-view:nth-child(2)')!
       .addEventListener('click', this._clickCancelButton.bind(this));
 
-    /** initialization by types */
+    // initialization by types
     switch (conditionView.conditionType) {
       case CONDITION_TYPE.type:
         this._editors.push(
-          new ConditionValueEditorCheckboxes(this, this._conditionView)
+          new ConditionValueEditorCheckboxes(
+            this as any,
+            this._conditionView as any
+          )
         );
         break;
 
       case CONDITION_TYPE.significance:
         this._editors.push(
           new ConditionValueEditorClinicalSignificance(
-            this,
-            this._conditionView
+            this as any,
+            this._conditionView as any
           )
         );
         break;
 
       case CONDITION_TYPE.consequence:
         this._editors.push(
-          new ConditionValueEditorColumns(this, this._conditionView)
+          new ConditionValueEditorColumns(
+            this as any,
+            this._conditionView as any
+          )
         );
         break;
 
       case CONDITION_TYPE.dataset:
       case CONDITION_TYPE.genotype:
         this._editors.push(
-          new ConditionValueEditorColumnsDataset(this, this._conditionView)
+          new ConditionValueEditorColumnsDataset(
+            this as any,
+            this._conditionView as any
+          )
         );
         this._editors.push(
-          new ConditionValueEditorFrequencyCount(this, this._conditionView)
+          new ConditionValueEditorFrequencyCount(
+            this as any,
+            this._conditionView as any
+          )
         );
         break;
 
       case CONDITION_TYPE.disease:
         this._editors.push(
-          new ConditionValueEditorDisease(this, this._conditionView)
+          new ConditionValueEditorDisease(
+            this as any,
+            this._conditionView as any
+          )
         );
         break;
 
       case CONDITION_TYPE.gene_symbol:
         this._editors.push(
-          new ConditionValueEditorGene(this, this._conditionView)
+          new ConditionValueEditorGene(this as any, this._conditionView as any)
         );
         break;
 
       case CONDITION_TYPE.pathogenicity_prediction:
         this._editors.push(
           new ConditionValueEditorPathogenicityPrediction(
-            this,
-            this._conditionView
+            this as any,
+            this._conditionView as any
           )
         );
         break;
 
       case CONDITION_TYPE.variant_id:
         this._editors.push(
-          new ConditionValueEditorVariantID(this, this._conditionView)
+          new ConditionValueEditorVariantID(
+            this as any,
+            this._conditionView as any
+          )
         );
         break;
 
       case CONDITION_TYPE.location:
         this._editors.push(
           new ConditionValueEditorLocation(
-            this,
-            this._conditionView,
-            defaultValues
+            this as any,
+            this._conditionView as any,
+            0
           )
         );
         break;
@@ -121,15 +148,14 @@ class ConditionValues {
 
   // public methods
   /** Retains the value of ConditionValueEditor once editing starts */
-  startToEditCondition() {
+  startToEditCondition(): void {
     for (const editor of this._editors) {
       editor.keepLastValues();
     }
   }
 
-  /** Whether isValid(whether condition has a value) is true or false and okButton is disabled
-   * @param {boolean} isValid - whether you can press the ok button */
-  update(isValid) {
+  /** Whether isValid(whether condition has a value) is true or false and okButton is disabled */
+  update(isValid: boolean): void {
     if (
       [CONDITION_TYPE.dataset, CONDITION_TYPE.genotype].includes(
         this._conditionView.conditionType
@@ -147,18 +173,14 @@ class ConditionValues {
   }
 
   // private methods
-  /** If isFirstTime is false and there is no Node in values, delete conditionView. Otherwise finish editing
-   * @private
-   * @param {MouseEvent} e - click event */
-  _clickOkButton(e) {
+  /** If isFirstTime is false and there is no Node in values, delete conditionView. Otherwise finish editing */
+  private _clickOkButton(e: MouseEvent): void {
     e.stopImmediatePropagation();
     this._conditionView.doneEditing();
   }
 
-  /** When isFirstTime is true, remove conditionView. Otherwise, revert to the state before editing.
-   * @private
-   * @param {MouseEvent} e - click event */
-  _clickCancelButton(e) {
+  /** When isFirstTime is true, remove conditionView. Otherwise, revert to the state before editing. */
+  private _clickCancelButton(e: MouseEvent): void {
     e.stopImmediatePropagation();
     if (this._conditionView.isFirstTime) {
       this._conditionView.remove();
@@ -178,21 +200,16 @@ class ConditionValues {
     }
   }
 
-  // accessor
-  /** @type {ConditionItemView} */
-  get conditionView() {
+  // accessors
+  get conditionView(): ConditionItemView {
     return this._conditionView;
   }
 
-  /** div.sections
-   * @type {HTMLDivElement} */
-  get sections() {
+  get sections(): HTMLDivElement {
     return this._sections;
   }
 
-  /**
-   * @type {ConditionValueEditorCheckboxes[]|ConditionValueEditorColumns[]|ConditionValueEditorFrequencyCount[]|ConditionValueEditorDisease[]|ConditionValueEditorTextField[]} */
-  get editors() {
+  get editors(): ConditionValueEditor[] {
     return this._editors;
   }
 }
