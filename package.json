@@ -55,7 +55,7 @@
     "jquery": "^3.5.1",
     "jquery-ui": "^1.13.2",
     "json-loader": "^0.5.7",
-    "lit": "^2.2.7",
+    "lit": "^2.8.0",
     "lit-html": "^2.2.6",
     "lit-scss-loader": "^2.0.1",
     "mini-css-extract-plugin": "^2.6.0",

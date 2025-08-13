@@ -1,6 +1,7 @@
 export const CONDITION_TYPE = {
   term: 'term',
   dataset: 'dataset',
+  genotype: 'genotype',
   frequency: 'frequency',
   pathogenicity_prediction: 'pathogenicity_prediction',
   quality: 'quality',
