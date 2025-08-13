@@ -227,7 +227,7 @@ class ConditionItemView extends ConditionView {
       ':scope > .advanced-search-condition-editor-view'
     ) as HTMLDivElement;
 
-    this._conditionValues = new ConditionValues(this, 0); // conditionItemType is always 0 for ConditionItemView
+    this._conditionValues = new ConditionValues(this); // conditionItemType is always 0 for ConditionItemView
   }
 
   /**

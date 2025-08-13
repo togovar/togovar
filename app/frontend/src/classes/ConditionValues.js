@@ -16,7 +16,7 @@ class ConditionValues {
   /**
    * @param {ConditionItemView} conditionView
    * @param {0|1} defaultValues ConditionItemView represents "0", ConditionGroupView represents "1". */
-  constructor(conditionView, defaultValues) {
+  constructor(conditionView, defaultValues = 0) {
     /** @property {ConditionItemView} _conditionView */
     this._conditionView = conditionView;
     /** @property {ConditionValueEditorCheckboxes[]|ConditionValueEditorClinicalSignificance[]|ConditionValueEditorColumns[]|ConditionValueEditorFrequencyCount[]|ConditionValueEditorDisease[]|ConditionValueEditorTextField[]} _editor */
