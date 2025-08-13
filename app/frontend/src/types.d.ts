@@ -23,6 +23,7 @@ type StoreState = {
   statisticsSignificance?: any;
   statisticsType?: any;
   statisticsConsequence?: any;
+  showModal?: boolean;
 };
 
 // -------------------------------------

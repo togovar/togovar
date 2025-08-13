@@ -4,7 +4,11 @@
     "target": "es6",
     "module": "esnext",
     "sourceMap": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false
   },
-  "include": ["./app/frontend/src/**/*"]
+  "include": ["./app/frontend/src/**/*", "./app/frontend/css.d.ts"]
 }
