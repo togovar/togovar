@@ -5,6 +5,7 @@ import { map } from 'lit/directives/map.js';
 import './SearchField';
 import './SearchFieldSuggestionsList';
 import { SearchFieldController } from './SearchFieldController';
+import { SuggestionKeyboardHandler } from './SuggestionKeyboardHandler';
 
 import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
 import { storeManager } from '../../../store/StoreManager';
@@ -49,6 +50,9 @@ class SearchFieldWithSuggestions extends LitElement {
 
     // コントローラーを初期化
     this._controller = new SearchFieldController(this);
+
+    // キーボードハンドラーを初期化
+    this._keyboardHandler = new SuggestionKeyboardHandler(this);
 
     // for only  gene
     if (element) element.appendChild(this);
@@ -114,18 +118,7 @@ class SearchFieldWithSuggestions extends LitElement {
   /** Handle index of column
    * @private */
   _handleStepThroughColumns() {
-    if (
-      this.currentSuggestionIndex >
-      this.suggestData[
-        this._suggestionKeysArray[this.currentSuggestionColumnIndex]
-      ]?.length -
-        1
-    ) {
-      this.currentSuggestionIndex =
-        this.suggestData[
-          this._suggestionKeysArray[this.currentSuggestionColumnIndex]
-        ]?.length - 1;
-    }
+    return this._keyboardHandler._handleStepThroughColumns();
   }
 
   /** Select with keydown(ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Enter, Escape)
@@ -133,90 +126,7 @@ class SearchFieldWithSuggestions extends LitElement {
    * @param {Event} e
    * @returns {void} */
   _handleUpDownKeys = (e) => {
-    if (!this.showSuggestions) {
-      storeManager.setData('showSuggest', false);
-    }
-
-    const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-    if (
-      arrowKeys.includes(e.key) &&
-      this.showSuggestions &&
-      this.currentSuggestionIndex !== -1
-    ) {
-      e.preventDefault();
-    }
-
-    switch (e.key) {
-      case 'ArrowLeft':
-        if (this.currentSuggestionColumnIndex - 1 < 0) {
-          this.currentSuggestionColumnIndex =
-            this._suggestionKeysArray?.length - 1;
-
-          return;
-        }
-        this.currentSuggestionColumnIndex--;
-        this._handleStepThroughColumns();
-        break;
-
-      case 'ArrowRight':
-        if (
-          this.currentSuggestionColumnIndex + 1 >
-          this._suggestionKeysArray?.length - 1
-        ) {
-          this.currentSuggestionColumnIndex = 0;
-          return;
-        }
-        this.currentSuggestionColumnIndex++;
-        this._handleStepThroughColumns();
-        break;
-
-      case 'ArrowUp':
-        if (this.currentSuggestionIndex - 1 < 0) {
-          this.currentSuggestionIndex =
-            this.suggestData[
-              this._suggestionKeysArray[this.currentSuggestionColumnIndex]
-            ]?.length - 1;
-          return;
-        }
-        this.currentSuggestionIndex--;
-        break;
-
-      case 'ArrowDown':
-        if (
-          this.currentSuggestionIndex + 1 >
-          this.suggestData[
-            this._suggestionKeysArray[this.currentSuggestionColumnIndex]
-          ]?.length -
-            1
-        ) {
-          this.currentSuggestionIndex = 0;
-          return;
-        }
-        this.currentSuggestionIndex++;
-        break;
-
-      case 'Enter':
-        if (this.showSuggestions && this.currentSuggestionIndex !== -1) {
-          this._select(
-            this.suggestData[
-              this._suggestionKeysArray[this.currentSuggestionColumnIndex]
-            ][this.currentSuggestionIndex]
-          );
-          [this.currentSuggestionIndex, this.currentSuggestionColumnIndex] = [
-            -1, 0,
-          ];
-          this._hideSuggestions();
-        } else {
-          this._apiWithoutSelect(this.term);
-        }
-        break;
-
-      case 'Escape':
-        this._hideSuggestions();
-        break;
-      default:
-        break;
-    }
+    return this._keyboardHandler.handleUpDownKeys(e);
   };
 
   /** Put the selected value in value and label, create new-suggestion-selected event, and hide suggestion
@@ -294,8 +204,7 @@ class SearchFieldWithSuggestions extends LitElement {
   /** Initialize currentSuggestion position when input is clicked.
    * @private */
   _handleClick() {
-    this.currentSuggestionIndex = -1;
-    this.currentSuggestionColumnIndex = 0;
+    this._keyboardHandler.resetSelection();
   }
 
   /** Display suggestions, if the input character is greater than 3 when the focus on.
