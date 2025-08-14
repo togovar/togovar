@@ -7,6 +7,7 @@ import './SearchFieldSuggestionsList';
 import { SearchFieldController } from './SearchFieldController';
 import { SuggestionKeyboardHandler } from './SuggestionKeyboardHandler';
 import { SuggestionSelectionHandler } from './SuggestionSelectionHandler';
+import { InputEventHandler } from './InputEventHandler';
 
 import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
 import { storeManager } from '../../../store/StoreManager';
@@ -57,6 +58,9 @@ class SearchFieldWithSuggestions extends LitElement {
 
     // 選択ハンドラーを初期化
     this._selectionHandler = new SuggestionSelectionHandler(this);
+
+    // 入力ハンドラーを初期化
+    this._inputHandler = new InputEventHandler(this);
 
     // for only  gene
     if (element) element.appendChild(this);
@@ -155,53 +159,33 @@ class SearchFieldWithSuggestions extends LitElement {
 
   /** Put the characters input in this.term, (Only SimpleSearch)create input-term event, hide suggestions if the length is less than 3, and empty suggestData
    * @private */
-  _handleInput(e) {
-    this.term = e.data;
-    this.dispatchEvent(
-      new CustomEvent('input-term', {
-        detail: e.data,
-        bubbles: true,
-        composed: true,
-      })
-    );
-    if (this.term.length < 3) {
-      this._controller.hideSuggestions();
-      this._controller.clearSuggestData();
-    }
-  }
+  _handleInput = (e) => {
+    return this._inputHandler.handleInput(e);
+  };
 
   /** Initialize currentSuggestion position when input is clicked.
    * @private */
-  _handleClick() {
-    this._keyboardHandler.resetSelection();
-  }
+  _handleClick = () => {
+    return this._inputHandler.handleClick();
+  };
 
   /** Display suggestions, if the input character is greater than 3 when the focus on.
    * @private */
-  _handleFocusIn() {
-    if (this.term?.length > 3) {
-      this._controller.showSuggestions();
-    }
-  }
+  _handleFocusIn = () => {
+    return this._inputHandler.handleFocusIn();
+  };
 
   /** Hide suggestions when focus moves away from input
    * @private */
-  _handleFocusOut() {
-    this._hideSuggestions();
-    storeManager.setData('showSuggest', false);
-  }
+  _handleFocusOut = () => {
+    return this._inputHandler.handleFocusOut();
+  };
 
   /** Hide suggestions and empty input when input is reset. input-reset event for simple search
    * @private */
-  _handleInputReset() {
-    this.term = '';
-    this.value = '';
-    this.label = '';
-    this.showSuggestions = false;
-    this._controller.clearSuggestData();
-    this._hideSuggestions();
-    this.dispatchEvent(new CustomEvent('input-reset'));
-  }
+  _handleInputReset = () => {
+    return this._inputHandler.handleInputReset();
+  };
 
   render() {
     return html`
