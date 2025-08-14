@@ -1,14 +1,12 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
-import { Task } from '@lit-labs/task';
-import { axios } from '../../../utils/cachedAxios';
 
 import './SearchField';
 import './SearchFieldSuggestionsList';
+import { SearchFieldController } from './SearchFieldController';
 
 import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
-import { debounce } from '../../../utils/debounce';
 import { storeManager } from '../../../store/StoreManager';
 
 /**
@@ -49,6 +47,9 @@ class SearchFieldWithSuggestions extends LitElement {
     this.suggestAPIQueryParam = suggestAPIQueryParam;
     this._searchFieldOptions = options;
 
+    // コントローラーを初期化
+    this._controller = new SearchFieldController(this);
+
     // for only  gene
     if (element) element.appendChild(this);
   }
@@ -86,41 +87,17 @@ class SearchFieldWithSuggestions extends LitElement {
   /**
    * @private
    * @param {string} term - input value d*/
-  _apiTask = new Task(
-    this,
-    debounce(async (term) => {
-      if (term.length >= 3) {
-        this.showSuggestions = true;
-        const { data } = await axios.get(this._getSuggestURL(term));
-        let dataToReturn;
-
-        // Make suggestion data same format for simple & gene etc search
-        if (Array.isArray(data)) {
-          // for AdvancedSearch
-          dataToReturn = { data: data };
-          this._suggestionKeysArray = ['data'];
-        } else {
-          // for SimpleSearch
-          dataToReturn = data;
-          this._suggestionKeysArray = Object.keys(data);
-        }
-
-        storeManager.setData('showSuggest', true);
-        return (this.suggestData = dataToReturn);
-      }
-      return (this.showSuggestions = false);
-    }, 300),
-    () => this.term
-  );
+  get _apiTask() {
+    return this._controller.apiTask;
+  }
 
   /** compute property values that depend on other properties and are used in the rest of the update process */
   willUpdate(changedProperties) {
     if (changedProperties.has('suggestAPIURL')) {
-      this._getSuggestURL = (text) => {
-        const url = new URL(this.suggestAPIURL);
-        url.searchParams.set(this.suggestAPIQueryParam, text);
-        return url.toString();
-      };
+      this._controller.setSuggestURL(
+        this.suggestAPIURL,
+        this.suggestAPIQueryParam
+      );
     }
 
     if (changedProperties.has('options')) {
@@ -309,8 +286,8 @@ class SearchFieldWithSuggestions extends LitElement {
       })
     );
     if (this.term.length < 3) {
-      this._hideSuggestions();
-      this.suggestData = [];
+      this._controller.hideSuggestions();
+      this._controller.clearSuggestData();
     }
   }
 
@@ -325,8 +302,7 @@ class SearchFieldWithSuggestions extends LitElement {
    * @private */
   _handleFocusIn() {
     if (this.term?.length > 3) {
-      this.showSuggestions = true;
-      storeManager.setData('showSuggest', true);
+      this._controller.showSuggestions();
     }
   }
 
@@ -344,7 +320,7 @@ class SearchFieldWithSuggestions extends LitElement {
     this.value = '';
     this.label = '';
     this.showSuggestions = false;
-    this.suggestData = [];
+    this._controller.clearSuggestData();
     this._hideSuggestions();
     this.dispatchEvent(new CustomEvent('input-reset'));
   }
