@@ -125,10 +125,12 @@ export class SuggestionKeyboardHandler {
 
   /**
    * Enterキーの処理 - 選択または検索実行
+   * ホストのメソッドを呼び出してビジネスロジックを実行
    * @private
    */
   _handleEnter() {
     if (this.host.showSuggestions && this.host.currentSuggestionIndex !== -1) {
+      // サジェストが選択されている場合：選択処理を実行
       this.host._select(
         this.host.suggestData[
           this.host._suggestionKeysArray[this.host.currentSuggestionColumnIndex]
@@ -140,6 +142,7 @@ export class SuggestionKeyboardHandler {
       ] = [-1, 0];
       this.host._hideSuggestions();
     } else {
+      // サジェストが選択されていない場合：直接検索を実行
       this.host._apiWithoutSelect(this.host.term);
     }
   }

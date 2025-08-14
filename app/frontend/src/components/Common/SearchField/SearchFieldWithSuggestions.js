@@ -6,6 +6,7 @@ import './SearchField';
 import './SearchFieldSuggestionsList';
 import { SearchFieldController } from './SearchFieldController';
 import { SuggestionKeyboardHandler } from './SuggestionKeyboardHandler';
+import { SuggestionSelectionHandler } from './SuggestionSelectionHandler';
 
 import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
 import { storeManager } from '../../../store/StoreManager';
@@ -53,6 +54,9 @@ class SearchFieldWithSuggestions extends LitElement {
 
     // キーボードハンドラーを初期化
     this._keyboardHandler = new SuggestionKeyboardHandler(this);
+
+    // 選択ハンドラーを初期化
+    this._selectionHandler = new SuggestionSelectionHandler(this);
 
     // for only  gene
     if (element) element.appendChild(this);
@@ -133,55 +137,20 @@ class SearchFieldWithSuggestions extends LitElement {
    * @param {Object} suggestion - Symple{term, alias_of}, Gene{slias_of, highlight, id, name, symbol}
    * @private */
   _select = (suggestion) => {
-    const escapeString = (str) =>
-      String(str || '')
-        .replace(/\\/g, '\\\\')
-        .replace(/"/g, '\\"');
-
-    const valueKey =
-      suggestion[this._searchFieldOptions.valueMappings.valueKey] || '';
-    const labelKey =
-      suggestion[this._searchFieldOptions.valueMappings.labelKey] || '';
-
-    // SimpleSearchの場合のみダブルクォートを付ける
-    // gene, diseaseの場合は付けない
-    const isSimpleSearch = this._suggestionKeysArray.length > 1;
-
-    if (isSimpleSearch) {
-      this.value = `"${escapeString(valueKey)}"`;
-      this.label = `"${escapeString(labelKey)}"`;
-    } else {
-      this.value = escapeString(valueKey);
-      this.label = escapeString(labelKey);
-    }
-
-    this.dispatchEvent(
-      new CustomEvent('new-suggestion-selected', {
-        detail: { id: this.value, label: this.label },
-        bubbles: true,
-        composed: true,
-      })
-    );
+    return this._selectionHandler.select(suggestion);
   };
 
   /** (Only SimpleSearch) Search without suggestions, create search-term-enter event and hide suggest after event firing
    * @private
    * @param {string} term - input value */
   _apiWithoutSelect = (term) => {
-    this.dispatchEvent(
-      new CustomEvent('search-term-enter', {
-        detail: term,
-        bubbles: true,
-        composed: true,
-      })
-    );
-    this._hideSuggestions();
+    return this._selectionHandler.searchWithoutSelect(term);
   };
 
   /** e.detail: Symple{term, alias_of}, Gene{slias_of, highlight, id, name, symbol}
    * @private */
   _handleSuggestionSelected = (e) => {
-    this._select(e.detail);
+    return this._selectionHandler.handleSuggestionSelected(e);
   };
 
   /** Put the characters input in this.term, (Only SimpleSearch)create input-term event, hide suggestions if the length is less than 3, and empty suggestData
