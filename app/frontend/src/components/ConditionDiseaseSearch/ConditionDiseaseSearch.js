@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
 
 import './ConditionDiseaseSearchOntologyView.js';
-import '../Common/SearchField/SearchFieldWithSuggestions';
+import '../Common/SearchField/suggestions/SearchFieldWithSuggestions';
 
 import { API_URL } from '../../global';
 
@@ -77,7 +77,7 @@ export class ConditionDiseaseSearch extends LitElement {
         .suggestAPIURL=${suggestAPI}
         .suggestAPIQueryParam="${'term'}"
         .options="${{ valueMappings: { valueKey: 'id', labelKey: 'label' } }}"
-        .placeholder=${"Breast-ovarian cancer, familial 2"}
+        .placeholder=${'Breast-ovarian cancer, familial 2'}
         @new-suggestion-selected="${this._changeDiseaseEventHadnler}"
       ></search-field-with-suggestions>
 

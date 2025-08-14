@@ -1,4 +1,4 @@
-import { storeManager } from '../../../store/StoreManager';
+import { storeManager } from '../../../../../store/StoreManager';
 
 /**
  * SuggestionKeyboardHandler - キーボードナビゲーションとキー操作を担当するクラス

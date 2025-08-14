@@ -1,5 +1,5 @@
 import { CONDITION_TYPE } from '../definition.js';
-import '../components/Common/SearchField/SearchFieldWithSuggestions.js';
+import '../components/Common/SearchField/suggestions/SearchFieldWithSuggestions.js';
 
 // TODO this whole component except for examples can be replaced with SearchFieldWithSuggestions (?)
 const NUMBER_OF_SUGGESTS = 10; // TODO: Config

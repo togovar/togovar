@@ -1,5 +1,5 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
-import SearchFieldWithSuggestions from '../components/Common/SearchField/SearchFieldWithSuggestions.js';
+import SearchFieldWithSuggestions from '../components/Common/SearchField/suggestions/SearchFieldWithSuggestions.js';
 import { API_URL } from '../global.js';
 
 /** Gene Search editing screen */

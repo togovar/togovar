@@ -2,15 +2,14 @@ import { LitElement, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 
-import './SearchField';
+import '../SearchField';
 import './SearchFieldSuggestionsList';
-import { SearchFieldController } from './SearchFieldController';
-import { SuggestionKeyboardHandler } from './SuggestionKeyboardHandler';
-import { SuggestionSelectionHandler } from './SuggestionSelectionHandler';
-import { InputEventHandler } from './InputEventHandler';
+import { SearchFieldController } from './handlers/SearchFieldController';
+import { SuggestionKeyboardHandler } from './handlers/SuggestionKeyboardHandler';
+import { SuggestionSelectionHandler } from './handlers/SuggestionSelectionHandler';
+import { InputEventHandler } from './handlers/InputEventHandler';
 
-import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
-import { storeManager } from '../../../store/StoreManager';
+import Styles from '../../../../../stylesheets/object/component/search-field-with-suggestions.scss';
 
 /**
  * @typedef SearchFieldOptions

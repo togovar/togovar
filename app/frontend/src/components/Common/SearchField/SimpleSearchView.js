@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import './SearchFieldWithSuggestions';
+import './suggestions/SearchFieldWithSuggestions';
 import './SearchFieldExamples';
 import './SimpleSearchButton';
 // import {storeManager} from '../../../store/StoreManager';

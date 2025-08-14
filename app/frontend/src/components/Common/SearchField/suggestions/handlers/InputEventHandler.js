@@ -1,4 +1,4 @@
-import { storeManager } from '../../../store/StoreManager';
+import { storeManager } from '../../../../../store/StoreManager';
 
 /**
  * InputEventHandler - 入力イベントの処理とフォーカス管理を担当するクラス

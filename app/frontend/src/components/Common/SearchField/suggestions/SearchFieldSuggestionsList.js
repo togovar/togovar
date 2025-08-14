@@ -2,8 +2,8 @@ import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import Styles from '../../../../stylesheets/object/component/search-field-suggestions-list.scss';
-import { scrollMeUp } from './scrollMeUp';
+import Styles from '../../../../../stylesheets/object/component/search-field-suggestions-list.scss';
+import { scrollMeUp } from '../scrollMeUp';
 
 /** Class to create a list of suggestions */
 @customElement('search-field-suggestions-list')
