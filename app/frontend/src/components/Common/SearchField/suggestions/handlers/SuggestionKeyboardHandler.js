@@ -140,7 +140,7 @@ export class SuggestionKeyboardHandler {
         this.host.currentSuggestionIndex,
         this.host.currentSuggestionColumnIndex,
       ] = [-1, 0];
-      this.host._hideSuggestions();
+      this.host.hideSuggestionsMethod();
     } else {
       // サジェストが選択されていない場合：直接検索を実行
       this.host._apiWithoutSelect(this.host.term);
@@ -152,7 +152,7 @@ export class SuggestionKeyboardHandler {
    * @private
    */
   _handleEscape() {
-    this.host._hideSuggestions();
+    this.host.hideSuggestions();
   }
 
   /**

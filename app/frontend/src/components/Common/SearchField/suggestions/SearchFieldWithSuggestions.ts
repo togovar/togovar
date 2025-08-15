@@ -11,6 +11,17 @@ import { InputEventHandler } from './handlers/InputEventHandler';
 
 import Styles from '../../../../../stylesheets/object/component/search-field-with-suggestions.scss';
 
+/** Suggestion data structure */
+export interface SuggestionData {
+  term?: string;
+  alias_of?: string;
+  highlight?: string;
+  id?: string;
+  name?: string;
+  symbol?: string;
+  [key: string]: any;
+}
+
 /** Options for configuring the search field behavior */
 export interface SearchFieldOptions {
   /** Mappings for suggestion values */
@@ -26,6 +37,16 @@ export interface SearchFieldOptions {
   titleMappings?: { [key: string]: string };
 }
 
+/** Host interface for handlers */
+export interface SearchFieldHost {
+  _searchFieldOptions: SearchFieldOptions;
+  _suggestionKeysArray: string[];
+  value: string;
+  label: string;
+  hideSuggestionsMethod(): void;
+  dispatchEvent(event: CustomEvent): boolean;
+}
+
 /** Partial options type for more flexible configuration */
 export type PartialSearchFieldOptions = {
   valueMappings: Partial<SearchFieldOptions['valueMappings']> & {
@@ -34,17 +55,6 @@ export type PartialSearchFieldOptions = {
   };
   titleMappings?: { [key: string]: string };
 };
-
-/** Suggestion data structure */
-export interface SuggestionData {
-  term?: string;
-  alias_of?: string;
-  highlight?: string;
-  id?: string;
-  name?: string;
-  symbol?: string;
-  [key: string]: any;
-}
 
 /** Class for search field with suggestions
  * Used by SimpleSearchView, ConditionValueEditorGene, ConditionValueEditorDisease */
@@ -58,6 +68,7 @@ class SearchFieldWithSuggestions extends LitElement {
   @property() suggestAPIURL: string = ''; // API URL
   @property() suggestAPIQueryParam: string = ''; // Query parameter for API
   @property({ type: Object }) options?: PartialSearchFieldOptions; // Options for the search field
+  @property({ type: Boolean }) hideSuggestions: boolean = false; // Whether to hide suggestions from parent
 
   // ============================================================================
   // State Properties (Internal State)
@@ -69,7 +80,7 @@ class SearchFieldWithSuggestions extends LitElement {
   @state() currentSuggestionIndex: number = -1; // Position from top of selection
   @state() currentSuggestionColumnIndex: number = 0; // Position from side of selection
   @state() suggestData: { [key: string]: SuggestionData[] } = {}; // Suggest data list
-  @state() _suggestionKeysArray: string[] = []; // Suggest content keys
+  @state() private _suggestionKeysArrayInternal: string[] = []; // Suggest content keys
 
   // ============================================================================
   // Private Properties
@@ -78,7 +89,7 @@ class SearchFieldWithSuggestions extends LitElement {
   private _keyboardHandler: SuggestionKeyboardHandler;
   private _selectionHandler: SuggestionSelectionHandler;
   private _inputHandler: InputEventHandler;
-  private _searchFieldOptions: SearchFieldOptions;
+  private _searchFieldOptionsInternal: SearchFieldOptions;
 
   // ============================================================================
   // Constructor
@@ -102,7 +113,7 @@ class SearchFieldWithSuggestions extends LitElement {
     this.suggestAPIQueryParam = suggestAPIQueryParam;
 
     // デフォルト値とマージして完全なSearchFieldOptionsを作成
-    this._searchFieldOptions = {
+    this._searchFieldOptionsInternal = {
       valueMappings: {
         valueKey: options?.valueMappings?.valueKey || 'id',
         labelKey: options?.valueMappings?.labelKey || 'term',
@@ -129,6 +140,21 @@ class SearchFieldWithSuggestions extends LitElement {
     return this._controller.apiTask;
   }
 
+  /** Get search field options for handlers */
+  get _searchFieldOptions() {
+    return this._searchFieldOptionsInternal;
+  }
+
+  /** Get suggestion keys array for handlers */
+  get _suggestionKeysArray() {
+    return this._suggestionKeysArrayInternal;
+  }
+
+  /** Set suggestion keys array for handlers */
+  set _suggestionKeysArray(value: string[]) {
+    this._suggestionKeysArrayInternal = value;
+  }
+
   // ============================================================================
   // Lifecycle Methods
   // ============================================================================
@@ -143,7 +169,7 @@ class SearchFieldWithSuggestions extends LitElement {
 
     if (changedProperties.has('options') && this.options) {
       // 部分的なオプションを完全なSearchFieldOptionsに変換
-      this._searchFieldOptions = {
+      this._searchFieldOptionsInternal = {
         valueMappings: {
           valueKey: this.options.valueMappings?.valueKey || 'id',
           labelKey: this.options.valueMappings?.labelKey || 'term',
@@ -152,10 +178,14 @@ class SearchFieldWithSuggestions extends LitElement {
         titleMappings: this.options.titleMappings || {},
       };
     }
+
+    if (changedProperties.has('hideSuggestions')) {
+      this.showSuggestions = !this.hideSuggestions;
+    }
   }
 
   // ============================================================================
-  // Public Event Handlers (Template Bound)
+  // Public Event Handlers
   // ============================================================================
   /** Select with keydown(ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Enter, Escape) */
   handleUpDownKeys = (e: KeyboardEvent): void => {
@@ -192,6 +222,11 @@ class SearchFieldWithSuggestions extends LitElement {
     return this._inputHandler.handleInputReset();
   };
 
+  /** Hide suggestions */
+  hideSuggestionsMethod = (): void => {
+    this.showSuggestions = false;
+  };
+
   // ============================================================================
   // Protected Methods (Used by Handlers)
   // ============================================================================
@@ -220,11 +255,6 @@ class SearchFieldWithSuggestions extends LitElement {
           this._suggestionKeysArray[this.currentSuggestionColumnIndex]
         ]?.length - 1;
     }
-  }
-
-  /** Hide suggestions */
-  protected _hideSuggestions(): void {
-    this.showSuggestions = false;
   }
 
   // ============================================================================

@@ -1,35 +1,4 @@
-import { LitElement } from 'lit';
-
-/** Suggestion data structure */
-interface SuggestionData {
-  term?: string;
-  alias_of?: string;
-  highlight?: string;
-  id?: string;
-  name?: string;
-  symbol?: string;
-  [key: string]: any;
-}
-
-/** Search field options interface */
-interface SearchFieldOptions {
-  valueMappings: {
-    valueKey: string;
-    labelKey: string;
-    aliasOfKey?: string;
-  };
-  titleMappings?: { [key: string]: string };
-}
-
-/** Host interface for SearchFieldWithSuggestions */
-interface SearchFieldHost extends LitElement {
-  _searchFieldOptions: SearchFieldOptions;
-  _suggestionKeysArray: string[];
-  value: string;
-  label: string;
-  _hideSuggestions(): void;
-  dispatchEvent(event: CustomEvent): boolean;
-}
+import { SuggestionData, SearchFieldHost } from '../SearchFieldWithSuggestions';
 
 /**
  * SuggestionSelectionHandler - サジェストの選択と検索実行を担当するクラス
@@ -92,7 +61,7 @@ export class SuggestionSelectionHandler {
         composed: true,
       })
     );
-    this.host._hideSuggestions();
+    this.host.hideSuggestionsMethod();
   };
 
   /**

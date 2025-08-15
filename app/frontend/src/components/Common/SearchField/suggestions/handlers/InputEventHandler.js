@@ -52,7 +52,7 @@ export class InputEventHandler {
    * フォーカスアウトイベントを処理 - サジェストを非表示
    */
   handleFocusOut = () => {
-    this.host._hideSuggestions();
+    this.host.hideSuggestionsMethod();
     storeManager.setData('showSuggest', false);
   };
 
@@ -65,7 +65,7 @@ export class InputEventHandler {
     this.host.label = '';
     this.host.showSuggestions = false;
     this.host._controller.clearSuggestData();
-    this.host._hideSuggestions();
+    this.host.hideSuggestionsMethod();
     this.host.dispatchEvent(new CustomEvent('input-reset'));
   };
 
