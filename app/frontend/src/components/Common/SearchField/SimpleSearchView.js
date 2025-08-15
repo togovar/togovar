@@ -1,8 +1,8 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import './suggestions/SearchFieldWithSuggestions';
-import './SearchFieldExamples';
-import './SimpleSearchButton';
+import './SimpleSearchExamples.ts';
+import './SimpleSearchButton.ts';
 import { getSimpleSearchCondition } from '../../../store/searchManager';
 import { SimpleSearchController } from './SimpleSearchController';
 import { SimpleSearchEventHandlers } from './SimpleSearchEventHandlers';
@@ -76,15 +76,13 @@ class SimpleSearchView extends LitElement {
           @input-reset=${this._eventHandlers.handleInputReset}
         ></search-field-with-suggestions>
 
-        <search-button
-          @click=${this._eventHandlers.handleSearchButtonClick}
-        ></search-button>
+        <search-button @click=${this._handleSeachButtonClick}></search-button>
       </div>
-      <search-field-examples
+      <simple-search-examples
         .examples=${EXAMPLES}
-        @example-selected=${this._eventHandlers.handleExampleSelected}
+        @example-selected=${this._handleExampleSelected}
       >
-      </search-field-examples>
+      </simple-search-examples>
     `;
   }
 }
