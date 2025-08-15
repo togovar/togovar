@@ -1,13 +1,12 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, CSSResultGroup, TemplateResult } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import '../suggestions/SearchFieldWithSuggestions';
 import './SimpleSearchExamples.ts';
 import './SimpleSearchButton.ts';
 import { getSimpleSearchCondition } from '../../../../store/searchManager';
-import { SimpleSearchController } from './SimpleSearchController.ts';
-import { SimpleSearchEventHandlers } from './SimpleSearchEventHandlers.ts';
-import { EXAMPLES, SEARCH_FIELD_CONFIG } from './SimpleSearchConstants.ts';
-
+import { SimpleSearchController } from './SimpleSearchController';
+import { SimpleSearchEventHandlers } from './SimpleSearchEventHandlers';
+import { EXAMPLES, SEARCH_FIELD_CONFIG } from './SimpleSearchConstants';
 import Styles from '../../../../../stylesheets/object/component/simple-search-view.scss';
 
 /**
@@ -16,11 +15,17 @@ import Styles from '../../../../../stylesheets/object/component/simple-search-vi
  */
 @customElement('simple-search-view')
 class SimpleSearchView extends LitElement {
-  static styles = [Styles];
+  static styles: CSSResultGroup = [Styles];
+
+  private _controller: SimpleSearchController;
+  private _eventHandlers: SimpleSearchEventHandlers;
 
   constructor() {
     super();
-    document.getElementById('SimpleSearchView').appendChild(this);
+    const element = document.getElementById('SimpleSearchView');
+    if (element) {
+      element.appendChild(this);
+    }
 
     // コントローラーとイベントハンドラーを初期化
     this._controller = new SimpleSearchController(this);
@@ -30,27 +35,21 @@ class SimpleSearchView extends LitElement {
   // ============================================================================
   // State Properties
   // ============================================================================
-
-  /** @property {string} _value - サジェストの選択値 */
-  @state() _value;
-
-  /** @property {string} _term - 入力値 */
-  @state() _term = getSimpleSearchCondition('term');
-
-  /** @property {boolean} _hideSuggestions - サジェストを非表示にするかどうか */
-  @state() _hideSuggestions = true;
+  @state() _value: string = ''; // 選択されたサジェストの値
+  @state() _term: string = getSimpleSearchCondition('term') || ''; // 検索キーワード
+  @state() _hideSuggestions: boolean = true; // サジェストを非表示にするかどうか
 
   // ============================================================================
   // Getter Methods (Controller Access)
   // ============================================================================
 
   /** コントローラーへのアクセサ */
-  get controller() {
+  get controller(): SimpleSearchController {
     return this._controller;
   }
 
   /** イベントハンドラーへのアクセサ */
-  get eventHandlers() {
+  get eventHandlers(): SimpleSearchEventHandlers {
     return this._eventHandlers;
   }
 
@@ -59,20 +58,20 @@ class SimpleSearchView extends LitElement {
   // ============================================================================
 
   /** 検索ボタンクリック時の処理 */
-  _handleSearchButtonClick = () => {
+  private _handleSearchButtonClick = (): void => {
     this._eventHandlers.handleSearchButtonClick();
   };
 
   /** 例文選択時の処理 */
-  _handleExampleSelected = (e) => {
+  private _handleExampleSelected = (e: CustomEvent): void => {
     this._eventHandlers.handleExampleSelected(e);
   };
 
-  // ============================================================================
+  // ===============  =============================================================
   // Render Method
   // ============================================================================
 
-  render() {
+  render(): TemplateResult {
     return html`
       <div class="simple-search-container">
         <search-field-with-suggestions
