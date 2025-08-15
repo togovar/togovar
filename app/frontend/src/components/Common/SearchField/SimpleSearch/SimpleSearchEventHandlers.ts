@@ -1,0 +1,74 @@
+/** SimpleSearchEventHandlers - SimpleSearchViewのイベントハンドラーを担当 */
+
+/** Host インターフェース */
+interface SimpleSearchHost {
+  _hideSuggestions: boolean;
+  [key: string]: any;
+}
+
+/** Controller インターフェース */
+interface SimpleSearchControllerInterface {
+  selectSuggestion(suggestion: any): void;
+  selectExample(example: any): void;
+  updateTerm(term: string): void;
+  executeCurrentSearch(): void;
+  executeButtonSearch(): void;
+  reset(): void;
+}
+
+export class SimpleSearchEventHandlers {
+  private host: SimpleSearchHost;
+  private controller: SimpleSearchControllerInterface;
+
+  constructor(
+    host: SimpleSearchHost,
+    controller: SimpleSearchControllerInterface
+  ) {
+    this.host = host;
+    this.controller = controller;
+  }
+
+  /**
+   * サジェスト選択イベントの処理
+   * @param e - new-suggestion-selected イベント
+   */
+  handleSuggestionEnter = (e: CustomEvent): void => {
+    this.controller.selectSuggestion(e.detail);
+  };
+
+  /**
+   * 例文選択イベントの処理
+   * @param e - example-selected イベント
+   */
+  handleExampleSelected = (e: CustomEvent): void => {
+    this.controller.selectExample(e.detail);
+  };
+
+  /**
+   * 入力イベントの処理
+   * @param e - input-term イベント
+   */
+  handleInputTerm = (e: CustomEvent): void => {
+    this.controller.updateTerm(e.detail);
+  };
+
+  /** Enterキー押下時の検索実行 */
+  handleTermEnter = (): void => {
+    this.controller.executeCurrentSearch();
+  };
+
+  /** 検索ボタンクリック時の処理 */
+  handleSearchButtonClick = (): void => {
+    this.controller.executeButtonSearch();
+  };
+
+  /** 入力フィールドでの入力開始時の処理 */
+  handleInputStart = (): void => {
+    this.host._hideSuggestions = false;
+  };
+
+  /** リセットボタンクリック時の処理 */
+  handleInputReset = (): void => {
+    this.controller.reset();
+  };
+}

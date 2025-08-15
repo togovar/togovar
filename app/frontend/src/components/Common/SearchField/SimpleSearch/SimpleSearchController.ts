@@ -1,24 +1,42 @@
-import {
-  setSimpleSearchCondition,
-  getSimpleSearchCondition,
-} from '../../../../store/searchManager';
+import { setSimpleSearchCondition } from '../../../../store/searchManager';
 import { storeManager } from '../../../../store/StoreManager';
 import { CHROMOSOME_PATTERN } from './SimpleSearchConstants';
+
+/** Host インターフェース */
+interface SimpleSearchHost {
+  _term: string;
+  _value: string;
+  _hideSuggestions: boolean;
+}
+
+/** サジェストアイテムの型 */
+interface SuggestionItem {
+  label: string;
+  [key: string]: any;
+}
+
+/** 例文アイテムの型 */
+interface ExampleItem {
+  value: string;
+  [key: string]: any;
+}
 
 /**
  * SimpleSearchController - SimpleSearchViewのビジネスロジックを担当
  */
 export class SimpleSearchController {
-  constructor(host) {
+  private host: SimpleSearchHost;
+
+  constructor(host: SimpleSearchHost) {
     this.host = host;
   }
 
   /**
    * 検索処理
    * 染色体パターンの正規化も行う
-   * @param {string} term - 検索語
+   * @param term - 検索語
    */
-  search(term) {
+  search(term: string): void {
     if (CHROMOSOME_PATTERN.test(term)) {
       term = term.replace(/Chr|ch|Cr|cs/i, '').toUpperCase();
 
@@ -32,9 +50,9 @@ export class SimpleSearchController {
 
   /**
    * 入力項目の更新
-   * @param {string} term - 入力値
+   * @param term - 入力値
    */
-  updateTerm(term) {
+  updateTerm(term: string): void {
     this.host._term = term;
 
     // 入力されたテキストを検索条件に反映する（ただし検索は実行しない）
@@ -47,7 +65,7 @@ export class SimpleSearchController {
   }
 
   /** 検索状態のリセット */
-  reset() {
+  reset(): void {
     this.host._term = '';
     this.host._value = '';
     this.host._hideSuggestions = true;
@@ -58,9 +76,9 @@ export class SimpleSearchController {
 
   /**
    * サジェスト選択時の処理
-   * @param {Object} suggestion - 選択されたサジェスト
+   * @param suggestion - 選択されたサジェスト
    */
-  selectSuggestion(suggestion) {
+  selectSuggestion(suggestion: SuggestionItem): void {
     this.host._hideSuggestions = true;
     this.host._value = suggestion.label;
     this.host._term = suggestion.label;
@@ -69,9 +87,9 @@ export class SimpleSearchController {
 
   /**
    * 例文選択時の処理
-   * @param {Object} example - 選択された例文
+   * @param example - 選択された例文
    */
-  selectExample(example) {
+  selectExample(example: ExampleItem): void {
     this.host._hideSuggestions = true;
     this.host._value = example.value;
     this.host._term = example.value;
@@ -81,7 +99,7 @@ export class SimpleSearchController {
   /**
    * 現在の検索項目を使用して検索実行
    */
-  executeCurrentSearch() {
+  executeCurrentSearch(): void {
     if (this.host._term === undefined) return;
     this.search(this.host._term);
   }
@@ -89,7 +107,7 @@ export class SimpleSearchController {
   /**
    * ボタンクリック時の検索実行
    */
-  executeButtonSearch() {
+  executeButtonSearch(): void {
     this.search(this.host._term || '');
   }
 }

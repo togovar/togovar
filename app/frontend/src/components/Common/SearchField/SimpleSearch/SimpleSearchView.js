@@ -4,9 +4,9 @@ import '../suggestions/SearchFieldWithSuggestions';
 import './SimpleSearchExamples.ts';
 import './SimpleSearchButton.ts';
 import { getSimpleSearchCondition } from '../../../../store/searchManager';
-import { SimpleSearchController } from './SimpleSearchController';
-import { SimpleSearchEventHandlers } from './SimpleSearchEventHandlers';
-import { EXAMPLES, SEARCH_FIELD_CONFIG } from './SimpleSearchConstants';
+import { SimpleSearchController } from './SimpleSearchController.ts';
+import { SimpleSearchEventHandlers } from './SimpleSearchEventHandlers.ts';
+import { EXAMPLES, SEARCH_FIELD_CONFIG } from './SimpleSearchConstants.ts';
 
 import Styles from '../../../../../stylesheets/object/component/simple-search-view.scss';
 
@@ -55,6 +55,20 @@ class SimpleSearchView extends LitElement {
   }
 
   // ============================================================================
+  // Event Handler Methods
+  // ============================================================================
+
+  /** 検索ボタンクリック時の処理 */
+  _handleSearchButtonClick = () => {
+    this._eventHandlers.handleSearchButtonClick();
+  };
+
+  /** 例文選択時の処理 */
+  _handleExampleSelected = (e) => {
+    this._eventHandlers.handleExampleSelected(e);
+  };
+
+  // ============================================================================
   // Render Method
   // ============================================================================
 
@@ -76,13 +90,12 @@ class SimpleSearchView extends LitElement {
           @input-reset=${this._eventHandlers.handleInputReset}
         ></search-field-with-suggestions>
 
-        <search-button @click=${this._handleSeachButtonClick}></search-button>
+        <search-button @click=${this._handleSearchButtonClick}></search-button>
       </div>
       <simple-search-examples
         .examples=${EXAMPLES}
         @example-selected=${this._handleExampleSelected}
-      >
-      </simple-search-examples>
+      ></simple-search-examples>
     `;
   }
 }

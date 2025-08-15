@@ -2,8 +2,35 @@ import { API_URL } from '../../../../global.js';
 
 /** SimpleSearchConstants - SimpleSearchView関連の定数定義 */
 
+/** グローバル変数の型宣言 */
+declare const TOGOVAR_FRONTEND_REFERENCE: 'GRCh37' | 'GRCh38' | string;
+
+/** 検索例のアイテム型 */
+export interface ExampleItem {
+  key: string;
+  value: string;
+}
+
+/** 検索フィールド設定の型 */
+export interface SearchFieldConfig {
+  placeholder: string;
+  suggestAPIURL: string;
+  suggestAPIQueryParam: string;
+  options: {
+    valueMappings: {
+      valueKey: string;
+      labelKey: string;
+      aliasOfKey: string;
+    };
+    titleMappings: {
+      gene: string;
+      disease: string;
+    };
+  };
+}
+
 /** 検索例のデータ */
-export const EXAMPLES = (() => {
+export const EXAMPLES: ExampleItem[] = (() => {
   switch (TOGOVAR_FRONTEND_REFERENCE) {
     case 'GRCh37':
       return [
@@ -81,7 +108,7 @@ export const EXAMPLES = (() => {
 })();
 
 /** 検索フィールドの設定 */
-export const SEARCH_FIELD_CONFIG = {
+export const SEARCH_FIELD_CONFIG: SearchFieldConfig = {
   placeholder: 'Search for disease or gene symbol or rs...',
   suggestAPIURL: `${API_URL}/suggest`,
   suggestAPIQueryParam: 'term',
@@ -99,4 +126,4 @@ export const SEARCH_FIELD_CONFIG = {
 };
 
 /** 染色体パターンの正規表現 */
-export const CHROMOSOME_PATTERN = /([1-9]|1[0-9]|2[0-2]|X|Y|M|MT):\d+/i;
+export const CHROMOSOME_PATTERN: RegExp = /([1-9]|1[0-9]|2[0-2]|X|Y|M|MT):\d+/i;
