@@ -12,10 +12,6 @@ export class SuggestionKeyboardHandler {
 
   /** キーボードイベント（ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Enter, Escape）を処理 */
   handleUpDownKeys = (e: KeyboardEvent): void => {
-    if (!this.host.showSuggestions) {
-      // storeManager.setData('showSuggest', false); // TODO: StoreStateに定義が必要
-    }
-
     const arrowKeys: string[] = [
       'ArrowUp',
       'ArrowDown',

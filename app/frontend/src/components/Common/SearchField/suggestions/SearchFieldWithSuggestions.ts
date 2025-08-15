@@ -1,6 +1,7 @@
 import { LitElement, html, nothing, CSSResultGroup, TemplateResult } from 'lit';
 import { customElement, state, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
+import { ReactiveControllerHost } from 'lit';
 
 import '../SearchField';
 import './SearchFieldSuggestionsList';
@@ -34,7 +35,7 @@ export interface SearchFieldOptions {
 }
 
 /** Host interface for handlers */
-export interface SearchFieldHost {
+export interface SearchFieldHost extends ReactiveControllerHost {
   _searchFieldOptions: SearchFieldOptions;
   _suggestionKeysArray: string[];
   value: string;
@@ -205,7 +206,7 @@ class SearchFieldWithSuggestions extends LitElement {
   };
 
   /** Put the characters input in this.term, (Only SimpleSearch)create input-term event, hide suggestions if the length is less than 3, and empty suggestData */
-  handleInput = (e: CustomEvent<string>): void => {
+  handleInput = (e: InputEvent): void => {
     return this._inputHandler.handleInput(e);
   };
 
@@ -267,7 +268,6 @@ class SearchFieldWithSuggestions extends LitElement {
   // ============================================================================
   // Protected Methods (Used by Handlers)
   // ============================================================================
-
   /** Handle index of column */
   protected _handleStepThroughColumns(): void {
     // 列間のインデックス調整を処理
@@ -288,7 +288,6 @@ class SearchFieldWithSuggestions extends LitElement {
   // ============================================================================
   // Render Method
   // ============================================================================
-
   render(): TemplateResult {
     return html`
       <search-field
