@@ -1,20 +1,55 @@
+import { LitElement } from 'lit';
+
+/** Suggestion data structure */
+interface SuggestionData {
+  term?: string;
+  alias_of?: string;
+  highlight?: string;
+  id?: string;
+  name?: string;
+  symbol?: string;
+  [key: string]: any;
+}
+
+/** Search field options interface */
+interface SearchFieldOptions {
+  valueMappings: {
+    valueKey: string;
+    labelKey: string;
+    aliasOfKey?: string;
+  };
+  titleMappings?: { [key: string]: string };
+}
+
+/** Host interface for SearchFieldWithSuggestions */
+interface SearchFieldHost extends LitElement {
+  _searchFieldOptions: SearchFieldOptions;
+  _suggestionKeysArray: string[];
+  value: string;
+  label: string;
+  _hideSuggestions(): void;
+  dispatchEvent(event: CustomEvent): boolean;
+}
+
 /**
  * SuggestionSelectionHandler - サジェストの選択と検索実行を担当するクラス
  */
 export class SuggestionSelectionHandler {
+  private host: SearchFieldHost;
+
   /**
-   * @param {LitElement} host - ホストとなるLitElementインスタンス
+   * @param host - ホストとなるLitElementインスタンス
    */
-  constructor(host) {
+  constructor(host: SearchFieldHost) {
     this.host = host;
   }
 
   /**
    * サジェストを選択して値を設定
-   * @param {Object} suggestion - 選択されたサジェスト
+   * @param suggestion - 選択されたサジェスト
    */
-  select = (suggestion) => {
-    const escapeString = (str) =>
+  select = (suggestion: SuggestionData): void => {
+    const escapeString = (str: string | undefined): string =>
       String(str || '')
         .replace(/\\/g, '\\\\')
         .replace(/"/g, '\\"');
@@ -47,9 +82,9 @@ export class SuggestionSelectionHandler {
 
   /**
    * (Only SimpleSearch) サジェストなしで検索を実行
-   * @param {string} term - 検索語
+   * @param term - 検索語
    */
-  searchWithoutSelect = (term) => {
+  searchWithoutSelect = (term: string): void => {
     this.host.dispatchEvent(
       new CustomEvent('search-term-enter', {
         detail: term,
@@ -62,9 +97,9 @@ export class SuggestionSelectionHandler {
 
   /**
    * サジェスト選択イベントを処理
-   * @param {Event} e - サジェスト選択イベント
+   * @param e - サジェスト選択イベント
    */
-  handleSuggestionSelected = (e) => {
+  handleSuggestionSelected = (e: CustomEvent<SuggestionData>): void => {
     this.select(e.detail);
   };
 }
