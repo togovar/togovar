@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import Styles from '../../../../../stylesheets/object/component/search-field-suggestions-list.scss';
-import { scrollMeUp } from '../scrollMeUp';
+import { scrollIntoView } from '../scrollIntoView';
 
 /** Suggestion data structure */
 interface SuggestionItem {
@@ -67,7 +67,9 @@ class SearchFieldSuggestionsList extends LitElement {
                     ? '-selected'
                     : ''}"
                   @mousedown="${() => this._handleSelect(item)}"
-                  ${scrollMeUp(this.highlightedSuggestionIndex === index)}
+                  ${(scrollIntoView as any)(
+                    this.highlightedSuggestionIndex === index
+                  )}
                 >
                   ${unsafeHTML(item?.highlight || item?.[this.itemLabelKey])}
                   ${this.subTextKey && item?.[this.subTextKey]
