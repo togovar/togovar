@@ -47,6 +47,10 @@ export interface SearchFieldHost {
   hideSuggestionsMethod(): void;
   selectSuggestion(suggestion: SuggestionData): void;
   searchWithoutSuggestion(term: string): void;
+  hideControllerSuggestions(): void;
+  showControllerSuggestions(): void;
+  clearControllerSuggestData(): void;
+  resetKeyboardSelection(): void;
   dispatchEvent(event: CustomEvent): boolean;
 }
 
@@ -238,6 +242,26 @@ class SearchFieldWithSuggestions extends LitElement {
   /** (Only SimpleSearch) Search without suggestions, create search-term-enter event and hide suggest after event firing */
   searchWithoutSuggestion = (term: string): void => {
     return this._selectionHandler.searchWithoutSelect(term);
+  };
+
+  /** Hide suggestions using controller */
+  hideControllerSuggestions = (): void => {
+    this._controller.hideSuggestions();
+  };
+
+  /** Show suggestions using controller */
+  showControllerSuggestions = (): void => {
+    this._controller.showSuggestions();
+  };
+
+  /** Clear suggest data using controller */
+  clearControllerSuggestData = (): void => {
+    this._controller.clearSuggestData();
+  };
+
+  /** Reset keyboard selection */
+  resetKeyboardSelection = (): void => {
+    this._keyboardHandler.resetSelection();
   };
 
   // ============================================================================
