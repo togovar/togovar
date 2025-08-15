@@ -1,8 +1,8 @@
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
-} from '../../../store/searchManager';
-import { storeManager } from '../../../store/StoreManager';
+} from '../../../../store/searchManager';
+import { storeManager } from '../../../../store/StoreManager';
 import { CHROMOSOME_PATTERN } from './SimpleSearchConstants';
 
 /**

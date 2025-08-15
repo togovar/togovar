@@ -1,4 +1,4 @@
-import { API_URL } from '../../../global.js';
+import { API_URL } from '../../../../global.js';
 
 /** SimpleSearchConstants - SimpleSearchView関連の定数定義 */
 

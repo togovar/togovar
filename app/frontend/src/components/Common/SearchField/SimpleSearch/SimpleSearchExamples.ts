@@ -2,7 +2,7 @@ import { LitElement, html, CSSResultGroup, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 
-import Styles from '../../../../stylesheets/object/component/simple-search-examples.scss';
+import Styles from '../../../../../stylesheets/object/component/simple-search-examples.scss';
 
 /** 例文データの型定義 */
 export interface ExampleItem {
