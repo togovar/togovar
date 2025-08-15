@@ -1,27 +1,27 @@
 import { storeManager } from '../../../../../store/StoreManager';
+import { SearchFieldHost } from '../SearchFieldWithSuggestions';
 
-/**
- * SuggestionKeyboardHandler - キーボードナビゲーションとキー操作を担当するクラス
- */
+/** SuggestionKeyboardHandler - キーボードナビゲーションとキー操作を担当するクラス */
 export class SuggestionKeyboardHandler {
-  /**
-   * @param {LitElement} host - ホストとなるLitElementインスタンス
-   */
-  constructor(host) {
+  private host: SearchFieldHost;
+
+  /** @param host - ホストとなるLitElementインスタンス */
+  constructor(host: SearchFieldHost) {
     this.host = host;
   }
 
-  /**
-   * キーボードイベント（ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Enter, Escape）を処理
-   * @param {Event} e - キーボードイベント
-   * @returns {void}
-   */
-  handleUpDownKeys = (e) => {
+  /** キーボードイベント（ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Enter, Escape）を処理 */
+  handleUpDownKeys = (e: KeyboardEvent): void => {
     if (!this.host.showSuggestions) {
-      storeManager.setData('showSuggest', false);
+      // storeManager.setData('showSuggest', false); // TODO: StoreStateに定義が必要
     }
 
-    const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    const arrowKeys: string[] = [
+      'ArrowUp',
+      'ArrowDown',
+      'ArrowLeft',
+      'ArrowRight',
+    ];
     if (
       arrowKeys.includes(e.key) &&
       this.host.showSuggestions &&
@@ -60,11 +60,8 @@ export class SuggestionKeyboardHandler {
     }
   };
 
-  /**
-   * 左矢印キーの処理 - 列の左移動
-   * @private
-   */
-  _handleArrowLeft() {
+  /** 左矢印キーの処理 - 列の左移動 */
+  private _handleArrowLeft(): void {
     if (this.host.currentSuggestionColumnIndex - 1 < 0) {
       this.host.currentSuggestionColumnIndex =
         this.host._suggestionKeysArray?.length - 1;
@@ -74,11 +71,8 @@ export class SuggestionKeyboardHandler {
     this._handleStepThroughColumns();
   }
 
-  /**
-   * 右矢印キーの処理 - 列の右移動
-   * @private
-   */
-  _handleArrowRight() {
+  /** 右矢印キーの処理 - 列の右移動 */
+  private _handleArrowRight(): void {
     if (
       this.host.currentSuggestionColumnIndex + 1 >
       this.host._suggestionKeysArray?.length - 1
@@ -90,11 +84,8 @@ export class SuggestionKeyboardHandler {
     this._handleStepThroughColumns();
   }
 
-  /**
-   * 上矢印キーの処理 - 行の上移動
-   * @private
-   */
-  _handleArrowUp() {
+  /** 上矢印キーの処理 - 行の上移動 */
+  private _handleArrowUp(): void {
     if (this.host.currentSuggestionIndex - 1 < 0) {
       this.host.currentSuggestionIndex =
         this.host.suggestData[
@@ -105,11 +96,8 @@ export class SuggestionKeyboardHandler {
     this.host.currentSuggestionIndex--;
   }
 
-  /**
-   * 下矢印キーの処理 - 行の下移動
-   * @private
-   */
-  _handleArrowDown() {
+  /** 下矢印キーの処理 - 行の下移動 */
+  private _handleArrowDown(): void {
     if (
       this.host.currentSuggestionIndex + 1 >
       this.host.suggestData[
@@ -123,15 +111,12 @@ export class SuggestionKeyboardHandler {
     this.host.currentSuggestionIndex++;
   }
 
-  /**
-   * Enterキーの処理 - 選択または検索実行
-   * ホストのメソッドを呼び出してビジネスロジックを実行
-   * @private
-   */
-  _handleEnter() {
+  /** Enterキーの処理 - 選択または検索実行
+   * ホストのメソッドを呼び出してビジネスロジックを実行 */
+  private _handleEnter(): void {
     if (this.host.showSuggestions && this.host.currentSuggestionIndex !== -1) {
       // サジェストが選択されている場合：選択処理を実行
-      this.host._select(
+      this.host.selectSuggestion(
         this.host.suggestData[
           this.host._suggestionKeysArray[this.host.currentSuggestionColumnIndex]
         ][this.host.currentSuggestionIndex]
@@ -143,23 +128,17 @@ export class SuggestionKeyboardHandler {
       this.host.hideSuggestionsMethod();
     } else {
       // サジェストが選択されていない場合：直接検索を実行
-      this.host._apiWithoutSelect(this.host.term);
+      this.host.searchWithoutSuggestion(this.host.term);
     }
   }
 
-  /**
-   * Escapeキーの処理 - サジェスト非表示
-   * @private
-   */
-  _handleEscape() {
-    this.host.hideSuggestions();
+  /** Escapeキーの処理 - サジェスト非表示 */
+  private _handleEscape(): void {
+    this.host.hideSuggestionsMethod();
   }
 
-  /**
-   * 列間のインデックス調整を処理
-   * @private
-   */
-  _handleStepThroughColumns() {
+  /** 列間のインデックス調整を処理 */
+  private _handleStepThroughColumns(): void {
     if (
       this.host.currentSuggestionIndex >
       this.host.suggestData[
@@ -174,10 +153,8 @@ export class SuggestionKeyboardHandler {
     }
   }
 
-  /**
-   * 選択位置を初期化
-   */
-  resetSelection() {
+  /** 選択位置を初期化 */
+  resetSelection(): void {
     this.host.currentSuggestionIndex = -1;
     this.host.currentSuggestionColumnIndex = 0;
   }

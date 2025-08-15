@@ -26,15 +26,11 @@ export interface SuggestionData {
 export interface SearchFieldOptions {
   /** Mappings for suggestion values */
   valueMappings: {
-    /** Key to map to the value (usually "id") */
-    valueKey: string;
-    /** Key to map to the label */
-    labelKey: string;
-    /** Key to map to the subText (optional) */
-    aliasOfKey?: string;
+    valueKey: string; // Key to map to the value (usually "id")
+    labelKey: string; // Key to map to the label
+    aliasOfKey?: string; // Key to map to the subText (optional)
   };
-  /** Mappings for suggestion titles (optional) */
-  titleMappings?: { [key: string]: string };
+  titleMappings?: { [key: string]: string }; // Mappings for suggestion titles (optional)
 }
 
 /** Host interface for handlers */
@@ -43,7 +39,14 @@ export interface SearchFieldHost {
   _suggestionKeysArray: string[];
   value: string;
   label: string;
+  term: string;
+  showSuggestions: boolean;
+  currentSuggestionIndex: number;
+  currentSuggestionColumnIndex: number;
+  suggestData: { [key: string]: SuggestionData[] };
   hideSuggestionsMethod(): void;
+  selectSuggestion(suggestion: SuggestionData): void;
+  searchWithoutSuggestion(term: string): void;
   dispatchEvent(event: CustomEvent): boolean;
 }
 
@@ -227,18 +230,19 @@ class SearchFieldWithSuggestions extends LitElement {
     this.showSuggestions = false;
   };
 
-  // ============================================================================
-  // Protected Methods (Used by Handlers)
-  // ============================================================================
   /** Put the selected value in value and label, create new-suggestion-selected event, and hide suggestion */
-  protected _select = (suggestion: SuggestionData): void => {
+  selectSuggestion = (suggestion: SuggestionData): void => {
     return this._selectionHandler.select(suggestion);
   };
 
   /** (Only SimpleSearch) Search without suggestions, create search-term-enter event and hide suggest after event firing */
-  protected _apiWithoutSelect = (term: string): void => {
+  searchWithoutSuggestion = (term: string): void => {
     return this._selectionHandler.searchWithoutSelect(term);
   };
+
+  // ============================================================================
+  // Protected Methods (Used by Handlers)
+  // ============================================================================
 
   /** Handle index of column */
   protected _handleStepThroughColumns(): void {
