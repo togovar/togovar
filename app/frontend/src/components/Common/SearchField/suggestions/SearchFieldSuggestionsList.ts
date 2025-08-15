@@ -1,36 +1,49 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, CSSResultGroup, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import Styles from '../../../../../stylesheets/object/component/search-field-suggestions-list.scss';
 import { scrollMeUp } from '../scrollMeUp';
 
+/** Suggestion data structure */
+interface SuggestionItem {
+  term?: string;
+  alias_of?: string;
+  highlight?: string;
+  id?: string;
+  name?: string;
+  symbol?: string;
+  [key: string]: any;
+}
+
 /** Class to create a list of suggestions */
 @customElement('search-field-suggestions-list')
 class SearchFieldSuggestionsList extends LitElement {
-  static styles = [Styles];
-  /** @property {Array} suggestData - suggestions data */
-  @property({ type: Array }) suggestData = [];
+  static styles: CSSResultGroup = [Styles];
 
-  /** @property {numbar} highlightedSuggestionIndex - Highlighted item's index (by keys) */
-  @property({ type: Number }) highlightedSuggestionIndex = -1;
+  /** Suggestions data */
+  @property({ type: Array }) suggestData: SuggestionItem[] = [];
 
-  /** @property {string} itemIdKey - What of an item to map to dispatched event's detail.id */
-  @property() itemIdKey = '';
+  /** Highlighted item's index (by keys) */
+  @property({ type: Number }) highlightedSuggestionIndex: number = -1;
 
-  /** @property {string} itemLabelKey - What of an item to map to dispatched event's detail.label */
-  @property() itemLabelKey = '';
+  /** What of an item to map to dispatched event's detail.id */
+  @property() itemIdKey: string = '';
 
-  /** @property {string} subTextKey - If there is alias_of -kind of data, where in data to see for it */
-  @property() subTextKey = '';
+  /** What of an item to map to dispatched event's detail.label */
+  @property() itemLabelKey: string = '';
 
-  /** @property {string} title - Column title in case of Simple search */
-  @property() title = '';
+  /** If there is alias_of -kind of data, where in data to see for it */
+  @property() subTextKey: string = '';
+
+  /** Column title in case of Simple search */
+  @property() title: string = '';
 
   /**
-   * @private
-   * @param {{term: string, alias_of: string}} item */
-  _handleSelect(item) {
+   * Handle suggestion selection
+   * @param item - The selected suggestion item
+   */
+  private _handleSelect(item: SuggestionItem): void {
     this.dispatchEvent(
       new CustomEvent('suggestion-selected', {
         detail: item,
@@ -40,7 +53,7 @@ class SearchFieldSuggestionsList extends LitElement {
     );
   }
 
-  render() {
+  render(): TemplateResult {
     return html`
       ${this.title ? html`<h3 class="title">${this.title}</h3>` : nothing}
       <ul class="list">
@@ -48,7 +61,7 @@ class SearchFieldSuggestionsList extends LitElement {
           ? html`<li class="item -empty">No results</li>`
           : map(
               this.suggestData,
-              (item, index) => html`
+              (item: SuggestionItem, index: number) => html`
                 <li
                   class="item ${this.highlightedSuggestionIndex === index
                     ? '-selected'
