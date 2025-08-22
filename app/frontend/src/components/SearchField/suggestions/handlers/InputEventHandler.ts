@@ -11,10 +11,10 @@ export class InputEventHandler {
 
   /** 入力変更イベントを処理 */
   handleInput = (e: InputEvent): void => {
-    this.host.term = e.data || '';
+    this.host.term = String(e.detail) || '';
     this.host.dispatchEvent(
       new CustomEvent('input-term', {
-        detail: e.data || '',
+        detail: e.detail || '',
         bubbles: true,
         composed: true,
       })

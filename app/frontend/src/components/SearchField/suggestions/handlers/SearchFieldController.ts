@@ -1,6 +1,6 @@
 import { Task } from '@lit-labs/task';
-import { axios } from '../../../../../utils/cachedAxios';
-import { debounce } from '../../../../../utils/debounce';
+import { axios } from '../../../../utils/cachedAxios';
+import { debounce } from '../../../../utils/debounce';
 import { SearchFieldHost, SuggestionData } from '../SearchFieldWithSuggestions';
 
 /** SearchFieldController - API呼び出しとデータ管理を担当するクラス */

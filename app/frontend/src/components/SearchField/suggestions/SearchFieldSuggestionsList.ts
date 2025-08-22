@@ -2,7 +2,7 @@ import { LitElement, html, nothing, CSSResultGroup, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import Styles from '../../../../../stylesheets/object/component/search-field-suggestions-list.scss';
+import Styles from '../../../../stylesheets/object/component/search-field-suggestions-list.scss';
 import { scrollIntoView } from '../scrollIntoView';
 
 /** Suggestion data structure */

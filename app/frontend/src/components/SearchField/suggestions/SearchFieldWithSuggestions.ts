@@ -10,7 +10,7 @@ import { SuggestionKeyboardHandler } from './handlers/SuggestionKeyboardHandler'
 import { SuggestionSelectionHandler } from './handlers/SuggestionSelectionHandler';
 import { InputEventHandler } from './handlers/InputEventHandler';
 
-import Styles from '../../../../../stylesheets/object/component/search-field-with-suggestions.scss';
+import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
 
 /** Suggestion data structure */
 export interface SuggestionData {

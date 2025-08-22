@@ -1,7 +1,7 @@
 import { LitElement, html, CSSResultGroup, TemplateResult } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-import Styles from '../../../../../stylesheets/object/component/simple-search-button.scss';
+import Styles from '../../../../stylesheets/object/component/simple-search-button.scss';
 
 /** SearchButton - 検索ボタンコンポーネント */
 @customElement('search-button')

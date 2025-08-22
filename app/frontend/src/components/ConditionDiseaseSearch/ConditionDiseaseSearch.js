@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
 
 import './ConditionDiseaseSearchOntologyView.js';
-import '../Common/SearchField/suggestions/SearchFieldWithSuggestions';
+import '../SearchField/suggestions/SearchFieldWithSuggestions';
 
 import { API_URL } from '../../global';
 

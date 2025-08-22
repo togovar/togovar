@@ -1,4 +1,3 @@
-import { storeManager } from '../../../../../store/StoreManager';
 import { SearchFieldHost } from '../SearchFieldWithSuggestions';
 
 /** SuggestionKeyboardHandler - キーボードナビゲーションとキー操作を担当するクラス */
@@ -122,15 +121,21 @@ export class SuggestionKeyboardHandler {
         this.host.currentSuggestionColumnIndex,
       ] = [-1, 0];
       this.host.hideSuggestionsMethod();
+      // サジェスト選択後はサジェストを抑制
+      this.host.suppressSuggestions = true;
     } else {
       // サジェストが選択されていない場合：直接検索を実行
       this.host.searchWithoutSuggestion(this.host.term);
+      // 検索実行後はサジェストを抑制
+      this.host.suppressSuggestions = true;
     }
   }
 
   /** Escapeキーの処理 - サジェスト非表示 */
   private _handleEscape(): void {
     this.host.hideSuggestionsMethod();
+    // Escapeキーでサジェストを手動で閉じた場合も抑制
+    this.host.suppressSuggestions = true;
   }
 
   /** 列間のインデックス調整を処理 */

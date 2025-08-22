@@ -1,5 +1,5 @@
-import { setSimpleSearchCondition } from '../../../../store/searchManager';
-import { storeManager } from '../../../../store/StoreManager';
+import { setSimpleSearchCondition } from '../../../store/searchManager';
+import { storeManager } from '../../../store/StoreManager';
 import { CHROMOSOME_PATTERN } from './SimpleSearchConstants';
 
 /** Host インターフェース */
