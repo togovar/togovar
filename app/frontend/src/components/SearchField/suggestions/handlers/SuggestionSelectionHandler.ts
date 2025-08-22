@@ -40,6 +40,9 @@ export class SuggestionSelectionHandler {
       this.host.label = escapeString(labelKey);
     }
 
+    // サジェスト選択後はサジェストを抑制
+    this.host.suppressSuggestions = true;
+
     this.host.dispatchEvent(
       new CustomEvent('new-suggestion-selected', {
         detail: { id: this.host.value, label: this.host.label },
@@ -54,6 +57,9 @@ export class SuggestionSelectionHandler {
    * @param term - 検索語
    */
   searchWithoutSelect = (term: string): void => {
+    // 検索実行後はサジェストを抑制
+    this.host.suppressSuggestions = true;
+    
     this.host.dispatchEvent(
       new CustomEvent('search-term-enter', {
         detail: term,

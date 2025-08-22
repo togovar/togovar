@@ -42,6 +42,7 @@ export interface SearchFieldHost extends ReactiveControllerHost {
   label: string;
   term: string;
   showSuggestions: boolean;
+  suppressSuggestions: boolean;
   currentSuggestionIndex: number;
   currentSuggestionColumnIndex: number;
   suggestData: { [key: string]: SuggestionData[] };
@@ -85,6 +86,7 @@ class SearchFieldWithSuggestions extends LitElement {
   @state() value: string = ''; // Value of selected suggestion
   @state() label: string = ''; // Label of selected suggestion
   @state() showSuggestions: boolean = false; // Whether suggestions are displayed
+  @state() suppressSuggestions: boolean = false; // Whether to suppress suggestions after search
   @state() currentSuggestionIndex: number = -1; // Position from top of selection
   @state() currentSuggestionColumnIndex: number = 0; // Position from side of selection
   @state() suggestData: { [key: string]: SuggestionData[] } = {}; // Suggest data list

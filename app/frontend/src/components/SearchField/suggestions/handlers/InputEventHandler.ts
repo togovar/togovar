@@ -12,6 +12,12 @@ export class InputEventHandler {
   /** 入力変更イベントを処理 */
   handleInput = (e: InputEvent): void => {
     this.host.term = String(e.detail) || '';
+    
+    // 新しい入力があった場合、サジェスト抑制を解除
+    if (this.host.suppressSuggestions) {
+      this.host.suppressSuggestions = false;
+    }
+    
     this.host.dispatchEvent(
       new CustomEvent('input-term', {
         detail: e.detail || '',
@@ -34,7 +40,7 @@ export class InputEventHandler {
 
   /** フォーカスインイベントを処理 - 条件を満たす場合サジェストを表示 */
   handleFocusIn = (): void => {
-    if (this.host.term?.length > 3) {
+    if (this.host.term?.length > 3 && !this.host.suppressSuggestions) {
       this.host.showControllerSuggestions();
     }
   };
