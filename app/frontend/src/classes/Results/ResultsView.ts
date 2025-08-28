@@ -1,17 +1,55 @@
 import { storeManager } from '../../store/StoreManager';
-import { ResultsRowView } from './ResultsRowView';
 import ScrollBar from './../ScrollBar.js';
-import { TR_HEIGHT, COMMON_FOOTER_HEIGHT, COLUMNS } from '../../global.js';
+import { TR_HEIGHT, COLUMNS } from '../../global.js';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
 import { ResultsViewScrollHandler } from './ResultsViewScrollHandler';
 import { ResultsViewDataManager } from './ResultsViewDataManager';
+
+/** 検索メッセージの型定義 */
+type SearchMessages = {
+  notice?: string;
+  warning?: string;
+  error?: string;
+};
+
+/** 検索ステータスの型定義 */
+type SearchStatus = {
+  available: number;
+  filtered: number;
+};
+
+/** カラム設定の型定義 */
+type ColumnConfig = {
+  id: string;
+  isUsed: boolean;
+};
 
 /**
  * 検索結果テーブルビューを管理するクラス
  * スクロール機能、タッチ操作、行の表示管理を行う
  */
 export class ResultsView {
+  /** DOMセレクタ定数 */
+  private static readonly SELECTORS = {
+    STATUS: 'header.header > .left > .status',
+    MESSAGES: '#Messages',
+    TABLE_CONTAINER: '.tablecontainer',
+    TABLE_THEAD: '.tablecontainer > table.results-view > thead',
+    TABLE_TBODY: '.tablecontainer > table.results-view > tbody',
+    SCROLL_BAR: '.scroll-bar',
+  } as const;
+
+  /** ストアマネージャーのバインドキー */
+  private static readonly STORE_BINDINGS = [
+    'searchStatus',
+    'searchResults',
+    'columns',
+    'offset',
+    'karyotype',
+    'searchMessages',
+  ] as const;
+
   /** ルート要素 */
   private elm: HTMLElement;
   /** タッチハンドラー */
@@ -32,49 +70,100 @@ export class ResultsView {
   constructor(elm: HTMLElement) {
     this.elm = elm;
 
-    const status = this.elm.querySelector(
-      'header.header > .left > .status'
-    ) as HTMLElement;
-    const messages = this.elm.querySelector('#Messages') as HTMLElement;
+    // DOM要素の取得
+    const { status, messages, thead, tbody, tablecontainer } =
+      this.getDOMElements();
+    this.tbody = tbody;
+    this.tablecontainer = tablecontainer;
 
     // ストアマネージャーのバインド
-    storeManager.bind('searchStatus', this);
-    storeManager.bind('searchResults', this);
-    storeManager.bind('columns', this);
-    storeManager.bind('offset', this);
-    storeManager.bind('karyotype', this);
-    storeManager.bind('searchMessages', this);
-    document.addEventListener('keydown', this.keydown.bind(this));
+    this.bindToStoreManager();
 
-    // スクロールバーの生成
-    this.elm
-      .querySelector('.tablecontainer')!
-      .insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
-    new ScrollBar(this.elm.querySelector('.scroll-bar') as HTMLElement);
+    // UI要素の初期化
+    this.initializeScrollBar();
+    this.initializeTableHeader(thead);
+    const stylesheet = this.createStylesheet();
 
-    // ヘッダ+ ヘッダのツールチップ用のデータ設定
-    const thead = this.elm.querySelector(
-      '.tablecontainer > table.results-view > thead'
+    // ハンドラーの初期化
+    this.initializeHandlers(status, messages, stylesheet);
+
+    // 初期設定
+    this.setupInitialConfiguration();
+  }
+
+  /**
+   * DOM要素を取得する
+   */
+  private getDOMElements() {
+    const status = this.elm.querySelector(
+      ResultsView.SELECTORS.STATUS
     ) as HTMLElement;
+    const messages = this.elm.querySelector(
+      ResultsView.SELECTORS.MESSAGES
+    ) as HTMLElement;
+    const thead = this.elm.querySelector(
+      ResultsView.SELECTORS.TABLE_THEAD
+    ) as HTMLElement;
+    const tbody = this.elm.querySelector(
+      ResultsView.SELECTORS.TABLE_TBODY
+    ) as HTMLElement;
+    const tablecontainer = this.elm.querySelector(
+      ResultsView.SELECTORS.TABLE_CONTAINER
+    ) as HTMLElement;
+
+    return { status, messages, thead, tbody, tablecontainer };
+  }
+
+  /**
+   * ストアマネージャーにバインドする
+   */
+  private bindToStoreManager(): void {
+    ResultsView.STORE_BINDINGS.forEach((key) => {
+      storeManager.bind(key, this);
+    });
+    document.addEventListener('keydown', this.keydown.bind(this));
+  }
+
+  /**
+   * スクロールバーを初期化する
+   */
+  private initializeScrollBar(): void {
+    this.elm
+      .querySelector(ResultsView.SELECTORS.TABLE_CONTAINER)!
+      .insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
+    new ScrollBar(
+      this.elm.querySelector(ResultsView.SELECTORS.SCROLL_BAR) as HTMLElement
+    );
+  }
+
+  /**
+   * テーブルヘッダーを初期化する
+   */
+  private initializeTableHeader(thead: HTMLElement): void {
     thead.innerHTML = `<tr>${COLUMNS.map(
       (column) =>
         `<th class="${column.id}"><p data-tooltip-id="table-header-${column.id}">${column.label}</p></th>`
     ).join('')}</tr>`;
+  }
 
-    this.tbody = this.elm.querySelector(
-      '.tablecontainer > table.results-view > tbody'
-    ) as HTMLElement;
-
-    this.tablecontainer = this.elm.querySelector(
-      '.tablecontainer'
-    ) as HTMLElement;
-
-    // カラムの表示を制御するためのスタイルシート
+  /**
+   * スタイルシートを作成する
+   */
+  private createStylesheet(): HTMLStyleElement {
     const stylesheet = document.createElement('style');
     stylesheet.type = 'text/css';
     document.getElementsByTagName('head')[0].appendChild(stylesheet);
+    return stylesheet;
+  }
 
-    // ハンドラーの初期化
+  /**
+   * ハンドラーを初期化する
+   */
+  private initializeHandlers(
+    status: HTMLElement,
+    messages: HTMLElement,
+    stylesheet: HTMLStyleElement
+  ): void {
     this.touchHandler = new ResultsViewTouchHandler(
       this.elm,
       this.tbody,
@@ -91,19 +180,31 @@ export class ResultsView {
 
     // コールバック設定
     this.setupEventHandlers();
+  }
 
+  /**
+   * 初期設定を行う
+   */
+  private setupInitialConfiguration(): void {
     // 初期化
     this.dataManager.handleColumnsChange(storeManager.getData('columns'));
     this.scrollHandler.updateLastScrollFromOffset();
 
     // 初期状態のpointer-events設定
-    if (this.touchHandler.isTouchEnabled) {
-      // タッチデバイスでは初期状態をnoneに設定
-      this.touchHandler.setTouchElementsPointerEvents(false);
-    } else {
-      // 非タッチデバイスではpointer-eventsを有効化
-      this.touchHandler.setTouchElementsPointerEvents(true);
-    }
+    this.touchHandler.setTouchElementsPointerEvents(
+      !this.touchHandler.isTouchEnabled
+    );
+  }
+
+  /**
+   * ホイールイベント名を取得する
+   */
+  private getWheelEventName(): string {
+    return 'onwheel' in document
+      ? 'wheel'
+      : 'onmousewheel' in document
+      ? 'mousewheel'
+      : 'DOMMouseScroll';
   }
 
   /**
@@ -111,13 +212,10 @@ export class ResultsView {
    */
   private setupEventHandlers(): void {
     // PC用のホイールイベント
-    const mousewheelevent =
-      'onwheel' in document
-        ? 'wheel'
-        : 'onmousewheel' in document
-        ? 'mousewheel'
-        : 'DOMMouseScroll';
-    this.tbody.addEventListener(mousewheelevent, this.scroll.bind(this));
+    this.tbody.addEventListener(
+      this.getWheelEventName(),
+      this.scroll.bind(this)
+    );
 
     // タッチハンドラーのコールバック設定
     this.touchHandler.setScrollCallbacks({
@@ -159,11 +257,7 @@ export class ResultsView {
    * 検索メッセージの表示
    * @param messages - メッセージオブジェクト
    */
-  searchMessages(messages: {
-    notice?: string;
-    warning?: string;
-    error?: string;
-  }): void {
+  searchMessages(messages: SearchMessages): void {
     this.dataManager.handleSearchMessages(messages);
   }
 
@@ -171,7 +265,7 @@ export class ResultsView {
    * 検索ステータスの表示
    * @param status - ステータスオブジェクト
    */
-  searchStatus(status: { available: number; filtered: number }): void {
+  searchStatus(status: SearchStatus): void {
     this.dataManager.handleSearchStatus(status);
   }
 
@@ -191,7 +285,7 @@ export class ResultsView {
    * カラムの表示／非表示を制御する
    * @param columns - カラム設定の配列
    */
-  columns(columns: Array<{ id: string; isUsed: boolean }>): void {
+  columns(columns: ColumnConfig[]): void {
     this.dataManager.handleColumnsChange(columns);
   }
 
