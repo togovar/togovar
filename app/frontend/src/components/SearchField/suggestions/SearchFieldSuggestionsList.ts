@@ -39,6 +39,9 @@ class SearchFieldSuggestionsList extends LitElement {
   /** Column title in case of Simple search */
   @property() title: string = '';
 
+  /** Whether API response has been received */
+  @property({ type: Boolean }) hasApiResponse: boolean = false;
+
   /**
    * Handle suggestion selection
    * @param item - The selected suggestion item
@@ -57,7 +60,9 @@ class SearchFieldSuggestionsList extends LitElement {
     return html`
       ${this.title ? html`<h3 class="title">${this.title}</h3>` : nothing}
       <ul class="list">
-        ${!this.suggestData || this.suggestData.length === 0
+        ${!this.hasApiResponse
+          ? nothing
+          : !this.suggestData || this.suggestData.length === 0
           ? html`<li class="item -empty">No results</li>`
           : map(
               this.suggestData,

@@ -43,6 +43,8 @@ export interface SearchFieldHost extends ReactiveControllerHost {
   term: string;
   showSuggestions: boolean;
   suppressSuggestions: boolean;
+  hasApiResponse: boolean;
+  hasUserInput: boolean;
   currentSuggestionIndex: number;
   currentSuggestionColumnIndex: number;
   suggestData: { [key: string]: SuggestionData[] };
@@ -87,6 +89,8 @@ class SearchFieldWithSuggestions extends LitElement {
   @state() label: string = ''; // Label of selected suggestion
   @state() showSuggestions: boolean = false; // Whether suggestions are displayed
   @state() suppressSuggestions: boolean = false; // Whether to suppress suggestions after search
+  @state() hasApiResponse: boolean = false; // Whether API response has been received
+  @state() hasUserInput: boolean = false; // Whether user has made input
   @state() currentSuggestionIndex: number = -1; // Position from top of selection
   @state() currentSuggestionColumnIndex: number = 0; // Position from side of selection
   @state() suggestData: { [key: string]: SuggestionData[] } = {}; // Suggest data list
@@ -304,7 +308,7 @@ class SearchFieldWithSuggestions extends LitElement {
         @input-reset=${this.handleInputReset}
       ></search-field>
       <div class="suggestions-container">
-        ${this.suggestData && this.showSuggestions
+        ${this.suggestData && this.showSuggestions && this.hasApiResponse
           ? html`
               ${map(
                 this._suggestionKeysArray,
@@ -321,6 +325,7 @@ class SearchFieldWithSuggestions extends LitElement {
                         .itemLabelKey=${'term'}
                         .subTextKey=${this._searchFieldOptions?.valueMappings
                           ?.aliasOfKey}
+                        .hasApiResponse=${this.hasApiResponse}
                         title=${this._searchFieldOptions?.titleMappings?.[key]}
                         @suggestion-selected=${this.handleSuggestionSelected}
                       ></search-field-suggestions-list>

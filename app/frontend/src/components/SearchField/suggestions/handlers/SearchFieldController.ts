@@ -21,31 +21,40 @@ export class SearchFieldController {
       this.host, // SearchFieldHostはReactiveControllerHostを継承
       debounce(async (dependencies: readonly unknown[]) => {
         const term = dependencies[0] as string;
-        if (term && term.length >= 3) {
+        // ユーザーが実際に入力を行った場合のみAPI呼び出しを実行
+        if (term && term.length >= 3 && this.host.hasUserInput) {
+          this.host.hasApiResponse = false;
           this.host.showSuggestions = true;
 
           if (!this._getSuggestURL) {
             throw new Error('Suggest URL function is not set');
           }
 
-          const { data } = await axios.get(this._getSuggestURL(term));
-          let dataToReturn: { [key: string]: SuggestionData[] };
+          try {
+            const { data } = await axios.get(this._getSuggestURL(term));
+            let dataToReturn: { [key: string]: SuggestionData[] };
 
-          // Make suggestion data same format for simple & gene etc search
-          if (Array.isArray(data)) {
-            // for AdvancedSearch
-            dataToReturn = { data: data as SuggestionData[] };
-            this.host._suggestionKeysArray = ['data'];
-          } else {
-            // for SimpleSearch
-            dataToReturn = data as { [key: string]: SuggestionData[] };
-            this.host._suggestionKeysArray = Object.keys(data);
+            // Make suggestion data same format for simple & gene etc search
+            if (Array.isArray(data)) {
+              // for AdvancedSearch
+              dataToReturn = { data: data as SuggestionData[] };
+              this.host._suggestionKeysArray = ['data'];
+            } else {
+              // for SimpleSearch
+              dataToReturn = data as { [key: string]: SuggestionData[] };
+              this.host._suggestionKeysArray = Object.keys(data);
+            }
+
+            this.host.suggestData = dataToReturn;
+            this.host.hasApiResponse = true;
+            return dataToReturn;
+          } catch (error) {
+            this.host.hasApiResponse = true; // エラーでもレスポンスは受信したとみなす
+            throw error;
           }
-
-          this.host.suggestData = dataToReturn;
-          return dataToReturn;
         }
         this.host.showSuggestions = false;
+        this.host.hasApiResponse = false;
         return {};
       }, 300),
       () => [this.host.term]
@@ -78,5 +87,6 @@ export class SearchFieldController {
   /** サジェストデータをクリア */
   clearSuggestData(): void {
     this.host.suggestData = {};
+    this.host.hasApiResponse = false;
   }
 }

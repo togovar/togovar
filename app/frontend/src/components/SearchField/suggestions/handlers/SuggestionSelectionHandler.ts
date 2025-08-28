@@ -42,6 +42,8 @@ export class SuggestionSelectionHandler {
 
     // サジェスト選択後はサジェストを抑制
     this.host.suppressSuggestions = true;
+    // サジェスト選択後はユーザー入力フラグもリセット
+    this.host.hasUserInput = false;
 
     this.host.dispatchEvent(
       new CustomEvent('new-suggestion-selected', {
@@ -59,6 +61,8 @@ export class SuggestionSelectionHandler {
   searchWithoutSelect = (term: string): void => {
     // 検索実行後はサジェストを抑制
     this.host.suppressSuggestions = true;
+    // 検索実行後はユーザー入力フラグもリセット
+    this.host.hasUserInput = false;
     
     this.host.dispatchEvent(
       new CustomEvent('search-term-enter', {
