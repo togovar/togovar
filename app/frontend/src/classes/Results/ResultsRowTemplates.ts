@@ -1,9 +1,13 @@
 import { getSimpleSearchConditionMaster } from '../../store/searchManager';
 import { DatasetMasterItem } from '../../types';
 
+/** Ref/Alt列で表示する配列の最大長 */
 export const REF_ALT_SHOW_LENGTH = 4;
 
-// 各カラムのHTMLテンプレートを定数として分離
+/**
+ * 各カラムのHTMLテンプレートを定数として定義
+ * テーブルの各列に対応するHTML構造を提供
+ */
 export const COLUMN_TEMPLATES = {
   togovar_id:
     '<td class="togovar_id"><a href="" class="hyper-text -internal" target="_blank"></a></td>',
@@ -26,7 +30,14 @@ export const COLUMN_TEMPLATES = {
     '<td class="polyphen"><div class="variant-function" data-function=""></div></td>',
 } as const;
 
-/** 頻度カラムのHTMLを生成 */
+/**
+ * アレル頻度(Alt frequency)カラムのHTMLを動的に生成
+ *
+ * データセットマスタから頻度データを持つデータセットを取得し、
+ * 各データセットに対応するlogarithmized-block-graph-frequency-view要素を生成する
+ *
+ * @returns 生成されたHTMLテーブルセル文字列
+ */
 export function createFrequencyColumnHTML(): string {
   const master: DatasetMasterItem[] =
     getSimpleSearchConditionMaster('dataset').items;
