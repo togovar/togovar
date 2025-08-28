@@ -1,35 +1,76 @@
 import { storeManager } from '../../store/StoreManager';
-import { ResultsRowView } from './ResultsRowView.ts';
+import { ResultsRowView } from './ResultsRowView';
 import ScrollBar from './../ScrollBar.js';
 import { TR_HEIGHT, COMMON_FOOTER_HEIGHT, COLUMNS } from '../../global.js';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 
+/**
+ * 検索結果テーブルビューを管理するクラス
+ * スクロール機能、タッチ操作、行の表示管理を行う
+ */
 export class ResultsView {
-  static SCROLL_SENSITIVITY = 0.1; // スクロール感度の調整
-  static SCROLL_THRESHOLD = 10; // スクロール判定の閾値（ピクセル）
-  static TAP_THRESHOLD = 300; // タップ判定の閾値（ミリ秒）
+  /** スクロール感度の調整 */
+  static readonly SCROLL_SENSITIVITY: number = 0.1;
+  /** スクロール判定の閾値（ピクセル） */
+  static readonly SCROLL_THRESHOLD: number = 10;
+  /** タップ判定の閾値（ミリ秒） */
+  static readonly TAP_THRESHOLD: number = 300;
 
-  constructor(elm) {
+  /** ルート要素 */
+  private elm: HTMLElement;
+  /** 結果行のビューインスタンス配列 */
+  private rows: ResultsRowView[] = [];
+  /** 最後のスクロール位置 */
+  private lastScroll: number = 0;
+  /** ステータス表示要素 */
+  private status: HTMLElement;
+  /** メッセージ表示要素 */
+  private messages: HTMLElement;
+  /** テーブルボディ要素 */
+  private tbody: HTMLElement;
+  /** テーブルコンテナ要素 */
+  private tablecontainer: HTMLElement;
+  /** カラム表示制御用スタイルシート */
+  private stylesheet: HTMLStyleElement;
+
+  // タッチスクロール用変数
+  /** タッチ開始Y座標 */
+  private touchStartY: number = 0;
+  /** タッチ開始X座標 */
+  private touchStartX: number = 0;
+  /** タッチ開始時刻 */
+  private touchStartTime: number = 0;
+  /** 最後のタッチY座標 */
+  private touchLastY: number = 0;
+  /** 最後のタッチX座標 */
+  private touchLastX: number = 0;
+  /** スクロール中フラグ */
+  private isScrolling: boolean = false;
+  /** 最後のタッチ時刻 */
+  private lastTouchTime: number = 0;
+
+  // タッチ検出用変数
+  /** タッチ移動距離 */
+  private touchDistance: number = 0;
+  /** タッチ継続時間 */
+  private touchDuration: number = 0;
+  /** タッチデバイス判定フラグ */
+  private isTouchDevice: boolean = false;
+  /** タッチ開始時のオフセット */
+  private touchStartOffset: number = 0;
+
+  /**
+   * ResultsViewのコンストラクタ
+   * @param elm - 結果表示用のルート要素
+   */
+  constructor(elm: HTMLElement) {
     this.elm = elm;
-    this.rows = [];
-    this.lastScroll = 0;
-    this.status = this.elm.querySelector('header.header > .left > .status');
-    this.messages = this.elm.querySelector('#Messages');
+    this.status = this.elm.querySelector(
+      'header.header > .left > .status'
+    ) as HTMLElement;
+    this.messages = this.elm.querySelector('#Messages') as HTMLElement;
 
-    // Variables for touch scrolling
-    this.touchStartY = 0;
-    this.touchStartX = 0;
-    this.touchStartTime = 0;
-    this.touchLastY = 0;
-    this.touchLastX = 0;
-    this.isScrolling = false;
-    this.lastTouchTime = 0;
-
-    // Variables for touch detection
-    this.touchDistance = 0;
-    this.touchDuration = 0;
-    this.isTouchDevice = false;
-
+    // ストアマネージャーのバインド
     storeManager.bind('searchStatus', this);
     storeManager.bind('searchResults', this);
     storeManager.bind('columns', this);
@@ -38,25 +79,27 @@ export class ResultsView {
     storeManager.bind('searchMessages', this);
     document.addEventListener('keydown', this.keydown.bind(this));
 
-    // Touch device detection
+    // タッチデバイス検出
     this.detectTouchDevice();
 
     // スクロールバーの生成
     this.elm
-      .querySelector('.tablecontainer')
+      .querySelector('.tablecontainer')!
       .insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
-    new ScrollBar(this.elm.querySelector('.scroll-bar'));
+    new ScrollBar(this.elm.querySelector('.scroll-bar') as HTMLElement);
+
     // ヘッダ+ ヘッダのツールチップ用のデータ設定
-    this.elm.querySelector(
+    const thead = this.elm.querySelector(
       '.tablecontainer > table.results-view > thead'
-    ).innerHTML = `<tr>${COLUMNS.map(
+    ) as HTMLElement;
+    thead.innerHTML = `<tr>${COLUMNS.map(
       (column) =>
         `<th class="${column.id}"><p data-tooltip-id="table-header-${column.id}">${column.label}</p></th>`
     ).join('')}</tr>`;
 
     this.tbody = this.elm.querySelector(
       '.tablecontainer > table.results-view > tbody'
-    );
+    ) as HTMLElement;
 
     // スクロール制御
     this.setupScrollEvents();
@@ -80,17 +123,22 @@ export class ResultsView {
     }
   }
 
-  // Touch device detection
-  detectTouchDevice() {
+  /**
+   * タッチデバイスを検出する
+   */
+  private detectTouchDevice(): void {
     this.isTouchDevice =
       'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }
 
-  // タッチ要素のpointer-eventsを制御
-  setTouchElementsPointerEvents(enabled) {
+  /**
+   * タッチ要素のpointer-eventsを制御する
+   * @param enabled - pointer-eventsを有効にするかどうか
+   */
+  private setTouchElementsPointerEvents(enabled: boolean): void {
     const touchElements = this.elm.querySelectorAll(
       '.tablecontainer > table > tbody > tr, .tablecontainer > table > tbody > td, .tablecontainer > table > tbody > td *'
-    );
+    ) as NodeListOf<HTMLElement>;
 
     touchElements.forEach((element) => {
       if (enabled) {
@@ -103,19 +151,24 @@ export class ResultsView {
     // リンク要素は常に有効にする
     const linkElements = this.elm.querySelectorAll(
       '.tablecontainer > table > tbody > td a'
-    );
+    ) as NodeListOf<HTMLElement>;
     linkElements.forEach((element) => {
       element.style.pointerEvents = 'auto';
     });
   }
 
-  // offsetからthis.lastScrollを更新するメソッド
-  updateLastScrollFromOffset() {
+  /**
+   * offsetからthis.lastScrollを更新する
+   */
+  private updateLastScrollFromOffset(): void {
     const currentOffset = storeManager.getData('offset') || 0;
     this.lastScroll = currentOffset * TR_HEIGHT;
   }
 
-  setupScrollEvents() {
+  /**
+   * スクロールイベントを設定する
+   */
+  private setupScrollEvents(): void {
     // PC用のホイールイベント
     const mousewheelevent =
       'onwheel' in document
@@ -126,7 +179,9 @@ export class ResultsView {
     this.tbody.addEventListener(mousewheelevent, this.scroll.bind(this));
 
     // tablecontainerの要素を取得
-    this.tablecontainer = this.elm.querySelector('.tablecontainer');
+    this.tablecontainer = this.elm.querySelector(
+      '.tablecontainer'
+    ) as HTMLElement;
 
     // モバイル・タブレット用のタッチイベント（ResultsViewの範囲内のみ）
     const touchElements = [this.tablecontainer, this.tbody];
@@ -153,9 +208,16 @@ export class ResultsView {
     );
   }
 
-  handleTouchStart(e) {
+  /**
+   * タッチ開始イベントを処理する
+   * @param e - タッチイベント
+   */
+  private handleTouchStart(e: TouchEvent): void {
     // ResultsViewの範囲内かどうかをチェック
-    if (!this.elm.contains(e.target) && !this.elm.contains(e.currentTarget)) {
+    if (
+      !this.elm.contains(e.target as Node) &&
+      !this.elm.contains(e.currentTarget as Node)
+    ) {
       return;
     }
 
@@ -187,11 +249,18 @@ export class ResultsView {
     this.setTouchElementsPointerEvents(true);
   }
 
-  handleTouchMove(e) {
+  /**
+   * タッチ移動イベントを処理する
+   * @param e - タッチイベント
+   */
+  private handleTouchMove(e: TouchEvent): void {
     if (e.touches.length !== 1) return;
 
     // ResultsViewの範囲内かどうかをチェック
-    if (!this.elm.contains(e.target) && !this.elm.contains(e.currentTarget)) {
+    if (
+      !this.elm.contains(e.target as Node) &&
+      !this.elm.contains(e.currentTarget as Node)
+    ) {
       return;
     }
 
@@ -231,7 +300,11 @@ export class ResultsView {
     }
   }
 
-  handleTouchEnd(e) {
+  /**
+   * タッチ終了イベントを処理する
+   * @param e - タッチイベント
+   */
+  private handleTouchEnd(e: TouchEvent): void {
     this.touchDuration = Date.now() - this.touchStartTime;
 
     // タップ判定：移動距離が少なく、時間が短い場合
@@ -262,27 +335,36 @@ export class ResultsView {
     this.lastTouchTime = 0;
   }
 
-  // タップ処理完了時の処理
-  handleTapCompleted(e) {
+  /**
+   * タップ処理完了時の処理
+   * @param e - カスタムイベント
+   */
+  private handleTapCompleted(e: Event): void {
     if (!this.isTouchDevice) return;
 
     // タップ処理完了後、一時的にpointer-eventsを無効化
     this.setTouchElementsPointerEvents(false);
   }
 
-  // スクロールバーのアクティブ状態を解除
-  deactivateScrollBar() {
-    const scrollBar = this.elm.querySelector('.scroll-bar');
+  /**
+   * スクロールバーのアクティブ状態を解除する
+   */
+  private deactivateScrollBar(): void {
+    const scrollBar = this.elm.querySelector('.scroll-bar') as HTMLElement;
     if (scrollBar) {
       scrollBar.classList.remove('-active');
     }
   }
 
-  handleScroll(deltaY) {
+  /**
+   * スクロール処理を行う
+   * @param deltaY - Y方向のスクロール量
+   */
+  private handleScroll(deltaY: number): void {
     const totalHeight = storeManager.getData('numberOfRecords') * TR_HEIGHT;
     let availableScrollY =
         totalHeight - storeManager.getData('rowCount') * TR_HEIGHT,
-      wheelScroll;
+      wheelScroll: number;
     availableScrollY = availableScrollY < 0 ? 0 : availableScrollY;
 
     // スクロール量の計算
@@ -301,8 +383,11 @@ export class ResultsView {
     storeManager.setData('offset', offset);
   }
 
-  // スクロールバーを直接操作している感覚のスクロール処理
-  handleScrollWithScrollBarFeedback(deltaY) {
+  /**
+   * スクロールバーを直接操作している感覚のスクロール処理
+   * @param deltaY - Y方向のスクロール量
+   */
+  private handleScrollWithScrollBarFeedback(deltaY: number): void {
     const rowCount = storeManager.getData('rowCount');
     const numberOfRecords = storeManager.getData('numberOfRecords');
 
@@ -329,17 +414,22 @@ export class ResultsView {
     storeManager.setData('offset', newOffset);
   }
 
-  // スクロールバーの位置を初期化
-  initializeScrollBarPosition() {
-    const scrollBar = this.elm.querySelector('.scroll-bar');
+  /**
+   * スクロールバーの位置を初期化する
+   */
+  private initializeScrollBarPosition(): void {
+    const scrollBar = this.elm.querySelector('.scroll-bar') as HTMLElement;
     if (scrollBar) {
       scrollBar.classList.add('-active');
     }
   }
 
-  // スクロールバーを直接操作している感覚で更新
-  updateScrollBarDirectly(offset) {
-    const scrollBar = this.elm.querySelector('.scroll-bar');
+  /**
+   * スクロールバーを直接操作している感覚で更新する
+   * @param offset - オフセット値
+   */
+  private updateScrollBarDirectly(offset: number): void {
+    const scrollBar = this.elm.querySelector('.scroll-bar') as HTMLElement;
     if (!scrollBar) return;
 
     const rowCount = storeManager.getData('rowCount');
@@ -357,15 +447,15 @@ export class ResultsView {
     const barTop = Math.ceil(offset * TR_HEIGHT * availableRate);
 
     // スクロールバーの位置を直接更新
-    const bar = scrollBar.querySelector('.bar');
+    const bar = scrollBar.querySelector('.bar') as HTMLElement;
     if (bar) {
       bar.style.height = `${barHeight}px`;
       bar.style.top = `${barTop}px`;
 
       // 位置表示も更新
-      const position = bar.querySelector('.position');
+      const position = bar.querySelector('.position') as HTMLElement;
       if (position) {
-        position.textContent = offset + 1;
+        position.textContent = String(offset + 1);
       }
     }
 
@@ -373,7 +463,10 @@ export class ResultsView {
     scrollBar.classList.add('-active');
   }
 
-  updateDisplaySize() {
+  /**
+   * 表示サイズを更新する
+   */
+  private updateDisplaySize(): void {
     if (storeManager.getData('isFetching')) {
       // フェッチ中は処理をスキップ
       return;
@@ -424,14 +517,22 @@ export class ResultsView {
     });
   }
 
-  scroll(e) {
+  /**
+   * スクロールイベントハンドラ
+   * @param e - ホイールイベント
+   */
+  private scroll(e: WheelEvent): void {
     e.stopPropagation();
     // 縦方向にスクロールしていない場合スルー
     if (e.deltaY === 0) return;
     this.handleScroll(e.deltaY);
   }
 
-  offset(offset) {
+  /**
+   * オフセットの変更時の処理
+   * @param offset - 新しいオフセット値
+   */
+  offset(offset: number): void {
     this.lastScroll = offset * TR_HEIGHT;
 
     // データ更新中は処理をスキップ
@@ -443,8 +544,9 @@ export class ResultsView {
     }
 
     // 染色体位置
-    const displayingRegions1 = {},
-      displayingRegions2 = {};
+    const displayingRegions1: { [key: string]: number[] } = {},
+      displayingRegions2: { [key: string]: { start: number; end: number } } =
+        {};
 
     for (let i = 0; i <= storeManager.getData('rowCount') - 1; i++) {
       const record = storeManager.getRecordByIndex(i);
@@ -470,7 +572,15 @@ export class ResultsView {
     }
   }
 
-  searchMessages(messages) {
+  /**
+   * 検索メッセージの表示
+   * @param messages - メッセージオブジェクト
+   */
+  searchMessages(messages: {
+    notice?: string;
+    warning?: string;
+    error?: string;
+  }): void {
     this.messages.innerHTML = '';
 
     if (messages.notice) {
@@ -484,11 +594,12 @@ export class ResultsView {
     }
   }
 
-  // bindings ///////////////////////////
-
-  searchStatus(status) {
+  /**
+   * 検索ステータスの表示
+   * @param status - ステータスオブジェクト
+   */
+  searchStatus(status: { available: number; filtered: number }): void {
     this.status.innerHTML = `The number of available variations is ${status.available.toLocaleString()} out of <span class="bigger">${status.filtered.toLocaleString()}</span>.`;
-    // this.status.textContent = `The number of available variations is ${status.available.toLocaleString()} out of ${status.filtered.toLocaleString()}.`;
     if (status.filtered === 0) {
       this.elm.classList.add('-not-found');
     } else {
@@ -496,7 +607,11 @@ export class ResultsView {
     }
   }
 
-  searchResults(_results) {
+  /**
+   * 検索結果の表示
+   * @param _results - 検索結果（未使用）
+   */
+  searchResults(_results: any): void {
     // 更新中フラグのチェックを1回だけに
     const isUpdating = storeManager.getData('isStoreUpdating');
     const isFetching = storeManager.getData('isFetching');
@@ -514,7 +629,11 @@ export class ResultsView {
     this.updateDisplaySize();
   }
 
-  _validateData() {
+  /**
+   * データの妥当性を検証する
+   * @returns 検証結果
+   */
+  private _validateData(): boolean {
     const results = storeManager.getData('searchResults');
     const numberOfRecords = storeManager.getData('numberOfRecords');
 
@@ -525,16 +644,19 @@ export class ResultsView {
     );
   }
 
-  // カラムの表示／非表示
-  columns(columns) {
+  /**
+   * カラムの表示／非表示を制御する
+   * @param columns - カラム設定の配列
+   */
+  columns(columns: Array<{ id: string; isUsed: boolean }>): void {
     // 既存のスタイルの削除
-    while (this.stylesheet.sheet.cssRules.length > 0) {
-      this.stylesheet.sheet.deleteRule(0);
+    while (this.stylesheet.sheet!.cssRules.length > 0) {
+      this.stylesheet.sheet!.deleteRule(0);
     }
     // スタイルの追加
     for (let i = 0; i < columns.length; i++) {
       const column = columns[i];
-      this.stylesheet.sheet.insertRule(
+      this.stylesheet.sheet!.insertRule(
         `
       .tablecontainer > table.results-view th.${
         column.id
@@ -546,8 +668,11 @@ export class ResultsView {
     }
   }
 
-  // 上下カーソルタイプで選択行の移動 & ESCで選択解除
-  keydown(e) {
+  /**
+   * キーダウンイベントハンドラ
+   * @param e - キーボードイベント
+   */
+  private keydown(e: KeyboardEvent): void {
     if (storeManager.getData('selectedRow') === undefined) return;
 
     if (keyDownEvent('selectedRow')) {
@@ -565,7 +690,11 @@ export class ResultsView {
     }
   }
 
-  shiftSelectedRow(value) {
+  /**
+   * 選択行を移動する
+   * @param value - 移動量（+1で下、-1で上）
+   */
+  private shiftSelectedRow(value: number): void {
     let currentIndex = storeManager.getData('selectedRow'),
       shiftIndex = currentIndex + value,
       rowCount = storeManager.getData('rowCount'),
@@ -589,7 +718,11 @@ export class ResultsView {
     storeManager.setData('selectedRow', shiftIndex);
   }
 
-  karyotype(_karyotype) {
+  /**
+   * 核型の変更時の処理
+   * @param _karyotype - 核型データ（未使用）
+   */
+  karyotype(_karyotype: any): void {
     this.updateDisplaySize();
   }
 }
