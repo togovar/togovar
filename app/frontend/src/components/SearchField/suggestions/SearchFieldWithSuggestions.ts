@@ -336,7 +336,10 @@ class SearchFieldWithSuggestions extends LitElement {
         @input-reset=${this.handleInputReset}
       ></search-field>
       <div class="suggestions-container">
-        ${this.suggestData && this.showSuggestions && this.hasApiResponse
+        ${this.suggestData &&
+        this.showSuggestions &&
+        this.hasApiResponse &&
+        !this.hideSuggestions
           ? html`
               ${map(
                 this._suggestionKeysArray,
