@@ -1,25 +1,11 @@
 import { setSimpleSearchCondition } from '../../../store/searchManager';
 import { storeManager } from '../../../store/StoreManager';
 import { CHROMOSOME_PATTERN } from './SimpleSearchConstants';
-
-/** Host インターフェース */
-interface SimpleSearchHost {
-  _term: string;
-  _value: string;
-  _hideSuggestions: boolean;
-}
-
-/** サジェストアイテムの型 */
-interface SuggestionItem {
-  label: string;
-  [key: string]: any;
-}
-
-/** 例文アイテムの型 */
-interface ExampleItem {
-  value: string;
-  [key: string]: any;
-}
+import {
+  SimpleSearchHost,
+  SuggestionItem,
+  ExampleItem,
+} from './SimpleSearchTypes';
 
 /**
  * SimpleSearchController - SimpleSearchViewのビジネスロジックを担当

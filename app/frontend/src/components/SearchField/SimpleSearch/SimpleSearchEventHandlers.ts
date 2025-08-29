@@ -1,20 +1,11 @@
 /** SimpleSearchEventHandlers - SimpleSearchViewのイベントハンドラーを担当 */
 
-/** Host インターフェース */
-interface SimpleSearchHost {
-  _hideSuggestions: boolean;
-  [key: string]: any;
-}
-
-/** Controller インターフェース */
-interface SimpleSearchControllerInterface {
-  selectSuggestion(suggestion: any): void;
-  selectExample(example: any): void;
-  updateTerm(term: string): void;
-  executeCurrentSearch(): void;
-  executeButtonSearch(): void;
-  reset(): void;
-}
+import {
+  SimpleSearchHost,
+  SimpleSearchControllerInterface,
+  SuggestionItem,
+  ExampleItem,
+} from './SimpleSearchTypes';
 
 export class SimpleSearchEventHandlers {
   private host: SimpleSearchHost;
@@ -32,7 +23,7 @@ export class SimpleSearchEventHandlers {
    * サジェスト選択イベントの処理
    * @param e - new-suggestion-selected イベント
    */
-  handleSuggestionEnter = (e: CustomEvent): void => {
+  handleSuggestionEnter = (e: CustomEvent<SuggestionItem>): void => {
     this.controller.selectSuggestion(e.detail);
   };
 
@@ -40,7 +31,7 @@ export class SimpleSearchEventHandlers {
    * 例文選択イベントの処理
    * @param e - example-selected イベント
    */
-  handleExampleSelected = (e: CustomEvent): void => {
+  handleExampleSelected = (e: CustomEvent<ExampleItem>): void => {
     this.controller.selectExample(e.detail);
   };
 
@@ -48,7 +39,7 @@ export class SimpleSearchEventHandlers {
    * 入力イベントの処理
    * @param e - input-term イベント
    */
-  handleInputTerm = (e: CustomEvent): void => {
+  handleInputTerm = (e: CustomEvent<string>): void => {
     this.controller.updateTerm(e.detail);
   };
 
