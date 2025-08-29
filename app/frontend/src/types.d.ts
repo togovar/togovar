@@ -1,6 +1,15 @@
 // ------------------------------
 // Store
 // ------------------------------
+
+/** 表示される染色体領域の型定義 */
+type DisplayingRegions = {
+  [chromosome: string]: {
+    start: number;
+    end: number;
+  };
+};
+
 type StoreState = {
   karyotype: any;
   searchMode: any;

@@ -1,5 +1,5 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
-import SearchField from '../components/Common/SearchField/SearchField.js';
+import SearchField from '../components/SearchField/SearchField';
 
 /** Variant ID editing screen */
 class ConditionValueEditorVariantID extends ConditionValueEditor {
