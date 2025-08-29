@@ -23,8 +23,14 @@ export class SearchFieldController {
         const term = dependencies[0] as string;
         // ユーザーが実際に入力を行った場合のみAPI呼び出しを実行
         if (term && term.length >= 3 && this.host.hasUserInput) {
-          this.host.hasApiResponse = false;
+          // サジェストを表示状態にする
           this.host.showSuggestions = true;
+          
+          // 既存のサジェストがない場合のみ、APIレスポンス待機状態に設定
+          const hadPreviousData = this.host.hasApiResponse && Object.keys(this.host.suggestData).length > 0;
+          if (!hadPreviousData) {
+            this.host.hasApiResponse = false;
+          }
 
           if (!this._getSuggestURL) {
             throw new Error('Suggest URL function is not set');
@@ -53,8 +59,13 @@ export class SearchFieldController {
             throw error;
           }
         }
-        this.host.showSuggestions = false;
-        this.host.hasApiResponse = false;
+        
+        // 3文字未満の場合のみサジェストを非表示にする
+        // 空文字や短い文字列の場合は、既存のサジェストもクリアする
+        if (!term || term.length < 3) {
+          this.host.showSuggestions = false;
+          this.host.hasApiResponse = false;
+        }
         return {};
       }, 300),
       () => [this.host.term]

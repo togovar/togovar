@@ -12,6 +12,29 @@ import { InputEventHandler } from './handlers/InputEventHandler';
 
 import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
 
+/** SearchFieldWithSuggestionsのデフォルト設定 */
+const DEFAULT_VALUE_MAPPINGS = {
+  valueKey: 'id',
+  labelKey: 'term',
+  aliasOfKey: 'alias_of',
+} as const;
+
+/**
+ * 部分的なオプションを完全なSearchFieldOptionsに変換する
+ * @param options - 部分的なオプション
+ * @returns 完全なSearchFieldOptions
+ */
+function createCompleteSearchFieldOptions(options?: Partial<SearchFieldOptions>): SearchFieldOptions {
+  return {
+    valueMappings: {
+      valueKey: options?.valueMappings?.valueKey || DEFAULT_VALUE_MAPPINGS.valueKey,
+      labelKey: options?.valueMappings?.labelKey || DEFAULT_VALUE_MAPPINGS.labelKey,
+      aliasOfKey: options?.valueMappings?.aliasOfKey || DEFAULT_VALUE_MAPPINGS.aliasOfKey,
+    },
+    titleMappings: options?.titleMappings || {},
+  };
+}
+
 /** Suggestion data structure */
 export interface SuggestionData {
   term?: string;
@@ -130,14 +153,7 @@ class SearchFieldWithSuggestions extends LitElement {
     this.suggestAPIQueryParam = suggestAPIQueryParam;
 
     // デフォルト値とマージして完全なSearchFieldOptionsを作成
-    this._searchFieldOptionsInternal = {
-      valueMappings: {
-        valueKey: options?.valueMappings?.valueKey || 'id',
-        labelKey: options?.valueMappings?.labelKey || 'term',
-        aliasOfKey: options?.valueMappings?.aliasOfKey || 'alias_of',
-      },
-      titleMappings: options?.titleMappings || {},
-    };
+    this._searchFieldOptionsInternal = createCompleteSearchFieldOptions(options);
 
     // 初期化
     this._controller = new SearchFieldController(this);
@@ -186,14 +202,7 @@ class SearchFieldWithSuggestions extends LitElement {
 
     if (changedProperties.has('options') && this.options) {
       // 部分的なオプションを完全なSearchFieldOptionsに変換
-      this._searchFieldOptionsInternal = {
-        valueMappings: {
-          valueKey: this.options.valueMappings?.valueKey || 'id',
-          labelKey: this.options.valueMappings?.labelKey || 'term',
-          aliasOfKey: this.options.valueMappings?.aliasOfKey || 'alias_of',
-        },
-        titleMappings: this.options.titleMappings || {},
-      };
+      this._searchFieldOptionsInternal = createCompleteSearchFieldOptions(this.options);
     }
 
     if (changedProperties.has('hideSuggestions')) {

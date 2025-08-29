@@ -23,14 +23,9 @@ export class SuggestionSelectionHandler {
     const labelKey =
       suggestion[this.host._searchFieldOptions.valueMappings.labelKey] || '';
 
-    // SimpleSearchの場合のみダブルクォートを付け、gene, diseaseの場合は付けない
-    if (this._isSimpleSearch()) {
-      this.host.value = `"${this._escapeString(valueKey)}"`;
-      this.host.label = `"${this._escapeString(labelKey)}"`;
-    } else {
-      this.host.value = this._escapeString(valueKey);
-      this.host.label = this._escapeString(labelKey);
-    }
+    // サジェストの値をフォーマットして設定
+    this.host.value = this._formatSuggestionValue(valueKey);
+    this.host.label = this._formatSuggestionValue(labelKey);
 
     // サジェスト選択後はサジェストを抑制
     this.host.suppressSuggestions = true;
@@ -75,10 +70,11 @@ export class SuggestionSelectionHandler {
   };
 
   /**
-   * 現在の検索フィールドがSimpleSearchモードかどうかを判定
-   * @returns SimpleSearchの場合はtrue、それ以外（gene, diseaseなど）の場合はfalse
+   * 複数のサジェストカラムが存在するかチェック
+   * 複数カラムの場合はSimpleSearchモードとしてダブルクォートを追加する
+   * @returns 複数カラムの場合はtrue、単一カラム（gene, diseaseなど）の場合はfalse
    */
-  private _isSimpleSearch(): boolean {
+  private _hasMultipleSuggestionColumns(): boolean {
     return this.host._suggestionKeysArray.length > 1;
   }
 
@@ -91,5 +87,31 @@ export class SuggestionSelectionHandler {
     return String(str || '')
       .replace(/\\/g, '\\\\')
       .replace(/"/g, '\\"');
+  }
+
+  /**
+   * サジェスト値を適切にフォーマットする
+   * 
+   * SimpleSearchモード（複数カラム）の場合：
+   * - ダブルクォートで囲む（完全一致検索のため）
+   * - 複数の検索対象（遺伝子、疾患など）が混在するため、明示的な区切りが必要
+   * 
+   * 特定検索モード（gene, diseaseなど単一カラム）の場合：
+   * - クォートなし（部分一致検索を許可）
+   * - 検索対象が特定されているため、より柔軟な検索が可能
+   * 
+   * @param value - フォーマットする値
+   * @returns フォーマットされた値
+   */
+  private _formatSuggestionValue(value: string): string {
+    const escapedValue = this._escapeString(value);
+    
+    if (this._hasMultipleSuggestionColumns()) {
+      // SimpleSearchモード: ダブルクォートで囲んで完全一致検索
+      return `"${escapedValue}"`;
+    } else {
+      // 特定検索モード: クォートなしで部分一致検索を許可
+      return escapedValue;
+    }
   }
 }
