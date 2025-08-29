@@ -18,26 +18,18 @@ export class SuggestionSelectionHandler {
    * @param suggestion - 選択されたサジェスト
    */
   select = (suggestion: SuggestionData): void => {
-    const escapeString = (str: string | undefined): string =>
-      String(str || '')
-        .replace(/\\/g, '\\\\')
-        .replace(/"/g, '\\"');
-
     const valueKey =
       suggestion[this.host._searchFieldOptions.valueMappings.valueKey] || '';
     const labelKey =
       suggestion[this.host._searchFieldOptions.valueMappings.labelKey] || '';
 
-    // SimpleSearchの場合のみダブルクォートを付ける
-    // gene, diseaseの場合は付けない
-    const isSimpleSearch = this.host._suggestionKeysArray.length > 1;
-
-    if (isSimpleSearch) {
-      this.host.value = `"${escapeString(valueKey)}"`;
-      this.host.label = `"${escapeString(labelKey)}"`;
+    // SimpleSearchの場合のみダブルクォートを付け、gene, diseaseの場合は付けない
+    if (this._isSimpleSearch()) {
+      this.host.value = `"${this._escapeString(valueKey)}"`;
+      this.host.label = `"${this._escapeString(labelKey)}"`;
     } else {
-      this.host.value = escapeString(valueKey);
-      this.host.label = escapeString(labelKey);
+      this.host.value = this._escapeString(valueKey);
+      this.host.label = this._escapeString(labelKey);
     }
 
     // サジェスト選択後はサジェストを抑制
@@ -63,7 +55,7 @@ export class SuggestionSelectionHandler {
     this.host.suppressSuggestions = true;
     // 検索実行後はユーザー入力フラグもリセット
     this.host.hasUserInput = false;
-    
+
     this.host.dispatchEvent(
       new CustomEvent('search-term-enter', {
         detail: term,
@@ -81,4 +73,23 @@ export class SuggestionSelectionHandler {
   handleSuggestionSelected = (e: CustomEvent<SuggestionData>): void => {
     this.select(e.detail);
   };
+
+  /**
+   * 現在の検索フィールドがSimpleSearchモードかどうかを判定
+   * @returns SimpleSearchの場合はtrue、それ以外（gene, diseaseなど）の場合はfalse
+   */
+  private _isSimpleSearch(): boolean {
+    return this.host._suggestionKeysArray.length > 1;
+  }
+
+  /**
+   * 文字列をエスケープする
+   * @param str - エスケープする文字列
+   * @returns エスケープされた文字列
+   */
+  private _escapeString(str: string | undefined): string {
+    return String(str || '')
+      .replace(/\\/g, '\\\\')
+      .replace(/"/g, '\\"');
+  }
 }
