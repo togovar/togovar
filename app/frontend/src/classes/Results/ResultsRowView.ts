@@ -68,13 +68,17 @@ export class ResultsRowView {
   constructor(index: number) {
     this.index = index;
     this.selected = false;
-    this.tr = this.createTableRow();
+    this.tr = this._createTableRow();
 
     // `selectedRow` の変更を監視し、selectedRow() を活用
     storeManager.subscribe('selectedRow', this.selectedRow.bind(this));
     // `offset` の変更を監視し、テーブル行を更新
     storeManager.subscribe('offset', this.updateTableRow.bind(this));
   }
+
+  // ========================================
+  // Public Methods
+  // ========================================
 
   /**
    * 行がクリックされたときの処理
@@ -113,34 +117,37 @@ export class ResultsRowView {
       storeManager.getData('isFetching') ||
       storeManager.getData('isStoreUpdating')
     ) {
-      return this.setLoadingState();
+      return this._setLoadingState();
     }
 
     // styleで範囲外の行(-out-of-range)は非表示
     const rowCount = storeManager.getData('rowCount');
     if (rowCount <= this.index) {
-      return this.setOutOfRangeState();
+      return this._setOutOfRangeState();
     }
 
     const result = storeManager.getRecordByIndex(this.index);
     if (!result || result === 'loading' || result === 'out of range') {
-      return this.setLoadingState();
+      return this._setLoadingState();
     }
 
-    this.prepareTableData();
+    this._prepareTableData();
 
     // 各カラムのデータ更新
-    COLUMNS.forEach((column) => this.updateColumnContent(column, result));
+    COLUMNS.forEach((column) => this._updateColumnContent(column, result));
 
     this.tr.classList.remove('-loading', '-out-of-range');
   }
 
+  // ========================================
+  // Private Methods
+  // ========================================
   /**
    * テーブル行要素を作成
    *
    * @returns 作成されたテーブル行要素
    */
-  private createTableRow(): HTMLTableRowElement {
+  private _createTableRow(): HTMLTableRowElement {
     const tr = document.createElement('tr');
     tr.classList.add('-loading');
     tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
@@ -151,7 +158,7 @@ export class ResultsRowView {
   /**
    * 行をローディング状態に設定
    */
-  private setLoadingState() {
+  private _setLoadingState() {
     this.tr.classList.add('-loading');
     this.tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
   }
@@ -159,7 +166,7 @@ export class ResultsRowView {
   /**
    * 行を範囲外状態に設定
    */
-  private setOutOfRangeState() {
+  private _setOutOfRangeState() {
     this.tr.classList.add('-out-of-range');
     this.tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
   }
@@ -169,9 +176,9 @@ export class ResultsRowView {
    *
    * HTMLの生成とDOM要素のキャッシュを実行
    */
-  private prepareTableData() {
-    this.tr.innerHTML = this.createTableCellHTML();
-    this.cacheTableCells();
+  private _prepareTableData() {
+    this.tr.innerHTML = this._createTableCellHTML();
+    this._cacheTableCells();
   }
 
   /**
@@ -179,7 +186,7 @@ export class ResultsRowView {
    *
    * @returns 生成されたHTML文字列
    */
-  private createTableCellHTML(): string {
+  private _createTableCellHTML(): string {
     return COLUMNS.map((column) => {
       if (column.id === 'alt_frequency') {
         return createFrequencyColumnHTML();
@@ -193,16 +200,16 @@ export class ResultsRowView {
    *
    * パフォーマンス向上のため、頻繁にアクセスするDOM要素を事前にキャッシュ
    */
-  private cacheTableCells() {
-    this.cacheBasicElements();
-    this.cacheFrequencyElements();
-    this.cacheFunctionElements();
+  private _cacheTableCells() {
+    this._cacheBasicElements();
+    this._cacheFrequencyElements();
+    this._cacheFunctionElements();
   }
 
   /**
    * 基本的なテーブルセル要素をキャッシュ
    */
-  private cacheBasicElements() {
+  private _cacheBasicElements() {
     // TogoVar ID
     this.tdTGVAnchor = this.tr.querySelector('td.togovar_id > a');
 
@@ -247,7 +254,7 @@ export class ResultsRowView {
   /**
    * 頻度関連のテーブルセル要素をキャッシュ
    */
-  private cacheFrequencyElements() {
+  private _cacheFrequencyElements() {
     this.tdFrequencies = {};
     this.tr
       .querySelectorAll(
@@ -265,7 +272,7 @@ export class ResultsRowView {
   /**
    * 機能予測関連のテーブルセル要素をキャッシュ
    */
-  private cacheFunctionElements() {
+  private _cacheFunctionElements() {
     // AlphaMissense
     const tdAlphaMissense = this.tr.querySelector('td.alphamissense');
     this.tdAlphaMissenseFunction =
@@ -287,7 +294,7 @@ export class ResultsRowView {
    * @param column - 更新対象のカラム定義
    * @param result - 表示データ
    */
-  private updateColumnContent(column: Column, result: ResultData) {
+  private _updateColumnContent(column: Column, result: ResultData) {
     const columnHandlers = {
       togovar_id: () =>
         ResultsRowUpdaters.updateTogovarId(

@@ -108,14 +108,14 @@ export class ResultsViewDataManager {
     isTouchDevice: boolean,
     setTouchElementsPointerEvents: (enabled: boolean) => void
   ): void {
-    if (this.shouldSkipUpdate()) {
+    if (this._shouldSkipUpdate()) {
       return;
     }
 
-    const calculation = this.calculateDisplaySize();
-    this.ensureRowsExist(calculation.rowCount);
-    this.adjustOffset(calculation);
-    this.updateRowsWithAnimation(isTouchDevice, setTouchElementsPointerEvents);
+    const calculation = this._calculateDisplaySize();
+    this._ensureRowsExist(calculation.rowCount);
+    this._adjustOffset(calculation);
+    this._updateRowsWithAnimation(isTouchDevice, setTouchElementsPointerEvents);
   }
 
   /**
@@ -123,11 +123,11 @@ export class ResultsViewDataManager {
    * @param offset - 新しいオフセット値
    */
   handleOffsetChange(offset: number): void {
-    if (this.shouldSkipOffsetUpdate()) {
+    if (this._shouldSkipOffsetUpdate()) {
       return;
     }
 
-    const displayingRegions = this.calculateDisplayingRegions();
+    const displayingRegions = this._calculateDisplayingRegions();
     if (Object.keys(displayingRegions).length > 0) {
       storeManager.setData('displayingRegionsOnChromosome', displayingRegions);
     }
@@ -140,9 +140,9 @@ export class ResultsViewDataManager {
   handleSearchMessages(messages: SearchMessages): void {
     this.messages.innerHTML = '';
 
-    this.appendMessageIfExists(messages.notice, 'notice');
-    this.appendMessageIfExists(messages.warning, 'warning');
-    this.appendMessageIfExists(messages.error, 'error');
+    this._appendMessageIfExists(messages.notice, 'notice');
+    this._appendMessageIfExists(messages.warning, 'warning');
+    this._appendMessageIfExists(messages.error, 'error');
   }
 
   /**
@@ -156,7 +156,7 @@ export class ResultsViewDataManager {
       `The number of available variations is ${available.toLocaleString()} ` +
       `out of <span class="bigger">${filtered.toLocaleString()}</span>.`;
 
-    this.updateNotFoundState(filtered === 0);
+    this._updateNotFoundState(filtered === 0);
   }
 
   /**
@@ -185,7 +185,7 @@ export class ResultsViewDataManager {
       return;
     }
 
-    if (!this.validateData()) {
+    if (!this._validateData()) {
       console.warn('データの検証に失敗しました');
       return;
     }
@@ -198,8 +198,8 @@ export class ResultsViewDataManager {
    * @param columns - カラム設定の配列
    */
   handleColumnsChange(columns: ColumnConfig[]): void {
-    this.clearExistingStyles();
-    this.applyColumnStyles(columns);
+    this._clearExistingStyles();
+    this._applyColumnStyles(columns);
   }
 
   /**
@@ -207,9 +207,9 @@ export class ResultsViewDataManager {
    * @param direction - 移動方向（+1で下、-1で上）
    */
   shiftSelectedRow(direction: number): void {
-    const state = this.getSelectionState();
-    const newIndex = this.calculateNewIndex(state, direction);
-    const adjustedOffset = this.adjustOffsetForSelection(
+    const state = this._getSelectionState();
+    const newIndex = this._calculateNewIndex(state, direction);
+    const adjustedOffset = this._adjustOffsetForSelection(
       state,
       newIndex,
       direction
@@ -229,15 +229,15 @@ export class ResultsViewDataManager {
   /**
    * 更新をスキップすべきかチェックする
    */
-  private shouldSkipUpdate(): boolean {
+  private _shouldSkipUpdate(): boolean {
     return storeManager.getData('isFetching');
   }
 
   /**
    * 表示サイズの計算を行う
    */
-  private calculateDisplaySize(): DisplaySizeCalculation {
-    const availableHeight = this.calculateAvailableHeight();
+  private _calculateDisplaySize(): DisplaySizeCalculation {
+    const availableHeight = this._calculateAvailableHeight();
     const maxRowCount = Math.floor(availableHeight / TR_HEIGHT);
     const numberOfRecords = storeManager.getData('numberOfRecords');
     const offset = storeManager.getData('offset');
@@ -256,7 +256,7 @@ export class ResultsViewDataManager {
   /**
    * 利用可能な高さを計算する
    */
-  private calculateAvailableHeight(): number {
+  private _calculateAvailableHeight(): number {
     const karyotypeHeight = storeManager.getData('karyotype')?.height || 0;
     return (
       window.innerHeight -
@@ -270,7 +270,7 @@ export class ResultsViewDataManager {
   /**
    * 必要な行数が確保されているかチェックし、不足分を追加する
    */
-  private ensureRowsExist(requiredRowCount: number): void {
+  private _ensureRowsExist(requiredRowCount: number): void {
     while (this.rows.length < requiredRowCount) {
       const rowIndex = this.rows.length;
       const rowView = new ResultsRowView(rowIndex);
@@ -282,13 +282,13 @@ export class ResultsViewDataManager {
   /**
    * オフセット量を調整する
    */
-  private adjustOffset(calculation: DisplaySizeCalculation): void {
+  private _adjustOffset(calculation: DisplaySizeCalculation): void {
     const { maxRowCount, numberOfRecords, offset } = calculation;
     const visibleRecords = numberOfRecords - offset;
     const emptySpace = maxRowCount - visibleRecords;
 
     if (emptySpace > 0) {
-      const newOffset = this.calculateAdjustedOffset(offset, emptySpace);
+      const newOffset = this._calculateAdjustedOffset(offset, emptySpace);
       storeManager.setData('offset', newOffset);
     }
   }
@@ -296,7 +296,7 @@ export class ResultsViewDataManager {
   /**
    * 調整されたオフセット値を計算する
    */
-  private calculateAdjustedOffset(
+  private _calculateAdjustedOffset(
     currentOffset: number,
     emptySpace: number
   ): number {
@@ -312,7 +312,7 @@ export class ResultsViewDataManager {
   /**
    * アニメーションフレーム内で行の更新を実行する
    */
-  private updateRowsWithAnimation(
+  private _updateRowsWithAnimation(
     isTouchDevice: boolean,
     setTouchElementsPointerEvents: (enabled: boolean) => void
   ): void {
@@ -328,7 +328,7 @@ export class ResultsViewDataManager {
   /**
    * オフセット更新をスキップすべきかチェックする
    */
-  private shouldSkipOffsetUpdate(): boolean {
+  private _shouldSkipOffsetUpdate(): boolean {
     return (
       storeManager.getData('isStoreUpdating') ||
       storeManager.getData('isFetching')
@@ -338,7 +338,7 @@ export class ResultsViewDataManager {
   /**
    * 現在表示中の染色体領域を計算する
    */
-  private calculateDisplayingRegions(): DisplayingRegions {
+  private _calculateDisplayingRegions(): DisplayingRegions {
     const rowCount = storeManager.getData('rowCount');
     const chromosomePositions: { [key: string]: number[] } = {};
 
@@ -346,18 +346,18 @@ export class ResultsViewDataManager {
     for (let i = 0; i < rowCount; i++) {
       const record = storeManager.getRecordByIndex(i) as Record;
 
-      if (this.isValidRecord(record)) {
+      if (this._isValidRecord(record)) {
         (chromosomePositions[record.chromosome] ??= []).push(record.start);
       }
     }
 
-    return this.convertToRegions(chromosomePositions);
+    return this._convertToRegions(chromosomePositions);
   }
 
   /**
    * レコードが有効かチェックする
    */
-  private isValidRecord(record: any): record is Record {
+  private _isValidRecord(record: any): record is Record {
     return (
       record &&
       typeof record === 'object' &&
@@ -369,7 +369,7 @@ export class ResultsViewDataManager {
   /**
    * 染色体位置の配列を領域オブジェクトに変換する
    */
-  private convertToRegions(chromosomePositions: {
+  private _convertToRegions(chromosomePositions: {
     [key: string]: number[];
   }): DisplayingRegions {
     const regions: DisplayingRegions = {};
@@ -388,7 +388,7 @@ export class ResultsViewDataManager {
   /**
    * メッセージが存在する場合にDOMに追加する
    */
-  private appendMessageIfExists(
+  private _appendMessageIfExists(
     message: string | undefined,
     type: string
   ): void {
@@ -400,7 +400,7 @@ export class ResultsViewDataManager {
   /**
    * 検索結果が見つからない状態のUI更新
    */
-  private updateNotFoundState(isNotFound: boolean): void {
+  private _updateNotFoundState(isNotFound: boolean): void {
     if (isNotFound) {
       this.elm.classList.add('-not-found');
     } else {
@@ -412,7 +412,7 @@ export class ResultsViewDataManager {
    * データの妥当性を検証する
    * @returns 検証結果
    */
-  private validateData(): boolean {
+  private _validateData(): boolean {
     const results = storeManager.getData('searchResults');
     const numberOfRecords = storeManager.getData('numberOfRecords');
 
@@ -426,7 +426,7 @@ export class ResultsViewDataManager {
   /**
    * 既存のスタイルをクリアする
    */
-  private clearExistingStyles(): void {
+  private _clearExistingStyles(): void {
     const sheet = this.stylesheet.sheet;
     if (!sheet) return;
 
@@ -438,7 +438,7 @@ export class ResultsViewDataManager {
   /**
    * カラムスタイルを適用する
    */
-  private applyColumnStyles(columns: ColumnConfig[]): void {
+  private _applyColumnStyles(columns: ColumnConfig[]): void {
     const sheet = this.stylesheet.sheet;
     if (!sheet) return;
 
@@ -456,7 +456,7 @@ export class ResultsViewDataManager {
   /**
    * 現在の選択状態を取得する
    */
-  private getSelectionState() {
+  private _getSelectionState() {
     return {
       currentIndex: storeManager.getData('selectedRow'),
       rowCount: storeManager.getData('rowCount'),
@@ -468,7 +468,7 @@ export class ResultsViewDataManager {
   /**
    * 新しい選択インデックスを計算する
    */
-  private calculateNewIndex(state: any, direction: number): number {
+  private _calculateNewIndex(state: any, direction: number): number {
     const newIndex = state.currentIndex + direction;
     return Math.max(0, Math.min(newIndex, state.rowCount - 1));
   }
@@ -476,7 +476,7 @@ export class ResultsViewDataManager {
   /**
    * 選択に応じてオフセットを調整する
    */
-  private adjustOffsetForSelection(
+  private _adjustOffsetForSelection(
     state: any,
     newIndex: number,
     direction: number

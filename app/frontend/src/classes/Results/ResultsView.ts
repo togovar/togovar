@@ -72,23 +72,23 @@ export class ResultsView {
 
     // DOM要素の取得
     const { status, messages, thead, tbody, tablecontainer } =
-      this.getDOMElements();
+      this._getDOMElements();
     this.tbody = tbody;
     this.tablecontainer = tablecontainer;
 
     // ストアマネージャーのバインド
-    this.connectToStoreManager();
+    this._connectToStoreManager();
 
     // UI要素の初期化
-    this.configureScrollBar();
-    this.initializeTableHeader(thead);
-    const stylesheet = this.createStylesheet();
+    this._configureScrollBar();
+    this._initializeTableHeader(thead);
+    const stylesheet = this._createStylesheet();
 
     // ハンドラーの初期化
-    this.initializeComponentHandlers(status, messages, stylesheet);
+    this._initializeComponentHandlers(status, messages, stylesheet);
 
     // 初期設定
-    this.configureInitialState();
+    this._configureInitialState();
   }
 
   // ========================================
@@ -165,7 +165,7 @@ export class ResultsView {
   /**
    * DOM要素を取得する
    */
-  private getDOMElements() {
+  private _getDOMElements() {
     const status = this.elm.querySelector(
       ResultsView.SELECTORS.STATUS
     ) as HTMLElement;
@@ -189,18 +189,18 @@ export class ResultsView {
    * ストアマネージャーに接続する
    * データバインディングとキーボードイベントリスナーを設定
    */
-  private connectToStoreManager(): void {
+  private _connectToStoreManager(): void {
     ResultsView.STORE_BINDINGS.forEach((key) => {
       storeManager.bind(key, this);
     });
-    document.addEventListener('keydown', this.keydown.bind(this));
+    document.addEventListener('keydown', this._keydown.bind(this));
   }
 
   /**
    * スクロールバーを設定する
    * ホイールイベントの検出とスクロールバーの初期状態を構成
    */
-  private configureScrollBar(): void {
+  private _configureScrollBar(): void {
     this.elm
       .querySelector(ResultsView.SELECTORS.TABLE_CONTAINER)!
       .insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
@@ -212,7 +212,7 @@ export class ResultsView {
   /**
    * テーブルヘッダーを初期化する
    */
-  private initializeTableHeader(thead: HTMLElement): void {
+  private _initializeTableHeader(thead: HTMLElement): void {
     thead.innerHTML = `<tr>${COLUMNS.map(
       (column) =>
         `<th class="${column.id}"><p data-tooltip-id="table-header-${column.id}">${column.label}</p></th>`
@@ -222,7 +222,7 @@ export class ResultsView {
   /**
    * スタイルシートを作成する
    */
-  private createStylesheet(): HTMLStyleElement {
+  private _createStylesheet(): HTMLStyleElement {
     const stylesheet = document.createElement('style');
     document.getElementsByTagName('head')[0].appendChild(stylesheet);
     return stylesheet;
@@ -232,7 +232,7 @@ export class ResultsView {
    * コンポーネントハンドラーを初期化する
    * タッチ、スクロール、データ管理の各ハンドラーを作成し、イベントを設定
    */
-  private initializeComponentHandlers(
+  private _initializeComponentHandlers(
     status: HTMLElement,
     messages: HTMLElement,
     stylesheet: HTMLStyleElement
@@ -252,14 +252,14 @@ export class ResultsView {
     );
 
     // コールバック設定
-    this.configureEventHandlers();
+    this._configureEventHandlers();
   }
 
   /**
    * 初期状態を設定する
    * カラム設定、スクロール位置、タッチイベントの初期化
    */
-  private configureInitialState(): void {
+  private _configureInitialState(): void {
     // 初期化
     this.dataManager.handleColumnsChange(storeManager.getData('columns'));
     this.scrollHandler.updateLastScrollFromOffset();
@@ -284,11 +284,11 @@ export class ResultsView {
   /**
    * イベントハンドラーを設定する
    */
-  private configureEventHandlers(): void {
+  private _configureEventHandlers(): void {
     // PC用のホイールイベント
     this.tbody.addEventListener(
       this.getWheelEventName(),
-      this.scroll.bind(this)
+      this._scroll.bind(this)
     );
 
     // タッチハンドラーのコールバック設定
@@ -311,7 +311,7 @@ export class ResultsView {
    * スクロールイベントハンドラ
    * @param e - ホイールイベント
    */
-  private scroll(e: WheelEvent): void {
+  private _scroll(e: WheelEvent): void {
     e.stopPropagation();
     // 縦方向にスクロールしていない場合スルー
     if (e.deltaY === 0) return;
@@ -322,7 +322,7 @@ export class ResultsView {
    * キーダウンイベントハンドラ
    * @param e - キーボードイベント
    */
-  private keydown(e: KeyboardEvent): void {
+  private _keydown(e: KeyboardEvent): void {
     if (storeManager.getData('selectedRow') === undefined) return;
 
     if (keyDownEvent('selectedRow')) {

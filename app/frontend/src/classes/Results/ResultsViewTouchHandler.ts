@@ -112,8 +112,8 @@ export class ResultsViewTouchHandler {
    * @param enabled - pointer-eventsを有効にするかどうか
    */
   setTouchElementsPointerEvents(enabled: boolean): void {
-    this.updateTouchElementsPointerEvents(enabled);
-    this.ensureLinkElementsEnabled();
+    this._updateTouchElementsPointerEvents(enabled);
+    this._ensureLinkElementsEnabled();
   }
 
   // ========================================
@@ -152,15 +152,19 @@ export class ResultsViewTouchHandler {
     const touchElements = [this.tablecontainer, this.tbody];
 
     touchElements.forEach((element) => {
-      element.addEventListener('touchstart', this.handleTouchStart.bind(this), {
+      element.addEventListener(
+        'touchstart',
+        this._handleTouchStart.bind(this),
+        {
+          passive: false,
+          capture: true,
+        }
+      );
+      element.addEventListener('touchmove', this._handleTouchMove.bind(this), {
         passive: false,
         capture: true,
       });
-      element.addEventListener('touchmove', this.handleTouchMove.bind(this), {
-        passive: false,
-        capture: true,
-      });
-      element.addEventListener('touchend', this.handleTouchEnd.bind(this), {
+      element.addEventListener('touchend', this._handleTouchEnd.bind(this), {
         passive: false,
         capture: true,
       });
@@ -168,14 +172,14 @@ export class ResultsViewTouchHandler {
 
     this.tbody.addEventListener(
       'tapCompleted',
-      this.handleTapCompleted.bind(this)
+      this._handleTapCompleted.bind(this)
     );
   }
 
   /**
    * タッチ要素のpointer-eventsを更新する
    */
-  private updateTouchElementsPointerEvents(enabled: boolean): void {
+  private _updateTouchElementsPointerEvents(enabled: boolean): void {
     const touchElements = this.elm.querySelectorAll(
       TOUCH_ELEMENTS_SELECTOR
     ) as NodeListOf<HTMLElement>;
@@ -188,7 +192,7 @@ export class ResultsViewTouchHandler {
   /**
    * リンク要素を常に有効にする
    */
-  private ensureLinkElementsEnabled(): void {
+  private _ensureLinkElementsEnabled(): void {
     const linkElements = this.elm.querySelectorAll(
       '.tablecontainer > table > tbody > td a'
     ) as NodeListOf<HTMLElement>;
@@ -201,7 +205,7 @@ export class ResultsViewTouchHandler {
   /**
    * タッチが有効な範囲内かチェックする
    */
-  private isValidTouchTarget(e: TouchEvent): boolean {
+  private _isValidTouchTarget(e: TouchEvent): boolean {
     return (
       (this.elm.contains(e.target as Node) ||
         this.elm.contains(e.currentTarget as Node)) &&
@@ -213,7 +217,7 @@ export class ResultsViewTouchHandler {
   /**
    * タッチ状態をリセットする
    */
-  private resetTouchState(): void {
+  private _resetTouchState(): void {
     this.touchState.isScrolling = false;
     this.touchState.distance = 0;
     this.touchState.startY = 0;
@@ -227,7 +231,7 @@ export class ResultsViewTouchHandler {
   /**
    * タッチジェスチャーを判定する
    */
-  private analyzeTouchGesture(
+  private _analyzeTouchGesture(
     currentY: number,
     currentX: number
   ): TouchGesture {
@@ -256,12 +260,12 @@ export class ResultsViewTouchHandler {
    * タッチ開始イベントを処理する
    * @param e - タッチイベント
    */
-  private handleTouchStart(e: TouchEvent): void {
-    if (!this.isValidTouchTarget(e) || e.touches.length !== 1) {
+  private _handleTouchStart(e: TouchEvent): void {
+    if (!this._isValidTouchTarget(e) || e.touches.length !== 1) {
       return;
     }
 
-    this.resetTouchState();
+    this._resetTouchState();
 
     const touch = e.touches[0];
     this.touchState.startY = touch.clientY;
@@ -277,13 +281,13 @@ export class ResultsViewTouchHandler {
    * タッチ移動イベントを処理する
    * @param e - タッチイベント
    */
-  private handleTouchMove(e: TouchEvent): void {
-    if (!this.isValidTouchTarget(e) || e.touches.length !== 1) {
+  private _handleTouchMove(e: TouchEvent): void {
+    if (!this._isValidTouchTarget(e) || e.touches.length !== 1) {
       return;
     }
 
     const touch = e.touches[0];
-    const gesture = this.analyzeTouchGesture(touch.clientY, touch.clientX);
+    const gesture = this._analyzeTouchGesture(touch.clientY, touch.clientX);
 
     this.touchState.distance = Math.sqrt(
       gesture.deltaX * gesture.deltaX + gesture.deltaY * gesture.deltaY
@@ -307,7 +311,7 @@ export class ResultsViewTouchHandler {
    * タッチ終了イベントを処理する
    * @param e - タッチイベント
    */
-  private handleTouchEnd(e: TouchEvent): void {
+  private _handleTouchEnd(e: TouchEvent): void {
     this.touchState.duration = Date.now() - this.touchState.startTime;
 
     const isTap =
@@ -324,14 +328,14 @@ export class ResultsViewTouchHandler {
       this.setTouchElementsPointerEvents(true);
     }
 
-    this.resetTouchState();
+    this._resetTouchState();
   }
 
   /**
    * タップ処理完了時の処理
    * @param e - カスタムイベント
    */
-  private handleTapCompleted(e: Event): void {
+  private _handleTapCompleted(e: Event): void {
     if (!this.isTouchDevice) return;
     this.setTouchElementsPointerEvents(false);
   }
