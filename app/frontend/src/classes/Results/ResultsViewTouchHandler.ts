@@ -1,3 +1,6 @@
+/** タッチ対象要素のセレクタ定数 */
+const TOUCH_ELEMENTS_SELECTOR =
+  '.tablecontainer > table > tbody > tr, .tablecontainer > table > tbody > td, .tablecontainer > table > tbody > td *';
 /** スクロールコールバックの型定義 */
 interface ScrollCallbacks {
   onScrollStart?: () => void;
@@ -174,7 +177,7 @@ export class ResultsViewTouchHandler {
    */
   private updateTouchElementsPointerEvents(enabled: boolean): void {
     const touchElements = this.elm.querySelectorAll(
-      '.tablecontainer > table > tbody > tr, .tablecontainer > table > tbody > td, .tablecontainer > table > tbody > td *'
+      TOUCH_ELEMENTS_SELECTOR
     ) as NodeListOf<HTMLElement>;
 
     touchElements.forEach((element) => {
