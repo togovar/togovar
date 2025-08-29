@@ -106,40 +106,20 @@ export class SuggestionKeyboardHandler {
     this.host.currentSuggestionIndex++;
   }
 
-  /** Enterキーの処理 - 選択または検索実行
-   * ホストのメソッドを呼び出してビジネスロジックを実行 */
+  /** Enterキーの処理 - 選択または検索実行 */
   private _handleEnter(): void {
     if (this.host.showSuggestions && this.host.currentSuggestionIndex !== -1) {
-      // サジェストが選択されている場合：選択処理を実行
-      this.host.selectSuggestion(
-        this.host.suggestData[
-          this.host._suggestionKeysArray[this.host.currentSuggestionColumnIndex]
-        ][this.host.currentSuggestionIndex]
-      );
-      [
-        this.host.currentSuggestionIndex,
-        this.host.currentSuggestionColumnIndex,
-      ] = [-1, 0];
-      this.host.hideSuggestionsMethod();
-      // サジェスト選択後はサジェストを抑制
-      this.host.suppressSuggestions = true;
-      // サジェスト選択後はユーザー入力フラグもリセット
-      this.host.hasUserInput = false;
+      // サジェストが選択されている場合：ホストに委譲
+      this.host.selectCurrentSuggestion();
     } else {
-      // サジェストが選択されていない場合：直接検索を実行
-      this.host.searchWithoutSuggestion(this.host.term);
-      // 検索実行後はサジェストを抑制
-      this.host.suppressSuggestions = true;
-      // 検索実行後はユーザー入力フラグもリセット
-      this.host.hasUserInput = false;
+      // サジェストが選択されていない場合：ホストに委譲
+      this.host.executeSearchWithoutSuggestion();
     }
   }
 
   /** Escapeキーの処理 - サジェスト非表示 */
   private _handleEscape(): void {
-    this.host.hideSuggestionsMethod();
-    // Escapeキーでサジェストを手動で閉じた場合も抑制
-    this.host.suppressSuggestions = true;
+    this.host.closeSuggestions();
   }
 
   /** 列間のインデックス調整を処理 */

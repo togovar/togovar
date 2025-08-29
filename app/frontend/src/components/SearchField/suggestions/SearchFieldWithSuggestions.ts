@@ -51,6 +51,9 @@ export interface SearchFieldHost extends ReactiveControllerHost {
   hideSuggestionsMethod(): void;
   selectSuggestion(suggestion: SuggestionData): void;
   searchWithoutSuggestion(term: string): void;
+  selectCurrentSuggestion(): void;
+  executeSearchWithoutSuggestion(): void;
+  closeSuggestions(): void;
   hideControllerSuggestions(): void;
   showControllerSuggestions(): void;
   clearControllerSuggestData(): void;
@@ -249,6 +252,31 @@ class SearchFieldWithSuggestions extends LitElement {
   /** (Only SimpleSearch) Search without suggestions, create search-term-enter event and hide suggest after event firing */
   searchWithoutSuggestion = (term: string): void => {
     return this._selectionHandler.searchWithoutSelect(term);
+  };
+
+  /** Select currently highlighted suggestion with keyboard navigation */
+  selectCurrentSuggestion = (): void => {
+    if (this.showSuggestions && this.currentSuggestionIndex !== -1) {
+      const currentSuggestion =
+        this.suggestData[
+          this._suggestionKeysArray[this.currentSuggestionColumnIndex]
+        ][this.currentSuggestionIndex];
+
+      this.selectSuggestion(currentSuggestion);
+      this.resetKeyboardSelection();
+      this.hideSuggestionsMethod();
+    }
+  };
+
+  /** Execute search without suggestion selection */
+  executeSearchWithoutSuggestion = (): void => {
+    this.searchWithoutSuggestion(this.term);
+  };
+
+  /** Close suggestions and suppress further suggestions */
+  closeSuggestions = (): void => {
+    this.hideSuggestionsMethod();
+    this.suppressSuggestions = true;
   };
 
   /** Hide suggestions using controller */
