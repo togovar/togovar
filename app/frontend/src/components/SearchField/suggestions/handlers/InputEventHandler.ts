@@ -10,20 +10,30 @@ export class InputEventHandler {
   }
 
   /** 入力変更イベントを処理 */
-  handleInput = (e: InputEvent): void => {
-    this.host.term = String(e.detail) || '';
+  handleInput = (e: CustomEvent<string> | InputEvent): void => {
+    // イベントの型に応じて適切なプロパティから値を取得
+    let inputValue: string;
+    if (e instanceof CustomEvent) {
+      inputValue = String(e.detail) || '';
+    } else {
+      // 標準的な InputEvent の場合は data プロパティまたは target.value を使用
+      const target = e.target as HTMLInputElement;
+      inputValue = target?.value || '';
+    }
     
+    this.host.term = inputValue;
+
     // ユーザーが入力を行ったことを記録
     this.host.hasUserInput = true;
-    
+
     // 新しい入力があった場合、サジェスト抑制を解除
     if (this.host.suppressSuggestions) {
       this.host.suppressSuggestions = false;
     }
-    
+
     this.host.dispatchEvent(
       new CustomEvent('input-term', {
-        detail: e.detail || '',
+        detail: inputValue,
         bubbles: true,
         composed: true,
       })
@@ -44,7 +54,11 @@ export class InputEventHandler {
   /** フォーカスインイベントを処理 - 条件を満たす場合サジェストを表示 */
   handleFocusIn = (): void => {
     // ユーザーが実際に入力を行った場合のみサジェストを表示
-    if (this.host.term?.length > 3 && !this.host.suppressSuggestions && this.host.hasUserInput) {
+    if (
+      this.host.term?.length > 3 &&
+      !this.host.suppressSuggestions &&
+      this.host.hasUserInput
+    ) {
       this.host.showControllerSuggestions();
     }
   };
