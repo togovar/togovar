@@ -347,10 +347,7 @@ export class ResultsViewDataManager {
       const record = storeManager.getRecordByIndex(i) as Record;
 
       if (this.isValidRecord(record)) {
-        if (!chromosomePositions[record.chromosome]) {
-          chromosomePositions[record.chromosome] = [];
-        }
-        chromosomePositions[record.chromosome].push(record.start);
+        (chromosomePositions[record.chromosome] ??= []).push(record.start);
       }
     }
 
