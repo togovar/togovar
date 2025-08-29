@@ -77,172 +77,23 @@ export class ResultsView {
     this.tablecontainer = tablecontainer;
 
     // ストアマネージャーのバインド
-    this.bindToStoreManager();
+    this.connectToStoreManager();
 
     // UI要素の初期化
-    this.initializeScrollBar();
+    this.configureScrollBar();
     this.initializeTableHeader(thead);
     const stylesheet = this.createStylesheet();
 
     // ハンドラーの初期化
-    this.initializeHandlers(status, messages, stylesheet);
+    this.initializeComponentHandlers(status, messages, stylesheet);
 
     // 初期設定
-    this.setupInitialConfiguration();
+    this.configureInitialState();
   }
 
-  /**
-   * DOM要素を取得する
-   */
-  private getDOMElements() {
-    const status = this.elm.querySelector(
-      ResultsView.SELECTORS.STATUS
-    ) as HTMLElement;
-    const messages = this.elm.querySelector(
-      ResultsView.SELECTORS.MESSAGES
-    ) as HTMLElement;
-    const thead = this.elm.querySelector(
-      ResultsView.SELECTORS.TABLE_THEAD
-    ) as HTMLElement;
-    const tbody = this.elm.querySelector(
-      ResultsView.SELECTORS.TABLE_TBODY
-    ) as HTMLElement;
-    const tablecontainer = this.elm.querySelector(
-      ResultsView.SELECTORS.TABLE_CONTAINER
-    ) as HTMLElement;
-
-    return { status, messages, thead, tbody, tablecontainer };
-  }
-
-  /**
-   * ストアマネージャーにバインドする
-   */
-  private bindToStoreManager(): void {
-    ResultsView.STORE_BINDINGS.forEach((key) => {
-      storeManager.bind(key, this);
-    });
-    document.addEventListener('keydown', this.keydown.bind(this));
-  }
-
-  /**
-   * スクロールバーを初期化する
-   */
-  private initializeScrollBar(): void {
-    this.elm
-      .querySelector(ResultsView.SELECTORS.TABLE_CONTAINER)!
-      .insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
-    new ScrollBar(
-      this.elm.querySelector(ResultsView.SELECTORS.SCROLL_BAR) as HTMLElement
-    );
-  }
-
-  /**
-   * テーブルヘッダーを初期化する
-   */
-  private initializeTableHeader(thead: HTMLElement): void {
-    thead.innerHTML = `<tr>${COLUMNS.map(
-      (column) =>
-        `<th class="${column.id}"><p data-tooltip-id="table-header-${column.id}">${column.label}</p></th>`
-    ).join('')}</tr>`;
-  }
-
-  /**
-   * スタイルシートを作成する
-   */
-  private createStylesheet(): HTMLStyleElement {
-    const stylesheet = document.createElement('style');
-    stylesheet.type = 'text/css';
-    document.getElementsByTagName('head')[0].appendChild(stylesheet);
-    return stylesheet;
-  }
-
-  /**
-   * ハンドラーを初期化する
-   */
-  private initializeHandlers(
-    status: HTMLElement,
-    messages: HTMLElement,
-    stylesheet: HTMLStyleElement
-  ): void {
-    this.touchHandler = new ResultsViewTouchHandler(
-      this.elm,
-      this.tbody,
-      this.tablecontainer
-    );
-    this.scrollHandler = new ResultsViewScrollHandler(this.elm);
-    this.dataManager = new ResultsViewDataManager(
-      this.elm,
-      status,
-      messages,
-      this.tbody,
-      stylesheet
-    );
-
-    // コールバック設定
-    this.setupEventHandlers();
-  }
-
-  /**
-   * 初期設定を行う
-   */
-  private setupInitialConfiguration(): void {
-    // 初期化
-    this.dataManager.handleColumnsChange(storeManager.getData('columns'));
-    this.scrollHandler.updateLastScrollFromOffset();
-
-    // 初期状態のpointer-events設定
-    this.touchHandler.setTouchElementsPointerEvents(
-      !this.touchHandler.isTouchEnabled
-    );
-  }
-
-  /**
-   * ホイールイベント名を取得する
-   */
-  private getWheelEventName(): string {
-    return 'onwheel' in document
-      ? 'wheel'
-      : 'onmousewheel' in document
-      ? 'mousewheel'
-      : 'DOMMouseScroll';
-  }
-
-  /**
-   * イベントハンドラーを設定する
-   */
-  private setupEventHandlers(): void {
-    // PC用のホイールイベント
-    this.tbody.addEventListener(
-      this.getWheelEventName(),
-      this.scroll.bind(this)
-    );
-
-    // タッチハンドラーのコールバック設定
-    this.touchHandler.setScrollCallbacks({
-      onScrollStart: () => {
-        this.scrollHandler.initializeScrollBarPosition();
-      },
-      onScroll: (deltaY) => {
-        const offset = storeManager.getData('offset') || 0;
-        this.touchHandler.setTouchStartOffset(offset);
-        this.scrollHandler.handleScrollWithScrollBarFeedback(deltaY, offset);
-      },
-      onScrollEnd: () => {
-        this.scrollHandler.deactivateScrollBar();
-      },
-    });
-  }
-
-  /**
-   * スクロールイベントハンドラ
-   * @param e - ホイールイベント
-   */
-  private scroll(e: WheelEvent): void {
-    e.stopPropagation();
-    // 縦方向にスクロールしていない場合スルー
-    if (e.deltaY === 0) return;
-    this.scrollHandler.handleScroll(e.deltaY);
-  }
+  // ========================================
+  // Public Methods
+  // ========================================
 
   /**
    * オフセットの変更時の処理
@@ -290,6 +141,184 @@ export class ResultsView {
   }
 
   /**
+   * 表示サイズを更新する（外部からの呼び出し用）
+   */
+  updateDisplaySize(): void {
+    this.dataManager.updateDisplaySize(
+      this.touchHandler.isTouchEnabled,
+      this.touchHandler.setTouchElementsPointerEvents.bind(this.touchHandler)
+    );
+  }
+
+  /**
+   * 核型の変更時の処理
+   * @param _karyotype - 核型データ（未使用）
+   */
+  karyotype(_karyotype: any): void {
+    this.updateDisplaySize();
+  }
+
+  // ========================================
+  // Private Methods
+  // ========================================
+
+  /**
+   * DOM要素を取得する
+   */
+  private getDOMElements() {
+    const status = this.elm.querySelector(
+      ResultsView.SELECTORS.STATUS
+    ) as HTMLElement;
+    const messages = this.elm.querySelector(
+      ResultsView.SELECTORS.MESSAGES
+    ) as HTMLElement;
+    const thead = this.elm.querySelector(
+      ResultsView.SELECTORS.TABLE_THEAD
+    ) as HTMLElement;
+    const tbody = this.elm.querySelector(
+      ResultsView.SELECTORS.TABLE_TBODY
+    ) as HTMLElement;
+    const tablecontainer = this.elm.querySelector(
+      ResultsView.SELECTORS.TABLE_CONTAINER
+    ) as HTMLElement;
+
+    return { status, messages, thead, tbody, tablecontainer };
+  }
+
+  /**
+   * ストアマネージャーに接続する
+   * データバインディングとキーボードイベントリスナーを設定
+   */
+  private connectToStoreManager(): void {
+    ResultsView.STORE_BINDINGS.forEach((key) => {
+      storeManager.bind(key, this);
+    });
+    document.addEventListener('keydown', this.keydown.bind(this));
+  }
+
+  /**
+   * スクロールバーを設定する
+   * ホイールイベントの検出とスクロールバーの初期状態を構成
+   */
+  private configureScrollBar(): void {
+    this.elm
+      .querySelector(ResultsView.SELECTORS.TABLE_CONTAINER)!
+      .insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
+    new ScrollBar(
+      this.elm.querySelector(ResultsView.SELECTORS.SCROLL_BAR) as HTMLElement
+    );
+  }
+
+  /**
+   * テーブルヘッダーを初期化する
+   */
+  private initializeTableHeader(thead: HTMLElement): void {
+    thead.innerHTML = `<tr>${COLUMNS.map(
+      (column) =>
+        `<th class="${column.id}"><p data-tooltip-id="table-header-${column.id}">${column.label}</p></th>`
+    ).join('')}</tr>`;
+  }
+
+  /**
+   * スタイルシートを作成する
+   */
+  private createStylesheet(): HTMLStyleElement {
+    const stylesheet = document.createElement('style');
+    document.getElementsByTagName('head')[0].appendChild(stylesheet);
+    return stylesheet;
+  }
+
+  /**
+   * コンポーネントハンドラーを初期化する
+   * タッチ、スクロール、データ管理の各ハンドラーを作成し、イベントを設定
+   */
+  private initializeComponentHandlers(
+    status: HTMLElement,
+    messages: HTMLElement,
+    stylesheet: HTMLStyleElement
+  ): void {
+    this.touchHandler = new ResultsViewTouchHandler(
+      this.elm,
+      this.tbody,
+      this.tablecontainer
+    );
+    this.scrollHandler = new ResultsViewScrollHandler(this.elm);
+    this.dataManager = new ResultsViewDataManager(
+      this.elm,
+      status,
+      messages,
+      this.tbody,
+      stylesheet
+    );
+
+    // コールバック設定
+    this.configureEventHandlers();
+  }
+
+  /**
+   * 初期状態を設定する
+   * カラム設定、スクロール位置、タッチイベントの初期化
+   */
+  private configureInitialState(): void {
+    // 初期化
+    this.dataManager.handleColumnsChange(storeManager.getData('columns'));
+    this.scrollHandler.updateLastScrollFromOffset();
+
+    // 初期状態のpointer-events設定
+    this.touchHandler.setTouchElementsPointerEvents(
+      !this.touchHandler.isTouchEnabled
+    );
+  }
+
+  /**
+   * ホイールイベント名を取得する
+   */
+  private getWheelEventName(): string {
+    return 'onwheel' in document
+      ? 'wheel'
+      : 'onmousewheel' in document
+      ? 'mousewheel'
+      : 'DOMMouseScroll';
+  }
+
+  /**
+   * イベントハンドラーを設定する
+   */
+  private configureEventHandlers(): void {
+    // PC用のホイールイベント
+    this.tbody.addEventListener(
+      this.getWheelEventName(),
+      this.scroll.bind(this)
+    );
+
+    // タッチハンドラーのコールバック設定
+    this.touchHandler.setScrollCallbacks({
+      onScrollStart: () => {
+        this.scrollHandler.initializeScrollBarPosition();
+      },
+      onScroll: (deltaY) => {
+        const offset = storeManager.getData('offset') || 0;
+        this.touchHandler.setTouchStartOffset(offset);
+        this.scrollHandler.handleScrollWithScrollBarFeedback(deltaY, offset);
+      },
+      onScrollEnd: () => {
+        this.scrollHandler.deactivateScrollBar();
+      },
+    });
+  }
+
+  /**
+   * スクロールイベントハンドラ
+   * @param e - ホイールイベント
+   */
+  private scroll(e: WheelEvent): void {
+    e.stopPropagation();
+    // 縦方向にスクロールしていない場合スルー
+    if (e.deltaY === 0) return;
+    this.scrollHandler.handleScroll(e.deltaY);
+  }
+
+  /**
    * キーダウンイベントハンドラ
    * @param e - キーボードイベント
    */
@@ -309,23 +338,5 @@ export class ResultsView {
           break;
       }
     }
-  }
-
-  /**
-   * 表示サイズを更新する（外部からの呼び出し用）
-   */
-  updateDisplaySize(): void {
-    this.dataManager.updateDisplaySize(
-      this.touchHandler.isTouchEnabled,
-      this.touchHandler.setTouchElementsPointerEvents.bind(this.touchHandler)
-    );
-  }
-
-  /**
-   * 核型の変更時の処理
-   * @param _karyotype - 核型データ（未使用）
-   */
-  karyotype(_karyotype: any): void {
-    this.updateDisplaySize();
   }
 }

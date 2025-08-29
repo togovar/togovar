@@ -1,6 +1,30 @@
 import { storeManager } from '../../store/StoreManager';
 import { TR_HEIGHT } from '../../global.js';
 
+/** スクロール計算結果の型定義 */
+type ScrollCalculation = {
+  totalHeight: number;
+  availableScrollY: number;
+  newScrollPosition: number;
+};
+
+/** スクロールバーの計算結果の型定義 */
+type ScrollBarCalculation = {
+  barHeight: number;
+  barTop: number;
+  displayRate: number;
+};
+
+/** スクロール境界の型定義 */
+type ScrollBounds = {
+  min: number;
+  max: number;
+};
+
+/** 定数 */
+const MIN_SCROLLBAR_HEIGHT = 30;
+const DEFAULT_OFFSET = 0;
+
 /**
  * スクロール処理を管理するクラス
  * スクロールバーの制御、スクロール量の計算、表示位置の管理を行う
@@ -18,6 +42,10 @@ export class ResultsViewScrollHandler {
   constructor(elm: HTMLElement) {
     this.elm = elm;
   }
+
+  // ========================================
+  // Public Methods
+  // ========================================
 
   /**
    * 最後のスクロール位置を取得
@@ -39,7 +67,7 @@ export class ResultsViewScrollHandler {
    * offsetからthis.lastScrollを更新する
    */
   updateLastScrollFromOffset(): void {
-    const currentOffset = storeManager.getData('offset') || 0;
+    const currentOffset = storeManager.getData('offset') || DEFAULT_OFFSET;
     this.lastScroll = currentOffset * TR_HEIGHT;
   }
 
@@ -47,7 +75,7 @@ export class ResultsViewScrollHandler {
    * スクロールバーのアクティブ状態を解除する
    */
   deactivateScrollBar(): void {
-    const scrollBar = this.elm.querySelector('.scroll-bar') as HTMLElement;
+    const scrollBar = this.getScrollBarElement();
     if (scrollBar) {
       scrollBar.classList.remove('-active');
     }
@@ -58,25 +86,14 @@ export class ResultsViewScrollHandler {
    * @param deltaY - Y方向のスクロール量
    */
   handleScroll(deltaY: number): void {
-    const totalHeight = storeManager.getData('numberOfRecords') * TR_HEIGHT;
-    let availableScrollY =
-        totalHeight - storeManager.getData('rowCount') * TR_HEIGHT,
-      wheelScroll: number;
-    availableScrollY = availableScrollY < 0 ? 0 : availableScrollY;
+    const calculation = this.calculateScrollPosition(deltaY);
 
-    // スクロール量の計算
-    wheelScroll = this.lastScroll + deltaY;
-    wheelScroll = wheelScroll < 0 ? 0 : wheelScroll;
-    wheelScroll =
-      wheelScroll > availableScrollY ? availableScrollY : wheelScroll;
+    if (calculation.newScrollPosition === this.lastScroll) {
+      return;
+    }
 
-    if (wheelScroll === this.lastScroll) return;
-
-    // スクロール量決定
-    this.lastScroll = wheelScroll;
-
-    // 表示行位置
-    let offset = Math.ceil(this.lastScroll / TR_HEIGHT);
+    this.lastScroll = calculation.newScrollPosition;
+    const offset = this.calculateOffsetFromScroll(this.lastScroll);
     storeManager.setData('offset', offset);
   }
 
@@ -89,36 +106,19 @@ export class ResultsViewScrollHandler {
     deltaY: number,
     touchStartOffset: number
   ): void {
-    const rowCount = storeManager.getData('rowCount');
-    const numberOfRecords = storeManager.getData('numberOfRecords');
+    const newOffset = this.calculateTouchScrollOffset(deltaY, touchStartOffset);
+    const boundedOffset = this.clampOffsetToValidRange(newOffset);
 
-    // スクロールバーのドラッグ処理と同じように開始位置からの累積移動量を使用
-    const availableHeight = rowCount * TR_HEIGHT;
-    const offsetRate = deltaY / availableHeight;
-    let newOffset = Math.ceil(offsetRate * numberOfRecords) + touchStartOffset;
-
-    // 境界チェック
-    newOffset = newOffset < 0 ? 0 : newOffset;
-    newOffset =
-      newOffset + rowCount > numberOfRecords
-        ? numberOfRecords - rowCount
-        : newOffset;
-
-    // lastScrollを更新
-    this.lastScroll = newOffset * TR_HEIGHT;
-
-    // スクロールバーを直接操作している感覚でoffsetを更新
-    this.updateScrollBarDirectly(newOffset);
-
-    // データ更新（遅延読み込み機能を維持）
-    storeManager.setData('offset', newOffset);
+    this.lastScroll = boundedOffset * TR_HEIGHT;
+    this.updateScrollBarDirectly(boundedOffset);
+    storeManager.setData('offset', boundedOffset);
   }
 
   /**
    * スクロールバーの位置を初期化する
    */
   initializeScrollBarPosition(): void {
-    const scrollBar = this.elm.querySelector('.scroll-bar') as HTMLElement;
+    const scrollBar = this.getScrollBarElement();
     if (scrollBar) {
       scrollBar.classList.add('-active');
     }
@@ -129,37 +129,144 @@ export class ResultsViewScrollHandler {
    * @param offset - オフセット値
    */
   updateScrollBarDirectly(offset: number): void {
-    const scrollBar = this.elm.querySelector('.scroll-bar') as HTMLElement;
+    const scrollBar = this.getScrollBarElement();
     if (!scrollBar) return;
 
+    const calculation = this.calculateScrollBarPosition(offset);
+    this.applyScrollBarStyles(scrollBar, calculation, offset);
+  }
+
+  // ========================================
+  // Private Methods
+  // ========================================
+
+  /**
+   * スクロール位置を計算する
+   */
+  private calculateScrollPosition(deltaY: number): ScrollCalculation {
+    const numberOfRecords = storeManager.getData('numberOfRecords');
+    const rowCount = storeManager.getData('rowCount');
+
+    const totalHeight = numberOfRecords * TR_HEIGHT;
+    let availableScrollY = totalHeight - rowCount * TR_HEIGHT;
+    availableScrollY = Math.max(0, availableScrollY);
+
+    const newScrollPosition = this.clampScrollPosition(
+      this.lastScroll + deltaY,
+      { min: 0, max: availableScrollY }
+    );
+
+    return {
+      totalHeight,
+      availableScrollY,
+      newScrollPosition,
+    };
+  }
+
+  /**
+   * スクロール位置を範囲内に制限する
+   */
+  private clampScrollPosition(value: number, bounds: ScrollBounds): number {
+    return Math.max(bounds.min, Math.min(value, bounds.max));
+  }
+
+  /**
+   * スクロール位置からオフセットを計算する
+   */
+  private calculateOffsetFromScroll(scrollPosition: number): number {
+    return Math.ceil(scrollPosition / TR_HEIGHT);
+  }
+
+  /**
+   * スクロールバー要素を取得する
+   */
+  private getScrollBarElement(): HTMLElement | null {
+    return this.elm.querySelector('.scroll-bar') as HTMLElement;
+  }
+
+  /**
+   * タッチスクロールのオフセットを計算する
+   */
+  private calculateTouchScrollOffset(
+    deltaY: number,
+    touchStartOffset: number
+  ): number {
     const rowCount = storeManager.getData('rowCount');
     const numberOfRecords = storeManager.getData('numberOfRecords');
+
+    const availableHeight = rowCount * TR_HEIGHT;
+    const offsetRate = deltaY / availableHeight;
+
+    return Math.ceil(offsetRate * numberOfRecords) + touchStartOffset;
+  }
+
+  /**
+   * オフセットを有効な範囲内に制限する
+   */
+  private clampOffsetToValidRange(offset: number): number {
+    const rowCount = storeManager.getData('rowCount');
+    const numberOfRecords = storeManager.getData('numberOfRecords');
+
+    const minOffset = 0;
+    const maxOffset = Math.max(0, numberOfRecords - rowCount);
+
+    return Math.max(minOffset, Math.min(offset, maxOffset));
+  }
+
+  /**
+   * スクロールバーの位置とサイズを計算する
+   */
+  private calculateScrollBarPosition(offset: number): ScrollBarCalculation {
+    const rowCount = storeManager.getData('rowCount');
+    const numberOfRecords = storeManager.getData('numberOfRecords');
+
     const totalHeight = numberOfRecords * TR_HEIGHT;
     const displayHeight = rowCount * TR_HEIGHT;
     const displayRate = displayHeight / totalHeight;
 
-    // スクロールバーの高さと位置を計算
     let barHeight = Math.ceil(displayHeight * displayRate);
-    barHeight = barHeight < 30 ? 30 : barHeight; // MIN_HEIGHT
+    barHeight = Math.max(barHeight, MIN_SCROLLBAR_HEIGHT);
 
     const availableHeight = displayHeight - barHeight;
     const availableRate = availableHeight / totalHeight;
     const barTop = Math.ceil(offset * TR_HEIGHT * availableRate);
 
-    // スクロールバーの位置を直接更新
-    const bar = scrollBar.querySelector('.bar') as HTMLElement;
-    if (bar) {
-      bar.style.height = `${barHeight}px`;
-      bar.style.top = `${barTop}px`;
+    return {
+      barHeight,
+      barTop,
+      displayRate,
+    };
+  }
 
-      // 位置表示も更新
-      const position = bar.querySelector('.position') as HTMLElement;
-      if (position) {
-        position.textContent = String(offset + 1);
-      }
-    }
+  /**
+   * スクロールバーのスタイルを適用する
+   */
+  private applyScrollBarStyles(
+    scrollBar: HTMLElement,
+    calculation: ScrollBarCalculation,
+    offset: number
+  ): void {
+    const bar = scrollBar.querySelector('.bar') as HTMLElement;
+    if (!bar) return;
+
+    // バーのスタイル設定
+    bar.style.height = `${calculation.barHeight}px`;
+    bar.style.top = `${calculation.barTop}px`;
+
+    // 位置表示の更新
+    this.updatePositionDisplay(bar, offset);
 
     // アクティブ状態を維持
     scrollBar.classList.add('-active');
+  }
+
+  /**
+   * 位置表示を更新する
+   */
+  private updatePositionDisplay(bar: HTMLElement, offset: number): void {
+    const position = bar.querySelector('.position') as HTMLElement;
+    if (position) {
+      position.textContent = String(offset + 1);
+    }
   }
 }
