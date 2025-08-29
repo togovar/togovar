@@ -33,7 +33,9 @@ type StoreState = {
   statisticsType?: any;
   statisticsConsequence?: any;
   showModal?: boolean;
-  displayingRegionsOnChromosome?: DisplayingRegions;
+  displayingRegionsOnChromosome?: {
+    [key: string]: { start: number; end: number };
+  };
 };
 
 // -------------------------------------

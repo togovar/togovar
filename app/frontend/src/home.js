@@ -1,5 +1,5 @@
 import { storeManager } from '../src/store/StoreManager';
-import { ResultsView } from '../src/classes/Results/ResultsView.js';
+import { ResultsView } from '../src/classes/Results/ResultsView.ts';
 import SideBar from '../src/classes/SideBar.js';
 import Configuration from '../src/classes/Configuration.js';
 import SelectedRowIndicator from '../src/classes/SelectedRowIndicator.js';

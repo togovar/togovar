@@ -27,12 +27,19 @@ export default class ScrollBar {
     storeManager.bind('offset', this);
     storeManager.bind('numberOfRecords', this);
     storeManager.bind('rowCount', this);
-    $(this.bar).draggable({
-      axis: 'y',
-      containment: this.elm,
-      cursor: 'grab',
-      drag: this.drag.bind(this),
-    });
+
+    // Desktop drag functionality (for mouse devices)
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      $(this.bar).draggable({
+        axis: 'y',
+        containment: this.elm,
+        cursor: 'grab',
+        drag: this.drag.bind(this),
+      });
+    }
+
+    // Touch support for touch devices
+    this.setupTouchEvents();
   }
 
   drag(e, ui) {
@@ -51,6 +58,14 @@ export default class ScrollBar {
   offset(offset) {
     this.position.textContent = offset + 1;
     this.update();
+
+    // Maintain active state on touch devices
+    if (
+      window.matchMedia('(hover: none) and (pointer: coarse)').matches &&
+      this.elm.classList.contains('-active')
+    ) {
+      return;
+    }
   }
 
   numberOfRecords(numberOfRecords) {
@@ -96,5 +111,48 @@ export default class ScrollBar {
 
   release() {
     this.elm.classList.remove('-dragging');
+  }
+
+  setupTouchEvents() {
+    // Touch event setup
+    this.bar.addEventListener('touchstart', this.handleTouchStart.bind(this), {
+      passive: false,
+    });
+    this.bar.addEventListener('touchmove', this.handleTouchMove.bind(this), {
+      passive: false,
+    });
+    this.bar.addEventListener('touchend', this.handleTouchEnd.bind(this), {
+      passive: false,
+    });
+  }
+
+  handleTouchStart(e) {
+    e.preventDefault();
+    this.isDragging = true;
+    this.touchStartY = e.touches[0].clientY;
+    this.touchStartTop = parseInt(this.bar.style.top) || 0;
+    this.elm.classList.add('-dragging');
+    this.elm.classList.add('-active');
+  }
+
+  handleTouchMove(e) {
+    if (!this.isDragging) return;
+    e.preventDefault();
+
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - this.touchStartY;
+    const newTop = this.touchStartTop + deltaY;
+
+    // Simulate drag processing
+    const mockEvent = { position: { top: newTop } };
+    this.drag(null, mockEvent);
+  }
+
+  handleTouchEnd(e) {
+    if (!this.isDragging) return;
+    e.preventDefault();
+    this.isDragging = false;
+    this.prepareRelease();
+    this.elm.classList.remove('-active'); // Added: Remove active state when drag ends
   }
 }
