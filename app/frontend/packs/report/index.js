@@ -1,15 +1,15 @@
-import 'jquery'
-
 const ENV = {
-  "TOGOVAR_FRONTEND_API_URL":TOGOVAR_FRONTEND_API_URL || "https://grch37.togovar.org",
-  'TOGOVAR_FRONTEND_REFERENCE': TOGOVAR_FRONTEND_REFERENCE || 'GRCh37',
-  'TOGOVAR_STANZA_SPARQL': TOGOVAR_ENDPOINT_SPARQL || '/sparql',
-  'TOGOVAR_STANZA_SPARQLIST': TOGOVAR_ENDPOINT_SPARQLIST || '/sparqlist',
-  'TOGOVAR_STANZA_SEARCH': TOGOVAR_ENDPOINT_SEARCH || '/search',
-  'TOGOVAR_STANZA_JBROWSE': TOGOVAR_ENDPOINT_JBROWSE || '/jbrowse',
+  TOGOVAR_FRONTEND_API_URL:
+    TOGOVAR_FRONTEND_API_URL || 'https://grch37.togovar.org',
+  TOGOVAR_FRONTEND_REFERENCE: TOGOVAR_FRONTEND_REFERENCE || 'GRCh37',
+  TOGOVAR_STANZA_SPARQL: TOGOVAR_ENDPOINT_SPARQL || '/sparql',
+  TOGOVAR_STANZA_SPARQLIST: TOGOVAR_ENDPOINT_SPARQLIST || '/sparqlist',
+  TOGOVAR_STANZA_SEARCH: TOGOVAR_ENDPOINT_SEARCH || '/search',
+  TOGOVAR_STANZA_JBROWSE: TOGOVAR_ENDPOINT_JBROWSE || '/jbrowse',
 };
 
-const STANZA_PATH = TOGOVAR_FRONTEND_STANZA_URL || 'https://togovar.github.io/stanza';
+const STANZA_PATH =
+  TOGOVAR_FRONTEND_STANZA_URL || 'https://togovar.github.io/stanza';
 
 const config = (function (obj) {
   const replace_recursive = function (obj) {
@@ -20,7 +20,7 @@ const config = (function (obj) {
         obj = obj.replace(match[0], value);
       }
     } else if (Array.isArray(obj)) {
-      obj = obj.map(x => replace_recursive(x));
+      obj = obj.map((x) => replace_recursive(x));
     } else if (obj && typeof obj === 'object') {
       for (const [key, value] of Object.entries(obj)) {
         obj[key] = replace_recursive(value);
@@ -28,7 +28,7 @@ const config = (function (obj) {
     }
 
     return obj;
-  }
+  };
 
   return replace_recursive(obj);
 })(require('../../config/stanza.yaml'));
@@ -44,8 +44,8 @@ const formatOption = function (config) {
         const url = new URL(value);
 
         url.search = [...url.searchParams]
-          .filter(x => x[1])
-          .map(x => [x[0], encodeURIComponent(x[1])].join('='))
+          .filter((x) => x[1])
+          .map((x) => [x[0], encodeURIComponent(x[1])].join('='))
           .join('&');
 
         buf[key] = url.href;
@@ -56,7 +56,7 @@ const formatOption = function (config) {
   }
 
   return buf;
-}
+};
 
 const appendStanzaTag = function (config, base_options) {
   const id = config.id;
@@ -75,8 +75,35 @@ const appendStanzaTag = function (config, base_options) {
   const src = config.src || `${STANZA_PATH}/${config.id}.js`;
   const options = formatOption(config.options);
 
-  $('head').append($(`<script type="module" src="${src}" async></script>`));
-  $(`${dom}`).append($(`<togostanza-${id}></togostanza-${id}>`).attr(base_options || {}).attr(options || {}));
+  // Create and append script tag to head
+  const script = document.createElement('script');
+  script.type = 'module';
+  script.src = src;
+  script.async = true;
+  document.head.appendChild(script);
+
+  // Create togostanza element with attributes
+  const stanzaElement = document.createElement(`togostanza-${id}`);
+
+  // Set base_options attributes
+  if (base_options) {
+    for (const [key, value] of Object.entries(base_options)) {
+      stanzaElement.setAttribute(key, value);
+    }
+  }
+
+  // Set options attributes
+  if (options) {
+    for (const [key, value] of Object.entries(options)) {
+      stanzaElement.setAttribute(key, value);
+    }
+  }
+
+  // Append to target DOM element
+  const targetElement = document.querySelector(dom);
+  if (targetElement) {
+    targetElement.appendChild(stanzaElement);
+  }
 };
 
 const initialize = function () {
@@ -88,20 +115,30 @@ const initialize = function () {
   const id_key = config[report]?.id || 'id';
   base_options[id_key] = id;
 
-  $('.report_id').html(id);
+  // Set report ID in all elements with class 'report_id'
+  const reportIdElements = document.querySelectorAll('.report_id');
+  reportIdElements.forEach((element) => {
+    element.textContent = id;
+  });
 
-  stanzas.forEach(stanza => {
+  stanzas.forEach((stanza) => {
     if (stanza.options) {
       for (const [key, value] of Object.entries(stanza.options)) {
         if (typeof value === 'string' && value.includes('$')) {
-          stanza.options[key] = value.replaceAll(new RegExp(`\\$(${id_key}|{${id_key}})`, 'g'), id);
+          stanza.options[key] = value.replaceAll(
+            new RegExp(`\\$(${id_key}|{${id_key}})`, 'g'),
+            id
+          );
         }
       }
     }
-    appendStanzaTag(stanza, base_options)
+    appendStanzaTag(stanza, base_options);
   });
 };
 
-$(function () {
+// Wait for DOM to be ready before initializing
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initialize);
+} else {
   initialize();
-});
+}
