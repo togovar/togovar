@@ -30,12 +30,7 @@ export default class ScrollBar {
 
     // Desktop drag functionality (for mouse devices)
     if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      $(this.bar).draggable({
-        axis: 'y',
-        containment: this.elm,
-        cursor: 'grab',
-        drag: this.drag.bind(this),
-      });
+      this.setupMouseDrag();
     }
 
     // Touch support for touch devices
@@ -111,6 +106,48 @@ export default class ScrollBar {
 
   release() {
     this.elm.classList.remove('-dragging');
+  }
+
+  setupMouseDrag() {
+    let isDragging = false;
+    let dragStartY = 0;
+    let dragStartTop = 0;
+
+    this.bar.style.cursor = 'grab';
+
+    this.bar.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      isDragging = true;
+      dragStartY = e.clientY;
+      dragStartTop = parseInt(this.bar.style.top) || 0;
+      this.bar.style.cursor = 'grabbing';
+      this.elm.classList.add('-dragging');
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+
+      const deltaY = e.clientY - dragStartY;
+      const newTop = dragStartTop + deltaY;
+
+      // Apply containment (keep within parent element)
+      const maxTop = this.elm.offsetHeight - this.bar.offsetHeight;
+      const constrainedTop = Math.max(0, Math.min(newTop, maxTop));
+
+      this.bar.style.top = `${constrainedTop}px`;
+
+      // Simulate drag processing
+      const mockEvent = { position: { top: constrainedTop } };
+      this.drag(null, mockEvent);
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      this.bar.style.cursor = 'grab';
+      this.prepareRelease();
+    });
   }
 
   setupTouchEvents() {
