@@ -11,7 +11,7 @@ Object.assign(process.env, env);
 const config = {
   entry: {
     main: './app/frontend/packs/index.js',
-    report: './app/frontend/packs/report/index.js',
+    report: './app/frontend/packs/report/index.ts',
   },
   output: {
     path: path.resolve(__dirname, '../../../dist'),
