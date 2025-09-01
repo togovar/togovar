@@ -1,9 +1,8 @@
 import { storeManager } from '../../store/StoreManager';
-import ScrollBar from './../ScrollBar';
-import { TR_HEIGHT, COLUMNS } from '../../global.js';
+import ResultsScrollBar from './ResultsScrollBar';
+import { COLUMNS } from '../../global.js';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
-import { ResultsViewScrollHandler } from './ResultsViewScrollHandler';
 import { ResultsViewDataManager } from './ResultsViewDataManager';
 
 /** 検索メッセージの型定義 */
@@ -54,8 +53,8 @@ export class ResultsView {
   private elm: HTMLElement;
   /** タッチハンドラー */
   private touchHandler: ResultsViewTouchHandler;
-  /** スクロールハンドラー */
-  private scrollHandler: ResultsViewScrollHandler;
+  /** スクロールバー */
+  private scrollBar: ResultsScrollBar;
   /** データマネージャー */
   private dataManager: ResultsViewDataManager;
   /** テーブルボディ要素 */
@@ -100,7 +99,6 @@ export class ResultsView {
    * @param offset - 新しいオフセット値
    */
   offset(offset: number): void {
-    this.scrollHandler.lastScrollPosition = offset * TR_HEIGHT;
     this.dataManager.handleOffsetChange(offset);
   }
 
@@ -204,7 +202,7 @@ export class ResultsView {
     this.elm
       .querySelector(ResultsView.SELECTORS.TABLE_CONTAINER)!
       .insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
-    new ScrollBar(
+    this.scrollBar = new ResultsScrollBar(
       this.elm.querySelector(ResultsView.SELECTORS.SCROLL_BAR) as HTMLElement
     );
   }
@@ -242,7 +240,6 @@ export class ResultsView {
       this.tbody,
       this.tablecontainer
     );
-    this.scrollHandler = new ResultsViewScrollHandler(this.elm);
     this.dataManager = new ResultsViewDataManager(
       this.elm,
       status,
@@ -262,7 +259,6 @@ export class ResultsView {
   private _configureInitialState(): void {
     // 初期化
     this.dataManager.handleColumnsChange(storeManager.getData('columns'));
-    this.scrollHandler.updateLastScrollFromOffset();
 
     // 初期状態のpointer-events設定
     this.touchHandler.setTouchElementsPointerEvents(
@@ -294,15 +290,13 @@ export class ResultsView {
     // タッチハンドラーのコールバック設定
     this.touchHandler.setScrollCallbacks({
       onScrollStart: () => {
-        this.scrollHandler.initializeScrollBarPosition();
+        this.scrollBar.initializePosition();
       },
-      onScroll: (deltaY) => {
-        const offset = storeManager.getData('offset') || 0;
-        this.touchHandler.setTouchStartOffset(offset);
-        this.scrollHandler.handleScrollWithScrollBarFeedback(deltaY, offset);
+      onScroll: (deltaY, startOffset) => {
+        this.scrollBar.handleScrollWithFeedback(deltaY, startOffset);
       },
       onScrollEnd: () => {
-        this.scrollHandler.deactivateScrollBar();
+        this.scrollBar.deactivate();
       },
     });
   }
@@ -315,7 +309,8 @@ export class ResultsView {
     e.stopPropagation();
     // 縦方向にスクロールしていない場合スルー
     if (e.deltaY === 0) return;
-    this.scrollHandler.handleScroll(e.deltaY);
+
+    this.scrollBar.handleScroll(e.deltaY);
   }
 
   /**

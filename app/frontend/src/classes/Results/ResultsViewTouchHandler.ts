@@ -4,7 +4,7 @@ const TOUCH_ELEMENTS_SELECTOR =
 /** スクロールコールバックの型定義 */
 interface ScrollCallbacks {
   onScrollStart?: () => void;
-  onScroll?: (deltaY: number) => void;
+  onScroll?: (deltaY: number, startOffset: number) => void;
   onScrollEnd?: () => void;
 }
 
@@ -302,7 +302,8 @@ export class ResultsViewTouchHandler {
 
       this.touchState.lastY = touch.clientY;
       this.scrollCallbacks.onScroll?.(
-        -gesture.deltaY * TOUCH_CONFIG.SCROLL_SENSITIVITY
+        -gesture.deltaY * TOUCH_CONFIG.SCROLL_SENSITIVITY,
+        this.touchState.startOffset
       );
     }
   }
