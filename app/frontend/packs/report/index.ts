@@ -80,8 +80,8 @@ interface EnvironmentConfig {
  */
 interface StanzaConfig {
   id: string; // Unique identifier for the stanza component
-  dom: string; // CSS selector for the DOM element where the stanza will be rendered
-  src?: string; // Optional custom source URL for the stanza JavaScript file
+  targetSelector: string; // CSS selector for the DOM element where the stanza will be rendered
+  scriptUrl?: string; // Optional custom source URL for the stanza JavaScript file
   options?: Record<string, unknown>; // Optional configuration options passed to the stanza component
 }
 
@@ -151,33 +151,33 @@ class ConfigProcessor {
    * ```
    */
   static processConfig(configObject: unknown): unknown {
-    const replaceRecursively = (obj: unknown): unknown => {
-      if (typeof obj === 'string' && obj.includes('$')) {
-        return this.replaceEnvironmentVariables(obj);
+    const processItemRecursively = (item: unknown): unknown => {
+      if (typeof item === 'string' && item.includes('$')) {
+        return this.replaceEnvironmentVariables(item);
       }
 
-      if (Array.isArray(obj)) {
-        return obj.map(replaceRecursively);
+      if (Array.isArray(item)) {
+        return item.map(processItemRecursively);
       }
 
-      if (obj && typeof obj === 'object') {
-        const result: Record<string, unknown> = {};
-        for (const [key, value] of Object.entries(obj)) {
-          result[key] = replaceRecursively(value);
+      if (item && typeof item === 'object') {
+        const processedResult: Record<string, unknown> = {};
+        for (const [key, value] of Object.entries(item)) {
+          processedResult[key] = processItemRecursively(value);
         }
-        return result;
+        return processedResult;
       }
 
-      return obj;
+      return item;
     };
 
-    return replaceRecursively(configObject);
+    return processItemRecursively(configObject);
   }
 
   /**
    * Replaces environment variable placeholders in a string with actual values.
    *
-   * @param str - String containing environment variable references
+   * @param templateString - String containing environment variable references
    * @returns String with variables replaced by their values
    *
    * @example
@@ -186,13 +186,20 @@ class ConfigProcessor {
    * // Returns: "https://grch37.togovar.org/api"
    * ```
    */
-  private static replaceEnvironmentVariables(str: string): string {
-    const envVarRegex = /(\$([A-Z_]+)|\${([A-Z_]+)})/g;
-    return str.replace(
-      envVarRegex,
-      (match: string, _: string, key1?: string, key2?: string): string => {
-        const key = key1 || key2;
-        return key ? ENV_CONFIG[key as keyof EnvironmentConfig] || '' : '';
+  private static replaceEnvironmentVariables(templateString: string): string {
+    const environmentVariablePattern = /(\$([A-Z_]+)|\${([A-Z_]+)})/g;
+    return templateString.replace(
+      environmentVariablePattern,
+      (
+        match: string,
+        _: string,
+        variableKey1?: string,
+        variableKey2?: string
+      ): string => {
+        const variableKey = variableKey1 || variableKey2;
+        return variableKey
+          ? ENV_CONFIG[variableKey as keyof EnvironmentConfig] || ''
+          : '';
       }
     );
   }
@@ -230,22 +237,24 @@ class OptionFormatter {
   ): Record<string, string> {
     if (!options) return {};
 
-    const result: Record<string, string> = {};
+    const formattedAttributes: Record<string, string> = {};
 
-    for (const [key, value] of Object.entries(options)) {
-      if (value && typeof value === 'object') {
+    for (const [attributeName, attributeValue] of Object.entries(options)) {
+      if (attributeValue && typeof attributeValue === 'object') {
         // Serialize objects to JSON strings
-        result[key] = JSON.stringify(value);
-      } else if (this.isUrl(value)) {
+        formattedAttributes[attributeName] = JSON.stringify(attributeValue);
+      } else if (this.isUrl(attributeValue)) {
         // Format URLs with proper encoding
-        result[key] = this.formatUrl(value as string);
+        formattedAttributes[attributeName] = this.formatUrl(
+          attributeValue as string
+        );
       } else {
         // Convert all other values to strings
-        result[key] = String(value);
+        formattedAttributes[attributeName] = String(attributeValue);
       }
     }
 
-    return result;
+    return formattedAttributes;
   }
 
   /**
@@ -309,25 +318,25 @@ class StanzaManager {
    * ```typescript
    * const config = {
    *   id: "variant-summary",
-   *   dom: "#variant-summary",
+   *   targetSelector: "#variant-summary",
    *   options: { assembly: "GRCh38" }
    * };
-   * StanzaManager.appendStanzaTag(config, { sparqlist: "/sparqlist" });
+   * StanzaManager.createStanzaAndInsertIntoDOM(config, { sparqlist: "/sparqlist" });
    * ```
    */
-  static appendStanzaTag(
+  static createStanzaAndInsertIntoDOM(
     stanzaConfig: StanzaConfig,
     baseOptions: Record<string, unknown> = {}
   ): void {
-    const { id, dom, src, options } = stanzaConfig;
+    const { id, targetSelector, scriptUrl, options } = stanzaConfig;
 
     if (!this.validateStanzaConfig(stanzaConfig)) {
       console.error('Invalid stanza config:', stanzaConfig);
       return;
     }
 
-    this.loadStanzaScript(src || `${STANZA_PATH}/${id}.js`);
-    this.createAndInsertStanzaElement(id, dom, baseOptions, options);
+    this.loadStanzaScript(scriptUrl || `${STANZA_PATH}/${id}.js`);
+    this.createAndInsertStanzaElement(id, targetSelector, baseOptions, options);
   }
 
   /**
@@ -336,14 +345,17 @@ class StanzaManager {
    * @param config - Stanza configuration to validate
    * @returns True if configuration is valid, false otherwise
    */
-  private static validateStanzaConfig({ id, dom }: StanzaConfig): boolean {
+  private static validateStanzaConfig({
+    id,
+    targetSelector,
+  }: StanzaConfig): boolean {
     if (!id) {
       console.error("Missing required stanza property: 'id'");
       return false;
     }
 
-    if (!dom) {
-      console.error("Missing required stanza property: 'dom'");
+    if (!targetSelector) {
+      console.error("Missing required stanza property: 'targetSelector'");
       return false;
     }
 
@@ -353,51 +365,51 @@ class StanzaManager {
   /**
    * Dynamically loads a stanza JavaScript module by creating a script element.
    *
-   * @param src - URL of the stanza JavaScript file
+   * @param scriptSourceUrl - URL of the stanza JavaScript file
    */
-  private static loadStanzaScript(src: string): void {
-    const script = document.createElement('script');
-    script.type = 'module';
-    script.src = src;
-    script.async = true;
-    document.head.appendChild(script);
+  private static loadStanzaScript(scriptSourceUrl: string): void {
+    const scriptElement = document.createElement('script');
+    scriptElement.type = 'module';
+    scriptElement.src = scriptSourceUrl;
+    scriptElement.async = true;
+    document.head.appendChild(scriptElement);
   }
 
   /**
    * Creates a stanza custom element and inserts it into the target DOM location.
    *
-   * @param id - Stanza identifier used to create the custom element name
-   * @param domSelector - CSS selector for the target DOM element
+   * @param stanzaId - Stanza identifier used to create the custom element name
+   * @param targetSelector - CSS selector for the target DOM element
    * @param baseOptions - Base options applied to all stanzas
-   * @param options - Specific options for this stanza instance
+   * @param stanzaOptions - Specific options for this stanza instance
    */
   private static createAndInsertStanzaElement(
-    id: string,
-    domSelector: string,
+    stanzaId: string,
+    targetSelector: string,
     baseOptions: Record<string, unknown>,
-    options?: Record<string, unknown>
+    stanzaOptions?: Record<string, unknown>
   ): void {
     // Create the custom element with standardized naming convention
-    const stanzaElement = document.createElement(`togostanza-${id}`);
+    const stanzaElement = document.createElement(`togostanza-${stanzaId}`);
 
     // Apply all options as HTML attributes
     this.applyAttributesToElement(
       stanzaElement,
-      this.convertToStringRecord(baseOptions)
+      this.convertObjectToStringRecord(baseOptions)
     );
     this.applyAttributesToElement(
       stanzaElement,
-      OptionFormatter.format(options)
+      OptionFormatter.format(stanzaOptions)
     );
 
     // Find target element and insert stanza
-    const targetElement = document.querySelector(domSelector);
+    const targetElement = document.querySelector(targetSelector);
 
     if (targetElement) {
       targetElement.appendChild(stanzaElement);
     } else {
       console.warn(
-        `Target element not found for stanza '${id}': ${domSelector}`
+        `Target element not found for stanza '${stanzaId}': ${targetSelector}`
       );
     }
   }
@@ -405,17 +417,17 @@ class StanzaManager {
   /**
    * Converts an object with unknown value types to string-only record.
    *
-   * @param obj - Object to convert
+   * @param objectToConvert - Object to convert
    * @returns Record with all values converted to strings
    */
-  private static convertToStringRecord(
-    obj: Record<string, unknown>
+  private static convertObjectToStringRecord(
+    objectToConvert: Record<string, unknown>
   ): Record<string, string> {
-    const result: Record<string, string> = {};
-    for (const [key, value] of Object.entries(obj)) {
-      result[key] = String(value);
+    const stringRecord: Record<string, string> = {};
+    for (const [key, value] of Object.entries(objectToConvert)) {
+      stringRecord[key] = String(value);
     }
-    return result;
+    return stringRecord;
   }
 
   /**
@@ -585,7 +597,7 @@ class ReportApp {
         reportId,
         idKey
       );
-      StanzaManager.appendStanzaTag(processedStanza, baseOptions);
+      StanzaManager.createStanzaAndInsertIntoDOM(processedStanza, baseOptions);
     });
   }
 
@@ -595,16 +607,16 @@ class ReportApp {
    * Supports template syntax like `${report_id}` or `$report_id` where the variable
    * name matches the configured ID key for the report type.
    *
-   * @param stanza - Original stanza configuration
+   * @param stanzaConfig - Original stanza configuration
    * @param reportId - Value to substitute for template variables
-   * @param idKey - Variable name to look for in templates
+   * @param idKeyName - Variable name to look for in templates
    * @returns Stanza configuration with template variables resolved
    *
    * @example
    * ```typescript
    * const stanza = {
    *   id: "variant-summary",
-   *   dom: "#summary",
+   *   targetSelector: "#summary",
    *   options: { url: "/api/variant/${tgv_id}" }
    * };
    * const processed = ReportApp.processStanzaTemplateVariables(stanza, "tgv123456", "tgv_id");
@@ -612,27 +624,35 @@ class ReportApp {
    * ```
    */
   private static processStanzaTemplateVariables(
-    stanza: StanzaConfig,
+    stanzaConfig: StanzaConfig,
     reportId: string,
-    idKey: string
+    idKeyName: string
   ): StanzaConfig {
-    if (!stanza.options) {
-      return stanza;
+    if (!stanzaConfig.options) {
+      return stanzaConfig;
     }
 
-    const processedStanza: StanzaConfig = { ...stanza };
-    processedStanza.options = { ...stanza.options };
+    const processedStanzaConfig: StanzaConfig = { ...stanzaConfig };
+    processedStanzaConfig.options = { ...stanzaConfig.options };
 
     // Process each option value for template variables
-    for (const [key, value] of Object.entries(processedStanza.options)) {
-      if (typeof value === 'string' && value.includes('$')) {
+    for (const [optionKey, optionValue] of Object.entries(
+      processedStanzaConfig.options
+    )) {
+      if (typeof optionValue === 'string' && optionValue.includes('$')) {
         // Replace both ${var} and $var syntax
-        const templateRegex = new RegExp(`\\$(${idKey}|{${idKey}})`, 'g');
-        processedStanza.options[key] = value.replace(templateRegex, reportId);
+        const templateVariablePattern = new RegExp(
+          `\\$(${idKeyName}|{${idKeyName}})`,
+          'g'
+        );
+        processedStanzaConfig.options[optionKey] = optionValue.replace(
+          templateVariablePattern,
+          reportId
+        );
       }
     }
 
-    return processedStanza;
+    return processedStanzaConfig;
   }
 }
 

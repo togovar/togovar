@@ -6,36 +6,36 @@ variant:
 
   stanza:
     - id: variant-header
-      dom: '#variant-header'
+      targetSelector: '#variant-header'
       options:
         togostanza-menu-placement: none
 
     - id: variant-summary
-      dom: '#variant-summary'
+      targetSelector: '#variant-summary'
 
     - id: variant-other-overlapping-variants
-      dom: '#variant-other-overlapping-variants'
+      targetSelector: '#variant-other-overlapping-variants'
       options:
         assembly: $TOGOVAR_FRONTEND_REFERENCE
 
     - id: variant-frequency
-      dom: '#variant-frequency'
+      targetSelector: '#variant-frequency'
       options:
         assembly: $TOGOVAR_FRONTEND_REFERENCE
         data-url: $TOGOVAR_FRONTEND_API_URL
         no_data_message: 'No data'
 
     - id: variant-mgend
-      dom: '#variant-mgend'
+      targetSelector: '#variant-mgend'
       options:
         data-url: ${TOGOVAR_FRONTEND_API_URL}/api/search/variant
 
     - id: variant-clinvar
-      dom: '#variant-clinvar'
+      targetSelector: '#variant-clinvar'
 
     - id: pagination-table
-      dom: '#variant-gwas'
-      src: https://togostanza.github.io/metastanza/pagination-table.js
+      targetSelector: '#variant-gwas'
+      scriptUrl: https://togostanza.github.io/metastanza/pagination-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/variant_gwas?tgv_id=${tgv_id}
         data-type: json
@@ -91,20 +91,20 @@ variant:
             line-clamp: 3
 
     - id: variant-genomic-context
-      dom: '#variant-genomic-context'
+      targetSelector: '#variant-genomic-context'
       options:
         assembly: $TOGOVAR_FRONTEND_REFERENCE
         jbrowse: $TOGOVAR_STANZA_JBROWSE
         margin: 50
 
     - id: variant-gene
-      dom: '#variant-gene'
+      targetSelector: '#variant-gene'
 
     - id: variant-transcript
-      dom: '#variant-transcript'
+      targetSelector: '#variant-transcript'
 
     - id: variant-publication
-      dom: '#variant-publication'
+      targetSelector: '#variant-publication'
 
 gene:
   id: hgnc_id
@@ -114,22 +114,22 @@ gene:
 
   stanza:
     - id: gene-header
-      dom: '#gene-header'
+      targetSelector: '#gene-header'
       options:
         togostanza-menu-placement: none
 
     - id: gene-summary
-      dom: '#gene-summary'
+      targetSelector: '#gene-summary'
 
     - id: gene-mgend
-      dom: '#gene-mgend'
+      targetSelector: '#gene-mgend'
       options:
         term: ${hgnc_id}
         data-url: ${TOGOVAR_FRONTEND_API_URL}/api/search/variant
 
     - id: pagination-table
-      dom: '#gene-clinvar'
-      src: https://togostanza.github.io/metastanza/pagination-table.js
+      targetSelector: '#gene-clinvar'
+      scriptUrl: https://togostanza.github.io/metastanza/pagination-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/gene_clinvar?hgnc_id=${hgnc_id}
         data-type: json
@@ -171,8 +171,8 @@ gene:
             line-clamp: 3
 
     - id: pagination-table
-      dom: '#gene-gwas'
-      src: https://togostanza.github.io/metastanza/pagination-table.js
+      targetSelector: '#gene-gwas'
+      scriptUrl: https://togostanza.github.io/metastanza/pagination-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/gene_gwas?hgnc_id=${hgnc_id}
         data-type: json
@@ -244,8 +244,8 @@ gene:
             line-clamp: 3
 
     - id: pagination-table
-      dom: "#gene-mogplus"
-      src: https://togostanza.github.io/metastanza/pagination-table.js
+      targetSelector: '#gene-mogplus'
+      scriptUrl: https://togostanza.github.io/metastanza/pagination-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/gene_mogplus?hgnc_id=${hgnc_id}
         data-type: json
@@ -287,14 +287,14 @@ gene:
             escape: false
 
     - id: gene-genomic-context
-      dom: '#gene-genomic-context'
+      targetSelector: '#gene-genomic-context'
       options:
         assembly: $TOGOVAR_FRONTEND_REFERENCE
         jbrowse: $TOGOVAR_STANZA_JBROWSE
         margin: 200
 
     - id: gene-protein-browser
-      dom: '#gene-protein-browser'
+      targetSelector: '#gene-protein-browser'
       options:
         hgnc_id: ${hgnc_id}
         togovar_target: stg-grch38
@@ -302,13 +302,13 @@ gene:
         glycosmos_endpoint: https://ts.glycosmos.org/sparql
 
     - id: gene-protein-structure
-      dom: '#gene-protein-structure'
+      targetSelector: '#gene-protein-structure'
       options:
         molmil: ${TOGOVAR_FRONTEND_API_URL}/molmil/
 
     - id: scroll-table
-      dom: '#gene-variant'
-      src: https://togostanza.github.io/metastanza/scroll-table.js
+      targetSelector: '#gene-variant'
+      scriptUrl: https://togostanza.github.io/metastanza/scroll-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/gene_variant?hgnc_id=${hgnc_id}
         data-type: json
@@ -351,7 +351,7 @@ gene:
             escape: false
 
     - id: gene-publication
-      dom: '#gene-publication'
+      targetSelector: '#gene-publication'
 
 disease:
   id: medgen_cid
@@ -361,13 +361,13 @@ disease:
 
   stanza:
     - id: disease-header
-      dom: '#disease-header'
+      targetSelector: '#disease-header'
       options:
         togostanza-menu-placement: none
 
     - id: hash-table
-      dom: '#disease-summary'
-      src: https://togostanza.github.io/metastanza/hash-table.js
+      targetSelector: '#disease-summary'
+      scriptUrl: https://togostanza.github.io/metastanza/hash-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/disease_summary?medgen_cid=${medgen_cid}
         data-type: json
@@ -383,14 +383,14 @@ disease:
             escape: false
 
     - id: disease-mgend
-      dom: '#disease-mgend'
+      targetSelector: '#disease-mgend'
       options:
         term: ${medgen_cid}
         data-url: ${TOGOVAR_FRONTEND_API_URL}/api/search/variant
 
     - id: pagination-table
-      dom: '#disease-clinvar'
-      src: https://togostanza.github.io/metastanza/pagination-table.js
+      targetSelector: '#disease-clinvar'
+      scriptUrl: https://togostanza.github.io/metastanza/pagination-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/disease_clinvar?medgen_cid=${medgen_cid}
         data-type: json
@@ -429,8 +429,8 @@ disease:
             line-clamp: 3
 
     - id: pagination-table
-      dom: '#disease-gwas'
-      src: https://togostanza.github.io/metastanza/pagination-table.js
+      targetSelector: '#disease-gwas'
+      scriptUrl: https://togostanza.github.io/metastanza/pagination-table.js
       options:
         data-url: ${TOGOVAR_STANZA_SPARQLIST}/api/disease_gwas?medgen_cid=${medgen_cid}
         data-type: json
