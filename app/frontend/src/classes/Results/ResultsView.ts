@@ -1,5 +1,5 @@
 import { storeManager } from '../../store/StoreManager';
-import ScrollBar from './../ScrollBar.js';
+import ScrollBar from './../ScrollBar';
 import { TR_HEIGHT, COLUMNS } from '../../global.js';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
