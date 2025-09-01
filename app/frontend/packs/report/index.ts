@@ -205,9 +205,9 @@ class ConfigProcessor {
   }
 }
 
-/** Processed configuration loaded from YAML with environment variables resolved */
+/** Processed configuration loaded from JSON with environment variables resolved */
 const REPORT_CONFIG = ConfigProcessor.processConfig(
-  require('../../config/stanza.yaml')
+  require('../../assets/stanza.json')
 ) as Record<string, ReportConfig>;
 
 // ============================================================================
