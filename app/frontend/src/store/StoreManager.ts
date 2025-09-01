@@ -26,6 +26,7 @@ class StoreManager {
     isLogin: false,
     isFetching: false,
     isStoreUpdating: false,
+    displayingRegionsOnChromosome: {},
   };
 
   constructor() {

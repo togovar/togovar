@@ -2,9 +2,13 @@
   "compilerOptions": {
     "allowJs": true,
     "target": "es6",
-    "module": "esnext",
+    "module": "nodenext",
     "sourceMap": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "moduleResolution": "nodenext",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false
   },
-  "include": ["./app/frontend/src/**/*"]
+  "include": ["./app/frontend/src/**/*", "./app/frontend/css.d.ts"]
 }

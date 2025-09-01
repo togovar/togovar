@@ -1,5 +1,5 @@
 import { storeManager } from '../src/store/StoreManager';
-import { ResultsView } from '../src/classes/Results/ResultsView.js';
+import { ResultsView } from '../src/classes/Results/ResultsView';
 import SideBar from '../src/classes/SideBar.js';
 import Configuration from '../src/classes/Configuration.js';
 import SelectedRowIndicator from '../src/classes/SelectedRowIndicator.js';
@@ -10,7 +10,7 @@ import ModuleTabsView from '../src/classes/ModuleTabsView.js';
 import TopPageLayoutManager from '../src/classes/TopPageLayoutManager.js';
 import DownloadButton from './classes/DownloadButton.js';
 // Search
-import SimpleSearchView from './components/Common/SearchField/SimpleSearchView.js';
+import SimpleSearchView from './components/SearchField/SimpleSearch/SimpleSearchView';
 import AdvancedSearchBuilderView from '../src/classes/AdvancedSearchBuilderView.js';
 // PanelViews
 // PanelViews: Filters

@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import './FrequencyCountValueView'; // for embedding
 import './ConditionPathogenicityPredictionSearch/PredictionValueView'; // for embedding
@@ -8,12 +8,12 @@ import Style from '../../stylesheets/object/component/condition-item-value-view.
 class ConditionItemValueView extends LitElement {
   static styles = [Style];
 
-  @property({ type: String }) label;
-  @property({ type: String }) conditionType;
-  @property({ type: String }) value;
-  @property({ type: Boolean }) deleteButton = false;
+  @property({ type: String }) label: string = '';
+  @property({ type: String }) conditionType: string = '';
+  @property({ type: String }) value: string = '';
+  @property({ type: Boolean }) deleteButton: boolean = false;
 
-  _handleDelete(e) {
+  private _handleDelete(e: Event): void {
     e.stopPropagation();
     this.dispatchEvent(
       new CustomEvent('delete-condition-item', {
@@ -24,17 +24,19 @@ class ConditionItemValueView extends LitElement {
   }
 
   // Render the UI as a function of component state
-  render() {
-    this.dataset.conditionType = this.conditionType;
-    this.dataset.value = this.value;
+  render(): TemplateResult {
+    if (this.dataset) {
+      this.dataset.conditionType = this.conditionType;
+      this.dataset.value = this.value;
+    }
 
-    let option = '';
-    if (this.conditionType == 'dataset') {
+    let option: TemplateResult | string = '';
+    if (this.conditionType === 'dataset' || this.conditionType === 'genotype') {
       option = html`<frequency-count-value-view
         data-dataset="${this.value}"
       ></frequency-count-value-view>`;
     }
-    if (this.conditionType == 'pathogenicity_prediction') {
+    if (this.conditionType === 'pathogenicity_prediction') {
       option = html` <prediction-value-view
         data-dataset=${this.value}
       ></prediction-value-view>`;

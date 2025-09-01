@@ -1355,6 +1355,836 @@
       "label": "Gene symbol",
       "type": "text"
     },
+    "genotype": {
+      "label": "Genotype count",
+      "type": "peculiar",
+      "values": [
+        {
+          "value": "jga_wgs",
+          "label": "JGA-WGS",
+          "children": [
+            {
+              "value": "jga_wgs.jgad000670",
+              "label": "Normal tissues from lung adenocarcinoma (JGAD000670)"
+            },
+            {
+              "value": "jga_wgs.jgad000687",
+              "label": "Normal tissues from colorectal cancer (JGAD000687)"
+            },
+            {
+              "value": "jga_wgs.jgad000688",
+              "label": "Normal tissues from hepatoblastoma (JGAD000688)"
+            },
+            {
+              "value": "jga_wgs.jgad000689",
+              "label": "Normal tissues from gastrointestinal chronic inflammatory (JGAD000689)"
+            }
+          ]
+        },
+        {
+          "value": "jga_snp",
+          "label": "JGA-SNP",
+          "children": [
+            {
+              "label": "Neoplasms",
+              "children": [
+                {
+                  "value": "bbj_riken.mpheno1",
+                  "label": "Lung cancer",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno1.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno1.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno2",
+                  "label": "Esophageal cancer",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno2.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno2.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno3",
+                  "label": "Gastric cancer",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno3.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno3.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno4",
+                  "label": "Colorectal cancer",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno4.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno4.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno5",
+                  "label": "Liver cancer",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno5.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno5.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno6",
+                  "label": "Pancreas cancer",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno6.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno6.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno7",
+                  "label": "Gallbladder/Cholangiocarcinoma",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno7.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno7.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno8",
+                  "label": "Prostate cancer",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno8.male",
+                      "label": "Male"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno9",
+                  "label": "Breast cancer",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno9.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno10",
+                  "label": "Cervical cancer",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno10.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno11",
+                  "label": "Uterine cancer",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno11.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno12",
+                  "label": "Ovarian center",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno12.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno13",
+                  "label": "Hematopoietic tumor",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno13.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno13.female",
+                      "label": "Female"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Diseases of the nervous system",
+              "children": [
+                {
+                  "value": "bbj_riken.mpheno14",
+                  "label": "Cerebral infarction",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno14.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno14.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno15",
+                  "label": "Cerebral aneurysm",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno15.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno15.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno16",
+                  "label": "Epilepsy",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno16.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno16.female",
+                      "label": "Female"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Diseases of the respiratory system",
+              "children": [
+                {
+                  "value": "bbj_riken.mpheno17",
+                  "label": "Bronchial asthma",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno17.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno17.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno18",
+                  "label": "Pulmonary tuberculosis",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno18.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno18.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno19",
+                  "label": "Chronic obstructive pulmonary disease",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno19.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno19.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno20",
+                  "label": "Interstitial lung disease/Pulmonary fibrosis",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno20.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno20.female",
+                      "label": "Female"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Diseases of the circulatory system",
+              "children": [
+                {
+                  "value": "bbj_riken.mpheno21",
+                  "label": "Myocardial infarction",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno21.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno21.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno22",
+                  "label": "Unstable angina",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno22.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno22.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno23",
+                  "label": "Stable angina",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno23.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno23.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno24",
+                  "label": "Arrhythmia",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno24.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno24.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno25",
+                  "label": "Heart failure",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno25.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno25.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno26",
+                  "label": "Peripheral arterial diseases",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno26.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno26.female",
+                      "label": "Female"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Hepato-Biliary-Pancreatic diseases",
+              "children": [
+                {
+                  "value": "bbj_riken.mpheno27",
+                  "label": "Chronic hepatitis B",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno27.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno27.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno28",
+                  "label": "Chronic hepatitis C",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno28.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno28.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno29",
+                  "label": "Liver cirrhosis",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno29.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno29.female",
+                      "label": "Female"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Diseases of the genitourinary system",
+              "children": [
+                {
+                  "value": "bbj_riken.mpheno30",
+                  "label": "Nephrotic syndrome",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno30.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno30.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno31",
+                  "label": "Urolithiasis",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno31.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno31.female",
+                      "label": "Female"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Metabolic diseases",
+              "children": [
+                {
+                  "value": "bbj_riken.mpheno32",
+                  "label": "Osteoporosis",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno32.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno32.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno33",
+                  "label": "Diabetes mellitus",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno33.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno33.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno34",
+                  "label": "Dyslipidemia",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno34.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno34.female",
+                      "label": "Female"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Endocrine diseases",
+              "children": [
+                {
+                  "value": "bbj_riken.mpheno35",
+                  "label": "Graves' disease",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno35.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno35.female",
+                      "label": "Female"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Collagen diseases (connective tissue diseases)",
+              "children": [
+                {
+                  "value": "bbj_riken.mpheno36",
+                  "label": "Rheumatoid arthritis",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno36.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno36.female",
+                      "label": "Female"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Allergy",
+              "children": [
+                {
+                  "value": "bbj_riken.mpheno37",
+                  "label": "Hay fever",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno37.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno37.female",
+                      "label": "Female"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Diseases of the skin and subcutaneous tissue",
+              "children": [
+                {
+                  "value": "bbj_riken.mpheno38",
+                  "label": "Drug eruption",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno38.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno38.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno39",
+                  "label": "Atopic dermatitis",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno39.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno39.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno40",
+                  "label": "Keloid",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno40.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno40.female",
+                      "label": "Female"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Gynecological diseases",
+              "children": [
+                {
+                  "value": "bbj_riken.mpheno41",
+                  "label": "Uterine fibroid",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno41.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno42",
+                  "label": "Endometriosis",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno42.female",
+                      "label": "Female"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Diseases of the eye and adnexa",
+              "children": [
+                {
+                  "value": "bbj_riken.mpheno44",
+                  "label": "Glaucoma",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno44.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno44.female",
+                      "label": "Female"
+                    }
+                  ]
+                },
+                {
+                  "value": "bbj_riken.mpheno45",
+                  "label": "Cataract",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno45.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno45.female",
+                      "label": "Female"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "Oral and Maxillofacial diseases",
+              "children": [
+                {
+                  "value": "bbj_riken.mpheno46",
+                  "label": "Periodontitis",
+                  "children": [
+                    {
+                      "value": "bbj_riken.mpheno46.male",
+                      "label": "Male"
+                    },
+                    {
+                      "value": "bbj_riken.mpheno46.female",
+                      "label": "Female"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "value": "ncbn",
+          "label": "NCBN",
+          "children": [
+            {
+              "value": "ncbn.jpn",
+              "label": "Japanese",
+              "children": [
+                {
+                  "value": "ncbn.jpn.hondo",
+                  "label": "Hondo"
+                },
+                {
+                  "value": "ncbn.jpn.ryukyu",
+                  "label": "Ryukyu"
+                }
+              ]
+            },
+            {
+              "value": "ncbn.acb",
+              "label": "African Caribbean in Barbados"
+            },
+            {
+              "value": "ncbn.asw",
+              "label": "African Ancestry in SW USA"
+            },
+            {
+              "value": "ncbn.beb",
+              "label": "Bengali in Bangladesh"
+            },
+            {
+              "value": "ncbn.gbr",
+              "label": "British From England and Scotland"
+            },
+            {
+              "value": "ncbn.cdx",
+              "label": "Chinese Dai in Xishuangbanna, China"
+            },
+            {
+              "value": "ncbn.clm",
+              "label": "Colombian in Medellín, Colombia"
+            },
+            {
+              "value": "ncbn.esn",
+              "label": "Esan in Nigeria"
+            },
+            {
+              "value": "ncbn.fin",
+              "label": "Finnish in Finland"
+            },
+            {
+              "value": "ncbn.gwd",
+              "label": "Gambian in Western Division – Mandinka"
+            },
+            {
+              "value": "ncbn.gih",
+              "label": "Gujarati Indians in Houston, Texas, USA"
+            },
+            {
+              "value": "ncbn.chb",
+              "label": "Han Chinese in Beijing, China"
+            },
+            {
+              "value": "ncbn.chs",
+              "label": "Han Chinese South"
+            },
+            {
+              "value": "ncbn.ibs",
+              "label": "Iberian Populations in Spain"
+            },
+            {
+              "value": "ncbn.itu",
+              "label": "Indian Telugu in the U.K."
+            },
+            {
+              "value": "ncbn.jpt",
+              "label": "Japanese in Tokyo, Japan"
+            },
+            {
+              "value": "ncbn.khv",
+              "label": "Kinh in Ho Chi Minh City, Vietnam"
+            },
+            {
+              "value": "ncbn.lwk",
+              "label": "Luhya in Webuye, Kenya"
+            },
+            {
+              "value": "ncbn.msl",
+              "label": "Mende in Sierra Leone"
+            },
+            {
+              "value": "ncbn.mxl",
+              "label": "Mexican Ancestry in Los Angeles CA USA"
+            },
+            {
+              "value": "ncbn.pel",
+              "label": "Peruvian in Lima Peru"
+            },
+            {
+              "value": "ncbn.pur",
+              "label": "Puerto Rican in Puerto Rico"
+            },
+            {
+              "value": "ncbn.pjl",
+              "label": "Punjabi in Lahore, Pakistan"
+            },
+            {
+              "value": "ncbn.stu",
+              "label": "Sri Lankan Tamil in the UK"
+            },
+            {
+              "value": "ncbn.tsi",
+              "label": "Toscani in Italia"
+            },
+            {
+              "value": "ncbn.ceu",
+              "label": "Utah residents (CEPH) with Northern and Western European ancestry"
+            },
+            {
+              "value": "ncbn.yri",
+              "label": "Yoruba in Ibadan, Nigeria"
+            }
+          ]
+        }
+      ]
+    },
     "location": {
       "label": "Location",
       "type": "peculiar"
