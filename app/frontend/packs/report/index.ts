@@ -7,7 +7,7 @@
  *
  * The application is built around several key classes:
  *
- * - **ConfigProcessor**: Processes YAML configuration and resolves environment variables
+ * - **ConfigProcessor**: Processes JSON configuration and resolves environment variables
  * - **OptionFormatter**: Formats stanza options for HTML attribute assignment
  * - **StanzaManager**: Manages stanza creation, validation, and DOM insertion
  * - **ReportApp**: Orchestrates the entire report rendering process
@@ -30,18 +30,21 @@
  * Each stanza is defined in the YAML configuration with:
  *
  * - **id**: Unique identifier for the stanza type
- * - **dom**: CSS selector for the target DOM element
- * - **src**: Optional custom JavaScript source URL
+ * - **targetSelector**: CSS selector for the target DOM element
+ * - **scriptUrl**: Optional custom JavaScript source URL
  * - **options**: Configuration parameters passed to the stanza
  *
  * ## Environment Variables
  *
  * The system supports template variables in configuration:
  *
- * - `$TOGOVAR_FRONTEND_API_URL` - Base API endpoint
- * - `$TOGOVAR_FRONTEND_REFERENCE` - Reference genome assembly
- * - `$TOGOVAR_STANZA_SPARQLIST` - SPARQLiST endpoint
- * - And more...
+ * - `$TOGOVAR_FRONTEND_API_URL` - Base API endpoint (e.g., https://grch37.togovar.org)
+ * - `$TOGOVAR_FRONTEND_REFERENCE` - Reference genome assembly (GRCh37/GRCh38)
+ * - `$TOGOVAR_STANZA_SPARQLIST` - SPARQLiST endpoint for predefined queries
+ * - `$TOGOVAR_STANZA_JBROWSE` - JBrowse genomic browser endpoint
+ * - `$TOGOVAR_ENDPOINT_SPARQL` - SPARQL endpoint for semantic queries
+ * - `$TOGOVAR_ENDPOINT_SEARCH` - Search endpoint for variant searches
+ * - `$TOGOVAR_FRONTEND_STANZA_URL` - Custom stanza JavaScript source URL
  *
  */
 
@@ -131,7 +134,7 @@ const STANZA_PATH: string = TOGOVAR_FRONTEND_STANZA_URL || DEFAULT_STANZA_PATH;
 // ============================================================================
 
 /**
- * Processes YAML configuration by recursively replacing environment variables
+ * Processes JSON configuration by recursively replacing environment variables
  * with their actual values from ENV_CONFIG.
  *
  * Supports both `$VAR_NAME` and `${VAR_NAME}` syntax for environment variable references.
@@ -140,7 +143,7 @@ class ConfigProcessor {
   /**
    * Recursively processes a configuration object, replacing environment variables.
    *
-   * @param configObject - Raw configuration object from YAML file
+   * @param configObject - Raw configuration object from JSON file
    * @returns Processed configuration with environment variables resolved
    *
    * @example
@@ -153,7 +156,7 @@ class ConfigProcessor {
   static processConfig(configObject: unknown): unknown {
     const processItemRecursively = (item: unknown): unknown => {
       if (typeof item === 'string' && item.includes('$')) {
-        return this.replaceEnvironmentVariables(item);
+        return this._replaceEnvironmentVariables(item);
       }
 
       if (Array.isArray(item)) {
@@ -182,11 +185,11 @@ class ConfigProcessor {
    *
    * @example
    * ```typescript
-   * const result = ConfigProcessor.replaceEnvironmentVariables("$TOGOVAR_FRONTEND_API_URL/api");
+   * const result = ConfigProcessor._replaceEnvironmentVariables("$TOGOVAR_FRONTEND_API_URL/api");
    * // Returns: "https://grch37.togovar.org/api"
    * ```
    */
-  private static replaceEnvironmentVariables(templateString: string): string {
+  private static _replaceEnvironmentVariables(templateString: string): string {
     const environmentVariablePattern = /(\$([A-Z_]+)|\${([A-Z_]+)})/g;
     return templateString.replace(
       environmentVariablePattern,
@@ -243,9 +246,9 @@ class OptionFormatter {
       if (attributeValue && typeof attributeValue === 'object') {
         // Serialize objects to JSON strings
         formattedAttributes[attributeName] = JSON.stringify(attributeValue);
-      } else if (this.isUrl(attributeValue)) {
+      } else if (this._isUrl(attributeValue)) {
         // Format URLs with proper encoding
-        formattedAttributes[attributeName] = this.formatUrl(
+        formattedAttributes[attributeName] = this._formatUrl(
           attributeValue as string
         );
       } else {
@@ -263,7 +266,7 @@ class OptionFormatter {
    * @param value - Value to check
    * @returns True if value is a URL string starting with http/https
    */
-  private static isUrl(value: unknown): value is string {
+  private static _isUrl(value: unknown): value is string {
     return typeof value === 'string' && /^https?:\/\//.test(value);
   }
 
@@ -275,11 +278,11 @@ class OptionFormatter {
    *
    * @example
    * ```typescript
-   * const formatted = OptionFormatter.formatUrl("https://example.com?name=John Doe&age=30");
+   * const formatted = OptionFormatter._formatUrl("https://example.com?name=John Doe&age=30");
    * // Returns: "https://example.com?name=John%20Doe&age=30"
    * ```
    */
-  private static formatUrl(urlString: string): string {
+  private static _formatUrl(urlString: string): string {
     const url = new URL(urlString);
 
     // Rebuild search params with proper encoding
@@ -330,13 +333,18 @@ class StanzaManager {
   ): void {
     const { id, targetSelector, scriptUrl, options } = stanzaConfig;
 
-    if (!this.validateStanzaConfig(stanzaConfig)) {
+    if (!this._validateStanzaConfig(stanzaConfig)) {
       console.error('Invalid stanza config:', stanzaConfig);
       return;
     }
 
-    this.loadStanzaScript(scriptUrl || `${STANZA_PATH}/${id}.js`);
-    this.createAndInsertStanzaElement(id, targetSelector, baseOptions, options);
+    this._loadStanzaScript(scriptUrl || `${STANZA_PATH}/${id}.js`);
+    this._createAndInsertStanzaElement(
+      id,
+      targetSelector,
+      baseOptions,
+      options
+    );
   }
 
   /**
@@ -345,7 +353,7 @@ class StanzaManager {
    * @param config - Stanza configuration to validate
    * @returns True if configuration is valid, false otherwise
    */
-  private static validateStanzaConfig({
+  private static _validateStanzaConfig({
     id,
     targetSelector,
   }: StanzaConfig): boolean {
@@ -367,7 +375,7 @@ class StanzaManager {
    *
    * @param scriptSourceUrl - URL of the stanza JavaScript file
    */
-  private static loadStanzaScript(scriptSourceUrl: string): void {
+  private static _loadStanzaScript(scriptSourceUrl: string): void {
     const scriptElement = document.createElement('script');
     scriptElement.type = 'module';
     scriptElement.src = scriptSourceUrl;
@@ -383,7 +391,7 @@ class StanzaManager {
    * @param baseOptions - Base options applied to all stanzas
    * @param stanzaOptions - Specific options for this stanza instance
    */
-  private static createAndInsertStanzaElement(
+  private static _createAndInsertStanzaElement(
     stanzaId: string,
     targetSelector: string,
     baseOptions: Record<string, unknown>,
@@ -393,11 +401,11 @@ class StanzaManager {
     const stanzaElement = document.createElement(`togostanza-${stanzaId}`);
 
     // Apply all options as HTML attributes
-    this.applyAttributesToElement(
+    this._applyAttributesToElement(
       stanzaElement,
-      this.convertObjectToStringRecord(baseOptions)
+      this._convertObjectToStringRecord(baseOptions)
     );
-    this.applyAttributesToElement(
+    this._applyAttributesToElement(
       stanzaElement,
       OptionFormatter.format(stanzaOptions)
     );
@@ -420,7 +428,7 @@ class StanzaManager {
    * @param objectToConvert - Object to convert
    * @returns Record with all values converted to strings
    */
-  private static convertObjectToStringRecord(
+  private static _convertObjectToStringRecord(
     objectToConvert: Record<string, unknown>
   ): Record<string, string> {
     const stringRecord: Record<string, string> = {};
@@ -436,7 +444,7 @@ class StanzaManager {
    * @param element - Target DOM element
    * @param attributes - Key-value pairs to set as HTML attributes
    */
-  private static applyAttributesToElement(
+  private static _applyAttributesToElement(
     element: Element,
     attributes: Record<string, string>
   ): void {
@@ -469,8 +477,8 @@ class ReportApp {
    * It handles error cases gracefully and provides detailed logging for debugging.
    */
   static initialize(): void {
-    const routeInfo = this.parseCurrentRoute();
-    const reportConfig = this.getReportConfig(routeInfo.reportType);
+    const routeInfo = this._parseCurrentRoute();
+    const reportConfig = this._getReportConfig(routeInfo.reportType);
 
     if (!reportConfig) {
       console.error(
@@ -479,13 +487,13 @@ class ReportApp {
       return;
     }
 
-    const baseOptions = this.prepareBaseOptions(
+    const baseOptions = this._prepareBaseOptions(
       reportConfig,
       routeInfo.reportId
     );
 
-    this.updatePageElements(routeInfo.reportId);
-    this.renderAllStanzas(
+    this._updatePageElements(routeInfo.reportId);
+    this._renderAllStanzas(
       reportConfig.stanza || [],
       baseOptions,
       routeInfo.reportId,
@@ -504,11 +512,11 @@ class ReportApp {
    * @example
    * ```typescript
    * // URL: https://example.com/variant/tgv123456
-   * const route = ReportApp.parseCurrentRoute();
+   * const route = ReportApp._parseCurrentRoute();
    * // Returns: { reportType: "variant", reportId: "tgv123456" }
    * ```
    */
-  private static parseCurrentRoute(): RouteInfo {
+  private static _parseCurrentRoute(): RouteInfo {
     const pathSegments = window.location.pathname.split('/').slice(-2);
     return {
       reportType: pathSegments[0],
@@ -522,7 +530,9 @@ class ReportApp {
    * @param reportType - Type of report (variant, gene, disease, etc.)
    * @returns Report configuration or undefined if not found
    */
-  private static getReportConfig(reportType: string): ReportConfig | undefined {
+  private static _getReportConfig(
+    reportType: string
+  ): ReportConfig | undefined {
     return REPORT_CONFIG[reportType];
   }
 
@@ -539,11 +549,11 @@ class ReportApp {
    * @example
    * ```typescript
    * const config = { base_options: { sparqlist: "/api" }, id: "tgv_id" };
-   * const options = ReportApp.prepareBaseOptions(config, "tgv123456");
+   * const options = ReportApp._prepareBaseOptions(config, "tgv123456");
    * // Returns: { sparqlist: "/api", tgv_id: "tgv123456" }
    * ```
    */
-  private static prepareBaseOptions(
+  private static _prepareBaseOptions(
     reportConfig: ReportConfig,
     reportId: string
   ): Record<string, unknown> {
@@ -566,7 +576,7 @@ class ReportApp {
    *
    * @param reportId - Identifier to display in page elements
    */
-  private static updatePageElements(reportId: string): void {
+  private static _updatePageElements(reportId: string): void {
     const reportIdElements = document.querySelectorAll('.report_id');
     reportIdElements.forEach((element) => {
       element.textContent = reportId;
@@ -585,14 +595,14 @@ class ReportApp {
    * @param reportId - Report identifier for template variable replacement
    * @param idKey - Key name for the report ID in template variables
    */
-  private static renderAllStanzas(
+  private static _renderAllStanzas(
     stanzas: StanzaConfig[],
     baseOptions: Record<string, unknown>,
     reportId: string,
     idKey: string = 'id'
   ): void {
     stanzas.forEach((stanza) => {
-      const processedStanza = this.processStanzaTemplateVariables(
+      const processedStanza = this._processStanzaTemplateVariables(
         stanza,
         reportId,
         idKey
@@ -619,11 +629,11 @@ class ReportApp {
    *   targetSelector: "#summary",
    *   options: { url: "/api/variant/${tgv_id}" }
    * };
-   * const processed = ReportApp.processStanzaTemplateVariables(stanza, "tgv123456", "tgv_id");
+   * const processed = ReportApp._processStanzaTemplateVariables(stanza, "tgv123456", "tgv_id");
    * // Result: { ...stanza, options: { url: "/api/variant/tgv123456" } }
    * ```
    */
-  private static processStanzaTemplateVariables(
+  private static _processStanzaTemplateVariables(
     stanzaConfig: StanzaConfig,
     reportId: string,
     idKeyName: string
