@@ -111,9 +111,6 @@ const config = {
     ],
   },
   plugins: [
-    new webpack.ProvidePlugin({
-      $: 'jquery/dist/jquery',
-    }),
     new HtmlWebpackPlugin({
       template: 'app/frontend/views/index.pug',
       filename: 'index.html',
