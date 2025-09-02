@@ -10,7 +10,7 @@ Object.assign(process.env, env);
 
 const config = {
   entry: {
-    main: './app/frontend/packs/index.js',
+    main: './app/frontend/packs/index.ts',
     report: './app/frontend/packs/report/index.ts',
   },
   output: {
