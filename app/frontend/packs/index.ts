@@ -19,7 +19,9 @@ async function init(): Promise<void> {
       console.error('Failed to import home module:', error);
     }
   }
-} // DOM Ready check
+}
+
+// DOM Ready check
 const isReady: boolean =
   document.readyState === 'complete' || document.readyState === 'interactive';
 
