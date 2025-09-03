@@ -1,7 +1,9 @@
 import { storeManager } from '../../store/StoreManager';
 import { ResultsRowView } from './ResultsRowView';
 import { TR_HEIGHT, COMMON_FOOTER_HEIGHT } from '../../global.js';
+import { DisplayingRegions } from '../../types/index';
 
+// 一時的にローカル型定義を使用（後で移行予定）
 /** 検索メッセージの型定義 */
 type SearchMessages = {
   notice?: string;
@@ -21,16 +23,8 @@ type ColumnConfig = {
   isUsed: boolean;
 };
 
-/** 表示される染色体領域の型定義 */
-type DisplayingRegions = {
-  [chromosome: string]: {
-    start: number;
-    end: number;
-  };
-};
-
 /** レコードの型定義 */
-type Record = {
+type ResultsRecord = {
   chromosome: string;
   start: number;
   [key: string]: any;
@@ -344,7 +338,7 @@ export class ResultsViewDataManager {
 
     // 各行のレコードから染色体位置を収集
     for (let i = 0; i < rowCount; i++) {
-      const record = storeManager.getRecordByIndex(i) as Record;
+      const record = storeManager.getRecordByIndex(i) as ResultsRecord;
 
       if (this._isValidRecord(record)) {
         (chromosomePositions[record.chromosome] ??= []).push(record.start);
@@ -357,7 +351,7 @@ export class ResultsViewDataManager {
   /**
    * レコードが有効かチェックする
    */
-  private _isValidRecord(record: any): record is Record {
+  private _isValidRecord(record: any): record is ResultsRecord {
     return (
       record &&
       typeof record === 'object' &&

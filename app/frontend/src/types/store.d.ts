@@ -1,0 +1,42 @@
+// ------------------------------
+// Store Types
+// ------------------------------
+
+import type { MasterConditions, SimpleSearchCurrentConditions } from './search';
+import type { Column, ResultData } from './data';
+
+/** 表示される染色体領域の型定義 */
+export type DisplayingRegions = {
+  [chromosome: string]: {
+    start: number;
+    end: number;
+  };
+};
+
+export type StoreState = {
+  karyotype: any;
+  searchMode: any;
+  simpleSearchConditionsMaster: MasterConditions[];
+  simpleSearchConditions: SimpleSearchCurrentConditions;
+  columns: Column[];
+  searchResults: ResultData[];
+  numberOfRecords: number;
+  offset: number;
+  rowCount: number;
+  appStatus: 'preparing' | 'searching' | 'normal'; //'preparing' | 'searching' | 'idle'に変更する?
+  isLogin: boolean;
+  isFetching: boolean;
+  isStoreUpdating: boolean;
+  selectedRow?: number;
+  advancedSearchConditions?: any;
+  searchMessages?: any;
+  searchStatus?: any;
+  statisticsDataset?: any;
+  statisticsSignificance?: any;
+  statisticsType?: any;
+  statisticsConsequence?: any;
+  showModal?: boolean;
+  displayingRegionsOnChromosome?: {
+    [key: string]: { start: number; end: number };
+  };
+};

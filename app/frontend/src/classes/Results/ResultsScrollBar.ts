@@ -1,5 +1,6 @@
 import { storeManager } from '../../store/StoreManager';
 import { TR_HEIGHT } from '../../global.js';
+// import { DragState } from '../../types/index';
 
 // ================================================================
 // CONSTANTS & TYPES
@@ -8,6 +9,7 @@ import { TR_HEIGHT } from '../../global.js';
 const RELEASE_DURATION = 2000;
 const MIN_SCROLLBAR_HEIGHT = 30;
 
+// 型定義はui.d.tsに移動済み（将来的にインポート予定）
 /**
  * Represents the state of a drag operation
  */
