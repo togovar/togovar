@@ -77,7 +77,7 @@ export class ResultsRowView {
   }
 
   // ========================================
-  // Public Methods
+  // Table Row Update Method
   // ========================================
 
   /**
@@ -114,10 +114,8 @@ export class ResultsRowView {
   }
 
   // ========================================
-  // Public Methods
+  // Event Handlers
   // ========================================
-
-  // Event Handlers --------------------------------
 
   /**
    * Handler for when a row is clicked
@@ -145,7 +143,9 @@ export class ResultsRowView {
     this.tr.classList.toggle('-selected', this.selected);
   }
 
-  // DOM Creation and State Management --------------------------------
+  // ========================================
+  // DOM Creation and State Management
+  // ========================================
 
   /**
    * Create table row element
@@ -176,7 +176,9 @@ export class ResultsRowView {
     this.tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
   }
 
-  // Data Preparation and HTML Generation --------------------------------
+  // ========================================
+  //  Data Preparation and HTML Generation
+  // ========================================
 
   /**
    * Prepare table data
@@ -202,7 +204,10 @@ export class ResultsRowView {
     }).join('');
   }
 
-  // DOM Element Caching --------------------------------
+  // ========================================
+  //  DOM Element Caching
+  // ========================================
+
   /**
    * Cache table cell elements
    *
@@ -294,7 +299,9 @@ export class ResultsRowView {
       tdPolyphen?.querySelector('.variant-function') || null;
   }
 
-  // Column Content Updates --------------------------------
+  // ========================================
+  //  Column Content Updates
+  // ========================================
 
   /**
    * Update content for the specified column

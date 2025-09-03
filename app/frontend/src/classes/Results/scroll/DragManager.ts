@@ -276,7 +276,7 @@ export class DragManager {
   }
 
   // ========================================
-  // Utility Methods
+  // Helper Methods
   // ========================================
 
   /**
