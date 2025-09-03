@@ -2,7 +2,6 @@ import { storeManager } from '../src/store/StoreManager';
 import { ResultsView } from '../src/classes/Results/ResultsView';
 import SideBar from '../src/classes/SideBar.js';
 import Configuration from '../src/classes/Configuration.js';
-import SelectedRowIndicator from '../src/classes/SelectedRowIndicator.js';
 import Karyotype from '../src/classes/Karyotype.js';
 import ActivityIndicator from '../src/classes/ActivityIndicator.js';
 import ModuleTabsView from '../src/classes/ModuleTabsView.js';
@@ -30,7 +29,6 @@ import TippyBox from '../src/classes/TippyBox.js';
 import qs from 'qs';
 import { extractSearchCondition } from './store/searchManager';
 import { initializeApp } from './store/initializeApp';
-const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
 const _currentUrlParams = qs.parse(window.location.search.substring(1));
 
 export function initHome() {

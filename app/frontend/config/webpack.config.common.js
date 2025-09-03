@@ -10,8 +10,8 @@ Object.assign(process.env, env);
 
 const config = {
   entry: {
-    main: './app/frontend/packs/index.js',
-    report: './app/frontend/packs/report/index.js',
+    main: './app/frontend/packs/index.ts',
+    report: './app/frontend/packs/report/index.ts',
   },
   output: {
     path: path.resolve(__dirname, '../../../dist'),
@@ -111,9 +111,6 @@ const config = {
     ],
   },
   plugins: [
-    new webpack.ProvidePlugin({
-      $: 'jquery/dist/jquery',
-    }),
     new HtmlWebpackPlugin({
       template: 'app/frontend/views/index.pug',
       filename: 'index.html',
