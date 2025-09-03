@@ -1,12 +1,26 @@
+/**
+ * Results Row Templates
+ *
+ * This module provides HTML templates and utilities for generating
+ * table row content in the search results display. It includes:
+ * - Column HTML templates for consistent table structure
+ * - Dynamic frequency column generation based on dataset configuration
+ * - Constants for display formatting and limits
+ */
+
 import { getSimpleSearchConditionMaster } from '../../store/searchManager';
 import { DatasetMasterItem } from '../../types';
 
-/** Ref/Alt列で表示する配列の最大長 */
+/** Maximum length of array to display in Ref/Alt column */
 export const REF_ALT_SHOW_LENGTH = 4;
 
+// ============================================
+// Column Template Definitions
+// ============================================
+
 /**
- * 各カラムのHTMLテンプレートを定数として定義
- * テーブルの各列に対応するHTML構造を提供
+ * HTML templates for each column defined as constants
+ * Provides HTML structure corresponding to each table column
  */
 export const COLUMN_TEMPLATES = {
   togovar_id:
@@ -30,13 +44,18 @@ export const COLUMN_TEMPLATES = {
     '<td class="polyphen"><div class="variant-function" data-function=""></div></td>',
 } as const;
 
+// ============================================
+// Dynamic Template Generation
+// ============================================
+
 /**
- * アレル頻度(Alt frequency)カラムのHTMLを動的に生成
+ * Dynamically generates HTML for Alt frequency column
  *
- * データセットマスタから頻度データを持つデータセットを取得し、
- * 各データセットに対応するlogarithmized-block-graph-frequency-view要素を生成する
+ * Retrieves datasets with frequency data from the dataset master,
+ * and generates logarithmized-block-graph-frequency-view elements
+ * corresponding to each dataset
  *
- * @returns 生成されたHTMLテーブルセル文字列
+ * @returns Generated HTML table cell string
  */
 export function createFrequencyColumnHTML(): string {
   const master: DatasetMasterItem[] =
