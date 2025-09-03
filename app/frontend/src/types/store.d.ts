@@ -1,9 +1,20 @@
-// ------------------------------
-// Store Types
-// ------------------------------
+/**
+ * Store & State Management Type Definitions
+ *
+ * This module contains type definitions for:
+ * - Global application state structure
+ * - Store data models and schemas
+ * - State update actions and mutations
+ * - Data binding and reactive properties
+ * - Application lifecycle states
+ */
+
+// ============================================
+// State Models & Regional Data Types
+// ============================================
 
 import type { MasterConditions, SimpleSearchCurrentConditions } from './search';
-import type { Column, ResultData } from './data';
+import type { Column, ResultData } from './api';
 
 /** 表示される染色体領域の型定義 */
 export type DisplayingRegions = {
@@ -12,6 +23,10 @@ export type DisplayingRegions = {
     end: number;
   };
 };
+
+// ============================================
+// Application State Schema
+// ============================================
 
 export type StoreState = {
   karyotype: any;

@@ -1,6 +1,17 @@
-// -------------------------------------
-// Search Types
-// -------------------------------------
+/**
+ * Search & Query Type Definitions
+ *
+ * This module contains type definitions for:
+ * - Search conditions and parameters
+ * - Query builders and form states
+ * - Search modes (simple/advanced)
+ * - Filter configurations and validations
+ * - Search result messages and status
+ */
+
+// ============================================
+// Master Data & Configuration Types
+// ============================================
 
 export interface MasterConditions {
   id: MasterConditionId;
@@ -43,9 +54,10 @@ export interface ItemItemClass {
   items: string[];
 }
 
-// -------------------------------------
-// SimpleSearch Current Conditions
-// -------------------------------------
+// ============================================
+// Search Conditions & Form State Types
+// ============================================
+
 export type SimpleSearchCurrentConditions = {
   mode?: SearchMode;
   term?: string;
@@ -64,9 +76,9 @@ export type SimpleSearchCurrentConditions = {
   polyphen?: Record<string, string>; // { "N": "1", "PROBD": "1", ... }
 };
 
-//  -------------------------------------
-//  Search Mode
-//  -------------------------------------
+// ============================================
+// Search Mode & Query Types
+// ============================================
 export type SearchMode = 'simple' | 'advanced';
 
 export type FetchOption = SimpleSearchFetchOption | AdvancedSearchFetchOption;
@@ -92,9 +104,9 @@ export type AdvancedSearchFetchOption = {
   body: string;
 };
 
-// -------------------------------------
-// Search Messages and Status
-// -------------------------------------
+// ============================================
+// Search Messages & Status Types
+// ============================================
 
 /** 検索メッセージの型定義 */
 export type SearchMessages = {

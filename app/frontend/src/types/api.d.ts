@@ -1,6 +1,17 @@
-//  -------------------------------------
-//  Result Data, Statistics Data
-//  -------------------------------------
+/**
+ * API & Data Model Type Definitions
+ *
+ * This module contains type definitions for:
+ * - API response structures and data models
+ * - Search results and statistical data
+ * - Database records and entity definitions
+ * - Master data and configuration objects
+ * - Data transformation and processing types
+ */
+
+// ============================================
+// Search Results & Statistics Types
+// ============================================
 
 export type SearchResults = {
   data: ResultData[];
@@ -26,6 +37,10 @@ export type StatisticsData = {
   significance: Record<string, number>;
   consequence: Record<string, number>;
 };
+
+// ============================================
+// Master Data & Configuration Types
+// ============================================
 
 export type DatasetMaster = {
   items: DatasetMasterItem[];
@@ -54,10 +69,18 @@ export type ConsequenceMasterItem = {
   description: string;
 };
 
+// ============================================
+// Table & Column Configuration Types
+// ============================================
+
 export type Column = {
   id: string;
   label: string;
 };
+
+// ============================================
+// Result Data & Entity Types
+// ============================================
 
 export type ResultData = {
   id: string;
@@ -138,9 +161,9 @@ export type Frequency = {
 export type TdFrequencies = Record<string, FrequencyElement>;
 export type FrequencyElement = HTMLElement & { frequency?: any };
 
-// -------------------------------------
-// Results View Data Types
-// -------------------------------------
+// ============================================
+// Results Display & Processing Types
+// ============================================
 
 /** レコードの型定義（Results表示用） */
 export type ResultsRecord = {

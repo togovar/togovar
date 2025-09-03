@@ -1,18 +1,32 @@
-// -------------------------------------
-// Main Types Export
-// -------------------------------------
+/**
+ * TogoVar Frontend Type Definitions
+ *
+ * This file serves as the main entry point for all type definitions used
+ * throughout the TogoVar frontend application. Types are organized into
+ * logical modules for better maintainability and discoverability.
+ */
 
-// Store types
+// ============================================
+// Store & State Management Types
+// ============================================
 export * from './store';
 
-// Search types
+// ============================================
+// Search & Query Types
+// ============================================
 export * from './search';
 
-// Data types
-export * from './data';
+// ============================================
+// API & Data Model Types
+// ============================================
+export * from './api';
 
-// UI types
-export * from './ui';
+// ============================================
+// UI Components & Interaction Types
+// ============================================
+export * from './components';
 
-// Report types
+// ============================================
+// Report System Types
+// ============================================
 export * from './report';

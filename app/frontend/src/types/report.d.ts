@@ -1,6 +1,17 @@
-// -------------------------------------
-// Report System Types
-// -------------------------------------
+/**
+ * Report System Type Definitions
+ *
+ * This module contains type definitions for:
+ * - Report page configurations and layouts
+ * - Stanza component definitions and settings
+ * - Environment and API endpoint configurations
+ * - Report generation and rendering types
+ * - Dynamic content loading and management
+ */
+
+// ============================================
+// Environment & Configuration Types
+// ============================================
 
 /**
  * Environment configuration interface defining all endpoint URLs and settings

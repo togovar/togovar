@@ -1,6 +1,17 @@
-// -------------------------------------
-// UI and Display Types
-// -------------------------------------
+/**
+ * UI Components & Interaction Type Definitions
+ *
+ * This module contains type definitions for:
+ * - UI component configurations and state
+ * - User interaction events and handlers
+ * - Layout and display calculations
+ * - Touch and scroll behavior types
+ * - Visual element properties and styles
+ */
+
+// ============================================
+// Component Configuration Types
+// ============================================
 
 /** カラム設定の型定義 */
 export type ColumnConfig = {
@@ -16,9 +27,9 @@ export type DisplaySizeCalculation = {
   offset: number;
 };
 
-// -------------------------------------
-// ScrollBar Types
-// -------------------------------------
+// ============================================
+// ScrollBar Component Types
+// ============================================
 
 /** ドラッグ状態を表す型 */
 export interface DragState {
@@ -54,9 +65,9 @@ export type ScrollBounds = {
   max: number;
 };
 
-// -------------------------------------
+// ============================================
 // Touch Handler Types
-// -------------------------------------
+// ============================================
 
 /** スクロールコールバックの型定義 */
 export interface ScrollCallbacks {
