@@ -69,7 +69,7 @@ export default class ResultsScrollBar {
     ScrollBarRenderer.createScrollBarHTML(this._container);
 
     // DOM要素を取得
-    const elements = ScrollBarRenderer.getRequiredElements(this._container);
+    const elements = ScrollBarRenderer.initializeElements(this._container);
     this._scrollBarElement = elements.scrollBar;
     this._positionDisplay = elements.position;
     this._totalDisplay = elements.total;
@@ -90,7 +90,8 @@ export default class ResultsScrollBar {
     });
 
     this._bindStoreEvents();
-    this._dragManager.initialize();
+    this._renderer.initializeCursor(); // カーソル初期化をレンダラーで実行
+    this._dragManager.initializeDragManager();
   }
 
   /**
@@ -127,7 +128,7 @@ export default class ResultsScrollBar {
 
     // 重要: _lastScrollPositionを更新してトラックパッドスクロールとの整合性を保つ
     this._lastScrollPosition = offset * TR_HEIGHT;
-    
+
     storeManager.setData('offset', offset);
     this._renderer.scheduleVisualStateRelease();
   }
@@ -189,7 +190,7 @@ export default class ResultsScrollBar {
    */
   destroy(): void {
     // 1. DragManagerのクリーンアップ（最も重要）
-    this._dragManager.destroy();
+    this._dragManager.destroyDragManager();
 
     // 2. StoreManagerのイベントバインディング解除
     storeManager.unbind('offset', this);
@@ -310,6 +311,9 @@ export default class ResultsScrollBar {
    * @param top - ドラッグ位置
    */
   private _handleDrag(top: number): void {
+    // レンダラーでスクロールバー位置を更新
+    this._renderer.updateScrollBarPosition(top);
+
     const mockEvent: DragEventUI = { position: { top } };
     this.onDrag(null, mockEvent);
   }

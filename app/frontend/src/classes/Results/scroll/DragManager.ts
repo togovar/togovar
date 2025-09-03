@@ -9,9 +9,6 @@ import {
  */
 export class DragManager {
   // Constants
-  private static readonly CURSOR_GRAB = 'grab';
-  private static readonly CSS_CLASS_DRAGGING = '-dragging';
-  private static readonly CSS_CLASS_ACTIVE = '-active';
   private static readonly TOUCH_EVENT_OPTIONS: TouchEventOptions = {
     passive: false,
   };
@@ -59,7 +56,7 @@ export class DragManager {
    * Initialize drag functionality by setting up event listeners
    * Automatically detects device capabilities and configures appropriate interaction methods
    */
-  initialize(): void {
+  initializeDragManager(): void {
     if (this._supportsMouseInteraction()) {
       this._initializeMouseDrag();
     }
@@ -70,7 +67,7 @@ export class DragManager {
    * Clean up all event listeners and reset internal state
    * Call this method when the component is no longer needed to prevent memory leaks
    */
-  destroy(): void {
+  destroyDragManager(): void {
     this._removeMouseEventListeners();
     this._removeTouchEventListeners();
     this._resetState();
@@ -111,7 +108,6 @@ export class DragManager {
       startTop: 0,
     };
 
-    this._scrollBarElement.style.cursor = DragManager.CURSOR_GRAB;
     this._attachMouseEventListeners();
   }
 
@@ -170,7 +166,6 @@ export class DragManager {
     const newTop = this._mouseDragState.startTop + deltaY;
     const constrainedTop = this._constrainPositionWithinBounds(newTop);
 
-    this._updateScrollBarPosition(constrainedTop);
     this._onDragCallback(constrainedTop);
   }
 
@@ -244,7 +239,6 @@ export class DragManager {
     this._touchStartY = e.touches[0].clientY;
     this._touchStartTop = this._getCurrentScrollBarTop();
 
-    this._addDragClasses();
     this._onVisualStateChange(true);
   }
 
@@ -272,7 +266,6 @@ export class DragManager {
 
     this._isTouchDragging = false;
     this._onVisualStateChange(false);
-    this._removeDragClasses();
   }
 
   // ========================================
@@ -287,39 +280,12 @@ export class DragManager {
   }
 
   /**
-   * Update scrollbar position
-   */
-  private _updateScrollBarPosition(top: number): void {
-    this._scrollBarElement.style.top = `${top}px`;
-  }
-
-  /**
    * Constrain position within bounds
    */
   private _constrainPositionWithinBounds(newTop: number): number {
     const maxTop =
       this._container.offsetHeight - this._scrollBarElement.offsetHeight;
     return Math.max(0, Math.min(newTop, maxTop));
-  }
-
-  // ========================================
-  // Visual State Management
-  // ========================================
-
-  /**
-   * Add drag-related CSS classes
-   */
-  private _addDragClasses(): void {
-    this._container.classList.add(DragManager.CSS_CLASS_DRAGGING);
-    this._container.classList.add(DragManager.CSS_CLASS_ACTIVE);
-  }
-
-  /**
-   * Remove drag-related CSS classes
-   */
-  private _removeDragClasses(): void {
-    this._container.classList.remove(DragManager.CSS_CLASS_DRAGGING);
-    this._container.classList.remove(DragManager.CSS_CLASS_ACTIVE);
   }
 
   // ========================================

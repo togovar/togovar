@@ -6,9 +6,22 @@ const RELEASE_DURATION = 2000;
  * Class responsible for DOM manipulation and rendering of scrollbars
  */
 export class ScrollBarRenderer {
+  // Constants
+  private static readonly CURSOR_GRAB = 'grab';
+  private static readonly CURSOR_GRABBING = 'grabbing';
+
+  private static readonly CSS_CLASS_ACTIVE = '-active';
+  private static readonly CSS_CLASS_DRAGGING = '-dragging';
+  private static readonly CSS_CLASS_DISABLED = '-disabled';
+
+  private static readonly SELECTOR_BAR = '.bar';
+  private static readonly SELECTOR_POSITION = '.position';
+  private static readonly SELECTOR_TOTAL = '.total';
+
+  // Instance Properties
   private _releaseTimeoutId: number | undefined;
 
-  // DOM elements (managed by this renderer)
+  // DOM elements
   private readonly _container: HTMLElement;
   private readonly _scrollBarElement: HTMLElement;
   private readonly _positionDisplay: HTMLElement;
@@ -27,53 +40,21 @@ export class ScrollBarRenderer {
   }
 
   // ========================================
-  // Public API - DOM Element Access
+  // DOM Initialization
   // ========================================
 
   /**
-   * Get container element
-   */
-  getContainer(): HTMLElement {
-    return this._container;
-  }
-
-  /**
-   * Get scrollbar element (primary DOM element)
-   */
-  getScrollBarElement(): HTMLElement {
-    return this._scrollBarElement;
-  }
-
-  /**
-   * Get position display element
-   */
-  getPositionDisplay(): HTMLElement {
-    return this._positionDisplay;
-  }
-
-  /**
-   * Get total display element
-   */
-  getTotalDisplay(): HTMLElement {
-    return this._totalDisplay;
-  }
-
-  // ========================================
-  // Static Factory Methods
-  // ========================================
-
-  /**
-   * Create HTML structure for scrollbar
-   * @param container - Container element
+   * Create and inject HTML structure for scrollbar into container
+   * @param container - Container element where scrollbar HTML will be inserted
    */
   static createScrollBarHTML(container: HTMLElement): void {
     container.insertAdjacentHTML(
       'beforeend',
       `
-      <div class="bar">
+      <div class="${ScrollBarRenderer.SELECTOR_BAR.slice(1)}">
         <div class="indicator">
-          <span class="position">1</span>
-          <span class="total"></span>
+          <span class="${ScrollBarRenderer.SELECTOR_POSITION.slice(1)}">1</span>
+          <span class="${ScrollBarRenderer.SELECTOR_TOTAL.slice(1)}"></span>
         </div>
       </div>
       `
@@ -81,24 +62,51 @@ export class ScrollBarRenderer {
   }
 
   /**
-   * Get required DOM elements with validation
-   * @param container - Container element
+   * Initialize and validate required DOM elements from container
+   * @param container - Container element containing the scrollbar structure
+   * @returns Object containing validated scrollbar DOM elements
+   * @throws Error if required elements are not found
    */
-  static getRequiredElements(container: HTMLElement) {
-    const scrollBar = container.querySelector('.bar') as HTMLElement;
-    if (!scrollBar) {
-      throw new Error('ScrollBar element (.bar) not found');
-    }
+  static initializeElements(container: HTMLElement) {
+    const scrollBar = ScrollBarRenderer._getElement(
+      container,
+      ScrollBarRenderer.SELECTOR_BAR,
+      'ScrollBar element'
+    );
 
-    const position = scrollBar.querySelector('.position') as HTMLElement;
-    const total = scrollBar.querySelector('.total') as HTMLElement;
-    if (!position || !total) {
-      throw new Error(
-        'Required indicator elements (.position, .total) not found'
-      );
-    }
+    const position = ScrollBarRenderer._getElement(
+      scrollBar,
+      ScrollBarRenderer.SELECTOR_POSITION,
+      'Position indicator element'
+    );
+
+    const total = ScrollBarRenderer._getElement(
+      scrollBar,
+      ScrollBarRenderer.SELECTOR_TOTAL,
+      'Total indicator element'
+    );
 
     return { scrollBar, position, total };
+  }
+
+  /**
+   * Safely retrieve a DOM element with validation
+   * @param parent - Parent element to search within
+   * @param selector - CSS selector for the target element
+   * @param description - Human-readable description for error messages
+   * @returns The found HTML element
+   * @throws Error if element is not found
+   */
+  private static _getElement(
+    parent: Element,
+    selector: string,
+    description: string
+  ): HTMLElement {
+    const element = parent.querySelector(selector) as HTMLElement;
+    if (!element) {
+      throw new Error(`${description} (${selector}) not found`);
+    }
+    return element;
   }
 
   // ========================================
@@ -122,7 +130,7 @@ export class ScrollBarRenderer {
     this.updatePositionDisplay(offset);
 
     // Maintain active state
-    this._container.classList.add('-active');
+    this._container.classList.add(ScrollBarRenderer.CSS_CLASS_ACTIVE);
   }
 
   /**
@@ -157,9 +165,13 @@ export class ScrollBarRenderer {
     this.scheduleVisualStateRelease();
 
     if (rowCount === 0 || numberOfRecords === rowCount) {
-      this._scrollBarElement.classList.add('-disabled');
+      this._scrollBarElement.classList.add(
+        ScrollBarRenderer.CSS_CLASS_DISABLED
+      );
     } else {
-      this._scrollBarElement.classList.remove('-disabled');
+      this._scrollBarElement.classList.remove(
+        ScrollBarRenderer.CSS_CLASS_DISABLED
+      );
     }
   }
 
@@ -186,21 +198,21 @@ export class ScrollBarRenderer {
       this._releaseVisualState.bind(this),
       RELEASE_DURATION
     );
-    this._container.classList.add('-dragging');
+    this._container.classList.add(ScrollBarRenderer.CSS_CLASS_DRAGGING);
   }
 
   /**
    * Activate scrollbar
    */
   activate(): void {
-    this._container.classList.add('-active');
+    this._container.classList.add(ScrollBarRenderer.CSS_CLASS_ACTIVE);
   }
 
   /**
    * Deactivate scrollbar
    */
   deactivate(): void {
-    this._container.classList.remove('-active');
+    this._container.classList.remove(ScrollBarRenderer.CSS_CLASS_ACTIVE);
   }
 
   /**
@@ -209,8 +221,8 @@ export class ScrollBarRenderer {
    */
   setDraggingState(isDragging: boolean): void {
     if (isDragging) {
-      this._container.classList.add('-dragging');
-      this._container.classList.add('-active');
+      this._container.classList.add(ScrollBarRenderer.CSS_CLASS_DRAGGING);
+      this._container.classList.add(ScrollBarRenderer.CSS_CLASS_ACTIVE);
     } else {
       this.scheduleVisualStateRelease();
     }
@@ -221,7 +233,24 @@ export class ScrollBarRenderer {
    * @param isDragging - Whether currently dragging
    */
   setCursorStyle(isDragging: boolean): void {
-    this._scrollBarElement.style.cursor = isDragging ? 'grabbing' : 'grab';
+    this._scrollBarElement.style.cursor = isDragging
+      ? ScrollBarRenderer.CURSOR_GRABBING
+      : ScrollBarRenderer.CURSOR_GRAB;
+  }
+
+  /**
+   * Initialize cursor style for drag operations
+   */
+  initializeCursor(): void {
+    this._scrollBarElement.style.cursor = ScrollBarRenderer.CURSOR_GRAB;
+  }
+
+  /**
+   * Update scrollbar position
+   * @param top - Top position in pixels
+   */
+  updateScrollBarPosition(top: number): void {
+    this._scrollBarElement.style.top = `${top}px`;
   }
 
   /**
@@ -243,6 +272,6 @@ export class ScrollBarRenderer {
    * Release drag visual state
    */
   private _releaseVisualState(): void {
-    this._container.classList.remove('-dragging');
+    this._container.classList.remove(ScrollBarRenderer.CSS_CLASS_DRAGGING);
   }
 }
