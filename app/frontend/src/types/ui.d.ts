@@ -53,3 +53,35 @@ export type ScrollBounds = {
   min: number;
   max: number;
 };
+
+// -------------------------------------
+// Touch Handler Types
+// -------------------------------------
+
+/** スクロールコールバックの型定義 */
+export interface ScrollCallbacks {
+  onScrollStart?: () => void;
+  onScroll?: (deltaY: number, startOffset: number) => void;
+  onScrollEnd?: () => void;
+}
+
+/** タッチ状態の型定義 */
+export interface TouchState {
+  startY: number;
+  startX: number;
+  startTime: number;
+  lastY: number;
+  lastX: number;
+  distance: number;
+  duration: number;
+  isScrolling: boolean;
+  startOffset: number;
+}
+
+/** タッチ判定結果の型定義 */
+export interface TouchGesture {
+  isTap: boolean;
+  isScroll: boolean;
+  deltaY: number;
+  deltaX: number;
+}

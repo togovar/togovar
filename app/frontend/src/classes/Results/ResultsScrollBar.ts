@@ -1,58 +1,19 @@
 import { storeManager } from '../../store/StoreManager';
 import { TR_HEIGHT } from '../../global.js';
-// import { DragState } from '../../types/index';
+import {
+  DragState,
+  DragEventUI,
+  ScrollCalculation,
+  ScrollBarCalculation,
+  ScrollBounds,
+} from '../../types';
 
 // ================================================================
-// CONSTANTS & TYPES
+// CONSTANTS
 // ================================================================
 
 const RELEASE_DURATION = 2000;
 const MIN_SCROLLBAR_HEIGHT = 30;
-
-// 型定義はui.d.tsに移動済み（将来的にインポート予定）
-/**
- * Represents the state of a drag operation
- */
-interface DragState {
-  isDragging: boolean;
-  startY: number;
-  startTop: number;
-}
-
-/**
- * UI object for drag events containing position information
- */
-interface DragEventUI {
-  position: {
-    top: number;
-  };
-}
-
-/**
- * Scroll calculation result type
- */
-type ScrollCalculation = {
-  totalHeight: number;
-  availableScrollY: number;
-  newScrollPosition: number;
-};
-
-/**
- * ScrollBar calculation result type
- */
-type ScrollBarCalculation = {
-  barHeight: number;
-  barTop: number;
-  displayRate: number;
-};
-
-/**
- * Scroll bounds type
- */
-type ScrollBounds = {
-  min: number;
-  max: number;
-};
 
 // ================================================================
 // MAIN CLASS

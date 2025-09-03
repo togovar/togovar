@@ -1,42 +1,14 @@
 import { storeManager } from '../../store/StoreManager';
 import { ResultsRowView } from './ResultsRowView';
 import { TR_HEIGHT, COMMON_FOOTER_HEIGHT } from '../../global.js';
-import { DisplayingRegions } from '../../types/index';
-
-// 一時的にローカル型定義を使用（後で移行予定）
-/** 検索メッセージの型定義 */
-type SearchMessages = {
-  notice?: string;
-  warning?: string;
-  error?: string;
-};
-
-/** 検索ステータスの型定義 */
-type SearchStatus = {
-  available: number;
-  filtered: number;
-};
-
-/** カラム設定の型定義 */
-type ColumnConfig = {
-  id: string;
-  isUsed: boolean;
-};
-
-/** レコードの型定義 */
-type ResultsRecord = {
-  chromosome: string;
-  start: number;
-  [key: string]: any;
-};
-
-/** 表示サイズ計算結果の型定義 */
-type DisplaySizeCalculation = {
-  maxRowCount: number;
-  rowCount: number;
-  numberOfRecords: number;
-  offset: number;
-};
+import {
+  DisplayingRegions,
+  SearchMessages,
+  SearchStatus,
+  ColumnConfig,
+  ResultsRecord,
+  DisplaySizeCalculation,
+} from '../../types';
 
 /** 定数 */
 const DISPLAY_CALCULATION_MARGIN = 2;

@@ -4,25 +4,7 @@ import { COLUMNS } from '../../global.js';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
 import { ResultsViewDataManager } from './ResultsViewDataManager';
-
-/** 検索メッセージの型定義 */
-type SearchMessages = {
-  notice?: string;
-  warning?: string;
-  error?: string;
-};
-
-/** 検索ステータスの型定義 */
-type SearchStatus = {
-  available: number;
-  filtered: number;
-};
-
-/** カラム設定の型定義 */
-type ColumnConfig = {
-  id: string;
-  isUsed: boolean;
-};
+import { SearchMessages, SearchStatus, ColumnConfig } from '../../types';
 
 /**
  * 検索結果テーブルビューを管理するクラス

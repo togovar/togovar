@@ -1,33 +1,8 @@
+import { ScrollCallbacks, TouchState, TouchGesture } from '../../types';
+
 /** タッチ対象要素のセレクタ定数 */
 const TOUCH_ELEMENTS_SELECTOR =
   '.tablecontainer > table > tbody > tr, .tablecontainer > table > tbody > td, .tablecontainer > table > tbody > td *';
-/** スクロールコールバックの型定義 */
-interface ScrollCallbacks {
-  onScrollStart?: () => void;
-  onScroll?: (deltaY: number, startOffset: number) => void;
-  onScrollEnd?: () => void;
-}
-
-/** タッチ状態の型定義 */
-interface TouchState {
-  startY: number;
-  startX: number;
-  startTime: number;
-  lastY: number;
-  lastX: number;
-  distance: number;
-  duration: number;
-  isScrolling: boolean;
-  startOffset: number;
-}
-
-/** タッチ判定結果の型定義 */
-interface TouchGesture {
-  isTap: boolean;
-  isScroll: boolean;
-  deltaY: number;
-  deltaX: number;
-}
 
 /** タッチ設定の定数 */
 const TOUCH_CONFIG = {
@@ -180,12 +155,10 @@ export class ResultsViewTouchHandler {
    * タッチ要素のpointer-eventsを更新する
    */
   private _updateTouchElementsPointerEvents(enabled: boolean): void {
-    const touchElements = this.elm.querySelectorAll(
-      TOUCH_ELEMENTS_SELECTOR
-    ) as NodeListOf<HTMLElement>;
+    const touchElements = this.elm.querySelectorAll(TOUCH_ELEMENTS_SELECTOR);
 
     touchElements.forEach((element) => {
-      element.style.pointerEvents = enabled ? 'auto' : 'none';
+      (element as HTMLElement).style.pointerEvents = enabled ? 'auto' : 'none';
     });
   }
 
@@ -195,10 +168,10 @@ export class ResultsViewTouchHandler {
   private _ensureLinkElementsEnabled(): void {
     const linkElements = this.elm.querySelectorAll(
       '.tablecontainer > table > tbody > td a'
-    ) as NodeListOf<HTMLElement>;
+    );
 
     linkElements.forEach((element) => {
-      element.style.pointerEvents = 'auto';
+      (element as HTMLElement).style.pointerEvents = 'auto';
     });
   }
 
