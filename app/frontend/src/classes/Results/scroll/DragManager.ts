@@ -276,7 +276,7 @@ export class DragManager {
   }
 
   // ========================================
-  // Helper Methods
+  // Position Management
   // ========================================
 
   /**
@@ -294,6 +294,19 @@ export class DragManager {
   }
 
   /**
+   * Constrain position within bounds
+   */
+  private _constrainPositionWithinBounds(newTop: number): number {
+    const maxTop =
+      this._container.offsetHeight - this._scrollBarElement.offsetHeight;
+    return Math.max(0, Math.min(newTop, maxTop));
+  }
+
+  // ========================================
+  // Visual State Management
+  // ========================================
+
+  /**
    * Add drag-related CSS classes
    */
   private _addDragClasses(): void {
@@ -309,14 +322,9 @@ export class DragManager {
     this._container.classList.remove(DragManager.CSS_CLASS_ACTIVE);
   }
 
-  /**
-   * Constrain position within bounds
-   */
-  private _constrainPositionWithinBounds(newTop: number): number {
-    const maxTop =
-      this._container.offsetHeight - this._scrollBarElement.offsetHeight;
-    return Math.max(0, Math.min(newTop, maxTop));
-  }
+  // ========================================
+  // State Management
+  // ========================================
 
   /**
    * Reset internal state without affecting DOM elements
