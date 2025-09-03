@@ -1,8 +1,8 @@
 /**
- * Results Row Templates
+ * Results Column Templates
  *
  * This module provides HTML templates and utilities for generating
- * table row content in the search results display. It includes:
+ * table column content in the search results display. It includes:
  * - Column HTML templates for consistent table structure
  * - Dynamic frequency column generation based on dataset configuration
  * - Constants for display formatting and limits

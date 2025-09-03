@@ -10,8 +10,8 @@ import {
 import {
   COLUMN_TEMPLATES,
   createFrequencyColumnHTML,
-} from './ResultsRowTemplates';
-import { ResultsRowUpdaters } from './ResultsRowUpdaters';
+} from './ResultsColumnTemplates';
+import { ResultsColumnUpdater } from './ResultsColumnUpdater';
 
 /**
  * 検索結果テーブルの1行を管理するクラス
@@ -297,67 +297,67 @@ export class ResultsRowView {
   private _updateColumnContent(column: Column, result: ResultData) {
     const columnHandlers = {
       togovar_id: () =>
-        ResultsRowUpdaters.updateTogovarId(
+        ResultsColumnUpdater.updateTogovarId(
           this.tdTGVAnchor,
           result.id,
           `/variant/${result.id}`
         ),
       refsnp_id: () =>
-        ResultsRowUpdaters.updateRefSNP(
+        ResultsColumnUpdater.updateRefSNP(
           this.tdRS,
           this.tdRSAnchor,
           result.existing_variations
         ),
       position: () =>
-        ResultsRowUpdaters.updatePosition(
+        ResultsColumnUpdater.updatePosition(
           this.tdPositionChromosome,
           this.tdPositionCoordinate,
           result.chromosome,
           result.position
         ),
       ref_alt: () =>
-        ResultsRowUpdaters.updateRefAlt(
+        ResultsColumnUpdater.updateRefAlt(
           this.tdRefAltRef,
           this.tdRefAltAlt,
           result.reference,
           result.alternate
         ),
       type: () =>
-        ResultsRowUpdaters.updateVariantType(this.tdType, result.type),
+        ResultsColumnUpdater.updateVariantType(this.tdType, result.type),
       gene: () =>
-        ResultsRowUpdaters.updateGene(
+        ResultsColumnUpdater.updateGene(
           this.tdGene,
           this.tdGeneAnchor,
           result.symbols
         ),
       alt_frequency: () =>
-        ResultsRowUpdaters.updateAltFrequency(
+        ResultsColumnUpdater.updateAltFrequency(
           this.tdFrequencies,
           result.frequencies
         ),
       consequence: () =>
-        ResultsRowUpdaters.updateConsequence(
+        ResultsColumnUpdater.updateConsequence(
           this.tdConsequence,
           this.tdConsequenceItem,
           result.most_severe_consequence,
           result.transcripts
         ),
       clinical_significance: () =>
-        ResultsRowUpdaters.updateClinicalSignificance(
+        ResultsColumnUpdater.updateClinicalSignificance(
           this.tdClinicalSign,
           this.tdClinicalAnchor,
           this.tdClinicalIcon,
           result.significance
         ),
       alphamissense: () =>
-        ResultsRowUpdaters.updateAlphaMissense(
+        ResultsColumnUpdater.updateAlphaMissense(
           this.tdAlphaMissenseFunction,
           result.alphamissense
         ),
       sift: () =>
-        ResultsRowUpdaters.updateSift(this.tdSiftFunction, result.sift),
+        ResultsColumnUpdater.updateSift(this.tdSiftFunction, result.sift),
       polyphen: () =>
-        ResultsRowUpdaters.updatePolyphen(
+        ResultsColumnUpdater.updatePolyphen(
           this.tdPolyphenFunction,
           result.polyphen
         ),
