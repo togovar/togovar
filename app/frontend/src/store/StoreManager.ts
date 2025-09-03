@@ -96,6 +96,21 @@ class StoreManager {
     }
   }
 
+  /** 指定されたキーからターゲットをアンバインドする */
+  // TODO: bindingsがなくなったら、以下は削除する
+  unbind<T = any>(key: string, target: T) {
+    if (this.#bindings[key]) {
+      const index = this.#bindings[key].indexOf(target);
+      if (index !== -1) {
+        this.#bindings[key].splice(index, 1);
+        // 配列が空になったら削除
+        if (this.#bindings[key].length === 0) {
+          delete this.#bindings[key];
+        }
+      }
+    }
+  }
+
   /** listenersに登録されている関数を実行 */
   publish<T extends keyof StoreState>(key: T) {
     this.#listeners.get(key)?.forEach((callback) => callback(this.#state[key]));

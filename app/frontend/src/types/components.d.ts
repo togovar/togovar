@@ -45,6 +45,19 @@ export interface DragEventUI {
   };
 }
 
+/** ドラッグマネージャーの設定オプション */
+export interface DragManagerConfig {
+  scrollBarElement: HTMLElement;
+  container: HTMLElement;
+  onDragCallback: (_top: number) => void;
+  onVisualStateChange: (_isDragging: boolean) => void;
+}
+
+/** タッチイベントオプション（タッチハンドリング改善用） */
+export interface TouchEventOptions {
+  passive: boolean;
+}
+
 /** スクロール計算結果の型 */
 export type ScrollCalculation = {
   totalHeight: number;

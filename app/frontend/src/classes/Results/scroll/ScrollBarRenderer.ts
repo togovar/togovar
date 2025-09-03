@@ -3,12 +3,12 @@ import { ScrollBarCalculation } from '../../../types';
 const RELEASE_DURATION = 2000;
 
 /**
- * スクロールバーのDOM操作とレンダリングを担当するクラス
+ * Class responsible for DOM manipulation and rendering of scrollbars
  */
 export class ScrollBarRenderer {
   private _releaseTimeoutId: number | undefined;
 
-  // プライベートプロパティ（直接アクセス用）
+  // DOM elements (managed by this renderer)
   private readonly _container: HTMLElement;
   private readonly _scrollBarElement: HTMLElement;
   private readonly _positionDisplay: HTMLElement;
@@ -26,6 +26,10 @@ export class ScrollBarRenderer {
     this._totalDisplay = totalDisplay;
   }
 
+  // ========================================
+  // Public API - DOM Element Access
+  // ========================================
+
   /**
    * Get container element
    */
@@ -34,7 +38,7 @@ export class ScrollBarRenderer {
   }
 
   /**
-   * Get scrollbar element
+   * Get scrollbar element (primary DOM element)
    */
   getScrollBarElement(): HTMLElement {
     return this._scrollBarElement;
@@ -54,9 +58,13 @@ export class ScrollBarRenderer {
     return this._totalDisplay;
   }
 
+  // ========================================
+  // Static Factory Methods
+  // ========================================
+
   /**
-   * HTML構造を作成
-   * @param container - コンテナ要素
+   * Create HTML structure for scrollbar
+   * @param container - Container element
    */
   static createScrollBarHTML(container: HTMLElement): void {
     container.insertAdjacentHTML(
@@ -73,8 +81,8 @@ export class ScrollBarRenderer {
   }
 
   /**
-   * 必要なDOM要素を取得・検証
-   * @param container - コンテナ要素
+   * Get required DOM elements with validation
+   * @param container - Container element
    */
   static getRequiredElements(container: HTMLElement) {
     const scrollBar = container.querySelector('.bar') as HTMLElement;
@@ -93,47 +101,51 @@ export class ScrollBarRenderer {
     return { scrollBar, position, total };
   }
 
+  // ========================================
+  // Public API - Style and Layout Methods
+  // ========================================
+
   /**
-   * スクロールバーのスタイルを適用
-   * @param calculation - 計算結果
-   * @param offset - オフセット値
+   * Apply scrollbar styles
+   * @param calculation - Calculation results
+   * @param offset - Offset value
    */
   applyScrollBarStyles(
     calculation: ScrollBarCalculation,
     offset: number
   ): void {
-    // バーのスタイル
+    // Apply bar styles
     this._scrollBarElement.style.height = `${calculation.barHeight}px`;
     this._scrollBarElement.style.top = `${calculation.barTop}px`;
 
-    // 位置表示を更新
+    // Update position display
     this.updatePositionDisplay(offset);
 
-    // アクティブ状態を維持
+    // Maintain active state
     this._container.classList.add('-active');
   }
 
   /**
-   * 位置表示を更新
-   * @param offset - オフセット値
+   * Update position display
+   * @param offset - Offset value
    */
   updatePositionDisplay(offset: number): void {
     this._positionDisplay.textContent = String(offset + 1);
   }
 
   /**
-   * 総数表示を更新
-   * @param numberOfRecords - 総レコード数
+   * Update total display
+   * @param numberOfRecords - Total number of records
    */
   updateTotalDisplay(numberOfRecords: number): void {
     this._totalDisplay.textContent = numberOfRecords.toLocaleString();
   }
 
   /**
-   * スクロールバーの外観を更新
-   * @param calculation - 計算結果
-   * @param rowCount - 表示行数
-   * @param numberOfRecords - 総レコード数
+   * Update scrollbar appearance
+   * @param calculation - Calculation results
+   * @param rowCount - Number of visible rows
+   * @param numberOfRecords - Total number of records
    */
   updateScrollBarAppearance(
     calculation: ScrollBarCalculation,
@@ -152,15 +164,19 @@ export class ScrollBarRenderer {
   }
 
   /**
-   * スクロールバーの位置を設定
-   * @param top - 上端位置
+   * Set scrollbar position
+   * @param top - Top position
    */
   setScrollBarPosition(top: number): void {
     this._scrollBarElement.style.top = `${top}px`;
   }
 
+  // ========================================
+  // Public API - State Management Methods
+  // ========================================
+
   /**
-   * 視覚的な状態の遅延解除をスケジュール
+   * Schedule delayed release of visual state
    */
   scheduleVisualStateRelease(): void {
     if (this._releaseTimeoutId !== undefined) {
@@ -174,29 +190,22 @@ export class ScrollBarRenderer {
   }
 
   /**
-   * ドラッグの視覚的状態を解除
-   */
-  private _releaseVisualState(): void {
-    this._container.classList.remove('-dragging');
-  }
-
-  /**
-   * スクロールバーをアクティブ化
+   * Activate scrollbar
    */
   activate(): void {
     this._container.classList.add('-active');
   }
 
   /**
-   * スクロールバーを非アクティブ化
+   * Deactivate scrollbar
    */
   deactivate(): void {
     this._container.classList.remove('-active');
   }
 
   /**
-   * ドラッグ状態を設定
-   * @param isDragging - ドラッグ中かどうか
+   * Set dragging state
+   * @param isDragging - Whether currently dragging
    */
   setDraggingState(isDragging: boolean): void {
     if (isDragging) {
@@ -208,10 +217,32 @@ export class ScrollBarRenderer {
   }
 
   /**
-   * カーソルスタイルを設定
-   * @param isDragging - ドラッグ中かどうか
+   * Set cursor style
+   * @param isDragging - Whether currently dragging
    */
   setCursorStyle(isDragging: boolean): void {
     this._scrollBarElement.style.cursor = isDragging ? 'grabbing' : 'grab';
+  }
+
+  /**
+   * Clean up all timeouts and timers
+   * Call this method when the renderer is no longer needed
+   */
+  clearTimeouts(): void {
+    if (this._releaseTimeoutId !== undefined) {
+      window.clearTimeout(this._releaseTimeoutId);
+      this._releaseTimeoutId = undefined;
+    }
+  }
+
+  // ========================================
+  // Private Methods
+  // ========================================
+
+  /**
+   * Release drag visual state
+   */
+  private _releaseVisualState(): void {
+    this._container.classList.remove('-dragging');
   }
 }

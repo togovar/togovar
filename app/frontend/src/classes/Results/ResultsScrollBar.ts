@@ -20,6 +20,16 @@ import { ScrollCalculator, ScrollBarRenderer, DragManager } from './scroll';
  * ## Usage
  * ```typescript
  * const scrollbar = new ResultsScrollBar(containerElement);
+ *
+ * // ページ遷移時やコンポーネント削除時には必ずcleanupを実行
+ * window.addEventListener('beforeunload', () => {
+ *   scrollbar.destroy(); // メモリリーク防止
+ * });
+ *
+ * // または、コンポーネントのライフサイクルに合わせて
+ * someComponent.onDestroy(() => {
+ *   scrollbar.destroy();
+ * });
  * ```
  */
 export default class ResultsScrollBar {
@@ -72,12 +82,12 @@ export default class ResultsScrollBar {
       this._positionDisplay,
       this._totalDisplay
     );
-    this._dragManager = new DragManager(
-      this._scrollBarElement,
-      this._container,
-      this._handleDrag.bind(this),
-      this._handleVisualStateChange.bind(this)
-    );
+    this._dragManager = new DragManager({
+      scrollBarElement: this._scrollBarElement,
+      container: this._container,
+      onDragCallback: this._handleDrag.bind(this),
+      onVisualStateChange: this._handleVisualStateChange.bind(this),
+    });
 
     this._bindStoreEvents();
     this._dragManager.initialize();
@@ -115,6 +125,9 @@ export default class ResultsScrollBar {
       numberOfRecords
     );
 
+    // 重要: _lastScrollPositionを更新してトラックパッドスクロールとの整合性を保つ
+    this._lastScrollPosition = offset * TR_HEIGHT;
+    
     storeManager.setData('offset', offset);
     this._renderer.scheduleVisualStateRelease();
   }
@@ -168,6 +181,31 @@ export default class ResultsScrollBar {
    */
   initializePosition(): void {
     this._renderer.activate();
+  }
+
+  /**
+   * Clean up all resources and prevent memory leaks
+   * Call this method when the scrollbar component is no longer needed
+   */
+  destroy(): void {
+    // 1. DragManagerのクリーンアップ（最も重要）
+    this._dragManager.destroy();
+
+    // 2. StoreManagerのイベントバインディング解除
+    storeManager.unbind('offset', this);
+    storeManager.unbind('numberOfRecords', this);
+    storeManager.unbind('rowCount', this);
+
+    // 3. Rendererのタイマークリーンアップ
+    this._renderer.clearTimeouts();
+
+    // 4. DOM要素からのスクロールバー削除（オプション）
+    const scrollBarContainer = this._container.querySelector(
+      '.scrollbar-container'
+    );
+    if (scrollBarContainer) {
+      scrollBarContainer.remove();
+    }
   }
 
   /**
