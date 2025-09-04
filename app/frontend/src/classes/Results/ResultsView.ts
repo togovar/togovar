@@ -1,6 +1,6 @@
 import { storeManager } from '../../store/StoreManager';
 import { COLUMNS } from '../../global.js';
-import ResultsScrollBar from './ResultsScrollBar';
+import { ResultsScrollBar } from './ResultsScrollBar';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
 import { ResultsViewDataManager } from './ResultsViewDataManager';
@@ -272,7 +272,7 @@ export class ResultsView {
     // タッチハンドラーのコールバック設定
     this.touchHandler.setScrollCallbacks({
       onScrollStart: () => {
-        this.scrollBar.initializePosition();
+        this.scrollBar.setActive();
       },
       onScroll: (deltaY, startOffset) => {
         this.scrollBar.handleScrollWithFeedback(deltaY, startOffset);
