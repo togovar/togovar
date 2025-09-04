@@ -41,10 +41,10 @@ export default class ResultsScrollBar {
   private readonly _container: HTMLElement;
   /** Main scrollbar element */
   private readonly _scrollBarElement: HTMLElement;
-  /** Display element for current position */
-  private readonly _positionDisplay: HTMLElement;
-  /** Display element for total count */
-  private readonly _totalDisplay: HTMLElement;
+  /** Label element for current position */
+  private readonly _positionLabel: HTMLElement;
+  /** Label element for total count */
+  private readonly _totalLabel: HTMLElement;
 
   /** Last scroll position for delta calculations */
   private _lastScrollPosition: number = 0;
@@ -69,18 +69,20 @@ export default class ResultsScrollBar {
     ScrollBarRenderer.createScrollBarHTML(this._container);
 
     // DOM要素を取得
-    const elements = ScrollBarRenderer.initializeElements(this._container);
-    this._scrollBarElement = elements.scrollBar;
-    this._positionDisplay = elements.position;
-    this._totalDisplay = elements.total;
+    const { scrollBar, position, total } = ScrollBarRenderer.initializeElements(
+      this._container
+    );
+    this._scrollBarElement = scrollBar;
+    this._positionLabel = position;
+    this._totalLabel = total;
 
     // コンポーネントを初期化
     this._calculator = new ScrollCalculator();
     this._renderer = new ScrollBarRenderer(
       this._container,
       this._scrollBarElement,
-      this._positionDisplay,
-      this._totalDisplay
+      this._positionLabel,
+      this._totalLabel
     );
     this._dragManager = new DragManager({
       scrollBarElement: this._scrollBarElement,
@@ -90,7 +92,7 @@ export default class ResultsScrollBar {
     });
 
     this._bindStoreEvents();
-    this._renderer.initializeCursor(); // カーソル初期化をレンダラーで実行
+    this._renderer.resetCursorStyle(); // カーソル初期化をレンダラーで実行
     this._dragManager.initializeDragManager();
   }
 
@@ -130,7 +132,7 @@ export default class ResultsScrollBar {
     this._lastScrollPosition = offset * TR_HEIGHT;
 
     storeManager.setData('offset', offset);
-    this._renderer.scheduleVisualStateRelease();
+    this._renderer.activateDragStateWithAutoRelease();
   }
 
   /**
@@ -138,8 +140,8 @@ export default class ResultsScrollBar {
    * @param offset - The new offset value (0-based index)
    */
   offset(offset: number): void {
-    this._renderer.updatePositionDisplay(offset);
-    this._updateScrollBarAppearance();
+    this._renderer.updatePositionLabel(offset);
+    this._synchronizeScrollBarWithStore();
 
     // Maintain active state on touch devices
     if (
@@ -155,15 +157,15 @@ export default class ResultsScrollBar {
    * @param numberOfRecords - The total count of records
    */
   numberOfRecords(numberOfRecords: number): void {
-    this._renderer.updateTotalDisplay(numberOfRecords);
-    this._updateScrollBarAppearance();
+    this._renderer.updateTotalLabel(numberOfRecords);
+    this._synchronizeScrollBarWithStore();
   }
 
   /**
    * Handles row count changes and triggers a UI update
    */
   rowCount(): void {
-    this._updateScrollBarAppearance();
+    this._synchronizeScrollBarWithStore();
   }
 
   // ================================================================
@@ -171,17 +173,17 @@ export default class ResultsScrollBar {
   // ================================================================
 
   /**
-   * Deactivate the scrollbar visual state
+   * setInactive the scrollbar visual state
    */
-  deactivate(): void {
-    this._renderer.deactivate();
+  setInactive(): void {
+    this._renderer.setInactive();
   }
 
   /**
    * Initialize scrollbar position
    */
   initializePosition(): void {
-    this._renderer.activate();
+    this._renderer.setActive();
   }
 
   /**
@@ -198,7 +200,7 @@ export default class ResultsScrollBar {
     storeManager.unbind('rowCount', this);
 
     // 3. Rendererのタイマークリーンアップ
-    this._renderer.clearTimeouts();
+    this._renderer.clearAllTimeouts();
 
     // 4. DOM要素からのスクロールバー削除（オプション）
     const scrollBarContainer = this._container.querySelector(
@@ -282,9 +284,9 @@ export default class ResultsScrollBar {
   // ================================================================
 
   /**
-   * Updates the scrollbar appearance based on current data store values
+   * Synchronizes scrollbar appearance with current store data
    */
-  private _updateScrollBarAppearance(): void {
+  private _synchronizeScrollBarWithStore(): void {
     const offset = storeManager.getData('offset') as number;
     const rowCount = storeManager.getData('rowCount') as number;
     const numberOfRecords = storeManager.getData('numberOfRecords') as number;
@@ -295,7 +297,7 @@ export default class ResultsScrollBar {
       numberOfRecords
     );
 
-    this._renderer.updateScrollBarAppearance(
+    this._renderer.updateScrollBarVisualState(
       calculation,
       rowCount,
       numberOfRecords
@@ -323,7 +325,7 @@ export default class ResultsScrollBar {
    * @param isDragging - ドラッグ中かどうか
    */
   private _handleVisualStateChange(isDragging: boolean): void {
-    this._renderer.setCursorStyle(isDragging);
-    this._renderer.setDraggingState(isDragging);
+    this._renderer.updateCursorStyle(isDragging);
+    this._renderer.updateDraggingState(isDragging);
   }
 }

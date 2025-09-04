@@ -1,6 +1,6 @@
 import { storeManager } from '../../store/StoreManager';
-import ResultsScrollBar from './ResultsScrollBar';
 import { COLUMNS } from '../../global.js';
+import ResultsScrollBar from './ResultsScrollBar';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
 import { ResultsViewDataManager } from './ResultsViewDataManager';
@@ -278,7 +278,7 @@ export class ResultsView {
         this.scrollBar.handleScrollWithFeedback(deltaY, startOffset);
       },
       onScrollEnd: () => {
-        this.scrollBar.deactivate();
+        this.scrollBar.setInactive();
       },
     });
   }
