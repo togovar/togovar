@@ -2,11 +2,11 @@ import { storeManager } from '../../store/StoreManager';
 import { TR_HEIGHT } from '../../global.js';
 import { DragEventUI } from '../../types';
 import {
-  calculateScrollPosition,
-  clampOffsetToValidRange,
-  calculateTouchScrollOffset,
-  calculateOffsetFromScroll,
-  calculateScrollBarPosition,
+  calculateNewScrollPosition,
+  constrainRowOffsetToValidRange,
+  calculateTouchBasedRowOffset,
+  convertScrollPositionToRowOffset,
+  calculateScrollbarDimensions,
   ScrollBarRenderer,
   DragManager,
 } from './scroll';
@@ -121,14 +121,18 @@ export default class ResultsScrollBar {
    * @param ui - Object containing the drag position information
    */
   onDrag(e: Event | null, ui: DragEventUI): void {
-    const rowCount = storeManager.getData('rowCount') as number;
-    const numberOfRecords = storeManager.getData('numberOfRecords') as number;
+    const visibleRowCount = storeManager.getData('rowCount') as number;
+    const totalRecordCount = storeManager.getData('numberOfRecords') as number;
     const availableHeight =
-      rowCount * TR_HEIGHT - this._scrollBarElement.offsetHeight * 0;
+      visibleRowCount * TR_HEIGHT - this._scrollBarElement.offsetHeight * 0;
     const offsetRate = ui.position.top / availableHeight;
 
-    let offset = Math.ceil(offsetRate * numberOfRecords);
-    offset = clampOffsetToValidRange(offset, rowCount, numberOfRecords);
+    let offset = Math.ceil(offsetRate * totalRecordCount);
+    offset = constrainRowOffsetToValidRange(
+      offset,
+      visibleRowCount,
+      totalRecordCount
+    );
 
     // 重要: _lastScrollPositionを更新してトラックパッドスクロールとの整合性を保つ
     this._lastScrollPosition = offset * TR_HEIGHT;
@@ -219,19 +223,19 @@ export default class ResultsScrollBar {
    * @param touchStartOffset - Starting offset when touch began
    */
   handleScrollWithFeedback(deltaY: number, touchStartOffset: number): void {
-    const rowCount = storeManager.getData('rowCount') as number;
-    const numberOfRecords = storeManager.getData('numberOfRecords') as number;
+    const visibleRowCount = storeManager.getData('rowCount') as number;
+    const totalRecordCount = storeManager.getData('numberOfRecords') as number;
 
-    const newOffset = calculateTouchScrollOffset(
+    const newOffset = calculateTouchBasedRowOffset(
       deltaY,
       touchStartOffset,
-      rowCount,
-      numberOfRecords
+      visibleRowCount,
+      totalRecordCount
     );
-    const boundedOffset = clampOffsetToValidRange(
+    const boundedOffset = constrainRowOffsetToValidRange(
       newOffset,
-      rowCount,
-      numberOfRecords
+      visibleRowCount,
+      totalRecordCount
     );
 
     this._lastScrollPosition = boundedOffset * TR_HEIGHT;
@@ -244,14 +248,14 @@ export default class ResultsScrollBar {
    * @param deltaY - Y delta value
    */
   handleScroll(deltaY: number): void {
-    const numberOfRecords = storeManager.getData('numberOfRecords') as number;
-    const rowCount = storeManager.getData('rowCount') as number;
+    const totalRecordCount = storeManager.getData('numberOfRecords') as number;
+    const visibleRowCount = storeManager.getData('rowCount') as number;
 
-    const calculation = calculateScrollPosition(
+    const calculation = calculateNewScrollPosition(
       deltaY,
       this._lastScrollPosition,
-      numberOfRecords,
-      rowCount
+      totalRecordCount,
+      visibleRowCount
     );
 
     if (calculation.newScrollPosition === this._lastScrollPosition) {
@@ -259,7 +263,7 @@ export default class ResultsScrollBar {
     }
 
     this._lastScrollPosition = calculation.newScrollPosition;
-    const offset = calculateOffsetFromScroll(this._lastScrollPosition);
+    const offset = convertScrollPositionToRowOffset(this._lastScrollPosition);
     storeManager.setData('offset', offset);
   }
 
@@ -268,13 +272,13 @@ export default class ResultsScrollBar {
    * @param offset - Offset value
    */
   updateDirectly(offset: number): void {
-    const rowCount = storeManager.getData('rowCount') as number;
-    const numberOfRecords = storeManager.getData('numberOfRecords') as number;
+    const visibleRowCount = storeManager.getData('rowCount') as number;
+    const totalRecordCount = storeManager.getData('numberOfRecords') as number;
 
-    const calculation = calculateScrollBarPosition(
+    const calculation = calculateScrollbarDimensions(
       offset,
-      rowCount,
-      numberOfRecords
+      visibleRowCount,
+      totalRecordCount
     );
     this._renderer.applyScrollBarStyles(calculation, offset);
   }
@@ -288,19 +292,19 @@ export default class ResultsScrollBar {
    */
   private _synchronizeScrollBarWithStore(): void {
     const offset = storeManager.getData('offset') as number;
-    const rowCount = storeManager.getData('rowCount') as number;
-    const numberOfRecords = storeManager.getData('numberOfRecords') as number;
+    const visibleRowCount = storeManager.getData('rowCount') as number;
+    const totalRecordCount = storeManager.getData('numberOfRecords') as number;
 
-    const calculation = calculateScrollBarPosition(
+    const calculation = calculateScrollbarDimensions(
       offset,
-      rowCount,
-      numberOfRecords
+      visibleRowCount,
+      totalRecordCount
     );
 
     this._renderer.updateScrollBarVisualState(
       calculation,
-      rowCount,
-      numberOfRecords
+      visibleRowCount,
+      totalRecordCount
     );
   }
 

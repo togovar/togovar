@@ -8,44 +8,52 @@ import {
 const MIN_SCROLLBAR_HEIGHT = 30;
 
 /**
- * スクロール関連の計算ロジック
- * 純粋な計算関数の集合
+ * Collection of pure calculation functions for scroll-related operations.
+ * These functions handle scroll position calculations, offset conversions,
+ * and scrollbar visual positioning without any side effects.
  */
+
 /**
- * スクロール位置を計算
- * @param deltaY - Y軸の変化量
- * @param currentScrollPosition - 現在のスクロール位置
- * @param numberOfRecords - 総レコード数
- * @param rowCount - 表示行数
+ * Calculates new scroll position based on wheel/trackpad input.
+ * Handles boundary checking to prevent scrolling beyond valid range.
+ *
+ * @param deltaY - The Y-axis movement delta from scroll events
+ * @param currentScrollPosition - Current pixel scroll position
+ * @param totalRecordCount - Total number of records in the dataset
+ * @param visibleRowCount - Number of rows visible in the viewport
+ * @returns Object containing calculated scroll values and constraints
  */
-export function calculateScrollPosition(
+export function calculateNewScrollPosition(
   deltaY: number,
   currentScrollPosition: number,
-  numberOfRecords: number,
-  rowCount: number
+  totalRecordCount: number,
+  visibleRowCount: number
 ): ScrollCalculation {
-  const totalHeight = numberOfRecords * TR_HEIGHT;
-  let availableScrollY = totalHeight - rowCount * TR_HEIGHT;
-  availableScrollY = Math.max(0, availableScrollY);
+  const totalContentHeight = totalRecordCount * TR_HEIGHT;
+  let maxScrollableDistance = totalContentHeight - visibleRowCount * TR_HEIGHT;
+  maxScrollableDistance = Math.max(0, maxScrollableDistance);
 
-  const newScrollPosition = clampScrollPosition(
+  const newScrollPosition = clampValueWithinBounds(
     currentScrollPosition + deltaY,
-    { min: 0, max: availableScrollY }
+    { min: 0, max: maxScrollableDistance }
   );
 
   return {
-    totalHeight,
-    availableScrollY,
+    totalHeight: totalContentHeight,
+    availableScrollY: maxScrollableDistance,
     newScrollPosition,
   };
 }
 
 /**
- * スクロール位置を境界内に制限
- * @param value - 制限する値
- * @param bounds - 境界値
+ * Constrains a numeric value within specified minimum and maximum bounds.
+ * Essential for preventing scroll positions from exceeding valid ranges.
+ *
+ * @param value - The value to constrain
+ * @param bounds - Object containing min and max boundary values
+ * @returns The value clamped within the specified bounds
  */
-export function clampScrollPosition(
+export function clampValueWithinBounds(
   value: number,
   bounds: ScrollBounds
 ): number {
@@ -53,74 +61,93 @@ export function clampScrollPosition(
 }
 
 /**
- * スクロール位置からオフセットを計算
- * @param scrollPosition - スクロール位置
+ * Converts pixel-based scroll position to row-based offset.
+ * Used to determine which row should be at the top of the viewport.
+ *
+ * @param scrollPosition - Current scroll position in pixels
+ * @returns Row offset (0-based index of the first visible row)
  */
-export function calculateOffsetFromScroll(scrollPosition: number): number {
+export function convertScrollPositionToRowOffset(
+  scrollPosition: number
+): number {
   return Math.ceil(scrollPosition / TR_HEIGHT);
 }
 
 /**
- * タッチスクロールのオフセットを計算
- * @param deltaY - Y軸の変化量
- * @param touchStartOffset - タッチ開始時のオフセット
- * @param rowCount - 表示行数
- * @param numberOfRecords - 総レコード数
+ * Calculates row offset for touch-based scrolling interactions.
+ * Touch scrolling uses proportional movement relative to available space.
+ *
+ * @param deltaY - Y-axis movement delta from touch events
+ * @param touchStartOffset - Row offset when touch interaction began
+ * @param visibleRowCount - Number of rows visible in the viewport
+ * @param totalRecordCount - Total number of records in the dataset
+ * @returns Calculated row offset for the new scroll position
  */
-export function calculateTouchScrollOffset(
+export function calculateTouchBasedRowOffset(
   deltaY: number,
   touchStartOffset: number,
-  rowCount: number,
-  numberOfRecords: number
+  visibleRowCount: number,
+  totalRecordCount: number
 ): number {
-  const availableHeight = rowCount * TR_HEIGHT;
-  const offsetRate = deltaY / availableHeight;
+  const viewportHeight = visibleRowCount * TR_HEIGHT;
+  const movementRatio = deltaY / viewportHeight;
 
-  return Math.ceil(offsetRate * numberOfRecords) + touchStartOffset;
+  return Math.ceil(movementRatio * totalRecordCount) + touchStartOffset;
 }
 
 /**
- * オフセットを有効範囲内に制限
- * @param offset - オフセット値
- * @param rowCount - 表示行数
- * @param numberOfRecords - 総レコード数
+ * Ensures row offset stays within valid boundaries.
+ * Prevents scrolling beyond the first or last available rows.
+ *
+ * @param offset - Row offset to validate and constrain
+ * @param visibleRowCount - Number of rows visible in the viewport
+ * @param totalRecordCount - Total number of records in the dataset
+ * @returns Constrained offset within valid range [0, maxOffset]
  */
-export function clampOffsetToValidRange(
+export function constrainRowOffsetToValidRange(
   offset: number,
-  rowCount: number,
-  numberOfRecords: number
+  visibleRowCount: number,
+  totalRecordCount: number
 ): number {
   const minOffset = 0;
-  const maxOffset = Math.max(0, numberOfRecords - rowCount);
+  const maxOffset = Math.max(0, totalRecordCount - visibleRowCount);
 
   return Math.max(minOffset, Math.min(offset, maxOffset));
 }
 
 /**
- * スクロールバーの位置とサイズを計算
- * @param offset - オフセット値
- * @param rowCount - 表示行数
- * @param numberOfRecords - 総レコード数
+ * Calculates scrollbar visual properties based on current scroll state.
+ * Determines the scrollbar's height, position, and display ratio for proper rendering.
+ * Ensures minimum scrollbar height for usability regardless of content size.
+ *
+ * @param currentRowOffset - Current row offset (first visible row index)
+ * @param visibleRowCount - Number of rows visible in the viewport
+ * @param totalRecordCount - Total number of records in the dataset
+ * @returns Object containing scrollbar height, position, and display ratio
  */
-export function calculateScrollBarPosition(
-  offset: number,
-  rowCount: number,
-  numberOfRecords: number
+export function calculateScrollbarDimensions(
+  currentRowOffset: number,
+  visibleRowCount: number,
+  totalRecordCount: number
 ): ScrollBarCalculation {
-  const totalHeight = numberOfRecords * TR_HEIGHT;
-  const displayHeight = rowCount * TR_HEIGHT;
-  const displayRate = displayHeight / totalHeight;
+  const totalContentHeight = totalRecordCount * TR_HEIGHT;
+  const viewportHeight = visibleRowCount * TR_HEIGHT;
+  const visibilityRatio = viewportHeight / totalContentHeight;
 
-  let barHeight = Math.ceil(displayHeight * displayRate);
-  barHeight = Math.max(barHeight, MIN_SCROLLBAR_HEIGHT);
+  // Calculate scrollbar height with minimum constraint
+  let scrollbarHeight = Math.ceil(viewportHeight * visibilityRatio);
+  scrollbarHeight = Math.max(scrollbarHeight, MIN_SCROLLBAR_HEIGHT);
 
-  const availableHeight = displayHeight - barHeight;
-  const availableRate = availableHeight / totalHeight;
-  const barTop = Math.ceil(offset * TR_HEIGHT * availableRate);
+  // Calculate scrollbar position within available space
+  const availableScrollSpace = viewportHeight - scrollbarHeight;
+  const positionRatio = availableScrollSpace / totalContentHeight;
+  const scrollbarTopPosition = Math.ceil(
+    currentRowOffset * TR_HEIGHT * positionRatio
+  );
 
   return {
-    barHeight,
-    barTop,
-    displayRate,
+    barHeight: scrollbarHeight,
+    barTop: scrollbarTopPosition,
+    displayRate: visibilityRatio,
   };
 }
