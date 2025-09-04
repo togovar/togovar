@@ -1,7 +1,15 @@
 import { storeManager } from '../../store/StoreManager';
 import { TR_HEIGHT } from '../../global.js';
 import { DragEventUI } from '../../types';
-import { ScrollCalculator, ScrollBarRenderer, DragManager } from './scroll';
+import {
+  calculateScrollPosition,
+  clampOffsetToValidRange,
+  calculateTouchScrollOffset,
+  calculateOffsetFromScroll,
+  calculateScrollBarPosition,
+  ScrollBarRenderer,
+  DragManager,
+} from './scroll';
 
 // ================================================================
 // MAIN CLASS
@@ -50,7 +58,6 @@ export default class ResultsScrollBar {
   private _lastScrollPosition: number = 0;
 
   // 分離されたコンポーネント
-  private readonly _calculator: ScrollCalculator;
   private readonly _renderer: ScrollBarRenderer;
   private readonly _dragManager: DragManager;
 
@@ -77,7 +84,6 @@ export default class ResultsScrollBar {
     this._totalLabel = total;
 
     // コンポーネントを初期化
-    this._calculator = new ScrollCalculator();
     this._renderer = new ScrollBarRenderer(
       this._container,
       this._scrollBarElement,
@@ -122,11 +128,7 @@ export default class ResultsScrollBar {
     const offsetRate = ui.position.top / availableHeight;
 
     let offset = Math.ceil(offsetRate * numberOfRecords);
-    offset = this._calculator.clampOffsetToValidRange(
-      offset,
-      rowCount,
-      numberOfRecords
-    );
+    offset = clampOffsetToValidRange(offset, rowCount, numberOfRecords);
 
     // 重要: _lastScrollPositionを更新してトラックパッドスクロールとの整合性を保つ
     this._lastScrollPosition = offset * TR_HEIGHT;
@@ -220,13 +222,13 @@ export default class ResultsScrollBar {
     const rowCount = storeManager.getData('rowCount') as number;
     const numberOfRecords = storeManager.getData('numberOfRecords') as number;
 
-    const newOffset = this._calculator.calculateTouchScrollOffset(
+    const newOffset = calculateTouchScrollOffset(
       deltaY,
       touchStartOffset,
       rowCount,
       numberOfRecords
     );
-    const boundedOffset = this._calculator.clampOffsetToValidRange(
+    const boundedOffset = clampOffsetToValidRange(
       newOffset,
       rowCount,
       numberOfRecords
@@ -245,7 +247,7 @@ export default class ResultsScrollBar {
     const numberOfRecords = storeManager.getData('numberOfRecords') as number;
     const rowCount = storeManager.getData('rowCount') as number;
 
-    const calculation = this._calculator.calculateScrollPosition(
+    const calculation = calculateScrollPosition(
       deltaY,
       this._lastScrollPosition,
       numberOfRecords,
@@ -257,9 +259,7 @@ export default class ResultsScrollBar {
     }
 
     this._lastScrollPosition = calculation.newScrollPosition;
-    const offset = this._calculator.calculateOffsetFromScroll(
-      this._lastScrollPosition
-    );
+    const offset = calculateOffsetFromScroll(this._lastScrollPosition);
     storeManager.setData('offset', offset);
   }
 
@@ -271,7 +271,7 @@ export default class ResultsScrollBar {
     const rowCount = storeManager.getData('rowCount') as number;
     const numberOfRecords = storeManager.getData('numberOfRecords') as number;
 
-    const calculation = this._calculator.calculateScrollBarPosition(
+    const calculation = calculateScrollBarPosition(
       offset,
       rowCount,
       numberOfRecords
@@ -291,7 +291,7 @@ export default class ResultsScrollBar {
     const rowCount = storeManager.getData('rowCount') as number;
     const numberOfRecords = storeManager.getData('numberOfRecords') as number;
 
-    const calculation = this._calculator.calculateScrollBarPosition(
+    const calculation = calculateScrollBarPosition(
       offset,
       rowCount,
       numberOfRecords
