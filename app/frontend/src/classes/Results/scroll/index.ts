@@ -5,6 +5,6 @@ export {
   calculateTouchBasedRowOffset,
   constrainRowOffsetToValidRange,
   calculateScrollbarDimensions,
-} from './ScrollCalculator';
+} from './scrollCalculator';
 export { ScrollBarRenderer } from './ScrollBarRenderer';
 export { DragManager } from './DragManager';
