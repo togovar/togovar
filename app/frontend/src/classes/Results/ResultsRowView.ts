@@ -42,7 +42,7 @@ export class ResultsRowView {
   geneCell: HTMLTableCellElement | null;
   geneAnchor: HTMLAnchorElement | null;
   // Alt frequency
-  frequencyElements: TdFrequencies;
+  frequencyElements: TdFrequencies = {};
   // Consequence
   consequenceCell: HTMLTableCellElement | null;
   consequenceItem: HTMLDivElement | null;
@@ -91,7 +91,7 @@ export class ResultsRowView {
     }
 
     // Clear DOM element references
-    this.tr = null as any;
+    this.tr = null!;
     this.togovarIdAnchor = null;
     this.refsnpCell = null;
     this.refsnpAnchor = null;
@@ -151,24 +151,8 @@ export class ResultsRowView {
   }
 
   // ========================================
-  // Event Handlers
+  // Store Event Handlers
   // ========================================
-
-  /**
-   * Handler for when a row is clicked
-   *
-   * Toggles selection state and fires a custom event
-   */
-  private _handleRowClick() {
-    storeManager.setData('selectedRow', this.selected ? undefined : this.index);
-
-    // Dispatch custom event to notify tap completion
-    const tapCompletedEvent = new CustomEvent('tapCompleted', {
-      bubbles: true,
-      detail: { rowIndex: this.index },
-    });
-    this.tr.dispatchEvent(tapCompletedEvent);
-  }
 
   /**
    * Handle selected row changes
@@ -356,7 +340,7 @@ export class ResultsRowView {
    * @param result - Display data
    */
   private _updateColumnContent(column: Column, result: ResultData) {
-    const columnHandlers = {
+    const columnHandlers: Record<string, () => void> = {
       togovar_id: () =>
         ResultsColumnUpdater.updateTogovarId(
           this.togovarIdAnchor,
@@ -424,5 +408,24 @@ export class ResultsRowView {
         ),
     };
     columnHandlers[column.id]?.();
+  }
+
+  // ========================================
+  // Event Handler
+  // ========================================
+
+  /**
+   * Handler for when a row is clicked
+   * Toggles selection state and fires a custom event
+   */
+  private _handleRowClick(): void {
+    storeManager.setData('selectedRow', this.selected ? undefined : this.index);
+
+    // Dispatch custom event to notify tap completion
+    const tapCompletedEvent = new CustomEvent('tapCompleted', {
+      bubbles: true,
+      detail: { rowIndex: this.index },
+    });
+    this.tr.dispatchEvent(tapCompletedEvent);
   }
 }
