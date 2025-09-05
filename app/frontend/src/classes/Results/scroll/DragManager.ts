@@ -3,6 +3,7 @@ import {
   DragManagerConfig,
   TouchEventOptions,
 } from '../../../types';
+import { supportsMouseInteraction } from '../../../utils/deviceDetection';
 
 /**
  * Class that manages drag functionality with support for both mouse and touch interactions
@@ -78,10 +79,7 @@ export class DragManager {
   // ========================================
 
   /**
-   * Check if device supports mouse interaction
-   * Uses CSS Media Queries to detect if the device has:
-   * - hover capability (can hover over elements)
-   * - fine pointer precision (mouse/trackpad vs finger touch)
+   * Check if device supports mouse interaction using shared utility
    *
    * @returns true for desktop/laptop with mouse/trackpad, false for touch-only devices
    * @example
@@ -91,7 +89,7 @@ export class DragManager {
    * Smartphone: false
    */
   private _supportsMouseInteraction(): boolean {
-    return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    return supportsMouseInteraction();
   }
 
   // ========================================

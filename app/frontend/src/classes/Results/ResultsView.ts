@@ -5,6 +5,7 @@ import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
 import { ResultsViewDataManager } from './ResultsViewDataManager';
 import { SearchMessages, SearchStatus, ColumnConfig } from '../../types';
+import { isTouchDevice } from '../../utils/deviceDetection';
 
 /**
  * 検索結果テーブルビューを管理するクラス
@@ -146,7 +147,7 @@ export class ResultsView {
   searchResults(_results: any): void {
     this.dataManager.handleSearchResults(
       _results,
-      this.touchHandler.isTouchEnabled,
+      isTouchDevice(),
       this.touchHandler.setTouchElementsPointerEvents.bind(this.touchHandler)
     );
   }
@@ -164,7 +165,7 @@ export class ResultsView {
    */
   updateDisplaySize(): void {
     this.dataManager.updateDisplaySize(
-      this.touchHandler.isTouchEnabled,
+      isTouchDevice(),
       this.touchHandler.setTouchElementsPointerEvents.bind(this.touchHandler)
     );
   }
@@ -283,9 +284,7 @@ export class ResultsView {
     this.dataManager.handleColumnsChange(storeManager.getData('columns'));
 
     // 初期状態のpointer-events設定
-    this.touchHandler.setTouchElementsPointerEvents(
-      !this.touchHandler.isTouchEnabled
-    );
+    this.touchHandler.setTouchElementsPointerEvents(!isTouchDevice());
   }
 
   /**
@@ -314,8 +313,9 @@ export class ResultsView {
       onScrollStart: () => {
         this.scrollBar.setActive();
       },
-      onScroll: (deltaY, startOffset) => {
-        this.scrollBar.handleScrollWithFeedback(deltaY, startOffset);
+      onScroll: (deltaY) => {
+        const currentOffset = storeManager.getData('offset') || 0;
+        this.scrollBar.handleScrollWithFeedback(deltaY, currentOffset);
       },
       onScrollEnd: () => {
         this.scrollBar.setInactive();

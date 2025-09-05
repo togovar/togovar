@@ -85,7 +85,7 @@ export type ScrollBounds = {
 /** スクロールコールバックの型定義 */
 export interface ScrollCallbacks {
   onScrollStart?: () => void;
-  onScroll?: (_deltaY: number, _startOffset: number) => void;
+  onScroll?: (_deltaY: number) => void;
   onScrollEnd?: () => void;
 }
 
@@ -99,7 +99,6 @@ export interface TouchState {
   distance: number;
   duration: number;
   isScrolling: boolean;
-  startOffset: number;
 }
 
 /** タッチ判定結果の型定義 */
