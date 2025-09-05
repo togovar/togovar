@@ -1,6 +1,6 @@
 import { storeManager } from '../../store/StoreManager';
 import { TR_HEIGHT } from '../../global.js';
-import { DragEventUI } from '../../types';
+import { DragEventUI, StoreState } from '../../types';
 import {
   calculateNewScrollPosition,
   constrainRowOffsetToValidRange,
@@ -11,9 +11,8 @@ import {
   DragManager,
 } from './scroll';
 
-// ================================================================
-// MAIN CLASS
-// ================================================================
+// Whether to ignore the scrollbar thumb height in calculations
+const IGNORE_SCROLLBAR_THUMB_HEIGHT = true;
 
 /**
  * Specialized scrollbar component for Results display (Refactored Version)
@@ -28,29 +27,19 @@ import {
  * ## Usage
  * ```typescript
  * const scrollbar = new ResultsScrollBar(containerElement);
- *
- * // Always execute cleanup during page transitions or component removal
- * window.addEventListener('beforeunload', () => {
- *   scrollbar.destroy(); // Prevent memory leaks
- * });
- *
- * // Or align with component lifecycle
- * someComponent.onDestroy(() => {
- *   scrollbar.destroy();
- * });
  * ```
  */
 export class ResultsScrollBar {
-  // CORE DOM ELEMENTS
+  // Core dom elements
   private readonly _container: HTMLElement;
   private readonly _scrollBarElement: HTMLElement;
   private readonly _positionLabel: HTMLElement;
   private readonly _totalLabel: HTMLElement;
 
-  // STATE MANAGEMENT
+  // State management
   private _lastScrollPosition: number = 0;
 
-  // COMPONENT DEPENDENCIES
+  // Component dependencies
   private readonly _renderer: ScrollBarRenderer;
   private readonly _dragManager: DragManager;
 
@@ -101,7 +90,7 @@ export class ResultsScrollBar {
   }
 
   // ================================================================
-  // PUBLIC API - Store Event Handlers
+  // Store Event Handlers
   // ================================================================
 
   /**
@@ -148,7 +137,7 @@ export class ResultsScrollBar {
   }
 
   // ================================================================
-  // Results-specific methods
+  // Visual State Management
   // ================================================================
 
   /**
@@ -165,30 +154,36 @@ export class ResultsScrollBar {
     this._renderer.setActive();
   }
 
+  // ================================================================
+  // Lifecycle Management
+  // ================================================================
+
   /**
    * Clean up all resources and prevent memory leaks
    * Call this method when the scrollbar component is no longer needed
    */
   destroy(): void {
-    // 1. DragManager cleanup (most critical)
+    // DragManager cleanup
     this._dragManager.destroyDragManager();
 
-    // 2. Unbind StoreManager event bindings
+    // Unbind StoreManager event bindings
     storeManager.unbind('offset', this);
     storeManager.unbind('numberOfRecords', this);
     storeManager.unbind('rowCount', this);
 
-    // 3. Renderer timer cleanup
+    // Renderer timer cleanup
     this._renderer.clearAllTimeouts();
 
-    // 4. Remove scrollbar from DOM (optional)
-    const scrollBarContainer = this._container.querySelector(
-      '.scrollbar-container'
-    );
-    if (scrollBarContainer) {
-      scrollBarContainer.remove();
+    // Remove the inner scrollbar element
+    const scrollBarElement = this._container.querySelector('.bar');
+    if (scrollBarElement) {
+      scrollBarElement.remove();
     }
   }
+
+  // ================================================================
+  // Scroll Handling
+  // ================================================================
 
   /**
    * Handle scroll with scrollbar feedback (for touch events)
@@ -196,8 +191,13 @@ export class ResultsScrollBar {
    * @param touchStartOffset - Starting offset when touch began
    */
   handleScrollWithFeedback(deltaY: number, touchStartOffset: number): void {
-    const visibleRowCount = storeManager.getData('rowCount') as number;
-    const totalRecordCount = storeManager.getData('numberOfRecords') as number;
+    const visibleRowCount = this._getStoreData('rowCount', 0);
+    const totalRecordCount = this._getStoreData('numberOfRecords', 0);
+
+    // Early return if data is invalid
+    if (visibleRowCount <= 0 || totalRecordCount <= 0) {
+      return;
+    }
 
     const newOffset = calculateTouchBasedRowOffset(
       deltaY,
@@ -221,8 +221,13 @@ export class ResultsScrollBar {
    * @param deltaY - Y delta value
    */
   handleScroll(deltaY: number): void {
-    const totalRecordCount = storeManager.getData('numberOfRecords') as number;
-    const visibleRowCount = storeManager.getData('rowCount') as number;
+    const totalRecordCount = this._getStoreData('numberOfRecords', 0);
+    const visibleRowCount = this._getStoreData('rowCount', 0);
+
+    // Early return if data is invalid
+    if (visibleRowCount <= 0 || totalRecordCount <= 0) {
+      return;
+    }
 
     const calculation = calculateNewScrollPosition(
       deltaY,
@@ -245,8 +250,13 @@ export class ResultsScrollBar {
    * @param offset - Offset value
    */
   updateDirectly(offset: number): void {
-    const visibleRowCount = storeManager.getData('rowCount') as number;
-    const totalRecordCount = storeManager.getData('numberOfRecords') as number;
+    const visibleRowCount = this._getStoreData('rowCount', 0);
+    const totalRecordCount = this._getStoreData('numberOfRecords', 0);
+
+    // Early return if data is invalid
+    if (visibleRowCount <= 0 || totalRecordCount <= 0) {
+      return;
+    }
 
     const calculation = calculateScrollbarDimensions(
       offset,
@@ -257,6 +267,37 @@ export class ResultsScrollBar {
   }
 
   // ================================================================
+  // Data Access & Validation
+  // ================================================================
+
+  /**
+   * Safely retrieves store data with validation
+   * @param key - Store key to retrieve
+   * @param defaultValue - Default value if data is invalid
+   * @returns The store value or default value
+   */
+  private _getStoreData<T>(key: keyof StoreState, defaultValue: T): T {
+    const value = storeManager.getData<T>(key);
+    return typeof value === 'number' && value >= 0 ? value : defaultValue;
+  }
+
+  /**
+   * Gets all essential scroll data from store with validation
+   * @returns Object containing rowCount, numberOfRecords, and offset
+   */
+  private _getScrollData(): {
+    visibleRowCount: number;
+    totalRecordCount: number;
+    offset: number;
+  } {
+    return {
+      visibleRowCount: this._getStoreData('rowCount', 0),
+      totalRecordCount: this._getStoreData('numberOfRecords', 0),
+      offset: this._getStoreData('offset', 0),
+    };
+  }
+
+  // ================================================================
   // Visual Updates
   // ================================================================
 
@@ -264,9 +305,7 @@ export class ResultsScrollBar {
    * Synchronizes scrollbar appearance with current store data
    */
   private _synchronizeScrollBarWithStore(): void {
-    const offset = storeManager.getData('offset') as number;
-    const visibleRowCount = storeManager.getData('rowCount') as number;
-    const totalRecordCount = storeManager.getData('numberOfRecords') as number;
+    const { offset, visibleRowCount, totalRecordCount } = this._getScrollData();
 
     const calculation = calculateScrollbarDimensions(
       offset,
@@ -303,10 +342,17 @@ export class ResultsScrollBar {
    * @param ui - Object containing the drag position information
    */
   private _processDragPosition(e: Event | null, ui: DragEventUI): void {
-    const visibleRowCount = storeManager.getData('rowCount') as number;
-    const totalRecordCount = storeManager.getData('numberOfRecords') as number;
-    const availableHeight =
-      visibleRowCount * TR_HEIGHT - this._scrollBarElement.offsetHeight * 0;
+    const visibleRowCount = this._getStoreData('rowCount', 0);
+    const totalRecordCount = this._getStoreData('numberOfRecords', 0);
+
+    // Early return if data is invalid
+    if (visibleRowCount <= 0 || totalRecordCount <= 0) {
+      return;
+    }
+    // Calculate available height for scrollbar movement
+    const availableHeight = IGNORE_SCROLLBAR_THUMB_HEIGHT
+      ? visibleRowCount * TR_HEIGHT
+      : visibleRowCount * TR_HEIGHT - this._scrollBarElement.offsetHeight;
     const offsetRate = ui.position.top / availableHeight;
 
     let offset = Math.ceil(offsetRate * totalRecordCount);
