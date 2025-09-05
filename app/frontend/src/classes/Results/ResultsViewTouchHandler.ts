@@ -99,18 +99,18 @@ export class ResultsViewTouchHandler {
   // ========================================
 
   /**
-   * Control pointer-events CSS property for touch-sensitive elements
+   * Control whether table elements can be touched/interacted with
    *
    * ## Use Cases
-   * - **Scroll Mode**: Disable interactions to prevent accidental taps during touch scrolling
-   * - **Normal Mode**: Re-enable interactions after scroll gesture completes
-   * - **Gesture Recognition**: Temporary disable during gesture analysis
+   * - **Scroll Mode**: Make elements untouchable to prevent accidental taps during scrolling
+   * - **Normal Mode**: Make elements touchable after scroll gesture completes
+   * - **Gesture Recognition**: Temporarily make elements untouchable during gesture analysis
    *
-   * @param enabled - Whether to enable pointer-events
-   *   - `true`: Elements can receive clicks/taps (normal interaction mode)
-   *   - `false`: Elements ignore pointer events (scrolling mode)
+   * @param enabled - Whether elements should be interactable
+   *   - `true`: Elements can be touched/clicked (normal interaction mode)
+   *   - `false`: Elements cannot be touched (scrolling mode)
    */
-  setTouchElementsPointerEvents(enabled: boolean): void {
+  setElementsInteractable(enabled: boolean): void {
     // Update pointer-events for all touch-sensitive table elements (excluding links)
     const touchElements = this._container.querySelectorAll(
       TOUCH_ELEMENTS_SELECTOR
@@ -134,21 +134,9 @@ export class ResultsViewTouchHandler {
 
     // Remove touch event listeners
     touchElements.forEach((element) => {
-      element.removeEventListener(
-        'touchstart',
-        this._boundHandlers.touchStart,
-        true
-      );
-      element.removeEventListener(
-        'touchmove',
-        this._boundHandlers.touchMove,
-        true
-      );
-      element.removeEventListener(
-        'touchend',
-        this._boundHandlers.touchEnd,
-        true
-      );
+      element.removeEventListener('touchstart', this._boundHandlers.touchStart);
+      element.removeEventListener('touchmove', this._boundHandlers.touchMove);
+      element.removeEventListener('touchend', this._boundHandlers.touchEnd);
     });
 
     // Remove tap completed listener
@@ -188,22 +176,24 @@ export class ResultsViewTouchHandler {
 
   /**
    * Set up touch events
+   *
+   * ## Event Configuration
+   * - **passive: true**: Optimizes performance since we don't call preventDefault()
+   *   This allows the browser to perform scroll optimizations without waiting
+   *   to see if preventDefault() will be called.
    */
   private _setupTouchEvents(): void {
     const touchElements = [this._tablecontainer, this._tbody];
 
     touchElements.forEach((element) => {
       element.addEventListener('touchstart', this._boundHandlers.touchStart, {
-        passive: false,
-        capture: true,
+        passive: true,
       });
       element.addEventListener('touchmove', this._boundHandlers.touchMove, {
-        passive: false,
-        capture: true,
+        passive: true,
       });
       element.addEventListener('touchend', this._boundHandlers.touchEnd, {
-        passive: false,
-        capture: true,
+        passive: true,
       });
     });
 
@@ -218,16 +208,25 @@ export class ResultsViewTouchHandler {
   // ========================================
 
   /**
-   * Handle touch start event
-   * @param e - Touch event
+   * Handle touch start event - Initialize touch tracking
+   *
+   * This method is called when a user first touches the screen within the table area.
+   * It initializes the touch state tracking system and enables pointer events for
+   * normal interaction mode.
+   *
+   * @param e - TouchEvent containing touch point information
+   * ```
    */
   private _handleTouchStart(e: TouchEvent): void {
+    // Verify the touch is on a valid target with single finger
     if (!this._isValidTouchTarget(e) || e.touches.length !== 1) {
       return;
     }
 
+    // Clear any previous touch state data
     this._resetTouchState();
 
+    // Record initial touch positions and timestamp
     const touch = e.touches[0];
     this._touchState.startY = touch.clientY;
     this._touchState.startX = touch.clientX;
@@ -235,12 +234,18 @@ export class ResultsViewTouchHandler {
     this._touchState.lastX = touch.clientX;
     this._touchState.startTime = Date.now();
 
-    this.setTouchElementsPointerEvents(true);
+    // Enable pointer events for touch elements
+    this.setElementsInteractable(true);
   }
 
   /**
-   * Handle touch move event
-   * @param e - Touch event
+   * Handle touch move event - Process ongoing touch movement
+   *
+   * This method continuously tracks finger movement and determines user intent
+   * (scrolling vs accidental movement). It implements gesture recognition logic
+   * to distinguish between intentional scrolling and minor finger adjustments.
+   *
+   * @param e - TouchEvent containing current touch position
    */
   private _handleTouchMove(e: TouchEvent): void {
     if (!this._isValidTouchTarget(e) || e.touches.length !== 1) {
@@ -250,17 +255,18 @@ export class ResultsViewTouchHandler {
     const touch = e.touches[0];
     const gesture = this._analyzeTouchGesture(touch.clientY, touch.clientX);
 
-    this._touchState.distance = Math.sqrt(
-      gesture.deltaX * gesture.deltaX + gesture.deltaY * gesture.deltaY
-    );
+    // Update distance tracking
+    this._touchState.distance = gesture.distance;
 
     if (gesture.isScroll) {
+      // Handle scroll gesture initiation
       if (!this._touchState.isScrolling) {
         this._touchState.isScrolling = true;
-        this.setTouchElementsPointerEvents(false);
+        this.setElementsInteractable(false);
         this._scrollCallbacks.onScrollStart?.();
       }
 
+      // Continue scroll gesture
       this._touchState.lastY = touch.clientY;
       this._scrollCallbacks.onScroll?.(
         -gesture.deltaY * TOUCH_CONFIG.SCROLL_SENSITIVITY
@@ -269,36 +275,59 @@ export class ResultsViewTouchHandler {
   }
 
   /**
-   * Handle touch end event
-   * @param e - Touch event
+   * Handle touch end event - Finalize gesture and restore interaction state
+   *
+   * This method determines the final classification of the completed touch gesture
+   * and restores appropriate interaction state. It handles three scenarios:
+   * successful taps, completed scrolls, and cancelled gestures.
+   *
+   * @param _e - TouchEvent (unused but required for event handler signature)
    */
   private _handleTouchEnd(_e: TouchEvent): void {
+    // Calculate total gesture duration
     this._touchState.duration = Date.now() - this._touchState.startTime;
 
+    // Classify completed gesture
     const isTap =
       this._touchState.distance < TOUCH_CONFIG.SCROLL_THRESHOLD &&
       this._touchState.duration < TOUCH_CONFIG.TAP_THRESHOLD;
 
+    // Handle gesture completion based on classification
     if (isTap) {
-      this.setTouchElementsPointerEvents(true);
+      // Successful tap - enable interactions for click processing
+      this.setElementsInteractable(true);
     } else if (this._touchState.isScrolling) {
+      // Completed scroll - keep interactions disabled, notify completion
       this._touchState.isScrolling = false;
-      this.setTouchElementsPointerEvents(false);
+      this.setElementsInteractable(false);
       this._scrollCallbacks.onScrollEnd?.();
     } else {
-      this.setTouchElementsPointerEvents(true);
+      // Cancelled or unrecognized gesture - enable interactions (safe fallback)
+      this.setElementsInteractable(true);
     }
 
+    // Clean up for next gesture
     this._resetTouchState();
   }
 
   /**
-   * Handle tap completion
-   * @param e - Custom event
+   * Handle tap completion event - Restore scroll-optimized interaction state
+   *
+   * This method is triggered after a successful tap gesture has been processed
+   * by the UI system. For touch devices, it restores the scroll-optimized state
+   * by disabling pointer events, preventing accidental interactions during
+   * subsequent scroll gestures.
+   *
+   * ## Touch Device Behavior
+   * - **Touch Devices**: Disable interactions to prepare for scrolling
+   * - **Non-Touch Devices**: No action (precise pointer control available)
+   *
+   * @param _e - Custom Event (unused but required for event handler signature)
+   * ```
    */
   private _handleTapCompleted(_e: Event): void {
     if (!isTouchDevice()) return;
-    this.setTouchElementsPointerEvents(false);
+    this.setElementsInteractable(false);
   }
 
   // ========================================
@@ -315,17 +344,11 @@ export class ResultsViewTouchHandler {
    *
    * @param currentY - Current Y coordinate of touch point
    * @param currentX - Current X coordinate of touch point
-   * @returns Gesture analysis result containing tap/scroll flags and deltas
-   *
-   * @example
-   * ```typescript
-   * const gesture = this._analyzeTouchGesture(touchY, touchX);
-   * if (gesture.isTap) {
-   *   // Handle tap interaction
-   * } else if (gesture.isScroll) {
-   *   // Handle scroll with gesture.deltaY
-   * }
-   * ```
+   * @returns Gesture analysis result containing:
+   *   - `isTap`: Whether gesture qualifies as a tap
+   *   - `isScroll`: Whether gesture qualifies as a scroll
+   *   - `deltaY`, `deltaX`: Movement deltas from start position
+   *   - `distance`: Euclidean distance (calculated once for efficiency)
    */
   private _analyzeTouchGesture(
     currentY: number,
@@ -349,6 +372,7 @@ export class ResultsViewTouchHandler {
       isScroll,
       deltaY,
       deltaX,
+      distance,
     };
   }
 

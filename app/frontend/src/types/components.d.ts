@@ -107,4 +107,5 @@ export interface TouchGesture {
   isScroll: boolean;
   deltaY: number;
   deltaX: number;
+  distance: number;
 }

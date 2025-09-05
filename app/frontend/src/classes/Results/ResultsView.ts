@@ -148,7 +148,7 @@ export class ResultsView {
     this.dataManager.handleSearchResults(
       _results,
       isTouchDevice(),
-      this.touchHandler.setTouchElementsPointerEvents.bind(this.touchHandler)
+      this.touchHandler.setElementsInteractable.bind(this.touchHandler)
     );
   }
 
@@ -166,7 +166,7 @@ export class ResultsView {
   updateDisplaySize(): void {
     this.dataManager.updateDisplaySize(
       isTouchDevice(),
-      this.touchHandler.setTouchElementsPointerEvents.bind(this.touchHandler)
+      this.touchHandler.setElementsInteractable.bind(this.touchHandler)
     );
   }
 
@@ -284,7 +284,7 @@ export class ResultsView {
     this.dataManager.handleColumnsChange(storeManager.getData('columns'));
 
     // 初期状態のpointer-events設定
-    this.touchHandler.setTouchElementsPointerEvents(!isTouchDevice());
+    this.touchHandler.setElementsInteractable(!isTouchDevice());
   }
 
   /**
