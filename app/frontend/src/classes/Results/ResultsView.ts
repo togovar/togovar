@@ -43,6 +43,8 @@ export class ResultsView {
   private tbody: HTMLElement;
   /** テーブルコンテナ要素 */
   private tablecontainer: HTMLElement;
+  /** バインドされたイベントハンドラー */
+  private _boundKeydownHandler: (_e: KeyboardEvent) => void;
 
   /**
    * ResultsViewのコンストラクタ
@@ -75,6 +77,43 @@ export class ResultsView {
   // ========================================
   // Public Methods
   // ========================================
+
+  /**
+   * Clean up all resources and prevent memory leaks
+   * Call this method when the ResultsView component is no longer needed
+   */
+  destroy(): void {
+    // Clean up ScrollBar component
+    if (this.scrollBar) {
+      this.scrollBar.destroy();
+    }
+
+    // Clean up TouchHandler component
+    if (this.touchHandler) {
+      this.touchHandler.destroy();
+    }
+
+    // Clean up DataManager component
+    if (this.dataManager) {
+      this.dataManager.destroy();
+    }
+
+    // Unbind all StoreManager event bindings
+    ResultsView.STORE_BINDINGS.forEach((key) => {
+      storeManager.unbind(key, this);
+    });
+
+    // Remove keydown event listener
+    document.removeEventListener('keydown', this._boundKeydownHandler);
+
+    // Clear DOM references
+    this.elm = null as any;
+    this.tbody = null as any;
+    this.tablecontainer = null as any;
+    this.scrollBar = null as any;
+    this.touchHandler = null as any;
+    this.dataManager = null as any;
+  }
 
   /**
    * オフセットの変更時の処理
@@ -173,7 +212,8 @@ export class ResultsView {
     ResultsView.STORE_BINDINGS.forEach((key) => {
       storeManager.bind(key, this);
     });
-    document.addEventListener('keydown', this._keydown.bind(this));
+    this._boundKeydownHandler = this._keydown.bind(this);
+    document.addEventListener('keydown', this._boundKeydownHandler);
   }
 
   /**

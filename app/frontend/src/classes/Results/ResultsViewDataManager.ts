@@ -72,7 +72,7 @@ export class ResultsViewDataManager {
    */
   updateDisplaySize(
     isTouchDevice: boolean,
-    setTouchElementsPointerEvents: (enabled: boolean) => void
+    setTouchElementsPointerEvents: (_enabled: boolean) => void
   ): void {
     if (this._shouldSkipUpdate()) {
       return;
@@ -88,7 +88,7 @@ export class ResultsViewDataManager {
    * オフセットの変更時の処理
    * @param offset - 新しいオフセット値
    */
-  handleOffsetChange(offset: number): void {
+  handleOffsetChange(_offset: number): void {
     if (this._shouldSkipOffsetUpdate()) {
       return;
     }
@@ -134,7 +134,7 @@ export class ResultsViewDataManager {
   handleSearchResults(
     _results: any,
     isTouchDevice: boolean,
-    setTouchElementsPointerEvents: (enabled: boolean) => void
+    setTouchElementsPointerEvents: (_enabled: boolean) => void
   ): void {
     // 更新中フラグのチェックを1回だけに
     const isUpdating = storeManager.getData('isStoreUpdating');
@@ -280,7 +280,7 @@ export class ResultsViewDataManager {
    */
   private _updateRowsWithAnimation(
     isTouchDevice: boolean,
-    setTouchElementsPointerEvents: (enabled: boolean) => void
+    setTouchElementsPointerEvents: (_enabled: boolean) => void
   ): void {
     requestAnimationFrame(() => {
       this.rows.forEach((row) => row.updateTableRow());
@@ -460,5 +460,26 @@ export class ResultsViewDataManager {
     }
 
     return offset;
+  }
+
+  /**
+   * Clean up all resources and row instances
+   * Call this method when the DataManager is no longer needed
+   */
+  destroy(): void {
+    // Clean up all row instances
+    this.rows.forEach((row) => {
+      if (row && typeof row.destroy === 'function') {
+        row.destroy();
+      }
+    });
+    this.rows = [];
+
+    // Clear DOM references
+    this.elm = null as any;
+    this.status = null as any;
+    this.messages = null as any;
+    this.tbody = null as any;
+    this.stylesheet = null as any;
   }
 }

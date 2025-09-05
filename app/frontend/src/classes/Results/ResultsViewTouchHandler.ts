@@ -34,6 +34,14 @@ export class ResultsViewTouchHandler {
   /** スクロールコールバック */
   private scrollCallbacks: ScrollCallbacks = {};
 
+  /** Bound event handlers for proper cleanup */
+  private readonly _boundHandlers = {
+    touchStart: this._handleTouchStart.bind(this),
+    touchMove: this._handleTouchMove.bind(this),
+    touchEnd: this._handleTouchEnd.bind(this),
+    tapCompleted: this._handleTapCompleted.bind(this),
+  };
+
   /**
    * コンストラクタ
    * @param elm - ルート要素
@@ -127,19 +135,15 @@ export class ResultsViewTouchHandler {
     const touchElements = [this.tablecontainer, this.tbody];
 
     touchElements.forEach((element) => {
-      element.addEventListener(
-        'touchstart',
-        this._handleTouchStart.bind(this),
-        {
-          passive: false,
-          capture: true,
-        }
-      );
-      element.addEventListener('touchmove', this._handleTouchMove.bind(this), {
+      element.addEventListener('touchstart', this._boundHandlers.touchStart, {
         passive: false,
         capture: true,
       });
-      element.addEventListener('touchend', this._handleTouchEnd.bind(this), {
+      element.addEventListener('touchmove', this._boundHandlers.touchMove, {
+        passive: false,
+        capture: true,
+      });
+      element.addEventListener('touchend', this._boundHandlers.touchEnd, {
         passive: false,
         capture: true,
       });
@@ -147,7 +151,7 @@ export class ResultsViewTouchHandler {
 
     this.tbody.addEventListener(
       'tapCompleted',
-      this._handleTapCompleted.bind(this)
+      this._boundHandlers.tapCompleted
     );
   }
 
@@ -285,7 +289,7 @@ export class ResultsViewTouchHandler {
    * タッチ終了イベントを処理する
    * @param e - タッチイベント
    */
-  private _handleTouchEnd(e: TouchEvent): void {
+  private _handleTouchEnd(_e: TouchEvent): void {
     this.touchState.duration = Date.now() - this.touchState.startTime;
 
     const isTap =
@@ -309,8 +313,49 @@ export class ResultsViewTouchHandler {
    * タップ処理完了時の処理
    * @param e - カスタムイベント
    */
-  private _handleTapCompleted(e: Event): void {
+  private _handleTapCompleted(_e: Event): void {
     if (!this.isTouchDevice) return;
     this.setTouchElementsPointerEvents(false);
+  }
+
+  /**
+   * Clean up all resources and event listeners
+   * Call this method when the TouchHandler is no longer needed
+   */
+  destroy(): void {
+    const touchElements = [this.tablecontainer, this.tbody];
+
+    // Remove touch event listeners
+    touchElements.forEach((element) => {
+      element.removeEventListener(
+        'touchstart',
+        this._boundHandlers.touchStart,
+        true
+      );
+      element.removeEventListener(
+        'touchmove',
+        this._boundHandlers.touchMove,
+        true
+      );
+      element.removeEventListener(
+        'touchend',
+        this._boundHandlers.touchEnd,
+        true
+      );
+    });
+
+    // Remove tap completed listener
+    this.tbody.removeEventListener(
+      'tapCompleted',
+      this._boundHandlers.tapCompleted
+    );
+
+    // Clear callbacks
+    this.scrollCallbacks = {};
+
+    // Clear DOM references
+    this.elm = null as any;
+    this.tbody = null as any;
+    this.tablecontainer = null as any;
   }
 }

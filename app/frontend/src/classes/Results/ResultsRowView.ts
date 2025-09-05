@@ -67,13 +67,50 @@ export class ResultsRowView {
     this.selected = false;
     this.tr = this._createTableRow();
 
-    // Watch for changes to `selectedRow` and apply _handleSelectedRowChange() method
-    storeManager.subscribe(
-      'selectedRow',
-      this._handleSelectedRowChange.bind(this)
-    );
-    // Watch for changes to `offset` and update the table row
-    storeManager.subscribe('offset', this.updateTableRow.bind(this));
+    // Watch for changes to `selectedRow` and `offset`
+    storeManager.bind('selectedRow', this);
+    storeManager.bind('offset', this);
+  }
+
+  // ========================================
+  // Lifecycle Management
+  // ========================================
+
+  /**
+   * Clean up all resources and event listeners
+   * Call this method when the row is no longer needed
+   */
+  destroy(): void {
+    // Unbind from store events
+    storeManager.unbind('selectedRow', this);
+    storeManager.unbind('offset', this);
+
+    // Remove DOM element
+    if (this.tr && this.tr.parentNode) {
+      this.tr.parentNode.removeChild(this.tr);
+    }
+
+    // Clear DOM element references
+    this.tr = null as any;
+    this.togovarIdAnchor = null;
+    this.refsnpCell = null;
+    this.refsnpAnchor = null;
+    this.positionChromosome = null;
+    this.positionCoordinate = null;
+    this.refElement = null;
+    this.altElement = null;
+    this.typeElement = null;
+    this.geneCell = null;
+    this.geneAnchor = null;
+    this.frequencyElements = {};
+    this.consequenceCell = null;
+    this.consequenceItem = null;
+    this.clinicalSignificance = null;
+    this.clinicalAnchor = null;
+    this.clinicalIcon = null;
+    this.alphaMissenseFunction = null;
+    this.siftFunction = null;
+    this.polyphenFunction = null;
   }
 
   // ========================================
@@ -135,12 +172,21 @@ export class ResultsRowView {
 
   /**
    * Handle selected row changes
+   * Store event handler method (called by bind/unbind system)
    *
    * @param selectedIndex - Index of the selected row
    */
-  private _handleSelectedRowChange(selectedIndex: number) {
+  selectedRow(selectedIndex: number) {
     this.selected = selectedIndex === this.index;
     this.tr.classList.toggle('-selected', this.selected);
+  }
+
+  /**
+   * Handle offset changes
+   * Store event handler method (called by bind/unbind system)
+   */
+  offset() {
+    this.updateTableRow();
   }
 
   // ========================================
