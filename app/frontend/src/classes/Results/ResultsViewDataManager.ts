@@ -51,14 +51,6 @@ export class ResultsViewDataManager {
   // ========================================
 
   /**
-   * 結果行の配列を取得
-   * @returns 結果行の配列
-   */
-  get resultRows(): ResultsRowView[] {
-    return this._rows;
-  }
-
-  /**
    * 表示サイズを更新する
    * @param isTouchDevice - タッチデバイスかどうか
    * @param setTouchElementsPointerEvents - pointer-events制御関数
