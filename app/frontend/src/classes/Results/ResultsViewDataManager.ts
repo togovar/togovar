@@ -10,7 +10,6 @@ import {
   DisplaySizeCalculation,
 } from '../../types';
 
-/** 定数 */
 const DISPLAY_CALCULATION_MARGIN = 2;
 
 /**
@@ -18,39 +17,33 @@ const DISPLAY_CALCULATION_MARGIN = 2;
  * 検索結果の表示、ストア連携、行の管理を行う
  */
 export class ResultsViewDataManager {
-  /** ルート要素 */
-  private elm: HTMLElement;
-  /** 結果行のビューインスタンス配列 */
-  private rows: ResultsRowView[] = [];
-  /** ステータス表示要素 */
-  private status: HTMLElement;
-  /** メッセージ表示要素 */
-  private messages: HTMLElement;
-  /** テーブルボディ要素 */
-  private tbody: HTMLElement;
-  /** カラム表示制御用スタイルシート */
-  private stylesheet: HTMLStyleElement;
+  private _container: HTMLElement; // Root element
+  private _rows: ResultsRowView[] = []; // Array of result row view instances
+  private _status: HTMLElement; // Status display element
+  private _messages: HTMLElement; // Message display element
+  private _tbody: HTMLElement; // Table body element
+  private _stylesheet: HTMLStyleElement; // Stylesheet for column display control
 
   /**
    * コンストラクタ
-   * @param elm - ルート要素
-   * @param status - ステータス表示要素
-   * @param messages - メッセージ表示要素
-   * @param tbody - テーブルボディ要素
-   * @param stylesheet - カラム表示制御用スタイルシート
+   * @param _container - ルート要素
+   * @param _status - ステータス表示要素
+   * @param _messages - メッセージ表示要素
+   * @param _tbody - テーブルボディ要素
+   * @param _stylesheet - カラム表示制御用スタイルシート
    */
   constructor(
-    elm: HTMLElement,
-    status: HTMLElement,
-    messages: HTMLElement,
-    tbody: HTMLElement,
-    stylesheet: HTMLStyleElement
+    _container: HTMLElement,
+    _status: HTMLElement,
+    _messages: HTMLElement,
+    _tbody: HTMLElement,
+    _stylesheet: HTMLStyleElement
   ) {
-    this.elm = elm;
-    this.status = status;
-    this.messages = messages;
-    this.tbody = tbody;
-    this.stylesheet = stylesheet;
+    this._container = _container;
+    this._status = _status;
+    this._messages = _messages;
+    this._tbody = _tbody;
+    this._stylesheet = _stylesheet;
   }
 
   // ========================================
@@ -62,7 +55,7 @@ export class ResultsViewDataManager {
    * @returns 結果行の配列
    */
   get resultRows(): ResultsRowView[] {
-    return this.rows;
+    return this._rows;
   }
 
   /**
@@ -104,7 +97,7 @@ export class ResultsViewDataManager {
    * @param messages - メッセージオブジェクト
    */
   handleSearchMessages(messages: SearchMessages): void {
-    this.messages.innerHTML = '';
+    this._messages.innerHTML = '';
 
     this._appendMessageIfExists(messages.notice, 'notice');
     this._appendMessageIfExists(messages.warning, 'warning');
@@ -118,7 +111,7 @@ export class ResultsViewDataManager {
   handleSearchStatus(status: SearchStatus): void {
     const { available, filtered } = status;
 
-    this.status.innerHTML =
+    this._status.innerHTML =
       `The number of available variations is ${available.toLocaleString()} ` +
       `out of <span class="bigger">${filtered.toLocaleString()}</span>.`;
 
@@ -136,7 +129,7 @@ export class ResultsViewDataManager {
     isTouchDevice: boolean,
     setTouchElementsPointerEvents: (_enabled: boolean) => void
   ): void {
-    // 更新中フラグのチェックを1回だけに
+    // Check update flags only once
     const isUpdating = storeManager.getData('isStoreUpdating');
     const isFetching = storeManager.getData('isFetching');
 
@@ -152,7 +145,7 @@ export class ResultsViewDataManager {
     }
 
     if (!this._validateData()) {
-      console.warn('データの検証に失敗しました');
+      console.warn('Data validation failed');
       return;
     }
 
@@ -226,7 +219,7 @@ export class ResultsViewDataManager {
     const karyotypeHeight = storeManager.getData('karyotype')?.height || 0;
     return (
       window.innerHeight -
-      this.tbody.getBoundingClientRect().top -
+      this._tbody.getBoundingClientRect().top -
       karyotypeHeight -
       COMMON_FOOTER_HEIGHT -
       DISPLAY_CALCULATION_MARGIN
@@ -237,11 +230,11 @@ export class ResultsViewDataManager {
    * 必要な行数が確保されているかチェックし、不足分を追加する
    */
   private _ensureRowsExist(requiredRowCount: number): void {
-    while (this.rows.length < requiredRowCount) {
-      const rowIndex = this.rows.length;
+    while (this._rows.length < requiredRowCount) {
+      const rowIndex = this._rows.length;
       const rowView = new ResultsRowView(rowIndex);
-      this.rows.push(rowView);
-      this.tbody.appendChild(rowView.tr);
+      this._rows.push(rowView);
+      this._tbody.appendChild(rowView.tr);
     }
   }
 
@@ -267,10 +260,10 @@ export class ResultsViewDataManager {
     emptySpace: number
   ): number {
     if (currentOffset >= emptySpace) {
-      // 上の隙間の方が大きい場合、差分をオフセットにセット
+      // If the upper gap is larger, set the difference to offset
       return currentOffset - emptySpace;
     } else {
-      // 下の隙間が大きい場合、オフセット量をゼロに
+      // If the lower gap is larger, set offset to zero
       return 0;
     }
   }
@@ -283,7 +276,7 @@ export class ResultsViewDataManager {
     setTouchElementsPointerEvents: (_enabled: boolean) => void
   ): void {
     requestAnimationFrame(() => {
-      this.rows.forEach((row) => row.updateTableRow());
+      this._rows.forEach((row) => row.updateTableRow());
 
       if (isTouchDevice) {
         setTouchElementsPointerEvents(false);
@@ -308,7 +301,7 @@ export class ResultsViewDataManager {
     const rowCount = storeManager.getData('rowCount');
     const chromosomePositions: { [key: string]: number[] } = {};
 
-    // 各行のレコードから染色体位置を収集
+    // Collect chromosome positions from each row's record
     for (let i = 0; i < rowCount; i++) {
       const record = storeManager.getRecordByIndex(i) as ResultsRecord;
 
@@ -359,7 +352,7 @@ export class ResultsViewDataManager {
     type: string
   ): void {
     if (message) {
-      this.messages.innerHTML += `<div class="message -${type}">${message}</div>`;
+      this._messages.innerHTML += `<div class="message -${type}">${message}</div>`;
     }
   }
 
@@ -368,9 +361,9 @@ export class ResultsViewDataManager {
    */
   private _updateNotFoundState(isNotFound: boolean): void {
     if (isNotFound) {
-      this.elm.classList.add('-not-found');
+      this._container.classList.add('-not-found');
     } else {
-      this.elm.classList.remove('-not-found');
+      this._container.classList.remove('-not-found');
     }
   }
 
@@ -393,7 +386,7 @@ export class ResultsViewDataManager {
    * 既存のスタイルをクリアする
    */
   private _clearExistingStyles(): void {
-    const sheet = this.stylesheet.sheet;
+    const sheet = this._stylesheet.sheet;
     if (!sheet) return;
 
     while (sheet.cssRules.length > 0) {
@@ -405,7 +398,7 @@ export class ResultsViewDataManager {
    * カラムスタイルを適用する
    */
   private _applyColumnStyles(columns: ColumnConfig[]): void {
-    const sheet = this.stylesheet.sheet;
+    const sheet = this._stylesheet.sheet;
     if (!sheet) return;
 
     columns.forEach((column, index) => {
@@ -450,10 +443,10 @@ export class ResultsViewDataManager {
     let { offset } = state;
 
     if (direction < 0 && newIndex === 0 && offset > 0) {
-      // 上にスクロール
+      // Scroll up
       offset--;
     } else if (direction > 0 && newIndex === state.rowCount - 1) {
-      // 下にスクロール（範囲内の場合のみ）
+      // Scroll down (only if within range)
       if (offset + newIndex < state.numberOfRecords - 1) {
         offset++;
       }
@@ -468,18 +461,18 @@ export class ResultsViewDataManager {
    */
   destroy(): void {
     // Clean up all row instances
-    this.rows.forEach((row) => {
+    this._rows.forEach((row) => {
       if (row && typeof row.destroy === 'function') {
         row.destroy();
       }
     });
-    this.rows = [];
+    this._rows = [];
 
     // Clear DOM references
-    this.elm = null as any;
-    this.status = null as any;
-    this.messages = null as any;
-    this.tbody = null as any;
-    this.stylesheet = null as any;
+    this._container = null as any;
+    this._status = null as any;
+    this._messages = null as any;
+    this._tbody = null as any;
+    this._stylesheet = null as any;
   }
 }
