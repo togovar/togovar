@@ -7,31 +7,31 @@ import { ResultsViewDataManager } from './ResultsViewDataManager';
 import { SearchMessages, SearchStatus, ColumnConfig } from '../../types';
 import { isTouchDevice } from '../../utils/deviceDetection';
 
+// Define DOM selector constants outside the class
+const SELECTORS = {
+  STATUS: 'header.header > .left > .status',
+  MESSAGES: '#Messages',
+  TABLE_CONTAINER: '.tablecontainer',
+  TABLE_THEAD: '.tablecontainer > table.results-view > thead',
+  TABLE_TBODY: '.tablecontainer > table.results-view > tbody',
+  SCROLL_BAR: '.scroll-bar',
+} as const;
+
+// Define store manager binding keys outside the class
+const STORE_BINDINGS = [
+  'searchStatus',
+  'searchResults',
+  'columns',
+  'offset',
+  'karyotype',
+  'searchMessages',
+] as const;
+
 /**
  * 検索結果テーブルビューを管理するクラス
  * スクロール機能、タッチ操作、行の表示管理を行う
  */
 export class ResultsView {
-  /** DOMセレクタ定数 */
-  private static readonly SELECTORS = {
-    STATUS: 'header.header > .left > .status',
-    MESSAGES: '#Messages',
-    TABLE_CONTAINER: '.tablecontainer',
-    TABLE_THEAD: '.tablecontainer > table.results-view > thead',
-    TABLE_TBODY: '.tablecontainer > table.results-view > tbody',
-    SCROLL_BAR: '.scroll-bar',
-  } as const;
-
-  /** ストアマネージャーのバインドキー */
-  private static readonly STORE_BINDINGS = [
-    'searchStatus',
-    'searchResults',
-    'columns',
-    'offset',
-    'karyotype',
-    'searchMessages',
-  ] as const;
-
   /** ルート要素 */
   private elm: HTMLElement;
   /** タッチハンドラー */
@@ -100,7 +100,7 @@ export class ResultsView {
     }
 
     // Unbind all StoreManager event bindings
-    ResultsView.STORE_BINDINGS.forEach((key) => {
+    STORE_BINDINGS.forEach((key) => {
       storeManager.unbind(key, this);
     });
 
@@ -186,20 +186,12 @@ export class ResultsView {
    * DOM要素を取得する
    */
   private _getDOMElements() {
-    const status = this.elm.querySelector(
-      ResultsView.SELECTORS.STATUS
-    ) as HTMLElement;
-    const messages = this.elm.querySelector(
-      ResultsView.SELECTORS.MESSAGES
-    ) as HTMLElement;
-    const thead = this.elm.querySelector(
-      ResultsView.SELECTORS.TABLE_THEAD
-    ) as HTMLElement;
-    const tbody = this.elm.querySelector(
-      ResultsView.SELECTORS.TABLE_TBODY
-    ) as HTMLElement;
+    const status = this.elm.querySelector(SELECTORS.STATUS) as HTMLElement;
+    const messages = this.elm.querySelector(SELECTORS.MESSAGES) as HTMLElement;
+    const thead = this.elm.querySelector(SELECTORS.TABLE_THEAD) as HTMLElement;
+    const tbody = this.elm.querySelector(SELECTORS.TABLE_TBODY) as HTMLElement;
     const tablecontainer = this.elm.querySelector(
-      ResultsView.SELECTORS.TABLE_CONTAINER
+      SELECTORS.TABLE_CONTAINER
     ) as HTMLElement;
 
     return { status, messages, thead, tbody, tablecontainer };
@@ -210,7 +202,7 @@ export class ResultsView {
    * データバインディングとキーボードイベントリスナーを設定
    */
   private _connectToStoreManager(): void {
-    ResultsView.STORE_BINDINGS.forEach((key) => {
+    STORE_BINDINGS.forEach((key) => {
       storeManager.bind(key, this);
     });
     this._boundKeydownHandler = this._keydown.bind(this);
@@ -223,10 +215,10 @@ export class ResultsView {
    */
   private _configureScrollBar(): void {
     this.elm
-      .querySelector(ResultsView.SELECTORS.TABLE_CONTAINER)!
+      .querySelector(SELECTORS.TABLE_CONTAINER)!
       .insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
     this.scrollBar = new ResultsScrollBar(
-      this.elm.querySelector(ResultsView.SELECTORS.SCROLL_BAR) as HTMLElement
+      this.elm.querySelector(SELECTORS.SCROLL_BAR) as HTMLElement
     );
   }
 
