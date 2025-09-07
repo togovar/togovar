@@ -47,7 +47,7 @@ export class ResultsViewDataManager {
   }
 
   // ========================================
-  // Public Methods
+  // Display Management
   // ========================================
 
   /**
@@ -68,50 +68,6 @@ export class ResultsViewDataManager {
     this._ensureRowsExist(calculation.rowCount);
     this._adjustOffset(calculation);
     this._updateRowsWithAnimation(isTouchDevice, setTouchElementsPointerEvents);
-  }
-
-  /**
-   * Handles changes to the offset value.
-   * Updates the visible regions on the chromosome based on the new offset.
-   * @param offset - The new offset value.
-   */
-  handleOffsetChange(_offset: number): void {
-    if (this._shouldSkipOffsetUpdate()) {
-      return;
-    }
-
-    const displayingRegions = this._calculateDisplayingRegions();
-    if (Object.keys(displayingRegions).length > 0) {
-      storeManager.setData('displayingRegionsOnChromosome', displayingRegions);
-    }
-  }
-
-  /**
-   * Displays search messages in the UI.
-   * Clears existing messages and appends new ones based on their type (notice, warning, error).
-   * @param messages - The object containing search messages.
-   */
-  handleSearchMessages(messages: SearchMessages): void {
-    this._messages.innerHTML = '';
-
-    this._appendMessageIfExists(messages.notice, 'notice');
-    this._appendMessageIfExists(messages.warning, 'warning');
-    this._appendMessageIfExists(messages.error, 'error');
-  }
-
-  /**
-   * Updates the search status in the UI.
-   * Displays the number of available and filtered variations.
-   * @param status - The object containing search status information.
-   */
-  handleSearchStatus(status: SearchStatus): void {
-    const { available, filtered } = status;
-
-    this._status.innerHTML =
-      `The number of available variations is ${available.toLocaleString()} ` +
-      `out of <span class="bigger">${filtered.toLocaleString()}</span>.`;
-
-    this._updateNotFoundState(filtered === 0);
   }
 
   /**
@@ -157,6 +113,58 @@ export class ResultsViewDataManager {
   handleColumnsChange(columns: ColumnConfig[]): void {
     this._clearExistingStyles();
     this._applyColumnStyles(columns);
+  }
+
+  // ========================================
+  // Status and Messages Handling
+  // ========================================
+
+  /**
+   * Displays search messages in the UI.
+   * Clears existing messages and appends new ones based on their type (notice, warning, error).
+   * @param messages - The object containing search messages.
+   */
+  handleSearchMessages(messages: SearchMessages): void {
+    this._messages.innerHTML = '';
+
+    this._appendMessageIfExists(messages.notice, 'notice');
+    this._appendMessageIfExists(messages.warning, 'warning');
+    this._appendMessageIfExists(messages.error, 'error');
+  }
+
+  /**
+   * Updates the search status in the UI.
+   * Displays the number of available and filtered variations.
+   * @param status - The object containing search status information.
+   */
+  handleSearchStatus(status: SearchStatus): void {
+    const { available, filtered } = status;
+
+    this._status.innerHTML =
+      `The number of available variations is ${available.toLocaleString()} ` +
+      `out of <span class="bigger">${filtered.toLocaleString()}</span>.`;
+
+    this._updateNotFoundState(filtered === 0);
+  }
+
+  // ========================================
+  // Offset and Selection Handling
+  // ========================================
+
+  /**
+   * Handles changes to the offset value.
+   * Updates the visible regions on the chromosome based on the new offset.
+   * @param offset - The new offset value.
+   */
+  handleOffsetChange(_offset: number): void {
+    if (this._shouldSkipOffsetUpdate()) {
+      return;
+    }
+
+    const displayingRegions = this._calculateDisplayingRegions();
+    if (Object.keys(displayingRegions).length > 0) {
+      storeManager.setData('displayingRegionsOnChromosome', displayingRegions);
+    }
   }
 
   /**
