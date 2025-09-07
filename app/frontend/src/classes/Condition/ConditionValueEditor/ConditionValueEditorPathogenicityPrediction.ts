@@ -1,9 +1,9 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
-import '../components/ConditionPathogenicityPredictionSearch/TabView.js';
-import '../components/ConditionPathogenicityPredictionSearch/PredictionRangeSliderView.js';
-import { PREDICTIONS } from '../components/ConditionPathogenicityPredictionSearch/PredictionDatasets.js';
-import ConditionValues from './ConditionValues.js';
-import ConditionItemView from './ConditionItemView';
+import '../../../components/ConditionPathogenicityPredictionSearch/TabView.js';
+import '../../../components/ConditionPathogenicityPredictionSearch/PredictionRangeSliderView.js';
+import { PREDICTIONS } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets.js';
+import ConditionValues from '../ConditionValues.js';
+import ConditionItemView from '../ConditionItemView';
 
 interface ConditionItemValueViewElement extends HTMLElement {
   label?: string;

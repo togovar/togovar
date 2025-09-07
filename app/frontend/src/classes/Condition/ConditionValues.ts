@@ -1,14 +1,14 @@
-import { CONDITION_TYPE } from '../definition.js';
-import ConditionValueEditorCheckboxes from './ConditionValueEditorCheckboxes.js';
-import ConditionValueEditorClinicalSignificance from './ConditionValueEditorClinicalSignificance';
-import ConditionValueEditorColumns from './ConditionValueEditorColumns.js';
-import ConditionValueEditorColumnsDataset from './ConditionValueEditorColumnsDataset';
-import ConditionValueEditorDisease from './ConditionValueEditorDisease.js';
-import ConditionValueEditorFrequencyCount from './ConditionValueEditorFrequencyCount';
-import ConditionValueEditorGene from './ConditionValueEditorGene.js';
-import ConditionValueEditorLocation from './ConditionValueEditorLocation.js';
-import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditorPathogenicityPrediction';
-import ConditionValueEditorVariantID from './ConditionValueEditorVariantID.js';
+import { CONDITION_TYPE } from '../../definition.js';
+import ConditionValueEditorCheckboxes from './ConditionValueEditor/ConditionValueEditorCheckboxes.js';
+import ConditionValueEditorClinicalSignificance from './ConditionValueEditor/ConditionValueEditorClinicalSignificance';
+import ConditionValueEditorColumns from './ConditionValueEditor/ConditionValueEditorColumns.js';
+import ConditionValueEditorColumnsDataset from './ConditionValueEditor/ConditionValueEditorColumnsDataset';
+import ConditionValueEditorDisease from './ConditionValueEditor/ConditionValueEditorDisease.js';
+import ConditionValueEditorFrequencyCount from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
+import ConditionValueEditorGene from './ConditionValueEditor/ConditionValueEditorGene.js';
+import ConditionValueEditorLocation from './ConditionValueEditor/ConditionValueEditorLocation.js';
+import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditor/ConditionValueEditorPathogenicityPrediction';
+import ConditionValueEditorVariantID from './ConditionValueEditor/ConditionValueEditorVariantID.js';
 import ConditionItemView from './ConditionItemView';
 
 interface ConditionValueEditor {

@@ -1,6 +1,6 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
 
-import { ConditionDiseaseSearch } from '../components/ConditionDiseaseSearch/ConditionDiseaseSearch.js';
+import { ConditionDiseaseSearch } from '../../../components/ConditionDiseaseSearch/ConditionDiseaseSearch.js';
 
 export default class ConditionValueEditorDisease extends ConditionValueEditor {
   /**

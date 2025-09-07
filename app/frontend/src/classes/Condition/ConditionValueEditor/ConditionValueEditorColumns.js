@@ -1,15 +1,15 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
-import { ADVANCED_CONDITIONS, API_URL } from '../global.js';
-import { CONDITION_TYPE } from '../definition.js';
+import { ADVANCED_CONDITIONS } from '../../../global';
+import { CONDITION_TYPE } from '../../../definition.js';
 
 const SELECTION_DEPENDED_ON_PARENT = {
   consequence: true,
   disease: false,
 };
-const DISEASE_API = {
-  PATH: `${API_URL}/sparqlist/api/advanced_search_disease_selector`,
-  KEY: 'mesh_in',
-};
+// const DISEASE_API = {
+//   PATH: `${API_URL}/sparqlist/api/advanced_search_disease_selector`,
+//   KEY: 'mesh_in',
+// };
 
 export default class ConditionValueEditorColumns extends ConditionValueEditor {
   /**

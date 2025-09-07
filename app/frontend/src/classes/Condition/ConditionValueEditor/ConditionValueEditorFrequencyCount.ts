@@ -1,5 +1,5 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
-import '../components/RangeSliderView.js';
+import '../../../components/RangeSliderView.js';
 
 /**
  * Interface for frequency condition values

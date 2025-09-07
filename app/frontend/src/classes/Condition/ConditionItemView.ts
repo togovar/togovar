@@ -1,9 +1,9 @@
 import ConditionView from './ConditionView.js';
 import ConditionValues from './ConditionValues';
-import { storeManager } from '../store/StoreManager';
-import { ADVANCED_CONDITIONS } from '../global.js';
-import { CONDITION_TYPE, CONDITION_ITEM_TYPE } from '../definition.js';
-import { keyDownEvent } from '../utils/keyDownEvent.js';
+import { storeManager } from '../../store/StoreManager';
+import { ADVANCED_CONDITIONS } from '../../global';
+import { CONDITION_TYPE, CONDITION_ITEM_TYPE } from '../../definition.js';
+import { keyDownEvent } from '../../utils/keyDownEvent.js';
 
 /**
  * Interface for the advanced search builder view that manages search conditions

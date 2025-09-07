@@ -1,5 +1,5 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
-import { ADVANCED_CONDITIONS } from '../global.js';
+import { ADVANCED_CONDITIONS } from '../../../global';
 
 /** for clinical significance, variant type */
 export default class ConditionValueEditorCheckboxes extends ConditionValueEditor {
@@ -20,8 +20,8 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
       <button class="button-view -weak">Clear all</button>
     </div>
     <ul class="checkboxes body">${master.values
-        .map(
-          (value) => `
+      .map(
+        (value) => `
       <li data-value="${value.value}">
         <label>
           <input
@@ -30,8 +30,8 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
           data-label="${value.label}">${value.label}
         </label>
       </li>`
-        )
-        .join('')}
+      )
+      .join('')}
     </ul>
     `
     );
