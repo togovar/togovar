@@ -1,5 +1,6 @@
 import { storeManager } from '../../store/StoreManager';
 import { ResultsRowView } from './ResultsRowView';
+import { ResultsViewDisplayManager } from './ResultsViewDisplayManager';
 import { TR_HEIGHT, COMMON_FOOTER_HEIGHT } from '../../global.js';
 import {
   DisplayingRegions,
@@ -23,6 +24,7 @@ export class ResultsViewDataManager {
   private _messages: HTMLElement; // Message display element
   private _tbody: HTMLElement; // Table body element
   private _stylesheet: HTMLStyleElement; // Stylesheet for column display control
+  private _displayManager: ResultsViewDisplayManager;
 
   /**
    * Constructor for ResultsViewDataManager.
@@ -44,6 +46,7 @@ export class ResultsViewDataManager {
     this._messages = _messages;
     this._tbody = _tbody;
     this._stylesheet = _stylesheet;
+    this._displayManager = new ResultsViewDisplayManager(_tbody, _stylesheet);
   }
 
   // ========================================
@@ -60,14 +63,10 @@ export class ResultsViewDataManager {
     isTouchDevice: boolean,
     setTouchElementsPointerEvents: (_enabled: boolean) => void
   ): void {
-    if (this._shouldSkipUpdate()) {
-      return;
-    }
-
-    const calculation = this._calculateDisplaySize();
-    this._ensureRowsExist(calculation.rowCount);
-    this._adjustOffset(calculation);
-    this._updateRowsWithAnimation(isTouchDevice, setTouchElementsPointerEvents);
+    this._displayManager.updateDisplaySize(
+      isTouchDevice,
+      setTouchElementsPointerEvents
+    );
   }
 
   /**
@@ -111,8 +110,7 @@ export class ResultsViewDataManager {
    * @param columns - Array of column configuration objects.
    */
   handleColumnsChange(columns: ColumnConfig[]): void {
-    this._clearExistingStyles();
-    this._applyColumnStyles(columns);
+    this._displayManager.handleColumnsChange(columns);
   }
 
   // ========================================
