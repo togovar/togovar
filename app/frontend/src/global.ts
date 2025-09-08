@@ -1,22 +1,25 @@
-import GRCh37Conditions from '../assets/GRCh37/advanced_search_conditions.json';
-import GRCh38Conditions from '../assets/GRCh38/advanced_search_conditions.json';
+import grch37Json from '../assets/GRCh37/advanced_search_conditions.json';
+import grch38Json from '../assets/GRCh38/advanced_search_conditions.json';
+import { GRChConditions } from './types/advancedSearchConditions';
 
 export const PAGE = document.getElementsByTagName('html')[0].dataset.page;
 export const TR_HEIGHT = 27;
 export const COMMON_HEADER_HEIGHT = 30;
 export const COMMON_FOOTER_HEIGHT = 22;
 export const API_URL = TOGOVAR_FRONTEND_API_URL || 'https://togovar.org';
+
+const GRCh37: GRChConditions = grch37Json as unknown as GRChConditions;
+const GRCh38: GRChConditions = grch38Json as unknown as GRChConditions;
+
+const CONDITIONS_MAP = {
+  GRCh37: GRCh37.conditions,
+  GRCh38: GRCh38.conditions,
+} as const;
+
+type Reference = keyof typeof CONDITIONS_MAP;
+
 export const ADVANCED_CONDITIONS = Object.freeze(
-  ((reference) => {
-    switch (reference) {
-      case 'GRCh37':
-        return GRCh37Conditions.conditions;
-      case 'GRCh38':
-        return GRCh38Conditions.conditions;
-      default:
-        return [];
-    }
-  })(TOGOVAR_FRONTEND_REFERENCE)
+  CONDITIONS_MAP[TOGOVAR_FRONTEND_REFERENCE as Reference]
 );
 
 export const COLUMNS = [
