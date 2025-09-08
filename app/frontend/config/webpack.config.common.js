@@ -1,12 +1,11 @@
-import webpack from 'webpack';
-import path from 'path';
+const webpack = require('webpack');
+const path = require('path');
 
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-import dotenv from 'dotenv';
-const env = dotenv.config().parsed || {};
+const env = require('dotenv').config().parsed || {};
 Object.assign(process.env, env);
 
 const config = {
@@ -140,7 +139,7 @@ const config = {
     new MiniCssExtractPlugin({
       filename: 'css/[name]-[contenthash].css',
     }),
-    new WebpackManifestPlugin({}),
+    new WebpackManifestPlugin(),
     new webpack.DefinePlugin({
       TOGOVAR_FRONTEND_API_URL: JSON.stringify(
         process.env.TOGOVAR_FRONTEND_API_URL
@@ -205,7 +204,7 @@ const pages = (function (assembly) {
   }
 })(process.env.TOGOVAR_REFERENCE);
 
-pages!.forEach(function (name) {
+pages.forEach(function (name) {
   config.plugins.push(
     new HtmlWebpackPlugin({
       template: `app/frontend/views/doc/ja/${name}.pug`,
