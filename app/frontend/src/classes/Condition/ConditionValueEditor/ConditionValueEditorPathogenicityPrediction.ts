@@ -1,7 +1,11 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
 import '../../../components/ConditionPathogenicityPredictionSearch/TabView.js';
 import '../../../components/ConditionPathogenicityPredictionSearch/PredictionRangeSliderView.js';
-import { PREDICTIONS } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets.js';
+import {
+  PredictionKey,
+  PredictionLabel,
+  PREDICTIONS,
+} from '../../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
 import ConditionValues from '../ConditionValues.js';
 import ConditionItemView from '../ConditionItemView';
 
@@ -19,10 +23,13 @@ interface PredictionValueViewElement extends HTMLElement {
   unassignedChecks: Array<string>;
 }
 
-/** Pathogenicity prediction editing screen */
+/**
+ * Pathogenicity prediction editing screen
+ * This class manages the UI and state for editing pathogenicity predictions.
+ */
 class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
-  private _dataset!: string; // selected dataset (e.g., alphamissense, sift, polyphen)
-  private _label!: string; // selected label (e.g., AlphaMissense, SIFT, PolyPhen)
+  private _dataset!: PredictionKey; // selected dataset (e.g., alphamissense, sift, polyphen)
+  private _label!: PredictionLabel; // selected label (e.g., AlphaMissense, SIFT, PolyPhen)
   private _values!: Array<number>; // max-min values (0〜1)
   private _inequalitySigns!: Array<string>; // max-min inequality signs (gte, gt, lte, lt)
   private _unassignedChecks!: Array<string>; // unassigned checks (e.g., unassigned, unknown)
@@ -45,6 +52,55 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
     this._initializeUI();
     this._initializeEvents();
   }
+
+  // ========================================
+  // State Management
+  // ========================================
+
+  /**
+   * Retain values when switching to the edit screen.
+   * This method saves the current state of the values to allow restoration if needed.
+   */
+  keepLastValues() {
+    this._valuesElement
+      .querySelectorAll(':scope > condition-item-value-view')
+      .forEach((view) => {
+        const conditionValues = (
+          view.shadowRoot?.querySelector('prediction-value-view') as any
+        )?.conditionValues;
+        if (conditionValues) {
+          const { dataset, label, values, inequalitySigns, unassignedChecks } =
+            conditionValues;
+          this._lastState = {
+            dataset,
+            label,
+            values,
+            inequalitySigns,
+            unassignedChecks,
+          };
+        }
+      });
+  }
+
+  /**
+   * Restore the last selected values if editing is canceled.
+   * This method re-applies the previously saved state to the UI.
+   */
+  restore() {
+    const { dataset, label, values, inequalitySigns, unassignedChecks } =
+      this._lastState;
+    this._addPredictionValueView(
+      dataset,
+      label,
+      values,
+      inequalitySigns,
+      unassignedChecks
+    );
+  }
+
+  // ========================================
+  // Initialization
+  // ========================================
 
   // Initialize default values
   private _initializeDefaultValues() {
@@ -88,43 +144,6 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
     });
   }
 
-  // Public methods
-  /** Retain values when switching to edit screen */
-  keepLastValues() {
-    this._valuesElement
-      .querySelectorAll(':scope > condition-item-value-view')
-      .forEach((view) => {
-        const conditionValues = (
-          view.shadowRoot?.querySelector('prediction-value-view') as any
-        )?.conditionValues;
-        if (conditionValues) {
-          const { dataset, label, values, inequalitySigns, unassignedChecks } =
-            conditionValues;
-          this._lastState = {
-            dataset,
-            label,
-            values,
-            inequalitySigns,
-            unassignedChecks,
-          };
-        }
-      });
-  }
-
-  /** Restore the last selected values if editing is canceled */
-  restore() {
-    const { dataset, label, values, inequalitySigns, unassignedChecks } =
-      this._lastState;
-    this._addPredictionValueView(
-      dataset,
-      label,
-      values,
-      inequalitySigns,
-      unassignedChecks
-    );
-  }
-
-  // Private methods
   /** Update UI and values when a tab is switched */
   private _switchTab(detail: any) {
     this._dataset = detail.dataset;

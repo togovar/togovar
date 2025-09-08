@@ -1,4 +1,14 @@
-export const ALPHAMISSENSE_THRESHOLD = {
+interface Threshold {
+  [key: string]: {
+    color: string;
+    min: number;
+    max: number;
+    minInequalitySign: string;
+    maxInequalitySign: string;
+  };
+}
+
+export const ALPHAMISSENSE_THRESHOLD: Threshold = {
   'Likely benign': {
     color: '#9def3A',
     min: 0,
@@ -63,7 +73,18 @@ const POLYPHEN_THRESHOLD = {
   },
 };
 
-export const PREDICTIONS = {
+export type PredictionKey = 'alphamissense' | 'sift' | 'polyphen';
+
+interface Prediction {
+  label: string;
+  unassignedLists: string[];
+  threshold: Threshold;
+}
+
+export type PredictionLabel =
+  (typeof PREDICTIONS)[keyof typeof PREDICTIONS]['label'];
+
+export const PREDICTIONS: Record<PredictionKey, Prediction> = {
   alphamissense: {
     label: 'AlphaMissense',
     unassignedLists: ['unassigned'],
@@ -79,4 +100,4 @@ export const PREDICTIONS = {
     unassignedLists: ['unassigned', 'unknown'],
     threshold: POLYPHEN_THRESHOLD,
   },
-};
+} as const;

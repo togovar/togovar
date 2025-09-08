@@ -3,7 +3,7 @@ import { customElement, state, query, queryAll } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { range } from 'lit/directives/range.js';
 import { createGradientSlider } from './createGradientSlider';
-import { ALPHAMISSENSE_THRESHOLD, PREDICTIONS } from './PredictionDatasets.js';
+import { ALPHAMISSENSE_THRESHOLD, PREDICTIONS } from './PredictionDatasets';
 import { setInequalitySign } from './setInequalitySign.js';
 import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
 
