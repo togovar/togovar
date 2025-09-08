@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "target": "es6",
+    "target": "es2020",
     "module": "nodenext",
     "sourceMap": true,
     "outDir": "./dist",
     "moduleResolution": "nodenext",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "strict": true
   },
   "include": ["./app/frontend/src/**/*", "./app/frontend/css.d.ts"]
 }
