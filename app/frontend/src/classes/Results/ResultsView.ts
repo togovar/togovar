@@ -73,6 +73,9 @@ export class ResultsView {
 
     // 初期設定
     this._configureInitialState();
+
+    // Initialize search mode listener
+    this._initializeSearchModeListener();
   }
 
   // ========================================
@@ -347,5 +350,16 @@ export class ResultsView {
           break;
       }
     }
+  }
+
+  /**
+   * Initialize search mode listener
+   * Monitors changes to the search mode and reinitializes components as needed.
+   */
+  private _initializeSearchModeListener(): void {
+    storeManager.subscribe('searchMode', (_newMode) => {
+      // Reset scroll position when search mode changes
+      this.scrollBar.resetScrollPosition();
+    });
   }
 }

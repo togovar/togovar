@@ -266,6 +266,14 @@ export class ResultsScrollBar {
     this._renderer.applyScrollBarStyles(calculation, offset);
   }
 
+  /**
+   * Reset the scroll position to the initial state
+   */
+  resetScrollPosition(): void {
+    this._lastScrollPosition = 0;
+    this.updateDirectly(0);
+  }
+
   // ================================================================
   // Data Access & Validation
   // ================================================================
