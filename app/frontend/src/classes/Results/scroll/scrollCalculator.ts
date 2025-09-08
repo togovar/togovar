@@ -1,4 +1,4 @@
-import { TR_HEIGHT } from '../../../global.js';
+import { TR_HEIGHT } from '../../../global';
 import {
   ScrollCalculation,
   ScrollBarCalculation,

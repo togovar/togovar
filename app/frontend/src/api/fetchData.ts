@@ -1,7 +1,7 @@
 import { storeManager } from '../store/StoreManager';
 import * as qs from 'qs';
 import * as _ from 'lodash';
-import { API_URL } from '../global.js';
+import { API_URL } from '../global';
 const LIMIT = 100;
 import { extractSearchCondition } from '../store/searchManager';
 import { FetchOption, SearchResults, SearchStatistics } from '../types';

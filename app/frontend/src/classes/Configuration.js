@@ -1,4 +1,4 @@
-import { PAGE, COLUMNS } from '../global.js';
+import { PAGE, COLUMNS } from '../global.ts';
 import { storeManager } from '../store/StoreManager';
 
 export default class Configuration {

@@ -1,4 +1,4 @@
-import { COLUMNS } from '../../global.js';
+import { COLUMNS } from '../../global';
 import { storeManager } from '../../store/StoreManager';
 import '../../components/LogarithmizedBlockGraphFrequencyView';
 import {

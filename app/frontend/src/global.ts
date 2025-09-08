@@ -1,3 +1,6 @@
+import GRCh37Conditions from '../assets/GRCh37/advanced_search_conditions.json';
+import GRCh38Conditions from '../assets/GRCh38/advanced_search_conditions.json';
+
 export const PAGE = document.getElementsByTagName('html')[0].dataset.page;
 export const TR_HEIGHT = 27;
 export const COMMON_HEADER_HEIGHT = 30;
@@ -7,11 +10,9 @@ export const ADVANCED_CONDITIONS = Object.freeze(
   ((reference) => {
     switch (reference) {
       case 'GRCh37':
-        return require('../assets/GRCh37/advanced_search_conditions.json')
-          .conditions;
+        return GRCh37Conditions.conditions;
       case 'GRCh38':
-        return require('../assets/GRCh38/advanced_search_conditions.json')
-          .conditions;
+        return GRCh38Conditions.conditions;
       default:
         return [];
     }
@@ -32,7 +33,3 @@ export const COLUMNS = [
   { label: 'SIFT', id: 'sift' },
   { label: 'PolyPhen', id: 'polyphen' },
 ];
-
-export function strIns(str, idx, val) {
-  return str.slice(0, idx) + val + str.slice(idx);
-}

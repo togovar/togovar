@@ -1,5 +1,5 @@
 import { storeManager } from '../../store/StoreManager';
-import { TR_HEIGHT } from '../../global.js';
+import { TR_HEIGHT } from '../../global';
 import { DragEventUI, StoreState } from '../../types';
 import {
   calculateNewScrollPosition,

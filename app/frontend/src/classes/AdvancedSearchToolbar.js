@@ -1,4 +1,4 @@
-import { ADVANCED_CONDITIONS } from '../global.js';
+import { ADVANCED_CONDITIONS } from '../global.ts';
 
 export default class AdvancedSearchToolbar {
   constructor(delegate, toolbar) {
