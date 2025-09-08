@@ -144,6 +144,10 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
     });
   }
 
+  // ========================================
+  // State Management
+  // ========================================
+
   /** Update UI and values when a tab is switched */
   private _switchTab(detail: any) {
     this._dataset = detail.dataset;
@@ -162,6 +166,21 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
     );
     this._valuesView.update(this._validate());
   }
+
+  /** Update values and inequality signs */
+  private _updateValuesAndSigns(detail: any) {
+    this._values = [detail.values[0], detail.values[1]];
+    this._inequalitySigns = [
+      detail.inequalitySigns[0],
+      detail.inequalitySigns[1],
+    ];
+    this._unassignedChecks = detail.unassignedChecks;
+    this._update();
+  }
+
+  // ========================================
+  // UI Rendering
+  // ========================================
 
   /** Add or update the value view */
   private _addPredictionValueView(
@@ -199,11 +218,6 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
       });
   }
 
-  /** Validate if the values are valid */
-  private _validate(): boolean {
-    return this._values.filter((item) => !Number.isNaN(item)).length === 2;
-  }
-
   /** Create tab view */
   private _createTabView() {
     const tabView = document.createElement('tab-view') as any;
@@ -211,15 +225,12 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
     this._tabsContainer.appendChild(tabView);
   }
 
-  /** Update values and inequality signs */
-  private _updateValuesAndSigns(detail: any) {
-    this._values = [detail.values[0], detail.values[1]];
-    this._inequalitySigns = [
-      detail.inequalitySigns[0],
-      detail.inequalitySigns[1],
-    ];
-    this._unassignedChecks = detail.unassignedChecks;
-    this._update();
+  // ========================================
+  // Validation
+  // ========================================
+  /** Validate if the values are valid */
+  private _validate(): boolean {
+    return this._values.filter((item) => !Number.isNaN(item)).length === 2;
   }
 
   // Accessor
