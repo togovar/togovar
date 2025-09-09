@@ -72,7 +72,7 @@ export default class ConditionGroupView extends ConditionView {
 
   // public methods
 
-  maketToolbar() {
+  makeToolbar() {
     const toolbar = document.createElement('nav');
     this._conditionViewEl.append(toolbar);
     return toolbar;

@@ -1,6 +1,6 @@
 import { setAdvancedSearchCondition } from '../store/searchManager';
 import ConditionGroupView from './Condition/ConditionGroupView.js';
-import AdvancedSearchToolbar from './AdvancedSearchToolbar.js';
+import { AdvancedSearchToolbar } from './AdvancedSearchToolbar.ts';
 import AdvancedSearchSelection from './AdvancedSearchSelection.js';
 // import {ADVANCED_CONDITIONS} from '../global.js';
 // import {API_URL} from "../global.js";
@@ -15,7 +15,7 @@ export default class AdvancedSearchBuilderView {
     // toolbar
     this._toolbar = new AdvancedSearchToolbar(
       this,
-      this._rootGroup.maketToolbar()
+      this._rootGroup.makeToolbar()
     );
 
     // events
@@ -125,7 +125,7 @@ export default class AdvancedSearchBuilderView {
    *
    * @param {Array<ConditionView>} views
    */
-  delete(views) {
+  deleteCondition(views) {
     const conditionViews =
       views ?? this._selection.getSelectingConditionViews();
     for (const view of conditionViews) {

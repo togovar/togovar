@@ -314,7 +314,7 @@ class ConditionItemView extends ConditionView {
         this._enterEditMode();
         break;
       case 'delete':
-        this._builder.delete([this]);
+        this._builder.deleteCondition([this]);
         break;
     }
   }

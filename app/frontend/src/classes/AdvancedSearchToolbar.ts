@@ -1,7 +1,10 @@
-import { ADVANCED_CONDITIONS } from '../global.ts';
+import { ADVANCED_CONDITIONS } from '../global';
+import AdvancedSearchBuilderView from './AdvancedSearchBuilderView.js';
 
-export default class AdvancedSearchToolbar {
-  constructor(delegate, toolbar) {
+export class AdvancedSearchToolbar {
+  private _delegate: AdvancedSearchBuilderView;
+
+  constructor(delegate: AdvancedSearchBuilderView, toolbar: HTMLElement) {
     this._delegate = delegate;
 
     toolbar.classList.add('advanced-search-toolbar');
@@ -18,16 +21,6 @@ export default class AdvancedSearchToolbar {
         label: 'Ungroup',
         shortcut: [16, 71],
       },
-      // {
-      //   command: 'copy',
-      //   label: 'Copy',
-      //   shortcut: [67]
-      // },
-      // {
-      //   command: 'edit',
-      //   label: 'Edit',
-      //   shortcut: [69]
-      // },
       {
         command: 'delete',
         label: 'Delete',
@@ -67,19 +60,21 @@ export default class AdvancedSearchToolbar {
       </li>
       `
       ).join('')}
-     
     </ul>
     `;
 
-    // references
-
     // events
     toolbar.querySelectorAll('.command').forEach((command) => {
-      command.addEventListener('click', (e) => {
+      const cmdElement = command as HTMLElement;
+      cmdElement.addEventListener('click', (e: Event) => {
         e.stopImmediatePropagation();
-        switch (command.dataset.command) {
+        const dataset = cmdElement.dataset;
+        switch (dataset.command) {
           case 'add-condition':
-            this._delegate.addCondition(command.dataset.condition, e.detail);
+            this._delegate.addCondition(
+              dataset.condition || '',
+              (e as CustomEvent).detail
+            );
             break;
           case 'group':
             this._delegate.group();
@@ -87,24 +82,13 @@ export default class AdvancedSearchToolbar {
           case 'ungroup':
             this._delegate.ungroup();
             break;
-          case 'copy':
-            this._delegate.copy();
-            break;
-          case 'edit':
-            this._delegate.edit();
-            break;
           case 'delete':
-            this._delegate.delete();
+            this._delegate.deleteCondition(
+              this._delegate.selection.getSelectingConditionViews()
+            );
             break;
         }
       });
     });
-  }
-
-  // public methods
-
-  canSearch(can) {
-    if (can) this._searchButton.classList.remove('-disabled');
-    else this._searchButton.classList.add('-disabled');
   }
 }
