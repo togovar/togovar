@@ -1,18 +1,36 @@
+import AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
+import ConditionItemView from './ConditionItemView';
+import ConditionGroupView from './ConditionGroupView';
+
+interface DelegateElement extends HTMLElement {
+  delegate: ConditionItemView | ConditionGroupView;
+}
+
 export class ConditionView {
+  private _conditionViewEl: HTMLDivElement;
+  private _type: number;
+  private _builder: AdvancedSearchBuilderView;
+  private _parentView?: ConditionItemView | ConditionGroupView;
+
   /**
    * @param {Number} type - what number???
    * @param {AdvancedSearchBuilderView} builder - Static Object(_container, _elm, _rootGroup, _selection, _toolbar)
    * @param {ConditionItemView | ConditionGroupView} parentView - Dynamic Object(_builder, _container, _elm, _logicalOperatorSwitch, _mutationObserver, _type)
    * @param {Node} referenceElm - what's this? null??
    */
-  constructor(type, builder, parentView, referenceElm) {
+  constructor(
+    type: number,
+    builder: AdvancedSearchBuilderView,
+    parentView: { container: HTMLElement },
+    referenceElm: Node | null
+  ) {
     this._type = type;
     this._builder = builder;
 
     // make HTML
     this._conditionViewEl = document.createElement('div');
     this._conditionViewEl.classList.add('advanced-search-condition-view');
-    this._conditionViewEl.delegate = this;
+    (this._conditionViewEl as any).delegate = this;
 
     // Insert the condition view element into the parent container.
     // If the reference element exists within the parent container, insert the condition view element before it.
@@ -26,12 +44,14 @@ export class ConditionView {
 
   // private methods
 
-  _toggleSelecting(e) {
+  _toggleSelecting(e: Event) {
     e.stopImmediatePropagation();
-    const ifEditing = this._conditionViewEl.classList.contains('-editing');
-    if (ifEditing) return;
+    const isEditing = this._conditionViewEl.classList.contains('-editing');
+    if (isEditing) return;
 
-    if (this.isSelecting) {
+    const isSelecting = this._conditionViewEl.classList.contains('-selected');
+
+    if (isSelecting) {
       this._builder.selection.deselectConditionView(this);
     } else {
       this._builder.selection.selectConditionView(this, false);
@@ -48,9 +68,12 @@ export class ConditionView {
     this._conditionViewEl.classList.remove('-selected');
   }
 
-  remove() {
-    this.parentView.removeConditionView(this);
-    delete this;
+  remove(): void {
+    if (this._parentView && 'removeConditionView' in this._parentView) {
+      this._parentView.removeConditionView(
+        this as unknown as ConditionItemView | ConditionGroupView
+      );
+    }
   }
 
   // accessor
@@ -62,8 +85,8 @@ export class ConditionView {
     return this._conditionViewEl;
   }
 
-  get siblingElms() {
-    return [...this._conditionViewEl.parentNode.childNodes];
+  get siblingElms(): Node[] {
+    return Array.from(this._conditionViewEl.parentNode?.childNodes || []);
   }
 
   /**
@@ -80,12 +103,13 @@ export class ConditionView {
     return this._conditionViewEl.classList.contains('-selected');
   }
 
-  /**
-   * @return {ConditionItemView | ConditionGroupView}
-   */
-  get parentView() {
-    return this.elm.parentNode.closest('.advanced-search-condition-view')
-      .delegate;
+  get parentView(): ConditionItemView | ConditionGroupView | undefined {
+    const closestElement = this._conditionViewEl.parentNode as HTMLElement;
+    return (
+      closestElement.closest(
+        '.advanced-search-condition-view'
+      ) as DelegateElement
+    )?.delegate;
   }
 
   /**

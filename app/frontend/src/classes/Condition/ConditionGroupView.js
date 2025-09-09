@@ -1,4 +1,4 @@
-import { ConditionView } from './ConditionView.js';
+import { ConditionView } from './ConditionView';
 import ConditionItemView from './ConditionItemView';
 import { CONDITION_ITEM_TYPE } from '../../definition.js';
 

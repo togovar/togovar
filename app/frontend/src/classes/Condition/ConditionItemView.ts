@@ -1,4 +1,4 @@
-import { ConditionView } from './ConditionView.js';
+import { ConditionView } from './ConditionView';
 import ConditionValues from './ConditionValues';
 import { storeManager } from '../../store/StoreManager';
 import { ADVANCED_CONDITIONS } from '../../global';
