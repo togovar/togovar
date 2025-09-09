@@ -67,188 +67,10 @@ class ConditionItemView extends ConditionView {
     this._isFirstTime = true;
     this._keepLastRelation = 'eq';
 
-    this.initializeHTML();
-    this.setupDOMReferences();
-    this.attachEventListeners();
-    this.autoEnterEditMode();
-  }
-
-  /**
-   * Initializes the HTML structure for the condition item
-   */
-  private initializeHTML(): void {
-    this._elm.classList.add('advanced-search-condition-item-view');
-    this._elm.dataset.classification = this._conditionType;
-    this._elm.dataset.relation = this.getInitialRelation();
-    this._elm.innerHTML = this.generateHTML();
-  }
-
-  /**
-   * Determines the initial relation value based on condition type
-   */
-  private getInitialRelation(): string {
-    const noRelationTypes = [
-      'dataset',
-      'genotype',
-      'pathogenicity_prediction',
-      'id',
-      'location',
-    ];
-    return noRelationTypes.includes(this._conditionType) ? '' : 'eq';
-  }
-
-  /**
-   * Generates the HTML template for the condition item
-   */
-  private generateHTML(): string {
-    const conditionType = this
-      ._conditionType as keyof typeof ADVANCED_CONDITIONS;
-    const label = ADVANCED_CONDITIONS[conditionType]?.label;
-
-    return `
-    <div class="body">
-      <div class="summary">
-        <div class="classification">${label}</div>
-        <div class="relation"></div>
-        <div class="values"></div>
-        <div class="buttons">
-          <button class="edit" title="Edit"></button>
-          <button class="delete" title="Delete"></button>
-        </div>
-      </div>
-      <div class="advanced-search-condition-editor-view"></div>
-    </div>
-    <div class="bg"></div>`;
-  }
-
-  /**
-   * Sets up DOM element references
-   */
-  private setupDOMReferences(): void {
-    const body = this._elm.querySelector(':scope > .body')!;
-    const summary = body.querySelector(':scope > .summary')!;
-
-    this._valuesEl = summary.querySelector(
-      ':scope > .values'
-    ) as HTMLDivElement;
-    this._editorEl = body.querySelector(
-      ':scope > .advanced-search-condition-editor-view'
-    ) as HTMLDivElement;
-
-    this._conditionValues = new ConditionValues(this); // conditionItemType is always 0 for ConditionItemView
-  }
-
-  /**
-   * Attaches event listeners to DOM elements
-   */
-  private attachEventListeners(): void {
-    this.attachClickPropagationStopper();
-    this.attachSelectionToggle();
-    this.attachRelationToggle();
-    this.attachButtonHandlers();
-    this.attachKeyboardHandler();
-  }
-
-  /**
-   * Prevents click event propagation
-   */
-  private attachClickPropagationStopper(): void {
-    this._elm.addEventListener('click', (e: MouseEvent) => {
-      e.stopImmediatePropagation();
-    });
-  }
-
-  /**
-   * Attaches selection toggle functionality
-   */
-  private attachSelectionToggle(): void {
-    const summary = this._elm.querySelector(':scope > .body > .summary')!;
-    summary.addEventListener('click', this._toggleSelecting.bind(this));
-  }
-
-  /**
-   * Attaches logical operation toggle functionality
-   */
-  private attachRelationToggle(): void {
-    const summary = this._elm.querySelector(':scope > .body > .summary')!;
-    const relationElement = summary.querySelector(':scope > .relation')!;
-
-    relationElement.addEventListener('click', (e: Event) => {
-      const mouseEvent = e as MouseEvent;
-      mouseEvent.stopImmediatePropagation();
-      this.toggleRelation();
-    });
-  }
-
-  /**
-   * Toggles the logical relation between 'eq' and 'ne'
-   */
-  private toggleRelation(): void {
-    const currentRelation = this._elm.dataset.relation;
-    this._elm.dataset.relation = currentRelation === 'eq' ? 'ne' : 'eq';
-
-    if (!storeManager.getData('showModal')) {
-      this._keepLastRelation = this._elm.dataset.relation!;
-      this._builder.changeCondition();
-    }
-  }
-
-  /**
-   * Attaches edit and delete button handlers
-   */
-  private attachButtonHandlers(): void {
-    const summary = this._elm.querySelector(':scope > .body > .summary')!;
-    const buttons = summary.querySelectorAll(':scope > .buttons > button');
-
-    for (const button of buttons) {
-      button.addEventListener('click', (e: Event) => {
-        const mouseEvent = e as MouseEvent;
-        mouseEvent.stopImmediatePropagation();
-        this.handleButtonClick(mouseEvent.target as HTMLButtonElement);
-      });
-    }
-  }
-
-  /**
-   * Handles button click events
-   */
-  private handleButtonClick(target: HTMLButtonElement): void {
-    switch (target.className) {
-      case 'edit':
-        this.enterEditMode();
-        break;
-      case 'delete':
-        this._builder.delete([this]);
-        break;
-    }
-  }
-
-  /**
-   * Enters edit mode for the condition
-   */
-  private enterEditMode(): void {
-    this._elm.classList.add('-editing');
-    this._conditionValues!.startToEditCondition();
-    storeManager.setData('showModal', true);
-    window.addEventListener('keydown', this._keydownEscapeEvent);
-  }
-
-  /**
-   * Attaches keyboard event handler
-   */
-  private attachKeyboardHandler(): void {
-    window.addEventListener('keydown', this._keydownEscapeEvent);
-  }
-
-  /**
-   * Automatically enters edit mode when the instance is created
-   */
-  private autoEnterEditMode(): void {
-    const summary = this._elm.querySelector(':scope > .body > .summary')!;
-    const editButton = summary.querySelector(
-      ':scope > .buttons > button.edit'
-    ) as HTMLButtonElement;
-    editButton.dispatchEvent(new Event('click'));
+    this._initializeHTML();
+    this._setupDOMReferences();
+    this._attachEventListeners();
+    this._autoEnterEditMode();
   }
 
   /**
@@ -271,44 +93,6 @@ class ConditionItemView extends ConditionView {
     super.remove();
     storeManager.setData('showModal', false);
     window.removeEventListener('keydown', this._keydownEscapeEvent);
-  }
-
-  /**
-   * Bound reference to the keyboard escape handler
-   */
-  private readonly _keydownEscapeEvent = this._keydownEscape.bind(this);
-
-  /**
-   * Handles escape key press to exit edit mode
-   * Removes the item if it's first time editing, otherwise reverts changes
-   */
-  private _keydownEscape(e: KeyboardEvent): void {
-    if (
-      e.key !== 'Escape' ||
-      !this._conditionValues ||
-      !storeManager.getData('showModal')
-    ) {
-      return;
-    }
-
-    if (keyDownEvent('showModal')) {
-      if (this._isFirstTime) {
-        this.remove();
-      } else {
-        this.revertChanges();
-        this.doneEditing();
-      }
-    }
-  }
-
-  /**
-   * Reverts all changes made during editing
-   */
-  private revertChanges(): void {
-    for (const editor of this._conditionValues!.editors) {
-      editor.restore();
-      this._elm.dataset.relation = this._keepLastRelation;
-    }
   }
 
   /**
@@ -351,37 +135,253 @@ class ConditionItemView extends ConditionView {
    * @see {@link https://grch38.togovar.org/api} API Schemas documentation
    */
   get query(): ConditionQuery {
-    const valueElements = this.getValueElements();
+    const valueElements = this._getValueElements();
 
     switch (this._conditionType) {
       case CONDITION_TYPE.dataset:
       case CONDITION_TYPE.genotype:
-        return this.buildDatasetQuery(valueElements);
+        return this._buildDatasetQuery(valueElements);
 
       case CONDITION_TYPE.pathogenicity_prediction:
-        return this.buildPathogenicityQuery(valueElements);
+        return this._buildPathogenicityQuery(valueElements);
 
       case CONDITION_TYPE.location:
-        return this.buildLocationQuery(valueElements);
+        return this._buildLocationQuery(valueElements);
 
       case CONDITION_TYPE.gene_symbol:
-        return this.buildGeneQuery(valueElements);
+        return this._buildGeneQuery(valueElements);
 
       case CONDITION_TYPE.variant_id:
-        return this.buildVariantIdQuery(valueElements);
+        return this._buildVariantIdQuery(valueElements);
 
       case CONDITION_TYPE.significance:
-        return this.buildSignificanceQuery();
+        return this._buildSignificanceQuery();
 
       default:
-        return this.buildDefaultQuery(valueElements);
+        return this._buildDefaultQuery(valueElements);
+    }
+  }
+
+  /**
+   * Initializes the HTML structure for the condition item
+   */
+  private _initializeHTML(): void {
+    this._elm.classList.add('advanced-search-condition-item-view');
+    this._elm.dataset.classification = this._conditionType;
+    this._elm.dataset.relation = this._getInitialRelation();
+    this._elm.innerHTML = this._generateHTML();
+  }
+
+  /**
+   * Determines the initial relation value based on condition type
+   */
+  private _getInitialRelation(): string {
+    const noRelationTypes = [
+      'dataset',
+      'genotype',
+      'pathogenicity_prediction',
+      'id',
+      'location',
+    ];
+    return noRelationTypes.includes(this._conditionType) ? '' : 'eq';
+  }
+
+  /**
+   * Generates the HTML template for the condition item
+   */
+  private _generateHTML(): string {
+    const conditionType = this
+      ._conditionType as keyof typeof ADVANCED_CONDITIONS;
+    const label = ADVANCED_CONDITIONS[conditionType]?.label;
+
+    return `
+    <div class="body">
+      <div class="summary">
+        <div class="classification">${label}</div>
+        <div class="relation"></div>
+        <div class="values"></div>
+        <div class="buttons">
+          <button class="edit" title="Edit"></button>
+          <button class="delete" title="Delete"></button>
+        </div>
+      </div>
+      <div class="advanced-search-condition-editor-view"></div>
+    </div>
+    <div class="bg"></div>`;
+  }
+
+  /**
+   * Sets up DOM element references
+   */
+  private _setupDOMReferences(): void {
+    const body = this._elm.querySelector(':scope > .body')!;
+    const summary = body.querySelector(':scope > .summary')!;
+
+    this._valuesEl = summary.querySelector(
+      ':scope > .values'
+    ) as HTMLDivElement;
+    this._editorEl = body.querySelector(
+      ':scope > .advanced-search-condition-editor-view'
+    ) as HTMLDivElement;
+
+    this._conditionValues = new ConditionValues(this); // conditionItemType is always 0 for ConditionItemView
+  }
+
+  /**
+   * Attaches event listeners to DOM elements
+   */
+  private _attachEventListeners(): void {
+    this._attachClickPropagationStopper();
+    this._attachSelectionToggle();
+    this._attachRelationToggle();
+    this._attachButtonHandlers();
+    this._attachKeyboardHandler();
+  }
+
+  /**
+   * Prevents click event propagation
+   */
+  private _attachClickPropagationStopper(): void {
+    this._elm.addEventListener('click', (e: MouseEvent) => {
+      e.stopImmediatePropagation();
+    });
+  }
+
+  /**
+   * Attaches selection toggle functionality
+   */
+  private _attachSelectionToggle(): void {
+    const summary = this._elm.querySelector(':scope > .body > .summary')!;
+    summary.addEventListener('click', this._toggleSelecting.bind(this));
+  }
+
+  /**
+   * Attaches logical operation toggle functionality
+   */
+  private _attachRelationToggle(): void {
+    const summary = this._elm.querySelector(':scope > .body > .summary')!;
+    const relationElement = summary.querySelector(':scope > .relation')!;
+
+    relationElement.addEventListener('click', (e: Event) => {
+      const mouseEvent = e as MouseEvent;
+      mouseEvent.stopImmediatePropagation();
+      this._toggleRelation();
+    });
+  }
+
+  /**
+   * Toggles the logical relation between 'eq' and 'ne'
+   */
+  private _toggleRelation(): void {
+    const currentRelation = this._elm.dataset.relation;
+    this._elm.dataset.relation = currentRelation === 'eq' ? 'ne' : 'eq';
+
+    if (!storeManager.getData('showModal')) {
+      this._keepLastRelation = this._elm.dataset.relation!;
+      this._builder.changeCondition();
+    }
+  }
+
+  /**
+   * Attaches edit and delete button handlers
+   */
+  private _attachButtonHandlers(): void {
+    const summary = this._elm.querySelector(':scope > .body > .summary')!;
+    const buttons = summary.querySelectorAll(':scope > .buttons > button');
+
+    for (const button of buttons) {
+      button.addEventListener('click', (e: Event) => {
+        const mouseEvent = e as MouseEvent;
+        mouseEvent.stopImmediatePropagation();
+        this._handleButtonClick(mouseEvent.target as HTMLButtonElement);
+      });
+    }
+  }
+
+  /**
+   * Handles button click events
+   */
+  private _handleButtonClick(target: HTMLButtonElement): void {
+    switch (target.className) {
+      case 'edit':
+        this._enterEditMode();
+        break;
+      case 'delete':
+        this._builder.delete([this]);
+        break;
+    }
+  }
+
+  /**
+   * Enters edit mode for the condition
+   */
+  private _enterEditMode(): void {
+    this._elm.classList.add('-editing');
+    this._conditionValues!.startToEditCondition();
+    storeManager.setData('showModal', true);
+    window.addEventListener('keydown', this._keydownEscapeEvent);
+  }
+
+  /**
+   * Attaches keyboard event handler
+   */
+  private _attachKeyboardHandler(): void {
+    window.addEventListener('keydown', this._keydownEscapeEvent);
+  }
+
+  /**
+   * Automatically enters edit mode when the instance is created
+   */
+  private _autoEnterEditMode(): void {
+    const summary = this._elm.querySelector(':scope > .body > .summary')!;
+    const editButton = summary.querySelector(
+      ':scope > .buttons > button.edit'
+    ) as HTMLButtonElement;
+    editButton.dispatchEvent(new Event('click'));
+  }
+
+  /**
+   * Bound reference to the keyboard escape handler
+   */
+  private readonly _keydownEscapeEvent = this._keydownEscape.bind(this);
+
+  /**
+   * Handles escape key press to exit edit mode
+   * Removes the item if it's first time editing, otherwise reverts changes
+   */
+  private _keydownEscape(e: KeyboardEvent): void {
+    if (
+      e.key !== 'Escape' ||
+      !this._conditionValues ||
+      !storeManager.getData('showModal')
+    ) {
+      return;
+    }
+
+    if (keyDownEvent('showModal')) {
+      if (this._isFirstTime) {
+        this.remove();
+      } else {
+        this._revertChanges();
+        this.doneEditing();
+      }
+    }
+  }
+
+  /**
+   * Reverts all changes made during editing
+   */
+  private _revertChanges(): void {
+    for (const editor of this._conditionValues!.editors) {
+      editor.restore();
+      this._elm.dataset.relation = this._keepLastRelation;
     }
   }
 
   /**
    * Gets all condition item value view elements
    */
-  private getValueElements(): ConditionItemValueViewElement[] {
+  private _getValueElements(): ConditionItemValueViewElement[] {
     return Array.from(
       this._valuesEl!.querySelectorAll(':scope > condition-item-value-view')
     ) as ConditionItemValueViewElement[];
@@ -390,7 +390,7 @@ class ConditionItemView extends ConditionView {
   /**
    * Builds query for dataset and genotype conditions
    */
-  private buildDatasetQuery(
+  private _buildDatasetQuery(
     valueElements: ConditionItemValueViewElement[]
   ): ConditionQuery {
     const queries = valueElements.map((view) => {
@@ -407,7 +407,7 @@ class ConditionItemView extends ConditionView {
   /**
    * Builds query for pathogenicity prediction conditions
    */
-  private buildPathogenicityQuery(
+  private _buildPathogenicityQuery(
     valueElements: ConditionItemValueViewElement[]
   ): ConditionQuery {
     const shadowRoot = (valueElements[0] as any).shadowRoot;
@@ -421,7 +421,7 @@ class ConditionItemView extends ConditionView {
   /**
    * Builds query for location-based conditions
    */
-  private buildLocationQuery(
+  private _buildLocationQuery(
     valueElements: ConditionItemValueViewElement[]
   ): LocationQuery {
     const value = valueElements[0].value;
@@ -444,7 +444,7 @@ class ConditionItemView extends ConditionView {
   /**
    * Builds query for gene symbol conditions
    */
-  private buildGeneQuery(
+  private _buildGeneQuery(
     valueElements: ConditionItemValueViewElement[]
   ): GeneQuery {
     const queryId = valueElements[0]?.value;
@@ -459,7 +459,7 @@ class ConditionItemView extends ConditionView {
   /**
    * Builds query for variant ID conditions
    */
-  private buildVariantIdQuery(
+  private _buildVariantIdQuery(
     valueElements: ConditionItemValueViewElement[]
   ): IdQuery {
     const ids = valueElements.map((element) => element.value);
@@ -469,13 +469,13 @@ class ConditionItemView extends ConditionView {
   /**
    * Builds query for clinical significance conditions
    */
-  private buildSignificanceQuery(): ConditionQuery {
-    const valueMgendElements = this.getMgendElements();
-    const valueClinvarElements = this.getClinvarElements();
+  private _buildSignificanceQuery(): ConditionQuery {
+    const valueMgendElements = this._getMgendElements();
+    const valueClinvarElements = this._getClinvarElements();
 
     const relationType = this._elm.dataset.relation === 'ne' ? 'and' : 'or';
-    const mgendCondition = this.buildMgendCondition(valueMgendElements);
-    const clinvarCondition = this.buildClinvarCondition(valueClinvarElements);
+    const mgendCondition = this._buildMgendCondition(valueMgendElements);
+    const clinvarCondition = this._buildClinvarCondition(valueClinvarElements);
 
     const conditions = [mgendCondition, clinvarCondition].filter(Boolean);
 
@@ -487,7 +487,7 @@ class ConditionItemView extends ConditionView {
   /**
    * Gets MGEND condition elements
    */
-  private getMgendElements(): ConditionItemValueViewElement[] {
+  private _getMgendElements(): ConditionItemValueViewElement[] {
     return Array.from(
       this._valuesEl!.querySelectorAll(
         ':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view'
@@ -498,7 +498,7 @@ class ConditionItemView extends ConditionView {
   /**
    * Gets ClinVar condition elements
    */
-  private getClinvarElements(): ConditionItemValueViewElement[] {
+  private _getClinvarElements(): ConditionItemValueViewElement[] {
     return Array.from(
       this._valuesEl!.querySelectorAll(
         ':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view'
@@ -509,7 +509,7 @@ class ConditionItemView extends ConditionView {
   /**
    * Builds MGEND condition object
    */
-  private buildMgendCondition(
+  private _buildMgendCondition(
     elements: ConditionItemValueViewElement[]
   ): SignificanceQuery | null {
     return elements.length > 0
@@ -526,7 +526,7 @@ class ConditionItemView extends ConditionView {
   /**
    * Builds ClinVar condition object
    */
-  private buildClinvarCondition(
+  private _buildClinvarCondition(
     elements: ConditionItemValueViewElement[]
   ): SignificanceQuery | null {
     return elements.length > 0
@@ -543,7 +543,7 @@ class ConditionItemView extends ConditionView {
   /**
    * Builds default query for other condition types
    */
-  private buildDefaultQuery(
+  private _buildDefaultQuery(
     valueElements: ConditionItemValueViewElement[]
   ): DefaultQuery {
     return {
