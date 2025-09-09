@@ -1,4 +1,4 @@
-import ConditionView from './ConditionView.js';
+import { ConditionView } from './ConditionView.js';
 import ConditionItemView from './ConditionItemView';
 import { CONDITION_ITEM_TYPE } from '../../definition.js';
 
@@ -23,18 +23,20 @@ export default class ConditionGroupView extends ConditionView {
     super(CONDITION_ITEM_TYPE.group, builder, parentView, referenceElm);
 
     // make HTML
-    this._elm.classList.add('advanced-search-condition-group-view');
+    this._conditionViewEl.classList.add('advanced-search-condition-group-view');
     this._isRoot = isRoot;
-    if (isRoot) this._elm.classList.add('-root');
-    this._elm.dataset.numberOfChild = conditionViews.length;
-    this._elm.innerHTML = `<div class="logical-operator-switch"></div>
+    if (isRoot) this._conditionViewEl.classList.add('-root');
+    this._conditionViewEl.dataset.numberOfChild = conditionViews.length;
+    this._conditionViewEl.innerHTML = `<div class="logical-operator-switch"></div>
     <div class="container"></div>`;
 
     // reference
-    this._logicalOperatorSwitch = this._elm.querySelector(
+    this._logicalOperatorSwitch = this._conditionViewEl.querySelector(
       ':scope > .logical-operator-switch'
     );
-    this._container = this._elm.querySelector(':scope > .container');
+    this._container = this._conditionViewEl.querySelector(
+      ':scope > .container'
+    );
 
     // contents
     for (const conditionView of conditionViews) {
@@ -48,7 +50,10 @@ export default class ConditionGroupView extends ConditionView {
     // events
     // select/deselect
     if (!isRoot)
-      this._elm.addEventListener('click', this._toggleSelecting.bind(this));
+      this._conditionViewEl.addEventListener(
+        'click',
+        this._toggleSelecting.bind(this)
+      );
     // switch logical operator
     this._logicalOperatorSwitch.addEventListener('click', (e) => {
       e.stopImmediatePropagation();
@@ -69,7 +74,7 @@ export default class ConditionGroupView extends ConditionView {
 
   maketToolbar() {
     const toolbar = document.createElement('nav');
-    this._elm.append(toolbar);
+    this._conditionViewEl.append(toolbar);
     return toolbar;
   }
 
@@ -142,7 +147,7 @@ export default class ConditionGroupView extends ConditionView {
   }
 
   // select() {
-  //   // this._elm.classList
+  //   // this._conditionViewEl.classList
   // }
 
   // deselect() {
@@ -157,7 +162,7 @@ export default class ConditionGroupView extends ConditionView {
       for (const mutation of mutationsList) {
         if (mutation.type === 'childList') {
           const numberOfChild = this._numberOfChild;
-          this._elm.dataset.numberOfChild = numberOfChild;
+          this._conditionViewEl.dataset.numberOfChild = numberOfChild;
           // if the number of child is less than 2, ungroup
           if (!this._isRoot && numberOfChild <= 1) this.ungroup();
         }

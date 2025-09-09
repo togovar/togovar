@@ -1,6 +1,4 @@
-// import {ADVANCED_CONDITIONS} from '../global.js';
-
-export default class ConditionView {
+export class ConditionView {
   /**
    * @param {Number} type - what number???
    * @param {AdvancedSearchBuilderView} builder - Static Object(_container, _elm, _rootGroup, _selection, _toolbar)
@@ -10,38 +8,27 @@ export default class ConditionView {
   constructor(type, builder, parentView, referenceElm) {
     this._type = type;
     this._builder = builder;
-    // this._parentView = parentView;
 
     // make HTML
-    this._elm = document.createElement('div');
-    this._elm.classList.add('advanced-search-condition-view');
-    this._elm.delegate = this;
-    if (parentView.container.contains(referenceElm)) {
-      parentView.container.insertBefore(this._elm, referenceElm);
-    } else {
-      parentView.container.appendChild(this._elm);
-    }
+    this._conditionViewEl = document.createElement('div');
+    this._conditionViewEl.classList.add('advanced-search-condition-view');
+    this._conditionViewEl.delegate = this;
 
-    // event
-    // let eventTarget;
-    // switch (type) {
-    //   case 'group':
-    //   eventTarget = this._elm;
-    //   break;
-    //   case 'item':
-    //   eventTarget = this._elm.querySelector(':scope > .body > .summary');
-    //   break;
-    // }
-    // eventTarget.addEventListener('click', e => {
-    //   e.stopPropagation();
-    // });
+    // Insert the condition view element into the parent container.
+    // If the reference element exists within the parent container, insert the condition view element before it.
+    // Otherwise, append the condition view element to the end of the parent container.
+    if (parentView.container.contains(referenceElm)) {
+      parentView.container.insertBefore(this._conditionViewEl, referenceElm);
+    } else {
+      parentView.container.appendChild(this._conditionViewEl);
+    }
   }
 
   // private methods
 
   _toggleSelecting(e) {
     e.stopImmediatePropagation();
-    const ifEditing = this._elm.classList.contains('-editing');
+    const ifEditing = this._conditionViewEl.classList.contains('-editing');
     if (ifEditing) return;
 
     if (this.isSelecting) {
@@ -49,26 +36,16 @@ export default class ConditionView {
     } else {
       this._builder.selection.selectConditionView(this, false);
     }
-
-    // if (e.shiftKey) {
-    //   if (this.isSelecting) {
-    //     this._builder.selection.deselectConditionViews([this]);
-    //   } else {
-    //     this._builder.selection.selectConditionViews([this], false);
-    //   }
-    // } else {
-    //   this._builder.selection.selectConditionViews([this], true);
-    // }
   }
 
   // public methods
 
   select() {
-    this._elm.classList.add('-selected');
+    this._conditionViewEl.classList.add('-selected');
   }
 
   deselect() {
-    this._elm.classList.remove('-selected');
+    this._conditionViewEl.classList.remove('-selected');
   }
 
   remove() {
@@ -82,11 +59,11 @@ export default class ConditionView {
    * @return {HTMLElement}
    */
   get elm() {
-    return this._elm;
+    return this._conditionViewEl;
   }
 
   get siblingElms() {
-    return [...this._elm.parentNode.childNodes];
+    return [...this._conditionViewEl.parentNode.childNodes];
   }
 
   /**
@@ -100,7 +77,7 @@ export default class ConditionView {
    * @return {Boolean}
    */
   get isSelecting() {
-    return this._elm.classList.contains('-selected');
+    return this._conditionViewEl.classList.contains('-selected');
   }
 
   /**
