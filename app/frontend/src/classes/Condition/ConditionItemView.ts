@@ -254,7 +254,7 @@ class ConditionItemView extends ConditionView {
     const summary = this._conditionViewEl.querySelector(
       ':scope > .body > .summary'
     )!;
-    summary.addEventListener('click', this._toggleSelecting.bind(this));
+    summary.addEventListener('click', this.toggleSelectionState.bind(this));
   }
 
   /**

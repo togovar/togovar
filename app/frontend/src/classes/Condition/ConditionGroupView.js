@@ -52,7 +52,7 @@ export default class ConditionGroupView extends ConditionView {
     if (!isRoot)
       this._conditionViewEl.addEventListener(
         'click',
-        this._toggleSelecting.bind(this)
+        this.toggleSelectionState.bind(this)
       );
     // switch logical operator
     this._logicalOperatorSwitch.addEventListener('click', (e) => {

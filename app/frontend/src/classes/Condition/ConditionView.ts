@@ -42,29 +42,13 @@ export class ConditionView {
     }
   }
 
-  // private methods
-
-  _toggleSelecting(e: Event) {
-    e.stopImmediatePropagation();
-    const isEditing = this._conditionViewEl.classList.contains('-editing');
-    if (isEditing) return;
-
-    const isSelecting = this._conditionViewEl.classList.contains('-selected');
-
-    if (isSelecting) {
-      this._builder.selection.deselectConditionView(this);
-    } else {
-      this._builder.selection.selectConditionView(this, false);
-    }
-  }
-
   // public methods
 
-  select() {
+  select(): void {
     this._conditionViewEl.classList.add('-selected');
   }
 
-  deselect() {
+  deselect(): void {
     this._conditionViewEl.classList.remove('-selected');
   }
 
@@ -78,10 +62,7 @@ export class ConditionView {
 
   // accessor
 
-  /**
-   * @return {HTMLElement}
-   */
-  get elm() {
+  get elm(): HTMLElement {
     return this._conditionViewEl;
   }
 
@@ -89,16 +70,10 @@ export class ConditionView {
     return Array.from(this._conditionViewEl.parentNode?.childNodes || []);
   }
 
-  /**
-   * @return {Number}
-   */
-  get type() {
+  get type(): number {
     return this._type;
   }
 
-  /**
-   * @return {Boolean}
-   */
   get isSelecting() {
     return this._conditionViewEl.classList.contains('-selected');
   }
@@ -112,14 +87,11 @@ export class ConditionView {
     )?.delegate;
   }
 
-  /**
-   * @param {parentView} conditionGroupView
-   */
-  set parentView(parentView) {
+  set parentView(parentView: ConditionItemView | ConditionGroupView) {
     this._parentView = parentView;
   }
 
-  get depth() {
+  get depth(): number {
     let parentView = this.parentView;
     let depth = 0;
     while (parentView) {
@@ -127,5 +99,26 @@ export class ConditionView {
       if (parentView) depth++;
     }
     return depth;
+  }
+
+  /**
+   * Toggles the selection state of the condition view.
+   * If the condition view is currently being edited, the toggle is ignored.
+   * Otherwise, it selects or deselects the condition view based on its current state.
+   *
+   * @param e - The event object triggered by the user interaction.
+   */
+  protected toggleSelectionState(e: Event): void {
+    e.stopImmediatePropagation();
+    const isEditing = this._conditionViewEl.classList.contains('-editing');
+    if (isEditing) return;
+
+    const isSelecting = this._conditionViewEl.classList.contains('-selected');
+
+    if (isSelecting) {
+      this._builder.selection.deselectConditionView(this);
+    } else {
+      this._builder.selection.selectConditionView(this, false);
+    }
   }
 }
