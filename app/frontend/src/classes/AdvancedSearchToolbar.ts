@@ -18,12 +18,14 @@ const COMMANDS = [
  */
 export class AdvancedSearchToolbar {
   private _advancedSearchBuilderView: AdvancedSearchBuilderView;
+  private _toolbar: HTMLElement;
 
   constructor(
     _advancedSearchBuilderView: AdvancedSearchBuilderView,
     _toolbar: HTMLElement
   ) {
     this._advancedSearchBuilderView = _advancedSearchBuilderView;
+    this._toolbar = _toolbar;
 
     this._initializeToolbar(_toolbar);
     this._attachEventListeners(_toolbar);
@@ -112,16 +114,19 @@ export class AdvancedSearchToolbar {
   private _attachEventListeners(toolbar: HTMLElement): void {
     toolbar.querySelectorAll('.command').forEach((command) => {
       const cmdElement = command as HTMLElement;
-      cmdElement.addEventListener('click', (e: Event) => {
-        e.stopImmediatePropagation();
-        this._handleCommand(
-          cmdElement.dataset.command,
-          cmdElement.dataset.condition,
-          e
-        );
-      });
+      cmdElement.addEventListener('click', this._boundHandleCommand);
     });
   }
+
+  private _boundHandleCommand = (e: Event): void => {
+    const cmdElement = e.currentTarget as HTMLElement;
+    e.stopImmediatePropagation();
+    this._handleCommand(
+      cmdElement.dataset.command,
+      cmdElement.dataset.condition,
+      e
+    );
+  };
 
   /**
    * Handles the execution of a command based on user interaction.
@@ -154,5 +159,25 @@ export class AdvancedSearchToolbar {
         );
         break;
     }
+  }
+
+  // ========================================
+  // Lifecycle Management
+  // ========================================
+
+  // TODO: This feature is not currently implemented, but we intend to implement it in the future, so we will leave it uncommented.
+  /**
+   * Clean up all resources and prevent memory leaks
+   * Call this method when the toolbar component is no longer needed
+   */
+  destroy(): void {
+    // Remove event listeners from toolbar commands
+    this._toolbar.querySelectorAll('.command').forEach((command) => {
+      const cmdElement = command as HTMLElement;
+      cmdElement.removeEventListener('click', this._boundHandleCommand);
+    });
+
+    // Clear references to avoid memory leaks
+    this._advancedSearchBuilderView = null!;
   }
 }
