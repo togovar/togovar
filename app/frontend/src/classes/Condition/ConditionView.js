@@ -16,7 +16,11 @@ export default class ConditionView {
     this._elm = document.createElement('div');
     this._elm.classList.add('advanced-search-condition-view');
     this._elm.delegate = this;
-    parentView.container.insertBefore(this._elm, referenceElm);
+    if (parentView.container.contains(referenceElm)) {
+      parentView.container.insertBefore(this._elm, referenceElm);
+    } else {
+      parentView.container.appendChild(this._elm);
+    }
 
     // event
     // let eventTarget;

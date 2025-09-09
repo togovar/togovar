@@ -2,117 +2,26 @@ import ConditionView from './ConditionView.js';
 import ConditionValues from './ConditionValues';
 import { storeManager } from '../../store/StoreManager';
 import { ADVANCED_CONDITIONS } from '../../global';
-import { CONDITION_TYPE, CONDITION_ITEM_TYPE } from '../../definition.js';
+import {
+  CONDITION_TYPE,
+  CONDITION_ITEM_TYPE,
+  ConditionTypeValue,
+} from '../../definition';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 
-/**
- * Interface for the advanced search builder view that manages search conditions
- */
-interface AdvancedSearchBuilderView {
-  /** Triggers when search conditions change */
-  changeCondition(): void;
-  /** Deletes the specified condition items */
-  delete(items: ConditionItemView[]): void;
-}
-
-/**
- * Interface for the condition group view that contains condition items
- */
-interface ConditionGroupView {
-  // Properties to be defined as needed
-}
-
-/**
- * Generic query value object
- */
-interface QueryValue {
-  [key: string]: any;
-}
-
-/**
- * Query structure for location-based searches
- */
-interface LocationQuery {
-  location: {
-    chromosome: string;
-    position: number | { gte: number; lte: number };
-  };
-}
-
-/**
- * Query structure for gene-based searches
- */
-interface GeneQuery {
-  gene: {
-    relation: string;
-    terms: number[];
-  };
-}
-
-/**
- * Query structure for variant ID searches
- */
-interface IdQuery {
-  id: string[];
-}
-
-/**
- * Query structure for clinical significance searches
- */
-interface SignificanceQuery {
-  [key: string]: {
-    relation: string;
-    source: string[];
-    terms: string[];
-  };
-}
-
-/**
- * Default query structure for other condition types
- */
-interface DefaultQuery {
-  [key: string]: {
-    relation: string;
-    terms: string[];
-  };
-}
-
-/**
- * Custom element interface for condition item value views
- */
-interface ConditionItemValueViewElement extends Element {
-  /** The value of the condition item */
-  value: string;
-}
-
-/**
- * Custom element interface for frequency count value views
- */
-interface FrequencyCountValueViewElement extends Element {
-  /** The query value for frequency counts */
-  queryValue: any;
-}
-
-/**
- * Custom element interface for prediction value views
- */
-interface PredictionValueViewElement extends Element {
-  /** The query value for pathogenicity predictions */
-  queryValue: any;
-}
-
-/**
- * Union type representing all possible condition query structures
- */
-type ConditionQuery =
-  | QueryValue
-  | LocationQuery
-  | GeneQuery
-  | IdQuery
-  | SignificanceQuery
-  | DefaultQuery
-  | { or: any[] }
-  | { and: any[] };
+import {
+  AdvancedSearchBuilderView,
+  ConditionGroupView,
+  LocationQuery,
+  GeneQuery,
+  IdQuery,
+  SignificanceQuery,
+  DefaultQuery,
+  ConditionItemValueViewElement,
+  FrequencyCountValueViewElement,
+  PredictionValueViewElement,
+  ConditionQuery,
+} from '../../types/conditionTypes';
 
 /**
  * Represents a condition item view for editing and deleting search conditions.
@@ -120,23 +29,15 @@ type ConditionQuery =
  * individual search conditions in the advanced search interface.
  */
 class ConditionItemView extends ConditionView {
-  /** The type of condition (e.g., gene, id, dataset, location) */
-  private readonly _conditionType: string;
+  private readonly _conditionType: ConditionTypeValue; // The type of condition (e.g., gene, id, dataset, location)
+  private _isFirstTime: boolean; // Whether this is the first time editing (affects deletion behavior)
+  private _keepLastRelation: string; // Stores the last relation state for cancellation purposes
 
-  /** Whether this is the first time editing (affects deletion behavior) */
-  private _isFirstTime: boolean;
-
-  /** Stores the last relation state for cancellation purposes */
-  private _keepLastRelation: string;
-
-  /** DOM element containing the condition values */
-  private _valuesEl: HTMLDivElement;
-
-  /** DOM element containing the condition editor */
-  private _editorEl: HTMLDivElement;
+  private _valuesEl: HTMLDivElement | undefined; // DOM element containing the condition values
+  private _editorEl: HTMLDivElement | undefined; // DOM element containing the condition editor
 
   /** The condition values manager instance */
-  private _conditionValues: ConditionValues;
+  private _conditionValues: ConditionValues | undefined;
 
   /**
    * Creates a new ConditionItemView instance
@@ -152,10 +53,15 @@ class ConditionItemView extends ConditionView {
     builder: AdvancedSearchBuilderView,
     parentView: ConditionGroupView,
     conditionType: string,
-    cconditionItemType: 0 | 1,
+    conditionItemType: 0 | 1,
     referenceElm: Node | null = null
   ) {
-    super(CONDITION_ITEM_TYPE.condition, builder, parentView, referenceElm);
+    super(
+      CONDITION_ITEM_TYPE.condition,
+      builder,
+      parentView,
+      referenceElm ?? document.createTextNode('')
+    );
 
     this._conditionType = conditionType;
     this._isFirstTime = true;
@@ -195,12 +101,14 @@ class ConditionItemView extends ConditionView {
    * Generates the HTML template for the condition item
    */
   private generateHTML(): string {
+    const conditionType = this
+      ._conditionType as keyof typeof ADVANCED_CONDITIONS;
+    const label = ADVANCED_CONDITIONS[conditionType]?.label;
+
     return `
     <div class="body">
       <div class="summary">
-        <div class="classification">${
-          ADVANCED_CONDITIONS[this._conditionType].label
-        }</div>
+        <div class="classification">${label}</div>
         <div class="relation"></div>
         <div class="values"></div>
         <div class="buttons">
@@ -265,8 +173,9 @@ class ConditionItemView extends ConditionView {
     const summary = this._elm.querySelector(':scope > .body > .summary')!;
     const relationElement = summary.querySelector(':scope > .relation')!;
 
-    relationElement.addEventListener('click', (e: MouseEvent) => {
-      e.stopImmediatePropagation();
+    relationElement.addEventListener('click', (e: Event) => {
+      const mouseEvent = e as MouseEvent;
+      mouseEvent.stopImmediatePropagation();
       this.toggleRelation();
     });
   }
@@ -292,9 +201,10 @@ class ConditionItemView extends ConditionView {
     const buttons = summary.querySelectorAll(':scope > .buttons > button');
 
     for (const button of buttons) {
-      button.addEventListener('click', (e: MouseEvent) => {
-        e.stopImmediatePropagation();
-        this.handleButtonClick(e.target as HTMLButtonElement);
+      button.addEventListener('click', (e: Event) => {
+        const mouseEvent = e as MouseEvent;
+        mouseEvent.stopImmediatePropagation();
+        this.handleButtonClick(mouseEvent.target as HTMLButtonElement);
       });
     }
   }
@@ -318,7 +228,7 @@ class ConditionItemView extends ConditionView {
    */
   private enterEditMode(): void {
     this._elm.classList.add('-editing');
-    this._conditionValues.startToEditCondition();
+    this._conditionValues!.startToEditCondition();
     storeManager.setData('showModal', true);
     window.addEventListener('keydown', this._keydownEscapeEvent);
   }
@@ -357,7 +267,7 @@ class ConditionItemView extends ConditionView {
    * Used in _clickCancelButton of ConditionValues
    */
   remove(): void {
-    delete this._conditionValues;
+    this._conditionValues = undefined;
     super.remove();
     storeManager.setData('showModal', false);
     window.removeEventListener('keydown', this._keydownEscapeEvent);
@@ -395,7 +305,7 @@ class ConditionItemView extends ConditionView {
    * Reverts all changes made during editing
    */
   private revertChanges(): void {
-    for (const editor of this._conditionValues.editors) {
+    for (const editor of this._conditionValues!.editors) {
       editor.restore();
       this._elm.dataset.relation = this._keepLastRelation;
     }
@@ -412,14 +322,14 @@ class ConditionItemView extends ConditionView {
    * Gets the DOM element containing condition values
    */
   get valuesElement(): HTMLDivElement {
-    return this._valuesEl;
+    return this._valuesEl!;
   }
 
   /**
    * Gets the DOM element containing the condition editor
    */
   get editorElement(): HTMLDivElement {
-    return this._editorEl;
+    return this._editorEl!;
   }
 
   /**
@@ -473,7 +383,7 @@ class ConditionItemView extends ConditionView {
    */
   private getValueElements(): ConditionItemValueViewElement[] {
     return Array.from(
-      this._valuesEl.querySelectorAll(':scope > condition-item-value-view')
+      this._valuesEl!.querySelectorAll(':scope > condition-item-value-view')
     ) as ConditionItemValueViewElement[];
   }
 
@@ -579,7 +489,7 @@ class ConditionItemView extends ConditionView {
    */
   private getMgendElements(): ConditionItemValueViewElement[] {
     return Array.from(
-      this._valuesEl.querySelectorAll(
+      this._valuesEl!.querySelectorAll(
         ':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view'
       )
     ) as ConditionItemValueViewElement[];
@@ -590,7 +500,7 @@ class ConditionItemView extends ConditionView {
    */
   private getClinvarElements(): ConditionItemValueViewElement[] {
     return Array.from(
-      this._valuesEl.querySelectorAll(
+      this._valuesEl!.querySelectorAll(
         ':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view'
       )
     ) as ConditionItemValueViewElement[];
