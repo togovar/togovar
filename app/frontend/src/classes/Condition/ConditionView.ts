@@ -53,11 +53,15 @@ export class ConditionView {
   }
 
   remove(): void {
-    if (this._parentView && 'removeConditionView' in this._parentView) {
-      this._parentView.removeConditionView(
+    const parent = this.parentView;
+    if (parent && 'removeConditionView' in parent) {
+      parent.removeConditionView(
         this as unknown as ConditionItemView | ConditionGroupView
       );
     }
+
+    this._conditionViewEl.remove();
+    this._parentView = undefined;
   }
 
   // accessor
