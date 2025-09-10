@@ -10,7 +10,7 @@ import TopPageLayoutManager from '../src/classes/TopPageLayoutManager.js';
 import DownloadButton from './classes/DownloadButton.js';
 // Search
 import SimpleSearchView from './components/SearchField/SimpleSearch/SimpleSearchView';
-import AdvancedSearchBuilderView from '../src/classes/AdvancedSearchBuilderView.js';
+import AdvancedSearchBuilderView from '../src/classes/AdvancedSearchBuilderView.ts';
 // PanelViews
 // PanelViews: Filters
 import PanelViewCheckList from '../src/classes/PanelViewCheckList.js';

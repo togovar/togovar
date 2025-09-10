@@ -1,5 +1,5 @@
 import { ADVANCED_CONDITIONS } from '../global';
-import AdvancedSearchBuilderView from './AdvancedSearchBuilderView.js';
+import type AdvancedSearchBuilderView from './AdvancedSearchBuilderView';
 
 const COMMANDS = [
   { command: 'group', label: 'Group', shortcut: [71] },
