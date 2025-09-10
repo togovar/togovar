@@ -84,13 +84,14 @@ export class ConditionView {
     return this._conditionViewEl.classList.contains('-selected');
   }
 
-  get parentView(): ConditionItemView | ConditionGroupView | undefined {
+  get parentView(): ConditionGroupView {
     const closestElement = this._conditionViewEl.parentNode as HTMLElement;
+
     return (
       closestElement.closest(
         '.advanced-search-condition-view'
       ) as DelegateElement
-    )?.delegate;
+    )?.delegate as ConditionGroupView;
   }
 
   set parentView(parentView: ConditionItemView | ConditionGroupView) {

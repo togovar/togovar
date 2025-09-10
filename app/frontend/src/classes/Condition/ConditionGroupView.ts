@@ -204,10 +204,17 @@ export class ConditionGroupView extends ConditionView {
     return this._container;
   }
 
-  get childViews(): ConditionView[] {
-    return Array.from(this._container?.childNodes || []).map(
-      (el: any) => el.delegate
-    );
+  get childViews(): (ConditionGroupView | ConditionItemView)[] {
+    return Array.from(this._container?.childNodes || []).map((el: any) => {
+      if (!('delegate' in el)) {
+        throw new Error('Child element does not have a delegate property');
+      }
+      const delegate = el.delegate;
+      if (delegate instanceof ConditionGroupView || delegate instanceof ConditionItemView) {
+        return delegate;
+      }
+      throw new Error('Delegate is not a valid ConditionGroupView or ConditionItemView');
+    });
   }
 
   private get _numberOfChild(): number {

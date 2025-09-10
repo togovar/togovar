@@ -1,5 +1,6 @@
 import { setAdvancedSearchCondition } from '../store/searchManager';
 import { ConditionGroupView } from './Condition/ConditionGroupView';
+import type ConditionItemView from './Condition/ConditionItemView';
 import { AdvancedSearchToolbar } from './AdvancedSearchToolbar';
 import AdvancedSearchSelection from './AdvancedSearchSelection';
 import { CONDITION_ITEM_TYPE } from '../definition.js';
@@ -68,25 +69,52 @@ export default class AdvancedSearchBuilderView {
     this.search();
   }
 
-  group() {
-    const conditionViews = this._selection.getSelectingConditionViews();
+  /**
+   * Groups the currently selected condition views into a new condition group.
+   *
+   * This method identifies the parent group of the selected condition views,
+   * determines the insertion position for the new group, and creates a new
+   * condition group containing the selected views. The new group is then
+   * selected, and the condition state is updated.
+   */
+  group(): void {
+    const conditionViews: (ConditionGroupView | ConditionItemView)[] =
+      this._selection.getSelectingConditionViews();
+    if (conditionViews.length === 0) {
+      throw new Error('No condition views selected to group.');
+    }
+
     const parentGroupView = conditionViews[0].parentView;
-    // insert position
-    const siblingViews = parentGroupView.childViews;
-    let position = Infinity,
-      referenceElm = null;
-    conditionViews.forEach((view) => {
-      const index = siblingViews.indexOf(view);
-      if (index < position) {
-        position = index;
-        referenceElm = view.elm;
-      }
-    });
-    // add new gropu
+    if (!parentGroupView) {
+      throw new Error(
+        'Parent group view not found for the selected condition views.'
+      );
+    }
+
+    // Determine the insertion position and reference element
+    const childViewsOfParentGroup: (ConditionGroupView | ConditionItemView)[] =
+      parentGroupView.childViews;
+
+    const { insertionPointEl } = conditionViews.reduce(
+      (acc, view) => {
+        const index = childViewsOfParentGroup.indexOf(view);
+        // Identify the view that is positioned at the very front
+        if (index < acc.position) {
+          acc.position = index;
+          acc.insertionPointEl = view.elm;
+        }
+        return acc;
+      },
+      { position: Infinity, insertionPointEl: null as HTMLElement | null }
+    );
+
+    // Add new group
     const conditionGroupView = parentGroupView.addNewConditionGroup(
       conditionViews,
-      referenceElm
+      insertionPointEl
     );
+
+    // Select the new group and update the condition state
     this._selection.selectConditionView(conditionGroupView, true);
     this.changeCondition();
   }
