@@ -2,7 +2,7 @@ import { setAdvancedSearchCondition } from '../store/searchManager';
 import { ConditionGroupView } from './Condition/ConditionGroupView';
 import type ConditionItemView from './Condition/ConditionItemView';
 import { AdvancedSearchToolbar } from './AdvancedSearchToolbar';
-import AdvancedSearchSelection from './AdvancedSearchSelection';
+import { AdvancedSearchSelection } from './AdvancedSearchSelection';
 import { CONDITION_ITEM_TYPE } from '../definition.js';
 
 export default class AdvancedSearchBuilderView {
@@ -31,7 +31,7 @@ export default class AdvancedSearchBuilderView {
     );
     // this._defineEvents();
 
-    this._selection = new AdvancedSearchSelection(this._rootGroup.elm, this);
+    this._selection = new AdvancedSearchSelection(this);
   }
 
   selectedConditionViews(conditionViews: any[]): void {
