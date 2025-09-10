@@ -8,10 +8,9 @@ import {
   ConditionTypeValue,
 } from '../../definition';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
-
+import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
+import type { ConditionGroupView } from './ConditionGroupView';
 import {
-  AdvancedSearchBuilderView,
-  ConditionGroupView,
   LocationQuery,
   GeneQuery,
   IdQuery,

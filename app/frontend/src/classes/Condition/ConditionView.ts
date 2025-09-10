@@ -1,6 +1,6 @@
 import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
-import ConditionItemView from './ConditionItemView';
-import ConditionGroupView from './ConditionGroupView';
+import type ConditionItemView from './ConditionItemView';
+import type { ConditionGroupView } from './ConditionGroupView';
 
 interface DelegateElement extends HTMLElement {
   delegate: ConditionItemView | ConditionGroupView;

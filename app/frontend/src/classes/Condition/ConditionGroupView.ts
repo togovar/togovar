@@ -2,7 +2,7 @@ import { ConditionView } from './ConditionView';
 import ConditionItemView from './ConditionItemView';
 import { CONDITION_ITEM_TYPE } from '../../definition.js';
 
-export default class ConditionGroupView extends ConditionView {
+export class ConditionGroupView extends ConditionView {
   /**
    *
    * @param {AdvancedSearchBuilderView} builder

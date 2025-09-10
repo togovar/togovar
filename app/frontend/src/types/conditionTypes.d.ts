@@ -1,21 +1,4 @@
 /**
- * export interface for the advanced search builder view that manages search conditions
- */
-export interface AdvancedSearchBuilderView {
-  /** Triggers when search conditions change */
-  changeCondition(): void;
-  /** Deletes the specified condition items */
-  delete(items: ConditionItemView[]): void;
-}
-
-/**
- * export interface for the condition group view that contains condition items
- */
-export interface ConditionGroupView {
-  // Properties to be defined as needed
-}
-
-/**
  * Generic query value object
  */
 export interface QueryValue {
