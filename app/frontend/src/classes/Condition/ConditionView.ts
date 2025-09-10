@@ -1,4 +1,4 @@
-import AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
+import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
 import ConditionItemView from './ConditionItemView';
 import ConditionGroupView from './ConditionGroupView';
 

@@ -5,20 +5,17 @@ import AdvancedSearchSelection from './AdvancedSearchSelection';
 import { CONDITION_ITEM_TYPE } from '../definition.js';
 
 export default class AdvancedSearchBuilderView {
-  // 修正: _elm を public に変更
-  public _elm: HTMLElement;
-  // 修正: _container を public に変更
-  public _container: HTMLElement;
-  // 修正: _rootGroup を public に変更
-  public _rootGroup: any;
-  // 修正: _toolbar を public に変更
-  public _toolbar: AdvancedSearchToolbar;
-  // 修正: _selection を public に変更
-  public _selection: AdvancedSearchSelection;
+  _advancedSearchBuilderEl: HTMLElement;
+  _container: HTMLElement;
+  _rootGroup: ConditionGroupView;
+  _toolbar: AdvancedSearchToolbar;
+  _selection: AdvancedSearchSelection;
 
-  constructor(elm: HTMLElement) {
-    this._elm = elm;
-    this._container = elm.querySelector(':scope > .inner') as HTMLElement;
+  constructor(advancedSearchBuilderEl: HTMLElement) {
+    this._advancedSearchBuilderEl = advancedSearchBuilderEl;
+    this._container = advancedSearchBuilderEl.querySelector(
+      ':scope > .inner'
+    ) as HTMLElement;
     this._rootGroup = new ConditionGroupView(
       this as AdvancedSearchBuilderView,
       this as any,
@@ -55,12 +52,16 @@ export default class AdvancedSearchBuilderView {
     // // can copy
     // this._elm.dataset.canCopy = canCopy;
 
-    this._elm.dataset.canDelete = String(conditionViews.length > 0);
-    this._elm.dataset.canGroup = String(conditionViews.length > 1);
+    this._advancedSearchBuilderEl.dataset.canDelete = String(
+      conditionViews.length > 0
+    );
+    this._advancedSearchBuilderEl.dataset.canGroup = String(
+      conditionViews.length > 1
+    );
     const canUngroup = conditionViews.some((view) => view.canUngroup);
-    this._elm.dataset.canUngroup = String(canUngroup);
+    this._advancedSearchBuilderEl.dataset.canUngroup = String(canUngroup);
     const canCopy = conditionViews.some((view) => view.canCopy);
-    this._elm.dataset.canCopy = String(canCopy);
+    this._advancedSearchBuilderEl.dataset.canCopy = String(canCopy);
   }
 
   changeCondition() {
@@ -163,7 +164,7 @@ export default class AdvancedSearchBuilderView {
   // accessor
 
   get elm(): HTMLElement {
-    return this._elm;
+    return this._advancedSearchBuilderEl;
   }
 
   get container(): HTMLElement {
