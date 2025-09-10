@@ -1,5 +1,5 @@
 import { setAdvancedSearchCondition } from '../store/searchManager';
-import { ConditionGroupView } from './Condition/ConditionGroupView.js';
+import { ConditionGroupView } from './Condition/ConditionGroupView';
 import { AdvancedSearchToolbar } from './AdvancedSearchToolbar';
 import AdvancedSearchSelection from './AdvancedSearchSelection';
 import { CONDITION_ITEM_TYPE } from '../definition.js';

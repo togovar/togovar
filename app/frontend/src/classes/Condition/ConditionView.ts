@@ -7,9 +7,11 @@ interface DelegateElement extends HTMLElement {
 }
 
 export class ConditionView {
-  private _conditionViewEl: HTMLDivElement;
+  // private _conditionViewEl: HTMLDivElement;
+  _conditionViewEl: HTMLDivElement;
   private _type: number;
-  private _builder: AdvancedSearchBuilderView;
+  // private _builder: AdvancedSearchBuilderView;
+  _builder: AdvancedSearchBuilderView;
   private _parentView?: ConditionItemView | ConditionGroupView;
 
   /**

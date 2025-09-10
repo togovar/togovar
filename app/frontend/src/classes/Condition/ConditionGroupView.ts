@@ -1,24 +1,21 @@
 import { ConditionView } from './ConditionView';
 import ConditionItemView from './ConditionItemView';
 import { CONDITION_ITEM_TYPE } from '../../definition.js';
+import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
 
 export class ConditionGroupView extends ConditionView {
-  /**
-   *
-   * @param {AdvancedSearchBuilderView} builder
-   * @param {*} parentView
-   * @param {String} logicalOperator
-   * @param {Array} conditionViews
-   * @param {Node} referenceElm
-   * @param {Boolean} isRoot
-   */
+  private _isRoot: boolean;
+  private _logicalOperatorSwitch: HTMLElement | null;
+  private _container: HTMLElement | null;
+  private _mutationObserver: MutationObserver;
+
   constructor(
-    builder,
-    parentView,
-    logicalOperator = 'and',
-    conditionViews = [],
-    referenceElm = null,
-    isRoot = false
+    builder: AdvancedSearchBuilderView,
+    parentView: ConditionView & { container: HTMLElement },
+    logicalOperator: string = 'and',
+    conditionViews: ConditionView[] = [],
+    referenceElm: Node | null = null,
+    isRoot: boolean = false
   ) {
     super(CONDITION_ITEM_TYPE.group, builder, parentView, referenceElm);
 
@@ -26,7 +23,8 @@ export class ConditionGroupView extends ConditionView {
     this._conditionViewEl.classList.add('advanced-search-condition-group-view');
     this._isRoot = isRoot;
     if (isRoot) this._conditionViewEl.classList.add('-root');
-    this._conditionViewEl.dataset.numberOfChild = conditionViews.length;
+    this._conditionViewEl.dataset.numberOfChild =
+      conditionViews.length.toString();
     this._conditionViewEl.innerHTML = `<div class="logical-operator-switch"></div>
     <div class="container"></div>`;
 
@@ -40,12 +38,16 @@ export class ConditionGroupView extends ConditionView {
 
     // contents
     for (const conditionView of conditionViews) {
-      this._container.append(conditionView.elm);
+      if (this._container) {
+        this._container.append(conditionView.elm);
+      }
       conditionView.parentView = this;
     }
 
     // logical operator
-    this._logicalOperatorSwitch.dataset.operator = logicalOperator;
+    if (this._logicalOperatorSwitch) {
+      this._logicalOperatorSwitch.dataset.operator = logicalOperator;
+    }
 
     // events
     // select/deselect
@@ -55,34 +57,42 @@ export class ConditionGroupView extends ConditionView {
         this.toggleSelectionState.bind(this)
       );
     // switch logical operator
-    this._logicalOperatorSwitch.addEventListener('click', (e) => {
-      e.stopImmediatePropagation();
-      this._logicalOperatorSwitch.dataset.operator = { and: 'or', or: 'and' }[
-        this._logicalOperatorSwitch.dataset.operator
-      ];
-      this._doneEditing();
-    });
+    if (this._logicalOperatorSwitch) {
+      this._logicalOperatorSwitch.addEventListener('click', (e: MouseEvent) => {
+        e.stopImmediatePropagation();
+        if (
+          this._logicalOperatorSwitch &&
+          this._logicalOperatorSwitch.dataset.operator
+        ) {
+          this._logicalOperatorSwitch.dataset.operator = {
+            and: 'or',
+            or: 'and',
+          }[this._logicalOperatorSwitch.dataset.operator];
+        }
+        this._doneEditing();
+      });
+    }
     // mutation
     this._mutationObserver = this._defineObserveConditions();
   }
 
-  _doneEditing() {
+  private _doneEditing() {
     this._builder.changeCondition();
   }
 
   // public methods
 
-  makeToolbar() {
+  makeToolbar(): HTMLElement {
     const toolbar = document.createElement('nav');
     this._conditionViewEl.append(toolbar);
     return toolbar;
   }
 
-  /**
-   *
-   * @param {String} conditionType
-   */
-  addNewConditionItem(conditionType, options, referenceElm = null) {
+  addNewConditionItem(
+    conditionType: string,
+    options: any,
+    referenceElm: Node | null = null
+  ): ConditionItemView {
     const conditionView = new ConditionItemView(
       this._builder,
       this,
@@ -93,12 +103,10 @@ export class ConditionGroupView extends ConditionView {
     return conditionView;
   }
 
-  /**
-   *
-   * @param {Array} conditionViews
-   * @param {Node} referenceElm
-   */
-  addNewConditionGroup(conditionViews, referenceElm) {
+  addNewConditionGroup(
+    conditionViews: ConditionView[],
+    referenceElm: Node | null
+  ): ConditionGroupView {
     const conditionGroupView = new ConditionGroupView(
       this._builder,
       this,
@@ -109,103 +117,104 @@ export class ConditionGroupView extends ConditionView {
     return conditionGroupView;
   }
 
-  /**
-   *
-   */
-  ungroup() {
+  ungroup(): void {
     const conditionViews = Array.from(
-      this._container.querySelectorAll(
+      this._container?.querySelectorAll(
         ':scope > .advanced-search-condition-view'
-      )
+      ) || []
     );
-    this.parentView.addConditionViews(conditionViews, this.elm);
+    if (this.parentView instanceof ConditionGroupView) {
+      this.parentView.addConditionViews(conditionViews, this.elm);
+    }
     this.remove();
   }
 
-  /**
-   *
-   * @param {Array} conditionViews
-   * @param {Node} referenceElm
-   */
-  addConditionViews(conditionViews, referenceElm) {
+  addConditionViews(conditionViews: Node[], referenceElm: Node | null): void {
     for (const view of conditionViews) {
-      this._container.insertBefore(view, referenceElm);
+      this._container?.insertBefore(view, referenceElm);
     }
   }
 
-  /**
-   *
-   * @param {ConditionItemView | ConditionGroupView} conditionView
-   */
-  removeConditionView(conditionView) {
-    this._container.removeChild(conditionView.elm);
+  removeConditionView(conditionView: ConditionView): void {
+    if (this._container) {
+      this._container.removeChild(conditionView.elm);
+    }
   }
 
-  remove() {
+  remove(): void {
     this._mutationObserver.disconnect();
     super.remove();
   }
 
-  // select() {
-  //   // this._conditionViewEl.classList
-  // }
-
-  // deselect() {
-
-  // }
-
-  // private methods
-
-  _defineObserveConditions() {
+  private _defineObserveConditions(): MutationObserver {
     const config = { attributes: false, childList: true, subtree: false };
-    const callback = function (mutationsList) {
+    const callback = (mutationsList: MutationRecord[]) => {
       for (const mutation of mutationsList) {
         if (mutation.type === 'childList') {
           const numberOfChild = this._numberOfChild;
-          this._conditionViewEl.dataset.numberOfChild = numberOfChild;
+          this._conditionViewEl.dataset.numberOfChild =
+            numberOfChild.toString();
           // if the number of child is less than 2, ungroup
           if (!this._isRoot && numberOfChild <= 1) this.ungroup();
         }
       }
     };
-    const observer = new MutationObserver(callback.bind(this));
-    observer.observe(this._container, config);
+    const observer = new MutationObserver(callback);
+    if (this._container) {
+      observer.observe(this._container, config);
+    }
     return observer;
   }
 
   // accessor
 
-  get query() {
+  get query(): object {
     const children = Array.from(
-      this._container.querySelectorAll(
+      this._container?.querySelectorAll(
         ':scope > .advanced-search-condition-view'
-      )
+      ) || []
     );
     switch (this._numberOfChild) {
       case 0:
         return {};
-      case 1:
-        return children[0].delegate.query;
+      case 1: {
+        const firstChild = children[0];
+        if ('delegate' in firstChild) {
+          return (firstChild as { delegate: any }).delegate.query;
+        }
+        throw new Error('Delegate property is missing');
+      }
       default:
         return {
-          [this._logicalOperatorSwitch.dataset.operator]: children.map(
-            (el) => el.delegate.query
-          ),
+          [this._logicalOperatorSwitch?.dataset.operator || 'and']:
+            children.map((el) => {
+              if ('delegate' in el) {
+                return (el as { delegate: any }).delegate.query;
+              }
+              throw new Error('Delegate property is missing');
+            }),
         };
     }
   }
 
-  get container() {
+  get container(): HTMLElement {
+    if (!this._container) {
+      throw new Error('Container is not initialized');
+    }
     return this._container;
   }
 
-  get childViews() {
-    return Array.from(this._container.childNodes).map((el) => el.delegate);
+  get childViews(): ConditionView[] {
+    return Array.from(this._container?.childNodes || []).map(
+      (el: any) => el.delegate
+    );
   }
 
-  get _numberOfChild() {
-    return this._container.querySelectorAll(
-      ':scope > .advanced-search-condition-view'
-    ).length;
+  private get _numberOfChild(): number {
+    return (
+      this._container?.querySelectorAll(
+        ':scope > .advanced-search-condition-view'
+      ).length || 0
+    );
   }
 }
