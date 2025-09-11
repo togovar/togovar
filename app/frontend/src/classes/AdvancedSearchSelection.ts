@@ -93,13 +93,13 @@ export class AdvancedSearchSelection {
     const existing = this.getSelectedConditionViews();
     const siblings = view.siblingElms;
     existing.forEach((v) => {
-      if (!siblings.includes(v.elm)) this.deselectConditionView(v);
+      if (!siblings.includes(v.rootEl)) this.deselectConditionView(v);
     });
 
     // Update DOM state to "selected".
     view.select();
-    view.elm.setAttribute(ARIA_SELECTED, 'true');
-    view.elm.classList.add(SELECTED_CLASS);
+    view.rootEl.setAttribute(ARIA_SELECTED, 'true');
+    view.rootEl.classList.add(SELECTED_CLASS);
 
     this._notifyBuilder();
   }
@@ -110,8 +110,8 @@ export class AdvancedSearchSelection {
    */
   deselectConditionView(view: ConditionView): void {
     view.deselect();
-    view.elm.removeAttribute(ARIA_SELECTED);
-    view.elm.classList.remove(SELECTED_CLASS);
+    view.rootEl.removeAttribute(ARIA_SELECTED);
+    view.rootEl.classList.remove(SELECTED_CLASS);
 
     this._notifyBuilder();
   }

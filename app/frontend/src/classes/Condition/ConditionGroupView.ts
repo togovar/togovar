@@ -33,22 +33,22 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
 
     this._isRoot = isRoot;
 
-    // ベースの要素(APIは this.elm / this._el)
-    this.elm.classList.add('advanced-search-condition-group-view');
-    if (isRoot) this.elm.classList.add('-root');
+    // ベースの要素(APIは this.rootEl / this._el)
+    this.rootEl.classList.add('advanced-search-condition-group-view');
+    if (isRoot) this.rootEl.classList.add('-root');
 
-    this.elm.innerHTML = `
+    this.rootEl.innerHTML = `
       <div class="logical-operator-switch"></div>
       <div class="container"></div>
     `;
-    this._logicalOperatorSwitch = this.elm.querySelector(
+    this._logicalOperatorSwitch = this.rootEl.querySelector(
       ':scope > .logical-operator-switch'
     );
-    this._container = this.elm.querySelector(':scope > .container')!;
+    this._container = this.rootEl.querySelector(':scope > .container')!;
 
     // 初期子要素
     for (const cv of conditionViews) {
-      this._container.append(cv.elm);
+      this._container.append(cv.rootEl);
       this._childViews.push(cv);
     }
 
@@ -57,7 +57,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
       this._logicalOperatorSwitch.dataset.operator = logicalOperator;
 
       if (!isRoot) {
-        this.elm.addEventListener('click', this._toggleSelection.bind(this));
+        this.rootEl.addEventListener('click', this._toggleSelection.bind(this));
       }
 
       this._logicalOperatorSwitch.addEventListener('click', (e) => {
@@ -72,7 +72,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
     // 子数監視
     this._mutationObserver = this._defineObserveConditions();
     this._syncNumberOfChild();
-    this.elm.dataset.numberOfChild = this._numberOfChild.toString();
+    this.rootEl.dataset.numberOfChild = this._numberOfChild.toString();
   }
 
   private _doneEditing(): void {
@@ -83,7 +83,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
 
   makeToolbar(): HTMLElement {
     const toolbar = document.createElement('nav');
-    this.elm.append(toolbar);
+    this.rootEl.append(toolbar);
     return toolbar;
   }
 
@@ -130,7 +130,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
 
     const parent = this.parentView; // GroupView | null
     if (parent) {
-      parent.addConditionViews(nodes, this.elm);
+      parent.addConditionViews(nodes, this.rootEl);
     }
     this.remove(); // ↓ override で observer を止めてから super.remove()
   }
@@ -154,8 +154,8 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
   removeConditionView(view: ConditionView): void {
     const idx = this._childViews.indexOf(view);
     if (idx >= 0) this._childViews.splice(idx, 1);
-    view.elm.remove();
-    this.elm.dataset.numberOfChild = this._numberOfChild.toString();
+    view.rootEl.remove();
+    this.rootEl.dataset.numberOfChild = this._numberOfChild.toString();
 
     this._syncNumberOfChild();
   }
@@ -188,7 +188,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
       this._container?.querySelectorAll(
         ':scope > .advanced-search-condition-view'
       ).length ?? 0;
-    this.elm.dataset.numberOfChild = String(count); // ← data-number-of-child を更新
+    this.rootEl.dataset.numberOfChild = String(count); // ← data-number-of-child を更新
   }
 
   // ========= accessors =========

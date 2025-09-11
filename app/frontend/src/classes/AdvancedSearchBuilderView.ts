@@ -131,7 +131,7 @@ export default class AdvancedSearchBuilderView {
       const idx = siblings.indexOf(v);
       if (idx !== -1 && idx < minIndex) {
         minIndex = idx;
-        insertionEl = v.elm;
+        insertionEl = v.rootEl;
       }
     }
 

@@ -8,7 +8,7 @@ export interface ConditionView {
   readonly conditionNodeKind:
     | typeof CONDITION_NODE_KIND.group
     | typeof CONDITION_NODE_KIND.condition;
-  readonly elm: HTMLElement;
+  readonly rootEl: HTMLElement;
   readonly parentView: GroupView | null;
   readonly siblingElms: HTMLElement[];
   readonly canUngroup?: boolean;
@@ -68,7 +68,7 @@ export abstract class BaseConditionView implements ConditionView {
     (this._el as any).delegate = this;
   }
 
-  get elm(): HTMLElement {
+  get rootEl(): HTMLElement {
     return this._el;
   }
   get siblingElms(): HTMLElement[] {

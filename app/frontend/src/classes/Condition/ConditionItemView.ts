@@ -68,7 +68,7 @@ class ConditionItemView extends BaseConditionView {
 
   /** Exits edit mode and triggers condition search */
   doneEditing(): void {
-    this.elm.classList.remove('-editing');
+    this.rootEl.classList.remove('-editing');
     this._isFirstTime = false;
     this._builder.changeCondition();
     storeManager.setData('showModal', false);
@@ -130,10 +130,10 @@ class ConditionItemView extends BaseConditionView {
 
   /** Initializes the HTML structure for the condition item */
   private _initializeHTML(): void {
-    this.elm.classList.add('advanced-search-condition-item-view');
-    this.elm.dataset.classification = this._conditionType;
-    this.elm.dataset.relation = this._getInitialRelation();
-    this.elm.innerHTML = this._generateHTML();
+    this.rootEl.classList.add('advanced-search-condition-item-view');
+    this.rootEl.dataset.classification = this._conditionType;
+    this.rootEl.dataset.relation = this._getInitialRelation();
+    this.rootEl.innerHTML = this._generateHTML();
   }
 
   /** Determines the initial relation value based on condition type */
@@ -172,7 +172,7 @@ class ConditionItemView extends BaseConditionView {
 
   /** Sets up DOM element references */
   private _setupDOMReferences(): void {
-    const body = this.elm.querySelector(':scope > .body') as HTMLDivElement;
+    const body = this.rootEl.querySelector(':scope > .body') as HTMLDivElement;
     const summary = body.querySelector(':scope > .summary') as HTMLDivElement;
 
     this._valuesEl = summary.querySelector(
@@ -196,20 +196,20 @@ class ConditionItemView extends BaseConditionView {
 
   /** Prevents click event propagation */
   private _attachClickPropagationStopper(): void {
-    this.elm.addEventListener('click', (e: MouseEvent) => {
+    this.rootEl.addEventListener('click', (e: MouseEvent) => {
       e.stopImmediatePropagation();
     });
   }
 
   /** Attaches selection toggle functionality */
   private _attachSelectionToggle(): void {
-    const summary = this.elm.querySelector(':scope > .body > .summary')!;
+    const summary = this.rootEl.querySelector(':scope > .body > .summary')!;
     summary.addEventListener('click', this._toggleSelection.bind(this));
   }
 
   /** Attaches logical operation toggle functionality */
   private _attachRelationToggle(): void {
-    const summary = this.elm.querySelector(':scope > .body > .summary')!;
+    const summary = this.rootEl.querySelector(':scope > .body > .summary')!;
     const relationElement = summary.querySelector(':scope > .relation')!;
 
     relationElement.addEventListener('click', (e: Event) => {
@@ -221,18 +221,18 @@ class ConditionItemView extends BaseConditionView {
 
   /** Toggles the logical relation between 'eq' and 'ne' */
   private _toggleRelation(): void {
-    const currentRelation = this.elm.dataset.relation;
-    this.elm.dataset.relation = currentRelation === 'eq' ? 'ne' : 'eq';
+    const currentRelation = this.rootEl.dataset.relation;
+    this.rootEl.dataset.relation = currentRelation === 'eq' ? 'ne' : 'eq';
 
     if (!storeManager.getData('showModal')) {
-      this._keepLastRelation = this.elm.dataset.relation!;
+      this._keepLastRelation = this.rootEl.dataset.relation!;
       this._builder.changeCondition();
     }
   }
 
   /** Attaches edit and delete button handlers */
   private _attachButtonHandlers(): void {
-    const summary = this.elm.querySelector(':scope > .body > .summary')!;
+    const summary = this.rootEl.querySelector(':scope > .body > .summary')!;
     const buttons = summary.querySelectorAll(':scope > .buttons > button');
 
     for (const button of buttons) {
@@ -258,7 +258,7 @@ class ConditionItemView extends BaseConditionView {
 
   /** Enters edit mode for the condition */
   private _enterEditMode(): void {
-    this.elm.classList.add('-editing');
+    this.rootEl.classList.add('-editing');
     this._conditionValues!.startToEditCondition();
     storeManager.setData('showModal', true);
     window.addEventListener('keydown', this._keydownEscapeEvent);
@@ -271,7 +271,7 @@ class ConditionItemView extends BaseConditionView {
 
   /** Automatically enters edit mode when the instance is created */
   private _autoEnterEditMode(): void {
-    const summary = this.elm.querySelector(':scope > .body > .summary')!;
+    const summary = this.rootEl.querySelector(':scope > .body > .summary')!;
     const editButton = summary.querySelector(
       ':scope > .buttons > button.edit'
     ) as HTMLButtonElement;
@@ -305,7 +305,7 @@ class ConditionItemView extends BaseConditionView {
   private _revertChanges(): void {
     for (const editor of this._conditionValues!.editors) {
       editor.restore();
-      this.elm.dataset.relation = this._keepLastRelation;
+      this.rootEl.dataset.relation = this._keepLastRelation;
     }
   }
 
@@ -368,7 +368,7 @@ class ConditionItemView extends BaseConditionView {
     const queryId = valueElements[0]?.value;
     return {
       gene: {
-        relation: this.elm.dataset.relation!,
+        relation: this.rootEl.dataset.relation!,
         terms: [Number(queryId)],
       },
     };
@@ -387,7 +387,7 @@ class ConditionItemView extends BaseConditionView {
     const valueMgendElements = this._getMgendElements();
     const valueClinvarElements = this._getClinvarElements();
 
-    const relationType = this.elm.dataset.relation === 'ne' ? 'and' : 'or';
+    const relationType = this.rootEl.dataset.relation === 'ne' ? 'and' : 'or';
     const mgendCondition = this._buildMgendCondition(valueMgendElements);
     const clinvarCondition = this._buildClinvarCondition(valueClinvarElements);
 
@@ -423,7 +423,7 @@ class ConditionItemView extends BaseConditionView {
     return elements.length > 0
       ? {
           [this._conditionType]: {
-            relation: this.elm.dataset.relation!,
+            relation: this.rootEl.dataset.relation!,
             source: ['mgend'],
             terms: elements.map((value) => value.value),
           },
@@ -438,7 +438,7 @@ class ConditionItemView extends BaseConditionView {
     return elements.length > 0
       ? {
           [this._conditionType]: {
-            relation: this.elm.dataset.relation!,
+            relation: this.rootEl.dataset.relation!,
             source: ['clinvar'],
             terms: elements.map((value) => value.value),
           },
@@ -452,7 +452,7 @@ class ConditionItemView extends BaseConditionView {
   ): DefaultQuery {
     return {
       [this._conditionType]: {
-        relation: this.elm.dataset.relation!,
+        relation: this.rootEl.dataset.relation!,
         terms: valueElements.map((value) => value.value),
       },
     };
