@@ -91,7 +91,7 @@ export class AdvancedSearchSelection {
 
     // Keep only sibling selections.
     const existing = this.getSelectedConditionViews();
-    const siblings = view.siblingElms;
+    const siblings = view.childEls;
     existing.forEach((v) => {
       if (!siblings.includes(v.rootEl)) this.deselectConditionView(v);
     });

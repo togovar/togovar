@@ -9,8 +9,8 @@ export interface ConditionView {
     | typeof CONDITION_NODE_KIND.group
     | typeof CONDITION_NODE_KIND.condition;
   readonly rootEl: HTMLElement;
-  readonly parentView: GroupView | null;
-  readonly siblingElms: HTMLElement[];
+  readonly parentGroup: GroupView | null;
+  readonly childEls: HTMLElement[];
   readonly canUngroup?: boolean;
   readonly canCopy?: boolean;
   readonly query: object; // ← 両クラスにあるので契約へ
@@ -71,10 +71,10 @@ export abstract class BaseConditionView implements ConditionView {
   get rootEl(): HTMLElement {
     return this._el;
   }
-  get siblingElms(): HTMLElement[] {
+  get childEls(): HTMLElement[] {
     return Array.from(this._el.parentElement?.children ?? []) as HTMLElement[];
   }
-  get parentView(): GroupView | null {
+  get parentGroup(): GroupView | null {
     const host = this._el.parentElement;
     const groupEl = host?.closest(
       '.advanced-search-condition-group-view'
@@ -91,7 +91,7 @@ export abstract class BaseConditionView implements ConditionView {
     this._el.removeAttribute('aria-selected');
   }
   remove(): void {
-    const parent = this.parentView;
+    const parent = this.parentGroup;
     if (parent) parent.removeConditionView(this);
     viewByEl.delete(this._el);
     this._el.remove();

@@ -79,9 +79,9 @@ export default class AdvancedSearchBuilderView {
 
     let canGroup = false;
     if (n > 1) {
-      const parent = selection[0].parentView; // GroupView | null
+      const parent = selection[0].parentGroup; // GroupView | null
       const sameParent =
-        !!parent && selection.every((v) => v.parentView === parent);
+        !!parent && selection.every((v) => v.parentGroup === parent);
       if (sameParent && parent) {
         const totalChildren = parent.childViews.length;
         const notAllSelected = n < totalChildren;
@@ -117,7 +117,7 @@ export default class AdvancedSearchBuilderView {
     if (selected.length === 0)
       throw new Error('No condition views selected to group.');
 
-    const parent = selected[0].parentView; // GroupView | null
+    const parent = selected[0].parentGroup; // GroupView | null
     if (!parent)
       throw new Error(
         'Parent group view not found for the selected condition views.'

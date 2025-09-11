@@ -128,7 +128,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
       ) ?? []
     );
 
-    const parent = this.parentView; // GroupView | null
+    const parent = this.parentGroup; // GroupView | null
     if (parent) {
       parent.addConditionViews(nodes, this.rootEl);
     }
