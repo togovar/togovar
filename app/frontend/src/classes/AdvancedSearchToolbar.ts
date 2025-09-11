@@ -155,7 +155,7 @@ export class AdvancedSearchToolbar {
         break;
       case 'delete':
         this._advancedSearchBuilderView.deleteCondition(
-          this._advancedSearchBuilderView.selection.getSelectingConditionViews()
+          this._advancedSearchBuilderView.selection.getSelectedConditionViews()
         );
         break;
     }

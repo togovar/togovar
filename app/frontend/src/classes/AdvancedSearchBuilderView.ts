@@ -1,6 +1,6 @@
 import { setAdvancedSearchCondition } from '../store/searchManager';
 import { ConditionGroupView } from './Condition/ConditionGroupView';
-import type ConditionItemView from './Condition/ConditionItemView';
+import type { ConditionView } from './Condition/ConditionView';
 import { AdvancedSearchToolbar } from './AdvancedSearchToolbar';
 import { AdvancedSearchSelection } from './AdvancedSearchSelection';
 import { CONDITION_ITEM_TYPE } from '../definition.js';
@@ -78,49 +78,46 @@ export default class AdvancedSearchBuilderView {
    * selected, and the condition state is updated.
    */
   group(): void {
-    const conditionViews: (ConditionGroupView | ConditionItemView)[] =
-      this._selection.getSelectingConditionViews();
-    if (conditionViews.length === 0) {
+    const selectedViews: ConditionView[] =
+      this._selection.getSelectedConditionViews();
+
+    if (selectedViews.length === 0) {
       throw new Error('No condition views selected to group.');
     }
 
-    const parentGroupView = conditionViews[0].parentView;
+    const parentGroupView = selectedViews[0].parentView;
     if (!parentGroupView) {
       throw new Error(
         'Parent group view not found for the selected condition views.'
       );
     }
 
-    // Determine the insertion position and reference element
-    const childViewsOfParentGroup: (ConditionGroupView | ConditionItemView)[] =
-      parentGroupView.childViews;
+    const childViewsOfParent: ConditionView[] = parentGroupView.childViews;
+    let minIndex = Number.POSITIVE_INFINITY;
+    let insertionPointEl: HTMLElement | null = null;
 
-    const { insertionPointEl } = conditionViews.reduce(
-      (acc, view) => {
-        const index = childViewsOfParentGroup.indexOf(view);
-        // Identify the view that is positioned at the very front
-        if (index < acc.position) {
-          acc.position = index;
-          acc.insertionPointEl = view.elm;
-        }
-        return acc;
-      },
-      { position: Infinity, insertionPointEl: null as HTMLElement | null }
-    );
+    // Determine the insertion position and reference element
+    for (const view of selectedViews) {
+      const idx = childViewsOfParent.indexOf(view);
+      if (idx !== -1 && idx < minIndex) {
+        minIndex = idx;
+        insertionPointEl = view.elm;
+      }
+    }
 
     // Add new group
-    const conditionGroupView = parentGroupView.addNewConditionGroup(
-      conditionViews,
+    const newGroup = parentGroupView.addNewConditionGroup(
+      selectedViews,
       insertionPointEl
     );
 
     // Select the new group and update the condition state
-    this._selection.selectConditionView(conditionGroupView, true);
+    this._selection.selectConditionView(newGroup, true);
     this.changeCondition();
   }
 
   ungroup() {
-    const conditionViews = this._selection.getSelectingConditionViews();
+    const conditionViews = this._selection.getSelectedConditionViews();
     // deselect selecting group
     conditionViews.forEach((conditionView) => {
       this._selection.deselectConditionView(conditionView);
@@ -135,7 +132,7 @@ export default class AdvancedSearchBuilderView {
    * @param {Array<ConditionView>} views
    */
   deleteCondition(views?: any[]): void {
-    views = views ?? this._selection.getSelectingConditionViews();
+    views = views ?? this._selection.getSelectedConditionViews();
     for (const view of views) {
       view.remove();
       this._selection.deselectConditionView(view);
@@ -152,8 +149,7 @@ export default class AdvancedSearchBuilderView {
   // add search condition to the currently selected layer
   addCondition(conditionType: string, options: any): void {
     // get selecting condition
-    const selectingConditionViews =
-      this._selection.getSelectingConditionViews();
+    const selectingConditionViews = this._selection.getSelectedConditionViews();
     const selectingConditionView =
       selectingConditionViews.length > 0
         ? selectingConditionViews[0]
