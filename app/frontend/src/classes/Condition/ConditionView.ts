@@ -1,131 +1,115 @@
 import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
-import type ConditionItemView from './ConditionItemView';
-import type { ConditionGroupView } from './ConditionGroupView';
+import { CONDITION_ITEM_TYPE } from '../../definition';
 
-interface DelegateElement extends HTMLElement {
-  delegate: ConditionItemView | ConditionGroupView;
+export interface ConditionView {
+  readonly type:
+    | typeof CONDITION_ITEM_TYPE.group
+    | typeof CONDITION_ITEM_TYPE.condition;
+  readonly elm: HTMLElement;
+  readonly parentView: GroupView | null;
+  readonly siblingElms: HTMLElement[];
+  select(): void;
+  deselect(): void;
+  readonly canUngroup?: boolean;
+  readonly canCopy?: boolean;
+  readonly query: object; // ← 両クラスにあるので契約へ
+  remove(): void; // ← Base で実装
 }
 
-export class ConditionView {
-  // private _conditionViewEl: HTMLDivElement;
-  _conditionViewEl: HTMLDivElement;
-  private _type: number;
-  // private _builder: AdvancedSearchBuilderView;
-  _builder: AdvancedSearchBuilderView;
-  private _parentView?: ConditionItemView | ConditionGroupView;
+export interface GroupView extends ConditionView {
+  readonly type: typeof CONDITION_ITEM_TYPE.group;
+  readonly container: HTMLElement;
+  readonly childViews: ConditionView[];
+  removeConditionView(_view: ConditionView): void;
+  addNewConditionGroup(
+    _selected: ConditionView[],
+    _ref?: HTMLElement | null
+  ): GroupView;
+  addConditionViews(_conditionViews: Node[], _referenceElm: Node | null): void; // ← 追加
 
-  /**
-   * @param {Number} type - what number???
-   * @param {AdvancedSearchBuilderView} builder - Static Object(_container, _elm, _rootGroup, _selection, _toolbar)
-   * @param {ConditionItemView | ConditionGroupView} parentView - Dynamic Object(_builder, _container, _elm, _logicalOperatorSwitch, _mutationObserver, _type)
-   * @param {Node} referenceElm - what's this? null??
-   */
+  addNewConditionItem(
+    _conditionType: string,
+    _options: any,
+    _referenceElm?: Node | null
+  ): ConditionView;
+  ungroup(): void;
+}
+
+export const viewByEl = new WeakMap<HTMLElement, ConditionView>();
+
+export function isGroupView(
+  v: ConditionView | null | undefined
+): v is GroupView {
+  return !!v && v.type === CONDITION_ITEM_TYPE.group;
+}
+
+export abstract class BaseConditionView implements ConditionView {
+  readonly type!: ConditionView['type'];
+  protected readonly _builder: AdvancedSearchBuilderView;
+  protected readonly _el: HTMLDivElement;
+
   constructor(
-    type: number,
     builder: AdvancedSearchBuilderView,
-    parentView: { container: HTMLElement },
-    referenceElm: Node | null
+    parentContainer: HTMLElement,
+    ref: Node | null
   ) {
-    this._type = type;
     this._builder = builder;
+    this._el = document.createElement('div');
+    this._el.classList.add('advanced-search-condition-view');
+    if (ref && parentContainer.contains(ref))
+      parentContainer.insertBefore(this._el, ref);
+    else parentContainer.appendChild(this._el);
+    viewByEl.set(this._el, this);
 
-    // make HTML
-    this._conditionViewEl = document.createElement('div');
-    this._conditionViewEl.classList.add('advanced-search-condition-view');
-    (this._conditionViewEl as any).delegate = this;
+    // BaseConditionView constructor の末尾あたり
+    viewByEl.set(this._el, this);
 
-    // Insert the condition view element into the parent container.
-    // If the reference element exists within the parent container, insert the condition view element before it.
-    // Otherwise, append the condition view element to the end of the parent container.
-    if (parentView.container.contains(referenceElm)) {
-      parentView.container.insertBefore(this._conditionViewEl, referenceElm);
-    } else {
-      parentView.container.appendChild(this._conditionViewEl);
-    }
+    // ★ 互換レイヤー（旧 AdvancedSearchSelection が el.delegate を参照するため）
+    (this._el as any).delegate = this;
   }
-
-  // public methods
-
-  select(): void {
-    this._conditionViewEl.classList.add('-selected');
-  }
-
-  deselect(): void {
-    this._conditionViewEl.classList.remove('-selected');
-  }
-
-  remove(): void {
-    const parent = this.parentView;
-    if (parent && 'removeConditionView' in parent) {
-      parent.removeConditionView(
-        this as unknown as ConditionItemView | ConditionGroupView
-      );
-    }
-
-    this._conditionViewEl.remove();
-    this._parentView = undefined;
-  }
-
-  // accessor
 
   get elm(): HTMLElement {
-    return this._conditionViewEl;
+    return this._el;
+  }
+  get siblingElms(): HTMLElement[] {
+    return Array.from(this._el.parentElement?.children ?? []) as HTMLElement[];
+  }
+  get parentView(): GroupView | null {
+    const host = this._el.parentElement;
+    const groupEl = host?.closest(
+      '.advanced-search-condition-group-view'
+    ) as HTMLElement | null;
+    const v = groupEl ? viewByEl.get(groupEl) : undefined;
+    return isGroupView(v) ? v : null;
+  }
+  select(): void {
+    this._el.classList.add('-selected');
+    this._el.setAttribute('aria-selected', 'true');
+  }
+  deselect(): void {
+    this._el.classList.remove('-selected');
+    this._el.removeAttribute('aria-selected');
+  }
+  remove(): void {
+    const parent = this.parentView;
+    if (parent) parent.removeConditionView(this);
+    viewByEl.delete(this._el);
+    this._el.remove();
+  }
+  get canUngroup(): boolean | undefined {
+    return undefined;
+  }
+  get canCopy(): boolean | undefined {
+    return undefined;
   }
 
-  get siblingElms(): Node[] {
-    return Array.from(this._conditionViewEl.parentNode?.childNodes || []);
-  }
+  abstract get query(): object;
 
-  get type(): number {
-    return this._type;
-  }
-
-  get isSelecting() {
-    return this._conditionViewEl.classList.contains('-selected');
-  }
-
-  get parentView(): ConditionGroupView {
-    const closestElement = this._conditionViewEl.parentNode as HTMLElement;
-
-    return (
-      closestElement.closest(
-        '.advanced-search-condition-view'
-      ) as DelegateElement
-    )?.delegate as ConditionGroupView;
-  }
-
-  set parentView(parentView: ConditionItemView | ConditionGroupView) {
-    this._parentView = parentView;
-  }
-
-  get depth(): number {
-    let parentView = this.parentView;
-    let depth = 0;
-    while (parentView) {
-      parentView = parentView.parentView;
-      if (parentView) depth++;
-    }
-    return depth;
-  }
-
-  /**
-   * Toggles the selection state of the condition view.
-   * If the condition view is currently being edited, the toggle is ignored.
-   * Otherwise, it selects or deselects the condition view based on its current state.
-   *
-   * @param e - The event object triggered by the user interaction.
-   */
-  protected toggleSelectionState(e: Event): void {
+  protected _toggleSelection(e: Event): void {
     e.stopImmediatePropagation();
-    const isEditing = this._conditionViewEl.classList.contains('-editing');
-    if (isEditing) return;
-
-    const isSelecting = this._conditionViewEl.classList.contains('-selected');
-
-    if (isSelecting) {
-      this._builder.selection.deselectConditionView(this);
-    } else {
-      this._builder.selection.selectConditionView(this, false);
-    }
+    if (this._el.classList.contains('-editing')) return;
+    const selected = this._el.classList.contains('-selected');
+    if (selected) this._builder.selection.deselectConditionView(this);
+    else this._builder.selection.selectConditionView(this, false);
   }
 }
