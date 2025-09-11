@@ -8,7 +8,7 @@ import {
 } from './Condition/ConditionView';
 import { AdvancedSearchToolbar } from './AdvancedSearchToolbar';
 import { AdvancedSearchSelection } from './AdvancedSearchSelection';
-import { CONDITION_ITEM_TYPE } from '../definition';
+import { CONDITION_NODE_KIND } from '../definition';
 
 type SelectionCapabilities = {
   canDelete: boolean;
@@ -75,7 +75,7 @@ export default class AdvancedSearchBuilderView {
     const canUngroup =
       n === 1 &&
       (selection[0].canUngroup === true ||
-        selection[0].type === CONDITION_ITEM_TYPE.group);
+        selection[0].conditionNodeKind === CONDITION_NODE_KIND.group);
 
     let canGroup = false;
     if (n > 1) {
@@ -94,7 +94,7 @@ export default class AdvancedSearchBuilderView {
     const canCopy =
       n === 1 &&
       (selection[0].canCopy === true ||
-        selection[0].type === CONDITION_ITEM_TYPE.condition);
+        selection[0].conditionNodeKind === CONDITION_NODE_KIND.condition);
 
     return { canDelete, canGroup, canUngroup, canCopy };
   }
@@ -191,11 +191,11 @@ export default class AdvancedSearchBuilderView {
     // clear current selection
     this._selection.deselectAllConditions();
 
-    switch (target.type) {
-      case CONDITION_ITEM_TYPE.condition:
+    switch (target.conditionNodeKind) {
+      case CONDITION_NODE_KIND.condition:
         // TODO: insert after the selected condition
         break;
-      case CONDITION_ITEM_TYPE.group:
+      case CONDITION_NODE_KIND.group:
         if (isGroupView(target)) {
           target.addNewConditionItem(conditionType, options);
         }

@@ -6,14 +6,14 @@ import {
 } from './ConditionView';
 import ConditionItemView from './ConditionItemView';
 import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
-import { CONDITION_ITEM_TYPE } from '../../definition';
+import { CONDITION_NODE_KIND } from '../../definition';
 
 type MutationObserverInit = NonNullable<
   Parameters<MutationObserver['observe']>[1]
 >;
 
 export class ConditionGroupView extends BaseConditionView implements GroupView {
-  readonly type = CONDITION_ITEM_TYPE.group;
+  readonly conditionNodeKind = CONDITION_NODE_KIND.group;
 
   private _isRoot: boolean;
   private _logicalOperatorSwitch: HTMLElement | null;

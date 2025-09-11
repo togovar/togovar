@@ -4,7 +4,7 @@ import { storeManager } from '../../store/StoreManager';
 import { ADVANCED_CONDITIONS } from '../../global';
 import {
   CONDITION_TYPE,
-  CONDITION_ITEM_TYPE,
+  CONDITION_NODE_KIND,
   ConditionTypeValue,
 } from '../../definition';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
@@ -27,6 +27,8 @@ import {
  * This class extends BaseConditionView and manages individual search conditions.
  */
 class ConditionItemView extends BaseConditionView {
+  readonly conditionNodeKind = CONDITION_NODE_KIND.condition;
+
   private readonly _conditionType: ConditionTypeValue;
   private _isFirstTime: boolean;
   private _keepLastRelation: string;
@@ -37,7 +39,6 @@ class ConditionItemView extends BaseConditionView {
   /** The condition values manager instance */
   private _conditionValues: ConditionValues | undefined;
 
-  readonly type = CONDITION_ITEM_TYPE.condition;
   get canCopy() {
     return true;
   }

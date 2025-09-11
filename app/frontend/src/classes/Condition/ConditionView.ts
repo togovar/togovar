@@ -1,23 +1,23 @@
 import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
-import { CONDITION_ITEM_TYPE } from '../../definition';
+import { CONDITION_NODE_KIND } from '../../definition';
 
 export interface ConditionView {
-  readonly type:
-    | typeof CONDITION_ITEM_TYPE.group
-    | typeof CONDITION_ITEM_TYPE.condition;
+  select(): void; // Select this view in the UI (CSS-driven)
+  deselect(): void; // Clear the selected state
+  remove(): void; // Remove from parent group and the DOM (detach listeners/resources as needed)
+  readonly conditionNodeKind:
+    | typeof CONDITION_NODE_KIND.group
+    | typeof CONDITION_NODE_KIND.condition;
   readonly elm: HTMLElement;
   readonly parentView: GroupView | null;
   readonly siblingElms: HTMLElement[];
-  select(): void;
-  deselect(): void;
   readonly canUngroup?: boolean;
   readonly canCopy?: boolean;
   readonly query: object; // ← 両クラスにあるので契約へ
-  remove(): void; // ← Base で実装
 }
 
 export interface GroupView extends ConditionView {
-  readonly type: typeof CONDITION_ITEM_TYPE.group;
+  readonly conditionNodeKind: typeof CONDITION_NODE_KIND.group;
   readonly container: HTMLElement;
   readonly childViews: ConditionView[];
   removeConditionView(_view: ConditionView): void;
@@ -40,11 +40,11 @@ export const viewByEl = new WeakMap<HTMLElement, ConditionView>();
 export function isGroupView(
   v: ConditionView | null | undefined
 ): v is GroupView {
-  return !!v && v.type === CONDITION_ITEM_TYPE.group;
+  return !!v && v.conditionNodeKind === CONDITION_NODE_KIND.group;
 }
 
 export abstract class BaseConditionView implements ConditionView {
-  readonly type!: ConditionView['type'];
+  readonly conditionNodeKind!: ConditionView['conditionNodeKind'];
   protected readonly _builder: AdvancedSearchBuilderView;
   protected readonly _el: HTMLDivElement;
 

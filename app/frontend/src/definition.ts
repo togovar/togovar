@@ -18,10 +18,10 @@ export const CONDITION_TYPE = {
   location: 'location',
 };
 
-export const CONDITION_ITEM_TYPE = {
+export type ConditionTypeValue =
+  (typeof CONDITION_TYPE)[keyof typeof CONDITION_TYPE];
+
+export const CONDITION_NODE_KIND = {
   condition: 0,
   group: 1,
 };
-
-export type ConditionTypeValue =
-  (typeof CONDITION_TYPE)[keyof typeof CONDITION_TYPE];
