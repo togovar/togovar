@@ -5,6 +5,9 @@ const COMMANDS = [
   { command: 'group', label: 'Group', shortcut: [71] },
   { command: 'ungroup', label: 'Ungroup', shortcut: [16, 71] },
   { command: 'delete', label: 'Delete', shortcut: [46] },
+  // TODO: These are currently unused, but may be implemented in the future.
+  // { command: 'copy', label: 'Copy', shortcut: [67] },
+  // { command: 'edit', label: 'Edit', shortcut: [69] },
 ];
 
 /**
@@ -158,6 +161,13 @@ export class AdvancedSearchToolbar {
           this._advancedSearchBuilderView.selection.getSelectedConditionViews()
         );
         break;
+      // TODO: These are currently unused, but may be implemented in the future.
+      // case 'copy':
+      //   this._advancedSearchBuilderView.copy();
+      //   break;
+      // case 'edit':
+      //   this._advancedSearchBuilderView.edit();
+      //   break;
     }
   }
 

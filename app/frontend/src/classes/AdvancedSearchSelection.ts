@@ -101,7 +101,7 @@ export class AdvancedSearchSelection {
     view.elm.setAttribute(ARIA_SELECTED, 'true');
     view.elm.classList.add(SELECTED_CLASS);
 
-    this.notifyBuilder();
+    this._notifyBuilder();
   }
 
   /**
@@ -113,7 +113,7 @@ export class AdvancedSearchSelection {
     view.elm.removeAttribute(ARIA_SELECTED);
     view.elm.classList.remove(SELECTED_CLASS);
 
-    this.notifyBuilder();
+    this._notifyBuilder();
   }
 
   /**
@@ -125,7 +125,7 @@ export class AdvancedSearchSelection {
       el.removeAttribute(ARIA_SELECTED);
       el.classList.remove(SELECTED_CLASS);
     });
-    this.notifyBuilder();
+    this._notifyBuilder();
   }
 
   /**
@@ -146,8 +146,8 @@ export class AdvancedSearchSelection {
   /**
    * Notifies the builder with the latest selection state.
    */
-  private notifyBuilder(): void {
-    this.builder.selectedConditionViews(this.getSelectedConditionViews());
+  private _notifyBuilder(): void {
+    this.builder.onSelectionChange(this.getSelectedConditionViews());
   }
 }
 
