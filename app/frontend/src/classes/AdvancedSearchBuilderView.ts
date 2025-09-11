@@ -178,7 +178,7 @@ export default class AdvancedSearchBuilderView {
   }
 
   search(): void {
-    const query = this._rootGroup.query;
+    const query = this._rootGroup.queryFragment;
     setAdvancedSearchCondition(query);
   }
 

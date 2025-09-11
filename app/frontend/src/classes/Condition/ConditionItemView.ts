@@ -100,7 +100,7 @@ class ConditionItemView extends BaseConditionView {
   }
 
   /** Creates and returns the search query object based on current values */
-  get query(): ConditionQuery {
+  get queryFragment(): ConditionQuery {
     const valueElements = this._getValueElements();
 
     switch (this._conditionType) {

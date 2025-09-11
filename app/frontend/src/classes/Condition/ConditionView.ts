@@ -1,6 +1,7 @@
 import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
 import { CONDITION_NODE_KIND } from '../../definition';
 
+/** Public contract for both condition items and groups */
 export interface ConditionView {
   select(): void; // Select this view in the UI (CSS-driven)
   deselect(): void; // Clear the selected state
@@ -11,11 +12,12 @@ export interface ConditionView {
   readonly rootEl: HTMLElement;
   readonly parentGroup: GroupView | null;
   readonly childEls: HTMLElement[];
+  readonly queryFragment: object;
   readonly canUngroup?: boolean;
   readonly canCopy?: boolean;
-  readonly query: object; // ← 両クラスにあるので契約へ
 }
 
+/** Group-specific */
 export interface GroupView extends ConditionView {
   readonly conditionNodeKind: typeof CONDITION_NODE_KIND.group;
   readonly container: HTMLElement;
@@ -103,7 +105,7 @@ export abstract class BaseConditionView implements ConditionView {
     return undefined;
   }
 
-  abstract get query(): object;
+  abstract get queryFragment(): object;
 
   protected _toggleSelection(e: Event): void {
     e.stopImmediatePropagation();

@@ -193,7 +193,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
 
   // ========= accessors =========
 
-  get query(): object {
+  get queryFragment(): object {
     const children = Array.from(
       this._container?.querySelectorAll(
         ':scope > .advanced-search-condition-view'
@@ -206,7 +206,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
       case 1: {
         const v = viewByEl.get(children[0]);
         if (!v) throw new Error('View not found for the first child');
-        return v.query;
+        return v.queryFragment;
       }
       default: {
         const op = this._logicalOperatorSwitch?.dataset.operator || 'and';
@@ -214,7 +214,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
           [op]: children.map((el) => {
             const v = viewByEl.get(el);
             if (!v) throw new Error('View not found for a child');
-            return v.query;
+            return v.queryFragment;
           }),
         };
       }
