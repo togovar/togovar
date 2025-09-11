@@ -8,7 +8,7 @@ import {
 } from './Condition/ConditionView';
 import { AdvancedSearchToolbar } from './AdvancedSearchToolbar';
 import { AdvancedSearchSelection } from './AdvancedSearchSelection';
-import { CONDITION_ITEM_TYPE } from '../definition.js';
+import { CONDITION_ITEM_TYPE } from '../definition';
 
 type SelectionCapabilities = {
   canDelete: boolean;

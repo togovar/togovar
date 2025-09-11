@@ -1,5 +1,5 @@
 import { HierarchyNode, hierarchy } from 'd3-hierarchy';
-import { CONDITION_TYPE } from '../../../definition.js';
+import { CONDITION_TYPE } from '../../../definition';
 import { ADVANCED_CONDITIONS } from '../../../global';
 import ConditionItemView from '../ConditionItemView';
 import ConditionValueEditor from './ConditionValueEditor.js';

@@ -1,4 +1,4 @@
-import { CONDITION_TYPE } from '../../definition.js';
+import { CONDITION_TYPE } from '../../definition';
 import ConditionValueEditorCheckboxes from './ConditionValueEditor/ConditionValueEditorCheckboxes.js';
 import ConditionValueEditorClinicalSignificance from './ConditionValueEditor/ConditionValueEditorClinicalSignificance';
 import ConditionValueEditorColumns from './ConditionValueEditor/ConditionValueEditorColumns.js';

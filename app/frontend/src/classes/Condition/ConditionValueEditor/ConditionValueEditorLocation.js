@@ -1,7 +1,6 @@
 import { storeManager } from '../../../store/StoreManager';
 import ConditionValueEditor from './ConditionValueEditor.js';
 import '../../../components/ConditionItemValueView';
-// import { CONDITION_TYPE } from '../definition.js';
 
 const OPTIONS = [
   '',

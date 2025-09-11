@@ -1,6 +1,6 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
 import { ADVANCED_CONDITIONS } from '../../../global';
-import { CONDITION_TYPE } from '../../../definition.js';
+import { CONDITION_TYPE } from '../../../definition.ts';
 
 const SELECTION_DEPENDED_ON_PARENT = {
   consequence: true,
