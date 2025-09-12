@@ -35,6 +35,108 @@ export interface GroupView extends ConditionView {
   readonly container: HTMLElement;
   readonly childViews: ConditionView[];
 }
+
+/** Abstract base class for group and item condition views */
+export abstract class BaseConditionView implements ConditionView {
+  // Structural discriminant (group | condition)
+  readonly conditionNodeKind!: ConditionView['conditionNodeKind'];
+  protected readonly _builder: AdvancedSearchBuilderView;
+  protected readonly _rootEl: HTMLDivElement;
+
+  constructor(
+    builder: AdvancedSearchBuilderView,
+    parentContainer: HTMLElement,
+    ref: Node | null
+  ) {
+    this._builder = builder;
+
+    // Create the host element and attach it
+    this._rootEl = document.createElement('div');
+    this._rootEl.classList.add('advanced-search-condition-view');
+
+    if (ref && parentContainer.contains(ref))
+      parentContainer.insertBefore(this._rootEl, ref);
+    else parentContainer.appendChild(this._rootEl);
+
+    // Register: host element -> view instance
+    viewByEl.set(this._rootEl, this);
+
+    // ★ 互換レイヤー（旧 AdvancedSearchSelection が el.delegate を参照するため）
+    (this._rootEl as any).delegate = this;
+  }
+
+  /** Exposes the host/root DOM element of this view. */
+  get rootEl(): HTMLElement {
+    return this._rootEl;
+  }
+
+  /** Direct element children of the parent container  */
+  get childEls(): HTMLElement[] {
+    return Array.from(
+      this._rootEl.parentElement?.children ?? []
+    ) as HTMLElement[];
+  }
+
+  /** Parent group view; `null` when this view is the root or detached. */
+  get parentGroup(): GroupView | null {
+    const parent = this._rootEl.parentElement;
+    const groupEl = parent?.closest(
+      '.advanced-search-condition-group-view'
+    ) as HTMLElement | null;
+    const view = groupEl ? viewByEl.get(groupEl) : undefined;
+    return isGroupView(view) ? view : null;
+  }
+
+  /** Marks this view as selected (CSS-driven) */
+  select(): void {
+    this._rootEl.classList.add('-selected');
+    // TODO: いずれ削除?
+    this._rootEl.setAttribute('aria-selected', 'true');
+  }
+  /** Clears the selected state */
+  deselect(): void {
+    this._rootEl.classList.remove('-selected');
+    // TODO: いずれ削除?
+    this._rootEl.removeAttribute('aria-selected');
+  }
+
+  /** Removes this view from its parent group and the DOM. */
+  remove(): void {
+    const parent = this.parentGroup;
+    if (parent) parent.removeConditionView(this);
+    viewByEl.delete(this._rootEl);
+    this._rootEl.remove();
+  }
+
+  /**
+   * Serializable fragment of the global query produced by this view.
+   *
+   * Examples:
+   * - Group: `{ and: [child1, child2, ...] }` or `{}` when empty.
+   * - Item:  `{ gene: { relation: 'eq', terms: [...] } }`, etc.
+   */
+  abstract get queryFragment(): object;
+
+  /**
+   * Shared handler for selection toggling.
+   * - Ignores toggles while in editing mode.
+   * - Delegates to the builder's selection manager.
+   *
+   * @param e - The triggering event (click, etc.)
+   */
+  protected _toggleSelection(e: Event): void {
+    e.stopImmediatePropagation();
+    if (this._rootEl.classList.contains('-editing')) return;
+
+    const selected = this._rootEl.classList.contains('-selected');
+    if (selected) {
+      this._builder.selection.deselectConditionView(this);
+    } else {
+      this._builder.selection.selectConditionView(this, false);
+    }
+  }
+}
+
 /** Maps a view's host DOM element to its owning ConditionView instance. */
 export const viewByEl = new WeakMap<HTMLElement, ConditionView>();
 
@@ -47,74 +149,4 @@ export function isGroupView(
   view: ConditionView | null | undefined
 ): view is GroupView {
   return !!view && view.conditionNodeKind === CONDITION_NODE_KIND.group;
-}
-
-export abstract class BaseConditionView implements ConditionView {
-  readonly conditionNodeKind!: ConditionView['conditionNodeKind'];
-  protected readonly _builder: AdvancedSearchBuilderView;
-  protected readonly _rootEl: HTMLDivElement;
-
-  constructor(
-    builder: AdvancedSearchBuilderView,
-    parentContainer: HTMLElement,
-    ref: Node | null
-  ) {
-    this._builder = builder;
-    this._rootEl = document.createElement('div');
-    this._rootEl.classList.add('advanced-search-condition-view');
-    if (ref && parentContainer.contains(ref))
-      parentContainer.insertBefore(this._rootEl, ref);
-    else parentContainer.appendChild(this._rootEl);
-    viewByEl.set(this._rootEl, this);
-
-    // ★ 互換レイヤー（旧 AdvancedSearchSelection が el.delegate を参照するため）
-    (this._rootEl as any).delegate = this;
-  }
-
-  get rootEl(): HTMLElement {
-    return this._rootEl;
-  }
-  get childEls(): HTMLElement[] {
-    return Array.from(
-      this._rootEl.parentElement?.children ?? []
-    ) as HTMLElement[];
-  }
-  get parentGroup(): GroupView | null {
-    const host = this._rootEl.parentElement;
-    const groupEl = host?.closest(
-      '.advanced-search-condition-group-view'
-    ) as HTMLElement | null;
-    const view = groupEl ? viewByEl.get(groupEl) : undefined;
-    return isGroupView(view) ? view : null;
-  }
-  select(): void {
-    this._rootEl.classList.add('-selected');
-    this._rootEl.setAttribute('aria-selected', 'true');
-  }
-  deselect(): void {
-    this._rootEl.classList.remove('-selected');
-    this._rootEl.removeAttribute('aria-selected');
-  }
-  remove(): void {
-    const parent = this.parentGroup;
-    if (parent) parent.removeConditionView(this);
-    viewByEl.delete(this._rootEl);
-    this._rootEl.remove();
-  }
-  get canUngroup(): boolean | undefined {
-    return undefined;
-  }
-  get canCopy(): boolean | undefined {
-    return undefined;
-  }
-
-  abstract get queryFragment(): object;
-
-  protected _toggleSelection(e: Event): void {
-    e.stopImmediatePropagation();
-    if (this._rootEl.classList.contains('-editing')) return;
-    const selected = this._rootEl.classList.contains('-selected');
-    if (selected) this._builder.selection.deselectConditionView(this);
-    else this._builder.selection.selectConditionView(this, false);
-  }
 }
