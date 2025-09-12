@@ -5,7 +5,7 @@ import { ADVANCED_CONDITIONS } from '../../global';
 import {
   CONDITION_TYPE,
   CONDITION_NODE_KIND,
-  ConditionTypeValue,
+  type ConditionTypeValue,
 } from '../../definition';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
@@ -26,7 +26,7 @@ import {
  * Represents a condition item view for editing and deleting search conditions.
  * This class extends BaseConditionView and manages individual search conditions.
  */
-class ConditionItemView extends BaseConditionView {
+export class ConditionItemView extends BaseConditionView {
   readonly conditionNodeKind = CONDITION_NODE_KIND.condition;
 
   private readonly _conditionType: ConditionTypeValue;
@@ -47,7 +47,6 @@ class ConditionItemView extends BaseConditionView {
     builder: AdvancedSearchBuilderView,
     parentGroup: ConditionGroupView,
     conditionType: string,
-    _conditionItemType: 0 | 1, // unused, keep underscore for lint
     referenceElm: Node | null = null
   ) {
     super(
@@ -458,5 +457,3 @@ class ConditionItemView extends BaseConditionView {
     };
   }
 }
-
-export default ConditionItemView;

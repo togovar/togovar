@@ -7,7 +7,7 @@ import {
   PREDICTIONS,
 } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
 import ConditionValues from '../ConditionValues.js';
-import ConditionItemView from '../ConditionItemView';
+import { ConditionItemView } from '../ConditionItemView';
 
 interface ConditionItemValueViewElement extends HTMLElement {
   label?: string;

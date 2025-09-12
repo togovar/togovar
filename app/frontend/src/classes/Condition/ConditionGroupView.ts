@@ -4,7 +4,7 @@ import {
   type GroupView,
   viewByEl,
 } from './ConditionView';
-import ConditionItemView from './ConditionItemView';
+import { ConditionItemView } from './ConditionItemView';
 import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
 import { CONDITION_NODE_KIND } from '../../definition';
 
@@ -96,7 +96,6 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
       this._builder,
       this,
       conditionType,
-      options,
       referenceElm
     );
     this._childViews.push(item); // ← 追跡

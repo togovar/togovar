@@ -9,7 +9,7 @@ import ConditionValueEditorGene from './ConditionValueEditor/ConditionValueEdito
 import ConditionValueEditorLocation from './ConditionValueEditor/ConditionValueEditorLocation.js';
 import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditor/ConditionValueEditorPathogenicityPrediction';
 import ConditionValueEditorVariantID from './ConditionValueEditor/ConditionValueEditorVariantID.js';
-import ConditionItemView from './ConditionItemView';
+import type { ConditionItemView } from './ConditionItemView';
 
 interface ConditionValueEditor {
   keepLastValues(): void;
