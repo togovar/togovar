@@ -19,36 +19,40 @@ export interface ConditionView {
 
 /** Group-specific */
 export interface GroupView extends ConditionView {
-  readonly conditionNodeKind: typeof CONDITION_NODE_KIND.group;
-  readonly container: HTMLElement;
-  readonly childViews: ConditionView[];
   removeConditionView(_view: ConditionView): void;
   addNewConditionGroup(
     _selected: ConditionView[],
     _ref?: HTMLElement | null
   ): GroupView;
-  addConditionViews(_conditionViews: Node[], _referenceElm: Node | null): void; // ← 追加
-
+  addConditionViews(_conditionViews: Node[], _referenceElm: Node | null): void;
   addNewConditionItem(
     _conditionType: string,
     _options: any,
     _referenceElm?: Node | null
   ): ConditionView;
   ungroup(): void;
+  readonly conditionNodeKind: typeof CONDITION_NODE_KIND.group;
+  readonly container: HTMLElement;
+  readonly childViews: ConditionView[];
 }
-
+/** Maps a view's host DOM element to its owning ConditionView instance. */
 export const viewByEl = new WeakMap<HTMLElement, ConditionView>();
 
+/**
+ * Type guard that narrows a `ConditionView | null | undefined` to `GroupView`
+ * @param view - Value to test (a `ConditionView` or `null`/`undefined`).
+ * @returns `true` if `view` is a `GroupView`; otherwise `false`.
+ */
 export function isGroupView(
-  v: ConditionView | null | undefined
-): v is GroupView {
-  return !!v && v.conditionNodeKind === CONDITION_NODE_KIND.group;
+  view: ConditionView | null | undefined
+): view is GroupView {
+  return !!view && view.conditionNodeKind === CONDITION_NODE_KIND.group;
 }
 
 export abstract class BaseConditionView implements ConditionView {
   readonly conditionNodeKind!: ConditionView['conditionNodeKind'];
   protected readonly _builder: AdvancedSearchBuilderView;
-  protected readonly _el: HTMLDivElement;
+  protected readonly _rootEl: HTMLDivElement;
 
   constructor(
     builder: AdvancedSearchBuilderView,
@@ -56,47 +60,46 @@ export abstract class BaseConditionView implements ConditionView {
     ref: Node | null
   ) {
     this._builder = builder;
-    this._el = document.createElement('div');
-    this._el.classList.add('advanced-search-condition-view');
+    this._rootEl = document.createElement('div');
+    this._rootEl.classList.add('advanced-search-condition-view');
     if (ref && parentContainer.contains(ref))
-      parentContainer.insertBefore(this._el, ref);
-    else parentContainer.appendChild(this._el);
-    viewByEl.set(this._el, this);
-
-    // BaseConditionView constructor の末尾あたり
-    viewByEl.set(this._el, this);
+      parentContainer.insertBefore(this._rootEl, ref);
+    else parentContainer.appendChild(this._rootEl);
+    viewByEl.set(this._rootEl, this);
 
     // ★ 互換レイヤー（旧 AdvancedSearchSelection が el.delegate を参照するため）
-    (this._el as any).delegate = this;
+    (this._rootEl as any).delegate = this;
   }
 
   get rootEl(): HTMLElement {
-    return this._el;
+    return this._rootEl;
   }
   get childEls(): HTMLElement[] {
-    return Array.from(this._el.parentElement?.children ?? []) as HTMLElement[];
+    return Array.from(
+      this._rootEl.parentElement?.children ?? []
+    ) as HTMLElement[];
   }
   get parentGroup(): GroupView | null {
-    const host = this._el.parentElement;
+    const host = this._rootEl.parentElement;
     const groupEl = host?.closest(
       '.advanced-search-condition-group-view'
     ) as HTMLElement | null;
-    const v = groupEl ? viewByEl.get(groupEl) : undefined;
-    return isGroupView(v) ? v : null;
+    const view = groupEl ? viewByEl.get(groupEl) : undefined;
+    return isGroupView(view) ? view : null;
   }
   select(): void {
-    this._el.classList.add('-selected');
-    this._el.setAttribute('aria-selected', 'true');
+    this._rootEl.classList.add('-selected');
+    this._rootEl.setAttribute('aria-selected', 'true');
   }
   deselect(): void {
-    this._el.classList.remove('-selected');
-    this._el.removeAttribute('aria-selected');
+    this._rootEl.classList.remove('-selected');
+    this._rootEl.removeAttribute('aria-selected');
   }
   remove(): void {
     const parent = this.parentGroup;
     if (parent) parent.removeConditionView(this);
-    viewByEl.delete(this._el);
-    this._el.remove();
+    viewByEl.delete(this._rootEl);
+    this._rootEl.remove();
   }
   get canUngroup(): boolean | undefined {
     return undefined;
@@ -109,8 +112,8 @@ export abstract class BaseConditionView implements ConditionView {
 
   protected _toggleSelection(e: Event): void {
     e.stopImmediatePropagation();
-    if (this._el.classList.contains('-editing')) return;
-    const selected = this._el.classList.contains('-selected');
+    if (this._rootEl.classList.contains('-editing')) return;
+    const selected = this._rootEl.classList.contains('-selected');
     if (selected) this._builder.selection.deselectConditionView(this);
     else this._builder.selection.selectConditionView(this, false);
   }
