@@ -31,7 +31,7 @@ class ConditionValueEditorVariantID extends ConditionValueEditor {
       }
     });
 
-    this._valuesView.conditionView.elm.addEventListener(
+    this._valuesView.conditionView.elm?.addEventListener(
       'delete-condition-item',
       this.#handleDeleteValue.bind(this)
     );

@@ -2,25 +2,15 @@ import { BaseConditionView } from './ConditionView';
 import ConditionValues from './ConditionValues';
 import { storeManager } from '../../store/StoreManager';
 import { ADVANCED_CONDITIONS } from '../../global';
-import {
-  CONDITION_TYPE,
-  CONDITION_NODE_KIND,
-  type ConditionTypeValue,
-} from '../../definition';
+import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../../definition';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
 import type { ConditionGroupView } from './ConditionGroupView';
 import {
-  LocationQuery,
-  GeneQuery,
-  IdQuery,
-  SignificanceQuery,
-  DefaultQuery,
   ConditionItemValueViewElement,
-  FrequencyCountValueViewElement,
-  PredictionValueViewElement,
   ConditionQuery,
 } from '../../types/conditionTypes';
+import { buildQueryFragment, type Relation } from './queryBuilders';
 
 /**
  * Represents a condition item view for editing and deleting search conditions.
@@ -100,31 +90,22 @@ export class ConditionItemView extends BaseConditionView {
 
   /** Creates and returns the search query object based on current values */
   get queryFragment(): ConditionQuery {
-    const valueElements = this._getValueElements();
+    const values = this._getValueElements();
+    const relation = (this.rootEl.dataset.relation ?? '') as Relation;
 
-    switch (this._conditionType) {
-      case CONDITION_TYPE.dataset:
-      case CONDITION_TYPE.genotype:
-        return this._buildDatasetQuery(valueElements);
+    return buildQueryFragment({
+      type: this._conditionType,
+      relation,
+      values,
+      valuesContainer: this._valuesEl!, // significance builder uses this
+    });
+  }
 
-      case CONDITION_TYPE.pathogenicity_prediction:
-        return this._buildPathogenicityQuery(valueElements);
-
-      case CONDITION_TYPE.location:
-        return this._buildLocationQuery(valueElements);
-
-      case CONDITION_TYPE.gene_symbol:
-        return this._buildGeneQuery(valueElements);
-
-      case CONDITION_TYPE.variant_id:
-        return this._buildVariantIdQuery(valueElements);
-
-      case CONDITION_TYPE.significance:
-        return this._buildSignificanceQuery();
-
-      default:
-        return this._buildDefaultQuery(valueElements);
-    }
+  /** Gets all condition item value view elements */
+  private _getValueElements(): ConditionItemValueViewElement[] {
+    return Array.from(
+      this._valuesEl!.querySelectorAll(':scope > condition-item-value-view')
+    ) as ConditionItemValueViewElement[];
   }
 
   /** Initializes the HTML structure for the condition item */
@@ -306,154 +287,5 @@ export class ConditionItemView extends BaseConditionView {
       editor.restore();
       this.rootEl.dataset.relation = this._keepLastRelation;
     }
-  }
-
-  /** Gets all condition item value view elements */
-  private _getValueElements(): ConditionItemValueViewElement[] {
-    return Array.from(
-      this._valuesEl!.querySelectorAll(':scope > condition-item-value-view')
-    ) as ConditionItemValueViewElement[];
-  }
-
-  /** Builds query for dataset and genotype conditions */
-  private _buildDatasetQuery(
-    valueElements: ConditionItemValueViewElement[]
-  ): ConditionQuery {
-    const queries = valueElements.map((view) => {
-      const shadowRoot = (view as any).shadowRoot;
-      const frequencyCountElement = shadowRoot.querySelector(
-        'frequency-count-value-view'
-      ) as FrequencyCountValueViewElement;
-      return frequencyCountElement.queryValue;
-    });
-
-    return queries.length <= 1 ? queries[0] : { or: queries };
-  }
-
-  /** Builds query for pathogenicity prediction conditions */
-  private _buildPathogenicityQuery(
-    valueElements: ConditionItemValueViewElement[]
-  ): ConditionQuery {
-    const shadowRoot = (valueElements[0] as any).shadowRoot;
-    const predictionElement = shadowRoot.querySelector(
-      'prediction-value-view'
-    ) as PredictionValueViewElement;
-
-    return predictionElement.queryValue;
-  }
-
-  /** Builds query for location-based conditions */
-  private _buildLocationQuery(
-    valueElements: ConditionItemValueViewElement[]
-  ): LocationQuery {
-    const value = valueElements[0].value;
-    const [chromosome, positionStr] = value.split(':');
-    const positionArray = positionStr.split('-');
-
-    let position: number | { gte: number; lte: number };
-    if (positionArray.length === 1) {
-      position = +positionArray[0];
-    } else {
-      position = { gte: +positionArray[0], lte: +positionArray[1] };
-    }
-
-    return { location: { chromosome, position } };
-  }
-
-  /** Builds query for gene symbol conditions */
-  private _buildGeneQuery(
-    valueElements: ConditionItemValueViewElement[]
-  ): GeneQuery {
-    const queryId = valueElements[0]?.value;
-    return {
-      gene: {
-        relation: this.rootEl.dataset.relation!,
-        terms: [Number(queryId)],
-      },
-    };
-  }
-
-  /** Builds query for variant ID conditions */
-  private _buildVariantIdQuery(
-    valueElements: ConditionItemValueViewElement[]
-  ): IdQuery {
-    const ids = valueElements.map((element) => element.value);
-    return { id: ids };
-  }
-
-  /** Builds query for clinical significance conditions */
-  private _buildSignificanceQuery(): ConditionQuery {
-    const valueMgendElements = this._getMgendElements();
-    const valueClinvarElements = this._getClinvarElements();
-
-    const relationType = this.rootEl.dataset.relation === 'ne' ? 'and' : 'or';
-    const mgendCondition = this._buildMgendCondition(valueMgendElements);
-    const clinvarCondition = this._buildClinvarCondition(valueClinvarElements);
-
-    const conditions = [mgendCondition, clinvarCondition].filter(Boolean);
-
-    return conditions.length === 1
-      ? conditions[0]!
-      : { [relationType]: conditions };
-  }
-
-  /** Gets MGEND condition elements */
-  private _getMgendElements(): ConditionItemValueViewElement[] {
-    return Array.from(
-      this._valuesEl!.querySelectorAll(
-        ':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view'
-      )
-    ) as ConditionItemValueViewElement[];
-  }
-
-  /** Gets ClinVar condition elements */
-  private _getClinvarElements(): ConditionItemValueViewElement[] {
-    return Array.from(
-      this._valuesEl!.querySelectorAll(
-        ':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view'
-      )
-    ) as ConditionItemValueViewElement[];
-  }
-
-  /** Builds MGEND condition object */
-  private _buildMgendCondition(
-    elements: ConditionItemValueViewElement[]
-  ): SignificanceQuery | null {
-    return elements.length > 0
-      ? {
-          [this._conditionType]: {
-            relation: this.rootEl.dataset.relation!,
-            source: ['mgend'],
-            terms: elements.map((value) => value.value),
-          },
-        }
-      : null;
-  }
-
-  /** Builds ClinVar condition object */
-  private _buildClinvarCondition(
-    elements: ConditionItemValueViewElement[]
-  ): SignificanceQuery | null {
-    return elements.length > 0
-      ? {
-          [this._conditionType]: {
-            relation: this.rootEl.dataset.relation!,
-            source: ['clinvar'],
-            terms: elements.map((value) => value.value),
-          },
-        }
-      : null;
-  }
-
-  /** Builds default query for other condition types */
-  private _buildDefaultQuery(
-    valueElements: ConditionItemValueViewElement[]
-  ): DefaultQuery {
-    return {
-      [this._conditionType]: {
-        relation: this.rootEl.dataset.relation!,
-        terms: valueElements.map((value) => value.value),
-      },
-    };
   }
 }
