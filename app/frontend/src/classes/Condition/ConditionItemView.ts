@@ -6,11 +6,12 @@ import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../../definition';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
 import type { ConditionGroupView } from './ConditionGroupView';
-import {
+import type {
   ConditionItemValueViewElement,
   ConditionQuery,
-} from '../../types/conditionTypes';
-import { buildQueryFragment, type Relation } from './queryBuilders';
+  Relation,
+} from '../../types';
+import { buildQueryFragment } from './queryBuilders';
 
 /**
  * Represents a condition item view for editing and deleting search conditions.
@@ -36,7 +37,7 @@ export class ConditionItemView extends BaseConditionView {
   constructor(
     builder: AdvancedSearchBuilderView,
     parentGroup: ConditionGroupView,
-    conditionType: string,
+    conditionType: ConditionTypeValue,
     referenceElm: Node | null = null
   ) {
     super(
@@ -45,7 +46,7 @@ export class ConditionItemView extends BaseConditionView {
       referenceElm ?? document.createTextNode('')
     );
 
-    this._conditionType = conditionType as ConditionTypeValue;
+    this._conditionType = conditionType;
     this._isFirstTime = true;
     this._keepLastRelation = 'eq';
 
@@ -72,7 +73,7 @@ export class ConditionItemView extends BaseConditionView {
     window.removeEventListener('keydown', this._keydownEscapeEvent);
   }
 
-  get conditionType(): string {
+  get conditionType(): ConditionTypeValue {
     return this._conditionType;
   }
   get valuesElement(): HTMLDivElement {

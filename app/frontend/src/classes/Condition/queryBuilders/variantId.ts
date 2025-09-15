@@ -3,8 +3,8 @@ import type {
   ConditionQuery,
   ConditionItemValueViewElement,
   IdQuery,
-} from '../../../types/conditionTypes';
-import type { BuildContext } from './index';
+  BuildContext,
+} from '../../../types';
 
 /** Build query for variant id(s). */
 export function buildVariantIdQuery(context: BuildContext): ConditionQuery {

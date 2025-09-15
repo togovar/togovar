@@ -1,3 +1,4 @@
+import { ConditionTypeValue } from '../definition';
 /**
  * Generic query value object
  */
@@ -89,3 +90,16 @@ export type ConditionQuery =
   | DefaultQuery
   | { or: any[] }
   | { and: any[] };
+
+/** Context object passed to query builders */
+export type BuildContext = {
+  type: ConditionTypeValue;
+  relation: Relation;
+  values: ConditionItemValueViewElement[];
+  valuesContainer?: HTMLElement | null; //  Used by significance
+};
+
+// Logical relation annotation stored in dataset.relation on the host node
+export type Relation = 'eq' | 'ne' | '';
+
+export type Builder = (_ctx: BuildContext) => ConditionQuery;

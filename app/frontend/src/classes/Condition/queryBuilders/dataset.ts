@@ -2,8 +2,8 @@ import type {
   ConditionQuery,
   ConditionItemValueViewElement,
   FrequencyCountValueViewElement,
-} from '../../../types/conditionTypes';
-import type { BuildContext } from './index';
+  BuildContext,
+} from '../../../types';
 
 /** Narrowing helper to access a shadow root safely. */
 function getFrequencyCount(

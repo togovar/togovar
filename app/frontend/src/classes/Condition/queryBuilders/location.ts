@@ -3,8 +3,8 @@ import type {
   ConditionQuery,
   ConditionItemValueViewElement,
   LocationQuery,
-} from '../../../types/conditionTypes';
-import type { BuildContext } from './index';
+  BuildContext,
+} from '../../../types';
 
 /** Build query for genomic location like "chr:pos" or "chr:start-end". */
 export function buildLocationQuery(ctx: BuildContext): ConditionQuery {

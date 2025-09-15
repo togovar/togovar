@@ -3,8 +3,8 @@ import type {
   ConditionQuery,
   ConditionItemValueViewElement,
   SignificanceQuery,
-} from '../../../types/conditionTypes';
-import type { BuildContext } from './index';
+  BuildContext,
+} from '../../../types';
 
 /** Query selectors scoped within the values container. */
 const SEL = {

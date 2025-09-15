@@ -3,8 +3,8 @@ import type {
   ConditionQuery,
   ConditionItemValueViewElement,
   DefaultQuery,
-} from '../../../types/conditionTypes';
-import type { BuildContext } from './index';
+  BuildContext,
+} from '../../../types';
 
 /** Fallback builder for miscellaneous condition types. */
 export function buildDefaultQuery(ctx: BuildContext): ConditionQuery {

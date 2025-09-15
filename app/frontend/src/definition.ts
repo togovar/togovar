@@ -16,10 +16,10 @@ export const CONDITION_TYPE = {
   gene_symbol: 'gene',
   variant_id: 'id',
   location: 'location',
-};
+} as const;
 
-export type ConditionTypeValue =
-  (typeof CONDITION_TYPE)[keyof typeof CONDITION_TYPE];
+type ConditionTypeKey = keyof typeof CONDITION_TYPE;
+export type ConditionTypeValue = (typeof CONDITION_TYPE)[ConditionTypeKey];
 
 export const CONDITION_NODE_KIND = {
   condition: 0,

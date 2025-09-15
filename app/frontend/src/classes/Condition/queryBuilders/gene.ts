@@ -3,8 +3,8 @@ import type {
   ConditionQuery,
   ConditionItemValueViewElement,
   GeneQuery,
-} from '../../../types/conditionTypes';
-import type { BuildContext } from './index';
+  BuildContext,
+} from '../../../types';
 
 /** Build query for gene symbol. */
 export function buildGeneQuery(ctx: BuildContext): ConditionQuery {

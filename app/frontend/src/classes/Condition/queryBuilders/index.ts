@@ -1,7 +1,4 @@
-import type {
-  ConditionQuery,
-  ConditionItemValueViewElement,
-} from '../../../types/conditionTypes';
+import type { ConditionQuery, Builder, BuildContext } from '../../../types';
 import { CONDITION_TYPE, type ConditionTypeValue } from '../../../definition';
 import { buildDatasetQuery } from './dataset';
 import { buildPathogenicityQuery } from './pathogenicity';
@@ -10,19 +7,6 @@ import { buildGeneQuery } from './gene';
 import { buildVariantIdQuery } from './variantId';
 import { buildSignificanceQuery } from './significance';
 import { buildDefaultQuery } from './default';
-
-/** Context object passed to query builders */
-export type BuildContext = {
-  type: ConditionTypeValue;
-  relation: Relation;
-  values: ConditionItemValueViewElement[];
-  valuesContainer?: HTMLElement | null; //  Used by significance
-};
-
-// Logical relation annotation stored in dataset.relation on the host node
-export type Relation = 'eq' | 'ne' | '';
-
-type Builder = (_ctx: BuildContext) => ConditionQuery;
 
 const BUILDERS: Partial<Record<ConditionTypeValue, Builder>> = {
   [CONDITION_TYPE.dataset]: buildDatasetQuery,

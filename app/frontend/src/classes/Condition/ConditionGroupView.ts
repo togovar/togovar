@@ -6,7 +6,7 @@ import {
 } from './ConditionView';
 import { ConditionItemView } from './ConditionItemView';
 import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
-import { CONDITION_NODE_KIND } from '../../definition';
+import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../../definition';
 
 type MutationObserverInit = NonNullable<
   Parameters<MutationObserver['observe']>[1]
@@ -88,7 +88,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
   }
 
   addNewConditionItem(
-    conditionType: string,
+    conditionType: ConditionTypeValue,
     options: any,
     referenceElm: Node | null = null
   ): ConditionItemView {
