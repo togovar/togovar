@@ -13,6 +13,7 @@ import type {
 } from '../../types';
 import { buildQueryFragment } from './queryBuilders';
 
+/** Condition types that do not support a logical relation (eq/ne). */
 const NO_RELATION_TYPES = new Set<ConditionTypeValue>([
   'dataset',
   'genotype',
@@ -21,9 +22,25 @@ const NO_RELATION_TYPES = new Set<ConditionTypeValue>([
   'location',
 ]);
 
+/** Roots that can be queried via `querySelector` (includes ShadowRoot via DocumentFragment). */
+type QueryRoot = Document | DocumentFragment | Element;
+
 /**
- * Represents a condition item view for editing and deleting search conditions.
- * This class extends BaseConditionView and manages individual search conditions.
+ * Query helper: returns the element if found; otherwise throws.
+ * Use for elements that must exist to ensure early failure on template regressions.
+ */
+export function selectRequired<T extends Element>(
+  root: QueryRoot,
+  selector: string
+): T {
+  const el = root.querySelector(selector);
+  if (!el) throw new Error(`selector not found: ${selector}`);
+  return el as T;
+}
+
+/**
+ * Represents a single condition item row with edit/delete behaviors.
+ * Extends BaseConditionView and manages its own value editors and relation state.
  */
 export class ConditionItemView extends BaseConditionView {
   readonly conditionNodeKind = CONDITION_NODE_KIND.condition;
@@ -34,17 +51,17 @@ export class ConditionItemView extends BaseConditionView {
 
   private _valuesEl!: HTMLDivElement;
   private _editorEl!: HTMLDivElement;
-  private _conditionValues: ConditionValues | undefined;
+  private _conditionValues!: ConditionValues;
 
+  /** Controller to abort all event listeners added by this instance at once. */
+  private readonly _events = new AbortController();
+
+  /** Cached getters for critical nodes (throws if not found for early detection). */
   private get _summaryEl(): HTMLDivElement {
-    const el = this.rootEl.querySelector(':scope > .body > .summary');
-    if (!el) throw new Error('summary element not found');
-    return el as HTMLDivElement;
-  }
-  private get _relationEl(): HTMLDivElement {
-    const el = this._summaryEl.querySelector(':scope > .relation');
-    if (!el) throw new Error('relation element not found');
-    return el as HTMLDivElement;
+    return selectRequired<HTMLDivElement>(
+      this.rootEl,
+      ':scope > .body > .summary'
+    );
   }
 
   constructor(
@@ -63,10 +80,10 @@ export class ConditionItemView extends BaseConditionView {
     this._initializeHTML();
     this._setupDOMReferences();
     this._attachEventDelegation();
-    this._enterEditMode();
+    this._enterEditMode(); // Enter edit mode on first render.
   }
 
-  /** Exits edit mode and triggers condition search */
+  /** Exit edit mode, close modal, and notify the builder that the condition changed. */
   doneEditing(): void {
     this.rootEl.classList.remove('-editing');
     this._isFirstTime = false;
@@ -75,10 +92,10 @@ export class ConditionItemView extends BaseConditionView {
     this._builder.changeCondition();
   }
 
-  /** Removes the condition item and cleans up resources */
+  /** Clean up resources and remove the node from the DOM. */
   remove(): void {
-    this._conditionValues = undefined as any;
     this._toggleGlobalKeydown(false);
+    this._events.abort(); // Detach all listeners registered with this controller.
     storeManager.setData('showModal', false);
     super.remove();
   }
@@ -87,33 +104,34 @@ export class ConditionItemView extends BaseConditionView {
     return this._conditionType;
   }
   get valuesElement(): HTMLDivElement {
-    return this._valuesEl!;
+    return this._valuesEl;
   }
   get editorElement(): HTMLDivElement {
-    return this._editorEl!;
+    return this._editorEl;
   }
   get isFirstTime(): boolean {
     return this._isFirstTime;
   }
-  get keepLastRelation(): string {
+  get keepLastRelation(): Relation {
     return this._keepLastRelation;
   }
 
-  /** Creates and returns the search query object based on current values */
+  /** Build the query fragment from current UI values and relation state. */
   get queryFragment(): ConditionQuery {
     const relation = (this.rootEl.dataset.relation ?? '') as Relation;
     const values = Array.from(
       this._valuesEl.querySelectorAll(':scope > condition-item-value-view')
     ) as ConditionItemValueViewElement[];
+
     return buildQueryFragment({
       type: this._conditionType,
       relation,
       values,
-      valuesContainer: this._valuesEl, // significance builder uses this
+      valuesContainer: this._valuesEl, // significance builder expects the container
     });
   }
 
-  /** Initializes the HTML structure for the condition item */
+  /** Set up static structure and initial dataset attributes. */
   private _initializeHTML(): void {
     this.rootEl.classList.add('advanced-search-condition-item-view');
     this.rootEl.dataset.classification = this._conditionType;
@@ -123,21 +141,22 @@ export class ConditionItemView extends BaseConditionView {
     this.rootEl.innerHTML = this._generateHTML();
   }
 
-  /** Generates the HTML template for the condition item */
+  /** Template markup for this condition item. Prefer `createElement` if you need stronger refs. */
   private _generateHTML(): string {
     const conditionType = this
       ._conditionType as keyof typeof ADVANCED_CONDITIONS;
-    const label = ADVANCED_CONDITIONS[conditionType]?.label;
+    const label =
+      ADVANCED_CONDITIONS[conditionType]?.label ?? this._conditionType;
 
     return `
     <div class="body">
       <div class="summary">
         <div class="classification">${label}</div>
-        <div class="relation"></div>
+        <div class="relation" role="button" aria-label="Toggle relation"></div>
         <div class="values"></div>
         <div class="buttons">
-          <button class="edit" title="Edit"></button>
-          <button class="delete" title="Delete"></button>
+          <button class="edit" type="button" title="Edit" aria-label="Edit"></button>
+          <button class="delete" type="button" title="Delete" aria-label="Delete"></button>
         </div>
       </div>
       <div class="advanced-search-condition-editor-view"></div>
@@ -145,48 +164,58 @@ export class ConditionItemView extends BaseConditionView {
     <div class="bg"></div>`;
   }
 
-  /** Sets up DOM element references */
+  /** Cache essential DOM references and initialize the value editors. */
   private _setupDOMReferences(): void {
-    const body = this.rootEl.querySelector(':scope > .body') as HTMLDivElement;
-    const summary = body.querySelector(':scope > .summary') as HTMLDivElement;
-    this._valuesEl = summary.querySelector(
+    const body = selectRequired<HTMLDivElement>(this.rootEl, ':scope > .body');
+    const summary = selectRequired<HTMLDivElement>(body, ':scope > .summary');
+    this._valuesEl = selectRequired<HTMLDivElement>(
+      summary,
       ':scope > .values'
-    ) as HTMLDivElement;
-    this._editorEl = body.querySelector(
+    );
+    this._editorEl = selectRequired<HTMLDivElement>(
+      body,
       ':scope > .advanced-search-condition-editor-view'
-    ) as HTMLDivElement;
+    );
     this._conditionValues = new ConditionValues(this);
   }
 
-  /** クリック・キーダウンを委譲でハンドリング */
+  /** Centralized click delegation within the item; stops propagation to parent containers. */
   private _attachEventDelegation(): void {
-    // 自要素内のクリックは外に飛ばさない
-    this.rootEl.addEventListener('click', (e) => e.stopImmediatePropagation());
+    const { signal } = this._events;
 
-    // summary 内の全ボタン/領域を1箇所で
-    this._summaryEl.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement;
-      if (target.closest('button.delete')) {
-        e.stopImmediatePropagation();
-        this._builder.deleteCondition([this]);
-        return;
-      }
-      if (target.closest('button.edit')) {
-        e.stopImmediatePropagation();
-        this._enterEditMode();
-        return;
-      }
-      if (target.closest('.relation')) {
-        e.stopImmediatePropagation();
-        this._toggleRelation();
-        return;
-      }
-      // それ以外の summary クリックは選択トグル
-      this._toggleSelection(e);
+    // Prevent event leakage to outer containers.
+    this.rootEl.addEventListener('click', (e) => e.stopImmediatePropagation(), {
+      signal,
     });
+
+    // Single handler for edit/delete/relation/selection inside the summary area.
+    this._summaryEl.addEventListener(
+      'click',
+      (e) => {
+        const target = e.target as HTMLElement;
+        if (target.closest('button.delete')) {
+          e.stopImmediatePropagation();
+          this._builder.deleteCondition([this]);
+          return;
+        }
+        if (target.closest('button.edit')) {
+          e.stopImmediatePropagation();
+          this._enterEditMode();
+          return;
+        }
+        if (target.closest('.relation')) {
+          e.stopImmediatePropagation();
+          this._toggleRelation();
+          return;
+        }
+        // Fallback: toggle selection on summary click.
+        this._toggleSelection(e);
+      },
+      { signal }
+    );
   }
 
-  /** Toggles the logical relation between 'eq' and 'ne' */
+  /** Toggle relation state between 'eq' and 'ne', then notify if modal is not open. */
   private _toggleRelation(): void {
     const next: Relation = this.rootEl.dataset.relation === 'eq' ? 'ne' : 'eq';
     this.rootEl.dataset.relation = next;
@@ -196,22 +225,25 @@ export class ConditionItemView extends BaseConditionView {
     }
   }
 
-  /** Enters edit mode for the condition */
+  /** Enter edit mode, initialize editors, show modal state, and bind keyboard handler. */
   private _enterEditMode(): void {
     this.rootEl.classList.add('-editing');
-    this._conditionValues!.startToEditCondition();
+    this._conditionValues.startToEditCondition();
     storeManager.setData('showModal', true);
     this._toggleGlobalKeydown(true);
   }
 
-  // 編集モード中の Esc 管理を一元化
+  /** Attach or detach the global Escape key handler for edit mode. */
   private _toggleGlobalKeydown(enable: boolean): void {
     const fn = this._keydownEscapeEvent;
-    if (enable) window.addEventListener('keydown', fn);
-    else window.removeEventListener('keydown', fn);
+    if (enable) {
+      window.addEventListener('keydown', fn, { signal: this._events.signal });
+    } else {
+      window.removeEventListener('keydown', fn);
+    }
   }
 
-  /** Handles escape key press to exit edit mode */
+  /** Exit edit mode on Escape: delete if first time, otherwise restore and close. */
   private readonly _keydownEscapeEvent = (e: KeyboardEvent) => {
     if (e.key !== 'Escape' || !storeManager.getData('showModal')) return;
     if (keyDownEvent('showModal')) {
@@ -224,9 +256,9 @@ export class ConditionItemView extends BaseConditionView {
     }
   };
 
-  /** Reverts all changes made during editing */
+  /** Restore editor states and last relation when canceling edits. */
   private _revertChanges(): void {
-    for (const editor of this._conditionValues!.editors) editor.restore();
+    for (const editor of this._conditionValues.editors) editor.restore();
     this.rootEl.dataset.relation = this._keepLastRelation;
   }
 }
