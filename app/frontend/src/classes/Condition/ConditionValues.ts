@@ -192,7 +192,7 @@ class ConditionValues {
             this._conditionView.conditionType
           )
         ) {
-          this._conditionView._elm.dataset.relation =
+          this._conditionView.rootEl.dataset.relation =
             this._conditionView.keepLastRelation;
         }
       }
