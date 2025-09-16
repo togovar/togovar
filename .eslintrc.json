@@ -1,37 +1,51 @@
 {
-  "extends": ["eslint:recommended", "prettier"],
-  "env": {
-    "es6": true,
-    "browser": true,
-    "node": true
-  },
-  "rules": {
-    "no-console": [
-      "error",
-      {
-        "allow": ["log", "warn", "error"]
-      }
-    ],
-    "no-unused-vars": [
-      "error",
-      {
-        "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^TOGOVAR_"
-      }
-    ]
-  },
+  "root": true,
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended", // ← 追加
+    "prettier"
+  ],
+  "env": { "es2021": true, "browser": true, "node": true },
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+
   "parserOptions": {
     "ecmaVersion": 2021,
     "sourceType": "module"
   },
-  "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
 
-  // "parser": "@babel/eslint-parser",
-  // "parserOptions": {
-  //   "ecmaVersion": 2020,
-  //   "sourceType": "module"
-  // },
+  "rules": {
+    "no-console": ["error", { "allow": ["log", "warn", "error"] }]
+  },
+
+  "overrides": [
+    {
+      "files": ["**/*.ts", "**/*.tsx"],
+      "rules": {
+        "no-undef": "off",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          { "argsIgnorePattern": "^_", "varsIgnorePattern": "^TOGOVAR_" }
+        ],
+        "@typescript-eslint/no-use-before-define": [
+          "error",
+          { "functions": false, "classes": false, "variables": true }
+        ],
+        "@typescript-eslint/consistent-type-imports": "warn"
+      }
+    },
+    {
+      "files": ["**/*.js"],
+      "rules": {
+        "no-unused-vars": [
+          "error",
+          { "argsIgnorePattern": "^_", "varsIgnorePattern": "^TOGOVAR_" }
+        ]
+      }
+    }
+  ],
+
   "globals": {
     "TOGOVAR_FRONTEND_REFERENCE": "readonly",
     "TOGOVAR_FRONTEND_API_URL": "readonly",

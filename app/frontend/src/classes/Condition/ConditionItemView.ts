@@ -12,6 +12,7 @@ import type {
   Relation,
 } from '../../types';
 import { buildQueryFragment } from './queryBuilders';
+import { selectRequired } from '../../utils/dom/select';
 
 /** Condition types that do not support a logical relation (eq/ne). */
 const NO_RELATION_TYPES = new Set<ConditionTypeValue>([
@@ -21,22 +22,6 @@ const NO_RELATION_TYPES = new Set<ConditionTypeValue>([
   'id',
   'location',
 ]);
-
-/** Roots that can be queried via `querySelector` (includes ShadowRoot via DocumentFragment). */
-type QueryRoot = Document | DocumentFragment | Element;
-
-/**
- * Query helper: returns the element if found; otherwise throws.
- * Use for elements that must exist to ensure early failure on template regressions.
- */
-export function selectRequired<T extends Element>(
-  root: QueryRoot,
-  selector: string
-): T {
-  const el = root.querySelector(selector);
-  if (!el) throw new Error(`selector not found: ${selector}`);
-  return el as T;
-}
 
 /**
  * Represents a single condition item row with edit/delete behaviors.
