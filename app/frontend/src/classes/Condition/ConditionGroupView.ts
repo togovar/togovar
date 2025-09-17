@@ -4,36 +4,40 @@ import {
   type GroupView,
   viewByEl,
 } from './ConditionView';
-import { selectRequired } from '../../utils/dom/select';
 import { ConditionItemView } from './ConditionItemView';
 import type { AdvancedSearchBuilderView } from '../AdvancedSearchBuilderView';
 import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../../definition';
-import type { ConditionQuery } from '../../types';
-
-/** Logical operator used to combine child conditions. */
-type LogicalOperator = 'and' | 'or';
+import type { ConditionQuery, LogicalOperator } from '../../types';
+import { createEl } from '../../utils/dom/createEl';
 
 /** Selector constants to avoid repetition and typos. */
-const SELECTOR = {
-  operatorSwitch: ':scope > .logical-operator-switch',
-  container: ':scope > .container',
-  childView: ':scope > .advanced-search-condition-view',
-} as const;
+const CHILD_VIEW_SEL = ':scope > .advanced-search-condition-view' as const;
 
 /**
  * Manages a group of condition views (items or nested groups).
- * Handles logical operator toggling, selection, and child lifecycle.
+ * Handles logical-operator toggling, selection, and child lifecycle.
  */
 export class ConditionGroupView extends BaseConditionView implements GroupView {
   readonly conditionNodeKind = CONDITION_NODE_KIND.group;
 
-  private _isRoot: boolean;
-  private _logicalOperatorSwitch!: HTMLDivElement;
-  private _container!: HTMLDivElement; // implements GroupView.container
-  private _childViews: ConditionView[] = []; // implements GroupView.childViews
-  private _mutationObserver!: MutationObserver; // observes child list changes
-  private readonly _events = new AbortController(); // for bulk listener cleanup
+  private _isRoot: boolean; // root group cannot be selected or ungrouped
 
+  // DOM refs
+  private _logicalOperatorSwitch!: HTMLDivElement;
+  private _childContainerEl!: HTMLDivElement; // implements GroupView.container
+
+  private _mutationObserver!: MutationObserver; // Observes direct child-list
+
+  private readonly _events = new AbortController(); // For controller to clean up
+
+  /**
+   * @param builder         Owning AdvancedSearchBuilderView
+   * @param parentContainer Where this group's root element is inserted
+   * @param logicalOperator Initial logical operator (and/or)
+   * @param conditionViews  Optional initial children to move under this group
+   * @param referenceElm    Insert this group before this node (or append when null)
+   * @param isRoot          Whether this group is the top-level group
+   */
   constructor(
     builder: AdvancedSearchBuilderView,
     parentContainer: HTMLElement,
@@ -45,50 +49,35 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
     super(builder, parentContainer, referenceElm);
     this._isRoot = isRoot;
 
-    // Base element
     this.rootEl.classList.add('advanced-search-condition-group-view');
     if (isRoot) this.rootEl.classList.add('-root');
 
-    // Static template
-    this.rootEl.innerHTML = `
-      <div class="logical-operator-switch" role="button" aria-label="Toggle logical operator"></div>
-      <div class="container"></div>
-    `;
-
-    // Cache required elements
-    this._logicalOperatorSwitch = selectRequired<HTMLDivElement>(
-      this.rootEl,
-      SELECTOR.operatorSwitch
-    );
-    this._container = selectRequired<HTMLDivElement>(
-      this.rootEl,
-      SELECTOR.container
-    );
-
-    // Initialize children (DOM nodes are already owned by each child's rootEl)
-    for (const cv of conditionViews) {
-      this._container.append(cv.rootEl);
-      this._childViews.push(cv);
-    }
-
-    // Initialize operator and wire events
+    this._buildDOM(); // Create and cache DOM nodes
     this.logicalOperator = logicalOperator;
     this._attachEvents();
 
-    // Observe child list to keep count in sync and auto-ungroup when needed
+    // Move provided children under this group's container
+    for (const cv of conditionViews) {
+      this._childContainerEl.append(cv.rootEl);
+    }
+
+    // Observe changes to child list
     this._mutationObserver = this._createChildObserver();
     this._syncNumberOfChildren();
-    this.rootEl.dataset.numberOfChild = this._numberOfChildren.toString();
   }
 
-  /** Public API: create and append a toolbar element. */
+  // ───────────────────────────────────────────────────────────────────────────
+  // Public API
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /** Create and append a toolbar container inside this group. */
   makeToolbar(): HTMLElement {
-    const toolbar = document.createElement('nav');
+    const toolbar = createEl('nav', { class: 'advanced-search-toolbar-host' });
     this.rootEl.append(toolbar);
     return toolbar;
   }
 
-  /** Public API: add a new condition item as a child. */
+  /** Add a new condition item as a direct child of this group. */
   addNewConditionItem(
     conditionType: ConditionTypeValue,
     _options?: unknown,
@@ -100,113 +89,86 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
       conditionType,
       referenceElm
     );
-    this._childViews.push(item);
     this._syncNumberOfChildren();
     return item;
   }
 
-  /** Public API: wrap selected views into a new subgroup. */
+  /** Wrap given views into a new subgroup under this group. */
   addNewConditionGroup(
     selected: ConditionView[],
     ref?: HTMLElement | null
   ): GroupView {
     const group = new ConditionGroupView(
       this._builder,
-      this._container,
+      this._childContainerEl,
       'and',
       selected,
       ref ?? null,
       false
     );
-    this._childViews.push(group);
     this._syncNumberOfChildren();
     return group;
   }
 
-  /** Public API: remove this group but keep (move) its children to the parent group. */
+  /**
+   * Ungroup this group: move its children to the parent group, then remove self.
+   * No-op if no parent group.
+   */
   ungroup(): void {
     const nodes = Array.from(
-      this._container.querySelectorAll(SELECTOR.childView)
+      this._childContainerEl.querySelectorAll(CHILD_VIEW_SEL)
     );
-    const parent = this.parentGroup; // GroupView | null
+    const parent = this.parentGroup;
     if (parent) {
       parent.addConditionViews(nodes, this.rootEl);
     }
-    // Disconnect observer first, then remove self
-    this.remove();
+    this.remove(); // disconnects observer & listeners
   }
 
-  /** Public API: insert existing views before a reference element and rebuild the cache. */
+  /**
+   * Insert existing view nodes before a reference element and refresh state.
+   * Used by parent when "ungroup" moves descendants up one level.
+   */
   addConditionViews(conditionViews: Node[], referenceElm: Node | null): void {
     for (const n of conditionViews) {
-      this._container.insertBefore(n, referenceElm);
+      this._childContainerEl.insertBefore(n, referenceElm);
     }
-    // Rebuild childViews cache from DOM using the global view map
-    this._childViews = Array.from(
-      this._container.querySelectorAll(SELECTOR.childView)
-    )
-      .map((el) => viewByEl.get(el as HTMLElement)!)
-      .filter(Boolean);
-
     this._syncNumberOfChildren();
   }
 
-  /** Public API: remove one child view from both DOM and local cache. */
+  /** Public API: remove one child view from DOM and refresh state. */
   removeConditionView(view: ConditionView): void {
-    const idx = this._childViews.indexOf(view);
-    if (idx >= 0) this._childViews.splice(idx, 1);
-    view.rootEl.remove();
-    this.rootEl.dataset.numberOfChild = this._numberOfChildren.toString();
-    this._syncNumberOfChildren();
+    view.rootEl.remove(); // DOM を唯一のソースに
+    this._syncNumberOfChildren(); // data-number-of-child を同期
   }
 
-  /** Public API: dispose group and its resources. */
+  /** Dispose this group and its resources. */
   remove(): void {
     this._mutationObserver?.disconnect();
     this._events.abort();
-    super.remove(); // BaseConditionView.remove()
+    super.remove();
   }
 
-  // ========== Accessors ==========
+  // ───────────────────────────────────────────────────────────────────────────
+  // Accessors
+  // ───────────────────────────────────────────────────────────────────────────
 
-  /** Group-level query assembled from child queries. */
-  get queryFragment(): ConditionQuery {
-    const children = Array.from(
-      this._container.querySelectorAll(SELECTOR.childView)
-    ) as HTMLElement[];
-
-    switch (this._numberOfChildren) {
-      case 0:
-        return {} as ConditionQuery;
-      case 1: {
-        const v = viewByEl.get(children[0]);
-        if (!v) throw new Error('View not found for the first child');
-        return v.queryFragment as ConditionQuery;
-      }
-      default: {
-        const op = this.logicalOperator;
-        return {
-          [op]: children.map((el) => {
-            const v = viewByEl.get(el);
-            if (!v) throw new Error('View not found for a child');
-            return v.queryFragment;
-          }),
-        } as ConditionQuery;
-      }
-    }
-  }
-
-  /** Container element that holds child condition views. */
+  /** Direct container that holds child condition views (items or groups). */
   get container(): HTMLDivElement {
-    return this._container;
+    return this._childContainerEl;
   }
 
-  /** Cached child view instances (items or nested groups). */
+  /**
+   * Current children as live View instances.
+   * DOM is the single source of truth; we resolve views via viewByEl.
+   */
   get childViews(): ConditionView[] {
-    return this._childViews;
+    return Array.from(this._childContainerEl.querySelectorAll(CHILD_VIEW_SEL))
+      .map((el) => viewByEl.get(el as HTMLElement)!)
+      .filter(Boolean);
   }
 
-  /** Current logical operator based on the switch's dataset. */
+  /** Current logical operator, normalized to 'and' | 'or'. */
   get logicalOperator(): LogicalOperator {
     const op = (this._logicalOperatorSwitch.dataset.operator ??
       'and') as LogicalOperator;
@@ -214,62 +176,130 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
   }
   set logicalOperator(op: LogicalOperator) {
     this._logicalOperatorSwitch.dataset.operator = op;
+    // Reflect state for a11y: treat 'or' as checked=true.
+    this._logicalOperatorSwitch.setAttribute(
+      'aria-checked',
+      String(op === 'or')
+    );
   }
 
-  // ========== Internals ==========
+  /** Group-level query assembled from child queries. */
+  get queryFragment(): ConditionQuery {
+    const children = this.childViews;
+    switch (children.length) {
+      case 0:
+        return {} as ConditionQuery;
+      case 1:
+        return children[0].queryFragment as ConditionQuery;
+      default:
+        return {
+          [this.logicalOperator]: children.map((v) => v.queryFragment),
+        } as ConditionQuery;
+    }
+  }
 
-  /** Attach all event listeners (selection toggle, operator toggle). */
+  // ───────────────────────────────────────────────────────────────────────────
+  // Internals
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /** Create and cache the inner structure using createEl (no innerHTML). */
+  private _buildDOM(): void {
+    // Operator switch (use role="switch" for binary toggle; Space/Enter works nicely)
+    this._logicalOperatorSwitch = createEl('div', {
+      class: 'logical-operator-switch',
+      attrs: {
+        role: 'switch',
+        'aria-label': 'Toggle logical operator',
+        'aria-checked': 'false',
+        tabindex: '0',
+      },
+    });
+
+    // Children container
+    this._childContainerEl = createEl('div', { class: 'container' });
+
+    // Hydrate
+    this.rootEl.replaceChildren(
+      this._logicalOperatorSwitch,
+      this._childContainerEl
+    );
+  }
+
+  /** Wire up selection behavior and operator toggle (mouse + keyboard). */
   private _attachEvents(): void {
     const { signal } = this._events;
 
-    // Root click toggles selection (except for the root-most group)
+    // Background click toggles selection for non-root groups.
     if (!this._isRoot) {
       this.rootEl.addEventListener('click', this._toggleSelection.bind(this), {
         signal,
       });
     }
 
-    // Toggle logical operator without bubbling to parents
+    // Toggle logical operator (mouse)
     this._logicalOperatorSwitch.addEventListener(
       'click',
       (e) => {
-        e.stopImmediatePropagation();
+        e.stopPropagation();
         this.logicalOperator = this.logicalOperator === 'and' ? 'or' : 'and';
         this._notifyChanged();
       },
       { signal }
     );
+
+    // Toggle logical operator (keyboard: Enter/Space)
+    this._logicalOperatorSwitch.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          e.stopPropagation();
+          this.logicalOperator = this.logicalOperator === 'and' ? 'or' : 'and';
+          this._notifyChanged();
+        }
+      },
+      { signal }
+    );
   }
 
-  /** Notify the builder that this group’s condition settings changed. */
+  /** Notify the builder that this group's condition settings changed. */
   private _notifyChanged(): void {
     this._builder.changeCondition();
   }
 
-  /** Create a MutationObserver that tracks child list changes. */
+  /**
+   * Track child-list changes to keep count in sync and auto-ungroup small groups.
+   * We disconnect before ungroup to avoid re-entrancy loops.
+   */
   private _createChildObserver(): MutationObserver {
-    const config: MutationObserverInit = {
-      attributes: false,
-      childList: true,
-      subtree: false,
-    };
     const observer = new MutationObserver(() => {
       this._syncNumberOfChildren();
-      // Auto-ungroup when a non-root group ends up with <=1 child
-      if (!this._isRoot && this._numberOfChildren <= 1) this.ungroup();
+      if (!this._isRoot && this._numberOfChildren <= 1) {
+        observer.disconnect();
+        this.ungroup();
+        // If this group still exists (rare), resume observing:
+        if (this.rootEl.isConnected) {
+          observer.observe(this._childContainerEl, {
+            childList: true,
+            subtree: false,
+          });
+        }
+      }
     });
-    observer.observe(this._container, config);
+    observer.observe(this._childContainerEl, {
+      childList: true,
+      subtree: false,
+    });
     return observer;
   }
 
-  /** Update data-number-of-child to match the current DOM. */
+  /** Write data-number-of-child to match the current DOM count. */
   private _syncNumberOfChildren(): void {
-    const count = this._container.querySelectorAll(SELECTOR.childView).length;
-    this.rootEl.dataset.numberOfChild = String(count);
+    this.rootEl.dataset.numberOfChild = String(this._numberOfChildren);
   }
 
-  /** Count children directly from DOM (source of truth). */
+  /** Count children directly from DOM (single source of truth). */
   private get _numberOfChildren(): number {
-    return this._container.querySelectorAll(SELECTOR.childView).length;
+    return this._childContainerEl.querySelectorAll(CHILD_VIEW_SEL).length;
   }
 }

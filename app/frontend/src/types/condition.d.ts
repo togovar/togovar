@@ -113,3 +113,6 @@ type CommandDef = Readonly<{
   // TODO: Key codes (display only). Currently informational; no keybindings here.
   shortcut: number[];
 }>;
+
+/** Logical operator used to combine child conditions. */
+type LogicalOperator = 'and' | 'or';
