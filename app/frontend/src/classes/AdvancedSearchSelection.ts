@@ -1,87 +1,56 @@
+import { selectRequired } from '../utils/dom/select';
 import type { AdvancedSearchBuilderView } from './AdvancedSearchBuilderView';
-import type { ConditionView } from './Condition/ConditionView';
+import { type ConditionView, viewByEl } from './Condition/ConditionView';
 
-/**
- * Root container selector for the selection scope.
- * Targets elements under:
- * `.inner > .advanced-search-condition-group-view.-root > .container`
- */
-const ROOT_SELECTOR =
-  '#AdvancedSearchBuilderView > .inner > .advanced-search-condition-group-view.-root > .container';
-
-/**
- * Common selector for *selected* elements (both group and item).
- * Selection is represented by `aria-selected="true"` and a CSS class.
- */
-const SELECTED_SELECTOR =
-  '.advanced-search-condition-group-view[aria-selected="true"], ' +
-  '.advanced-search-condition-item-view[aria-selected="true"]';
-
-/** CSS class name applied to selected elements. */
-const SELECTED_CLASS = '-selected';
+/** CSS selector for “selected” views (group or item share this base class). */
+const SELECTED_SEL =
+  '.advanced-search-condition-view[aria-selected="true"]' as const;
 
 /** ARIA attribute used to indicate selection state. */
 const ARIA_SELECTED = 'aria-selected';
 
-/**
- * HTMLElement extended with a `delegate` reference to its corresponding ConditionView.
- */
-type ConditionViewEl = HTMLElement & { delegate: ConditionView };
-// export type ConditionViewEl = HTMLElement & { conditionView: ConditionView };
+const ROOT_CONTAINER_SEL =
+  ':scope > .advanced-search-condition-group-view.-root > .container' as const;
 
 /**
- * Manages multi-selection for Advanced Search without relying on external selection libraries.
+ * Manages multi-selection for Advanced Search.
  *
- * The DOM itself is the single source of truth for selection state:
- * - Selected elements must expose a `delegate: ConditionView`.
- * - Selection is expressed via `aria-selected="true"` and the `-selected` class.
+ * Source of truth is the DOM:
+ * - Selected elements are marked with `aria-selected="true"`.
+ * - We resolve DOM → View via the global `viewByEl` map (no custom HTMLElement fields).
  *
- * @remarks
- * - Ordering: results are returned in **dom-sibling order**.
- * - Responsibility: This class only manages selection state & notifications; visuals are controlled by CSS.
+ * Results are returned in **document order**.
+ * This class only manages state & notifications; visuals are handled by CSS.
  */
 export class AdvancedSearchSelection {
-  /** View that receives selection updates. */
-  private readonly builder: AdvancedSearchBuilderView;
+  private readonly _builder: AdvancedSearchBuilderView; // Owning view that reacts to selection changes.
+  private readonly _rootContainer: HTMLElement;
 
-  /**
-   * Creates a new selection manager.
-   * @param builder - Target view that reacts to selection changes.
-   */
   constructor(builder: AdvancedSearchBuilderView) {
-    this.builder = builder;
+    this._builder = builder;
+    this._rootContainer = selectRequired(
+      this._builder.container,
+      ROOT_CONTAINER_SEL
+    );
   }
 
-  /**
-   * Returns the currently selected ConditionViews in **document order**.
-   *
-   * @returns Array of selected ConditionViews ordered by their position in the DOM.
-   *
-   * @example
-   * const selected = selection.getSelectedConditionViews();
-   * selected.forEach(v => v.highlight());
-   */
+  /** Return selected ConditionView instances in document order. */
   getSelectedConditionViews(): ConditionView[] {
-    const els = this._getSelectedConditionElements();
-
-    // Robust document-order sort.
+    const els = Array.from(this._selectedNodeList());
     els.sort((a, b) => {
-      if (a === b) return 0;
-      return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING
-        ? -1
-        : 1;
+      const pos = a.compareDocumentPosition(b);
+      if (pos & Node.DOCUMENT_POSITION_PRECEDING) return 1;
+      if (pos & Node.DOCUMENT_POSITION_FOLLOWING) return -1;
+      return 0;
     });
-
-    return els.map((el) => el.delegate);
-    // return els.map((el) => el.conditionView);
+    return els
+      .map((el) => viewByEl.get(el))
+      .filter((v): v is ConditionView => !!v);
   }
 
   /**
-   * Selects the given view. Optionally clears the previous selection first.
-   * Non-sibling selections will be deselected to preserve existing behavior.
-   *
-   * @param view - ConditionView to select.
-   * @param deselectSelecting - If true, clears all current selections before selecting. Default: `true`.
+   * Select a view. Optionally clear previous selection.
+   * To preserve legacy behavior, we only keep selections under the **same parent container**.
    */
   selectConditionView(
     view: ConditionView,
@@ -89,74 +58,56 @@ export class AdvancedSearchSelection {
   ): void {
     if (deselectSelecting) this.deselectAllConditions();
 
-    // Keep only sibling selections.
+    // Keep only sibling selections (same parent element).
+    const parentEl = view.rootEl.parentElement;
     const existing = this.getSelectedConditionViews();
-    const siblings = view.childEls;
-    existing.forEach((v) => {
-      if (!siblings.includes(v.rootEl)) this.deselectConditionView(v);
-    });
+    for (const v of existing) {
+      if (v.rootEl.parentElement !== parentEl) this._unmarkSelected(v);
+    }
 
-    // Update DOM state to "selected".
+    this._markSelected(view);
+    this._notifyBuilder();
+  }
+
+  /** Deselect a single view. */
+  deselectConditionView(view: ConditionView): void {
+    this._unmarkSelected(view);
+    this._notifyBuilder();
+  }
+
+  /** Deselect all selected views within the boundary. */
+  deselectAllConditions(): void {
+    const nodes = this._selectedNodeList();
+    nodes.forEach((el) => {
+      const view = viewByEl.get(el as HTMLElement);
+      if (view) this._unmarkSelected(view);
+    });
+    this._notifyBuilder();
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // Internals
+  // ─────────────────────────────────────────────────────────
+
+  /** Query selected elements under the boundary. */
+  private _selectedNodeList(): NodeListOf<HTMLElement> {
+    return this._rootContainer.querySelectorAll(SELECTED_SEL);
+  }
+
+  /** Apply selected state to DOM + delegate. */
+  private _markSelected(view: ConditionView): void {
     view.select();
     view.rootEl.setAttribute(ARIA_SELECTED, 'true');
-    view.rootEl.classList.add(SELECTED_CLASS);
-
-    this._notifyBuilder();
   }
 
-  /**
-   * Deselects the given view.
-   * @param view - ConditionView to deselect.
-   */
-  deselectConditionView(view: ConditionView): void {
+  /** Remove selected state from DOM + delegate. */
+  private _unmarkSelected(view: ConditionView): void {
     view.deselect();
     view.rootEl.removeAttribute(ARIA_SELECTED);
-    view.rootEl.classList.remove(SELECTED_CLASS);
-
-    this._notifyBuilder();
   }
 
-  /**
-   * Clears the selection for all currently selected elements.
-   */
-  deselectAllConditions(): void {
-    this._getSelectedConditionElements().forEach((el) => {
-      el.delegate.deselect();
-      el.removeAttribute(ARIA_SELECTED);
-      el.classList.remove(SELECTED_CLASS);
-    });
-    this._notifyBuilder();
-  }
-
-  /**
-   * Retrieves selected **HTMLElement** nodes within the boundary that expose a `delegate`.
-   * @returns Array of selected elements bearing a `delegate: ConditionView`.
-   */
-  private _getSelectedConditionElements(): ConditionViewEl[] {
-    const rootEl = document.querySelector(ROOT_SELECTOR);
-    if (!rootEl) return [];
-    const nodeList = rootEl.querySelectorAll(SELECTED_SELECTOR);
-    const selectedEls: ConditionViewEl[] = [];
-    nodeList.forEach((el) => {
-      if (isConditionViewEl(el)) selectedEls.push(el);
-    });
-    return selectedEls;
-  }
-
-  /**
-   * Notifies the builder with the latest selection state.
-   */
+  /** Notify the builder that the selection has changed. */
   private _notifyBuilder(): void {
-    this.builder.onSelectionChange(this.getSelectedConditionViews());
+    this._builder.onSelectionChange(this.getSelectedConditionViews());
   }
-}
-
-/**
- * Type guard to ensure an Element has a `delegate` pointing to a ConditionView.
- * @param el - Element to test.
- * @returns True if the element is a ConditionViewEl.
- */
-function isConditionViewEl(el: Element): el is ConditionViewEl {
-  return !!(el as any)?.delegate;
-  // return !!(el as any)?.conditionView;
 }

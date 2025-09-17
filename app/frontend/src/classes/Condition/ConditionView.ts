@@ -75,9 +75,6 @@ export abstract class BaseConditionView implements ConditionView {
 
     // Register: host element -> view instance
     viewByEl.set(this._rootEl, this);
-
-    // ★ 互換レイヤー（旧 AdvancedSearchSelection が el.delegate を参照するため）
-    (this._rootEl as any).delegate = this;
   }
 
   /** Exposes the host/root DOM element of this view. */
@@ -104,14 +101,10 @@ export abstract class BaseConditionView implements ConditionView {
 
   /** Marks this view as selected (CSS-driven) */
   select(): void {
-    this._rootEl.classList.add('-selected');
-    // TODO: いずれ削除?
     this._rootEl.setAttribute('aria-selected', 'true');
   }
   /** Clears the selected state */
   deselect(): void {
-    this._rootEl.classList.remove('-selected');
-    // TODO: いずれ削除?
     this._rootEl.removeAttribute('aria-selected');
   }
 
@@ -140,11 +133,11 @@ export abstract class BaseConditionView implements ConditionView {
    * @param e - The triggering event (click, etc.)
    */
   protected _toggleSelection(e: Event): void {
-    e.stopImmediatePropagation();
+    e.stopPropagation();
     if (this._rootEl.classList.contains('-editing')) return;
 
-    const selected = this._rootEl.classList.contains('-selected');
-    if (selected) {
+    const isSelected = this._rootEl.getAttribute('aria-selected') === 'true';
+    if (isSelected) {
       this._builder.selection.deselectConditionView(this);
     } else {
       this._builder.selection.selectConditionView(this, false);
