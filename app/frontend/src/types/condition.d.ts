@@ -94,13 +94,13 @@ export type ConditionQuery =
 /** Context object passed to query builders */
 export type BuildContext = {
   type: ConditionTypeValue;
-  relation: Relation;
+  relation?: Relation;
   values: ConditionItemValueViewElement[];
   valuesContainer?: HTMLElement | null; //  Used by significance
 };
 
 // Logical relation annotation stored in dataset.relation on the host node
-export type Relation = 'eq' | 'ne' | '';
+export type Relation = 'eq' | 'ne';
 
 export type Builder = (_ctx: BuildContext) => ConditionQuery;
 

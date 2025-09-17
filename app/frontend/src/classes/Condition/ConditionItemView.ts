@@ -104,7 +104,7 @@ export class ConditionItemView extends BaseConditionView {
    * Note: relation may be '' (empty) when the type does not support relation.
    */
   get queryFragment(): ConditionQuery {
-    const relation = (this.rootEl.dataset.relation ?? '') as Relation;
+    const relation = this._readRelation();
     const values = Array.from(
       this._valuesEl.querySelectorAll(':scope > condition-item-value-view')
     ) as ConditionItemValueViewElement[];
@@ -113,7 +113,7 @@ export class ConditionItemView extends BaseConditionView {
       type: this._conditionType,
       relation,
       values,
-      valuesContainer: this._valuesEl, // needed by significance builder
+      valuesContainer: this._valuesEl,
     });
   }
 
@@ -126,11 +126,15 @@ export class ConditionItemView extends BaseConditionView {
   private _initializeHTML(): void {
     this.rootEl.classList.add('advanced-search-condition-item-view');
     this.rootEl.dataset.classification = this._conditionType;
-    this.rootEl.dataset.relation = this._relationSupported ? 'eq' : '';
+
+    if (this._relationSupported) {
+      this.rootEl.dataset.relation = 'eq';
+    } else {
+      delete this.rootEl.dataset.relation;
+    }
 
     const { body, bg } = this._generateDOM();
     this.rootEl.replaceChildren(body, bg);
-
     this._syncRelationUI();
   }
 
@@ -140,18 +144,7 @@ export class ConditionItemView extends BaseConditionView {
    * - When supported: enable control and reflect the current pressed state
    */
   private _syncRelationUI(): void {
-    if (this._relationSupported) {
-      this._relationEl.removeAttribute('aria-disabled');
-      this._relationEl.classList.remove('-disabled');
-      this._relationEl.setAttribute('tabindex', '0');
-      const pressed = this.rootEl.dataset.relation === 'ne';
-      this._relationEl.setAttribute('aria-pressed', String(pressed));
-    } else {
-      this._relationEl.setAttribute('aria-disabled', 'true');
-      this._relationEl.classList.add('-disabled');
-      this._relationEl.setAttribute('tabindex', '-1');
-      this._relationEl.removeAttribute('aria-pressed');
-    }
+    this._setRelation(this._readRelation());
   }
 
   /**
@@ -162,18 +155,23 @@ export class ConditionItemView extends BaseConditionView {
     const meta = ADVANCED_CONDITIONS[this._conditionType];
     const label = meta?.label ?? this._conditionType;
 
-    this._summaryEl = createEl('div', {
-      class: 'summary',
-      children: [
-        createEl('div', { class: 'classification', text: label }),
-        (this._relationEl = createEl('div', {
+    const relationChild = this._relationSupported
+      ? (this._relationEl = createEl('div', {
           class: 'relation',
           attrs: {
             role: 'button',
             'aria-label': 'Toggle relation',
-            'aria-pressed': 'false',
+            tabindex: '0',
           },
-        })),
+        }))
+      : null;
+
+    this._summaryEl = createEl('div', {
+      class: 'summary',
+      children: [
+        // TODO: In the future, implement drag-and-drop to change the order of classifications.
+        createEl('div', { class: 'classification', text: label }),
+        ...(relationChild ? [relationChild] : []),
         (this._valuesEl = createEl('div', { class: 'values' })),
         createEl('div', {
           class: 'buttons',
@@ -219,7 +217,7 @@ export class ConditionItemView extends BaseConditionView {
     const { signal } = this._events;
 
     // Prevent clicks from bubbling outside of this condition item.
-    this.rootEl.addEventListener('click', (e) => e.stopImmediatePropagation(), {
+    this.rootEl.addEventListener('click', (e) => e.stopPropagation(), {
       signal,
     });
 
@@ -244,27 +242,28 @@ export class ConditionItemView extends BaseConditionView {
     );
 
     // Relation (mouse)
-    this._relationEl.addEventListener(
-      'click',
-      (e) => {
-        e.stopImmediatePropagation();
-        this._toggleRelation();
-      },
-      { signal }
-    );
-
-    // Relation (keyboard)
-    this._relationEl.addEventListener(
-      'keydown',
-      (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          e.stopPropagation();
+    if (this._relationSupported && this._relationEl) {
+      this._relationEl.addEventListener(
+        'click',
+        (e) => {
+          e.stopImmediatePropagation();
           this._toggleRelation();
-        }
-      },
-      { signal }
-    );
+        },
+        { signal }
+      );
+
+      this._relationEl.addEventListener(
+        'keydown',
+        (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            this._toggleRelation();
+          }
+        },
+        { signal }
+      );
+    }
 
     // Background click inside summary toggles selection (excluding controls).
     this._summaryEl.addEventListener(
@@ -284,11 +283,9 @@ export class ConditionItemView extends BaseConditionView {
    */
   private _toggleRelation(): void {
     if (!this._relationSupported) return;
-
-    const next: Relation = this.rootEl.dataset.relation === 'eq' ? 'ne' : 'eq';
-    this.rootEl.dataset.relation = next;
-    this._relationEl.setAttribute('aria-pressed', String(next === 'ne'));
-
+    const cur = this._readRelation() ?? 'eq';
+    const next: Relation = cur === 'eq' ? 'ne' : 'eq';
+    this._setRelation(next);
     if (!storeManager.getData('showModal')) {
       this._keepLastRelation = next;
       this._builder.changeCondition();
@@ -336,6 +333,26 @@ export class ConditionItemView extends BaseConditionView {
   /** Restore editor UI and last confirmed relation when canceling edits. */
   private _revertChanges(): void {
     for (const editor of this._conditionValues.editors) editor.restore();
-    this.rootEl.dataset.relation = this._keepLastRelation;
+    this._setRelation(
+      this._relationSupported ? this._keepLastRelation : undefined
+    );
+  }
+
+  private _readRelation(): Relation | undefined {
+    if (!this._relationSupported) return undefined;
+    const r = this.rootEl.dataset.relation;
+    return r === 'eq' || r === 'ne' ? r : undefined;
+  }
+
+  private _setRelation(next: Relation | undefined): void {
+    if (!this._relationSupported) {
+      delete this.rootEl.dataset.relation;
+      return;
+    }
+    if (!next) next = 'eq';
+    this.rootEl.dataset.relation = next;
+    if (this._relationEl) {
+      this._relationEl.setAttribute('aria-pressed', String(next === 'ne'));
+    }
   }
 }
