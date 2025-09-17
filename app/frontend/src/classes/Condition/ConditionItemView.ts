@@ -1,9 +1,11 @@
 import { BaseConditionView } from './ConditionView';
 import ConditionValues from './ConditionValues';
 import { storeManager } from '../../store/StoreManager';
-import { ADVANCED_CONDITIONS } from '../../global';
+import { ADVANCED_CONDITIONS, supportsRelation } from '../../conditions';
 import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../../definition';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
+import { buildQueryFragment } from './queryBuilders';
+import { createEl } from '../../utils/dom/createEl';
 import type { AdvancedSearchBuilderView } from '../AdvancedSearchBuilderView';
 import type { ConditionGroupView } from './ConditionGroupView';
 import type {
@@ -11,17 +13,6 @@ import type {
   ConditionQuery,
   Relation,
 } from '../../types';
-import { buildQueryFragment } from './queryBuilders';
-import { selectRequired } from '../../utils/dom/select';
-
-/** Condition types that do not support a logical relation (eq/ne). */
-const NO_RELATION_TYPES = new Set<ConditionTypeValue>([
-  'dataset',
-  'genotype',
-  'pathogenicity_prediction',
-  'id',
-  'location',
-]);
 
 /**
  * Represents a single condition item row with edit/delete behaviors.
@@ -31,23 +22,20 @@ export class ConditionItemView extends BaseConditionView {
   readonly conditionNodeKind = CONDITION_NODE_KIND.condition;
 
   private readonly _conditionType: ConditionTypeValue;
+  private readonly _relationSupported: boolean;
   private _isFirstTime = true;
   private _keepLastRelation: Relation = 'eq';
 
+  private _summaryEl!: HTMLDivElement;
+  private _relationEl!: HTMLDivElement;
   private _valuesEl!: HTMLDivElement;
+  private _btnEdit!: HTMLButtonElement;
+  private _btnDelete!: HTMLButtonElement;
   private _editorEl!: HTMLDivElement;
   private _conditionValues!: ConditionValues;
 
   /** Controller to abort all event listeners added by this instance at once. */
   private readonly _events = new AbortController();
-
-  /** Cached getters for critical nodes (throws if not found for early detection). */
-  private get _summaryEl(): HTMLDivElement {
-    return selectRequired<HTMLDivElement>(
-      this.rootEl,
-      ':scope > .body > .summary'
-    );
-  }
 
   constructor(
     builder: AdvancedSearchBuilderView,
@@ -61,9 +49,10 @@ export class ConditionItemView extends BaseConditionView {
       referenceElm ?? document.createTextNode('')
     );
     this._conditionType = conditionType;
+    this._relationSupported = supportsRelation(conditionType);
 
     this._initializeHTML();
-    this._setupDOMReferences();
+    this._conditionValues = new ConditionValues(this);
     this._attachEventDelegation();
     this._enterEditMode(); // Enter edit mode on first render.
   }
@@ -82,6 +71,8 @@ export class ConditionItemView extends BaseConditionView {
     this._toggleGlobalKeydown(false);
     this._events.abort(); // Detach all listeners registered with this controller.
     storeManager.setData('showModal', false);
+
+    // this._conditionValues?.destroy?.(); // If ConditionValues has a destroy method
     super.remove();
   }
 
@@ -120,80 +111,137 @@ export class ConditionItemView extends BaseConditionView {
   private _initializeHTML(): void {
     this.rootEl.classList.add('advanced-search-condition-item-view');
     this.rootEl.dataset.classification = this._conditionType;
-    this.rootEl.dataset.relation = NO_RELATION_TYPES.has(this._conditionType)
-      ? ''
-      : 'eq';
-    this.rootEl.innerHTML = this._generateHTML();
+
+    // Determine if this condition type supports a relation; set initial to 'eq'.
+    this.rootEl.dataset.relation = this._relationSupported ? 'eq' : '';
+
+    const { body, bg } = this._generateDOM();
+    this.rootEl.replaceChildren(body, bg);
+
+    this._syncRelationUI();
+  }
+
+  private _syncRelationUI(): void {
+    if (this._relationSupported) {
+      this._relationEl.removeAttribute('aria-disabled');
+      this._relationEl.classList.remove('-disabled');
+      this._relationEl.setAttribute('tabindex', '0');
+      const pressed = this.rootEl.dataset.relation === 'ne';
+      this._relationEl.setAttribute('aria-pressed', String(pressed));
+    } else {
+      this._relationEl.setAttribute('aria-disabled', 'true');
+      this._relationEl.classList.add('-disabled');
+      this._relationEl.setAttribute('tabindex', '-1');
+      this._relationEl.removeAttribute('aria-pressed');
+    }
   }
 
   /** Template markup for this condition item. Prefer `createElement` if you need stronger refs. */
-  private _generateHTML(): string {
-    const conditionType = this
-      ._conditionType as keyof typeof ADVANCED_CONDITIONS;
-    const label =
-      ADVANCED_CONDITIONS[conditionType]?.label ?? this._conditionType;
+  private _generateDOM(): { body: HTMLDivElement; bg: HTMLDivElement } {
+    const meta = ADVANCED_CONDITIONS[this._conditionType];
+    const label = meta?.label ?? this._conditionType;
 
-    return `
-    <div class="body">
-      <div class="summary">
-        <div class="classification">${label}</div>
-        <div class="relation" role="button" aria-label="Toggle relation"></div>
-        <div class="values"></div>
-        <div class="buttons">
-          <button class="edit" type="button" title="Edit" aria-label="Edit"></button>
-          <button class="delete" type="button" title="Delete" aria-label="Delete"></button>
-        </div>
-      </div>
-      <div class="advanced-search-condition-editor-view"></div>
-    </div>
-    <div class="bg"></div>`;
-  }
+    this._summaryEl = createEl('div', {
+      class: 'summary',
+      children: [
+        createEl('div', { class: 'classification', text: label }),
+        (this._relationEl = createEl('div', {
+          class: 'relation',
+          attrs: {
+            role: 'button',
+            'aria-label': 'Toggle relation',
+            'aria-pressed': 'false',
+          },
+        })),
+        (this._valuesEl = createEl('div', { class: 'values' })),
+        createEl('div', {
+          class: 'buttons',
+          children: [
+            (this._btnEdit = createEl('button', {
+              class: 'edit',
+              attrs: { type: 'button', title: 'Edit', 'aria-label': 'Edit' },
+            })),
+            (this._btnDelete = createEl('button', {
+              class: 'delete',
+              attrs: {
+                type: 'button',
+                title: 'Delete',
+                'aria-label': 'Delete',
+              },
+            })),
+          ],
+        }),
+      ],
+    });
 
-  /** Cache essential DOM references and initialize the value editors. */
-  private _setupDOMReferences(): void {
-    const body = selectRequired<HTMLDivElement>(this.rootEl, ':scope > .body');
-    const summary = selectRequired<HTMLDivElement>(body, ':scope > .summary');
-    this._valuesEl = selectRequired<HTMLDivElement>(
-      summary,
-      ':scope > .values'
-    );
-    this._editorEl = selectRequired<HTMLDivElement>(
-      body,
-      ':scope > .advanced-search-condition-editor-view'
-    );
-    this._conditionValues = new ConditionValues(this);
+    const body = createEl('div', {
+      class: 'body',
+      children: [
+        this._summaryEl,
+        (this._editorEl = createEl('div', {
+          class: 'advanced-search-condition-editor-view',
+        })),
+      ],
+    });
+    const bg = createEl('div', { class: 'bg' });
+
+    return { body: body, bg: bg };
   }
 
   /** Centralized click delegation within the item; stops propagation to parent containers. */
   private _attachEventDelegation(): void {
     const { signal } = this._events;
 
-    // Prevent event leakage to outer containers.
     this.rootEl.addEventListener('click', (e) => e.stopImmediatePropagation(), {
       signal,
     });
 
-    // Single handler for edit/delete/relation/selection inside the summary area.
+    // ボタンは直接バインドでもOK（すでに参照を保持しているため）
+    this._btnDelete.addEventListener(
+      'click',
+      (e) => {
+        e.stopImmediatePropagation();
+        this._builder.deleteCondition([this]);
+      },
+      { signal }
+    );
+
+    this._btnEdit.addEventListener(
+      'click',
+      (e) => {
+        e.stopImmediatePropagation();
+        this._enterEditMode();
+      },
+      { signal }
+    );
+
+    this._relationEl.addEventListener(
+      'click',
+      (e) => {
+        e.stopImmediatePropagation();
+        this._toggleRelation();
+      },
+      { signal }
+    );
+
+    this._relationEl.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          e.stopPropagation();
+          this._toggleRelation();
+        }
+      },
+      { signal }
+    );
+
+    // 空白部クリックで選択トグルを維持したいなら summary へも直接バインド
     this._summaryEl.addEventListener(
       'click',
       (e) => {
-        const target = e.target as HTMLElement;
-        if (target.closest('button.delete')) {
-          e.stopImmediatePropagation();
-          this._builder.deleteCondition([this]);
-          return;
-        }
-        if (target.closest('button.edit')) {
-          e.stopImmediatePropagation();
-          this._enterEditMode();
-          return;
-        }
-        if (target.closest('.relation')) {
-          e.stopImmediatePropagation();
-          this._toggleRelation();
-          return;
-        }
-        // Fallback: toggle selection on summary click.
+        const t = e.target as Element;
+        if (t.closest('button, .relation')) return; // 既に個別ハンドラが処理
         this._toggleSelection(e);
       },
       { signal }
@@ -202,8 +250,12 @@ export class ConditionItemView extends BaseConditionView {
 
   /** Toggle relation state between 'eq' and 'ne', then notify if modal is not open. */
   private _toggleRelation(): void {
+    if (!this._relationSupported) return;
+
     const next: Relation = this.rootEl.dataset.relation === 'eq' ? 'ne' : 'eq';
     this.rootEl.dataset.relation = next;
+    this._relationEl.setAttribute('aria-pressed', String(next === 'ne'));
+
     if (!storeManager.getData('showModal')) {
       this._keepLastRelation = next;
       this._builder.changeCondition();
