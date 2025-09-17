@@ -21,6 +21,15 @@ export const CONDITION_TYPE = {
 type ConditionTypeKey = keyof typeof CONDITION_TYPE;
 export type ConditionTypeValue = (typeof CONDITION_TYPE)[ConditionTypeKey];
 
+export type Option = Readonly<{ value: string; label: string }>;
+export type ConditionMeta = Readonly<{
+  label: string;
+  supportsRelation?: boolean;
+}>;
+export type ConditionOptionsMap = Readonly<
+  Partial<Record<ConditionTypeValue, ReadonlyArray<Option>>>
+>;
+
 export const CONDITION_NODE_KIND = {
   condition: 0,
   group: 1,

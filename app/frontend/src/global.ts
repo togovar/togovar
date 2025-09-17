@@ -1,6 +1,6 @@
 import grch37Json from '../assets/GRCh37/advanced_search_conditions.json';
 import grch38Json from '../assets/GRCh38/advanced_search_conditions.json';
-import { GRChConditions } from './types/advancedSearchConditions';
+import type { GRChConditions } from './types/advancedSearchConditions';
 
 export const PAGE = document.getElementsByTagName('html')[0].dataset.page;
 export const TR_HEIGHT = 27;

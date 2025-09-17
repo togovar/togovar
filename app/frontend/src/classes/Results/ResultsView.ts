@@ -4,7 +4,7 @@ import { ResultsScrollBar } from './ResultsScrollBar';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
 import { ResultsViewDataManager } from './ResultsViewDataManager';
-import { SearchMessages, SearchStatus, ColumnConfig } from '../../types';
+import type { SearchMessages, SearchStatus, ColumnConfig } from '../../types';
 import { isTouchDevice } from '../../utils/deviceDetection';
 
 // Define DOM selector constants outside the class

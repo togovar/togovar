@@ -1,7 +1,7 @@
 import { COLUMNS } from '../../global';
 import { storeManager } from '../../store/StoreManager';
 import '../../components/LogarithmizedBlockGraphFrequencyView';
-import {
+import type {
   ResultData,
   Column,
   TdFrequencies,

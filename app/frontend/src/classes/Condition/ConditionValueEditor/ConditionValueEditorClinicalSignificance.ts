@@ -1,6 +1,6 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
 import { ADVANCED_CONDITIONS } from '../../../global';
-import ConditionValues from '../ConditionValues.js';
+import type ConditionValues from '../ConditionValues.js';
 import type { ConditionItemView } from '../ConditionItemView';
 
 type DatasetSource = 'clinvar' | 'mgend';

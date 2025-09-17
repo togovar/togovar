@@ -1,4 +1,3 @@
-// src/utils/dom/select.ts
 export type QueryRoot = Document | DocumentFragment | Element; // ShadowRoot included
 
 /** Returns required element; throws if not found (fail fast on template regressions). */
