@@ -28,7 +28,6 @@ export interface GroupView extends ConditionView {
   addConditionViews(_conditionViews: Node[], _referenceElm: Node | null): void;
   addNewConditionItem(
     _conditionType: ConditionTypeValue,
-    _options: any,
     _referenceElm?: Node | null
   ): ConditionView;
   ungroup(): void;

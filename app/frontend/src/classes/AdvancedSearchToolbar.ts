@@ -142,7 +142,7 @@ export class AdvancedSearchToolbar {
     const condition = cmdEl.dataset.condition as ConditionTypeValue | undefined;
     if (!command) return;
 
-    this._handleCommand(command, condition, e);
+    this._handleCommand(command, condition);
   };
 
   /** Keyboard activation for accessibility: Enter/Space triggers the same action. */
@@ -165,7 +165,7 @@ export class AdvancedSearchToolbar {
         | undefined;
       if (!command) return;
 
-      this._handleCommand(command, condition, e);
+      this._handleCommand(command, condition);
     }
   };
 
@@ -195,13 +195,12 @@ export class AdvancedSearchToolbar {
    */
   private _handleCommand(
     command: Command,
-    condition: ConditionTypeValue | undefined,
-    event: Event
+    ConditionTypeValue: ConditionTypeValue | undefined
   ): void {
     switch (command) {
       case 'add-condition':
-        if (!condition) return;
-        this._builder.addCondition(condition, (event as CustomEvent).detail);
+        if (!ConditionTypeValue) return;
+        this._builder.addCondition(ConditionTypeValue);
         break;
       case 'group':
         this._builder.group();

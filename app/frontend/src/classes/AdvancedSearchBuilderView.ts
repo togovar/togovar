@@ -218,7 +218,7 @@ export class AdvancedSearchBuilderView {
    * If a single condition is selected, we could insert "after" it; currently we
    * append to its parent group (kept as-is to avoid interface drift).
    */
-  addCondition(conditionType: ConditionTypeValue, options: unknown): void {
+  addCondition(conditionType: ConditionTypeValue): void {
     const selected = this._selection.getSelectedConditionViews();
     const target = selected.length > 0 ? selected[0] : this._rootGroup;
 
@@ -227,14 +227,13 @@ export class AdvancedSearchBuilderView {
     if (target.conditionNodeKind === CONDITION_NODE_KIND.condition) {
       target.parentGroup?.addNewConditionItem(
         conditionType,
-        options,
         target.rootEl.nextSibling // ← 直後に挿入
       );
     } else if (
       target.conditionNodeKind === CONDITION_NODE_KIND.group &&
       isGroupView(target)
     ) {
-      target.addNewConditionItem(conditionType, options);
+      target.addNewConditionItem(conditionType);
     }
   }
 
