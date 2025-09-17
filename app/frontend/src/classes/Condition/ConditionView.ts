@@ -1,4 +1,4 @@
-import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
+import type { AdvancedSearchBuilderView } from '../AdvancedSearchBuilderView';
 import type { ConditionTypeValue } from '../../definition';
 import { CONDITION_NODE_KIND } from '../../definition';
 

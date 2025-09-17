@@ -1,6 +1,6 @@
 import { ADVANCED_CONDITIONS } from '../global';
 import { createEl } from '../utils/dom/createEl';
-import type AdvancedSearchBuilderView from './AdvancedSearchBuilderView';
+import type { AdvancedSearchBuilderView } from './AdvancedSearchBuilderView';
 import type { ConditionTypeValue } from '../definition';
 import type { Command, CommandDef } from '../types';
 

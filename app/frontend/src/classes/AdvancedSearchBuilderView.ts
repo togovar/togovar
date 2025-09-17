@@ -9,26 +9,37 @@ import { AdvancedSearchToolbar } from './AdvancedSearchToolbar';
 import { AdvancedSearchSelection } from './AdvancedSearchSelection';
 import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../definition';
 
-type SelectionCapabilities = {
+type Selection = ReadonlyArray<ConditionView>;
+
+type SelectionCapabilities = Readonly<{
   canDelete: boolean;
   canGroup: boolean;
   canUngroup: boolean;
   canCopy: boolean;
-};
+}>;
 
-export default class AdvancedSearchBuilderView {
-  _advancedSearchBuilderEl: HTMLElement;
-  _container: HTMLElement;
-  _rootGroup: ConditionGroupView;
-  _toolbar: AdvancedSearchToolbar;
-  _selection: AdvancedSearchSelection;
+/**
+ * AdvancedSearchBuilderView
+ * - Owns the root group and toolbar
+ * - Mediates selection → capability flags → toolbar state
+ * - Builds and submits the query on changes
+ */
+export class AdvancedSearchBuilderView {
+  private _advancedSearchBuilderEl: HTMLElement;
+  private _container: HTMLElement;
+  private _rootGroup: ConditionGroupView;
+  private _toolbar: AdvancedSearchToolbar;
+  private _selection: AdvancedSearchSelection;
 
   constructor(advancedSearchBuilderEl: HTMLElement) {
     this._advancedSearchBuilderEl = advancedSearchBuilderEl;
+
+    // Container that holds all condition/group views
     this._container = advancedSearchBuilderEl.querySelector(
       ':scope > .inner'
     ) as HTMLElement;
 
+    // Root (AND) group
     this._rootGroup = new ConditionGroupView(
       this,
       this._container,
@@ -38,6 +49,7 @@ export default class AdvancedSearchBuilderView {
       true
     );
 
+    // Toolbar & selection manager
     this._toolbar = new AdvancedSearchToolbar(
       this,
       this._rootGroup.makeToolbar()
@@ -45,51 +57,57 @@ export default class AdvancedSearchBuilderView {
     this._selection = new AdvancedSearchSelection(this);
   }
 
-  /** Back-compat for callers still invoking selectedConditionViews(...) */
-  // selectedConditionViews(selection: ConditionView[]): void {
-  //   this.onSelectionChange(selection);
-  // }
+  // ─────────────────────────────────────────────────────────
+  // Selection → capability flags
+  // ─────────────────────────────────────────────────────────
 
-  // /** Primary entry from selection manager */
-  // onSelectionChange(selection: ConditionView[]): void {
-  //   const caps = this._computeSelectionCapabilities(selection);
-  //   this._applyCapabilitiesToDataset(caps);
-  // }
-
+  /** Back-compat: legacy callers still call selectedConditionViews(...) */
   selectedConditionViews(selection: ConditionView[]): void {
     this.onSelectionChange(selection);
   }
 
+  /** Primary entry from selection manager. */
   onSelectionChange(selection: ConditionView[]): void {
     const caps = this._computeSelectionCapabilities(selection);
-
     this._applyCapabilitiesToDataset(caps);
   }
 
+  /** Compute capability flags from current selection. */
   private _computeSelectionCapabilities(
-    selection: ConditionView[]
+    selection: Selection
   ): SelectionCapabilities {
     const n = selection.length;
+    if (n === 0) {
+      return {
+        canDelete: false,
+        canGroup: false,
+        canUngroup: false,
+        canCopy: false,
+      };
+    }
 
+    // canUngroup: a single selected group (or item that declares canUngroup)
     const canUngroup =
       n === 1 &&
       (selection[0].canUngroup === true ||
         selection[0].conditionNodeKind === CONDITION_NODE_KIND.group);
 
+    // canGroup: 2+ items, same parent, and not all siblings selected
     let canGroup = false;
     if (n > 1) {
-      const parent = selection[0].parentGroup; // GroupView | null
+      const parent = selection[0].parentGroup;
       const sameParent =
         !!parent && selection.every((v) => v.parentGroup === parent);
       if (sameParent && parent) {
         const totalChildren = parent.childViews.length;
-        const notAllSelected = n < totalChildren;
-        canGroup = notAllSelected;
+        canGroup = n < totalChildren; // avoid grouping the entire group
       }
     }
 
+    // canDelete: any selection
     const canDelete = n > 0;
 
+    // canCopy: a single condition (or item that declares canCopy)
     const canCopy =
       n === 1 &&
       (selection[0].canCopy === true ||
@@ -98,31 +116,41 @@ export default class AdvancedSearchBuilderView {
     return { canDelete, canGroup, canUngroup, canCopy };
   }
 
+  /** Reflect capability flags as data-* attributes for CSS/toolbar state. */
   private _applyCapabilitiesToDataset(caps: SelectionCapabilities): void {
-    this._advancedSearchBuilderEl.dataset.canDelete = String(caps.canDelete);
-    this._advancedSearchBuilderEl.dataset.canGroup = String(caps.canGroup);
-    this._advancedSearchBuilderEl.dataset.canUngroup = String(caps.canUngroup);
-    this._advancedSearchBuilderEl.dataset.canCopy = String(caps.canCopy);
+    const dataset = this._advancedSearchBuilderEl.dataset;
+    dataset.canDelete = String(caps.canDelete);
+    dataset.canGroup = String(caps.canGroup);
+    dataset.canUngroup = String(caps.canUngroup);
+    dataset.canCopy = String(caps.canCopy);
   }
 
+  // ─────────────────────────────────────────────────────────
+  // Public actions
+  // ─────────────────────────────────────────────────────────
+
+  /** Notify that the condition set changed → re-run search. */
   changeCondition(): void {
     this.search();
   }
 
-  /** Group selected views into a new group under their common parent. */
+  /** Group selected views into a new subgroup under their common parent. */
   group(): void {
-    const selected: ConditionView[] =
-      this._selection.getSelectedConditionViews();
+    const selected = this._selection.getSelectedConditionViews();
     if (selected.length === 0)
       throw new Error('No condition views selected to group.');
 
-    const parent = selected[0].parentGroup; // GroupView | null
+    const parent = selected[0].parentGroup;
     if (!parent)
       throw new Error(
         'Parent group view not found for the selected condition views.'
       );
 
-    const siblings: ConditionView[] = parent.childViews;
+    // Ensure all selected share the same parent
+    if (!selected.every((v) => v.parentGroup === parent)) return;
+
+    // Compute insertion position = the minimum index among selected
+    const siblings = parent.childViews;
     let minIndex = Number.POSITIVE_INFINITY;
     let insertionEl: HTMLElement | null = null;
 
@@ -139,17 +167,17 @@ export default class AdvancedSearchBuilderView {
     this.changeCondition();
   }
 
-  /** Ungroup the (single) selected group. */
+  /** Ungroup the (single) selected group. No-op if selection is empty or not a group. */
   ungroup(): void {
     const selected = this._selection.getSelectedConditionViews();
     if (selected.length === 0) return;
 
-    // deselect current selection
+    // Deselect current selection before modification
     selected.forEach((v) => this._selection.deselectConditionView(v));
 
     const first = selected[0];
     if (isGroupView(first)) {
-      first.ungroup(); // GroupView の API として宣言されていることが前提
+      first.ungroup();
       this.changeCondition();
     }
   }
@@ -169,6 +197,8 @@ export default class AdvancedSearchBuilderView {
   /** Delete selected (or provided) views. */
   deleteCondition(views?: ConditionView[]): void {
     const list = views ?? this._selection.getSelectedConditionViews();
+    if (list.length === 0) return;
+
     for (const v of list) {
       v.remove();
       this._selection.deselectConditionView(v);
@@ -176,23 +206,31 @@ export default class AdvancedSearchBuilderView {
     this.changeCondition();
   }
 
+  /** Rebuild query from the root group and submit to the store. */
   search(): void {
     const query = this._rootGroup.queryFragment;
     setAdvancedSearchCondition(query);
   }
 
-  /** Add a condition under the selected group (or root if none selected). */
-  addCondition(conditionType: ConditionTypeValue, options: any): void {
+  /**
+   * Add a condition under the selected group (or root if none selected).
+   * If a single condition is selected, we could insert "after" it; currently we
+   * append to its parent group (kept as-is to avoid interface drift).
+   */
+  addCondition(conditionType: ConditionTypeValue, options: unknown): void {
     const selected = this._selection.getSelectedConditionViews();
     const target: ConditionView | GroupView =
       selected.length > 0 ? selected[0] : this._rootGroup;
 
-    // clear current selection
+    // Clear current selection so the new item becomes the active focus (by editors).
     this._selection.deselectAllConditions();
 
     switch (target.conditionNodeKind) {
       case CONDITION_NODE_KIND.condition:
-        // TODO: insert after the selected condition
+        // TODO: Optionally insert *after* the selected condition by calling
+        // target.parentGroup?.addNewConditionItem(conditionType, options, target.rootEl.nextSibling)
+        // once the GroupView interface exposes the reference param.
+        target.parentGroup?.addNewConditionItem(conditionType, options);
         break;
       case CONDITION_NODE_KIND.group:
         if (isGroupView(target)) {
@@ -283,7 +321,10 @@ export default class AdvancedSearchBuilderView {
   //   });
   // }
 
-  // accessors
+  // ─────────────────────────────────────────────────────────
+  // Accessors
+  // ─────────────────────────────────────────────────────────
+
   get elm(): HTMLElement {
     return this._advancedSearchBuilderEl;
   }

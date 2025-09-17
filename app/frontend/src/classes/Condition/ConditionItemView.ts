@@ -4,7 +4,7 @@ import { storeManager } from '../../store/StoreManager';
 import { ADVANCED_CONDITIONS } from '../../global';
 import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../../definition';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
-import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
+import type { AdvancedSearchBuilderView } from '../AdvancedSearchBuilderView';
 import type { ConditionGroupView } from './ConditionGroupView';
 import type {
   ConditionItemValueViewElement,

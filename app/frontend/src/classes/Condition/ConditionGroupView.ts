@@ -6,7 +6,7 @@ import {
 } from './ConditionView';
 import { selectRequired } from '../../utils/dom/select';
 import { ConditionItemView } from './ConditionItemView';
-import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
+import type { AdvancedSearchBuilderView } from '../AdvancedSearchBuilderView';
 import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../../definition';
 import type { ConditionQuery } from '../../types';
 
