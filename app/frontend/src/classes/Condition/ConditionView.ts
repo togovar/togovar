@@ -1,4 +1,5 @@
 import type AdvancedSearchBuilderView from '../AdvancedSearchBuilderView';
+import type { ConditionTypeValue } from '../../definition';
 import { CONDITION_NODE_KIND } from '../../definition';
 
 /** Public contract for both condition items and groups */
@@ -26,7 +27,7 @@ export interface GroupView extends ConditionView {
   ): GroupView;
   addConditionViews(_conditionViews: Node[], _referenceElm: Node | null): void;
   addNewConditionItem(
-    _conditionType: string,
+    _conditionType: ConditionTypeValue,
     _options: any,
     _referenceElm?: Node | null
   ): ConditionView;
@@ -34,6 +35,20 @@ export interface GroupView extends ConditionView {
   readonly conditionNodeKind: typeof CONDITION_NODE_KIND.group;
   readonly container: HTMLElement;
   readonly childViews: ConditionView[];
+}
+
+/** Maps a view's host DOM element to its owning ConditionView instance. */
+export const viewByEl = new WeakMap<HTMLElement, ConditionView>();
+
+/**
+ * Type guard that narrows a `ConditionView | null | undefined` to `GroupView`
+ * @param view - Value to test (a `ConditionView` or `null`/`undefined`).
+ * @returns `true` if `view` is a `GroupView`; otherwise `false`.
+ */
+export function isGroupView(
+  view: ConditionView | null | undefined
+): view is GroupView {
+  return !!view && view.conditionNodeKind === CONDITION_NODE_KIND.group;
 }
 
 /** Abstract base class for group and item condition views */
@@ -135,18 +150,4 @@ export abstract class BaseConditionView implements ConditionView {
       this._builder.selection.selectConditionView(this, false);
     }
   }
-}
-
-/** Maps a view's host DOM element to its owning ConditionView instance. */
-export const viewByEl = new WeakMap<HTMLElement, ConditionView>();
-
-/**
- * Type guard that narrows a `ConditionView | null | undefined` to `GroupView`
- * @param view - Value to test (a `ConditionView` or `null`/`undefined`).
- * @returns `true` if `view` is a `GroupView`; otherwise `false`.
- */
-export function isGroupView(
-  view: ConditionView | null | undefined
-): view is GroupView {
-  return !!view && view.conditionNodeKind === CONDITION_NODE_KIND.group;
 }

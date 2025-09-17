@@ -1,4 +1,3 @@
-// AdvancedSearchBuilderView.ts
 import { setAdvancedSearchCondition } from '../store/searchManager';
 import { ConditionGroupView } from './Condition/ConditionGroupView';
 import {
@@ -8,7 +7,7 @@ import {
 } from './Condition/ConditionView';
 import { AdvancedSearchToolbar } from './AdvancedSearchToolbar';
 import { AdvancedSearchSelection } from './AdvancedSearchSelection';
-import { CONDITION_NODE_KIND } from '../definition';
+import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../definition';
 
 type SelectionCapabilities = {
   canDelete: boolean;
@@ -155,10 +154,10 @@ export default class AdvancedSearchBuilderView {
     }
   }
 
+  // copyとeditは現在未実装だが、将来的に拡張の可能性あり
   // copy() {
   //   console.log('_copy')
   //   const selectingConditionViews = this._selection.getSelectingConditionViews();
-  //   // TODO:
   //   this.changeCondition();
   // }
 
@@ -183,7 +182,7 @@ export default class AdvancedSearchBuilderView {
   }
 
   /** Add a condition under the selected group (or root if none selected). */
-  addCondition(conditionType: string, options: any): void {
+  addCondition(conditionType: ConditionTypeValue, options: any): void {
     const selected = this._selection.getSelectedConditionViews();
     const target: ConditionView | GroupView =
       selected.length > 0 ? selected[0] : this._rootGroup;
@@ -203,7 +202,7 @@ export default class AdvancedSearchBuilderView {
     }
   }
 
-  // private methods
+  // 以下のコメントは、範囲外を押すと選択が解除されるようにするためのコードだが、現在は動作していないので修正が必要
   // _defineEvents() {
   //   let downX, downY;
   //   this._elm.addEventListener('mousedown', (e) => {

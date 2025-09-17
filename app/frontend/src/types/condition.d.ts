@@ -1,4 +1,4 @@
-import { ConditionTypeValue } from '../definition';
+import type { ConditionTypeValue } from '../definition';
 /**
  * Generic query value object
  */
@@ -88,8 +88,8 @@ export type ConditionQuery =
   | IdQuery
   | SignificanceQuery
   | DefaultQuery
-  | { or: any[] }
-  | { and: any[] };
+  | { or: ConditionQuery[] }
+  | { and: ConditionQuery[] };
 
 /** Context object passed to query builders */
 export type BuildContext = {
@@ -103,3 +103,13 @@ export type BuildContext = {
 export type Relation = 'eq' | 'ne' | '';
 
 export type Builder = (_ctx: BuildContext) => ConditionQuery;
+
+/** Command identifiers handled by the toolbar. */
+type Command = 'add-condition' | 'group' | 'ungroup' | 'delete';
+
+type CommandDef = Readonly<{
+  command: Command;
+  label: string;
+  // TODO: Key codes (display only). Currently informational; no keybindings here.
+  shortcut: number[];
+}>;
