@@ -16,20 +16,18 @@ import type {
 
 /**
  * A single condition row with edit/delete behaviors.
- * Extends BaseConditionView and owns its editor(s) and relation state.
+ * Owns its editor(s), relation state, and all event wiring for the row.
  */
 export class ConditionItemView extends BaseConditionView {
   readonly conditionNodeKind = CONDITION_NODE_KIND.condition;
 
   private readonly _conditionType: ConditionTypeValue;
-  /** Whether this condition type supports a logical relation (eq/ne). */
   private readonly _relationSupported: boolean;
-  /** True until the first edit is completed; used for Esc handling. */
-  private _isFirstTime = true;
-  /** Last confirmed relation that we restore on cancel. */
-  private _keepLastRelation: Relation = 'eq';
 
-  /** Cached DOM refs created in _generateDOM. */
+  private _isFirstTime = true;
+  private _keepLastRelation: Relation = 'eq'; // restored when user cancels with Esc.
+
+  // DOM references
   private _summaryEl!: HTMLDivElement;
   private _relationEl!: HTMLDivElement;
   private _valuesEl!: HTMLDivElement;
@@ -37,12 +35,18 @@ export class ConditionItemView extends BaseConditionView {
   private _btnDelete!: HTMLButtonElement;
   private _editorEl!: HTMLDivElement;
 
-  /** Entry point for value editors of this item. */
+  /** Manages concrete editors (checkboxes, selects, etc.) inside this row. */
   private _conditionValues!: ConditionValues;
 
-  /** One AbortController to remove all event listeners this instance added. */
+  /** Single controller to clean up every listener added by this instance. */
   private readonly _events = new AbortController();
 
+  /**
+   * @param builder      Owning AdvancedSearchBuilderView (for callbacks)
+   * @param parentGroup  The logical parent group view
+   * @param conditionType Type discriminator for this row
+   * @param referenceElm  Insert before this node (or appended when null)
+   */
   constructor(
     builder: AdvancedSearchBuilderView,
     parentGroup: ConditionGroupView,
@@ -54,6 +58,7 @@ export class ConditionItemView extends BaseConditionView {
       parentGroup.container,
       referenceElm ?? document.createTextNode('')
     );
+
     this._conditionType = conditionType;
     this._relationSupported = supportsRelation(conditionType);
 
@@ -62,6 +67,10 @@ export class ConditionItemView extends BaseConditionView {
     this._attachEventDelegation();
     this._enterEditMode(); // Start in edit mode on first render.
   }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Public API (called by outer components)
+  // ───────────────────────────────────────────────────────────────────────────
 
   /** Leave edit mode, close modal, and notify the builder that this item changed. */
   doneEditing(): void {
@@ -81,8 +90,9 @@ export class ConditionItemView extends BaseConditionView {
     super.remove();
   }
 
-  // ---------- accessors ----------
-
+  // ───────────────────────────────────────────────────────────────────────────
+  // Read-only accessors
+  // ───────────────────────────────────────────────────────────────────────────
   get conditionType(): ConditionTypeValue {
     return this._conditionType;
   }
@@ -99,12 +109,15 @@ export class ConditionItemView extends BaseConditionView {
     return this._keepLastRelation;
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // Query building
+  // ───────────────────────────────────────────────────────────────────────────
   /**
    * Build a query fragment from the current UI and relation state.
-   * Note: relation may be '' (empty) when the type does not support relation.
+   * Note: relation is undefined for types that do not support it.
    */
   get queryFragment(): ConditionQuery {
-    const relation = this._readRelation();
+    const relation = this._readRelation(); // Relation | undefined
     const values = Array.from(
       this._valuesEl.querySelectorAll(':scope > condition-item-value-view')
     ) as ConditionItemValueViewElement[];
@@ -117,10 +130,13 @@ export class ConditionItemView extends BaseConditionView {
     });
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // DOM creation / initial sync
+  // ───────────────────────────────────────────────────────────────────────────
   /**
    * Set up static structure and initial dataset attributes on the root element.
    * - classification: the condition type
-   * - relation: 'eq' or 'ne' if supported, otherwise '' (empty)
+   * - relation: 'eq' or 'ne' if supported; removed when unsupported
    * - children: built by _generateDOM()
    */
   private _initializeHTML(): void {
@@ -135,15 +151,6 @@ export class ConditionItemView extends BaseConditionView {
 
     const { body, bg } = this._generateDOM();
     this.rootEl.replaceChildren(body, bg);
-    this._syncRelationUI();
-  }
-
-  /**
-   * Sync the relation control UI (ARIA/state) with the current capabilities and state.
-   * - When unsupported: disable control and hide pressed state
-   * - When supported: enable control and reflect the current pressed state
-   */
-  private _syncRelationUI(): void {
     this._setRelation(this._readRelation());
   }
 
@@ -169,7 +176,7 @@ export class ConditionItemView extends BaseConditionView {
     this._summaryEl = createEl('div', {
       class: 'summary',
       children: [
-        // TODO: In the future, implement drag-and-drop to change the order of classifications.
+        // TODO: In the future, implement drag-and-drop ordering.
         createEl('div', { class: 'classification', text: label }),
         ...(relationChild ? [relationChild] : []),
         (this._valuesEl = createEl('div', { class: 'values' })),
@@ -202,11 +209,14 @@ export class ConditionItemView extends BaseConditionView {
         })),
       ],
     });
-    const bg = createEl('div', { class: 'bg' });
 
+    const bg = createEl('div', { class: 'bg' });
     return { body, bg };
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // Event wiring
+  // ───────────────────────────────────────────────────────────────────────────
   /**
    * Centralized event wiring:
    * - Stops bubbling out of this item
@@ -225,7 +235,7 @@ export class ConditionItemView extends BaseConditionView {
     this._btnDelete.addEventListener(
       'click',
       (e) => {
-        e.stopImmediatePropagation();
+        e.stopPropagation();
         this._builder.deleteCondition([this]);
       },
       { signal }
@@ -235,7 +245,7 @@ export class ConditionItemView extends BaseConditionView {
     this._btnEdit.addEventListener(
       'click',
       (e) => {
-        e.stopImmediatePropagation();
+        e.stopPropagation();
         this._enterEditMode();
       },
       { signal }
@@ -246,12 +256,13 @@ export class ConditionItemView extends BaseConditionView {
       this._relationEl.addEventListener(
         'click',
         (e) => {
-          e.stopImmediatePropagation();
+          e.stopPropagation();
           this._toggleRelation();
         },
         { signal }
       );
 
+      // Relation (keyboard)
       this._relationEl.addEventListener(
         'keydown',
         (e) => {
@@ -270,13 +281,16 @@ export class ConditionItemView extends BaseConditionView {
       'click',
       (e) => {
         const t = e.target as Element;
-        if (t.closest('button, .relation')) return; // already handled
+        if (t.closest('button, .relation')) return; // handled above
         this._toggleSelection(e);
       },
       { signal }
     );
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // Relation helpers
+  // ───────────────────────────────────────────────────────────────────────────
   /**
    * Toggle relation ('eq' <-> 'ne') if this type supports relation.
    * Also updates ARIA state and notifies the builder if the modal is not open.
@@ -286,12 +300,39 @@ export class ConditionItemView extends BaseConditionView {
     const cur = this._readRelation() ?? 'eq';
     const next: Relation = cur === 'eq' ? 'ne' : 'eq';
     this._setRelation(next);
+
     if (!storeManager.getData('showModal')) {
       this._keepLastRelation = next;
       this._builder.changeCondition();
     }
   }
 
+  /** Read relation from dataset. returns undefined when unsupported or absent. */
+  private _readRelation(): Relation | undefined {
+    if (!this._relationSupported) return undefined;
+    const r = this.rootEl.dataset.relation;
+    return r === 'eq' || r === 'ne' ? r : undefined;
+  }
+
+  /**
+   * Normalize and write relation to dataset, then sync ARIA.
+   * When unsupported: clear the attribute and do not show ARIA pressed state.
+   */
+  private _setRelation(next: Relation | undefined): void {
+    if (!this._relationSupported) {
+      delete this.rootEl.dataset.relation;
+      return;
+    }
+    if (!next) next = 'eq';
+    this.rootEl.dataset.relation = next;
+    if (this._relationEl) {
+      this._relationEl.setAttribute('aria-pressed', String(next === 'ne'));
+    }
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Edit mode helpers (modal lifecycle)
+  // ───────────────────────────────────────────────────────────────────────────
   /** Enter edit mode and bind the global Escape handler while the modal is open. */
   private _enterEditMode(): void {
     this.rootEl.classList.add('-editing');
@@ -302,7 +343,7 @@ export class ConditionItemView extends BaseConditionView {
 
   /**
    * Attach/detach a single global keydown handler via AbortController.
-   * Keeps the wiring localized to this instance.
+   * This keeps the wiring localized to this instance.
    */
   private _toggleGlobalKeydown(enable: boolean): void {
     const fn = this._keydownEscapeEvent;
@@ -315,8 +356,8 @@ export class ConditionItemView extends BaseConditionView {
 
   /**
    * Global Escape handler:
-   * - On first-time edit, Esc removes the item
-   * - Otherwise Esc restores previous state and exits edit mode
+   * - On first edit, Esc removes the item entirely
+   * - Otherwise, Esc restores previous state and exits edit mode
    */
   private readonly _keydownEscapeEvent = (e: KeyboardEvent) => {
     if (e.key !== 'Escape' || !storeManager.getData('showModal')) return;
@@ -336,23 +377,5 @@ export class ConditionItemView extends BaseConditionView {
     this._setRelation(
       this._relationSupported ? this._keepLastRelation : undefined
     );
-  }
-
-  private _readRelation(): Relation | undefined {
-    if (!this._relationSupported) return undefined;
-    const r = this.rootEl.dataset.relation;
-    return r === 'eq' || r === 'ne' ? r : undefined;
-  }
-
-  private _setRelation(next: Relation | undefined): void {
-    if (!this._relationSupported) {
-      delete this.rootEl.dataset.relation;
-      return;
-    }
-    if (!next) next = 'eq';
-    this.rootEl.dataset.relation = next;
-    if (this._relationEl) {
-      this._relationEl.setAttribute('aria-pressed', String(next === 'ne'));
-    }
   }
 }
