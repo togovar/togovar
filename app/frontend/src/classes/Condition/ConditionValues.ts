@@ -1,217 +1,210 @@
-import { CONDITION_TYPE } from '../../definition';
-import ConditionValueEditorCheckboxes from './ConditionValueEditor/ConditionValueEditorCheckboxes.js';
+import { CONDITION_TYPE, type ConditionTypeValue } from '../../definition';
+import { supportsRelation } from '../../conditions';
+import ConditionValueEditorCheckboxes from './ConditionValueEditor/ConditionValueEditorCheckboxes';
 import ConditionValueEditorClinicalSignificance from './ConditionValueEditor/ConditionValueEditorClinicalSignificance';
-import ConditionValueEditorColumns from './ConditionValueEditor/ConditionValueEditorColumns.js';
+import ConditionValueEditorColumns from './ConditionValueEditor/ConditionValueEditorColumns';
 import ConditionValueEditorColumnsDataset from './ConditionValueEditor/ConditionValueEditorColumnsDataset';
-import ConditionValueEditorDisease from './ConditionValueEditor/ConditionValueEditorDisease.js';
+import ConditionValueEditorDisease from './ConditionValueEditor/ConditionValueEditorDisease';
 import ConditionValueEditorFrequencyCount from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
-import ConditionValueEditorGene from './ConditionValueEditor/ConditionValueEditorGene.js';
-import ConditionValueEditorLocation from './ConditionValueEditor/ConditionValueEditorLocation.js';
+import ConditionValueEditorGene from './ConditionValueEditor/ConditionValueEditorGene';
+import ConditionValueEditorLocation from './ConditionValueEditor/ConditionValueEditorLocation';
 import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditor/ConditionValueEditorPathogenicityPrediction';
-import ConditionValueEditorVariantID from './ConditionValueEditor/ConditionValueEditorVariantID.js';
+import ConditionValueEditorVariantID from './ConditionValueEditor/ConditionValueEditorVariantID';
 import type { ConditionItemView } from './ConditionItemView';
+import { createEl } from '../../utils/dom/createEl';
 
-interface ConditionValueEditor {
+/** Minimal interface all editors must satisfy. */
+export interface ConditionValueEditor {
+  /** Capture current state when editing begins. */
   keepLastValues(): void;
+  /** Restore captured state when user cancels. */
   restore(): void;
-  isValid: boolean;
+  /** Whether this editor currently has a valid value. */
+  readonly isValid: boolean;
 }
 
+/** Constructor signature for editor classes. */
+type EditorCtor = new (
+  host: ConditionValues,
+  view: ConditionItemView
+) => ConditionValueEditor;
+
+/** Registry: which editors are used for each condition type. */
+const EDITOR_REGISTRY: Readonly<
+  Partial<Record<ConditionTypeValue, EditorCtor[]>>
+> = {
+  [CONDITION_TYPE.type]: [ConditionValueEditorCheckboxes],
+  [CONDITION_TYPE.significance]: [ConditionValueEditorClinicalSignificance],
+  [CONDITION_TYPE.consequence]: [ConditionValueEditorColumns],
+  [CONDITION_TYPE.dataset]: [
+    ConditionValueEditorColumnsDataset,
+    ConditionValueEditorFrequencyCount,
+  ],
+  [CONDITION_TYPE.genotype]: [
+    ConditionValueEditorColumnsDataset,
+    ConditionValueEditorFrequencyCount,
+  ],
+  [CONDITION_TYPE.disease]: [ConditionValueEditorDisease],
+  [CONDITION_TYPE.gene_symbol]: [ConditionValueEditorGene],
+  [CONDITION_TYPE.pathogenicity_prediction]: [
+    ConditionValueEditorPathogenicityPrediction,
+  ],
+  [CONDITION_TYPE.variant_id]: [ConditionValueEditorVariantID],
+  [CONDITION_TYPE.location]: [ConditionValueEditorLocation],
+};
+
 /**
- * About the AdvancedSearch edit screen.
- * Create an instance of ConditionValueEditors
+ * Orchestrates editors for one condition’s edit panel:
+ * - builds OK/Cancel UI
+ * - instantiates the correct editors
+ * - aggregates validity and toggles the OK button
+ * - applies or reverts on OK/Cancel
  */
-class ConditionValues {
-  private _conditionView: ConditionItemView;
-  private _editors: ConditionValueEditor[];
-  private _sections: HTMLDivElement;
-  private _okButton: HTMLButtonElement;
+export default class ConditionValues {
+  private readonly _conditionView: ConditionItemView;
+  private readonly _events = new AbortController();
+
+  private _editors: ConditionValueEditor[] = [];
+  private _sectionsEl!: HTMLDivElement;
+  private _okButtonEl!: HTMLButtonElement;
+  private _cancelButtonEl!: HTMLButtonElement;
 
   constructor(conditionView: ConditionItemView) {
     this._conditionView = conditionView;
-    this._editors = [];
-
-    // HTML
-    conditionView.editorElement.innerHTML = `
-      <div class="sections"></div>
-      <div class="buttons">
-        <button class="button-view -disabled">OK</button>
-        <button class="button-view -negative">Cancel</button>
-      </div>`;
-
-    // references
-    this._sections = conditionView.editorElement.querySelector(
-      ':scope > .sections'
-    ) as HTMLDivElement;
-    const buttons = conditionView.editorElement.querySelector(
-      ':scope > .buttons'
-    ) as HTMLElement;
-    this._okButton = buttons.querySelector(
-      ':scope > .button-view:nth-child(1)'
-    ) as HTMLButtonElement;
-
-    // events
-    this._okButton.addEventListener('click', this._clickOkButton.bind(this));
-    buttons
-      .querySelector(':scope > .button-view:nth-child(2)')!
-      .addEventListener('click', this._clickCancelButton.bind(this));
-
-    // initialization by types
-    switch (conditionView.conditionType) {
-      case CONDITION_TYPE.type:
-        this._editors.push(
-          new ConditionValueEditorCheckboxes(
-            this as any,
-            this._conditionView as any
-          )
-        );
-        break;
-
-      case CONDITION_TYPE.significance:
-        this._editors.push(
-          new ConditionValueEditorClinicalSignificance(
-            this as any,
-            this._conditionView as any
-          )
-        );
-        break;
-
-      case CONDITION_TYPE.consequence:
-        this._editors.push(
-          new ConditionValueEditorColumns(
-            this as any,
-            this._conditionView as any
-          )
-        );
-        break;
-
-      case CONDITION_TYPE.dataset:
-      case CONDITION_TYPE.genotype:
-        this._editors.push(
-          new ConditionValueEditorColumnsDataset(
-            this as any,
-            this._conditionView as any
-          )
-        );
-        this._editors.push(
-          new ConditionValueEditorFrequencyCount(
-            this as any,
-            this._conditionView as any
-          )
-        );
-        break;
-
-      case CONDITION_TYPE.disease:
-        this._editors.push(
-          new ConditionValueEditorDisease(
-            this as any,
-            this._conditionView as any
-          )
-        );
-        break;
-
-      case CONDITION_TYPE.gene_symbol:
-        this._editors.push(
-          new ConditionValueEditorGene(this as any, this._conditionView as any)
-        );
-        break;
-
-      case CONDITION_TYPE.pathogenicity_prediction:
-        this._editors.push(
-          new ConditionValueEditorPathogenicityPrediction(
-            this as any,
-            this._conditionView as any
-          )
-        );
-        break;
-
-      case CONDITION_TYPE.variant_id:
-        this._editors.push(
-          new ConditionValueEditorVariantID(
-            this as any,
-            this._conditionView as any
-          )
-        );
-        break;
-
-      case CONDITION_TYPE.location:
-        this._editors.push(
-          new ConditionValueEditorLocation(
-            this as any,
-            this._conditionView as any,
-            0
-          )
-        );
-        break;
-    }
+    this._buildDOM();
+    this._wireEvents();
+    this._instantiateEditorsFor(conditionView.conditionType);
   }
 
-  // public methods
-  /** Retains the value of ConditionValueEditor once editing starts */
+  // ─────────────────────────────────────────────────────────
+  // Public API used by editors / owner
+  // ─────────────────────────────────────────────────────────
+
+  /** Called by ConditionItemView right after entering edit mode. */
   startToEditCondition(): void {
-    for (const editor of this._editors) {
-      editor.keepLastValues();
-    }
+    for (const ed of this._editors) ed.keepLastValues();
+    this._recomputeValidity();
   }
 
-  /** Whether isValid(whether condition has a value) is true or false and okButton is disabled */
-  update(isValid: boolean): void {
-    if (
-      [CONDITION_TYPE.dataset, CONDITION_TYPE.genotype].includes(
-        this._conditionView.conditionType
-      )
-    ) {
-      isValid = this._editors.every((editor) => {
-        return editor.isValid;
-      });
-    }
-    if (isValid) {
-      this._okButton.classList.remove('-disabled');
-    } else {
-      this._okButton.classList.add('-disabled');
-    }
+  /** Editors call this when their internal validity changed. */
+  update(isValidHint?: boolean): void {
+    // For dataset/genotype we require ALL editors valid; otherwise accept hint or aggregate.
+    const t = this._conditionView.conditionType;
+    const allEditorsValid = this._editors.every((e) => e.isValid);
+    const requireAll =
+      t === CONDITION_TYPE.dataset || t === CONDITION_TYPE.genotype;
+
+    const finalValid = requireAll
+      ? allEditorsValid
+      : isValidHint ?? allEditorsValid;
+    this._setOkEnabled(finalValid);
   }
 
-  // private methods
-  /** If isFirstTime is false and there is no Node in values, delete conditionView. Otherwise finish editing */
-  private _clickOkButton(e: MouseEvent): void {
-    e.stopImmediatePropagation();
-    this._conditionView.doneEditing();
+  // ─────────────────────────────────────────────────────────
+  // DOM build & events
+  // ─────────────────────────────────────────────────────────
+
+  private _buildDOM(): void {
+    const sections = (this._sectionsEl = createEl('div', {
+      class: 'sections',
+    }));
+
+    const buttons = createEl('div', {
+      class: 'buttons',
+      children: [
+        (this._okButtonEl = createEl('button', {
+          class: ['button-view'],
+          text: 'OK',
+          attrs: { type: 'button', disabled: '' },
+        })),
+        (this._cancelButtonEl = createEl('button', {
+          class: ['button-view', '-negative'],
+          text: 'Cancel',
+          attrs: { type: 'button' },
+        })),
+      ],
+    });
+
+    // Mount once
+    this._conditionView.editorElement.replaceChildren(sections, buttons);
   }
 
-  /** When isFirstTime is true, remove conditionView. Otherwise, revert to the state before editing. */
-  private _clickCancelButton(e: MouseEvent): void {
-    e.stopImmediatePropagation();
-    if (this._conditionView.isFirstTime) {
-      this._conditionView.remove();
-    } else {
-      for (const editor of this._editors) {
-        editor.restore();
-        if (
-          !['dataset', 'pathogenicity_prediction', 'id', 'location'].includes(
-            this._conditionView.conditionType
-          )
-        ) {
+  private _wireEvents(): void {
+    const { signal } = this._events;
+
+    this._okButtonEl.addEventListener(
+      'click',
+      (e) => {
+        e.stopImmediatePropagation();
+        // Apply and close
+        this._conditionView.doneEditing();
+      },
+      { signal }
+    );
+
+    this._cancelButtonEl.addEventListener(
+      'click',
+      (e) => {
+        e.stopImmediatePropagation();
+        if (this._conditionView.isFirstTime) {
+          // First-time cancel removes the item
+          this._conditionView.remove();
+          return;
+        }
+        // Revert all editors
+        for (const ed of this._editors) ed.restore();
+
+        // Restore relation only for types that support it
+        if (supportsRelation(this._conditionView.conditionType)) {
           this._conditionView.rootEl.dataset.relation =
             this._conditionView.keepLastRelation;
+        } else {
+          delete this._conditionView.rootEl.dataset.relation;
         }
-      }
-      this._conditionView.doneEditing();
+
+        this._conditionView.doneEditing();
+      },
+      { signal }
+    );
+  }
+
+  private _instantiateEditorsFor(type: ConditionTypeValue): void {
+    const ctors = EDITOR_REGISTRY[type] ?? [];
+    this._editors = ctors.map((Ctor) => new Ctor(this, this._conditionView));
+    // 初期状態のボタン有効状態を反映
+    this._recomputeValidity();
+  }
+
+  private _recomputeValidity(): void {
+    this.update(); // aggregate from editors
+  }
+
+  private _setOkEnabled(enabled: boolean): void {
+    if (enabled) {
+      this._okButtonEl.removeAttribute('disabled');
+    } else {
+      this._okButtonEl.setAttribute('disabled', '');
     }
   }
 
-  // accessors
+  // ─────────────────────────────────────────────────────────
+  // Accessors (used by editors)
+  // ─────────────────────────────────────────────────────────
+
   get conditionView(): ConditionItemView {
     return this._conditionView;
   }
 
   get sections(): HTMLDivElement {
-    return this._sections;
+    return this._sectionsEl;
   }
 
-  get editors(): ConditionValueEditor[] {
+  get editors(): readonly ConditionValueEditor[] {
     return this._editors;
   }
-}
 
-export default ConditionValues;
+  /** Call to free event listeners when editor view is discarded. */
+  destroy(): void {
+    this._events.abort();
+  }
+}

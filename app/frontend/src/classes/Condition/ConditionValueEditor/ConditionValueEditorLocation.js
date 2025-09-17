@@ -4,7 +4,7 @@ import '../../../components/ConditionItemValueView';
 
 const OPTIONS = [
   '',
-  ...[...Array(22)].map((_, index) => index + 1 + ''),
+  ...[...Array(22)].map((_, index) => String(index + 1)),
   'X',
   'Y',
   'MT',
@@ -14,8 +14,8 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
   /**
    * @param {ConditionValues} valuesView
    * @param {ConditionItemView} conditionView
-   * @param {0|1} defaultValues ConditionItemView represents "0", ConditionGroupView represents "1". */
-  constructor(valuesView, conditionView, defaultValues) {
+   */
+  constructor(valuesView, conditionView) {
     super(valuesView, conditionView);
 
     // HTML
@@ -65,7 +65,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     this._end = inputs.find((input) => input.classList.contains('end'));
     this._isWhole = false;
 
-    // attach events
+    // events
     this._el
       .querySelector(':scope > .body > .row:nth-child(1) > label > input')
       .addEventListener('change', (e) => {
@@ -74,31 +74,33 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
           : 'region';
         this._update();
       });
+
     [this._chr, ...inputs].forEach((input) => {
       input.addEventListener('change', (e) => {
         this._update(e);
       });
     });
 
+    // karyotype data (end coordinate lookup)
     this._karyotype = storeManager.getData('karyotype');
 
-    // default values
-    if (defaultValues) {
-      this._chr.value = defaultValues.chr;
-      this._start.value = +defaultValues.start;
-      this._end.value = +defaultValues.end;
-      this._update();
-    }
+    // Prefill from existing value view if present (e.g., reopening editor)
+    this._prefillFromViews();
+    // Ensure UI reflects current state
+    this._update();
   }
 
-  // public methods
+  // ─────────────────────────────────────────────────────
+  // public
+  // ─────────────────────────────────────────────────────
 
   keepLastValues() {
-    // this._lastValue = this._searchFieldView.value;
+    // no-op for now (we rebuild from _valueViews when needed)
   }
 
   restore() {
-    // this._searchFieldView.setTerm(this._lastValue);
+    // Re-apply UI from current value views (if any)
+    this._prefillFromViews();
     this._update();
   }
 
@@ -107,65 +109,98 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
   }
 
   get isValid() {
-    if (this._chr.value === '') {
-      return false;
-    } else {
-      switch (this._rangeInputView.dataset.type) {
-        case 'region':
-          return (
-            this._start.value !== '' &&
-            this._end.value !== '' &&
-            +this._start.value < +this._end.value
-          );
-        case 'single_position':
-          return this._start.value !== '';
-      }
+    if (this._chr.value === '') return false;
+
+    switch (this._rangeInputView.dataset.type) {
+      case 'region':
+        return (
+          this._start.value !== '' &&
+          this._end.value !== '' &&
+          +this._start.value < +this._end.value
+        );
+      case 'single_position':
+        return this._start.value !== '';
+      default:
+        return false;
     }
   }
 
-  // private methods
+  // ─────────────────────────────────────────────────────
+  // private
+  // ─────────────────────────────────────────────────────
 
+  /**
+   * Read existing value view (if any) and prefill UI controls.
+   * Expected format: "chr:start-end" or "chr:start"
+   */
+  _prefillFromViews() {
+    const vv = this._valueViews?.[0];
+    const raw = vv?.value || vv?.label;
+    if (!raw || typeof raw !== 'string') return;
+
+    // e.g. "7:123-456" or "X:999"
+    const m = /^([^:]+):(\d+)(?:-(\d+))?$/.exec(raw.trim());
+    if (!m) return;
+
+    const [, chr, start, end] = m;
+    // set fields
+    if (OPTIONS.includes(chr)) this._chr.value = chr;
+    this._start.value = start;
+    if (end) {
+      this._rangeInputView.dataset.type = 'region';
+      this._end.value = end;
+    } else {
+      this._rangeInputView.dataset.type = 'single_position';
+      this._end.value = '';
+    }
+  }
+
+  /**
+   * Recompute UI → value view(s), apply validation, and notify host.
+   */
   _update(e) {
-    const reference = this._karyotype.reference;
-    const end =
-      this._karyotype.chromosomes[this._chr.value]?.region[reference][1];
-    // if chromosome changed, change ranges
-    if (e?.target === this._chr) {
-      // reset input
-      this._start.max = end;
-      this._end.max = end;
-      if (this._isWhole) this._end.value = end;
+    // update range max by chromosome change
+    const ref = this._karyotype?.reference;
+    const endMax =
+      ref &&
+      this._karyotype?.chromosomes?.[this._chr.value]?.region?.[ref]?.[1];
+
+    if (e?.target === this._chr && endMax) {
+      // reset input constraints when chromosome changes
+      this._start.max = endMax;
+      this._end.max = endMax;
+
+      if (this._isWhole) this._end.value = endMax;
+
       if (this._start.value === '') {
         this._start.value = 1;
         this._isWhole = true;
-      } else if (this._start.value > end) {
-        this._start.value = end;
+      } else if (+this._start.value > endMax) {
+        this._start.value = endMax;
       }
+
       if (this._end.value === '') {
-        this._end.value = end;
+        this._end.value = endMax;
         this._isWhole = true;
-      } else if (this._end.value > end) {
-        this._end.value = end;
+      } else if (+this._end.value > endMax) {
+        this._end.value = endMax;
         this._isWhole = true;
       }
-    } else {
-      if (this._end.value < end) {
-        this._isWhole = false;
-      }
+    } else if (endMax && +this._end.value < endMax) {
+      this._isWhole = false;
     }
 
-    // update value
-    const valueView = this._valueViews[0];
+    // rebuild value view
+    const vv = this._valueViews[0];
     if (this.isValid) {
+      const asRegion = this._rangeInputView.dataset.type === 'region';
       const value = `${this._chr.value}:${this._start.value}${
-        this._rangeInputView.dataset.type === 'single_position'
-          ? ''
-          : `-${this._end.value}`
+        asRegion ? `-${this._end.value}` : ''
       }`;
-      if (valueView) {
-        //update
-        valueView.label = value;
-        valueView.value = value;
+
+      if (vv) {
+        vv.label = value;
+        vv.value = value;
       } else {
         this._addValueView(value, value, true);
       }
@@ -173,11 +208,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
       this._removeValueView();
     }
 
-    // validation
-    this._valuesView.update(this._validate());
-  }
-
-  _validate() {
-    return this.isValid;
+    // validation → enable/disable OK button via host
+    this._valuesView.update(this.isValid);
   }
 }

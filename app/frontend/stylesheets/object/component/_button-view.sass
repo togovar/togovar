@@ -14,7 +14,9 @@
     background: linear-gradient(to bottom, var(--color-pale-gray), var(--color-light-gray))
   &.-negative
     background: linear-gradient(to bottom, var(--color-disable), var(--color-disable-deep))
-  &.-disabled
+  &.-disabled,
+  &:disabled
+
     opacity: .4
     pointer-events: none
   &:hover
