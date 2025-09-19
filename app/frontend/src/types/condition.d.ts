@@ -2,16 +2,16 @@ import type { ConditionTypeValue } from '../definition';
 import type { ConditionItemView } from '../classes/Condition/ConditionItemView';
 import type ConditionValues from '../classes/Condition/ConditionValues';
 
+/** Context object passed to query builders */
+type BuildContext = {
+  type: ConditionTypeValue;
+  values: ConditionItemValueViewEl[];
+  relation?: Relation;
+  valuesContainer: HTMLDivElement;
+};
+
 // Logical relation annotation stored in dataset.relation on the host node
 export type Relation = 'eq' | 'ne';
-
-/** Context object passed to query builders */
-export type BuildContext = {
-  type: ConditionTypeValue;
-  relation?: Relation;
-  values: ConditionItemValueViewEl[];
-  valuesContainer?: HTMLElement | null; //  Used by significance
-};
 
 export type Builder = (_ctx: BuildContext) => ConditionQuery;
 

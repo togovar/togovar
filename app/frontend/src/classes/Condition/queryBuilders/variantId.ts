@@ -1,4 +1,3 @@
-// app/frontend/src/classes/Condition/query-builders/variantId.ts
 import type {
   ConditionQuery,
   ConditionItemValueViewEl,
@@ -8,7 +7,10 @@ import type {
 
 /** Build query for variant id(s). */
 export function buildVariantIdQuery(context: BuildContext): ConditionQuery {
-  const ids = context.values.map((v: ConditionItemValueViewEl) => v.value);
-  const query: IdQuery = { id: ids };
-  return query;
+  const ids = context.values
+    .map((v: ConditionItemValueViewEl) => v.value?.trim())
+    .filter((s): s is string => !!s && s.length > 0);
+  if (ids.length === 0) return {};
+
+  return { id: ids } as IdQuery;
 }
