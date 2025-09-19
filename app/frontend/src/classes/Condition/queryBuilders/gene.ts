@@ -5,14 +5,16 @@ import type {
   BuildContext,
 } from '../../../types';
 
-/** Build query for gene symbol. */
+/** Build query for gene IDs (numeric). */
 export function buildGeneQuery(ctx: BuildContext): ConditionQuery {
-  const first = ctx.values[0] as ConditionItemValueViewEl | undefined;
-  if (!first) return {};
+  const geneIds = ctx.values.map((v: ConditionItemValueViewEl) =>
+    Number(v.value)
+  );
 
-  const idNum = Number(first.value);
-  const q: GeneQuery = {
-    gene: { relation: ctx.relation, terms: [idNum] },
-  };
-  return q;
+  if (geneIds.length === 0) return {};
+
+  // unique
+  const uniqueIds = Array.from(new Set(geneIds));
+
+  return { gene: { relation: ctx.relation, terms: uniqueIds } } as GeneQuery;
 }

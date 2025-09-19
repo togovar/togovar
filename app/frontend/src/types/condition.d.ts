@@ -60,7 +60,7 @@ export type ConditionQuery =
 //   [key: string]: any;
 // }
 
-// Query structure for location-based searches
+// Query structure for location
 export interface LocationQuery {
   location: {
     chromosome: string;
@@ -68,15 +68,15 @@ export interface LocationQuery {
   };
 }
 
-// Query structure for gene-based searches
+// Query structure for gene
 export interface GeneQuery {
   gene: {
-    relation?: Relation;
+    relation: Relation;
     terms: number[];
   };
 }
 
-// Query structure for variant ID searches
+// Query structure for variant ID
 export interface IdQuery {
   id: string[];
 }
