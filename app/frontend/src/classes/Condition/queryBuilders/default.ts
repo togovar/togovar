@@ -1,14 +1,13 @@
-// app/frontend/src/classes/Condition/query-builders/default.ts
 import type {
   ConditionQuery,
-  ConditionItemValueViewElement,
+  SelectedConditionValueEl,
   DefaultQuery,
   BuildContext,
 } from '../../../types';
 
 /** Fallback builder for miscellaneous condition types. */
 export function buildDefaultQuery(ctx: BuildContext): ConditionQuery {
-  const terms = ctx.values.map((v: ConditionItemValueViewElement) => v.value);
+  const terms = ctx.values.map((v: SelectedConditionValueEl) => v.value);
   const q: DefaultQuery = {
     [ctx.type]: { relation: ctx.relation, terms },
   };

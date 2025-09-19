@@ -1,5 +1,6 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
 import '../../../components/RangeSliderView.js';
+import type { FrequencyCountViewElement } from '../../../types';
 
 /**
  * Interface for frequency condition values
@@ -36,23 +37,6 @@ interface RangeSliderElement extends HTMLElement {
   searchType: string;
   sliderStep: number;
   inputStep: number;
-}
-
-/**
- * Interface for frequency count view custom element
- */
-interface FrequencyCountViewElement extends Element {
-  setValues(
-    conditionType: 'dataset' | 'genotype',
-    mode: string,
-    from: string | number,
-    to: string | number,
-    invert: string,
-    filtered: boolean
-  ): void;
-  mode: string;
-  from: string | number;
-  update(): void;
 }
 
 let id: number = 0;

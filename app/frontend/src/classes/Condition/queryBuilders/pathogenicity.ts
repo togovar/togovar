@@ -1,15 +1,14 @@
-// app/frontend/src/classes/Condition/query-builders/pathogenicity.ts
 import type {
   ConditionQuery,
-  ConditionItemValueViewElement,
+  SelectedConditionValueEl,
   PredictionValueViewElement,
   BuildContext,
 } from '../../../types';
 
 function getPrediction(
-  el: ConditionItemValueViewElement
+  el: SelectedConditionValueEl
 ): PredictionValueViewElement | null {
-  const sr = (el as any).shadowRoot as ShadowRoot | undefined;
+  const sr = el.shadowRoot as ShadowRoot | undefined;
   return sr
     ? (sr.querySelector(
         'prediction-value-view'

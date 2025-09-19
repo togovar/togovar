@@ -1,9 +1,10 @@
-import { HierarchyNode, hierarchy } from 'd3-hierarchy';
+import type { HierarchyNode } from 'd3-hierarchy';
+import { hierarchy } from 'd3-hierarchy';
 import { CONDITION_TYPE } from '../../../definition';
 import { ADVANCED_CONDITIONS } from '../../../global';
 import type { ConditionItemView } from '../ConditionItemView';
 import ConditionValueEditor from './ConditionValueEditor.js';
-import ConditionValues from '../ConditionValues.js';
+import type ConditionValues from '../ConditionValues.js';
 import { storeManager } from '../../../store/StoreManager';
 
 type DataNode = {

@@ -1,7 +1,7 @@
 // app/frontend/src/classes/Condition/query-builders/significance.ts
 import type {
   ConditionQuery,
-  ConditionItemValueViewElement,
+  SelectedConditionValueEl,
   SignificanceQuery,
   BuildContext,
 } from '../../../types';
@@ -17,18 +17,18 @@ const SEL = {
 function pickScoped(
   container: HTMLElement | null | undefined,
   selector: string
-): ConditionItemValueViewElement[] {
+): SelectedConditionValueEl[] {
   if (!container) return [];
   return Array.from(
     container.querySelectorAll(selector)
-  ) as ConditionItemValueViewElement[];
+  ) as SelectedConditionValueEl[];
 }
 
 function buildSourceCondition(
   key: string, // e.g., 'significance'
   relation: string, // 'eq' | 'ne' | ''
   source: 'mgend' | 'clinvar',
-  elements: ConditionItemValueViewElement[]
+  elements: SelectedConditionValueEl[]
 ): SignificanceQuery | null {
   if (elements.length === 0) return null;
   return {

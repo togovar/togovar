@@ -1,27 +1,17 @@
 import ConditionValueEditor from './ConditionValueEditor.js';
 import '../../../components/ConditionPathogenicityPredictionSearch/TabView.js';
 import '../../../components/ConditionPathogenicityPredictionSearch/PredictionRangeSliderView.js';
-import {
+import type {
   PredictionKey,
   PredictionLabel,
-  PREDICTIONS,
 } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
-import ConditionValues from '../ConditionValues.js';
-import { ConditionItemView } from '../ConditionItemView';
-
-interface ConditionItemValueViewElement extends HTMLElement {
-  label?: string;
-  conditionType?: string;
-  value?: string;
-  deleteButton?: boolean;
-}
-
-interface PredictionValueViewElement extends HTMLElement {
-  predictionDataset: string;
-  values: Array<number>;
-  inequalitySigns: Array<string>;
-  unassignedChecks: Array<string>;
-}
+import { PREDICTIONS } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
+import type ConditionValues from '../ConditionValues.js';
+import type { ConditionItemView } from '../ConditionItemView';
+import type {
+  ConditionItemValueViewEl,
+  PredictionValueViewElement,
+} from '../../../types';
 
 /**
  * Pathogenicity prediction editing screen
@@ -192,7 +182,7 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
   ) {
     let valueView = this._valuesElement.querySelector(
       'condition-item-value-view'
-    ) as ConditionItemValueViewElement;
+    ) as ConditionItemValueViewEl;
 
     if (!valueView) {
       valueView = document.createElement('condition-item-value-view');

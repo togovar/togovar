@@ -9,7 +9,7 @@ import { createEl } from '../../utils/dom/createEl';
 import type { AdvancedSearchBuilderView } from '../AdvancedSearchBuilderView';
 import type { ConditionGroupView } from './ConditionGroupView';
 import type {
-  ConditionItemValueViewElement,
+  SelectedConditionValueEl,
   ConditionQuery,
   Relation,
 } from '../../types';
@@ -120,7 +120,7 @@ export class ConditionItemView extends BaseConditionView {
     const relation = this._readRelation(); // Relation | undefined
     const values = Array.from(
       this._valuesEl.querySelectorAll(':scope > condition-item-value-view')
-    ) as ConditionItemValueViewElement[];
+    ) as SelectedConditionValueEl[];
 
     return buildQueryFragment({
       type: this._conditionType,

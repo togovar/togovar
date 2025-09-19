@@ -12,22 +12,7 @@ import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditor/
 import ConditionValueEditorVariantID from './ConditionValueEditor/ConditionValueEditorVariantID';
 import type { ConditionItemView } from './ConditionItemView';
 import { createEl } from '../../utils/dom/createEl';
-
-/** Minimal interface all editors must satisfy. */
-export interface ConditionValueEditor {
-  /** Capture current state when editing begins. */
-  keepLastValues(): void;
-  /** Restore captured state when user cancels. */
-  restore(): void;
-  /** Whether this editor currently has a valid value. */
-  readonly isValid: boolean;
-}
-
-/** Constructor signature for editor classes. */
-type EditorCtor = new (
-  host: ConditionValues,
-  view: ConditionItemView
-) => ConditionValueEditor;
+import type { ConditionValueEditor, EditorCtor } from '../../types';
 
 /** Registry: which editors are used for each condition type. */
 const EDITOR_REGISTRY: Readonly<

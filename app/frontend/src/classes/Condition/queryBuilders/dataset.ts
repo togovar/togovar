@@ -1,19 +1,19 @@
 import type {
   ConditionQuery,
-  ConditionItemValueViewElement,
-  FrequencyCountValueViewElement,
+  SelectedConditionValueEl,
+  FrequencyCountViewElement,
   BuildContext,
 } from '../../../types';
 
 /** Narrowing helper to access a shadow root safely. */
 function getFrequencyCount(
-  el: ConditionItemValueViewElement
-): FrequencyCountValueViewElement | null {
+  el: SelectedConditionValueEl
+): FrequencyCountViewElement | null {
   const shadowRoot = el.shadowRoot as ShadowRoot | undefined;
   return shadowRoot
     ? (shadowRoot.querySelector(
         'frequency-count-value-view'
-      ) as FrequencyCountValueViewElement | null)
+      ) as FrequencyCountViewElement | null)
     : null;
 }
 
@@ -25,7 +25,7 @@ export function buildDatasetQuery(ctx: BuildContext): ConditionQuery {
   const queries = ctx.values
     .map(getFrequencyCount)
     .filter(Boolean)
-    .map((fc) => (fc as FrequencyCountValueViewElement).queryValue);
+    .map((fc) => (fc as FrequencyCountViewElement).queryValue);
 
   if (queries.length <= 1) return queries[0] ?? {};
   return { or: queries };

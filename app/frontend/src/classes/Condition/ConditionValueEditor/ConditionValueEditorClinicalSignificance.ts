@@ -2,6 +2,7 @@ import ConditionValueEditor from './ConditionValueEditor.js';
 import { ADVANCED_CONDITIONS } from '../../../global';
 import type ConditionValues from '../ConditionValues.js';
 import type { ConditionItemView } from '../ConditionItemView';
+import type { ConditionItemValueViewEl } from '../../../types';
 
 type DatasetSource = 'clinvar' | 'mgend';
 
@@ -19,13 +20,6 @@ type Dataset = {
 interface DatasetValues {
   mgend: DatasetValue[];
   clinvar: DatasetValue[];
-}
-
-interface ConditionItemValueViewElement extends HTMLElement {
-  label: string;
-  conditionType: string;
-  value: string;
-  deleteButton?: boolean;
 }
 
 /** for clinical significance */
@@ -133,12 +127,12 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
       this._valuesElement.querySelectorAll(
         ':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view'
       )
-    ) as ConditionItemValueViewElement[];
+    ) as ConditionItemValueViewEl[];
     const valueClinvarElements = Array.from(
       this._valuesElement.querySelectorAll(
         ':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view'
       )
-    ) as ConditionItemValueViewElement[];
+    ) as ConditionItemValueViewEl[];
 
     this.#lastValues = {
       mgend: valueMgendElements.map((value) => ({
@@ -284,7 +278,7 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
     values.forEach((value) => {
       const valueView = document.createElement(
         'condition-item-value-view'
-      ) as ConditionItemValueViewElement;
+      ) as ConditionItemValueViewEl;
       valueView.conditionType = this._conditionType;
       valueView.label = value.label;
       valueView.value = value.value;
