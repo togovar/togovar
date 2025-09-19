@@ -91,12 +91,15 @@ export interface SignificanceQuery {
 }
 
 // Default query structure for other condition types
-export interface DefaultQuery {
-  [key: string]: {
-    relation?: Relation;
-    terms: string[];
-  };
+type DefaultQueryKey = 'consequence' | 'disease' | 'type';
+interface DefaultQueryEntry {
+  relation: Relation;
+  terms: string[];
 }
+type DefaultQuery =
+  | { consequence: DefaultQueryEntry }
+  | { disease: DefaultQueryEntry }
+  | { type: DefaultQueryEntry };
 
 // ───────────────────────────────────────────────────────────────────────────
 // ConditionValueEditor

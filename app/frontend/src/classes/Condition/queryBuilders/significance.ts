@@ -32,7 +32,6 @@ function buildSourceCondition(
   elements: ConditionItemValueViewEl[]
 ): SignificanceQuery | null {
   if (elements.length === 0) return null;
-  console.log(key, relation, source, elements);
   return {
     [key]: {
       relation,
