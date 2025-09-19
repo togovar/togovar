@@ -9,7 +9,7 @@ export type Relation = 'eq' | 'ne';
 export type BuildContext = {
   type: ConditionTypeValue;
   relation?: Relation;
-  values: SelectedConditionValueEl[];
+  values: ConditionItemValueViewEl[];
   valuesContainer?: HTMLElement | null; //  Used by significance
 };
 
@@ -40,14 +40,6 @@ type EditorCtor = new (
   host: ConditionValues,
   view: ConditionItemView
 ) => ConditionValueEditor;
-
-// ───────────────────────────────────────────────────────────────────────────
-// ValueViewElement
-// ───────────────────────────────────────────────────────────────────────────
-// Custom element export interface for condition item value views
-interface SelectedConditionValueEl extends Element {
-  value: string;
-}
 
 // ───────────────────────────────────────────────────────────────────────────
 // Query
@@ -118,7 +110,7 @@ interface ConditionItemValueViewEl extends HTMLElement {
 }
 
 // Custom element <frequency-count-value-view>
-interface FrequencyCountViewElement extends Element {
+interface FrequencyCountViewEl extends Element {
   readonly queryValue: ConditionQuery;
 
   setValues(
@@ -135,7 +127,7 @@ interface FrequencyCountViewElement extends Element {
 }
 
 // Custom element <prediction-value-view>
-interface PredictionValueViewElement extends HTMLElement {
+interface PredictionValueViewEl extends HTMLElement {
   readonly queryValue: ConditionQuery;
   predictionDataset: string;
   values: Array<number>;

@@ -1,18 +1,18 @@
 import type {
   ConditionQuery,
-  SelectedConditionValueEl,
-  PredictionValueViewElement,
+  ConditionItemValueViewEl,
+  PredictionValueViewEl,
   BuildContext,
 } from '../../../types';
 
 function getPrediction(
-  el: SelectedConditionValueEl
-): PredictionValueViewElement | null {
+  el: ConditionItemValueViewEl
+): PredictionValueViewEl | null {
   const sr = el.shadowRoot as ShadowRoot | undefined;
   return sr
     ? (sr.querySelector(
         'prediction-value-view'
-      ) as PredictionValueViewElement | null)
+      ) as PredictionValueViewEl | null)
     : null;
 }
 

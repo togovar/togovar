@@ -10,7 +10,7 @@ import type ConditionValues from '../ConditionValues.js';
 import type { ConditionItemView } from '../ConditionItemView';
 import type {
   ConditionItemValueViewEl,
-  PredictionValueViewElement,
+  PredictionValueViewEl,
 } from '../../../types';
 
 /**
@@ -198,7 +198,7 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
       .forEach((view) => {
         const predictionValueView = view.shadowRoot?.querySelector(
           'prediction-value-view'
-        ) as PredictionValueViewElement;
+        ) as PredictionValueViewEl;
         if (predictionValueView) {
           predictionValueView.predictionDataset = dataset;
           predictionValueView.values = values;

@@ -1,13 +1,13 @@
 import type {
   ConditionQuery,
-  SelectedConditionValueEl,
+  ConditionItemValueViewEl,
   LocationQuery,
   BuildContext,
 } from '../../../types';
 
 /** Build query for genomic location like "chr:pos" or "chr:start-end". */
 export function buildLocationQuery(ctx: BuildContext): ConditionQuery {
-  const first = ctx.values[0] as SelectedConditionValueEl | undefined;
+  const first = ctx.values[0] as ConditionItemValueViewEl | undefined;
   if (!first) return {};
 
   const raw = first.value ?? '';
