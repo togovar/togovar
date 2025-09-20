@@ -1,51 +1,13 @@
 import type { ConditionTypeValue } from '../definition';
+import type { NoRelationType } from '../conditions';
 import type { ConditionItemView } from '../classes/Condition/ConditionItemView';
 import type ConditionValues from '../classes/Condition/ConditionValues';
-
-/** Context object passed to query builders */
-type BuildContext = {
-  type: ConditionTypeValue;
-  values: ConditionItemValueViewEl[];
-  relation?: Relation;
-  valuesContainer: HTMLDivElement;
-};
-
-// Logical relation annotation stored in dataset.relation on the host node
-export type Relation = 'eq' | 'ne';
-
-export type Builder = (_ctx: BuildContext) => ConditionQuery;
-
-/** Command identifiers handled by the toolbar. */
-type Command = 'add-condition' | 'group' | 'ungroup' | 'delete';
-
-type CommandDef = Readonly<{
-  command: Command;
-  label: string;
-  // TODO: Key codes (display only). Currently informational; no keybindings here.
-  shortcut: number[];
-}>;
-
-/** Logical operator used to combine child conditions. */
-type LogicalOperator = 'and' | 'or';
-
-/** Minimal interface all editors must satisfy. */
-interface ConditionValueEditor {
-  keepLastValues(): void; // Capture current state when editing begins
-  restore(): void; // Restore captured state when user cancels
-  readonly isValid: boolean; // Whether this editor currently has a valid value
-}
-
-/** Constructor signature for editor classes. */
-type EditorCtor = new (
-  host: ConditionValues,
-  view: ConditionItemView
-) => ConditionValueEditor;
 
 // ───────────────────────────────────────────────────────────────────────────
 // Query
 // ───────────────────────────────────────────────────────────────────────────
 // Union type representing all possible condition query structures
-export type ConditionQuery =
+type ConditionQuery =
   // | QueryValue
   | LocationQuery
   | GeneQuery
@@ -54,6 +16,20 @@ export type ConditionQuery =
   | DefaultQuery
   | { or: ConditionQuery[] }
   | { and: ConditionQuery[] };
+
+/** Context object passed to query builders */
+type BuildContext<T extends ConditionTypeValue = ConditionTypeValue> = {
+  type: T;
+  values: ConditionItemValueViewEl[];
+  valuesContainer: HTMLDivElement;
+} & (T extends NoRelationType
+  ? { relation?: undefined }
+  : { relation: Relation });
+
+// Logical relation annotation stored in dataset.relation on the host node
+type Relation = 'eq' | 'ne';
+
+type Builder = (_ctx: BuildContext) => ConditionQuery;
 
 // // Generic query value object
 // export interface QueryValue {
@@ -69,7 +45,7 @@ export interface LocationQuery {
 }
 
 // Query structure for gene
-export interface GeneQuery {
+interface GeneQuery {
   gene: {
     relation: Relation;
     terms: number[];
@@ -82,11 +58,35 @@ export interface IdQuery {
 }
 
 // Query structure for clinical significance searches
+type SignificanceSource = 'mgend' | 'clinvar';
+type SignificanceTerms =
+  | 'NC'
+  | 'P'
+  | 'PLP'
+  | 'LP '
+  | 'LPLP '
+  | 'DR '
+  | 'ERA'
+  | 'LRA'
+  | 'URA '
+  | 'CS '
+  | 'A '
+  | 'RF'
+  | 'AF'
+  | 'PR'
+  | 'B'
+  | 'LB'
+  | 'CI'
+  | 'AN '
+  | 'O '
+  | 'US '
+  | 'NP ';
+
 export interface SignificanceQuery {
-  [key: string]: {
-    relation?: Relation;
-    source: string[];
-    terms: string[];
+  significance: {
+    relation: Relation;
+    source: SignificanceSource[];
+    terms: SignificanceTerms[];
   };
 }
 
@@ -96,10 +96,14 @@ interface DefaultQueryEntry {
   relation: Relation;
   terms: string[];
 }
+type DefaultQueryOf<K extends DefaultQueryKey> = {
+  [P in K]: { relation: Relation; terms: string[] };
+};
+
 type DefaultQuery =
-  | { consequence: DefaultQueryEntry }
-  | { disease: DefaultQueryEntry }
-  | { type: DefaultQueryEntry };
+  | DefaultQueryOf<'consequence'>
+  | DefaultQueryOf<'disease'>
+  | DefaultQueryOf<'type'>;
 
 // ───────────────────────────────────────────────────────────────────────────
 // ConditionValueEditor
@@ -137,3 +141,29 @@ interface PredictionValueViewEl extends HTMLElement {
   inequalitySigns: Array<string>;
   unassignedChecks: Array<string>;
 }
+
+/** Command identifiers handled by the toolbar. */
+type Command = 'add-condition' | 'group' | 'ungroup' | 'delete';
+
+type CommandDef = Readonly<{
+  command: Command;
+  label: string;
+  // TODO: Key codes (display only). Currently informational; no keybindings here.
+  shortcut: number[];
+}>;
+
+/** Logical operator used to combine child conditions. */
+type LogicalOperator = 'and' | 'or';
+
+/** Minimal interface all editors must satisfy. */
+interface ConditionValueEditor {
+  keepLastValues(): void; // Capture current state when editing begins
+  restore(): void; // Restore captured state when user cancels
+  readonly isValid: boolean; // Whether this editor currently has a valid value
+}
+
+/** Constructor signature for editor classes. */
+type EditorCtor = new (
+  host: ConditionValues,
+  view: ConditionItemView
+) => ConditionValueEditor;

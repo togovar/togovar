@@ -1,24 +1,22 @@
-import type {
-  ConditionQuery,
-  ConditionItemValueViewEl,
-  LocationQuery,
-  BuildContext,
-} from '../../../types';
+import type { ConditionQuery, BuildContext } from '../../../types';
 
 /** Build query for genomic location like "chr:pos" or "chr:start-end". */
 export function buildLocationQuery(ctx: BuildContext): ConditionQuery {
-  const first = ctx.values[0] as ConditionItemValueViewEl | undefined;
-  if (!first) return {};
+  const raw = ctx.values[0]?.value?.trim();
+  if (!raw) return {};
 
-  const raw = first.value ?? '';
-  const [chromosome, positionStr = ''] = raw.split(':');
-  const parts = positionStr.split('-');
+  // chr: expects 1-22, X, Y, MT, etc. The number part is one or more half-width digits.
+  const m = /^([^:]+):(\d+)(?:-(\d+))?$/.exec(raw);
+  if (!m) return {};
+
+  const [, chromosome, startStr, endStr] = m;
+  const start = Number(startStr);
+  const end = endStr ? Number(endStr) : undefined;
 
   const position =
-    parts.length === 1
-      ? Number(parts[0])
-      : { gte: Number(parts[0]), lte: Number(parts[1]) };
+    end === undefined
+      ? start
+      : { gte: Math.min(start, end), lte: Math.max(start, end) };
 
-  const q: LocationQuery = { location: { chromosome, position } };
-  return q;
+  return { location: { chromosome, position } };
 }

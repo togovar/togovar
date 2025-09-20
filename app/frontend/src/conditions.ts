@@ -11,9 +11,7 @@ const RAW_BY_REF = {
   GRCh38: (grch38Json as GRChConditions).conditions,
 } as const;
 
-const NO_RELATION_BY_REF: Readonly<
-  Record<Reference, Readonly<Partial<Record<ConditionTypeValue, true>>>>
-> = {
+const NO_RELATION_BY_REF = {
   GRCh37: {
     dataset: true,
     genotype: true,
@@ -28,7 +26,15 @@ const NO_RELATION_BY_REF: Readonly<
     id: true,
     location: true,
   },
-};
+} as const satisfies Record<
+  Reference,
+  Readonly<Partial<Record<ConditionTypeValue, true>>>
+>;
+
+type NoRel37 = keyof (typeof NO_RELATION_BY_REF)['GRCh37'];
+type NoRel38 = keyof (typeof NO_RELATION_BY_REF)['GRCh38'];
+
+export type NoRelationType = NoRel37 | NoRel38;
 
 function normalizeConditions(
   raw: Partial<Record<ConditionTypeValue, string | { label: string }>>,
@@ -50,5 +56,7 @@ export const ADVANCED_CONDITIONS = normalizeConditions(
   NO_RELATION_BY_REF[TOGOVAR_FRONTEND_REFERENCE]
 );
 
-export const supportsRelation = (t: ConditionTypeValue) =>
-  ADVANCED_CONDITIONS[t]?.supportsRelation ?? true;
+export const supportsRelation = <T extends ConditionTypeValue>(
+  t: T
+): t is Exclude<T, NoRelationType> =>
+  !((t as NoRelationType) in NO_RELATION_BY_REF[TOGOVAR_FRONTEND_REFERENCE]);

@@ -1,20 +1,9 @@
-import type {
-  ConditionQuery,
-  ConditionItemValueViewEl,
-  GeneQuery,
-  BuildContext,
-} from '../../../types';
+import type { ConditionQuery, BuildContext } from '../../../types';
 
 /** Build query for gene IDs (numeric). */
-export function buildGeneQuery(ctx: BuildContext): ConditionQuery {
-  const geneIds = ctx.values.map((v: ConditionItemValueViewEl) =>
-    Number(v.value)
-  );
-
-  if (geneIds.length === 0) return {};
-
-  // unique
+export function buildGeneQuery(ctx: BuildContext<'gene'>): ConditionQuery {
+  const geneIds = ctx.values.map((v) => Number(v.value));
   const uniqueIds = Array.from(new Set(geneIds));
 
-  return { gene: { relation: ctx.relation, terms: uniqueIds } } as GeneQuery;
+  return { gene: { relation: ctx.relation!, terms: uniqueIds } };
 }

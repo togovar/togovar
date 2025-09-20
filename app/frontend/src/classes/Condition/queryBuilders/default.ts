@@ -1,19 +1,17 @@
 import type {
   ConditionQuery,
-  ConditionItemValueViewEl,
-  DefaultQueryKey,
-  DefaultQuery,
   BuildContext,
+  DefaultQuery,
 } from '../../../types';
 
 /** Fallback builder for Consequence, Disease, Variant type condition types. */
-export function buildDefaultQuery(ctx: BuildContext): ConditionQuery {
+export function buildDefaultQuery(
+  ctx: BuildContext<'consequence' | 'disease' | 'type'>
+): ConditionQuery {
   const terms = ctx.values
-    .map((v: ConditionItemValueViewEl) => v.value?.trim())
+    .map((v) => v.value?.trim())
     .filter((s): s is string => !!s && s.length > 0);
-  if (terms.length === 0) return {};
-
-  const key = ctx.type as DefaultQueryKey;
+  const key = ctx.type;
 
   return { [key]: { relation: ctx.relation, terms } } as DefaultQuery;
 }
