@@ -29,7 +29,9 @@ type BuildContext<T extends ConditionTypeValue = ConditionTypeValue> = {
 // Logical relation annotation stored in dataset.relation on the host node
 type Relation = 'eq' | 'ne';
 
-type Builder = (_ctx: BuildContext) => ConditionQuery;
+type BuilderMap = {
+  [K in ConditionTypeValue]?: (ctx: BuildContext<K>) => ConditionQuery;
+};
 
 // // Generic query value object
 // export interface QueryValue {

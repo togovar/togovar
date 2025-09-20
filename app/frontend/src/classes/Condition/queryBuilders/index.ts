@@ -6,9 +6,14 @@ import { buildLocationQuery } from './location';
 import { buildPathogenicityQuery } from './pathogenicity';
 import { buildVariantIdQuery } from './variantId';
 import { buildDefaultQuery } from './default';
-import type { ConditionQuery, Builder, BuildContext } from '../../../types';
+import type {
+  ConditionQuery,
+  BuilderMap,
+  BuildContext,
+  DefaultQueryKey,
+} from '../../../types';
 
-const BUILDERS: Partial<Record<ConditionTypeValue, Builder>> = {
+const BUILDERS: BuilderMap = {
   [CONDITION_TYPE.dataset]: buildDatasetQuery,
   [CONDITION_TYPE.significance]: buildSignificanceQuery,
   [CONDITION_TYPE.gene_symbol]: buildGeneQuery,
@@ -19,7 +24,12 @@ const BUILDERS: Partial<Record<ConditionTypeValue, Builder>> = {
 };
 
 /** Dispatch to the appropriate builder based on condition type */
-export function buildQueryFragment(ctx: BuildContext): ConditionQuery {
-  const builder = BUILDERS[ctx.type] ?? buildDefaultQuery;
-  return builder(ctx);
+export function buildQueryFragment<T extends ConditionTypeValue>(
+  ctx: BuildContext<T>
+): ConditionQuery {
+  const b = BUILDERS[ctx.type] as
+    | ((c: BuildContext<T>) => ConditionQuery)
+    | undefined;
+
+  return b ? b(ctx) : buildDefaultQuery(ctx as BuildContext<DefaultQueryKey>);
 }
