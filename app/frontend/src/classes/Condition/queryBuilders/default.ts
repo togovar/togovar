@@ -1,12 +1,13 @@
 import type {
   ConditionQuery,
   BuildContext,
+  DefaultQueryKey,
   DefaultQuery,
 } from '../../../types';
 
 /** Fallback builder for Consequence, Disease, Variant type condition types. */
 export function buildDefaultQuery(
-  ctx: BuildContext<'consequence' | 'disease' | 'type'>
+  ctx: BuildContext<DefaultQueryKey>
 ): ConditionQuery {
   const terms = ctx.values
     .map((v) => v.value?.trim())

@@ -8,7 +8,6 @@ import type ConditionValues from '../classes/Condition/ConditionValues';
 // ───────────────────────────────────────────────────────────────────────────
 // Union type representing all possible condition query structures
 type ConditionQuery =
-  // | QueryValue
   | LocationQuery
   | GeneQuery
   | IdQuery
@@ -27,18 +26,13 @@ type BuildContext<T extends ConditionTypeValue = ConditionTypeValue> = {
   : { relation: Relation });
 
 // Logical relation annotation stored in dataset.relation on the host node
-type Relation = 'eq' | 'ne';
 
 type BuilderMap = {
   [K in ConditionTypeValue]?: (ctx: BuildContext<K>) => ConditionQuery;
 };
 
-// // Generic query value object
-// export interface QueryValue {
-//   [key: string]: any;
-// }
+type Relation = 'eq' | 'ne';
 
-// Query structure for location
 export interface LocationQuery {
   location: {
     chromosome: string;
@@ -46,7 +40,6 @@ export interface LocationQuery {
   };
 }
 
-// Query structure for gene
 interface GeneQuery {
   gene: {
     relation: Relation;
