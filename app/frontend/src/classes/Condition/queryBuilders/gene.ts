@@ -1,7 +1,7 @@
-import type { ConditionQuery, BuildContext } from '../../../types';
+import type { GeneQuery, BuildContext } from '../../../types';
 
 /** Build query for gene IDs (numeric). */
-export function buildGeneQuery(ctx: BuildContext<'gene'>): ConditionQuery {
+export function buildGeneQuery(ctx: BuildContext<'gene'>): GeneQuery {
   const geneIds = ctx.values.map((v) => Number(v.value));
   const uniqueIds = Array.from(new Set(geneIds));
 

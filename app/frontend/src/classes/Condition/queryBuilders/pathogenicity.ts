@@ -1,25 +1,26 @@
 import type {
-  ConditionQuery,
   ConditionItemValueViewEl,
-  PredictionValueViewEl,
   BuildContext,
+  PredictionQuery,
+  PredictionValueViewEl,
 } from '../../../types';
 
 function getPrediction(
   el: ConditionItemValueViewEl
 ): PredictionValueViewEl | null {
-  const sr = el.shadowRoot as ShadowRoot | undefined;
-  return sr
-    ? (sr.querySelector(
-        'prediction-value-view'
-      ) as PredictionValueViewEl | null)
-    : null;
+  if (!el.shadowRoot) {
+    throw new Error('pathogenicity_prediction: missing shadow root');
+  }
+  return el.shadowRoot.querySelector('prediction-value-view');
 }
 
 /** Build query for pathogenicity_prediction. */
-export function buildPathogenicityQuery(ctx: BuildContext): ConditionQuery {
-  const first = ctx.values[0];
-  if (!first) return {};
-  const pred = getPrediction(first);
-  return pred ? pred.queryValue : {};
+export function buildPathogenicityQuery(
+  ctx: BuildContext<'pathogenicity_prediction'>
+): PredictionQuery {
+  const predictionValueEl = getPrediction(ctx.values[0]);
+  if (!predictionValueEl) {
+    throw new Error('pathogenicity_prediction: missing or invalid value');
+  }
+  return predictionValueEl.queryValue;
 }

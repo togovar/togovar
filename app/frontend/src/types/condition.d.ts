@@ -12,6 +12,7 @@ type ConditionQuery =
   | GeneQuery
   | IdQuery
   | SignificanceQuery
+  | PredictionQuery
   | DefaultQuery
   | { or: ConditionQuery[] }
   | { and: ConditionQuery[] };
@@ -85,20 +86,38 @@ export interface SignificanceQuery {
   };
 }
 
+type PredictionKey = 'alphamissense' | 'sift' | 'polyphen';
+
+type PredictionQueryOf<K extends PredictionKey> = {
+  [P in K]?: {
+    score: ScoreRange;
+  };
+};
+
+type PredictionQuery<K extends PredictionKey = PredictionKey> =
+  PredictionQueryOf<K>;
+
+type ScoreRange =
+  // pairs
+  | { gte: number; lte: number; gt?: never; lt?: never }
+  | { gt: number; lt: number; gte?: never; lte?: never }
+  | { gt: number; lte: number; gte?: never; lt?: never }
+  | { gte: number; lt: number; gt?: never; lte?: never }
+  // singles
+  | { gte: number; gt?: never; lte?: never; lt?: never }
+  | { gt: number; gte?: never; lte?: never; lt?: never }
+  | { lte: number; gte?: never; gt?: never; lt?: never }
+  | { lt: number; gte?: never; gt?: never; lte?: never };
+
 // Default query structure for other condition types
 type DefaultQueryKey = 'consequence' | 'disease' | 'type';
-interface DefaultQueryEntry {
-  relation: Relation;
-  terms: string[];
-}
+
 type DefaultQueryOf<K extends DefaultQueryKey> = {
   [P in K]: { relation: Relation; terms: string[] };
 };
 
-type DefaultQuery =
-  | DefaultQueryOf<'consequence'>
-  | DefaultQueryOf<'disease'>
-  | DefaultQueryOf<'type'>;
+type DefaultQuery<K extends DefaultQueryKey = DefaultQueryKey> =
+  DefaultQueryOf<K>;
 
 // ───────────────────────────────────────────────────────────────────────────
 // ConditionValueEditor
@@ -130,13 +149,16 @@ interface FrequencyCountViewEl extends Element {
 
 // Custom element <prediction-value-view>
 interface PredictionValueViewEl extends HTMLElement {
-  readonly queryValue: ConditionQuery;
+  readonly queryValue: PredictionQuery;
   predictionDataset: string;
   values: Array<number>;
   inequalitySigns: Array<string>;
   unassignedChecks: Array<string>;
 }
 
+// ───────────────────────────────────────────────────────────────────────────
+//
+// ───────────────────────────────────────────────────────────────────────────
 /** Command identifiers handled by the toolbar. */
 type Command = 'add-condition' | 'group' | 'ungroup' | 'delete';
 
