@@ -1,8 +1,9 @@
-// app/frontend/src/classes/Condition/query-builders/significance.ts
 import type {
-  ConditionQuery,
   ConditionItemValueViewEl,
+  SignificanceSource,
+  SignificanceTerms,
   SignificanceQuery,
+  SignificanceExpression,
   BuildContext,
   Relation,
 } from '../../../types';
@@ -13,50 +14,95 @@ const SEL = {
     ':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view',
   clinvar:
     ':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view',
-};
+} as const;
+
+const SIGNIFICANCE_TERMS = new Set<SignificanceTerms>([
+  'NC',
+  'P',
+  'PLP',
+  'LP',
+  'LPLP',
+  'DR',
+  'ERA',
+  'LRA',
+  'URA',
+  'CS',
+  'A',
+  'RF',
+  'AF',
+  'PR',
+  'B',
+  'LB',
+  'CI',
+  'AN',
+  'O',
+  'US',
+  'NP',
+]);
 
 function pickScoped(
   container: HTMLElement | null | undefined,
   selector: string
 ): ConditionItemValueViewEl[] {
-  if (!container) return [];
+  if (!container) {
+    throw new Error('pickScoped: missing container');
+  }
   return Array.from(
     container.querySelectorAll(selector)
   ) as ConditionItemValueViewEl[];
 }
 
+function isSignificanceTerm(v: unknown): v is SignificanceTerms {
+  return (
+    typeof v === 'string' && SIGNIFICANCE_TERMS.has(v as SignificanceTerms)
+  );
+}
+
+function collectTerms(
+  elements: ConditionItemValueViewEl[]
+): SignificanceTerms[] {
+  return elements.map((e) => e.value).filter(isSignificanceTerm);
+}
+
+// Per-source builder returns `null` when that source is simply "not selected" (no DOM items).
 function buildSourceCondition(
-  key: string, // e.g., 'significance'
   relation: Relation,
-  source: 'mgend' | 'clinvar',
+  source: SignificanceSource,
   elements: ConditionItemValueViewEl[]
 ): SignificanceQuery | null {
   if (elements.length === 0) return null;
-  return {
-    [key]: {
-      relation,
-      source: [source],
-      terms: elements.map((e) => e.value),
-    },
-  };
+  const terms = collectTerms(elements);
+  if (terms.length === 0) return null;
+
+  return { significance: { relation, source: [source], terms } };
 }
 
-/** Build query for clinical significance (combines MGEND and ClinVar). */
-export function buildSignificanceQuery(ctx: BuildContext): ConditionQuery {
-  const container = ctx.valuesContainer ?? null;
+export function buildSignificanceQuery(
+  ctx: BuildContext<'significance'>
+): SignificanceExpression {
+  const container = ctx.valuesContainer;
   const mgendEls = pickScoped(container, SEL.mgend);
   const clinvarEls = pickScoped(container, SEL.clinvar);
 
-  const rel = ctx.relation;
-  const relationType = rel === 'ne' ? 'and' : 'or';
+  // Build clauses per source (MGEND/ClinVar)
+  const mgend = buildSourceCondition(ctx.relation, 'mgend', mgendEls);
+  const clinvar = buildSourceCondition(ctx.relation, 'clinvar', clinvarEls);
 
-  const mgend = buildSourceCondition(ctx.type, rel, 'mgend', mgendEls);
-  const clinvar = buildSourceCondition(ctx.type, rel, 'clinvar', clinvarEls);
+  // Keep only present clauses (drop `null`) and narrow the array to `SignificanceQuery[]`
+  const conditions = [mgend, clinvar].filter(
+    (clause): clause is SignificanceQuery => clause !== null
+  );
 
-  const conditions = [mgend, clinvar].filter(Boolean) as SignificanceQuery[];
+  // 0 sources => user selected nothing in both sections: fail fast
+  if (conditions.length === 0) {
+    throw new Error('significance: no terms selected');
+  }
 
-  if (conditions.length === 0) return {};
-  if (conditions.length === 1) return conditions[0];
+  // 1 source => pass the single clause through as-is
+  if (conditions.length === 1) {
+    return conditions[0];
+  }
 
-  return { [relationType]: conditions };
+  // 2 sources => combine by relation: 'ne' (exclude) uses AND, otherwise OR
+  return ctx.relation === 'ne' ? { and: conditions } : { or: conditions };
 }

@@ -11,7 +11,7 @@ type ConditionQuery =
   | LocationQuery
   | GeneQuery
   | IdQuery
-  | SignificanceQuery
+  | SignificanceExpression
   | PredictionQuery
   | DefaultQuery
   | { or: ConditionQuery[] }
@@ -32,9 +32,12 @@ type BuilderMap = {
   [K in ConditionTypeValue]?: (ctx: BuildContext<K>) => ConditionQuery;
 };
 
+// Generic logical wrapper for query fragments.
+type Logical<T> = T | { and: Logical<T>[] } | { or: Logical<T>[] };
+
 type Relation = 'eq' | 'ne';
 
-export interface LocationQuery {
+interface LocationQuery {
   location: {
     chromosome: string;
     position: number | { gte: number; lte: number };
@@ -59,24 +62,24 @@ type SignificanceTerms =
   | 'NC'
   | 'P'
   | 'PLP'
-  | 'LP '
-  | 'LPLP '
-  | 'DR '
+  | 'LP'
+  | 'LPLP'
+  | 'DR'
   | 'ERA'
   | 'LRA'
-  | 'URA '
-  | 'CS '
-  | 'A '
+  | 'URA'
+  | 'CS'
+  | 'A'
   | 'RF'
   | 'AF'
   | 'PR'
   | 'B'
   | 'LB'
   | 'CI'
-  | 'AN '
-  | 'O '
-  | 'US '
-  | 'NP ';
+  | 'AN'
+  | 'O'
+  | 'US'
+  | 'NP';
 
 export interface SignificanceQuery {
   significance: {
@@ -85,6 +88,8 @@ export interface SignificanceQuery {
     terms: SignificanceTerms[];
   };
 }
+// Significance-specific logical expression
+type SignificanceExpression = Logical<SignificanceQuery>;
 
 type PredictionKey = 'alphamissense' | 'sift' | 'polyphen';
 
