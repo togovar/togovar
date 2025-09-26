@@ -4,11 +4,11 @@ import * as _ from 'lodash';
 import { API_URL } from '../global';
 const LIMIT = 100;
 import { extractSearchCondition } from '../store/searchManager';
-import { FetchOption, SearchResults, SearchStatistics } from '../types';
+import type { FetchOption, SearchResults, SearchStatistics } from '../types';
 
 let currentAbortController = null;
 let _currentSearchMode: 'simple' | 'advanced' | null = null;
-let lastRequestRanges = new Set(); // 取得済みの範囲を管理
+const lastRequestRanges = new Set(); // 取得済みの範囲を管理
 
 /** 検索を実行するメソッド（データ取得 & 更新） */
 export const executeSearch = (() => {
@@ -241,8 +241,15 @@ function _getErrorMessage(statusCode: number): string {
 
 /** 検索結果データをセット */
 function _processSearchResults(json: SearchResults) {
-  // results
-  storeManager.setResults(json.data, json.scroll.offset);
+  const rows = Array.isArray(json?.data) ? json.data : [];
+  const offset =
+    typeof json?.scroll?.offset === 'number' ? json.scroll.offset : 0;
+
+  if (!Array.isArray(json?.data)) {
+    console.error('[search] Unexpected result shape (no data array):', json);
+  }
+
+  storeManager.setResults(rows, offset);
 }
 
 /** 統計情報をセット */
