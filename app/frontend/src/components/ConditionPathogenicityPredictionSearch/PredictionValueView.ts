@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, state, query, queryAll } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { range } from 'lit/directives/range.js';
@@ -6,37 +6,45 @@ import { createGradientSlider } from './createGradientSlider';
 import { ALPHAMISSENSE_THRESHOLD, PREDICTIONS } from './PredictionDatasets';
 import { setInequalitySign } from './setInequalitySign.js';
 import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
-
 import Styles from '../../../stylesheets/object/component/prediction-value-view.scss';
+import type { ScoreRange, Inequality, PredictionKey } from '../../types';
 
 const SLIDER_CONFIG = {
   numberOfScales: 10,
   sliderWidth: 100,
-};
+} as const;
 
 @customElement('prediction-value-view')
 export class PredictionValueView extends LitElement {
   static styles = [Styles];
 
-  @state({ type: String }) _dataset = 'alphamissense';
-  @state({ type: String }) _label = 'AlphaMissense';
-  @state({ type: Array }) _values = [0, 1];
-  @state({ type: Array }) _inequalitySigns = ['gte', 'lte'];
-  @state({ type: Array }) _unassignedChecks = [];
-  @state({ type: Object }) _activeDataset = ALPHAMISSENSE_THRESHOLD;
+  @state() private _dataset: PredictionKey = 'alphamissense';
+  @state() private _label: string = 'AlphaMissense';
 
-  @query('.bar') _bar;
-  @queryAll('.inequality-sign') _inequalitySignsEl;
+  @state() private _values: [number, number] = [0, 1];
+  @state() private _inequalitySigns: [Inequality, Inequality] = ['gte', 'lte'];
+  @state() private _unassignedChecks: string[] = [];
+  @state() private _activeDataset: unknown = ALPHAMISSENSE_THRESHOLD;
+
+  @query('.bar') private _bar!: HTMLDivElement;
+  @queryAll('.inequality-sign')
+  private _inequalitySignsEl!: NodeListOf<HTMLSpanElement>;
 
   firstUpdated() {
     this._setBarStyles();
   }
 
-  setValues(dataset, values, inequalitySigns, unassignedChecks) {
+  setValues(
+    dataset: PredictionKey,
+    values: [number, number],
+    inequalitySigns: [Inequality, Inequality],
+    unassignedChecks: string[]
+  ): void {
     this._dataset = dataset;
     this._values = values;
     this._inequalitySigns = inequalitySigns;
     this._unassignedChecks = unassignedChecks;
+
     this._label = PREDICTIONS[this._dataset].label;
     this._activeDataset = PREDICTIONS[this._dataset].threshold;
 
@@ -46,7 +54,7 @@ export class PredictionValueView extends LitElement {
     this._setBarStyles();
   }
 
-  _setBarStyles() {
+  private _setBarStyles() {
     this._bar.style.left = this._values[0] * 100 + '%';
     this._bar.style.right = 100 - this._values[1] * 100 + '%';
     this._bar.style.backgroundImage = createGradientSlider(
@@ -140,5 +148,3 @@ export class PredictionValueView extends LitElement {
     };
   }
 }
-
-export default PredictionValueView;

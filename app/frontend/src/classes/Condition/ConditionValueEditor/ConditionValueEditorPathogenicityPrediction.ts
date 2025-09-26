@@ -1,4 +1,4 @@
-import { ConditionValueEditor } from './ConditionValueEditor.js';
+import { ConditionValueEditor } from './ConditionValueEditor';
 import '../../../components/ConditionPathogenicityPredictionSearch/TabView.js';
 import '../../../components/ConditionPathogenicityPredictionSearch/PredictionRangeSliderView.js';
 import type {
@@ -8,10 +8,8 @@ import type {
 import { PREDICTIONS } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
 import type ConditionValues from '../ConditionValues.js';
 import type { ConditionItemView } from '../ConditionItemView';
-import type {
-  ConditionItemValueViewEl,
-  PredictionValueViewEl,
-} from '../../../types';
+import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
+import type { PredictionValueView } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionValueView';
 
 /**
  * Pathogenicity prediction editing screen
@@ -114,7 +112,7 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
       'pathogenicity-editor-view',
       `<header>Select prediction</header><div class="body" />`
     );
-    this._tabsContainer = this._el?.querySelector('.body')!;
+    this._tabsContainer = this.sectionEl?.querySelector('.body')!;
     this._createTabView();
   }
 
@@ -182,7 +180,7 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
   ) {
     let valueView = this._valuesElement.querySelector(
       'condition-item-value-view'
-    ) as ConditionItemValueViewEl;
+    ) as ConditionItemValueView;
 
     if (!valueView) {
       valueView = document.createElement('condition-item-value-view');
@@ -198,7 +196,7 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
       .forEach((view) => {
         const predictionValueView = view.shadowRoot?.querySelector(
           'prediction-value-view'
-        ) as PredictionValueViewEl;
+        ) as PredictionValueView;
         if (predictionValueView) {
           predictionValueView.predictionDataset = dataset;
           predictionValueView.values = values;

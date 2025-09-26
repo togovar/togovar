@@ -154,6 +154,7 @@ type ScoreRange =
   | { lte: number; gte?: never; gt?: never; lt?: never }
   | { lt: number; gte?: never; gt?: never; lte?: never };
 
+type Inequality = 'gt' | 'gte' | 'lt' | 'lte';
 // ───────────────────────────────────────────────────────────────────────────
 //
 // ───────────────────────────────────────────────────────────────────────────
