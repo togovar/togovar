@@ -1,5 +1,5 @@
 import { storeManager } from '../../../store/StoreManager';
-import ConditionValueEditor from './ConditionValueEditor.js';
+import { ConditionValueEditor } from './ConditionValueEditor.js';
 import '../../../components/ConditionItemValueView';
 
 const OPTIONS = [

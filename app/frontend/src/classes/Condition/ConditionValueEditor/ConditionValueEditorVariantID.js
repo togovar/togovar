@@ -1,4 +1,4 @@
-import ConditionValueEditor from './ConditionValueEditor.js';
+import { ConditionValueEditor } from './ConditionValueEditor.js';
 import SearchField from '../../../components/SearchField/SearchField';
 
 /** Variant ID editing screen */

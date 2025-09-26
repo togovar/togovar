@@ -1,4 +1,4 @@
-import ConditionValueEditor from './ConditionValueEditor.js';
+import { ConditionValueEditor } from './ConditionValueEditor.js';
 import '../../../components/ConditionPathogenicityPredictionSearch/TabView.js';
 import '../../../components/ConditionPathogenicityPredictionSearch/PredictionRangeSliderView.js';
 import type {

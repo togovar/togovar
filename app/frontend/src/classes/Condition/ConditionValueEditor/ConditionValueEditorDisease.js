@@ -1,4 +1,4 @@
-import ConditionValueEditor from './ConditionValueEditor.js';
+import { ConditionValueEditor } from './ConditionValueEditor.js';
 
 import { ConditionDiseaseSearch } from '../../../components/ConditionDiseaseSearch/ConditionDiseaseSearch.js';
 

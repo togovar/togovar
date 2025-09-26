@@ -1,4 +1,4 @@
-import ConditionValueEditor from './ConditionValueEditor.js';
+import { ConditionValueEditor } from './ConditionValueEditor.js';
 import '../../../components/RangeSliderView.js';
 import type { FrequencyCountViewEl } from '../../../types';
 

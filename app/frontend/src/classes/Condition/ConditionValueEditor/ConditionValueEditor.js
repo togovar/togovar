@@ -1,14 +1,4 @@
-/** The core of advanced search conditions.
- * Superclass of
- * {@link ConditionValueEditorCheckboxes},
- * {@link ConditionValueEditorColumns},
- * {@link ConditionValueEditorDisease}
- * {@link ConditionValueEditorFrequencyCount},
- * {@link ConditionValueEditorGene},
- * {@link ConditionValueEditorLocation},
- * {@link ConditionValueEditorVariantID},
- */
-class ConditionValueEditor {
+export class ConditionValueEditor {
   /**
    * @param {ConditionValues} valuesView
    * @param {ConditionItemView} conditionView */
@@ -110,5 +100,3 @@ class ConditionValueEditor {
     return valueViews;
   }
 }
-
-export default ConditionValueEditor;

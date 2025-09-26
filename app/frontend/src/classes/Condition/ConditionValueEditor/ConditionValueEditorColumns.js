@@ -1,4 +1,4 @@
-import ConditionValueEditor from './ConditionValueEditor.js';
+import { ConditionValueEditor } from './ConditionValueEditor.js';
 import { ADVANCED_CONDITIONS } from '../../../global';
 import { CONDITION_TYPE } from '../../../definition.ts';
 
