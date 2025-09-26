@@ -1,9 +1,9 @@
-import type { LocationQuery, BuildContext } from '../../../types';
+import type { LocationLeaf, BuildContext } from '../../../types';
 
 /** Build query for genomic location like "chr:pos" or "chr:start-end". */
 export function buildLocationQuery(
   ctx: BuildContext<'location'>
-): LocationQuery {
+): LocationLeaf {
   const v0 = ctx.values[0];
   if (!v0 || typeof v0.value !== 'string' || v0.value.trim() === '') {
     throw new Error('location: missing or empty value');

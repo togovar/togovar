@@ -1,7 +1,7 @@
 import type {
   ConditionItemValueViewEl,
   BuildContext,
-  PredictionQuery,
+  PredictionLeaf,
   PredictionValueViewEl,
 } from '../../../types';
 
@@ -17,7 +17,7 @@ function getPrediction(
 /** Build query for pathogenicity_prediction. */
 export function buildPathogenicityQuery(
   ctx: BuildContext<'pathogenicity_prediction'>
-): PredictionQuery {
+): PredictionLeaf {
   const predictionValueEl = getPrediction(ctx.values[0]);
   if (!predictionValueEl) {
     throw new Error('pathogenicity_prediction: missing or invalid value');

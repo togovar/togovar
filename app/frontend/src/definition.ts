@@ -34,3 +34,57 @@ export const CONDITION_NODE_KIND = {
   condition: 0,
   group: 1,
 };
+
+export const FREQUENCY_DATASETS = [
+  'gem_j_wga',
+  'jga_wgs',
+  'jga_wes',
+  'jga_snp',
+  'tommo',
+  'ncbn',
+  'gnomad_genomes',
+  'gnomad_exomes',
+] as const;
+export type FrequencyDataset = (typeof FREQUENCY_DATASETS)[number];
+
+export const GENOTYPE_KEYS = [
+  'aac',
+  'arc',
+  'rrc',
+  'aoc',
+  'roc',
+  'ooc',
+  'hac',
+  'hrc',
+  'hoc',
+] as const;
+export type GenotypeKey = (typeof GENOTYPE_KEYS)[number];
+
+export const SIGNIFICANCE_TERMS = [
+  'NC',
+  'P',
+  'PLP',
+  'LP',
+  'LPLP',
+  'DR',
+  'ERA',
+  'LRA',
+  'URA',
+  'CS',
+  'A',
+  'RF',
+  'AF',
+  'PR',
+  'B',
+  'LB',
+  'CI',
+  'AN',
+  'O',
+  'US',
+  'NP',
+] as const;
+export type SignificanceTerm = (typeof SIGNIFICANCE_TERMS)[number];
+
+export const SIGNIFICANCE_TERM_SET: ReadonlySet<SignificanceTerm> = new Set(
+  SIGNIFICANCE_TERMS
+);

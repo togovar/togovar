@@ -1,24 +1,18 @@
-import type { ConditionTypeValue } from '../definition';
+import type {
+  ConditionTypeValue,
+  FrequencyDataset,
+  GenotypeKey,
+  SignificanceTerm,
+} from '../definition';
 import type { NoRelationType } from '../conditions';
 import type { ConditionItemView } from '../classes/Condition/ConditionItemView';
 import type ConditionValues from '../classes/Condition/ConditionValues';
 
 // ───────────────────────────────────────────────────────────────────────────
-// Query
+// Builder
 // ───────────────────────────────────────────────────────────────────────────
-// Union type representing all possible condition query structures
-type ConditionQuery =
-  | LocationQuery
-  | GeneQuery
-  | IdQuery
-  | SignificanceExpression
-  | PredictionQuery
-  | DefaultQuery
-  | { or: ConditionQuery[] }
-  | { and: ConditionQuery[] };
-
 /** Context object passed to query builders */
-type BuildContext<T extends ConditionTypeValue = ConditionTypeValue> = {
+type BuildContext<T extends ConditionTypeValue> = {
   type: T;
   values: ConditionItemValueViewEl[];
   valuesContainer: HTMLDivElement;
@@ -26,82 +20,127 @@ type BuildContext<T extends ConditionTypeValue = ConditionTypeValue> = {
   ? { relation?: undefined }
   : { relation: Relation });
 
-// Logical relation annotation stored in dataset.relation on the host node
-
 type BuilderMap = {
   [K in ConditionTypeValue]?: (ctx: BuildContext<K>) => ConditionQuery;
 };
 
-// Generic logical wrapper for query fragments.
+// ───────────────────────────────────────────────────────────────────────────
+// Query
+// ───────────────────────────────────────────────────────────────────────────
+// Union type representing all possible condition query structures
+type ConditionLeaf =
+  | SignificanceLeaf
+  | FrequencyLeaf
+  | GeneLeaf
+  | LocationLeaf
+  | PredictionLeaf
+  | IdLeaf
+  | DefaultLeaf;
+
+type ConditionQuery = Logical<ConditionLeaf>;
+
 type Logical<T> = T | { and: Logical<T>[] } | { or: Logical<T>[] };
 
 type Relation = 'eq' | 'ne';
 
-interface LocationQuery {
-  location: {
-    chromosome: string;
-    position: number | { gte: number; lte: number };
-  };
+// ───────────────────────────────────────────────────────────────────────────
+// Frequency Query
+// ───────────────────────────────────────────────────────────────────────────
+type FrequencyQuery = Logical<AlleleFrequency | AlleleCount | GenotypeCount>;
+type FrequencyLeaf = AlleleFrequency | AlleleCount | GenotypeCount;
+
+interface FrequencyBase<
+  Extra extends Record<string, unknown> = Record<string, never>
+> {
+  frequency: {
+    dataset: { name: FrequencyDataset };
+    filtered?: boolean;
+  } & Extra;
 }
 
-interface GeneQuery {
+interface AlleleFrequency
+  extends FrequencyBase<{ frequency: ScoreRange } & { filtered: boolean }> {}
+
+interface AlleleCount
+  extends FrequencyBase<{ count: ScoreRange } & { filtered: boolean }> {}
+
+interface GenotypeCount
+  extends FrequencyBase<
+    { genotype: { key: GenotypeKey; count: ScoreRange } } & {
+      filtered: boolean;
+    }
+  > {}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Significance Query
+// ───────────────────────────────────────────────────────────────────────────
+interface SignificanceLeaf {
+  significance: {
+    relation: Relation;
+    source: SignificanceSource[];
+    terms: SignificanceTerm[];
+  };
+}
+type SignificanceQuery = Logical<SignificanceLeaf>;
+
+type SignificanceSource = 'mgend' | 'clinvar';
+
+// ───────────────────────────────────────────────────────────────────────────
+// Gene Query
+// ───────────────────────────────────────────────────────────────────────────
+interface GeneLeaf {
   gene: {
     relation: Relation;
     terms: number[];
   };
 }
 
-// Query structure for variant ID
-export interface IdQuery {
+// ───────────────────────────────────────────────────────────────────────────
+// Location Query
+// ───────────────────────────────────────────────────────────────────────────
+interface LocationLeaf {
+  location: {
+    chromosome: string;
+    position: number | ScoreRange;
+  };
+}
+
+// TODO: chromosome: stringを厳密にする
+
+// ───────────────────────────────────────────────────────────────────────────
+// Prediction Query
+// ───────────────────────────────────────────────────────────────────────────
+type PredictionKey = 'alphamissense' | 'sift' | 'polyphen';
+
+type PredictionLeaf =
+  | { alphamissense: { score: ScoreRange } }
+  | { sift: { score: ScoreRange } }
+  | { polyphen: { score: ScoreRange } };
+
+// ───────────────────────────────────────────────────────────────────────────
+// ID Query
+// ───────────────────────────────────────────────────────────────────────────
+interface IdLeaf {
   id: string[];
 }
 
-// Query structure for clinical significance searches
-type SignificanceSource = 'mgend' | 'clinvar';
-type SignificanceTerms =
-  | 'NC'
-  | 'P'
-  | 'PLP'
-  | 'LP'
-  | 'LPLP'
-  | 'DR'
-  | 'ERA'
-  | 'LRA'
-  | 'URA'
-  | 'CS'
-  | 'A'
-  | 'RF'
-  | 'AF'
-  | 'PR'
-  | 'B'
-  | 'LB'
-  | 'CI'
-  | 'AN'
-  | 'O'
-  | 'US'
-  | 'NP';
+// ───────────────────────────────────────────────────────────────────────────
+// Default Query
+// ───────────────────────────────────────────────────────────────────────────
+type DefaultQueryKey = 'consequence' | 'disease' | 'type';
 
-export interface SignificanceQuery {
-  significance: {
-    relation: Relation;
-    source: SignificanceSource[];
-    terms: SignificanceTerms[];
-  };
-}
-// Significance-specific logical expression
-type SignificanceExpression = Logical<SignificanceQuery>;
-
-type PredictionKey = 'alphamissense' | 'sift' | 'polyphen';
-
-type PredictionQueryOf<K extends PredictionKey> = {
-  [P in K]?: {
-    score: ScoreRange;
-  };
+type DefaultQueryOf<K extends DefaultQueryKey> = {
+  [P in K]: { relation: Relation; terms: string[] };
 };
 
-type PredictionQuery<K extends PredictionKey = PredictionKey> =
-  PredictionQueryOf<K>;
+type DefaultLeaf =
+  | { consequence: { relation: Relation; terms: string[] } }
+  | { disease: { relation: Relation; terms: string[] } }
+  | { type: { relation: Relation; terms: string[] } };
 
+// ───────────────────────────────────────────────────────────────────────────
+//
+// ───────────────────────────────────────────────────────────────────────────
 type ScoreRange =
   // pairs
   | { gte: number; lte: number; gt?: never; lt?: never }
@@ -113,16 +152,6 @@ type ScoreRange =
   | { gt: number; gte?: never; lte?: never; lt?: never }
   | { lte: number; gte?: never; gt?: never; lt?: never }
   | { lt: number; gte?: never; gt?: never; lte?: never };
-
-// Default query structure for other condition types
-type DefaultQueryKey = 'consequence' | 'disease' | 'type';
-
-type DefaultQueryOf<K extends DefaultQueryKey> = {
-  [P in K]: { relation: Relation; terms: string[] };
-};
-
-type DefaultQuery<K extends DefaultQueryKey = DefaultQueryKey> =
-  DefaultQueryOf<K>;
 
 // ───────────────────────────────────────────────────────────────────────────
 // ConditionValueEditor
@@ -137,7 +166,7 @@ interface ConditionItemValueViewEl extends HTMLElement {
 
 // Custom element <frequency-count-value-view>
 interface FrequencyCountViewEl extends Element {
-  readonly queryValue: ConditionQuery;
+  readonly queryValue: FrequencyQuery;
 
   setValues(
     conditionType: 'dataset' | 'genotype',
@@ -154,7 +183,7 @@ interface FrequencyCountViewEl extends Element {
 
 // Custom element <prediction-value-view>
 interface PredictionValueViewEl extends HTMLElement {
-  readonly queryValue: PredictionQuery;
+  readonly queryValue: PredictionLeaf;
   predictionDataset: string;
   values: Array<number>;
   inequalitySigns: Array<string>;

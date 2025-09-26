@@ -1,13 +1,13 @@
 import type {
   BuildContext,
-  DefaultQuery,
+  DefaultLeaf,
   DefaultQueryKey,
 } from '../../../types';
 
 /** Fallback builder for Consequence, Disease, Variant type condition types. */
 export function buildDefaultQuery(
   ctx: BuildContext<DefaultQueryKey>
-): DefaultQuery {
+): DefaultLeaf {
   const key = ctx.type;
   const terms = ctx.values
     .map((v) => v.value?.trim())
@@ -15,5 +15,5 @@ export function buildDefaultQuery(
 
   return {
     [key]: { relation: ctx.relation, terms },
-  } as DefaultQuery;
+  } as DefaultLeaf;
 }

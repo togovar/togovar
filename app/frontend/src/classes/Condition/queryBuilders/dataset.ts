@@ -1,5 +1,5 @@
 import type {
-  ConditionQuery,
+  FrequencyQuery,
   ConditionItemValueViewEl,
   FrequencyCountViewEl,
   BuildContext,
@@ -9,24 +9,23 @@ import type {
 function getFrequencyCount(
   el: ConditionItemValueViewEl
 ): FrequencyCountViewEl | null {
-  const shadowRoot = el.shadowRoot as ShadowRoot | undefined;
-  return shadowRoot
-    ? (shadowRoot.querySelector(
-        'frequency-count-value-view'
-      ) as FrequencyCountViewEl | null)
-    : null;
+  if (!el.shadowRoot) {
+    throw new Error('dataset/genotype: missing shadow root');
+  }
+  return el.shadowRoot.querySelector('frequency-count-value-view');
 }
 
 /**
  * Build query for dataset/genotype.
- * Each value hosts a <frequency-count-value-view> in its shadowRoot.
  */
-export function buildDatasetQuery(ctx: BuildContext): ConditionQuery {
+export function buildDatasetQuery(
+  ctx: BuildContext<'dataset' | 'genotype'>
+): FrequencyQuery {
   const queries = ctx.values
     .map(getFrequencyCount)
     .filter(Boolean)
     .map((fc) => (fc as FrequencyCountViewEl).queryValue);
 
-  if (queries.length <= 1) return queries[0] ?? {};
+  if (queries.length <= 1) return queries[0];
   return { or: queries };
 }

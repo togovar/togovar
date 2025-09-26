@@ -1,12 +1,16 @@
 import type {
   ConditionItemValueViewEl,
   SignificanceSource,
-  SignificanceTerms,
+  SignificanceLeaf,
   SignificanceQuery,
-  SignificanceExpression,
   BuildContext,
   Relation,
 } from '../../../types';
+
+import {
+  SIGNIFICANCE_TERM_SET,
+  type SignificanceTerm,
+} from '../../../definition';
 
 /** Query selectors scoped within the values container. */
 const SEL = {
@@ -15,30 +19,6 @@ const SEL = {
   clinvar:
     ':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view',
 } as const;
-
-const SIGNIFICANCE_TERMS = new Set<SignificanceTerms>([
-  'NC',
-  'P',
-  'PLP',
-  'LP',
-  'LPLP',
-  'DR',
-  'ERA',
-  'LRA',
-  'URA',
-  'CS',
-  'A',
-  'RF',
-  'AF',
-  'PR',
-  'B',
-  'LB',
-  'CI',
-  'AN',
-  'O',
-  'US',
-  'NP',
-]);
 
 function pickScoped(
   container: HTMLElement | null | undefined,
@@ -52,15 +32,15 @@ function pickScoped(
   ) as ConditionItemValueViewEl[];
 }
 
-function isSignificanceTerm(v: unknown): v is SignificanceTerms {
+function isSignificanceTerm(v: unknown): v is SignificanceTerm {
   return (
-    typeof v === 'string' && SIGNIFICANCE_TERMS.has(v as SignificanceTerms)
+    typeof v === 'string' && SIGNIFICANCE_TERM_SET.has(v as SignificanceTerm)
   );
 }
 
 function collectTerms(
   elements: ConditionItemValueViewEl[]
-): SignificanceTerms[] {
+): SignificanceTerm[] {
   return elements.map((e) => e.value).filter(isSignificanceTerm);
 }
 
@@ -69,7 +49,7 @@ function buildSourceCondition(
   relation: Relation,
   source: SignificanceSource,
   elements: ConditionItemValueViewEl[]
-): SignificanceQuery | null {
+): SignificanceLeaf | null {
   if (elements.length === 0) return null;
   const terms = collectTerms(elements);
   if (terms.length === 0) return null;
@@ -79,7 +59,7 @@ function buildSourceCondition(
 
 export function buildSignificanceQuery(
   ctx: BuildContext<'significance'>
-): SignificanceExpression {
+): SignificanceQuery {
   const container = ctx.valuesContainer;
   const mgendEls = pickScoped(container, SEL.mgend);
   const clinvarEls = pickScoped(container, SEL.clinvar);
@@ -88,9 +68,9 @@ export function buildSignificanceQuery(
   const mgend = buildSourceCondition(ctx.relation, 'mgend', mgendEls);
   const clinvar = buildSourceCondition(ctx.relation, 'clinvar', clinvarEls);
 
-  // Keep only present clauses (drop `null`) and narrow the array to `SignificanceQuery[]`
+  // Keep only present clauses (drop `null`) and narrow the array to `SignificanceLeaf[]`
   const conditions = [mgend, clinvar].filter(
-    (clause): clause is SignificanceQuery => clause !== null
+    (clause): clause is SignificanceLeaf => clause !== null
   );
 
   // 0 sources => user selected nothing in both sections: fail fast
