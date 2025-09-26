@@ -1,5 +1,4 @@
 import type {
-  ConditionItemValueViewEl,
   SignificanceSource,
   SignificanceLeaf,
   SignificanceQuery,
@@ -11,6 +10,7 @@ import {
   SIGNIFICANCE_TERM_SET,
   type SignificanceTerm,
 } from '../../../definition';
+import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 
 /** Query selectors scoped within the values container. */
 const SEL = {
@@ -23,13 +23,13 @@ const SEL = {
 function pickScoped(
   container: HTMLElement | null | undefined,
   selector: string
-): ConditionItemValueViewEl[] {
+): ConditionItemValueView[] {
   if (!container) {
     throw new Error('pickScoped: missing container');
   }
   return Array.from(
     container.querySelectorAll(selector)
-  ) as ConditionItemValueViewEl[];
+  ) as ConditionItemValueView[];
 }
 
 function isSignificanceTerm(v: unknown): v is SignificanceTerm {
@@ -38,9 +38,7 @@ function isSignificanceTerm(v: unknown): v is SignificanceTerm {
   );
 }
 
-function collectTerms(
-  elements: ConditionItemValueViewEl[]
-): SignificanceTerm[] {
+function collectTerms(elements: ConditionItemValueView[]): SignificanceTerm[] {
   return elements.map((e) => e.value).filter(isSignificanceTerm);
 }
 
@@ -48,7 +46,7 @@ function collectTerms(
 function buildSourceCondition(
   relation: Relation,
   source: SignificanceSource,
-  elements: ConditionItemValueViewEl[]
+  elements: ConditionItemValueView[]
 ): SignificanceLeaf | null {
   if (elements.length === 0) return null;
   const terms = collectTerms(elements);

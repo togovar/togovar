@@ -1,4 +1,4 @@
-import { ConditionValueEditor } from './ConditionValueEditor.js';
+import { ConditionValueEditor } from './ConditionValueEditor.ts';
 import SearchFieldWithSuggestions from '../../../components/SearchField/suggestions/SearchFieldWithSuggestions';
 import { API_URL } from '../../../global.ts';
 

@@ -3,7 +3,7 @@ import { hierarchy } from 'd3-hierarchy';
 import { CONDITION_TYPE } from '../../../definition';
 import { ADVANCED_CONDITIONS } from '../../../global';
 import type { ConditionItemView } from '../ConditionItemView';
-import { ConditionValueEditor } from './ConditionValueEditor.js';
+import { ConditionValueEditor } from './ConditionValueEditor';
 import type ConditionValues from '../ConditionValues.js';
 import { storeManager } from '../../../store/StoreManager';
 

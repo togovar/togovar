@@ -1,13 +1,8 @@
-import type {
-  ConditionItemValueViewEl,
-  BuildContext,
-  PredictionLeaf,
-  PredictionValueViewEl,
-} from '../../../types';
+import type { BuildContext, PredictionLeaf } from '../../../types';
+import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
+import type { PredictionValueView } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionValueView';
 
-function getPrediction(
-  el: ConditionItemValueViewEl
-): PredictionValueViewEl | null {
+function getPrediction(el: ConditionItemValueView): PredictionValueView | null {
   if (!el.shadowRoot) {
     throw new Error('pathogenicity_prediction: missing shadow root');
   }

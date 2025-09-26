@@ -1,5 +1,5 @@
 import { storeManager } from '../../../store/StoreManager';
-import { ConditionValueEditor } from './ConditionValueEditor.js';
+import { ConditionValueEditor } from './ConditionValueEditor.ts';
 import '../../../components/ConditionItemValueView';
 
 const OPTIONS = [
@@ -53,7 +53,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     );
 
     // references
-    const rows = this._el.querySelectorAll(':scope > .body > .row');
+    const rows = this.sectionEl.querySelectorAll(':scope > .body > .row');
     this._chr = rows[1].querySelector(':scope > .chromosome > .form > select');
     this._rangeInputView = rows[1].querySelector(
       ':scope > .position > .range-inputs-view'
@@ -66,7 +66,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     this._isWhole = false;
 
     // events
-    this._el
+    this.sectionEl
       .querySelector(':scope > .body > .row:nth-child(1) > label > input')
       .addEventListener('change', (e) => {
         this._rangeInputView.dataset.type = e.target.checked

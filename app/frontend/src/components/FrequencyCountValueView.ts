@@ -1,6 +1,13 @@
-import { LitElement, html, TemplateResult } from 'lit';
+import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import Style from '../../stylesheets/object/component/frequency-count-value-view.scss';
+import type {
+  ScoreRange,
+  FrequencyLeaf,
+  FrequencyQuery,
+  GenotypeCount,
+} from '../types';
+import type { FrequencyDataset, GenotypeKey } from '../definition';
 
 /**
  * Display mode constants definition
@@ -13,7 +20,22 @@ const MODE = {
   hemi_alt: 'hac',
 } as const;
 
-type ModeType = (typeof MODE)[keyof typeof MODE];
+type ModeKey = keyof typeof MODE;
+
+const DATASET_MODES = ['frequency', 'count'] as const;
+type DatasetMode = (typeof DATASET_MODES)[number];
+const isDatasetMode = (m: ModeKey): m is DatasetMode =>
+  (DATASET_MODES as readonly string[]).includes(m);
+
+const GENOTYPE_MODES = ['alt_alt', 'alt_ref', 'hemi_alt'] as const;
+type GenotypeMode = (typeof GENOTYPE_MODES)[number];
+const GENOTYPE_MODE_TO_KEY = {
+  alt_alt: 'aac',
+  alt_ref: 'arc',
+  hemi_alt: 'hac',
+} as const satisfies Record<GenotypeMode, GenotypeKey>;
+const isGenotypeMode = (m: string): m is GenotypeMode =>
+  (GENOTYPE_MODES as readonly string[]).includes(m);
 
 /**
  * Web component for visualizing frequency count values
@@ -23,10 +45,10 @@ export class FrequencyCountValueView extends LitElement {
   static styles = [Style];
 
   /** Type of condition for query building ('dataset' or 'genotype') */
-  @property({ type: String }) conditionType: 'dataset' | 'genotype';
+  @property({ type: String }) conditionType: 'dataset' | 'genotype' = 'dataset';
 
   /** Display mode */
-  @property({ type: String }) mode: ModeType = MODE.frequency;
+  @property({ type: String }) mode: DatasetMode | GenotypeMode = 'frequency';
 
   /** Range start value */
   @property({ type: Number }) from: number = 0;
@@ -101,7 +123,7 @@ export class FrequencyCountValueView extends LitElement {
    */
   setValues(
     conditionType: 'dataset' | 'genotype',
-    mode: ModeType,
+    mode: ModeKey,
     from: number,
     to: number,
     invert: string,
@@ -162,8 +184,12 @@ export class FrequencyCountValueView extends LitElement {
    * Generates query value object based on current component state
    * @returns Query parameter object for filtering
    */
-  get queryValue() {
-    const dataset = { name: this.dataset.dataset };
+  get queryValue(): FrequencyQuery {
+    const nameStr = this.dataset?.dataset ?? '';
+
+    const dataset: { name: FrequencyDataset } = {
+      name: nameStr as FrequencyDataset,
+    };
 
     if (this.conditionType === 'dataset') {
       return this._buildDatasetQuery(dataset);
@@ -178,7 +204,9 @@ export class FrequencyCountValueView extends LitElement {
    * @returns Query object for dataset filtering
    * @private
    */
-  private _buildDatasetQuery(dataset: { name: string }) {
+  private _buildDatasetQuery(dataset: {
+    name: FrequencyDataset;
+  }): FrequencyQuery {
     if (this.invert === '1') {
       return this._buildInvertedDatasetQuery(dataset);
     } else {
@@ -192,31 +220,24 @@ export class FrequencyCountValueView extends LitElement {
    * @returns Inverted query object with OR conditions
    * @private
    */
-  private _buildInvertedDatasetQuery(dataset: { name: string }) {
-    return {
-      or: [
-        {
-          frequency: {
-            dataset,
-            frequency: {
-              gte: 0,
-              lte: this.from,
-            },
-            filtered: this.filtered,
-          },
-        },
-        {
-          frequency: {
-            dataset,
-            frequency: {
-              gte: this.to,
-              lte: 1,
-            },
-            filtered: this.filtered,
-          },
-        },
-      ],
+  private _buildInvertedDatasetQuery(dataset: {
+    name: FrequencyDataset;
+  }): FrequencyQuery {
+    const left: FrequencyLeaf = {
+      frequency: {
+        dataset,
+        frequency: { gte: 0, lte: this.from },
+        filtered: this.filtered,
+      },
     };
+    const right: FrequencyLeaf = {
+      frequency: {
+        dataset,
+        frequency: { gte: this.to, lte: 1 },
+        filtered: this.filtered,
+      },
+    };
+    return { or: [left, right] };
   }
 
   /**
@@ -225,15 +246,21 @@ export class FrequencyCountValueView extends LitElement {
    * @returns Normal query object with range values
    * @private
    */
-  private _buildNormalDatasetQuery(dataset: { name: string }) {
+  private _buildNormalDatasetQuery(dataset: {
+    name: FrequencyDataset;
+  }): FrequencyLeaf {
+    if (!isDatasetMode(this.mode)) {
+      throw new Error(`invalid dataset mode: ${this.mode}`);
+    }
+    const field: DatasetMode = this.mode;
     const values = this._buildRangeValues();
     return {
       frequency: {
         dataset,
-        [this.mode]: values,
+        [field]: values,
         filtered: this.filtered,
       },
-    };
+    } as FrequencyLeaf;
   }
 
   /**
@@ -242,15 +269,21 @@ export class FrequencyCountValueView extends LitElement {
    * @returns Query object for genotype filtering
    * @private
    */
-  private _buildGenotypeQuery(dataset: { name: string }) {
+  private _buildGenotypeQuery(dataset: {
+    name: FrequencyDataset;
+  }): GenotypeCount {
     const values = this._buildRangeValues();
+
+    if (!isGenotypeMode(this.mode)) {
+      throw new Error(`invalid genotype mode: ${this.mode}`);
+    }
+
+    const key: GenotypeKey = GENOTYPE_MODE_TO_KEY[this.mode];
+
     return {
       frequency: {
         dataset,
-        genotype: {
-          key: MODE[this.mode],
-          count: values,
-        },
+        genotype: { key, count: values },
         filtered: this.filtered,
       },
     };
@@ -261,11 +294,14 @@ export class FrequencyCountValueView extends LitElement {
    * @returns Object containing gte and/or lte values
    * @private
    */
-  private _buildRangeValues(): Record<string, number> {
-    const values: Record<string, number> = {};
-    if (String(this.from) !== '') values.gte = this.from;
-    if (String(this.to) !== '') values.lte = this.to;
-    return values;
+  private _buildRangeValues(): ScoreRange {
+    const hasFrom = String(this.from) !== '';
+    const hasTo = String(this.to) !== '';
+    if (hasFrom && hasTo) return { gte: this.from, lte: this.to };
+    if (hasFrom) return { gte: this.from };
+    if (hasTo) return { lte: this.to };
+    // どちらも未指定の場合の扱いは仕様に合わせて。ここでは全域を返す例。
+    return { gte: 0, lte: 1 };
   }
 }
 

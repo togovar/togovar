@@ -1,8 +1,8 @@
-import { ConditionValueEditor } from './ConditionValueEditor.js';
+import { ConditionValueEditor } from './ConditionValueEditor';
 import { ADVANCED_CONDITIONS } from '../../../global';
 import type ConditionValues from '../ConditionValues.js';
 import type { ConditionItemView } from '../ConditionItemView';
-import type { ConditionItemValueViewEl } from '../../../types';
+import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 
 type DatasetSource = 'clinvar' | 'mgend';
 
@@ -65,12 +65,12 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
 
     // delete 'not in clinver'
     if (this._conditionType === 'significance') {
-      this._el.querySelector('li[data-value="NC"]').remove();
+      this.sectionEl.querySelector('li[data-value="NC"]').remove();
     }
 
     // references
     this.#checkboxes = Array.from(
-      this._el.querySelectorAll(':scope > ul > li > label > input')
+      this.sectionEl.querySelectorAll(':scope > ul > li > label > input')
     );
 
     // attach events
@@ -111,7 +111,7 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
   /** "Select all" と "Clear all" ボタンにクリックイベントを追加し、
    * ボタンがクリックされた際にチェックボックスの状態を一括変更する。 */
   #attachButtonEvents() {
-    this._el
+    this.sectionEl
       .querySelectorAll(':scope > .buttons > button')
       .forEach((button, index) => {
         button.addEventListener('click', () => {
@@ -127,12 +127,12 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
       this._valuesElement.querySelectorAll(
         ':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view'
       )
-    ) as ConditionItemValueViewEl[];
+    ) as ConditionItemValueView[];
     const valueClinvarElements = Array.from(
       this._valuesElement.querySelectorAll(
         ':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view'
       )
-    ) as ConditionItemValueViewEl[];
+    ) as ConditionItemValueView[];
 
     this.#lastValues = {
       mgend: valueMgendElements.map((value) => ({
@@ -278,7 +278,7 @@ export default class ConditionValueEditorClinicalSignificance extends ConditionV
     values.forEach((value) => {
       const valueView = document.createElement(
         'condition-item-value-view'
-      ) as ConditionItemValueViewEl;
+      ) as ConditionItemValueView;
       valueView.conditionType = this._conditionType;
       valueView.label = value.label;
       valueView.value = value.value;

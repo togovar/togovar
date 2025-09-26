@@ -8,11 +8,8 @@ import { buildQueryFragment } from './queryBuilders';
 import { createEl } from '../../utils/dom/createEl';
 import type { AdvancedSearchBuilderView } from '../AdvancedSearchBuilderView';
 import type { ConditionGroupView } from './ConditionGroupView';
-import type {
-  ConditionItemValueViewEl,
-  ConditionQuery,
-  Relation,
-} from '../../types';
+import type { ConditionQuery, Relation } from '../../types';
+import type { ConditionItemValueView } from '../../components/ConditionItemValueView';
 
 /**
  * A single condition row with edit/delete behaviors.
@@ -120,7 +117,7 @@ export class ConditionItemView extends BaseConditionView {
     const relation = this._readRelation(); // Relation | undefined
     const values = Array.from(
       this._valuesEl.querySelectorAll(':scope > condition-item-value-view')
-    ) as ConditionItemValueViewEl[];
+    ) as ConditionItemValueView[];
 
     return buildQueryFragment({
       type: this._conditionType,

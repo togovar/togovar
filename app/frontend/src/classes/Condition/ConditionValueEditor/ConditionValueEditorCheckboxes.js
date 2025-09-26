@@ -1,4 +1,4 @@
-import { ConditionValueEditor } from './ConditionValueEditor.js';
+import { ConditionValueEditor } from './ConditionValueEditor.ts';
 import { ADVANCED_CONDITIONS } from '../../../global';
 
 /** for clinical significance, variant type */
@@ -38,12 +38,12 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
 
     // delete 'not in clinver'
     if (this._conditionType === 'significance') {
-      this._el.querySelector('li[data-value="NC"]').remove();
+      this.sectionEl.querySelector('li[data-value="NC"]').remove();
     }
 
     // references
     this._checkboxes = Array.from(
-      this._el.querySelectorAll(':scope > ul > li > label > input')
+      this.sectionEl.querySelectorAll(':scope > ul > li > label > input')
     );
 
     // attach events
@@ -52,7 +52,7 @@ export default class ConditionValueEditorCheckboxes extends ConditionValueEditor
         this._update();
       });
     });
-    this._el
+    this.sectionEl
       .querySelectorAll(':scope > .buttons > button')
       .forEach((button, index) => {
         button.addEventListener('click', () => {

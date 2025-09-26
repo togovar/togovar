@@ -7,6 +7,7 @@ import type {
 import type { NoRelationType } from '../conditions';
 import type { ConditionItemView } from '../classes/Condition/ConditionItemView';
 import type ConditionValues from '../classes/Condition/ConditionValues';
+import type { ConditionItemValueView } from '../components/ConditionItemValueView';
 
 // ───────────────────────────────────────────────────────────────────────────
 // Builder
@@ -14,7 +15,7 @@ import type ConditionValues from '../classes/Condition/ConditionValues';
 /** Context object passed to query builders */
 type BuildContext<T extends ConditionTypeValue> = {
   type: T;
-  values: ConditionItemValueViewEl[];
+  values: ConditionItemValueView[];
   valuesContainer: HTMLDivElement;
 } & (T extends NoRelationType
   ? { relation?: undefined }
@@ -152,43 +153,6 @@ type ScoreRange =
   | { gt: number; gte?: never; lte?: never; lt?: never }
   | { lte: number; gte?: never; gt?: never; lt?: never }
   | { lt: number; gte?: never; gt?: never; lte?: never };
-
-// ───────────────────────────────────────────────────────────────────────────
-// ConditionValueEditor
-// ───────────────────────────────────────────────────────────────────────────
-// Custom element <condition-item-value-view>
-interface ConditionItemValueViewEl extends HTMLElement {
-  label?: string;
-  conditionType?: string;
-  value?: string;
-  deleteButton?: boolean;
-}
-
-// Custom element <frequency-count-value-view>
-interface FrequencyCountViewEl extends Element {
-  readonly queryValue: FrequencyQuery;
-
-  setValues(
-    conditionType: 'dataset' | 'genotype',
-    mode: string,
-    from: string | number,
-    to: string | number,
-    invert: string,
-    filtered: boolean
-  ): void;
-  mode: string;
-  from: string | number;
-  update(): void;
-}
-
-// Custom element <prediction-value-view>
-interface PredictionValueViewEl extends HTMLElement {
-  readonly queryValue: PredictionLeaf;
-  predictionDataset: string;
-  values: Array<number>;
-  inequalitySigns: Array<string>;
-  unassignedChecks: Array<string>;
-}
 
 // ───────────────────────────────────────────────────────────────────────────
 //

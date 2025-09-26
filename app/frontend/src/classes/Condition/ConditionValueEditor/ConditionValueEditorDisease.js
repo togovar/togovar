@@ -1,4 +1,4 @@
-import { ConditionValueEditor } from './ConditionValueEditor.js';
+import { ConditionValueEditor } from './ConditionValueEditor.ts';
 
 import { ConditionDiseaseSearch } from '../../../components/ConditionDiseaseSearch/ConditionDiseaseSearch.js';
 
@@ -20,7 +20,7 @@ export default class ConditionValueEditorDisease extends ConditionValueEditor {
     `
     );
 
-    this._el.classList.add('text-field-editor-view');
+    this.sectionEl.classList.add('text-field-editor-view');
 
     this._conditionElem =
       this._body.querySelector('condition-disease-search') ||

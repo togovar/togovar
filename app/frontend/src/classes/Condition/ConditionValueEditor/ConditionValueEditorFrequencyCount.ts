@@ -1,6 +1,6 @@
-import { ConditionValueEditor } from './ConditionValueEditor.js';
+import { ConditionValueEditor } from './ConditionValueEditor';
 import '../../../components/RangeSliderView.js';
-import type { FrequencyCountViewEl } from '../../../types';
+import type { FrequencyCountValueView } from '../../../components/FrequencyCountValueView';
 
 /**
  * Interface for frequency condition values
@@ -266,7 +266,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       this.changeParameter(e.detail);
     });
 
-    const container = this._el.querySelector('.range-selector-view');
+    const container = this.sectionEl.querySelector('.range-selector-view');
     if (container) {
       container.appendChild(rangeSlider);
     }
@@ -460,13 +460,13 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * @param view - Parent view element
    * @returns Frequency count view element or null
    */
-  #getFrequencyCountView(view: Element): FrequencyCountViewEl | null {
+  #getFrequencyCountView(view: Element): FrequencyCountValueView | null {
     const shadowRoot = (view as any).shadowRoot;
     if (!shadowRoot) return null;
 
     const freqCountView = shadowRoot.querySelector(
       'frequency-count-value-view'
-    ) as FrequencyCountViewEl;
+    ) as FrequencyCountValueView;
     return freqCountView && typeof freqCountView.setValues === 'function'
       ? freqCountView
       : null;
@@ -476,7 +476,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * Updates a frequency count view with current condition values
    * @param freqCountView - The frequency count view to update
    */
-  #updateFrequencyCountView(freqCountView: FrequencyCountViewEl): void {
+  #updateFrequencyCountView(freqCountView: FrequencyCountValueView): void {
     const currentCondition = this.#condition[this.#mode];
     const invertValue =
       this.#mode === MODE.frequency ? this.#condition.frequency.invert : '';
