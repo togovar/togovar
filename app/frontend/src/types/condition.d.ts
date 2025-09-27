@@ -112,11 +112,17 @@ interface LocationLeaf {
 // Prediction Query
 // ───────────────────────────────────────────────────────────────────────────
 type PredictionKey = 'alphamissense' | 'sift' | 'polyphen';
+type PredictionScore = ScoreRange | ['unassigned'];
 
-type PredictionLeaf =
-  | { alphamissense: { score: ScoreRange } }
-  | { sift: { score: ScoreRange } }
-  | { polyphen: { score: ScoreRange } };
+type SinglePredictionOf<K extends PredictionKey> = {
+  [P in K]: { score: PredictionScore };
+};
+
+type PredictionLeaf = {
+  [K in PredictionKey]: SinglePredictionOf<K>;
+}[PredictionKey];
+
+type PredictionQueryLocal = PredictionLeaf | { or: PredictionLeaf[] };
 
 // ───────────────────────────────────────────────────────────────────────────
 // ID Query
