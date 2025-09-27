@@ -1,14 +1,15 @@
-interface Threshold {
-  [key: string]: {
-    color: string;
-    min: number;
-    max: number;
-    minInequalitySign: string;
-    maxInequalitySign: string;
-  };
-}
+import type { Inequality } from '../../types';
 
-export const ALPHAMISSENSE_THRESHOLD: Threshold = {
+interface ThresholdEntry {
+  color: string;
+  min: number;
+  max: number;
+  minInequalitySign: Inequality;
+  maxInequalitySign: Inequality;
+}
+export type Threshold = Record<string, ThresholdEntry>;
+
+export const ALPHAMISSENSE_THRESHOLD = {
   'Likely benign': {
     color: '#9def3A',
     min: 0,
@@ -30,7 +31,7 @@ export const ALPHAMISSENSE_THRESHOLD: Threshold = {
     minInequalitySign: 'gt',
     maxInequalitySign: 'lte',
   },
-};
+} as const satisfies Threshold;
 
 const SIFT_THRESHOLD = {
   Tolerated: {
@@ -47,7 +48,7 @@ const SIFT_THRESHOLD = {
     minInequalitySign: 'gte',
     maxInequalitySign: 'lte',
   },
-};
+} as const satisfies Threshold;
 
 const POLYPHEN_THRESHOLD = {
   Benign: {
@@ -71,7 +72,7 @@ const POLYPHEN_THRESHOLD = {
     minInequalitySign: 'gt',
     maxInequalitySign: 'lte',
   },
-};
+} as const satisfies Threshold;
 
 export type PredictionKey = 'alphamissense' | 'sift' | 'polyphen';
 
@@ -81,10 +82,7 @@ interface Prediction {
   threshold: Threshold;
 }
 
-export type PredictionLabel =
-  (typeof PREDICTIONS)[keyof typeof PREDICTIONS]['label'];
-
-export const PREDICTIONS: Record<PredictionKey, Prediction> = {
+export const PREDICTIONS = {
   alphamissense: {
     label: 'AlphaMissense',
     unassignedLists: ['unassigned'],
@@ -100,4 +98,7 @@ export const PREDICTIONS: Record<PredictionKey, Prediction> = {
     unassignedLists: ['unassigned', 'unknown'],
     threshold: POLYPHEN_THRESHOLD,
   },
-} as const;
+} as const satisfies Record<PredictionKey, Prediction>;
+
+export type PredictionLabel =
+  (typeof PREDICTIONS)[keyof typeof PREDICTIONS]['label'];
