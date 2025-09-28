@@ -5,15 +5,15 @@ import { range } from 'lit/directives/range.js';
 import { createGradientSlider } from './createGradientSlider';
 import {
   type Threshold,
+  type PredictionLabel,
   ALPHAMISSENSE_THRESHOLD,
   PREDICTIONS,
 } from './PredictionDatasets';
 import { setInequalitySign } from './setInequalitySign.js';
-import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
 import Styles from '../../../stylesheets/object/component/prediction-value-view.scss';
 import type {
   PredictionKey,
-  PredictionScore,
+  ScoreOrUnassignedFor,
   SinglePredictionOf,
   PredictionQueryLocal,
   ScoreRange,
@@ -27,7 +27,7 @@ const SLIDER_CONFIG = {
 
 const makeLeaf = <K extends PredictionKey>(
   k: K,
-  score: PredictionScore
+  score: ScoreOrUnassignedFor<K>
 ): SinglePredictionOf<K> => ({ [k]: { score } } as SinglePredictionOf<K>);
 
 @customElement('prediction-value-view')
@@ -35,12 +35,13 @@ export class PredictionValueView extends LitElement {
   static styles = [Styles];
 
   @state() private _dataset: PredictionKey = 'alphamissense';
-  @state() private _label: string = 'AlphaMissense';
+  @state() private _label: PredictionLabel = 'AlphaMissense';
 
   @state() private _values: [number, number] = [0, 1];
   @state() private _inequalitySigns: [Inequality, Inequality] = ['gte', 'lte'];
 
-  @state() private _unassignedChecks: ['unassigned'] | [] = [];
+  @state() private _includeUnassigned = false;
+  @state() private _includeUnknown = false; // for polyphen
 
   // グラデーション生成に使うしきい値データ（型は環境に合わせてOK）
   @state() private _activeDataset: Threshold = ALPHAMISSENSE_THRESHOLD;
@@ -58,12 +59,14 @@ export class PredictionValueView extends LitElement {
     dataset: PredictionKey,
     values: [number, number],
     inequalitySigns: [Inequality, Inequality],
-    unassignedChecks: string[]
+    includeUnassigned: boolean,
+    includeUnknown: boolean // for polyphen
   ): void {
     this._dataset = dataset;
     this._values = values;
     this._inequalitySigns = inequalitySigns;
-    this._unassignedChecks = unassignedChecks;
+    this._includeUnassigned = includeUnassigned;
+    this._includeUnknown = includeUnknown; // for polyphen
 
     this._label = PREDICTIONS[this._dataset].label;
     this._activeDataset = PREDICTIONS[this._dataset].threshold;
@@ -110,7 +113,8 @@ export class PredictionValueView extends LitElement {
         <span class="inequality-sign" data-inequality-sign="lte">&#8804;</span>
         <span class="to">${this._values[1]}</span>
         <span class="text">
-          ${this._unassignedChecks.map(capitalizeFirstLetter).join(', ')}
+          ${this._includeUnassigned ? 'Unassigned' : ''}
+          ${this._includeUnknown ? 'Unknown' : ''}
         </span>
       </div>
     `;
@@ -119,34 +123,29 @@ export class PredictionValueView extends LitElement {
   /** UI 表示用に現在値を返す（型は適宜） */
   get conditionValues(): {
     dataset: PredictionKey;
-    label: string;
+    label: PredictionLabel;
     values: [number, number];
     inequalitySigns: [Inequality, Inequality];
-    unassignedChecks: string[];
+    includeUnassigned: boolean;
+    includeUnknown: boolean; // for polyphen
   } {
     return {
       dataset: this._dataset,
       label: this._label,
       values: this._values,
       inequalitySigns: this._inequalitySigns,
-      unassignedChecks: this._unassignedChecks,
+      includeUnassigned: this._includeUnassigned,
+      includeUnknown: this._includeUnknown, // for polyphen
     };
   }
 
-  /**
-   * クエリ形を返す
-   * 単一 or OR のいずれか（API 仕様に合わせて ScoreRange | string[] を許容）
-   */
+  /** クエリ形を返す
+   * 単一 or OR のいずれか（API 仕様に合わせて ScoreRange | string[] を許容） */
   get queryValue(): PredictionQueryLocal {
     const key = this._dataset;
 
-    // 未割当なし → レンジのみ
-    if (this._unassignedChecks.length === 0) {
-      console.log(
-        '未割当なし',
-        key,
-        this._toScoreRange(this._values, this._inequalitySigns)
-      );
+    // No Unassigned check, range only
+    if (this._noLabelSelected()) {
       return makeLeaf(
         key,
         this._toScoreRange(this._values, this._inequalitySigns)
@@ -154,25 +153,24 @@ export class PredictionValueView extends LitElement {
     }
 
     // 点 & 非包括ペア → 未割当のみ
-    if (
-      this._values[0] === this._values[1] &&
-      (this._inequalitySigns[0] === 'gt' || this._inequalitySigns[1] === 'lt')
-    ) {
-      console.log('点 & 非包括ペア', key, this._unassignedChecks);
-      return makeLeaf(key, this._unassignedChecks);
+    const [from, to] = this._values;
+    const [left, right] = this._inequalitySigns;
+    const isPointNonInclusive =
+      from === to && (left === 'gt' || right === 'lt');
+    if (isPointNonInclusive) {
+      return makeLeaf(key, this._labelScoreFor(key));
     }
 
     // それ以外 → 未割当 OR レンジ
-    const leafUnassigned = makeLeaf(key, this._unassignedChecks);
+    const leafUnassigned = makeLeaf(key, this._labelScoreFor(key));
     const leafRange = makeLeaf(
       key,
       this._toScoreRange(this._values, this._inequalitySigns)
     );
-    console.log('未該当', leafUnassigned, leafRange);
     return { or: [leafUnassigned, leafRange] };
   }
 
-  /** [from,to] & 不等号 → ScoreRange へ正規化 */
+  /** [from,to] & inequality sign → Normalized to ScoreRange */
   private _toScoreRange(
     [from, to]: [number, number],
     [left, right]: [Inequality, Inequality]
@@ -189,5 +187,34 @@ export class PredictionValueView extends LitElement {
     if (right === 'lt') return { lt: to };
 
     throw new Error('Invalid inequality signs');
+  }
+
+  // キー依存の未割当ラベル配列を生成して返す
+  private _labelScoreFor<K extends PredictionKey>(
+    k: K
+  ): ScoreOrUnassignedFor<K> {
+    if (k === 'polyphen') {
+      if (this._includeUnassigned && this._includeUnknown) {
+        return ['unassigned', 'unknown'] as const as ScoreOrUnassignedFor<K>;
+      }
+      if (this._includeUnassigned) {
+        return ['unassigned'] as const as ScoreOrUnassignedFor<K>;
+      }
+      if (this._includeUnknown) {
+        return ['unknown'] as const as ScoreOrUnassignedFor<K>;
+      }
+      // ここには来ない想定（呼び出し側で未選択は排除）
+      return ['unassigned'] as const as ScoreOrUnassignedFor<K>;
+    }
+    // sift / alphamissense
+    return ['unassigned'] as const as ScoreOrUnassignedFor<K>;
+  }
+
+  // “何も選ばれていないか？”の判定
+  private _noLabelSelected(): boolean {
+    if (this._dataset === 'polyphen') {
+      return !(this._includeUnassigned || this._includeUnknown);
+    }
+    return !this._includeUnassigned;
   }
 }

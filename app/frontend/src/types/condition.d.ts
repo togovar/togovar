@@ -112,10 +112,21 @@ interface LocationLeaf {
 // Prediction Query
 // ───────────────────────────────────────────────────────────────────────────
 type PredictionKey = 'alphamissense' | 'sift' | 'polyphen';
+
+type OneOrTwo<T> = readonly [T] | readonly [T, T];
+
 type PredictionScore = ScoreRange | ['unassigned'];
 
+type ScoreOrUnassignedFor<K extends PredictionKey> =
+  | ScoreRange
+  | (K extends 'polyphen'
+      ? // polyphen は unassigned/unknown を 1つ or 2つ
+        OneOrTwo<'unassigned' | 'unknown'>
+      : // それ以外は unassigned のみ（1つ）
+        readonly ['unassigned']);
+
 type SinglePredictionOf<K extends PredictionKey> = {
-  [P in K]: { score: PredictionScore };
+  [P in K]: { score: ScoreOrUnassignedFor<P> };
 };
 
 type PredictionLeaf = {

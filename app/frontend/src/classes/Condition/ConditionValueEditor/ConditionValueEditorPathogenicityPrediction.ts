@@ -10,30 +10,46 @@ import type ConditionValues from '../ConditionValues.js';
 import type { ConditionItemView } from '../ConditionItemView';
 import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 import type { PredictionValueView } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionValueView';
+import type { Inequality } from '../../../types';
+import type TabView from '../../../components/ConditionPathogenicityPredictionSearch/TabView.js';
+
+type PredictionChangeDetail = {
+  dataset: PredictionKey;
+  values: [number, number];
+  inequalitySigns: [Inequality, Inequality];
+  unassignedChecks?: string[];
+  includeUnassigned?: boolean;
+  includeUnknown?: boolean;
+};
 
 /**
  * Pathogenicity prediction editing screen
  * This class manages the UI and state for editing pathogenicity predictions.
  */
 class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
-  private _dataset!: PredictionKey; // selected dataset (e.g., alphamissense, sift, polyphen)
-  private _label!: PredictionLabel; // selected label (e.g., AlphaMissense, SIFT, PolyPhen)
-  private _values!: Array<number>; // max-min values (0〜1)
-  private _inequalitySigns!: Array<string>; // max-min inequality signs (gte, gt, lte, lt)
-  private _unassignedChecks!: Array<string>; // unassigned checks (e.g., unassigned, unknown)
+  private _dataset: PredictionKey = 'alphamissense'; // selected dataset (e.g., alphamissense, sift, polyphen)
+  private _label: PredictionLabel = 'AlphaMissense'; // selected label (e.g., AlphaMissense, SIFT, PolyPhen)
+  private _values: [number, number] = [0, 1]; // max-min values (0〜1)
+  private _inequalitySigns: [Inequality, Inequality] = ['gte', 'lte']; // max-min inequality signs (gte, gt, lte, lt)
+  private _includeUnassigned = false;
+  private _includeUnknown = false; // polyphen用
   private _tabsContainer!: HTMLDivElement; // container for tabs
-  private _lastState!: {
-    dataset: string;
-    label: string;
-    values: Array<number>;
-    inequalitySigns: Array<string>;
-    unassignedChecks: Array<string>;
-  }; // last selected values and states
+  private _lastState: {
+    dataset: PredictionKey;
+    label: PredictionLabel;
+    values: [number, number];
+    inequalitySigns: [Inequality, Inequality];
+    includeUnassigned: boolean;
+    includeUnknown: boolean;
+  } = {
+    dataset: 'alphamissense',
+    label: 'AlphaMissense',
+    values: [0, 1],
+    inequalitySigns: ['gte', 'lte'],
+    includeUnassigned: false,
+    includeUnknown: false,
+  };
 
-  /**
-   * @param {ConditionValues} valuesView
-   * @param {ConditionItemView} conditionView
-   */
   constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
     this._initializeDefaultValues();
@@ -53,18 +69,26 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
     this._valuesElement
       .querySelectorAll(':scope > condition-item-value-view')
       .forEach((view) => {
-        const conditionValues = (
-          view.shadowRoot?.querySelector('prediction-value-view') as any
-        )?.conditionValues;
-        if (conditionValues) {
-          const { dataset, label, values, inequalitySigns, unassignedChecks } =
-            conditionValues;
+        const pv = view.shadowRoot?.querySelector<PredictionValueView>(
+          'prediction-value-view'
+        );
+        const cv = pv?.conditionValues;
+        if (cv) {
+          const {
+            dataset,
+            label,
+            values,
+            inequalitySigns,
+            includeUnassigned,
+            includeUnknown,
+          } = cv;
           this._lastState = {
             dataset,
             label,
             values,
             inequalitySigns,
-            unassignedChecks,
+            includeUnassigned,
+            includeUnknown,
           };
         }
       });
@@ -75,14 +99,21 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
    * This method re-applies the previously saved state to the UI.
    */
   restore() {
-    const { dataset, label, values, inequalitySigns, unassignedChecks } =
-      this._lastState;
+    const {
+      dataset,
+      label,
+      values,
+      inequalitySigns,
+      includeUnassigned,
+      includeUnknown,
+    } = this._lastState;
     this._addPredictionValueView(
       dataset,
       label,
       values,
       inequalitySigns,
-      unassignedChecks
+      includeUnassigned,
+      includeUnknown
     );
   }
 
@@ -96,13 +127,15 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
     this._label = 'AlphaMissense';
     this._values = [0, 1];
     this._inequalitySigns = ['gte', 'lte'];
-    this._unassignedChecks = [];
+    this._includeUnassigned = false;
+    this._includeUnknown = false;
     this._lastState = {
       dataset: this._dataset,
       label: this._label,
       values: [...this._values],
       inequalitySigns: [...this._inequalitySigns],
-      unassignedChecks: [...this._unassignedChecks],
+      includeUnassigned: false,
+      includeUnknown: false,
     };
   }
 
@@ -110,9 +143,10 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
   private _initializeUI() {
     this._createElement(
       'pathogenicity-editor-view',
-      `<header>Select prediction</header><div class="body" />`
+      `<header>Select prediction</header><div class="body"></div>`
     );
-    this._tabsContainer = this.sectionEl?.querySelector('.body')!;
+    this._tabsContainer =
+      this.sectionEl.querySelector<HTMLDivElement>('.body')!;
     this._createTabView();
   }
 
@@ -121,14 +155,13 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
     this._tabsContainer.addEventListener(
       'set-prediction-values',
       (e: Event) => {
-        const customEvent = e as CustomEvent;
-        this._updateValuesAndSigns(customEvent.detail);
+        const detail = (e as CustomEvent<PredictionChangeDetail>).detail;
+        this._updateValuesAndSigns(detail);
       }
     );
-
     this._tabsContainer.addEventListener('switch-tab', (e: Event) => {
-      const customEvent = e as CustomEvent;
-      this._switchTab(customEvent.detail);
+      const detail = (e as CustomEvent<PredictionChangeDetail>).detail;
+      this._switchTab(detail);
     });
   }
 
@@ -137,7 +170,7 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
   // ========================================
 
   /** Update UI and values when a tab is switched */
-  private _switchTab(detail: any) {
+  private _switchTab(detail: PredictionChangeDetail) {
     this._dataset = detail.dataset;
     this._label = PREDICTIONS[this._dataset].label;
     this._updateValuesAndSigns(detail);
@@ -150,19 +183,25 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
       this._label,
       this._values,
       this._inequalitySigns,
-      this._unassignedChecks
+      this._includeUnassigned,
+      this._includeUnknown
     );
-    this._valuesView.update(this._validate());
+    // ConditionValues に update がある環境のみ呼ぶ
+    if (hasUpdate(this._valuesView)) {
+      this._valuesView.update(this._validate());
+    }
   }
 
-  /** Update values and inequality signs */
-  private _updateValuesAndSigns(detail: any) {
+  // 受け取った detail を反映（boolean 正規化を含む）
+  private _updateValuesAndSigns(detail: PredictionChangeDetail) {
     this._values = [detail.values[0], detail.values[1]];
     this._inequalitySigns = [
       detail.inequalitySigns[0],
       detail.inequalitySigns[1],
     ];
-    this._unassignedChecks = detail.unassignedChecks;
+    const flags = normalizeIncludeFlags(detail);
+    this._includeUnassigned = flags.includeUnassigned;
+    this._includeUnknown = flags.includeUnknown;
     this._update();
   }
 
@@ -172,18 +211,21 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
 
   /** Add or update the value view */
   private _addPredictionValueView(
-    dataset: string,
-    label: string,
-    values: Array<number>,
-    inequalitySigns: Array<string>,
-    unassignedChecks: Array<string>
+    dataset: PredictionKey,
+    label: PredictionLabel,
+    values: [number, number],
+    inequalitySigns: [Inequality, Inequality],
+    includeUnassigned = false,
+    includeUnknown = false
   ) {
-    let valueView = this._valuesElement.querySelector(
+    // 既存 valueView を取得 or 作成
+    let valueView = this._valuesElement.querySelector<ConditionItemValueView>(
       'condition-item-value-view'
-    ) as ConditionItemValueView;
-
+    );
     if (!valueView) {
-      valueView = document.createElement('condition-item-value-view');
+      valueView = document.createElement(
+        'condition-item-value-view'
+      ) as ConditionItemValueView;
       valueView.conditionType = this._conditionType;
       this._valuesElement.append(valueView);
     }
@@ -191,24 +233,30 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
     valueView.value = dataset;
     valueView.label = label;
 
+    // 内部の prediction-value-view に値を流し込む
     this._valuesElement
-      .querySelectorAll(':scope > condition-item-value-view')
+      .querySelectorAll<ConditionItemValueView>(
+        ':scope > condition-item-value-view'
+      )
       .forEach((view) => {
-        const predictionValueView = view.shadowRoot?.querySelector(
+        const pv = view.shadowRoot?.querySelector<PredictionValueView>(
           'prediction-value-view'
-        ) as PredictionValueView;
-        if (predictionValueView) {
-          predictionValueView.predictionDataset = dataset;
-          predictionValueView.values = values;
-          predictionValueView.inequalitySigns = inequalitySigns;
-          predictionValueView.unassignedChecks = unassignedChecks;
+        );
+        if (pv) {
+          pv.setValues(
+            dataset,
+            values,
+            inequalitySigns,
+            includeUnassigned,
+            includeUnknown
+          );
         }
       });
   }
 
   /** Create tab view */
   private _createTabView() {
-    const tabView = document.createElement('tab-view') as any;
+    const tabView = document.createElement('tab-view') as TabView;
     tabView.datasets = PREDICTIONS;
     this._tabsContainer.appendChild(tabView);
   }
@@ -218,14 +266,25 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
   // ========================================
   /** Validate if the values are valid */
   private _validate(): boolean {
-    return this._values.filter((item) => !Number.isNaN(item)).length === 2;
+    return Number.isFinite(this._values[0]) && Number.isFinite(this._values[1]);
   }
 
   // Accessor
   /** You can press the OK button if there are two valid values */
   get isValid() {
-    return this._values.filter((item) => !Number.isNaN(item)).length === 2;
+    return this._validate();
   }
 }
 
 export default ConditionValueEditorPathogenicityPrediction;
+
+function hasUpdate(x: unknown): x is { update(valid: boolean): void } {
+  return typeof (x as Record<string, unknown>)?.update === 'function';
+}
+function normalizeIncludeFlags(d: PredictionChangeDetail) {
+  const arr = d.unassignedChecks ?? [];
+  return {
+    includeUnassigned: d.includeUnassigned ?? arr.includes('unassigned'),
+    includeUnknown: d.includeUnknown ?? arr.includes('unknown'),
+  };
+}
