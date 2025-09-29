@@ -42,7 +42,7 @@ export class PredictionValueView extends LitElement {
   @state() private _includeUnassigned = false;
   @state() private _includeUnknown = false; // for polyphen
 
-  // グラデーション生成に使うしきい値データ（型は環境に合わせてOK）
+  // Threshold data used for gradient generation
   @state() private _activeDataset: Threshold = ALPHAMISSENSE_THRESHOLD;
 
   @query('.bar') private _bar!: HTMLDivElement;
@@ -53,7 +53,7 @@ export class PredictionValueView extends LitElement {
     this._setBarStyles();
   }
 
-  /** 外部から UI 値を流し込む */
+  /** Inject UI values from outside */
   setValues(
     dataset: PredictionKey,
     values: [number, number],
@@ -123,7 +123,7 @@ export class PredictionValueView extends LitElement {
     `;
   }
 
-  /** UI 表示用に現在値を返す（型は適宜） */
+  /** Return the current value for UI display */
   get conditionValues(): {
     dataset: PredictionKey;
     label: PredictionLabel;
@@ -142,8 +142,8 @@ export class PredictionValueView extends LitElement {
     };
   }
 
-  /** クエリ形を返す
-   * 単一 or OR のいずれか（API 仕様に合わせて ScoreRange | string[] を許容） */
+  /** Return the query shape
+   * Either single or OR (allowing ScoreRange | string[] to match API specs) */
   get queryValue(): PredictionQueryLocal {
     const key = this._dataset;
 
@@ -155,7 +155,7 @@ export class PredictionValueView extends LitElement {
       );
     }
 
-    // 点 & 非包括ペア → 未割当のみ
+    // Point & Non-inclusive pair → Unassigned only
     const [from, to] = this._values;
     const [left, right] = this._inequalitySigns;
     const isPointNonInclusive =
@@ -164,7 +164,7 @@ export class PredictionValueView extends LitElement {
       return makeLeaf(key, this._labelScoreFor(key));
     }
 
-    // それ以外 → 未割当 OR レンジ
+    // Otherwise → Unassigned OR Range
     const leafUnassigned = makeLeaf(key, this._labelScoreFor(key));
     const leafRange = makeLeaf(
       key,
@@ -183,7 +183,7 @@ export class PredictionValueView extends LitElement {
     if (left === 'gt' && right === 'lte') return { gt: from, lte: to };
     if (left === 'gt' && right === 'lt') return { gt: from, lt: to };
 
-    // 片側のみを許すなら必要に応じて追加
+    // If only one side is permitted, add as needed.
     if (left === 'gte') return { gte: from };
     if (left === 'gt') return { gt: from };
     if (right === 'lte') return { lte: to };
@@ -192,7 +192,7 @@ export class PredictionValueView extends LitElement {
     throw new Error('Invalid inequality signs');
   }
 
-  // キー依存の未割当ラベル配列を生成して返す
+  // Generates and returns a key-dependent array of unassigned labels.
   private _labelScoreFor<K extends PredictionKey>(
     k: K
   ): ScoreOrUnassignedFor<K> {
@@ -213,7 +213,7 @@ export class PredictionValueView extends LitElement {
     return ['unassigned'] as const as ScoreOrUnassignedFor<K>;
   }
 
-  // “何も選ばれていないか？”の判定
+  // Determine whether nothing has been selected
   private _noLabelSelected(): boolean {
     if (this._dataset === 'polyphen') {
       return !(this._includeUnassigned || this._includeUnknown);

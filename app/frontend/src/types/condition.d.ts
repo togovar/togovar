@@ -117,6 +117,8 @@ type OneOrTwo<T> = readonly [T] | readonly [T, T];
 
 type PredictionScore = ScoreRange | ['unassigned'];
 
+type UnassignedOption = 'unassigned' | 'unknown';
+
 type ScoreOrUnassignedFor<K extends PredictionKey> =
   | ScoreRange
   | (K extends 'polyphen'
