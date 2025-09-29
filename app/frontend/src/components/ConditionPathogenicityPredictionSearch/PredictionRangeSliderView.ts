@@ -4,7 +4,7 @@ import { map } from 'lit/directives/map.js';
 import { range } from 'lit/directives/range.js';
 import { createGradientSlider } from './createGradientSlider';
 import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
-import { setInequalitySign } from './setInequalitySign.js';
+import { setInequalitySign, toggleInequality } from './setInequalitySign';
 import { type PredictionKey } from './PredictionDatasets';
 import type {
   Inequality,
@@ -190,16 +190,14 @@ export class PredictionRangeSlider extends LitElement {
 
   private _handleInequalitySign(e: Event) {
     const btn = e.currentTarget as HTMLButtonElement;
-    const { newSign, newHtml } = this._switchInequalitySign(
-      btn.dataset.inequalitySign as Inequality
-    );
-    btn.dataset.inequalitySign = newSign;
-    btn.innerHTML = newHtml;
+    const prev = btn.dataset.inequalitySign as Inequality;
+    const next = toggleInequality(prev);
+    setInequalitySign(btn, next);
 
-    if (newSign === 'gte' || newSign === 'gt') {
-      this.minInequalitySign = newSign;
+    if (next === 'gte' || next === 'gt') {
+      this.minInequalitySign = next;
     } else {
-      this.maxInequalitySign = newSign;
+      this.maxInequalitySign = next;
     }
   }
 

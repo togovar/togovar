@@ -10,7 +10,7 @@ import {
   ALPHAMISSENSE_THRESHOLD,
   PREDICTIONS,
 } from './PredictionDatasets';
-import { setInequalitySign } from './setInequalitySign.js';
+import { setInequalitySign } from './setInequalitySign';
 import Styles from '../../../stylesheets/object/component/prediction-value-view.scss';
 import type {
   ScoreOrUnassignedFor,
