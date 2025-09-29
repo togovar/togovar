@@ -19,7 +19,7 @@ SLIDER_CONFIG.scaleInterval =
 
 /** Class to create a PredictionRangeSlider */
 @customElement('prediction-range-slider')
-class PredictionRangeSlider extends LitElement {
+export class PredictionRangeSlider extends LitElement {
   static styles = [Styles];
 
   @property({ type: String, reflect: true, attribute: 'data-dataset' })
@@ -295,5 +295,3 @@ class PredictionRangeSlider extends LitElement {
     `;
   }
 }
-
-export default PredictionRangeSlider;

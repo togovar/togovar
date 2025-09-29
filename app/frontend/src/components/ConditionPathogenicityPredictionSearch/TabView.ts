@@ -1,11 +1,11 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, queryAll } from 'lit/decorators.js';
-import './PredictionRangeSliderView.js';
+import './PredictionRangeSliderView';
 import Styles from '../../../stylesheets/object/component/tab-view.scss';
 
 /** Class to create a TabView */
 @customElement('tab-view')
-class TabView extends LitElement {
+export class TabView extends LitElement {
   static styles = [Styles];
 
   @property({ type: Object }) datasets;
@@ -101,5 +101,3 @@ class TabView extends LitElement {
     `;
   }
 }
-
-export default TabView;

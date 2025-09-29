@@ -1,6 +1,6 @@
 import { ConditionValueEditor } from './ConditionValueEditor';
-import '../../../components/ConditionPathogenicityPredictionSearch/TabView.js';
-import '../../../components/ConditionPathogenicityPredictionSearch/PredictionRangeSliderView.js';
+import '../../../components/ConditionPathogenicityPredictionSearch/TabView';
+import '../../../components/ConditionPathogenicityPredictionSearch/PredictionRangeSliderView';
 import type {
   PredictionKey,
   PredictionLabel,
@@ -11,7 +11,7 @@ import type { ConditionItemView } from '../ConditionItemView';
 import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 import type { PredictionValueView } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionValueView';
 import type { Inequality } from '../../../types';
-import type TabView from '../../../components/ConditionPathogenicityPredictionSearch/TabView.js';
+import type { TabView } from '../../../components/ConditionPathogenicityPredictionSearch/TabView';
 
 type PredictionChangeDetail = {
   dataset: PredictionKey;
@@ -26,7 +26,7 @@ type PredictionChangeDetail = {
  * Pathogenicity prediction editing screen
  * This class manages the UI and state for editing pathogenicity predictions.
  */
-class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
+export class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
   private _dataset: PredictionKey = 'alphamissense'; // selected dataset (e.g., alphamissense, sift, polyphen)
   private _label: PredictionLabel = 'AlphaMissense'; // selected label (e.g., AlphaMissense, SIFT, PolyPhen)
   private _values: [number, number] = [0, 1]; // max-min values (0〜1)
@@ -275,8 +275,6 @@ class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
     return this._validate();
   }
 }
-
-export default ConditionValueEditorPathogenicityPrediction;
 
 function hasUpdate(x: unknown): x is { update(valid: boolean): void } {
   return typeof (x as Record<string, unknown>)?.update === 'function';

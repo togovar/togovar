@@ -8,7 +8,7 @@ import ConditionValueEditorDisease from './ConditionValueEditor/ConditionValueEd
 import ConditionValueEditorFrequencyCount from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
 import ConditionValueEditorGene from './ConditionValueEditor/ConditionValueEditorGene';
 import ConditionValueEditorLocation from './ConditionValueEditor/ConditionValueEditorLocation';
-import ConditionValueEditorPathogenicityPrediction from './ConditionValueEditor/ConditionValueEditorPathogenicityPrediction';
+import { ConditionValueEditorPathogenicityPrediction } from './ConditionValueEditor/ConditionValueEditorPathogenicityPrediction';
 import ConditionValueEditorVariantID from './ConditionValueEditor/ConditionValueEditorVariantID';
 import type { ConditionItemView } from './ConditionItemView';
 import { createEl } from '../../utils/dom/createEl';
