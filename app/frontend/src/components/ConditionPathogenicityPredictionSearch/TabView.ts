@@ -1,8 +1,8 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, queryAll } from 'lit/decorators.js';
-import type { Threshold } from './PredictionDatasets';
-import type { PredictionChangeDetail } from './PredictionRangeSliderView';
+import type { PredictionChangeDetail } from './../../types';
 import type { PredictionRangeSlider } from './PredictionRangeSliderView';
+import type { PredictionKey, PredictionDatasets } from './PredictionDatasets';
 import Styles from '../../../stylesheets/object/component/tab-view.scss';
 
 /** Class to create a TabView */
@@ -11,14 +11,7 @@ export class TabView extends LitElement {
   static styles = [Styles];
 
   @property({ type: Object })
-  datasets!: Record<
-    string,
-    {
-      label: string;
-      threshold: Threshold;
-      unassignedLists: ReadonlyArray<'unassigned' | 'unknown'>;
-    }
-  >;
+  datasets!: PredictionDatasets;
 
   @queryAll('ul[role="tablist"] > li > a.tab')
   private _tabButtons!: NodeListOf<HTMLAnchorElement>;
@@ -68,30 +61,30 @@ export class TabView extends LitElement {
   }
 
   render() {
-    const entries = Object.entries(this.datasets);
-
+    const keys = Object.keys(this.datasets) as PredictionKey[];
     return html`
-      <ul aria-labelledby="tabs-title" role="tablist">
-        ${entries.map(
-          ([key, details], i) => html`
+      <ul role="tablist">
+        ${keys.map(
+          (key, i) => html`
             <li>
               <a
-                id="tab-${key}"
+                id=${`tab-${key}`}
                 class="tab"
-                href="#${key}"
-                aria-selected=${i === 0 ? 'true' : 'false'}
+                href=${`#${key}`}
+                aria-selected=${i === 0}
                 tabindex=${i === 0 ? '0' : '-1'}
                 @click=${(e: Event) => this._handleSwitchTab(e)}
-                >${details.label}</a
-              >
+                >${this.datasets[key].label}
+              </a>
             </li>
           `
         )}
       </ul>
 
       <div class="tab-panel">
-        ${entries.map(
-          ([key, details], i) => html`
+        ${keys.map((key, i) => {
+          const details = this.datasets[key];
+          return html`
             <prediction-range-slider
               id=${key}
               aria-labelledby=${`tab-${key}`}
@@ -106,8 +99,8 @@ export class TabView extends LitElement {
               .includeUnknown=${false}
               ?hidden=${i !== 0}
             ></prediction-range-slider>
-          `
-        )}
+          `;
+        })}
       </div>
     `;
   }

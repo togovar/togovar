@@ -5,7 +5,12 @@ import { range } from 'lit/directives/range.js';
 import { createGradientSlider } from './createGradientSlider';
 import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
 import { setInequalitySign } from './setInequalitySign.js';
-import type { Inequality, UnassignedOption } from './../../types';
+import { type PredictionKey } from './PredictionDatasets';
+import type {
+  Inequality,
+  UnassignedOption,
+  PredictionChangeDetail,
+} from './../../types';
 import Styles from '../../../stylesheets/object/component/prediction-range-slider.scss';
 
 const SLIDER_CONFIG = {
@@ -18,15 +23,6 @@ const SLIDER_CONFIG = {
 const SCALE_INTERVAL =
   (SLIDER_CONFIG.max - SLIDER_CONFIG.min) / SLIDER_CONFIG.numberOfScales;
 
-/** event detail that this component emits */
-export interface PredictionChangeDetail {
-  dataset: string; // predictionScoreName
-  values: [number, number];
-  inequalitySigns: [Inequality, Inequality];
-  includeUnassigned?: boolean;
-  includeUnknown?: boolean;
-}
-
 /** Class to create a PredictionRangeSlider */
 @customElement('prediction-range-slider')
 export class PredictionRangeSlider extends LitElement {
@@ -34,7 +30,7 @@ export class PredictionRangeSlider extends LitElement {
 
   /** dataset name (= prediction key) */
   @property({ type: String, reflect: true, attribute: 'data-dataset' })
-  predictionScoreName: string = '';
+  predictionScoreName: PredictionKey = 'alphamissense';
 
   @property({ type: Number, reflect: true, attribute: 'data-min-value' })
   minValue: number = SLIDER_CONFIG.min;

@@ -135,6 +135,15 @@ type PredictionLeaf = {
 
 type PredictionQueryLocal = PredictionLeaf | { or: PredictionLeaf[] };
 
+interface PredictionChangeDetail {
+  dataset: PredictionKey;
+  values: [number, number];
+  inequalitySigns: [Inequality, Inequality];
+  unassignedChecks?: string[];
+  includeUnassigned?: boolean;
+  includeUnknown?: boolean;
+}
+
 // ───────────────────────────────────────────────────────────────────────────
 // ID Query
 // ───────────────────────────────────────────────────────────────────────────

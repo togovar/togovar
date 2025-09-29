@@ -10,17 +10,8 @@ import type ConditionValues from '../ConditionValues.js';
 import type { ConditionItemView } from '../ConditionItemView';
 import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 import type { PredictionValueView } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionValueView';
-import type { Inequality } from '../../../types';
+import type { Inequality, PredictionChangeDetail } from '../../../types';
 import type { TabView } from '../../../components/ConditionPathogenicityPredictionSearch/TabView';
-
-type PredictionChangeDetail = {
-  dataset: PredictionKey;
-  values: [number, number];
-  inequalitySigns: [Inequality, Inequality];
-  unassignedChecks?: string[];
-  includeUnassigned?: boolean;
-  includeUnknown?: boolean;
-};
 
 /**
  * Pathogenicity prediction editing screen

@@ -95,3 +95,4 @@ export const PREDICTIONS = {
 export type PredictionKey = keyof typeof PREDICTIONS;
 export type PredictionLabel =
   (typeof PREDICTIONS)[keyof typeof PREDICTIONS]['label'];
+export type PredictionDatasets = typeof PREDICTIONS;
