@@ -74,14 +74,6 @@ const POLYPHEN_THRESHOLD = {
   },
 } as const satisfies Threshold;
 
-export type PredictionKey = 'alphamissense' | 'sift' | 'polyphen';
-
-interface Prediction {
-  label: string;
-  unassignedLists: string[];
-  threshold: Threshold;
-}
-
 export const PREDICTIONS = {
   alphamissense: {
     label: 'AlphaMissense',
@@ -98,7 +90,8 @@ export const PREDICTIONS = {
     unassignedLists: ['unassigned', 'unknown'],
     threshold: POLYPHEN_THRESHOLD,
   },
-} as const satisfies Record<PredictionKey, Prediction>;
+} as const;
 
+export type PredictionKey = keyof typeof PREDICTIONS;
 export type PredictionLabel =
   (typeof PREDICTIONS)[keyof typeof PREDICTIONS]['label'];

@@ -5,6 +5,7 @@ import { range } from 'lit/directives/range.js';
 import { createGradientSlider } from './createGradientSlider';
 import {
   type Threshold,
+  type PredictionKey,
   type PredictionLabel,
   ALPHAMISSENSE_THRESHOLD,
   PREDICTIONS,
@@ -12,9 +13,7 @@ import {
 import { setInequalitySign } from './setInequalitySign.js';
 import Styles from '../../../stylesheets/object/component/prediction-value-view.scss';
 import type {
-  PredictionKey,
   ScoreOrUnassignedFor,
-  SinglePredictionOf,
   PredictionQueryLocal,
   ScoreRange,
   Inequality,
@@ -28,7 +27,7 @@ const SLIDER_CONFIG = {
 const makeLeaf = <K extends PredictionKey>(
   k: K,
   score: ScoreOrUnassignedFor<K>
-): SinglePredictionOf<K> => ({ [k]: { score } } as SinglePredictionOf<K>);
+) => ({ [k]: { score } } as { [P in K]: { score: ScoreOrUnassignedFor<P> } });
 
 @customElement('prediction-value-view')
 export class PredictionValueView extends LitElement {
@@ -113,8 +112,12 @@ export class PredictionValueView extends LitElement {
         <span class="inequality-sign" data-inequality-sign="lte">&#8804;</span>
         <span class="to">${this._values[1]}</span>
         <span class="text">
-          ${this._includeUnassigned ? 'Unassigned' : ''}
-          ${this._includeUnknown ? 'Unknown' : ''}
+          ${[
+            this._includeUnassigned && 'Unassigned',
+            this._dataset === 'polyphen' && this._includeUnknown && 'Unknown',
+          ]
+            .filter((x): x is string => Boolean(x))
+            .join(', ')}
         </span>
       </div>
     `;

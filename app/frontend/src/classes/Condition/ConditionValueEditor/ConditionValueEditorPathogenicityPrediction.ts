@@ -281,6 +281,7 @@ export default ConditionValueEditorPathogenicityPrediction;
 function hasUpdate(x: unknown): x is { update(valid: boolean): void } {
   return typeof (x as Record<string, unknown>)?.update === 'function';
 }
+
 function normalizeIncludeFlags(d: PredictionChangeDetail) {
   const arr = d.unassignedChecks ?? [];
   return {

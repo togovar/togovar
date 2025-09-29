@@ -8,6 +8,7 @@ import type { NoRelationType } from '../conditions';
 import type { ConditionItemView } from '../classes/Condition/ConditionItemView';
 import type ConditionValues from '../classes/Condition/ConditionValues';
 import type { ConditionItemValueView } from '../components/ConditionItemValueView';
+import type { PredictionKey } from '../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
 
 // ───────────────────────────────────────────────────────────────────────────
 // Builder
@@ -111,7 +112,6 @@ interface LocationLeaf {
 // ───────────────────────────────────────────────────────────────────────────
 // Prediction Query
 // ───────────────────────────────────────────────────────────────────────────
-type PredictionKey = 'alphamissense' | 'sift' | 'polyphen';
 
 type OneOrTwo<T> = readonly [T] | readonly [T, T];
 
@@ -120,10 +120,8 @@ type PredictionScore = ScoreRange | ['unassigned'];
 type ScoreOrUnassignedFor<K extends PredictionKey> =
   | ScoreRange
   | (K extends 'polyphen'
-      ? // polyphen は unassigned/unknown を 1つ or 2つ
-        OneOrTwo<'unassigned' | 'unknown'>
-      : // それ以外は unassigned のみ（1つ）
-        readonly ['unassigned']);
+      ? OneOrTwo<'unassigned' | 'unknown'> // polyphen only allows unassigned/unknown, 1 or 2
+      : readonly ['unassigned']);
 
 type SinglePredictionOf<K extends PredictionKey> = {
   [P in K]: { score: ScoreOrUnassignedFor<P> };
