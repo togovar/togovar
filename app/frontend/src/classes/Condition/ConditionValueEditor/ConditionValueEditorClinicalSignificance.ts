@@ -41,24 +41,33 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     // HTML
     const dataset: Dataset = ADVANCED_CONDITIONS[this._conditionType];
 
-    this._createElement(
-      'clinical-significance-view',
-      `
-  <header>Select ${this._conditionType}</header>
-  <div class="buttons">
-    <button class="button-view -weak">Select all</button>
-    <button class="button-view -weak">Clear all</button>
-  </div>
-
-  <div class="dataset-title mgend">MGeND</div>
-  <ul class="checkboxes body" data-type="clinical-significance" data-source="mgend"></ul>
-
-  <hr/>
-
-  <div class="dataset-title clinvar">Clinvar</div>
-  <ul class="checkboxes body" data-type="clinical-significance" data-source="clinvar"></ul>
-  `
-    );
+    this._createElement('clinical-significance-view', () => [
+      createEl('header', { text: `Select ${this._conditionType}` }),
+      createEl('div', {
+        class: 'buttons',
+        children: [
+          createEl('button', {
+            class: ['button-view', '-weak'],
+            text: 'Select all',
+          }),
+          createEl('button', {
+            class: ['button-view', '-weak'],
+            text: 'Clear all',
+          }),
+        ],
+      }),
+      createEl('div', { class: ['dataset-title', 'mgend'], text: 'MGeND' }),
+      createEl('ul', {
+        class: ['checkboxes', 'body'],
+        dataset: { type: 'clinical-significance', source: 'mgend' },
+      }),
+      createEl('hr'),
+      createEl('div', { class: ['dataset-title', 'clinvar'], text: 'Clinvar' }),
+      createEl('ul', {
+        class: ['checkboxes', 'body'],
+        dataset: { type: 'clinical-significance', source: 'clinvar' },
+      }),
+    ]);
 
     this._values = { mgend: [], clinvar: [] };
     this._lastValues = { mgend: [], clinvar: [] };

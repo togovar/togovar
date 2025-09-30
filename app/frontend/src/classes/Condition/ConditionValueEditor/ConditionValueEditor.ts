@@ -5,32 +5,53 @@ import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';
 import type { EditorSectionClassName } from '../../../types';
 
+type SectionChildren = ReadonlyArray<Node | string>;
+type SectionContent =
+  | string
+  | DocumentFragment
+  | SectionChildren
+  | (() => SectionChildren);
+
 export class ConditionValueEditor {
   private _sectionEl: HTMLElement | null = null;
-  protected _body: HTMLDivElement | null = null;
-  protected _conditionType: ConditionTypeValue;
+  protected _body: HTMLElement | null = null;
 
   constructor(
     protected readonly _valuesView: ConditionValues,
     protected readonly _conditionView: ConditionItemView
-  ) {
-    this._conditionType = _conditionView.conditionType;
-  }
+  ) {}
 
   /** Create an element for the edit screen. */
   protected _createElement(
     className: EditorSectionClassName,
-    html: string
-  ): void {
+    content: SectionContent
+  ): HTMLElement {
     const sectionEl = createEl('section', {
       class: className,
       dataset: { conditionType: String(this._conditionType) },
-      domProps: { innerHTML: html },
     });
 
+    if (typeof content === 'string') {
+      sectionEl.innerHTML = content;
+    } else {
+      const list =
+        typeof content === 'function'
+          ? content()
+          : content instanceof DocumentFragment
+          ? [content]
+          : content;
+
+      const frag = document.createDocumentFragment();
+      for (const n of list) {
+        frag.append(n instanceof Node ? n : document.createTextNode(String(n)));
+      }
+      sectionEl.append(frag);
+    }
+
     this._valuesView.sections.append(sectionEl);
-    this._body = sectionEl.querySelector<HTMLDivElement>(':scope > .body');
+    this._body = sectionEl.querySelector<HTMLElement>(':scope > .body');
     this._sectionEl = sectionEl;
+    return sectionEl;
   }
 
   /** If there is only one value in the condition, update it,
@@ -83,6 +104,10 @@ export class ConditionValueEditor {
   protected get sectionEl(): HTMLElement {
     if (!this._sectionEl) throw new Error('not mounted yet');
     return this._sectionEl;
+  }
+
+  protected get _conditionType(): ConditionTypeValue {
+    return this._conditionView.conditionType;
   }
 
   // div.values which is a wrapper for condition-item-value-view
