@@ -1,14 +1,24 @@
 import { BaseConditionView } from './ConditionView';
 import ConditionValues from './ConditionValues';
 import { storeManager } from '../../store/StoreManager';
-import { ADVANCED_CONDITIONS, supportsRelation } from '../../conditions';
+import {
+  supportsRelation,
+  type NoRelationType,
+  type KeysWithRelation,
+} from '../../conditions';
+import { ADVANCED_CONDITIONS } from '../../global';
+
 import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../../definition';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import { buildQueryFragment } from './queryBuilders';
 import { createEl } from '../../utils/dom/createEl';
 import type { AdvancedSearchBuilderView } from '../AdvancedSearchBuilderView';
 import type { ConditionGroupView } from './ConditionGroupView';
-import type { ConditionQuery, Relation } from '../../types';
+import type {
+  ConditionQuery,
+  Relation,
+  ConditionDefinition,
+} from '../../types';
 import type { ConditionItemValueView } from '../../components/ConditionItemValueView';
 
 /**
@@ -114,17 +124,28 @@ export class ConditionItemView extends BaseConditionView {
    * Note: relation is undefined for types that do not support it.
    */
   get queryFragment(): ConditionQuery {
-    const relation = this._readRelation(); // Relation | undefined
     const values = Array.from(
       this._valuesEl.querySelectorAll(':scope > condition-item-value-view')
     ) as ConditionItemValueView[];
 
-    return buildQueryFragment({
-      type: this._conditionType,
-      relation,
-      values,
-      valuesContainer: this._valuesEl,
-    });
+    if (supportsRelation(this._conditionType)) {
+      const type = this._conditionType as KeysWithRelation;
+      const relation: Relation = this._readRelation() ?? 'eq';
+
+      return buildQueryFragment<KeysWithRelation>({
+        type,
+        relation,
+        values,
+        valuesContainer: this._valuesEl,
+      });
+    } else {
+      const type = this._conditionType as NoRelationType;
+      return buildQueryFragment<NoRelationType>({
+        type,
+        values,
+        valuesContainer: this._valuesEl,
+      });
+    }
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -156,8 +177,10 @@ export class ConditionItemView extends BaseConditionView {
    * We keep direct references (buttons, relation, values…) to avoid repeated queries.
    */
   private _generateDOM(): { body: HTMLDivElement; bg: HTMLDivElement } {
-    const meta = ADVANCED_CONDITIONS[this._conditionType];
-    const label = meta?.label ?? this._conditionType;
+    const cond = ADVANCED_CONDITIONS[this._conditionType] as
+      | ConditionDefinition
+      | undefined;
+    const label = cond?.label ?? this._conditionType;
 
     const relationChild = this._relationSupported
       ? (this._relationEl = createEl('div', {

@@ -1,9 +1,9 @@
 // Common
-type ConditionType = 'peculiar' | 'enumeration' | 'tree' | 'text';
+type ConditionKind = 'peculiar' | 'enumeration' | 'tree' | 'text';
 
 interface ConditionBase {
   label: string;
-  type: ConditionType;
+  type: ConditionKind;
 }
 
 /* ------------ peculiar ------------- */
@@ -15,21 +15,29 @@ type TreeNode =
 
 interface PeculiarCondition extends ConditionBase {
   type: 'peculiar';
-  values?: TreeNode[];
+  values?: readonly TreeNode[];
 }
 
 /* ------------ enumeration ----------- */
 // significance: values are Record<string, EnumerationItem[]>
 // type: values are EnumerationItem[] (array)
+
+interface SignificanceCondition extends ConditionBase {
+  type: 'enumeration';
+  values: {
+    mgend: readonly EnumerationItem[];
+    clinvar: readonly EnumerationItem[];
+  };
+}
+
+interface VariantTypeCondition extends ConditionBase {
+  type: 'enumeration';
+  values: readonly EnumerationItem[];
+}
+
 interface EnumerationItem {
   value: string;
   label: string;
-}
-type EnumerationValues = EnumerationItem[] | Record<string, EnumerationItem[]>;
-
-interface EnumerationCondition extends ConditionBase {
-  type: 'enumeration';
-  values: EnumerationValues;
 }
 
 /* --------------- tree --------------- */
@@ -54,12 +62,13 @@ interface TextCondition extends ConditionBase {
 }
 
 /* ----------- Root Type --------------- */
-type Condition =
+type ConditionDefinition =
   | PeculiarCondition
-  | EnumerationCondition
   | TreeCondition
-  | TextCondition;
+  | TextCondition
+  | SignificanceCondition
+  | VariantTypeCondition;
 
 export interface GRChConditions {
-  conditions: Record<string, Condition>;
+  conditions: Record<string, ConditionDefinition>;
 }
