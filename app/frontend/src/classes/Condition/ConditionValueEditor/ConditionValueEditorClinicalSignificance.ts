@@ -4,15 +4,11 @@ import { ADVANCED_CONDITIONS } from '../../../global';
 import type ConditionValues from '../ConditionValues.js';
 import type { ConditionItemView } from '../ConditionItemView';
 import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
-import type { SignificanceSource } from '../../../types';
+import type {
+  SignificanceSource,
+  MutableSignificanceValues,
+} from '../../../types';
 import { CONDITION_TYPE } from '../../../definition';
-
-type DatasetValue = { value: string; label: string };
-
-interface DatasetValues {
-  mgend: DatasetValue[];
-  clinvar: DatasetValue[];
-}
 
 const SEL = {
   mgend:
@@ -23,9 +19,9 @@ const SEL = {
 
 /** for clinical significance */
 export class ConditionValueEditorClinicalSignificance extends ConditionValueEditor {
-  private _checkboxes: Array<HTMLInputElement>;
-  private _values: DatasetValues;
-  private _lastValues: DatasetValues;
+  private _checkboxes: HTMLInputElement[];
+  private _values: MutableSignificanceValues = { mgend: [], clinvar: [] };
+  private _lastValues: MutableSignificanceValues = { mgend: [], clinvar: [] };
 
   constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
@@ -113,6 +109,45 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     this._attachButtonEvents();
   }
 
+  // public methods
+  keepLastValues() {
+    const valueMgendElements = Array.from(
+      this._valuesElement.querySelectorAll(SEL.mgend)
+    ) as ConditionItemValueView[];
+    const valueClinvarElements = Array.from(
+      this._valuesElement.querySelectorAll(SEL.clinvar)
+    ) as ConditionItemValueView[];
+
+    this._lastValues = {
+      mgend: valueMgendElements.map((value) => ({
+        value: value.value,
+        label: value.label,
+      })),
+      clinvar: valueClinvarElements.map((value) => ({
+        value: value.value,
+        label: value.label,
+      })),
+    };
+  }
+
+  restore() {
+    this._checkboxes.forEach((checkbox) => {
+      // チェックボックスのデータソースに応じて、対応する配列で値を探す
+      const valuesArray =
+        checkbox.dataset.source === 'mgend'
+          ? this._lastValues.mgend
+          : this._lastValues.clinvar;
+
+      const datasetValue = valuesArray.find((value) => {
+        return value.value === checkbox.value;
+      });
+
+      // チェックボックスの状態を過去の値に基づいて復元
+      checkbox.checked = !!datasetValue; // 値が見つかった場合はチェックを入れる
+    });
+    this._update();
+  }
+
   private _generateCheckboxListNodes(
     values: Array<{ value: string; label: string }>,
     source: SignificanceSource
@@ -174,46 +209,6 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     return Array.from(values);
   }
 
-  // public methods
-  keepLastValues() {
-    const valueMgendElements = Array.from(
-      this._valuesElement.querySelectorAll(SEL.mgend)
-    ) as ConditionItemValueView[];
-    const valueClinvarElements = Array.from(
-      this._valuesElement.querySelectorAll(SEL.clinvar)
-    ) as ConditionItemValueView[];
-
-    this._lastValues = {
-      mgend: valueMgendElements.map((value) => ({
-        value: value.value,
-        label: value.label,
-      })),
-      clinvar: valueClinvarElements.map((value) => ({
-        value: value.value,
-        label: value.label,
-      })),
-    };
-  }
-
-  restore() {
-    this._checkboxes.forEach((checkbox) => {
-      // チェックボックスのデータソースに応じて、対応する配列で値を探す
-      const valuesArray =
-        checkbox.dataset.source === 'mgend'
-          ? this._lastValues.mgend
-          : this._lastValues.clinvar;
-
-      const datasetValue = valuesArray.find((value) => {
-        return value.value === checkbox.value;
-      });
-
-      // チェックボックスの状態を過去の値に基づいて復元
-      checkbox.checked = !!datasetValue; // 値が見つかった場合はチェックを入れる
-    });
-    this._update();
-  }
-
-  // private methods
   /** チェックボックスの状態に基づいて、値の更新、重複のチェック、ラベルや要素の削除を行う
    * また、更新された値に基づいて Clinical Significance のビューを更新 */
   private _update() {
