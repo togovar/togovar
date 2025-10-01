@@ -7,15 +7,41 @@ interface EnumerationItem {
   label: string;
 }
 /* ------------ peculiar ------------- */
-// Trees with arbitrary depth like dataset/genotype (id is not used)
-// Group nodes do not have values, while leaves have values
+/** Tree node used by "peculiar" conditions that have hierarchical values. */
 type TreeNode =
-  | { label: string; children: TreeNode[] } // Group
-  | { value: string; label: string; children?: TreeNode[] }; // Leaf or Leaf + Sub-level
+  | { label: string; children: ReadonlyArray<TreeNode> } // group
+  | { label: string; value: string; children?: ReadonlyArray<TreeNode> }; // leaf or leaf+subtree
 
-interface PeculiarCondition {
+/** Keys whose "peculiar" condition HAS hierarchical values. */
+export type PeculiarWithTreeKeys = 'dataset' | 'genotype';
+
+/** Keys whose "peculiar" condition HAS NO values (UI/editor derives from key). */
+export type PeculiarEmptyKeys = 'location' | 'pathogenicity_prediction';
+
+/** dataset: peculiar with tree values. */
+export interface DatasetCondition {
+  label: string;
   type: 'peculiar';
-  values?: readonly TreeNode[];
+  values: ReadonlyArray<TreeNode>;
+}
+
+/** genotype: peculiar with tree values. */
+export interface GenotypeCondition {
+  label: string;
+  type: 'peculiar';
+  values: ReadonlyArray<TreeNode>;
+}
+
+/** location: peculiar without values. */
+export interface LocationCondition {
+  label: string;
+  type: 'peculiar';
+}
+
+/** pathogenicity_prediction: peculiar without values. */
+export interface PathogenicityPredictionCondition {
+  label: string;
+  type: 'peculiar';
 }
 
 /* ------------ enumeration ----------- */
@@ -64,24 +90,42 @@ interface TextCondition {
 }
 
 export type ConditionDefinition =
-  | PeculiarCondition
+  | DatasetCondition
+  | GenotypeCondition
+  | LocationCondition
+  | PathogenicityPredictionCondition
   | TreeCondition
   | TextCondition
   | SignificanceCondition
   | CheckboxesCondition;
 
-// ★ ここをキー別に厳密化
-export type AdvancedConditionMap = Partial<
+/**
+ * Strongly-typed map of all condition definitions by key.
+ * - Keys not declared here fall back to a generic shape (if必要なら) or simply remain absent (Partial).
+ */
+type AdvancedConditionMap = Partial<
   Record<
-    Exclude<ConditionTypeValue, 'significance' | 'type'>,
-    ConditionDefinition
+    // 汎用キーは unknown（= まだ厳密にしていない）
+    Exclude<
+      ConditionTypeValue,
+      | 'dataset'
+      | 'genotype'
+      | 'location'
+      | 'pathogenicity_prediction'
+      | 'significance'
+      | 'type'
+    >,
+    unknown
   >
 > & {
-  significance?: SignificanceCondition;
-  type?: CheckboxesCondition;
+  dataset?: DatasetCondition;
+  genotype?: GenotypeCondition;
+  location?: LocationCondition; // values なし
+  pathogenicity_prediction?: PathogenicityPredictionCondition; // values なし
+  significance?: SignificanceCondition; // mgend/clinvar のレコード
+  type?: CheckboxesCondition; // フラット配列
 };
 
-export interface GRChConditions {
-  // JSON 全体の conditions は「キー別に厳密」
+interface GRChConditions {
   conditions: AdvancedConditionMap;
 }

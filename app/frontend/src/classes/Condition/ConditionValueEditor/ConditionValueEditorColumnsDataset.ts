@@ -7,15 +7,13 @@ import type { ConditionItemView } from '../ConditionItemView';
 import { ConditionValueEditor } from './ConditionValueEditor';
 import type ConditionValues from '../ConditionValues.js';
 import { storeManager } from '../../../store/StoreManager';
+import type { TreeNode } from '../../../types';
 
-type DataNode = {
+type UiNode = {
   id: string;
   label: string;
-  value: string;
-  children?: Array<DataNode>;
-};
-
-type DataNodeWithChecked = DataNode & {
+  value?: string;
+  children?: UiNode[];
   checked: boolean;
   indeterminate?: boolean;
 };
@@ -28,9 +26,9 @@ const ROOT_NODE_ID = '-1';
  */
 export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   private _lastValueViews: Array<{ dataset: { value?: string } }> = [];
-  private _data: HierarchyNode<DataNodeWithChecked>;
+  private _data: HierarchyNode<UiNode>;
   private _columns: HTMLElement | null = null;
-  private _nodesToShowInValueView: Array<HierarchyNode<DataNodeWithChecked>>;
+  private _nodesToShowInValueView: Array<HierarchyNode<UiNode>>;
   private _uniqueIdCounter: number;
 
   /**
@@ -110,23 +108,22 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * @param dataNodes - Array of data nodes to process
    * @returns Array of data nodes with unique IDs and checked properties
    */
-  private _addUniqueIdsToNodes(dataNodes: DataNode[]): DataNodeWithChecked[] {
+  private _addUniqueIdsToNodes(dataNodes: readonly TreeNode[]): UiNode[] {
     return dataNodes.map((node) => {
       if (!Number.isInteger(this._uniqueIdCounter)) {
         this._uniqueIdCounter = 0;
       }
 
-      const processedNode: DataNodeWithChecked = {
-        ...node,
+      const processedNode: UiNode = {
+        label: node.label,
+        value: 'value' in node ? node.value : undefined,
         id: `${this._uniqueIdCounter++}`,
         checked: false,
         indeterminate: false,
       };
 
-      if (processedNode.children && processedNode.children.length > 0) {
-        processedNode.children = this._addUniqueIdsToNodes(
-          processedNode.children
-        );
+      if (node.children && node.children.length > 0) {
+        processedNode.children = this._addUniqueIdsToNodes(node.children);
       }
 
       return processedNode;
@@ -137,7 +134,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * Prepares the hierarchical data structure based on condition type.
    * @returns Hierarchy node with processed data
    */
-  private _prepareHierarchicalData(): HierarchyNode<DataNodeWithChecked> {
+  private _prepareHierarchicalData(): HierarchyNode<UiNode> {
     switch (this._conditionType) {
       case CONDITION_TYPE.dataset:
       case CONDITION_TYPE.genotype: {
@@ -146,11 +143,11 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
           throw new Error('Invalid condition definition or no values property');
         }
         const rawData = (
-          conditionDef as unknown as { values: DataNodeWithChecked[] }
+          conditionDef as unknown as { values: readonly TreeNode[] }
         ).values;
         const processedData = this._addUniqueIdsToNodes(rawData);
 
-        return hierarchy<DataNodeWithChecked>({
+        return hierarchy<UiNode>({
           id: ROOT_NODE_ID,
           label: 'root',
           value: '',
@@ -206,7 +203,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * @returns HTML string for the column content
    */
   private _generateColumnList(
-    items: HierarchyNode<DataNodeWithChecked>[],
+    items: HierarchyNode<UiNode>[],
     isLogin: boolean
   ): HTMLUListElement {
     return createEl('ul', {
@@ -221,7 +218,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * @returns HTML string for the list item
    */
   private _makeListItemEl(
-    item: HierarchyNode<DataNodeWithChecked>,
+    item: HierarchyNode<UiNode>,
     isLogin: boolean
   ): HTMLLIElement {
     const inputId = `checkbox-${item.data.id}`;
@@ -281,10 +278,12 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * @returns True if lock icon should be shown
    */
   private _shouldShowLockIcon(
-    item: HierarchyNode<DataNodeWithChecked>,
+    item: HierarchyNode<UiNode>,
     isLogin: boolean
   ): boolean {
-    return isLogin === false && item.data.value?.includes('jga_wgs.');
+    return (
+      isLogin === false && (item.data.value?.includes('jga_wgs.') ?? false)
+    );
   }
 
   /**
@@ -292,9 +291,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * @param item - The hierarchy node to check
    * @returns True if dataset icon should be shown
    */
-  private _shouldShowDatasetIcon(
-    item: HierarchyNode<DataNodeWithChecked>
-  ): boolean {
+  private _shouldShowDatasetIcon(item: HierarchyNode<UiNode>): boolean {
     return (
       (this._conditionType === CONDITION_TYPE.dataset ||
         this._conditionType === CONDITION_TYPE.genotype) &&
@@ -434,9 +431,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * @param parentId - ID of the parent node
    * @returns Promise resolving to array of child nodes
    */
-  private _getChildItems(
-    parentId?: string
-  ): Promise<HierarchyNode<DataNodeWithChecked>[]> {
+  private _getChildItems(parentId?: string): Promise<HierarchyNode<UiNode>[]> {
     return new Promise((resolve) => {
       if (!parentId) {
         resolve(this._data.children || []);
@@ -514,7 +509,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * @param checked - The check state to apply
    */
   private _updateChildrenCheckState(
-    node: HierarchyNode<DataNodeWithChecked>,
+    node: HierarchyNode<UiNode>,
     checked: boolean
   ): void {
     if (!node.children || node.children.length === 0) return;
@@ -531,7 +526,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * @param checked - Optional explicit check state for the current node
    */
   private _updateParentCheckState(
-    dataNode: HierarchyNode<DataNodeWithChecked> | undefined,
+    dataNode: HierarchyNode<UiNode> | undefined,
     checked?: boolean
   ): void {
     if (!dataNode) return;
@@ -550,9 +545,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * Calculates the check state for a parent node based on its children.
    * @param dataNode - The parent node to calculate state for
    */
-  private _calculateParentCheckState(
-    dataNode: HierarchyNode<DataNodeWithChecked>
-  ): void {
+  private _calculateParentCheckState(dataNode: HierarchyNode<UiNode>): void {
     if (!dataNode.children) return;
 
     const checkedChildren = dataNode.children.filter(
@@ -606,7 +599,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
 
     for (const nodeToShow of this._nodesToShowInValueView) {
       this._addValueView(
-        nodeToShow.data.value,
+        nodeToShow.data.value || '',
         this._getLabelWithPath(nodeToShow)
       );
     }
@@ -632,8 +625,8 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * @returns Array of nodes that should be displayed
    */
   private _getOptimalNodesToShow(
-    node: HierarchyNode<DataNodeWithChecked>
-  ): HierarchyNode<DataNodeWithChecked>[] {
+    node: HierarchyNode<UiNode>
+  ): HierarchyNode<UiNode>[] {
     if (!node.children) {
       return node.data.checked ? [node] : [];
     }
@@ -656,7 +649,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * @param node - The node to get label for
    * @returns Formatted label with full path
    */
-  private _getLabelWithPath(node: HierarchyNode<DataNodeWithChecked>): string {
+  private _getLabelWithPath(node: HierarchyNode<UiNode>): string {
     const [, ...pathNodes] = node.path(this._data).reverse();
     return pathNodes.map((pathNode) => pathNode.data.label).join(' > ');
   }

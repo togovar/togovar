@@ -1,7 +1,6 @@
 import grch37Json from '../assets/GRCh37/advanced_search_conditions.json';
 import grch38Json from '../assets/GRCh38/advanced_search_conditions.json';
-import { type ConditionTypeValue } from './definition';
-import type { GRChConditions, ConditionDefinition } from './types';
+import type { GRChConditions, AdvancedConditionMap } from './types';
 
 export const PAGE = document.getElementsByTagName('html')[0].dataset.page;
 export const TR_HEIGHT = 27;
@@ -18,27 +17,6 @@ const CONDITIONS_MAP = {
 } as const;
 
 export type Reference = keyof typeof CONDITIONS_MAP;
-
-type AdvancedConditionMap = Partial<
-  Record<
-    Exclude<ConditionTypeValue, 'significance' | 'type'>,
-    ConditionDefinition
-  >
-> & {
-  significance?: {
-    label: string;
-    type: 'enumeration';
-    values: {
-      mgend: ReadonlyArray<{ value: string; label: string }>;
-      clinvar: ReadonlyArray<{ value: string; label: string }>;
-    };
-  };
-  type?: {
-    label: string;
-    type: 'enumeration';
-    values: ReadonlyArray<{ value: string; label: string }>;
-  };
-};
 
 export const ADVANCED_CONDITIONS: Readonly<AdvancedConditionMap> =
   Object.freeze(CONDITIONS_MAP[TOGOVAR_FRONTEND_REFERENCE as Reference]);
