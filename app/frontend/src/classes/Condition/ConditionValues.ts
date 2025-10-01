@@ -3,7 +3,7 @@ import { supportsRelation } from '../../conditions';
 import { ConditionValueEditorCheckboxes } from './ConditionValueEditor/ConditionValueEditorCheckboxes';
 import { ConditionValueEditorClinicalSignificance } from './ConditionValueEditor/ConditionValueEditorClinicalSignificance';
 import ConditionValueEditorColumns from './ConditionValueEditor/ConditionValueEditorColumns';
-import ConditionValueEditorColumnsDataset from './ConditionValueEditor/ConditionValueEditorColumnsDataset';
+import { ConditionValueEditorColumnsDataset } from './ConditionValueEditor/ConditionValueEditorColumnsDataset';
 import ConditionValueEditorDisease from './ConditionValueEditor/ConditionValueEditorDisease';
 import ConditionValueEditorFrequencyCount from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
 import ConditionValueEditorGene from './ConditionValueEditor/ConditionValueEditorGene';
