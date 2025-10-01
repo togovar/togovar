@@ -5,151 +5,154 @@ import type ConditionValues from '../ConditionValues.js';
 import type { ConditionItemView } from '../ConditionItemView';
 import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 import type {
-  SignificanceSource,
+  EnumerationItem,
   MutableSignificanceValues,
+  SignificanceSource,
 } from '../../../types';
-import { CONDITION_TYPE } from '../../../definition';
 
-const SEL = {
-  mgend:
-    ':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view',
-  clinvar:
-    ':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view',
+const LABELS = {
+  selectHeader: (t: string) => `Select ${t}`,
+  selectAll: 'Select all',
+  clearAll: 'Clear all',
+  mgend: 'MGeND',
+  clinvar: 'Clinvar',
 } as const;
 
-/** for clinical significance */
+/**
+ * Editor for the "Clinical significance" condition.
+ * - Renders MGeND and ClinVar buckets with checkboxes
+ * - Maintains mutable selection state
+ * - Keeps last confirmed values for restore()
+ */
 export class ConditionValueEditorClinicalSignificance extends ConditionValueEditor {
-  private _checkboxes: HTMLInputElement[];
+  private _checkboxes: HTMLInputElement[] = [];
   private _values: MutableSignificanceValues = { mgend: [], clinvar: [] };
   private _lastValues: MutableSignificanceValues = { mgend: [], clinvar: [] };
 
+  /** Cached UL containers (filled after initial render) */
+  private _mgendUl?: HTMLUListElement;
+  private _clinvarUl?: HTMLUListElement;
+
+  /**
+   * @param valuesView Parent view orchestrating editors
+   * @param conditionView Condition row (provides container & meta)
+   */
   constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
 
-    if (this._conditionType !== CONDITION_TYPE.significance) {
-      throw new Error(
-        'ConditionValueEditorClinicalSignificance は significance 用です'
-      );
-    }
-
-    // 型が SignificanceCondition | undefined と推論される
+    // Typed config from JSON (significance is always enumeration with 2 buckets)
     const raw = ADVANCED_CONDITIONS.significance;
     if (!raw) {
-      throw new Error('significance の定義が見つかりません');
+      throw new Error('Missing condition definition: significance');
     }
 
-    const dataset = {
-      label: raw.label,
-      type: raw.type,
-      values: {
-        mgend: raw.values.mgend,
-        clinvar: raw.values.clinvar,
-      },
-    };
-
+    // Build section skeleton
     this._createElement('clinical-significance-view', () => [
-      createEl('header', { text: `Select ${this._conditionType}` }),
+      createEl('header', { text: LABELS.selectHeader(this._conditionType) }),
       createEl('div', {
         class: 'buttons',
         children: [
           createEl('button', {
             class: ['button-view', '-weak'],
-            text: 'Select all',
+            text: LABELS.selectAll,
           }),
           createEl('button', {
             class: ['button-view', '-weak'],
-            text: 'Clear all',
+            text: LABELS.clearAll,
           }),
         ],
       }),
-      createEl('div', { class: ['dataset-title', 'mgend'], text: 'MGeND' }),
-      createEl('ul', {
+      createEl('div', {
+        class: ['dataset-title', 'mgend'],
+        text: LABELS.mgend,
+      }),
+      (this._mgendUl = createEl('ul', {
         class: ['checkboxes', 'body'],
         dataset: { type: 'clinical-significance', source: 'mgend' },
-      }),
+      })),
       createEl('hr'),
-      createEl('div', { class: ['dataset-title', 'clinvar'], text: 'Clinvar' }),
-      createEl('ul', {
+      createEl('div', {
+        class: ['dataset-title', 'clinvar'],
+        text: LABELS.clinvar,
+      }),
+      (this._clinvarUl = createEl('ul', {
         class: ['checkboxes', 'body'],
         dataset: { type: 'clinical-significance', source: 'clinvar' },
-      }),
+      })),
     ]);
 
-    this._values = { mgend: [], clinvar: [] };
-    this._lastValues = { mgend: [], clinvar: [] };
+    // Populate checkboxes (accept readonly input, create mutable UI)
+    const mgendVals = this._filterValues(raw.values.mgend, 'mgend');
+    const clinvarVals = this._filterValues(raw.values.clinvar, 'clinvar');
 
-    // UL を取得
-    const mgendUl = this.sectionEl.querySelector<HTMLUListElement>(
-      ':scope > ul[data-source="mgend"]'
-    )!;
-
-    const clinvarUl = this.sectionEl.querySelector<HTMLUListElement>(
-      ':scope > ul[data-source="clinvar"]'
-    )!;
-
-    const mgendVals = this._filterValues(dataset.values.mgend, 'mgend');
-    const clinvarVals = this._filterValues(dataset.values.clinvar, 'clinvar');
-
-    // LI を生成して挿入
-    mgendUl.append(...this._generateCheckboxListNodes(mgendVals, 'mgend'));
-    clinvarUl.append(
+    this._mgendUl!.append(
+      ...this._generateCheckboxListNodes(mgendVals, 'mgend')
+    );
+    this._clinvarUl!.append(
       ...this._generateCheckboxListNodes(clinvarVals, 'clinvar')
     );
 
-    // references
-    // 参照を取る（LI を挿入した後で）
+    // Cache all checkbox refs once
     this._checkboxes = Array.from(
       this.sectionEl.querySelectorAll<HTMLInputElement>(
-        ':scope > ul > li > label > input[type="checkbox"]'
+        ':scope ul[data-type="clinical-significance"] input[type="checkbox"]'
       )
     );
 
-    // attach events
-    this._attachCheckboxEvents();
+    this._attachCheckboxEventsDelegated();
     this._attachButtonEvents();
   }
 
-  // public methods
-  keepLastValues() {
-    const valueMgendElements = Array.from(
-      this._valuesElement.querySelectorAll(SEL.mgend)
-    ) as ConditionItemValueView[];
-    const valueClinvarElements = Array.from(
-      this._valuesElement.querySelectorAll(SEL.clinvar)
-    ) as ConditionItemValueView[];
+  // ───────────────────────────────────────────────────────────────────────────
+  // Public API
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /** Capture current rendered value-views as "last confirmed" values. */
+  public keepLastValues(): void {
+    const mgendNodes =
+      this._valuesElement.querySelectorAll<ConditionItemValueView>(
+        ':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view'
+      );
+    const clinvarNodes =
+      this._valuesElement.querySelectorAll<ConditionItemValueView>(
+        ':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view'
+      );
 
     this._lastValues = {
-      mgend: valueMgendElements.map((value) => ({
-        value: value.value,
-        label: value.label,
+      mgend: Array.from(mgendNodes, (v) => ({
+        value: v.value,
+        label: v.label,
       })),
-      clinvar: valueClinvarElements.map((value) => ({
-        value: value.value,
-        label: value.label,
+      clinvar: Array.from(clinvarNodes, (v) => ({
+        value: v.value,
+        label: v.label,
       })),
     };
   }
 
-  restore() {
-    this._checkboxes.forEach((checkbox) => {
-      // チェックボックスのデータソースに応じて、対応する配列で値を探す
-      const valuesArray =
-        checkbox.dataset.source === 'mgend'
-          ? this._lastValues.mgend
-          : this._lastValues.clinvar;
+  /** Restore checkboxes from the last confirmed values, then re-render. */
+  public restore(): void {
+    const has = (src: SignificanceSource, val: string) =>
+      this._lastValues[src].some((x) => x.value === val);
 
-      const datasetValue = valuesArray.find((value) => {
-        return value.value === checkbox.value;
-      });
-
-      // チェックボックスの状態を過去の値に基づいて復元
-      checkbox.checked = !!datasetValue; // 値が見つかった場合はチェックを入れる
-    });
+    for (const cb of this._checkboxes) {
+      const src = (cb.dataset.source as SignificanceSource) || 'mgend';
+      cb.checked = has(src, cb.value);
+    }
     this._update();
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // DOM build helpers
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Create LI nodes for one bucket.
+   * @param values Readonly source items from JSON
+   * @param source Either "mgend" or "clinvar"
+   */
   private _generateCheckboxListNodes(
-    values: Array<{ value: string; label: string }>,
+    values: ReadonlyArray<EnumerationItem>,
     source: SignificanceSource
   ): HTMLLIElement[] {
     return values.map(({ value, label }) =>
@@ -176,196 +179,159 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     );
   }
 
-  private _attachCheckboxEvents() {
-    this._checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener('change', () => {
+  /** Attach a single delegated change handler for all checkboxes. */
+  private _attachCheckboxEventsDelegated(): void {
+    this.sectionEl.addEventListener('change', (e) => {
+      const t = e.target as Element | null;
+      if (!t || !(t instanceof HTMLInputElement)) return;
+      if (!t.matches('input[type="checkbox"]')) return;
+      this._update();
+    });
+  }
+
+  /** Wire "Select all" / "Clear all" buttons with a single handler. */
+  private _attachButtonEvents(): void {
+    const btns = this.sectionEl.querySelectorAll<HTMLButtonElement>(
+      ':scope > .buttons > button'
+    );
+    btns.forEach((button, index) => {
+      button.addEventListener('click', () => {
+        const check = index === 0; // 0: select all, 1: clear all
+        for (const cb of this._checkboxes) cb.checked = check;
         this._update();
       });
     });
   }
 
-  /** "Select all" と "Clear all" ボタンにクリックイベントを追加し、
-   * ボタンがクリックされた際にチェックボックスの状態を一括変更する。 */
-  private _attachButtonEvents() {
-    this.sectionEl
-      .querySelectorAll(':scope > .buttons > button')
-      .forEach((button, index) => {
-        button.addEventListener('click', () => {
-          this._checkboxes.forEach((checkbox) => (checkbox.checked = !index));
-          this._update();
-        });
-      });
-  }
-
+  /**
+   * Filter raw values into a mutable array for UI consumption.
+   * @param values Source values (readonly, from JSON)
+   * @param source MGeND or ClinVar
+   */
   private _filterValues(
-    values: ReadonlyArray<{ value: string; label: string }>,
+    values: ReadonlyArray<EnumerationItem>,
     source: SignificanceSource
-  ): { value: string; label: string }[] {
+  ): EnumerationItem[] {
     if (this._conditionType === 'significance' && source === 'clinvar') {
-      // `filter` は新しい（可変の）配列を返すのでそのままOK
-      return values.filter((v) => v.value !== 'NC');
+      return values.filter((v) => v.value !== 'NC'); // new mutable array
     }
-    // そのまま返す場合はコピーして可変にする
-    return Array.from(values);
+    return Array.from(values); // mutable copy
   }
 
-  /** チェックボックスの状態に基づいて、値の更新、重複のチェック、ラベルや要素の削除を行う
-   * また、更新された値に基づいて Clinical Significance のビューを更新 */
-  private _update() {
-    // update values
-    this._checkboxes.forEach((checkbox) => {
-      const newValue = {
-        value: checkbox.value,
-        label: checkbox.dataset.label ?? checkbox.value,
-      };
+  // ───────────────────────────────────────────────────────────────────────────
+  // State & rendering
+  // ───────────────────────────────────────────────────────────────────────────
 
-      if (checkbox.checked) {
-        // Add new value if not already exists
-        this._addUniqueValue(
-          checkbox.dataset.source as SignificanceSource,
-          newValue
-        );
-      } else {
-        // Remove value when unchecked
-        this._removeValue(
-          checkbox.dataset.source as SignificanceSource,
-          checkbox.value,
-          checkbox.dataset.label ?? checkbox.value
-        );
-      }
-    });
+  /**
+   * Recompute selection state from checkboxes and update the rendered chips.
+   * Side-effects:
+   * - Mutates `_values`
+   * - Re-renders value views
+   * - Notifies parent about validity
+   */
+  private _update(): void {
+    // Rebuild `_values` from checkbox states
+    this._values = { mgend: [], clinvar: [] };
+    for (const cb of this._checkboxes) {
+      if (!cb.checked) continue;
+      const source = (cb.dataset.source as SignificanceSource) || 'mgend';
+      const label = cb.dataset.label ?? cb.value;
+      this._values[source].push({ value: cb.value, label });
+    }
 
-    // Update Clinical Significance View
-    this._updateClinicalSignificanceValueView();
+    // Re-render both sources
+    this._renderSource('mgend', this._values.mgend);
+    this._renderSource('clinvar', this._values.clinvar);
 
-    // validation
+    // Update parent validity
     this._valuesView.update(this.isValid);
   }
 
-  /** MGeNDまたはClinVarの配列に値を一意に追加 */
-  private _addUniqueValue(
-    source: SignificanceSource,
-    newValue: { value: string; label: string }
-  ) {
-    const values =
-      source === 'mgend' ? this._values.mgend : this._values.clinvar;
-    const exists = values.some(
-      (item) => item.value === newValue.value && item.label === newValue.label
-    );
-
-    if (!exists) {
-      values.push(newValue); // 重複していなければ追加
-    }
-  }
-
-  /** 指定されたソースの配列から該当の値を削除
-   * また、すべての値が削除された場合は、関連するラベルと要素も削除 */
-  private _removeValue(
-    source: SignificanceSource,
-    value: string,
-    label: string
-  ) {
-    const values =
-      source === 'mgend' ? this._values.mgend : this._values.clinvar;
-    const index = values.findIndex(
-      (item) => item.value === value && item.label === label
-    );
-
-    if (index !== -1) {
-      values.splice(index, 1); // 一致する要素を削除
-    }
-
-    if (values.length === 0) {
-      this._removeConditionWrapper(source); // 値が全てなくなった場合の処理
-    }
-  }
-
-  /** 指定されたソースに関連する要素（spanやcondition-wrapper）を削除 */
-  private _removeConditionWrapper(source: SignificanceSource) {
-    const span = this._valuesElement.querySelector(`span.${source}`);
-    const wrapper = this._valuesElement.querySelector(
-      `.${source}-condition-wrapper`
-    );
-
-    if (span) span.remove();
-    if (wrapper) wrapper.remove();
-  }
-
-  /** Clinical Significance のビューを更新し、ラベルと対応する値を表示します。
-   * 新しいラベルや条件が追加される場合、既存のものを削除してから再描画します。 */
-  private _updateClinicalSignificanceValueView() {
-    this._renderSource('mgend', this._values.mgend);
-    this._renderSource('clinvar', this._values.clinvar);
-  }
-
-  /** 指定されたデータソースに対応するラベルや条件を描画
-   * 既存のビューがある場合は削除してから、新しい条件ビューを追加 */
+  /**
+   * Render one bucket (mgend/clinvar):
+   * - If empty: remove wrapper group
+   * - Else: ensure wrapper and replace all chips
+   */
   private _renderSource(
     source: SignificanceSource,
-    values: Array<{ value: string; label: string }>
+    values: Array<EnumerationItem>
   ): void {
     if (values.length === 0) {
-      // 0 件なら見出し＋wrapperごと削除
       this._removeConditionWrapper(source);
       return;
     }
 
-    // 1 件以上なら wrapper を用意して中身を全差し替え
-    const wrapper = this._ensureWrapperExists(source); // ← HTMLElement
+    const wrapper = this._ensureWrapperExists(source);
 
-    // 既存の value-view を削除（型を付ける）
+    // Clear existing chips
     wrapper
       .querySelectorAll<ConditionItemValueView>('condition-item-value-view')
-      .forEach((view: ConditionItemValueView) => view.remove());
+      .forEach((v) => v.remove());
 
-    // 新しい値を追加（型を明示）
+    // Append chips
     for (const v of values) {
-      const valueView = document.createElement(
+      const chip = document.createElement(
         'condition-item-value-view'
       ) as ConditionItemValueView;
-      valueView.conditionType = this._conditionType;
-      valueView.label = v.label;
-      valueView.value = v.value;
-      wrapper.append(valueView);
+      chip.conditionType = this._conditionType;
+      chip.label = v.label;
+      chip.value = v.value;
+      wrapper.append(chip);
     }
   }
 
-  /** 指定されたデータソースに対応するラベルとコンディションのラッパー要素が存在しない場合、作成して追加 */
+  /**
+   * Ensure existence of the bucket wrapper:
+   * <div class="{source}-wrapper">
+   *   <span class="{source}">MGeND|Clinvar</span>
+   *   <div class="{source}-condition-wrapper"></div>
+   * </div>
+   * @returns the inner "{source}-condition-wrapper" element
+   */
   private _ensureWrapperExists(source: SignificanceSource): HTMLElement {
     const wrapperClass = `${source}-wrapper`;
     const conditionWrapperClass = `${source}-condition-wrapper`;
 
-    // outer（見出し＋内側ラッパーの親）
-    let outer = this._valuesElement.querySelector<HTMLElement>(
-      `.${wrapperClass}`
-    );
-    if (!outer) {
-      outer = document.createElement('div');
-      outer.classList.add(wrapperClass);
+    // outer (parent of header and inner wrapper)
+    const outer =
+      this._valuesElement.querySelector<HTMLElement>(`.${wrapperClass}`) ??
+      createEl('div', { class: wrapperClass });
+
+    // If it's not in the DOM yet, append it.
+    if (!outer.isConnected) {
       this._valuesElement.append(outer);
     }
 
-    // outer の直下に conditionWrapper を持たせる（スコープを outer に限定）
-    let conditionWrapper = outer.querySelector<HTMLElement>(
-      `.${conditionWrapperClass}`
-    );
-    if (!conditionWrapper) {
-      const span = document.createElement('span');
-      span.classList.add(source);
-      span.textContent = source === 'mgend' ? 'MGeND' : 'ClinVar';
+    // inner wrapper
+    const conditionWrapper =
+      outer.querySelector<HTMLElement>(`.${conditionWrapperClass}`) ??
+      createEl('div', { class: conditionWrapperClass });
 
-      conditionWrapper = document.createElement('div');
-      conditionWrapper.classList.add(conditionWrapperClass);
-
-      outer.append(span, conditionWrapper);
+    // When creating a new one, add it together with the label.
+    if (!conditionWrapper.isConnected) {
+      const label = createEl('span', {
+        class: source,
+        text: source === 'mgend' ? LABELS.mgend : LABELS.clinvar,
+      });
+      outer.append(label, conditionWrapper);
     }
 
     return conditionWrapper;
   }
 
-  //accessor
-  /** You can press the ok button if there are two valid values */
-  get isValid() {
-    return this._checkboxes.some((checkbox) => checkbox.checked);
+  /**
+   * Remove the entire wrapper group for one source.
+   * This prevents an empty "Clinvar" or "MGeND" header from lingering.
+   */
+  private _removeConditionWrapper(source: SignificanceSource): void {
+    const outer = this._valuesElement.querySelector<HTMLElement>(
+      `.${source}-wrapper`
+    );
+    if (outer) outer.remove();
+  }
+
+  /** Editor validity: true if at least one checkbox is checked. */
+  public get isValid(): boolean {
+    return this._checkboxes.some((cb) => cb.checked);
   }
 }
