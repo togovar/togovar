@@ -5,27 +5,13 @@ import type ConditionValues from '../ConditionValues.js';
 import type { ConditionItemView } from '../ConditionItemView';
 import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 import type { SignificanceSource } from '../../../types';
+import { CONDITION_TYPE } from '../../../definition';
 
 type DatasetValue = { value: string; label: string };
-type Dataset = {
-  label: string;
-  type: string;
-  values: Record<SignificanceSource, DatasetValue[]>;
-};
 
 interface DatasetValues {
   mgend: DatasetValue[];
   clinvar: DatasetValue[];
-}
-
-function isClinSigDataset(x: any): x is Dataset {
-  return (
-    x &&
-    typeof x === 'object' &&
-    x.values &&
-    Array.isArray(x.values.mgend) &&
-    Array.isArray(x.values.clinvar)
-  );
 }
 
 const SEL = {
@@ -44,18 +30,25 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
 
-    // HTML
-    const raw = ADVANCED_CONDITIONS[this._conditionType] as unknown;
-    if (!isClinSigDataset(raw)) {
+    if (this._conditionType !== CONDITION_TYPE.significance) {
       throw new Error(
-        `clinical-significance 用の定義ではありません: ${this._conditionType}`
+        'ConditionValueEditorClinicalSignificance は significance 用です'
       );
     }
 
-    const dataset: Dataset = {
-      label: String(raw.label ?? 'Clinical significance'),
-      type: String(raw.type ?? 'clinical-significance'),
-      values: raw.values,
+    // 型が SignificanceCondition | undefined と推論される
+    const raw = ADVANCED_CONDITIONS.significance;
+    if (!raw) {
+      throw new Error('significance の定義が見つかりません');
+    }
+
+    const dataset = {
+      label: raw.label,
+      type: raw.type,
+      values: {
+        mgend: raw.values.mgend,
+        clinvar: raw.values.clinvar,
+      },
     };
 
     this._createElement('clinical-significance-view', () => [
@@ -170,14 +163,15 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   }
 
   private _filterValues(
-    values: Array<{ value: string; label: string }>,
+    values: ReadonlyArray<{ value: string; label: string }>,
     source: SignificanceSource
-  ) {
-    // 例）significance のとき ClinVar から NC を除外
+  ): { value: string; label: string }[] {
     if (this._conditionType === 'significance' && source === 'clinvar') {
+      // `filter` は新しい（可変の）配列を返すのでそのままOK
       return values.filter((v) => v.value !== 'NC');
     }
-    return values;
+    // そのまま返す場合はコピーして可変にする
+    return Array.from(values);
   }
 
   // public methods
@@ -250,7 +244,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     this._updateClinicalSignificanceValueView();
 
     // validation
-    this._valuesView.update(this._validate());
+    this._valuesView.update(this.isValid);
   }
 
   /** MGeNDまたはClinVarの配列に値を一意に追加 */
@@ -372,10 +366,6 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     }
 
     return conditionWrapper;
-  }
-
-  private _validate() {
-    return this.isValid;
   }
 
   //accessor

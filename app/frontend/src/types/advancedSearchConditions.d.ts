@@ -1,74 +1,44 @@
-// Common
-type ConditionKind = 'peculiar' | 'enumeration' | 'tree' | 'text';
+// types.ts など
+import type { ConditionTypeValue } from '../definition';
 
-interface ConditionBase {
-  label: string;
-  type: ConditionKind;
-}
-
-/* ------------ peculiar ------------- */
-// Trees with arbitrary depth like dataset/genotype (id is not used)
-// Group nodes do not have values, while leaves have values
-type TreeNode =
-  | { label: string; children: TreeNode[] } // Group
-  | { value: string; label: string; children?: TreeNode[] }; // Leaf or Leaf + Sub-level
-
-interface PeculiarCondition extends ConditionBase {
-  type: 'peculiar';
-  values?: readonly TreeNode[];
-}
-
-/* ------------ enumeration ----------- */
-// significance: values are Record<string, EnumerationItem[]>
-// type: values are EnumerationItem[] (array)
-
-interface SignificanceCondition extends ConditionBase {
-  type: 'enumeration';
-  values: {
-    mgend: readonly EnumerationItem[];
-    clinvar: readonly EnumerationItem[];
-  };
-}
-
-interface VariantTypeCondition extends ConditionBase {
-  type: 'enumeration';
-  values: readonly EnumerationItem[];
-}
-
-interface EnumerationItem {
+export interface EnumerationItem {
   value: string;
   label: string;
 }
 
-/* --------------- tree --------------- */
-// Trees like "numeric id reference type" such as consequence
-// Each node must have an id, children are referenced by an array of ids, descriptions are optional
-interface ConsequenceNodeBase {
-  id: number;
+export interface SignificanceCondition {
   label: string;
-  parent?: number;
-  children?: number[];
-  value?: string;
-  description?: string;
-}
-interface TreeCondition extends ConditionBase {
-  type: 'tree';
-  values: ConsequenceNodeBase[];
+  type: 'enumeration';
+  values: {
+    mgend: ReadonlyArray<EnumerationItem>;
+    clinvar: ReadonlyArray<EnumerationItem>;
+  };
 }
 
-/* --------------- text --------------- */
-interface TextCondition extends ConditionBase {
-  type: 'text';
+export interface VariantTypeCondition {
+  label: string;
+  type: 'enumeration';
+  values: ReadonlyArray<EnumerationItem>;
 }
 
-/* ----------- Root Type --------------- */
-type ConditionDefinition =
-  | PeculiarCondition
-  | TreeCondition
-  | TextCondition
-  | SignificanceCondition
-  | VariantTypeCondition;
+export type ConditionDefinition =
+  // | PeculiarCondition
+  // | TreeCondition
+  // | TextCondition
+  SignificanceCondition | VariantTypeCondition;
+
+// ★ ここをキー別に厳密化
+export type AdvancedConditionMap = Partial<
+  Record<
+    Exclude<ConditionTypeValue, 'significance' | 'type'>,
+    ConditionDefinition
+  >
+> & {
+  significance?: SignificanceCondition;
+  type?: VariantTypeCondition;
+};
 
 export interface GRChConditions {
-  conditions: Record<string, ConditionDefinition>;
+  // JSON 全体の conditions は「キー別に厳密」
+  conditions: AdvancedConditionMap;
 }
