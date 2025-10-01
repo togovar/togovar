@@ -1,3 +1,4 @@
+import { createEl } from '../../../utils/dom/createEl';
 import type { HierarchyNode } from 'd3-hierarchy';
 import { hierarchy } from 'd3-hierarchy';
 import { CONDITION_TYPE } from '../../../definition';
@@ -26,7 +27,7 @@ const ROOT_NODE_ID = '-1';
  * Provides functionality for selecting datasets with hierarchical drill-down navigation.
  */
 export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
-  private _lastValueViews: Array<HTMLDivElement> = [];
+  private _lastValueViews: Array<{ dataset: { value?: string } }> = [];
   private _data: HierarchyNode<DataNodeWithChecked>;
   private _columns: HTMLElement | null = null;
   private _nodesToShowInValueView: Array<HierarchyNode<DataNodeWithChecked>>;
@@ -67,7 +68,6 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
     this._resetAllCheckStates();
     this._restoreCheckedStates();
     this._updateUI();
-    this._updateValueViews(this._lastValueViews);
   }
 
   /**
@@ -82,15 +82,20 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * Initializes the UI elements and structure.
    */
   private _initializeUI(): void {
-    this._createElement(
-      'columns-editor-view',
-      `
-    <header>Select ${this._conditionType}</header>
-    <div class="body">
-      <div class="columns"></div>
-    </div>`
-    );
-    this._columns = this._body.querySelector(':scope > .columns');
+    this._createElement('columns-editor-view', () => [
+      createEl('header', { text: `Select ${this._conditionType}` }),
+      createEl('div', {
+        class: 'body',
+        children: [createEl('div', { class: 'columns' })],
+      }),
+    ]);
+
+    // safety checks
+    if (!this.bodyEl) throw new Error('columns-editor-view: .body not found');
+    this._columns =
+      this.bodyEl.querySelector<HTMLDivElement>(':scope > .columns');
+    if (!this._columns)
+      throw new Error('columns-editor-view: .columns not found');
   }
 
   /**
@@ -136,8 +141,13 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
     switch (this._conditionType) {
       case CONDITION_TYPE.dataset:
       case CONDITION_TYPE.genotype: {
-        const rawData = ADVANCED_CONDITIONS[this._conditionType]
-          .values as DataNodeWithChecked[];
+        const conditionDef = ADVANCED_CONDITIONS[this._conditionType];
+        if (!conditionDef || !('values' in conditionDef)) {
+          throw new Error('Invalid condition definition or no values property');
+        }
+        const rawData = (
+          conditionDef as unknown as { values: DataNodeWithChecked[] }
+        ).values;
         const processedData = this._addUniqueIdsToNodes(rawData);
 
         return hierarchy<DataNodeWithChecked>({
@@ -165,9 +175,10 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
     const items = await this._getChildItems(parentId);
 
     const column = this._createColumnElement();
+    if (!this._columns) throw new Error('Columns container not found');
     this._columns.append(column);
 
-    column.innerHTML = this._generateColumnHTML(items, isLogin);
+    column.append(this._generateColumnList(items, isLogin));
 
     this._attachColumnEventListeners(column, isLogin);
     this._updateUI();
@@ -181,6 +192,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   private _createColumnElement(): HTMLDivElement {
     const column = document.createElement('div');
     column.classList.add('column');
+    if (!this._columns) throw new Error('Columns container not found');
     column.dataset.depth = this._columns
       .querySelectorAll(':scope > .column')
       .length.toString();
@@ -193,16 +205,13 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * @param isLogin - Whether the user is logged in
    * @returns HTML string for the column content
    */
-  private _generateColumnHTML(
+  private _generateColumnList(
     items: HierarchyNode<DataNodeWithChecked>[],
     isLogin: boolean
-  ): string {
-    return `
-      <ul>
-        ${items
-          .map((item) => this._generateListItemHTML(item, isLogin))
-          .join('')}
-      </ul>`;
+  ): HTMLUListElement {
+    return createEl('ul', {
+      children: items.map((item) => this._makeListItemEl(item, isLogin)),
+    });
   }
 
   /**
@@ -210,39 +219,59 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * @param item - The hierarchy node to render
    * @param isLogin - Whether the user is logged in
    * @returns HTML string for the list item
-   * @private
    */
-  private _generateListItemHTML(
+  private _makeListItemEl(
     item: HierarchyNode<DataNodeWithChecked>,
     isLogin: boolean
-  ): string {
+  ): HTMLLIElement {
     const inputId = `checkbox-${item.data.id}`;
-    let listItem = `<li data-id="${item.data.id}" data-parent="${item.parent.data.id}"`;
 
-    if (item.data.value) {
-      listItem += ` data-value="${item.data.value}"`;
-    }
+    // input or lock
+    const inputOrLock = this._shouldShowLockIcon(item, isLogin)
+      ? createEl('span', { class: 'lock' })
+      : createEl('input', {
+          attrs: { type: 'checkbox', id: inputId },
+          domProps: { value: item.data.id },
+        });
 
-    listItem += `><label for="${inputId}">`;
+    // dataset アイコン（必要なら）
+    const datasetIcon = this._shouldShowDatasetIcon(item)
+      ? createEl('span', {
+          class: 'dataset-icon',
+          dataset: item.data.value ? { dataset: item.data.value } : undefined,
+        })
+      : null;
 
-    if (this._shouldShowLockIcon(item, isLogin)) {
-      listItem += `<span class="lock"></span>`;
-    } else {
-      listItem += `<input type="checkbox" id="${inputId}" value="${item.data.id}">`;
-    }
+    // ラベル内のスパン（テキスト）
+    const textSpan = createEl('span', { text: item.data.label });
 
-    if (this._shouldShowDatasetIcon(item)) {
-      listItem += `<span class="dataset-icon" data-dataset="${item.data.value}"></span>`;
-    }
+    // <label for=...> の中身
+    const labelEl = createEl('label', {
+      attrs: { for: inputId },
+      children: [inputOrLock, ...(datasetIcon ? [datasetIcon] : []), textSpan],
+    });
 
-    listItem += `<span>${item.data.label}</span></label>`;
+    // 子がいる時だけ矢印
+    const arrow =
+      item.children !== undefined
+        ? createEl('div', {
+            class: 'arrow',
+            dataset: {
+              id: item.data.id,
+              ...(item.data.value ? { value: item.data.value } : {}),
+            },
+          })
+        : null;
 
-    if (item.children !== undefined) {
-      listItem += `<div class="arrow" data-id="${item.data.id}" data-value="${item.data.value}"></div>`;
-    }
-
-    listItem += `</li>`;
-    return listItem;
+    // 最終的な <li>
+    return createEl('li', {
+      dataset: {
+        id: item.data.id,
+        parent: item.parent?.data.id ?? '',
+        ...(item.data.value ? { value: item.data.value } : {}),
+      },
+      children: [labelEl, ...(arrow ? [arrow] : [])],
+    });
   }
 
   /**
@@ -250,7 +279,6 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * @param item - The hierarchy node to check
    * @param isLogin - Whether the user is logged in
    * @returns True if lock icon should be shown
-   * @private
    */
   private _shouldShowLockIcon(
     item: HierarchyNode<DataNodeWithChecked>,
@@ -263,7 +291,6 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * Determines if a dataset icon should be shown for the item.
    * @param item - The hierarchy node to check
    * @returns True if dataset icon should be shown
-   * @private
    */
   private _shouldShowDatasetIcon(
     item: HierarchyNode<DataNodeWithChecked>
@@ -279,7 +306,6 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * Attaches event listeners to the column element.
    * @param column - The column element to attach listeners to
    * @param isLogin - Whether the user is logged in
-   * @private
    */
   private _attachColumnEventListeners(
     column: HTMLElement,
@@ -292,14 +318,16 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   /**
    * Attaches checkbox change event listeners to the column.
    * @param column - The column element
-   * @private
    */
   private _attachCheckboxEventListeners(column: HTMLElement): void {
     column.addEventListener('change', (e) => {
       const target = e.target as HTMLInputElement;
       const checked = target.checked;
-      const nodeId = target.closest('li').dataset.id;
+      const listItem = target.closest('li');
+      if (!listItem || !listItem.dataset.id) return;
+      const nodeId = listItem.dataset.id;
       const changedNode = this._data.find((datum) => datum.data.id === nodeId);
+      if (!changedNode) return;
 
       if (changedNode.children)
         this._updateChildrenCheckState(changedNode, checked);
@@ -323,6 +351,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
       arrow.addEventListener('click', (e) => {
         const target = e.target as HTMLElement;
         const listItem = target.closest('li');
+        if (!listItem) return;
 
         this._handleArrowClick(listItem, target, isLogin);
       });
@@ -352,16 +381,20 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   /**
    * Clears current selection and removes sub-columns.
    * @param listItem - The current list item
-   * @private
    */
   private _clearSelectionAndSubColumns(listItem: Element): void {
     const currentColumn = listItem.closest('.column') as HTMLElement;
     const columnsContainer = listItem.closest('.columns');
+    if (!currentColumn || !columnsContainer || !currentColumn.dataset.depth)
+      return;
 
     // Clear current selection
-    listItem.parentNode
-      .querySelector(':scope > .-selected')
-      ?.classList.remove('-selected');
+    const parentNode = listItem.parentNode as Element;
+    if (parentNode) {
+      parentNode
+        .querySelector(':scope > .-selected')
+        ?.classList.remove('-selected');
+    }
 
     // Remove deeper columns
     const currentDepth = parseInt(currentColumn.dataset.depth);
@@ -369,20 +402,26 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
       ':scope > .column'
     )) {
       const columnElement = column as HTMLElement;
-      if (parseInt(columnElement.dataset.depth) > currentDepth) {
-        columnElement.parentNode.removeChild(columnElement);
+      if (
+        columnElement.dataset.depth &&
+        parseInt(columnElement.dataset.depth) > currentDepth
+      ) {
+        const columnParent = columnElement.parentNode;
+        if (columnParent) {
+          columnParent.removeChild(columnElement);
+        }
       }
     }
   }
 
   /**
    * Scrolls to reveal the newly added column if necessary.
-   * @private
    */
   private _scrollToRevealNewColumn(): void {
-    const left = this._body.scrollWidth - this._body.clientWidth;
+    if (!this.bodyEl) return;
+    const left = this.bodyEl.scrollWidth - this.bodyEl.clientWidth;
     if (left > 0) {
-      this._body.scrollTo({
+      this.bodyEl.scrollTo({
         top: 0,
         left: left,
         behavior: 'smooth',
@@ -400,7 +439,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   ): Promise<HierarchyNode<DataNodeWithChecked>[]> {
     return new Promise((resolve) => {
       if (!parentId) {
-        resolve(this._data.children);
+        resolve(this._data.children || []);
         return;
       }
 
@@ -412,17 +451,34 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   /**
    * Adds a column prompting the user to login for JGAD datasets.
    */
+  /** Append the "login required" column for JGAD datasets using createEl. */
   private async _addLoginPromptColumn(): Promise<void> {
     await storeManager.fetchLoginStatus();
-    const column = document.createElement('div');
-    column.classList.add('column');
-    column.dataset.depth = '2';
-    column.innerHTML = `
-      <div class="messages-view">
-        <div class="note message -warning">
-          <a class="link" href="/auth/login">Login</a> to select JGAD datasets
-        </div>
-      </div>`;
+    if (!this._columns) throw new Error('columns not mounted');
+
+    const column = createEl('div', {
+      class: 'column',
+      dataset: { depth: '2' },
+      children: [
+        createEl('div', {
+          class: 'messages-view',
+          children: [
+            createEl('div', {
+              class: ['note', 'message', '-warning'],
+              children: [
+                createEl('a', {
+                  class: 'link',
+                  attrs: { href: '/auth/login' },
+                  text: 'Login',
+                }),
+                ' to select JGAD datasets',
+              ],
+            }),
+          ],
+        }),
+      ],
+    });
+
     this._columns.append(column);
   }
 
@@ -487,7 +543,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
       this._calculateParentCheckState(dataNode);
     }
 
-    this._updateParentCheckState(dataNode.parent);
+    this._updateParentCheckState(dataNode.parent || undefined);
   }
 
   /**
@@ -528,14 +584,15 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * Updates checkbox states in the DOM to reflect data state.
    */
   private _updateCheckboxStatesInDOM(): void {
+    if (!this._columns) return;
     this._data.eachAfter((datum) => {
-      const checkbox: HTMLInputElement = this._columns.querySelector(
+      const checkbox = this._columns!.querySelector(
         `li[data-id="${datum.data.id}"] > label > input`
-      );
+      ) as HTMLInputElement;
       if (checkbox) {
         checkbox.checked = !datum.data.indeterminate && datum.data.checked;
         checkbox.indeterminate =
-          !datum.data.checked && datum.data.indeterminate;
+          !datum.data.checked && (datum.data.indeterminate || false);
       }
     });
   }
@@ -543,7 +600,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   /**
    * Updates the value views with current selections.
    */
-  private _updateValueViews(): void {
+  protected _updateValueViews(): void {
     this._processNodesToShowInValueView();
     this._clearValueViews();
 

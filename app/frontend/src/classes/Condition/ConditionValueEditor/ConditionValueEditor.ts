@@ -14,7 +14,7 @@ type SectionContent =
 
 export class ConditionValueEditor {
   private _sectionEl: HTMLElement | null = null;
-  protected _body: HTMLElement | null = null;
+  protected _body: HTMLElement | null = null; // To be deleted in the future
 
   constructor(
     protected readonly _valuesView: ConditionValues,
@@ -49,7 +49,7 @@ export class ConditionValueEditor {
     }
 
     this._valuesView.sections.append(sectionEl);
-    this._body = sectionEl.querySelector<HTMLElement>(':scope > .body');
+    this._body = sectionEl.querySelector<HTMLElement>(':scope > .body'); // To be deleted in the future
     this._sectionEl = sectionEl;
     return sectionEl;
   }
@@ -104,6 +104,12 @@ export class ConditionValueEditor {
   protected get sectionEl(): HTMLElement {
     if (!this._sectionEl) throw new Error('not mounted yet');
     return this._sectionEl;
+  }
+
+  protected get bodyEl(): HTMLElement {
+    const el = this.sectionEl.querySelector<HTMLDivElement>(':scope > .body');
+    if (!el) throw new Error('columns-editor-view: .body not found');
+    return el;
   }
 
   protected get _conditionType(): ConditionTypeValue {
