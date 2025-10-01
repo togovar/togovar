@@ -1,6 +1,6 @@
 import { CONDITION_TYPE, type ConditionTypeValue } from '../../definition';
 import { supportsRelation } from '../../conditions';
-import ConditionValueEditorCheckboxes from './ConditionValueEditor/ConditionValueEditorCheckboxes';
+import { ConditionValueEditorCheckboxes } from './ConditionValueEditor/ConditionValueEditorCheckboxes';
 import { ConditionValueEditorClinicalSignificance } from './ConditionValueEditor/ConditionValueEditorClinicalSignificance';
 import ConditionValueEditorColumns from './ConditionValueEditor/ConditionValueEditorColumns';
 import ConditionValueEditorColumnsDataset from './ConditionValueEditor/ConditionValueEditorColumnsDataset';

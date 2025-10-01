@@ -41,8 +41,8 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     super(valuesView, conditionView);
 
     // Typed config from JSON (significance is always enumeration with 2 buckets)
-    const raw = ADVANCED_CONDITIONS.significance;
-    if (!raw) {
+    const master = ADVANCED_CONDITIONS.significance;
+    if (!master) {
       throw new Error('Missing condition definition: significance');
     }
 
@@ -82,8 +82,8 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     ]);
 
     // Populate checkboxes (accept readonly input, create mutable UI)
-    const mgendVals = this._filterValues(raw.values.mgend, 'mgend');
-    const clinvarVals = this._filterValues(raw.values.clinvar, 'clinvar');
+    const mgendVals = this._filterValues(master.values.mgend, 'mgend');
+    const clinvarVals = this._filterValues(master.values.clinvar, 'clinvar');
 
     this._mgendUl!.append(
       ...this._generateCheckboxListNodes(mgendVals, 'mgend')
@@ -108,7 +108,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   // ───────────────────────────────────────────────────────────────────────────
 
   /** Capture current rendered value-views as "last confirmed" values. */
-  public keepLastValues(): void {
+  keepLastValues(): void {
     const mgendNodes =
       this._valuesElement.querySelectorAll<ConditionItemValueView>(
         ':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view'
@@ -131,7 +131,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   }
 
   /** Restore checkboxes from the last confirmed values, then re-render. */
-  public restore(): void {
+  restore(): void {
     const has = (src: SignificanceSource, val: string) =>
       this._lastValues[src].some((x) => x.value === val);
 
@@ -204,7 +204,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   }
 
   /**
-   * Filter raw values into a mutable array for UI consumption.
+   * Filter master values into a mutable array for UI consumption.
    * @param values Source values (readonly, from JSON)
    * @param source MGeND or ClinVar
    */

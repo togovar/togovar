@@ -36,7 +36,7 @@ interface SignificanceCondition {
   values: SignificanceValues;
 }
 
-interface VariantTypeCondition {
+interface CheckboxesCondition {
   label: string;
   type: 'enumeration';
   values: ReadonlyArray<EnumerationItem>;
@@ -68,7 +68,7 @@ export type ConditionDefinition =
   | TreeCondition
   | TextCondition
   | SignificanceCondition
-  | VariantTypeCondition;
+  | CheckboxesCondition;
 
 // ★ ここをキー別に厳密化
 export type AdvancedConditionMap = Partial<
@@ -78,7 +78,7 @@ export type AdvancedConditionMap = Partial<
   >
 > & {
   significance?: SignificanceCondition;
-  type?: VariantTypeCondition;
+  type?: CheckboxesCondition;
 };
 
 export interface GRChConditions {
