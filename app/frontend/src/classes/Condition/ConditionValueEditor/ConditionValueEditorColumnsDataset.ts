@@ -73,7 +73,7 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
    * @returns True if at least one item is selected
    */
   get isValid(): boolean {
-    return this._isCurrentStateValid();
+    return this._valueViews.length > 0;
   }
 
   /**
@@ -102,6 +102,29 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   private _renderInitialColumn(): void {
     this._drawColumn();
   }
+
+  /**
+   * Renders a column with items from the specified parent node.
+   * @param parentId - ID of the parent node to get children from
+   */
+  private async _drawColumn(parentId?: string): Promise<void> {
+    const isLogin = storeManager.getData('isLogin');
+    const items = await this._getChildItems(parentId);
+
+    const column = this._createColumnElement();
+    if (!this._columns) throw new Error('Columns container not found');
+    this._columns.append(column);
+
+    column.append(this._generateColumnList(items, isLogin));
+
+    this._attachColumnEventListeners(column, isLogin);
+    this._updateUI();
+    this._scrollToRevealNewColumn();
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Data conversion
+  // ───────────────────────────────────────────────────────────────────────────
 
   /**
    * Adds unique IDs to data nodes recursively.
@@ -164,38 +187,34 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   }
 
   /**
-   * Renders a column with items from the specified parent node.
-   * @param parentId - ID of the parent node to get children from
+   * Resets all check states in the data hierarchy.
    */
-  private async _drawColumn(parentId?: string): Promise<void> {
-    const isLogin = storeManager.getData('isLogin');
-    const items = await this._getChildItems(parentId);
-
-    const column = this._createColumnElement();
-    if (!this._columns) throw new Error('Columns container not found');
-    this._columns.append(column);
-
-    column.append(this._generateColumnList(items, isLogin));
-
-    this._attachColumnEventListeners(column, isLogin);
-    this._updateUI();
-    this._scrollToRevealNewColumn();
+  private _resetAllCheckStates(): void {
+    this._data.each((datum) => {
+      datum.data.checked = false;
+      datum.data.indeterminate = false;
+    });
   }
 
   /**
-   * Creates a new column DOM element with appropriate attributes.
-   * @returns The created column element
+   * Restores checked states from the last saved values.
    */
-  private _createColumnElement(): HTMLDivElement {
-    const column = document.createElement('div');
-    column.classList.add('column');
-    if (!this._columns) throw new Error('Columns container not found');
-    column.dataset.depth = this._columns
-      .querySelectorAll(':scope > .column')
-      .length.toString();
-    return column;
+  private _restoreCheckedStates(): void {
+    for (const lastValue of this._lastValueViews) {
+      const node = this._data.find(
+        (d) => d.data.value === lastValue.dataset['value']
+      );
+      if (!node) continue;
+
+      node.data.checked = true;
+      this._updateChildrenCheckState(node, true);
+      this._updateParentCheckState(node, true);
+    }
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // DOM Generation and Rendering
+  // ───────────────────────────────────────────────────────────────────────────
   /**
    * Generates HTML content for a column based on the provided items.
    * @param items - Array of hierarchy nodes to render
@@ -272,32 +291,56 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   }
 
   /**
-   * Determines if a lock icon should be shown for the item.
-   * @param item - The hierarchy node to check
-   * @param isLogin - Whether the user is logged in
-   * @returns True if lock icon should be shown
+   * Creates a new column DOM element with appropriate attributes.
+   * @returns The created column element
    */
-  private _shouldShowLockIcon(
-    item: HierarchyNode<UiNode>,
-    isLogin: boolean
-  ): boolean {
-    return (
-      isLogin === false && (item.data.value?.includes('jga_wgs.') ?? false)
-    );
+  private _createColumnElement(): HTMLDivElement {
+    const column = document.createElement('div');
+    column.classList.add('column');
+    if (!this._columns) throw new Error('Columns container not found');
+    column.dataset.depth = this._columns
+      .querySelectorAll(':scope > .column')
+      .length.toString();
+    return column;
   }
 
   /**
-   * Determines if a dataset icon should be shown for the item.
-   * @param item - The hierarchy node to check
-   * @returns True if dataset icon should be shown
+   * Adds a column prompting the user to login for JGAD datasets.
    */
-  private _shouldShowDatasetIcon(item: HierarchyNode<UiNode>): boolean {
-    return (
-      (this._conditionType === CONDITION_TYPE.dataset ||
-        this._conditionType === CONDITION_TYPE.genotype) &&
-      item.depth === 1
-    );
+  /** Append the "login required" column for JGAD datasets using createEl. */
+  private async _addLoginPromptColumn(): Promise<void> {
+    await storeManager.fetchLoginStatus();
+    if (!this._columns) throw new Error('columns not mounted');
+
+    const column = createEl('div', {
+      class: 'column',
+      dataset: { depth: '2' },
+      children: [
+        createEl('div', {
+          class: 'messages-view',
+          children: [
+            createEl('div', {
+              class: ['note', 'message', '-warning'],
+              children: [
+                createEl('a', {
+                  class: 'link',
+                  attrs: { href: '/auth/login' },
+                  text: 'Login',
+                }),
+                ' to select JGAD datasets',
+              ],
+            }),
+          ],
+        }),
+      ],
+    });
+
+    this._columns.append(column);
   }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Event Handling
+  // ───────────────────────────────────────────────────────────────────────────
 
   /**
    * Attaches event listeners to the column element.
@@ -411,96 +454,18 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
     }
   }
 
-  /**
-   * Scrolls to reveal the newly added column if necessary.
-   */
-  private _scrollToRevealNewColumn(): void {
-    if (!this.bodyEl) return;
-    const left = this.bodyEl.scrollWidth - this.bodyEl.clientWidth;
-    if (left > 0) {
-      this.bodyEl.scrollTo({
-        top: 0,
-        left: left,
-        behavior: 'smooth',
-      });
-    }
-  }
+  // ───────────────────────────────────────────────────────────────────────────
+  // State Management
+  // ───────────────────────────────────────────────────────────────────────────
 
   /**
-   * Gets child items for the specified parent node.
-   * @param parentId - ID of the parent node
-   * @returns Promise resolving to array of child nodes
+   * Updates the entire UI including DOM elements and value views.
    */
-  private _getChildItems(parentId?: string): Promise<HierarchyNode<UiNode>[]> {
-    return new Promise((resolve) => {
-      if (!parentId) {
-        resolve(this._data.children || []);
-        return;
-      }
+  private _updateUI(): void {
+    this._updateCheckboxStatesInDOM();
+    this._updateValueViews();
 
-      const parentNode = this._data.find((datum) => datum.data.id === parentId);
-      resolve(parentNode?.children || []);
-    });
-  }
-
-  /**
-   * Adds a column prompting the user to login for JGAD datasets.
-   */
-  /** Append the "login required" column for JGAD datasets using createEl. */
-  private async _addLoginPromptColumn(): Promise<void> {
-    await storeManager.fetchLoginStatus();
-    if (!this._columns) throw new Error('columns not mounted');
-
-    const column = createEl('div', {
-      class: 'column',
-      dataset: { depth: '2' },
-      children: [
-        createEl('div', {
-          class: 'messages-view',
-          children: [
-            createEl('div', {
-              class: ['note', 'message', '-warning'],
-              children: [
-                createEl('a', {
-                  class: 'link',
-                  attrs: { href: '/auth/login' },
-                  text: 'Login',
-                }),
-                ' to select JGAD datasets',
-              ],
-            }),
-          ],
-        }),
-      ],
-    });
-
-    this._columns.append(column);
-  }
-
-  /**
-   * Resets all check states in the data hierarchy.
-   */
-  private _resetAllCheckStates(): void {
-    this._data.each((datum) => {
-      datum.data.checked = false;
-      datum.data.indeterminate = false;
-    });
-  }
-
-  /**
-   * Restores checked states from the last saved values.
-   */
-  private _restoreCheckedStates(): void {
-    for (const lastValue of this._lastValueViews) {
-      const node = this._data.find(
-        (d) => d.data.value === lastValue.dataset['value']
-      );
-      if (!node) continue;
-
-      node.data.checked = true;
-      this._updateChildrenCheckState(node, true);
-      this._updateParentCheckState(node, true);
-    }
+    this._valuesView.update(this.isValid);
   }
 
   /**
@@ -565,15 +530,6 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   }
 
   /**
-   * Updates the entire UI including DOM elements and value views.
-   */
-  private _updateUI(): void {
-    this._updateCheckboxStatesInDOM();
-    this._updateValueViews();
-    this._validateAndUpdateValuesView();
-  }
-
-  /**
    * Updates checkbox states in the DOM to reflect data state.
    */
   private _updateCheckboxStatesInDOM(): void {
@@ -590,27 +546,9 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
     });
   }
 
-  /**
-   * Updates the value views with current selections.
-   */
-  protected _updateValueViews(): void {
-    this._processNodesToShowInValueView();
-    this._clearValueViews();
-
-    for (const nodeToShow of this._nodesToShowInValueView) {
-      this._addValueView(
-        nodeToShow.data.value || '',
-        this._getLabelWithPath(nodeToShow)
-      );
-    }
-  }
-
-  /**
-   * Validates the current state and updates the values view accordingly.
-   */
-  private _validateAndUpdateValuesView(): void {
-    this._valuesView.update(this._isCurrentStateValid());
-  }
+  // ───────────────────────────────────────────────────────────────────────────
+  // Value Display Logic
+  // ───────────────────────────────────────────────────────────────────────────
 
   /**
    * Processes nodes to determine which should be shown in value view.
@@ -655,10 +593,77 @@ export class ConditionValueEditorColumnsDataset extends ConditionValueEditor {
   }
 
   /**
-   * Validates if the current state is valid.
-   * @returns True if the current state is valid
+   * Determines if a lock icon should be shown for the item.
+   * @param item - The hierarchy node to check
+   * @param isLogin - Whether the user is logged in
+   * @returns True if lock icon should be shown
    */
-  private _isCurrentStateValid(): boolean {
-    return this._valueViews.length > 0;
+  private _shouldShowLockIcon(
+    item: HierarchyNode<UiNode>,
+    isLogin: boolean
+  ): boolean {
+    return (
+      isLogin === false && (item.data.value?.includes('jga_wgs.') ?? false)
+    );
+  }
+
+  /**
+   * Determines if a dataset icon should be shown for the item.
+   * @param item - The hierarchy node to check
+   * @returns True if dataset icon should be shown
+   */
+  private _shouldShowDatasetIcon(item: HierarchyNode<UiNode>): boolean {
+    return (
+      (this._conditionType === CONDITION_TYPE.dataset ||
+        this._conditionType === CONDITION_TYPE.genotype) &&
+      item.depth === 1
+    );
+  }
+
+  /**
+   * Scrolls to reveal the newly added column if necessary.
+   */
+  private _scrollToRevealNewColumn(): void {
+    if (!this.bodyEl) return;
+    const left = this.bodyEl.scrollWidth - this.bodyEl.clientWidth;
+    if (left > 0) {
+      this.bodyEl.scrollTo({
+        top: 0,
+        left: left,
+        behavior: 'smooth',
+      });
+    }
+  }
+
+  /**
+   * Gets child items for the specified parent node.
+   * @param parentId - ID of the parent node
+   * @returns Promise resolving to array of child nodes
+   */
+  private _getChildItems(parentId?: string): Promise<HierarchyNode<UiNode>[]> {
+    return new Promise((resolve) => {
+      if (!parentId) {
+        resolve(this._data.children || []);
+        return;
+      }
+
+      const parentNode = this._data.find((datum) => datum.data.id === parentId);
+      resolve(parentNode?.children || []);
+    });
+  }
+
+  /**
+   * Updates the value views with current selections.
+   */
+  protected _updateValueViews(): void {
+    this._processNodesToShowInValueView();
+    this._clearValueViews();
+
+    for (const nodeToShow of this._nodesToShowInValueView) {
+      this._addValueView(
+        nodeToShow.data.value || '',
+        this._getLabelWithPath(nodeToShow)
+      );
+    }
   }
 }
