@@ -1,4 +1,7 @@
+import { createEl } from '../../../utils/dom/createEl';
+import type { ConditionItemView } from '../ConditionItemView';
 import { ConditionValueEditor } from './ConditionValueEditor';
+import type ConditionValues from '../ConditionValues.js';
 import '../../../components/RangeSliderView.js';
 import type { FrequencyCountValueView } from '../../../components/FrequencyCountValueView';
 
@@ -87,42 +90,42 @@ type ModeType = (typeof MODE)[keyof typeof MODE];
  */
 export default class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   #conditionType: 'dataset' | 'genotype';
-  #condition: Condition;
-  #mode: ModeType;
-  #rangeSelectorView: RangeSliderElement | null = null;
-  #filtered: HTMLInputElement | null = null;
-  #lastValue: ConditionFrequency | ConditionCount | null = null;
+  _condition: Condition;
+  _mode: ModeType;
+  _rangeSelectorView: RangeSliderElement | null = null;
+  _filtered: HTMLInputElement | null = null;
+  _lastValue: ConditionFrequency | ConditionCount | null = null;
 
   /**
    * Creates a new frequency/count condition editor
    * @param valuesView - The parent values view component
    * @param conditionView - The parent condition view component
    */
-  constructor(valuesView: any, conditionView: any) {
+  constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
 
     this.#conditionType = conditionView.conditionType;
-    this.#condition = {
+    this._condition = {
       frequency: Object.assign({}, DEFAULT_CONDITION.frequency),
       count: Object.assign({}, DEFAULT_CONDITION.count),
       alt_alt: Object.assign({}, DEFAULT_CONDITION.alt_alt),
       alt_ref: Object.assign({}, DEFAULT_CONDITION.alt_ref),
       hemi_alt: Object.assign({}, DEFAULT_CONDITION.hemi_alt),
     };
-    this.#mode =
-      this._conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
+    this._mode =
+      this.#conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
 
-    this.#initializeComponent();
-    this.#setupEventListeners();
-    this.#observeValueChanges();
+    this._initializeComponent();
+    this._setupEventListeners();
+    this._observeValueChanges();
   }
 
   /**
    * Observes changes in the values view and triggers updates
    */
-  #observeValueChanges(): void {
+  private _observeValueChanges(): void {
     const observer = new MutationObserver(() => {
-      window.requestAnimationFrame(() => this.#update());
+      window.requestAnimationFrame(() => this._update());
     });
     observer.observe(this._valuesElement, {
       attributes: false,
@@ -134,15 +137,15 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
   /**
    * Initializes the component's HTML structure
    */
-  #initializeComponent(): void {
+  private _initializeComponent(): void {
     const name = `ConditionValueEditorFrequencyCount${id++}`;
 
     this._createElement(
       'frequency-count-editor-view',
-      this.#generateHTML(name)
+      this._generateHTML(name)
     );
 
-    this.#setupRangeSlider();
+    this._setupRangeSlider();
   }
 
   /**
@@ -150,11 +153,11 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * @param name - Unique name for radio button grouping
    * @returns HTML string template
    */
-  #generateHTML(name: string): string {
-    if (this._conditionType === 'genotype') {
-      return this.#generateGenotypeHTML(name);
+  private _generateHTML(name: string): string {
+    if (this.#conditionType === 'genotype') {
+      return this._generateGenotypeHTML(name);
     }
-    return this.#generateDatasetHTML(name);
+    return this._generateDatasetHTML(name);
   }
 
   /**
@@ -162,7 +165,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * @param name - Unique name for radio button grouping
    * @returns HTML string template
    */
-  #generateDatasetHTML(name: string): string {
+  private _generateDatasetHTML(name: string): string {
     const frequencySection = `
       <section class="frequency switching" data-mode="${MODE.frequency}">
         <label>
@@ -172,14 +175,14 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
         <div class="range-selector-view input"></div>
       </section>`;
 
-    const countSection = this.#generateCountSection(name, MODE.count, 'Count');
+    const countSection = this._generateCountSection(name, MODE.count, 'Count');
 
     return `
     <header>Specify range</header>
     <div class="body">
       ${frequencySection}
       ${countSection}
-      ${this.#generateFilteredSection()}
+      ${this._generateFilteredSection()}
     </div>`;
   }
 
@@ -188,7 +191,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * @param name - Unique name for radio button grouping
    * @returns HTML string template
    */
-  #generateGenotypeHTML(name: string): string {
+  private _generateGenotypeHTML(name: string): string {
     const genotypeOptions = [
       { mode: MODE.alt_alt, label: 'Alt/Alt: Number of homozygous genotypes' },
       {
@@ -203,7 +206,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
 
     const sections = genotypeOptions
       .map((option) =>
-        this.#generateCountSection(name, option.mode, option.label)
+        this._generateCountSection(name, option.mode, option.label)
       )
       .join('');
 
@@ -211,7 +214,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     <header>Specify range</header>
     <div class="body">
       ${sections}
-      ${this.#generateFilteredSection()}
+      ${this._generateFilteredSection()}
     </div>`;
   }
 
@@ -222,7 +225,11 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * @param label - Display label for the section
    * @returns HTML string for a single count section
    */
-  #generateCountSection(name: string, mode: string, label: string): string {
+  private _generateCountSection(
+    name: string,
+    mode: string,
+    label: string
+  ): string {
     return `
       <section class="count switching" data-mode="${mode}">
         <label>
@@ -241,7 +248,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * Generates the filtered checkbox section
    * @returns HTML string for the filtered section
    */
-  #generateFilteredSection(): string {
+  private _generateFilteredSection(): string {
     return `
       <section class="filtered">
         <label>
@@ -254,7 +261,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
   /**
    * Sets up the range slider component
    */
-  #setupRangeSlider(): void {
+  private _setupRangeSlider(): void {
     const rangeSlider = document.createElement(
       'range-slider'
     ) as RangeSliderElement;
@@ -271,23 +278,23 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       container.appendChild(rangeSlider);
     }
 
-    this.#rangeSelectorView = rangeSlider;
+    this._rangeSelectorView = rangeSlider;
   }
 
   /**
    * Sets up all event listeners for the component
    */
-  #setupEventListeners(): void {
-    this.#setupModeToggleListeners();
-    this.#setupCountInputListeners();
-    this.#setupFilteredCheckboxListener();
+  private _setupEventListeners(): void {
+    this._setupModeToggleListeners();
+    this._setupCountInputListeners();
+    this._setupFilteredCheckboxListener();
   }
 
   /**
    * Sets up event listeners for mode toggle radio buttons
    */
-  #setupModeToggleListeners(): void {
-    const switchingElements = this._body.querySelectorAll(
+  private _setupModeToggleListeners(): void {
+    const switchingElements = this.bodyEl.querySelectorAll(
       ':scope > .switching'
     );
 
@@ -298,12 +305,12 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       if (!input) continue;
 
       input.addEventListener('change', (e) => {
-        this.#handleModeChange(e, switchingElements);
+        this._handleModeChange(e, switchingElements);
       });
 
       // Set default selection based on condition type
       const defaultMode =
-        this._conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
+        this.#conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
       if (input.value === defaultMode) {
         requestAnimationFrame(() => {
           input.dispatchEvent(new Event('change'));
@@ -318,7 +325,10 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * @param e - Change event
    * @param switchingElements - All switching elements
    */
-  #handleModeChange(e: Event, switchingElements: NodeListOf<Element>): void {
+  private _handleModeChange(
+    e: Event,
+    switchingElements: NodeListOf<Element>
+  ): void {
     const target = e.target as HTMLInputElement;
 
     // Update visual state of switching elements
@@ -331,15 +341,15 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       }
     }
 
-    this.#mode = target.value as ModeType;
-    this.#update();
+    this._mode = target.value as ModeType;
+    this._update();
   }
 
   /**
    * Sets up event listeners for count input fields
    */
-  #setupCountInputListeners(): void {
-    const switchingElements = this._body.querySelectorAll(
+  private _setupCountInputListeners(): void {
+    const switchingElements = this.bodyEl.querySelectorAll(
       ':scope > .switching'
     );
 
@@ -348,7 +358,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       const inputs = element.querySelectorAll(':scope > .input > input');
       inputs.forEach((input) => {
         input.addEventListener('change', (e) => {
-          this.#handleCountInputChange(e);
+          this._handleCountInputChange(e);
         });
       });
     });
@@ -358,28 +368,28 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * Handles count input change events
    * @param e - Change event from count input
    */
-  #handleCountInputChange(e: Event): void {
+  private _handleCountInputChange(e: Event): void {
     const target = e.target as HTMLInputElement;
     const key = target.className as keyof ConditionCount;
-    const currentCondition = this.#condition[this.#mode] as ConditionCount;
+    const currentCondition = this._condition[this._mode] as ConditionCount;
     if (currentCondition) {
       (currentCondition as any)[key] = Number(target.value);
-      this.#update();
+      this._update();
     }
   }
 
   /**
    * Sets up event listener for filtered checkbox
    */
-  #setupFilteredCheckboxListener(): void {
-    this.#filtered = this._body.querySelector(
+  private _setupFilteredCheckboxListener(): void {
+    this._filtered = this.bodyEl.querySelector(
       ':scope > .filtered > label > input'
     );
-    if (this.#filtered) {
-      this.#filtered.addEventListener('change', () => {
-        this.#update();
+    if (this._filtered) {
+      this._filtered.addEventListener('change', () => {
+        this._update();
       });
-      this.#filtered.dispatchEvent(new Event('change'));
+      this._filtered.dispatchEvent(new Event('change'));
     }
   }
 
@@ -388,23 +398,23 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * @param newCondition - New condition values from range slider
    */
   changeParameter(newCondition: Partial<ConditionFrequency>): void {
-    if (!this.#rangeSelectorView) return;
+    if (!this._rangeSelectorView) return;
 
     for (const key in newCondition) {
-      if (key in this.#condition.frequency) {
-        (this.#condition.frequency as any)[key] = (newCondition as any)[key];
+      if (key in this._condition.frequency) {
+        (this._condition.frequency as any)[key] = (newCondition as any)[key];
       }
     }
-    this.#update();
+    this._update();
   }
 
   /**
    * Stores the current values for potential restoration
    */
   keepLastValues(): void {
-    const currentCondition = this.#condition[this.#mode];
+    const currentCondition = this._condition[this._mode];
     if (currentCondition) {
-      this.#lastValue = { ...currentCondition };
+      this._lastValue = { ...currentCondition };
     }
   }
 
@@ -412,9 +422,9 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * Restores previously stored values
    */
   restore(): void {
-    if (this.#lastValue && this.#condition[this.#mode]) {
-      this.#condition[this.#mode] = this.#lastValue as any;
-      this.#update();
+    if (this._lastValue && this._condition[this._mode]) {
+      this._condition[this._mode] = this._lastValue as any;
+      this._update();
     }
   }
 
@@ -422,7 +432,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * Triggers a search operation
    */
   search(): void {
-    this.#update();
+    this._update();
   }
 
   /**
@@ -430,28 +440,28 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * @returns True if the condition is valid
    */
   get isValid(): boolean {
-    return this.#validate();
+    return this._validate();
   }
 
   /**
    * Updates the component state and validates conditions
    */
-  #update(): void {
-    this.#statsApplyToFreqCountViews();
-    this._valuesView.update(this.#validate());
+  private _update(): void {
+    this._statsApplyToFreqCountViews();
+    this._valuesView.update(this._validate());
   }
 
   /**
    * Applies current condition values to frequency count views
    */
-  #statsApplyToFreqCountViews(): void {
+  private _statsApplyToFreqCountViews(): void {
     this._valuesElement
       .querySelectorAll(':scope > condition-item-value-view')
       .forEach((view) => {
-        const freqCountView = this.#getFrequencyCountView(view);
+        const freqCountView = this._getFrequencyCountView(view);
         if (!freqCountView) return;
 
-        this.#updateFrequencyCountView(freqCountView);
+        this._updateFrequencyCountView(freqCountView);
       });
   }
 
@@ -460,7 +470,9 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * @param view - Parent view element
    * @returns Frequency count view element or null
    */
-  #getFrequencyCountView(view: Element): FrequencyCountValueView | null {
+  private _getFrequencyCountView(
+    view: Element
+  ): FrequencyCountValueView | null {
     const shadowRoot = (view as any).shadowRoot;
     if (!shadowRoot) return null;
 
@@ -476,22 +488,24 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * Updates a frequency count view with current condition values
    * @param freqCountView - The frequency count view to update
    */
-  #updateFrequencyCountView(freqCountView: FrequencyCountValueView): void {
-    const currentCondition = this.#condition[this.#mode];
+  private _updateFrequencyCountView(
+    freqCountView: FrequencyCountValueView
+  ): void {
+    const currentCondition = this._condition[this._mode];
     const invertValue =
-      this.#mode === MODE.frequency ? this.#condition.frequency.invert : '';
-    const isFiltered = this.#filtered?.checked ?? false;
+      this._mode === MODE.frequency ? this._condition.frequency.invert : '';
+    const isFiltered = this._filtered?.checked ?? false;
 
     freqCountView.setValues(
       this.#conditionType,
-      this.#mode,
+      this._mode,
       currentCondition.from ?? '',
       currentCondition.to ?? '',
       invertValue,
       isFiltered
     );
 
-    freqCountView.mode = this.#mode;
+    freqCountView.mode = this._mode;
     freqCountView.from = currentCondition.from ?? '';
     freqCountView.update();
   }
@@ -500,8 +514,8 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * Validates the current condition
    * @returns True if any condition value is not null
    */
-  #validate(): boolean {
-    const currentCondition = this.#condition[this.#mode];
+  private _validate(): boolean {
+    const currentCondition = this._condition[this._mode];
     if (!currentCondition) {
       return false;
     }
