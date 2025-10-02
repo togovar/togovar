@@ -76,6 +76,14 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
     this._nodesToShowInValueView = [];
 
     this._initializeUI();
+    this._initializeWithLoginStatus();
+  }
+
+  /**
+   * Initializes the interface after ensuring login status is fetched.
+   */
+  private async _initializeWithLoginStatus(): Promise<void> {
+    await storeManager.fetchLoginStatus();
     this._renderInitialColumn();
   }
 
@@ -170,7 +178,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
    * Creates and displays a new column showing the children of a selected item.
    *
    * This method:
-   * 1. Fetches the current user's login status (for restricted dataset handling)
+   * 1. Uses the provided login status (for restricted dataset handling)
    * 2. Retrieves child items for the specified parent (or root if no parent)
    * 3. Creates a new column DOM element
    * 4. Renders the child items as a list with checkboxes and navigation arrows
@@ -179,20 +187,25 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
    *
    * @param parentId - ID of the parent node whose children should be displayed.
    *                   If undefined, shows root-level categories.
+   * @param userIsLoggedIn - Whether the current user is authenticated.
+   *                         If undefined, fetches from store manager.
    */
-  private async _drawColumn(parentId?: string): Promise<void> {
-    const userIsLoggedIn = storeManager.getData('isLogin');
+  private async _drawColumn(
+    parentId?: string,
+    userIsLoggedIn?: boolean
+  ): Promise<void> {
+    const loginStatus: boolean =
+      userIsLoggedIn ?? storeManager.getData('isLogin');
+
     const childItems = await this._getChildItems(parentId);
 
     const newColumnElement = this._createColumnElement();
     if (!this._columns) throw new Error('Columns container not found');
     this._columns.append(newColumnElement);
 
-    newColumnElement.append(
-      this._generateColumnList(childItems, userIsLoggedIn)
-    );
+    newColumnElement.append(this._generateColumnList(childItems, loginStatus));
 
-    this._attachColumnEventListeners(newColumnElement, userIsLoggedIn);
+    this._attachColumnEventListeners(newColumnElement, loginStatus);
     this._updateUI();
     this._scrollToRevealNewColumn();
   }
@@ -283,7 +296,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   ): void {
     this._eventHandler.clearSelectionAndSubColumns(listItem);
     listItem.classList.add('-selected');
-    this._drawColumn(target.dataset.id);
+    this._drawColumn(target.dataset.id, userIsLoggedIn);
 
     if (target.dataset.value === 'jga_wgs' && !userIsLoggedIn) {
       this._addLoginPromptColumn();

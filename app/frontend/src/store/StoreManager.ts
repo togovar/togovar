@@ -6,7 +6,7 @@ import {
   setAdvancedSearchCondition,
 } from '../store/searchManager';
 import { executeSearch } from '../api/fetchData';
-import { StoreState, ResultData, SearchMode } from '../types';
+import type { StoreState, ResultData, SearchMode } from '../types';
 
 // class storeManager extends FormatData {
 class StoreManager {
