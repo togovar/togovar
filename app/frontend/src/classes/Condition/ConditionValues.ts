@@ -3,7 +3,7 @@ import { supportsRelation } from '../../conditions';
 import { ConditionValueEditorCheckboxes } from './ConditionValueEditor/ConditionValueEditorCheckboxes';
 import { ConditionValueEditorClinicalSignificance } from './ConditionValueEditor/ConditionValueEditorClinicalSignificance';
 import ConditionValueEditorColumns from './ConditionValueEditor/ConditionValueEditorColumns';
-import { ConditionValueEditorColumnsDataset } from './ConditionValueEditor/ConditionValueEditorColumnsDataset';
+import { ConditionValueEditorDatasetColumns } from './ConditionValueEditor/ConditionValueEditorDatasetColumns';
 import ConditionValueEditorDisease from './ConditionValueEditor/ConditionValueEditorDisease';
 import ConditionValueEditorFrequencyCount from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
 import ConditionValueEditorGene from './ConditionValueEditor/ConditionValueEditorGene';
@@ -22,11 +22,11 @@ const EDITOR_REGISTRY: Readonly<
   [CONDITION_TYPE.significance]: [ConditionValueEditorClinicalSignificance],
   [CONDITION_TYPE.consequence]: [ConditionValueEditorColumns],
   [CONDITION_TYPE.dataset]: [
-    ConditionValueEditorColumnsDataset,
+    ConditionValueEditorDatasetColumns,
     ConditionValueEditorFrequencyCount,
   ],
   [CONDITION_TYPE.genotype]: [
-    ConditionValueEditorColumnsDataset,
+    ConditionValueEditorDatasetColumns,
     ConditionValueEditorFrequencyCount,
   ],
   [CONDITION_TYPE.disease]: [ConditionValueEditorDisease],
