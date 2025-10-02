@@ -5,110 +5,162 @@ import { storeManager } from '../../../../store/StoreManager';
 import type { UiNode } from './types';
 
 /**
- * Handles DOM generation and rendering for dataset columns
+ * Responsible for creating and rendering DOM elements within the dataset column interface.
+ *
+ * This class transforms hierarchical dataset data into interactive HTML elements:
+ * - Converts dataset nodes into list items with checkboxes, labels, and navigation arrows
+ * - Handles different visual states (checkboxes vs lock icons for restricted datasets)
+ * - Creates column containers that organize the hierarchical navigation
+ * - Generates special UI elements like login prompts for restricted content
+ *
+ * The rendered elements are designed to work seamlessly with the event handling
+ * and state management systems to provide a complete interactive experience.
  */
 export class DatasetColumnRenderer {
   /**
-   * Generates HTML content for a column based on the provided items.
-   * @param items - Array of hierarchy nodes to render
-   * @param isLogin - Whether the user is logged in
-   * @returns HTML string for the column content
+   * Creates a complete HTML list of selectable dataset items for display in a column.
+   *
+   * This method transforms an array of hierarchical dataset nodes into a structured
+   * HTML unordered list where each item includes:
+   * - A checkbox (or lock icon for restricted datasets)
+   * - Dataset icon (for certain condition types)
+   * - Readable label text
+   * - Navigation arrow (if the item has children)
+   *
+   * @param datasetNodes - Array of hierarchical dataset nodes to render as list items
+   * @param userIsLoggedIn - Whether the current user is authenticated (affects restricted dataset display)
+   * @param conditionType - The type of condition being edited (affects icon display)
+   * @returns Complete HTML unordered list element ready for insertion into a column
    */
   generateColumnList(
-    items: HierarchyNode<UiNode>[],
-    isLogin: boolean,
+    datasetNodes: HierarchyNode<UiNode>[],
+    userIsLoggedIn: boolean,
     conditionType: string
   ): HTMLUListElement {
     return createEl('ul', {
-      children: items.map((item) =>
-        this.makeListItemEl(item, isLogin, conditionType)
+      children: datasetNodes.map((datasetNode) =>
+        this._createListItemElement(datasetNode, userIsLoggedIn, conditionType)
       ),
     });
   }
 
   /**
-   * Generates HTML for a single list item.
-   * @param item - The hierarchy node to render
-   * @param isLogin - Whether the user is logged in
-   * @returns HTML string for the list item
+   * Creates a single interactive list item representing a dataset or category.
+   *
+   * Each list item is a complex element containing:
+   * - A unique identifier for event handling and state management
+   * - A checkbox for selection (or lock icon if restricted and user not logged in)
+   * - Optional dataset icon for visual categorization
+   * - Human-readable label text
+   * - Optional navigation arrow for items with children
+   *
+   * @param datasetNode - The hierarchical dataset node to render
+   * @param userIsLoggedIn - Whether the current user is authenticated
+   * @param conditionType - The type of condition being edited
+   * @returns Complete HTML list item element with all interactive components
    */
-  makeListItemEl(
-    item: HierarchyNode<UiNode>,
-    isLogin: boolean,
+  private _createListItemElement(
+    datasetNode: HierarchyNode<UiNode>,
+    userIsLoggedIn: boolean,
     conditionType: string
   ): HTMLLIElement {
-    const inputId = `checkbox-${item.data.id}`;
+    const uniqueCheckboxId = `checkbox-${datasetNode.data.id}`;
 
-    // input or lock
-    const inputOrLock = this.shouldShowLockIcon(item, isLogin)
+    // Show either a clickable checkbox or a lock icon for restricted datasets
+    const selectionElement = this.shouldShowLockIcon(
+      datasetNode,
+      userIsLoggedIn
+    )
       ? createEl('span', { class: 'lock' })
       : createEl('input', {
-          attrs: { type: 'checkbox', id: inputId },
-          domProps: { value: item.data.id },
+          attrs: { type: 'checkbox', id: uniqueCheckboxId },
+          domProps: { value: datasetNode.data.id },
         });
 
-    // dataset アイコン（必要なら）
-    const datasetIcon = this.shouldShowDatasetIcon(item, conditionType)
+    // Add dataset icon for visual categorization (only for specific condition types and depths)
+    const categoryIcon = this.shouldShowDatasetIcon(datasetNode, conditionType)
       ? createEl('span', {
           class: 'dataset-icon',
-          dataset: item.data.value ? { dataset: item.data.value } : undefined,
+          dataset: datasetNode.data.value
+            ? { dataset: datasetNode.data.value }
+            : undefined,
         })
       : null;
 
-    // ラベル内のスパン（テキスト）
-    const textSpan = createEl('span', { text: item.data.label });
+    // Create the readable text label
+    const labelText = createEl('span', { text: datasetNode.data.label });
 
-    // <label for=...> の中身
-    const labelEl = createEl('label', {
-      attrs: { for: inputId },
-      children: [inputOrLock, ...(datasetIcon ? [datasetIcon] : []), textSpan],
+    // Combine all elements into a clickable label
+    const labelElement = createEl('label', {
+      attrs: { for: uniqueCheckboxId },
+      children: [
+        selectionElement,
+        ...(categoryIcon ? [categoryIcon] : []),
+        labelText,
+      ],
     });
 
-    // 子がいる時だけ矢印
-    const arrow =
-      item.children !== undefined
+    // Add navigation arrow only for items that have children to drill into
+    const navigationArrow =
+      datasetNode.children !== undefined
         ? createEl('div', {
             class: 'arrow',
             dataset: {
-              id: item.data.id,
-              ...(item.data.value ? { value: item.data.value } : {}),
+              id: datasetNode.data.id,
+              ...(datasetNode.data.value
+                ? { value: datasetNode.data.value }
+                : {}),
             },
           })
         : null;
 
-    // 最終的な <li>
+    // Create the final list item with all data attributes for event handling
     return createEl('li', {
       dataset: {
-        id: item.data.id,
-        parent: item.parent?.data.id ?? '',
-        ...(item.data.value ? { value: item.data.value } : {}),
+        id: datasetNode.data.id,
+        parent: datasetNode.parent?.data.id ?? '',
+        ...(datasetNode.data.value ? { value: datasetNode.data.value } : {}),
       },
-      children: [labelEl, ...(arrow ? [arrow] : [])],
+      children: [labelElement, ...(navigationArrow ? [navigationArrow] : [])],
     });
   }
 
   /**
-   * Creates a new column DOM element with appropriate attributes.
-   * @returns The created column element
+   * Creates a new column container element for the hierarchical navigation interface.
+   *
+   * Each column represents one level of the hierarchy and is assigned a depth
+   * value based on how many columns already exist. This depth is used for
+   * navigation cleanup when users go back to previous levels.
+   *
+   * @param columnsContainer - The parent container that holds all column elements
+   * @returns A new column div element ready to be populated with dataset items
    */
-  createColumnElement(columns: HTMLElement): HTMLDivElement {
-    const column = document.createElement('div');
-    column.classList.add('column');
-    column.dataset.depth = columns
+  createColumnElement(columnsContainer: HTMLElement): HTMLDivElement {
+    const newColumnElement = document.createElement('div');
+    newColumnElement.classList.add('column');
+    // Set depth based on number of existing columns for navigation management
+    newColumnElement.dataset.depth = columnsContainer
       .querySelectorAll(':scope > .column')
       .length.toString();
-    return column;
+    return newColumnElement;
   }
 
   /**
-   * Adds a column prompting the user to login for JGAD datasets.
+   * Creates and displays a special column that prompts users to log in for restricted datasets.
+   *
+   * This column appears when users try to access JGA-WGS (restricted) datasets
+   * without being authenticated. It provides a clear login link and explanation
+   * instead of showing the restricted dataset items.
+   *
+   * @param columnsContainer - The parent container where the login prompt column should be added
    */
-  async addLoginPromptColumn(columns: HTMLElement): Promise<void> {
+  async addLoginPromptColumn(columnsContainer: HTMLElement): Promise<void> {
+    // Ensure we have the latest login status before showing the prompt
     await storeManager.fetchLoginStatus();
 
-    const column = createEl('div', {
+    const loginPromptColumn = createEl('div', {
       class: 'column',
-      dataset: { depth: '2' },
+      dataset: { depth: '2' }, // Fixed depth for login prompt columns
       children: [
         createEl('div', {
           class: 'messages-view',
@@ -129,37 +181,50 @@ export class DatasetColumnRenderer {
       ],
     });
 
-    columns.append(column);
+    columnsContainer.append(loginPromptColumn);
   }
 
   /**
-   * Determines if a lock icon should be shown for the item.
-   * @param item - The hierarchy node to check
-   * @param isLogin - Whether the user is logged in
-   * @returns True if lock icon should be shown
+   * Determines whether a lock icon should be displayed instead of a checkbox.
+   *
+   * Lock icons are shown for restricted datasets (JGA-WGS) when the user
+   * is not authenticated. This provides a visual indication that the dataset
+   * requires login to access, preventing user confusion about why they can't
+   * select certain items.
+   *
+   * @param datasetNode - The hierarchical dataset node to check for restrictions
+   * @param userIsLoggedIn - Whether the current user is authenticated
+   * @returns True if a lock icon should be shown instead of a checkbox
    */
   private shouldShowLockIcon(
-    item: HierarchyNode<UiNode>,
-    isLogin: boolean
+    datasetNode: HierarchyNode<UiNode>,
+    userIsLoggedIn: boolean
   ): boolean {
     return (
-      isLogin === false && (item.data.value?.includes('jga_wgs.') ?? false)
+      userIsLoggedIn === false &&
+      (datasetNode.data.value?.includes('jga_wgs.') ?? false)
     );
   }
 
   /**
-   * Determines if a dataset icon should be shown for the item.
-   * @param item - The hierarchy node to check
-   * @returns True if dataset icon should be shown
+   * Determines whether a dataset icon should be displayed for visual categorization.
+   *
+   * Dataset icons are shown only for specific condition types (dataset, genotype)
+   * and only at the first level of depth (immediate children of root categories).
+   * This helps users visually distinguish between different types of datasets.
+   *
+   * @param datasetNode - The hierarchical dataset node to check
+   * @param conditionType - The type of condition being edited
+   * @returns True if a dataset icon should be displayed
    */
   private shouldShowDatasetIcon(
-    item: HierarchyNode<UiNode>,
+    datasetNode: HierarchyNode<UiNode>,
     conditionType: string
   ): boolean {
     return (
       (conditionType === CONDITION_TYPE.dataset ||
         conditionType === CONDITION_TYPE.genotype) &&
-      item.depth === 1
+      datasetNode.depth === 1
     );
   }
 }

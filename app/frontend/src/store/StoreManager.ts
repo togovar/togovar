@@ -201,7 +201,7 @@ class StoreManager {
   async fetchLoginStatus() {
     try {
       if (window.location.origin === 'http://localhost:8000') {
-        this.setData('isLogin', true);
+        this.setData('isLogin', false);
         return;
       }
 
