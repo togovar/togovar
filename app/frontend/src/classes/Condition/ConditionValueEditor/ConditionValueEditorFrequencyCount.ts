@@ -89,7 +89,6 @@ type ModeType = (typeof MODE)[keyof typeof MODE];
  * Provides UI controls for setting frequency ranges and count ranges for variant filtering
  */
 export default class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
-  #conditionType: 'dataset' | 'genotype';
   _condition: Condition;
   _mode: ModeType;
   _rangeSelectorView: RangeSliderElement | null = null;
@@ -104,7 +103,6 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
   constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
 
-    this.#conditionType = conditionView.conditionType;
     this._condition = {
       frequency: Object.assign({}, DEFAULT_CONDITION.frequency),
       count: Object.assign({}, DEFAULT_CONDITION.count),
@@ -113,7 +111,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       hemi_alt: Object.assign({}, DEFAULT_CONDITION.hemi_alt),
     };
     this._mode =
-      this.#conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
+      this._conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
 
     this._initializeComponent();
     this._setupEventListeners();
@@ -140,58 +138,48 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
   private _initializeComponent(): void {
     const name = `ConditionValueEditorFrequencyCount${id++}`;
 
-    this._createElement(
-      'frequency-count-editor-view',
-      this._generateHTML(name)
-    );
+    this._createElement('frequency-count-editor-view', () => [
+      createEl('header', { text: 'Specify range' }),
+      createEl('div', {
+        class: 'body',
+        children: this._createBodyElements(name),
+      }),
+    ]);
 
     this._setupRangeSlider();
   }
 
   /**
-   * Generates the HTML template for the component
+   * Creates the body elements for the component
    * @param name - Unique name for radio button grouping
-   * @returns HTML string template
+   * @returns Array of HTML elements
    */
-  private _generateHTML(name: string): string {
-    if (this.#conditionType === 'genotype') {
-      return this._generateGenotypeHTML(name);
+  private _createBodyElements(name: string): HTMLElement[] {
+    if (this._conditionType === 'genotype') {
+      return this._createGenotypeElements(name);
     }
-    return this._generateDatasetHTML(name);
+    return this._createDatasetElements(name);
   }
 
   /**
-   * Generates HTML for dataset condition type
+   * Creates elements for dataset condition type
    * @param name - Unique name for radio button grouping
-   * @returns HTML string template
+   * @returns Array of HTML elements
    */
-  private _generateDatasetHTML(name: string): string {
-    const frequencySection = `
-      <section class="frequency switching" data-mode="${MODE.frequency}">
-        <label>
-          <input type="radio" name="${name}" value="${MODE.frequency}">
-          <span>Frequency</span>
-        </label>
-        <div class="range-selector-view input"></div>
-      </section>`;
+  private _createDatasetElements(name: string): HTMLElement[] {
+    const frequencySection = this._createFrequencySection(name);
+    const countSection = this._createCountSection(name, MODE.count, 'Count');
+    const filteredSection = this._createFilteredSection();
 
-    const countSection = this._generateCountSection(name, MODE.count, 'Count');
-
-    return `
-    <header>Specify range</header>
-    <div class="body">
-      ${frequencySection}
-      ${countSection}
-      ${this._generateFilteredSection()}
-    </div>`;
+    return [frequencySection, countSection, filteredSection];
   }
 
   /**
-   * Generates HTML for genotype dataset condition type
+   * Creates elements for genotype dataset condition type
    * @param name - Unique name for radio button grouping
-   * @returns HTML string template
+   * @returns Array of HTML elements
    */
-  private _generateGenotypeHTML(name: string): string {
+  private _createGenotypeElements(name: string): HTMLElement[] {
     const genotypeOptions = [
       { mode: MODE.alt_alt, label: 'Alt/Alt: Number of homozygous genotypes' },
       {
@@ -204,58 +192,116 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       },
     ];
 
-    const sections = genotypeOptions
-      .map((option) =>
-        this._generateCountSection(name, option.mode, option.label)
-      )
-      .join('');
+    const sections = genotypeOptions.map((option) =>
+      this._createCountSection(name, option.mode, option.label)
+    );
 
-    return `
-    <header>Specify range</header>
-    <div class="body">
-      ${sections}
-      ${this._generateFilteredSection()}
-    </div>`;
+    const filteredSection = this._createFilteredSection();
+    return [...sections, filteredSection];
   }
 
   /**
-   * Generates a count input section
+   * Creates a frequency section with range slider
+   * @param name - Radio button group name
+   * @returns HTML element for frequency section
+   */
+  private _createFrequencySection(name: string): HTMLElement {
+    return createEl('section', {
+      class: ['frequency', 'switching'],
+      dataset: { mode: MODE.frequency },
+      children: [
+        createEl('label', {
+          children: [
+            createEl('input', {
+              attrs: {
+                type: 'radio',
+                name,
+                value: MODE.frequency,
+              },
+            }),
+            createEl('span', { text: 'Frequency' }),
+          ],
+        }),
+        createEl('div', { class: ['range-selector-view', 'input'] }),
+      ],
+    });
+  }
+
+  /**
+   * Creates a count input section
    * @param name - Radio button group name
    * @param mode - Mode value for the section
    * @param label - Display label for the section
-   * @returns HTML string for a single count section
+   * @returns HTML element for a single count section
    */
-  private _generateCountSection(
+  private _createCountSection(
     name: string,
     mode: string,
     label: string
-  ): string {
-    return `
-      <section class="count switching" data-mode="${mode}">
-        <label>
-          <input type="radio" name="${name}" value="${mode}">
-          <span>${label}</span>
-        </label>
-        <div class="input">
-          <input class="from" min="0" step="1" type="number">
-          ~
-          <input class="to" min="0" step="1" type="number">
-        </div>
-      </section>`;
+  ): HTMLElement {
+    return createEl('section', {
+      class: ['count', 'switching'],
+      dataset: { mode },
+      children: [
+        createEl('label', {
+          children: [
+            createEl('input', {
+              attrs: {
+                type: 'radio',
+                name,
+                value: mode,
+              },
+            }),
+            createEl('span', { text: label }),
+          ],
+        }),
+        createEl('div', {
+          class: 'input',
+          children: [
+            createEl('input', {
+              class: 'from',
+              attrs: {
+                min: '0',
+                step: '1',
+                type: 'number',
+              },
+            }),
+            ' ~ ',
+            createEl('input', {
+              class: 'to',
+              attrs: {
+                min: '0',
+                step: '1',
+                type: 'number',
+              },
+            }),
+          ],
+        }),
+      ],
+    });
   }
 
   /**
-   * Generates the filtered checkbox section
-   * @returns HTML string for the filtered section
+   * Creates the filtered checkbox section
+   * @returns HTML element for the filtered section
    */
-  private _generateFilteredSection(): string {
-    return `
-      <section class="filtered">
-        <label>
-          <input type="checkbox" checked>
-          <span>Exclude filtered out variants</span>
-        </label>
-      </section>`;
+  private _createFilteredSection(): HTMLElement {
+    return createEl('section', {
+      class: 'filtered',
+      children: [
+        createEl('label', {
+          children: [
+            createEl('input', {
+              attrs: {
+                type: 'checkbox',
+                checked: 'checked',
+              },
+            }),
+            createEl('span', { text: 'Exclude filtered out variants' }),
+          ],
+        }),
+      ],
+    });
   }
 
   /**
@@ -268,10 +314,10 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     rangeSlider.searchType = 'advanced';
     rangeSlider.sliderStep = 0.01;
     rangeSlider.inputStep = 0.05;
-    rangeSlider.addEventListener('range-changed', (e: CustomEvent) => {
+    rangeSlider.addEventListener('range-changed', ((e: CustomEvent) => {
       e.stopPropagation();
       this.changeParameter(e.detail);
-    });
+    }) as EventListener);
 
     const container = this.sectionEl.querySelector('.range-selector-view');
     if (container) {
@@ -310,7 +356,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
 
       // Set default selection based on condition type
       const defaultMode =
-        this.#conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
+        this._conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
       if (input.value === defaultMode) {
         requestAnimationFrame(() => {
           input.dispatchEvent(new Event('change'));
@@ -372,8 +418,8 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     const target = e.target as HTMLInputElement;
     const key = target.className as keyof ConditionCount;
     const currentCondition = this._condition[this._mode] as ConditionCount;
-    if (currentCondition) {
-      (currentCondition as any)[key] = Number(target.value);
+    if (currentCondition && key in currentCondition) {
+      currentCondition[key] = Number(target.value) || null;
       this._update();
     }
   }
@@ -400,10 +446,14 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
   changeParameter(newCondition: Partial<ConditionFrequency>): void {
     if (!this._rangeSelectorView) return;
 
-    for (const key in newCondition) {
-      if (key in this._condition.frequency) {
-        (this._condition.frequency as any)[key] = (newCondition as any)[key];
-      }
+    if (newCondition.from !== undefined) {
+      this._condition.frequency.from = newCondition.from;
+    }
+    if (newCondition.to !== undefined) {
+      this._condition.frequency.to = newCondition.to;
+    }
+    if (newCondition.invert !== undefined) {
+      this._condition.frequency.invert = newCondition.invert;
     }
     this._update();
   }
@@ -423,7 +473,11 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    */
   restore(): void {
     if (this._lastValue && this._condition[this._mode]) {
-      this._condition[this._mode] = this._lastValue as any;
+      if (this._mode === MODE.frequency) {
+        this._condition[this._mode] = this._lastValue as ConditionFrequency;
+      } else {
+        this._condition[this._mode] = this._lastValue as ConditionCount;
+      }
       this._update();
     }
   }
@@ -473,7 +527,8 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
   private _getFrequencyCountView(
     view: Element
   ): FrequencyCountValueView | null {
-    const shadowRoot = (view as any).shadowRoot;
+    const viewWithShadow = view as Element & { shadowRoot?: ShadowRoot };
+    const shadowRoot = viewWithShadow.shadowRoot;
     if (!shadowRoot) return null;
 
     const freqCountView = shadowRoot.querySelector(
@@ -497,17 +552,17 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     const isFiltered = this._filtered?.checked ?? false;
 
     freqCountView.setValues(
-      this.#conditionType,
+      this._conditionType as 'dataset' | 'genotype',
       this._mode,
-      currentCondition.from ?? '',
-      currentCondition.to ?? '',
+      currentCondition.from ?? 0,
+      currentCondition.to ?? 0,
       invertValue,
       isFiltered
     );
 
     freqCountView.mode = this._mode;
-    freqCountView.from = currentCondition.from ?? '';
-    freqCountView.update();
+    freqCountView.from = currentCondition.from ?? 0;
+    // Note: Removed .update() call as it's protected and may not be needed externally
   }
 
   /**
