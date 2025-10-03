@@ -29,6 +29,7 @@
 :host > .frequencygraph > .bar {
   position: absolute;
   height: 100%;
+  background-color: var(--color-dataset-foreign);
 }
 
 :host([data-dataset='gem_j_wga']) > .frequencygraph > .bar {
