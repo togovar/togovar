@@ -5,6 +5,12 @@ import type ConditionValues from '../ConditionValues.js';
 import '../../../components/RangeSliderView.js';
 import type { FrequencyCountValueView } from '../../../components/FrequencyCountValueView';
 
+export type RangeSliderData = {
+  from?: number;
+  to?: number;
+  invert?: boolean | string;
+};
+
 const MODE = {
   frequency: 'frequency',
   count: 'count',
@@ -24,9 +30,8 @@ type CountBuckets = Record<CountMode, CountCondition>;
 export interface FrequencyCondition {
   from: number;
   to: number;
-  invert: InvertFlag;
+  invert: boolean;
 }
-type InvertFlag = '0' | '1'; // or boolean
 
 interface CountCondition {
   from: number | null;
@@ -60,7 +65,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
   _lastValue: FrequencyCondition | CountCondition | null = null;
   private static _idCounter = 0;
   private static readonly DEFAULT_CONDITION: ConditionState = {
-    frequency: { from: 0, to: 1, invert: '0' },
+    frequency: { from: 0, to: 1, invert: false },
     count: { from: null, to: null },
     alt_alt: { from: null, to: null },
     alt_ref: { from: null, to: null },
@@ -340,14 +345,19 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
         sliderStep: 0.01,
         inputStep: 0.05,
       },
+      attrs: {
+        value1: this._condition.frequency.from.toString(),
+        value2: this._condition.frequency.to.toString(),
+        invert: this._condition.frequency.invert.toString(), // "true" or "false"
+      },
     });
 
     // Listen for changes from the range slider and update condition
     rangeSlider.addEventListener(
       'range-changed',
-      (e: CustomEvent<Partial<FrequencyCondition>>) => {
+      (e: CustomEvent<RangeSliderData>) => {
         e.stopPropagation();
-        this._changeParameter(e.detail);
+        this.changeParameter(e.detail);
       }
     );
 
@@ -355,6 +365,22 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       .querySelector(SELECTORS.RANGE_SELECTOR)
       ?.appendChild(rangeSlider);
     this._rangeSelectorView = rangeSlider;
+
+    // Force initial state sync after DOM insertion
+    requestAnimationFrame(() => {
+      if (this._rangeSelectorView) {
+        // Ensure the checkbox reflects the current state
+        const shadowHost = this._rangeSelectorView as HTMLElement & {
+          shadowRoot?: ShadowRoot;
+        };
+        const checkboxInShadow = shadowHost.shadowRoot?.querySelector(
+          '.invert'
+        ) as HTMLInputElement;
+        if (checkboxInShadow) {
+          checkboxInShadow.checked = this._condition.frequency.invert;
+        }
+      }
+    });
   }
 
   /**
@@ -465,7 +491,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * Updates the condition parameters based on range slider changes
    * @param newCondition - New condition values from range slider
    */
-  _changeParameter(newCondition: Partial<FrequencyCondition>): void {
+  changeParameter(newCondition: RangeSliderData): void {
     if (!this._rangeSelectorView) return;
 
     if (newCondition.from !== undefined) {
@@ -475,7 +501,11 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       this._condition.frequency.to = newCondition.to;
     }
     if (newCondition.invert !== undefined) {
-      this._condition.frequency.invert = newCondition.invert;
+      // Convert string/boolean to boolean for consistent internal state
+      this._condition.frequency.invert =
+        typeof newCondition.invert === 'string'
+          ? newCondition.invert === '1' || newCondition.invert === 'true'
+          : Boolean(newCondition.invert);
     }
     this._update();
   }
@@ -531,7 +561,11 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
   ): void {
     const currentCondition = this._condition[this._mode];
     const invertValue =
-      this._mode === MODE.frequency ? this._condition.frequency.invert : '';
+      this._mode === MODE.frequency
+        ? this._condition.frequency.invert
+          ? '1'
+          : '0'
+        : '';
     const isFiltered = this._filtered?.checked ?? false;
 
     freqCountView.setValues(

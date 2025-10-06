@@ -1,5 +1,5 @@
 import type { ConditionItemValueView } from '../components/ConditionItemValueView';
-import type { FrequencyCondition } from '../classes/Condition/ConditionValueEditor/ConditionValueEditorFrequencyCount';
+import type { RangeSliderData } from '../classes/Condition/ConditionValueEditor/ConditionValueEditorFrequencyCount';
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -13,7 +13,7 @@ declare global {
   }
 
   interface HTMLElementEventMap {
-    'range-changed': CustomEvent<Partial<FrequencyCondition>>;
+    'range-changed': CustomEvent<RangeSliderData>;
   }
 }
 export {};
