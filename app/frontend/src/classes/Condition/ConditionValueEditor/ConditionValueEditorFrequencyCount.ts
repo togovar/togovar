@@ -5,75 +5,6 @@ import type ConditionValues from '../ConditionValues.js';
 import '../../../components/RangeSliderView.js';
 import type { FrequencyCountValueView } from '../../../components/FrequencyCountValueView';
 
-/**
- * Interface for frequency condition values
- */
-interface ConditionFrequency {
-  from: number;
-  to: number;
-  invert: string;
-}
-
-/**
- * Interface for count condition values
- */
-interface ConditionCount {
-  from: number | null;
-  to: number | null;
-}
-
-/**
- * Combined condition interface containing both frequency and count conditions
- */
-interface Condition {
-  frequency: ConditionFrequency;
-  count: ConditionCount;
-  alt_alt: ConditionCount;
-  alt_ref: ConditionCount;
-  hemi_alt: ConditionCount;
-}
-
-/**
- * Interface for range selector custom element
- */
-interface RangeSliderElement extends HTMLElement {
-  searchType: string;
-  sliderStep: number;
-  inputStep: number;
-}
-
-let id: number = 0;
-
-/**
- * Default condition values for both frequency and count modes
- */
-const DEFAULT_CONDITION: Condition = {
-  frequency: {
-    from: 0,
-    to: 1,
-    invert: '0',
-  },
-  count: {
-    from: null,
-    to: null,
-  },
-  alt_alt: {
-    from: null,
-    to: null,
-  },
-  alt_ref: {
-    from: null,
-    to: null,
-  },
-  hemi_alt: {
-    from: null,
-    to: null,
-  },
-};
-
-/**
- * Available modes for the condition editor
- */
 const MODE = {
   frequency: 'frequency',
   count: 'count',
@@ -83,17 +14,59 @@ const MODE = {
 } as const;
 
 type ModeType = (typeof MODE)[keyof typeof MODE];
+type CountMode = Exclude<ModeType, typeof MODE.frequency>;
+
+type ConditionState = {
+  frequency: FrequencyCondition;
+} & CountBuckets;
+type CountBuckets = Record<CountMode, CountCondition>;
+
+export interface FrequencyCondition {
+  from: number;
+  to: number;
+  invert: InvertFlag;
+}
+type InvertFlag = '0' | '1'; // or boolean
+
+interface CountCondition {
+  from: number | null;
+  to: number | null;
+}
+
+// Interface for range selector custom element
+interface RangeSliderElement extends HTMLElement {
+  searchType: string;
+  sliderStep: number;
+  inputStep: number;
+}
+
+const SELECTORS = {
+  SWITCHING: ':scope > .switching',
+  FREQUENCY_COUNT_VIEW: 'frequency-count-value-view',
+  RANGE_SELECTOR: '.range-selector-view',
+  RADIO_INPUT: ':scope > label > input',
+  FILTERED_CHECKBOX: ':scope > .filtered > label > input',
+} as const;
 
 /**
- * Condition value editor for frequency and count filtering
+ * ConditionState value editor for frequency and count filtering
  * Provides UI controls for setting frequency ranges and count ranges for variant filtering
  */
 export default class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
-  _condition: Condition;
+  _condition: ConditionState;
   _mode: ModeType;
   _rangeSelectorView: RangeSliderElement | null = null;
   _filtered: HTMLInputElement | null = null;
-  _lastValue: ConditionFrequency | ConditionCount | null = null;
+  _lastValue: FrequencyCondition | CountCondition | null = null;
+  private static _idCounter = 0;
+  private static readonly DEFAULT_CONDITION: ConditionState = {
+    frequency: { from: 0, to: 1, invert: '0' },
+    count: { from: null, to: null },
+    alt_alt: { from: null, to: null },
+    alt_ref: { from: null, to: null },
+    hemi_alt: { from: null, to: null },
+  };
+  private readonly _radioGroupName = `freqcount-${ConditionValueEditorFrequencyCount._idCounter++}`;
 
   /**
    * Creates a new frequency/count condition editor
@@ -104,11 +77,19 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     super(valuesView, conditionView);
 
     this._condition = {
-      frequency: Object.assign({}, DEFAULT_CONDITION.frequency),
-      count: Object.assign({}, DEFAULT_CONDITION.count),
-      alt_alt: Object.assign({}, DEFAULT_CONDITION.alt_alt),
-      alt_ref: Object.assign({}, DEFAULT_CONDITION.alt_ref),
-      hemi_alt: Object.assign({}, DEFAULT_CONDITION.hemi_alt),
+      frequency: {
+        ...ConditionValueEditorFrequencyCount.DEFAULT_CONDITION.frequency,
+      },
+      count: { ...ConditionValueEditorFrequencyCount.DEFAULT_CONDITION.count },
+      alt_alt: {
+        ...ConditionValueEditorFrequencyCount.DEFAULT_CONDITION.alt_alt,
+      },
+      alt_ref: {
+        ...ConditionValueEditorFrequencyCount.DEFAULT_CONDITION.alt_ref,
+      },
+      hemi_alt: {
+        ...ConditionValueEditorFrequencyCount.DEFAULT_CONDITION.hemi_alt,
+      },
     };
     this._mode =
       this._conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
@@ -116,6 +97,48 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     this._initializeComponent();
     this._setupEventListeners();
     this._observeValueChanges();
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Public API
+  // ───────────────────────────────────────────────────────────────────────────
+  /**
+   * Stores the current values for potential restoration
+   */
+  keepLastValues(): void {
+    const currentCondition = this._condition[this._mode];
+    if (currentCondition) {
+      this._lastValue = { ...currentCondition };
+    }
+  }
+
+  /**
+   * Restores previously stored values
+   */
+  restore(): void {
+    if (this._lastValue && this._condition[this._mode]) {
+      if (this._mode === MODE.frequency) {
+        this._condition[this._mode] = this._lastValue as FrequencyCondition;
+      } else {
+        this._condition[this._mode] = this._lastValue as CountCondition;
+      }
+      this._update();
+    }
+  }
+
+  /**
+   * Triggers a search operation
+   */
+  search(): void {
+    this._update();
+  }
+
+  /**
+   * Gets the validation state of the current condition
+   * @returns True if the condition is valid
+   */
+  get isValid(): boolean {
+    return this._validate();
   }
 
   /**
@@ -132,17 +155,16 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     });
   }
 
-  /**
-   * Initializes the component's HTML structure
-   */
+  // ───────────────────────────────────────────────────────────────────────────
+  // DOM Generation
+  // ───────────────────────────────────────────────────────────────────────────
+  /** Initializes the component's HTML structure */
   private _initializeComponent(): void {
-    const name = `ConditionValueEditorFrequencyCount${id++}`;
-
     this._createElement('frequency-count-editor-view', () => [
       createEl('header', { text: 'Specify range' }),
       createEl('div', {
         class: 'body',
-        children: this._createBodyElements(name),
+        children: this._createBodyElements(this._radioGroupName),
       }),
     ]);
 
@@ -202,8 +224,6 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
 
   /**
    * Creates a frequency section with range slider
-   * @param name - Radio button group name
-   * @returns HTML element for frequency section
    */
   private _createFrequencySection(name: string): HTMLElement {
     return createEl('section', {
@@ -286,15 +306,21 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * @returns HTML element for the filtered section
    */
   private _createFilteredSection(): HTMLElement {
+    const filteredCheckboxId = `${this._radioGroupName}-filtered`;
+
     return createEl('section', {
       class: 'filtered',
       children: [
         createEl('label', {
+          attrs: {
+            for: filteredCheckboxId,
+          },
           children: [
             createEl('input', {
               attrs: {
                 type: 'checkbox',
                 checked: 'checked',
+                id: filteredCheckboxId,
               },
             }),
             createEl('span', { text: 'Exclude filtered out variants' }),
@@ -308,22 +334,26 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * Sets up the range slider component
    */
   private _setupRangeSlider(): void {
-    const rangeSlider = document.createElement(
-      'range-slider'
-    ) as RangeSliderElement;
-    rangeSlider.searchType = 'advanced';
-    rangeSlider.sliderStep = 0.01;
-    rangeSlider.inputStep = 0.05;
-    rangeSlider.addEventListener('range-changed', ((e: CustomEvent) => {
-      e.stopPropagation();
-      this.changeParameter(e.detail);
-    }) as EventListener);
+    const rangeSlider = createEl('range-slider', {
+      domProps: {
+        searchType: 'advanced',
+        sliderStep: 0.01,
+        inputStep: 0.05,
+      },
+    });
 
-    const container = this.sectionEl.querySelector('.range-selector-view');
-    if (container) {
-      container.appendChild(rangeSlider);
-    }
+    // Listen for changes from the range slider and update condition
+    rangeSlider.addEventListener(
+      'range-changed',
+      (e: CustomEvent<Partial<FrequencyCondition>>) => {
+        e.stopPropagation();
+        this._changeParameter(e.detail);
+      }
+    );
 
+    this.sectionEl
+      .querySelector(SELECTORS.RANGE_SELECTOR)
+      ?.appendChild(rangeSlider);
     this._rangeSelectorView = rangeSlider;
   }
 
@@ -340,14 +370,10 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * Sets up event listeners for mode toggle radio buttons
    */
   private _setupModeToggleListeners(): void {
-    const switchingElements = this.bodyEl.querySelectorAll(
-      ':scope > .switching'
-    );
+    const switchingElements = this.bodyEl.querySelectorAll(SELECTORS.SWITCHING);
 
     for (const el of switchingElements) {
-      const input = el.querySelector(
-        ':scope > label > input'
-      ) as HTMLInputElement;
+      const input = el.querySelector(SELECTORS.RADIO_INPUT) as HTMLInputElement;
       if (!input) continue;
 
       input.addEventListener('change', (e) => {
@@ -395,9 +421,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * Sets up event listeners for count input fields
    */
   private _setupCountInputListeners(): void {
-    const switchingElements = this.bodyEl.querySelectorAll(
-      ':scope > .switching'
-    );
+    const switchingElements = this.bodyEl.querySelectorAll(SELECTORS.SWITCHING);
 
     // Set up input listeners for all switching sections
     switchingElements.forEach((element) => {
@@ -416,8 +440,8 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    */
   private _handleCountInputChange(e: Event): void {
     const target = e.target as HTMLInputElement;
-    const key = target.className as keyof ConditionCount;
-    const currentCondition = this._condition[this._mode] as ConditionCount;
+    const key = target.className as keyof CountCondition;
+    const currentCondition = this._condition[this._mode] as CountCondition;
     if (currentCondition && key in currentCondition) {
       currentCondition[key] = Number(target.value) || null;
       this._update();
@@ -428,9 +452,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * Sets up event listener for filtered checkbox
    */
   private _setupFilteredCheckboxListener(): void {
-    this._filtered = this.bodyEl.querySelector(
-      ':scope > .filtered > label > input'
-    );
+    this._filtered = this.bodyEl.querySelector(SELECTORS.FILTERED_CHECKBOX);
     if (this._filtered) {
       this._filtered.addEventListener('change', () => {
         this._update();
@@ -443,7 +465,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * Updates the condition parameters based on range slider changes
    * @param newCondition - New condition values from range slider
    */
-  changeParameter(newCondition: Partial<ConditionFrequency>): void {
+  _changeParameter(newCondition: Partial<FrequencyCondition>): void {
     if (!this._rangeSelectorView) return;
 
     if (newCondition.from !== undefined) {
@@ -459,56 +481,17 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
   }
 
   /**
-   * Stores the current values for potential restoration
-   */
-  keepLastValues(): void {
-    const currentCondition = this._condition[this._mode];
-    if (currentCondition) {
-      this._lastValue = { ...currentCondition };
-    }
-  }
-
-  /**
-   * Restores previously stored values
-   */
-  restore(): void {
-    if (this._lastValue && this._condition[this._mode]) {
-      if (this._mode === MODE.frequency) {
-        this._condition[this._mode] = this._lastValue as ConditionFrequency;
-      } else {
-        this._condition[this._mode] = this._lastValue as ConditionCount;
-      }
-      this._update();
-    }
-  }
-
-  /**
-   * Triggers a search operation
-   */
-  search(): void {
-    this._update();
-  }
-
-  /**
-   * Gets the validation state of the current condition
-   * @returns True if the condition is valid
-   */
-  get isValid(): boolean {
-    return this._validate();
-  }
-
-  /**
    * Updates the component state and validates conditions
    */
   private _update(): void {
-    this._statsApplyToFreqCountViews();
+    this._applyConditionToAllViews();
     this._valuesView.update(this._validate());
   }
 
   /**
    * Applies current condition values to frequency count views
    */
-  private _statsApplyToFreqCountViews(): void {
+  private _applyConditionToAllViews(): void {
     this._valuesElement
       .querySelectorAll(':scope > condition-item-value-view')
       .forEach((view) => {
@@ -532,7 +515,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     if (!shadowRoot) return null;
 
     const freqCountView = shadowRoot.querySelector(
-      'frequency-count-value-view'
+      SELECTORS.FREQUENCY_COUNT_VIEW
     ) as FrequencyCountValueView;
     return freqCountView && typeof freqCountView.setValues === 'function'
       ? freqCountView
