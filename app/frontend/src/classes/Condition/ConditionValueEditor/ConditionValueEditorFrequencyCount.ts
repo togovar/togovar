@@ -1,4 +1,5 @@
 import { createEl } from '../../../utils/dom/createEl';
+import { selectOrNull } from '../../../utils/dom/select';
 import type { ConditionItemView } from '../ConditionItemView';
 import { ConditionValueEditor } from './ConditionValueEditor';
 import type ConditionValues from '../ConditionValues.js';
@@ -361,9 +362,11 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
       }
     );
 
-    this.sectionEl
-      .querySelector(SELECTORS.RANGE_SELECTOR)
-      ?.appendChild(rangeSlider);
+    const rangeContainer = selectOrNull<HTMLElement>(
+      this.sectionEl,
+      SELECTORS.RANGE_SELECTOR
+    );
+    rangeContainer?.appendChild(rangeSlider);
     this._rangeSelectorView = rangeSlider;
 
     // Force initial state sync after DOM insertion
@@ -373,11 +376,14 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
         const shadowHost = this._rangeSelectorView as HTMLElement & {
           shadowRoot?: ShadowRoot;
         };
-        const checkboxInShadow = shadowHost.shadowRoot?.querySelector(
-          '.invert'
-        ) as HTMLInputElement;
-        if (checkboxInShadow) {
-          checkboxInShadow.checked = this._condition.frequency.invert;
+        if (shadowHost.shadowRoot) {
+          const checkboxInShadow = selectOrNull<HTMLInputElement>(
+            shadowHost.shadowRoot,
+            '.invert'
+          );
+          if (checkboxInShadow) {
+            checkboxInShadow.checked = this._condition.frequency.invert;
+          }
         }
       }
     });
@@ -399,7 +405,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     const switchingElements = this.bodyEl.querySelectorAll(SELECTORS.SWITCHING);
 
     for (const el of switchingElements) {
-      const input = el.querySelector(SELECTORS.RADIO_INPUT) as HTMLInputElement;
+      const input = selectOrNull<HTMLInputElement>(el, SELECTORS.RADIO_INPUT);
       if (!input) continue;
 
       input.addEventListener('change', (e) => {
@@ -478,7 +484,10 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
    * Sets up event listener for filtered checkbox
    */
   private _setupFilteredCheckboxListener(): void {
-    this._filtered = this.bodyEl.querySelector(SELECTORS.FILTERED_CHECKBOX);
+    this._filtered = selectOrNull<HTMLInputElement>(
+      this.bodyEl,
+      SELECTORS.FILTERED_CHECKBOX
+    );
     if (this._filtered) {
       this._filtered.addEventListener('change', () => {
         this._update();
@@ -544,9 +553,10 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     const shadowRoot = viewWithShadow.shadowRoot;
     if (!shadowRoot) return null;
 
-    const freqCountView = shadowRoot.querySelector(
+    const freqCountView = selectOrNull<FrequencyCountValueView>(
+      shadowRoot,
       SELECTORS.FREQUENCY_COUNT_VIEW
-    ) as FrequencyCountValueView;
+    );
     return freqCountView && typeof freqCountView.setValues === 'function'
       ? freqCountView
       : null;
