@@ -37,8 +37,8 @@ export class FrequencyCountValueView extends LitElement {
 
   @property({ type: String }) conditionType: 'dataset' | 'genotype' = 'dataset';
   @property({ type: String }) mode: DatasetMode | GenotypeMode = 'frequency';
-  @property({ type: Number }) from: number = 0;
-  @property({ type: Number }) to: number = 1;
+  @property({ type: Number }) from: number | null = 0;
+  @property({ type: Number }) to: number | null = 1;
   @property({ type: Boolean }) invert: boolean = false;
   @property({ type: Boolean }) filtered: boolean = false;
 
@@ -55,7 +55,8 @@ export class FrequencyCountValueView extends LitElement {
         <div class="bar -bar2"></div>
       </div>
       <div class="range">
-        <span class="from">${this.from}</span> ~
+        <span class="from">${this.from}</span>
+        ~
         <span class="to">${this.to}</span>
       </div>
       <p class="filtered" ?hidden=${!this.filtered}>
@@ -102,8 +103,8 @@ export class FrequencyCountValueView extends LitElement {
   setValues(
     conditionType: 'dataset' | 'genotype',
     mode: DatasetMode | GenotypeMode,
-    from: number,
-    to: number,
+    from: number | null,
+    to: number | null,
     invert: boolean,
     filtered: boolean
   ): void {
@@ -136,7 +137,7 @@ export class FrequencyCountValueView extends LitElement {
    * Sets normal bar display mode
    */
   private _setNormalBarMode(): void {
-    if (!this._bars) return;
+    if (!this._bars || this.from === null || this.to === null) return;
 
     this._bars[0].style.left = `${this.from * 100}%`;
     this._bars[0].style.width = `${(this.to - this.from) * 100}%`;
@@ -147,7 +148,7 @@ export class FrequencyCountValueView extends LitElement {
    * Sets inverted bar display mode
    */
   private _setInvertBarMode(): void {
-    if (!this._bars) return;
+    if (!this._bars || this.from === null || this.to === null) return;
 
     this._bars[0].style.left = '0%';
     this._bars[0].style.width = `${this.from * 100}%`;
@@ -199,17 +200,19 @@ export class FrequencyCountValueView extends LitElement {
   private _buildInvertedDatasetQuery(dataset: {
     name: FrequencyDataset;
   }): FrequencyQuery {
+    const from = this.from ?? 0;
+    const to = this.to ?? 1;
     const left: FrequencyLeaf = {
       frequency: {
         dataset,
-        frequency: { gte: 0, lte: this.from },
+        frequency: { gte: 0, lte: from },
         filtered: this.filtered,
       },
     };
     const right: FrequencyLeaf = {
       frequency: {
         dataset,
-        frequency: { gte: this.to, lte: 1 },
+        frequency: { gte: to, lte: 1 },
         filtered: this.filtered,
       },
     };
@@ -268,14 +271,16 @@ export class FrequencyCountValueView extends LitElement {
    * @returns Object containing gte and/or lte values
    */
   private _buildRangeValues(): ScoreRange {
-    const hasFrom = String(this.from) !== '';
-    const hasTo = String(this.to) !== '';
-    if (hasFrom && hasTo) return { gte: this.from, lte: this.to };
-    if (hasFrom) return { gte: this.from };
-    if (hasTo) return { lte: this.to };
+    const hasFrom = this.from !== null && String(this.from) !== '';
+    const hasTo = this.to !== null && String(this.to) !== '';
+    if (hasFrom && hasTo) return { gte: this.from!, lte: this.to! };
+    if (hasFrom) return { gte: this.from! };
+    if (hasTo) return { lte: this.to! };
 
-    // If no value is present
-    return { gte: 0, lte: 1 };
+    // If no value is present, cannot build a valid range query
+    throw new Error(
+      `Cannot build range values: both from and to are null or empty for mode ${this.mode}`
+    );
   }
 }
 

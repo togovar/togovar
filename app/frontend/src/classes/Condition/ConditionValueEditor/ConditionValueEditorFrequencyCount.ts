@@ -470,7 +470,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     const key = target.className as keyof CountCondition;
     const currentCondition = this._condition[this._mode] as CountCondition;
     if (currentCondition && key in currentCondition) {
-      currentCondition[key] = Number(target.value) || null;
+      currentCondition[key] = Number(target.value);
       this._update();
     }
   }
@@ -572,14 +572,14 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
     freqCountView.setValues(
       this._conditionType as 'dataset' | 'genotype',
       this._mode,
-      currentCondition.from ?? 0,
-      currentCondition.to ?? 0,
+      currentCondition.from,
+      currentCondition.to,
       invertValue,
       isFiltered
     );
 
     freqCountView.mode = this._mode;
-    freqCountView.from = currentCondition.from ?? 0;
+    freqCountView.from = currentCondition.from;
     // Note: Removed .update() call as it's protected and may not be needed externally
   }
 
