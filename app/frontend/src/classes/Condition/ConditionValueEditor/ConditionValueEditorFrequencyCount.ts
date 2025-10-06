@@ -4,7 +4,10 @@ import type { ConditionItemView } from '../ConditionItemView';
 import { ConditionValueEditor } from './ConditionValueEditor';
 import type ConditionValues from '../ConditionValues.js';
 import '../../../components/RangeSliderView.js';
-import type { FrequencyCountValueView } from '../../../components/FrequencyCountValueView';
+import {
+  MODE,
+  type FrequencyCountValueView,
+} from '../../../components/FrequencyCountValueView';
 
 export type RangeSliderData = {
   from?: number;
@@ -12,16 +15,8 @@ export type RangeSliderData = {
   invert?: boolean | string;
 };
 
-const MODE = {
-  frequency: 'frequency',
-  count: 'count',
-  alt_alt: 'alt_alt',
-  alt_ref: 'alt_ref',
-  hemi_alt: 'hemi_alt',
-} as const;
-
 type ModeType = (typeof MODE)[keyof typeof MODE];
-type CountMode = Exclude<ModeType, typeof MODE.frequency>;
+type CountMode = Exclude<ModeType, 'frequency'>;
 
 type ConditionState = {
   frequency: FrequencyCondition;
@@ -68,9 +63,9 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
   private static readonly DEFAULT_CONDITION: ConditionState = {
     frequency: { from: 0, to: 1, invert: false },
     count: { from: null, to: null },
-    alt_alt: { from: null, to: null },
-    alt_ref: { from: null, to: null },
-    hemi_alt: { from: null, to: null },
+    aac: { from: null, to: null },
+    arc: { from: null, to: null },
+    hac: { from: null, to: null },
   };
   private readonly _radioGroupName = `freqcount-${ConditionValueEditorFrequencyCount._idCounter++}`;
 
@@ -87,14 +82,14 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
         ...ConditionValueEditorFrequencyCount.DEFAULT_CONDITION.frequency,
       },
       count: { ...ConditionValueEditorFrequencyCount.DEFAULT_CONDITION.count },
-      alt_alt: {
-        ...ConditionValueEditorFrequencyCount.DEFAULT_CONDITION.alt_alt,
+      aac: {
+        ...ConditionValueEditorFrequencyCount.DEFAULT_CONDITION.aac,
       },
-      alt_ref: {
-        ...ConditionValueEditorFrequencyCount.DEFAULT_CONDITION.alt_ref,
+      arc: {
+        ...ConditionValueEditorFrequencyCount.DEFAULT_CONDITION.arc,
       },
-      hemi_alt: {
-        ...ConditionValueEditorFrequencyCount.DEFAULT_CONDITION.hemi_alt,
+      hac: {
+        ...ConditionValueEditorFrequencyCount.DEFAULT_CONDITION.hac,
       },
     };
     this._mode =
