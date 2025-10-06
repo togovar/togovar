@@ -12,7 +12,7 @@ import {
 export type RangeSliderData = {
   from?: number;
   to?: number;
-  invert?: boolean | string;
+  invert?: boolean;
 };
 
 type ModeType = (typeof MODE)[keyof typeof MODE];
@@ -566,11 +566,7 @@ export default class ConditionValueEditorFrequencyCount extends ConditionValueEd
   ): void {
     const currentCondition = this._condition[this._mode];
     const invertValue =
-      this._mode === MODE.frequency
-        ? this._condition.frequency.invert
-          ? '1'
-          : '0'
-        : '';
+      this._mode === MODE.frequency ? this._condition.frequency.invert : false;
     const isFiltered = this._filtered?.checked ?? false;
 
     freqCountView.setValues(

@@ -9,9 +9,7 @@ import type {
 } from '../types';
 import type { FrequencyDataset, GenotypeKey } from '../definition';
 
-/**
- * Display mode constants definition
- */
+// Display mode constants definition
 export const MODE = {
   frequency: 'frequency',
   count: 'count',
@@ -27,8 +25,7 @@ const isDatasetMode = (m: DatasetMode | GenotypeMode): m is DatasetMode =>
 
 const GENOTYPE_MODES = ['aac', 'arc', 'hac'] as const;
 type GenotypeMode = (typeof GENOTYPE_MODES)[number];
-
-const isGenotypeMode = (m: string): m is GenotypeMode =>
+const isGenotypeMode = (m: DatasetMode | GenotypeMode): m is GenotypeMode =>
   (GENOTYPE_MODES as readonly string[]).includes(m);
 
 /**
@@ -38,25 +35,13 @@ const isGenotypeMode = (m: string): m is GenotypeMode =>
 export class FrequencyCountValueView extends LitElement {
   static styles = [Style];
 
-  /** Type of condition for query building ('dataset' or 'genotype') */
   @property({ type: String }) conditionType: 'dataset' | 'genotype' = 'dataset';
-
-  /** Display mode */
   @property({ type: String }) mode: DatasetMode | GenotypeMode = 'frequency';
-
-  /** Range start value */
   @property({ type: Number }) from: number = 0;
-
-  /** Range end value */
   @property({ type: Number }) to: number = 1;
-
-  /** Invert mode flag */
-  @property({ type: String }) invert: string = '0';
-
-  /** Filtering status */
+  @property({ type: Boolean }) invert: boolean = false;
   @property({ type: Boolean }) filtered: boolean = false;
 
-  /** Reference to bar elements */
   private _bars: NodeListOf<HTMLElement> | undefined;
 
   /**
@@ -90,7 +75,6 @@ export class FrequencyCountValueView extends LitElement {
 
   /**
    * Creates scale elements and adds them to the frequency graph
-   * @private
    */
   private _createScaleElements(): void {
     const frequencyGraph = this.shadowRoot!.querySelector(
@@ -120,7 +104,7 @@ export class FrequencyCountValueView extends LitElement {
     mode: DatasetMode | GenotypeMode,
     from: number,
     to: number,
-    invert: string,
+    invert: boolean,
     filtered: boolean
   ): void {
     this.conditionType = conditionType;
@@ -141,7 +125,7 @@ export class FrequencyCountValueView extends LitElement {
   private _updateBarVisualization(): void {
     if (this.mode !== MODE.frequency || !this._bars) return;
 
-    if (this.invert === '0') {
+    if (!this.invert) {
       this._setNormalBarMode();
     } else {
       this._setInvertBarMode();
@@ -171,6 +155,9 @@ export class FrequencyCountValueView extends LitElement {
     this._bars[1].style.width = `${(1 - this.to) * 100}%`;
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // Query
+  // ───────────────────────────────────────────────────────────────────────────
   /**
    * Generates query value object based on current component state
    * @returns Query parameter object for filtering
@@ -193,12 +180,11 @@ export class FrequencyCountValueView extends LitElement {
    * Builds query object for dataset condition type
    * @param dataset - Dataset information object
    * @returns Query object for dataset filtering
-   * @private
    */
   private _buildDatasetQuery(dataset: {
     name: FrequencyDataset;
   }): FrequencyQuery {
-    if (this.invert === '1') {
+    if (this.invert) {
       return this._buildInvertedDatasetQuery(dataset);
     } else {
       return this._buildNormalDatasetQuery(dataset);
@@ -209,7 +195,6 @@ export class FrequencyCountValueView extends LitElement {
    * Builds inverted query object for dataset condition
    * @param dataset - Dataset information object
    * @returns Inverted query object with OR conditions
-   * @private
    */
   private _buildInvertedDatasetQuery(dataset: {
     name: FrequencyDataset;
@@ -235,7 +220,6 @@ export class FrequencyCountValueView extends LitElement {
    * Builds normal query object for dataset condition
    * @param dataset - Dataset information object
    * @returns Normal query object with range values
-   * @private
    */
   private _buildNormalDatasetQuery(dataset: {
     name: FrequencyDataset;
@@ -258,7 +242,6 @@ export class FrequencyCountValueView extends LitElement {
    * Builds query object for genotype condition type
    * @param dataset - Dataset information object
    * @returns Query object for genotype filtering
-   * @private
    */
   private _buildGenotypeQuery(dataset: {
     name: FrequencyDataset;
@@ -283,7 +266,6 @@ export class FrequencyCountValueView extends LitElement {
   /**
    * Builds range values object from current from/to properties
    * @returns Object containing gte and/or lte values
-   * @private
    */
   private _buildRangeValues(): ScoreRange {
     const hasFrom = String(this.from) !== '';
