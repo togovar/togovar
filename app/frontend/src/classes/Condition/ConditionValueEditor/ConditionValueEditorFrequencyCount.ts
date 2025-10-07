@@ -98,6 +98,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     this._initializeComponent();
     this._setupEventListeners();
     this._observeValueChanges();
+    this._updateErrorMessageVisibility();
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -260,6 +261,9 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     mode: string,
     label: string
   ): HTMLElement {
+    const shouldShowError =
+      mode === this._mode && this._isCurrentConditionInvalid();
+
     return createEl('section', {
       class: ['count', 'switching'],
       dataset: { mode },
@@ -277,24 +281,38 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
           ],
         }),
         createEl('div', {
-          class: 'input',
+          class: 'input-container',
           children: [
-            createEl('input', {
-              class: 'from',
-              attrs: {
-                min: '0',
-                step: '1',
-                type: 'number',
-              },
+            createEl('div', {
+              class: 'input',
+              children: [
+                createEl('input', {
+                  class: 'from',
+                  attrs: {
+                    min: '0',
+                    step: '1',
+                    type: 'number',
+                  },
+                }),
+                ' ~ ',
+                createEl('input', {
+                  class: 'to',
+                  attrs: {
+                    min: '0',
+                    step: '1',
+                    type: 'number',
+                  },
+                }),
+              ],
             }),
-            ' ~ ',
-            createEl('input', {
-              class: 'to',
-              attrs: {
-                min: '0',
-                step: '1',
-                type: 'number',
-              },
+            createEl('div', {
+              class: ['messages-view', ...(shouldShowError ? [] : ['-hidden'])],
+              children: [
+                createEl('div', {
+                  class: ['message', '-error'],
+                  text: 'The maximum and minimum values are invalid.',
+                }),
+              ],
             }),
           ],
         }),
@@ -441,6 +459,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     }
 
     this._mode = target.value as ModeType;
+    this._updateErrorMessageVisibility();
     this._update();
   }
 
@@ -452,9 +471,13 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
 
     // Set up input listeners for all switching sections
     switchingElements.forEach((element) => {
-      const inputs = element.querySelectorAll(':scope > .input > input');
+      const inputs = element.querySelectorAll(':scope .input > input');
       inputs.forEach((input) => {
         input.addEventListener('change', (e) => {
+          this._handleCountInputChange(e);
+        });
+        // Also listen to input event for real-time validation
+        input.addEventListener('input', (e) => {
           this._handleCountInputChange(e);
         });
       });
@@ -470,8 +493,51 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     const key = target.className as keyof CountCondition;
     const currentCondition = this._condition[this._mode] as CountCondition;
     if (currentCondition && key in currentCondition) {
-      currentCondition[key] = Number(target.value);
+      const value = target.value.trim();
+      currentCondition[key] = value === '' ? null : Number(value);
+      this._updateErrorMessageVisibility();
       this._update();
+    }
+  }
+
+  /**
+   * Validates current condition and returns error state
+   */
+  private _isCurrentConditionInvalid(): boolean {
+    // Only validate count modes, not frequency mode
+    if (this._mode === MODE.frequency) {
+      return false;
+    }
+
+    const currentCondition = this._condition[this._mode] as CountCondition;
+    return (
+      currentCondition.from !== null &&
+      currentCondition.to !== null &&
+      currentCondition.from > currentCondition.to
+    );
+  }
+
+  /**
+   * Updates error message visibility by re-rendering the section
+   */
+  private _updateErrorMessageVisibility(): void {
+    const isInvalid = this._isCurrentConditionInvalid();
+
+    // Find the current mode's section and update error message visibility
+    const currentSection = this.bodyEl.querySelector(
+      `[data-mode="${this._mode}"]`
+    );
+    if (currentSection) {
+      const messagesView = currentSection.querySelector(
+        '.messages-view'
+      ) as HTMLElement;
+      if (messagesView) {
+        if (isInvalid) {
+          messagesView.classList.remove('-hidden');
+        } else {
+          messagesView.classList.add('-hidden');
+        }
+      }
     }
   }
 
