@@ -149,13 +149,15 @@ class StoreManager {
     const updatedResults = Array(this.getData('numberOfRecords')).fill(null);
 
     // 既存データと新データの更新
-    this.getData('searchResults').forEach((record, index) => {
-      if (record) {
-        updatedResults[index] = record;
+    this.getData('searchResults').forEach(
+      (record: ResultData | null, index: number) => {
+        if (record) {
+          updatedResults[index] = record;
+        }
       }
-    });
+    );
 
-    records.forEach((record, index) => {
+    records.forEach((record: ResultData, index: number) => {
       updatedResults[offset + index] = record;
     });
 
@@ -250,11 +252,12 @@ class StoreManager {
           reflectSimpleSearchConditionToURI();
           this.publish('simpleSearchConditions');
           break;
-        case 'advanced':
+        case 'advanced': {
           const condition = this.getData('advancedSearchConditions');
           setAdvancedSearchCondition(condition);
           reflectAdvancedSearchConditionToURI();
           break;
+        }
       }
 
       // 検索を開始（モード切り替え時は必ず初回検索として扱う）

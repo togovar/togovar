@@ -177,10 +177,9 @@ export class ConditionItemView extends BaseConditionView {
    * We keep direct references (buttons, relation, values…) to avoid repeated queries.
    */
   private _generateDOM(): { body: HTMLDivElement; bg: HTMLDivElement } {
-    const cond = ADVANCED_CONDITIONS[this._conditionType] as
-      | ConditionDefinition
-      | undefined;
-    const label = cond?.label ?? this._conditionType;
+    const cond = ADVANCED_CONDITIONS[
+      this._conditionType
+    ] as ConditionDefinition;
 
     const relationChild = this._relationSupported
       ? (this._relationEl = createEl('div', {
@@ -197,7 +196,7 @@ export class ConditionItemView extends BaseConditionView {
       class: 'summary',
       children: [
         // TODO: In the future, implement drag-and-drop ordering.
-        createEl('div', { class: 'classification', text: label }),
+        createEl('div', { class: 'classification', text: cond.label }),
         ...(relationChild ? [relationChild] : []),
         (this._valuesEl = createEl('div', { class: 'values' })),
         createEl('div', {

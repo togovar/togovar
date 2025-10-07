@@ -80,12 +80,14 @@ interface ConsequenceNodeBase {
   description?: string;
 }
 interface TreeCondition {
+  label: string;
   type: 'tree';
   values: ConsequenceNodeBase[];
 }
 
 /* --------------- text --------------- */
 interface TextCondition {
+  label: string;
   type: 'text';
 }
 
