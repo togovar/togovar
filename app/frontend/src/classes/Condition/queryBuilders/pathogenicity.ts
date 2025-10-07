@@ -1,4 +1,4 @@
-import type { BuildContext, PredictionLeaf } from '../../../types';
+import type { BuildContext, PredictionQueryLocal } from '../../../types';
 import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 import type { PredictionValueView } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionValueView';
 
@@ -12,7 +12,7 @@ function getPrediction(el: ConditionItemValueView): PredictionValueView | null {
 /** Build query for pathogenicity_prediction. */
 export function buildPathogenicityQuery(
   ctx: BuildContext<'pathogenicity_prediction'>
-): PredictionLeaf {
+): PredictionQueryLocal {
   const predictionValueEl = getPrediction(ctx.values[0]);
   if (!predictionValueEl) {
     throw new Error('pathogenicity_prediction: missing or invalid value');

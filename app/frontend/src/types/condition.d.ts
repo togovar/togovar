@@ -36,6 +36,7 @@ type ConditionLeaf =
   | GeneLeaf
   | LocationLeaf
   | PredictionLeaf
+  | PredictionQueryLocal
   | IdLeaf
   | DefaultLeaf;
 
