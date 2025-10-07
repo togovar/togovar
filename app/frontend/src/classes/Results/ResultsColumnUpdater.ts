@@ -1,5 +1,5 @@
 import { getSimpleSearchConditionMaster } from '../../store/searchManager';
-import {
+import type {
   DatasetMasterItem,
   TypeMasterItem,
   ConsequenceMasterItem,
@@ -313,7 +313,7 @@ export class ResultsColumnUpdater {
   static updateClinicalCondition(
     tdClinicalSign: HTMLDivElement,
     tdClinicalAnchor: HTMLAnchorElement,
-    firstCondition: any
+    firstCondition: { name: string; medgen?: string } | undefined
   ) {
     if (firstCondition) {
       tdClinicalSign.textContent = '';

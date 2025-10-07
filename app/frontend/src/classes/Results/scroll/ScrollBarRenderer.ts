@@ -1,4 +1,4 @@
-import { ScrollBarCalculation } from '../../../types';
+import type { ScrollBarCalculation } from '../../../types';
 
 const RELEASE_DURATION = 2000;
 

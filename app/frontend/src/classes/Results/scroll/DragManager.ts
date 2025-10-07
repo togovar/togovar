@@ -1,4 +1,4 @@
-import {
+import type {
   DragState,
   DragManagerConfig,
   TouchEventOptions,

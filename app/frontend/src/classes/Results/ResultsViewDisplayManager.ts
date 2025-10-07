@@ -1,7 +1,7 @@
 import { storeManager } from '../../store/StoreManager';
 import { ResultsRowView } from './ResultsRowView';
 import { TR_HEIGHT, COMMON_FOOTER_HEIGHT } from '../../global';
-import { ColumnConfig, DisplaySizeCalculation } from '../../types';
+import type { ColumnConfig, DisplaySizeCalculation } from '../../types';
 
 const DISPLAY_CALCULATION_MARGIN = 2;
 

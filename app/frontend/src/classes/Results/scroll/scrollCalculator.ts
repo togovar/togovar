@@ -1,5 +1,5 @@
 import { TR_HEIGHT } from '../../../global';
-import {
+import type {
   ScrollCalculation,
   ScrollBarCalculation,
   ScrollBounds,

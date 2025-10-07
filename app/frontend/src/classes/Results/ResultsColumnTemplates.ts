@@ -9,7 +9,7 @@
  */
 
 import { getSimpleSearchConditionMaster } from '../../store/searchManager';
-import { DatasetMasterItem } from '../../types';
+import type { DatasetMasterItem } from '../../types';
 
 /** Maximum length of array to display in Ref/Alt column */
 export const REF_ALT_SHOW_LENGTH = 4;
