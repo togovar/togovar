@@ -34,7 +34,16 @@ export class ResultsViewTouchHandler {
   private _container: HTMLElement;
   private _tbody: HTMLElement;
   private _tablecontainer: HTMLElement;
-  private _touchState: TouchState;
+  private _touchState: TouchState = {
+    startY: 0,
+    startX: 0,
+    startTime: 0,
+    lastY: 0,
+    lastX: 0,
+    distance: 0,
+    duration: 0,
+    isScrolling: false,
+  };
   private _scrollCallbacks: ScrollCallbacks = {};
 
   // Bound event handlers for proper cleanup
@@ -51,7 +60,6 @@ export class ResultsViewTouchHandler {
    * @param _container - Root container element containing the table
    * @param _tbody - Table body element where row interactions occur
    * @param _tablecontainer - Table container element for scroll area
-   * ```
    */
   constructor(
     _container: HTMLElement,
@@ -62,7 +70,6 @@ export class ResultsViewTouchHandler {
     this._tbody = _tbody;
     this._tablecontainer = _tablecontainer;
 
-    this._initializeTouchState();
     this._setupTouchEvents();
   }
 
@@ -159,22 +166,6 @@ export class ResultsViewTouchHandler {
   // ========================================
 
   /**
-   * Initialize touch state
-   */
-  private _initializeTouchState(): void {
-    this._touchState = {
-      startY: 0,
-      startX: 0,
-      startTime: 0,
-      lastY: 0,
-      lastX: 0,
-      distance: 0,
-      duration: 0,
-      isScrolling: false,
-    };
-  }
-
-  /**
    * Set up touch events
    *
    * ## Event Configuration
@@ -215,7 +206,6 @@ export class ResultsViewTouchHandler {
    * normal interaction mode.
    *
    * @param e - TouchEvent containing touch point information
-   * ```
    */
   private _handleTouchStart(e: TouchEvent): void {
     // Verify the touch is on a valid target with single finger
@@ -323,7 +313,6 @@ export class ResultsViewTouchHandler {
    * - **Non-Touch Devices**: No action (precise pointer control available)
    *
    * @param _e - Custom Event (unused but required for event handler signature)
-   * ```
    */
   private _handleTapCompleted(_e: Event): void {
     if (!isTouchDevice()) return;
