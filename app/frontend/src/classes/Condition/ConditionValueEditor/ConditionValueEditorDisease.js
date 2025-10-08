@@ -13,14 +13,12 @@ export default class ConditionValueEditorDisease extends ConditionValueEditor {
 
     // HTML
     this._createElement(
-      'disease-editor-view',
+      'text-field-editor-view',
       `
     <header>Select ${this._conditionType}</header>
     <div class="body"></div>
     `
     );
-
-    this.sectionEl.classList.add('text-field-editor-view');
 
     this._conditionElem =
       this.bodyEl.querySelector('condition-disease-search') ||

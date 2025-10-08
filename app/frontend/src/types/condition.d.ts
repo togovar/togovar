@@ -218,8 +218,7 @@ type EditorSectionClassName =
   | 'columns-editor-view' // dataset, consequence, genotype
   | 'frequency-count-editor-view' // dataset, genotype
   | 'clinical-significance-view' // significance
-  | 'disease-editor-view' // disease
-  | 'text-field-editor-view' // gene, variant id
+  | 'text-field-editor-view' // disease, gene, variant id
   | 'location-editor-view' // location
   | 'pathogenicity-editor-view' // pathogenicity
   | 'checkboxes-editor-view'; // variant type
