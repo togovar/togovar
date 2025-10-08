@@ -1,4 +1,5 @@
 import { createEl } from '../../../utils/dom/createEl';
+import { selectRequired, selectOrNull } from '../../../utils/dom/select';
 import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 import type { ConditionTypeValue } from '../../../definition';
 import type ConditionValues from '../ConditionValues';
@@ -14,7 +15,6 @@ type SectionContent =
 
 export class ConditionValueEditor {
   private _sectionEl: HTMLElement | null = null;
-  protected _body: HTMLElement | null = null; // To be deleted in the future
 
   constructor(
     protected readonly _valuesView: ConditionValues,
@@ -49,7 +49,6 @@ export class ConditionValueEditor {
     }
 
     this._valuesView.sections.append(sectionEl);
-    this._body = sectionEl.querySelector<HTMLElement>(':scope > .body'); // To be deleted in the future
     this._sectionEl = sectionEl;
     return sectionEl;
   }
@@ -64,7 +63,8 @@ export class ConditionValueEditor {
     showDeleteButton = false
   ): ConditionItemValueView {
     const selector = isOnly ? '' : `[data-value="${value}"]`;
-    let valueView = this._valuesElement.querySelector<ConditionItemValueView>(
+    let valueView = selectOrNull<ConditionItemValueView>(
+      this._valuesElement,
       `condition-item-value-view${selector}`
     );
 
@@ -95,7 +95,8 @@ export class ConditionValueEditor {
   /** Delete if argument value contains a value */
   protected _removeValueView(value: string): void {
     const selector = value ? `[data-value="${value}"]` : '';
-    const view = this._valuesElement.querySelector<ConditionItemValueView>(
+    const view = selectOrNull<ConditionItemValueView>(
+      this._valuesElement,
       `condition-item-value-view${selector}`
     );
     if (view) view.remove();
@@ -107,9 +108,11 @@ export class ConditionValueEditor {
   }
 
   protected get bodyEl(): HTMLElement {
-    const el = this.sectionEl.querySelector<HTMLDivElement>(':scope > .body');
-    if (!el) throw new Error('columns-editor-view: .body not found');
-    return el;
+    return selectRequired<HTMLElement>(
+      this.sectionEl,
+      ':scope > .body',
+      'ConditionValueEditor.bodyEl'
+    );
   }
 
   protected get _conditionType(): ConditionTypeValue {

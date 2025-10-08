@@ -26,7 +26,7 @@ class ConditionValueEditorGene extends ConditionValueEditor {
       'BRCA2',
       `${API_URL}/api/search/${this._conditionType}`,
       'term',
-      this._body,
+      this.bodyEl,
       {
         valueMappings: {
           valueKey: 'id',

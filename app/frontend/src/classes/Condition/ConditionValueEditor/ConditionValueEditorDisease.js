@@ -23,8 +23,8 @@ export default class ConditionValueEditorDisease extends ConditionValueEditor {
     this.sectionEl.classList.add('text-field-editor-view');
 
     this._conditionElem =
-      this._body.querySelector('condition-disease-search') ||
-      new ConditionDiseaseSearch(this._body);
+      this.bodyEl.querySelector('condition-disease-search') ||
+      new ConditionDiseaseSearch(this.bodyEl);
 
     this._conditionElem.addEventListener('disease-selected', (e) => {
       e.stopPropagation();

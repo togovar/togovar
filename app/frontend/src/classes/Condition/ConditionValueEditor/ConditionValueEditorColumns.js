@@ -32,8 +32,9 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
       <div class="description"></div>
     </div>`
     );
-    this._columns = this._body.querySelector(':scope > .columns');
-    this._description = this._body.querySelector(':scope > .description');
+
+    this._columns = this.bodyEl.querySelector(':scope > .columns');
+    this._description = this.bodyEl.querySelector(':scope > .description');
     this._drawColumn();
   }
 
@@ -144,9 +145,9 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
       this._update();
 
       // scroll
-      const left = this._body.scrollWidth - this._body.clientWidth;
+      const left = this.bodyEl.scrollWidth - this.bodyEl.clientWidth;
       if (left > 0) {
-        this._body.scrollTo({
+        this.bodyEl.scrollTo({
           top: 0,
           left: left,
           behavior: 'smooth',

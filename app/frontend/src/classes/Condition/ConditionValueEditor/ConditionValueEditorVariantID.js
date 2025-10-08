@@ -17,7 +17,7 @@ class ConditionValueEditorVariantID extends ConditionValueEditor {
     );
 
     /** @property {HTMLDivElement} _searchFieldView - CustomElement */
-    this._searchFieldView = new SearchField(this._body, 'rs1489251879');
+    this._searchFieldView = new SearchField(this.bodyEl, 'rs1489251879');
 
     this._searchFieldView.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {

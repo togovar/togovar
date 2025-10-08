@@ -12,6 +12,7 @@ import { DatasetCheckStateManager } from './dataset-columns/DatasetCheckStateMan
 import { DatasetValueViewManager } from './dataset-columns/DatasetValueViewManager';
 import type { UiNode } from './dataset-columns/types';
 import { createEl } from '../../../utils/dom/createEl';
+import { selectRequired } from '../../../utils/dom/select';
 
 /**
  * A condition value editor that displays datasets in a hierarchical column-based interface.
@@ -156,12 +157,12 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
       }),
     ]);
 
-    // safety checks
-    if (!this.bodyEl) throw new Error('columns-editor-view: .body not found');
-    this._columns =
-      this.bodyEl.querySelector<HTMLDivElement>(':scope > .columns');
-    if (!this._columns)
-      throw new Error('columns-editor-view: .columns not found');
+    // Use selectRequired for safer DOM element retrieval
+    this._columns = selectRequired<HTMLDivElement>(
+      this.bodyEl,
+      ':scope > .columns',
+      'ConditionValueEditorDatasetColumns._initializeUI'
+    );
   }
 
   /**
