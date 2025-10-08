@@ -1,17 +1,17 @@
 import { CONDITION_TYPE, type ConditionTypeValue } from '../../definition';
 import { supportsRelation } from '../../conditions';
+import { createEl } from '../../utils/dom/createEl';
 import { ConditionValueEditorCheckboxes } from './ConditionValueEditor/ConditionValueEditorCheckboxes';
 import { ConditionValueEditorClinicalSignificance } from './ConditionValueEditor/ConditionValueEditorClinicalSignificance';
 import ConditionValueEditorColumns from './ConditionValueEditor/ConditionValueEditorColumns';
 import { ConditionValueEditorDatasetColumns } from './ConditionValueEditor/ConditionValueEditorDatasetColumns';
 import ConditionValueEditorDisease from './ConditionValueEditor/ConditionValueEditorDisease';
 import ConditionValueEditorFrequencyCount from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
-import ConditionValueEditorGene from './ConditionValueEditor/ConditionValueEditorGene';
+import { ConditionValueEditorGene } from './ConditionValueEditor/ConditionValueEditorGene';
 import ConditionValueEditorLocation from './ConditionValueEditor/ConditionValueEditorLocation';
 import { ConditionValueEditorPathogenicityPrediction } from './ConditionValueEditor/ConditionValueEditorPathogenicityPrediction';
 import { ConditionValueEditorVariantID } from './ConditionValueEditor/ConditionValueEditorVariantID';
 import type { ConditionItemView } from './ConditionItemView';
-import { createEl } from '../../utils/dom/createEl';
 import type { ConditionValueEditor, EditorCtor } from '../../types';
 
 /** Registry: which editors are used for each condition type. */
