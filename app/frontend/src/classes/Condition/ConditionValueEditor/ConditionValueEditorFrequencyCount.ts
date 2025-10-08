@@ -101,7 +101,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     this._updateErrorMessageVisibility();
 
     // Set initial classification text based on default mode
-    this._conditionView.updateClassificationText(
+    this.conditionItemView.updateClassificationText(
       this._getModeDisplayText(this._mode)
     );
   }
@@ -466,7 +466,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     this._mode = target.value as ModeType;
 
     // Update parent classification text based on selected mode
-    this._conditionView.updateClassificationText(
+    this.conditionItemView.updateClassificationText(
       this._getModeDisplayText(this._mode)
     );
 
