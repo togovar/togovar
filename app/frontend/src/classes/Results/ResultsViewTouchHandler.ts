@@ -1,4 +1,4 @@
-import { ScrollCallbacks, TouchState, TouchGesture } from '../../types';
+import type { ScrollCallbacks, TouchState, TouchGesture } from '../../types';
 import { isTouchDevice } from '../../utils/deviceDetection';
 
 // Selector constant for touch target elements (excluding links for accessibility)
@@ -34,6 +34,7 @@ export class ResultsViewTouchHandler {
   private _container: HTMLElement;
   private _tbody: HTMLElement;
   private _tablecontainer: HTMLElement;
+  private _isDestroyed = false;
   private _touchState: TouchState = {
     startY: 0,
     startX: 0,
@@ -98,6 +99,7 @@ export class ResultsViewTouchHandler {
    * ```
    */
   setScrollCallbacks(callbacks: ScrollCallbacks): void {
+    if (this._isDestroyed) return;
     this._scrollCallbacks = { ...callbacks };
   }
 
@@ -137,6 +139,8 @@ export class ResultsViewTouchHandler {
    * Call this method when the TouchHandler is no longer needed
    */
   destroy(): void {
+    if (this._isDestroyed) return;
+
     const touchElements = [this._tablecontainer, this._tbody];
 
     // Remove touch event listeners
@@ -155,10 +159,11 @@ export class ResultsViewTouchHandler {
     // Clear callbacks
     this._scrollCallbacks = {};
 
-    // Clear DOM references
-    this._container = null!;
-    this._tbody = null!;
-    this._tablecontainer = null!;
+    // Mark as destroyed to prevent further operations
+    this._isDestroyed = true;
+
+    // Note: DOM references are kept to avoid TypeScript null assertion issues
+    // The _isDestroyed flag ensures the instance won't be used after cleanup
   }
 
   // ========================================
