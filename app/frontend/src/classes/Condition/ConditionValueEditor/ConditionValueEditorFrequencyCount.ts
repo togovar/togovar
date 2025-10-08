@@ -99,6 +99,11 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     this._setupEventListeners();
     this._observeValueChanges();
     this._updateErrorMessageVisibility();
+
+    // Set initial classification text based on default mode
+    this._conditionView.updateClassificationText(
+      this._getModeDisplayText(this._mode)
+    );
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -459,6 +464,12 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     }
 
     this._mode = target.value as ModeType;
+
+    // Update parent classification text based on selected mode
+    this._conditionView.updateClassificationText(
+      this._getModeDisplayText(this._mode)
+    );
+
     this._updateErrorMessageVisibility();
     this._update();
   }
@@ -659,5 +670,22 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
       return false;
     }
     return Object.values(currentCondition).some((value) => value !== null);
+  }
+
+  /**
+   * Gets the display text for classification based on current mode
+   * @param mode - The mode to get display text for
+   * @returns Display text for classification
+   */
+  private _getModeDisplayText(mode: ModeType): string {
+    const displayTextMap: Record<ModeType, string> = {
+      [MODE.frequency]: 'Alternative allele frequency',
+      [MODE.count]: 'Alternative allele count',
+      [MODE.alt_alt]: 'Genotype count (Alt/Alt)',
+      [MODE.alt_ref]: 'Genotype count (Alt/Ref)',
+      [MODE.hemi_alt]: 'Genotype count (Hemi_Alt)',
+    };
+
+    return displayTextMap[mode];
   }
 }

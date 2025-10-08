@@ -41,6 +41,7 @@ export class ConditionItemView extends BaseConditionView {
   private _btnEdit!: HTMLButtonElement;
   private _btnDelete!: HTMLButtonElement;
   private _editorEl!: HTMLDivElement;
+  private _classificationEl!: HTMLDivElement;
 
   /** Manages concrete editors (checkboxes, selects, etc.) inside this row. */
   private _conditionValues!: ConditionValues;
@@ -95,6 +96,13 @@ export class ConditionItemView extends BaseConditionView {
     storeManager.setData('showModal', false);
     // this._conditionValues?.destroy?.(); // Uncomment if ConditionValues implements destroy().
     super.remove();
+  }
+
+  /** Update the classification text (called by child editors) */
+  updateClassificationText(newText: string): void {
+    if (this._classificationEl) {
+      this._classificationEl.textContent = newText;
+    }
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -198,7 +206,10 @@ export class ConditionItemView extends BaseConditionView {
       class: 'summary',
       children: [
         // TODO: In the future, implement drag-and-drop ordering.
-        createEl('div', { class: 'classification', text: cond.label }),
+        (this._classificationEl = createEl('div', {
+          class: 'classification',
+          text: cond.label,
+        })),
         ...(relationChild ? [relationChild] : []),
         (this._valuesContainerEl = createEl('div', {
           class: 'values-container',
