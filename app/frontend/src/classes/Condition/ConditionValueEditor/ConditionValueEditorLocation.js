@@ -202,7 +202,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
         vv.label = value;
         vv.value = value;
       } else {
-        this._addValueView(value, value, true);
+        this.addValueView(value, value, true);
       }
     } else {
       this._removeValueView();

@@ -56,7 +56,7 @@ export class ConditionValueEditor {
   /** If there is only one value in the condition, update it,
    * for multiple values, add them without duplicates. (for variant id)
    */
-  protected _addValueView(
+  protected addValueView(
     value: string,
     label: string,
     isOnly = false,

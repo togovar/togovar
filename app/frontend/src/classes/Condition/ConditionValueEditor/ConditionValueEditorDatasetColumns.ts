@@ -378,7 +378,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
     this._clearValueViews();
 
     for (const selectedNode of this._nodesToShowInValueView) {
-      this._addValueView(
+      this.addValueView(
         selectedNode.data.value || '',
         this._valueViewManager.getLabelWithPath(selectedNode, this._data)
       );

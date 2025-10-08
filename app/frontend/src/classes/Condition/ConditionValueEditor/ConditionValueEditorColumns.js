@@ -240,7 +240,7 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     this._data.forEach((datum) => {
       if (!datum.value) return;
       if (datum.checked) {
-        this._addValueView(datum.value, datum.label);
+        this.addValueView(datum.value, datum.label);
       } else {
         this._removeValueView(datum.value);
       }

@@ -30,7 +30,7 @@ export class ConditionValueEditorVariantID extends ConditionValueEditor {
         const id = this._searchFieldView.value;
 
         if (this._searchFieldView.value.trim().length > 0) {
-          this._addValueView(id, id, false, true);
+          this.addValueView(id, id, false, true);
           this._update();
           this._searchFieldView.value = '';
         }

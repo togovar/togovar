@@ -61,7 +61,7 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
 
   /** Restore the value before editing if cancel button is pressed */
   restore(): void {
-    this._addValueView(this._lastValue, this._lastLabel, true);
+    this.addValueView(this._lastValue, this._lastLabel, true);
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -73,7 +73,7 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
   ): void => {
     this._value = String(e.detail.id);
     this._label = e.detail.label;
-    this._addValueView(this._value, this._label, true, false);
+    this.addValueView(this._value, this._label, true, false);
 
     // Change whether okbutton can be pressed
     this._valuesView.update(this.isValid);

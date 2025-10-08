@@ -70,7 +70,7 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
     this._data = { ...this._lastValues };
 
     if (this._lastValues.id && this._lastValues.label) {
-      this._addValueView(this._lastValues.id, this._lastValues.label, true);
+      this.addValueView(this._lastValues.id, this._lastValues.label, true);
     }
 
     this._update();
@@ -83,7 +83,7 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
     this._data = { ...diseaseData };
 
     if (this._data.id && this._data.label) {
-      this._addValueView(this._data.id, this._data.label, true);
+      this.addValueView(this._data.id, this._data.label, true);
     }
 
     this._update();

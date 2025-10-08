@@ -131,7 +131,7 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
     this._checkboxes.forEach((checkbox) => {
       const label = checkbox.dataset.label ?? checkbox.value; // guard against undefined
       if (checkbox.checked) {
-        this._addValueView(checkbox.value, label);
+        this.addValueView(checkbox.value, label);
       } else {
         this._removeValueView(checkbox.value);
       }
