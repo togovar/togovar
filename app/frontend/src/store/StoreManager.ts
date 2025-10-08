@@ -202,6 +202,8 @@ class StoreManager {
   // ------------------------------
   async fetchLoginStatus() {
     try {
+      // For development on localhost, we intentionally set login status to false.
+      // This avoids authentication checks during local development.
       if (window.location.origin === 'http://localhost:8000') {
         this.setData('isLogin', false);
         return;
