@@ -8,8 +8,8 @@ export const COMMON_HEADER_HEIGHT = 30;
 export const COMMON_FOOTER_HEIGHT = 22;
 export const API_URL = TOGOVAR_FRONTEND_API_URL || 'https://togovar.org';
 
-const GRCh37: GRChConditions = grch37Json as unknown as GRChConditions;
-const GRCh38: GRChConditions = grch38Json as unknown as GRChConditions;
+const GRCh37 = grch37Json as GRChConditions;
+const GRCh38 = grch38Json as GRChConditions;
 
 const CONDITIONS_MAP = {
   GRCh37: GRCh37.conditions,
