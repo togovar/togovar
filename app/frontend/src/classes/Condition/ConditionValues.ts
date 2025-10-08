@@ -6,7 +6,7 @@ import { ConditionValueEditorClinicalSignificance } from './ConditionValueEditor
 import ConditionValueEditorColumns from './ConditionValueEditor/ConditionValueEditorColumns';
 import { ConditionValueEditorDatasetColumns } from './ConditionValueEditor/ConditionValueEditorDatasetColumns';
 import ConditionValueEditorDisease from './ConditionValueEditor/ConditionValueEditorDisease';
-import ConditionValueEditorFrequencyCount from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
+import { ConditionValueEditorFrequencyCount } from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
 import { ConditionValueEditorGene } from './ConditionValueEditor/ConditionValueEditorGene';
 import ConditionValueEditorLocation from './ConditionValueEditor/ConditionValueEditorLocation';
 import { ConditionValueEditorPathogenicityPrediction } from './ConditionValueEditor/ConditionValueEditorPathogenicityPrediction';

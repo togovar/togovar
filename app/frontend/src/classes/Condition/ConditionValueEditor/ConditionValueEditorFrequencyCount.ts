@@ -53,7 +53,7 @@ const SELECTORS = {
  * ConditionState value editor for frequency and count filtering
  * Provides UI controls for setting frequency ranges and count ranges for variant filtering
  */
-export default class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
+export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   _condition: ConditionState;
   _mode: ModeType;
   _rangeSelectorView: RangeSliderElement | null = null;
