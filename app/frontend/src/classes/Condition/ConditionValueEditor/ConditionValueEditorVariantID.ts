@@ -1,0 +1,87 @@
+import { ConditionValueEditor } from './ConditionValueEditor';
+import type ConditionValues from '../ConditionValues';
+import type { ConditionItemView } from '../ConditionItemView';
+import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
+import SearchField from '../../../components/SearchField/SearchField';
+import { createEl } from '../../../utils/dom/createEl';
+
+/** Variant ID editing screen */
+export class ConditionValueEditorVariantID extends ConditionValueEditor {
+  private _searchFieldView!: SearchField;
+  private _lastValueViews: ConditionItemValueView[] = [];
+
+  constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
+    super(valuesView, conditionView);
+
+    // HTML
+    this._createElement('text-field-editor-view', () => [
+      createEl('header', { text: `Search for ${this._conditionType}` }),
+      createEl('div', { class: 'body' }),
+    ]);
+
+    // Initialize search field with proper type casting
+    this._searchFieldView = new SearchField(
+      this.bodyEl as HTMLDivElement,
+      'rs1489251879'
+    );
+
+    this._searchFieldView.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        const id = this._searchFieldView.value;
+
+        if (this._searchFieldView.value.trim().length > 0) {
+          this._addValueView(id, id, false, true);
+          this._update();
+          this._searchFieldView.value = '';
+        }
+      }
+    });
+
+    this._valuesView.conditionView.valuesElement?.addEventListener(
+      'delete-condition-item',
+      (e: Event) => {
+        const customEvent = e as CustomEvent<string>;
+        this._handleDeleteValue(customEvent);
+      }
+    );
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Public API
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /** Retain _valueViews when changing to edit screen */
+  keepLastValues(): void {
+    this._lastValueViews = this._valueViews;
+  }
+
+  /** Restore the _valueViews before editing if cancel button is pressed */
+  restore(): void {
+    this._updateValueViews(this._lastValueViews);
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Private Methods
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /** Update validation state for the OK button */
+  private _update(): void {
+    this._valuesView.update(this.isValid);
+  }
+
+  /** Delete value and _update when value's button.delete is pressed on edit screen */
+  private _handleDeleteValue(e: CustomEvent<string>): void {
+    e.stopPropagation();
+    this._removeValueView(e.detail);
+    this._update();
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Validation
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /** Returns true if there are value nodes in div.values */
+  get isValid(): boolean {
+    return this.conditionItemView.valuesElement.hasChildNodes();
+  }
+}

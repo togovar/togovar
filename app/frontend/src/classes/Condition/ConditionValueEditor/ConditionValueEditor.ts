@@ -115,8 +115,13 @@ export class ConditionValueEditor {
     );
   }
 
+  /** Access to the parent condition item view */
+  protected get conditionItemView(): ConditionItemView {
+    return this._conditionView;
+  }
+
   protected get _conditionType(): ConditionTypeValue {
-    return this._conditionView.conditionType;
+    return this.conditionItemView.conditionType;
   }
 
   // div.values which is a wrapper for condition-item-value-view

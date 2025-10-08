@@ -6,7 +6,7 @@ import type {
   PredictionLabel,
 } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
 import { PREDICTIONS } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
-import type ConditionValues from '../ConditionValues.js';
+import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';
 import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 import type { PredictionValueView } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionValueView';
