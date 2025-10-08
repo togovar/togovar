@@ -1,13 +1,20 @@
 import { storeManager } from '../../store/StoreManager';
-import { ResultsRowView } from './ResultsRowView';
+import type { ResultsRowView } from './ResultsRowView';
 import { ResultsViewDisplayManager } from './ResultsViewDisplayManager';
-import {
+import type {
   DisplayingRegions,
   SearchMessages,
   SearchStatus,
   ColumnConfig,
   ResultsRecord,
 } from '../../types';
+
+interface SelectionState {
+  currentIndex: number;
+  rowCount: number;
+  offset: number;
+  numberOfRecords: number;
+}
 
 /**
  * Manages data for the results view.
@@ -18,6 +25,7 @@ export class ResultsViewDataManager {
   private _rows: ResultsRowView[] = []; // Array of result row view instances
   private _status: HTMLElement; // Status display element
   private _messages: HTMLElement; // Message display element
+  private _isDestroyed = false; // Track if instance has been destroyed
 
   _tbody: HTMLElement; // Table body element
   _stylesheet: HTMLStyleElement; // Stylesheet for column display control
@@ -61,6 +69,7 @@ export class ResultsViewDataManager {
     isTouchDevice: boolean,
     setTouchElementsPointerEvents: (_enabled: boolean) => void
   ): void {
+    if (this._isDestroyed) return;
     this._displayManager.updateDisplaySize(
       isTouchDevice,
       setTouchElementsPointerEvents
@@ -75,7 +84,7 @@ export class ResultsViewDataManager {
    * @param setTouchElementsPointerEvents - Function to control pointer-events for touch elements.
    */
   handleSearchResults(
-    _results: any,
+    _results: unknown,
     isTouchDevice: boolean,
     setTouchElementsPointerEvents: (_enabled: boolean) => void
   ): void {
@@ -176,6 +185,8 @@ export class ResultsViewDataManager {
    * Call this method when the DataManager is no longer needed
    */
   destroy(): void {
+    if (this._isDestroyed) return;
+
     // Clean up all row instances
     this._rows.forEach((row) => {
       if (row && typeof row.destroy === 'function') {
@@ -184,12 +195,14 @@ export class ResultsViewDataManager {
     });
     this._rows = [];
 
-    // Clear DOM references
-    this._container = null as any;
-    this._status = null as any;
-    this._messages = null as any;
-    this._tbody = null as any;
-    this._stylesheet = null as any;
+    // Clean up display manager (if it has destroy method in the future)
+    // Note: ResultsViewDisplayManager doesn't currently have a destroy method
+
+    // Mark as destroyed to prevent further operations
+    this._isDestroyed = true;
+
+    // Note: DOM references are kept to avoid TypeScript null assertion issues
+    // The _isDestroyed flag ensures the instance won't be used after cleanup
   }
 
   // ========================================
@@ -232,13 +245,13 @@ export class ResultsViewDataManager {
    * @param record - The record object to validate.
    * @returns True if the record is valid, false otherwise.
    */
-  private _isValidRecord(record: any): record is ResultsRecord {
-    return (
-      record &&
-      typeof record === 'object' &&
-      typeof record.chromosome === 'string' &&
-      typeof record.start === 'number'
-    );
+  private _isValidRecord(record: unknown): record is ResultsRecord {
+    if (record === null || typeof record !== 'object') {
+      return false;
+    }
+
+    const obj = record as Record<string, unknown>;
+    return typeof obj.chromosome === 'string' && typeof obj.start === 'number';
   }
 
   /**
@@ -292,7 +305,7 @@ export class ResultsViewDataManager {
    * Retrieves the current selection state from the store.
    * @returns An object representing the current selection state.
    */
-  private _getSelectionState() {
+  private _getSelectionState(): SelectionState {
     return {
       currentIndex: storeManager.getData('selectedRow'),
       rowCount: storeManager.getData('rowCount'),
@@ -307,7 +320,7 @@ export class ResultsViewDataManager {
    * @param direction - The direction to move the selection (+1 or -1).
    * @returns The calculated new index for the selected row.
    */
-  private _calculateNewIndex(state: any, direction: number): number {
+  private _calculateNewIndex(state: SelectionState, direction: number): number {
     const newIndex = state.currentIndex + direction;
     return Math.max(0, Math.min(newIndex, state.rowCount - 1));
   }
@@ -321,7 +334,7 @@ export class ResultsViewDataManager {
    * @returns The adjusted offset value.
    */
   private _adjustOffsetForSelection(
-    state: any,
+    state: SelectionState,
     newIndex: number,
     direction: number
   ): number {
