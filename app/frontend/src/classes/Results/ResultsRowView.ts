@@ -23,39 +23,40 @@ export class ResultsRowView {
   index: number; // Row index number
   selected: boolean; // Row selection state
   tr: HTMLTableRowElement; // Table row element
+  private _isDestroyed = false; // Track if instance has been destroyed
 
   // Cache for DOM elements
   // TogoVar ID
-  togovarIdAnchor: HTMLAnchorElement | null;
+  togovarIdAnchor: HTMLAnchorElement | null = null;
   // RefSNP ID
-  refsnpCell: HTMLTableCellElement | null;
-  refsnpAnchor: HTMLAnchorElement | null;
+  refsnpCell: HTMLTableCellElement | null = null;
+  refsnpAnchor: HTMLAnchorElement | null = null;
   // Position
-  positionChromosome: HTMLDivElement | null;
-  positionCoordinate: HTMLDivElement | null;
+  positionChromosome: HTMLDivElement | null = null;
+  positionCoordinate: HTMLDivElement | null = null;
   // Ref/Alt
-  refElement: HTMLSpanElement | null;
-  altElement: HTMLSpanElement | null;
+  refElement: HTMLSpanElement | null = null;
+  altElement: HTMLSpanElement | null = null;
   // Type
-  typeElement: HTMLDivElement | null;
+  typeElement: HTMLDivElement | null = null;
   // Gene
-  geneCell: HTMLTableCellElement | null;
-  geneAnchor: HTMLAnchorElement | null;
+  geneCell: HTMLTableCellElement | null = null;
+  geneAnchor: HTMLAnchorElement | null = null;
   // Alt frequency
   frequencyElements: TdFrequencies = {};
   // Consequence
-  consequenceCell: HTMLTableCellElement | null;
-  consequenceItem: HTMLDivElement | null;
+  consequenceCell: HTMLTableCellElement | null = null;
+  consequenceItem: HTMLDivElement | null = null;
   // Clinical significance
-  clinicalSignificance: HTMLDivElement | null;
-  clinicalAnchor: HTMLAnchorElement | null;
-  clinicalIcon: HTMLSpanElement | null;
+  clinicalSignificance: HTMLDivElement | null = null;
+  clinicalAnchor: HTMLAnchorElement | null = null;
+  clinicalIcon: HTMLSpanElement | null = null;
   // AlphaMissense
-  alphaMissenseFunction: HTMLDivElement | null;
+  alphaMissenseFunction: HTMLDivElement | null = null;
   // SIFT
-  siftFunction: HTMLDivElement | null;
+  siftFunction: HTMLDivElement | null = null;
   // PolyPhen
-  polyphenFunction: HTMLDivElement | null;
+  polyphenFunction: HTMLDivElement | null = null;
 
   /**
    * Constructor for ResultsRowView
@@ -81,6 +82,8 @@ export class ResultsRowView {
    * Call this method when the row is no longer needed
    */
   destroy(): void {
+    if (this._isDestroyed) return;
+
     // Unbind from store events
     storeManager.unbind('selectedRow', this);
     storeManager.unbind('offset', this);
@@ -90,8 +93,7 @@ export class ResultsRowView {
       this.tr.parentNode.removeChild(this.tr);
     }
 
-    // Clear DOM element references
-    this.tr = null!;
+    // Clear cached DOM element references
     this.togovarIdAnchor = null;
     this.refsnpCell = null;
     this.refsnpAnchor = null;
@@ -111,6 +113,12 @@ export class ResultsRowView {
     this.alphaMissenseFunction = null;
     this.siftFunction = null;
     this.polyphenFunction = null;
+
+    // Mark as destroyed to prevent further operations
+    this._isDestroyed = true;
+
+    // Note: this.tr reference kept to avoid TypeScript null assertion issues
+    // The _isDestroyed flag ensures the instance won't be used after cleanup
   }
 
   // ========================================
@@ -124,6 +132,8 @@ export class ResultsRowView {
    * Sets appropriate display state based on data fetching status
    */
   updateTableRow() {
+    if (this._isDestroyed) return;
+
     if (
       storeManager.getData('isFetching') ||
       storeManager.getData('isStoreUpdating')
@@ -161,6 +171,7 @@ export class ResultsRowView {
    * @param selectedIndex - Index of the selected row
    */
   selectedRow(selectedIndex: number) {
+    if (this._isDestroyed) return;
     this.selected = selectedIndex === this.index;
     this.tr.classList.toggle('-selected', this.selected);
   }
@@ -170,6 +181,7 @@ export class ResultsRowView {
    * Store event handler method (called by bind/unbind system)
    */
   offset() {
+    if (this._isDestroyed) return;
     this.updateTableRow();
   }
 
@@ -230,7 +242,7 @@ export class ResultsRowView {
       if (column.id === 'alt_frequency') {
         return createFrequencyColumnHTML();
       }
-      return COLUMN_TEMPLATES[column.id] || '';
+      return (COLUMN_TEMPLATES as Record<string, string>)[column.id] || '';
     }).join('');
   }
 
