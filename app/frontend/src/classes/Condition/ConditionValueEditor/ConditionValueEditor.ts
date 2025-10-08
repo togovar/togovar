@@ -22,7 +22,7 @@ export class ConditionValueEditor {
   ) {}
 
   /** Create an element for the edit screen. */
-  protected _createElement(
+  protected createSectionEl(
     className: EditorSectionClassName,
     content: SectionContent
   ): HTMLElement {

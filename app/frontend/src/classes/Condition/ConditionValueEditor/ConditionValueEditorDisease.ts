@@ -30,7 +30,7 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
   // Initialization
   // ───────────────────────────────────────────────────────────────────────────
   private _initializeElements(): void {
-    this._createElement('text-field-editor-view', () => [
+    this.createSectionEl('text-field-editor-view', () => [
       createEl('header', { text: `Select ${this._conditionType}` }),
       createEl('div', { class: 'body' }),
     ]);

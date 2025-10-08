@@ -19,7 +19,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     super(valuesView, conditionView);
 
     // HTML
-    this._createElement(
+    this.createSectionEl(
       'location-editor-view',
       `
     <header>Set location</header>

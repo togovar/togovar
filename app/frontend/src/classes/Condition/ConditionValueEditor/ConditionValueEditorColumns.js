@@ -23,7 +23,7 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
       SELECTION_DEPENDED_ON_PARENT[this._conditionType];
 
     // HTML
-    this._createElement(
+    this.createSectionEl(
       'columns-editor-view',
       `
     <header>Select ${this._conditionType}</header>

@@ -161,7 +161,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   // ───────────────────────────────────────────────────────────────────────────
   /** Initializes the component's HTML structure */
   private _initializeComponent(): void {
-    this._createElement('frequency-count-editor-view', () => [
+    this.createSectionEl('frequency-count-editor-view', () => [
       createEl('header', { text: 'Specify range' }),
       createEl('div', {
         class: 'body',

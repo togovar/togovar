@@ -28,7 +28,7 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
     }
 
     // Build HTML (template string kept for brevity; safe because values are static text)
-    this._createElement('checkboxes-editor-view', () => [
+    this.createSectionEl('checkboxes-editor-view', () => [
       // <header>Select {type}</header>
       createEl('header', { text: `Select ${this._conditionType}` }),
 

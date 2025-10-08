@@ -132,7 +132,7 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
 
   // Initialize UI elements
   private _initializeUI() {
-    this._createElement(
+    this.createSectionEl(
       'pathogenicity-editor-view',
       `<header>Select prediction</header><div class="body"></div>`
     );
