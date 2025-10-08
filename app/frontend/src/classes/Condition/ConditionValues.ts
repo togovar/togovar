@@ -5,7 +5,7 @@ import { ConditionValueEditorCheckboxes } from './ConditionValueEditor/Condition
 import { ConditionValueEditorClinicalSignificance } from './ConditionValueEditor/ConditionValueEditorClinicalSignificance';
 import ConditionValueEditorColumns from './ConditionValueEditor/ConditionValueEditorColumns';
 import { ConditionValueEditorDatasetColumns } from './ConditionValueEditor/ConditionValueEditorDatasetColumns';
-import ConditionValueEditorDisease from './ConditionValueEditor/ConditionValueEditorDisease';
+import { ConditionValueEditorDisease } from './ConditionValueEditor/ConditionValueEditorDisease';
 import { ConditionValueEditorFrequencyCount } from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
 import { ConditionValueEditorGene } from './ConditionValueEditor/ConditionValueEditorGene';
 import ConditionValueEditorLocation from './ConditionValueEditor/ConditionValueEditorLocation';
