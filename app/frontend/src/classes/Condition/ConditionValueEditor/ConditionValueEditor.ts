@@ -81,14 +81,9 @@ export class ConditionValueEditor {
     return valueView;
   }
 
-  /** Remove all valueViews. */
-  protected _clearValueViews(): void {
-    this._valueViews.forEach((view) => view.remove());
-  }
-
-  /** Remove current valueViews and add lastValueViews. (for variant id) */
+  /** Remove current condition value views and add last value views. (for variant id) */
   protected _updateValueViews(lastValueViews: ConditionItemValueView[]): void {
-    this._valueViews.forEach((view) => view.remove());
+    this.conditionItemValueViews.forEach((view) => view.remove());
     this._valuesElement.append(...lastValueViews);
   }
 
@@ -129,8 +124,8 @@ export class ConditionValueEditor {
     return this._valuesView.conditionView.valuesElement;
   }
 
-  /** [condition-item-value-view] */
-  protected get _valueViews(): ConditionItemValueView[] {
+  /** Get all condition item value views. */
+  protected get conditionItemValueViews(): ConditionItemValueView[] {
     return Array.from(
       this._valuesElement.querySelectorAll<ConditionItemValueView>(
         ':scope > condition-item-value-view'

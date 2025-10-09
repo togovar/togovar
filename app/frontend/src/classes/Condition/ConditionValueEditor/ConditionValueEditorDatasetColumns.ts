@@ -99,7 +99,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
    * Called automatically when the user begins editing (clicks the pencil icon).
    */
   keepLastValues(): void {
-    this._lastValueViews = this._valueViews;
+    this._lastValueViews = this.conditionItemValueViews;
   }
 
   /**
@@ -135,7 +135,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
    * @returns true if one or more datasets are selected, false if none are selected
    */
   get isValid(): boolean {
-    return this._valueViews.length > 0;
+    return this.conditionItemValueViews.length > 0;
   }
 
   /**
@@ -375,7 +375,9 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
    */
   protected _updateValueViews(): void {
     this._processNodesToShowInValueView();
-    this._clearValueViews();
+
+    // Clear all existing condition value views
+    this.conditionItemValueViews.forEach((view) => view.remove());
 
     for (const selectedNode of this._nodesToShowInValueView) {
       this.addValueView(

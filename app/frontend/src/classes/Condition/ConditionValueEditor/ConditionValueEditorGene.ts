@@ -84,6 +84,6 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
   // ───────────────────────────────────────────────────────────────────────────
   /** You can press the ok button if there is condition-item-value-view */
   get isValid(): boolean {
-    return this._valueViews.length > 0;
+    return this.conditionItemValueViews.length > 0;
   }
 }

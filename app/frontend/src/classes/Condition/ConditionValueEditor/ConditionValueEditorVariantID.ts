@@ -50,12 +50,12 @@ export class ConditionValueEditorVariantID extends ConditionValueEditor {
   // Public API
   // ───────────────────────────────────────────────────────────────────────────
 
-  /** Retain _valueViews when changing to edit screen */
+  /** Retain value views when changing to edit screen */
   keepLastValues(): void {
-    this._lastValueViews = this._valueViews;
+    this._lastValueViews = this.conditionItemValueViews;
   }
 
-  /** Restore the _valueViews before editing if cancel button is pressed */
+  /** Restore the value views before editing if cancel button is pressed */
   restore(): void {
     this._updateValueViews(this._lastValueViews);
   }

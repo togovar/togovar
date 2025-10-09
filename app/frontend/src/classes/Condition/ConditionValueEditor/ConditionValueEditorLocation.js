@@ -95,7 +95,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
   // ─────────────────────────────────────────────────────
 
   keepLastValues() {
-    // no-op for now (we rebuild from _valueViews when needed)
+    // no-op for now (we rebuild from conditionItemValueViews when needed)
   }
 
   restore() {
@@ -134,7 +134,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
    * Expected format: "chr:start-end" or "chr:start"
    */
   _prefillFromViews() {
-    const vv = this._valueViews?.[0];
+    const vv = this.conditionItemValueViews?.[0];
     const raw = vv?.value || vv?.label;
     if (!raw || typeof raw !== 'string') return;
 
@@ -191,7 +191,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     }
 
     // rebuild value view
-    const vv = this._valueViews[0];
+    const vv = this.conditionItemValueViews[0];
     if (this.isValid) {
       const asRegion = this._rangeInputView.dataset.type === 'region';
       const value = `${this._chr.value}:${this._start.value}${

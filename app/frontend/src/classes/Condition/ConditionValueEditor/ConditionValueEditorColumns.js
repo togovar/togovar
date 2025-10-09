@@ -54,7 +54,7 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
   }
 
   get isValid() {
-    return this._valueViews.length > 0;
+    return this.conditionItemValueViews.length > 0;
   }
 
   // private methods
