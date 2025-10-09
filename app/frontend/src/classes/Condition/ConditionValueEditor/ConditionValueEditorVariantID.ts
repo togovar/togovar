@@ -37,7 +37,7 @@ export class ConditionValueEditorVariantID extends ConditionValueEditor {
       }
     });
 
-    this._valuesView.conditionView.valuesElement?.addEventListener(
+    this.valuesContainerEl?.addEventListener(
       'delete-condition-item',
       (e: Event) => {
         const customEvent = e as CustomEvent<string>;
@@ -82,6 +82,6 @@ export class ConditionValueEditorVariantID extends ConditionValueEditor {
 
   /** Returns true if there are value nodes in div.values */
   get isValid(): boolean {
-    return this.conditionItemView.valuesElement.hasChildNodes();
+    return this.valuesContainerEl.hasChildNodes();
   }
 }

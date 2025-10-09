@@ -37,7 +37,7 @@ export class ConditionItemView extends BaseConditionView {
   // DOM references
   private _summaryEl!: HTMLDivElement;
   private _relationEl!: HTMLDivElement;
-  private _valuesEl!: HTMLDivElement;
+  private _valuesContainerEl!: HTMLDivElement;
   private _btnEdit!: HTMLButtonElement;
   private _btnDelete!: HTMLButtonElement;
   private _editorEl!: HTMLDivElement;
@@ -103,8 +103,8 @@ export class ConditionItemView extends BaseConditionView {
   get conditionType(): ConditionTypeValue {
     return this._conditionType;
   }
-  get valuesElement(): HTMLDivElement {
-    return this._valuesEl;
+  get valuesContainerEl(): HTMLDivElement {
+    return this._valuesContainerEl;
   }
   get editorElement(): HTMLDivElement {
     return this._editorEl;
@@ -125,7 +125,9 @@ export class ConditionItemView extends BaseConditionView {
    */
   get queryFragment(): ConditionQuery {
     const values = Array.from(
-      this._valuesEl.querySelectorAll(':scope > condition-item-value-view')
+      this._valuesContainerEl.querySelectorAll(
+        ':scope > condition-item-value-view'
+      )
     ) as ConditionItemValueView[];
 
     if (supportsRelation(this._conditionType)) {
@@ -136,14 +138,14 @@ export class ConditionItemView extends BaseConditionView {
         type,
         relation,
         values,
-        valuesContainer: this._valuesEl,
+        valuesContainer: this._valuesContainerEl,
       });
     } else {
       const type = this._conditionType as NoRelationType;
       return buildQueryFragment<NoRelationType>({
         type,
         values,
-        valuesContainer: this._valuesEl,
+        valuesContainer: this._valuesContainerEl,
       });
     }
   }
@@ -198,7 +200,9 @@ export class ConditionItemView extends BaseConditionView {
         // TODO: In the future, implement drag-and-drop ordering.
         createEl('div', { class: 'classification', text: cond.label }),
         ...(relationChild ? [relationChild] : []),
-        (this._valuesEl = createEl('div', { class: 'values' })),
+        (this._valuesContainerEl = createEl('div', {
+          class: 'values-container',
+        })),
         createEl('div', {
           class: 'buttons',
           children: [

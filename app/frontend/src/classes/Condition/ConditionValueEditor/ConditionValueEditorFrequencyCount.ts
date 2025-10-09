@@ -149,7 +149,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     const observer = new MutationObserver(() => {
       window.requestAnimationFrame(() => this._update());
     });
-    observer.observe(this._valuesElement, {
+    observer.observe(this.valuesContainerEl, {
       attributes: false,
       childList: true,
       subtree: false,
@@ -526,7 +526,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
    * Applies current condition values to frequency count views
    */
   private _applyConditionToAllViews(): void {
-    this._valuesElement
+    this.valuesContainerEl
       .querySelectorAll(':scope > condition-item-value-view')
       .forEach((view) => {
         const freqCountView = this._getFrequencyCountView(view);

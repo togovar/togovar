@@ -64,7 +64,7 @@ export class ConditionValueEditor {
   ): ConditionItemValueView {
     const selector = isOnly ? '' : `[data-value="${value}"]`;
     let valueView = selectOrNull<ConditionItemValueView>(
-      this._valuesElement,
+      this.valuesContainerEl,
       `condition-item-value-view${selector}`
     );
 
@@ -73,7 +73,7 @@ export class ConditionValueEditor {
       valueView = document.createElement('condition-item-value-view');
       valueView.conditionType = this._conditionType;
       valueView.deleteButton = showDeleteButton;
-      this._valuesElement.append(valueView);
+      this.valuesContainerEl.append(valueView);
     }
 
     valueView.label = label;
@@ -84,19 +84,22 @@ export class ConditionValueEditor {
   /** Remove current condition value views and add last value views. (for variant id) */
   protected _updateValueViews(lastValueViews: ConditionItemValueView[]): void {
     this.conditionItemValueViews.forEach((view) => view.remove());
-    this._valuesElement.append(...lastValueViews);
+    this.valuesContainerEl.append(...lastValueViews);
   }
 
   /** Delete if argument value contains a value */
   protected _removeValueView(value: string): void {
     const selector = value ? `[data-value="${value}"]` : '';
     const view = selectOrNull<ConditionItemValueView>(
-      this._valuesElement,
+      this.valuesContainerEl,
       `condition-item-value-view${selector}`
     );
     if (view) view.remove();
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // Accessors
+  // ───────────────────────────────────────────────────────────────────────────
   protected get sectionEl(): HTMLElement {
     if (!this._sectionEl) throw new Error('not mounted yet');
     return this._sectionEl;
@@ -120,14 +123,14 @@ export class ConditionValueEditor {
   }
 
   // div.values which is a wrapper for condition-item-value-view
-  protected get _valuesElement(): HTMLDivElement {
-    return this._valuesView.conditionView.valuesElement;
+  protected get valuesContainerEl(): HTMLDivElement {
+    return this.conditionItemView.valuesContainerEl;
   }
 
   /** Get all condition item value views. */
   protected get conditionItemValueViews(): ConditionItemValueView[] {
     return Array.from(
-      this._valuesElement.querySelectorAll<ConditionItemValueView>(
+      this.valuesContainerEl.querySelectorAll<ConditionItemValueView>(
         ':scope > condition-item-value-view'
       )
     );

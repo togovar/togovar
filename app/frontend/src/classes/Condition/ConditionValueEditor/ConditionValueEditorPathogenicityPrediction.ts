@@ -57,7 +57,7 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
    * This method saves the current state of the values to allow restoration if needed.
    */
   keepLastValues() {
-    this._valuesElement
+    this.valuesContainerEl
       .querySelectorAll(':scope > condition-item-value-view')
       .forEach((view) => {
         const pv = view.shadowRoot?.querySelector<PredictionValueView>(
@@ -210,22 +210,23 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
     includeUnknown = false
   ) {
     // 既存 valueView を取得 or 作成
-    let valueView = this._valuesElement.querySelector<ConditionItemValueView>(
-      'condition-item-value-view'
-    );
+    let valueView =
+      this.valuesContainerEl.querySelector<ConditionItemValueView>(
+        'condition-item-value-view'
+      );
     if (!valueView) {
       valueView = document.createElement(
         'condition-item-value-view'
       ) as ConditionItemValueView;
       valueView.conditionType = this._conditionType;
-      this._valuesElement.append(valueView);
+      this.valuesContainerEl.append(valueView);
     }
 
     valueView.value = dataset;
     valueView.label = label;
 
     // 内部の prediction-value-view に値を流し込む
-    this._valuesElement
+    this.valuesContainerEl
       .querySelectorAll<ConditionItemValueView>(
         ':scope > condition-item-value-view'
       )

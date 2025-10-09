@@ -51,7 +51,7 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
   // ───────────────────────────────────────────────────────────────────────────
   /** Retain value when changing to edit screen */
   keepLastValues(): void {
-    const valueView = this._valuesElement.querySelector(
+    const valueView = this.valuesContainerEl.querySelector(
       'condition-item-value-view'
     ) as Element & { value?: string; label?: string };
 

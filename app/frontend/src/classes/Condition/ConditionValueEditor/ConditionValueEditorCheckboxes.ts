@@ -101,7 +101,7 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
   /** Save current values so they can be restored on cancel. */
   keepLastValues(): void {
     const views = Array.from(
-      this._valuesElement.querySelectorAll<ConditionItemValueView>(
+      this.valuesContainerEl.querySelectorAll<ConditionItemValueView>(
         ':scope > condition-item-value-view'
       )
     );

@@ -110,11 +110,11 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   /** Capture current rendered value-views as "last confirmed" values. */
   keepLastValues(): void {
     const mgendNodes =
-      this._valuesElement.querySelectorAll<ConditionItemValueView>(
+      this.valuesContainerEl.querySelectorAll<ConditionItemValueView>(
         ':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view'
       );
     const clinvarNodes =
-      this._valuesElement.querySelectorAll<ConditionItemValueView>(
+      this.valuesContainerEl.querySelectorAll<ConditionItemValueView>(
         ':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view'
       );
 
@@ -294,12 +294,12 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
 
     // outer (parent of header and inner wrapper)
     const outer =
-      this._valuesElement.querySelector<HTMLElement>(`.${wrapperClass}`) ??
+      this.valuesContainerEl.querySelector<HTMLElement>(`.${wrapperClass}`) ??
       createEl('div', { class: wrapperClass });
 
     // If it's not in the DOM yet, append it.
     if (!outer.isConnected) {
-      this._valuesElement.append(outer);
+      this.valuesContainerEl.append(outer);
     }
 
     // inner wrapper
@@ -324,7 +324,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
    * This prevents an empty "Clinvar" or "MGeND" header from lingering.
    */
   private _removeConditionWrapper(source: SignificanceSource): void {
-    const outer = this._valuesElement.querySelector<HTMLElement>(
+    const outer = this.valuesContainerEl.querySelector<HTMLElement>(
       `.${source}-wrapper`
     );
     if (outer) outer.remove();
