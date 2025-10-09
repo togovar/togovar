@@ -111,6 +111,11 @@ export class ConditionValueEditor {
     );
   }
 
+  /** Access to the parent condition item view */
+  protected get conditionItemView(): ConditionItemView {
+    return this._conditionItemView;
+  }
+
   /** Access to the condition values component */
   protected get conditionValues(): ConditionValues {
     return this._conditionValues;
