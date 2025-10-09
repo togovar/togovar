@@ -55,14 +55,45 @@ export class FrequencyCountValueView extends LitElement {
         <div class="bar -bar2"></div>
       </div>
       <div class="range">
-        <span class="from">${this.from}</span>
+        <span class="from">${this._formatDisplayValue(this.from)}</span>
         ~
-        <span class="to">${this.to}</span>
+        <span class="to">${this._formatDisplayValue(this.to)}</span>
       </div>
       <p class="filtered" ?hidden=${!this.filtered}>
         Exclude filtered out variants
       </p>
     `;
+  }
+
+  /**
+   * Formats display value based on mode type
+   * For frequency mode, ensures at least one decimal place (e.g., 0.0, 1.0)
+   * For count mode, displays as integer
+   * @param value - The value to format
+   * @returns Formatted string representation
+   */
+  private _formatDisplayValue(value: number | null): string {
+    if (value === null) return '';
+
+    if (this.mode === MODE.frequency) {
+      // For frequency: always show at least 1 decimal place
+      return value.toFixed(Math.max(1, this._getDecimalPlaces(value)));
+    } else {
+      // For count modes: show as integer
+      return value.toString();
+    }
+  }
+
+  /**
+   * Gets the number of decimal places needed to accurately represent a value
+   * @param value - The number to check
+   * @returns Number of decimal places (minimum 1 for frequency)
+   */
+  private _getDecimalPlaces(value: number): number {
+    const str = value.toString();
+    const decimalIndex = str.indexOf('.');
+    if (decimalIndex === -1) return 1; // No decimal point, use 1 decimal place
+    return Math.max(1, str.length - decimalIndex - 1);
   }
 
   /**

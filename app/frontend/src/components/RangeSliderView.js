@@ -389,6 +389,10 @@ class RangeSlider extends HTMLElement {
 
     this.invertChk.addEventListener('change', this._invertChange);
 
+    // Set initial formatted values in input fields
+    this.from.value = this._formatInputValue(this.state.from);
+    this.to.value = this._formatInputValue(this.state.to);
+
     this._fillSlider();
     this._reRenderRuler();
   }
@@ -404,10 +408,32 @@ class RangeSlider extends HTMLElement {
     this.slider1.value = Math.min(this.state.from, this.state.to);
     this.slider2.value = Math.max(this.state.to, this.state.to);
 
-    this.from.value = this.state.from;
-    this.to.value = this.state.to;
+    // Format values to always show at least 1 decimal place (e.g., 0.0, 1.0)
+    this.from.value = this._formatInputValue(this.state.from);
+    this.to.value = this._formatInputValue(this.state.to);
 
     this._fillSlider.call(this);
+  }
+
+  /**
+   * Formats a numeric value for display in input fields
+   * Ensures at least 1 decimal place is shown (e.g., 0.0, 1.0)
+   * @param {number} value - The numeric value to format
+   * @returns {string} Formatted value string
+   */
+  _formatInputValue(value) {
+    const num = parseFloat(value);
+    if (isNaN(num)) return value;
+
+    // Determine the number of decimal places to show
+    // Use at least 1, and preserve existing precision if needed
+    const str = num.toString();
+    const decimalIndex = str.indexOf('.');
+    const currentDecimals =
+      decimalIndex === -1 ? 0 : str.length - decimalIndex - 1;
+    const decimals = Math.max(1, currentDecimals);
+
+    return num.toFixed(decimals);
   }
 
   _toChange = (e) => {
