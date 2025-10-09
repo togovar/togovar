@@ -497,6 +497,9 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
 
   /**
    * Handles count input change events
+   * For count modes (non-frequency), ensures:
+   * - Negative values are converted to 0
+   * - Decimal values are truncated to integers
    * @param e - Change event from count input
    */
   private _handleCountInputChange(e: Event): void {
@@ -505,7 +508,28 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     const currentCondition = this._condition[this._mode] as CountCondition;
     if (currentCondition && key in currentCondition) {
       const value = target.value.trim();
-      currentCondition[key] = value === '' ? null : Number(value);
+
+      if (value === '') {
+        currentCondition[key] = null;
+      } else {
+        let numValue = Number(value);
+
+        // For count modes (not frequency), enforce integer constraints
+        if (this._mode !== MODE.frequency) {
+          // Convert negative values to 0
+          if (numValue < 0) {
+            numValue = 0;
+          }
+          // Truncate decimal values to integers (floor)
+          numValue = Math.floor(numValue);
+
+          // Update the input field to reflect the corrected value
+          target.value = numValue.toString();
+        }
+
+        currentCondition[key] = numValue;
+      }
+
       this._updateErrorMessageVisibility();
       this._update();
     }
