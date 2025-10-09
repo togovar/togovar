@@ -282,11 +282,16 @@ async function _updateAppState() {
         document.body.setAttribute('data-has-conditions', 'true');
       }
       break;
-    case 'advanced':
+    case 'advanced': {
+      const advancedConditions = storeManager.getData(
+        'advancedSearchConditions'
+      );
       document.body.toggleAttribute(
         'data-has-conditions',
-        Object.keys(storeManager.getData('advancedSearchConditions')).length > 0
+        advancedConditions && Object.keys(advancedConditions).length > 0
       );
+      break;
+    }
   }
 
   // まずoffsetを更新して表示位置を確定

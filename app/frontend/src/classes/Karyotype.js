@@ -385,6 +385,10 @@ export default class Karyotype {
   advancedSearchConditions(conditions) {
     const locations = [];
     const takeOutLocations = (conditions) => {
+      // Guard against undefined, null, or non-object values
+      if (!conditions || typeof conditions !== 'object') {
+        return;
+      }
       Object.keys(conditions).forEach((key) => {
         switch (key) {
           case 'or':
