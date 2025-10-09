@@ -142,10 +142,38 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
 
   /**
    * Gets the validation state of the current condition
+   * Validates that:
+   * - At least one value (from or to) is not null
+   * - For count modes: from is not greater than to
    * @returns True if the condition is valid
    */
   get isValid(): boolean {
-    return this._validate();
+    const currentCondition = this._condition[this._mode];
+    if (!currentCondition) {
+      return false;
+    }
+
+    // Check if at least one value is not null
+    const hasValue = Object.values(currentCondition).some(
+      (value) => value !== null
+    );
+    if (!hasValue) {
+      return false;
+    }
+
+    // For count modes, validate that from <= to
+    if (this._mode !== MODE.frequency) {
+      const countCondition = currentCondition as CountCondition;
+      if (
+        countCondition.from !== null &&
+        countCondition.to !== null &&
+        countCondition.from > countCondition.to
+      ) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -536,7 +564,9 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Validates current condition and returns error state
+   * Checks if the current condition has an invalid range (from > to)
+   * This is specifically for showing error messages to the user
+   * @returns True if the range is invalid (from > to for count modes)
    */
   private _isCurrentConditionInvalid(): boolean {
     // Only validate count modes, not frequency mode
@@ -620,7 +650,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
    */
   private _update(): void {
     this._applyConditionToAllViews();
-    this.conditionValues.update(this._validate());
+    this.conditionValues.update(this.isValid);
   }
 
   /**
@@ -702,18 +732,6 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   private _formatFrequencyValue(value: number): number {
     // Round to 2 decimal places to avoid floating point precision issues
     return Math.round(value * 100) / 100;
-  }
-
-  /**
-   * Validates the current condition
-   * @returns True if any condition value is not null
-   */
-  private _validate(): boolean {
-    const currentCondition = this._condition[this._mode];
-    if (!currentCondition) {
-      return false;
-    }
-    return Object.values(currentCondition).some((value) => value !== null);
   }
 
   /**
