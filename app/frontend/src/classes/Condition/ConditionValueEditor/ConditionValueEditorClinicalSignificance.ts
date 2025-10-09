@@ -34,11 +34,14 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   private _clinvarUl?: HTMLUListElement;
 
   /**
-   * @param valuesView Parent view orchestrating editors
+   * @param conditionValues Parent view orchestrating editors
    * @param conditionView Condition row (provides container & meta)
    */
-  constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
-    super(valuesView, conditionView);
+  constructor(
+    conditionValues: ConditionValues,
+    conditionView: ConditionItemView
+  ) {
+    super(conditionValues, conditionView);
 
     // Typed config from JSON (significance is always enumeration with 2 buckets)
     const master = ADVANCED_CONDITIONS.significance;
@@ -48,7 +51,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
 
     // Build section skeleton
     this.createSectionEl('clinical-significance-view', () => [
-      createEl('header', { text: LABELS.selectHeader(this._conditionType) }),
+      createEl('header', { text: LABELS.selectHeader(this.conditionType) }),
       createEl('div', {
         class: 'buttons',
         children: [
@@ -212,7 +215,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     values: ReadonlyArray<EnumerationItem>,
     source: SignificanceSource
   ): EnumerationItem[] {
-    if (this._conditionType === 'significance' && source === 'clinvar') {
+    if (this.conditionType === 'significance' && source === 'clinvar') {
       return values.filter((v) => v.value !== 'NC'); // new mutable array
     }
     return Array.from(values); // mutable copy
@@ -244,7 +247,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     this._renderSource('clinvar', this._values.clinvar);
 
     // Update parent validity
-    this._valuesView.update(this.isValid);
+    this.conditionValues.update(this.isValid);
   }
 
   /**
@@ -273,7 +276,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
       const chip = document.createElement(
         'condition-item-value-view'
       ) as ConditionItemValueView;
-      chip.conditionType = this._conditionType;
+      chip.conditionType = this.conditionType;
       chip.label = v.label;
       chip.value = v.value;
       wrapper.append(chip);

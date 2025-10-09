@@ -93,7 +93,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
       },
     };
     this._mode =
-      this._conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
+      this.conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
 
     this._initializeComponent();
     this._setupEventListeners();
@@ -178,7 +178,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
    * @returns Array of HTML elements
    */
   private _createBodyElements(name: string): HTMLElement[] {
-    if (this._conditionType === 'genotype') {
+    if (this.conditionType === 'genotype') {
       return this._createGenotypeElements(name);
     }
     return this._createDatasetElements(name);
@@ -409,7 +409,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
 
       // Set default selection based on condition type
       const defaultMode =
-        this._conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
+        this.conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
       if (input.value === defaultMode) {
         requestAnimationFrame(() => {
           input.dispatchEvent(new Event('change'));
@@ -519,7 +519,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
    */
   private _update(): void {
     this._applyConditionToAllViews();
-    this._valuesView.update(this._validate());
+    this.conditionValues.update(this._validate());
   }
 
   /**
@@ -570,7 +570,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     const isFiltered = this._filtered?.checked ?? false;
 
     freqCountView.setValues(
-      this._conditionType as 'dataset' | 'genotype',
+      this.conditionType as 'dataset' | 'genotype',
       this._mode,
       currentCondition.from,
       currentCondition.to,

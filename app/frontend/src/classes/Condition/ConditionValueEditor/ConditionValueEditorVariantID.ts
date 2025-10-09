@@ -15,7 +15,7 @@ export class ConditionValueEditorVariantID extends ConditionValueEditor {
 
     // HTML
     this.createSectionEl('text-field-editor-view', () => [
-      createEl('header', { text: `Search for ${this._conditionType}` }),
+      createEl('header', { text: `Search for ${this.conditionType}` }),
       createEl('div', { class: 'body' }),
     ]);
 
@@ -66,7 +66,7 @@ export class ConditionValueEditorVariantID extends ConditionValueEditor {
 
   /** Update validation state for the OK button */
   private _update(): void {
-    this._valuesView.update(this.isValid);
+    this.conditionValues.update(this.isValid);
   }
 
   /** Delete value and _update when value's button.delete is pressed on edit screen */

@@ -13,20 +13,20 @@ const SELECTION_DEPENDED_ON_PARENT = {
 
 export default class ConditionValueEditorColumns extends ConditionValueEditor {
   /**
-   * @param {ConditionValues} valuesView
+   * @param {ConditionValues} conditionValues
    * @param {ConditionItemView} conditionView */
-  constructor(valuesView, conditionView) {
-    super(valuesView, conditionView);
+  constructor(conditionValues, conditionView) {
+    super(conditionValues, conditionView);
 
     this._data = this._prepareData();
     this._selectionDependedOnParent =
-      SELECTION_DEPENDED_ON_PARENT[this._conditionType];
+      SELECTION_DEPENDED_ON_PARENT[this.conditionType];
 
     // HTML
     this.createSectionEl(
       'columns-editor-view',
       `
-    <header>Select ${this._conditionType}</header>
+    <header>Select ${this.conditionType}</header>
     <div class="body">
       <div class="columns"></div>
       <div class="description"></div>
@@ -60,15 +60,17 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
   // private methods
 
   _prepareData() {
-    switch (this._conditionType) {
+    switch (this.conditionType) {
       case CONDITION_TYPE.consequence:
       case CONDITION_TYPE.dataset:
-        return ADVANCED_CONDITIONS[this._conditionType].values.map((value) =>
+        return ADVANCED_CONDITIONS[this.conditionType].values.map((value) =>
           Object.assign({ checked: false }, value)
         );
       case CONDITION_TYPE.disease:
         return [];
     }
+    // Fallback: ensure an array is always returned to avoid undefined
+    return [];
   }
 
   _drawColumn(parentId) {
@@ -91,7 +93,7 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
               <label>
                 <input type="checkbox">
                 ${
-                  this._conditionType === CONDITION_TYPE.dataset
+                  this.conditionType === CONDITION_TYPE.dataset
                     ? `<span class="dataset-icon" data-dataset="${item.value}"></span>`
                     : ''
                 }
@@ -159,8 +161,9 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
   _getItems(parentId) {
     return new Promise((resolve, reject) => {
       // TODO: alt allele, consequence と disease で、取り方が変わる
-      switch (this._conditionType) {
+      switch (this.conditionType) {
         case CONDITION_TYPE.consequence:
+        case CONDITION_TYPE.dataset:
           resolve(this._data.filter((datum) => datum.parent === parentId));
           break;
         default:
@@ -247,7 +250,7 @@ export default class ConditionValueEditorColumns extends ConditionValueEditor {
     });
 
     // validation
-    this._valuesView.update(this._validate());
+    this.conditionValues.update(this._validate());
   }
 
   _validate() {

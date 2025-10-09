@@ -17,9 +17,13 @@ export class ConditionValueEditor {
   private _sectionEl: HTMLElement | null = null;
 
   constructor(
-    protected readonly _valuesView: ConditionValues,
-    protected readonly _conditionView: ConditionItemView
+    private readonly _conditionValues: ConditionValues,
+    private readonly _conditionItemView: ConditionItemView
   ) {}
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // DOM Creation
+  // ───────────────────────────────────────────────────────────────────────────
 
   /** Create an element for the edit screen. */
   protected createSectionEl(
@@ -28,7 +32,7 @@ export class ConditionValueEditor {
   ): HTMLElement {
     const sectionEl = createEl('section', {
       class: className,
-      dataset: { conditionType: String(this._conditionType) },
+      dataset: { conditionType: String(this.conditionType) },
     });
 
     if (typeof content === 'string') {
@@ -48,7 +52,7 @@ export class ConditionValueEditor {
       sectionEl.append(frag);
     }
 
-    this._valuesView.sections.append(sectionEl);
+    this._conditionValues.sections.append(sectionEl);
     this._sectionEl = sectionEl;
     return sectionEl;
   }
@@ -71,7 +75,7 @@ export class ConditionValueEditor {
     if (!valueView) {
       // HTMLElementTagNameMap の拡張が効いていれば、型は自動的に ConditionItemValueView
       valueView = document.createElement('condition-item-value-view');
-      valueView.conditionType = this._conditionType;
+      valueView.conditionType = this.conditionType;
       valueView.deleteButton = showDeleteButton;
       this.valuesContainerEl.append(valueView);
     }
@@ -115,11 +119,17 @@ export class ConditionValueEditor {
 
   /** Access to the parent condition item view */
   protected get conditionItemView(): ConditionItemView {
-    return this._conditionView;
+    return this._conditionItemView;
   }
 
-  protected get _conditionType(): ConditionTypeValue {
-    return this.conditionItemView.conditionType;
+  /** Access to the condition values component */
+  protected get conditionValues(): ConditionValues {
+    return this._conditionValues;
+  }
+
+  /** Get the condition type from the parent view */
+  protected get conditionType(): ConditionTypeValue {
+    return this._conditionItemView.conditionType;
   }
 
   // div.values which is a wrapper for condition-item-value-view

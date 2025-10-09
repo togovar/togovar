@@ -209,6 +209,6 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     }
 
     // validation → enable/disable OK button via host
-    this._valuesView.update(this.isValid);
+    this.conditionValues.update(this.isValid);
   }
 }

@@ -10,7 +10,7 @@ import type { ConditionItemValueView } from '../../../components/ConditionItemVa
  * It renders a list of checkboxes and syncs them with <condition-item-value-view> elements.
  *
  * Assumptions:
- * - `ADVANCED_CONDITIONS[this._conditionType]` is a flat enumeration definition
+ * - `ADVANCED_CONDITIONS[this.conditionType]` is a flat enumeration definition
  *   (i.e., `values` is an array of {value, label}).
  * - Clinical significance (with mgend/clinvar split) should use a different editor class.
  */
@@ -18,8 +18,11 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
   private _checkboxes: HTMLInputElement[] = [];
   private _lastValues: string[] = [];
 
-  constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
-    super(valuesView, conditionView);
+  constructor(
+    conditionValues: ConditionValues,
+    conditionView: ConditionItemView
+  ) {
+    super(conditionValues, conditionView);
 
     // Read the master definition for this condition type and assert it is flat.
     const master = ADVANCED_CONDITIONS.type;
@@ -30,7 +33,7 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
     // Build HTML (template string kept for brevity; safe because values are static text)
     this.createSectionEl('checkboxes-editor-view', () => [
       // <header>Select {type}</header>
-      createEl('header', { text: `Select ${this._conditionType}` }),
+      createEl('header', { text: `Select ${this.conditionType}` }),
 
       // buttons
       createEl('div', {
@@ -138,6 +141,6 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
     });
 
     // Validation: enable/disable OK based on current validity
-    this._valuesView.update(this.isValid);
+    this.conditionValues.update(this.isValid);
   }
 }

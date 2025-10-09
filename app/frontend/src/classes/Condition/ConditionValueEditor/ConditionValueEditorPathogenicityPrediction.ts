@@ -178,8 +178,8 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
       this._includeUnknown
     );
     // ConditionValues に update がある環境のみ呼ぶ
-    if (hasUpdate(this._valuesView)) {
-      this._valuesView.update(this._validate());
+    if (hasUpdate(this.conditionValues)) {
+      this.conditionValues.update(this._validate());
     }
   }
 
@@ -218,7 +218,7 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
       valueView = document.createElement(
         'condition-item-value-view'
       ) as ConditionItemValueView;
-      valueView.conditionType = this._conditionType;
+      valueView.conditionType = this.conditionType;
       this.valuesContainerEl.append(valueView);
     }
 

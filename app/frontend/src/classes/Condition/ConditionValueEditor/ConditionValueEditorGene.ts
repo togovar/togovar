@@ -13,19 +13,22 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
   private _lastValue: string = '';
   private _lastLabel: string = '';
 
-  constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
-    super(valuesView, conditionView);
+  constructor(
+    conditionValues: ConditionValues,
+    conditionItemView: ConditionItemView
+  ) {
+    super(conditionValues, conditionItemView);
 
     // HTML
     this.createSectionEl('text-field-editor-view', () => [
-      createEl('header', { text: `Search for ${this._conditionType}` }),
+      createEl('header', { text: `Search for ${this.conditionType}` }),
       createEl('div', { class: 'body' }),
     ]);
 
     /** @property {HTMLDivElement} _searchFieldView - CustomElement */
     this._searchFieldView = new SearchFieldWithSuggestions(
       'BRCA2',
-      `${API_URL}/api/search/${this._conditionType}`,
+      `${API_URL}/api/search/${this.conditionType}`,
       'term',
       this.bodyEl,
       {
@@ -76,7 +79,7 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     this.addValueView(this._value, this._label, true, false);
 
     // Change whether okbutton can be pressed
-    this._valuesView.update(this.isValid);
+    this.conditionValues.update(this.isValid);
   };
 
   // ───────────────────────────────────────────────────────────────────────────

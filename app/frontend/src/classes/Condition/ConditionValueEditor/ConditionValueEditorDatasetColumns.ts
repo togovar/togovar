@@ -72,7 +72,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
     super(valuesView, conditionView);
 
     this._data = this._dataProcessor.prepareHierarchicalData(
-      this._conditionType
+      this.conditionType
     );
     this._nodesToShowInValueView = [];
 
@@ -150,7 +150,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
    */
   private _initializeUI(): void {
     this.createSectionEl('columns-editor-view', () => [
-      createEl('header', { text: `Select ${this._conditionType}` }),
+      createEl('header', { text: `Select ${this.conditionType}` }),
       createEl('div', {
         class: 'body',
         children: [createEl('div', { class: 'columns' })],
@@ -233,7 +233,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
     return this._renderer.generateColumnList(
       hierarchyItems,
       userIsLoggedIn,
-      this._conditionType
+      this.conditionType
     );
   }
 
@@ -319,7 +319,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
       );
     }
     this._updateValueViews();
-    this._valuesView.update(this.isValid);
+    this.conditionValues.update(this.isValid);
   }
 
   // ───────────────────────────────────────────────────────────────────────────
