@@ -46,6 +46,7 @@ export class FrequencyCountValueView extends LitElement {
 
   /**
    * Generates the HTML template for the component
+   * For invert mode (frequency only), displays two ranges: "0.0~from, to~1.0"
    * @returns TemplateResult for rendering
    */
   render(): TemplateResult {
@@ -54,14 +55,36 @@ export class FrequencyCountValueView extends LitElement {
         <div class="bar -bar1"></div>
         <div class="bar -bar2"></div>
       </div>
-      <div class="range">
-        <span class="from">${this._formatDisplayValue(this.from)}</span>
-        ~
-        <span class="to">${this._formatDisplayValue(this.to)}</span>
-      </div>
+      <div class="range">${this._renderRangeDisplay()}</div>
       <p class="filtered" ?hidden=${!this.filtered}>
         Exclude filtered out variants
       </p>
+    `;
+  }
+
+  /**
+   * Renders the range display based on mode and invert state
+   * @returns Template for the range display
+   */
+  private _renderRangeDisplay(): TemplateResult {
+    // For frequency mode with invert, show two ranges
+    if (this.mode === MODE.frequency && this.invert) {
+      return html`
+        <span class="from">0.0</span>
+        ~
+        <span class="to">${this._formatDisplayValue(this.from)}</span>
+        ,
+        <span class="from">${this._formatDisplayValue(this.to)}</span>
+        ~
+        <span class="to">1.0</span>
+      `;
+    }
+
+    // Default: single range display
+    return html`
+      <span class="from">${this._formatDisplayValue(this.from)}</span>
+      ~
+      <span class="to">${this._formatDisplayValue(this.to)}</span>
     `;
   }
 
