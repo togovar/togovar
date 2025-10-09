@@ -136,7 +136,7 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
       if (checkbox.checked) {
         this.addValueView(checkbox.value, label);
       } else {
-        this._removeValueView(checkbox.value);
+        this.removeValueView(checkbox.value);
       }
     });
 

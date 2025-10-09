@@ -318,7 +318,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
         this._data
       );
     }
-    this._updateValueViews();
+    this._syncValueViewsWithSelection();
     this.conditionValues.update(this.isValid);
   }
 
@@ -369,11 +369,11 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   }
 
   /**
-   * Updates the value views to reflect the current selection state.
+   * Synchronizes the value views with the current selection state.
    * Processes nodes that should be shown, clears existing views, and adds
    * new value views with appropriate labels and paths.
    */
-  protected _updateValueViews(): void {
+  private _syncValueViewsWithSelection(): void {
     this._processNodesToShowInValueView();
 
     // Clear all existing condition value views

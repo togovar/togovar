@@ -57,7 +57,8 @@ export class ConditionValueEditorVariantID extends ConditionValueEditor {
 
   /** Restore the value views before editing if cancel button is pressed */
   restore(): void {
-    this._updateValueViews(this._lastValueViews);
+    this.conditionItemValueViews.forEach((view) => view.remove());
+    this.valuesContainerEl.append(...this._lastValueViews);
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -72,7 +73,7 @@ export class ConditionValueEditorVariantID extends ConditionValueEditor {
   /** Delete value and _update when value's button.delete is pressed on edit screen */
   private _handleDeleteValue(e: CustomEvent<string>): void {
     e.stopPropagation();
-    this._removeValueView(e.detail);
+    this.removeValueView(e.detail);
     this._update();
   }
 

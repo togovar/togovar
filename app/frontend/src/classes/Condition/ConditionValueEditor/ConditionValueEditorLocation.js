@@ -205,7 +205,7 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
         this.addValueView(value, value, true);
       }
     } else {
-      this._removeValueView();
+      this.removeValueView();
     }
 
     // validation → enable/disable OK button via host

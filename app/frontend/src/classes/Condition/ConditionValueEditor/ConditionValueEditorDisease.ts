@@ -91,7 +91,7 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
 
   private _clearSelection(): void {
     if (this._data.id) {
-      this._removeValueView(this._data.id);
+      this.removeValueView(this._data.id);
     }
     this._data = { id: null, label: null };
     this._update();

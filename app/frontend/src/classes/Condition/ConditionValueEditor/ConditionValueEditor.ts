@@ -85,14 +85,8 @@ export class ConditionValueEditor {
     return valueView;
   }
 
-  /** Remove current condition value views and add last value views. (for variant id) */
-  protected _updateValueViews(lastValueViews: ConditionItemValueView[]): void {
-    this.conditionItemValueViews.forEach((view) => view.remove());
-    this.valuesContainerEl.append(...lastValueViews);
-  }
-
   /** Delete if argument value contains a value */
-  protected _removeValueView(value: string): void {
+  protected removeValueView(value: string): void {
     const selector = value ? `[data-value="${value}"]` : '';
     const view = selectOrNull<ConditionItemValueView>(
       this.valuesContainerEl,
