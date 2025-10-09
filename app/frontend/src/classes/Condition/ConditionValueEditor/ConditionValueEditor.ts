@@ -117,11 +117,6 @@ export class ConditionValueEditor {
     );
   }
 
-  /** Access to the parent condition item view */
-  protected get conditionItemView(): ConditionItemView {
-    return this._conditionItemView;
-  }
-
   /** Access to the condition values component */
   protected get conditionValues(): ConditionValues {
     return this._conditionValues;
@@ -134,7 +129,7 @@ export class ConditionValueEditor {
 
   // div.values which is a wrapper for condition-item-value-view
   protected get valuesContainerEl(): HTMLDivElement {
-    return this.conditionItemView.valuesContainerEl;
+    return this._conditionItemView.valuesContainerEl;
   }
 
   /** Get all condition item value views. */
