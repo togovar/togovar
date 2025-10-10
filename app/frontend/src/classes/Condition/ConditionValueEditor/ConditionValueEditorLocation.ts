@@ -1,6 +1,8 @@
 import { storeManager } from '../../../store/StoreManager';
-import { ConditionValueEditor } from './ConditionValueEditor.ts';
+import { ConditionValueEditor } from './ConditionValueEditor';
 import { createEl } from '../../../utils/dom/createEl';
+import type ConditionValues from '../ConditionValues';
+import type { ConditionItemView } from '../ConditionItemView';
 import '../../../components/ConditionItemValueView';
 
 const OPTIONS = [
@@ -12,12 +14,19 @@ const OPTIONS = [
 ];
 
 export class ConditionValueEditorLocation extends ConditionValueEditor {
-  /**
-   * @param {ConditionValues} valuesView
-   * @param {ConditionItemView} conditionView
-   */
-  constructor(valuesView, conditionView) {
-    super(valuesView, conditionView);
+  private _checkboxInputEl!: HTMLInputElement;
+  private _chrEl!: HTMLSelectElement;
+  private _startEl!: HTMLInputElement;
+  private _endEl!: HTMLInputElement;
+  private _rangeInputView!: HTMLSpanElement;
+  private _karyotype: unknown;
+  private _isWhole: boolean = false;
+
+  constructor(
+    conditionValues: ConditionValues,
+    conditionItemView: ConditionItemView
+  ) {
+    super(conditionValues, conditionItemView);
 
     // HTML
     const row1 = createEl('div', {
@@ -25,7 +34,7 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
       children: [
         createEl('label', {
           children: [
-            (this._checkboxInput = createEl('input', {
+            (this._checkboxInputEl = createEl('input', {
               attrs: {
                 type: 'checkbox',
                 name: 'range-or-position',
@@ -48,16 +57,16 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
             createEl('span', {
               class: 'form',
               children: [
-                (this._chr = createEl('select', {
+                (this._chrEl = createEl('select', {
                   children: OPTIONS.map((value) =>
                     createEl('option', { attrs: { value }, text: value })
                   ),
                 })),
               ],
             }),
-            createEl('span', { class: 'label', text: ':' }),
           ],
         }),
+        createEl('span', { class: 'label', text: ':' }),
         createEl('label', {
           class: 'position',
           children: [
@@ -65,12 +74,12 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
               class: ['form', 'range-inputs-view'],
               dataset: { type: 'region' },
               children: [
-                (this._start = createEl('input', {
+                (this._startEl = createEl('input', {
                   class: 'start',
                   attrs: { type: 'number', min: '1' },
                 })),
                 createEl('span', { class: 'line' }),
-                (this._end = createEl('input', {
+                (this._endEl = createEl('input', {
                   class: 'end',
                   attrs: { type: 'number', min: '1' },
                 })),
@@ -87,18 +96,19 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
     ]);
 
     // references
-    const inputs = [this._start, this._end];
+    const inputs = [this._startEl, this._endEl];
     this._isWhole = false;
 
     // events
-    this._checkboxInput.addEventListener('change', (e) => {
-      this._rangeInputView.dataset.type = e.target.checked
+    this._checkboxInputEl.addEventListener('change', (e) => {
+      const target = e.target as HTMLInputElement;
+      this._rangeInputView.dataset.type = target.checked
         ? 'single_position'
         : 'region';
       this._update();
     });
 
-    [this._chr, ...inputs].forEach((input) => {
+    [this._chrEl, ...inputs].forEach((input) => {
       input.addEventListener('change', (e) => {
         this._update(e);
       });
@@ -132,17 +142,17 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
   }
 
   get isValid() {
-    if (this._chr.value === '') return false;
+    if (this._chrEl.value === '') return false;
 
     switch (this._rangeInputView.dataset.type) {
       case 'region':
         return (
-          this._start.value !== '' &&
-          this._end.value !== '' &&
-          +this._start.value < +this._end.value
+          this._startEl.value !== '' &&
+          this._endEl.value !== '' &&
+          +this._startEl.value < +this._endEl.value
         );
       case 'single_position':
-        return this._start.value !== '';
+        return this._startEl.value !== '';
       default:
         return false;
     }
@@ -156,7 +166,7 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
    * Read existing value view (if any) and prefill UI controls.
    * Expected format: "chr:start-end" or "chr:start"
    */
-  _prefillFromViews() {
+  private _prefillFromViews() {
     const vv = this.conditionItemValueViews?.[0];
     const raw = vv?.value || vv?.label;
     if (!raw || typeof raw !== 'string') return;
@@ -167,49 +177,75 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
 
     const [, chr, start, end] = m;
     // set fields
-    if (OPTIONS.includes(chr)) this._chr.value = chr;
-    this._start.value = start;
+    if (OPTIONS.includes(chr)) this._chrEl.value = chr;
+    this._startEl.value = start;
     if (end) {
       this._rangeInputView.dataset.type = 'region';
-      this._end.value = end;
+      this._endEl.value = end;
     } else {
       this._rangeInputView.dataset.type = 'single_position';
-      this._end.value = '';
+      this._endEl.value = '';
     }
   }
 
   /**
    * Recompute UI → value view(s), apply validation, and notify host.
    */
-  _update(e) {
+  private _update(e?: Event) {
     // update range max by chromosome change
-    const ref = this._karyotype?.reference;
-    const endMax =
-      ref &&
-      this._karyotype?.chromosomes?.[this._chr.value]?.region?.[ref]?.[1];
+    // Safely narrow _karyotype to expected shape
+    const k = this._karyotype as
+      | { reference?: string; chromosomes?: unknown }
+      | undefined;
+    const ref = k?.reference;
+    let endMax: number | undefined = undefined;
+    if (ref && k?.chromosomes && typeof k.chromosomes === 'object') {
+      const chrEntry = (k.chromosomes as Record<string, unknown>)[
+        this._chrEl.value
+      ];
+      if (
+        chrEntry &&
+        typeof chrEntry === 'object' &&
+        'region' in (chrEntry as Record<string, unknown>)
+      ) {
+        const regionObj = (chrEntry as Record<string, unknown>).region as
+          | unknown
+          | undefined;
+        if (
+          regionObj &&
+          typeof regionObj === 'object' &&
+          (regionObj as Record<string, unknown>)[ref] &&
+          Array.isArray((regionObj as Record<string, unknown>)[ref])
+        ) {
+          endMax = (
+            (regionObj as Record<string, unknown>)[ref] as unknown[]
+          )[1] as number | undefined;
+        }
+      }
+    }
 
-    if (e?.target === this._chr && endMax) {
+    if (e?.target === this._chrEl && endMax) {
       // reset input constraints when chromosome changes
-      this._start.max = endMax;
-      this._end.max = endMax;
+      this._startEl.max = String(endMax);
+      this._endEl.max = String(endMax);
 
-      if (this._isWhole) this._end.value = endMax;
+      if (this._isWhole) this._endEl.value = String(endMax);
 
-      if (this._start.value === '') {
-        this._start.value = 1;
+      if (this._startEl.value === '') {
+        this._startEl.value = '1';
         this._isWhole = true;
-      } else if (+this._start.value > endMax) {
-        this._start.value = endMax;
+      } else if (+this._startEl.value > endMax) {
+        this._startEl.value = String(endMax);
       }
 
-      if (this._end.value === '') {
-        this._end.value = endMax;
+      if (this._endEl.value === '') {
+        this._endEl.value = String(endMax);
         this._isWhole = true;
-      } else if (+this._end.value > endMax) {
-        this._end.value = endMax;
+      } else if (+this._endEl.value > endMax) {
+        this._endEl.value = String(endMax);
         this._isWhole = true;
       }
-    } else if (endMax && +this._end.value < endMax) {
+    } else if (endMax && +this._endEl.value < endMax) {
       this._isWhole = false;
     }
 
@@ -217,8 +253,8 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
     const vv = this.conditionItemValueViews[0];
     if (this.isValid) {
       const asRegion = this._rangeInputView.dataset.type === 'region';
-      const value = `${this._chr.value}:${this._start.value}${
-        asRegion ? `-${this._end.value}` : ''
+      const value = `${this._chrEl.value}:${this._startEl.value}${
+        asRegion ? `-${this._endEl.value}` : ''
       }`;
 
       if (vv) {
@@ -228,7 +264,8 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
         this.addValueView(value, value, true);
       }
     } else {
-      this.removeValueView();
+      // remove any existing value view
+      this.removeValueView('');
     }
 
     // validation → enable/disable OK button via host
