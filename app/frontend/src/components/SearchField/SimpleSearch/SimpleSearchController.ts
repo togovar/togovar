@@ -1,7 +1,7 @@
 import { setSimpleSearchCondition } from '../../../store/searchManager';
 import { storeManager } from '../../../store/StoreManager';
 import { CHROMOSOME_PATTERN } from './SimpleSearchConstants';
-import {
+import type {
   SimpleSearchHost,
   SuggestionItem,
   ExampleItem,

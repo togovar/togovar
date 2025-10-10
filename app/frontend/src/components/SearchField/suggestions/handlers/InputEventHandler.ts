@@ -1,4 +1,4 @@
-import { SearchFieldHost } from '../SearchFieldWithSuggestions';
+import type { SearchFieldHost } from '../SearchFieldWithSuggestions';
 
 /** InputEventHandler - 入力イベントの処理とフォーカス管理を担当するクラス */
 export class InputEventHandler {
@@ -20,7 +20,7 @@ export class InputEventHandler {
       const target = e.target as HTMLInputElement;
       inputValue = target?.value || '';
     }
-    
+
     this.host.term = inputValue;
 
     // ユーザーが入力を行ったことを記録

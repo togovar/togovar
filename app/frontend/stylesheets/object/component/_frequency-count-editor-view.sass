@@ -8,11 +8,11 @@
           margin-bottom: 4px
           > span
             font-weight: bold
-        > .input
+        > .input, .input-container
           opacity: .4
           pointer-events: none
         &.-current
-          > .input
+          > .input, .input-container
             opacity: 1
             pointer-events: auto
       &.frequency
@@ -22,8 +22,18 @@
               position: absolute
               left: 368px
       &.count
-        > .input
-          > input
-            width: 5em
-            margin-right: 3px
-            +input-number
+        > .input-container
+          display: flex
+          align-items: center
+          column-gap: 2em
+          > .input
+            > input
+              width: 5em
+              margin-right: 3px
+              +input-number
+          > .messages-view
+            &.-hidden
+              display: none
+            > .message
+              padding: 1px 6px 1px 20px
+              margin-bottom: 0

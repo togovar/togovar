@@ -1,4 +1,7 @@
-import { SuggestionData, SearchFieldHost } from '../SearchFieldWithSuggestions';
+import type {
+  SuggestionData,
+  SearchFieldHost,
+} from '../SearchFieldWithSuggestions';
 
 /**
  * SuggestionSelectionHandler - サジェストの選択と検索実行を担当するクラス
@@ -91,21 +94,21 @@ export class SuggestionSelectionHandler {
 
   /**
    * サジェスト値を適切にフォーマットする
-   * 
+   *
    * SimpleSearchモード（複数カラム）の場合：
    * - ダブルクォートで囲む（完全一致検索のため）
    * - 複数の検索対象（遺伝子、疾患など）が混在するため、明示的な区切りが必要
-   * 
+   *
    * 特定検索モード（gene, diseaseなど単一カラム）の場合：
    * - クォートなし（部分一致検索を許可）
    * - 検索対象が特定されているため、より柔軟な検索が可能
-   * 
+   *
    * @param value - フォーマットする値
    * @returns フォーマットされた値
    */
   private _formatSuggestionValue(value: string): string {
     const escapedValue = this._escapeString(value);
-    
+
     if (this._hasMultipleSuggestionColumns()) {
       // SimpleSearchモード: ダブルクォートで囲んで完全一致検索
       return `"${escapedValue}"`;

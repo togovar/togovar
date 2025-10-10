@@ -1,5 +1,5 @@
 import { directive, AsyncDirective } from 'lit/async-directive.js';
-import { PartInfo } from 'lit/directive.js';
+import type { PartInfo } from 'lit/directive.js';
 
 /** 表示可能領域の情報 */
 interface ViewableArea {

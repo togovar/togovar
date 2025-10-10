@@ -1,15 +1,16 @@
-import { LitElement, html, nothing, TemplateResult } from 'lit';
+import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import './FrequencyCountValueView'; // for embedding
 import './ConditionPathogenicityPredictionSearch/PredictionValueView'; // for embedding
+import type { ConditionTypeValue } from '../definition';
 import Style from '../../stylesheets/object/component/condition-item-value-view.scss';
 
 @customElement('condition-item-value-view')
-class ConditionItemValueView extends LitElement {
+export class ConditionItemValueView extends LitElement {
   static styles = [Style];
 
   @property({ type: String }) label: string = '';
-  @property({ type: String }) conditionType: string = '';
+  @property({ type: String }) conditionType: ConditionTypeValue | undefined;
   @property({ type: String }) value: string = '';
   @property({ type: Boolean }) deleteButton: boolean = false;
 
@@ -19,6 +20,7 @@ class ConditionItemValueView extends LitElement {
       new CustomEvent('delete-condition-item', {
         detail: this.value,
         bubbles: true,
+        composed: true,
       })
     );
   }
@@ -26,40 +28,45 @@ class ConditionItemValueView extends LitElement {
   // Render the UI as a function of component state
   render(): TemplateResult {
     if (this.dataset) {
-      this.dataset.conditionType = this.conditionType;
-      this.dataset.value = this.value;
+      if (this.conditionType) {
+        this.dataset.conditionType = this.conditionType;
+      }
+      this.dataset.value = this.value ?? '';
     }
 
-    let option: TemplateResult | string = '';
+    // empty is nothing
+    let option: TemplateResult | typeof nothing = nothing;
+
     if (this.conditionType === 'dataset' || this.conditionType === 'genotype') {
-      option = html`<frequency-count-value-view
-        data-dataset="${this.value}"
-      ></frequency-count-value-view>`;
+      option = html`
+        <frequency-count-value-view data-dataset="${this.value}">
+        </frequency-count-value-view>
+      `;
+    } else if (this.conditionType === 'pathogenicity_prediction') {
+      option = html`
+        <prediction-value-view data-dataset="${this.value}">
+        </prediction-value-view>
+      `;
     }
-    if (this.conditionType === 'pathogenicity_prediction') {
-      option = html` <prediction-value-view
-        data-dataset=${this.value}
-      ></prediction-value-view>`;
-    }
+
     return html`
       <div class="condition-item-value-container">
         <span
           class="inner"
-          data-condition-type="${this.conditionType}"
-          data-value=${this.value}
+          data-condition-type="${this.conditionType ?? ''}"
+          data-value="${this.value}"
         >
-          ${this.label}${this.deleteButton
+          ${this.label}
+          ${this.deleteButton
             ? html`<button
                 class="delete"
                 part="delete-tag-btn"
                 @click=${this._handleDelete}
               ></button>`
-            : nothing}</span
-        >
+            : nothing}
+        </span>
         ${option}
       </div>
     `;
   }
 }
-
-export default ConditionItemValueView;

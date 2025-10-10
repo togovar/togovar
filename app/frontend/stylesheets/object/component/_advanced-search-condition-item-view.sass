@@ -37,7 +37,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2)
         margin: #{calc(($HEIGHT - $HEIGHT-RELATION) / 2)} #{calc(-1 * $HEIGHT-RELATION / 2)}
         width: $HEIGHT_RELATION
         min-width: $HEIGHT_RELATION
-      > .values
+      > .values-container
         flex-grow: 1
         padding: var(--padding-values-vertical) $CORNER_RADIUS var(--padding-values-vertical) 16px
         flex-wrap: wrap
@@ -96,7 +96,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2)
         > .buttons
           opacity: 0
           pointer-events: none
-        > .values
+        > .values-container
           > condition-item-value-view::part(delete-tag-btn)
             display: inline-block
 
@@ -141,7 +141,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2)
             transform: rotate(-20deg)
             top: 2px
             left: 6.5px
-  &.-selected
+  &[aria-selected="true"]
     &::after
       content: ""
       display: block
@@ -156,7 +156,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2)
   &[data-classification="significance"]
     > .body
       > .summary
-        > .values
+        > .values-container
           > .mgend-wrapper
             display: flex
             > span

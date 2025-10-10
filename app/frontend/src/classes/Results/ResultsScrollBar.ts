@@ -1,159 +1,80 @@
 import { storeManager } from '../../store/StoreManager';
-import { TR_HEIGHT } from '../../global.js';
-
-// ================================================================
-// CONSTANTS & TYPES
-// ================================================================
-
-const RELEASE_DURATION = 2000;
-const MIN_SCROLLBAR_HEIGHT = 30;
-
-/**
- * Represents the state of a drag operation
- */
-interface DragState {
-  isDragging: boolean;
-  startY: number;
-  startTop: number;
-}
+import { TR_HEIGHT } from '../../global';
+import type { DragEventUI, StoreState } from '../../types';
+import {
+  calculateNewScrollPosition,
+  constrainRowOffsetToValidRange,
+  calculateTouchBasedRowOffset,
+  convertScrollPositionToRowOffset,
+  calculateScrollbarDimensions,
+  ScrollBarRenderer,
+  DragManager,
+} from './scroll';
 
 /**
- * UI object for drag events containing position information
- */
-interface DragEventUI {
-  position: {
-    top: number;
-  };
-}
-
-/**
- * Scroll calculation result type
- */
-type ScrollCalculation = {
-  totalHeight: number;
-  availableScrollY: number;
-  newScrollPosition: number;
-};
-
-/**
- * ScrollBar calculation result type
- */
-type ScrollBarCalculation = {
-  barHeight: number;
-  barTop: number;
-  displayRate: number;
-};
-
-/**
- * Scroll bounds type
- */
-type ScrollBounds = {
-  min: number;
-  max: number;
-};
-
-// ================================================================
-// MAIN CLASS
-// ================================================================
-
-/**
- * Results専用スクロールバーコンポーネント
+ * Specialized scrollbar component for Results display (Refactored Version)
  *
  * ## Features
- * - Results表示に特化したスクロール処理
- * - マウス・タッチドラッグ対応
- * - 自動位置計算とフィードバック
- * - パフォーマンス最適化済み
+ * - Scroll processing specialized for Results display
+ * - Mouse and touch drag support
+ * - Automatic position calculation and feedback
+ * - Performance optimized
+ * - Modular design with separation of concerns
  *
  * ## Usage
  * ```typescript
  * const scrollbar = new ResultsScrollBar(containerElement);
  * ```
  */
-export default class ResultsScrollBar {
-  // ================================================================
-  // PROPERTIES
-  // ================================================================
+export class ResultsScrollBar {
+  // Core dom elements
+  private readonly _container: HTMLElement;
+  private readonly _scrollBarElement: HTMLElement;
+  private readonly _positionLabel: HTMLElement;
+  private readonly _totalLabel: HTMLElement;
 
-  /** Container element for the scrollbar */
-  private readonly container: HTMLElement;
-  /** Main scrollbar element */
-  private readonly scrollBarElement: HTMLElement;
-  /** Display element for current position */
-  private readonly positionDisplay: HTMLElement;
-  /** Display element for total count */
-  private readonly totalDisplay: HTMLElement;
+  // State management
+  private _lastScrollPosition: number = 0;
 
-  /** Timeout ID for delayed release of visual states */
-  private releaseTimeoutId: number | undefined;
-  /** State object for mouse drag operations */
-  private mouseDragState: DragState | undefined;
-  /** Flag indicating if touch dragging is active */
-  private isTouchDragging: boolean = false;
-  /** Initial Y coordinate for touch drag */
-  private touchStartY: number = 0;
-  /** Initial top position for touch drag */
-  private touchStartTop: number = 0;
-  /** Last scroll position for delta calculations */
-  private lastScrollPosition: number = 0;
-
-  // ================================================================
-  // CONSTRUCTOR & INITIALIZATION
-  // ================================================================
+  // Component dependencies
+  private readonly _renderer: ScrollBarRenderer;
+  private readonly _dragManager: DragManager;
 
   /**
    * Creates a new ResultsScrollBar instance
    * @param containerElement - The container element where the scrollbar will be inserted
    */
   constructor(containerElement: HTMLElement) {
-    this.container = containerElement;
+    this._container = containerElement;
 
-    this._createScrollBarHTML();
+    // Create HTML structure
+    ScrollBarRenderer.createScrollBarHTML(this._container);
 
-    const elements = this._getRequiredElements();
-    this.scrollBarElement = elements.scrollBar;
-    this.positionDisplay = elements.position;
-    this.totalDisplay = elements.total;
+    // Get DOM elements
+    const { scrollBar, position, total } = ScrollBarRenderer.initializeElements(
+      this._container
+    );
+    this._scrollBarElement = scrollBar;
+    this._positionLabel = position;
+    this._totalLabel = total;
+
+    // Initialize components
+    this._renderer = new ScrollBarRenderer(
+      this._container,
+      this._scrollBarElement,
+      this._positionLabel,
+      this._totalLabel
+    );
+    this._dragManager = new DragManager({
+      scrollBarElement: this._scrollBarElement,
+      container: this._container,
+      onDragCallback: this._handleDrag.bind(this),
+      onVisualStateChange: this._handleVisualStateChange.bind(this),
+    });
 
     this._bindStoreEvents();
-    this._initializeDragFunctionality();
-  }
-
-  /**
-   * Creates the HTML structure for the scrollbar
-   */
-  private _createScrollBarHTML(): void {
-    this.container.insertAdjacentHTML(
-      'beforeend',
-      `
-      <div class="bar">
-        <div class="indicator">
-          <span class="position">1</span>
-          <span class="total"></span>
-        </div>
-      </div>
-      `
-    );
-  }
-
-  /**
-   * Gets and validates required DOM elements
-   */
-  private _getRequiredElements() {
-    const scrollBar = this.container.querySelector('.bar') as HTMLElement;
-    if (!scrollBar) {
-      throw new Error('ScrollBar element (.bar) not found');
-    }
-
-    const position = scrollBar.querySelector('.position') as HTMLElement;
-    const total = scrollBar.querySelector('.total') as HTMLElement;
-    if (!position || !total) {
-      throw new Error(
-        'Required indicator elements (.position, .total) not found'
-      );
-    }
-
-    return { scrollBar, position, total };
+    this._renderer.resetCursorStyle();
+    this._dragManager.initializeDragManager();
   }
 
   /**
@@ -165,91 +86,101 @@ export default class ResultsScrollBar {
     storeManager.bind('rowCount', this);
   }
 
-  /**
-   * Initializes drag functionality based on device capabilities
-   */
-  private _initializeDragFunctionality(): void {
-    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      this._initializeMouseDrag();
-    }
-    this._initializeTouchDrag();
-  }
-
   // ================================================================
-  // PUBLIC API - Store Event Handlers
+  // Store Event Handlers
   // ================================================================
 
   /**
-   * Handles drag operation and updates the scroll position in store
-   * @param e - The original event (can be null for programmatic calls)
-   * @param ui - Object containing the drag position information
-   */
-  onDrag(e: Event | null, ui: DragEventUI): void {
-    const rowCount = storeManager.getData('rowCount') as number;
-    const numberOfRecords = storeManager.getData('numberOfRecords') as number;
-    const availableHeight =
-      rowCount * TR_HEIGHT - this.scrollBarElement.offsetHeight * 0;
-    const offsetRate = ui.position.top / availableHeight;
-
-    let offset = Math.ceil(offsetRate * numberOfRecords);
-    offset = offset < 0 ? 0 : offset;
-    offset =
-      offset + rowCount > numberOfRecords ? numberOfRecords - rowCount : offset;
-
-    storeManager.setData('offset', offset);
-    this._scheduleVisualStateRelease();
-  }
-
-  /**
-   * Updates the displayed position when the offset changes
+   * Store event handler: Called when offset value changes
+   * Updates the displayed position and synchronizes scrollbar appearance
    * @param offset - The new offset value (0-based index)
    */
   offset(offset: number): void {
-    this.positionDisplay.textContent = (offset + 1).toString();
-    this._updateScrollBarAppearance();
+    this._renderer.updatePositionLabel(offset);
+    this._synchronizeScrollBarWithStore();
 
     // Maintain active state on touch devices
     if (
       window.matchMedia('(hover: none) and (pointer: coarse)').matches &&
-      this.container.classList.contains('-active')
+      this._container.classList.contains('-active')
     ) {
       return;
     }
   }
 
   /**
-   * Updates the total number of records displayed
-   * @param numberOfRecords - The total count of records
+   * Store event handler: Called when the total record count changes
+   *
+   * This method is automatically invoked by StoreManager when the 'numberOfRecords'
+   * state value changes. It updates the total count display and synchronizes the
+   * scrollbar appearance to reflect the new dataset size.
+   *
+   * @param numberOfRecords - The new total count of records in the dataset
    */
   numberOfRecords(numberOfRecords: number): void {
-    this.totalDisplay.textContent = numberOfRecords.toLocaleString();
-    this._updateScrollBarAppearance();
+    this._renderer.updateTotalLabel(numberOfRecords);
+    this._synchronizeScrollBarWithStore();
   }
 
   /**
-   * Handles row count changes and triggers a UI update
+   * Store event handler: Called when the visible row count changes
+   *
+   * This method is automatically invoked by StoreManager when the 'rowCount'
+   * state value changes. It triggers a UI update to recalculate scrollbar
+   * dimensions based on the new viewport size.
    */
   rowCount(): void {
-    this._updateScrollBarAppearance();
+    this._synchronizeScrollBarWithStore();
   }
 
   // ================================================================
-  // PUBLIC API - Results-specific methods
+  // Visual State Management
   // ================================================================
 
   /**
-   * Deactivate the scrollbar visual state
+   * Deactivates the scrollbar visual state
    */
-  deactivate(): void {
-    this.container.classList.remove('-active');
+  setInactive(): void {
+    this._renderer.setInactive();
   }
 
   /**
-   * Initialize scrollbar position
+   * Activates the scrollbar visual state
    */
-  initializePosition(): void {
-    this.container.classList.add('-active');
+  setActive(): void {
+    this._renderer.setActive();
   }
+
+  // ================================================================
+  // Lifecycle Management
+  // ================================================================
+
+  /**
+   * Clean up all resources and prevent memory leaks
+   * Call this method when the scrollbar component is no longer needed
+   */
+  destroy(): void {
+    // DragManager cleanup
+    this._dragManager.destroyDragManager();
+
+    // Unbind StoreManager event bindings
+    storeManager.unbind('offset', this);
+    storeManager.unbind('numberOfRecords', this);
+    storeManager.unbind('rowCount', this);
+
+    // Renderer timer cleanup
+    this._renderer.clearAllTimeouts();
+
+    // Remove the inner scrollbar element
+    const scrollBarElement = this._container.querySelector('.bar');
+    if (scrollBarElement) {
+      scrollBarElement.remove();
+    }
+  }
+
+  // ================================================================
+  // Scroll Handling
+  // ================================================================
 
   /**
    * Handle scroll with scrollbar feedback (for touch events)
@@ -257,13 +188,27 @@ export default class ResultsScrollBar {
    * @param touchStartOffset - Starting offset when touch began
    */
   handleScrollWithFeedback(deltaY: number, touchStartOffset: number): void {
-    const newOffset = this._calculateTouchScrollOffset(
-      deltaY,
-      touchStartOffset
-    );
-    const boundedOffset = this._clampOffsetToValidRange(newOffset);
+    const visibleRowCount = this._getStoreData('rowCount', 0);
+    const totalRecordCount = this._getStoreData('numberOfRecords', 0);
 
-    this.lastScrollPosition = boundedOffset * TR_HEIGHT;
+    // Early return if data is invalid
+    if (visibleRowCount <= 0 || totalRecordCount <= 0) {
+      return;
+    }
+
+    const newOffset = calculateTouchBasedRowOffset(
+      deltaY,
+      touchStartOffset,
+      visibleRowCount,
+      totalRecordCount
+    );
+    const boundedOffset = constrainRowOffsetToValidRange(
+      newOffset,
+      visibleRowCount,
+      totalRecordCount
+    );
+
+    this._lastScrollPosition = boundedOffset * TR_HEIGHT;
     storeManager.setData('offset', boundedOffset);
     this.updateDirectly(boundedOffset);
   }
@@ -273,14 +218,27 @@ export default class ResultsScrollBar {
    * @param deltaY - Y delta value
    */
   handleScroll(deltaY: number): void {
-    const calculation = this._calculateScrollPosition(deltaY);
+    const totalRecordCount = this._getStoreData('numberOfRecords', 0);
+    const visibleRowCount = this._getStoreData('rowCount', 0);
 
-    if (calculation.newScrollPosition === this.lastScrollPosition) {
+    // Early return if data is invalid
+    if (visibleRowCount <= 0 || totalRecordCount <= 0) {
       return;
     }
 
-    this.lastScrollPosition = calculation.newScrollPosition;
-    const offset = this._calculateOffsetFromScroll(this.lastScrollPosition);
+    const calculation = calculateNewScrollPosition(
+      deltaY,
+      this._lastScrollPosition,
+      totalRecordCount,
+      visibleRowCount
+    );
+
+    if (calculation.newScrollPosition === this._lastScrollPosition) {
+      return;
+    }
+
+    this._lastScrollPosition = calculation.newScrollPosition;
+    const offset = convertScrollPositionToRowOffset(this._lastScrollPosition);
     storeManager.setData('offset', offset);
   }
 
@@ -289,374 +247,137 @@ export default class ResultsScrollBar {
    * @param offset - Offset value
    */
   updateDirectly(offset: number): void {
-    const calculation = this._calculateScrollBarPosition(offset);
-    this._applyScrollBarStyles(this.scrollBarElement, calculation, offset);
-  }
+    const visibleRowCount = this._getStoreData('rowCount', 0);
+    const totalRecordCount = this._getStoreData('numberOfRecords', 0);
 
-  // ================================================================
-  // PRIVATE - Visual Updates
-  // ================================================================
-
-  /**
-   * Updates the scrollbar appearance based on current data store values
-   */
-  private _updateScrollBarAppearance(): void {
-    const offset = storeManager.getData('offset') as number;
-    const rowCount = storeManager.getData('rowCount') as number;
-    const numberOfRecords = storeManager.getData('numberOfRecords') as number;
-
-    const totalHeight = numberOfRecords * TR_HEIGHT;
-    const offsetHeight = offset * TR_HEIGHT;
-    const displayHeight = rowCount * TR_HEIGHT;
-    const displayRate = displayHeight / totalHeight;
-
-    let barHeight = Math.ceil(displayHeight * displayRate);
-    barHeight =
-      barHeight < MIN_SCROLLBAR_HEIGHT ? MIN_SCROLLBAR_HEIGHT : barHeight;
-
-    const availableHeight = displayHeight - barHeight * 0;
-    const availableRate = availableHeight / totalHeight;
-    const barTop = Math.ceil(offsetHeight * availableRate);
-
-    this.scrollBarElement.style.height = `${barHeight}px`;
-    this.scrollBarElement.style.top = `${barTop}px`;
-    this._scheduleVisualStateRelease();
-
-    if (rowCount === 0 || numberOfRecords === rowCount) {
-      this.scrollBarElement.classList.add('-disabled');
-    } else {
-      this.scrollBarElement.classList.remove('-disabled');
+    // Early return if data is invalid
+    if (visibleRowCount <= 0 || totalRecordCount <= 0) {
+      return;
     }
-  }
 
-  /**
-   * Schedules delayed release of visual dragging state
-   */
-  private _scheduleVisualStateRelease(): void {
-    if (this.releaseTimeoutId !== undefined) {
-      window.clearTimeout(this.releaseTimeoutId);
-    }
-    this.releaseTimeoutId = window.setTimeout(
-      this._releaseVisualState.bind(this),
-      RELEASE_DURATION
+    const calculation = calculateScrollbarDimensions(
+      offset,
+      visibleRowCount,
+      totalRecordCount
     );
-    this.container.classList.add('-dragging');
+    this._renderer.applyScrollBarStyles(calculation, offset);
   }
 
   /**
-   * Removes the dragging visual state from the scrollbar
+   * Reset the scroll position to the initial state
    */
-  private _releaseVisualState(): void {
-    this.container.classList.remove('-dragging');
+  resetScrollPosition(): void {
+    this._lastScrollPosition = 0;
+    this.updateDirectly(0);
   }
 
   // ================================================================
-  // PRIVATE - Scroll Calculations (integrated from ScrollHandler)
+  // Data Access & Validation
   // ================================================================
 
   /**
-   * Calculate scroll position
+   * Safely retrieves store data with validation
+   * @param key - Store key to retrieve
+   * @param defaultValue - Default value if data is invalid
+   * @returns The store value or default value
    */
-  private _calculateScrollPosition(deltaY: number): ScrollCalculation {
-    const numberOfRecords = storeManager.getData('numberOfRecords') as number;
-    const rowCount = storeManager.getData('rowCount') as number;
+  private _getStoreData<T>(key: keyof StoreState, defaultValue: T): T {
+    const value = storeManager.getData<T>(key);
+    return typeof value === 'number' && value >= 0 ? value : defaultValue;
+  }
 
-    const totalHeight = numberOfRecords * TR_HEIGHT;
-    let availableScrollY = totalHeight - rowCount * TR_HEIGHT;
-    availableScrollY = Math.max(0, availableScrollY);
-
-    const newScrollPosition = this._clampScrollPosition(
-      this.lastScrollPosition + deltaY,
-      { min: 0, max: availableScrollY }
-    );
-
+  /**
+   * Gets all essential scroll data from store with validation
+   * @returns Object containing rowCount, numberOfRecords, and offset
+   */
+  private _getScrollData(): {
+    visibleRowCount: number;
+    totalRecordCount: number;
+    offset: number;
+  } {
     return {
-      totalHeight,
-      availableScrollY,
-      newScrollPosition,
+      visibleRowCount: this._getStoreData('rowCount', 0),
+      totalRecordCount: this._getStoreData('numberOfRecords', 0),
+      offset: this._getStoreData('offset', 0),
     };
   }
 
-  /**
-   * Clamp scroll position within bounds
-   */
-  private _clampScrollPosition(value: number, bounds: ScrollBounds): number {
-    return Math.max(bounds.min, Math.min(value, bounds.max));
-  }
-
-  /**
-   * Calculate offset from scroll position
-   */
-  private _calculateOffsetFromScroll(scrollPosition: number): number {
-    return Math.ceil(scrollPosition / TR_HEIGHT);
-  }
-
-  /**
-   * Calculate touch scroll offset
-   */
-  private _calculateTouchScrollOffset(
-    deltaY: number,
-    touchStartOffset: number
-  ): number {
-    const rowCount = storeManager.getData('rowCount') as number;
-    const numberOfRecords = storeManager.getData('numberOfRecords') as number;
-
-    const availableHeight = rowCount * TR_HEIGHT;
-    const offsetRate = deltaY / availableHeight;
-
-    return Math.ceil(offsetRate * numberOfRecords) + touchStartOffset;
-  }
-
-  /**
-   * Clamp offset to valid range
-   */
-  private _clampOffsetToValidRange(offset: number): number {
-    const rowCount = storeManager.getData('rowCount') as number;
-    const numberOfRecords = storeManager.getData('numberOfRecords') as number;
-
-    const minOffset = 0;
-    const maxOffset = Math.max(0, numberOfRecords - rowCount);
-
-    return Math.max(minOffset, Math.min(offset, maxOffset));
-  }
-
-  /**
-   * Calculate scrollbar position and size
-   */
-  private _calculateScrollBarPosition(offset: number): ScrollBarCalculation {
-    const rowCount = storeManager.getData('rowCount') as number;
-    const numberOfRecords = storeManager.getData('numberOfRecords') as number;
-
-    const totalHeight = numberOfRecords * TR_HEIGHT;
-    const displayHeight = rowCount * TR_HEIGHT;
-    const displayRate = displayHeight / totalHeight;
-
-    let barHeight = Math.ceil(displayHeight * displayRate);
-    barHeight = Math.max(barHeight, MIN_SCROLLBAR_HEIGHT);
-
-    const availableHeight = displayHeight - barHeight;
-    const availableRate = availableHeight / totalHeight;
-    const barTop = Math.ceil(offset * TR_HEIGHT * availableRate);
-
-    return {
-      barHeight,
-      barTop,
-      displayRate,
-    };
-  }
-
-  /**
-   * Apply scrollbar styles
-   */
-  private _applyScrollBarStyles(
-    scrollBar: HTMLElement,
-    calculation: ScrollBarCalculation,
-    offset: number
-  ): void {
-    // Bar styles
-    scrollBar.style.height = `${calculation.barHeight}px`;
-    scrollBar.style.top = `${calculation.barTop}px`;
-
-    // Update position display
-    this._updatePositionDisplay(scrollBar, offset);
-
-    // Maintain active state
-    this.container.classList.add('-active');
-  }
-
-  /**
-   * Update position display
-   */
-  private _updatePositionDisplay(bar: HTMLElement, offset: number): void {
-    const position = bar.querySelector('.position') as HTMLElement;
-    if (position) {
-      position.textContent = String(offset + 1);
-    }
-  }
-
   // ================================================================
-  // PRIVATE - Mouse Drag Implementation
+  // Visual Updates
   // ================================================================
 
   /**
-   * Initializes mouse drag functionality for desktop devices
+   * Synchronizes scrollbar appearance with current store data
    */
-  private _initializeMouseDrag(): void {
-    this.mouseDragState = {
-      isDragging: false,
-      startY: 0,
-      startTop: 0,
-    };
+  private _synchronizeScrollBarWithStore(): void {
+    const { offset, visibleRowCount, totalRecordCount } = this._getScrollData();
 
-    this._setInitialCursorStyle();
-    this._attachMouseEventListeners();
-  }
-
-  /**
-   * Sets the initial cursor style for the scrollbar
-   */
-  private _setInitialCursorStyle(): void {
-    this.scrollBarElement.style.cursor = 'grab';
-  }
-
-  /**
-   * Attaches mouse event listeners for drag functionality
-   */
-  private _attachMouseEventListeners(): void {
-    this.scrollBarElement.addEventListener(
-      'mousedown',
-      this._onMouseDown.bind(this)
+    const calculation = calculateScrollbarDimensions(
+      offset,
+      visibleRowCount,
+      totalRecordCount
     );
-    document.addEventListener('mousemove', this._onMouseMove.bind(this));
-    document.addEventListener('mouseup', this._onMouseUp.bind(this));
-  }
 
-  /**
-   * Handles mouse down events to start dragging
-   */
-  private _onMouseDown(e: MouseEvent): void {
-    if (!this.mouseDragState) return;
-
-    e.preventDefault();
-    this.mouseDragState.isDragging = true;
-    this.mouseDragState.startY = e.clientY;
-    this.mouseDragState.startTop =
-      parseInt(this.scrollBarElement.style.top) || 0;
-
-    this._setDraggingCursorStyle(true);
-  }
-
-  /**
-   * Handles mouse move events during dragging
-   */
-  private _onMouseMove(e: MouseEvent): void {
-    if (!this.mouseDragState?.isDragging) return;
-
-    e.preventDefault();
-
-    const deltaY = e.clientY - this.mouseDragState.startY;
-    const newTop = this.mouseDragState.startTop + deltaY;
-    const constrainedTop = this._constrainPositionWithinBounds(newTop);
-
-    this._setScrollBarPosition(constrainedTop);
-    this._triggerDragEvent(constrainedTop);
-  }
-
-  /**
-   * Handles mouse up events to end dragging
-   */
-  private _onMouseUp(): void {
-    if (!this.mouseDragState?.isDragging) return;
-
-    this.mouseDragState.isDragging = false;
-    this._setDraggingCursorStyle(false);
-    this._scheduleVisualStateRelease();
-  }
-
-  // ================================================================
-  // PRIVATE - Touch Drag Implementation
-  // ================================================================
-
-  /**
-   * Initializes touch event listeners for mobile device support
-   */
-  private _initializeTouchDrag(): void {
-    this.scrollBarElement.addEventListener(
-      'touchstart',
-      this._onTouchStart.bind(this),
-      {
-        passive: false,
-      }
-    );
-    this.scrollBarElement.addEventListener(
-      'touchmove',
-      this._onTouchMove.bind(this),
-      {
-        passive: false,
-      }
-    );
-    this.scrollBarElement.addEventListener(
-      'touchend',
-      this._onTouchEnd.bind(this),
-      {
-        passive: false,
-      }
+    this._renderer.updateScrollBarVisualState(
+      calculation,
+      visibleRowCount,
+      totalRecordCount
     );
   }
 
-  /**
-   * Handles touch start events to begin touch dragging
-   */
-  private _onTouchStart(e: TouchEvent): void {
-    e.preventDefault();
-    this.isTouchDragging = true;
-    this.touchStartY = e.touches[0].clientY;
-    this.touchStartTop = parseInt(this.scrollBarElement.style.top) || 0;
-    this.container.classList.add('-dragging');
-    this.container.classList.add('-active');
-  }
-
-  /**
-   * Handles touch move events during touch dragging
-   */
-  private _onTouchMove(e: TouchEvent): void {
-    if (!this.isTouchDragging) return;
-    e.preventDefault();
-
-    const currentY = e.touches[0].clientY;
-    const deltaY = currentY - this.touchStartY;
-    const newTop = this.touchStartTop + deltaY;
-
-    this._triggerDragEvent(newTop);
-  }
-
-  /**
-   * Handles touch end events to finish touch dragging
-   */
-  private _onTouchEnd(e: TouchEvent): void {
-    if (!this.isTouchDragging) return;
-    e.preventDefault();
-    this.isTouchDragging = false;
-    this._scheduleVisualStateRelease();
-    this.container.classList.remove('-active');
-  }
-
   // ================================================================
-  // PRIVATE - Helper Methods
+  // Drag Event Handlers
   // ================================================================
 
   /**
-   * Constrains position within the container bounds
+   * Handles drag events and updates scroll position
+   * @param top - Drag position
    */
-  private _constrainPositionWithinBounds(newTop: number): number {
-    const maxTop =
-      this.container.offsetHeight - this.scrollBarElement.offsetHeight;
-    return Math.max(0, Math.min(newTop, maxTop));
-  }
+  private _handleDrag(top: number): void {
+    // Update scrollbar position via renderer
+    this._renderer.updateScrollBarPosition(top);
 
-  /**
-   * Updates the visual position of the scrollbar
-   */
-  private _setScrollBarPosition(top: number): void {
-    this.scrollBarElement.style.top = `${top}px`;
-  }
-
-  /**
-   * Triggers the main drag event with position data
-   */
-  private _triggerDragEvent(top: number): void {
     const mockEvent: DragEventUI = { position: { top } };
-    this.onDrag(null, mockEvent);
+    this._processDragPosition(null, mockEvent);
   }
 
   /**
-   * Sets the visual cursor style during dragging
+   * Processes drag position and updates scroll state
+   * @param e - The original event (can be null for programmatic calls)
+   * @param ui - Object containing the drag position information
    */
-  private _setDraggingCursorStyle(isDragging: boolean): void {
-    this.scrollBarElement.style.cursor = isDragging ? 'grabbing' : 'grab';
+  private _processDragPosition(e: Event | null, ui: DragEventUI): void {
+    const visibleRowCount = this._getStoreData('rowCount', 0);
+    const totalRecordCount = this._getStoreData('numberOfRecords', 0);
 
-    if (isDragging) {
-      this.container.classList.add('-dragging');
+    // Early return if data is invalid
+    if (visibleRowCount <= 0 || totalRecordCount <= 0) {
+      return;
     }
+    // Calculate available height for scrollbar movement
+    const availableHeight = visibleRowCount * TR_HEIGHT;
+    const offsetRate = ui.position.top / availableHeight;
+
+    let offset = Math.ceil(offsetRate * totalRecordCount);
+    offset = constrainRowOffsetToValidRange(
+      offset,
+      visibleRowCount,
+      totalRecordCount
+    );
+
+    // Update _lastScrollPosition to maintain consistency with trackpad scrolling
+    this._lastScrollPosition = offset * TR_HEIGHT;
+
+    storeManager.setData('offset', offset);
+    this._renderer.activateDragStateWithAutoRelease();
+  }
+
+  /**
+   * Handles visual state changes during drag operations
+   * @param isDragging - Whether currently dragging
+   */
+  private _handleVisualStateChange(isDragging: boolean): void {
+    this._renderer.updateCursorStyle(isDragging);
+    this._renderer.updateDraggingState(isDragging);
   }
 }

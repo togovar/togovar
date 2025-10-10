@@ -1,5 +1,5 @@
 import { storeManager } from '../store/StoreManager';
-import { API_URL } from '../global.js';
+import { API_URL } from '../global.ts';
 
 export default class DownloadButton {
   #trigger;

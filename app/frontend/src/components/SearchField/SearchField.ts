@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { ref, createRef, Ref } from 'lit/directives/ref.js';
+import { ref, createRef } from 'lit/directives/ref.js';
+import type { Ref } from 'lit/directives/ref.js';
 import Style from '../../../stylesheets/object/component/search-field.scss';
 
 /** Class to create a only search field */

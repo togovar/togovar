@@ -1,7 +1,7 @@
 import * as qs from 'qs';
 import { executeSearch } from '../api/fetchData';
 import { storeManager } from '../store/StoreManager';
-import {
+import type {
   MasterConditions,
   MasterConditionId,
   SimpleSearchCurrentConditions,

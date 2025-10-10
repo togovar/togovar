@@ -25,7 +25,7 @@ export class ConditionDiseaseSearch extends LitElement {
     super();
     el.appendChild(this);
 
-    this._valuesElement = el.parentElement.querySelector(
+    this.valuesContainerEl = el.parentElement.querySelector(
       ':scope > .summary > .values'
     );
 
