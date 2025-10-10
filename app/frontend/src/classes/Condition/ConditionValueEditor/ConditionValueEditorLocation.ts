@@ -3,9 +3,14 @@ import { ConditionValueEditor } from './ConditionValueEditor';
 import { createEl } from '../../../utils/dom/createEl';
 import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';
+import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 import '../../../components/ConditionItemValueView';
 
-const OPTIONS = [
+// ============================================================================
+// Constants
+// ============================================================================
+
+const CHROMOSOME_OPTIONS = [
   '',
   ...[...Array(22)].map((_, index) => String(index + 1)),
   'X',
@@ -13,14 +18,38 @@ const OPTIONS = [
   'MT',
 ];
 
+const INPUT_MODE = {
+  REGION: 'region',
+  SINGLE_POSITION: 'single_position',
+} as const;
+
+const DEFAULT_START_POSITION = 1;
+
+// ============================================================================
+// Types
+// ============================================================================
+
+type InputMode = (typeof INPUT_MODE)[keyof typeof INPUT_MODE];
+
+interface KaryotypeData {
+  reference?: string;
+  chromosomes?: Record<string, ChromosomeInfo>;
+}
+
+interface ChromosomeInfo {
+  region?: Record<string, [number, number]>;
+}
+
 export class ConditionValueEditorLocation extends ConditionValueEditor {
-  private _checkboxInputEl!: HTMLInputElement;
-  private _chrEl!: HTMLSelectElement;
-  private _startEl!: HTMLInputElement;
-  private _endEl!: HTMLInputElement;
-  private _rangeInputView!: HTMLSpanElement;
-  private _karyotype: unknown;
-  private _isWhole: boolean = false;
+  private _singlePositionCheckbox!: HTMLInputElement;
+  private _chromosomeSelect!: HTMLSelectElement;
+  private _startPositionInput!: HTMLInputElement;
+  private _endPositionInput!: HTMLInputElement;
+  private _positionInputContainer!: HTMLSpanElement;
+
+  // State
+  /** Reference genome karyotype data for chromosome length validation */
+  private _karyotypeData: KaryotypeData | null = null;
 
   constructor(
     conditionValues: ConditionValues,
@@ -28,17 +57,80 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
   ) {
     super(conditionValues, conditionItemView);
 
-    // HTML
-    const row1 = createEl('div', {
+    this._buildUI();
+    this._loadKaryotypeData();
+    this._attachEventListeners();
+    this._initializeFromExistingValue();
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Public API
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /** Preserve current state (no-op for this editor) */
+  keepLastValues(): void {
+    // No-op: state is rebuilt from value views when needed
+    // TODO
+  }
+
+  /** Restore UI state from existing value views */
+  restore(): void {
+    this._loadFromValueViews();
+    this._updateValueAndValidation();
+  }
+
+  /** Trigger validation and value update */
+  search(): void {
+    this._updateValueAndValidation();
+  }
+
+  /** Check if current input represents a valid genomic location */
+  get isValid(): boolean {
+    if (this._chromosomeSelect.value === '') return false;
+
+    const mode = this._positionInputContainer.dataset.type as InputMode;
+
+    if (mode === INPUT_MODE.REGION) {
+      return this._isValidRegion();
+    }
+
+    if (mode === INPUT_MODE.SINGLE_POSITION) {
+      return this._isValidSinglePosition();
+    }
+
+    return false;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // UI Construction
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /** Build the complete editor UI structure */
+  private _buildUI(): void {
+    const modeToggleRow = this._createModeToggleRow();
+    const positionInputRow = this._createPositionInputRow();
+
+    this.createSectionEl('location-editor-view', [
+      createEl('header', { text: `Set ${this.conditionType}` }),
+      createEl('div', {
+        class: 'body',
+        children: [modeToggleRow, positionInputRow],
+      }),
+    ]);
+  }
+
+  /** Create the row with single position checkbox toggle */
+  private _createModeToggleRow(): HTMLDivElement {
+    return createEl('div', {
       class: 'row',
       children: [
         createEl('label', {
           children: [
-            (this._checkboxInputEl = createEl('input', {
+            (this._singlePositionCheckbox = createEl('input', {
               attrs: {
                 type: 'checkbox',
                 name: 'range-or-position',
-                value: 'single_position',
+                value: INPUT_MODE.SINGLE_POSITION,
               },
             })),
             ' Single position',
@@ -46,8 +138,11 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
         }),
       ],
     });
+  }
 
-    const row2 = createEl('div', {
+  /** Create the row with chromosome and position inputs */
+  private _createPositionInputRow(): HTMLDivElement {
+    return createEl('div', {
       class: 'row',
       children: [
         createEl('label', {
@@ -57,8 +152,8 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
             createEl('span', {
               class: 'form',
               children: [
-                (this._chrEl = createEl('select', {
-                  children: OPTIONS.map((value) =>
+                (this._chromosomeSelect = createEl('select', {
+                  children: CHROMOSOME_OPTIONS.map((value) =>
                     createEl('option', { attrs: { value }, text: value })
                   ),
                 })),
@@ -69,206 +164,245 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
         createEl('span', { class: 'label', text: ':' }),
         createEl('label', {
           class: 'position',
-          children: [
-            (this._rangeInputView = createEl('span', {
-              class: ['form', 'range-inputs-view'],
-              dataset: { type: 'region' },
-              children: [
-                (this._startEl = createEl('input', {
-                  class: 'start',
-                  attrs: { type: 'number', min: '1' },
-                })),
-                createEl('span', { class: 'line' }),
-                (this._endEl = createEl('input', {
-                  class: 'end',
-                  attrs: { type: 'number', min: '1' },
-                })),
-              ],
-            })),
-          ],
+          children: [this._createPositionInputContainer()],
         }),
       ],
     });
+  }
 
-    this.createSectionEl('location-editor-view', [
-      createEl('header', { text: `Set ${this.conditionType}` }),
-      createEl('div', { class: 'body', children: [row1, row2] }),
-    ]);
-
-    // references
-    const inputs = [this._startEl, this._endEl];
-    this._isWhole = false;
-
-    // events
-    this._checkboxInputEl.addEventListener('change', (e) => {
-      const target = e.target as HTMLInputElement;
-      this._rangeInputView.dataset.type = target.checked
-        ? 'single_position'
-        : 'region';
-      this._update();
+  /** Create container with start/end position inputs */
+  private _createPositionInputContainer(): HTMLSpanElement {
+    this._positionInputContainer = createEl('span', {
+      class: ['form', 'range-inputs-view'],
+      dataset: { type: INPUT_MODE.REGION },
+      children: [
+        (this._startPositionInput = createEl('input', {
+          class: 'start',
+          attrs: { type: 'number', min: String(DEFAULT_START_POSITION) },
+        })),
+        createEl('span', { class: 'line' }),
+        (this._endPositionInput = createEl('input', {
+          class: 'end',
+          attrs: { type: 'number', min: String(DEFAULT_START_POSITION) },
+        })),
+      ],
     });
 
-    [this._chrEl, ...inputs].forEach((input) => {
-      input.addEventListener('change', (e) => {
-        this._update(e);
-      });
+    return this._positionInputContainer;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Event Handling
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /** Attach all event listeners to UI elements */
+  private _attachEventListeners(): void {
+    // Handle toggle between region and single position modes
+    this._singlePositionCheckbox.addEventListener('change', () => {
+      const mode = this._singlePositionCheckbox.checked
+        ? INPUT_MODE.SINGLE_POSITION
+        : INPUT_MODE.REGION;
+
+      this._positionInputContainer.dataset.type = mode;
+      this._updateValueAndValidation();
     });
 
-    // karyotype data (end coordinate lookup)
-    this._karyotype = storeManager.getData('karyotype');
+    // Handle chromosome selection change and update position constraints
+    this._chromosomeSelect.addEventListener('change', () => {
+      const maxPosition = this._getChromosomeMaxPosition();
 
-    // Prefill from existing value view if present (e.g., reopening editor)
-    this._prefillFromViews();
-    // Ensure UI reflects current state
-    this._update();
+      if (maxPosition) {
+        this._updatePositionConstraints(maxPosition);
+        this._enforcePositionLimits(maxPosition);
+      }
+
+      this._updateValueAndValidation();
+    });
+
+    this._startPositionInput.addEventListener('change', () => {
+      this._updateValueAndValidation();
+    });
+
+    this._endPositionInput.addEventListener('change', () => {
+      this._updateValueAndValidation();
+    });
   }
 
-  // ─────────────────────────────────────────────────────
-  // public
-  // ─────────────────────────────────────────────────────
+  // ──────────────────────────────────────────────────────────────────────────
+  // Data Loading
+  // ──────────────────────────────────────────────────────────────────────────
 
-  keepLastValues() {
-    // no-op for now (we rebuild from conditionItemValueViews when needed)
+  /** Load karyotype reference data from store */
+  private _loadKaryotypeData(): void {
+    const data = storeManager.getData('karyotype');
+    this._karyotypeData = data as KaryotypeData | null;
   }
 
-  restore() {
-    // Re-apply UI from current value views (if any)
-    this._prefillFromViews();
-    this._update();
+  /** Initialize UI from existing condition value if present */
+  private _initializeFromExistingValue(): void {
+    this._loadFromValueViews();
+    this._updateValueAndValidation();
   }
-
-  search() {
-    this._update();
-  }
-
-  get isValid() {
-    if (this._chrEl.value === '') return false;
-
-    switch (this._rangeInputView.dataset.type) {
-      case 'region':
-        return (
-          this._startEl.value !== '' &&
-          this._endEl.value !== '' &&
-          +this._startEl.value < +this._endEl.value
-        );
-      case 'single_position':
-        return this._startEl.value !== '';
-      default:
-        return false;
-    }
-  }
-
-  // ─────────────────────────────────────────────────────
-  // private
-  // ─────────────────────────────────────────────────────
 
   /**
-   * Read existing value view (if any) and prefill UI controls.
+   * Parse existing value view and populate UI controls.
    * Expected format: "chr:start-end" or "chr:start"
+   * Examples: "7:123-456", "X:999"
    */
-  private _prefillFromViews() {
-    const vv = this.conditionItemValueViews?.[0];
-    const raw = vv?.value || vv?.label;
-    if (!raw || typeof raw !== 'string') return;
+  private _loadFromValueViews(): void {
+    const valueView = this.conditionItemValueViews?.[0];
+    const rawValue = valueView?.value || valueView?.label;
 
-    // e.g. "7:123-456" or "X:999"
-    const m = /^([^:]+):(\d+)(?:-(\d+))?$/.exec(raw.trim());
-    if (!m) return;
+    if (!rawValue || typeof rawValue !== 'string') return;
 
-    const [, chr, start, end] = m;
-    // set fields
-    if (OPTIONS.includes(chr)) this._chrEl.value = chr;
-    this._startEl.value = start;
-    if (end) {
-      this._rangeInputView.dataset.type = 'region';
-      this._endEl.value = end;
-    } else {
-      this._rangeInputView.dataset.type = 'single_position';
-      this._endEl.value = '';
-    }
+    const parsed = this._parseLocationString(rawValue.trim());
+    if (!parsed) return;
+
+    this._applyParsedLocation(parsed);
   }
 
   /**
-   * Recompute UI → value view(s), apply validation, and notify host.
+   * Parse location string into components.
+   * @param locationStr - String like "7:123-456" or "X:999"
+   * @returns Parsed components or null if invalid format
    */
-  private _update(e?: Event) {
-    // update range max by chromosome change
-    // Safely narrow _karyotype to expected shape
-    const k = this._karyotype as
-      | { reference?: string; chromosomes?: unknown }
-      | undefined;
-    const ref = k?.reference;
-    let endMax: number | undefined = undefined;
-    if (ref && k?.chromosomes && typeof k.chromosomes === 'object') {
-      const chrEntry = (k.chromosomes as Record<string, unknown>)[
-        this._chrEl.value
-      ];
-      if (
-        chrEntry &&
-        typeof chrEntry === 'object' &&
-        'region' in (chrEntry as Record<string, unknown>)
-      ) {
-        const regionObj = (chrEntry as Record<string, unknown>).region as
-          | unknown
-          | undefined;
-        if (
-          regionObj &&
-          typeof regionObj === 'object' &&
-          (regionObj as Record<string, unknown>)[ref] &&
-          Array.isArray((regionObj as Record<string, unknown>)[ref])
-        ) {
-          endMax = (
-            (regionObj as Record<string, unknown>)[ref] as unknown[]
-          )[1] as number | undefined;
-        }
-      }
+  private _parseLocationString(locationStr: string): {
+    chromosome: string;
+    start: string;
+    end?: string;
+  } | null {
+    const match = /^([^:]+):(\d+)(?:-(\d+))?$/.exec(locationStr);
+    if (!match) return null;
+
+    const [, chromosome, start, end] = match;
+    return { chromosome, start, end };
+  }
+
+  /** Apply parsed location data to UI controls */
+  private _applyParsedLocation(parsed: {
+    chromosome: string;
+    start: string;
+    end?: string;
+  }): void {
+    if (CHROMOSOME_OPTIONS.includes(parsed.chromosome)) {
+      this._chromosomeSelect.value = parsed.chromosome;
     }
 
-    if (e?.target === this._chrEl && endMax) {
-      // reset input constraints when chromosome changes
-      this._startEl.max = String(endMax);
-      this._endEl.max = String(endMax);
+    this._startPositionInput.value = parsed.start;
 
-      if (this._isWhole) this._endEl.value = String(endMax);
-
-      if (this._startEl.value === '') {
-        this._startEl.value = '1';
-        this._isWhole = true;
-      } else if (+this._startEl.value > endMax) {
-        this._startEl.value = String(endMax);
-      }
-
-      if (this._endEl.value === '') {
-        this._endEl.value = String(endMax);
-        this._isWhole = true;
-      } else if (+this._endEl.value > endMax) {
-        this._endEl.value = String(endMax);
-        this._isWhole = true;
-      }
-    } else if (endMax && +this._endEl.value < endMax) {
-      this._isWhole = false;
-    }
-
-    // rebuild value view
-    const vv = this.conditionItemValueViews[0];
-    if (this.isValid) {
-      const asRegion = this._rangeInputView.dataset.type === 'region';
-      const value = `${this._chrEl.value}:${this._startEl.value}${
-        asRegion ? `-${this._endEl.value}` : ''
-      }`;
-
-      if (vv) {
-        vv.label = value;
-        vv.value = value;
-      } else {
-        this.addValueView(value, value, true);
-      }
+    if (parsed.end) {
+      this._positionInputContainer.dataset.type = INPUT_MODE.REGION;
+      this._endPositionInput.value = parsed.end;
+      this._singlePositionCheckbox.checked = false;
     } else {
-      // remove any existing value view
+      this._positionInputContainer.dataset.type = INPUT_MODE.SINGLE_POSITION;
+      this._endPositionInput.value = '';
+      this._singlePositionCheckbox.checked = true;
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Validation
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /** Check if current region input is valid */
+  private _isValidRegion(): boolean {
+    const hasStartValue = this._startPositionInput.value !== '';
+    const hasEndValue = this._endPositionInput.value !== '';
+    const startLessThanEnd =
+      +this._startPositionInput.value < +this._endPositionInput.value;
+
+    return hasStartValue && hasEndValue && startLessThanEnd;
+  }
+
+  /** Check if current single position input is valid */
+  private _isValidSinglePosition(): boolean {
+    return this._startPositionInput.value !== '';
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Karyotype Utilities
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /** Get maximum valid position for currently selected chromosome */
+  private _getChromosomeMaxPosition(): number | null {
+    if (!this._karyotypeData?.reference) return null;
+
+    const chromosome = this._chromosomeSelect.value;
+    const chromosomeInfo = this._karyotypeData.chromosomes?.[chromosome];
+
+    if (!chromosomeInfo?.region) return null;
+
+    const region = chromosomeInfo.region[this._karyotypeData.reference];
+    return region?.[1] ?? null;
+  }
+
+  /** Update position input constraints based on chromosome length */
+  private _updatePositionConstraints(maxPosition: number): void {
+    this._startPositionInput.max = String(maxPosition);
+    this._endPositionInput.max = String(maxPosition);
+  }
+
+  /** Enforce position values within valid chromosome boundaries */
+  private _enforcePositionLimits(maxPosition: number): void {
+    // Initialize start position if empty
+    if (this._startPositionInput.value === '') {
+      this._startPositionInput.value = String(DEFAULT_START_POSITION);
+    } else if (+this._startPositionInput.value > maxPosition) {
+      this._startPositionInput.value = String(maxPosition);
+    }
+
+    // Initialize or cap end position
+    if (this._endPositionInput.value === '') {
+      this._endPositionInput.value = String(maxPosition);
+    } else if (+this._endPositionInput.value > maxPosition) {
+      this._endPositionInput.value = String(maxPosition);
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Value Updates
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /** Update value view based on current UI state and trigger validation */
+  private _updateValueAndValidation(): void {
+    const existingValueView = this.conditionItemValueViews[0];
+
+    if (this.isValid) {
+      const locationString = this._buildLocationString();
+      this._updateOrCreateValueView(existingValueView, locationString);
+    } else {
       this.removeValueView('');
     }
 
-    // validation → enable/disable OK button via host
     this.conditionValues.update(this.isValid);
+  }
+
+  /** Build location string from current UI state */
+  private _buildLocationString(): string {
+    const chromosome = this._chromosomeSelect.value;
+    const start = this._startPositionInput.value;
+    const isRegionMode =
+      this._positionInputContainer.dataset.type === INPUT_MODE.REGION;
+
+    if (isRegionMode) {
+      const end = this._endPositionInput.value;
+      return `${chromosome}:${start}-${end}`;
+    }
+
+    return `${chromosome}:${start}`;
+  }
+
+  /** Update existing value view or create new one */
+  private _updateOrCreateValueView(
+    existingView: ConditionItemValueView | undefined,
+    locationString: string
+  ): void {
+    if (existingView) {
+      existingView.label = locationString;
+      existingView.value = locationString;
+    } else {
+      this.addValueView(locationString, locationString, true);
+    }
   }
 }
