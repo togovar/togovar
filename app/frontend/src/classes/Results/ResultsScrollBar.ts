@@ -11,9 +11,6 @@ import {
   DragManager,
 } from './scroll';
 
-// Whether to ignore the scrollbar thumb height in calculations
-const IGNORE_SCROLLBAR_THUMB_HEIGHT = true;
-
 /**
  * Specialized scrollbar component for Results display (Refactored Version)
  *
@@ -358,9 +355,7 @@ export class ResultsScrollBar {
       return;
     }
     // Calculate available height for scrollbar movement
-    const availableHeight = IGNORE_SCROLLBAR_THUMB_HEIGHT
-      ? visibleRowCount * TR_HEIGHT
-      : visibleRowCount * TR_HEIGHT - this._scrollBarElement.offsetHeight;
+    const availableHeight = visibleRowCount * TR_HEIGHT;
     const offsetRate = ui.position.top / availableHeight;
 
     let offset = Math.ceil(offsetRate * totalRecordCount);

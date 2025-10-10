@@ -34,9 +34,7 @@ export class DatasetTreeDataProcessor {
    * @param rawDataNodes - Array of raw tree nodes from configuration files
    * @returns Array of UI-ready nodes with unique IDs and initialized selection states
    */
-  private _transformNodesToUiNodes(
-    rawDataNodes: readonly TreeNode[]
-  ): UiNode[] {
+  private _addNodeIds(rawDataNodes: readonly TreeNode[]): UiNode[] {
     return rawDataNodes.map((rawNode) => {
       // Ensure ID counter is valid (reset if corrupted)
       if (!Number.isInteger(this._uniqueIdCounter)) {
@@ -53,7 +51,7 @@ export class DatasetTreeDataProcessor {
 
       // Recursively process children if they exist
       if (rawNode.children && rawNode.children.length > 0) {
-        uiReadyNode.children = this._transformNodesToUiNodes(rawNode.children);
+        uiReadyNode.children = this._addNodeIds(rawNode.children);
       }
 
       return uiReadyNode;
@@ -86,9 +84,7 @@ export class DatasetTreeDataProcessor {
         const rawDatasetConfiguration = (
           conditionDefinition as unknown as { values: readonly TreeNode[] }
         ).values;
-        const uiReadyDataNodes = this._transformNodesToUiNodes(
-          rawDatasetConfiguration
-        );
+        const uiReadyDataNodes = this._addNodeIds(rawDatasetConfiguration);
 
         // Create a d3-hierarchy with synthetic root node for unified tree operations
         return hierarchy<UiNode>({
