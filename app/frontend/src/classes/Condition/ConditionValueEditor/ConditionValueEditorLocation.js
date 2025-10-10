@@ -1,5 +1,6 @@
 import { storeManager } from '../../../store/StoreManager';
 import { ConditionValueEditor } from './ConditionValueEditor.ts';
+import { createEl } from '../../../utils/dom/createEl';
 import '../../../components/ConditionItemValueView';
 
 const OPTIONS = [
@@ -10,7 +11,7 @@ const OPTIONS = [
   'MT',
 ];
 
-export default class ConditionValueEditorLocation extends ConditionValueEditor {
+export class ConditionValueEditorLocation extends ConditionValueEditor {
   /**
    * @param {ConditionValues} valuesView
    * @param {ConditionItemView} conditionView
@@ -19,61 +20,83 @@ export default class ConditionValueEditorLocation extends ConditionValueEditor {
     super(valuesView, conditionView);
 
     // HTML
-    this.createSectionEl(
-      'location-editor-view',
-      `
-    <header>Set location</header>
-    <div class="body">
-      <div class="row">
-        <label>
-          <input type="checkbox" name="range-or-position" value="single_position"> Single position
-        </label>
-      </div>
-      <div class="row">
-        <label class="chromosome">
-          <span class="label">Chr.</span>
-          <span class="form">
-            <select>
-              ${OPTIONS.map(
-                (value) => `<option value="${value}">${value}</option>`
-              ).join('')}
-            </select>
-          </span>
-          <span class="label">&nbsp;:&nbsp;&nbsp;</span>
-        </label>
-        <label class="position">
-          <span class="form range-inputs-view" data-type="region">
-            <input class="start" type="number" min="1">
-            <span class="line"></span>
-            <input class="end" type="number" min="1">
-          </span>
-        </label>
-      </div>
-    </div>`
-    );
+    const row1 = createEl('div', {
+      class: 'row',
+      children: [
+        createEl('label', {
+          children: [
+            (this._checkboxInput = createEl('input', {
+              attrs: {
+                type: 'checkbox',
+                name: 'range-or-position',
+                value: 'single_position',
+              },
+            })),
+            ' Single position',
+          ],
+        }),
+      ],
+    });
+
+    const row2 = createEl('div', {
+      class: 'row',
+      children: [
+        createEl('label', {
+          class: 'chromosome',
+          children: [
+            createEl('span', { class: 'label', text: 'Chr.' }),
+            createEl('span', {
+              class: 'form',
+              children: [
+                (this._chr = createEl('select', {
+                  children: OPTIONS.map((value) =>
+                    createEl('option', { attrs: { value }, text: value })
+                  ),
+                })),
+              ],
+            }),
+            createEl('span', { class: 'label', text: ':' }),
+          ],
+        }),
+        createEl('label', {
+          class: 'position',
+          children: [
+            (this._rangeInputView = createEl('span', {
+              class: ['form', 'range-inputs-view'],
+              dataset: { type: 'region' },
+              children: [
+                (this._start = createEl('input', {
+                  class: 'start',
+                  attrs: { type: 'number', min: '1' },
+                })),
+                createEl('span', { class: 'line' }),
+                (this._end = createEl('input', {
+                  class: 'end',
+                  attrs: { type: 'number', min: '1' },
+                })),
+              ],
+            })),
+          ],
+        }),
+      ],
+    });
+
+    this.createSectionEl('location-editor-view', [
+      createEl('header', { text: `Set ${this.conditionType}` }),
+      createEl('div', { class: 'body', children: [row1, row2] }),
+    ]);
 
     // references
-    const rows = this.sectionEl.querySelectorAll(':scope > .body > .row');
-    this._chr = rows[1].querySelector(':scope > .chromosome > .form > select');
-    this._rangeInputView = rows[1].querySelector(
-      ':scope > .position > .range-inputs-view'
-    );
-    const inputs = Array.from(
-      this._rangeInputView.querySelectorAll(':scope > input')
-    );
-    this._start = inputs.find((input) => input.classList.contains('start'));
-    this._end = inputs.find((input) => input.classList.contains('end'));
+    const inputs = [this._start, this._end];
     this._isWhole = false;
 
     // events
-    this.sectionEl
-      .querySelector(':scope > .body > .row:nth-child(1) > label > input')
-      .addEventListener('change', (e) => {
-        this._rangeInputView.dataset.type = e.target.checked
-          ? 'single_position'
-          : 'region';
-        this._update();
-      });
+    this._checkboxInput.addEventListener('change', (e) => {
+      this._rangeInputView.dataset.type = e.target.checked
+        ? 'single_position'
+        : 'region';
+      this._update();
+    });
 
     [this._chr, ...inputs].forEach((input) => {
       input.addEventListener('change', (e) => {
