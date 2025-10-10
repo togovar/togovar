@@ -47,7 +47,9 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   private _dataProcessor = new DatasetTreeDataProcessor();
 
   /** Creates DOM elements for columns, checkboxes, and navigation arrows */
-  private _renderer = new DatasetColumnRenderer();
+  private _renderer = new DatasetColumnRenderer(
+    `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+  );
 
   /** Handles user interactions: checkbox changes, arrow clicks, navigation */
   private _eventHandler = new DatasetColumnEventHandler();

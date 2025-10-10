@@ -17,6 +17,16 @@ import type { UiNode } from './types';
  * and state management systems to provide a complete interactive experience.
  */
 export class DatasetColumnRenderer {
+  private readonly _instancePrefix: string;
+
+  /**
+   * Creates a new DatasetColumnRenderer instance.
+   * @param instancePrefix - Unique prefix for this instance to ensure globally unique element IDs
+   */
+  constructor(instancePrefix: string = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`) {
+    this._instancePrefix = instancePrefix;
+  }
+
   /**
    * Creates a complete HTML list of selectable dataset items for display in a column.
    *
@@ -64,7 +74,7 @@ export class DatasetColumnRenderer {
     userIsLoggedIn: boolean,
     conditionType: string
   ): HTMLLIElement {
-    const uniqueCheckboxId = `checkbox-${datasetNode.data.id}`;
+    const uniqueCheckboxId = `checkbox-${this._instancePrefix}-${datasetNode.data.id}`;
 
     // Show either a clickable checkbox or a lock icon for restricted datasets
     const selectionElement = this.shouldShowLockIcon(
