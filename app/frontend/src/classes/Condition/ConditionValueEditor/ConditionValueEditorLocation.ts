@@ -79,11 +79,6 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
     this._updateValueAndValidation();
   }
 
-  /** Trigger validation and value update */
-  search(): void {
-    this._updateValueAndValidation();
-  }
-
   /** Check if current input represents a valid genomic location */
   get isValid(): boolean {
     if (this._chromosomeSelect.value === '') return false;

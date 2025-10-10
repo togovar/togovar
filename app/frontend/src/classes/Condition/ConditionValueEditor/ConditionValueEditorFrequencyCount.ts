@@ -134,13 +134,6 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Triggers a search operation
-   */
-  search(): void {
-    this._update();
-  }
-
-  /**
    * Gets the validation state of the current condition
    * Validates that:
    * - At least one value (from or to) is not null

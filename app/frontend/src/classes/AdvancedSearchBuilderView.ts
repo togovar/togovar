@@ -138,7 +138,7 @@ export class AdvancedSearchBuilderView {
 
   /** Notify that the condition set changed → re-run search. */
   changeCondition(): void {
-    this.search();
+    this._submitAdvancedSearchCondition();
   }
 
   /** Group selected views into a new subgroup under their common parent. */
@@ -208,7 +208,7 @@ export class AdvancedSearchBuilderView {
   }
 
   /** Rebuild query from the root group and submit to the store. */
-  search(): void {
+  private _submitAdvancedSearchCondition(): void {
     const query = this._rootGroup.queryFragment;
     setAdvancedSearchCondition(query);
   }
