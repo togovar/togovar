@@ -2,7 +2,7 @@
   "root": true,
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended", // ← 追加
+    "plugin:@typescript-eslint/recommended",
     "prettier"
   ],
   "env": { "es2021": true, "browser": true, "node": true },
