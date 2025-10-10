@@ -22,6 +22,7 @@ export function buildDatasetQuery(
     .filter(Boolean)
     .map((fc) => (fc as FrequencyCountValueView).queryValue);
 
-  if (queries.length <= 1) return queries[0];
+  if (queries.length === 0) return {} as FrequencyQuery;
+  if (queries.length === 1) return queries[0];
   return { or: queries };
 }

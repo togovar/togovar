@@ -191,10 +191,34 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
         return {} as ConditionQuery;
       case 1:
         return children[0].queryFragment as ConditionQuery;
-      default:
+      default: {
+        // Filter out null, undefined, and empty objects to prevent malformed queries
+        const validFragments = children
+          .map((v) => v.queryFragment)
+          .filter((fragment) => {
+            if (fragment == null) return false; // null or undefined
+            if (
+              typeof fragment === 'object' &&
+              Object.keys(fragment).length === 0
+            )
+              return false; // empty object
+            return true;
+          });
+
+        // If no valid fragments remain, return empty query
+        if (validFragments.length === 0) {
+          return {} as ConditionQuery;
+        }
+
+        // If only one valid fragment, return it directly (no need for logical operator wrapper)
+        if (validFragments.length === 1) {
+          return validFragments[0] as ConditionQuery;
+        }
+
         return {
-          [this.logicalOperator]: children.map((v) => v.queryFragment),
+          [this.logicalOperator]: validFragments,
         } as ConditionQuery;
+      }
     }
   }
 
