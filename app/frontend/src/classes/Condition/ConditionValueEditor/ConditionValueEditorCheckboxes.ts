@@ -109,7 +109,6 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
       )
     );
     this._lastValues = views.map((v) => v.value);
-    console.log('keepLastValues', this._lastValues);
   }
 
   /** Restore checkbox states to the last confirmed values. */
