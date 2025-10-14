@@ -212,19 +212,6 @@ export class PredictionRangeSlider extends LitElement {
     if (name === 'unknown') this.includeUnknown = checked;
   }
 
-  private _switchInequalitySign(sign: Inequality) {
-    switch (sign) {
-      case 'gte':
-        return { newSign: 'gt' as Inequality, newHtml: '&#60;' };
-      case 'gt':
-        return { newSign: 'gte' as Inequality, newHtml: '&#8804;' };
-      case 'lte':
-        return { newSign: 'lt' as Inequality, newHtml: '&#60;' };
-      case 'lt':
-        return { newSign: 'lte' as Inequality, newHtml: '&#8804;' };
-    }
-  }
-
   render() {
     const createNumberInput = (
       className: 'from' | 'to',
