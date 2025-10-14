@@ -79,7 +79,7 @@ const config = {
         exclude: /node_modules/,
       },
       {
-        test: /\.(jpg|jpeg|png|gif|tiff|svg)$/,
+        test: /\.(jpg|jpeg|png|gif|tiff|svg|webp)$/,
         loader: 'file-loader',
         options: {
           outputPath: 'images',
