@@ -6,7 +6,7 @@ const LIMIT = 100;
 import { extractSearchCondition } from '../store/searchManager';
 import type { FetchOption, SearchResults, SearchStatistics } from '../types';
 
-let currentAbortController = null;
+let currentAbortController: AbortController | null = null;
 let _currentSearchMode: 'simple' | 'advanced' | null = null;
 const lastRequestRanges = new Set(); // 取得済みの範囲を管理
 
@@ -83,7 +83,7 @@ export const executeSearch = (() => {
         })
         .catch((error) => {
           // AbortErrorの場合はローディング状態を維持
-          if (error.name === 'AbortError') return;
+          if (error instanceof Error && error.name === 'AbortError') return;
           storeManager.setData('isFetching', false);
           isRequestInProgress = false;
           storeManager.setData('searchMessages', { error });
@@ -137,6 +137,9 @@ function _determineSearchEndpoints(
         ? [`${basePath}?stat=0&data=1`, `${basePath}?stat=1&data=0`]
         : [`${basePath}?stat=0&data=1`];
     }
+
+    default:
+      return [];
   }
 }
 
@@ -156,7 +159,7 @@ function _getRequestOptions(signal: AbortSignal): FetchOption {
   }
 
   // Advanced search のリクエストオプション
-  const body: Partial<{ offset: number; query: any }> = {
+  const body: Partial<{ offset: number; query: Record<string, unknown> }> = {
     offset: _calculateOffset(storeManager.getData('offset'), LIMIT),
   };
 
@@ -217,7 +220,7 @@ async function _fetchData(endpoint: string, options: FetchOption) {
     }
   } catch (error) {
     console.error(error);
-    if (error.name === 'AbortError') {
+    if (error instanceof Error && error.name === 'AbortError') {
       // AbortErrorの場合はエラーオブジェクトを投げる
       const abortError = new Error('ABORTED');
       abortError.name = 'AbortError';
@@ -229,7 +232,7 @@ async function _fetchData(endpoint: string, options: FetchOption) {
 
 /** HTTP ステータスコードに応じたエラーメッセージを取得 */
 function _getErrorMessage(statusCode: number): string {
-  const errorTypes = {
+  const errorTypes: Record<number, string> = {
     400: 'INVALID_REQUEST',
     401: 'UNAUTHORIZED',
     404: 'NOT_FOUND',
