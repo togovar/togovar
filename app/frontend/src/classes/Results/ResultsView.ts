@@ -35,17 +35,17 @@ export class ResultsView {
   /** ルート要素 */
   private elm: HTMLElement;
   /** タッチハンドラー */
-  private touchHandler: ResultsViewTouchHandler;
+  private touchHandler!: ResultsViewTouchHandler;
   /** スクロールバー */
-  private scrollBar: ResultsScrollBar;
+  private scrollBar!: ResultsScrollBar;
   /** データマネージャー */
-  private dataManager: ResultsViewDataManager;
+  private dataManager!: ResultsViewDataManager;
   /** テーブルボディ要素 */
-  private tbody: HTMLElement;
+  private tbody!: HTMLElement;
   /** テーブルコンテナ要素 */
-  private tablecontainer: HTMLElement;
+  private tablecontainer!: HTMLElement;
   /** バインドされたイベントハンドラー */
-  private _boundKeydownHandler: (_e: KeyboardEvent) => void;
+  private _boundKeydownHandler!: (_e: KeyboardEvent) => void;
 
   /**
    * ResultsViewのコンストラクタ
@@ -109,14 +109,6 @@ export class ResultsView {
 
     // Remove keydown event listener
     document.removeEventListener('keydown', this._boundKeydownHandler);
-
-    // Clear DOM references
-    this.elm = null as any;
-    this.tbody = null as any;
-    this.tablecontainer = null as any;
-    this.scrollBar = null as any;
-    this.touchHandler = null as any;
-    this.dataManager = null as any;
   }
 
   /**
@@ -147,7 +139,7 @@ export class ResultsView {
    * 検索結果の表示
    * @param _results - 検索結果（未使用）
    */
-  searchResults(_results: any): void {
+  searchResults(_results: unknown): void {
     this.dataManager.handleSearchResults(
       _results,
       isTouchDevice(),
@@ -177,7 +169,7 @@ export class ResultsView {
    * 核型の変更時の処理
    * @param _karyotype - 核型データ（未使用）
    */
-  karyotype(_karyotype: any): void {
+  karyotype(_karyotype: unknown): void {
     this.updateDisplaySize();
   }
 
@@ -300,7 +292,7 @@ export class ResultsView {
     // PC用のホイールイベント
     this.tbody.addEventListener(
       this.getWheelEventName(),
-      this._scroll.bind(this)
+      this._scroll.bind(this) as EventListener
     );
 
     // タッチハンドラーのコールバック設定
