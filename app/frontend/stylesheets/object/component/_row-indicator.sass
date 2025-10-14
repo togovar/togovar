@@ -1,3 +1,5 @@
+@use "sass:color"
+
 .row-indicator
   width: 14px
   height: 27px
@@ -20,7 +22,7 @@
     filter: blur(1px)
     opacity: .4
   &:after
-    border-left: solid 9px lighten($COLOR_SELECTED, 30%)
+    border-left: solid 9px color.adjust($COLOR_SELECTED, $lightness: 30%)
     border-top: solid 8px transparent
     border-bottom: solid 8px transparent
     top: 5px

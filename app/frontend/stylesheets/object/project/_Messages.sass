@@ -1,3 +1,5 @@
+@use "sass:color"
+
 #Messages, .messages-view
   padding-right: 10px
   > .message
@@ -14,20 +16,20 @@
       transform: translateY(-50%)
       left: 6px
     &.-error
-      border-color: darken($COLOR_SIGN_DANGEROUS, 2%)
-      background-color: lighten($COLOR_SIGN_DANGEROUS, 30%)
+      border-color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: -2%)
+      background-color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: 30%)
       &:before
         content: $CHAR_TIMES
-        color: darken($COLOR_SIGN_DANGEROUS, 2%)
+        color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: -2%)
     &.-warning
-      border-color: darken($COLOR_SIGN_WARNING, 2%)
-      background-color: lighten($COLOR_SIGN_WARNING, 45%)
+      border-color: color.adjust($COLOR_SIGN_WARNING, $lightness: -2%)
+      background-color: color.adjust($COLOR_SIGN_WARNING, $lightness: 45%)
       &:before
         content: $CHAR_EXCRAMATION_TRIANGLE
-        color: darken($COLOR_SIGN_WARNING, 2%)
+        color: color.adjust($COLOR_SIGN_WARNING, $lightness: -2%)
     &.-notice
-      border-color: darken($COLOR_SIGN_NORMAL, 2%)
-      background-color: lighten($COLOR_SIGN_NORMAL, 42%)
+      border-color: color.adjust($COLOR_SIGN_NORMAL, $lightness: -2%)
+      background-color: color.adjust($COLOR_SIGN_NORMAL, $lightness: 42%)
       &:before
         content: $CHAR_INFO_CIRCLE
-        color: darken($COLOR_SIGN_NORMAL, 2%)
+        color: color.adjust($COLOR_SIGN_NORMAL, $lightness: -2%)

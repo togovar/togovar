@@ -138,7 +138,7 @@ export class AdvancedSearchBuilderView {
 
   /** Notify that the condition set changed → re-run search. */
   changeCondition(): void {
-    this.search();
+    this._submitAdvancedSearchCondition();
   }
 
   /** Group selected views into a new subgroup under their common parent. */
@@ -208,7 +208,7 @@ export class AdvancedSearchBuilderView {
   }
 
   /** Rebuild query from the root group and submit to the store. */
-  search(): void {
+  private _submitAdvancedSearchCondition(): void {
     const query = this._rootGroup.queryFragment;
     setAdvancedSearchCondition(query);
   }
@@ -217,8 +217,9 @@ export class AdvancedSearchBuilderView {
    * Add a condition under the selected group (or root if none selected).
    * If a single condition is selected, we could insert "after" it; currently we
    * append to its parent group (kept as-is to avoid interface drift).
+   * @param options - Optional initial values (e.g., from karyotype selection: {chr, start, end})
    */
-  addCondition(conditionType: ConditionTypeValue): void {
+  addCondition(conditionType: ConditionTypeValue, options?: unknown): void {
     const selected = this._selection.getSelectedConditionViews();
     const target = selected.length > 0 ? selected[0] : this._rootGroup;
 
@@ -227,13 +228,14 @@ export class AdvancedSearchBuilderView {
     if (target.conditionNodeKind === CONDITION_NODE_KIND.condition) {
       target.parentGroup?.addNewConditionItem(
         conditionType,
-        target.rootEl.nextSibling // ← 直後に挿入
+        target.rootEl.nextSibling,
+        options
       );
     } else if (
       target.conditionNodeKind === CONDITION_NODE_KIND.group &&
       isGroupView(target)
     ) {
-      target.addNewConditionItem(conditionType);
+      target.addNewConditionItem(conditionType, null, options);
     }
   }
 

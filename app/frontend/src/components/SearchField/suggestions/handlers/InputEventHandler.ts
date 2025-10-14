@@ -89,6 +89,6 @@ export class InputEventHandler {
 
   /** サジェスト表示の条件をチェック */
   shouldShowSuggestions(): boolean {
-    return this.host.term && this.host.term.length >= 3;
+    return !!(this.host.term && this.host.term.length >= 3);
   }
 }

@@ -2,7 +2,7 @@
   "root": true,
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended", // ← 追加
+    "plugin:@typescript-eslint/recommended",
     "prettier"
   ],
   "env": { "es2021": true, "browser": true, "node": true },
@@ -42,6 +42,12 @@
           "error",
           { "argsIgnorePattern": "^_", "varsIgnorePattern": "^TOGOVAR_" }
         ]
+      }
+    },
+    {
+      "files": ["**/webpack.config*.js", "**/config/webpack.config*.js"],
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off"
       }
     }
   ],

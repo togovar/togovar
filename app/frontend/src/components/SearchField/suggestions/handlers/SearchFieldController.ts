@@ -9,7 +9,7 @@ import type {
 /** SearchFieldController - API呼び出しとデータ管理を担当するクラス */
 export class SearchFieldController {
   private host: SearchFieldHost;
-  apiTask: Task;
+  apiTask!: Task;
   private _getSuggestURL: ((text: string) => string) | null = null;
 
   /** @param host - ホストとなるLitElementインスタンス */

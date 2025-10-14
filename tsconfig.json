@@ -11,5 +11,9 @@
     "useDefineForClassFields": false,
     "strict": true
   },
-  "include": ["./app/frontend/src/**/*", "./app/frontend/css.d.ts"]
+  "include": ["./app/frontend/src/**/*", "./app/frontend/css.d.ts"],
+  "exclude": [
+    "./app/frontend/config/webpack.config*.js",
+    "./app/frontend/server/**/*"
+  ]
 }

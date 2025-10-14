@@ -54,9 +54,12 @@ export class AdvancedSearchToolbar {
 
     // Build "Add condition" items
     const addItems = Object.keys(ADVANCED_CONDITIONS).map((key, index) => {
-      const label =
-        ADVANCED_CONDITIONS[key as keyof typeof ADVANCED_CONDITIONS]?.label ??
-        key;
+      const condition =
+        ADVANCED_CONDITIONS[key as keyof typeof ADVANCED_CONDITIONS];
+      const label: string =
+        (condition && typeof condition === 'object' && 'label' in condition
+          ? String(condition.label)
+          : key) ?? key;
 
       return createEl('li', {
         class: 'command',
@@ -123,9 +126,9 @@ export class AdvancedSearchToolbar {
   // =========================================================
 
   /** One delegated click handler for the whole toolbar. */
-  private _onClick = (e: MouseEvent) => {
-    // Ignore non-primary buttons (e.g., right/middle click).
-    if (e.button !== 0) return;
+  private _onClick = (e: Event) => {
+    // Ignore non-primary buttons (e.g., right/middle click) for MouseEvent.
+    if (e instanceof MouseEvent && e.button !== 0) return;
 
     const target = e.target;
     if (!(target instanceof Element)) return;
@@ -142,7 +145,7 @@ export class AdvancedSearchToolbar {
     const condition = cmdEl.dataset.condition as ConditionTypeValue | undefined;
     if (!command) return;
 
-    this._handleCommand(command, condition);
+    this._handleCommand(command, condition, e);
   };
 
   /** Keyboard activation for accessibility: Enter/Space triggers the same action. */
@@ -195,13 +198,17 @@ export class AdvancedSearchToolbar {
    */
   private _handleCommand(
     command: Command,
-    ConditionTypeValue: ConditionTypeValue | undefined
+    ConditionTypeValue: ConditionTypeValue | undefined,
+    event?: Event
   ): void {
     switch (command) {
-      case 'add-condition':
+      case 'add-condition': {
         if (!ConditionTypeValue) return;
-        this._builder.addCondition(ConditionTypeValue);
+        // Pass CustomEvent detail (e.g., from karyotype selection) if available
+        const options = event instanceof CustomEvent ? event.detail : undefined;
+        this._builder.addCondition(ConditionTypeValue, options);
         break;
+      }
       case 'group':
         this._builder.group();
         break;

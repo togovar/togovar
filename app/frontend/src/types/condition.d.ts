@@ -203,6 +203,7 @@ interface ConditionValueEditor {
   keepLastValues(): void; // Capture current state when editing begins
   restore(): void; // Restore captured state when user cancels
   readonly isValid: boolean; // Whether this editor currently has a valid value
+  applyOptions(options: unknown): void; // Apply initial options (e.g., from karyotype selection)
 }
 
 /** Constructor signature for editor classes. */

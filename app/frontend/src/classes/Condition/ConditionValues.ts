@@ -8,7 +8,7 @@ import { ConditionValueEditorDatasetColumns } from './ConditionValueEditor/Condi
 import { ConditionValueEditorDisease } from './ConditionValueEditor/ConditionValueEditorDisease';
 import { ConditionValueEditorFrequencyCount } from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
 import { ConditionValueEditorGene } from './ConditionValueEditor/ConditionValueEditorGene';
-import ConditionValueEditorLocation from './ConditionValueEditor/ConditionValueEditorLocation';
+import { ConditionValueEditorLocation } from './ConditionValueEditor/ConditionValueEditorLocation';
 import { ConditionValueEditorPathogenicityPrediction } from './ConditionValueEditor/ConditionValueEditorPathogenicityPrediction';
 import { ConditionValueEditorVariantID } from './ConditionValueEditor/ConditionValueEditorVariantID';
 import type { ConditionItemView } from './ConditionItemView';
@@ -53,9 +53,11 @@ export default class ConditionValues {
   private _sectionsEl!: HTMLDivElement;
   private _okButtonEl!: HTMLButtonElement;
   private _cancelButtonEl!: HTMLButtonElement;
+  private _options?: unknown;
 
-  constructor(conditionView: ConditionItemView) {
+  constructor(conditionView: ConditionItemView, options?: unknown) {
     this._conditionView = conditionView;
+    this._options = options;
     this._buildDOM();
     this._wireEvents();
     this._instantiateEditorsFor(conditionView.conditionType);
@@ -156,6 +158,16 @@ export default class ConditionValues {
   private _instantiateEditorsFor(type: ConditionTypeValue): void {
     const ctors = EDITOR_REGISTRY[type] ?? [];
     this._editors = ctors.map((Ctor) => new Ctor(this, this._conditionView));
+
+    // If options provided (e.g., from karyotype), apply them to editors
+    if (this._options) {
+      for (const editor of this._editors) {
+        if (typeof editor.applyOptions === 'function') {
+          editor.applyOptions(this._options);
+        }
+      }
+    }
+
     // 初期状態のボタン有効状態を反映
     this._recomputeValidity();
   }

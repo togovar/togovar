@@ -1,10 +1,12 @@
+@use "sass:color"
+
 .remains-count
   display: inline-block
   font-size: 10px
   line-height: 14px
   border: solid 1px $COLOR_GRAY
   border-radius: 7px
-  background-color: lighten($COLOR_GRAY, 35%)
+  background-color: color.adjust($COLOR_GRAY, $lightness: 35%)
   padding: 0 4px
   margin-left: 4px
   vertical-align: middle
