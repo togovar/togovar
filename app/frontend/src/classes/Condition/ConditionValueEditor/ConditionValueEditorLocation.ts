@@ -51,6 +51,14 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
   /** Reference genome karyotype data for chromosome length validation */
   private _karyotypeData: KaryotypeData | null = null;
 
+  /** Saved state for restoration on cancel */
+  private _savedState: {
+    chromosome: string;
+    startPosition: string;
+    endPosition: string;
+    isSinglePosition: boolean;
+  } | null = null;
+
   constructor(
     conditionValues: ConditionValues,
     conditionItemView: ConditionItemView
@@ -67,15 +75,43 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
   // Public API
   // ──────────────────────────────────────────────────────────────────────────
 
-  /** Preserve current state (no-op for this editor) */
+  /** Preserve current state before editing */
   keepLastValues(): void {
-    // No-op: state is rebuilt from value views when needed
-    // TODO
+    this._savedState = {
+      chromosome: this._chromosomeSelect.value,
+      startPosition: this._startPositionInput.value,
+      endPosition: this._endPositionInput.value,
+      isSinglePosition: this._singlePositionCheckbox.checked,
+    };
   }
 
-  /** Restore UI state from existing value views */
+  /** Restore UI state from saved state (on cancel) */
   restore(): void {
-    this._loadFromValueViews();
+    if (!this._savedState) {
+      // No saved state, fallback to loading from value views
+      this._loadFromValueViews();
+      this._updateValueAndValidation();
+      return;
+    }
+
+    // Restore from saved state
+    this._chromosomeSelect.value = this._savedState.chromosome;
+    this._startPositionInput.value = this._savedState.startPosition;
+    this._endPositionInput.value = this._savedState.endPosition;
+    this._singlePositionCheckbox.checked = this._savedState.isSinglePosition;
+
+    // Update UI mode
+    this._positionInputContainer.dataset.type = this._savedState
+      .isSinglePosition
+      ? INPUT_MODE.SINGLE_POSITION
+      : INPUT_MODE.REGION;
+
+    // Update position constraints based on chromosome
+    const maxPosition = this._getChromosomeMaxPosition();
+    if (maxPosition) {
+      this._updatePositionConstraints(maxPosition);
+    }
+
     this._updateValueAndValidation();
   }
 
