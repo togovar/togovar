@@ -43,6 +43,12 @@
           { "argsIgnorePattern": "^_", "varsIgnorePattern": "^TOGOVAR_" }
         ]
       }
+    },
+    {
+      "files": ["**/webpack.config*.js", "**/config/webpack.config*.js"],
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off"
+      }
     }
   ],
 
