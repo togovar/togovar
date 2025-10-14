@@ -102,6 +102,8 @@ class RangeSlider extends HTMLElement {
     };
 
     this.state = initState;
+    this.searchType = null; // Will be set by parent component
+    this._isInitializing = true; // Flag to prevent events during initialization
 
     this.root = this.getRootNode();
     this.attachShadow({ mode: 'open' });
@@ -138,13 +140,37 @@ class RangeSlider extends HTMLElement {
         this.to.step = newValue;
         break;
       case 'value1':
-        this.slider1.value = parseFloat(newValue).toFixed(3);
+        // Only update slider value during initialization to avoid triggering input events
+        if (this._isInitializing) {
+          this.slider1.value = parseFloat(newValue).toFixed(3);
+        }
+        // Update state when value1 attribute changes - BUT ONLY during initialization
+        // After initialization, the state is the source of truth and should not be overwritten by attributes
+        if (this.state && this._isInitializing) {
+          const parsedValue = parseFloat(newValue);
+          this.state.from = Math.min(parsedValue, this.state.to);
+        }
         break;
       case 'value2':
-        this.slider2.value = parseFloat(newValue).toFixed(3);
+        // Only update slider value during initialization to avoid triggering input events
+        if (this._isInitializing) {
+          this.slider2.value = parseFloat(newValue).toFixed(3);
+        }
+        // Update state when value2 attribute changes - BUT ONLY during initialization
+        if (this.state && this._isInitializing) {
+          const parsedValue = parseFloat(newValue);
+          this.state.to = Math.max(parsedValue, this.state.from);
+        }
         break;
       case 'invert':
-        this.invertChk.checked = newValue === 'true';
+        // Only update checkbox during initialization to avoid triggering change events
+        if (this._isInitializing) {
+          this.invertChk.checked = newValue === 'true';
+        }
+        // Update state when invert attribute changes - BUT ONLY during initialization
+        if (this.state && this._isInitializing) {
+          this.state.invert = newValue === 'true' ? '1' : '0';
+        }
         break;
       case 'ruler-number-of-steps':
         this.state.rulerNumberOfSteps = newValue;
@@ -276,6 +302,9 @@ class RangeSlider extends HTMLElement {
     this.setAttribute('ruler-number-of-steps', value);
   }
   set searchType(value) {
+    // Store searchType for use in range validation
+    this._searchType = value;
+
     // do not expose this to the user
     if (value === 'simple') {
       this.shadowRoot.querySelector('.wrapper').appendChild(searchTypeSimple);
@@ -288,6 +317,10 @@ class RangeSlider extends HTMLElement {
         }
       });
     }
+  }
+
+  get searchType() {
+    return this._searchType;
   }
 
   set invert(value) {
@@ -309,6 +342,9 @@ class RangeSlider extends HTMLElement {
   }
 
   connectedCallback() {
+    // Reset initialization flag when reconnecting (e.g., during grouping)
+    this._isInitializing = true;
+    
     this.min = this.getAttribute('min') || 0;
     this.max = this.getAttribute('max') || 1;
     this.value1 = this.getAttribute('value1') || 0;
@@ -324,7 +360,11 @@ class RangeSlider extends HTMLElement {
 
           const parsedValue = parseFloat(value);
 
-          if (parsedValue > 1 || parsedValue < 0) {
+          // Only enforce 0-1 range restriction for simple search type (frequency mode)
+          // Advanced search with count mode needs to allow values > 1
+          const isSimpleSearch = this.searchType === 'simple';
+
+          if (isSimpleSearch && (parsedValue > 1 || parsedValue < 0)) {
             if (parsedValue > 1) {
               target.to = 1;
             }
@@ -332,6 +372,11 @@ class RangeSlider extends HTMLElement {
               target.from = 0;
             }
           } else {
+            // Enforce min value of 0 for all cases
+            if (parsedValue < 0) {
+              return true; // Ignore negative values
+            }
+
             if (prop === 'from') {
               // if from is larger than to, set to instead
               if (parsedValue > target.to) {
@@ -349,7 +394,10 @@ class RangeSlider extends HTMLElement {
           }
 
           this._getToFromFromState.call(this);
-          this._fireEvent(target);
+          // Don't fire event during initialization
+          if (!this._isInitializing) {
+            this._fireEvent(target);
+          }
           return true;
         } else if (prop === 'invert') {
           if (typeof value === 'boolean') {
@@ -360,7 +408,10 @@ class RangeSlider extends HTMLElement {
 
           this._getToFromFromState.call(this);
 
-          this._fireEvent(target);
+          // Don't fire event during initialization
+          if (!this._isInitializing) {
+            this._fireEvent(target);
+          }
           return true;
         } else {
           this._getToFromFromState.call(this);
@@ -395,6 +446,9 @@ class RangeSlider extends HTMLElement {
 
     this._fillSlider();
     this._reRenderRuler();
+
+    // Initialization complete - enable event firing
+    this._isInitializing = false;
   }
 
   _slider1Input = (e) => {
