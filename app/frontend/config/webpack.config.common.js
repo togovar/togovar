@@ -42,7 +42,18 @@ const config = {
       },
       {
         test: /\.(sa|c)ss$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                silenceDeprecations: ['import', 'global-builtin'],
+              },
+            },
+          },
+        ],
         exclude: /node_modules/,
       },
       {
@@ -56,7 +67,14 @@ const config = {
           },
           'extract-loader',
           'css-loader',
-          'sass-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                silenceDeprecations: ['import', 'global-builtin'],
+              },
+            },
+          },
         ],
         exclude: /node_modules/,
       },

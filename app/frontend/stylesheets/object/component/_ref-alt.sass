@@ -1,5 +1,7 @@
-$COLOR_REF_BG: desaturate(lighten($COLOR_REF, 48%), 10%)
-$COLOR_ALT_BG: desaturate(lighten($COLOR_ALT, 24%), 10%)
+@use "sass:color"
+
+$COLOR_REF_BG: color.adjust($COLOR_REF, $lightness: 48%, $saturation: -10%)
+$COLOR_ALT_BG: color.adjust($COLOR_ALT, $lightness: 24%, $saturation: -10%)
 
 .ref-alt
   font-weight: bold
