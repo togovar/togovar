@@ -29,7 +29,7 @@ const config = {
         use: {
           loader: 'pug-loader',
           options: {
-            globals: ['GLOBALS'],
+            globals: ['GLOBALS', 'TOGOVAR_FRONTEND_GTM_ID'],
             pretty: true,
           },
         },
@@ -129,6 +129,11 @@ const config = {
     ],
   },
   plugins: [
+    new webpack.DefinePlugin({
+      TOGOVAR_FRONTEND_GTM_ID: JSON.stringify(
+        process.env.TOGOVAR_FRONTEND_GTM_ID || ''
+      ),
+    }),
     new HtmlWebpackPlugin({
       template: 'app/frontend/views/index.pug',
       filename: 'index.html',
