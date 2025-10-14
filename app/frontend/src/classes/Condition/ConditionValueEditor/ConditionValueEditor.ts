@@ -139,4 +139,17 @@ export class ConditionValueEditor {
       )
     );
   }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Options handling (for karyotype selection, etc.)
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Apply initial options to the editor (e.g., from karyotype selection).
+   * Override this method in subclasses to handle specific options.
+   * @param _options - Options object (structure depends on the editor type)
+   */
+  applyOptions(_options: unknown): void {
+    // Base implementation does nothing; subclasses can override
+  }
 }

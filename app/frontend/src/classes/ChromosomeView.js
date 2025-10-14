@@ -200,17 +200,25 @@ export default class ChromosomeView {
       case 'simple':
         setSimpleSearchCondition('term', `${chr}:${start}-${end}`);
         break;
-      case 'advanced':
-        document
+      case 'advanced': {
+        const targetElement = document
           .getElementById('AdvancedSearchBuilderView')
-          .querySelector(
+          ?.querySelector(
             ':scope > .inner > .advanced-search-condition-group-view.-root > .advanced-search-toolbar > ul > li > ul > li[data-condition="location"]'
-          )
-          .dispatchEvent(
-            new CustomEvent('click', { detail: { chr, start, end } })
           );
 
+        if (targetElement) {
+          targetElement.dispatchEvent(
+            new CustomEvent('click', {
+              detail: { chr, start, end },
+              bubbles: true,
+              cancelable: true,
+            })
+          );
+        }
+
         break;
+      }
     }
     // Karyotype 上の座標編集フィールドが廃止になったため、不要
     //storeManager.setData('region__', {

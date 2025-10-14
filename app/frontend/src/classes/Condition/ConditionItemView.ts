@@ -54,12 +54,14 @@ export class ConditionItemView extends BaseConditionView {
    * @param parentGroup  The logical parent group view
    * @param conditionType Type discriminator for this row
    * @param referenceElm  Insert before this node (or appended when null)
+   * @param options      Optional initial values (e.g., from karyotype selection)
    */
   constructor(
     builder: AdvancedSearchBuilderView,
     parentGroup: ConditionGroupView,
     conditionType: ConditionTypeValue,
-    referenceElm: Node | null = null
+    referenceElm: Node | null = null,
+    options?: unknown
   ) {
     super(
       builder,
@@ -71,7 +73,7 @@ export class ConditionItemView extends BaseConditionView {
     this._relationSupported = supportsRelation(conditionType);
 
     this._initializeHTML();
-    this._conditionValues = new ConditionValues(this);
+    this._conditionValues = new ConditionValues(this, options);
     this._attachEventDelegation();
     this._enterEditMode(); // Start in edit mode on first render.
   }

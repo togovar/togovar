@@ -400,4 +400,53 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
       this.addValueView(locationString, locationString, true);
     }
   }
+
+  /**
+   * Apply options from karyotype selection (or other sources).
+   * Expected format: { chr: string|number, start: number|string, end: number|string }
+   */
+  applyOptions(options: unknown): void {
+    if (!options || typeof options !== 'object') return;
+
+    const opts = options as Record<string, unknown>;
+    const chr = opts.chr;
+    const start = opts.start;
+    const end = opts.end;
+
+    // Convert chromosome to string
+    const chrStr = String(chr);
+    if (!chrStr) return;
+
+    // Convert start/end to numbers (handle both number and string)
+    const startNum =
+      typeof start === 'number'
+        ? start
+        : start
+        ? parseInt(String(start), 10)
+        : null;
+    const endNum =
+      typeof end === 'number' ? end : end ? parseInt(String(end), 10) : null;
+
+    // Set chromosome
+    this._chromosomeSelect.value = chrStr;
+
+    // Set start position
+    if (startNum !== null && !isNaN(startNum)) {
+      this._startPositionInput.value = String(startNum);
+    }
+
+    // Set end position (if provided and different from start)
+    if (endNum !== null && !isNaN(endNum) && endNum !== startNum) {
+      this._singlePositionCheckbox.checked = false;
+      this._positionInputContainer.dataset.type = INPUT_MODE.REGION;
+      this._endPositionInput.value = String(endNum);
+    } else if (startNum !== null && !isNaN(startNum)) {
+      // Single position mode
+      this._singlePositionCheckbox.checked = true;
+      this._positionInputContainer.dataset.type = INPUT_MODE.SINGLE_POSITION;
+    }
+
+    // Trigger validation and value update
+    this._updateValueAndValidation();
+  }
 }

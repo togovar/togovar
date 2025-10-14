@@ -80,14 +80,15 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
   /** Add a new condition item as a direct child of this group. */
   addNewConditionItem(
     conditionType: ConditionTypeValue,
-    _options?: unknown,
-    referenceElm: Node | null = null
+    referenceElm: Node | null = null,
+    options?: unknown
   ): ConditionItemView {
     const item = new ConditionItemView(
       this._builder,
       this,
       conditionType,
-      referenceElm
+      referenceElm,
+      options
     );
     this._syncNumberOfChildren();
     return item;
