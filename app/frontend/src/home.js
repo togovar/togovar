@@ -14,7 +14,7 @@ import { AdvancedSearchBuilderView } from '../src/classes/AdvancedSearchBuilderV
 // PanelViews
 // PanelViews: Filters
 import PanelViewCheckList from '../src/classes/PanelViewCheckList.js';
-import PanelViewFilterAlternativeAlleleFrequency from '../src/classes/PanelViewFilterAlternativeAlleleFrequency.js';
+import { PanelViewFilterAlternativeAlleleFrequency } from '../src/classes/PanelViewFilterAlternativeAlleleFrequency.ts';
 import PanelViewFilterVariantCallingQuality from '../src/classes/PanelViewFilterVariantCallingQuality.js';
 import PanelViewFilterConsequence from '../src/classes/PanelViewFilterConsequence.js';
 // PanelViews: Variant preview
