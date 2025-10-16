@@ -12,7 +12,6 @@ export interface RulerRenderOptions {
   rulerNumberOfSteps: number;
   min: number;
   max: number;
-  orientation: 'horizontal' | 'vertical';
 }
 
 /**
@@ -20,10 +19,10 @@ export interface RulerRenderOptions {
  *
  * Creates scale divs evenly distributed across the slider width.
  * Each scale shows a numeric label (e.g., 0.0, 0.1, 0.2, ..., 1.0).
- * Called when ruler-number-of-steps or orientation changes.
+ * Called when ruler-number-of-steps changes.
  */
 export function renderRuler(options: RulerRenderOptions): void {
-  const { rulerElement, rulerNumberOfSteps, min, max, orientation } = options;
+  const { rulerElement, rulerNumberOfSteps, min, max } = options;
 
   rulerElement.innerHTML = ''; // Clear existing scales
 
@@ -34,7 +33,6 @@ export function renderRuler(options: RulerRenderOptions): void {
     const scale = document.createElement('div');
     scale.className = 'scale';
     scale.part.add('scale'); // CSS part for styling
-    scale.part.add(`scale-${orientation}`); // Orientation-specific styling
     scale.innerText = (min + i * step).toFixed(1); // Numeric label
     scale.style.left = `calc(${(i * 100) / rulerNumberOfSteps}% - 0.5em`; // Position
     rulerElement.appendChild(scale);

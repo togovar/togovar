@@ -33,9 +33,6 @@ import Styles from '../../stylesheets/object/component/frequency-range.slider.sc
 /** Search context type: 'simple' for frequency mode, 'advanced' for count/other modes */
 type SearchType = 'simple' | 'advanced' | null;
 
-/** Slider orientation for layout */
-type Orientation = 'horizontal' | 'vertical';
-
 /** Match criteria for dataset filtering (simple search only) */
 type MatchType = 'all' | 'any';
 
@@ -135,9 +132,6 @@ class RangeSlider extends LitElement {
 
   @property({ type: Number, reflect: true, attribute: 'input-step' })
   inputStep: number = 0.05;
-
-  @property({ type: String, reflect: true, attribute: 'orientation' })
-  orientation: Orientation = 'horizontal';
 
   @property({ type: Boolean, reflect: true, attribute: 'invert' })
   invert: boolean = false;
@@ -282,15 +276,6 @@ class RangeSlider extends LitElement {
       this.state.match = this.match;
     }
 
-    if (changedProperties.has('orientation')) {
-      if (this.orientation === 'vertical') {
-        this._meter.classList.add('-vertical');
-      } else {
-        this._meter.classList.remove('-vertical');
-      }
-      this._reRenderRuler();
-    }
-
     // Update visual slider track after any property change
     if (changedProperties.size > 0) {
       this._fillSlider();
@@ -375,7 +360,7 @@ class RangeSlider extends LitElement {
    *
    * Creates scale divs evenly distributed across the slider width.
    * Each scale shows a numeric label (e.g., 0.0, 0.1, 0.2, ..., 1.0).
-   * Called when ruler-number-of-steps or orientation changes.
+   * Called when ruler-number-of-steps changes.
    */
   private _reRenderRuler(): void {
     const ruler = this.shadowRoot?.querySelector('.ruler');
@@ -386,7 +371,6 @@ class RangeSlider extends LitElement {
       rulerNumberOfSteps: this.state.rulerNumberOfSteps,
       min: this.state.min,
       max: this.state.max,
-      orientation: this.orientation,
     });
   }
 
@@ -659,11 +643,6 @@ class RangeSlider extends LitElement {
     // Set initial display values
     this.from.value = this._formatInputValue(this.state.from);
     this.to.value = this._formatInputValue(this.state.to);
-
-    // Apply orientation class
-    if (this.orientation === 'vertical') {
-      this._meter.classList.add('-vertical');
-    }
 
     // Render visuals
     this._fillSlider();
