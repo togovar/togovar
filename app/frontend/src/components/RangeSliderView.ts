@@ -88,7 +88,8 @@ class RangeSlider extends LitElement {
   public state: RangeSliderState;
 
   /** Search type context: 'simple' enables match radio buttons and 0-1 range restriction */
-  private _searchType: SearchType;
+  @property({ type: String, attribute: false })
+  private _searchType: SearchType = null;
 
   /** Stored click handler for match radios so it can be removed on disconnect */
   private _matchClickHandler?: EventListener;
@@ -224,6 +225,15 @@ class RangeSlider extends LitElement {
    * Called after any reactive property changes.
    */
   updated(changedProperties: Map<string | number | symbol, unknown>): void {
+    // When searchType changes, ensure visual elements are rendered after DOM update
+    if (changedProperties.has('_searchType')) {
+      // Use setTimeout to ensure DOM is updated after render
+      setTimeout(() => {
+        this._fillSlider();
+        this._reRenderRuler();
+      }, 0);
+    }
+
     // Check if DOM elements are available
     const domReady =
       !!this.slider1 &&
@@ -406,7 +416,9 @@ class RangeSlider extends LitElement {
    * Called when ruler-number-of-steps or orientation changes.
    */
   private _reRenderRuler(): void {
-    const ruler = this.shadowRoot!.querySelector('.ruler')!;
+    const ruler = this.shadowRoot?.querySelector('.ruler');
+    if (!ruler) return;
+    
     renderRuler({
       rulerElement: ruler,
       rulerNumberOfSteps: this.state.rulerNumberOfSteps,
@@ -428,6 +440,8 @@ class RangeSlider extends LitElement {
    * - var(--color-key-dark1): Selected regions
    */
   private _fillSlider(): void {
+    if (!this.slider1 || !this.slider2 || !this.sliderTrack) return;
+    
     fillSlider({
       slider1: this.slider1,
       slider2: this.slider2,
@@ -451,9 +465,11 @@ class RangeSlider extends LitElement {
    * Uses dynamic CSS injection to target specific slider thumbs.
    */
   private _drawThumbs(): void {
-    const styleElement = this.shadowRoot!.querySelector(
+    const styleElement = this.shadowRoot?.querySelector(
       "style[data='slider-track-style']"
-    )! as HTMLStyleElement;
+    ) as HTMLStyleElement | null;
+    
+    if (!styleElement || !this.slider1 || !this.slider2) return;
 
     drawThumbs({
       slider1: this.slider1,
@@ -481,7 +497,12 @@ class RangeSlider extends LitElement {
    * - Used in advanced search context
    */
   set searchType(value: SearchType) {
+    const oldValue = this._searchType;
     this._searchType = value;
+    
+    // Request update to trigger re-render when searchType changes
+    this.requestUpdate('_searchType', oldValue);
+    
     // Rendering of match radio buttons is handled by `render()` when searchType === 'simple'.
     // Add a delegated listener to the component root so clicks on the radios are handled.
     if (value === 'simple') {
