@@ -1,9 +1,9 @@
 import PanelView from './PanelView.js';
-import { storeManager } from '../store/StoreManager';
+import { storeManager } from '../../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
-} from '../store/searchManager';
+} from '../../store/searchManager';
 
 export default class PanelViewFilterVariantCallingQuality extends PanelView {
   constructor(elm) {

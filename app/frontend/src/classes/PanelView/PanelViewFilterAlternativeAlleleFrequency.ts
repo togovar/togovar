@@ -1,15 +1,15 @@
 import PanelView from './PanelView.js';
-import { storeManager } from '../store/StoreManager';
+import { storeManager } from '../../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
   getSimpleSearchConditionMaster,
-} from '../store/searchManager';
+} from '../../store/searchManager';
 import type {
   SimpleSearchCurrentConditions,
   FrequencyMasterCondition,
-} from '../types/search';
-import '../components/RangeSliderView';
+} from '../../types/search';
+import '../../components/RangeSliderView';
 
 /**
  * Panel view component for filtering variants by alternative allele frequency.

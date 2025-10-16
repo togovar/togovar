@@ -1,6 +1,6 @@
 import PanelView from './PanelView.js';
-import { storeManager } from '../store/StoreManager';
-import { getSimpleSearchConditionMaster } from '../store/searchManager';
+import { storeManager } from '../../store/StoreManager';
+import { getSimpleSearchConditionMaster } from '../../store/searchManager';
 
 export default class PanelViewPreviewClinicalSignificance extends PanelView {
   constructor(elm) {

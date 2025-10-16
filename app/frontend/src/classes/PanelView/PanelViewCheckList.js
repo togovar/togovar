@@ -1,9 +1,9 @@
 import PanelView from './PanelView.js';
-import { storeManager } from '../store/StoreManager';
+import { storeManager } from '../../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
-} from '../store/searchManager';
+} from '../../store/searchManager';
 
 /**  Dataset of Statistics / Filters
  * @param {Element} elm - Panel element section.panel-view (#FilterDatasets | #FilterVariantType | #FilterClinicalSignificance | #FilterSift | #FilterPolyphen | #FilterAlphaMissense)

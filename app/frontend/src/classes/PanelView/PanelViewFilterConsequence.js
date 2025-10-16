@@ -1,11 +1,11 @@
-import CollapseView from './CollapseView.js';
+import CollapseView from './../CollapseView.js';
 import PanelView from './PanelView.js';
-import { storeManager } from '../store/StoreManager';
+import { storeManager } from '../../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
   getSimpleSearchConditionMaster,
-} from '../store/searchManager';
+} from '../../store/searchManager';
 
 const KIND_OF_CONDITION = 'consequence';
 
