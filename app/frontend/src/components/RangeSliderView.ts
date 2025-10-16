@@ -124,11 +124,11 @@ class RangeSlider extends LitElement {
   > = {};
 
   // === Reactive Properties (Lit pattern) ===
-  @property({ type: Number, reflect: true, attribute: 'min' })
-  min: number = 0;
+  @property({ type: Number, reflect: true, attribute: 'data-min-value' })
+  minValue: number = 0;
 
-  @property({ type: Number, reflect: true, attribute: 'max' })
-  max: number = 1;
+  @property({ type: Number, reflect: true, attribute: 'data-max-value' })
+  maxValue: number = 1;
 
   @property({ type: Number, reflect: true, attribute: 'slider-step' })
   sliderStep: number = 0.01;
@@ -246,20 +246,20 @@ class RangeSlider extends LitElement {
     if (!domReady) return;
 
     // Sync property changes to DOM elements and state
-    if (changedProperties.has('min')) {
-      this.state.min = this.min;
-      this.slider1.min = String(this.min);
-      this.slider2.min = String(this.min);
-      this.from.min = String(this.min);
-      this.to.min = String(this.min);
+    if (changedProperties.has('minValue')) {
+      this.state.min = this.minValue;
+      this.slider1.min = String(this.minValue);
+      this.slider2.min = String(this.minValue);
+      this.from.min = String(this.minValue);
+      this.to.min = String(this.minValue);
     }
 
-    if (changedProperties.has('max')) {
-      this.state.max = this.max;
-      this.slider1.max = String(this.max);
-      this.slider2.max = String(this.max);
-      this.from.max = String(this.max);
-      this.to.max = String(this.max);
+    if (changedProperties.has('maxValue')) {
+      this.state.max = this.maxValue;
+      this.slider1.max = String(this.maxValue);
+      this.slider2.max = String(this.maxValue);
+      this.from.max = String(this.maxValue);
+      this.to.max = String(this.maxValue);
     }
 
     if (changedProperties.has('sliderStep')) {
@@ -426,8 +426,8 @@ class RangeSlider extends LitElement {
       slider1: this.slider1,
       slider2: this.slider2,
       sliderTrack: this.sliderTrack,
-      min: this.min,
-      max: this.max,
+      min: this.minValue,
+      max: this.maxValue,
       invert: this.state.invert,
     });
 
@@ -563,8 +563,8 @@ class RangeSlider extends LitElement {
   }
   firstUpdated(): void {
     // Initialize from reactive properties (already set via @property decorators)
-    this.state.min = this.min;
-    this.state.max = this.max;
+    this.state.min = this.minValue;
+    this.state.max = this.maxValue;
     this.state['slider-step'] = this.sliderStep;
     this.state['input-step'] = this.inputStep;
     this.state.from = Math.min(this.value1, this.value2);
@@ -626,15 +626,15 @@ class RangeSlider extends LitElement {
     });
 
     // Apply initial values to DOM elements (already queried via @query)
-    this.slider1.min = String(this.min);
-    this.slider2.min = String(this.min);
-    this.from.min = String(this.min);
-    this.to.min = String(this.min);
+    this.slider1.min = String(this.minValue);
+    this.slider2.min = String(this.minValue);
+    this.from.min = String(this.minValue);
+    this.to.min = String(this.minValue);
 
-    this.slider1.max = String(this.max);
-    this.slider2.max = String(this.max);
-    this.from.max = String(this.max);
-    this.to.max = String(this.max);
+    this.slider1.max = String(this.maxValue);
+    this.slider2.max = String(this.maxValue);
+    this.from.max = String(this.maxValue);
+    this.to.max = String(this.maxValue);
 
     this.slider1.step = String(this.sliderStep);
     this.slider2.step = String(this.sliderStep);
