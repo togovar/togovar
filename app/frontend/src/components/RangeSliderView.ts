@@ -21,12 +21,13 @@
  * 5. Custom events - 'range-changed' dispatched on value changes
  */
 
-import { LitElement, html, css } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, query, property } from 'lit/decorators.js';
 // Ensure the gradient slider webcomponent is registered
 import './ConditionPathogenicityPredictionSearch/GradientSliderBar';
 import type { Inequality } from '../types';
 import { renderRuler, fillSlider, drawThumbs } from './rangeSliderUtils';
+import Styles from '../../stylesheets/object/component/frequency-range.slider.scss';
 
 // Type definitions
 /** Search context type: 'simple' for frequency mode, 'advanced' for count/other modes */
@@ -315,31 +316,10 @@ class RangeSlider extends LitElement {
   }
 
   // === Lit rendering ===
-  static styles = css``;
+  static styles = [Styles];
 
   render() {
     return html`
-      <style>
-        input[type='range']::-webkit-slider-runnable-track {
-          -webkit-appearance: none;
-          height: 8px;
-        }
-        .-vertical {
-          transform: rotate(-90deg);
-        }
-        input[type='range']::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          height: 1em;
-          width: 3px;
-          background-color: transparent;
-          border-top: solid 1px rgba(0, 0, 0, 0.5);
-          border-bottom: solid 1px rgba(0, 0, 0, 0.5);
-          cursor: col-resize;
-          pointer-events: auto;
-          margin-top: -0.2em;
-        }
-      </style>
-
       <div class="wrapper" part="wrapper">
         <div class="input" part="div-input">
           <input
@@ -418,7 +398,7 @@ class RangeSlider extends LitElement {
   private _reRenderRuler(): void {
     const ruler = this.shadowRoot?.querySelector('.ruler');
     if (!ruler) return;
-    
+
     renderRuler({
       rulerElement: ruler,
       rulerNumberOfSteps: this.state.rulerNumberOfSteps,
@@ -441,7 +421,7 @@ class RangeSlider extends LitElement {
    */
   private _fillSlider(): void {
     if (!this.slider1 || !this.slider2 || !this.sliderTrack) return;
-    
+
     fillSlider({
       slider1: this.slider1,
       slider2: this.slider2,
@@ -468,7 +448,7 @@ class RangeSlider extends LitElement {
     const styleElement = this.shadowRoot?.querySelector(
       "style[data='slider-track-style']"
     ) as HTMLStyleElement | null;
-    
+
     if (!styleElement || !this.slider1 || !this.slider2) return;
 
     drawThumbs({
@@ -499,10 +479,10 @@ class RangeSlider extends LitElement {
   set searchType(value: SearchType) {
     const oldValue = this._searchType;
     this._searchType = value;
-    
+
     // Request update to trigger re-render when searchType changes
     this.requestUpdate('_searchType', oldValue);
-    
+
     // Rendering of match radio buttons is handled by `render()` when searchType === 'simple'.
     // Add a delegated listener to the component root so clicks on the radios are handled.
     if (value === 'simple') {
