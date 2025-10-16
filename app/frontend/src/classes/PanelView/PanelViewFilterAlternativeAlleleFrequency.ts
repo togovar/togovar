@@ -23,9 +23,9 @@ import '../../components/RangeSliderView';
 export class PanelViewFilterAlternativeAlleleFrequency extends PanelView {
   private _rangeSelectorView: HTMLElementTagNameMap['range-slider'];
 
-  // TODO: change elm to "panelViewEl"
-  constructor(elm: Element) {
-    super(elm, 'frequency');
+  // TODO: change panelViewEl to "panelViewEl"
+  constructor(panelViewEl: Element) {
+    super(panelViewEl, 'frequency');
 
     const condition = this._getOrCreateCondition();
     this._rangeSelectorView = this._createRangeSlider(condition);
@@ -137,7 +137,7 @@ export class PanelViewFilterAlternativeAlleleFrequency extends PanelView {
    * Mounts the range slider element to the panel's container.
    */
   private _mountRangeSlider(): void {
-    const rangeSelectorContainer = this.elm.querySelector(
+    const rangeSelectorContainer = this.panelViewEl.querySelector(
       '.range-selector-view'
     );
     if (rangeSelectorContainer) {

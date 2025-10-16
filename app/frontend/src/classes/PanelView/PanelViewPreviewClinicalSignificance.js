@@ -3,11 +3,11 @@ import { storeManager } from '../../store/StoreManager';
 import { getSimpleSearchConditionMaster } from '../../store/searchManager';
 
 export default class PanelViewPreviewClinicalSignificance extends PanelView {
-  constructor(elm) {
-    super(elm, 'clinicalSignificance');
+  constructor(panelViewEl) {
+    super(panelViewEl, 'clinicalSignificance');
     storeManager.bind('selectedRow', this);
     storeManager.bind('offset', this);
-    this.content = this.elm.querySelector('.content');
+    this.content = this.panelViewEl.querySelector('.content');
   }
 
   selectedRow() {
@@ -167,10 +167,10 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
           </dl>`;
           })
           .join('');
-        this.elm.classList.remove('-notfound');
+        this.panelViewEl.classList.remove('-notfound');
       }
     } else {
-      this.elm.classList.add('-notfound');
+      this.panelViewEl.classList.add('-notfound');
     }
     this.content.innerHTML = html;
   }

@@ -5,11 +5,11 @@ import { getSimpleSearchConditionMaster } from '../../store/searchManager';
 const DECIMAL_DIGIT = 4;
 
 export default class PanelViewPreviewAlternativeAlleleFrequencies extends PanelView {
-  constructor(elm) {
-    super(elm, 'frenquecies');
+  constructor(panelViewEl) {
+    super(panelViewEl, 'frenquecies');
     storeManager.bind('selectedRow', this);
     storeManager.bind('offset', this);
-    const tbody = this.elm.querySelector('.frequency-detail > tbody');
+    const tbody = this.panelViewEl.querySelector('.frequency-detail > tbody');
     this._master = getSimpleSearchConditionMaster('dataset').items;
     // make DOM
     tbody.innerHTML = this._master

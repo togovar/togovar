@@ -6,12 +6,12 @@ import {
 } from '../../store/searchManager';
 
 /**  Dataset of Statistics / Filters
- * @param {Element} elm - Panel element section.panel-view (#FilterDatasets | #FilterVariantType | #FilterClinicalSignificance | #FilterSift | #FilterPolyphen | #FilterAlphaMissense)
+ * @param {Element} panelViewEl - Panel element section.panel-view (#FilterDatasets | #FilterVariantType | #FilterClinicalSignificance | #FilterSift | #FilterPolyphen | #FilterAlphaMissense)
  * @param {string} kind - Panel id (dataset | type | significance | sift | polyphen | alphamissense)
  * @param {string} statisticsType - (statisticsDataset | statisticsType | statisticsSignificance | undefined) */
 export default class PanelViewCheckList extends PanelView {
-  constructor(elm, kind, statisticsType) {
-    super(elm, kind);
+  constructor(panelViewEl, kind, statisticsType) {
+    super(panelViewEl, kind);
     this._statisticsType = statisticsType;
     // 検索条件マスター
     const conditionMaster = storeManager
@@ -23,7 +23,7 @@ export default class PanelViewCheckList extends PanelView {
     // references
     const condition = getSimpleSearchCondition(this.kind);
     this._inputsValues = {};
-    this.elm
+    this.panelViewEl
       .querySelectorAll('.content > .checklist-values > .item > .label > input')
       .forEach((input) => {
         this._inputsValues[input.value] = {
@@ -183,14 +183,14 @@ export default class PanelViewCheckList extends PanelView {
     `
       )
       .join('');
-    this.elm
+    this.panelViewEl
       .querySelector('.content > .checklist-values')
       .insertAdjacentHTML('beforeend', html);
     // not検索の重複を削除
     if (
       ['significance', 'alphamissense', 'sift', 'polyphen'].includes(this.kind)
     ) {
-      this.elm
+      this.panelViewEl
         .querySelector('.content > .checklist-values > .item:nth-child(5)')
         .remove();
     }
