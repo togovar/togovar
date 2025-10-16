@@ -3,7 +3,7 @@ import { selectOrNull } from '../../../utils/dom/select';
 import type { ConditionItemView } from '../ConditionItemView';
 import { ConditionValueEditor } from './ConditionValueEditor';
 import type ConditionValues from '../ConditionValues';
-import '../../../components/RangeSliderView.js';
+import '../../../components/RangeSliderView';
 import {
   MODE,
   type FrequencyCountValueView,
