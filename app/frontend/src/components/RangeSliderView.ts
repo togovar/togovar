@@ -90,8 +90,6 @@ class RangeSlider extends LitElement {
   /** Search type context: 'simple' enables match radio buttons and 0-1 range restriction */
   private _searchType: SearchType;
 
-  /** Flag to prevent event firing during component initialization */
-  private _isInitializing: boolean;
   /** Stored click handler for match radios so it can be removed on disconnect */
   private _matchClickHandler?: EventListener;
   /** Timeout id used when deferring adding the match click handler */
@@ -122,6 +120,37 @@ class RangeSlider extends LitElement {
       maxInequalitySign: Inequality;
     }
   > = {};
+
+  // === Reactive Properties (Lit pattern) ===
+  @property({ type: Number, reflect: true })
+  minProp: number = 0;
+
+  @property({ type: Number, reflect: true })
+  maxProp: number = 1;
+
+  @property({ type: Number, reflect: true, attribute: 'slider-step' })
+  sliderStepProp: number = 0.01;
+
+  @property({ type: Number, reflect: true, attribute: 'input-step' })
+  inputStepProp: number = 0.05;
+
+  @property({ type: Number, reflect: true, attribute: 'value1' })
+  value1Prop: number = 0;
+
+  @property({ type: Number, reflect: true, attribute: 'value2' })
+  value2Prop: number = 1;
+
+  @property({ type: String, reflect: true })
+  orientationProp: Orientation = 'horizontal';
+
+  @property({ type: Boolean, reflect: true, attribute: 'invert' })
+  invertProp: boolean = false;
+
+  @property({ type: String, reflect: true, attribute: 'match' })
+  matchProp: MatchType = 'any';
+
+  @property({ type: Number, reflect: true, attribute: 'ruler-number-of-steps' })
+  rulerNumberOfStepsProp: number = 10;
 
   private _resizeObserver?: ResizeObserver;
 
@@ -159,25 +188,6 @@ class RangeSlider extends LitElement {
     return Math.max(0, Math.min(1, (val - min) / (max - min)));
   }
 
-  /**
-   * Observed attributes - Custom Element API
-   * When these attributes change, attributeChangedCallback is triggered
-   */
-  static get observedAttributes(): string[] {
-    return [
-      'min', // Minimum allowed value
-      'max', // Maximum allowed value
-      'input-step', // Step size for number inputs
-      'slider-step', // Step size for range sliders
-      'value1', // Initial lower bound
-      'value2', // Initial upper bound
-      'orientation', // 'horizontal' or 'vertical'
-      'invert', // 'true' or 'false'
-      'match', // 'all' or 'any' (simple search)
-      'ruler-number-of-steps', // Number of scale marks
-    ];
-  }
-
   constructor() {
     super();
 
@@ -196,7 +206,6 @@ class RangeSlider extends LitElement {
 
     this.state = initState;
     this._searchType = null; // Will be set by parent component
-    this._isInitializing = true; // Prevent events during setup
 
     // Setup Shadow DOM
     // Lit will handle ShadowRoot and rendering. Element queries happen in firstUpdated().
@@ -209,24 +218,13 @@ class RangeSlider extends LitElement {
   // _initializeElements removed; queries are provided by @query decorators
 
   /**
-   * Custom Element lifecycle callback - triggered when observed attributes change
+   * Lit lifecycle: React to property changes
    *
-   * Responsibilities:
-   * 1. Sync attribute changes to HTML elements (sliders, inputs)
-   * 2. Update internal state (during initialization only)
-   * 3. Refresh visual elements (slider track, ruler)
-   *
-   * IMPORTANT: Only updates state during initialization (_isInitializing=true)
-   * to prevent infinite loops between attribute changes and state changes.
+   * This replaces the old attributeChangedCallback pattern.
+   * Called after any reactive property changes.
    */
-  attributeChangedCallback(
-    name: string,
-    oldValue: string | null,
-    newValue: string | null
-  ): void {
-    if (!newValue) return;
-    // DOM elements (slider1/slider2/from/to/etc) are only available after render/firstUpdated.
-    // Check whether DOM is ready before touching element properties.
+  updated(changedProperties: Map<string | number | symbol, unknown>): void {
+    // Check if DOM elements are available
     const domReady =
       !!this.slider1 &&
       !!this.slider2 &&
@@ -234,99 +232,76 @@ class RangeSlider extends LitElement {
       !!this.to &&
       !!this.sliderTrack;
 
-    switch (name) {
-      case 'min':
-        // update internal state regardless
-        if (this.state) this.state.min = parseFloat(newValue);
-        if (domReady) {
-          this.slider1.min = newValue;
-          this.slider2.min = newValue;
-          this.from.min = newValue;
-          this.to.min = newValue;
-        }
-        break;
-      case 'max':
-        if (this.state) this.state.max = parseFloat(newValue);
-        if (domReady) {
-          this.slider1.max = newValue;
-          this.slider2.max = newValue;
-          this.from.max = newValue;
-          this.to.max = newValue;
-        }
-        break;
-      case 'slider-step':
-        if (this.state) this.state['slider-step'] = parseFloat(newValue);
-        if (domReady) {
-          this.slider1.step = newValue;
-          this.slider2.step = newValue;
-        }
-        break;
-      case 'input-step':
-        if (this.state) this.state['input-step'] = parseFloat(newValue);
-        if (domReady) {
-          this.from.step = newValue;
-          this.to.step = newValue;
-        }
-        break;
-      case 'value1':
-        // Update slider position during initialization only
-        if (this._isInitializing && domReady) {
-          this.slider1.value = parseFloat(newValue).toFixed(3);
-        }
-        // Update internal state during initialization (no DOM required)
-        if (this.state && this._isInitializing) {
-          const parsedValue = parseFloat(newValue);
-          this.state.from = Math.min(parsedValue, this.state.to);
-        }
-        break;
+    if (!domReady) return;
 
-      case 'value2':
-        // Update slider position during initialization only
-        if (this._isInitializing && domReady) {
-          this.slider2.value = parseFloat(newValue).toFixed(3);
-        }
-        if (this.state && this._isInitializing) {
-          const parsedValue = parseFloat(newValue);
-          this.state.to = Math.max(parsedValue, this.state.from);
-        }
-        break;
-
-      case 'invert':
-        // Update checkbox during initialization only
-        if (this._isInitializing && domReady) {
-          this.invertChk.checked = newValue === 'true';
-        }
-        if (this.state && this._isInitializing) {
-          this.state.invert = newValue === 'true' ? '1' : '0';
-        }
-        break;
-
-      case 'ruler-number-of-steps':
-        // Number of scale marks on ruler
-        if (this.state) this.state.rulerNumberOfSteps = parseInt(newValue, 10);
-        if (domReady) this._reRenderRuler();
-        break;
-
-      case 'match':
-        // IMPORTANT: Don't call this.match setter to avoid infinite loop
-        // Just update state directly since the attribute is already set
-        if (this.state) {
-          this.state.match = newValue as MatchType;
-        }
-        break;
-
-      case 'orientation':
-        // Apply CSS class for vertical orientation (rotates slider 90deg)
-        if (domReady) {
-          if (newValue === 'vertical') this._meter.classList.add('-vertical');
-          else this._meter.classList.remove('-vertical');
-          this._reRenderRuler(); // Reposition scale marks
-        }
-        break;
+    // Sync property changes to DOM elements and state
+    if (changedProperties.has('minProp')) {
+      this.state.min = this.minProp;
+      this.slider1.min = String(this.minProp);
+      this.slider2.min = String(this.minProp);
+      this.from.min = String(this.minProp);
+      this.to.min = String(this.minProp);
     }
 
-    // Update visual slider track after any attribute change (only if DOM ready)
-    if (domReady) this._fillSlider();
+    if (changedProperties.has('maxProp')) {
+      this.state.max = this.maxProp;
+      this.slider1.max = String(this.maxProp);
+      this.slider2.max = String(this.maxProp);
+      this.from.max = String(this.maxProp);
+      this.to.max = String(this.maxProp);
+    }
+
+    if (changedProperties.has('sliderStepProp')) {
+      this.state['slider-step'] = this.sliderStepProp;
+      this.slider1.step = String(this.sliderStepProp);
+      this.slider2.step = String(this.sliderStepProp);
+    }
+
+    if (changedProperties.has('inputStepProp')) {
+      this.state['input-step'] = this.inputStepProp;
+      this.from.step = String(this.inputStepProp);
+      this.to.step = String(this.inputStepProp);
+    }
+
+    if (changedProperties.has('value1Prop')) {
+      const parsedValue = this.value1Prop;
+      this.state.from = Math.min(parsedValue, this.state.to);
+      this.slider1.value = parsedValue.toFixed(3);
+    }
+
+    if (changedProperties.has('value2Prop')) {
+      const parsedValue = this.value2Prop;
+      this.state.to = Math.max(parsedValue, this.state.from);
+      this.slider2.value = parsedValue.toFixed(3);
+    }
+
+    if (changedProperties.has('invertProp')) {
+      this.state.invert = this.invertProp ? '1' : '0';
+      this.invertChk.checked = this.invertProp;
+    }
+
+    if (changedProperties.has('rulerNumberOfStepsProp')) {
+      this.state.rulerNumberOfSteps = this.rulerNumberOfStepsProp;
+      this._reRenderRuler();
+    }
+
+    if (changedProperties.has('matchProp')) {
+      this.state.match = this.matchProp;
+    }
+
+    if (changedProperties.has('orientationProp')) {
+      if (this.orientationProp === 'vertical') {
+        this._meter.classList.add('-vertical');
+      } else {
+        this._meter.classList.remove('-vertical');
+      }
+      this._reRenderRuler();
+    }
+
+    // Update visual slider track after any property change
+    if (changedProperties.size > 0) {
+      this._fillSlider();
+    }
   }
 
   // === Lit rendering ===
@@ -457,8 +432,8 @@ class RangeSlider extends LitElement {
       slider1: this.slider1,
       slider2: this.slider2,
       sliderTrack: this.sliderTrack,
-      min: parseFloat(this.min!),
-      max: parseFloat(this.max!),
+      min: this.minProp,
+      max: this.maxProp,
       invert: this.state.invert,
     });
 
@@ -487,43 +462,43 @@ class RangeSlider extends LitElement {
     });
   }
 
-  // === Attribute Getters/Setters ===
-  // Provide public API for reading/writing component attributes
+  // === Public API: Getters/Setters (compatibility layer) ===
+  // These provide backward-compatible API for external code
 
-  get min(): string | null {
-    return this.getAttribute('min');
+  get min(): string {
+    return String(this.minProp);
   }
 
-  get max(): string | null {
-    return this.getAttribute('max');
+  get max(): string {
+    return String(this.maxProp);
   }
 
-  get step(): string | null {
-    return this.getAttribute('step');
+  get step(): string {
+    return String(this.sliderStepProp);
   }
 
-  get value1(): string | null {
-    return this.getAttribute('value1');
+  get value1(): string {
+    return String(this.value1Prop);
   }
 
-  get value2(): string | null {
-    return this.getAttribute('value2');
+  get value2(): string {
+    return String(this.value2Prop);
   }
 
   get orientation(): Orientation {
-    return (this.getAttribute('orientation') as Orientation) || 'horizontal';
+    return this.orientationProp;
   }
 
   get invert(): boolean {
-    return this.getAttribute('invert') === 'true';
+    return this.invertProp;
   }
 
-  get rulerNumberOfSteps(): string | null {
-    return this.getAttribute('ruler-number-of-steps');
+  get rulerNumberOfSteps(): string {
+    return String(this.rulerNumberOfStepsProp);
   }
 
   get match(): MatchType {
-    return (this.getAttribute('match') as MatchType) || 'any';
+    return this.matchProp;
   }
 
   /** Get search type (determines behavior: simple vs advanced mode) */
@@ -534,39 +509,43 @@ class RangeSlider extends LitElement {
   // === Setters ===
 
   set min(value: string | number) {
-    this.setAttribute('min', String(value));
+    this.minProp = Number(value);
   }
 
   set max(value: string | number) {
-    this.setAttribute('max', String(value));
+    this.maxProp = Number(value);
   }
 
   set sliderStep(value: string | number) {
-    this.setAttribute('slider-step', String(value));
+    this.sliderStepProp = Number(value);
   }
 
   set inputStep(value: string | number) {
-    this.setAttribute('input-step', String(value));
+    this.inputStepProp = Number(value);
   }
 
   set value1(value: string | number) {
-    this.setAttribute('value1', String(value));
+    this.value1Prop = Number(value);
   }
 
   set value2(value: string | number) {
-    this.setAttribute('value2', String(value));
+    this.value2Prop = Number(value);
   }
 
   set orientation(value: Orientation) {
-    this.setAttribute('orientation', value);
+    this.orientationProp = value;
   }
 
   set rulerNumberOfSteps(value: string | number) {
-    this.setAttribute('ruler-number-of-steps', String(value));
+    this.rulerNumberOfStepsProp = Number(value);
   }
 
   set match(value: MatchType) {
-    this.setAttribute('match', value);
+    this.matchProp = value;
+  }
+
+  set invert(value: boolean | string) {
+    this.invertProp = typeof value === 'boolean' ? value : value === 'true';
   }
 
   /**
@@ -598,7 +577,7 @@ class RangeSlider extends LitElement {
         this._matchClickHandler = (e: Event) => {
           const target = e.target as HTMLInputElement;
           if (target && target.tagName === 'INPUT') {
-            this.match = target.value as MatchType;
+            this.matchProp = target.value as MatchType;
             this.state.match = target.value as MatchType;
             this._fireEvent(this.state);
           }
@@ -627,10 +606,6 @@ class RangeSlider extends LitElement {
         this._searchTypeTimeoutId = undefined;
       }
     }
-  }
-
-  set invert(value: boolean | string) {
-    this.setAttribute('invert', String(value));
   }
 
   /**
@@ -667,19 +642,18 @@ class RangeSlider extends LitElement {
     this.dispatchEvent(event);
   }
   firstUpdated(): void {
-    // Migrate previous connectedCallback behavior into Lit lifecycle
-    this._isInitializing = true;
+    // Initialize from reactive properties (already set via @property decorators)
+    this.state.min = this.minProp;
+    this.state.max = this.maxProp;
+    this.state['slider-step'] = this.sliderStepProp;
+    this.state['input-step'] = this.inputStepProp;
+    this.state.from = Math.min(this.value1Prop, this.value2Prop);
+    this.state.to = Math.max(this.value1Prop, this.value2Prop);
+    this.state.invert = this.invertProp ? '1' : '0';
+    this.state.match = this.matchProp;
+    this.state.rulerNumberOfSteps = this.rulerNumberOfStepsProp;
 
-    // Read attributes or use defaults
-    this.min = this.getAttribute('min') || '0';
-    this.max = this.getAttribute('max') || '1';
-    this.value1 = this.getAttribute('value1') || '0';
-    this.value2 = this.getAttribute('value2') || '1';
-    this.orientation =
-      (this.getAttribute('orientation') as Orientation) || 'horizontal';
-    this.match = (this.getAttribute('simple-search') as MatchType) || 'any';
-
-    // Setup Proxy-based state (same logic as before)
+    // Setup Proxy-based state for reactive updates
     this.state = new Proxy(this.state, {
       set: (
         target: RangeSliderState,
@@ -713,7 +687,7 @@ class RangeSlider extends LitElement {
           }
 
           this._getToFromFromState();
-          if (!this._isInitializing) this._fireEvent(target);
+          this._fireEvent(target);
           return true;
         } else if (prop === 'invert') {
           if (typeof value === 'boolean') target[prop] = value ? '1' : '0';
@@ -722,7 +696,7 @@ class RangeSlider extends LitElement {
           else target[prop] = String(value) === 'true' ? '1' : '0';
 
           this._getToFromFromState();
-          if (!this._isInitializing) this._fireEvent(target);
+          this._fireEvent(target);
           return true;
         } else {
           this._getToFromFromState();
@@ -731,51 +705,28 @@ class RangeSlider extends LitElement {
       },
     });
 
-    // Initialize state from attributes
-    this.state.min = parseFloat(this.min!);
-    this.state.max = parseFloat(this.max!);
-    this.state.step = parseFloat(this.getAttribute('step') || '0.01');
-    this.state.from = Math.min(
-      parseFloat(this.value1!),
-      parseFloat(this.value2!)
-    );
-    this.state.to = Math.max(
-      parseFloat(this.value1!),
-      parseFloat(this.value2!)
-    );
-    this.state.invert = this.getAttribute('invert') === 'true' ? '1' : '0';
-    this.state.match = this.match;
+    // Apply initial values to DOM elements (already queried via @query)
+    this.slider1.min = String(this.minProp);
+    this.slider2.min = String(this.minProp);
+    this.from.min = String(this.minProp);
+    this.to.min = String(this.minProp);
 
-    this.rulerNumberOfSteps = 10;
+    this.slider1.max = String(this.maxProp);
+    this.slider2.max = String(this.maxProp);
+    this.from.max = String(this.maxProp);
+    this.to.max = String(this.maxProp);
 
-    // Ensure slider/input attributes (min/max/step) are applied now that DOM is rendered
-    if (this.slider1 && this.slider2 && this.from && this.to) {
-      const minAttr = this.getAttribute('min') || '0';
-      const maxAttr = this.getAttribute('max') || '1';
-      const sliderStepAttr =
-        this.getAttribute('slider-step') ||
-        String(this.state['slider-step'] || 0.01);
-      const inputStepAttr =
-        this.getAttribute('input-step') ||
-        String(this.state['input-step'] || 0.05);
+    this.slider1.step = String(this.sliderStepProp);
+    this.slider2.step = String(this.sliderStepProp);
+    this.from.step = String(this.inputStepProp);
+    this.to.step = String(this.inputStepProp);
 
-      this.slider1.min = minAttr;
-      this.slider2.min = minAttr;
-      this.from.min = minAttr;
-      this.to.min = minAttr;
+    this.slider1.value = this.value1Prop.toFixed(3);
+    this.slider2.value = this.value2Prop.toFixed(3);
 
-      this.slider1.max = maxAttr;
-      this.slider2.max = maxAttr;
-      this.from.max = maxAttr;
-      this.to.max = maxAttr;
+    this.invertChk.checked = this.invertProp;
 
-      this.slider1.step = sliderStepAttr;
-      this.slider2.step = sliderStepAttr;
-      this.from.step = inputStepAttr;
-      this.to.step = inputStepAttr;
-    }
-
-    // Attach listeners to rendered elements
+    // Attach event listeners
     this.slider1.addEventListener('input', this._slider1Input);
     this.slider2.addEventListener('input', this._slider2Input);
     this.from.addEventListener('change', this._fromChange);
@@ -803,13 +754,18 @@ class RangeSlider extends LitElement {
       this._resizeObserver.observe(this.sliderTrack);
     }
 
+    // Set initial display values
     this.from.value = this._formatInputValue(this.state.from);
     this.to.value = this._formatInputValue(this.state.to);
 
+    // Apply orientation class
+    if (this.orientationProp === 'vertical') {
+      this._meter.classList.add('-vertical');
+    }
+
+    // Render visuals
     this._fillSlider();
     this._reRenderRuler();
-
-    this._isInitializing = false;
   }
 
   // === Event Handler Methods ===
