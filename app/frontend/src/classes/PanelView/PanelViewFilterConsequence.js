@@ -13,7 +13,7 @@ export default class PanelViewFilterConsequence extends PanelView {
   constructor(panelViewEl) {
     super(panelViewEl, 'consequence');
     // 検索条件マスター
-    const conditionMaster = getSimpleSearchConditionMaster(this.kind);
+    const conditionMaster = getSimpleSearchConditionMaster(this.panelId);
     const grouping = getSimpleSearchConditionMaster(
       'consequence_grouping'
     ).items;
@@ -24,7 +24,7 @@ export default class PanelViewFilterConsequence extends PanelView {
       .querySelectorAll('.collapse-view')
       .forEach((collapseView) => new CollapseView(collapseView));
     // references
-    const condition = getSimpleSearchCondition(this.kind);
+    const condition = getSimpleSearchCondition(this.panelId);
     this._inputsValues = {};
     this.panelViewEl
       .querySelectorAll('.content > .checklist-values input')
@@ -54,7 +54,7 @@ export default class PanelViewFilterConsequence extends PanelView {
   /*
   // 検索条件マスター
   searchConditionsMaster(master) {
-    const conditionMaster = master.find(condition => condition.id === this.kind).items;
+    const conditionMaster = master.find(condition => condition.id === this.panelId).items;
     const grouping = master.find(condition => condition.id === 'consequence_grouping').items;
     console.log(grouping)
     // GUIの生成
@@ -66,7 +66,7 @@ export default class PanelViewFilterConsequence extends PanelView {
       })
     });
     // references
-    const condition = storeManager.getSimpleSearchCondition(this.kind);
+    const condition = storeManager.getSimpleSearchCondition(this.panelId);
     console.log(condition)
     this._inputsValues = {};
     this.panelViewEl.querySelectorAll('.content > .checklist-values input').forEach(input => {

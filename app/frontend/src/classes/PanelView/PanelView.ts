@@ -1,16 +1,16 @@
 export class PanelView {
   protected panelViewEl: Element;
-  protected kind: string;
+  protected panelId: string;
   private localStorageKey: string;
 
   /**
    * @param panelViewEl - Panel element section.panel-view
-   * @param kind - Panel id (dataset, frequency, quality, type, significance, consequence, shift, polyphen, alphamissense)
+   * @param panelId - Panel id (dataset, frequency, quality, type, significance, consequence, shift, polyphen, alphamissense)
    */
-  constructor(panelViewEl: Element, kind: string) {
+  constructor(panelViewEl: Element, panelId: string) {
     this.panelViewEl = panelViewEl;
-    this.kind = kind;
-    this.localStorageKey = 'panel_' + kind;
+    this.panelId = panelId;
+    this.localStorageKey = 'panel_' + panelId;
 
     // Use local storage and manage panel opening/closing
     if (window.localStorage.getItem(this.localStorageKey) === 'collapsed') {
