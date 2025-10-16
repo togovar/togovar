@@ -1,4 +1,4 @@
-import PanelView from './PanelView.js';
+import PanelView from './PanelView.ts';
 import { storeManager } from '../../store/StoreManager';
 
 export default class PanelViewPreviewExternalLinks extends PanelView {
