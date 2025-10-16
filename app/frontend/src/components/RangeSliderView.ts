@@ -21,6 +21,9 @@
  * 5. Custom events - 'range-changed' dispatched on value changes
  */
 
+import { LitElement, html, css } from 'lit';
+import { customElement, query } from 'lit/decorators.js';
+
 // Type definitions
 /** Search context type: 'simple' for frequency mode, 'advanced' for count/other modes */
 type SearchType = 'simple' | 'advanced' | null;
@@ -61,78 +64,7 @@ interface RangeChangedEventDetail {
  * 2. template - Main slider UI with inputs, ruler, and dual range sliders
  */
 
-// Simple search template: Match type selector (all/any datasets)
-const template = document.createElement('template');
-const searchTypeSimple = document.createElement('div');
-searchTypeSimple.className = 'match';
-searchTypeSimple.part = 'match';
-searchTypeSimple.innerHTML = `
-<label part="match label">
-  <input class="all" name="match" type="radio" value="all">
-  for all datasets
-</label>
-<label part="label">
-  <input class="any" checked="checked" name="match" type="radio" value="any">
-  for any dataset
-</label>
-`;
-
-// Main slider template: Numeric inputs + visual slider + ruler
-template.innerHTML = `
-<style data="slider-style">
-input[type="range"]::-webkit-slider-runnable-track {
-    -webkit-appearance: none;
-    height: 8px;
-}
-
-.-vertical {
-  transform: rotate(-90deg);
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    height: 1em;
-    width: 3px;
-    background-color: transparent;
-    border-top: solid 1px rgba(0, 0, 0, 0.5);
-    border-bottom: solid 1px rgba(0, 0, 0, 0.5);
-    cursor: col-resize;
-    pointer-events: auto;
-    margin-top: -0.2em;
-}
-</style>
-<style data="slider-track-style"></style>
-<div class="wrapper" part="wrapper">
-
-    <div class="input" part="div-input">
-        <input class="from"  part="num-input" type="number" part="limit-input" title="Lower limit">
-    ~
-        <input class="to"  part="num-input" type="number" part="limit-input" title="Upper limit">
-        <label part="checkbox-label label">
-            <input class="invert" type="checkbox" part="checkbox">Invert range
-        </label>
-    </div>
-    <div class="meter" part="meter">
-      <div class="meter-container" part="meter-container">
-        <div class="slider-track" id="slider-track" part="slider-track">
-          <div class="ruler" part="ruler"></div>
-        </div>
-        <input
-            part = "slider"
-            type="range"
-            name="slider-1"
-            id="slider-1"
-        />
-        <input
-            part = "slider"
-            type="range"
-            name="slider-2"
-            id="slider-2"
-        />
-      </div>
-    </div>
-</div>
-`;
+// Template is provided by Lit via the `render()` method below.
 
 /**
  * RangeSlider Web Component
@@ -145,7 +77,8 @@ input[type="range"]::-webkit-slider-thumb {
  * - Range inversion capability
  * - Match type selection (simple search mode)
  */
-class RangeSlider extends HTMLElement {
+@customElement('range-slider')
+class RangeSlider extends LitElement {
   // === State Management ===
   /** Reactive state object (wrapped in Proxy for change detection) */
   public state: RangeSliderState;
@@ -157,29 +90,17 @@ class RangeSlider extends HTMLElement {
   private _isInitializing: boolean;
 
   // === Shadow DOM Elements ===
-  /** Root node reference (Document or ShadowRoot) */
-  private root: Node;
+  /** Root node reference (Document or ShadowRoot) - not needed with Lit */
+  // removed: private root: Node;
 
   /** Left/lower range slider (HTML input type="range") */
-  private slider1!: HTMLInputElement;
-
-  /** Right/upper range slider (HTML input type="range") */
-  private slider2!: HTMLInputElement;
-
-  /** Visual slider track with gradient background */
-  private sliderTrack!: HTMLDivElement;
-
-  /** Lower bound numeric input field */
-  private from!: HTMLInputElement;
-
-  /** Upper bound numeric input field */
-  private to!: HTMLInputElement;
-
-  /** "Invert range" checkbox */
-  private invertChk!: HTMLInputElement;
-
-  /** Meter container (for vertical orientation support) */
-  private _meter!: HTMLDivElement;
+  @query('#slider-1') private slider1!: HTMLInputElement;
+  @query('#slider-2') private slider2!: HTMLInputElement;
+  @query('#slider-track') private sliderTrack!: HTMLDivElement;
+  @query('.from') private from!: HTMLInputElement;
+  @query('.to') private to!: HTMLInputElement;
+  @query('.invert') private invertChk!: HTMLInputElement;
+  @query('.meter') private _meter!: HTMLDivElement;
 
   /**
    * Observed attributes - Custom Element API
@@ -221,27 +142,14 @@ class RangeSlider extends HTMLElement {
     this._isInitializing = true; // Prevent events during setup
 
     // Setup Shadow DOM
-    this.root = this.getRootNode();
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot!.appendChild(template.content.cloneNode(true));
-
-    // Query and store DOM element references
-    this._initializeElements();
+    // Lit will handle ShadowRoot and rendering. Element queries happen in firstUpdated().
   }
 
   /**
    * Query and cache references to Shadow DOM elements
    * Called once during construction to avoid repeated queries
    */
-  private _initializeElements(): void {
-    this.slider1 = this.shadowRoot!.querySelector('#slider-1')!;
-    this.slider2 = this.shadowRoot!.querySelector('#slider-2')!;
-    this.sliderTrack = this.shadowRoot!.querySelector('#slider-track')!;
-    this.from = this.shadowRoot!.querySelector('.from')!;
-    this.to = this.shadowRoot!.querySelector('.to')!;
-    this.invertChk = this.shadowRoot!.querySelector('.invert')!;
-    this._meter = this.shadowRoot!.querySelector('.meter')!;
-  }
+  // _initializeElements removed; queries are provided by @query decorators
 
   /**
    * Custom Element lifecycle callback - triggered when observed attributes change
@@ -260,34 +168,55 @@ class RangeSlider extends HTMLElement {
     newValue: string | null
   ): void {
     if (!newValue) return;
+    // DOM elements (slider1/slider2/from/to/etc) are only available after render/firstUpdated.
+    // Check whether DOM is ready before touching element properties.
+    const domReady =
+      !!this.slider1 &&
+      !!this.slider2 &&
+      !!this.from &&
+      !!this.to &&
+      !!this.sliderTrack;
 
     switch (name) {
       case 'min':
-        this.slider1.min = newValue;
-        this.slider2.min = newValue;
-        this.from.min = newValue;
-        this.to.min = newValue;
+        // update internal state regardless
+        if (this.state) this.state.min = parseFloat(newValue);
+        if (domReady) {
+          this.slider1.min = newValue;
+          this.slider2.min = newValue;
+          this.from.min = newValue;
+          this.to.min = newValue;
+        }
         break;
       case 'max':
-        this.slider1.max = newValue;
-        this.slider2.max = newValue;
-        this.from.max = newValue;
-        this.to.max = newValue;
+        if (this.state) this.state.max = parseFloat(newValue);
+        if (domReady) {
+          this.slider1.max = newValue;
+          this.slider2.max = newValue;
+          this.from.max = newValue;
+          this.to.max = newValue;
+        }
         break;
       case 'slider-step':
-        this.slider1.step = newValue;
-        this.slider2.step = newValue;
+        if (this.state) this.state['slider-step'] = parseFloat(newValue);
+        if (domReady) {
+          this.slider1.step = newValue;
+          this.slider2.step = newValue;
+        }
         break;
       case 'input-step':
-        this.from.step = newValue;
-        this.to.step = newValue;
+        if (this.state) this.state['input-step'] = parseFloat(newValue);
+        if (domReady) {
+          this.from.step = newValue;
+          this.to.step = newValue;
+        }
         break;
       case 'value1':
         // Update slider position during initialization only
-        if (this._isInitializing) {
+        if (this._isInitializing && domReady) {
           this.slider1.value = parseFloat(newValue).toFixed(3);
         }
-        // Update state (ensures from <= to)
+        // Update internal state during initialization (no DOM required)
         if (this.state && this._isInitializing) {
           const parsedValue = parseFloat(newValue);
           this.state.from = Math.min(parsedValue, this.state.to);
@@ -296,10 +225,9 @@ class RangeSlider extends HTMLElement {
 
       case 'value2':
         // Update slider position during initialization only
-        if (this._isInitializing) {
+        if (this._isInitializing && domReady) {
           this.slider2.value = parseFloat(newValue).toFixed(3);
         }
-        // Update state (ensures to >= from)
         if (this.state && this._isInitializing) {
           const parsedValue = parseFloat(newValue);
           this.state.to = Math.max(parsedValue, this.state.from);
@@ -308,10 +236,9 @@ class RangeSlider extends HTMLElement {
 
       case 'invert':
         // Update checkbox during initialization only
-        if (this._isInitializing) {
+        if (this._isInitializing && domReady) {
           this.invertChk.checked = newValue === 'true';
         }
-        // Update state (convert boolean to '0'/'1')
         if (this.state && this._isInitializing) {
           this.state.invert = newValue === 'true' ? '1' : '0';
         }
@@ -319,8 +246,8 @@ class RangeSlider extends HTMLElement {
 
       case 'ruler-number-of-steps':
         // Number of scale marks on ruler
-        this.state.rulerNumberOfSteps = parseInt(newValue, 10);
-        this._reRenderRuler();
+        if (this.state) this.state.rulerNumberOfSteps = parseInt(newValue, 10);
+        if (domReady) this._reRenderRuler();
         break;
 
       case 'match':
@@ -333,17 +260,99 @@ class RangeSlider extends HTMLElement {
 
       case 'orientation':
         // Apply CSS class for vertical orientation (rotates slider 90deg)
-        if (newValue === 'vertical') {
-          this._meter.classList.add('-vertical');
-        } else {
-          this._meter.classList.remove('-vertical');
+        if (domReady) {
+          if (newValue === 'vertical') this._meter.classList.add('-vertical');
+          else this._meter.classList.remove('-vertical');
+          this._reRenderRuler(); // Reposition scale marks
         }
-        this._reRenderRuler(); // Reposition scale marks
         break;
     }
 
-    // Update visual slider track after any attribute change
-    this._fillSlider();
+    // Update visual slider track after any attribute change (only if DOM ready)
+    if (domReady) this._fillSlider();
+  }
+
+  // === Lit rendering ===
+  static styles = css``;
+
+  render() {
+    return html`
+      <style>
+        input[type='range']::-webkit-slider-runnable-track {
+          -webkit-appearance: none;
+          height: 8px;
+        }
+        .-vertical {
+          transform: rotate(-90deg);
+        }
+        input[type='range']::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          height: 1em;
+          width: 3px;
+          background-color: transparent;
+          border-top: solid 1px rgba(0, 0, 0, 0.5);
+          border-bottom: solid 1px rgba(0, 0, 0, 0.5);
+          cursor: col-resize;
+          pointer-events: auto;
+          margin-top: -0.2em;
+        }
+      </style>
+
+      <div class="wrapper" part="wrapper">
+        <div class="input" part="div-input">
+          <input
+            class="from"
+            part="num-input"
+            type="number"
+            part="limit-input"
+            title="Lower limit"
+          />
+          ~
+          <input
+            class="to"
+            part="num-input"
+            type="number"
+            part="limit-input"
+            title="Upper limit"
+          />
+          <label part="checkbox-label label">
+            <input class="invert" type="checkbox" part="checkbox" />Invert range
+          </label>
+        </div>
+
+        <div class="meter" part="meter">
+          <div class="meter-container" part="meter-container">
+            <div class="slider-track" id="slider-track" part="slider-track">
+              <style data="slider-track-style"></style>
+              <div class="ruler" part="ruler"></div>
+            </div>
+            <input part="slider" type="range" name="slider-1" id="slider-1" />
+            <input part="slider" type="range" name="slider-2" id="slider-2" />
+          </div>
+        </div>
+
+        ${this.searchType === 'simple'
+          ? html`
+              <div class="match" part="match">
+                <label part="match label">
+                  <input class="all" name="match" type="radio" value="all" />
+                  for all datasets
+                </label>
+                <label part="label">
+                  <input
+                    class="any"
+                    checked
+                    name="match"
+                    type="radio"
+                    value="any"
+                  />
+                  for any dataset
+                </label>
+              </div>
+            `
+          : ''}
+      </div>
+    `;
   }
 
   /**
@@ -552,19 +561,21 @@ class RangeSlider extends HTMLElement {
    */
   set searchType(value: SearchType) {
     this._searchType = value;
-
+    // Rendering of match radio buttons is handled by `render()` when searchType === 'simple'.
+    // Add a delegated listener to the component root so clicks on the radios are handled.
     if (value === 'simple') {
-      // Append match type selector to wrapper
-      this.shadowRoot!.querySelector('.wrapper')!.appendChild(searchTypeSimple);
-
-      // Listen for match type changes
-      const simpleSearchDiv = this.shadowRoot!.querySelector('.match')!;
-      simpleSearchDiv.addEventListener('click', (e: Event) => {
-        const target = e.target as HTMLInputElement;
-        if (target.tagName === 'INPUT') {
-          this.match = target.value as MatchType;
-          this.state.match = target.value as MatchType;
-          this._fireEvent(this.state);
+      // setTimeout used to ensure rendered nodes are present
+      setTimeout(() => {
+        const simpleSearchDiv = this.renderRoot.querySelector('.match');
+        if (simpleSearchDiv) {
+          simpleSearchDiv.addEventListener('click', (e: Event) => {
+            const target = e.target as HTMLInputElement;
+            if (target && target.tagName === 'INPUT') {
+              this.match = target.value as MatchType;
+              this.state.match = target.value as MatchType;
+              this._fireEvent(this.state);
+            }
+          });
         }
       });
     }
@@ -607,19 +618,8 @@ class RangeSlider extends HTMLElement {
 
     this.dispatchEvent(event);
   }
-
-  /**
-   * Custom Element lifecycle - called when element is added to DOM
-   *
-   * Responsibilities:
-   * 1. Initialize attributes from HTML or defaults
-   * 2. Setup Proxy-based state management with validation
-   * 3. Attach event listeners to sliders, inputs, checkbox
-   * 4. Render initial visual state (ruler, gradient, thumbs)
-   * 5. Enable event firing after initialization completes
-   */
-  connectedCallback(): void {
-    // Start initialization mode (prevents events during setup)
+  firstUpdated(): void {
+    // Migrate previous connectedCallback behavior into Lit lifecycle
     this._isInitializing = true;
 
     // Read attributes or use defaults
@@ -631,20 +631,7 @@ class RangeSlider extends HTMLElement {
       (this.getAttribute('orientation') as Orientation) || 'horizontal';
     this.match = (this.getAttribute('simple-search') as MatchType) || 'any';
 
-    /**
-     * Wrap state in Proxy for reactive updates
-     *
-     * This Proxy intercepts property assignments and:
-     * 1. Validates values (range checks, type conversions)
-     * 2. Maintains from <= to constraint
-     * 3. Updates UI elements (sliders, inputs, gradient)
-     * 4. Dispatches 'range-changed' events (after initialization)
-     *
-     * Proxy handlers:
-     * - 'from'/'to': Numeric validation, range enforcement, cross-constraint
-     * - 'invert': Boolean to '0'/'1' conversion
-     * - Other props: Standard reflection
-     */
+    // Setup Proxy-based state (same logic as before)
     this.state = new Proxy(this.state, {
       set: (
         target: RangeSliderState,
@@ -652,15 +639,13 @@ class RangeSlider extends HTMLElement {
         value: unknown,
         receiver: RangeSliderState
       ): boolean => {
-        // === Handle 'from' and 'to' value changes ===
         if (prop === 'from' || prop === 'to') {
           const valueStr = String(value);
-          if (isNaN(parseFloat(valueStr))) return true; // Ignore invalid numbers
+          if (isNaN(parseFloat(valueStr))) return true;
 
           const parsedValue = parseFloat(valueStr);
           const isSimpleSearch = this.searchType === 'simple';
 
-          // Simple search: Enforce 0-1 range (frequency mode)
           if (isSimpleSearch && (parsedValue > 1 || parsedValue < 0)) {
             if (parsedValue > 1) {
               target.to = 1;
@@ -669,53 +654,29 @@ class RangeSlider extends HTMLElement {
               target.from = 0;
             }
           } else {
-            // Advanced search: Allow values > 1, but reject negatives
-            if (parsedValue < 0) {
-              return true; // Ignore negative values
-            }
-
-            // Maintain from <= to constraint
+            if (parsedValue < 0) return true;
             if (prop === 'from') {
-              if (parsedValue > target.to) {
-                target.to = parsedValue; // Adjust 'to' upward
-              } else {
-                target.from = parsedValue;
-              }
+              if (parsedValue > target.to) target.to = parsedValue;
+              else target.from = parsedValue;
             } else {
-              // prop === 'to'
-              if (parsedValue < target.from) {
-                target.from = parsedValue; // Adjust 'from' downward
-              } else {
-                target.to = parsedValue;
-              }
+              if (parsedValue < target.from) target.from = parsedValue;
+              else target.to = parsedValue;
             }
           }
 
-          this._getToFromFromState(); // Sync UI elements
-          if (!this._isInitializing) {
-            this._fireEvent(target); // Notify parent components
-          }
+          this._getToFromFromState();
+          if (!this._isInitializing) this._fireEvent(target);
           return true;
-        }
-        // === Handle 'invert' boolean changes ===
-        else if (prop === 'invert') {
-          // Convert various input types to '0' or '1'
-          if (typeof value === 'boolean') {
-            target[prop] = value ? '1' : '0';
-          } else if (value === '0' || value === '1') {
-            target[prop] = value;
-          } else {
-            target[prop] = String(value) === 'true' ? '1' : '0';
-          }
+        } else if (prop === 'invert') {
+          if (typeof value === 'boolean') target[prop] = value ? '1' : '0';
+          else if (value === '0' || value === '1')
+            target[prop] = value as '0' | '1';
+          else target[prop] = String(value) === 'true' ? '1' : '0';
 
-          this._getToFromFromState(); // Update gradient for inverted mode
-          if (!this._isInitializing) {
-            this._fireEvent(target);
-          }
+          this._getToFromFromState();
+          if (!this._isInitializing) this._fireEvent(target);
           return true;
-        }
-        // === Handle other properties ===
-        else {
+        } else {
           this._getToFromFromState();
           return Reflect.set(target, prop, value, receiver);
         }
@@ -726,8 +687,6 @@ class RangeSlider extends HTMLElement {
     this.state.min = parseFloat(this.min!);
     this.state.max = parseFloat(this.max!);
     this.state.step = parseFloat(this.getAttribute('step') || '0.01');
-
-    // Ensure from <= to
     this.state.from = Math.min(
       parseFloat(this.value1!),
       parseFloat(this.value2!)
@@ -736,34 +695,51 @@ class RangeSlider extends HTMLElement {
       parseFloat(this.value1!),
       parseFloat(this.value2!)
     );
-
     this.state.invert = this.getAttribute('invert') === 'true' ? '1' : '0';
     this.state.match = this.match;
 
-    // Setup ruler with 10 scale marks
     this.rulerNumberOfSteps = 10;
 
-    // === Attach Event Listeners ===
-    // Slider drag events -> update state
+    // Ensure slider/input attributes (min/max/step) are applied now that DOM is rendered
+    if (this.slider1 && this.slider2 && this.from && this.to) {
+      const minAttr = this.getAttribute('min') || '0';
+      const maxAttr = this.getAttribute('max') || '1';
+      const sliderStepAttr =
+        this.getAttribute('slider-step') ||
+        String(this.state['slider-step'] || 0.01);
+      const inputStepAttr =
+        this.getAttribute('input-step') ||
+        String(this.state['input-step'] || 0.05);
+
+      this.slider1.min = minAttr;
+      this.slider2.min = minAttr;
+      this.from.min = minAttr;
+      this.to.min = minAttr;
+
+      this.slider1.max = maxAttr;
+      this.slider2.max = maxAttr;
+      this.from.max = maxAttr;
+      this.to.max = maxAttr;
+
+      this.slider1.step = sliderStepAttr;
+      this.slider2.step = sliderStepAttr;
+      this.from.step = inputStepAttr;
+      this.to.step = inputStepAttr;
+    }
+
+    // Attach listeners to rendered elements
     this.slider1.addEventListener('input', this._slider1Input);
     this.slider2.addEventListener('input', this._slider2Input);
-
-    // Number input changes -> update state
     this.from.addEventListener('change', this._fromChange);
     this.to.addEventListener('change', this._toChange);
-
-    // Invert checkbox -> update state
     this.invertChk.addEventListener('change', this._invertChange);
 
-    // Set initial formatted values in input fields
     this.from.value = this._formatInputValue(this.state.from);
     this.to.value = this._formatInputValue(this.state.to);
 
-    // Render initial visual state
-    this._fillSlider(); // Gradient track
-    this._reRenderRuler(); // Scale marks
+    this._fillSlider();
+    this._reRenderRuler();
 
-    // Initialization complete - enable event firing
     this._isInitializing = false;
   }
 
@@ -855,7 +831,5 @@ class RangeSlider extends HTMLElement {
   }
 }
 
-// Register custom element in the browser's CustomElementRegistry
-customElements.define('range-slider', RangeSlider);
-
+// Element is registered via @customElement; export the class for tests/consumers
 export default RangeSlider;
