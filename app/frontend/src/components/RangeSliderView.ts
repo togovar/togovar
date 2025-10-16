@@ -22,7 +22,11 @@
  */
 
 import { LitElement, html, css } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import { customElement, query, property } from 'lit/decorators.js';
+// Ensure the gradient slider webcomponent is registered
+import './ConditionPathogenicityPredictionSearch/GradientSliderBar';
+import type { Inequality } from '../types';
+import { renderRuler, fillSlider, drawThumbs } from './rangeSliderUtils';
 
 // Type definitions
 /** Search context type: 'simple' for frequency mode, 'advanced' for count/other modes */
@@ -88,6 +92,10 @@ class RangeSlider extends LitElement {
 
   /** Flag to prevent event firing during component initialization */
   private _isInitializing: boolean;
+  /** Stored click handler for match radios so it can be removed on disconnect */
+  private _matchClickHandler?: EventListener;
+  /** Timeout id used when deferring adding the match click handler */
+  private _searchTypeTimeoutId?: number;
 
   // === Shadow DOM Elements ===
   /** Root node reference (Document or ShadowRoot) - not needed with Lit */
@@ -101,6 +109,55 @@ class RangeSlider extends LitElement {
   @query('.to') private to!: HTMLInputElement;
   @query('.invert') private invertChk!: HTMLInputElement;
   @query('.meter') private _meter!: HTMLDivElement;
+
+  /** Optional dataset for the gradient bar (keys -> {min,max,color,...}), normalized 0-1 */
+  @property({ type: Object })
+  public activeDataset: Record<
+    string,
+    {
+      color: string;
+      min: number;
+      max: number;
+      minInequalitySign: Inequality;
+      maxInequalitySign: Inequality;
+    }
+  > = {};
+
+  private _resizeObserver?: ResizeObserver;
+
+  private _onThresholdSelected = (e: Event): void => {
+    const ce = e as CustomEvent;
+    const detail = ce.detail as
+      | { minValue: number; maxValue: number }
+      | undefined;
+    if (!detail) return;
+
+    // Convert normalized (0-1) values to absolute slider values
+    const minAbs =
+      this.state.min + detail.minValue * (this.state.max - this.state.min);
+    const maxAbs =
+      this.state.min + detail.maxValue * (this.state.max - this.state.min);
+
+    // Update state (Proxy will handle ordering and events)
+    this.state.from = minAbs;
+    this.state.to = maxAbs;
+  };
+
+  private _normalizedMin(): number {
+    const min = this.state.min;
+    const max = this.state.max;
+    if (max === min) return 0;
+    const val = Math.min(this.state.from, this.state.to);
+    return Math.max(0, Math.min(1, (val - min) / (max - min)));
+  }
+
+  private _normalizedMax(): number {
+    const min = this.state.min;
+    const max = this.state.max;
+    if (max === min) return 1;
+    const val = Math.max(this.state.from, this.state.to);
+    return Math.max(0, Math.min(1, (val - min) / (max - min)));
+  }
 
   /**
    * Observed attributes - Custom Element API
@@ -325,7 +382,18 @@ class RangeSlider extends LitElement {
             <div class="slider-track" id="slider-track" part="slider-track">
               <style data="slider-track-style"></style>
               <div class="ruler" part="ruler"></div>
+              <!-- Embed reusable gradient bar when dataset is provided -->
+              <gradient-slider-bar
+                .activeDataset=${this.activeDataset}
+                .minValue=${this._normalizedMin()}
+                .maxValue=${this._normalizedMax()}
+                .numberOfScales=${this.state.rulerNumberOfSteps}
+                .sliderWidth=${(this.sliderTrack &&
+                  this.sliderTrack.clientWidth) ||
+                247.5}
+              ></gradient-slider-bar>
             </div>
+
             <input part="slider" type="range" name="slider-1" id="slider-1" />
             <input part="slider" type="range" name="slider-2" id="slider-2" />
           </div>
@@ -364,23 +432,13 @@ class RangeSlider extends LitElement {
    */
   private _reRenderRuler(): void {
     const ruler = this.shadowRoot!.querySelector('.ruler')!;
-    ruler.innerHTML = ''; // Clear existing scales
-
-    const rulerNumberOfSteps = this.state.rulerNumberOfSteps;
-    const min = this.state.min;
-    const max = this.state.max;
-    const step = (max - min) / rulerNumberOfSteps;
-
-    // Create and position scale marks
-    for (let i = 0; i <= rulerNumberOfSteps; i++) {
-      const scale = document.createElement('div');
-      scale.className = 'scale';
-      scale.part.add('scale'); // CSS part for styling
-      scale.part.add(`scale-${this.orientation}`); // Orientation-specific styling
-      scale.innerText = (min + i * step).toFixed(1); // Numeric label
-      scale.style.left = `calc(${(i * 100) / rulerNumberOfSteps}% - 0.5em`; // Position
-      ruler.appendChild(scale);
-    }
+    renderRuler({
+      rulerElement: ruler,
+      rulerNumberOfSteps: this.state.rulerNumberOfSteps,
+      min: this.state.min,
+      max: this.state.max,
+      orientation: this.orientation,
+    });
   }
 
   /**
@@ -395,30 +453,14 @@ class RangeSlider extends LitElement {
    * - var(--color-key-dark1): Selected regions
    */
   private _fillSlider(): void {
-    // Get actual slider values (handle crossing)
-    const val1 = Math.min(
-      parseFloat(this.slider1.value),
-      parseFloat(this.slider2.value)
-    );
-    const val2 = Math.max(
-      parseFloat(this.slider1.value),
-      parseFloat(this.slider2.value)
-    );
-
-    // Convert values to percentages (0-100%)
-    const percentVal1 =
-      (val1 * 100) / (parseFloat(this.max!) - parseFloat(this.min!));
-    const percentVal2 =
-      (val2 * 100) / (parseFloat(this.max!) - parseFloat(this.min!));
-
-    // Apply gradient based on invert state
-    if (this.state.invert !== '1') {
-      // Normal mode: Gray - Blue - Gray
-      this.sliderTrack.style.background = `linear-gradient(90deg, var(--color-light-gray) 0%, var(--color-light-gray) ${percentVal1}% , var(--color-key-dark1) ${percentVal1}%,   var(--color-key-dark1) ${percentVal2}%, var(--color-light-gray) ${percentVal2}%,  var(--color-light-gray) 100% )`;
-    } else {
-      // Inverted mode: Blue - Gray - Blue
-      this.sliderTrack.style.background = `linear-gradient(90deg, var(--color-key-dark1) 0%, var(--color-key-dark1) ${percentVal1}%, var(--color-light-gray) ${percentVal1}%,  var(--color-light-gray) ${percentVal2}%, var(--color-key-dark1) ${percentVal2}%,  var(--color-key-dark1) 100% )`;
-    }
+    fillSlider({
+      slider1: this.slider1,
+      slider2: this.slider2,
+      sliderTrack: this.sliderTrack,
+      min: parseFloat(this.min!),
+      max: parseFloat(this.max!),
+      invert: this.state.invert,
+    });
 
     // Update thumb borders to show which is left/right
     this._drawThumbs();
@@ -436,32 +478,13 @@ class RangeSlider extends LitElement {
   private _drawThumbs(): void {
     const styleElement = this.shadowRoot!.querySelector(
       "style[data='slider-track-style']"
-    )!;
+    )! as HTMLStyleElement;
 
-    // Determine which slider is on the left/right
-    if (parseFloat(this.slider1.value) < parseFloat(this.slider2.value)) {
-      // slider1 is left, slider2 is right
-      styleElement.innerHTML = `#slider-1::-webkit-slider-thumb {
-            border-right: 1px solid rgba(0, 0, 0, 0.5);
-            transform: translateX(-1.5px);
-        }
-        #slider-2::-webkit-slider-thumb {
-            border-left: 1px solid rgba(0, 0, 0, 0.5);
-            transform: translateX(1.5px)
-        }
-        `;
-    } else {
-      // slider2 is left, slider1 is right
-      styleElement.innerHTML = `#slider-2::-webkit-slider-thumb {
-            border-right: 1px solid rgba(0, 0, 0, 0.5);
-            transform: translateX(-1.5px);
-        }
-        #slider-1::-webkit-slider-thumb {
-            border-left: 1px solid rgba(0, 0, 0, 0.5);
-            transform: translateX(1.5px)
-        }
-        `;
-    }
+    drawThumbs({
+      slider1: this.slider1,
+      slider2: this.slider2,
+      styleElement,
+    });
   }
 
   // === Attribute Getters/Setters ===
@@ -564,20 +587,45 @@ class RangeSlider extends LitElement {
     // Rendering of match radio buttons is handled by `render()` when searchType === 'simple'.
     // Add a delegated listener to the component root so clicks on the radios are handled.
     if (value === 'simple') {
-      // setTimeout used to ensure rendered nodes are present
-      setTimeout(() => {
-        const simpleSearchDiv = this.renderRoot.querySelector('.match');
-        if (simpleSearchDiv) {
-          simpleSearchDiv.addEventListener('click', (e: Event) => {
-            const target = e.target as HTMLInputElement;
-            if (target && target.tagName === 'INPUT') {
-              this.match = target.value as MatchType;
-              this.state.match = target.value as MatchType;
-              this._fireEvent(this.state);
-            }
-          });
-        }
-      });
+      // Ensure previous timeout/listener cleared
+      if (this._searchTypeTimeoutId) {
+        clearTimeout(this._searchTypeTimeoutId);
+        this._searchTypeTimeoutId = undefined;
+      }
+
+      // Prepare handler once so it can be removed later
+      if (!this._matchClickHandler) {
+        this._matchClickHandler = (e: Event) => {
+          const target = e.target as HTMLInputElement;
+          if (target && target.tagName === 'INPUT') {
+            this.match = target.value as MatchType;
+            this.state.match = target.value as MatchType;
+            this._fireEvent(this.state);
+          }
+        };
+      }
+
+      // Defer attaching until DOM rendered, but keep the timeout id so we can cancel
+      this._searchTypeTimeoutId = window.setTimeout(() => {
+        const simpleSearchDiv = this.renderRoot?.querySelector('.match');
+        if (simpleSearchDiv && this._matchClickHandler)
+          simpleSearchDiv.addEventListener(
+            'click',
+            this._matchClickHandler as EventListener
+          );
+      }, 0);
+    } else {
+      // If switching away from simple mode, remove any handler attached
+      const simpleSearchDiv = this.renderRoot?.querySelector('.match');
+      if (simpleSearchDiv && this._matchClickHandler)
+        simpleSearchDiv.removeEventListener(
+          'click',
+          this._matchClickHandler as EventListener
+        );
+      if (this._searchTypeTimeoutId) {
+        clearTimeout(this._searchTypeTimeoutId);
+        this._searchTypeTimeoutId = undefined;
+      }
     }
   }
 
@@ -734,6 +782,27 @@ class RangeSlider extends LitElement {
     this.to.addEventListener('change', this._toChange);
     this.invertChk.addEventListener('change', this._invertChange);
 
+    // Listen for threshold-selected events from gradient-slider-bar
+    const grad = this.sliderTrack.querySelector('gradient-slider-bar');
+    if (grad)
+      grad.addEventListener(
+        'threshold-selected',
+        this._onThresholdSelected as EventListener
+      );
+
+    // Observe size changes to keep sliderWidth in sync
+    if ('ResizeObserver' in window && this.sliderTrack) {
+      this._resizeObserver = new ResizeObserver(() => {
+        const g = this.sliderTrack.querySelector(
+          'gradient-slider-bar'
+        ) as HTMLElement | null;
+        if (g)
+          (g as HTMLElement & { sliderWidth?: number }).sliderWidth =
+            this.sliderTrack.clientWidth;
+      });
+      this._resizeObserver.observe(this.sliderTrack);
+    }
+
     this.from.value = this._formatInputValue(this.state.from);
     this.to.value = this._formatInputValue(this.state.to);
 
@@ -828,6 +897,35 @@ class RangeSlider extends LitElement {
     this.from.removeEventListener('change', this._fromChange);
     this.to.removeEventListener('change', this._toChange);
     this.invertChk.removeEventListener('change', this._invertChange);
+
+    const grad =
+      this.sliderTrack && this.sliderTrack.querySelector('gradient-slider-bar');
+    if (grad)
+      grad.removeEventListener(
+        'threshold-selected',
+        this._onThresholdSelected as EventListener
+      );
+
+    if (this._resizeObserver && this.sliderTrack) {
+      this._resizeObserver.unobserve(this.sliderTrack);
+      this._resizeObserver.disconnect();
+      this._resizeObserver = undefined;
+    }
+
+    // Clean up match handler and any pending timeout
+    if (this._matchClickHandler) {
+      const simpleSearchDiv = this.renderRoot?.querySelector('.match');
+      if (simpleSearchDiv)
+        simpleSearchDiv.removeEventListener(
+          'click',
+          this._matchClickHandler as EventListener
+        );
+      this._matchClickHandler = undefined;
+    }
+    if (this._searchTypeTimeoutId) {
+      clearTimeout(this._searchTypeTimeoutId);
+      this._searchTypeTimeoutId = undefined;
+    }
   }
 }
 
