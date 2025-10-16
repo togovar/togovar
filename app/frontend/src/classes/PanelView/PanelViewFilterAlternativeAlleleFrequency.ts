@@ -1,4 +1,4 @@
-import PanelView from './PanelView';
+import { PanelView } from './PanelView';
 import { storeManager } from '../../store/StoreManager';
 import {
   setSimpleSearchCondition,

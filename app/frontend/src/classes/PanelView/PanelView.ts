@@ -1,4 +1,4 @@
-class PanelView {
+export class PanelView {
   protected elm: Element;
   protected kind: string;
   private localStorageKey: string;
@@ -29,5 +29,3 @@ class PanelView {
     }
   }
 }
-
-export default PanelView;
