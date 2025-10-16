@@ -7,6 +7,8 @@ export class PanelView {
    * @param panelViewEl - Panel element section.panel-view
    * @param panelId - Panel id (dataset, frequency, quality, type, significance, consequence, shift, polyphen, alphamissense)
    */
+  // TODO: A type definition for panelId is required. We probably need to refer to the JSON for SimpleSearch.
+  // TODO: Review of localStorageKey is required. If the panel location isn't clearly specified, IDs may duplicate.
   constructor(panelViewEl: Element, panelId: string) {
     this.panelViewEl = panelViewEl;
     this.panelId = panelId;

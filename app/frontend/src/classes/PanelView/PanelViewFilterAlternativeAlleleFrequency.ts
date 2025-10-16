@@ -23,7 +23,6 @@ import '../../components/RangeSliderView';
 export class PanelViewFilterAlternativeAlleleFrequency extends PanelView {
   private _rangeSelectorView: HTMLElementTagNameMap['range-slider'];
 
-  // TODO: change panelViewEl to "panelViewEl"
   constructor(panelViewEl: Element) {
     super(panelViewEl, 'frequency');
 
