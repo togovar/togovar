@@ -136,12 +136,6 @@ class RangeSlider extends LitElement {
   @property({ type: Number, reflect: true, attribute: 'input-step' })
   inputStep: number = 0.05;
 
-  @property({ type: Number, reflect: true, attribute: 'value1' })
-  value1: number = 0;
-
-  @property({ type: Number, reflect: true, attribute: 'value2' })
-  value2: number = 1;
-
   @property({ type: String, reflect: true, attribute: 'orientation' })
   orientation: Orientation = 'horizontal';
 
@@ -272,18 +266,6 @@ class RangeSlider extends LitElement {
       this.state['input-step'] = this.inputStep;
       this.from.step = String(this.inputStep);
       this.to.step = String(this.inputStep);
-    }
-
-    if (changedProperties.has('value1')) {
-      const parsedValue = this.value1;
-      this.state.from = Math.min(parsedValue, this.state.to);
-      this.slider1.value = parsedValue.toFixed(3);
-    }
-
-    if (changedProperties.has('value2')) {
-      const parsedValue = this.value2;
-      this.state.to = Math.max(parsedValue, this.state.from);
-      this.slider2.value = parsedValue.toFixed(3);
     }
 
     if (changedProperties.has('invert')) {
@@ -567,8 +549,8 @@ class RangeSlider extends LitElement {
     this.state.max = this.maxValue;
     this.state['slider-step'] = this.sliderStep;
     this.state['input-step'] = this.inputStep;
-    this.state.from = Math.min(this.value1, this.value2);
-    this.state.to = Math.max(this.value1, this.value2);
+    this.state.from = this.minValue;
+    this.state.to = this.maxValue;
     this.state.invert = this.invert ? '1' : '0';
     this.state.match = this.match;
     this.state.rulerNumberOfSteps = this.rulerNumberOfSteps;
@@ -641,8 +623,8 @@ class RangeSlider extends LitElement {
     this.from.step = String(this.inputStep);
     this.to.step = String(this.inputStep);
 
-    this.slider1.value = this.value1.toFixed(3);
-    this.slider2.value = this.value2.toFixed(3);
+    this.slider1.value = this.minValue.toFixed(3);
+    this.slider2.value = this.maxValue.toFixed(3);
 
     this.invertChk.checked = this.invert;
 
