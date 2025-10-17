@@ -157,24 +157,6 @@ class RangeSlider extends LitElement {
     this.maxValue = maxAbs;
   };
 
-  private _normalizedMin(): number {
-    if (this.maxValue === this.minValue) return 0;
-    const val = Math.min(this.minValue, this.maxValue);
-    return Math.max(
-      0,
-      Math.min(1, (val - this.minValue) / (this.maxValue - this.minValue))
-    );
-  }
-
-  private _normalizedMax(): number {
-    if (this.maxValue === this.minValue) return 1;
-    const val = Math.max(this.minValue, this.maxValue);
-    return Math.max(
-      0,
-      Math.min(1, (val - this.minValue) / (this.maxValue - this.minValue))
-    );
-  }
-
   constructor() {
     super();
     this._searchType = null; // Will be set by parent component
@@ -192,8 +174,8 @@ class RangeSlider extends LitElement {
   /**
    * Lit lifecycle: React to property changes
    *
-   * This replaces the old attributeChangedCallback pattern.
-   * Called after any reactive property changes.
+   * Dispatch events and update visuals when properties change.
+   * DOM synchronization is handled automatically by Lit's template bindings.
    */
   updated(changedProperties: Map<string | number | symbol, unknown>): void {
     // When searchType changes, ensure visual elements are rendered after DOM update
@@ -205,43 +187,12 @@ class RangeSlider extends LitElement {
       }, 0);
     }
 
-    // Check if DOM elements are available
-    const domReady =
-      !!this.slider1 &&
-      !!this.slider2 &&
-      !!this.from &&
-      !!this.to &&
-      !!this.sliderTrack;
-
-    if (!domReady) return;
-
-    // Sync property changes to DOM elements
-    if (changedProperties.has('minValue')) {
-      this.slider1.min = String(this.minValue);
-      this.slider2.min = String(this.minValue);
-      this.from.min = String(this.minValue);
-      this.to.min = String(this.minValue);
-    }
-
-    if (changedProperties.has('maxValue')) {
-      this.slider1.max = String(this.maxValue);
-      this.slider2.max = String(this.maxValue);
-      this.from.max = String(this.maxValue);
-      this.to.max = String(this.maxValue);
-    }
-
-    if (changedProperties.has('sliderStep')) {
-      this.slider1.step = String(this.sliderStep);
-      this.slider2.step = String(this.sliderStep);
-    }
-
-    if (changedProperties.has('inputStep')) {
-      this.from.step = String(this.inputStep);
-      this.to.step = String(this.inputStep);
-    }
-
-    if (changedProperties.has('invert')) {
-      this.invertChk.checked = this.invert;
+    // Update visual representation when values change
+    if (
+      changedProperties.has('minValue') ||
+      changedProperties.has('maxValue') ||
+      changedProperties.has('invert')
+    ) {
       this._fillSlider();
     }
 
@@ -249,13 +200,27 @@ class RangeSlider extends LitElement {
       this._reRenderRuler();
     }
 
-    // Fire range-changed event when minValue or maxValue changes
+    // Dispatch range-changed event when relevant properties change
     if (
       changedProperties.has('minValue') ||
-      changedProperties.has('maxValue')
+      changedProperties.has('maxValue') ||
+      changedProperties.has('match') ||
+      changedProperties.has('invert')
     ) {
-      this._fireEvent();
-      this._fillSlider();
+      const detail: RangeChangedEventDetail = {
+        from: this.minValue,
+        to: this.maxValue,
+        match: this.match,
+        invert: this.invert ? '1' : '0',
+      };
+
+      this.dispatchEvent(
+        new CustomEvent<RangeChangedEventDetail>('range-changed', {
+          detail,
+          bubbles: true,
+          composed: true,
+        })
+      );
     }
   }
 
@@ -345,7 +310,13 @@ class RangeSlider extends LitElement {
           ${createNumberInput('from', 'Lower limit', this.minValue)} ~
           ${createNumberInput('to', 'Upper limit', this.maxValue)}
           <label part="checkbox-label label">
-            <input class="invert" type="checkbox" part="checkbox" />Invert range
+            <input
+              class="invert"
+              type="checkbox"
+              part="checkbox"
+              .checked=${this.invert}
+              @change=${this._invertChange}
+            />Invert range
           </label>
         </div>
 
@@ -357,8 +328,8 @@ class RangeSlider extends LitElement {
               <!-- Embed reusable gradient bar when dataset is provided -->
               <gradient-slider-bar
                 .activeDataset=${this.activeDataset}
-                .minValue=${this._normalizedMin()}
-                .maxValue=${this._normalizedMax()}
+                .minValue=${this.minValue}
+                .maxValue=${this.maxValue}
                 .numberOfScales=${this.rulerNumberOfSteps}
                 .sliderWidth=${(this.sliderTrack &&
                   this.sliderTrack.clientWidth) ||
@@ -504,7 +475,7 @@ class RangeSlider extends LitElement {
           const target = e.target as HTMLInputElement;
           if (target && target.tagName === 'INPUT') {
             this.match = target.value as MatchType;
-            this._fireEvent();
+            // Event will be dispatched automatically via updated() lifecycle
           }
         };
       }
@@ -533,114 +504,29 @@ class RangeSlider extends LitElement {
     }
   }
 
-  /**
-   * Dispatch 'range-changed' custom event
-   *
-   * Event detail contains:
-   * - from: Lower bound value
-   * - to: Upper bound value
-   * - invert: '0' or '1'
-   * - match: 'all' or 'any' (if applicable)
-   *
-   * This event bubbles up to parent components for state synchronization.
-   */
-  private _fireEvent(): void {
-    const eventData: RangeChangedEventDetail = {
-      from: this.minValue,
-      to: this.maxValue,
-      match: this.match,
-      invert: this.invert ? '1' : '0',
-    };
-
-    const event = new CustomEvent<RangeChangedEventDetail>('range-changed', {
-      bubbles: true,
-      detail: eventData,
-    });
-
-    this.dispatchEvent(event);
-  }
   firstUpdated(): void {
-    // Apply initial values to DOM elements (already queried via @query)
-    this.slider1.min = String(this.minValue);
-    this.slider2.min = String(this.minValue);
-    this.from.min = String(this.minValue);
-    this.to.min = String(this.minValue);
-
-    this.slider1.max = String(this.maxValue);
-    this.slider2.max = String(this.maxValue);
-    this.from.max = String(this.maxValue);
-    this.to.max = String(this.maxValue);
-
-    this.slider1.step = String(this.sliderStep);
-    this.slider2.step = String(this.sliderStep);
-    this.from.step = String(this.inputStep);
-    this.to.step = String(this.inputStep);
-
-    this.slider1.value = this.minValue.toFixed(3);
-    this.slider2.value = this.maxValue.toFixed(3);
-
-    this.invertChk.checked = this.invert;
-
-    // Event listeners for number/range inputs are now handled in render() via @input
-    // Only attach listeners for invert checkbox and gradient-slider-bar events
-
-    this.invertChk.addEventListener('change', this._invertChange);
-
     // Listen for threshold-selected events from gradient-slider-bar
     const grad = this.sliderTrack.querySelector('gradient-slider-bar');
     if (grad)
-      grad.addEventListener(
-        'threshold-selected',
-        this._onThresholdSelected as EventListener
-      );
+      if ('ResizeObserver' in window && this.sliderTrack) {
+        // Observe size changes to keep sliderWidth in sync
+        this._resizeObserver = new ResizeObserver(() => {
+          const g = this.sliderTrack.querySelector(
+            'gradient-slider-bar'
+          ) as HTMLElement | null;
+          if (g)
+            (g as HTMLElement & { sliderWidth?: number }).sliderWidth =
+              this.sliderTrack.clientWidth;
+        });
+        this._resizeObserver.observe(this.sliderTrack);
+      }
 
-    // Observe size changes to keep sliderWidth in sync
-    if ('ResizeObserver' in window && this.sliderTrack) {
-      this._resizeObserver = new ResizeObserver(() => {
-        const g = this.sliderTrack.querySelector(
-          'gradient-slider-bar'
-        ) as HTMLElement | null;
-        if (g)
-          (g as HTMLElement & { sliderWidth?: number }).sliderWidth =
-            this.sliderTrack.clientWidth;
-      });
-      this._resizeObserver.observe(this.sliderTrack);
-    }
-
-    // Set initial display values
-    this.from.value = this._formatInputValue(this.minValue);
-    this.to.value = this._formatInputValue(this.maxValue);
-
-    // Render visuals
+    // Render initial visuals
     this._fillSlider();
     this._reRenderRuler();
   }
 
   // === Event Handler Methods ===
-
-  /**
-   * Format numeric value for input field display
-   *
-   * Ensures consistent formatting:
-   * - At least 1 decimal place (0.0, 1.0)
-   * - Preserves existing precision if needed
-   *
-   * @param value - Numeric value to format
-   * @returns Formatted string (e.g., "0.0", "0.25", "1.0")
-   */
-  private _formatInputValue(value: number | string): string {
-    const num = parseFloat(String(value));
-    if (isNaN(num)) return String(value);
-
-    // Calculate number of decimal places to show
-    const str = num.toString();
-    const decimalIndex = str.indexOf('.');
-    const currentDecimals =
-      decimalIndex === -1 ? 0 : str.length - decimalIndex - 1;
-    const decimals = Math.max(1, currentDecimals); // Minimum 1 decimal
-
-    return num.toFixed(decimals);
-  }
 
   /** Handle invert checkbox toggle */
   private _invertChange = (e: Event): void => {
@@ -654,24 +540,17 @@ class RangeSlider extends LitElement {
    * Cleanup: Remove all event listeners to prevent memory leaks
    */
   disconnectedCallback(): void {
-    // Event listeners for number/range inputs are handled in render() and auto-cleaned by Lit
-    // Only manually remove listeners for invert checkbox and gradient-slider-bar
-
-    this.invertChk.removeEventListener('change', this._invertChange);
+    // Event listeners in render() (number/range inputs, invert checkbox) are auto-cleaned by Lit
+    // Only manually remove listeners for gradient-slider-bar
 
     const grad =
       this.sliderTrack && this.sliderTrack.querySelector('gradient-slider-bar');
     if (grad)
-      grad.removeEventListener(
-        'threshold-selected',
-        this._onThresholdSelected as EventListener
-      );
-
-    if (this._resizeObserver && this.sliderTrack) {
-      this._resizeObserver.unobserve(this.sliderTrack);
-      this._resizeObserver.disconnect();
-      this._resizeObserver = undefined;
-    }
+      if (this._resizeObserver && this.sliderTrack) {
+        this._resizeObserver.unobserve(this.sliderTrack);
+        this._resizeObserver.disconnect();
+        this._resizeObserver = undefined;
+      }
 
     // Clean up match handler and any pending timeout
     if (this._matchClickHandler) {
