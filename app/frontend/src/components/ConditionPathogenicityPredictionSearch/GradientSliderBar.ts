@@ -92,7 +92,7 @@ export class GradientSliderBar extends LitElement {
     // If no gradient (activeDataset is empty or undefined), use default solid color
     if (gradientImage === 'none') {
       this._barElement.style.backgroundImage = 'none';
-      this._barElement.style.backgroundColor = '#0f6272';
+      this._barElement.style.backgroundColor = '#117f93';
     } else {
       this._barElement.style.backgroundImage = gradientImage;
       this._barElement.style.backgroundColor = '';
@@ -102,7 +102,7 @@ export class GradientSliderBar extends LitElement {
     if (this.invert && this._barElement2) {
       if (gradientImage === 'none') {
         this._barElement2.style.backgroundImage = 'none';
-        this._barElement2.style.backgroundColor = '#0f6272';
+        this._barElement2.style.backgroundColor = '#117f93';
       } else {
         this._barElement2.style.backgroundImage = gradientImage;
         this._barElement2.style.backgroundColor = '';
@@ -167,7 +167,7 @@ export class GradientSliderBar extends LitElement {
 
     return html`
       <div class="slider ${this.invert ? 'inverted' : ''}" part="slider">
-        <div class="bar" part="bar"></div>
+        <div class="bar bar1" part="bar"></div>
         <div class="bar bar2" part="bar"></div>
 
         <ul class="ruler" part="ruler">

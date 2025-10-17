@@ -11,7 +11,6 @@
  * - Visual ruler with scale marks
  * - Range inversion (select values outside the range)
  * - Match type selection (for simple search: all/any datasets)
- * - Horizontal/vertical orientation support
  *
  * Component Architecture:
  * 1. Template definition - HTML structure with Shadow DOM
@@ -24,7 +23,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, queryAll } from 'lit/decorators.js';
 import './ConditionPathogenicityPredictionSearch/GradientSliderBar';
-import Styles from '../../stylesheets/object/component/frequency-range.slider.scss';
+import Styles from '../../stylesheets/object/component/frequency-range-slider.scss';
 
 // Type definitions
 /** Search context type: 'simple' for frequency mode, 'advanced' for count/other modes */
@@ -227,7 +226,7 @@ class RangeSlider extends LitElement {
           </label>
         </div>
 
-        <div class="meter range-input" part="meter">
+        <div class="range-input">
           <gradient-slider-bar
             .minValue=${this.minValue}
             .maxValue=${this.maxValue}
@@ -341,5 +340,4 @@ class RangeSlider extends LitElement {
   };
 }
 
-// Element is registered via @customElement; export the class for tests/consumers
 export default RangeSlider;
