@@ -62,6 +62,8 @@ const SLIDER_CONFIG = {
  */
 @customElement('range-slider')
 class RangeSlider extends LitElement {
+  static styles = [Styles];
+
   /** Search type context: 'simple' enables match radio buttons and 0-1 range restriction */
   @property({ type: String, attribute: false })
   private _searchType: SearchType = null;
@@ -72,10 +74,6 @@ class RangeSlider extends LitElement {
   private _searchTypeTimeoutId?: number;
 
   // === Shadow DOM Elements ===
-  /** Root node reference (Document or ShadowRoot) - not needed with Lit */
-  // removed: private root: Node;
-
-  /** Left/lower range slider (HTML input type="range") */
   @query('gradient-slider-bar') private gradientBar?: HTMLElement & {
     sliderWidth?: number;
   };
@@ -106,24 +104,6 @@ class RangeSlider extends LitElement {
   private _numberInput!: NodeListOf<HTMLInputElement>;
   @queryAll('.range-input  > input[type="range"]')
   private _rangeInput!: NodeListOf<HTMLInputElement>;
-
-  /**
-   * Optional dataset for gradient-slider-bar visualization.
-   * RangeSliderView doesn't use threshold buttons (showThresholds=false),
-   * but uses the bar for visual gradient display.
-   * Empty by default = no gradient, just solid color bar.
-   */
-  @property({ type: Object })
-  activeDataset: Record<
-    string,
-    {
-      color: string;
-      min: number;
-      max: number;
-      minInequalitySign: string;
-      maxInequalitySign: string;
-    }
-  > = {};
 
   private _resizeObserver?: ResizeObserver;
 
@@ -160,7 +140,6 @@ class RangeSlider extends LitElement {
   }
 
   // === Lit rendering ===
-  static styles = [Styles];
 
   private _handleSliderValues(
     e: Event,
@@ -257,11 +236,9 @@ class RangeSlider extends LitElement {
 
         <div class="meter range-input" part="meter">
           <gradient-slider-bar
-            .activeDataset=${this.activeDataset}
             .minValue=${this.minValue}
             .maxValue=${this.maxValue}
             .numberOfScales=${this.rulerNumberOfSteps}
-            .showThresholds=${false}
           ></gradient-slider-bar>
 
           ${createRangeInput('from', this.minValue)}

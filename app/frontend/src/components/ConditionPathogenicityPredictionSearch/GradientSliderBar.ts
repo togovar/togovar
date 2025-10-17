@@ -22,9 +22,9 @@ export interface ThresholdSelectedDetail {
 export class GradientSliderBar extends LitElement {
   static styles = [Styles];
 
-  /** Threshold data for gradient generation and threshold buttons */
+  /** Threshold data for gradient generation and threshold buttons (optional) */
   @property({ type: Object })
-  activeDataset: Record<
+  activeDataset?: Record<
     string,
     {
       color: string;
@@ -33,7 +33,7 @@ export class GradientSliderBar extends LitElement {
       minInequalitySign: Inequality;
       maxInequalitySign: Inequality;
     }
-  > = {};
+  >;
 
   /** Minimum value (0-1) for slider position */
   @property({ type: Number })
@@ -50,14 +50,6 @@ export class GradientSliderBar extends LitElement {
   /** Width of slider in pixels for gradient calculation */
   @property({ type: Number })
   sliderWidth = 247.5;
-
-  /** Whether to show threshold buttons (default: true for backward compatibility) */
-  @property({ type: Boolean })
-  showThresholds = true;
-
-  /** Default background color when activeDataset is empty */
-  @property({ type: String })
-  defaultColor = '#0f6272';
 
   @query('.bar')
   private _barElement!: HTMLDivElement;
@@ -83,15 +75,15 @@ export class GradientSliderBar extends LitElement {
     this._barElement.style.right = 100 - this.maxValue * 100 + '%';
 
     const gradientImage = createGradientSlider(
-      this.activeDataset,
+      this.activeDataset || {},
       this._barElement,
       this.sliderWidth
     );
 
-    // If no gradient (activeDataset is empty), use default solid color
+    // If no gradient (activeDataset is empty or undefined), use default solid color
     if (gradientImage === 'none') {
       this._barElement.style.backgroundImage = 'none';
-      this._barElement.style.backgroundColor = this.defaultColor;
+      this._barElement.style.backgroundColor = '#0f6272';
     } else {
       this._barElement.style.backgroundImage = gradientImage;
       this._barElement.style.backgroundColor = '';
@@ -119,6 +111,8 @@ export class GradientSliderBar extends LitElement {
 
   render() {
     const SCALE_INTERVAL = 1 / this.numberOfScales;
+    const hasActiveDataset =
+      this.activeDataset && Object.keys(this.activeDataset).length > 0;
 
     return html`
       <div class="slider" part="slider">
@@ -137,10 +131,10 @@ export class GradientSliderBar extends LitElement {
           )}
         </ul>
 
-        ${this.showThresholds
+        ${hasActiveDataset
           ? html`
               <div class="threshold">
-                ${Object.entries(this.activeDataset).map(
+                ${Object.entries(this.activeDataset!).map(
                   ([key, details], i, arr) => html`
                     <div
                       class="threshold-line"
