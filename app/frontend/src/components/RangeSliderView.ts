@@ -24,7 +24,6 @@
 import { LitElement, html } from 'lit';
 import { customElement, query, property, queryAll } from 'lit/decorators.js';
 import './ConditionPathogenicityPredictionSearch/GradientSliderBar';
-import { renderRuler, fillSlider, drawThumbs } from './rangeSliderUtils';
 import Styles from '../../stylesheets/object/component/frequency-range.slider.scss';
 
 // Type definitions
@@ -49,16 +48,6 @@ const SLIDER_CONFIG = {
   inputStep: 0.05,
   numberOfSteps: 10,
 } as const;
-
-/**
- * Template definitions - Shadow DOM structure
- *
- * Two templates are created:
- * 1. searchTypeSimple - Radio buttons for 'all datasets' vs 'any dataset' (simple search only)
- * 2. template - Main slider UI with inputs, ruler, and dual range sliders
- */
-
-// Template is provided by Lit via the `render()` method below.
 
 /**
  * RangeSlider Web Component
@@ -87,9 +76,9 @@ class RangeSlider extends LitElement {
   // removed: private root: Node;
 
   /** Left/lower range slider (HTML input type="range") */
-  @query('#slider-1') private slider1!: HTMLInputElement;
-  @query('#slider-2') private slider2!: HTMLInputElement;
-  @query('#slider-track') private sliderTrack!: HTMLDivElement;
+  @query('gradient-slider-bar') private gradientBar?: HTMLElement & {
+    sliderWidth?: number;
+  };
 
   // === Reactive Properties (Lit pattern) ===
   @property({ type: Number, reflect: true, attribute: 'data-min-value' })
@@ -141,47 +130,12 @@ class RangeSlider extends LitElement {
   constructor() {
     super();
     this._searchType = null; // Will be set by parent component
-
-    // Setup Shadow DOM
-    // Lit will handle ShadowRoot and rendering. Element queries happen in firstUpdated().
   }
 
   /**
-   * Query and cache references to Shadow DOM elements
-   * Called once during construction to avoid repeated queries
-   */
-  // _initializeElements removed; queries are provided by @query decorators
-
-  /**
-   * Lit lifecycle: React to property changes
-   *
    * Dispatch events and update visuals when properties change.
-   * DOM synchronization is handled automatically by Lit's template bindings.
    */
   updated(changedProperties: Map<string | number | symbol, unknown>): void {
-    // When searchType changes, ensure visual elements are rendered after DOM update
-    if (changedProperties.has('_searchType')) {
-      // Use setTimeout to ensure DOM is updated after render
-      setTimeout(() => {
-        this._fillSlider();
-        this._reRenderRuler();
-      }, 0);
-    }
-
-    // Update visual representation when values change
-    if (
-      changedProperties.has('minValue') ||
-      changedProperties.has('maxValue') ||
-      changedProperties.has('invert')
-    ) {
-      this._fillSlider();
-    }
-
-    if (changedProperties.has('rulerNumberOfSteps')) {
-      this._reRenderRuler();
-    }
-
-    // Dispatch range-changed event when relevant properties change
     if (
       changedProperties.has('minValue') ||
       changedProperties.has('maxValue') ||
@@ -307,9 +261,6 @@ class RangeSlider extends LitElement {
             .minValue=${this.minValue}
             .maxValue=${this.maxValue}
             .numberOfScales=${this.rulerNumberOfSteps}
-            .sliderWidth=${this.sliderTrack
-              ? this.sliderTrack.clientWidth
-              : 247.5}
             .showThresholds=${false}
           ></gradient-slider-bar>
 
@@ -339,75 +290,6 @@ class RangeSlider extends LitElement {
           : ''}
       </div>
     `;
-  }
-
-  /**
-   * Re-render ruler scale marks
-   *
-   * Creates scale divs evenly distributed across the slider width.
-   * Each scale shows a numeric label (e.g., 0.0, 0.1, 0.2, ..., 1.0).
-   * Called when ruler-number-of-steps changes.
-   */
-  private _reRenderRuler(): void {
-    const ruler = this.shadowRoot?.querySelector('.ruler');
-    if (!ruler) return;
-
-    renderRuler({
-      rulerElement: ruler,
-      rulerNumberOfSteps: this.rulerNumberOfSteps,
-      min: this.minValue,
-      max: this.maxValue,
-    });
-  }
-
-  /**
-   * Update slider track gradient to show selected/unselected regions
-   *
-   * Visual representation:
-   * - Normal mode: Light gray | BLUE selected range | Light gray
-   * - Inverted mode: BLUE | Light gray unselected range | BLUE
-   *
-   * The gradient uses CSS variables:
-   * - var(--color-light-gray): Unselected regions
-   * - var(--color-key-dark1): Selected regions
-   */
-  private _fillSlider(): void {
-    if (!this.slider1 || !this.slider2 || !this.sliderTrack) return;
-
-    fillSlider({
-      slider1: this.slider1,
-      slider2: this.slider2,
-      sliderTrack: this.sliderTrack,
-      min: this.minValue,
-      max: this.maxValue,
-      invert: this.invert ? '1' : '0',
-    });
-
-    // Update thumb borders to show which is left/right
-    this._drawThumbs();
-  }
-
-  /**
-   * Update slider thumb borders dynamically based on slider positions
-   *
-   * Visual feedback:
-   * - Left thumb: Border on right side
-   * - Right thumb: Border on left side
-   *
-   * Uses dynamic CSS injection to target specific slider thumbs.
-   */
-  private _drawThumbs(): void {
-    const styleElement = this.shadowRoot?.querySelector(
-      "style[data='slider-track-style']"
-    ) as HTMLStyleElement | null;
-
-    if (!styleElement || !this.slider1 || !this.slider2) return;
-
-    drawThumbs({
-      slider1: this.slider1,
-      slider2: this.slider2,
-      styleElement,
-    });
   }
 
   /** Get search type (determines behavior: simple vs advanced mode) */
@@ -481,21 +363,15 @@ class RangeSlider extends LitElement {
 
   firstUpdated(): void {
     // Observe size changes to keep sliderWidth in sync for gradient-slider-bar
-    if ('ResizeObserver' in window && this.sliderTrack) {
+    if ('ResizeObserver' in window && this.gradientBar) {
       this._resizeObserver = new ResizeObserver(() => {
-        const gradientBar = this.sliderTrack.querySelector(
-          'gradient-slider-bar'
-        ) as HTMLElement & { sliderWidth?: number };
-        if (gradientBar) {
-          gradientBar.sliderWidth = this.sliderTrack.clientWidth;
+        if (this.gradientBar) {
+          // Update gradient bar width when container resizes
+          this.gradientBar.sliderWidth = this.gradientBar.clientWidth;
         }
       });
-      this._resizeObserver.observe(this.sliderTrack);
+      this._resizeObserver.observe(this.gradientBar);
     }
-
-    // Render initial visuals
-    this._fillSlider();
-    this._reRenderRuler();
   }
 
   // === Event Handler Methods ===
@@ -514,11 +390,9 @@ class RangeSlider extends LitElement {
   disconnectedCallback(): void {
     super.disconnectedCallback();
 
-    // Event listeners in render() (number/range inputs, invert checkbox) are auto-cleaned by Lit
-
     // Clean up ResizeObserver
-    if (this._resizeObserver && this.sliderTrack) {
-      this._resizeObserver.unobserve(this.sliderTrack);
+    if (this._resizeObserver && this.gradientBar) {
+      this._resizeObserver.unobserve(this.gradientBar);
       this._resizeObserver.disconnect();
       this._resizeObserver = undefined;
     }

@@ -55,10 +55,6 @@ export class GradientSliderBar extends LitElement {
   @property({ type: Boolean })
   showThresholds = true;
 
-  /** Whether to show ruler (default: true for PredictionRangeSliderView) */
-  @property({ type: Boolean })
-  showRuler = true;
-
   /** Default background color when activeDataset is empty */
   @property({ type: String })
   defaultColor = '#0f6272';
@@ -128,23 +124,19 @@ export class GradientSliderBar extends LitElement {
       <div class="slider" part="slider">
         <div class="bar" part="bar"></div>
 
-        ${this.showRuler
-          ? html`
-              <ul class="ruler" part="ruler">
-                ${map(
-                  range(this.numberOfScales + 1),
-                  (i) => html`<li
-                    class="scale"
-                    part="scale"
-                    style="left: calc(${(i * 100) /
-                    this.numberOfScales}% - 0.3rem)"
-                  >
-                    ${(SCALE_INTERVAL * i).toFixed(1)}
-                  </li>`
-                )}
-              </ul>
-            `
-          : ''}
+        <ul class="ruler" part="ruler">
+          ${map(
+            range(this.numberOfScales + 1),
+            (i) => html`<li
+              class="scale"
+              part="scale"
+              style="left: calc(${(i * 100) / this.numberOfScales}% - 0.3rem)"
+            >
+              ${(SCALE_INTERVAL * i).toFixed(1)}
+            </li>`
+          )}
+        </ul>
+
         ${this.showThresholds
           ? html`
               <div class="threshold">
