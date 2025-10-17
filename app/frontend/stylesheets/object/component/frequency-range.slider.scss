@@ -100,12 +100,19 @@ input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   height: 1em;
   width: 3px;
-  background-color: transparent;
   border-top: solid 1px rgba(0, 0, 0, 0.5);
   border-bottom: solid 1px rgba(0, 0, 0, 0.5);
-  cursor: col-resize;
   pointer-events: auto;
   margin-top: -0.2em;
+  cursor: col-resize;
+}
+.from[type='range']::-webkit-slider-thumb {
+  transform: translateX(-3px);
+  border-right: solid 1px rgba(0, 0, 0, 0.5);
+}
+.to[type='range']::-webkit-slider-thumb {
+  transform: translateX(-1px);
+  border-left: solid 1px rgba(0, 0, 0, 0.5);
 }
 
 /* Match radio buttons */

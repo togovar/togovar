@@ -23,9 +23,7 @@
 
 import { LitElement, html } from 'lit';
 import { customElement, query, property, queryAll } from 'lit/decorators.js';
-// Ensure the gradient slider webcomponent is registered
 import './ConditionPathogenicityPredictionSearch/GradientSliderBar';
-import type { Inequality } from '../types';
 import { renderRuler, fillSlider, drawThumbs } from './rangeSliderUtils';
 import Styles from '../../stylesheets/object/component/frequency-range.slider.scss';
 
@@ -92,23 +90,6 @@ class RangeSlider extends LitElement {
   @query('#slider-1') private slider1!: HTMLInputElement;
   @query('#slider-2') private slider2!: HTMLInputElement;
   @query('#slider-track') private sliderTrack!: HTMLDivElement;
-  @query('.from') private from!: HTMLInputElement;
-  @query('.to') private to!: HTMLInputElement;
-  @query('.invert') private invertChk!: HTMLInputElement;
-  @query('.meter') private _meter!: HTMLDivElement;
-
-  /** Optional dataset for the gradient bar (keys -> {min,max,color,...}), normalized 0-1 */
-  @property({ type: Object })
-  public activeDataset: Record<
-    string,
-    {
-      color: string;
-      min: number;
-      max: number;
-      minInequalitySign: Inequality;
-      maxInequalitySign: Inequality;
-    }
-  > = {};
 
   // === Reactive Properties (Lit pattern) ===
   @property({ type: Number, reflect: true, attribute: 'data-min-value' })
@@ -137,25 +118,25 @@ class RangeSlider extends LitElement {
   @queryAll('.range-input  > input[type="range"]')
   private _rangeInput!: NodeListOf<HTMLInputElement>;
 
+  /**
+   * Optional dataset for gradient-slider-bar visualization.
+   * RangeSliderView doesn't use threshold buttons (showThresholds=false),
+   * but uses the bar for visual gradient display.
+   * Empty by default = no gradient, just solid color bar.
+   */
+  @property({ type: Object })
+  activeDataset: Record<
+    string,
+    {
+      color: string;
+      min: number;
+      max: number;
+      minInequalitySign: string;
+      maxInequalitySign: string;
+    }
+  > = {};
+
   private _resizeObserver?: ResizeObserver;
-
-  private _onThresholdSelected = (e: Event): void => {
-    const ce = e as CustomEvent;
-    const detail = ce.detail as
-      | { minValue: number; maxValue: number }
-      | undefined;
-    if (!detail) return;
-
-    // Convert normalized (0-1) values to absolute slider values
-    const minAbs =
-      this.minValue + detail.minValue * (this.maxValue - this.minValue);
-    const maxAbs =
-      this.minValue + detail.maxValue * (this.maxValue - this.minValue);
-
-    // Update reactive properties (this will trigger updated() and events)
-    this.minValue = minAbs;
-    this.maxValue = maxAbs;
-  };
 
   constructor() {
     super();
@@ -325,7 +306,7 @@ class RangeSlider extends LitElement {
             <div class="slider-track" id="slider-track" part="slider-track">
               <style data="slider-track-style"></style>
               <div class="ruler" part="ruler"></div>
-              <!-- Embed reusable gradient bar when dataset is provided -->
+              <!-- Use gradient-slider-bar for visualization (no thresholds, no ruler) -->
               <gradient-slider-bar
                 .activeDataset=${this.activeDataset}
                 .minValue=${this.minValue}
@@ -334,6 +315,7 @@ class RangeSlider extends LitElement {
                 .sliderWidth=${(this.sliderTrack &&
                   this.sliderTrack.clientWidth) ||
                 247.5}
+                .showThresholds=${false}
               ></gradient-slider-bar>
             </div>
 
@@ -505,21 +487,18 @@ class RangeSlider extends LitElement {
   }
 
   firstUpdated(): void {
-    // Listen for threshold-selected events from gradient-slider-bar
-    const grad = this.sliderTrack.querySelector('gradient-slider-bar');
-    if (grad)
-      if ('ResizeObserver' in window && this.sliderTrack) {
-        // Observe size changes to keep sliderWidth in sync
-        this._resizeObserver = new ResizeObserver(() => {
-          const g = this.sliderTrack.querySelector(
-            'gradient-slider-bar'
-          ) as HTMLElement | null;
-          if (g)
-            (g as HTMLElement & { sliderWidth?: number }).sliderWidth =
-              this.sliderTrack.clientWidth;
-        });
-        this._resizeObserver.observe(this.sliderTrack);
-      }
+    // Observe size changes to keep sliderWidth in sync for gradient-slider-bar
+    if ('ResizeObserver' in window && this.sliderTrack) {
+      this._resizeObserver = new ResizeObserver(() => {
+        const gradientBar = this.sliderTrack.querySelector(
+          'gradient-slider-bar'
+        ) as HTMLElement & { sliderWidth?: number };
+        if (gradientBar) {
+          gradientBar.sliderWidth = this.sliderTrack.clientWidth;
+        }
+      });
+      this._resizeObserver.observe(this.sliderTrack);
+    }
 
     // Render initial visuals
     this._fillSlider();
@@ -540,17 +519,16 @@ class RangeSlider extends LitElement {
    * Cleanup: Remove all event listeners to prevent memory leaks
    */
   disconnectedCallback(): void {
-    // Event listeners in render() (number/range inputs, invert checkbox) are auto-cleaned by Lit
-    // Only manually remove listeners for gradient-slider-bar
+    super.disconnectedCallback();
 
-    const grad =
-      this.sliderTrack && this.sliderTrack.querySelector('gradient-slider-bar');
-    if (grad)
-      if (this._resizeObserver && this.sliderTrack) {
-        this._resizeObserver.unobserve(this.sliderTrack);
-        this._resizeObserver.disconnect();
-        this._resizeObserver = undefined;
-      }
+    // Event listeners in render() (number/range inputs, invert checkbox) are auto-cleaned by Lit
+
+    // Clean up ResizeObserver
+    if (this._resizeObserver && this.sliderTrack) {
+      this._resizeObserver.unobserve(this.sliderTrack);
+      this._resizeObserver.disconnect();
+      this._resizeObserver = undefined;
+    }
 
     // Clean up match handler and any pending timeout
     if (this._matchClickHandler) {

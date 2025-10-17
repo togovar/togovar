@@ -51,6 +51,18 @@ export class GradientSliderBar extends LitElement {
   @property({ type: Number })
   sliderWidth = 247.5;
 
+  /** Whether to show threshold buttons (default: true for backward compatibility) */
+  @property({ type: Boolean })
+  showThresholds = true;
+
+  /** Whether to show ruler (default: true for PredictionRangeSliderView) */
+  @property({ type: Boolean })
+  showRuler = true;
+
+  /** Default background color when activeDataset is empty */
+  @property({ type: String })
+  defaultColor = '#0f6272';
+
   @query('.bar')
   private _barElement!: HTMLDivElement;
 
@@ -73,11 +85,21 @@ export class GradientSliderBar extends LitElement {
 
     this._barElement.style.left = this.minValue * 100 + '%';
     this._barElement.style.right = 100 - this.maxValue * 100 + '%';
-    this._barElement.style.backgroundImage = createGradientSlider(
+
+    const gradientImage = createGradientSlider(
       this.activeDataset,
       this._barElement,
       this.sliderWidth
     );
+
+    // If no gradient (activeDataset is empty), use default solid color
+    if (gradientImage === 'none') {
+      this._barElement.style.backgroundImage = 'none';
+      this._barElement.style.backgroundColor = this.defaultColor;
+    } else {
+      this._barElement.style.backgroundImage = gradientImage;
+      this._barElement.style.backgroundColor = '';
+    }
   }
 
   private _handleThresholdClick(e: Event): void {
@@ -103,45 +125,56 @@ export class GradientSliderBar extends LitElement {
     const SCALE_INTERVAL = 1 / this.numberOfScales;
 
     return html`
-      <div class="slider">
-        <div class="bar"></div>
-        <ul class="ruler">
-          ${map(
-            range(this.numberOfScales + 1),
-            (i) => html`<li
-              class="scale"
-              style="left: calc(${(i * 100) / this.numberOfScales}% - 0.3rem)"
-            >
-              ${(SCALE_INTERVAL * i).toFixed(1)}
-            </li>`
-          )}
-        </ul>
+      <div class="slider" part="slider">
+        <div class="bar" part="bar"></div>
 
-        <div class="threshold">
-          ${Object.entries(this.activeDataset).map(
-            ([key, details], i, arr) => html`
-              <div
-                class="threshold-line"
-                style="height:${(arr.length - i) * 20 +
-                10}px; left:${details.min * 100}%;"
-              ></div>
-              <button
-                type="button"
-                class="threshold-button"
-                data-key=${key}
-                data-min-value=${details.min}
-                data-max-value=${details.max}
-                data-min-inequality-sign=${details.minInequalitySign}
-                data-max-inequality-sign=${details.maxInequalitySign}
-                style="left:${details.min * 100}%; top:${(arr.length - i) *
-                20}px;"
-                @click=${this._handleThresholdClick}
-              >
-                ${key}
-              </button>
+        ${this.showRuler
+          ? html`
+              <ul class="ruler" part="ruler">
+                ${map(
+                  range(this.numberOfScales + 1),
+                  (i) => html`<li
+                    class="scale"
+                    part="scale"
+                    style="left: calc(${(i * 100) /
+                    this.numberOfScales}% - 0.3rem)"
+                  >
+                    ${(SCALE_INTERVAL * i).toFixed(1)}
+                  </li>`
+                )}
+              </ul>
             `
-          )}
-        </div>
+          : ''}
+        ${this.showThresholds
+          ? html`
+              <div class="threshold">
+                ${Object.entries(this.activeDataset).map(
+                  ([key, details], i, arr) => html`
+                    <div
+                      class="threshold-line"
+                      style="height:${(arr.length - i) * 20 +
+                      10}px; left:${details.min * 100}%;"
+                    ></div>
+                    <button
+                      type="button"
+                      class="threshold-button"
+                      data-key=${key}
+                      data-min-value=${details.min}
+                      data-max-value=${details.max}
+                      data-min-inequality-sign=${details.minInequalitySign}
+                      data-max-inequality-sign=${details.maxInequalitySign}
+                      style="left:${details.min * 100}%; top:${(arr.length -
+                        i) *
+                      20}px;"
+                      @click=${this._handleThresholdClick}
+                    >
+                      ${key}
+                    </button>
+                  `
+                )}
+              </div>
+            `
+          : ''}
       </div>
     `;
   }
