@@ -22,7 +22,7 @@
  */
 
 import { LitElement, html } from 'lit';
-import { customElement, query, property, queryAll } from 'lit/decorators.js';
+import { customElement, property, queryAll } from 'lit/decorators.js';
 import './ConditionPathogenicityPredictionSearch/GradientSliderBar';
 import Styles from '../../stylesheets/object/component/frequency-range.slider.scss';
 
@@ -73,11 +73,6 @@ class RangeSlider extends LitElement {
   /** Timeout id used when deferring adding the match click handler */
   private _searchTypeTimeoutId?: number;
 
-  // === Shadow DOM Elements ===
-  @query('gradient-slider-bar') private gradientBar?: HTMLElement & {
-    sliderWidth?: number;
-  };
-
   // === Reactive Properties (Lit pattern) ===
   @property({ type: Number, reflect: true, attribute: 'data-min-value' })
   minValue: number = SLIDER_CONFIG.min;
@@ -104,8 +99,6 @@ class RangeSlider extends LitElement {
   private _numberInput!: NodeListOf<HTMLInputElement>;
   @queryAll('.range-input  > input[type="range"]')
   private _rangeInput!: NodeListOf<HTMLInputElement>;
-
-  private _resizeObserver?: ResizeObserver;
 
   constructor() {
     super();
@@ -345,37 +338,6 @@ class RangeSlider extends LitElement {
     // Update reactive property (this will trigger updated() lifecycle)
     this.invert = (e.target as HTMLInputElement).checked;
   };
-
-  /**
-   * Custom Element lifecycle - called when element is removed from DOM
-   *
-   * Cleanup: Remove all event listeners to prevent memory leaks
-   */
-  disconnectedCallback(): void {
-    super.disconnectedCallback();
-
-    // Clean up ResizeObserver
-    if (this._resizeObserver && this.gradientBar) {
-      this._resizeObserver.unobserve(this.gradientBar);
-      this._resizeObserver.disconnect();
-      this._resizeObserver = undefined;
-    }
-
-    // Clean up match handler and any pending timeout
-    if (this._matchClickHandler) {
-      const simpleSearchDiv = this.renderRoot?.querySelector('.match');
-      if (simpleSearchDiv)
-        simpleSearchDiv.removeEventListener(
-          'click',
-          this._matchClickHandler as EventListener
-        );
-      this._matchClickHandler = undefined;
-    }
-    if (this._searchTypeTimeoutId) {
-      clearTimeout(this._searchTypeTimeoutId);
-      this._searchTypeTimeoutId = undefined;
-    }
-  }
 }
 
 // Element is registered via @customElement; export the class for tests/consumers
