@@ -232,6 +232,7 @@ class RangeSlider extends LitElement {
             .minValue=${this.minValue}
             .maxValue=${this.maxValue}
             .numberOfScales=${this.rulerNumberOfSteps}
+            .invert=${this.invert}
           ></gradient-slider-bar>
 
           ${createRangeInput('from', this.minValue)}

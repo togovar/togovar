@@ -51,14 +51,22 @@ export class GradientSliderBar extends LitElement {
   @property({ type: Number })
   sliderWidth = 247.5;
 
+  /** Invert range (visual indication for inverted selection) */
+  @property({ type: Boolean })
+  invert = false;
+
   @query('.bar')
   private _barElement!: HTMLDivElement;
+
+  @query('.bar2')
+  private _barElement2?: HTMLDivElement;
 
   updated(changedProps: Map<string | number | symbol, unknown>): void {
     if (
       changedProps.has('activeDataset') ||
       changedProps.has('minValue') ||
-      changedProps.has('maxValue')
+      changedProps.has('maxValue') ||
+      changedProps.has('invert')
     ) {
       this._updateBarStyle();
     }
@@ -67,8 +75,13 @@ export class GradientSliderBar extends LitElement {
   private _updateBarStyle(): void {
     if (!this._barElement) return;
 
-    this._barElement.style.left = this.minValue * 100 + '%';
-    this._barElement.style.right = 100 - this.maxValue * 100 + '%';
+    if (!this.invert) {
+      // Normal mode: single bar showing selected range
+      this._setNormalBarMode();
+    } else {
+      // Invert mode: two bars showing ranges outside selection
+      this._setInvertBarMode();
+    }
 
     const gradientImage = createGradientSlider(
       this.activeDataset || {},
@@ -83,6 +96,48 @@ export class GradientSliderBar extends LitElement {
     } else {
       this._barElement.style.backgroundImage = gradientImage;
       this._barElement.style.backgroundColor = '';
+    }
+
+    // Apply same gradient/color to second bar in invert mode
+    if (this.invert && this._barElement2) {
+      if (gradientImage === 'none') {
+        this._barElement2.style.backgroundImage = 'none';
+        this._barElement2.style.backgroundColor = '#0f6272';
+      } else {
+        this._barElement2.style.backgroundImage = gradientImage;
+        this._barElement2.style.backgroundColor = '';
+      }
+    }
+  }
+
+  /**
+   * Sets normal bar display mode (single bar showing selected range)
+   */
+  private _setNormalBarMode(): void {
+    this._barElement.style.left = this.minValue * 100 + '%';
+    this._barElement.style.width = (this.maxValue - this.minValue) * 100 + '%';
+    this._barElement.style.right = '';
+
+    // Hide second bar in normal mode
+    if (this._barElement2) {
+      this._barElement2.style.width = '0%';
+    }
+  }
+
+  /**
+   * Sets inverted bar display mode (two bars showing ranges outside selection)
+   */
+  private _setInvertBarMode(): void {
+    // Left bar: from 0% to minValue
+    this._barElement.style.left = '0%';
+    this._barElement.style.width = this.minValue * 100 + '%';
+    this._barElement.style.right = '';
+
+    // Right bar: from maxValue to 100%
+    if (this._barElement2) {
+      this._barElement2.style.left = this.maxValue * 100 + '%';
+      this._barElement2.style.width = (1 - this.maxValue) * 100 + '%';
+      this._barElement2.style.right = '';
     }
   }
 
@@ -111,8 +166,9 @@ export class GradientSliderBar extends LitElement {
       this.activeDataset && Object.keys(this.activeDataset).length > 0;
 
     return html`
-      <div class="slider" part="slider">
+      <div class="slider ${this.invert ? 'inverted' : ''}" part="slider">
         <div class="bar" part="bar"></div>
+        <div class="bar bar2" part="bar"></div>
 
         <ul class="ruler" part="ruler">
           ${map(
