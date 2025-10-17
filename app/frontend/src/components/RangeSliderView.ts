@@ -301,27 +301,20 @@ class RangeSlider extends LitElement {
           </label>
         </div>
 
-        <div class="meter" part="meter">
-          <div class="meter-container range-input" part="meter-container">
-            <div class="slider-track" id="slider-track" part="slider-track">
-              <style data="slider-track-style"></style>
-              <div class="ruler" part="ruler"></div>
-              <!-- Use gradient-slider-bar for visualization (no thresholds, no ruler) -->
-              <gradient-slider-bar
-                .activeDataset=${this.activeDataset}
-                .minValue=${this.minValue}
-                .maxValue=${this.maxValue}
-                .numberOfScales=${this.rulerNumberOfSteps}
-                .sliderWidth=${(this.sliderTrack &&
-                  this.sliderTrack.clientWidth) ||
-                247.5}
-                .showThresholds=${false}
-              ></gradient-slider-bar>
-            </div>
+        <div class="meter range-input" part="meter">
+          <gradient-slider-bar
+            .activeDataset=${this.activeDataset}
+            .minValue=${this.minValue}
+            .maxValue=${this.maxValue}
+            .numberOfScales=${this.rulerNumberOfSteps}
+            .sliderWidth=${this.sliderTrack
+              ? this.sliderTrack.clientWidth
+              : 247.5}
+            .showThresholds=${false}
+          ></gradient-slider-bar>
 
-            ${createRangeInput('from', this.minValue)}
-            ${createRangeInput('to', this.maxValue)}
-          </div>
+          ${createRangeInput('from', this.minValue)}
+          ${createRangeInput('to', this.maxValue)}
         </div>
 
         ${this.searchType === 'simple'
