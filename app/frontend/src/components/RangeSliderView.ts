@@ -338,19 +338,6 @@ class RangeSlider extends LitElement {
     }
   }
 
-  firstUpdated(): void {
-    // Observe size changes to keep sliderWidth in sync for gradient-slider-bar
-    if ('ResizeObserver' in window && this.gradientBar) {
-      this._resizeObserver = new ResizeObserver(() => {
-        if (this.gradientBar) {
-          // Update gradient bar width when container resizes
-          this.gradientBar.sliderWidth = this.gradientBar.clientWidth;
-        }
-      });
-      this._resizeObserver.observe(this.gradientBar);
-    }
-  }
-
   // === Event Handler Methods ===
 
   /** Handle invert checkbox toggle */

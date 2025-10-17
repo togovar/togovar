@@ -54,10 +54,6 @@ export class GradientSliderBar extends LitElement {
   @query('.bar')
   private _barElement!: HTMLDivElement;
 
-  firstUpdated(): void {
-    this._updateBarStyle();
-  }
-
   updated(changedProps: Map<string | number | symbol, unknown>): void {
     if (
       changedProps.has('activeDataset') ||
