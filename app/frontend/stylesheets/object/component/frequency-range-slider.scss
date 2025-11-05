@@ -26,8 +26,10 @@ label {
     -webkit-appearance: none;
     line-height: 1em;
     appearance: none;
-    width: 100%;
+    width: calc(100% - 12px);
     position: absolute;
+    top: 10px;
+    left: 9px;
     margin: auto;
     background-color: transparent;
     pointer-events: none;

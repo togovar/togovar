@@ -4,7 +4,7 @@ import { map } from 'lit/directives/map.js';
 import { range } from 'lit/directives/range.js';
 import { createGradientSlider } from './createGradientSlider';
 import type { Inequality } from './../../types';
-import Styles from '../../../stylesheets/object/component/prediction-range-slider.scss';
+import Styles from '../../../stylesheets/object/component/gradient-slider-bar.scss';
 
 export interface ThresholdSelectedDetail {
   key: string;
@@ -47,9 +47,9 @@ export class GradientSliderBar extends LitElement {
   @property({ type: Number })
   numberOfScales = 10;
 
-  /** Width of slider in pixels for gradient calculation */
-  @property({ type: Number })
-  sliderWidth = 247.5;
+  /** Width of slider in pixels for gradient calculation (deprecated, use actual element width) */
+  // @property({ type: Number })
+  // sliderWidth = 247.5;
 
   /** Invert range (visual indication for inverted selection) */
   @property({ type: Boolean })
@@ -83,10 +83,11 @@ export class GradientSliderBar extends LitElement {
       this._setInvertBarMode();
     }
 
+    const barWidth = this._barElement.getBoundingClientRect().width;
     const gradientImage = createGradientSlider(
       this.activeDataset || {},
       this._barElement,
-      this.sliderWidth
+      barWidth
     );
 
     // If no gradient (activeDataset is empty or undefined), use default solid color
