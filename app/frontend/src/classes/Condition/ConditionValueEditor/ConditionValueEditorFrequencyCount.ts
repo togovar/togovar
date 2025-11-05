@@ -693,15 +693,9 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
       this._mode === MODE.frequency ? this._condition.frequency.invert : false;
     const isFiltered = this._filtered?.checked ?? false;
 
-    // Format frequency values to always show at least one decimal place
-    const fromValue =
-      this._mode === MODE.frequency
-        ? this._formatFrequencyValue(currentCondition.from as number)
-        : currentCondition.from;
-    const toValue =
-      this._mode === MODE.frequency
-        ? this._formatFrequencyValue(currentCondition.to as number)
-        : currentCondition.to;
+    // Use values directly to preserve user input precision
+    const fromValue = currentCondition.from;
+    const toValue = currentCondition.to;
 
     freqCountView.setValues(
       this.conditionType as 'dataset' | 'genotype',
@@ -715,16 +709,6 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     freqCountView.mode = this._mode;
     freqCountView.from = fromValue;
     // Note: Removed .update() call as it's protected and may not be needed externally
-  }
-
-  /**
-   * Formats a frequency value to ensure at least one decimal place is shown (e.g., 0.0, 1.0)
-   * @param value - The numeric frequency value
-   * @returns Formatted value (number with at least 1 decimal place)
-   */
-  private _formatFrequencyValue(value: number): number {
-    // Round to 2 decimal places to avoid floating point precision issues
-    return Math.round(value * 100) / 100;
   }
 
   /**
