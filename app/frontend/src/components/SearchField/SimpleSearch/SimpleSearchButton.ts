@@ -1,4 +1,5 @@
-import { LitElement, html, CSSResultGroup, TemplateResult } from 'lit';
+import { LitElement, html } from 'lit';
+import type { CSSResultGroup, TemplateResult } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 import Styles from '../../../../stylesheets/object/component/simple-search-button.scss';

@@ -1,3 +1,5 @@
+@use "sass:color"
+
 .results-view
   white-space: nowrap
   font-size: 14px
@@ -51,7 +53,7 @@
           line-height: 14px
           border: solid 1px $COLOR_GRAY
           border-radius: 7px
-          background-color: lighten($COLOR_GRAY, 35%)
+          background-color: color.adjust($COLOR_GRAY, $lightness: 35%)
           padding: 0 4px
           margin-left: 4px
           vertical-align: middle
@@ -78,7 +80,7 @@
             line-height: 14px
             border: solid 1px $COLOR_GRAY
             border-radius: 7px
-            background-color: lighten($COLOR_GRAY, 35%)
+            background-color: color.adjust($COLOR_GRAY, $lightness: 35%)
             padding: 0 4px
             margin-left: 4px
             vertical-align: middle

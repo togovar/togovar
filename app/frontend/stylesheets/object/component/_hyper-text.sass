@@ -1,10 +1,12 @@
+@use "sass:color"
+
 .hyper-text
   &:not([href=""])
     &:after
       font-family: FontAwesome
       display: inline-block
       margin-left: .25em
-      color: lighten($COLOR_GRAY, 10)
+      color: color.adjust($COLOR_GRAY, $lightness: 10%)
   &:hover:after
     color: $COLOR_KEY
   &.-internal

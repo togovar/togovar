@@ -1,7 +1,11 @@
-import { LitElement, html, nothing, CSSResultGroup, TemplateResult } from 'lit';
+import { LitElement, html, nothing } from 'lit';
+import type {
+  ReactiveControllerHost,
+  CSSResultGroup,
+  TemplateResult,
+} from 'lit';
 import { customElement, state, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
-import { ReactiveControllerHost } from 'lit';
 
 import '../SearchField';
 import './SearchFieldSuggestionsList';
@@ -24,12 +28,17 @@ const DEFAULT_VALUE_MAPPINGS = {
  * @param options - 部分的なオプション
  * @returns 完全なSearchFieldOptions
  */
-function createCompleteSearchFieldOptions(options?: Partial<SearchFieldOptions>): SearchFieldOptions {
+function createCompleteSearchFieldOptions(
+  options?: Partial<SearchFieldOptions>
+): SearchFieldOptions {
   return {
     valueMappings: {
-      valueKey: options?.valueMappings?.valueKey || DEFAULT_VALUE_MAPPINGS.valueKey,
-      labelKey: options?.valueMappings?.labelKey || DEFAULT_VALUE_MAPPINGS.labelKey,
-      aliasOfKey: options?.valueMappings?.aliasOfKey || DEFAULT_VALUE_MAPPINGS.aliasOfKey,
+      valueKey:
+        options?.valueMappings?.valueKey || DEFAULT_VALUE_MAPPINGS.valueKey,
+      labelKey:
+        options?.valueMappings?.labelKey || DEFAULT_VALUE_MAPPINGS.labelKey,
+      aliasOfKey:
+        options?.valueMappings?.aliasOfKey || DEFAULT_VALUE_MAPPINGS.aliasOfKey,
     },
     titleMappings: options?.titleMappings || {},
   };
@@ -153,7 +162,8 @@ class SearchFieldWithSuggestions extends LitElement {
     this.suggestAPIQueryParam = suggestAPIQueryParam;
 
     // デフォルト値とマージして完全なSearchFieldOptionsを作成
-    this._searchFieldOptionsInternal = createCompleteSearchFieldOptions(options);
+    this._searchFieldOptionsInternal =
+      createCompleteSearchFieldOptions(options);
 
     // 初期化
     this._controller = new SearchFieldController(this);
@@ -168,7 +178,7 @@ class SearchFieldWithSuggestions extends LitElement {
   // ============================================================================
   // Getters
   // ============================================================================
-  /** API task getter　- provides access to the suggestion fetching task */
+  /** API task getter - provides access to the suggestion fetching task */
   get apiTask() {
     return this._controller.apiTask;
   }
@@ -202,7 +212,9 @@ class SearchFieldWithSuggestions extends LitElement {
 
     if (changedProperties.has('options') && this.options) {
       // 部分的なオプションを完全なSearchFieldOptionsに変換
-      this._searchFieldOptionsInternal = createCompleteSearchFieldOptions(this.options);
+      this._searchFieldOptionsInternal = createCompleteSearchFieldOptions(
+        this.options
+      );
     }
 
     if (changedProperties.has('hideSuggestions')) {

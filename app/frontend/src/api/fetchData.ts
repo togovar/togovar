@@ -1,14 +1,14 @@
 import { storeManager } from '../store/StoreManager';
 import * as qs from 'qs';
 import * as _ from 'lodash';
-import { API_URL } from '../global.js';
+import { API_URL } from '../global';
 const LIMIT = 100;
 import { extractSearchCondition } from '../store/searchManager';
-import { FetchOption, SearchResults, SearchStatistics } from '../types';
+import type { FetchOption, SearchResults, SearchStatistics } from '../types';
 
-let currentAbortController = null;
+let currentAbortController: AbortController | null = null;
 let _currentSearchMode: 'simple' | 'advanced' | null = null;
-let lastRequestRanges = new Set(); // 取得済みの範囲を管理
+const lastRequestRanges = new Set(); // 取得済みの範囲を管理
 
 /** 検索を実行するメソッド（データ取得 & 更新） */
 export const executeSearch = (() => {
@@ -83,7 +83,7 @@ export const executeSearch = (() => {
         })
         .catch((error) => {
           // AbortErrorの場合はローディング状態を維持
-          if (error.name === 'AbortError') return;
+          if (error instanceof Error && error.name === 'AbortError') return;
           storeManager.setData('isFetching', false);
           isRequestInProgress = false;
           storeManager.setData('searchMessages', { error });
@@ -137,6 +137,9 @@ function _determineSearchEndpoints(
         ? [`${basePath}?stat=0&data=1`, `${basePath}?stat=1&data=0`]
         : [`${basePath}?stat=0&data=1`];
     }
+
+    default:
+      return [];
   }
 }
 
@@ -156,7 +159,7 @@ function _getRequestOptions(signal: AbortSignal): FetchOption {
   }
 
   // Advanced search のリクエストオプション
-  const body: Partial<{ offset: number; query: any }> = {
+  const body: Partial<{ offset: number; query: Record<string, unknown> }> = {
     offset: _calculateOffset(storeManager.getData('offset'), LIMIT),
   };
 
@@ -217,7 +220,7 @@ async function _fetchData(endpoint: string, options: FetchOption) {
     }
   } catch (error) {
     console.error(error);
-    if (error.name === 'AbortError') {
+    if (error instanceof Error && error.name === 'AbortError') {
       // AbortErrorの場合はエラーオブジェクトを投げる
       const abortError = new Error('ABORTED');
       abortError.name = 'AbortError';
@@ -229,7 +232,7 @@ async function _fetchData(endpoint: string, options: FetchOption) {
 
 /** HTTP ステータスコードに応じたエラーメッセージを取得 */
 function _getErrorMessage(statusCode: number): string {
-  const errorTypes = {
+  const errorTypes: Record<number, string> = {
     400: 'INVALID_REQUEST',
     401: 'UNAUTHORIZED',
     404: 'NOT_FOUND',
@@ -241,8 +244,15 @@ function _getErrorMessage(statusCode: number): string {
 
 /** 検索結果データをセット */
 function _processSearchResults(json: SearchResults) {
-  // results
-  storeManager.setResults(json.data, json.scroll.offset);
+  const rows = Array.isArray(json?.data) ? json.data : [];
+  const offset =
+    typeof json?.scroll?.offset === 'number' ? json.scroll.offset : 0;
+
+  if (!Array.isArray(json?.data)) {
+    console.error('[search] Unexpected result shape (no data array):', json);
+  }
+
+  storeManager.setResults(rows, offset);
 }
 
 /** 統計情報をセット */
@@ -275,11 +285,16 @@ async function _updateAppState() {
         document.body.setAttribute('data-has-conditions', 'true');
       }
       break;
-    case 'advanced':
+    case 'advanced': {
+      const advancedConditions = storeManager.getData(
+        'advancedSearchConditions'
+      );
       document.body.toggleAttribute(
         'data-has-conditions',
-        Object.keys(storeManager.getData('advancedSearchConditions')).length > 0
+        advancedConditions && Object.keys(advancedConditions).length > 0
       );
+      break;
+    }
   }
 
   // まずoffsetを更新して表示位置を確定

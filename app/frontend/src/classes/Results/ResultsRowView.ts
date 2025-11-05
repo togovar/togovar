@@ -1,7 +1,7 @@
-import { COLUMNS } from '../../global.js';
+import { COLUMNS } from '../../global';
 import { storeManager } from '../../store/StoreManager';
 import '../../components/LogarithmizedBlockGraphFrequencyView';
-import {
+import type {
   ResultData,
   Column,
   TdFrequencies,
@@ -10,109 +10,130 @@ import {
 import {
   COLUMN_TEMPLATES,
   createFrequencyColumnHTML,
-} from './ResultsRowTemplates';
-import { ResultsRowUpdaters } from './ResultsRowUpdaters';
+} from './ResultsColumnTemplates';
+import { ResultsColumnUpdater } from './ResultsColumnUpdater';
 
 /**
- * 検索結果テーブルの1行を管理するクラス
+ * Class for managing a single row in the search results table
  *
- * 各行のDOM要素の作成、データバインディング、状態管理を担当する
- * storeManagerからのデータ変更通知を受け取り、対応するDOM要素を更新する
+ * Responsible for creating DOM elements, data binding, and state management for each row
+ * Receives data change notifications from storeManager and updates corresponding DOM elements
  */
 export class ResultsRowView {
-  /** 行のインデックス番号 */
-  index: number;
-  /** 行の選択状態 */
-  selected: boolean;
-  /** テーブル行要素 */
-  tr: HTMLTableRowElement;
+  index: number; // Row index number
+  selected: boolean; // Row selection state
+  tr: HTMLTableRowElement; // Table row element
+  private _isDestroyed = false; // Track if instance has been destroyed
 
-  // DOM要素のキャッシュ
+  // Cache for DOM elements
   // TogoVar ID
-  tdTGVAnchor: HTMLAnchorElement | null;
+  togovarIdAnchor: HTMLAnchorElement | null = null;
   // RefSNP ID
-  tdRS: HTMLTableCellElement | null;
-  tdRSAnchor: HTMLAnchorElement | null;
+  refsnpCell: HTMLTableCellElement | null = null;
+  refsnpAnchor: HTMLAnchorElement | null = null;
   // Position
-  tdPositionChromosome: HTMLDivElement | null;
-  tdPositionCoordinate: HTMLDivElement | null;
+  positionChromosome: HTMLDivElement | null = null;
+  positionCoordinate: HTMLDivElement | null = null;
   // Ref/Alt
-  tdRefAltRef: HTMLSpanElement | null;
-  tdRefAltAlt: HTMLSpanElement | null;
+  refElement: HTMLSpanElement | null = null;
+  altElement: HTMLSpanElement | null = null;
   // Type
-  tdType: HTMLDivElement | null;
+  typeElement: HTMLDivElement | null = null;
   // Gene
-  tdGene: HTMLTableCellElement | null;
-  tdGeneAnchor: HTMLAnchorElement | null;
+  geneCell: HTMLTableCellElement | null = null;
+  geneAnchor: HTMLAnchorElement | null = null;
   // Alt frequency
-  tdFrequencies: TdFrequencies;
+  frequencyElements: TdFrequencies = {};
   // Consequence
-  tdConsequence: HTMLTableCellElement | null;
-  tdConsequenceItem: HTMLDivElement | null;
+  consequenceCell: HTMLTableCellElement | null = null;
+  consequenceItem: HTMLDivElement | null = null;
   // Clinical significance
-  tdClinicalSign: HTMLDivElement | null;
-  tdClinicalAnchor: HTMLAnchorElement | null;
-  tdClinicalIcon: HTMLSpanElement | null;
+  clinicalSignificance: HTMLDivElement | null = null;
+  clinicalAnchor: HTMLAnchorElement | null = null;
+  clinicalIcon: HTMLSpanElement | null = null;
   // AlphaMissense
-  tdAlphaMissenseFunction: HTMLDivElement | null;
+  alphaMissenseFunction: HTMLDivElement | null = null;
   // SIFT
-  tdSiftFunction: HTMLDivElement | null;
+  siftFunction: HTMLDivElement | null = null;
   // PolyPhen
-  tdPolyphenFunction: HTMLDivElement | null;
+  polyphenFunction: HTMLDivElement | null = null;
 
   /**
-   * ResultsRowViewのコンストラクタ
+   * Constructor for ResultsRowView
    *
-   * @param index - テーブル内の行のインデックス番号
+   * @param index - Row index number in the table
    */
   constructor(index: number) {
     this.index = index;
     this.selected = false;
     this.tr = this._createTableRow();
 
-    // `selectedRow` の変更を監視し、selectedRow() を活用
-    storeManager.subscribe('selectedRow', this.selectedRow.bind(this));
-    // `offset` の変更を監視し、テーブル行を更新
-    storeManager.subscribe('offset', this.updateTableRow.bind(this));
+    // Watch for changes to `selectedRow` and `offset`
+    storeManager.bind('selectedRow', this);
+    storeManager.bind('offset', this);
   }
 
   // ========================================
-  // Public Methods
+  // Lifecycle Management
   // ========================================
 
   /**
-   * 行がクリックされたときの処理
-   *
-   * 選択状態をトグルし、カスタムイベントを発火する
+   * Clean up all resources and event listeners
+   * Call this method when the row is no longer needed
    */
-  click() {
-    storeManager.setData('selectedRow', this.selected ? undefined : this.index);
+  destroy(): void {
+    if (this._isDestroyed) return;
 
-    // Dispatch custom event to notify tap completion
-    const tapCompletedEvent = new CustomEvent('tapCompleted', {
-      bubbles: true,
-      detail: { rowIndex: this.index },
-    });
-    this.tr.dispatchEvent(tapCompletedEvent);
+    // Unbind from store events
+    storeManager.unbind('selectedRow', this);
+    storeManager.unbind('offset', this);
+
+    // Remove DOM element
+    if (this.tr && this.tr.parentNode) {
+      this.tr.parentNode.removeChild(this.tr);
+    }
+
+    // Clear cached DOM element references
+    this.togovarIdAnchor = null;
+    this.refsnpCell = null;
+    this.refsnpAnchor = null;
+    this.positionChromosome = null;
+    this.positionCoordinate = null;
+    this.refElement = null;
+    this.altElement = null;
+    this.typeElement = null;
+    this.geneCell = null;
+    this.geneAnchor = null;
+    this.frequencyElements = {};
+    this.consequenceCell = null;
+    this.consequenceItem = null;
+    this.clinicalSignificance = null;
+    this.clinicalAnchor = null;
+    this.clinicalIcon = null;
+    this.alphaMissenseFunction = null;
+    this.siftFunction = null;
+    this.polyphenFunction = null;
+
+    // Mark as destroyed to prevent further operations
+    this._isDestroyed = true;
+
+    // Note: this.tr reference kept to avoid TypeScript null assertion issues
+    // The _isDestroyed flag ensures the instance won't be used after cleanup
   }
 
-  /**
-   * 選択行の変更を処理
-   *
-   * @param index - 選択された行のインデックス
-   */
-  selectedRow(index: number) {
-    this.selected = index === this.index;
-    this.tr.classList.toggle('-selected', this.selected);
-  }
+  // ========================================
+  // Table Row Update Method
+  // ========================================
 
   /**
-   * テーブル行のデータを更新
+   * Update table row data
    *
-   * storeManagerからの通知を受けて行の表示内容を更新する
-   * データの取得状況に応じて適切な表示状態を設定する
+   * Receives notifications from storeManager and updates the row display content
+   * Sets appropriate display state based on data fetching status
    */
   updateTableRow() {
+    if (this._isDestroyed) return;
+
     if (
       storeManager.getData('isFetching') ||
       storeManager.getData('isStoreUpdating')
@@ -120,7 +141,7 @@ export class ResultsRowView {
       return this._setLoadingState();
     }
 
-    // styleで範囲外の行(-out-of-range)は非表示
+    // Rows beyond range are hidden using style (-out-of-range)
     const rowCount = storeManager.getData('rowCount');
     if (rowCount <= this.index) {
       return this._setOutOfRangeState();
@@ -133,30 +154,56 @@ export class ResultsRowView {
 
     this._prepareTableData();
 
-    // 各カラムのデータ更新
+    // Update data for each column
     COLUMNS.forEach((column) => this._updateColumnContent(column, result));
 
     this.tr.classList.remove('-loading', '-out-of-range');
   }
 
   // ========================================
-  // Private Methods
+  // Store Event Handlers
   // ========================================
+
   /**
-   * テーブル行要素を作成
+   * Handle selected row changes
+   * Store event handler method (called by bind/unbind system)
    *
-   * @returns 作成されたテーブル行要素
+   * @param selectedIndex - Index of the selected row
+   */
+  selectedRow(selectedIndex: number) {
+    if (this._isDestroyed) return;
+    this.selected = selectedIndex === this.index;
+    this.tr.classList.toggle('-selected', this.selected);
+  }
+
+  /**
+   * Handle offset changes
+   * Store event handler method (called by bind/unbind system)
+   */
+  offset() {
+    if (this._isDestroyed) return;
+    this.updateTableRow();
+  }
+
+  // ========================================
+  // DOM Creation and State Management
+  // ========================================
+
+  /**
+   * Create table row element
+   *
+   * @returns Created table row element
    */
   private _createTableRow(): HTMLTableRowElement {
     const tr = document.createElement('tr');
     tr.classList.add('-loading');
     tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
-    tr.addEventListener('click', this.click.bind(this));
+    tr.addEventListener('click', this._handleRowClick.bind(this));
     return tr;
   }
 
   /**
-   * 行をローディング状態に設定
+   * Set row to loading state
    */
   private _setLoadingState() {
     this.tr.classList.add('-loading');
@@ -164,17 +211,21 @@ export class ResultsRowView {
   }
 
   /**
-   * 行を範囲外状態に設定
+   * Set row to out-of-range state
    */
   private _setOutOfRangeState() {
     this.tr.classList.add('-out-of-range');
     this.tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
   }
 
+  // ========================================
+  //  Data Preparation and HTML Generation
+  // ========================================
+
   /**
-   * テーブルデータの準備
+   * Prepare table data
    *
-   * HTMLの生成とDOM要素のキャッシュを実行
+   * Generate HTML and cache DOM elements
    */
   private _prepareTableData() {
     this.tr.innerHTML = this._createTableCellHTML();
@@ -182,23 +233,27 @@ export class ResultsRowView {
   }
 
   /**
-   * テーブルセルのHTMLを動的に生成
+   * Dynamically generate table cell HTML
    *
-   * @returns 生成されたHTML文字列
+   * @returns Generated HTML string
    */
   private _createTableCellHTML(): string {
     return COLUMNS.map((column) => {
       if (column.id === 'alt_frequency') {
         return createFrequencyColumnHTML();
       }
-      return COLUMN_TEMPLATES[column.id] || '';
+      return (COLUMN_TEMPLATES as Record<string, string>)[column.id] || '';
     }).join('');
   }
 
+  // ========================================
+  //  DOM Element Caching
+  // ========================================
+
   /**
-   * テーブルセル要素をキャッシュ
+   * Cache table cell elements
    *
-   * パフォーマンス向上のため、頻繁にアクセスするDOM要素を事前にキャッシュ
+   * Pre-cache frequently accessed DOM elements for performance improvement
    */
   private _cacheTableCells() {
     this._cacheBasicElements();
@@ -207,55 +262,53 @@ export class ResultsRowView {
   }
 
   /**
-   * 基本的なテーブルセル要素をキャッシュ
+   * Cache basic table cell elements
    */
   private _cacheBasicElements() {
     // TogoVar ID
-    this.tdTGVAnchor = this.tr.querySelector('td.togovar_id > a');
+    this.togovarIdAnchor = this.tr.querySelector('td.togovar_id > a');
 
     // RefSNP ID
-    this.tdRS = this.tr.querySelector('td.refsnp_id');
-    this.tdRSAnchor = this.tdRS?.querySelector('a') || null;
+    this.refsnpCell = this.tr.querySelector('td.refsnp_id');
+    this.refsnpAnchor = this.refsnpCell?.querySelector('a') || null;
 
     // Position
     const tdPosition = this.tr.querySelector(
       'td.position > .chromosome-position'
     );
-    this.tdPositionChromosome =
-      tdPosition?.querySelector('.chromosome') || null;
-    this.tdPositionCoordinate =
-      tdPosition?.querySelector('.coordinate') || null;
+    this.positionChromosome = tdPosition?.querySelector('.chromosome') || null;
+    this.positionCoordinate = tdPosition?.querySelector('.coordinate') || null;
 
     // Ref/Alt
     const tdRefAlt = this.tr.querySelector('td.ref_alt > .ref-alt');
-    this.tdRefAltRef = tdRefAlt?.querySelector('span.ref') || null;
-    this.tdRefAltAlt = tdRefAlt?.querySelector('span.alt') || null;
+    this.refElement = tdRefAlt?.querySelector('span.ref') || null;
+    this.altElement = tdRefAlt?.querySelector('span.alt') || null;
 
     // Type
-    this.tdType = this.tr.querySelector('td.type > .variant-type');
+    this.typeElement = this.tr.querySelector('td.type > .variant-type');
 
     // Gene
-    this.tdGene = this.tr.querySelector('td.gene');
-    this.tdGeneAnchor = this.tdGene?.querySelector('a') || null;
+    this.geneCell = this.tr.querySelector('td.gene');
+    this.geneAnchor = this.geneCell?.querySelector('a') || null;
 
     // Consequence
-    this.tdConsequence = this.tr.querySelector('td.consequence');
-    this.tdConsequenceItem =
-      this.tdConsequence?.querySelector('.consequence-item') || null;
+    this.consequenceCell = this.tr.querySelector('td.consequence');
+    this.consequenceItem =
+      this.consequenceCell?.querySelector('.consequence-item') || null;
 
     // Clinical significance
     const tdClinical = this.tr.querySelector('td.clinical_significance');
-    this.tdClinicalSign =
+    this.clinicalSignificance =
       tdClinical?.querySelector('.clinical-significance') || null;
-    this.tdClinicalAnchor = tdClinical?.querySelector('a') || null;
-    this.tdClinicalIcon = tdClinical?.querySelector('span.icon') || null;
+    this.clinicalAnchor = tdClinical?.querySelector('a') || null;
+    this.clinicalIcon = tdClinical?.querySelector('span.icon') || null;
   }
 
   /**
-   * 頻度関連のテーブルセル要素をキャッシュ
+   * Cache frequency-related table cell elements
    */
   private _cacheFrequencyElements() {
-    this.tdFrequencies = {};
+    this.frequencyElements = {};
     this.tr
       .querySelectorAll(
         'td.alt_frequency > logarithmized-block-graph-frequency-view'
@@ -264,104 +317,127 @@ export class ResultsRowView {
         const element = elm as FrequencyElement;
         const datasetId = element.dataset.dataset;
         if (datasetId) {
-          this.tdFrequencies[datasetId] = element;
+          this.frequencyElements[datasetId] = element;
         }
       });
   }
 
   /**
-   * 機能予測関連のテーブルセル要素をキャッシュ
+   * Cache function prediction-related table cell elements
    */
   private _cacheFunctionElements() {
     // AlphaMissense
     const tdAlphaMissense = this.tr.querySelector('td.alphamissense');
-    this.tdAlphaMissenseFunction =
+    this.alphaMissenseFunction =
       tdAlphaMissense?.querySelector('.variant-function') || null;
 
     // SIFT
     const tdSift = this.tr.querySelector('td.sift');
-    this.tdSiftFunction = tdSift?.querySelector('.variant-function') || null;
+    this.siftFunction = tdSift?.querySelector('.variant-function') || null;
 
     // PolyPhen
     const tdPolyphen = this.tr.querySelector('td.polyphen');
-    this.tdPolyphenFunction =
+    this.polyphenFunction =
       tdPolyphen?.querySelector('.variant-function') || null;
   }
 
+  // ========================================
+  //  Column Content Updates
+  // ========================================
+
   /**
-   * 指定されたカラムの内容を更新
+   * Update content for the specified column
    *
-   * @param column - 更新対象のカラム定義
-   * @param result - 表示データ
+   * @param column - Column definition to update
+   * @param result - Display data
    */
   private _updateColumnContent(column: Column, result: ResultData) {
-    const columnHandlers = {
+    const columnHandlers: Record<string, () => void> = {
       togovar_id: () =>
-        ResultsRowUpdaters.updateTogovarId(
-          this.tdTGVAnchor,
+        ResultsColumnUpdater.updateTogovarId(
+          this.togovarIdAnchor,
           result.id,
           `/variant/${result.id}`
         ),
       refsnp_id: () =>
-        ResultsRowUpdaters.updateRefSNP(
-          this.tdRS,
-          this.tdRSAnchor,
+        ResultsColumnUpdater.updateRefSNP(
+          this.refsnpCell,
+          this.refsnpAnchor,
           result.existing_variations
         ),
       position: () =>
-        ResultsRowUpdaters.updatePosition(
-          this.tdPositionChromosome,
-          this.tdPositionCoordinate,
+        ResultsColumnUpdater.updatePosition(
+          this.positionChromosome,
+          this.positionCoordinate,
           result.chromosome,
           result.position
         ),
       ref_alt: () =>
-        ResultsRowUpdaters.updateRefAlt(
-          this.tdRefAltRef,
-          this.tdRefAltAlt,
+        ResultsColumnUpdater.updateRefAlt(
+          this.refElement,
+          this.altElement,
           result.reference,
           result.alternate
         ),
       type: () =>
-        ResultsRowUpdaters.updateVariantType(this.tdType, result.type),
+        ResultsColumnUpdater.updateVariantType(this.typeElement, result.type),
       gene: () =>
-        ResultsRowUpdaters.updateGene(
-          this.tdGene,
-          this.tdGeneAnchor,
+        ResultsColumnUpdater.updateGene(
+          this.geneCell,
+          this.geneAnchor,
           result.symbols
         ),
       alt_frequency: () =>
-        ResultsRowUpdaters.updateAltFrequency(
-          this.tdFrequencies,
+        ResultsColumnUpdater.updateAltFrequency(
+          this.frequencyElements,
           result.frequencies
         ),
       consequence: () =>
-        ResultsRowUpdaters.updateConsequence(
-          this.tdConsequence,
-          this.tdConsequenceItem,
+        ResultsColumnUpdater.updateConsequence(
+          this.consequenceCell,
+          this.consequenceItem,
           result.most_severe_consequence,
           result.transcripts
         ),
       clinical_significance: () =>
-        ResultsRowUpdaters.updateClinicalSignificance(
-          this.tdClinicalSign,
-          this.tdClinicalAnchor,
-          this.tdClinicalIcon,
+        ResultsColumnUpdater.updateClinicalSignificance(
+          this.clinicalSignificance,
+          this.clinicalAnchor,
+          this.clinicalIcon,
           result.significance
         ),
       alphamissense: () =>
-        ResultsRowUpdaters.updateAlphaMissense(
-          this.tdAlphaMissenseFunction,
+        ResultsColumnUpdater.updateAlphaMissense(
+          this.alphaMissenseFunction,
           result.alphamissense
         ),
       sift: () =>
-        ResultsRowUpdaters.updateSift(this.tdSiftFunction, result.sift),
+        ResultsColumnUpdater.updateSift(this.siftFunction, result.sift),
       polyphen: () =>
-        ResultsRowUpdaters.updatePolyphen(
-          this.tdPolyphenFunction,
+        ResultsColumnUpdater.updatePolyphen(
+          this.polyphenFunction,
           result.polyphen
         ),
     };
     columnHandlers[column.id]?.();
+  }
+
+  // ========================================
+  // Event Handler
+  // ========================================
+
+  /**
+   * Handler for when a row is clicked
+   * Toggles selection state and fires a custom event
+   */
+  private _handleRowClick(): void {
+    storeManager.setData('selectedRow', this.selected ? undefined : this.index);
+
+    // Dispatch custom event to notify tap completion
+    const tapCompletedEvent = new CustomEvent('tapCompleted', {
+      bubbles: true,
+      detail: { rowIndex: this.index },
+    });
+    this.tr.dispatchEvent(tapCompletedEvent);
   }
 }

@@ -1,4 +1,5 @@
-import { LitElement, html, CSSResultGroup, TemplateResult } from 'lit';
+import { LitElement, html } from 'lit';
+import type { CSSResultGroup, TemplateResult } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import '../suggestions/SearchFieldWithSuggestions';
 import './SimpleSearchExamples';

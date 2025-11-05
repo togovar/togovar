@@ -2,7 +2,6 @@ import { storeManager } from '../src/store/StoreManager';
 import { ResultsView } from '../src/classes/Results/ResultsView';
 import SideBar from '../src/classes/SideBar.js';
 import Configuration from '../src/classes/Configuration.js';
-import SelectedRowIndicator from '../src/classes/SelectedRowIndicator.js';
 import Karyotype from '../src/classes/Karyotype.js';
 import ActivityIndicator from '../src/classes/ActivityIndicator.js';
 import ModuleTabsView from '../src/classes/ModuleTabsView.js';
@@ -11,7 +10,7 @@ import TopPageLayoutManager from '../src/classes/TopPageLayoutManager.js';
 import DownloadButton from './classes/DownloadButton.js';
 // Search
 import SimpleSearchView from './components/SearchField/SimpleSearch/SimpleSearchView';
-import AdvancedSearchBuilderView from '../src/classes/AdvancedSearchBuilderView.js';
+import { AdvancedSearchBuilderView } from '../src/classes/AdvancedSearchBuilderView.ts';
 // PanelViews
 // PanelViews: Filters
 import PanelViewCheckList from '../src/classes/PanelViewCheckList.js';
@@ -30,7 +29,6 @@ import TippyBox from '../src/classes/TippyBox.js';
 import qs from 'qs';
 import { extractSearchCondition } from './store/searchManager';
 import { initializeApp } from './store/initializeApp';
-const DEFAULT_SEARCH_MODE = 'simple'; // 'simple' or 'advanced';
 const _currentUrlParams = qs.parse(window.location.search.substring(1));
 
 export function initHome() {
@@ -55,6 +53,9 @@ export function initHome() {
     initSearchInputs();
     initModuleTabs();
     initTooltip();
+
+    // クリーンアップハンドラーを設定
+    setupCleanupHandlers();
   });
 }
 
@@ -121,10 +122,73 @@ function readyInitialSearch(callback) {
 const getElement = (id) => document.getElementById(id);
 const getAllElements = (selector) => document.querySelectorAll(selector);
 
+// グローバル変数: ResultsView インスタンスを管理
+let globalResultsView = null;
+
 // 検索結果画面の初期化
 function initResultsView() {
   const resultView = new ResultsView(getElement('ResultsView'));
+  globalResultsView = resultView; // グローバル参照を保存
   TopPageLayoutManager.init([resultView]);
+}
+
+// クリーンアップ機能: すべてのリソースを解放
+function cleanupApplication() {
+  console.log('Cleaning up application resources...');
+
+  // ResultsView のクリーンアップ
+  if (globalResultsView && typeof globalResultsView.destroy === 'function') {
+    try {
+      globalResultsView.destroy();
+      console.log('ResultsView cleaned up successfully');
+    } catch (error) {
+      console.error('Error cleaning up ResultsView:', error);
+    }
+    globalResultsView = null;
+  }
+
+  // TopPageLayoutManager のクリーンアップ
+  if (typeof TopPageLayoutManager.cleanup === 'function') {
+    try {
+      TopPageLayoutManager.cleanup();
+      console.log('TopPageLayoutManager cleaned up successfully');
+    } catch (error) {
+      console.error('Error cleaning up TopPageLayoutManager:', error);
+    }
+  }
+
+  // StoreManager のクリーンアップ（必要に応じて）
+  if (typeof storeManager.cleanup === 'function') {
+    try {
+      storeManager.cleanup();
+      console.log('StoreManager cleaned up successfully');
+    } catch (error) {
+      console.error('Error cleaning up StoreManager:', error);
+    }
+  }
+
+  console.log('Application cleanup completed.');
+}
+
+// ページ離脱時のクリーンアップ設定
+function setupCleanupHandlers() {
+  // ブラウザのページ離脱時
+  window.addEventListener('beforeunload', () => {
+    cleanupApplication();
+  });
+
+  // ページ非表示時（タブ切り替えやブラウザ最小化）
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      // 必要に応じてクリーンアップ（通常は beforeunload で十分）
+      // cleanupApplication();
+    }
+  });
+
+  // 開発環境用: グローバル関数として手動クリーンアップを公開
+  if (typeof window !== 'undefined') {
+    window.cleanupTogovar = cleanupApplication;
+  }
 }
 
 // ダウンロードボタンの初期化

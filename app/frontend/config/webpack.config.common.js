@@ -10,8 +10,8 @@ Object.assign(process.env, env);
 
 const config = {
   entry: {
-    main: './app/frontend/packs/index.js',
-    report: './app/frontend/packs/report/index.js',
+    main: './app/frontend/packs/index.ts',
+    report: './app/frontend/packs/report/index.ts',
   },
   output: {
     path: path.resolve(__dirname, '../../../dist'),
@@ -42,7 +42,18 @@ const config = {
       },
       {
         test: /\.(sa|c)ss$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                silenceDeprecations: ['import', 'global-builtin'],
+              },
+            },
+          },
+        ],
         exclude: /node_modules/,
       },
       {
@@ -56,12 +67,19 @@ const config = {
           },
           'extract-loader',
           'css-loader',
-          'sass-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                silenceDeprecations: ['import', 'global-builtin'],
+              },
+            },
+          },
         ],
         exclude: /node_modules/,
       },
       {
-        test: /\.(jpg|jpeg|png|gif|tiff|svg)$/,
+        test: /\.(jpg|jpeg|png|gif|tiff|svg|webp)$/,
         loader: 'file-loader',
         options: {
           outputPath: 'images',
@@ -111,9 +129,6 @@ const config = {
     ],
   },
   plugins: [
-    new webpack.ProvidePlugin({
-      $: 'jquery/dist/jquery',
-    }),
     new HtmlWebpackPlugin({
       template: 'app/frontend/views/index.pug',
       filename: 'index.html',

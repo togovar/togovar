@@ -4,11 +4,30 @@
 # or operating system, you probably want to add a global ignore instead:
 #   git config --global core.excludesfile '~/.gitignore_global'
 
+# ============================================================================
+# Environment & Security
+# ============================================================================
+
 # Ignore env file
 .env
 
+# Ignore master key for decrypting credentials and more.
+/config/master.key
+
+# ============================================================================
+# Dependencies
+# ============================================================================
+
 # Ignore bundler config
 /.bundle
+
+# Ignore vendor libraries
+/node_modules
+/vendor/bundle
+
+# ============================================================================
+# Logs & Temporary Files
+# ============================================================================
 
 # Ignore all logfiles and tempfiles
 /log/*
@@ -22,9 +41,9 @@
 !/tmp/pids/
 !/tmp/pids/.keep
 
-# Ignore vendor libraries
-/node_modules
-/vendor/bundle
+# ============================================================================
+# Build Output
+# ============================================================================
 
 # frontend
 .cache/
@@ -33,10 +52,16 @@ dist/
 public/packs
 app/frontend/docs
 
+# ============================================================================
+# Development & Debugging
+# ============================================================================
+
 # history
 .byebug_history
-
-# Ignore master key for decrypting credentials and more.
-/config/master.key
-
 .github/act
+
+# ============================================================================
+# Operating System Files
+# ============================================================================
+
+.DS_Store

@@ -225,9 +225,10 @@ function initialiseKaryotype() {
 
 initialiseKaryotype();
 
-const tsv =
-  (await import(`../../assets/${karyotype.reference}/karyotype.tsv`)).default ||
-  [];
+async function loadKaryotypeData(reference) {
+  const module = await import(`../../assets/${reference}/karyotype.tsv`);
+  return module.default || [];
+}
 
 export default class Karyotype {
   constructor(elm) {
@@ -269,20 +270,27 @@ export default class Karyotype {
       (elm) => elm.dataset.value === 'hide'
     )[0];
 
-    // 染色体座標データ
+    // 染色体座標データを非同期で読み込む
+    loadKaryotypeData(karyotype.reference).then((tsv) => {
+      this.geneMap = this.parseGeneMap(tsv);
+      this.maxLength = Math.max(
+        ...this.geneMap.map(
+          (chromosome) => chromosome[chromosome.length - 1].end
+        )
+      );
+      this._drawChromosome(this.geneMap);
+      this.isReady = true;
 
-    this.geneMap = this.parseGeneMap(tsv);
-    this.maxLength = Math.max(
-      ...this.geneMap.map((chromosome) => chromosome[chromosome.length - 1].end)
-    );
-    this._drawChromosome(this.geneMap);
-    //fetch(`./assets/${karyotype.reference}.tsv`)
-    //  .then(response => response.text())
-    //  .then(tsv => {
-    //    this.geneMap = this.parseGeneMap(tsv);
-    //    this.maxLength = Math.max(...this.geneMap.map(chromosome => chromosome[chromosome.length - 1].end));
-    //    this._drawChromosome(this.geneMap);
-    //  });
+      // データ読み込み完了後、保留していた検索条件があれば適用
+      if (this._pendingSimpleSearchConditions) {
+        this.simpleSearchConditions(this._pendingSimpleSearchConditions);
+        this._pendingSimpleSearchConditions = null;
+      }
+      if (this._pendingAdvancedSearchConditions) {
+        this.advancedSearchConditions(this._pendingAdvancedSearchConditions);
+        this._pendingAdvancedSearchConditions = null;
+      }
+    });
 
     // ストアの情報を反映
     this.karyotype(storeManager.getData('karyotype'));
@@ -368,6 +376,12 @@ export default class Karyotype {
   }
 
   simpleSearchConditions(conditions) {
+    // データ読み込みが完了していない場合は保留
+    if (!this.chromosomeViews) {
+      this._pendingSimpleSearchConditions = conditions;
+      return;
+    }
+
     const result = REGEXP.exec(conditions.term);
     if (result) {
       const location = { chromosome: result[1] };
@@ -383,8 +397,18 @@ export default class Karyotype {
     }
   }
   advancedSearchConditions(conditions) {
+    // データ読み込みが完了していない場合は保留
+    if (!this.chromosomeViews) {
+      this._pendingAdvancedSearchConditions = conditions;
+      return;
+    }
+
     const locations = [];
     const takeOutLocations = (conditions) => {
+      // Guard against undefined, null, or non-object values
+      if (!conditions || typeof conditions !== 'object') {
+        return;
+      }
       Object.keys(conditions).forEach((key) => {
         switch (key) {
           case 'or':
@@ -403,6 +427,10 @@ export default class Karyotype {
   _updateLocations(locations) {
     this.elm.dataset.isSelectingChromosome = locations.length > 0;
     if (locations.length === 0) return;
+
+    // データ読み込みが完了するまで待つ
+    if (!this.chromosomeViews) return;
+
     const collectedLocations = {};
     locations.forEach((location) => {
       if (!collectedLocations[location.chromosome])

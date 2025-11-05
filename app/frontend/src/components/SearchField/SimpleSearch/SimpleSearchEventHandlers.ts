@@ -1,6 +1,6 @@
 /** SimpleSearchEventHandlers - SimpleSearchViewのイベントハンドラーを担当 */
 
-import {
+import type {
   SimpleSearchHost,
   SimpleSearchControllerInterface,
   SuggestionItem,

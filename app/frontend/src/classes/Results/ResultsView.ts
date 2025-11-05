@@ -1,67 +1,51 @@
 import { storeManager } from '../../store/StoreManager';
-import ScrollBar from './../ScrollBar.js';
-import { TR_HEIGHT, COLUMNS } from '../../global.js';
+import { COLUMNS } from '../../global';
+import { ResultsScrollBar } from './ResultsScrollBar';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
-import { ResultsViewScrollHandler } from './ResultsViewScrollHandler';
 import { ResultsViewDataManager } from './ResultsViewDataManager';
+import type { SearchMessages, SearchStatus, ColumnConfig } from '../../types';
+import { isTouchDevice } from '../../utils/deviceDetection';
 
-/** 検索メッセージの型定義 */
-type SearchMessages = {
-  notice?: string;
-  warning?: string;
-  error?: string;
-};
+// Define DOM selector constants outside the class
+const SELECTORS = {
+  STATUS: 'header.header > .left > .status',
+  MESSAGES: '#Messages',
+  TABLE_CONTAINER: '.tablecontainer',
+  TABLE_THEAD: '.tablecontainer > table.results-view > thead',
+  TABLE_TBODY: '.tablecontainer > table.results-view > tbody',
+  SCROLL_BAR: '.scroll-bar',
+} as const;
 
-/** 検索ステータスの型定義 */
-type SearchStatus = {
-  available: number;
-  filtered: number;
-};
-
-/** カラム設定の型定義 */
-type ColumnConfig = {
-  id: string;
-  isUsed: boolean;
-};
+// Define store manager binding keys outside the class
+const STORE_BINDINGS = [
+  'searchStatus',
+  'searchResults',
+  'columns',
+  'offset',
+  'karyotype',
+  'searchMessages',
+] as const;
 
 /**
  * 検索結果テーブルビューを管理するクラス
  * スクロール機能、タッチ操作、行の表示管理を行う
  */
 export class ResultsView {
-  /** DOMセレクタ定数 */
-  private static readonly SELECTORS = {
-    STATUS: 'header.header > .left > .status',
-    MESSAGES: '#Messages',
-    TABLE_CONTAINER: '.tablecontainer',
-    TABLE_THEAD: '.tablecontainer > table.results-view > thead',
-    TABLE_TBODY: '.tablecontainer > table.results-view > tbody',
-    SCROLL_BAR: '.scroll-bar',
-  } as const;
-
-  /** ストアマネージャーのバインドキー */
-  private static readonly STORE_BINDINGS = [
-    'searchStatus',
-    'searchResults',
-    'columns',
-    'offset',
-    'karyotype',
-    'searchMessages',
-  ] as const;
-
   /** ルート要素 */
   private elm: HTMLElement;
   /** タッチハンドラー */
-  private touchHandler: ResultsViewTouchHandler;
-  /** スクロールハンドラー */
-  private scrollHandler: ResultsViewScrollHandler;
+  private touchHandler!: ResultsViewTouchHandler;
+  /** スクロールバー */
+  private scrollBar!: ResultsScrollBar;
   /** データマネージャー */
-  private dataManager: ResultsViewDataManager;
+  private dataManager!: ResultsViewDataManager;
   /** テーブルボディ要素 */
-  private tbody: HTMLElement;
+  private tbody!: HTMLElement;
   /** テーブルコンテナ要素 */
-  private tablecontainer: HTMLElement;
+  private tablecontainer!: HTMLElement;
+  /** バインドされたイベントハンドラー */
+  private _boundKeydownHandler!: (_e: KeyboardEvent) => void;
 
   /**
    * ResultsViewのコンストラクタ
@@ -89,6 +73,9 @@ export class ResultsView {
 
     // 初期設定
     this._configureInitialState();
+
+    // Initialize search mode listener
+    this._initializeSearchModeListener();
   }
 
   // ========================================
@@ -96,11 +83,39 @@ export class ResultsView {
   // ========================================
 
   /**
+   * Clean up all resources and prevent memory leaks
+   * Call this method when the ResultsView component is no longer needed
+   */
+  destroy(): void {
+    // Clean up ScrollBar component
+    if (this.scrollBar) {
+      this.scrollBar.destroy();
+    }
+
+    // Clean up TouchHandler component
+    if (this.touchHandler) {
+      this.touchHandler.destroy();
+    }
+
+    // Clean up DataManager component
+    if (this.dataManager) {
+      this.dataManager.destroy();
+    }
+
+    // Unbind all StoreManager event bindings
+    STORE_BINDINGS.forEach((key) => {
+      storeManager.unbind(key, this);
+    });
+
+    // Remove keydown event listener
+    document.removeEventListener('keydown', this._boundKeydownHandler);
+  }
+
+  /**
    * オフセットの変更時の処理
    * @param offset - 新しいオフセット値
    */
   offset(offset: number): void {
-    this.scrollHandler.lastScrollPosition = offset * TR_HEIGHT;
     this.dataManager.handleOffsetChange(offset);
   }
 
@@ -124,11 +139,11 @@ export class ResultsView {
    * 検索結果の表示
    * @param _results - 検索結果（未使用）
    */
-  searchResults(_results: any): void {
+  searchResults(_results: unknown): void {
     this.dataManager.handleSearchResults(
       _results,
-      this.touchHandler.isTouchEnabled,
-      this.touchHandler.setTouchElementsPointerEvents.bind(this.touchHandler)
+      isTouchDevice(),
+      this.touchHandler.setElementsInteractable.bind(this.touchHandler)
     );
   }
 
@@ -145,8 +160,8 @@ export class ResultsView {
    */
   updateDisplaySize(): void {
     this.dataManager.updateDisplaySize(
-      this.touchHandler.isTouchEnabled,
-      this.touchHandler.setTouchElementsPointerEvents.bind(this.touchHandler)
+      isTouchDevice(),
+      this.touchHandler.setElementsInteractable.bind(this.touchHandler)
     );
   }
 
@@ -154,7 +169,7 @@ export class ResultsView {
    * 核型の変更時の処理
    * @param _karyotype - 核型データ（未使用）
    */
-  karyotype(_karyotype: any): void {
+  karyotype(_karyotype: unknown): void {
     this.updateDisplaySize();
   }
 
@@ -166,20 +181,12 @@ export class ResultsView {
    * DOM要素を取得する
    */
   private _getDOMElements() {
-    const status = this.elm.querySelector(
-      ResultsView.SELECTORS.STATUS
-    ) as HTMLElement;
-    const messages = this.elm.querySelector(
-      ResultsView.SELECTORS.MESSAGES
-    ) as HTMLElement;
-    const thead = this.elm.querySelector(
-      ResultsView.SELECTORS.TABLE_THEAD
-    ) as HTMLElement;
-    const tbody = this.elm.querySelector(
-      ResultsView.SELECTORS.TABLE_TBODY
-    ) as HTMLElement;
+    const status = this.elm.querySelector(SELECTORS.STATUS) as HTMLElement;
+    const messages = this.elm.querySelector(SELECTORS.MESSAGES) as HTMLElement;
+    const thead = this.elm.querySelector(SELECTORS.TABLE_THEAD) as HTMLElement;
+    const tbody = this.elm.querySelector(SELECTORS.TABLE_TBODY) as HTMLElement;
     const tablecontainer = this.elm.querySelector(
-      ResultsView.SELECTORS.TABLE_CONTAINER
+      SELECTORS.TABLE_CONTAINER
     ) as HTMLElement;
 
     return { status, messages, thead, tbody, tablecontainer };
@@ -190,10 +197,11 @@ export class ResultsView {
    * データバインディングとキーボードイベントリスナーを設定
    */
   private _connectToStoreManager(): void {
-    ResultsView.STORE_BINDINGS.forEach((key) => {
+    STORE_BINDINGS.forEach((key) => {
       storeManager.bind(key, this);
     });
-    document.addEventListener('keydown', this._keydown.bind(this));
+    this._boundKeydownHandler = this._keydown.bind(this);
+    document.addEventListener('keydown', this._boundKeydownHandler);
   }
 
   /**
@@ -202,10 +210,10 @@ export class ResultsView {
    */
   private _configureScrollBar(): void {
     this.elm
-      .querySelector(ResultsView.SELECTORS.TABLE_CONTAINER)!
+      .querySelector(SELECTORS.TABLE_CONTAINER)!
       .insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
-    new ScrollBar(
-      this.elm.querySelector(ResultsView.SELECTORS.SCROLL_BAR) as HTMLElement
+    this.scrollBar = new ResultsScrollBar(
+      this.elm.querySelector(SELECTORS.SCROLL_BAR) as HTMLElement
     );
   }
 
@@ -242,7 +250,6 @@ export class ResultsView {
       this.tbody,
       this.tablecontainer
     );
-    this.scrollHandler = new ResultsViewScrollHandler(this.elm);
     this.dataManager = new ResultsViewDataManager(
       this.elm,
       status,
@@ -262,12 +269,9 @@ export class ResultsView {
   private _configureInitialState(): void {
     // 初期化
     this.dataManager.handleColumnsChange(storeManager.getData('columns'));
-    this.scrollHandler.updateLastScrollFromOffset();
 
     // 初期状態のpointer-events設定
-    this.touchHandler.setTouchElementsPointerEvents(
-      !this.touchHandler.isTouchEnabled
-    );
+    this.touchHandler.setElementsInteractable(!isTouchDevice());
   }
 
   /**
@@ -288,21 +292,20 @@ export class ResultsView {
     // PC用のホイールイベント
     this.tbody.addEventListener(
       this.getWheelEventName(),
-      this._scroll.bind(this)
+      this._scroll.bind(this) as EventListener
     );
 
     // タッチハンドラーのコールバック設定
     this.touchHandler.setScrollCallbacks({
       onScrollStart: () => {
-        this.scrollHandler.initializeScrollBarPosition();
+        this.scrollBar.setActive();
       },
       onScroll: (deltaY) => {
-        const offset = storeManager.getData('offset') || 0;
-        this.touchHandler.setTouchStartOffset(offset);
-        this.scrollHandler.handleScrollWithScrollBarFeedback(deltaY, offset);
+        const currentOffset = storeManager.getData('offset') || 0;
+        this.scrollBar.handleScrollWithFeedback(deltaY, currentOffset);
       },
       onScrollEnd: () => {
-        this.scrollHandler.deactivateScrollBar();
+        this.scrollBar.setInactive();
       },
     });
   }
@@ -315,7 +318,8 @@ export class ResultsView {
     e.stopPropagation();
     // 縦方向にスクロールしていない場合スルー
     if (e.deltaY === 0) return;
-    this.scrollHandler.handleScroll(e.deltaY);
+
+    this.scrollBar.handleScroll(e.deltaY);
   }
 
   /**
@@ -338,5 +342,16 @@ export class ResultsView {
           break;
       }
     }
+  }
+
+  /**
+   * Initialize search mode listener
+   * Monitors changes to the search mode and reinitializes components as needed.
+   */
+  private _initializeSearchModeListener(): void {
+    storeManager.subscribe('searchMode', (_newMode) => {
+      // Reset scroll position when search mode changes
+      this.scrollBar.resetScrollPosition();
+    });
   }
 }

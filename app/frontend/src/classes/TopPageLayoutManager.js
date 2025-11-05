@@ -20,8 +20,11 @@ class TopPageLayoutManager {
     // 初回レイアウト更新
     this.update();
 
+    // バインドされたハンドラーを保存（クリーンアップ時に使用）
+    this._boundUpdateHandler = this.update.bind(this);
+
     // ウィンドウリサイズ時にレイアウトを更新
-    window.addEventListener('resize', this.update.bind(this));
+    window.addEventListener('resize', this._boundUpdateHandler);
     window.dispatchEvent(new Event('resize')); // 読み込み時にレイアウトを更新
   }
 
@@ -36,11 +39,28 @@ class TopPageLayoutManager {
 
     // 検索結果エリアの高さを動的に調整
     if (this._searchResultsView) {
-      this._searchResultsView.style.height = `calc(100vh - ${globalHeaderHeight + searchInputHeight + drawerHeight}px)`;
+      this._searchResultsView.style.height = `calc(100vh - ${
+        globalHeaderHeight + searchInputHeight + drawerHeight
+      }px)`;
     }
 
     // すべてのターゲット要素の表示サイズを更新
-    this.targets.forEach(target => target.updateDisplaySize());
+    this.targets.forEach((target) => target.updateDisplaySize());
+  }
+
+  /** リソースのクリーンアップ */
+  cleanup() {
+    if (this._boundUpdateHandler) {
+      window.removeEventListener('resize', this._boundUpdateHandler);
+    }
+
+    // 参照をクリア
+    this.targets = null;
+    this._globalHeader = null;
+    this._searchInputView = null;
+    this._searchResultsView = null;
+    this._drawerView = null;
+    this._isReady = false;
   }
 }
 

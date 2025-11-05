@@ -1,11 +1,16 @@
-import { LitElement, html, TemplateResult } from 'lit';
+import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import Style from '../../stylesheets/object/component/frequency-count-value-view.scss';
+import type {
+  ScoreRange,
+  FrequencyLeaf,
+  FrequencyQuery,
+  GenotypeCount,
+} from '../types';
+import type { FrequencyDataset, GenotypeKey } from '../definition';
 
-/**
- * Display mode constants definition
- */
-const MODE = {
+// Display mode constants definition
+export const MODE = {
   frequency: 'frequency',
   count: 'count',
   alt_alt: 'aac',
@@ -13,7 +18,15 @@ const MODE = {
   hemi_alt: 'hac',
 } as const;
 
-type ModeType = (typeof MODE)[keyof typeof MODE];
+const DATASET_MODES = ['frequency', 'count'] as const;
+type DatasetMode = (typeof DATASET_MODES)[number];
+const isDatasetMode = (m: DatasetMode | GenotypeMode): m is DatasetMode =>
+  (DATASET_MODES as readonly string[]).includes(m);
+
+const GENOTYPE_MODES = ['aac', 'arc', 'hac'] as const;
+type GenotypeMode = (typeof GENOTYPE_MODES)[number];
+const isGenotypeMode = (m: DatasetMode | GenotypeMode): m is GenotypeMode =>
+  (GENOTYPE_MODES as readonly string[]).includes(m);
 
 /**
  * Web component for visualizing frequency count values
@@ -22,45 +35,88 @@ type ModeType = (typeof MODE)[keyof typeof MODE];
 export class FrequencyCountValueView extends LitElement {
   static styles = [Style];
 
-  /** Type of condition for query building ('dataset' or 'genotype') */
-  @property({ type: String }) conditionType: 'dataset' | 'genotype';
-
-  /** Display mode */
-  @property({ type: String }) mode: ModeType = MODE.frequency;
-
-  /** Range start value */
-  @property({ type: Number }) from: number = 0;
-
-  /** Range end value */
-  @property({ type: Number }) to: number = 1;
-
-  /** Invert mode flag */
-  @property({ type: String }) invert: string = '0';
-
-  /** Filtering status */
+  @property({ type: String }) conditionType: 'dataset' | 'genotype' = 'dataset';
+  @property({ type: String }) mode: DatasetMode | GenotypeMode = 'frequency';
+  @property({ type: Number }) from: number | null = 0;
+  @property({ type: Number }) to: number | null = 1;
+  @property({ type: Boolean }) invert: boolean = false;
   @property({ type: Boolean }) filtered: boolean = false;
 
-  /** Reference to bar elements */
   private _bars: NodeListOf<HTMLElement> | undefined;
 
   /**
    * Generates the HTML template for the component
+   * For invert mode (frequency only), displays two ranges: "0.0~from, to~1.0"
    * @returns TemplateResult for rendering
    */
   render(): TemplateResult {
     return html`
-      <div class="frequencygraph">
+      <div class="frequencygraph" ?hidden=${this.mode !== MODE.frequency}>
         <div class="bar -bar1"></div>
         <div class="bar -bar2"></div>
       </div>
-      <div class="range">
-        <span class="from">${this.from}</span> ~
-        <span class="to">${this.to}</span>
-      </div>
+      <div class="range">${this._renderRangeDisplay()}</div>
       <p class="filtered" ?hidden=${!this.filtered}>
         Exclude filtered out variants
       </p>
     `;
+  }
+
+  /**
+   * Renders the range display based on mode and invert state
+   * @returns Template for the range display
+   */
+  private _renderRangeDisplay(): TemplateResult {
+    // For frequency mode with invert, show two ranges
+    if (this.mode === MODE.frequency && this.invert) {
+      return html`
+        <span class="from">0.0</span>
+        ~
+        <span class="to">${this._formatDisplayValue(this.from)}</span>
+        ,
+        <span class="from">${this._formatDisplayValue(this.to)}</span>
+        ~
+        <span class="to">1.0</span>
+      `;
+    }
+
+    // Default: single range display
+    return html`
+      <span class="from">${this._formatDisplayValue(this.from)}</span>
+      ~
+      <span class="to">${this._formatDisplayValue(this.to)}</span>
+    `;
+  }
+
+  /**
+   * Formats display value based on mode type
+   * For frequency mode, ensures at least one decimal place (e.g., 0.0, 1.0)
+   * For count mode, displays as integer
+   * @param value - The value to format
+   * @returns Formatted string representation
+   */
+  private _formatDisplayValue(value: number | null): string {
+    if (value === null) return '';
+
+    if (this.mode === MODE.frequency) {
+      // For frequency: always show at least 1 decimal place
+      return value.toFixed(Math.max(1, this._getDecimalPlaces(value)));
+    } else {
+      // For count modes: show as integer
+      return value.toString();
+    }
+  }
+
+  /**
+   * Gets the number of decimal places needed to accurately represent a value
+   * @param value - The number to check
+   * @returns Number of decimal places (minimum 1 for frequency)
+   */
+  private _getDecimalPlaces(value: number): number {
+    const str = value.toString();
+    const decimalIndex = str.indexOf('.');
+    if (decimalIndex === -1) return 1; // No decimal point, use 1 decimal place
+    return Math.max(1, str.length - decimalIndex - 1);
   }
 
   /**
@@ -74,7 +130,6 @@ export class FrequencyCountValueView extends LitElement {
 
   /**
    * Creates scale elements and adds them to the frequency graph
-   * @private
    */
   private _createScaleElements(): void {
     const frequencyGraph = this.shadowRoot!.querySelector(
@@ -101,10 +156,10 @@ export class FrequencyCountValueView extends LitElement {
    */
   setValues(
     conditionType: 'dataset' | 'genotype',
-    mode: ModeType,
-    from: number,
-    to: number,
-    invert: string,
+    mode: DatasetMode | GenotypeMode,
+    from: number | null,
+    to: number | null,
+    invert: boolean,
     filtered: boolean
   ): void {
     this.conditionType = conditionType;
@@ -121,12 +176,11 @@ export class FrequencyCountValueView extends LitElement {
 
   /**
    * Updates bar visualization
-   * @private
    */
   private _updateBarVisualization(): void {
     if (this.mode !== MODE.frequency || !this._bars) return;
 
-    if (this.invert === '0') {
+    if (!this.invert) {
       this._setNormalBarMode();
     } else {
       this._setInvertBarMode();
@@ -135,10 +189,9 @@ export class FrequencyCountValueView extends LitElement {
 
   /**
    * Sets normal bar display mode
-   * @private
    */
   private _setNormalBarMode(): void {
-    if (!this._bars) return;
+    if (!this._bars || this.from === null || this.to === null) return;
 
     this._bars[0].style.left = `${this.from * 100}%`;
     this._bars[0].style.width = `${(this.to - this.from) * 100}%`;
@@ -147,10 +200,9 @@ export class FrequencyCountValueView extends LitElement {
 
   /**
    * Sets inverted bar display mode
-   * @private
    */
   private _setInvertBarMode(): void {
-    if (!this._bars) return;
+    if (!this._bars || this.from === null || this.to === null) return;
 
     this._bars[0].style.left = '0%';
     this._bars[0].style.width = `${this.from * 100}%`;
@@ -158,12 +210,19 @@ export class FrequencyCountValueView extends LitElement {
     this._bars[1].style.width = `${(1 - this.to) * 100}%`;
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // Query
+  // ───────────────────────────────────────────────────────────────────────────
   /**
    * Generates query value object based on current component state
    * @returns Query parameter object for filtering
    */
-  get queryValue() {
-    const dataset = { name: this.dataset.dataset };
+  get queryValue(): FrequencyQuery {
+    const nameStr = this.dataset?.dataset ?? '';
+
+    const dataset: { name: FrequencyDataset } = {
+      name: nameStr as FrequencyDataset,
+    };
 
     if (this.conditionType === 'dataset') {
       return this._buildDatasetQuery(dataset);
@@ -176,10 +235,11 @@ export class FrequencyCountValueView extends LitElement {
    * Builds query object for dataset condition type
    * @param dataset - Dataset information object
    * @returns Query object for dataset filtering
-   * @private
    */
-  private _buildDatasetQuery(dataset: { name: string }) {
-    if (this.invert === '1') {
+  private _buildDatasetQuery(dataset: {
+    name: FrequencyDataset;
+  }): FrequencyQuery {
+    if (this.invert) {
       return this._buildInvertedDatasetQuery(dataset);
     } else {
       return this._buildNormalDatasetQuery(dataset);
@@ -190,67 +250,71 @@ export class FrequencyCountValueView extends LitElement {
    * Builds inverted query object for dataset condition
    * @param dataset - Dataset information object
    * @returns Inverted query object with OR conditions
-   * @private
    */
-  private _buildInvertedDatasetQuery(dataset: { name: string }) {
-    return {
-      or: [
-        {
-          frequency: {
-            dataset,
-            frequency: {
-              gte: 0,
-              lte: this.from,
-            },
-            filtered: this.filtered,
-          },
-        },
-        {
-          frequency: {
-            dataset,
-            frequency: {
-              gte: this.to,
-              lte: 1,
-            },
-            filtered: this.filtered,
-          },
-        },
-      ],
+  private _buildInvertedDatasetQuery(dataset: {
+    name: FrequencyDataset;
+  }): FrequencyQuery {
+    const from = this.from ?? 0;
+    const to = this.to ?? 1;
+    const left: FrequencyLeaf = {
+      frequency: {
+        dataset,
+        frequency: { gte: 0, lte: from },
+        filtered: this.filtered,
+      },
     };
+    const right: FrequencyLeaf = {
+      frequency: {
+        dataset,
+        frequency: { gte: to, lte: 1 },
+        filtered: this.filtered,
+      },
+    };
+    return { or: [left, right] };
   }
 
   /**
    * Builds normal query object for dataset condition
    * @param dataset - Dataset information object
    * @returns Normal query object with range values
-   * @private
    */
-  private _buildNormalDatasetQuery(dataset: { name: string }) {
+  private _buildNormalDatasetQuery(dataset: {
+    name: FrequencyDataset;
+  }): FrequencyLeaf {
+    if (!isDatasetMode(this.mode)) {
+      throw new Error(`invalid dataset mode: ${this.mode}`);
+    }
+    const field: DatasetMode = this.mode;
     const values = this._buildRangeValues();
     return {
       frequency: {
         dataset,
-        [this.mode]: values,
+        [field]: values,
         filtered: this.filtered,
       },
-    };
+    } as FrequencyLeaf;
   }
 
   /**
    * Builds query object for genotype condition type
    * @param dataset - Dataset information object
    * @returns Query object for genotype filtering
-   * @private
    */
-  private _buildGenotypeQuery(dataset: { name: string }) {
+  private _buildGenotypeQuery(dataset: {
+    name: FrequencyDataset;
+  }): GenotypeCount {
     const values = this._buildRangeValues();
+
+    if (!isGenotypeMode(this.mode)) {
+      throw new Error(`invalid genotype mode: ${this.mode}`);
+    }
+
+    const key: GenotypeKey = this.mode as GenotypeMode;
+
     return {
       frequency: {
         dataset,
-        genotype: {
-          key: MODE[this.mode],
-          count: values,
-        },
+        genotype: { key, count: values },
         filtered: this.filtered,
       },
     };
@@ -259,13 +323,18 @@ export class FrequencyCountValueView extends LitElement {
   /**
    * Builds range values object from current from/to properties
    * @returns Object containing gte and/or lte values
-   * @private
    */
-  private _buildRangeValues(): Record<string, number> {
-    const values: Record<string, number> = {};
-    if (String(this.from) !== '') values.gte = this.from;
-    if (String(this.to) !== '') values.lte = this.to;
-    return values;
+  private _buildRangeValues(): ScoreRange {
+    const hasFrom = this.from !== null && String(this.from) !== '';
+    const hasTo = this.to !== null && String(this.to) !== '';
+    if (hasFrom && hasTo) return { gte: this.from!, lte: this.to! };
+    if (hasFrom) return { gte: this.from! };
+    if (hasTo) return { lte: this.to! };
+
+    // If no value is present, cannot build a valid range query
+    throw new Error(
+      `Cannot build range values: both from and to are null or empty for mode ${this.mode}`
+    );
   }
 }
 

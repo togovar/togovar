@@ -6,7 +6,7 @@ import {
   setAdvancedSearchCondition,
 } from '../store/searchManager';
 import { executeSearch } from '../api/fetchData';
-import { StoreState, ResultData, SearchMode } from '../types';
+import type { StoreState, ResultData, SearchMode } from '../types';
 
 // class storeManager extends FormatData {
 class StoreManager {
@@ -96,6 +96,21 @@ class StoreManager {
     }
   }
 
+  /** 指定されたキーからターゲットをアンバインドする */
+  // TODO: bindingsがなくなったら、以下は削除する
+  unbind<T = any>(key: string, target: T) {
+    if (this.#bindings[key]) {
+      const index = this.#bindings[key].indexOf(target);
+      if (index !== -1) {
+        this.#bindings[key].splice(index, 1);
+        // 配列が空になったら削除
+        if (this.#bindings[key].length === 0) {
+          delete this.#bindings[key];
+        }
+      }
+    }
+  }
+
   /** listenersに登録されている関数を実行 */
   publish<T extends keyof StoreState>(key: T) {
     this.#listeners.get(key)?.forEach((callback) => callback(this.#state[key]));
@@ -134,13 +149,15 @@ class StoreManager {
     const updatedResults = Array(this.getData('numberOfRecords')).fill(null);
 
     // 既存データと新データの更新
-    this.getData('searchResults').forEach((record, index) => {
-      if (record) {
-        updatedResults[index] = record;
+    this.getData('searchResults').forEach(
+      (record: ResultData | null, index: number) => {
+        if (record) {
+          updatedResults[index] = record;
+        }
       }
-    });
+    );
 
-    records.forEach((record, index) => {
+    records.forEach((record: ResultData, index: number) => {
       updatedResults[offset + index] = record;
     });
 
@@ -185,8 +202,10 @@ class StoreManager {
   // ------------------------------
   async fetchLoginStatus() {
     try {
+      // For development on localhost, we intentionally set login status to false.
+      // This avoids authentication checks during local development.
       if (window.location.origin === 'http://localhost:8000') {
-        this.setData('isLogin', true);
+        this.setData('isLogin', false);
         return;
       }
 
@@ -235,11 +254,12 @@ class StoreManager {
           reflectSimpleSearchConditionToURI();
           this.publish('simpleSearchConditions');
           break;
-        case 'advanced':
+        case 'advanced': {
           const condition = this.getData('advancedSearchConditions');
           setAdvancedSearchCondition(condition);
           reflectAdvancedSearchConditionToURI();
           break;
+        }
       }
 
       // 検索を開始（モード切り替え時は必ず初回検索として扱う）

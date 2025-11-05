@@ -1,4 +1,4 @@
-import { SearchFieldHost } from '../SearchFieldWithSuggestions';
+import type { SearchFieldHost } from '../SearchFieldWithSuggestions';
 
 /** SuggestionKeyboardHandler - キーボードナビゲーションとキー操作を担当するクラス */
 export class SuggestionKeyboardHandler {

@@ -1,12 +1,15 @@
 import { Task } from '@lit-labs/task';
 import { axios } from '../../../../utils/cachedAxios';
 import { debounce } from '../../../../utils/debounce';
-import { SearchFieldHost, SuggestionData } from '../SearchFieldWithSuggestions';
+import type {
+  SearchFieldHost,
+  SuggestionData,
+} from '../SearchFieldWithSuggestions';
 
 /** SearchFieldController - API呼び出しとデータ管理を担当するクラス */
 export class SearchFieldController {
   private host: SearchFieldHost;
-  apiTask: Task;
+  apiTask!: Task;
   private _getSuggestURL: ((text: string) => string) | null = null;
 
   /** @param host - ホストとなるLitElementインスタンス */
@@ -25,9 +28,11 @@ export class SearchFieldController {
         if (term && term.length >= 3 && this.host.hasUserInput) {
           // サジェストを表示状態にする
           this.host.showSuggestions = true;
-          
+
           // 既存のサジェストがない場合のみ、APIレスポンス待機状態に設定
-          const hadPreviousData = this.host.hasApiResponse && Object.keys(this.host.suggestData).length > 0;
+          const hadPreviousData =
+            this.host.hasApiResponse &&
+            Object.keys(this.host.suggestData).length > 0;
           if (!hadPreviousData) {
             this.host.hasApiResponse = false;
           }
@@ -59,7 +64,7 @@ export class SearchFieldController {
             throw error;
           }
         }
-        
+
         // 3文字未満の場合のみサジェストを非表示にする
         // 空文字や短い文字列の場合は、既存のサジェストもクリアする
         if (!term || term.length < 3) {

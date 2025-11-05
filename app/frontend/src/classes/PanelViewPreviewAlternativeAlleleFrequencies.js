@@ -1,4 +1,3 @@
-import { strIns } from '../global.js';
 import PanelView from './PanelView.js';
 import { storeManager } from '../store/StoreManager';
 import { getSimpleSearchConditionMaster } from '../store/searchManager';
@@ -109,4 +108,8 @@ export default class PanelViewPreviewAlternativeAlleleFrequencies extends PanelV
       }
     }
   }
+}
+
+function strIns(str, idx, val) {
+  return str.slice(0, idx) + val + str.slice(idx);
 }

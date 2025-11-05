@@ -1,7 +1,7 @@
 import * as qs from 'qs';
 import { executeSearch } from '../api/fetchData';
 import { storeManager } from '../store/StoreManager';
-import {
+import type {
   MasterConditions,
   MasterConditionId,
   SimpleSearchCurrentConditions,
@@ -84,7 +84,8 @@ function _setSimpleSearchConditions(
     ...storeManager.getData('simpleSearchConditions'),
   };
   Object.keys(newSearchConditions).forEach((conditionKey) => {
-    updatedConditions[conditionKey] = newSearchConditions[conditionKey];
+    const key = conditionKey as keyof SimpleSearchCurrentConditions;
+    updatedConditions[key] = newSearchConditions[key];
   });
   storeManager.setData('simpleSearchConditions', updatedConditions);
 
@@ -147,23 +148,26 @@ export function reflectSimpleSearchConditionToURI() {
 
 export function resetSimpleSearchConditions() {
   const simpleSearchConditionsMaster = storeManager.getData(
-      'simpleSearchConditionsMaster'
-    ),
-    resetConditions = {};
+    'simpleSearchConditionsMaster'
+  );
+  const resetConditions: Partial<SimpleSearchCurrentConditions> = {};
   for (const condition of simpleSearchConditionsMaster) {
     switch (condition.type) {
       case 'string':
       case 'boolean':
-        if (condition.id !== 'term')
-          resetConditions[condition.id] = condition.default;
+        if (condition.id !== 'term') {
+          const key = condition.id as keyof SimpleSearchCurrentConditions;
+          (resetConditions as Record<string, unknown>)[key] = condition.default;
+        }
         break;
       case 'array':
         {
-          const temp = {};
+          const temp: Record<string, unknown> = {};
           for (const item of condition.items) {
             temp[item.id] = item.default;
           }
-          resetConditions[condition.id] = temp;
+          const key = condition.id as keyof SimpleSearchCurrentConditions;
+          (resetConditions as Record<string, unknown>)[key] = temp;
         }
         break;
     }
@@ -172,19 +176,21 @@ export function resetSimpleSearchConditions() {
 }
 
 // 動かないからチェック
-/** ブラウザの「戻る」「進む」ボタンが押されたときに検索条件を更新
- * @param {Event} event - popstate イベント */
-export function handleHistoryChange(_e) {
+/** ブラウザの「戻る」「進む」ボタンが押されたときに検索条件を更新 */
+export function handleHistoryChange(_e: PopStateEvent) {
   // 現在のURLからクエリパラメータを取得
   const urlParams = qs.parse(window.location.search.substring(1));
 
   // 取得したクエリパラメータを検索条件として適用
-  _setSimpleSearchConditions(urlParams, true);
+  _setSimpleSearchConditions(
+    urlParams as Partial<SimpleSearchCurrentConditions>,
+    true
+  );
 }
 
 // Advanced Search ----------------------------------------
 /** AdvancedSearch検索条件を設定し、必要に応じて検索を実行 */
-export function setAdvancedSearchCondition(newSearchConditions: any) {
+export function setAdvancedSearchCondition(newSearchConditions: unknown) {
   storeManager.setData('advancedSearchConditions', newSearchConditions);
   storeManager.setData('appStatus', 'searching');
 
