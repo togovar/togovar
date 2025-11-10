@@ -439,6 +439,24 @@
         }
       },
       {
+        "id": "jogo-haplotype-explorer",
+        "targetSelector": "#gene-haplotype-explorer",
+        "references": [
+          "GRCh38"
+        ],
+        "scriptUrl": "https://jogo.csml.org/stanza/jogo-haplotype-explorer.js",
+        "options": {
+          "region_name": "",
+          "symbol": "ALDH2",
+          "search_ids": "",
+          "highlight_ids": "",
+          "highlight_positions": "",
+          "level": "ac",
+          "togovar_api": "${TOGOVAR_FRONTEND_API_URL}/api/search/variant",
+          "hide_header": "0"
+        }
+      },
+      {
         "id": "scroll-table",
         "targetSelector": "#gene-variant",
         "scriptUrl": "https://togostanza.github.io/metastanza/scroll-table.js",
