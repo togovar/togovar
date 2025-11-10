@@ -348,6 +348,9 @@
       {
         "id": "pagination-table",
         "targetSelector": "#gene-mogplus",
+        "references": [
+          "GRCh38"
+        ],
         "scriptUrl": "https://togostanza.github.io/metastanza/pagination-table.js",
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/gene_mogplus?hgnc_id=${hgnc_id}",

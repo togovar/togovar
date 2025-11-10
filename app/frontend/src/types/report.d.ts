@@ -34,6 +34,7 @@ export interface StanzaConfig {
   targetSelector: string; // CSS selector for the DOM element where the stanza will be rendered
   scriptUrl?: string; // Optional custom source URL for the stanza JavaScript file
   options?: Record<string, unknown>; // Optional configuration options passed to the stanza component
+  references?: string[]; // Optional array of reference genome assemblies (e.g., ["GRCh38"]) - stanza will only render if current reference matches
 }
 
 /**
