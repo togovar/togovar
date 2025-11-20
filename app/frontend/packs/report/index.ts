@@ -564,7 +564,24 @@ class ReportApp {
     reportId: string,
     idKey: string = 'id'
   ): void {
+    const currentReference = ENV_CONFIG.TOGOVAR_FRONTEND_REFERENCE;
+
     stanzas.forEach((stanza) => {
+      // Skip stanza if references are specified and current reference doesn't match
+      if (stanza.references && !stanza.references.includes(currentReference)) {
+        // Hide the target element if it exists
+        const targetElement = document.querySelector(stanza.targetSelector);
+        if (targetElement) {
+          const parentSection = targetElement.closest(
+            'section.stanza-view'
+          ) as HTMLElement;
+          if (parentSection) {
+            parentSection.style.display = 'none';
+          }
+        }
+        return;
+      }
+
       const processedStanza = this._processStanzaTemplateVariables(
         stanza,
         reportId,
