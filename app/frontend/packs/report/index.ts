@@ -1,4 +1,5 @@
 import stanzaConfigJson from '../../assets/stanza.json';
+import { initializeStanzaResize } from '../../src/stanza/stanza-resize';
 
 /**
  * This module provides a comprehensive system for rendering TogoVar report pages
@@ -305,7 +306,7 @@ class StanzaManager {
     }
 
     /** If using a local stanza, enter the URL here. */
-    const DEV_STANZA_PATH: string = '';
+    const DEV_STANZA_PATH: string = 'http://localhost:81/';
 
     const basePath = DEV_STANZA_PATH ? DEV_STANZA_PATH : STANZA_PATH;
 
@@ -668,15 +669,19 @@ class DOMReadyHandler {
   /**
    * Initializes the report application when the DOM is ready.
    */
+
   static initialize(): void {
+    const init = () => {
+      ReportApp.initialize();
+      initializeStanzaResize();
+    };
+
     if (document.readyState === 'loading') {
       // DOM is still loading, wait for it to complete
-      document.addEventListener('DOMContentLoaded', () => {
-        ReportApp.initialize();
-      });
+      document.addEventListener('DOMContentLoaded', init);
     } else {
       // DOM is already loaded, start immediately
-      ReportApp.initialize();
+      init();
     }
   }
 }
