@@ -1,3 +1,5 @@
+import stanzaConfigJson from '../../assets/stanza.json';
+
 /**
  * This module provides a comprehensive system for rendering TogoVar report pages
  * with interactive stanza components. It handles configuration processing,
@@ -172,9 +174,10 @@ class ConfigProcessor {
 }
 
 /** Processed configuration loaded from JSON with environment variables resolved */
-const REPORT_CONFIG = ConfigProcessor.processConfig(
-  require('../../assets/stanza.json')
-) as Record<string, ReportConfig>;
+const REPORT_CONFIG = ConfigProcessor.processConfig(stanzaConfigJson) as Record<
+  string,
+  ReportConfig
+>;
 
 // ============================================================================
 // Option Formatting
@@ -301,7 +304,12 @@ class StanzaManager {
       return;
     }
 
-    this._loadStanzaScript(scriptUrl || `${STANZA_PATH}/${id}.js`);
+    /** If using a local stanza, enter the URL here. */
+    const DEV_STANZA_PATH: string = '';
+
+    const basePath = DEV_STANZA_PATH ? DEV_STANZA_PATH : STANZA_PATH;
+
+    this._loadStanzaScript(scriptUrl || `${basePath}/${id}.js`);
     this._createAndInsertStanzaElement(
       id,
       targetSelector,
