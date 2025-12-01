@@ -47,7 +47,6 @@ export function initializeStanzaResize(): void {
         // 成功したらすぐにObserverを停止
         mutationObserver.disconnect();
         stanzaResizeObserver.disconnect();
-
       }
     };
 
@@ -95,6 +94,9 @@ export function initializeStanzaResize(): void {
       if (!container.classList.contains('resized')) {
         container.classList.add('resized');
         container.style.maxHeight = 'none';
+
+        // 一度リサイズされたら監視を停止
+        containerResizeObserver.disconnect();
       }
     });
 
