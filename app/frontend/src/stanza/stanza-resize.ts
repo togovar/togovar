@@ -18,14 +18,17 @@ export function initializeStanzaResize(): void {
     let stanzaResizeObserver: ResizeObserver =
       null as unknown as ResizeObserver;
 
+    const findStanzaElement = (): HTMLElementWithShadowRoot | undefined => {
+      const children = Array.from(container.children);
+      return children.find((child) =>
+        child.tagName.toLowerCase().startsWith('togostanza-')
+      ) as HTMLElementWithShadowRoot | undefined;
+    };
+
     const setInitialHeight = () => {
       if (initialHeightSet) return;
 
-      const children = Array.from(container.children);
-      const stanzaElement = children.find((child) =>
-        child.tagName.toLowerCase().startsWith('togostanza-')
-      ) as HTMLElementWithShadowRoot | undefined;
-
+      const stanzaElement = findStanzaElement();
       if (!stanzaElement) return;
 
       const shadowRoot = stanzaElement.shadowRoot;
@@ -71,10 +74,7 @@ export function initializeStanzaResize(): void {
 
     // Stanza要素を監視対象に追加（遅延して確認）
     const startObservingStanza = () => {
-      const children = Array.from(container.children);
-      const stanzaElement = children.find((child) =>
-        child.tagName.toLowerCase().startsWith('togostanza-')
-      ) as HTMLElement | undefined;
+      const stanzaElement = findStanzaElement();
 
       if (stanzaElement) {
         stanzaResizeObserver.observe(stanzaElement);
