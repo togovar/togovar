@@ -4,12 +4,19 @@ interface HTMLElementWithShadowRoot extends HTMLElement {
   shadowRoot: ShadowRoot | null;
 }
 
+const STANZA_INITIALIZATION_DELAY_MS = 500;
+
 export function initializeStanzaResize(): void {
   Object.entries(STANZA_RESIZE_CONFIG).forEach(([stanzaId, config]) => {
     const container = document.getElementById(stanzaId);
     if (!container) return;
 
     let initialHeightSet = false;
+
+    let mutationObserver: MutationObserver =
+      null as unknown as MutationObserver;
+    let stanzaResizeObserver: ResizeObserver =
+      null as unknown as ResizeObserver;
 
     const setInitialHeight = () => {
       if (initialHeightSet) return;
@@ -37,12 +44,16 @@ export function initializeStanzaResize(): void {
         container.style.height = `${initialHeight}px`;
         initialHeightSet = true;
 
+        // 成功したらすぐにObserverを停止
+        mutationObserver.disconnect();
+        stanzaResizeObserver.disconnect();
+
         console.log(`Set initial height for ${stanzaId}: ${initialHeight}px`);
       }
     };
 
     // MutationObserverでStanza要素とShadow DOMの追加を監視
-    const mutationObserver = new MutationObserver(() => {
+    mutationObserver = new MutationObserver(() => {
       setInitialHeight();
     });
 
@@ -52,7 +63,7 @@ export function initializeStanzaResize(): void {
     });
 
     // ResizeObserverでStanza要素のサイズ変化を監視
-    const stanzaResizeObserver = new ResizeObserver(() => {
+    stanzaResizeObserver = new ResizeObserver(() => {
       if (initialHeightSet) {
         stanzaResizeObserver.disconnect();
         return;
@@ -76,12 +87,7 @@ export function initializeStanzaResize(): void {
     setTimeout(() => {
       setInitialHeight();
       startObservingStanza();
-
-      if (initialHeightSet) {
-        mutationObserver.disconnect();
-        stanzaResizeObserver.disconnect();
-      }
-    }, 500);
+    }, STANZA_INITIALIZATION_DELAY_MS);
 
     // ユーザーのリサイズ操作を監視
     const containerResizeObserver = new ResizeObserver(() => {
