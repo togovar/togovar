@@ -48,7 +48,6 @@ export function initializeStanzaResize(): void {
         mutationObserver.disconnect();
         stanzaResizeObserver.disconnect();
 
-        console.log(`Set initial height for ${stanzaId}: ${initialHeight}px`);
       }
     };
 
