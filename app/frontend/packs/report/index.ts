@@ -305,7 +305,10 @@ class StanzaManager {
       return;
     }
 
-    /** If using a local stanza, enter the URL here. */
+    /**
+     * Local stanza path for development (e.g., 'http://localhost:8080').
+     * Leave empty ('') to use remote stanza.
+     */
     const DEV_STANZA_PATH: string = '';
 
     const basePath = DEV_STANZA_PATH ? DEV_STANZA_PATH : STANZA_PATH;
