@@ -666,7 +666,9 @@ class ReportApp {
  * supporting both scenarios where the script loads before or after DOM completion.
  */
 class DOMReadyHandler {
-  // Initializes the report application when the DOM is ready.
+  /**
+   * Initializes the report application when the DOM is ready.
+   */
   static initialize(): void {
     const init = () => {
       ReportApp.initialize();
