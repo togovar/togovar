@@ -306,7 +306,7 @@ class StanzaManager {
     }
 
     /** If using a local stanza, enter the URL here. */
-    const DEV_STANZA_PATH: string = 'http://localhost:81/';
+    const DEV_STANZA_PATH: string = '';
 
     const basePath = DEV_STANZA_PATH ? DEV_STANZA_PATH : STANZA_PATH;
 
