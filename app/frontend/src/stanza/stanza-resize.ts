@@ -11,95 +11,100 @@ export function initializeStanzaResize(): void {
     const container = document.getElementById(stanzaId);
     if (!container) return;
 
-    let initialHeightSet = false;
-
-    let mutationObserver: MutationObserver =
-      null as unknown as MutationObserver;
-    let stanzaResizeObserver: ResizeObserver =
-      null as unknown as ResizeObserver;
-
-    const findStanzaElement = (): HTMLElementWithShadowRoot | undefined => {
-      const children = Array.from(container.children);
-      return children.find((child) =>
-        child.tagName.toLowerCase().startsWith('togostanza-')
-      ) as HTMLElementWithShadowRoot | undefined;
-    };
-
-    const setInitialHeight = () => {
-      if (initialHeightSet) return;
-
-      const stanzaElement = findStanzaElement();
-      if (!stanzaElement) return;
-
-      const shadowRoot = stanzaElement.shadowRoot;
-      if (!shadowRoot) return;
-
-      const shadowContent =
-        shadowRoot.querySelector('main') || shadowRoot.children[0];
-      if (!shadowContent) return;
-
-      const contentHeight = shadowContent.scrollHeight;
-
-      if (contentHeight > 0) {
-        const initialHeight = Math.min(contentHeight, config.maxInitialHeight);
-        container.style.minHeight = `${config.minHeight}px`;
-        container.style.maxHeight = `${config.maxInitialHeight}px`;
-        container.style.height = `${initialHeight}px`;
-        initialHeightSet = true;
-
-        // 成功したらすぐにObserverを停止
-        mutationObserver.disconnect();
-        stanzaResizeObserver.disconnect();
-      }
-    };
-
-    // MutationObserverでStanza要素とShadow DOMの追加を監視
-    mutationObserver = new MutationObserver(() => {
-      setInitialHeight();
-    });
-
-    mutationObserver.observe(container, {
-      childList: true,
-      subtree: true,
-    });
-
-    // ResizeObserverでStanza要素のサイズ変化を監視
-    stanzaResizeObserver = new ResizeObserver(() => {
-      if (initialHeightSet) {
-        stanzaResizeObserver.disconnect();
-        return;
-      }
-      setInitialHeight();
-    });
-
-    // Stanza要素を監視対象に追加（遅延して確認）
-    const startObservingStanza = () => {
-      const stanzaElement = findStanzaElement();
-
-      if (stanzaElement) {
-        stanzaResizeObserver.observe(stanzaElement);
-      }
-    };
-
-    // 初回チェック
-    setTimeout(() => {
-      setInitialHeight();
-      startObservingStanza();
-    }, STANZA_INITIALIZATION_DELAY_MS);
-
-    // ユーザーのリサイズ操作を監視
-    const containerResizeObserver = new ResizeObserver(() => {
-      if (!initialHeightSet) return;
-
-      if (!container.classList.contains('resized')) {
-        container.classList.add('resized');
-        container.style.maxHeight = 'none';
-
-        // 一度リサイズされたら監視を停止
-        containerResizeObserver.disconnect();
-      }
-    });
-
-    containerResizeObserver.observe(container);
+    initializeStanza(container, stanzaId, config);
   });
+}
+
+function initializeStanza(
+  container: HTMLElement,
+  stanzaId: string,
+  config: { minHeight: number; maxInitialHeight: number }
+): void {
+  let initialHeightSet = false;
+
+  // オブザーバーへの参照を保持するオブジェクト
+  const observers = {
+    mutation: null as MutationObserver | null,
+    stanzaResize: null as ResizeObserver | null,
+  };
+
+  const findStanzaElement = (): HTMLElementWithShadowRoot | undefined => {
+    const children = Array.from(container.children);
+    return children.find((child) =>
+      child.tagName.toLowerCase().startsWith('togostanza-')
+    ) as HTMLElementWithShadowRoot | undefined;
+  };
+
+  const setInitialHeight = (): void => {
+    if (initialHeightSet) return;
+
+    const stanzaElement = findStanzaElement();
+
+    if (!stanzaElement) return;
+
+    const shadowRoot = stanzaElement.shadowRoot;
+    if (!shadowRoot) return;
+
+    const shadowContent =
+      shadowRoot.querySelector('main') || shadowRoot.children[0];
+    if (!shadowContent) return;
+
+    const contentHeight = shadowContent.scrollHeight;
+
+    if (contentHeight > 0) {
+      const initialHeight = Math.min(contentHeight, config.maxInitialHeight);
+      container.style.minHeight = `${config.minHeight}px`;
+      container.style.maxHeight = `${config.maxInitialHeight}px`;
+      container.style.height = `${initialHeight}px`;
+      initialHeightSet = true;
+
+      // オブザーバーを停止
+      observers.mutation?.disconnect();
+      observers.stanzaResize?.disconnect();
+    }
+  };
+
+  // MutationObserverを作成
+  observers.mutation = new MutationObserver(() => {
+    setInitialHeight();
+  });
+
+  observers.mutation.observe(container, {
+    childList: true,
+    subtree: true,
+  });
+
+  // ResizeObserverを作成
+  observers.stanzaResize = new ResizeObserver(() => {
+    if (initialHeightSet) {
+      observers.stanzaResize?.disconnect();
+      return;
+    }
+    setInitialHeight();
+  });
+
+  const startObservingStanza = (): void => {
+    const stanzaElement = findStanzaElement();
+
+    if (stanzaElement && observers.stanzaResize) {
+      observers.stanzaResize.observe(stanzaElement);
+    }
+  };
+
+  setTimeout(() => {
+    setInitialHeight();
+    startObservingStanza();
+  }, STANZA_INITIALIZATION_DELAY_MS);
+
+  const containerResizeObserver = new ResizeObserver(() => {
+    if (!initialHeightSet) return;
+
+    if (!container.classList.contains('resized')) {
+      container.classList.add('resized');
+      container.style.maxHeight = 'none';
+      containerResizeObserver.disconnect();
+    }
+  });
+
+  containerResizeObserver.observe(container);
 }
