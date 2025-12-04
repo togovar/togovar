@@ -20,7 +20,7 @@ function initializeStanza(
   stanzaId: string,
   config: { minHeight: number; maxInitialHeight: number }
 ): void {
-  let initialHeightSet = false;
+  let isManuallyResized = false;
 
   // オブザーバーへの参照を保持するオブジェクト
   const observers = {
@@ -35,8 +35,8 @@ function initializeStanza(
     ) as HTMLElementWithShadowRoot | undefined;
   };
 
-  const setInitialHeight = (): void => {
-    if (initialHeightSet) return;
+  const adjustHeight = (): void => {
+    if (isManuallyResized) return;
 
     const stanzaElement = findStanzaElement();
 
@@ -52,11 +52,11 @@ function initializeStanza(
     const contentHeight = shadowContent.scrollHeight;
 
     if (contentHeight > 0) {
-      const initialHeight = Math.min(contentHeight, config.maxInitialHeight);
+      const newHeight = Math.min(contentHeight, config.maxInitialHeight);
       container.style.minHeight = `${config.minHeight}px`;
       container.style.maxHeight = `${config.maxInitialHeight}px`;
-      container.style.height = `${initialHeight}px`;
-      initialHeightSet = true;
+      container.style.height = `${newHeight}px`;
+      isManuallyResized = true;
 
       // オブザーバーを停止
       observers.mutation?.disconnect();
@@ -66,7 +66,7 @@ function initializeStanza(
 
   // MutationObserverを作成
   observers.mutation = new MutationObserver(() => {
-    setInitialHeight();
+    adjustHeight();
   });
 
   observers.mutation.observe(container, {
@@ -76,11 +76,11 @@ function initializeStanza(
 
   // ResizeObserverを作成
   observers.stanzaResize = new ResizeObserver(() => {
-    if (initialHeightSet) {
+    if (isManuallyResized) {
       observers.stanzaResize?.disconnect();
       return;
     }
-    setInitialHeight();
+    adjustHeight();
   });
 
   const startObservingStanza = (): void => {
@@ -92,12 +92,12 @@ function initializeStanza(
   };
 
   setTimeout(() => {
-    setInitialHeight();
+    adjustHeight();
     startObservingStanza();
   }, STANZA_INITIALIZATION_DELAY_MS);
 
   const containerResizeObserver = new ResizeObserver(() => {
-    if (!initialHeightSet) return;
+    if (!isManuallyResized) return;
 
     if (!container.classList.contains('resized')) {
       container.classList.add('resized');
