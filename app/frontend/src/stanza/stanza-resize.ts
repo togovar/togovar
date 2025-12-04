@@ -11,21 +11,22 @@ export function initializeStanzaResize(): void {
     const container = document.getElementById(stanzaId);
     if (!container) return;
 
-    initializeStanza(container, stanzaId, config);
+    initializeStanza(container, config);
   });
 }
 
 function initializeStanza(
   container: HTMLElement,
-  stanzaId: string,
   config: { minHeight: number; maxInitialHeight: number }
 ): void {
   let isManuallyResized = false;
+  let previousContentHeight = 0;
+  let lastSetHeight = 0;
+  let isSettingHeight = false;
 
-  // オブザーバーへの参照を保持するオブジェクト
   const observers = {
     mutation: null as MutationObserver | null,
-    stanzaResize: null as ResizeObserver | null,
+    shadowContentResize: null as ResizeObserver | null,
   };
 
   const findStanzaElement = (): HTMLElementWithShadowRoot | undefined => {
@@ -35,38 +36,120 @@ function initializeStanza(
     ) as HTMLElementWithShadowRoot | undefined;
   };
 
-  const adjustHeight = (): void => {
-    if (isManuallyResized) return;
-
+  const getShadowContent = (): HTMLElement | null => {
     const stanzaElement = findStanzaElement();
+    if (!stanzaElement?.shadowRoot) return null;
 
-    if (!stanzaElement) return;
+    return (
+      (stanzaElement.shadowRoot.querySelector('main') as HTMLElement) ||
+      (stanzaElement.shadowRoot.children[0] as HTMLElement) ||
+      null
+    );
+  };
 
-    const shadowRoot = stanzaElement.shadowRoot;
-    if (!shadowRoot) return;
+  const setHeight = (height: number): void => {
+    isSettingHeight = true;
+    container.style.height = `${height}px`;
+    lastSetHeight = height;
+    requestAnimationFrame(() => {
+      isSettingHeight = false;
+    });
+  };
 
-    const shadowContent =
-      shadowRoot.querySelector('main') || shadowRoot.children[0];
+  const markAsManuallyResized = (): void => {
+    isManuallyResized = true;
+    container.style.maxHeight = 'none';
+    container.classList.add('resized');
+  };
+
+  const handleContentResize = (): void => {
+    // 初期化（previousContentHeight = 0の場合のみ）
+    if (previousContentHeight === 0) {
+      const shadowContent = getShadowContent();
+      if (shadowContent) {
+        previousContentHeight = shadowContent.scrollHeight;
+      }
+      return;
+    }
+
+    const shadowContent = getShadowContent();
     if (!shadowContent) return;
 
-    const contentHeight = shadowContent.scrollHeight;
+    const currentContentHeight = shadowContent.scrollHeight;
+    const currentContainerHeight = container.offsetHeight;
 
-    if (contentHeight > 0) {
-      const newHeight = Math.min(contentHeight, config.maxInitialHeight);
-      container.style.minHeight = `${config.minHeight}px`;
-      container.style.maxHeight = `${config.maxInitialHeight}px`;
-      container.style.height = `${newHeight}px`;
-      isManuallyResized = true;
+    // 手動リサイズ後の処理
+    if (isManuallyResized) {
+      if (currentContainerHeight >= config.maxInitialHeight) {
+        previousContentHeight = currentContentHeight;
+        return;
+      }
 
-      // オブザーバーを停止
-      observers.mutation?.disconnect();
-      observers.stanzaResize?.disconnect();
+      // 250px未満の場合、開閉時に250pxに設定
+      if (currentContentHeight !== previousContentHeight) {
+        setHeight(config.maxInitialHeight);
+        previousContentHeight = currentContentHeight;
+      }
+      return;
+    }
+
+    // 手動リサイズの検出（250px超の場合）
+    if (currentContainerHeight > config.maxInitialHeight) {
+      // JavaScriptで未設定で、かつcontainer.style.heightが設定されている場合
+      if (lastSetHeight === 0 && container.style.height) {
+        previousContentHeight = currentContentHeight;
+        markAsManuallyResized();
+        return;
+      }
+    }
+
+    // 開いた場合
+    if (
+      currentContentHeight > previousContentHeight &&
+      currentContentHeight > 0
+    ) {
+      setHeight(config.maxInitialHeight);
+      previousContentHeight = currentContentHeight;
+    }
+    // 閉じた場合（一度でも開いた後）
+    else if (
+      lastSetHeight > 0 &&
+      currentContentHeight < previousContentHeight
+    ) {
+      setHeight(config.maxInitialHeight);
+      previousContentHeight = currentContentHeight;
+    }
+    // 高さが変わらない場合
+    else if (currentContentHeight > 0) {
+      previousContentHeight = currentContentHeight;
     }
   };
 
-  // MutationObserverを作成
+  const startObservingShadowContent = (): void => {
+    const shadowContent = getShadowContent();
+    if (!shadowContent) return;
+
+    observers.shadowContentResize?.disconnect();
+
+    previousContentHeight = 0; // 初期化をトリガー
+    handleContentResize();
+
+    observers.shadowContentResize = new ResizeObserver(handleContentResize);
+
+    requestAnimationFrame(() => {
+      const currentShadowContent = getShadowContent();
+      if (currentShadowContent && observers.shadowContentResize) {
+        observers.shadowContentResize.observe(currentShadowContent);
+      }
+    });
+  };
+
+  // stanza要素の追加を監視
   observers.mutation = new MutationObserver(() => {
-    adjustHeight();
+    const shadowContent = getShadowContent();
+    if (shadowContent && !observers.shadowContentResize) {
+      startObservingShadowContent();
+    }
   });
 
   observers.mutation.observe(container, {
@@ -74,35 +157,31 @@ function initializeStanza(
     subtree: true,
   });
 
-  // ResizeObserverを作成
-  observers.stanzaResize = new ResizeObserver(() => {
-    if (isManuallyResized) {
-      observers.stanzaResize?.disconnect();
-      return;
-    }
-    adjustHeight();
-  });
+  setTimeout(startObservingShadowContent, STANZA_INITIALIZATION_DELAY_MS);
 
-  const startObservingStanza = (): void => {
-    const stanzaElement = findStanzaElement();
+  // 手動リサイズの検出
+  const containerResizeObserver = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      if (isSettingHeight) return;
 
-    if (stanzaElement && observers.stanzaResize) {
-      observers.stanzaResize.observe(stanzaElement);
-    }
-  };
+      const currentHeight = Math.round(entry.contentRect.height);
 
-  setTimeout(() => {
-    adjustHeight();
-    startObservingStanza();
-  }, STANZA_INITIALIZATION_DELAY_MS);
+      // JavaScriptで高さを設定した後にのみ手動リサイズを検出
+      if (
+        !isManuallyResized &&
+        lastSetHeight > 0 &&
+        currentHeight !== lastSetHeight
+      ) {
+        markAsManuallyResized();
 
-  const containerResizeObserver = new ResizeObserver(() => {
-    if (!isManuallyResized) return;
+        if (currentHeight < config.maxInitialHeight) {
+          setHeight(config.maxInitialHeight);
+        } else {
+          lastSetHeight = currentHeight;
+        }
 
-    if (!container.classList.contains('resized')) {
-      container.classList.add('resized');
-      container.style.maxHeight = 'none';
-      containerResizeObserver.disconnect();
+        observers.mutation?.disconnect();
+      }
     }
   });
 
