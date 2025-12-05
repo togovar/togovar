@@ -309,7 +309,7 @@ class StanzaManager {
      * Local stanza path for development (e.g., 'http://localhost:8080').
      * Leave empty ('') to use remote stanza.
      */
-    const DEV_STANZA_PATH: string = '';
+    const DEV_STANZA_PATH: string = 'http://localhost:81';
 
     const basePath = DEV_STANZA_PATH ? DEV_STANZA_PATH : STANZA_PATH;
 
