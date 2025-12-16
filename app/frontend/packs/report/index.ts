@@ -1,3 +1,6 @@
+import stanzaConfigJson from '../../assets/stanza.json';
+import { initializeStanzaResize } from '../../src/stanza/stanza-resize';
+
 /**
  * This module provides a comprehensive system for rendering TogoVar report pages
  * with interactive stanza components. It handles configuration processing,
@@ -172,9 +175,10 @@ class ConfigProcessor {
 }
 
 /** Processed configuration loaded from JSON with environment variables resolved */
-const REPORT_CONFIG = ConfigProcessor.processConfig(
-  require('../../assets/stanza.json')
-) as Record<string, ReportConfig>;
+const REPORT_CONFIG = ConfigProcessor.processConfig(stanzaConfigJson) as Record<
+  string,
+  ReportConfig
+>;
 
 // ============================================================================
 // Option Formatting
@@ -301,7 +305,15 @@ class StanzaManager {
       return;
     }
 
-    this._loadStanzaScript(scriptUrl || `${STANZA_PATH}/${id}.js`);
+    /**
+     * Local stanza path for development (e.g., 'http://localhost:8080').
+     * Leave empty ('') to use remote stanza.
+     */
+    const DEV_STANZA_PATH: string = 'http://localhost:81';
+
+    const basePath = DEV_STANZA_PATH ? DEV_STANZA_PATH : STANZA_PATH;
+
+    this._loadStanzaScript(scriptUrl || `${basePath}/${id}.js`);
     this._createAndInsertStanzaElement(
       id,
       targetSelector,
@@ -661,14 +673,17 @@ class DOMReadyHandler {
    * Initializes the report application when the DOM is ready.
    */
   static initialize(): void {
+    const init = () => {
+      ReportApp.initialize();
+      initializeStanzaResize();
+    };
+
     if (document.readyState === 'loading') {
       // DOM is still loading, wait for it to complete
-      document.addEventListener('DOMContentLoaded', () => {
-        ReportApp.initialize();
-      });
+      document.addEventListener('DOMContentLoaded', init);
     } else {
       // DOM is already loaded, start immediately
-      ReportApp.initialize();
+      init();
     }
   }
 }
