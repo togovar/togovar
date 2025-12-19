@@ -1,5 +1,4 @@
 import stanzaConfigJson from '../../assets/stanza.json';
-import { initializeStanzaResize } from '../../src/stanza/stanza-resize';
 
 /**
  * This module provides a comprehensive system for rendering TogoVar report pages
@@ -675,7 +674,6 @@ class DOMReadyHandler {
   static initialize(): void {
     const init = () => {
       ReportApp.initialize();
-      initializeStanzaResize();
     };
 
     if (document.readyState === 'loading') {
