@@ -664,17 +664,16 @@ class DOMReadyHandler {
    * Initializes the report application when the DOM is ready.
    */
   static initialize(): void {
-    const init = () => {
-      ReportApp.initialize();
-    };
-
-    if (document.readyState === 'loading') {
-      // DOM is still loading, wait for it to complete
-      document.addEventListener('DOMContentLoaded', init);
-    } else {
+    if (document.readyState !== 'loading') {
       // DOM is already loaded, start immediately
-      init();
+      ReportApp.initialize();
+      return;
     }
+
+    // DOM is still loading, wait for it to complete
+    document.addEventListener('DOMContentLoaded', () => {
+      ReportApp.initialize();
+    });
   }
 }
 
