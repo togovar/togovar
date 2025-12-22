@@ -304,15 +304,7 @@ class StanzaManager {
       return;
     }
 
-    /**
-     * Local stanza path for development (e.g., 'http://localhost:8080').
-     * Leave empty ('') to use remote stanza.
-     */
-    const DEV_STANZA_PATH: string = '';
-
-    const basePath = DEV_STANZA_PATH ? DEV_STANZA_PATH : STANZA_PATH;
-
-    this._loadStanzaScript(scriptUrl || `${basePath}/${id}.js`);
+    this._loadStanzaScript(scriptUrl || `${STANZA_PATH}/${id}.js`);
     this._createAndInsertStanzaElement(
       id,
       targetSelector,
