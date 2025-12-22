@@ -1,3 +1,5 @@
+import stanzaConfigJson from '../../assets/stanza.json';
+
 /**
  * This module provides a comprehensive system for rendering TogoVar report pages
  * with interactive stanza components. It handles configuration processing,
@@ -172,9 +174,10 @@ class ConfigProcessor {
 }
 
 /** Processed configuration loaded from JSON with environment variables resolved */
-const REPORT_CONFIG = ConfigProcessor.processConfig(
-  require('../../assets/stanza.json')
-) as Record<string, ReportConfig>;
+const REPORT_CONFIG = ConfigProcessor.processConfig(stanzaConfigJson) as Record<
+  string,
+  ReportConfig
+>;
 
 // ============================================================================
 // Option Formatting
@@ -564,7 +567,24 @@ class ReportApp {
     reportId: string,
     idKey: string = 'id'
   ): void {
+    const currentReference = ENV_CONFIG.TOGOVAR_FRONTEND_REFERENCE;
+
     stanzas.forEach((stanza) => {
+      // Skip stanza if references are specified and current reference doesn't match
+      if (stanza.references && !stanza.references.includes(currentReference)) {
+        // Hide the target element if it exists
+        const targetElement = document.querySelector(stanza.targetSelector);
+        if (targetElement) {
+          const parentSection = targetElement.closest(
+            'section.stanza-view'
+          ) as HTMLElement;
+          if (parentSection) {
+            parentSection.style.display = 'none';
+          }
+        }
+        return;
+      }
+
       const processedStanza = this._processStanzaTemplateVariables(
         stanza,
         reportId,
@@ -644,15 +664,16 @@ class DOMReadyHandler {
    * Initializes the report application when the DOM is ready.
    */
   static initialize(): void {
-    if (document.readyState === 'loading') {
-      // DOM is still loading, wait for it to complete
-      document.addEventListener('DOMContentLoaded', () => {
-        ReportApp.initialize();
-      });
-    } else {
+    if (document.readyState !== 'loading') {
       // DOM is already loaded, start immediately
       ReportApp.initialize();
+      return;
     }
+
+    // DOM is still loading, wait for it to complete
+    document.addEventListener('DOMContentLoaded', () => {
+      ReportApp.initialize();
+    });
   }
 }
 

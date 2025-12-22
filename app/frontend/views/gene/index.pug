@@ -23,7 +23,7 @@ block head
       }
     });
   // Stanza theme
-  link(href="https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20220803", rel="stylesheet")
+  link(href="https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20251204", rel="stylesheet")
 
 block content
   header#DetailHeader
@@ -71,6 +71,13 @@ block content
         h3.title
           | Genomic context
       #gene-genomic-context.stanza
+
+    section.stanza-view#haplotype-explorer
+      .titlelink-wrapper
+        a.titlelink(href="#haplotype-explorer")
+        h3.title
+          | Haplotype browser
+      #gene-haplotype-explorer.stanza
 
     section.stanza-view#protein-browser
       .titlelink-wrapper
