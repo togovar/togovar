@@ -53,15 +53,13 @@
         "id": "pagination-table",
         "targetSelector": "#variant-gwas",
         "references": ["GRCh37", "GRCh38"],
-        "scriptUrl": "https://togostanza.github.io/metastanza/pagination-table.js",
+        "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_gwas?tgv_id=${tgv_id}",
           "data-type": "json",
-          "custom-css-url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20251204",
-          "padding": 0,
-          "page-size-option": "5,10,20,50,100",
-          "page-slider": false,
-          "data-unavailable_message": "No data",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
+          "page-size_option": "5,10,20,50,100",
+          "message-not_found": "No data",
           "columns": [
             {
               "id": "variant_and_risk_allele",
@@ -193,15 +191,13 @@
         "id": "pagination-table",
         "targetSelector": "#gene-clinvar",
         "references": ["GRCh37", "GRCh38"],
-        "scriptUrl": "https://togostanza.github.io/metastanza/pagination-table.js",
+        "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/gene_clinvar?hgnc_id=${hgnc_id}",
           "data-type": "json",
-          "custom-css-url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20251204",
-          "padding": 0,
-          "page-size-option": "5,10,20,50,100",
-          "page-slider": false,
-          "data-unavailable_message": "No data",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
+          "page-size_option": "5,10,20,50,100",
+          "message-not_found": "No data",
           "columns": [
             {
               "id": "tgv_id",
@@ -256,15 +252,13 @@
         "id": "pagination-table",
         "targetSelector": "#gene-gwas",
         "references": ["GRCh37", "GRCh38"],
-        "scriptUrl": "https://togostanza.github.io/metastanza/pagination-table.js",
+        "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/gene_gwas?hgnc_id=${hgnc_id}",
           "data-type": "json",
-          "padding": 0,
-          "custom-css-url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20251204",
-          "page-size-option": "5,10,20,50,100",
-          "page-slider": false,
-          "data-unavailable_message": "No data",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
+          "page-size_option": "5,10,20,50,100",
+          "message-not_found": "No data",
           "columns": [
             {
               "id": "tgv_id",
@@ -365,15 +359,13 @@
         "id": "pagination-table",
         "targetSelector": "#gene-mogplus",
         "references": ["GRCh38"],
-        "scriptUrl": "https://togostanza.github.io/metastanza/pagination-table.js",
+        "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/gene_mogplus?hgnc_id=${hgnc_id}",
           "data-type": "json",
-          "custom-css-url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20251204",
-          "padding": 0,
-          "page-size-option": "5,10,20,50,100",
-          "page-slider": false,
-          "data-unavailable_message": "No data",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
+          "page-size_option": "5,10,20,50,100",
+          "message-not_found": "No data",
           "columns": [
             {
               "id": "allele_grcm39",
@@ -479,7 +471,7 @@
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/gene_variant?hgnc_id=${hgnc_id}",
           "data-type": "json",
-          "custom-css-url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20251204",
+          "custom-css-url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
           "height": 500,
           "page-size": 100,
           "columns": [
@@ -570,7 +562,7 @@
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/disease_summary?medgen_cid=${medgen_cid}",
           "data-type": "json",
-          "custom-css-url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20251204",
+          "custom-css-url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
           "padding": 0,
           "columns": [
             {
@@ -602,15 +594,13 @@
         "id": "pagination-table",
         "targetSelector": "#disease-clinvar",
         "references": ["GRCh37", "GRCh38"],
-        "scriptUrl": "https://togostanza.github.io/metastanza/pagination-table.js",
+        "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/disease_clinvar?medgen_cid=${medgen_cid}",
           "data-type": "json",
-          "custom-css-url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20251204",
-          "padding": 0,
-          "page-size-option": "5,10,20,50,100",
-          "page-slider": false,
-          "data-unavailable_message": "No data",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
+          "page-size_option": "5,10,20,50,100",
+          "message-not_found": "No data",
           "columns": [
             {
               "id": "tgv_id",
@@ -660,15 +650,13 @@
         "id": "pagination-table",
         "targetSelector": "#disease-gwas",
         "references": ["GRCh37", "GRCh38"],
-        "scriptUrl": "https://togostanza.github.io/metastanza/pagination-table.js",
+        "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/disease_gwas?medgen_cid=${medgen_cid}",
           "data-type": "json",
-          "custom-css-url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20251204",
-          "padding": 0,
-          "page-size-option": "5,10,20,50,100",
-          "page-slider": false,
-          "data-unavailable_message": "No data",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
+          "page-size_option": "5,10,20,50,100",
+          "message-not_found": "No data",
           "columns": [
             {
               "id": "variant_and_risk_allele",
