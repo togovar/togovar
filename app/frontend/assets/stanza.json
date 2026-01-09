@@ -57,7 +57,7 @@
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_gwas?tgv_id=${tgv_id}",
           "data-type": "json",
-          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
           "page-size_option": "5,10,20,50,100",
           "message-not_found": "No data",
           "columns": [
@@ -195,7 +195,7 @@
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/gene_clinvar?hgnc_id=${hgnc_id}",
           "data-type": "json",
-          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
           "page-size_option": "5,10,20,50,100",
           "message-not_found": "No data",
           "columns": [
@@ -256,7 +256,7 @@
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/gene_gwas?hgnc_id=${hgnc_id}",
           "data-type": "json",
-          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
           "page-size_option": "5,10,20,50,100",
           "message-not_found": "No data",
           "columns": [
@@ -363,7 +363,7 @@
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/gene_mogplus?hgnc_id=${hgnc_id}",
           "data-type": "json",
-          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
           "page-size_option": "5,10,20,50,100",
           "message-not_found": "No data",
           "columns": [
@@ -471,7 +471,7 @@
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/gene_variant?hgnc_id=${hgnc_id}",
           "data-type": "json",
-          "custom-css-url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
+          "custom-css-url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
           "height": 500,
           "page-size": 100,
           "columns": [
@@ -562,7 +562,7 @@
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/disease_summary?medgen_cid=${medgen_cid}",
           "data-type": "json",
-          "custom-css-url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
+          "custom-css-url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
           "padding": 0,
           "columns": [
             {
@@ -598,7 +598,7 @@
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/disease_clinvar?medgen_cid=${medgen_cid}",
           "data-type": "json",
-          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
           "page-size_option": "5,10,20,50,100",
           "message-not_found": "No data",
           "columns": [
@@ -654,7 +654,7 @@
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/disease_gwas?medgen_cid=${medgen_cid}",
           "data-type": "json",
-          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260106",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
           "page-size_option": "5,10,20,50,100",
           "message-not_found": "No data",
           "columns": [
