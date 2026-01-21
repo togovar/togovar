@@ -4,6 +4,7 @@
     "target": "es2020",
     "module": "nodenext",
     "sourceMap": true,
+    "rootDir": "./app/frontend",
     "outDir": "./dist",
     "moduleResolution": "nodenext",
     "experimentalDecorators": true,
@@ -11,7 +12,11 @@
     "useDefineForClassFields": false,
     "strict": true
   },
-  "include": ["./app/frontend/src/**/*", "./app/frontend/css.d.ts"],
+  "include": [
+    "./app/frontend/src/**/*",
+    "./app/frontend/packs/**/*",
+    "./app/frontend/css.d.ts"
+  ],
   "exclude": [
     "./app/frontend/config/webpack.config*.js",
     "./app/frontend/server/**/*"

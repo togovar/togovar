@@ -15,7 +15,7 @@ import '!file-loader?name=[name].[ext]!../assets/togovar.jsonld';
 async function init(): Promise<void> {
   if (PAGE === 'home') {
     try {
-      const homeModule = await import('../src/home');
+      const homeModule = await import('../src/home.js');
       homeModule.initHome();
     } catch (error) {
       console.error('Failed to import home module:', error);
