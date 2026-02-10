@@ -4,16 +4,18 @@ import '../stylesheets/main.sass';
 // Import modules
 import { PAGE } from '../src/global';
 
+// Import components (execute to register custom elements)
+import '../src/components/LogarithmizedBlockGraphFrequencyView.js';
+
 // Import assets
 import '!file-loader?name=[name].[ext]!../images/favicon.svg';
 import '!file-loader?name=[name].[ext]!../assets/togovar.jsonld';
-import '!file-loader?name=js/components/[name].[ext]!../src/components/LogarithmizedBlockGraphFrequencyView.js';
 
 // Initialization function
 async function init(): Promise<void> {
   if (PAGE === 'home') {
     try {
-      const homeModule = await import('../src/home');
+      const homeModule = await import('../src/home.js');
       homeModule.initHome();
     } catch (error) {
       console.error('Failed to import home module:', error);
