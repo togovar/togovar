@@ -1,19 +1,43 @@
 declare module '*.scss' {
-  const content: any;
+  import type { CSSResult } from 'lit';
+  const content: CSSResult;
+  export default content;
+}
+
+declare module '*.sass' {
+  import type { CSSResult } from 'lit';
+  const content: CSSResult;
   export default content;
 }
 
 declare module '*.css' {
-  const content: any;
+  import type { CSSResult } from 'lit';
+  const content: CSSResult;
   export default content;
 }
 
 declare module '*.module.scss' {
-  const content: any;
-  export default content;
+  const classes: Record<string, string>;
+  export default classes;
 }
 
 declare module '*.module.css' {
-  const content: any;
+  const classes: Record<string, string>;
+  export default classes;
+}
+
+// Asset imports with file-loader
+declare module '!file-loader?name=[name].[ext]!*' {
+  const content: string;
+  export default content;
+}
+
+declare module '*.svg' {
+  const content: string;
+  export default content;
+}
+
+declare module '*.jsonld' {
+  const content: string;
   export default content;
 }
