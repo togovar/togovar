@@ -1,12 +1,12 @@
-import { PanelView } from './PanelView.ts';
-import { storeManager } from '../../store/StoreManager';
+import PanelView from './PanelView.js';
+import { storeManager } from '../store/StoreManager';
 
 export default class PanelViewPreviewGene extends PanelView {
-  constructor(panelViewEl) {
-    super(panelViewEl, 'dataset');
+  constructor(elm) {
+    super(elm, 'dataset');
     storeManager.bind('selectedRow', this);
     storeManager.bind('offset', this);
-    this.table = this.panelViewEl.querySelector('.content > .right-headline');
+    this.table = this.elm.querySelector('.content > .right-headline');
   }
 
   selectedRow() {
@@ -19,7 +19,7 @@ export default class PanelViewPreviewGene extends PanelView {
 
   update() {
     let html = '';
-    this.panelViewEl.classList.add('-notfound');
+    this.elm.classList.add('-notfound');
     if (storeManager.getData('selectedRow') !== undefined) {
       const record = storeManager.getSelectedRecord();
       if (record && record.symbols) {
@@ -46,7 +46,7 @@ export default class PanelViewPreviewGene extends PanelView {
             </tbody>
           `;
 
-          this.panelViewEl.classList.remove('-notfound');
+          this.elm.classList.remove('-notfound');
         }
       }
     }

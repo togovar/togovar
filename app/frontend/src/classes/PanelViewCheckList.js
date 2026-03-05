@@ -1,29 +1,29 @@
-import { PanelView } from './PanelView.ts';
-import { storeManager } from '../../store/StoreManager';
+import PanelView from './PanelView.js';
+import { storeManager } from '../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
-} from '../../store/searchManager';
+} from '../store/searchManager';
 
 /**  Dataset of Statistics / Filters
- * @param {Element} panelViewEl - Panel element section.panel-view (#FilterDatasets | #FilterVariantType | #FilterClinicalSignificance | #FilterSift | #FilterPolyphen | #FilterAlphaMissense)
- * @param {string} panelId - Panel id (dataset | type | significance | sift | polyphen | alphamissense)
+ * @param {Element} elm - Panel element section.panel-view (#FilterDatasets | #FilterVariantType | #FilterClinicalSignificance | #FilterSift | #FilterPolyphen | #FilterAlphaMissense)
+ * @param {string} kind - Panel id (dataset | type | significance | sift | polyphen | alphamissense)
  * @param {string} statisticsType - (statisticsDataset | statisticsType | statisticsSignificance | undefined) */
 export default class PanelViewCheckList extends PanelView {
-  constructor(panelViewEl, panelId, statisticsType) {
-    super(panelViewEl, panelId);
+  constructor(elm, kind, statisticsType) {
+    super(elm, kind);
     this._statisticsType = statisticsType;
     // 検索条件マスター
     const conditionMaster = storeManager
       .getData('simpleSearchConditionsMaster')
-      .find((condition) => condition.id === this.panelId);
+      .find((condition) => condition.id === this.kind);
 
     // GUIの生成
     this._createGUI(conditionMaster);
     // references
-    const condition = getSimpleSearchCondition(this.panelId);
+    const condition = getSimpleSearchCondition(this.kind);
     this._inputsValues = {};
-    this.panelViewEl
+    this.elm
       .querySelectorAll('.content > .checklist-values > .item > .label > input')
       .forEach((input) => {
         this._inputsValues[input.value] = {
@@ -81,7 +81,7 @@ export default class PanelViewCheckList extends PanelView {
     </li>
     <li class="separator"><hr></li>
     `;
-    if (this.panelId === 'significance') {
+    if (this.kind === 'significance') {
       html += `
       <li class="item">
         <label class="label">
@@ -93,7 +93,7 @@ export default class PanelViewCheckList extends PanelView {
       <li class="separator"><hr></li>
       `;
     }
-    if (this.panelId === 'alphamissense') {
+    if (this.kind === 'alphamissense') {
       html += `
       <li class="item">
         <label class="label">
@@ -105,7 +105,7 @@ export default class PanelViewCheckList extends PanelView {
       <li class="separator"><hr></li>
       `;
     }
-    if (this.panelId === 'sift') {
+    if (this.kind === 'sift') {
       html += `
       <li class="item">
         <label class="label">
@@ -117,7 +117,7 @@ export default class PanelViewCheckList extends PanelView {
       <li class="separator"><hr></li>
       `;
     }
-    if (this.panelId === 'polyphen') {
+    if (this.kind === 'polyphen') {
       html += `
       <li class="item">
         <label class="label">
@@ -137,24 +137,24 @@ export default class PanelViewCheckList extends PanelView {
       <label class="label">
         <input type="checkbox" value="${item.id}" checked>
         ${
-          this.panelId === 'dataset'
+          this.kind === 'dataset'
             ? `<div class="dataset-icon" data-dataset="${item.id}"><div class="properties"></div></div>`
             : ''
         }
         ${
-          this.panelId === 'significance'
+          this.kind === 'significance'
             ? `<div class="clinical-significance" data-value="${item.id}"></div>`
             : ''
         }
         ${
-          this.panelId === 'sift'
+          this.kind === 'sift'
             ? `<div class="variant-function _width_5em _align-center" data-function="${
                 item.id
               }">${{ D: '&lt; 0.05', T: '&ge; 0.05' }[item.id]}</div>`
             : ''
         }
         ${
-          this.panelId === 'polyphen'
+          this.kind === 'polyphen'
             ? `<div class="variant-function _width_5em _align-center" data-function="${
                 item.id
               }">${
@@ -168,7 +168,7 @@ export default class PanelViewCheckList extends PanelView {
             : ''
         }
         ${
-          this.panelId === 'alphamissense'
+          this.kind === 'alphamissense'
             ? `<div class="variant-function _width_5em _align-center" data-function="${
                 item.id
               }">${
@@ -183,16 +183,14 @@ export default class PanelViewCheckList extends PanelView {
     `
       )
       .join('');
-    this.panelViewEl
+    this.elm
       .querySelector('.content > .checklist-values')
       .insertAdjacentHTML('beforeend', html);
     // not検索の重複を削除
     if (
-      ['significance', 'alphamissense', 'sift', 'polyphen'].includes(
-        this.panelId
-      )
+      ['significance', 'alphamissense', 'sift', 'polyphen'].includes(this.kind)
     ) {
-      this.panelViewEl
+      this.elm
         .querySelector('.content > .checklist-values > .item:nth-child(5)')
         .remove();
     }
@@ -230,16 +228,16 @@ export default class PanelViewCheckList extends PanelView {
         checked[key] = this._inputsValues[key].input.checked ? '1' : '0';
       }
     }
-    setSimpleSearchCondition(this.panelId, checked);
+    setSimpleSearchCondition(this.kind, checked);
   }
 
   // フィルターを更新すると呼ばれる
   simpleSearchConditions(conditions) {
     let isAll = 0;
-    for (const key in conditions[this.panelId]) {
+    for (const key in conditions[this.kind]) {
       this._inputsValues[key].input.checked =
-        conditions[this.panelId][key] !== '0';
-      isAll += conditions[this.panelId][key] === '0';
+        conditions[this.kind][key] !== '0';
+      isAll += conditions[this.kind][key] === '0';
     }
     this._inputsValues.all.input.checked = isAll === 0;
   }

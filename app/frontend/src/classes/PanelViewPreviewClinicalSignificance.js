@@ -1,13 +1,13 @@
-import { PanelView } from './PanelView.ts';
-import { storeManager } from '../../store/StoreManager';
-import { getSimpleSearchConditionMaster } from '../../store/searchManager';
+import PanelView from './PanelView.js';
+import { storeManager } from '../store/StoreManager';
+import { getSimpleSearchConditionMaster } from '../store/searchManager';
 
 export default class PanelViewPreviewClinicalSignificance extends PanelView {
-  constructor(panelViewEl) {
-    super(panelViewEl, 'clinicalSignificance');
+  constructor(elm) {
+    super(elm, 'clinicalSignificance');
     storeManager.bind('selectedRow', this);
     storeManager.bind('offset', this);
-    this.content = this.panelViewEl.querySelector('.content');
+    this.content = this.elm.querySelector('.content');
   }
 
   selectedRow() {
@@ -167,10 +167,10 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
           </dl>`;
           })
           .join('');
-        this.panelViewEl.classList.remove('-notfound');
+        this.elm.classList.remove('-notfound');
       }
     } else {
-      this.panelViewEl.classList.add('-notfound');
+      this.elm.classList.add('-notfound');
     }
     this.content.innerHTML = html;
   }

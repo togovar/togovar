@@ -37,7 +37,7 @@
 
 .slider {
   max-width: calc(250px - 2.5px);
-  height: 7px;
+  height: 5px;
   position: relative;
   left: 1px;
   background: #ddd;
@@ -45,6 +45,7 @@
   .bar {
     height: inherit;
     position: absolute;
+    left: 0%;
     right: 0%;
   }
 
@@ -52,7 +53,7 @@
     .scale {
       list-style: none;
       position: absolute;
-      top: -16px;
+      top: -18px;
       font-size: 0.6rem;
       z-index: 10;
       line-height: 1;
@@ -105,7 +106,7 @@
 
   input[type='range'] {
     position: absolute;
-    top: -6px;
+    top: -5px;
     width: 100%;
     max-width: 250px;
     height: 5px;
