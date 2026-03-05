@@ -1,10 +1,8 @@
 import { LitElement, html } from 'lit';
-import { customElement, property, query, queryAll } from 'lit/decorators.js';
-import { map } from 'lit/directives/map.js';
-import { range } from 'lit/directives/range.js';
-import { createGradientSlider } from './createGradientSlider';
+import { customElement, property, queryAll } from 'lit/decorators.js';
 import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
 import { setInequalitySign, toggleInequality } from './setInequalitySign';
+import './GradientSliderBar';
 import { type PredictionKey } from './PredictionDatasets';
 import type {
   Inequality,
@@ -20,8 +18,6 @@ const SLIDER_CONFIG = {
   numberOfScales: 10,
   sliderWidth: 247.5,
 } as const;
-const SCALE_INTERVAL =
-  (SLIDER_CONFIG.max - SLIDER_CONFIG.min) / SLIDER_CONFIG.numberOfScales;
 
 /** Class to create a PredictionRangeSlider */
 @customElement('prediction-range-slider')
@@ -78,15 +74,6 @@ export class PredictionRangeSlider extends LitElement {
   private _rangeInput!: NodeListOf<HTMLInputElement>;
   @queryAll('.number-input .inequality-sign')
   private _inequalitySign!: NodeListOf<HTMLButtonElement>;
-  @query('.slider .bar') private _range!: HTMLDivElement;
-
-  firstUpdated(): void {
-    this._range.style.backgroundImage = createGradientSlider(
-      this.activeDataset,
-      this._range,
-      SLIDER_CONFIG.sliderWidth
-    );
-  }
 
   // Notify parent when value changes (array unassignedChecks is deprecated)
   protected updated(changed: Map<string | number | symbol, unknown>): void {
@@ -127,31 +114,23 @@ export class PredictionRangeSlider extends LitElement {
 
     if (target.className === 'from') {
       secondaryInputs[0].value = String(minValue);
-      this._range.style.left = minValue * 100 + '%';
 
       if (minValue > maxValue) {
         maxValue = parseFloat(primaryInputs[0].value);
         primaryInputs[1].value = String(maxValue);
         secondaryInputs[1].value = String(maxValue);
-        this._range.style.right = 100 - maxValue * 100 + '%';
       }
     } else {
       secondaryInputs[1].value = String(maxValue);
-      this._range.style.right = 100 - maxValue * 100 + '%';
 
       if (maxValue < minValue) {
         minValue = parseFloat(primaryInputs[1].value);
         primaryInputs[0].value = String(minValue);
         secondaryInputs[0].value = String(minValue);
-        this._range.style.left = minValue * 100 + '%';
       }
     }
 
-    this._range.style.backgroundImage = createGradientSlider(
-      this.activeDataset,
-      this._range,
-      SLIDER_CONFIG.sliderWidth
-    );
+    // Update properties - gradient-slider-bar will automatically update its display
     [this.minValue, this.maxValue] = [minValue, maxValue];
   }
 
@@ -174,14 +153,7 @@ export class PredictionRangeSlider extends LitElement {
     setInequalitySign(this._inequalitySign[0], minInequalitySign);
     setInequalitySign(this._inequalitySign[1], maxInequalitySign);
 
-    this._range.style.left = minValue * 100 + '%';
-    this._range.style.right = 100 - maxValue * 100 + '%';
-    this._range.style.backgroundImage = createGradientSlider(
-      this.activeDataset,
-      this._range,
-      SLIDER_CONFIG.sliderWidth
-    );
-
+    // Update properties - gradient-slider-bar will automatically update its display
     this.minValue = minValue;
     this.maxValue = maxValue;
     this.minInequalitySign = minInequalitySign;
@@ -210,19 +182,6 @@ export class PredictionRangeSlider extends LitElement {
 
     if (name === 'unassigned') this.includeUnassigned = checked;
     if (name === 'unknown') this.includeUnknown = checked;
-  }
-
-  private _switchInequalitySign(sign: Inequality) {
-    switch (sign) {
-      case 'gte':
-        return { newSign: 'gt' as Inequality, newHtml: '&#60;' };
-      case 'gt':
-        return { newSign: 'gte' as Inequality, newHtml: '&#8804;' };
-      case 'lte':
-        return { newSign: 'lt' as Inequality, newHtml: '&#60;' };
-      case 'lt':
-        return { newSign: 'lte' as Inequality, newHtml: '&#8804;' };
-    }
   }
 
   render() {
@@ -296,46 +255,28 @@ export class PredictionRangeSlider extends LitElement {
         ${createLabelCheckboxes()}
       </div>
 
-      <div class="slider">
-        <div class="bar"></div>
-        <ul class="ruler">
-          ${map(
-            range(SLIDER_CONFIG.numberOfScales + 1),
-            (i) => html`<li
-              class="scale"
-              style="left: calc(${(i * 100) /
-              SLIDER_CONFIG.numberOfScales}% - 0.3rem)"
-            >
-              ${(SCALE_INTERVAL * i).toFixed(1)}
-            </li>`
-          )}
-        </ul>
-
-        <div class="threshold">
-          ${Object.entries(this.activeDataset).map(
-            ([key, details], i, arr) => html`
-              <div
-                class="threshold-line"
-                style="height:${(arr.length - i) * 20 +
-                10}px; left:${details.min * 100}%;"
-              ></div>
-              <button
-                type="button"
-                class="threshold-button"
-                data-min-value=${details.min}
-                data-max-value=${details.max}
-                data-min-inequality-sign=${details.minInequalitySign}
-                data-max-inequality-sign=${details.maxInequalitySign}
-                style="left:${details.min * 100}%; top:${(arr.length - i) *
-                20}px;"
-                @click=${this._handleThresholdButton}
-              >
-                ${key}
-              </button>
-            `
-          )}
-        </div>
-      </div>
+      <gradient-slider-bar
+        .activeDataset=${this.activeDataset}
+        .minValue=${this.minValue}
+        .maxValue=${this.maxValue}
+        .numberOfScales=${SLIDER_CONFIG.numberOfScales}
+        .sliderWidth=${SLIDER_CONFIG.sliderWidth}
+        @threshold-selected=${(e: CustomEvent) => {
+          const detail = e.detail;
+          // Create a synthetic event to reuse existing handler
+          const syntheticEvent = {
+            currentTarget: {
+              dataset: {
+                minValue: String(detail.minValue),
+                maxValue: String(detail.maxValue),
+                minInequalitySign: detail.minInequalitySign,
+                maxInequalitySign: detail.maxInequalitySign,
+              },
+            },
+          } as unknown as Event;
+          this._handleThresholdButton(syntheticEvent);
+        }}
+      ></gradient-slider-bar>
 
       <div class="range-input">
         ${createRangeInput('from', SLIDER_CONFIG.min)}

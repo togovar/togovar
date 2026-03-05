@@ -1,13 +1,13 @@
-import PanelView from './PanelView.js';
-import { storeManager } from '../store/StoreManager';
-import { getSimpleSearchConditionMaster } from '../store/searchManager';
+import { PanelView } from './PanelView.ts';
+import { storeManager } from '../../store/StoreManager';
+import { getSimpleSearchConditionMaster } from '../../store/searchManager';
 
 export default class PanelViewPreviewConsequence extends PanelView {
-  constructor(elm) {
-    super(elm, 'frenquecies');
+  constructor(panelViewEl) {
+    super(panelViewEl, 'frenquecies');
     storeManager.bind('selectedRow', this);
     storeManager.bind('offset', this);
-    this._content = this.elm.querySelector('.content');
+    this._content = this.panelViewEl.querySelector('.content');
   }
 
   selectedRow() {
@@ -20,7 +20,7 @@ export default class PanelViewPreviewConsequence extends PanelView {
 
   _update() {
     let html = '';
-    this.elm.classList.add('-notfound');
+    this.panelViewEl.classList.add('-notfound');
     if (storeManager.getData('selectedRow') !== undefined) {
       const record = storeManager.getSelectedRecord();
       if (record && record.transcripts && record.transcripts.length > 0) {
@@ -39,7 +39,7 @@ export default class PanelViewPreviewConsequence extends PanelView {
               `<dl class="above-headline"><dt>${consequence.label}</dt><dd>${consequence.description}</dd></dl>`
           )
           .join('');
-        this.elm.classList.remove('-notfound');
+        this.panelViewEl.classList.remove('-notfound');
       }
     }
     this._content.innerHTML = html;

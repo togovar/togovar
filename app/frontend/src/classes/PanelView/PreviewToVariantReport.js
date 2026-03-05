@@ -1,12 +1,12 @@
-import PanelView from './PanelView.js';
-import { storeManager } from '../store/StoreManager';
+import { PanelView } from './PanelView.ts';
+import { storeManager } from '../../store/StoreManager';
 
 export default class PreviewToVariantReport extends PanelView {
-  constructor(elm) {
-    super(elm, 'dataset');
+  constructor(panelViewEl) {
+    super(panelViewEl, 'dataset');
     storeManager.bind('selectedRow', this);
     storeManager.bind('offset', this);
-    this.title = this.elm.querySelector('.title');
+    this.title = this.panelViewEl.querySelector('.title');
   }
 
   selectedRow() {
@@ -25,11 +25,11 @@ export default class PreviewToVariantReport extends PanelView {
       if (record && record.id) {
         html = `<a class="hyper-text -internal" href="/variant/${record.id}">Detailed variant report page</a>`;
 
-        this.elm.classList.remove('-disable');
+        this.panelViewEl.classList.remove('-disable');
       } else {
         html = `<a class="hyper-text -internal">Detailed variant report page</a>`;
 
-        this.elm.classList.add('-disable');
+        this.panelViewEl.classList.add('-disable');
       }
     }
 

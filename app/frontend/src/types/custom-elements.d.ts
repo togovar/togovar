@@ -10,6 +10,12 @@ declare global {
     searchType: string;
     sliderStep: number;
     inputStep: number;
+    value1: number;
+    value2: number;
+    min: string | number;
+    max: string | number;
+    invert: string | boolean;
+    match: string;
   }
 
   interface HTMLElementEventMap {

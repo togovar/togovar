@@ -1,21 +1,21 @@
-import PanelView from './PanelView.js';
-import { storeManager } from '../store/StoreManager';
+import { PanelView } from './PanelView.ts';
+import { storeManager } from '../../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
-} from '../store/searchManager';
+} from '../../store/searchManager';
 
 export default class PanelViewFilterVariantCallingQuality extends PanelView {
-  constructor(elm) {
-    super(elm, 'quality');
+  constructor(panelViewEl) {
+    super(panelViewEl, 'quality');
     storeManager.bind('simpleSearchConditions', this);
     // reference
-    this.checkbox = this.elm.querySelector('.content > label > input');
+    this.checkbox = this.panelViewEl.querySelector('.content > label > input');
     // event
     this.checkbox.addEventListener('change', this.change.bind(this));
     this.checkbox.dispatchEvent(new Event('change'));
     // initial condition
-    const condition = getSimpleSearchCondition(this.kind);
+    const condition = getSimpleSearchCondition(this.panelId);
     this.checkbox.checked = condition === undefined;
   }
 

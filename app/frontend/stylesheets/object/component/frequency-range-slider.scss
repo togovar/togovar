@@ -1,0 +1,95 @@
+@use '../../foundation/_variables.scss' as *;
+
+.wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 1em;
+  column-gap: 2em;
+}
+
+label {
+  margin: 0;
+}
+
+/* Meter container */
+.range-input {
+  width: 100%;
+  max-width: 250px;
+  z-index: 1;
+  height: 1.5em;
+  margin-top: 0.5em;
+  padding: 0 8px;
+  position: relative;
+
+  /* Range sliders */
+  input[type='range'] {
+    -webkit-appearance: none;
+    line-height: 1em;
+    appearance: none;
+    width: calc(100% - 12px);
+    position: absolute;
+    top: 10px;
+    left: 9px;
+    margin: auto;
+    background-color: transparent;
+    pointer-events: none;
+  }
+
+  input[type='range']::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+    height: 8px;
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 1em;
+    width: 3px;
+    border-top: solid 1px rgba(0, 0, 0, 0.5);
+    border-bottom: solid 1px rgba(0, 0, 0, 0.5);
+    pointer-events: auto;
+    margin-top: -0.2em;
+    cursor: col-resize;
+  }
+  .from[type='range']::-webkit-slider-thumb {
+    transform: translateX(-3px);
+    border-right: solid 1px rgba(0, 0, 0, 0.5);
+  }
+  .to[type='range']::-webkit-slider-thumb {
+    transform: translateX(-1px);
+    border-left: solid 1px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Input section */
+.input {
+  text-align: center;
+}
+
+input[type='checkbox'] {
+  vertical-align: middle;
+}
+
+input[type='number'] {
+  font-size: inherit;
+  width: 5em;
+  margin-right: 3px;
+  display: inline-block;
+  text-align: right;
+  line-height: 18px;
+  padding: 0 0 0 8px;
+  border-radius: 9px;
+  border: solid 1px #94928d;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
+  outline: none;
+}
+
+.checkbox-label {
+  margin-left: 8px;
+  margin-bottom: 0;
+}
+
+/* Match radio buttons */
+.match {
+  text-align: center;
+  margin-left: 1em;
+}

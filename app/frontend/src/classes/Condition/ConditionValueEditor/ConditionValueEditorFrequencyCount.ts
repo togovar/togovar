@@ -3,16 +3,21 @@ import { selectOrNull } from '../../../utils/dom/select';
 import type { ConditionItemView } from '../ConditionItemView';
 import { ConditionValueEditor } from './ConditionValueEditor';
 import type ConditionValues from '../ConditionValues';
-import '../../../components/RangeSliderView.js';
+import '../../../components/RangeSliderView';
 import {
   MODE,
   type FrequencyCountValueView,
 } from '../../../components/FrequencyCountValueView';
 
+/**
+ * Data structure for range slider change events.
+ * Used by both frequency and count mode sliders.
+ */
 export type RangeSliderData = {
   from?: number;
   to?: number;
-  invert?: boolean;
+  invert?: string; // "0" or "1" (string format for consistency with store)
+  match?: string; // "any" or "all" (dataset matching mode)
 };
 
 type ModeType = (typeof MODE)[keyof typeof MODE];

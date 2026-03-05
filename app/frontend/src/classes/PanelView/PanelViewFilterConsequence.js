@@ -1,32 +1,32 @@
-import CollapseView from './CollapseView.js';
-import PanelView from './PanelView.js';
-import { storeManager } from '../store/StoreManager';
+import CollapseView from './../CollapseView.js';
+import { PanelView } from './PanelView.ts';
+import { storeManager } from '../../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
   getSimpleSearchConditionMaster,
-} from '../store/searchManager';
+} from '../../store/searchManager';
 
 const KIND_OF_CONDITION = 'consequence';
 
 export default class PanelViewFilterConsequence extends PanelView {
-  constructor(elm) {
-    super(elm, 'consequence');
+  constructor(panelViewEl) {
+    super(panelViewEl, 'consequence');
     // 検索条件マスター
-    const conditionMaster = getSimpleSearchConditionMaster(this.kind);
+    const conditionMaster = getSimpleSearchConditionMaster(this.panelId);
     const grouping = getSimpleSearchConditionMaster(
       'consequence_grouping'
     ).items;
     // GUIの生成
     this._createGUI(conditionMaster, grouping);
     // collapse menu
-    elm
+    panelViewEl
       .querySelectorAll('.collapse-view')
       .forEach((collapseView) => new CollapseView(collapseView));
     // references
-    const condition = getSimpleSearchCondition(this.kind);
+    const condition = getSimpleSearchCondition(this.panelId);
     this._inputsValues = {};
-    this.elm
+    this.panelViewEl
       .querySelectorAll('.content > .checklist-values input')
       .forEach((input) => {
         this._inputsValues[input.value] = {
@@ -54,22 +54,22 @@ export default class PanelViewFilterConsequence extends PanelView {
   /*
   // 検索条件マスター
   searchConditionsMaster(master) {
-    const conditionMaster = master.find(condition => condition.id === this.kind).items;
+    const conditionMaster = master.find(condition => condition.id === this.panelId).items;
     const grouping = master.find(condition => condition.id === 'consequence_grouping').items;
     console.log(grouping)
     // GUIの生成
     this._createGUI(conditionMaster, grouping);
     // accordion
-    this.elm.querySelectorAll('.-haschildren > .accordionbutton').forEach(elm => {
-      elm.addEventListener('click', () => {
-        elm.parentNode.classList.toggle('-collapsed');
+    this.panelViewEl.querySelectorAll('.-haschildren > .accordionbutton').forEach(panelViewEl => {
+      panelViewEl.addEventListener('click', () => {
+        panelViewEl.parentNode.classList.toggle('-collapsed');
       })
     });
     // references
-    const condition = storeManager.getSimpleSearchCondition(this.kind);
+    const condition = storeManager.getSimpleSearchCondition(this.panelId);
     console.log(condition)
     this._inputsValues = {};
-    this.elm.querySelectorAll('.content > .checklist-values input').forEach(input => {
+    this.panelViewEl.querySelectorAll('.content > .checklist-values input').forEach(input => {
       this._inputsValues[input.value] = {
         input: input,
         value: input.parentNode.nextElementSibling
@@ -96,11 +96,11 @@ export default class PanelViewFilterConsequence extends PanelView {
     html += grouping
       .map((group) => this.render(conditionMaster, group))
       .join('');
-    this.elm
+    this.panelViewEl
       .querySelector('.content > .checklist-values')
       .insertAdjacentHTML('beforeend', html);
     // transcript variant は開く
-    this.elm
+    this.panelViewEl
       .querySelector('.content > .checklist-values > .item:nth-child(3)')
       .classList.remove('-collapsed');
   }
