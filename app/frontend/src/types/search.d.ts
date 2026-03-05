@@ -55,47 +55,6 @@ export interface ItemItemClass {
 }
 
 // ============================================
-// Specialized Master Condition Types
-// ============================================
-
-/**
- * Master configuration for frequency condition.
- * Represents the structure from search_conditions.json for frequency filtering.
- */
-export interface FrequencyMasterCondition {
-  id: 'frequency';
-  label: 'Alternative allele frequency';
-  type: 'array';
-  items: [
-    {
-      id: 'from';
-      label: 'From';
-      type: 'range';
-      default: number;
-    },
-    {
-      id: 'to';
-      label: 'To';
-      type: 'range';
-      default: number;
-    },
-    {
-      id: 'invert';
-      label: 'Invert';
-      type: 'boolean';
-      default: string; // "0" or "1"
-    },
-    {
-      id: 'match';
-      label: 'Match';
-      type: 'enumeration';
-      default: 'any' | 'all';
-      values: ['all', 'any'];
-    }
-  ];
-}
-
-// ============================================
 // Search Conditions & Form State Types
 // ============================================
 
