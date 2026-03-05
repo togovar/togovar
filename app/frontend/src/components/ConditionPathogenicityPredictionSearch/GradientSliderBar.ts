@@ -101,9 +101,10 @@ export class GradientSliderBar extends LitElement {
     );
 
     // Apply gradient to the slider container (fixed position, not the moving bar)
+    // When no gradient, use the active color so the selected range is visible
     if (gradientImage === 'none') {
       this._sliderElement.style.backgroundImage = 'none';
-      this._sliderElement.style.backgroundColor = '#ddd';
+      this._sliderElement.style.backgroundColor = '#117f93';
     } else {
       this._sliderElement.style.backgroundImage = gradientImage;
       this._sliderElement.style.backgroundColor = '';
