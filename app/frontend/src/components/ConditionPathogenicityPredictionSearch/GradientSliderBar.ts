@@ -79,10 +79,10 @@ export class GradientSliderBar extends LitElement {
     if (!this._barElement) return;
 
     if (!this.invert) {
-      // Normal mode: single bar showing selected range
+      // Normal mode: gray mask bars on the left and right, highlighting the selected range in the center
       this._setNormalBarMode();
     } else {
-      // Invert mode: two bars showing ranges outside selection
+      // Invert mode: mask over the selected range, highlighting the ranges outside the selection
       this._setInvertBarMode();
     }
 
