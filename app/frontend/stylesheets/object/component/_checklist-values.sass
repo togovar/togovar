@@ -11,6 +11,22 @@
     list-style-type: none
     clear: both
     position: relative
+  > .item.-total
+    margin-top: -6px
+    padding: 5px $PADDING_PANEL_VIEW
+    background-color: #E7F1F3
+    display: flex
+    justify-content: space-between
+    align-items: center
+    > .label
+      font-weight: bold
+      margin-bottom: 0
+    > .value
+      display: block
+      padding-left: 1em
+      float: right
+      line-height: 18px
+      font-weight: bold
   > .item
     padding: 2px $PADDING_PANEL_VIEW
     display: flex
@@ -48,10 +64,12 @@
   > .separator
     height: 0
     line-height: 0
-    padding: 2px 0
+    padding: 3px 0
     > hr
       margin: 0
       border: none
       border-top: solid 1px $COLOR_SEPARATOR_SUB
     + .item
       margin-top: 4px
+  > .item.-total + .separator
+    padding: 0

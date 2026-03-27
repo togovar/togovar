@@ -79,6 +79,8 @@ const UNASSIGNED_VALUE: Partial<Record<CheckListKind, string>> = {
 export default class PanelViewCheckList extends PanelView {
   /** key: チェックボックスの value 属性 → { input要素, 件数span } */
   private _inputsValues: Record<string, InputValueEntry> = {};
+  /** Total 行の件数表示 span */
+  private _totalValueElm: Element | null = null;
 
   /**
    * @param elm - パネルのルート要素
@@ -119,6 +121,9 @@ export default class PanelViewCheckList extends PanelView {
       this.kind as MasterConditionId
     ) as Record<string, string> | undefined;
 
+    const hasActiveFilter =
+      condition !== undefined && Object.keys(condition).length > 0;
+
     this.elm
       .querySelectorAll<HTMLInputElement>(
         '.content > .checklist-values > .item > .label > input'
@@ -128,11 +133,17 @@ export default class PanelViewCheckList extends PanelView {
           input,
           value: (input.parentNode as Element).nextElementSibling as Element,
         };
-        // URL パラメータに値があればチェック状態を復元
-        if (condition?.[input.value]) {
-          input.checked = condition[input.value] === '1';
+        if (hasActiveFilter) {
+          // フィルター有効時: '0' = 未チェック、conditionにないアイテムはチェック済み
+          input.checked = condition![input.value] !== '0';
         }
+        // condition が undefined または空 → チェックなし（フィルターなし）
       });
+
+    // Total 行の件数 span への参照を取得
+    this._totalValueElm =
+      this.elm.querySelector('.checklist-values > .item.-total > .value') ??
+      null;
   }
 
   /** 各チェックボックスに change イベントを登録する */
@@ -140,23 +151,29 @@ export default class PanelViewCheckList extends PanelView {
     for (const entry of Object.values(this._inputsValues)) {
       entry.input.addEventListener('change', this._changeFilter.bind(this));
     }
+
+    // Clear ボタン: 全チェックを外してフィルターリセット
+    const clearBtn = this.elm.querySelector<HTMLButtonElement>('.clear-button');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // パネル開閉を発火させない
+        for (const entry of Object.values(this._inputsValues)) {
+          entry.input.checked = false;
+        }
+        this._changeFilter();
+      });
+    }
   }
 
   /**
    * ストアの変更購読を登録する。
    * statisticsType が指定されている場合は統計情報の更新も購読する。
-   *
-   * storeManager.bind(key, observer) は、ストアの key が更新されると
-   * observer[key](newValue) を呼び出す仕組みのため、
-   * statisticsType と同名のメソッドを動的に登録する必要がある。
    */
   private _bindStore(statisticsType?: StatisticsType): void {
     storeManager.bind('simpleSearchConditions', this);
 
     if (statisticsType) {
       storeManager.bind(statisticsType, this);
-      // storeManager が observer[statisticsType](values) を呼べるよう、
-      // インスタンスに同名のメソッドを動的に設定する
       (this as Record<string, unknown>)[statisticsType] =
         this._updateStatistics.bind(this);
     }
@@ -170,7 +187,7 @@ export default class PanelViewCheckList extends PanelView {
   private _createGUI(conditionMaster: MasterConditions): void {
     const unassignedValue = UNASSIGNED_VALUE[this.kind as CheckListKind];
 
-    let html = this._buildAllItemHtml();
+    let html = this._buildTotalRowHtml();
 
     // significance / alphamissense / sift / polyphen は
     // マスターデータとは別に "Unassigned" チェックボックスを先頭に追加する
@@ -194,14 +211,11 @@ export default class PanelViewCheckList extends PanelView {
     }
   }
 
-  /** "All" チェックボックスの HTML を返す */
-  private _buildAllItemHtml(): string {
+  /** "Total" 表示行の HTML を返す（チェックボックスなし） */
+  private _buildTotalRowHtml(): string {
     return `
-    <li class="item">
-      <label class="label">
-        <input type="checkbox" value="all">
-        All
-      </label>
+    <li class="item -total">
+      <span class="label">Total</span>
       <span class="value"></span>
     </li>
     <li class="separator"><hr></li>
@@ -259,29 +273,13 @@ export default class PanelViewCheckList extends PanelView {
   // ----------------------------------------
 
   /** チェックボックスが変更されたときにフィルター状態を更新する */
-  private _changeFilter(e?: Event): void {
-    if (e && (e.target as HTMLInputElement).value === 'all') {
-      const isChecked = (e.target as HTMLInputElement).checked;
-      for (const entry of Object.values(this._inputsValues)) {
-        entry.input.checked = isChecked;
-      }
-    } else {
-      const allChecked = Object.entries(this._inputsValues)
-        .filter(([key]) => key !== 'all')
-        .every(([, entry]) => entry.input.checked);
-      this._inputsValues.all.input.checked = allChecked;
-    }
+  private _changeFilter(_e?: Event): void {
+    const entries = Object.entries(this._inputsValues);
 
-    const entries = Object.entries(this._inputsValues).filter(
-      ([key]) => key !== 'all'
-    );
-
-    // ↓ ここが修正ポイント
     const anyChecked = entries.some(([, entry]) => entry.input.checked);
     const checked: Record<string, string> = {};
 
     if (anyChecked) {
-      // 1つでもチェックがあれば、チェックなしのものだけ =0 で送る（既存の動作）
       for (const [key, entry] of entries) {
         checked[key] = entry.input.checked ? '1' : '0';
       }
@@ -296,47 +294,45 @@ export default class PanelViewCheckList extends PanelView {
 
   /**
    * ストアの simpleSearchConditions が更新されたときに UI に反映する。
-   * storeManager.bind によって自動的に呼び出される。
    */
   simpleSearchConditions(
     conditions: Record<string, Record<string, string>>
   ): void {
     const kindConditions = conditions[this.kind] ?? {};
-    let uncheckedCount = 0;
+
+    if (Object.keys(kindConditions).length === 0) {
+      for (const entry of Object.values(this._inputsValues)) {
+        entry.input.checked = false;
+      }
+      return;
+    }
 
     for (const [key, value] of Object.entries(kindConditions)) {
       if (!this._inputsValues[key]) continue;
-      const isChecked = value !== '0';
-      this._inputsValues[key].input.checked = isChecked;
-      if (!isChecked) uncheckedCount++;
+      this._inputsValues[key].input.checked = value !== '0';
     }
-
-    this._inputsValues.all.input.checked = uncheckedCount === 0;
   }
 
   /**
    * 統計情報が更新されたときに件数表示を更新する。
-   * storeManager.bind によって statisticsType の名前で自動的に呼び出される。
    */
   private _updateStatistics(values: Record<string, number> | null): void {
     if (values) {
-      let total = 0;
       for (const [key, entry] of Object.entries(this._inputsValues)) {
         const count = values[key] ?? 0;
-        total += count;
         entry.value.textContent = count.toLocaleString();
       }
-      this._inputsValues.all.value.textContent = total.toLocaleString();
     } else {
-      // 統計情報が未取得の場合は N/A を表示
       for (const entry of Object.values(this._inputsValues)) {
         entry.value.textContent = 'N/A';
       }
     }
 
-    // "All" の件数は検索ステータスの filtered 件数で上書きする
-    this._inputsValues.all.value.textContent = storeManager
-      .getData('searchStatus')
-      .filtered.toLocaleString();
+    // Total 行の件数は searchStatus の filtered 件数で表示する
+    if (this._totalValueElm) {
+      this._totalValueElm.textContent = storeManager
+        .getData('searchStatus')
+        .filtered.toLocaleString();
+    }
   }
 }
