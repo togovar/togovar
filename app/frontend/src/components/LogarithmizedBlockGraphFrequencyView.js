@@ -144,18 +144,17 @@ export class LogarithmizedBlockGraphFrequencyView extends LitElement {
       background-color: var(--color-singleton);
     }
     :host([data-alternate-allele-count]) > .blocks::before {
-      content: 'H';
+      content: '';
       position: absolute;
-      top: -24px;
-      right: -5px;
+      top: -22px;
+      right: -4px;
+      width: 8px;
+      height: 8px;
       background-color: var(--color-homozygote);
-      color: white;
-      font-size: 8px;
-      font-weight: bold;
-      width: 9px;
-      height: 9px;
-      text-align: center;
-      line-height: 9px;
+      border-radius: 2px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cline x1='5' y1='0' x2='1' y2='9' stroke='white' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-size: 10px 10px;
       z-index: 10;
     }
   `;
