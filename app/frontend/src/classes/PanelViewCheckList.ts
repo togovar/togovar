@@ -97,7 +97,9 @@ export default class PanelViewCheckList extends PanelView {
       .find((c: MasterConditions) => c.id === this.kind);
 
     if (!conditionMaster) {
-      throw new Error(`[PanelViewCheckList] conditionMaster not found for kind: ${this.kind}`);
+      throw new Error(
+        `[PanelViewCheckList] conditionMaster not found for kind: ${this.kind}`
+      );
     }
 
     this._createGUI(conditionMaster);
@@ -197,7 +199,7 @@ export default class PanelViewCheckList extends PanelView {
     return `
     <li class="item">
       <label class="label">
-        <input type="checkbox" value="all" checked>
+        <input type="checkbox" value="all">
         All
       </label>
       <span class="value"></span>
@@ -211,7 +213,7 @@ export default class PanelViewCheckList extends PanelView {
     return `
     <li class="item">
       <label class="label">
-        <input type="checkbox" value="${value}" checked>
+        <input type="checkbox" value="${value}">
         Unassigned
       </label>
       <span class="value"></span>
@@ -225,7 +227,7 @@ export default class PanelViewCheckList extends PanelView {
     return `
     <li class="item">
       <label class="label">
-        <input type="checkbox" value="${id}" checked>
+        <input type="checkbox" value="${id}">
         ${this._buildKindSpecificHtml(id)}
         ${label}
       </label>
@@ -259,27 +261,33 @@ export default class PanelViewCheckList extends PanelView {
   /** チェックボックスが変更されたときにフィルター状態を更新する */
   private _changeFilter(e?: Event): void {
     if (e && (e.target as HTMLInputElement).value === 'all') {
-      // "All" を操作した場合: 全チェックボックスを一括で選択 / 解除する
       const isChecked = (e.target as HTMLInputElement).checked;
       for (const entry of Object.values(this._inputsValues)) {
         entry.input.checked = isChecked;
       }
     } else {
-      // 個別チェックボックスを操作した場合:
-      // すべてチェックされていれば "All" もチェックする
       const allChecked = Object.entries(this._inputsValues)
         .filter(([key]) => key !== 'all')
         .every(([, entry]) => entry.input.checked);
       this._inputsValues.all.input.checked = allChecked;
     }
 
-    // チェック状態を '1' / '0' に変換してストアに反映する
+    const entries = Object.entries(this._inputsValues).filter(
+      ([key]) => key !== 'all'
+    );
+
+    // ↓ ここが修正ポイント
+    const anyChecked = entries.some(([, entry]) => entry.input.checked);
     const checked: Record<string, string> = {};
-    for (const [key, entry] of Object.entries(this._inputsValues)) {
-      if (key !== 'all') {
+
+    if (anyChecked) {
+      // 1つでもチェックがあれば、チェックなしのものだけ =0 で送る（既存の動作）
+      for (const [key, entry] of entries) {
         checked[key] = entry.input.checked ? '1' : '0';
       }
     }
+    // 全チェックなしの場合は checked が空 → パラメータなし → フィルターなし（全件表示）
+
     setSimpleSearchCondition(
       this.kind as CheckListKind,
       checked as SimpleSearchCurrentConditions[CheckListKind]
@@ -310,9 +318,7 @@ export default class PanelViewCheckList extends PanelView {
    * 統計情報が更新されたときに件数表示を更新する。
    * storeManager.bind によって statisticsType の名前で自動的に呼び出される。
    */
-  private _updateStatistics(
-    values: Record<string, number> | null
-  ): void {
+  private _updateStatistics(values: Record<string, number> | null): void {
     if (values) {
       let total = 0;
       for (const [key, entry] of Object.entries(this._inputsValues)) {
