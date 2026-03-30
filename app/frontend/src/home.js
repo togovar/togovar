@@ -13,10 +13,10 @@ import SimpleSearchView from './components/SearchField/SimpleSearch/SimpleSearch
 import { AdvancedSearchBuilderView } from '../src/classes/AdvancedSearchBuilderView.ts';
 // PanelViews
 // PanelViews: Filters
-import PanelViewCheckList from '../src/classes/PanelViewCheckList.js';
+import PanelViewCheckList from '../src/classes/PanelViewCheckList.ts';
 import PanelViewFilterAlternativeAlleleFrequency from '../src/classes/PanelViewFilterAlternativeAlleleFrequency.js';
 import PanelViewFilterVariantCallingQuality from '../src/classes/PanelViewFilterVariantCallingQuality.js';
-import PanelViewFilterConsequence from '../src/classes/PanelViewFilterConsequence.js';
+import PanelViewFilterConsequence from '../src/classes/PanelViewFilterConsequence.ts';
 // PanelViews: Variant preview
 import PanelViewPreviewGene from '../src/classes/PanelViewPreviewGene.js';
 import PreviewToVariantReport from '../src/classes/PreviewToVariantReport.js';

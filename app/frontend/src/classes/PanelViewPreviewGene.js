@@ -1,4 +1,4 @@
-import PanelView from './PanelView.js';
+import PanelView from './PanelView.ts';
 import { storeManager } from '../store/StoreManager';
 
 export default class PanelViewPreviewGene extends PanelView {
@@ -32,8 +32,8 @@ export default class PanelViewPreviewGene extends PanelView {
                   <a href="gene/${
                     symbol.id
                   }" target="_blank" class="hyper-text -internal">${
-            symbol.name
-          }</a>
+                    symbol.name
+                  }</a>
                 </td>
               </tr>
               ${

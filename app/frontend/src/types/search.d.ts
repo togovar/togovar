@@ -70,6 +70,7 @@ export type SimpleSearchCurrentConditions = {
   };
   quality?: string;
   type?: Record<string, string>; // { "SO_0001483": "1", ... }
+  consequence?: Record<string, string>; // { "SO_0001580": "1", ... }
   significance?: Record<string, string>; // { "NC": "1", ... }
   alphamissense?: Record<string, string>; // { "N": "1", "LP": "1", ... }
   sift?: Record<string, string>; // { "N": "1", "D": "1", ... }
