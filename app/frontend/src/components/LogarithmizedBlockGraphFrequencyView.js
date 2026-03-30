@@ -1,4 +1,5 @@
-import { LitElement, css, html } from 'lit';
+import { LitElement, css, html, unsafeCSS } from 'lit';
+import checkmarkSvgUrl from '../assets/icons/checkmark.svg';
 
 const VERTICAL_BLOCK_WIDTH = 5;
 const VERTICAL_BLOCK_HEIGHT = 2;
@@ -144,18 +145,17 @@ export class LogarithmizedBlockGraphFrequencyView extends LitElement {
       background-color: var(--color-singleton);
     }
     :host([data-alternate-allele-count]) > .blocks::before {
-      content: 'H';
+      content: '';
       position: absolute;
-      top: -24px;
-      right: -5px;
+      top: -22px;
+      right: -4px;
+      width: 8px;
+      height: 8px;
       background-color: var(--color-homozygote);
-      color: white;
-      font-size: 8px;
-      font-weight: bold;
-      width: 9px;
-      height: 9px;
-      text-align: center;
-      line-height: 9px;
+      border-radius: 2px;
+      background-image: url(${unsafeCSS(checkmarkSvgUrl)});
+      background-repeat: no-repeat;
+      background-size: 10px 10px;
       z-index: 10;
     }
   `;
