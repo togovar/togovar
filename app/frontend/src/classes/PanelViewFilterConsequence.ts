@@ -242,16 +242,15 @@ export default class PanelViewFilterConsequence extends PanelView {
     const kindConditions = conditions[KIND_OF_CONDITION] ?? {};
 
     if (Object.keys(kindConditions).length === 0) {
+      // デフォルト or Clear → 全チェックなし
       for (const entry of Object.values(this._inputsValues)) {
         entry.input.checked = false;
       }
-      this._updateNestedCheckboxes();
-      return;
-    }
-
-    for (const [key, value] of Object.entries(kindConditions)) {
-      if (this._inputsValues[key]) {
-        this._inputsValues[key].input.checked = value !== '0';
+    } else {
+      // URLに存在しないキー = チェックあり（除外指定されていない）
+      // URLに =0 があるキー = チェックなし
+      for (const [key, entry] of Object.entries(this._inputsValues)) {
+        entry.input.checked = kindConditions[key] !== '0';
       }
     }
     this._updateNestedCheckboxes();
