@@ -1,4 +1,5 @@
-import { LitElement, css, html } from 'lit';
+import { LitElement, css, html, unsafeCSS } from 'lit';
+import checkmarkSvgUrl from '../assets/icons/checkmark.svg';
 
 const VERTICAL_BLOCK_WIDTH = 5;
 const VERTICAL_BLOCK_HEIGHT = 2;
@@ -152,7 +153,7 @@ export class LogarithmizedBlockGraphFrequencyView extends LitElement {
       height: 8px;
       background-color: var(--color-homozygote);
       border-radius: 2px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cline x1='5' y1='0' x2='1' y2='9' stroke='white' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-image: url(${unsafeCSS(checkmarkSvgUrl)});
       background-repeat: no-repeat;
       background-size: 10px 10px;
       z-index: 10;
