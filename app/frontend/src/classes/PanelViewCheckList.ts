@@ -79,9 +79,6 @@ const UNASSIGNED_VALUE: Partial<Record<CheckListKind, string>> = {
 export default class PanelViewCheckList extends PanelView {
   /** key: チェックボックスの value 属性 → { input要素, 件数span } */
   private _inputsValues: Record<string, InputValueEntry> = {};
-  /** Total 行の件数表示 span */
-  private _totalValueElm: Element | null = null;
-
   /**
    * @param elm - パネルのルート要素
    * @param kind - パネル種別ID (dataset | type | significance | sift | polyphen | alphamissense)
@@ -139,11 +136,6 @@ export default class PanelViewCheckList extends PanelView {
         }
         // condition が undefined または空 → チェックなし（フィルターなし）
       });
-
-    // Total 行の件数 span への参照を取得
-    this._totalValueElm =
-      this.elm.querySelector('.checklist-values > .item.-total > .value') ??
-      null;
   }
 
   /** 各チェックボックスに change イベントを登録する */
@@ -187,7 +179,7 @@ export default class PanelViewCheckList extends PanelView {
   private _createGUI(conditionMaster: MasterConditions): void {
     const unassignedValue = UNASSIGNED_VALUE[this.kind as CheckListKind];
 
-    let html = this._buildTotalRowHtml();
+    let html = '';
 
     // significance / alphamissense / sift / polyphen は
     // マスターデータとは別に "Unassigned" チェックボックスを先頭に追加する
@@ -206,20 +198,9 @@ export default class PanelViewCheckList extends PanelView {
     // マスターデータにも Unassigned 相当のアイテムが含まれているため、重複を削除する
     if (unassignedValue) {
       this.elm
-        .querySelector('.content > .checklist-values > .item:nth-child(5)')!
+        .querySelector('.content > .checklist-values > .item:nth-child(3)')!
         .remove();
     }
-  }
-
-  /** "Total" 表示行の HTML を返す（チェックボックスなし） */
-  private _buildTotalRowHtml(): string {
-    return `
-    <li class="item -total">
-      <span class="label">Total</span>
-      <span class="value"></span>
-    </li>
-    <li class="separator"><hr></li>
-    `;
   }
 
   /** "Unassigned" チェックボックスの HTML を返す */
@@ -326,13 +307,6 @@ export default class PanelViewCheckList extends PanelView {
       for (const entry of Object.values(this._inputsValues)) {
         entry.value.textContent = 'N/A';
       }
-    }
-
-    // Total 行の件数は searchStatus の filtered 件数で表示する
-    if (this._totalValueElm) {
-      this._totalValueElm.textContent = storeManager
-        .getData('searchStatus')
-        .filtered.toLocaleString();
     }
   }
 }

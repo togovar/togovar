@@ -39,15 +39,13 @@ const KIND_OF_CONDITION = 'consequence' as const;
  */
 export default class PanelViewFilterConsequence extends PanelView {
   private _inputsValues: Record<string, InputValueEntry> = {};
-  private _totalValueElm: Element | null = null;
 
   constructor(elm: Element) {
     super(elm, 'consequence');
 
-    const conditionMaster = getSimpleSearchConditionMaster(this.kind);
-    const grouping = getSimpleSearchConditionMaster('consequence_grouping').items as Array<
-      ItemItemClass | string
-    >;
+    const conditionMaster = getSimpleSearchConditionMaster('consequence');
+    const grouping = getSimpleSearchConditionMaster('consequence_grouping')
+      .items as Array<ItemItemClass | string>;
 
     // GUI 生成
     this._createGUI(conditionMaster, grouping);
@@ -58,9 +56,9 @@ export default class PanelViewFilterConsequence extends PanelView {
       .forEach((collapseView) => new CollapseView(collapseView));
 
     // input 要素への参照を収集
-    const condition = getSimpleSearchCondition(
-      KIND_OF_CONDITION
-    ) as Record<string, string> | undefined;
+    const condition = getSimpleSearchCondition(KIND_OF_CONDITION) as
+      | Record<string, string>
+      | undefined;
 
     const hasActiveFilter =
       condition !== undefined && Object.keys(condition).length > 0;
@@ -71,7 +69,7 @@ export default class PanelViewFilterConsequence extends PanelView {
       .forEach((input) => {
         this._inputsValues[input.value] = {
           input,
-          value: input.parentNode!.nextElementSibling as Element,
+          value: (input.parentNode as Element).nextElementSibling as Element,
         };
         if (hasActiveFilter) {
           // フィルター有効時: '0' = 未チェック、conditionにないアイテムはチェック済み
@@ -79,9 +77,6 @@ export default class PanelViewFilterConsequence extends PanelView {
         }
         // condition が undefined または空 → チェックなし（フィルターなし）
       });
-
-    this._totalValueElm =
-      elm.querySelector('.checklist-values > .item.-total > .value') ?? null;
 
     // 入れ子グループの子キーを収集
     this._collectGroupValues(grouping);
@@ -119,21 +114,16 @@ export default class PanelViewFilterConsequence extends PanelView {
     conditionMaster: MasterConditions,
     grouping: Array<ItemItemClass | string>
   ): void {
-    let html = `
-      <li class="item -total">
-        <span class="label">Total</span>
-        <span class="value"></span>
-      </li>
-      <li class="separator"><hr></li>
-    `;
-    html += grouping.map((group) => this._render(conditionMaster, group)).join('');
+    const html = grouping
+      .map((group) => this._render(conditionMaster, group))
+      .join('');
     this.elm
       .querySelector('.content > .checklist-values')!
       .insertAdjacentHTML('beforeend', html);
 
     // transcript variant グループは開いた状態にする
     this.elm
-      .querySelector('.content > .checklist-values > .item:nth-child(3)')!
+      .querySelector('.content > .checklist-values > .item:nth-child(1)')!
       .classList.remove('-collapsed');
   }
 
@@ -172,13 +162,13 @@ export default class PanelViewFilterConsequence extends PanelView {
   // 入れ子グループのリーフキー収集
   // ----------------------------------------
 
-  private _collectGroupValues(
-    items: Array<ItemItemClass | string>
-  ): string[] {
+  private _collectGroupValues(items: Array<ItemItemClass | string>): string[] {
     const leafKeys: string[] = [];
     for (const item of items) {
       if (typeof item === 'object') {
-        const childLeaves = this._collectGroupValues(item.items as Array<ItemItemClass | string>);
+        const childLeaves = this._collectGroupValues(
+          item.items as Array<ItemItemClass | string>
+        );
         const groupKey = (item as unknown as { label: string }).label;
         if (this._inputsValues[groupKey]) {
           this._inputsValues[groupKey].values = childLeaves;
@@ -281,12 +271,6 @@ export default class PanelViewFilterConsequence extends PanelView {
           entry.value.textContent = '0';
         }
       }
-    }
-
-    if (this._totalValueElm) {
-      this._totalValueElm.textContent = storeManager
-        .getData('searchStatus')
-        .filtered.toLocaleString();
     }
   }
 }
