@@ -165,9 +165,9 @@ export default class PanelViewCheckList extends PanelView {
     storeManager.bind('simpleSearchConditions', this);
 
     if (statisticsType) {
-      storeManager.bind(statisticsType, this);
       (this as Record<string, unknown>)[statisticsType] =
         this._updateStatistics.bind(this);
+      storeManager.bind(statisticsType, this);
     }
   }
 
