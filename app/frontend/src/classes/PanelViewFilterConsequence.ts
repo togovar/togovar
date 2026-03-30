@@ -193,6 +193,7 @@ export default class PanelViewFilterConsequence extends PanelView {
       for (const leafKey of this._inputsValues[target.value].values ?? []) {
         this._inputsValues[leafKey].input.checked = target.checked;
       }
+      this._updateNestedCheckboxes();
     } else if (e) {
       this._updateNestedCheckboxes();
     }
