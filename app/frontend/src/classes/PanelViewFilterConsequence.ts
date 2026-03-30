@@ -123,7 +123,7 @@ export default class PanelViewFilterConsequence extends PanelView {
 
     // transcript variant グループは開いた状態にする
     this.elm
-      .querySelector('.content > .checklist-values > .item:nth-child(1)')!
+      .querySelector('.content > .checklist-values > .item[data-group="Transcript variant"]')!
       .classList.remove('-collapsed');
   }
 
@@ -140,7 +140,7 @@ export default class PanelViewFilterConsequence extends PanelView {
     const value = resolved.id ? resolved.id : resolved.label;
 
     return `
-      <li class="item${hasChildren ? ' collapse-view -hierarchic -collapsed' : ''}">
+      <li class="item${hasChildren ? ' collapse-view -hierarchic -collapsed' : ''}"${hasChildren ? ` data-group="${resolved.label}"` : ''}>
         ${hasChildren ? '<div class="collapsebutton"></div>' : ''}
         <label class="label">
           <input type="checkbox" value="${value}" data-has-children="${childItems ? 'true' : 'false'}">

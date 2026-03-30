@@ -187,20 +187,18 @@ export default class PanelViewCheckList extends PanelView {
       html += this._buildUnassignedItemHtml(unassignedValue);
     }
 
-    html += (conditionMaster.items ?? [])
+    const masterItems = conditionMaster.items ?? [];
+    const filteredItems = unassignedValue
+      ? masterItems.filter((item) => item.id !== unassignedValue)
+      : masterItems;
+
+    html += filteredItems
       .map((item) => this._buildMasterItemHtml(item.id!, item.label))
       .join('');
 
     this.elm
       .querySelector('.content > .checklist-values')!
       .insertAdjacentHTML('beforeend', html);
-
-    // マスターデータにも Unassigned 相当のアイテムが含まれているため、重複を削除する
-    if (unassignedValue) {
-      this.elm
-        .querySelector('.content > .checklist-values > .item:nth-child(3)')!
-        .remove();
-    }
   }
 
   /** "Unassigned" チェックボックスの HTML を返す */
