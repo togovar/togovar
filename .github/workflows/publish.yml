@@ -5,6 +5,9 @@ on:
     branches:
       - staging
 
+env:
+  NGROK_SKIP_BINARY_DOWNLOAD: 'true'
+
 jobs:
   deploy_grch38:
     runs-on: ubuntu-latest
@@ -22,8 +25,6 @@ jobs:
           node-version: '18'
 
       - run: npm ci
-        env:
-          NGROK_SKIP_BINARY_DOWNLOAD: 'true'
 
       - run: npm run build
         env:
@@ -59,8 +60,6 @@ jobs:
           node-version: '18'
 
       - run: npm ci
-        env:
-          NGROK_SKIP_BINARY_DOWNLOAD: 'true'
 
       - run: npm run build
         env:
