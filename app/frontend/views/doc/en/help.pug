@@ -166,7 +166,23 @@ block content
             h4.question Are the data linked with information about gene expression and proteins?
             .answer
               p
-                | Not yet but planned.
+                | TogoVar integrates publicly available information on human genomic variants, primarily for the Japanese population.
+                | We also provide protein-centered views, including mapping variant positions onto 3D structures from
+                a.hyper-text.-external(target='_blank', href='https://pdbj.org/?lang=en') PDBj
+                | /
+                a.hyper-text.-external(target='_blank', href='https://alphafold.ebi.ac.uk/') AlphaFold
+                | (e.g.
+                a.hyper-text.-external(target='_blank', href='https://grch38.togovar.org/gene/1097#protein-structure') BRAF gene
+                | ) and a Protein Browser that aligns variants with key annotations along the amino acid sequence, such as phosphorylation sites (
+                a.hyper-text.-external(target='_blank', href='https://jpostdb.org/') jPOST
+                | ), glycosylation sites (
+                a.hyper-text.-external(target='_blank', href='https://glycosmos.org/') GlyCosmos
+                | ), and disease-associated variants (
+                a.hyper-text.-external(target='_blank', href='https://www.uniprot.org/') UniProt
+                | ) (e.g.
+                a.hyper-text.-external(target='_blank', href='https://grch38.togovar.org/gene/1101#protein-browser') BRCA2 gene
+                | ).
+                | Because TogoVar is built on RDF, it can be readily extended to link with gene expression and other RDF-based resources, and we plan to expand these links step by step.
           #d3.question-answer
             h4.question What software is used for detecting variants and how you manage the quality?
             .answer
