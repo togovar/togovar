@@ -1,9 +1,3 @@
-/*!
- * Axios Cache Interceptor 1.8.3
- * (c) 2021-present Arthur Fiorette & Contributors
- * Released under the MIT License.
- */
-
 /**
  * @license
  * Copyright 2017 Google LLC
