@@ -5,6 +5,9 @@ on:
     branches:
       - staging
 
+env:
+  NGROK_SKIP_BINARY_DOWNLOAD: 'true'
+
 jobs:
   deploy_grch38:
     runs-on: ubuntu-latest
