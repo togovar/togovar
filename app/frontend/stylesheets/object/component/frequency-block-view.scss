@@ -4,7 +4,7 @@ $vertical-block-height: 2px;
 $block-count: 6;
 
 // 各頻度ラベルに対して表示するブロック数のマップ
-// キー: data-logarithmized-frequency 属性値、値: 表示するブロック数
+// キー: data-log-frequency 属性値、値: 表示するブロック数
 $frequency-block-counts: (
   '<0.0001': 1,
   '<0.001': 2,
@@ -85,7 +85,7 @@ $frequency-block-counts: (
 // 例: '<0.01' → ブロック1〜3を表示
 @each $freq, $visible-count in $frequency-block-counts {
   @for $i from 1 through $visible-count {
-    :host([data-logarithmized-frequency='#{$freq}'])
+    :host([data-log-frequency='#{$freq}'])
       > .blocks
       > .block:nth-child(#{$i}) {
       display: block;
@@ -94,7 +94,7 @@ $frequency-block-counts: (
 }
 
 // データなし（na）はグレーで表示
-:host([data-logarithmized-frequency='na']) {
+:host([data-log-frequency='na']) {
   border-color: #d4d3d1;
   background-color: #f4f4f4;
 }

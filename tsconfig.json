@@ -2,11 +2,11 @@
   "compilerOptions": {
     "allowJs": true,
     "target": "es2020",
-    "module": "nodenext",
+    "module": "esnext",
     "sourceMap": true,
     "rootDir": "./app/frontend",
     "outDir": "./dist",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "useDefineForClassFields": false,

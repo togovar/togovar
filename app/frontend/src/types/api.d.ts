@@ -160,7 +160,7 @@ export type Frequency = {
 };
 
 export type TdFrequencies = Record<string, FrequencyElement>;
-export type FrequencyElement = LogarithmizedBlockGraphFrequencyElement;
+export type FrequencyElement = FrequencyBlockElement;
 
 // ============================================
 // Results Display & Processing Types

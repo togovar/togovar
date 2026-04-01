@@ -5,10 +5,10 @@ import type { Frequency } from './api';
 declare global {
   interface HTMLElementTagNameMap {
     'condition-item-value-view': ConditionItemValueView;
-    'logarithmized-block-graph-frequency-view': LogarithmizedBlockGraphFrequencyElement;
+    'frequency-block-view': FrequencyBlockElement;
     'range-slider': RangeSliderElement;
   }
-  interface LogarithmizedBlockGraphFrequencyElement extends HTMLElement {
+  interface FrequencyBlockElement extends HTMLElement {
     frequency?: Frequency;
   }
   interface RangeSliderElement extends HTMLElement {

@@ -6,10 +6,10 @@ import {
 } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import type { Frequency } from '../types/api';
-import Styles from '../../stylesheets/object/component/logarithmized-block-graph-frequency-view.scss';
+import Styles from '../../stylesheets/object/component/frequency-block-view.scss';
 
 /** CSSが表示するブロック数を決定するためのカテゴリラベル */
-type LogarithmizedFrequencyLabel =
+type LogFrequencyLabel =
   | 'na' // データなし
   | 'monomorphic' // 頻度0（モノモルフィック）
   | '<0.0001' // ブロック1個
@@ -23,12 +23,12 @@ const BLOCK_COUNT = 6;
 
 /**
  * アレル頻度（af）を対数スケールのカテゴリラベルに変換する。
- * このラベルは `data-logarithmized-frequency` 属性にセットされ、
+ * このラベルは `data-log-frequency` 属性にセットされ、
  * SCSSのセレクタが何個のブロックを表示するかを制御する。
  */
-const getLogarithmizedFrequencyLabel = (
+const getLogFrequencyLabel = (
   frequency?: Frequency
-): LogarithmizedFrequencyLabel => {
+): LogFrequencyLabel => {
   if (!frequency) return 'na';
 
   const { af: alleleFrequency } = frequency;
@@ -45,8 +45,8 @@ const getLogarithmizedFrequencyLabel = (
   return 'monomorphic';
 };
 
-@customElement('logarithmized-block-graph-frequency-view')
-export class LogarithmizedBlockGraphFrequencyView extends LitElement {
+@customElement('frequency-block-view')
+export class FrequencyBlockView extends LitElement {
   static styles: CSSResultGroup = [Styles];
 
   /** アレルカウント（ac） */
@@ -95,8 +95,8 @@ export class LogarithmizedBlockGraphFrequencyView extends LitElement {
         : undefined
     );
     this._setDatasetValue(
-      'logarithmizedFrequency',
-      getLogarithmizedFrequencyLabel(frequency)
+      'logFrequency',
+      getLogFrequencyLabel(frequency)
     );
   }
 
