@@ -8,50 +8,40 @@ import { customElement } from 'lit/decorators.js';
 import type { Frequency } from '../types/api';
 import Styles from '../../stylesheets/object/component/logarithmized-block-graph-frequency-view.scss';
 
+/** CSSが表示するブロック数を決定するためのカテゴリラベル */
+type LogarithmizedFrequencyLabel =
+  | 'na' // データなし
+  | 'monomorphic' // 頻度0（モノモルフィック）
+  | '<0.0001' // ブロック1個
+  | '<0.001' // ブロック2個
+  | '<0.01' // ブロック3個
+  | '<0.05' // ブロック4個
+  | '<0.5' // ブロック5個
+  | '≥0.5'; // ブロック6個（最大）
+
 const BLOCK_COUNT = 6;
 
-type LogarithmizedFrequencyLabel =
-  | 'na'
-  | 'monomorphic'
-  | '<0.0001'
-  | '<0.001'
-  | '<0.01'
-  | '<0.05'
-  | '<0.5'
-  | '≥0.5';
-
 /**
- * Converts raw allele frequency into the categorical label consumed by CSS.
- * The rendered blocks are controlled entirely by this `data-*` attribute.
+ * アレル頻度（af）を対数スケールのカテゴリラベルに変換する。
+ * このラベルは `data-logarithmized-frequency` 属性にセットされ、
+ * SCSSのセレクタが何個のブロックを表示するかを制御する。
  */
 const getLogarithmizedFrequencyLabel = (
   frequency?: Frequency
 ): LogarithmizedFrequencyLabel => {
-  if (!frequency) {
-    return 'na';
-  }
+  if (!frequency) return 'na';
 
-  const alleleFrequency = frequency.af;
+  const { af: alleleFrequency } = frequency;
 
-  if (alleleFrequency !== undefined) {
-    switch (true) {
-      case alleleFrequency >= 0.5:
-        return '≥0.5';
-      case alleleFrequency > 0.05:
-        return '<0.5';
-      case alleleFrequency > 0.01:
-        return '<0.05';
-      case alleleFrequency > 0.001:
-        return '<0.01';
-      case alleleFrequency > 0.0001:
-        return '<0.001';
-      case alleleFrequency > 0:
-        return '<0.0001';
-      default:
-        return 'monomorphic';
-    }
-  }
+  // afがundefinedの場合はモノモルフィック扱い
+  if (alleleFrequency === undefined) return 'monomorphic';
 
+  if (alleleFrequency >= 0.5) return '≥0.5';
+  if (alleleFrequency > 0.05) return '<0.5';
+  if (alleleFrequency > 0.01) return '<0.05';
+  if (alleleFrequency > 0.001) return '<0.01';
+  if (alleleFrequency > 0.0001) return '<0.001';
+  if (alleleFrequency > 0) return '<0.0001';
   return 'monomorphic';
 };
 
@@ -59,9 +49,13 @@ const getLogarithmizedFrequencyLabel = (
 export class LogarithmizedBlockGraphFrequencyView extends LitElement {
   static styles: CSSResultGroup = [Styles];
 
+  /** アレルカウント（ac） */
   alleleCount?: number;
+  /** 総アレル数（an） */
   total?: number;
+  /** アレル頻度（af） */
   frequencyValue?: number;
+  /** 代替アレルカウント（aac）: ホモ接合マーカーの表示に使用 */
   alternateAlleleCount?: number;
 
   private _frequency?: Frequency;
@@ -81,8 +75,8 @@ export class LogarithmizedBlockGraphFrequencyView extends LitElement {
   }
 
   /**
-   * Mirrors frequency data into `data-*` attributes so the CSS selectors can
-   * decide how many blocks to show and whether to draw extra markers.
+   * 頻度データを `data-*` 属性に反映する。
+   * SCSSは属性値を見て、表示するブロック数やマーカーを切り替える。
    */
   set frequency(frequency: Frequency | undefined) {
     this._frequency = frequency;
@@ -93,7 +87,7 @@ export class LogarithmizedBlockGraphFrequencyView extends LitElement {
 
     this._setDatasetValue('alleleCount', this.alleleCount);
 
-    // The homozygote marker only needs to exist when a non-zero count is present.
+    // ホモ接合マーカーは count > 0 のときだけ表示する
     this._setDatasetValue(
       'alternateAlleleCount',
       this.alternateAlleleCount && this.alternateAlleleCount > 0
@@ -107,8 +101,8 @@ export class LogarithmizedBlockGraphFrequencyView extends LitElement {
   }
 
   /**
-   * `HTMLElement.dataset` stores strings only, so absent values should remove
-   * the attribute instead of leaving stale state behind.
+   * `HTMLElement.dataset` は文字列のみ保持するため、
+   * 値がない場合は属性自体を削除して古い状態が残らないようにする。
    */
   private _setDatasetValue(
     key: string,

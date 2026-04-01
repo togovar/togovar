@@ -1,22 +1,37 @@
+// ブロックのサイズ定数
 $vertical-block-width: 5px;
 $vertical-block-height: 2px;
 $block-count: 6;
 
+// 各頻度ラベルに対して表示するブロック数のマップ
+// キー: data-logarithmized-frequency 属性値、値: 表示するブロック数
+$frequency-block-counts: (
+  '<0.0001': 1,
+  '<0.001': 2,
+  '<0.01': 3,
+  '<0.05': 4,
+  '<0.5': 5,
+  '≥0.5': 6,
+);
+
+// ホスト要素（カスタム要素自体）のベーススタイル
+// 幅・高さはブロック数とサイズ定数から計算
 :host {
   --color-dataset: var(--color-dataset-foreign);
   position: relative;
   margin-right: 1px;
   border-style: solid;
   border-width: 1px;
+  border-color: var(--color-dataset);
   display: inline-block;
   width: #{$vertical-block-width + 4px};
   height: #{$vertical-block-height * $block-count + 5px + 4px};
   vertical-align: middle;
   font-size: 0;
   background-color: white;
-  border-color: var(--color-dataset);
 }
 
+// data-dataset 属性ごとにデータセットカラーを切り替える
 :host([data-dataset='gem_j_wga']) {
   --color-dataset: var(--color-dataset-gemj);
 }
@@ -41,6 +56,7 @@ $block-count: 6;
   --color-dataset: var(--color-dataset-bbj);
 }
 
+// ブロックコンテナ: 要素の左下を基準に積み上げる
 :host > .blocks {
   position: absolute;
   left: 1px;
@@ -48,72 +64,47 @@ $block-count: 6;
   width: $vertical-block-width;
   display: block;
 
+  // 各ブロックはデフォルト非表示（頻度属性で必要な数だけ表示する）
+  // ブロック位置はループで生成: 隙間1pxを加味し下から順に積み上がるよう配置
   > .block {
     position: absolute;
     display: none;
     width: $vertical-block-width;
     height: $vertical-block-height;
     background-color: var(--color-dataset);
+
+    @for $i from 1 through $block-count {
+      &:nth-child(#{$i}) {
+        bottom: #{($i - 1) * ($vertical-block-height + 1px)};
+      }
+    }
   }
 }
 
-:host > .blocks > .block:nth-child(1) {
-  bottom: 0;
+// 頻度ラベルに応じて対応するブロック数を表示する
+// 例: '<0.01' → ブロック1〜3を表示
+@each $freq, $visible-count in $frequency-block-counts {
+  @for $i from 1 through $visible-count {
+    :host([data-logarithmized-frequency='#{$freq}'])
+      > .blocks
+      > .block:nth-child(#{$i}) {
+      display: block;
+    }
+  }
 }
 
-:host > .blocks > .block:nth-child(2) {
-  bottom: #{$vertical-block-height + 1px};
-}
-
-:host > .blocks > .block:nth-child(3) {
-  bottom: #{$vertical-block-height * 2 + 2px};
-}
-
-:host > .blocks > .block:nth-child(4) {
-  bottom: #{$vertical-block-height * 3 + 3px};
-}
-
-:host > .blocks > .block:nth-child(5) {
-  bottom: #{$vertical-block-height * 4 + 4px};
-}
-
-:host > .blocks > .block:nth-child(6) {
-  bottom: #{$vertical-block-height * 5 + 5px};
-}
-
-:host([data-logarithmized-frequency='<0.0001']) > .blocks > .block:nth-child(1),
-:host([data-logarithmized-frequency='<0.001']) > .blocks > .block:nth-child(1),
-:host([data-logarithmized-frequency='<0.001']) > .blocks > .block:nth-child(2),
-:host([data-logarithmized-frequency='<0.01']) > .blocks > .block:nth-child(1),
-:host([data-logarithmized-frequency='<0.01']) > .blocks > .block:nth-child(2),
-:host([data-logarithmized-frequency='<0.01']) > .blocks > .block:nth-child(3),
-:host([data-logarithmized-frequency='<0.05']) > .blocks > .block:nth-child(1),
-:host([data-logarithmized-frequency='<0.05']) > .blocks > .block:nth-child(2),
-:host([data-logarithmized-frequency='<0.05']) > .blocks > .block:nth-child(3),
-:host([data-logarithmized-frequency='<0.05']) > .blocks > .block:nth-child(4),
-:host([data-logarithmized-frequency='<0.5']) > .blocks > .block:nth-child(1),
-:host([data-logarithmized-frequency='<0.5']) > .blocks > .block:nth-child(2),
-:host([data-logarithmized-frequency='<0.5']) > .blocks > .block:nth-child(3),
-:host([data-logarithmized-frequency='<0.5']) > .blocks > .block:nth-child(4),
-:host([data-logarithmized-frequency='<0.5']) > .blocks > .block:nth-child(5),
-:host([data-logarithmized-frequency='≥0.5']) > .blocks > .block:nth-child(1),
-:host([data-logarithmized-frequency='≥0.5']) > .blocks > .block:nth-child(2),
-:host([data-logarithmized-frequency='≥0.5']) > .blocks > .block:nth-child(3),
-:host([data-logarithmized-frequency='≥0.5']) > .blocks > .block:nth-child(4),
-:host([data-logarithmized-frequency='≥0.5']) > .blocks > .block:nth-child(5),
-:host([data-logarithmized-frequency='≥0.5']) > .blocks > .block:nth-child(6) {
-  display: block;
-}
-
+// データなし（na）はグレーで表示
 :host([data-logarithmized-frequency='na']) {
   border-color: #d4d3d1;
   background-color: #f4f4f4;
 }
 
+// シングルトン（アレルカウント=1）は専用カラーで強調
 :host([data-allele-count='1']) {
   background-color: var(--color-singleton);
 }
 
+// ホモ接合マーカー: 代替アレルが存在する場合にチェックマークアイコンを表示
 :host([data-alternate-allele-count]) > .blocks::before {
   content: '';
   position: absolute;
