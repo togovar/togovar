@@ -85,9 +85,7 @@ $frequency-block-counts: (
 // 例: '<0.01' → ブロック1〜3を表示
 @each $freq, $visible-count in $frequency-block-counts {
   @for $i from 1 through $visible-count {
-    :host([data-log-frequency='#{$freq}'])
-      > .blocks
-      > .block:nth-child(#{$i}) {
+    :host([data-log-frequency='#{$freq}']) > .blocks > .block:nth-child(#{$i}) {
       display: block;
     }
   }
@@ -110,12 +108,12 @@ $frequency-block-counts: (
   position: absolute;
   top: -22px;
   right: -4px;
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   background-color: var(--color-homozygote);
-  border-radius: 2px;
+  border-radius: 1.5px;
   background-image: url('../../../src/assets/icons/checkmark.svg');
   background-repeat: no-repeat;
-  background-size: 10px 10px;
+  background-size: 7px 7px;
   z-index: 10;
 }
