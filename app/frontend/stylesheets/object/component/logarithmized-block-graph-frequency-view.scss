@@ -1,0 +1,130 @@
+$vertical-block-width: 5px;
+$vertical-block-height: 2px;
+$block-count: 6;
+
+:host {
+  --color-dataset: var(--color-dataset-foreign);
+  position: relative;
+  margin-right: 1px;
+  border-style: solid;
+  border-width: 1px;
+  display: inline-block;
+  width: #{$vertical-block-width + 4px};
+  height: #{$vertical-block-height * $block-count + 5px + 4px};
+  vertical-align: middle;
+  font-size: 0;
+  background-color: white;
+  border-color: var(--color-dataset);
+}
+
+:host([data-dataset='gem_j_wga']) {
+  --color-dataset: var(--color-dataset-gemj);
+}
+
+:host([data-dataset^='jga_']) {
+  --color-dataset: var(--color-dataset-jga);
+}
+
+:host([data-dataset='tommo']) {
+  --color-dataset: var(--color-dataset-tommo);
+}
+
+:host([data-dataset='hgvd']) {
+  --color-dataset: var(--color-dataset-hgvd);
+}
+
+:host([data-dataset='ncbn']) {
+  --color-dataset: var(--color-dataset-ncbn);
+}
+
+:host([data-dataset='bbj']) {
+  --color-dataset: var(--color-dataset-bbj);
+}
+
+:host > .blocks {
+  position: absolute;
+  left: 1px;
+  bottom: 1px;
+  width: $vertical-block-width;
+  display: block;
+
+  > .block {
+    position: absolute;
+    display: none;
+    width: $vertical-block-width;
+    height: $vertical-block-height;
+    background-color: var(--color-dataset);
+  }
+}
+
+:host > .blocks > .block:nth-child(1) {
+  bottom: 0;
+}
+
+:host > .blocks > .block:nth-child(2) {
+  bottom: #{$vertical-block-height + 1px};
+}
+
+:host > .blocks > .block:nth-child(3) {
+  bottom: #{$vertical-block-height * 2 + 2px};
+}
+
+:host > .blocks > .block:nth-child(4) {
+  bottom: #{$vertical-block-height * 3 + 3px};
+}
+
+:host > .blocks > .block:nth-child(5) {
+  bottom: #{$vertical-block-height * 4 + 4px};
+}
+
+:host > .blocks > .block:nth-child(6) {
+  bottom: #{$vertical-block-height * 5 + 5px};
+}
+
+:host([data-logarithmized-frequency='<0.0001']) > .blocks > .block:nth-child(1),
+:host([data-logarithmized-frequency='<0.001']) > .blocks > .block:nth-child(1),
+:host([data-logarithmized-frequency='<0.001']) > .blocks > .block:nth-child(2),
+:host([data-logarithmized-frequency='<0.01']) > .blocks > .block:nth-child(1),
+:host([data-logarithmized-frequency='<0.01']) > .blocks > .block:nth-child(2),
+:host([data-logarithmized-frequency='<0.01']) > .blocks > .block:nth-child(3),
+:host([data-logarithmized-frequency='<0.05']) > .blocks > .block:nth-child(1),
+:host([data-logarithmized-frequency='<0.05']) > .blocks > .block:nth-child(2),
+:host([data-logarithmized-frequency='<0.05']) > .blocks > .block:nth-child(3),
+:host([data-logarithmized-frequency='<0.05']) > .blocks > .block:nth-child(4),
+:host([data-logarithmized-frequency='<0.5']) > .blocks > .block:nth-child(1),
+:host([data-logarithmized-frequency='<0.5']) > .blocks > .block:nth-child(2),
+:host([data-logarithmized-frequency='<0.5']) > .blocks > .block:nth-child(3),
+:host([data-logarithmized-frequency='<0.5']) > .blocks > .block:nth-child(4),
+:host([data-logarithmized-frequency='<0.5']) > .blocks > .block:nth-child(5),
+:host([data-logarithmized-frequency='≥0.5']) > .blocks > .block:nth-child(1),
+:host([data-logarithmized-frequency='≥0.5']) > .blocks > .block:nth-child(2),
+:host([data-logarithmized-frequency='≥0.5']) > .blocks > .block:nth-child(3),
+:host([data-logarithmized-frequency='≥0.5']) > .blocks > .block:nth-child(4),
+:host([data-logarithmized-frequency='≥0.5']) > .blocks > .block:nth-child(5),
+:host([data-logarithmized-frequency='≥0.5']) > .blocks > .block:nth-child(6) {
+  display: block;
+}
+
+:host([data-logarithmized-frequency='na']) {
+  border-color: #d4d3d1;
+  background-color: #f4f4f4;
+}
+
+:host([data-allele-count='1']) {
+  background-color: var(--color-singleton);
+}
+
+:host([data-alternate-allele-count]) > .blocks::before {
+  content: '';
+  position: absolute;
+  top: -22px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-homozygote);
+  border-radius: 2px;
+  background-image: url('../../../src/assets/icons/checkmark.svg');
+  background-repeat: no-repeat;
+  background-size: 10px 10px;
+  z-index: 10;
+}
