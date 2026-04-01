@@ -1,9 +1,64 @@
-import { LitElement, css, html, unsafeCSS } from 'lit';
+import {
+  LitElement,
+  css,
+  html,
+  unsafeCSS,
+  type TemplateResult,
+} from 'lit';
+import { customElement } from 'lit/decorators.js';
+import type { Frequency } from '../types/api';
 import checkmarkSvgUrl from '../assets/icons/checkmark.svg';
 
 const VERTICAL_BLOCK_WIDTH = 5;
 const VERTICAL_BLOCK_HEIGHT = 2;
+const BLOCK_COUNT = 6;
 
+type LogarithmizedFrequencyLabel =
+  | 'na'
+  | 'monomorphic'
+  | '<0.0001'
+  | '<0.001'
+  | '<0.01'
+  | '<0.05'
+  | '<0.5'
+  | '≥0.5';
+
+/**
+ * Converts raw allele frequency into the categorical label consumed by CSS.
+ * The rendered blocks are controlled entirely by this `data-*` attribute.
+ */
+const getLogarithmizedFrequencyLabel = (
+  frequency?: Frequency
+): LogarithmizedFrequencyLabel => {
+  if (!frequency) {
+    return 'na';
+  }
+
+  const alleleFrequency = frequency.af;
+
+  if (alleleFrequency !== undefined) {
+    switch (true) {
+      case alleleFrequency >= 0.5:
+        return '≥0.5';
+      case alleleFrequency > 0.05:
+        return '<0.5';
+      case alleleFrequency > 0.01:
+        return '<0.05';
+      case alleleFrequency > 0.001:
+        return '<0.01';
+      case alleleFrequency > 0.0001:
+        return '<0.001';
+      case alleleFrequency > 0:
+        return '<0.0001';
+      default:
+        return 'monomorphic';
+    }
+  }
+
+  return 'monomorphic';
+};
+
+@customElement('logarithmized-block-graph-frequency-view')
 export class LogarithmizedBlockGraphFrequencyView extends LitElement {
   static styles = css`
     :host {
@@ -14,7 +69,7 @@ export class LogarithmizedBlockGraphFrequencyView extends LitElement {
       border-width: 1px;
       display: inline-block;
       width: ${VERTICAL_BLOCK_WIDTH + 4}px;
-      height: ${VERTICAL_BLOCK_HEIGHT * 6 + 5 + 4}px;
+      height: ${VERTICAL_BLOCK_HEIGHT * BLOCK_COUNT + 5 + 4}px;
       vertical-align: middle;
       font-size: 0;
       background-color: white;
@@ -160,82 +215,66 @@ export class LogarithmizedBlockGraphFrequencyView extends LitElement {
     }
   `;
 
-  constructor() {
-    super();
-    // Declare reactive properties
-    this.dataset;
-    this.alleleCount;
-    this.total;
-    this.frequencyValue;
-    this.alternateAlleleCount;
-  }
+  alleleCount?: number;
+  total?: number;
+  frequencyValue?: number;
+  alternateAlleleCount?: number;
 
-  render() {
+  private _frequency?: Frequency;
+
+  render(): TemplateResult {
     return html`
       <span class="blocks">
-        ${Array.from({ length: 6 }).map(
+        ${Array.from({ length: BLOCK_COUNT }).map(
           () => html`<span class="block"></span>`
         )}
       </span>
     `;
   }
 
-  firstUpdated() {}
+  get frequency(): Frequency | undefined {
+    return this._frequency;
+  }
 
-  /** Setter for variant frequency information.
-   *
-   * This method receives a frequency object containing various metrics related to variant frequency.
-   * It updates internal dataset fields such as allele count, alternate allele count, total allele number,
-   * frequency value, and a categorized frequency label (`logarithmizedFrequency`) used for display or filtering.
-   *
-   * @param {Object} frequency - Frequency data for the variant.
-   * @param {number} frequency.ac - Allele count.
-   * @param {number} frequency.an - Total number of alleles.
-   * @param {number} frequency.af - Allele frequency (between 0 and 1).
-   * @param {number} [frequency.aac] - Alternate allele count (optional, may be used for singleton detection).
-   * @param {string[]} frequency.filter - Filters applied to the variant.
-   * @param {number} frequency.quality - Variant calling quality score.
-   * @param {string} frequency.source - Source of the frequency data. */
-  set frequency(frequency) {
-    this.dataset.alleleCount = frequency?.ac;
+  /**
+   * Mirrors frequency data into `data-*` attributes so the CSS selectors can
+   * decide how many blocks to show and whether to draw extra markers.
+   */
+  set frequency(frequency: Frequency | undefined) {
+    this._frequency = frequency;
+    this.alleleCount = frequency?.ac;
+    this.total = frequency?.an;
+    this.frequencyValue = frequency?.af;
+    this.alternateAlleleCount = frequency?.aac;
 
-    if (frequency?.aac) {
-      this.dataset.alternateAlleleCount = frequency.aac;
+    this._setDatasetValue('alleleCount', this.alleleCount);
+
+    // The homozygote marker only needs to exist when a non-zero count is present.
+    this._setDatasetValue(
+      'alternateAlleleCount',
+      this.alternateAlleleCount && this.alternateAlleleCount > 0
+        ? this.alternateAlleleCount
+        : undefined
+    );
+    this._setDatasetValue(
+      'logarithmizedFrequency',
+      getLogarithmizedFrequencyLabel(frequency)
+    );
+  }
+
+  /**
+   * `HTMLElement.dataset` stores strings only, so absent values should remove
+   * the attribute instead of leaving stale state behind.
+   */
+  private _setDatasetValue(
+    key: string,
+    value: string | number | undefined
+  ): void {
+    if (value === undefined || value === null || value === '') {
+      delete this.dataset[key];
+      return;
     }
 
-    let logarithmizedFrequency = 'na';
-    if (frequency) {
-      this.alleleCount = frequency.ac;
-      this.total = frequency.an;
-      this.frequencyValue = frequency.af;
-      switch (true) {
-        case frequency.af >= 0.5:
-          logarithmizedFrequency = '≥0.5';
-          break;
-        case frequency.af > 0.05:
-          logarithmizedFrequency = '<0.5';
-          break;
-        case frequency.af > 0.01:
-          logarithmizedFrequency = '<0.05';
-          break;
-        case frequency.af > 0.001:
-          logarithmizedFrequency = '<0.01';
-          break;
-        case frequency.af > 0.0001:
-          logarithmizedFrequency = '<0.001';
-          break;
-        case frequency.af > 0:
-          logarithmizedFrequency = '<0.0001';
-          break;
-        default:
-          logarithmizedFrequency = 'monomorphic';
-          break;
-      }
-    }
-    this.dataset.logarithmizedFrequency = logarithmizedFrequency;
+    this.dataset[key] = String(value);
   }
 }
-customElements.define(
-  'logarithmized-block-graph-frequency-view',
-  LogarithmizedBlockGraphFrequencyView
-);

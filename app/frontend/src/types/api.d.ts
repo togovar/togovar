@@ -152,6 +152,7 @@ export type Transcript = {
 
 export type Frequency = {
   ac?: number;
+  aac?: number;
   af?: number;
   an?: number;
   filter?: string[];
@@ -159,7 +160,7 @@ export type Frequency = {
 };
 
 export type TdFrequencies = Record<string, FrequencyElement>;
-export type FrequencyElement = HTMLElement & { frequency?: any };
+export type FrequencyElement = LogarithmizedBlockGraphFrequencyElement;
 
 // ============================================
 // Results Display & Processing Types
