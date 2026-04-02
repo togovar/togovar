@@ -93,10 +93,7 @@ export class FrequencyBlockView extends LitElement {
         : undefined
     );
     // ヘミ接合マーカーは hac が数値として存在するとき表示する（0 を含む）
-    this._setDatasetValue(
-      'hemizygoteAlleleCount',
-      this.hemizygoteAlleleCount !== undefined ? this.hemizygoteAlleleCount : undefined
-    );
+    this._setDatasetValue('hemizygoteAlleleCount', this.hemizygoteAlleleCount);
     this._setDatasetValue('frequency', getLogFrequencyLabel(frequency));
   }
 
