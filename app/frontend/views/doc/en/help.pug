@@ -312,67 +312,70 @@ block content
                 | value is represented on a 9-point scale.
               ._flex._break-avoid
                 ._padding-right-large
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="na")
+                  frequency-block-view(data-dataset="" data-frequency="na")
                   | &nbsp; Not Available
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="monomorphic")
+                  frequency-block-view(data-dataset="" data-frequency="monomorphic")
                   | &nbsp; Monomorphic (REF)
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="undefined" data-allele-count="1")
+                  frequency-block-view(data-dataset="" data-frequency="undefined" data-allele-count="1")
                   | &nbsp; Singleton
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-alternate-allele-count)
-                  | &nbsp; Homozygous
+                  frequency-block-view(data-dataset="" data-homozygous-allele-count)
+                  | &nbsp; Homozygous (ALT)
+                  br
+                  frequency-block-view(data-dataset="" data-hemizygote-allele-count)
+                  | &nbsp; Hemizygous
                 ._padding-right-large
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.0001")
+                  frequency-block-view(data-dataset="" data-frequency="<0.0001")
                   | &nbsp; &lt; 0.0001
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.001")
+                  frequency-block-view(data-dataset="" data-frequency="<0.001")
                   | &nbsp; &lt; 0.001
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.01")
+                  frequency-block-view(data-dataset="" data-frequency="<0.01")
                   | &nbsp; &lt; 0.01
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.05")
+                  frequency-block-view(data-dataset="" data-frequency="<0.05")
                   | &nbsp; &lt; 0.05
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.5")
+                  frequency-block-view(data-dataset="" data-frequency="<0.5")
                   | &nbsp; &lt; 0.5
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="≥0.5")
+                  frequency-block-view(data-dataset="" data-frequency="≥0.5")
                   | &nbsp; ≥ 0.5
                 ._padding-right-large
-                  logarithmized-block-graph-frequency-view(data-dataset="gem_j_wga" data-logarithmized-frequency="≥0.5")
+                  frequency-block-view(data-dataset="gem_j_wga" data-frequency="≥0.5")
                   | &nbsp; GEM-J WGA
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="jga_snp" data-logarithmized-frequency="≥0.5")
+                  frequency-block-view(data-dataset="jga_snp" data-frequency="≥0.5")
                   | &nbsp; JGA-SNP
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="jga_wes" data-logarithmized-frequency="≥0.5")
+                  frequency-block-view(data-dataset="jga_wes" data-frequency="≥0.5")
                   | &nbsp; JGA-WES
                   br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    logarithmized-block-graph-frequency-view(data-dataset="jga_wgs" data-logarithmized-frequency="≥0.5")
+                    frequency-block-view(data-dataset="jga_wgs" data-frequency="≥0.5")
                     | &nbsp; JGA-WGS
                     br
-                  logarithmized-block-graph-frequency-view(data-dataset="tommo" data-logarithmized-frequency="≥0.5")
+                  frequency-block-view(data-dataset="tommo" data-frequency="≥0.5")
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
                     | &nbsp; ToMMo 8.3KJPN
                   else if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
                     | &nbsp; ToMMo 54KJPN
                   br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
-                    logarithmized-block-graph-frequency-view(data-dataset="hgvd" data-logarithmized-frequency="≥0.5")
+                    frequency-block-view(data-dataset="hgvd" data-frequency="≥0.5")
                     | &nbsp; HGVD
                     br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    logarithmized-block-graph-frequency-view(data-dataset="ncbn" data-logarithmized-frequency="≥0.5")
+                    frequency-block-view(data-dataset="ncbn" data-frequency="≥0.5")
                     | &nbsp; NCBN
                     br
-                  logarithmized-block-graph-frequency-view(data-dataset="gnomad_genomes" data-logarithmized-frequency="≥0.5")
+                  frequency-block-view(data-dataset="gnomad_genomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD genomes
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="gnomad_exomes" data-logarithmized-frequency="≥0.5")
+                  frequency-block-view(data-dataset="gnomad_exomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD exomes
 
           #s2.question-answer._column-span-all
