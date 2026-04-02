@@ -14,7 +14,6 @@
     "comment-empty-line-before": null,
     "custom-property-empty-line-before": null,
     "scss/dollar-variable-pattern": null,
-    "scss/operator-no-newline-after": null,
-    "font-family-no-missing-generic-family-keyword": null
+    "scss/operator-no-newline-after": null
   }
 }
