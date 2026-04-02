@@ -19,11 +19,9 @@ type LogFrequencyLabel =
   | '<0.5' // ブロック5個
   | '≥0.5'; // ブロック6個（最大）
 
-const BLOCK_COUNT = 6;
-
 /**
  * アレル頻度（af）を対数スケールのカテゴリラベルに変換する。
- * このラベルは `data-log-frequency` 属性にセットされ、
+ * このラベルは `data-frequency` 属性にセットされ、
  * SCSSのセレクタが何個のブロックを表示するかを制御する。
  */
 const getLogFrequencyLabel = (
@@ -57,16 +55,15 @@ export class FrequencyBlockView extends LitElement {
   frequencyValue?: number;
   /** 代替アレルカウント（aac）: ホモ接合マーカーの表示に使用 */
   alternateAlleleCount?: number;
+  /** ヘミ接合アレルカウント（hac）: ヘミ接合マーカーの表示に使用 */
+  hemizygoteAlleleCount?: number;
 
   private _frequency?: Frequency;
 
   render(): TemplateResult {
     return html`
-      <span class="blocks">
-        ${Array.from({ length: BLOCK_COUNT }).map(
-          () => html`<span class="block"></span>`
-        )}
-      </span>
+      <span class="marker homozygote-marker"></span>
+      <span class="marker hemizygote-marker"></span>
     `;
   }
 
@@ -84,6 +81,7 @@ export class FrequencyBlockView extends LitElement {
     this.total = frequency?.an;
     this.frequencyValue = frequency?.af;
     this.alternateAlleleCount = frequency?.aac;
+    this.hemizygoteAlleleCount = frequency?.hac;
 
     this._setDatasetValue('alleleCount', this.alleleCount);
 
@@ -94,10 +92,12 @@ export class FrequencyBlockView extends LitElement {
         ? this.alternateAlleleCount
         : undefined
     );
+    // ヘミ接合マーカーは hac が数値として存在するとき表示する（0 を含む）
     this._setDatasetValue(
-      'logFrequency',
-      getLogFrequencyLabel(frequency)
+      'hemizygoteAlleleCount',
+      this.hemizygoteAlleleCount !== undefined ? this.hemizygoteAlleleCount : undefined
     );
+    this._setDatasetValue('frequency', getLogFrequencyLabel(frequency));
   }
 
   /**

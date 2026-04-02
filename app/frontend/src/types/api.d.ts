@@ -155,6 +155,7 @@ export type Frequency = {
   aac?: number;
   af?: number;
   an?: number;
+  hac?: number;
   filter?: string[];
   source?: string;
 };

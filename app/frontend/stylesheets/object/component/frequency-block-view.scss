@@ -1,10 +1,13 @@
-// ブロックのサイズ定数
+@use '../../foundation/_variables.scss' as *;
+
+$frequency-block-count: 6;
+$frequency-block-gap: 1px;
 $vertical-block-width: 5px;
 $vertical-block-height: 2px;
-$block-count: 6;
+$vertical-graph-width: $vertical-block-width + 4px;
+$vertical-graph-height: ($vertical-block-height * $frequency-block-count) +
+  (($frequency-block-gap * ($frequency-block-count - 1)) + 4px);
 
-// 各頻度ラベルに対して表示するブロック数のマップ
-// キー: data-log-frequency 属性値、値: 表示するブロック数
 $frequency-block-counts: (
   '<0.0001': 1,
   '<0.001': 2,
@@ -14,87 +17,86 @@ $frequency-block-counts: (
   '≥0.5': 6,
 );
 
-// ホスト要素（カスタム要素自体）のベーススタイル
-// 幅・高さはブロック数とサイズ定数から計算
+$frequency-na-border: #d4d3d1;
+$frequency-na-background: #f4f4f4;
+$frequency-marker-color: $COLOR_SIGN_DANGEROUS;
+$frequency-marker-size: 7px;
+$frequency-marker-offset: -5px;
+$frequency-marker-gap: 1px;
+
+// ホスト要素のベーススタイル
 :host {
-  --color-dataset: var(--color-dataset-foreign);
+  --frequency-dataset-color: var(--color-dataset-foreign);
+
   position: relative;
-  margin-right: 1px;
-  border-style: solid;
-  border-width: 1px;
-  border-color: var(--color-dataset);
+  box-sizing: border-box;
   display: inline-block;
-  width: #{$vertical-block-width + 4px};
-  height: #{$vertical-block-height * $block-count + 5px + 4px};
+  width: $vertical-graph-width;
+  height: $vertical-graph-height;
+  margin-right: 4px;
   vertical-align: middle;
   font-size: 0;
   background-color: white;
+  border: solid 1px var(--frequency-dataset-color);
 }
 
 // data-dataset 属性ごとにデータセットカラーを切り替える
 :host([data-dataset='gem_j_wga']) {
-  --color-dataset: var(--color-dataset-gemj);
+  --frequency-dataset-color: var(--color-dataset-gemj);
 }
 
 :host([data-dataset^='jga_']) {
-  --color-dataset: var(--color-dataset-jga);
+  --frequency-dataset-color: var(--color-dataset-jga);
 }
 
 :host([data-dataset='tommo']) {
-  --color-dataset: var(--color-dataset-tommo);
+  --frequency-dataset-color: var(--color-dataset-tommo);
 }
 
 :host([data-dataset='hgvd']) {
-  --color-dataset: var(--color-dataset-hgvd);
+  --frequency-dataset-color: var(--color-dataset-hgvd);
 }
 
 :host([data-dataset='ncbn']) {
-  --color-dataset: var(--color-dataset-ncbn);
+  --frequency-dataset-color: var(--color-dataset-ncbn);
 }
 
 :host([data-dataset='bbj']) {
-  --color-dataset: var(--color-dataset-bbj);
+  --frequency-dataset-color: var(--color-dataset-bbj);
 }
 
-// ブロックコンテナ: 要素の左下を基準に積み上げる
-:host > .blocks {
+// ブロックは ::before で repeating-linear-gradient を使って描画
+:host::before {
   position: absolute;
-  left: 1px;
   bottom: 1px;
+  left: 1px;
+  display: none;
   width: $vertical-block-width;
-  display: block;
-
-  // 各ブロックはデフォルト非表示（頻度属性で必要な数だけ表示する）
-  // ブロック位置はループで生成: 隙間1pxを加味し下から順に積み上がるよう配置
-  > .block {
-    position: absolute;
-    display: none;
-    width: $vertical-block-width;
-    height: $vertical-block-height;
-    background-color: var(--color-dataset);
-
-    @for $i from 1 through $block-count {
-      &:nth-child(#{$i}) {
-        bottom: #{($i - 1) * ($vertical-block-height + 1px)};
-      }
-    }
-  }
+  content: '';
+  background-image: repeating-linear-gradient(
+    to top,
+    var(--frequency-dataset-color) 0,
+    var(--frequency-dataset-color) $vertical-block-height,
+    transparent $vertical-block-height,
+    transparent ($vertical-block-height + $frequency-block-gap)
+  );
 }
 
-// 頻度ラベルに応じて対応するブロック数を表示する
-// 例: '<0.01' → ブロック1〜3を表示
-@each $freq, $visible-count in $frequency-block-counts {
-  @for $i from 1 through $visible-count {
-    :host([data-log-frequency='#{$freq}']) > .blocks > .block:nth-child(#{$i}) {
+// 頻度ラベルに応じてブロックの高さを設定
+@each $level, $count in $frequency-block-counts {
+  @if $count > 0 {
+    :host([data-frequency='#{$level}'])::before {
       display: block;
+      height: ($count * $vertical-block-height) +
+        (($count - 1) * $frequency-block-gap);
     }
   }
 }
 
 // データなし（na）はグレーで表示
-:host([data-log-frequency='na']) {
-  border-color: #d4d3d1;
-  background-color: #f4f4f4;
+:host([data-frequency='na']) {
+  border-color: $frequency-na-border;
+  background-color: $frequency-na-background;
 }
 
 // シングルトン（アレルカウント=1）は専用カラーで強調
@@ -102,18 +104,45 @@ $frequency-block-counts: (
   background-color: var(--color-singleton);
 }
 
-// ホモ接合マーカー: 代替アレルが存在する場合にチェックマークアイコンを表示
-:host([data-alternate-allele-count]) > .blocks::before {
-  content: '';
+// マーカー共通スタイル: デフォルト非表示
+:host > .marker {
   position: absolute;
-  top: -22px;
+  top: $frequency-marker-offset;
   right: -4px;
-  width: 7px;
-  height: 7px;
-  background-color: var(--color-homozygote);
-  border-radius: 1.5px;
-  background-image: url('../../../src/assets/icons/slashmark.svg');
+  z-index: 1;
+  box-sizing: border-box;
+  display: none;
+  width: $frequency-marker-size;
+  height: $frequency-marker-size;
+  background-color: $frequency-marker-color;
   background-repeat: no-repeat;
-  background-size: 7px 7px;
-  z-index: 10;
+  background-position: center;
+  background-size: cover;
+  border-radius: 1.5px;
+}
+
+// ホモ接合マーカー
+:host > .marker.homozygote-marker {
+  background-image: url('../../../src/assets/icons/slashmark.svg');
+}
+
+:host([data-alternate-allele-count]) > .marker.homozygote-marker {
+  display: block;
+}
+
+// ヘミ接合マーカー
+:host > .marker.hemizygote-marker {
+  background-image: url('../../../src/assets/icons/slashmark-hemi.svg');
+}
+
+:host([data-hemizygote-allele-count]) > .marker.hemizygote-marker {
+  display: block;
+}
+
+// 両マーカーが揃っているとき: ヘミ接合マーカーをホモ接合マーカーの下にずらす
+:host([data-alternate-allele-count][data-hemizygote-allele-count])
+  > .marker.hemizygote-marker {
+  top: calc(
+    #{$frequency-marker-offset + $frequency-marker-size + $frequency-marker-gap}
+  );
 }
