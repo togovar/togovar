@@ -131,7 +131,24 @@ block content
             h4.question 遺伝子発現やタンパク質の情報とは結び付かないのでしょうか。
             .answer
               p
-                | 当データベースはヒトゲノムの遺伝子変異について、日本人の公開情報を中心として統合したものです。当データベースはRDFの技術をベースとして利用している為、遺伝子発現やタンパク質の情報がRDFを利用しているデータベースである場合は、容易に拡張が可能と考えております。遺伝子発現やタンパク質の情報への拡張は順次実施する予定です。
+                | TogoVarは、ヒトゲノムの遺伝子変異について、日本人の公開情報を中心として統合したものです。
+                | 加えて、タンパク質に関する可視化・比較機能として、
+                a.hyper-text.-external(target='_blank', href='https://pdbj.org/?lang=ja') PDBj
+                | ／
+                a.hyper-text.-external(target='_blank', href='https://alphafold.ebi.ac.uk/') AlphaFold
+                | の立体構造上でのバリアント位置表示 (例：
+                a.hyper-text.-external(target='_blank', href='https://grch38.togovar.org/gene/1097#protein-structure') BRAF gene
+                | )や、Protein Browser によるアミノ酸配列上でのアライメント表示を提供しています。
+                | Protein Browser では、ミスセンス変異と病原性（TogoVar）に加え、リン酸化部位（
+                a.hyper-text.-external(target='_blank', href='https://jpostdb.org/') jPOST
+                | ）、糖鎖修飾部位（
+                a.hyper-text.-external(target='_blank', href='https://glycosmos.org/') GlyCosmos
+                | ）、疾患関連バリアント（
+                a.hyper-text.-external(target='_blank', href='https://www.uniprot.org/') UniProt
+                | ）などを配列上で並べて比較できます(例：
+                a.hyper-text.-external(target='_blank', href='https://grch38.togovar.org/gene/1101#protein-browser') BRCA2 gene
+                | )。
+                | TogoVarはRDF技術をベースとしているため、RDFを利用する遺伝子発現・タンパク質関連データベースとの連携や拡張も容易であり、今後も順次拡張していく予定です。
           #d3.question-answer
             h4.question バリアントの検出の際に使用したソフトウェアおよび品質管理の方法を教えてください。
             .answer
