@@ -54,7 +54,7 @@ export class FrequencyBlockView extends LitElement {
   /** アレル頻度（af） */
   frequencyValue?: number;
   /** 代替アレルカウント（aac）: ホモ接合マーカーの表示に使用 */
-  alternateAlleleCount?: number;
+  homozygousAlleleCount?: number;
   /** ヘミ接合アレルカウント（hac）: ヘミ接合マーカーの表示に使用 */
   hemizygoteAlleleCount?: number;
 
@@ -80,16 +80,16 @@ export class FrequencyBlockView extends LitElement {
     this.alleleCount = frequency?.ac;
     this.total = frequency?.an;
     this.frequencyValue = frequency?.af;
-    this.alternateAlleleCount = frequency?.aac;
+    this.homozygousAlleleCount = frequency?.aac;
     this.hemizygoteAlleleCount = frequency?.hac;
 
     this._setDatasetValue('alleleCount', this.alleleCount);
 
     // ホモ接合マーカーは count > 0 のときだけ表示する
     this._setDatasetValue(
-      'alternateAlleleCount',
-      this.alternateAlleleCount && this.alternateAlleleCount > 0
-        ? this.alternateAlleleCount
+      'homozygousAlleleCount',
+      this.homozygousAlleleCount && this.homozygousAlleleCount > 0
+        ? this.homozygousAlleleCount
         : undefined
     );
     // ヘミ接合マーカーは hac が数値として存在するとき表示する（0 を含む）

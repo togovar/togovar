@@ -312,67 +312,70 @@ block content
                 | value is represented on a 9-point scale.
               ._flex._break-avoid
                 ._padding-right-large
-                  frequency-block-view(data-dataset="" data-log-frequency="na")
+                  frequency-block-view(data-dataset="" data-frequency="na")
                   | &nbsp; Not Available
                   br
-                  frequency-block-view(data-dataset="" data-log-frequency="monomorphic")
+                  frequency-block-view(data-dataset="" data-frequency="monomorphic")
                   | &nbsp; Monomorphic (REF)
                   br
-                  frequency-block-view(data-dataset="" data-log-frequency="undefined" data-allele-count="1")
+                  frequency-block-view(data-dataset="" data-frequency="undefined" data-allele-count="1")
                   | &nbsp; Singleton
                   br
-                  frequency-block-view(data-dataset="" data-alternate-allele-count)
+                  frequency-block-view(data-dataset="" data-homozygous-allele-count)
                   | &nbsp; Homozygous (ALT)
+                  br
+                  frequency-block-view(data-dataset="" data-hemizygote-allele-count)
+                  | &nbsp; Hemizygous
                 ._padding-right-large
-                  frequency-block-view(data-dataset="" data-log-frequency="<0.0001")
+                  frequency-block-view(data-dataset="" data-frequency="<0.0001")
                   | &nbsp; &lt; 0.0001
                   br
-                  frequency-block-view(data-dataset="" data-log-frequency="<0.001")
+                  frequency-block-view(data-dataset="" data-frequency="<0.001")
                   | &nbsp; &lt; 0.001
                   br
-                  frequency-block-view(data-dataset="" data-log-frequency="<0.01")
+                  frequency-block-view(data-dataset="" data-frequency="<0.01")
                   | &nbsp; &lt; 0.01
                   br
-                  frequency-block-view(data-dataset="" data-log-frequency="<0.05")
+                  frequency-block-view(data-dataset="" data-frequency="<0.05")
                   | &nbsp; &lt; 0.05
                   br
-                  frequency-block-view(data-dataset="" data-log-frequency="<0.5")
+                  frequency-block-view(data-dataset="" data-frequency="<0.5")
                   | &nbsp; &lt; 0.5
                   br
-                  frequency-block-view(data-dataset="" data-log-frequency="≥0.5")
+                  frequency-block-view(data-dataset="" data-frequency="≥0.5")
                   | &nbsp; ≥ 0.5
                 ._padding-right-large
-                  frequency-block-view(data-dataset="gem_j_wga" data-log-frequency="≥0.5")
+                  frequency-block-view(data-dataset="gem_j_wga" data-frequency="≥0.5")
                   | &nbsp; GEM-J WGA
                   br
-                  frequency-block-view(data-dataset="jga_snp" data-log-frequency="≥0.5")
+                  frequency-block-view(data-dataset="jga_snp" data-frequency="≥0.5")
                   | &nbsp; JGA-SNP
                   br
-                  frequency-block-view(data-dataset="jga_wes" data-log-frequency="≥0.5")
+                  frequency-block-view(data-dataset="jga_wes" data-frequency="≥0.5")
                   | &nbsp; JGA-WES
                   br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    frequency-block-view(data-dataset="jga_wgs" data-log-frequency="≥0.5")
+                    frequency-block-view(data-dataset="jga_wgs" data-frequency="≥0.5")
                     | &nbsp; JGA-WGS
                     br
-                  frequency-block-view(data-dataset="tommo" data-log-frequency="≥0.5")
+                  frequency-block-view(data-dataset="tommo" data-frequency="≥0.5")
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
                     | &nbsp; ToMMo 8.3KJPN
                   else if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
                     | &nbsp; ToMMo 54KJPN
                   br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
-                    frequency-block-view(data-dataset="hgvd" data-log-frequency="≥0.5")
+                    frequency-block-view(data-dataset="hgvd" data-frequency="≥0.5")
                     | &nbsp; HGVD
                     br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    frequency-block-view(data-dataset="ncbn" data-log-frequency="≥0.5")
+                    frequency-block-view(data-dataset="ncbn" data-frequency="≥0.5")
                     | &nbsp; NCBN
                     br
-                  frequency-block-view(data-dataset="gnomad_genomes" data-log-frequency="≥0.5")
+                  frequency-block-view(data-dataset="gnomad_genomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD genomes
                   br
-                  frequency-block-view(data-dataset="gnomad_exomes" data-log-frequency="≥0.5")
+                  frequency-block-view(data-dataset="gnomad_exomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD exomes
 
           #s2.question-answer._column-span-all

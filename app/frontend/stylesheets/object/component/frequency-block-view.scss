@@ -21,7 +21,7 @@ $frequency-na-border: #d4d3d1;
 $frequency-na-background: #f4f4f4;
 $frequency-marker-color: $COLOR_SIGN_DANGEROUS;
 $frequency-marker-size: 7px;
-$frequency-marker-offset: -5px;
+$frequency-marker-offset: -4px;
 $frequency-marker-gap: 1px;
 
 // ホスト要素のベーススタイル
@@ -108,7 +108,7 @@ $frequency-marker-gap: 1px;
 :host > .marker {
   position: absolute;
   top: $frequency-marker-offset;
-  right: -4px;
+  right: $frequency-marker-offset;
   z-index: 1;
   box-sizing: border-box;
   display: none;
@@ -126,7 +126,7 @@ $frequency-marker-gap: 1px;
   background-image: url('../../../src/assets/icons/slashmark.svg');
 }
 
-:host([data-alternate-allele-count]) > .marker.homozygote-marker {
+:host([data-homozygous-allele-count]) > .marker.homozygote-marker {
   display: block;
 }
 
@@ -140,7 +140,7 @@ $frequency-marker-gap: 1px;
 }
 
 // 両マーカーが揃っているとき: ヘミ接合マーカーをホモ接合マーカーの下にずらす
-:host([data-alternate-allele-count][data-hemizygote-allele-count])
+:host([data-homozygous-allele-count][data-hemizygote-allele-count])
   > .marker.hemizygote-marker {
   top: calc(
     #{$frequency-marker-offset + $frequency-marker-size + $frequency-marker-gap}
