@@ -85,15 +85,20 @@ export class FrequencyBlockView extends LitElement {
 
     this._setDatasetValue('alleleCount', this.alleleCount);
 
-    // ホモ接合マーカーは count > 0 のときだけ表示する
+    // ホモ接合マーカーは aac が 1 以上のときだけ表示する
     this._setDatasetValue(
       'homozygousAlleleCount',
-      this.homozygousAlleleCount && this.homozygousAlleleCount > 0
+      this.homozygousAlleleCount && this.homozygousAlleleCount >= 1
         ? this.homozygousAlleleCount
         : undefined
     );
-    // ヘミ接合マーカーは hac が数値として存在するとき表示する（0 を含む）
-    this._setDatasetValue('hemizygoteAlleleCount', this.hemizygoteAlleleCount);
+    // ヘミ接合マーカーは hac が 1 以上のときだけ表示する
+    this._setDatasetValue(
+      'hemizygoteAlleleCount',
+      this.hemizygoteAlleleCount && this.hemizygoteAlleleCount >= 1
+        ? this.hemizygoteAlleleCount
+        : undefined
+    );
     this._setDatasetValue('frequency', getLogFrequencyLabel(frequency));
   }
 
