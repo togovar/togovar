@@ -303,47 +303,47 @@ block content
           h3.sectiontitle About the TogoVar search system
           #s1.question-answer._column-span-all
             h4.question
-              | What does the frequency indicator in the Frequency column of the search results
-              | represent?
+              | What does the frequency indicator shown in the Alt Frequency column of the search results represent?
             .answer
               p
-                | The frequency indicator represents the alternative allele frequency for each dataset. The color of the
-                | frequency meter corresponds to the color allocated to the dataset. The data availability or frequency
-                | value is represented on a 9-point scale.
+                | The frequency indicator shows the alternate (Alt) allele count (AC) or frequency (AF) for each dataset 
+                | on a nine-level scale. Datasets in which at least one Alt homozygote or hemizygote has been identified are marked 
+                | with an icon in the upper-right corner of the indicator. 
+                | The color of each indicator corresponds to the color assigned to the dataset.
               ._flex._break-avoid
                 ._padding-right-large
                   frequency-block-view(data-dataset="" data-frequency="na")
-                  | &nbsp; Not Available
+                  | &nbsp; Not available
                   br
                   frequency-block-view(data-dataset="" data-frequency="monomorphic")
-                  | &nbsp; Monomorphic (REF)
+                  | &nbsp; AC = 0 (Monomorphic)
                   br
                   frequency-block-view(data-dataset="" data-frequency="undefined" data-allele-count="1")
-                  | &nbsp; Singleton
+                  | &nbsp; AC = 1 (Singleton)
                   br
-                  frequency-block-view(data-dataset="" data-homozygous-allele-count)
-                  | &nbsp; Homozygous (ALT)
-                  br
-                  frequency-block-view(data-dataset="" data-hemizygote-allele-count)
-                  | &nbsp; Hemizygous
-                ._padding-right-large
                   frequency-block-view(data-dataset="" data-frequency="<0.0001")
-                  | &nbsp; &lt; 0.0001
+                  | &nbsp; AF &lt; 0.0001
                   br
                   frequency-block-view(data-dataset="" data-frequency="<0.001")
-                  | &nbsp; &lt; 0.001
+                  | &nbsp; AF &lt; 0.001
                   br
                   frequency-block-view(data-dataset="" data-frequency="<0.01")
-                  | &nbsp; &lt; 0.01
+                  | &nbsp; AF &lt; 0.01
                   br
                   frequency-block-view(data-dataset="" data-frequency="<0.05")
-                  | &nbsp; &lt; 0.05
+                  | &nbsp; AF &lt; 0.05
                   br
                   frequency-block-view(data-dataset="" data-frequency="<0.5")
-                  | &nbsp; &lt; 0.5
+                  | &nbsp; AF &lt; 0.5
                   br
                   frequency-block-view(data-dataset="" data-frequency="≥0.5")
-                  | &nbsp; ≥ 0.5
+                  | &nbsp; AF &ge; 0.5
+                ._padding-right-large
+                  frequency-block-view(data-dataset="" data-homozygous-allele-count)
+                  | &nbsp; &ge;1 Alt homozygote
+                  br
+                  frequency-block-view(data-dataset="" data-hemizygote-allele-count)
+                  | &nbsp; &ge;1 Alt hemizygote
                 ._padding-right-large
                   frequency-block-view(data-dataset="gem_j_wga" data-frequency="≥0.5")
                   | &nbsp; GEM-J WGA

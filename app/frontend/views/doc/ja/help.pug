@@ -241,44 +241,46 @@ block content
         section.section
           h3.sectiontitle TogoVarの検索システムに関して
           #s1.question-answer._column-span-all
-            h4.question 検索結果のFrequency列に表示される頻度メーターは何を表現していますか。
+            h4.question 検索結果の Alt frequency 列に表示される頻度インジケーターは何を表していますか。
             .answer
               p
-                | 各データセットにおけるAlternative allele頻度を表現しています。頻度メータの色はデータセットに割り当てられた色に対応しています。データの有無や頻度の値を９段階で表現しています。
+                | 検索結果の頻度インジケーターは、各データセットにおける代替（Alt）アレル数（AC）または頻度（AF）を9段階で示したものです。
+                | Altホモ接合体またはヘミ接合体が1例以上確認されているデータセットでは、インジケーターの右上にアイコンが表示されます。
+                | インジケーターの色は、各データセットに割り当てられた色に対応しています。
               ._flex._break-avoid
                 ._padding-right-large
                   frequency-block-view(data-dataset="" data-frequency="na")
-                  | &nbsp; Not Available
+                  | &nbsp; Not available
                   br
                   frequency-block-view(data-dataset="" data-frequency="monomorphic")
-                  | &nbsp; Monomorphic (REF)
+                  | &nbsp; AC = 0 (Monomorphic)
                   br
                   frequency-block-view(data-dataset="" data-frequency="undefined" data-allele-count="1")
-                  | &nbsp; Singleton
+                  | &nbsp; AC = 1 (Singleton)
                   br
-                  frequency-block-view(data-dataset="" data-homozygous-allele-count)
-                  | &nbsp; Homozygous (ALT)
-                  br
-                  frequency-block-view(data-dataset="" data-hemizygote-allele-count)
-                  | &nbsp; Hemizygous
-                ._padding-right-large
                   frequency-block-view(data-dataset="" data-frequency="<0.0001")
-                  | &nbsp; &lt; 0.0001
+                  | &nbsp; AF &lt; 0.0001
                   br
                   frequency-block-view(data-dataset="" data-frequency="<0.001")
-                  | &nbsp; &lt; 0.001
+                  | &nbsp; AF &lt; 0.001
                   br
                   frequency-block-view(data-dataset="" data-frequency="<0.01")
-                  | &nbsp; &lt; 0.01
+                  | &nbsp; AF &lt; 0.01
                   br
                   frequency-block-view(data-dataset="" data-frequency="<0.05")
-                  | &nbsp; &lt; 0.05
+                  | &nbsp; AF &lt; 0.05
                   br
                   frequency-block-view(data-dataset="" data-frequency="<0.5")
-                  | &nbsp; &lt; 0.5
+                  | &nbsp; AF &lt; 0.5
                   br
                   frequency-block-view(data-dataset="" data-frequency="≥0.5")
-                  | &nbsp; ≥ 0.5
+                  | &nbsp; AF &ge; 0.5
+                ._padding-right-large
+                  frequency-block-view(data-dataset="" data-homozygous-allele-count)
+                  | &nbsp; &ge;1 Alt homozygote
+                  br
+                  frequency-block-view(data-dataset="" data-hemizygote-allele-count)
+                  | &nbsp; &ge;1 Alt hemizygote
                 ._padding-right-large
                   frequency-block-view(data-dataset="gem_j_wga" data-frequency="≥0.5")
                   | &nbsp; GEM-J WGA
