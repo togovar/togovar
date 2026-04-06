@@ -19,7 +19,7 @@ $frequency-block-counts: (
 
 $frequency-na-border: #d4d3d1;
 $frequency-na-background: #f4f4f4;
-$frequency-marker-size: 7px;
+$frequency-marker-size: 9px;
 $frequency-marker-offset: -4px;
 $frequency-marker-gap: 1px;
 
@@ -107,15 +107,12 @@ $frequency-marker-gap: 1px;
 :host > .marker {
   position: absolute;
   top: $frequency-marker-offset;
-  right: $frequency-marker-offset;
+  right: -5px;
   z-index: 1;
   box-sizing: border-box;
   display: none;
   width: $frequency-marker-size;
   height: $frequency-marker-size;
-  // TODO: 色を固定からデータセットカラーに切り替えるか要検討
-  background-color: var(--frequency-dataset-color);
-  background-color: $COLOR_SIGN_DANGEROUS;
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
