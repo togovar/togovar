@@ -66,7 +66,6 @@ export function createFrequencyColumnHTML(): string {
       (dataset) =>
         `<frequency-block-view
         data-dataset="${dataset.id}"
-        data-direction="vertical"
       ></frequency-block-view>`
     )
     .join('');
