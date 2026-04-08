@@ -53,9 +53,9 @@ export class FrequencyBlockView extends LitElement {
   total?: number;
   /** アレル頻度（af） */
   frequencyValue?: number;
-  /** 代替アレルカウント（aac）: ホモ接合マーカーの表示に使用 */
+  /** Alt ホモ接合ジェノタイプカウント（aac）: ホモ接合マーカーの表示に使用 */
   homozygousAlleleCount?: number;
-  /** ヘミ接合アレルカウント（hac）: ヘミ接合マーカーの表示に使用 */
+  /** Alt ヘミ接合ジェノタイプカウント（hac）: ヘミ接合マーカーの表示に使用 */
   hemizygoteAlleleCount?: number;
 
   private _frequency?: Frequency;
