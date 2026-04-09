@@ -319,76 +319,79 @@ block content
           h3.sectiontitle About the TogoVar search system
           #s1.question-answer._column-span-all
             h4.question
-              | What does the frequency indicator in the Frequency column of the search results
-              | represent?
+              | What does the frequency indicator shown in the Alt frequency column of the search results represent?
             .answer
               p
-                | The frequency indicator represents the alternative allele frequency for each dataset. The color of the
-                | frequency meter corresponds to the color allocated to the dataset. The data availability or frequency
-                | value is represented on a 9-point scale.
+                | The frequency indicator shows the alternate (Alt) allele count (AC) or frequency (AF) for each dataset 
+                | on a nine-level scale. Datasets in which at least one Alt homozygote or hemizygote has been identified are marked 
+                | with an icon in the upper-right corner of the indicator. 
+                | The color of each indicator corresponds to the color assigned to the dataset.
               ._flex._break-avoid
                 ._padding-right-large
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="na")
-                  | &nbsp; Not Available
+                  frequency-block-view(data-dataset="" data-frequency="na")
+                  | &nbsp; Not available
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="monomorphic")
-                  | &nbsp; Monomorphic (REF)
+                  frequency-block-view(data-dataset="" data-frequency="monomorphic")
+                  | &nbsp; AC = 0 (Monomorphic)
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="undefined" data-allele-count="1")
-                  | &nbsp; Singleton
+                  frequency-block-view(data-dataset="" data-frequency="undefined" data-allele-count="1")
+                  | &nbsp; AC = 1 (Singleton)
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-alternate-allele-count)
-                  | &nbsp; Homozygous
+                  frequency-block-view(data-dataset="" data-frequency="<0.0001")
+                  | &nbsp; AF &lt; 0.0001
+                  br
+                  frequency-block-view(data-dataset="" data-frequency="<0.001")
+                  | &nbsp; AF &lt; 0.001
+                  br
+                  frequency-block-view(data-dataset="" data-frequency="<0.01")
+                  | &nbsp; AF &lt; 0.01
+                  br
+                  frequency-block-view(data-dataset="" data-frequency="<0.05")
+                  | &nbsp; AF &lt; 0.05
+                  br
+                  frequency-block-view(data-dataset="" data-frequency="<0.5")
+                  | &nbsp; AF &lt; 0.5
+                  br
+                  frequency-block-view(data-dataset="" data-frequency="≥0.5")
+                  | &nbsp; AF &ge; 0.5
                 ._padding-right-large
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.0001")
-                  | &nbsp; &lt; 0.0001
+                  frequency-block-view(data-dataset="" data-homozygous-allele-count)
+                  | &nbsp; &ge;1 Alt homozygote
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.001")
-                  | &nbsp; &lt; 0.001
-                  br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.01")
-                  | &nbsp; &lt; 0.01
-                  br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.05")
-                  | &nbsp; &lt; 0.05
-                  br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="<0.5")
-                  | &nbsp; &lt; 0.5
-                  br
-                  logarithmized-block-graph-frequency-view(data-dataset="" data-logarithmized-frequency="≥0.5")
-                  | &nbsp; ≥ 0.5
+                  frequency-block-view(data-dataset="" data-hemizygote-allele-count)
+                  | &nbsp; &ge;1 Alt hemizygote
                 ._padding-right-large
-                  logarithmized-block-graph-frequency-view(data-dataset="gem_j_wga" data-logarithmized-frequency="≥0.5")
+                  frequency-block-view(data-dataset="gem_j_wga" data-frequency="≥0.5")
                   | &nbsp; GEM-J WGA
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="jga_snp" data-logarithmized-frequency="≥0.5")
+                  frequency-block-view(data-dataset="jga_snp" data-frequency="≥0.5")
                   | &nbsp; JGA-SNP
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="jga_wes" data-logarithmized-frequency="≥0.5")
+                  frequency-block-view(data-dataset="jga_wes" data-frequency="≥0.5")
                   | &nbsp; JGA-WES
                   br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    logarithmized-block-graph-frequency-view(data-dataset="jga_wgs" data-logarithmized-frequency="≥0.5")
+                    frequency-block-view(data-dataset="jga_wgs" data-frequency="≥0.5")
                     | &nbsp; JGA-WGS
                     br
-                  logarithmized-block-graph-frequency-view(data-dataset="tommo" data-logarithmized-frequency="≥0.5")
+                  frequency-block-view(data-dataset="tommo" data-frequency="≥0.5")
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
                     | &nbsp; ToMMo 8.3KJPN
                   else if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
                     | &nbsp; ToMMo 54KJPN
                   br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
-                    logarithmized-block-graph-frequency-view(data-dataset="hgvd" data-logarithmized-frequency="≥0.5")
+                    frequency-block-view(data-dataset="hgvd" data-frequency="≥0.5")
                     | &nbsp; HGVD
                     br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    logarithmized-block-graph-frequency-view(data-dataset="ncbn" data-logarithmized-frequency="≥0.5")
+                    frequency-block-view(data-dataset="ncbn" data-frequency="≥0.5")
                     | &nbsp; NCBN
                     br
-                  logarithmized-block-graph-frequency-view(data-dataset="gnomad_genomes" data-logarithmized-frequency="≥0.5")
+                  frequency-block-view(data-dataset="gnomad_genomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD genomes
                   br
-                  logarithmized-block-graph-frequency-view(data-dataset="gnomad_exomes" data-logarithmized-frequency="≥0.5")
+                  frequency-block-view(data-dataset="gnomad_exomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD exomes
 
           #s2.question-answer._column-span-all

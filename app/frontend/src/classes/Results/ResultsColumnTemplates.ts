@@ -52,7 +52,7 @@ export const COLUMN_TEMPLATES = {
  * Dynamically generates HTML for Alt frequency column
  *
  * Retrieves datasets with frequency data from the dataset master,
- * and generates logarithmized-block-graph-frequency-view elements
+ * and generates frequency-block-view elements
  * corresponding to each dataset
  *
  * @returns Generated HTML table cell string
@@ -64,10 +64,9 @@ export function createFrequencyColumnHTML(): string {
     .filter((dataset) => dataset.has_freq)
     .map(
       (dataset) =>
-        `<logarithmized-block-graph-frequency-view
+        `<frequency-block-view
         data-dataset="${dataset.id}"
-        data-direction="vertical"
-      ></logarithmized-block-graph-frequency-view>`
+      ></frequency-block-view>`
     )
     .join('');
 
