@@ -100,7 +100,7 @@
     "webpack-hot-middleware": "^2.25.0"
   },
   "engines": {
-    "node": ">=22"
+    "node": "22.x"
   },
   "resolutions": {
     "ssri": "~8.0.1"
