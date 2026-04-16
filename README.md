@@ -11,8 +11,7 @@ See [togovar-docker](https://github.com/togovar/togovar-docker) for details.
 ## Prerequisites
 
 * ruby 2.7
-* node.js v12.x (LTS)
-    - yarn
+* node.js v22.x (LTS)
 
 ## Configuration
 
