@@ -121,7 +121,7 @@ $frequency-marker-gap: 1px;
 
 // ホモ接合マーカー
 :host > .marker.homozygote-marker {
-  background-image: url('../../../src/assets/icons/slashmark.svg');
+  background-image: url('../../../src/assets/icons/homozygote.svg');
 }
 
 :host([data-homozygous-allele-count]) > .marker.homozygote-marker {
@@ -130,7 +130,7 @@ $frequency-marker-gap: 1px;
 
 // ヘミ接合マーカー
 :host > .marker.hemizygote-marker {
-  background-image: url('../../../src/assets/icons/slashmark-hemi.svg');
+  background-image: url('../../../src/assets/icons/hemizygote.svg');
 }
 
 :host([data-hemizygote-allele-count]) > .marker.hemizygote-marker {
