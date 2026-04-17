@@ -54,13 +54,13 @@ TOGOVAR_STANZA_JBROWSE_URL=https://togovar-stg.biosciencedbc.jp/jbrowse
 1. First install dependencies:
 
     ```sh
-    $ yarn install
+    $ npm install
     ```
 
 1. Start development server on `localhost:8000`
 
     ```sh
-    $ yarn start
+    $ npm start
     ```
 
 Other commands
@@ -68,17 +68,17 @@ Other commands
 * Static code analysis for js and css
 
     ```sh
-    $ yarn list
+    $ npm run lint
     ```
 
 * Start production server
 
     ```sh
-    $ start:production
+    $ npm run start:prod
     ```
 
 * Build distribution files
 
     ```sh
-    $ yarn build
+    $ npm run build
     ```
