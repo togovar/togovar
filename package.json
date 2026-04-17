@@ -101,8 +101,5 @@
   },
   "engines": {
     "node": "22.x"
-  },
-  "overrides": {
-    "ssri": "~8.0.1"
   }
 }
