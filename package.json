@@ -99,7 +99,7 @@
     "webpack-dev-server": "^5.2.1",
     "webpack-hot-middleware": "^2.25.0"
   },
-  "resolutions": {
-    "ssri": "~8.0.1"
+  "engines": {
+    "node": "22.x"
   }
 }

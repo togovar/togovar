@@ -18,6 +18,7 @@
     "./app/frontend/css.d.ts"
   ],
   "exclude": [
+    "node_modules",
     "./app/frontend/config/webpack.config*.js",
     "./app/frontend/server/**/*"
   ]
