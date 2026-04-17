@@ -1,6 +1,5 @@
 import { COLUMNS } from '../../global';
 import { storeManager } from '../../store/StoreManager';
-import '../../components/LogarithmizedBlockGraphFrequencyView';
 import type {
   ResultData,
   Column,
@@ -311,7 +310,7 @@ export class ResultsRowView {
     this.frequencyElements = {};
     this.tr
       .querySelectorAll(
-        'td.alt_frequency > logarithmized-block-graph-frequency-view'
+        'td.alt_frequency > frequency-block-view'
       )
       .forEach((elm) => {
         const element = elm as FrequencyElement;

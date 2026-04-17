@@ -5,7 +5,7 @@ import '../stylesheets/main.sass';
 import { PAGE } from '../src/global';
 
 // Import components (execute to register custom elements)
-import '../src/components/LogarithmizedBlockGraphFrequencyView.js';
+import '../src/components/FrequencyBlockView';
 
 // Import assets
 import '!file-loader?name=[name].[ext]!../images/favicon.svg';

@@ -152,14 +152,16 @@ export type Transcript = {
 
 export type Frequency = {
   ac?: number;
+  aac?: number;
   af?: number;
   an?: number;
+  hac?: number;
   filter?: string[];
   source?: string;
 };
 
 export type TdFrequencies = Record<string, FrequencyElement>;
-export type FrequencyElement = HTMLElement & { frequency?: any };
+export type FrequencyElement = FrequencyBlockElement;
 
 // ============================================
 // Results Display & Processing Types

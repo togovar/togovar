@@ -71,9 +71,11 @@ main#SearchResultsView.LayoutMainAside
         h2.title
           span.simple Statistics / Filters
           span.advanced Statistics
-          button.button-view Reset
+          button.button-view Clear all
         section#FilterDatasets.panel-view
-          h3.title Dataset
+          h3.title
+            | Dataset
+            button.clear-button.button-view Clear
           .content
             ul.checklist-values
         section#FilterAlternativeAlleleFrequency.panel-view
@@ -87,26 +89,38 @@ main#SearchResultsView.LayoutMainAside
               input(checked='checked', type='checkbox')
               | Exclude filtered out variants in all datasets
         section#FilterVariantType.panel-view
-          h3.title Variant type
+          h3.title
+            | Variant type
+            button.clear-button.button-view Clear
           .content
             ul.checklist-values
         section#FilterConsequence.panel-view
-          h3.title Consequence
+          h3.title
+            | Consequence
+            button.clear-button.button-view Clear
           .content
             ul.checklist-values
         section#FilterClinicalSignificance.panel-view
-          h3.title Clinical significance
+          h3.title
+            | Clinical significance
+            button.clear-button.button-view Clear
           .content
             ul.checklist-values
         section#FilterAlphaMissense.panel-view
-          h3.title AlphaMissense
+          h3.title
+            | AlphaMissense
+            button.clear-button.button-view Clear
           .content
             ul.checklist-values
         section#FilterSIFT.panel-view
-          h3.title SIFT
+          h3.title
+            | SIFT
+            button.clear-button.button-view Clear
           .content
             ul.checklist-values
         section#FilterPolyPhen.panel-view
-          h3.title PolyPhen
+          h3.title
+            | PolyPhen
+            button.clear-button.button-view Clear
           .content
             ul.checklist-values

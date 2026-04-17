@@ -162,12 +162,8 @@ export function resetSimpleSearchConditions() {
         break;
       case 'array':
         {
-          const temp: Record<string, unknown> = {};
-          for (const item of condition.items) {
-            temp[item.id] = item.default;
-          }
           const key = condition.id as keyof SimpleSearchCurrentConditions;
-          (resetConditions as Record<string, unknown>)[key] = temp;
+          (resetConditions as Record<string, unknown>)[key] = {};
         }
         break;
     }

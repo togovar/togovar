@@ -11,6 +11,13 @@
     font-size: 14px
     font-weight: bold
     line-height: 16px
+    display: flex
+    align-items: center
+    justify-content: space-between
+    > .clear-button
+      font-size: 11px
+      z-index: 1
+      margin-right: 16px
     &:after
       content: ""
       display: block
@@ -21,7 +28,7 @@
       border-left: solid 1px $COLOR_BLACK
       transform: rotate(45deg)
       right: 12px
-      top: 13px
+      top: 16px
       transition: transform $GUI_DURATION, top $GUI_DURATION
   > .close
     position: absolute
@@ -54,7 +61,7 @@
       border-bottom: none
       &:after
         transform: rotate(225deg)
-        top: 10px
+        top: 12px
     > .content
       display: none
     &.-notfound
@@ -79,6 +86,12 @@
         &.hyper-text
           &:after
             color: white
+
+body[data-search-mode="advanced"]
+  .panel-view
+    > .title
+      > .clear-button
+        display: none
 
 .panel-view-heading
   font-size: 10px

@@ -11,8 +11,15 @@ See [togovar-docker](https://github.com/togovar/togovar-docker) for details.
 ## Prerequisites
 
 * ruby 2.7
-* node.js v12.x (LTS)
-    - yarn
+* node.js v22.x (LTS) — version is pinned in `.nvmrc`
+
+  If you use a version manager, run the following command in the project root to switch automatically:
+
+  | Tool | Command | URL |
+  |------|---------|-----|
+  | nvm  | `nvm use` | https://github.com/nvm-sh/nvm |
+  | fnm  | `fnm use` | https://github.com/Schniz/fnm |
+  | mise | `mise install` | https://github.com/jdx/mise |
 
 ## Configuration
 
@@ -55,13 +62,13 @@ TOGOVAR_STANZA_JBROWSE_URL=https://togovar-stg.biosciencedbc.jp/jbrowse
 1. First install dependencies:
 
     ```sh
-    $ yarn install
+    $ npm install
     ```
 
 1. Start development server on `localhost:8000`
 
     ```sh
-    $ yarn start
+    $ npm start
     ```
 
 Other commands
@@ -69,17 +76,17 @@ Other commands
 * Static code analysis for js and css
 
     ```sh
-    $ yarn list
+    $ npm run lint
     ```
 
 * Start production server
 
     ```sh
-    $ start:production
+    $ npm run start:prod
     ```
 
 * Build distribution files
 
     ```sh
-    $ yarn build
+    $ npm run build
     ```
