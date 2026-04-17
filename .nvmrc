@@ -1,0 +1,7 @@
+# Node.js version for this project.
+# Version managers that read this file will automatically switch to this version:
+#   nvm  : https://github.com/nvm-sh/nvm
+#   fnm  : https://github.com/Schniz/fnm
+#   mise : https://github.com/jdx/mise
+# Run `nvm use` / `fnm use` / `mise install` in the project root to activate.
+22

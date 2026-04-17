@@ -11,7 +11,7 @@ See [togovar-docker](https://github.com/togovar/togovar-docker) for details.
 ## Prerequisites
 
 * ruby 2.7
-* node.js v22.x (LTS)
+* node.js v22.x (LTS) — version is pinned in `.nvmrc`; run `nvm use` / `fnm use` / `mise install` in the project root to switch automatically
 
 ## Configuration
 
