@@ -147,13 +147,13 @@ class StoreManager {
     this.#listeners.get(key)?.add(callback as unknown as StoreListener);
   }
 
-  // /** 変更監視を解除する */
-  // unsubscribe<T extends keyof StoreState>(
-  //   key: T,
-  //   callback: (value: StoreState[T]) => void
-  // ) {
-  //   this.#listeners.get(key)?.delete(callback);
-  // }
+  /** 変更監視を解除する */
+  unsubscribe<T extends keyof StoreState>(
+    key: T,
+    callback: (value: StoreState[T]) => void
+  ) {
+    this.#listeners.get(key)?.delete(callback as unknown as StoreListener);
+  }
 
   /** 指定されたキーにターゲットをバインドする */
   // TODO: bindings が廃止されたら、このメソッドは削除する

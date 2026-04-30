@@ -53,6 +53,8 @@ export class ResultsView {
   private columnsDropdown!: ResultsColumnsDropdown;
   /** バインドされたキーボードイベントハンドラー */
   private _boundKeydownHandler!: (_e: KeyboardEvent) => void;
+  /** バインドされた検索モード変更ハンドラー */
+  private _boundSearchModeHandler!: (_newMode: unknown) => void;
 
   /**
    * ResultsView のコンストラクタ
@@ -124,6 +126,8 @@ export class ResultsView {
     STORE_BINDINGS.forEach((key) => {
       storeManager.unbind(key, this);
     });
+
+    storeManager.unsubscribe('searchMode', this._boundSearchModeHandler);
 
     // Remove keydown event listener
     document.removeEventListener('keydown', this._boundKeydownHandler);
@@ -420,9 +424,10 @@ export class ResultsView {
    * - 検索モード切り替え時にスクロール位置をリセット
    */
   private _initializeSearchModeListener(): void {
-    storeManager.subscribe('searchMode', (_newMode) => {
+    this._boundSearchModeHandler = (_newMode) => {
       // 検索モード変更時にスクロール位置をリセット
       this.scrollBar.resetScrollPosition();
-    });
+    };
+    storeManager.subscribe('searchMode', this._boundSearchModeHandler);
   }
 }
