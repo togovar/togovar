@@ -2,6 +2,37 @@
 // 検索結果テーブルのメインビュー（Results）スタイル
 // =======================================================
 
+// Columns ドロップダウンのドラッグゴースト（body直下に追加されるためグローバル定義）
+.columns-dropdown-item.-drag-ghost
+  display: flex
+  align-items: center
+  gap: 10px
+  padding: 4px 14px
+  background: white
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .18)
+  border-radius: 4px
+  > .drag-handle
+    flex: 0 0 auto
+    width: 1em
+    display: flex
+    align-items: center
+    justify-content: center
+    &::before
+      content: $CHAR_DRAG_HANDLE
+      font-family: "Font Awesome 7 Free", "Font Awesome 6 Free", FontAwesome
+      font-weight: 900
+      color: var(--color-gray)
+      font-size: 8px
+  > label
+    display: flex
+    align-items: center
+    gap: 10px
+    width: 100%
+    color: var(--color-black)
+    pointer-events: none
+    > input
+      margin: 0
+
 #ResultsView
   padding: 10px $PADDING_SIDE $PADDING_SIDE
   position: relative
@@ -129,20 +160,25 @@
             margin: 0
             padding: 0
             list-style: none
+            user-select: none
+            -webkit-user-select: none
 
             // ドラッグ中：ホバー状態を無効化（背景色変更を抑止）・トランジションも無効化
             &.-is-dragging
               > .columns-dropdown-item
+                cursor: grabbing
                 transition: none
                 &:hover
                   background: white
+                > .drag-handle
+                  cursor: grabbing
 
             // 列アイテム（1 行 = 1 列）
             > .columns-dropdown-item
               display: flex
               align-items: center
               gap: 10px
-              padding: 4px 14px
+              padding: 0px 14px
               margin: 0
               background: white
               cursor: grab
@@ -162,6 +198,7 @@
               // ドラッグ中：元要素は不可視にする（スペースは維持）
               &.-dragging-hidden
                 visibility: hidden
+                pointer-events: none
 
               // 固定列（TogoVar ID）：ドラッグ禁止・グレーアウト・鍵アイコン表示
               &.-locked
@@ -182,6 +219,9 @@
                   color: var(--color-gray)
                   cursor: default
 
+                  > input
+                    cursor: default
+
                 // 鍵アイコン表示（FontAwesome ロック）
                 > .lock
                   &::before
@@ -197,6 +237,7 @@
                 display: flex
                 align-items: center
                 justify-content: center
+                cursor: grab
 
                 &::before
                   content: $CHAR_DRAG_HANDLE
@@ -217,9 +258,11 @@
                 width: 100%
                 color: var(--color-black)
                 cursor: pointer
+                padding: 4px 0
 
                 > input
                   margin: 0
+                  cursor: pointer
 
         // ドロップダウンが開いている状態
         &.-open

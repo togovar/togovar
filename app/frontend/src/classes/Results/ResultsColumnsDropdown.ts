@@ -17,6 +17,8 @@ const SELECTORS = {
 
 /** 常に先頭に固定される列の ID（TogoVar ID） */
 const LOCKED_COLUMN_ID = 'togovar_id';
+const LONG_PRESS_MS = 150;
+const DRAG_START_MOVE_THRESHOLD_PX = 6;
 
 /**
  * 検索結果テーブルの列表示/非表示・ドラッグ並び替え機能を提供するドロップダウン
@@ -33,6 +35,8 @@ export class ResultsColumnsDropdown {
   private readonly _menu: HTMLElement;
   private readonly _list: HTMLElement;
   private _draggingElement: HTMLElement | null = null;
+  private _ghostElement: HTMLElement | null = null;
+  private _draggingCursorStyleEl: HTMLStyleElement | null = null;
   private readonly _boundDocumentClick: (_event: MouseEvent) => void;
   private readonly _boundDocumentKeydown: (_event: KeyboardEvent) => void;
 
@@ -56,6 +60,7 @@ export class ResultsColumnsDropdown {
     storeManager.unbind('columns', this);
     document.removeEventListener('click', this._boundDocumentClick);
     document.removeEventListener('keydown', this._boundDocumentKeydown);
+    this._disableGlobalDraggingCursor();
   }
 
   /**
@@ -67,7 +72,9 @@ export class ResultsColumnsDropdown {
   columns(columns: ColumnConfig[]): void {
     const normalizedColumns = normalizeColumnConfigs(columns);
     const constrainedColumns = this._applyLockedColumnConstraints(
-      normalizedColumns.length > 0 ? normalizedColumns : getDefaultColumnConfigs()
+      normalizedColumns.length > 0
+        ? normalizedColumns
+        : getDefaultColumnConfigs()
     );
     this._render(constrainedColumns);
   }
@@ -76,7 +83,7 @@ export class ResultsColumnsDropdown {
    * 全イベントリスナーをセットアップ
    * - ボタンクリック：ドロップダウン開閉
    * - チェックボックス change：列表示/非表示制御
-   * - ドラッグ系イベント：列の並び替え
+   * - mousedown on drag-handle：列の並び替え（mousemove/mouseup ベース）
    * - ドキュメントクリック/キー：ドロップダウン自動クローズ
    */
   private _bindEvents(): void {
@@ -99,7 +106,9 @@ export class ResultsColumnsDropdown {
       const nextColumns = this._applyLockedColumnConstraints(
         normalizeColumnConfigs(storeManager.getData('columns'))
       );
-      const targetColumn = nextColumns.find((column) => column.id === target.value);
+      const targetColumn = nextColumns.find(
+        (column) => column.id === target.value
+      );
 
       if (!targetColumn) {
         return;
@@ -112,100 +121,59 @@ export class ResultsColumnsDropdown {
       );
     });
 
-    // dragstart：ドラッグ開始
-    // 固定列（TogoVar ID）の場合はドラッグを禁止
-    this._list.addEventListener('dragstart', (event) => {
-      const target = (event.target as HTMLElement | null)?.closest(
-        SELECTORS.ITEM
-      ) as HTMLElement | null;
-
+    // mousedown：checkbox 以外のエリアは長押しでドラッグ開始
+    // checkbox は通常クリックで表示/非表示切り替えを維持する
+    this._list.addEventListener('mousedown', (event) => {
+      const target = event.target as HTMLElement | null;
       if (!target) {
         return;
       }
 
-      const columnId = target.dataset.columnId;
-      if (!columnId || columnId === LOCKED_COLUMN_ID) {
-        event.preventDefault();
+      // checkbox 自体は既存のクリック挙動を優先
+      if (target.closest(SELECTORS.INPUT)) {
         return;
       }
 
-      this._draggingElement = target;
-      this._list.classList.add('-is-dragging');
+      const item = target.closest(SELECTORS.ITEM) as HTMLElement | null;
+      if (!item || item.dataset.columnId === LOCKED_COLUMN_ID) {
+        return;
+      }
 
-      // ドラッグ開始直後（ゴースト生成後）に元要素を非表示にする
-      requestAnimationFrame(() => {
-        if (this._draggingElement === target) {
-          target.classList.add('-dragging-hidden');
+      const startX = event.clientX;
+      const startY = event.clientY;
+      let longPressTimer: number | null = null;
+
+      // 長押し前に大きく動いたら通常クリック扱いに戻す
+      function onPendingMove(e: MouseEvent): void {
+        const movedX = e.clientX - startX;
+        const movedY = e.clientY - startY;
+        if (Math.hypot(movedX, movedY) > DRAG_START_MOVE_THRESHOLD_PX) {
+          clearLongPressWatchers();
         }
-      });
-
-      if (event.dataTransfer) {
-        event.dataTransfer.effectAllowed = 'move';
-      }
-    });
-
-    // dragover：ドラッグ中に DOM を実際に並び替える
-    this._list.addEventListener('dragover', (event) => {
-      if (!this._draggingElement) {
-        return;
       }
 
-      // ドラッグ中は常に preventDefault()（これを省くとスナップバックアニメーションが発生する）
-      event.preventDefault();
-
-      const target = (event.target as HTMLElement | null)?.closest(
-        SELECTORS.ITEM
-      ) as HTMLElement | null;
-
-      if (!target || target === this._draggingElement) {
-        return;
+      // 長押し時間に達する前に離した場合はドラッグしない
+      function onPendingMouseUp(): void {
+        clearLongPressWatchers();
       }
 
-      // 固定列（TogoVar ID）の後ろにしか挿入できない
-      const isTargetLocked = target.dataset.columnId === LOCKED_COLUMN_ID;
-      const rect = target.getBoundingClientRect();
-      const shouldInsertAfter = isTargetLocked
-        ? true
-        : event.clientY > rect.top + rect.height / 2;
-
-      // FLIP：移動前の各アイテムの Y 座標を記録
-      const items = Array.from(
-        this._list.querySelectorAll(SELECTORS.ITEM)
-      ) as HTMLElement[];
-      const beforeTops = new Map(
-        items.map((el) => [el, el.getBoundingClientRect().top])
-      );
-
-      // DOM を並び替え
-      if (shouldInsertAfter) {
-        target.after(this._draggingElement);
-      } else {
-        target.before(this._draggingElement);
+      function clearLongPressWatchers(): void {
+        if (longPressTimer !== null) {
+          window.clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }
+        document.removeEventListener('mousemove', onPendingMove);
+        document.removeEventListener('mouseup', onPendingMouseUp);
       }
 
-      // FLIP：移動後の差分を transform で補正し、transition でアニメーション
-      items.forEach((el) => {
-        if (el === this._draggingElement) return;
-        const delta = (beforeTops.get(el) ?? 0) - el.getBoundingClientRect().top;
-        if (delta === 0) return;
-        el.style.transition = 'none';
-        el.style.transform = `translateY(${delta}px)`;
-        requestAnimationFrame(() => {
-          el.style.transition = 'transform 0.15s ease';
-          el.style.transform = '';
-        });
-      });
-    });
+      const startDrag = (): void => {
+        clearLongPressWatchers();
+        this._beginDrag(item, startX, startY);
+      };
 
-    // dragend：ドラッグ終了後に DOM の順序を store に保存
-    this._list.addEventListener('dragend', () => {
-      this._commitCurrentOrder();
-      this._clearDragState();
-    });
-
-    // drop：ブラウザの「ゴーストが元位置に戻るアニメーション」を抑止するために必要
-    this._list.addEventListener('drop', (event) => {
-      event.preventDefault();
+      longPressTimer = window.setTimeout(startDrag, LONG_PRESS_MS);
+      document.addEventListener('mousemove', onPendingMove);
+      document.addEventListener('mouseup', onPendingMouseUp);
     });
 
     // ドキュメントクリック：範囲外クリックでドロップダウンを閉じる
@@ -225,7 +193,7 @@ export class ResultsColumnsDropdown {
       .map((column) => {
         const isLocked = column.id === LOCKED_COLUMN_ID;
         return `
-          <li class="columns-dropdown-item${isLocked ? ' -locked' : ''}" data-column-id="${column.id}" draggable="${isLocked ? 'false' : 'true'}">
+          <li class="columns-dropdown-item${isLocked ? ' -locked' : ''}" data-column-id="${column.id}">
             <span class="drag-handle" aria-hidden="true"></span>
             <label>
               <input type="checkbox" value="${column.id}"${column.isUsed ? ' checked' : ''}${isLocked ? ' disabled' : ''}>
@@ -245,8 +213,12 @@ export class ResultsColumnsDropdown {
    * - 固定列制約を再度適用（安全性確保）
    */
   private _commitCurrentOrder(): void {
-    const currentColumns = normalizeColumnConfigs(storeManager.getData('columns'));
-    const columnMap = new Map(currentColumns.map((column) => [column.id, column]));
+    const currentColumns = normalizeColumnConfigs(
+      storeManager.getData('columns')
+    );
+    const columnMap = new Map(
+      currentColumns.map((column) => [column.id, column])
+    );
 
     // DOM の現在の並び順から新しい列設定を作成
     const domItems = Array.from(
@@ -263,6 +235,111 @@ export class ResultsColumnsDropdown {
   }
 
   /**
+   * 実ドラッグ処理を開始
+   * - カーソル固定
+   * - ゴースト作成
+   * - mousemove/mouseup 監視登録
+   */
+  private _beginDrag(
+    item: HTMLElement,
+    startClientX: number,
+    startClientY: number
+  ): void {
+    this._draggingElement = item;
+    this._list.classList.add('-is-dragging');
+    this._enableGlobalDraggingCursor();
+    item.classList.add('-dragging-hidden');
+
+    // ゴースト要素を生成してカーソルに追従させる
+    const ghost = item.cloneNode(true) as HTMLElement;
+    const itemRect = item.getBoundingClientRect();
+    ghost.classList.add('-drag-ghost');
+    ghost.style.cssText = `
+      position: fixed;
+      top: ${itemRect.top}px;
+      left: ${itemRect.left}px;
+      width: ${itemRect.width}px;
+      pointer-events: none;
+      opacity: 0.9;
+      z-index: 10500;
+      margin: 0;
+      list-style: none;
+      padding-left: 0;
+    `;
+    document.body.appendChild(ghost);
+    this._ghostElement = ghost;
+
+    // マウス位置とアイテム左上の差分（ドラッグ中にオフセットを保つ）
+    const offsetX = startClientX - itemRect.left;
+    const offsetY = startClientY - itemRect.top;
+
+    const onMouseMove = (e: MouseEvent): void => {
+      if (!this._draggingElement) {
+        return;
+      }
+
+      // ゴーストをカーソルに追従
+      if (this._ghostElement) {
+        this._ghostElement.style.left = `${e.clientX - offsetX}px`;
+        this._ghostElement.style.top = `${e.clientY - offsetY}px`;
+      }
+
+      const target = (e.target as HTMLElement | null)?.closest(
+        SELECTORS.ITEM
+      ) as HTMLElement | null;
+
+      if (!target || target === this._draggingElement) {
+        return;
+      }
+
+      const isTargetLocked = target.dataset.columnId === LOCKED_COLUMN_ID;
+      const rect = target.getBoundingClientRect();
+      const shouldInsertAfter = isTargetLocked
+        ? true
+        : e.clientY > rect.top + rect.height / 2;
+
+      // FLIP：移動前の各アイテムの Y 座標を記録
+      const items = Array.from(
+        this._list.querySelectorAll(SELECTORS.ITEM)
+      ) as HTMLElement[];
+      const beforeTops = new Map(
+        items.map((el) => [el, el.getBoundingClientRect().top])
+      );
+
+      // DOM を並び替え
+      if (shouldInsertAfter) {
+        target.after(this._draggingElement);
+      } else {
+        target.before(this._draggingElement);
+      }
+
+      // FLIP：移動後の差分を transform で補正し、transition でアニメーション
+      items.forEach((el) => {
+        if (el === this._draggingElement) return;
+        const delta =
+          (beforeTops.get(el) ?? 0) - el.getBoundingClientRect().top;
+        if (delta === 0) return;
+        el.style.transition = 'none';
+        el.style.transform = `translateY(${delta}px)`;
+        requestAnimationFrame(() => {
+          el.style.transition = 'transform 0.15s ease';
+          el.style.transform = '';
+        });
+      });
+    };
+
+    const onMouseUp = (): void => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      this._commitCurrentOrder();
+      this._clearDragState();
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }
+
+  /**
    * 固定列制約を適用（TogoVar ID は常に先頭・表示状態確定）
    * - TogoVar ID が存在しない場合は先頭に追加
    * - TogoVar ID が存在する場合は先頭に移動
@@ -270,7 +347,9 @@ export class ResultsColumnsDropdown {
    * @param columns 制約適用対象の列設定配列
    * @returns 制約適用済みの列設定配列
    */
-  private _applyLockedColumnConstraints(columns: ColumnConfig[]): ColumnConfig[] {
+  private _applyLockedColumnConstraints(
+    columns: ColumnConfig[]
+  ): ColumnConfig[] {
     const normalized = normalizeColumnConfigs(columns).map((column) => ({
       ...column,
       // 固定列は常に表示状態
@@ -300,15 +379,44 @@ export class ResultsColumnsDropdown {
    */
   private _clearDragState(): void {
     this._draggingElement = null;
+    this._disableGlobalDraggingCursor();
+
+    // ゴースト要素を削除
+    if (this._ghostElement) {
+      this._ghostElement.remove();
+      this._ghostElement = null;
+    }
+
     this._list.classList.remove('-is-dragging');
-    this._list
-      .querySelectorAll(SELECTORS.ITEM)
-      .forEach((element) => {
-        const el = element as HTMLElement;
-        el.classList.remove('-dragging-hidden');
-        el.style.transform = '';
-        el.style.transition = '';
-      });
+    this._list.querySelectorAll(SELECTORS.ITEM).forEach((element) => {
+      const el = element as HTMLElement;
+      el.classList.remove('-dragging-hidden');
+      el.style.transform = '';
+      el.style.transition = '';
+    });
+  }
+
+  /** ドラッグ中のみ全体カーソルを grabbing に固定 */
+  private _enableGlobalDraggingCursor(): void {
+    if (this._draggingCursorStyleEl) {
+      return;
+    }
+
+    const styleEl = document.createElement('style');
+    styleEl.textContent =
+      'html, body, body * { cursor: grabbing !important; user-select: none !important; -webkit-user-select: none !important; }';
+    document.head.appendChild(styleEl);
+    this._draggingCursorStyleEl = styleEl;
+  }
+
+  /** ドラッグ終了後に全体カーソル固定を解除 */
+  private _disableGlobalDraggingCursor(): void {
+    if (!this._draggingCursorStyleEl) {
+      return;
+    }
+
+    this._draggingCursorStyleEl.remove();
+    this._draggingCursorStyleEl = null;
   }
 
   /**
