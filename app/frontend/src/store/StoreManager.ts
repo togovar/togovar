@@ -113,10 +113,17 @@ class StoreManager {
   /** 指定されたキーにデータをセットする */
   setData<T extends keyof StoreState>(key: T, newValue: StoreState[T]) {
     const oldValue = this.#state[key];
+    const nextValue =
+      key === 'columns'
+        ? (normalizeColumnConfigs(
+            newValue as StoreState['columns']
+          ) as StoreState[T])
+        : newValue;
+
     // 値がプリミティブ型ならそのまま比較
-    if (typeof newValue !== 'object' || newValue === null) {
-      if (!Object.is(oldValue, newValue)) {
-        this.#state[key] = newValue;
+    if (typeof nextValue !== 'object' || nextValue === null) {
+      if (!Object.is(oldValue, nextValue)) {
+        this.#state[key] = nextValue;
         if (key === 'columns') {
           this.#saveColumnsToStorage(this.#state.columns);
         }
@@ -126,8 +133,8 @@ class StoreManager {
     }
 
     // オブジェクトの比較（変更があればコピーして保存）
-    if (!_.isEqual(oldValue, newValue)) {
-      this.#state[key] = structuredClone(newValue);
+    if (!_.isEqual(oldValue, nextValue)) {
+      this.#state[key] = structuredClone(nextValue);
       if (key === 'columns') {
         this.#saveColumnsToStorage(this.#state.columns);
       }

@@ -66,6 +66,9 @@ export const COLUMNS = [
 /** 列 ID から列定義オブジェクトへの高速マップ */
 const COLUMN_MAP = new Map(COLUMNS.map((column) => [column.id, column]));
 
+/** 常に先頭に固定される列の ID（TogoVar ID） */
+const LOCKED_COLUMN_ID = 'togovar_id';
+
 
 // ================================
 // 列設定管理用のヘルパー関数
@@ -85,8 +88,9 @@ export function getDefaultColumnConfigs(): ColumnConfig[] {
 }
 
 /**
- * 列設定を正規化（ユーザー順序保持・重複排除・欠落列補充）
- * - 既に定義済みの列設定を検証し、渡された列順を保持
+ * 列設定を正規化（固定列制約・ユーザー順序保持・重複排除・欠落列補充）
+ * - TogoVar ID 列は常に先頭かつ表示状態に固定
+ * - 既に定義済みの列設定を検証し、固定列以外は渡された列順を保持
  * - 重複や不正な列 ID を削除
  * - 欠落している列は COLUMNS の定義順で末尾に追加
  * @param columns 正規化対象の列設定配列（オプション）
@@ -101,7 +105,10 @@ export function normalizeColumnConfigs(columns: ColumnConfig[] = []): ColumnConf
       return;
     }
 
-    normalized.push({ id: column.id, isUsed: column.isUsed });
+    normalized.push({
+      id: column.id,
+      isUsed: column.id === LOCKED_COLUMN_ID ? true : column.isUsed,
+    });
     usedIds.add(column.id);
   });
 
@@ -113,6 +120,17 @@ export function normalizeColumnConfigs(columns: ColumnConfig[] = []): ColumnConf
     normalized.push(column);
   });
 
+  const lockedIndex = normalized.findIndex(
+    (column) => column.id === LOCKED_COLUMN_ID
+  );
+
+  if (lockedIndex === -1) {
+    normalized.unshift({ id: LOCKED_COLUMN_ID, isUsed: true });
+    return normalized;
+  }
+
+  const [lockedColumn] = normalized.splice(lockedIndex, 1);
+  normalized.unshift({ ...lockedColumn, isUsed: true });
   return normalized;
 }
 
