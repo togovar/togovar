@@ -260,7 +260,7 @@ export class ResultsColumnsDropdown {
       left: ${itemRect.left}px;
       width: ${itemRect.width}px;
       pointer-events: none;
-      opacity: 0.9;
+      opacity: 1;
       z-index: 10500;
       margin: 0;
       list-style: none;

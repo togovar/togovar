@@ -20,7 +20,8 @@
 
   &::before {
     content: $CHAR_DRAG_HANDLE;
-    font-family: 'Font Awesome 7 Free', 'Font Awesome 6 Free', FontAwesome, sans-serif;
+    font-family:
+      'Font Awesome 7 Free', 'Font Awesome 6 Free', FontAwesome, sans-serif;
     font-weight: 900;
     color: var(--color-gray);
     font-size: 8px;
@@ -165,20 +166,11 @@
 
         // ドロップダウンボタン
         > .columns-dropdown-button {
-          padding-right: 1.6em;
+          line-height: 1.6;
+          min-width: 65px;
 
-          // ボタンの右側に下向きの矢印を表示
-          &::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            right: 0.8em;
-            width: 0;
-            height: 0;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-            border-top: 6px solid rgba(255, 255, 255, 0.92);
-            transform: translateY(-30%);
+          &:active {
+            background: linear-gradient(to bottom, var(--color-key-dark1), var(--color-key-dark3));
           }
         }
 
@@ -299,8 +291,12 @@
                 cursor: grabbing;
                 transition: none;
 
-                &:hover {
+                &:not(.-locked):hover {
                   background: white;
+                }
+
+                &.-locked:hover {
+                  background: #f3f3f3;
                 }
 
                 > .drag-handle {
