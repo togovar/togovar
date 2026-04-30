@@ -85,10 +85,10 @@ export function getDefaultColumnConfigs(): ColumnConfig[] {
 }
 
 /**
- * 列設定を正規化（重複排除・欠落列補充・順序保証）
- * - 既に定義済みの列設定を検証し、欠落している列を追加
+ * 列設定を正規化（ユーザー順序保持・重複排除・欠落列補充）
+ * - 既に定義済みの列設定を検証し、渡された列順を保持
  * - 重複や不正な列 ID を削除
- * - 常に COLUMNS の定義順序を保証
+ * - 欠落している列は COLUMNS の定義順で末尾に追加
  * @param columns 正規化対象の列設定配列（オプション）
  * @returns 正規化済みの列設定配列
  */
@@ -117,11 +117,12 @@ export function normalizeColumnConfigs(columns: ColumnConfig[] = []): ColumnConf
 }
 
 /**
- * 表示対象の列オブジェクト配列を取得（isUsed かつ定義順）
- * - normalizeColumnConfigs() で順序保証済みの列から表示対象のみを抽出
- * - テーブル描画に使用
+ * 列設定順に対応する列オブジェクト配列を取得
+ * - normalizeColumnConfigs() で正規化済みの列を Column 定義へ変換
+ * - isUsed による表示/非表示は呼び出し側の CSS 制御で扱う
+ * - テーブル DOM 生成に使用
  * @param columns 列設定配列（オプション）
- * @returns 表示対象の Column オブジェクト配列
+ * @returns 列設定順に対応する Column オブジェクト配列
  */
 export function getOrderedColumns(columns: ColumnConfig[] = []): Column[] {
   return normalizeColumnConfigs(columns)
