@@ -1,6 +1,12 @@
+// =======================================================
+// 検索結果テーブルのメインビュー（Results）スタイル
+// =======================================================
+
 #ResultsView
   padding: 10px $PADDING_SIDE $PADDING_SIDE
   position: relative
+
+  // テーブル検索結果が見つからない場合のメッセージ
   &.-not-found:after
     content: "Not found"
     text-align: center
@@ -8,42 +14,215 @@
     font-size: 14px
     line-height: 64px
     color: $COLOR_GRAY
+
+  // ========================
+  // ヘッダー領域
+  // ========================
   > .header
     white-space: nowrap
     position: relative
     display: flex
     justify-content: space-between
+
+    // ヘッダー左側：見出し・結果件数
     > .left
       > .heading
         display: inline-block
         font-size: 16px
         margin-right: 8px
         margin-bottom: -2px
+
       > .status
         display: inline-block
         font-size: 12px
+
         > .bigger
           font-size: 16px
+
+    // ヘッダー右側：操作ボタン・ドロップダウン
     > .right
       position: relative
       top: 4px
-      height: 16px
+      min-height: 16px
       list-style: none
       display: flex
       gap: 5px
+      align-items: flex-start
       z-index: var(--z-index-base)
+
       > .text
         font-size: 12px
         font-weight: bold
         padding-right: 3px
+
       > li
         > .button-view
           body[data-has-conditions] &
             opacity: 1
             pointer-events: auto
+
           &:active
             background: var(--color-key-dark1)
             transform: translateY(.5px)
+
+      // ダウンロードボタングループ（複数ボタンを角丸でグループ化）
+      > .download-buttons
+        display: flex
+        gap: 0
+
+        > .button-view
+          min-width: 54px
+          border-radius: 0
+
+          // ボタン間の線と下のシャドウ
+          box-shadow: inset -1px 0 0 rgba(255, 255, 255, .22), 0 1px 2px rgba(0, 0, 0, .22)
+
+          &:first-child
+            border-top-left-radius: .9em
+            border-bottom-left-radius: .9em
+
+          &:last-child
+            border-top-right-radius: .9em
+            border-bottom-right-radius: .9em
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .22)
+      // =================================
+      // 列管理ドロップダウン（Columns）
+      // =================================
+      > .columns-dropdown
+        position: relative
+
+        // ドロップダウンボタン
+        > .columns-dropdown-button
+          min-width: 98px
+          padding-right: 1.6em
+
+          // ボタンの右側に下向きの矢印を表示
+          &:after
+            content: ""
+            position: absolute
+            top: 50%
+            right: .8em
+            width: 0
+            height: 0
+            border-left: 4px solid transparent
+            border-right: 4px solid transparent
+            border-top: 6px solid rgba(255, 255, 255, .92)
+            transform: translateY(-30%)
+
+        // ドロップダウンメニュー（列リスト）
+        > .columns-dropdown-menu
+          position: absolute
+          top: calc(100% + 8px)
+          right: 0
+          min-width: 170px
+          padding: 8px 0
+          border-radius: 12px
+          background: white
+          box-shadow: 0 10px 30px rgba(0, 0, 0, .22)
+
+          // 初期状態：非表示
+          opacity: 0
+          pointer-events: none
+          transform: translateY(-6px)
+          transition: opacity .16s ease, transform .16s ease
+
+          // 列のリスト
+          > .columns-dropdown-list
+            margin: 0
+            padding: 0
+            list-style: none
+
+            // ドラッグ中：ホバー状態を無効化（背景色変更を抑止）
+            &.-is-dragging
+              > .columns-dropdown-item:hover
+                background: white
+
+            // 列アイテム（1 行 = 1 列）
+            > .columns-dropdown-item
+              display: flex
+              align-items: center
+              gap: 10px
+              padding: 8px 14px
+              background: white
+              cursor: grab
+
+              // 移動アニメーション（FLIP パターン）：180ms
+              transition: background-color .12s ease, transform .18s cubic-bezier(0.2, 0, 0, 1)
+              will-change: transform
+
+              // 通常時：ホバーで背景色が変わる
+              &:hover
+                background: rgba(0, 103, 133, .08)
+
+              // ドラッグ中：ドラッグ対象は半透明
+              &.-dragging
+                background: white
+                opacity: 1
+
+              // 固定列（TogoVar ID）：ドラッグ禁止・グレーアウト・鍵アイコン表示
+              &.-locked
+                background: #f3f3f3
+                cursor: default
+                opacity: .75
+
+                // ホバーでも背景色が変わらない
+                &:hover
+                  background: #f3f3f3
+
+                // ドラッグハンドル非表示
+                > .drag-handle
+                  visibility: hidden
+
+                // ラベル：グレーアウト、クリック不可
+                > label
+                  color: var(--color-gray)
+                  cursor: default
+
+                // 鍵アイコン表示（FontAwesome ロック）
+                > .lock
+                  &::before
+                    content: $CHAR_LOCK
+                    font-family: FontAwesome
+                    color: var(--color-gray)
+                    font-size: 13px
+
+              // ドラッグハンドル（FontAwesome グリップアイコン）
+              > .drag-handle
+                flex: 0 0 auto
+                width: 1em
+                display: flex
+                align-items: center
+                justify-content: center
+
+                &::before
+                  content: $CHAR_DRAG_HANDLE
+                  font-family: "Font Awesome 7 Free", "Font Awesome 6 Free", FontAwesome
+                  font-weight: 900
+                  color: var(--color-gray)
+                  font-size: 8px
+
+              // 鍵アイコン（固定列用）
+              > .lock
+                margin-left: auto
+
+              // チェックボックスとラベルの組
+              > label
+                display: flex
+                align-items: center
+                gap: 10px
+                width: 100%
+                color: var(--color-black)
+                cursor: pointer
+
+                > input
+                  margin: 0
+
+        // ドロップダウンが開いている状態
+        &.-open
+          > .columns-dropdown-menu
+            opacity: 1
+            pointer-events: auto
+            transform: translateY(0)
   > .tablecontainer
     overflow-x: auto
     overflow-y: hidden

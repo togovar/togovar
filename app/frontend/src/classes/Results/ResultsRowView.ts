@@ -1,4 +1,4 @@
-import { COLUMNS } from '../../global';
+import { COLUMNS, getOrderedColumns } from '../../global';
 import { storeManager } from '../../store/StoreManager';
 import type {
   ResultData,
@@ -154,7 +154,9 @@ export class ResultsRowView {
     this._prepareTableData();
 
     // Update data for each column
-    COLUMNS.forEach((column) => this._updateColumnContent(column, result));
+    this._getCurrentColumns().forEach((column) =>
+      this._updateColumnContent(column, result)
+    );
 
     this.tr.classList.remove('-loading', '-out-of-range');
   }
@@ -237,12 +239,18 @@ export class ResultsRowView {
    * @returns Generated HTML string
    */
   private _createTableCellHTML(): string {
-    return COLUMNS.map((column) => {
+    return this._getCurrentColumns()
+      .map((column) => {
       if (column.id === 'alt_frequency') {
         return createFrequencyColumnHTML();
       }
       return (COLUMN_TEMPLATES as Record<string, string>)[column.id] || '';
-    }).join('');
+    })
+      .join('');
+  }
+
+  private _getCurrentColumns() {
+    return getOrderedColumns(storeManager.getData('columns'));
   }
 
   // ========================================

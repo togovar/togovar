@@ -14,7 +14,8 @@
 // ============================================
 
 import type { MasterConditions, SimpleSearchCurrentConditions } from './search';
-import type { Column, ResultData } from './api';
+import type { ResultData } from './api';
+import type { ColumnConfig } from './components';
 
 /** 表示される染色体領域の型定義 */
 export type DisplayingRegions = {
@@ -33,7 +34,7 @@ export type StoreState = {
   searchMode: any;
   simpleSearchConditionsMaster: MasterConditions[];
   simpleSearchConditions: SimpleSearchCurrentConditions;
-  columns: Column[];
+  columns: ColumnConfig[];
   searchResults: ResultData[];
   numberOfRecords: number;
   offset: number;
