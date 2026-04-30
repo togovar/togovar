@@ -53,6 +53,10 @@ export class ResultsView {
   private columnsDropdown!: ResultsColumnsDropdown;
   /** バインドされたキーボードイベントハンドラー */
   private _boundKeydownHandler!: (_e: KeyboardEvent) => void;
+  /** バインドされたホイールイベントハンドラー */
+  private _boundWheelHandler!: EventListener;
+  /** ブラウザに応じたホイールイベント名 */
+  private _wheelEventName = '';
   /** バインドされた検索モード変更ハンドラー */
   private _boundSearchModeHandler!: (_newMode: unknown) => void;
 
@@ -131,6 +135,13 @@ export class ResultsView {
 
     // Remove keydown event listener
     document.removeEventListener('keydown', this._boundKeydownHandler);
+
+    if (this._wheelEventName && this._boundWheelHandler) {
+      this.tbody.removeEventListener(
+        this._wheelEventName,
+        this._boundWheelHandler
+      );
+    }
   }
 
   /**
@@ -361,10 +372,9 @@ export class ResultsView {
    */
   private _configureEventHandlers(): void {
     // PC 用ホイールイベント
-    this.tbody.addEventListener(
-      this.getWheelEventName(),
-      this._scroll.bind(this) as EventListener
-    );
+    this._wheelEventName = this.getWheelEventName();
+    this._boundWheelHandler = this._scroll.bind(this) as EventListener;
+    this.tbody.addEventListener(this._wheelEventName, this._boundWheelHandler);
 
     // タッチハンドラーのスクロールコールバック設定
     this.touchHandler.setScrollCallbacks({
