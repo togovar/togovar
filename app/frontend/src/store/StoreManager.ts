@@ -9,7 +9,7 @@ import { executeSearch } from '../api/fetchData';
 import { getDefaultColumnConfigs, normalizeColumnConfigs } from '../global';
 import type { StoreState, ResultData, SearchMode } from '../types';
 
-const COLUMNS_STORAGE_KEY = 'togovar.columns.v1';
+const COLUMNS_STORAGE_KEY = 'columns';
 
 type StoreListener = (value: unknown) => void;
 
@@ -58,15 +58,25 @@ class StoreManager {
         return fallbackColumns;
       }
 
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) {
+      const columns = this.#parseStoredColumns(raw);
+      if (!columns) {
         return fallbackColumns;
       }
 
-      return normalizeColumnConfigs(parsed);
+      return columns;
     } catch (_error) {
       return fallbackColumns;
     }
+  }
+
+  /** localStorage に保存された列設定文字列を検証・正規化 */
+  #parseStoredColumns(raw: string): StoreState['columns'] | null {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return null;
+    }
+
+    return normalizeColumnConfigs(parsed);
   }
 
   /** 列設定を localStorage に保存 */
