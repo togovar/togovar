@@ -151,10 +151,11 @@ export class ResultsRowView {
       return this._setLoadingState();
     }
 
-    this._prepareTableData();
+    const columns = this._getCurrentColumns();
+    this._prepareTableData(columns);
 
     // Update data for each column
-    this._getCurrentColumns().forEach((column) =>
+    columns.forEach((column) =>
       this._updateColumnContent(column, result)
     );
 
@@ -228,8 +229,8 @@ export class ResultsRowView {
    *
    * Generate HTML and cache DOM elements
    */
-  private _prepareTableData() {
-    this.tr.innerHTML = this._createTableCellHTML();
+  private _prepareTableData(columns: Column[]) {
+    this.tr.innerHTML = this._createTableCellHTML(columns);
     this._cacheTableCells();
   }
 
@@ -238,14 +239,14 @@ export class ResultsRowView {
    *
    * @returns Generated HTML string
    */
-  private _createTableCellHTML(): string {
-    return this._getCurrentColumns()
+  private _createTableCellHTML(columns: Column[]): string {
+    return columns
       .map((column) => {
-      if (column.id === 'alt_frequency') {
-        return createFrequencyColumnHTML();
-      }
-      return (COLUMN_TEMPLATES as Record<string, string>)[column.id] || '';
-    })
+        if (column.id === 'alt_frequency') {
+          return createFrequencyColumnHTML();
+        }
+        return (COLUMN_TEMPLATES as Record<string, string>)[column.id] || '';
+      })
       .join('');
   }
 
