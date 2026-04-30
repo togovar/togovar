@@ -38,6 +38,7 @@ export class ResultsColumnsDropdown {
   private _ghostElement: HTMLElement | null = null;
   private _draggingCursorStyleEl: HTMLStyleElement | null = null;
   private _clearPendingLongPress: (() => void) | null = null;
+  private _cleanupDragListeners: (() => void) | null = null;
   private readonly _eventAbortController = new AbortController();
   private readonly _boundDocumentClick: (_event: MouseEvent) => void;
   private readonly _boundDocumentKeydown: (_event: KeyboardEvent) => void;
@@ -63,7 +64,8 @@ export class ResultsColumnsDropdown {
     storeManager.unbind('columns', this);
     this._clearPendingLongPress?.();
     this._eventAbortController.abort();
-    this._disableGlobalDraggingCursor();
+    this._cleanupDragListeners?.();
+    this._clearDragState();
   }
 
   /**
@@ -344,15 +346,27 @@ export class ResultsColumnsDropdown {
       });
     };
 
+    const dragAbortController = new AbortController();
+    const cleanupDragListeners = (): void => {
+      dragAbortController.abort();
+      if (this._cleanupDragListeners === cleanupDragListeners) {
+        this._cleanupDragListeners = null;
+      }
+    };
+
     const onMouseUp = (): void => {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
+      cleanupDragListeners();
       this._commitCurrentOrder();
       this._clearDragState();
     };
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    this._cleanupDragListeners = cleanupDragListeners;
+    document.addEventListener('mousemove', onMouseMove, {
+      signal: dragAbortController.signal,
+    });
+    document.addEventListener('mouseup', onMouseUp, {
+      signal: dragAbortController.signal,
+    });
   }
 
   /**
