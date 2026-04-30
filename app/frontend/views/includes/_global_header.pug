@@ -48,8 +48,7 @@ header#GlobalHeader
             a.link(href=navLink("help")) Help
 
         if locals.currentPage === "home"
-          ul.menu.config
-            li.menu-button.config Configuration
+          ul.menu
             li.menu-button.login 
               a.link(href="/auth/login" aria-label="Login")
         else if locals.currentPage === "404"
