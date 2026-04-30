@@ -37,6 +37,7 @@ export class ResultsColumnsDropdown {
   private _draggingElement: HTMLElement | null = null;
   private _ghostElement: HTMLElement | null = null;
   private _draggingCursorStyleEl: HTMLStyleElement | null = null;
+  private readonly _eventAbortController = new AbortController();
   private readonly _boundDocumentClick: (_event: MouseEvent) => void;
   private readonly _boundDocumentKeydown: (_event: KeyboardEvent) => void;
 
@@ -59,8 +60,7 @@ export class ResultsColumnsDropdown {
    */
   destroy(): void {
     storeManager.unbind('columns', this);
-    document.removeEventListener('click', this._boundDocumentClick);
-    document.removeEventListener('keydown', this._boundDocumentKeydown);
+    this._eventAbortController.abort();
     this._disableGlobalDraggingCursor();
   }
 
@@ -88,10 +88,12 @@ export class ResultsColumnsDropdown {
    * - ドキュメントクリック/キー：ドロップダウン自動クローズ
    */
   private _bindEvents(): void {
+    const { signal } = this._eventAbortController;
+
     // ボタンクリック：ドロップダウンメニューの開閉
     this._button.addEventListener('click', () => {
       this._toggle();
-    });
+    }, { signal });
 
     // チェックボックス変更：列の表示/非表示を更新
     this._list.addEventListener('change', (event) => {
@@ -120,7 +122,7 @@ export class ResultsColumnsDropdown {
         'columns',
         this._applyLockedColumnConstraints(nextColumns)
       );
-    });
+    }, { signal });
 
     // mousedown：checkbox 以外のエリアは長押しでドラッグ開始
     // checkbox は通常クリックで表示/非表示切り替えを維持する
@@ -175,12 +177,14 @@ export class ResultsColumnsDropdown {
       longPressTimer = window.setTimeout(startDrag, LONG_PRESS_MS);
       document.addEventListener('mousemove', onPendingMove);
       document.addEventListener('mouseup', onPendingMouseUp);
-    });
+    }, { signal });
 
     // ドキュメントクリック：範囲外クリックでドロップダウンを閉じる
-    document.addEventListener('click', this._boundDocumentClick);
+    document.addEventListener('click', this._boundDocumentClick, { signal });
     // Escape キー：ドロップダウンを閉じる
-    document.addEventListener('keydown', this._boundDocumentKeydown);
+    document.addEventListener('keydown', this._boundDocumentKeydown, {
+      signal,
+    });
   }
 
   /**
