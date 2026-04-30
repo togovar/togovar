@@ -48,6 +48,7 @@ export class ResultsColumnsDropdown {
     this._boundDocumentClick = this._handleDocumentClick.bind(this);
     this._boundDocumentKeydown = this._handleDocumentKeydown.bind(this);
 
+    this._toggle(false);
     this._bindEvents();
     storeManager.bind('columns', this);
     this.columns(storeManager.getData('columns'));
@@ -428,6 +429,14 @@ export class ResultsColumnsDropdown {
     const shouldOpen = forceOpen ?? !this._root.classList.contains('-open');
     this._root.classList.toggle('-open', shouldOpen);
     this._button.setAttribute('aria-expanded', String(shouldOpen));
+    this._menu.hidden = !shouldOpen;
+    this._menu.setAttribute('aria-hidden', String(!shouldOpen));
+
+    if (shouldOpen) {
+      this._menu.removeAttribute('inert');
+    } else {
+      this._menu.setAttribute('inert', '');
+    }
   }
 
   /**
