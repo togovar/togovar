@@ -71,7 +71,6 @@
         gap: 0
 
         > .button-view
-          min-width: 54px
           border-radius: 0
 
           // ボタン間の線と下のシャドウ
@@ -93,7 +92,6 @@
 
         // ドロップダウンボタン
         > .columns-dropdown-button
-          min-width: 98px
           padding-right: 1.6em
 
           // ボタンの右側に下向きの矢印を表示
@@ -116,7 +114,7 @@
           right: 0
           min-width: 170px
           padding: 8px 0
-          border-radius: 12px
+          border-radius: 5px
           background: white
           box-shadow: 0 10px 30px rgba(0, 0, 0, .22)
 
@@ -132,23 +130,25 @@
             padding: 0
             list-style: none
 
-            // ドラッグ中：ホバー状態を無効化（背景色変更を抑止）
+            // ドラッグ中：ホバー状態を無効化（背景色変更を抑止）・トランジションも無効化
             &.-is-dragging
-              > .columns-dropdown-item:hover
-                background: white
+              > .columns-dropdown-item
+                transition: none
+                &:hover
+                  background: white
 
             // 列アイテム（1 行 = 1 列）
             > .columns-dropdown-item
               display: flex
               align-items: center
               gap: 10px
-              padding: 8px 14px
+              padding: 4px 14px
+              margin: 0
               background: white
               cursor: grab
 
-              // 移動アニメーション（FLIP パターン）：180ms
-              transition: background-color .12s ease, transform .18s cubic-bezier(0.2, 0, 0, 1)
-              will-change: transform
+              // 通常時はホバー背景色のみトランジション
+              transition: background-color .12s ease
 
               // 通常時：ホバーで背景色が変わる
               &:hover
@@ -158,6 +158,10 @@
               &.-dragging
                 background: white
                 opacity: 1
+
+              // ドラッグ中：元要素は不可視にする（スペースは維持）
+              &.-dragging-hidden
+                visibility: hidden
 
               // 固定列（TogoVar ID）：ドラッグ禁止・グレーアウト・鍵アイコン表示
               &.-locked

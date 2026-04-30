@@ -32,9 +32,7 @@ export class ResultsColumnsDropdown {
   private readonly _button: HTMLButtonElement;
   private readonly _menu: HTMLElement;
   private readonly _list: HTMLElement;
-  private _draggingColumnId: string | null = null;
   private _draggingElement: HTMLElement | null = null;
-  private _dropCommitted = false;
   private readonly _boundDocumentClick: (_event: MouseEvent) => void;
   private readonly _boundDocumentKeydown: (_event: KeyboardEvent) => void;
 
@@ -78,7 +76,7 @@ export class ResultsColumnsDropdown {
    * 全イベントリスナーをセットアップ
    * - ボタンクリック：ドロップダウン開閉
    * - チェックボックス change：列表示/非表示制御
-   * - ドラッグ系イベント：列の並び替え（FLIP アニメーション付き）
+   * - ドラッグ系イベント：列の並び替え
    * - ドキュメントクリック/キー：ドロップダウン自動クローズ
    */
   private _bindEvents(): void {
@@ -125,85 +123,89 @@ export class ResultsColumnsDropdown {
         return;
       }
 
-      this._draggingColumnId = target.dataset.columnId || null;
-      if (!this._draggingColumnId || this._draggingColumnId === LOCKED_COLUMN_ID) {
+      const columnId = target.dataset.columnId;
+      if (!columnId || columnId === LOCKED_COLUMN_ID) {
         event.preventDefault();
         return;
       }
 
       this._draggingElement = target;
-      this._dropCommitted = false;
       this._list.classList.add('-is-dragging');
-      target.classList.add('-dragging');
+
+      // ドラッグ開始直後（ゴースト生成後）に元要素を非表示にする
+      requestAnimationFrame(() => {
+        if (this._draggingElement === target) {
+          target.classList.add('-dragging-hidden');
+        }
+      });
+
       if (event.dataTransfer) {
         event.dataTransfer.effectAllowed = 'move';
       }
     });
 
-    // dragover：ドラッグ中に他要素上へのマウス移動を処理
-    // FLIP（First, Last, Invert, Play）パターンで移動アニメーション
+    // dragover：ドラッグ中に DOM を実際に並び替える
     this._list.addEventListener('dragover', (event) => {
+      if (!this._draggingElement) {
+        return;
+      }
+
+      // ドラッグ中は常に preventDefault()（これを省くとスナップバックアニメーションが発生する）
+      event.preventDefault();
+
       const target = (event.target as HTMLElement | null)?.closest(
         SELECTORS.ITEM
       ) as HTMLElement | null;
 
-      if (!target || !this._draggingColumnId || !this._draggingElement) {
+      if (!target || target === this._draggingElement) {
         return;
       }
 
-      event.preventDefault();
-
-      if (target === this._draggingElement) {
-        return;
-      }
-
-      // ドラッグ前の各要素の垂直位置を記録（First）
-      const previousTops = this._captureItemTops();
-
+      // 固定列（TogoVar ID）の後ろにしか挿入できない
+      const isTargetLocked = target.dataset.columnId === LOCKED_COLUMN_ID;
       const rect = target.getBoundingClientRect();
-      const shouldInsertAfter = event.clientY > rect.top + rect.height / 2;
-      const isTargetLocked =
-        (target as HTMLElement).dataset.columnId === LOCKED_COLUMN_ID;
+      const shouldInsertAfter = isTargetLocked
+        ? true
+        : event.clientY > rect.top + rect.height / 2;
 
-      // 固定列より前には挿入しない
-      const referenceNode = isTargetLocked
-        ? target.nextElementSibling
-        : shouldInsertAfter
-        ? target.nextElementSibling
-        : target;
+      // FLIP：移動前の各アイテムの Y 座標を記録
+      const items = Array.from(
+        this._list.querySelectorAll(SELECTORS.ITEM)
+      ) as HTMLElement[];
+      const beforeTops = new Map(
+        items.map((el) => [el, el.getBoundingClientRect().top])
+      );
 
-      // DOM 順序を変更（Last の前に記録）
-      if (referenceNode !== this._draggingElement) {
-        this._list.insertBefore(
-          this._draggingElement,
-          referenceNode as ChildNode | null
-        );
-        // 変更後の位置から差分を計算してアニメーション実行
-        this._animateReorder(previousTops);
-      }
-    });
-
-    // drop：ドラッグ終了、ドロップ位置で確定
-    this._list.addEventListener('drop', (event) => {
-      if (!this._draggingColumnId) {
-        return;
+      // DOM を並び替え
+      if (shouldInsertAfter) {
+        target.after(this._draggingElement);
+      } else {
+        target.before(this._draggingElement);
       }
 
-      event.preventDefault();
-
-      // 新しい順序を store に保存
-      this._commitCurrentOrder();
-      this._dropCommitted = true;
-      this._clearDragState();
+      // FLIP：移動後の差分を transform で補正し、transition でアニメーション
+      items.forEach((el) => {
+        if (el === this._draggingElement) return;
+        const delta = (beforeTops.get(el) ?? 0) - el.getBoundingClientRect().top;
+        if (delta === 0) return;
+        el.style.transition = 'none';
+        el.style.transform = `translateY(${delta}px)`;
+        requestAnimationFrame(() => {
+          el.style.transition = 'transform 0.15s ease';
+          el.style.transform = '';
+        });
+      });
     });
 
-    // dragend：ドラッグ中止時は UI をリセット
+    // dragend：ドラッグ終了後に DOM の順序を store に保存
     this._list.addEventListener('dragend', () => {
-      if (!this._dropCommitted) {
-        // drop されなかった場合は元の順序に戻す
-        this.columns(storeManager.getData('columns'));
-      }
+      this._commitCurrentOrder();
       this._clearDragState();
+    });
+
+    // drop：ブラウザの「ゴーストが元位置に戻るアニメーション」を抑止するために必要
+    this._list.addEventListener('drop', (event) => {
+      event.preventDefault();
     });
 
     // ドキュメントクリック：範囲外クリックでドロップダウンを閉じる
@@ -238,39 +240,21 @@ export class ResultsColumnsDropdown {
 
   /**
    * 現在の DOM 上の列順を読み込み、store に保存
-   * - ドロップ終了時に呼ばれる
+   * - ドラッグ終了時に呼ばれる
    * - 表示/非表示状態は保持
    * - 固定列制約を再度適用（安全性確保）
    */
   private _commitCurrentOrder(): void {
     const currentColumns = normalizeColumnConfigs(storeManager.getData('columns'));
-    const currentById = new Map(
-      currentColumns.map((column) => [column.id, column])
-    );
+    const columnMap = new Map(currentColumns.map((column) => [column.id, column]));
 
-    // DOM 上の列順を読み込む
-    const orderedIds = Array.from(
+    // DOM の現在の並び順から新しい列設定を作成
+    const domItems = Array.from(
       this._list.querySelectorAll(SELECTORS.ITEM)
-    )
-      .map((element) => (element as HTMLElement).dataset.columnId || '')
-      .filter((id) => id !== '');
-
-    if (orderedIds.length === 0) {
-      return;
-    }
-
-    // 新しい順序で列設定を再構成
-    const nextColumns: ColumnConfig[] = orderedIds
-      .map((id) => currentById.get(id))
-      .filter((column): column is ColumnConfig => column !== undefined)
-      .map((column) => ({ ...column }));
-
-    // 欠落している列を追加
-    currentColumns.forEach((column) => {
-      if (!nextColumns.find((item) => item.id === column.id)) {
-        nextColumns.push({ ...column });
-      }
-    });
+    ) as HTMLElement[];
+    const nextColumns = domItems
+      .map((item) => columnMap.get(item.dataset.columnId ?? ''))
+      .filter((column): column is ColumnConfig => column !== undefined);
 
     storeManager.setData(
       'columns',
@@ -310,80 +294,21 @@ export class ResultsColumnsDropdown {
   }
 
   /**
-   * 各列要素の現在の垂直位置を記録（FLIP アニメーション用）
-   * @returns 列 ID → 垂直位置の Map
+   * ドラッグ状態をリセット
+   * - ドラッグ中の CSS クラス（-dragging-hidden, -is-dragging）を全て削除
+   * - 内部状態変数を初期化
    */
-  private _captureItemTops(): Map<string, number> {
-    const tops = new Map<string, number>();
-
-    Array.from(this._list.querySelectorAll(SELECTORS.ITEM)).forEach((item) => {
-      const element = item as HTMLElement;
-      const id = element.dataset.columnId;
-      if (!id) {
-        return;
-      }
-
-      tops.set(id, element.getBoundingClientRect().top);
-    });
-
-    return tops;
-  }
-
-  /**
-   * FLIP パターンで列の移動アニメーションを実行
-   * - First: ドラッグ前の位置を記録（previousTops から）
-   * - Last: 現在の位置を取得
-   * - Invert: 差分を計算して translate で初期位置に戻す
-   * - Play: transform を 0 に戻すアニメーションで滑らかに移動
-   * @param previousTops ドラッグ前の各要素の垂直位置 Map
-   */
-  private _animateReorder(previousTops: Map<string, number>): void {
-    const items = Array.from(this._list.querySelectorAll(SELECTORS.ITEM)) as HTMLElement[];
-
-    // Invert：各要素の移動差分を計算
-    items.forEach((item) => {
-      if (item === this._draggingElement) {
-        return;
-      }
-
-      const id = item.dataset.columnId;
-      if (!id) {
-        return;
-      }
-
-      const previousTop = previousTops.get(id);
-      if (previousTop === undefined) {
-        return;
-      }
-
-      // 変更前後の位置の差分でドラッグ前の位置に戻す
-      const deltaY = previousTop - item.getBoundingClientRect().top;
-      if (Math.abs(deltaY) < 1) {
-        return;
-      }
-
-      item.style.transition = 'none';
-      item.style.transform = `translateY(${deltaY}px)`;
-    });
-
-    // Play：アニメーションで元の位置（transform: none）に戻す
-    requestAnimationFrame(() => {
-      items.forEach((item) => {
-        if (item === this._draggingElement || item.style.transform === '') {
-          return;
-        }
-
-        item.style.transition = 'transform 180ms cubic-bezier(0.2, 0, 0, 1)';
-        item.style.transform = '';
-
-        const cleanup = () => {
-          item.style.transition = '';
-          item.removeEventListener('transitionend', cleanup);
-        };
-
-        item.addEventListener('transitionend', cleanup);
+  private _clearDragState(): void {
+    this._draggingElement = null;
+    this._list.classList.remove('-is-dragging');
+    this._list
+      .querySelectorAll(SELECTORS.ITEM)
+      .forEach((element) => {
+        const el = element as HTMLElement;
+        el.classList.remove('-dragging-hidden');
+        el.style.transform = '';
+        el.style.transition = '';
       });
-    });
   }
 
   /**
@@ -417,21 +342,5 @@ export class ResultsColumnsDropdown {
     if (event.key === 'Escape') {
       this._toggle(false);
     }
-  }
-
-  /**
-   * ドラッグ状態をリセット
-   * - ドラッグ中の CSS クラス(-dragging, -is-dragging)を全て削除
-   * - 内部状態変数を初期化
-   */
-  private _clearDragState(): void {
-    this._draggingColumnId = null;
-    this._draggingElement = null;
-    this._list.classList.remove('-is-dragging');
-    this._list
-      .querySelectorAll(`${SELECTORS.ITEM}.-dragging`)
-      .forEach((element) => {
-        element.classList.remove('-dragging');
-      });
   }
 }
