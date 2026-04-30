@@ -74,6 +74,16 @@ const LOCKED_COLUMN_ID = 'togovar_id';
 // 列設定管理用のヘルパー関数
 // ================================
 
+/** 値が有効な列設定かどうかを判定 */
+function isColumnConfig(value: unknown): value is ColumnConfig {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as Partial<ColumnConfig>).id === 'string' &&
+    typeof (value as Partial<ColumnConfig>).isUsed === 'boolean'
+  );
+}
+
 /**
  * デフォルトの列設定配列を取得
  * - Type 列はデフォルトで非表示（isUsed: false）
@@ -100,7 +110,11 @@ export function normalizeColumnConfigs(columns: ColumnConfig[] = []): ColumnConf
   const normalized: ColumnConfig[] = [];
   const usedIds = new Set<string>();
 
-  columns.forEach((column) => {
+  columns.forEach((column: unknown) => {
+    if (!isColumnConfig(column)) {
+      return;
+    }
+
     if (!COLUMN_MAP.has(column.id) || usedIds.has(column.id)) {
       return;
     }
