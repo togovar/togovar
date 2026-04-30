@@ -37,6 +37,7 @@ export class ResultsColumnsDropdown {
   private _draggingElement: HTMLElement | null = null;
   private _ghostElement: HTMLElement | null = null;
   private _draggingCursorStyleEl: HTMLStyleElement | null = null;
+  private _clearPendingLongPress: (() => void) | null = null;
   private readonly _eventAbortController = new AbortController();
   private readonly _boundDocumentClick: (_event: MouseEvent) => void;
   private readonly _boundDocumentKeydown: (_event: KeyboardEvent) => void;
@@ -60,6 +61,7 @@ export class ResultsColumnsDropdown {
    */
   destroy(): void {
     storeManager.unbind('columns', this);
+    this._clearPendingLongPress?.();
     this._eventAbortController.abort();
     this._disableGlobalDraggingCursor();
   }
@@ -145,6 +147,19 @@ export class ResultsColumnsDropdown {
       const startX = event.clientX;
       const startY = event.clientY;
       let longPressTimer: number | null = null;
+      this._clearPendingLongPress?.();
+      const pendingAbortController = new AbortController();
+
+      const clearLongPressWatchers = (): void => {
+        if (longPressTimer !== null) {
+          window.clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }
+        pendingAbortController.abort();
+        if (this._clearPendingLongPress === clearLongPressWatchers) {
+          this._clearPendingLongPress = null;
+        }
+      };
 
       // 長押し前に大きく動いたら通常クリック扱いに戻す
       function onPendingMove(e: MouseEvent): void {
@@ -160,23 +175,19 @@ export class ResultsColumnsDropdown {
         clearLongPressWatchers();
       }
 
-      function clearLongPressWatchers(): void {
-        if (longPressTimer !== null) {
-          window.clearTimeout(longPressTimer);
-          longPressTimer = null;
-        }
-        document.removeEventListener('mousemove', onPendingMove);
-        document.removeEventListener('mouseup', onPendingMouseUp);
-      }
-
       const startDrag = (): void => {
         clearLongPressWatchers();
         this._beginDrag(item, startX, startY);
       };
 
+      this._clearPendingLongPress = clearLongPressWatchers;
       longPressTimer = window.setTimeout(startDrag, LONG_PRESS_MS);
-      document.addEventListener('mousemove', onPendingMove);
-      document.addEventListener('mouseup', onPendingMouseUp);
+      document.addEventListener('mousemove', onPendingMove, {
+        signal: pendingAbortController.signal,
+      });
+      document.addEventListener('mouseup', onPendingMouseUp, {
+        signal: pendingAbortController.signal,
+      });
     }, { signal });
 
     // ドキュメントクリック：範囲外クリックでドロップダウンを閉じる
