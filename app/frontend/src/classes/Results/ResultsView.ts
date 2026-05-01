@@ -276,7 +276,7 @@ export class ResultsView {
 
   /**
    * テーブルヘッダーを描画
-   * - store.columns から表示対象の列のみを抽出
+   * - store.columns を表示順に並べ替え
    * - 各列ごとに th 要素を生成
    * - tooltip ID を設定（アクセシビリティ対応）
    * @param thead テーブルヘッダー要素
@@ -288,9 +288,9 @@ export class ResultsView {
   ): void {
     thead.innerHTML = `<tr>${getOrderedColumns(columns)
       .map(
-      (column) =>
-        `<th class="${column.id}"><p data-tooltip-id="table-header-${column.id}">${column.label}</p></th>`
-    )
+        (column) =>
+          `<th class="${column.id}"><p data-tooltip-id="table-header-${column.id}">${column.label}</p></th>`
+      )
       .join('')}</tr>`;
   }
 
