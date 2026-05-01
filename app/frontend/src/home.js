@@ -169,9 +169,11 @@ function cleanupApplication() {
 
 // ページ離脱時のクリーンアップ設定
 function setupCleanupHandlers() {
-  // ブラウザのページ離脱時
-  window.addEventListener('beforeunload', () => {
-    cleanupApplication();
+  // bfcache 復元時にイベントリスナーが消えないよう、キャッシュされない離脱時だけ破棄する
+  window.addEventListener('pagehide', (event) => {
+    if (!event.persisted) {
+      cleanupApplication();
+    }
   });
 
   // ページ非表示時（タブ切り替えやブラウザ最小化）
