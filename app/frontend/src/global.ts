@@ -67,7 +67,7 @@ export const COLUMNS = [
 const COLUMN_MAP = new Map(COLUMNS.map((column) => [column.id, column]));
 
 /** 常に先頭に固定される列の ID（TogoVar ID） */
-const LOCKED_COLUMN_ID = 'togovar_id';
+export const LOCKED_COLUMN_ID = 'togovar_id';
 
 
 // ================================

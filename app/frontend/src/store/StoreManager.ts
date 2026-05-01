@@ -86,10 +86,9 @@ class StoreManager {
         return;
       }
 
-      const normalizedColumns = normalizeColumnConfigs(columns);
       window.localStorage.setItem(
         COLUMNS_STORAGE_KEY,
-        JSON.stringify(normalizedColumns)
+        JSON.stringify(columns)
       );
     } catch (_error) {
       // localStorage 制限超過やプライベートブラウズ環境では保存失敗を許容
@@ -124,9 +123,6 @@ class StoreManager {
     if (typeof nextValue !== 'object' || nextValue === null) {
       if (!Object.is(oldValue, nextValue)) {
         this.#state[key] = nextValue;
-        if (key === 'columns') {
-          this.#saveColumnsToStorage(this.#state.columns);
-        }
         this.publish(key);
       }
       return;

@@ -1,6 +1,6 @@
 import {
   getColumnLabel,
-  getDefaultColumnConfigs,
+  LOCKED_COLUMN_ID,
   normalizeColumnConfigs,
 } from '../../global';
 import { storeManager } from '../../store/StoreManager';
@@ -15,8 +15,6 @@ const SELECTORS = {
   INPUT: 'input[type="checkbox"]',
 } as const;
 
-/** 常に先頭に固定される列の ID（TogoVar ID） */
-const LOCKED_COLUMN_ID = 'togovar_id';
 const LONG_PRESS_MS = 150;
 const DRAG_START_MOVE_THRESHOLD_PX = 6;
 
@@ -75,13 +73,7 @@ export class ResultsColumnsDropdown {
    * @param columns 列設定配列
    */
   columns(columns: ColumnConfig[]): void {
-    const normalizedColumns = normalizeColumnConfigs(columns);
-    const constrainedColumns = this._applyLockedColumnConstraints(
-      normalizedColumns.length > 0
-        ? normalizedColumns
-        : getDefaultColumnConfigs()
-    );
-    this._render(constrainedColumns);
+    this._render(normalizeColumnConfigs(columns));
   }
 
   /**
@@ -110,8 +102,8 @@ export class ResultsColumnsDropdown {
         return;
       }
 
-      const nextColumns = this._applyLockedColumnConstraints(
-        normalizeColumnConfigs(storeManager.getData('columns'))
+      const nextColumns = normalizeColumnConfigs(
+        storeManager.getData('columns')
       );
       const targetColumn = nextColumns.find(
         (column) => column.id === target.value
@@ -122,10 +114,7 @@ export class ResultsColumnsDropdown {
       }
 
       targetColumn.isUsed = target.checked;
-      storeManager.setData(
-        'columns',
-        this._applyLockedColumnConstraints(nextColumns)
-      );
+      storeManager.setData('columns', nextColumns);
     }, { signal });
 
     // mousedown：checkbox 以外のエリアは長押しでドラッグ開始
@@ -248,7 +237,7 @@ export class ResultsColumnsDropdown {
 
     storeManager.setData(
       'columns',
-      this._applyLockedColumnConstraints(nextColumns)
+      normalizeColumnConfigs(nextColumns)
     );
   }
 
@@ -367,39 +356,6 @@ export class ResultsColumnsDropdown {
     document.addEventListener('mouseup', onMouseUp, {
       signal: dragAbortController.signal,
     });
-  }
-
-  /**
-   * 固定列制約を適用（TogoVar ID は常に先頭・表示状態確定）
-   * - TogoVar ID が存在しない場合は先頭に追加
-   * - TogoVar ID が存在する場合は先頭に移動
-   * - TogoVar ID の isUsed は常に true に強制
-   * @param columns 制約適用対象の列設定配列
-   * @returns 制約適用済みの列設定配列
-   */
-  private _applyLockedColumnConstraints(
-    columns: ColumnConfig[]
-  ): ColumnConfig[] {
-    const normalized = normalizeColumnConfigs(columns).map((column) => ({
-      ...column,
-      // 固定列は常に表示状態
-      isUsed: column.id === LOCKED_COLUMN_ID ? true : column.isUsed,
-    }));
-
-    const lockedIndex = normalized.findIndex(
-      (column) => column.id === LOCKED_COLUMN_ID
-    );
-
-    if (lockedIndex === -1) {
-      // 固定列が存在しない場合は先頭に追加
-      normalized.unshift({ id: LOCKED_COLUMN_ID, isUsed: true });
-      return normalized;
-    }
-
-    // 固定列が先頭以外にある場合は先頭に移動
-    const [locked] = normalized.splice(lockedIndex, 1);
-    normalized.unshift({ ...locked, isUsed: true });
-    return normalized;
   }
 
   /**
