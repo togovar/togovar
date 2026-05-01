@@ -4,6 +4,11 @@ import * as _ from 'lodash';
 import { API_URL } from '../global';
 const LIMIT = 100;
 const DOWNLOAD_VARIANT_LIMIT = 100000;
+const DOWNLOAD_VARIANT_LIMIT_TEXT = new Intl.NumberFormat('en-US').format(
+  DOWNLOAD_VARIANT_LIMIT
+);
+const DOWNLOAD_LIMIT_TITLE = `Download is available for up to ${DOWNLOAD_VARIANT_LIMIT_TEXT} variants.`;
+const DOWNLOAD_LIMIT_REASON = `${DOWNLOAD_LIMIT_TITLE} Narrow your results.`;
 import { extractSearchCondition } from '../store/searchManager';
 import type { FetchOption, SearchResults, SearchStatistics } from '../types';
 
@@ -308,7 +313,6 @@ async function _updateAppState() {
 
   document.body.toggleAttribute('data-has-conditions', hasConditions);
   document.body.toggleAttribute('data-download-available', isDownloadAvailable);
-  document.body.toggleAttribute('data-download-limit-exceeded', isDownloadLimitExceeded);
   _updateDownloadButtonState(isDownloadAvailable, isDownloadLimitExceeded);
   _updateDownloadDisabledReasonMessage(downloadDisabledReason);
 
@@ -330,11 +334,12 @@ function _updateDownloadButtonState(
   document.querySelectorAll('.download-buttons .button-view').forEach((button) => {
     button.classList.toggle('-disabled', !isDownloadAvailable);
     button.setAttribute('aria-disabled', String(!isDownloadAvailable));
+    if (button instanceof HTMLButtonElement) {
+      button.disabled = !isDownloadAvailable;
+    }
     button.setAttribute(
       'title',
-      isDownloadLimitExceeded
-        ? 'Download is available for up to 100,000 variants.'
-        : ''
+      isDownloadLimitExceeded ? DOWNLOAD_LIMIT_TITLE : ''
     );
   });
 }
@@ -348,7 +353,7 @@ function _getDownloadDisabledReason(
   }
 
   if (isDownloadLimitExceeded) {
-    return 'Download is available for up to 100,000 variants. Narrow your results.';
+    return DOWNLOAD_LIMIT_REASON;
   }
 
   return '';
