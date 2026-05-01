@@ -109,11 +109,6 @@
                 background: rgba(0, 103, 133, 0.08);
               }
 
-              &.-dragging {
-                background: white;
-                opacity: 1;
-              }
-
               &.-dragging-hidden {
                 visibility: hidden;
                 pointer-events: none;

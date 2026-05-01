@@ -103,14 +103,18 @@ export function getDefaultColumnConfigs(): ColumnConfig[] {
  * - 既に定義済みの列設定を検証し、固定列以外は渡された列順を保持
  * - 重複や不正な列 ID を削除
  * - 欠落している列は COLUMNS の定義順で末尾に追加
- * @param columns 正規化対象の列設定配列（オプション）
+ * @param columns 正規化対象の値（配列以外は空配列として扱う）
  * @returns 正規化済みの列設定配列
  */
-export function normalizeColumnConfigs(columns: ColumnConfig[] = []): ColumnConfig[] {
+export function normalizeColumnConfigs(
+  columns: readonly unknown[] | unknown = []
+): ColumnConfig[] {
   const normalized: ColumnConfig[] = [];
   const usedIds = new Set<string>();
 
-  columns.forEach((column: unknown) => {
+  const sourceColumns = Array.isArray(columns) ? columns : [];
+
+  sourceColumns.forEach((column) => {
     if (!isColumnConfig(column)) {
       return;
     }
@@ -156,7 +160,9 @@ export function normalizeColumnConfigs(columns: ColumnConfig[] = []): ColumnConf
  * @param columns 列設定配列（オプション）
  * @returns 列設定順に対応する Column オブジェクト配列
  */
-export function getOrderedColumns(columns: ColumnConfig[] = []): Column[] {
+export function getOrderedColumns(
+  columns: readonly unknown[] | unknown = []
+): Column[] {
   return normalizeColumnConfigs(columns)
     .map((column) => COLUMN_MAP.get(column.id))
     .filter((column): column is Column => column !== undefined);

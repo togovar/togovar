@@ -38,6 +38,7 @@ export class ResultsColumnsDropdown {
   private _draggingCursorStyleEl: HTMLStyleElement | null = null;
   private _clearPendingLongPress: (() => void) | null = null;
   private _cleanupDragListeners: (() => void) | null = null;
+  private _suppressNextListClick = false;
   private readonly _eventAbortController = new AbortController();
   private readonly _boundDocumentClick: (_event: MouseEvent) => void;
   private readonly _boundDocumentKeydown: (_event: KeyboardEvent) => void;
@@ -64,6 +65,7 @@ export class ResultsColumnsDropdown {
     this._clearPendingLongPress?.();
     this._eventAbortController.abort();
     this._cleanupDragListeners?.();
+    this._suppressNextListClick = false;
     this._clearDragState();
   }
 
@@ -94,6 +96,21 @@ export class ResultsColumnsDropdown {
         this._toggle();
       },
       { signal }
+    );
+
+    // ドラッグ終了後に発火する click で checkbox が誤って切り替わるのを防ぐ
+    this._list.addEventListener(
+      'click',
+      (event) => {
+        if (!this._suppressNextListClick) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        this._suppressNextListClick = false;
+      },
+      { capture: true, signal }
     );
 
     // チェックボックス変更：列の表示/非表示を更新
@@ -268,6 +285,7 @@ export class ResultsColumnsDropdown {
     startClientY: number
   ): void {
     this._draggingElement = item;
+    this._suppressNextListClick = true;
     this._list.classList.add('-is-dragging');
     this._enableGlobalDraggingCursor();
     item.classList.add('-dragging-hidden');
@@ -364,6 +382,9 @@ export class ResultsColumnsDropdown {
       cleanupDragListeners();
       this._commitCurrentOrder();
       this._clearDragState();
+      window.setTimeout(() => {
+        this._suppressNextListClick = false;
+      }, 0);
     };
 
     this._cleanupDragListeners = cleanupDragListeners;
