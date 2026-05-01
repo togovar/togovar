@@ -1,3 +1,26 @@
+@mixin dropdown-view-list-panel {
+  pointer-events: none;
+  margin: 0;
+  padding: 8px 0;
+  border-radius: 5px;
+  list-style: none;
+  background-color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+  font-weight: normal;
+  white-space: nowrap;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+  opacity: 0;
+}
+
+@mixin dropdown-view-list-open {
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .dropdown-view {
   font-size: 14px;
 
@@ -25,22 +48,10 @@
     cursor: pointer;
 
     > .list {
-      pointer-events: none;
+      @include dropdown-view-list-panel;
+
       position: relative;
       top: 20px;
-      margin: 0;
-      padding: 8px 0;
-      border-radius: 5px;
-      list-style: none;
-      background-color: white;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
-      font-weight: normal;
-      white-space: nowrap;
-      transform: translateY(-6px);
-      transition:
-        opacity 0.16s ease,
-        transform 0.16s ease;
-      opacity: 0;
       cursor: pointer;
 
       > .item {
@@ -75,9 +86,7 @@
       background-color: rgba(255, 255, 255, 0.1);
 
       > .list {
-        pointer-events: auto;
-        opacity: 1;
-        transform: translateY(0);
+        @include dropdown-view-list-open;
       }
     }
   }

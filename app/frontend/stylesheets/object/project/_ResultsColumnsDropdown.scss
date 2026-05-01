@@ -83,20 +83,12 @@
         }
 
         > .columns-dropdown-menu {
+          @include dropdown-view-list-panel;
+
           position: absolute;
           top: calc(100% + 8px);
           right: 0;
           min-width: 170px;
-          padding: 8px 0;
-          border-radius: 5px;
-          background: white;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
-          opacity: 0;
-          pointer-events: none;
-          transform: translateY(-6px);
-          transition:
-            opacity 0.16s ease,
-            transform 0.16s ease;
 
           > .columns-dropdown-list {
             margin: 0;
@@ -197,9 +189,7 @@
 
         &.-open {
           > .columns-dropdown-menu {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(0);
+            @include dropdown-view-list-open;
           }
         }
       }
