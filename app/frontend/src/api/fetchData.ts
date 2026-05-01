@@ -288,7 +288,9 @@ async function _updateAppState() {
 
   switch (storeManager.getData('searchMode')) {
     case 'simple':
-      hasConditions = Boolean(storeManager.getData('simpleSearchConditions').term);
+      hasConditions = Boolean(
+        storeManager.getData('simpleSearchConditions').term
+      );
       break;
     case 'advanced': {
       const advancedConditions = storeManager.getData(
@@ -311,7 +313,6 @@ async function _updateAppState() {
     isDownloadLimitExceeded
   );
 
-  document.body.toggleAttribute('data-has-conditions', hasConditions);
   document.body.toggleAttribute('data-download-available', isDownloadAvailable);
   _updateDownloadButtonState(isDownloadAvailable, isDownloadLimitExceeded);
   _updateDownloadDisabledReasonMessage(downloadDisabledReason);
@@ -331,17 +332,20 @@ function _updateDownloadButtonState(
   isDownloadAvailable: boolean,
   isDownloadLimitExceeded: boolean
 ) {
-  document.querySelectorAll('.download-buttons .button-view').forEach((button) => {
-    button.classList.toggle('-disabled', !isDownloadAvailable);
-    button.setAttribute('aria-disabled', String(!isDownloadAvailable));
-    if (button instanceof HTMLButtonElement) {
-      button.disabled = !isDownloadAvailable;
-    }
-    button.setAttribute(
-      'title',
-      isDownloadLimitExceeded ? DOWNLOAD_LIMIT_TITLE : ''
-    );
-  });
+  document
+    .querySelectorAll('.download-buttons .button-view')
+    .forEach((button) => {
+      button.classList.toggle('-disabled', !isDownloadAvailable);
+      button.setAttribute('aria-disabled', String(!isDownloadAvailable));
+      if (button instanceof HTMLButtonElement) {
+        button.disabled = !isDownloadAvailable;
+      }
+      if (isDownloadLimitExceeded) {
+        button.setAttribute('title', DOWNLOAD_LIMIT_TITLE);
+      } else {
+        button.removeAttribute('title');
+      }
+    });
 }
 
 function _getDownloadDisabledReason(

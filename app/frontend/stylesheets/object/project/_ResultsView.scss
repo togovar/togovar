@@ -94,11 +94,14 @@
         position: absolute;
         top: calc(100% - 16px);
         right: 0;
+        max-width: min(100%, 320px);
         margin: 0;
         font-size: 11px;
         line-height: 1.25;
         color: $COLOR_GRAY;
-        white-space: nowrap;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        text-align: right;
 
         &::before {
           content: '\f071';
