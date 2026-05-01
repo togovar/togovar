@@ -287,11 +287,12 @@ async function _updateAppState() {
   let hasConditions = false;
 
   switch (storeManager.getData('searchMode')) {
-    case 'simple':
-      hasConditions = Boolean(
-        storeManager.getData('simpleSearchConditions').term
-      );
+    case 'simple': {
+      const simpleConditions = storeManager.getData('simpleSearchConditions');
+      const extractedSimpleConditions = extractSearchCondition(simpleConditions);
+      hasConditions = Object.keys(extractedSimpleConditions).length > 0;
       break;
+    }
     case 'advanced': {
       const advancedConditions = storeManager.getData(
         'advancedSearchConditions'
