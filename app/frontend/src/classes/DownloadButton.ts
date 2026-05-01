@@ -1,5 +1,7 @@
 import { storeManager } from '../store/StoreManager';
+import * as qs from 'qs';
 import { API_URL } from '../global';
+import { extractSearchCondition } from '../store/searchManager';
 import type { SearchMode } from '../types';
 
 type DownloadFileType = 'json' | 'csv' | 'txt';
@@ -32,7 +34,9 @@ export default class DownloadButton {
   }
 
   /** data-filetype の値が対応済み形式かどうかを判定 */
-  #isDownloadFileType(filetype: string | undefined): filetype is DownloadFileType {
+  #isDownloadFileType(
+    filetype: string | undefined
+  ): filetype is DownloadFileType {
     return filetype === 'json' || filetype === 'csv' || filetype === 'txt';
   }
 
@@ -63,11 +67,10 @@ export default class DownloadButton {
 
   /** Simple search 用の GET ダウンロード */
   #downloadFromSimpleSearch(type: DownloadFileType): void {
-    const query = storeManager.getData<{ term?: string }>(
-      'simpleSearchConditions'
-    ).term;
+    const simpleConditions = storeManager.getData('simpleSearchConditions');
+    const query = qs.stringify(extractSearchCondition(simpleConditions));
     const anchor = document.createElement('a');
-    anchor.href = `${this.#path}.${type}?term=${encodeURIComponent(query ?? '')}`;
+    anchor.href = `${this.#path}.${type}${query ? `?${query}` : ''}`;
     anchor.click();
   }
 
