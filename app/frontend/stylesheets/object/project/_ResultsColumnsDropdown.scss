@@ -172,8 +172,12 @@
 
             &.-is-dragging {
               > .columns-dropdown-item {
+                position: relative;
                 cursor: grabbing;
                 transition: none;
+                box-shadow:
+                  0 -1px 0 white,
+                  0 1px 0 white;
 
                 &:not(.-locked):hover {
                   background: white;

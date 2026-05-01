@@ -17,6 +17,7 @@ const SELECTORS = {
 
 const LONG_PRESS_MS = 150;
 const DRAG_START_MOVE_THRESHOLD_PX = 6;
+const DRAG_REORDER_ANIMATION_MS = 80;
 
 /**
  * 検索結果テーブルの列表示/非表示・ドラッグ並び替え機能を提供するドロップダウン
@@ -87,99 +88,111 @@ export class ResultsColumnsDropdown {
     const { signal } = this._eventAbortController;
 
     // ボタンクリック：ドロップダウンメニューの開閉
-    this._button.addEventListener('click', () => {
-      this._toggle();
-    }, { signal });
+    this._button.addEventListener(
+      'click',
+      () => {
+        this._toggle();
+      },
+      { signal }
+    );
 
     // チェックボックス変更：列の表示/非表示を更新
-    this._list.addEventListener('change', (event) => {
-      const target = event.target as HTMLInputElement | null;
-      if (!target?.matches(SELECTORS.INPUT)) {
-        return;
-      }
-      // 固定列（TogoVar ID）はチェック状態の変更を無視
-      if (target.value === LOCKED_COLUMN_ID) {
-        return;
-      }
+    this._list.addEventListener(
+      'change',
+      (event) => {
+        const target = event.target as HTMLInputElement | null;
+        if (!target?.matches(SELECTORS.INPUT)) {
+          return;
+        }
+        // 固定列（TogoVar ID）はチェック状態の変更を無視
+        if (target.value === LOCKED_COLUMN_ID) {
+          return;
+        }
 
-      const nextColumns = normalizeColumnConfigs(
-        storeManager.getData('columns')
-      );
-      const targetColumn = nextColumns.find(
-        (column) => column.id === target.value
-      );
+        const nextColumns = normalizeColumnConfigs(
+          storeManager.getData('columns')
+        );
+        const targetColumn = nextColumns.find(
+          (column) => column.id === target.value
+        );
 
-      if (!targetColumn) {
-        return;
-      }
+        if (!targetColumn) {
+          return;
+        }
 
-      targetColumn.isUsed = target.checked;
-      storeManager.setData('columns', nextColumns);
-    }, { signal });
+        targetColumn.isUsed = target.checked;
+        storeManager.setData('columns', nextColumns);
+      },
+      { signal }
+    );
 
     // mousedown：checkbox 以外のエリアは長押しでドラッグ開始
     // checkbox は通常クリックで表示/非表示切り替えを維持する
-    this._list.addEventListener('mousedown', (event) => {
-      const target = event.target as HTMLElement | null;
-      if (!target) {
-        return;
-      }
-
-      // checkbox 自体は既存のクリック挙動を優先
-      if (target.closest(SELECTORS.INPUT)) {
-        return;
-      }
-
-      const item = target.closest(SELECTORS.ITEM) as HTMLElement | null;
-      if (!item || item.dataset.columnId === LOCKED_COLUMN_ID) {
-        return;
-      }
-
-      const startX = event.clientX;
-      const startY = event.clientY;
-      let longPressTimer: number | null = null;
-      this._clearPendingLongPress?.();
-      const pendingAbortController = new AbortController();
-
-      const clearLongPressWatchers = (): void => {
-        if (longPressTimer !== null) {
-          window.clearTimeout(longPressTimer);
-          longPressTimer = null;
+    this._list.addEventListener(
+      'mousedown',
+      (event) => {
+        const target = event.target as HTMLElement | null;
+        if (!target) {
+          return;
         }
-        pendingAbortController.abort();
-        if (this._clearPendingLongPress === clearLongPressWatchers) {
-          this._clearPendingLongPress = null;
-        }
-      };
 
-      // 長押し前に大きく動いたら通常クリック扱いに戻す
-      function onPendingMove(e: MouseEvent): void {
-        const movedX = e.clientX - startX;
-        const movedY = e.clientY - startY;
-        if (Math.hypot(movedX, movedY) > DRAG_START_MOVE_THRESHOLD_PX) {
+        // checkbox 自体は既存のクリック挙動を優先
+        if (target.closest(SELECTORS.INPUT)) {
+          return;
+        }
+
+        const item = target.closest(SELECTORS.ITEM) as HTMLElement | null;
+        if (!item || item.dataset.columnId === LOCKED_COLUMN_ID) {
+          return;
+        }
+
+        const startX = event.clientX;
+        const startY = event.clientY;
+        let longPressTimer: number | null = null;
+        this._clearPendingLongPress?.();
+        const pendingAbortController = new AbortController();
+
+        const clearLongPressWatchers = (): void => {
+          if (longPressTimer !== null) {
+            window.clearTimeout(longPressTimer);
+            longPressTimer = null;
+          }
+          pendingAbortController.abort();
+          if (this._clearPendingLongPress === clearLongPressWatchers) {
+            this._clearPendingLongPress = null;
+          }
+        };
+
+        // 長押し前に大きく動いたら通常クリック扱いに戻す
+        function onPendingMove(e: MouseEvent): void {
+          const movedX = e.clientX - startX;
+          const movedY = e.clientY - startY;
+          if (Math.hypot(movedX, movedY) > DRAG_START_MOVE_THRESHOLD_PX) {
+            clearLongPressWatchers();
+          }
+        }
+
+        // 長押し時間に達する前に離した場合はドラッグしない
+        function onPendingMouseUp(): void {
           clearLongPressWatchers();
         }
-      }
 
-      // 長押し時間に達する前に離した場合はドラッグしない
-      function onPendingMouseUp(): void {
-        clearLongPressWatchers();
-      }
+        const startDrag = (): void => {
+          clearLongPressWatchers();
+          this._beginDrag(item, startX, startY);
+        };
 
-      const startDrag = (): void => {
-        clearLongPressWatchers();
-        this._beginDrag(item, startX, startY);
-      };
-
-      this._clearPendingLongPress = clearLongPressWatchers;
-      longPressTimer = window.setTimeout(startDrag, LONG_PRESS_MS);
-      document.addEventListener('mousemove', onPendingMove, {
-        signal: pendingAbortController.signal,
-      });
-      document.addEventListener('mouseup', onPendingMouseUp, {
-        signal: pendingAbortController.signal,
-      });
-    }, { signal });
+        this._clearPendingLongPress = clearLongPressWatchers;
+        longPressTimer = window.setTimeout(startDrag, LONG_PRESS_MS);
+        document.addEventListener('mousemove', onPendingMove, {
+          signal: pendingAbortController.signal,
+        });
+        document.addEventListener('mouseup', onPendingMouseUp, {
+          signal: pendingAbortController.signal,
+        });
+      },
+      { signal }
+    );
 
     // ドキュメントクリック：範囲外クリックでドロップダウンを閉じる
     document.addEventListener('click', this._boundDocumentClick, { signal });
@@ -235,10 +248,7 @@ export class ResultsColumnsDropdown {
       .map((item) => columnMap.get(item.dataset.columnId ?? ''))
       .filter((column): column is ColumnConfig => column !== undefined);
 
-    storeManager.setData(
-      'columns',
-      normalizeColumnConfigs(nextColumns)
-    );
+    storeManager.setData('columns', normalizeColumnConfigs(nextColumns));
   }
 
   /**
@@ -260,6 +270,7 @@ export class ResultsColumnsDropdown {
     // ゴースト要素を生成してカーソルに追従させる
     const ghost = item.cloneNode(true) as HTMLElement;
     const itemRect = item.getBoundingClientRect();
+    ghost.classList.remove('-dragging-hidden');
     ghost.classList.add('-drag-ghost');
     ghost.style.cssText = `
       position: fixed;
@@ -320,7 +331,7 @@ export class ResultsColumnsDropdown {
         target.before(this._draggingElement);
       }
 
-      // FLIP：移動後の差分を transform で補正し、transition でアニメーション
+      // FLIP：移動後の差分を transform で補正し、短い transition でアニメーション
       items.forEach((el) => {
         if (el === this._draggingElement) return;
         const delta =
@@ -329,7 +340,7 @@ export class ResultsColumnsDropdown {
         el.style.transition = 'none';
         el.style.transform = `translateY(${delta}px)`;
         requestAnimationFrame(() => {
-          el.style.transition = 'transform 0.15s ease';
+          el.style.transition = `transform ${DRAG_REORDER_ANIMATION_MS}ms ease-out`;
           el.style.transform = '';
         });
       });
