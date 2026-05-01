@@ -95,7 +95,7 @@
             transform: translateY(0.5px);
           }
 
-          body[data-has-conditions] & {
+          body[data-download-available] & {
             opacity: 1;
             pointer-events: auto;
           }

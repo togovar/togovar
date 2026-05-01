@@ -18,6 +18,13 @@ export default class DownloadButton {
   }
 
   #downloadFile(type) {
+    if (
+      this.#trigger.classList.contains('-disabled') ||
+      this.#trigger.getAttribute('aria-disabled') === 'true'
+    ) {
+      return;
+    }
+
     switch (storeManager.getData('searchMode')) {
       case 'simple':
         return this.#downloadFromSimpleSearch(type);
