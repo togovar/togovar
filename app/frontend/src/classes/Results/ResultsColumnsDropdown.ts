@@ -100,10 +100,14 @@ export class ResultsColumnsDropdown {
     this._list.addEventListener(
       'change',
       (event) => {
-        const target = event.target as HTMLInputElement | null;
-        if (!target?.matches(SELECTORS.INPUT)) {
+        if (
+          !(event.target instanceof HTMLInputElement) ||
+          !event.target.matches(SELECTORS.INPUT)
+        ) {
           return;
         }
+
+        const target = event.target;
         // 固定列（TogoVar ID）はチェック状態の変更を無視
         if (target.value === LOCKED_COLUMN_ID) {
           return;
@@ -131,10 +135,11 @@ export class ResultsColumnsDropdown {
     this._list.addEventListener(
       'mousedown',
       (event) => {
-        const target = event.target as HTMLElement | null;
-        if (!target) {
+        if (!(event.target instanceof Element)) {
           return;
         }
+
+        const target = event.target;
 
         // checkbox 自体は既存のクリック挙動を優先
         if (target.closest(SELECTORS.INPUT)) {
@@ -302,9 +307,10 @@ export class ResultsColumnsDropdown {
         this._ghostElement.style.top = `${e.clientY - offsetY}px`;
       }
 
-      const target = (e.target as HTMLElement | null)?.closest(
-        SELECTORS.ITEM
-      ) as HTMLElement | null;
+      const target =
+        e.target instanceof Element
+          ? (e.target.closest(SELECTORS.ITEM) as HTMLElement | null)
+          : null;
 
       if (!target || target === this._draggingElement) {
         return;
@@ -440,7 +446,7 @@ export class ResultsColumnsDropdown {
    * - ドロップダウン範囲外がクリックされた場合、メニューを自動クローズ
    */
   private _handleDocumentClick(event: MouseEvent): void {
-    if (this._root.contains(event.target as Node)) {
+    if (event.target instanceof Node && this._root.contains(event.target)) {
       return;
     }
 
