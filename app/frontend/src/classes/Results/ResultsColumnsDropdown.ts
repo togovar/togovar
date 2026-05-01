@@ -18,6 +18,7 @@ const SELECTORS = {
 const LONG_PRESS_MS = 150;
 const DRAG_START_MOVE_THRESHOLD_PX = 6;
 const DRAG_REORDER_ANIMATION_MS = 80;
+const HOVER_CLOSE_DELAY_MS = 120;
 
 /**
  * 検索結果テーブルの列表示/非表示・ドラッグ並び替え機能を提供するドロップダウン
@@ -39,6 +40,7 @@ export class ResultsColumnsDropdown {
   private _clearPendingLongPress: (() => void) | null = null;
   private _cleanupDragListeners: (() => void) | null = null;
   private _suppressNextListClick = false;
+  private _hoverCloseTimer: number | null = null;
   private readonly _eventAbortController = new AbortController();
   private readonly _boundDocumentClick: (_event: MouseEvent) => void;
   private readonly _boundDocumentKeydown: (_event: KeyboardEvent) => void;
@@ -63,6 +65,7 @@ export class ResultsColumnsDropdown {
   destroy(): void {
     storeManager.unbind('columns', this);
     this._clearPendingLongPress?.();
+    this._cancelHoverClose();
     this._eventAbortController.abort();
     this._cleanupDragListeners?.();
     this._suppressNextListClick = false;
@@ -81,7 +84,7 @@ export class ResultsColumnsDropdown {
 
   /**
    * 全イベントリスナーをセットアップ
-   * - ボタンクリック：ドロップダウン開閉
+   * - hover/focus：ドロップダウン開閉
    * - チェックボックス change：列表示/非表示制御
    * - mousedown on drag-handle：列の並び替え（mousemove/mouseup ベース）
    * - ドキュメントクリック/キー：ドロップダウン自動クローズ
@@ -89,11 +92,46 @@ export class ResultsColumnsDropdown {
   private _bindEvents(): void {
     const { signal } = this._eventAbortController;
 
-    // ボタンクリック：ドロップダウンメニューの開閉
-    this._button.addEventListener(
-      'click',
+    // hover：ドロップダウンメニューを開く
+    this._root.addEventListener(
+      'mouseenter',
       () => {
-        this._toggle();
+        this._cancelHoverClose();
+        this._toggle(true);
+      },
+      { signal }
+    );
+
+    // hover 解除：メニューとの隙間をまたぐため少し遅らせて閉じる
+    this._root.addEventListener(
+      'mouseleave',
+      () => {
+        this._scheduleHoverClose();
+      },
+      { signal }
+    );
+
+    // キーボード操作では focus で開き、フォーカスが外れたら閉じる
+    this._root.addEventListener(
+      'focusin',
+      () => {
+        this._cancelHoverClose();
+        this._toggle(true);
+      },
+      { signal }
+    );
+
+    this._root.addEventListener(
+      'focusout',
+      (event) => {
+        if (
+          event.relatedTarget instanceof Node &&
+          this._root.contains(event.relatedTarget)
+        ) {
+          return;
+        }
+
+        this._toggle(false);
       },
       { signal }
     );
@@ -441,6 +479,25 @@ export class ResultsColumnsDropdown {
 
     this._draggingCursorStyleEl.remove();
     this._draggingCursorStyleEl = null;
+  }
+
+  /** hover 解除後、少し遅らせてドロップダウンを閉じる */
+  private _scheduleHoverClose(): void {
+    this._cancelHoverClose();
+    this._hoverCloseTimer = window.setTimeout(() => {
+      this._hoverCloseTimer = null;
+      this._toggle(false);
+    }, HOVER_CLOSE_DELAY_MS);
+  }
+
+  /** hover クローズ予約をキャンセル */
+  private _cancelHoverClose(): void {
+    if (this._hoverCloseTimer === null) {
+      return;
+    }
+
+    window.clearTimeout(this._hoverCloseTimer);
+    this._hoverCloseTimer = null;
   }
 
   /**
