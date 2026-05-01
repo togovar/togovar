@@ -59,6 +59,8 @@ export class ResultsView {
   private _wheelEventName = '';
   /** バインドされた検索モード変更ハンドラー */
   private _boundSearchModeHandler!: (_newMode: unknown) => void;
+  /** 動的に作成した列表示制御用スタイル要素 */
+  private _stylesheet!: HTMLStyleElement;
 
   /**
    * ResultsView のコンストラクタ
@@ -83,10 +85,10 @@ export class ResultsView {
     // UI コンポーネントの初期化
     this._configureScrollBar();
     this._initializeTableHeader(thead, storeManager.getData('columns'));
-    const stylesheet = this._createStylesheet();
+    this._stylesheet = this._createStylesheet();
 
     // イベントハンドラー・コンポーネントの初期化
-    this._initializeComponentHandlers(status, messages, stylesheet);
+    this._initializeComponentHandlers(status, messages, this._stylesheet);
     this.columnsDropdown = new ResultsColumnsDropdown(columnsDropdown);
 
     // 初期表示設定
@@ -141,6 +143,10 @@ export class ResultsView {
         this._wheelEventName,
         this._boundWheelHandler
       );
+    }
+
+    if (this._stylesheet) {
+      this._stylesheet.remove();
     }
   }
 

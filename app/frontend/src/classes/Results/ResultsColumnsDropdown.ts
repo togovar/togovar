@@ -128,15 +128,19 @@ export class ResultsColumnsDropdown {
 
     this._root.addEventListener(
       'focusout',
-      (event) => {
-        if (
-          event.relatedTarget instanceof Node &&
-          this._root.contains(event.relatedTarget)
-        ) {
-          return;
-        }
+      () => {
+        window.setTimeout(() => {
+          const activeElement = document.activeElement;
+          if (
+            this._root.matches(':hover') ||
+            (activeElement instanceof Node &&
+              this._root.contains(activeElement))
+          ) {
+            return;
+          }
 
-        this._toggle(false);
+          this._toggle(false);
+        }, 0);
       },
       { signal }
     );
@@ -217,7 +221,6 @@ export class ResultsColumnsDropdown {
 
         const startX = event.clientX;
         const startY = event.clientY;
-        const nativeEvent = event;
         let longPressTimer: number | null = null;
         this._clearPendingLongPress?.();
         const pendingAbortController = new AbortController();
@@ -249,7 +252,6 @@ export class ResultsColumnsDropdown {
 
         const startDrag = (): void => {
           clearLongPressWatchers();
-          nativeEvent.preventDefault();
           this._beginDrag(item, startX, startY);
         };
 
