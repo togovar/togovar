@@ -98,8 +98,10 @@ class StoreManager {
   /** 検索条件まわりの初期イベントを登録 */
   #initSearchCondition() {
     this.setData('isFetching', false);
-    // イベント登録
-    window.addEventListener('popstate', handleHistoryChange.bind(this));
+    if (typeof window !== 'undefined' && window.addEventListener) {
+      // イベント登録
+      window.addEventListener('popstate', handleHistoryChange.bind(this));
+    }
     this.subscribe('searchMode', this.searchMode.bind(this));
   }
 
@@ -284,6 +286,11 @@ class StoreManager {
   /** ログイン状態を取得してストアに反映 */
   async fetchLoginStatus() {
     try {
+      if (typeof window === 'undefined') {
+        this.setData('isLogin', false);
+        return;
+      }
+
       // localhost 開発時は常に未ログイン扱いにして認証チェックをスキップ
       if (window.location.origin === 'http://localhost:8000') {
         this.setData('isLogin', false);
@@ -328,7 +335,9 @@ class StoreManager {
       this.setData('numberOfRecords', 0);
       this.setData('rowCount', 0);
 
-      document.body.dataset.searchMode = mode;
+      if (typeof document !== 'undefined') {
+        document.body.dataset.searchMode = mode;
+      }
 
       switch (mode) {
         case 'simple':

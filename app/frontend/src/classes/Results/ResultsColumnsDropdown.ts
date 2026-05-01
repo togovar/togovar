@@ -195,6 +195,10 @@ export class ResultsColumnsDropdown {
     this._list.addEventListener(
       'mousedown',
       (event) => {
+        if (event.button !== 0) {
+          return;
+        }
+
         if (!(event.target instanceof Element)) {
           return;
         }
@@ -213,6 +217,7 @@ export class ResultsColumnsDropdown {
 
         const startX = event.clientX;
         const startY = event.clientY;
+        const nativeEvent = event;
         let longPressTimer: number | null = null;
         this._clearPendingLongPress?.();
         const pendingAbortController = new AbortController();
@@ -244,6 +249,7 @@ export class ResultsColumnsDropdown {
 
         const startDrag = (): void => {
           clearLongPressWatchers();
+          nativeEvent.preventDefault();
           this._beginDrag(item, startX, startY);
         };
 
