@@ -54,6 +54,8 @@
       display: flex;
       gap: 5px;
       align-items: flex-start;
+      padding: 0 0 18px;
+      margin: 0;
       z-index: var(--z-index-base);
 
       > .text {
@@ -86,6 +88,17 @@
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
           }
         }
+      }
+
+      > .download-disabled-reason {
+        position: absolute;
+        top: calc(100% - 16px);
+        right: 0;
+        margin: 0;
+        font-size: 11px;
+        line-height: 1.25;
+        color: $COLOR_GRAY;
+        white-space: nowrap;
       }
 
       > li {

@@ -301,11 +301,16 @@ async function _updateAppState() {
     hasConditions && filteredCount <= DOWNLOAD_VARIANT_LIMIT;
   const isDownloadLimitExceeded =
     hasConditions && filteredCount > DOWNLOAD_VARIANT_LIMIT;
+  const downloadDisabledReason = _getDownloadDisabledReason(
+    hasConditions,
+    isDownloadLimitExceeded
+  );
 
   document.body.toggleAttribute('data-has-conditions', hasConditions);
   document.body.toggleAttribute('data-download-available', isDownloadAvailable);
   document.body.toggleAttribute('data-download-limit-exceeded', isDownloadLimitExceeded);
   _updateDownloadButtonState(isDownloadAvailable, isDownloadLimitExceeded);
+  _updateDownloadDisabledReasonMessage(downloadDisabledReason);
 
   // まずoffsetを更新して表示位置を確定
   storeManager.publish('offset');
@@ -332,4 +337,29 @@ function _updateDownloadButtonState(
         : ''
     );
   });
+}
+
+function _getDownloadDisabledReason(
+  hasConditions: boolean,
+  isDownloadLimitExceeded: boolean
+): string {
+  if (!hasConditions) {
+    return 'Add a search condition to enable download.';
+  }
+
+  if (isDownloadLimitExceeded) {
+    return 'Download is available for up to 100,000 variants. Narrow your results.';
+  }
+
+  return '';
+}
+
+function _updateDownloadDisabledReasonMessage(message: string): void {
+  const reasonNode = document.getElementById('DownloadDisabledReason');
+  if (!reasonNode) {
+    return;
+  }
+
+  reasonNode.textContent = message;
+  reasonNode.toggleAttribute('hidden', message === '');
 }
