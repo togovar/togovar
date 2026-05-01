@@ -1,4 +1,4 @@
-import { COLUMNS } from '../../global';
+import { COLUMNS, getOrderedColumns } from '../../columns';
 import { storeManager } from '../../store/StoreManager';
 import type {
   ResultData,
@@ -151,10 +151,13 @@ export class ResultsRowView {
       return this._setLoadingState();
     }
 
-    this._prepareTableData();
+    const columns = this._getCurrentColumns();
+    this._prepareTableData(columns);
 
     // Update data for each column
-    COLUMNS.forEach((column) => this._updateColumnContent(column, result));
+    columns.forEach((column) =>
+      this._updateColumnContent(column, result)
+    );
 
     this.tr.classList.remove('-loading', '-out-of-range');
   }
@@ -226,8 +229,8 @@ export class ResultsRowView {
    *
    * Generate HTML and cache DOM elements
    */
-  private _prepareTableData() {
-    this.tr.innerHTML = this._createTableCellHTML();
+  private _prepareTableData(columns: Column[]) {
+    this.tr.innerHTML = this._createTableCellHTML(columns);
     this._cacheTableCells();
   }
 
@@ -236,13 +239,19 @@ export class ResultsRowView {
    *
    * @returns Generated HTML string
    */
-  private _createTableCellHTML(): string {
-    return COLUMNS.map((column) => {
-      if (column.id === 'alt_frequency') {
-        return createFrequencyColumnHTML();
-      }
-      return (COLUMN_TEMPLATES as Record<string, string>)[column.id] || '';
-    }).join('');
+  private _createTableCellHTML(columns: Column[]): string {
+    return columns
+      .map((column) => {
+        if (column.id === 'alt_frequency') {
+          return createFrequencyColumnHTML();
+        }
+        return (COLUMN_TEMPLATES as Record<string, string>)[column.id] || '';
+      })
+      .join('');
+  }
+
+  private _getCurrentColumns() {
+    return getOrderedColumns(storeManager.getData('columns'));
   }
 
   // ========================================

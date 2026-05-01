@@ -1,0 +1,198 @@
+// =======================================================
+// 検索結果テーブルの列ドロップダウン（Columns）スタイル
+// =======================================================
+
+@mixin columns-dropdown-item-base {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  margin: 0;
+  background: white;
+}
+
+@mixin columns-dropdown-drag-handle {
+  flex: 0 0 auto;
+  width: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::before {
+    content: $CHAR_DRAG_HANDLE;
+    font-family:
+      'Font Awesome 7 Free', 'Font Awesome 6 Free', FontAwesome, sans-serif;
+    font-weight: 900;
+    color: var(--color-gray);
+    font-size: 8px;
+  }
+}
+
+@mixin columns-dropdown-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  color: var(--color-black);
+  padding: 4px 0;
+
+  > input {
+    margin: 0;
+  }
+}
+
+// ドラッグゴーストは body 直下に追加されるため、#ResultsView の外で定義する。
+.columns-dropdown-item.-drag-ghost {
+  @include columns-dropdown-item-base;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  border-radius: 4px;
+
+  > .drag-handle {
+    @include columns-dropdown-drag-handle;
+  }
+
+  > label {
+    @include columns-dropdown-label;
+    pointer-events: none;
+  }
+}
+
+#ResultsView {
+  > .header {
+    > .right {
+      > .columns-dropdown {
+        position: relative;
+
+        > .columns-dropdown-button {
+          line-height: 1.6;
+          min-width: 60px;
+
+          &:hover {
+            transform: none;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+          }
+
+          &:active {
+            background: linear-gradient(
+              to bottom,
+              var(--color-key-dark1),
+              var(--color-key-dark3)
+            );
+          }
+        }
+
+        > .columns-dropdown-menu {
+          @include dropdown-view-list-panel;
+
+          position: absolute;
+          top: calc(100% + 8px);
+          right: 0;
+          min-width: 170px;
+
+          > .columns-dropdown-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            user-select: none;
+            -webkit-user-select: none;
+
+            > .columns-dropdown-item {
+              @include columns-dropdown-item-base;
+              cursor: grab;
+              transition: background-color 0.12s ease;
+
+              &:hover {
+                background: var(--color-selected-hover);
+              }
+
+              &.-dragging-hidden {
+                visibility: hidden;
+                pointer-events: none;
+              }
+
+              > .drag-handle {
+                @include columns-dropdown-drag-handle;
+                cursor: grab;
+              }
+
+              > .lock {
+                margin-left: auto;
+              }
+
+              > label {
+                @include columns-dropdown-label;
+                cursor: pointer;
+
+                > input {
+                  cursor: pointer;
+                }
+              }
+
+              &.-locked {
+                background: #f3f3f3;
+                cursor: default;
+                opacity: 0.75;
+
+                &:hover {
+                  background: #f3f3f3;
+                }
+
+                > .drag-handle {
+                  visibility: hidden;
+                }
+
+                > label {
+                  color: var(--color-gray);
+                  cursor: default;
+
+                  > input {
+                    cursor: default;
+                  }
+                }
+
+                > .lock {
+                  &::before {
+                    content: $CHAR_LOCK;
+                    font-family: FontAwesome, sans-serif;
+                    color: var(--color-gray);
+                    font-size: 13px;
+                  }
+                }
+              }
+            }
+
+            &.-is-dragging {
+              > .columns-dropdown-item {
+                position: relative;
+                cursor: grabbing;
+                transition: none;
+                box-shadow:
+                  0 -1px 0 white,
+                  0 1px 0 white;
+
+                &:not(.-locked):hover {
+                  background: white;
+                }
+
+                &.-locked:hover {
+                  background: #f3f3f3;
+                }
+
+                > .drag-handle {
+                  cursor: grabbing;
+                }
+              }
+            }
+          }
+        }
+
+        &.-open {
+          > .columns-dropdown-menu {
+            @include dropdown-view-list-open;
+          }
+        }
+      }
+    }
+  }
+}

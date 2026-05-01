@@ -20,12 +20,14 @@ main#SearchResultsView.LayoutMainAside
           .status
         ul.right
           li.text Download
-          li
+          li.download-buttons
             button#DownloadJson.button-view.-disabled(data-filetype="json") JSON
-          li
             button#DownloadCsv.button-view.-disabled(data-filetype="csv") CSV
-          li
             button#DownloadTsv.button-view.-disabled(data-filetype="txt") TSV
+          li.columns-dropdown
+            button.columns-dropdown-button.button-view.-dropdown(type='button' aria-expanded='false') Columns
+            .columns-dropdown-menu(hidden aria-hidden='true' inert)
+              ul.columns-dropdown-list
       #Messages
       .tablecontainer
         table.results-view

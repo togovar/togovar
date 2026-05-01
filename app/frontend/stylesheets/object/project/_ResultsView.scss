@@ -1,0 +1,126 @@
+// =======================================================
+// 検索結果テーブルのメインビュー（Results）スタイル
+// =======================================================
+
+#ResultsView {
+  padding: 10px $PADDING_SIDE $PADDING_SIDE;
+  position: relative;
+
+  // テーブル検索結果が見つからない場合のメッセージ
+  &.-not-found::after {
+    content: 'Not found';
+    text-align: center;
+    display: block;
+    font-size: 14px;
+    line-height: 64px;
+    color: $COLOR_GRAY;
+  }
+
+  // ========================
+  // ヘッダー領域
+  // ========================
+  > .header {
+    white-space: nowrap;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+
+    // ヘッダー左側：見出し・結果件数
+    > .left {
+      > .heading {
+        display: inline-block;
+        font-size: 16px;
+        margin-right: 8px;
+        margin-bottom: -2px;
+      }
+
+      > .status {
+        display: inline-block;
+        font-size: 12px;
+
+        > .bigger {
+          font-size: 16px;
+        }
+      }
+    }
+
+    // ヘッダー右側：操作ボタン・ドロップダウン
+    /* stylelint-disable no-descending-specificity */
+    > .right {
+      position: relative;
+      top: 4px;
+      min-height: 16px;
+      list-style: none;
+      display: flex;
+      gap: 5px;
+      align-items: flex-start;
+      z-index: var(--z-index-base);
+
+      > .text {
+        font-size: 12px;
+        font-weight: bold;
+        padding-right: 3px;
+      }
+
+      // ダウンロードボタングループ（複数ボタンを角丸でグループ化）
+      > .download-buttons {
+        display: flex;
+        gap: 0;
+
+        > .button-view {
+          border-radius: 0;
+
+          // ボタン間の線と下のシャドウ
+          box-shadow:
+            inset -1px 0 0 rgba(255, 255, 255, 0.22),
+            0 1px 2px rgba(0, 0, 0, 0.22);
+
+          &:first-child {
+            border-top-left-radius: 0.9em;
+            border-bottom-left-radius: 0.9em;
+          }
+
+          &:last-child {
+            border-top-right-radius: 0.9em;
+            border-bottom-right-radius: 0.9em;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+          }
+        }
+      }
+
+      > li {
+        > .button-view {
+          &:active {
+            background: var(--color-key-dark1);
+            transform: translateY(0.5px);
+          }
+
+          body[data-has-conditions] & {
+            opacity: 1;
+            pointer-events: auto;
+          }
+        }
+      }
+    }
+    /* stylelint-enable no-descending-specificity */
+  }
+
+  > .tablecontainer {
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin-top: -20px;
+    margin-right: -$PADDING_SIDE;
+    padding-bottom: 20px;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y;
+
+    > .results-view {
+      > thead {
+        > tr {
+          height: 64px;
+        }
+      }
+    }
+  }
+}

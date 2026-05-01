@@ -14,6 +14,19 @@
     background: linear-gradient(to bottom, var(--color-pale-gray), var(--color-light-gray))
   &.-negative
     background: linear-gradient(to bottom, var(--color-disable), var(--color-disable-deep))
+  &.-dropdown
+    padding-right: 1.6em
+    line-height: 20px
+    border-radius: 10px
+    background: linear-gradient(to bottom, var(--color-key-dark1), var(--color-key-dark3))
+    &:after
+      content: var(--char-CARET-DOWN)
+      position: absolute
+      top: 50%
+      right: .65em
+      font-family: FontAwesome, sans-serif
+      font-size: .7rem
+      transform: translateY(-50%)
   &.-disabled,
   &:disabled
     opacity: .4

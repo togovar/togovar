@@ -1,7 +1,6 @@
 import { storeManager } from '../src/store/StoreManager';
 import { ResultsView } from '../src/classes/Results/ResultsView';
 import SideBar from '../src/classes/SideBar.js';
-import Configuration from '../src/classes/Configuration.js';
 import Karyotype from '../src/classes/Karyotype.js';
 import ActivityIndicator from '../src/classes/ActivityIndicator.js';
 import ModuleTabsView from '../src/classes/ModuleTabsView.js';
@@ -38,8 +37,6 @@ export function initHome() {
   storeManager.setData('selectedRow', undefined);
 
   initializeApp(); // 先にURLからモードを設定
-
-  new Configuration(document.getElementById('Configuration'));
 
   new Karyotype(document.getElementById('Karyotype'));
 
@@ -172,9 +169,11 @@ function cleanupApplication() {
 
 // ページ離脱時のクリーンアップ設定
 function setupCleanupHandlers() {
-  // ブラウザのページ離脱時
-  window.addEventListener('beforeunload', () => {
-    cleanupApplication();
+  // bfcache 復元時にイベントリスナーが消えないよう、キャッシュされない離脱時だけ破棄する
+  window.addEventListener('pagehide', (event) => {
+    if (!event.persisted) {
+      cleanupApplication();
+    }
   });
 
   // ページ非表示時（タブ切り替えやブラウザ最小化）

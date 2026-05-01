@@ -1,0 +1,93 @@
+@mixin dropdown-view-list-panel {
+  pointer-events: none;
+  margin: 0;
+  padding: 8px 0;
+  border-radius: 5px;
+  list-style: none;
+  background-color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+  font-weight: normal;
+  white-space: nowrap;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+  opacity: 0;
+}
+
+@mixin dropdown-view-list-open {
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dropdown-view {
+  font-size: 14px;
+
+  > .button {
+    margin: 0;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(
+      to bottom,
+      var(--color-key-dark1),
+      var(--color-key-dark3)
+    );
+    color: white;
+    line-height: 20px;
+    cursor: pointer;
+
+    &::after {
+      content: var(--char-CARET-DOWN);
+      font-family: FontAwesome, sans-serif;
+    }
+  }
+
+  > .selectshow {
+    transition: 0.3s;
+    cursor: pointer;
+
+    > .list {
+      @include dropdown-view-list-panel;
+
+      position: relative;
+      top: 20px;
+      cursor: pointer;
+
+      > .item {
+        > .link {
+          display: block;
+          text-decoration: none;
+          padding-right: 5px;
+          transition: 0.3s;
+
+          &::before {
+            content: var(--char-CHECK);
+            font-family: FontAwesome, sans-serif;
+            color: var(--color-key-dark2);
+            font-size: 0.6rem;
+            opacity: 0;
+          }
+
+          &:hover {
+            background-color: var(--color-selected-hover);
+          }
+        }
+
+        > .-active {
+          &::before {
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+
+      > .list {
+        @include dropdown-view-list-open;
+      }
+    }
+  }
+}
