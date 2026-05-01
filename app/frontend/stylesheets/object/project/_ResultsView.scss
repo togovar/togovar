@@ -54,6 +54,8 @@
       display: flex;
       gap: 5px;
       align-items: flex-start;
+      padding: 0 0 18px;
+      margin: 0;
       z-index: var(--z-index-base);
 
       > .text {
@@ -88,6 +90,27 @@
         }
       }
 
+      > .download-disabled-reason {
+        position: absolute;
+        top: calc(100% - 16px);
+        right: 0;
+        max-width: min(100%, 320px);
+        margin: 0;
+        font-size: 11px;
+        line-height: 1.25;
+        color: $COLOR_GRAY;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        text-align: right;
+
+        &::before {
+          content: '\f071';
+          font-family: FontAwesome, sans-serif;
+          color: var(--color-sign-warning);
+          margin-right: 4px;
+        }
+      }
+
       > li {
         > .button-view {
           &:active {
@@ -95,7 +118,7 @@
             transform: translateY(0.5px);
           }
 
-          body[data-has-conditions] & {
+          body[data-download-available] & {
             opacity: 1;
             pointer-events: auto;
           }

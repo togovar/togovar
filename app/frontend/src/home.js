@@ -6,7 +6,7 @@ import ActivityIndicator from '../src/classes/ActivityIndicator.js';
 import ModuleTabsView from '../src/classes/ModuleTabsView.js';
 // import CollapseView from '../src/classes/CollapseView.js';
 import TopPageLayoutManager from '../src/classes/TopPageLayoutManager.js';
-import DownloadButton from './classes/DownloadButton.js';
+import DownloadButton from './classes/DownloadButton.ts';
 // Search
 import SimpleSearchView from './components/SearchField/SimpleSearch/SimpleSearchView';
 import { AdvancedSearchBuilderView } from '../src/classes/AdvancedSearchBuilderView.ts';

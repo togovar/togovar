@@ -3,6 +3,12 @@ import * as qs from 'qs';
 import * as _ from 'lodash';
 import { API_URL } from '../global';
 const LIMIT = 100;
+const DOWNLOAD_VARIANT_LIMIT = 100000;
+const DOWNLOAD_VARIANT_LIMIT_TEXT = new Intl.NumberFormat('en-US').format(
+  DOWNLOAD_VARIANT_LIMIT
+);
+const DOWNLOAD_LIMIT_TITLE = `Download is available for up to ${DOWNLOAD_VARIANT_LIMIT_TEXT} variants.`;
+const DOWNLOAD_LIMIT_REASON = `${DOWNLOAD_LIMIT_TITLE} Narrow your results.`;
 import { extractSearchCondition } from '../store/searchManager';
 import type { FetchOption, SearchResults, SearchStatistics } from '../types';
 
@@ -278,24 +284,39 @@ function _processStatistics(json: SearchStatistics) {
 /** 検索状態を更新し、条件が変わっていた場合は再検索 */
 async function _updateAppState() {
   // for Download button
-  storeManager.getData('searchMode');
+  let hasConditions = false;
+
   switch (storeManager.getData('searchMode')) {
-    case 'simple':
-      if (storeManager.getData('simpleSearchConditions').term) {
-        document.body.setAttribute('data-has-conditions', 'true');
-      }
+    case 'simple': {
+      const simpleConditions = storeManager.getData('simpleSearchConditions');
+      const extractedSimpleConditions = extractSearchCondition(simpleConditions);
+      hasConditions = Object.keys(extractedSimpleConditions).length > 0;
       break;
+    }
     case 'advanced': {
       const advancedConditions = storeManager.getData(
         'advancedSearchConditions'
       );
-      document.body.toggleAttribute(
-        'data-has-conditions',
+      hasConditions = Boolean(
         advancedConditions && Object.keys(advancedConditions).length > 0
       );
       break;
     }
   }
+
+  const filteredCount = storeManager.getData('searchStatus')?.filtered ?? 0;
+  const isDownloadAvailable =
+    hasConditions && filteredCount <= DOWNLOAD_VARIANT_LIMIT;
+  const isDownloadLimitExceeded =
+    hasConditions && filteredCount > DOWNLOAD_VARIANT_LIMIT;
+  const downloadDisabledReason = _getDownloadDisabledReason(
+    hasConditions,
+    isDownloadLimitExceeded
+  );
+
+  document.body.toggleAttribute('data-download-available', isDownloadAvailable);
+  _updateDownloadButtonState(isDownloadAvailable, isDownloadLimitExceeded);
+  _updateDownloadDisabledReasonMessage(downloadDisabledReason);
 
   // まずoffsetを更新して表示位置を確定
   storeManager.publish('offset');
@@ -305,4 +326,50 @@ async function _updateAppState() {
 
   // 最後にステータスを更新
   storeManager.setData('appStatus', 'normal');
+}
+
+/** ダウンロードボタンの有効/無効状態を更新 */
+function _updateDownloadButtonState(
+  isDownloadAvailable: boolean,
+  isDownloadLimitExceeded: boolean
+) {
+  document
+    .querySelectorAll('.download-buttons .button-view')
+    .forEach((button) => {
+      button.classList.toggle('-disabled', !isDownloadAvailable);
+      button.setAttribute('aria-disabled', String(!isDownloadAvailable));
+      if (button instanceof HTMLButtonElement) {
+        button.disabled = !isDownloadAvailable;
+      }
+      if (isDownloadLimitExceeded) {
+        button.setAttribute('title', DOWNLOAD_LIMIT_TITLE);
+      } else {
+        button.removeAttribute('title');
+      }
+    });
+}
+
+function _getDownloadDisabledReason(
+  hasConditions: boolean,
+  isDownloadLimitExceeded: boolean
+): string {
+  if (!hasConditions) {
+    return 'Add a search condition to enable download.';
+  }
+
+  if (isDownloadLimitExceeded) {
+    return DOWNLOAD_LIMIT_REASON;
+  }
+
+  return '';
+}
+
+function _updateDownloadDisabledReasonMessage(message: string): void {
+  const reasonNode = document.getElementById('DownloadDisabledReason');
+  if (!reasonNode) {
+    return;
+  }
+
+  reasonNode.textContent = message;
+  reasonNode.toggleAttribute('hidden', message === '');
 }
