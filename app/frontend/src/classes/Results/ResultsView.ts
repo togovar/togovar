@@ -1,5 +1,5 @@
 import { storeManager } from '../../store/StoreManager';
-import { getOrderedColumns } from '../../global';
+import { getOrderedColumns } from '../../columns';
 import { ResultsScrollBar } from './ResultsScrollBar';
 import { ResultsColumnsDropdown } from './ResultsColumnsDropdown';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';

@@ -6,7 +6,7 @@ import {
   setAdvancedSearchCondition,
 } from '../store/searchManager';
 import { executeSearch } from '../api/fetchData';
-import { getDefaultColumnConfigs, normalizeColumnConfigs } from '../global';
+import { getDefaultColumnConfigs, normalizeColumnConfigs } from '../columns';
 import type { StoreState, ResultData, SearchMode } from '../types';
 
 const COLUMNS_STORAGE_KEY = 'columns';

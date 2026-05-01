@@ -1,4 +1,4 @@
-import { COLUMNS, getOrderedColumns } from '../../global';
+import { COLUMNS, getOrderedColumns } from '../../columns';
 import { storeManager } from '../../store/StoreManager';
 import type {
   ResultData,

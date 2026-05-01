@@ -2,7 +2,7 @@ import {
   getColumnLabel,
   LOCKED_COLUMN_ID,
   normalizeColumnConfigs,
-} from '../../global';
+} from '../../columns';
 import { storeManager } from '../../store/StoreManager';
 import type { ColumnConfig } from '../../types';
 
