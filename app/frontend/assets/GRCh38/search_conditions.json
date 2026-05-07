@@ -84,7 +84,7 @@
   },
   {
     "id": "frequency",
-    "label": "Alternative allele frequency",
+    "label": "Alternate allele frequency",
     "type": "array",
     "items": [
       {
