@@ -29,8 +29,8 @@
   .inner {
     min-width: 50px;
     &::before {
-      font-family: fontello, sans-serif;
-      content: var(--char-dataset);
+      font-family: 'Font Awesome 7 Free', 'Font Awesome 6 Free', FontAwesome, sans-serif;
+      content: var(--icon-database);
       margin-right: 4px;
     }
   }
@@ -331,14 +331,14 @@ button.delete {
   color: var(--color-gray);
   cursor: pointer;
   position: relative;
-  font-family: fontello, sans-serif;
+  font-family: FontAwesome, sans-serif;
   background-color: transparent;
   padding: 0;
   margin-left: 0.2em;
   margin-right: -0.5em;
 
   &::before {
-    content: var(--char-delete);
+    content: var(--icon-xmark);
     font-size: 0.8em;
   }
 }

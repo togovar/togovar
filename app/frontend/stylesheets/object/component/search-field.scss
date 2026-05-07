@@ -38,8 +38,8 @@ $SIZE: 30px;
         cursor: pointer;
 
         &:after {
-          font-family: fontello;
-          content: var(--char-delete);
+          font-family: FontAwesome, sans-serif;
+          content: var(--icon-xmark);
           position: absolute;
           font-size: 1.2rem;
         }
