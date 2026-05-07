@@ -13,14 +13,14 @@ import { AdvancedSearchBuilderView } from '../src/classes/AdvancedSearchBuilderV
 // PanelViews
 // PanelViews: Filters
 import PanelViewCheckList from '../src/classes/PanelViewCheckList.ts';
-import PanelViewFilterAlternativeAlleleFrequency from '../src/classes/PanelViewFilterAlternativeAlleleFrequency.js';
+import PanelViewFilterAlternateAlleleFrequency from '../src/classes/PanelViewFilterAlternateAlleleFrequency.js';
 import PanelViewFilterVariantCallingQuality from '../src/classes/PanelViewFilterVariantCallingQuality.js';
 import PanelViewFilterConsequence from '../src/classes/PanelViewFilterConsequence.ts';
 // PanelViews: Variant preview
 import PanelViewPreviewGene from '../src/classes/PanelViewPreviewGene.js';
 import PreviewToVariantReport from '../src/classes/PreviewToVariantReport.js';
 import PanelViewPreviewExternalLinks from '../src/classes/PanelViewPreviewExternalLinks.js';
-import PanelViewPreviewAlternativeAlleleFrequencies from '../src/classes/PanelViewPreviewAlternativeAlleleFrequencies.js';
+import PanelViewPreviewAlternateAlleleFrequencies from '../src/classes/PanelViewPreviewAlternateAlleleFrequencies.js';
 import PanelViewPreviewConsequence from '../src/classes/PanelViewPreviewConsequence.js';
 import PanelViewPreviewClinicalSignificance from '../src/classes/PanelViewPreviewClinicalSignificance.js';
 import FloatingInfo from '../src/classes/FloatingInfo.ts';
@@ -216,8 +216,8 @@ function initSidebar() {
     'dataset',
     'statisticsDataset'
   );
-  new PanelViewFilterAlternativeAlleleFrequency(
-    getElement('FilterAlternativeAlleleFrequency')
+  new PanelViewFilterAlternateAlleleFrequency(
+    getElement('FilterAlternateAlleleFrequency')
   );
   new PanelViewFilterVariantCallingQuality(
     getElement('FilterVariantCallingQuality')
@@ -243,8 +243,8 @@ function initVariantPreview() {
   new PanelViewPreviewGene(getElement('PreviewGene'));
   new PreviewToVariantReport(getElement('PreviewToVariantReport'));
   new PanelViewPreviewExternalLinks(getElement('PreviewExternalLinks'));
-  new PanelViewPreviewAlternativeAlleleFrequencies(
-    getElement('PreviewAlternativeAlleleFrequencies')
+  new PanelViewPreviewAlternateAlleleFrequencies(
+    getElement('PreviewAlternateAlleleFrequencies')
   );
   new PanelViewPreviewConsequence(getElement('PreviewConsequence'));
   new PanelViewPreviewClinicalSignificance(
