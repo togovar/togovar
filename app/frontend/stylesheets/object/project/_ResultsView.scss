@@ -100,13 +100,6 @@
         line-height: 1.25;
         color: $COLOR_GRAY;
         text-align: right;
-
-        &::before {
-          content: '\f071';
-          font-family: FontAwesome, sans-serif;
-          color: var(--color-sign-warning);
-          margin-right: 4px;
-        }
       }
 
       > li {
