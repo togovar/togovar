@@ -7,8 +7,7 @@ const DOWNLOAD_VARIANT_LIMIT = 100000;
 const DOWNLOAD_VARIANT_LIMIT_TEXT = new Intl.NumberFormat('en-US').format(
   DOWNLOAD_VARIANT_LIMIT
 );
-const DOWNLOAD_LIMIT_TITLE = `Download is available for up to ${DOWNLOAD_VARIANT_LIMIT_TEXT} variants.`;
-const DOWNLOAD_LIMIT_REASON = `${DOWNLOAD_LIMIT_TITLE} Narrow your results.`;
+const DOWNLOAD_LIMIT_TITLE = `Download is limited to ${DOWNLOAD_VARIANT_LIMIT_TEXT} variants.`;
 import { extractSearchCondition } from '../store/searchManager';
 import type { FetchOption, SearchResults, SearchStatistics } from '../types';
 
@@ -289,7 +288,8 @@ async function _updateAppState() {
   switch (storeManager.getData('searchMode')) {
     case 'simple': {
       const simpleConditions = storeManager.getData('simpleSearchConditions');
-      const extractedSimpleConditions = extractSearchCondition(simpleConditions);
+      const extractedSimpleConditions =
+        extractSearchCondition(simpleConditions);
       hasConditions = Object.keys(extractedSimpleConditions).length > 0;
       break;
     }
@@ -358,7 +358,7 @@ function _getDownloadDisabledReason(
   }
 
   if (isDownloadLimitExceeded) {
-    return DOWNLOAD_LIMIT_REASON;
+    return DOWNLOAD_LIMIT_TITLE;
   }
 
   return '';
