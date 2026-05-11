@@ -23,7 +23,7 @@ import PanelViewPreviewExternalLinks from '../src/classes/PanelViewPreviewExtern
 import PanelViewPreviewAlternativeAlleleFrequencies from '../src/classes/PanelViewPreviewAlternativeAlleleFrequencies.js';
 import PanelViewPreviewConsequence from '../src/classes/PanelViewPreviewConsequence.js';
 import PanelViewPreviewClinicalSignificance from '../src/classes/PanelViewPreviewClinicalSignificance.js';
-import FloatingInfo from '../src/classes/FloatingInfo.js';
+import FloatingInfo from '../src/classes/FloatingInfo.ts';
 
 import qs from 'qs';
 import { extractSearchCondition } from './store/searchManager';
