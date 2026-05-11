@@ -8,8 +8,8 @@ import {
 } from '@floating-ui/dom';
 import tooltipData from '../../assets/tooltips.json';
 
-// All data with [data-tooltip-id] gets tooltip
-export default class TippyBox {
+// All data with [data-tooltip-id] gets floating info
+export default class FloatingInfo {
   constructor() {
     const tooltipElements = document.querySelectorAll('[data-tooltip-id]'),
       data = this.getData();
@@ -36,7 +36,7 @@ export default class TippyBox {
 
       const template = this.createTemplate(tooltip),
         tooltipEl = this.createTooltipElement(template),
-        arrowEl = tooltipEl.querySelector('.floating-tooltip-arrow');
+        arrowEl = tooltipEl.querySelector('.floating-info-arrow');
 
       let cleanup = null,
         showTimer = null,
@@ -133,12 +133,12 @@ export default class TippyBox {
     const tooltipEl = document.createElement('div'),
       arrowEl = document.createElement('div');
 
-    tooltipEl.className = 'floating-tooltip';
+    tooltipEl.className = 'floating-info';
     tooltipEl.setAttribute('role', 'tooltip');
     tooltipEl.setAttribute('data-state', 'hidden');
     tooltipEl.appendChild(template);
 
-    arrowEl.className = 'floating-tooltip-arrow';
+    arrowEl.className = 'floating-info-arrow';
     tooltipEl.appendChild(arrowEl);
 
     return tooltipEl;

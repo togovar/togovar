@@ -1,5 +1,5 @@
-// Theme for Floating UI tooltips
-.floating-tooltip
+// Theme for Floating UI information popovers
+.floating-info
     position: absolute
     top: 0
     left: 0
@@ -27,7 +27,7 @@
             font-weight: bolder
             padding-left: 0.2rem
 
-    .floating-tooltip-arrow
+    .floating-info-arrow
         position: absolute
         width: 5px
         height: 2px
@@ -39,7 +39,7 @@
             border-style: solid
 
     &[data-placement^=top]
-        .floating-tooltip-arrow
+        .floating-info-arrow
             bottom: 0
             &:before
                 bottom: -9px
@@ -49,7 +49,7 @@
                 transform-origin: center top
 
     &[data-placement^=bottom]
-        .floating-tooltip-arrow
+        .floating-info-arrow
             top: 0
             &:before
                 top: -9px
@@ -59,7 +59,7 @@
                 transform-origin: center bottom
 
     &[data-placement^=left]
-        .floating-tooltip-arrow
+        .floating-info-arrow
             right: 0
             &:before
                 right: -9px
@@ -69,7 +69,7 @@
                 transform-origin: center left
 
     &[data-placement^=right]
-        .floating-tooltip-arrow
+        .floating-info-arrow
             left: 0
             &:before
                 left: -9px

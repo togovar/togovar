@@ -23,7 +23,7 @@ import PanelViewPreviewExternalLinks from '../src/classes/PanelViewPreviewExtern
 import PanelViewPreviewAlternativeAlleleFrequencies from '../src/classes/PanelViewPreviewAlternativeAlleleFrequencies.js';
 import PanelViewPreviewConsequence from '../src/classes/PanelViewPreviewConsequence.js';
 import PanelViewPreviewClinicalSignificance from '../src/classes/PanelViewPreviewClinicalSignificance.js';
-import TippyBox from '../src/classes/TippyBox.js';
+import FloatingInfo from '../src/classes/FloatingInfo.js';
 
 import qs from 'qs';
 import { extractSearchCondition } from './store/searchManager';
@@ -265,5 +265,5 @@ function initModuleTabs() {
 
 // ツールチップの初期化
 function initTooltip() {
-  new TippyBox();
+  new FloatingInfo();
 }
