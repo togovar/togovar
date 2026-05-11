@@ -1,0 +1,132 @@
+// Theme for Floating UI information popovers
+.floating-info {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10100;
+  max-width: 15rem;
+  margin: 0;
+  background-color: $COLOR_BLACK;
+  color: white;
+  border: 1px solid white;
+  border-radius: 7px;
+  padding: 0.4rem 0.6rem;
+  white-space: normal;
+  opacity: 1;
+  transition: opacity 400ms ease;
+
+  &[data-state='hidden'] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .content {
+    margin: 0;
+
+    .url {
+      text-decoration: underline;
+      color: white;
+      font-weight: bolder;
+      padding-left: 0.2rem;
+    }
+  }
+
+  .floating-info-arrow {
+    position: absolute;
+    width: 18px;
+    height: 9px;
+    pointer-events: none;
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+    }
+  }
+
+  &[data-placement^='top'] {
+    .floating-info-arrow {
+      &::before {
+        left: 0;
+        top: 0;
+        border-left: 9px solid transparent;
+        border-right: 9px solid transparent;
+        border-top: 9px solid $COLOR_BLACK;
+      }
+
+      &::after {
+        left: 1px;
+        top: -1px;
+        width: 16px;
+        height: 2px;
+        background-color: $COLOR_BLACK;
+      }
+    }
+  }
+
+  &[data-placement^='bottom'] {
+    .floating-info-arrow {
+      &::before {
+        left: 0;
+        bottom: 0;
+        border-left: 9px solid transparent;
+        border-right: 9px solid transparent;
+        border-bottom: 9px solid $COLOR_BLACK;
+      }
+
+      &::after {
+        left: 1px;
+        bottom: -1px;
+        width: 16px;
+        height: 2px;
+        background-color: $COLOR_BLACK;
+      }
+    }
+  }
+
+  &[data-placement^='left'] {
+    .floating-info-arrow {
+      width: 9px;
+      height: 18px;
+
+      &::before {
+        left: 0;
+        top: 0;
+        border-top: 9px solid transparent;
+        border-bottom: 9px solid transparent;
+        border-left: 9px solid $COLOR_BLACK;
+      }
+
+      &::after {
+        left: -1px;
+        top: 1px;
+        width: 2px;
+        height: 16px;
+        background-color: $COLOR_BLACK;
+      }
+    }
+  }
+
+  &[data-placement^='right'] {
+    .floating-info-arrow {
+      width: 9px;
+      height: 18px;
+
+      &::before {
+        right: 0;
+        top: 0;
+        border-top: 9px solid transparent;
+        border-bottom: 9px solid transparent;
+        border-right: 9px solid $COLOR_BLACK;
+      }
+
+      &::after {
+        right: -1px;
+        top: 1px;
+        width: 2px;
+        height: 16px;
+        background-color: $COLOR_BLACK;
+      }
+    }
+  }
+}
