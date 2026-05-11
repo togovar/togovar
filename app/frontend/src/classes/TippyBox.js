@@ -1,4 +1,13 @@
-import tippy from 'tippy.js';
+import {
+  arrow,
+  autoUpdate,
+  computePosition,
+  flip,
+  offset,
+  shift,
+} from '@floating-ui/dom';
+import tooltipData from '../../assets/tooltips.json';
+
 // All data with [data-tooltip-id] gets tooltip
 export default class TippyBox {
   constructor() {
@@ -6,49 +15,107 @@ export default class TippyBox {
       data = this.getData();
 
     tooltipElements.forEach((HTMLElement) => {
-      HTMLElement.addEventListener(
-        'mouseover',
-        this.setTooltip(HTMLElement, data)
-      );
+      this.setTooltip(HTMLElement, data);
     });
   }
 
   // Tooltip data is stored in /assets/tooltips.json, id = [data-tooltip-id]
   getData() {
-    const json = require('../../assets/tooltips.json');
-    Object.freeze(json);
+    Object.freeze(tooltipData);
 
-    return json;
+    return tooltipData;
   }
-  // Set tooltip with tippy.js plugin
+  // Set tooltip with Floating UI
   setTooltip(el, data) {
     const id = el.getAttribute('data-tooltip-id');
 
     try {
-      const tooltip = data.find((entry) => entry.id === id),
-        template = this.createTemplate(tooltip);
+      const tooltip = data.find((entry) => entry.id === id);
 
-      tippy(el, {
-        content: template.innerHTML,
-        allowHTML: true,
-        animation: 'fade',
-        duration: [400],
-        interactive: true,
-        theme: 'black',
-        placement: 'top',
-        appendTo: document.body,
-        maxWidth: '15rem',
-        delay: [300, 300],
-        offset: this.offset(el),
-        zIndex: 10100,
-      });
+      if (!tooltip) throw new Error(`Tooltip data is missing for ${id}`);
+
+      const template = this.createTemplate(tooltip),
+        tooltipEl = this.createTooltipElement(template),
+        arrowEl = tooltipEl.querySelector('.floating-tooltip-arrow');
+
+      let cleanup = null,
+        showTimer = null,
+        hideTimer = null,
+        isVisible = false;
+
+      const updatePosition = () => {
+          const [crossAxis, mainAxis] = this.offset(el);
+
+          computePosition(el, tooltipEl, {
+            placement: 'top',
+            middleware: [
+              offset({ mainAxis, crossAxis }),
+              flip(),
+              shift({ padding: 8 }),
+              arrow({ element: arrowEl }),
+            ],
+          }).then(({ x, y, placement, middlewareData }) => {
+            const { x: arrowX, y: arrowY } = middlewareData.arrow || {},
+              staticSide = {
+                top: 'bottom',
+                right: 'left',
+                bottom: 'top',
+                left: 'right',
+              }[placement.split('-')[0]];
+
+            Object.assign(tooltipEl.style, {
+              left: `${x}px`,
+              top: `${y}px`,
+            });
+
+            tooltipEl.setAttribute('data-placement', placement);
+
+            Object.assign(arrowEl.style, {
+              left: arrowX != null ? `${arrowX}px` : '',
+              top: arrowY != null ? `${arrowY}px` : '',
+              right: '',
+              bottom: '',
+              [staticSide]: '-4px',
+            });
+          });
+        },
+        show = () => {
+          window.clearTimeout(hideTimer);
+          showTimer = window.setTimeout(() => {
+            if (isVisible) return;
+
+            isVisible = true;
+            tooltipEl.setAttribute('data-state', 'visible');
+            cleanup = autoUpdate(el, tooltipEl, updatePosition);
+          }, 300);
+        },
+        hide = () => {
+          window.clearTimeout(showTimer);
+          hideTimer = window.setTimeout(() => {
+            isVisible = false;
+            tooltipEl.setAttribute('data-state', 'hidden');
+            if (cleanup) cleanup();
+            cleanup = null;
+          }, 300);
+        };
+
+      document.body.appendChild(tooltipEl);
+      tooltipEl.id = `tooltip-${id}`;
+      el.setAttribute('aria-describedby', tooltipEl.id);
+
+      el.addEventListener('mouseenter', show);
+      el.addEventListener('focus', show);
+      el.addEventListener('mouseleave', hide);
+      el.addEventListener('blur', hide);
+      tooltipEl.addEventListener('mouseenter', show);
+      tooltipEl.addEventListener('mouseleave', hide);
     } catch (err) {
       console.error(
         `Failed to set the tooltip for item with a data-tooltip id of [${id}].\nCheck if there is corresponding data in tooltips.JSON`
       );
     }
   }
-  // HTML template for inside Tippy
+  // HTML template for inside tooltip
   createTemplate(tooltip) {
     const template = document.createElement('span'),
       contentP = document.createElement('p');
@@ -60,6 +127,21 @@ export default class TippyBox {
     template.appendChild(contentP);
 
     return template;
+  }
+
+  createTooltipElement(template) {
+    const tooltipEl = document.createElement('div'),
+      arrowEl = document.createElement('div');
+
+    tooltipEl.className = 'floating-tooltip';
+    tooltipEl.setAttribute('role', 'tooltip');
+    tooltipEl.setAttribute('data-state', 'hidden');
+    tooltipEl.appendChild(template);
+
+    arrowEl.className = 'floating-tooltip-arrow';
+    tooltipEl.appendChild(arrowEl);
+
+    return tooltipEl;
   }
 
   createAnchor(url) {

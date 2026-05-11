@@ -1,13 +1,24 @@
-// Theme for tippy
-.tippy-box
-    &[data-theme~='black']
-        margin: 0
-        background-color: $COLOR_BLACK
-        color: white
-        border: 1px solid white
-        border-radius: 7px
-        padding: 0.4rem 0.6rem
-        white-space: none
+// Theme for Floating UI tooltips
+.floating-tooltip
+    position: absolute
+    top: 0
+    left: 0
+    z-index: 10100
+    max-width: 15rem
+    margin: 0
+    background-color: $COLOR_BLACK
+    color: white
+    border: 1px solid white
+    border-radius: 7px
+    padding: 0.4rem 0.6rem
+    white-space: normal
+    opacity: 1
+    transition: opacity 400ms ease
+
+    &[data-state='hidden']
+        opacity: 0
+        pointer-events: none
+
     .content
         margin: 0
         .url
@@ -15,9 +26,9 @@
             color: white
             font-weight: bolder
             padding-left: 0.2rem
-    &[data-animation='fade'][data-state='hidden']
-        opacity: 0
-    .tippy-arrow
+
+    .floating-tooltip-arrow
+        position: absolute
         width: 5px
         height: 2px
         color: $COLOR_BLACK
@@ -26,8 +37,9 @@
             position: absolute
             border-color: transparent
             border-style: solid
+
     &[data-placement^=top]
-        .tippy-arrow
+        .floating-tooltip-arrow
             bottom: 0
             &:before
                 bottom: -9px
@@ -35,8 +47,9 @@
                 border-right: 9px solid transparent
                 border-top: 9px solid $COLOR_BLACK
                 transform-origin: center top
+
     &[data-placement^=bottom]
-        .tippy-arrow
+        .floating-tooltip-arrow
             top: 0
             &:before
                 top: -9px
@@ -44,8 +57,9 @@
                 border-right: 9px solid transparent
                 border-bottom: 9px solid $COLOR_BLACK
                 transform-origin: center bottom
+
     &[data-placement^=left]
-        .tippy-arrow
+        .floating-tooltip-arrow
             right: 0
             &:before
                 right: -9px
@@ -53,8 +67,9 @@
                 border-top: 9px solid transparent
                 border-left: 9px solid $COLOR_BLACK
                 transform-origin: center left
+
     &[data-placement^=right]
-        .tippy-arrow
+        .floating-tooltip-arrow
             left: 0
             &:before
                 left: -9px
