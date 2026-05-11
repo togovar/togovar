@@ -117,10 +117,10 @@ export default class FloatingInfo {
         hideTimer: number | null = null,
         isVisible = false;
 
-      const updatePosition = () => {
+      const updatePosition = (): Promise<void> => {
           const [crossAxis, mainAxis] = this.offset(el);
 
-          computePosition(el, floatingInfoEl, {
+          return computePosition(el, floatingInfoEl, {
             placement: 'top',
             middleware: [
               offset({ mainAxis, crossAxis }),
@@ -157,8 +157,14 @@ export default class FloatingInfo {
             if (isVisible) return;
 
             isVisible = true;
-            floatingInfoEl.setAttribute('data-state', 'visible');
-            cleanup = autoUpdate(el, floatingInfoEl, updatePosition);
+
+            // 初回の位置計算が終わるまでは hidden のままにし、左上に一瞬表示されるのを防ぐ。
+            updatePosition().then(() => {
+              if (!isVisible) return;
+
+              floatingInfoEl.setAttribute('data-state', 'visible');
+              cleanup = autoUpdate(el, floatingInfoEl, updatePosition);
+            });
           }, 300);
         },
         hide = () => {
