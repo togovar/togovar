@@ -51,7 +51,10 @@ const FOCUSABLE_SELECTOR = [
 export default class FloatingInfo {
   private readonly data = this.getData();
 
-  private readonly boundFloatingInfo = new Map<HTMLElement, BoundFloatingInfo>();
+  private readonly boundFloatingInfo = new Map<
+    HTMLElement,
+    BoundFloatingInfo
+  >();
 
   private readonly observer: MutationObserver;
 
@@ -168,6 +171,7 @@ export default class FloatingInfo {
           if (isVisible) return updatePosition();
 
           isVisible = true;
+          this.setFloatingInfoHidden(floatingInfoEl, false);
 
           // 初回の位置計算が終わるまでは hidden のままにし、左上に一瞬表示されるのを防ぐ。
           return updatePosition().then(() => {
@@ -192,6 +196,7 @@ export default class FloatingInfo {
 
           isVisible = false;
           floatingInfoEl.setAttribute('data-state', 'hidden');
+          this.setFloatingInfoHidden(floatingInfoEl, true);
           el.setAttribute('aria-expanded', 'false');
           if (cleanup) cleanup();
           cleanup = null;
@@ -206,7 +211,8 @@ export default class FloatingInfo {
           }, 300);
         },
         hideOnFocusOut = (event: FocusEvent) => {
-          if (this.containsTarget(el, floatingInfoEl, event.relatedTarget)) return;
+          if (this.containsTarget(el, floatingInfoEl, event.relatedTarget))
+            return;
 
           hide();
         },
@@ -302,6 +308,7 @@ export default class FloatingInfo {
     floatingInfoEl.className = 'floating-info';
     floatingInfoEl.setAttribute('role', 'tooltip');
     floatingInfoEl.setAttribute('data-state', 'hidden');
+    this.setFloatingInfoHidden(floatingInfoEl, true);
     floatingInfoEl.appendChild(template);
 
     arrowEl.className = 'floating-info-arrow';
@@ -327,6 +334,21 @@ export default class FloatingInfo {
 
     el.setAttribute('tabindex', '0');
     return true;
+  }
+
+  // 非表示中の tooltip 内リンクへ Tab 移動しないよう、支援技術とフォーカス対象から外す。
+  private setFloatingInfoHidden(
+    floatingInfoEl: HTMLElement,
+    isHidden: boolean
+  ): void {
+    if (isHidden) {
+      floatingInfoEl.setAttribute('aria-hidden', 'true');
+      floatingInfoEl.setAttribute('inert', '');
+      return;
+    }
+
+    floatingInfoEl.removeAttribute('aria-hidden');
+    floatingInfoEl.removeAttribute('inert');
   }
 
   private containsFocus(el: HTMLElement, floatingInfoEl: HTMLElement): boolean {
