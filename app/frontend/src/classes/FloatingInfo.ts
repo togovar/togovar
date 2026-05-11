@@ -35,6 +35,15 @@ const STATIC_SIDE: Record<BasePlacement, BasePlacement> = {
   left: 'right',
 };
 
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]',
+].join(',');
+
 // data-tooltip-id を持つ要素に、対応する補足情報を Floating UI で表示する。
 export default class FloatingInfo {
   private readonly data = this.getData();
@@ -181,6 +190,7 @@ export default class FloatingInfo {
       document.body.appendChild(floatingInfoEl);
       floatingInfoEl.id = `tooltip-${id}`;
       el.setAttribute('aria-describedby', floatingInfoEl.id);
+      const addedTabIndex = this.ensureFocusable(el);
 
       el.addEventListener('mouseenter', show);
       el.addEventListener('focus', show);
@@ -203,6 +213,7 @@ export default class FloatingInfo {
           floatingInfoEl.removeEventListener('mouseenter', show);
           floatingInfoEl.removeEventListener('mouseleave', hide);
           el.removeAttribute('aria-describedby');
+          if (addedTabIndex) el.removeAttribute('tabindex');
           floatingInfoEl.remove();
         },
       });
@@ -253,6 +264,14 @@ export default class FloatingInfo {
     anchor.innerText = 'Read More';
 
     return anchor;
+  }
+
+  // p/span などの非インタラクティブ要素でも、キーボードフォーカスで表示できるようにする。
+  private ensureFocusable(el: HTMLElement): boolean {
+    if (el.matches(FOCUSABLE_SELECTOR)) return false;
+
+    el.setAttribute('tabindex', '0');
+    return true;
   }
 
   // 回転している要素では見た目の中心に近づくよう、横方向の offset を補正する。
