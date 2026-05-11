@@ -219,7 +219,8 @@ export default class FloatingInfo {
       });
     } catch (err) {
       console.error(
-        `Failed to set the tooltip for item with a data-tooltip id of [${id}].\nCheck if there is corresponding data in tooltips.JSON`
+        `Failed to set the tooltip for item with a data-tooltip id of [${id}].\nCheck if there is corresponding data in tooltips.json`,
+        err
       );
     }
   }
