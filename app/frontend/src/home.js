@@ -23,7 +23,7 @@ import PanelViewPreviewExternalLinks from '../src/classes/PanelViewPreviewExtern
 import PanelViewPreviewAlternativeAlleleFrequencies from '../src/classes/PanelViewPreviewAlternativeAlleleFrequencies.js';
 import PanelViewPreviewConsequence from '../src/classes/PanelViewPreviewConsequence.js';
 import PanelViewPreviewClinicalSignificance from '../src/classes/PanelViewPreviewClinicalSignificance.js';
-import TippyBox from '../src/classes/TippyBox.js';
+import FloatingInfo from '../src/classes/FloatingInfo.ts';
 
 import qs from 'qs';
 import { extractSearchCondition } from './store/searchManager';
@@ -121,6 +121,7 @@ const getAllElements = (selector) => document.querySelectorAll(selector);
 
 // グローバル変数: ResultsView インスタンスを管理
 let globalResultsView = null;
+let globalFloatingInfo = null;
 
 // 検索結果画面の初期化
 function initResultsView() {
@@ -142,6 +143,16 @@ function cleanupApplication() {
       console.error('Error cleaning up ResultsView:', error);
     }
     globalResultsView = null;
+  }
+
+  // FloatingInfo のクリーンアップ
+  if (globalFloatingInfo && typeof globalFloatingInfo.dispose === 'function') {
+    try {
+      globalFloatingInfo.dispose();
+    } catch (error) {
+      console.error('Error cleaning up FloatingInfo:', error);
+    }
+    globalFloatingInfo = null;
   }
 
   // TopPageLayoutManager のクリーンアップ
@@ -265,5 +276,9 @@ function initModuleTabs() {
 
 // ツールチップの初期化
 function initTooltip() {
-  new TippyBox();
+  if (globalFloatingInfo && typeof globalFloatingInfo.dispose === 'function') {
+    globalFloatingInfo.dispose();
+  }
+
+  globalFloatingInfo = new FloatingInfo();
 }

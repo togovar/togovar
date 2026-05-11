@@ -50,6 +50,11 @@ block content
         a.titlelink(href="#frequency")
         h3.title
           | Frequency
+          button.floating-info-trigger(
+            type="button"
+            data-tooltip-id="variant-frequency"
+            aria-label="Why do allele frequencies differ between datasets?"
+          )
       #variant-frequency.stanza
 
     section.stanza-view#clinical-significance-mgend

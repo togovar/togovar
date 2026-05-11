@@ -26,7 +26,12 @@
   {
     "id": "table-header-alt_frequency",
     "content": "Frequency indicator representing alternative allele frequencies",
-    "url": "doc/help#s1"
+    "url": "/doc/help#s1"
+  },
+  {
+    "id": "variant-frequency",
+    "content": "Why do allele frequencies differ between datasets within the Japanese ancestral group?",
+    "url": "/doc/help#d9"
   },
   {
     "id": "table-header-consequence",
