@@ -21,6 +21,11 @@ type FloatingInfoElements = {
 
 type Cleanup = () => void;
 
+type BoundFloatingInfo = {
+  floatingInfoEl: HTMLDivElement;
+  dispose: () => void;
+};
+
 type BasePlacement = 'top' | 'right' | 'bottom' | 'left';
 
 const STATIC_SIDE: Record<BasePlacement, BasePlacement> = {
@@ -32,14 +37,24 @@ const STATIC_SIDE: Record<BasePlacement, BasePlacement> = {
 
 // data-tooltip-id を持つ要素に、対応する補足情報を Floating UI で表示する。
 export default class FloatingInfo {
-  constructor() {
-    const tooltipElements =
-        document.querySelectorAll<HTMLElement>('[data-tooltip-id]'),
-      data = this.getData();
+  private readonly data = this.getData();
 
-    tooltipElements.forEach((htmlElement) => {
-      this.setTooltip(htmlElement, data);
+  private readonly boundFloatingInfo = new Map<HTMLElement, BoundFloatingInfo>();
+
+  private readonly observer: MutationObserver;
+
+  constructor() {
+    this.attachAll(document);
+
+    // 検索結果などで DOM が再生成された場合も、新しい tooltip 対象を自動で拾う。
+    this.observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.removedNodes.forEach((node) => this.detachNode(node));
+        mutation.addedNodes.forEach((node) => this.attachNode(node));
+      });
     });
+
+    this.observer.observe(document.body, { childList: true, subtree: true });
   }
 
   // tooltips.json の id と data-tooltip-id を突き合わせて表示内容を取得する。
@@ -49,12 +64,48 @@ export default class FloatingInfo {
     return tooltipData as readonly TooltipEntry[];
   }
 
+  // 指定範囲内にある tooltip 対象をまとめて初期化する。
+  public attachAll(root: ParentNode = document): void {
+    root
+      .querySelectorAll<HTMLElement>('[data-tooltip-id]')
+      .forEach((htmlElement) => {
+        this.setTooltip(htmlElement);
+      });
+  }
+
+  private attachNode(node: Node): void {
+    if (!(node instanceof HTMLElement)) return;
+
+    if (node.matches('[data-tooltip-id]')) this.setTooltip(node);
+    this.attachAll(node);
+  }
+
+  private detachNode(node: Node): void {
+    if (!(node instanceof HTMLElement)) return;
+
+    if (node.matches('[data-tooltip-id]')) this.disposeTooltip(node);
+    node.querySelectorAll<HTMLElement>('[data-tooltip-id]').forEach((el) => {
+      this.disposeTooltip(el);
+    });
+  }
+
+  private disposeTooltip(el: HTMLElement): void {
+    const bound = this.boundFloatingInfo.get(el);
+
+    if (!bound) return;
+
+    bound.dispose();
+    this.boundFloatingInfo.delete(el);
+  }
+
   // 対象要素ごとに表示・非表示イベントと位置計算を設定する。
-  private setTooltip(el: HTMLElement, data: readonly TooltipEntry[]): void {
+  private setTooltip(el: HTMLElement): void {
+    if (this.boundFloatingInfo.has(el)) return;
+
     const id = el.getAttribute('data-tooltip-id');
 
     try {
-      const tooltip = data.find((entry) => entry.id === id);
+      const tooltip = this.data.find((entry) => entry.id === id);
 
       if (!tooltip) throw new Error(`Tooltip data is missing for ${id}`);
 
@@ -131,6 +182,24 @@ export default class FloatingInfo {
       el.addEventListener('blur', hide);
       floatingInfoEl.addEventListener('mouseenter', show);
       floatingInfoEl.addEventListener('mouseleave', hide);
+
+      this.boundFloatingInfo.set(el, {
+        floatingInfoEl,
+        dispose: () => {
+          if (showTimer !== null) window.clearTimeout(showTimer);
+          if (hideTimer !== null) window.clearTimeout(hideTimer);
+          if (cleanup) cleanup();
+
+          el.removeEventListener('mouseenter', show);
+          el.removeEventListener('focus', show);
+          el.removeEventListener('mouseleave', hide);
+          el.removeEventListener('blur', hide);
+          floatingInfoEl.removeEventListener('mouseenter', show);
+          floatingInfoEl.removeEventListener('mouseleave', hide);
+          el.removeAttribute('aria-describedby');
+          floatingInfoEl.remove();
+        },
+      });
     } catch (err) {
       console.error(
         `Failed to set the tooltip for item with a data-tooltip id of [${id}].\nCheck if there is corresponding data in tooltips.JSON`
