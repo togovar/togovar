@@ -6,13 +6,16 @@ import {
   offset,
   shift,
 } from '@floating-ui/dom';
-import tooltipData from '../../assets/tooltips.json';
+
+declare const require: (path: string) => unknown;
 
 type TooltipEntry = {
   id: string;
   content: string;
   url?: string;
 };
+
+const tooltipData = require('../../assets/tooltips.json') as TooltipEntry[];
 
 type FloatingInfoElements = {
   floatingInfoEl: HTMLDivElement;
@@ -159,45 +162,89 @@ export default class FloatingInfo {
             });
           });
         },
-        show = () => {
+        showFloatingInfo = (): Promise<void> => {
           if (hideTimer !== null) window.clearTimeout(hideTimer);
 
+          if (isVisible) return updatePosition();
+
+          isVisible = true;
+
+          // 初回の位置計算が終わるまでは hidden のままにし、左上に一瞬表示されるのを防ぐ。
+          return updatePosition().then(() => {
+            if (!isVisible) return;
+
+            floatingInfoEl.setAttribute('data-state', 'visible');
+            el.setAttribute('aria-expanded', 'true');
+            cleanup = autoUpdate(el, floatingInfoEl, updatePosition);
+          });
+        },
+        show = () => {
+          if (hideTimer !== null) window.clearTimeout(hideTimer);
+          if (showTimer !== null) window.clearTimeout(showTimer);
+
           showTimer = window.setTimeout(() => {
-            if (isVisible) return;
-
-            isVisible = true;
-
-            // 初回の位置計算が終わるまでは hidden のままにし、左上に一瞬表示されるのを防ぐ。
-            updatePosition().then(() => {
-              if (!isVisible) return;
-
-              floatingInfoEl.setAttribute('data-state', 'visible');
-              cleanup = autoUpdate(el, floatingInfoEl, updatePosition);
-            });
+            showFloatingInfo();
           }, 300);
+        },
+        hideFloatingInfo = () => {
+          if (showTimer !== null) window.clearTimeout(showTimer);
+          if (hideTimer !== null) window.clearTimeout(hideTimer);
+
+          isVisible = false;
+          floatingInfoEl.setAttribute('data-state', 'hidden');
+          el.setAttribute('aria-expanded', 'false');
+          if (cleanup) cleanup();
+          cleanup = null;
         },
         hide = () => {
           if (showTimer !== null) window.clearTimeout(showTimer);
 
           hideTimer = window.setTimeout(() => {
-            isVisible = false;
-            floatingInfoEl.setAttribute('data-state', 'hidden');
-            if (cleanup) cleanup();
-            cleanup = null;
+            if (this.containsFocus(el, floatingInfoEl)) return;
+
+            hideFloatingInfo();
           }, 300);
+        },
+        hideOnFocusOut = (event: FocusEvent) => {
+          if (this.containsTarget(el, floatingInfoEl, event.relatedTarget)) return;
+
+          hide();
+        },
+        keydown = (event: KeyboardEvent) => {
+          if (event.key === 'Escape') {
+            hideFloatingInfo();
+            el.focus();
+            return;
+          }
+
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+
+          const firstFocusable =
+            floatingInfoEl.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+
+          if (!firstFocusable) return;
+
+          event.preventDefault();
+          showFloatingInfo().then(() => firstFocusable.focus());
         };
 
       document.body.appendChild(floatingInfoEl);
       floatingInfoEl.id = `tooltip-${id}`;
       el.setAttribute('aria-describedby', floatingInfoEl.id);
+      el.setAttribute('aria-controls', floatingInfoEl.id);
+      el.setAttribute('aria-expanded', 'false');
       const addedTabIndex = this.ensureFocusable(el);
 
       el.addEventListener('mouseenter', show);
       el.addEventListener('focus', show);
       el.addEventListener('mouseleave', hide);
-      el.addEventListener('blur', hide);
+      el.addEventListener('focusout', hideOnFocusOut);
+      el.addEventListener('keydown', keydown);
       floatingInfoEl.addEventListener('mouseenter', show);
       floatingInfoEl.addEventListener('mouseleave', hide);
+      floatingInfoEl.addEventListener('focusin', show);
+      floatingInfoEl.addEventListener('focusout', hideOnFocusOut);
+      floatingInfoEl.addEventListener('keydown', keydown);
 
       this.boundFloatingInfo.set(el, {
         floatingInfoEl,
@@ -209,10 +256,16 @@ export default class FloatingInfo {
           el.removeEventListener('mouseenter', show);
           el.removeEventListener('focus', show);
           el.removeEventListener('mouseleave', hide);
-          el.removeEventListener('blur', hide);
+          el.removeEventListener('focusout', hideOnFocusOut);
+          el.removeEventListener('keydown', keydown);
           floatingInfoEl.removeEventListener('mouseenter', show);
           floatingInfoEl.removeEventListener('mouseleave', hide);
+          floatingInfoEl.removeEventListener('focusin', show);
+          floatingInfoEl.removeEventListener('focusout', hideOnFocusOut);
+          floatingInfoEl.removeEventListener('keydown', keydown);
           el.removeAttribute('aria-describedby');
+          el.removeAttribute('aria-controls');
+          el.removeAttribute('aria-expanded');
           if (addedTabIndex) el.removeAttribute('tabindex');
           floatingInfoEl.remove();
         },
@@ -267,12 +320,28 @@ export default class FloatingInfo {
     return anchor;
   }
 
-  // p/span などの非インタラクティブ要素でも、キーボードフォーカスで表示できるようにする。
+  // 非インタラクティブ要素は、明示されたものだけキーボードフォーカス対象にする。
   private ensureFocusable(el: HTMLElement): boolean {
     if (el.matches(FOCUSABLE_SELECTOR)) return false;
+    if (!el.hasAttribute('data-tooltip-focusable')) return false;
 
     el.setAttribute('tabindex', '0');
     return true;
+  }
+
+  private containsFocus(el: HTMLElement, floatingInfoEl: HTMLElement): boolean {
+    return this.containsTarget(el, floatingInfoEl, document.activeElement);
+  }
+
+  private containsTarget(
+    el: HTMLElement,
+    floatingInfoEl: HTMLElement,
+    target: EventTarget | null
+  ): boolean {
+    return (
+      target instanceof Node &&
+      (el.contains(target) || floatingInfoEl.contains(target))
+    );
   }
 
   // 回転している要素では見た目の中心に近づくよう、横方向の offset を補正する。
