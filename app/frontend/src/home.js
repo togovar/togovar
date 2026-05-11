@@ -149,7 +149,6 @@ function cleanupApplication() {
   if (globalFloatingInfo && typeof globalFloatingInfo.dispose === 'function') {
     try {
       globalFloatingInfo.dispose();
-      console.log('FloatingInfo cleaned up successfully');
     } catch (error) {
       console.error('Error cleaning up FloatingInfo:', error);
     }

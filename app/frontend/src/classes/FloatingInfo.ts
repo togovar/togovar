@@ -184,12 +184,13 @@ export default class FloatingInfo {
           if (isVisible) return updatePosition();
 
           isVisible = true;
-          this.setFloatingInfoHidden(floatingInfoEl, false);
 
-          // 初回の位置計算が終わるまでは hidden のままにし、左上に一瞬表示されるのを防ぐ。
+          // 初回の位置計算が終わるまでは hidden/inert のままにし、
+          // 左上に一瞬表示されることや、非表示要素がフォーカス可能になることを防ぐ。
           return updatePosition().then(() => {
             if (!isVisible) return;
 
+            this.setFloatingInfoHidden(floatingInfoEl, false);
             floatingInfoEl.setAttribute('data-state', 'visible');
             if (isKeyboardAccessible) el.setAttribute('aria-expanded', 'true');
             cleanup = autoUpdate(el, floatingInfoEl, updatePosition);
