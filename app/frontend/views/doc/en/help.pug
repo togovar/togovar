@@ -56,6 +56,8 @@ block content
                   a.link(href='#d7') What are AlphaMissense, SIFT and PolyPhen?
                 li.item.-question
                   a.link(href='#d8') Was a liftover tool used for generating variant data?
+                li.item.-question
+                  a.link(href='#d9') Why do allele frequencies differ between datasets even within the same Japanese ancestry group?
             li.category
               h3.categorytitle About the TogoVar search system
               ul.categorylist
@@ -315,6 +317,16 @@ block content
                 a.hyper-text.-external(target='_blank', href='https://crossmap.sourceforge.net/')
                   | CrossMap
                 | was used until the release on July 14, 2023.
+          #d9.question-answer
+            h4.question Why do allele frequencies differ between datasets even within the same Japanese ancestry group?
+            .answer
+              p
+                | Even within the same Japanese ancestry group, allele frequencies may differ between datasets when participants’ regions of origin or sampling designs differ. Fine-scale genetic structure related to geographic regions has been reported within the Japanese population, and differences in regional composition or participant selection may therefore be reflected as differences in allele frequencies between datasets. Other factors, such as sample size, age distribution, disease status, sequencing conditions, variant calling, quality control, and allele frequency calculation methods, can also contribute to such differences.
+              p
+                | Reference:
+                br
+                | Sakaue S. et al. Dimensionality reduction reveals fine-scale structure in the Japanese population with consequences for polygenic risk prediction. Nature Communications, 2020.
+
         section.section
           h3.sectiontitle About the TogoVar search system
           #s1.question-answer._column-span-all
