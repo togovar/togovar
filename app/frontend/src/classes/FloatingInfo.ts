@@ -58,6 +58,8 @@ export default class FloatingInfo {
 
   private readonly observer: MutationObserver;
 
+  private tooltipIdSequence = 0;
+
   constructor() {
     this.attachAll(document);
 
@@ -70,6 +72,14 @@ export default class FloatingInfo {
     });
 
     this.observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  public dispose(): void {
+    this.observer.disconnect();
+    this.boundFloatingInfo.forEach((boundFloatingInfo) => {
+      boundFloatingInfo.dispose();
+    });
+    this.boundFloatingInfo.clear();
   }
 
   // tooltips.json の id と data-tooltip-id を突き合わせて表示内容を取得する。
@@ -132,6 +142,9 @@ export default class FloatingInfo {
         hideTimer: number | null = null,
         isVisible = false;
 
+      const addedTabIndex = this.ensureFocusable(el),
+        isKeyboardAccessible = el.matches(FOCUSABLE_SELECTOR);
+
       const updatePosition = (): Promise<void> => {
           const [crossAxis, mainAxis] = this.offset(el);
 
@@ -178,7 +191,7 @@ export default class FloatingInfo {
             if (!isVisible) return;
 
             floatingInfoEl.setAttribute('data-state', 'visible');
-            el.setAttribute('aria-expanded', 'true');
+            if (isKeyboardAccessible) el.setAttribute('aria-expanded', 'true');
             cleanup = autoUpdate(el, floatingInfoEl, updatePosition);
           });
         },
@@ -197,7 +210,7 @@ export default class FloatingInfo {
           isVisible = false;
           floatingInfoEl.setAttribute('data-state', 'hidden');
           this.setFloatingInfoHidden(floatingInfoEl, true);
-          el.setAttribute('aria-expanded', 'false');
+          if (isKeyboardAccessible) el.setAttribute('aria-expanded', 'false');
           if (cleanup) cleanup();
           cleanup = null;
         },
@@ -235,22 +248,25 @@ export default class FloatingInfo {
         };
 
       document.body.appendChild(floatingInfoEl);
-      floatingInfoEl.id = `tooltip-${id}`;
+      floatingInfoEl.id = this.createFloatingInfoId(id);
       el.setAttribute('aria-describedby', floatingInfoEl.id);
-      el.setAttribute('aria-controls', floatingInfoEl.id);
-      el.setAttribute('aria-expanded', 'false');
-      const addedTabIndex = this.ensureFocusable(el);
+      if (isKeyboardAccessible) {
+        el.setAttribute('aria-controls', floatingInfoEl.id);
+        el.setAttribute('aria-expanded', 'false');
+      }
 
       el.addEventListener('mouseenter', show);
-      el.addEventListener('focus', show);
       el.addEventListener('mouseleave', hide);
-      el.addEventListener('focusout', hideOnFocusOut);
-      el.addEventListener('keydown', keydown);
       floatingInfoEl.addEventListener('mouseenter', show);
       floatingInfoEl.addEventListener('mouseleave', hide);
-      floatingInfoEl.addEventListener('focusin', show);
-      floatingInfoEl.addEventListener('focusout', hideOnFocusOut);
-      floatingInfoEl.addEventListener('keydown', keydown);
+      if (isKeyboardAccessible) {
+        el.addEventListener('focus', show);
+        el.addEventListener('focusout', hideOnFocusOut);
+        el.addEventListener('keydown', keydown);
+        floatingInfoEl.addEventListener('focusin', show);
+        floatingInfoEl.addEventListener('focusout', hideOnFocusOut);
+        floatingInfoEl.addEventListener('keydown', keydown);
+      }
 
       this.boundFloatingInfo.set(el, {
         floatingInfoEl,
@@ -260,15 +276,17 @@ export default class FloatingInfo {
           if (cleanup) cleanup();
 
           el.removeEventListener('mouseenter', show);
-          el.removeEventListener('focus', show);
           el.removeEventListener('mouseleave', hide);
-          el.removeEventListener('focusout', hideOnFocusOut);
-          el.removeEventListener('keydown', keydown);
           floatingInfoEl.removeEventListener('mouseenter', show);
           floatingInfoEl.removeEventListener('mouseleave', hide);
-          floatingInfoEl.removeEventListener('focusin', show);
-          floatingInfoEl.removeEventListener('focusout', hideOnFocusOut);
-          floatingInfoEl.removeEventListener('keydown', keydown);
+          if (isKeyboardAccessible) {
+            el.removeEventListener('focus', show);
+            el.removeEventListener('focusout', hideOnFocusOut);
+            el.removeEventListener('keydown', keydown);
+            floatingInfoEl.removeEventListener('focusin', show);
+            floatingInfoEl.removeEventListener('focusout', hideOnFocusOut);
+            floatingInfoEl.removeEventListener('keydown', keydown);
+          }
           el.removeAttribute('aria-describedby');
           el.removeAttribute('aria-controls');
           el.removeAttribute('aria-expanded');
@@ -315,6 +333,11 @@ export default class FloatingInfo {
     floatingInfoEl.appendChild(arrowEl);
 
     return { floatingInfoEl, arrowEl };
+  }
+
+  private createFloatingInfoId(id: string | null): string {
+    this.tooltipIdSequence += 1;
+    return `tooltip-${id || 'unknown'}-${this.tooltipIdSequence}`;
   }
 
   private createAnchor(url: string): HTMLAnchorElement {
