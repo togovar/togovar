@@ -29,6 +29,11 @@
     "url": "doc/help#s1"
   },
   {
+    "id": "variant-frequency",
+    "content": "Why do allele frequencies differ between datasets within the Japanese ancestral group?",
+    "url": "/doc/help#s1"
+  },
+  {
     "id": "table-header-consequence",
     "content": "Variant consequence detected by Variant Effect Predictor (VEP)",
     "url": "/doc/help#d5"

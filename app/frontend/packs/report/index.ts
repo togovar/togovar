@@ -1,4 +1,5 @@
 import stanzaConfigJson from '../../assets/stanza.json';
+import FloatingInfo from '../../src/classes/FloatingInfo';
 
 /**
  * This module provides a comprehensive system for rendering TogoVar report pages
@@ -667,12 +668,14 @@ class DOMReadyHandler {
     if (document.readyState !== 'loading') {
       // DOM is already loaded, start immediately
       ReportApp.initialize();
+      new FloatingInfo();
       return;
     }
 
     // DOM is still loading, wait for it to complete
     document.addEventListener('DOMContentLoaded', () => {
       ReportApp.initialize();
+      new FloatingInfo();
     });
   }
 }
