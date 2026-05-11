@@ -95,7 +95,7 @@ export default class FloatingInfo {
               top: arrowY != null ? `${arrowY}px` : '',
               right: '',
               bottom: '',
-              [staticSide]: '-4px',
+              [staticSide]: '-6px',
             });
           });
         },

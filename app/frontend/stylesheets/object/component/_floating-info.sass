@@ -29,51 +29,74 @@
 
     .floating-info-arrow
         position: absolute
-        width: 5px
-        height: 2px
-        color: $COLOR_BLACK
-        &:before
+        width: 18px
+        height: 9px
+        pointer-events: none
+        &::before,
+        &::after
             content: ""
             position: absolute
-            border-color: transparent
-            border-style: solid
 
     &[data-placement^=top]
         .floating-info-arrow
-            bottom: 0
-            &:before
-                bottom: -9px
+            &::before
+                left: 0
+                top: 0
                 border-left: 9px solid transparent
                 border-right: 9px solid transparent
                 border-top: 9px solid $COLOR_BLACK
-                transform-origin: center top
+            &::after
+                left: 1px
+                top: -1px
+                width: 16px
+                height: 2px
+                background-color: $COLOR_BLACK
 
     &[data-placement^=bottom]
         .floating-info-arrow
-            top: 0
-            &:before
-                top: -9px
+            &::before
+                left: 0
+                bottom: 0
                 border-left: 9px solid transparent
                 border-right: 9px solid transparent
                 border-bottom: 9px solid $COLOR_BLACK
-                transform-origin: center bottom
+            &::after
+                left: 1px
+                bottom: -1px
+                width: 16px
+                height: 2px
+                background-color: $COLOR_BLACK
 
     &[data-placement^=left]
         .floating-info-arrow
-            right: 0
-            &:before
-                right: -9px
-                border-bottom: 9px solid transparent
+            width: 9px
+            height: 18px
+            &::before
+                left: 0
+                top: 0
                 border-top: 9px solid transparent
+                border-bottom: 9px solid transparent
                 border-left: 9px solid $COLOR_BLACK
-                transform-origin: center left
+            &::after
+                left: -1px
+                top: 1px
+                width: 2px
+                height: 16px
+                background-color: $COLOR_BLACK
 
     &[data-placement^=right]
         .floating-info-arrow
-            left: 0
-            &:before
-                left: -9px
-                border-bottom: 9px solid transparent
+            width: 9px
+            height: 18px
+            &::before
+                right: 0
+                top: 0
                 border-top: 9px solid transparent
+                border-bottom: 9px solid transparent
                 border-right: 9px solid $COLOR_BLACK
-                transform-origin: center right
+            &::after
+                right: -1px
+                top: 1px
+                width: 2px
+                height: 16px
+                background-color: $COLOR_BLACK
