@@ -4,7 +4,7 @@ import { getSimpleSearchConditionMaster } from '../store/searchManager';
 
 const DECIMAL_DIGIT = 4;
 
-export default class PanelViewPreviewAlternativeAlleleFrequencies extends PanelView {
+export default class PanelViewPreviewAlternateAlleleFrequencies extends PanelView {
   constructor(elm) {
     super(elm, 'frenquecies');
     storeManager.bind('selectedRow', this);

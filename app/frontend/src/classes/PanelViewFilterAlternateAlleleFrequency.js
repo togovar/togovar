@@ -7,7 +7,7 @@ import {
 } from '../store/searchManager';
 import '../components/RangeSliderView.js';
 
-export default class PanelViewFilterAlternativeAlleleFrequency extends PanelView {
+export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
   constructor(elm) {
     super(elm, 'frequency');
 

@@ -13,7 +13,7 @@
   },
   {
     "id": "table-header-ref_alt",
-    "content": "Reference and alternative allele"
+    "content": "Reference and alternate allele"
   },
   {
     "id": "table-header-type",
@@ -25,7 +25,7 @@
   },
   {
     "id": "table-header-alt_frequency",
-    "content": "Frequency indicator representing alternative allele frequencies",
+    "content": "Frequency indicator representing alternate allele frequencies",
     "url": "/doc/help#s1"
   },
   {
