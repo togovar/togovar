@@ -1,0 +1,76 @@
+.logical-operator-switch {
+  padding: 0.1em 0.3em;
+  border-radius: 0.75em;
+  line-height: 1;
+  color: $COLOR_KEY_DARK3;
+  cursor: pointer;
+
+  &[data-operator='and'],
+  &[data-operator='or'] {
+    &::before {
+      font-family: fontello, sans-serif;
+      font-size: 1.4em;
+      vertical-align: middle;
+      display: inline-block;
+      width: 1.15em;
+      letter-spacing: -1em;
+    }
+
+    &::after {
+      font-weight: bold;
+      bottom: -0.1em;
+      position: relative;
+    }
+  }
+
+  &[data-operator='and'] {
+    &::before {
+      content: '';
+      background-color: currentColor;
+      -webkit-mask-image: url('../src/assets/icons/logical-and.svg');
+      -webkit-mask-position: center;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-size: contain;
+      mask-image: url('../src/assets/icons/logical-and.svg');
+      mask-position: center;
+      mask-repeat: no-repeat;
+      mask-size: contain;
+      width: 14px;
+      height: 14px;
+      margin-right: 0.2em;
+      letter-spacing: 0;
+    }
+
+    &::after {
+      content: 'AND';
+    }
+  }
+
+  &[data-operator='or'] {
+    &::before {
+      content: '';
+      background-color: currentColor;
+      -webkit-mask-image: url('../src/assets/icons/logical-or.svg');
+      -webkit-mask-position: center;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-size: contain;
+      mask-image: url('../src/assets/icons/logical-or.svg');
+      mask-position: center;
+      mask-repeat: no-repeat;
+      mask-size: contain;
+      width: 14px;
+      height: 14px;
+      margin-right: 0.2em;
+      letter-spacing: 0;
+    }
+
+    &::after {
+      content: 'OR';
+    }
+  }
+
+  &:hover {
+    color: white;
+    background-color: $COLOR_KEY_DARK3;
+  }
+}
