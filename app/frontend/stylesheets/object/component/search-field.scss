@@ -38,10 +38,12 @@ $SIZE: 30px;
         cursor: pointer;
 
         &:after {
-          font-family: FontAwesome, sans-serif;
+          font-family: 'Font Awesome 7 Free', sans-serif;
+          font-weight: 900;
           content: var(--icon-xmark);
           position: absolute;
-          font-size: 1.2rem;
+          top: 2px;
+          font-size: 1rem;
         }
       }
 
