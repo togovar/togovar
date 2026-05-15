@@ -8,12 +8,8 @@
   &[data-operator='and'],
   &[data-operator='or'] {
     &::before {
-      font-family: fontello, sans-serif;
-      font-size: 1.4em;
       vertical-align: middle;
       display: inline-block;
-      width: 1.15em;
-      letter-spacing: -1em;
     }
 
     &::after {
