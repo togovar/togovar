@@ -278,7 +278,7 @@ export class ResultsColumnsDropdown {
   /**
    * 列リストを HTML にレンダリング
    * - 固定列（TogoVar ID）は draggable="false"・チェック常時有効・鍵アイコン表示
-   * - その他の列はドラッグハンドル表示（FontAwesome グリップアイコン）
+   * - その他の列はドラッグハンドル表示（Font Awesome グリップアイコン）
    * @param columns レンダリング対象の列設定配列
    */
   private _render(columns: ColumnConfig[]): void {
