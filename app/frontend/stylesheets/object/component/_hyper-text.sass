@@ -3,7 +3,8 @@
 .hyper-text
   &:not([href=""])
     &:after
-      font-family: FontAwesome
+      font-family: 'Font Awesome 7 Free', sans-serif
+      font-weight: 900
       display: inline-block
       margin-left: .25em
       color: color.adjust($COLOR_GRAY, $lightness: 10%)
@@ -12,10 +13,10 @@
   &.-internal
     &:not([href=""])
       &:after
-        content: $CHAR_ARROW_CIRCLE_RIGHT
+        content: var(--icon-circle-arrow-right)
         font-size: .8em
   &.-external
     &:not([href=""])
       &:after
-        content: $CHAR_EXTERNAL_LINK
+        content: var(--icon-arrow-up-right-from-square)
         font-size: .7em
