@@ -9,6 +9,8 @@ const SITE_ORIGINS = {
 };
 
 const reportHtmlCache = new Map();
+const LONG_TERM_CACHE_PATTERN =
+  /\.(?:css|js|woff2?|eot|ttf|otf|png|jpe?g|gif|svg|webp|jsonld)$/i;
 
 function getSiteOrigin() {
   return SITE_ORIGINS[process.env.TOGOVAR_REFERENCE] || SITE_ORIGINS.GRCh38;
@@ -75,12 +77,25 @@ function sendReportHtml(outputPath, req, res) {
       return res.sendStatus(err.code === 'ENOENT' ? 404 : 500);
     }
 
+    res.setHeader('Cache-Control', 'no-cache');
     return res.send(withCanonicalUrl(html, req));
   });
 }
 
 function getTrailingSlashUrl(req) {
   return `${req.path}/${req.originalUrl.slice(req.path.length)}`;
+}
+
+function isLongTermCacheAsset(filePath) {
+  return LONG_TERM_CACHE_PATTERN.test(filePath);
+}
+
+function setStaticAssetCacheHeaders(res, filePath) {
+  if (isLongTermCacheAsset(filePath)) {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  } else {
+    res.setHeader('Cache-Control', 'no-cache');
+  }
 }
 
 // 本番環境用のExpressミドルウェアを追加する。
@@ -107,5 +122,10 @@ module.exports = function addProdMiddlewares(app, options) {
     sendReportHtml(outputPath, req, res);
   });
 
-  app.use(publicPath, express.static(outputPath));
+  app.use(
+    publicPath,
+    express.static(outputPath, {
+      setHeaders: setStaticAssetCacheHeaders,
+    })
+  );
 };
