@@ -100,9 +100,4 @@ module.exports = function addProdMiddlewares(app, options) {
   });
 
   app.use(publicPath, express.static(outputPath));
-
-  // トップページはビルド済みの dist/index.html をそのまま返す。
-  app.get('/', (req, res) => {
-    return res.sendFile(path.resolve(outputPath, 'index.html'));
-  });
 };
