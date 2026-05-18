@@ -49,6 +49,16 @@ function readReportHtml(outputPath, report, callback) {
   fs.readFile(path.resolve(outputPath, report, 'index.html'), 'utf8', callback);
 }
 
+function sendReportHtml(outputPath, req, res) {
+  readReportHtml(outputPath, req.params.report, (err, html) => {
+    if (err) {
+      return res.sendStatus(err.code === 'ENOENT' ? 404 : 500);
+    }
+
+    return res.send(withCanonicalUrl(html, req));
+  });
+}
+
 // 本番環境用のExpressミドルウェアを追加する。
 // dist配下のビルド済みファイルを配信し、レポート詳細ページだけcanonicalを差し替えて返す。
 module.exports = function addProdMiddlewares(app, options) {
@@ -58,18 +68,18 @@ module.exports = function addProdMiddlewares(app, options) {
   // レスポンスをgzip圧縮して転送サイズを小さくする。
   // HTMLだけでなく、CSS/JSなどの静的アセットにも適用される。
   app.use(compression());
-  app.use(publicPath, express.static(outputPath));
+
+  // /variant, /gene, /disease もcanonicalを差し替えて返す。
+  app.get('/:report(variant|gene|disease)/?', (req, res) => {
+    sendReportHtml(outputPath, req, res);
+  });
 
   // 詳細ページはURLごとにcanonicalが違うため、HTML文字列を読み込んで差し替える。
   app.get('/:report(variant|gene|disease)/:id', (req, res) => {
-    readReportHtml(outputPath, req.params.report, (err, html) => {
-      if (err) {
-        return res.sendStatus(err.code === 'ENOENT' ? 404 : 500);
-      }
-
-      return res.send(withCanonicalUrl(html, req));
-    });
+    sendReportHtml(outputPath, req, res);
   });
+
+  app.use(publicPath, express.static(outputPath));
 
   // トップページはビルド済みの dist/index.html をそのまま返す。
   app.get('/', (req, res) => {

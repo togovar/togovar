@@ -51,6 +51,19 @@ function withCanonicalUrl(html, req) {
   );
 }
 
+function sendReportHtml(outputFileSystem, outputPath, req, res) {
+  outputFileSystem.readFile(
+    path.resolve(outputPath, req.params.report, 'index.html'),
+    (err, file) => {
+      if (err) {
+        res.sendStatus(404);
+      } else {
+        res.send(withCanonicalUrl(file.toString(), req));
+      }
+    }
+  );
+}
+
 module.exports = function addDevMiddlewares(app, webpackConfig) {
   // 開発中はwebpackのビルド結果をディスクではなくメモリ上に作る。
   const compiler = webpack(webpackConfig);
@@ -75,26 +88,22 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
   };
   app.use('/stanza', createProxyMiddleware(proxyOptions));
 
-  // dist配下の静的ファイルを配信する。
-  app.use(publicPath, express.static(outputPath));
-
   // webpack-dev-middleware はビルド結果をメモリ上に保持するため、
   // ディスク上のdistではなく、middlewareが持つファイルシステムからHTMLを読む。
   const outputFileSystem = middleware.context.outputFileSystem;
 
-  // /variant/:id, /gene/:id, /disease/:id は同じHTMLを使い、canonicalだけURLごとに差し替える。
-  app.get('/:report(variant|gene|disease)/:id', (req, res) => {
-    outputFileSystem.readFile(
-      path.resolve(compiler.outputPath, req.params.report, 'index.html'),
-      (err, file) => {
-        if (err) {
-          res.sendStatus(404);
-        } else {
-          res.send(withCanonicalUrl(file.toString(), req));
-        }
-      }
-    );
+  // /variant, /gene, /disease も同じHTMLを使い、canonicalだけURLごとに差し替える。
+  app.get('/:report(variant|gene|disease)/?', (req, res) => {
+    sendReportHtml(outputFileSystem, compiler.outputPath, req, res);
   });
+
+  // /variant/:id, /gene/:id, /disease/:id も同じHTMLを使い、canonicalだけURLごとに差し替える。
+  app.get('/:report(variant|gene|disease)/:id', (req, res) => {
+    sendReportHtml(outputFileSystem, compiler.outputPath, req, res);
+  });
+
+  // dist配下の静的ファイルを配信する。
+  app.use(publicPath, express.static(outputPath));
 
   app.get('/', (req, res) => {
     outputFileSystem.readFile(
