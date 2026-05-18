@@ -10,7 +10,8 @@ const SITE_ORIGINS = {
 
 const reportHtmlCache = new Map();
 const LONG_TERM_CACHE_PATTERN =
-  /\.(?:css|js|woff2?|eot|ttf|otf|png|jpe?g|gif|svg|webp|jsonld)$/i;
+  /\.(?:css|js|woff2?|eot|ttf|otf|png|jpe?g|gif|svg|webp)(?:\.gz)?$/i;
+const LONG_TERM_CACHE_DIRECTORY_PATTERN = /(?:^|\/)(?:css|js|fonts|images)\//;
 
 function getSiteOrigin() {
   return SITE_ORIGINS[process.env.TOGOVAR_REFERENCE] || SITE_ORIGINS.GRCh38;
@@ -92,7 +93,12 @@ function getNoTrailingSlashUrl(req) {
 }
 
 function isLongTermCacheAsset(filePath) {
-  return LONG_TERM_CACHE_PATTERN.test(filePath);
+  const normalizedPath = filePath.split(path.sep).join('/');
+
+  return (
+    LONG_TERM_CACHE_DIRECTORY_PATTERN.test(normalizedPath) &&
+    LONG_TERM_CACHE_PATTERN.test(normalizedPath)
+  );
 }
 
 function setStaticAssetCacheHeaders(res, filePath) {
