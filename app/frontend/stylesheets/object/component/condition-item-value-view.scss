@@ -29,7 +29,8 @@
   .inner {
     min-width: 50px;
     &::before {
-      font-family: 'Font Awesome 7 Free', 'Font Awesome 6 Free', FontAwesome, sans-serif;
+      font-family: 'Font Awesome 7 Free', sans-serif;
+      font-weight: 900;
       content: var(--icon-database);
       margin-right: 4px;
     }
@@ -331,7 +332,8 @@ button.delete {
   color: var(--color-gray);
   cursor: pointer;
   position: relative;
-  font-family: FontAwesome, sans-serif;
+  font-family: 'Font Awesome 7 Free', sans-serif;
+  font-weight: 900;
   background-color: transparent;
   padding: 0;
   margin-left: 0.2em;

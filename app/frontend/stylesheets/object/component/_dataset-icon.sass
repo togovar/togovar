@@ -51,8 +51,9 @@
   // Disease
   &[data-dataset="mgend"], &[data-dataset="clinvar"]
     &::before
-      content: "\f067"
-      font-family: FontAwesome
+      content: var(--icon-plus)
+      font-family: 'Font Awesome 7 Free', sans-serif
+      font-weight: 900
       color: $COLOR_DATASET_DISEASE
       font-size: 14px
     > .properties
