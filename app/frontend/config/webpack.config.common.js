@@ -317,21 +317,35 @@ const pages = (function (assembly) {
   }
 })(process.env.TOGOVAR_REFERENCE);
 
+// pages に定義したドキュメントページを、英語版・日本語版それぞれHTMLとして出力する。
+// 例: name が "datasets" の場合
+//   app/frontend/views/doc/en/datasets.pug -> dist/doc/datasets/index.html
+//   app/frontend/views/doc/ja/datasets.pug -> dist/doc/ja/datasets/index.html
 pages.forEach(function (name) {
   config.plugins.push(
     new HtmlWebpackPlugin({
       template: `app/frontend/views/doc/ja/${name}.pug`,
       filename: `doc/ja/${name}/index.html`,
+      // 各ドキュメントページ自身のURLを canonical としてテンプレートへ渡す。
+      templateParameters: {
+        canonicalUrl: `${getSiteOrigin()}/doc/ja/${name}`,
+      },
       inject: false,
     }),
     new HtmlWebpackPlugin({
       template: `app/frontend/views/doc/en/${name}.pug`,
       filename: `doc/${name}/index.html`,
+      // 英語ページは /doc/{name} を正規URLとして扱う。
+      templateParameters: {
+        canonicalUrl: `${getSiteOrigin()}/doc/${name}`,
+      },
       inject: false,
     })
   );
 });
 
+// robots.txt と sitemap.xml を dist 直下に追加する。
+// sitemap.xml には、上で生成したドキュメントページのURL一覧を含める。
 config.plugins.push(new StaticSeoFilesPlugin(pages));
 
 module.exports = config;
