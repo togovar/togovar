@@ -19,9 +19,8 @@
   justify-content: center;
 
   &::before {
-    content: $CHAR_DRAG_HANDLE;
-    font-family:
-      'Font Awesome 7 Free', 'Font Awesome 6 Free', FontAwesome, sans-serif;
+    content: var(--icon-grip-vertical);
+    font-family: 'Font Awesome 7 Free', sans-serif;
     font-weight: 900;
     color: var(--color-gray);
     font-size: 8px;
@@ -86,7 +85,6 @@
           @include dropdown-view-list-panel;
 
           position: absolute;
-          top: calc(100% + 8px);
           right: 0;
           min-width: 170px;
 
@@ -153,10 +151,11 @@
 
                 > .lock {
                   &::before {
-                    content: $CHAR_LOCK;
-                    font-family: FontAwesome, sans-serif;
+                    content: var(--icon-lock);
+                    font-family: 'Font Awesome 7 Free', sans-serif;
+                    font-weight: 900;
                     color: var(--color-gray);
-                    font-size: 13px;
+                    font-size: 10px;
                   }
                 }
               }

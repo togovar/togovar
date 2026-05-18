@@ -19,7 +19,6 @@ const LONG_PRESS_MS = 150;
 const DRAG_START_MOVE_THRESHOLD_PX = 6;
 const DRAG_REORDER_ANIMATION_MS = 80;
 const HOVER_CLOSE_DELAY_MS = 120;
-const MENU_TRANSITION_MS = 160;
 
 /**
  * 検索結果テーブルの列表示/非表示・ドラッグ並び替え機能を提供するドロップダウン
@@ -42,8 +41,6 @@ export class ResultsColumnsDropdown {
   private _cleanupDragListeners: (() => void) | null = null;
   private _suppressNextListClick = false;
   private _hoverCloseTimer: number | null = null;
-  private _menuOpenAnimationFrame: number | null = null;
-  private _menuHideTimer: number | null = null;
   private readonly _eventAbortController = new AbortController();
   private readonly _boundDocumentClick: (_event: MouseEvent) => void;
   private readonly _boundDocumentKeydown: (_event: KeyboardEvent) => void;
@@ -69,8 +66,6 @@ export class ResultsColumnsDropdown {
     storeManager.unbind('columns', this);
     this._clearPendingLongPress?.();
     this._cancelHoverClose();
-    this._cancelMenuOpenAnimation();
-    this._cancelMenuHideTimer();
     this._eventAbortController.abort();
     this._cleanupDragListeners?.();
     this._suppressNextListClick = false;
@@ -278,7 +273,7 @@ export class ResultsColumnsDropdown {
   /**
    * 列リストを HTML にレンダリング
    * - 固定列（TogoVar ID）は draggable="false"・チェック常時有効・鍵アイコン表示
-   * - その他の列はドラッグハンドル表示（FontAwesome グリップアイコン）
+   * - その他の列はドラッグハンドル表示（Font Awesome グリップアイコン）
    * @param columns レンダリング対象の列設定配列
    */
   private _render(columns: ColumnConfig[]): void {
@@ -513,26 +508,6 @@ export class ResultsColumnsDropdown {
     this._hoverCloseTimer = null;
   }
 
-  /** メニュー表示開始用の requestAnimationFrame をキャンセル */
-  private _cancelMenuOpenAnimation(): void {
-    if (this._menuOpenAnimationFrame === null) {
-      return;
-    }
-
-    window.cancelAnimationFrame(this._menuOpenAnimationFrame);
-    this._menuOpenAnimationFrame = null;
-  }
-
-  /** メニュー非表示予約をキャンセル */
-  private _cancelMenuHideTimer(): void {
-    if (this._menuHideTimer === null) {
-      return;
-    }
-
-    window.clearTimeout(this._menuHideTimer);
-    this._menuHideTimer = null;
-  }
-
   /**
    * ドロップダウンメニューの開閉を切り替え
    * - aria-expanded を自動更新（アクセシビリティ対応）
@@ -540,29 +515,15 @@ export class ResultsColumnsDropdown {
    */
   private _toggle(forceOpen?: boolean): void {
     const shouldOpen = forceOpen ?? !this._root.classList.contains('-open');
+    this._root.classList.toggle('-open', shouldOpen);
     this._button.setAttribute('aria-expanded', String(shouldOpen));
     this._menu.setAttribute('aria-hidden', String(!shouldOpen));
+    this._menu.hidden = false;
 
     if (shouldOpen) {
-      this._cancelMenuOpenAnimation();
-      this._cancelMenuHideTimer();
-      this._menu.hidden = false;
       this._menu.removeAttribute('inert');
-      this._menuOpenAnimationFrame = window.requestAnimationFrame(() => {
-        this._menuOpenAnimationFrame = null;
-        this._root.classList.add('-open');
-      });
     } else {
-      this._cancelMenuOpenAnimation();
-      this._root.classList.remove('-open');
       this._menu.setAttribute('inert', '');
-      this._cancelMenuHideTimer();
-      this._menuHideTimer = window.setTimeout(() => {
-        this._menuHideTimer = null;
-        if (!this._root.classList.contains('-open')) {
-          this._menu.hidden = true;
-        }
-      }, MENU_TRANSITION_MS);
     }
   }
 

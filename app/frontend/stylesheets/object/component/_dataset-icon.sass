@@ -1,9 +1,10 @@
 .dataset-icon
   height: 18px
-  font-family: fontello
+  font-family: 'Font Awesome 7 Free', sans-serif
+  font-weight: 900
   position: relative
   &:before
-    content: $CHAR_DATASET
+    content: var(--icon-database)
     margin-right: 2px
     position: relative
     left: 2px
@@ -51,8 +52,9 @@
   // Disease
   &[data-dataset="mgend"], &[data-dataset="clinvar"]
     &::before
-      content: "\f067"
-      font-family: FontAwesome
+      content: var(--icon-plus)
+      font-family: 'Font Awesome 7 Free', sans-serif
+      font-weight: 900
       color: $COLOR_DATASET_DISEASE
       font-size: 14px
     > .properties
