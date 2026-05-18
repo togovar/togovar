@@ -10,9 +10,7 @@ html(data-page=locals.currentPage, lang=lang)
     meta(charset="utf-8")
     meta(name="viewport" content="width=device-width, initial-scale=1")
     meta(name="description" content=locals.description ? locals.description : "TogoVar is an integrated database of Japanese genomic variation, providing allele frequencies and annotations for human variants.")
-    if typeof canonicalUrl !== "undefined"
-      link(rel="canonical" href=canonicalUrl)
-    else if locals.canonicalUrl
+    if locals.canonicalUrl
       link(rel="canonical" href=locals.canonicalUrl)
     link(rel="icon" href="/favicon.svg" type="image/svg+xml")
     script.
