@@ -40,9 +40,11 @@ function getCanonicalUrl(req) {
 // ビルド済みHTML内のプレースホルダーを、実際にアクセスされたURLへ置き換える。
 // /variant/:id, /gene/:id, /disease/:id は同じHTMLを使い回すため、ここでcanonicalを個別化する。
 function withCanonicalUrl(html, req) {
+  const canonicalUrl = escapeHtmlAttribute(getCanonicalUrl(req));
+
   return html.replace(
     /__TOGOVAR_CANONICAL_URL__/g,
-    escapeHtmlAttribute(getCanonicalUrl(req))
+    () => canonicalUrl
   );
 }
 

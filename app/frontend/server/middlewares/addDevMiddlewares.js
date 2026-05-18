@@ -45,9 +45,11 @@ function getCanonicalUrl(req) {
 
 // 詳細ページ用HTML内のプレースホルダーを、アクセスされたURL自身のcanonicalへ置き換える。
 function withCanonicalUrl(html, req) {
+  const canonicalUrl = escapeHtmlAttribute(getCanonicalUrl(req));
+
   return html.replace(
     /__TOGOVAR_CANONICAL_URL__/g,
-    escapeHtmlAttribute(getCanonicalUrl(req))
+    () => canonicalUrl
   );
 }
 
