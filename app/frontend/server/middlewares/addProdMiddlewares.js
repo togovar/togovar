@@ -8,6 +8,8 @@ const SITE_ORIGINS = {
   GRCh38: 'https://grch38.togovar.org',
 };
 
+const reportHtmlCache = new Map();
+
 function getSiteOrigin() {
   return SITE_ORIGINS[process.env.TOGOVAR_REFERENCE] || SITE_ORIGINS.GRCh38;
 }
@@ -44,13 +46,29 @@ function withCanonicalUrl(html, req) {
   );
 }
 
-// レポート種別に対応するビルド済みHTMLを非同期で読み込む。
-function readReportHtml(outputPath, report, callback) {
-  fs.readFile(path.resolve(outputPath, report, 'index.html'), 'utf8', callback);
+// 本番のビルド済みHTMLはデプロイ中に変わらない前提なので、初回読み込み後はメモリに保持する。
+function getReportHtml(outputPath, report, callback) {
+  const htmlPath = path.resolve(outputPath, report, 'index.html');
+  const cachedHtml = reportHtmlCache.get(htmlPath);
+
+  if (cachedHtml) {
+    callback(null, cachedHtml);
+    return;
+  }
+
+  fs.readFile(htmlPath, 'utf8', (err, html) => {
+    if (err) {
+      callback(err);
+      return;
+    }
+
+    reportHtmlCache.set(htmlPath, html);
+    callback(null, html);
+  });
 }
 
 function sendReportHtml(outputPath, req, res) {
-  readReportHtml(outputPath, req.params.report, (err, html) => {
+  getReportHtml(outputPath, req.params.report, (err, html) => {
     if (err) {
       return res.sendStatus(err.code === 'ENOENT' ? 404 : 500);
     }
