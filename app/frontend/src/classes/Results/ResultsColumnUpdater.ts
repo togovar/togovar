@@ -18,6 +18,23 @@ import { REF_ALT_SHOW_LENGTH } from './ResultsColumnTemplates';
  * DOM elements of specific column types with corresponding data
  */
 export class ResultsColumnUpdater {
+  static resetAnchor(element: HTMLAnchorElement) {
+    element.removeAttribute('href');
+    element.removeAttribute('aria-label');
+    element.textContent = '';
+  }
+
+  static updateAnchor(
+    element: HTMLAnchorElement,
+    url: string,
+    text: string,
+    label: string
+  ) {
+    element.setAttribute('href', url);
+    element.textContent = text;
+    element.setAttribute('aria-label', label);
+  }
+
   /**
    * Update TogoVar ID column
    *
@@ -32,14 +49,12 @@ export class ResultsColumnUpdater {
   ) {
     if (!element || !value) {
       if (element) {
-        element.href = '';
-        element.textContent = '';
+        this.resetAnchor(element);
       }
       return;
     }
 
-    element.href = url;
-    element.textContent = value;
+    this.updateAnchor(element, url, value, `View variant ${value} details`);
   }
 
   /**
@@ -58,14 +73,17 @@ export class ResultsColumnUpdater {
 
     if (!values || values.length === 0) {
       tdRS.dataset.remains = '0';
-      tdRSAnchor.href = '';
-      tdRSAnchor.textContent = '';
+      this.resetAnchor(tdRSAnchor);
       return;
     }
 
     tdRS.dataset.remains = (values.length - 1).toString();
-    tdRSAnchor.href = `http://identifiers.org/dbsnp/${values[0]}`;
-    tdRSAnchor.textContent = values[0];
+    this.updateAnchor(
+      tdRSAnchor,
+      `http://identifiers.org/dbsnp/${values[0]}`,
+      values[0],
+      `Open dbSNP record ${values[0]}`
+    );
   }
 
   /**
@@ -175,14 +193,17 @@ export class ResultsColumnUpdater {
 
     if (!symbols || symbols.length === 0) {
       tdGene.dataset.remains = '0';
-      tdGeneAnchor.href = '';
-      tdGeneAnchor.textContent = '';
+      this.resetAnchor(tdGeneAnchor);
       return;
     }
 
     tdGene.dataset.remains = (symbols.length - 1).toString();
-    tdGeneAnchor.href = `/gene/${symbols[0].id}`;
-    tdGeneAnchor.textContent = symbols[0].name;
+    this.updateAnchor(
+      tdGeneAnchor,
+      `/gene/${symbols[0].id}`,
+      symbols[0].name,
+      `View gene ${symbols[0].name} details`
+    );
   }
 
   /**
@@ -297,8 +318,7 @@ export class ResultsColumnUpdater {
     tdClinicalIcon: HTMLSpanElement
   ) {
     tdClinicalSign.dataset.value = '';
-    tdClinicalAnchor.textContent = '';
-    tdClinicalAnchor.setAttribute('href', '');
+    this.resetAnchor(tdClinicalAnchor);
     tdClinicalIcon.dataset.remains = '0';
     tdClinicalIcon.dataset.mgend = 'false';
   }
@@ -317,23 +337,23 @@ export class ResultsColumnUpdater {
   ) {
     if (firstCondition) {
       tdClinicalSign.textContent = '';
-      tdClinicalAnchor.textContent = firstCondition.name || '';
 
       if (firstCondition.medgen) {
-        tdClinicalAnchor.setAttribute(
-          'href',
-          `/disease/${firstCondition.medgen}`
+        this.updateAnchor(
+          tdClinicalAnchor,
+          `/disease/${firstCondition.medgen}`,
+          firstCondition.name || '',
+          `View disease ${firstCondition.name} details`
         );
       } else {
         // Display in div instead of anchor when no medgen
         tdClinicalSign.textContent = firstCondition.name;
-        tdClinicalAnchor.textContent = '';
-        tdClinicalAnchor.className = '';
+        this.resetAnchor(tdClinicalAnchor);
       }
     } else {
       // No conditions exist
       tdClinicalSign.textContent = 'others';
-      tdClinicalAnchor.textContent = '';
+      this.resetAnchor(tdClinicalAnchor);
     }
   }
 
