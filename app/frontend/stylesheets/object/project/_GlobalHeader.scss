@@ -178,34 +178,10 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
       padding-left: 8px;
 
       > button.button {
-        padding: 0 0.7em;
+        font-weight: normal;
 
         &:after {
-          position: relative;
-          left: 5px;
-          padding-right: 2px;
-          font-size: 0.7rem;
-        }
-      }
-
-      > .selectshow {
-        position: relative;
-        top: -20px;
-        height: 20px;
-
-        > ul.list {
-          padding: 3px 0 3px;
-
-          > li.item {
-            > a:where(.link) {
-              &:before {
-                position: relative;
-                top: -1px;
-                left: -4px;
-                padding-left: 10px;
-              }
-            }
-          }
+          right: 8px;
         }
       }
     }

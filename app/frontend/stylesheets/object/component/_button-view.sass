@@ -15,16 +15,18 @@
   &.-negative
     background: linear-gradient(to bottom, var(--color-disable), var(--color-disable-deep))
   &.-dropdown
-    padding-right: 1.6em
-    line-height: 20px
-    border-radius: 10px
     background: linear-gradient(to bottom, var(--color-key-dark1), var(--color-key-dark3))
+    color: white
+    line-height: 20px
+    cursor: pointer
+    padding-right: 1.4em
     &:after
-      content: var(--char-CARET-DOWN)
+      content: var(--icon-caret-down)
+      font-family: 'Font Awesome 7 Free', sans-serif
+      font-weight: 900
       position: absolute
       top: 50%
-      right: .65em
-      font-family: FontAwesome, sans-serif
+      right: .36rem
       font-size: .7rem
       transform: translateY(-50%)
   &.-disabled,
