@@ -3,17 +3,45 @@ const express = require('express');
 const compression = require('compression');
 const fs = require('fs');
 
-// リクエストされたURL自身をcanonical URLとして組み立てる。
-// reverse proxy配下では x-forwarded-proto を優先し、https/http の判定を合わせる。
+const SITE_ORIGINS = {
+  GRCh37: 'https://grch37.togovar.org',
+  GRCh38: 'https://grch38.togovar.org',
+};
+
+function getSiteOrigin() {
+  return SITE_ORIGINS[process.env.TOGOVAR_REFERENCE] || SITE_ORIGINS.GRCh38;
+}
+
+function escapeHtmlAttribute(value) {
+  return value.replace(/["&<>]/g, (char) => {
+    switch (char) {
+      case '"':
+        return '&quot;';
+      case '&':
+        return '&amp;';
+      case '<':
+        return '&lt;';
+      case '>':
+        return '&gt;';
+      default:
+        return char;
+    }
+  });
+}
+
+// 信頼済みの設定値からcanonical URLを組み立てる。
+// Hostやx-forwarded-protoなどのリクエストヘッダーは、canonicalには使わない。
 function getCanonicalUrl(req) {
-  const protocol = req.get('x-forwarded-proto') || req.protocol;
-  return `${protocol}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
+  return `${getSiteOrigin()}${req.originalUrl.split('?')[0]}`;
 }
 
 // ビルド済みHTML内のプレースホルダーを、実際にアクセスされたURLへ置き換える。
 // /variant/:id, /gene/:id, /disease/:id は同じHTMLを使い回すため、ここでcanonicalを個別化する。
 function withCanonicalUrl(html, req) {
-  return html.replace(/__TOGOVAR_CANONICAL_URL__/g, getCanonicalUrl(req));
+  return html.replace(
+    /__TOGOVAR_CANONICAL_URL__/g,
+    escapeHtmlAttribute(getCanonicalUrl(req))
+  );
 }
 
 // レポート種別に対応するビルド済みHTMLを非同期で読み込む。
