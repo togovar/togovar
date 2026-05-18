@@ -37,8 +37,8 @@ function createRobotsTxt(siteOrigin) {
 function createSitemapXml(siteOrigin, pages) {
   const urls = [
     `${siteOrigin}/`,
-    ...pages.map(page => `${siteOrigin}/doc/${page}`),
-    ...pages.map(page => `${siteOrigin}/doc/ja/${page}`),
+    ...pages.map(page => `${siteOrigin}/doc/${page}/`),
+    ...pages.map(page => `${siteOrigin}/doc/ja/${page}/`),
   ];
 
   return [
@@ -328,7 +328,7 @@ pages.forEach(function (name) {
       filename: `doc/ja/${name}/index.html`,
       // 各ドキュメントページ自身のURLを canonical としてテンプレートへ渡す。
       templateParameters: {
-        canonicalUrl: `${getSiteOrigin()}/doc/ja/${name}`,
+        canonicalUrl: `${getSiteOrigin()}/doc/ja/${name}/`,
       },
       inject: false,
     }),
@@ -337,7 +337,7 @@ pages.forEach(function (name) {
       filename: `doc/${name}/index.html`,
       // 英語ページは /doc/{name} を正規URLとして扱う。
       templateParameters: {
-        canonicalUrl: `${getSiteOrigin()}/doc/${name}`,
+        canonicalUrl: `${getSiteOrigin()}/doc/${name}/`,
       },
       inject: false,
     })
