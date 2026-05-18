@@ -310,8 +310,8 @@ export default class FloatingInfo {
 
     contentP.className = 'content';
     contentP.innerText = tooltip.content;
-    // URL がある項目だけ Read More リンクを追加する。
-    if (tooltip.url) contentP.appendChild(this.createAnchor(tooltip.url));
+    // URL がある項目だけ詳細リンクを追加する。
+    if (tooltip.url) contentP.appendChild(this.createAnchor(tooltip));
     template.appendChild(contentP);
 
     return template;
@@ -341,12 +341,13 @@ export default class FloatingInfo {
     return `tooltip-${id || 'unknown'}-${this.tooltipIdSequence}`;
   }
 
-  private createAnchor(url: string): HTMLAnchorElement {
+  private createAnchor(tooltip: TooltipEntry): HTMLAnchorElement {
     const anchor = document.createElement('a');
 
     anchor.className = 'url';
-    anchor.href = url;
+    anchor.href = tooltip.url || '';
     anchor.innerText = 'Read More';
+    anchor.setAttribute('aria-label', `Read more about ${tooltip.content}`);
 
     return anchor;
   }
