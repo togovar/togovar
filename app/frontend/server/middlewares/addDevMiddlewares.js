@@ -12,14 +12,43 @@ function createWebpackMiddleware(compiler, publicPath) {
   });
 }
 
+function escapeHtmlAttribute(value) {
+  return value.replace(/["&<>]/g, (char) => {
+    switch (char) {
+      case '"':
+        return '&quot;';
+      case '&':
+        return '&amp;';
+      case '<':
+        return '&lt;';
+      case '>':
+        return '&gt;';
+      default:
+        return char;
+    }
+  });
+}
+
+function getTrustedDevOrigin(req) {
+  const protocol = req.protocol === 'https' ? 'https' : 'http';
+  const port =
+    req.socket && typeof req.socket.localPort === 'number'
+      ? `:${req.socket.localPort}`
+      : '';
+
+  return `${protocol}://localhost${port}`;
+}
+
 function getCanonicalUrl(req) {
-  const protocol = req.get('x-forwarded-proto') || req.protocol;
-  return `${protocol}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
+  return `${getTrustedDevOrigin(req)}${req.originalUrl.split('?')[0]}`;
 }
 
 // 詳細ページ用HTML内のプレースホルダーを、アクセスされたURL自身のcanonicalへ置き換える。
 function withCanonicalUrl(html, req) {
-  return html.replace(/__TOGOVAR_CANONICAL_URL__/g, getCanonicalUrl(req));
+  return html.replace(
+    /__TOGOVAR_CANONICAL_URL__/g,
+    escapeHtmlAttribute(getCanonicalUrl(req))
+  );
 }
 
 module.exports = function addDevMiddlewares(app, webpackConfig) {
