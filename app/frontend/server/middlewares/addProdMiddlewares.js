@@ -2,6 +2,11 @@ const path = require('path');
 const express = require('express');
 const compression = require('compression');
 const fs = require('fs');
+const {
+  withCanonicalUrl,
+  getTrailingSlashUrl,
+  getNoTrailingSlashUrl,
+} = require('./middlewareHelpers');
 
 const SITE_ORIGINS = {
   GRCh37: 'https://grch37.togovar.org',
@@ -17,38 +22,10 @@ function getSiteOrigin() {
   return SITE_ORIGINS[process.env.TOGOVAR_REFERENCE] || SITE_ORIGINS.GRCh38;
 }
 
-function escapeHtmlAttribute(value) {
-  return value.replace(/["&<>]/g, (char) => {
-    switch (char) {
-      case '"':
-        return '&quot;';
-      case '&':
-        return '&amp;';
-      case '<':
-        return '&lt;';
-      case '>':
-        return '&gt;';
-      default:
-        return char;
-    }
-  });
-}
-
 // 信頼済みの設定値からcanonical URLを組み立てる。
 // Hostやx-forwarded-protoなどのリクエストヘッダーは、canonicalには使わない。
 function getCanonicalUrl(req) {
   return `${getSiteOrigin()}${req.originalUrl.split('?')[0]}`;
-}
-
-// ビルド済みHTML内のプレースホルダーを、実際にアクセスされたURLへ置き換える。
-// /variant/:id, /gene/:id, /disease/:id は同じHTMLを使い回すため、ここでcanonicalを個別化する。
-function withCanonicalUrl(html, req) {
-  const canonicalUrl = escapeHtmlAttribute(getCanonicalUrl(req));
-
-  return html.replace(
-    /__TOGOVAR_CANONICAL_URL__/g,
-    () => canonicalUrl
-  );
 }
 
 // 本番のビルド済みHTMLはデプロイ中に変わらない前提なので、初回読み込み後はメモリに保持する。
@@ -79,17 +56,8 @@ function sendReportHtml(outputPath, req, res) {
     }
 
     res.setHeader('Cache-Control', 'no-cache');
-    return res.send(withCanonicalUrl(html, req));
+    return res.send(withCanonicalUrl(html, getCanonicalUrl(req)));
   });
-}
-
-function getTrailingSlashUrl(req) {
-  return `${req.path}/${req.originalUrl.slice(req.path.length)}`;
-}
-
-function getNoTrailingSlashUrl(req) {
-  const queryString = req.originalUrl.slice(req.path.length);
-  return `${req.path.replace(/\/+$/, '')}${queryString}`;
 }
 
 function isLongTermCacheAsset(filePath) {

@@ -4,28 +4,16 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
+const {
+  withCanonicalUrl,
+  getTrailingSlashUrl,
+  getNoTrailingSlashUrl,
+} = require('./middlewareHelpers');
 
 function createWebpackMiddleware(compiler, publicPath) {
   return webpackDevMiddleware(compiler, {
     publicPath,
     stats: 'errors-only',
-  });
-}
-
-function escapeHtmlAttribute(value) {
-  return value.replace(/["&<>]/g, (char) => {
-    switch (char) {
-      case '"':
-        return '&quot;';
-      case '&':
-        return '&amp;';
-      case '<':
-        return '&lt;';
-      case '>':
-        return '&gt;';
-      default:
-        return char;
-    }
   });
 }
 
@@ -44,15 +32,6 @@ function getCanonicalUrl(req) {
 }
 
 // 詳細ページ用HTML内のプレースホルダーを、アクセスされたURL自身のcanonicalへ置き換える。
-function withCanonicalUrl(html, req) {
-  const canonicalUrl = escapeHtmlAttribute(getCanonicalUrl(req));
-
-  return html.replace(
-    /__TOGOVAR_CANONICAL_URL__/g,
-    () => canonicalUrl
-  );
-}
-
 function sendReportHtml(outputFileSystem, outputPath, req, res) {
   outputFileSystem.readFile(
     path.resolve(outputPath, req.params.report, 'index.html'),
@@ -60,19 +39,10 @@ function sendReportHtml(outputFileSystem, outputPath, req, res) {
       if (err) {
         res.sendStatus(404);
       } else {
-        res.send(withCanonicalUrl(file.toString(), req));
+        res.send(withCanonicalUrl(file.toString(), getCanonicalUrl(req)));
       }
     }
   );
-}
-
-function getTrailingSlashUrl(req) {
-  return `${req.path}/${req.originalUrl.slice(req.path.length)}`;
-}
-
-function getNoTrailingSlashUrl(req) {
-  const queryString = req.originalUrl.slice(req.path.length);
-  return `${req.path.replace(/\/+$/, '')}${queryString}`;
 }
 
 module.exports = function addDevMiddlewares(app, webpackConfig) {
