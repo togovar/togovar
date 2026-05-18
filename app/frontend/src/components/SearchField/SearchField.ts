@@ -122,6 +122,7 @@ class SearchField extends LitElement {
             <button
               class="delete"
               type="reset"
+              aria-label="Clear search input"
               @click=${this._handleResetClick}
             ></button>
           </form>
