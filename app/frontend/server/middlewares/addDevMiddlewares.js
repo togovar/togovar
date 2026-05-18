@@ -70,6 +70,11 @@ function getTrailingSlashUrl(req) {
   return `${req.path}/${req.originalUrl.slice(req.path.length)}`;
 }
 
+function getNoTrailingSlashUrl(req) {
+  const queryString = req.originalUrl.slice(req.path.length);
+  return `${req.path.replace(/\/+$/, '')}${queryString}`;
+}
+
 module.exports = function addDevMiddlewares(app, webpackConfig) {
   // 開発中はwebpackのビルド結果をディスクではなくメモリ上に作る。
   const compiler = webpack(webpackConfig);
@@ -109,6 +114,10 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
 
   // /variant/:id, /gene/:id, /disease/:id も同じHTMLを使い、canonicalだけURLごとに差し替える。
   app.get('/:report(variant|gene|disease)/:id', (req, res) => {
+    if (req.path.endsWith('/')) {
+      return res.redirect(302, getNoTrailingSlashUrl(req));
+    }
+
     sendReportHtml(outputFileSystem, compiler.outputPath, req, res);
   });
 

@@ -86,6 +86,11 @@ function getTrailingSlashUrl(req) {
   return `${req.path}/${req.originalUrl.slice(req.path.length)}`;
 }
 
+function getNoTrailingSlashUrl(req) {
+  const queryString = req.originalUrl.slice(req.path.length);
+  return `${req.path.replace(/\/+$/, '')}${queryString}`;
+}
+
 function isLongTermCacheAsset(filePath) {
   return LONG_TERM_CACHE_PATTERN.test(filePath);
 }
@@ -119,6 +124,10 @@ module.exports = function addProdMiddlewares(app, options) {
 
   // 詳細ページはURLごとにcanonicalが違うため、HTML文字列を読み込んで差し替える。
   app.get('/:report(variant|gene|disease)/:id', (req, res) => {
+    if (req.path.endsWith('/')) {
+      return res.redirect(301, getNoTrailingSlashUrl(req));
+    }
+
     sendReportHtml(outputPath, req, res);
   });
 
