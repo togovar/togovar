@@ -79,6 +79,10 @@ function sendReportHtml(outputPath, req, res) {
   });
 }
 
+function getTrailingSlashUrl(req) {
+  return `${req.path}/${req.originalUrl.slice(req.path.length)}`;
+}
+
 // 本番環境用のExpressミドルウェアを追加する。
 // dist配下のビルド済みファイルを配信し、レポート詳細ページだけcanonicalを差し替えて返す。
 module.exports = function addProdMiddlewares(app, options) {
@@ -89,8 +93,12 @@ module.exports = function addProdMiddlewares(app, options) {
   // HTMLだけでなく、CSS/JSなどの静的アセットにも適用される。
   app.use(compression());
 
-  // /variant, /gene, /disease もcanonicalを差し替えて返す。
+  // /variant, /gene, /disease は末尾スラッシュ付きURLへ統一する。
   app.get('/:report(variant|gene|disease)/?', (req, res) => {
+    if (!req.path.endsWith('/')) {
+      return res.redirect(301, getTrailingSlashUrl(req));
+    }
+
     sendReportHtml(outputPath, req, res);
   });
 

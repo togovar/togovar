@@ -66,6 +66,10 @@ function sendReportHtml(outputFileSystem, outputPath, req, res) {
   );
 }
 
+function getTrailingSlashUrl(req) {
+  return `${req.path}/${req.originalUrl.slice(req.path.length)}`;
+}
+
 module.exports = function addDevMiddlewares(app, webpackConfig) {
   // 開発中はwebpackのビルド結果をディスクではなくメモリ上に作る。
   const compiler = webpack(webpackConfig);
@@ -94,8 +98,12 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
   // ディスク上のdistではなく、middlewareが持つファイルシステムからHTMLを読む。
   const outputFileSystem = middleware.context.outputFileSystem;
 
-  // /variant, /gene, /disease も同じHTMLを使い、canonicalだけURLごとに差し替える。
+  // /variant, /gene, /disease は末尾スラッシュ付きURLへ統一する。
   app.get('/:report(variant|gene|disease)/?', (req, res) => {
+    if (!req.path.endsWith('/')) {
+      return res.redirect(302, getTrailingSlashUrl(req));
+    }
+
     sendReportHtml(outputFileSystem, compiler.outputPath, req, res);
   });
 
