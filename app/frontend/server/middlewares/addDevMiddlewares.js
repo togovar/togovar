@@ -104,9 +104,7 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
     sendReportHtml(outputFileSystem, compiler.outputPath, req, res);
   });
 
-  // dist配下の静的ファイルを配信する。
-  app.use(publicPath, express.static(outputPath));
-
+  // トップページも、開発中はメモリ上の最新HTMLを返す。
   app.get('/', (req, res) => {
     outputFileSystem.readFile(
       path.resolve(compiler.outputPath, 'index.html'),
@@ -119,4 +117,7 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
       }
     );
   });
+
+  // dist配下の静的ファイルを配信する。
+  app.use(publicPath, express.static(outputPath));
 };
