@@ -2,6 +2,8 @@ extend layouts/application
 
 append variables
   - locals.currentPage = "home";
+  - locals.description = "TogoVar is an integrated database of Japanese genomic variation, providing allele frequencies and annotations for human variants.";
+  - locals.canonicalUrl = TOGOVAR_FRONTEND_REFERENCE === "GRCh37" ? "https://grch37.togovar.org/" : "https://grch38.togovar.org/";
 
 block head
   link(href="/togovar.jsonld" rel="alternate" type="application/ld+json")
