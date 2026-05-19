@@ -193,6 +193,8 @@ export class ResultsViewDisplayManager {
       if (isTouchDevice) {
         setTouchElementsPointerEvents(false);
       }
+
+      window.dispatchEvent(new CustomEvent('togovar:results-rendered'));
     });
   }
 

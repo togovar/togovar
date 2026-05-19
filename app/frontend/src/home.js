@@ -32,6 +32,7 @@ const _currentUrlParams = qs.parse(window.location.search.substring(1));
 
 export function initHome() {
   setUserAgent();
+  setupInitialLayoutReady();
 
   storeManager.setData('offset', 0);
   storeManager.setData('selectedRow', undefined);
@@ -68,6 +69,18 @@ function setUserAgent() {
       break;
   }
   document.querySelector('html').dataset.os = os;
+}
+
+function setupInitialLayoutReady() {
+  const reveal = () => {
+    TopPageLayoutManager.update();
+    requestAnimationFrame(() => {
+      TopPageLayoutManager.update();
+      document.body.classList.add('-layout-ready');
+    });
+  };
+
+  window.addEventListener('togovar:results-rendered', reveal, { once: true });
 }
 
 /** 初期検索の準備を行うメソッド

@@ -34,6 +34,14 @@ body {
     overflow: hidden;
   }
 
+  [data-page='home'] &:not(.-layout-ready) {
+    #SearchInputView,
+    #SearchResultsView,
+    #Karyotype {
+      visibility: hidden;
+    }
+  }
+
   &[data-search-mode='advanced'] {
     #FilterAlternateAlleleFrequency,
     #FilterVariantCallingQuality,
