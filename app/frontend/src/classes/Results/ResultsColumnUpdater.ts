@@ -12,18 +12,24 @@ import type {
 import { REF_ALT_SHOW_LENGTH } from './ResultsColumnTemplates';
 
 /**
- * Utility class responsible for updating data in each column of result rows
+ * 検索結果テーブルの各列に、バリアント情報を反映するためのユーティリティクラス。
  *
- * Each method is implemented as a static method and is responsible for updating
- * DOM elements of specific column types with corresponding data
+ * 各メソッドは列ごとのDOM要素を受け取り、表示テキスト、リンク先、
+ * 補助情報用のdata属性などを更新する。
  */
 export class ResultsColumnUpdater {
+  /**
+   * リンクとして表示する内容がない場合に、a要素を空の状態へ戻す。
+   */
   static resetAnchor(element: HTMLAnchorElement) {
     element.removeAttribute('href');
     element.removeAttribute('aria-label');
     element.textContent = '';
   }
 
+  /**
+   * a要素にリンク先、表示文字列、スクリーンリーダー向けラベルを設定する。
+   */
   static updateAnchor(
     element: HTMLAnchorElement,
     url: string,
@@ -36,11 +42,11 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Update TogoVar ID column
+   * TogoVar ID列を更新する。
    *
-   * @param element - Target anchor element to update
-   * @param value - TogoVar ID value
-   * @param url - Link destination URL
+   * @param element - 更新対象のa要素
+   * @param value - 表示するTogoVar ID
+   * @param url - バリアント詳細ページのURL
    */
   static updateTogovarId(
     element: HTMLAnchorElement | null,
@@ -58,11 +64,11 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Update RefSNP ID column
+   * RefSNP ID列を更新する。
    *
-   * @param tdRS - RefSNP table cell element
-   * @param tdRSAnchor - RefSNP anchor element
-   * @param values - RefSNP ID array
+   * @param tdRS - RefSNP列のtd要素
+   * @param tdRSAnchor - RefSNP IDを表示するa要素
+   * @param values - RefSNP IDの配列
    */
   static updateRefSNP(
     tdRS: HTMLTableCellElement | null,
@@ -77,22 +83,23 @@ export class ResultsColumnUpdater {
       return;
     }
 
+    // 画面には先頭のrsIDだけを表示し、残りの件数はdata-remainsに保持する。
     tdRS.dataset.remains = (values.length - 1).toString();
     this.updateAnchor(
       tdRSAnchor,
-      `http://identifiers.org/dbsnp/${values[0]}`,
+      `https://identifiers.org/dbsnp/${values[0]}`,
       values[0],
       `Open dbSNP record ${values[0]}`
     );
   }
 
   /**
-   * Update Position column
+   * Position列を更新する。
    *
-   * @param tdPositionChromosome - Div element for chromosome display
-   * @param tdPositionCoordinate - Div element for coordinate display
-   * @param chromosome - Chromosome name
-   * @param position - Coordinate position
+   * @param tdPositionChromosome - 染色体名を表示するdiv要素
+   * @param tdPositionCoordinate - 座標を表示するdiv要素
+   * @param chromosome - 染色体名
+   * @param position - ゲノム上の座標
    */
   static updatePosition(
     tdPositionChromosome: HTMLDivElement | null,
@@ -109,12 +116,12 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Update Ref/Alt column
+   * Ref/Alt列を更新する。
    *
-   * @param tdRefAltRef - Span element for Reference display
-   * @param tdRefAltAlt - Span element for Alternate display
-   * @param reference - Reference allele array
-   * @param alternate - Alternate allele array
+   * @param tdRefAltRef - Reference alleleを表示するspan要素
+   * @param tdRefAltAlt - Alternate alleleを表示するspan要素
+   * @param reference - Reference allele
+   * @param alternate - Alternate allele
    */
   static updateRefAlt(
     tdRefAltRef: HTMLSpanElement | null,
@@ -137,10 +144,10 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Generate formatting information for Ref/Alt data
+   * Ref/Alt表示用の文字列と、元の長さを生成する。
    *
-   * @param sequence - Sequence string to format
-   * @returns Object containing display string and original length
+   * @param sequence - 整形対象の塩基配列
+   * @returns 表示文字列と元の文字数
    */
   static formatRefAltData(sequence: string) {
     return {
@@ -150,11 +157,11 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Format Ref/Alt sequence for display
-   * Adds ellipsis if sequence exceeds specified length
+   * Ref/Altの塩基配列を表示用に整形する。
+   * 長すぎる場合は、指定文字数で省略して末尾に...を付ける。
    *
-   * @param sequence - Sequence string to format
-   * @returns Formatted string
+   * @param sequence - 整形対象の塩基配列
+   * @returns 整形後の表示文字列
    */
   static formatRefAlt(sequence: string) {
     return (
@@ -164,10 +171,10 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Update Variant Type column
+   * Variant Type列を更新する。
    *
-   * @param element - Target Div element to update
-   * @param value - Variant type ID
+   * @param element - 更新対象のdiv要素
+   * @param value - バリアントタイプID
    */
   static updateVariantType(element: HTMLDivElement | null, value: string) {
     if (!element) return;
@@ -178,11 +185,11 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Update Gene column
+   * Gene列を更新する。
    *
-   * @param tdGene - Gene table cell element
-   * @param tdGeneAnchor - Gene anchor element
-   * @param symbols - Gene symbol array
+   * @param tdGene - Gene列のtd要素
+   * @param tdGeneAnchor - Gene名を表示するa要素
+   * @param symbols - 遺伝子シンボルの配列
    */
   static updateGene(
     tdGene: HTMLTableCellElement | null,
@@ -197,6 +204,7 @@ export class ResultsColumnUpdater {
       return;
     }
 
+    // 画面には先頭の遺伝子だけを表示し、残りの件数はdata-remainsに保持する。
     tdGene.dataset.remains = (symbols.length - 1).toString();
     this.updateAnchor(
       tdGeneAnchor,
@@ -207,10 +215,10 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Update Alt frequency column
+   * Alt frequency列を更新する。
    *
-   * @param tdFrequencies - Map of frequency display elements
-   * @param frequencies - Frequency data array
+   * @param tdFrequencies - データセットIDごとの頻度表示要素
+   * @param frequencies - 頻度データの配列
    */
   static updateAltFrequency(
     tdFrequencies: TdFrequencies,
@@ -233,12 +241,12 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Update Consequence column
+   * Consequence列を更新する。
    *
-   * @param tdConsequence - Consequence table cell element
-   * @param tdConsequenceItem - Consequence display Div element
-   * @param mostConsequence - Most significant consequence
-   * @param transcripts - Transcript data array
+   * @param tdConsequence - Consequence列のtd要素
+   * @param tdConsequenceItem - Consequence名を表示するdiv要素
+   * @param mostConsequence - 最も重要なConsequence ID
+   * @param transcripts - Transcript情報の配列
    */
   static updateConsequence(
     tdConsequence: HTMLTableCellElement | null,
@@ -267,12 +275,12 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Update Clinical significance column
+   * Clinical significance列を更新する。
    *
-   * @param tdClinicalSign - Clinical significance display Div element
-   * @param tdClinicalAnchor - Clinical significance anchor element
-   * @param tdClinicalIcon - Clinical significance icon Span element
-   * @param significances - Clinical significance data array
+   * @param tdClinicalSign - Clinical significanceを表示するdiv要素
+   * @param tdClinicalAnchor - 疾患名をリンク表示するa要素
+   * @param tdClinicalIcon - 追加情報の有無を示すspan要素
+   * @param significances - Clinical significance情報の配列
    */
   static updateClinicalSignificance(
     tdClinicalSign: HTMLDivElement | null,
@@ -294,7 +302,7 @@ export class ResultsColumnUpdater {
     const firstSignificance = significances[0];
     const firstCondition = firstSignificance.conditions?.[0];
 
-    // Set interpretations value
+    // interpretationの値は、色分けなどの表示制御に使う。
     tdClinicalSign.dataset.value = firstSignificance.interpretations[0];
 
     this.updateClinicalCondition(
@@ -306,11 +314,11 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Reset Clinical significance processing
+   * Clinical significance列を空の状態へ戻す。
    *
-   * @param tdClinicalSign - Clinical significance display Div element
-   * @param tdClinicalAnchor - Clinical significance anchor element
-   * @param tdClinicalIcon - Clinical significance icon Span element
+   * @param tdClinicalSign - Clinical significanceを表示するdiv要素
+   * @param tdClinicalAnchor - 疾患名をリンク表示するa要素
+   * @param tdClinicalIcon - 追加情報の有無を示すspan要素
    */
   static resetClinicalSignificance(
     tdClinicalSign: HTMLDivElement,
@@ -324,11 +332,11 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Update Clinical significance condition information
+   * Clinical significanceに紐づく疾患情報を更新する。
    *
-   * @param tdClinicalSign - Clinical significance display Div element
-   * @param tdClinicalAnchor - Clinical significance anchor element
-   * @param firstCondition - First condition data
+   * @param tdClinicalSign - Clinical significanceを表示するdiv要素
+   * @param tdClinicalAnchor - 疾患名をリンク表示するa要素
+   * @param firstCondition - 先頭の疾患情報
    */
   static updateClinicalCondition(
     tdClinicalSign: HTMLDivElement,
@@ -346,31 +354,31 @@ export class ResultsColumnUpdater {
           `View disease ${firstCondition.name} details`
         );
       } else {
-        // Display in div instead of anchor when no medgen
+        // MedGen IDがない場合はリンクにせず、通常テキストとして表示する。
         tdClinicalSign.textContent = firstCondition.name;
         this.resetAnchor(tdClinicalAnchor);
       }
     } else {
-      // No conditions exist
+      // 疾患情報がない場合はothersとして表示する。
       tdClinicalSign.textContent = 'others';
       this.resetAnchor(tdClinicalAnchor);
     }
   }
 
   /**
-   * Update Clinical significance metadata
+   * Clinical significance列の補助情報を更新する。
    *
-   * @param tdClinicalIcon - Clinical significance icon Span element
-   * @param significances - Clinical significance data array
+   * @param tdClinicalIcon - 追加情報の有無を示すspan要素
+   * @param significances - Clinical significance情報の配列
    */
   static updateClinicalMetadata(
     tdClinicalIcon: HTMLSpanElement,
     significances: Significance[]
   ) {
-    // Set remaining significance count
+    // 画面に表示している先頭1件以外の件数を保持する。
     tdClinicalIcon.dataset.remains = (significances.length - 1).toString();
 
-    // Check if mgend source exists in significances
+    // MGeND由来の情報が含まれるかを保持する。
     const hasMedgen = significances.some(
       (significance) => significance.source === 'mgend'
     );
@@ -378,11 +386,11 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Common update logic for function prediction
+   * 機能予測スコア列の共通更新処理。
    *
-   * @param element - Target Div element to update
-   * @param score - Function prediction score value
-   * @param classifyScore - Function to determine function class from score value
+   * @param element - 更新対象のdiv要素
+   * @param score - 機能予測スコア
+   * @param classifyScore - スコアから表示用クラスを判定する関数
    */
   static updateFunctionPrediction(
     element: HTMLDivElement | null,
@@ -402,10 +410,10 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Update AlphaMissense score
+   * AlphaMissenseスコアを更新する。
    *
-   * @param element - Target Div element to update
-   * @param score - AlphaMissense score
+   * @param element - 更新対象のdiv要素
+   * @param score - AlphaMissenseスコア
    */
   static updateAlphaMissense(element: HTMLDivElement | null, score: number) {
     this.updateFunctionPrediction(element, score, (_score) => {
@@ -416,10 +424,10 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Update SIFT score
+   * SIFTスコアを更新する。
    *
-   * @param element - Target Div element to update
-   * @param score - SIFT score
+   * @param element - 更新対象のdiv要素
+   * @param score - SIFTスコア
    */
   static updateSift(element: HTMLDivElement | null, score: number) {
     this.updateFunctionPrediction(element, score, (_score) =>
@@ -428,10 +436,10 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Update PolyPhen score
+   * PolyPhenスコアを更新する。
    *
-   * @param element - Target Div element to update
-   * @param score - PolyPhen score
+   * @param element - 更新対象のdiv要素
+   * @param score - PolyPhenスコア
    */
   static updatePolyphen(element: HTMLDivElement | null, score: number) {
     this.updateFunctionPrediction(element, score, (_score) => {
