@@ -35,8 +35,10 @@ body {
   }
 
   [data-page='home'] &:not(.-layout-ready) {
-    #SearchInputView,
-    #SearchResultsView,
+    #SearchResultsView .tablecontainer,
+    #SearchResultsView #Messages,
+    #SearchResultsView #RowIndicator,
+    #SearchResultsView .LayoutAside,
     #Karyotype {
       visibility: hidden;
     }
