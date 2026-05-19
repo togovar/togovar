@@ -26,10 +26,9 @@ export class ResultsRowView {
 
   // Cache for DOM elements
   // TogoVar ID
-  togovarIdAnchor: HTMLAnchorElement | null = null;
+  togovarIdCell: HTMLTableCellElement | null = null;
   // RefSNP ID
   refsnpCell: HTMLTableCellElement | null = null;
-  refsnpAnchor: HTMLAnchorElement | null = null;
   // Position
   positionChromosome: HTMLDivElement | null = null;
   positionCoordinate: HTMLDivElement | null = null;
@@ -40,15 +39,14 @@ export class ResultsRowView {
   typeElement: HTMLDivElement | null = null;
   // Gene
   geneCell: HTMLTableCellElement | null = null;
-  geneAnchor: HTMLAnchorElement | null = null;
   // Alt frequency
   frequencyElements: TdFrequencies = {};
   // Consequence
   consequenceCell: HTMLTableCellElement | null = null;
   consequenceItem: HTMLDivElement | null = null;
   // Clinical significance
+  clinicalCell: HTMLTableCellElement | null = null;
   clinicalSignificance: HTMLDivElement | null = null;
-  clinicalAnchor: HTMLAnchorElement | null = null;
   clinicalIcon: HTMLSpanElement | null = null;
   // AlphaMissense
   alphaMissenseFunction: HTMLDivElement | null = null;
@@ -93,21 +91,19 @@ export class ResultsRowView {
     }
 
     // Clear cached DOM element references
-    this.togovarIdAnchor = null;
+    this.togovarIdCell = null;
     this.refsnpCell = null;
-    this.refsnpAnchor = null;
     this.positionChromosome = null;
     this.positionCoordinate = null;
     this.refElement = null;
     this.altElement = null;
     this.typeElement = null;
     this.geneCell = null;
-    this.geneAnchor = null;
     this.frequencyElements = {};
     this.consequenceCell = null;
     this.consequenceItem = null;
+    this.clinicalCell = null;
     this.clinicalSignificance = null;
-    this.clinicalAnchor = null;
     this.clinicalIcon = null;
     this.alphaMissenseFunction = null;
     this.siftFunction = null;
@@ -274,11 +270,10 @@ export class ResultsRowView {
    */
   private _cacheBasicElements() {
     // TogoVar ID
-    this.togovarIdAnchor = this.tr.querySelector('td.togovar_id > a');
+    this.togovarIdCell = this.tr.querySelector('td.togovar_id');
 
     // RefSNP ID
     this.refsnpCell = this.tr.querySelector('td.refsnp_id');
-    this.refsnpAnchor = this.refsnpCell?.querySelector('a') || null;
 
     // Position
     const tdPosition = this.tr.querySelector(
@@ -297,7 +292,6 @@ export class ResultsRowView {
 
     // Gene
     this.geneCell = this.tr.querySelector('td.gene');
-    this.geneAnchor = this.geneCell?.querySelector('a') || null;
 
     // Consequence
     this.consequenceCell = this.tr.querySelector('td.consequence');
@@ -305,10 +299,11 @@ export class ResultsRowView {
       this.consequenceCell?.querySelector('.consequence-item') || null;
 
     // Clinical significance
-    const tdClinical = this.tr.querySelector('td.clinical_significance');
+    const tdClinical =
+      this.tr.querySelector<HTMLTableCellElement>('td.clinical_significance');
+    this.clinicalCell = tdClinical;
     this.clinicalSignificance =
       tdClinical?.querySelector('.clinical-significance') || null;
-    this.clinicalAnchor = tdClinical?.querySelector('a') || null;
     this.clinicalIcon = tdClinical?.querySelector('span.icon') || null;
   }
 
@@ -363,14 +358,13 @@ export class ResultsRowView {
     const columnHandlers: Record<string, () => void> = {
       togovar_id: () =>
         ResultsColumnUpdater.updateTogovarId(
-          this.togovarIdAnchor,
+          this.togovarIdCell,
           result.id,
           `/variant/${result.id}`
         ),
       refsnp_id: () =>
         ResultsColumnUpdater.updateRefSNP(
           this.refsnpCell,
-          this.refsnpAnchor,
           result.existing_variations
         ),
       position: () =>
@@ -392,7 +386,6 @@ export class ResultsRowView {
       gene: () =>
         ResultsColumnUpdater.updateGene(
           this.geneCell,
-          this.geneAnchor,
           result.symbols
         ),
       alt_frequency: () =>
@@ -410,7 +403,7 @@ export class ResultsRowView {
       clinical_significance: () =>
         ResultsColumnUpdater.updateClinicalSignificance(
           this.clinicalSignificance,
-          this.clinicalAnchor,
+          this.clinicalCell,
           this.clinicalIcon,
           result.significance
         ),

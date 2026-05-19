@@ -198,6 +198,9 @@ const config = {
     new HtmlWebpackPlugin({
       template: 'app/frontend/views/index.pug',
       filename: 'index.html',
+      templateParameters: {
+        canonicalUrl: `${getSiteOrigin()}/`,
+      },
       inject: false,
     }),
     new HtmlWebpackPlugin({
