@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://grch38.togovar.org/sitemap.xml
