@@ -295,7 +295,7 @@ export class ResultsView {
     thead.innerHTML = `<tr>${getOrderedColumns(columns)
       .map(
         (column) =>
-          `<th class="${column.id}"><p data-tooltip-id="table-header-${column.id}">${column.label}</p></th>`
+          `<th class="${column.id}"><span data-tooltip-id="table-header-${column.id}">${column.label}</span></th>`
       )
       .join('')}</tr>`;
   }

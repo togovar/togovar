@@ -33,6 +33,29 @@ main#SearchResultsView.LayoutMainAside
       .tablecontainer
         table.results-view
           thead
+            tr
+              th.togovar_id
+                span(data-tooltip-id="table-header-togovar_id") TogoVar ID
+              th.refsnp_id
+                span(data-tooltip-id="table-header-refsnp_id") RefSNP ID
+              th.position
+                span(data-tooltip-id="table-header-position") Position
+              th.ref_alt
+                span(data-tooltip-id="table-header-ref_alt") Ref / Alt
+              th.gene
+                span(data-tooltip-id="table-header-gene") Gene
+              th.alt_frequency
+                span(data-tooltip-id="table-header-alt_frequency") Alt frequency
+              th.consequence
+                span(data-tooltip-id="table-header-consequence") Consequence
+              th.clinical_significance
+                span(data-tooltip-id="table-header-clinical_significance") Clinical significance
+              th.alphamissense
+                span(data-tooltip-id="table-header-alphamissense") AlphaMissense
+              th.sift
+                span(data-tooltip-id="table-header-sift") SIFT
+              th.polyphen
+                span(data-tooltip-id="table-header-polyphen") PolyPhen
 
           tbody
       #RowIndicator.row-indicator
