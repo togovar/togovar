@@ -2,25 +2,17 @@ const path = require('path');
 const express = require('express');
 const compression = require('compression');
 const fs = require('fs');
+const { getSiteOrigin } = require('../../config/siteOrigin');
 const {
   withCanonicalUrl,
   getTrailingSlashUrl,
   getNoTrailingSlashUrl,
 } = require('./middlewareHelpers');
 
-const SITE_ORIGINS = {
-  GRCh37: 'https://grch37.togovar.org',
-  GRCh38: 'https://grch38.togovar.org',
-};
-
 const reportHtmlCache = new Map();
 const LONG_TERM_CACHE_PATTERN =
   /\.(?:css|js|woff2?|eot|ttf|otf|png|jpe?g|gif|svg|webp)(?:\.gz)?$/i;
 const LONG_TERM_CACHE_DIRECTORY_PATTERN = /(?:^|\/)(?:css|js|fonts|images)\//;
-
-function getSiteOrigin() {
-  return SITE_ORIGINS[process.env.TOGOVAR_REFERENCE] || SITE_ORIGINS.GRCh38;
-}
 
 // 信頼済みの設定値からcanonical URLを組み立てる。
 // Hostやx-forwarded-protoなどのリクエストヘッダーは、canonicalには使わない。

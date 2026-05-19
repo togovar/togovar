@@ -4,21 +4,10 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { getSiteOrigin } = require('./siteOrigin');
 
 const env = require('dotenv').config().parsed || {};
 Object.assign(process.env, env);
-
-// SEO用の静的ファイルを作るときに使う、本番公開URLの対応表。
-// .env の TOGOVAR_REFERENCE に合わせて、GRCh37/GRCh38 のURLを切り替える。
-const SITE_ORIGINS = {
-  GRCh37: 'https://grch37.togovar.org',
-  GRCh38: 'https://grch38.togovar.org',
-};
-
-// TOGOVAR_REFERENCE が未設定または想定外の場合は、現在の標準であるGRCh38を使う。
-function getSiteOrigin() {
-  return SITE_ORIGINS[process.env.TOGOVAR_REFERENCE] || SITE_ORIGINS.GRCh38;
-}
 
 // 検索エンジン向けの robots.txt を生成する。
 // ここではクロールを許可し、同時に sitemap.xml の場所を知らせる。
@@ -240,6 +229,7 @@ const config = {
         process.env.TOGOVAR_FRONTEND_API_URL
       ),
       TOGOVAR_FRONTEND_REFERENCE: JSON.stringify(process.env.TOGOVAR_REFERENCE),
+      TOGOVAR_FRONTEND_SITE_ORIGIN: JSON.stringify(getSiteOrigin()),
       TOGOVAR_FRONTEND_STANZA_URL: JSON.stringify(
         process.env.TOGOVAR_FRONTEND_STANZA_URL
       ),
