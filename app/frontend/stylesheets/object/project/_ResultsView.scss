@@ -37,9 +37,11 @@
       > .status {
         display: inline-block;
         font-size: 12px;
+        min-width: 12em;
 
-        > .bigger {
-          font-size: 16px;
+        > .highlight {
+          font-size: inherit;
+          font-weight: bold;
         }
       }
     }
