@@ -79,7 +79,7 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
       return res.redirect(302, getTrailingSlashUrl(req));
     }
 
-    sendReportHtml(outputFileSystem, compiler.outputPath, req, res);
+    sendReportHtml(outputFileSystem, outputPath, req, res);
   });
 
   // /variant/:id, /gene/:id, /disease/:id も同じHTMLを使い、canonicalだけURLごとに差し替える。
@@ -88,13 +88,13 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
       return res.redirect(302, getNoTrailingSlashUrl(req));
     }
 
-    sendReportHtml(outputFileSystem, compiler.outputPath, req, res);
+    sendReportHtml(outputFileSystem, outputPath, req, res);
   });
 
   // トップページも、開発中はメモリ上の最新HTMLを返す。
   app.get('/', (req, res) => {
     outputFileSystem.readFile(
-      path.resolve(compiler.outputPath, 'index.html'),
+      path.resolve(outputPath, 'index.html'),
       (err, file) => {
         if (err) {
           res.sendStatus(404);
