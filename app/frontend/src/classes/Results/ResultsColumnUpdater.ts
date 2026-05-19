@@ -25,6 +25,7 @@ export class ResultsColumnUpdater {
     element.removeAttribute('href');
     element.removeAttribute('aria-label');
     element.textContent = '';
+    element.hidden = true;
   }
 
   /**
@@ -39,6 +40,7 @@ export class ResultsColumnUpdater {
     element.setAttribute('href', url);
     element.textContent = text;
     element.setAttribute('aria-label', label);
+    element.hidden = false;
   }
 
   /**
