@@ -14,6 +14,10 @@ export default class SearchButton extends LitElement {
   }
 
   render(): TemplateResult {
-    return html`<button class="btn"></button>`;
+    return html`<button
+      class="btn"
+      type="button"
+      aria-label="Search"
+    ></button>`;
   }
 }

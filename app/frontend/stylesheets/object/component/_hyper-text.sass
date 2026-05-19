@@ -1,22 +1,22 @@
 @use "sass:color"
 
 .hyper-text
-  &:not([href=""])
+  &[href]:not([href=""])
     &:after
       font-family: 'Font Awesome 7 Free', sans-serif
       font-weight: 900
       display: inline-block
       margin-left: .25em
       color: color.adjust($COLOR_GRAY, $lightness: 10%)
-  &:hover:after
+  &[href]:not([href=""]):hover:after
     color: $COLOR_KEY
   &.-internal
-    &:not([href=""])
+    &[href]:not([href=""])
       &:after
         content: var(--icon-circle-arrow-right)
         font-size: .8em
   &.-external
-    &:not([href=""])
+    &[href]:not([href=""])
       &:after
         content: var(--icon-arrow-up-right-from-square)
         font-size: .7em
