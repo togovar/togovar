@@ -12,6 +12,10 @@
       height: 36px
       > th
         position: relative
+        &.type
+          display: none
+        &.ref_alt
+          min-width: 112px
         > span
           position: absolute
           display: inline-block
@@ -49,6 +53,8 @@
         min-width: 2em
         padding: 2px 10px 2px 6px
         transition: background $GUI_DURATION
+        &.ref_alt
+          min-width: 112px
         &[data-remains]:after
           content: "+" attr(data-remains)
           display: inline-block

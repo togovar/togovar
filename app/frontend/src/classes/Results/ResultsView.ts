@@ -292,7 +292,18 @@ export class ResultsView {
     thead: HTMLElement,
     columns: ColumnConfig[]
   ): void {
-    thead.innerHTML = `<tr>${getOrderedColumns(columns)
+    const orderedColumns = getOrderedColumns(columns);
+    const currentColumnIds = Array.from(thead.querySelectorAll('th')).map(
+      (th) =>
+        orderedColumns.find((column) => th.classList.contains(column.id))?.id
+    );
+    const nextColumnIds = orderedColumns.map((column) => column.id);
+
+    if (currentColumnIds.join(',') === nextColumnIds.join(',')) {
+      return;
+    }
+
+    thead.innerHTML = `<tr>${orderedColumns
       .map(
         (column) =>
           `<th class="${column.id}"><span data-tooltip-id="table-header-${column.id}">${column.label}</span></th>`

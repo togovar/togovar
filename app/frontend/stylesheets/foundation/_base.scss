@@ -34,6 +34,10 @@ body {
     overflow: hidden;
   }
 
+  [data-page='home'] #SearchResultsView {
+    height: calc(100vh - 184px);
+  }
+
   [data-page='home'] &:not(.-layout-ready) {
     #SearchResultsView .tablecontainer tbody,
     #SearchResultsView #Messages,
