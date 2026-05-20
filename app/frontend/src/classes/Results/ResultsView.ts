@@ -42,6 +42,14 @@ type ColumnResizeState = {
   nextColumns: ColumnConfig[];
 };
 
+const FIXED_INITIAL_WIDTH_COLUMN_IDS = new Set([
+  'alt_frequency',
+  'alphamissense',
+  'sift',
+  'polyphen',
+]);
+const AUTO_SIZE_EXTRA_WIDTH = 4;
+
 /**
  * 検索結果テーブルビューを管理するクラス
  * - 行の描画、スクロール、タッチ操作、列管理を統合制御
@@ -79,6 +87,9 @@ export class ResultsView {
   private _boundColumnResizeMove!: (_e: PointerEvent) => void;
   private _boundColumnResizeEnd!: (_e: PointerEvent) => void;
   private _boundColumnResizeReset!: (_e: MouseEvent) => void;
+  private _boundAutoSizeResultColumns!: () => void;
+  private _autoSizedResultSignature = '';
+  private _resizedColumnIds = new Set<string>();
 
   /**
    * ResultsView のコンストラクタ
@@ -163,20 +174,15 @@ export class ResultsView {
       );
     }
 
-    this.thead.removeEventListener(
-      'pointerdown',
-      this._boundColumnResizeStart
-    );
+    this.thead.removeEventListener('pointerdown', this._boundColumnResizeStart);
     this.thead.removeEventListener('dblclick', this._boundColumnResizeReset);
-    document.removeEventListener(
-      'pointermove',
-      this._boundColumnResizeMove
-    );
+    document.removeEventListener('pointermove', this._boundColumnResizeMove);
     document.removeEventListener('pointerup', this._boundColumnResizeEnd);
     document.removeEventListener('pointercancel', this._boundColumnResizeEnd);
-    this.tbody.removeEventListener(
-      'pointerdown',
-      this._boundColumnResizeStart
+    this.tbody.removeEventListener('pointerdown', this._boundColumnResizeStart);
+    window.removeEventListener(
+      'togovar:results-rendered',
+      this._boundAutoSizeResultColumns
     );
 
     if (this._stylesheet) {
@@ -338,7 +344,10 @@ export class ResultsView {
     const hasResizeBars =
       thead.querySelectorAll('.resize-bar').length === resizeBarCount;
 
-    if (hasResizeBars && currentColumnIds.join(',') === nextColumnIds.join(',')) {
+    if (
+      hasResizeBars &&
+      currentColumnIds.join(',') === nextColumnIds.join(',')
+    ) {
       return;
     }
 
@@ -421,8 +430,8 @@ export class ResultsView {
     return 'onwheel' in document
       ? 'wheel'
       : 'onmousewheel' in document
-      ? 'mousewheel'
-      : 'DOMMouseScroll';
+        ? 'mousewheel'
+        : 'DOMMouseScroll';
   }
 
   /**
@@ -440,12 +449,18 @@ export class ResultsView {
     this._boundColumnResizeMove = this._moveColumnResize.bind(this);
     this._boundColumnResizeEnd = this._endColumnResize.bind(this);
     this._boundColumnResizeReset = this._resetColumnWidths.bind(this);
+    this._boundAutoSizeResultColumns =
+      this._autoSizeResultColumns.bind(this);
     this.thead.addEventListener('pointerdown', this._boundColumnResizeStart);
     this.tbody.addEventListener('pointerdown', this._boundColumnResizeStart);
     this.thead.addEventListener('dblclick', this._boundColumnResizeReset);
     document.addEventListener('pointermove', this._boundColumnResizeMove);
     document.addEventListener('pointerup', this._boundColumnResizeEnd);
     document.addEventListener('pointercancel', this._boundColumnResizeEnd);
+    window.addEventListener(
+      'togovar:results-rendered',
+      this._boundAutoSizeResultColumns
+    );
 
     // タッチハンドラーのスクロールコールバック設定
     this.touchHandler.setScrollCallbacks({
@@ -475,6 +490,8 @@ export class ResultsView {
 
     e.preventDefault();
     e.stopPropagation();
+
+    this._resizedColumnIds.add(columnId);
 
     const columns = normalizeColumnConfigs(storeManager.getData('columns'));
     const column = columns.find((item) => item.id === columnId);
@@ -520,6 +537,9 @@ export class ResultsView {
   private _resetColumnWidths(e: MouseEvent): void {
     if (!(e.target as HTMLElement).closest('thead')) return;
 
+    this._autoSizedResultSignature = '';
+    this._resizedColumnIds.clear();
+
     const columns = normalizeColumnConfigs(storeManager.getData('columns')).map(
       (column) => ({
         ...column,
@@ -528,6 +548,96 @@ export class ResultsView {
     );
 
     storeManager.setData('columns', columns);
+  }
+
+  private _autoSizeResultColumns(): void {
+    const resultSignature = this._getResultSignature();
+    if (
+      !resultSignature ||
+      resultSignature === this._autoSizedResultSignature
+    ) {
+      return;
+    }
+
+    const columns = normalizeColumnConfigs(storeManager.getData('columns'));
+    const nextColumns = columns.map((column) => {
+      if (
+        !column.isUsed ||
+        FIXED_INITIAL_WIDTH_COLUMN_IDS.has(column.id) ||
+        this._resizedColumnIds.has(column.id)
+      ) {
+        return column;
+      }
+
+      const contentWidth = this._measureColumnContentWidth(column.id);
+      const maxWidth = getColumnDefaultWidth(column.id);
+      const width =
+        contentWidth > 0
+          ? Math.min(maxWidth, Math.max(getMinColumnWidth(), contentWidth))
+          : getMinColumnWidth();
+
+      return { ...column, width };
+    });
+
+    this._autoSizedResultSignature = resultSignature;
+    storeManager.setData('columns', nextColumns);
+  }
+
+  private _getResultSignature(): string {
+    const results = storeManager.getData('searchResults');
+    const numberOfRecords = storeManager.getData('numberOfRecords');
+
+    if (!Array.isArray(results) || results.length === 0) {
+      return '';
+    }
+
+    const firstResult = results[0] as { id?: unknown };
+    return `${numberOfRecords}:${String(firstResult?.id || '')}`;
+  }
+
+  private _measureColumnContentWidth(columnId: string): number {
+    const cells = Array.from(
+      this.tbody.querySelectorAll<HTMLTableCellElement>(
+        `td.${columnId}:not(:empty)`
+      )
+    ).filter((cell) => cell.offsetParent !== null);
+    if (cells.length === 0) return 0;
+
+    return Math.ceil(
+      Math.max(
+        ...cells.map((cell) => {
+          const content = this._getMeasureTarget(cell, columnId);
+          if (!content || !content.textContent?.trim()) return 0;
+
+          const style = window.getComputedStyle(cell);
+          const horizontalPadding =
+            parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+
+          const range = document.createRange();
+          range.selectNodeContents(content);
+          const textWidth = range.getBoundingClientRect().width;
+          range.detach();
+
+          return textWidth + horizontalPadding + AUTO_SIZE_EXTRA_WIDTH;
+        })
+      )
+    );
+  }
+
+  private _getMeasureTarget(
+    cell: HTMLTableCellElement,
+    columnId: string
+  ): HTMLElement {
+    const selectorByColumn: Record<string, string> = {
+      position: '.chromosome-position',
+      consequence: '.consequence-item',
+      clinical_significance: '.hyper-text',
+      alphamissense: '.variant-function',
+      sift: '.variant-function',
+      polyphen: '.variant-function',
+    };
+
+    return cell.querySelector<HTMLElement>(selectorByColumn[columnId]) || cell;
   }
 
   /**
