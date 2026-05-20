@@ -10,16 +10,21 @@ export const COLUMNS = [
   { label: 'Ref / Alt', id: 'ref_alt', defaultWidth: 104 },
   { label: 'Type', id: 'type', defaultWidth: 96 },
   { label: 'Gene', id: 'gene', defaultWidth: 116 },
-  { label: 'Alt frequency', id: 'alt_frequency', defaultWidth: 236 },
+  {
+    label: 'Alt frequency',
+    id: 'alt_frequency',
+    defaultWidth: 120,
+    resizable: false,
+  },
   { label: 'Consequence', id: 'consequence', defaultWidth: 176 },
   {
     label: 'Clinical significance',
     id: 'clinical_significance',
     defaultWidth: 276,
   },
-  { label: 'AlphaMissense', id: 'alphamissense', defaultWidth: 126 },
-  { label: 'SIFT', id: 'sift', defaultWidth: 88 },
-  { label: 'PolyPhen', id: 'polyphen', defaultWidth: 98 },
+  { label: 'AlphaMissense', id: 'alphamissense', defaultWidth: 71 },
+  { label: 'SIFT', id: 'sift', defaultWidth: 57 },
+  { label: 'PolyPhen', id: 'polyphen', defaultWidth: 70 },
 ];
 
 /** 列 ID から列定義オブジェクトへの高速マップ */
@@ -161,4 +166,8 @@ export function getColumnDefaultWidth(columnId: string): number {
 
 export function getMinColumnWidth(): number {
   return MIN_COLUMN_WIDTH;
+}
+
+export function isColumnResizable(columnId: string): boolean {
+  return COLUMN_MAP.get(columnId)?.resizable !== false;
 }

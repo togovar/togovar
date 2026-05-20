@@ -3,6 +3,7 @@ import {
   getColumnDefaultWidth,
   getMinColumnWidth,
   getOrderedColumns,
+  isColumnResizable,
   normalizeColumnConfigs,
 } from '../../columns';
 import { ResultsScrollBar } from './ResultsScrollBar';
@@ -331,8 +332,11 @@ export class ResultsView {
         orderedColumns.find((column) => th.classList.contains(column.id))?.id
     );
     const nextColumnIds = orderedColumns.map((column) => column.id);
+    const resizeBarCount = orderedColumns.filter(
+      (column) => column.resizable !== false
+    ).length;
     const hasResizeBars =
-      thead.querySelectorAll('.resize-bar').length === orderedColumns.length;
+      thead.querySelectorAll('.resize-bar').length === resizeBarCount;
 
     if (hasResizeBars && currentColumnIds.join(',') === nextColumnIds.join(',')) {
       return;
@@ -343,7 +347,9 @@ export class ResultsView {
         (column) =>
           `<th class="${column.id}" data-column-id="${column.id}">` +
           `<span data-tooltip-id="table-header-${column.id}">${column.label}</span>` +
-          '<div class="resize-bar" aria-hidden="true"></div>' +
+          (column.resizable === false
+            ? ''
+            : '<div class="resize-bar" aria-hidden="true"></div>') +
           '</th>'
       )
       .join('')}</tr>`;
@@ -465,6 +471,7 @@ export class ResultsView {
     const cell = resizeBar.closest<HTMLTableCellElement>('th, td');
     const columnId = resizeBar.dataset.columnId || cell?.dataset.columnId;
     if (!cell || !columnId) return;
+    if (!isColumnResizable(columnId)) return;
 
     e.preventDefault();
     e.stopPropagation();

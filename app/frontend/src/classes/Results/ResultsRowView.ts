@@ -238,7 +238,10 @@ export class ResultsRowView {
   private _createTableCellHTML(columns: Column[]): string {
     return columns
       .map((column) => {
-        const resizeBar = `<div class="resize-bar" data-column-id="${column.id}" aria-hidden="true"></div>`;
+        const resizeBar =
+          column.resizable === false
+            ? ''
+            : `<div class="resize-bar" data-column-id="${column.id}" aria-hidden="true"></div>`;
 
         if (column.id === 'alt_frequency') {
           return this._appendResizeBar(createFrequencyColumnHTML(), resizeBar);

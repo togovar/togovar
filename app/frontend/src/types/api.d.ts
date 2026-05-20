@@ -77,6 +77,7 @@ export type Column = {
   id: string;
   label: string;
   defaultWidth: number;
+  resizable?: boolean;
 };
 
 // ============================================
