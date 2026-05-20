@@ -6,8 +6,12 @@ append variables
 
 block head
   link(href="/togovar.jsonld" rel="alternate" type="application/ld+json")
-  each css in htmlWebpackPlugin.files.css.filter(x => x.match(/^\/css\/main-/))
-    link(href=css, rel="stylesheet")
+  - var mainCssFiles = htmlWebpackPlugin.files.css.filter(x => x.match(/^\/css\/main-/))
+  each css in mainCssFiles
+    link(rel="preload" href=css as="style" onload="this.onload=null;this.rel='stylesheet'")
+  noscript
+    each css in mainCssFiles
+      link(href=css, rel="stylesheet")
   each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/main-/))
     script(type="text/javascript", src=js, defer)
 

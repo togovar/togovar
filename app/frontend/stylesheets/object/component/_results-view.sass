@@ -15,7 +15,9 @@
         &.type
           display: none
         &.ref_alt
-          min-width: 112px
+          width: 96px
+        &.consequence
+          width: 160px
         > span
           position: absolute
           display: inline-block
@@ -54,7 +56,11 @@
         padding: 2px 10px 2px 6px
         transition: background $GUI_DURATION
         &.ref_alt
-          min-width: 112px
+          min-width: 96px
+        &.consequence
+          width: 160px
+          max-width: 160px
+          overflow: hidden
         &[data-remains]:after
           content: "+" attr(data-remains)
           display: inline-block
