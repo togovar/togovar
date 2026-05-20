@@ -29,7 +29,7 @@
     position: relative;
     top: -20px;
     height: 20px;
-    transition: 0.3s;
+    transition: background-color 0.16s ease;
     cursor: pointer;
 
     > .list {
@@ -45,7 +45,7 @@
           display: block;
           text-decoration: none;
           padding-right: 5px;
-          transition: 0.3s;
+          transition: background-color 0.16s ease;
 
           &::before {
             content: var(--icon-check);
