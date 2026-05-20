@@ -23,7 +23,7 @@ html {
 
 body {
   font-size: 10px;
-  font-family: 'Roboto Condensed', sans-serif;
+  font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
   color: $COLOR_BLACK;
   // height: 100%
   padding-top: $HEIGHT_GLOBAL_MENU + $HEIGHT_NBDC_COMMON_HEADER !important;
@@ -120,7 +120,7 @@ select {
 ::placeholder,
 *::part(input-field)::placeholder {
   color: $COLOR_GRAY;
-  font-family: 'Roboto Condensed', sans-serif;
+  font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
 }
 
 .unimplemented {
