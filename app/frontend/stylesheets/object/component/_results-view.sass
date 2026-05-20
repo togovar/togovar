@@ -14,11 +14,6 @@
         position: relative
         &.type
           display: none
-        &.ref_alt
-          width: 96px
-        &.consequence
-          width: 160px
-          min-width: 160px
         > span
           position: absolute
           display: inline-block
@@ -29,6 +24,16 @@
           font-size: 12px
           line-height: 1
           white-space: nowrap
+        > .resize-bar
+          cursor: col-resize
+          user-select: none
+          display: block
+          height: 100%
+          position: absolute
+          right: -4px
+          top: 0
+          width: 8px
+          z-index: 1
         &.separator
           border-bottom: solid 2px white
           &:before
@@ -53,15 +58,32 @@
       transition: background $GUI_DURATION
       height: 27px
       > td
+        position: relative
         min-width: 2em
         padding: 2px 10px 2px 6px
+        overflow: hidden
+        text-overflow: ellipsis
         transition: background $GUI_DURATION
-        &.ref_alt
-          min-width: 96px
-        &.consequence
-          width: 160px
-          min-width: 160px
-          overflow: hidden
+        > .resize-bar
+          cursor: col-resize
+          user-select: none
+          display: block
+          height: 100%
+          position: absolute
+          right: -4px
+          top: 0
+          width: 8px
+          z-index: 1
+        &.clinical_significance
+          > .clinical-significance
+            max-width: calc(100% - 54px)
+            overflow: hidden
+            text-overflow: ellipsis
+            vertical-align: middle
+          > .hyper-text
+            max-width: calc(100% - 70px)
+          > .icon
+            white-space: nowrap
         &[data-remains]:after
           content: "+" attr(data-remains)
           display: inline-block
@@ -115,6 +137,15 @@
         > .consequence-item, > .dataset-icon, > .clinical-significance, > .variant-function
           display: inline-block
           vertical-align: middle
+          max-width: 100%
+          overflow: hidden
+          text-overflow: ellipsis
+        > .hyper-text
+          display: inline-block
+          max-width: 100%
+          overflow: hidden
+          text-overflow: ellipsis
+          vertical-align: middle
         &:last-child
           padding-right: 6px
 
@@ -128,3 +159,7 @@
           background-size: 30px 10px
       &.-out-of-range
         display: none
+
+body[data-column-resizing="true"]
+  cursor: col-resize
+  user-select: none

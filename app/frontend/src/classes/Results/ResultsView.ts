@@ -1,5 +1,10 @@
 import { storeManager } from '../../store/StoreManager';
-import { getOrderedColumns } from '../../columns';
+import {
+  getColumnDefaultWidth,
+  getMinColumnWidth,
+  getOrderedColumns,
+  normalizeColumnConfigs,
+} from '../../columns';
 import { ResultsScrollBar } from './ResultsScrollBar';
 import { ResultsColumnsDropdown } from './ResultsColumnsDropdown';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
@@ -28,6 +33,13 @@ const STORE_BINDINGS = [
   'karyotype',
   'searchMessages',
 ] as const;
+
+type ColumnResizeState = {
+  columnId: string;
+  startX: number;
+  startWidth: number;
+  nextColumns: ColumnConfig[];
+};
 
 /**
  * 検索結果テーブルビューを管理するクラス
@@ -61,6 +73,11 @@ export class ResultsView {
   private _boundSearchModeHandler!: (_newMode: unknown) => void;
   /** 動的に作成した列表示制御用スタイル要素 */
   private _stylesheet!: HTMLStyleElement;
+  private _resizeState: ColumnResizeState | null = null;
+  private _boundColumnResizeStart!: (_e: PointerEvent) => void;
+  private _boundColumnResizeMove!: (_e: PointerEvent) => void;
+  private _boundColumnResizeEnd!: (_e: PointerEvent) => void;
+  private _boundColumnResizeReset!: (_e: MouseEvent) => void;
 
   /**
    * ResultsView のコンストラクタ
@@ -144,6 +161,22 @@ export class ResultsView {
         this._boundWheelHandler
       );
     }
+
+    this.thead.removeEventListener(
+      'pointerdown',
+      this._boundColumnResizeStart
+    );
+    this.thead.removeEventListener('dblclick', this._boundColumnResizeReset);
+    document.removeEventListener(
+      'pointermove',
+      this._boundColumnResizeMove
+    );
+    document.removeEventListener('pointerup', this._boundColumnResizeEnd);
+    document.removeEventListener('pointercancel', this._boundColumnResizeEnd);
+    this.tbody.removeEventListener(
+      'pointerdown',
+      this._boundColumnResizeStart
+    );
 
     if (this._stylesheet) {
       this._stylesheet.remove();
@@ -298,15 +331,20 @@ export class ResultsView {
         orderedColumns.find((column) => th.classList.contains(column.id))?.id
     );
     const nextColumnIds = orderedColumns.map((column) => column.id);
+    const hasResizeBars =
+      thead.querySelectorAll('.resize-bar').length === orderedColumns.length;
 
-    if (currentColumnIds.join(',') === nextColumnIds.join(',')) {
+    if (hasResizeBars && currentColumnIds.join(',') === nextColumnIds.join(',')) {
       return;
     }
 
     thead.innerHTML = `<tr>${orderedColumns
       .map(
         (column) =>
-          `<th class="${column.id}"><span data-tooltip-id="table-header-${column.id}">${column.label}</span></th>`
+          `<th class="${column.id}" data-column-id="${column.id}">` +
+          `<span data-tooltip-id="table-header-${column.id}">${column.label}</span>` +
+          '<div class="resize-bar" aria-hidden="true"></div>' +
+          '</th>'
       )
       .join('')}</tr>`;
   }
@@ -392,6 +430,16 @@ export class ResultsView {
     this._wheelEventName = this.getWheelEventName();
     this._boundWheelHandler = this._scroll.bind(this) as EventListener;
     this.tbody.addEventListener(this._wheelEventName, this._boundWheelHandler);
+    this._boundColumnResizeStart = this._startColumnResize.bind(this);
+    this._boundColumnResizeMove = this._moveColumnResize.bind(this);
+    this._boundColumnResizeEnd = this._endColumnResize.bind(this);
+    this._boundColumnResizeReset = this._resetColumnWidths.bind(this);
+    this.thead.addEventListener('pointerdown', this._boundColumnResizeStart);
+    this.tbody.addEventListener('pointerdown', this._boundColumnResizeStart);
+    this.thead.addEventListener('dblclick', this._boundColumnResizeReset);
+    document.addEventListener('pointermove', this._boundColumnResizeMove);
+    document.addEventListener('pointerup', this._boundColumnResizeEnd);
+    document.addEventListener('pointercancel', this._boundColumnResizeEnd);
 
     // タッチハンドラーのスクロールコールバック設定
     this.touchHandler.setScrollCallbacks({
@@ -406,6 +454,73 @@ export class ResultsView {
         this.scrollBar.setInactive();
       },
     });
+  }
+
+  private _startColumnResize(e: PointerEvent): void {
+    const resizeBar = (e.target as HTMLElement).closest<HTMLElement>(
+      '.resize-bar'
+    );
+    if (!resizeBar) return;
+
+    const cell = resizeBar.closest<HTMLTableCellElement>('th, td');
+    const columnId = resizeBar.dataset.columnId || cell?.dataset.columnId;
+    if (!cell || !columnId) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const columns = normalizeColumnConfigs(storeManager.getData('columns'));
+    const column = columns.find((item) => item.id === columnId);
+    const startWidth =
+      column?.width || Math.round(cell.getBoundingClientRect().width);
+
+    this._resizeState = {
+      columnId,
+      startX: e.clientX,
+      startWidth,
+      nextColumns: columns,
+    };
+    document.body.dataset.columnResizing = 'true';
+  }
+
+  private _moveColumnResize(e: PointerEvent): void {
+    if (!this._resizeState) return;
+
+    e.preventDefault();
+
+    const { columnId, startX, startWidth } = this._resizeState;
+    const minWidth = getMinColumnWidth();
+    const nextWidth = Math.max(
+      minWidth,
+      Math.round(startWidth + e.clientX - startX)
+    );
+
+    this._resizeState.nextColumns = this._resizeState.nextColumns.map(
+      (column) =>
+        column.id === columnId ? { ...column, width: nextWidth } : column
+    );
+    this.dataManager.handleColumnsChange(this._resizeState.nextColumns);
+  }
+
+  private _endColumnResize(): void {
+    if (!this._resizeState) return;
+
+    storeManager.setData('columns', this._resizeState.nextColumns);
+    this._resizeState = null;
+    delete document.body.dataset.columnResizing;
+  }
+
+  private _resetColumnWidths(e: MouseEvent): void {
+    if (!(e.target as HTMLElement).closest('thead')) return;
+
+    const columns = normalizeColumnConfigs(storeManager.getData('columns')).map(
+      (column) => ({
+        ...column,
+        width: getColumnDefaultWidth(column.id),
+      })
+    );
+
+    storeManager.setData('columns', columns);
   }
 
   /**

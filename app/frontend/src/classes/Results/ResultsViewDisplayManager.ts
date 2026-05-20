@@ -237,10 +237,14 @@ export class ResultsViewDisplayManager {
 
     columns.forEach((column, index) => {
       const displayValue = column.isUsed ? 'table-cell' : 'none';
+      const width = column.width ? `${column.width}px` : 'auto';
       const rule =
         `.tablecontainer > table.results-view th.${column.id}, ` +
         `.tablecontainer > table.results-view td.${column.id} { ` +
-        `display: ${displayValue} }`;
+        `display: ${displayValue}; ` +
+        `width: ${width}; ` +
+        `min-width: ${width}; ` +
+        `max-width: ${width}; }`;
 
       sheet.insertRule(rule, index);
     });

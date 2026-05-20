@@ -1,19 +1,25 @@
 import type { Column, ColumnConfig } from './types';
 
+const MIN_COLUMN_WIDTH = 48;
+
 /** 検索結果テーブルで利用可能な全列の定義（TogoVar ID は常に先頭・固定） */
 export const COLUMNS = [
-  { label: 'TogoVar ID', id: 'togovar_id' },
-  { label: 'RefSNP ID', id: 'refsnp_id' },
-  { label: 'Position', id: 'position' },
-  { label: 'Ref / Alt', id: 'ref_alt' },
-  { label: 'Type', id: 'type' },
-  { label: 'Gene', id: 'gene' },
-  { label: 'Alt frequency', id: 'alt_frequency' },
-  { label: 'Consequence', id: 'consequence' },
-  { label: 'Clinical significance', id: 'clinical_significance' },
-  { label: 'AlphaMissense', id: 'alphamissense' },
-  { label: 'SIFT', id: 'sift' },
-  { label: 'PolyPhen', id: 'polyphen' },
+  { label: 'TogoVar ID', id: 'togovar_id', defaultWidth: 124 },
+  { label: 'RefSNP ID', id: 'refsnp_id', defaultWidth: 116 },
+  { label: 'Position', id: 'position', defaultWidth: 164 },
+  { label: 'Ref / Alt', id: 'ref_alt', defaultWidth: 104 },
+  { label: 'Type', id: 'type', defaultWidth: 96 },
+  { label: 'Gene', id: 'gene', defaultWidth: 116 },
+  { label: 'Alt frequency', id: 'alt_frequency', defaultWidth: 236 },
+  { label: 'Consequence', id: 'consequence', defaultWidth: 176 },
+  {
+    label: 'Clinical significance',
+    id: 'clinical_significance',
+    defaultWidth: 276,
+  },
+  { label: 'AlphaMissense', id: 'alphamissense', defaultWidth: 126 },
+  { label: 'SIFT', id: 'sift', defaultWidth: 88 },
+  { label: 'PolyPhen', id: 'polyphen', defaultWidth: 98 },
 ];
 
 /** 列 ID から列定義オブジェクトへの高速マップ */
@@ -32,6 +38,26 @@ function isColumnConfig(value: unknown): value is ColumnConfig {
   );
 }
 
+function getColumnOrThrow(columnId: string): Column {
+  const column = COLUMN_MAP.get(columnId);
+
+  if (!column) {
+    throw new Error(`Unknown column: ${columnId}`);
+  }
+
+  return column;
+}
+
+function normalizeColumnWidth(columnId: string, width: unknown): number {
+  const column = getColumnOrThrow(columnId);
+
+  if (typeof width !== 'number' || !Number.isFinite(width)) {
+    return column.defaultWidth;
+  }
+
+  return Math.max(MIN_COLUMN_WIDTH, Math.round(width));
+}
+
 /**
  * デフォルトの列設定配列を取得
  * - Type 列はデフォルトで非表示（isUsed: false）
@@ -42,6 +68,7 @@ export function getDefaultColumnConfigs(): ColumnConfig[] {
   return COLUMNS.map((column) => ({
     id: column.id,
     isUsed: column.id !== 'type',
+    width: column.defaultWidth,
   }));
 }
 
@@ -74,6 +101,7 @@ export function normalizeColumnConfigs(
     normalized.push({
       id: column.id,
       isUsed: column.id === LOCKED_COLUMN_ID ? true : column.isUsed,
+      width: normalizeColumnWidth(column.id, column.width),
     });
     usedIds.add(column.id);
   });
@@ -125,4 +153,12 @@ export function getOrderedColumns(
  */
 export function getColumnLabel(columnId: string): string {
   return COLUMN_MAP.get(columnId)?.label || columnId;
+}
+
+export function getColumnDefaultWidth(columnId: string): number {
+  return COLUMN_MAP.get(columnId)?.defaultWidth || 100;
+}
+
+export function getMinColumnWidth(): number {
+  return MIN_COLUMN_WIDTH;
 }

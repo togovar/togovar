@@ -238,12 +238,23 @@ export class ResultsRowView {
   private _createTableCellHTML(columns: Column[]): string {
     return columns
       .map((column) => {
+        const resizeBar = `<div class="resize-bar" data-column-id="${column.id}" aria-hidden="true"></div>`;
+
         if (column.id === 'alt_frequency') {
-          return createFrequencyColumnHTML();
+          return this._appendResizeBar(createFrequencyColumnHTML(), resizeBar);
         }
-        return (COLUMN_TEMPLATES as Record<string, string>)[column.id] || '';
+        return this._appendResizeBar(
+          (COLUMN_TEMPLATES as Record<string, string>)[column.id] || '',
+          resizeBar
+        );
       })
       .join('');
+  }
+
+  private _appendResizeBar(cellHTML: string, resizeBar: string): string {
+    if (!cellHTML) return '';
+
+    return cellHTML.replace('</td>', `${resizeBar}</td>`);
   }
 
   private _getCurrentColumns() {
