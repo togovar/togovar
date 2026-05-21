@@ -505,6 +505,9 @@ export class ResultsView {
       nextColumns: columns,
     };
     document.body.dataset.columnResizing = 'true';
+    this.thead
+      .querySelector<HTMLElement>(`th[data-column-id="${columnId}"]`)
+      ?.classList.add('-resizing');
   }
 
   private _moveColumnResize(e: PointerEvent): void {
@@ -532,6 +535,9 @@ export class ResultsView {
     storeManager.setData('columns', this._resizeState.nextColumns);
     this._resizeState = null;
     delete document.body.dataset.columnResizing;
+    this.thead
+      .querySelectorAll<HTMLElement>('th.-resizing')
+      .forEach((th) => th.classList.remove('-resizing'));
   }
 
   private _resetColumnWidths(e: MouseEvent): void {
