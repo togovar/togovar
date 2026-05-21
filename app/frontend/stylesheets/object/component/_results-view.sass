@@ -235,12 +235,3 @@
 body[data-column-resizing="true"]
   cursor: col-resize
   user-select: none
-
-// Column hover highlight — shows left/right border on full column (th + td)
-// Column border: shows a single continuous vertical line (th → td) when hovering resize-bar or during active resize
-@each $col in togovar_id, refsnp_id, position, ref_alt, type, gene, alt_frequency, consequence, clinical_significance, alphamissense, sift, polyphen
-  body:not([data-column-resizing]) .results-view:has(.#{$col} > .resize-bar:hover) > thead > tr > th.#{$col},
-  body:not([data-column-resizing]) .results-view:has(.#{$col} > .resize-bar:hover) > tbody > tr > td.#{$col},
-  .results-view:has(.#{$col} > .resize-bar.-active) > thead > tr > th.#{$col},
-  .results-view:has(.#{$col} > .resize-bar.-active) > tbody > tr > td.#{$col}
-    box-shadow: inset -2px 0 0 rgba($COLOR_KEY_DARK1, 0.5)

@@ -1,5 +1,6 @@
 import { storeManager } from '../../store/StoreManager';
 import {
+  COLUMNS,
   getInitialColumnWidth,
   getMinColumnWidth,
   getOrderedColumns,
@@ -77,13 +78,17 @@ export class ResultsView {
   private _boundSearchModeHandler!: (_newMode: unknown) => void;
   /** 動的に作成した列表示制御用スタイル要素 */
   private _stylesheet!: HTMLStyleElement;
+  private _columnBorderStylesheet!: HTMLStyleElement;
   private _resizeState: ColumnResizeState | null = null;
-  private _activeResizeBar: HTMLElement | null = null;
   private _boundColumnResizeStart!: (_e: PointerEvent) => void;
   private _boundColumnResizeMove!: (_e: PointerEvent) => void;
   private _boundColumnResizeEnd!: (_e: PointerEvent) => void;
   private _boundColumnResizeReset!: (_e: MouseEvent) => void;
   private _boundAutoSizeResultColumns!: (_event: Event) => void;
+  private _boundResizeHoverOver!: (_e: MouseEvent) => void;
+  private _boundResizeHoverLeave!: () => void;
+  private _lastPointerX = 0;
+  private _lastPointerY = 0;
   private _autoSizedResultSignature = '';
   private _resizedColumnIds = new Set<string>();
 
@@ -184,6 +189,13 @@ export class ResultsView {
     if (this._stylesheet) {
       this._stylesheet.remove();
     }
+
+    if (this._columnBorderStylesheet) {
+      this._columnBorderStylesheet.remove();
+    }
+
+    this.tablecontainer.removeEventListener('mouseover', this._boundResizeHoverOver);
+    this.tablecontainer.removeEventListener('mouseleave', this._boundResizeHoverLeave);
   }
 
   /**
@@ -450,8 +462,9 @@ export class ResultsView {
     this._boundColumnResizeMove = this._moveColumnResize.bind(this);
     this._boundColumnResizeEnd = this._endColumnResize.bind(this);
     this._boundColumnResizeReset = this._resetColumnWidths.bind(this);
-    this._boundAutoSizeResultColumns =
-      this._autoSizeResultColumns.bind(this);
+    this._boundAutoSizeResultColumns = this._autoSizeResultColumns.bind(this);
+    this._boundResizeHoverOver = this._onResizeHoverOver.bind(this);
+    this._boundResizeHoverLeave = this._onResizeHoverLeave.bind(this);
     this.thead.addEventListener('pointerdown', this._boundColumnResizeStart);
     this.tbody.addEventListener('pointerdown', this._boundColumnResizeStart);
     this.thead.addEventListener('dblclick', this._boundColumnResizeReset);
@@ -462,6 +475,9 @@ export class ResultsView {
       'togovar:results-rendered',
       this._boundAutoSizeResultColumns
     );
+    this.tablecontainer.addEventListener('mouseover', this._boundResizeHoverOver);
+    this.tablecontainer.addEventListener('mouseleave', this._boundResizeHoverLeave);
+    this._createColumnBorderStyles();
 
     // タッチハンドラーのスクロールコールバック設定
     this.touchHandler.setScrollCallbacks({
@@ -505,15 +521,18 @@ export class ResultsView {
       startWidth,
       nextColumns: columns,
     };
+    this._lastPointerX = e.clientX;
+    this._lastPointerY = e.clientY;
     document.body.dataset.columnResizing = 'true';
-    resizeBar.classList.add('-active');
-    this._activeResizeBar = resizeBar;
+    this.tablecontainer.dataset.resizeHover = columnId;
   }
 
   private _moveColumnResize(e: PointerEvent): void {
     if (!this._resizeState) return;
 
     e.preventDefault();
+    this._lastPointerX = e.clientX;
+    this._lastPointerY = e.clientY;
 
     const { columnId, startX, startWidth } = this._resizeState;
     const minWidth = getMinColumnWidth();
@@ -535,8 +554,54 @@ export class ResultsView {
     storeManager.setData('columns', this._resizeState.nextColumns);
     this._resizeState = null;
     delete document.body.dataset.columnResizing;
-    this._activeResizeBar?.classList.remove('-active');
-    this._activeResizeBar = null;
+
+    const x = this._lastPointerX;
+    const y = this._lastPointerY;
+    requestAnimationFrame(() => {
+      if (!document.elementFromPoint(x, y)?.closest('.resize-bar')) {
+        delete this.tablecontainer.dataset.resizeHover;
+      }
+    });
+  }
+
+  private _onResizeHoverOver(e: MouseEvent): void {
+    if (this._resizeState) return;
+    const resizeBar = (e.target as HTMLElement).closest<HTMLElement>('.resize-bar');
+    if (!resizeBar) {
+      delete this.tablecontainer.dataset.resizeHover;
+      return;
+    }
+    const cell = resizeBar.closest<HTMLElement>('th[data-column-id]');
+    const columnId = cell
+      ? cell.dataset.columnId
+      : (() => {
+          const td = resizeBar.closest<HTMLTableCellElement>('td');
+          if (!td) return undefined;
+          return this.thead.querySelectorAll<HTMLElement>('th')[td.cellIndex]
+            ?.dataset.columnId;
+        })();
+    if (columnId) {
+      this.tablecontainer.dataset.resizeHover = columnId;
+    }
+  }
+
+  private _onResizeHoverLeave(): void {
+    if (!this._resizeState) {
+      delete this.tablecontainer.dataset.resizeHover;
+    }
+  }
+
+  private _createColumnBorderStyles(): void {
+    this._columnBorderStylesheet = document.createElement('style');
+    document.head.appendChild(this._columnBorderStylesheet);
+    const sheet = this._columnBorderStylesheet.sheet;
+    if (!sheet) return;
+    COLUMNS.forEach((column) => {
+      const base = `.tablecontainer[data-resize-hover="${column.id}"] .results-view`;
+      sheet.insertRule(
+        `${base} th.${column.id}, ${base} td.${column.id} { box-shadow: inset -2px 0 0 rgba(17,127,147,0.5); }`
+      );
+    });
   }
 
   private _resetColumnWidths(e: MouseEvent): void {
@@ -703,13 +768,11 @@ export class ResultsView {
       measuringCell.appendChild(content.cloneNode(true));
     }
 
-    measuringCell
-      .querySelectorAll<HTMLElement>('*')
-      .forEach((element) => {
-        element.style.maxWidth = 'none';
-        element.style.overflow = 'visible';
-        element.style.textOverflow = 'clip';
-      });
+    measuringCell.querySelectorAll<HTMLElement>('*').forEach((element) => {
+      element.style.maxWidth = 'none';
+      element.style.overflow = 'visible';
+      element.style.textOverflow = 'clip';
+    });
 
     row.appendChild(measuringCell);
     tbody.appendChild(row);
