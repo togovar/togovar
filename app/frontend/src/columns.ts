@@ -28,9 +28,14 @@ export const COLUMNS = [
     id: 'clinical_significance',
     defaultWidth: 276,
   },
-  { label: 'AlphaMissense', id: 'alphamissense', defaultWidth: 71 },
-  { label: 'SIFT', id: 'sift', defaultWidth: 57 },
-  { label: 'PolyPhen', id: 'polyphen', defaultWidth: 70 },
+  {
+    label: 'AlphaMissense',
+    id: 'alphamissense',
+    defaultWidth: 71,
+    resizable: false,
+  },
+  { label: 'SIFT', id: 'sift', defaultWidth: 57, resizable: false },
+  { label: 'PolyPhen', id: 'polyphen', defaultWidth: 70, resizable: false },
 ];
 
 /** 列 ID から列定義オブジェクトへの高速マップ */

@@ -6,7 +6,11 @@ import {
   setAdvancedSearchCondition,
 } from '../store/searchManager';
 import { executeSearch } from '../api/fetchData';
-import { getDefaultColumnConfigs, normalizeColumnConfigs } from '../columns';
+import {
+  getDefaultColumnConfigs,
+  getInitialColumnWidth,
+  normalizeColumnConfigs,
+} from '../columns';
 import type { StoreState, ResultData, SearchMode } from '../types';
 
 const COLUMNS_STORAGE_KEY = 'columns';
@@ -150,6 +154,16 @@ class StoreManager {
       }
       this.publish(key);
     }
+  }
+
+  /** 列幅を初期値にリセット（isUsed は維持） */
+  resetColumnWidths() {
+    const resetColumns = this.#state.columns.map((column) => ({
+      id: column.id,
+      isUsed: column.isUsed,
+      width: getInitialColumnWidth(column.id),
+    }));
+    this.setData('columns', resetColumns);
   }
 
   /** 変更監視を追加する

@@ -107,6 +107,7 @@ function _resetSearchResults() {
   storeManager.setData('rowCount', 0);
   storeManager.setData('isFetching', false);
   storeManager.setData('searchResults', []);
+  storeManager.resetColumnWidths();
   lastRequestRanges.clear(); // データリセット時にクリア
 }
 
