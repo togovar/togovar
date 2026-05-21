@@ -78,6 +78,7 @@ export class ResultsView {
   /** 動的に作成した列表示制御用スタイル要素 */
   private _stylesheet!: HTMLStyleElement;
   private _resizeState: ColumnResizeState | null = null;
+  private _activeResizeBar: HTMLElement | null = null;
   private _boundColumnResizeStart!: (_e: PointerEvent) => void;
   private _boundColumnResizeMove!: (_e: PointerEvent) => void;
   private _boundColumnResizeEnd!: (_e: PointerEvent) => void;
@@ -505,9 +506,8 @@ export class ResultsView {
       nextColumns: columns,
     };
     document.body.dataset.columnResizing = 'true';
-    this.thead
-      .querySelector<HTMLElement>(`th[data-column-id="${columnId}"]`)
-      ?.classList.add('-resizing');
+    resizeBar.classList.add('-active');
+    this._activeResizeBar = resizeBar;
   }
 
   private _moveColumnResize(e: PointerEvent): void {
@@ -535,9 +535,8 @@ export class ResultsView {
     storeManager.setData('columns', this._resizeState.nextColumns);
     this._resizeState = null;
     delete document.body.dataset.columnResizing;
-    this.thead
-      .querySelectorAll<HTMLElement>('th.-resizing')
-      .forEach((th) => th.classList.remove('-resizing'));
+    this._activeResizeBar?.classList.remove('-active');
+    this._activeResizeBar = null;
   }
 
   private _resetColumnWidths(e: MouseEvent): void {
