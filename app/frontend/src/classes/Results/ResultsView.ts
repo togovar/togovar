@@ -582,7 +582,7 @@ export class ResultsView {
 
       const contentWidth = this._measureColumnContentWidth(column.id);
       if (contentWidth <= 0) {
-        return column;
+        return { ...column, width: getMinColumnWidth() };
       }
 
       const width = Math.max(getMinColumnWidth(), contentWidth);
