@@ -1,6 +1,12 @@
 import type { Column, ColumnConfig } from './types';
 
 const MIN_COLUMN_WIDTH = 48;
+const FIXED_INITIAL_WIDTH_COLUMN_IDS = new Set([
+  'alt_frequency',
+  'alphamissense',
+  'sift',
+  'polyphen',
+]);
 
 /** 検索結果テーブルで利用可能な全列の定義（TogoVar ID は常に先頭・固定） */
 export const COLUMNS = [
@@ -53,14 +59,23 @@ function getColumnOrThrow(columnId: string): Column {
   return column;
 }
 
-function normalizeColumnWidth(columnId: string, width: unknown): number {
-  const column = getColumnOrThrow(columnId);
-
+function normalizeColumnWidth(
+  columnId: string,
+  width: unknown
+): number | undefined {
   if (typeof width !== 'number' || !Number.isFinite(width)) {
-    return column.defaultWidth;
+    return getInitialColumnWidth(columnId);
   }
 
   return Math.max(MIN_COLUMN_WIDTH, Math.round(width));
+}
+
+export function getInitialColumnWidth(columnId: string): number | undefined {
+  if (!FIXED_INITIAL_WIDTH_COLUMN_IDS.has(columnId)) {
+    return undefined;
+  }
+
+  return getColumnOrThrow(columnId).defaultWidth;
 }
 
 /**
@@ -73,7 +88,7 @@ export function getDefaultColumnConfigs(): ColumnConfig[] {
   return COLUMNS.map((column) => ({
     id: column.id,
     isUsed: column.id !== 'type',
-    width: column.defaultWidth,
+    width: getInitialColumnWidth(column.id),
   }));
 }
 
@@ -170,4 +185,8 @@ export function getMinColumnWidth(): number {
 
 export function isColumnResizable(columnId: string): boolean {
   return COLUMN_MAP.get(columnId)?.resizable !== false;
+}
+
+export function usesInitialColumnWidth(columnId: string): boolean {
+  return FIXED_INITIAL_WIDTH_COLUMN_IDS.has(columnId);
 }

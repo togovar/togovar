@@ -1,10 +1,11 @@
 import { storeManager } from '../../store/StoreManager';
 import {
-  getColumnDefaultWidth,
+  getInitialColumnWidth,
   getMinColumnWidth,
   getOrderedColumns,
   isColumnResizable,
   normalizeColumnConfigs,
+  usesInitialColumnWidth,
 } from '../../columns';
 import { ResultsScrollBar } from './ResultsScrollBar';
 import { ResultsColumnsDropdown } from './ResultsColumnsDropdown';
@@ -42,12 +43,6 @@ type ColumnResizeState = {
   nextColumns: ColumnConfig[];
 };
 
-const FIXED_INITIAL_WIDTH_COLUMN_IDS = new Set([
-  'alt_frequency',
-  'alphamissense',
-  'sift',
-  'polyphen',
-]);
 const AUTO_SIZE_EXTRA_WIDTH = 4;
 
 /**
@@ -87,7 +82,7 @@ export class ResultsView {
   private _boundColumnResizeMove!: (_e: PointerEvent) => void;
   private _boundColumnResizeEnd!: (_e: PointerEvent) => void;
   private _boundColumnResizeReset!: (_e: MouseEvent) => void;
-  private _boundAutoSizeResultColumns!: () => void;
+  private _boundAutoSizeResultColumns!: (_event: Event) => void;
   private _autoSizedResultSignature = '';
   private _resizedColumnIds = new Set<string>();
 
@@ -228,6 +223,11 @@ export class ResultsView {
    * @param _results 検索結果（_prefix は使用しないことを示す）
    */
   searchResults(_results: unknown): void {
+    const results = storeManager.getData('searchResults');
+    if (!Array.isArray(results) || results.length === 0) {
+      this._autoSizedResultSignature = '';
+    }
+
     this.dataManager.handleSearchResults(
       _results,
       isTouchDevice(),
@@ -543,14 +543,25 @@ export class ResultsView {
     const columns = normalizeColumnConfigs(storeManager.getData('columns')).map(
       (column) => ({
         ...column,
-        width: getColumnDefaultWidth(column.id),
+        width: getInitialColumnWidth(column.id),
       })
     );
 
     storeManager.setData('columns', columns);
   }
 
-  private _autoSizeResultColumns(): void {
+  private _autoSizeResultColumns(event?: Event): void {
+    if (
+      event instanceof CustomEvent &&
+      event.detail?.reason !== 'searchResults'
+    ) {
+      return;
+    }
+
+    if (storeManager.getData('offset') !== 0) {
+      return;
+    }
+
     const resultSignature = this._getResultSignature();
     if (
       !resultSignature ||
@@ -563,18 +574,18 @@ export class ResultsView {
     const nextColumns = columns.map((column) => {
       if (
         !column.isUsed ||
-        FIXED_INITIAL_WIDTH_COLUMN_IDS.has(column.id) ||
+        usesInitialColumnWidth(column.id) ||
         this._resizedColumnIds.has(column.id)
       ) {
         return column;
       }
 
       const contentWidth = this._measureColumnContentWidth(column.id);
-      const maxWidth = getColumnDefaultWidth(column.id);
-      const width =
-        contentWidth > 0
-          ? Math.min(maxWidth, Math.max(getMinColumnWidth(), contentWidth))
-          : getMinColumnWidth();
+      if (contentWidth <= 0) {
+        return column;
+      }
+
+      const width = Math.max(getMinColumnWidth(), contentWidth);
 
       return { ...column, width };
     });
@@ -613,15 +624,59 @@ export class ResultsView {
           const horizontalPadding =
             parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
 
-          const range = document.createRange();
-          range.selectNodeContents(content);
-          const textWidth = range.getBoundingClientRect().width;
-          range.detach();
-
-          return textWidth + horizontalPadding + AUTO_SIZE_EXTRA_WIDTH;
+          return (
+            this._measureContentBoxWidth(cell, content) +
+            horizontalPadding +
+            AUTO_SIZE_EXTRA_WIDTH
+          );
         })
       )
     );
+  }
+
+  private _measureContentBoxWidth(
+    cell: HTMLTableCellElement,
+    content: HTMLElement
+  ): number {
+    const rangeWidth = this._measureRangeWidth(cell, content);
+    if (content === cell) {
+      return rangeWidth;
+    }
+
+    return Math.max(
+      rangeWidth,
+      content.scrollWidth,
+      content.getBoundingClientRect().width
+    );
+  }
+
+  private _measureRangeWidth(
+    cell: HTMLTableCellElement,
+    content: HTMLElement
+  ): number {
+    const range = document.createRange();
+
+    if (content === cell) {
+      const contentNodes = Array.from(cell.childNodes).filter((node) => {
+        return !(
+          node instanceof HTMLElement && node.classList.contains('resize-bar')
+        );
+      });
+
+      if (contentNodes.length === 0) {
+        range.detach();
+        return 0;
+      }
+
+      range.setStartBefore(contentNodes[0]);
+      range.setEndAfter(contentNodes[contentNodes.length - 1]);
+    } else {
+      range.selectNodeContents(content);
+    }
+
+    const width = range.getBoundingClientRect().width;
+    range.detach();
+    return width;
   }
 
   private _getMeasureTarget(
@@ -629,6 +684,7 @@ export class ResultsView {
     columnId: string
   ): HTMLElement {
     const selectorByColumn: Record<string, string> = {
+      ref_alt: '.ref-alt',
       position: '.chromosome-position',
       consequence: '.consequence-item',
       clinical_significance: '.hyper-text',

@@ -4,6 +4,7 @@ import { TR_HEIGHT, COMMON_FOOTER_HEIGHT } from '../../global';
 import type { ColumnConfig, DisplaySizeCalculation } from '../../types';
 
 const DISPLAY_CALCULATION_MARGIN = 2;
+type ResultsRenderReason = 'layout' | 'searchResults';
 
 export class ResultsViewDisplayManager {
   private _rows: ResultsRowView[] = []; // Array of result row view instances
@@ -27,7 +28,8 @@ export class ResultsViewDisplayManager {
    */
   updateDisplaySize(
     isTouchDevice: boolean,
-    setTouchElementsPointerEvents: (_enabled: boolean) => void
+    setTouchElementsPointerEvents: (_enabled: boolean) => void,
+    renderReason: ResultsRenderReason = 'layout'
   ): void {
     if (this._shouldSkipUpdate()) {
       return;
@@ -36,7 +38,11 @@ export class ResultsViewDisplayManager {
     const calculation = this._calculateDisplaySize();
     this._ensureRowsExist(calculation.rowCount);
     this._adjustOffset(calculation);
-    this._updateRowsWithAnimation(isTouchDevice, setTouchElementsPointerEvents);
+    this._updateRowsWithAnimation(
+      isTouchDevice,
+      setTouchElementsPointerEvents,
+      renderReason
+    );
   }
 
   /**
@@ -66,7 +72,11 @@ export class ResultsViewDisplayManager {
       return;
     }
 
-    this.updateDisplaySize(isTouchDevice, setTouchElementsPointerEvents);
+    this.updateDisplaySize(
+      isTouchDevice,
+      setTouchElementsPointerEvents,
+      'searchResults'
+    );
   }
 
   /**
@@ -185,7 +195,8 @@ export class ResultsViewDisplayManager {
    */
   private _updateRowsWithAnimation(
     isTouchDevice: boolean,
-    setTouchElementsPointerEvents: (_enabled: boolean) => void
+    setTouchElementsPointerEvents: (_enabled: boolean) => void,
+    renderReason: ResultsRenderReason
   ): void {
     requestAnimationFrame(() => {
       this._rows.forEach((row) => row.updateTableRow());
@@ -194,7 +205,11 @@ export class ResultsViewDisplayManager {
         setTouchElementsPointerEvents(false);
       }
 
-      window.dispatchEvent(new CustomEvent('togovar:results-rendered'));
+      window.dispatchEvent(
+        new CustomEvent('togovar:results-rendered', {
+          detail: { reason: renderReason },
+        })
+      );
     });
   }
 
@@ -237,14 +252,18 @@ export class ResultsViewDisplayManager {
 
     columns.forEach((column, index) => {
       const displayValue = column.isUsed ? 'table-cell' : 'none';
-      const width = column.width ? `${column.width}px` : 'auto';
+      const widthStyles =
+        typeof column.width === 'number'
+          ? `width: ${column.width}px; ` +
+            `min-width: ${column.width}px; ` +
+            `max-width: ${column.width}px; `
+          : '';
       const rule =
         `.tablecontainer > table.results-view th.${column.id}, ` +
         `.tablecontainer > table.results-view td.${column.id} { ` +
         `display: ${displayValue}; ` +
-        `width: ${width}; ` +
-        `min-width: ${width}; ` +
-        `max-width: ${width}; }`;
+        widthStyles +
+        '}';
 
       sheet.insertRule(rule, index);
     });
