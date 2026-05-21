@@ -194,8 +194,14 @@ export class ResultsView {
       this._columnBorderStylesheet.remove();
     }
 
-    this.tablecontainer.removeEventListener('mouseover', this._boundResizeHoverOver);
-    this.tablecontainer.removeEventListener('mouseleave', this._boundResizeHoverLeave);
+    this.tablecontainer.removeEventListener(
+      'mouseover',
+      this._boundResizeHoverOver
+    );
+    this.tablecontainer.removeEventListener(
+      'mouseleave',
+      this._boundResizeHoverLeave
+    );
   }
 
   /**
@@ -475,8 +481,14 @@ export class ResultsView {
       'togovar:results-rendered',
       this._boundAutoSizeResultColumns
     );
-    this.tablecontainer.addEventListener('mouseover', this._boundResizeHoverOver);
-    this.tablecontainer.addEventListener('mouseleave', this._boundResizeHoverLeave);
+    this.tablecontainer.addEventListener(
+      'mouseover',
+      this._boundResizeHoverOver
+    );
+    this.tablecontainer.addEventListener(
+      'mouseleave',
+      this._boundResizeHoverLeave
+    );
     this._createColumnBorderStyles();
 
     // タッチハンドラーのスクロールコールバック設定
@@ -566,7 +578,9 @@ export class ResultsView {
 
   private _onResizeHoverOver(e: MouseEvent): void {
     if (this._resizeState) return;
-    const resizeBar = (e.target as HTMLElement).closest<HTMLElement>('.resize-bar');
+    const resizeBar = (e.target as HTMLElement).closest<HTMLElement>(
+      '.resize-bar'
+    );
     if (!resizeBar) {
       delete this.tablecontainer.dataset.resizeHover;
       return;

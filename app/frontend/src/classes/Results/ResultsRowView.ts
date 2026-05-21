@@ -341,7 +341,9 @@ export class ResultsRowView {
     // Clinical significance
     const tdClinical =
       this.tr.querySelector<HTMLTableCellElement>('td.clinical_significance');
-    this.clinicalCell = tdClinical;
+    const clinicalFlex =
+      tdClinical?.querySelector<HTMLElement>('.clinical-significance-flex') || null;
+    this.clinicalCell = clinicalFlex as HTMLTableCellElement | null;
     this.clinicalSignificance =
       tdClinical?.querySelector('.clinical-significance') || null;
     this.clinicalRemains =

@@ -76,57 +76,63 @@
           width: 8px
           z-index: 1
         &.clinical_significance
-          display: flex
-          align-items: center
-          gap: 3px
-          > .clinical-significance
-            order: 0
-            flex: 0 0 auto
-            max-width: none
+          > .clinical-significance-flex
+            display: flex
+            align-items: center
+            gap: 3px
+            height: 100%
             overflow: hidden
-            text-overflow: ellipsis
-            vertical-align: middle
-          > .hyper-text
-            order: 1
-            flex: 0 1 auto
-            min-width: 0
-            display: inline-block
-            max-width: none
-            overflow: hidden
-            text-overflow: ellipsis
-            white-space: nowrap
-          > .clinical-remains
-            order: 2
-            flex: 0 0 auto
-            display: inline-block
-            overflow: visible
-            text-overflow: clip
-            white-space: nowrap
-            vertical-align: middle
-            font-size: 10px
-            line-height: 14px
-            border: solid 1px $COLOR_GRAY
-            border-radius: 7px
-            background-color: color.adjust($COLOR_GRAY, $lightness: 35%)
-            padding: 0 4px
-            margin-left: 4px
-            &[data-remains="0"], &[data-remains=""]
-              display: none
-            &.-truncated
-              font-size: inherit
-              line-height: inherit
-              border: none
-              border-radius: 0
-              background: transparent
-              padding: 0
-          > .icon
-            order: 3
-            flex: 0 0 auto
-            display: inline-block
-            vertical-align: middle
-            &[data-mgend="true"]::after
-              margin-left: 0
-              top: 0
+            > .clinical-significance
+              flex: 0 0 auto
+              max-width: none
+              overflow: hidden
+              text-overflow: ellipsis
+              vertical-align: middle
+            > .hyper-text
+              flex: 0 1 auto
+              min-width: 0
+              display: inline-block
+              max-width: none
+              overflow: hidden
+              text-overflow: ellipsis
+              white-space: nowrap
+            > .clinical-remains
+              flex: 0 0 auto
+              display: inline-block
+              overflow: visible
+              text-overflow: clip
+              white-space: nowrap
+              vertical-align: middle
+              font-size: 10px
+              line-height: 14px
+              border: solid 1px $COLOR_GRAY
+              border-radius: 7px
+              background-color: color.adjust($COLOR_GRAY, $lightness: 35%)
+              padding: 0 4px
+              margin-left: 4px
+              &[data-remains="0"], &[data-remains=""]
+                display: none
+              &.-truncated
+                font-size: inherit
+                line-height: inherit
+                border: none
+                border-radius: 0
+                background: transparent
+                padding: 0
+            > .icon
+              flex: 0 0 auto
+              display: inline-block
+              vertical-align: middle
+              &[data-mgend="true"]::after
+                content: ""
+                position: relative
+                margin-left: 6px
+                top: 3px
+                display: inline-block
+                width: 16px
+                height: 16px
+                background: url(../images/mgend-logo.png) no-repeat
+                background-size: contain
         &.refsnp_id, &.gene, &.consequence
           > .remains-content
             display: flex

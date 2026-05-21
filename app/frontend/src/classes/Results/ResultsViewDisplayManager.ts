@@ -252,9 +252,7 @@ export class ResultsViewDisplayManager {
 
     columns.forEach((column) => {
       const headerDisplayValue = column.isUsed ? 'table-cell' : 'none';
-      const usesFixedRemainsBadge = column.id === 'clinical_significance';
-      const bodyDisplayValue =
-        column.isUsed && usesFixedRemainsBadge ? 'flex' : headerDisplayValue;
+      const bodyDisplayValue = headerDisplayValue;
       const widthStyles =
         typeof column.width === 'number'
           ? `width: ${column.width}px; ` +
