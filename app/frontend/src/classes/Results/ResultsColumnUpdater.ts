@@ -18,6 +18,11 @@ import { REF_ALT_SHOW_LENGTH } from './ResultsColumnTemplates';
  * 補助情報用のdata属性などを更新する。
  */
 export class ResultsColumnUpdater {
+  static clinicalRemainsResizeObservers = new WeakMap<
+    HTMLSpanElement,
+    ResizeObserver
+  >();
+
   /**
    * セル内に残っているリンクを削除する。
    * hrefのない空リンクはLighthouseで「クロールできないリンク」と判定されるため、
@@ -314,21 +319,30 @@ export class ResultsColumnUpdater {
    *
    * @param tdClinicalSign - Clinical significanceを表示するdiv要素
    * @param tdClinicalCell - Clinical significance列のtd要素
+   * @param tdClinicalRemains - 追加件数を表示するspan要素
    * @param tdClinicalIcon - 追加情報の有無を示すspan要素
    * @param significances - Clinical significance情報の配列
    */
   static updateClinicalSignificance(
     tdClinicalSign: HTMLDivElement | null,
     tdClinicalCell: HTMLTableCellElement | null,
+    tdClinicalRemains: HTMLSpanElement | null,
     tdClinicalIcon: HTMLSpanElement | null,
     significances: Significance[]
   ) {
-    if (!tdClinicalSign || !tdClinicalCell || !tdClinicalIcon) return;
+    if (
+      !tdClinicalSign ||
+      !tdClinicalCell ||
+      !tdClinicalRemains ||
+      !tdClinicalIcon
+    )
+      return;
 
     if (!significances || significances.length === 0) {
       this.resetClinicalSignificance(
         tdClinicalSign,
         tdClinicalCell,
+        tdClinicalRemains,
         tdClinicalIcon
       );
       return;
@@ -343,10 +357,15 @@ export class ResultsColumnUpdater {
     this.updateClinicalCondition(
       tdClinicalSign,
       tdClinicalCell,
-      tdClinicalIcon,
+      tdClinicalRemains,
       firstCondition
     );
-    this.updateClinicalMetadata(tdClinicalIcon, significances);
+    this.updateClinicalMetadata(
+      tdClinicalCell,
+      tdClinicalRemains,
+      tdClinicalIcon,
+      significances
+    );
   }
 
   /**
@@ -354,17 +373,24 @@ export class ResultsColumnUpdater {
    *
    * @param tdClinicalSign - Clinical significanceを表示するdiv要素
    * @param tdClinicalCell - Clinical significance列のtd要素
+   * @param tdClinicalRemains - 追加件数を表示するspan要素
    * @param tdClinicalIcon - 追加情報の有無を示すspan要素
    */
   static resetClinicalSignificance(
     tdClinicalSign: HTMLDivElement,
     tdClinicalCell: HTMLTableCellElement,
+    tdClinicalRemains: HTMLSpanElement,
     tdClinicalIcon: HTMLSpanElement
   ) {
     tdClinicalSign.dataset.value = '';
     tdClinicalSign.textContent = '';
     this.resetAnchor(tdClinicalCell);
-    tdClinicalIcon.dataset.remains = '0';
+    tdClinicalCell.dataset.remains = '0';
+    tdClinicalCell.dataset.mgend = 'false';
+    tdClinicalRemains.dataset.remains = '0';
+    tdClinicalRemains.textContent = '';
+    tdClinicalRemains.classList.remove('-truncated');
+    this.disconnectClinicalRemainsResizeObserver(tdClinicalRemains);
     tdClinicalIcon.dataset.mgend = 'false';
   }
 
@@ -373,13 +399,13 @@ export class ResultsColumnUpdater {
    *
    * @param tdClinicalSign - Clinical significanceを表示するdiv要素
    * @param tdClinicalCell - Clinical significance列のtd要素
-   * @param tdClinicalIcon - 追加情報の有無を示すspan要素
+   * @param tdClinicalRemains - 追加件数を表示するspan要素
    * @param firstCondition - 先頭の疾患情報
    */
   static updateClinicalCondition(
     tdClinicalSign: HTMLDivElement,
     tdClinicalCell: HTMLTableCellElement,
-    tdClinicalIcon: HTMLSpanElement,
+    tdClinicalRemains: HTMLSpanElement,
     firstCondition: { name: string; medgen?: string } | undefined
   ) {
     if (firstCondition) {
@@ -392,7 +418,7 @@ export class ResultsColumnUpdater {
           `/disease/${firstCondition.medgen}`,
           firstCondition.name || '',
           `View disease ${firstCondition.name} details`,
-          tdClinicalIcon
+          tdClinicalRemains
         );
       } else {
         // MedGen IDがない場合はリンクにせず、通常テキストとして表示する。
@@ -409,21 +435,109 @@ export class ResultsColumnUpdater {
   /**
    * Clinical significance列の補助情報を更新する。
    *
+   * @param tdClinicalCell - Clinical significance列のtd要素
+   * @param tdClinicalRemains - 追加件数を表示するspan要素
    * @param tdClinicalIcon - 追加情報の有無を示すspan要素
    * @param significances - Clinical significance情報の配列
    */
   static updateClinicalMetadata(
+    tdClinicalCell: HTMLTableCellElement,
+    tdClinicalRemains: HTMLSpanElement,
     tdClinicalIcon: HTMLSpanElement,
     significances: Significance[]
   ) {
     // 画面に表示している先頭1件以外の件数を保持する。
-    tdClinicalIcon.dataset.remains = (significances.length - 1).toString();
+    const remains = (significances.length - 1).toString();
+    tdClinicalCell.dataset.remains = remains;
+    tdClinicalRemains.dataset.remains = remains;
+    this.updateClinicalRemainsText(tdClinicalRemains, remains);
 
     // MGeND由来の情報が含まれるかを保持する。
     const hasMedgen = significances.some(
       (significance) => significance.source === 'mgend'
     );
+    tdClinicalCell.dataset.mgend = hasMedgen.toString();
     tdClinicalIcon.dataset.mgend = hasMedgen.toString();
+  }
+
+  /**
+   * Clinical significanceの追加件数は、入り切らない場合だけ省略記号に切り替える。
+   *
+   * @param tdClinicalRemains - 追加件数を表示するspan要素
+   * @param remains - 追加件数
+   */
+  static updateClinicalRemainsText(
+    tdClinicalRemains: HTMLSpanElement,
+    remains: string
+  ) {
+    const text = remains === '0' ? '' : `+${remains}`;
+
+    tdClinicalRemains.classList.remove('-truncated');
+    tdClinicalRemains.textContent = text;
+    this.disconnectClinicalRemainsResizeObserver(tdClinicalRemains);
+
+    if (!text) return;
+
+    this.updateClinicalRemainsDisplay(tdClinicalRemains, text);
+    this.observeClinicalRemainsResize(tdClinicalRemains, text);
+  }
+
+  /**
+   * Clinical significanceの追加件数が入らない幅では、バッジではなくプレーンな省略記号にする。
+   *
+   * @param tdClinicalRemains - 追加件数を表示するspan要素
+   * @param text - 表示テキスト
+   */
+  static updateClinicalRemainsDisplay(
+    tdClinicalRemains: HTMLSpanElement,
+    text: string
+  ) {
+    requestAnimationFrame(() => {
+      if (!tdClinicalRemains.isConnected) return;
+
+      tdClinicalRemains.classList.remove('-truncated');
+      tdClinicalRemains.textContent = text;
+
+      const textElement = tdClinicalRemains.parentElement?.querySelector<
+        HTMLElement
+      >('.hyper-text, .clinical-significance');
+      const shouldShowEllipsis = textElement
+        ? textElement.scrollWidth > textElement.clientWidth + 1
+        : false;
+
+      tdClinicalRemains.classList.toggle('-truncated', shouldShowEllipsis);
+      tdClinicalRemains.textContent = shouldShowEllipsis ? '...' : text;
+    });
+  }
+
+  /**
+   * 列幅変更でも追加件数表示を再判定する。
+   *
+   * @param tdClinicalRemains - 追加件数を表示するspan要素
+   * @param text - 表示テキスト
+   */
+  static observeClinicalRemainsResize(
+    tdClinicalRemains: HTMLSpanElement,
+    text: string
+  ) {
+    const observer = new ResizeObserver(() => {
+      this.updateClinicalRemainsDisplay(tdClinicalRemains, text);
+    });
+
+    observer.observe(tdClinicalRemains.parentElement || tdClinicalRemains);
+    this.clinicalRemainsResizeObservers.set(tdClinicalRemains, observer);
+  }
+
+  /**
+   * 以前の追加件数表示用ResizeObserverを解除する。
+   *
+   * @param tdClinicalRemains - 追加件数を表示するspan要素
+   */
+  static disconnectClinicalRemainsResizeObserver(
+    tdClinicalRemains: HTMLSpanElement
+  ) {
+    this.clinicalRemainsResizeObservers.get(tdClinicalRemains)?.disconnect();
+    this.clinicalRemainsResizeObservers.delete(tdClinicalRemains);
   }
 
   /**

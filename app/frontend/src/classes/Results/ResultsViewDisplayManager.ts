@@ -250,22 +250,31 @@ export class ResultsViewDisplayManager {
     const sheet = this._stylesheet.sheet;
     if (!sheet) return;
 
-    columns.forEach((column, index) => {
-      const displayValue = column.isUsed ? 'table-cell' : 'none';
+    columns.forEach((column) => {
+      const headerDisplayValue = column.isUsed ? 'table-cell' : 'none';
+      const bodyDisplayValue =
+        column.isUsed && column.id === 'clinical_significance'
+          ? 'flex'
+          : headerDisplayValue;
       const widthStyles =
         typeof column.width === 'number'
           ? `width: ${column.width}px; ` +
             `min-width: ${column.width}px; ` +
             `max-width: ${column.width}px; `
           : '';
-      const rule =
-        `.tablecontainer > table.results-view th.${column.id}, ` +
+      const headerRule =
+        `.tablecontainer > table.results-view th.${column.id} { ` +
+        `display: ${headerDisplayValue}; ` +
+        widthStyles +
+        '}';
+      const bodyRule =
         `.tablecontainer > table.results-view td.${column.id} { ` +
-        `display: ${displayValue}; ` +
+        `display: ${bodyDisplayValue}; ` +
         widthStyles +
         '}';
 
-      sheet.insertRule(rule, index);
+      sheet.insertRule(headerRule, sheet.cssRules.length);
+      sheet.insertRule(bodyRule, sheet.cssRules.length);
     });
   }
 }

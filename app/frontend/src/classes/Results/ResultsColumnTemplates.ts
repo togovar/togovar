@@ -34,7 +34,7 @@ export const COLUMN_TEMPLATES = {
   consequence:
     '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>',
   clinical_significance:
-    '<td class="clinical_significance"><div class="clinical-significance" data-value=""></div><span class="icon" data-remains="" data-mgend=""></span></td>',
+    '<td class="clinical_significance"><div class="clinical-significance" data-value=""></div><span class="clinical-remains" data-remains=""></span><span class="icon" data-mgend=""></span></td>',
   alphamissense:
     '<td class="alphamissense"><div class="variant-function" data-function=""></div></td>',
   sift: '<td class="sift"><div class="variant-function" data-function=""></div></td>',

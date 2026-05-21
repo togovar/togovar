@@ -638,6 +638,14 @@ export class ResultsView {
     cell: HTMLTableCellElement,
     content: HTMLElement
   ): number {
+    const unconstrainedWidth = this._measureUnconstrainedContentWidth(
+      cell,
+      content
+    );
+    if (unconstrainedWidth > 0) {
+      return unconstrainedWidth;
+    }
+
     const rangeWidth = this._measureRangeWidth(cell, content);
     if (content === cell) {
       return rangeWidth;
@@ -648,6 +656,64 @@ export class ResultsView {
       content.scrollWidth,
       content.getBoundingClientRect().width
     );
+  }
+
+  private _measureUnconstrainedContentWidth(
+    cell: HTMLTableCellElement,
+    content: HTMLElement
+  ): number {
+    const table = document.createElement('table');
+    const tbody = document.createElement('tbody');
+    const row = document.createElement('tr');
+    const measuringCell = cell.cloneNode(false) as HTMLTableCellElement;
+
+    table.className = 'results-view';
+    table.style.position = 'absolute';
+    table.style.left = '-10000px';
+    table.style.top = '0';
+    table.style.visibility = 'hidden';
+    table.style.width = 'auto';
+    table.style.tableLayout = 'auto';
+    table.style.pointerEvents = 'none';
+
+    measuringCell.style.width = 'auto';
+    measuringCell.style.minWidth = '0';
+    measuringCell.style.maxWidth = 'none';
+    measuringCell.style.padding = '0';
+    measuringCell.style.overflow = 'visible';
+    measuringCell.style.textOverflow = 'clip';
+
+    if (content === cell) {
+      Array.from(cell.childNodes).forEach((node) => {
+        if (
+          node instanceof HTMLElement &&
+          node.classList.contains('resize-bar')
+        ) {
+          return;
+        }
+
+        measuringCell.appendChild(node.cloneNode(true));
+      });
+    } else {
+      measuringCell.appendChild(content.cloneNode(true));
+    }
+
+    measuringCell
+      .querySelectorAll<HTMLElement>('*')
+      .forEach((element) => {
+        element.style.maxWidth = 'none';
+        element.style.overflow = 'visible';
+        element.style.textOverflow = 'clip';
+      });
+
+    row.appendChild(measuringCell);
+    tbody.appendChild(row);
+    table.appendChild(tbody);
+    document.body.appendChild(table);
+
+    const width = measuringCell.getBoundingClientRect().width;
+    table.remove();
+    return width;
   }
 
   private _measureRangeWidth(
@@ -686,8 +752,6 @@ export class ResultsView {
     const selectorByColumn: Record<string, string> = {
       ref_alt: '.ref-alt',
       position: '.chromosome-position',
-      consequence: '.consequence-item',
-      clinical_significance: '.hyper-text',
       alphamissense: '.variant-function',
       sift: '.variant-function',
       polyphen: '.variant-function',

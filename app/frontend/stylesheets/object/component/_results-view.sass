@@ -75,16 +75,58 @@
           width: 8px
           z-index: 1
         &.clinical_significance
+          display: flex
+          align-items: center
+          gap: 3px
           > .clinical-significance
-            max-width: calc(100% - 54px)
+            order: 0
+            flex: 0 0 auto
+            max-width: none
             overflow: hidden
             text-overflow: ellipsis
             vertical-align: middle
           > .hyper-text
-            max-width: calc(100% - 70px)
-          > .icon
+            order: 1
+            flex: 0 1 auto
+            min-width: 0
+            display: inline-block
+            max-width: none
+            overflow: hidden
+            text-overflow: ellipsis
             white-space: nowrap
-        &[data-remains]:after
+          > .clinical-remains
+            order: 2
+            flex: 0 0 auto
+            display: inline-block
+            overflow: visible
+            text-overflow: clip
+            white-space: nowrap
+            vertical-align: middle
+            font-size: 10px
+            line-height: 14px
+            border: solid 1px $COLOR_GRAY
+            border-radius: 7px
+            background-color: color.adjust($COLOR_GRAY, $lightness: 35%)
+            padding: 0 4px
+            margin-left: 4px
+            &[data-remains="0"], &[data-remains=""]
+              display: none
+            &.-truncated
+              font-size: inherit
+              line-height: inherit
+              border: none
+              border-radius: 0
+              background: transparent
+              padding: 0
+          > .icon
+            order: 3
+            flex: 0 0 auto
+            display: inline-block
+            vertical-align: middle
+            &[data-mgend="true"]::after
+              margin-left: 0
+              top: 0
+        &:not(.clinical_significance)[data-remains]:after
           content: "+" attr(data-remains)
           display: inline-block
           font-size: 10px
@@ -95,7 +137,7 @@
           padding: 0 4px
           margin-left: 4px
           vertical-align: middle
-        &[data-remains="0"]:after, &[data-remains=""]:after
+        &:not(.clinical_significance)[data-remains="0"]:after, &:not(.clinical_significance)[data-remains=""]:after
           display: none
         &.separator
           border-bottom: solid 1px white

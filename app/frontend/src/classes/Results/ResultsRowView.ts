@@ -47,6 +47,7 @@ export class ResultsRowView {
   // Clinical significance
   clinicalCell: HTMLTableCellElement | null = null;
   clinicalSignificance: HTMLDivElement | null = null;
+  clinicalRemains: HTMLSpanElement | null = null;
   clinicalIcon: HTMLSpanElement | null = null;
   // AlphaMissense
   alphaMissenseFunction: HTMLDivElement | null = null;
@@ -104,6 +105,7 @@ export class ResultsRowView {
     this.consequenceItem = null;
     this.clinicalCell = null;
     this.clinicalSignificance = null;
+    this.clinicalRemains = null;
     this.clinicalIcon = null;
     this.alphaMissenseFunction = null;
     this.siftFunction = null;
@@ -318,6 +320,8 @@ export class ResultsRowView {
     this.clinicalCell = tdClinical;
     this.clinicalSignificance =
       tdClinical?.querySelector('.clinical-significance') || null;
+    this.clinicalRemains =
+      tdClinical?.querySelector('.clinical-remains') || null;
     this.clinicalIcon = tdClinical?.querySelector('span.icon') || null;
   }
 
@@ -418,6 +422,7 @@ export class ResultsRowView {
         ResultsColumnUpdater.updateClinicalSignificance(
           this.clinicalSignificance,
           this.clinicalCell,
+          this.clinicalRemains,
           this.clinicalIcon,
           result.significance
         ),
