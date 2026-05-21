@@ -615,7 +615,7 @@ export class ResultsView {
       const baseResizing = `body[data-column-resizing="true"] ${base}`;
       // hover 時 th: ::after で高さ固定（th 全体の高さに依存しない）
       sheet.insertRule(
-        `${base} th.${column.id}::after { content: ''; position: absolute; right: 0; bottom: 0; width: 2px; height: 20px; background: rgba(17,127,147,0.15); pointer-events: none; transition: background 0.15s; }`
+        `${base} th.${column.id}::after { content: ''; position: absolute; right: 0; bottom: 0; width: 2px; height: 20px; background: rgba(17,127,147,0.15); pointer-events: none; }`
       );
       // hover 時 td: box-shadow（行高さに追従）
       sheet.insertRule(

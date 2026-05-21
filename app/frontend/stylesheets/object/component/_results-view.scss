@@ -97,10 +97,6 @@
         padding: 2px 10px 2px 6px;
         overflow: hidden;
         text-overflow: ellipsis;
-        // ホバー・リサイズ時の背景色と列ボーダーをトランジション
-        transition:
-          background $GUI_DURATION,
-          box-shadow $GUI_DURATION;
 
         // 列幅リサイズ用ドラッグハンドル（td 側）
         > .resize-bar {
