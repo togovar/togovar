@@ -29,6 +29,8 @@ export class ResultsRowView {
   togovarIdCell: HTMLTableCellElement | null = null;
   // RefSNP ID
   refsnpCell: HTMLTableCellElement | null = null;
+  refsnpContent: HTMLDivElement | null = null;
+  refsnpRemains: HTMLSpanElement | null = null;
   // Position
   positionChromosome: HTMLDivElement | null = null;
   positionCoordinate: HTMLDivElement | null = null;
@@ -39,11 +41,15 @@ export class ResultsRowView {
   typeElement: HTMLDivElement | null = null;
   // Gene
   geneCell: HTMLTableCellElement | null = null;
+  geneContent: HTMLDivElement | null = null;
+  geneRemains: HTMLSpanElement | null = null;
   // Alt frequency
   frequencyElements: TdFrequencies = {};
   // Consequence
   consequenceCell: HTMLTableCellElement | null = null;
+  consequenceContent: HTMLDivElement | null = null;
   consequenceItem: HTMLDivElement | null = null;
+  consequenceRemains: HTMLSpanElement | null = null;
   // Clinical significance
   clinicalCell: HTMLTableCellElement | null = null;
   clinicalSignificance: HTMLDivElement | null = null;
@@ -94,15 +100,21 @@ export class ResultsRowView {
     // Clear cached DOM element references
     this.togovarIdCell = null;
     this.refsnpCell = null;
+    this.refsnpContent = null;
+    this.refsnpRemains = null;
     this.positionChromosome = null;
     this.positionCoordinate = null;
     this.refElement = null;
     this.altElement = null;
     this.typeElement = null;
     this.geneCell = null;
+    this.geneContent = null;
+    this.geneRemains = null;
     this.frequencyElements = {};
     this.consequenceCell = null;
+    this.consequenceContent = null;
     this.consequenceItem = null;
+    this.consequenceRemains = null;
     this.clinicalCell = null;
     this.clinicalSignificance = null;
     this.clinicalRemains = null;
@@ -290,6 +302,10 @@ export class ResultsRowView {
 
     // RefSNP ID
     this.refsnpCell = this.tr.querySelector('td.refsnp_id');
+    this.refsnpContent =
+      this.refsnpCell?.querySelector('.remains-content') || null;
+    this.refsnpRemains =
+      this.refsnpCell?.querySelector('.remains-badge') || null;
 
     // Position
     const tdPosition = this.tr.querySelector(
@@ -308,11 +324,19 @@ export class ResultsRowView {
 
     // Gene
     this.geneCell = this.tr.querySelector('td.gene');
+    this.geneContent =
+      this.geneCell?.querySelector('.remains-content') || null;
+    this.geneRemains =
+      this.geneCell?.querySelector('.remains-badge') || null;
 
     // Consequence
     this.consequenceCell = this.tr.querySelector('td.consequence');
+    this.consequenceContent =
+      this.consequenceCell?.querySelector('.remains-content') || null;
     this.consequenceItem =
       this.consequenceCell?.querySelector('.consequence-item') || null;
+    this.consequenceRemains =
+      this.consequenceCell?.querySelector('.remains-badge') || null;
 
     // Clinical significance
     const tdClinical =
@@ -382,7 +406,8 @@ export class ResultsRowView {
         ),
       refsnp_id: () =>
         ResultsColumnUpdater.updateRefSNP(
-          this.refsnpCell,
+          this.refsnpContent,
+          this.refsnpRemains,
           result.existing_variations
         ),
       position: () =>
@@ -403,7 +428,8 @@ export class ResultsRowView {
         ResultsColumnUpdater.updateVariantType(this.typeElement, result.type),
       gene: () =>
         ResultsColumnUpdater.updateGene(
-          this.geneCell,
+          this.geneContent,
+          this.geneRemains,
           result.symbols
         ),
       alt_frequency: () =>
@@ -413,8 +439,8 @@ export class ResultsRowView {
         ),
       consequence: () =>
         ResultsColumnUpdater.updateConsequence(
-          this.consequenceCell,
           this.consequenceItem,
+          this.consequenceRemains,
           result.most_severe_consequence,
           result.transcripts
         ),

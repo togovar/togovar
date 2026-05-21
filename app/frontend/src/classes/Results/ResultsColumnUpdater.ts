@@ -28,7 +28,7 @@ export class ResultsColumnUpdater {
    * hrefのない空リンクはLighthouseで「クロールできないリンク」と判定されるため、
    * 値がない場合はa要素自体をDOMに置かない。
    */
-  static resetAnchor(cell: HTMLTableCellElement) {
+  static resetAnchor(cell: HTMLElement) {
     cell.querySelector('a.hyper-text')?.remove();
   }
 
@@ -36,7 +36,7 @@ export class ResultsColumnUpdater {
    * セル内のa要素を取得し、存在しない場合は作成する。
    */
   static ensureAnchor(
-    cell: HTMLTableCellElement,
+    cell: HTMLElement,
     className: string,
     insertBefore?: Element | null
   ) {
@@ -63,7 +63,7 @@ export class ResultsColumnUpdater {
    * セル内のa要素にリンク先、表示文字列、スクリーンリーダー向けラベルを設定する。
    */
   static updateAnchor(
-    cell: HTMLTableCellElement,
+    cell: HTMLElement,
     className: string,
     url: string,
     text: string,
@@ -112,25 +112,27 @@ export class ResultsColumnUpdater {
    * @param values - RefSNP IDの配列
    */
   static updateRefSNP(
-    tdRS: HTMLTableCellElement | null,
+    tdRS: HTMLDivElement | null,
+    tdRSRemains: HTMLSpanElement | null,
     values: string[]
   ) {
-    if (!tdRS) return;
+    if (!tdRS || !tdRSRemains) return;
 
     if (!values || values.length === 0) {
-      tdRS.dataset.remains = '0';
+      this.updateRemainsBadge(tdRSRemains, 0);
       this.resetAnchor(tdRS);
       return;
     }
 
     // 画面には先頭のrsIDだけを表示し、残りの件数はdata-remainsに保持する。
-    tdRS.dataset.remains = (values.length - 1).toString();
+    this.updateRemainsBadge(tdRSRemains, values.length - 1);
     this.updateAnchor(
       tdRS,
       'hyper-text -external',
       `https://identifiers.org/dbsnp/${values[0]}`,
       values[0],
-      `Open dbSNP record ${values[0]}`
+      `Open dbSNP record ${values[0]}`,
+      tdRSRemains
     );
   }
 
@@ -232,25 +234,27 @@ export class ResultsColumnUpdater {
    * @param symbols - 遺伝子シンボルの配列
    */
   static updateGene(
-    tdGene: HTMLTableCellElement | null,
+    tdGene: HTMLDivElement | null,
+    tdGeneRemains: HTMLSpanElement | null,
     symbols: GeneSymbol[]
   ) {
-    if (!tdGene) return;
+    if (!tdGene || !tdGeneRemains) return;
 
     if (!symbols || symbols.length === 0) {
-      tdGene.dataset.remains = '0';
+      this.updateRemainsBadge(tdGeneRemains, 0);
       this.resetAnchor(tdGene);
       return;
     }
 
     // 画面には先頭の遺伝子だけを表示し、残りの件数はdata-remainsに保持する。
-    tdGene.dataset.remains = (symbols.length - 1).toString();
+    this.updateRemainsBadge(tdGeneRemains, symbols.length - 1);
     this.updateAnchor(
       tdGene,
       'hyper-text -internal',
       `/gene/${symbols[0].id}`,
       symbols[0].name,
-      `View gene ${symbols[0].name} details`
+      `View gene ${symbols[0].name} details`,
+      tdGeneRemains
     );
   }
 
@@ -289,15 +293,15 @@ export class ResultsColumnUpdater {
    * @param transcripts - Transcript情報の配列
    */
   static updateConsequence(
-    tdConsequence: HTMLTableCellElement | null,
     tdConsequenceItem: HTMLDivElement | null,
+    tdConsequenceRemains: HTMLSpanElement | null,
     mostConsequence: string,
     transcripts: Transcript[]
   ) {
-    if (!tdConsequence || !tdConsequenceItem) return;
+    if (!tdConsequenceItem || !tdConsequenceRemains) return;
 
     if (!mostConsequence) {
-      tdConsequence.dataset.remains = '0';
+      this.updateRemainsBadge(tdConsequenceRemains, 0);
       tdConsequenceItem.textContent = '';
       return;
     }
@@ -308,10 +312,24 @@ export class ResultsColumnUpdater {
       new Set(transcripts.flatMap((transcript) => transcript.consequence))
     );
 
-    tdConsequence.dataset.remains = (uniqueConsequences.length - 1).toString();
+    this.updateRemainsBadge(
+      tdConsequenceRemains,
+      uniqueConsequences.length - 1
+    );
     tdConsequenceItem.textContent =
       master.find((consequence) => consequence.id === mostConsequence)?.label ||
       '';
+  }
+
+  /**
+   * 追加件数バッジを更新する。
+   *
+   * @param element - 追加件数表示要素
+   * @param remains - 追加件数
+   */
+  static updateRemainsBadge(element: HTMLSpanElement, remains: number) {
+    element.dataset.remains = remains.toString();
+    element.textContent = remains > 0 ? `+${remains}` : '';
   }
 
   /**

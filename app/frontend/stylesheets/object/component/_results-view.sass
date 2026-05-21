@@ -126,7 +126,36 @@
             &[data-mgend="true"]::after
               margin-left: 0
               top: 0
-        &:not(.clinical_significance)[data-remains]:after
+        &.refsnp_id, &.gene, &.consequence
+          > .remains-content
+            display: flex
+            align-items: center
+            max-width: 100%
+            overflow: hidden
+          > .remains-content > .hyper-text, > .remains-content > .consequence-item
+            flex: 0 1 auto
+            min-width: 0
+            max-width: none
+            overflow: hidden
+            text-overflow: ellipsis
+            white-space: nowrap
+          > .remains-content > .remains-badge
+            flex: 0 0 auto
+            display: inline-block
+            overflow: visible
+            text-overflow: clip
+            white-space: nowrap
+            font-size: 10px
+            line-height: 14px
+            border: solid 1px $COLOR_GRAY
+            border-radius: 7px
+            background-color: color.adjust($COLOR_GRAY, $lightness: 35%)
+            padding: 0 4px
+            margin-left: 4px
+            vertical-align: middle
+            &:empty, &[data-remains="0"], &[data-remains=""]
+              display: none
+        &:not(.clinical_significance):not(.refsnp_id):not(.gene):not(.consequence)[data-remains]:after
           content: "+" attr(data-remains)
           display: inline-block
           font-size: 10px
@@ -137,7 +166,7 @@
           padding: 0 4px
           margin-left: 4px
           vertical-align: middle
-        &:not(.clinical_significance)[data-remains="0"]:after, &:not(.clinical_significance)[data-remains=""]:after
+        &:not(.clinical_significance):not(.refsnp_id):not(.gene):not(.consequence)[data-remains="0"]:after, &:not(.clinical_significance):not(.refsnp_id):not(.gene):not(.consequence)[data-remains=""]:after
           display: none
         &.separator
           border-bottom: solid 1px white

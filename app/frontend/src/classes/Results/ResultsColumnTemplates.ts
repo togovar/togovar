@@ -24,15 +24,17 @@ export const REF_ALT_SHOW_LENGTH = 4;
  */
 export const COLUMN_TEMPLATES = {
   togovar_id: '<td class="togovar_id"></td>',
-  refsnp_id: '<td class="refsnp_id" data-remains=""></td>',
+  refsnp_id:
+    '<td class="refsnp_id"><div class="remains-content"><span class="remains-badge" data-remains=""></span></div></td>',
   position:
     '<td class="position"><div class="chromosome-position"><div class="chromosome"></div><div class="coordinate"></div></div></td>',
   ref_alt:
     '<td class="ref_alt"><div class="ref-alt"><span class="ref" data-sum=""></span><span class="arrow"></span><span class="alt" data-sum=""><span class="sum"></span></span></div></td>',
   type: '<td class="type"><div class="variant-type"></div></td>',
-  gene: '<td class="gene" data-remains=""></td>',
+  gene:
+    '<td class="gene"><div class="remains-content"><span class="remains-badge" data-remains=""></span></div></td>',
   consequence:
-    '<td class="consequence" data-remains=""><div class="consequence-item"></div></td>',
+    '<td class="consequence"><div class="remains-content"><div class="consequence-item"></div><span class="remains-badge" data-remains=""></span></div></td>',
   clinical_significance:
     '<td class="clinical_significance"><div class="clinical-significance" data-value=""></div><span class="clinical-remains" data-remains=""></span><span class="icon" data-mgend=""></span></td>',
   alphamissense:
