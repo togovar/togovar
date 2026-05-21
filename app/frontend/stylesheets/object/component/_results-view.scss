@@ -17,14 +17,9 @@
   > thead {
     > tr {
       border-bottom: solid 2px $COLOR_BLACK;
-      height: 36px;
 
       > th {
         position: relative;
-        // ホバー・リサイズ時の背景色とボーダーをトランジション
-        transition:
-          background $GUI_DURATION,
-          box-shadow $GUI_DURATION;
 
         // Type 列はデフォルト非表示（列設定で表示切替可能）
         &.type {
