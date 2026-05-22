@@ -248,7 +248,6 @@ export class ResultsColumnAutoSizer {
       });
 
       if (contentNodes.length === 0) {
-        range.detach();
         return 0;
       }
 
@@ -259,7 +258,6 @@ export class ResultsColumnAutoSizer {
     }
 
     const width = range.getBoundingClientRect().width;
-    range.detach();
     return width;
   }
 
