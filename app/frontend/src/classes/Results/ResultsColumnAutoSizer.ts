@@ -115,10 +115,12 @@ export class ResultsColumnAutoSizer {
 
   private _measureColumnContentWidth(columnId: string): number {
     const cells = Array.from(
-      this._tbody.querySelectorAll<HTMLTableCellElement>(
-        `td.${columnId}:not(:empty)`
-      )
-    ).filter((cell) => cell.offsetParent !== null);
+      this._tbody.querySelectorAll<HTMLTableCellElement>(`td.${columnId}`)
+    ).filter((cell) => {
+      if (cell.offsetParent === null) return false;
+      const content = this._getMeasureTarget(cell, columnId);
+      return Boolean(content?.textContent?.trim());
+    });
     if (cells.length === 0) return 0;
 
     return Math.ceil(
