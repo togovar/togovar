@@ -91,7 +91,7 @@
         }
       }
 
-      > .download-disabled-reason {
+      > .download-disabled-reason-item {
         position: absolute;
         top: calc(100% - 16px);
         right: 0;
@@ -99,8 +99,12 @@
         margin: 0;
         font-size: 11px;
         line-height: 1.25;
-        color: $COLOR_GRAY;
         text-align: right;
+
+        > .download-disabled-reason {
+          font-weight: 300;
+          color: $COLOR_BLACK;
+        }
       }
 
       > li {

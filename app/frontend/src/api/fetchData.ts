@@ -372,5 +372,9 @@ function _updateDownloadDisabledReasonMessage(message: string): void {
   }
 
   reasonNode.textContent = message;
-  reasonNode.toggleAttribute('hidden', message === '');
+  const shouldHide = message === '';
+  reasonNode.toggleAttribute('hidden', shouldHide);
+  reasonNode
+    .closest('.download-disabled-reason-item')
+    ?.toggleAttribute('hidden', shouldHide);
 }
