@@ -343,7 +343,6 @@
             }
 
             // 追加件数バッジ (+N)
-            // 幅が足りない場合は JS により省略記号 (...) に切り替わる
             > .clinical-remains {
               flex: 0 0 auto;
               display: inline-block;
@@ -363,16 +362,6 @@
               &[data-remains='0'],
               &[data-remains=''] {
                 display: none;
-              }
-
-              // 幅不足時: バッジスタイルを解除してプレーンな省略記号に変える
-              &.-truncated {
-                font-size: inherit;
-                line-height: inherit;
-                border: none;
-                border-radius: 0;
-                background: transparent;
-                padding: 0;
               }
             }
 

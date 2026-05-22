@@ -18,11 +18,6 @@ import { REF_ALT_SHOW_LENGTH } from './ResultsColumnTemplates';
  * 補助情報用のdata属性などを更新する。
  */
 export class ResultsColumnUpdater {
-  static clinicalRemainsResizeObservers = new WeakMap<
-    HTMLSpanElement,
-    ResizeObserver
-  >();
-
   /**
    * セル内に残っているリンクを削除する。
    * hrefのない空リンクはLighthouseで「クロールできないリンク」と判定されるため、
@@ -407,8 +402,6 @@ export class ResultsColumnUpdater {
     tdClinicalCell.dataset.mgend = 'false';
     tdClinicalRemains.dataset.remains = '0';
     tdClinicalRemains.textContent = '';
-    tdClinicalRemains.classList.remove('-truncated');
-    this.disconnectClinicalRemainsResizeObserver(tdClinicalRemains);
     tdClinicalIcon.dataset.mgend = 'false';
   }
 
@@ -479,7 +472,7 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Clinical significanceの追加件数は、入り切らない場合だけ省略記号に切り替える。
+   * Clinical significanceの追加件数を表示する。
    *
    * @param tdClinicalRemains - 追加件数を表示するspan要素
    * @param remains - 追加件数
@@ -490,72 +483,7 @@ export class ResultsColumnUpdater {
   ) {
     const text = remains === '0' ? '' : `+${remains}`;
 
-    tdClinicalRemains.classList.remove('-truncated');
     tdClinicalRemains.textContent = text;
-    this.disconnectClinicalRemainsResizeObserver(tdClinicalRemains);
-
-    if (!text) return;
-
-    this.updateClinicalRemainsDisplay(tdClinicalRemains, text);
-    this.observeClinicalRemainsResize(tdClinicalRemains, text);
-  }
-
-  /**
-   * Clinical significanceの追加件数が入らない幅では、バッジではなくプレーンな省略記号にする。
-   *
-   * @param tdClinicalRemains - 追加件数を表示するspan要素
-   * @param text - 表示テキスト
-   */
-  static updateClinicalRemainsDisplay(
-    tdClinicalRemains: HTMLSpanElement,
-    text: string
-  ) {
-    requestAnimationFrame(() => {
-      if (!tdClinicalRemains.isConnected) return;
-
-      tdClinicalRemains.classList.remove('-truncated');
-      tdClinicalRemains.textContent = text;
-
-      const textElement = tdClinicalRemains.parentElement?.querySelector<
-        HTMLElement
-      >('.hyper-text, .clinical-significance');
-      const shouldShowEllipsis = textElement
-        ? textElement.scrollWidth > textElement.clientWidth + 1
-        : false;
-
-      tdClinicalRemains.classList.toggle('-truncated', shouldShowEllipsis);
-      tdClinicalRemains.textContent = shouldShowEllipsis ? '...' : text;
-    });
-  }
-
-  /**
-   * 列幅変更でも追加件数表示を再判定する。
-   *
-   * @param tdClinicalRemains - 追加件数を表示するspan要素
-   * @param text - 表示テキスト
-   */
-  static observeClinicalRemainsResize(
-    tdClinicalRemains: HTMLSpanElement,
-    text: string
-  ) {
-    const observer = new ResizeObserver(() => {
-      this.updateClinicalRemainsDisplay(tdClinicalRemains, text);
-    });
-
-    observer.observe(tdClinicalRemains.parentElement || tdClinicalRemains);
-    this.clinicalRemainsResizeObservers.set(tdClinicalRemains, observer);
-  }
-
-  /**
-   * 以前の追加件数表示用ResizeObserverを解除する。
-   *
-   * @param tdClinicalRemains - 追加件数を表示するspan要素
-   */
-  static disconnectClinicalRemainsResizeObserver(
-    tdClinicalRemains: HTMLSpanElement
-  ) {
-    this.clinicalRemainsResizeObservers.get(tdClinicalRemains)?.disconnect();
-    this.clinicalRemainsResizeObservers.delete(tdClinicalRemains);
   }
 
   /**
