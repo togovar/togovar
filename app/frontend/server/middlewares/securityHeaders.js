@@ -6,9 +6,9 @@ const CSP_DIRECTIVES = [
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  "script-src 'self' 'unsafe-inline'",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' https://fonts.gstatic.com data:",
+  "script-src 'self' 'unsafe-inline' https://togovar.github.io",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://togostanza.github.io",
+  "font-src 'self' https://fonts.gstatic.com https://togostanza.github.io data:",
   "img-src 'self' data: https:",
   "connect-src 'self' https:",
 ].join('; ');
