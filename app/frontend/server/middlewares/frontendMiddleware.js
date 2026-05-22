@@ -5,6 +5,9 @@
  */
 module.exports = (app, options) => {
   const isProd = process.env.NODE_ENV === 'production';
+  const setSecurityHeaders = require('./securityHeaders');
+
+  app.use(setSecurityHeaders);
 
   if (isProd) {
     const addProdMiddlewares = require('./addProdMiddlewares');
