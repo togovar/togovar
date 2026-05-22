@@ -1,18 +1,12 @@
 import { storeManager } from '../../store/StoreManager';
-import {
-  COLUMNS,
-  getInitialColumnWidth,
-  getMinColumnWidth,
-  getOrderedColumns,
-  isColumnResizable,
-  normalizeColumnConfigs,
-  usesInitialColumnWidth,
-} from '../../columns';
+import { getOrderedColumns } from '../../columns';
 import { ResultsScrollBar } from './ResultsScrollBar';
 import { ResultsColumnsDropdown } from './ResultsColumnsDropdown';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
 import { ResultsViewDataManager } from './ResultsViewDataManager';
+import { ResultsColumnAutoSizer } from './ResultsColumnAutoSizer';
+import { ResultsColumnResizeController } from './ResultsColumnResizeController';
 import type { SearchMessages, SearchStatus, ColumnConfig } from '../../types';
 import { isTouchDevice } from '../../utils/deviceDetection';
 
@@ -36,15 +30,6 @@ const STORE_BINDINGS = [
   'karyotype',
   'searchMessages',
 ] as const;
-
-type ColumnResizeState = {
-  columnId: string;
-  startX: number;
-  startWidth: number;
-  nextColumns: ColumnConfig[];
-};
-
-const AUTO_SIZE_EXTRA_WIDTH = 4;
 
 /**
  * 検索結果テーブルビューを管理するクラス
@@ -78,19 +63,8 @@ export class ResultsView {
   private _boundSearchModeHandler!: (_newMode: unknown) => void;
   /** 動的に作成した列表示制御用スタイル要素 */
   private _stylesheet!: HTMLStyleElement;
-  private _columnBorderStylesheet!: HTMLStyleElement;
-  private _resizeState: ColumnResizeState | null = null;
-  private _boundColumnResizeStart!: (_e: PointerEvent) => void;
-  private _boundColumnResizeMove!: (_e: PointerEvent) => void;
-  private _boundColumnResizeEnd!: (_e: PointerEvent) => void;
-  private _boundColumnResizeReset!: (_e: MouseEvent) => void;
-  private _boundAutoSizeResultColumns!: (_event: Event) => void;
-  private _boundResizeHoverOver!: (_e: MouseEvent) => void;
-  private _boundResizeHoverLeave!: () => void;
-  private _lastPointerX = 0;
-  private _lastPointerY = 0;
-  private _autoSizedResultSignature = '';
-  private _resizedColumnIds = new Set<string>();
+  private columnAutoSizer!: ResultsColumnAutoSizer;
+  private columnResizeController!: ResultsColumnResizeController;
 
   /**
    * ResultsView のコンストラクタ
@@ -158,6 +132,14 @@ export class ResultsView {
       this.columnsDropdown.destroy();
     }
 
+    if (this.columnResizeController) {
+      this.columnResizeController.destroy();
+    }
+
+    if (this.columnAutoSizer) {
+      this.columnAutoSizer.destroy();
+    }
+
     // Unbind all StoreManager event bindings
     STORE_BINDINGS.forEach((key) => {
       storeManager.unbind(key, this);
@@ -175,33 +157,9 @@ export class ResultsView {
       );
     }
 
-    this.thead.removeEventListener('pointerdown', this._boundColumnResizeStart);
-    this.thead.removeEventListener('dblclick', this._boundColumnResizeReset);
-    document.removeEventListener('pointermove', this._boundColumnResizeMove);
-    document.removeEventListener('pointerup', this._boundColumnResizeEnd);
-    document.removeEventListener('pointercancel', this._boundColumnResizeEnd);
-    this.tbody.removeEventListener('pointerdown', this._boundColumnResizeStart);
-    window.removeEventListener(
-      'togovar:results-rendered',
-      this._boundAutoSizeResultColumns
-    );
-
     if (this._stylesheet) {
       this._stylesheet.remove();
     }
-
-    if (this._columnBorderStylesheet) {
-      this._columnBorderStylesheet.remove();
-    }
-
-    this.tablecontainer.removeEventListener(
-      'mouseover',
-      this._boundResizeHoverOver
-    );
-    this.tablecontainer.removeEventListener(
-      'mouseleave',
-      this._boundResizeHoverLeave
-    );
   }
 
   /**
@@ -244,7 +202,7 @@ export class ResultsView {
   searchResults(_results: unknown): void {
     const results = storeManager.getData('searchResults');
     if (!Array.isArray(results) || results.length === 0) {
-      this._autoSizedResultSignature = '';
+      this.columnAutoSizer.resetSignature();
     }
 
     this.dataManager.handleSearchResults(
@@ -464,32 +422,17 @@ export class ResultsView {
     this._wheelEventName = this.getWheelEventName();
     this._boundWheelHandler = this._scroll.bind(this) as EventListener;
     this.tbody.addEventListener(this._wheelEventName, this._boundWheelHandler);
-    this._boundColumnResizeStart = this._startColumnResize.bind(this);
-    this._boundColumnResizeMove = this._moveColumnResize.bind(this);
-    this._boundColumnResizeEnd = this._endColumnResize.bind(this);
-    this._boundColumnResizeReset = this._resetColumnWidths.bind(this);
-    this._boundAutoSizeResultColumns = this._autoSizeResultColumns.bind(this);
-    this._boundResizeHoverOver = this._onResizeHoverOver.bind(this);
-    this._boundResizeHoverLeave = this._onResizeHoverLeave.bind(this);
-    this.thead.addEventListener('pointerdown', this._boundColumnResizeStart);
-    this.tbody.addEventListener('pointerdown', this._boundColumnResizeStart);
-    this.thead.addEventListener('dblclick', this._boundColumnResizeReset);
-    document.addEventListener('pointermove', this._boundColumnResizeMove);
-    document.addEventListener('pointerup', this._boundColumnResizeEnd);
-    document.addEventListener('pointercancel', this._boundColumnResizeEnd);
-    window.addEventListener(
-      'togovar:results-rendered',
-      this._boundAutoSizeResultColumns
-    );
-    this.tablecontainer.addEventListener(
-      'mouseover',
-      this._boundResizeHoverOver
-    );
-    this.tablecontainer.addEventListener(
-      'mouseleave',
-      this._boundResizeHoverLeave
-    );
-    this._createColumnBorderStyles();
+
+    this.columnAutoSizer = new ResultsColumnAutoSizer(this.tbody);
+    this.columnResizeController = new ResultsColumnResizeController({
+      thead: this.thead,
+      tbody: this.tbody,
+      tablecontainer: this.tablecontainer,
+      autoSizer: this.columnAutoSizer,
+      previewColumns: (columns) => {
+        this.dataManager.handleColumnsChange(columns);
+      },
+    });
 
     // タッチハンドラーのスクロールコールバック設定
     this.touchHandler.setScrollCallbacks({
@@ -504,356 +447,6 @@ export class ResultsView {
         this.scrollBar.setInactive();
       },
     });
-  }
-
-  private _startColumnResize(e: PointerEvent): void {
-    const resizeBar = (e.target as HTMLElement).closest<HTMLElement>(
-      '.resize-bar'
-    );
-    if (!resizeBar) return;
-
-    const cell = resizeBar.closest<HTMLTableCellElement>('th, td');
-    const columnId = resizeBar.dataset.columnId || cell?.dataset.columnId;
-    if (!cell || !columnId) return;
-    if (!isColumnResizable(columnId)) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    this._resizedColumnIds.add(columnId);
-
-    const columns = normalizeColumnConfigs(storeManager.getData('columns'));
-    const column = columns.find((item) => item.id === columnId);
-    const startWidth =
-      column?.width || Math.round(cell.getBoundingClientRect().width);
-
-    this._resizeState = {
-      columnId,
-      startX: e.clientX,
-      startWidth,
-      nextColumns: columns,
-    };
-    this._lastPointerX = e.clientX;
-    this._lastPointerY = e.clientY;
-    document.body.dataset.columnResizing = 'true';
-    this.tablecontainer.dataset.resizeHover = columnId;
-  }
-
-  private _moveColumnResize(e: PointerEvent): void {
-    if (!this._resizeState) return;
-
-    e.preventDefault();
-    this._lastPointerX = e.clientX;
-    this._lastPointerY = e.clientY;
-
-    const { columnId, startX, startWidth } = this._resizeState;
-    const minWidth = getMinColumnWidth();
-    const nextWidth = Math.max(
-      minWidth,
-      Math.round(startWidth + e.clientX - startX)
-    );
-
-    this._resizeState.nextColumns = this._resizeState.nextColumns.map(
-      (column) =>
-        column.id === columnId ? { ...column, width: nextWidth } : column
-    );
-    this.dataManager.handleColumnsChange(this._resizeState.nextColumns);
-  }
-
-  private _endColumnResize(): void {
-    if (!this._resizeState) return;
-
-    storeManager.setData('columns', this._resizeState.nextColumns);
-    this._resizeState = null;
-    delete document.body.dataset.columnResizing;
-
-    const x = this._lastPointerX;
-    const y = this._lastPointerY;
-    requestAnimationFrame(() => {
-      if (!document.elementFromPoint(x, y)?.closest('.resize-bar')) {
-        delete this.tablecontainer.dataset.resizeHover;
-      }
-    });
-  }
-
-  private _onResizeHoverOver(e: MouseEvent): void {
-    if (this._resizeState) return;
-    const resizeBar = (e.target as HTMLElement).closest<HTMLElement>(
-      '.resize-bar'
-    );
-    if (!resizeBar) {
-      delete this.tablecontainer.dataset.resizeHover;
-      return;
-    }
-    const cell = resizeBar.closest<HTMLElement>('th[data-column-id]');
-    const columnId = cell
-      ? cell.dataset.columnId
-      : (() => {
-          const td = resizeBar.closest<HTMLTableCellElement>('td');
-          if (!td) return undefined;
-          return this.thead.querySelectorAll<HTMLElement>('th')[td.cellIndex]
-            ?.dataset.columnId;
-        })();
-    if (columnId) {
-      this.tablecontainer.dataset.resizeHover = columnId;
-    }
-  }
-
-  private _onResizeHoverLeave(): void {
-    if (!this._resizeState) {
-      delete this.tablecontainer.dataset.resizeHover;
-    }
-  }
-
-  private _createColumnBorderStyles(): void {
-    this._columnBorderStylesheet = document.createElement('style');
-    document.head.appendChild(this._columnBorderStylesheet);
-    const sheet = this._columnBorderStylesheet.sheet;
-    if (!sheet) return;
-    COLUMNS.forEach((column) => {
-      const base = `.tablecontainer[data-resize-hover="${column.id}"] .results-view`;
-      const baseResizing = `body[data-column-resizing="true"] ${base}`;
-      // hover 時 th: ::after で高さ固定（th 全体の高さに依存しない）
-      sheet.insertRule(
-        `${base} th.${column.id}::after { content: ''; position: absolute; right: 0; bottom: 0; width: 2px; height: 20px; background: rgba(17,127,147,0.15); pointer-events: none; }`
-      );
-      // hover 時 td: box-shadow（行高さに追従）
-      sheet.insertRule(
-        `${base} td.${column.id} { box-shadow: inset -2px 0 0 rgba(17,127,147,0.15); }`
-      );
-      // drag 中 th: 濃いめ
-      sheet.insertRule(
-        `${baseResizing} th.${column.id}::after { background: rgba(17,127,147,0.5); }`
-      );
-      // drag 中 td: 濃いめ
-      sheet.insertRule(
-        `${baseResizing} td.${column.id} { box-shadow: inset -2px 0 0 rgba(17,127,147,0.5); }`
-      );
-    });
-  }
-
-  private _resetColumnWidths(e: MouseEvent): void {
-    if (!(e.target as HTMLElement).closest('thead')) return;
-
-    this._autoSizedResultSignature = '';
-    this._resizedColumnIds.clear();
-
-    const columns = normalizeColumnConfigs(storeManager.getData('columns')).map(
-      (column) => ({
-        ...column,
-        width: getInitialColumnWidth(column.id),
-      })
-    );
-
-    storeManager.setData('columns', columns);
-  }
-
-  private _autoSizeResultColumns(event?: Event): void {
-    if (
-      event instanceof CustomEvent &&
-      event.detail?.reason !== 'searchResults'
-    ) {
-      return;
-    }
-
-    if (storeManager.getData('offset') !== 0) {
-      return;
-    }
-
-    const resultSignature = this._getResultSignature();
-    if (
-      !resultSignature ||
-      resultSignature === this._autoSizedResultSignature
-    ) {
-      return;
-    }
-
-    const columns = normalizeColumnConfigs(storeManager.getData('columns'));
-    const nextColumns = columns.map((column) => {
-      if (
-        !column.isUsed ||
-        usesInitialColumnWidth(column.id) ||
-        this._resizedColumnIds.has(column.id)
-      ) {
-        return column;
-      }
-
-      const contentWidth = this._measureColumnContentWidth(column.id);
-      if (contentWidth <= 0) {
-        return { ...column, width: getMinColumnWidth() };
-      }
-
-      const width = Math.max(getMinColumnWidth(), contentWidth);
-
-      return { ...column, width };
-    });
-
-    this._autoSizedResultSignature = resultSignature;
-    storeManager.setData('columns', nextColumns);
-  }
-
-  private _getResultSignature(): string {
-    const results = storeManager.getData('searchResults');
-    const numberOfRecords = storeManager.getData('numberOfRecords');
-
-    if (!Array.isArray(results) || results.length === 0) {
-      return '';
-    }
-
-    const firstResult = results[0] as { id?: unknown };
-    return `${numberOfRecords}:${String(firstResult?.id || '')}`;
-  }
-
-  private _measureColumnContentWidth(columnId: string): number {
-    const cells = Array.from(
-      this.tbody.querySelectorAll<HTMLTableCellElement>(
-        `td.${columnId}:not(:empty)`
-      )
-    ).filter((cell) => cell.offsetParent !== null);
-    if (cells.length === 0) return 0;
-
-    return Math.ceil(
-      Math.max(
-        ...cells.map((cell) => {
-          const content = this._getMeasureTarget(cell, columnId);
-          if (!content || !content.textContent?.trim()) return 0;
-
-          const style = window.getComputedStyle(cell);
-          const horizontalPadding =
-            parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
-
-          return (
-            this._measureContentBoxWidth(cell, content) +
-            horizontalPadding +
-            AUTO_SIZE_EXTRA_WIDTH
-          );
-        })
-      )
-    );
-  }
-
-  private _measureContentBoxWidth(
-    cell: HTMLTableCellElement,
-    content: HTMLElement
-  ): number {
-    const unconstrainedWidth = this._measureUnconstrainedContentWidth(
-      cell,
-      content
-    );
-    if (unconstrainedWidth > 0) {
-      return unconstrainedWidth;
-    }
-
-    const rangeWidth = this._measureRangeWidth(cell, content);
-    if (content === cell) {
-      return rangeWidth;
-    }
-
-    return Math.max(
-      rangeWidth,
-      content.scrollWidth,
-      content.getBoundingClientRect().width
-    );
-  }
-
-  private _measureUnconstrainedContentWidth(
-    cell: HTMLTableCellElement,
-    content: HTMLElement
-  ): number {
-    const table = document.createElement('table');
-    const tbody = document.createElement('tbody');
-    const row = document.createElement('tr');
-    const measuringCell = cell.cloneNode(false) as HTMLTableCellElement;
-
-    table.className = 'results-view';
-    table.style.position = 'absolute';
-    table.style.left = '-10000px';
-    table.style.top = '0';
-    table.style.visibility = 'hidden';
-    table.style.width = 'auto';
-    table.style.tableLayout = 'auto';
-    table.style.pointerEvents = 'none';
-
-    measuringCell.style.width = 'auto';
-    measuringCell.style.minWidth = '0';
-    measuringCell.style.maxWidth = 'none';
-    measuringCell.style.padding = '0';
-    measuringCell.style.overflow = 'visible';
-    measuringCell.style.textOverflow = 'clip';
-
-    if (content === cell) {
-      Array.from(cell.childNodes).forEach((node) => {
-        if (
-          node instanceof HTMLElement &&
-          node.classList.contains('resize-bar')
-        ) {
-          return;
-        }
-
-        measuringCell.appendChild(node.cloneNode(true));
-      });
-    } else {
-      measuringCell.appendChild(content.cloneNode(true));
-    }
-
-    measuringCell.querySelectorAll<HTMLElement>('*').forEach((element) => {
-      element.style.maxWidth = 'none';
-      element.style.overflow = 'visible';
-      element.style.textOverflow = 'clip';
-    });
-
-    row.appendChild(measuringCell);
-    tbody.appendChild(row);
-    table.appendChild(tbody);
-    document.body.appendChild(table);
-
-    const width = measuringCell.getBoundingClientRect().width;
-    table.remove();
-    return width;
-  }
-
-  private _measureRangeWidth(
-    cell: HTMLTableCellElement,
-    content: HTMLElement
-  ): number {
-    const range = document.createRange();
-
-    if (content === cell) {
-      const contentNodes = Array.from(cell.childNodes).filter((node) => {
-        return !(
-          node instanceof HTMLElement && node.classList.contains('resize-bar')
-        );
-      });
-
-      if (contentNodes.length === 0) {
-        range.detach();
-        return 0;
-      }
-
-      range.setStartBefore(contentNodes[0]);
-      range.setEndAfter(contentNodes[contentNodes.length - 1]);
-    } else {
-      range.selectNodeContents(content);
-    }
-
-    const width = range.getBoundingClientRect().width;
-    range.detach();
-    return width;
-  }
-
-  private _getMeasureTarget(
-    cell: HTMLTableCellElement,
-    columnId: string
-  ): HTMLElement {
-    const selectorByColumn: Record<string, string> = {
-      ref_alt: '.ref-alt',
-      position: '.chromosome-position',
-      alphamissense: '.variant-function',
-      sift: '.variant-function',
-      polyphen: '.variant-function',
-    };
-
-    return cell.querySelector<HTMLElement>(selectorByColumn[columnId]) || cell;
   }
 
   /**
