@@ -51,7 +51,7 @@ export class ResultsRowView {
   consequenceItem: HTMLDivElement | null = null;
   consequenceRemains: HTMLSpanElement | null = null;
   // Clinical significance
-  clinicalCell: HTMLTableCellElement | null = null;
+  clinicalContainer: HTMLDivElement | null = null;
   clinicalSignificance: HTMLDivElement | null = null;
   clinicalRemains: HTMLSpanElement | null = null;
   clinicalIcon: HTMLSpanElement | null = null;
@@ -115,7 +115,7 @@ export class ResultsRowView {
     this.consequenceContent = null;
     this.consequenceItem = null;
     this.consequenceRemains = null;
-    this.clinicalCell = null;
+    this.clinicalContainer = null;
     this.clinicalSignificance = null;
     this.clinicalRemains = null;
     this.clinicalIcon = null;
@@ -342,8 +342,9 @@ export class ResultsRowView {
     const tdClinical =
       this.tr.querySelector<HTMLTableCellElement>('td.clinical_significance');
     const clinicalFlex =
-      tdClinical?.querySelector<HTMLElement>('.clinical-significance-flex') || null;
-    this.clinicalCell = clinicalFlex as HTMLTableCellElement | null;
+      tdClinical?.querySelector<HTMLDivElement>('.clinical-significance-flex') ||
+      null;
+    this.clinicalContainer = clinicalFlex;
     this.clinicalSignificance =
       tdClinical?.querySelector('.clinical-significance') || null;
     this.clinicalRemains =
@@ -449,7 +450,7 @@ export class ResultsRowView {
       clinical_significance: () =>
         ResultsColumnUpdater.updateClinicalSignificance(
           this.clinicalSignificance,
-          this.clinicalCell,
+          this.clinicalContainer,
           this.clinicalRemains,
           this.clinicalIcon,
           result.significance

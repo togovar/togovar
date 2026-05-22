@@ -331,21 +331,21 @@ export class ResultsColumnUpdater {
    * Clinical significance列を更新する。
    *
    * @param tdClinicalSign - Clinical significanceを表示するdiv要素
-   * @param tdClinicalCell - Clinical significance列のtd要素
+   * @param clinicalContainer - Clinical significance列の内容コンテナ
    * @param tdClinicalRemains - 追加件数を表示するspan要素
    * @param tdClinicalIcon - 追加情報の有無を示すspan要素
    * @param significances - Clinical significance情報の配列
    */
   static updateClinicalSignificance(
     tdClinicalSign: HTMLDivElement | null,
-    tdClinicalCell: HTMLTableCellElement | null,
+    clinicalContainer: HTMLDivElement | null,
     tdClinicalRemains: HTMLSpanElement | null,
     tdClinicalIcon: HTMLSpanElement | null,
     significances: Significance[]
   ) {
     if (
       !tdClinicalSign ||
-      !tdClinicalCell ||
+      !clinicalContainer ||
       !tdClinicalRemains ||
       !tdClinicalIcon
     )
@@ -354,7 +354,7 @@ export class ResultsColumnUpdater {
     if (!significances || significances.length === 0) {
       this.resetClinicalSignificance(
         tdClinicalSign,
-        tdClinicalCell,
+        clinicalContainer,
         tdClinicalRemains,
         tdClinicalIcon
       );
@@ -369,12 +369,12 @@ export class ResultsColumnUpdater {
 
     this.updateClinicalCondition(
       tdClinicalSign,
-      tdClinicalCell,
+      clinicalContainer,
       tdClinicalRemains,
       firstCondition
     );
     this.updateClinicalMetadata(
-      tdClinicalCell,
+      clinicalContainer,
       tdClinicalRemains,
       tdClinicalIcon,
       significances
@@ -385,21 +385,21 @@ export class ResultsColumnUpdater {
    * Clinical significance列を空の状態へ戻す。
    *
    * @param tdClinicalSign - Clinical significanceを表示するdiv要素
-   * @param tdClinicalCell - Clinical significance列のtd要素
+   * @param clinicalContainer - Clinical significance列の内容コンテナ
    * @param tdClinicalRemains - 追加件数を表示するspan要素
    * @param tdClinicalIcon - 追加情報の有無を示すspan要素
    */
   static resetClinicalSignificance(
     tdClinicalSign: HTMLDivElement,
-    tdClinicalCell: HTMLTableCellElement,
+    clinicalContainer: HTMLDivElement,
     tdClinicalRemains: HTMLSpanElement,
     tdClinicalIcon: HTMLSpanElement
   ) {
     tdClinicalSign.dataset.value = '';
     tdClinicalSign.textContent = '';
-    this.resetAnchor(tdClinicalCell);
-    tdClinicalCell.dataset.remains = '0';
-    tdClinicalCell.dataset.mgend = 'false';
+    this.resetAnchor(clinicalContainer);
+    clinicalContainer.dataset.remains = '0';
+    clinicalContainer.dataset.mgend = 'false';
     tdClinicalRemains.dataset.remains = '0';
     tdClinicalRemains.textContent = '';
     tdClinicalIcon.dataset.mgend = 'false';
@@ -409,13 +409,13 @@ export class ResultsColumnUpdater {
    * Clinical significanceに紐づく疾患情報を更新する。
    *
    * @param tdClinicalSign - Clinical significanceを表示するdiv要素
-   * @param tdClinicalCell - Clinical significance列のtd要素
+   * @param clinicalContainer - Clinical significance列の内容コンテナ
    * @param tdClinicalRemains - 追加件数を表示するspan要素
    * @param firstCondition - 先頭の疾患情報
    */
   static updateClinicalCondition(
     tdClinicalSign: HTMLDivElement,
-    tdClinicalCell: HTMLTableCellElement,
+    clinicalContainer: HTMLDivElement,
     tdClinicalRemains: HTMLSpanElement,
     firstCondition: { name: string; medgen?: string } | undefined
   ) {
@@ -424,7 +424,7 @@ export class ResultsColumnUpdater {
 
       if (firstCondition.medgen) {
         this.updateAnchor(
-          tdClinicalCell,
+          clinicalContainer,
           'hyper-text -internal',
           `/disease/${firstCondition.medgen}`,
           firstCondition.name || '',
@@ -434,32 +434,32 @@ export class ResultsColumnUpdater {
       } else {
         // MedGen IDがない場合はリンクにせず、通常テキストとして表示する。
         tdClinicalSign.textContent = firstCondition.name;
-        this.resetAnchor(tdClinicalCell);
+        this.resetAnchor(clinicalContainer);
       }
     } else {
       // 疾患情報がない場合はothersとして表示する。
       tdClinicalSign.textContent = 'others';
-      this.resetAnchor(tdClinicalCell);
+      this.resetAnchor(clinicalContainer);
     }
   }
 
   /**
    * Clinical significance列の補助情報を更新する。
    *
-   * @param tdClinicalCell - Clinical significance列のtd要素
+   * @param clinicalContainer - Clinical significance列の内容コンテナ
    * @param tdClinicalRemains - 追加件数を表示するspan要素
    * @param tdClinicalIcon - 追加情報の有無を示すspan要素
    * @param significances - Clinical significance情報の配列
    */
   static updateClinicalMetadata(
-    tdClinicalCell: HTMLTableCellElement,
+    clinicalContainer: HTMLDivElement,
     tdClinicalRemains: HTMLSpanElement,
     tdClinicalIcon: HTMLSpanElement,
     significances: Significance[]
   ) {
     // 画面に表示している先頭1件以外の件数を保持する。
     const remains = (significances.length - 1).toString();
-    tdClinicalCell.dataset.remains = remains;
+    clinicalContainer.dataset.remains = remains;
     tdClinicalRemains.dataset.remains = remains;
     this.updateClinicalRemainsText(tdClinicalRemains, remains);
 
@@ -467,7 +467,7 @@ export class ResultsColumnUpdater {
     const hasMedgen = significances.some(
       (significance) => significance.source === 'mgend'
     );
-    tdClinicalCell.dataset.mgend = hasMedgen.toString();
+    clinicalContainer.dataset.mgend = hasMedgen.toString();
     tdClinicalIcon.dataset.mgend = hasMedgen.toString();
   }
 
