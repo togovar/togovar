@@ -13,6 +13,8 @@ export class ResultsColumnAutoSizer {
   private _autoSizedResultSignature = '';
   private _resizedColumnIds = new Set<string>();
   private _boundAutoSizeResultColumns: (_event: Event) => void;
+  private _measuringTable: HTMLTableElement | null = null;
+  private _measuringRow: HTMLTableRowElement | null = null;
 
   constructor(tbody: HTMLElement) {
     this._tbody = tbody;
@@ -28,6 +30,9 @@ export class ResultsColumnAutoSizer {
       'togovar:results-rendered',
       this._boundAutoSizeResultColumns
     );
+    this._measuringTable?.remove();
+    this._measuringTable = null;
+    this._measuringRow = null;
   }
 
   resetSignature(): void {
@@ -164,19 +169,8 @@ export class ResultsColumnAutoSizer {
     cell: HTMLTableCellElement,
     content: HTMLElement
   ): number {
-    const table = document.createElement('table');
-    const tbody = document.createElement('tbody');
-    const row = document.createElement('tr');
+    const measuringRow = this._getMeasuringRow();
     const measuringCell = cell.cloneNode(false) as HTMLTableCellElement;
-
-    table.className = 'results-view';
-    table.style.position = 'absolute';
-    table.style.left = '-10000px';
-    table.style.top = '0';
-    table.style.visibility = 'hidden';
-    table.style.width = 'auto';
-    table.style.tableLayout = 'auto';
-    table.style.pointerEvents = 'none';
 
     measuringCell.style.width = 'auto';
     measuringCell.style.minWidth = '0';
@@ -206,14 +200,38 @@ export class ResultsColumnAutoSizer {
       element.style.textOverflow = 'clip';
     });
 
-    row.appendChild(measuringCell);
+    measuringRow.replaceChildren(measuringCell);
+    const width = measuringCell.getBoundingClientRect().width;
+    measuringRow.replaceChildren();
+    return width;
+  }
+
+  private _getMeasuringRow(): HTMLTableRowElement {
+    if (this._measuringRow && this._measuringTable?.isConnected) {
+      return this._measuringRow;
+    }
+
+    const table = document.createElement('table');
+    const tbody = document.createElement('tbody');
+    const row = document.createElement('tr');
+
+    table.className = 'results-view';
+    table.style.position = 'absolute';
+    table.style.left = '-10000px';
+    table.style.top = '0';
+    table.style.visibility = 'hidden';
+    table.style.width = 'auto';
+    table.style.tableLayout = 'auto';
+    table.style.pointerEvents = 'none';
+
     tbody.appendChild(row);
     table.appendChild(tbody);
     document.body.appendChild(table);
 
-    const width = measuringCell.getBoundingClientRect().width;
-    table.remove();
-    return width;
+    this._measuringTable = table;
+    this._measuringRow = row;
+
+    return row;
   }
 
   private _measureRangeWidth(
