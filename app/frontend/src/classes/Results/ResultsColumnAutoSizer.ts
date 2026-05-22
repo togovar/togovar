@@ -13,15 +13,21 @@ export class ResultsColumnAutoSizer {
   private _autoSizedResultSignature = '';
   private _resizedColumnIds = new Set<string>();
   private _boundAutoSizeResultColumns: (_event: Event) => void;
+  private _boundResetAutoSizeState: () => void;
   private _measuringTable: HTMLTableElement | null = null;
   private _measuringRow: HTMLTableRowElement | null = null;
 
   constructor(tbody: HTMLElement) {
     this._tbody = tbody;
     this._boundAutoSizeResultColumns = this.autoSizeResultColumns.bind(this);
+    this._boundResetAutoSizeState = this.resetAutoSizeState.bind(this);
     window.addEventListener(
       'togovar:results-rendered',
       this._boundAutoSizeResultColumns
+    );
+    window.addEventListener(
+      'results-column-widths-reset',
+      this._boundResetAutoSizeState
     );
   }
 
@@ -30,9 +36,18 @@ export class ResultsColumnAutoSizer {
       'togovar:results-rendered',
       this._boundAutoSizeResultColumns
     );
+    window.removeEventListener(
+      'results-column-widths-reset',
+      this._boundResetAutoSizeState
+    );
     this._measuringTable?.remove();
     this._measuringTable = null;
     this._measuringRow = null;
+  }
+
+  resetAutoSizeState(): void {
+    this._autoSizedResultSignature = '';
+    this._resizedColumnIds.clear();
   }
 
   resetSignature(): void {
@@ -44,8 +59,7 @@ export class ResultsColumnAutoSizer {
   }
 
   resetColumnWidths(): void {
-    this._autoSizedResultSignature = '';
-    this._resizedColumnIds.clear();
+    this.resetAutoSizeState();
 
     const columns = normalizeColumnConfigs(storeManager.getData('columns')).map(
       (column) => ({

@@ -108,6 +108,9 @@ function _resetSearchResults() {
   storeManager.setData('isFetching', false);
   storeManager.setData('searchResults', []);
   storeManager.resetColumnWidths();
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('results-column-widths-reset'));
+  }
   lastRequestRanges.clear(); // データリセット時にクリア
 }
 
