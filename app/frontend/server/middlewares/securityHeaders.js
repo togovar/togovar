@@ -26,15 +26,26 @@ function buildCspDirectives(nonce) {
   ].join('; ');
 }
 
+function isHttpsRequest(req) {
+  const forwardedProto = req.get('x-forwarded-proto');
+  const firstForwardedProto = forwardedProto
+    ? forwardedProto.split(',')[0].trim()
+    : '';
+
+  return req.secure || firstForwardedProto === 'https';
+}
+
 function setSecurityHeaders(req, res, next) {
   const nonce = createCspNonce();
   res.locals.cspNonce = nonce;
 
   res.setHeader('Content-Security-Policy', buildCspDirectives(nonce));
-  res.setHeader(
-    'Strict-Transport-Security',
-    `max-age=${ONE_YEAR_SECONDS}; includeSubDomains`
-  );
+  if (process.env.NODE_ENV === 'production' && isHttpsRequest(req)) {
+    res.setHeader(
+      'Strict-Transport-Security',
+      `max-age=${ONE_YEAR_SECONDS}; includeSubDomains`
+    );
+  }
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-Content-Type-Options', 'nosniff');
