@@ -10,10 +10,13 @@ export class ResultsViewDisplayManager {
   private _rows: ResultsRowView[] = []; // Array of result row view instances
   private _tbody: HTMLElement; // Table body element
   private _stylesheet: HTMLStyleElement; // Stylesheet for column display control
+  private _table: HTMLElement | null; // Results table element
+  private _columnStyleSignature = '';
 
   constructor(tbody: HTMLElement, stylesheet: HTMLStyleElement) {
     this._tbody = tbody;
     this._stylesheet = stylesheet;
+    this._table = tbody.closest<HTMLElement>('table.results-view');
   }
 
   // ========================================
@@ -85,7 +88,7 @@ export class ResultsViewDisplayManager {
    * @param columns - Array of column configuration objects.
    */
   handleColumnsChange(columns: ColumnConfig[]): void {
-    this._clearExistingStyles();
+    this._ensureColumnStyleRules(columns);
     this._applyColumnStyles(columns);
   }
 
@@ -229,49 +232,60 @@ export class ResultsViewDisplayManager {
   }
 
   /**
-   * Clears existing styles from the stylesheet.
-   * Removes all CSS rules to prepare for new column styles.
+   * Ensures the static column CSS rules exist.
+   * Width and display values are updated through CSS custom properties.
+   * @param columns - The array of column configuration objects.
    */
-  private _clearExistingStyles(): void {
-    const sheet = this._stylesheet.sheet;
-    if (!sheet) return;
+  private _ensureColumnStyleRules(columns: ColumnConfig[]): void {
+    const signature = columns.map((column) => column.id).join('|');
+    if (signature === this._columnStyleSignature) return;
 
-    while (sheet.cssRules.length > 0) {
-      sheet.deleteRule(0);
-    }
+    this._stylesheet.textContent = columns
+      .map((column) => {
+        const displayProperty = `--results-column-${column.id}-display`;
+        const widthProperty = `--results-column-${column.id}-width`;
+        const headerRule =
+          `.tablecontainer > table.results-view th.${column.id} { ` +
+          `display: var(${displayProperty}, table-cell); ` +
+          `width: var(${widthProperty}, auto); ` +
+          `min-width: var(${widthProperty}, 0); ` +
+          `max-width: var(${widthProperty}, none); ` +
+          '}';
+        const bodyRule =
+          `.tablecontainer > table.results-view td.${column.id} { ` +
+          `display: var(${displayProperty}, table-cell); ` +
+          `width: var(${widthProperty}, auto); ` +
+          `min-width: var(${widthProperty}, 0); ` +
+          `max-width: var(${widthProperty}, none); ` +
+          '}';
+
+        return `${headerRule}\n${bodyRule}`;
+      })
+      .join('\n');
+    this._columnStyleSignature = signature;
   }
 
   /**
-   * Applies column styles based on the provided configuration.
-   * Inserts CSS rules for each column to show or hide them as needed.
+   * Applies column display and width values without rebuilding CSS rules.
    * @param columns - The array of column configuration objects.
    */
   private _applyColumnStyles(columns: ColumnConfig[]): void {
-    const sheet = this._stylesheet.sheet;
-    if (!sheet) return;
+    if (!this._table) return;
 
     columns.forEach((column) => {
-      const headerDisplayValue = column.isUsed ? 'table-cell' : 'none';
-      const bodyDisplayValue = headerDisplayValue;
-      const widthStyles =
-        typeof column.width === 'number'
-          ? `width: ${column.width}px; ` +
-            `min-width: ${column.width}px; ` +
-            `max-width: ${column.width}px; `
-          : '';
-      const headerRule =
-        `.tablecontainer > table.results-view th.${column.id} { ` +
-        `display: ${headerDisplayValue}; ` +
-        widthStyles +
-        '}';
-      const bodyRule =
-        `.tablecontainer > table.results-view td.${column.id} { ` +
-        `display: ${bodyDisplayValue}; ` +
-        widthStyles +
-        '}';
+      const displayProperty = `--results-column-${column.id}-display`;
+      const widthProperty = `--results-column-${column.id}-width`;
 
-      sheet.insertRule(headerRule, sheet.cssRules.length);
-      sheet.insertRule(bodyRule, sheet.cssRules.length);
+      this._table?.style.setProperty(
+        displayProperty,
+        column.isUsed ? 'table-cell' : 'none'
+      );
+
+      if (typeof column.width === 'number') {
+        this._table?.style.setProperty(widthProperty, `${column.width}px`);
+      } else {
+        this._table?.style.removeProperty(widthProperty);
+      }
     });
   }
 }
