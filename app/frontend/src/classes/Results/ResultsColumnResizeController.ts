@@ -9,29 +9,53 @@ import type { ColumnConfig } from '../../types';
 import type { ResultsColumnAutoSizer } from './ResultsColumnAutoSizer';
 
 type ColumnResizeState = {
+  /** リサイズ中の列ID */
   columnId: string;
+  /** ドラッグ開始時のポインターX座標 */
   startX: number;
+  /** ドラッグ開始時の列幅 */
   startWidth: number;
+  /** ドラッグ中に一時反映する列設定 */
   nextColumns: ColumnConfig[];
 };
 
 type ResultsColumnResizeControllerOptions = {
+  /** 結果テーブルのヘッダー */
   thead: HTMLElement;
+  /** 結果テーブルのボディ */
   tbody: HTMLElement;
+  /** 結果テーブルを囲むスクロールコンテナ */
   tablecontainer: HTMLElement;
+  /** 自動列幅調整の状態管理 */
   autoSizer: ResultsColumnAutoSizer;
+  /** ドラッグ中の列幅を store 保存前に画面へ反映するコールバック */
   previewColumns: (_columns: ColumnConfig[]) => void;
 };
 
+/**
+ * 検索結果テーブルの列リサイズ操作を管理するクラス。
+ *
+ * pointer イベントの登録・解除、ドラッグ中の列幅プレビュー、リサイズ対象列の
+ * hover 表示、列幅リセットを担当する。確定した列幅は storeManager に保存する。
+ */
 export class ResultsColumnResizeController {
+  /** 結果テーブルのヘッダー */
   private _thead: HTMLElement;
+  /** 結果テーブルのボディ */
   private _tbody: HTMLElement;
+  /** 結果テーブルを囲むスクロールコンテナ */
   private _tablecontainer: HTMLElement;
+  /** 自動列幅調整の状態管理 */
   private _autoSizer: ResultsColumnAutoSizer;
+  /** ドラッグ中の列幅を画面へ即時反映するコールバック */
   private _previewColumns: (_columns: ColumnConfig[]) => void;
+  /** リサイズ対象列の境界線を表示するための動的 stylesheet */
   private _columnBorderStylesheet!: HTMLStyleElement;
+  /** 現在のドラッグリサイズ状態。リサイズ中でなければ null */
   private _resizeState: ColumnResizeState | null = null;
+  /** 最後に観測したポインターX座標。drag 終了後の hover 判定で使う */
   private _lastPointerX = 0;
+  /** 最後に観測したポインターY座標。drag 終了後の hover 判定で使う */
   private _lastPointerY = 0;
   private _boundColumnResizeStart: (_e: PointerEvent) => void;
   private _boundColumnResizeMove: (_e: PointerEvent) => void;
@@ -58,6 +82,9 @@ export class ResultsColumnResizeController {
     this._createColumnBorderStyles();
   }
 
+  /**
+   * 登録したイベントリスナーと動的 stylesheet を破棄する。
+   */
   destroy(): void {
     this._thead.removeEventListener(
       'pointerdown',
@@ -85,6 +112,9 @@ export class ResultsColumnResizeController {
     }
   }
 
+  /**
+   * 列リサイズに必要な pointer / hover / reset イベントを登録する。
+   */
   private _attachEventHandlers(): void {
     this._thead.addEventListener('pointerdown', this._boundColumnResizeStart);
     this._tbody.addEventListener('pointerdown', this._boundColumnResizeStart);
@@ -102,6 +132,9 @@ export class ResultsColumnResizeController {
     );
   }
 
+  /**
+   * resize-bar を掴んだときにドラッグ状態を開始する。
+   */
   private _startColumnResize(e: PointerEvent): void {
     const resizeBar = (e.target as HTMLElement).closest<HTMLElement>(
       '.resize-bar'
@@ -116,6 +149,7 @@ export class ResultsColumnResizeController {
     e.preventDefault();
     e.stopPropagation();
 
+    // ユーザーが明示的に幅変更した列は、自動列幅調整の対象から外す。
     this._autoSizer.markColumnResized(columnId);
 
     const columns = normalizeColumnConfigs(storeManager.getData('columns'));
@@ -131,10 +165,14 @@ export class ResultsColumnResizeController {
     };
     this._lastPointerX = e.clientX;
     this._lastPointerY = e.clientY;
+    // CSS 側でドラッグ中の境界線表示を切り替えるためのフラグ。
     document.body.dataset.columnResizing = 'true';
     this._tablecontainer.dataset.resizeHover = columnId;
   }
 
+  /**
+   * ドラッグ中の移動量から列幅を計算し、画面へ一時反映する。
+   */
   private _moveColumnResize(e: PointerEvent): void {
     if (!this._resizeState) return;
 
@@ -156,6 +194,9 @@ export class ResultsColumnResizeController {
     this._previewColumns(this._resizeState.nextColumns);
   }
 
+  /**
+   * ドラッグを終了し、確定した列幅を store に保存する。
+   */
   private _endColumnResize(): void {
     if (!this._resizeState) return;
 
@@ -165,6 +206,7 @@ export class ResultsColumnResizeController {
 
     const x = this._lastPointerX;
     const y = this._lastPointerY;
+    // pointerup 後の DOM 状態で、まだ resize-bar 上にいるかを確認する。
     requestAnimationFrame(() => {
       if (!document.elementFromPoint(x, y)?.closest('.resize-bar')) {
         delete this._tablecontainer.dataset.resizeHover;
@@ -172,6 +214,9 @@ export class ResultsColumnResizeController {
     });
   }
 
+  /**
+   * resize-bar の hover 対象列を tablecontainer の data 属性へ反映する。
+   */
   private _onResizeHoverOver(e: MouseEvent): void {
     if (this._resizeState) return;
     const resizeBar = (e.target as HTMLElement).closest<HTMLElement>(
@@ -185,6 +230,7 @@ export class ResultsColumnResizeController {
     const columnId = cell
       ? cell.dataset.columnId
       : (() => {
+          // tbody 側の resize-bar では cellIndex から対応する th を引く。
           const td = resizeBar.closest<HTMLTableCellElement>('td');
           if (!td) return undefined;
           return this._thead.querySelectorAll<HTMLElement>('th')[td.cellIndex]
@@ -195,12 +241,18 @@ export class ResultsColumnResizeController {
     }
   }
 
+  /**
+   * テーブル外へ出たら hover 表示を解除する。
+   */
   private _onResizeHoverLeave(): void {
     if (!this._resizeState) {
       delete this._tablecontainer.dataset.resizeHover;
     }
   }
 
+  /**
+   * リサイズ対象列の縦境界線を表示するための CSS ルールを生成する。
+   */
   private _createColumnBorderStyles(): void {
     this._columnBorderStylesheet = document.createElement('style');
     document.head.appendChild(this._columnBorderStylesheet);
@@ -209,21 +261,28 @@ export class ResultsColumnResizeController {
     COLUMNS.forEach((column) => {
       const base = `.tablecontainer[data-resize-hover="${column.id}"] .results-view`;
       const baseResizing = `body[data-column-resizing="true"] ${base}`;
+      // hover 時 th: ::after で高さ固定（th 全体の高さに依存しない）
       sheet.insertRule(
         `${base} th.${column.id}::after { content: ''; position: absolute; right: 0; bottom: 0; width: 2px; height: 20px; background: rgba(17,127,147,0.15); pointer-events: none; }`
       );
+      // hover 時 td: box-shadow（行高さに追従）
       sheet.insertRule(
         `${base} td.${column.id} { box-shadow: inset -2px 0 0 rgba(17,127,147,0.15); }`
       );
+      // drag 中 th: hover 時より濃い境界線にする
       sheet.insertRule(
         `${baseResizing} th.${column.id}::after { background: rgba(17,127,147,0.5); }`
       );
+      // drag 中 td: hover 時より濃い境界線にする
       sheet.insertRule(
         `${baseResizing} td.${column.id} { box-shadow: inset -2px 0 0 rgba(17,127,147,0.5); }`
       );
     });
   }
 
+  /**
+   * ヘッダーのダブルクリックで列幅を初期値へ戻す。
+   */
   private _resetColumnWidths(e: MouseEvent): void {
     if (!(e.target as HTMLElement).closest('thead')) return;
 
