@@ -14,7 +14,7 @@ block head
   //-   .LayoutMainAside, #SearchResultsView → stylesheets/layout/_layout.sass
   //-   table.results-view column widths → stylesheets/object/component/_results-view.scss
   //-   .drawer-view → stylesheets/object/component/_drawer-view.sass
-  style(nonce=cspNonce).
+  style(nonce="__CSP_NONCE__").
     html{height:100%}
     @media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
     *,*::before,*::after{box-sizing:border-box}
@@ -85,7 +85,7 @@ block head
       link(href=css, rel="stylesheet")
   each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/main-/))
     script(type="text/javascript", src=js, defer)
-  script(nonce=cspNonce).
+  script(nonce="__CSP_NONCE__").
     document.querySelectorAll('link[data-activate-stylesheet]').forEach(function(link) {
       link.onload = function() { this.rel = 'stylesheet'; };
     });

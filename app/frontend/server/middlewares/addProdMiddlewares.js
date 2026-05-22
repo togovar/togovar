@@ -8,6 +8,7 @@ const {
   getTrailingSlashUrl,
   getNoTrailingSlashUrl,
 } = require('./middlewareHelpers');
+const { applyCspNonce } = require('./securityHeaders');
 
 const reportHtmlCache = new Map();
 const LONG_TERM_CACHE_PATTERN =
@@ -48,7 +49,65 @@ function sendReportHtml(outputPath, req, res) {
     }
 
     res.setHeader('Cache-Control', 'no-cache');
-    return res.send(withCanonicalUrl(html, getCanonicalUrl(req)));
+    return res.send(
+      applyCspNonce(withCanonicalUrl(html, getCanonicalUrl(req)), res.locals.cspNonce)
+    );
+  });
+}
+
+function getSafeHtmlPath(outputPath, requestPath) {
+  const outputRoot = path.resolve(outputPath);
+  const normalizedRequestPath = decodeURIComponent(requestPath).split('?')[0];
+  const relativePath =
+    normalizedRequestPath === '/'
+      ? 'index.html'
+      : normalizedRequestPath.replace(/^\/+/, '');
+  const candidatePaths = [];
+
+  if (relativePath.endsWith('.html')) {
+    candidatePaths.push(path.resolve(outputPath, relativePath));
+  } else {
+    candidatePaths.push(path.resolve(outputPath, relativePath, 'index.html'));
+    candidatePaths.push(path.resolve(outputPath, `${relativePath}.html`));
+  }
+
+  return candidatePaths.find((candidatePath) => {
+    return (
+      (candidatePath === outputRoot ||
+        candidatePath.startsWith(`${outputRoot}${path.sep}`)) &&
+      fs.existsSync(candidatePath) &&
+      fs.statSync(candidatePath).isFile()
+    );
+  });
+}
+
+function sendStaticHtmlWithNonce(outputPath, req, res, next) {
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    next();
+    return;
+  }
+
+  const extension = path.extname(req.path);
+  if (extension && extension !== '.html') {
+    next();
+    return;
+  }
+
+  const htmlPath = getSafeHtmlPath(outputPath, req.path);
+  if (!htmlPath) {
+    next();
+    return;
+  }
+
+  fs.readFile(htmlPath, 'utf8', (err, html) => {
+    if (err) {
+      next();
+      return;
+    }
+
+    res.setHeader('Cache-Control', 'no-cache');
+    res.type('html');
+    res.send(applyCspNonce(html, res.locals.cspNonce));
   });
 }
 
@@ -95,6 +154,10 @@ module.exports = function addProdMiddlewares(app, options) {
     }
 
     sendReportHtml(outputPath, req, res);
+  });
+
+  app.get('*', (req, res, next) => {
+    sendStaticHtmlWithNonce(outputPath, req, res, next);
   });
 
   app.use(
