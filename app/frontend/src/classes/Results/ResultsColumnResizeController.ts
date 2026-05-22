@@ -259,11 +259,19 @@ export class ResultsColumnResizeController {
     const sheet = this._columnBorderStylesheet.sheet;
     if (!sheet) return;
     COLUMNS.forEach((column) => {
+      const idleBase = `.tablecontainer .results-view`;
       const base = `.tablecontainer[data-resize-hover="${column.id}"] .results-view`;
       const baseResizing = `body[data-column-resizing="true"] ${base}`;
+      // 通常時も透明な境界線を持たせ、hover 解除時にも transition が効くようにする
+      sheet.insertRule(
+        `${idleBase} th.${column.id}::after { content: ''; position: absolute; right: 0; bottom: 0; width: 2px; height: 20px; background-color: rgba(17,127,147,0); opacity: 0; transform: scaleY(0.7); transform-origin: bottom; pointer-events: none; transition: opacity 300ms ease, transform 140ms ease, background-color 140ms ease; }`
+      );
+      sheet.insertRule(
+        `${idleBase} td.${column.id} { box-shadow: inset -2px 0 0 rgba(17,127,147,0); transition: box-shadow 300ms ease; }`
+      );
       // hover 時 th: ::after で高さ固定（th 全体の高さに依存しない）
       sheet.insertRule(
-        `${base} th.${column.id}::after { content: ''; position: absolute; right: 0; bottom: 0; width: 2px; height: 20px; background: rgba(17,127,147,0.15); pointer-events: none; }`
+        `${base} th.${column.id}::after { background-color: rgba(17,127,147,0.15); opacity: 1; transform: scaleY(1); }`
       );
       // hover 時 td: box-shadow（行高さに追従）
       sheet.insertRule(
@@ -271,7 +279,7 @@ export class ResultsColumnResizeController {
       );
       // drag 中 th: hover 時より濃い境界線にする
       sheet.insertRule(
-        `${baseResizing} th.${column.id}::after { background: rgba(17,127,147,0.5); }`
+        `${baseResizing} th.${column.id}::after { background-color: rgba(17,127,147,0.5); }`
       );
       // drag 中 td: hover 時より濃い境界線にする
       sheet.insertRule(
