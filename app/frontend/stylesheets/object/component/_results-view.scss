@@ -21,9 +21,71 @@
       > th {
         position: relative;
 
-        // Type 列はデフォルト非表示（列設定で表示切替可能）
+        &.togovar_id {
+          width: 124px;
+          min-width: 124px;
+          max-width: 124px;
+        }
+
+        &.refsnp_id {
+          width: 116px;
+          min-width: 116px;
+          max-width: 116px;
+        }
+
+        &.position {
+          width: 164px;
+          min-width: 164px;
+          max-width: 164px;
+        }
+
+        &.ref_alt {
+          width: 104px;
+          min-width: 104px;
+          max-width: 104px;
+        }
+
         &.type {
+          width: 96px;
+          min-width: 96px;
+          max-width: 96px;
           display: none;
+        }
+
+        &.gene {
+          width: 116px;
+          min-width: 116px;
+          max-width: 116px;
+        }
+
+        &.alt_frequency {
+          width: 120px;
+          min-width: 120px;
+          max-width: 120px;
+        }
+
+        &.consequence {
+          width: 176px;
+          min-width: 176px;
+          max-width: 176px;
+        }
+
+        &.alphamissense {
+          width: 71px;
+          min-width: 71px;
+          max-width: 71px;
+        }
+
+        &.sift {
+          width: 57px;
+          min-width: 57px;
+          max-width: 57px;
+        }
+
+        &.polyphen {
+          width: 70px;
+          min-width: 70px;
+          max-width: 70px;
         }
 
         // 列名テキスト（-20deg 傾けて縦に詰まったヘッダー内に収める）
@@ -97,6 +159,72 @@
         padding: 2px 10px 2px 6px;
         overflow: hidden;
         text-overflow: ellipsis;
+
+        &.togovar_id {
+          width: 124px;
+          min-width: 124px;
+          max-width: 124px;
+        }
+
+        &.refsnp_id {
+          width: 116px;
+          min-width: 116px;
+          max-width: 116px;
+        }
+
+        &.position {
+          width: 164px;
+          min-width: 164px;
+          max-width: 164px;
+        }
+
+        &.ref_alt {
+          width: 104px;
+          min-width: 104px;
+          max-width: 104px;
+        }
+
+        &.type {
+          width: 96px;
+          min-width: 96px;
+          max-width: 96px;
+        }
+
+        &.gene {
+          width: 116px;
+          min-width: 116px;
+          max-width: 116px;
+        }
+
+        &.alt_frequency {
+          width: 120px;
+          min-width: 120px;
+          max-width: 120px;
+        }
+
+        &.consequence {
+          width: 176px;
+          min-width: 176px;
+          max-width: 176px;
+        }
+
+        &.alphamissense {
+          width: 71px;
+          min-width: 71px;
+          max-width: 71px;
+        }
+
+        &.sift {
+          width: 57px;
+          min-width: 57px;
+          max-width: 57px;
+        }
+
+        &.polyphen {
+          width: 70px;
+          min-width: 70px;
+          max-width: 70px;
+        }
 
         // 列幅リサイズ用ドラッグハンドル（td 側）
         > .resize-bar {
@@ -177,6 +305,10 @@
         // td 自体は display:table-cell のままにする。
         // -------------------------------------------------------------------------
         &.clinical_significance {
+          width: 276px;
+          min-width: 276px;
+          max-width: 276px;
+
           > .clinical-significance-flex {
             display: flex;
             align-items: center;
