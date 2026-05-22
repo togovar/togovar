@@ -247,16 +247,16 @@ export class ResultsViewDisplayManager {
         const headerRule =
           `.tablecontainer > table.results-view th.${column.id} { ` +
           `display: var(${displayProperty}, table-cell); ` +
-          `width: var(${widthProperty}, auto); ` +
-          `min-width: var(${widthProperty}, 0); ` +
-          `max-width: var(${widthProperty}, none); ` +
+          `width: var(${widthProperty}); ` +
+          `min-width: var(${widthProperty}); ` +
+          `max-width: var(${widthProperty}); ` +
           '}';
         const bodyRule =
           `.tablecontainer > table.results-view td.${column.id} { ` +
           `display: var(${displayProperty}, table-cell); ` +
-          `width: var(${widthProperty}, auto); ` +
-          `min-width: var(${widthProperty}, 0); ` +
-          `max-width: var(${widthProperty}, none); ` +
+          `width: var(${widthProperty}); ` +
+          `min-width: var(${widthProperty}); ` +
+          `max-width: var(${widthProperty}); ` +
           '}';
 
         return `${headerRule}\n${bodyRule}`;
