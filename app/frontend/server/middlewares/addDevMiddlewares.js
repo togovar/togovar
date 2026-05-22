@@ -9,6 +9,7 @@ const {
   getTrailingSlashUrl,
   getNoTrailingSlashUrl,
 } = require('./middlewareHelpers');
+const { applyCspNonce } = require('./securityHeaders');
 
 function createWebpackMiddleware(compiler, publicPath) {
   return webpackDevMiddleware(compiler, {
@@ -39,7 +40,7 @@ function sendReportHtml(outputFileSystem, outputPath, req, res) {
       if (err) {
         res.sendStatus(404);
       } else {
-        res.send(withCanonicalUrl(file.toString(), getCanonicalUrl(req)));
+        res.send(applyCspNonce(withCanonicalUrl(file.toString(), getCanonicalUrl(req)), res.locals.cspNonce));
       }
     }
   );
@@ -99,7 +100,7 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
         if (err) {
           res.sendStatus(404);
         } else {
-          res.send(file.toString());
+          res.send(applyCspNonce(file.toString(), res.locals.cspNonce));
         }
       }
     );
