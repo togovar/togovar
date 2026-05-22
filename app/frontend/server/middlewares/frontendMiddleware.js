@@ -5,12 +5,11 @@
  */
 module.exports = (app, options) => {
   const isProd = process.env.NODE_ENV === 'production';
-  const setSecurityHeaders = require('./securityHeaders');
-
-  app.use(setSecurityHeaders);
 
   if (isProd) {
+    const setSecurityHeaders = require('./securityHeaders');
     const addProdMiddlewares = require('./addProdMiddlewares');
+    app.use(setSecurityHeaders);
     addProdMiddlewares(app, options);
   } else {
     const webpackConfig = require('../../config/webpack.config.dev');
