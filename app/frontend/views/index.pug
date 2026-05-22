@@ -87,7 +87,14 @@ block head
     script(type="text/javascript", src=js, defer)
   script(nonce="__CSP_NONCE__").
     document.querySelectorAll('link[data-activate-stylesheet]').forEach(function(link) {
-      link.onload = function() { this.rel = 'stylesheet'; };
+      function activateStylesheet() {
+        link.rel = 'stylesheet';
+        link.removeAttribute('data-activate-stylesheet');
+        link.removeEventListener('load', activateStylesheet);
+      }
+
+      link.addEventListener('load', activateStylesheet);
+      activateStylesheet();
     });
 
 block content
