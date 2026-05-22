@@ -17,11 +17,15 @@ html(data-page=locals.currentPage, lang=lang)
     link(rel="preconnect" href="https://fonts.googleapis.com")
     link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
     link(rel="preload" href=fontStylesheetHref as="style")
-    link(rel="stylesheet" href=fontStylesheetHref media="print" onload="this.media='all'")
+    link(rel="stylesheet" href=fontStylesheetHref media="print" id="font-stylesheet")
     noscript
       link(rel="stylesheet" href=fontStylesheetHref)
     link(rel="icon" href="/favicon.svg" type="image/svg+xml")
-    script.
+    script(nonce=cspNonce).
+      (function() {
+        var f = document.getElementById('font-stylesheet');
+        if (f) f.addEventListener('load', function() { this.media = 'all'; });
+      })();
       (async function() {
         try {
           if (window.location.origin === 'http://localhost:8000') return

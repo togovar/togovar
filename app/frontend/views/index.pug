@@ -14,7 +14,7 @@ block head
   //-   .LayoutMainAside, #SearchResultsView → stylesheets/layout/_layout.sass
   //-   table.results-view column widths → stylesheets/object/component/_results-view.scss
   //-   .drawer-view → stylesheets/object/component/_drawer-view.sass
-  style.
+  style(nonce=cspNonce).
     html{height:100%}
     @media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
     *,*::before,*::after{box-sizing:border-box}
@@ -79,12 +79,16 @@ block head
     body.-layout-ready #SearchResultsView .tablecontainer tbody,body.-layout-ready #SearchResultsView #Messages,body.-layout-ready #SearchResultsView #RowIndicator,body.-layout-ready #SearchResultsView .LayoutAside,body.-layout-ready #Karyotype{opacity:1;pointer-events:auto}
   - var mainCssFiles = htmlWebpackPlugin.files.css.filter(x => x.match(/^\/css\/main-/))
   each css in mainCssFiles
-    link(rel="preload" href=css as="style" onload="this.onload=null;this.rel='stylesheet'")
+    link(rel="preload" href=css as="style" data-activate-stylesheet)
   noscript
     each css in mainCssFiles
       link(href=css, rel="stylesheet")
   each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/main-/))
     script(type="text/javascript", src=js, defer)
+  script(nonce=cspNonce).
+    document.querySelectorAll('link[data-activate-stylesheet]').forEach(function(link) {
+      link.onload = function() { this.rel = 'stylesheet'; };
+    });
 
 block content
   include includes/_search_results_main
