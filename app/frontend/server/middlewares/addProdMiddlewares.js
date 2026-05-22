@@ -57,7 +57,14 @@ function sendReportHtml(outputPath, req, res) {
 
 function getSafeHtmlPath(outputPath, requestPath) {
   const outputRoot = path.resolve(outputPath);
-  const normalizedRequestPath = decodeURIComponent(requestPath).split('?')[0];
+  let normalizedRequestPath;
+
+  try {
+    normalizedRequestPath = decodeURIComponent(requestPath).split('?')[0];
+  } catch (err) {
+    return null;
+  }
+
   const relativePath =
     normalizedRequestPath === '/'
       ? 'index.html'
