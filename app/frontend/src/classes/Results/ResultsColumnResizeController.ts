@@ -110,6 +110,10 @@ export class ResultsColumnResizeController {
     if (this._columnBorderStylesheet) {
       this._columnBorderStylesheet.remove();
     }
+
+    this._resizeState = null;
+    delete document.body.dataset.columnResizing;
+    delete this._tablecontainer.dataset.resizeHover;
   }
 
   /**
