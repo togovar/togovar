@@ -62,20 +62,24 @@ export class AdvancedSearchToolbar {
           : key) ?? key;
 
       return createEl('li', {
-        class: 'command',
-        attrs: { tabindex: '0', role: 'button' },
-        dataset: {
-          command: 'add-condition',
-          condition: key,
-          shortcut: String(index + 1),
-        },
         children: [
-          createEl('p', { text: label }),
-          createEl('small', {
-            class: 'shortcut',
+          createEl('button', {
+            class: 'command',
+            attrs: { type: 'button' },
+            dataset: {
+              command: 'add-condition',
+              condition: key,
+              shortcut: String(index + 1),
+            },
             children: [
-              createEl('span', { class: ['char', '-command'] }),
-              String(index + 1),
+              createEl('span', { text: label }),
+              createEl('small', {
+                class: 'shortcut',
+                children: [
+                  createEl('span', { class: ['char', '-command'] }),
+                  String(index + 1),
+                ],
+              }),
             ],
           }),
         ],
@@ -94,13 +98,13 @@ export class AdvancedSearchToolbar {
     // Build command items (group / ungroup / delete)
     const commandLis = COMMANDS.map((cmd) =>
       createEl('li', {
-        class: 'command',
-        attrs: { tabindex: '0', role: 'button' },
-        dataset: { command: cmd.command },
         children: [
-          createEl('p', {
+          createEl('button', {
+            class: 'command',
+            attrs: { type: 'button' },
+            dataset: { command: cmd.command },
             children: [
-              cmd.label, // text node
+              createEl('span', { text: cmd.label }),
               createEl('small', {
                 class: 'shortcut',
                 children: [
@@ -152,6 +156,9 @@ export class AdvancedSearchToolbar {
   private _onKeydown = (e: KeyboardEvent) => {
     const target = e.target;
     if (!(target instanceof Element)) return;
+
+    // Native buttons already provide Enter/Space activation.
+    if (target instanceof HTMLButtonElement) return;
 
     // Only handle focused .command items.
     const cmdEl = target.closest<HTMLElement>('.command');
