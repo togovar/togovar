@@ -2,6 +2,8 @@
 
 $COLOR_REF_BG: color.adjust($COLOR_REF, $lightness: 48%, $saturation: -10%)
 $COLOR_ALT_BG: color.adjust($COLOR_ALT, $lightness: 24%, $saturation: -10%)
+$COLOR_REF_TEXT: $COLOR_KEY_DARK2
+$COLOR_ALT_TEXT: #c52543
 
 .ref-alt
   font-weight: bold
@@ -34,7 +36,7 @@ $COLOR_ALT_BG: color.adjust($COLOR_ALT, $lightness: 24%, $saturation: -10%)
     border-bottom: solid 1px $COLOR_REF
     border-top-left-radius: 3px
     border-bottom-left-radius: 3px
-    color: $COLOR_REF
+    color: $COLOR_REF_TEXT
     background-color: $COLOR_REF_BG
     position: relative
     padding-right: 4px
@@ -46,7 +48,7 @@ $COLOR_ALT_BG: color.adjust($COLOR_ALT, $lightness: 24%, $saturation: -10%)
     border-bottom: solid 1px $COLOR_ALT
     border-top-right-radius: 3px
     border-bottom-right-radius: 3px
-    color: $COLOR_ALT
+    color: $COLOR_ALT_TEXT
     background-color: $COLOR_ALT_BG
     padding-left: 9px
     &[data-sum]:after

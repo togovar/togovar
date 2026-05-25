@@ -11,7 +11,7 @@ $SIZE: 30px;
 
     > .input-form {
       > .searchfield[type='text'] {
-        font-family: 'Roboto Condensed', sans-serif;
+        font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
         box-sizing: border-box;
         width: 100%;
         line-height: $SIZE;
@@ -38,10 +38,12 @@ $SIZE: 30px;
         cursor: pointer;
 
         &:after {
-          font-family: fontello;
-          content: var(--char-delete);
+          font-family: 'Font Awesome 7 Free', sans-serif;
+          font-weight: 900;
+          content: var(--icon-xmark);
           position: absolute;
-          font-size: 1.2rem;
+          top: 2px;
+          font-size: 1rem;
         }
       }
 

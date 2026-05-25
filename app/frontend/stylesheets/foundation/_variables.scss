@@ -126,25 +126,6 @@ $TRANSITION_DURATION: 0.5s;
 // effect
 $SHADOW_DEPTH1: 0 1px 1px rgba(black, 0.3);
 
-// charactor
-// FontAwesome
-$CHAR_TIMES: '\f00d';
-$CHAR_INFO_CIRCLE: '\f05a';
-$CHAR_ARROW_RIGHT: '\f061';
-$CHAR_ARROW_DOWN: '\f063';
-$CHAR_EXCRAMATION_TRIANGLE: '\f071';
-$CHAR_EXTERNAL_LINK: '\f08e';
-$CHAR_ARROW_CIRCLE_RIGHT: '\f0a9';
-$CHAR_WRENCH: '\f0ad';
-$CHAR_STANZA_LINK: '\f0c1';
-$CHAR_BARS: '\f0c9';
-$CHAR_LOCK: '\f023';
-// fontello
-$CHAR_DATASET: '\E800';
-$CHAR_LOGICAL_OP_AND: '\E801';
-$CHAR_LOGICAL_OP_OR: '\E802';
-$CHAR_LOGICAL_OP_OUTLINE: '\E803';
-
 :root {
   // color
   --color-key: #{$COLOR_KEY};
@@ -221,27 +202,19 @@ $CHAR_LOGICAL_OP_OUTLINE: '\E803';
   --z-index-editing-condition: calc(var(--z-index-base) + 400);
   --z-index-activity-indicator: calc(var(--z-index-base) + 500);
 
-  // charactor
-  // FontAwesome
-  --char-TIMES: '\f00d';
-  --char-INFO_CIRCLE: '\f05a';
-  --char-ARROW_RIGHT: '\f061';
-  --char-ARROW_DOWN: '\f063';
-  --char-CARET-UP: '\f0d8';
-  --char-CARET-DOWN: '\f0d7';
-  --char-EXCRAMATION_TRIANGLE: '\f071';
-  --char-EXTERNAL_LINK: '\f08e';
-  --char-ARROW_CIRCLE_RIGHT: '\f0a9';
-  --char-WRENCH: '\f0ad';
-  --char-CHECK: '\f00c';
-  // fontello
-  --char-dataset: '\E800';
-  --char-logical-op-and: '\E801';
-  --char-logical-op-or: '\E802';
-  --char-logical-op-outline: '\E803';
-  --char-edit: '\E804';
-  --char-delete: '\E805';
-  --char-group: '\E806';
-  --char-ungroup: '\E807';
-  --char-copy: '\E808';
+  // icon
+  --icon-plus: '\2b';
+  --icon-check: '\f00c';
+  --icon-xmark: '\f00d';
+  --icon-lock: '\f023';
+  --icon-circle-info: '\f05a';
+  --icon-arrow-down: '\f063';
+  --icon-triangle-exclamation: '\f071';
+  --icon-arrow-up-right-from-square: '\f08e';
+  --icon-circle-arrow-right: '\f0a9';
+  --icon-link: '\f0c1';
+  --icon-bars: '\f0c9';
+  --icon-database: '\f1c0';
+  --icon-pencil: '\f303';
+  --icon-grip-vertical: '\f58e';
 }

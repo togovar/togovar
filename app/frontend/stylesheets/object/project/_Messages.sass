@@ -10,7 +10,8 @@
     margin-bottom: 4px
     position: relative
     &:before
-      font-family: "FontAwesome"
+      font-family: 'Font Awesome 7 Free'
+      font-weight: 900
       position: absolute
       top: 50%
       transform: translateY(-50%)
@@ -19,17 +20,17 @@
       border-color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: -2%)
       background-color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: 30%)
       &:before
-        content: $CHAR_TIMES
+        content: var(--icon-xmark)
         color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: -2%)
     &.-warning
       border-color: color.adjust($COLOR_SIGN_WARNING, $lightness: -2%)
       background-color: color.adjust($COLOR_SIGN_WARNING, $lightness: 45%)
       &:before
-        content: $CHAR_EXCRAMATION_TRIANGLE
+        content: var(--icon-triangle-exclamation)
         color: color.adjust($COLOR_SIGN_WARNING, $lightness: -2%)
     &.-notice
       border-color: color.adjust($COLOR_SIGN_NORMAL, $lightness: -2%)
       background-color: color.adjust($COLOR_SIGN_NORMAL, $lightness: 42%)
       &:before
-        content: $CHAR_INFO_CIRCLE
+        content: var(--icon-circle-info)
         color: color.adjust($COLOR_SIGN_NORMAL, $lightness: -2%)

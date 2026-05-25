@@ -54,6 +54,8 @@ block content
                   a.link(href='#d7') AlphaMissense、SIFT、PolyPhenとは何ですか。
                 li.item.-question
                   a.link(href='#d8') バリアントデータ作成時にリフトオーバツールを利用しましたか。
+                li.item.-question
+                  a.link(href='#d9') 同じ日本人祖先集団内であっても、データセット毎にアレル頻度が異なるのはなぜですか。
             li.category
               h3.categorytitle TogoVar検索システムに関して
               ul.categorylist
@@ -254,6 +256,15 @@ block content
                 a.hyper-text.-external(target='_blank', href='https://crossmap.sourceforge.net/')
                   | CrossMap
                 | を利用しました。
+          #d9.question-answer
+            h4.question 同じ日本人祖先集団内であっても、データセット毎にアレル頻度が異なるのはなぜですか。
+            .answer
+              p
+                | 同じ日本人祖先集団内であっても、対象者の出身地域やサンプリング方法が異なると、データセット間でアレル頻度に差が生じることがあります。日本人集団には地域に関連した細かな遺伝的構造が存在することが報告されており、特にデータセットの対象地域や対象者構成に偏りがある場合、その違いがアレル頻度の差として反映される可能性があります。また、サンプル数、年齢構成、疾患の有無、シーケンス条件、バリアント検出・品質管理・頻度計算の方法の違いも、頻度差の要因となります。
+              p
+                | 参考文献:
+                br
+                | Sakaue S. et al. Dimensionality reduction reveals fine-scale structure in the Japanese population with consequences for polygenic risk prediction. Nature Communications, 2020.
 
         section.section
           h3.sectiontitle TogoVarの検索システムに関して
@@ -399,7 +410,7 @@ block content
             h4.question TogoVarでは、どのようにバリアントを表記していますか。
             .answer
               p
-                | TogoVarでは、ゲノム上の位置及びreference allele、alternative allele、ヒトゲノム標準配列のビルド番号の組み合わせでバリアントを一意に識別します。TogoVar及びdbSNP、
+                | TogoVarでは、ゲノム上の位置及びreference allele、alternate allele、ヒトゲノム標準配列のビルド番号の組み合わせでバリアントを一意に識別します。TogoVar及びdbSNP、
                 a.hyper-text.-external(target='_blank', href='https://samtools.github.io/hts-specs/VCFv4.2.pdf') VCF
                 | 、
                 a.hyper-text.-external(target='_blank', href='http://varnomen.hgvs.org/bg-material/simple/#types-of-variants') HGVS
@@ -571,7 +582,7 @@ block content
                 ol.ordered-list
                   li 画面上部のAdvanced searchタブを選択します。
                     img(src=require("../../../images/help-image1.png").default alt="help-image1")
-                  li Add conditionメニューからAlternative allele frequency/countを選択します。
+                  li Add conditionメニューからAlternate allele frequency/countを選択します。
                     p
                       img(src=require("../../../images/help-image2.png").default alt="help-image2" width="241")
                   li 以下の画面でデータセット(GEM-J WGA)と代替アレル頻度(>=0.3)を指定します。代替アレル数でも指定できます。

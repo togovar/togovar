@@ -2,13 +2,15 @@ extend ../layouts/application
 
 append variables
   - locals.currentPage = "variant";
+  - locals.description = "TogoVar variant report pages provide allele frequencies, clinical significance, consequences, genes, transcripts, publications, and genomic context for human variants.";
+  - locals.canonicalUrl = "__TOGOVAR_CANONICAL_URL__";
 
 block head
   each css in htmlWebpackPlugin.files.css.filter(x => x.match(/^\/css\/main-/))
     link(href=css, rel="stylesheet")
   each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/report-/))
     script(type="text/javascript", src=js)
-  script.
+  script(nonce="__CSP_NONCE__").
     window.addEventListener('DOMContentLoaded', () => {
       window.scrollTo(0, 0);
 
@@ -50,6 +52,11 @@ block content
         a.titlelink(href="#frequency")
         h3.title
           | Frequency
+          button.floating-info-trigger(
+            type="button"
+            data-tooltip-id="variant-frequency"
+            aria-label="Why do allele frequencies differ between datasets?"
+          )
       #variant-frequency.stanza
 
     section.stanza-view#clinical-significance-mgend

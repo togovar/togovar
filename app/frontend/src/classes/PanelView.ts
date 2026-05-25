@@ -4,10 +4,10 @@
  *
  * 以下のサブクラスで継承される:
  * {@link PanelViewCheckList} - チェックリスト形式のフィルター
- * {@link PanelViewFilterAlternativeAlleleFrequency} - アレル頻度フィルター
+ * {@link PanelViewFilterAlternateAlleleFrequency} - アレル頻度フィルター
  * {@link PanelViewFilterConsequence} - Consequenceフィルター
  * {@link PanelViewFilterVariantCallingQuality} - バリアントコール品質フィルター
- * {@link PanelViewPreviewAlternativeAlleleFrequencies} - アレル頻度プレビュー
+ * {@link PanelViewPreviewAlternateAlleleFrequencies} - アレル頻度プレビュー
  * {@link PanelViewPreviewClinicalSignificance} - 臨床的意義プレビュー
  * {@link PanelViewPreviewConsequence} - Consequenceプレビュー
  * {@link PanelViewPreviewExternalLinks} - 外部リンクプレビュー

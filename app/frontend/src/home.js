@@ -1,30 +1,28 @@
 import { storeManager } from '../src/store/StoreManager';
 import { ResultsView } from '../src/classes/Results/ResultsView';
 import SideBar from '../src/classes/SideBar.js';
-import Configuration from '../src/classes/Configuration.js';
 import Karyotype from '../src/classes/Karyotype.js';
 import ActivityIndicator from '../src/classes/ActivityIndicator.js';
 import ModuleTabsView from '../src/classes/ModuleTabsView.js';
 // import CollapseView from '../src/classes/CollapseView.js';
 import TopPageLayoutManager from '../src/classes/TopPageLayoutManager.js';
-import DownloadButton from './classes/DownloadButton.js';
+import DownloadButton from './classes/DownloadButton.ts';
 // Search
 import SimpleSearchView from './components/SearchField/SimpleSearch/SimpleSearchView';
-import { AdvancedSearchBuilderView } from '../src/classes/AdvancedSearchBuilderView.ts';
 // PanelViews
 // PanelViews: Filters
 import PanelViewCheckList from '../src/classes/PanelViewCheckList.ts';
-import PanelViewFilterAlternativeAlleleFrequency from '../src/classes/PanelViewFilterAlternativeAlleleFrequency.js';
+import PanelViewFilterAlternateAlleleFrequency from '../src/classes/PanelViewFilterAlternateAlleleFrequency.js';
 import PanelViewFilterVariantCallingQuality from '../src/classes/PanelViewFilterVariantCallingQuality.js';
 import PanelViewFilterConsequence from '../src/classes/PanelViewFilterConsequence.ts';
 // PanelViews: Variant preview
 import PanelViewPreviewGene from '../src/classes/PanelViewPreviewGene.js';
 import PreviewToVariantReport from '../src/classes/PreviewToVariantReport.js';
 import PanelViewPreviewExternalLinks from '../src/classes/PanelViewPreviewExternalLinks.js';
-import PanelViewPreviewAlternativeAlleleFrequencies from '../src/classes/PanelViewPreviewAlternativeAlleleFrequencies.js';
+import PanelViewPreviewAlternateAlleleFrequencies from '../src/classes/PanelViewPreviewAlternateAlleleFrequencies.js';
 import PanelViewPreviewConsequence from '../src/classes/PanelViewPreviewConsequence.js';
 import PanelViewPreviewClinicalSignificance from '../src/classes/PanelViewPreviewClinicalSignificance.js';
-import TippyBox from '../src/classes/TippyBox.js';
+import FloatingInfo from '../src/classes/FloatingInfo.ts';
 
 import qs from 'qs';
 import { extractSearchCondition } from './store/searchManager';
@@ -38,8 +36,6 @@ export function initHome() {
   storeManager.setData('selectedRow', undefined);
 
   initializeApp(); // 先にURLからモードを設定
-
-  new Configuration(document.getElementById('Configuration'));
 
   new Karyotype(document.getElementById('Karyotype'));
 
@@ -124,12 +120,18 @@ const getAllElements = (selector) => document.querySelectorAll(selector);
 
 // グローバル変数: ResultsView インスタンスを管理
 let globalResultsView = null;
+let globalFloatingInfo = null;
+let advancedSearchBuilderView = null;
+let advancedSearchBuilderViewPromise = null;
 
 // 検索結果画面の初期化
 function initResultsView() {
   const resultView = new ResultsView(getElement('ResultsView'));
   globalResultsView = resultView; // グローバル参照を保存
   TopPageLayoutManager.init([resultView]);
+  requestAnimationFrame(() => {
+    document.body.classList.add('-layout-ready');
+  });
 }
 
 // クリーンアップ機能: すべてのリソースを解放
@@ -145,6 +147,16 @@ function cleanupApplication() {
       console.error('Error cleaning up ResultsView:', error);
     }
     globalResultsView = null;
+  }
+
+  // FloatingInfo のクリーンアップ
+  if (globalFloatingInfo && typeof globalFloatingInfo.dispose === 'function') {
+    try {
+      globalFloatingInfo.dispose();
+    } catch (error) {
+      console.error('Error cleaning up FloatingInfo:', error);
+    }
+    globalFloatingInfo = null;
   }
 
   // TopPageLayoutManager のクリーンアップ
@@ -172,9 +184,11 @@ function cleanupApplication() {
 
 // ページ離脱時のクリーンアップ設定
 function setupCleanupHandlers() {
-  // ブラウザのページ離脱時
-  window.addEventListener('beforeunload', () => {
-    cleanupApplication();
+  // bfcache 復元時にイベントリスナーが消えないよう、キャッシュされない離脱時だけ破棄する
+  window.addEventListener('pagehide', (event) => {
+    if (!event.persisted) {
+      cleanupApplication();
+    }
   });
 
   // ページ非表示時（タブ切り替えやブラウザ最小化）
@@ -206,8 +220,8 @@ function initSidebar() {
     'dataset',
     'statisticsDataset'
   );
-  new PanelViewFilterAlternativeAlleleFrequency(
-    getElement('FilterAlternativeAlleleFrequency')
+  new PanelViewFilterAlternateAlleleFrequency(
+    getElement('FilterAlternateAlleleFrequency')
   );
   new PanelViewFilterVariantCallingQuality(
     getElement('FilterVariantCallingQuality')
@@ -233,8 +247,8 @@ function initVariantPreview() {
   new PanelViewPreviewGene(getElement('PreviewGene'));
   new PreviewToVariantReport(getElement('PreviewToVariantReport'));
   new PanelViewPreviewExternalLinks(getElement('PreviewExternalLinks'));
-  new PanelViewPreviewAlternativeAlleleFrequencies(
-    getElement('PreviewAlternativeAlleleFrequencies')
+  new PanelViewPreviewAlternateAlleleFrequencies(
+    getElement('PreviewAlternateAlleleFrequencies')
   );
   new PanelViewPreviewConsequence(getElement('PreviewConsequence'));
   new PanelViewPreviewClinicalSignificance(
@@ -245,16 +259,53 @@ function initVariantPreview() {
 // 検索窓の初期化
 function initSearchInputs() {
   new SimpleSearchView();
-  new AdvancedSearchBuilderView(getElement('AdvancedSearchBuilderView'));
+
+  if (storeManager.getData('searchMode') === 'advanced') {
+    loadAdvancedSearchBuilderView();
+  }
 
   // 検索モード変更の設定
   getAllElements('#SearchInputView > .tabscontainer > ul > li').forEach(
     (elm) => {
       elm.addEventListener('click', (e) => {
-        storeManager.setData('searchMode', e.target.dataset.target);
+        const mode = e.currentTarget.dataset.target;
+        if (mode !== 'simple' && mode !== 'advanced') return;
+
+        storeManager.setData('searchMode', mode);
+
+        if (mode === 'advanced') {
+          loadAdvancedSearchBuilderView();
+        }
       });
     }
   );
+}
+
+function loadAdvancedSearchBuilderView() {
+  if (advancedSearchBuilderView) {
+    return Promise.resolve(advancedSearchBuilderView);
+  }
+
+  if (advancedSearchBuilderViewPromise) {
+    return advancedSearchBuilderViewPromise;
+  }
+
+  advancedSearchBuilderViewPromise = import(
+    /* webpackChunkName: "advanced-search" */
+    '../src/classes/AdvancedSearchBuilderView.ts'
+  )
+    .then(({ AdvancedSearchBuilderView }) => {
+      advancedSearchBuilderView = new AdvancedSearchBuilderView(
+        getElement('AdvancedSearchBuilderView')
+      );
+      return advancedSearchBuilderView;
+    })
+    .catch((error) => {
+      advancedSearchBuilderViewPromise = null;
+      console.error('Failed to import advanced search module:', error);
+    });
+
+  return advancedSearchBuilderViewPromise;
 }
 
 // モジュールタブメニューの初期化
@@ -266,5 +317,9 @@ function initModuleTabs() {
 
 // ツールチップの初期化
 function initTooltip() {
-  new TippyBox();
+  if (globalFloatingInfo && typeof globalFloatingInfo.dispose === 'function') {
+    globalFloatingInfo.dispose();
+  }
+
+  globalFloatingInfo = new FloatingInfo();
 }

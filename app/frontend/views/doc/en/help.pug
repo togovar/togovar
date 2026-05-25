@@ -56,6 +56,8 @@ block content
                   a.link(href='#d7') What are AlphaMissense, SIFT and PolyPhen?
                 li.item.-question
                   a.link(href='#d8') Was a liftover tool used for generating variant data?
+                li.item.-question
+                  a.link(href='#d9') Why do allele frequencies differ between datasets even within the same Japanese ancestry group?
             li.category
               h3.categorytitle About the TogoVar search system
               ul.categorylist
@@ -65,7 +67,7 @@ block content
                     | results represent?
                 li.item.-question
                   a.link(href='#s2')
-                    | For each variant type, how is the position, reference and alternative allele
+                    | For each variant type, how is the position, reference and alternate allele
                     | described respectively?
                 li.item.-question
                   a.link(href='#s3') In TogoVar, how is the variant described?
@@ -74,7 +76,7 @@ block content
                 li.item.-question
                   a.link(href='#s5') What can I do with the Advanced search?
                 li.item.-question
-                  a.link(href='#s6') Can I search for variants with different alternative allele frequencies between Japanese and other populations?
+                  a.link(href='#s6') Can I search for variants with different alternate allele frequencies between Japanese and other populations?
                 li.item.-question
                   a.link(href='#s7') Can I search for variants by both positions on GRCh38 and GRCh37?
 
@@ -315,6 +317,16 @@ block content
                 a.hyper-text.-external(target='_blank', href='https://crossmap.sourceforge.net/')
                   | CrossMap
                 | was used until the release on July 14, 2023.
+          #d9.question-answer
+            h4.question Why do allele frequencies differ between datasets even within the same Japanese ancestry group?
+            .answer
+              p
+                | Even within the same Japanese ancestry group, allele frequencies may differ between datasets when participants’ regions of origin or sampling designs differ. Fine-scale genetic structure related to geographic regions has been reported within the Japanese population, and differences in regional composition or participant selection may therefore be reflected as differences in allele frequencies between datasets. Other factors, such as sample size, age distribution, disease status, sequencing conditions, variant calling, quality control, and allele frequency calculation methods, can also contribute to such differences.
+              p
+                | Reference:
+                br
+                | Sakaue S. et al. Dimensionality reduction reveals fine-scale structure in the Japanese population with consequences for polygenic risk prediction. Nature Communications, 2020.
+
         section.section
           h3.sectiontitle About the TogoVar search system
           #s1.question-answer._column-span-all
@@ -396,7 +408,7 @@ block content
 
           #s2.question-answer._column-span-all
             h4.question
-              | For each variant type, how is the position, reference and alternative allele described respectively?
+              | For each variant type, how is the position, reference and alternate allele described respectively?
             .answer
               p
                 | An example for each variant type is shown below. Note that the position of the first base in the
@@ -624,32 +636,32 @@ block content
               | ?
             .answer
               p
-                |You can build a query with an alternative allele frequency, clinical significance,
+                |You can build a query with an alternate allele frequency, clinical significance,
                 | and other search criteria combined with the AND and/or OR operator. See
-                a.link(href='#s6') "Q: Can I search for variants with different alternative allele frequencies between Japanese and other populations?"
+                a.link(href='#s6') "Q: Can I search for variants with different alternate allele frequencies between Japanese and other populations?"
                 |
                 |for usage.
           #s6.question-answer._column-span-all
-            h4.question Can I search for variants with different alternative allele frequencies between Japanese and other populations?
+            h4.question Can I search for variants with different alternate allele frequencies between Japanese and other populations?
             .answer
               p
                 | Yes. You can search by
                 a.hyper-text.-external(target='_blank', href='/?mode=advanced')  Advanced search
                 p
-                | Variant sets for comparison of alternative allele frequencies are as follows:
+                | Variant sets for comparison of alternate allele frequencies are as follows:
                 ul.unordered-list
                   li For Japanese populations, variants included in either GEM-J WGA or 8.3KJPN
                   li For gnomAD populations,  variants included in either gnomAD genomes or gnomAD exomes
                 p
-                | We will search for variants with an alternative allele frequency greater than 0.3 for Japanese populations and less than 0.05 for gnomAD populations.
+                | We will search for variants with an alternate allele frequency greater than 0.3 for Japanese populations and less than 0.05 for gnomAD populations.
                 ol.ordered-list
                   li Select the Advanced search tab at the top of
                     a.hyper-text.-external(target='_blank', href='https://togovar-stg.biosciencedbc.jp')  the home page.
                     img(src=require("../../../images/help-image1.png").default alt="help-image1")
-                  li Select the Alternative allele frequency/count at the Add condition menu.
+                  li Select the Alternate allele frequency/count at the Add condition menu.
                     p
                       img(src=require("../../../images/help-image2.png").default alt="help-image2" width="241")
-                  li Specify a dataset (GEM-J WGA) and an alternative allele frequency (>= 0.3). You can also specify the number of alternative alleles.
+                  li Specify a dataset (GEM-J WGA) and an alternate allele frequency (>= 0.3). You can also specify the number of alternate alleles.
                     img(src=require("../../../images/help-image3.png").default alt="help-image3")
                   li Click the OK button. The search criteria has been set.
                     img(src=require("../../../images/help-image4.png").default alt="help-image4")

@@ -6,15 +6,17 @@
     > .titlelink
       display: inline-block
       width: 11px
-      font-family: "FontAwesome"
+      font-family: 'Font Awesome 7 Free'
+      font-weight: 900
       text-decoration: none
       font-size: .7rem
-      margin-right: 3px
+      margin-right: 2px
+      transform: translateY(-2px)
       vertical-align: bottom
       color: var(--color-gray)
     &:hover
       .titlelink::before
-        content: $CHAR_STANZA_LINK
+        content: var(--icon-link)
     > .title
       display: inline-block
       margin: 0
@@ -27,6 +29,24 @@
           color: $COLOR_DATASET_DISEASE_MGEND
         &.clinvar
           color: $COLOR_DATASET_DISEASE_CLINVAR
+      > .floating-info-trigger
+        position: relative
+        top: 1px
+        display: inline-block
+        margin-left: 2px
+        padding: 0
+        border: 0
+        background: transparent
+        color: var(--color-gray)
+        font-family: 'Font Awesome 7 Free'
+        font-weight: 900
+        font-size: 12px
+        line-height: 1
+        vertical-align: 1px
+        cursor: help
+        appearance: none
+        &::before
+          content: var(--icon-circle-info)
   > .stanza
     background: white
     box-shadow: 0 2px 2px rgba(black, .2)

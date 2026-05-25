@@ -61,6 +61,8 @@ export class ConditionItemValueView extends LitElement {
             ? html`<button
                 class="delete"
                 part="delete-tag-btn"
+                type="button"
+                aria-label="Remove condition value"
                 @click=${this._handleDelete}
               ></button>`
             : nothing}

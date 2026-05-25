@@ -1,4 +1,4 @@
-import { COLUMNS } from '../../global';
+import { COLUMNS, getOrderedColumns } from '../../columns';
 import { storeManager } from '../../store/StoreManager';
 import type {
   ResultData,
@@ -26,10 +26,11 @@ export class ResultsRowView {
 
   // Cache for DOM elements
   // TogoVar ID
-  togovarIdAnchor: HTMLAnchorElement | null = null;
+  togovarIdCell: HTMLTableCellElement | null = null;
   // RefSNP ID
   refsnpCell: HTMLTableCellElement | null = null;
-  refsnpAnchor: HTMLAnchorElement | null = null;
+  refsnpContent: HTMLDivElement | null = null;
+  refsnpRemains: HTMLSpanElement | null = null;
   // Position
   positionChromosome: HTMLDivElement | null = null;
   positionCoordinate: HTMLDivElement | null = null;
@@ -40,15 +41,19 @@ export class ResultsRowView {
   typeElement: HTMLDivElement | null = null;
   // Gene
   geneCell: HTMLTableCellElement | null = null;
-  geneAnchor: HTMLAnchorElement | null = null;
+  geneContent: HTMLDivElement | null = null;
+  geneRemains: HTMLSpanElement | null = null;
   // Alt frequency
   frequencyElements: TdFrequencies = {};
   // Consequence
   consequenceCell: HTMLTableCellElement | null = null;
+  consequenceContent: HTMLDivElement | null = null;
   consequenceItem: HTMLDivElement | null = null;
+  consequenceRemains: HTMLSpanElement | null = null;
   // Clinical significance
+  clinicalContainer: HTMLDivElement | null = null;
   clinicalSignificance: HTMLDivElement | null = null;
-  clinicalAnchor: HTMLAnchorElement | null = null;
+  clinicalRemains: HTMLSpanElement | null = null;
   clinicalIcon: HTMLSpanElement | null = null;
   // AlphaMissense
   alphaMissenseFunction: HTMLDivElement | null = null;
@@ -93,21 +98,26 @@ export class ResultsRowView {
     }
 
     // Clear cached DOM element references
-    this.togovarIdAnchor = null;
+    this.togovarIdCell = null;
     this.refsnpCell = null;
-    this.refsnpAnchor = null;
+    this.refsnpContent = null;
+    this.refsnpRemains = null;
     this.positionChromosome = null;
     this.positionCoordinate = null;
     this.refElement = null;
     this.altElement = null;
     this.typeElement = null;
     this.geneCell = null;
-    this.geneAnchor = null;
+    this.geneContent = null;
+    this.geneRemains = null;
     this.frequencyElements = {};
     this.consequenceCell = null;
+    this.consequenceContent = null;
     this.consequenceItem = null;
+    this.consequenceRemains = null;
+    this.clinicalContainer = null;
     this.clinicalSignificance = null;
-    this.clinicalAnchor = null;
+    this.clinicalRemains = null;
     this.clinicalIcon = null;
     this.alphaMissenseFunction = null;
     this.siftFunction = null;
@@ -151,10 +161,13 @@ export class ResultsRowView {
       return this._setLoadingState();
     }
 
-    this._prepareTableData();
+    const columns = this._getCurrentColumns();
+    this._prepareTableData(columns);
 
     // Update data for each column
-    COLUMNS.forEach((column) => this._updateColumnContent(column, result));
+    columns.forEach((column) =>
+      this._updateColumnContent(column, result)
+    );
 
     this.tr.classList.remove('-loading', '-out-of-range');
   }
@@ -226,8 +239,8 @@ export class ResultsRowView {
    *
    * Generate HTML and cache DOM elements
    */
-  private _prepareTableData() {
-    this.tr.innerHTML = this._createTableCellHTML();
+  private _prepareTableData(columns: Column[]) {
+    this.tr.innerHTML = this._createTableCellHTML(columns);
     this._cacheTableCells();
   }
 
@@ -236,13 +249,33 @@ export class ResultsRowView {
    *
    * @returns Generated HTML string
    */
-  private _createTableCellHTML(): string {
-    return COLUMNS.map((column) => {
-      if (column.id === 'alt_frequency') {
-        return createFrequencyColumnHTML();
-      }
-      return (COLUMN_TEMPLATES as Record<string, string>)[column.id] || '';
-    }).join('');
+  private _createTableCellHTML(columns: Column[]): string {
+    return columns
+      .map((column) => {
+        const resizeBar =
+          column.resizable === false
+            ? ''
+            : `<div class="resize-bar" data-column-id="${column.id}" aria-hidden="true"></div>`;
+
+        if (column.id === 'alt_frequency') {
+          return this._appendResizeBar(createFrequencyColumnHTML(), resizeBar);
+        }
+        return this._appendResizeBar(
+          (COLUMN_TEMPLATES as Record<string, string>)[column.id] || '',
+          resizeBar
+        );
+      })
+      .join('');
+  }
+
+  private _appendResizeBar(cellHTML: string, resizeBar: string): string {
+    if (!cellHTML) return '';
+
+    return cellHTML.replace('</td>', `${resizeBar}</td>`);
+  }
+
+  private _getCurrentColumns() {
+    return getOrderedColumns(storeManager.getData('columns'));
   }
 
   // ========================================
@@ -265,11 +298,14 @@ export class ResultsRowView {
    */
   private _cacheBasicElements() {
     // TogoVar ID
-    this.togovarIdAnchor = this.tr.querySelector('td.togovar_id > a');
+    this.togovarIdCell = this.tr.querySelector('td.togovar_id');
 
     // RefSNP ID
     this.refsnpCell = this.tr.querySelector('td.refsnp_id');
-    this.refsnpAnchor = this.refsnpCell?.querySelector('a') || null;
+    this.refsnpContent =
+      this.refsnpCell?.querySelector('.remains-content') || null;
+    this.refsnpRemains =
+      this.refsnpCell?.querySelector('.remains-badge') || null;
 
     // Position
     const tdPosition = this.tr.querySelector(
@@ -288,18 +324,31 @@ export class ResultsRowView {
 
     // Gene
     this.geneCell = this.tr.querySelector('td.gene');
-    this.geneAnchor = this.geneCell?.querySelector('a') || null;
+    this.geneContent =
+      this.geneCell?.querySelector('.remains-content') || null;
+    this.geneRemains =
+      this.geneCell?.querySelector('.remains-badge') || null;
 
     // Consequence
     this.consequenceCell = this.tr.querySelector('td.consequence');
+    this.consequenceContent =
+      this.consequenceCell?.querySelector('.remains-content') || null;
     this.consequenceItem =
       this.consequenceCell?.querySelector('.consequence-item') || null;
+    this.consequenceRemains =
+      this.consequenceCell?.querySelector('.remains-badge') || null;
 
     // Clinical significance
-    const tdClinical = this.tr.querySelector('td.clinical_significance');
+    const tdClinical =
+      this.tr.querySelector<HTMLTableCellElement>('td.clinical_significance');
+    const clinicalFlex =
+      tdClinical?.querySelector<HTMLDivElement>('.clinical-significance-flex') ||
+      null;
+    this.clinicalContainer = clinicalFlex;
     this.clinicalSignificance =
       tdClinical?.querySelector('.clinical-significance') || null;
-    this.clinicalAnchor = tdClinical?.querySelector('a') || null;
+    this.clinicalRemains =
+      tdClinical?.querySelector('.clinical-remains') || null;
     this.clinicalIcon = tdClinical?.querySelector('span.icon') || null;
   }
 
@@ -354,14 +403,14 @@ export class ResultsRowView {
     const columnHandlers: Record<string, () => void> = {
       togovar_id: () =>
         ResultsColumnUpdater.updateTogovarId(
-          this.togovarIdAnchor,
+          this.togovarIdCell,
           result.id,
           `/variant/${result.id}`
         ),
       refsnp_id: () =>
         ResultsColumnUpdater.updateRefSNP(
-          this.refsnpCell,
-          this.refsnpAnchor,
+          this.refsnpContent,
+          this.refsnpRemains,
           result.existing_variations
         ),
       position: () =>
@@ -382,8 +431,8 @@ export class ResultsRowView {
         ResultsColumnUpdater.updateVariantType(this.typeElement, result.type),
       gene: () =>
         ResultsColumnUpdater.updateGene(
-          this.geneCell,
-          this.geneAnchor,
+          this.geneContent,
+          this.geneRemains,
           result.symbols
         ),
       alt_frequency: () =>
@@ -393,15 +442,16 @@ export class ResultsRowView {
         ),
       consequence: () =>
         ResultsColumnUpdater.updateConsequence(
-          this.consequenceCell,
           this.consequenceItem,
+          this.consequenceRemains,
           result.most_severe_consequence,
           result.transcripts
         ),
       clinical_significance: () =>
         ResultsColumnUpdater.updateClinicalSignificance(
           this.clinicalSignificance,
-          this.clinicalAnchor,
+          this.clinicalContainer,
+          this.clinicalRemains,
           this.clinicalIcon,
           result.significance
         ),

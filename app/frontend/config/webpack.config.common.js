@@ -4,9 +4,75 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { getSiteOrigin } = require('./siteOrigin');
 
 const env = require('dotenv').config().parsed || {};
 Object.assign(process.env, env);
+
+// 検索エンジン向けの robots.txt を生成する。
+// ここではクロールを許可し、同時に sitemap.xml の場所を知らせる。
+function createRobotsTxt(siteOrigin) {
+  return [
+    'User-agent: *',
+    'Allow: /',
+    '',
+    `Sitemap: ${siteOrigin}/sitemap.xml`,
+    '',
+  ].join('\n');
+}
+
+// webpackで生成している静的ページ一覧から sitemap.xml を生成する。
+// トップページ、英語ドキュメント、日本語ドキュメントを検索エンジンへ伝える。
+function createSitemapXml(siteOrigin, pages) {
+  const urls = [
+    `${siteOrigin}/`,
+    ...pages.map(page => `${siteOrigin}/doc/${page}/`),
+    ...pages.map(page => `${siteOrigin}/doc/ja/${page}/`),
+  ];
+
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...urls.map(url => `  <url><loc>${url}</loc></url>`),
+    '</urlset>',
+    '',
+  ].join('\n');
+}
+
+// webpackのビルド結果へ robots.txt と sitemap.xml を追加するための独自プラグイン。
+// 実ファイルを手で管理せず、ビルド対象ページとTOGOVAR_REFERENCEに合わせて自動生成する。
+class StaticSeoFilesPlugin {
+  constructor(pages) {
+    this.pages = pages;
+  }
+
+  apply(compiler) {
+    // webpackのコンパイルごとに、アセット追加のタイミングでSEO用ファイルを差し込む。
+    compiler.hooks.thisCompilation.tap('StaticSeoFilesPlugin', compilation => {
+      compilation.hooks.processAssets.tap(
+        {
+          name: 'StaticSeoFilesPlugin',
+          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONS,
+        },
+        () => {
+          const { RawSource } = compiler.webpack.sources;
+          const siteOrigin = getSiteOrigin();
+
+          // dist/robots.txt として出力される。
+          compilation.emitAsset(
+            'robots.txt',
+            new RawSource(createRobotsTxt(siteOrigin))
+          );
+          // dist/sitemap.xml として出力される。
+          compilation.emitAsset(
+            'sitemap.xml',
+            new RawSource(createSitemapXml(siteOrigin, this.pages))
+          );
+        }
+      );
+    });
+  }
+}
 
 const config = {
   entry: {
@@ -16,6 +82,7 @@ const config = {
   output: {
     path: path.resolve(__dirname, '../../../dist'),
     filename: 'js/[name]-[contenthash].js',
+    chunkFilename: 'js/[name]-[contenthash].js',
     publicPath: '/',
   },
   resolve: {
@@ -132,6 +199,9 @@ const config = {
     new HtmlWebpackPlugin({
       template: 'app/frontend/views/index.pug',
       filename: 'index.html',
+      templateParameters: {
+        canonicalUrl: `${getSiteOrigin()}/`,
+      },
       inject: false,
     }),
     new HtmlWebpackPlugin({
@@ -163,6 +233,7 @@ const config = {
         process.env.TOGOVAR_FRONTEND_API_URL
       ),
       TOGOVAR_FRONTEND_REFERENCE: JSON.stringify(process.env.TOGOVAR_REFERENCE),
+      TOGOVAR_FRONTEND_SITE_ORIGIN: JSON.stringify(getSiteOrigin()),
       TOGOVAR_FRONTEND_STANZA_URL: JSON.stringify(
         process.env.TOGOVAR_FRONTEND_STANZA_URL
       ),
@@ -219,22 +290,56 @@ const pages = (function (assembly) {
         'policy',
         'terms',
       ];
+    default:
+      // TOGOVAR_REFERENCE が未設定または想定外の場合は、現在の標準であるGRCh38のページを生成する。
+      return [
+        'about',
+        'contact',
+        'datasets',
+        'datasets/analysis',
+        'datasets/gem_j_wga',
+        'datasets/jga_wes',
+        'datasets/jga_wgs',
+        'datasets/jga_snp',
+        'datasets/ncbn',
+        'downloads',
+        'help',
+        'history',
+        'policy',
+        'terms',
+      ];
   }
 })(process.env.TOGOVAR_REFERENCE);
 
+// pages に定義したドキュメントページを、英語版・日本語版それぞれHTMLとして出力する。
+// 例: name が "datasets" の場合
+//   app/frontend/views/doc/en/datasets.pug -> dist/doc/datasets/index.html
+//   app/frontend/views/doc/ja/datasets.pug -> dist/doc/ja/datasets/index.html
 pages.forEach(function (name) {
   config.plugins.push(
     new HtmlWebpackPlugin({
       template: `app/frontend/views/doc/ja/${name}.pug`,
       filename: `doc/ja/${name}/index.html`,
+      // 各ドキュメントページ自身のURLを canonical としてテンプレートへ渡す。
+      templateParameters: {
+        canonicalUrl: `${getSiteOrigin()}/doc/ja/${name}/`,
+      },
       inject: false,
     }),
     new HtmlWebpackPlugin({
       template: `app/frontend/views/doc/en/${name}.pug`,
       filename: `doc/${name}/index.html`,
+      // 英語ページは /doc/{name} を正規URLとして扱う。
+      templateParameters: {
+        canonicalUrl: `${getSiteOrigin()}/doc/${name}/`,
+      },
       inject: false,
     })
   );
 });
+
+// robots.txt と sitemap.xml を dist 直下に追加する。
+// sitemap.xml には、上で生成したドキュメントページのURL一覧を含める。
+config.plugins.push(new StaticSeoFilesPlugin(pages));
 
 module.exports = config;

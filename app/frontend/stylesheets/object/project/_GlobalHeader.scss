@@ -1,3 +1,5 @@
+/* stylelint-disable no-descending-specificity */
+
 $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
 
 #GlobalHeader {
@@ -10,71 +12,6 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
   width: 100%;
   top: $HEIGHT_NBDC_COMMON_HEADER;
   z-index: $Z_INDEX_GLOBAL_HEADER;
-
-  > .left {
-    display: flex;
-    position: relative;
-    padding: 10px $PADDING_SIDE;
-    top: -2px;
-
-    > h1.heading {
-      .link {
-        text-decoration: none;
-
-        .logotype {
-          width: 101px;
-          height: 31px;
-          display: block;
-          position: relative;
-          left: -5px;
-          margin-right: 0.3rem;
-        }
-      }
-    }
-
-    span.summary {
-      padding-top: 8px;
-      font-size: 12px;
-      font-weight: normal;
-    }
-
-    nav.dropdown-view {
-      padding-top: 6px;
-      padding-left: 8px;
-
-      > button.button {
-        padding: 0 0.7em;
-
-        &:after {
-          position: relative;
-          left: 5px;
-          padding-right: 2px;
-          font-size: 0.7rem;
-        }
-      }
-
-      > .selectshow {
-        position: relative;
-        top: -20px;
-        height: 20px;
-
-        > ul.list {
-          padding: 3px 0 3px;
-
-          > li.item {
-            > a.link {
-              &:before {
-                position: relative;
-                top: -1px;
-                left: -4px;
-                padding-left: 10px;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
 
   > .right {
     position: relative;
@@ -98,7 +35,7 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
             }
 
             &.login {
-              > a.link {
+              > a:where(.link) {
                 min-width: 30px;
                 color: $COLOR_BLACK;
                 text-decoration: none;
@@ -113,7 +50,7 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
               color: $COLOR_KEY_DARK1;
             }
 
-            > a.link {
+            > a:where(.link) {
               display: block;
               width: 100%;
             }
@@ -125,7 +62,7 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
 
           &.navigation {
             > .item {
-              > a.link {
+              > a:where(.link) {
                 color: $COLOR_BLACK;
                 text-decoration: none;
 
@@ -136,7 +73,7 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
               }
 
               &.-current {
-                > .link {
+                > :where(.link) {
                   color: $COLOR_KEY_DARK1;
                 }
               }
@@ -149,12 +86,16 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
     @media (max-width: 1170px) {
       position: relative;
       > .menu-bar {
+        width: 31px;
+        height: 16px;
+
         &::before {
-          content: $CHAR_BARS;
-          font-family: 'FontAwesome';
+          content: var(--icon-bars);
+          font-family: 'Font Awesome 7 Free', sans-serif;
+          font-weight: 900;
           font-size: 16px;
-          padding-right: 15px;
           display: inline-block;
+          width: 16px;
         }
       }
 
@@ -203,6 +144,47 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
           > .menu-wrapper {
             display: block;
           }
+        }
+      }
+    }
+  }
+
+  > .left {
+    display: flex;
+    position: relative;
+    padding: 10px $PADDING_SIDE;
+    top: -2px;
+
+    > h1.heading {
+      :where(.link) {
+        text-decoration: none;
+
+        .logotype {
+          width: 101px;
+          height: 31px;
+          display: block;
+          position: relative;
+          left: -5px;
+          margin-right: 0.3rem;
+        }
+      }
+    }
+
+    span.summary {
+      padding-top: 8px;
+      font-size: 12px;
+      font-weight: normal;
+    }
+
+    nav.dropdown-view {
+      padding-top: 6px;
+      padding-left: 8px;
+
+      > button.button {
+        font-weight: normal;
+
+        &:after {
+          right: 8px;
         }
       }
     }

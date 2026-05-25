@@ -718,8 +718,8 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
    */
   private _getModeDisplayText(mode: ModeType): string {
     const displayTextMap: Record<ModeType, string> = {
-      [MODE.frequency]: 'Alternative allele frequency',
-      [MODE.count]: 'Alternative allele count',
+      [MODE.frequency]: 'Alternate allele frequency',
+      [MODE.count]: 'Alternate allele count',
       [MODE.alt_alt]: 'Genotype count (Alt/Alt)',
       [MODE.alt_ref]: 'Genotype count (Alt/Ref)',
       [MODE.hemi_alt]: 'Genotype count (Hemi_Alt)',
