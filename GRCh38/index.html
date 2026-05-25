@@ -28,7 +28,54 @@
         } catch (error) {
           console.error('Error fetching auth status:', error);
         }
-      })();</script><link href="/togovar.jsonld" rel="alternate" type="application/ld+json"><style nonce="__CSP_NONCE__">html{height:100%}
+      })();</script><script type="application/ld+json" nonce="__CSP_NONCE__">{
+  "@context": "https://schema.org",
+  "@type": "DataCatalog",
+  "@id": "https://grch38.togovar.org/",
+  "name": "TogoVar",
+  "description": "TogoVar (NBDC's integrated database of Japanese genomic variation) is a database that has collected and organized genome sequence differences between individuals (variants) in the Japanese population and disease information associated with them.",
+  "url": "https://grch38.togovar.org/",
+  "keywords": "genomic variation, Japanese population, allele frequency, integrated database, variant annotation",
+  "provider": {
+    "@type": "Organization",
+    "name": "the National Bioscience Database Center (NBDC) of the Japan Science and Technology Agency (JST)"
+  },
+  "dataset": [
+    {
+      "@type": "Dataset",
+      "@id": "https://grch38.togovar.org/doc/datasets/jga_wes",
+      "name": "Variant set aggregated from WES data in NBDC Human Database/JGA",
+      "description": "JGA-WES dataset is a frequency dataset that assembles variants detected by reanalyzing individual-level exome sequence data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA). All JGA data for which an approval for creating secondary data has been obtained are to be aggregated. Note that variants with alternate allele counts of five or fewer are not included.",
+      "url": "https://grch38.togovar.org/doc/datasets/jga_wes",
+      "identifier": "JGA-WES",
+      "keywords": "genomic variation, Japanese population, allele frequency, WES",
+      "includedInDataCatalog": "https://grch38.togovar.org/",
+      "creator": {
+        "@type": "Organization",
+        "name": "the National Bioscience Database Center (NBDC) of the Japan Science and Technology Agency (JST)"
+      },
+      "version": "2018-06",
+      "license": "Proprietary License. See https://grch38.togovar.org/doc/datasets/jga_wes."
+    },
+    {
+      "@type": "Dataset",
+      "@id": "https://grch38.togovar.org/doc/datasets/jga_snp",
+      "name": "Variant set aggregated from SNP-chip data in NBDC Human Database/JGA",
+      "description": "JGA-SNP dataset is a frequency dataset that has aggregated variants detected from SNP-chip data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA). All JGA data for which an approval for creating secondary data has been obtained are to be aggregated. Note that no variants with 5 alternate alleles or less are included.",
+      "url": "https://grch38.togovar.org/doc/datasets/jga_snp",
+      "identifier": "JGA-SNP",
+      "keywords": "genomic variation, Japanese population, allele frequency, SNP-chip",
+      "includedInDataCatalog": "https://grch38.togovar.org/",
+      "creator": {
+        "@type": "Organization",
+        "name": "the National Bioscience Database Center (NBDC) of the Japan Science and Technology Agency (JST)"
+      },
+      "version": "2018-06",
+      "license": "Proprietary License. See https://grch38.togovar.org/doc/datasets/jga_snp."
+    }
+  ],
+  "license": "Open Database License (ODbL)"
+}</script><style nonce="__CSP_NONCE__">html{height:100%}
       @media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
       *,*::before,*::after{box-sizing:border-box}
       body{margin:0;font-size:10px;font-family:'Roboto Condensed','Arial Narrow',Arial,sans-serif;color:#444;padding-top:50px!important;overflow:hidden;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
@@ -89,7 +136,7 @@
       .drawer-view>.content{position:relative;overflow:hidden}
       .drawer-view>.content>.chromosomes{box-sizing:content-box;padding:10px 18px 16px;height:344px;text-align:center;white-space:nowrap;overflow-x:auto}
       body:not(.-layout-ready) #SearchResultsView .tablecontainer tbody,body:not(.-layout-ready) #SearchResultsView #Messages,body:not(.-layout-ready) #SearchResultsView #RowIndicator,body:not(.-layout-ready) #SearchResultsView .LayoutAside,body:not(.-layout-ready) #Karyotype{opacity:0;pointer-events:none}
-      body.-layout-ready #SearchResultsView .tablecontainer tbody,body.-layout-ready #SearchResultsView #Messages,body.-layout-ready #SearchResultsView #RowIndicator,body.-layout-ready #SearchResultsView .LayoutAside,body.-layout-ready #Karyotype{opacity:1;pointer-events:auto}</style><link rel="preload" href="/css/main-53ed8b8078d28ec0a594.css" as="style" data-activate-stylesheet><noscript><link href="/css/main-53ed8b8078d28ec0a594.css" rel="stylesheet"></noscript><script src="/js/main-36f6ee4b781168009be1.js" defer="defer"></script><script nonce="__CSP_NONCE__">document.querySelectorAll('link[data-activate-stylesheet]').forEach(function(link) {
+      body.-layout-ready #SearchResultsView .tablecontainer tbody,body.-layout-ready #SearchResultsView #Messages,body.-layout-ready #SearchResultsView #RowIndicator,body.-layout-ready #SearchResultsView .LayoutAside,body.-layout-ready #Karyotype{opacity:1;pointer-events:auto}</style><link rel="preload" href="/css/main-53ed8b8078d28ec0a594.css" as="style" data-activate-stylesheet><noscript><link href="/css/main-53ed8b8078d28ec0a594.css" rel="stylesheet"></noscript><script src="/js/main-75fc4f51f08443d5ee00.js" defer="defer"></script><script nonce="__CSP_NONCE__">document.querySelectorAll('link[data-activate-stylesheet]').forEach(function(link) {
         function isPreloadComplete() {
           if (!window.performance || !window.performance.getEntriesByName) {
             return false;
