@@ -47,10 +47,17 @@ function createSitemapXml(siteOrigin, pages) {
 
 // JSON-LD内のサイトURLを、GRCh37/GRCh38などビルド対象のoriginに合わせる。
 function createStructuredDataJson(siteOrigin) {
-  const template = fs.readFileSync(STRUCTURED_DATA_TEMPLATE_PATH, 'utf8');
-  const json = template.replace(/__TOGOVAR_SITE_ORIGIN__/g, siteOrigin);
+  try {
+    const template = fs.readFileSync(STRUCTURED_DATA_TEMPLATE_PATH, 'utf8');
+    const json = template.replace(/__TOGOVAR_SITE_ORIGIN__/g, siteOrigin);
 
-  return JSON.stringify(JSON.parse(json), null, 2).replace(/</g, '\\u003c');
+    return JSON.stringify(JSON.parse(json), null, 2).replace(/</g, '\\u003c');
+  } catch (error) {
+    throw new Error(
+      `Failed to create structured data JSON from ${STRUCTURED_DATA_TEMPLATE_PATH}`,
+      { cause: error }
+    );
+  }
 }
 
 // webpack watch が JSON-LD テンプレート変更を検知できるようにする。
@@ -71,6 +78,8 @@ function createIndexTemplateParameters(
   assetTags,
   options
 ) {
+  const siteOrigin = getSiteOrigin();
+
   return {
     compilation,
     webpackConfig: compilation.options,
@@ -79,8 +88,8 @@ function createIndexTemplateParameters(
       files: assets,
       options,
     },
-    canonicalUrl: `${getSiteOrigin()}/`,
-    structuredDataJson: createStructuredDataJson(getSiteOrigin()),
+    canonicalUrl: `${siteOrigin}/`,
+    structuredDataJson: createStructuredDataJson(siteOrigin),
   };
 }
 
