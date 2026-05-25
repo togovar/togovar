@@ -39,9 +39,7 @@ dl {
       color: inherit;
       font: inherit;
       cursor: pointer;
-      transition:
-        background-color $GUI_DURATION,
-        box-shadow $GUI_DURATION;
+      transition: background-color $GUI_DURATION;
 
       &:hover,
       &:focus-visible {
