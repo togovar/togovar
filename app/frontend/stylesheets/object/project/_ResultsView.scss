@@ -127,6 +127,7 @@
   > .tablecontainer {
     overflow-x: auto;
     overflow-y: hidden;
+    min-height: 96px;
     margin-top: -15px;
     margin-right: -$PADDING_SIDE;
     padding-bottom: 20px;
