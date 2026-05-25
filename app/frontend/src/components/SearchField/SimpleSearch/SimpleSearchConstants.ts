@@ -1,15 +1,10 @@
 import { API_URL } from '../../../global';
+import type { ExampleItem } from './SimpleSearchTypes';
 
 /** SimpleSearchConstants - SimpleSearchView関連の定数定義 */
 
 /** グローバル変数の型宣言 */
 declare const TOGOVAR_FRONTEND_REFERENCE: 'GRCh37' | 'GRCh38' | string;
-
-/** 検索例のアイテム型 */
-export interface ExampleItem {
-  key: string;
-  value: string;
-}
 
 /** 検索フィールド設定の型 */
 export interface SearchFieldConfig {
@@ -52,11 +47,7 @@ export const EXAMPLES: ExampleItem[] = (() => {
         },
         {
           key: 'HGVSc',
-          value: 'ALDH2:c.1510G>A',
-        },
-        {
-          key: 'HGVSc',
-          value: 'NM_000690:c.1510G>A',
+          value: ['ALDH2:c.1510G>A', 'NM_000690:c.1510G>A'],
         },
         {
           key: 'Chr:Position:Ref>Alt',
@@ -74,7 +65,7 @@ export const EXAMPLES: ExampleItem[] = (() => {
           key: 'Region',
           value: '12:112241766-112241766',
         },
-      {
+        {
           key: 'Disease',
           value: '"Alcohol sensitivity"',
         },
@@ -99,11 +90,7 @@ export const EXAMPLES: ExampleItem[] = (() => {
         },
         {
           key: 'HGVSc',
-          value: 'ALDH2:c.1510G>A',
-        },
-        {
-          key: 'HGVSc',
-          value: 'NM_000690:c.1510G>A',
+          value: ['ALDH2:c.1510G>A', 'NM_000690:c.1510G>A'],
         },
         {
           key: 'Chr:Position:Ref>Alt',
@@ -121,7 +108,7 @@ export const EXAMPLES: ExampleItem[] = (() => {
           key: 'Region',
           value: '12:111803962-111803962',
         },
-      {
+        {
           key: 'Disease',
           value: '"Alcohol sensitivity"',
         },

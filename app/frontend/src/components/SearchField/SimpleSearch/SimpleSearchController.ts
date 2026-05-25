@@ -4,7 +4,7 @@ import { CHROMOSOME_PATTERN } from './SimpleSearchConstants';
 import type {
   SimpleSearchHost,
   SuggestionItem,
-  ExampleItem,
+  ExampleSelectedDetail,
 } from './SimpleSearchTypes';
 
 /**
@@ -75,7 +75,7 @@ export class SimpleSearchController {
    * 例文選択時の処理
    * @param example - 選択された例文
    */
-  selectExample(example: ExampleItem): void {
+  selectExample(example: ExampleSelectedDetail): void {
     this.host._hideSuggestions = true;
     this.host._value = example.value;
     this.host._term = example.value;

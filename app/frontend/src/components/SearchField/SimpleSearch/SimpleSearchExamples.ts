@@ -4,12 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 
 import Styles from '../../../../stylesheets/object/component/simple-search-examples.scss';
-
-/** 例文データの型定義 */
-export interface ExampleItem {
-  key: string;
-  value: string;
-}
+import type { ExampleItem, ExampleSelectedDetail } from './SimpleSearchTypes';
 
 /** SimpleSearchExamples - Simple検索用の例表示コンポーネント */
 @customElement('simple-search-examples')
@@ -22,27 +17,56 @@ export default class SimpleSearchExamples extends LitElement {
 
   /**
    * 例文クリック時のイベントハンドラー
-   * @param example - クリックされた例文データ
+   * @param e - クリックイベント
    */
-  private handleClick(example: ExampleItem): void {
+  private handleClick = (e: Event): void => {
+    const button = e.currentTarget as HTMLButtonElement;
+    const key = button.dataset.key;
+    const value = button.dataset.value;
+    if (!key || !value) return;
+
+    const detail: ExampleSelectedDetail = {
+      key,
+      value,
+    };
+
     this.dispatchEvent(
-      new CustomEvent('example-selected', {
-        detail: example,
+      new CustomEvent<ExampleSelectedDetail>('example-selected', {
+        detail,
         bubbles: true,
         composed: true,
       })
     );
+  };
+
+  private getValues(example: ExampleItem): string[] {
+    return Array.isArray(example.value) ? example.value : [example.value];
   }
 
   render(): TemplateResult {
     return html`
       ${map(
         this.examples,
-        (example: ExampleItem) =>
-          html`<dl @click=${() => this.handleClick(example)}>
+        (example: ExampleItem) => {
+          const values = this.getValues(example);
+          return html`<dl>
             <dt>${example.key}</dt>
-            <dd>${example.value}</dd>
-          </dl>`
+            <dd>
+              ${map(
+                values,
+                (value, index) =>
+                  html`${index > 0 ? ', ' : ''}<button
+                      type="button"
+                      data-key=${example.key}
+                      data-value=${value}
+                      @click=${this.handleClick}
+                    >
+                      ${value}
+                    </button>`
+              )}
+            </dd>
+          </dl>`;
+        }
       )}
     `;
   }
