@@ -59,7 +59,23 @@ function sendReportHtml(outputPath, req, res) {
   });
 }
 
-function getSafeHtmlPath(outputPath, requestPath) {
+async function isSafeHtmlFile(candidatePath, outputRoot) {
+  if (
+    candidatePath !== outputRoot &&
+    !candidatePath.startsWith(`${outputRoot}${path.sep}`)
+  ) {
+    return false;
+  }
+
+  try {
+    const stats = await fs.promises.stat(candidatePath);
+    return stats.isFile();
+  } catch (err) {
+    return false;
+  }
+}
+
+async function getSafeHtmlPath(outputPath, requestPath) {
   const outputRoot = path.resolve(outputPath);
   const cacheKey = `${outputRoot}\0${requestPath}`;
 
@@ -72,7 +88,6 @@ function getSafeHtmlPath(outputPath, requestPath) {
   try {
     normalizedRequestPath = decodeURIComponent(requestPath).split('?')[0];
   } catch (err) {
-    htmlPathCache.set(cacheKey, null);
     return null;
   }
 
@@ -89,21 +104,17 @@ function getSafeHtmlPath(outputPath, requestPath) {
     candidatePaths.push(path.resolve(outputPath, `${relativePath}.html`));
   }
 
-  const htmlPath =
-    candidatePaths.find((candidatePath) => {
-      return (
-        (candidatePath === outputRoot ||
-          candidatePath.startsWith(`${outputRoot}${path.sep}`)) &&
-        fs.existsSync(candidatePath) &&
-        fs.statSync(candidatePath).isFile()
-      );
-    }) || null;
+  for (const candidatePath of candidatePaths) {
+    if (await isSafeHtmlFile(candidatePath, outputRoot)) {
+      htmlPathCache.set(cacheKey, candidatePath);
+      return candidatePath;
+    }
+  }
 
-  htmlPathCache.set(cacheKey, htmlPath);
-  return htmlPath;
+  return null;
 }
 
-function sendStaticHtmlWithNonce(outputPath, req, res, next) {
+async function sendStaticHtmlWithNonce(outputPath, req, res, next) {
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     next();
     return;
@@ -115,7 +126,14 @@ function sendStaticHtmlWithNonce(outputPath, req, res, next) {
     return;
   }
 
-  const htmlPath = getSafeHtmlPath(outputPath, req.path);
+  let htmlPath;
+  try {
+    htmlPath = await getSafeHtmlPath(outputPath, req.path);
+  } catch (err) {
+    next(err);
+    return;
+  }
+
   if (!htmlPath) {
     next();
     return;
