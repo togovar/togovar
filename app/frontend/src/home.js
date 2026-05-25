@@ -268,7 +268,9 @@ function initSearchInputs() {
   getAllElements('#SearchInputView > .tabscontainer > ul > li').forEach(
     (elm) => {
       elm.addEventListener('click', (e) => {
-        const mode = e.target.dataset.target;
+        const mode = e.currentTarget.dataset.target;
+        if (mode !== 'simple' && mode !== 'advanced') return;
+
         storeManager.setData('searchMode', mode);
 
         if (mode === 'advanced') {
