@@ -13,6 +13,7 @@
     position: relative
   > .item
     padding: 2px $PADDING_PANEL_VIEW
+    min-height: 24px
     display: flex
     justify-content: space-between
     align-items: center
@@ -23,10 +24,11 @@
       margin-bottom: 0
       line-height: 14px
       font-weight: bold
+      min-height: 20px
       > .dataset-icon, > .variant-icon, > .clinical-significance, > .variant-function
         display: inline-block
         vertical-align: middle
-        margin-left: -3px
+        margin-left: -2px
       > .dataset-icon
         #FilterDatasets &
           width: 56px
@@ -34,6 +36,9 @@
             top: -2px
             width: 15px
       > input[type="checkbox"]
+        width: 13px
+        height: 13px
+        margin: 0
         body[data-search-mode="advanced"] &
           display: none
     > .value

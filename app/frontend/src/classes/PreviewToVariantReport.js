@@ -18,7 +18,8 @@ export default class PreviewToVariantReport extends PanelView {
   }
 
   update() {
-    let html = '';
+    let html =
+      '<a class="hyper-text -internal">Detailed variant report page</a>';
 
     if (storeManager.getData('selectedRow') !== undefined) {
       const record = storeManager.getSelectedRecord();
@@ -27,10 +28,10 @@ export default class PreviewToVariantReport extends PanelView {
 
         this.elm.classList.remove('-disable');
       } else {
-        html = `<a class="hyper-text -internal">Detailed variant report page</a>`;
-
         this.elm.classList.add('-disable');
       }
+    } else {
+      this.elm.classList.add('-disable');
     }
 
     this.title.innerHTML = html;
