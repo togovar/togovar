@@ -80,7 +80,7 @@ class StoreManager {
       return null;
     }
 
-    return normalizeColumnConfigs(parsed);
+    return normalizeColumnConfigs(this.#stripColumnWidths(parsed));
   }
 
   /** 列設定を localStorage に保存 */
@@ -92,11 +92,23 @@ class StoreManager {
 
       window.localStorage.setItem(
         COLUMNS_STORAGE_KEY,
-        JSON.stringify(columns)
+        JSON.stringify(this.#stripColumnWidths(columns))
       );
     } catch (_error) {
       // localStorage 制限超過やプライベートブラウズ環境では保存失敗を許容
     }
+  }
+
+  #stripColumnWidths(columns: unknown[]) {
+    return columns.map((column) => {
+      if (typeof column !== 'object' || column === null) {
+        return column;
+      }
+
+      const { id, isUsed } = column as { id?: unknown; isUsed?: unknown };
+
+      return { id, isUsed };
+    });
   }
 
   /** 検索条件まわりの初期イベントを登録 */
