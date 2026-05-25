@@ -24,7 +24,11 @@ html(data-page=locals.currentPage, lang=lang)
     script(nonce="__CSP_NONCE__").
       (function() {
         var f = document.getElementById('font-stylesheet');
-        if (f) f.addEventListener('load', function() { this.media = 'all'; });
+        if (!f) return;
+
+        var activateFontStylesheet = function() { f.media = 'all'; };
+        f.addEventListener('load', activateFontStylesheet, { once: true });
+        if (f.sheet) activateFontStylesheet();
       })();
       (async function() {
         try {
