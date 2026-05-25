@@ -10,8 +10,9 @@
   overscroll-behavior: contain
   -webkit-overflow-scrolling: touch
   transform: translateX(-297px)
-  transition: transform $GUI_DURATION
   white-space: nowrap
+  body.-sidebar-ready &
+    transition: transform $GUI_DURATION
   .-drawer-opened &
     padding-bottom: $HEIGHT_BOTTOM_DRAWER_OPENED + $PADDING_SIDEBAR_SIDE
   > .sidebarcontent
