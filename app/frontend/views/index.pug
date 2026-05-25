@@ -5,7 +5,7 @@ append variables
   - locals.description = "TogoVar is an integrated database of Japanese genomic variation, providing allele frequencies and annotations for human variants.";
 
 block head
-  script(type="application/ld+json")
+  script(type="application/ld+json" nonce="__CSP_NONCE__")
     != structuredDataJson
   //- Critical CSS: inlined to prevent FOUC while main CSS loads asynchronously.
   //- These rules mirror the sources listed below; keep in sync when editing SCSS.
