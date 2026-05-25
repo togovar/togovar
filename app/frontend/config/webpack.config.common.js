@@ -65,6 +65,25 @@ class StructuredDataTemplateDependencyPlugin {
   }
 }
 
+function createIndexTemplateParameters(
+  compilation,
+  assets,
+  assetTags,
+  options
+) {
+  return {
+    compilation,
+    webpackConfig: compilation.options,
+    htmlWebpackPlugin: {
+      tags: assetTags,
+      files: assets,
+      options,
+    },
+    canonicalUrl: `${getSiteOrigin()}/`,
+    structuredDataJson: createStructuredDataJson(getSiteOrigin()),
+  };
+}
+
 // webpackのビルド結果へ robots.txt と sitemap.xml を追加するための独自プラグイン。
 // 実ファイルを手で管理せず、ビルド対象ページとTOGOVAR_REFERENCEに合わせて自動生成する。
 class StaticSeoFilesPlugin {
@@ -228,10 +247,7 @@ const config = {
     new HtmlWebpackPlugin({
       template: 'app/frontend/views/index.pug',
       filename: 'index.html',
-      templateParameters: () => ({
-        canonicalUrl: `${getSiteOrigin()}/`,
-        structuredDataJson: createStructuredDataJson(getSiteOrigin()),
-      }),
+      templateParameters: createIndexTemplateParameters,
       inject: false,
     }),
     new HtmlWebpackPlugin({

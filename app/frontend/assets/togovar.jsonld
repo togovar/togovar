@@ -13,19 +13,19 @@
   "dataset": [
     {
       "@type": "Dataset",
-      "@id": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_ngs",
-      "name": "Variant set aggregated from NGS data in NBDC Human Database/JGA",
-      "description": "JGA-NGS dataset is a frequency dataset that assembles variants detected by reanalyzing individual-level genome sequence data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA). All JGA data for which an approval for creating secondary data has been obtained are to be aggregated. Note that no variants with 5 alternate alleles or less are included.",
-      "url": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_ngs",
-      "identifier": "JGA-NGS",
-      "keywords": "genomic variation, Japanese population, allele frequency, NGS",
+      "@id": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_wes",
+      "name": "Variant set aggregated from WES data in NBDC Human Database/JGA",
+      "description": "JGA-WES dataset is a frequency dataset that assembles variants detected by reanalyzing individual-level exome sequence data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA). All JGA data for which an approval for creating secondary data has been obtained are to be aggregated. Note that variants with alternate allele counts of five or fewer are not included.",
+      "url": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_wes",
+      "identifier": "JGA-WES",
+      "keywords": "genomic variation, Japanese population, allele frequency, WES",
       "includedInDataCatalog": "__TOGOVAR_SITE_ORIGIN__/",
       "creator": {
         "@type": "Organization",
         "name": "the National Bioscience Database Center (NBDC) of the Japan Science and Technology Agency (JST)"
       },
       "version": "2018-06",
-      "license": "Proprietary License. See __TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_ngs."
+      "license": "Proprietary License. See __TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_wes."
     },
     {
       "@type": "Dataset",
