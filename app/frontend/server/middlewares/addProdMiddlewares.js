@@ -11,6 +11,7 @@ const {
 const { applyCspNonce } = require('./securityHeaders');
 
 const htmlCache = new Map();
+const htmlPathCache = new Map();
 const LONG_TERM_CACHE_PATTERN =
   /\.(?:css|js|woff2?|eot|ttf|otf|png|jpe?g|gif|svg|webp)(?:\.gz)?$/i;
 const LONG_TERM_CACHE_DIRECTORY_PATTERN = /(?:^|\/)(?:css|js|fonts|images)\//;
@@ -60,11 +61,18 @@ function sendReportHtml(outputPath, req, res) {
 
 function getSafeHtmlPath(outputPath, requestPath) {
   const outputRoot = path.resolve(outputPath);
+  const cacheKey = `${outputRoot}\0${requestPath}`;
+
+  if (htmlPathCache.has(cacheKey)) {
+    return htmlPathCache.get(cacheKey);
+  }
+
   let normalizedRequestPath;
 
   try {
     normalizedRequestPath = decodeURIComponent(requestPath).split('?')[0];
   } catch (err) {
+    htmlPathCache.set(cacheKey, null);
     return null;
   }
 
@@ -81,14 +89,18 @@ function getSafeHtmlPath(outputPath, requestPath) {
     candidatePaths.push(path.resolve(outputPath, `${relativePath}.html`));
   }
 
-  return candidatePaths.find((candidatePath) => {
-    return (
-      (candidatePath === outputRoot ||
-        candidatePath.startsWith(`${outputRoot}${path.sep}`)) &&
-      fs.existsSync(candidatePath) &&
-      fs.statSync(candidatePath).isFile()
-    );
-  });
+  const htmlPath =
+    candidatePaths.find((candidatePath) => {
+      return (
+        (candidatePath === outputRoot ||
+          candidatePath.startsWith(`${outputRoot}${path.sep}`)) &&
+        fs.existsSync(candidatePath) &&
+        fs.statSync(candidatePath).isFile()
+      );
+    }) || null;
+
+  htmlPathCache.set(cacheKey, htmlPath);
+  return htmlPath;
 }
 
 function sendStaticHtmlWithNonce(outputPath, req, res, next) {
