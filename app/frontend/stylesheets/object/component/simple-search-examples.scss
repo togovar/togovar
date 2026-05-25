@@ -30,16 +30,21 @@ dl {
   > dd {
     margin-inline-start: -0.2rem;
 
-    > span {
+    > button {
       display: inline-block;
       padding: 0 0.25rem;
+      border: 0;
       border-radius: 8px;
+      background: transparent;
+      color: inherit;
+      font: inherit;
       cursor: pointer;
       transition:
         background-color $GUI_DURATION,
         box-shadow $GUI_DURATION;
 
-      &:hover {
+      &:hover,
+      &:focus-visible {
         background-color: $COLOR_KEY_DARK2;
       }
     }

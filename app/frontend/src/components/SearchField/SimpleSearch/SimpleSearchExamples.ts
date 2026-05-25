@@ -27,7 +27,7 @@ export default class SimpleSearchExamples extends LitElement {
     };
 
     this.dispatchEvent(
-      new CustomEvent('example-selected', {
+      new CustomEvent<ExampleSelectedDetail>('example-selected', {
         detail,
         bubbles: true,
         composed: true,
@@ -51,11 +51,12 @@ export default class SimpleSearchExamples extends LitElement {
               ${map(
                 values,
                 (value, index) =>
-                  html`${index > 0 ? ', ' : ''}<span
+                  html`${index > 0 ? ', ' : ''}<button
+                      type="button"
                       @click=${() => this.handleClick(example, value)}
                     >
                       ${value}
-                    </span>`
+                    </button>`
               )}
             </dd>
           </dl>`;
