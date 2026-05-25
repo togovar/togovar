@@ -10,7 +10,7 @@ const {
 } = require('./middlewareHelpers');
 const { applyCspNonce } = require('./securityHeaders');
 
-const reportHtmlCache = new Map();
+const htmlCache = new Map();
 const LONG_TERM_CACHE_PATTERN =
   /\.(?:css|js|woff2?|eot|ttf|otf|png|jpe?g|gif|svg|webp)(?:\.gz)?$/i;
 const LONG_TERM_CACHE_DIRECTORY_PATTERN = /(?:^|\/)(?:css|js|fonts|images)\//;
@@ -22,9 +22,8 @@ function getCanonicalUrl(req) {
 }
 
 // 本番のビルド済みHTMLはデプロイ中に変わらない前提なので、初回読み込み後はメモリに保持する。
-function getReportHtml(outputPath, report, callback) {
-  const htmlPath = path.resolve(outputPath, report, 'index.html');
-  const cachedHtml = reportHtmlCache.get(htmlPath);
+function getCachedHtml(htmlPath, callback) {
+  const cachedHtml = htmlCache.get(htmlPath);
 
   if (cachedHtml) {
     callback(null, cachedHtml);
@@ -37,9 +36,13 @@ function getReportHtml(outputPath, report, callback) {
       return;
     }
 
-    reportHtmlCache.set(htmlPath, html);
+    htmlCache.set(htmlPath, html);
     callback(null, html);
   });
+}
+
+function getReportHtml(outputPath, report, callback) {
+  getCachedHtml(path.resolve(outputPath, report, 'index.html'), callback);
 }
 
 function sendReportHtml(outputPath, req, res) {
@@ -106,7 +109,7 @@ function sendStaticHtmlWithNonce(outputPath, req, res, next) {
     return;
   }
 
-  fs.readFile(htmlPath, 'utf8', (err, html) => {
+  getCachedHtml(htmlPath, (err, html) => {
     if (err) {
       next();
       return;
