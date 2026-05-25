@@ -293,10 +293,10 @@ export class ResultsColumnResizeController {
   }
 
   /**
-   * ヘッダーのダブルクリックで列幅を初期値へ戻す。
+   * resize-bar のダブルクリックで列幅を初期値へ戻す。
    */
   private _resetColumnWidths(e: MouseEvent): void {
-    if (!(e.target as HTMLElement).closest('thead')) return;
+    if (!(e.target as HTMLElement).closest('.resize-bar')) return;
 
     this._autoSizer.resetColumnWidths();
   }
