@@ -197,16 +197,15 @@ export class ResultsView {
    * - store から呼ばれるコールバック
    * - DataManager に処理を委譲
    * - タッチデバイス判定を含める
-   * @param _results 検索結果（_prefix は使用しないことを示す）
+   * @param results 検索結果
    */
-  searchResults(_results: unknown): void {
-    const results = storeManager.getData('searchResults');
+  searchResults(results: unknown): void {
     if (!Array.isArray(results) || results.length === 0) {
       this.columnAutoSizer.resetSignature();
     }
 
     this.dataManager.handleSearchResults(
-      _results,
+      results,
       isTouchDevice(),
       this.touchHandler.setElementsInteractable.bind(this.touchHandler)
     );
