@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
+const fs = require('fs');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
@@ -7,7 +8,11 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { getSiteOrigin } = require('./siteOrigin');
 
 const env = require('dotenv').config().parsed || {};
-Object.assign(process.env, env);
+Object.keys(env).forEach((key) => {
+  if (process.env[key] === undefined) {
+    process.env[key] = env[key];
+  }
+});
 
 // 検索エンジン向けの robots.txt を生成する。
 // ここではクロールを許可し、同時に sitemap.xml の場所を知らせる。
@@ -37,6 +42,17 @@ function createSitemapXml(siteOrigin, pages) {
     '</urlset>',
     '',
   ].join('\n');
+}
+
+// JSON-LD内のサイトURLを、GRCh37/GRCh38などビルド対象のoriginに合わせる。
+function createStructuredDataJson(siteOrigin) {
+  const template = fs.readFileSync(
+    path.resolve(__dirname, '../assets/togovar.jsonld'),
+    'utf8'
+  );
+  const json = template.replace(/__TOGOVAR_SITE_ORIGIN__/g, siteOrigin);
+
+  return JSON.stringify(JSON.parse(json), null, 2);
 }
 
 // webpackのビルド結果へ robots.txt と sitemap.xml を追加するための独自プラグイン。
@@ -201,6 +217,7 @@ const config = {
       filename: 'index.html',
       templateParameters: {
         canonicalUrl: `${getSiteOrigin()}/`,
+        structuredDataJson: createStructuredDataJson(getSiteOrigin()),
       },
       inject: false,
     }),

@@ -9,7 +9,6 @@ import '../src/components/FrequencyBlockView';
 
 // Import assets
 import '!file-loader?name=[name].[ext]!../images/favicon.svg';
-import '!file-loader?name=[name].[ext]!../assets/togovar.jsonld';
 
 // Initialization function
 async function init(): Promise<void> {
