@@ -50,7 +50,7 @@ function createStructuredDataJson(siteOrigin) {
   const template = fs.readFileSync(STRUCTURED_DATA_TEMPLATE_PATH, 'utf8');
   const json = template.replace(/__TOGOVAR_SITE_ORIGIN__/g, siteOrigin);
 
-  return JSON.stringify(JSON.parse(json), null, 2);
+  return JSON.stringify(JSON.parse(json), null, 2).replace(/</g, '\\u003c');
 }
 
 // webpack watch が JSON-LD テンプレート変更を検知できるようにする。
