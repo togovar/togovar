@@ -8,6 +8,11 @@ import Styles from '../../../../stylesheets/object/component/simple-search-examp
 /** 例文データの型定義 */
 export interface ExampleItem {
   key: string;
+  value: string | string[];
+}
+
+interface ExampleSelectedDetail {
+  key: string;
   value: string;
 }
 
@@ -23,26 +28,48 @@ export default class SimpleSearchExamples extends LitElement {
   /**
    * 例文クリック時のイベントハンドラー
    * @param example - クリックされた例文データ
+   * @param value - 検索に使う値
    */
-  private handleClick(example: ExampleItem): void {
+  private handleClick(example: ExampleItem, value: string): void {
+    const detail: ExampleSelectedDetail = {
+      key: example.key,
+      value,
+    };
+
     this.dispatchEvent(
       new CustomEvent('example-selected', {
-        detail: example,
+        detail,
         bubbles: true,
         composed: true,
       })
     );
   }
 
+  private getValues(example: ExampleItem): string[] {
+    return Array.isArray(example.value) ? example.value : [example.value];
+  }
+
   render(): TemplateResult {
     return html`
       ${map(
         this.examples,
-        (example: ExampleItem) =>
-          html`<dl @click=${() => this.handleClick(example)}>
+        (example: ExampleItem) => {
+          const values = this.getValues(example);
+          return html`<dl>
             <dt>${example.key}</dt>
-            <dd>${example.value}</dd>
-          </dl>`
+            <dd>
+              ${map(
+                values,
+                (value, index) =>
+                  html`${index > 0 ? ', ' : ''}<span
+                      @click=${() => this.handleClick(example, value)}
+                    >
+                      ${value}
+                    </span>`
+              )}
+            </dd>
+          </dl>`;
+        }
       )}
     `;
   }
