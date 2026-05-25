@@ -86,13 +86,16 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
     @media (max-width: 1170px) {
       position: relative;
       > .menu-bar {
+        width: 31px;
+        height: 16px;
+
         &::before {
           content: var(--icon-bars);
           font-family: 'Font Awesome 7 Free', sans-serif;
           font-weight: 900;
           font-size: 16px;
-          padding-right: 15px;
           display: inline-block;
+          width: 16px;
         }
       }
 

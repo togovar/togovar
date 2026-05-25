@@ -18,12 +18,15 @@
 
 html {
   height: 100%;
-  scroll-behavior: smooth;
+
+  @media (prefers-reduced-motion: no-preference) {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
   font-size: 10px;
-  font-family: 'Roboto Condensed', sans-serif;
+  font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
   color: $COLOR_BLACK;
   // height: 100%
   padding-top: $HEIGHT_GLOBAL_MENU + $HEIGHT_NBDC_COMMON_HEADER !important;
@@ -32,6 +35,26 @@ body {
 
   [data-page='home'] & {
     overflow: hidden;
+  }
+
+  [data-page='home'] & #SearchResultsView {
+    height: var(
+      --search-results-height,
+      calc(
+        100vh - #{$HEIGHT_GLOBAL_MENU + $HEIGHT_BOTTOM_DRAWER} - 104px
+      )
+    );
+  }
+
+  [data-page='home'] &:not(.-layout-ready) {
+    #SearchResultsView .tablecontainer tbody,
+    #SearchResultsView #Messages,
+    #SearchResultsView #RowIndicator,
+    #SearchResultsView .LayoutAside,
+    #Karyotype {
+      opacity: 0;
+      pointer-events: none;
+    }
   }
 
   &[data-search-mode='advanced'] {
@@ -110,7 +133,7 @@ select {
 ::placeholder,
 *::part(input-field)::placeholder {
   color: $COLOR_GRAY;
-  font-family: 'Roboto Condensed', sans-serif;
+  font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
 }
 
 .unimplemented {

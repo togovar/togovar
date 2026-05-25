@@ -5,6 +5,8 @@ import { ResultsColumnsDropdown } from './ResultsColumnsDropdown';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
 import { ResultsViewDataManager } from './ResultsViewDataManager';
+import { ResultsColumnAutoSizer } from './ResultsColumnAutoSizer';
+import { ResultsColumnResizeController } from './ResultsColumnResizeController';
 import type { SearchMessages, SearchStatus, ColumnConfig } from '../../types';
 import { isTouchDevice } from '../../utils/deviceDetection';
 
@@ -61,6 +63,8 @@ export class ResultsView {
   private _boundSearchModeHandler!: (_newMode: unknown) => void;
   /** 動的に作成した列表示制御用スタイル要素 */
   private _stylesheet!: HTMLStyleElement;
+  private columnAutoSizer!: ResultsColumnAutoSizer;
+  private columnResizeController!: ResultsColumnResizeController;
 
   /**
    * ResultsView のコンストラクタ
@@ -128,6 +132,14 @@ export class ResultsView {
       this.columnsDropdown.destroy();
     }
 
+    if (this.columnResizeController) {
+      this.columnResizeController.destroy();
+    }
+
+    if (this.columnAutoSizer) {
+      this.columnAutoSizer.destroy();
+    }
+
     // Unbind all StoreManager event bindings
     STORE_BINDINGS.forEach((key) => {
       storeManager.unbind(key, this);
@@ -185,11 +197,15 @@ export class ResultsView {
    * - store から呼ばれるコールバック
    * - DataManager に処理を委譲
    * - タッチデバイス判定を含める
-   * @param _results 検索結果（_prefix は使用しないことを示す）
+   * @param results 検索結果
    */
-  searchResults(_results: unknown): void {
+  searchResults(results: unknown): void {
+    if (!Array.isArray(results) || results.length === 0) {
+      this.columnAutoSizer.resetSignature();
+    }
+
     this.dataManager.handleSearchResults(
-      _results,
+      results,
       isTouchDevice(),
       this.touchHandler.setElementsInteractable.bind(this.touchHandler)
     );
@@ -292,10 +308,34 @@ export class ResultsView {
     thead: HTMLElement,
     columns: ColumnConfig[]
   ): void {
-    thead.innerHTML = `<tr>${getOrderedColumns(columns)
+    const orderedColumns = getOrderedColumns(columns);
+    const currentColumnIds = Array.from(thead.querySelectorAll('th')).map(
+      (th) =>
+        orderedColumns.find((column) => th.classList.contains(column.id))?.id
+    );
+    const nextColumnIds = orderedColumns.map((column) => column.id);
+    const resizeBarCount = orderedColumns.filter(
+      (column) => column.resizable !== false
+    ).length;
+    const hasResizeBars =
+      thead.querySelectorAll('.resize-bar').length === resizeBarCount;
+
+    if (
+      hasResizeBars &&
+      currentColumnIds.join(',') === nextColumnIds.join(',')
+    ) {
+      return;
+    }
+
+    thead.innerHTML = `<tr>${orderedColumns
       .map(
         (column) =>
-          `<th class="${column.id}"><p data-tooltip-id="table-header-${column.id}">${column.label}</p></th>`
+          `<th class="${column.id}" data-column-id="${column.id}">` +
+          `<span data-tooltip-id="table-header-${column.id}">${column.label}</span>` +
+          (column.resizable === false
+            ? ''
+            : '<div class="resize-bar" aria-hidden="true"></div>') +
+          '</th>'
       )
       .join('')}</tr>`;
   }
@@ -366,8 +406,8 @@ export class ResultsView {
     return 'onwheel' in document
       ? 'wheel'
       : 'onmousewheel' in document
-      ? 'mousewheel'
-      : 'DOMMouseScroll';
+        ? 'mousewheel'
+        : 'DOMMouseScroll';
   }
 
   /**
@@ -381,6 +421,17 @@ export class ResultsView {
     this._wheelEventName = this.getWheelEventName();
     this._boundWheelHandler = this._scroll.bind(this) as EventListener;
     this.tbody.addEventListener(this._wheelEventName, this._boundWheelHandler);
+
+    this.columnAutoSizer = new ResultsColumnAutoSizer(this.tbody);
+    this.columnResizeController = new ResultsColumnResizeController({
+      thead: this.thead,
+      tbody: this.tbody,
+      tablecontainer: this.tablecontainer,
+      autoSizer: this.columnAutoSizer,
+      previewColumns: (columns) => {
+        this.dataManager.handleColumnsChange(columns);
+      },
+    });
 
     // タッチハンドラーのスクロールコールバック設定
     this.touchHandler.setScrollCallbacks({

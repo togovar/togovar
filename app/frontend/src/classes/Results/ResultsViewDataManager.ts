@@ -130,7 +130,7 @@ export class ResultsViewDataManager {
 
     this._status.innerHTML =
       `The number of available variations is ${available.toLocaleString()} ` +
-      `out of <span class="bigger">${filtered.toLocaleString()}</span>.`;
+      `out of <span class="highlight">${filtered.toLocaleString()}</span>.`;
 
     this._updateNotFoundState(filtered === 0);
   }

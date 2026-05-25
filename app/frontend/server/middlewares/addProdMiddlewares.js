@@ -8,8 +8,10 @@ const {
   getTrailingSlashUrl,
   getNoTrailingSlashUrl,
 } = require('./middlewareHelpers');
+const { applyCspNonce } = require('./securityHeaders');
 
-const reportHtmlCache = new Map();
+const htmlCache = new Map();
+const htmlPathCache = new Map();
 const LONG_TERM_CACHE_PATTERN =
   /\.(?:css|js|woff2?|eot|ttf|otf|png|jpe?g|gif|svg|webp)(?:\.gz)?$/i;
 const LONG_TERM_CACHE_DIRECTORY_PATTERN = /(?:^|\/)(?:css|js|fonts|images)\//;
@@ -21,9 +23,8 @@ function getCanonicalUrl(req) {
 }
 
 // 本番のビルド済みHTMLはデプロイ中に変わらない前提なので、初回読み込み後はメモリに保持する。
-function getReportHtml(outputPath, report, callback) {
-  const htmlPath = path.resolve(outputPath, report, 'index.html');
-  const cachedHtml = reportHtmlCache.get(htmlPath);
+function getCachedHtml(htmlPath, callback) {
+  const cachedHtml = htmlCache.get(htmlPath);
 
   if (cachedHtml) {
     callback(null, cachedHtml);
@@ -36,9 +37,13 @@ function getReportHtml(outputPath, report, callback) {
       return;
     }
 
-    reportHtmlCache.set(htmlPath, html);
+    htmlCache.set(htmlPath, html);
     callback(null, html);
   });
+}
+
+function getReportHtml(outputPath, report, callback) {
+  getCachedHtml(path.resolve(outputPath, report, 'index.html'), callback);
 }
 
 function sendReportHtml(outputPath, req, res) {
@@ -48,7 +53,101 @@ function sendReportHtml(outputPath, req, res) {
     }
 
     res.setHeader('Cache-Control', 'no-cache');
-    return res.send(withCanonicalUrl(html, getCanonicalUrl(req)));
+    return res.send(
+      applyCspNonce(withCanonicalUrl(html, getCanonicalUrl(req)), res.locals.cspNonce)
+    );
+  });
+}
+
+async function isSafeHtmlFile(candidatePath, outputRoot) {
+  if (
+    candidatePath !== outputRoot &&
+    !candidatePath.startsWith(`${outputRoot}${path.sep}`)
+  ) {
+    return false;
+  }
+
+  try {
+    const stats = await fs.promises.stat(candidatePath);
+    return stats.isFile();
+  } catch (err) {
+    return false;
+  }
+}
+
+async function getSafeHtmlPath(outputPath, requestPath) {
+  const outputRoot = path.resolve(outputPath);
+  const cacheKey = `${outputRoot}\0${requestPath}`;
+
+  if (htmlPathCache.has(cacheKey)) {
+    return htmlPathCache.get(cacheKey);
+  }
+
+  let normalizedRequestPath;
+
+  try {
+    normalizedRequestPath = decodeURIComponent(requestPath).split('?')[0];
+  } catch (err) {
+    return null;
+  }
+
+  const relativePath =
+    normalizedRequestPath === '/'
+      ? 'index.html'
+      : normalizedRequestPath.replace(/^\/+/, '');
+  const candidatePaths = [];
+
+  if (relativePath.endsWith('.html')) {
+    candidatePaths.push(path.resolve(outputPath, relativePath));
+  } else {
+    candidatePaths.push(path.resolve(outputPath, relativePath, 'index.html'));
+    candidatePaths.push(path.resolve(outputPath, `${relativePath}.html`));
+  }
+
+  for (const candidatePath of candidatePaths) {
+    if (await isSafeHtmlFile(candidatePath, outputRoot)) {
+      htmlPathCache.set(cacheKey, candidatePath);
+      return candidatePath;
+    }
+  }
+
+  return null;
+}
+
+async function sendStaticHtmlWithNonce(outputPath, req, res, next) {
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    next();
+    return;
+  }
+
+  const extension = path.extname(req.path);
+  if (extension && extension !== '.html') {
+    next();
+    return;
+  }
+
+  let htmlPath;
+  try {
+    htmlPath = await getSafeHtmlPath(outputPath, req.path);
+  } catch (err) {
+    next(err);
+    return;
+  }
+
+  if (!htmlPath) {
+    next();
+    return;
+  }
+
+  getCachedHtml(htmlPath, (err, html) => {
+    if (err) {
+      next();
+      return;
+    }
+
+    res.setHeader('Cache-Control', 'no-cache');
+    res.type('html');
+    res.send(applyCspNonce(html, res.locals.cspNonce));
   });
 }
 
@@ -95,6 +194,10 @@ module.exports = function addProdMiddlewares(app, options) {
     }
 
     sendReportHtml(outputPath, req, res);
+  });
+
+  app.get('*', (req, res, next) => {
+    sendStaticHtmlWithNonce(outputPath, req, res, next);
   });
 
   app.use(

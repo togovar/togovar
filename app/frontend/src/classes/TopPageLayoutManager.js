@@ -36,12 +36,16 @@ class TopPageLayoutManager {
     const searchInputHeight = this._searchInputView?.clientHeight || 0;
     const drawerOffsetTop = this._drawerView?.offsetTop || 0;
     const drawerHeight = window.innerHeight - drawerOffsetTop;
+    const searchResultsHeight =
+      window.innerHeight -
+      (globalHeaderHeight + searchInputHeight + drawerHeight);
 
     // 検索結果エリアの高さを動的に調整
     if (this._searchResultsView) {
-      this._searchResultsView.style.height = `calc(100vh - ${
-        globalHeaderHeight + searchInputHeight + drawerHeight
-      }px)`;
+      this._searchResultsView.style.setProperty(
+        '--search-results-height',
+        `${Math.max(0, searchResultsHeight)}px`
+      );
     }
 
     // すべてのターゲット要素の表示サイズを更新

@@ -107,6 +107,10 @@ function _resetSearchResults() {
   storeManager.setData('rowCount', 0);
   storeManager.setData('isFetching', false);
   storeManager.setData('searchResults', []);
+  storeManager.resetColumnWidths();
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('results-column-widths-reset'));
+  }
   lastRequestRanges.clear(); // データリセット時にクリア
 }
 
@@ -371,5 +375,9 @@ function _updateDownloadDisabledReasonMessage(message: string): void {
   }
 
   reasonNode.textContent = message;
-  reasonNode.toggleAttribute('hidden', message === '');
+  const shouldHide = message === '';
+  reasonNode.toggleAttribute('hidden', shouldHide);
+  reasonNode
+    .closest('.download-disabled-reason-item')
+    ?.toggleAttribute('hidden', shouldHide);
 }

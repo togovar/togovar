@@ -17,7 +17,7 @@ main#SearchResultsView.LayoutMainAside
       header.header
         .left
           h2.heading Results
-          .status
+          .status Loading results...
         ul.right
           li.text Download
           li.download-buttons
@@ -28,11 +28,37 @@ main#SearchResultsView.LayoutMainAside
             button.columns-dropdown-button.button-view.-dropdown(type='button' aria-expanded='false') Columns
             .columns-dropdown-menu(hidden aria-hidden='true' inert)
               ul.columns-dropdown-list
-          li#DownloadDisabledReason.download-disabled-reason(role='status' aria-live='polite' hidden)
+          li.download-disabled-reason-item(hidden)
+            span#DownloadDisabledReason.download-disabled-reason(role='status' aria-live='polite' hidden)
       #Messages
       .tablecontainer
         table.results-view
           thead
+            tr
+              th.togovar_id
+                span(data-tooltip-id="table-header-togovar_id") TogoVar ID
+              th.refsnp_id
+                span(data-tooltip-id="table-header-refsnp_id") RefSNP ID
+              th.position
+                span(data-tooltip-id="table-header-position") Position
+              th.ref_alt
+                span(data-tooltip-id="table-header-ref_alt") Ref / Alt
+              th.type
+                span(data-tooltip-id="table-header-type") Type
+              th.gene
+                span(data-tooltip-id="table-header-gene") Gene
+              th.alt_frequency
+                span(data-tooltip-id="table-header-alt_frequency") Alt frequency
+              th.consequence
+                span(data-tooltip-id="table-header-consequence") Consequence
+              th.clinical_significance
+                span(data-tooltip-id="table-header-clinical_significance") Clinical significance
+              th.alphamissense
+                span(data-tooltip-id="table-header-alphamissense") AlphaMissense
+              th.sift
+                span(data-tooltip-id="table-header-sift") SIFT
+              th.polyphen
+                span(data-tooltip-id="table-header-polyphen") PolyPhen
 
           tbody
       #RowIndicator.row-indicator

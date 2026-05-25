@@ -17,6 +17,7 @@
 export type ColumnConfig = {
   id: string;
   isUsed: boolean;
+  width?: number;
 };
 
 /** 表示サイズ計算結果の型定義 */

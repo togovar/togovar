@@ -1,7 +1,15 @@
 $SIZE: 30px
 
+#SearchInputView
+  // SimpleSearchViewはLitコンポーネントとして後から描画されるため、
+  // 初期HTMLの時点で検索フォーム分の高さを確保してCLSを抑える。
+  min-height: 104px
+  > .sectionscontainer
+    min-height: 72px
+
 #SimpleSearchView
   padding: 14px
+  min-height: 72px
   > .search-field-view
     > .fieldcontainer, > .examples
       display: none

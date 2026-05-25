@@ -57,12 +57,14 @@ input[type="range"]::-webkit-slider-thumb {
             type="range"
             name="slider-1"
             id="slider-1"
+            aria-label="Lower range limit"
         />
         <input
             part = "slider"
             type="range"
             name="slider-2"
             id="slider-2"
+            aria-label="Upper range limit"
         />
       </div>
     </div>

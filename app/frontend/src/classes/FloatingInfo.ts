@@ -346,10 +346,28 @@ export default class FloatingInfo {
 
     anchor.className = 'url';
     anchor.href = tooltip.url || '';
-    anchor.innerText = 'Read More';
+    anchor.innerText = this.getAnchorText(tooltip);
     anchor.setAttribute('aria-label', `Read more about ${tooltip.content}`);
 
     return anchor;
+  }
+
+  private getAnchorText(tooltip: TooltipEntry): string {
+    switch (tooltip.id) {
+      case 'table-header-alt_frequency':
+      case 'variant-frequency':
+        return 'Read frequency help';
+      case 'table-header-consequence':
+        return 'Read consequence help';
+      case 'table-header-sift':
+      case 'table-header-polyphen':
+      case 'table-header-alphamissense':
+        return 'Read prediction help';
+      case 'table-header-clinical_significance':
+        return 'Read clinical significance help';
+      default:
+        return 'Read related help';
+    }
   }
 
   // 非インタラクティブ要素は、明示されたものだけキーボードフォーカス対象にする。

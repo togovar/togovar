@@ -9,7 +9,6 @@ import TopPageLayoutManager from '../src/classes/TopPageLayoutManager.js';
 import DownloadButton from './classes/DownloadButton.ts';
 // Search
 import SimpleSearchView from './components/SearchField/SimpleSearch/SimpleSearchView';
-import { AdvancedSearchBuilderView } from '../src/classes/AdvancedSearchBuilderView.ts';
 // PanelViews
 // PanelViews: Filters
 import PanelViewCheckList from '../src/classes/PanelViewCheckList.ts';
@@ -122,12 +121,17 @@ const getAllElements = (selector) => document.querySelectorAll(selector);
 // グローバル変数: ResultsView インスタンスを管理
 let globalResultsView = null;
 let globalFloatingInfo = null;
+let advancedSearchBuilderView = null;
+let advancedSearchBuilderViewPromise = null;
 
 // 検索結果画面の初期化
 function initResultsView() {
   const resultView = new ResultsView(getElement('ResultsView'));
   globalResultsView = resultView; // グローバル参照を保存
   TopPageLayoutManager.init([resultView]);
+  requestAnimationFrame(() => {
+    document.body.classList.add('-layout-ready');
+  });
 }
 
 // クリーンアップ機能: すべてのリソースを解放
@@ -255,16 +259,53 @@ function initVariantPreview() {
 // 検索窓の初期化
 function initSearchInputs() {
   new SimpleSearchView();
-  new AdvancedSearchBuilderView(getElement('AdvancedSearchBuilderView'));
+
+  if (storeManager.getData('searchMode') === 'advanced') {
+    loadAdvancedSearchBuilderView();
+  }
 
   // 検索モード変更の設定
   getAllElements('#SearchInputView > .tabscontainer > ul > li').forEach(
     (elm) => {
       elm.addEventListener('click', (e) => {
-        storeManager.setData('searchMode', e.target.dataset.target);
+        const mode = e.currentTarget.dataset.target;
+        if (mode !== 'simple' && mode !== 'advanced') return;
+
+        storeManager.setData('searchMode', mode);
+
+        if (mode === 'advanced') {
+          loadAdvancedSearchBuilderView();
+        }
       });
     }
   );
+}
+
+function loadAdvancedSearchBuilderView() {
+  if (advancedSearchBuilderView) {
+    return Promise.resolve(advancedSearchBuilderView);
+  }
+
+  if (advancedSearchBuilderViewPromise) {
+    return advancedSearchBuilderViewPromise;
+  }
+
+  advancedSearchBuilderViewPromise = import(
+    /* webpackChunkName: "advanced-search" */
+    '../src/classes/AdvancedSearchBuilderView.ts'
+  )
+    .then(({ AdvancedSearchBuilderView }) => {
+      advancedSearchBuilderView = new AdvancedSearchBuilderView(
+        getElement('AdvancedSearchBuilderView')
+      );
+      return advancedSearchBuilderView;
+    })
+    .catch((error) => {
+      advancedSearchBuilderViewPromise = null;
+      console.error('Failed to import advanced search module:', error);
+    });
+
+  return advancedSearchBuilderViewPromise;
 }
 
 // モジュールタブメニューの初期化

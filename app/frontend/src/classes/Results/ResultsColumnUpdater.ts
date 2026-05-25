@@ -19,77 +19,115 @@ import { REF_ALT_SHOW_LENGTH } from './ResultsColumnTemplates';
  */
 export class ResultsColumnUpdater {
   /**
-   * リンクとして表示する内容がない場合に、a要素を空の状態へ戻す。
+   * セル内に残っているリンクを削除する。
+   * hrefのない空リンクはLighthouseで「クロールできないリンク」と判定されるため、
+   * 値がない場合はa要素自体をDOMに置かない。
    */
-  static resetAnchor(element: HTMLAnchorElement) {
-    element.removeAttribute('href');
-    element.removeAttribute('aria-label');
-    element.textContent = '';
+  static resetAnchor(cell: HTMLElement) {
+    cell.querySelector('a.hyper-text')?.remove();
   }
 
   /**
-   * a要素にリンク先、表示文字列、スクリーンリーダー向けラベルを設定する。
+   * セル内のa要素を取得し、存在しない場合は作成する。
+   */
+  static ensureAnchor(
+    cell: HTMLElement,
+    className: string,
+    insertBefore?: Element | null
+  ) {
+    const currentAnchor = cell.querySelector<HTMLAnchorElement>('a.hyper-text');
+
+    if (currentAnchor) return currentAnchor;
+
+    const anchor = document.createElement('a');
+
+    anchor.className = className;
+    anchor.target = '_blank';
+    anchor.rel = 'noopener noreferrer';
+
+    if (insertBefore) {
+      cell.insertBefore(anchor, insertBefore);
+    } else {
+      cell.appendChild(anchor);
+    }
+
+    return anchor;
+  }
+
+  /**
+   * セル内のa要素にリンク先、表示文字列、スクリーンリーダー向けラベルを設定する。
    */
   static updateAnchor(
-    element: HTMLAnchorElement,
+    cell: HTMLElement,
+    className: string,
     url: string,
     text: string,
-    label: string
+    label: string,
+    insertBefore?: Element | null
   ) {
-    element.setAttribute('href', url);
-    element.textContent = text;
-    element.setAttribute('aria-label', label);
+    const anchor = this.ensureAnchor(cell, className, insertBefore);
+
+    anchor.setAttribute('href', url);
+    anchor.textContent = text;
+    anchor.setAttribute('aria-label', label);
   }
 
   /**
    * TogoVar ID列を更新する。
    *
-   * @param element - 更新対象のa要素
+   * @param cell - TogoVar ID列のtd要素
    * @param value - 表示するTogoVar ID
    * @param url - バリアント詳細ページのURL
    */
   static updateTogovarId(
-    element: HTMLAnchorElement | null,
+    cell: HTMLTableCellElement | null,
     value: string,
     url: string
   ) {
-    if (!element || !value) {
-      if (element) {
-        this.resetAnchor(element);
+    if (!cell || !value) {
+      if (cell) {
+        this.resetAnchor(cell);
       }
       return;
     }
 
-    this.updateAnchor(element, url, value, `View variant ${value} details`);
+    this.updateAnchor(
+      cell,
+      'hyper-text -internal',
+      url,
+      value,
+      `View variant ${value} details`
+    );
   }
 
   /**
    * RefSNP ID列を更新する。
    *
    * @param tdRS - RefSNP列のtd要素
-   * @param tdRSAnchor - RefSNP IDを表示するa要素
    * @param values - RefSNP IDの配列
    */
   static updateRefSNP(
-    tdRS: HTMLTableCellElement | null,
-    tdRSAnchor: HTMLAnchorElement | null,
+    tdRS: HTMLDivElement | null,
+    tdRSRemains: HTMLSpanElement | null,
     values: string[]
   ) {
-    if (!tdRS || !tdRSAnchor) return;
+    if (!tdRS || !tdRSRemains) return;
 
     if (!values || values.length === 0) {
-      tdRS.dataset.remains = '0';
-      this.resetAnchor(tdRSAnchor);
+      this.updateRemainsBadge(tdRSRemains, 0);
+      this.resetAnchor(tdRS);
       return;
     }
 
     // 画面には先頭のrsIDだけを表示し、残りの件数はdata-remainsに保持する。
-    tdRS.dataset.remains = (values.length - 1).toString();
+    this.updateRemainsBadge(tdRSRemains, values.length - 1);
     this.updateAnchor(
-      tdRSAnchor,
+      tdRS,
+      'hyper-text -external',
       `https://identifiers.org/dbsnp/${values[0]}`,
       values[0],
-      `Open dbSNP record ${values[0]}`
+      `Open dbSNP record ${values[0]}`,
+      tdRSRemains
     );
   }
 
@@ -188,29 +226,30 @@ export class ResultsColumnUpdater {
    * Gene列を更新する。
    *
    * @param tdGene - Gene列のtd要素
-   * @param tdGeneAnchor - Gene名を表示するa要素
    * @param symbols - 遺伝子シンボルの配列
    */
   static updateGene(
-    tdGene: HTMLTableCellElement | null,
-    tdGeneAnchor: HTMLAnchorElement | null,
+    tdGene: HTMLDivElement | null,
+    tdGeneRemains: HTMLSpanElement | null,
     symbols: GeneSymbol[]
   ) {
-    if (!tdGene || !tdGeneAnchor) return;
+    if (!tdGene || !tdGeneRemains) return;
 
     if (!symbols || symbols.length === 0) {
-      tdGene.dataset.remains = '0';
-      this.resetAnchor(tdGeneAnchor);
+      this.updateRemainsBadge(tdGeneRemains, 0);
+      this.resetAnchor(tdGene);
       return;
     }
 
     // 画面には先頭の遺伝子だけを表示し、残りの件数はdata-remainsに保持する。
-    tdGene.dataset.remains = (symbols.length - 1).toString();
+    this.updateRemainsBadge(tdGeneRemains, symbols.length - 1);
     this.updateAnchor(
-      tdGeneAnchor,
+      tdGene,
+      'hyper-text -internal',
       `/gene/${symbols[0].id}`,
       symbols[0].name,
-      `View gene ${symbols[0].name} details`
+      `View gene ${symbols[0].name} details`,
+      tdGeneRemains
     );
   }
 
@@ -249,15 +288,15 @@ export class ResultsColumnUpdater {
    * @param transcripts - Transcript情報の配列
    */
   static updateConsequence(
-    tdConsequence: HTMLTableCellElement | null,
     tdConsequenceItem: HTMLDivElement | null,
+    tdConsequenceRemains: HTMLSpanElement | null,
     mostConsequence: string,
     transcripts: Transcript[]
   ) {
-    if (!tdConsequence || !tdConsequenceItem) return;
+    if (!tdConsequenceItem || !tdConsequenceRemains) return;
 
     if (!mostConsequence) {
-      tdConsequence.dataset.remains = '0';
+      this.updateRemainsBadge(tdConsequenceRemains, 0);
       tdConsequenceItem.textContent = '';
       return;
     }
@@ -268,32 +307,55 @@ export class ResultsColumnUpdater {
       new Set(transcripts.flatMap((transcript) => transcript.consequence))
     );
 
-    tdConsequence.dataset.remains = (uniqueConsequences.length - 1).toString();
+    this.updateRemainsBadge(
+      tdConsequenceRemains,
+      uniqueConsequences.length - 1
+    );
     tdConsequenceItem.textContent =
       master.find((consequence) => consequence.id === mostConsequence)?.label ||
       '';
   }
 
   /**
+   * 追加件数バッジを更新する。
+   *
+   * @param element - 追加件数表示要素
+   * @param remains - 追加件数
+   */
+  static updateRemainsBadge(element: HTMLSpanElement, remains: number) {
+    element.dataset.remains = remains.toString();
+    element.textContent = remains > 0 ? `+${remains}` : '';
+  }
+
+  /**
    * Clinical significance列を更新する。
    *
    * @param tdClinicalSign - Clinical significanceを表示するdiv要素
-   * @param tdClinicalAnchor - 疾患名をリンク表示するa要素
+   * @param clinicalContainer - Clinical significance列の内容コンテナ
+   * @param tdClinicalRemains - 追加件数を表示するspan要素
    * @param tdClinicalIcon - 追加情報の有無を示すspan要素
    * @param significances - Clinical significance情報の配列
    */
   static updateClinicalSignificance(
     tdClinicalSign: HTMLDivElement | null,
-    tdClinicalAnchor: HTMLAnchorElement | null,
+    clinicalContainer: HTMLDivElement | null,
+    tdClinicalRemains: HTMLSpanElement | null,
     tdClinicalIcon: HTMLSpanElement | null,
     significances: Significance[]
   ) {
-    if (!tdClinicalSign || !tdClinicalAnchor || !tdClinicalIcon) return;
+    if (
+      !tdClinicalSign ||
+      !clinicalContainer ||
+      !tdClinicalRemains ||
+      !tdClinicalIcon
+    )
+      return;
 
     if (!significances || significances.length === 0) {
       this.resetClinicalSignificance(
         tdClinicalSign,
-        tdClinicalAnchor,
+        clinicalContainer,
+        tdClinicalRemains,
         tdClinicalIcon
       );
       return;
@@ -307,27 +369,39 @@ export class ResultsColumnUpdater {
 
     this.updateClinicalCondition(
       tdClinicalSign,
-      tdClinicalAnchor,
+      clinicalContainer,
+      tdClinicalRemains,
       firstCondition
     );
-    this.updateClinicalMetadata(tdClinicalIcon, significances);
+    this.updateClinicalMetadata(
+      clinicalContainer,
+      tdClinicalRemains,
+      tdClinicalIcon,
+      significances
+    );
   }
 
   /**
    * Clinical significance列を空の状態へ戻す。
    *
    * @param tdClinicalSign - Clinical significanceを表示するdiv要素
-   * @param tdClinicalAnchor - 疾患名をリンク表示するa要素
+   * @param clinicalContainer - Clinical significance列の内容コンテナ
+   * @param tdClinicalRemains - 追加件数を表示するspan要素
    * @param tdClinicalIcon - 追加情報の有無を示すspan要素
    */
   static resetClinicalSignificance(
     tdClinicalSign: HTMLDivElement,
-    tdClinicalAnchor: HTMLAnchorElement,
+    clinicalContainer: HTMLDivElement,
+    tdClinicalRemains: HTMLSpanElement,
     tdClinicalIcon: HTMLSpanElement
   ) {
     tdClinicalSign.dataset.value = '';
-    this.resetAnchor(tdClinicalAnchor);
-    tdClinicalIcon.dataset.remains = '0';
+    tdClinicalSign.textContent = '';
+    this.resetAnchor(clinicalContainer);
+    clinicalContainer.dataset.remains = '0';
+    clinicalContainer.dataset.mgend = 'false';
+    tdClinicalRemains.dataset.remains = '0';
+    tdClinicalRemains.textContent = '';
     tdClinicalIcon.dataset.mgend = 'false';
   }
 
@@ -335,12 +409,14 @@ export class ResultsColumnUpdater {
    * Clinical significanceに紐づく疾患情報を更新する。
    *
    * @param tdClinicalSign - Clinical significanceを表示するdiv要素
-   * @param tdClinicalAnchor - 疾患名をリンク表示するa要素
+   * @param clinicalContainer - Clinical significance列の内容コンテナ
+   * @param tdClinicalRemains - 追加件数を表示するspan要素
    * @param firstCondition - 先頭の疾患情報
    */
   static updateClinicalCondition(
     tdClinicalSign: HTMLDivElement,
-    tdClinicalAnchor: HTMLAnchorElement,
+    clinicalContainer: HTMLDivElement,
+    tdClinicalRemains: HTMLSpanElement,
     firstCondition: { name: string; medgen?: string } | undefined
   ) {
     if (firstCondition) {
@@ -348,41 +424,66 @@ export class ResultsColumnUpdater {
 
       if (firstCondition.medgen) {
         this.updateAnchor(
-          tdClinicalAnchor,
+          clinicalContainer,
+          'hyper-text -internal',
           `/disease/${firstCondition.medgen}`,
           firstCondition.name || '',
-          `View disease ${firstCondition.name} details`
+          `View disease ${firstCondition.name} details`,
+          tdClinicalRemains
         );
       } else {
         // MedGen IDがない場合はリンクにせず、通常テキストとして表示する。
         tdClinicalSign.textContent = firstCondition.name;
-        this.resetAnchor(tdClinicalAnchor);
+        this.resetAnchor(clinicalContainer);
       }
     } else {
       // 疾患情報がない場合はothersとして表示する。
       tdClinicalSign.textContent = 'others';
-      this.resetAnchor(tdClinicalAnchor);
+      this.resetAnchor(clinicalContainer);
     }
   }
 
   /**
    * Clinical significance列の補助情報を更新する。
    *
+   * @param clinicalContainer - Clinical significance列の内容コンテナ
+   * @param tdClinicalRemains - 追加件数を表示するspan要素
    * @param tdClinicalIcon - 追加情報の有無を示すspan要素
    * @param significances - Clinical significance情報の配列
    */
   static updateClinicalMetadata(
+    clinicalContainer: HTMLDivElement,
+    tdClinicalRemains: HTMLSpanElement,
     tdClinicalIcon: HTMLSpanElement,
     significances: Significance[]
   ) {
     // 画面に表示している先頭1件以外の件数を保持する。
-    tdClinicalIcon.dataset.remains = (significances.length - 1).toString();
+    const remains = (significances.length - 1).toString();
+    clinicalContainer.dataset.remains = remains;
+    tdClinicalRemains.dataset.remains = remains;
+    this.updateClinicalRemainsText(tdClinicalRemains, remains);
 
     // MGeND由来の情報が含まれるかを保持する。
     const hasMedgen = significances.some(
       (significance) => significance.source === 'mgend'
     );
+    clinicalContainer.dataset.mgend = hasMedgen.toString();
     tdClinicalIcon.dataset.mgend = hasMedgen.toString();
+  }
+
+  /**
+   * Clinical significanceの追加件数を表示する。
+   *
+   * @param tdClinicalRemains - 追加件数を表示するspan要素
+   * @param remains - 追加件数
+   */
+  static updateClinicalRemainsText(
+    tdClinicalRemains: HTMLSpanElement,
+    remains: string
+  ) {
+    const text = remains === '0' ? '' : `+${remains}`;
+
+    tdClinicalRemains.textContent = text;
   }
 
   /**

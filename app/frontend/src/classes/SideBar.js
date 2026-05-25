@@ -7,10 +7,6 @@ export default class SideBar {
     this._body = document.getElementsByTagName('body')[0];
     // イベント
     storeManager.bind('selectedRow', this);
-    // スクロールバーを隠す
-    const scrollBarWidth = this._elm.offsetWidth - this._elm.clientWidth;
-    this._elm.style.width = `${this._elm.offsetWidth + scrollBarWidth}px`;
-    this._elm.style.marginRight = `-${scrollBarWidth}px`;
     // リセットボタン
     this._setupResetButton();
   }

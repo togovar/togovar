@@ -82,6 +82,7 @@ const config = {
   output: {
     path: path.resolve(__dirname, '../../../dist'),
     filename: 'js/[name]-[contenthash].js',
+    chunkFilename: 'js/[name]-[contenthash].js',
     publicPath: '/',
   },
   resolve: {
@@ -198,6 +199,9 @@ const config = {
     new HtmlWebpackPlugin({
       template: 'app/frontend/views/index.pug',
       filename: 'index.html',
+      templateParameters: {
+        canonicalUrl: `${getSiteOrigin()}/`,
+      },
       inject: false,
     }),
     new HtmlWebpackPlugin({
