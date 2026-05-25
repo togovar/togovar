@@ -17,12 +17,16 @@ export default class SimpleSearchExamples extends LitElement {
 
   /**
    * 例文クリック時のイベントハンドラー
-   * @param example - クリックされた例文データ
-   * @param value - 検索に使う値
+   * @param e - クリックイベント
    */
-  private handleClick(example: ExampleItem, value: string): void {
+  private handleClick = (e: Event): void => {
+    const button = e.currentTarget as HTMLButtonElement;
+    const key = button.dataset.key;
+    const value = button.dataset.value;
+    if (!key || !value) return;
+
     const detail: ExampleSelectedDetail = {
-      key: example.key,
+      key,
       value,
     };
 
@@ -33,7 +37,7 @@ export default class SimpleSearchExamples extends LitElement {
         composed: true,
       })
     );
-  }
+  };
 
   private getValues(example: ExampleItem): string[] {
     return Array.isArray(example.value) ? example.value : [example.value];
@@ -53,7 +57,9 @@ export default class SimpleSearchExamples extends LitElement {
                 (value, index) =>
                   html`${index > 0 ? ', ' : ''}<button
                       type="button"
-                      @click=${() => this.handleClick(example, value)}
+                      data-key=${example.key}
+                      data-value=${value}
+                      @click=${this.handleClick}
                     >
                       ${value}
                     </button>`
