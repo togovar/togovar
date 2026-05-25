@@ -28,16 +28,22 @@ export interface SuggestionItem {
 
 /** 例文アイテムの型 */
 export interface ExampleItem {
-  /** 例文の値 */
+  /** 例文の分類ラベル */
+  key: string;
+  /** 表示する例文の値 */
+  value: string | string[];
+}
+
+/** example-selected イベントで検索処理へ渡す値 */
+export interface ExampleSelectedDetail {
+  key: string;
   value: string;
-  /** 例文のラベル（オプション） */
-  label?: string;
 }
 
 /** Controller インターフェース */
 export interface SimpleSearchControllerInterface {
   selectSuggestion(suggestion: SuggestionItem): void;
-  selectExample(example: ExampleItem): void;
+  selectExample(example: ExampleSelectedDetail): void;
   updateTerm(term: string): void;
   executeCurrentSearch(): void;
   executeButtonSearch(): void;

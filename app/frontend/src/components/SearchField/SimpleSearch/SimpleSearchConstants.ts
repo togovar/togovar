@@ -1,15 +1,10 @@
 import { API_URL } from '../../../global';
+import type { ExampleItem } from './SimpleSearchTypes';
 
 /** SimpleSearchConstants - SimpleSearchView関連の定数定義 */
 
 /** グローバル変数の型宣言 */
 declare const TOGOVAR_FRONTEND_REFERENCE: 'GRCh37' | 'GRCh38' | string;
-
-/** 検索例のアイテム型 */
-export interface ExampleItem {
-  key: string;
-  value: string | string[];
-}
 
 /** 検索フィールド設定の型 */
 export interface SearchFieldConfig {
