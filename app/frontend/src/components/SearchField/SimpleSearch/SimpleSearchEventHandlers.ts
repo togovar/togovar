@@ -4,7 +4,7 @@ import type {
   SimpleSearchHost,
   SimpleSearchControllerInterface,
   SuggestionItem,
-  ExampleItem,
+  ExampleSelectedDetail,
 } from './SimpleSearchTypes';
 
 export class SimpleSearchEventHandlers {
@@ -31,7 +31,7 @@ export class SimpleSearchEventHandlers {
    * 例文選択イベントの処理
    * @param e - example-selected イベント
    */
-  handleExampleSelected = (e: CustomEvent<ExampleItem>): void => {
+  handleExampleSelected = (e: CustomEvent<ExampleSelectedDetail>): void => {
     this.controller.selectExample(e.detail);
   };
 

@@ -1,7 +1,7 @@
 @use '../../foundation/_variables.scss' as *;
 :host {
   display: flex;
-  gap: 0.2em;
+  gap: 0.5rem;
   flex-wrap: wrap;
   align-items: center;
   height: fit-content;
@@ -11,14 +11,8 @@ dl {
   font-size: 12px;
   line-height: 16px;
   margin-bottom: 0;
-  padding: 0 0.5em;
   display: inline-block;
   margin-block-start: 0;
-  border-radius: 8px;
-  cursor: pointer;
-  transition:
-    background-color $GUI_DURATION,
-    box-shadow $GUI_DURATION;
   > dt,
   > dd {
     display: inline-block;
@@ -34,9 +28,23 @@ dl {
     }
   }
   > dd {
-    margin-inline-start: 0.2em;
-  }
-  &:hover {
-    background-color: $COLOR_KEY_DARK2;
+    margin-inline-start: -0.2rem;
+
+    > button {
+      display: inline-block;
+      padding: 0 0.25rem;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      transition: background-color $GUI_DURATION;
+
+      &:hover,
+      &:focus-visible {
+        background-color: $COLOR_KEY_DARK2;
+      }
+    }
   }
 }
