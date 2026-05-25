@@ -5,9 +5,11 @@ import '../suggestions/SearchFieldWithSuggestions';
 import './SimpleSearchExamples';
 import './SimpleSearchButton';
 import { getSimpleSearchCondition } from '../../../store/searchManager';
+import { storeManager } from '../../../store/StoreManager';
 import { SimpleSearchController } from './SimpleSearchController';
 import { SimpleSearchEventHandlers } from './SimpleSearchEventHandlers';
 import { EXAMPLES, SEARCH_FIELD_CONFIG } from './SimpleSearchConstants';
+import type { SimpleSearchCurrentConditions } from '../../../types';
 import Styles from '../../../../stylesheets/object/component/simple-search-view.scss';
 
 /**
@@ -20,6 +22,15 @@ class SimpleSearchView extends LitElement {
 
   private _controller: SimpleSearchController;
   private _eventHandlers: SimpleSearchEventHandlers;
+  private _boundSimpleSearchConditionsHandler = (
+    conditions: SimpleSearchCurrentConditions
+  ): void => {
+    this._term = conditions.term || '';
+    if (!this._term) {
+      this._value = '';
+      this._hideSuggestions = true;
+    }
+  };
 
   constructor() {
     super();
@@ -31,6 +42,22 @@ class SimpleSearchView extends LitElement {
     // コントローラーとイベントハンドラーを初期化
     this._controller = new SimpleSearchController(this);
     this._eventHandlers = new SimpleSearchEventHandlers(this, this._controller);
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    storeManager.subscribe(
+      'simpleSearchConditions',
+      this._boundSimpleSearchConditionsHandler
+    );
+  }
+
+  disconnectedCallback(): void {
+    storeManager.unsubscribe(
+      'simpleSearchConditions',
+      this._boundSimpleSearchConditionsHandler
+    );
+    super.disconnectedCallback();
   }
 
   // ============================================================================

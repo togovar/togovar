@@ -9,7 +9,12 @@ const DOWNLOAD_VARIANT_LIMIT_TEXT = new Intl.NumberFormat('en-US').format(
 );
 const DOWNLOAD_LIMIT_TITLE = `Download is limited to ${DOWNLOAD_VARIANT_LIMIT_TEXT} variants.`;
 import { extractSearchCondition } from '../store/searchManager';
-import type { FetchOption, SearchResults, SearchStatistics } from '../types';
+import type {
+  FetchOption,
+  SearchResults,
+  SearchStatistics,
+  SimpleSearchCurrentConditions,
+} from '../types';
 
 let currentAbortController: AbortController | null = null;
 let _currentSearchMode: 'simple' | 'advanced' | null = null;
@@ -84,6 +89,9 @@ export const executeSearch = (() => {
           // すべてのリクエストが完了した後にローディング状態を解除
           storeManager.setData('isFetching', false);
           isRequestInProgress = false;
+          if (_redirectToSingleVariantResult()) {
+            return;
+          }
           _updateAppState();
         })
         .catch((error) => {
@@ -239,6 +247,89 @@ async function _fetchData(endpoint: string, options: FetchOption) {
   }
 }
 
+/** 検索結果が1件だけなら、その variant 詳細ページへ遷移する */
+function _redirectToSingleVariantResult(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  if (window.location.pathname.startsWith('/variant/')) {
+    return false;
+  }
+
+  if (!_hasSearchConditions()) {
+    return false;
+  }
+
+  const searchStatus = storeManager.getData('searchStatus');
+  if (searchStatus?.filtered !== 1) {
+    return false;
+  }
+
+  const [record] = storeManager.getData('searchResults');
+  const variantId = typeof record?.id === 'string' ? record.id : '';
+  if (!variantId) {
+    return false;
+  }
+
+  _clearSimpleSearchTermFromCurrentHistory();
+  window.location.assign(`/variant/${encodeURIComponent(variantId)}`);
+  return true;
+}
+
+/** 自動遷移前の検索履歴エントリから term だけを取り除く */
+function _clearSimpleSearchTermFromCurrentHistory() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const url = new URL(window.location.href);
+  url.searchParams.delete('term');
+
+  const query = url.searchParams.toString();
+  const nextUrl = `${url.pathname}${query ? `?${query}` : ''}${url.hash}`;
+  const nextState =
+    typeof window.history.state === 'object' && window.history.state !== null
+      ? { ...window.history.state }
+      : {};
+  delete nextState.term;
+
+  window.history.replaceState(nextState, '', nextUrl);
+
+  if (storeManager.getData('searchMode') === 'simple') {
+    const simpleConditions =
+      storeManager.getData<SimpleSearchCurrentConditions>(
+        'simpleSearchConditions'
+      );
+    storeManager.setData('simpleSearchConditions', {
+      ...simpleConditions,
+      term: '',
+    });
+  }
+}
+
+/** 検索条件が設定されているかを判定する */
+function _hasSearchConditions(): boolean {
+  switch (storeManager.getData('searchMode')) {
+    case 'simple': {
+      const simpleConditions = storeManager.getData('simpleSearchConditions');
+      const extractedSimpleConditions =
+        extractSearchCondition(simpleConditions);
+      return Object.keys(extractedSimpleConditions).length > 0;
+    }
+    case 'advanced': {
+      const advancedConditions = storeManager.getData(
+        'advancedSearchConditions'
+      );
+      return Boolean(
+        advancedConditions && Object.keys(advancedConditions).length > 0
+      );
+    }
+    default:
+      return false;
+  }
+}
+
 /** HTTP ステータスコードに応じたエラーメッセージを取得 */
 function _getErrorMessage(statusCode: number): string {
   const errorTypes: Record<number, string> = {
@@ -287,26 +378,7 @@ function _processStatistics(json: SearchStatistics) {
 /** 検索状態を更新し、条件が変わっていた場合は再検索 */
 async function _updateAppState() {
   // for Download button
-  let hasConditions = false;
-
-  switch (storeManager.getData('searchMode')) {
-    case 'simple': {
-      const simpleConditions = storeManager.getData('simpleSearchConditions');
-      const extractedSimpleConditions =
-        extractSearchCondition(simpleConditions);
-      hasConditions = Object.keys(extractedSimpleConditions).length > 0;
-      break;
-    }
-    case 'advanced': {
-      const advancedConditions = storeManager.getData(
-        'advancedSearchConditions'
-      );
-      hasConditions = Boolean(
-        advancedConditions && Object.keys(advancedConditions).length > 0
-      );
-      break;
-    }
-  }
+  const hasConditions = _hasSearchConditions();
 
   const filteredCount = storeManager.getData('searchStatus')?.filtered ?? 0;
   const isDownloadAvailable =

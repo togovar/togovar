@@ -27,6 +27,7 @@ import FloatingInfo from '../src/classes/FloatingInfo.ts';
 import qs from 'qs';
 import { extractSearchCondition } from './store/searchManager';
 import { initializeApp } from './store/initializeApp';
+import { executeSearch } from './api/fetchData';
 const _currentUrlParams = qs.parse(window.location.search.substring(1));
 
 export function initHome() {
@@ -52,6 +53,7 @@ export function initHome() {
 
     // クリーンアップハンドラーを設定
     setupCleanupHandlers();
+    setupPageShowHandler();
   });
 }
 
@@ -112,6 +114,21 @@ function readyInitialSearch(callback) {
   storeManager.setData('advancedSearchConditions', advancedSearchConditions);
 
   callback();
+}
+
+function setupPageShowHandler() {
+  window.addEventListener('pageshow', (event) => {
+    if (!event.persisted || storeManager.getData('searchMode') !== 'simple') {
+      return;
+    }
+
+    const urlParams = qs.parse(window.location.search.substring(1));
+    const simpleSearchConditions = extractSearchCondition(urlParams);
+
+    storeManager.setData('simpleSearchConditions', simpleSearchConditions);
+    storeManager.setData('appStatus', 'searching');
+    executeSearch(0, true);
+  });
 }
 
 // ヘルパー関数: 要素取得
