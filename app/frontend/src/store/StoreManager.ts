@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import isEqual from 'lodash/isEqual';
 import {
   handleHistoryChange,
   reflectSimpleSearchConditionToURI,
@@ -135,7 +135,7 @@ class StoreManager {
     }
 
     // オブジェクトの比較（変更があればコピーして保存）
-    if (!_.isEqual(oldValue, nextValue)) {
+    if (!isEqual(oldValue, nextValue)) {
       this.#state[key] = structuredClone(nextValue);
       if (key === 'columns') {
         this.#saveColumnsToStorage(this.#state.columns);
