@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
+const fs = require('fs');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
@@ -8,6 +9,11 @@ const { getSiteOrigin } = require('./siteOrigin');
 
 const env = require('dotenv').config().parsed || {};
 Object.assign(process.env, env);
+
+const STRUCTURED_DATA_TEMPLATE_PATH = path.resolve(
+  __dirname,
+  '../assets/togovar.jsonld'
+);
 
 // 検索エンジン向けの robots.txt を生成する。
 // ここではクロールを許可し、同時に sitemap.xml の場所を知らせる。
@@ -26,17 +32,65 @@ function createRobotsTxt(siteOrigin) {
 function createSitemapXml(siteOrigin, pages) {
   const urls = [
     `${siteOrigin}/`,
-    ...pages.map(page => `${siteOrigin}/doc/${page}/`),
-    ...pages.map(page => `${siteOrigin}/doc/ja/${page}/`),
+    ...pages.map((page) => `${siteOrigin}/doc/${page}/`),
+    ...pages.map((page) => `${siteOrigin}/doc/ja/${page}/`),
   ];
 
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ...urls.map(url => `  <url><loc>${url}</loc></url>`),
+    ...urls.map((url) => `  <url><loc>${url}</loc></url>`),
     '</urlset>',
     '',
   ].join('\n');
+}
+
+// JSON-LD内のサイトURLを、GRCh37/GRCh38などビルド対象のoriginに合わせる。
+function createStructuredDataJson(siteOrigin) {
+  try {
+    const template = fs.readFileSync(STRUCTURED_DATA_TEMPLATE_PATH, 'utf8');
+    const json = template.replace(/__TOGOVAR_SITE_ORIGIN__/g, siteOrigin);
+
+    return JSON.stringify(JSON.parse(json), null, 2).replace(/</g, '\\u003c');
+  } catch (error) {
+    throw new Error(
+      `Failed to create structured data JSON from ${STRUCTURED_DATA_TEMPLATE_PATH}`,
+      { cause: error }
+    );
+  }
+}
+
+// webpack watch が JSON-LD テンプレート変更を検知できるようにする。
+class StructuredDataTemplateDependencyPlugin {
+  apply(compiler) {
+    compiler.hooks.thisCompilation.tap(
+      'StructuredDataTemplateDependencyPlugin',
+      (compilation) => {
+        compilation.fileDependencies.add(STRUCTURED_DATA_TEMPLATE_PATH);
+      }
+    );
+  }
+}
+
+function createIndexTemplateParameters(
+  compilation,
+  assets,
+  assetTags,
+  options
+) {
+  const siteOrigin = getSiteOrigin();
+
+  return {
+    compilation,
+    webpackConfig: compilation.options,
+    htmlWebpackPlugin: {
+      tags: assetTags,
+      files: assets,
+      options,
+    },
+    canonicalUrl: `${siteOrigin}/`,
+    structuredDataJson: createStructuredDataJson(siteOrigin),
+  };
 }
 
 // webpackのビルド結果へ robots.txt と sitemap.xml を追加するための独自プラグイン。
@@ -48,29 +102,32 @@ class StaticSeoFilesPlugin {
 
   apply(compiler) {
     // webpackのコンパイルごとに、アセット追加のタイミングでSEO用ファイルを差し込む。
-    compiler.hooks.thisCompilation.tap('StaticSeoFilesPlugin', compilation => {
-      compilation.hooks.processAssets.tap(
-        {
-          name: 'StaticSeoFilesPlugin',
-          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONS,
-        },
-        () => {
-          const { RawSource } = compiler.webpack.sources;
-          const siteOrigin = getSiteOrigin();
+    compiler.hooks.thisCompilation.tap(
+      'StaticSeoFilesPlugin',
+      (compilation) => {
+        compilation.hooks.processAssets.tap(
+          {
+            name: 'StaticSeoFilesPlugin',
+            stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONS,
+          },
+          () => {
+            const { RawSource } = compiler.webpack.sources;
+            const siteOrigin = getSiteOrigin();
 
-          // dist/robots.txt として出力される。
-          compilation.emitAsset(
-            'robots.txt',
-            new RawSource(createRobotsTxt(siteOrigin))
-          );
-          // dist/sitemap.xml として出力される。
-          compilation.emitAsset(
-            'sitemap.xml',
-            new RawSource(createSitemapXml(siteOrigin, this.pages))
-          );
-        }
-      );
-    });
+            // dist/robots.txt として出力される。
+            compilation.emitAsset(
+              'robots.txt',
+              new RawSource(createRobotsTxt(siteOrigin))
+            );
+            // dist/sitemap.xml として出力される。
+            compilation.emitAsset(
+              'sitemap.xml',
+              new RawSource(createSitemapXml(siteOrigin, this.pages))
+            );
+          }
+        );
+      }
+    );
   }
 }
 
@@ -199,9 +256,7 @@ const config = {
     new HtmlWebpackPlugin({
       template: 'app/frontend/views/index.pug',
       filename: 'index.html',
-      templateParameters: {
-        canonicalUrl: `${getSiteOrigin()}/`,
-      },
+      templateParameters: createIndexTemplateParameters,
       inject: false,
     }),
     new HtmlWebpackPlugin({
@@ -228,6 +283,7 @@ const config = {
       filename: 'css/[name]-[contenthash].css',
     }),
     new WebpackManifestPlugin(),
+    new StructuredDataTemplateDependencyPlugin(),
     new webpack.DefinePlugin({
       TOGOVAR_FRONTEND_API_URL: JSON.stringify(
         process.env.TOGOVAR_FRONTEND_API_URL
