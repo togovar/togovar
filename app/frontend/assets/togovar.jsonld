@@ -3,46 +3,62 @@
   "@type": "DataCatalog",
   "@id": "__TOGOVAR_SITE_ORIGIN__/",
   "name": "TogoVar",
-  "description": "TogoVar (NBDC's integrated database of Japanese genomic variation) is a database that has collected and organized genome sequence differences between individuals (variants) in the Japanese population and disease information associated with them.",
+  "description": "TogoVar is an integrated database of Japanese genomic variation, providing allele frequencies and annotations for human variants.",
   "url": "__TOGOVAR_SITE_ORIGIN__/",
   "keywords": "genomic variation, Japanese population, allele frequency, integrated database, variant annotation",
   "provider": {
     "@type": "Organization",
-    "name": "the National Bioscience Database Center (NBDC) of the Japan Science and Technology Agency (JST)"
+    "name": "National Bioscience Database Center (NBDC), Japan Science and Technology Agency (JST)"
   },
   "dataset": [
     {
       "@type": "Dataset",
-      "@id": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_wes",
-      "name": "Variant set aggregated from WES data in NBDC Human Database/JGA",
-      "description": "JGA-WES dataset is a frequency dataset that assembles variants detected by reanalyzing individual-level exome sequence data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA). All JGA data for which an approval for creating secondary data has been obtained are to be aggregated. Note that variants with alternate allele counts of five or fewer are not included.",
-      "url": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_wes",
+      "@id": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/gem_j_wga/",
+      "name": "GEM Japan Whole Genome Aggregation (GEM-J WGA) Panel",
+      "description": "The GEM-J WGA panel is a variant frequency dataset of a Japanese general population, obtained by joint variant calling of whole genome sequence data collected from 7,609 individuals across Japan.",
+      "url": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/gem_j_wga/",
+      "identifier": "GEM-J WGA",
+      "keywords": "genomic variation, Japanese population, allele frequency, WGS",
+      "includedInDataCatalog": "__TOGOVAR_SITE_ORIGIN__/",
+      "creator": {
+        "@type": "Organization",
+        "name": "GEnome Medical alliance Japan (GEM Japan)"
+      },
+      "version": "2020-07-27",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "@type": "Dataset",
+      "@id": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_wes/",
+      "name": "JGA-WES dataset",
+      "description": "The JGA-WES dataset is a frequency dataset that assembles variants detected by reanalyzing individual-level exome sequence data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA).",
+      "url": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_wes/",
       "identifier": "JGA-WES",
       "keywords": "genomic variation, Japanese population, allele frequency, WES",
       "includedInDataCatalog": "__TOGOVAR_SITE_ORIGIN__/",
       "creator": {
         "@type": "Organization",
-        "name": "the National Bioscience Database Center (NBDC) of the Japan Science and Technology Agency (JST)"
+        "name": "National Bioscience Database Center (NBDC), Japan Science and Technology Agency (JST)"
       },
-      "version": "2018-06",
-      "license": "Proprietary License. See __TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_wes."
+      "version": "2018-06-01",
+      "license": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_wes/"
     },
     {
       "@type": "Dataset",
-      "@id": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_snp",
-      "name": "Variant set aggregated from SNP-chip data in NBDC Human Database/JGA",
-      "description": "JGA-SNP dataset is a frequency dataset that has aggregated variants detected from SNP-chip data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA). All JGA data for which an approval for creating secondary data has been obtained are to be aggregated. Note that no variants with 5 alternate alleles or less are included.",
-      "url": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_snp",
+      "@id": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_snp/",
+      "name": "JGA-SNP dataset",
+      "description": "The JGA-SNP dataset is a frequency dataset that aggregates variants detected from SNP-chip data in the NBDC Human Database/Japanese Genotype-phenotype Archive (JGA).",
+      "url": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_snp/",
       "identifier": "JGA-SNP",
       "keywords": "genomic variation, Japanese population, allele frequency, SNP-chip",
       "includedInDataCatalog": "__TOGOVAR_SITE_ORIGIN__/",
       "creator": {
         "@type": "Organization",
-        "name": "the National Bioscience Database Center (NBDC) of the Japan Science and Technology Agency (JST)"
+        "name": "National Bioscience Database Center (NBDC), Japan Science and Technology Agency (JST)"
       },
-      "version": "2018-06",
-      "license": "Proprietary License. See __TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_snp."
+      "version": "2024-06-28",
+      "license": "__TOGOVAR_SITE_ORIGIN__/doc/datasets/jga_snp/"
     }
   ],
-  "license": "Open Database License (ODbL)"
+  "license": "https://opendatacommons.org/licenses/odbl/"
 }

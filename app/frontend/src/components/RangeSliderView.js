@@ -15,6 +15,11 @@ searchTypeSimple.innerHTML = `
 
 template.innerHTML = `
 <style data="slider-style">
+input[type="range"] {
+    height: 24px;
+    padding: 0;
+}
+
 input[type="range"]::-webkit-slider-runnable-track {
     -webkit-appearance: none;
     height: 8px;
