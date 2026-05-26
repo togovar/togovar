@@ -18,6 +18,8 @@ function buildCspDirectives(nonce) {
     "object-src 'none'",
     "frame-ancestors 'none'",
     "form-action 'self'",
+    // strict-dynamic trusts only nonce/hash-approved scripts in modern browsers.
+    // Keep server-rendered script tags on nonce="__CSP_NONCE__".
     `script-src 'nonce-${nonce}' 'strict-dynamic' 'self' https://togovar.github.io`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://togostanza.github.io",
     "font-src 'self' https://fonts.gstatic.com https://togostanza.github.io data:",

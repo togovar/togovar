@@ -323,13 +323,22 @@ class StoreManager {
       clearTimeout(timeoutId);
 
       if (response instanceof Response) {
+        // In staging/prod, /auth/status can return 403 for an authenticated
+        // session that is not authorized for the status endpoint itself.
+        // Treat it as logged in so restricted dataset UI can stay enabled.
         if (response.status === 200 || response.status === 403) {
           this.setData('isLogin', true);
         } else {
           this.setData('isLogin', false);
         }
       }
-    } catch {
+    } catch (error) {
+      if (
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1'
+      ) {
+        console.warn('Failed to fetch auth status:', error);
+      }
       this.setData('isLogin', false);
     }
   }
