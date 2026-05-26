@@ -7,6 +7,10 @@ export default class SideBar {
     this._body = document.getElementsByTagName('body')[0];
     // イベント
     storeManager.bind('selectedRow', this);
+    this.selectedRow(storeManager.getData('selectedRow'));
+    requestAnimationFrame(() => {
+      this._body.classList.add('-sidebar-ready');
+    });
     // リセットボタン
     this._setupResetButton();
   }
