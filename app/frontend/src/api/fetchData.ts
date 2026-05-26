@@ -1,6 +1,6 @@
 import { storeManager } from '../store/StoreManager';
 import * as qs from 'qs';
-import * as _ from 'lodash';
+import debounce from 'lodash/debounce';
 import { API_URL } from '../global';
 const LIMIT = 100;
 const DOWNLOAD_VARIANT_LIMIT = 100000;
@@ -24,7 +24,7 @@ const lastRequestRanges = new Set(); // 取得済みの範囲を管理
 export const executeSearch = (() => {
   let isRequestInProgress = false;
 
-  return _.debounce((offset = 0, isFirstTime = false) => {
+  return debounce((offset = 0, isFirstTime = false) => {
     // 既にリクエストが進行中の場合はスキップ
     if (isRequestInProgress && !isFirstTime) {
       return;

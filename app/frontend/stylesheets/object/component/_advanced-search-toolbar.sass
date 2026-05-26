@@ -1,4 +1,4 @@
-$OPACITY_DISABLED: .5
+$OPACITY_DISABLED: .8
 
 .advanced-search-toolbar
   margin: 0 0 calc(var(--height-toolbar) * -1 - 1px) 0
@@ -7,6 +7,20 @@ $OPACITY_DISABLED: .5
   color: white
   font-size: 12px
   line-height: 14px
+  .command
+    -webkit-appearance: none
+    appearance: none
+    border: 0
+    border-radius: 0
+    box-shadow: none
+    background: transparent
+    color: inherit
+    font: inherit
+    line-height: inherit
+    margin: 0
+    text-align: left
+    white-space: nowrap
+    cursor: pointer
   > ul
     margin: 0
     display: flex
@@ -14,6 +28,8 @@ $OPACITY_DISABLED: .5
     padding-left: 0
     white-space: nowrap
     > li
+      > .command
+        padding: 4px 8px 3px
       > p
         padding: 4px 8px 3px
         margin-bottom: 0
@@ -69,46 +85,55 @@ $OPACITY_DISABLED: .5
           white-space: nowrap
           list-style: none
           > li
-            cursor: pointer
             transition: background-color $GUI_DURATION
-            display: flex
-            align-items: center
-            > p
+            > .command
+              display: flex
+              align-items: center
+              width: 100%
               margin-bottom: 0
-              padding-right: 8px
-              flex-grow: 1
+              padding: 4px 8px
+              transition: background-color $GUI_DURATION
             &:hover
-              background-color: $COLOR_KEY_DARK1
+              > .command
+                background-color: $COLOR_KEY_DARK1
         &:hover
           > ul
             pointer-events: auto
             opacity: 1
             transform: translateY(0)
-            > li
-              padding: 4px 8px
 
-      &.command
+      > .command
         opacity: $OPACITY_DISABLED
         pointer-events: none
         &.-enabled
           opacity: 1
           pointer-events: auto
+          &:hover
+            background-color: $COLOR_KEY_DARK1
         &[data-command="group"]
           #AdvancedSearchBuilderView[data-can-group="true"] &
             opacity: 1
             pointer-events: auto
+            &:hover
+              background-color: $COLOR_KEY_DARK1
         &[data-command="ungroup"]
           #AdvancedSearchBuilderView[data-can-ungroup="true"] &
             opacity: 1
             pointer-events: auto
+            &:hover
+              background-color: $COLOR_KEY_DARK1
         &[data-command="copy"]
           #AdvancedSearchBuilderView[data-can-copy="true"] &
             opacity: 1
             pointer-events: auto
+            &:hover
+              background-color: $COLOR_KEY_DARK1
         &[data-command="delete"]
           #AdvancedSearchBuilderView[data-can-delete="true"] &
             opacity: 1
             pointer-events: auto
+            &:hover
+              background-color: $COLOR_KEY_DARK1
       &.buttoncontainer
         flex-grow: 1
         text-align: right

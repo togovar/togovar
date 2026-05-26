@@ -53,6 +53,7 @@ export class AdvancedSearchBuilderView {
       this._rootGroup.makeToolbar()
     );
     this._selection = new AdvancedSearchSelection(this);
+    this.onSelectionChange([]);
   }
 
   // ─────────────────────────────────────────────────────────
@@ -130,6 +131,11 @@ export class AdvancedSearchBuilderView {
     this._setFlag('canGroup', caps.canGroup);
     this._setFlag('canUngroup', caps.canUngroup);
     this._setFlag('canCopy', caps.canCopy);
+    this._toolbar.setCommandStates({
+      delete: caps.canDelete,
+      group: caps.canGroup,
+      ungroup: caps.canUngroup,
+    });
   }
 
   // ─────────────────────────────────────────────────────────
