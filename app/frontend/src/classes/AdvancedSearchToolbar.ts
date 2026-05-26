@@ -13,6 +13,8 @@ const COMMANDS: ReadonlyArray<CommandDef> = [
   // { command: 'edit', label: 'Edit', shortcut: [69] },
 ];
 
+type ToolbarCommand = Exclude<Command, 'add-condition'>;
+
 /** Formats a shortcut label from key codes. */
 function formatShortcut(codes: number[]): string {
   // Minimal mapping; extend as needed.
@@ -31,6 +33,11 @@ export class AdvancedSearchToolbar {
   private _toolbar: HTMLElement;
   private _usesSignal = false; // set true only if addEventListener with {signal} succeeded
   private _disposed = false; // guard against multiple destroy() calls
+  private readonly _commandEnabled: Record<ToolbarCommand, boolean> = {
+    group: false,
+    ungroup: false,
+    delete: false,
+  };
 
   /** One controller to remove all listeners on destroy. */
   private readonly _events = new AbortController();
@@ -101,7 +108,11 @@ export class AdvancedSearchToolbar {
         children: [
           createEl('button', {
             class: 'command',
-            attrs: { type: 'button' },
+            attrs: {
+              type: 'button',
+              disabled: '',
+              'aria-disabled': 'true',
+            },
             dataset: { command: cmd.command },
             children: [
               createEl('span', { text: cmd.label }),
@@ -125,6 +136,21 @@ export class AdvancedSearchToolbar {
     root.replaceChildren(ul);
   }
 
+  setCommandStates(states: Partial<Record<ToolbarCommand, boolean>>): void {
+    for (const command of Object.keys(states) as ToolbarCommand[]) {
+      const enabled = states[command] === true;
+      this._commandEnabled[command] = enabled;
+
+      const button = this._toolbar.querySelector<HTMLButtonElement>(
+        `button.command[data-command="${command}"]`
+      );
+      if (!button) continue;
+
+      button.disabled = !enabled;
+      button.setAttribute('aria-disabled', String(!enabled));
+    }
+  }
+
   // =========================================================
   // Event Handling
   // =========================================================
@@ -142,8 +168,7 @@ export class AdvancedSearchToolbar {
     // Stop bubbling beyond the toolbar (but keep other toolbar listeners alive).
     e.stopPropagation();
 
-    // Optional: ignore disabled items.
-    if (cmdEl.getAttribute('aria-disabled') === 'true') return;
+    if (cmdEl instanceof HTMLButtonElement && cmdEl.disabled) return;
 
     const command = cmdEl.dataset.command as Command | undefined;
     const condition = cmdEl.dataset.condition as ConditionTypeValue | undefined;
@@ -217,18 +242,25 @@ export class AdvancedSearchToolbar {
         break;
       }
       case 'group':
+        if (!this._isCommandEnabled(command)) return;
         this._builder.group();
         break;
       case 'ungroup':
+        if (!this._isCommandEnabled(command)) return;
         this._builder.ungroup();
         break;
       case 'delete':
+        if (!this._isCommandEnabled(command)) return;
         this._builder.deleteCondition(
           this._builder.selection.getSelectedConditionViews()
         );
         break;
       // TODO: Future commands (copy/edit) may be added here.
     }
+  }
+
+  private _isCommandEnabled(command: Command): boolean {
+    return command === 'add-condition' || this._commandEnabled[command] === true;
   }
 
   // =========================================================
