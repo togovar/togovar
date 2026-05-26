@@ -104,6 +104,9 @@
       #GlobalHeader .logotype{width:101px;height:31px;display:block;position:relative;left:-5px;margin-right:.3rem}
       #GlobalHeader span.summary{padding-top:8px;font-size:12px;font-weight:400}
       #GlobalHeader nav.dropdown-view{padding-top:6px;padding-left:8px;font-size:14px}
+      #GlobalHeader nav.dropdown-view>.selectshow{position:relative;top:-20px;height:20px}
+      #GlobalHeader nav.dropdown-view>.selectshow>.list{pointer-events:none;margin:0;padding:3px 0;border-radius:5px;list-style:none;background-color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.22);font-weight:400;white-space:nowrap;position:relative;top:20px;opacity:0;transform:translateY(-6px)}
+      #GlobalHeader nav.dropdown-view>.selectshow:hover>.list{pointer-events:auto;opacity:1;transform:translateY(0);z-index:1}
       #GlobalHeader>.right{position:relative;font-size:14px;align-self:center}
       .button-view{box-sizing:border-box;border:0;position:relative;font-weight:700}
       .button-view.-dropdown{line-height:20px;padding:0 1.4em 0 .8em;border-radius:.8em;color:#fff;background:#125263}
@@ -152,7 +155,7 @@
       .drawer-view>.content{position:relative;overflow:hidden}
       .drawer-view>.content>.chromosomes{box-sizing:content-box;padding:10px 18px 16px;height:344px;text-align:center;white-space:nowrap;overflow-x:auto}
       body:not(.-layout-ready) #SearchResultsView .tablecontainer tbody,body:not(.-layout-ready) #SearchResultsView #Messages,body:not(.-layout-ready) #SearchResultsView #RowIndicator,body:not(.-layout-ready) #SearchResultsView .LayoutAside,body:not(.-layout-ready) #Karyotype{opacity:0;pointer-events:none}
-      body.-layout-ready #SearchResultsView .tablecontainer tbody,body.-layout-ready #SearchResultsView #Messages,body.-layout-ready #SearchResultsView #RowIndicator,body.-layout-ready #SearchResultsView .LayoutAside,body.-layout-ready #Karyotype{opacity:1;pointer-events:auto}</style><link rel="preload" href="/css/main-c55028523c951f329699.css" as="style" data-activate-stylesheet><noscript><link href="/css/main-c55028523c951f329699.css" rel="stylesheet"></noscript><script src="/js/main-b1dd6a96bc1ac090de2a.js" defer="defer"></script><script nonce="__CSP_NONCE__">document.querySelectorAll('link[data-activate-stylesheet]').forEach(function(link) {
+      body.-layout-ready #SearchResultsView .tablecontainer tbody,body.-layout-ready #SearchResultsView #Messages,body.-layout-ready #SearchResultsView #RowIndicator,body.-layout-ready #SearchResultsView .LayoutAside,body.-layout-ready #Karyotype{opacity:1;pointer-events:auto}</style><link rel="preload" href="/css/main-65fb077a411f6a6b9a04.css" as="style" data-activate-stylesheet><noscript><link href="/css/main-65fb077a411f6a6b9a04.css" rel="stylesheet"></noscript><script src="/js/main-f71cad9dfdc0f88247cd.js" defer="defer" nonce="__CSP_NONCE__"></script><script nonce="__CSP_NONCE__">document.querySelectorAll('link[data-activate-stylesheet]').forEach(function(link) {
         function isPreloadComplete() {
           if (!window.performance || !window.performance.getEntriesByName) {
             return false;
