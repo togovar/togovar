@@ -18,7 +18,7 @@ function buildCspDirectives(nonce) {
     "object-src 'none'",
     "frame-ancestors 'none'",
     "form-action 'self'",
-    `script-src 'self' 'nonce-${nonce}' https://togovar.github.io`,
+    `script-src 'unsafe-inline' 'nonce-${nonce}' 'strict-dynamic' 'self'`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://togostanza.github.io",
     "font-src 'self' https://fonts.gstatic.com https://togostanza.github.io data:",
     "img-src 'self' data: https:",
@@ -26,24 +26,15 @@ function buildCspDirectives(nonce) {
   ].join('; ');
 }
 
-function isHttpsRequest(req) {
-  const forwardedProto = req.get('x-forwarded-proto');
-  const firstForwardedProto = forwardedProto
-    ? forwardedProto.split(',')[0].trim()
-    : '';
-
-  return req.secure || firstForwardedProto === 'https';
-}
-
 function setSecurityHeaders(req, res, next) {
   const nonce = createCspNonce();
   res.locals.cspNonce = nonce;
 
   res.setHeader('Content-Security-Policy', buildCspDirectives(nonce));
-  if (process.env.NODE_ENV === 'production' && isHttpsRequest(req)) {
+  if (process.env.NODE_ENV === 'production') {
     res.setHeader(
       'Strict-Transport-Security',
-      `max-age=${ONE_YEAR_SECONDS}; includeSubDomains`
+      `max-age=${ONE_YEAR_SECONDS}; includeSubDomains; preload`
     );
   }
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');

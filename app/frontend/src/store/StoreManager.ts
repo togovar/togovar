@@ -323,14 +323,13 @@ class StoreManager {
       clearTimeout(timeoutId);
 
       if (response instanceof Response) {
-        if (response.status === 200) {
+        if (response.status === 200 || response.status === 403) {
           this.setData('isLogin', true);
         } else {
-          console.warn(`Not logged in: status=${response.status}`);
+          this.setData('isLogin', false);
         }
       }
-    } catch (error) {
-      console.error('Failed to fetch auth status:', error);
+    } catch {
       this.setData('isLogin', false);
     }
   }

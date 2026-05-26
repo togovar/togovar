@@ -33,6 +33,7 @@ html(data-page=locals.currentPage, lang=lang)
       (async function() {
         try {
           if (window.location.origin === 'http://localhost:8000') return
+          if (!document.cookie) return
           const response = await fetch(`${window.location.origin}/auth/status`);
 
           let isLogin = false;

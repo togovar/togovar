@@ -89,7 +89,7 @@ block head
     each css in mainCssFiles
       link(href=css, rel="stylesheet")
   each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/main-/))
-    script(type="text/javascript", src=js, defer)
+    script(type="text/javascript", src=js, defer, nonce="__CSP_NONCE__")
   script(nonce="__CSP_NONCE__").
     document.querySelectorAll('link[data-activate-stylesheet]').forEach(function(link) {
       function isPreloadComplete() {
