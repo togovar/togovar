@@ -1,6 +1,8 @@
 import PanelView from './PanelView.ts';
 import { storeManager } from '../store/StoreManager';
 
+const REPORT_LABEL = 'Detailed variant report page';
+
 export default class PreviewToVariantReport extends PanelView {
   constructor(elm) {
     super(elm, 'dataset');
@@ -18,22 +20,26 @@ export default class PreviewToVariantReport extends PanelView {
   }
 
   update() {
-    let html =
-      '<a class="hyper-text -internal">Detailed variant report page</a>';
+    const selectedRow = storeManager.getData('selectedRow');
+    const record =
+      selectedRow !== undefined ? storeManager.getSelectedRecord() : null;
 
-    if (storeManager.getData('selectedRow') !== undefined) {
-      const record = storeManager.getSelectedRecord();
-      if (record && record.id) {
-        html = `<a class="hyper-text -internal" href="/variant/${record.id}">Detailed variant report page</a>`;
+    if (record && record.id) {
+      const link = document.createElement('a');
+      link.classList.add('hyper-text', '-internal');
+      link.href = `/variant/${encodeURIComponent(String(record.id))}`;
+      link.textContent = REPORT_LABEL;
 
-        this.elm.classList.remove('-disable');
-      } else {
-        this.elm.classList.add('-disable');
-      }
-    } else {
-      this.elm.classList.add('-disable');
+      this.elm.classList.remove('-disable');
+      this.title.replaceChildren(link);
+      return;
     }
 
-    this.title.innerHTML = html;
+    const label = document.createElement('span');
+    label.classList.add('hyper-text', '-internal');
+    label.textContent = REPORT_LABEL;
+
+    this.elm.classList.add('-disable');
+    this.title.replaceChildren(label);
   }
 }
