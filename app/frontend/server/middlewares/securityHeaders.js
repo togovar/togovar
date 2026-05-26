@@ -18,7 +18,7 @@ function buildCspDirectives(nonce) {
     "object-src 'none'",
     "frame-ancestors 'none'",
     "form-action 'self'",
-    `script-src 'unsafe-inline' 'nonce-${nonce}' 'strict-dynamic' 'self'`,
+    `script-src 'nonce-${nonce}' 'strict-dynamic' 'self'`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://togostanza.github.io",
     "font-src 'self' https://fonts.gstatic.com https://togostanza.github.io data:",
     "img-src 'self' data: https:",
