@@ -34,7 +34,7 @@ function setSecurityHeaders(req, res, next) {
   if (process.env.NODE_ENV === 'production') {
     res.setHeader(
       'Strict-Transport-Security',
-      `max-age=${ONE_YEAR_SECONDS}; includeSubDomains; preload`
+      `max-age=${ONE_YEAR_SECONDS}; includeSubDomains`
     );
   }
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
