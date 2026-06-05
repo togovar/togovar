@@ -11,17 +11,17 @@ import DownloadButton from './classes/DownloadButton.ts';
 import SimpleSearchView from './components/SearchField/SimpleSearch/SimpleSearchView';
 // PanelViews
 // PanelViews: Filters
-import PanelViewCheckList from '../src/classes/PanelViewCheckList.ts';
-import PanelViewFilterAlternateAlleleFrequency from '../src/classes/PanelViewFilterAlternateAlleleFrequency.js';
-import PanelViewFilterVariantCallingQuality from '../src/classes/PanelViewFilterVariantCallingQuality.js';
-import PanelViewFilterConsequence from '../src/classes/PanelViewFilterConsequence.ts';
+import PanelViewCheckList from '../src/classes/PanelView/PanelViewCheckList.ts';
+import PanelViewFilterAlternateAlleleFrequency from '../src/classes/PanelView/PanelViewFilterAlternateAlleleFrequency.js';
+import PanelViewFilterVariantCallingQuality from '../src/classes/PanelView/PanelViewFilterVariantCallingQuality.js';
+import PanelViewFilterConsequence from '../src/classes/PanelView/PanelViewFilterConsequence.ts';
 // PanelViews: Variant preview
-import PanelViewPreviewGene from '../src/classes/PanelViewPreviewGene.js';
-import PreviewToVariantReport from '../src/classes/PreviewToVariantReport.js';
-import PanelViewPreviewExternalLinks from '../src/classes/PanelViewPreviewExternalLinks.js';
-import PanelViewPreviewAlternateAlleleFrequencies from '../src/classes/PanelViewPreviewAlternateAlleleFrequencies.js';
-import PanelViewPreviewConsequence from '../src/classes/PanelViewPreviewConsequence.js';
-import PanelViewPreviewClinicalSignificance from '../src/classes/PanelViewPreviewClinicalSignificance.js';
+import PanelViewPreviewGene from '../src/classes/PanelView/PanelViewPreviewGene.js';
+import PreviewToVariantReport from '../src/classes/PanelView/PreviewToVariantReport.js';
+import PanelViewPreviewExternalLinks from '../src/classes/PanelView/PanelViewPreviewExternalLinks.js';
+import PanelViewPreviewAlternateAlleleFrequencies from '../src/classes/PanelView/PanelViewPreviewAlternateAlleleFrequencies.js';
+import PanelViewPreviewConsequence from '../src/classes/PanelView/PanelViewPreviewConsequence.js';
+import PanelViewPreviewClinicalSignificance from '../src/classes/PanelView/PanelViewPreviewClinicalSignificance.js';
 import FloatingInfo from '../src/classes/FloatingInfo.ts';
 
 import qs from 'qs';

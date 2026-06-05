@@ -1,11 +1,11 @@
 import PanelView from './PanelView.ts';
-import { storeManager } from '../store/StoreManager';
+import { storeManager } from '../../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
   getSimpleSearchConditionMaster,
-} from '../store/searchManager';
-import '../components/RangeSliderView.js';
+} from '../../store/searchManager';
+import '../../components/RangeSliderView.js';
 
 export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
   constructor(elm) {
