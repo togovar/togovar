@@ -6,7 +6,10 @@ import type {
   MasterConditionId,
   SimpleSearchCurrentConditions,
 } from '../types';
-import { encodeConditionForURL, decodeConditionFromURL } from './advancedSearchURL';
+import {
+  encodeConditionForURL,
+  decodeConditionFromURL,
+} from './advancedSearchURL';
 
 let _currentUrlParams = qs.parse(window.location.search.substring(1));
 
@@ -65,7 +68,7 @@ export function extractSearchCondition(
 // Simple Search ----------------------------------------
 /** SimpleSearchの検索条件を設定 */
 export function setSimpleSearchCondition<
-  K extends keyof SimpleSearchCurrentConditions
+  K extends keyof SimpleSearchCurrentConditions,
 >(conditionKey: K, conditionValue: SimpleSearchCurrentConditions[K]) {
   _setSimpleSearchConditions({ [conditionKey]: conditionValue });
 }
@@ -189,8 +192,8 @@ export function handleHistoryChange(_e: PopStateEvent) {
       storeManager.setData('appStatus', 'searching');
       executeSearch(0, true);
     } else {
-      // モード切替: searchModeサブスクライバがexecuteSearchを実行するためここでは呼ばない。
-      storeManager.setData('searchMode', 'advanced');
+      // モード切替: setSearchModeFromHistoryでreflect*ToURIをスキップしながらモードを切替える。
+      storeManager.setSearchModeFromHistory('advanced');
     }
   } else {
     // URLを正本としてSimple Search条件を丸ごと構築し直す。
@@ -204,8 +207,8 @@ export function handleHistoryChange(_e: PopStateEvent) {
       storeManager.setData('appStatus', 'searching');
       executeSearch(0, true);
     } else {
-      // モード切替: searchModeサブスクライバがexecuteSearchを実行するためここでは呼ばない。
-      storeManager.setData('searchMode', 'simple');
+      // モード切替: setSearchModeFromHistoryでreflect*ToURIをスキップしながらモードを切替える。
+      storeManager.setSearchModeFromHistory('simple');
     }
   }
 }
@@ -218,7 +221,8 @@ export function handleHistoryChange(_e: PopStateEvent) {
 function _buildSimpleConditionsFromURL(
   urlParams: ReturnType<typeof qs.parse>
 ): SimpleSearchCurrentConditions {
-  const master: MasterConditions[] = storeManager.getData('simpleSearchConditionsMaster') ?? [];
+  const master: MasterConditions[] =
+    storeManager.getData('simpleSearchConditionsMaster') ?? [];
   const conditionIds = new Set(master.map((c) => c.id));
 
   const conditions: Record<string, unknown> = {};
@@ -314,7 +318,10 @@ export function reflectAdvancedSearchConditionToURI() {
 
   // 条件が2000文字以内に収まるようになった場合にフラグを戻す。
   // hasConditions があるのにencodedがnullの場合のみ超過扱い。
-  storeManager.setData('advancedSearchURLTooLong', hasConditions && encoded === null);
+  storeManager.setData(
+    'advancedSearchURLTooLong',
+    hasConditions && encoded === null
+  );
 
   window.history.pushState(_currentUrlParams, '', url);
 }

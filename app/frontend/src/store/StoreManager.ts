@@ -21,6 +21,8 @@ type StoreListener = (value: unknown) => void;
 class StoreManager {
   #bindings: Record<string, unknown[]> = {}; // TODO: いずれ削除
   #listeners = new Map<string, Set<StoreListener>>();
+  // popstate経由のモード切替時にreflect*ToURIをスキップするためのフラグ。
+  #fromHistory = false;
   #state: StoreState = {
     karyotype: '',
     searchMode: '',
@@ -363,13 +365,17 @@ class StoreManager {
 
       switch (mode) {
         case 'simple':
-          reflectSimpleSearchConditionToURI();
+          // #fromHistoryのときはpopstateで既にURLが確定済みのためpushStateしない。
+          if (!this.#fromHistory) reflectSimpleSearchConditionToURI();
           this.publish('simpleSearchConditions');
           break;
         case 'advanced': {
-          const condition = this.getData('advancedSearchConditions');
-          setAdvancedSearchCondition(condition);
-          reflectAdvancedSearchConditionToURI();
+          // #fromHistoryのときは条件はストア設定済み・URLも変更不要のためreflect系をスキップ。
+          if (!this.#fromHistory) {
+            const condition = this.getData('advancedSearchConditions');
+            setAdvancedSearchCondition(condition);
+            reflectAdvancedSearchConditionToURI();
+          }
           break;
         }
       }
@@ -379,6 +385,20 @@ class StoreManager {
       executeSearch(0, true);
     } finally {
       this.setData('isStoreUpdating', false);
+    }
+  }
+
+  /**
+   * popstateなど履歴移動によるモード切替。
+   * setData('searchMode', mode)と同じ副作用を持つが、reflect*ToURIを呼ばないため
+   * history.pushStateが発生せず、「戻る」ボタンの履歴が壊れない。
+   */
+  setSearchModeFromHistory(mode: SearchMode) {
+    this.#fromHistory = true;
+    try {
+      this.setData('searchMode', mode);
+    } finally {
+      this.#fromHistory = false;
     }
   }
 }
