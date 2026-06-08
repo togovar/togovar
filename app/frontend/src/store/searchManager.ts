@@ -171,6 +171,7 @@ export function resetSimpleSearchConditions() {
 export function handleHistoryChange(_e: PopStateEvent) {
   const urlParams = qs.parse(window.location.search.substring(1));
   const mode = urlParams.mode as string | undefined;
+  const currentMode = storeManager.getData('searchMode');
 
   if (mode === 'advanced') {
     // Advanced Searchの戻る/進むでURLのqパラメータを再デコードしてストアへ反映する。
@@ -178,19 +179,68 @@ export function handleHistoryChange(_e: PopStateEvent) {
     const encoded = urlParams.q as string | undefined;
     const condition = encoded ? decodeConditionFromURL(encoded) : null;
     storeManager.setData('advancedSearchConditions', condition ?? {});
-    storeManager.setData('searchMode', 'advanced');
     // false→trueのトグルでBuilderのsubscribeを確実に発火させる。
+    // モード切替でBuilderがすでにロード済みの場合も再構築が必要なため常に実行する。
     storeManager.setData('advancedSearchRestoredFromURL', false);
     storeManager.setData('advancedSearchRestoredFromURL', true);
-    storeManager.setData('appStatus', 'searching');
-    executeSearch(0, true);
+
+    if (currentMode === 'advanced') {
+      // 同一モード内の移動: searchModeサブスクライバは発火しないため直接検索を実行する。
+      storeManager.setData('appStatus', 'searching');
+      executeSearch(0, true);
+    } else {
+      // モード切替: searchModeサブスクライバがexecuteSearchを実行するためここでは呼ばない。
+      storeManager.setData('searchMode', 'advanced');
+    }
   } else {
-    storeManager.setData('searchMode', 'simple');
-    _setSimpleSearchConditions(
-      urlParams as Partial<SimpleSearchCurrentConditions>,
-      true
-    );
+    // URLを正本としてSimple Search条件を丸ごと構築し直す。
+    // urlParamsにはmode等の非条件キーが含まれるため、マスターに存在するキーのみを適用する。
+    // URLにない条件はマスターのデフォルト値に戻すことで、履歴移動後に古い条件が残るのを防ぐ。
+    const fullConditions = _buildSimpleConditionsFromURL(urlParams);
+    storeManager.setData('simpleSearchConditions', fullConditions);
+
+    if (currentMode === 'simple') {
+      // 同一モード内の移動: searchModeサブスクライバは発火しないため直接検索を実行する。
+      storeManager.setData('appStatus', 'searching');
+      executeSearch(0, true);
+    } else {
+      // モード切替: searchModeサブスクライバがexecuteSearchを実行するためここでは呼ばない。
+      storeManager.setData('searchMode', 'simple');
+    }
   }
+}
+
+/**
+ * URLパラメータからSimpleSearch条件を構築する。
+ * マスターのデフォルト値をベースに、URLに含まれるマスター条件キーのみを上書きする。
+ * mode・qなど非条件キーは除外する。
+ */
+function _buildSimpleConditionsFromURL(
+  urlParams: ReturnType<typeof qs.parse>
+): SimpleSearchCurrentConditions {
+  const master: MasterConditions[] = storeManager.getData('simpleSearchConditionsMaster') ?? [];
+  const conditionIds = new Set(master.map((c) => c.id));
+
+  const conditions: Record<string, unknown> = {};
+  for (const cond of master) {
+    switch (cond.type) {
+      case 'string':
+      case 'boolean':
+        conditions[cond.id] = cond.default;
+        break;
+      case 'array':
+        conditions[cond.id] = {};
+        break;
+    }
+  }
+
+  for (const [key, value] of Object.entries(urlParams)) {
+    if (conditionIds.has(key as MasterConditionId)) {
+      conditions[key] = value;
+    }
+  }
+
+  return conditions as SimpleSearchCurrentConditions;
 }
 
 // Advanced Search ----------------------------------------
