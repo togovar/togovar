@@ -17,7 +17,11 @@ export class DatasetColumnRenderer {
    * 同一ページに複数インスタンスが存在する場合でもcheckboxのidが重複しないよう、
    * インスタンスごとにプレフィックスを付ける。
    */
-  constructor(instancePrefix: string = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`) {
+  constructor(
+    instancePrefix: string = `${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2, 9)}`
+  ) {
     this._instancePrefix = instancePrefix;
   }
 
@@ -62,7 +66,10 @@ export class DatasetColumnRenderer {
     const labelText = createEl('span', { text: datasetNode.data.label });
 
     const labelElement = createEl('label', {
-      attrs: { for: uniqueCheckboxId },
+      attrs:
+        selectionElement instanceof HTMLInputElement
+          ? { for: uniqueCheckboxId }
+          : {},
       children: [
         selectionElement,
         ...(categoryIcon ? [categoryIcon] : []),

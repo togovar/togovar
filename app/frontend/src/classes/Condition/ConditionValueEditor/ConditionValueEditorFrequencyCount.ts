@@ -528,7 +528,9 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
    * @param e - Change event from count input
    */
   private _handleCountInputChange(e: Event): void {
-    this._hasUserChangedCondition = true;
+    if (e.isTrusted) {
+      this._hasUserChangedCondition = true;
+    }
     const target = e.target as HTMLInputElement;
     const key = target.className as keyof CountCondition;
     const currentCondition = this._condition[this._mode] as CountCondition;
