@@ -24,6 +24,9 @@ export function toMergedFrequencyItem(logical: {
 }): RestoredItem | null {
   if (logical.operator !== 'or') return null;
 
+  const invertedItem = _restoreInvertedDatasetFrequencyItem(logical.children);
+  if (invertedItem) return invertedItem;
+
   const items = logical.children
     .map((child) =>
       isQueryObject(child) && isQueryObject(child.frequency)
@@ -51,8 +54,93 @@ export function toMergedFrequencyItem(logical: {
   };
 }
 
+/**
+ * dataset frequencyのinvertはquery上で [0..from] OR [to..1] になる。
+ * 複数dataset選択と同じOR形なので、先に単一のinvert条件へ戻す。
+ */
+function _restoreInvertedDatasetFrequencyItem(
+  children: unknown[]
+): RestoredItem | null {
+  if (children.length !== 2) return null;
+
+  const first = _toDatasetFrequencyLeaf(children[0]);
+  const second = _toDatasetFrequencyLeaf(children[1]);
+  if (!first || !second) return null;
+  if (first.name !== second.name || first.filtered !== second.filtered) {
+    return null;
+  }
+
+  const left = _getInvertedLeftRange(first, second);
+  if (!left) return null;
+
+  const right = left === first ? second : first;
+  if (getRangeEnd(right.range) !== 1) return null;
+
+  const from = getRangeEnd(left.range);
+  const to = getRangeStart(right.range);
+  if (from === null || to === null) return null;
+
+  return {
+    conditionType: CONDITION_TYPE.dataset,
+    values: [
+      {
+        value: left.name,
+        label: findConditionLabel(CONDITION_TYPE.dataset, left.name),
+        frequency: {
+          conditionType: CONDITION_TYPE.dataset,
+          mode: 'frequency',
+          from,
+          to,
+          invert: true,
+          filtered: left.filtered,
+        },
+      },
+    ],
+  };
+}
+
+function _getInvertedLeftRange(
+  first: DatasetFrequencyLeaf,
+  second: DatasetFrequencyLeaf
+): DatasetFrequencyLeaf | null {
+  if (getRangeStart(first.range) === 0) return first;
+  if (getRangeStart(second.range) === 0) return second;
+  return null;
+}
+
+type DatasetFrequencyLeaf = {
+  name: FrequencyDataset;
+  range: QueryObject;
+  filtered: boolean;
+};
+
+function _toDatasetFrequencyLeaf(
+  child: unknown
+): DatasetFrequencyLeaf | null {
+  if (!isQueryObject(child) || !isQueryObject(child.frequency)) return null;
+
+  const frequency = child.frequency;
+  const dataset = frequency.dataset;
+  const range = frequency.frequency;
+  if (
+    !isQueryObject(dataset) ||
+    typeof dataset.name !== 'string' ||
+    !isQueryObject(range)
+  ) {
+    return null;
+  }
+
+  return {
+    name: dataset.name as FrequencyDataset,
+    range,
+    filtered: frequency.filtered === true,
+  };
+}
+
 /** dataset/genotype条件を、外側の値表示と内側のfrequency-count-value-viewの状態として復元する。 */
-export function restoreFrequencyItem(frequency: QueryObject): RestoredItem | null {
+export function restoreFrequencyItem(
+  frequency: QueryObject
+): RestoredItem | null {
   const dataset = frequency.dataset;
   if (!isQueryObject(dataset) || typeof dataset.name !== 'string') return null;
 
