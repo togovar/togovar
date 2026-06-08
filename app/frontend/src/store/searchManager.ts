@@ -171,7 +171,7 @@ export function resetSimpleSearchConditions() {
 }
 
 /** ブラウザの「戻る」「進む」ボタンが押されたときに検索条件を更新 */
-export function handleHistoryChange(_e: PopStateEvent) {
+export function handleHistoryChange(e: PopStateEvent) {
   const urlParams = qs.parse(window.location.search.substring(1));
   const mode = urlParams.mode as string | undefined;
   const currentMode = storeManager.getData('searchMode');
@@ -180,7 +180,10 @@ export function handleHistoryChange(_e: PopStateEvent) {
     // Advanced Searchの戻る/進むでURLのqパラメータを再デコードしてストアへ反映する。
     // initializeApp()は初回ロード時にしか呼ばれないため、popstate時にこちらで再デコードする。
     const encoded = urlParams.q as string | undefined;
-    const condition = encoded ? decodeConditionFromURL(encoded) : null;
+    // URL長制限超過で q が省略された履歴エントリに戻った場合は event.state から復元する。
+    const condition = encoded
+      ? decodeConditionFromURL(encoded)
+      : _getConditionFromState(e.state);
     storeManager.setData('advancedSearchConditions', condition ?? {});
     // false→trueのトグルでBuilderのsubscribeを確実に発火させる。
     // モード切替でBuilderがすでにロード済みの場合も再構築が必要なため常に実行する。
@@ -211,6 +214,17 @@ export function handleHistoryChange(_e: PopStateEvent) {
       storeManager.setSearchModeFromHistory('simple');
     }
   }
+}
+
+/**
+ * popstateのevent.stateからAdvanced Search条件を安全に取り出す。
+ * URL長制限超過時にstateへ退避した advancedSearchConditions のみを返す。
+ */
+function _getConditionFromState(state: unknown): Record<string, unknown> | null {
+  if (state === null || typeof state !== 'object' || Array.isArray(state)) return null;
+  const val = (state as Record<string, unknown>).advancedSearchConditions;
+  if (val === null || typeof val !== 'object' || Array.isArray(val)) return null;
+  return val as Record<string, unknown>;
 }
 
 /**
@@ -323,5 +337,11 @@ export function reflectAdvancedSearchConditionToURI() {
     hasConditions && encoded === null
   );
 
-  window.history.pushState(_currentUrlParams, '', url);
+  // URL長制限超過時はqパラメータに条件を乗せられないため、popstate時に復元できるよう
+  // historyのstateに条件を退避する。
+  const state =
+    hasConditions && encoded === null
+      ? { ..._currentUrlParams, advancedSearchConditions: conditions }
+      : _currentUrlParams;
+  window.history.pushState(state, '', url);
 }
