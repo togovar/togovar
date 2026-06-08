@@ -23,3 +23,26 @@ export function decodeConditionFromURL(encoded: string): unknown | null {
     return null;
   }
 }
+
+/**
+ * URL/画面復元用のメタ情報を取り除き、検索APIへ送れるqueryだけにする。
+ * 現在はGene symbolの表示名(labels)だけが対象。
+ */
+export function stripAdvancedSearchMetadata(query: unknown): unknown {
+  if (Array.isArray(query)) {
+    return query.map((item) => stripAdvancedSearchMetadata(item));
+  }
+
+  if (!isPlainObject(query)) return query;
+
+  const next: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(query)) {
+    if (key === 'labels') continue;
+    next[key] = stripAdvancedSearchMetadata(value);
+  }
+  return next;
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}

@@ -1,9 +1,10 @@
-import { ADVANCED_CONDITIONS } from '../../global';
+import { ADVANCED_CONDITIONS, API_URL } from '../../global';
 import {
   CONDITION_TYPE,
   type ConditionTypeValue,
   type FrequencyDataset,
 } from '../../definition';
+import { axios } from '../../utils/cachedAxios';
 import type { ConditionGroupView } from '../Condition/ConditionGroupView';
 import type {
   RestoredFrequencyMode,
@@ -75,7 +76,7 @@ async function appendQueryToGroup(
     return;
   }
 
-  const item = toRestoredItem(query);
+  const item = await toRestoredItem(query);
   if (!item) return;
 
   await appendRestoredItem(parentGroup, item);
@@ -107,7 +108,9 @@ function getLogicalQuery(
 }
 
 // query leafのキーから、復元すべき条件種別と表示値へ変換する。
-function toRestoredItem(query: QueryObject): RestoredItem | null {
+async function toRestoredItem(
+  query: QueryObject
+): Promise<RestoredItem | null> {
   if (isQueryObject(query.frequency)) {
     return restoreFrequencyItem(query.frequency);
   }
@@ -117,7 +120,7 @@ function toRestoredItem(query: QueryObject): RestoredItem | null {
   }
 
   if (isQueryObject(query.gene)) {
-    return restoreTermItem(CONDITION_TYPE.gene_symbol, query.gene, true);
+    return restoreGeneItem(query.gene);
   }
 
   if (Array.isArray(query.id)) {
@@ -153,7 +156,11 @@ function toMergedFrequencyItem(logical: {
   if (logical.operator !== 'or') return null;
 
   const items = logical.children
-    .map((child) => (isQueryObject(child) ? toRestoredItem(child) : null))
+    .map((child) =>
+      isQueryObject(child) && isQueryObject(child.frequency)
+        ? restoreFrequencyItem(child.frequency)
+        : null
+    )
     .filter((item): item is RestoredItem => item !== null);
 
   if (items.length !== logical.children.length || items.length <= 1) {
@@ -173,6 +180,56 @@ function toMergedFrequencyItem(logical: {
     conditionType,
     values: items.flatMap((item) => item.values),
   };
+}
+
+// Gene symbolはURL上では数値IDだけを持つため、表示用symbolをAPIから引き直す。
+async function restoreGeneItem(
+  gene: QueryObject
+): Promise<RestoredItem | null> {
+  const terms = gene.terms;
+  if (!Array.isArray(terms)) return null;
+
+  const relation = gene.relation === 'ne' ? 'ne' : 'eq';
+  const values = await Promise.all(
+    terms.map(async (term) => {
+      const value = String(term);
+      const label =
+        getGeneLabelFromQuery(gene.labels, value) ??
+        (await findGeneSymbolLabel(value)) ??
+        value;
+      return makeValue(value, label);
+    })
+  );
+
+  return {
+    conditionType: CONDITION_TYPE.gene_symbol,
+    relation,
+    values,
+  };
+}
+
+function getGeneLabelFromQuery(labels: unknown, geneId: string): string | null {
+  if (!isQueryObject(labels)) return null;
+  return getString(labels[geneId]);
+}
+
+async function findGeneSymbolLabel(geneId: string): Promise<string | null> {
+  const url = new URL(`${API_URL}/api/search/${CONDITION_TYPE.gene_symbol}`);
+  url.searchParams.set('term', geneId);
+
+  try {
+    const { data } = await axios.get(url.toString());
+    const suggestions = Array.isArray(data) ? data : [];
+    const matched = suggestions.find(
+      (suggestion) =>
+        isQueryObject(suggestion) && String(suggestion.id) === geneId
+    );
+    if (!isQueryObject(matched)) return null;
+
+    return getString(matched.symbol ?? matched.label ?? matched.name);
+  } catch (_error) {
+    return null;
+  }
 }
 
 // dataset/genotype条件は、外側の値表示と内側のfrequency-count-value-viewの状態を両方復元する。
@@ -336,6 +393,10 @@ function getRangeEnd(range: QueryObject): number | null {
 // URL由来の値は信用せず、有限なnumberだけをrange値として採用する。
 function getNumber(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function getString(value: unknown): string | null {
+  return typeof value === 'string' && value.length > 0 ? value : null;
 }
 
 // 検索条件マスタから表示ラベルを探し、URL復元後も通常操作時に近い見た目へ戻す。
