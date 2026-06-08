@@ -62,8 +62,15 @@ async function appendQueryToGroup(
       : parentGroup.addEmptyConditionGroup(logical.operator);
     targetGroup.logicalOperator = logical.operator;
 
-    for (const child of logical.children) {
-      await appendQueryToGroup(targetGroup, child);
+    const resumeAutoUngroup = useCurrentGroup
+      ? null
+      : targetGroup.suspendAutoUngroup();
+    try {
+      for (const child of logical.children) {
+        await appendQueryToGroup(targetGroup, child);
+      }
+    } finally {
+      resumeAutoUngroup?.();
     }
     return;
   }

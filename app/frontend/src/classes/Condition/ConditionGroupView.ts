@@ -27,6 +27,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
   private _childContainerEl!: HTMLDivElement; // implements GroupView.container
 
   private _mutationObserver!: MutationObserver; // Observes direct child-list
+  private _isAutoUngroupSuspended = false;
 
   private readonly _events = new AbortController(); // For controller to clean up
 
@@ -134,6 +135,19 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
       view.remove();
     }
     this._syncNumberOfChildren();
+  }
+
+  /** URL復元など、子要素をまとめて追加している間だけ自動Ungroupを止める。 */
+  suspendAutoUngroup(): () => void {
+    this._isAutoUngroupSuspended = true;
+
+    return () => {
+      this._isAutoUngroupSuspended = false;
+      this._syncNumberOfChildren();
+      if (!this._isRoot && this._numberOfChildren <= 1) {
+        this.ungroup();
+      }
+    };
   }
 
   /**
@@ -324,7 +338,11 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
   private _createChildObserver(): MutationObserver {
     const observer = new MutationObserver(() => {
       this._syncNumberOfChildren();
-      if (!this._isRoot && this._numberOfChildren <= 1) {
+      if (
+        !this._isRoot &&
+        !this._isAutoUngroupSuspended &&
+        this._numberOfChildren <= 1
+      ) {
         observer.disconnect();
         this.ungroup();
         // If this group still exists (rare), resume observing:
