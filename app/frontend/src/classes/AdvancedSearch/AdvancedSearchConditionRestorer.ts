@@ -46,6 +46,12 @@ async function appendQueryToGroup(
 
   const logical = getLogicalQuery(query);
   if (logical) {
+    const mergedItem = toMergedFrequencyItem(logical);
+    if (mergedItem) {
+      await appendRestoredItem(parentGroup, mergedItem);
+      return;
+    }
+
     // ルートqueryが {and: [...]} / {or: [...]} の場合は、既存のroot groupをそのまま使う。
     const targetGroup = useCurrentGroup
       ? parentGroup
@@ -61,6 +67,13 @@ async function appendQueryToGroup(
   const item = toRestoredItem(query);
   if (!item) return;
 
+  await appendRestoredItem(parentGroup, item);
+}
+
+async function appendRestoredItem(
+  parentGroup: ConditionGroupView,
+  item: RestoredItem
+): Promise<void> {
   // ConditionItemViewの通常生成後に値だけを注入し、編集モードを閉じた状態に戻す。
   const itemView = parentGroup.addNewConditionItem(item.conditionType);
   await itemView.hydrateFromRestoredQuery({
@@ -123,6 +136,36 @@ function toRestoredItem(query: QueryObject): RestoredItem | null {
   }
 
   return null;
+}
+
+// dataset/genotypeの複数選択はquery上では { or: [frequency, ...] } になるため、UI復元時は1条件行に畳み戻す。
+function toMergedFrequencyItem(logical: {
+  operator: LogicalOperator;
+  children: unknown[];
+}): RestoredItem | null {
+  if (logical.operator !== 'or') return null;
+
+  const items = logical.children
+    .map((child) => (isQueryObject(child) ? toRestoredItem(child) : null))
+    .filter((item): item is RestoredItem => item !== null);
+
+  if (items.length !== logical.children.length || items.length <= 1) {
+    return null;
+  }
+
+  const conditionType = items[0].conditionType;
+  const canMerge = items.every(
+    (item) =>
+      item.conditionType === conditionType &&
+      item.values.length > 0 &&
+      item.values.every((value) => value.frequency)
+  );
+  if (!canMerge) return null;
+
+  return {
+    conditionType,
+    values: items.flatMap((item) => item.values),
+  };
 }
 
 // dataset/genotype条件は、外側の値表示と内側のfrequency-count-value-viewの状態を両方復元する。
