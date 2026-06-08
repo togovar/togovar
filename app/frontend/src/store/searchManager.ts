@@ -179,7 +179,10 @@ export function handleHistoryChange(e: PopStateEvent) {
   if (mode === 'advanced') {
     // Advanced Searchの戻る/進むでURLのqパラメータを再デコードしてストアへ反映する。
     // initializeApp()は初回ロード時にしか呼ばれないため、popstate時にこちらで再デコードする。
-    const encoded = urlParams.q as string | undefined;
+    // qs.parseは同名パラメータが複数あるとstring[]を返すため、先頭要素のみ使う。
+    const qParam = urlParams.q;
+    const first = Array.isArray(qParam) ? qParam[0] : qParam;
+    const encoded = typeof first === 'string' ? first : undefined;
     // URL長制限超過で q が省略された履歴エントリに戻った場合は event.state から復元する。
     const condition = encoded
       ? decodeConditionFromURL(encoded)
