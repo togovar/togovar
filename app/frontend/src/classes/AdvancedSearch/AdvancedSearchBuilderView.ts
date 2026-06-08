@@ -53,6 +53,15 @@ export class AdvancedSearchBuilderView {
     // void でラップしてPromiseを意図的に無視する。
     // 復元エラーはRestorer内部でハンドリングされ、UIは初期状態のまま表示される。
     void this._restoreConditionFromStore();
+
+    // popstate時にhandleHistoryChangeがストアを更新したことを検知してViewを再構築する。
+    // 初回ロード時はinitializeApp()で復元するため、ここではtrue時のみ処理する。
+    storeManager.subscribe('advancedSearchRestoredFromURL', (restored) => {
+      if (restored) {
+        this._rootGroup.clearConditionViews();
+        void this._restoreConditionFromStore();
+      }
+    });
   }
 
   /** 旧実装との互換用。既存の呼び出し元が残っている可能性がある。 */

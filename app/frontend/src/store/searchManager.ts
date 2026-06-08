@@ -6,7 +6,7 @@ import type {
   MasterConditionId,
   SimpleSearchCurrentConditions,
 } from '../types';
-import { encodeConditionForURL } from './advancedSearchURL';
+import { encodeConditionForURL, decodeConditionFromURL } from './advancedSearchURL';
 
 let _currentUrlParams = qs.parse(window.location.search.substring(1));
 
@@ -167,17 +167,30 @@ export function resetSimpleSearchConditions() {
   _setSimpleSearchConditions(resetConditions);
 }
 
-// 動かないからチェック
 /** ブラウザの「戻る」「進む」ボタンが押されたときに検索条件を更新 */
 export function handleHistoryChange(_e: PopStateEvent) {
-  // 現在のURLからクエリパラメータを取得
   const urlParams = qs.parse(window.location.search.substring(1));
+  const mode = urlParams.mode as string | undefined;
 
-  // 取得したクエリパラメータを検索条件として適用
-  _setSimpleSearchConditions(
-    urlParams as Partial<SimpleSearchCurrentConditions>,
-    true
-  );
+  if (mode === 'advanced') {
+    // Advanced Searchの戻る/進むでURLのqパラメータを再デコードしてストアへ反映する。
+    // initializeApp()は初回ロード時にしか呼ばれないため、popstate時にこちらで再デコードする。
+    const encoded = urlParams.q as string | undefined;
+    const condition = encoded ? decodeConditionFromURL(encoded) : null;
+    storeManager.setData('advancedSearchConditions', condition ?? {});
+    storeManager.setData('searchMode', 'advanced');
+    // false→trueのトグルでBuilderのsubscribeを確実に発火させる。
+    storeManager.setData('advancedSearchRestoredFromURL', false);
+    storeManager.setData('advancedSearchRestoredFromURL', true);
+    storeManager.setData('appStatus', 'searching');
+    executeSearch(0, true);
+  } else {
+    storeManager.setData('searchMode', 'simple');
+    _setSimpleSearchConditions(
+      urlParams as Partial<SimpleSearchCurrentConditions>,
+      true
+    );
+  }
 }
 
 // Advanced Search ----------------------------------------
