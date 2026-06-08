@@ -349,8 +349,12 @@ export function reflectAdvancedSearchConditionToURI() {
   try {
     window.history.pushState(state, '', url);
   } catch {
-    // stateが大きすぎる等でpushStateが失敗しても検索自体は継続する。
-    // 条件退避を諦めてURLのみ更新する。
-    window.history.pushState(_currentUrlParams, '', url);
+    // stateが大きすぎて失敗した場合は条件退避を諦めてURLのみ更新する。
+    // そのpushStateも失敗する環境ではURL更新自体を諦めて検索のみ継続する。
+    try {
+      window.history.pushState(_currentUrlParams, '', url);
+    } catch {
+      // do nothing
+    }
   }
 }

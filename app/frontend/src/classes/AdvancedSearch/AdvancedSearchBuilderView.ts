@@ -25,6 +25,7 @@ export class AdvancedSearchBuilderView {
   private _rootGroup: ConditionGroupView;
   private _toolbar: AdvancedSearchToolbar;
   private _selection: AdvancedSearchSelection;
+  private readonly _onRestoredFromURL: (restored: boolean | undefined) => void;
 
   constructor(advancedSearchBuilderEl: HTMLElement) {
     this._advancedSearchBuilderEl = advancedSearchBuilderEl;
@@ -56,12 +57,14 @@ export class AdvancedSearchBuilderView {
 
     // popstate時にhandleHistoryChangeがストアを更新したことを検知してViewを再構築する。
     // 初回ロード時はinitializeApp()で復元するため、ここではtrue時のみ処理する。
-    storeManager.subscribe('advancedSearchRestoredFromURL', (restored) => {
+    // コールバック参照をフィールドに保持し、destroy()でunsubscribeできるようにする。
+    this._onRestoredFromURL = (restored) => {
       if (restored) {
         this._rootGroup.clearConditionViews();
         void this._restoreConditionFromStore();
       }
-    });
+    };
+    storeManager.subscribe('advancedSearchRestoredFromURL', this._onRestoredFromURL);
   }
 
   /** 旧実装との互換用。既存の呼び出し元が残っている可能性がある。 */
@@ -208,6 +211,7 @@ export class AdvancedSearchBuilderView {
   }
 
   destroy(options?: { clearDom?: boolean }): void {
+    storeManager.unsubscribe('advancedSearchRestoredFromURL', this._onRestoredFromURL);
     this._toolbar?.destroy({ clearDom: options?.clearDom });
     this._rootGroup?.remove();
   }
