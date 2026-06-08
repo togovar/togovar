@@ -33,7 +33,6 @@
 
 - Node.js は `22.x` 前提。`.nvmrc` と `package.json` の `engines.node` を確認する。
 - `tsconfig.json` は `strict: true` だが `allowJs: true`。既存JSとTSが共存しているため、周辺ファイルの粒度に合わせて変更する。
-- Ruby/Rails系の起動手順は `README.md` を確認する。
 
 ## 重要なディレクトリ方針
 
