@@ -33,17 +33,12 @@ function formatShortcut(codes: number[]): string {
 export class AdvancedSearchToolbar {
   private _builder: AdvancedSearchBuilderView;
   private _toolbar: HTMLElement;
-  // AbortController の signal オプションが使えない環境への fallback 判定用。
-  private _usesSignal = false;
   private _disposed = false;
   private readonly _commandEnabled: Record<ToolbarCommand, boolean> = {
     group: false,
     ungroup: false,
     delete: false,
   };
-
-  /** destroy 時にイベントリスナーをまとめて解除するための Controller。 */
-  private readonly _events = new AbortController();
 
   constructor(builder: AdvancedSearchBuilderView, toolbar: HTMLElement) {
     this._builder = builder;
@@ -204,25 +199,10 @@ export class AdvancedSearchToolbar {
     }
   };
 
-  /**
-   * click と keydown をツールバーへ一度だけ委譲登録する。
-   * AbortController の signal が使える環境では signal でまとめて解除し、
-   * そうでない環境では destroy 時に個別に removeEventListener する。
-   */
+  /** click と keydown をツールバーへ委譲登録する。 */
   private _attachEventDelegation(): void {
-    try {
-      this._toolbar.addEventListener('click', this._onClick, {
-        signal: this._events.signal,
-      });
-      this._toolbar.addEventListener('keydown', this._onKeydown, {
-        signal: this._events.signal,
-      });
-      this._usesSignal = true;
-    } catch {
-      this._toolbar.addEventListener('click', this._onClick);
-      this._toolbar.addEventListener('keydown', this._onKeydown);
-      this._usesSignal = false;
-    }
+    this._toolbar.addEventListener('click', this._onClick);
+    this._toolbar.addEventListener('keydown', this._onKeydown);
   }
 
   /**
@@ -272,12 +252,8 @@ export class AdvancedSearchToolbar {
   destroy(options?: { clearDom?: boolean }): void {
     if (this._disposed) return;
 
-    if (this._usesSignal) {
-      this._events.abort();
-    } else {
-      this._toolbar.removeEventListener('click', this._onClick);
-      this._toolbar.removeEventListener('keydown', this._onKeydown);
-    }
+    this._toolbar.removeEventListener('click', this._onClick);
+    this._toolbar.removeEventListener('keydown', this._onKeydown);
 
     if (options?.clearDom) {
       this._toolbar.replaceChildren();
