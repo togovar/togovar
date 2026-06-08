@@ -28,37 +28,20 @@ import type { ConditionItemValueView } from '../../components/ConditionItemValue
 import type { FrequencyCountValueView } from '../../components/FrequencyCountValueView';
 import type { PredictionValueView } from '../../components/ConditionPathogenicityPredictionSearch/PredictionValueView';
 
-export type RestoredFrequencyMode =
-  Parameters<FrequencyCountValueView['setValues']>[1];
-
-export type RestoredFrequencyValue = Readonly<{
-  conditionType: 'dataset' | 'genotype';
-  mode: RestoredFrequencyMode;
-  from: number | null;
-  to: number | null;
-  invert: boolean;
-  filtered: boolean;
-}>;
-
-export type RestoredConditionValue = Readonly<{
-  value: string;
-  label: string;
-  source?: SignificanceSource;
-  frequency?: RestoredFrequencyValue;
-  prediction?: RestoredPredictionValue;
-}>;
-
-export type RestoredPredictionValue = Readonly<{
-  dataset: 'alphamissense' | 'sift' | 'polyphen';
-  values: [number, number];
-  inequalitySigns: ['gte' | 'gt', 'lte' | 'lt'];
-  includeUnassigned: boolean;
-  includeUnknown: boolean;
-}>;
+// Restored* 型は AdvancedSearch/Restorer との共有型として独立ファイルに定義している。
+export type {
+  RestoredFrequencyMode,
+  RestoredFrequencyValue,
+  RestoredConditionValue,
+  RestoredPredictionValue,
+} from './ConditionItemRestoreTypes';
+import type {
+  RestoredConditionValue,
+} from './ConditionItemRestoreTypes';
 
 /**
- * A single condition row with edit/delete behaviors.
- * Owns its editor(s), relation state, and all event wiring for the row.
+ * 1条件行の View。編集・削除・relation切り替えのイベントと、
+ * URLからの値復元（hydrate）を担う。
  */
 export class ConditionItemView extends BaseConditionView {
   readonly conditionNodeKind = CONDITION_NODE_KIND.condition;
@@ -67,9 +50,9 @@ export class ConditionItemView extends BaseConditionView {
   private readonly _relationSupported: boolean;
 
   private _isFirstTime = true;
-  private _keepLastRelation: Relation = 'eq'; // restored when user cancels with Esc.
+  // Escapeでキャンセルするときに戻すための直前のrelation値。
+  private _keepLastRelation: Relation = 'eq';
 
-  // DOM references
   private _summaryEl!: HTMLDivElement;
   private _relationEl!: HTMLDivElement;
   private _valuesContainerEl!: HTMLDivElement;
@@ -78,19 +61,11 @@ export class ConditionItemView extends BaseConditionView {
   private _editorEl!: HTMLDivElement;
   private _classificationEl!: HTMLDivElement;
 
-  /** Manages concrete editors (checkboxes, selects, etc.) inside this row. */
   private _conditionValues!: ConditionValues;
 
-  /** Single controller to clean up every listener added by this instance. */
+  /** このインスタンスが登録したリスナーをまとめて解除するController。 */
   private readonly _events = new AbortController();
 
-  /**
-   * @param builder      Owning AdvancedSearchBuilderView (for callbacks)
-   * @param parentGroup  The logical parent group view
-   * @param conditionType Type discriminator for this row
-   * @param referenceElm  Insert before this node (or appended when null)
-   * @param options      Optional initial values (e.g., from karyotype selection)
-   */
   constructor(
     builder: AdvancedSearchBuilderView,
     parentGroup: ConditionGroupView,
@@ -110,14 +85,15 @@ export class ConditionItemView extends BaseConditionView {
     this._initializeHTML();
     this._conditionValues = new ConditionValues(this, options);
     this._attachEventDelegation();
-    this._enterEditMode(); // Start in edit mode on first render.
+    // 条件追加時は即座に編集モードへ入り、ユーザーが値を選択できる状態にする。
+    this._enterEditMode();
   }
 
   // ───────────────────────────────────────────────────────────────────────────
-  // Public API (called by outer components)
+  // Public API
   // ───────────────────────────────────────────────────────────────────────────
 
-  /** Leave edit mode, close modal, and notify the builder that this item changed. */
+  /** 編集モードを終了し、条件の変更をBuilderへ通知する。 */
   doneEditing(): void {
     this.rootEl.classList.remove('-editing');
     this._isFirstTime = false;
@@ -126,23 +102,25 @@ export class ConditionItemView extends BaseConditionView {
     this._builder.changeCondition();
   }
 
-  /** Clean up resources and remove this item from the DOM. */
   remove(): void {
     this._toggleGlobalKeydown(false);
-    this._events.abort(); // Detach all listeners registered with this controller.
+    this._events.abort();
     storeManager.setData('showModal', false);
-    // this._conditionValues?.destroy?.(); // Uncomment if ConditionValues implements destroy().
     super.remove();
   }
 
-  /** Update the classification text (called by child editors) */
   updateClassificationText(newText: string): void {
     if (this._classificationEl) {
       this._classificationEl.textContent = newText;
     }
   }
 
-  /** URLから復元した値を、この条件行の表示に反映する。 */
+  /**
+   * URLから復元した値をこの条件行へ反映する。
+   *
+   * 通常の編集フローを経ずに直接値を注入するため、
+   * 完了後は編集モードを閉じ isFirstTime を false にする。
+   */
   async hydrateFromRestoredQuery(options: {
     relation?: Relation;
     values: RestoredConditionValue[];
@@ -164,8 +142,9 @@ export class ConditionItemView extends BaseConditionView {
   }
 
   // ───────────────────────────────────────────────────────────────────────────
-  // Read-only accessors
+  // Accessors
   // ───────────────────────────────────────────────────────────────────────────
+
   get conditionType(): ConditionTypeValue {
     return this._conditionType;
   }
@@ -181,6 +160,10 @@ export class ConditionItemView extends BaseConditionView {
   get keepLastRelation(): Relation {
     return this._keepLastRelation;
   }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Restore helpers（hydration）
+  // ───────────────────────────────────────────────────────────────────────────
 
   private _createRestoredValueView(
     value: RestoredConditionValue
@@ -207,6 +190,11 @@ export class ConditionItemView extends BaseConditionView {
     this._valuesContainerEl.append(valueView);
   }
 
+  /**
+   * significanceはsource（mgend/clinvar）ごとにラベル付きラッパーを持つ。
+   * ラッパーがなければ生成して追加し、あればそれを返す。
+   * source別に条件値をグループ化するためのDOM構造をここで遅延生成する。
+   */
   private _getSignificanceValueContainer(
     source: SignificanceSource
   ): HTMLElement {
@@ -233,6 +221,11 @@ export class ConditionItemView extends BaseConditionView {
     return container;
   }
 
+  /**
+   * frequency値をLit要素へ注入する。
+   * condition-item-value-view はLitコンポーネントのため、
+   * updateComplete を待たないとshadowRootが未構築で要素が見つからない。
+   */
   private async _hydrateNestedValueView(
     valueView: ConditionItemValueView,
     value: RestoredConditionValue
@@ -257,6 +250,11 @@ export class ConditionItemView extends BaseConditionView {
     );
   }
 
+  /**
+   * prediction値をLit要素へ注入する。
+   * prediction-value-view 自体もLitコンポーネントのため、
+   * 2段階のupdateComplete待機が必要になる。
+   */
   private async _hydratePredictionValueView(
     valueView: ConditionItemValueView,
     value: RestoredConditionValue
@@ -285,10 +283,8 @@ export class ConditionItemView extends BaseConditionView {
   // ───────────────────────────────────────────────────────────────────────────
   // Query building
   // ───────────────────────────────────────────────────────────────────────────
-  /**
-   * Build a query fragment from the current UI and relation state.
-   * Note: relation is undefined for types that do not support it.
-   */
+
+  /** DOMの現在状態からクエリを組み立てる。 */
   get queryFragment(): ConditionQuery {
     const values = Array.from(
       this._valuesContainerEl.querySelectorAll(
@@ -317,14 +313,9 @@ export class ConditionItemView extends BaseConditionView {
   }
 
   // ───────────────────────────────────────────────────────────────────────────
-  // DOM creation / initial sync
+  // DOM construction
   // ───────────────────────────────────────────────────────────────────────────
-  /**
-   * Set up static structure and initial dataset attributes on the root element.
-   * - classification: the condition type
-   * - relation: 'eq' or 'ne' if supported; removed when unsupported
-   * - children: built by _generateDOM()
-   */
+
   private _initializeHTML(): void {
     this.rootEl.classList.add('advanced-search-condition-item-view');
     this.rootEl.dataset.classification = this._conditionType;
@@ -341,8 +332,8 @@ export class ConditionItemView extends BaseConditionView {
   }
 
   /**
-   * Create the inner DOM using `createEl` and cache important nodes.
-   * We keep direct references (buttons, relation, values…) to avoid repeated queries.
+   * createEl でDOM構造を一括生成し、頻繁にアクセスするノードを直接参照としてキャッシュする。
+   * querySelector で毎回探索するよりもパフォーマンスとコードの可読性が向上する。
    */
   private _generateDOM(): { body: HTMLDivElement; bg: HTMLDivElement } {
     const cond = ADVANCED_CONDITIONS[
@@ -409,21 +400,15 @@ export class ConditionItemView extends BaseConditionView {
   // ───────────────────────────────────────────────────────────────────────────
   // Event wiring
   // ───────────────────────────────────────────────────────────────────────────
-  /**
-   * Centralized event wiring:
-   * - Stops bubbling out of this item
-   * - Direct listeners for Edit/Delete/Relation
-   * - Click on the summary background toggles selection
-   */
+
   private _attachEventDelegation(): void {
     const { signal } = this._events;
 
-    // Prevent clicks from bubbling outside of this condition item.
+    // この条件行内のクリックがグループの選択トグルへ伝播しないよう止める。
     this.rootEl.addEventListener('click', (e) => e.stopPropagation(), {
       signal,
     });
 
-    // Delete
     this._btnDelete.addEventListener(
       'click',
       (e) => {
@@ -433,7 +418,6 @@ export class ConditionItemView extends BaseConditionView {
       { signal }
     );
 
-    // Edit
     this._btnEdit.addEventListener(
       'click',
       (e) => {
@@ -443,7 +427,6 @@ export class ConditionItemView extends BaseConditionView {
       { signal }
     );
 
-    // Relation (mouse)
     if (this._relationSupported && this._relationEl) {
       this._relationEl.addEventListener(
         'click',
@@ -454,7 +437,6 @@ export class ConditionItemView extends BaseConditionView {
         { signal }
       );
 
-      // Relation (keyboard)
       this._relationEl.addEventListener(
         'keydown',
         (e) => {
@@ -468,12 +450,12 @@ export class ConditionItemView extends BaseConditionView {
       );
     }
 
-    // Background click inside summary toggles selection (excluding controls).
+    // summary 背景クリックで選択トグル。ボタンやrelation要素は上記で処理済みなので除外。
     this._summaryEl.addEventListener(
       'click',
       (e) => {
         const t = e.target as Element;
-        if (t.closest('button, .relation')) return; // handled above
+        if (t.closest('button, .relation')) return;
         this._toggleSelection(e);
       },
       { signal }
@@ -483,33 +465,26 @@ export class ConditionItemView extends BaseConditionView {
   // ───────────────────────────────────────────────────────────────────────────
   // Relation helpers
   // ───────────────────────────────────────────────────────────────────────────
-  /**
-   * Toggle relation ('eq' <-> 'ne') if this type supports relation.
-   * Also updates ARIA state and notifies the builder if the modal is not open.
-   */
+
   private _toggleRelation(): void {
     if (!this._relationSupported) return;
     const cur = this._readRelation() ?? 'eq';
     const next: Relation = cur === 'eq' ? 'ne' : 'eq';
     this._setRelation(next);
 
+    // モーダル表示中はrelation変更を検索へ反映しない（OK/Cancelで確定させる）。
     if (!storeManager.getData('showModal')) {
       this._keepLastRelation = next;
       this._builder.changeCondition();
     }
   }
 
-  /** Read relation from dataset. returns undefined when unsupported or absent. */
   private _readRelation(): Relation | undefined {
     if (!this._relationSupported) return undefined;
     const r = this.rootEl.dataset.relation;
     return r === 'eq' || r === 'ne' ? r : undefined;
   }
 
-  /**
-   * Normalize and write relation to dataset, then sync ARIA.
-   * When unsupported: clear the attribute and do not show ARIA pressed state.
-   */
   private _setRelation(next: Relation | undefined): void {
     if (!this._relationSupported) {
       delete this.rootEl.dataset.relation;
@@ -518,14 +493,15 @@ export class ConditionItemView extends BaseConditionView {
     if (!next) next = 'eq';
     this.rootEl.dataset.relation = next;
     if (this._relationEl) {
+      // aria-pressed: 'ne'（否定）を "押されている" 状態として扱う。
       this._relationEl.setAttribute('aria-pressed', String(next === 'ne'));
     }
   }
 
   // ───────────────────────────────────────────────────────────────────────────
-  // Edit mode helpers (modal lifecycle)
+  // Edit mode / modal lifecycle
   // ───────────────────────────────────────────────────────────────────────────
-  /** Enter edit mode and bind the global Escape handler while the modal is open. */
+
   private _enterEditMode(): void {
     this.rootEl.classList.add('-editing');
     this._conditionValues.startToEditCondition();
@@ -534,8 +510,9 @@ export class ConditionItemView extends BaseConditionView {
   }
 
   /**
-   * Attach/detach a single global keydown handler via AbortController.
-   * This keeps the wiring localized to this instance.
+   * グローバルのEscapeハンドラをAbortControllerで着脱する。
+   * イベントリスナーをこのインスタンスのsignalに紐付けることで、
+   * remove()時に確実に解除される。
    */
   private _toggleGlobalKeydown(enable: boolean): void {
     const fn = this._keydownEscapeEvent;
@@ -547,9 +524,8 @@ export class ConditionItemView extends BaseConditionView {
   }
 
   /**
-   * Global Escape handler:
-   * - On first edit, Esc removes the item entirely
-   * - Otherwise, Esc restores previous state and exits edit mode
+   * Escapeキーのハンドラ。
+   * 初回編集中のEscapeは条件行ごと削除し、2回目以降は変更を破棄して閉じる。
    */
   private readonly _keydownEscapeEvent = (e: KeyboardEvent) => {
     if (e.key !== 'Escape' || !storeManager.getData('showModal')) return;
@@ -563,7 +539,6 @@ export class ConditionItemView extends BaseConditionView {
     }
   };
 
-  /** Restore editor UI and last confirmed relation when canceling edits. */
   private _revertChanges(): void {
     for (const editor of this._conditionValues.editors) editor.restore();
     this._setRelation(

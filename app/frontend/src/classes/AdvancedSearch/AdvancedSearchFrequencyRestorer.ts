@@ -2,7 +2,7 @@ import {
   CONDITION_TYPE,
   type FrequencyDataset,
 } from '../../definition';
-import type { RestoredFrequencyMode } from '../Condition/ConditionItemView';
+import type { RestoredFrequencyMode } from '../Condition/ConditionItemRestoreTypes';
 import type { LogicalOperator } from '../../types';
 import {
   isQueryObject,

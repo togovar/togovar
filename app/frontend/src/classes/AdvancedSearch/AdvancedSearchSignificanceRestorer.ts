@@ -3,7 +3,7 @@ import {
   PREDICTIONS,
   type PredictionKey,
 } from '../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
-import type { RestoredPredictionValue } from '../Condition/ConditionItemView';
+import type { RestoredPredictionValue } from '../Condition/ConditionItemRestoreTypes';
 import type { Inequality, SignificanceSource } from '../../types';
 import {
   isQueryObject,

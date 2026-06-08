@@ -2,11 +2,11 @@ import type { AdvancedSearchBuilderView } from '../AdvancedSearch/AdvancedSearch
 import type { ConditionTypeValue } from '../../definition';
 import { CONDITION_NODE_KIND } from '../../definition';
 
-/** Public contract for both condition items and groups */
+/** グループと条件行の両方が実装する公開インターフェース。 */
 export interface ConditionView {
-  select(): void; // Select this view in the UI (CSS-driven)
-  deselect(): void; // Clear the selected state
-  remove(): void; // Remove from parent group and the DOM (detach listeners/resources as needed)
+  select(): void;
+  deselect(): void;
+  remove(): void;
   readonly conditionNodeKind:
     | typeof CONDITION_NODE_KIND.group
     | typeof CONDITION_NODE_KIND.condition;
@@ -18,7 +18,7 @@ export interface ConditionView {
   readonly canCopy?: boolean;
 }
 
-/** Group-specific */
+/** グループ固有の操作を追加したインターフェース。 */
 export interface GroupView extends ConditionView {
   removeConditionView(_view: ConditionView): void;
   addNewConditionGroup(
@@ -42,23 +42,26 @@ export interface GroupView extends ConditionView {
   readonly childViews: ConditionView[];
 }
 
-/** Maps a view's host DOM element to its owning ConditionView instance. */
+/**
+ * DOM要素からViewインスタンスを逆引きするマップ。
+ * WeakMapにすることでViewがGCされるとエントリも自動回収される。
+ */
 export const viewByEl = new WeakMap<HTMLElement, ConditionView>();
 
-/**
- * Type guard that narrows a `ConditionView | null | undefined` to `GroupView`
- * @param view - Value to test (a `ConditionView` or `null`/`undefined`).
- * @returns `true` if `view` is a `GroupView`; otherwise `false`.
- */
+/** conditionNodeKind で GroupView を識別する型ガード。 */
 export function isGroupView(
   view: ConditionView | null | undefined
 ): view is GroupView {
   return !!view && view.conditionNodeKind === CONDITION_NODE_KIND.group;
 }
 
-/** Abstract base class for group and item condition views */
+/**
+ * GroupView と ConditionItemView が共有する基底クラス。
+ *
+ * DOM要素の生成・配置・viewByEl登録・選択トグルを共通化する。
+ * select/deselect は aria-selected 属性で表現し、表示はCSSに委ねる。
+ */
 export abstract class BaseConditionView implements ConditionView {
-  // Structural discriminant (group | condition)
   readonly conditionNodeKind!: ConditionView['conditionNodeKind'];
   protected readonly _builder: AdvancedSearchBuilderView;
   protected readonly _rootEl: HTMLDivElement;
@@ -70,7 +73,6 @@ export abstract class BaseConditionView implements ConditionView {
   ) {
     this._builder = builder;
 
-    // Create the host element and attach it
     this._rootEl = document.createElement('div');
     this._rootEl.classList.add('advanced-search-condition-view');
 
@@ -78,23 +80,20 @@ export abstract class BaseConditionView implements ConditionView {
       parentContainer.insertBefore(this._rootEl, ref);
     else parentContainer.appendChild(this._rootEl);
 
-    // Register: host element -> view instance
     viewByEl.set(this._rootEl, this);
   }
 
-  /** Exposes the host/root DOM element of this view. */
   get rootEl(): HTMLElement {
     return this._rootEl;
   }
 
-  /** Direct element children of the parent container  */
   get childEls(): HTMLElement[] {
     return Array.from(
       this._rootEl.parentElement?.children ?? []
     ) as HTMLElement[];
   }
 
-  /** Parent group view; `null` when this view is the root or detached. */
+  /** 親GroupViewをDOMから逆引きする。rootまたは切り離し済みの場合はnull。 */
   get parentGroup(): GroupView | null {
     const parent = this._rootEl.parentElement;
     const groupEl = parent?.closest(
@@ -104,16 +103,13 @@ export abstract class BaseConditionView implements ConditionView {
     return isGroupView(view) ? view : null;
   }
 
-  /** Marks this view as selected (CSS-driven) */
   select(): void {
     this._rootEl.setAttribute('aria-selected', 'true');
   }
-  /** Clears the selected state */
   deselect(): void {
     this._rootEl.removeAttribute('aria-selected');
   }
 
-  /** Removes this view from its parent group and the DOM. */
   remove(): void {
     const parent = this.parentGroup;
     if (parent) parent.removeConditionView(this);
@@ -121,21 +117,11 @@ export abstract class BaseConditionView implements ConditionView {
     this._rootEl.remove();
   }
 
-  /**
-   * Serializable fragment of the global query produced by this view.
-   *
-   * Examples:
-   * - Group: `{ and: [child1, child2, ...] }` or `{}` when empty.
-   * - Item:  `{ gene: { relation: 'eq', terms: [...] } }`, etc.
-   */
   abstract get queryFragment(): object;
 
   /**
-   * Shared handler for selection toggling.
-   * - Ignores toggles while in editing mode.
-   * - Delegates to the builder's selection manager.
-   *
-   * @param e - The triggering event (click, etc.)
+   * 選択トグルの共通処理。
+   * 編集モード中（-editingクラスあり）はクリックで選択が切り替わらないよう保護する。
    */
   protected _toggleSelection(e: Event): void {
     e.stopPropagation();
