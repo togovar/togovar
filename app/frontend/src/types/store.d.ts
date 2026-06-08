@@ -45,6 +45,8 @@ export type StoreState = {
   isStoreUpdating: boolean;
   selectedRow?: number;
   advancedSearchConditions?: any;
+  advancedSearchURLTooLong?: boolean;
+  advancedSearchRestoredFromURL?: boolean;
   searchMessages?: any;
   searchStatus?: any;
   statisticsDataset?: any;

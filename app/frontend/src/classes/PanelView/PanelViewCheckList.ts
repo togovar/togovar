@@ -1,14 +1,14 @@
 import PanelView from './PanelView';
-import { storeManager } from '../store/StoreManager';
+import { storeManager } from '../../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
-} from '../store/searchManager';
+} from '../../store/searchManager';
 import type {
   MasterConditions,
   MasterConditionId,
   SimpleSearchCurrentConditions,
-} from '../types';
+} from '../../types';
 
 // ----------------------------------------
 // 型定義

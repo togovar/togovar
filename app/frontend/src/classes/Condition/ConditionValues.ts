@@ -14,7 +14,8 @@ import { ConditionValueEditorVariantID } from './ConditionValueEditor/ConditionV
 import type { ConditionItemView } from './ConditionItemView';
 import type { ConditionValueEditor, EditorCtor } from '../../types';
 
-/** Registry: which editors are used for each condition type. */
+// 条件種別ごとに使用するエディタを宣言的に管理する。
+// 新しい条件種別を追加するときはここへ追記するだけで済む。
 const EDITOR_REGISTRY: Readonly<
   Partial<Record<ConditionTypeValue, EditorCtor[]>>
 > = {
@@ -39,11 +40,11 @@ const EDITOR_REGISTRY: Readonly<
 };
 
 /**
- * Orchestrates editors for one condition’s edit panel:
- * - builds OK/Cancel UI
- * - instantiates the correct editors
- * - aggregates validity and toggles the OK button
- * - applies or reverts on OK/Cancel
+ * 1条件行の編集パネルを管理する。
+ * - OK/Cancelボタンの生成
+ * - 条件種別に対応するエディタのインスタンス化
+ * - 有効状態の集約とOKボタンの活性制御
+ * - 確定（OK）・取消（Cancel）のイベント処理
  */
 export default class ConditionValues {
   private readonly _conditionView: ConditionItemView;
@@ -67,15 +68,20 @@ export default class ConditionValues {
   // Public API used by editors / owner
   // ─────────────────────────────────────────────────────────
 
-  /** Called by ConditionItemView right after entering edit mode. */
+  /** 編集モードに入るとき、エディタに「元の値を記憶」させてからOKを無効化する。 */
   startToEditCondition(): void {
     for (const ed of this._editors) ed.keepLastValues();
     this._recomputeValidity();
   }
 
-  /** Editors call this when their internal validity changed. */
+  /**
+   * エディタの有効状態が変わったときに呼ばれる。
+   *
+   * dataset/genotype は「データセット選択」と「頻度条件」の両方が揃わないと
+   * クエリが成立しないため、全エディタが有効であることを必須とする。
+   * それ以外の条件種別はエディタが1つなのでisValidHintをそのまま使う。
+   */
   update(isValidHint?: boolean): void {
-    // For dataset/genotype we require ALL editors valid; otherwise accept hint or aggregate.
     const t = this._conditionView.conditionType;
     const allEditorsValid = this._editors.every((e) => e.isValid);
     const requireAll =
@@ -112,7 +118,6 @@ export default class ConditionValues {
       ],
     });
 
-    // Mount once
     this._conditionView.editorElement.replaceChildren(sections, buttons);
   }
 
@@ -123,7 +128,6 @@ export default class ConditionValues {
       'click',
       (e) => {
         e.stopImmediatePropagation();
-        // Apply and close
         this._conditionView.doneEditing();
       },
       { signal }
@@ -133,15 +137,14 @@ export default class ConditionValues {
       'click',
       (e) => {
         e.stopImmediatePropagation();
+        // 初回追加のCancelは条件行を削除する（確定前のロールバック）。
         if (this._conditionView.isFirstTime) {
-          // First-time cancel removes the item
           this._conditionView.remove();
           return;
         }
-        // Revert all editors
+        // 2回目以降のCancelはエディタ値とrelationを元に戻す。
         for (const ed of this._editors) ed.restore();
 
-        // Restore relation only for types that support it
         if (supportsRelation(this._conditionView.conditionType)) {
           this._conditionView.rootEl.dataset.relation =
             this._conditionView.keepLastRelation;
@@ -159,7 +162,6 @@ export default class ConditionValues {
     const ctors = EDITOR_REGISTRY[type] ?? [];
     this._editors = ctors.map((Ctor) => new Ctor(this, this._conditionView));
 
-    // If options provided (e.g., from karyotype), apply them to editors
     if (this._options) {
       for (const editor of this._editors) {
         if (typeof editor.applyOptions === 'function') {
@@ -173,7 +175,7 @@ export default class ConditionValues {
   }
 
   private _recomputeValidity(): void {
-    this.update(); // aggregate from editors
+    this.update();
   }
 
   private _setOkEnabled(enabled: boolean): void {
@@ -185,7 +187,7 @@ export default class ConditionValues {
   }
 
   // ─────────────────────────────────────────────────────────
-  // Accessors (used by editors)
+  // Accessors
   // ─────────────────────────────────────────────────────────
 
   get conditionView(): ConditionItemView {
@@ -200,7 +202,6 @@ export default class ConditionValues {
     return this._editors;
   }
 
-  /** Call to free event listeners when editor view is discarded. */
   destroy(): void {
     this._events.abort();
   }

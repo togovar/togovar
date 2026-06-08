@@ -1,17 +1,17 @@
-import CollapseView from './CollapseView.js';
+import CollapseView from '../CollapseView.js';
 import PanelView from './PanelView';
-import { storeManager } from '../store/StoreManager';
+import { storeManager } from '../../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
   getSimpleSearchConditionMaster,
-} from '../store/searchManager';
+} from '../../store/searchManager';
 import type {
   MasterConditions,
   MasterConditionItem,
   ItemItemClass,
   SimpleSearchCurrentConditions,
-} from '../types';
+} from '../../types';
 
 // ----------------------------------------
 // 型定義

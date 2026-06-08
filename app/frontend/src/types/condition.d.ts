@@ -95,6 +95,8 @@ interface GeneLeaf {
   gene: {
     relation: Relation;
     terms: number[];
+    /** URL/画面復元用。検索APIへ送る前に取り除く。 */
+    labels?: Record<string, string>;
   };
 }
 

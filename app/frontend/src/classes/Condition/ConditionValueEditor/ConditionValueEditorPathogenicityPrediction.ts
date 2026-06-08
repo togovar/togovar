@@ -147,6 +147,10 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
       'set-prediction-values',
       (e: Event) => {
         const detail = (e as CustomEvent<PredictionChangeDetail>).detail;
+        // 非アクティブなスライダーの初回レンダリングイベントを無視する。
+        // アクティブでないタブのスライダーも初回描画時にイベントを発火するが、
+        // this._dataset（アクティブなデータセット）と一致する場合のみ処理する。
+        if (detail.dataset !== this._dataset) return;
         this._updateValuesAndSigns(detail);
       }
     );
