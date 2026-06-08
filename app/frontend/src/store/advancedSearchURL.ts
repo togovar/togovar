@@ -4,7 +4,7 @@ export const ADVANCED_SEARCH_URL_MAX_JSON_LENGTH = 2000;
 /**
  * Advanced Search条件をURLの `q` パラメータ用にエンコードする。
  * JSON.stringify → btoa (Base64) の順で変換する。
- * Raw JSONが上限を超える場合は null を返す。
+ * Raw JSONが上限を超える、またはエンコードに失敗した場合は null を返す。
  */
 export function encodeConditionForURL(query: unknown): string | null {
   try {
