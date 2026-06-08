@@ -26,8 +26,6 @@ export function getSelectionCapabilities(
 ): SelectionCapabilities {
   if (selection.length === 0) return DISABLED_CAPABILITIES;
 
-  // グループ化は「同じ親の直下にある兄弟」だけを対象にする。
-  // 異なる親の条件をまとめるとDOM移動とquery構造が崩れやすいため、ここで弾く。
   const selectedParentGroups = new Set(
     selection
       .map((view) => view.parentGroup)
@@ -57,6 +55,7 @@ function canGroupSelectedViews(
   selection: ReadonlyArray<ConditionView>,
   selectedParentGroups: ReadonlySet<GroupView>
 ): boolean {
+  // 異なる親の条件をまとめるとDOM移動とquery構造が崩れやすいため、同じ親の兄弟だけを対象にする。
   if (selection.length <= 1 || selectedParentGroups.size !== 1) return false;
 
   const parentGroup = selectedParentGroups.values().next().value!;

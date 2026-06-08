@@ -15,9 +15,9 @@ const ROOT_CONTAINER_SEL =
 /**
  * 高度検索の複数選択を管理する。
  *
- * 選択状態の正本は DOM。
- * - 選択中の要素には `aria-selected="true"` を付ける
- * - DOM から View への変換は `viewByEl` で行う
+ * 選択状態の正本はDOM（aria-selected属性）に置く。
+ * インメモリのSetではなくDOMを正本にすることで、View の再生成やDOMの外部操作があっても
+ * 選択状態が壊れにくく、テストやデバッグでDOMを直接検査できる。
  *
  * 取得結果は document order で返す。
  * このクラスは状態更新と通知だけを担当し、見た目は CSS に任せる。
@@ -34,7 +34,10 @@ export class AdvancedSearchSelection {
     );
   }
 
-  /** 選択中の ConditionView を document order で返す。 */
+  /**
+   * 選択中の ConditionView を document order で返す。
+   * document order で返すことで、group/delete などの操作が表示順と一致する。
+   */
   getSelectedConditionViews(): ConditionView[] {
     const els = Array.from(this._selectedNodeList());
     els.sort((a, b) => {
@@ -51,7 +54,9 @@ export class AdvancedSearchSelection {
   /**
    * View を選択する。
    *
-   * 既存挙動に合わせ、複数選択は同じ親コンテナ配下だけに限定する。
+   * 複数選択は同じ親コンテナ配下だけに限定する。
+   * 異なる親の条件をまとめると DOM 移動とquery構造が崩れやすいため、
+   * 別親の既選択は自動的に解除する。
    * `deselectSelecting` が true の場合は、選択前に既存選択をすべて解除する。
    */
   selectConditionView(

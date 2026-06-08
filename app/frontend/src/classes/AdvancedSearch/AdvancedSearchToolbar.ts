@@ -15,9 +15,11 @@ const COMMANDS: ReadonlyArray<CommandDef> = [
 
 type ToolbarCommand = Exclude<Command, 'add-condition'>;
 
-/** 表示用のショートカット文字列を keyCode から作る。 */
+/**
+ * 表示用のショートカット文字列を keyCode から作る。
+ * mapに登録されていないキーは文字コードで英字変換する（A-Z を想定）。
+ */
 function formatShortcut(codes: number[]): string {
-  // 必要なキーだけを明示する。未定義のキーは英字として扱う。
   const map: Record<number, string> = { 16: 'Shift', 46: 'Del' };
   const parts = codes.map((c) => map[c] ?? String.fromCharCode(c));
   return parts.join('+');
@@ -31,6 +33,7 @@ function formatShortcut(codes: number[]): string {
 export class AdvancedSearchToolbar {
   private _builder: AdvancedSearchBuilderView;
   private _toolbar: HTMLElement;
+  // AbortController の signal オプションが使えない環境への fallback 判定用。
   private _usesSignal = false;
   private _disposed = false;
   private readonly _commandEnabled: Record<ToolbarCommand, boolean> = {
@@ -174,12 +177,14 @@ export class AdvancedSearchToolbar {
     this._handleCommand(command, condition, e);
   };
 
-  /** アクセシビリティ用。Enter/Space で click と同じ処理を実行する。 */
+  /**
+   * アクセシビリティ用。Enter/Space で click と同じ処理を実行する。
+   * button要素はブラウザ標準で Enter/Space に対応しているため、button以外だけを対象にする。
+   */
   private _onKeydown = (e: KeyboardEvent) => {
     const target = e.target;
     if (!(target instanceof Element)) return;
 
-    // button 要素はブラウザ標準で Enter/Space に対応している。
     if (target instanceof HTMLButtonElement) return;
 
     const cmdEl = target.closest<HTMLElement>('.command');
@@ -199,7 +204,11 @@ export class AdvancedSearchToolbar {
     }
   };
 
-  /** click と keydown をツールバーへ一度だけ委譲登録する。 */
+  /**
+   * click と keydown をツールバーへ一度だけ委譲登録する。
+   * AbortController の signal が使える環境では signal でまとめて解除し、
+   * そうでない環境では destroy 時に個別に removeEventListener する。
+   */
   private _attachEventDelegation(): void {
     try {
       this._toolbar.addEventListener('click', this._onClick, {
@@ -210,7 +219,6 @@ export class AdvancedSearchToolbar {
       });
       this._usesSignal = true;
     } catch {
-      // 古い環境では addEventListener の signal オプションが使えない。
       this._toolbar.addEventListener('click', this._onClick);
       this._toolbar.addEventListener('keydown', this._onKeydown);
       this._usesSignal = false;

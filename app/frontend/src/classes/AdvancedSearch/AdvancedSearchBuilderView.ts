@@ -49,6 +49,9 @@ export class AdvancedSearchBuilderView {
     );
     this._selection = new AdvancedSearchSelection(this);
     this.onSelectionChange([]);
+
+    // void でラップしてPromiseを意図的に無視する。
+    // 復元エラーはRestorer内部でハンドリングされ、UIは初期状態のまま表示される。
     void this._restoreConditionFromStore();
   }
 
@@ -70,7 +73,10 @@ export class AdvancedSearchBuilderView {
     this._advancedSearchBuilderEl.dataset[name] = String(value);
   }
 
-  /** 操作可否を data-* 属性とツールバーの disabled 状態へ反映する。 */
+  /**
+   * 操作可否を data-* 属性とツールバーの disabled 状態へ反映する。
+   * data-* 属性はCSSセレクターから参照されるため、ToolbarだけでなくDOM側にも書き込む。
+   */
   private _applyCapabilitiesToDataset(caps: SelectionCapabilities): void {
     this._setFlag('canDelete', caps.canDelete);
     this._setFlag('canGroup', caps.canGroup);
@@ -105,6 +111,7 @@ export class AdvancedSearchBuilderView {
       const idx = siblingViews.indexOf(view);
       if (idx >= 0 && idx < minIndex) {
         minIndex = idx;
+        // 新しいグループを先頭の選択条件の直前に挿入することで、元の表示順を保持する。
         insertionEl = view.rootEl;
       }
     }
