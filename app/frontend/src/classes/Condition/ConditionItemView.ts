@@ -254,6 +254,10 @@ export class ConditionItemView extends BaseConditionView {
    * prediction値をLit要素へ注入する。
    * prediction-value-view 自体もLitコンポーネントのため、
    * 2段階のupdateComplete待機が必要になる。
+   *
+   * await の間にエディタ内スライダーの初回レンダリングイベント（set-prediction-values）が
+   * 発火し、valueView の label/value を 'AlphaMissense' に上書きすることがある。
+   * setValues 後に再設定することで正しいラベルを保証する。
    */
   private async _hydratePredictionValueView(
     valueView: ConditionItemValueView,
@@ -278,6 +282,10 @@ export class ConditionItemView extends BaseConditionView {
       prediction.includeUnassigned,
       prediction.includeUnknown
     );
+
+    // スライダーの初回レンダリングイベントが上書きした場合に備えて再設定する。
+    valueView.value = value.value;
+    valueView.label = value.label;
   }
 
   // ───────────────────────────────────────────────────────────────────────────
