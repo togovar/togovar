@@ -343,5 +343,11 @@ export function reflectAdvancedSearchConditionToURI() {
     hasConditions && encoded === null
       ? { ..._currentUrlParams, advancedSearchConditions: conditions }
       : _currentUrlParams;
-  window.history.pushState(state, '', url);
+  try {
+    window.history.pushState(state, '', url);
+  } catch {
+    // stateが大きすぎる等でpushStateが失敗しても検索自体は継続する。
+    // 条件退避を諦めてURLのみ更新する。
+    window.history.pushState(_currentUrlParams, '', url);
+  }
 }

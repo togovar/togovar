@@ -125,6 +125,13 @@ export class ConditionItemView extends BaseConditionView {
     relation?: Relation;
     values: RestoredConditionValue[];
   }): Promise<void> {
+    // constructorの_enterEditModeの副作用をawaitより前に即座に打ち消す。
+    // awaitを跨いだままだとモーダル/編集UIが一瞬表示されEscハンドラも有効になる。
+    this.rootEl.classList.remove('-editing');
+    this._isFirstTime = false;
+    this._toggleGlobalKeydown(false);
+    storeManager.setData('showModal', false);
+
     this._setRelation(options.relation);
     this._valuesContainerEl.replaceChildren();
 
@@ -134,11 +141,6 @@ export class ConditionItemView extends BaseConditionView {
       await this._hydrateNestedValueView(valueView, value);
       await this._hydratePredictionValueView(valueView, value);
     }
-
-    this.rootEl.classList.remove('-editing');
-    this._isFirstTime = false;
-    this._toggleGlobalKeydown(false);
-    storeManager.setData('showModal', false);
   }
 
   // ───────────────────────────────────────────────────────────────────────────
