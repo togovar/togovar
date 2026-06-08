@@ -3,7 +3,6 @@ import {
   handleHistoryChange,
   reflectSimpleSearchConditionToURI,
   reflectAdvancedSearchConditionToURI,
-  setAdvancedSearchCondition,
 } from '../store/searchManager';
 import { executeSearch } from '../api/fetchData';
 import {
@@ -370,12 +369,10 @@ class StoreManager {
           this.publish('simpleSearchConditions');
           break;
         case 'advanced': {
-          // #fromHistoryのときは条件はストア設定済み・URLも変更不要のためreflect系をスキップ。
-          if (!this.#fromHistory) {
-            const condition = this.getData('advancedSearchConditions');
-            setAdvancedSearchCondition(condition);
-            reflectAdvancedSearchConditionToURI();
-          }
+          // setAdvancedSearchConditionはexecuteSearchを内包するため呼ばない。
+          // #fromHistoryのときはURLも変更不要のためreflect系をスキップ。
+          // 検索実行はこのメソッド末尾のexecuteSearch(0, true)に一本化する。
+          if (!this.#fromHistory) reflectAdvancedSearchConditionToURI();
           break;
         }
       }
