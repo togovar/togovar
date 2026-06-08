@@ -35,8 +35,6 @@ export function initHome() {
   storeManager.setData('offset', 0);
   storeManager.setData('selectedRow', undefined);
 
-  initializeApp(); // 先にURLからモードを設定
-
   new Karyotype(document.getElementById('Karyotype'));
 
   new ActivityIndicator(document.getElementById('ActivityIndicator'));
@@ -89,28 +87,20 @@ function readyInitialSearch(callback) {
     simpleSearchConditionsMaster
   );
 
-  // URLパラメータから検索条件を復元
-  const currentSearchMode = storeManager.getData('searchMode');
-  const simpleSearchConditions = {};
-  const advancedSearchConditions =
-    storeManager.getData('advancedSearchConditions') || {};
+  // URLを解析して Advanced Search条件をストアへ反映し、searchModeを取得する。
+  // searchModeのサブスクライバがexecuteSearchを発火するため、条件確定後に最後にセットする。
+  const searchMode = initializeApp();
 
-  // URLパラメータからシンプル検索条件を抽出
-  switch (currentSearchMode) {
-    case 'simple':
-      Object.assign(
-        simpleSearchConditions,
-        extractSearchCondition(_currentUrlParams)
-      );
-      break;
-    case 'advanced':
-      // initializeApp() で `q` から復元済みの条件をそのまま使う
-      break;
-  }
-
-  // 検索条件をストアに保存（isFromHistory = trueとして設定）
+  // URLパラメータからSimple Search条件を抽出してストアに保存する。
+  const simpleSearchConditions =
+    searchMode === 'simple'
+      ? extractSearchCondition(_currentUrlParams)
+      : {};
   storeManager.setData('simpleSearchConditions', simpleSearchConditions);
-  storeManager.setData('advancedSearchConditions', advancedSearchConditions);
+
+  // searchModeを設定: ここでStoreManager.searchMode()サブスクライバが
+  // reflect*ToURI() + executeSearch() を実行するため、正しい条件で初回検索が走る。
+  storeManager.setData('searchMode', searchMode);
 
   callback();
 }
