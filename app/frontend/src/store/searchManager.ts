@@ -241,12 +241,14 @@ export function reflectAdvancedSearchConditionToURI() {
     // 条件なし、または2000文字超過のためURLには mode のみ
     url = `${window.location.origin}${window.location.pathname}?mode=advanced`;
     _currentUrlParams = { mode: 'advanced' };
-
-    if (conditions) {
-      // 2000文字超過の場合（conditionsはあるがencodedがnull）
-      storeManager.setData('advancedSearchURLTooLong', true);
-    }
   }
+
+  // 条件が2000文字以内に収まるようになった場合にフラグを戻す。
+  // conditionsがあるのにencodedがnullの場合のみ超過扱い。
+  storeManager.setData(
+    'advancedSearchURLTooLong',
+    conditions !== null && conditions !== undefined && encoded === null
+  );
 
   window.history.pushState(_currentUrlParams, '', url);
 }
