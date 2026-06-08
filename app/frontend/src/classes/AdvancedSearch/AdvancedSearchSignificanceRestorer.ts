@@ -4,7 +4,11 @@ import {
   type PredictionKey,
 } from '../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
 import type { RestoredPredictionValue } from '../Condition/ConditionItemRestoreTypes';
-import type { Inequality, SignificanceSource } from '../../types';
+import type {
+  Inequality,
+  LogicalOperator,
+  SignificanceSource,
+} from '../../types';
 import {
   isQueryObject,
   makeValue,
@@ -14,6 +18,11 @@ import {
   type QueryObject,
   type RestoredItem,
 } from './AdvancedSearchRestorerUtils';
+
+type LogicalQuery = Readonly<{
+  operator: LogicalOperator;
+  children: unknown[];
+}>;
 
 /**
  * Clinical significanceはsourceごとに表示ラベル（MGeND/ClinVar）とqueryを分ける必要がある。
@@ -58,6 +67,43 @@ function _getSignificanceSources(source: unknown): SignificanceSource[] {
 }
 
 /**
+ * Clinical significanceは2 source選択時にsourceごとのleafへ分かれる。
+ * UI復元時は、同じrelationのleafを1条件行へ戻す。
+ */
+export function toMergedSignificanceItem(
+  logical: LogicalQuery
+): RestoredItem | null {
+  const items = logical.children
+    .map((child) =>
+      isQueryObject(child) && isQueryObject(child.significance)
+        ? restoreSignificanceItem(child.significance)
+        : null
+    )
+    .filter((item): item is RestoredItem => item !== null);
+
+  if (items.length !== logical.children.length || items.length <= 1) {
+    return null;
+  }
+
+  const relation = items[0].relation;
+  const expectedOperator = relation === 'ne' ? 'and' : 'or';
+  const canMerge = items.every(
+    (item) =>
+      item.conditionType === CONDITION_TYPE.significance &&
+      item.relation === relation
+  );
+  if (!relation || logical.operator !== expectedOperator || !canMerge) {
+    return null;
+  }
+
+  return {
+    conditionType: CONDITION_TYPE.significance,
+    relation,
+    values: items.flatMap((item) => item.values),
+  };
+}
+
+/**
  * Pathogenicity predictionはquery key（alphamissense/sift/polyphen）から
  * 共通の条件行へ戻す。scoreがオブジェクトならrangeモード、配列ならcategoryモード。
  */
@@ -81,6 +127,69 @@ export function restorePredictionItem(query: QueryObject): RestoredItem | null {
       },
     ],
   };
+}
+
+/**
+ * Pathogenicity predictionでUnassigned/Unknownとrangeを同時に選ぶと、
+ * queryは { or: [category leaf, range leaf] } になる。これを1条件行へ戻す。
+ */
+export function toMergedPredictionItem(
+  logical: LogicalQuery
+): RestoredItem | null {
+  if (logical.operator !== 'or') return null;
+
+  const leaves = logical.children
+    .map(_toPredictionLeaf)
+    .filter((leaf): leaf is PredictionLeaf => leaf !== null);
+  if (leaves.length !== logical.children.length || leaves.length <= 1) {
+    return null;
+  }
+
+  const dataset = leaves[0].dataset;
+  if (!leaves.every((leaf) => leaf.dataset === dataset)) return null;
+
+  const range = leaves.find((leaf) => isQueryObject(leaf.score));
+  const categories = leaves.filter((leaf) => Array.isArray(leaf.score));
+  if (!range || categories.length === 0) return null;
+
+  const rangePrediction = _toRestoredPredictionValue(dataset, range.score);
+  if (!rangePrediction) return null;
+
+  const selectedCategories = categories.flatMap((leaf) =>
+    Array.isArray(leaf.score) ? leaf.score : []
+  );
+
+  return {
+    conditionType: CONDITION_TYPE.pathogenicity_prediction,
+    values: [
+      {
+        value: dataset,
+        label: PREDICTIONS[dataset].label,
+        prediction: {
+          ...rangePrediction,
+          includeUnassigned: selectedCategories.includes('unassigned'),
+          includeUnknown: selectedCategories.includes('unknown'),
+        },
+      },
+    ],
+  };
+}
+
+type PredictionLeaf = Readonly<{
+  dataset: PredictionKey;
+  score: unknown;
+}>;
+
+function _toPredictionLeaf(child: unknown): PredictionLeaf | null {
+  if (!isQueryObject(child)) return null;
+
+  const dataset = _getPredictionKey(child);
+  if (!dataset) return null;
+
+  const leaf = child[dataset];
+  if (!isQueryObject(leaf)) return null;
+
+  return { dataset, score: leaf.score };
 }
 
 /** queryのキーがPREDICTIONSに含まれるものだけを予測スコア条件として識別する。 */

@@ -9,6 +9,8 @@ import { restoreGeneItem } from './AdvancedSearchGeneRestorer';
 import {
   restoreSignificanceItem,
   restorePredictionItem,
+  toMergedSignificanceItem,
+  toMergedPredictionItem,
 } from './AdvancedSearchSignificanceRestorer';
 import {
   isQueryObject,
@@ -47,8 +49,11 @@ async function appendQueryToGroup(
 
   const logical = getLogicalQuery(query);
   if (logical) {
-    // dataset/genotypeの複数選択はorで展開されているため、先にまとめを試みる。
-    const mergedItem = toMergedFrequencyItem(logical);
+    // 1条件行がquery上で論理式に展開されるものは、先にUI単位へ畳み戻す。
+    const mergedItem =
+      toMergedFrequencyItem(logical) ??
+      toMergedSignificanceItem(logical) ??
+      toMergedPredictionItem(logical);
     if (mergedItem) {
       await appendRestoredItem(parentGroup, mergedItem);
       return;
