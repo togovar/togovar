@@ -1,92 +1,282 @@
 # TogoVar
 
-TogoVar (NBDC's integrated database of Japanese genomic variation) is a database that has collected and organized genome 
-sequence differences between individuals (variants) in the Japanese population and disease information associated with 
-them.
+TogoVar は、日本人集団のゲノム配列差異（variant）と疾患関連情報を収集・整理した、日本人ゲノム多様性の統合データベースです。
+
+このリポジトリは、TogoVar のフロントエンドを中心にした作業ツリーです。検索画面、variant/gene/disease レポート画面、ドキュメントページ、参照ゲノム別の検索条件定義などを管理します。
+
+AIエージェント向けの作業指示・設計ルールは [AGENTS.md](./AGENTS.md) にまとめています。
+この README は、人間がプロジェクトを理解・開発・運用するための説明書です。
+
+## 主な機能
+
+- Simple search: キーワードやフィルターによる variant 検索
+- Advanced search: 条件を組み合わせた詳細検索
+- Search results: 検索結果テーブル、列表示設定、プレビュー
+- Karyotype view: 染色体上の表示領域・条件連携
+- Report pages: variant / gene / disease の詳細ページ
+- Download: 検索条件に基づくダウンロード
+- Documentation: datasets / downloads / help / history / terms などの英語・日本語ドキュメント
+- SEO files: `robots.txt` と `sitemap.xml` のビルド時生成
+
+## 使用技術
+
+| 役割 | 技術 |
+| --- | --- |
+| フロントエンド | TypeScript / JavaScript / Lit / Web Components |
+| ビルド | Webpack 5 / ts-loader / Babel |
+| スタイル | Sass / SCSS / CSS |
+| テンプレート | Pug |
+| サーバー | Node.js / Express 系フロントエンドサーバー |
+| API連携 | TogoVar API |
+| データ定義 | JSON / TSV / YAML |
+| 検証 | ESLint / stylelint / TypeScript |
+
+## ディレクトリ構成
+
+主な構成は以下です。
+
+```txt
+app/frontend/
+  assets/        参照ゲノム別JSON、karyotype.tsv、stanza設定など
+  config/        Webpack設定、サイトURL生成設定
+  packs/         Webpackエントリポイント
+  server/        開発/本番フロントエンドサーバー
+  src/
+    api/         API通信
+    classes/     既存Viewクラス、検索UI、結果表示
+    components/  Lit/Web Components
+    store/       StoreManager、検索条件、URL反映
+    types/       グローバル型定義
+    utils/       汎用ヘルパー
+  stylesheets/   Sass / SCSS
+  views/         Pugテンプレート
+dist/             ビルド出力
+```
+
+## ローカル開発
+
+### 必要なもの
+
+- Node.js 22.x
+- npm
+
+Node.js のバージョンは `.nvmrc` と `package.json` の `engines.node` で 22.x に固定しています。
+バージョン管理ツールを使っている場合は、プロジェクトルートで以下を実行してください。
+
+| Tool | Command | URL |
+| --- | --- | --- |
+| nvm | `nvm use` | https://github.com/nvm-sh/nvm |
+| fnm | `fnm use` | https://github.com/Schniz/fnm |
+| mise | `mise install` | https://github.com/jdx/mise |
+
+### セットアップ
+
+```bash
+npm install
+```
+
+### 環境変数
+
+開発時はプロジェクトルートに `.env` を置くと、Webpack設定から読み込まれます。
+
+```dotenv
+# TogoVar API endpoint
+TOGOVAR_FRONTEND_API_URL=https://grch38.togovar.org
+
+# Reference genome: GRCh37 or GRCh38
+TOGOVAR_REFERENCE=GRCh38
+
+# Site origin used for canonical URL, sitemap.xml, JSON-LD
+# 未設定の場合、TOGOVAR_REFERENCE に応じて https://grch37.togovar.org / https://grch38.togovar.org を使う
+TOGOVAR_SITE_ORIGIN=http://localhost:8000
+
+# Optional: stanza base URL
+TOGOVAR_FRONTEND_STANZA_URL=https://grch38.togovar.org/stanza
+
+# Optional: endpoints passed to report/stanza configuration
+TOGOVAR_ENDPOINT_SPARQL=https://grch38.togovar.org/sparql
+TOGOVAR_ENDPOINT_SPARQLIST=https://grch38.togovar.org/sparqlist
+TOGOVAR_ENDPOINT_SEARCH=https://grch38.togovar.org/search
+TOGOVAR_ENDPOINT_JBROWSE=https://grch38.togovar.org/jbrowse
+```
+
+よく使う最小構成は以下です。
+
+```dotenv
+TOGOVAR_FRONTEND_API_URL=https://grch38.togovar.org
+TOGOVAR_REFERENCE=GRCh38
+```
+
+### 開発サーバー
+
+```bash
+npm start
+```
+
+デフォルトでは `http://localhost:8000` で起動します。
+ポートを変えたい場合は `PORT` または `--port` を使います。
+
+```bash
+PORT=8001 npm start
+npm start -- --port 8001
+```
+
+### 本番ビルド
+
+```bash
+npm run build
+```
+
+ビルド成果物は `dist/` に生成されます。
+ビルド時には、参照ゲノムに応じたドキュメントページ、`robots.txt`、`sitemap.xml` も生成されます。
+
+### 本番ビルドをローカル起動
+
+```bash
+npm run start:prod
+```
+
+`npm run build` のあと、production mode のフロントエンドサーバーを起動します。
+
+## 検証
+
+このリポジトリには `npm run check` は定義されていません。
+変更後は可能な範囲で以下を実行してください。
+
+```bash
+npm run lint
+npm run build
+```
+
+個別に確認する場合:
+
+```bash
+npm run lint:js
+npm run lint:css
+./node_modules/.bin/tsc --noEmit
+```
+
+補足:
+
+- `npm run lint` は JavaScript/TypeScript と Sass/CSS の lint をまとめて実行します。
+- `tsc --noEmit` は package scripts にはありませんが、TypeScript の型チェックだけを確認したい場合に使えます。
+- 環境によって `node` / `npm` が PATH に無い場合があります。その場合は Node.js 22.x を有効化してください。
+
+## Advanced Search
+
+Advanced Search は、条件行と AND/OR グループを組み合わせて検索クエリを作ります。
+
+主な関連ファイル:
+
+```txt
+app/frontend/src/classes/AdvancedSearchBuilderView.ts
+app/frontend/src/classes/AdvancedSearchSelection.ts
+app/frontend/src/classes/AdvancedSearchToolbar.ts
+app/frontend/src/classes/AdvancedSearchConditionRestorer.ts
+app/frontend/src/classes/Condition/
+app/frontend/src/classes/Condition/queryBuilders/
+app/frontend/src/store/searchManager.ts
+app/frontend/src/store/advancedSearchURL.ts
+```
+
+### URL共有
+
+Advanced Search の条件は URL に保存できます。
+
+```txt
+/?mode=advanced&q=<Base64 encoded JSON>
+```
+
+処理の流れ:
+
+1. 条件オブジェクトを `JSON.stringify()` する
+2. `btoa()` で Base64 へ変換する
+3. `encodeURIComponent()` して `q` パラメータへ入れる
+4. ページ読み込み時に `q` をデコードして Store へ復元する
+5. `AdvancedSearchConditionRestorer` が Store の条件を UI へ戻す
+
+URLに載せる条件JSONは 2000 文字を上限にしています。
+上限を超えた場合、検索自体は実行しますが URL には `?mode=advanced` のみを反映します。
+
+## Simple Search
+
+Simple Search の条件は、フラットなURLクエリとして反映されます。
+
+主な関連ファイル:
+
+```txt
+app/frontend/src/components/SearchField/
+app/frontend/src/classes/SideBar.js
+app/frontend/src/classes/PanelView/
+app/frontend/src/store/searchManager.ts
+app/frontend/src/api/fetchData.ts
+```
+
+Simple Search と Advanced Search はどちらも `StoreManager` を経由して検索状態を更新し、`executeSearch()` で API リクエストを行います。
+
+## 参照ゲノム
+
+`TOGOVAR_REFERENCE` によって、参照ゲノム別のデータと生成ページが切り替わります。
+
+| 値 | 主なデータ |
+| --- | --- |
+| `GRCh37` | `app/frontend/assets/GRCh37/*` |
+| `GRCh38` | `app/frontend/assets/GRCh38/*` |
+
+検索条件マスタは以下にあります。
+
+```txt
+app/frontend/assets/GRCh37/advanced_search_conditions.json
+app/frontend/assets/GRCh38/advanced_search_conditions.json
+app/frontend/assets/GRCh37/search_conditions.json
+app/frontend/assets/GRCh38/search_conditions.json
+```
+
+## API通信
+
+検索とダウンロードは TogoVar API にリクエストします。
+
+主な関連ファイル:
+
+```txt
+app/frontend/src/api/fetchData.ts
+app/frontend/src/classes/DownloadButton.ts
+app/frontend/src/global.ts
+```
+
+- Simple Search は GET リクエストで検索条件をクエリパラメータに展開します。
+- Advanced Search は POST リクエストで `body.query` に条件オブジェクトを入れます。
+- ダウンロードは現在の検索モードに応じて、Simple / Advanced の条件を送ります。
+
+## ドキュメントページ
+
+ドキュメントページは `app/frontend/views/doc/` にあります。
+
+```txt
+app/frontend/views/doc/en/
+app/frontend/views/doc/ja/
+```
+
+Webpack設定で、`TOGOVAR_REFERENCE` に応じたページ一覧を `dist/doc/...` へ生成します。
+英語ページは `/doc/{name}/`、日本語ページは `/doc/ja/{name}/` に出力されます。
 
 ## Docker
 
-See [togovar-docker](https://github.com/togovar/togovar-docker) for details.
+Docker を使った開発・運用については [togovar-docker](https://github.com/togovar/togovar-docker) を参照してください。
 
-## Prerequisites
+## README と AGENTS の分担
 
-* ruby 2.7
-* node.js v22.x (LTS) — version is pinned in `.nvmrc`
+READMEに書くもの:
 
-  If you use a version manager, run the following command in the project root to switch automatically:
+- アプリ概要
+- ローカル開発手順
+- 環境変数
+- 検索やURL共有など、人間向けの仕様説明
+- ビルド・検証・運用手順
 
-  | Tool | Command | URL |
-  |------|---------|-----|
-  | nvm  | `nvm use` | https://github.com/nvm-sh/nvm |
-  | fnm  | `fnm use` | https://github.com/Schniz/fnm |
-  | mise | `mise install` | https://github.com/jdx/mise |
+AGENTSに書くもの:
 
-## Configuration
-
-## Development
-
-### Dotenv for development
-
-```dotenv
-# Frontend URL
-TOGOVAR_FRONTEND_URL=https://togovar-stg.biosciencedbc.jp
-# TogoStanza URL instead of relative URL `/stanza`
-TOGOVAR_FRONTEND_STANZA_URL=https://togovar-stg.biosciencedbc.jp/stanza
-
-# (Optional) if this is set, it will be passed to all stanzas as `ep`
-TOGOVAR_STANZA_SPARQL_URL=https://togovar-stg.biosciencedbc.jp/sparql
-# (Optional) if this is set, it will be passed to all stanzas as `sparqlist`
-TOGOVAR_STANZA_SPARQLIST_URL=https://togovar-stg.biosciencedbc.jp/sparqlist
-# (Optional) if this is set, it will be passed to stanzas that require `search` parameter
-TOGOVAR_STANZA_SEARCH_API_URL=https://togovar-stg.biosciencedbc.jp/search
-# (Optional) if this is set, it will be passed to stanzas that require `jbrowse` parameter
-TOGOVAR_STANZA_JBROWSE_URL=https://togovar-stg.biosciencedbc.jp/jbrowse
-```
-
-### Backend
-
-1. First install dependencies:
-
-    ```sh
-    $ bundle install
-    ```
-
-1. Start development server on `localhost:3000`
-
-    ```sh
-    $ rails server
-    ```
-
-### Frontend
-
-1. First install dependencies:
-
-    ```sh
-    $ npm install
-    ```
-
-1. Start development server on `localhost:8000`
-
-    ```sh
-    $ npm start
-    ```
-
-Other commands
-
-* Static code analysis for js and css
-
-    ```sh
-    $ npm run lint
-    ```
-
-* Start production server
-
-    ```sh
-    $ npm run start:prod
-    ```
-
-* Build distribution files
-
-    ```sh
-    $ npm run build
-    ```
+- AIが実装時に守るべき設計方針
+- 変更時の判断基準
+- 間違えやすいデータ名・URL仕様・API方針
+- コード配置ルール
