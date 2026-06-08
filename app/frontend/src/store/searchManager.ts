@@ -228,7 +228,13 @@ export function setAdvancedSearchCondition(newSearchConditions: unknown) {
 
 export function reflectAdvancedSearchConditionToURI() {
   const conditions = storeManager.getData('advancedSearchConditions');
-  const encoded = conditions ? encodeConditionForURL(conditions) : null;
+  // home.js が初期値として {} をセットするため、空オブジェクトは「条件なし」として扱う。
+  const hasConditions =
+    conditions !== null &&
+    conditions !== undefined &&
+    typeof conditions === 'object' &&
+    Object.keys(conditions as object).length > 0;
+  const encoded = hasConditions ? encodeConditionForURL(conditions) : null;
 
   let url: string;
   if (encoded !== null) {
@@ -244,11 +250,8 @@ export function reflectAdvancedSearchConditionToURI() {
   }
 
   // 条件が2000文字以内に収まるようになった場合にフラグを戻す。
-  // conditionsがあるのにencodedがnullの場合のみ超過扱い。
-  storeManager.setData(
-    'advancedSearchURLTooLong',
-    conditions !== null && conditions !== undefined && encoded === null
-  );
+  // hasConditions があるのにencodedがnullの場合のみ超過扱い。
+  storeManager.setData('advancedSearchURLTooLong', hasConditions && encoded === null);
 
   window.history.pushState(_currentUrlParams, '', url);
 }
