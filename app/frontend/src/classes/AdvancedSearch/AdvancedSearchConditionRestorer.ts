@@ -4,13 +4,19 @@ import {
   type ConditionTypeValue,
   type FrequencyDataset,
 } from '../../definition';
+import {
+  PREDICTIONS,
+  type PredictionKey,
+} from '../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
 import { axios } from '../../utils/cachedAxios';
 import type { ConditionGroupView } from '../Condition/ConditionGroupView';
 import type {
   RestoredFrequencyMode,
   RestoredConditionValue,
+  RestoredPredictionValue,
 } from '../Condition/ConditionItemView';
 import type {
+  Inequality,
   LogicalOperator,
   Relation,
   SignificanceSource,
@@ -145,6 +151,9 @@ async function toRestoredItem(
     return restoreSignificanceItem(query.significance);
   }
 
+  const prediction = restorePredictionItem(query);
+  if (prediction) return prediction;
+
   return null;
 }
 
@@ -211,6 +220,74 @@ async function restoreGeneItem(
 function getGeneLabelFromQuery(labels: unknown, geneId: string): string | null {
   if (!isQueryObject(labels)) return null;
   return getString(labels[geneId]);
+}
+
+// Pathogenicity predictionはquery key(alphamissense/sift/polyphen)から共通の条件行へ戻す。
+function restorePredictionItem(query: QueryObject): RestoredItem | null {
+  const predictionKey = getPredictionKey(query);
+  if (!predictionKey) return null;
+
+  const leaf = query[predictionKey];
+  if (!isQueryObject(leaf)) return null;
+
+  const prediction = toRestoredPredictionValue(predictionKey, leaf.score);
+  if (!prediction) return null;
+
+  return {
+    conditionType: CONDITION_TYPE.pathogenicity_prediction,
+    values: [
+      {
+        value: predictionKey,
+        label: PREDICTIONS[predictionKey].label,
+        prediction,
+      },
+    ],
+  };
+}
+
+function getPredictionKey(query: QueryObject): PredictionKey | null {
+  return (Object.keys(PREDICTIONS) as PredictionKey[]).find((key) =>
+    isQueryObject(query[key])
+  ) ?? null;
+}
+
+function toRestoredPredictionValue(
+  dataset: PredictionKey,
+  score: unknown
+): RestoredPredictionValue | null {
+  if (isQueryObject(score)) {
+    return {
+      dataset,
+      values: [getRangeStart(score) ?? 0, getRangeEnd(score) ?? 1],
+      inequalitySigns: [getLeftInequality(score), getRightInequality(score)],
+      includeUnassigned: false,
+      includeUnknown: false,
+    };
+  }
+
+  if (Array.isArray(score)) {
+    return {
+      dataset,
+      values: [0, 0],
+      inequalitySigns: ['gt', 'lt'],
+      includeUnassigned: score.includes('unassigned'),
+      includeUnknown: score.includes('unknown'),
+    };
+  }
+
+  return null;
+}
+
+function getLeftInequality(
+  score: QueryObject
+): Extract<Inequality, 'gte' | 'gt'> {
+  return score.gt === undefined ? 'gte' : 'gt';
+}
+
+function getRightInequality(
+  score: QueryObject
+): Extract<Inequality, 'lte' | 'lt'> {
+  return score.lt === undefined ? 'lte' : 'lt';
 }
 
 async function findGeneSymbolLabel(geneId: string): Promise<string | null> {

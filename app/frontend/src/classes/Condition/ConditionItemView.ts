@@ -26,6 +26,7 @@ import type {
 } from '../../types';
 import type { ConditionItemValueView } from '../../components/ConditionItemValueView';
 import type { FrequencyCountValueView } from '../../components/FrequencyCountValueView';
+import type { PredictionValueView } from '../../components/ConditionPathogenicityPredictionSearch/PredictionValueView';
 
 export type RestoredFrequencyMode =
   Parameters<FrequencyCountValueView['setValues']>[1];
@@ -44,6 +45,15 @@ export type RestoredConditionValue = Readonly<{
   label: string;
   source?: SignificanceSource;
   frequency?: RestoredFrequencyValue;
+  prediction?: RestoredPredictionValue;
+}>;
+
+export type RestoredPredictionValue = Readonly<{
+  dataset: 'alphamissense' | 'sift' | 'polyphen';
+  values: [number, number];
+  inequalitySigns: ['gte' | 'gt', 'lte' | 'lt'];
+  includeUnassigned: boolean;
+  includeUnknown: boolean;
 }>;
 
 /**
@@ -144,6 +154,7 @@ export class ConditionItemView extends BaseConditionView {
       const valueView = this._createRestoredValueView(value);
       this._appendRestoredValueView(valueView, value);
       await this._hydrateNestedValueView(valueView, value);
+      await this._hydratePredictionValueView(valueView, value);
     }
 
     this.rootEl.classList.remove('-editing');
@@ -243,6 +254,31 @@ export class ConditionItemView extends BaseConditionView {
       frequency.to,
       frequency.invert,
       frequency.filtered
+    );
+  }
+
+  private async _hydratePredictionValueView(
+    valueView: ConditionItemValueView,
+    value: RestoredConditionValue
+  ): Promise<void> {
+    if (!value.prediction) return;
+
+    await valueView.updateComplete;
+    const predictionValueView =
+      valueView.shadowRoot?.querySelector<PredictionValueView>(
+        'prediction-value-view'
+      );
+    if (!predictionValueView) return;
+
+    await predictionValueView.updateComplete;
+
+    const prediction = value.prediction;
+    predictionValueView.setValues(
+      prediction.dataset,
+      prediction.values,
+      prediction.inequalitySigns,
+      prediction.includeUnassigned,
+      prediction.includeUnknown
     );
   }
 
