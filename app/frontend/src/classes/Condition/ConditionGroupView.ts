@@ -94,6 +94,23 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
     return item;
   }
 
+  /** URLなどから復元するときに、空の子グループを追加する。 */
+  addEmptyConditionGroup(
+    logicalOperator: LogicalOperator = 'and',
+    referenceElm: Node | null = null
+  ): ConditionGroupView {
+    const group = new ConditionGroupView(
+      this._builder,
+      this._childContainerEl,
+      logicalOperator,
+      [],
+      referenceElm,
+      false
+    );
+    this._syncNumberOfChildren();
+    return group;
+  }
+
   /** Wrap given views into a new subgroup under this group. */
   addNewConditionGroup(
     selected: ConditionView[],
@@ -109,6 +126,14 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
     );
     this._syncNumberOfChildren();
     return group;
+  }
+
+  /** このグループ直下の条件をすべて削除する。 */
+  clearConditionViews(): void {
+    for (const view of [...this.childViews]) {
+      view.remove();
+    }
+    this._syncNumberOfChildren();
   }
 
   /**

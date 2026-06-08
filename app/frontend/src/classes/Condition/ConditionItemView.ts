@@ -8,7 +8,11 @@ import {
 } from '../../conditions';
 import { ADVANCED_CONDITIONS } from '../../global';
 
-import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../../definition';
+import {
+  CONDITION_NODE_KIND,
+  CONDITION_TYPE,
+  type ConditionTypeValue,
+} from '../../definition';
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import { buildQueryFragment } from './queryBuilders';
 import { createEl } from '../../utils/dom/createEl';
@@ -20,6 +24,25 @@ import type {
   ConditionDefinition,
 } from '../../types';
 import type { ConditionItemValueView } from '../../components/ConditionItemValueView';
+import type { FrequencyCountValueView } from '../../components/FrequencyCountValueView';
+
+export type RestoredFrequencyMode =
+  Parameters<FrequencyCountValueView['setValues']>[1];
+
+export type RestoredFrequencyValue = Readonly<{
+  conditionType: 'dataset' | 'genotype';
+  mode: RestoredFrequencyMode;
+  from: number | null;
+  to: number | null;
+  invert: boolean;
+  filtered: boolean;
+}>;
+
+export type RestoredConditionValue = Readonly<{
+  value: string;
+  label: string;
+  frequency?: RestoredFrequencyValue;
+}>;
 
 /**
  * A single condition row with edit/delete behaviors.
@@ -107,6 +130,26 @@ export class ConditionItemView extends BaseConditionView {
     }
   }
 
+  /** URLから復元した値を、この条件行の表示に反映する。 */
+  async hydrateFromRestoredQuery(options: {
+    relation?: Relation;
+    values: RestoredConditionValue[];
+  }): Promise<void> {
+    this._setRelation(options.relation);
+    this._valuesContainerEl.replaceChildren();
+
+    for (const value of options.values) {
+      const valueView = this._createRestoredValueView(value);
+      this._valuesContainerEl.append(valueView);
+      await this._hydrateNestedValueView(valueView, value);
+    }
+
+    this.rootEl.classList.remove('-editing');
+    this._isFirstTime = false;
+    this._toggleGlobalKeydown(false);
+    storeManager.setData('showModal', false);
+  }
+
   // ───────────────────────────────────────────────────────────────────────────
   // Read-only accessors
   // ───────────────────────────────────────────────────────────────────────────
@@ -124,6 +167,43 @@ export class ConditionItemView extends BaseConditionView {
   }
   get keepLastRelation(): Relation {
     return this._keepLastRelation;
+  }
+
+  private _createRestoredValueView(
+    value: RestoredConditionValue
+  ): ConditionItemValueView {
+    const valueView = document.createElement(
+      'condition-item-value-view'
+    ) as ConditionItemValueView;
+    valueView.conditionType = this._conditionType;
+    valueView.value = value.value;
+    valueView.label = value.label;
+    valueView.deleteButton = this._conditionType === CONDITION_TYPE.variant_id;
+    return valueView;
+  }
+
+  private async _hydrateNestedValueView(
+    valueView: ConditionItemValueView,
+    value: RestoredConditionValue
+  ): Promise<void> {
+    if (!value.frequency) return;
+
+    await valueView.updateComplete;
+    const frequencyValueView =
+      valueView.shadowRoot?.querySelector<FrequencyCountValueView>(
+        'frequency-count-value-view'
+      );
+    if (!frequencyValueView) return;
+
+    const frequency = value.frequency;
+    frequencyValueView.setValues(
+      frequency.conditionType,
+      frequency.mode,
+      frequency.from,
+      frequency.to,
+      frequency.invert,
+      frequency.filtered
+    );
   }
 
   // ───────────────────────────────────────────────────────────────────────────

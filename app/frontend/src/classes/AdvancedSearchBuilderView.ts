@@ -1,4 +1,5 @@
 import { setAdvancedSearchCondition } from '../store/searchManager';
+import { storeManager } from '../store/StoreManager';
 import { ConditionGroupView } from './Condition/ConditionGroupView';
 import { type ConditionView, isGroupView } from './Condition/ConditionView';
 import { AdvancedSearchToolbar } from './AdvancedSearchToolbar';
@@ -9,6 +10,7 @@ import {
   getSelectionCapabilities,
   type SelectionCapabilities,
 } from './AdvancedSearchSelectionCapabilities';
+import { restoreAdvancedSearchCondition } from './AdvancedSearchConditionRestorer';
 
 /**
  * 高度検索ビルダー全体を管理する View。
@@ -47,6 +49,7 @@ export class AdvancedSearchBuilderView {
     );
     this._selection = new AdvancedSearchSelection(this);
     this.onSelectionChange([]);
+    void this._restoreConditionFromStore();
   }
 
   /** 旧実装との互換用。既存の呼び出し元が残っている可能性がある。 */
@@ -141,6 +144,16 @@ export class AdvancedSearchBuilderView {
   private _submitAdvancedSearchCondition(): void {
     const query = this._rootGroup.queryFragment;
     setAdvancedSearchCondition(query);
+  }
+
+  /** URLなどからストアへ復元済みの条件を、Builderの表示へ反映する。 */
+  private async _restoreConditionFromStore(): Promise<void> {
+    const query = storeManager.getData('advancedSearchConditions');
+    if (!query || typeof query !== 'object' || Object.keys(query).length === 0)
+      return;
+
+    await restoreAdvancedSearchCondition(this._rootGroup, query);
+    this.onSelectionChange([]);
   }
 
   /**

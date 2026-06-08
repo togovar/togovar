@@ -92,7 +92,8 @@ function readyInitialSearch(callback) {
   // URLパラメータから検索条件を復元
   const currentSearchMode = storeManager.getData('searchMode');
   const simpleSearchConditions = {};
-  const advancedSearchConditions = {};
+  const advancedSearchConditions =
+    storeManager.getData('advancedSearchConditions') || {};
 
   // URLパラメータからシンプル検索条件を抽出
   switch (currentSearchMode) {
@@ -103,7 +104,7 @@ function readyInitialSearch(callback) {
       );
       break;
     case 'advanced':
-      // advanced用の条件抽出を追加
+      // initializeApp() で `q` から復元済みの条件をそのまま使う
       break;
   }
 

@@ -6,13 +6,9 @@ import type {
   MasterConditionId,
   SimpleSearchCurrentConditions,
 } from '../types';
+import { encodeConditionForURL } from './advancedSearchURL';
 
 let _currentUrlParams = qs.parse(window.location.search.substring(1));
-
-// 初期化処理を遅延実行
-setTimeout(() => {
-  initializeSearchMode();
-}, 100);
 
 /** デフォルト値と異なる検索条件を抽出 */
 export function extractSearchCondition(
@@ -193,13 +189,13 @@ export function handleHistoryChange(_e: PopStateEvent) {
 //   条件なし: ?mode=advanced
 //
 // ### エンコード方式
-//   条件オブジェクト → JSON.stringify() → btoa() (Base64) → `q` パラメータ
+//   条件オブジェクト → JSON.stringify() → btoa() (Base64) → encodeURIComponent() → `q` パラメータ
 //   例: { and: [{ gene: { relation: "eq", terms: [123] } }] }
 //       → '{"and":[{"gene":{"relation":"eq","terms":[123]}}]}'
 //       → "eyJhbmQiOlt7Imdlbm..."
 //
 // ### デコード方式
-//   `q` パラメータ → atob() → JSON.parse() → 条件オブジェクトとして復元
+//   `q` パラメータ → decode済み文字列 → atob() → JSON.parse() → 条件オブジェクトとして復元
 //
 // ### 文字数制限
 //   - Raw JSON (btoa前) が 2000文字以内の場合のみ `q` パラメータをURLに付与する
@@ -212,7 +208,7 @@ export function handleHistoryChange(_e: PopStateEvent) {
 //   3. 検索自体は正常に実行される
 //
 // ### ページ読み込み時の復元
-//   1. initializeSearchMode() で `?q=` を読み取り、デコードしてストアに保存
+//   1. initializeApp() で `?q=` を読み取り、デコードしてストアに保存
 //   2. AdvancedSearchBuilderView の初期化時にストアから条件を読み取り、Viewを再構築
 //
 // ### Simple Searchとの比較
@@ -230,35 +226,6 @@ export function setAdvancedSearchCondition(newSearchConditions: unknown) {
   executeSearch(0, true);
 }
 
-/** Advanced Search条件のURLエンコード上限（Raw JSON文字数） */
-export const ADVANCED_SEARCH_URL_MAX_JSON_LENGTH = 2000;
-
-/**
- * Advanced Search条件をURLの `q` パラメータ用にエンコードする。
- * JSON.stringify → btoa (Base64) の順で変換する。
- * Raw JSONが上限を超える場合は null を返す。
- *
- * 将来 lz-string による圧縮に切り替える場合はこの関数のみ変更する。
- */
-export function encodeConditionForURL(query: unknown): string | null {
-  const json = JSON.stringify(query);
-  if (json.length > ADVANCED_SEARCH_URL_MAX_JSON_LENGTH) return null;
-  return btoa(json);
-}
-
-/**
- * URLの `q` パラメータをAdvanced Search条件にデコードする。
- * atob (Base64) → JSON.parse の順で変換する。
- * デコードや Parse に失敗した場合は null を返す。
- */
-export function decodeConditionFromURL(encoded: string): unknown | null {
-  try {
-    return JSON.parse(atob(encoded));
-  } catch {
-    return null;
-  }
-}
-
 export function reflectAdvancedSearchConditionToURI() {
   const conditions = storeManager.getData('advancedSearchConditions');
   const encoded = conditions ? encodeConditionForURL(conditions) : null;
@@ -266,7 +233,9 @@ export function reflectAdvancedSearchConditionToURI() {
   let url: string;
   if (encoded !== null) {
     // 条件をBase64エンコードしてURLに付与
-    url = `${window.location.origin}${window.location.pathname}?mode=advanced&q=${encoded}`;
+    url = `${window.location.origin}${
+      window.location.pathname
+    }?mode=advanced&q=${encodeURIComponent(encoded)}`;
     _currentUrlParams = { mode: 'advanced', q: encoded };
   } else {
     // 条件なし、または2000文字超過のためURLには mode のみ
@@ -280,27 +249,4 @@ export function reflectAdvancedSearchConditionToURI() {
   }
 
   window.history.pushState(_currentUrlParams, '', url);
-}
-
-// アプリケーション初期化時
-function initializeSearchMode() {
-  const searchParams = new URLSearchParams(window.location.search);
-  const urlMode = searchParams.get('mode');
-
-  // URLのモードパラメータに基づいて検索モードを設定
-  if (urlMode === 'advanced') {
-    storeManager.setData('searchMode', 'advanced');
-
-    // `q` パラメータがあれば条件を復元してストアに保存
-    const encodedCondition = searchParams.get('q');
-    if (encodedCondition) {
-      const condition = decodeConditionFromURL(encodedCondition);
-      if (condition !== null) {
-        storeManager.setData('advancedSearchConditions', condition);
-        storeManager.setData('advancedSearchRestoredFromURL', true);
-      }
-    }
-  } else {
-    storeManager.setData('searchMode', 'simple');
-  }
 }

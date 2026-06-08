@@ -31,6 +31,11 @@ export interface GroupView extends ConditionView {
     _referenceElm?: Node | null,
     _options?: unknown
   ): ConditionView;
+  addEmptyConditionGroup?(
+    _logicalOperator?: 'and' | 'or',
+    _referenceElm?: Node | null
+  ): GroupView;
+  clearConditionViews?(): void;
   ungroup(): void;
   readonly conditionNodeKind: typeof CONDITION_NODE_KIND.group;
   readonly container: HTMLElement;
