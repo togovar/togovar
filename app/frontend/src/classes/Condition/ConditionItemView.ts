@@ -22,6 +22,7 @@ import type {
   ConditionQuery,
   Relation,
   ConditionDefinition,
+  SignificanceSource,
 } from '../../types';
 import type { ConditionItemValueView } from '../../components/ConditionItemValueView';
 import type { FrequencyCountValueView } from '../../components/FrequencyCountValueView';
@@ -41,6 +42,7 @@ export type RestoredFrequencyValue = Readonly<{
 export type RestoredConditionValue = Readonly<{
   value: string;
   label: string;
+  source?: SignificanceSource;
   frequency?: RestoredFrequencyValue;
 }>;
 
@@ -140,7 +142,7 @@ export class ConditionItemView extends BaseConditionView {
 
     for (const value of options.values) {
       const valueView = this._createRestoredValueView(value);
-      this._valuesContainerEl.append(valueView);
+      this._appendRestoredValueView(valueView, value);
       await this._hydrateNestedValueView(valueView, value);
     }
 
@@ -180,6 +182,44 @@ export class ConditionItemView extends BaseConditionView {
     valueView.label = value.label;
     valueView.deleteButton = this._conditionType === CONDITION_TYPE.variant_id;
     return valueView;
+  }
+
+  private _appendRestoredValueView(
+    valueView: ConditionItemValueView,
+    value: RestoredConditionValue
+  ): void {
+    if (this._conditionType === CONDITION_TYPE.significance && value.source) {
+      this._getSignificanceValueContainer(value.source).append(valueView);
+      return;
+    }
+
+    this._valuesContainerEl.append(valueView);
+  }
+
+  private _getSignificanceValueContainer(
+    source: SignificanceSource
+  ): HTMLElement {
+    const wrapperClass = `${source}-wrapper`;
+    const conditionWrapperClass = `${source}-condition-wrapper`;
+
+    const existing = this._valuesContainerEl.querySelector<HTMLElement>(
+      `.${wrapperClass} > .${conditionWrapperClass}`
+    );
+    if (existing) return existing;
+
+    const outer = document.createElement('div');
+    outer.classList.add(wrapperClass);
+
+    const label = document.createElement('span');
+    label.classList.add(source);
+    label.textContent = source === 'mgend' ? 'MGeND' : 'Clinvar';
+
+    const container = document.createElement('div');
+    container.classList.add(conditionWrapperClass);
+
+    outer.append(label, container);
+    this._valuesContainerEl.append(outer);
+    return container;
   }
 
   private async _hydrateNestedValueView(

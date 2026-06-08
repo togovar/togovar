@@ -9,7 +9,11 @@ import type {
   RestoredFrequencyMode,
   RestoredConditionValue,
 } from '../Condition/ConditionItemView';
-import type { LogicalOperator, Relation } from '../../types';
+import type {
+  LogicalOperator,
+  Relation,
+  SignificanceSource,
+} from '../../types';
 
 type QueryObject = Record<string, unknown>;
 
@@ -128,11 +132,7 @@ function toRestoredItem(query: QueryObject): RestoredItem | null {
   }
 
   if (isQueryObject(query.significance)) {
-    return restoreTermItem(
-      CONDITION_TYPE.significance,
-      query.significance,
-      false
-    );
+    return restoreSignificanceItem(query.significance);
   }
 
   return null;
@@ -251,6 +251,44 @@ function restoreLocationItem(location: QueryObject): RestoredItem | null {
     conditionType: CONDITION_TYPE.location,
     values: [makeValue(value)],
   };
+}
+
+// Clinical significanceはsourceごとに表示ラベル(MGeND/ClinVar)とqueryを分ける必要がある。
+function restoreSignificanceItem(
+  significance: QueryObject
+): RestoredItem | null {
+  const terms = significance.terms;
+  if (!Array.isArray(terms)) return null;
+
+  const sources = getSignificanceSources(significance.source);
+  if (sources.length === 0) return null;
+
+  const relation = significance.relation === 'ne' ? 'ne' : 'eq';
+  return {
+    conditionType: CONDITION_TYPE.significance,
+    relation,
+    values: sources.flatMap((source) =>
+      terms.map((term) => {
+        const value = String(term);
+        return {
+          ...makeValue(
+            value,
+            findConditionLabel(CONDITION_TYPE.significance, value)
+          ),
+          source,
+        };
+      })
+    ),
+  };
+}
+
+function getSignificanceSources(source: unknown): SignificanceSource[] {
+  if (!Array.isArray(source)) return [];
+
+  return source.filter(
+    (item): item is SignificanceSource =>
+      item === 'mgend' || item === 'clinvar'
+  );
 }
 
 // relationとtermsを持つ標準的な条件を、共通の表示値配列へ戻す。
