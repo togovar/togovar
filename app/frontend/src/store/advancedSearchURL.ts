@@ -7,9 +7,14 @@ export const ADVANCED_SEARCH_URL_MAX_JSON_LENGTH = 2000;
  * Raw JSONが上限を超える場合は null を返す。
  */
 export function encodeConditionForURL(query: unknown): string | null {
-  const json = JSON.stringify(query);
-  if (json.length > ADVANCED_SEARCH_URL_MAX_JSON_LENGTH) return null;
-  return btoa(json);
+  try {
+    const json = JSON.stringify(query);
+    if (typeof json !== 'string') return null;
+    if (json.length > ADVANCED_SEARCH_URL_MAX_JSON_LENGTH) return null;
+    return btoa(json);
+  } catch {
+    return null;
+  }
 }
 
 /**
