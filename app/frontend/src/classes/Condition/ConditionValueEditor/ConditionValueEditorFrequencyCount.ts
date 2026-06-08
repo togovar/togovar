@@ -630,21 +630,35 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   changeParameter(newCondition: RangeSliderData): void {
     if (!this._rangeSelectorView) return;
 
-    this._hasUserChangedCondition = true;
-
-    if (newCondition.from !== undefined) {
-      this._condition.frequency.from = newCondition.from;
-    }
-    if (newCondition.to !== undefined) {
-      this._condition.frequency.to = newCondition.to;
-    }
-    if (newCondition.invert !== undefined) {
-      // Convert string/boolean to boolean for consistent internal state
-      this._condition.frequency.invert =
-        typeof newCondition.invert === 'string'
+    // RangeSliderView は初期化時にも range-changed を発火するため、
+    // 実際に値が変わったときだけ「ユーザーが変更した」扱いにする。
+    const nextFrom =
+      newCondition.from !== undefined
+        ? newCondition.from
+        : this._condition.frequency.from;
+    const nextTo =
+      newCondition.to !== undefined
+        ? newCondition.to
+        : this._condition.frequency.to;
+    const nextInvert =
+      newCondition.invert !== undefined
+        ? typeof newCondition.invert === 'string'
           ? newCondition.invert === '1' || newCondition.invert === 'true'
-          : Boolean(newCondition.invert);
+          : Boolean(newCondition.invert)
+        : this._condition.frequency.invert;
+
+    const changed =
+      nextFrom !== this._condition.frequency.from ||
+      nextTo !== this._condition.frequency.to ||
+      nextInvert !== this._condition.frequency.invert;
+
+    if (changed) {
+      this._hasUserChangedCondition = true;
     }
+
+    this._condition.frequency.from = nextFrom;
+    this._condition.frequency.to = nextTo;
+    this._condition.frequency.invert = nextInvert;
     this._update();
   }
 
