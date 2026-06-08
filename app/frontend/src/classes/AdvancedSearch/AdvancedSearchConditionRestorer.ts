@@ -1,15 +1,15 @@
-import { ADVANCED_CONDITIONS } from '../global';
+import { ADVANCED_CONDITIONS } from '../../global';
 import {
   CONDITION_TYPE,
   type ConditionTypeValue,
   type FrequencyDataset,
-} from '../definition';
-import type { ConditionGroupView } from './Condition/ConditionGroupView';
+} from '../../definition';
+import type { ConditionGroupView } from '../Condition/ConditionGroupView';
 import type {
   RestoredFrequencyMode,
   RestoredConditionValue,
-} from './Condition/ConditionItemView';
-import type { LogicalOperator, Relation } from '../types';
+} from '../Condition/ConditionItemView';
+import type { LogicalOperator, Relation } from '../../types';
 
 type QueryObject = Record<string, unknown>;
 

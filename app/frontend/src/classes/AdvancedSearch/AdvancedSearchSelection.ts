@@ -1,6 +1,6 @@
-import { selectRequired } from '../utils/dom/select';
+import { selectRequired } from '../../utils/dom/select';
 import type { AdvancedSearchBuilderView } from './AdvancedSearchBuilderView';
-import { type ConditionView, viewByEl } from './Condition/ConditionView';
+import { type ConditionView, viewByEl } from '../Condition/ConditionView';
 
 /** 選択中の条件 View を取得するセレクタ。グループと条件項目で共通のクラスを使う。 */
 const SELECTED_SEL =

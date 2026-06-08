@@ -1,11 +1,11 @@
-import { setAdvancedSearchCondition } from '../store/searchManager';
-import { storeManager } from '../store/StoreManager';
-import { ConditionGroupView } from './Condition/ConditionGroupView';
-import { type ConditionView, isGroupView } from './Condition/ConditionView';
+import { setAdvancedSearchCondition } from '../../store/searchManager';
+import { storeManager } from '../../store/StoreManager';
+import { ConditionGroupView } from '../Condition/ConditionGroupView';
+import { type ConditionView, isGroupView } from '../Condition/ConditionView';
 import { AdvancedSearchToolbar } from './AdvancedSearchToolbar';
 import { AdvancedSearchSelection } from './AdvancedSearchSelection';
-import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../definition';
-import { selectRequired } from '../utils/dom/select';
+import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../../definition';
+import { selectRequired } from '../../utils/dom/select';
 import {
   getSelectionCapabilities,
   type SelectionCapabilities,

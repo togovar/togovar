@@ -1,8 +1,8 @@
-import { ADVANCED_CONDITIONS } from '../global';
-import { createEl } from '../utils/dom/createEl';
+import { ADVANCED_CONDITIONS } from '../../global';
+import { createEl } from '../../utils/dom/createEl';
 import type { AdvancedSearchBuilderView } from './AdvancedSearchBuilderView';
-import type { ConditionTypeValue } from '../definition';
-import type { Command, CommandDef } from '../types';
+import type { ConditionTypeValue } from '../../definition';
+import type { Command, CommandDef } from '../../types';
 
 const COMMANDS: ReadonlyArray<CommandDef> = [
   { command: 'group', label: 'Group', shortcut: [71] }, // G

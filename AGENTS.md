@@ -55,6 +55,7 @@ app/frontend/
 ```
 
 - 既存のViewクラスは `app/frontend/src/classes/` に置く。
+- Advanced Search 本体の制御ファイルは `app/frontend/src/classes/AdvancedSearch/` に置く。
 - Lit/Web Components は `app/frontend/src/components/` に置く。
 - StoreやURL反映など、アプリ状態に関わる処理は `app/frontend/src/store/` に置く。
 - DOM生成の小さな共通処理は `app/frontend/src/utils/dom/` の既存ヘルパーを優先する。
@@ -64,16 +65,16 @@ app/frontend/
 ## Advanced Search 方針
 
 - Advanced Search のUIは主に以下で構成される。
-  - `AdvancedSearchBuilderView.ts`: 全体管理、条件変更、検索条件送信
-  - `AdvancedSearchSelection.ts`: 条件Viewの選択状態管理
-  - `AdvancedSearchToolbar.ts`: ツールバーDOMとコマンド委譲
+  - `classes/AdvancedSearch/AdvancedSearchBuilderView.ts`: 全体管理、条件変更、検索条件送信
+  - `classes/AdvancedSearch/AdvancedSearchSelection.ts`: 条件Viewの選択状態管理
+  - `classes/AdvancedSearch/AdvancedSearchToolbar.ts`: ツールバーDOMとコマンド委譲
   - `ConditionGroupView.ts`: AND/ORグループ
   - `ConditionItemView.ts`: 1条件行
   - `ConditionValues.ts` と `ConditionValueEditor/*`: 条件入力UI
 - 条件の検索クエリ化は `classes/Condition/queryBuilders/` に集約する。
 - Advanced Search のURL共有は `?mode=advanced&q=<Base64 JSON>` を使う。
   - encode/decode処理は `app/frontend/src/store/advancedSearchURL.ts` に集約する。
-  - URLから復元した条件をViewへ戻す処理は `AdvancedSearchConditionRestorer.ts` を確認する。
+  - URLから復元した条件をViewへ戻す処理は `classes/AdvancedSearch/AdvancedSearchConditionRestorer.ts` を確認する。
   - Base64はURL中で壊れやすいため、生成時は `encodeURIComponent` を通す。
 - `setAdvancedSearchCondition()` は検索条件をStoreへ保存し、URLへ反映し、検索を実行する。呼び出しタイミングを増やす場合は二重検索に注意する。
 - 条件UIを変更した場合は、検索クエリ、URL共有、URL復元の3点が同じ構造を扱えるか確認する。

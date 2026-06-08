@@ -16,7 +16,7 @@ import {
 import { keyDownEvent } from '../../utils/keyDownEvent.js';
 import { buildQueryFragment } from './queryBuilders';
 import { createEl } from '../../utils/dom/createEl';
-import type { AdvancedSearchBuilderView } from '../AdvancedSearchBuilderView';
+import type { AdvancedSearchBuilderView } from '../AdvancedSearch/AdvancedSearchBuilderView';
 import type { ConditionGroupView } from './ConditionGroupView';
 import type {
   ConditionQuery,

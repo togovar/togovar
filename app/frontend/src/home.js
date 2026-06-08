@@ -293,7 +293,7 @@ function loadAdvancedSearchBuilderView() {
 
   advancedSearchBuilderViewPromise = import(
     /* webpackChunkName: "advanced-search" */
-    '../src/classes/AdvancedSearchBuilderView.ts'
+    '../src/classes/AdvancedSearch/AdvancedSearchBuilderView.ts'
   )
     .then(({ AdvancedSearchBuilderView }) => {
       advancedSearchBuilderView = new AdvancedSearchBuilderView(

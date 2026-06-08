@@ -1,5 +1,5 @@
-import { CONDITION_NODE_KIND } from '../definition';
-import type { ConditionView, GroupView } from './Condition/ConditionView';
+import { CONDITION_NODE_KIND } from '../../definition';
+import type { ConditionView, GroupView } from '../Condition/ConditionView';
 
 export type SelectionCapabilities = Readonly<{
   canDelete: boolean;
