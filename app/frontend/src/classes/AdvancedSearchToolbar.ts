@@ -8,38 +8,38 @@ const COMMANDS: ReadonlyArray<CommandDef> = [
   { command: 'group', label: 'Group', shortcut: [71] }, // G
   { command: 'ungroup', label: 'Ungroup', shortcut: [16, 71] }, // Shift + G
   { command: 'delete', label: 'Delete', shortcut: [46] }, // Del
-  // TODO: These are currently unused, but may be implemented in the future.
+  // TODO: copy/edit は現在未使用。実装時に COMMANDS へ戻す。
   // { command: 'copy', label: 'Copy', shortcut: [67] },
   // { command: 'edit', label: 'Edit', shortcut: [69] },
 ];
 
 type ToolbarCommand = Exclude<Command, 'add-condition'>;
 
-/** Formats a shortcut label from key codes. */
+/** 表示用のショートカット文字列を keyCode から作る。 */
 function formatShortcut(codes: number[]): string {
-  // Minimal mapping; extend as needed.
+  // 必要なキーだけを明示する。未定義のキーは英字として扱う。
   const map: Record<number, string> = { 16: 'Shift', 46: 'Del' };
   const parts = codes.map((c) => map[c] ?? String.fromCharCode(c));
   return parts.join('+');
 }
 
 /**
- * Represents the toolbar for advanced search functionality.
- * This class initializes the toolbar UI, handles user interactions,
- * and delegates commands to the AdvancedSearchBuilderView.
+ * 高度検索ツールバーを管理する。
+ *
+ * DOM の構築、クリック/キーボード操作の受付、Builder へのコマンド委譲を担当する。
  */
 export class AdvancedSearchToolbar {
   private _builder: AdvancedSearchBuilderView;
   private _toolbar: HTMLElement;
-  private _usesSignal = false; // set true only if addEventListener with {signal} succeeded
-  private _disposed = false; // guard against multiple destroy() calls
+  private _usesSignal = false;
+  private _disposed = false;
   private readonly _commandEnabled: Record<ToolbarCommand, boolean> = {
     group: false,
     ungroup: false,
     delete: false,
   };
 
-  /** One controller to remove all listeners on destroy. */
+  /** destroy 時にイベントリスナーをまとめて解除するための Controller。 */
   private readonly _events = new AbortController();
 
   constructor(builder: AdvancedSearchBuilderView, toolbar: HTMLElement) {
@@ -50,23 +50,38 @@ export class AdvancedSearchToolbar {
     this._attachEventDelegation();
   }
 
-  // =========================================================
-  // DOM Creation
-  // =========================================================
-
-  /** Build the toolbar DOM once. */
+  /** ツールバーの DOM を一度だけ構築する。 */
   private _initializeToolbar(): void {
     const root = this._toolbar;
     root.classList.add('advanced-search-toolbar');
 
-    // Build "Add condition" items
-    const addItems = Object.keys(ADVANCED_CONDITIONS).map((key, index) => {
+    const addConditionMenu = createEl('li', {
+      class: '-haschild',
+      children: [
+        createEl('p', { text: 'Add condition' }),
+        createEl('ul', { children: this._createAddConditionItems() }),
+      ],
+    });
+
+    root.replaceChildren(
+      createEl('ul', {
+        children: [addConditionMenu, ...this._createCommandItems()],
+      })
+    );
+  }
+
+  /** 条件追加メニューの項目を作る。 */
+  private _createAddConditionItems(): HTMLLIElement[] {
+    return Object.keys(ADVANCED_CONDITIONS).map((conditionType, index) => {
       const condition =
-        ADVANCED_CONDITIONS[key as keyof typeof ADVANCED_CONDITIONS];
-      const label: string =
-        (condition && typeof condition === 'object' && 'label' in condition
+        ADVANCED_CONDITIONS[
+          conditionType as keyof typeof ADVANCED_CONDITIONS
+        ];
+      const label =
+        condition && typeof condition === 'object' && 'label' in condition
           ? String(condition.label)
-          : key) ?? key;
+          : conditionType;
+      const shortcut = String(index + 1);
 
       return createEl('li', {
         children: [
@@ -75,8 +90,8 @@ export class AdvancedSearchToolbar {
             attrs: { type: 'button' },
             dataset: {
               command: 'add-condition',
-              condition: key,
-              shortcut: String(index + 1),
+              condition: conditionType,
+              shortcut,
             },
             children: [
               createEl('span', { text: label }),
@@ -84,7 +99,7 @@ export class AdvancedSearchToolbar {
                 class: 'shortcut',
                 children: [
                   createEl('span', { class: ['char', '-command'] }),
-                  String(index + 1),
+                  shortcut,
                 ],
               }),
             ],
@@ -92,18 +107,11 @@ export class AdvancedSearchToolbar {
         ],
       });
     });
+  }
 
-    // Wrap the add-condition submenu
-    const liAdd = createEl('li', {
-      class: '-haschild',
-      children: [
-        createEl('p', { text: 'Add condition' }),
-        createEl('ul', { children: addItems }),
-      ],
-    });
-
-    // Build command items (group / ungroup / delete)
-    const commandLis = COMMANDS.map((cmd) =>
+  /** グループ化/解除/削除コマンドの項目を作る。 */
+  private _createCommandItems(): HTMLLIElement[] {
+    return COMMANDS.map((cmd) =>
       createEl('li', {
         children: [
           createEl('button', {
@@ -120,7 +128,7 @@ export class AdvancedSearchToolbar {
                 class: 'shortcut',
                 children: [
                   createEl('span', { class: ['char', '-command'] }),
-                  String(formatShortcut(cmd.shortcut)),
+                  formatShortcut(cmd.shortcut),
                 ],
               }),
             ],
@@ -128,14 +136,9 @@ export class AdvancedSearchToolbar {
         ],
       })
     );
-
-    // Root <ul> with both sections
-    const ul = createEl('ul', { children: [liAdd, ...commandLis] });
-
-    // Hydrate toolbar
-    root.replaceChildren(ul);
   }
 
+  /** Builder から受け取った操作可否をボタン状態へ反映する。 */
   setCommandStates(states: Partial<Record<ToolbarCommand, boolean>>): void {
     for (const command of Object.keys(states) as ToolbarCommand[]) {
       const enabled = states[command] === true;
@@ -151,13 +154,8 @@ export class AdvancedSearchToolbar {
     }
   }
 
-  // =========================================================
-  // Event Handling
-  // =========================================================
-
-  /** One delegated click handler for the whole toolbar. */
+  /** ツールバー全体で共有する click ハンドラ。 */
   private _onClick = (e: Event) => {
-    // Ignore non-primary buttons (e.g., right/middle click) for MouseEvent.
     if (e instanceof MouseEvent && e.button !== 0) return;
 
     const target = e.target;
@@ -165,7 +163,6 @@ export class AdvancedSearchToolbar {
     const cmdEl = target.closest<HTMLElement>('.command');
     if (!cmdEl) return;
 
-    // Stop bubbling beyond the toolbar (but keep other toolbar listeners alive).
     e.stopPropagation();
 
     if (cmdEl instanceof HTMLButtonElement && cmdEl.disabled) return;
@@ -177,19 +174,17 @@ export class AdvancedSearchToolbar {
     this._handleCommand(command, condition, e);
   };
 
-  /** Keyboard activation for accessibility: Enter/Space triggers the same action. */
+  /** アクセシビリティ用。Enter/Space で click と同じ処理を実行する。 */
   private _onKeydown = (e: KeyboardEvent) => {
     const target = e.target;
     if (!(target instanceof Element)) return;
 
-    // Native buttons already provide Enter/Space activation.
+    // button 要素はブラウザ標準で Enter/Space に対応している。
     if (target instanceof HTMLButtonElement) return;
 
-    // Only handle focused .command items.
     const cmdEl = target.closest<HTMLElement>('.command');
     if (!cmdEl) return;
 
-    // Activate on Enter or Space (Space also prevents page scroll).
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       e.stopPropagation();
@@ -204,7 +199,7 @@ export class AdvancedSearchToolbar {
     }
   };
 
-  /** Event delegation: set up click + keyboard once on the toolbar. */
+  /** click と keydown をツールバーへ一度だけ委譲登録する。 */
   private _attachEventDelegation(): void {
     try {
       this._toolbar.addEventListener('click', this._onClick, {
@@ -215,7 +210,7 @@ export class AdvancedSearchToolbar {
       });
       this._usesSignal = true;
     } catch {
-      // Older envs without AbortController on addEventListener.
+      // 古い環境では addEventListener の signal オプションが使えない。
       this._toolbar.addEventListener('click', this._onClick);
       this._toolbar.addEventListener('keydown', this._onKeydown);
       this._usesSignal = false;
@@ -223,22 +218,22 @@ export class AdvancedSearchToolbar {
   }
 
   /**
-   * Execute a command based on user interaction.
-   * @param command - Command identifier (click target).
-   * @param condition - Condition type (only for 'add-condition').
-   * @param event - Original event (may carry CustomEvent detail).
+   * ユーザー操作から得たコマンドを実行する。
+   *
+   * @param command 実行するコマンド
+   * @param conditionType add-condition の場合に追加する条件種別
+   * @param event 元イベント。CustomEvent の detail を初期値として渡すことがある
    */
   private _handleCommand(
     command: Command,
-    ConditionTypeValue: ConditionTypeValue | undefined,
+    conditionType: ConditionTypeValue | undefined,
     event?: Event
   ): void {
     switch (command) {
       case 'add-condition': {
-        if (!ConditionTypeValue) return;
-        // Pass CustomEvent detail (e.g., from karyotype selection) if available
+        if (!conditionType) return;
         const options = event instanceof CustomEvent ? event.detail : undefined;
-        this._builder.addCondition(ConditionTypeValue, options);
+        this._builder.addCondition(conditionType, options);
         break;
       }
       case 'group':
@@ -255,7 +250,7 @@ export class AdvancedSearchToolbar {
           this._builder.selection.getSelectedConditionViews()
         );
         break;
-      // TODO: Future commands (copy/edit) may be added here.
+      // TODO: copy/edit を復活させる場合はここに分岐を追加する。
     }
   }
 
@@ -263,19 +258,12 @@ export class AdvancedSearchToolbar {
     return command === 'add-condition' || this._commandEnabled[command] === true;
   }
 
-  // =========================================================
-  // Lifecycle
-  // =========================================================
-
-  // TODO: This feature is not currently implemented, but we intend to implement it in the future, so we will leave it uncommented.
   /**
-   * Clean up all resources and prevent memory leaks.
-   * Call this method when the toolbar component is no longer needed.
+   * ツールバーが不要になったときに、イベントリスナーと DOM を片付ける。
    */
   destroy(options?: { clearDom?: boolean }): void {
     if (this._disposed) return;
 
-    // Remove listeners
     if (this._usesSignal) {
       this._events.abort();
     } else {
@@ -283,12 +271,11 @@ export class AdvancedSearchToolbar {
       this._toolbar.removeEventListener('keydown', this._onKeydown);
     }
 
-    // Optional: clear toolbar contents if this instance owns the DOM
     if (options?.clearDom) {
       this._toolbar.replaceChildren();
     }
 
-    // Drop references to help GC (no re-init assumed)
+    // 再初期化は想定していないため、参照を落として GC しやすくする。
     this._builder = null!;
     this._toolbar = null!;
     this._disposed = true;

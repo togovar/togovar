@@ -2,28 +2,28 @@ import { selectRequired } from '../utils/dom/select';
 import type { AdvancedSearchBuilderView } from './AdvancedSearchBuilderView';
 import { type ConditionView, viewByEl } from './Condition/ConditionView';
 
-/** CSS selector for “selected” views (group or item share this base class). */
+/** 選択中の条件 View を取得するセレクタ。グループと条件項目で共通のクラスを使う。 */
 const SELECTED_SEL =
   '.advanced-search-condition-view[aria-selected="true"]' as const;
 
-/** ARIA attribute used to indicate selection state. */
+/** 選択状態を表す ARIA 属性。 */
 const ARIA_SELECTED = 'aria-selected';
 
 const ROOT_CONTAINER_SEL =
   ':scope > .advanced-search-condition-group-view.-root > .container' as const;
 
 /**
- * Manages multi-selection for Advanced Search.
+ * 高度検索の複数選択を管理する。
  *
- * Source of truth is the DOM:
- * - Selected elements are marked with `aria-selected="true"`.
- * - We resolve DOM → View via the global `viewByEl` map (no custom HTMLElement fields).
+ * 選択状態の正本は DOM。
+ * - 選択中の要素には `aria-selected="true"` を付ける
+ * - DOM から View への変換は `viewByEl` で行う
  *
- * Results are returned in **document order**.
- * This class only manages state & notifications; visuals are handled by CSS.
+ * 取得結果は document order で返す。
+ * このクラスは状態更新と通知だけを担当し、見た目は CSS に任せる。
  */
 export class AdvancedSearchSelection {
-  private readonly _builder: AdvancedSearchBuilderView; // Owning view that reacts to selection changes.
+  private readonly _builder: AdvancedSearchBuilderView;
   private readonly _rootContainer: HTMLElement;
 
   constructor(builder: AdvancedSearchBuilderView) {
@@ -34,7 +34,7 @@ export class AdvancedSearchSelection {
     );
   }
 
-  /** Return selected ConditionView instances in document order. */
+  /** 選択中の ConditionView を document order で返す。 */
   getSelectedConditionViews(): ConditionView[] {
     const els = Array.from(this._selectedNodeList());
     els.sort((a, b) => {
@@ -49,8 +49,10 @@ export class AdvancedSearchSelection {
   }
 
   /**
-   * Select a view. Optionally clear previous selection.
-   * To preserve legacy behavior, we only keep selections under the **same parent container**.
+   * View を選択する。
+   *
+   * 既存挙動に合わせ、複数選択は同じ親コンテナ配下だけに限定する。
+   * `deselectSelecting` が true の場合は、選択前に既存選択をすべて解除する。
    */
   selectConditionView(
     view: ConditionView,
@@ -58,7 +60,6 @@ export class AdvancedSearchSelection {
   ): void {
     if (deselectSelecting) this.deselectAllConditions();
 
-    // Keep only sibling selections (same parent element).
     const parentEl = view.rootEl.parentElement;
     const existing = this.getSelectedConditionViews();
     for (const v of existing) {
@@ -69,13 +70,13 @@ export class AdvancedSearchSelection {
     this._notifyBuilder();
   }
 
-  /** Deselect a single view. */
+  /** 指定した View の選択を解除する。 */
   deselectConditionView(view: ConditionView): void {
     this._unmarkSelected(view);
     this._notifyBuilder();
   }
 
-  /** Deselect all selected views within the boundary. */
+  /** 管理範囲内の選択をすべて解除する。 */
   deselectAllConditions(): void {
     const nodes = this._selectedNodeList();
     nodes.forEach((el) => {
@@ -85,28 +86,24 @@ export class AdvancedSearchSelection {
     this._notifyBuilder();
   }
 
-  // ─────────────────────────────────────────────────────────
-  // Internals
-  // ─────────────────────────────────────────────────────────
-
-  /** Query selected elements under the boundary. */
+  /** 管理範囲内の選択中 DOM 要素を取得する。 */
   private _selectedNodeList(): NodeListOf<HTMLElement> {
     return this._rootContainer.querySelectorAll(SELECTED_SEL);
   }
 
-  /** Apply selected state to DOM + delegate. */
+  /** View と DOM の両方へ選択状態を反映する。 */
   private _markSelected(view: ConditionView): void {
     view.select();
     view.rootEl.setAttribute(ARIA_SELECTED, 'true');
   }
 
-  /** Remove selected state from DOM + delegate. */
+  /** View と DOM の両方から選択状態を外す。 */
   private _unmarkSelected(view: ConditionView): void {
     view.deselect();
     view.rootEl.removeAttribute(ARIA_SELECTED);
   }
 
-  /** Notify the builder that the selection has changed. */
+  /** 選択状態の変更を Builder へ通知する。 */
   private _notifyBuilder(): void {
     this._builder.onSelectionChange(this.getSelectedConditionViews());
   }
