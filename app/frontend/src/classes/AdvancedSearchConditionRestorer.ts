@@ -19,17 +19,24 @@ type RestoredItem = Readonly<{
   values: RestoredConditionValue[];
 }>;
 
-/** URLから復元したAdvanced Search条件を、BuilderのView構造へ戻す。 */
+/**
+ * URLから復元したAdvanced Search条件を、BuilderのView構造へ戻す。
+ *
+ * 検索APIへ送るquery fragmentは表示用のView構造を持っていないため、
+ * ここで「論理グループ」と「条件行」に分解し直してからUIへ流し込む。
+ */
 export async function restoreAdvancedSearchCondition(
   rootGroup: ConditionGroupView,
   query: unknown
 ): Promise<void> {
   if (!isQueryObject(query) || Object.keys(query).length === 0) return;
 
+  // URL条件を正本として扱うため、既存の空行や前回の条件は一度消す。
   rootGroup.clearConditionViews();
   await appendQueryToGroup(rootGroup, query, true);
 }
 
+// query fragmentを再帰的にたどり、論理グループまたは条件行として追加する。
 async function appendQueryToGroup(
   parentGroup: ConditionGroupView,
   query: unknown,
@@ -39,6 +46,7 @@ async function appendQueryToGroup(
 
   const logical = getLogicalQuery(query);
   if (logical) {
+    // ルートqueryが {and: [...]} / {or: [...]} の場合は、既存のroot groupをそのまま使う。
     const targetGroup = useCurrentGroup
       ? parentGroup
       : parentGroup.addEmptyConditionGroup(logical.operator);
@@ -53,6 +61,7 @@ async function appendQueryToGroup(
   const item = toRestoredItem(query);
   if (!item) return;
 
+  // ConditionItemViewの通常生成後に値だけを注入し、編集モードを閉じた状態に戻す。
   const itemView = parentGroup.addNewConditionItem(item.conditionType);
   await itemView.hydrateFromRestoredQuery({
     relation: item.relation,
@@ -60,6 +69,7 @@ async function appendQueryToGroup(
   });
 }
 
+// { and: [...] } / { or: [...] } だけを論理グループとして扱う。
 function getLogicalQuery(
   query: QueryObject
 ): { operator: LogicalOperator; children: unknown[] } | null {
@@ -72,6 +82,7 @@ function getLogicalQuery(
   return { operator, children };
 }
 
+// query leafのキーから、復元すべき条件種別と表示値へ変換する。
 function toRestoredItem(query: QueryObject): RestoredItem | null {
   if (isQueryObject(query.frequency)) {
     return restoreFrequencyItem(query.frequency);
@@ -114,6 +125,7 @@ function toRestoredItem(query: QueryObject): RestoredItem | null {
   return null;
 }
 
+// dataset/genotype条件は、外側の値表示と内側のfrequency-count-value-viewの状態を両方復元する。
 function restoreFrequencyItem(frequency: QueryObject): RestoredItem | null {
   const dataset = frequency.dataset;
   if (!isQueryObject(dataset) || typeof dataset.name !== 'string') return null;
@@ -148,6 +160,7 @@ function restoreFrequencyItem(frequency: QueryObject): RestoredItem | null {
   };
 }
 
+// genotypeは genotype.key、datasetは frequency/count のどちらを持つかでUIモードを決める。
 function getFrequencyMode(
   frequency: QueryObject,
   genotype: unknown
@@ -160,10 +173,12 @@ function getFrequencyMode(
   return null;
 }
 
+// UI側が対応しているgenotypeモードだけを復元対象にする。
 function toSupportedFrequencyMode(value: string): RestoredFrequencyMode | null {
   return value === 'aac' || value === 'arc' || value === 'hac' ? value : null;
 }
 
+// query内でrangeが入っている位置はdataset条件とgenotype条件で異なる。
 function getFrequencyRange(
   frequency: QueryObject,
   genotype: unknown
@@ -172,6 +187,7 @@ function getFrequencyRange(
   return frequency.frequency ?? frequency.count;
 }
 
+// API用のlocation queryを、Location editorが扱う "chr:start-end" 形式へ戻す。
 function restoreLocationItem(location: QueryObject): RestoredItem | null {
   const chromosome = location.chromosome;
   if (typeof chromosome !== 'string') return null;
@@ -194,6 +210,7 @@ function restoreLocationItem(location: QueryObject): RestoredItem | null {
   };
 }
 
+// relationとtermsを持つ標準的な条件を、共通の表示値配列へ戻す。
 function restoreTermItem(
   conditionType: ConditionTypeValue,
   leaf: QueryObject,
@@ -213,22 +230,27 @@ function restoreTermItem(
   };
 }
 
+// ラベルが見つからない条件でもUI表示できるよう、valueをlabelの代替にする。
 function makeValue(value: string, label: string = value): RestoredConditionValue {
   return { value, label };
 }
 
+// gt/gteの違いは現状の表示UIでは区別しないため、開始値としてまとめて扱う。
 function getRangeStart(range: QueryObject): number | null {
   return getNumber(range.gte ?? range.gt);
 }
 
+// lt/lteの違いは現状の表示UIでは区別しないため、終了値としてまとめて扱う。
 function getRangeEnd(range: QueryObject): number | null {
   return getNumber(range.lte ?? range.lt);
 }
 
+// URL由来の値は信用せず、有限なnumberだけをrange値として採用する。
 function getNumber(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
+// 検索条件マスタから表示ラベルを探し、URL復元後も通常操作時に近い見た目へ戻す。
 function findConditionLabel(
   conditionType: ConditionTypeValue,
   value: string
@@ -241,6 +263,7 @@ function findConditionLabel(
   return findLabelInValues(condition.values, value) ?? value;
 }
 
+// datasetのような階層値と、significanceのようなsource別値の両方を再帰的に探す。
 function findLabelInValues(values: unknown, targetValue: string): string | null {
   if (Array.isArray(values)) {
     for (const item of values) {
@@ -260,6 +283,7 @@ function findLabelInValues(values: unknown, targetValue: string): string | null 
   return null;
 }
 
+// 1つのマスタ項目を調べ、子要素があればさらに下へ潜る。
 function findLabelInValueItem(item: unknown, targetValue: string): string | null {
   if (!isQueryObject(item)) return null;
 
@@ -270,6 +294,7 @@ function findLabelInValueItem(item: unknown, targetValue: string): string | null
   return findLabelInValues(item.children, targetValue);
 }
 
+// URL由来のunknownを安全に扱うため、配列ではないプレーンなobjectだけに絞る。
 function isQueryObject(value: unknown): value is QueryObject {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

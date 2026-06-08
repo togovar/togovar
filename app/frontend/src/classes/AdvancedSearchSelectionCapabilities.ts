@@ -26,6 +26,8 @@ export function getSelectionCapabilities(
 ): SelectionCapabilities {
   if (selection.length === 0) return DISABLED_CAPABILITIES;
 
+  // グループ化は「同じ親の直下にある兄弟」だけを対象にする。
+  // 異なる親の条件をまとめるとDOM移動とquery構造が崩れやすいため、ここで弾く。
   const selectedParentGroups = new Set(
     selection
       .map((view) => view.parentGroup)
@@ -35,12 +37,15 @@ export function getSelectionCapabilities(
   const firstSelected = selection[0];
 
   return {
+    // 選択が1件でもあれば削除できる。削除可否の細かい制御は各Viewのremove側へ寄せる。
     canDelete: true,
     canGroup: canGroupSelectedViews(selection, selectedParentGroups),
+    // グループ解除は単一選択だけに限定する。複数グループ同時解除は順序と親の扱いが複雑になる。
     canUngroup:
       isSingleSelection &&
       (firstSelected.canUngroup === true ||
         firstSelected.conditionNodeKind === CONDITION_NODE_KIND.group),
+    // copyは現状ツールバー未実装だが、将来のために単一条件だけ許可する判定を維持している。
     canCopy:
       isSingleSelection &&
       (firstSelected.canCopy === true ||
@@ -55,5 +60,6 @@ function canGroupSelectedViews(
   if (selection.length <= 1 || selectedParentGroups.size !== 1) return false;
 
   const parentGroup = selectedParentGroups.values().next().value!;
+  // 全兄弟を選択している場合、新しいグループで包んでも構造上の意味が変わらないため許可しない。
   return selection.length < parentGroup.childViews.length;
 }
