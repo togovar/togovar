@@ -1,6 +1,6 @@
 import { storeManager } from '../src/store/StoreManager';
 import { ResultsView } from '../src/classes/Results/ResultsView';
-import SideBar from '../src/classes/SideBar.js';
+import SideBar from '../src/classes/SideBar.ts';
 import Karyotype from '../src/classes/Karyotype.js';
 import ActivityIndicator from '../src/classes/ActivityIndicator.js';
 import ModuleTabsView from '../src/classes/ModuleTabsView.js';
