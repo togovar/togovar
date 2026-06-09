@@ -169,8 +169,19 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
     li.append(label);
 
     // 子を持つ項目にのみ矢印を追加してドリルダウンを示す。
+    // role/tabindex/aria-label を付与してキーボード・スクリーンリーダーでも操作可能にする。
     if (item.children !== undefined) {
-      li.append(createEl('div', { class: 'arrow', dataset: { id: String(item.id) } }));
+      li.append(
+        createEl('div', {
+          class: 'arrow',
+          attrs: {
+            role: 'button',
+            tabindex: '0',
+            'aria-label': `Open ${item.label ?? 'children'}`,
+          },
+          dataset: { id: String(item.id) },
+        })
+      );
     }
 
     return li as HTMLLIElement;
