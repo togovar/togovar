@@ -5,21 +5,23 @@ import type { ConditionItemValueView } from '../../../components/ConditionItemVa
 import SearchField from '../../../components/SearchField/SearchField';
 import { createEl } from '../../../utils/dom/createEl';
 
-/** Variant ID editing screen */
+/** Variant ID の複数入力エディタ。Enterキーで1件ずつIDを追加し削除ボタンで個別削除できる。 */
 export class ConditionValueEditorVariantID extends ConditionValueEditor {
   private _searchFieldView!: SearchField;
   private _lastValueViews: ConditionItemValueView[] = [];
 
+  /**
+   * 検索フィールドUI生成・EnterキーでのID追加・削除イベントを登録する。
+   * 削除イベントは valuesContainerEl に委譲することで、後から追加されたvalue-viewにも効く。
+   */
   constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
 
-    // HTML
     this.createSectionEl('text-field-editor-view', () => [
       createEl('header', { text: `Search for ${this.conditionType}` }),
       createEl('div', { class: 'body' }),
     ]);
 
-    // Initialize search field with proper type casting
     this._searchFieldView = new SearchField(
       this.bodyEl as HTMLDivElement,
       'rs1489251879'
@@ -50,12 +52,15 @@ export class ConditionValueEditorVariantID extends ConditionValueEditor {
   // Public API
   // ───────────────────────────────────────────────────────────────────────────
 
-  /** Retain value views when changing to edit screen */
+  /** Cancel時に戻す基準として現在のvalue-view一覧をDOMノードごと保存する。 */
   keepLastValues(): void {
     this._lastValueViews = this.conditionItemValueViews;
   }
 
-  /** Restore the value views before editing if cancel button is pressed */
+  /**
+   * 現在のvalue-viewを全削除してスナップショットを再挿入する。
+   * 同じDOMノードを再利用するため、createより安全にコストを抑えられる。
+   */
   restore(): void {
     this.conditionItemValueViews.forEach((view) => view.remove());
     this.valuesContainerEl.append(...this._lastValueViews);
@@ -65,12 +70,12 @@ export class ConditionValueEditorVariantID extends ConditionValueEditor {
   // Private Methods
   // ───────────────────────────────────────────────────────────────────────────
 
-  /** Update validation state for the OK button */
+  /** バリデーション結果をOKボタンに反映する。IDが追加・削除されるたびに呼ぶ。 */
   private _update(): void {
-    this.conditionValues.update(this.isValid);
+    this.notifyValidity();
   }
 
-  /** Delete value and _update when value's button.delete is pressed on edit screen */
+  /** 削除イベントのvalue値でvalue-viewを削除してバリデーションを更新する。 */
   private _handleDeleteValue(e: CustomEvent<string>): void {
     e.stopPropagation();
     this.removeValueView(e.detail);
@@ -81,7 +86,7 @@ export class ConditionValueEditorVariantID extends ConditionValueEditor {
   // Validation
   // ───────────────────────────────────────────────────────────────────────────
 
-  /** Returns true if there are value nodes in div.values */
+  /** value-viewが1件以上あればID入力済みと判断する。OKボタンの活性制御に使う。 */
   get isValid(): boolean {
     return this.valuesContainerEl.hasChildNodes();
   }

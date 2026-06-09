@@ -1,6 +1,10 @@
 import type { LocationLeaf, BuildContext } from '../../../types';
 
-/** Build query for genomic location like "chr:pos" or "chr:start-end". */
+/**
+ * ゲノム座標条件のクエリを組み立てる。
+ * 入力形式は "chr:pos" または "chr:start-end"。
+ * start > end の逆順入力でも min/max を取り直すため正しく動く。
+ */
 export function buildLocationQuery(
   ctx: BuildContext<'location'>
 ): LocationLeaf {
@@ -10,7 +14,7 @@ export function buildLocationQuery(
   }
   const raw = v0.value.trim();
 
-  // chr: expects 1-22, X, Y, MT, etc. The number part is one or more half-width digits.
+  // chr: 1-22, X, Y, MT など。位置は半角数字1文字以上。
   const m = /^([^:]+):(\d+)(?:-(\d+))?$/.exec(raw);
   if (!m) {
     throw new Error(
@@ -28,6 +32,7 @@ export function buildLocationQuery(
     throw new Error(`location: non-numeric position in "${raw}".`);
   }
 
+  // 範囲指定の場合、start/end の大小を正規化してから API に渡す。
   const position =
     end === undefined
       ? start

@@ -14,11 +14,16 @@ interface DiseaseSelectionEventDetail {
   label: string;
 }
 
-/** Disease Search editing screen */
+/** 疾患検索UIのエディタ。disease-search コンポーネントと連携して疾患を1件選択する。 */
 export class ConditionValueEditorDisease extends ConditionValueEditor {
   private _data: DiseaseData = { id: null, label: null };
   private _lastValues: DiseaseData = { id: null, label: null };
   private _conditionElem!: ConditionDiseaseSearch;
+
+  /**
+   * DOM生成・検索UIの配置・イベント登録をまとめる。
+   * DOMを確定させてからイベントを登録することで、参照未取得のままリスナーが動くミスを防ぐ。
+   */
   constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
 
@@ -29,6 +34,8 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
   // ───────────────────────────────────────────────────────────────────────────
   // Initialization
   // ───────────────────────────────────────────────────────────────────────────
+
+  /** セクションDOMを生成し、disease-search コンポーネントを body 要素へ配置する。 */
   private _initializeElements(): void {
     this.createSectionEl('text-field-editor-view', () => [
       createEl('header', { text: `Select ${this.conditionType}` }),
@@ -40,12 +47,17 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
       new ConditionDiseaseSearch(this.bodyEl);
   }
 
+  /** disease-selected イベントで選択・解除を処理するリスナーを登録する。 */
   private _setupEventListeners(): void {
     this._conditionElem.addEventListener('disease-selected', (e: Event) => {
       this._handleDiseaseSelection(e);
     });
   }
 
+  /**
+   * カスタムイベントの detail に id があれば選択、なければ解除と判定する。
+   * id の有無で2パターンを統一ハンドラで処理することで、登録イベント数を最小化するため。
+   */
   private _handleDiseaseSelection(e: Event): void {
     e.stopPropagation();
     const customEvent = e as CustomEvent<DiseaseSelectionEventDetail>;
@@ -61,11 +73,13 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
   // ───────────────────────────────────────────────────────────────────────────
   // Public API
   // ───────────────────────────────────────────────────────────────────────────
+
+  /** Cancel時に戻す基準として現在の _data スナップショットを保存する。 */
   keepLastValues(): void {
     this._lastValues = { ...this._data };
   }
 
-  /** Restore the value before editing if cancel button is pressed */
+  /** 保存済み _lastValues をvalue-viewに反映して編集前の状態に戻す。 */
   restore(): void {
     this._data = { ...this._lastValues };
 
@@ -79,6 +93,8 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
   // ───────────────────────────────────────────────────────────────────────────
   // Private Methods
   // ───────────────────────────────────────────────────────────────────────────
+
+  /** _data を更新してvalue-viewを上書き追加し、バリデーションを更新する。 */
   private _selectDisease(diseaseData: DiseaseData): void {
     this._data = { ...diseaseData };
 
@@ -89,6 +105,7 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
     this._update();
   }
 
+  /** 選択を解除してvalue-viewを削除し、_data を空に戻す。 */
   private _clearSelection(): void {
     if (this._data.id) {
       this.removeValueView(this._data.id);
@@ -97,13 +114,16 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
     this._update();
   }
 
+  /** バリデーション結果をOKボタンへ反映する。値が確定するたびに呼ぶ。 */
   private _update(): void {
-    this.conditionValues.update(this.isValid);
+    this.notifyValidity();
   }
 
   // ───────────────────────────────────────────────────────────────────────────
   // Validation
   // ───────────────────────────────────────────────────────────────────────────
+
+  /** id が null でなければ疾患が選択済みと判断する。 */
   get isValid(): boolean {
     return !!this._data.id;
   }

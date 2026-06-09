@@ -1,5 +1,5 @@
-import type { FrequencyCountValueView } from '../../components/FrequencyCountValueView';
-import type { SignificanceSource } from '../../types';
+import type { FrequencyCountValueView } from '../components/FrequencyCountValueView';
+import type { SignificanceSource } from './condition';
 
 // FrequencyCountValueView の setValues 第2引数を型として使うことで、
 // UIコンポーネント側のシグネチャ変更が自動的にここへ伝播する。

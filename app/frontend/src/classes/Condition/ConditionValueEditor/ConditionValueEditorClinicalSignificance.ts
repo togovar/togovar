@@ -19,23 +19,23 @@ const LABELS = {
 } as const;
 
 /**
- * Editor for the "Clinical significance" condition.
- * - Renders MGeND and ClinVar buckets with checkboxes
- * - Maintains mutable selection state
- * - Keeps last confirmed values for restore()
+ * Clinical significance 条件のエディタ。
+ * MGeND と ClinVar の2バケットを独立したチェックボックスリストで描画し、
+ * 選択状態をソース別に condition-item-value-view と同期する。
  */
 export class ConditionValueEditorClinicalSignificance extends ConditionValueEditor {
   private _checkboxes: HTMLInputElement[] = [];
   private _values: MutableSignificanceValues = { mgend: [], clinvar: [] };
   private _lastValues: MutableSignificanceValues = { mgend: [], clinvar: [] };
 
-  /** Cached UL containers (filled after initial render) */
+  // ULコンテナを事前に生成してcreateSelectionEl呼び出し前に参照を確定させるためのキャッシュ。
   private _mgendUl?: HTMLUListElement;
   private _clinvarUl?: HTMLUListElement;
 
   /**
-   * @param conditionValues Parent view orchestrating editors
-   * @param conditionView Condition row (provides container & meta)
+   * MGeND/ClinVar の2バケットを生成してイベントを登録する。
+   * バケット別のUL参照をコンストラクタ内で確定させることで、
+   * 後続の append が正しい要素へ向かうことを保証するため。
    */
   constructor(
     conditionValues: ConditionValues,
@@ -43,13 +43,11 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   ) {
     super(conditionValues, conditionView);
 
-    // Typed config from JSON (significance is always enumeration with 2 buckets)
     const master = ADVANCED_CONDITIONS.significance;
     if (!master) {
       throw new Error('Missing condition definition: significance');
     }
 
-    // Build section skeleton
     this.createSectionEl('clinical-significance-view', () => [
       createEl('header', { text: LABELS.selectHeader(this.conditionType) }),
       createEl('div', {
@@ -84,7 +82,6 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
       })),
     ]);
 
-    // Populate checkboxes (accept readonly input, create mutable UI)
     const mgendVals = this._filterValues(master.values.mgend, 'mgend');
     const clinvarVals = this._filterValues(master.values.clinvar, 'clinvar');
 
@@ -95,7 +92,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
       ...this._generateCheckboxListNodes(clinvarVals, 'clinvar')
     );
 
-    // Cache all checkbox refs once
+    // createSectionEl 実行後に参照を確定させることで、未挿入のDOMへのアクセスを防ぐ。
     this._checkboxes = Array.from(
       this.sectionEl.querySelectorAll<HTMLInputElement>(
         ':scope ul[data-type="clinical-significance"] input[type="checkbox"]'
@@ -110,7 +107,10 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   // Public API
   // ───────────────────────────────────────────────────────────────────────────
 
-  /** Capture current rendered value-views as "last confirmed" values. */
+  /**
+   * Cancel時に戻す基準として、DOM上のvalue-viewからソース別に値を収集して保存する。
+   * ソースが混在しないようMGeND/ClinVar別に保存することで restore の精度を保つ。
+   */
   keepLastValues(): void {
     const mgendNodes =
       this.valuesContainerEl.querySelectorAll<ConditionItemValueView>(
@@ -133,7 +133,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     };
   }
 
-  /** Restore checkboxes from the last confirmed values, then re-render. */
+  /** 保存済みスナップショットにチェック状態を巻き戻してUIを更新する。 */
   restore(): void {
     const has = (src: SignificanceSource, val: string) =>
       this._lastValues[src].some((x) => x.value === val);
@@ -150,9 +150,9 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   // ───────────────────────────────────────────────────────────────────────────
 
   /**
-   * Create LI nodes for one bucket.
-   * @param values Readonly source items from JSON
-   * @param source Either "mgend" or "clinvar"
+   * 1バケット分のLI要素を生成する。
+   * source 属性を input と li の両方に付与することで、
+   * イベント委譲時にDOM操作なしでソースを特定できるようにするため。
    */
   private _generateCheckboxListNodes(
     values: ReadonlyArray<EnumerationItem>,
@@ -182,7 +182,10 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     );
   }
 
-  /** Attach a single delegated change handler for all checkboxes. */
+  /**
+   * チェックボックスごとにリスナーを登録せず、section要素への委譲1件で処理する。
+   * 後から追加されたDOMにも自動で効くようにするため委譲を採用する。
+   */
   private _attachCheckboxEventsDelegated(): void {
     this.sectionEl.addEventListener('change', (e) => {
       const t = e.target as Element | null;
@@ -192,7 +195,10 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     });
   }
 
-  /** Wire "Select all" / "Clear all" buttons with a single handler. */
+  /**
+   * 全選択/全解除ボタンを index 0/1 で判別することで、
+   * ラベル変更にも型付けなしで対応できるようにする。
+   */
   private _attachButtonEvents(): void {
     const btns = this.sectionEl.querySelectorAll<HTMLButtonElement>(
       ':scope > .buttons > button'
@@ -207,18 +213,17 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   }
 
   /**
-   * Filter master values into a mutable array for UI consumption.
-   * @param values Source values (readonly, from JSON)
-   * @param source MGeND or ClinVar
+   * ClinVar の 'NC' をUIから除外するための前処理。
+   * APIの仕様として NC（No criteria provided）はURLクエリに含めないため除外する。
    */
   private _filterValues(
     values: ReadonlyArray<EnumerationItem>,
     source: SignificanceSource
   ): EnumerationItem[] {
     if (this.conditionType === 'significance' && source === 'clinvar') {
-      return values.filter((v) => v.value !== 'NC'); // new mutable array
+      return values.filter((v) => v.value !== 'NC');
     }
-    return Array.from(values); // mutable copy
+    return Array.from(values);
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -226,14 +231,10 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   // ───────────────────────────────────────────────────────────────────────────
 
   /**
-   * Recompute selection state from checkboxes and update the rendered chips.
-   * Side-effects:
-   * - Mutates `_values`
-   * - Re-renders value views
-   * - Notifies parent about validity
+   * チェックボックスの状態から values を再構築し、ソース別にvalue-viewを再描画してOKボタンの活性を更新する。
+   * _values をここで再構築することで、DOMとデータの整合を毎回保証する。
    */
   private _update(): void {
-    // Rebuild `_values` from checkbox states
     this._values = { mgend: [], clinvar: [] };
     for (const cb of this._checkboxes) {
       if (!cb.checked) continue;
@@ -242,18 +243,15 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
       this._values[source].push({ value: cb.value, label });
     }
 
-    // Re-render both sources
     this._renderSource('mgend', this._values.mgend);
     this._renderSource('clinvar', this._values.clinvar);
 
-    // Update parent validity
-    this.conditionValues.update(this.isValid);
+    this.notifyValidity();
   }
 
   /**
-   * Render one bucket (mgend/clinvar):
-   * - If empty: remove wrapper group
-   * - Else: ensure wrapper and replace all chips
+   * 1ソース分のvalue-viewをまとめて再描画する。
+   * 既存チップを消してから新規追加することで、順序のズレや残留要素を防ぐ。
    */
   private _renderSource(
     source: SignificanceSource,
@@ -266,12 +264,10 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
 
     const wrapper = this._ensureWrapperExists(source);
 
-    // Clear existing chips
     wrapper
       .querySelectorAll<ConditionItemValueView>('condition-item-value-view')
       .forEach((v) => v.remove());
 
-    // Append chips
     for (const v of values) {
       const chip = document.createElement(
         'condition-item-value-view'
@@ -284,33 +280,26 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   }
 
   /**
-   * Ensure existence of the bucket wrapper:
-   * <div class="{source}-wrapper">
-   *   <span class="{source}">MGeND|Clinvar</span>
-   *   <div class="{source}-condition-wrapper"></div>
-   * </div>
-   * @returns the inner "{source}-condition-wrapper" element
+   * ソース用ラッパーが未挿入なら生成してDOMへ追加し、内側のcondition-wrapperを返す。
+   * 値が0件のときは呼ばれないため、返す要素は常に有効な前提で使える。
    */
   private _ensureWrapperExists(source: SignificanceSource): HTMLElement {
     const wrapperClass = `${source}-wrapper`;
     const conditionWrapperClass = `${source}-condition-wrapper`;
 
-    // outer (parent of header and inner wrapper)
     const outer =
       this.valuesContainerEl.querySelector<HTMLElement>(`.${wrapperClass}`) ??
       createEl('div', { class: wrapperClass });
 
-    // If it's not in the DOM yet, append it.
     if (!outer.isConnected) {
       this.valuesContainerEl.append(outer);
     }
 
-    // inner wrapper
     const conditionWrapper =
       outer.querySelector<HTMLElement>(`.${conditionWrapperClass}`) ??
       createEl('div', { class: conditionWrapperClass });
 
-    // When creating a new one, add it together with the label.
+    // 新規作成時はラベルと一緒に追加する。
     if (!conditionWrapper.isConnected) {
       const label = createEl('span', {
         class: source,
@@ -323,8 +312,8 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   }
 
   /**
-   * Remove the entire wrapper group for one source.
-   * This prevents an empty "Clinvar" or "MGeND" header from lingering.
+   * チェックが全解除されたとき、ソース見出しが残らないようラッパーごと削除する。
+   * 空の "ClinVar" ヘッダーが表示されたままにならないようにするため。
    */
   private _removeConditionWrapper(source: SignificanceSource): void {
     const outer = this.valuesContainerEl.querySelector<HTMLElement>(
@@ -333,7 +322,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     if (outer) outer.remove();
   }
 
-  /** Editor validity: true if at least one checkbox is checked. */
+  /** 1件以上チェックがあればOK可能とする。全解除のままOKを押せないようにするため。 */
   public get isValid(): boolean {
     return this._checkboxes.some((cb) => cb.checked);
   }

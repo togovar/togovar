@@ -2,6 +2,10 @@ import type { BuildContext, PredictionQueryLocal } from '../../../types';
 import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 import type { PredictionValueView } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionValueView';
 
+/**
+ * condition-item-value-view の shadow DOM から prediction-value-view を取得する。
+ * shadow root が未構築の場合は Lit 初期化前のアクセスと判断し、即座にエラーとする。
+ */
 function getPrediction(el: ConditionItemValueView): PredictionValueView | null {
   if (!el.shadowRoot) {
     throw new Error('pathogenicity_prediction: missing shadow root');
@@ -9,7 +13,11 @@ function getPrediction(el: ConditionItemValueView): PredictionValueView | null {
   return el.shadowRoot.querySelector('prediction-value-view');
 }
 
-/** Build query for pathogenicity_prediction. */
+/**
+ * Pathogenicity prediction 条件のクエリを組み立てる。
+ * スコア範囲・inequalitySigns は prediction-value-view が保持しているため
+ * DOM から queryValue を取り出してそのまま返す。
+ */
 export function buildPathogenicityQuery(
   ctx: BuildContext<'pathogenicity_prediction'>
 ): PredictionQueryLocal {
