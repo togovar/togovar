@@ -103,7 +103,7 @@ export class DatasetTreeDataProcessor {
     for (const savedSelection of savedSelections) {
       const nodeToRestore = datasetTree.find(
         (datasetNode) =>
-          datasetNode.data.value === savedSelection.dataset['value']
+          datasetNode.data.value === savedSelection.value
       );
       if (!nodeToRestore) continue;
 

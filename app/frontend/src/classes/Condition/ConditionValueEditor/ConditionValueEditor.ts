@@ -80,10 +80,11 @@ export abstract class ConditionValueEditor {
       // HTMLElementTagNameMap の拡張が効いていれば、型は自動的に ConditionItemValueView
       valueView = document.createElement('condition-item-value-view');
       valueView.conditionType = this.conditionType;
-      valueView.deleteButton = showDeleteButton;
       this.valuesContainerEl.append(valueView);
     }
 
+    // 新規・既存どちらでも同じ引数で deleteButton を同期する。
+    valueView.deleteButton = showDeleteButton;
     valueView.label = label;
     valueView.value = value;
     return valueView;
@@ -94,12 +95,17 @@ export abstract class ConditionValueEditor {
    * 呼び出し元が値の有無を気にせずに使えるよう2パターンをここで吸収するため。
    */
   protected removeValueView(value: string): void {
-    const selector = value ? `[data-value="${value}"]` : '';
-    const view = selectOrNull<ConditionItemValueView>(
-      this.valuesContainerEl,
-      `condition-item-value-view${selector}`
-    );
-    if (view) view.remove();
+    if (value) {
+      const view = selectOrNull<ConditionItemValueView>(
+        this.valuesContainerEl,
+        `condition-item-value-view[data-value="${value}"]`
+      );
+      if (view) view.remove();
+    } else {
+      this.valuesContainerEl
+        .querySelectorAll<ConditionItemValueView>('condition-item-value-view')
+        .forEach((view) => view.remove());
+    }
   }
 
   // ───────────────────────────────────────────────────────────────────────────
