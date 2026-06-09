@@ -4,7 +4,6 @@ import { ConditionValueEditor } from './ConditionValueEditor';
 import type ConditionValues from '../ConditionValues';
 import { storeManager } from '../../../store/StoreManager';
 
-// Import separated modules
 import { DatasetTreeDataProcessor } from './dataset-columns/DatasetTreeDataProcessor';
 import { DatasetColumnRenderer } from './dataset-columns/DatasetColumnRenderer';
 import { DatasetColumnEventHandler } from './dataset-columns/DatasetColumnEventHandler';
@@ -15,66 +14,56 @@ import { createEl } from '../../../utils/dom/createEl';
 import { selectRequired } from '../../../utils/dom/select';
 
 /**
- * A condition value editor that displays datasets in a hierarchical column-based interface.
- *
- * Similar to macOS Finder's column view, this interface allows users to:
- * - Navigate through dataset categories by clicking arrows
- * - Select individual datasets or entire categories with checkboxes
- * - View parent-child selection relationships (indeterminate states)
- * - Handle restricted datasets that require authentication
- *
- * The interface dynamically creates columns as users drill down through the hierarchy,
- * with each column showing the children of the selected item in the previous column.
+ * dataset/genotype 条件をカラムビューで選択するエディタ。
+ * 階層ツリーを macOS Finder 形式で表示し、認証が必要なデータセットの制御も行う。
+ * 各責務を専用モジュールに委譲することで、このクラスはUI統合のみを担う。
  */
 export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
-  /** Previously selected values, stored for cancellation/restore functionality */
+  /** Cancel時に戻す基準として保存するvalue-viewのスナップショット。 */
   private _lastValueViews: Array<{ dataset: { value?: string } }> = [];
 
-  /** The complete hierarchical tree structure of all available datasets */
+  /** 全データセットの階層ツリー。checked状態もここで管理する。 */
   private _data: HierarchyNode<UiNode>;
 
-  /** The main DOM container that holds all the column elements */
+  /** カラムDOMを格納するコンテナ。_initializeUI で確定させる。 */
   private _columns: HTMLElement | null = null;
 
-  /** Array of currently selected nodes that should appear in the value display */
+  /** value-view に表示する選択ノードのリスト。_processNodesToShowInValueView で更新する。 */
   private _nodesToShowInValueView: Array<HierarchyNode<UiNode>>;
 
   /**
-   * URL復元直後は、値表示だけが先に復元され、datasetツリーのchecked状態はまだ空になる。
-   * 初期描画の非同期_updateUIでその値表示を消さないよう、ユーザー操作後だけ空選択で同期削除する。
+   * URL復元直後は値表示だけが先に復元され、ツリーの checked 状態はまだ空になる。
+   * ユーザーが操作する前に空選択で同期削除しないよう、ユーザー操作後だけ true にする。
    */
   private _hasUserChangedSelection = false;
 
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // Specialized modules - each handles a specific aspect of the interface
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ─────────────────────────────────────────────────────────────────────────
+  // 専用モジュール — それぞれ独立した責務を担う
+  // ─────────────────────────────────────────────────────────────────────────
 
-  /** Converts raw dataset configuration into hierarchical tree structures */
+  /** データ生成を委譲することで、このクラスがUI統合だけに集中できる。 */
   private _dataProcessor = new DatasetTreeDataProcessor();
 
-  /** Creates DOM elements for columns, checkboxes, and navigation arrows */
+  /**
+   * DOM生成を委譲することで、HTMLの詳細をこのクラスから隠蔽する。
+   * 乱数サフィックスで複数インスタンスが存在するときもID衝突を防ぐ。
+   */
   private _renderer = new DatasetColumnRenderer(
     `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
   );
 
-  /** Handles user interactions: checkbox changes, arrow clicks, navigation */
+  /** イベント処理を委譲することで、チェック・ナビゲーションのロジックを分離する。 */
   private _eventHandler = new DatasetColumnEventHandler();
 
-  /** Manages selection state propagation between parent and child nodes */
+  /** 親子間の checked 伝播を委譲することで、ツリー状態管理を一箇所に集約する。 */
   private _checkStateManager = new DatasetCheckStateManager();
 
-  /** Determines which selected values should be displayed in the summary */
+  /** 表示するvalue-viewの選定ロジックを委譲することで、最適化ルールを分離する。 */
   private _valueViewManager = new DatasetValueViewManager();
 
   /**
-   * Creates a new hierarchical dataset selection interface.
-   *
-   * Initializes the column-based UI and loads the dataset hierarchy based on the
-   * condition type (e.g., 'dataset' or 'genotype'). The interface starts with
-   * the root categories displayed in the first column.
-   *
-   * @param valuesView - Component that displays the selected values summary
-   * @param conditionView - Parent component that contains this editor
+   * 階層データの準備・UI生成・ログイン状態待ちの初期描画を順に行う。
+   * ログイン状態は非同期で確定するため、初期描画を _initializeWithLoginStatus に分離する。
    */
   constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
@@ -89,7 +78,8 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   }
 
   /**
-   * Initializes the interface after ensuring login status is fetched.
+   * ログイン状態の取得を待ってから初期カラムを描画する。
+   * 認証が必要なデータセットの表示制御がログイン状態に依存するため非同期で待つ。
    */
   private async _initializeWithLoginStatus(): Promise<void> {
     await storeManager.fetchLoginStatus();
@@ -99,27 +89,18 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   // ───────────────────────────────────────────────────────────────────────────
   // Public API
   // ───────────────────────────────────────────────────────────────────────────
+
   /**
-   * Captures a snapshot of the current selection state for later restoration.
-   *
-   * This creates a backup of the current selections so that if the user clicks
-   * "Cancel" during editing, we can restore the interface to this exact state.
-   * Called automatically when the user begins editing (clicks the pencil icon).
+   * Cancel時に戻す基準として現在のvalue-view一覧を保存する。
+   * DOMノードごと保持することで、restore時に同じ要素を再挿入できる。
    */
   keepLastValues(): void {
     this._lastValueViews = this.conditionItemValueViews;
   }
 
   /**
-   * Reverts all selections back to the previously saved state.
-   *
-   * This method:
-   * 1. Clears all current selection states in the data tree
-   * 2. Restores the selections from the saved snapshot
-   * 3. Updates parent/child relationships to maintain consistency
-   * 4. Refreshes the UI to reflect the restored state
-   *
-   * Called when the user clicks "Cancel" to abandon their changes.
+   * 保存済みスナップショットにツリーの checked 状態を巻き戻してUIを更新する。
+   * 子孫・祖先の状態も同時に再計算することで、部分選択（indeterminate）を正しく復元する。
    */
   restore(): void {
     this._dataProcessor.resetAllCheckStates(this._data);
@@ -134,27 +115,18 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
     this._updateUI();
   }
 
-  /**
-   * Determines whether the current selection state is valid for saving.
-   *
-   * A valid selection requires at least one dataset to be selected.
-   * This is used to enable/disable the "Apply" button and show validation messages.
-   *
-   * @returns true if one or more datasets are selected, false if none are selected
-   */
+  /** value-viewが1件以上あればOK可能とする。全解除のままOKを押せないようにするため。 */
   get isValid(): boolean {
     return this.conditionItemValueViews.length > 0;
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // UI Initialization
+  // ───────────────────────────────────────────────────────────────────────────
+
   /**
-   * Sets up the basic DOM structure for the column-based interface.
-   *
-   * Creates:
-   * - Header with condition type (e.g., "Select dataset")
-   * - Body container for the scrollable content
-   * - Columns container that will hold the individual column elements
-   *
-   * Also stores references to key DOM elements for later use.
+   * セクションDOMを生成して _columns 参照を確定させる。
+   * selectRequired を使うことで、テンプレート崩れを即座に検出できる。
    */
   private _initializeUI(): void {
     this.createSectionEl('columns-editor-view', () => [
@@ -165,7 +137,6 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
       }),
     ]);
 
-    // Use selectRequired for safer DOM element retrieval
     this._columns = selectRequired<HTMLDivElement>(
       this.bodyEl,
       ':scope > .columns',
@@ -174,30 +145,21 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   }
 
   /**
-   * Displays the first column containing the top-level dataset categories.
-   *
-   * This is called during initialization to show the root categories
-   * (e.g., "Genomic Studies", "Clinical Data") that users can navigate into.
+   * ルートカテゴリをカラムとして描画する。
+   * ログイン状態が確定した後に呼ぶことで、認証必要なデータセットの初期表示を正しく行う。
    */
   private _renderInitialColumn(): void {
     this._drawColumn();
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // Column Rendering
+  // ───────────────────────────────────────────────────────────────────────────
+
   /**
-   * Creates and displays a new column showing the children of a selected item.
-   *
-   * This method:
-   * 1. Uses the provided login status (for restricted dataset handling)
-   * 2. Retrieves child items for the specified parent (or root if no parent)
-   * 3. Creates a new column DOM element
-   * 4. Renders the child items as a list with checkboxes and navigation arrows
-   * 5. Attaches event listeners for user interactions
-   * 6. Updates the overall UI state
-   *
-   * @param parentId - ID of the parent node whose children should be displayed.
-   *                   If undefined, shows root-level categories.
-   * @param userIsLoggedIn - Whether the current user is authenticated.
-   *                         If undefined, fetches from store manager.
+   * 指定した親ノードの子アイテムで新しいカラムを生成して追加する。
+   * parentId が未指定のときはルートカテゴリを表示する（初回描画用）。
+   * ログイン状態は引数で受け取ることで、非同期取得との二重実行を防ぐ。
    */
   private async _drawColumn(
     parentId?: string,
@@ -220,19 +182,12 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   }
 
   // ───────────────────────────────────────────────────────────────────────────
-  // DOM Generation and Rendering (delegated to DatasetColumnRenderer)
+  // DOM Generation (DatasetColumnRenderer へ委譲)
   // ───────────────────────────────────────────────────────────────────────────
+
   /**
-   * Creates a list of selectable items for display in a column.
-   *
-   * Each item in the list includes:
-   * - A checkbox for selection (or lock icon for restricted datasets)
-   * - The item label (dataset name or category name)
-   * - An arrow for navigation if the item has children
-   *
-   * @param hierarchyItems - Array of dataset nodes to display in this column
-   * @param userIsLoggedIn - Whether the current user is authenticated (affects restricted dataset display)
-   * @returns HTML unordered list element containing all the selectable items
+   * カラム内のリスト要素を生成する。
+   * conditionType を渡すことで、renderer がデータセット種別ごとの表示を制御できる。
    */
   private _generateColumnList(
     hierarchyItems: HierarchyNode<UiNode>[],
@@ -246,8 +201,8 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   }
 
   /**
-   * Creates a new column DOM element with appropriate attributes.
-   * @returns The created column element
+   * depth 属性付きのカラムDIV要素を生成する。
+   * depth は削除対象の判定に使うため renderer 側で採番して付与する。
    */
   private _createColumnElement(): HTMLDivElement {
     if (!this._columns) throw new Error('Columns container not found');
@@ -255,7 +210,8 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   }
 
   /**
-   * Adds a column prompting the user to login for JGAD datasets.
+   * JGAD など認証が必要なデータセットでログインを促すカラムを追加する。
+   * 未ログイン時に矢印クリックされたタイミングで呼ぶことで、適切なタイミングで表示する。
    */
   private async _addLoginPromptColumn(): Promise<void> {
     if (!this._columns) throw new Error('columns not mounted');
@@ -263,13 +219,13 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   }
 
   // ───────────────────────────────────────────────────────────────────────────
-  // Event Handling (delegated to DatasetColumnEventHandler)
+  // Event Handling (DatasetColumnEventHandler へ委譲)
   // ───────────────────────────────────────────────────────────────────────────
 
   /**
-   * Attaches event listeners to the column element.
-   * @param column - The column element to attach listeners to
-   * @param userIsLoggedIn - Whether the user is logged in
+   * カラム要素にチェックボックスと矢印のイベントリスナーを登録する。
+   * コールバックを介して checked 更新と UI 更新を委譲することで、
+   * イベントハンドラが内部状態に直接触れないよう境界を保つ。
    */
   private _attachColumnEventListeners(
     column: HTMLElement,
@@ -296,10 +252,9 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   }
 
   /**
-   * Handles arrow click events for navigation.
-   * @param listItem - The clicked list item
-   * @param target - The arrow element that was clicked
-   * @param userIsLoggedIn - Whether the user is logged in
+   * 矢印クリックで選択中フラグを更新し、子カラムを描画する。
+   * jga_wgs かつ未ログインの場合はログイン促進カラムを追加することで、
+   * 認証制御とナビゲーション処理をここで一元化する。
    */
   private _handleArrowClick(
     listItem: Element,
@@ -316,11 +271,12 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   }
 
   // ───────────────────────────────────────────────────────────────────────────
-  // State Management (delegated to DatasetCheckStateManager)
+  // State & Rendering
   // ───────────────────────────────────────────────────────────────────────────
 
   /**
-   * Updates the entire UI including DOM elements and value views.
+   * チェックボックスのDOM状態・value-view・OKボタンをまとめて更新する。
+   * チェック変更のたびに呼ぶことで、DOM・データ・バリデーションを常に同期させる。
    */
   private _updateUI(): void {
     if (this._columns) {
@@ -333,12 +289,9 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
     this.conditionValues.update(this.isValid);
   }
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // Value Display Logic (delegated to DatasetValueViewManager)
-  // ───────────────────────────────────────────────────────────────────────────
-
   /**
-   * Processes nodes to determine which should be shown in value view.
+   * 表示するvalue-viewのノードリストを再計算して _nodesToShowInValueView に保持する。
+   * 選定ロジックを _valueViewManager に委譲することで、最適化ルールの変更を局所化する。
    */
   private _processNodesToShowInValueView(): void {
     this._nodesToShowInValueView = this._valueViewManager.getOptimalNodesToShow(
@@ -347,7 +300,8 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   }
 
   /**
-   * Scrolls to reveal the newly added column if necessary.
+   * 新カラム追加後に水平スクロールして最新カラムを見えるようにする。
+   * ユーザーが手動スクロールしなくても新しいカラムに気づけるようにするため。
    */
   private _scrollToRevealNewColumn(): void {
     if (!this.bodyEl) return;
@@ -362,10 +316,8 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   }
 
   /**
-   * Retrieves child items for the specified parent node in the hierarchy.
-   * Returns root-level children if no parent ID is provided.
-   * @param parentId - ID of the parent node to get children for, or undefined for root level
-   * @returns Promise resolving to array of child hierarchy nodes
+   * 指定した親ノードの子アイテムを返す。
+   * parentId が未指定のときはルートの children を返すことで、初回描画と再描画を統一する。
    */
   private _getChildItems(parentId?: string): Promise<HierarchyNode<UiNode>[]> {
     return new Promise((resolve) => {
@@ -380,9 +332,9 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   }
 
   /**
-   * Synchronizes the value views with the current selection state.
-   * Processes nodes that should be shown, clears existing views, and adds
-   * new value views with appropriate labels and paths.
+   * 現在の選択状態からvalue-viewを再同期する。
+   * URL復元直後にユーザー操作なしで選択が空になるケースでは同期を跳ばすことで、
+   * 復元済みのvalue-viewが誤って消えないようにする（_hasUserChangedSelection で制御）。
    */
   private _syncValueViewsWithSelection(): void {
     this._processNodesToShowInValueView();
@@ -395,7 +347,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
       return;
     }
 
-    // Clear all existing condition value views
+    // 既存のvalue-viewをすべて削除してから最新の選択状態を反映する。
     this.conditionItemValueViews.forEach((view) => view.remove());
 
     for (const selectedNode of this._nodesToShowInValueView) {

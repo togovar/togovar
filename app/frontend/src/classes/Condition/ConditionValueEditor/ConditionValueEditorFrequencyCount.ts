@@ -34,7 +34,6 @@ interface CountCondition {
   to: number | null;
 }
 
-// Interface for range selector custom element
 interface RangeSliderElement extends HTMLElement {
   searchType: string;
   sliderStep: number;
@@ -50,8 +49,8 @@ const SELECTORS = {
 } as const;
 
 /**
- * ConditionState value editor for frequency and count filtering
- * Provides UI controls for setting frequency ranges and count ranges for variant filtering
+ * 頻度・カウントフィルタの条件エディタ。
+ * dataset では frequency/count を、genotype では alt_alt/alt_ref/hemi_alt を切り替えて設定できる。
  */
 export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   _condition: ConditionState;
@@ -68,12 +67,12 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     arc: { from: null, to: null },
     hac: { from: null, to: null },
   };
+  // 複数インスタンスが存在するときもラジオグループ名が衝突しないよう連番で一意化する。
   private readonly _radioGroupName = `freqcount-${ConditionValueEditorFrequencyCount._idCounter++}`;
 
   /**
-   * Creates a new frequency/count condition editor
-   * @param valuesView - The parent values view component
-   * @param conditionView - The parent condition view component
+   * 初期条件・モード・DOM生成・イベント登録・初期表示テキスト設定を一括で行う。
+   * 条件種別によってモードのデフォルトが変わるため、constructorで確定させる。
    */
   constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
@@ -101,7 +100,6 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     this._observeValueChanges();
     this._updateErrorMessageVisibility();
 
-    // Set initial classification text based on default mode
     this.conditionItemView.updateClassificationText(
       this._getModeDisplayText(this._mode)
     );
@@ -110,8 +108,10 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   // ───────────────────────────────────────────────────────────────────────────
   // Public API
   // ───────────────────────────────────────────────────────────────────────────
+
   /**
-   * Stores the current values for potential restoration
+   * Cancel時に戻す基準として現在のモードの条件スナップショットを保存する。
+   * モードが変わっても保存時点の値に戻せるよう、モード情報は別途 _mode で管理する。
    */
   keepLastValues(): void {
     const currentCondition = this._condition[this._mode];
@@ -120,9 +120,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     }
   }
 
-  /**
-   * Restores previously stored values
-   */
+  /** 保存済み _lastValue を現在モードの条件へ戻してUIを更新する。 */
   restore(): void {
     if (this._lastValue && this._condition[this._mode]) {
       if (this._mode === MODE.frequency) {
@@ -135,11 +133,8 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Gets the validation state of the current condition
-   * Validates that:
-   * - At least one value (from or to) is not null
-   * - For count modes: from is not greater than to
-   * @returns True if the condition is valid
+   * 値が1件以上存在し、countモードの場合は from <= to の制約を満たすか検証する。
+   * frequency は range-slider が範囲を保証するため from/to の大小チェックは不要。
    */
   get isValid(): boolean {
     const currentCondition = this._condition[this._mode];
@@ -147,7 +142,6 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
       return false;
     }
 
-    // Check if at least one value is not null
     const hasValue = Object.values(currentCondition).some(
       (value) => value !== null
     );
@@ -155,7 +149,6 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
       return false;
     }
 
-    // For count modes, validate that from <= to
     if (this._mode !== MODE.frequency) {
       const countCondition = currentCondition as CountCondition;
       if (
@@ -171,7 +164,8 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Observes changes in the values view and triggers updates
+   * value-view の DOMが変化したときにエディタのUIを同期する MutationObserver を設定する。
+   * restore や hydrate 後の追加・削除を検知してエディタ状態を最新に保つため。
    */
   private _observeValueChanges(): void {
     const observer = new MutationObserver(() => {
@@ -187,7 +181,8 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   // ───────────────────────────────────────────────────────────────────────────
   // DOM Generation
   // ───────────────────────────────────────────────────────────────────────────
-  /** Initializes the component's HTML structure */
+
+  /** セクションDOM・レンジスライダーを生成して初期化する。 */
   private _initializeComponent(): void {
     this.createSectionEl('frequency-count-editor-view', () => [
       createEl('header', { text: 'Specify range' }),
@@ -200,11 +195,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     this._setupRangeSlider();
   }
 
-  /**
-   * Creates the body elements for the component
-   * @param name - Unique name for radio button grouping
-   * @returns Array of HTML elements
-   */
+  /** 条件種別に応じて dataset/genotype 用のUI要素を選択して返す。 */
   private _createBodyElements(name: string): HTMLElement[] {
     if (this.conditionType === 'genotype') {
       return this._createGenotypeElements(name);
@@ -212,11 +203,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     return this._createDatasetElements(name);
   }
 
-  /**
-   * Creates elements for dataset condition type
-   * @param name - Unique name for radio button grouping
-   * @returns Array of HTML elements
-   */
+  /** dataset 条件用の frequency/count/filtered の各セクション要素を生成する。 */
   private _createDatasetElements(name: string): HTMLElement[] {
     const frequencySection = this._createFrequencySection(name);
     const countSection = this._createCountSection(name, MODE.count, 'Count');
@@ -225,11 +212,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     return [frequencySection, countSection, filteredSection];
   }
 
-  /**
-   * Creates elements for genotype dataset condition type
-   * @param name - Unique name for radio button grouping
-   * @returns Array of HTML elements
-   */
+  /** genotype 条件用の alt_alt/alt_ref/hemi_alt の各countセクションを生成する。 */
   private _createGenotypeElements(name: string): HTMLElement[] {
     const genotypeOptions = [
       { mode: MODE.alt_alt, label: 'Alt/Alt: Number of homozygous genotypes' },
@@ -251,9 +234,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     return [...sections, filteredSection];
   }
 
-  /**
-   * Creates a frequency section with range slider
-   */
+  /** レンジスライダーを格納する frequency セクション要素を生成する。 */
   private _createFrequencySection(name: string): HTMLElement {
     return createEl('section', {
       class: ['frequency', 'switching'],
@@ -277,11 +258,8 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Creates a count input section
-   * @param name - Radio button group name
-   * @param mode - Mode value for the section
-   * @param label - Display label for the section
-   * @returns HTML element for a single count section
+   * カウント入力欄とエラーメッセージを持つ count セクション要素を生成する。
+   * 初期レンダリング時に既に invalid 状態であればエラーを表示状態で生成する。
    */
   private _createCountSection(
     name: string,
@@ -348,8 +326,9 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Creates the filtered checkbox section
-   * @returns HTML element for the filtered section
+   * 「フィルタ済みバリアントを除外する」チェックボックスセクションを生成する。
+   * id 属性と for 属性を _radioGroupName ベースで一意にすることで、
+   * 複数エディタが同一ページに存在してもラベルクリックが正しく動く。
    */
   private _createFilteredSection(): HTMLElement {
     const filteredCheckboxId = `${this._radioGroupName}-filtered`;
@@ -377,7 +356,9 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Sets up the range slider component
+   * range-slider 要素を生成して .range-selector-view 内に配置する。
+   * 初回の range-changed イベントとユーザー操作を区別するため、
+   * 初期同期を requestAnimationFrame で遅らせて shadow DOM の確定後に行う。
    */
   private _setupRangeSlider(): void {
     const rangeSlider = createEl('range-slider', {
@@ -389,11 +370,10 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
       attrs: {
         value1: this._condition.frequency.from.toString(),
         value2: this._condition.frequency.to.toString(),
-        invert: this._condition.frequency.invert.toString(), // "true" or "false"
+        invert: this._condition.frequency.invert.toString(),
       },
     });
 
-    // Listen for changes from the range slider and update condition
     rangeSlider.addEventListener(
       'range-changed',
       (e: CustomEvent<RangeSliderData>) => {
@@ -409,10 +389,8 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     rangeContainer?.appendChild(rangeSlider);
     this._rangeSelectorView = rangeSlider;
 
-    // Force initial state sync after DOM insertion
     requestAnimationFrame(() => {
       if (this._rangeSelectorView) {
-        // Ensure the checkbox reflects the current state
         const shadowHost = this._rangeSelectorView as HTMLElement & {
           shadowRoot?: ShadowRoot;
         };
@@ -430,7 +408,8 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Sets up all event listeners for the component
+   * モード切替・カウント入力・filtered チェックボックスのリスナーを一括登録する。
+   * 初期化の手順を揃えるためイベント登録をここに集約する。
    */
   private _setupEventListeners(): void {
     this._setupModeToggleListeners();
@@ -439,7 +418,8 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Sets up event listeners for mode toggle radio buttons
+   * ラジオボタンのchangeでモードを切り替えるリスナーを各switchingセクションに登録する。
+   * デフォルトモードのラジオを requestAnimationFrame で発火させて初期表示を確定させる。
    */
   private _setupModeToggleListeners(): void {
     const switchingElements = this.bodyEl.querySelectorAll(SELECTORS.SWITCHING);
@@ -452,7 +432,6 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
         this._handleModeChange(e, switchingElements);
       });
 
-      // Set default selection based on condition type
       const defaultMode =
         this.conditionType === 'genotype' ? MODE.alt_alt : MODE.frequency;
       if (input.value === defaultMode) {
@@ -465,9 +444,8 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Handles mode change events
-   * @param e - Change event
-   * @param switchingElements - All switching elements
+   * モード変更をDOMと内部状態に反映してUIを更新する。
+   * isTrusted で初回レンダリングのプログラムイベントとユーザー操作を区別する。
    */
   private _handleModeChange(
     e: Event,
@@ -478,7 +456,6 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
       this._hasUserChangedCondition = true;
     }
 
-    // Update visual state of switching elements
     for (const el of switchingElements) {
       const htmlEl = el as HTMLElement;
       if (htmlEl.dataset.mode === target.value) {
@@ -490,7 +467,6 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
 
     this._mode = target.value as ModeType;
 
-    // Update parent classification text based on selected mode
     this.conditionItemView.updateClassificationText(
       this._getModeDisplayText(this._mode)
     );
@@ -500,19 +476,18 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Sets up event listeners for count input fields
+   * count セクション内の from/to に change と input の両方を登録する。
+   * 確定操作と入力中の両方でバリデーションを即時更新するため両方が必要。
    */
   private _setupCountInputListeners(): void {
     const switchingElements = this.bodyEl.querySelectorAll(SELECTORS.SWITCHING);
 
-    // Set up input listeners for all switching sections
     switchingElements.forEach((element) => {
       const inputs = element.querySelectorAll(':scope .input > input');
       inputs.forEach((input) => {
         input.addEventListener('change', (e) => {
           this._handleCountInputChange(e);
         });
-        // Also listen to input event for real-time validation
         input.addEventListener('input', (e) => {
           this._handleCountInputChange(e);
         });
@@ -521,11 +496,8 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Handles count input change events
-   * For count modes (non-frequency), ensures:
-   * - Negative values are converted to 0
-   * - Decimal values are truncated to integers
-   * @param e - Change event from count input
+   * 入力値を数値化して countCondition へ反映する。
+   * 負数は0へ、小数は切り捨てることでAPIの仕様（非負整数）に合わせる。
    */
   private _handleCountInputChange(e: Event): void {
     if (e.isTrusted) {
@@ -542,16 +514,11 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
       } else {
         let numValue = Number(value);
 
-        // For count modes (not frequency), enforce integer constraints
         if (this._mode !== MODE.frequency) {
-          // Convert negative values to 0
           if (numValue < 0) {
             numValue = 0;
           }
-          // Truncate decimal values to integers (floor)
           numValue = Math.floor(numValue);
-
-          // Update the input field to reflect the corrected value
           target.value = numValue.toString();
         }
 
@@ -564,12 +531,10 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Checks if the current condition has an invalid range (from > to)
-   * This is specifically for showing error messages to the user
-   * @returns True if the range is invalid (from > to for count modes)
+   * countモードで from > to のエラー表示専用の判定。
+   * isValid とは別に持つことで、エラーメッセージ制御とOKボタン制御を分離する。
    */
   private _isCurrentConditionInvalid(): boolean {
-    // Only validate count modes, not frequency mode
     if (this._mode === MODE.frequency) {
       return false;
     }
@@ -583,12 +548,12 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Updates error message visibility by re-rendering the section
+   * 現在のモードのセクションだけエラーメッセージ表示を更新する。
+   * モード切替時にも呼ぶことで、他のセクションのエラーが残らないようにする。
    */
   private _updateErrorMessageVisibility(): void {
     const isInvalid = this._isCurrentConditionInvalid();
 
-    // Find the current mode's section and update error message visibility
     const currentSection = this.bodyEl.querySelector(
       `[data-mode="${this._mode}"]`
     );
@@ -607,7 +572,8 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Sets up event listener for filtered checkbox
+   * filtered チェックボックスの change をlistenして条件を更新する。
+   * 初回 dispatchEvent で初期状態をUI上で確定させるため、登録後に発火する。
    */
   private _setupFilteredCheckboxListener(): void {
     this._filtered = selectOrNull<HTMLInputElement>(
@@ -626,14 +592,13 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Updates the condition parameters based on range slider changes
-   * @param newCondition - New condition values from range slider
+   * レンジスライダーからの変更を _condition.frequency に反映してUIを更新する。
+   * RangeSliderView は初期化時にも range-changed を発火するため、
+   * 値が実際に変化したときだけ hasUserChangedCondition を true にする。
    */
   changeParameter(newCondition: RangeSliderData): void {
     if (!this._rangeSelectorView) return;
 
-    // RangeSliderView は初期化時にも range-changed を発火するため、
-    // 実際に値が変わったときだけ「ユーザーが変更した」扱いにする。
     const nextFrom =
       newCondition.from !== undefined
         ? newCondition.from
@@ -664,17 +629,13 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     this._update();
   }
 
-  /**
-   * Updates the component state and validates conditions
-   */
+  /** 全value-viewへ条件を適用してOKボタンの活性を更新する。 */
   private _update(): void {
     this._applyConditionToAllViews();
     this.conditionValues.update(this.isValid);
   }
 
-  /**
-   * Applies current condition values to frequency count views
-   */
+  /** valuesContainerEl 内の全value-viewに現在の条件を反映する。 */
   private _applyConditionToAllViews(): void {
     this.valuesContainerEl
       .querySelectorAll(':scope > condition-item-value-view')
@@ -687,6 +648,11 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
       });
   }
 
+  /**
+   * ユーザーが未変更の場合のみ、既存のvalue-viewから条件を逆引きして復元する。
+   * URLからの条件復元後にエディタの状態を合わせるために必要で、
+   * ユーザーが操作済みの場合は上書きしないよう _hasUserChangedCondition で制御する。
+   */
   private _syncConditionFromRestoredView(
     freqCountView: FrequencyCountValueView
   ): void {
@@ -718,9 +684,8 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   }
 
   /**
-   * Gets the frequency count view from a condition item value view
-   * @param view - Parent view element
-   * @returns Frequency count view element or null
+   * shadow DOM 内の frequency-count-value-view を取得する。
+   * setValues が実装されていない要素は無効として弾くことで、型ミスを防ぐ。
    */
   private _getFrequencyCountView(
     view: Element
@@ -738,10 +703,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
       : null;
   }
 
-  /**
-   * Updates a frequency count view with current condition values
-   * @param freqCountView - The frequency count view to update
-   */
+  /** 現在の条件を frequency-count-value-view へ反映する。 */
   private _updateFrequencyCountView(
     freqCountView: FrequencyCountValueView
   ): void {
@@ -750,7 +712,6 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
       this._mode === MODE.frequency ? this._condition.frequency.invert : false;
     const isFiltered = this._filtered?.checked ?? false;
 
-    // Use values directly to preserve user input precision
     const fromValue = currentCondition.from;
     const toValue = currentCondition.to;
 
@@ -765,14 +726,9 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
 
     freqCountView.mode = this._mode;
     freqCountView.from = fromValue;
-    // Note: Removed .update() call as it's protected and may not be needed externally
   }
 
-  /**
-   * Gets the display text for classification based on current mode
-   * @param mode - The mode to get display text for
-   * @returns Display text for classification
-   */
+  /** 現在のモードに対応する分類テキストを返す。ConditionItemView の分類テキスト更新に使う。 */
   private _getModeDisplayText(mode: ModeType): string {
     const displayTextMap: Record<ModeType, string> = {
       [MODE.frequency]: 'Alternate allele frequency',

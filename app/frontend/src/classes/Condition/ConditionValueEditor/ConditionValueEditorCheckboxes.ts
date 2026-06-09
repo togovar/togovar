@@ -6,36 +6,36 @@ import type { ConditionItemView } from '../ConditionItemView';
 import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 
 /**
- * Editor for flat enumeration conditions (e.g., Variant type).
- * It renders a list of checkboxes and syncs them with <condition-item-value-view> elements.
+ * フラット列挙型条件（Variant type など）向けのチェックボックスエディタ。
+ * ADVANCED_CONDITIONS.type のフラット values をそのままチェックボックスとして描画し、
+ * condition-item-value-view と同期する。
  *
- * Assumptions:
- * - `ADVANCED_CONDITIONS[this.conditionType]` is a flat enumeration definition
- *   (i.e., `values` is an array of {value, label}).
- * - Clinical significance (with mgend/clinvar split) should use a different editor class.
+ * 前提:
+ * - ADVANCED_CONDITIONS[this.conditionType] はフラット列挙定義（values が {value, label}[] の配列）
+ * - MGeND/ClinVar 分割が必要な clinical significance は別エディタクラスを使う
  */
 export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
   private _checkboxes: HTMLInputElement[] = [];
   private _lastValues: string[] = [];
 
+  /**
+   * チェックボックスのDOM生成・参照キャッシュ・イベント登録を1箇所にまとめる。
+   * createSectionEl 実行後に参照を取得することで、DOM確定前の取得ミスを防ぐ。
+   */
   constructor(
     conditionValues: ConditionValues,
     conditionView: ConditionItemView
   ) {
     super(conditionValues, conditionView);
 
-    // Read the master definition for this condition type and assert it is flat.
     const master = ADVANCED_CONDITIONS.type;
     if (!master) {
       throw new Error('type condition not found');
     }
 
-    // Build HTML (template string kept for brevity; safe because values are static text)
     this.createSectionEl('checkboxes-editor-view', () => [
-      // <header>Select {type}</header>
       createEl('header', { text: `Select ${this.conditionType}` }),
 
-      // buttons
       createEl('div', {
         class: 'buttons',
         children: [
@@ -50,7 +50,6 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
         ],
       }),
 
-      // <ul class="checkboxes body"> ...items... </ul>
       createEl('ul', {
         class: ['checkboxes', 'body'],
         children: master.values.map((item) =>
@@ -61,8 +60,8 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
                 children: [
                   createEl('input', {
                     attrs: { type: 'checkbox' },
-                    domProps: { value: item.value }, // value property
-                    dataset: { label: item.label }, // data-label
+                    domProps: { value: item.value },
+                    dataset: { label: item.label },
                   }),
                   ' ',
                   item.label,
@@ -74,14 +73,13 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
       }),
     ]);
 
-    // Cache references
+    // createSectionEl 実行後に参照を確定させることで、未挿入のDOMへのアクセスを防ぐ。
     this._checkboxes = Array.from(
       this.sectionEl.querySelectorAll<HTMLInputElement>(
         ':scope > ul > li > label > input[type="checkbox"]'
       )
     );
 
-    // Wire events
     this._checkboxes.forEach((checkbox) => {
       checkbox.addEventListener('change', () => this._update());
     });
@@ -101,7 +99,8 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
   // ───────────────────────────────────────────────────────────────────────────
   // Public API
   // ───────────────────────────────────────────────────────────────────────────
-  /** Save current values so they can be restored on cancel. */
+
+  /** Cancel時に戻す基準として、DOM上のvalue-viewから現在の値を保存する。 */
   keepLastValues(): void {
     const views = Array.from(
       this.valuesContainerEl.querySelectorAll<ConditionItemValueView>(
@@ -111,7 +110,7 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
     this._lastValues = views.map((v) => v.value);
   }
 
-  /** Restore checkbox states to the last confirmed values. */
+  /** 保存済みスナップショットにチェック状態を巻き戻してUIを更新する。 */
   restore(): void {
     this._checkboxes.forEach((checkbox) => {
       checkbox.checked = this._lastValues.includes(checkbox.value);
@@ -119,19 +118,22 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
     this._update();
   }
 
-  /** Whether the current state is valid (at least one option checked). */
+  /** 1件以上チェックがあればOK可能とする。全解除のままOKを押せないようにするため。 */
   get isValid(): boolean {
     return this._checkboxes.some((checkbox) => checkbox.checked);
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // Private Methods
+  // ───────────────────────────────────────────────────────────────────────────
+
   /**
-   * Sync the checked state into <condition-item-value-view> list and
-   * update the parent editor's OK button enabled state.
+   * チェック状態をvalue-viewに反映しOKボタンの活性を更新する。
+   * DOMとデータを常に同期させるため毎回全件走査する。
    */
   private _update(): void {
-    // Reflect checkbox checks into value views
     this._checkboxes.forEach((checkbox) => {
-      const label = checkbox.dataset.label ?? checkbox.value; // guard against undefined
+      const label = checkbox.dataset.label ?? checkbox.value;
       if (checkbox.checked) {
         this.addValueView(checkbox.value, label);
       } else {
@@ -139,7 +141,6 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
       }
     });
 
-    // Validation: enable/disable OK based on current validity
     this.conditionValues.update(this.isValid);
   }
 }
