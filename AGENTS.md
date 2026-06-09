@@ -85,6 +85,7 @@ app/frontend/
 - API通信は `app/frontend/src/api/fetchData.ts` など既存API層に合わせる。
 - コンポーネントやViewから直接URLやfetchの仕様を増やす前に、既存のStore/API層へ寄せられるか確認する。
 - 戻る/進む、URL貼り付け、モード切り替えでは、Store更新と検索実行が重複しやすい。変更時は初期表示・タブ切替・履歴操作を分けて考える。
+- popstate ハンドラ内での `storeManager.setData('searchMode', ...)` は `pushState` を発火させてしまう。`setSearchModeFromHistory(mode)` を使うことで、popstate 中の pushState を防ぐ（StoreManager の `#fromHistory` フラグで制御する）。
 
 ## TypeScript / JavaScript 方針
 
@@ -108,6 +109,7 @@ app/frontend/
 - 新規・更新するコメントは日本語を基本にする。
 - コメントは「何をしているか」だけでなく、「なぜその形にしているか」を優先する。
 - 単にコードを読み上げるコメントは書かない。
+- 全ての公開・非公開の関数、メソッド、getter/setter には必ず1行の日本語WHYコメントをつける。
 - リファクタリング時にコメントが古くなったら、コードと一緒に必ず更新する。
 - 既存に英語コメントが残っている場合、触った範囲では日本語化を検討する。ただし大規模なコメント翻訳だけの差分は避ける。
 

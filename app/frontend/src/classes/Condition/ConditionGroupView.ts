@@ -71,6 +71,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
     return toolbar;
   }
 
+  /** 指定した条件種別の新しい条件行をこのグループ内に追加する。 */
   addNewConditionItem(
     conditionType: ConditionTypeValue,
     referenceElm: Node | null = null,
@@ -171,11 +172,13 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
     this._syncNumberOfChildren();
   }
 
+  /** 指定した子Viewを削除する。削除後に件数を同期してungroup判定を発火させる。 */
   removeConditionView(view: ConditionView): void {
     view.rootEl.remove();
     this._syncNumberOfChildren();
   }
 
+  /** MutationObserverとイベントを解除してからViewを削除する。先に切断しないとungroup二重呼び出しが起きる。 */
   remove(): void {
     this._mutationObserver?.disconnect();
     this._events.abort();
@@ -186,6 +189,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
   // Accessors
   // ───────────────────────────────────────────────────────────────────────────
 
+  /** 子Viewを配置するコンテナ要素。addConditionViewsなどで子を挿入するために参照する。 */
   get container(): HTMLDivElement {
     return this._childContainerEl;
   }
@@ -200,11 +204,13 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
       .filter(Boolean);
   }
 
+  /** DOM（data-operator属性）を正本とすることで、シリアライズ後の復元でもズレが起きない。 */
   get logicalOperator(): LogicalOperator {
     const op = (this._logicalOperatorSwitch.dataset.operator ??
       'and') as LogicalOperator;
     return op === 'or' ? 'or' : 'and';
   }
+  /** data-operatorとaria-checkedを同時に更新してDOMとARIAの整合性を保つ。 */
   set logicalOperator(op: LogicalOperator) {
     this._logicalOperatorSwitch.dataset.operator = op;
     // aria-checked: 'or' を "チェック済み" として扱い、スクリーンリーダーへ伝える。
@@ -276,6 +282,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
     );
   }
 
+  /** クリック・キーボードのイベントを登録する。ルートグループは選択対象外のためclickを登録しない。 */
   private _attachEvents(): void {
     const { signal } = this._events;
 
@@ -309,6 +316,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
     );
   }
 
+  /** 論理演算子の切り替えをBuilderへ伝えて検索クエリの再構築を促す。 */
   private _notifyChanged(): void {
     this._builder.changeCondition();
   }

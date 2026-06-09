@@ -13,6 +13,8 @@ import type {
   DefaultQueryKey,
 } from '../../../types';
 
+// 条件種別ごとの専用ビルダーを宣言的に管理する。
+// 新しい条件種別を追加するときはここへ追記するだけで済む。
 const BUILDERS: BuilderMap = {
   [CONDITION_TYPE.dataset]: buildDatasetQuery,
   [CONDITION_TYPE.significance]: buildSignificanceQuery,
@@ -23,7 +25,10 @@ const BUILDERS: BuilderMap = {
   [CONDITION_TYPE.variant_id]: buildVariantIdQuery,
 };
 
-/** Dispatch to the appropriate builder based on condition type */
+/**
+ * 条件種別に対応するビルダーへディスパッチし、クエリフラグメントを返す。
+ * BUILDERS に登録されていない種別は buildDefaultQuery へフォールバックする。
+ */
 export function buildQueryFragment<T extends ConditionTypeValue>(
   ctx: BuildContext<T>
 ): ConditionQuery {

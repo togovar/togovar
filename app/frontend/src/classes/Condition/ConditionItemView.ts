@@ -150,18 +150,23 @@ export class ConditionItemView extends BaseConditionView {
   // Accessors
   // ───────────────────────────────────────────────────────────────────────────
 
+  /** この条件行が対象とする条件種別。生成後は変わらないためreadonlyで保持する。 */
   get conditionType(): ConditionTypeValue {
     return this._conditionType;
   }
+  /** 条件値要素（condition-item-value-view）を並べるコンテナ。エディタが値を追加・取得するために参照する。 */
   get valuesContainerEl(): HTMLDivElement {
     return this._valuesContainerEl;
   }
+  /** OK/CancelボタンとエディタのDOMを配置する要素。ConditionValuesが自身のDOMをここへ挿入する。 */
   get editorElement(): HTMLDivElement {
     return this._editorEl;
   }
+  /** 初回追加フラグ。Cancelで値を戻すか条件行ごと削除するかの分岐に使う。 */
   get isFirstTime(): boolean {
     return this._isFirstTime;
   }
+  /** CancelやEscapeで元に戻すrelationの基準値。編集確定時・hydrate時に更新する。 */
   get keepLastRelation(): Relation {
     return this._keepLastRelation;
   }
@@ -492,12 +497,14 @@ export class ConditionItemView extends BaseConditionView {
     }
   }
 
+  /** DOMのdata-relation属性を読み取ってRelationを返す。DOM正本にすることでhydrate後のズレを防ぐ。 */
   private _readRelation(): Relation | undefined {
     if (!this._relationSupported) return undefined;
     const r = this.rootEl.dataset.relation;
     return r === 'eq' || r === 'ne' ? r : undefined;
   }
 
+  /** data-relation属性とaria-pressed属性を同時に更新して、DOMとARIAの整合性を保つ。 */
   private _setRelation(next: Relation | undefined): void {
     if (!this._relationSupported) {
       delete this.rootEl.dataset.relation;
@@ -552,6 +559,7 @@ export class ConditionItemView extends BaseConditionView {
     }
   };
 
+  /** 編集をキャンセルするときにエディタの値とrelationを直前の確定値へ戻す。 */
   private _revertChanges(): void {
     for (const editor of this._conditionValues.editors) editor.restore();
     this._setRelation(
