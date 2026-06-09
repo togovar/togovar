@@ -21,17 +21,11 @@
     box-sizing: border-box;
     width: $WIDTH_SIDEBAR - $PADDING_SIDEBAR_SIDE * 2;
     height: 100%;
-    padding-bottom: $PADDING_SIDEBAR_SIDE + $HEIGHT_BOTTOM_DRAWER + 15px;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     white-space: initial;
-
-    .-drawer-opened & {
-      padding-bottom:
-        $HEIGHT_BOTTOM_DRAWER_OPENED + $PADDING_SIDEBAR_SIDE + 15px;
-    }
 
     > .title {
       position: relative;
@@ -61,6 +55,15 @@
           display: none;
         }
       }
+    }
+
+    // Karyotypeはfixedで重なるため、見せたい15pxに閉じたdrawer分の逃げを足して末尾を隠れない位置まで上げる。
+    > .sidebar-bottom-spacer {
+      height: $HEIGHT_BOTTOM_DRAWER;
+    }
+
+    .-drawer-opened & > .sidebar-bottom-spacer {
+      height: $HEIGHT_BOTTOM_DRAWER_OPENED;
     }
 
     + .sidebarcontent {
