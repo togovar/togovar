@@ -141,6 +141,6 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
       }
     });
 
-    this.conditionValues.update(this.isValid);
+    this.notifyValidity();
   }
 }

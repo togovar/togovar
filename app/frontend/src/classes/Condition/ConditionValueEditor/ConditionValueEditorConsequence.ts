@@ -286,6 +286,6 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
       }
     });
 
-    this.conditionValues.update(this.isValid);
+    this.notifyValidity();
   }
 }

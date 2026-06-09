@@ -72,7 +72,7 @@ export class ConditionValueEditorVariantID extends ConditionValueEditor {
 
   /** バリデーション結果をOKボタンに反映する。IDが追加・削除されるたびに呼ぶ。 */
   private _update(): void {
-    this.conditionValues.update(this.isValid);
+    this.notifyValidity();
   }
 
   /** 削除イベントのvalue値でvalue-viewを削除してバリデーションを更新する。 */

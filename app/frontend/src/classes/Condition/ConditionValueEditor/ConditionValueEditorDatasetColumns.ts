@@ -286,7 +286,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
       );
     }
     this._syncValueViewsWithSelection();
-    this.conditionValues.update(this.isValid);
+    this.notifyValidity();
   }
 
   /**

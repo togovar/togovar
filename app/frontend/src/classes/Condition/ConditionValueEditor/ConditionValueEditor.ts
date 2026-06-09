@@ -13,7 +13,7 @@ type SectionContent =
   | SectionChildren
   | (() => SectionChildren);
 
-export class ConditionValueEditor {
+export abstract class ConditionValueEditor {
   private _sectionEl: HTMLElement | null = null;
 
   constructor(
@@ -160,6 +160,17 @@ export class ConditionValueEditor {
         ':scope > condition-item-value-view'
       )
     );
+  }
+
+  /** サブクラスごとの入力完了判定。OKボタンの活性制御に使う。 */
+  abstract get isValid(): boolean;
+
+  /**
+   * OKボタンの活性状態を現在の isValid から更新する。
+   * 全サブクラスの _update 末尾で呼ぶことで、同じ1行の重複をなくすため。
+   */
+  protected notifyValidity(): void {
+    this.conditionValues.update(this.isValid);
   }
 
   // ───────────────────────────────────────────────────────────────────────────

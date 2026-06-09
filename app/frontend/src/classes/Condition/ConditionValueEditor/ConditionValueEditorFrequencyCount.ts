@@ -632,7 +632,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   /** 全value-viewへ条件を適用してOKボタンの活性を更新する。 */
   private _update(): void {
     this._applyConditionToAllViews();
-    this.conditionValues.update(this.isValid);
+    this.notifyValidity();
   }
 
   /** valuesContainerEl 内の全value-viewに現在の条件を反映する。 */

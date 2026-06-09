@@ -86,7 +86,7 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     this._label = e.detail.label;
     this.addValueView(this._value, this._label, true, false);
 
-    this.conditionValues.update(this.isValid);
+    this.notifyValidity();
   };
 
   // ───────────────────────────────────────────────────────────────────────────

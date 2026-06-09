@@ -246,7 +246,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     this._renderSource('mgend', this._values.mgend);
     this._renderSource('clinvar', this._values.clinvar);
 
-    this.conditionValues.update(this.isValid);
+    this.notifyValidity();
   }
 
   /**

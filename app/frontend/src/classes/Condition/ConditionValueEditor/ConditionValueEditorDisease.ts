@@ -116,7 +116,7 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
 
   /** バリデーション結果をOKボタンへ反映する。値が確定するたびに呼ぶ。 */
   private _update(): void {
-    this.conditionValues.update(this.isValid);
+    this.notifyValidity();
   }
 
   // ───────────────────────────────────────────────────────────────────────────

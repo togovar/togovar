@@ -425,7 +425,7 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
       this.removeValueView('');
     }
 
-    this.conditionValues.update(this.isValid);
+    this.notifyValidity();
   }
 
   /**
