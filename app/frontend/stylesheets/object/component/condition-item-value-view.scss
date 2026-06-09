@@ -30,7 +30,7 @@
   frequency-count-value-view {
     position: absolute;
     top: 50%;
-    left: 142px;
+    left: var(--left-advanced-search-condition-graph);
     transform: translateY(-50%);
   }
   .inner {

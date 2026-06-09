@@ -3,7 +3,7 @@
 :host {
   position: absolute;
   top: 0;
-  left: 142px;
+  left: var(--left-advanced-search-condition-graph);
   display: flex;
   align-items: center;
   white-space: nowrap;
