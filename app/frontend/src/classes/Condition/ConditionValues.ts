@@ -3,7 +3,7 @@ import { supportsRelation } from '../../conditions';
 import { createEl } from '../../utils/dom/createEl';
 import { ConditionValueEditorCheckboxes } from './ConditionValueEditor/ConditionValueEditorCheckboxes';
 import { ConditionValueEditorClinicalSignificance } from './ConditionValueEditor/ConditionValueEditorClinicalSignificance';
-import ConditionValueEditorColumns from './ConditionValueEditor/ConditionValueEditorColumns';
+import ConditionValueEditorConsequence from './ConditionValueEditor/ConditionValueEditorConsequence';
 import { ConditionValueEditorDatasetColumns } from './ConditionValueEditor/ConditionValueEditorDatasetColumns';
 import { ConditionValueEditorDisease } from './ConditionValueEditor/ConditionValueEditorDisease';
 import { ConditionValueEditorFrequencyCount } from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
@@ -21,7 +21,7 @@ const EDITOR_REGISTRY: Readonly<
 > = {
   [CONDITION_TYPE.type]: [ConditionValueEditorCheckboxes],
   [CONDITION_TYPE.significance]: [ConditionValueEditorClinicalSignificance],
-  [CONDITION_TYPE.consequence]: [ConditionValueEditorColumns],
+  [CONDITION_TYPE.consequence]: [ConditionValueEditorConsequence],
   [CONDITION_TYPE.dataset]: [
     ConditionValueEditorDatasetColumns,
     ConditionValueEditorFrequencyCount,

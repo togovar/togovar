@@ -23,7 +23,7 @@ type ColumnDatum = ConsequenceNodeBase & { checked: boolean };
  * NOTE: dataset は ConditionValueEditorDatasetColumns へ移管済みのため、
  *       このエディタは consequence 専用として扱う。
  */
-export default class ConditionValueEditorColumns extends ConditionValueEditor {
+export default class ConditionValueEditorConsequence extends ConditionValueEditor {
   private _data: ColumnDatum[] = [];
   private _lastValues: string[] = [];
   /** 親の選択変更を子孫に伝播させるかどうか。consequence だけ true。 */
