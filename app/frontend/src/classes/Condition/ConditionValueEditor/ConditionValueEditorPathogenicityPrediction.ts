@@ -14,17 +14,18 @@ import type { Inequality, PredictionChangeDetail } from '../../../types';
 import type { TabView } from '../../../components/ConditionPathogenicityPredictionSearch/TabView';
 
 /**
- * Pathogenicity prediction editing screen
- * This class manages the UI and state for editing pathogenicity predictions.
+ * Pathogenicity prediction 条件のエディタ。
+ * tab-view でデータセット（AlphaMissense/SIFT/PolyPhen 等）を切り替え、
+ * スコア範囲と不等号を設定して prediction-value-view へ反映する。
  */
 export class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
-  private _dataset: PredictionKey = 'alphamissense'; // selected dataset (e.g., alphamissense, sift, polyphen)
-  private _label: PredictionLabel = 'AlphaMissense'; // selected label (e.g., AlphaMissense, SIFT, PolyPhen)
-  private _values: [number, number] = [0, 1]; // max-min values (0〜1)
-  private _inequalitySigns: [Inequality, Inequality] = ['gte', 'lte']; // max-min inequality signs (gte, gt, lte, lt)
+  private _dataset: PredictionKey = 'alphamissense';
+  private _label: PredictionLabel = 'AlphaMissense';
+  private _values: [number, number] = [0, 1];
+  private _inequalitySigns: [Inequality, Inequality] = ['gte', 'lte'];
   private _includeUnassigned = false;
-  private _includeUnknown = false; // polyphen用
-  private _tabsContainer!: HTMLDivElement; // container for tabs
+  private _includeUnknown = false;
+  private _tabsContainer!: HTMLDivElement;
   private _lastState: {
     dataset: PredictionKey;
     label: PredictionLabel;
@@ -41,6 +42,10 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
     includeUnknown: false,
   };
 
+  /**
+   * デフォルト値初期化・UI生成・イベント登録を順に実行する。
+   * bodyEl を確定させてからイベントを登録するため、初期化を3段階に分離する。
+   */
   constructor(valuesView: ConditionValues, conditionView: ConditionItemView) {
     super(valuesView, conditionView);
     this._initializeDefaultValues();
@@ -48,13 +53,13 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
     this._initializeEvents();
   }
 
-  // ========================================
-  // State Management
-  // ========================================
+  // ───────────────────────────────────────────────────────────────────────────
+  // Public API
+  // ───────────────────────────────────────────────────────────────────────────
 
   /**
-   * Retain values when switching to the edit screen.
-   * This method saves the current state of the values to allow restoration if needed.
+   * Cancel時に戻す基準として、shadow DOM内の prediction-value-view の現在値を保存する。
+   * shadow DOM を経由するため、value-view が未更新のタイミングでも正確な値が取れる。
    */
   keepLastValues() {
     this.valuesContainerEl
@@ -85,10 +90,7 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
       });
   }
 
-  /**
-   * Restore the last selected values if editing is canceled.
-   * This method re-applies the previously saved state to the UI.
-   */
+  /** 保存済みスナップショットの値でvalue-viewを再描画して編集前の状態に戻す。 */
   restore() {
     const {
       dataset,
@@ -108,11 +110,14 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
     );
   }
 
-  // ========================================
+  // ───────────────────────────────────────────────────────────────────────────
   // Initialization
-  // ========================================
+  // ───────────────────────────────────────────────────────────────────────────
 
-  // Initialize default values
+  /**
+   * デフォルト値と _lastState の初期化をコンストラクタから分離する。
+   * constructor が肥大化しないよう責務を分割するため。
+   */
   private _initializeDefaultValues() {
     this._dataset = 'alphamissense';
     this._label = 'AlphaMissense';
@@ -130,7 +135,10 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
     };
   }
 
-  // Initialize UI elements
+  /**
+   * セクションDOMを生成してtab-viewを配置する。
+   * bodyEl は _initializeEvents の前に確定させる必要があるためここで行う。
+   */
   private _initializeUI() {
     this.createSectionEl(
       'pathogenicity-editor-view',
@@ -141,15 +149,16 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
     this._createTabView();
   }
 
-  // Initialize event listeners
+  /**
+   * set-prediction-values と switch-tab の2イベントを _tabsContainer に登録する。
+   * 非アクティブなタブのスライダーも初回描画時にイベントを発火するため、
+   * アクティブな _dataset との一致を確認してから処理する。
+   */
   private _initializeEvents() {
     this._tabsContainer.addEventListener(
       'set-prediction-values',
       (e: Event) => {
         const detail = (e as CustomEvent<PredictionChangeDetail>).detail;
-        // 非アクティブなスライダーの初回レンダリングイベントを無視する。
-        // アクティブでないタブのスライダーも初回描画時にイベントを発火するが、
-        // this._dataset（アクティブなデータセット）と一致する場合のみ処理する。
         if (detail.dataset !== this._dataset) return;
         this._updateValuesAndSigns(detail);
       }
@@ -160,18 +169,21 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
     });
   }
 
-  // ========================================
+  // ───────────────────────────────────────────────────────────────────────────
   // State Management
-  // ========================================
+  // ───────────────────────────────────────────────────────────────────────────
 
-  /** Update UI and values when a tab is switched */
+  /** タブ切り替え時に _dataset と _label を更新して値・不等号を同期する。 */
   private _switchTab(detail: PredictionChangeDetail) {
     this._dataset = detail.dataset;
     this._label = PREDICTIONS[this._dataset].label;
     this._updateValuesAndSigns(detail);
   }
 
-  /** Update internal values and render */
+  /**
+   * 現在の値でvalue-viewを更新してOKボタンの活性を通知する。
+   * conditionValues.update が存在する環境のみ呼ぶことで、テスト環境との互換性を保つ。
+   */
   private _update() {
     this._addPredictionValueView(
       this._dataset,
@@ -181,13 +193,15 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
       this._includeUnassigned,
       this._includeUnknown
     );
-    // ConditionValues に update がある環境のみ呼ぶ
     if (hasUpdate(this.conditionValues)) {
       this.conditionValues.update(this._validate());
     }
   }
 
-  // 受け取った detail を反映（boolean 正規化を含む）
+  /**
+   * detail の値・不等号・フラグを内部状態へ正規化して反映しUIを更新する。
+   * boolean 正規化を一箇所にまとめることで、各フラグの型変換ミスを防ぐ。
+   */
   private _updateValuesAndSigns(detail: PredictionChangeDetail) {
     this._values = [detail.values[0], detail.values[1]];
     this._inequalitySigns = [
@@ -200,11 +214,14 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
     this._update();
   }
 
-  // ========================================
+  // ───────────────────────────────────────────────────────────────────────────
   // UI Rendering
-  // ========================================
+  // ───────────────────────────────────────────────────────────────────────────
 
-  /** Add or update the value view */
+  /**
+   * value-viewを1件に保ちながら prediction-value-view へ値を流し込む。
+   * 値の変更のたびに呼ぶことで常に最新状態を表示するため、毎回 setValues を呼ぶ。
+   */
   private _addPredictionValueView(
     dataset: PredictionKey,
     label: PredictionLabel,
@@ -213,7 +230,6 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
     includeUnassigned = false,
     includeUnknown = false
   ) {
-    // 既存 valueView を取得 or 作成
     let valueView =
       this.valuesContainerEl.querySelector<ConditionItemValueView>(
         'condition-item-value-view'
@@ -229,7 +245,6 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
     valueView.value = dataset;
     valueView.label = label;
 
-    // 内部の prediction-value-view に値を流し込む
     this.valuesContainerEl
       .querySelectorAll<ConditionItemValueView>(
         ':scope > condition-item-value-view'
@@ -250,32 +265,34 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
       });
   }
 
-  /** Create tab view */
+  /** tab-view カスタム要素を生成して _tabsContainer へ追加する。 */
   private _createTabView() {
     const tabView = document.createElement('tab-view') as TabView;
     tabView.datasets = PREDICTIONS;
     this._tabsContainer.appendChild(tabView);
   }
 
-  // ========================================
+  // ───────────────────────────────────────────────────────────────────────────
   // Validation
-  // ========================================
-  /** Validate if the values are valid */
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /** from/to の両値が有限数であれば有効とする。NaN や Infinity を除外するため。 */
   private _validate(): boolean {
     return Number.isFinite(this._values[0]) && Number.isFinite(this._values[1]);
   }
 
-  // Accessor
-  /** You can press the OK button if there are two valid values */
+  /** _validate の結果をOKボタン制御に公開する。 */
   get isValid() {
     return this._validate();
   }
 }
 
+/** conditionValues に update メソッドが存在するか確認する型ガード。 */
 function hasUpdate(x: unknown): x is { update(valid: boolean): void } {
   return typeof (x as Record<string, unknown>)?.update === 'function';
 }
 
+/** detail から includeUnassigned/includeUnknown を正規化して返す。 */
 function normalizeIncludeFlags(d: PredictionChangeDetail) {
   const arr = d.unassignedChecks ?? [];
   return {

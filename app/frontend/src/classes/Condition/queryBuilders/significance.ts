@@ -12,7 +12,7 @@ import {
 } from '../../../definition';
 import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 
-/** Query selectors scoped within the values container. */
+// ソースごとのセレクタを定数化する。変更時は1箇所だけ修正すれば済む。
 const SEL = {
   mgend:
     ':scope > .mgend-wrapper > .mgend-condition-wrapper > condition-item-value-view',
@@ -20,6 +20,10 @@ const SEL = {
     ':scope > .clinvar-wrapper > .clinvar-condition-wrapper > condition-item-value-view',
 } as const;
 
+/**
+ * 指定セレクタで条件要素を取得する。
+ * container が null/undefined の場合は DOM 構造の問題として即座にエラーとする。
+ */
 function pickScoped(
   container: HTMLElement | null | undefined,
   selector: string
@@ -32,17 +36,22 @@ function pickScoped(
   ) as ConditionItemValueView[];
 }
 
+/** API に送れる有効な significance term かどうかを型ガードで判定する。 */
 function isSignificanceTerm(v: unknown): v is SignificanceTerm {
   return (
     typeof v === 'string' && SIGNIFICANCE_TERM_SET.has(v as SignificanceTerm)
   );
 }
 
+/** 要素リストから significance term を収集する。無効な値は除外する。 */
 function collectTerms(elements: ConditionItemValueView[]): SignificanceTerm[] {
   return elements.map((e) => e.value).filter(isSignificanceTerm);
 }
 
-// Per-source builder returns `null` when that source is simply "not selected" (no DOM items).
+/**
+ * 1ソース（mgend/clinvar）の条件クエリを組み立てる。
+ * DOM 要素が0件またはvalid termが0件の場合はnullを返し、呼び出し元でスキップさせる。
+ */
 function buildSourceCondition(
   relation: Relation,
   source: SignificanceSource,
@@ -55,6 +64,11 @@ function buildSourceCondition(
   return { significance: { relation, source: [source], terms } };
 }
 
+/**
+ * Clinical significance 条件のクエリを組み立てる。
+ * ソースが2つ選ばれた場合、除外（ne）は AND、包含（eq）は OR で結合する。
+ * API の仕様として、除外条件はすべてのソースで否定しないと意図通りにならないため AND を使う。
+ */
 export function buildSignificanceQuery(
   ctx: BuildContext<'significance'>
 ): SignificanceQuery {
@@ -62,25 +76,24 @@ export function buildSignificanceQuery(
   const mgendEls = pickScoped(container, SEL.mgend);
   const clinvarEls = pickScoped(container, SEL.clinvar);
 
-  // Build clauses per source (MGEND/ClinVar)
+  // ソースごとにクエリを生成し、null（未選択）を除外する。
   const mgend = buildSourceCondition(ctx.relation, 'mgend', mgendEls);
   const clinvar = buildSourceCondition(ctx.relation, 'clinvar', clinvarEls);
 
-  // Keep only present clauses (drop `null`) and narrow the array to `SignificanceLeaf[]`
   const conditions = [mgend, clinvar].filter(
     (clause): clause is SignificanceLeaf => clause !== null
   );
 
-  // 0 sources => user selected nothing in both sections: fail fast
+  // 両ソースとも未選択の場合はクエリが成立しない。
   if (conditions.length === 0) {
     throw new Error('significance: no terms selected');
   }
 
-  // 1 source => pass the single clause through as-is
+  // 1ソースのみ選択された場合はそのままの形で返す。
   if (conditions.length === 1) {
     return conditions[0];
   }
 
-  // 2 sources => combine by relation: 'ne' (exclude) uses AND, otherwise OR
+  // 2ソース選択: 除外（ne）は AND、包含（eq）は OR で結合する。
   return ctx.relation === 'ne' ? { and: conditions } : { or: conditions };
 }

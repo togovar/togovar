@@ -1,6 +1,6 @@
 import { ADVANCED_CONDITIONS } from '../../global';
 import type { ConditionTypeValue } from '../../definition';
-import type { RestoredConditionValue } from '../Condition/ConditionItemRestoreTypes';
+import type { RestoredConditionValue } from '../../types';
 import type { Relation } from '../../types';
 
 /** URL由来のunknownを安全に扱うための型エイリアス。 */

@@ -4,7 +4,10 @@ import type {
   DefaultQueryKey,
 } from '../../../types';
 
-/** Fallback builder for Consequence, Disease, Variant type condition types. */
+/**
+ * 専用ビルダーを持たない条件型（Consequence・Disease・Variant type など）の共通クエリを組み立てる。
+ * 空文字・空白のみの値は API 側でエラーになるため事前に除外する。
+ */
 export function buildDefaultQuery(
   ctx: BuildContext<DefaultQueryKey>
 ): DefaultLeaf {

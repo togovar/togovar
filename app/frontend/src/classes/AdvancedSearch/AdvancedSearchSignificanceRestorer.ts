@@ -3,7 +3,7 @@ import {
   PREDICTIONS,
   type PredictionKey,
 } from '../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
-import type { RestoredPredictionValue } from '../Condition/ConditionItemRestoreTypes';
+import type { RestoredPredictionValue } from '../../types';
 import type {
   Inequality,
   LogicalOperator,

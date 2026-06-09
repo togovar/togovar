@@ -71,7 +71,7 @@ interface CheckboxesCondition {
 /* --------------- tree --------------- */
 // Trees like "numeric id reference type" such as consequence
 // Each node must have an id, children are referenced by an array of ids, descriptions are optional
-interface ConsequenceNodeBase {
+export interface ConsequenceNodeBase {
   id: number;
   label: string;
   parent?: number;
@@ -79,7 +79,7 @@ interface ConsequenceNodeBase {
   value?: string;
   description?: string;
 }
-interface TreeCondition {
+export interface TreeCondition {
   label: string;
   type: 'tree';
   values: ConsequenceNodeBase[];

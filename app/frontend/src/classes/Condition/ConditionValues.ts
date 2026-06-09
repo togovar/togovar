@@ -3,7 +3,7 @@ import { supportsRelation } from '../../conditions';
 import { createEl } from '../../utils/dom/createEl';
 import { ConditionValueEditorCheckboxes } from './ConditionValueEditor/ConditionValueEditorCheckboxes';
 import { ConditionValueEditorClinicalSignificance } from './ConditionValueEditor/ConditionValueEditorClinicalSignificance';
-import ConditionValueEditorColumns from './ConditionValueEditor/ConditionValueEditorColumns';
+import ConditionValueEditorConsequence from './ConditionValueEditor/ConditionValueEditorConsequence';
 import { ConditionValueEditorDatasetColumns } from './ConditionValueEditor/ConditionValueEditorDatasetColumns';
 import { ConditionValueEditorDisease } from './ConditionValueEditor/ConditionValueEditorDisease';
 import { ConditionValueEditorFrequencyCount } from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
@@ -21,7 +21,7 @@ const EDITOR_REGISTRY: Readonly<
 > = {
   [CONDITION_TYPE.type]: [ConditionValueEditorCheckboxes],
   [CONDITION_TYPE.significance]: [ConditionValueEditorClinicalSignificance],
-  [CONDITION_TYPE.consequence]: [ConditionValueEditorColumns],
+  [CONDITION_TYPE.consequence]: [ConditionValueEditorConsequence],
   [CONDITION_TYPE.dataset]: [
     ConditionValueEditorDatasetColumns,
     ConditionValueEditorFrequencyCount,
@@ -97,6 +97,10 @@ export default class ConditionValues {
   // DOM build & events
   // ─────────────────────────────────────────────────────────
 
+  /**
+   * 編集パネルのDOM構造（sections + OK/Cancelボタン）を生成する。
+   * OKボタンは初期状態では disabled にしておき、エディタが有効になるまで押せないようにする。
+   */
   private _buildDOM(): void {
     const sections = (this._sectionsEl = createEl('div', {
       class: 'sections',
@@ -121,6 +125,10 @@ export default class ConditionValues {
     this._conditionView.editorElement.replaceChildren(sections, buttons);
   }
 
+  /**
+   * OK/Cancelボタンのクリックイベントを登録する。
+   * 初回追加のCancelは条件行ごと削除し、2回目以降のCancelは値を元に戻す。
+   */
   private _wireEvents(): void {
     const { signal } = this._events;
 
@@ -158,6 +166,10 @@ export default class ConditionValues {
     );
   }
 
+  /**
+   * 条件種別に対応するエディタをインスタンス化する。
+   * EDITOR_REGISTRY に登録のない種別はエディタなし（空配列）で動作する。
+   */
   private _instantiateEditorsFor(type: ConditionTypeValue): void {
     const ctors = EDITOR_REGISTRY[type] ?? [];
     this._editors = ctors.map((Ctor) => new Ctor(this, this._conditionView));
@@ -170,14 +182,16 @@ export default class ConditionValues {
       }
     }
 
-    // 初期状態のボタン有効状態を反映
+    // 初期状態のボタン有効状態を反映する。
     this._recomputeValidity();
   }
 
+  /** 全エディタの有効状態を再集計してOKボタンの活性を更新する。 */
   private _recomputeValidity(): void {
     this.update();
   }
 
+  /** OKボタンの disabled 属性を切り替えてユーザーが押せる状態かを制御する。 */
   private _setOkEnabled(enabled: boolean): void {
     if (enabled) {
       this._okButtonEl.removeAttribute('disabled');
@@ -190,18 +204,22 @@ export default class ConditionValues {
   // Accessors
   // ─────────────────────────────────────────────────────────
 
+  /** この編集パネルを持つ条件行View。エディタからOK/Cancel処理を委譲するために参照する。 */
   get conditionView(): ConditionItemView {
     return this._conditionView;
   }
 
+  /** エディタのDOMを配置するsections要素。エディタはここへ自身のDOMを追加する。 */
   get sections(): HTMLDivElement {
     return this._sectionsEl;
   }
 
+  /** この条件行に登録されているエディタの一覧。restore/keepLastValuesの一括呼び出しに使う。 */
   get editors(): readonly ConditionValueEditor[] {
     return this._editors;
   }
 
+  /** AbortControllerでOK/Cancelのイベントリスナーをまとめてクリーンアップする。 */
   destroy(): void {
     this._events.abort();
   }

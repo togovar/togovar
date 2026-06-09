@@ -13,7 +13,7 @@ type SectionContent =
   | SectionChildren
   | (() => SectionChildren);
 
-export class ConditionValueEditor {
+export abstract class ConditionValueEditor {
   private _sectionEl: HTMLElement | null = null;
 
   constructor(
@@ -25,7 +25,10 @@ export class ConditionValueEditor {
   // DOM Creation
   // ───────────────────────────────────────────────────────────────────────────
 
-  /** Create an element for the edit screen. */
+  /**
+   * エディタのDOM構造を sections 要素へ挿入し、_sectionEl にキャッシュする。
+   * constructor で必ず1度呼ぶことで、getter が「確定済み」を前提に使える保証とするため。
+   */
   protected createSectionEl(
     className: EditorSectionClassName,
     content: SectionContent
@@ -57,8 +60,9 @@ export class ConditionValueEditor {
     return sectionEl;
   }
 
-  /** If there is only one value in the condition, update it,
-   * for multiple values, add them without duplicates. (for variant id)
+  /**
+   * 重複追加を防ぐため既存のvalue-viewがあればラベルと値を上書きし、なければ新規生成する。
+   * isOnly が true のときはセレクタなしで既存を上書きする（単一値条件向け）。
    */
   protected addValueView(
     value: string,
@@ -76,33 +80,48 @@ export class ConditionValueEditor {
       // HTMLElementTagNameMap の拡張が効いていれば、型は自動的に ConditionItemValueView
       valueView = document.createElement('condition-item-value-view');
       valueView.conditionType = this.conditionType;
-      valueView.deleteButton = showDeleteButton;
       this.valuesContainerEl.append(valueView);
     }
 
+    // 新規・既存どちらでも同じ引数で deleteButton を同期する。
+    valueView.deleteButton = showDeleteButton;
     valueView.label = label;
     valueView.value = value;
     return valueView;
   }
 
-  /** Delete if argument value contains a value */
+  /**
+   * 値が空文字のときはセレクタなしで全件削除し、値がある場合は該当するものだけ削除する。
+   * 呼び出し元が値の有無を気にせずに使えるよう2パターンをここで吸収するため。
+   */
   protected removeValueView(value: string): void {
-    const selector = value ? `[data-value="${value}"]` : '';
-    const view = selectOrNull<ConditionItemValueView>(
-      this.valuesContainerEl,
-      `condition-item-value-view${selector}`
-    );
-    if (view) view.remove();
+    if (value) {
+      const view = selectOrNull<ConditionItemValueView>(
+        this.valuesContainerEl,
+        `condition-item-value-view[data-value="${value}"]`
+      );
+      if (view) view.remove();
+    } else {
+      this.valuesContainerEl
+        .querySelectorAll<ConditionItemValueView>('condition-item-value-view')
+        .forEach((view) => view.remove());
+    }
   }
 
   // ───────────────────────────────────────────────────────────────────────────
   // Accessors
   // ───────────────────────────────────────────────────────────────────────────
+
+  /** createSectionEl 実行前のアクセスはテンプレート崩れを示すため、即座にエラーとして検知する。 */
   protected get sectionEl(): HTMLElement {
     if (!this._sectionEl) throw new Error('not mounted yet');
     return this._sectionEl;
   }
 
+  /**
+   * エディタのメインコンテンツ領域。
+   * createEl で .body クラスを持つ要素として必ず生成するため、selectRequired で確実に取得できる。
+   */
   protected get bodyEl(): HTMLElement {
     return selectRequired<HTMLElement>(
       this.sectionEl,
@@ -111,27 +130,36 @@ export class ConditionValueEditor {
     );
   }
 
-  /** Access to the parent condition item view */
+  /** サブクラスが親行（条件の種別・値コンテナ）へアクセスするための参照。コンストラクタ引数をそのまま返す。 */
   protected get conditionItemView(): ConditionItemView {
     return this._conditionItemView;
   }
 
-  /** Access to the condition values component */
+  /** サブクラスがOKボタンの活性更新を依頼するための参照。コンストラクタ引数をそのまま返す。 */
   protected get conditionValues(): ConditionValues {
     return this._conditionValues;
   }
 
-  /** Get the condition type from the parent view */
+  /**
+   * 親行の conditionType を委譲取得する。
+   * エディタが独自にキャッシュすると親との不整合が起きるため、都度取得する。
+   */
   protected get conditionType(): ConditionTypeValue {
     return this._conditionItemView.conditionType;
   }
 
-  // div.values which is a wrapper for condition-item-value-view
+  /**
+   * 親行が持つ値コンテナを委譲取得する。
+   * エディタが独自に参照を持つと挿入先がずれるリスクがあるため委譲する。
+   */
   protected get valuesContainerEl(): HTMLDivElement {
     return this._conditionItemView.valuesContainerEl;
   }
 
-  /** Get all condition item value views. */
+  /**
+   * 現在のDOMから生きている condition-item-value-view を一覧で返す。
+   * isValid や keepLastValues で使用する。
+   */
   protected get conditionItemValueViews(): ConditionItemValueView[] {
     return Array.from(
       this.valuesContainerEl.querySelectorAll<ConditionItemValueView>(
@@ -140,14 +168,24 @@ export class ConditionValueEditor {
     );
   }
 
+  /** サブクラスごとの入力完了判定。OKボタンの活性制御に使う。 */
+  abstract get isValid(): boolean;
+
+  /**
+   * OKボタンの活性状態を現在の isValid から更新する。
+   * 全サブクラスの _update 末尾で呼ぶことで、同じ1行の重複をなくすため。
+   */
+  protected notifyValidity(): void {
+    this.conditionValues.update(this.isValid);
+  }
+
   // ───────────────────────────────────────────────────────────────────────────
   // Options handling (for karyotype selection, etc.)
   // ───────────────────────────────────────────────────────────────────────────
 
   /**
-   * Apply initial options to the editor (e.g., from karyotype selection).
-   * Override this method in subclasses to handle specific options.
-   * @param _options - Options object (structure depends on the editor type)
+   * カリオタイプ選択など外部からの初期値注入を受け付けるフック。
+   * デフォルトは何もしない。必要なサブクラスだけオーバーライドする。
    */
   applyOptions(_options: unknown): void {
     // Base implementation does nothing; subclasses can override

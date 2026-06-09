@@ -5,7 +5,7 @@ import SearchFieldWithSuggestions from '../../../components/SearchField/suggesti
 import { API_URL } from '../../../global';
 import { createEl } from '../../../utils/dom/createEl';
 
-/** Gene Search editing screen */
+/** Gene Symbol のサジェスト検索UIエディタ。APIからサジェストを取得してgene IDへ変換する。 */
 export class ConditionValueEditorGene extends ConditionValueEditor {
   private _searchFieldView!: SearchFieldWithSuggestions;
   private _value: string = '';
@@ -13,19 +13,22 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
   private _lastValue: string = '';
   private _lastLabel: string = '';
 
+  /**
+   * 検索フィールドUIを生成してサジェスト選択イベントを登録する。
+   * bodyEl に SearchFieldWithSuggestions をインスタンス化することで、
+   * 内部コンポーネントが自身の挿入先を管理できる。
+   */
   constructor(
     conditionValues: ConditionValues,
     conditionItemView: ConditionItemView
   ) {
     super(conditionValues, conditionItemView);
 
-    // HTML
     this.createSectionEl('text-field-editor-view', () => [
       createEl('header', { text: `Search for ${this.conditionType}` }),
       createEl('div', { class: 'body' }),
     ]);
 
-    /** @property {HTMLDivElement} _searchFieldView - CustomElement */
     this._searchFieldView = new SearchFieldWithSuggestions(
       'BRCA2',
       `${API_URL}/api/search/${this.conditionType}`,
@@ -52,7 +55,8 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
   // ───────────────────────────────────────────────────────────────────────────
   // Public API
   // ───────────────────────────────────────────────────────────────────────────
-  /** Retain value when changing to edit screen */
+
+  /** Cancel時に戻す基準として、DOM上のvalue-viewの値・ラベルを保存する。 */
   keepLastValues(): void {
     const valueView = this.valuesContainerEl.querySelector(
       'condition-item-value-view'
@@ -62,7 +66,7 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     this._lastLabel = valueView?.label || '';
   }
 
-  /** Restore the value before editing if cancel button is pressed */
+  /** 保存済み値でvalue-viewを再追加して編集前の状態に戻す。 */
   restore(): void {
     this.addValueView(this._lastValue, this._lastLabel, true);
   }
@@ -70,7 +74,11 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
   // ───────────────────────────────────────────────────────────────────────────
   // Private Methods
   // ───────────────────────────────────────────────────────────────────────────
-  /** Add condition-item-value-view with selected suggestion data */
+
+  /**
+   * サジェスト選択時にvalue-viewを上書きしてOKボタンの活性を更新する。
+   * isOnly=true で既存value-viewを上書きすることで、遺伝子は常に1件だけ選択できるようにする。
+   */
   private _handleSuggestSelect = (
     e: CustomEvent<{ id: number; label: string }>
   ): void => {
@@ -78,14 +86,14 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     this._label = e.detail.label;
     this.addValueView(this._value, this._label, true, false);
 
-    // Change whether okbutton can be pressed
-    this.conditionValues.update(this.isValid);
+    this.notifyValidity();
   };
 
   // ───────────────────────────────────────────────────────────────────────────
   // Validation
   // ───────────────────────────────────────────────────────────────────────────
-  /** You can press the ok button if there is condition-item-value-view */
+
+  /** value-viewが1件以上あれば選択済みと判断する。OKボタンの活性制御に使う。 */
   get isValid(): boolean {
     return this.conditionItemValueViews.length > 0;
   }
