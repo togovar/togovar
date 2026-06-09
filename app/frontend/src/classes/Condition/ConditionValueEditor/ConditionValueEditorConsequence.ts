@@ -130,16 +130,24 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
           ?.querySelector(':scope > .-selected')
           ?.classList.remove('-selected');
         const currentDepth = parseInt(
-          li.closest('.column')?.getAttribute('data-depth') ?? '0'
+          li.closest('.column')?.getAttribute('data-depth') ?? '0',
+          10
         );
         // クリックした階層より深いカラムをすべて削除してドリルダウン先を表示する。
         for (const col of this._columns.querySelectorAll<HTMLElement>(
           ':scope > .column'
         )) {
-          if (parseInt(col.dataset.depth ?? '0') > currentDepth) col.remove();
+          if (parseInt(col.dataset.depth ?? '0', 10) > currentDepth) col.remove();
         }
         li.classList.add('-selected');
         this._drawColumn(Number(arrow.dataset.id));
+      });
+      // tabindex 付与後もキーボード（Enter/Space）で操作できるようにする。
+      arrow.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          arrow.click();
+        }
       });
     }
 
