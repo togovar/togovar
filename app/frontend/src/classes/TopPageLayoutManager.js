@@ -3,9 +3,11 @@ class TopPageLayoutManager {
 
   constructor() {
     this._isReady = false; // 初期化フラグ
+    this._resizeObserver = null;
+    this._updateFrameId = null;
   }
 
-  /** レイアウトマネージャーを初期化する
+  /** SearchInputViewの高さが初期描画後に変わるため、再計算対象と監視を初期化する。
    * @param {Array} targets - 表示サイズを更新するコンポーネントのリスト */
   init(targets) {
     this._isReady = true;
@@ -26,9 +28,36 @@ class TopPageLayoutManager {
     // ウィンドウリサイズ時にレイアウトを更新
     window.addEventListener('resize', this._boundUpdateHandler);
     window.dispatchEvent(new Event('resize')); // 読み込み時にレイアウトを更新
+
+    this._setupResizeObserver();
   }
 
-  /** 検索結果エリアやターゲット要素の表示サイズを動的に更新する */
+  /** SearchInputViewはモード切替や遅延描画で高さが変わるため、次フレームに再計算をまとめる */
+  scheduleUpdate() {
+    if (!this._isReady || this._updateFrameId !== null) return;
+
+    this._updateFrameId = requestAnimationFrame(() => {
+      this._updateFrameId = null;
+      this.update();
+    });
+  }
+
+  /** 検索フォームやdrawerの実寸が変わったときに、検索結果エリアの高さを追従させる */
+  _setupResizeObserver() {
+    if (typeof ResizeObserver === 'undefined') return;
+
+    this._resizeObserver = new ResizeObserver(() => {
+      this.scheduleUpdate();
+    });
+
+    [this._globalHeader, this._searchInputView, this._drawerView].forEach(
+      (elm) => {
+        if (elm) this._resizeObserver.observe(elm);
+      }
+    );
+  }
+
+  /** 検索結果エリアやターゲット要素は周辺UIの実寸から残り高さを決める */
   update() {
     if (!this._isReady) return;
 
@@ -52,10 +81,18 @@ class TopPageLayoutManager {
     this.targets.forEach((target) => target.updateDisplaySize());
   }
 
-  /** リソースのクリーンアップ */
+  /** ページ離脱時に古い監視や予約済み更新が残らないよう、登録したリソースを解放する。 */
   cleanup() {
     if (this._boundUpdateHandler) {
       window.removeEventListener('resize', this._boundUpdateHandler);
+    }
+
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+    }
+
+    if (this._updateFrameId !== null) {
+      cancelAnimationFrame(this._updateFrameId);
     }
 
     // 参照をクリア
@@ -64,6 +101,8 @@ class TopPageLayoutManager {
     this._searchInputView = null;
     this._searchResultsView = null;
     this._drawerView = null;
+    this._resizeObserver = null;
+    this._updateFrameId = null;
     this._isReady = false;
   }
 }

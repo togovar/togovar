@@ -57,15 +57,6 @@
       }
     }
 
-    // Karyotypeはfixedで重なるため、見せたい15pxに閉じたdrawer分の逃げを足して末尾を隠れない位置まで上げる。
-    > .sidebar-bottom-spacer {
-      height: $HEIGHT_BOTTOM_DRAWER;
-    }
-
-    .-drawer-opened & > .sidebar-bottom-spacer {
-      height: $HEIGHT_BOTTOM_DRAWER_OPENED;
-    }
-
     + .sidebarcontent {
       margin-left: 25px;
     }
