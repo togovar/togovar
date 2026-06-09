@@ -26,6 +26,12 @@
 :host([data-condition-type='genotype']) {
   display: block;
   position: relative;
+  frequency-count-value-view {
+    position: absolute;
+    top: 50%;
+    left: 142px;
+    transform: translateY(-50%);
+  }
   .inner {
     min-width: 50px;
     &::before {
