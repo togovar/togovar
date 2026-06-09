@@ -26,6 +26,13 @@
 :host([data-condition-type='genotype']) {
   display: block;
   position: relative;
+  // dataset/genotypeは同じfrequency-count-value-viewを使うため、bar開始位置も揃える。
+  frequency-count-value-view {
+    position: absolute;
+    top: 50%;
+    left: var(--left-advanced-search-condition-graph);
+    transform: translateY(-50%);
+  }
   .inner {
     min-width: 50px;
     &::before {
