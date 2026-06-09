@@ -53,7 +53,7 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
     this._columns = selectRequired<HTMLElement>(
       this.bodyEl,
       ':scope > .columns',
-      'ConditionValueEditorColumns'
+      'ConditionValueEditorConsequence'
     );
 
     this._drawColumn();
@@ -215,7 +215,7 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
   /**
    * 親チェックボックスの indeterminate 状態を再計算する。
    * 全子孫のチェック数を集計して、全選択/一部選択/未選択を判定する。
-   * 戻り値は 0(未選択) または 1(選択済み or 中間) で数値として集計できるようにする。
+   * 戻り値は 0(未選択) / 1(中間) / 2(全選択) とし、多階層でも親が正しく集計できるようにする。
    */
   private _updateIndeterminate(): void {
     const checkLeaves = (datum: ColumnDatum): number => {
@@ -225,16 +225,18 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
       datum.children.forEach((childId) => {
         const child = this._data.find((d) => d.id === childId);
         if (!child) return;
-        // 非リーフノードは再帰集計し、リーフは checked の 0/1 で加算する。
-        numberOfChecked += child.children ? checkLeaves(child) : child.checked ? 1 : 0;
+        // 非リーフは再帰集計(0/1/2)、リーフは unchecked=0 / checked=2 で加算する。
+        // 1(中間) と 2(全選択) を区別することで、親が全選択かどうかを正しく判定できる。
+        numberOfChecked += child.children ? checkLeaves(child) : child.checked ? 2 : 0;
       });
 
+      const maxChecked = datum.children.length * 2;
       let checked: boolean;
       let indeterminate: boolean;
       if (numberOfChecked === 0) {
         checked = false;
         indeterminate = false;
-      } else if (numberOfChecked === datum.children.length) {
+      } else if (numberOfChecked === maxChecked) {
         checked = true;
         indeterminate = false;
       } else {
@@ -250,8 +252,7 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
         checkbox.checked = checked;
         checkbox.indeterminate = indeterminate;
       }
-      // 1を返すことで呼び出し元が「このノードは選択済み or 中間」と数値で扱える。
-      return checked || indeterminate ? 1 : 0;
+      return checked ? 2 : indeterminate ? 1 : 0;
     };
 
     // ルートレベルのノードから下位へ再帰する。

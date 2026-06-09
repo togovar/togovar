@@ -1,4 +1,4 @@
-// ShadowRoot は Element を継承しないため、明示的に union に含める。
+// ShadowRoot は DocumentFragment を継承するため、DocumentFragment を含めることで検索ルートとして扱える。
 export type QueryRoot = Document | DocumentFragment | Element;
 
 /**
