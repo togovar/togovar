@@ -23,21 +23,11 @@ import type {
   Relation,
   ConditionDefinition,
   SignificanceSource,
+  RestoredConditionValue,
 } from '../../types';
 import type { ConditionItemValueView } from '../../components/ConditionItemValueView';
 import type { FrequencyCountValueView } from '../../components/FrequencyCountValueView';
 import type { PredictionValueView } from '../../components/ConditionPathogenicityPredictionSearch/PredictionValueView';
-
-// Restored* 型は AdvancedSearch/Restorer との共有型として独立ファイルに定義している。
-export type {
-  RestoredFrequencyMode,
-  RestoredFrequencyValue,
-  RestoredConditionValue,
-  RestoredPredictionValue,
-} from './ConditionItemRestoreTypes';
-import type {
-  RestoredConditionValue,
-} from './ConditionItemRestoreTypes';
 
 /**
  * 1条件行の View。編集・削除・relation切り替えのイベントと、
