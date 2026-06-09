@@ -5,6 +5,7 @@ import { ADVANCED_CONDITIONS } from '../../../../global';
 import type { TreeNode } from '../../../../types';
 import type { UiNode } from './types';
 import { ROOT_NODE_ID } from './types';
+import type { ConditionItemValueView } from '../../../../components/ConditionItemValueView';
 
 /**
  * 検索条件マスタのデータをカラムUIが扱えるHierarchyNode形式に変換する。
@@ -89,7 +90,7 @@ export class DatasetTreeDataProcessor {
    */
   restoreCheckedStates(
     datasetTree: HierarchyNode<UiNode>,
-    savedSelections: Array<{ dataset: { value?: string } }>,
+    savedSelections: ConditionItemValueView[],
     propagateToChildren: (
       node: HierarchyNode<UiNode>,
       isSelected: boolean

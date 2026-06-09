@@ -12,6 +12,7 @@ import { DatasetValueViewManager } from './dataset-columns/DatasetValueViewManag
 import type { UiNode } from './dataset-columns/types';
 import { createEl } from '../../../utils/dom/createEl';
 import { selectRequired } from '../../../utils/dom/select';
+import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
 
 /**
  * dataset/genotype 条件をカラムビューで選択するエディタ。
@@ -20,7 +21,7 @@ import { selectRequired } from '../../../utils/dom/select';
  */
 export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   /** Cancel時に戻す基準として保存するvalue-viewのスナップショット。 */
-  private _lastValueViews: Array<{ dataset: { value?: string } }> = [];
+  private _lastValueViews: ConditionItemValueView[] = [];
 
   /** 全データセットの階層ツリー。checked状態もここで管理する。 */
   private _data: HierarchyNode<UiNode>;
