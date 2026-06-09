@@ -39,6 +39,12 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
   /** Array of currently selected nodes that should appear in the value display */
   private _nodesToShowInValueView: Array<HierarchyNode<UiNode>>;
 
+  /**
+   * URL復元直後は、値表示だけが先に復元され、datasetツリーのchecked状態はまだ空になる。
+   * 初期描画の非同期_updateUIでその値表示を消さないよう、ユーザー操作後だけ空選択で同期削除する。
+   */
+  private _hasUserChangedSelection = false;
+
   // ═══════════════════════════════════════════════════════════════════════════════
   // Specialized modules - each handles a specific aspect of the interface
   // ═══════════════════════════════════════════════════════════════════════════════
@@ -276,7 +282,10 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
         this._checkStateManager.updateChildrenCheckState(node, checked),
       (node, checked) =>
         this._checkStateManager.updateParentCheckState(node, checked),
-      () => this._updateUI()
+      () => {
+        this._hasUserChangedSelection = true;
+        this._updateUI();
+      }
     );
     this._eventHandler.attachArrowClickEventListeners(
       column,
@@ -377,6 +386,14 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
    */
   private _syncValueViewsWithSelection(): void {
     this._processNodesToShowInValueView();
+
+    if (
+      this._nodesToShowInValueView.length === 0 &&
+      this.conditionItemValueViews.length > 0 &&
+      !this._hasUserChangedSelection
+    ) {
+      return;
+    }
 
     // Clear all existing condition value views
     this.conditionItemValueViews.forEach((view) => view.remove());

@@ -2,6 +2,7 @@ import { storeManager } from '../store/StoreManager';
 import * as qs from 'qs';
 import debounce from 'lodash/debounce';
 import { API_URL } from '../global';
+import { stripAdvancedSearchMetadata } from '../store/advancedSearchURL';
 const LIMIT = 100;
 const DOWNLOAD_VARIANT_LIMIT = 100000;
 const DOWNLOAD_VARIANT_LIMIT_TEXT = new Intl.NumberFormat('en-US').format(
@@ -184,7 +185,9 @@ function _getRequestOptions(signal: AbortSignal): FetchOption {
     storeManager.getData('advancedSearchConditions') &&
     Object.keys(storeManager.getData('advancedSearchConditions')).length > 0
   ) {
-    body.query = storeManager.getData('advancedSearchConditions');
+    body.query = stripAdvancedSearchMetadata(
+      storeManager.getData('advancedSearchConditions')
+    ) as Record<string, unknown>;
   }
 
   return {

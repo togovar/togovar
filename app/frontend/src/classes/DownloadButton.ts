@@ -1,6 +1,7 @@
 import { storeManager } from '../store/StoreManager';
 import * as qs from 'qs';
 import { API_URL } from '../global';
+import { stripAdvancedSearchMetadata } from '../store/advancedSearchURL';
 import { extractSearchCondition } from '../store/searchManager';
 import type { SearchMode } from '../types';
 
@@ -76,7 +77,11 @@ export default class DownloadButton {
 
   /** Advanced search 用の POST ダウンロード */
   #downloadFromAdvancedSearch(type: DownloadFileType): void {
-    const body = { query: storeManager.getData('advancedSearchConditions') };
+    const body = {
+      query: stripAdvancedSearchMetadata(
+        storeManager.getData('advancedSearchConditions')
+      ),
+    };
     const form = document.createElement('form');
     form.action = `${this.#path}.${type}`;
     form.method = 'post';

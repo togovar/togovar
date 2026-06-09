@@ -35,7 +35,7 @@ export const COLUMNS = [
     resizable: false,
   },
   { label: 'SIFT', id: 'sift', defaultWidth: 57, resizable: false },
-  { label: 'PolyPhen', id: 'polyphen', defaultWidth: 70, resizable: false },
+  { label: 'PolyPhen', id: 'polyphen', defaultWidth: 90, resizable: false },
 ];
 
 /** 列 ID から列定義オブジェクトへの高速マップ */

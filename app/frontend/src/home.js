@@ -11,17 +11,17 @@ import DownloadButton from './classes/DownloadButton.ts';
 import SimpleSearchView from './components/SearchField/SimpleSearch/SimpleSearchView';
 // PanelViews
 // PanelViews: Filters
-import PanelViewCheckList from '../src/classes/PanelViewCheckList.ts';
-import PanelViewFilterAlternateAlleleFrequency from '../src/classes/PanelViewFilterAlternateAlleleFrequency.js';
-import PanelViewFilterVariantCallingQuality from '../src/classes/PanelViewFilterVariantCallingQuality.js';
-import PanelViewFilterConsequence from '../src/classes/PanelViewFilterConsequence.ts';
+import PanelViewCheckList from '../src/classes/PanelView/PanelViewCheckList.ts';
+import PanelViewFilterAlternateAlleleFrequency from '../src/classes/PanelView/PanelViewFilterAlternateAlleleFrequency.js';
+import PanelViewFilterVariantCallingQuality from '../src/classes/PanelView/PanelViewFilterVariantCallingQuality.js';
+import PanelViewFilterConsequence from '../src/classes/PanelView/PanelViewFilterConsequence.ts';
 // PanelViews: Variant preview
-import PanelViewPreviewGene from '../src/classes/PanelViewPreviewGene.js';
-import PreviewToVariantReport from '../src/classes/PreviewToVariantReport.js';
-import PanelViewPreviewExternalLinks from '../src/classes/PanelViewPreviewExternalLinks.js';
-import PanelViewPreviewAlternateAlleleFrequencies from '../src/classes/PanelViewPreviewAlternateAlleleFrequencies.js';
-import PanelViewPreviewConsequence from '../src/classes/PanelViewPreviewConsequence.js';
-import PanelViewPreviewClinicalSignificance from '../src/classes/PanelViewPreviewClinicalSignificance.js';
+import PanelViewPreviewGene from '../src/classes/PanelView/PanelViewPreviewGene.js';
+import PreviewToVariantReport from '../src/classes/PanelView/PreviewToVariantReport.js';
+import PanelViewPreviewExternalLinks from '../src/classes/PanelView/PanelViewPreviewExternalLinks.js';
+import PanelViewPreviewAlternateAlleleFrequencies from '../src/classes/PanelView/PanelViewPreviewAlternateAlleleFrequencies.js';
+import PanelViewPreviewConsequence from '../src/classes/PanelView/PanelViewPreviewConsequence.js';
+import PanelViewPreviewClinicalSignificance from '../src/classes/PanelView/PanelViewPreviewClinicalSignificance.js';
 import FloatingInfo from '../src/classes/FloatingInfo.ts';
 
 import qs from 'qs';
@@ -35,8 +35,6 @@ export function initHome() {
 
   storeManager.setData('offset', 0);
   storeManager.setData('selectedRow', undefined);
-
-  initializeApp(); // 先にURLからモードを設定
 
   new Karyotype(document.getElementById('Karyotype'));
 
@@ -91,27 +89,20 @@ function readyInitialSearch(callback) {
     simpleSearchConditionsMaster
   );
 
-  // URLパラメータから検索条件を復元
-  const currentSearchMode = storeManager.getData('searchMode');
-  const simpleSearchConditions = {};
-  const advancedSearchConditions = {};
+  // URLを解析して Advanced Search条件をストアへ反映し、searchModeを取得する。
+  // searchModeのサブスクライバがexecuteSearchを発火するため、条件確定後に最後にセットする。
+  const searchMode = initializeApp();
 
-  // URLパラメータからシンプル検索条件を抽出
-  switch (currentSearchMode) {
-    case 'simple':
-      Object.assign(
-        simpleSearchConditions,
-        extractSearchCondition(_currentUrlParams)
-      );
-      break;
-    case 'advanced':
-      // advanced用の条件抽出を追加
-      break;
-  }
-
-  // 検索条件をストアに保存（isFromHistory = trueとして設定）
+  // URLパラメータからSimple Search条件を抽出してストアに保存する。
+  const simpleSearchConditions =
+    searchMode === 'simple'
+      ? extractSearchCondition(_currentUrlParams)
+      : {};
   storeManager.setData('simpleSearchConditions', simpleSearchConditions);
-  storeManager.setData('advancedSearchConditions', advancedSearchConditions);
+
+  // searchModeを設定: ここでStoreManager.searchMode()サブスクライバが
+  // reflect*ToURI() + executeSearch() を実行するため、正しい条件で初回検索が走る。
+  storeManager.setData('searchMode', searchMode);
 
   callback();
 }
@@ -309,7 +300,7 @@ function loadAdvancedSearchBuilderView() {
 
   advancedSearchBuilderViewPromise = import(
     /* webpackChunkName: "advanced-search" */
-    '../src/classes/AdvancedSearchBuilderView.ts'
+    '../src/classes/AdvancedSearch/AdvancedSearchBuilderView.ts'
   )
     .then(({ AdvancedSearchBuilderView }) => {
       advancedSearchBuilderView = new AdvancedSearchBuilderView(

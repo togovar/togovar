@@ -59,6 +59,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   _rangeSelectorView: RangeSliderElement | null = null;
   _filtered: HTMLInputElement | null = null;
   _lastValue: FrequencyCondition | CountCondition | null = null;
+  private _hasUserChangedCondition = false;
   private static _idCounter = 0;
   private static readonly DEFAULT_CONDITION: ConditionState = {
     frequency: { from: 0, to: 1, invert: false },
@@ -473,6 +474,9 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     switchingElements: NodeListOf<Element>
   ): void {
     const target = e.target as HTMLInputElement;
+    if (e.isTrusted) {
+      this._hasUserChangedCondition = true;
+    }
 
     // Update visual state of switching elements
     for (const el of switchingElements) {
@@ -524,6 +528,9 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
    * @param e - Change event from count input
    */
   private _handleCountInputChange(e: Event): void {
+    if (e.isTrusted) {
+      this._hasUserChangedCondition = true;
+    }
     const target = e.target as HTMLInputElement;
     const key = target.className as keyof CountCondition;
     const currentCondition = this._condition[this._mode] as CountCondition;
@@ -608,7 +615,10 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
       SELECTORS.FILTERED_CHECKBOX
     );
     if (this._filtered) {
-      this._filtered.addEventListener('change', () => {
+      this._filtered.addEventListener('change', (e) => {
+        if (e.isTrusted) {
+          this._hasUserChangedCondition = true;
+        }
         this._update();
       });
       this._filtered.dispatchEvent(new Event('change'));
@@ -622,19 +632,35 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   changeParameter(newCondition: RangeSliderData): void {
     if (!this._rangeSelectorView) return;
 
-    if (newCondition.from !== undefined) {
-      this._condition.frequency.from = newCondition.from;
-    }
-    if (newCondition.to !== undefined) {
-      this._condition.frequency.to = newCondition.to;
-    }
-    if (newCondition.invert !== undefined) {
-      // Convert string/boolean to boolean for consistent internal state
-      this._condition.frequency.invert =
-        typeof newCondition.invert === 'string'
+    // RangeSliderView は初期化時にも range-changed を発火するため、
+    // 実際に値が変わったときだけ「ユーザーが変更した」扱いにする。
+    const nextFrom =
+      newCondition.from !== undefined
+        ? newCondition.from
+        : this._condition.frequency.from;
+    const nextTo =
+      newCondition.to !== undefined
+        ? newCondition.to
+        : this._condition.frequency.to;
+    const nextInvert =
+      newCondition.invert !== undefined
+        ? typeof newCondition.invert === 'string'
           ? newCondition.invert === '1' || newCondition.invert === 'true'
-          : Boolean(newCondition.invert);
+          : Boolean(newCondition.invert)
+        : this._condition.frequency.invert;
+
+    const changed =
+      nextFrom !== this._condition.frequency.from ||
+      nextTo !== this._condition.frequency.to ||
+      nextInvert !== this._condition.frequency.invert;
+
+    if (changed) {
+      this._hasUserChangedCondition = true;
     }
+
+    this._condition.frequency.from = nextFrom;
+    this._condition.frequency.to = nextTo;
+    this._condition.frequency.invert = nextInvert;
     this._update();
   }
 
@@ -656,8 +682,39 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
         const freqCountView = this._getFrequencyCountView(view);
         if (!freqCountView) return;
 
+        this._syncConditionFromRestoredView(freqCountView);
         this._updateFrequencyCountView(freqCountView);
       });
+  }
+
+  private _syncConditionFromRestoredView(
+    freqCountView: FrequencyCountValueView
+  ): void {
+    if (this._hasUserChangedCondition) return;
+
+    const mode = freqCountView.mode as ModeType;
+    this._mode = mode;
+    this.conditionItemView.updateClassificationText(
+      this._getModeDisplayText(mode)
+    );
+
+    if (mode === MODE.frequency) {
+      this._condition.frequency = {
+        from: freqCountView.from ?? 0,
+        to: freqCountView.to ?? 1,
+        invert: freqCountView.invert,
+      };
+    } else {
+      const countMode = mode as CountMode;
+      this._condition[countMode] = {
+        from: freqCountView.from,
+        to: freqCountView.to,
+      };
+    }
+
+    if (this._filtered) {
+      this._filtered.checked = freqCountView.filtered;
+    }
   }
 
   /**

@@ -1,5 +1,5 @@
 import PanelView from './PanelView.ts';
-import { storeManager } from '../store/StoreManager';
+import { storeManager } from '../../store/StoreManager';
 
 export default class PanelViewPreviewGene extends PanelView {
   constructor(elm) {

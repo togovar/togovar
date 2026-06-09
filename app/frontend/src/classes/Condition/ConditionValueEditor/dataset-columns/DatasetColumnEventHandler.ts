@@ -2,31 +2,17 @@ import type { HierarchyNode } from 'd3-hierarchy';
 import type { UiNode } from './types';
 
 /**
- * Manages user interaction events within the hierarchical dataset column interface.
+ * カラムインターフェースのユーザー操作イベントを管理する。
  *
- * This class encapsulates all event handling logic for the column-based navigation:
- * - Checkbox selection events that trigger state changes in the data model
- * - Arrow click events that enable drilling down into dataset categories
- * - Navigation state management including selection highlighting and column cleanup
- *
- * By centralizing event handling, this class maintains clean separation between
- * UI interactions and business logic, making the codebase more maintainable.
+ * イベント処理を親クラスから分離し、状態更新とUI描画の責務を
+ * コールバック経由で親クラスへ委ねることでテスト容易性を確保する。
  */
 export class DatasetColumnEventHandler {
   /**
-   * Sets up checkbox change event listeners for dataset selection within a column.
+   * カラム要素にcheckboxのchangeイベントを委譲登録する。
    *
-   * When a user clicks a checkbox, this method:
-   * 1. Identifies which dataset node was clicked
-   * 2. Propagates the selection state to children (if any)
-   * 3. Updates parent selection states to reflect the change
-   * 4. Triggers a UI refresh to show the updated states
-   *
-   * @param columnElement - The DOM element containing the checkboxes to monitor
-   * @param datasetTree - The complete hierarchical data structure for node lookups
-   * @param propagateToChildren - Callback to update all child nodes when parent is selected
-   * @param updateParentStates - Callback to recalculate parent states when child changes
-   * @param refreshUserInterface - Callback to update the visual interface after state changes
+   * 各リストアイテムに個別リスナーを付けると、カラム追加のたびに付け直しが必要になる。
+   * カラム要素への委譲にすることでカラム生成後に一度だけ呼べばよくなる。
    */
   attachCheckboxEventListeners(
     columnElement: HTMLElement,
@@ -53,12 +39,10 @@ export class DatasetColumnEventHandler {
       );
       if (!clickedDatasetNode) return;
 
-      // If this node has children, propagate the selection state downward
       if (clickedDatasetNode.children) {
         propagateToChildren(clickedDatasetNode, isNowSelected);
       }
 
-      // If this node has a parent, update parent states based on sibling selections
       if (clickedDatasetNode.parent) {
         updateParentStates(clickedDatasetNode, isNowSelected);
       }
@@ -67,18 +51,7 @@ export class DatasetColumnEventHandler {
     });
   }
 
-  /**
-   * Sets up navigation arrow click events for drilling down into dataset categories.
-   *
-   * When a user clicks a navigation arrow, this method:
-   * 1. Identifies which dataset category was clicked
-   * 2. Delegates to the provided callback to handle the navigation logic
-   * 3. Passes along the user's login status to handle restricted datasets
-   *
-   * @param columnElement - The DOM element containing the navigation arrows
-   * @param userIsLoggedIn - Whether the current user is authenticated (affects restricted dataset access)
-   * @param handleNavigationClick - Callback function to process the arrow click and create new columns
-   */
+  /** カラムのarrow要素にクリックリスナーを登録する。 */
   attachArrowClickEventListeners(
     columnElement: HTMLElement,
     userIsLoggedIn: boolean,
@@ -106,16 +79,10 @@ export class DatasetColumnEventHandler {
   }
 
   /**
-   * Cleans up the interface when navigating to a new category.
+   * 別カテゴリへ移動する際に選択ハイライトと子カラムを削除する。
    *
-   * This method performs two important cleanup tasks:
-   * 1. Removes the visual selection highlight from the previously selected item
-   * 2. Removes all columns that are deeper than the current navigation level
-   *
-   * This ensures the interface shows a clean navigation path without
-   * outdated selections or stale sub-columns from previous navigation.
-   *
-   * @param clickedListItem - The list item that was just clicked for navigation
+   * depth属性で現在より深いカラムだけを削除することで、
+   * 戻る操作時に上位カラムを再生成せずに済む。
    */
   clearSelectionAndSubColumns(clickedListItem: Element): void {
     const currentColumnElement = clickedListItem.closest(
@@ -129,7 +96,6 @@ export class DatasetColumnEventHandler {
     )
       return;
 
-    // Remove selection highlight from previously selected item in this column
     const parentListContainer = clickedListItem.parentNode as Element;
     if (parentListContainer) {
       parentListContainer
@@ -137,7 +103,6 @@ export class DatasetColumnEventHandler {
         ?.classList.remove('-selected');
     }
 
-    // Remove all columns that are deeper than the current navigation level
     const currentNavigationDepth = parseInt(currentColumnElement.dataset.depth);
     for (const columnInContainer of allColumnsContainer.querySelectorAll(
       ':scope > .column'
