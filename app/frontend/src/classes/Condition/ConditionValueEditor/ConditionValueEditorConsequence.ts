@@ -30,6 +30,7 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
   private readonly _selectionDependedOnParent: boolean;
   private _columns!: HTMLElement;
 
+  /** データ準備と初期カラム描画までを生成直後に完了させ、エディタ生成直後から操作可能にするため。 */
   constructor(conditionValues: ConditionValues, conditionView: ConditionItemView) {
     super(conditionValues, conditionView);
 
