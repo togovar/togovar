@@ -3,9 +3,9 @@ import { ResultsView } from '../src/classes/Results/ResultsView';
 import SideBar from '../src/classes/SideBar.ts';
 import Karyotype from '../src/classes/Karyotype.js';
 import ActivityIndicator from '../src/classes/ActivityIndicator.js';
-import ModuleTabsView from '../src/classes/ModuleTabsView.js';
-// import CollapseView from '../src/classes/CollapseView.js';
-import TopPageLayoutManager from '../src/classes/TopPageLayoutManager.js';
+import ModuleTabsView from '../src/classes/ModuleTabsView.ts';
+// import CollapseView from '../src/classes/CollapseView.ts';
+import TopPageLayoutManager from '../src/classes/TopPageLayoutManager.ts';
 import DownloadButton from './classes/DownloadButton.ts';
 // Search
 import SimpleSearchView from './components/SearchField/SimpleSearch/SimpleSearchView';
