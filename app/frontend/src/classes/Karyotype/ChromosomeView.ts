@@ -1,14 +1,14 @@
-import { storeManager } from '../store/StoreManager';
-import { setSimpleSearchCondition } from '../store/searchManager';
-import type { DisplayingRegions } from '../types/store';
+import { storeManager } from '../../store/StoreManager';
+import { setSimpleSearchCondition } from '../../store/searchManager';
+import type { DisplayingRegions } from '../../types/store';
 
 // 染色体棒の描画幅とSVG上下余白（px）。
 // CSSではなくJSでSVG座標を計算するため定数として保持する。
 const WIDTH = 12;
 const PADDING = 5;
 
-/** TSVから整形された1サブバンド分のデータ */
-interface SubBandEntry {
+/** TSVから整形された1サブバンド分のデータ。Karyotype.ts の parseGeneMap が生成する。 */
+export interface SubBandEntry {
   start: number;
   end: number;
   band: string;
@@ -32,9 +32,7 @@ export default class ChromosomeView {
   private readonly _elm: HTMLElement;
   private readonly _length: number;
   private readonly _svg: SVGSVGElement;
-  private readonly _filteredRegion: HTMLElement;
   private readonly _displayRegion: HTMLElement;
-  private readonly _selectedRegion: HTMLElement;
   private _subbands: SVGGElement[];
   private _bands: NodeListOf<SVGGElement>;
 
@@ -67,9 +65,7 @@ export default class ChromosomeView {
       </div>
     `;
 
-    this._filteredRegion = this._elm.querySelector<HTMLElement>('.lower > .filteredregion')!;
     this._displayRegion = this._elm.querySelector<HTMLElement>('.lower > .displayregion')!;
-    this._selectedRegion = this._elm.querySelector<HTMLElement>('.lower > .selectedregion')!;
 
     // サブバンドを主バンド単位に集約してラベル描画用データを作る。
     // 隣接するサブバンドが同じ主バンドに属する場合は end を延ばして結合する。
@@ -298,7 +294,7 @@ export default class ChromosomeView {
   }
 
   /**
-   * Karyotype.js が染色体ビューを配列管理するために染色体番号を参照する。
+   * Karyotype.ts が染色体ビューを配列管理するために染色体番号を参照する。
    */
   get no(): string {
     return this._no;

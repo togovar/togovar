@@ -1,6 +1,6 @@
-import { storeManager } from '../store/StoreManager';
-import ChromosomeView from './ChromosomeView';
-import type { SimpleSearchCurrentConditions } from '../types/search';
+import { storeManager } from '../../store/StoreManager';
+import ChromosomeView, { type SubBandEntry } from './ChromosomeView';
+import type { SimpleSearchCurrentConditions } from '../../types/search';
 
 // csv-loader が TSV をパースして返す形式: 各行が文字列配列
 type TsvRow = string[];
@@ -25,15 +25,6 @@ interface KaryotypeState {
   reference: 'GRCh37' | 'GRCh38';
   version: number;
   chromosomes: Record<string, ChromosomeConfig>;
-}
-
-/** ChromosomeView.ts の SubBandEntry と同じ構造（parseGeneMap の出力型） */
-interface SubBandEntry {
-  start: number;
-  end: number;
-  band: string;
-  subBand: string;
-  stainType: string;
 }
 
 /** 染色体上の位置：単一座標または範囲 */
@@ -216,7 +207,7 @@ initialiseKaryotype();
 async function loadKaryotypeData(
   reference: 'GRCh37' | 'GRCh38'
 ): Promise<TsvRow[]> {
-  const mod = (await import(`../../assets/${reference}/karyotype.tsv`)) as {
+  const mod = (await import(`../../../assets/${reference}/karyotype.tsv`)) as {
     default?: TsvRow[];
   };
   return mod.default ?? [];

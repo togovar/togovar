@@ -1,7 +1,7 @@
 import { storeManager } from './store/StoreManager';
 import { ResultsView } from './classes/Results/ResultsView';
 import SideBar from './classes/SideBar';
-import Karyotype from './classes/Karyotype';
+import Karyotype from './classes/Karyotype/Karyotype';
 import LoadingIndicator from './classes/LoadingIndicator';
 import ModuleTabsView from './classes/ModuleTabsView';
 import DownloadButton from './classes/DownloadButton';
