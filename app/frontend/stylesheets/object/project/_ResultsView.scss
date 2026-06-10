@@ -3,7 +3,11 @@
 // =======================================================
 
 #ResultsView {
-  padding: 10px $PADDING_SIDE $PADDING_SIDE;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 10px $PADDING_SIDE 0;
   position: relative;
 
   // テーブル検索結果が見つからない場合のメッセージ
@@ -24,6 +28,7 @@
     position: relative;
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
 
     // ヘッダー左側：見出し・結果件数
     > .left {
@@ -126,12 +131,13 @@
   }
 
   > .tablecontainer {
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-x: auto;
     overflow-y: hidden;
-    min-height: 96px;
     margin-top: -15px;
     margin-right: -$PADDING_SIDE;
-    padding-bottom: 20px;
+    padding-bottom: 0;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     touch-action: pan-x pan-y;

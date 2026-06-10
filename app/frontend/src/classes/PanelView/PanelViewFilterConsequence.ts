@@ -1,4 +1,4 @@
-import CollapseView from '../CollapseView.js';
+import CollapseView from '../CollapseView';
 import PanelView from './PanelView';
 import { storeManager } from '../../store/StoreManager';
 import {
@@ -52,7 +52,7 @@ export default class PanelViewFilterConsequence extends PanelView {
 
     // CollapseView の初期化
     elm
-      .querySelectorAll('.collapse-view')
+      .querySelectorAll<HTMLElement>('.collapse-view')
       .forEach((collapseView) => new CollapseView(collapseView));
 
     // input 要素への参照を収集
@@ -123,7 +123,9 @@ export default class PanelViewFilterConsequence extends PanelView {
 
     // transcript variant グループは開いた状態にする
     this.elm
-      .querySelector('.content > .checklist-values > .item[data-group="Transcript variant"]')!
+      .querySelector(
+        '.content > .checklist-values > .item[data-group="Transcript variant"]'
+      )!
       .classList.remove('-collapsed');
   }
 

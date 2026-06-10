@@ -1,0 +1,67 @@
+// ページの骨格となるレイアウト定義。flex チェーンの全体像：
+//   body (flex column, height: 100vh)
+//   └─ .LayoutMainAside (flex: 1 1 auto) ← このファイル
+//       ├─ .LayoutMain   (flex column)   ← このファイル
+//       │   └─ #SearchInputView, #ResultsView など
+//       └─ .LayoutAside                  ← このファイル
+
+// body の flex column で #SearchInputView タブバーの下から画面下端までを占有する。
+.LayoutMainAside {
+  display: flex;
+  flex: 1 1 auto;
+  // flex child の暗黙的 min-height: auto を打ち消し、内側を縦方向に圧縮できるようにする。
+  min-height: 0;
+  // BottomDrawer と外部共通フッターが画面下端に固定配置されるため、重ならないよう余白を確保する。
+  // Drawer 開時は展開後の高さ分に切り替え、コンテンツが Drawer に隠れないようにする。
+  // Drawer のアニメーション（$TRANSITION_DURATION）に合わせて margin-bottom をトランジションさせる。
+  margin-bottom: $HEIGHT_BOTTOM_DRAWER + $HEIGHT_NBDC_COMMON_FOOTER;
+  transition: margin-bottom $TRANSITION_DURATION;
+
+  body.-drawer-opened & {
+    margin-bottom: $HEIGHT_BOTTOM_DRAWER_OPENED + $HEIGHT_NBDC_COMMON_FOOTER;
+  }
+
+  // 縦積みの flex column にすることで、#ResultsView が残り高さをすべて受け取れるようにする。
+  > .LayoutMain {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - #{$WIDTH_SIDEBAR});
+    min-height: 0;
+    // サイドバーの開閉アニメーション中に内側コンテンツがはみ出さないよう隠す。
+    overflow: hidden;
+    // サイドバー幅の変化にスムーズに追従させるため width をトランジション対象にする。
+    transition: width $GUI_DURATION;
+
+    // 行選択でサイドバーが再表示されるとき通常幅に戻す。
+    body.-rowselected & {
+      width: calc(100% - #{$WIDTH_SIDEBAR});
+    }
+  }
+
+  // フィルタ・プレビューを表示する固定幅サイドバー列。
+  > .LayoutAside {
+    width: $WIDTH_SIDEBAR;
+    // 親の flex stretch に依存せず明示することで、コンテンツが少ない場合も背景色が欠けない。
+    height: 100%;
+    min-height: 0;
+    background-color: $COLOR_KEY_DARK3;
+    overflow: hidden;
+    // 内部の絶対配置要素（折りたたみボタンなど）の包含ブロックにする。
+    position: relative;
+    // グローバルヘッダー（z-index-global-header: base + 200）の下に収まるよう base + 100 にする。
+    z-index: var(--z-index-layout-aside);
+    // 右端の内側シャドウでメインコンテンツとの境界に奥行きを出す。
+    box-shadow: 2px 0 2px rgba(black, 0.2) inset;
+
+    body.-rowselected & {
+      width: $WIDTH_SIDEBAR;
+    }
+  }
+}
+
+// バリアントレポートページ専用のメインコンテンツ領域。
+// 検索ページの flex 制約とは独立したシンプルな余白定義。
+.LayoutReport {
+  padding: $PADDING_SIDE $PADDING_SIDE $PADDING_SIDE $PADDING_REPORT_LEFT;
+  background-color: $COLOR_LIGHT_GRAY;
+}

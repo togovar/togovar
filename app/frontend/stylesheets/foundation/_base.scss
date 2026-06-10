@@ -34,16 +34,15 @@ body {
   -webkit-font-smoothing: antialiased;
 
   [data-page='home'] & {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
     overflow: hidden;
   }
 
   [data-page='home'] & #SearchResultsView {
-    height: var(
-      --search-results-height,
-      calc(
-        100vh - #{$HEIGHT_GLOBAL_MENU + $HEIGHT_BOTTOM_DRAWER} - 104px
-      )
-    );
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   [data-page='home'] &:not(.-layout-ready) {
@@ -74,6 +73,13 @@ body {
 
 [draggable='true'] {
   -khtml-user-drag: element;
+}
+
+// Web Component の margin はライトDOM側の型セレクターで定義する。
+// :host { margin } は _reset.scss の * { margin: 0 } に上書きされるため、
+// 外部スタイルから明示的に設定することで隙間を保証する。
+frequency-block-view {
+  margin-right: 4px;
 }
 
 a {

@@ -10,7 +10,11 @@
     gap: 20px;
   }
   .inner {
+    // 削除ボタン付きのタグでも文字とアイコンの縦位置がずれないよう、タグ内部をflexで中央揃えにする。
+    display: inline-flex;
+    align-items: center;
     align-self: center;
+    gap: 0.2em;
     line-height: 1;
     padding: 1px 10px 0 10px;
     background-color: white;
@@ -21,7 +25,7 @@
   }
 }
 
-//core dataset
+// dataset/genotypeはタグの横に頻度バーを重ねて表示する。
 :host([data-condition-type='dataset']),
 :host([data-condition-type='genotype']) {
   display: block;
@@ -43,7 +47,7 @@
     }
   }
 }
-//core significance
+// significanceは先頭の略称バッジとラベルを同じタグ内に収める。
 :host([data-condition-type='significance']) {
   .inner {
     &::before {
@@ -55,7 +59,7 @@
     }
   }
 }
-//Pathogenicity_prediction
+// pathogenicity_predictionは子コンポーネント側で見た目を持つため、通常タグの枠を外す。
 :host([data-condition-type='pathogenicity_prediction']) {
   position: relative;
   .inner {
@@ -64,7 +68,7 @@
   }
 }
 
-//dataset
+// dataset/genotypeのデータセット種別ごとに、既存の色変数へ合わせる。
 :host([data-condition-type='dataset'][data-value='gem_j_wga']) {
   .inner {
     border-color: var(--color-dataset-gemj);
@@ -129,7 +133,7 @@
   }
 }
 
-//Clinical significance
+// Clinical significanceは値コードごとに表示ラベルと色を割り当てる。
 :host([data-condition-type='significance'][data-value='P']) {
   .inner {
     border-color: var(--color-sign-dangerous);
@@ -331,20 +335,24 @@
   }
 }
 
-// variant ID
+// 削除ボタンは編集中だけ外側の::part指定で表示し、表示時はタグ内で中央に揃える。
 button.delete {
   display: none;
-  border-radius: 50%;
   border: none;
   color: var(--color-gray);
   cursor: pointer;
   position: relative;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
   font-family: 'Font Awesome 7 Free', sans-serif;
   font-weight: 900;
+  line-height: 1;
   background-color: transparent;
+  width: 1em;
+  height: 1em;
   padding: 0;
-  margin-left: 0.2em;
-  margin-right: -0.5em;
+  margin-right: -0.35em;
 
   &::before {
     content: var(--icon-xmark);

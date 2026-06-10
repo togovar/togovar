@@ -518,12 +518,37 @@ export class ResultsColumnsDropdown {
     this._root.classList.toggle('-open', shouldOpen);
     this._button.setAttribute('aria-expanded', String(shouldOpen));
     this._menu.setAttribute('aria-hidden', String(!shouldOpen));
-    this._menu.hidden = false;
 
     if (shouldOpen) {
+      // opacity アニメーション開始前に hidden を解除してメニューを DOM に戻す。
+      this._menu.hidden = false;
       this._menu.removeAttribute('inert');
+      // inert 非対応ブラウザ向け: フォーカス制御を復元する。
+      this._menu
+        .querySelectorAll<HTMLInputElement>(SELECTORS.INPUT)
+        .forEach((input) => input.removeAttribute('tabindex'));
     } else {
       this._menu.setAttribute('inert', '');
+      // inert 非対応ブラウザ向け: フェードアウト中も Tab フォーカスがチェックボックスに入らないよう即座に遮断する。
+      this._menu
+        .querySelectorAll<HTMLInputElement>(SELECTORS.INPUT)
+        .forEach((input) => input.setAttribute('tabindex', '-1'));
+      // 既に hidden（display:none）なら transitionend は発火しないため即座に終了する。
+      // 範囲外クリックや Escape が連続して呼ばれてもリスナーが蓄積しない。
+      if (this._menu.hidden) {
+        return;
+      }
+      // CSS transition 完了後に hidden を設定する。
+      // 閉じるアニメーション中に再度開かれた場合は hidden を設定しない。
+      this._menu.addEventListener(
+        'transitionend',
+        () => {
+          if (!this._root.classList.contains('-open')) {
+            this._menu.hidden = true;
+          }
+        },
+        { once: true }
+      );
     }
   }
 

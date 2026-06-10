@@ -1,3 +1,8 @@
+// <simple-search-view> がデフォルトの inline にならないよう block を明示する。
+:host {
+  display: block;
+}
+
 .simple-search-container {
   display: flex;
   gap: 0.2rem;

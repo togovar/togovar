@@ -1,0 +1,86 @@
+// タブとコンテンツ切り替えの共通ビュー
+// タブナビゲーション領域は $COLOR_KEY_DARK2 で統一し、ページのヘッダー層として視覚的に区別する。
+.module-tabs-view {
+  background-color: $COLOR_KEY_DARK2;
+  color: #fff;
+
+  > .tabscontainer {
+    > ul {
+      margin: 0;
+      padding: 4px $PADDING_SIDE 0;
+
+      > li {
+        // 非選択タブは opacity: .8 で控えめにし、選択中・ホバー状態との対比でアクティブ状態を伝える。
+        position: relative;
+        z-index: $Z_INDEX_MODULE_TABS_VIEW;
+        display: inline-block;
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 24px;
+        padding: 2px 12px 0;
+        opacity: .8;
+        border-radius: 3px 3px 0 0;
+        cursor: pointer;
+        transition: background-color $GUI_DURATION, opacity $GUI_DURATION;
+
+        // ホバーと選択状態を揃えることで、クリック可能であることをホバー時に事前提示する。
+        &.-current,
+        &:hover {
+          background-color: $COLOR_KEY_DARK1;
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  > .sectionscontainer {
+    // 非表示セクション（position: absolute）の包含ブロックとして機能させるために position: relative が必要。
+    // これがないと非表示セクションが上位へ脱出し、別の要素に重なる。
+    position: relative;
+    background-color: $COLOR_KEY_DARK1;
+
+    > .section {
+      // 非アクティブセクションをフロー外に置くことで、.sectionscontainer の高さをアクティブな1セクション分に保つ。
+      visibility: hidden;
+      position: absolute;
+
+      // アクティブセクションだけをフローに戻し、.sectionscontainer の高さに反映させる。
+      &.-current {
+        visibility: visible;
+        position: static;
+      }
+    }
+  }
+
+  // ネストしたタブ（一段深い階層）は内側の色に合わせ、色でネスト深さを表現する。
+  &.-depth1 {
+    background-color: $COLOR_KEY_DARK1;
+
+    > .tabscontainer > ul > li {
+      &.-current,
+      &:hover {
+        background-color: $COLOR_KEY;
+      }
+    }
+
+    > .sectionscontainer {
+      background-color: $COLOR_KEY;
+    }
+  }
+
+  // .collapsebutton（絶対配置）の基点として position: relative が必要。
+  &.collapse-view {
+    position: relative;
+
+    > .collapsebutton {
+      top: 16px;
+      left: 5px;
+    }
+
+    &.-collapsed {
+      .collapsebutton {
+        top: 13px;
+      }
+    }
+  }
+}

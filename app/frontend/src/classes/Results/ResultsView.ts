@@ -65,6 +65,10 @@ export class ResultsView {
   private _stylesheet!: HTMLStyleElement;
   private columnAutoSizer!: ResultsColumnAutoSizer;
   private columnResizeController!: ResultsColumnResizeController;
+  private _resizeObserver: ResizeObserver | null = null;
+  private _mutationObserver: MutationObserver | null = null;
+  private _resizeFrameId: number | null = null;
+  private _boundResizeFallbackHandler: (() => void) | null = null;
 
   /**
    * ResultsView のコンストラクタ
@@ -100,6 +104,9 @@ export class ResultsView {
 
     // Search mode リスナー初期化
     this._initializeSearchModeListener();
+
+    // 表示領域の変化に追従して仮想行数を再計算
+    this._observeDisplaySize();
   }
 
   // ========================================
@@ -160,6 +167,19 @@ export class ResultsView {
     if (this._stylesheet) {
       this._stylesheet.remove();
     }
+
+    this._resizeObserver?.disconnect();
+    this._mutationObserver?.disconnect();
+    if (this._boundResizeFallbackHandler) {
+      window.removeEventListener('resize', this._boundResizeFallbackHandler);
+    }
+    if (this._resizeFrameId !== null) {
+      cancelAnimationFrame(this._resizeFrameId);
+    }
+    this._resizeObserver = null;
+    this._mutationObserver = null;
+    this._resizeFrameId = null;
+    this._boundResizeFallbackHandler = null;
   }
 
   /**
@@ -496,5 +516,45 @@ export class ResultsView {
       this.scrollBar.resetScrollPosition();
     };
     storeManager.subscribe('searchMode', this._boundSearchModeHandler);
+  }
+
+  /**
+   * ResultsViewの高さはCSS flexで決まるため、自身の実寸変化を監視して行数だけJSで再計算する。
+   */
+  private _observeDisplaySize(): void {
+    if (typeof ResizeObserver === 'undefined') {
+      this._boundResizeFallbackHandler = () => {
+        this._scheduleDisplaySizeUpdate();
+      };
+      window.addEventListener('resize', this._boundResizeFallbackHandler);
+      // ResizeObserver 非対応時の追加フォールバック:
+      // タブ切替・Drawer 開閉など「ウィンドウサイズが変わらないレイアウト変化」は
+      // window.resize では検出できないため、body の class / data-search-mode 変化を監視する。
+      this._mutationObserver = new MutationObserver(() => {
+        this._scheduleDisplaySizeUpdate();
+      });
+      this._mutationObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'data-search-mode'],
+      });
+      return;
+    }
+
+    this._resizeObserver = new ResizeObserver(() => {
+      this._scheduleDisplaySizeUpdate();
+    });
+    this._resizeObserver.observe(this.elm);
+  }
+
+  /**
+   * ResizeObserverは連続発火しやすいため、行数再計算を次フレームにまとめる。
+   */
+  private _scheduleDisplaySizeUpdate(): void {
+    if (this._resizeFrameId !== null) return;
+
+    this._resizeFrameId = requestAnimationFrame(() => {
+      this._resizeFrameId = null;
+      this.updateDisplaySize();
+    });
   }
 }

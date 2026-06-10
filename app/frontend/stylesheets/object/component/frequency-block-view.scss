@@ -32,7 +32,7 @@ $frequency-marker-gap: 1px;
   display: inline-block;
   width: $vertical-graph-width;
   height: $vertical-graph-height;
-  margin-right: 4px;
+  // margin-right は _base.scss の型セレクターで定義（:host への外部リセット対策）
   vertical-align: middle;
   font-size: 0;
   background-color: white;

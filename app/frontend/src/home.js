@@ -3,9 +3,8 @@ import { ResultsView } from '../src/classes/Results/ResultsView';
 import SideBar from '../src/classes/SideBar.ts';
 import Karyotype from '../src/classes/Karyotype.js';
 import ActivityIndicator from '../src/classes/ActivityIndicator.js';
-import ModuleTabsView from '../src/classes/ModuleTabsView.js';
-// import CollapseView from '../src/classes/CollapseView.js';
-import TopPageLayoutManager from '../src/classes/TopPageLayoutManager.js';
+import ModuleTabsView from '../src/classes/ModuleTabsView.ts';
+// import CollapseView from '../src/classes/CollapseView.ts';
 import DownloadButton from './classes/DownloadButton.ts';
 // Search
 import SimpleSearchView from './components/SearchField/SimpleSearch/SimpleSearchView';
@@ -136,7 +135,6 @@ let advancedSearchBuilderViewPromise = null;
 function initResultsView() {
   const resultView = new ResultsView(getElement('ResultsView'));
   globalResultsView = resultView; // グローバル参照を保存
-  TopPageLayoutManager.init([resultView]);
   requestAnimationFrame(() => {
     document.body.classList.add('-layout-ready');
   });
@@ -165,16 +163,6 @@ function cleanupApplication() {
       console.error('Error cleaning up FloatingInfo:', error);
     }
     globalFloatingInfo = null;
-  }
-
-  // TopPageLayoutManager のクリーンアップ
-  if (typeof TopPageLayoutManager.cleanup === 'function') {
-    try {
-      TopPageLayoutManager.cleanup();
-      console.log('TopPageLayoutManager cleaned up successfully');
-    } catch (error) {
-      console.error('Error cleaning up TopPageLayoutManager:', error);
-    }
   }
 
   // StoreManager のクリーンアップ（必要に応じて）
