@@ -1,19 +1,56 @@
+//-
+  検索入力エリア（タブ切り替え）
+  data-bound-url-param="mode" により、タブ選択が URL の ?mode= に反映される。
+  Simple / Advanced の切り替えは module-tabs-view の JS が .section/-current クラスで制御する。
 #SearchInputView.module-tabs-view(data-bound-url-param="mode")
+
+  //- タブナビゲーション（Simple search / Advanced search の切り替えボタン）
   nav.tabscontainer
     ul
       li(data-tab-group="tab-group-type-of-search" data-target="simple") Simple search
       li(data-tab-group="tab-group-type-of-search" data-target="advanced") Advanced search
 
+  //- 各タブのコンテンツ領域
+  //- 非アクティブな .section は CSS で position:absolute / visibility:hidden になりフロー外に置かれる。
+  //- アクティブな .section.-current のみが高さを持ち、#SearchInputView の高さに反映される。
   .sectionscontainer
+
+    //- Simple Search のコンテンツは JS が動的に挿入する（初期は空）
     #SimpleSearchView.section(data-tab-id="simple")
+
+    //-
+      Advanced Search のコンテンツ領域
+      .collapse-view を併用することで、条件ビルダーの折りたたみ（.-collapsed）に対応する。
+      .collapsecontent が非表示になると #AdvancedSearchBuilderView ごと消え、
+      .sectionscontainer の高さが縮小し main#SearchResultsView が上に詰まる。
     #AdvancedSearchView.section.collapse-view(data-tab-id="advanced")
       .collapsecontent
+
+        //-
+          条件ビルダーのルートコンテナ
+          .section クラスは JS の条件管理コードから参照されるが、
+          module-tabs-view の > .section ルール（直接子セレクター）には該当しないため
+          position:absolute は適用されない。
         #AdvancedSearchBuilderView.section
+          //- 条件行・グループは JS（AdvancedSearchBuilderView.ts）が .inner に動的挿入する
           .inner
 
+//-
+  検索結果エリア
+  #SearchInputView とは body の flex column 上の兄弟要素。
+  #SearchInputView の高さ変化（タブ切り替え・折りたたみ）に追従して
+  main の開始位置が自動的にずれる。
+  .LayoutMainAside / .LayoutMain / .LayoutAside の flex 構造は _layout.scss で定義。
 main#SearchResultsView.LayoutMainAside
+
   .LayoutMain
+
+    //-
+      結果テーブルとヘッダーを包むメインカラム
+      padding: 10px $PADDING_SIDE $PADDING_SIDE は _ResultsView.scss で定義。
     #ResultsView
+
+      //- ヘッダー行：見出し・結果件数・ダウンロードボタン・列切り替えドロップダウン
       header.header
         .left
           h2.heading Results
@@ -25,15 +62,26 @@ main#SearchResultsView.LayoutMainAside
             button#DownloadCsv.button-view.-disabled(data-filetype="csv") CSV
             button#DownloadTsv.button-view.-disabled(data-filetype="txt") TSV
           li.columns-dropdown
+            //- aria-expanded は JS がドロップダウン開閉に合わせて更新する
             button.columns-dropdown-button.button-view.-dropdown(type='button' aria-expanded='false') Columns
+            //- hidden / aria-hidden / inert でスクリーンリーダーと Tab フォーカスから除外する
             .columns-dropdown-menu(hidden aria-hidden='true' inert)
               ul.columns-dropdown-list
+          //- ダウンロード不可の理由（条件未入力など）を aria-live で読み上げる
           li.download-disabled-reason-item(hidden)
             span#DownloadDisabledReason.download-disabled-reason(role='status' aria-live='polite' hidden)
+
+      //- 検索状態メッセージ（ローディング中・件数ゼロ・エラーなど）を JS が挿入する
       #Messages
+
+      //- 仮想スクロール用テーブルコンテナ（行の表示/非表示切り替えは JS が制御）
       .tablecontainer
         table.results-view
           thead
+            //-
+              列ヘッダー行
+              各 th のクラス名は _results-view.scss の列幅定義・JS の列リサイズ処理と対応している。
+              data-tooltip-id はツールチップの表示に使う（JS が参照）。
             tr
               th.togovar_id
                 span(data-tooltip-id="table-header-togovar_id") TogoVar ID
@@ -60,10 +108,17 @@ main#SearchResultsView.LayoutMainAside
               th.polyphen
                 span(data-tooltip-id="table-header-polyphen") PolyPhen
 
+          //- tbody は JS（ResultsView の仮想スクロール）が行を動的挿入する
           tbody
+
+      //- 表示中の行番号インジケーター（JS が現在のスクロール位置に応じて更新）
       #RowIndicator.row-indicator
+
+  //- フィルタ・プレビューを表示するサイドバー（Advanced Search モード時は幅ゼロに畳まれる）
   .LayoutAside
     aside#SideBar
+
+      //- バリアントプレビュー（行クリック時にサイドバーに展開される詳細情報）
       #Previews.sidebarcontent
         h2.title Preview
         section#PreviewToVariantReport.panel-view.-cannotcollapse.-emphasize
@@ -96,6 +151,8 @@ main#SearchResultsView.LayoutMainAside
         section#PreviewClinicalSignificance.panel-view
           h3.title Clinical significance
           .content
+
+      //- 絞り込みフィルター群（Simple モード時のみ表示される項目も含む）
       #Filters.sidebarcontent
         h2.title
           span.simple Statistics / Filters
