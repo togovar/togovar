@@ -44,10 +44,10 @@
       visibility: hidden;
       position: absolute;
 
-      // position: inherit で static に戻し、アクティブセクションだけがレイアウト高さに寄与する。
+      // アクティブセクションだけをフローに戻し、.sectionscontainer の高さに反映させる。
       &.-current {
-        visibility: inherit;
-        position: inherit;
+        visibility: visible;
+        position: static;
       }
     }
   }

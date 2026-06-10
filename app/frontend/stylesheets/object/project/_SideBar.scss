@@ -1,7 +1,7 @@
 #SideBar {
   box-shadow: 2px 0 3px rgba(black, 0.2) inset;
   box-sizing: border-box;
-  padding: 0 15px 0;
+  padding: 0 $PADDING_SIDEBAR_SIDE 0;
   width: $WIDTH_SIDEBAR * 2;
   height: 100%;
   min-height: 0;
