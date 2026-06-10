@@ -518,12 +518,25 @@ export class ResultsColumnsDropdown {
     this._root.classList.toggle('-open', shouldOpen);
     this._button.setAttribute('aria-expanded', String(shouldOpen));
     this._menu.setAttribute('aria-hidden', String(!shouldOpen));
-    this._menu.hidden = false;
 
     if (shouldOpen) {
+      // opacity アニメーション開始前に hidden を解除してメニューを DOM に戻す。
+      this._menu.hidden = false;
       this._menu.removeAttribute('inert');
     } else {
       this._menu.setAttribute('inert', '');
+      // CSS transition 完了後に hidden を設定し、inert 非対応ブラウザでも
+      // タブフォーカスがメニュー内チェックボックスに入らないようにする。
+      // 閉じるアニメーション中に再度開かれた場合は hidden を設定しない。
+      this._menu.addEventListener(
+        'transitionend',
+        () => {
+          if (!this._root.classList.contains('-open')) {
+            this._menu.hidden = true;
+          }
+        },
+        { once: true }
+      );
     }
   }
 
