@@ -4,8 +4,11 @@
   min-height: 0
   margin-bottom: $HEIGHT_BOTTOM_DRAWER + $HEIGHT_NBDC_COMMON_FOOTER
   > .LayoutMain
+    display: flex
+    flex-direction: column
     width: calc(100% - #{$WIDTH_SIDEBAR})
     min-height: 0
+    overflow: hidden
     transition: width $GUI_DURATION
     body[data-search-mode="AdvancedSearchView"] &
       width: calc(100% - 0px)

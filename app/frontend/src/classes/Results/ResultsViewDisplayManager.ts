@@ -1,6 +1,6 @@
 import { storeManager } from '../../store/StoreManager';
 import { ResultsRowView } from './ResultsRowView';
-import { TR_HEIGHT, COMMON_FOOTER_HEIGHT } from '../../global';
+import { TR_HEIGHT } from '../../global';
 import type { ColumnConfig, DisplaySizeCalculation } from '../../types';
 
 const DISPLAY_CALCULATION_MARGIN = 2;
@@ -11,21 +11,14 @@ export class ResultsViewDisplayManager {
   private _tbody: HTMLElement;
   private _stylesheet: HTMLStyleElement;
   private _table: HTMLElement | null;
-  private _resultsView: HTMLElement | null;
   private _tableContainer: HTMLElement | null;
-  private _layoutMain: HTMLElement | null;
   private _columnStyleSignature = '';
 
-  /**
-   * 表示行数の計算で繰り返し使うDOM境界を、tbodyを起点にして初期化時に確定する。
-   */
   constructor(tbody: HTMLElement, stylesheet: HTMLStyleElement) {
     this._tbody = tbody;
     this._stylesheet = stylesheet;
     this._table = tbody.closest<HTMLElement>('table.results-view');
-    this._resultsView = tbody.closest<HTMLElement>('#ResultsView');
     this._tableContainer = tbody.closest<HTMLElement>('.tablecontainer');
-    this._layoutMain = tbody.closest<HTMLElement>('.LayoutMain');
   }
 
   // ========================================
@@ -122,15 +115,11 @@ export class ResultsViewDisplayManager {
     };
   }
 
-  /**
-   * 行の下にはtablecontainerとResultsViewの余白が残るため、その余白を除いて行に使える高さを求める。
-   */
   private _calculateAvailableHeight(): number {
     const tbodyTop = this._tbody.getBoundingClientRect().top;
-    const availableBottom = this._getAvailableBottom();
-    const bottomInset = this._getResultsBottomInset();
-
-    return availableBottom - tbodyTop - bottomInset - DISPLAY_CALCULATION_MARGIN;
+    const containerBottom = this._tableContainer?.getBoundingClientRect().bottom ?? 0;
+    const paddingBottom = this._getPixelStyle(this._tableContainer, 'padding-bottom');
+    return containerBottom - tbodyTop - paddingBottom - DISPLAY_CALCULATION_MARGIN;
   }
 
   /**
@@ -263,29 +252,6 @@ export class ResultsViewDisplayManager {
         this._table?.style.removeProperty(widthProperty);
       }
     });
-  }
-
-  /**
-   * LayoutMainが取得できる場合は、drawer分を反映済みの親下端を正として扱う。
-   */
-  private _getAvailableBottom(): number {
-    const layoutBottom = this._layoutMain?.getBoundingClientRect().bottom;
-    if (layoutBottom !== undefined) {
-      return layoutBottom;
-    }
-
-    const karyotypeHeight = storeManager.getData('karyotype')?.height || 0;
-    return window.innerHeight - karyotypeHeight - COMMON_FOOTER_HEIGHT;
-  }
-
-  /**
-   * 行のあとに残るCSS余白を行数計算から除外し、最後の行が親領域からはみ出さないようにする。
-   */
-  private _getResultsBottomInset(): number {
-    return (
-      this._getPixelStyle(this._tableContainer, 'padding-bottom') +
-      this._getPixelStyle(this._resultsView, 'padding-bottom')
-    );
   }
 
   /**
