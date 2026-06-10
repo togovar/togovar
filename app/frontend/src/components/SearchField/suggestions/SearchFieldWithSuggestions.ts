@@ -16,7 +16,9 @@ import { InputEventHandler } from './handlers/InputEventHandler';
 
 import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
 
-/** SearchFieldWithSuggestionsのデフォルト設定 */
+/**
+ * APIレスポンスのキー名が変わっても一か所で対応できるよう、デフォルトのキーマッピングをconstで管理する
+ */
 const DEFAULT_VALUE_MAPPINGS = {
   valueKey: 'id',
   labelKey: 'term',
@@ -24,9 +26,8 @@ const DEFAULT_VALUE_MAPPINGS = {
 } as const;
 
 /**
- * 部分的なオプションを完全なSearchFieldOptionsに変換する
- * @param options - 部分的なオプション
- * @returns 完全なSearchFieldOptions
+ * 部分的なオプションをデフォルト値で補完し、完全なSearchFieldOptionsを返す。
+ * 呼び出し元で毎回デフォルト値を記述しなくて済むよう純粋関数として切り出している
  */
 function createCompleteSearchFieldOptions(
   options?: Partial<SearchFieldOptions>
@@ -44,7 +45,11 @@ function createCompleteSearchFieldOptions(
   };
 }
 
-/** Suggestion data structure */
+/**
+ * APIから返るサジェスト候補の共通構造。
+ * エンドポイントによってキーが異なるため汎用インデックス型を持つが、
+ * anyを避けてunknownにすることで意図しない型操作を防ぐ
+ */
 export interface SuggestionData {
   term?: string;
   alias_of?: string;
@@ -52,21 +57,25 @@ export interface SuggestionData {
   id?: string;
   name?: string;
   symbol?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
-/** Options for configuring the search field behavior */
+/** サジェスト候補の表示・選択動作を設定するオプション */
 export interface SearchFieldOptions {
-  /** Mappings for suggestion values */
+  /** 候補データのどのキーを値・ラベル・補足テキストとして扱うかのマッピング */
   valueMappings: {
-    valueKey: string; // Key to map to the value (usually "id")
-    labelKey: string; // Key to map to the label
-    aliasOfKey?: string; // Key to map to the subText (optional)
+    valueKey: string;
+    labelKey: string;
+    aliasOfKey?: string;
   };
-  titleMappings?: { [key: string]: string }; // Mappings for suggestion titles (optional)
+  /** 候補リストの列見出しマッピング（複数列表示時に使用） */
+  titleMappings?: { [key: string]: string };
 }
 
-/** Host interface for handlers */
+/**
+ * ハンドラクラスがSearchFieldWithSuggestionsの状態を操作できるよう、
+ * 必要なプロパティとメソッドをインターフェースとして公開する
+ */
 export interface SearchFieldHost extends ReactiveControllerHost {
   _searchFieldOptions: SearchFieldOptions;
   _suggestionKeysArray: string[];
@@ -93,7 +102,10 @@ export interface SearchFieldHost extends ReactiveControllerHost {
   dispatchEvent(event: CustomEvent): boolean;
 }
 
-/** Partial options type for more flexible configuration */
+/**
+ * aliasOfKeyのみ省略可能にした呼び出し側向けの簡易オプション型。
+ * SearchFieldOptionsを直接使うと全フィールドが必須になるため別途定義している
+ */
 export type PartialSearchFieldOptions = {
   valueMappings: Partial<SearchFieldOptions['valueMappings']> & {
     valueKey: string;
@@ -102,53 +114,47 @@ export type PartialSearchFieldOptions = {
   titleMappings?: { [key: string]: string };
 };
 
-/** Class for search field with suggestions
- * Used by SimpleSearchView, ConditionValueEditorGene, ConditionValueEditorDisease */
+/**
+ * サジェスト機能付き検索フィールドのカスタムエレメント。
+ * SimpleSearchView・ConditionValueEditorGene・ConditionValueEditorDiseaseから使われる
+ */
 @customElement('search-field-with-suggestions')
 class SearchFieldWithSuggestions extends LitElement {
   static styles: CSSResultGroup = [Styles];
 
-  // ============================================================================
-  // Properties (External Configuration)
-  // ============================================================================
-  @property() suggestAPIURL: string = ''; // API URL
-  @property() suggestAPIQueryParam: string = ''; // Query parameter for API
-  @property({ type: Object }) options?: PartialSearchFieldOptions; // Options for the search field
-  @property({ type: Boolean }) hideSuggestions: boolean = false; // Whether to hide suggestions from parent
+  @property() suggestAPIURL: string = '';
+  @property() suggestAPIQueryParam: string = '';
+  @property({ type: Object }) options?: PartialSearchFieldOptions;
+  /** 親コンポーネントがサジェストを強制的に非表示にするためのフラグ */
+  @property({ type: Boolean }) hideSuggestions: boolean = false;
 
-  // ============================================================================
-  // State Properties (Internal State)
-  // ============================================================================
-  @state() term: string = ''; // Input area value
-  @state() value: string = ''; // Value of selected suggestion
-  @state() label: string = ''; // Label of selected suggestion
-  @state() showSuggestions: boolean = false; // Whether suggestions are displayed
-  @state() suppressSuggestions: boolean = false; // Whether to suppress suggestions after search
-  @state() hasApiResponse: boolean = false; // Whether API response has been received
-  @state() hasUserInput: boolean = false; // Whether user has made input
-  @state() currentSuggestionIndex: number = -1; // Position from top of selection
-  @state() currentSuggestionColumnIndex: number = 0; // Position from side of selection
-  @state() suggestData: { [key: string]: SuggestionData[] } = {}; // Suggest data list
-  @state() private _suggestionKeysArrayInternal: string[] = []; // Suggest content keys
+  @state() term: string = '';
+  @state() value: string = '';
+  @state() label: string = '';
+  @state() showSuggestions: boolean = false;
+  /** 検索実行後に再びサジェストが開くのを防ぐフラグ */
+  @state() suppressSuggestions: boolean = false;
+  @state() hasApiResponse: boolean = false;
+  @state() hasUserInput: boolean = false;
+  /** キー操作のハイライト行（-1は未選択） */
+  @state() currentSuggestionIndex: number = -1;
+  @state() currentSuggestionColumnIndex: number = 0;
+  @state() suggestData: { [key: string]: SuggestionData[] } = {};
+  /**
+   * getter/setterでラップするため内部用変数として分離している。
+   * ハンドラからはgetter経由でアクセスする
+   */
+  @state() private _suggestionKeysArrayInternal: string[] = [];
 
-  // ============================================================================
-  // Private Properties
-  // ============================================================================
   private _controller: SearchFieldController;
   private _keyboardHandler: SuggestionKeyboardHandler;
   private _selectionHandler: SuggestionSelectionHandler;
   private _inputHandler: InputEventHandler;
   private _searchFieldOptionsInternal: SearchFieldOptions;
 
-  // ============================================================================
-  // Constructor
-  // ============================================================================
   /**
-   * @param placeholder - Placeholder text
-   * @param suggestAPIURL - URL to fetch suggestions from
-   * @param suggestAPIQueryParam - Query parameter to be used for the API call
-   * @param element - HTML element to which the search field is attached
-   * @param options - Options for the search field
+   * 各ハンドラにthisを渡して初期化する。
+   * elementが指定されている場合はGene条件入力専用として、要素に直接appendして使う
    */
   constructor(
     public placeholder: string,
@@ -160,48 +166,47 @@ class SearchFieldWithSuggestions extends LitElement {
     super();
     this.suggestAPIURL = suggestAPIURL;
     this.suggestAPIQueryParam = suggestAPIQueryParam;
-
-    // デフォルト値とマージして完全なSearchFieldOptionsを作成
     this._searchFieldOptionsInternal =
       createCompleteSearchFieldOptions(options);
-
-    // 初期化
     this._controller = new SearchFieldController(this);
     this._keyboardHandler = new SuggestionKeyboardHandler(this);
     this._selectionHandler = new SuggestionSelectionHandler(this);
     this._inputHandler = new InputEventHandler(this);
-
-    // for only gene
     if (element) element.appendChild(this);
   }
 
-  // ============================================================================
-  // Getters
-  // ============================================================================
-  /** API task getter - provides access to the suggestion fetching task */
+  /**
+   * ハンドラからcontrollerのapiTaskへアクセスできるよう公開する
+   */
   get apiTask() {
     return this._controller.apiTask;
   }
 
-  /** Get search field options for handlers */
+  /**
+   * ハンドラがSearchFieldOptionsを読み取れるよう内部インスタンスをラップして公開する
+   */
   get _searchFieldOptions() {
     return this._searchFieldOptionsInternal;
   }
 
-  /** Get suggestion keys array for handlers */
+  /**
+   * ハンドラが候補キー配列を読み取れるよう内部インスタンスをラップして公開する
+   */
   get _suggestionKeysArray() {
     return this._suggestionKeysArrayInternal;
   }
 
-  /** Set suggestion keys array for handlers */
+  /**
+   * ハンドラが候補キー配列を書き換えられるよう内部インスタンスをラップして公開する
+   */
   set _suggestionKeysArray(value: string[]) {
     this._suggestionKeysArrayInternal = value;
   }
 
-  // ============================================================================
-  // Lifecycle Methods
-  // ============================================================================
-  /** Compute property values that depend on other properties and are used in the rest of the update process */
+  /**
+   * プロパティの変更に応じてコントローラーのURLや内部オプションを更新する。
+   * willUpdateは再描画前に呼ばれるため、副作用のある処理を安全に行える
+   */
   willUpdate(changedProperties: Map<string | number | symbol, unknown>): void {
     if (changedProperties.has('suggestAPIURL')) {
       this._controller.setSuggestURL(
@@ -209,123 +214,118 @@ class SearchFieldWithSuggestions extends LitElement {
         this.suggestAPIQueryParam
       );
     }
-
     if (changedProperties.has('options') && this.options) {
-      // 部分的なオプションを完全なSearchFieldOptionsに変換
       this._searchFieldOptionsInternal = createCompleteSearchFieldOptions(
         this.options
       );
     }
-
     if (changedProperties.has('hideSuggestions')) {
       this.showSuggestions = !this.hideSuggestions;
     }
   }
 
-  // ============================================================================
-  // Public Event Handlers
-  // ============================================================================
-  /** Select with keydown(ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Enter, Escape) */
+  /** キー操作（上下左右・Enter・Escape）をキーボードハンドラへ委譲する */
   handleUpDownKeys = (e: KeyboardEvent): void => {
     return this._keyboardHandler.handleUpDownKeys(e);
   };
 
-  /** Handle suggestion selected event */
+  /** 候補選択イベントを選択ハンドラへ委譲する */
   handleSuggestionSelected = (e: CustomEvent<SuggestionData>): void => {
     return this._selectionHandler.handleSuggestionSelected(e);
   };
 
-  /** Put the characters input in this.term, (Only SimpleSearch)create input-term event, hide suggestions if the length is less than 3, and empty suggestData */
+  /** 文字入力をインプットハンドラへ委譲する */
   handleInput = (e: InputEvent): void => {
     return this._inputHandler.handleInput(e);
   };
 
-  /** Initialize currentSuggestion position when input is clicked. */
+  /** クリック時のカーソル位置リセットをインプットハンドラへ委譲する */
   handleClick = (): void => {
     return this._inputHandler.handleClick();
   };
 
-  /** Display suggestions, if the input character is greater than 3 when the focus on. */
+  /** フォーカスイン時のサジェスト表示をインプットハンドラへ委譲する */
   handleFocusIn = (): void => {
     return this._inputHandler.handleFocusIn();
   };
 
-  /** Hide suggestions when focus moves away from input */
+  /** フォーカスアウト時のサジェスト非表示をインプットハンドラへ委譲する */
   handleFocusOut = (): void => {
     return this._inputHandler.handleFocusOut();
   };
 
-  /** Hide suggestions and empty input when input is reset. input-reset event for simple search */
+  /** 入力リセット時のサジェスト非表示と入力クリアをインプットハンドラへ委譲する */
   handleInputReset = (): void => {
     return this._inputHandler.handleInputReset();
   };
 
-  /** Hide suggestions */
+  /** ハンドラから直接呼べるようthisコンテキストを保持したままサジェストを非表示にする */
   hideSuggestionsMethod = (): void => {
     this.showSuggestions = false;
   };
 
-  /** Put the selected value in value and label, create new-suggestion-selected event, and hide suggestion */
+  /** 候補を選択して選択値・ラベルを更新し、イベントを発火する */
   selectSuggestion = (suggestion: SuggestionData): void => {
     return this._selectionHandler.select(suggestion);
   };
 
-  /** (Only SimpleSearch) Search without suggestions, create search-term-enter event and hide suggest after event firing */
+  /** サジェスト非選択のまま検索を実行する（SimpleSearch専用） */
   searchWithoutSuggestion = (term: string): void => {
     return this._selectionHandler.searchWithoutSelect(term);
   };
 
-  /** Select currently highlighted suggestion with keyboard navigation */
+  /**
+   * キーボードでハイライト中の候補を選択して確定する。
+   * サジェスト表示中かつ選択位置が有効な場合のみ動作する
+   */
   selectCurrentSuggestion = (): void => {
     if (this.showSuggestions && this.currentSuggestionIndex !== -1) {
       const currentSuggestion =
         this.suggestData[
           this._suggestionKeysArray[this.currentSuggestionColumnIndex]
         ][this.currentSuggestionIndex];
-
       this.selectSuggestion(currentSuggestion);
       this.resetKeyboardSelection();
       this.hideSuggestionsMethod();
     }
   };
 
-  /** Execute search without suggestion selection */
+  /** 入力中のtermでサジェスト非選択のまま検索を実行する */
   executeSearchWithoutSuggestion = (): void => {
     this.searchWithoutSuggestion(this.term);
   };
 
-  /** Close suggestions and suppress further suggestions */
+  /** サジェストを閉じ、検索後に再び開くのを一時的に抑制する */
   closeSuggestions = (): void => {
     this.hideSuggestionsMethod();
     this.suppressSuggestions = true;
   };
 
-  /** Hide suggestions using controller */
+  /** controllerのサジェスト非表示処理をハンドラから呼べるようラップする */
   hideControllerSuggestions = (): void => {
     this._controller.hideSuggestions();
   };
 
-  /** Show suggestions using controller */
+  /** controllerのサジェスト表示処理をハンドラから呼べるようラップする */
   showControllerSuggestions = (): void => {
     this._controller.showSuggestions();
   };
 
-  /** Clear suggest data using controller */
+  /** controllerのサジェストデータクリア処理をハンドラから呼べるようラップする */
   clearControllerSuggestData = (): void => {
     this._controller.clearSuggestData();
   };
 
-  /** Reset keyboard selection */
+  /** キーボードのハイライト状態をリセットする */
   resetKeyboardSelection = (): void => {
     this._keyboardHandler.resetSelection();
   };
 
-  // ============================================================================
-  // Protected Methods (Used by Handlers)
-  // ============================================================================
-  /** Handle index of column */
+  /**
+   * 複数列表示時、列をまたいだ場合のインデックス上限を調整する。
+   * 列によってデータ件数が異なるため、現在の列の末尾に収める必要がある
+   */
   protected _handleStepThroughColumns(): void {
-    // 列間のインデックス調整を処理
     if (
       this.currentSuggestionIndex >
       this.suggestData[
@@ -340,9 +340,6 @@ class SearchFieldWithSuggestions extends LitElement {
     }
   }
 
-  // ============================================================================
-  // Render Method
-  // ============================================================================
   render(): TemplateResult {
     return html`
       <search-field
