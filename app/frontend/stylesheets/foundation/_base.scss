@@ -75,6 +75,13 @@ body {
   -khtml-user-drag: element;
 }
 
+// Web Component の margin はライトDOM側の型セレクターで定義する。
+// :host { margin } は _reset.scss の * { margin: 0 } に上書きされるため、
+// 外部スタイルから明示的に設定することで隙間を保証する。
+frequency-block-view {
+  margin-right: 4px;
+}
+
 a {
   color: $COLOR_KEY_DARK3;
 
