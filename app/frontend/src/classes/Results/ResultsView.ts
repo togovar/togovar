@@ -66,6 +66,7 @@ export class ResultsView {
   private columnAutoSizer!: ResultsColumnAutoSizer;
   private columnResizeController!: ResultsColumnResizeController;
   private _resizeObserver: ResizeObserver | null = null;
+  private _mutationObserver: MutationObserver | null = null;
   private _resizeFrameId: number | null = null;
   private _boundResizeFallbackHandler: (() => void) | null = null;
 
@@ -168,6 +169,7 @@ export class ResultsView {
     }
 
     this._resizeObserver?.disconnect();
+    this._mutationObserver?.disconnect();
     if (this._boundResizeFallbackHandler) {
       window.removeEventListener('resize', this._boundResizeFallbackHandler);
     }
@@ -175,6 +177,7 @@ export class ResultsView {
       cancelAnimationFrame(this._resizeFrameId);
     }
     this._resizeObserver = null;
+    this._mutationObserver = null;
     this._resizeFrameId = null;
     this._boundResizeFallbackHandler = null;
   }
@@ -524,6 +527,16 @@ export class ResultsView {
         this._scheduleDisplaySizeUpdate();
       };
       window.addEventListener('resize', this._boundResizeFallbackHandler);
+      // ResizeObserver 非対応時の追加フォールバック:
+      // タブ切替・Drawer 開閉など「ウィンドウサイズが変わらないレイアウト変化」は
+      // window.resize では検出できないため、body の class / data-search-mode 変化を監視する。
+      this._mutationObserver = new MutationObserver(() => {
+        this._scheduleDisplaySizeUpdate();
+      });
+      this._mutationObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'data-search-mode'],
+      });
       return;
     }
 

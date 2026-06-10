@@ -260,9 +260,9 @@ export class ResultsViewDisplayManager {
   private _getPixelStyle(elm: HTMLElement | null, property: string): number {
     if (!elm) return 0;
 
-    const value = Number.parseFloat(
-      getComputedStyle(elm).getPropertyValue(property)
-    );
+    const raw = getComputedStyle(elm).getPropertyValue(property).trim();
+    if (!raw.endsWith('px')) return 0;
+    const value = Number.parseFloat(raw);
     return Number.isNaN(value) ? 0 : value;
   }
 }
