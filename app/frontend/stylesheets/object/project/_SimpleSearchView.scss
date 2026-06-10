@@ -7,11 +7,6 @@
 //   ここには外側コンテナの構造と CLS 防止の min-height のみを置く。
 
 #SearchInputView {
-  // Lit コンポーネントの初期描画前にレイアウトが崩れないよう最小高さを確保する。
-  // 実際の描画高さはタブバー＋#SimpleSearchView 合計で ~137px になるが、
-  // 完全にゼロにするよりも事前確保でシフト量を抑える。
-  min-height: 104px;
-
   > .sectionscontainer {
     // Lit 描画前に sectionscontainer が潰れないよう下限を設ける。
     min-height: 72px;
