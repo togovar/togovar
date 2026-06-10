@@ -6,7 +6,11 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import Styles from '../../../../stylesheets/object/component/search-field-suggestions-list.scss';
 import { scrollIntoView } from './scrollIntoView';
 
-/** Suggestion data structure */
+/**
+ * APIから返るサジェスト候補の共通構造。
+ * エンドポイントによってキーが異なるため汎用インデックス型を持つが、
+ * anyを避けてunknownにすることで意図しない型操作を防ぐ
+ */
 interface SuggestionItem {
   term?: string;
   alias_of?: string;
@@ -14,38 +18,43 @@ interface SuggestionItem {
   id?: string;
   name?: string;
   symbol?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
-/** Class to create a list of suggestions */
+/**
+ * LitテンプレートでscrollIntoViewディレクティブを型安全に呼び出すための関数型。
+ * directive()の戻り値はLit内部型のため、テンプレート内での使用に限定した型として定義する
+ */
+type ScrollIntoViewDirective = (selected: boolean) => unknown;
+
+/** サジェスト候補の一覧を表示するカスタムエレメント */
 @customElement('search-field-suggestions-list')
 class SearchFieldSuggestionsList extends LitElement {
   static styles: CSSResultGroup = [Styles];
 
-  /** Suggestions data */
+  /** サジェスト候補データ */
   @property({ type: Array }) suggestData: SuggestionItem[] = [];
 
-  /** Highlighted item's index (by keys) */
+  /** キー操作でハイライト中の候補インデックス（-1は未選択） */
   @property({ type: Number }) highlightedSuggestionIndex: number = -1;
 
-  /** What of an item to map to dispatched event's detail.id */
+  /** 候補選択イベントのdetail.idに使うデータキー名 */
   @property() itemIdKey: string = '';
 
-  /** What of an item to map to dispatched event's detail.label */
+  /** 候補選択イベントのdetail.labelに使うデータキー名 */
   @property() itemLabelKey: string = '';
 
-  /** If there is alias_of -kind of data, where in data to see for it */
+  /** エイリアス等の補足テキストを取得するデータキー名 */
   @property() subTextKey: string = '';
 
-  /** Column title in case of Simple search */
+  /** シンプル検索時の列見出しテキスト */
   @property() title: string = '';
 
-  /** Whether API response has been received */
+  /** APIレスポンス受信済みかどうか */
   @property({ type: Boolean }) hasApiResponse: boolean = false;
 
   /**
-   * Handle suggestion selection
-   * @param item - The selected suggestion item
+   * 候補が選択されたことを親コンポーネントへ伝えるためにカスタムイベントを発火する
    */
   private _handleSelect(item: SuggestionItem): void {
     this.dispatchEvent(
@@ -55,6 +64,13 @@ class SearchFieldSuggestionsList extends LitElement {
         composed: true,
       })
     );
+  }
+
+  /**
+   * インデックス署名がunknownのため、テンプレートで安全に表示できるようstring型へ絞り込む
+   */
+  private _toDisplayString(value: unknown): string {
+    return typeof value === 'string' ? value : '';
   }
 
   render(): TemplateResult {
@@ -73,14 +89,18 @@ class SearchFieldSuggestionsList extends LitElement {
                       ? '-selected'
                       : ''}"
                     @mousedown="${() => this._handleSelect(item)}"
-                    ${(scrollIntoView as any)(
+                    ${(scrollIntoView as ScrollIntoViewDirective)(
                       this.highlightedSuggestionIndex === index
                     )}
                   >
-                    ${unsafeHTML(item?.highlight || item?.[this.itemLabelKey])}
-                    ${this.subTextKey && item?.[this.subTextKey]
+                    ${unsafeHTML(
+                      item.highlight ||
+                        this._toDisplayString(item[this.itemLabelKey])
+                    )}
+                    ${this.subTextKey && item[this.subTextKey]
                       ? html`<span class="sub">
-                          alias: ${item[this.subTextKey]}</span
+                          alias:
+                          ${this._toDisplayString(item[this.subTextKey])}</span
                         >`
                       : nothing}
                   </li>
