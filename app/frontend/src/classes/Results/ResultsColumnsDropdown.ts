@@ -525,6 +525,11 @@ export class ResultsColumnsDropdown {
       this._menu.removeAttribute('inert');
     } else {
       this._menu.setAttribute('inert', '');
+      // 既に hidden（display:none）なら transitionend は発火しないため即座に終了する。
+      // 範囲外クリックや Escape が連続して呼ばれてもリスナーが蓄積しない。
+      if (this._menu.hidden) {
+        return;
+      }
       // CSS transition 完了後に hidden を設定し、inert 非対応ブラウザでも
       // タブフォーカスがメニュー内チェックボックスに入らないようにする。
       // 閉じるアニメーション中に再度開かれた場合は hidden を設定しない。
