@@ -12,8 +12,8 @@ block head
   //- These rules mirror the sources listed below; keep in sync when editing SCSS.
   //-   html/body/box-sizing → stylesheets/foundation/_base.scss
   //-   #GlobalHeader, .button-view → stylesheets/object/component/ (each component file)
-  //-   .module-tabs-view → stylesheets/object/component/_module-tabs-view.sass
-  //-   .LayoutMainAside, #SearchResultsView → stylesheets/layout/_layout.sass
+  //-   .module-tabs-view → stylesheets/object/component/_module-tabs-view.scss
+  //-   .LayoutMainAside, #SearchResultsView → stylesheets/layout/_layout.scss
   //-   table.results-view column widths → stylesheets/object/component/_results-view.scss
   //-   .drawer-view → stylesheets/object/component/_drawer-view.sass
   style(nonce="__CSP_NONCE__").
@@ -40,21 +40,21 @@ block head
     .module-tabs-view{background-color:#0f6272;color:#fff}
     .module-tabs-view>.tabscontainer>ul{margin:0;padding:4px 18px 0}
     .module-tabs-view>.tabscontainer>ul>li{display:inline-block;font-size:14px;font-weight:700;line-height:24px;padding:2px 12px 0}
-    .module-tabs-view>.sectionscontainer{min-height:72px;background-color:#117f93}
+    .module-tabs-view>.sectionscontainer{position:relative;min-height:72px;background-color:#117f93}
     .module-tabs-view>.sectionscontainer>.section{visibility:hidden;position:absolute}
     .module-tabs-view>.sectionscontainer>.section.-current{visibility:inherit;position:inherit}
     #SearchInputView{min-height:104px}
-    #SimpleSearchView{padding:14px;min-height:72px}
+    #SimpleSearchView{padding:14px}
     #SearchResultsView{flex:1 1 auto;min-height:0}
     .LayoutMainAside{display:flex;flex:1 1 auto;min-height:0;margin-bottom:30px}
-    .LayoutMainAside>.LayoutMain{width:calc(100% - 300px);min-height:0}
+    .LayoutMainAside>.LayoutMain{display:flex;flex-direction:column;width:calc(100% - 300px);min-height:0;overflow:hidden}
     .LayoutMainAside>.LayoutAside{width:300px;height:100%;min-height:0;overflow:hidden;position:relative;background:#125263}
-    #ResultsView{padding:10px 18px 18px;position:relative}
+    #ResultsView{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;padding:10px 18px 18px;position:relative}
     #ResultsView>.header{white-space:nowrap;position:relative;display:flex;justify-content:space-between}
     #ResultsView>.header>.left>.heading{display:inline-block;font-size:16px;margin-right:8px;margin-bottom:-2px}
     #ResultsView>.header>.left>.status{display:inline-block;font-size:12px;min-width:12em}
     #ResultsView>.header>.right{position:relative;top:4px;min-height:16px;list-style:none;display:flex;gap:5px;align-items:flex-start;padding:0 0 18px;margin:0}
-    #ResultsView>.tablecontainer{overflow-x:auto;overflow-y:hidden;min-height:96px;margin-top:-15px;margin-right:-18px;padding-bottom:20px}
+    #ResultsView>.tablecontainer{flex:1 1 auto;min-height:0;overflow-x:auto;overflow-y:hidden;margin-top:-15px;margin-right:-18px;padding-bottom:20px}
     table.results-view{caption-side:bottom;border-collapse:collapse;white-space:nowrap;font-size:14px;line-height:18px;border-right:solid 18px #fff;width:100%}
     table.results-view>thead>tr{height:64px;border-bottom:solid 2px #444}
     table.results-view thead,table.results-view tbody,table.results-view tr,table.results-view td,table.results-view th{border-color:inherit;border-style:solid;border-width:0}
