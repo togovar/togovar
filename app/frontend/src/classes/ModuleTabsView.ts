@@ -56,12 +56,12 @@ export default class ModuleTabsView {
   }
 
   /**
-   * 旧実装と同じclick経路を通し、外側で登録されたタブ切替処理も初期表示時に実行する。
+   * 初期表示では検索実行を再発火させず、タブの見た目だけを現在の状態へ揃える。
    */
   private _selectInitialTab(): void {
     const selectedTab = this._findInitialTab();
     if (selectedTab) {
-      selectedTab.dispatchEvent(new Event('click'));
+      this._selectTab(selectedTab);
     }
   }
 
