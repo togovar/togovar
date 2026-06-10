@@ -82,20 +82,19 @@ export default class ModuleTabsView {
   }
 
   /**
-   * URL共有時はURLパラメータを正として扱い、通常表示ではlocalStorageの前回値を使う。
+   * boundUrlParam が設定されている場合は URL パラメータのみを正として扱い、
+   * localStorage にはフォールバックしない。
+   * こうすることで初期タブ選択と initializeApp() の searchMode 判定が同じ基準になり、
+   * 「localStorage='advanced' + URL パラメータなし」のときに store と UI が不整合にならない。
+   * boundUrlParam がない場合は従来通り localStorage の前回値を使う。
    */
   private _getStoredTab(defaultTab: ModuleTab | undefined): string | null {
-    const tabGroup = defaultTab?.dataset.tabGroup;
-    const storedTab = tabGroup ? window.localStorage.getItem(tabGroup) : null;
-
-    if (!this._boundUrlParam) {
-      return storedTab;
+    if (this._boundUrlParam) {
+      return new URL(window.location.href).searchParams.get(this._boundUrlParam);
     }
 
-    return (
-      new URL(window.location.href).searchParams.get(this._boundUrlParam) ??
-      storedTab
-    );
+    const tabGroup = defaultTab?.dataset.tabGroup;
+    return tabGroup ? window.localStorage.getItem(tabGroup) : null;
   }
 
   /**
