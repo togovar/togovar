@@ -1,6 +1,6 @@
 import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import Style from '../../stylesheets/object/component/frequency-count-value-view.scss';
+import Style from '../../../stylesheets/object/component/frequency-count-value-view.scss';
 import type {
   ScoreRange,
   FrequencyLeaf,

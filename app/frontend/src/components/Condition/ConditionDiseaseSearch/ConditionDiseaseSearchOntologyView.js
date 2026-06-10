@@ -7,8 +7,8 @@ import { repeat } from 'lit/directives/repeat.js';
 
 import './ConditionDiseaseSearchColumn';
 
-import { cachedAxios } from '../../utils/cachedAxios';
-import { API_URL } from '../../global';
+import { cachedAxios } from '../../../utils/cachedAxios';
+import { API_URL } from '../../../global';
 
 class Container extends LitElement {
   flexRef = createRef();
