@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import Styles from '../../../../stylesheets/object/component/search-field-suggestions-list.scss';
-import { scrollIntoView } from '../scrollIntoView';
+import { scrollIntoView } from './scrollIntoView';
 
 /** Suggestion data structure */
 interface SuggestionItem {
@@ -64,28 +64,28 @@ class SearchFieldSuggestionsList extends LitElement {
         ${!this.hasApiResponse
           ? nothing
           : !this.suggestData || this.suggestData.length === 0
-          ? html`<li class="item -empty">No results</li>`
-          : map(
-              this.suggestData,
-              (item: SuggestionItem, index: number) => html`
-                <li
-                  class="item ${this.highlightedSuggestionIndex === index
-                    ? '-selected'
-                    : ''}"
-                  @mousedown="${() => this._handleSelect(item)}"
-                  ${(scrollIntoView as any)(
-                    this.highlightedSuggestionIndex === index
-                  )}
-                >
-                  ${unsafeHTML(item?.highlight || item?.[this.itemLabelKey])}
-                  ${this.subTextKey && item?.[this.subTextKey]
-                    ? html`<span class="sub">
-                        alias: ${item[this.subTextKey]}</span
-                      >`
-                    : nothing}
-                </li>
-              `
-            )}
+            ? html`<li class="item -empty">No results</li>`
+            : map(
+                this.suggestData,
+                (item: SuggestionItem, index: number) => html`
+                  <li
+                    class="item ${this.highlightedSuggestionIndex === index
+                      ? '-selected'
+                      : ''}"
+                    @mousedown="${() => this._handleSelect(item)}"
+                    ${(scrollIntoView as any)(
+                      this.highlightedSuggestionIndex === index
+                    )}
+                  >
+                    ${unsafeHTML(item?.highlight || item?.[this.itemLabelKey])}
+                    ${this.subTextKey && item?.[this.subTextKey]
+                      ? html`<span class="sub">
+                          alias: ${item[this.subTextKey]}</span
+                        >`
+                      : nothing}
+                  </li>
+                `
+              )}
       </ul>
     `;
   }
