@@ -1,22 +1,24 @@
 import { storeManager } from '../../store/StoreManager';
 import { ResultsRowView } from './ResultsRowView';
-import { TR_HEIGHT, COMMON_FOOTER_HEIGHT } from '../../global';
+import { TR_HEIGHT } from '../../global';
 import type { ColumnConfig, DisplaySizeCalculation } from '../../types';
 
 const DISPLAY_CALCULATION_MARGIN = 2;
 type ResultsRenderReason = 'layout' | 'searchResults';
 
 export class ResultsViewDisplayManager {
-  private _rows: ResultsRowView[] = []; // Array of result row view instances
-  private _tbody: HTMLElement; // Table body element
-  private _stylesheet: HTMLStyleElement; // Stylesheet for column display control
-  private _table: HTMLElement | null; // Results table element
+  private _rows: ResultsRowView[] = [];
+  private _tbody: HTMLElement;
+  private _stylesheet: HTMLStyleElement;
+  private _table: HTMLElement | null;
+  private _tableContainer: HTMLElement | null;
   private _columnStyleSignature = '';
 
   constructor(tbody: HTMLElement, stylesheet: HTMLStyleElement) {
     this._tbody = tbody;
     this._stylesheet = stylesheet;
     this._table = tbody.closest<HTMLElement>('table.results-view');
+    this._tableContainer = tbody.closest<HTMLElement>('.tablecontainer');
   }
 
   // ========================================
@@ -24,10 +26,7 @@ export class ResultsViewDisplayManager {
   // ========================================
 
   /**
-   * Updates the display size of the results view.
-   * Ensures rows are adjusted based on the available space and updates animations.
-   * @param isTouchDevice - Whether the device supports touch input.
-   * @param setTouchElementsPointerEvents - Function to control pointer-events for touch elements.
+   * レイアウト変更や検索結果更新のたびに、親領域へ収まる行数だけを描画する。
    */
   updateDisplaySize(
     isTouchDevice: boolean,
@@ -49,17 +48,12 @@ export class ResultsViewDisplayManager {
   }
 
   /**
-   * Handles the display of search results.
-   * Validates data, updates the display size, and manages animations.
-   * Retries if data is being updated or fetched.
-   * @param isTouchDevice - Whether the device supports touch input.
-   * @param setTouchElementsPointerEvents - Function to control pointer-events for touch elements.
+   * Store更新中の中途半端なデータで行を描画しないよう、更新完了後に検索結果を反映する。
    */
   handleSearchResults(
     isTouchDevice: boolean,
     setTouchElementsPointerEvents: (_enabled: boolean) => void
   ): void {
-    // Check update flags only once
     const isUpdating = storeManager.getData('isStoreUpdating');
     const isFetching = storeManager.getData('isFetching');
 
@@ -83,9 +77,7 @@ export class ResultsViewDisplayManager {
   }
 
   /**
-   * Controls the visibility of columns in the results table.
-   * Applies styles to show or hide columns based on the provided configuration.
-   * @param columns - Array of column configuration objects.
+   * 列表示はCSS変数で切り替えるため、列定義の変更時だけルール生成と値更新を行う。
    */
   handleColumnsChange(columns: ColumnConfig[]): void {
     this._ensureColumnStyleRules(columns);
@@ -97,20 +89,18 @@ export class ResultsViewDisplayManager {
   // ========================================
 
   /**
-   * Checks if the update should be skipped.
-   * @returns True if the update should be skipped, false otherwise.
+   * 取得中の検索結果で表示行数を更新するとちらつくため、fetch中は更新を待つ。
    */
   private _shouldSkipUpdate(): boolean {
     return storeManager.getData('isFetching');
   }
 
   /**
-   * Calculates the display size based on the available height and number of records.
-   * @returns An object containing the calculated display size parameters.
+   * 表示可能な高さと総件数から、Storeへ共有する表示行数を一箇所で決める。
    */
   private _calculateDisplaySize(): DisplaySizeCalculation {
     const availableHeight = this._calculateAvailableHeight();
-    const maxRowCount = Math.floor(availableHeight / TR_HEIGHT);
+    const maxRowCount = Math.max(0, Math.floor(availableHeight / TR_HEIGHT));
     const numberOfRecords = storeManager.getData('numberOfRecords');
     const offset = storeManager.getData('offset');
     const rowCount = Math.min(maxRowCount, numberOfRecords);
@@ -125,26 +115,15 @@ export class ResultsViewDisplayManager {
     };
   }
 
-  /**
-   * Calculates the available height for the results view.
-   * Considers the karyotype height, footer height, and a margin.
-   * @returns The calculated available height in pixels.
-   */
   private _calculateAvailableHeight(): number {
-    const karyotypeHeight = storeManager.getData('karyotype')?.height || 0;
-    return (
-      window.innerHeight -
-      this._tbody.getBoundingClientRect().top -
-      karyotypeHeight -
-      COMMON_FOOTER_HEIGHT -
-      DISPLAY_CALCULATION_MARGIN
-    );
+    const tbodyTop = this._tbody.getBoundingClientRect().top;
+    const containerBottom = this._tableContainer?.getBoundingClientRect().bottom ?? 0;
+    const paddingBottom = this._getPixelStyle(this._tableContainer, 'padding-bottom');
+    return containerBottom - tbodyTop - paddingBottom - DISPLAY_CALCULATION_MARGIN;
   }
 
   /**
-   * Ensures that the required number of rows exist in the view.
-   * Adds new row instances if necessary.
-   * @param requiredRowCount - The number of rows that should be present.
+   * 仮想スクロールで再利用する行Viewは、不足分だけ増やして既存行を作り直さない。
    */
   private _ensureRowsExist(requiredRowCount: number): void {
     while (this._rows.length < requiredRowCount) {
@@ -156,9 +135,7 @@ export class ResultsViewDisplayManager {
   }
 
   /**
-   * Adjusts the offset value based on the display size calculation.
-   * Ensures that enough records are visible and adjusts the offset if there is empty space.
-   * @param calculation - The display size calculation result.
+   * 末尾付近で空白が出ないよう、表示可能行数に合わせてoffsetを上方向へ詰める。
    */
   private _adjustOffset(calculation: DisplaySizeCalculation): void {
     const { maxRowCount, numberOfRecords, offset } = calculation;
@@ -172,29 +149,21 @@ export class ResultsViewDisplayManager {
   }
 
   /**
-   * Calculates the adjusted offset value to avoid empty space in the results view.
-   * @param currentOffset - The current offset value.
-   * @param emptySpace - The amount of empty space detected.
-   * @returns The adjusted offset value.
+   * offsetは負にできないため、空白量が現在offsetを超える場合は先頭へ戻す。
    */
   private _calculateAdjustedOffset(
     currentOffset: number,
     emptySpace: number
   ): number {
     if (currentOffset >= emptySpace) {
-      // If the upper gap is larger, set the difference to offset
       return currentOffset - emptySpace;
     } else {
-      // If the lower gap is larger, set offset to zero
       return 0;
     }
   }
 
   /**
-   * Executes row updates within an animation frame.
-   * Calls the updateTableRow method on each row instance.
-   * @param isTouchDevice - Whether the device supports touch input.
-   * @param setTouchElementsPointerEvents - Function to control pointer-events for touch elements.
+   * DOM更新を次フレームへまとめ、行更新後に後続UIへ描画完了イベントを通知する。
    */
   private _updateRowsWithAnimation(
     isTouchDevice: boolean,
@@ -217,8 +186,7 @@ export class ResultsViewDisplayManager {
   }
 
   /**
-   * Validates the integrity and structure of the data.
-   * @returns True if the data is valid, false otherwise.
+   * Store由来の値は外部更新されるため、描画前に最低限の構造だけ確認する。
    */
   private _validateData(): boolean {
     const results = storeManager.getData('searchResults');
@@ -232,9 +200,7 @@ export class ResultsViewDisplayManager {
   }
 
   /**
-   * Ensures the static column CSS rules exist.
-   * Width and display values are updated through CSS custom properties.
-   * @param columns - The array of column configuration objects.
+   * 列ごとのCSSルールは列ID構成が変わったときだけ再生成し、通常更新のコストを抑える。
    */
   private _ensureColumnStyleRules(columns: ColumnConfig[]): void {
     const signature = columns.map((column) => column.id).join('|');
@@ -266,8 +232,7 @@ export class ResultsViewDisplayManager {
   }
 
   /**
-   * Applies column display and width values without rebuilding CSS rules.
-   * @param columns - The array of column configuration objects.
+   * 列幅と表示状態はCSS変数だけを更新し、生成済みルールを使い回す。
    */
   private _applyColumnStyles(columns: ColumnConfig[]): void {
     if (!this._table) return;
@@ -287,5 +252,17 @@ export class ResultsViewDisplayManager {
         this._table?.style.removeProperty(widthProperty);
       }
     });
+  }
+
+  /**
+   * CSSの余白値は文字列なので、計算可能なpx値だけを数値として使う。
+   */
+  private _getPixelStyle(elm: HTMLElement | null, property: string): number {
+    if (!elm) return 0;
+
+    const raw = getComputedStyle(elm).getPropertyValue(property).trim();
+    if (!raw.endsWith('px')) return 0;
+    const value = Number.parseFloat(raw);
+    return Number.isNaN(value) ? 0 : value;
   }
 }
