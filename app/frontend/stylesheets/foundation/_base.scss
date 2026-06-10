@@ -34,16 +34,15 @@ body {
   -webkit-font-smoothing: antialiased;
 
   [data-page='home'] & {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
     overflow: hidden;
   }
 
   [data-page='home'] & #SearchResultsView {
-    height: var(
-      --search-results-height,
-      calc(
-        100vh - #{$HEIGHT_GLOBAL_MENU + $HEIGHT_BOTTOM_DRAWER} - 104px
-      )
-    );
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   [data-page='home'] &:not(.-layout-ready) {

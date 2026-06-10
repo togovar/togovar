@@ -1,5 +1,3 @@
-import TopPageLayoutManager from './TopPageLayoutManager';
-
 type ModuleTab = HTMLLIElement;
 type ModuleSection = HTMLElement;
 
@@ -47,7 +45,7 @@ export default class ModuleTabsView {
   }
 
   /**
-   * タブ切替時の状態更新とレイアウト再計算を、各タブのclickイベントに集約する。
+   * タブ切替時の状態更新を、各タブのclickイベントに集約する。
    */
   private _setupTabEvents(): void {
     this._tabs.forEach((tab) => {
@@ -101,7 +99,7 @@ export default class ModuleTabsView {
   }
 
   /**
-   * 表示中クラスとlocalStorageを同時に更新し、切替後の高さ変化をレイアウトへ反映する。
+   * 表示中クラスとlocalStorageを同時に更新し、タブ状態をDOMと保存値で揃える。
    */
   private _selectTab(selectedTab: ModuleTab): void {
     const selectedSection = this._sectionByTab.get(selectedTab);
@@ -117,8 +115,6 @@ export default class ModuleTabsView {
     selectedTab.classList.add('-current');
     selectedSection.classList.add('-current');
     this._storeSelectedTab(selectedTab);
-
-    TopPageLayoutManager.scheduleUpdate();
   }
 
   /**

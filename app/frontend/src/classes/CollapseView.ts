@@ -1,5 +1,3 @@
-import TopPageLayoutManager from './TopPageLayoutManager';
-
 type CollapseTarget = {
   ancestors: HTMLTableRowElement[];
   tr: HTMLTableRowElement;
@@ -43,7 +41,7 @@ export default class CollapseView {
   }
 
   /**
-   * 開閉状態のDOM反映、保存、レイアウト再計算を1つの操作として扱う。
+   * 開閉状態のDOM反映、子孫行の表示更新、保存を1つの操作として扱う。
    */
   private _toggle(): void {
     this._collapseView.classList.toggle('-collapsed');
@@ -53,10 +51,6 @@ export default class CollapseView {
     }
 
     this._storeStatus();
-
-    if (this._collapseView.dataset.collapseId === 'advanced-search') {
-      TopPageLayoutManager.scheduleUpdate();
-    }
   }
 
   /**
