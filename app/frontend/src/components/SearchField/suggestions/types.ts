@@ -11,5 +11,6 @@ export interface SuggestionData {
   id?: string;
   name?: string;
   symbol?: string;
+  // TODO: APIレスポンスの実際のキー・型を調査して、インデックス署名をなくすか具体的なユニオン型に置き換える
   [key: string]: unknown;
 }
