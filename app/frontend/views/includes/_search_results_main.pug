@@ -1,6 +1,6 @@
 //-
   検索入力エリア（タブ切り替え）
-  data-bound-url-param="mode" により、タブ選択が URL の ?mode= に反映される。
+  data-bound-url-param="mode" がある場合、初期タブ選択は URL の ?mode= を優先して決まる（タブ操作で URL は更新しない）。
   Simple / Advanced の切り替えは module-tabs-view の JS が .section/-current クラスで制御する。
 #SearchInputView.module-tabs-view(data-bound-url-param="mode")
 

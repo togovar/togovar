@@ -11,8 +11,13 @@
   flex: 1 1 auto;
   // flex child の暗黙的 min-height: auto を打ち消し、内側を縦方向に圧縮できるようにする。
   min-height: 0;
-  // BottomDrawer と外部共通フッターが画面下端に絶対配置されるため、重ならないよう余白を確保する。
+  // BottomDrawer と外部共通フッターが画面下端に固定配置されるため、重ならないよう余白を確保する。
+  // Drawer 開時は展開後の高さ分に切り替え、コンテンツが Drawer に隠れないようにする。
   margin-bottom: $HEIGHT_BOTTOM_DRAWER + $HEIGHT_NBDC_COMMON_FOOTER;
+
+  body.-drawer-opened & {
+    margin-bottom: $HEIGHT_BOTTOM_DRAWER_OPENED + $HEIGHT_NBDC_COMMON_FOOTER;
+  }
 
   // 縦積みの flex column にすることで、#ResultsView が残り高さをすべて受け取れるようにする。
   > .LayoutMain {
@@ -26,7 +31,7 @@
     transition: width $GUI_DURATION;
 
     // Advanced Search モードではサイドバーが幅ゼロになるため、その分を取り戻して全幅にする。
-    body[data-search-mode='AdvancedSearchView'] & {
+    body[data-search-mode='advanced'] & {
       width: 100%;
     }
 
@@ -52,7 +57,7 @@
     box-shadow: 2px 0 2px rgba(black, 0.2) inset;
 
     // Advanced Search モードではサイドバーを幅ゼロに畳む。
-    body[data-search-mode='AdvancedSearchView'] & {
+    body[data-search-mode='advanced'] & {
       width: 0;
     }
 
