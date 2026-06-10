@@ -32,11 +32,6 @@
     // サイドバー幅の変化にスムーズに追従させるため width をトランジション対象にする。
     transition: width $GUI_DURATION;
 
-    // Advanced Search モードではサイドバーが幅ゼロになるため、その分を取り戻して全幅にする。
-    body[data-search-mode='advanced'] & {
-      width: 100%;
-    }
-
     // 行選択でサイドバーが再表示されるとき通常幅に戻す。
     body.-rowselected & {
       width: calc(100% - #{$WIDTH_SIDEBAR});
@@ -57,11 +52,6 @@
     z-index: var(--z-index-layout-aside);
     // 右端の内側シャドウでメインコンテンツとの境界に奥行きを出す。
     box-shadow: 2px 0 2px rgba(black, 0.2) inset;
-
-    // Advanced Search モードではサイドバーを幅ゼロに畳む。
-    body[data-search-mode='advanced'] & {
-      width: 0;
-    }
 
     body.-rowselected & {
       width: $WIDTH_SIDEBAR;
