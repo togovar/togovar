@@ -2,7 +2,7 @@ import { storeManager } from './store/StoreManager';
 import { ResultsView } from './classes/Results/ResultsView';
 import SideBar from './classes/SideBar';
 import Karyotype from './classes/Karyotype.js';
-import ActivityIndicator from './classes/ActivityIndicator.js';
+import LoadingIndicator from './classes/LoadingIndicator';
 import ModuleTabsView from './classes/ModuleTabsView';
 import DownloadButton from './classes/DownloadButton';
 import SimpleSearchView from './components/SearchField/SimpleSearch/SimpleSearchView';
@@ -59,7 +59,9 @@ export function initHome(): void {
   storeManager.setData('selectedRow', undefined);
 
   new Karyotype(document.getElementById('Karyotype'));
-  new ActivityIndicator(document.getElementById('ActivityIndicator'));
+  new LoadingIndicator(
+    selectRequired<HTMLElement>(document, '#LoadingIndicator')
+  );
 
   readyInitialSearch(() => {
     initResultsView();
