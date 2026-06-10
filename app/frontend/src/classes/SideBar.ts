@@ -52,28 +52,13 @@ export default class SideBar {
   }
 
   /**
-   * selectedRowの有無がFilters/Previewの表示状態そのものなので、bind APIの受け口として残す。
+   * selectedRowはCSSだけでは参照できないStore状態なので、bodyの状態クラスへ橋渡しする。
    */
   selectedRow(index: SelectedRowIndex): void {
-    if (index === undefined) {
-      this._showFilters();
-    } else {
-      this._showPreviews();
+    const hasSelectedRow = index !== undefined;
+    if (hasSelectedRow) {
+      this._previews.scrollTop = 0;
     }
-  }
-
-  /**
-   * 一覧へ戻るときはFilters側のスクロール位置を維持したいので、状態クラスだけ戻す。
-   */
-  private _showFilters(): void {
-    this._body.classList.remove('-rowselected');
-  }
-
-  /**
-   * Previewは選択行ごとの詳細確認なので、前回のスクロール位置を引き継がず先頭から見せる。
-   */
-  private _showPreviews(): void {
-    this._previews.scrollTop = 0;
-    this._body.classList.add('-rowselected');
+    this._body.classList.toggle('-rowselected', hasSelectedRow);
   }
 }
