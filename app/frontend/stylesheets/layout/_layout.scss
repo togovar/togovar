@@ -26,7 +26,7 @@
     transition: width $GUI_DURATION;
 
     // Advanced Search モードではサイドバーが幅ゼロになるため、その分を取り戻して全幅にする。
-    body[data-search-mode="AdvancedSearchView"] & {
+    body[data-search-mode='AdvancedSearchView'] & {
       width: 100%;
     }
 
@@ -52,7 +52,7 @@
     box-shadow: 2px 0 2px rgba(black, 0.2) inset;
 
     // Advanced Search モードではサイドバーを幅ゼロに畳む。
-    body[data-search-mode="AdvancedSearchView"] & {
+    body[data-search-mode='AdvancedSearchView'] & {
       width: 0;
     }
 
