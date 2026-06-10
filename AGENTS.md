@@ -103,6 +103,8 @@ app/frontend/
 - 既存CSSに異なる書き方があっても、関連する変更範囲だけ段階的に整える。
 - UI状態は、可能なら既存の `data-*` 属性や状態クラスを利用する。
 - セレクターを追加する前に、既存の `object/component` / `object/project` に同じ責務のスタイルがないか確認する。
+- `app/frontend/stylesheets/foundation/_reset.scss` は**変更禁止**。Josh W. Comeau's CSS Reset の定義をそのまま維持する。
+- `tr` に `border` を使うテーブルは、必ずそのテーブルのセレクター自身に `border-collapse: collapse` を明示する（`_reset.scss` に書けないため各コンポーネントで対応）。
 
 ## コメント規約
 
