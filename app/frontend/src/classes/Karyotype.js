@@ -1,5 +1,5 @@
 import { storeManager } from '../store/StoreManager';
-import ChromosomeView from './ChromosomeView.js';
+import ChromosomeView from './ChromosomeView.ts';
 
 const CHROMOSOME_KEYS = [
   '1',
