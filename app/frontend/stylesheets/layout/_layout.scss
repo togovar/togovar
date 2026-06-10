@@ -13,7 +13,9 @@
   min-height: 0;
   // BottomDrawer と外部共通フッターが画面下端に固定配置されるため、重ならないよう余白を確保する。
   // Drawer 開時は展開後の高さ分に切り替え、コンテンツが Drawer に隠れないようにする。
+  // Drawer のアニメーション（$TRANSITION_DURATION）に合わせて margin-bottom をトランジションさせる。
   margin-bottom: $HEIGHT_BOTTOM_DRAWER + $HEIGHT_NBDC_COMMON_FOOTER;
+  transition: margin-bottom $TRANSITION_DURATION;
 
   body.-drawer-opened & {
     margin-bottom: $HEIGHT_BOTTOM_DRAWER_OPENED + $HEIGHT_NBDC_COMMON_FOOTER;
