@@ -1,7 +1,7 @@
 import { storeManager } from './store/StoreManager';
 import { ResultsView } from './classes/Results/ResultsView';
 import SideBar from './classes/SideBar';
-import Karyotype from './classes/Karyotype.js';
+import Karyotype from './classes/Karyotype';
 import LoadingIndicator from './classes/LoadingIndicator';
 import ModuleTabsView from './classes/ModuleTabsView';
 import DownloadButton from './classes/DownloadButton';
@@ -58,7 +58,7 @@ export function initHome(): void {
   storeManager.setData('offset', 0);
   storeManager.setData('selectedRow', undefined);
 
-  new Karyotype(document.getElementById('Karyotype'));
+  new Karyotype(selectRequired<HTMLElement>(document, '#Karyotype'));
   new LoadingIndicator(
     selectRequired<HTMLElement>(document, '#LoadingIndicator')
   );
