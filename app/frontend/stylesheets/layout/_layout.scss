@@ -1,0 +1,59 @@
+// メイン／サイドバー／レポートの大枠レイアウト定義
+
+// メインとサイドバーを横並びにするコンテナ。
+// body の flex column の中で flex: 1 1 auto を持ち、残り高さをすべて占有する。
+.LayoutMainAside {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  // BottomDrawer と共通フッターの高さ分だけ下マージンを確保する。
+  margin-bottom: $HEIGHT_BOTTOM_DRAWER + $HEIGHT_NBDC_COMMON_FOOTER;
+
+  > .LayoutMain {
+    // flex column にして #ResultsView が残り高さを flex で受け取れるようにする。
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - #{$WIDTH_SIDEBAR});
+    min-height: 0;
+    // サイドバー幅の変化をアニメーションで追従させるために width をトランジション対象にする。
+    overflow: hidden;
+    transition: width $GUI_DURATION;
+
+    // Advanced Search モード時はサイドバーを非表示にして全幅を使う。
+    body[data-search-mode="AdvancedSearchView"] & {
+      width: calc(100% - 0px);
+    }
+
+    // 行選択時はサイドバーを表示するため、通常幅に戻す。
+    body.-rowselected & {
+      width: calc(100% - #{$WIDTH_SIDEBAR});
+    }
+  }
+
+  > .LayoutAside {
+    width: $WIDTH_SIDEBAR;
+    // 親の flex stretch に頼らず明示的に 100% 指定し、コンテンツが少なくても背景色が欠けないようにする。
+    height: 100%;
+    min-height: 0;
+    background-color: $COLOR_KEY_DARK3;
+    overflow: hidden;
+    position: relative;
+    z-index: var(--z-index-layout-aside);
+    box-shadow: 2px 0 2px rgba(black, 0.2) inset;
+
+    // Advanced Search モードではサイドバーを幅ゼロに畳む。
+    body[data-search-mode="AdvancedSearchView"] & {
+      width: 0;
+    }
+
+    body.-rowselected & {
+      width: $WIDTH_SIDEBAR;
+    }
+  }
+}
+
+// バリアントレポートページのメインコンテンツ領域。
+.LayoutReport {
+  padding: $PADDING_SIDE $PADDING_SIDE $PADDING_SIDE $PADDING_REPORT_LEFT;
+  background-color: $COLOR_LIGHT_GRAY;
+}
