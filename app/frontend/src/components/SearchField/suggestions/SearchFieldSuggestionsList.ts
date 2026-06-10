@@ -5,21 +5,7 @@ import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import Styles from '../../../../stylesheets/object/component/search-field-suggestions-list.scss';
 import { scrollIntoView } from './scrollIntoView';
-
-/**
- * APIから返るサジェスト候補の共通構造。
- * エンドポイントによってキーが異なるため汎用インデックス型を持つが、
- * anyを避けてunknownにすることで意図しない型操作を防ぐ
- */
-interface SuggestionItem {
-  term?: string;
-  alias_of?: string;
-  highlight?: string;
-  id?: string;
-  name?: string;
-  symbol?: string;
-  [key: string]: unknown;
-}
+import type { SuggestionData } from './types';
 
 /**
  * LitテンプレートでscrollIntoViewディレクティブを型安全に呼び出すための関数型。
@@ -33,7 +19,7 @@ class SearchFieldSuggestionsList extends LitElement {
   static styles: CSSResultGroup = [Styles];
 
   /** サジェスト候補データ */
-  @property({ type: Array }) suggestData: SuggestionItem[] = [];
+  @property({ type: Array }) suggestData: SuggestionData[] = [];
 
   /** キー操作でハイライト中の候補インデックス（-1は未選択） */
   @property({ type: Number }) highlightedSuggestionIndex: number = -1;
@@ -56,7 +42,7 @@ class SearchFieldSuggestionsList extends LitElement {
   /**
    * 候補が選択されたことを親コンポーネントへ伝えるためにカスタムイベントを発火する
    */
-  private _handleSelect(item: SuggestionItem): void {
+  private _handleSelect(item: SuggestionData): void {
     this.dispatchEvent(
       new CustomEvent('suggestion-selected', {
         detail: item,
@@ -83,7 +69,7 @@ class SearchFieldSuggestionsList extends LitElement {
             ? html`<li class="item -empty">No results</li>`
             : map(
                 this.suggestData,
-                (item: SuggestionItem, index: number) => html`
+                (item: SuggestionData, index: number) => html`
                   <li
                     class="item ${this.highlightedSuggestionIndex === index
                       ? '-selected'

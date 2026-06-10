@@ -46,19 +46,11 @@ function createCompleteSearchFieldOptions(
 }
 
 /**
- * APIから返るサジェスト候補の共通構造。
- * エンドポイントによってキーが異なるため汎用インデックス型を持つが、
- * anyを避けてunknownにすることで意図しない型操作を防ぐ
+ * ハンドラや外部コンポーネントが同じパスからインポートできるよう re-export する。
+ * このファイル内でも使うため import も合わせて行う
  */
-export interface SuggestionData {
-  term?: string;
-  alias_of?: string;
-  highlight?: string;
-  id?: string;
-  name?: string;
-  symbol?: string;
-  [key: string]: unknown;
-}
+import type { SuggestionData } from './types';
+export type { SuggestionData } from './types';
 
 /** サジェスト候補の表示・選択動作を設定するオプション */
 export interface SearchFieldOptions {
