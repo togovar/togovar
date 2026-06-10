@@ -12,7 +12,8 @@
   white-space: nowrap;
 
   body.-sidebar-ready & {
-    transition: transform $GUI_DURATION;
+    // height は Karyotype Drawer のアニメーション（$TRANSITION_DURATION）に合わせて同期させる。
+    transition: transform $GUI_DURATION, height $TRANSITION_DURATION;
   }
 
   > .sidebarcontent {
@@ -68,5 +69,13 @@
 
   body.-rowselected & {
     transform: translateX(0);
+  }
+
+  // Karyotype（position: fixed）が開くとサイドバー下部に重なるため、
+  // 開いている間だけ Karyotype の高さ分を引いてスクロール領域を確保する。
+  body.-drawer-opened & {
+    height: calc(
+      100% - #{$HEIGHT_BOTTOM_DRAWER_OPENED} + #{$HEIGHT_BOTTOM_DRAWER}
+    );
   }
 }
