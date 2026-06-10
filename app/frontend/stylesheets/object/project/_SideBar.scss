@@ -1,7 +1,7 @@
 #SideBar {
   box-shadow: 2px 0 3px rgba(black, 0.2) inset;
   box-sizing: border-box;
-  padding: $PADDING_SIDEBAR_SIDE;
+  padding: 0 15px 0;
   width: $WIDTH_SIDEBAR * 2;
   height: 100%;
   min-height: 0;
@@ -19,6 +19,7 @@
     display: inline-block;
     vertical-align: top;
     box-sizing: border-box;
+    padding: 5px 0 15px;
     width: $WIDTH_SIDEBAR - $PADDING_SIDEBAR_SIDE * 2;
     height: 100%;
     overflow-x: hidden;
