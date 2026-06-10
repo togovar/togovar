@@ -1,44 +1,54 @@
-// メイン／サイドバー／レポートの大枠レイアウト定義
+// ページの骨格となるレイアウト定義。flex チェーンの全体像：
+//   body (flex column, height: 100vh)
+//   └─ .LayoutMainAside (flex: 1 1 auto) ← このファイル
+//       ├─ .LayoutMain   (flex column)   ← このファイル
+//       │   └─ #SearchInputView, #ResultsView など
+//       └─ .LayoutAside                  ← このファイル
 
-// メインとサイドバーを横並びにするコンテナ。
-// body の flex column の中で flex: 1 1 auto を持ち、残り高さをすべて占有する。
+// body の flex column で #SearchInputView タブバーの下から画面下端までを占有する。
 .LayoutMainAside {
   display: flex;
   flex: 1 1 auto;
+  // flex child の暗黙的 min-height: auto を打ち消し、内側を縦方向に圧縮できるようにする。
   min-height: 0;
-  // BottomDrawer と共通フッターの高さ分だけ下マージンを確保する。
+  // BottomDrawer と外部共通フッターが画面下端に絶対配置されるため、重ならないよう余白を確保する。
   margin-bottom: $HEIGHT_BOTTOM_DRAWER + $HEIGHT_NBDC_COMMON_FOOTER;
 
+  // 縦積みの flex column にすることで、#ResultsView が残り高さをすべて受け取れるようにする。
   > .LayoutMain {
-    // flex column にして #ResultsView が残り高さを flex で受け取れるようにする。
     display: flex;
     flex-direction: column;
     width: calc(100% - #{$WIDTH_SIDEBAR});
     min-height: 0;
-    // サイドバー幅の変化をアニメーションで追従させるために width をトランジション対象にする。
+    // サイドバーの開閉アニメーション中に内側コンテンツがはみ出さないよう隠す。
     overflow: hidden;
+    // サイドバー幅の変化にスムーズに追従させるため width をトランジション対象にする。
     transition: width $GUI_DURATION;
 
-    // Advanced Search モード時はサイドバーを非表示にして全幅を使う。
+    // Advanced Search モードではサイドバーが幅ゼロになるため、その分を取り戻して全幅にする。
     body[data-search-mode="AdvancedSearchView"] & {
-      width: calc(100% - 0px);
+      width: 100%;
     }
 
-    // 行選択時はサイドバーを表示するため、通常幅に戻す。
+    // 行選択でサイドバーが再表示されるとき通常幅に戻す。
     body.-rowselected & {
       width: calc(100% - #{$WIDTH_SIDEBAR});
     }
   }
 
+  // フィルタ・プレビューを表示する固定幅サイドバー列。
   > .LayoutAside {
     width: $WIDTH_SIDEBAR;
-    // 親の flex stretch に頼らず明示的に 100% 指定し、コンテンツが少なくても背景色が欠けないようにする。
+    // 親の flex stretch に依存せず明示することで、コンテンツが少ない場合も背景色が欠けない。
     height: 100%;
     min-height: 0;
     background-color: $COLOR_KEY_DARK3;
     overflow: hidden;
+    // 内部の絶対配置要素（折りたたみボタンなど）の包含ブロックにする。
     position: relative;
+    // グローバルヘッダー（z-index-global-header: base + 200）の下に収まるよう base + 100 にする。
     z-index: var(--z-index-layout-aside);
+    // 右端の内側シャドウでメインコンテンツとの境界に奥行きを出す。
     box-shadow: 2px 0 2px rgba(black, 0.2) inset;
 
     // Advanced Search モードではサイドバーを幅ゼロに畳む。
@@ -52,7 +62,8 @@
   }
 }
 
-// バリアントレポートページのメインコンテンツ領域。
+// バリアントレポートページ専用のメインコンテンツ領域。
+// 検索ページの flex 制約とは独立したシンプルな余白定義。
 .LayoutReport {
   padding: $PADDING_SIDE $PADDING_SIDE $PADDING_SIDE $PADDING_REPORT_LEFT;
   background-color: $COLOR_LIGHT_GRAY;
