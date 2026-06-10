@@ -1,4 +1,4 @@
-import type { FrequencyCountValueView } from '../views/Condition/FrequencyCountValueView';
+import type { FrequencyCountValueView } from '../components/Condition/FrequencyCountValueView';
 import type { SignificanceSource } from './condition';
 
 // FrequencyCountValueView の setValues 第2引数を型として使うことで、

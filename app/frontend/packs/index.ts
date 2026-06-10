@@ -5,7 +5,7 @@ import '../stylesheets/main.sass';
 import { PAGE } from '../src/global';
 
 // カスタム要素の登録はimport副作用で行われるため、明示的な参照がなくてもここで読み込む必要がある。
-import '../src/views/FrequencyBlockView';
+import '../src/components/FrequencyBlockView';
 
 // file-loaderでdistにそのままコピーし、ファビコンのURLをwebpackの管理下に置く。
 import '!file-loader?name=[name].[ext]!../images/favicon.svg';

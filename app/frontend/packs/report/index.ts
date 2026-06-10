@@ -1,5 +1,5 @@
 import stanzaConfigJson from '../../assets/stanza.json';
-import FloatingInfo from '../../src/views/FloatingInfo';
+import FloatingInfo from '../../src/components/FloatingInfo';
 
 /**
  * This module provides a comprehensive system for rendering TogoVar report pages

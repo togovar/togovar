@@ -1,22 +1,22 @@
 import { storeManager } from './store/StoreManager';
-import { ResultsView } from './views/Results/ResultsView';
-import SideBar from './views/SideBar';
-import Karyotype from './views/Karyotype/Karyotype';
-import LoadingIndicator from './views/LoadingIndicator';
-import ModuleTabsView from './views/ModuleTabsView';
-import DownloadButton from './views/DownloadButton';
-import SimpleSearchView from './views/SearchField/SimpleSearch/SimpleSearchView';
-import PanelViewCheckList from './views/PanelView/PanelViewCheckList';
-import PanelViewFilterAlternateAlleleFrequency from './views/PanelView/PanelViewFilterAlternateAlleleFrequency.js';
-import PanelViewFilterVariantCallingQuality from './views/PanelView/PanelViewFilterVariantCallingQuality.js';
-import PanelViewFilterConsequence from './views/PanelView/PanelViewFilterConsequence';
-import PanelViewPreviewGene from './views/PanelView/PanelViewPreviewGene.js';
-import PreviewToVariantReport from './views/PanelView/PreviewToVariantReport.js';
-import PanelViewPreviewExternalLinks from './views/PanelView/PanelViewPreviewExternalLinks.js';
-import PanelViewPreviewAlternateAlleleFrequencies from './views/PanelView/PanelViewPreviewAlternateAlleleFrequencies.js';
-import PanelViewPreviewConsequence from './views/PanelView/PanelViewPreviewConsequence.js';
-import PanelViewPreviewClinicalSignificance from './views/PanelView/PanelViewPreviewClinicalSignificance.js';
-import FloatingInfo from './views/FloatingInfo';
+import { ResultsView } from './components/Results/ResultsView';
+import SideBar from './components/SideBar';
+import Karyotype from './components/Karyotype/Karyotype';
+import LoadingIndicator from './components/LoadingIndicator';
+import ModuleTabsView from './components/ModuleTabsView';
+import DownloadButton from './components/DownloadButton';
+import SimpleSearchView from './components/SearchField/SimpleSearch/SimpleSearchView';
+import PanelViewCheckList from './components/PanelView/PanelViewCheckList';
+import PanelViewFilterAlternateAlleleFrequency from './components/PanelView/PanelViewFilterAlternateAlleleFrequency.js';
+import PanelViewFilterVariantCallingQuality from './components/PanelView/PanelViewFilterVariantCallingQuality.js';
+import PanelViewFilterConsequence from './components/PanelView/PanelViewFilterConsequence';
+import PanelViewPreviewGene from './components/PanelView/PanelViewPreviewGene.js';
+import PreviewToVariantReport from './components/PanelView/PreviewToVariantReport.js';
+import PanelViewPreviewExternalLinks from './components/PanelView/PanelViewPreviewExternalLinks.js';
+import PanelViewPreviewAlternateAlleleFrequencies from './components/PanelView/PanelViewPreviewAlternateAlleleFrequencies.js';
+import PanelViewPreviewConsequence from './components/PanelView/PanelViewPreviewConsequence.js';
+import PanelViewPreviewClinicalSignificance from './components/PanelView/PanelViewPreviewClinicalSignificance.js';
+import FloatingInfo from './components/FloatingInfo';
 import qs from 'qs';
 import { extractSearchCondition } from './store/searchManager';
 import { initializeApp } from './store/initializeApp';
@@ -25,7 +25,7 @@ import type {
   MasterConditions,
   SimpleSearchCurrentConditions,
 } from './types/search';
-import type { AdvancedSearchBuilderView as AdvancedSearchBuilderViewType } from './views/AdvancedSearch/AdvancedSearchBuilderView';
+import type { AdvancedSearchBuilderView as AdvancedSearchBuilderViewType } from './components/AdvancedSearch/AdvancedSearchBuilderView';
 
 // webpackのrequire()をTypeScriptで使うための型宣言（FloatingInfo.tsと同じパターン）。
 declare const require: (path: string) => unknown;
@@ -307,7 +307,7 @@ function loadAdvancedSearchBuilderView(): Promise<
 
   advancedSearchBuilderViewPromise = import(
     /* webpackChunkName: "advanced-search" */
-    './views/AdvancedSearch/AdvancedSearchBuilderView'
+    './components/AdvancedSearch/AdvancedSearchBuilderView'
   )
     .then(({ AdvancedSearchBuilderView }) => {
       advancedSearchBuilderView = new AdvancedSearchBuilderView(

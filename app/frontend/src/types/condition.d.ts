@@ -5,10 +5,10 @@ import type {
   SignificanceTerm,
 } from '../definition';
 import type { NoRelationType } from '../conditions';
-import type { ConditionItemView } from '../views/Condition/ConditionItemView';
-import type ConditionValues from '../views/Condition/ConditionValues';
-import type { ConditionItemValueView } from '../views/Condition/ConditionItemValueView';
-import type { PredictionKey } from '../views/Condition/ConditionPathogenicityPredictionSearch/PredictionDatasets';
+import type { ConditionItemView } from '../components/Condition/ConditionItemView';
+import type ConditionValues from '../components/Condition/ConditionValues';
+import type { ConditionItemValueView } from '../components/Condition/ConditionItemValueView';
+import type { PredictionKey } from '../components/Condition/ConditionPathogenicityPredictionSearch/PredictionDatasets';
 
 // ───────────────────────────────────────────────────────────────────────────
 // Builder

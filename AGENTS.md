@@ -19,15 +19,15 @@
 
 ## 技術スタック
 
-| レイヤー | 技術 |
-| --- | --- |
-| フロントエンド | TypeScript / JavaScript / Lit / Web Components |
-| ビルド | Webpack 5 / ts-loader / Babel |
-| スタイル | Sass / SCSS / CSS |
-| テンプレート | Pug |
-| サーバー | Node.js / Express系フロントエンドサーバー |
-| バックエンド連携 | TogoVar API |
-| パッケージ | npm |
+| レイヤー         | 技術                                           |
+| ---------------- | ---------------------------------------------- |
+| フロントエンド   | TypeScript / JavaScript / Lit / Web Components |
+| ビルド           | Webpack 5 / ts-loader / Babel                  |
+| スタイル         | Sass / SCSS / CSS                              |
+| テンプレート     | Pug                                            |
+| サーバー         | Node.js / Express系フロントエンドサーバー      |
+| バックエンド連携 | TogoVar API                                    |
+| パッケージ       | npm                                            |
 
 補足:
 
@@ -44,7 +44,7 @@ app/frontend/
   server/        開発/本番フロントエンドサーバー
   src/
     api/         API通信
-    views/       UIクラス・画面部品（Lit/Web Components含む）
+    components/  UIコンポーネント・画面部品
       AdvancedSearch/   Advanced Search全体制御
       Condition/        条件入力UI・クエリ変換
         ConditionDiseaseSearch/             疾患検索Lit要素
@@ -59,30 +59,29 @@ app/frontend/
     types/       グローバル型定義
     utils/       汎用ヘルパー
   stylesheets/   Sass/SCSS
-  views/         Pugテンプレート（※srcのviews/とは別）
+  views/         Pugテンプレート
 ```
 
-- UIクラス・Web Componentsは `app/frontend/src/views/` に置く（Lit使用の有無で分けない）。
-- Advanced Search 本体の制御ファイルは `app/frontend/src/views/AdvancedSearch/` に置く。
+- UIクラス・Web Componentsは `app/frontend/src/components/` に置く（Lit使用の有無で分けない）。
+- Advanced Search 本体の制御ファイルは `app/frontend/src/components/AdvancedSearch/` に置く。
 - StoreやURL反映など、アプリ状態に関わる処理は `app/frontend/src/store/` に置く。
 - DOM生成の小さな共通処理は `app/frontend/src/utils/dom/` の既存ヘルパーを優先する。
 - 参照ゲノム別の検索条件マスタは `app/frontend/assets/GRCh37` / `app/frontend/assets/GRCh38` を確認する。
 - PugテンプレートやSassの構成を変える場合は、関連する `app/frontend/views/` と `stylesheets/` の両方を確認する。
-- `src/views/` と `app/frontend/views/`（Pugテンプレート）は別物なので混同しない。
 
 ## Advanced Search 方針
 
 - Advanced Search のUIは主に以下で構成される。
-  - `views/AdvancedSearch/AdvancedSearchBuilderView.ts`: 全体管理、条件変更、検索条件送信
-  - `views/AdvancedSearch/AdvancedSearchSelection.ts`: 条件Viewの選択状態管理
-  - `views/AdvancedSearch/AdvancedSearchToolbar.ts`: ツールバーDOMとコマンド委譲
-  - `views/Condition/ConditionGroupView.ts`: AND/ORグループ
-  - `views/Condition/ConditionItemView.ts`: 1条件行
-  - `views/Condition/ConditionValues.ts` と `views/Condition/ConditionValueEditor/*`: 条件入力UI
-- 条件の検索クエリ化は `views/Condition/queryBuilders/` に集約する。
+  - `components/AdvancedSearch/AdvancedSearchBuilderView.ts`: 全体管理、条件変更、検索条件送信
+  - `components/AdvancedSearch/AdvancedSearchSelection.ts`: 条件Viewの選択状態管理
+  - `components/AdvancedSearch/AdvancedSearchToolbar.ts`: ツールバーDOMとコマンド委譲
+  - `components/Condition/ConditionGroupView.ts`: AND/ORグループ
+  - `components/Condition/ConditionItemView.ts`: 1条件行
+  - `components/Condition/ConditionValues.ts` と `components/Condition/ConditionValueEditor/*`: 条件入力UI
+- 条件の検索クエリ化は `components/Condition/queryBuilders/` に集約する。
 - Advanced Search のURL共有は `?mode=advanced&q=<Base64 JSON>` を使う。
   - encode/decode処理は `app/frontend/src/store/advancedSearchURL.ts` に集約する。
-  - URLから復元した条件をViewへ戻す処理は `views/AdvancedSearch/AdvancedSearchConditionRestorer.ts` を確認する。
+  - URLから復元した条件をViewへ戻す処理は `components/AdvancedSearch/AdvancedSearchConditionRestorer.ts` を確認する。
   - Base64はURL中で壊れやすいため、生成時は `encodeURIComponent` を通す。
 - `setAdvancedSearchCondition()` は検索条件をStoreへ保存し、URLへ反映し、検索を実行する。呼び出しタイミングを増やす場合は二重検索に注意する。
 - 条件UIを変更した場合は、検索クエリ、URL共有、URL復元の3点が同じ構造を扱えるか確認する。
