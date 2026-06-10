@@ -1,29 +1,28 @@
 import { directive, AsyncDirective } from 'lit/async-directive.js';
 import type { PartInfo } from 'lit/directive.js';
 
-/** 表示可能領域の情報 */
+/** 垂直方向の表示可能領域の高さ。水平スクロールは不要なため height のみ保持する */
 interface ViewableArea {
   height: number;
-  width: number;
 }
 
-/** スクロール計算の結果 */
+/** スクロール量の計算結果。上端・下端それぞれの距離を保持することで、より近い方向を選べるようにする */
 interface ScrollCalculation {
   scrollTop: number;
   scrollBot: number;
   shouldScrollTop: boolean;
 }
 
-/**
- * 選択された要素を親要素の表示可能領域内にスクロールするLitディレクティブ
- */
+/** キーボード操作でハイライトが変わるたびに候補をスクロールさせるLitディレクティブ */
 class ScrollIntoView extends AsyncDirective {
+  /**
+   * AsyncDirectiveはrender()の実装が必須だが、このディレクティブはDOMを生成しないため空にする
+   */
   render(): void {}
 
   /**
-   * ディレクティブの更新処理
-   * @param part - Litディレクティブのパート情報
-   * @param selected - 要素が選択されているかどうかのフラグ
+   * selected=trueになったタイミングでスクロールを実行する。
+   * update()はDOMアクセスが必要なためrender()ではなくupdate()で処理する
    */
   update(part: PartInfo, [selected]: [boolean]): void {
     if (!selected) {
@@ -39,12 +38,9 @@ class ScrollIntoView extends AsyncDirective {
   }
 
   /**
-   * PartInfoから要素を安全に取得する
-   * @param part - Litディレクティブのパート情報
-   * @returns 要素またはnull
+   * PartInfoのelement型はLitの内部型で直接アクセスできないため、in演算子でプロパティの存在を確認してから取得する
    */
   private _getElementFromPart(part: PartInfo): Element | null {
-    // elementプロパティが存在する場合に取得
     if ('element' in part && part.element) {
       return part.element as Element;
     }
@@ -52,11 +48,7 @@ class ScrollIntoView extends AsyncDirective {
   }
 
   /**
-   * 要素が表示可能領域内にあるかを判定する
-   * @param parentRect - 親要素の位置情報
-   * @param childRect - 子要素の位置情報
-   * @param viewableArea - 親要素の表示可能領域
-   * @returns 表示可能かどうか
+   * getBoundingClientRectは画面座標を返すため、親の上端を基準に子が収まっているか判定する
    */
   private _isElementViewable(
     parentRect: DOMRect,
@@ -70,10 +62,7 @@ class ScrollIntoView extends AsyncDirective {
   }
 
   /**
-   * スクロール方向と量を計算する
-   * @param parentRect - 親要素の位置情報
-   * @param childRect - 子要素の位置情報
-   * @returns スクロール計算結果
+   * 上端・下端それぞれのスクロール量を同時に計算することで、呼び出し元で2回計算しなくて済むようにする
    */
   private _calculateScrollDirection(
     parentRect: DOMRect,
@@ -90,43 +79,26 @@ class ScrollIntoView extends AsyncDirective {
   }
 
   /**
-   * 子要素を親要素の表示可能領域内にスクロールする
-   *
-   * 子要素が親要素の表示領域外にある場合、最小限のスクロールで
-   * 子要素を表示領域内に移動させる。上下どちらの方向でも
-   * より近い方向にスクロールする。
-   *
-   * @param parent - 親要素（スクロールコンテナ）
-   * @param child - 子要素（表示したい要素）
+   * 最小スクロール量で候補を見えるようにするため、上端・下端のうち移動量が少ない方向にスクロールする
    */
   private _scrollParentToChild(parent: Element, child: Element): void {
     const parentRect = parent.getBoundingClientRect();
-    const viewableArea: ViewableArea = {
-      height: parent.clientHeight,
-      width: parent.clientWidth,
-    };
-
+    const viewableArea: ViewableArea = { height: parent.clientHeight };
     const childRect = child.getBoundingClientRect();
 
-    // 既に表示可能領域内にある場合は何もしない
     if (this._isElementViewable(parentRect, childRect, viewableArea)) {
       return;
     }
 
-    // スクロール方向と量を計算
     const scrollCalc = this._calculateScrollDirection(parentRect, childRect);
-
-    // より少ないスクロール量の方向にスクロール
-    const scrollAmount = scrollCalc.shouldScrollTop
+    parent.scrollTop += scrollCalc.shouldScrollTop
       ? scrollCalc.scrollTop
       : scrollCalc.scrollBot;
-
-    parent.scrollTop += scrollAmount;
   }
 }
 
 /**
- * 選択された要素を表示可能領域内にスクロールするLitディレクティブ
- * @param selected 要素が選択されているかどうか
+ * selected=trueになった候補要素を自動スクロールで表示領域内に収めるLitディレクティブ。
+ * キーボードナビゲーション時にリストがスクロールしないと選択位置がわからなくなるため使用する
  */
 export const scrollIntoView = directive(ScrollIntoView);
