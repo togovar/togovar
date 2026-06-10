@@ -50,6 +50,9 @@
       }
 
       > .button-view {
+        // stretch（デフォルト）で引き伸ばされないよう自身の高さを持たせる。
+        align-self: center;
+        height: 20px;
         font-size: 12px;
 
         body[data-search-mode='advanced'] & {
