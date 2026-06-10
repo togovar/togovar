@@ -11,13 +11,13 @@ import {
   PREDICTIONS,
 } from './PredictionDatasets';
 import { setInequalitySign } from './setInequalitySign';
-import Styles from '../../../stylesheets/object/component/prediction-value-view.scss';
+import Styles from '../../../../stylesheets/object/component/prediction-value-view.scss';
 import type {
   ScoreOrUnassignedFor,
   PredictionQueryLocal,
   ScoreRange,
   Inequality,
-} from '../../types';
+} from '../../../types';
 
 const SLIDER_CONFIG = {
   numberOfScales: 10,

@@ -1,7 +1,7 @@
 import { ConditionValueEditor } from './ConditionValueEditor';
 import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';
-import SearchFieldWithSuggestions from '../../../components/SearchField/suggestions/SearchFieldWithSuggestions';
+import SearchFieldWithSuggestions from '../../SearchField/suggestions/SearchFieldWithSuggestions';
 import { API_URL } from '../../../global';
 import { createEl } from '../../../utils/dom/createEl';
 

@@ -1,7 +1,7 @@
 import { ConditionValueEditor } from './ConditionValueEditor';
 import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';
-import { ConditionDiseaseSearch } from '../../../components/ConditionDiseaseSearch/ConditionDiseaseSearch.js';
+import { ConditionDiseaseSearch } from '../ConditionDiseaseSearch/ConditionDiseaseSearch.js';
 import { createEl } from '../../../utils/dom/createEl';
 
 interface DiseaseData {

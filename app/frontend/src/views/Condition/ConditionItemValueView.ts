@@ -2,7 +2,7 @@ import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import './FrequencyCountValueView'; // for embedding
 import './ConditionPathogenicityPredictionSearch/PredictionValueView'; // for embedding
-import type { ConditionTypeValue } from '../definition';
+import type { ConditionTypeValue } from '../../definition';
 import Style from '../../stylesheets/object/component/condition-item-value-view.scss';
 
 @customElement('condition-item-value-view')

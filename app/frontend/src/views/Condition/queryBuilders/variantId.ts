@@ -1,5 +1,5 @@
 import type { IdLeaf, BuildContext } from '../../../types';
-import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
+import type { ConditionItemValueView } from '../ConditionItemValueView';
 
 /**
  * Variant ID 条件のクエリを組み立てる。

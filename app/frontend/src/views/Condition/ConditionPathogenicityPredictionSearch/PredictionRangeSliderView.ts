@@ -3,15 +3,15 @@ import { customElement, property, query, queryAll } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { range } from 'lit/directives/range.js';
 import { createGradientSlider } from './createGradientSlider';
-import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
+import { capitalizeFirstLetter } from '../../../utils/capitalizeFirstLetter';
 import { setInequalitySign, toggleInequality } from './setInequalitySign';
 import { type PredictionKey } from './PredictionDatasets';
 import type {
   Inequality,
   UnassignedOption,
   PredictionChangeDetail,
-} from './../../types';
-import Styles from '../../../stylesheets/object/component/prediction-range-slider.scss';
+} from '../../../types';
+import Styles from '../../../../stylesheets/object/component/prediction-range-slider.scss';
 
 const SLIDER_CONFIG = {
   min: 0,

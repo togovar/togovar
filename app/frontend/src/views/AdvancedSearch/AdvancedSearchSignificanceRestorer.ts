@@ -2,7 +2,7 @@ import { CONDITION_TYPE } from '../../definition';
 import {
   PREDICTIONS,
   type PredictionKey,
-} from '../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
+} from '../Condition/ConditionPathogenicityPredictionSearch/PredictionDatasets';
 import type { RestoredPredictionValue } from '../../types';
 import type {
   Inequality,

@@ -1,4 +1,4 @@
-import type { Inequality } from '../../types';
+import type { Inequality } from '../../../types';
 
 const SYMBOL: Record<Inequality, string> = {
   gte: '≤',

@@ -10,7 +10,7 @@ import {
   SIGNIFICANCE_TERM_SET,
   type SignificanceTerm,
 } from '../../../definition';
-import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
+import type { ConditionItemValueView } from '../ConditionItemValueView';
 
 // ソースごとのセレクタを定数化する。変更時は1箇所だけ修正すれば済む。
 const SEL = {

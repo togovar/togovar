@@ -1,8 +1,8 @@
 import { ConditionValueEditor } from './ConditionValueEditor';
 import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';
-import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
-import SearchField from '../../../components/SearchField/SearchField';
+import type { ConditionItemValueView } from '../ConditionItemValueView';
+import SearchField from '../../SearchField/SearchField';
 import { createEl } from '../../../utils/dom/createEl';
 
 /** Variant ID の複数入力エディタ。Enterキーで1件ずつIDを追加し削除ボタンで個別削除できる。 */

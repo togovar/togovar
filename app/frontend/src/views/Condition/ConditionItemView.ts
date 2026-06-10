@@ -25,9 +25,9 @@ import type {
   SignificanceSource,
   RestoredConditionValue,
 } from '../../types';
-import type { ConditionItemValueView } from '../../components/ConditionItemValueView';
-import type { FrequencyCountValueView } from '../../components/FrequencyCountValueView';
-import type { PredictionValueView } from '../../components/ConditionPathogenicityPredictionSearch/PredictionValueView';
+import type { ConditionItemValueView } from './ConditionItemValueView';
+import type { FrequencyCountValueView } from './FrequencyCountValueView';
+import type { PredictionValueView } from './ConditionPathogenicityPredictionSearch/PredictionValueView';
 
 /**
  * 1条件行の View。編集・削除・relation切り替えのイベントと、

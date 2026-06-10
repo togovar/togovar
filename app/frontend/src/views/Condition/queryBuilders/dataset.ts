@@ -1,6 +1,6 @@
 import type { FrequencyQuery, BuildContext } from '../../../types';
-import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
-import type { FrequencyCountValueView } from '../../../components/FrequencyCountValueView';
+import type { ConditionItemValueView } from '../ConditionItemValueView';
+import type { FrequencyCountValueView } from '../FrequencyCountValueView';
 
 /**
  * condition-item-value-view の shadow DOM から頻度フィルタ要素を取得する。

@@ -6,8 +6,8 @@ import type {
   FrequencyLeaf,
   FrequencyQuery,
   GenotypeCount,
-} from '../types';
-import type { FrequencyDataset, GenotypeKey } from '../definition';
+} from '../../types';
+import type { FrequencyDataset, GenotypeKey } from '../../definition';
 
 // Display mode constants definition
 export const MODE = {

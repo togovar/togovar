@@ -1,9 +1,9 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, queryAll } from 'lit/decorators.js';
-import type { PredictionChangeDetail } from './../../types';
+import type { PredictionChangeDetail } from '../../../types';
 import type { PredictionRangeSlider } from './PredictionRangeSliderView';
 import type { PredictionKey, PredictionDatasets } from './PredictionDatasets';
-import Styles from '../../../stylesheets/object/component/tab-view.scss';
+import Styles from '../../../../stylesheets/object/component/tab-view.scss';
 
 /** Class to create a TabView */
 @customElement('tab-view')

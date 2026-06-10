@@ -1,17 +1,17 @@
 import { ConditionValueEditor } from './ConditionValueEditor';
-import '../../../components/ConditionPathogenicityPredictionSearch/TabView';
-import '../../../components/ConditionPathogenicityPredictionSearch/PredictionRangeSliderView';
+import '../ConditionPathogenicityPredictionSearch/TabView';
+import '../ConditionPathogenicityPredictionSearch/PredictionRangeSliderView';
 import type {
   PredictionKey,
   PredictionLabel,
-} from '../../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
-import { PREDICTIONS } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
+} from '../ConditionPathogenicityPredictionSearch/PredictionDatasets';
+import { PREDICTIONS } from '../ConditionPathogenicityPredictionSearch/PredictionDatasets';
 import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';
-import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
-import type { PredictionValueView } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionValueView';
+import type { ConditionItemValueView } from '../ConditionItemValueView';
+import type { PredictionValueView } from '../ConditionPathogenicityPredictionSearch/PredictionValueView';
 import type { Inequality, PredictionChangeDetail } from '../../../types';
-import type { TabView } from '../../../components/ConditionPathogenicityPredictionSearch/TabView';
+import type { TabView } from '../ConditionPathogenicityPredictionSearch/TabView';
 
 /**
  * Pathogenicity prediction 条件のエディタ。

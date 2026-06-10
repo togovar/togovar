@@ -1,4 +1,4 @@
-import type { ConditionItemValueView } from '../components/ConditionItemValueView';
+import type { ConditionItemValueView } from '../views/Condition/ConditionItemValueView';
 import type { RangeSliderData } from '../views/Condition/ConditionValueEditor/ConditionValueEditorFrequencyCount';
 import type { Frequency } from './api';
 

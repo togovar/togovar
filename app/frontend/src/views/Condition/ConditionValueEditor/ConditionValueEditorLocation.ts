@@ -3,8 +3,8 @@ import { ConditionValueEditor } from './ConditionValueEditor';
 import { createEl } from '../../../utils/dom/createEl';
 import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';
-import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
-import '../../../components/ConditionItemValueView';
+import type { ConditionItemValueView } from '../ConditionItemValueView';
+import '../ConditionItemValueView';
 
 // ============================================================================
 // Constants

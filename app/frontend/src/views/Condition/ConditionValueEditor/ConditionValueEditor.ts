@@ -1,6 +1,6 @@
 import { createEl } from '../../../utils/dom/createEl';
 import { selectRequired, selectOrNull } from '../../../utils/dom/select';
-import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
+import type { ConditionItemValueView } from '../ConditionItemValueView';
 import type { ConditionTypeValue } from '../../../definition';
 import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';

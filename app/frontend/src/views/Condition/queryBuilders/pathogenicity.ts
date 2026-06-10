@@ -1,6 +1,6 @@
 import type { BuildContext, PredictionQueryLocal } from '../../../types';
-import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
-import type { PredictionValueView } from '../../../components/ConditionPathogenicityPredictionSearch/PredictionValueView';
+import type { ConditionItemValueView } from '../ConditionItemValueView';
+import type { PredictionValueView } from '../ConditionPathogenicityPredictionSearch/PredictionValueView';
 
 /**
  * condition-item-value-view の shadow DOM から prediction-value-view を取得する。

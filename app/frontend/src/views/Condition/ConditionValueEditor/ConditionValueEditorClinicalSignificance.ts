@@ -3,7 +3,7 @@ import { ConditionValueEditor } from './ConditionValueEditor';
 import { ADVANCED_CONDITIONS } from '../../../global';
 import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';
-import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
+import type { ConditionItemValueView } from '../ConditionItemValueView';
 import type {
   EnumerationItem,
   MutableSignificanceValues,

@@ -5,7 +5,7 @@ import {
   getSimpleSearchCondition,
   getSimpleSearchConditionMaster,
 } from '../../store/searchManager';
-import '../../components/RangeSliderView.js';
+import '../RangeSliderView.js';
 
 export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
   constructor(elm) {

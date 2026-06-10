@@ -7,8 +7,8 @@ import type {
 import type { NoRelationType } from '../conditions';
 import type { ConditionItemView } from '../views/Condition/ConditionItemView';
 import type ConditionValues from '../views/Condition/ConditionValues';
-import type { ConditionItemValueView } from '../components/ConditionItemValueView';
-import type { PredictionKey } from '../components/ConditionPathogenicityPredictionSearch/PredictionDatasets';
+import type { ConditionItemValueView } from '../views/Condition/ConditionItemValueView';
+import type { PredictionKey } from '../views/Condition/ConditionPathogenicityPredictionSearch/PredictionDatasets';
 
 // ───────────────────────────────────────────────────────────────────────────
 // Builder

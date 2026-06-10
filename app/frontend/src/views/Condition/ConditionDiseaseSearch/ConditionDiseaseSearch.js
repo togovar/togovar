@@ -1,9 +1,9 @@
 import { LitElement, html, nothing } from 'lit';
 
 import './ConditionDiseaseSearchOntologyView.js';
-import '../SearchField/suggestions/SearchFieldWithSuggestions';
+import '../../SearchField/suggestions/SearchFieldWithSuggestions';
 
-import { API_URL } from '../../global';
+import { API_URL } from '../../../global';
 
 const suggestAPI = `${API_URL}/api/search/disease`;
 

@@ -5,7 +5,7 @@ import Karyotype from './views/Karyotype/Karyotype';
 import LoadingIndicator from './views/LoadingIndicator';
 import ModuleTabsView from './views/ModuleTabsView';
 import DownloadButton from './views/DownloadButton';
-import SimpleSearchView from './components/SearchField/SimpleSearch/SimpleSearchView';
+import SimpleSearchView from './views/SearchField/SimpleSearch/SimpleSearchView';
 import PanelViewCheckList from './views/PanelView/PanelViewCheckList';
 import PanelViewFilterAlternateAlleleFrequency from './views/PanelView/PanelViewFilterAlternateAlleleFrequency.js';
 import PanelViewFilterVariantCallingQuality from './views/PanelView/PanelViewFilterVariantCallingQuality.js';

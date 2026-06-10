@@ -1,4 +1,4 @@
-import '../ErrorModal';
+import '../../ErrorModal';
 
 import { LitElement, html, css } from 'lit';
 import { ref, createRef } from 'lit/directives/ref.js';

@@ -12,7 +12,7 @@ import { DatasetValueViewManager } from './dataset-columns/DatasetValueViewManag
 import type { UiNode } from './dataset-columns/types';
 import { createEl } from '../../../utils/dom/createEl';
 import { selectRequired } from '../../../utils/dom/select';
-import type { ConditionItemValueView } from '../../../components/ConditionItemValueView';
+import type { ConditionItemValueView } from '../ConditionItemValueView';
 
 /**
  * dataset/genotype 条件をカラムビューで選択するエディタ。
