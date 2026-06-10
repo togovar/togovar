@@ -3,36 +3,36 @@ import type {
   SearchFieldHost,
 } from '../SearchFieldWithSuggestions';
 
-/**
- * SuggestionSelectionHandler - サジェストの選択と検索実行を担当するクラス
- */
+/** 候補選択と検索実行の責務を切り出したクラス。SearchFieldWithSuggestionsが肥大化しないようハンドラとして分離している */
 export class SuggestionSelectionHandler {
   private host: SearchFieldHost;
 
   /**
-   * @param host - ホストとなるLitElementインスタンス
+   * thisを渡すことでホストの状態を読み書きできるようにする
    */
   constructor(host: SearchFieldHost) {
     this.host = host;
   }
 
   /**
-   * サジェストを選択して値を設定
-   * @param suggestion - 選択されたサジェスト
+   * 候補を確定して値・ラベルをホストに反映し、新しい選択を親へ通知する。
+   * 選択後はサジェストが再度開かないようsuppressSuggestionsをtrueにする
    */
   select = (suggestion: SuggestionData): void => {
-    const valueKey =
-      suggestion[this.host._searchFieldOptions.valueMappings.valueKey] || '';
-    const labelKey =
-      suggestion[this.host._searchFieldOptions.valueMappings.labelKey] || '';
+    const rawValue =
+      suggestion[this.host._searchFieldOptions.valueMappings.valueKey];
+    const rawLabel =
+      suggestion[this.host._searchFieldOptions.valueMappings.labelKey];
 
-    // サジェストの値をフォーマットして設定
-    this.host.value = this._formatSuggestionValue(valueKey);
-    this.host.label = this._formatSuggestionValue(labelKey);
+    // インデックス署名がunknownのため、string型へ絞り込んでからフォーマットに渡す
+    this.host.value = this._formatSuggestionValue(
+      typeof rawValue === 'string' ? rawValue : ''
+    );
+    this.host.label = this._formatSuggestionValue(
+      typeof rawLabel === 'string' ? rawLabel : ''
+    );
 
-    // サジェスト選択後はサジェストを抑制
     this.host.suppressSuggestions = true;
-    // サジェスト選択後はユーザー入力フラグもリセット
     this.host.hasUserInput = false;
 
     this.host.dispatchEvent(
@@ -45,13 +45,11 @@ export class SuggestionSelectionHandler {
   };
 
   /**
-   * (Only SimpleSearch) サジェストなしで検索を実行
-   * @param term - 検索語
+   * SimpleSearch専用。サジェストを選ばずにそのまま入力語で検索する。
+   * 検索後もサジェストが再表示されないようsuppressSuggestionsをtrueにする
    */
   searchWithoutSelect = (term: string): void => {
-    // 検索実行後はサジェストを抑制
     this.host.suppressSuggestions = true;
-    // 検索実行後はユーザー入力フラグもリセット
     this.host.hasUserInput = false;
 
     this.host.dispatchEvent(
@@ -65,26 +63,22 @@ export class SuggestionSelectionHandler {
   };
 
   /**
-   * サジェスト選択イベントを処理
-   * @param e - サジェスト選択イベント
+   * search-field-suggestions-listからのイベントを受け取りselectへ委譲する
    */
   handleSuggestionSelected = (e: CustomEvent<SuggestionData>): void => {
     this.select(e.detail);
   };
 
   /**
-   * 複数のサジェストカラムが存在するかチェック
-   * 複数カラムの場合はSimpleSearchモードとしてダブルクォートを追加する
-   * @returns 複数カラムの場合はtrue、単一カラム（gene, diseaseなど）の場合はfalse
+   * 列が複数あるかどうかでSimpleSearchモードかを判定する。
+   * SimpleSearchは遺伝子・疾患など複数種類の候補を複数列で表示するため、1列かどうかで種別を区別できる
    */
   private _hasMultipleSuggestionColumns(): boolean {
     return this.host._suggestionKeysArray.length > 1;
   }
 
   /**
-   * 文字列をエスケープする
-   * @param str - エスケープする文字列
-   * @returns エスケープされた文字列
+   * ダブルクォートやバックスラッシュをエスケープして検索クエリを壊さないようにする
    */
   private _escapeString(str: string | undefined): string {
     return String(str || '')
@@ -93,28 +87,13 @@ export class SuggestionSelectionHandler {
   }
 
   /**
-   * サジェスト値を適切にフォーマットする
-   *
-   * SimpleSearchモード（複数カラム）の場合：
-   * - ダブルクォートで囲む（完全一致検索のため）
-   * - 複数の検索対象（遺伝子、疾患など）が混在するため、明示的な区切りが必要
-   *
-   * 特定検索モード（gene, diseaseなど単一カラム）の場合：
-   * - クォートなし（部分一致検索を許可）
-   * - 検索対象が特定されているため、より柔軟な検索が可能
-   *
-   * @param value - フォーマットする値
-   * @returns フォーマットされた値
+   * SimpleSearch（複数列）ではダブルクォートで囲んで完全一致にする。
+   * 遺伝子名や疾患名など複数候補種別が混在する場合、曖昧検索だと無関係な候補を拾うリスクがあるため
    */
   private _formatSuggestionValue(value: string): string {
     const escapedValue = this._escapeString(value);
-
-    if (this._hasMultipleSuggestionColumns()) {
-      // SimpleSearchモード: ダブルクォートで囲んで完全一致検索
-      return `"${escapedValue}"`;
-    } else {
-      // 特定検索モード: クォートなしで部分一致検索を許可
-      return escapedValue;
-    }
+    return this._hasMultipleSuggestionColumns()
+      ? `"${escapedValue}"`
+      : escapedValue;
   }
 }
