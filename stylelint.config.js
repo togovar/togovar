@@ -1,0 +1,30 @@
+/**
+ * @see https://stylelint.io/user-guide/configure
+ * @type {import('stylelint').Config}
+ */
+module.exports = {
+  extends: [
+    'stylelint-config-recommended',
+    'stylelint-config-recommended-scss',
+  ],
+  rules: {
+    'selector-class-pattern': null,
+    'selector-id-pattern': null,
+    'import-notation': null,
+    'selector-pseudo-class-no-unknown': true,
+    'comment-empty-line-before': null,
+    'custom-property-empty-line-before': null,
+    'scss/dollar-variable-pattern': null,
+    'scss/operator-no-newline-after': null,
+    'scss/load-no-partial-leading-underscore': null,
+  },
+  overrides: [
+    {
+      files: ['**/*.sass'],
+      customSyntax: 'postcss-sass',
+      rules: {
+        'no-empty-source': null,
+      },
+    },
+  ],
+};
