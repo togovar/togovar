@@ -67,6 +67,25 @@ export function createRangeSliderTemplate(): HTMLTemplateElement {
   return template;
 }
 
+/** ルーラーの目盛り要素を純粋関数として生成し、View の DOM 操作から切り離す。 */
+export function createRulerScales(
+  min: number,
+  max: number,
+  steps: number,
+  orientation: string | null
+): HTMLElement[] {
+  const stepSize = (max - min) / steps;
+  return Array.from({ length: steps + 1 }, (_, i) => {
+    const scale = document.createElement('div');
+    scale.className = 'scale';
+    scale.part = 'scale';
+    scale.part.add(`scale-${orientation}`);
+    scale.innerText = (min + i * stepSize).toFixed(1);
+    scale.style.left = `calc(${(i * 100) / steps}% - 0.5em)`;
+    return scale;
+  });
+}
+
 /** simple search用のmatch切替UIは任意機能なので、必要なインスタンスごとに生成する。 */
 export function createSearchTypeSimple(): HTMLDivElement {
   const searchTypeSimple = document.createElement('div');

@@ -6,6 +6,7 @@ import {
 } from './RangeSliderConstants';
 import {
   createRangeSliderTemplate,
+  createRulerScales,
   createSearchTypeSimple,
 } from './RangeSliderTemplate';
 import { createThumbStyle, createTrackBackground } from './RangeSliderStyle';
@@ -37,7 +38,6 @@ export class RangeSlider extends HTMLElement {
   private readonly _meter: HTMLElement;
   private readonly _ruler: HTMLElement;
   private readonly _sliderTrackStyle: HTMLStyleElement;
-  private match = 'any';
 
   /** 外部から属性で初期値や表示方向を渡せるよう、変更を監視する属性を明示する。 */
   static get observedAttributes(): RangeSliderAttribute[] {
@@ -132,7 +132,6 @@ export class RangeSlider extends HTMLElement {
         this._reRenderRuler();
         break;
       case 'match':
-        this.match = newValue;
         this.state.match = newValue;
         break;
       case 'orientation':
@@ -165,21 +164,12 @@ export class RangeSlider extends HTMLElement {
   /** 目盛りはmin/max/分割数から毎回作り直し、属性変更後も表示と状態を一致させる。 */
   private _reRenderRuler(): void {
     this._ruler.innerHTML = '';
-
-    const rulerNumberOfSteps = this.state.rulerNumberOfSteps;
-    const min = this.state.min;
-    const max = this.state.max;
-    const step = (max - min) / rulerNumberOfSteps;
-
-    for (let i = 0; i <= rulerNumberOfSteps; i++) {
-      const scale = document.createElement('div');
-      scale.className = 'scale';
-      scale.part = 'scale';
-      scale.part.add(`scale-${this.orientation}`);
-      scale.innerText = (min + i * step).toFixed(1);
-      scale.style.left = `calc(${(i * 100) / rulerNumberOfSteps}% - 0.5em)`;
-      this._ruler.appendChild(scale);
-    }
+    createRulerScales(
+      this.state.min,
+      this.state.max,
+      this.state.rulerNumberOfSteps,
+      this.orientation
+    ).forEach((scale) => this._ruler.appendChild(scale));
   }
 
   /** 選択範囲とinvert状態を背景グラデーションへ反映し、現在の条件を視覚化する。 */
@@ -191,7 +181,7 @@ export class RangeSlider extends HTMLElement {
       to: val2,
       min: this.state.min,
       max: this.state.max,
-      inverted: this.state.invert === '1',
+      inverted: this.state.invert,
     });
 
     this._drawThumbs();
@@ -308,7 +298,6 @@ export class RangeSlider extends HTMLElement {
     matchSelector.addEventListener('click', (e) => {
       if (!(e.target instanceof HTMLInputElement)) return;
 
-      this.match = e.target.value;
       this.state.match = e.target.value;
       this._syncInputsFromState();
       this._fireEvent();
@@ -338,29 +327,32 @@ export class RangeSlider extends HTMLElement {
 
   /** DOM接続後に属性から初期状態を確定し、入力イベントを登録して初期描画を行う。 */
   connectedCallback(): void {
+    this._initStateFromAttributes();
+    this._initUI();
+  }
+
+  /** 属性から内部状態を初期化する。DOM操作を含まず、状態確定だけを行う。 */
+  private _initStateFromAttributes(): void {
     this.min = this.getAttribute('min') || 0;
     this.max = this.getAttribute('max') || 1;
     this.value1 = this.getAttribute('value1') || 0;
     this.value2 = this.getAttribute('value2') || 1;
     this.orientation = this.getAttribute('orientation') || 'horizontal';
-    this.match = this.getAttribute('simple-search') || 'any';
-    this.state.min = parseNumber(
-      this.min ?? 0,
-      DEFAULT_RANGE_SLIDER_STATE.min
-    );
-    this.state.max = parseNumber(
-      this.max ?? 1,
-      DEFAULT_RANGE_SLIDER_STATE.max
-    );
+    this.state.match = this.getAttribute('simple-search') || 'any';
+    this.state.min = parseNumber(this.min ?? 0, DEFAULT_RANGE_SLIDER_STATE.min);
+    this.state.max = parseNumber(this.max ?? 1, DEFAULT_RANGE_SLIDER_STATE.max);
     this.state.step = parseNumber(
       this.getAttribute('step') ?? DEFAULT_RANGE_SLIDER_STATE.step,
       DEFAULT_RANGE_SLIDER_STATE.step
     );
     this.state.from = Math.min(+(this.value1 ?? 0), +(this.value2 ?? 1));
     this.state.to = Math.max(+(this.value1 ?? 0), +(this.value2 ?? 1));
-    this.state.invert = this.getAttribute('invert') === 'true' ? '1' : '0';
-    this.state.match = this.match;
+    this.state.invert = this.getAttribute('invert') === 'true';
     this.rulerNumberOfSteps = DEFAULT_RANGE_SLIDER_STATE.rulerNumberOfSteps;
+  }
+
+  /** イベント登録と初期描画を行う。状態確定後に呼ぶ。 */
+  private _initUI(): void {
     this._addEventListeners();
     this.from.value = formatInputValue(this.state.from);
     this.to.value = formatInputValue(this.state.to);

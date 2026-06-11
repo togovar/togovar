@@ -2,13 +2,13 @@ export type RangeSliderData = {
   from?: number;
   to?: number;
   match?: string;
-  invert?: boolean | '0' | '1' | 'true' | 'false';
+  invert?: boolean;
 };
 
 export type RangeSliderState = {
   from: number;
   to: number;
-  invert: '0' | '1';
+  invert: boolean;
   min: number;
   max: number;
   step: number;

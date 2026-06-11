@@ -11,10 +11,10 @@ export function formatSliderValue(value: string): string {
   return parseNumber(value, 0).toFixed(3);
 }
 
-/** booleanと文字列の両方で渡されるinvert値を、既存detail形式の0/1に正規化する。 */
-export function toInvertValue(value: unknown): '0' | '1' {
-  if (typeof value === 'boolean') return value ? '1' : '0';
-  return value === '1' || value === 'true' ? '1' : '0';
+/** booleanと文字列の両方で渡されるinvert値をbooleanに正規化する。 */
+export function toInvertValue(value: unknown): boolean {
+  if (typeof value === 'boolean') return value;
+  return value === '1' || value === 'true';
 }
 
 /** 2本のつまみが交差しないよう、下限・上限のどちらへ反映するかを現在値から決める。 */
