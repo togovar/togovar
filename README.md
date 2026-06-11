@@ -132,10 +132,12 @@ npm run build
 ### 本番ビルドをローカル起動
 
 ```bash
+npm run build
 npm run start:prod
 ```
 
-`npm run build` のあと、production mode のフロントエンドサーバーを起動します。
+`build` でビルドしてから `start:prod` でサーバーを起動します。
+CI などビルド済みの環境では `npm run start:prod` だけ実行してください。
 
 ## 検証
 

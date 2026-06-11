@@ -10,11 +10,10 @@
     "build": "cross-env NODE_ENV=production webpack --config app/frontend/config/webpack.config.prod.js --color --progress",
     "dev": "cross-env NODE_ENV=development node app/frontend/server",
     "start": "npm run dev",
-    "start:prod": "npm run build && cross-env NODE_ENV=production node app/frontend/server",
-    "lint": "npm run lint:js && npm run lint:css",
+    "start:prod": "cross-env NODE_ENV=production node app/frontend/server",
+    "lint": "npm run lint:eslint && npm run lint:css",
     "lint:css": "stylelint app/frontend/stylesheets/**/*.{css,scss,sass}",
-    "lint:eslint": "eslint --ignore-path .gitignore --ignore-pattern app/frontend/server",
-    "lint:js": "npm run lint:eslint app/frontend",
+    "lint:eslint": "eslint --ignore-path .gitignore --ignore-pattern app/frontend/server app/frontend",
     "lint:staged": "lint-staged"
   },
   "dependencies": {
