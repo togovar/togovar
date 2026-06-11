@@ -87,9 +87,10 @@ function groupAndSortByInterpretation(data: MergedResult[]): MergedResult[] {
   const grouped: Record<string, MergedResult[]> = {};
 
   data.forEach((entry) => {
-    // 解釈ラベル配列を文字列キーに変換して分類する（JSの暗黙変換と同等の動作）
+    // 解釈ラベル集合を順序非依存に比較できるよう、ソートしてからキー化する
     const key = entry.interpretations
       .map((i) => i.interpretation)
+      .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
       .join(',');
 
     if (!grouped[key]) {
