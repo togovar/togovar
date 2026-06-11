@@ -9,9 +9,9 @@
   "type": "module",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --config app/frontend/config/webpack.config.prod.js --color --progress",
-    "dev": "cross-env NODE_ENV=development node app/frontend/server",
+    "dev": "cross-env NODE_ENV=development NODE_OPTIONS=--experimental-strip-types node app/frontend/server",
     "start": "npm run dev",
-    "start:prod": "cross-env NODE_ENV=production node app/frontend/server",
+    "start:prod": "cross-env NODE_ENV=production NODE_OPTIONS=--experimental-strip-types node app/frontend/server",
     "typecheck": "tsc --noEmit",
     "format": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --write app/frontend/src",
     "format:check": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --check app/frontend/src",

@@ -1,6 +1,6 @@
 import express from 'express';
 import { resolve } from 'path';
-import logger from './logger.js';
+import logger from './logger.ts';
 import argv from './argv.js';
 import port from './port.js';
 import setup from './middlewares/frontendMiddleware.js';
