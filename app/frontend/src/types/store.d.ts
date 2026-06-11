@@ -52,7 +52,8 @@ type StoreSearchStatus = {
 export type StoreState = {
   // TODO: KaryotypeState を types/ へ export して具体的な型に置き換える
   karyotype: unknown;
-  searchMode: SearchMode;
+  /** '' は初期化前のセンチネル値。setSearchModeFromHistory が呼ばれるまでの一時的な状態 */
+  searchMode: SearchMode | '';
   simpleSearchConditionsMaster: MasterConditions[];
   simpleSearchConditions: SimpleSearchCurrentConditions;
   columns: ColumnConfig[];

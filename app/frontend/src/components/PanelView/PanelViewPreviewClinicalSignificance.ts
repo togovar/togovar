@@ -34,8 +34,8 @@ type MergedIntermediate = {
 // ----------------------------------------
 
 /**
- * MedGen IDをキーにエントリを統合し、解釈ごとにソースのSetを持つ構造に変換する。
- * 同じ疾患・解釈を複数ソース（ClinVar・MGeND）から重複なく集約するためモジュールスコープに置く
+ * 同じ疾患・解釈を複数ソース（ClinVar・MGeND）から重複なく集約して表示するため、MedGen IDをキーにエントリを統合する。
+ * 解釈ごとにソースの Set を持つ構造に変換し、groupAndSortByInterpretation に渡す。
  */
 function mergeByMedgen(data: Significance[]): MergedResult[] {
   const merged: Record<string, MergedIntermediate> = {};
@@ -80,8 +80,8 @@ function mergeByMedgen(data: Significance[]): MergedResult[] {
 }
 
 /**
- * interpretationキーでグループ化し、グループ内をname順にソートする。
- * 同じ解釈分類のエントリをまとめて表示するために使う
+ * 同じ解釈分類のエントリをまとめて表示するため、interpretationキーでグループ化する。
+ * グループ内はname順にソートして読みやすい表示順を保証する。
  */
 function groupAndSortByInterpretation(data: MergedResult[]): MergedResult[] {
   const grouped: Record<string, MergedResult[]> = {};
@@ -138,7 +138,7 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
     this.update();
   }
 
-  /** 選択行の significance データを取得し、HTML を再構築してパネルに反映する */
+  /** selectedRow / offset 変化のたびに最新の significance を表示するため、HTML を再構築してパネルに反映する */
   update(): void {
     let html = '';
     if (storeManager.getData('selectedRow') !== undefined) {

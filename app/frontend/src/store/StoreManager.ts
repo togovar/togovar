@@ -24,9 +24,7 @@ class StoreManager {
   #fromHistory = false;
   #state: StoreState = {
     karyotype: '',
-    // setSearchModeFromHistory が最初に呼ばれるまでのセンチネル値。
-    // setData の変更検知を機能させるために '' で始める必要があるため、型アサーションを使う。
-    searchMode: '' as unknown as SearchMode,
+    searchMode: '',
     simpleSearchConditionsMaster: [],
     simpleSearchConditions: {},
     columns: [],
@@ -352,7 +350,9 @@ class StoreManager {
   //  検索モードの管理
   // ------------------------------
   /** 検索モードを変更 */
-  searchMode(mode: SearchMode) {
+  searchMode(mode: SearchMode | '') {
+    // '' は初期化前のセンチネル値。setSearchModeFromHistory が実行される前には何もしない。
+    if (!mode) return;
     this.setData('isStoreUpdating', true);
 
     try {
