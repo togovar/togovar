@@ -135,9 +135,9 @@ npm run build
 個別に確認する場合:
 
 ```bash
-npm run lint:js
+npm run lint:eslint
 npm run lint:css
-./node_modules/.bin/tsc --noEmit
+npm run typecheck
 ```
 
 注意:

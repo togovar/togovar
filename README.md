@@ -152,15 +152,15 @@ npm run build
 個別に確認する場合:
 
 ```bash
-npm run lint:js
+npm run lint:eslint
 npm run lint:css
-./node_modules/.bin/tsc --noEmit
+npm run typecheck
 ```
 
 補足:
 
 - `npm run lint` は JavaScript/TypeScript と Sass/CSS の lint をまとめて実行します。
-- `tsc --noEmit` は package scripts にはありませんが、TypeScript の型チェックだけを確認したい場合に使えます。
+- `npm run typecheck` は TypeScript の型チェックのみを実行します（ビルドは行いません）。
 - 環境によって `node` / `npm` が PATH に無い場合があります。その場合は Node.js 22.x を有効化してください。
 
 ## Advanced Search

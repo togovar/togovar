@@ -11,10 +11,12 @@
     "dev": "cross-env NODE_ENV=development node app/frontend/server",
     "start": "npm run dev",
     "start:prod": "cross-env NODE_ENV=production node app/frontend/server",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write app/frontend/src",
+    "format:check": "prettier --check app/frontend/src",
     "lint": "npm run lint:eslint && npm run lint:css",
     "lint:css": "stylelint app/frontend/stylesheets/**/*.{css,scss,sass}",
-    "lint:eslint": "eslint --ignore-path .gitignore --ignore-pattern app/frontend/server app/frontend",
-    "lint:staged": "lint-staged"
+    "lint:eslint": "eslint --ignore-path .gitignore --ignore-pattern app/frontend/server app/frontend"
   },
   "dependencies": {
     "@babel/plugin-proposal-private-methods": "^7.18.6",
@@ -85,6 +87,7 @@
     "http-proxy-middleware": "^2.0.9",
     "npm-run-all": "^4.1.5",
     "postcss-sass": "^0.5.0",
+    "prettier": "^3.8.4",
     "sass": "1.93.2",
     "sass-loader": "16.0.6",
     "stylelint": "^17.13.0",
