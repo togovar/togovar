@@ -8,6 +8,7 @@ import {
   createRangeSliderTemplate,
   createSearchTypeSimple,
 } from './RangeSliderTemplate';
+import { createThumbStyle, createTrackBackground } from './RangeSliderStyle';
 import {
   formatInputValue,
   formatSliderValue,
@@ -185,45 +186,22 @@ export class RangeSlider extends HTMLElement {
   private _fillSlider(): void {
     const val1 = Math.min(+this.slider1.value, +this.slider2.value);
     const val2 = Math.max(+this.slider1.value, +this.slider2.value);
-    const min = this.state.min;
-    const max = this.state.max;
-    const range = max - min || 1;
-    const percentVal1 = ((val1 - min) * 100) / range;
-    const percentVal2 = ((val2 - min) * 100) / range;
-
-    if (this.state.invert !== '1') {
-      this.sliderTrack.style.background = `linear-gradient(90deg, var(--color-light-gray) 0%, var(--color-light-gray) ${percentVal1}% , var(--color-key-dark1) ${percentVal1}%,   var(--color-key-dark1) ${percentVal2}%, var(--color-light-gray) ${percentVal2}%,  var(--color-light-gray) 100% )`;
-    } else {
-      this.sliderTrack.style.background = `linear-gradient(90deg, var(--color-key-dark1) 0%, var(--color-key-dark1) ${percentVal1}%, var(--color-light-gray) ${percentVal1}%,  var(--color-light-gray) ${percentVal2}%, var(--color-key-dark1) ${percentVal2}%,  var(--color-key-dark1) 100% )`;
-    }
+    this.sliderTrack.style.background = createTrackBackground({
+      from: val1,
+      to: val2,
+      min: this.state.min,
+      max: this.state.max,
+      inverted: this.state.invert === '1',
+    });
 
     this._drawThumbs();
   }
 
   /** 2つのつまみが重なっても境界が見えるよう、左右どちら側に線を出すかを値の大小で切り替える。 */
   private _drawThumbs(): void {
-    if (+this.slider1.value < +this.slider2.value) {
-      this._sliderTrackStyle.innerHTML = `#slider-1::-webkit-slider-thumb {
-        border-right: 1px solid rgba(0, 0, 0, 0.5);
-        transform: translateX(-1.5px);
-      }
-      #slider-2::-webkit-slider-thumb {
-        border-left: 1px solid rgba(0, 0, 0, 0.5);
-        transform: translateX(1.5px)
-      }
-      `;
-      return;
-    }
-
-    this._sliderTrackStyle.innerHTML = `#slider-2::-webkit-slider-thumb {
-      border-right: 1px solid rgba(0, 0, 0, 0.5);
-      transform: translateX(-1.5px);
-    }
-    #slider-1::-webkit-slider-thumb {
-      border-left: 1px solid rgba(0, 0, 0, 0.5);
-      transform: translateX(1.5px)
-    }
-    `;
+    this._sliderTrackStyle.innerHTML = createThumbStyle(
+      +this.slider1.value < +this.slider2.value
+    );
   }
 
   /** 外部コードが属性と同じ名前で最小値を読めるよう、既存APIを保つ。 */
