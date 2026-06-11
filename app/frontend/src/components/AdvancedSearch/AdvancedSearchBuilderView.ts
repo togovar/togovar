@@ -64,7 +64,10 @@ export class AdvancedSearchBuilderView {
         void this._restoreConditionFromStore();
       }
     };
-    storeManager.subscribe('advancedSearchRestoredFromURL', this._onRestoredFromURL);
+    storeManager.subscribe(
+      'advancedSearchRestoredFromURL',
+      this._onRestoredFromURL
+    );
   }
 
   /** 旧実装との互換用。既存の呼び出し元が残っている可能性がある。 */
@@ -211,7 +214,10 @@ export class AdvancedSearchBuilderView {
   }
 
   destroy(options?: { clearDom?: boolean }): void {
-    storeManager.unsubscribe('advancedSearchRestoredFromURL', this._onRestoredFromURL);
+    storeManager.unsubscribe(
+      'advancedSearchRestoredFromURL',
+      this._onRestoredFromURL
+    );
     this._toolbar?.destroy({ clearDom: options?.clearDom });
     this._rootGroup?.remove();
   }

@@ -303,13 +303,14 @@ export class PredictionRangeSlider extends LitElement {
         <ul class="ruler">
           ${map(
             range(SLIDER_CONFIG.numberOfScales + 1),
-            (i) => html`<li
-              class="scale"
-              style="left: calc(${(i * 100) /
-              SLIDER_CONFIG.numberOfScales}% - 0.3rem)"
-            >
-              ${(SCALE_INTERVAL * i).toFixed(1)}
-            </li>`
+            (i) =>
+              html`<li
+                class="scale"
+                style="left: calc(${(i * 100) /
+                SLIDER_CONFIG.numberOfScales}% - 0.3rem)"
+              >
+                ${(SCALE_INTERVAL * i).toFixed(1)}
+              </li>`
           )}
         </ul>
 

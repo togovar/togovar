@@ -126,7 +126,11 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
     storeManager.bind('selectedRow', this);
     storeManager.bind('offset', this);
     // テンプレート崩れを早期検出するため、存在必須要素は selectRequired で取得する
-    this.content = selectRequired(this.elm, '.content', 'PanelViewPreviewClinicalSignificance');
+    this.content = selectRequired(
+      this.elm,
+      '.content',
+      'PanelViewPreviewClinicalSignificance'
+    );
   }
 
   /** storeManager.bind により selectedRow 変化時に呼ばれる */

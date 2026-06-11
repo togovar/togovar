@@ -1,7 +1,4 @@
-import {
-  CONDITION_TYPE,
-  type FrequencyDataset,
-} from '../../definition';
+import { CONDITION_TYPE, type FrequencyDataset } from '../../definition';
 import type { RestoredFrequencyMode } from '../../types';
 import type { LogicalOperator } from '../../types';
 import {
@@ -114,9 +111,7 @@ type DatasetFrequencyLeaf = {
   filtered: boolean;
 };
 
-function _toDatasetFrequencyLeaf(
-  child: unknown
-): DatasetFrequencyLeaf | null {
+function _toDatasetFrequencyLeaf(child: unknown): DatasetFrequencyLeaf | null {
   if (!isQueryObject(child) || !isQueryObject(child.frequency)) return null;
 
   const frequency = child.frequency;
@@ -191,7 +186,9 @@ function _getFrequencyMode(
  * UIが対応しているgenotypeモードだけを復元対象にする。
  * 対応外のmodeはnullを返し、その条件行を無視させる。
  */
-function _toSupportedFrequencyMode(value: string): RestoredFrequencyMode | null {
+function _toSupportedFrequencyMode(
+  value: string
+): RestoredFrequencyMode | null {
   return value === 'aac' || value === 'arc' || value === 'hac' ? value : null;
 }
 
@@ -200,7 +197,10 @@ function _toSupportedFrequencyMode(value: string): RestoredFrequencyMode | null 
  * dataset: frequency.frequency / frequency.count
  * genotype: genotype.count
  */
-function _getFrequencyRange(frequency: QueryObject, genotype: unknown): unknown {
+function _getFrequencyRange(
+  frequency: QueryObject,
+  genotype: unknown
+): unknown {
   if (isQueryObject(genotype)) return genotype.count;
   return frequency.frequency ?? frequency.count;
 }

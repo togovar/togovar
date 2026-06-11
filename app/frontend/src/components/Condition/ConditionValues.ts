@@ -89,7 +89,7 @@ export default class ConditionValues {
 
     const finalValid = requireAll
       ? allEditorsValid
-      : isValidHint ?? allEditorsValid;
+      : (isValidHint ?? allEditorsValid);
     this._setOkEnabled(finalValid);
   }
 

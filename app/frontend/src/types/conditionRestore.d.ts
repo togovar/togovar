@@ -3,8 +3,9 @@ import type { SignificanceSource } from './condition';
 
 // FrequencyCountValueView の setValues 第2引数を型として使うことで、
 // UIコンポーネント側のシグネチャ変更が自動的にここへ伝播する。
-export type RestoredFrequencyMode =
-  Parameters<FrequencyCountValueView['setValues']>[1];
+export type RestoredFrequencyMode = Parameters<
+  FrequencyCountValueView['setValues']
+>[1];
 
 export type RestoredFrequencyValue = Readonly<{
   conditionType: 'dataset' | 'genotype';

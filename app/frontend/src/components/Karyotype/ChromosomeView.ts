@@ -65,13 +65,19 @@ export default class ChromosomeView {
       </div>
     `;
 
-    this._displayRegion = this._elm.querySelector<HTMLElement>('.lower > .displayregion')!;
+    this._displayRegion = this._elm.querySelector<HTMLElement>(
+      '.lower > .displayregion'
+    )!;
 
     // サブバンドを主バンド単位に集約してラベル描画用データを作る。
     // 隣接するサブバンドが同じ主バンドに属する場合は end を延ばして結合する。
     const lowMap = map.reduce<BandEntry[]>((acc, subBand) => {
       if (acc.length === 0 || acc[acc.length - 1].band !== subBand.band) {
-        acc.push({ band: subBand.band, start: subBand.start, end: subBand.end });
+        acc.push({
+          band: subBand.band,
+          start: subBand.start,
+          end: subBand.end,
+        });
       } else {
         acc[acc.length - 1].end = subBand.end;
       }
@@ -173,8 +179,8 @@ export default class ChromosomeView {
           (band.end - band.start) * rate * 0.5 + 3
         }" class="bandtext">${band.band}</text>
         <path d="M0,1 V${(band.end - band.start) * rate - 1} M0,${Math.round(
-        (band.end - band.start) * rate * 0.5
-      )} H8" class="line" />
+          (band.end - band.start) * rate * 0.5
+        )} H8" class="line" />
       </g>
       `;
     }
@@ -191,10 +197,16 @@ export default class ChromosomeView {
       });
 
     // サブバンドのクリックでそのサブバンドの範囲を検索条件に設定する。
-    this._subbands = Array.from(this._svg.querySelectorAll<SVGGElement>('g.subband'));
+    this._subbands = Array.from(
+      this._svg.querySelectorAll<SVGGElement>('g.subband')
+    );
     this._subbands.forEach((subband) => {
       subband.addEventListener('click', () => {
-        this._selectBand(this._no, Number(subband.dataset.start), Number(subband.dataset.end));
+        this._selectBand(
+          this._no,
+          Number(subband.dataset.start),
+          Number(subband.dataset.end)
+        );
       });
     });
 
@@ -217,7 +229,9 @@ export default class ChromosomeView {
         includesSubbands.forEach((subband) => subband.classList.add('-hover'));
       });
       band.addEventListener('mouseleave', () => {
-        includesSubbands.forEach((subband) => subband.classList.remove('-hover'));
+        includesSubbands.forEach((subband) =>
+          subband.classList.remove('-hover')
+        );
       });
     });
   }
@@ -274,12 +288,18 @@ export default class ChromosomeView {
    */
   updateSelectedPositions(positions: PositionRange[]): void {
     this._subbands.forEach((subband) => {
-      const range: PositionRange = [Number(subband.dataset.start), Number(subband.dataset.end)];
+      const range: PositionRange = [
+        Number(subband.dataset.start),
+        Number(subband.dataset.end),
+      ];
       const hit = positions.some((pos) => this._intersection(pos, range));
       subband.classList.toggle('-selected', hit);
     });
     this._bands.forEach((band) => {
-      const range: PositionRange = [Number(band.dataset.start), Number(band.dataset.end)];
+      const range: PositionRange = [
+        Number(band.dataset.start),
+        Number(band.dataset.end),
+      ];
       const hit = positions.some((pos) => this._intersection(pos, range));
       band.classList.toggle('-selected', hit);
     });

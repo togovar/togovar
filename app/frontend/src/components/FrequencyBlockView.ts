@@ -24,9 +24,7 @@ type LogFrequencyLabel =
  * このラベルは `data-frequency` 属性にセットされ、
  * SCSSのセレクタが何個のブロックを表示するかを制御する。
  */
-const getLogFrequencyLabel = (
-  frequency?: Frequency
-): LogFrequencyLabel => {
+const getLogFrequencyLabel = (frequency?: Frequency): LogFrequencyLabel => {
   if (!frequency) return 'na';
 
   const { af: alleleFrequency } = frequency;

@@ -45,29 +45,26 @@ export default class SimpleSearchExamples extends LitElement {
 
   render(): TemplateResult {
     return html`
-      ${map(
-        this.examples,
-        (example: ExampleItem) => {
-          const values = this.getValues(example);
-          return html`<dl>
-            <dt>${example.key}</dt>
-            <dd>
-              ${map(
-                values,
-                (value, index) =>
-                  html`${index > 0 ? ', ' : ''}<button
-                      type="button"
-                      data-key=${example.key}
-                      data-value=${value}
-                      @click=${this.handleClick}
-                    >
-                      ${value}
-                    </button>`
-              )}
-            </dd>
-          </dl>`;
-        }
-      )}
+      ${map(this.examples, (example: ExampleItem) => {
+        const values = this.getValues(example);
+        return html`<dl>
+          <dt>${example.key}</dt>
+          <dd>
+            ${map(
+              values,
+              (value, index) =>
+                html`${index > 0 ? ', ' : ''}<button
+                    type="button"
+                    data-key=${example.key}
+                    data-value=${value}
+                    @click=${this.handleClick}
+                  >
+                    ${value}
+                  </button>`
+            )}
+          </dd>
+        </dl>`;
+      })}
     `;
   }
 }
