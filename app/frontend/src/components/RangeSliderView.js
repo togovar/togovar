@@ -45,9 +45,9 @@ input[type="range"]::-webkit-slider-thumb {
 <div class="wrapper" part="wrapper">
 
     <div class="input" part="div-input">
-        <input class="from" name="lower-limit" part="num-input" type="number" part="limit-input" title="Lower limit">
+        <input class="from" name="lower-limit" part="num-input limit-input" type="number" title="Lower limit">
     ~
-        <input class="to" name="upper-limit" part="num-input" type="number" part="limit-input" title="Upper limit">
+        <input class="to" name="upper-limit" part="num-input limit-input" type="number" title="Upper limit">
         <label part="checkbox-label label">
             <input class="invert" name="invert-range" type="checkbox" part="checkbox">Invert range
         </label>
