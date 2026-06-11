@@ -1,10 +1,14 @@
 import type { ConditionItemValueView } from '../components/Condition/ConditionItemValueView';
+import type { ConditionDiseaseSearch } from '../components/Condition/ConditionDiseaseSearch/ConditionDiseaseSearch';
+import type { ConditionDiseaseOntologyView } from '../components/Condition/ConditionDiseaseSearch/ConditionDiseaseSearchOntologyView';
 import type { RangeSliderData } from '../components/RangeSlider/RangeSliderTypes';
 import type { Frequency } from './api';
 
 declare global {
   interface HTMLElementTagNameMap {
     'condition-item-value-view': ConditionItemValueView;
+    'condition-disease-search': ConditionDiseaseSearch;
+    'condition-disease-ontology-view': ConditionDiseaseOntologyView;
     'frequency-block-view': FrequencyBlockElement;
     'range-slider': RangeSliderElement;
   }
