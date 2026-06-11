@@ -224,27 +224,6 @@ const config = {
         loader: 'json-loader',
         exclude: /node_modules/,
       },
-      {
-        test: /\.ya?ml$/,
-        use: [{ loader: 'json-loader' }, { loader: 'yaml-loader' }],
-      },
-      {
-        test: /\.ya?ml\.erb$/,
-        enforce: 'pre',
-        exclude: /node_modules/,
-        use: [
-          { loader: 'json-loader' },
-          { loader: 'yaml-loader' },
-          {
-            loader: 'rails-erb-loader',
-            options: {
-              runner:
-                (/^win/.test(process.platform) ? 'ruby ' : '') +
-                'bin/rails runner',
-            },
-          },
-        ],
-      },
     ],
   },
   plugins: [
