@@ -13,11 +13,13 @@
     "start": "npm run dev",
     "start:prod": "cross-env NODE_ENV=production NODE_OPTIONS=--experimental-strip-types node app/frontend/server",
     "typecheck": "tsc --noEmit",
+    "build:check": "npm run typecheck && npm run build",
     "format": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --write app/frontend/src",
     "format:check": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --check app/frontend/src",
     "lint": "npm run lint:eslint && npm run lint:css",
     "lint:css": "stylelint app/frontend/stylesheets/**/*.{css,scss,sass}",
-    "lint:eslint": "eslint app/frontend"
+    "lint:eslint": "eslint app/frontend",
+    "verify": "npm run lint && npm run typecheck && npm run build"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.6",
@@ -31,6 +33,7 @@
     "express": "^4.22.1",
     "ip": "^1.1.9",
     "lit": "^2.8.0",
+    "lodash": "^4.18.1",
     "minimist": "^1.2.6",
     "qs": "^6.14.2"
   },
