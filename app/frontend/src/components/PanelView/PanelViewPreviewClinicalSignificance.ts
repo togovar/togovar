@@ -170,10 +170,10 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
                 interpretation.interpretation
               }">
                 ${
-                  master!.items!.find(
+                  master?.items?.find(
                     (item: MasterConditionItem) =>
                       item.id === interpretation.interpretation
-                  )!.label
+                  )?.label ?? interpretation.interpretation
                 }
               </div>
               <div class="disease-category">
