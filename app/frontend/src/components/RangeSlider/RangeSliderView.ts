@@ -117,7 +117,11 @@ export class RangeSlider extends HTMLElement {
         break;
       case 'invert':
         this.invertChk.checked = newValue === 'true';
-        this.state.invert = this.invertChk.checked ? '1' : '0';
+        if (this.isConnected) {
+          this._updateInvert(this.invertChk.checked);
+        } else {
+          this.state.invert = toInvertValue(this.invertChk.checked);
+        }
         break;
       case 'ruler-number-of-steps':
         this.state.rulerNumberOfSteps = parseNumber(
@@ -328,7 +332,8 @@ export class RangeSlider extends HTMLElement {
 
       this.match = e.target.value;
       this.state.match = e.target.value;
-      this._fireEvent(this.state);
+      this._syncInputsFromState();
+      this._fireEvent();
     });
   }
 
@@ -338,9 +343,9 @@ export class RangeSlider extends HTMLElement {
   }
 
   /** 外部の条件エディタが必要な値だけを受け取れるよう、内部状態から公開detailを切り出す。 */
-  private _fireEvent(detail: RangeSliderState): void {
+  private _fireEvent(): void {
     const eventData = Object.fromEntries(
-      Object.entries(detail).filter(([key]) =>
+      Object.entries(this.state).filter(([key]) =>
         EVENT_DETAIL_KEYS.includes(key as (typeof EVENT_DETAIL_KEYS)[number])
       )
     ) as RangeSliderData;
@@ -361,7 +366,6 @@ export class RangeSlider extends HTMLElement {
     this.value2 = this.getAttribute('value2') || 1;
     this.orientation = this.getAttribute('orientation') || 'horizontal';
     this.match = this.getAttribute('simple-search') || 'any';
-    this.state = this._createStateProxy(this.state);
     this.state.min = parseNumber(
       this.min ?? 0,
       DEFAULT_RANGE_SLIDER_STATE.min
@@ -384,36 +388,21 @@ export class RangeSlider extends HTMLElement {
     this.to.value = formatInputValue(this.state.to);
     this._fillSlider();
     this._reRenderRuler();
+    this._fireEvent();
   }
 
-  /** state更新時に入力欄・スライダー・イベント発火を同じ経路へ通すためProxy化する。 */
-  private _createStateProxy(state: RangeSliderState): RangeSliderState {
-    return new Proxy(state, {
-      set: (
-        target,
-        prop: string | symbol,
-        value: unknown,
-        receiver
-      ): boolean => {
-        if (prop === 'from' || prop === 'to') {
-          setRangeValue(target, prop, value);
-          this._syncInputsFromState();
-          this._fireEvent(target);
-          return true;
-        }
+  /** 範囲値の変更だけがrange-changedを発火するよう、状態更新の副作用を明示する。 */
+  private _updateRangeValue(prop: 'from' | 'to', value: unknown): void {
+    setRangeValue(this.state, prop, value);
+    this._syncInputsFromState();
+    this._fireEvent();
+  }
 
-        if (prop === 'invert') {
-          target[prop] = toInvertValue(value);
-          this._syncInputsFromState();
-          this._fireEvent(target);
-          return true;
-        }
-
-        const updated = Reflect.set(target, prop, value, receiver);
-        this._syncInputsFromState();
-        return updated;
-      },
-    });
+  /** invert変更時の同期とイベント発火を明示し、単なる代入に副作用を隠さない。 */
+  private _updateInvert(value: unknown): void {
+    this.state.invert = toInvertValue(value);
+    this._syncInputsFromState();
+    this._fireEvent();
   }
 
   /** イベント登録と解除の対応を保つため、接続時の登録処理を1箇所にまとめる。 */
@@ -428,13 +417,13 @@ export class RangeSlider extends HTMLElement {
   /** 下限スライダー操作をstateへ通し、数値入力とイベント発火を同じ経路に揃える。 */
   private _slider1Input = (e: Event): void => {
     if (!(e.target instanceof HTMLInputElement)) return;
-    this.state.from = Number(e.target.value);
+    this._updateRangeValue('from', e.target.value);
   };
 
   /** 上限スライダー操作をstateへ通し、数値入力とイベント発火を同じ経路に揃える。 */
   private _slider2Input = (e: Event): void => {
     if (!(e.target instanceof HTMLInputElement)) return;
-    this.state.to = Number(e.target.value);
+    this._updateRangeValue('to', e.target.value);
   };
 
   /** stateを唯一の正とし、2本のスライダー・数値入力・背景描画を同期する。 */
@@ -449,19 +438,19 @@ export class RangeSlider extends HTMLElement {
   /** 上限の手入力もstateへ通し、スライダー操作と同じ補正・イベント発火を使う。 */
   private _toChange = (e: Event): void => {
     if (!(e.target instanceof HTMLInputElement)) return;
-    this.state.to = Number(e.target.value);
+    this._updateRangeValue('to', e.target.value);
   };
 
   /** 下限の手入力もstateへ通し、スライダー操作と同じ補正・イベント発火を使う。 */
   private _fromChange = (e: Event): void => {
     if (!(e.target instanceof HTMLInputElement)) return;
-    this.state.from = Number(e.target.value);
+    this._updateRangeValue('from', e.target.value);
   };
 
   /** checkboxのboolean値をstateへ通し、range-changedのdetail形式を既存仕様に揃える。 */
   private _invertChange = (e: Event): void => {
     if (!(e.target instanceof HTMLInputElement)) return;
-    this.state.invert = e.target.checked ? '1' : '0';
+    this._updateInvert(e.target.checked);
   };
 
   /** DOMから外れた後に古い要素参照へイベントが残らないよう、接続時の登録を解除する。 */
