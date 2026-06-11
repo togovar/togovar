@@ -11,19 +11,11 @@
 # Ignore env file
 .env
 
-# Ignore master key for decrypting credentials and more.
-/config/master.key
-
 # ============================================================================
 # Dependencies
 # ============================================================================
 
-# Ignore bundler config
-/.bundle
-
-# Ignore vendor libraries
 /node_modules
-/vendor/bundle
 
 # ============================================================================
 # Logs & Temporary Files
@@ -31,15 +23,8 @@
 
 # Ignore all logfiles and tempfiles
 /log/*
-/tmp/*
 !/log/.keep
-!/tmp/.keep
 /yarn-error.log
-
-# Ignore pidfiles, but keep the directory.
-/tmp/pids/*
-!/tmp/pids/
-!/tmp/pids/.keep
 
 # ============================================================================
 # Build Output
@@ -56,8 +41,6 @@ app/frontend/docs
 # Development & Debugging
 # ============================================================================
 
-# history
-.byebug_history
 .github/act
 
 # ============================================================================
