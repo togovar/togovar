@@ -113,7 +113,9 @@ class StoreManager {
   /** 指定されたキーからデータを取得する */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getData<T = any>(key: keyof StoreState): T {
-    return this._deepCopy(this.#state[key]);
+    // #state[key] は StoreState の値の union 型になるため、
+    // 呼び出し側が型パラメータを指定する前提で as unknown as T でキャストする。
+    return this._deepCopy(this.#state[key]) as unknown as T;
   }
 
   /** 指定されたキーにデータをセットする */
@@ -348,7 +350,9 @@ class StoreManager {
   //  検索モードの管理
   // ------------------------------
   /** 検索モードを変更 */
-  searchMode(mode: SearchMode) {
+  searchMode(mode: SearchMode | '') {
+    // '' は初期化前のセンチネル値。setSearchModeFromHistory が実行される前には何もしない。
+    if (!mode) return;
     this.setData('isStoreUpdating', true);
 
     try {
@@ -386,9 +390,11 @@ class StoreManager {
   }
 
   /**
-   * popstateなど履歴移動によるモード切替。
+   * 初期ロード・popstateなど、URLがすでに確定している場面でのモード切替。
    * setData('searchMode', mode)と同じ副作用を持つが、reflect*ToURIを呼ばないため
    * history.pushStateが発生せず、「戻る」ボタンの履歴が壊れない。
+   * 初期ロードでも同じ理由で使う（URLは正しいのに pushState するとブラウザが
+   * ユーザー操作なしと判断して履歴エントリをスキップ対象とするため）。
    */
   setSearchModeFromHistory(mode: SearchMode) {
     this.#fromHistory = true;

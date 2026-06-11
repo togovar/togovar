@@ -399,6 +399,7 @@ export class OntologyCard extends LitElement {
                                       key
                                     ]}"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     >${this.data[key]}</a
                                   >
                                 </td>

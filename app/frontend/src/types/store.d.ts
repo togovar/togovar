@@ -1,23 +1,27 @@
 /**
- * Store & State Management Type Definitions
+ * Store & 状態管理の型定義
  *
- * This module contains type definitions for:
- * - Global application state structure
- * - Store data models and schemas
- * - State update actions and mutations
- * - Data binding and reactive properties
- * - Application lifecycle states
+ * アプリ全体で共有される状態の型を一元管理する。
+ * コンポーネント間の状態共有は必ずここの型を通して行い、
+ * StoreManager を唯一の書き込み口として保つ。
  */
 
 // ============================================
-// State Models & Regional Data Types
+// 検索条件・API関連の型インポート
 // ============================================
 
-import type { MasterConditions, SimpleSearchCurrentConditions } from './search';
+import type {
+  MasterConditions,
+  SimpleSearchCurrentConditions,
+  SearchMode,
+} from './search';
 import type { ResultData } from './api';
 import type { ColumnConfig } from './components';
 
-/** 表示される染色体領域の型定義 */
+/**
+ * カリオタイプビューで表示中の染色体領域を管理する型。
+ * 複数染色体を同時に扱えるよう、染色体名をキーとしたindex signatureにしている。
+ */
 export type DisplayingRegions = {
   [chromosome: string]: {
     start: number;
@@ -26,12 +30,30 @@ export type DisplayingRegions = {
 };
 
 // ============================================
-// Application State Schema
+// アプリケーション状態スキーマ
 // ============================================
 
+/**
+ * 検索APIから取得するレコード数の集計。
+ * StoreState 内でのみ参照するため export しない。
+ * search.d.ts にも SearchStatus が存在するため、名前衝突を避けて StoreSearchStatus とする。
+ */
+type StoreSearchStatus = {
+  available: number;
+  filtered: number;
+  total: number;
+};
+
+/**
+ * アプリ全体の状態を1つのオブジェクトで表す。
+ * unknown 型の TODO フィールドは、該当APIレスポンスの型定義が確定次第、具体型へ置き換える。
+ * optional フィールドは初期化前や未使用状態を undefined で表すために省略可にしている。
+ */
 export type StoreState = {
-  karyotype: any;
-  searchMode: any;
+  // TODO: KaryotypeState を types/ へ export して具体的な型に置き換える
+  karyotype: unknown;
+  /** '' は初期化前のセンチネル値。setSearchModeFromHistory が呼ばれるまでの一時的な状態 */
+  searchMode: SearchMode | '';
   simpleSearchConditionsMaster: MasterConditions[];
   simpleSearchConditions: SimpleSearchCurrentConditions;
   columns: ColumnConfig[];
@@ -39,22 +61,25 @@ export type StoreState = {
   numberOfRecords: number;
   offset: number;
   rowCount: number;
-  appStatus: 'preparing' | 'searching' | 'normal'; //'preparing' | 'searching' | 'idle'に変更する?
+  /** 初期化・検索中・通常の3フェーズを文字列で管理し、UI側でのガード処理を単純化する */
+  appStatus: 'preparing' | 'searching' | 'normal';
   isLogin: boolean;
   isFetching: boolean;
   isStoreUpdating: boolean;
   selectedRow?: number;
-  advancedSearchConditions?: any;
+  // TODO: AdvancedSearchConditions の型を整理して具体的な型に置き換える
+  advancedSearchConditions?: unknown;
   advancedSearchURLTooLong?: boolean;
   advancedSearchRestoredFromURL?: boolean;
-  searchMessages?: any;
-  searchStatus?: any;
-  statisticsDataset?: any;
-  statisticsSignificance?: any;
-  statisticsType?: any;
-  statisticsConsequence?: any;
+  // TODO: searchMessages の形（オブジェクト or 空文字）を統一して具体的な型に置き換える
+  searchMessages?: unknown;
+  searchStatus?: StoreSearchStatus;
+  // TODO: statistics 系は API レスポンスの型定義が揃い次第具体的な型に置き換える
+  statisticsDataset?: unknown;
+  statisticsSignificance?: unknown;
+  statisticsType?: unknown;
+  statisticsConsequence?: unknown;
   showModal?: boolean;
-  displayingRegionsOnChromosome?: {
-    [key: string]: { start: number; end: number };
-  };
+  /** DisplayingRegions と同一構造。カリオタイプビューと検索条件復元の両方から参照する */
+  displayingRegionsOnChromosome?: DisplayingRegions;
 };
