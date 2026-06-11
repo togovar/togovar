@@ -196,11 +196,11 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
           </dl>`;
           })
           .join('');
-        this.elm.classList.remove('-notfound');
       }
-    } else {
-      this.elm.classList.add('-notfound');
     }
+    // html が空のケース（行未選択・レコードnull・significanceなし）を一括で扱い、
+    // 個別の remove/add より漏れにくい構造にする
+    this.elm.classList.toggle('-notfound', html === '');
     this.content.innerHTML = html;
   }
 }
