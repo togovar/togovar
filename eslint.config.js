@@ -3,12 +3,12 @@
  * @type {import('typescript-eslint').Config}
  */
 
-const tseslint = require('typescript-eslint');
-const eslintJs = require('@eslint/js');
-const eslintConfigPrettier = require('eslint-config-prettier');
-const globals = require('globals');
+import tseslint from 'typescript-eslint';
+import eslintJs from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import globals from 'globals';
 
-module.exports = tseslint.config(
+export default tseslint.config(
   // ビルド成果物・外部依存・開発サーバーはLint対象外にするため除外する
   {
     ignores: ['dist/', 'node_modules/', 'app/frontend/server/'],
@@ -87,14 +87,6 @@ module.exports = tseslint.config(
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^TOGOVAR_' },
       ],
-    },
-  },
-
-  // webpack設定はCommonJSのrequire()を多用するため、importルールを無効にする
-  {
-    files: ['app/frontend/config/webpack.config*.js'],
-    rules: {
-      '@typescript-eslint/no-require-imports': 'off',
     },
   }
 );

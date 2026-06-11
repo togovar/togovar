@@ -1,14 +1,15 @@
-const path = require('path');
-const express = require('express');
-const compression = require('compression');
-const fs = require('fs');
-const { getSiteOrigin } = require('../../config/siteOrigin');
-const {
+import path from 'path';
+import express from 'express';
+import compression from 'compression';
+import { readFile } from 'fs';
+import { stat } from 'fs/promises';
+import { getSiteOrigin } from '../../config/siteOrigin.js';
+import {
   withCanonicalUrl,
   getTrailingSlashUrl,
   getNoTrailingSlashUrl,
-} = require('./middlewareHelpers');
-const { applyCspNonce } = require('./securityHeaders');
+} from './middlewareHelpers.js';
+import { applyCspNonce } from './securityHeaders.js';
 
 const htmlCache = new Map();
 const htmlPathCache = new Map();
@@ -31,7 +32,7 @@ function getCachedHtml(htmlPath, callback) {
     return;
   }
 
-  fs.readFile(htmlPath, 'utf8', (err, html) => {
+  readFile(htmlPath, 'utf8', (err, html) => {
     if (err) {
       callback(err);
       return;
@@ -54,7 +55,10 @@ function sendReportHtml(outputPath, req, res) {
 
     res.setHeader('Cache-Control', 'no-cache');
     return res.send(
-      applyCspNonce(withCanonicalUrl(html, getCanonicalUrl(req)), res.locals.cspNonce)
+      applyCspNonce(
+        withCanonicalUrl(html, getCanonicalUrl(req)),
+        res.locals.cspNonce
+      )
     );
   });
 }
@@ -68,7 +72,7 @@ async function isSafeHtmlFile(candidatePath, outputRoot) {
   }
 
   try {
-    const stats = await fs.promises.stat(candidatePath);
+    const stats = await stat(candidatePath);
     return stats.isFile();
   } catch (err) {
     return false;
@@ -170,7 +174,7 @@ function setStaticAssetCacheHeaders(res, filePath) {
 
 // 本番環境用のExpressミドルウェアを追加する。
 // dist配下のビルド済みファイルを配信し、レポート詳細ページだけcanonicalを差し替えて返す。
-module.exports = function addProdMiddlewares(app, options) {
+export default function addProdMiddlewares(app, options) {
   const publicPath = options.publicPath || '/';
   const outputPath = options.outputPath || path.resolve(process.cwd(), 'dist');
 
@@ -206,4 +210,4 @@ module.exports = function addProdMiddlewares(app, options) {
       setHeaders: setStaticAssetCacheHeaders,
     })
   );
-};
+}

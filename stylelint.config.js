@@ -2,7 +2,7 @@
  * @see https://stylelint.io/user-guide/configure
  * @type {import('stylelint').Config}
  */
-module.exports = {
+export default {
   extends: [
     'stylelint-config-recommended',
     'stylelint-config-recommended-scss',

@@ -1,3 +1,3 @@
-const argv = require('./argv');
+import argv from './argv.js';
 
-module.exports = parseInt(argv.port || process.env.PORT || '8000', 10);
+export default parseInt(argv.port || process.env.PORT || '8000', 10);
