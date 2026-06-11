@@ -1,5 +1,5 @@
 import type { ConditionItemValueView } from '../components/Condition/ConditionItemValueView';
-import type { RangeSliderData } from '../components/Condition/ConditionValueEditor/ConditionValueEditorFrequencyCount';
+import type { RangeSliderData } from '../components/RangeSlider/RangeSliderTypes';
 import type { Frequency } from './api';
 
 declare global {

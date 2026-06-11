@@ -3,14 +3,9 @@ import { selectOrNull } from '../../../utils/dom/select';
 import type { ConditionItemView } from '../ConditionItemView';
 import { ConditionValueEditor } from './ConditionValueEditor';
 import type ConditionValues from '../ConditionValues';
-import '../../RangeSliderView.js';
+import '../../RangeSlider/RangeSliderView';
+import type { RangeSliderData } from '../../RangeSlider/RangeSliderTypes';
 import { MODE, type FrequencyCountValueView } from '../FrequencyCountValueView';
-
-export type RangeSliderData = {
-  from?: number;
-  to?: number;
-  invert?: boolean;
-};
 
 type ModeType = (typeof MODE)[keyof typeof MODE];
 type CountMode = Exclude<ModeType, 'frequency'>;
