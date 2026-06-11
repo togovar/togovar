@@ -36,8 +36,9 @@ export type DisplayingRegions = {
 /**
  * 検索APIから取得するレコード数の集計。
  * StoreState 内でのみ参照するため export しない。
+ * search.d.ts にも SearchStatus が存在するため、名前衝突を避けて StoreSearchStatus とする。
  */
-type SearchStatus = {
+type StoreSearchStatus = {
   available: number;
   filtered: number;
   total: number;
@@ -71,7 +72,7 @@ export type StoreState = {
   advancedSearchRestoredFromURL?: boolean;
   // TODO: searchMessages の形（オブジェクト or 空文字）を統一して具体的な型に置き換える
   searchMessages?: unknown;
-  searchStatus?: SearchStatus;
+  searchStatus?: StoreSearchStatus;
   // TODO: statistics 系は API レスポンスの型定義が揃い次第具体的な型に置き換える
   statisticsDataset?: unknown;
   statisticsSignificance?: unknown;
