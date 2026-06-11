@@ -11,6 +11,7 @@ declare global {
     'condition-disease-ontology-view': ConditionDiseaseOntologyView;
     'frequency-block-view': FrequencyBlockElement;
     'range-slider': RangeSliderElement;
+    'search-field-with-suggestions': SearchFieldWithSuggestionsElement;
   }
   interface FrequencyBlockElement extends HTMLElement {
     frequency?: Frequency;
@@ -21,6 +22,9 @@ declare global {
     inputStep: number;
     value1: string | number | null;
     value2: string | number | null;
+  }
+  interface SearchFieldWithSuggestionsElement extends HTMLElement {
+    showSuggestions: boolean;
   }
 
   interface HTMLElementEventMap {

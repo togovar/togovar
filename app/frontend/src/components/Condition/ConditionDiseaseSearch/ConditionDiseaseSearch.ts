@@ -2,7 +2,7 @@ import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { TemplateResult } from 'lit';
 
-import './ConditionDiseaseSearchOntologyView.js';
+import './ConditionDiseaseSearchOntologyView';
 import '../../SearchField/suggestions/SearchFieldWithSuggestions';
 
 import { API_URL } from '../../../global';
@@ -90,6 +90,9 @@ export class ConditionDiseaseSearch extends LitElement {
    */
   private _loadingStartedHandler(e: Event): void {
     e.stopPropagation();
+    if (this._timer !== null) {
+      clearTimeout(this._timer);
+    }
     this._timer = setTimeout(() => {
       this.loading = true;
     }, 200);
