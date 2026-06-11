@@ -158,12 +158,7 @@ const config = {
           },
         },
       },
-      { test: /\.ts$/, loader: 'ts-loader', exclude: /node_modules/ },
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/,
-      },
+      { test: /\.[tj]s$/, loader: 'ts-loader', exclude: /node_modules/ },
       {
         test: /\.(sa|c)ss$/,
         use: [
