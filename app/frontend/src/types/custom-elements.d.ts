@@ -15,6 +15,8 @@ declare global {
     searchType: string;
     sliderStep: number;
     inputStep: number;
+    value1: string | number | null;
+    value2: string | number | null;
   }
 
   interface HTMLElementEventMap {
