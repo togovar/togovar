@@ -68,10 +68,10 @@ export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
       from: newCondition.from ?? current.from,
       to: newCondition.to ?? current.to,
       match: newCondition.match ?? current.match,
-      // RangeSliderData.invert は boolean だが Store 側の frequency.invert は string を期待するため変換する
+      // RangeSliderData.invert は boolean だが Store 側の frequency.invert は '0'/'1' 文字列を期待するため変換する
       invert:
         newCondition.invert !== undefined
-          ? String(newCondition.invert)
+          ? (newCondition.invert ? '1' : '0')
           : current.invert,
     };
     setSimpleSearchCondition('frequency', updated);

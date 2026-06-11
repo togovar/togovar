@@ -40,10 +40,13 @@ export class ConditionDiseaseSearch extends LitElement {
   /**
    * 親要素に自身を appendChild して DOM ツリーへの組み込みとインスタンス生成を1ステップで行う。
    * 利用側が createElement → appendChild の2ステップを踏まなくて済むようにするため。
+   * @customElement 登録後はブラウザが引数なしで生成するケースがあるため、el は optional にする。
    */
-  constructor(el: Element) {
+  constructor(el?: Element) {
     super();
-    el.appendChild(this);
+    if (el) {
+      el.appendChild(this);
+    }
   }
 
   /**

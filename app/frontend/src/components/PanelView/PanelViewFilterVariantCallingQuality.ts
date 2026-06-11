@@ -24,13 +24,10 @@ export default class PanelViewFilterVariantCallingQuality extends PanelView {
       '.content > label > input'
     )!;
 
-    this._checkbox.addEventListener('change', (e) => this._change(e));
-    // HTMLのデフォルト checked 状態で Store を初期化するため、リスナー登録直後に change を発火する
-    this._checkbox.dispatchEvent(new Event('change'));
-
-    // URLパラメータから復元された条件が未設定の場合はチェック済み（フィルターなし）を初期状態とする
+    // URLパラメータ等で復元済みの値があればそれを優先し、未設定ならデフォルト（チェック済み＝フィルターなし）とする
     const condition = getSimpleSearchCondition('quality');
-    this._checkbox.checked = condition === undefined;
+    this._checkbox.checked = condition === undefined ? true : condition === '1';
+    this._checkbox.addEventListener('change', (e) => this._change(e));
   }
 
   /**
