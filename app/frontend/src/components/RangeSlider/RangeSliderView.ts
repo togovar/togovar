@@ -8,11 +8,17 @@ import {
   createRangeSliderTemplate,
   createSearchTypeSimple,
 } from './RangeSliderTemplate';
+import {
+  formatInputValue,
+  formatSliderValue,
+  parseNumber,
+  setRangeValue,
+  toInvertValue,
+} from './RangeSliderValue';
 import type {
   RangeSliderAttribute,
   RangeSliderData,
   RangeSliderState,
-  RangeStateKey,
 } from './RangeSliderTypes';
 
 const template = createRangeSliderTemplate();
@@ -89,11 +95,11 @@ export class RangeSlider extends HTMLElement {
     switch (name) {
       case 'min':
         this._setInputProperty('min', newValue);
-        this.state.min = this._parseNumber(newValue, this.state.min);
+        this.state.min = parseNumber(newValue, this.state.min);
         break;
       case 'max':
         this._setInputProperty('max', newValue);
-        this.state.max = this._parseNumber(newValue, this.state.max);
+        this.state.max = parseNumber(newValue, this.state.max);
         break;
       case 'slider-step':
         this.slider1.step = newValue;
@@ -104,17 +110,17 @@ export class RangeSlider extends HTMLElement {
         this.to.step = newValue;
         break;
       case 'value1':
-        this.slider1.value = this._formatSliderValue(newValue);
+        this.slider1.value = formatSliderValue(newValue);
         break;
       case 'value2':
-        this.slider2.value = this._formatSliderValue(newValue);
+        this.slider2.value = formatSliderValue(newValue);
         break;
       case 'invert':
         this.invertChk.checked = newValue === 'true';
         this.state.invert = this.invertChk.checked ? '1' : '0';
         break;
       case 'ruler-number-of-steps':
-        this.state.rulerNumberOfSteps = this._parseNumber(
+        this.state.rulerNumberOfSteps = parseNumber(
           newValue,
           this.state.rulerNumberOfSteps
         );
@@ -131,17 +137,6 @@ export class RangeSlider extends HTMLElement {
     }
 
     this._fillSlider();
-  }
-
-  /** 数値属性が空や不正値でも既存状態を壊さないため、fallback付きで変換する。 */
-  private _parseNumber(value: string | number, fallback: number): number {
-    const parsedValue = Number(value);
-    return Number.isNaN(parsedValue) ? fallback : parsedValue;
-  }
-
-  /** range input のvalue属性は小数3桁で揃える既存表示を保つ。 */
-  private _formatSliderValue(value: string): string {
-    return this._parseNumber(value, 0).toFixed(3);
   }
 
   /** min/maxは4つの入力要素で同じ値を使うため、属性反映の重複を避ける。 */
@@ -367,15 +362,15 @@ export class RangeSlider extends HTMLElement {
     this.orientation = this.getAttribute('orientation') || 'horizontal';
     this.match = this.getAttribute('simple-search') || 'any';
     this.state = this._createStateProxy(this.state);
-    this.state.min = this._parseNumber(
+    this.state.min = parseNumber(
       this.min ?? 0,
       DEFAULT_RANGE_SLIDER_STATE.min
     );
-    this.state.max = this._parseNumber(
+    this.state.max = parseNumber(
       this.max ?? 1,
       DEFAULT_RANGE_SLIDER_STATE.max
     );
-    this.state.step = this._parseNumber(
+    this.state.step = parseNumber(
       this.getAttribute('step') ?? DEFAULT_RANGE_SLIDER_STATE.step,
       DEFAULT_RANGE_SLIDER_STATE.step
     );
@@ -385,8 +380,8 @@ export class RangeSlider extends HTMLElement {
     this.state.match = this.match;
     this.rulerNumberOfSteps = DEFAULT_RANGE_SLIDER_STATE.rulerNumberOfSteps;
     this._addEventListeners();
-    this.from.value = this._formatInputValue(this.state.from);
-    this.to.value = this._formatInputValue(this.state.to);
+    this.from.value = formatInputValue(this.state.from);
+    this.to.value = formatInputValue(this.state.to);
     this._fillSlider();
     this._reRenderRuler();
   }
@@ -401,14 +396,14 @@ export class RangeSlider extends HTMLElement {
         receiver
       ): boolean => {
         if (prop === 'from' || prop === 'to') {
-          this._setRangeValue(target, prop, value);
+          setRangeValue(target, prop, value);
           this._syncInputsFromState();
           this._fireEvent(target);
           return true;
         }
 
         if (prop === 'invert') {
-          target[prop] = this._toInvertValue(value);
+          target[prop] = toInvertValue(value);
           this._syncInputsFromState();
           this._fireEvent(target);
           return true;
@@ -419,45 +414,6 @@ export class RangeSlider extends HTMLElement {
         return updated;
       },
     });
-  }
-
-  /** booleanと文字列の両方で渡されるinvert値を、既存detail形式の0/1に正規化する。 */
-  private _toInvertValue(value: unknown): '0' | '1' {
-    if (typeof value === 'boolean') return value ? '1' : '0';
-    return value === '1' || value === 'true' ? '1' : '0';
-  }
-
-  /** 2本のつまみが交差しないよう、下限・上限のどちらへ反映するかを現在値から決める。 */
-  private _setRangeValue(
-    target: RangeSliderState,
-    prop: RangeStateKey,
-    value: unknown
-  ): void {
-    const parsedValue =
-      typeof value === 'number' || typeof value === 'string'
-        ? parseFloat(String(value))
-        : Number.NaN;
-    if (Number.isNaN(parsedValue)) return;
-
-    const clampedValue = Math.min(
-      Math.max(parsedValue, target.min),
-      target.max
-    );
-
-    if (prop === 'from') {
-      if (clampedValue > target.to) {
-        target.to = clampedValue;
-      } else {
-        target.from = clampedValue;
-      }
-      return;
-    }
-
-    if (clampedValue < target.from) {
-      target.from = clampedValue;
-    } else {
-      target.to = clampedValue;
-    }
   }
 
   /** イベント登録と解除の対応を保つため、接続時の登録処理を1箇所にまとめる。 */
@@ -485,23 +441,9 @@ export class RangeSlider extends HTMLElement {
   private _syncInputsFromState(): void {
     this.slider1.value = String(Math.min(this.state.from, this.state.to));
     this.slider2.value = String(Math.max(this.state.from, this.state.to));
-    this.from.value = this._formatInputValue(this.state.from);
-    this.to.value = this._formatInputValue(this.state.to);
+    this.from.value = formatInputValue(this.state.from);
+    this.to.value = formatInputValue(this.state.to);
     this._fillSlider();
-  }
-
-  /** 0や1でも小数表示を保ち、頻度入力欄の表示桁が操作ごとに揺れないようにする。 */
-  private _formatInputValue(value: number | string): string {
-    const num = parseFloat(String(value));
-    if (Number.isNaN(num)) return String(value);
-
-    const str = num.toString();
-    const decimalIndex = str.indexOf('.');
-    const currentDecimals =
-      decimalIndex === -1 ? 0 : str.length - decimalIndex - 1;
-    const decimals = Math.max(1, currentDecimals);
-
-    return num.toFixed(decimals);
   }
 
   /** 上限の手入力もstateへ通し、スライダー操作と同じ補正・イベント発火を使う。 */
