@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "allowJs": true,
+    "checkJs": false,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "es2022",
+    "types": ["node"]
+  },
+  "include": [
+    "./app/frontend/server/**/*",
+    "./app/frontend/config/siteOrigin.js"
+  ],
+  "exclude": ["node_modules"]
+}

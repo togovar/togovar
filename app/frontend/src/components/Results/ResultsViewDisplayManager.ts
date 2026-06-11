@@ -117,9 +117,15 @@ export class ResultsViewDisplayManager {
 
   private _calculateAvailableHeight(): number {
     const tbodyTop = this._tbody.getBoundingClientRect().top;
-    const containerBottom = this._tableContainer?.getBoundingClientRect().bottom ?? 0;
-    const paddingBottom = this._getPixelStyle(this._tableContainer, 'padding-bottom');
-    return containerBottom - tbodyTop - paddingBottom - DISPLAY_CALCULATION_MARGIN;
+    const containerBottom =
+      this._tableContainer?.getBoundingClientRect().bottom ?? 0;
+    const paddingBottom = this._getPixelStyle(
+      this._tableContainer,
+      'padding-bottom'
+    );
+    return (
+      containerBottom - tbodyTop - paddingBottom - DISPLAY_CALCULATION_MARGIN
+    );
   }
 
   /**

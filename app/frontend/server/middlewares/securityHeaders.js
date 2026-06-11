@@ -1,13 +1,13 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 const ONE_YEAR_SECONDS = 31536000;
-const CSP_NONCE_PLACEHOLDER = '__CSP_NONCE__';
+export const CSP_NONCE_PLACEHOLDER = '__CSP_NONCE__';
 
 function createCspNonce() {
   return crypto.randomBytes(16).toString('base64');
 }
 
-function applyCspNonce(html, nonce) {
+export function applyCspNonce(html, nonce) {
   return String(html).replaceAll(CSP_NONCE_PLACEHOLDER, nonce || '');
 }
 
@@ -50,6 +50,4 @@ function setSecurityHeaders(req, res, next) {
   next();
 }
 
-module.exports = setSecurityHeaders;
-module.exports.applyCspNonce = applyCspNonce;
-module.exports.CSP_NONCE_PLACEHOLDER = CSP_NONCE_PLACEHOLDER;
+export default setSecurityHeaders;

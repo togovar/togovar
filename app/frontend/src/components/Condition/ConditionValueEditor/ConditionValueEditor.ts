@@ -45,8 +45,8 @@ export abstract class ConditionValueEditor {
         typeof content === 'function'
           ? content()
           : content instanceof DocumentFragment
-          ? [content]
-          : content;
+            ? [content]
+            : content;
 
       const frag = document.createDocumentFragment();
       for (const n of list) {

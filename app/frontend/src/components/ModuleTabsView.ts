@@ -90,7 +90,9 @@ export default class ModuleTabsView {
    */
   private _getStoredTab(defaultTab: ModuleTab | undefined): string | null {
     if (this._boundUrlParam) {
-      return new URL(window.location.href).searchParams.get(this._boundUrlParam);
+      return new URL(window.location.href).searchParams.get(
+        this._boundUrlParam
+      );
     }
 
     const tabGroup = defaultTab?.dataset.tabGroup;

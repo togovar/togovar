@@ -125,7 +125,8 @@ export class ConditionItemView extends BaseConditionView {
     this._setRelation(options.relation);
     // 復元したrelationをキャンセル時の復元先としても保持する。
     // 保持しないとEsc/Cancelでeqにリセットされてしまう。
-    if (this._relationSupported) this._keepLastRelation = options.relation ?? 'eq';
+    if (this._relationSupported)
+      this._keepLastRelation = options.relation ?? 'eq';
     this._valuesContainerEl.replaceChildren();
 
     for (const value of options.values) {

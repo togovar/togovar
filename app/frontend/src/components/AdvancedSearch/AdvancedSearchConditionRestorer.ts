@@ -161,8 +161,8 @@ function restoreLocationItem(location: QueryObject): RestoredItem | null {
     typeof position === 'number'
       ? `${chromosome}:${position}`
       : isQueryObject(position)
-      ? `${chromosome}:${getRangeStart(position) ?? ''}-${getRangeEnd(position) ?? ''}`
-      : null;
+        ? `${chromosome}:${getRangeStart(position) ?? ''}-${getRangeEnd(position) ?? ''}`
+        : null;
 
   if (!value) return null;
 

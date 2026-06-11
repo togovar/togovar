@@ -47,7 +47,10 @@ export class DatasetColumnRenderer {
     const uniqueCheckboxId = `checkbox-${this._instancePrefix}-${datasetNode.data.id}`;
 
     // 未ログイン状態でJGAデータセットはロックアイコンを表示し、誤操作を防ぐ。
-    const selectionElement = this._shouldShowLockIcon(datasetNode, userIsLoggedIn)
+    const selectionElement = this._shouldShowLockIcon(
+      datasetNode,
+      userIsLoggedIn
+    )
       ? createEl('span', { class: 'lock' })
       : createEl('input', {
           attrs: { type: 'checkbox', id: uniqueCheckboxId },

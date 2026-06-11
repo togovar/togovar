@@ -61,8 +61,7 @@ function _getSignificanceSources(source: unknown): SignificanceSource[] {
   if (!Array.isArray(source)) return [];
 
   return source.filter(
-    (item): item is SignificanceSource =>
-      item === 'mgend' || item === 'clinvar'
+    (item): item is SignificanceSource => item === 'mgend' || item === 'clinvar'
   );
 }
 

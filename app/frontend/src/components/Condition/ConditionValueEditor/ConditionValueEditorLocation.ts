@@ -481,8 +481,8 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
       typeof start === 'number'
         ? start
         : start
-        ? parseInt(String(start), 10)
-        : null;
+          ? parseInt(String(start), 10)
+          : null;
     const endNum =
       typeof end === 'number' ? end : end ? parseInt(String(end), 10) : null;
 

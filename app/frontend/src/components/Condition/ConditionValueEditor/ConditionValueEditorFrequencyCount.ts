@@ -4,10 +4,7 @@ import type { ConditionItemView } from '../ConditionItemView';
 import { ConditionValueEditor } from './ConditionValueEditor';
 import type ConditionValues from '../ConditionValues';
 import '../../RangeSliderView.js';
-import {
-  MODE,
-  type FrequencyCountValueView,
-} from '../FrequencyCountValueView';
+import { MODE, type FrequencyCountValueView } from '../FrequencyCountValueView';
 
 export type RangeSliderData = {
   from?: number;

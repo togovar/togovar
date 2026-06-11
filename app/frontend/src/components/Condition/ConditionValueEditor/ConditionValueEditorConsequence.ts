@@ -31,12 +31,16 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
   private _columns!: HTMLElement;
 
   /** データ準備と初期カラム描画までを生成直後に完了させ、エディタ生成直後から操作可能にするため。 */
-  constructor(conditionValues: ConditionValues, conditionView: ConditionItemView) {
+  constructor(
+    conditionValues: ConditionValues,
+    conditionView: ConditionItemView
+  ) {
     super(conditionValues, conditionView);
 
     this._data = this._prepareData();
     // consequence 以外に親連動が必要な条件種別は現状存在しないため、直接比較する。
-    this._selectionDependedOnParent = this.conditionType === CONDITION_TYPE.consequence;
+    this._selectionDependedOnParent =
+      this.conditionType === CONDITION_TYPE.consequence;
 
     this.createSectionEl('columns-editor-view', () => [
       createEl('header', { text: `Select ${this.conditionType}` }),
@@ -102,7 +106,11 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
       dataset: { depth: String(depth) },
     });
     this._columns.append(column);
-    column.append(createEl('ul', { children: items.map((item) => this._createColumnItem(item)) }));
+    column.append(
+      createEl('ul', {
+        children: items.map((item) => this._createColumnItem(item)),
+      })
+    );
 
     // チェックボックス操作でデータを更新してUI全体を再同期する。
     for (const input of column.querySelectorAll<HTMLInputElement>(
@@ -138,7 +146,8 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
         for (const col of this._columns.querySelectorAll<HTMLElement>(
           ':scope > .column'
         )) {
-          if (parseInt(col.dataset.depth ?? '0', 10) > currentDepth) col.remove();
+          if (parseInt(col.dataset.depth ?? '0', 10) > currentDepth)
+            col.remove();
         }
         li.classList.add('-selected');
         this._drawColumn(Number(arrow.dataset.id));
@@ -206,9 +215,14 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
    * tree 型でない条件種別（disease など）は空配列を返す。
    */
   private _prepareData(): ColumnDatum[] {
-    const def = ADVANCED_CONDITIONS[this.conditionType] as ConditionDefinition | undefined;
+    const def = ADVANCED_CONDITIONS[this.conditionType] as
+      | ConditionDefinition
+      | undefined;
     if (!def || def.type !== 'tree') return [];
-    return (def as TreeCondition).values.map((value) => ({ ...value, checked: false }));
+    return (def as TreeCondition).values.map((value) => ({
+      ...value,
+      checked: false,
+    }));
   }
 
   /**
@@ -247,7 +261,11 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
         if (!child) return;
         // 非リーフは再帰集計(0/1/2)、リーフは unchecked=0 / checked=2 で加算する。
         // 1(中間) と 2(全選択) を区別することで、親が全選択かどうかを正しく判定できる。
-        numberOfChecked += child.children ? checkLeaves(child) : child.checked ? 2 : 0;
+        numberOfChecked += child.children
+          ? checkLeaves(child)
+          : child.checked
+            ? 2
+            : 0;
       });
 
       const maxChecked = datum.children.length * 2;
