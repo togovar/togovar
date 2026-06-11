@@ -156,10 +156,9 @@ const config = {
       {
         test: /\.pug$/,
         use: {
-          loader: 'pug-loader',
+          loader: '@webdiscus/pug-loader',
           options: {
             globals: ['GLOBALS'],
-            pretty: true,
           },
         },
       },
@@ -171,7 +170,12 @@ const config = {
         test: /\.(sa|c)ss$/,
         use: [
           MiniCssExtractPlugin.loader,
-          'css-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              esModule: false,
+            },
+          },
           {
             loader: 'sass-loader',
             options: {
@@ -193,7 +197,12 @@ const config = {
             },
           },
           'extract-loader',
-          'css-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              esModule: false,
+            },
+          },
           {
             loader: 'sass-loader',
             options: {
@@ -211,6 +220,7 @@ const config = {
         options: {
           outputPath: 'images',
           name: '[name]-[contenthash].[ext]',
+          esModule: false,
         },
       },
       {
@@ -219,6 +229,7 @@ const config = {
         options: {
           outputPath: 'fonts',
           name: '[name]-[contenthash].[ext]',
+          esModule: false,
         },
       },
       {

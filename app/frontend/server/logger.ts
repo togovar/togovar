@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 import chalk from 'chalk';
-import ip from 'ip';
+import { networkInterfaces } from 'node:os';
 
 type TunnelUrl = string | false | undefined;
 
@@ -11,6 +11,19 @@ type Logger = {
 };
 
 const divider = chalk.gray('\n-----------------------------------');
+
+// 依存を増やさず起動ログ用のLAN URLを出すため、Node標準APIからIPv4アドレスを探す。
+function getLanAddress(): string {
+  for (const interfaces of Object.values(networkInterfaces())) {
+    for (const networkInterface of interfaces ?? []) {
+      if (networkInterface.family === 'IPv4' && !networkInterface.internal) {
+        return networkInterface.address;
+      }
+    }
+  }
+
+  return 'localhost';
+}
 
 // 起動失敗時も例外の形に依存せず、コンソールへ読める文字列を出すために共通化する。
 function formatError(error: unknown): string {
@@ -39,7 +52,7 @@ const logger: Logger = {
 ${chalk.bold('Access URLs:')}${divider}
 Localhost: ${chalk.magenta(`http://${host}:${port}`)}
       LAN: ${
-        chalk.magenta(`http://${ip.address()}:${port}`) +
+        chalk.magenta(`http://${getLanAddress()}:${port}`) +
         (tunnelStarted ? `\n    Proxy: ${chalk.magenta(tunnelStarted)}` : '')
       }${divider}
 ${chalk.blue(`Press ${chalk.italic('CTRL-C')} to stop`)}
