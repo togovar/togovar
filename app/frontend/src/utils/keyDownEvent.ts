@@ -25,5 +25,10 @@ export function keyDownEvent(storeName: KeyDownTarget): boolean {
 
     case 'selectedRow':
       return canHandleSelectedRowKeyDown();
+
+    default: {
+      const _exhaustive: never = storeName;
+      throw new Error(`Unexpected KeyDownTarget: ${_exhaustive}`);
+    }
   }
 }
