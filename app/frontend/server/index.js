@@ -11,12 +11,15 @@ const customHost = argv.host || process.env.HOST;
 const host = customHost || null; // Let http.Server use its default IPv6/4 host
 const prettyHost = customHost || 'localhost';
 
-// use the gzipped bundle
-app.get('*.js', (req, res, next) => {
-  req.url = req.url + '.gz';
-  res.set('Content-Encoding', 'gzip');
-  next();
-});
+// 本番ビルドは gzip 済みアセットを配信するためリライトする。
+// 開発時は webpack-dev-middleware が非圧縮で配信するため適用しない。
+if (process.env.NODE_ENV === 'production') {
+  app.get('*.js', (req, res, next) => {
+    req.url = req.url + '.gz';
+    res.set('Content-Encoding', 'gzip');
+    next();
+  });
+}
 
 // In production we need to pass these values in instead of relying on webpack
 await setup(app, {

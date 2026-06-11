@@ -13,8 +13,8 @@
     "start": "npm run dev",
     "start:prod": "cross-env NODE_ENV=production node app/frontend/server",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write app/frontend/src",
-    "format:check": "prettier --check app/frontend/src",
+    "format": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --write app/frontend/src",
+    "format:check": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --check app/frontend/src",
     "lint": "npm run lint:eslint && npm run lint:css",
     "lint:css": "stylelint app/frontend/stylesheets/**/*.{css,scss,sass}",
     "lint:eslint": "eslint app/frontend"

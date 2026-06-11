@@ -1,14 +1,10 @@
-/**
- * @see https://eslint.org/docs/latest/use/configure/configuration-files
- * @type {import('typescript-eslint').Config}
- */
-
-import tseslint from 'typescript-eslint';
+import { defineConfig } from 'eslint/config';
 import eslintJs from '@eslint/js';
+import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import globals from 'globals';
 
-export default tseslint.config(
+export default defineConfig(
   // ビルド成果物・外部依存・開発サーバーはLint対象外にするため除外する
   {
     ignores: ['dist/', 'node_modules/', 'app/frontend/server/'],
