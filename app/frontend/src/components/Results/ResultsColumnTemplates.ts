@@ -31,8 +31,7 @@ export const COLUMN_TEMPLATES = {
   ref_alt:
     '<td class="ref_alt"><div class="ref-alt"><span class="ref" data-sum=""></span><span class="arrow"></span><span class="alt" data-sum=""><span class="sum"></span></span></div></td>',
   type: '<td class="type"><div class="variant-type"></div></td>',
-  gene:
-    '<td class="gene"><div class="remains-content"><span class="remains-badge" data-remains=""></span></div></td>',
+  gene: '<td class="gene"><div class="remains-content"><span class="remains-badge" data-remains=""></span></div></td>',
   consequence:
     '<td class="consequence"><div class="remains-content"><div class="consequence-item"></div><span class="remains-badge" data-remains=""></span></div></td>',
   clinical_significance:

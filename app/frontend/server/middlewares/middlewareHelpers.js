@@ -37,7 +37,7 @@ function escapeHtmlAttribute(value) {
  * @param {string} canonicalUrl - 差し替える canonical URL（未エスケープ）
  * @returns {string} canonical URL を埋め込んだ HTML 文字列
  */
-function withCanonicalUrl(html, canonicalUrl) {
+export function withCanonicalUrl(html, canonicalUrl) {
   const escaped = escapeHtmlAttribute(canonicalUrl);
   return html.replace(/__TOGOVAR_CANONICAL_URL__/g, () => escaped);
 }
@@ -50,7 +50,7 @@ function withCanonicalUrl(html, canonicalUrl) {
  * @param {import('express').Request} req - Express リクエストオブジェクト
  * @returns {string} 末尾スラッシュを付加した URL 文字列
  */
-function getTrailingSlashUrl(req) {
+export function getTrailingSlashUrl(req) {
   return `${req.path}/${req.originalUrl.slice(req.path.length)}`;
 }
 
@@ -62,13 +62,7 @@ function getTrailingSlashUrl(req) {
  * @param {import('express').Request} req - Express リクエストオブジェクト
  * @returns {string} 末尾スラッシュを除去した URL 文字列
  */
-function getNoTrailingSlashUrl(req) {
+export function getNoTrailingSlashUrl(req) {
   const queryString = req.originalUrl.slice(req.path.length);
   return `${req.path.replace(/\/+$/, '')}${queryString}`;
 }
-
-module.exports = {
-  withCanonicalUrl,
-  getTrailingSlashUrl,
-  getNoTrailingSlashUrl,
-};

@@ -223,10 +223,14 @@ export function handleHistoryChange(e: PopStateEvent) {
  * popstateのevent.stateからAdvanced Search条件を安全に取り出す。
  * URL長制限超過時にstateへ退避した advancedSearchConditions のみを返す。
  */
-function _getConditionFromState(state: unknown): Record<string, unknown> | null {
-  if (state === null || typeof state !== 'object' || Array.isArray(state)) return null;
+function _getConditionFromState(
+  state: unknown
+): Record<string, unknown> | null {
+  if (state === null || typeof state !== 'object' || Array.isArray(state))
+    return null;
   const val = (state as Record<string, unknown>).advancedSearchConditions;
-  if (val === null || typeof val !== 'object' || Array.isArray(val)) return null;
+  if (val === null || typeof val !== 'object' || Array.isArray(val))
+    return null;
   return val as Record<string, unknown>;
 }
 

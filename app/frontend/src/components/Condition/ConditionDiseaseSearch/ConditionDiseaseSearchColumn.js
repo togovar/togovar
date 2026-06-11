@@ -89,10 +89,10 @@ export default class Column extends LitElement {
                     .order=${this.nodes.length === 1
                       ? 'single'
                       : index === 0
-                      ? 'first'
-                      : index === this.nodes.length - 1
-                      ? 'last'
-                      : 'mid'}
+                        ? 'first'
+                        : index === this.nodes.length - 1
+                          ? 'last'
+                          : 'mid'}
                     ${flip({
                       id: node.id,
                       heroId: this.heroId,

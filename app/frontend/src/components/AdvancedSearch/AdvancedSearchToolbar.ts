@@ -72,9 +72,7 @@ export class AdvancedSearchToolbar {
   private _createAddConditionItems(): HTMLLIElement[] {
     return Object.keys(ADVANCED_CONDITIONS).map((conditionType, index) => {
       const condition =
-        ADVANCED_CONDITIONS[
-          conditionType as keyof typeof ADVANCED_CONDITIONS
-        ];
+        ADVANCED_CONDITIONS[conditionType as keyof typeof ADVANCED_CONDITIONS];
       const label =
         condition && typeof condition === 'object' && 'label' in condition
           ? String(condition.label)
@@ -243,7 +241,9 @@ export class AdvancedSearchToolbar {
   }
 
   private _isCommandEnabled(command: Command): boolean {
-    return command === 'add-condition' || this._commandEnabled[command] === true;
+    return (
+      command === 'add-condition' || this._commandEnabled[command] === true
+    );
   }
 
   /**

@@ -22,7 +22,7 @@
 | レイヤー         | 技術                                           |
 | ---------------- | ---------------------------------------------- |
 | フロントエンド   | TypeScript / JavaScript / Lit / Web Components |
-| ビルド           | Webpack 5 / ts-loader / Babel                  |
+| ビルド           | Webpack 5 / ts-loader                          |
 | スタイル         | Sass / SCSS / CSS                              |
 | テンプレート     | Pug                                            |
 | サーバー         | Node.js / Express系フロントエンドサーバー      |
@@ -68,6 +68,15 @@ app/frontend/
 - DOM生成の小さな共通処理は `app/frontend/src/utils/dom/` の既存ヘルパーを優先する。
 - 参照ゲノム別の検索条件マスタは `app/frontend/assets/GRCh37` / `app/frontend/assets/GRCh38` を確認する。
 - PugテンプレートやSassの構成を変える場合は、関連する `app/frontend/views/` と `stylesheets/` の両方を確認する。
+
+## デプロイ / 配信方針
+
+- 共有されたDocker Compose運用では、`frontend-build` サービスが `npm run build` 相当で `dist/` を生成し、nginxが生成物を配信する構成として扱われている。
+- GitHub Pages向けの `.github/workflows/publish.yml` も `npm run build` 後に `dist/` を公開するだけで、`app/frontend/server/` は起動しない。
+- `app/frontend/server/` はローカル開発サーバー、または `npm run start:prod` でビルド済みファイルをローカル確認するための補助サーバーとして扱う。
+- 本番Dockerで `node app/frontend/server` / `npm run start:prod` を起動している証跡は、現時点で共有された設定からは見つかっていない。
+- ただし顧客側の実デプロイ設定がこのリポジトリ外にある可能性があるため、`app/frontend/server/`、`npm start`、`npm run start:prod`、`express` 関連依存を削除する前に、Dockerfile / Compose / nginx設定 / 起動コマンドを確認する。
+- `logger.ts` と `ip` 依存はフロントエンド用Expressサーバーの起動ログ用途。Expressサーバー本体より削除リスクは低いが、削除時は `npm start` / `npm run start:prod` の動作も合わせて整理する。
 
 ## Advanced Search 方針
 
@@ -135,9 +144,9 @@ npm run build
 個別に確認する場合:
 
 ```bash
-npm run lint:js
+npm run lint:eslint
 npm run lint:css
-./node_modules/.bin/tsc --noEmit
+npm run typecheck
 ```
 
 注意:

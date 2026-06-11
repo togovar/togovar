@@ -21,7 +21,9 @@ export function encodeConditionForURL(query: unknown): string | null {
  * URLの `q` パラメータをAdvanced Search条件にデコードする。
  * 既存のURL互換のため、`+` が空白に変換されたケースも補正する。
  */
-export function decodeConditionFromURL(encoded: string): Record<string, unknown> | null {
+export function decodeConditionFromURL(
+  encoded: string
+): Record<string, unknown> | null {
   try {
     const parsed = JSON.parse(atob(encoded.replace(/ /g, '+')));
     // 配列やプリミティブはAPIのquery bodyに流れると不正リクエストになるため弾く。

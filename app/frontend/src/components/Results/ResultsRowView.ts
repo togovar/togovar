@@ -165,9 +165,7 @@ export class ResultsRowView {
     this._prepareTableData(columns);
 
     // Update data for each column
-    columns.forEach((column) =>
-      this._updateColumnContent(column, result)
-    );
+    columns.forEach((column) => this._updateColumnContent(column, result));
 
     this.tr.classList.remove('-loading', '-out-of-range');
   }
@@ -324,10 +322,8 @@ export class ResultsRowView {
 
     // Gene
     this.geneCell = this.tr.querySelector('td.gene');
-    this.geneContent =
-      this.geneCell?.querySelector('.remains-content') || null;
-    this.geneRemains =
-      this.geneCell?.querySelector('.remains-badge') || null;
+    this.geneContent = this.geneCell?.querySelector('.remains-content') || null;
+    this.geneRemains = this.geneCell?.querySelector('.remains-badge') || null;
 
     // Consequence
     this.consequenceCell = this.tr.querySelector('td.consequence');
@@ -339,11 +335,13 @@ export class ResultsRowView {
       this.consequenceCell?.querySelector('.remains-badge') || null;
 
     // Clinical significance
-    const tdClinical =
-      this.tr.querySelector<HTMLTableCellElement>('td.clinical_significance');
+    const tdClinical = this.tr.querySelector<HTMLTableCellElement>(
+      'td.clinical_significance'
+    );
     const clinicalFlex =
-      tdClinical?.querySelector<HTMLDivElement>('.clinical-significance-flex') ||
-      null;
+      tdClinical?.querySelector<HTMLDivElement>(
+        '.clinical-significance-flex'
+      ) || null;
     this.clinicalContainer = clinicalFlex;
     this.clinicalSignificance =
       tdClinical?.querySelector('.clinical-significance') || null;
@@ -358,9 +356,7 @@ export class ResultsRowView {
   private _cacheFrequencyElements() {
     this.frequencyElements = {};
     this.tr
-      .querySelectorAll(
-        'td.alt_frequency > frequency-block-view'
-      )
+      .querySelectorAll('td.alt_frequency > frequency-block-view')
       .forEach((elm) => {
         const element = elm as FrequencyElement;
         const datasetId = element.dataset.dataset;

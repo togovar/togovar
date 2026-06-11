@@ -1,13 +1,18 @@
-const webpack = require('webpack');
-const path = require('path');
-const fs = require('fs');
+import webpack from 'webpack';
+import path from 'path';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import dotenv from 'dotenv';
+import { getSiteOrigin } from './siteOrigin.js';
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { getSiteOrigin } = require('./siteOrigin');
+// ESM では __dirname が使えないため、import.meta.url から再現する。
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const env = require('dotenv').config().parsed || {};
+const env = dotenv.config().parsed || {};
 Object.assign(process.env, env);
 
 const STRUCTURED_DATA_TEMPLATE_PATH = path.resolve(
@@ -48,7 +53,7 @@ function createSitemapXml(siteOrigin, pages) {
 // JSON-LD内のサイトURLを、GRCh37/GRCh38などビルド対象のoriginに合わせる。
 function createStructuredDataJson(siteOrigin) {
   try {
-    const template = fs.readFileSync(STRUCTURED_DATA_TEMPLATE_PATH, 'utf8');
+    const template = readFileSync(STRUCTURED_DATA_TEMPLATE_PATH, 'utf8');
     const json = template.replace(/__TOGOVAR_SITE_ORIGIN__/g, siteOrigin);
 
     return JSON.stringify(JSON.parse(json), null, 2).replace(/</g, '\\u003c');
@@ -151,24 +156,26 @@ const config = {
       {
         test: /\.pug$/,
         use: {
-          loader: 'pug-loader',
+          loader: '@webdiscus/pug-loader',
           options: {
             globals: ['GLOBALS'],
-            pretty: true,
           },
         },
       },
-      { test: /\.ts$/, loader: 'ts-loader', exclude: /node_modules/ },
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/,
-      },
+      // "type": "module" により .js が strict ESM 扱いになるため、
+      // 拡張子なしのインポートを引き続き解決できるよう fullySpecified を無効にする。
+      { test: /\.js$/, resolve: { fullySpecified: false } },
+      { test: /\.[tj]s$/, loader: 'ts-loader', exclude: /node_modules/ },
       {
         test: /\.(sa|c)ss$/,
         use: [
           MiniCssExtractPlugin.loader,
-          'css-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              esModule: false,
+            },
+          },
           {
             loader: 'sass-loader',
             options: {
@@ -190,7 +197,12 @@ const config = {
             },
           },
           'extract-loader',
-          'css-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              esModule: false,
+            },
+          },
           {
             loader: 'sass-loader',
             options: {
@@ -208,6 +220,7 @@ const config = {
         options: {
           outputPath: 'images',
           name: '[name]-[contenthash].[ext]',
+          esModule: false,
         },
       },
       {
@@ -216,39 +229,13 @@ const config = {
         options: {
           outputPath: 'fonts',
           name: '[name]-[contenthash].[ext]',
+          esModule: false,
         },
       },
       {
         test: /\.(csv|tsv)$/,
         loader: 'csv-loader',
         exclude: /node_modules/,
-      },
-      {
-        test: /\.json$/,
-        type: 'javascript/auto',
-        loader: 'json-loader',
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.ya?ml$/,
-        use: [{ loader: 'json-loader' }, { loader: 'yaml-loader' }],
-      },
-      {
-        test: /\.ya?ml\.erb$/,
-        enforce: 'pre',
-        exclude: /node_modules/,
-        use: [
-          { loader: 'json-loader' },
-          { loader: 'yaml-loader' },
-          {
-            loader: 'rails-erb-loader',
-            options: {
-              runner:
-                (/^win/.test(process.platform) ? 'ruby ' : '') +
-                'bin/rails runner',
-            },
-          },
-        ],
       },
     ],
   },
@@ -398,4 +385,4 @@ pages.forEach(function (name) {
 // sitemap.xml には、上で生成したドキュメントページのURL一覧を含める。
 config.plugins.push(new StaticSeoFilesPlugin(pages));
 
-module.exports = config;
+export default config;

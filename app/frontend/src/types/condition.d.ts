@@ -53,7 +53,7 @@ type FrequencyQuery = Logical<AlleleFrequency | AlleleCount | GenotypeCount>;
 type FrequencyLeaf = AlleleFrequency | AlleleCount | GenotypeCount;
 
 interface FrequencyBase<
-  Extra extends Record<string, unknown> = Record<string, never>
+  Extra extends Record<string, unknown> = Record<string, never>,
 > {
   frequency: {
     dataset: { name: FrequencyDataset };
@@ -61,18 +61,19 @@ interface FrequencyBase<
   } & Extra;
 }
 
-interface AlleleFrequency
-  extends FrequencyBase<{ frequency: ScoreRange } & { filtered: boolean }> {}
+interface AlleleFrequency extends FrequencyBase<
+  { frequency: ScoreRange } & { filtered: boolean }
+> {}
 
-interface AlleleCount
-  extends FrequencyBase<{ count: ScoreRange } & { filtered: boolean }> {}
+interface AlleleCount extends FrequencyBase<
+  { count: ScoreRange } & { filtered: boolean }
+> {}
 
-interface GenotypeCount
-  extends FrequencyBase<
-    { genotype: { key: GenotypeKey; count: ScoreRange } } & {
-      filtered: boolean;
-    }
-  > {}
+interface GenotypeCount extends FrequencyBase<
+  { genotype: { key: GenotypeKey; count: ScoreRange } } & {
+    filtered: boolean;
+  }
+> {}
 
 // ───────────────────────────────────────────────────────────────────────────
 // Significance Query

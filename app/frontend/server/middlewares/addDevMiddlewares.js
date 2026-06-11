@@ -1,15 +1,15 @@
-const path = require('path');
-const express = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware');
-const webpack = require('webpack');
-const webpackDevMiddleware = require('webpack-dev-middleware');
-const webpackHotMiddleware = require('webpack-hot-middleware');
-const {
+import path from 'path';
+import express from 'express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import webpack from 'webpack';
+import webpackDevMiddleware from 'webpack-dev-middleware';
+import webpackHotMiddleware from 'webpack-hot-middleware';
+import {
   withCanonicalUrl,
   getTrailingSlashUrl,
   getNoTrailingSlashUrl,
-} = require('./middlewareHelpers');
-const { applyCspNonce } = require('./securityHeaders');
+} from './middlewareHelpers.js';
+import { applyCspNonce } from './securityHeaders.js';
 
 function createWebpackMiddleware(compiler, publicPath) {
   return webpackDevMiddleware(compiler, {
@@ -40,13 +40,18 @@ function sendReportHtml(outputFileSystem, outputPath, req, res) {
       if (err) {
         res.sendStatus(404);
       } else {
-        res.send(applyCspNonce(withCanonicalUrl(file.toString(), getCanonicalUrl(req)), res.locals.cspNonce));
+        res.send(
+          applyCspNonce(
+            withCanonicalUrl(file.toString(), getCanonicalUrl(req)),
+            res.locals.cspNonce
+          )
+        );
       }
     }
   );
 }
 
-module.exports = function addDevMiddlewares(app, webpackConfig) {
+export default function addDevMiddlewares(app, webpackConfig) {
   // 開発中はwebpackのビルド結果をディスクではなくメモリ上に作る。
   const compiler = webpack(webpackConfig);
   const middleware = createWebpackMiddleware(
@@ -108,4 +113,4 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
 
   // dist配下の静的ファイルを配信する。
   app.use(publicPath, express.static(outputPath));
-};
+}

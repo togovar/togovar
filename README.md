@@ -23,7 +23,7 @@ AIエージェント向けの作業指示・設計ルールは [AGENTS.md](./AGE
 | 役割           | 技術                                           |
 | -------------- | ---------------------------------------------- |
 | フロントエンド | TypeScript / JavaScript / Lit / Web Components |
-| ビルド         | Webpack 5 / ts-loader / Babel                  |
+| ビルド         | Webpack 5 / ts-loader                          |
 | スタイル       | Sass / SCSS / CSS                              |
 | テンプレート   | Pug                                            |
 | サーバー       | Node.js / Express 系フロントエンドサーバー     |
@@ -132,10 +132,20 @@ npm run build
 ### 本番ビルドをローカル起動
 
 ```bash
+npm run build
 npm run start:prod
 ```
 
-`npm run build` のあと、production mode のフロントエンドサーバーを起動します。
+`build` でビルドしてから `start:prod` でサーバーを起動します。
+CI などビルド済みの環境では `npm run start:prod` だけ実行してください。
+
+### デプロイ運用メモ
+
+このリポジトリで確認できる GitHub Pages ワークフローは、`npm run build` で `dist/` を生成し、その内容を公開します。`app/frontend/server/` のExpressサーバーは起動しません。
+
+共有された顧客側Docker Composeでは、`frontend-build` サービスがNode.jsでフロントエンドをビルドし、生成物を `nginx_www` volume 経由でnginxが配信する構成でした。この構成でも、フロントエンド用Expressサーバーではなく、ビルド済み静的ファイルをnginxで配信していると考えられます。
+
+一方で、顧客側の実デプロイ設定がこのリポジトリ外で管理されている可能性があります。`app/frontend/server/` や `npm run start:prod` はローカル確認用として残っているため、削除する場合は実際のDockerfile、Compose、nginx設定、起動コマンドを確認してください。
 
 ## 検証
 
@@ -150,15 +160,15 @@ npm run build
 個別に確認する場合:
 
 ```bash
-npm run lint:js
+npm run lint:eslint
 npm run lint:css
-./node_modules/.bin/tsc --noEmit
+npm run typecheck
 ```
 
 補足:
 
 - `npm run lint` は JavaScript/TypeScript と Sass/CSS の lint をまとめて実行します。
-- `tsc --noEmit` は package scripts にはありませんが、TypeScript の型チェックだけを確認したい場合に使えます。
+- `npm run typecheck` は TypeScript の型チェックのみを実行します（ビルドは行いません）。
 - 環境によって `node` / `npm` が PATH に無い場合があります。その場合は Node.js 22.x を有効化してください。
 
 ## Advanced Search

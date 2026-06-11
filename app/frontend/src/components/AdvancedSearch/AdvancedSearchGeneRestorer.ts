@@ -39,7 +39,10 @@ export async function restoreGeneItem(
 }
 
 /** URLに埋め込まれた labels 辞書があれば、APIを叩かずにそこからラベルを取る。 */
-function _getGeneLabelFromQuery(labels: unknown, geneId: string): string | null {
+function _getGeneLabelFromQuery(
+  labels: unknown,
+  geneId: string
+): string | null {
   if (!isQueryObject(labels)) return null;
   return getString(labels[geneId]);
 }

@@ -22,7 +22,10 @@ export function isQueryObject(value: unknown): value is QueryObject {
 }
 
 /** ラベルが見つからない条件でもUI表示できるよう、value をlabelの代替にする。 */
-export function makeValue(value: string, label: string = value): RestoredConditionValue {
+export function makeValue(
+  value: string,
+  label: string = value
+): RestoredConditionValue {
   return { value, label };
 }
 
@@ -71,7 +74,10 @@ export function findConditionLabel(
  * datasetのような階層値と、significanceのようなsource別値の両方を再帰的に探す。
  * 値の形状がconditionTypeごとに異なるため、配列とオブジェクトの両パターンに対応する。
  */
-export function findLabelInValues(values: unknown, targetValue: string): string | null {
+export function findLabelInValues(
+  values: unknown,
+  targetValue: string
+): string | null {
   if (Array.isArray(values)) {
     for (const item of values) {
       const label = _findLabelInValueItem(item, targetValue);
@@ -91,7 +97,10 @@ export function findLabelInValues(values: unknown, targetValue: string): string 
 }
 
 /** 1つのマスタ項目を調べ、子要素があればさらに下へ潜る。 */
-function _findLabelInValueItem(item: unknown, targetValue: string): string | null {
+function _findLabelInValueItem(
+  item: unknown,
+  targetValue: string
+): string | null {
   if (!isQueryObject(item)) return null;
 
   if (item.value === targetValue && typeof item.label === 'string') {

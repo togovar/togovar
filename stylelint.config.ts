@@ -1,0 +1,52 @@
+import type { Config } from 'stylelint';
+
+const config: Config = {
+  extends: [
+    'stylelint-config-recommended',
+    'stylelint-config-recommended-scss',
+  ],
+  rules: {
+    // プロジェクト独自の命名規則（BEMベース）があり、
+    // stylelint のデフォルトパターン（kebab-case 強制）と競合するため無効にする
+    'selector-class-pattern': null,
+
+    // クラスと同様に、ID セレクターもプロジェクト側の命名に委ねるため無効にする
+    'selector-id-pattern': null,
+
+    // @use / @import どちらも混在しており、移行途中のため強制しない
+    'import-notation': null,
+
+    // ブラウザ固有の疑似クラス（:focus-visible など）を誤検出しないよう有効にする
+    'selector-pseudo-class-no-unknown': true,
+
+    // コメント前の空行ルールがプロジェクトの既存スタイルと合わないため無効にする
+    'comment-empty-line-before': null,
+
+    // CSS カスタムプロパティの記述スタイルが場所によって異なるため制約しない
+    'custom-property-empty-line-before': null,
+
+    // Sass 変数の命名規則はプロジェクト内で統一されており、
+    // stylelint のパターン強制は不要なため無効にする
+    'scss/dollar-variable-pattern': null,
+
+    // 長い演算式を改行で分割する記述が既存コードにあるため許容する
+    'scss/operator-no-newline-after': null,
+
+    // アンダースコア付きパーシャル（_variables.scss など）を @use で読み込む
+    // 旧来の書き方が残っているため、先頭アンダースコアを警告しない
+    'scss/load-no-partial-leading-underscore': null,
+  },
+  overrides: [
+    {
+      // .sass（インデント構文）は空ファイルが有効なケースがあるため、
+      // no-empty-source を無効にして誤検出を防ぐ
+      files: ['**/*.sass'],
+      customSyntax: 'postcss-sass',
+      rules: {
+        'no-empty-source': null,
+      },
+    },
+  ],
+};
+
+export default config;

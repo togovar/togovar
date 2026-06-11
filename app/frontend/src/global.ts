@@ -1,9 +1,6 @@
 import grch37Json from '../assets/GRCh37/advanced_search_conditions.json';
 import grch38Json from '../assets/GRCh38/advanced_search_conditions.json';
-import type {
-  GRChConditions,
-  AdvancedConditionMap,
-} from './types';
+import type { GRChConditions, AdvancedConditionMap } from './types';
 
 // ================================
 // グローバル定数・設定値
@@ -29,7 +26,6 @@ export const API_URL =
   typeof TOGOVAR_FRONTEND_API_URL !== 'undefined'
     ? TOGOVAR_FRONTEND_API_URL
     : 'https://togovar.org';
-
 
 const GRCh37 = grch37Json as GRChConditions;
 const GRCh38 = grch38Json as GRChConditions;

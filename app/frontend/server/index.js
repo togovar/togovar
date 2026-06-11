@@ -1,37 +1,34 @@
-/* eslint consistent-return:0 import/order:0 */
+import express from 'express';
+import { resolve } from 'path';
+import logger from './logger.ts';
+import argv from './argv.js';
+import port from './port.js';
+import setup from './middlewares/frontendMiddleware.js';
 
-const express = require('express');
-const logger = require('./logger');
-
-const argv = require('./argv');
-const port = require('./port');
-const setup = require('./middlewares/frontendMiddleware');
-const {resolve} = require('path');
 const app = express();
 
-// If you need a backend, e.g. an API, add your custom backend-specific middleware here
-// app.use('/api', myApi);
-
-// In production we need to pass these values in instead of relying on webpack
-setup(app, {
-  outputPath: resolve(process.cwd(), 'dist'),
-  publicPath: '/',
-});
-
-// get the intended host and port number, use localhost and port 8000 if not provided
 const customHost = argv.host || process.env.HOST;
 const host = customHost || null; // Let http.Server use its default IPv6/4 host
 const prettyHost = customHost || 'localhost';
 
-// use the gzipped bundle
-app.get('*.js', (req, res, next) => {
-  req.url = req.url + '.gz';
-  res.set('Content-Encoding', 'gzip');
-  next();
+// 本番ビルドは gzip 済みアセットを配信するためリライトする。
+// 開発時は webpack-dev-middleware が非圧縮で配信するため適用しない。
+if (process.env.NODE_ENV === 'production') {
+  app.get('*.js', (req, res, next) => {
+    req.url = req.url + '.gz';
+    res.set('Content-Encoding', 'gzip');
+    next();
+  });
+}
+
+// In production we need to pass these values in instead of relying on webpack
+await setup(app, {
+  outputPath: resolve(process.cwd(), 'dist'),
+  publicPath: '/',
 });
 
 // Start your app.
-app.listen(port, host, err => {
+app.listen(port, host, (err) => {
   if (err) {
     return logger.error(err.message);
   }

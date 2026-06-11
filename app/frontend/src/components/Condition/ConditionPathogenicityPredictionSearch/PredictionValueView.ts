@@ -27,7 +27,7 @@ const SLIDER_CONFIG = {
 const makeLeaf = <K extends PredictionKey>(
   k: K,
   score: ScoreOrUnassignedFor<K>
-) => ({ [k]: { score } } as { [P in K]: { score: ScoreOrUnassignedFor<P> } });
+) => ({ [k]: { score } }) as { [P in K]: { score: ScoreOrUnassignedFor<P> } };
 
 @customElement('prediction-value-view')
 export class PredictionValueView extends LitElement {
