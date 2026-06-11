@@ -15,7 +15,6 @@
 - 既存の設計、命名、TypeScript/JavaScript混在方針、Sass/SCSS構成、Store/API層の使い方に合わせる。
 - ユーザーの未コミット変更を勝手に戻さない。
 - 生成物や依存関係の大きな更新は、明確に必要な場合だけ行う。
-- 既存JSファイルをTSへ変換する場合は、呼び出し元、Webpack設定、型定義への影響を確認する。
 - 依存を移動・追加・削除する場合は、実行時依存かビルド時依存かを確認し、`package.json` と `package-lock.json` を揃える。
 
 ## 技術スタック
@@ -107,7 +106,10 @@ app/frontend/
 
 - 新規TypeScriptでは `any` を避け、型が曖昧な値は `unknown` から絞り込む。
 - `types/*.d.ts` にグローバル型が多い。新しい共有型を足す前に既存型を検索する。
-- 既存JSファイルを無理にTSへ変換しない。変換する場合は影響範囲とWebpack設定を確認する。
+- 既存JSファイルをTSへ変換する場合は、呼び出し元、Webpack設定、型定義への影響を確認する。
+- ファイル名だけを `.ts` に変えるのではなく、入力値・戻り値・公開APIを明示してから変換する。
+- 既存の import パスを壊さないため、拡張子なし import のまま解決できるか確認する。
+- 互換性のために既存の export 名を残す必要がある場合は、命名変更を別差分に分ける。
 - DOM要素取得は `selectRequired` / `selectOrNull` / `createEl` など既存ヘルパーを優先する。
 - Lit要素のプロパティや `updateComplete` を使う場合は、カスタム要素型を明示して strict TypeScript で扱う。
 - `structuredClone` やブラウザAPIを使う場合は、対象環境と既存使用箇所を確認する。
