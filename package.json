@@ -16,7 +16,7 @@
     "format:check": "prettier --check app/frontend/src",
     "lint": "npm run lint:eslint && npm run lint:css",
     "lint:css": "stylelint app/frontend/stylesheets/**/*.{css,scss,sass}",
-    "lint:eslint": "eslint --ignore-path .gitignore --ignore-pattern app/frontend/server app/frontend"
+    "lint:eslint": "eslint app/frontend"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.6",
@@ -64,11 +64,12 @@
     "webpack-merge": "^5.0.9"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/d3-hierarchy": "^3.1.7",
-    "@typescript-eslint/eslint-plugin": "^7.12.0",
-    "@typescript-eslint/parser": "^7.12.0",
-    "eslint": "^8.24.0",
+    "@types/qs": "^6.15.1",
+    "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.6.0",
     "html-webpack-plugin": "^5.6.4",
     "http-proxy-middleware": "^2.0.9",
     "postcss-sass": "^0.5.0",
@@ -80,6 +81,7 @@
     "stylelint-config-recommended-scss": "^17.0.1",
     "stylelint-scss": "^7.2.0",
     "typescript": "^5.9.2",
+    "typescript-eslint": "^8.61.0",
     "webpack-dev-middleware": "^5.3.4",
     "webpack-hot-middleware": "^2.25.0"
   },

@@ -121,13 +121,12 @@ function _determineSearchEndpoints(
   isFirstTime: boolean
 ): string[] {
   let basePath: string;
-  let conditions = '';
 
   switch (storeManager.getData('searchMode')) {
     case 'simple': {
       // Simple searchの場合のみLIMITでの調整を行う
       const offsetStart = offset - (offset % LIMIT);
-      conditions = qs.stringify(
+      const conditions = qs.stringify(
         extractSearchCondition(storeManager.getData('simpleSearchConditions'))
       );
       basePath = `${API_URL}/search?offset=${offsetStart}${

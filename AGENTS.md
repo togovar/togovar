@@ -22,7 +22,7 @@
 | レイヤー         | 技術                                           |
 | ---------------- | ---------------------------------------------- |
 | フロントエンド   | TypeScript / JavaScript / Lit / Web Components |
-| ビルド           | Webpack 5 / ts-loader / Babel                  |
+| ビルド           | Webpack 5 / ts-loader                          |
 | スタイル         | Sass / SCSS / CSS                              |
 | テンプレート     | Pug                                            |
 | サーバー         | Node.js / Express系フロントエンドサーバー      |
