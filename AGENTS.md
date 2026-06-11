@@ -136,14 +136,20 @@ app/frontend/
 
 ## 検証
 
-変更後は可能な範囲で以下を実行する。
+変更後は可能な範囲で以下を実行する。TS化や依存変更を含む場合は、まず型チェックで小さく確認してから全体検証へ進む。
+
+```bash
+npm run typecheck
+```
+
+全体確認:
 
 ```bash
 npm run lint
 npm run build
 ```
 
-個別に確認する場合:
+必要に応じた個別確認:
 
 ```bash
 npm run lint:eslint
