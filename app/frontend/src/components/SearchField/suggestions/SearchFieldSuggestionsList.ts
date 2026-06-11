@@ -4,50 +4,45 @@ import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import Styles from '../../../../stylesheets/object/component/search-field-suggestions-list.scss';
-import { scrollIntoView } from '../scrollIntoView';
+import { scrollIntoView } from './scrollIntoView';
+import type { SuggestionData } from './types';
 
-/** Suggestion data structure */
-interface SuggestionItem {
-  term?: string;
-  alias_of?: string;
-  highlight?: string;
-  id?: string;
-  name?: string;
-  symbol?: string;
-  [key: string]: any;
-}
+/**
+ * LitテンプレートでscrollIntoViewディレクティブを型安全に呼び出すための関数型。
+ * directive()の戻り値はLit内部型のため、テンプレート内での使用に限定した型として定義する
+ */
+type ScrollIntoViewDirective = (selected: boolean) => unknown;
 
-/** Class to create a list of suggestions */
+/** サジェスト候補の一覧を表示するカスタムエレメント */
 @customElement('search-field-suggestions-list')
 class SearchFieldSuggestionsList extends LitElement {
   static styles: CSSResultGroup = [Styles];
 
-  /** Suggestions data */
-  @property({ type: Array }) suggestData: SuggestionItem[] = [];
+  /** サジェスト候補データ */
+  @property({ type: Array }) suggestData: SuggestionData[] = [];
 
-  /** Highlighted item's index (by keys) */
+  /** キー操作でハイライト中の候補インデックス（-1は未選択） */
   @property({ type: Number }) highlightedSuggestionIndex: number = -1;
 
-  /** What of an item to map to dispatched event's detail.id */
+  /** 候補選択イベントのdetail.idに使うデータキー名 */
   @property() itemIdKey: string = '';
 
-  /** What of an item to map to dispatched event's detail.label */
+  /** 候補選択イベントのdetail.labelに使うデータキー名 */
   @property() itemLabelKey: string = '';
 
-  /** If there is alias_of -kind of data, where in data to see for it */
+  /** エイリアス等の補足テキストを取得するデータキー名 */
   @property() subTextKey: string = '';
 
-  /** Column title in case of Simple search */
+  /** シンプル検索時の列見出しテキスト */
   @property() title: string = '';
 
-  /** Whether API response has been received */
+  /** APIレスポンス受信済みかどうか */
   @property({ type: Boolean }) hasApiResponse: boolean = false;
 
   /**
-   * Handle suggestion selection
-   * @param item - The selected suggestion item
+   * 候補が選択されたことを親コンポーネントへ伝えるためにカスタムイベントを発火する
    */
-  private _handleSelect(item: SuggestionItem): void {
+  private _handleSelect(item: SuggestionData): void {
     this.dispatchEvent(
       new CustomEvent('suggestion-selected', {
         detail: item,
@@ -57,6 +52,13 @@ class SearchFieldSuggestionsList extends LitElement {
     );
   }
 
+  /**
+   * インデックス署名がunknownのため、テンプレートで安全に表示できるようstring型へ絞り込む
+   */
+  private _toDisplayString(value: unknown): string {
+    return typeof value === 'string' ? value : '';
+  }
+
   render(): TemplateResult {
     return html`
       ${this.title ? html`<h3 class="title">${this.title}</h3>` : nothing}
@@ -64,28 +66,32 @@ class SearchFieldSuggestionsList extends LitElement {
         ${!this.hasApiResponse
           ? nothing
           : !this.suggestData || this.suggestData.length === 0
-          ? html`<li class="item -empty">No results</li>`
-          : map(
-              this.suggestData,
-              (item: SuggestionItem, index: number) => html`
-                <li
-                  class="item ${this.highlightedSuggestionIndex === index
-                    ? '-selected'
-                    : ''}"
-                  @mousedown="${() => this._handleSelect(item)}"
-                  ${(scrollIntoView as any)(
-                    this.highlightedSuggestionIndex === index
-                  )}
-                >
-                  ${unsafeHTML(item?.highlight || item?.[this.itemLabelKey])}
-                  ${this.subTextKey && item?.[this.subTextKey]
-                    ? html`<span class="sub">
-                        alias: ${item[this.subTextKey]}</span
-                      >`
-                    : nothing}
-                </li>
-              `
-            )}
+            ? html`<li class="item -empty">No results</li>`
+            : map(
+                this.suggestData,
+                (item: SuggestionData, index: number) => html`
+                  <li
+                    class="item ${this.highlightedSuggestionIndex === index
+                      ? '-selected'
+                      : ''}"
+                    @mousedown="${() => this._handleSelect(item)}"
+                    ${(scrollIntoView as ScrollIntoViewDirective)(
+                      this.highlightedSuggestionIndex === index
+                    )}
+                  >
+                    ${unsafeHTML(
+                      item.highlight ||
+                        this._toDisplayString(item[this.itemLabelKey])
+                    )}
+                    ${this.subTextKey && item[this.subTextKey]
+                      ? html`<span class="sub">
+                          alias:
+                          ${this._toDisplayString(item[this.subTextKey])}</span
+                        >`
+                      : nothing}
+                  </li>
+                `
+              )}
       </ul>
     `;
   }
