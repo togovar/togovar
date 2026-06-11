@@ -15,7 +15,7 @@ import PreviewToVariantReport from './components/PanelView/PreviewToVariantRepor
 import PanelViewPreviewExternalLinks from './components/PanelView/PanelViewPreviewExternalLinks.js';
 import PanelViewPreviewAlternateAlleleFrequencies from './components/PanelView/PanelViewPreviewAlternateAlleleFrequencies.js';
 import PanelViewPreviewConsequence from './components/PanelView/PanelViewPreviewConsequence.js';
-import PanelViewPreviewClinicalSignificance from './components/PanelView/PanelViewPreviewClinicalSignificance.js';
+import PanelViewPreviewClinicalSignificance from './components/PanelView/PanelViewPreviewClinicalSignificance';
 import FloatingInfo from './components/FloatingInfo';
 import qs from 'qs';
 import { extractSearchCondition } from './store/searchManager';
@@ -118,9 +118,10 @@ function readyInitialSearch(callback: () => void): void {
       : {};
   storeManager.setData('simpleSearchConditions', simpleSearchConditions);
 
-  // searchModeを最後にセットしてサブスクライバ（reflectToURI + executeSearch）を発火する。
-  // 条件が確定した後に更新することで二重検索を防ぐ。
-  storeManager.setData('searchMode', searchMode);
+  // searchModeを最後にセットしてサブスクライバ（executeSearch）を発火する。
+  // 初期ロード時はURLがすでに正しいためsetSearchModeFromHistoryを使い、
+  // pushStateによる「ユーザー操作なし履歴エントリ」警告を防ぐ。
+  storeManager.setSearchModeFromHistory(searchMode);
 
   callback();
 }

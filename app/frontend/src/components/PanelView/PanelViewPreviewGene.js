@@ -31,7 +31,7 @@ export default class PanelViewPreviewGene extends PanelView {
                 <td>
                   <a href="gene/${
                     symbol.id
-                  }" target="_blank" class="hyper-text -internal">${
+                  }" target="_blank" rel="noopener noreferrer" class="hyper-text -internal">${
                     symbol.name
                   }</a>
                 </td>

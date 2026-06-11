@@ -115,6 +115,8 @@ class SearchField extends LitElement {
               part="input-field"
               ${ref(this._inputRef)}
               type="text"
+              name="q"
+              autocomplete="off"
               .placeholder=${this.placeholder}
               @input=${this._handleInput}
               required
