@@ -13,7 +13,11 @@
 // State Models & Regional Data Types
 // ============================================
 
-import type { MasterConditions, SimpleSearchCurrentConditions } from './search';
+import type {
+  MasterConditions,
+  SimpleSearchCurrentConditions,
+  SearchMode,
+} from './search';
 import type { ResultData } from './api';
 import type { ColumnConfig } from './components';
 
@@ -29,9 +33,17 @@ export type DisplayingRegions = {
 // Application State Schema
 // ============================================
 
+/** fetchData.ts で設定される検索結果のステータス */
+type SearchStatus = {
+  available: number;
+  filtered: number;
+  total: number;
+};
+
 export type StoreState = {
-  karyotype: any;
-  searchMode: any;
+  // TODO: KaryotypeState を types/ へ export して具体的な型に置き換える
+  karyotype: unknown;
+  searchMode: SearchMode;
   simpleSearchConditionsMaster: MasterConditions[];
   simpleSearchConditions: SimpleSearchCurrentConditions;
   columns: ColumnConfig[];
@@ -39,20 +51,23 @@ export type StoreState = {
   numberOfRecords: number;
   offset: number;
   rowCount: number;
-  appStatus: 'preparing' | 'searching' | 'normal'; //'preparing' | 'searching' | 'idle'に変更する?
+  appStatus: 'preparing' | 'searching' | 'normal';
   isLogin: boolean;
   isFetching: boolean;
   isStoreUpdating: boolean;
   selectedRow?: number;
-  advancedSearchConditions?: any;
+  // TODO: AdvancedSearchConditions の型を整理して具体的な型に置き換える
+  advancedSearchConditions?: unknown;
   advancedSearchURLTooLong?: boolean;
   advancedSearchRestoredFromURL?: boolean;
-  searchMessages?: any;
-  searchStatus?: any;
-  statisticsDataset?: any;
-  statisticsSignificance?: any;
-  statisticsType?: any;
-  statisticsConsequence?: any;
+  // TODO: searchMessages の形（オブジェクト or 空文字）を統一して具体的な型に置き換える
+  searchMessages?: unknown;
+  searchStatus?: SearchStatus;
+  // TODO: statistics 系は API レスポンスの型定義が揃い次第具体的な型に置き換える
+  statisticsDataset?: unknown;
+  statisticsSignificance?: unknown;
+  statisticsType?: unknown;
+  statisticsConsequence?: unknown;
   showModal?: boolean;
   displayingRegionsOnChromosome?: {
     [key: string]: { start: number; end: number };

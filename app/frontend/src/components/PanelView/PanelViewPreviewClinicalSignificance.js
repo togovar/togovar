@@ -2,6 +2,88 @@ import PanelView from './PanelView.ts';
 import { storeManager } from '../../store/StoreManager';
 import { getSimpleSearchConditionMaster } from '../../store/searchManager';
 
+/**
+ * MedGen IDをキーにエントリを統合し、解釈ごとにソースのSetを持つ構造に変換する。
+ * 同じ疾患・解釈を複数ソース（ClinVar・MGeND）から重複なく集約するためモジュールスコープに置く
+ */
+function mergeByMedgen(data) {
+  const merged = {};
+
+  data.forEach((entry) => {
+    if (entry.source === 'mgend') {
+      if (entry.conditions.length === 0) {
+        entry.conditions.push({ name: 'others', medgen: '' });
+      }
+    }
+
+    entry.conditions.forEach((condition) => {
+      const medgen = condition.medgen;
+      const medgenName = condition.name;
+
+      if (!merged[medgen]) {
+        merged[medgen] = {
+          name: medgenName,
+          interpretations: {},
+        };
+      }
+
+      entry.interpretations.forEach((interpretation) => {
+        if (!merged[medgen].interpretations[interpretation]) {
+          merged[medgen].interpretations[interpretation] = new Set([
+            entry.source,
+          ]);
+        } else {
+          merged[medgen].interpretations[interpretation].add(entry.source);
+        }
+      });
+    });
+  });
+
+  const results = Object.keys(merged).map((medgen) => ({
+    medgen,
+    name: merged[medgen].name,
+    interpretations: Object.keys(merged[medgen].interpretations).map(
+      (interpretation) => ({
+        interpretation,
+        sources: Array.from(merged[medgen].interpretations[interpretation]),
+      })
+    ),
+  }));
+
+  return groupAndSortByInterpretation(results);
+}
+
+/**
+ * interpretationキーでグループ化し、グループ内をname順にソートする。
+ * 同じ解釈分類のエントリをまとめて表示するために使う
+ */
+function groupAndSortByInterpretation(data) {
+  const grouped = {};
+
+  data.forEach((entry) => {
+    let interpretationKeys = [];
+    entry.interpretations.forEach((interpretationObj) => {
+      interpretationKeys.push(interpretationObj.interpretation);
+    });
+
+    if (!grouped[interpretationKeys]) {
+      grouped[interpretationKeys] = [];
+    }
+    grouped[interpretationKeys].push(entry);
+    interpretationKeys = [];
+  });
+
+  Object.keys(grouped).forEach((key) => {
+    grouped[key] = grouped[key].sort((a, b) => {
+      const nameA = a.name || '';
+      const nameB = b.name || '';
+      return nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
+    });
+  });
+
+  return Object.values(grouped).flat();
+}
+
 export default class PanelViewPreviewClinicalSignificance extends PanelView {
   constructor(elm) {
     super(elm, 'clinicalSignificance');
@@ -26,99 +108,6 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
         const master = getSimpleSearchConditionMaster('significance');
 
         const deepClone = structuredClone(record.significance);
-
-        function mergeByMedgen(data) {
-          const merged = {};
-
-          data.forEach((entry) => {
-            // 'mgend' ソースのエントリで conditions が空の場合、デフォルト値を追加
-            if (entry.source === 'mgend') {
-              if (entry.conditions.length === 0) {
-                entry.conditions.push({ name: 'others', medgen: '' });
-              }
-            }
-
-            entry.conditions.forEach((condition) => {
-              const medgen = condition.medgen;
-              const medgenName = condition.name;
-
-              // MedGen ID がまだ統合結果に存在しない場合、初期化
-              if (!merged[medgen]) {
-                merged[medgen] = {
-                  name: medgenName,
-                  interpretations: {}, // interpretationsごとにsourceを管理
-                };
-              }
-
-              entry.interpretations.forEach((interpretation) => {
-                // 解釈がまだ存在しなければSetで初期化（ソースの一意な集合を保存）
-                if (!merged[medgen].interpretations[interpretation]) {
-                  merged[medgen].interpretations[interpretation] = new Set([
-                    entry.source,
-                  ]);
-                } else {
-                  // すでに存在する解釈にはソースを追加
-                  merged[medgen].interpretations[interpretation].add(
-                    entry.source
-                  );
-                }
-              });
-            });
-          });
-
-          //最終的にSetを配列に変換して、オブジェクトから配列形式に変換
-          const results = Object.keys(merged).map((medgen) => ({
-            medgen,
-            name: merged[medgen].name,
-            interpretations: Object.keys(merged[medgen].interpretations).map(
-              (interpretation) => ({
-                interpretation,
-                sources: Array.from(
-                  merged[medgen].interpretations[interpretation]
-                ),
-              })
-            ),
-          }));
-
-          // return results
-          return groupAndSortByInterpretation(results);
-        }
-
-        function groupAndSortByInterpretation(data) {
-          // グループ化のためのオブジェクト
-          const grouped = {};
-
-          data.forEach((entry) => {
-            // 各エントリのinterpretationsを処理
-            let interpretationKeys = [];
-            entry.interpretations.forEach((interpretationObj) => {
-              interpretationKeys.push(interpretationObj.interpretation);
-            });
-
-            // interpretationKeyがまだ存在しない場合は初期化
-            if (!grouped[interpretationKeys]) {
-              grouped[interpretationKeys] = [];
-            }
-            // 現在のentryを該当するinterpretationグループに追加
-            grouped[interpretationKeys].push(entry);
-            interpretationKeys = [];
-          });
-
-          // 各グループをnameでソート
-          Object.keys(grouped).forEach((key) => {
-            grouped[key] = grouped[key].sort((a, b) => {
-              const nameA = a.name || ''; // 空文字列対策
-              const nameB = b.name || '';
-              return nameA.localeCompare(nameB, undefined, {
-                sensitivity: 'base',
-              });
-            });
-          });
-
-          return Object.values(grouped).flat();
-        }
-
-        // 関数の実行
         const significanceDataset = mergeByMedgen(deepClone);
         html = significanceDataset
           .map((data) => {

@@ -173,5 +173,6 @@ export type FrequencyElement = FrequencyBlockElement;
 export type ResultsRecord = {
   chromosome: string;
   start: number;
-  [key: string]: any;
+  // TODO: APIレスポンスの実際のキーを調査して具体的な型に置き換える
+  [key: string]: unknown;
 };
