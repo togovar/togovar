@@ -1,30 +1,56 @@
-import PanelView from './PanelView.ts';
+import PanelView from './PanelView';
 import { storeManager } from '../../store/StoreManager';
 import { getSimpleSearchConditionMaster } from '../../store/searchManager';
+import { selectRequired } from '../../utils/dom/select';
+import type { Significance } from '../../types/api';
+import type { MasterConditionItem } from '../../types';
+
+// ----------------------------------------
+// 型定義
+// ----------------------------------------
+
+/** 解釈ラベルと、その解釈を報告しているソース一覧 */
+type InterpretationWithSources = {
+  interpretation: string;
+  sources: string[];
+};
+
+/** mergeByMedgen が返す MedGen エントリ1件 */
+type MergedResult = {
+  medgen: string;
+  name: string;
+  interpretations: InterpretationWithSources[];
+};
+
+/** mergeByMedgen 内部でのみ使う集約中間構造 */
+type MergedIntermediate = {
+  name: string;
+  /** 解釈ラベル → 報告ソースの Set（重複排除のため Set を使う） */
+  interpretations: Record<string, Set<string>>;
+};
+
+// ----------------------------------------
+// モジュールスコープ関数
+// ----------------------------------------
 
 /**
  * MedGen IDをキーにエントリを統合し、解釈ごとにソースのSetを持つ構造に変換する。
  * 同じ疾患・解釈を複数ソース（ClinVar・MGeND）から重複なく集約するためモジュールスコープに置く
  */
-function mergeByMedgen(data) {
-  const merged = {};
+function mergeByMedgen(data: Significance[]): MergedResult[] {
+  const merged: Record<string, MergedIntermediate> = {};
 
   data.forEach((entry) => {
-    if (entry.source === 'mgend') {
-      if (entry.conditions.length === 0) {
-        entry.conditions.push({ name: 'others', medgen: '' });
-      }
+    // MGeND は conditions が空の場合に "others" を補完する仕様
+    if (entry.source === 'mgend' && entry.conditions.length === 0) {
+      entry.conditions.push({ name: 'others', medgen: '' });
     }
 
     entry.conditions.forEach((condition) => {
-      const medgen = condition.medgen;
-      const medgenName = condition.name;
+      const { medgen, name: medgenName } = condition;
 
       if (!merged[medgen]) {
-        merged[medgen] = {
-          name: medgenName,
-          interpretations: {},
-        };
+        merged[medgen] = { name: medgenName, interpretations: {} };
       }
 
       entry.interpretations.forEach((interpretation) => {
@@ -39,7 +65,7 @@ function mergeByMedgen(data) {
     });
   });
 
-  const results = Object.keys(merged).map((medgen) => ({
+  const results: MergedResult[] = Object.keys(merged).map((medgen) => ({
     medgen,
     name: merged[medgen].name,
     interpretations: Object.keys(merged[medgen].interpretations).map(
@@ -57,24 +83,23 @@ function mergeByMedgen(data) {
  * interpretationキーでグループ化し、グループ内をname順にソートする。
  * 同じ解釈分類のエントリをまとめて表示するために使う
  */
-function groupAndSortByInterpretation(data) {
-  const grouped = {};
+function groupAndSortByInterpretation(data: MergedResult[]): MergedResult[] {
+  const grouped: Record<string, MergedResult[]> = {};
 
   data.forEach((entry) => {
-    let interpretationKeys = [];
-    entry.interpretations.forEach((interpretationObj) => {
-      interpretationKeys.push(interpretationObj.interpretation);
-    });
+    // 解釈ラベル配列を文字列キーに変換して分類する（JSの暗黙変換と同等の動作）
+    const key = entry.interpretations
+      .map((i) => i.interpretation)
+      .join(',');
 
-    if (!grouped[interpretationKeys]) {
-      grouped[interpretationKeys] = [];
+    if (!grouped[key]) {
+      grouped[key] = [];
     }
-    grouped[interpretationKeys].push(entry);
-    interpretationKeys = [];
+    grouped[key].push(entry);
   });
 
   Object.keys(grouped).forEach((key) => {
-    grouped[key] = grouped[key].sort((a, b) => {
+    grouped[key].sort((a, b) => {
       const nameA = a.name || '';
       const nameB = b.name || '';
       return nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
@@ -84,23 +109,37 @@ function groupAndSortByInterpretation(data) {
   return Object.values(grouped).flat();
 }
 
+// ----------------------------------------
+// クラス定義
+// ----------------------------------------
+
+/**
+ * 臨床的意義（ClinicalSignificance）プレビューパネル。
+ * selectedRow / offset の変化で選択バリアントの significance を再描画する
+ */
 export default class PanelViewPreviewClinicalSignificance extends PanelView {
-  constructor(elm) {
+  private content: Element;
+
+  constructor(elm: Element) {
     super(elm, 'clinicalSignificance');
     storeManager.bind('selectedRow', this);
     storeManager.bind('offset', this);
-    this.content = this.elm.querySelector('.content');
+    // テンプレート崩れを早期検出するため、存在必須要素は selectRequired で取得する
+    this.content = selectRequired(this.elm, '.content', 'PanelViewPreviewClinicalSignificance');
   }
 
-  selectedRow() {
+  /** storeManager.bind により selectedRow 変化時に呼ばれる */
+  selectedRow(): void {
     this.update();
   }
 
-  offset() {
+  /** storeManager.bind により offset 変化時に呼ばれる（ページ送りで行選択が変わるため） */
+  offset(): void {
     this.update();
   }
 
-  update() {
+  /** 選択行の significance データを取得し、HTML を再構築してパネルに反映する */
+  update(): void {
     let html = '';
     if (storeManager.getData('selectedRow') !== undefined) {
       const record = storeManager.getSelectedRecord();
@@ -131,9 +170,10 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
                 interpretation.interpretation
               }">
                 ${
-                  master.items.find(
-                    (item) => item.id === interpretation.interpretation
-                  ).label
+                  master!.items!.find(
+                    (item: MasterConditionItem) =>
+                      item.id === interpretation.interpretation
+                  )!.label
                 }
               </div>
               <div class="disease-category">

@@ -15,7 +15,7 @@ import PreviewToVariantReport from './components/PanelView/PreviewToVariantRepor
 import PanelViewPreviewExternalLinks from './components/PanelView/PanelViewPreviewExternalLinks.js';
 import PanelViewPreviewAlternateAlleleFrequencies from './components/PanelView/PanelViewPreviewAlternateAlleleFrequencies.js';
 import PanelViewPreviewConsequence from './components/PanelView/PanelViewPreviewConsequence.js';
-import PanelViewPreviewClinicalSignificance from './components/PanelView/PanelViewPreviewClinicalSignificance.js';
+import PanelViewPreviewClinicalSignificance from './components/PanelView/PanelViewPreviewClinicalSignificance';
 import FloatingInfo from './components/FloatingInfo';
 import qs from 'qs';
 import { extractSearchCondition } from './store/searchManager';
