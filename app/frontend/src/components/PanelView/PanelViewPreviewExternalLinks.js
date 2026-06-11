@@ -80,7 +80,7 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
   #createLinkList(title, label, url) {
     const content = `
       <ul>
-        <li><a href="${url}" class="hyper-text -external" target="_blank">${label}</a></li>
+        <li><a href="${url}" class="hyper-text -external" target="_blank" rel="noopener noreferrer">${label}</a></li>
       </ul>`;
     return { title, content };
   }

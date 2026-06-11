@@ -156,7 +156,7 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
           ${
             data.medgen === 'undefined' || data.medgen === ''
               ? data.name
-              : `<a href="/disease/${data.medgen}" target="_blank" class="hyper-text -internal">
+              : `<a href="/disease/${data.medgen}" target="_blank" rel="noopener noreferrer" class="hyper-text -internal">
               ${data.name}</a>`
           }
           </dt>
