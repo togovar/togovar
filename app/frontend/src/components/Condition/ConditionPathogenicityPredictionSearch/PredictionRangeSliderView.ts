@@ -233,6 +233,7 @@ export class PredictionRangeSlider extends LitElement {
     ) => html`
       <input
         type="number"
+        name=${`${this.predictionScoreName}-${className}`}
         class=${className}
         title=${title}
         .value=${String(value)}
@@ -247,6 +248,7 @@ export class PredictionRangeSlider extends LitElement {
     const createRangeInput = (className: 'from' | 'to', value: number) => html`
       <input
         type="range"
+        name=${`${this.predictionScoreName}-${className}-range`}
         class=${className}
         .value=${String(value)}
         min=${SLIDER_CONFIG.min}
