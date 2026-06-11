@@ -218,12 +218,6 @@ const config = {
         loader: 'csv-loader',
         exclude: /node_modules/,
       },
-      {
-        test: /\.json$/,
-        type: 'javascript/auto',
-        loader: 'json-loader',
-        exclude: /node_modules/,
-      },
     ],
   },
   plugins: [
