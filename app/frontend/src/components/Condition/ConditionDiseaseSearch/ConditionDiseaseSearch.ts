@@ -59,11 +59,23 @@ export class ConditionDiseaseSearch extends LitElement {
 
   /**
    * id 属性を設定してスクリーンリーダーや CSS セレクターからの参照を可能にする。
-   * connectedCallback で行うことで DOM 接続後に確実に付与される。
+   * 既存の id を上書きしないことで、複数インスタンスが存在する場合の id 重複を防ぐ。
    */
   override connectedCallback(): void {
     super.connectedCallback();
-    this.setAttribute('id', 'ConditionDiseaseSearch');
+    if (!this.id) this.id = 'ConditionDiseaseSearch';
+  }
+
+  /**
+   * 切り離し時にローディングタイマーをキャンセルする。
+   * タイマーが残ったまま要素が破棄されると、切り離し後に loading が true へ更新され得るため。
+   */
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    if (this._timer !== null) {
+      clearTimeout(this._timer);
+      this._timer = null;
+    }
   }
 
   /**
@@ -111,13 +123,18 @@ export class ConditionDiseaseSearch extends LitElement {
     }
   }
 
+  /** SearchFieldWithSuggestions の options は参照同一性で更新判定されるため、毎回オブジェクトを生成しない。 */
+  private static readonly _SUGGEST_OPTIONS = {
+    valueMappings: { valueKey: 'id', labelKey: 'label' },
+  } as const;
+
   /** サジェスト入力欄とオントロジーツリーを並べたコンポーネントの骨格を描画する。 */
   override render(): TemplateResult {
     return html`
       <search-field-with-suggestions
         .suggestAPIURL=${suggestAPI}
         .suggestAPIQueryParam=${'term'}
-        .options=${{ valueMappings: { valueKey: 'id', labelKey: 'label' } }}
+        .options=${ConditionDiseaseSearch._SUGGEST_OPTIONS}
         .placeholder=${'Breast-ovarian cancer, familial 2'}
         @new-suggestion-selected=${this._changeDiseaseEventHandler}
       ></search-field-with-suggestions>
