@@ -333,10 +333,21 @@ export class ConditionDiseaseOntologyView extends LitElement {
    */
   private _fetchNode(id: string): void {
     this._loadingStarted();
-    this.api.get<OntologyNode>(`/disease?node=${id}`).then(({ data }) => {
-      this.data = data;
-      this._loadingEnded();
-    });
+    this.api
+      .get<OntologyNode>(`/disease?node=${id}`)
+      .then(({ data }) => {
+        this.data = data;
+        this._loadingEnded();
+      })
+      .catch((error) => {
+        console.error(
+          '[condition-disease-ontology-view] Failed to fetch node:',
+          error
+        );
+        this.dispatchEvent(
+          new CustomEvent('loading-ended', { bubbles: true, composed: true })
+        );
+      });
   }
 
   /**
@@ -353,18 +364,29 @@ export class ConditionDiseaseOntologyView extends LitElement {
     this.scrolledRect = event.detail?.rect ?? null;
     this._loadingStarted();
 
-    this.api.get<OntologyNode>(`/disease?node=${event.detail.id}`).then(({ data }) => {
-      this.data = data;
-      this._loadingEnded();
-      void this.updateComplete.then(() => {
-        if (event.detail.role === 'children') {
-          this.movement = 'left';
-          this._columns = ['_parents', 'parents', 'hero', 'children'];
-        } else if (event.detail.role === 'parents') {
-          this.movement = 'right';
-          this._columns = ['parents', 'hero', 'children', '_children'];
-        }
+    this.api
+      .get<OntologyNode>(`/disease?node=${event.detail.id}`)
+      .then(({ data }) => {
+        this.data = data;
+        this._loadingEnded();
+        void this.updateComplete.then(() => {
+          if (event.detail.role === 'children') {
+            this.movement = 'left';
+            this._columns = ['_parents', 'parents', 'hero', 'children'];
+          } else if (event.detail.role === 'parents') {
+            this.movement = 'right';
+            this._columns = ['parents', 'hero', 'children', '_children'];
+          }
+        });
+      })
+      .catch((error) => {
+        console.error(
+          '[condition-disease-ontology-view] Failed to fetch node:',
+          error
+        );
+        this.dispatchEvent(
+          new CustomEvent('loading-ended', { bubbles: true, composed: true })
+        );
       });
-    });
   }
 }

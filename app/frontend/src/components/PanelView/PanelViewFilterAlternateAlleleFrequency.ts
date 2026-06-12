@@ -23,8 +23,6 @@ type FrequencyCondition = NonNullable<SimpleSearchCurrentConditions['frequency']
 export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
   /** デフォルト値の参照に使用するマスター定義 */
   private _conditionMaster: MasterConditions;
-  /** 生成した range-slider 要素への参照 */
-  private _rangeSelectorView: RangeSliderElement;
 
   /** RangeSlider の生成と Store 購読を constructor に集約し、パネル初期化の流れを1箇所で把握できるようにする。 */
   constructor(elm: Element) {
@@ -53,7 +51,6 @@ export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
     });
 
     this.elm.querySelector<HTMLElement>('.range-selector-view')!.appendChild(rangeSlider);
-    this._rangeSelectorView = rangeSlider;
 
     storeManager.bind('simpleSearchConditions', this);
   }
