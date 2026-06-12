@@ -228,8 +228,11 @@ export class ResultsColumnResizeController {
 
     const x = this._lastPointerX;
     const y = this._lastPointerY;
-    // pointerup 後の DOM 状態で、まだ resize-bar 上にいるかを確認する。
+    // pointerup と同タスクの click が処理された後に実行されるため、
+    // click が発火しなかった場合（テーブル外で離す等）のフラグ残留をここで解消する。
+    // click が発火した場合はキャプチャハンドラーが先にクリア済みなので no-op になる。
     requestAnimationFrame(() => {
+      this._wasDragging = false;
       if (!document.elementFromPoint(x, y)?.closest('.resize-bar')) {
         delete this._tablecontainer.dataset.resizeHover;
       }
