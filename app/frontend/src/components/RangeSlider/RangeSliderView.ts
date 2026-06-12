@@ -306,9 +306,12 @@ export class RangeSlider extends HTMLElement {
     if (value !== 'simple') return;
 
     const matchSelector = createSearchTypeSimple();
-    this._selectShadowElement<HTMLElement>('.wrapper').appendChild(
-      matchSelector
+    const currentMatch = this.state.match;
+    const initial = matchSelector.querySelector<HTMLInputElement>(
+      `input[name="match"][value="${currentMatch}"]`
     );
+    if (initial) initial.checked = true;
+    this._selectShadowElement<HTMLElement>('.wrapper').appendChild(matchSelector);
     matchSelector.addEventListener('click', (e) => {
       if (!(e.target instanceof HTMLInputElement)) return;
 
