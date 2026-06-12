@@ -50,10 +50,13 @@ export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
     rangeSlider.searchType = 'simple';
     rangeSlider.lazy = true;
 
-    rangeSlider.addEventListener('range-changed', (e) => {
-      e.stopPropagation();
-      this.changeParameter(e.detail);
-    });
+    rangeSlider.addEventListener(
+      'range-changed',
+      (e: CustomEvent<RangeSliderData>) => {
+        e.stopPropagation();
+        this.changeParameter(e.detail);
+      }
+    );
 
     this.elm
       .querySelector<HTMLElement>('.range-selector-view')!
@@ -116,7 +119,10 @@ export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
         .map((item) => [item.id, item.default])
     ) as Partial<Record<keyof FrequencyCondition, unknown>>;
 
-    const merged = { ...defaults, ...(stored ?? {}) } as Record<string, unknown>;
+    const merged = { ...defaults, ...(stored ?? {}) } as Record<
+      string,
+      unknown
+    >;
 
     const parseNum = (value: unknown, fallback: number): number => {
       const num =
