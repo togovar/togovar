@@ -53,6 +53,8 @@ export class ResultsColumnResizeController {
   private _columnBorderStylesheet!: HTMLStyleElement;
   /** 現在のドラッグリサイズ状態。リサイズ中でなければ null */
   private _resizeState: ColumnResizeState | null = null;
+  /** ドラッグが発生したことを示すフラグ。pointerup 後の click を一度だけ抑制するために使う */
+  private _wasDragging = false;
   /** 最後に観測したポインターX座標。drag 終了後の hover 判定で使う */
   private _lastPointerX = 0;
   /** 最後に観測したポインターY座標。drag 終了後の hover 判定で使う */
@@ -77,6 +79,11 @@ export class ResultsColumnResizeController {
     this._boundColumnResizeEnd = this._endColumnResize.bind(this);
     this._boundAutoSizeColumnOnDblClick = this._onResizeBarDblClick.bind(this);
     this._boundStopClickOnResizeBar = (e: MouseEvent) => {
+      if (this._wasDragging) {
+        this._wasDragging = false;
+        e.stopPropagation();
+        return;
+      }
       if ((e.target as HTMLElement).closest('.resize-bar')) e.stopPropagation();
     };
     this._boundResizeHoverOver = this._onResizeHoverOver.bind(this);
@@ -191,6 +198,7 @@ export class ResultsColumnResizeController {
     if (!this._resizeState) return;
 
     e.preventDefault();
+    this._wasDragging = true;
     this._lastPointerX = e.clientX;
     this._lastPointerY = e.clientY;
 

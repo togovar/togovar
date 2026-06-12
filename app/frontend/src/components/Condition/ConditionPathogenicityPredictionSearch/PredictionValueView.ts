@@ -49,10 +49,6 @@ export class PredictionValueView extends LitElement {
   @queryAll('.inequality-sign')
   private _inequalitySignsEl!: NodeListOf<HTMLElement>;
 
-  firstUpdated(): void {
-    this._setBarStyles();
-  }
-
   /** Inject UI values from outside */
   setValues(
     dataset: PredictionKey,
@@ -69,12 +65,16 @@ export class PredictionValueView extends LitElement {
 
     this._label = PREDICTIONS[this._dataset].label;
     this._activeDataset = PREDICTIONS[this._dataset].threshold;
+  }
 
+  /**
+   * @state の変化ごとに呼ばれるため、setValues より先に呼ばれる firstUpdated では
+   * なく updated でまとめて DOM 操作することで、未レンダリング時のクラッシュを防ぐ。
+   */
+  updated(): void {
+    this._setBarStyles();
     setInequalitySign(this._inequalitySignsEl[0], this._inequalitySigns[0]);
     setInequalitySign(this._inequalitySignsEl[1], this._inequalitySigns[1]);
-
-    this._setBarStyles();
-    this.requestUpdate();
   }
 
   private _setBarStyles(): void {
