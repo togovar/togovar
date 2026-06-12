@@ -13,7 +13,7 @@ import {
   CONDITION_TYPE,
   type ConditionTypeValue,
 } from '../../definition';
-import { keyDownEvent } from '../../utils/keyDownEvent.js';
+import { keyDownEvent } from '../../utils/keyDownEvent';
 import { buildQueryFragment } from './queryBuilders';
 import { createEl } from '../../utils/dom/createEl';
 import type { AdvancedSearchBuilderView } from '../AdvancedSearch/AdvancedSearchBuilderView';
