@@ -52,7 +52,7 @@ export default class PanelViewPreviewGene extends PanelView {
     }
 
     const record = storeManager.getSelectedRecord();
-    if (!record || !record.symbols || record.symbols.length === 0) {
+    if (!record || !record.genes || record.genes.length === 0) {
       this._table.innerHTML = '';
       return;
     }
@@ -70,11 +70,11 @@ export default class PanelViewPreviewGene extends PanelView {
             "'": '&#39;',
           })[ch] as string
       );
-    this._table.innerHTML = record.symbols
+    this._table.innerHTML = record.genes
       .map((symbol) => {
         const name = escapeHtml(symbol.name);
         const aliases =
-          symbol.synonyms.length === 0
+          !symbol.synonyms || symbol.synonyms.length === 0
             ? ''
             : `<tr><th>Alias</th><td>${symbol.synonyms.map(escapeHtml).join(', ')}</td></tr>`;
         return (

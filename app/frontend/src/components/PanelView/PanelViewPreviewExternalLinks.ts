@@ -57,23 +57,32 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
     const record = storeManager.getSelectedRecord();
     if (!record) return;
 
-    const { external_link } = record;
-    if (!external_link) return;
+    const { external_links } = record;
+    if (!external_links) return;
     const list: LinkListEntry[] = [
-      ...(external_link.dbsnp?.map((item) =>
+      ...(external_links.dbsnp?.map((item) =>
         this._createLinkEntry('refSNP', item.title, item.xref)
       ) ?? []),
-      ...(external_link.mgend?.map((item) =>
+      ...(external_links.mgend?.map((item) =>
         this._createLinkEntry('MGeND', item.title, item.xref)
       ) ?? []),
-      ...(external_link.clinvar?.map((item) =>
+      ...(external_links.clinvar?.map((item) =>
         this._createLinkEntry('ClinVar', item.title, item.xref)
       ) ?? []),
-      ...(external_link.tommo?.map((item) =>
+      ...(external_links.tommo?.map((item) =>
         this._createLinkEntry('ToMMo', item.title, item.xref)
       ) ?? []),
-      ...(external_link.gnomad?.map((item) =>
+      ...(external_links.gnomad?.map((item) =>
         this._createLinkEntry('gnomAD', item.title, item.xref)
+      ) ?? []),
+      ...(external_links.jogo?.map((item) =>
+        this._createLinkEntry('JoGo', item.title, item.xref)
+      ) ?? []),
+      ...(external_links.gnomad_sv?.map((item) =>
+        this._createLinkEntry('gnomAD SV', item.title, item.xref)
+      ) ?? []),
+      ...(external_links.sscv_db?.map((item) =>
+        this._createLinkEntry('SSCV-DB', item.title, item.xref)
       ) ?? []),
     ];
 

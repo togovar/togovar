@@ -429,7 +429,7 @@ export class ResultsRowView {
         ResultsColumnUpdater.updateGene(
           this.geneContent,
           this.geneRemains,
-          result.symbols
+          result.genes
         ),
       alt_frequency: () =>
         ResultsColumnUpdater.updateAltFrequency(

@@ -116,6 +116,7 @@ export type Column = {
  */
 export type ResultData = {
   id: string;
+  sv?: boolean;
   type: string;
   chromosome: string;
   position: number;
@@ -123,34 +124,29 @@ export type ResultData = {
   stop: number;
   reference: string;
   alternate: string;
-  vcf: Vcf;
   existing_variations: string[];
-  symbols: GeneSymbol[];
-  external_link: ExternalLink;
+  genes: GeneSymbol[];
+  external_links: ExternalLink;
   significance: Significance[];
   most_severe_consequence: string;
   sift: number;
   polyphen: number;
   alphamissense: number;
+  cadd_phred?: number;
+  sscv_db?: SscvDbItem[];
   transcripts: Transcript[];
   frequencies: Frequency[];
-};
-
-/** VCF形式の座標・アレル情報。position は VCF の POS カラム、reference/alternate は REF/ALT に対応する。 */
-export type Vcf = {
-  position: number;
-  reference: string;
-  alternate: string;
 };
 
 /**
  * バリアントに関連する遺伝子シンボル。
  * synonyms は同じ遺伝子の別名一覧で、検索・表示時の名寄せに使う。
+ * バリアントによっては synonyms が存在しない場合があるためオプショナルにしている。
  */
 export type GeneSymbol = {
   name: string;
   id: number;
-  synonyms: string[];
+  synonyms?: string[];
 };
 
 /**
@@ -163,6 +159,18 @@ export type ExternalLink = {
   clinvar?: ExternalLinkItem[];
   tommo?: ExternalLinkItem[];
   gnomad?: ExternalLinkItem[];
+  jogo?: ExternalLinkItem[];
+  gnomad_sv?: ExternalLinkItem[];
+  sscv_db?: ExternalLinkItem[];
+};
+
+/**
+ * SSCV-DB のスプライシング予測情報。
+ * external_links.sscv_db（URLリンク）とは別に、予測結果の詳細を持つトップレベルの配列。
+ */
+export type SscvDbItem = {
+  variant: string;
+  predicted_splicing_type: string;
 };
 
 /** 外部リンク1件分。title は表示ラベル、xref はリンク先の識別子。 */
