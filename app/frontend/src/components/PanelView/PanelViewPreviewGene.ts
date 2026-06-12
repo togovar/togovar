@@ -55,18 +55,28 @@ export default class PanelViewPreviewGene extends PanelView {
       return;
     }
 
+    const escapeHtml = (value: string): string =>
+      value.replace(
+        /[&<>"']/g,
+        (ch) =>
+          ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch] as string)
+      );
     this._table.innerHTML = record.symbols
-      .map(
-        (symbol) =>
+      .map((symbol) => {
+        const name = escapeHtml(symbol.name);
+        const aliases =
+          symbol.synonyms.length === 0
+            ? ''
+            : `<tr><th>Alias</th><td>${symbol.synonyms.map(escapeHtml).join(', ')}</td></tr>`;
+        return (
           `<tbody>` +
           `<tr><th>Symbol</th><td>` +
-          `<a href="/gene/${encodeURIComponent(String(symbol.id))}" target="_blank" rel="noopener noreferrer" class="hyper-text -internal">${symbol.name}</a>` +
+          `<a href="/gene/${encodeURIComponent(String(symbol.id))}" target="_blank" rel="noopener noreferrer" class="hyper-text -internal">${name}</a>` +
           `</td></tr>` +
-          (symbol.synonyms.length === 0
-            ? ''
-            : `<tr><th>Alias</th><td>${symbol.synonyms.join(', ')}</td></tr>`) +
+          aliases +
           `</tbody>`
-      )
+        );
+      })
       .join('');
 
     this.elm.classList.remove('-notfound');

@@ -93,9 +93,27 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
     label: ExternalLinkItem['title'],
     url: ExternalLinkItem['xref']
   ): LinkListEntry {
+    const escapeHtml = (value: string): string =>
+      value.replace(
+        /[&<>"']/g,
+        (ch) =>
+          ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch] as string)
+      );
+    const safeLabel = escapeHtml(String(label));
+    let safeUrl = '';
+    try {
+      const parsed = new URL(String(url), window.location.href);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+        safeUrl = parsed.toString();
+      }
+    } catch {
+      // ignore invalid URLs
+    }
     return {
       title,
-      content: `<ul><li><a href="${url}" class="hyper-text -external" target="_blank" rel="noopener noreferrer">${label}</a></li></ul>`,
+      content: safeUrl
+        ? `<ul><li><a href="${safeUrl}" class="hyper-text -external" target="_blank" rel="noopener noreferrer">${safeLabel}</a></li></ul>`
+        : `<ul><li>${safeLabel}</li></ul>`,
     };
   }
 }
