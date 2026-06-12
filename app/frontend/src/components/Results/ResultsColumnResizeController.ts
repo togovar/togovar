@@ -96,7 +96,7 @@ export class ResultsColumnResizeController {
     );
     this._thead.removeEventListener('dblclick', this._boundAutoSizeColumnOnDblClick);
     this._tbody.removeEventListener('dblclick', this._boundAutoSizeColumnOnDblClick);
-    this._tbody.removeEventListener('click', this._boundStopClickOnResizeBar);
+    this._tbody.removeEventListener('click', this._boundStopClickOnResizeBar, true);
     document.removeEventListener('pointermove', this._boundColumnResizeMove);
     document.removeEventListener('pointerup', this._boundColumnResizeEnd);
     document.removeEventListener('pointercancel', this._boundColumnResizeEnd);
@@ -130,7 +130,9 @@ export class ResultsColumnResizeController {
     this._tbody.addEventListener('pointerdown', this._boundColumnResizeStart);
     this._thead.addEventListener('dblclick', this._boundAutoSizeColumnOnDblClick);
     this._tbody.addEventListener('dblclick', this._boundAutoSizeColumnOnDblClick);
-    this._tbody.addEventListener('click', this._boundStopClickOnResizeBar);
+    // キャプチャフェーズで登録することで、tr のサイドバーハンドラーより先に伝播を止める。
+    // バブリング登録だと tbody に届いた時点でサイドバー側がすでに実行済みになる。
+    this._tbody.addEventListener('click', this._boundStopClickOnResizeBar, true);
     document.addEventListener('pointermove', this._boundColumnResizeMove);
     document.addEventListener('pointerup', this._boundColumnResizeEnd);
     document.addEventListener('pointercancel', this._boundColumnResizeEnd);
