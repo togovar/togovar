@@ -13,7 +13,9 @@ import type {
 import type { RangeSliderData } from '../RangeSlider/RangeSliderTypes';
 
 /** アレル頻度フィルターパネルで扱う条件の型エイリアス */
-type FrequencyCondition = NonNullable<SimpleSearchCurrentConditions['frequency']>;
+type FrequencyCondition = NonNullable<
+  SimpleSearchCurrentConditions['frequency']
+>;
 
 /**
  * アレル頻度フィルターパネル。
@@ -50,7 +52,9 @@ export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
       this.changeParameter(e.detail);
     });
 
-    this.elm.querySelector<HTMLElement>('.range-selector-view')!.appendChild(rangeSlider);
+    this.elm
+      .querySelector<HTMLElement>('.range-selector-view')!
+      .appendChild(rangeSlider);
 
     storeManager.bind('simpleSearchConditions', this);
   }
@@ -68,9 +72,20 @@ export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
       // RangeSliderData.invert は boolean だが Store 側の frequency.invert は '0'/'1' 文字列を期待するため変換する
       invert:
         newCondition.invert !== undefined
-          ? (newCondition.invert ? '1' : '0')
+          ? newCondition.invert
+            ? '1'
+            : '0'
           : current.invert,
     };
+    // RangeSliderView は初期化時にも range-changed を発火するため、値が変わらない場合は検索を走らせない
+    if (
+      updated.from === current.from &&
+      updated.to === current.to &&
+      updated.match === current.match &&
+      updated.invert === current.invert
+    ) {
+      return;
+    }
     setSimpleSearchCondition('frequency', updated);
   }
 
@@ -79,8 +94,7 @@ export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
    * RangeSlider は内部で表示状態を管理するため、Store 変更を UI へ手動で反映する必要がない。
    * storeManager.bind で登録した購読を維持するために実装する。
    */
-  simpleSearchConditions(_conditions: SimpleSearchCurrentConditions): void {
-  }
+  simpleSearchConditions(_conditions: SimpleSearchCurrentConditions): void {}
 
   /**
    * Store から frequency 条件を取得し、未設定項目をマスターのデフォルトで補完して返す。
