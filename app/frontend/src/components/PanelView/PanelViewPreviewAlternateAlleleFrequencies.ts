@@ -158,10 +158,7 @@ export default class PanelViewPreviewAlternateAlleleFrequencies extends PanelVie
   }
 }
 
-/**
- * 文字列 str の idx 位置に val を挿入して返す。
- * 負の idx は末尾からの位置として機能し、小数点を末尾 N 桁前に挿入する用途に使う。
- */
+/** 小数点挿入など「末尾N桁前に文字を差し込む」用途が多いため、負の idx を末尾起点として扱えるようにしている。 */
 function strIns(str: string, idx: number, val: string): string {
   return str.slice(0, idx) + val + str.slice(idx);
 }
