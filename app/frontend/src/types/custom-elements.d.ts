@@ -22,6 +22,7 @@ declare global {
     inputStep: number;
     value1: string | number | null;
     value2: string | number | null;
+    lazy: boolean;
   }
   interface SearchFieldWithSuggestionsElement extends HTMLElement {
     showSuggestions: boolean;

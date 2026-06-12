@@ -395,10 +395,34 @@ export class RangeSlider extends HTMLElement {
     this._fireEvent();
   }
 
+  /**
+   * lazy 属性があるときは input（ドラッグ中）で視覚のみ更新し、
+   * change（リリース時）だけ range-changed を発火する。
+   * simple search で URL 変更・検索をリリース後に限定するために使う。
+   */
+  get lazy(): boolean {
+    return this.hasAttribute('lazy');
+  }
+
+  set lazy(value: boolean) {
+    if (value) {
+      this.setAttribute('lazy', '');
+    } else {
+      this.removeAttribute('lazy');
+    }
+  }
+
   /** イベント登録と解除の対応を保つため、接続時の登録処理を1箇所にまとめる。 */
   private _addEventListeners(): void {
-    this.slider1.addEventListener('input', this._slider1Input);
-    this.slider2.addEventListener('input', this._slider2Input);
+    if (this.lazy) {
+      this.slider1.addEventListener('input', this._slider1VisualUpdate);
+      this.slider2.addEventListener('input', this._slider2VisualUpdate);
+      this.slider1.addEventListener('change', this._sliderLazyCommit);
+      this.slider2.addEventListener('change', this._sliderLazyCommit);
+    } else {
+      this.slider1.addEventListener('input', this._slider1Input);
+      this.slider2.addEventListener('input', this._slider2Input);
+    }
     this.from.addEventListener('change', this._fromChange);
     this.to.addEventListener('change', this._toChange);
     this.invertChk.addEventListener('change', this._invertChange);
@@ -414,6 +438,25 @@ export class RangeSlider extends HTMLElement {
   private _slider2Input = (e: Event): void => {
     if (!(e.target instanceof HTMLInputElement)) return;
     this._updateRangeValue('to', e.target.value);
+  };
+
+  /** lazy モード: ドラッグ中は視覚のみ更新し range-changed を発火しない。 */
+  private _slider1VisualUpdate = (e: Event): void => {
+    if (!(e.target instanceof HTMLInputElement)) return;
+    setRangeValue(this.state, 'from', e.target.value);
+    this._syncInputsFromState();
+  };
+
+  /** lazy モード: ドラッグ中は視覚のみ更新し range-changed を発火しない。 */
+  private _slider2VisualUpdate = (e: Event): void => {
+    if (!(e.target instanceof HTMLInputElement)) return;
+    setRangeValue(this.state, 'to', e.target.value);
+    this._syncInputsFromState();
+  };
+
+  /** lazy モード: スライダーを放したときだけ range-changed を発火する。 */
+  private _sliderLazyCommit = (): void => {
+    this._fireEvent();
   };
 
   /** stateを唯一の正とし、2本のスライダー・数値入力・背景描画を同期する。 */
@@ -445,8 +488,15 @@ export class RangeSlider extends HTMLElement {
 
   /** DOMから外れた後に古い要素参照へイベントが残らないよう、接続時の登録を解除する。 */
   disconnectedCallback(): void {
-    this.slider1.removeEventListener('input', this._slider1Input);
-    this.slider2.removeEventListener('input', this._slider2Input);
+    if (this.lazy) {
+      this.slider1.removeEventListener('input', this._slider1VisualUpdate);
+      this.slider2.removeEventListener('input', this._slider2VisualUpdate);
+      this.slider1.removeEventListener('change', this._sliderLazyCommit);
+      this.slider2.removeEventListener('change', this._sliderLazyCommit);
+    } else {
+      this.slider1.removeEventListener('input', this._slider1Input);
+      this.slider2.removeEventListener('input', this._slider2Input);
+    }
     this.from.removeEventListener('change', this._fromChange);
     this.to.removeEventListener('change', this._toChange);
     this.invertChk.removeEventListener('change', this._invertChange);
