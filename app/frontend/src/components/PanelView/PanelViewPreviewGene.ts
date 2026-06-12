@@ -18,7 +18,9 @@ export default class PanelViewPreviewGene extends PanelView {
     super(elm, 'preview-gene');
     storeManager.bind('selectedRow', this);
     storeManager.bind('offset', this);
-    this._table = this.elm.querySelector<Element>('.content > .right-headline')!;
+    this._table = this.elm.querySelector<Element>(
+      '.content > .right-headline'
+    )!;
   }
 
   /**
@@ -50,7 +52,7 @@ export default class PanelViewPreviewGene extends PanelView {
     }
 
     const record = storeManager.getSelectedRecord();
-    if (!record || record.symbols.length === 0) {
+    if (!record || !record.symbols || record.symbols.length === 0) {
       this._table.innerHTML = '';
       return;
     }
@@ -59,7 +61,13 @@ export default class PanelViewPreviewGene extends PanelView {
       value.replace(
         /[&<>"']/g,
         (ch) =>
-          ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch] as string)
+          ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+          })[ch] as string
       );
     this._table.innerHTML = record.symbols
       .map((symbol) => {

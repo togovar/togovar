@@ -58,6 +58,7 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
     if (!record) return;
 
     const { external_link } = record;
+    if (!external_link) return;
     const list: LinkListEntry[] = [
       ...(external_link.dbsnp?.map((item) =>
         this._createLinkEntry('refSNP', item.title, item.xref)
