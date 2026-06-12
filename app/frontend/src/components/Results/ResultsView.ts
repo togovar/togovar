@@ -2,7 +2,7 @@ import { storeManager } from '../../store/StoreManager';
 import { getOrderedColumns } from '../../columns';
 import { ResultsScrollBar } from './ResultsScrollBar';
 import { ResultsColumnsDropdown } from './ResultsColumnsDropdown';
-import { keyDownEvent } from '../../utils/keyDownEvent.js';
+import { keyDownEvent } from '../../utils/keyDownEvent';
 import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
 import { ResultsViewDataManager } from './ResultsViewDataManager';
 import { ResultsColumnAutoSizer } from './ResultsColumnAutoSizer';

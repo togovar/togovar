@@ -495,12 +495,12 @@ export class ResultsColumnUpdater {
    */
   static updateFunctionPrediction(
     element: HTMLDivElement | null,
-    score: number | null,
+    score: number | null | undefined,
     classifyScore: (_score: number) => string
   ) {
     if (!element) return;
 
-    if (score === null) {
+    if (score == null) {
       element.textContent = '';
       element.dataset.function = '';
       return;
@@ -516,7 +516,7 @@ export class ResultsColumnUpdater {
    * @param element - 更新対象のdiv要素
    * @param score - AlphaMissenseスコア
    */
-  static updateAlphaMissense(element: HTMLDivElement | null, score: number) {
+  static updateAlphaMissense(element: HTMLDivElement | null, score: number | null | undefined) {
     this.updateFunctionPrediction(element, score, (_score) => {
       if (_score < 0.34) return 'LB';
       if (_score > 0.564) return 'LP';
@@ -530,7 +530,7 @@ export class ResultsColumnUpdater {
    * @param element - 更新対象のdiv要素
    * @param score - SIFTスコア
    */
-  static updateSift(element: HTMLDivElement | null, score: number) {
+  static updateSift(element: HTMLDivElement | null, score: number | null | undefined) {
     this.updateFunctionPrediction(element, score, (_score) =>
       _score >= 0.05 ? 'T' : 'D'
     );
@@ -542,7 +542,7 @@ export class ResultsColumnUpdater {
    * @param element - 更新対象のdiv要素
    * @param score - PolyPhenスコア
    */
-  static updatePolyphen(element: HTMLDivElement | null, score: number) {
+  static updatePolyphen(element: HTMLDivElement | null, score: number | null | undefined) {
     this.updateFunctionPrediction(element, score, (_score) => {
       if (_score > 0.908) return 'PROBD';
       if (_score > 0.446) return 'POSSD';

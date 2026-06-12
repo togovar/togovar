@@ -62,9 +62,15 @@
 // pathogenicity_predictionは子コンポーネント側で見た目を持つため、通常タグの枠を外す。
 :host([data-condition-type='pathogenicity_prediction']) {
   position: relative;
+  // dataset/genotypeと同様に、グラフコンポーネントを縦中央に揃えるため50%+translateYを使う。
+  prediction-value-view {
+    top: 50%;
+    transform: translateY(-50%);
+  }
   .inner {
     background-color: transparent;
     border: none;
+    padding: 0;
   }
 }
 

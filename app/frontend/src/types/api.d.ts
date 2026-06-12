@@ -159,6 +159,7 @@ export type GeneSymbol = {
  */
 export type ExternalLink = {
   dbsnp?: ExternalLinkItem[];
+  mgend?: ExternalLinkItem[];
   clinvar?: ExternalLinkItem[];
   tommo?: ExternalLinkItem[];
   gnomad?: ExternalLinkItem[];
