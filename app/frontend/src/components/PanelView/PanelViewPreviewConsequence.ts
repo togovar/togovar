@@ -70,11 +70,19 @@ export default class PanelViewPreviewConsequence extends PanelView {
 
     if (consequences.length === 0) return;
 
+    const escapeHtml = (value: string): string =>
+      value.replace(
+        /[&<>"']/g,
+        (ch) =>
+          ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch] as string)
+      );
+
     this._content.innerHTML = consequences
-      .map(
-        (item) =>
-          `<dl class="above-headline"><dt>${item.label}</dt><dd>${item.description ?? ''}</dd></dl>`
-      )
+      .map((item) => {
+        const label = escapeHtml(String(item.label));
+        const description = escapeHtml(String(item.description ?? ''));
+        return `<dl class="above-headline"><dt>${label}</dt><dd>${description}</dd></dl>`;
+      })
       .join('');
 
     this.elm.classList.remove('-notfound');
