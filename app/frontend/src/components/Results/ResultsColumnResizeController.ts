@@ -60,7 +60,8 @@ export class ResultsColumnResizeController {
   private _boundColumnResizeStart: (_e: PointerEvent) => void;
   private _boundColumnResizeMove: (_e: PointerEvent) => void;
   private _boundColumnResizeEnd: () => void;
-  private _boundColumnResizeReset: (_e: MouseEvent) => void;
+  private _boundAutoSizeColumnOnDblClick: (_e: MouseEvent) => void;
+  private _boundStopClickOnResizeBar: (_e: MouseEvent) => void;
   private _boundResizeHoverOver: (_e: MouseEvent) => void;
   private _boundResizeHoverLeave: () => void;
 
@@ -74,7 +75,10 @@ export class ResultsColumnResizeController {
     this._boundColumnResizeStart = this._startColumnResize.bind(this);
     this._boundColumnResizeMove = this._moveColumnResize.bind(this);
     this._boundColumnResizeEnd = this._endColumnResize.bind(this);
-    this._boundColumnResizeReset = this._resetColumnWidths.bind(this);
+    this._boundAutoSizeColumnOnDblClick = this._onResizeBarDblClick.bind(this);
+    this._boundStopClickOnResizeBar = (e: MouseEvent) => {
+      if ((e.target as HTMLElement).closest('.resize-bar')) e.stopPropagation();
+    };
     this._boundResizeHoverOver = this._onResizeHoverOver.bind(this);
     this._boundResizeHoverLeave = this._onResizeHoverLeave.bind(this);
 
@@ -90,7 +94,9 @@ export class ResultsColumnResizeController {
       'pointerdown',
       this._boundColumnResizeStart
     );
-    this._thead.removeEventListener('dblclick', this._boundColumnResizeReset);
+    this._thead.removeEventListener('dblclick', this._boundAutoSizeColumnOnDblClick);
+    this._tbody.removeEventListener('dblclick', this._boundAutoSizeColumnOnDblClick);
+    this._tbody.removeEventListener('click', this._boundStopClickOnResizeBar);
     document.removeEventListener('pointermove', this._boundColumnResizeMove);
     document.removeEventListener('pointerup', this._boundColumnResizeEnd);
     document.removeEventListener('pointercancel', this._boundColumnResizeEnd);
@@ -122,7 +128,9 @@ export class ResultsColumnResizeController {
   private _attachEventHandlers(): void {
     this._thead.addEventListener('pointerdown', this._boundColumnResizeStart);
     this._tbody.addEventListener('pointerdown', this._boundColumnResizeStart);
-    this._thead.addEventListener('dblclick', this._boundColumnResizeReset);
+    this._thead.addEventListener('dblclick', this._boundAutoSizeColumnOnDblClick);
+    this._tbody.addEventListener('dblclick', this._boundAutoSizeColumnOnDblClick);
+    this._tbody.addEventListener('click', this._boundStopClickOnResizeBar);
     document.addEventListener('pointermove', this._boundColumnResizeMove);
     document.addEventListener('pointerup', this._boundColumnResizeEnd);
     document.addEventListener('pointercancel', this._boundColumnResizeEnd);
@@ -293,11 +301,21 @@ export class ResultsColumnResizeController {
   }
 
   /**
-   * resize-bar のダブルクリックで列幅を初期値へ戻す。
+   * resize-bar のダブルクリックで対象列をコンテンツ最大幅に自動調整する。
+   * tbody 側は行クリック（サイドバー表示）と競合するため、resize-bar 上の場合だけ
+   * stopPropagation と preventDefault で行選択イベントの伝播を止める。
    */
-  private _resetColumnWidths(e: MouseEvent): void {
-    if (!(e.target as HTMLElement).closest('.resize-bar')) return;
+  private _onResizeBarDblClick(e: MouseEvent): void {
+    const resizeBar = (e.target as HTMLElement).closest<HTMLElement>('.resize-bar');
+    if (!resizeBar) return;
 
-    this._autoSizer.resetColumnWidths();
+    e.stopPropagation();
+    e.preventDefault();
+
+    const cell = resizeBar.closest<HTMLTableCellElement>('th, td');
+    const columnId = resizeBar.dataset.columnId || cell?.dataset.columnId;
+    if (!columnId) return;
+
+    this._autoSizer.autoSizeColumn(columnId);
   }
 }

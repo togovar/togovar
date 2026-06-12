@@ -55,6 +55,28 @@ export class ResultsColumnAutoSizer {
     this._measuringRow = null;
   }
 
+  /**
+   * 指定列だけをコンテンツの実測幅に合わせる。
+   * ドラッグリサイズと異なり「ユーザーが明示的に幅を固定した」とは見なさないため、
+   * markColumnResized を呼ばない。次の検索結果で再度自動調整される。
+   */
+  autoSizeColumn(columnId: string): void {
+    const columns = normalizeColumnConfigs(storeManager.getData('columns'));
+    const column = columns.find((c) => c.id === columnId);
+    if (!column || !column.isUsed || usesInitialColumnWidth(columnId)) return;
+
+    const contentWidth = this._measureColumnContentWidth(columnId);
+    const width =
+      contentWidth <= 0
+        ? getMinColumnWidth()
+        : Math.max(getMinColumnWidth(), contentWidth);
+
+    storeManager.setData(
+      'columns',
+      columns.map((c) => (c.id === columnId ? { ...c, width } : c))
+    );
+  }
+
   /** 列リセット時に署名とリサイズ記録を同時にクリアして次回自動調整を有効にする。 */
   resetAutoSizeState(): void {
     this._autoSizedResultSignature = '';

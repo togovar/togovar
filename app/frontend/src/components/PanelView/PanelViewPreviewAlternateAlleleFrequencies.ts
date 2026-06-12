@@ -125,7 +125,7 @@ export default class PanelViewPreviewAlternateAlleleFrequencies extends PanelVie
    * 丸めると0になる値は精度を失わず指数で表示するためこの分岐が必要。
    */
   private _formatAF(af: number | undefined): string {
-    if (af === undefined) return '';
+    if (af == null) return '';
 
     if (String(af).length > DECIMAL_DIGIT + 2) {
       const numOfDigits = String(af).length;
