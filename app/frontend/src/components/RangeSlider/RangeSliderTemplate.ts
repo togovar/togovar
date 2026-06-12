@@ -74,14 +74,15 @@ export function createRulerScales(
   steps: number,
   orientation: string | null
 ): HTMLElement[] {
-  const stepSize = (max - min) / steps;
-  return Array.from({ length: steps + 1 }, (_, i) => {
+  const safeSteps = steps > 0 ? steps : 1;
+  const stepSize = (max - min) / safeSteps;
+  return Array.from({ length: safeSteps + 1 }, (_, i) => {
     const scale = document.createElement('div');
     scale.className = 'scale';
     scale.part = 'scale';
     scale.part.add(`scale-${orientation}`);
     scale.innerText = (min + i * stepSize).toFixed(1);
-    scale.style.left = `calc(${(i * 100) / steps}% - 0.5em)`;
+    scale.style.left = `calc(${(i * 100) / safeSteps}% - 0.5em)`;
     return scale;
   });
 }

@@ -4,7 +4,7 @@ type KeyDownTarget = 'showModal' | 'selectedRow';
 
 /**
  * サジェスト表示中の Escape はサジェスト側に任せるため、モーダル側のキー処理を止める。
- * showSuggest は StoreState の管理対象外なので、DOM から直接 showSuggestions プロパティを読む。
+ * showSuggestions は StoreState の管理対象外なので、DOM から直接 showSuggestions プロパティを読む。
  */
 const canHandleModalKeyDown = (): boolean => {
   const els = document.querySelectorAll<SearchFieldWithSuggestionsElement>(

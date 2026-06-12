@@ -146,11 +146,12 @@ export default class PanelViewPreviewAlternateAlleleFrequencies extends PanelVie
         : af.toExponential(DECIMAL_DIGIT - 1);
     }
 
+    const rounded = Math.round(af * 10 ** DECIMAL_DIGIT);
+    if (rounded === 0 && af !== 0) {
+      return af.toExponential(DECIMAL_DIGIT - 1);
+    }
     return strIns(
-      String(Math.round(af * 10 ** DECIMAL_DIGIT)).padStart(
-        DECIMAL_DIGIT + 1,
-        '0'
-      ),
+      String(rounded).padStart(DECIMAL_DIGIT + 1, '0'),
       -DECIMAL_DIGIT,
       '.'
     );

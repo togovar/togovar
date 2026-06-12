@@ -1,5 +1,3 @@
-import '../../ErrorModal';
-
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ref, createRef } from 'lit/directives/ref.js';
