@@ -111,11 +111,21 @@ export class RangeSlider extends HTMLElement {
         this.to.step = newValue;
         break;
       case 'value1':
-        this.slider1.value = formatSliderValue(newValue);
+      case 'value2': {
+        if (name === 'value1') {
+          this.slider1.value = formatSliderValue(newValue);
+        } else {
+          this.slider2.value = formatSliderValue(newValue);
+        }
+        this.state.from = Math.min(+this.slider1.value, +this.slider2.value);
+        this.state.to = Math.max(+this.slider1.value, +this.slider2.value);
+        if (this.isConnected) {
+          this._syncInputsFromState();
+          this._fireEvent();
+          return;
+        }
         break;
-      case 'value2':
-        this.slider2.value = formatSliderValue(newValue);
-        break;
+      }
       case 'invert': {
         const invert = toInvertValue(newValue);
         this.invertChk.checked = invert;
@@ -228,7 +238,7 @@ export class RangeSlider extends HTMLElement {
 
   /** checkboxと属性の両方からinvert状態を扱うため、属性値をbooleanへ変換する。 */
   get invert(): boolean {
-    return this.getAttribute('invert') === 'true';
+    return toInvertValue(this.getAttribute('invert'));
   }
 
   /** 外部から目盛り数を属性で調整できるよう、既存APIを保つ。 */
