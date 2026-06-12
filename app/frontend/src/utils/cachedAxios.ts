@@ -48,7 +48,7 @@ export class cachedAxios {
 
       if (this.cache.size > this.maxCacheSize) {
         const firstUrl = this.cache.keys().next().value;
-        if (firstUrl) {
+        if (firstUrl !== undefined) {
           this.cache.delete(firstUrl);
         }
       }
