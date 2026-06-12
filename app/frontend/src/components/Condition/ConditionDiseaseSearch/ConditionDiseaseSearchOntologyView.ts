@@ -158,7 +158,8 @@ export class ConditionDiseaseOntologyView extends LitElement {
   }
   set _id(id: string) {
     this._idValue = id;
-    if (this.data?.id !== id) {
+    // DOM 接続前は firstUpdated() に初期フェッチを委譲し、二重リクエストを防ぐ
+    if (this.isConnected && this.data?.id !== id) {
       this._fetchNode(id);
     }
   }
@@ -223,11 +224,13 @@ export class ConditionDiseaseOntologyView extends LitElement {
   /**
    * 初回レンダリング後に初期ノードを取得する。
    * firstUpdated は DOM が確定してから呼ばれるため、ref が取得できる最初のタイミング。
+   * _fetchNode を経由することで loading-started/ended と disease-selected を確実に発火させる。
+   * setter からの二重フェッチは cachedAxios がキャッシュで吸収する。
    */
   override firstUpdated(_changedProperties: PropertyValues): void {
-    this.api.get<OntologyNode>(`/disease?node=${this._id}`).then(({ data }) => {
-      this.data = data;
-    });
+    if (this._idValue) {
+      this._fetchNode(this._idValue);
+    }
   }
 
   /**

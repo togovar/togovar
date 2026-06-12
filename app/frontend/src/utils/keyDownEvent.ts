@@ -8,7 +8,9 @@ type KeyDownTarget = 'showModal' | 'selectedRow';
  * showSuggest は StoreState の管理対象外なので、DOM から直接 showSuggestions プロパティを読む。
  */
 const canHandleModalKeyDown = (): boolean => {
-  const el = document.querySelector('search-field-with-suggestions');
+  const el = document.querySelector<SearchFieldWithSuggestionsElement>(
+    'search-field-with-suggestions'
+  );
   return el === null || !el.showSuggestions;
 };
 
