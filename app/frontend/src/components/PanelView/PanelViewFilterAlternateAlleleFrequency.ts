@@ -82,9 +82,7 @@ export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
    * RangeSlider は内部で表示状態を管理するため、Store 変更を UI へ手動で反映する必要がない。
    * storeManager.bind で登録した購読を維持するために実装する。
    */
-  simpleSearchConditions(conditions: SimpleSearchCurrentConditions): void {
-    const condition = conditions[this.kind as 'frequency'];
-    if (condition === undefined) return;
+  simpleSearchConditions(_conditions: SimpleSearchCurrentConditions): void {
   }
 
   /**
