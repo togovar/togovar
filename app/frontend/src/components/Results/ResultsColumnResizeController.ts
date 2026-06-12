@@ -84,7 +84,9 @@ export class ResultsColumnResizeController {
         e.stopPropagation();
         return;
       }
-      if ((e.target as HTMLElement).closest('.resize-bar')) e.stopPropagation();
+      if (e.target instanceof Element && e.target.closest('.resize-bar')) {
+        e.stopPropagation();
+      }
     };
     this._boundResizeHoverOver = this._onResizeHoverOver.bind(this);
     this._boundResizeHoverLeave = this._onResizeHoverLeave.bind(this);
