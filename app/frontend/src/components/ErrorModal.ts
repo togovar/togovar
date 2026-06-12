@@ -17,7 +17,7 @@ export class ErrorModal extends LitElement {
   /** テンプレートとロジックを分離するため、描画はrenderだけに閉じる。 */
   render(): TemplateResult {
     return html`
-      <div class="err-container">
+      <div class="err-container" role="alert" aria-live="assertive">
         <p>${this.errorMessage}</p>
       </div>
     `;

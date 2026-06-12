@@ -117,8 +117,10 @@ export class RangeSlider extends HTMLElement {
         } else {
           this.slider2.value = formatSliderValue(newValue);
         }
-        this.state.from = Math.min(+this.slider1.value, +this.slider2.value);
-        this.state.to = Math.max(+this.slider1.value, +this.slider2.value);
+        const rawFrom = Math.min(+this.slider1.value, +this.slider2.value);
+        const rawTo = Math.max(+this.slider1.value, +this.slider2.value);
+        this.state.from = Math.min(Math.max(rawFrom, this.state.min), this.state.max);
+        this.state.to = Math.min(Math.max(rawTo, this.state.min), this.state.max);
         if (this.isConnected) {
           this._syncInputsFromState();
           this._fireEvent();
@@ -358,8 +360,10 @@ export class RangeSlider extends HTMLElement {
       this.getAttribute('step') ?? DEFAULT_RANGE_SLIDER_STATE.step,
       DEFAULT_RANGE_SLIDER_STATE.step
     );
-    this.state.from = Math.min(+(this.value1 ?? 0), +(this.value2 ?? 1));
-    this.state.to = Math.max(+(this.value1 ?? 0), +(this.value2 ?? 1));
+    const rawFrom = Math.min(+(this.value1 ?? 0), +(this.value2 ?? 1));
+    const rawTo = Math.max(+(this.value1 ?? 0), +(this.value2 ?? 1));
+    this.state.from = Math.min(Math.max(rawFrom, this.state.min), this.state.max);
+    this.state.to = Math.min(Math.max(rawTo, this.state.min), this.state.max);
     this.state.invert = toInvertValue(this.getAttribute('invert'));
     this.rulerNumberOfSteps = DEFAULT_RANGE_SLIDER_STATE.rulerNumberOfSteps;
   }
