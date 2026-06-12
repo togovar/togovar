@@ -43,6 +43,8 @@ export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
     const rangeSlider = document.createElement('range-slider');
     rangeSlider.value1 = condition.from;
     rangeSlider.value2 = condition.to;
+    rangeSlider.setAttribute('invert', condition.invert);
+    rangeSlider.setAttribute('match', condition.match);
     rangeSlider.sliderStep = 0.01;
     rangeSlider.inputStep = 0.05;
     rangeSlider.searchType = 'simple';
@@ -98,11 +100,11 @@ export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
 
   /**
    * Store から frequency 条件を取得し、未設定項目をマスターのデフォルトで補完して返す。
-   * frequency の from/to は 0 が有効値のため、falsy チェックではなく nullish チェックで補完する。
+   * URL復元時に from/to が文字列で入る場合があるため、number に正規化してから返す。
    */
   private _getConditionFromStore(): FrequencyCondition {
     const stored = getSimpleSearchCondition('frequency') as
-      | FrequencyCondition
+      | Partial<Record<keyof FrequencyCondition, unknown>>
       | undefined;
 
     const defaults = Object.fromEntries(
@@ -111,8 +113,25 @@ export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
           (item): item is typeof item & { id: string } => item.id !== undefined
         )
         .map((item) => [item.id, item.default])
-    ) as Partial<FrequencyCondition>;
+    ) as Partial<Record<keyof FrequencyCondition, unknown>>;
 
-    return { ...defaults, ...stored } as FrequencyCondition;
+    const merged = { ...defaults, ...(stored ?? {}) } as Record<string, unknown>;
+
+    const parseNum = (value: unknown, fallback: number): number => {
+      const num =
+        typeof value === 'number'
+          ? value
+          : typeof value === 'string'
+            ? Number(value)
+            : Number.NaN;
+      return Number.isFinite(num) ? num : fallback;
+    };
+
+    return {
+      from: parseNum(merged.from, Number(defaults.from ?? 0)),
+      to: parseNum(merged.to, Number(defaults.to ?? 1)),
+      match: String(merged.match ?? defaults.match ?? 'any'),
+      invert: String(merged.invert ?? defaults.invert ?? '0'),
+    } as FrequencyCondition;
   }
 }

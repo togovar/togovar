@@ -116,14 +116,16 @@ export class RangeSlider extends HTMLElement {
       case 'value2':
         this.slider2.value = formatSliderValue(newValue);
         break;
-      case 'invert':
-        this.invertChk.checked = newValue === 'true';
+      case 'invert': {
+        const invert = toInvertValue(newValue);
+        this.invertChk.checked = invert;
         if (this.isConnected) {
-          this._updateInvert(this.invertChk.checked);
+          this._updateInvert(invert);
         } else {
-          this.state.invert = toInvertValue(this.invertChk.checked);
+          this.state.invert = invert;
         }
         break;
+      }
       case 'ruler-number-of-steps':
         this.state.rulerNumberOfSteps = parseNumber(
           newValue,
@@ -338,7 +340,8 @@ export class RangeSlider extends HTMLElement {
     this.value1 = this.getAttribute('value1') || 0;
     this.value2 = this.getAttribute('value2') || 1;
     this.orientation = this.getAttribute('orientation') || 'horizontal';
-    this.state.match = this.getAttribute('simple-search') || 'any';
+    const match = this.getAttribute('match') ?? this.getAttribute('simple-search');
+    this.state.match = match ?? DEFAULT_RANGE_SLIDER_STATE.match;
     this.state.min = parseNumber(this.min ?? 0, DEFAULT_RANGE_SLIDER_STATE.min);
     this.state.max = parseNumber(this.max ?? 1, DEFAULT_RANGE_SLIDER_STATE.max);
     this.state.step = parseNumber(
@@ -347,7 +350,7 @@ export class RangeSlider extends HTMLElement {
     );
     this.state.from = Math.min(+(this.value1 ?? 0), +(this.value2 ?? 1));
     this.state.to = Math.max(+(this.value1 ?? 0), +(this.value2 ?? 1));
-    this.state.invert = this.getAttribute('invert') === 'true';
+    this.state.invert = toInvertValue(this.getAttribute('invert'));
     this.rulerNumberOfSteps = DEFAULT_RANGE_SLIDER_STATE.rulerNumberOfSteps;
   }
 
