@@ -70,6 +70,7 @@ export default class PanelViewPreviewConsequence extends PanelView {
 
     if (consequences.length === 0) return;
 
+    /** innerHTML へ入れるラベル/説明が外部データ由来でも安全になるよう、最小限の HTML エスケープを行う。 */
     const escapeHtml = (value: string): string =>
       value.replace(
         /[&<>"']/g,

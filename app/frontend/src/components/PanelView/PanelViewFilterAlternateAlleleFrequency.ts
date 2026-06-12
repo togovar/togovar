@@ -124,6 +124,7 @@ export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
       unknown
     >;
 
+    /** URL復元などで number/string が混在しても条件値を壊さないため、数値化とフォールバックをまとめる。 */
     const parseNum = (value: unknown, fallback: number): number => {
       const num =
         typeof value === 'number'

@@ -94,6 +94,7 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
     label: ExternalLinkItem['title'],
     url: ExternalLinkItem['xref']
   ): LinkListEntry {
+    /** innerHTML を組み立てる前提のため、ラベル文字列を XSS にならない形へ最小限エスケープする。 */
     const escapeHtml = (value: string): string =>
       value.replace(
         /[&<>"']/g,

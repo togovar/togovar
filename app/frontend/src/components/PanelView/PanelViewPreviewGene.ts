@@ -57,6 +57,7 @@ export default class PanelViewPreviewGene extends PanelView {
       return;
     }
 
+    /** innerHTML へ挿入する値の XSS を避けるため、最低限の文字だけ HTML エスケープする。 */
     const escapeHtml = (value: string): string =>
       value.replace(
         /[&<>"']/g,
