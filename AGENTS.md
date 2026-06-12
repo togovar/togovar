@@ -31,7 +31,7 @@
 
 - Node.js は `22.x` 前提。`.nvmrc` と `package.json` の `engines.node` を確認する。
 - `tsconfig.json` は `strict: true` かつ `allowJs: true`。既存JSとTSが共存しているため、周辺ファイルの粒度に合わせて変更する。
-- `app/frontend/server/` は `tsconfig.server.json` と `npm run typecheck:server` で確認する。
+- 型チェックは `npm run typecheck`（= `tsc --noEmit`）で確認する。
 
 ## ディレクトリ方針
 
@@ -70,11 +70,9 @@ app/frontend/
 
 ## デプロイ / 配信方針
 
-- 共有されたDocker Compose運用では、`frontend-build` サービスが `npm run build` 相当で `dist/` を生成し、nginxが生成物を配信する構成として扱われている。
-- GitHub Pages向けの `.github/workflows/publish.yml` も `npm run build` 後に `dist/` を公開するだけで、`app/frontend/server/` は起動しない。
-- `app/frontend/server/` はローカル開発サーバー、または `npm run start:prod` でビルド済みファイルをローカル確認するための補助サーバーとして扱う。
-- 本番Dockerで `node app/frontend/server` / `npm run start:prod` を起動している証跡は、現時点で共有された設定からは見つかっていない。
-- 顧客側の実デプロイ設定がリポジトリ外にある可能性があるため、`app/frontend/server/`、`npm start`、`npm run start:prod`、`express` 関連依存を削除する前に、Dockerfile / Compose / nginx設定 / 起動コマンドを確認する。
+- `npm run build` で `dist/` を生成し、nginx などの静的ファイルサーバーが配信する構成として扱う。
+- GitHub Pages向けの `.github/workflows/publish.yml` も `npm run build` 後に `dist/` を公開するだけ。
+- フロントエンド用 Express サーバー（`app/frontend/server/`）は削除済み。ビルド出力のみが成果物。
 
 ## Advanced Search 方針
 
