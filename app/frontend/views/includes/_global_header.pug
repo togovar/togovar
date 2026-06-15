@@ -1,5 +1,6 @@
 - const navLink = (page) => `/doc/${locals.language && locals.language !== "en" ? `${locals.language}/${page}` : page}`
-- const apiDocLink = `${TOGOVAR_FRONTEND_API_URL.replace(/\/$/, "")}/api/index.html`
+- const apiUrl = typeof TOGOVAR_FRONTEND_API_URL !== "undefined" ? TOGOVAR_FRONTEND_API_URL : null
+- const apiDocLink = apiUrl ? `${apiUrl.replace(/\/$/, "")}/api/index.html` : "/api/index.html"
 
 header#GlobalHeader
   .left
