@@ -149,10 +149,7 @@ const config = {
   },
   resolve: {
     alias: {
-      axios$: path.resolve(
-        __dirname,
-        '../../../node_modules/axios/dist/browser/axios.cjs'
-      ),
+      axios$: 'axios/dist/browser/axios.cjs',
     },
     extensions: ['.ts', '.js', '...'],
   },
