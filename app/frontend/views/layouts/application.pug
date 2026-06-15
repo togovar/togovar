@@ -32,7 +32,32 @@ html(data-page=locals.currentPage, lang=lang)
       })();
       (async function() {
         try {
-          if (window.location.origin === 'http://localhost:8000') return
+          // ヘッダーはbody内にあるため、localでも確実にLoginリンクを取得できるまで待つ。
+          if (document.readyState === 'loading') {
+            await new Promise(function(resolve) {
+              document.addEventListener('DOMContentLoaded', resolve, { once: true });
+            });
+          }
+
+          const loginMenu = document.querySelector('.menu-button.login a.link');
+          if (!loginMenu) return;
+
+          if (
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1'
+          ) {
+            // localでは実認証を行わないが、UI確認のため ?auth=login でLogout表示を再現できるようにする。
+            const localAuthPreview = new URLSearchParams(window.location.search).get('auth');
+            const localIsLogin = localAuthPreview === 'login';
+            loginMenu.removeAttribute('href');
+            loginMenu.setAttribute('aria-disabled', 'true');
+            loginMenu.textContent = localIsLogin ? "Logout" : "Login";
+            loginMenu.addEventListener('click', function(event) {
+              event.preventDefault();
+            });
+            return;
+          }
+
           const response = await fetch(`${window.location.origin}/auth/status`);
 
           let isLogin = false;
@@ -40,12 +65,11 @@ html(data-page=locals.currentPage, lang=lang)
             isLogin = true;
           }
 
-          const loginMenu = document.querySelector('.menu-button.login a.link');
           if (isLogin === true) {
             loginMenu.href = "/auth/logout";
             loginMenu.textContent = "Logout";
           } else {
-            loginMenu.href = "/auth/login";
+            loginMenu.href = loginMenu.dataset.loginHref || "/auth/login";
             loginMenu.textContent = "Login";
           }
 
