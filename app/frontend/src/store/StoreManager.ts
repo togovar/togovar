@@ -259,7 +259,10 @@ class StoreManager {
    * 2系統あるのはbind/subscribeの移行期に両APIを同時に支える必要があるため。
    */
   publish<T extends keyof StoreState>(key: T) {
-    this._listeners.get(key)?.forEach((callback) => callback(this._state[key]));
+    // _state の生参照を渡すとコールバック内での変更がStoreを直接汚染するため、deepCopyして渡す
+    this._listeners.get(key)?.forEach((callback) =>
+      callback(this._deepCopy(this._state[key]))
+    );
 
     // TODO: _bindingsが廃止されたら削除する
     if (this._bindings[key]) {
@@ -303,26 +306,22 @@ class StoreManager {
   setResults(records: ResultData[], offset: number) {
     this.setData('isStoreUpdating', true);
 
-    const updatedResults = Array(this.getData<number>('numberOfRecords')).fill(
-      null
-    );
+    // numberOfRecords はプリミティブなので deepCopy コストゼロ
+    const updatedResults = Array(this._state.numberOfRecords).fill(null);
 
-    // 仮想スクロールで前後ページのデータを保持するため既存データを引き継ぐ
-    this.getData<ResultData[]>('searchResults').forEach(
-      (record: ResultData | null, index: number) => {
-        if (record) {
-          updatedResults[index] = record;
-        }
-      }
-    );
+    // 仮想スクロールで前後ページのデータを保持するため既存データを引き継ぐ。
+    // getData() を経由すると O(n) の deepCopy が走るため、_state を直接参照して回避する。
+    this._state.searchResults.forEach((record, index) => {
+      if (record) updatedResults[index] = record;
+    });
 
-    records.forEach((record: ResultData, index: number) => {
+    records.forEach((record, index) => {
       updatedResults[offset + index] = record;
     });
 
-    this.setData('searchResults', updatedResults);
-
-    // setDataはisEqualで変化がない場合にpublishをスキップするため、確実に通知するために明示的にpublishする
+    // updatedResults は常に新規構築のため isEqual チェックと structuredClone は不要。
+    // setData を経由せず直接代入し、publish を一度だけ呼ぶことで二重通知を防ぐ。
+    this._state.searchResults = updatedResults;
     this.publish('searchResults');
 
     // isFetchingはdata/statリクエスト全体の完了後にexecuteSearch側で解除するため、ここでは触らない
