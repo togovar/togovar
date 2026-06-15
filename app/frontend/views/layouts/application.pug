@@ -67,6 +67,7 @@ html(data-page=locals.currentPage, lang=lang)
             const localLabel = localIsLogin ? "Logout" : "Login";
             loginMenu.href = '#';
             loginMenu.setAttribute('aria-disabled', 'true');
+            loginMenu.setAttribute('tabindex', '-1');
             loginMenu.setAttribute('aria-label', localLabel);
             loginMenu.textContent = localLabel;
             loginMenu.addEventListener('click', function(event) {

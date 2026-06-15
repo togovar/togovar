@@ -24,7 +24,7 @@ export default merge(commonConfig, {
 
           if (normalizedPath !== requestUrl.pathname) {
             // レポート詳細は末尾スラッシュなしを正規形にし、旧Express配信時のURL解釈と揃える。
-            res.statusCode = 301;
+            res.statusCode = 302;
             res.setHeader(
               'Location',
               `${normalizedPath}${requestUrl.search}`
