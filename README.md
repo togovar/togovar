@@ -134,7 +134,11 @@ npm run build
 
 `npm run build` で `dist/` を生成し、nginx などの静的ファイルサーバーが配信します。Express サーバー（`app/frontend/server/`）は削除済みです。
 
-GitHub Pages ワークフロー（`.github/workflows/publish.yml`）も `npm run build` 後に `dist/` を公開するだけです。Docker 運用でも同様に、`frontend-build` サービスでビルドし、nginx が生成物を配信する構成です。
+このリポジトリ内では、以前 `app/frontend/server/middlewares/securityHeaders.js` が付与していたセキュリティヘッダーは設定されません。静的配信へ移したため、CSP、HSTS、COOP、`X-Frame-Options`、`X-Content-Type-Options`、`Referrer-Policy`、`Permissions-Policy` などは nginx / CDN / edge / 外部デプロイ設定側で管理してください。
+
+実デプロイの Dockerfile、Compose、nginx 設定、起動コマンドはこのリポジトリ外で管理されている可能性があります。配信方式やヘッダーを変える場合は、外部のデプロイ設定も合わせて確認してください。
+
+GitHub Pages ワークフロー（`.github/workflows/publish.yml`）も `npm run build` 後に `dist/` を公開するだけです。Docker 運用については [togovar-docker](https://github.com/togovar/togovar-docker) を参照してください。
 
 ## 検証
 

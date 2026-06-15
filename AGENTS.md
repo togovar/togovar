@@ -25,7 +25,7 @@
 | ビルド           | Webpack 5 / ts-loader                          |
 | スタイル         | Sass / SCSS / CSS                              |
 | テンプレート     | Pug                                            |
-| サーバー         | Node.js / Express系フロントエンドサーバー      |
+| サーバー         | nginx などの静的ファイルサーバー               |
 | バックエンド連携 | TogoVar API                                    |
 | パッケージ       | npm                                            |
 
@@ -40,7 +40,6 @@ app/frontend/
   assets/        参照ゲノム別JSONなどの静的データ
   config/        Webpack設定
   packs/         エントリポイント
-  server/        開発/本番フロントエンドサーバー
   src/
     api/         API通信
     components/  UIコンポーネント・画面部品
@@ -73,6 +72,8 @@ app/frontend/
 - `npm run build` で `dist/` を生成し、nginx などの静的ファイルサーバーが配信する構成として扱う。
 - GitHub Pages向けの `.github/workflows/publish.yml` も `npm run build` 後に `dist/` を公開するだけ。
 - フロントエンド用 Express サーバー（`app/frontend/server/`）は削除済み。ビルド出力のみが成果物。
+- Express削除により、CSP/HSTS/COOPなどのセキュリティヘッダーはこのリポジトリ内では付与されない。配信側（nginx/CDN/edge/外部Docker設定）で管理する前提で、ヘッダー方針を変える場合はREADMEと外部デプロイ設定の確認を促す。
+- `__CSP_NONCE__` のようなサーバー差し替え前提のプレースホルダーは使わない。静的配信で必要なCSPは nonce 注入ではなく、配信側のCSP設計として扱う。
 
 ## Advanced Search 方針
 
