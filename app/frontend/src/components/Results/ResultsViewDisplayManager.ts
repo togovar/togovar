@@ -89,7 +89,7 @@ export class ResultsViewDisplayManager {
   // ========================================
 
   /**
-   * 取得中の検索結果で表示行数を更新するとちらつくため、fetch中は更新を待つ。
+   * 初回検索やフィルタ変更中は全体loadingへ任せ、途中状態の行を増やさないようにする。
    */
   private _shouldSkipUpdate(): boolean {
     return storeManager.getData('isFetching');

@@ -266,8 +266,7 @@ class StoreManager {
 
     this.publish('searchResults');
 
-    this.setData('isFetching', false);
-
+    // isFetching は data/stat など検索リクエスト全体の完了後に executeSearch 側で解除する。
     this.setData('isStoreUpdating', false);
   }
 

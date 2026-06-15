@@ -11,6 +11,7 @@ export default class LoadingIndicator {
   constructor(elm: HTMLElement) {
     this.elm = elm;
     storeManager.bind('appStatus', this);
+    this.appStatus(storeManager.getData('appStatus'));
   }
 
   /**

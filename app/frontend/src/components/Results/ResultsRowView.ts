@@ -143,10 +143,11 @@ export class ResultsRowView {
   updateTableRow() {
     if (this._isDestroyed) return;
 
-    if (
-      storeManager.getData('isFetching') ||
-      storeManager.getData('isStoreUpdating')
-    ) {
+    if (storeManager.getData('isFetching')) {
+      return this._setOutOfRangeState();
+    }
+
+    if (storeManager.getData('isStoreUpdating')) {
       return this._setLoadingState();
     }
 
@@ -216,6 +217,7 @@ export class ResultsRowView {
    * Set row to loading state
    */
   private _setLoadingState() {
+    this.tr.classList.remove('-out-of-range');
     this.tr.classList.add('-loading');
     this.tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
   }
@@ -224,6 +226,7 @@ export class ResultsRowView {
    * Set row to out-of-range state
    */
   private _setOutOfRangeState() {
+    this.tr.classList.remove('-loading');
     this.tr.classList.add('-out-of-range');
     this.tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
   }

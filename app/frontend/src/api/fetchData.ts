@@ -78,12 +78,26 @@ export const executeSearch = (() => {
 
     // データ取得
     if (apiEndpoints && apiEndpoints.length > 0) {
-      Promise.all(
-        apiEndpoints.map((endpoint) => _fetchData(endpoint, requestOptions))
-      )
+      const requests = apiEndpoints.map((endpoint) => ({
+        endpoint,
+        promise: _fetchData(endpoint, requestOptions),
+      }));
+      const dataRequests = requests
+        .filter(({ endpoint }) => _isDataRequestEndpoint(endpoint))
+        .map(({ promise }) => promise);
+
+      Promise.all(dataRequests)
         .then(() => {
-          // すべてのリクエストが完了した後にローディング状態を解除
+          // 結果テーブルのloadingは行データの到着に合わせ、統計取得の遅延に引きずられないようにする。
           storeManager.setData('isFetching', false);
+        })
+        .catch((error) => {
+          if (error instanceof Error && error.name === 'AbortError') return;
+          storeManager.setData('isFetching', false);
+        });
+
+      Promise.all(requests.map(({ promise }) => promise))
+        .then(() => {
           isRequestInProgress = false;
           _updateAppState();
         })
@@ -150,6 +164,11 @@ function _determineSearchEndpoints(
     default:
       return [];
   }
+}
+
+/** 結果行のloading解除を統計取得ではなくdata取得に合わせるため、endpointの役割を判定する */
+function _isDataRequestEndpoint(endpoint: string): boolean {
+  return new URL(endpoint, API_URL).searchParams.get('data') === '1';
 }
 
 /** API リクエストのオプションを作成 */
@@ -263,6 +282,13 @@ function _processSearchResults(json: SearchResults) {
     console.error('[search] Unexpected result shape (no data array):', json);
   }
 
+  // 実際に取得したデータ件数を下限として numberOfRecords を更新する。
+  // max_rows はフィルタ前の件数を返す場合があり、統計レスポンス前に使うと
+  // データのない行がローディング表示されてしまうため使用しない。
+  // 統計レスポンス（_processStatistics）が正確な総件数を上書きする。
+  // 仮想スクロール中は既存の numberOfRecords を保持するため Math.max を使用する。
+  const currentCount = storeManager.getData<number>('numberOfRecords');
+  storeManager.setData('numberOfRecords', Math.max(currentCount, offset + rows.length));
   storeManager.setResults(rows, offset);
 }
 
