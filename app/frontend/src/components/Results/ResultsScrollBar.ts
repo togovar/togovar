@@ -12,45 +12,37 @@ import {
 } from './scroll';
 
 /**
- * Specialized scrollbar component for Results display (Refactored Version)
- *
- * ## Features
- * - Scroll processing specialized for Results display
- * - Mouse and touch drag support
- * - Automatic position calculation and feedback
- * - Performance optimized
- * - Modular design with separation of concerns
- *
- * ## Usage
- * ```typescript
- * const scrollbar = new ResultsScrollBar(containerElement);
- * ```
+ * 仮想スクロール（行を固定してoffsetを変える方式）に特化したスクロールバー。
+ * マウスホイール・タッチ・ドラッグの3入力を統合し、pixel座標とrow offset を相互変換して
+ * Storeに書き込む。ScrollBarRenderer・DragManagerに描画と入力検知を委譲し、
+ * このクラスは座標計算とStore連携だけを担う。
  */
 export class ResultsScrollBar {
-  // Core dom elements
+  // コアDOM要素
   private readonly _container: HTMLElement;
   private readonly _scrollBarElement: HTMLElement;
   private readonly _positionLabel: HTMLElement;
   private readonly _totalLabel: HTMLElement;
 
-  // State management
+  /**
+   * wheelイベントのインクリメンタル計算にpixel単位が必要なため、
+   * row単位のoffsetとは別にpixel座標をキャッシュする。
+   * フィルタ変更などでoffsetが外部から変更された場合は offset() ハンドラで同期する。
+   */
   private _lastScrollPosition: number = 0;
 
-  // Component dependencies
+  // 描画・入力検知の委譲先
   private readonly _renderer: ScrollBarRenderer;
   private readonly _dragManager: DragManager;
 
   /**
-   * Creates a new ResultsScrollBar instance
-   * @param containerElement - The container element where the scrollbar will be inserted
+   * スクロールバーのHTML構造を生成し、描画・入力を担うオブジェクトを初期化してStoreにバインドする。
    */
   constructor(containerElement: HTMLElement) {
     this._container = containerElement;
 
-    // Create HTML structure
     ScrollBarRenderer.createScrollBarHTML(this._container);
 
-    // Get DOM elements
     const { scrollBar, position, total } = ScrollBarRenderer.initializeElements(
       this._container
     );
@@ -58,7 +50,6 @@ export class ResultsScrollBar {
     this._positionLabel = position;
     this._totalLabel = total;
 
-    // Initialize components
     this._renderer = new ScrollBarRenderer(
       this._container,
       this._scrollBarElement,
@@ -78,7 +69,7 @@ export class ResultsScrollBar {
   }
 
   /**
-   * Binds this component to store events
+   * offset/numberOfRecords/rowCount の変化をトリガーにスクロールバーを更新するためにバインドする。
    */
   private _bindStoreEvents(): void {
     storeManager.bind('offset', this);
@@ -87,20 +78,20 @@ export class ResultsScrollBar {
   }
 
   // ================================================================
-  // Store Event Handlers
+  // Storeイベントハンドラ
   // ================================================================
 
   /**
-   * Store event handler: Called when offset value changes
-   * Updates the displayed position and synchronizes scrollbar appearance
-   * @param offset - The new offset value (0-based index)
+   * フィルタ変更などでStoreのoffsetが外部から書き換わった際に、スクロールバーの見た目と
+   * _lastScrollPosition を同時に同期する。
+   * 同期を省くと次のwheelイベントで古い座標から計算が始まり、意図しない位置ジャンプが起きる。
    */
   offset(offset: number): void {
     this._renderer.updatePositionLabel(offset);
     this._synchronizeScrollBarWithStore();
     this._lastScrollPosition = offset * TR_HEIGHT;
 
-    // Maintain active state on touch devices
+    // タッチデバイスでスクロール中は-activeクラスを維持する
     if (
       window.matchMedia('(hover: none) and (pointer: coarse)').matches &&
       this._container.classList.contains('-active')
@@ -110,13 +101,8 @@ export class ResultsScrollBar {
   }
 
   /**
-   * Store event handler: Called when the total record count changes
-   *
-   * This method is automatically invoked by StoreManager when the 'numberOfRecords'
-   * state value changes. It updates the total count display and synchronizes the
-   * scrollbar appearance to reflect the new dataset size.
-   *
-   * @param numberOfRecords - The new total count of records in the dataset
+   * データ総件数の変化に応じてスクロールバーの総件数ラベルとサイズを更新する。
+   * データ取得完了後に件数が確定するため、Storeの変化を契機に再計算する。
    */
   numberOfRecords(numberOfRecords: number): void {
     this._renderer.updateTotalLabel(numberOfRecords);
@@ -124,55 +110,48 @@ export class ResultsScrollBar {
   }
 
   /**
-   * Store event handler: Called when the visible row count changes
-   *
-   * This method is automatically invoked by StoreManager when the 'rowCount'
-   * state value changes. It triggers a UI update to recalculate scrollbar
-   * dimensions based on the new viewport size.
+   * 表示行数の変化でスクロールバーのサム高さが変わるため、再計算する。
+   * ウィンドウリサイズや列高さ変更で rowCount が変わることがある。
    */
   rowCount(): void {
     this._synchronizeScrollBarWithStore();
   }
 
   // ================================================================
-  // Visual State Management
+  // 表示状態管理
   // ================================================================
 
   /**
-   * Deactivates the scrollbar visual state
+   * タッチスクロール終了後に-activeクラスを外し、フィードバック表示を解除する。
    */
   setInactive(): void {
     this._renderer.setInactive();
   }
 
   /**
-   * Activates the scrollbar visual state
+   * タッチスクロール開始時に-activeクラスを付けて視覚フィードバックを有効にする。
    */
   setActive(): void {
     this._renderer.setActive();
   }
 
   // ================================================================
-  // Lifecycle Management
+  // ライフサイクル管理
   // ================================================================
 
   /**
-   * Clean up all resources and prevent memory leaks
-   * Call this method when the scrollbar component is no longer needed
+   * Storeバインドとイベントリスナーをまとめて解除してメモリリークを防ぐ。
+   * コンポーネント破棄時に必ず呼ぶこと。
    */
   destroy(): void {
-    // DragManager cleanup
     this._dragManager.destroyDragManager();
 
-    // Unbind StoreManager event bindings
     storeManager.unbind('offset', this);
     storeManager.unbind('numberOfRecords', this);
     storeManager.unbind('rowCount', this);
 
-    // Renderer timer cleanup
     this._renderer.clearAllTimeouts();
 
-    // Remove the inner scrollbar element
     const scrollBarElement = this._container.querySelector('.bar');
     if (scrollBarElement) {
       scrollBarElement.remove();
@@ -180,19 +159,17 @@ export class ResultsScrollBar {
   }
 
   // ================================================================
-  // Scroll Handling
+  // スクロール処理
   // ================================================================
 
   /**
-   * Handle scroll with scrollbar feedback (for touch events)
-   * @param deltaY - Y delta value
-   * @param touchStartOffset - Starting offset when touch began
+   * タッチ操作は慣性や指の絶対位置が基準になるため、wheelと異なり
+   * touchStartOffset を起点とした絶対計算を用いる。
    */
   handleScrollWithFeedback(deltaY: number, touchStartOffset: number): void {
     const visibleRowCount = this._getStoreData('rowCount', 0);
     const totalRecordCount = this._getStoreData('numberOfRecords', 0);
 
-    // Early return if data is invalid
     if (visibleRowCount <= 0 || totalRecordCount <= 0) {
       return;
     }
@@ -215,14 +192,14 @@ export class ResultsScrollBar {
   }
 
   /**
-   * Handle simple scroll (for wheel events)
-   * @param deltaY - Y delta value
+   * wheelイベントのインクリメンタルスクロール。
+   * _lastScrollPosition にデルタを加算してpixel座標を更新し、row offsetに変換してStoreへ書く。
+   * 座標が変化しない場合はStoreへの書き込みをスキップして無駄な再描画を防ぐ。
    */
   handleScroll(deltaY: number): void {
     const totalRecordCount = this._getStoreData('numberOfRecords', 0);
     const visibleRowCount = this._getStoreData('rowCount', 0);
 
-    // Early return if data is invalid
     if (visibleRowCount <= 0 || totalRecordCount <= 0) {
       return;
     }
@@ -244,14 +221,13 @@ export class ResultsScrollBar {
   }
 
   /**
-   * Update scrollbar directly with specific offset
-   * @param offset - Offset value
+   * 外部から offset を指定してスクロールバーの見た目を直接更新する。
+   * タッチスクロール後にフィードバックを即時反映するために使う。
    */
   updateDirectly(offset: number): void {
     const visibleRowCount = this._getStoreData('rowCount', 0);
     const totalRecordCount = this._getStoreData('numberOfRecords', 0);
 
-    // Early return if data is invalid
     if (visibleRowCount <= 0 || totalRecordCount <= 0) {
       return;
     }
@@ -265,7 +241,9 @@ export class ResultsScrollBar {
   }
 
   /**
-   * Reset the scroll position to the initial state
+   * 検索モード切替など、外部から明示的に先頭へ戻す必要がある場合に使う。
+   * _lastScrollPosition の同期は offset() ハンドラが担うが、
+   * Store更新を伴わずに見た目だけ先頭へ戻したい場面のためにここでも行う。
    */
   resetScrollPosition(): void {
     this._lastScrollPosition = 0;
@@ -273,14 +251,12 @@ export class ResultsScrollBar {
   }
 
   // ================================================================
-  // Data Access & Validation
+  // データアクセス
   // ================================================================
 
   /**
-   * Safely retrieves store data with validation
-   * @param key - Store key to retrieve
-   * @param defaultValue - Default value if data is invalid
-   * @returns The store value or default value
+   * 負値や非数値がスクロール計算に混入するとサムが消えたりジャンプするため、
+   * Storeから取得した数値をデフォルト値付きで安全に返す。
    */
   private _getStoreData<T>(key: keyof StoreState, defaultValue: T): T {
     const value = storeManager.getData<T>(key);
@@ -288,8 +264,8 @@ export class ResultsScrollBar {
   }
 
   /**
-   * Gets all essential scroll data from store with validation
-   * @returns Object containing rowCount, numberOfRecords, and offset
+   * スクロール計算で必ず必要になる3値をまとめて取得する。
+   * 個別取得の繰り返しを避けてコードの見通しをよくするためにまとめてある。
    */
   private _getScrollData(): {
     visibleRowCount: number;
@@ -304,11 +280,12 @@ export class ResultsScrollBar {
   }
 
   // ================================================================
-  // Visual Updates
+  // 描画更新
   // ================================================================
 
   /**
-   * Synchronizes scrollbar appearance with current store data
+   * offset/numberOfRecords/rowCount のどれが変わってもスクロールバーの見た目は同じ計算で
+   * 更新できるため、共通処理としてまとめてある。
    */
   private _synchronizeScrollBarWithStore(): void {
     const { offset, visibleRowCount, totalRecordCount } = this._getScrollData();
@@ -327,15 +304,14 @@ export class ResultsScrollBar {
   }
 
   // ================================================================
-  // Drag Event Handlers
+  // ドラッグイベントハンドラ
   // ================================================================
 
   /**
-   * Handles drag events and updates scroll position
-   * @param top - Drag position
+   * DragManagerからpixel座標を受け取り、描画更新とoffset計算を行う。
+   * DragManagerはDOM操作と入力検知を担い、座標の意味解釈はここで行う。
    */
   private _handleDrag(top: number): void {
-    // Update scrollbar position via renderer
     this._renderer.updateScrollBarPosition(top);
 
     const mockEvent: DragEventUI = { position: { top } };
@@ -343,19 +319,17 @@ export class ResultsScrollBar {
   }
 
   /**
-   * Processes drag position and updates scroll state
-   * @param e - The original event (can be null for programmatic calls)
-   * @param ui - Object containing the drag position information
+   * ドラッグのpixel座標からrow offsetを計算してStoreへ書く。
+   * wheelスクロールと一貫した操作感を保つため、_lastScrollPosition も同時に更新する。
    */
   private _processDragPosition(e: Event | null, ui: DragEventUI): void {
     const visibleRowCount = this._getStoreData('rowCount', 0);
     const totalRecordCount = this._getStoreData('numberOfRecords', 0);
 
-    // Early return if data is invalid
     if (visibleRowCount <= 0 || totalRecordCount <= 0) {
       return;
     }
-    // Calculate available height for scrollbar movement
+
     const availableHeight = visibleRowCount * TR_HEIGHT;
     const offsetRate = ui.position.top / availableHeight;
 
@@ -366,7 +340,6 @@ export class ResultsScrollBar {
       totalRecordCount
     );
 
-    // Update _lastScrollPosition to maintain consistency with trackpad scrolling
     this._lastScrollPosition = offset * TR_HEIGHT;
 
     storeManager.setData('offset', offset);
@@ -374,8 +347,8 @@ export class ResultsScrollBar {
   }
 
   /**
-   * Handles visual state changes during drag operations
-   * @param isDragging - Whether currently dragging
+   * ドラッグ中のカーソルスタイルとドラッグ状態クラスを切り替える。
+   * DragManagerがドラッグの開始・終了を検知し、このコールバックで見た目を反映する。
    */
   private _handleVisualStateChange(isDragging: boolean): void {
     this._renderer.updateCursorStyle(isDragging);
