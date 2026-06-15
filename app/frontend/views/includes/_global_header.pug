@@ -1,4 +1,6 @@
 - const navLink = (page) => `/doc/${locals.language && locals.language !== "en" ? `${locals.language}/${page}` : page}`
+- const apiUrl = typeof TOGOVAR_FRONTEND_API_URL !== "undefined" ? TOGOVAR_FRONTEND_API_URL : null
+- const apiDocLink = apiUrl ? `${apiUrl.replace(/\/$/, "")}/api/index.html` : "/api/index.html"
 
 header#GlobalHeader
   .left
@@ -35,7 +37,7 @@ header#GlobalHeader
           li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^downloads/)})
             a.link(href=navLink("downloads")) Downloads
           li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^api/)})
-            a.link(href="/api" target="_blank") API
+            a.link(href=apiDocLink target="_blank" rel="noopener noreferrer") API
           li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^terms/)})
             a.link(href=navLink("terms")) Terms
           li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^contact/)})
@@ -50,23 +52,23 @@ header#GlobalHeader
         if locals.currentPage === "home"
           ul.menu
             li.menu-button.login 
-              a.link(href="/auth/login" aria-label="Login")
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else if locals.currentPage === "404"
           ul.menu
             li.menu-button.login
-              a.link(href="/auth/login" aria-label="Login")
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else if locals.currentPage === "variant"
           ul.menu
             li.menu-button.login 
-              a.link(href="/auth/login" aria-label="Login")
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else if locals.currentPage === "gene"
           ul.menu
             li.menu-button.login 
-              a.link(href="/auth/login" aria-label="Login")
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else if locals.currentPage === "disease"
           ul.menu
             li.menu-button.login 
-              a.link(href="/auth/login" aria-label="Login")
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else
           ul.menu
             li.menu-button.languageswitcher(class={"en": locals.language === "en" , "ja": locals.language === "ja"})
@@ -76,4 +78,4 @@ header#GlobalHeader
                 | ja
 
             li.menu-button.login 
-              a.link(href="/auth/login" aria-label="Login")
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login

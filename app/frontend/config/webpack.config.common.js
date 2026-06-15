@@ -148,6 +148,9 @@ const config = {
     publicPath: '/',
   },
   resolve: {
+    alias: {
+      axios$: 'axios/dist/browser/axios.cjs',
+    },
     extensions: ['.ts', '.js', '...'],
   },
   devtool: 'source-map',

@@ -6,13 +6,13 @@ append variables
   - locals.description = "TogoVar is an integrated database of Japanese genomic variation, providing allele frequencies and annotations for human variants.";
 
 block head
-  script(type="application/ld+json" nonce="__CSP_NONCE__")
+  script(type="application/ld+json")
     != structuredDataJson
   - var mainCssFiles = htmlWebpackPlugin.files.css.filter(x => x.match(/^\/css\/main-/))
   each css in mainCssFiles
     link(rel="stylesheet" href=css)
   each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/main-/))
-    script(type="text/javascript", src=js, defer, nonce="__CSP_NONCE__")
+    script(type="text/javascript", src=js, defer)
 
 block content
   include includes/_search_results_main
