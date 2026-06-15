@@ -26,7 +26,7 @@ AIエージェント向けの作業指示・設計ルールは [AGENTS.md](./AGE
 | ビルド         | Webpack 5 / ts-loader                          |
 | スタイル       | Sass / SCSS / CSS                              |
 | テンプレート   | Pug                                            |
-| サーバー       | Node.js / Express 系フロントエンドサーバー     |
+| サーバー       | nginx（静的ファイル配信）                      |
 | API連携        | TogoVar API                                    |
 | データ定義     | JSON / TSV / YAML                              |
 | 検証           | ESLint / stylelint / TypeScript                |
@@ -40,7 +40,6 @@ app/frontend/
   assets/        参照ゲノム別JSON、karyotype.tsv、stanza設定など
   config/        Webpack設定、サイトURL生成設定
   packs/         Webpackエントリポイント
-  server/        開発/本番フロントエンドサーバー
   src/
     api/         API通信
     components/  UIコンポーネント・画面部品
@@ -108,17 +107,19 @@ TOGOVAR_REFERENCE=GRCh38
 
 ### 開発サーバー
 
-```bash
-npm start
-```
-
-デフォルトでは `http://localhost:8000` で起動します。
-ポートを変えたい場合は `PORT` または `--port` を使います。
+ローカルで画面を確認する場合は、webpack-dev-server を起動します。
 
 ```bash
-PORT=8001 npm start
-npm start -- --port 8001
+npm run dev
 ```
+
+起動後、以下の URL にアクセスしてください。
+
+```txt
+http://localhost:8000/
+```
+
+`/variant/tgv418765796` などのレポートページも、開発サーバーが対応する静的 HTML に fallback して表示します。
 
 ### 本番ビルド
 
@@ -129,23 +130,17 @@ npm run build
 ビルド成果物は `dist/` に生成されます。
 ビルド時には、参照ゲノムに応じたドキュメントページ、`robots.txt`、`sitemap.xml` も生成されます。
 
-### 本番ビルドをローカル起動
-
-```bash
-npm run build
-npm run start:prod
-```
-
-`build` でビルドしてから `start:prod` でサーバーを起動します。
-CI などビルド済みの環境では `npm run start:prod` だけ実行してください。
-
 ### デプロイ運用メモ
 
-このリポジトリで確認できる GitHub Pages ワークフローは、`npm run build` で `dist/` を生成し、その内容を公開します。`app/frontend/server/` のExpressサーバーは起動しません。
+`npm run build` で `dist/` を生成し、nginx などの静的ファイルサーバーが配信します。Express サーバー（`app/frontend/server/`）は削除済みです。
 
-共有された顧客側Docker Composeでは、`frontend-build` サービスがNode.jsでフロントエンドをビルドし、生成物を `nginx_www` volume 経由でnginxが配信する構成でした。この構成でも、フロントエンド用Expressサーバーではなく、ビルド済み静的ファイルをnginxで配信していると考えられます。
+このリポジトリ内では、以前 `app/frontend/server/middlewares/securityHeaders.js` が付与していたセキュリティヘッダーは設定されません。静的配信へ移したため、CSP、HSTS、COOP、`X-Frame-Options`、`X-Content-Type-Options`、`Referrer-Policy`、`Permissions-Policy` などは nginx / CDN / edge / 外部デプロイ設定側で管理してください。
 
-一方で、顧客側の実デプロイ設定がこのリポジトリ外で管理されている可能性があります。`app/frontend/server/` や `npm run start:prod` はローカル確認用として残っているため、削除する場合は実際のDockerfile、Compose、nginx設定、起動コマンドを確認してください。
+テンプレートには `app/frontend/views/layouts/application.pug` などのインライン script が残っています。配信側で CSP を厳格にする場合は、`script-src` で `'unsafe-inline'` を許可する、script hash を付与する、インライン script を外部ファイルへ移すなど、静的配信に合う方針を選んでください。Express の nonce 注入は削除済みです。
+
+実デプロイの Dockerfile、Compose、nginx 設定、起動コマンドはこのリポジトリ外で管理されている可能性があります。配信方式やヘッダーを変える場合は、外部のデプロイ設定も合わせて確認してください。
+
+GitHub Pages ワークフロー（`.github/workflows/publish.yml`）も `npm run build` 後に `dist/` を公開するだけです。Docker 運用については [togovar-docker](https://github.com/togovar/togovar-docker) を参照してください。
 
 ## 検証
 

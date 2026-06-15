@@ -21,7 +21,7 @@ html(data-page=locals.currentPage, lang=lang)
     noscript
       link(rel="stylesheet" href=fontStylesheetHref)
     link(rel="icon" href="/favicon.svg" type="image/svg+xml")
-    script(nonce="__CSP_NONCE__").
+    script.
       (function() {
         var f = document.getElementById('font-stylesheet');
         if (!f) return;
@@ -30,23 +30,82 @@ html(data-page=locals.currentPage, lang=lang)
         f.addEventListener('load', activateFontStylesheet, { once: true });
         if (f.sheet) activateFontStylesheet();
       })();
+      (function() {
+        var page = document.documentElement.getAttribute('data-page');
+        if (page !== 'variant' && page !== 'gene' && page !== 'disease') return;
+
+        var canonicalLink = document.querySelector('link[rel="canonical"]');
+        if (!canonicalLink) {
+          canonicalLink = document.createElement('link');
+          canonicalLink.setAttribute('rel', 'canonical');
+          document.head.appendChild(canonicalLink);
+        }
+
+        // レポート詳細は旧Express配信時と同じ末尾スラッシュなしを正規URLとして扱う。
+        var canonicalPath = window.location.pathname.replace(/^\/(variant|gene|disease)\/([^/]+)\/$/, '/$1/$2');
+        canonicalLink.href = "#{TOGOVAR_FRONTEND_SITE_ORIGIN}" + canonicalPath;
+      })();
       (async function() {
         try {
-          if (window.location.origin === 'http://localhost:8000') return
-          const response = await fetch(`${window.location.origin}/auth/status`);
+          // ヘッダーはbody内にあるため、localでも確実にLoginリンクを取得できるまで待つ。
+          if (document.readyState === 'loading') {
+            await new Promise(function(resolve) {
+              document.addEventListener('DOMContentLoaded', resolve, { once: true });
+            });
+          }
+
+          const loginMenu = document.querySelector('.menu-button.login a.link');
+          if (!loginMenu) return;
+
+          if (
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname === '::1'
+          ) {
+            // localでは実認証を行わないが、UI確認のため ?auth=login でLogout表示を再現できるようにする。
+            const localAuthPreview = new URLSearchParams(window.location.search).get('auth');
+            const localIsLogin = localAuthPreview === 'login';
+            const localLabel = localIsLogin ? "Logout" : "Login";
+            loginMenu.href = '#';
+            loginMenu.setAttribute('aria-disabled', 'true');
+            loginMenu.setAttribute('tabindex', '-1');
+            loginMenu.setAttribute('aria-label', localLabel);
+            loginMenu.textContent = localLabel;
+            loginMenu.addEventListener('click', function(event) {
+              event.preventDefault();
+            });
+            return;
+          }
+
+          const controller = new AbortController();
+          const timeoutId = setTimeout(function() {
+            controller.abort();
+          }, 10000);
+          let response;
+
+          try {
+            response = await fetch(`${window.location.origin}/auth/status`, {
+              signal: controller.signal,
+            });
+          } finally {
+            clearTimeout(timeoutId);
+          }
 
           let isLogin = false;
           if (response.status === 200 || response.status === 403) {
             isLogin = true;
           }
 
-          const loginMenu = document.querySelector('.menu-button.login a.link');
           if (isLogin === true) {
+            const logoutLabel = "Logout";
             loginMenu.href = "/auth/logout";
-            loginMenu.textContent = "Logout";
+            loginMenu.setAttribute('aria-label', logoutLabel);
+            loginMenu.textContent = logoutLabel;
           } else {
-            loginMenu.href = "/auth/login";
-            loginMenu.textContent = "Login";
+            const loginLabel = "Login";
+            loginMenu.href = loginMenu.dataset.loginHref || "/auth/login";
+            loginMenu.setAttribute('aria-label', loginLabel);
+            loginMenu.textContent = loginLabel;
           }
 
         } catch (error) {

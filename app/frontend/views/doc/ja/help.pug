@@ -9,7 +9,7 @@ block head
   each css in htmlWebpackPlugin.files.css
     link(href=css, rel="stylesheet")
   each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/main-/))
-    script(type="text/javascript", src=js, nonce="__CSP_NONCE__")
+    script(type="text/javascript", src=js)
 
 block content
   main
