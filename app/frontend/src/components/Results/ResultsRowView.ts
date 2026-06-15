@@ -143,7 +143,13 @@ export class ResultsRowView {
   updateTableRow() {
     if (this._isDestroyed) return;
 
-    if (storeManager.getData('isFetching')) {
+    // 初回fetch（numberOfRecords === 0）はまだ表示できるデータがないため行を非表示にする。
+    // スクロール中の追加fetch（numberOfRecords > 0）は既存データが見えているため
+    // out-of-rangeにせずloadingGIFを維持する（この後の isStoreUpdating / result チェックに委ねる）。
+    if (
+      storeManager.getData('isFetching') &&
+      storeManager.getData('numberOfRecords') === 0
+    ) {
       return this._setOutOfRangeState();
     }
 
