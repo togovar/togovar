@@ -3,7 +3,7 @@ import {
   handleHistoryChange,
   reflectSimpleSearchConditionToURI,
   reflectAdvancedSearchConditionToURI,
-} from '../store/searchManager';
+} from './searchManager';
 import { executeSearch } from '../api/fetchData';
 import { getInitialColumnWidth, normalizeColumnConfigs } from '../columns';
 import {
@@ -121,8 +121,8 @@ class StoreManager {
   }
 
   /**
-   * bind/unbind（旧API）に代わる新しいコールバックベースの変化監視API。
-   * Storeのキーに対して複数のコールバックを登録でき、setDataのたびに呼ばれる。
+   * Storeのキーに対してコールバックを登録する。
+   * setData / publish のたびに登録済みの全コールバックが呼ばれる。
    */
   subscribe<T extends keyof StoreState>(
     key: T,
