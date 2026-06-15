@@ -348,10 +348,8 @@ async function _updateAppState() {
   _updateDownloadButtonState(isDownloadAvailable, isDownloadLimitExceeded);
   _updateDownloadDisabledReasonMessage(downloadDisabledReason);
 
-  // まずoffsetを更新して表示位置を確定
-  storeManager.publish('offset');
-
-  // 次にデータを更新
+  // searchResults を publish し表示を更新する。
+  // offset/rowCount/numberOfRecords の同期はそれぞれの setData が publish 済みのため不要。
   storeManager.publish('searchResults');
 
   // 最後にステータスを更新
