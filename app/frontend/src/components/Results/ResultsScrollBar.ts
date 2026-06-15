@@ -98,6 +98,7 @@ export class ResultsScrollBar {
   offset(offset: number): void {
     this._renderer.updatePositionLabel(offset);
     this._synchronizeScrollBarWithStore();
+    this._lastScrollPosition = offset * TR_HEIGHT;
 
     // Maintain active state on touch devices
     if (
