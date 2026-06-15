@@ -162,12 +162,14 @@ export default class PanelViewCheckList extends PanelView {
    * statisticsType が指定されている場合は統計情報の更新も購読する。
    */
   private _bindStore(statisticsType?: StatisticsType): void {
-    storeManager.bind('simpleSearchConditions', this);
+    storeManager.subscribe('simpleSearchConditions', (v) => this.simpleSearchConditions(v as unknown as Record<string, Record<string, string>>));
 
     if (statisticsType) {
-      (this as Record<string, unknown>)[statisticsType] =
-        this._updateStatistics.bind(this);
-      storeManager.bind(statisticsType, this);
+      // bind APIではthis[statisticsType]を動的に生成していたが、
+      // subscribeでは直接コールバックを渡せるため動的プロパティ付与が不要になる。
+      storeManager.subscribe(statisticsType, (v) =>
+        this._updateStatistics(v as Record<string, number> | null)
+      );
     }
   }
 

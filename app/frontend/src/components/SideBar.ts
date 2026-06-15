@@ -16,7 +16,7 @@ export default class SideBar {
   private readonly _previews: HTMLElement;
 
   /**
-   * StoreManagerの旧bind APIから呼ばれるViewとして、必要なDOM参照を初期化時に確定する。
+   * selectedRowの変化を受け取るためStoreに購読登録し、初期値を即時反映する。
    */
   constructor(elm: HTMLElement) {
     this._elm = elm;
@@ -27,7 +27,7 @@ export default class SideBar {
       'SideBar'
     );
 
-    storeManager.bind('selectedRow', this);
+    storeManager.subscribe('selectedRow', (v) => this.selectedRow(v));
     this.selectedRow(storeManager.getData<SelectedRowIndex>('selectedRow'));
 
     requestAnimationFrame(() => {

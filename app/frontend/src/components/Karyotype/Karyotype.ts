@@ -236,9 +236,9 @@ export default class Karyotype {
     )!;
 
     storeManager.setData('karyotype', karyotype);
-    storeManager.bind('karyotype', this);
-    storeManager.bind('simpleSearchConditions', this);
-    storeManager.bind('advancedSearchConditions', this);
+    storeManager.subscribe('karyotype', (v) => this.karyotype(v as KaryotypeState));
+    storeManager.subscribe('simpleSearchConditions', (v) => this.simpleSearchConditions(v));
+    storeManager.subscribe('advancedSearchConditions', (v) => this.advancedSearchConditions(v));
 
     // ヘッダークリックで開閉状態をトグルする
     elm.querySelector<HTMLElement>('.header')!.addEventListener('click', () => {

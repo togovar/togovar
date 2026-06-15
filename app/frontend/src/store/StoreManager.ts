@@ -18,18 +18,9 @@ type StoreListener = (value: unknown) => void;
 
 /**
  * アプリ全体の状態を一元管理するシングルトンStore。
- * bind/subscribe/publish によるオブザーバーパターンで状態変化をUIコンポーネントへ伝える。
- * bind（旧API）とsubscribe（新API）の2系統が共存しているが、
- * subscribeへ一本化する方針でbind系は将来削除予定。
+ * subscribe/publish によるオブザーバーパターンで状態変化をUIコンポーネントへ伝える。
  */
 class StoreManager {
-  /**
-   * 旧実装互換のobserver配列。observer[key]() を呼ぶ規約でUIを更新する。
-   * subscribe/unsubscribeへ移行中のため将来削除予定。
-   * TODO: 廃止されたら削除する
-   */
-  private _bindings: Record<string, unknown[]> = {};
-
   /**
    * subscribeで登録されたコールバックのMap。
    * キーはStoreStateのキー名で、値の変化があるたびに対応するSetの全コールバックを呼ぶ。
@@ -227,63 +218,12 @@ class StoreManager {
   }
 
   /**
-   * observer[key]()を呼ぶ旧来のobserverパターン。subscribeへ移行中のため将来削除予定。
-   * TODO: _bindingsが廃止されたら削除する
-   */
-  bind<T = unknown>(key: string, target: T) {
-    if (this._bindings[key] === undefined) {
-      this._bindings[key] = [target];
-    } else {
-      this._bindings[key].push(target);
-    }
-  }
-
-  /**
-   * コンポーネント破棄時にbindingsから自身を外してメモリリークを防ぐ。
-   * TODO: _bindingsが廃止されたら削除する
-   */
-  unbind<T = unknown>(key: string, target: T) {
-    if (this._bindings[key]) {
-      const index = this._bindings[key].indexOf(target);
-      if (index !== -1) {
-        this._bindings[key].splice(index, 1);
-        if (this._bindings[key].length === 0) {
-          delete this._bindings[key];
-        }
-      }
-    }
-  }
-
-  /**
-   * listeners（新API）とbindings（旧API）の両方に変化を通知する。
-   * 2系統あるのはbind/subscribeの移行期に両APIを同時に支える必要があるため。
+   * _state の生参照を渡すとコールバック内での変更がStoreを直接汚染するため、deepCopyして渡す。
    */
   publish<T extends keyof StoreState>(key: T) {
-    // _state の生参照を渡すとコールバック内での変更がStoreを直接汚染するため、deepCopyして渡す
     this._listeners.get(key)?.forEach((callback) =>
       callback(this._deepCopy(this._state[key]))
     );
-
-    // TODO: _bindingsが廃止されたら削除する
-    if (this._bindings[key]) {
-      this._bindings[key].forEach((observer) => {
-        const valueCopy = this._deepCopy(this._state[key]);
-        const handler = (observer as Record<string, unknown>)[key as string];
-        if (typeof handler === 'function') {
-          // observer[key](...) と同等にthisをobserverに束縛して呼び出す
-          (handler as (this: unknown, value: unknown) => void).call(
-            observer,
-            valueCopy
-          );
-        } else {
-          console.warn(
-            `This binding has no corresponding function.`,
-            observer,
-            key
-          );
-        }
-      });
-    }
   }
 
   /**

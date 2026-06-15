@@ -31,6 +31,13 @@ export class ResultsScrollBar {
    */
   private _lastScrollPosition: number = 0;
 
+  /**
+   * unsubscribeで同一参照が必要なため、束縛済みコールバックをフィールドに保持する。
+   */
+  private _onOffset = (v: number) => this.offset(v);
+  private _onNumberOfRecords = (v: number) => this.numberOfRecords(v);
+  private _onRowCount = () => this.rowCount();
+
   // 描画・入力検知の委譲先
   private readonly _renderer: ScrollBarRenderer;
   private readonly _dragManager: DragManager;
@@ -69,12 +76,12 @@ export class ResultsScrollBar {
   }
 
   /**
-   * offset/numberOfRecords/rowCount の変化をトリガーにスクロールバーを更新するためにバインドする。
+   * offset/numberOfRecords/rowCount の変化をトリガーにスクロールバーを更新するため購読登録する。
    */
   private _bindStoreEvents(): void {
-    storeManager.bind('offset', this);
-    storeManager.bind('numberOfRecords', this);
-    storeManager.bind('rowCount', this);
+    storeManager.subscribe('offset', this._onOffset);
+    storeManager.subscribe('numberOfRecords', this._onNumberOfRecords);
+    storeManager.subscribe('rowCount', this._onRowCount);
   }
 
   // ================================================================
@@ -146,9 +153,9 @@ export class ResultsScrollBar {
   destroy(): void {
     this._dragManager.destroyDragManager();
 
-    storeManager.unbind('offset', this);
-    storeManager.unbind('numberOfRecords', this);
-    storeManager.unbind('rowCount', this);
+    storeManager.unsubscribe('offset', this._onOffset);
+    storeManager.unsubscribe('numberOfRecords', this._onNumberOfRecords);
+    storeManager.unsubscribe('rowCount', this._onRowCount);
 
     this._renderer.clearAllTimeouts();
 

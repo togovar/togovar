@@ -7,7 +7,7 @@ import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
 import { ResultsViewDataManager } from './ResultsViewDataManager';
 import { ResultsColumnAutoSizer } from './ResultsColumnAutoSizer';
 import { ResultsColumnResizeController } from './ResultsColumnResizeController';
-import type { SearchMessages, SearchStatus, ColumnConfig } from '../../types';
+import type { SearchMessages, SearchStatus, ColumnConfig, StoreState } from '../../types';
 import { isTouchDevice } from '../../utils/deviceDetection';
 
 /** テーブル関連の DOM セレクタマップ */
@@ -21,15 +21,6 @@ const SELECTORS = {
   COLUMNS_DROPDOWN: '.columns-dropdown',
 } as const;
 
-/** store マネージャーにバインドするキーのリスト */
-const STORE_BINDINGS = [
-  'searchStatus',
-  'searchResults',
-  'columns',
-  'offset',
-  'karyotype',
-  'searchMessages',
-] as const;
 
 /**
  * 検索結果テーブルビューを管理するクラス
@@ -69,6 +60,14 @@ export class ResultsView {
   private _mutationObserver: MutationObserver | null = null;
   private _resizeFrameId: number | null = null;
   private _boundResizeFallbackHandler: (() => void) | null = null;
+
+  /** unsubscribeで同一参照が必要なため、束縛済みコールバックをフィールドに保持する。 */
+  private _onSearchStatus = (v: StoreState['searchStatus']) => this.searchStatus(v as SearchStatus);
+  private _onSearchResults = (v: StoreState['searchResults']) => this.searchResults(v);
+  private _onColumns = (v: StoreState['columns']) => this.columns(v);
+  private _onOffset = (v: StoreState['offset']) => this.offset(v);
+  private _onKaryotype = (v: StoreState['karyotype']) => this.karyotype(v);
+  private _onSearchMessages = (v: StoreState['searchMessages']) => this.searchMessages(v as SearchMessages);
 
   /**
    * ResultsView のコンストラクタ
@@ -147,11 +146,12 @@ export class ResultsView {
       this.columnAutoSizer.destroy();
     }
 
-    // Unbind all StoreManager event bindings
-    STORE_BINDINGS.forEach((key) => {
-      storeManager.unbind(key, this);
-    });
-
+    storeManager.unsubscribe('searchStatus', this._onSearchStatus);
+    storeManager.unsubscribe('searchResults', this._onSearchResults);
+    storeManager.unsubscribe('columns', this._onColumns);
+    storeManager.unsubscribe('offset', this._onOffset);
+    storeManager.unsubscribe('karyotype', this._onKaryotype);
+    storeManager.unsubscribe('searchMessages', this._onSearchMessages);
     storeManager.unsubscribe('searchMode', this._boundSearchModeHandler);
 
     // Remove keydown event listener
@@ -295,9 +295,12 @@ export class ResultsView {
    * - キーボードイベントリスナーを登録
    */
   private _connectToStoreManager(): void {
-    STORE_BINDINGS.forEach((key) => {
-      storeManager.bind(key, this);
-    });
+    storeManager.subscribe('searchStatus', this._onSearchStatus);
+    storeManager.subscribe('searchResults', this._onSearchResults);
+    storeManager.subscribe('columns', this._onColumns);
+    storeManager.subscribe('offset', this._onOffset);
+    storeManager.subscribe('karyotype', this._onKaryotype);
+    storeManager.subscribe('searchMessages', this._onSearchMessages);
     this._boundKeydownHandler = this._keydown.bind(this);
     document.addEventListener('keydown', this._boundKeydownHandler);
   }

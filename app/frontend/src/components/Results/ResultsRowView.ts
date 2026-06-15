@@ -24,6 +24,12 @@ export class ResultsRowView {
   private _isDestroyed = false;
 
   /**
+   * unsubscribeで同一参照が必要なため、束縛済みコールバックをフィールドに保持する。
+   */
+  private _onSelectedRow = (v: number | undefined) => this.selectedRow(v!);
+  private _onOffset = () => this.offset();
+
+  /**
    * _prepareTableDataでHTML生成直後に一括取得し、updateTableRowで毎回querySelectorを
    * 実行しないよう保持する。
    */
@@ -61,8 +67,8 @@ export class ResultsRowView {
     this.selected = false;
     this.tr = this._createTableRow();
 
-    storeManager.bind('selectedRow', this);
-    storeManager.bind('offset', this);
+    storeManager.subscribe('selectedRow', this._onSelectedRow);
+    storeManager.subscribe('offset', this._onOffset);
   }
 
   // ================================================================
@@ -76,8 +82,8 @@ export class ResultsRowView {
   destroy(): void {
     if (this._isDestroyed) return;
 
-    storeManager.unbind('selectedRow', this);
-    storeManager.unbind('offset', this);
+    storeManager.unsubscribe('selectedRow', this._onSelectedRow);
+    storeManager.unsubscribe('offset', this._onOffset);
 
     if (this.tr && this.tr.parentNode) {
       this.tr.parentNode.removeChild(this.tr);

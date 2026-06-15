@@ -186,8 +186,8 @@ export default class ChromosomeView {
     }
     this._svg.innerHTML = html + '</g>';
 
-    // displayingRegionsOnChromosome の変化を受け取るためにバインドする。
-    storeManager.bind('displayingRegionsOnChromosome', this);
+    // displayingRegionsOnChromosome の変化を受け取るために購読登録する。
+    storeManager.subscribe('displayingRegionsOnChromosome', (v) => this.displayingRegionsOnChromosome(v!));
 
     // 染色体番号クリックで染色体全体を検索条件に設定する。
     this._elm

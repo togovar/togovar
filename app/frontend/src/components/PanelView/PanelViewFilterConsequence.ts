@@ -102,8 +102,8 @@ export default class PanelViewFilterConsequence extends PanelView {
       });
     }
 
-    storeManager.bind('simpleSearchConditions', this);
-    storeManager.bind('statisticsConsequence', this);
+    storeManager.subscribe('simpleSearchConditions', (v) => this.simpleSearchConditions(v as unknown as Record<string, Record<string, string>>));
+    storeManager.subscribe('statisticsConsequence', (v) => this.statisticsConsequence(v as Record<string, number> | null));
   }
 
   // ----------------------------------------

@@ -5,12 +5,11 @@ export default class LoadingIndicator {
   private readonly elm: HTMLElement;
 
   /**
-   * StoreManagerに自身をバインドし、appStatusの変化を受け取れるようにする。
-   * バインドすることでLoadingIndicator#appStatus()がStoreの変更通知先になる。
+   * appStatusの変化を受け取るためStoreに購読登録し、初期値を即時反映する。
    */
   constructor(elm: HTMLElement) {
     this.elm = elm;
-    storeManager.bind('appStatus', this);
+    storeManager.subscribe('appStatus', (v) => this.appStatus(v));
     this.appStatus(storeManager.getData('appStatus'));
   }
 

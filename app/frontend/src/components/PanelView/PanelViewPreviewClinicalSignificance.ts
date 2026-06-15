@@ -123,8 +123,8 @@ export default class PanelViewPreviewClinicalSignificance extends PanelView {
 
   constructor(elm: Element) {
     super(elm, 'clinicalSignificance');
-    storeManager.bind('selectedRow', this);
-    storeManager.bind('offset', this);
+    storeManager.subscribe('selectedRow', () => this.selectedRow());
+    storeManager.subscribe('offset', () => this.offset());
     // テンプレート崩れを早期検出するため、存在必須要素は selectRequired で取得する
     this.content = selectRequired(
       this.elm,
