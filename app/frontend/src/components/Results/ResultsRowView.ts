@@ -13,91 +13,76 @@ import {
 import { ResultsColumnUpdater } from './ResultsColumnUpdater';
 
 /**
- * Class for managing a single row in the search results table
- *
- * Responsible for creating DOM elements, data binding, and state management for each row
- * Receives data change notifications from storeManager and updates corresponding DOM elements
+ * 仮想スクロールにおける1行分のView。
+ * 固定DOM行を使い回し、offset変化のたびにデータをStoreから引いて表示を切り替えることで
+ * 大量件数でもDOM数を一定に保つ。
  */
 export class ResultsRowView {
-  index: number; // Row index number
-  selected: boolean; // Row selection state
-  tr: HTMLTableRowElement; // Table row element
-  private _isDestroyed = false; // Track if instance has been destroyed
+  index: number;
+  selected: boolean;
+  tr: HTMLTableRowElement;
+  private _isDestroyed = false;
 
-  // Cache for DOM elements
-  // TogoVar ID
+  /**
+   * _prepareTableDataでHTML生成直後に一括取得し、updateTableRowで毎回querySelectorを
+   * 実行しないよう保持する。
+   */
   togovarIdCell: HTMLTableCellElement | null = null;
-  // RefSNP ID
   refsnpCell: HTMLTableCellElement | null = null;
   refsnpContent: HTMLDivElement | null = null;
   refsnpRemains: HTMLSpanElement | null = null;
-  // Position
   positionChromosome: HTMLDivElement | null = null;
   positionCoordinate: HTMLDivElement | null = null;
-  // Ref/Alt
   refElement: HTMLSpanElement | null = null;
   altElement: HTMLSpanElement | null = null;
-  // Type
   typeElement: HTMLDivElement | null = null;
-  // Gene
   geneCell: HTMLTableCellElement | null = null;
   geneContent: HTMLDivElement | null = null;
   geneRemains: HTMLSpanElement | null = null;
-  // Alt frequency
   frequencyElements: TdFrequencies = {};
-  // Consequence
   consequenceCell: HTMLTableCellElement | null = null;
   consequenceContent: HTMLDivElement | null = null;
   consequenceItem: HTMLDivElement | null = null;
   consequenceRemains: HTMLSpanElement | null = null;
-  // Clinical significance
   clinicalContainer: HTMLDivElement | null = null;
   clinicalSignificance: HTMLDivElement | null = null;
   clinicalRemains: HTMLSpanElement | null = null;
   clinicalIcon: HTMLSpanElement | null = null;
-  // AlphaMissense
   alphaMissenseFunction: HTMLDivElement | null = null;
-  // SIFT
   siftFunction: HTMLDivElement | null = null;
-  // PolyPhen
   polyphenFunction: HTMLDivElement | null = null;
 
   /**
-   * Constructor for ResultsRowView
-   *
-   * @param index - Row index number in the table
+   * offsetとselectedRowの変化を受け取って行を再描画するためStoreにバインドする。
+   * 個別バインドにしているのは行インデックスに応じたデータを独立して取得・表示するため。
    */
   constructor(index: number) {
     this.index = index;
     this.selected = false;
     this.tr = this._createTableRow();
 
-    // Watch for changes to `selectedRow` and `offset`
     storeManager.bind('selectedRow', this);
     storeManager.bind('offset', this);
   }
 
-  // ========================================
-  // Lifecycle Management
-  // ========================================
+  // ================================================================
+  // ライフサイクル
+  // ================================================================
 
   /**
-   * Clean up all resources and event listeners
-   * Call this method when the row is no longer needed
+   * バインドしたままオブジェクトが破棄されるとコールバックが届き続けてメモリリークになるため
+   * 必ずStoreからunbindしてDOMも切り離す。
    */
   destroy(): void {
     if (this._isDestroyed) return;
 
-    // Unbind from store events
     storeManager.unbind('selectedRow', this);
     storeManager.unbind('offset', this);
 
-    // Remove DOM element
     if (this.tr && this.tr.parentNode) {
       this.tr.parentNode.removeChild(this.tr);
     }
 
-    // Clear cached DOM element references
     this.togovarIdCell = null;
     this.refsnpCell = null;
     this.refsnpContent = null;
@@ -123,22 +108,16 @@ export class ResultsRowView {
     this.siftFunction = null;
     this.polyphenFunction = null;
 
-    // Mark as destroyed to prevent further operations
     this._isDestroyed = true;
-
-    // Note: this.tr reference kept to avoid TypeScript null assertion issues
-    // The _isDestroyed flag ensures the instance won't be used after cleanup
   }
 
-  // ========================================
-  // Table Row Update Method
-  // ========================================
+  // ================================================================
+  // 行の状態更新
+  // ================================================================
 
   /**
-   * Update table row data
-   *
-   * Receives notifications from storeManager and updates the row display content
-   * Sets appropriate display state based on data fetching status
+   * isFetching / isStoreUpdating / rowCount / データの順に状態を確認し、
+   * 最も早い段階で不要な処理を打ち切ることで描画コストを抑える。
    */
   updateTableRow() {
     if (this._isDestroyed) return;
@@ -157,7 +136,6 @@ export class ResultsRowView {
       return this._setLoadingState();
     }
 
-    // Rows beyond range are hidden using style (-out-of-range)
     const rowCount = storeManager.getData('rowCount');
     if (rowCount <= this.index) {
       return this._setOutOfRangeState();
@@ -170,22 +148,16 @@ export class ResultsRowView {
 
     const columns = this._getCurrentColumns();
     this._prepareTableData(columns);
-
-    // Update data for each column
     columns.forEach((column) => this._updateColumnContent(column, result));
-
     this.tr.classList.remove('-loading', '-out-of-range');
   }
 
-  // ========================================
-  // Store Event Handlers
-  // ========================================
+  // ================================================================
+  // Storeイベントハンドラ
+  // ================================================================
 
   /**
-   * Handle selected row changes
-   * Store event handler method (called by bind/unbind system)
-   *
-   * @param selectedIndex - Index of the selected row
+   * 選択状態はCSSクラスだけで表現できるため、データの再描画は行わずclassToggleのみ行う。
    */
   selectedRow(selectedIndex: number) {
     if (this._isDestroyed) return;
@@ -194,22 +166,19 @@ export class ResultsRowView {
   }
 
   /**
-   * Handle offset changes
-   * Store event handler method (called by bind/unbind system)
+   * offsetが変わると表示すべきデータが変わるため、行全体を再評価する。
    */
   offset() {
     if (this._isDestroyed) return;
     this.updateTableRow();
   }
 
-  // ========================================
-  // DOM Creation and State Management
-  // ========================================
+  // ================================================================
+  // DOM生成と状態管理
+  // ================================================================
 
   /**
-   * Create table row element
-   *
-   * @returns Created table row element
+   * 生成直後はStoreからデータを受け取っていないため、初期状態を-loadingにして白紙を防ぐ。
    */
   private _createTableRow(): HTMLTableRowElement {
     const tr = document.createElement('tr');
@@ -220,7 +189,8 @@ export class ResultsRowView {
   }
 
   /**
-   * Set row to loading state
+   * スクロール中のデータ未到着行にローディングGIFを見せるために使う。
+   * 以前のデータが残ったままだとレイアウトが崩れるためinnerHTMLもリセットする。
    */
   private _setLoadingState() {
     this.tr.classList.remove('-out-of-range');
@@ -229,7 +199,8 @@ export class ResultsRowView {
   }
 
   /**
-   * Set row to out-of-range state
+   * 表示行数の範囲外・初回fetchのデータ未着行を完全に隠すために使う。
+   * display:noneはSCSSの-out-of-rangeクラスが担い、クラスの付け外しで制御する。
    */
   private _setOutOfRangeState() {
     this.tr.classList.remove('-loading');
@@ -237,14 +208,12 @@ export class ResultsRowView {
     this.tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
   }
 
-  // ========================================
-  //  Data Preparation and HTML Generation
-  // ========================================
+  // ================================================================
+  // データ準備とHTML生成
+  // ================================================================
 
   /**
-   * Prepare table data
-   *
-   * Generate HTML and cache DOM elements
+   * HTML生成とDOMキャッシュ取得を分離して、生成処理とキャッシュ処理の責務を明確にする。
    */
   private _prepareTableData(columns: Column[]) {
     this.tr.innerHTML = this._createTableCellHTML(columns);
@@ -252,9 +221,7 @@ export class ResultsRowView {
   }
 
   /**
-   * Dynamically generate table cell HTML
-   *
-   * @returns Generated HTML string
+   * 列の有効/無効・順序がStoreから動的に変わるため、固定HTMLではなく毎回生成する。
    */
   private _createTableCellHTML(columns: Column[]): string {
     return columns
@@ -275,24 +242,30 @@ export class ResultsRowView {
       .join('');
   }
 
+  /**
+   * 既存のカラムテンプレートHTML文字列を変更せずにリサイズバーを</td>直前へ注入するため
+   * 文字列置換で挿入する。
+   */
   private _appendResizeBar(cellHTML: string, resizeBar: string): string {
     if (!cellHTML) return '';
-
     return cellHTML.replace('</td>', `${resizeBar}</td>`);
   }
 
+  /**
+   * store.columnsは順序が保証されないためgetOrderedColumnsで表示順を正規化して返す。
+   */
   private _getCurrentColumns() {
     return getOrderedColumns(storeManager.getData('columns'));
   }
 
-  // ========================================
-  //  DOM Element Caching
-  // ========================================
+  // ================================================================
+  // DOM要素キャッシュ
+  // ================================================================
 
   /**
-   * Cache table cell elements
-   *
-   * Pre-cache frequently accessed DOM elements for performance improvement
+   * updateTableRowのたびにquerySelectorを実行するとコストが高いため、
+   * HTML生成後に一度だけまとめて取得してフィールドに保持する。
+   * 周波数・機能予測系は構造が異なるため3つのメソッドに分けている。
    */
   private _cacheTableCells() {
     this._cacheBasicElements();
@@ -301,40 +274,33 @@ export class ResultsRowView {
   }
 
   /**
-   * Cache basic table cell elements
+   * 各セルはネストが浅くquerySelectorで一意に取れるため、列ごとに直接取得する。
    */
   private _cacheBasicElements() {
-    // TogoVar ID
     this.togovarIdCell = this.tr.querySelector('td.togovar_id');
 
-    // RefSNP ID
     this.refsnpCell = this.tr.querySelector('td.refsnp_id');
     this.refsnpContent =
       this.refsnpCell?.querySelector('.remains-content') || null;
     this.refsnpRemains =
       this.refsnpCell?.querySelector('.remains-badge') || null;
 
-    // Position
     const tdPosition = this.tr.querySelector(
       'td.position > .chromosome-position'
     );
     this.positionChromosome = tdPosition?.querySelector('.chromosome') || null;
     this.positionCoordinate = tdPosition?.querySelector('.coordinate') || null;
 
-    // Ref/Alt
     const tdRefAlt = this.tr.querySelector('td.ref_alt > .ref-alt');
     this.refElement = tdRefAlt?.querySelector('span.ref') || null;
     this.altElement = tdRefAlt?.querySelector('span.alt') || null;
 
-    // Type
     this.typeElement = this.tr.querySelector('td.type > .variant-type');
 
-    // Gene
     this.geneCell = this.tr.querySelector('td.gene');
     this.geneContent = this.geneCell?.querySelector('.remains-content') || null;
     this.geneRemains = this.geneCell?.querySelector('.remains-badge') || null;
 
-    // Consequence
     this.consequenceCell = this.tr.querySelector('td.consequence');
     this.consequenceContent =
       this.consequenceCell?.querySelector('.remains-content') || null;
@@ -343,7 +309,6 @@ export class ResultsRowView {
     this.consequenceRemains =
       this.consequenceCell?.querySelector('.remains-badge') || null;
 
-    // Clinical significance
     const tdClinical = this.tr.querySelector<HTMLTableCellElement>(
       'td.clinical_significance'
     );
@@ -360,7 +325,8 @@ export class ResultsRowView {
   }
 
   /**
-   * Cache frequency-related table cell elements
+   * frequency-block-viewは複数あり、データセット名をキーにすることで
+   * 後からO(1)で対象要素を更新できる。
    */
   private _cacheFrequencyElements() {
     this.frequencyElements = {};
@@ -376,33 +342,29 @@ export class ResultsRowView {
   }
 
   /**
-   * Cache function prediction-related table cell elements
+   * 予測系カラムはすべて同じHTML構造（td.xxx > .variant-function）を持つため、
+   * カラムIDで識別してまとめてキャッシュする。
    */
   private _cacheFunctionElements() {
-    // AlphaMissense
     const tdAlphaMissense = this.tr.querySelector('td.alphamissense');
     this.alphaMissenseFunction =
       tdAlphaMissense?.querySelector('.variant-function') || null;
 
-    // SIFT
     const tdSift = this.tr.querySelector('td.sift');
     this.siftFunction = tdSift?.querySelector('.variant-function') || null;
 
-    // PolyPhen
     const tdPolyphen = this.tr.querySelector('td.polyphen');
     this.polyphenFunction =
       tdPolyphen?.querySelector('.variant-function') || null;
   }
 
-  // ========================================
-  //  Column Content Updates
-  // ========================================
+  // ================================================================
+  // 列コンテンツ更新
+  // ================================================================
 
   /**
-   * Update content for the specified column
-   *
-   * @param column - Column definition to update
-   * @param result - Display data
+   * 列IDをキーにしたディスパッチテーブルにすることで、列追加時の変更箇所を局所化する。
+   * 対応するハンドラが存在しない列IDは?. で安全にスキップする。
    */
   private _updateColumnContent(column: Column, result: ResultData) {
     const columnHandlers: Record<string, () => void> = {
@@ -476,18 +438,18 @@ export class ResultsRowView {
     columnHandlers[column.id]?.();
   }
 
-  // ========================================
-  // Event Handler
-  // ========================================
+  // ================================================================
+  // イベントハンドラ
+  // ================================================================
 
   /**
-   * Handler for when a row is clicked
-   * Toggles selection state and fires a custom event
+   * 同一行の再クリックで選択解除するUXのためselectedRowをトグルする。
+   * tapCompletedイベントはタッチデバイスのスクロール制御（ResultsViewTouchHandler）が
+   * タップ完了を検知するために使う。
    */
   private _handleRowClick(): void {
     storeManager.setData('selectedRow', this.selected ? undefined : this.index);
 
-    // Dispatch custom event to notify tap completion
     const tapCompletedEvent = new CustomEvent('tapCompleted', {
       bubbles: true,
       detail: { rowIndex: this.index },
