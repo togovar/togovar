@@ -98,13 +98,12 @@ export default class PanelViewPreviewAlternateAlleleFrequencies extends PanelVie
 
     const record = storeManager.getSelectedRecord();
     if (!record) return;
+    const frequencies = record.frequencies ?? [];
 
     for (const dataset of this._master) {
       if (!dataset.has_freq || dataset.id === undefined) continue;
 
-      const frequency = record.frequencies.find(
-        (freq) => freq.source === dataset.id
-      );
+      const frequency = frequencies.find((freq) => freq.source === dataset.id);
       const cells = this._datasets[dataset.id];
 
       if (frequency) {
