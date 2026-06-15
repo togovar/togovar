@@ -41,8 +41,8 @@ html(data-page=locals.currentPage, lang=lang)
           document.head.appendChild(canonicalLink);
         }
 
-        // レポートページは静的HTMLのため、削除したExpressの代わりに現在URLをcanonicalへ反映する。
-        canonicalLink.href = window.location.origin + window.location.pathname;
+        // レポートページは静的HTMLのため、ビルド時の正規originに現在パスをcanonicalとして反映する。
+        canonicalLink.href = "#{TOGOVAR_FRONTEND_SITE_ORIGIN}" + window.location.pathname;
       })();
       (async function() {
         try {
