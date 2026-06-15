@@ -5,14 +5,12 @@ import {
   reflectAdvancedSearchConditionToURI,
 } from '../store/searchManager';
 import { executeSearch } from '../api/fetchData';
+import { getInitialColumnWidth, normalizeColumnConfigs } from '../columns';
 import {
-  getDefaultColumnConfigs,
-  getInitialColumnWidth,
-  normalizeColumnConfigs,
-} from '../columns';
+  loadColumnsFromStorage,
+  saveColumnsToStorage,
+} from '../columns/columnStorage';
 import type { StoreState, ResultData, SearchMode } from '../types';
-
-const COLUMNS_STORAGE_KEY = 'columns';
 
 type StoreListener = (value: unknown) => void;
 
@@ -53,80 +51,9 @@ class StoreManager {
     displayingRegionsOnChromosome: {},
   };
 
-  /**
-   * 列設定とイベントの初期化を別メソッドに切り出して処理の意図を明確にする。
-   */
   constructor() {
-    this._initColumnsState();
+    this._state.columns = loadColumnsFromStorage();
     this._initSearchCondition();
-  }
-
-  /**
-   * localStorageから列設定を復元してstateに適用する。
-   * constructorに直接書くと初期化処理が長くなるため切り出している。
-   */
-  private _initColumnsState() {
-    this._state.columns = this._loadColumnsFromStorage();
-  }
-
-  /**
-   * SSRや壊れたlocalStorageデータに備えてデフォルト値へのフォールバックを保証する。
-   * localStorage自体のアクセスが例外を投げる環境があるためtry/catchで保護している。
-   */
-  private _loadColumnsFromStorage() {
-    const fallbackColumns = getDefaultColumnConfigs();
-
-    try {
-      if (typeof window === 'undefined' || !window.localStorage) {
-        return fallbackColumns;
-      }
-
-      const raw = window.localStorage.getItem(COLUMNS_STORAGE_KEY);
-      if (!raw) {
-        return fallbackColumns;
-      }
-
-      const columns = this._parseStoredColumns(raw);
-      if (!columns) {
-        return fallbackColumns;
-      }
-
-      return columns;
-    } catch (_error) {
-      return fallbackColumns;
-    }
-  }
-
-  /**
-   * JSON.parseの結果が配列でない場合はnullを返してフォールバックさせる。
-   * normalizeColumnConfigsで古い列設定の構造差異も吸収する。
-   */
-  private _parseStoredColumns(raw: string): StoreState['columns'] | null {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) {
-      return null;
-    }
-
-    return normalizeColumnConfigs(parsed);
-  }
-
-  /**
-   * localStorage容量超過やプライベートブラウズでの書き込み失敗を許容する。
-   * 保存できなくてもUIは動作するためエラーを握り潰して継続する。
-   */
-  private _saveColumnsToStorage(columns: StoreState['columns']) {
-    try {
-      if (typeof window === 'undefined' || !window.localStorage) {
-        return;
-      }
-
-      window.localStorage.setItem(
-        COLUMNS_STORAGE_KEY,
-        JSON.stringify(normalizeColumnConfigs(columns))
-      );
-    } catch (_error) {
-      // localStorage制限超過やプライベートブラウズ環境では保存失敗を許容
-    }
   }
 
   /**
@@ -174,7 +101,7 @@ class StoreManager {
     if (!isEqual(oldValue, nextValue)) {
       this._state[key] = structuredClone(nextValue);
       if (key === 'columns') {
-        this._saveColumnsToStorage(this._state.columns);
+        saveColumnsToStorage(this._state.columns);
       }
       this.publish(key);
     }
@@ -297,56 +224,6 @@ class StoreManager {
       ];
     } else {
       return null;
-    }
-  }
-
-  // ------------------------------
-  //  Login Status管理
-  // ------------------------------
-
-  /**
-   * localhost環境ではCORSエラーになるため認証APIを呼ばずに未ログイン扱いにする。
-   * 403もログイン済みとして扱うのは、ステージング/本番でステータスエンドポイントへの
-   * アクセス権がセッションに関係なく制限される場合があるため。
-   */
-  async fetchLoginStatus() {
-    try {
-      if (typeof window === 'undefined') {
-        this.setData('isLogin', false);
-        return;
-      }
-
-      if (window.location.origin === 'http://localhost:8000') {
-        this.setData('isLogin', false);
-        return;
-      }
-
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-      const response = await fetch(`${window.location.origin}/auth/status`, {
-        signal: controller.signal,
-      }).catch(() => {
-        throw new Error('Request failed or timed out');
-      });
-
-      clearTimeout(timeoutId);
-
-      if (response instanceof Response) {
-        if (response.status === 200 || response.status === 403) {
-          this.setData('isLogin', true);
-        } else {
-          this.setData('isLogin', false);
-        }
-      }
-    } catch (error) {
-      if (
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1'
-      ) {
-        console.warn('Failed to fetch auth status:', error);
-      }
-      this.setData('isLogin', false);
     }
   }
 
