@@ -30,6 +30,14 @@ html(data-page=locals.currentPage, lang=lang)
         f.addEventListener('load', activateFontStylesheet, { once: true });
         if (f.sheet) activateFontStylesheet();
       })();
+      (function() {
+        var canonicalLink = document.querySelector('link[rel="canonical"]');
+        if (!canonicalLink) return;
+        if (canonicalLink.getAttribute('href') !== '__TOGOVAR_CANONICAL_URL__') return;
+
+        // レポートページは静的HTMLのため、削除したExpressの代わりに現在URLをcanonicalへ反映する。
+        canonicalLink.href = window.location.origin + window.location.pathname;
+      })();
       (async function() {
         try {
           // ヘッダーはbody内にあるため、localでも確実にLoginリンクを取得できるまで待つ。
@@ -49,9 +57,11 @@ html(data-page=locals.currentPage, lang=lang)
             // localでは実認証を行わないが、UI確認のため ?auth=login でLogout表示を再現できるようにする。
             const localAuthPreview = new URLSearchParams(window.location.search).get('auth');
             const localIsLogin = localAuthPreview === 'login';
+            const localLabel = localIsLogin ? "Logout" : "Login";
             loginMenu.removeAttribute('href');
             loginMenu.setAttribute('aria-disabled', 'true');
-            loginMenu.textContent = localIsLogin ? "Logout" : "Login";
+            loginMenu.setAttribute('aria-label', localLabel);
+            loginMenu.textContent = localLabel;
             loginMenu.addEventListener('click', function(event) {
               event.preventDefault();
             });
@@ -66,11 +76,15 @@ html(data-page=locals.currentPage, lang=lang)
           }
 
           if (isLogin === true) {
+            const logoutLabel = "Logout";
             loginMenu.href = "/auth/logout";
-            loginMenu.textContent = "Logout";
+            loginMenu.setAttribute('aria-label', logoutLabel);
+            loginMenu.textContent = logoutLabel;
           } else {
+            const loginLabel = "Login";
             loginMenu.href = loginMenu.dataset.loginHref || "/auth/login";
-            loginMenu.textContent = "Login";
+            loginMenu.setAttribute('aria-label', loginLabel);
+            loginMenu.textContent = loginLabel;
           }
 
         } catch (error) {

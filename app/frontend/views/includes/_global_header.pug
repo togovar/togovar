@@ -50,23 +50,23 @@ header#GlobalHeader
         if locals.currentPage === "home"
           ul.menu
             li.menu-button.login 
-              a.link(data-login-href="/auth/login" aria-label="Login") Login
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else if locals.currentPage === "404"
           ul.menu
             li.menu-button.login
-              a.link(data-login-href="/auth/login" aria-label="Login") Login
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else if locals.currentPage === "variant"
           ul.menu
             li.menu-button.login 
-              a.link(data-login-href="/auth/login" aria-label="Login") Login
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else if locals.currentPage === "gene"
           ul.menu
             li.menu-button.login 
-              a.link(data-login-href="/auth/login" aria-label="Login") Login
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else if locals.currentPage === "disease"
           ul.menu
             li.menu-button.login 
-              a.link(data-login-href="/auth/login" aria-label="Login") Login
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else
           ul.menu
             li.menu-button.languageswitcher(class={"en": locals.language === "en" , "ja": locals.language === "ja"})
@@ -76,4 +76,4 @@ header#GlobalHeader
                 | ja
 
             li.menu-button.login 
-              a.link(data-login-href="/auth/login" aria-label="Login") Login
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login

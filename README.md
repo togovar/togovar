@@ -105,6 +105,22 @@ TOGOVAR_FRONTEND_API_URL=https://grch38.togovar.org
 TOGOVAR_REFERENCE=GRCh38
 ```
 
+### 開発サーバー
+
+ローカルで画面を確認する場合は、webpack-dev-server を起動します。
+
+```bash
+npm run dev
+```
+
+起動後、以下の URL にアクセスしてください。
+
+```txt
+http://localhost:8000/
+```
+
+`/variant/tgv418765796` などのレポートページも、開発サーバーが対応する静的 HTML に fallback して表示します。
+
 ### 本番ビルド
 
 ```bash
