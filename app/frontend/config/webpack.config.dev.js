@@ -10,6 +10,10 @@ export default merge(commonConfig, {
         { from: /^\/variant(?:\/.*)?$/, to: '/variant/index.html' },
         { from: /^\/gene(?:\/.*)?$/, to: '/gene/index.html' },
         { from: /^\/disease(?:\/.*)?$/, to: '/disease/index.html' },
+        {
+          from: /^\/doc\/(?!.*(?:\/index)?\.html$)(.+?)(?:\/)?$/,
+          to: (context) => `/doc/${context.match[1]}/index.html`,
+        },
       ],
     },
     setupMiddlewares: (middlewares) => {

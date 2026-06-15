@@ -76,7 +76,19 @@ html(data-page=locals.currentPage, lang=lang)
             return;
           }
 
-          const response = await fetch(`${window.location.origin}/auth/status`);
+          const controller = new AbortController();
+          const timeoutId = setTimeout(function() {
+            controller.abort();
+          }, 10000);
+          let response;
+
+          try {
+            response = await fetch(`${window.location.origin}/auth/status`, {
+              signal: controller.signal,
+            });
+          } finally {
+            clearTimeout(timeoutId);
+          }
 
           let isLogin = false;
           if (response.status === 200 || response.status === 403) {
