@@ -41,8 +41,9 @@ html(data-page=locals.currentPage, lang=lang)
           document.head.appendChild(canonicalLink);
         }
 
-        // レポートページは静的HTMLのため、ビルド時の正規originに現在パスをcanonicalとして反映する。
-        canonicalLink.href = "#{TOGOVAR_FRONTEND_SITE_ORIGIN}" + window.location.pathname;
+        // レポート詳細は旧Express配信時と同じ末尾スラッシュなしを正規URLとして扱う。
+        var canonicalPath = window.location.pathname.replace(/^\/(variant|gene|disease)\/([^/]+)\/$/, '/$1/$2');
+        canonicalLink.href = "#{TOGOVAR_FRONTEND_SITE_ORIGIN}" + canonicalPath;
       })();
       (async function() {
         try {
