@@ -295,15 +295,13 @@ function _processSearchResults(json: SearchResults) {
 /** 統計情報をセット */
 function _processStatistics(json: SearchStatistics) {
   // status
+  const available = Math.min(json.statistics.filtered, json.scroll.max_rows);
   storeManager.setData('searchStatus', {
-    available: Math.min(json.statistics.filtered, json.scroll.max_rows),
+    available,
     filtered: json.statistics.filtered,
     total: json.statistics.total,
   });
-  storeManager.setData(
-    'numberOfRecords',
-    storeManager.getData('searchStatus').available
-  );
+  storeManager.setData('numberOfRecords', available);
 
   // statistics
   storeManager.setData('statisticsDataset', json.statistics.dataset); // dataset
