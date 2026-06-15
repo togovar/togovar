@@ -3,7 +3,6 @@ extend ../layouts/application
 append variables
   - locals.currentPage = "gene";
   - locals.description = "TogoVar gene report pages provide variant annotations, clinical significance, genomic context, protein information, and publications for human genes.";
-  - locals.canonicalUrl = "__TOGOVAR_CANONICAL_URL__";
 
 block head
   each css in htmlWebpackPlugin.files.css.filter(x => x.match(/^\/css\/main-/))

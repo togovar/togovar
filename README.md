@@ -136,6 +136,8 @@ npm run build
 
 このリポジトリ内では、以前 `app/frontend/server/middlewares/securityHeaders.js` が付与していたセキュリティヘッダーは設定されません。静的配信へ移したため、CSP、HSTS、COOP、`X-Frame-Options`、`X-Content-Type-Options`、`Referrer-Policy`、`Permissions-Policy` などは nginx / CDN / edge / 外部デプロイ設定側で管理してください。
 
+テンプレートには `app/frontend/views/layouts/application.pug` などのインライン script が残っています。配信側で CSP を厳格にする場合は、`script-src` で `'unsafe-inline'` を許可する、script hash を付与する、インライン script を外部ファイルへ移すなど、静的配信に合う方針を選んでください。Express の nonce 注入は削除済みです。
+
 実デプロイの Dockerfile、Compose、nginx 設定、起動コマンドはこのリポジトリ外で管理されている可能性があります。配信方式やヘッダーを変える場合は、外部のデプロイ設定も合わせて確認してください。
 
 GitHub Pages ワークフロー（`.github/workflows/publish.yml`）も `npm run build` 後に `dist/` を公開するだけです。Docker 運用については [togovar-docker](https://github.com/togovar/togovar-docker) を参照してください。

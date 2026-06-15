@@ -31,9 +31,15 @@ html(data-page=locals.currentPage, lang=lang)
         if (f.sheet) activateFontStylesheet();
       })();
       (function() {
+        var page = document.documentElement.getAttribute('data-page');
+        if (page !== 'variant' && page !== 'gene' && page !== 'disease') return;
+
         var canonicalLink = document.querySelector('link[rel="canonical"]');
-        if (!canonicalLink) return;
-        if (canonicalLink.getAttribute('href') !== '__TOGOVAR_CANONICAL_URL__') return;
+        if (!canonicalLink) {
+          canonicalLink = document.createElement('link');
+          canonicalLink.setAttribute('rel', 'canonical');
+          document.head.appendChild(canonicalLink);
+        }
 
         // レポートページは静的HTMLのため、削除したExpressの代わりに現在URLをcanonicalへ反映する。
         canonicalLink.href = window.location.origin + window.location.pathname;
@@ -52,13 +58,14 @@ html(data-page=locals.currentPage, lang=lang)
 
           if (
             window.location.hostname === 'localhost' ||
-            window.location.hostname === '127.0.0.1'
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname === '::1'
           ) {
             // localでは実認証を行わないが、UI確認のため ?auth=login でLogout表示を再現できるようにする。
             const localAuthPreview = new URLSearchParams(window.location.search).get('auth');
             const localIsLogin = localAuthPreview === 'login';
             const localLabel = localIsLogin ? "Logout" : "Login";
-            loginMenu.removeAttribute('href');
+            loginMenu.href = '#';
             loginMenu.setAttribute('aria-disabled', 'true');
             loginMenu.setAttribute('aria-label', localLabel);
             loginMenu.textContent = localLabel;
