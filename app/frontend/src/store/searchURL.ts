@@ -96,26 +96,60 @@ export function parseSearchURLParams(): ReturnType<typeof qs.parse> {
 }
 
 /**
- * Simple Search URLは条件をそのままURLへ載せられるため、通常のpushStateだけを行う。
+ * 同一URLの重複履歴と未操作時のskippable履歴を避け、Simple Searchの戻る挙動を自然に保つ。
  */
 function pushSearchUrl(params: SearchUrlParams): void {
   const newUrl = `${window.location.origin}${
     window.location.pathname
   }?${qs.stringify(params)}`;
-  window.history.pushState(params, '', newUrl);
+  updateSearchHistory(params, newUrl);
 }
 
 /**
- * Advanced SearchはURL長制限時にstateへ条件を退避するため、失敗時のフォールバックを持つ。
+ * Advanced SearchはURL長制限時にstateへ条件を退避するため、履歴更新失敗時のフォールバックを持つ。
  */
 function pushAdvancedSearchUrl(state: SearchUrlParams, url: string): void {
   try {
-    window.history.pushState(state, '', url);
+    updateSearchHistory(state, url);
   } catch {
     try {
-      window.history.pushState(currentUrlParams, '', url);
+      updateSearchHistory(currentUrlParams, url);
     } catch {
       // URL更新に失敗しても検索自体は継続できるため、ここでは何もしない。
     }
   }
+}
+
+/**
+ * ブラウザ未操作時はreplaceStateへ切り替え、DevToolsのskippable履歴警告と不自然な履歴増殖を防ぐ。
+ */
+function updateSearchHistory(state: SearchUrlParams, url: string): void {
+  if (isSameDocumentUrl(url)) {
+    return;
+  }
+
+  if (shouldPushHistoryEntry()) {
+    window.history.pushState(state, '', url);
+    return;
+  }
+
+  window.history.replaceState(state, '', url);
+}
+
+/**
+ * すでに表示中のURLと同じなら履歴更新自体が不要なため、無駄なpush/replaceを避ける。
+ */
+function isSameDocumentUrl(url: string): boolean {
+  return url === window.location.href;
+}
+
+/**
+ * ユーザー操作後だけpushStateを許可し、ページ初期化や自動復元ではreplaceStateを使う。
+ */
+function shouldPushHistoryEntry(): boolean {
+  if (typeof navigator === 'undefined' || !('userActivation' in navigator)) {
+    return true;
+  }
+
+  return navigator.userActivation.hasBeenActive;
 }
