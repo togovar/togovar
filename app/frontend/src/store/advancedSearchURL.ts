@@ -1,4 +1,4 @@
-import type { ConditionQuery } from '../types/condition';
+import type { ConditionQuery } from '../types/query';
 
 /** Advanced Search条件のURLエンコード上限（Raw JSON文字数） */
 export const ADVANCED_SEARCH_URL_MAX_JSON_LENGTH = 2000;

@@ -1,6 +1,6 @@
 // types.ts など
 import type { ConditionTypeValue } from '../definition';
-import type { SignificanceSource } from './condition';
+import type { SignificanceSource } from './query';
 
 interface EnumerationItem {
   value: string;

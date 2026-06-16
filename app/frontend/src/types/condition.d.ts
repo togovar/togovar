@@ -1,14 +1,18 @@
-import type {
-  ConditionTypeValue,
-  FrequencyDataset,
-  GenotypeKey,
-  SignificanceTerm,
-} from '../definition';
+/**
+ * Advanced Search UIビルダー型定義
+ *
+ * 条件入力UIとクエリビルダーが使う型を定義する。
+ * Store/APIレイヤーが扱う検索条件クエリ型（ConditionQuery、各Leaf型など）は
+ * query.d.ts に分離されており、ここでは参照のみ行う。
+ */
+
+import type { ConditionTypeValue } from '../definition';
 import type { NoRelationType } from '../conditions';
 import type { ConditionItemView } from '../components/Condition/ConditionItemView';
 import type ConditionValues from '../components/Condition/ConditionValues';
 import type { ConditionItemValueView } from '../components/Condition/ConditionItemValueView';
 import type { PredictionKey } from '../components/Condition/ConditionPathogenicityPredictionSearch/PredictionDatasets';
+import type { ConditionQuery, Relation, Inequality } from './query';
 
 // ───────────────────────────────────────────────────────────────────────────
 // Builder
@@ -27,118 +31,9 @@ type BuilderMap = {
 };
 
 // ───────────────────────────────────────────────────────────────────────────
-// Query
+// Prediction UI イベント
 // ───────────────────────────────────────────────────────────────────────────
-// Union type representing all possible condition query structures
-type ConditionLeaf =
-  | SignificanceLeaf
-  | FrequencyLeaf
-  | GeneLeaf
-  | LocationLeaf
-  | PredictionLeaf
-  | PredictionQueryLocal
-  | IdLeaf
-  | DefaultLeaf;
-
-type ConditionQuery = Logical<ConditionLeaf>;
-
-type Logical<T> = T | { and: Logical<T>[] } | { or: Logical<T>[] };
-
-type Relation = 'eq' | 'ne';
-
-// ───────────────────────────────────────────────────────────────────────────
-// Frequency Query
-// ───────────────────────────────────────────────────────────────────────────
-type FrequencyQuery = Logical<AlleleFrequency | AlleleCount | GenotypeCount>;
-type FrequencyLeaf = AlleleFrequency | AlleleCount | GenotypeCount;
-
-interface FrequencyBase<
-  Extra extends Record<string, unknown> = Record<string, never>,
-> {
-  frequency: {
-    dataset: { name: FrequencyDataset };
-    filtered?: boolean;
-  } & Extra;
-}
-
-interface AlleleFrequency extends FrequencyBase<
-  { frequency: ScoreRange } & { filtered: boolean }
-> {}
-
-interface AlleleCount extends FrequencyBase<
-  { count: ScoreRange } & { filtered: boolean }
-> {}
-
-interface GenotypeCount extends FrequencyBase<
-  { genotype: { key: GenotypeKey; count: ScoreRange } } & {
-    filtered: boolean;
-  }
-> {}
-
-// ───────────────────────────────────────────────────────────────────────────
-// Significance Query
-// ───────────────────────────────────────────────────────────────────────────
-interface SignificanceLeaf {
-  significance: {
-    relation: Relation;
-    source: SignificanceSource[];
-    terms: SignificanceTerm[];
-  };
-}
-type SignificanceQuery = Logical<SignificanceLeaf>;
-
-type SignificanceSource = 'mgend' | 'clinvar';
-
-// ───────────────────────────────────────────────────────────────────────────
-// Gene Query
-// ───────────────────────────────────────────────────────────────────────────
-interface GeneLeaf {
-  gene: {
-    relation: Relation;
-    terms: number[];
-    /** URL/画面復元用。検索APIへ送る前に取り除く。 */
-    labels?: Record<string, string>;
-  };
-}
-
-// ───────────────────────────────────────────────────────────────────────────
-// Location Query
-// ───────────────────────────────────────────────────────────────────────────
-interface LocationLeaf {
-  location: {
-    chromosome: string;
-    position: number | ScoreRange;
-  };
-}
-
-// TODO: chromosome: stringを厳密にする
-
-// ───────────────────────────────────────────────────────────────────────────
-// Prediction Query
-// ───────────────────────────────────────────────────────────────────────────
-
-type OneOrTwo<T> = readonly [T] | readonly [T, T];
-
-type PredictionScore = ScoreRange | ['unassigned'];
-
-type UnassignedOption = 'unassigned' | 'unknown';
-
-type ScoreOrUnassignedFor<K extends PredictionKey> =
-  | ScoreRange
-  | (K extends 'polyphen'
-      ? OneOrTwo<'unassigned' | 'unknown'> // polyphen only allows unassigned/unknown, 1 or 2
-      : readonly ['unassigned']);
-
-type SinglePredictionOf<K extends PredictionKey> = {
-  [P in K]: { score: ScoreOrUnassignedFor<P> };
-};
-
-type PredictionLeaf = {
-  [K in PredictionKey]: SinglePredictionOf<K>;
-}[PredictionKey];
-
-type PredictionQueryLocal = PredictionLeaf | { or: PredictionLeaf[] };
-
+/** 予測スコアUIコンポーネント間のカスタムイベントペイロード */
 interface PredictionChangeDetail {
   dataset: PredictionKey;
   values: [number, number];
@@ -149,44 +44,7 @@ interface PredictionChangeDetail {
 }
 
 // ───────────────────────────────────────────────────────────────────────────
-// ID Query
-// ───────────────────────────────────────────────────────────────────────────
-interface IdLeaf {
-  id: string[];
-}
-
-// ───────────────────────────────────────────────────────────────────────────
-// Default Query
-// ───────────────────────────────────────────────────────────────────────────
-type DefaultQueryKey = 'consequence' | 'disease' | 'type';
-
-type DefaultQueryOf<K extends DefaultQueryKey> = {
-  [P in K]: { relation: Relation; terms: string[] };
-};
-
-type DefaultLeaf =
-  | { consequence: { relation: Relation; terms: string[] } }
-  | { disease: { relation: Relation; terms: string[] } }
-  | { type: { relation: Relation; terms: string[] } };
-
-// ───────────────────────────────────────────────────────────────────────────
-//
-// ───────────────────────────────────────────────────────────────────────────
-type ScoreRange =
-  // pairs
-  | { gte: number; lte: number; gt?: never; lt?: never }
-  | { gt: number; lt: number; gte?: never; lte?: never }
-  | { gt: number; lte: number; gte?: never; lt?: never }
-  | { gte: number; lt: number; gt?: never; lte?: never }
-  // singles
-  | { gte: number; gt?: never; lte?: never; lt?: never }
-  | { gt: number; gte?: never; lte?: never; lt?: never }
-  | { lte: number; gte?: never; gt?: never; lt?: never }
-  | { lt: number; gte?: never; gt?: never; lte?: never };
-
-type Inequality = 'gt' | 'gte' | 'lt' | 'lte';
-// ───────────────────────────────────────────────────────────────────────────
-//
+// ツールバーコマンド
 // ───────────────────────────────────────────────────────────────────────────
 /** Command identifiers handled by the toolbar. */
 type Command = 'add-condition' | 'group' | 'ungroup' | 'delete';
@@ -201,6 +59,9 @@ type CommandDef = Readonly<{
 /** Logical operator used to combine child conditions. */
 type LogicalOperator = 'and' | 'or';
 
+// ───────────────────────────────────────────────────────────────────────────
+// エディター抽象
+// ───────────────────────────────────────────────────────────────────────────
 /** Minimal interface all editors must satisfy. */
 interface ConditionValueEditor {
   keepLastValues(): void; // Capture current state when editing begins
@@ -216,7 +77,7 @@ type EditorCtor = new (
 ) => ConditionValueEditor;
 
 // ───────────────────────────────────────────────────────────────────────────
-//
+// エディターセクション
 // ───────────────────────────────────────────────────────────────────────────
 type EditorSectionClassName =
   | 'columns-editor-view' // dataset, consequence, genotype

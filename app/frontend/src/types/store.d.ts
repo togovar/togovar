@@ -20,7 +20,7 @@ import type {
 import type { ResultData } from './api';
 import type { ColumnConfig } from './components';
 import type { KaryotypeState } from './karyotype';
-import type { ConditionQuery } from './condition';
+import type { ConditionQuery } from './query';
 
 /**
  * カリオタイプビューで表示中の染色体領域を管理する型。

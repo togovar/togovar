@@ -101,6 +101,20 @@ app/frontend/
 - 戻る/進む、URL貼り付け、モード切り替えでは、Store更新と検索実行が重複しやすい。変更時は初期表示・タブ切替・履歴操作を分けて考える。
 - popstate ハンドラ内での `storeManager.setData('searchMode', ...)` は `pushState` を発火させてしまう。`setSearchModeFromHistory(mode)` を使うことで、popstate 中の pushState を防ぐ。
 
+## Advanced Search 型ファイルの分担
+
+`types/condition.d.ts` と `types/query.d.ts` は役割が異なる。混在させない。
+
+| ファイル | 役割 | 主な型 |
+| --- | --- | --- |
+| `types/query.d.ts` | Store/API層向け。コンポーネント依存を持たない（PredictionKey のみ例外） | `ConditionQuery`, `ConditionLeaf`, 各Leaf型, `ScoreRange`, `Inequality`, `Relation` |
+| `types/condition.d.ts` | UIビルダー向け。コンポーネントを import する | `BuildContext`, `BuilderMap`, `ConditionValueEditor`, `EditorCtor`, `PredictionChangeDetail` |
+
+- `ConditionQuery` は Advanced Search の Store 値の正規型。`storeManager.getData('advancedSearchConditions')` は `ConditionQuery | undefined` を返す。
+- `undefined` は「条件なし」を表すセンチネル値であり、`{}` は使わない。
+- Store/API層（`store/`, `Karyotype.ts` など）から `ConditionQuery` を参照するときは `types/query.d.ts` を直接 import する。`types/condition.d.ts` は参照しない。
+- `GeneLeaf.gene.labels` はURL復元用のUIメタ情報。API送信前に `stripAdvancedSearchMetadata()` で除去する。
+
 ## TypeScript / JavaScript 方針
 
 - 新規TypeScriptでは `any` を避け、型が曖昧な値は `unknown` から絞り込む。

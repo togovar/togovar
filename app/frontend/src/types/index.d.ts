@@ -38,6 +38,7 @@ export * from './advancedSearchConditions';
 // ============================================
 // Condition Types
 // ============================================
+export * from './query';
 export * from './condition';
 export * from './conditionRestore';
 // ============================================

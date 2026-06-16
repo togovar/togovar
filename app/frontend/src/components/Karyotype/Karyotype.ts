@@ -2,7 +2,7 @@ import { storeManager } from '../../store/StoreManager';
 import ChromosomeView, { type SubBandEntry } from './ChromosomeView';
 import type { SimpleSearchCurrentConditions } from '../../types/search';
 import type { KaryotypeState } from '../../types';
-import type { ConditionQuery } from '../../types/condition';
+import type { ConditionQuery } from '../../types/query';
 
 // csv-loader が TSV をパースして返す形式: 各行が文字列配列
 type TsvRow = string[];

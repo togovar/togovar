@@ -7,7 +7,7 @@ import type {
   SimpleSearchCurrentConditions,
   SearchMode,
 } from '../types';
-import type { ConditionQuery } from '../types/condition';
+import type { ConditionQuery } from '../types/query';
 import {
   encodeConditionForURL,
   decodeConditionFromURL,
