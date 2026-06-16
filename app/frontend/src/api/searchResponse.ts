@@ -157,22 +157,22 @@ function buildStatisticsStoreUpdate(
 function applyStatisticsStoreUpdate(
   statisticsStoreUpdate: StatisticsStoreUpdate
 ): void {
-  storeManager.setData('searchStatus', statisticsStoreUpdate.searchStatus);
-  storeManager.setData(
-    'numberOfRecords',
-    statisticsStoreUpdate.numberOfRecords
-  );
-  storeManager.setData(
-    'statisticsDataset',
-    statisticsStoreUpdate.statisticsDataset
-  );
-  storeManager.setData(
-    'statisticsSignificance',
-    statisticsStoreUpdate.statisticsSignificance
-  );
-  storeManager.setData('statisticsType', statisticsStoreUpdate.statisticsType);
+  const {
+    searchStatus,
+    numberOfRecords,
+    statisticsDataset,
+    statisticsSignificance,
+    statisticsType,
+    statisticsConsequence,
+  } = statisticsStoreUpdate;
+
+  storeManager.setData('searchStatus', searchStatus);
+  storeManager.setData('numberOfRecords', numberOfRecords);
+  storeManager.setData('statisticsDataset', statisticsDataset);
+  storeManager.setData('statisticsSignificance', statisticsSignificance);
+  storeManager.setData('statisticsType', statisticsType);
   storeManager.setData(
     'statisticsConsequence',
-    statisticsStoreUpdate.statisticsConsequence
+    statisticsConsequence
   );
 }

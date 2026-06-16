@@ -98,10 +98,7 @@ export function handleHistoryChange(e: PopStateEvent) {
     // URL長制限超過で q が省略された履歴エントリに戻った場合は event.state から復元する。
     const condition = getAdvancedConditionFromHistory(urlParams, e.state);
     storeManager.setData('advancedSearchConditions', condition ?? undefined);
-    // false→trueのトグルでBuilderのsubscribeを確実に発火させる。
-    // モード切替でBuilderがすでにロード済みの場合も再構築が必要なため常に実行する。
-    storeManager.setData('advancedSearchRestoredFromURL', false);
-    storeManager.setData('advancedSearchRestoredFromURL', true);
+    _triggerAdvancedSearchRestore();
 
     if (currentMode === 'advanced') {
       // 同一モード内の移動: searchModeサブスクライバは発火しないため直接検索を実行する。
@@ -148,6 +145,15 @@ function _reflectAdvancedSearchConditionToURI() {
   const conditions = storeManager.getData('advancedSearchConditions');
   const { isURLTooLong } = reflectAdvancedSearchConditionToURI(conditions);
   storeManager.setData('advancedSearchURLTooLong', isURLTooLong);
+}
+
+/**
+ * false→trueのトグル理由を名前で表し、URL復元後にBuilder再構築が必要な意図を隠さないようにする。
+ */
+function _triggerAdvancedSearchRestore(): void {
+  // モード切替でBuilderがすでにロード済みの場合も再構築が必要なため、毎回トグルで通知する。
+  storeManager.setData('advancedSearchRestoredFromURL', false);
+  storeManager.setData('advancedSearchRestoredFromURL', true);
 }
 
 // ================================================================
