@@ -1,9 +1,4 @@
 import isEqual from 'lodash/isEqual';
-import {
-  handleHistoryChange,
-  reflectSimpleSearchConditionToURI,
-  reflectAdvancedSearchConditionToURI,
-} from './searchManager';
 import { executeSearch } from '../api/fetchData';
 import { getInitialColumnWidth, normalizeColumnConfigs } from '../columns';
 import {
@@ -28,8 +23,14 @@ class StoreManager {
   /**
    * popstate経由のモード切替時にreflect*ToURIをスキップするためのフラグ。
    * setSearchModeFromHistoryとsearchModeの組み合わせでpushState二重発火を防ぐ。
+   * searchManager の subscriber が fromHistory getter 経由で読む。
    */
   private _fromHistory = false;
+
+  /** searchManager の searchMode subscriber が URL 更新をスキップするか判定するために公開する。 */
+  get fromHistory(): boolean {
+    return this._fromHistory;
+  }
 
   /**
    * アプリ全体の状態オブジェクト。外部からはgetData/setDataのみを通じてアクセスする。
@@ -57,14 +58,11 @@ class StoreManager {
   }
 
   /**
-   * isFetchingの初期化とpopstateリスナー・searchModeの変化監視を登録する。
-   * searchModeのsubscribeは検索モード切替に伴う状態リセットと再検索を担う。
+   * isFetchingの初期化とsearchModeの状態リセットハンドラを登録する。
+   * popstateリスナーとDOM/URL/API側の副作用は searchManager.initSearchHandlers() で別途登録する。
    */
   private _initSearchCondition() {
     this.setData('isFetching', false);
-    if (typeof window !== 'undefined' && window.addEventListener) {
-      window.addEventListener('popstate', handleHistoryChange.bind(this));
-    }
     this.subscribe('searchMode', this.searchMode.bind(this));
   }
 
@@ -232,43 +230,19 @@ class StoreManager {
   // ------------------------------
 
   /**
-   * searchModeのsubscribeコールバック。モード切替時にoffset/selectedRow/searchResultsを
-   * リセットしてから再検索する。
+   * searchMode 変化時に状態をリセットする subscriber。
+   * DOM操作・URL管理・API呼び出しは searchManager の subscriber が担う（責務分離）。
    * ''（空文字）はStoreの初期化前センチネルのため何もしない。
    */
   searchMode(mode: SearchMode | '') {
     if (!mode) return;
     this.setData('isStoreUpdating', true);
-
     try {
       this.setData('offset', 0);
       this.setData('selectedRow', undefined);
       this.setData('searchResults', []);
       this.setData('numberOfRecords', 0);
       this.setData('rowCount', 0);
-
-      if (typeof document !== 'undefined') {
-        document.body.dataset.searchMode = mode;
-      }
-
-      switch (mode) {
-        case 'simple':
-          // _fromHistoryのときはpopstateでURLが確定済みのためpushStateしない
-          if (!this._fromHistory) reflectSimpleSearchConditionToURI();
-          this.publish('simpleSearchConditions');
-          break;
-        case 'advanced': {
-          // setAdvancedSearchConditionはexecuteSearchを内包するため呼ばない。
-          // _fromHistoryのときはURLも変更不要のためreflect系をスキップ。
-          // 検索実行はこのメソッド末尾のexecuteSearch(0, true)に一本化する。
-          if (!this._fromHistory) reflectAdvancedSearchConditionToURI();
-          break;
-        }
-      }
-
-      // モード切り替え時は必ず初回検索として扱う
-      this.setData('appStatus', 'searching');
-      executeSearch(0, true);
     } finally {
       this.setData('isStoreUpdating', false);
     }

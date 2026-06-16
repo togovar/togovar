@@ -1,10 +1,11 @@
 import * as qs from 'qs';
 import { executeSearch } from '../api/fetchData';
-import { storeManager } from '../store/StoreManager';
+import { storeManager } from './StoreManager';
 import type {
   MasterConditions,
   MasterConditionId,
   SimpleSearchCurrentConditions,
+  SearchMode,
 } from '../types';
 import {
   encodeConditionForURL,
@@ -360,5 +361,51 @@ export function reflectAdvancedSearchConditionToURI() {
     } catch {
       // do nothing
     }
+  }
+}
+
+// ================================================================
+// searchMode の副作用ハンドラ
+// ================================================================
+
+/**
+ * searchMode 変化時に DOM・URL・API の副作用を実行する subscriber。
+ * 状態リセットは StoreManager.searchMode() が先に実行するため、
+ * この関数はリセット後の状態を前提に動作する。
+ * storeManager.fromHistory が true のとき（popstate経由）は URL 更新をスキップする。
+ */
+function _handleSearchModeChange(mode: SearchMode | ''): void {
+  if (!mode) return;
+
+  if (typeof document !== 'undefined') {
+    document.body.dataset.searchMode = mode;
+  }
+
+  switch (mode) {
+    case 'simple':
+      // popstate経由のときはURLがすでに確定済みのためpushStateしない
+      if (!storeManager.fromHistory) reflectSimpleSearchConditionToURI();
+      // パネルUIをモード切替後の条件で再描画させるために強制 publish する
+      storeManager.publish('simpleSearchConditions');
+      break;
+    case 'advanced':
+      if (!storeManager.fromHistory) reflectAdvancedSearchConditionToURI();
+      break;
+  }
+
+  storeManager.setData('appStatus', 'searching');
+  executeSearch(0, true);
+}
+
+/**
+ * searchMode subscriber と popstate リスナーを登録する初期化関数。
+ * initializeApp() の冒頭で一度だけ呼ぶこと。
+ * StoreManager のコンストラクタから searchManager への循環インポートを
+ * 断ち切るために、明示的な呼び出し方式にしている。
+ */
+export function initSearchHandlers(): void {
+  storeManager.subscribe('searchMode', _handleSearchModeChange);
+  if (typeof window !== 'undefined' && window.addEventListener) {
+    window.addEventListener('popstate', handleHistoryChange);
   }
 }
