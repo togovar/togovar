@@ -1,6 +1,7 @@
 import type { ResultData } from '../types';
 import type { StoreState } from '../types/storeState';
 
+export type SearchResultSlot = ResultData | null;
 export type SearchRecordLookupResult = ResultData | 'loading' | 'out of range';
 export type SearchResultsResetState = Pick<
   StoreState,
@@ -43,12 +44,12 @@ export function getNextSearchResultCount(
  * 仮想スクロール用の疎な検索結果配列を作り直し、既存ページと新規ページを同じ配列へ合成する。
  */
 export function mergeSearchResults(
-  currentResults: ResultData[],
+  currentResults: SearchResultSlot[],
   records: ResultData[],
   offset: number,
   numberOfRecords: number
-): ResultData[] {
-  const updatedResults = Array(numberOfRecords).fill(null);
+): SearchResultSlot[] {
+  const updatedResults: SearchResultSlot[] = Array(numberOfRecords).fill(null);
 
   currentResults.forEach((record, index) => {
     if (record) updatedResults[index] = record;
@@ -65,12 +66,12 @@ export function mergeSearchResults(
  * 結果配列更新中のフラグ制御とpublish順序を定型化し、StoreManager側の手続き重複を減らす。
  */
 export function applyMergedSearchResults(params: {
-  currentResults: ResultData[];
+  currentResults: SearchResultSlot[];
   records: ResultData[];
   offset: number;
   numberOfRecords: number;
   setUpdating(isUpdating: boolean): void;
-  updateResults(nextResults: ResultData[]): void;
+  updateResults(nextResults: SearchResultSlot[]): void;
   publishResults(): void;
 }): void {
   params.setUpdating(true);
@@ -93,7 +94,7 @@ export function applyMergedSearchResults(params: {
  * 表示行indexを実データindexへ変換し、未取得ページならfetch起動はせずloadingだけを返す。
  */
 export function getSearchRecordByDisplayIndex(
-  searchResults: ResultData[],
+  searchResults: SearchResultSlot[],
   displayIndex: number,
   offset: number,
   numberOfRecords: number
@@ -111,7 +112,7 @@ export function getSearchRecordByDisplayIndex(
  * 選択行は表示offset込みで保存されるため、パネル表示用の実レコードへ変換する。
  */
 export function getSelectedSearchRecord(
-  searchResults: ResultData[],
+  searchResults: SearchResultSlot[],
   offset: number,
   selectedRow: number | undefined
 ): ResultData | null {

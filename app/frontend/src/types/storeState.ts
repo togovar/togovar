@@ -49,7 +49,7 @@ export type StoreState = {
   simpleSearchConditionsMaster: MasterConditions[];
   simpleSearchConditions: SimpleSearchCurrentConditions;
   columns: ColumnConfig[];
-  searchResults: ResultData[];
+  searchResults: (ResultData | null)[];
   numberOfRecords: number;
   offset: number;
   rowCount: number;
