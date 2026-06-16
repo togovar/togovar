@@ -3,14 +3,15 @@ import * as qs from 'qs';
 import debounce from 'lodash/debounce';
 import { API_URL } from '../global';
 import { stripAdvancedSearchMetadata } from '../store/advancedSearchURL';
+import { extractSearchCondition } from '../store/simpleSearchConditions';
+import type { FetchOption, SearchResults, SearchStatistics } from '../types';
+
 const LIMIT = 100;
 const DOWNLOAD_VARIANT_LIMIT = 100000;
 const DOWNLOAD_VARIANT_LIMIT_TEXT = new Intl.NumberFormat('en-US').format(
   DOWNLOAD_VARIANT_LIMIT
 );
 const DOWNLOAD_LIMIT_TITLE = `Download is limited to ${DOWNLOAD_VARIANT_LIMIT_TEXT} variants.`;
-import { extractSearchCondition } from '../store/searchManager';
-import type { FetchOption, SearchResults, SearchStatistics } from '../types';
 
 let currentAbortController: AbortController | null = null;
 let _currentSearchMode: 'simple' | 'advanced' | null = null;

@@ -2,8 +2,7 @@ import { storeManager } from '../store/StoreManager';
 import * as qs from 'qs';
 import { API_URL } from '../global';
 import { stripAdvancedSearchMetadata } from '../store/advancedSearchURL';
-import { extractSearchCondition } from '../store/searchManager';
-import type { SearchMode } from '../types';
+import { extractSearchCondition } from '../store/simpleSearchConditions';
 
 type DownloadFileType = 'json' | 'csv' | 'txt';
 

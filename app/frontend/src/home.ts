@@ -18,7 +18,7 @@ import PanelViewPreviewConsequence from './components/PanelView/PanelViewPreview
 import PanelViewPreviewClinicalSignificance from './components/PanelView/PanelViewPreviewClinicalSignificance';
 import FloatingInfo from './components/FloatingInfo';
 import qs from 'qs';
-import { extractSearchCondition } from './store/searchManager';
+import { extractSearchCondition } from './store/simpleSearchConditions';
 import { initializeApp } from './store/initializeApp';
 import { selectRequired } from './utils/dom/select';
 import type {
