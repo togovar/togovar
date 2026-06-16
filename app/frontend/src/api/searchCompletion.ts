@@ -99,6 +99,7 @@ function finalizeSearchFailure(error: unknown): void {
   finishSearchDataLoading();
   markSearchRequestFinished();
   storeManager.setData('searchMessages', { error: getSearchErrorMessage(error) });
+  storeManager.setData('appLoadingStatus', 'normal');
 }
 
 /**

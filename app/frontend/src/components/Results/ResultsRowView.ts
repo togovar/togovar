@@ -27,7 +27,7 @@ export class ResultsRowView {
   /**
    * unsubscribeで同一参照が必要なため、束縛済みコールバックをフィールドに保持する。
    */
-  private _onSelectedRow = (v: number | undefined) => this.selectedRow(v!);
+  private _onSelectedRow = (v: number | undefined) => this.selectedRow(v);
   private _onOffset = () => this.offset();
 
   /**
@@ -171,7 +171,7 @@ export class ResultsRowView {
   /**
    * 選択状態はCSSクラスだけで表現できるため、データの再描画は行わずclassToggleのみ行う。
    */
-  selectedRow(selectedIndex: number) {
+  selectedRow(selectedIndex: number | undefined) {
     if (this._isDestroyed) return;
     this.selected = selectedIndex === this.index;
     this.tr.classList.toggle('-selected', this.selected);

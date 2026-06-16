@@ -52,7 +52,7 @@ export function mergeSearchResults(
   const updatedResults: SearchResultSlot[] = Array(numberOfRecords).fill(null);
 
   currentResults.forEach((record, index) => {
-    if (record) updatedResults[index] = record;
+    if (record !== null) updatedResults[index] = record;
   });
 
   records.forEach((record, index) => {
@@ -105,7 +105,7 @@ export function getSearchRecordByDisplayIndex(
     return 'out of range';
   }
 
-  return searchResults[recordIndex] || 'loading';
+  return searchResults[recordIndex] ?? 'loading';
 }
 
 /**
