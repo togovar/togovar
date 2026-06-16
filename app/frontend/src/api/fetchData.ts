@@ -20,6 +20,11 @@ import {
   prepareSearchExecution,
 } from './searchExecutionState';
 
+type SearchRequest = {
+  endpoint: string;
+  promise: Promise<void>;
+};
+
 /** 検索開始の入口を1つにし、連続操作時のAPI多重発火をdebounceで抑える。 */
 export const executeSearch = (() => {
   return debounce((offset = 0, isFirstTime = false) => {
@@ -52,35 +57,10 @@ export const executeSearch = (() => {
         endpoint,
         promise: _fetchData(endpoint, requestOptions),
       }));
-      const dataRequests = requests
-        .filter(({ endpoint }) => isDataRequestEndpoint(endpoint))
-        .map(({ promise }) => promise);
-
-      Promise.all(dataRequests)
-        .then(() => {
-          // Resultsの行loadingは統計ではなくdata=1レスポンスの到着に合わせて解除する。
-          storeManager.setData('isSearchDataFetching', false);
-        })
-        .catch((error) => {
-          if (error instanceof Error && error.name === 'AbortError') return;
-          storeManager.setData('isSearchDataFetching', false);
-        });
-
-      Promise.all(requests.map(({ promise }) => promise))
-        .then(() => {
-          markSearchRequestFinished();
-          _updateAppState();
-        })
-        .catch((error) => {
-          // AbortErrorは次の検索がisSearchDataFetchingを引き継ぐため、古いリクエスト側では解除しない。
-          if (error instanceof Error && error.name === 'AbortError') return;
-          storeManager.setData('isSearchDataFetching', false);
-          markSearchRequestFinished();
-          storeManager.setData('searchMessages', { error });
-        });
+      _watchSearchRequestCompletion(requests);
     } else {
-      storeManager.setData('isSearchDataFetching', false);
-      markSearchRequestFinished();
+      _finishSearchDataLoading();
+      _finishSearchSuccessfully();
     }
   }, 300);
 })();
@@ -116,6 +96,87 @@ async function _fetchData(endpoint: string, options: FetchOption) {
   }
 
   applySearchMessages(jsonResponse);
+}
+
+/**
+ * data取得と全体完了を別々に監視し、行loadingと画面全体loadingの責務を混ぜない。
+ */
+function _watchSearchRequestCompletion(requests: SearchRequest[]): void {
+  const dataRequests = requests
+    .filter(({ endpoint }) => isDataRequestEndpoint(endpoint))
+    .map(({ promise }) => promise);
+
+  _watchSearchDataCompletion(dataRequests);
+  _watchAllSearchRequestsCompletion(requests.map(({ promise }) => promise));
+}
+
+/**
+ * Resultsの行loadingはdata=1レスポンスだけに連動させ、統計取得の遅延から切り離す。
+ */
+function _watchSearchDataCompletion(dataRequests: Promise<void>[]): void {
+  Promise.all(dataRequests)
+    .then(() => {
+      _finishSearchDataLoading();
+    })
+    .catch((error: unknown) => {
+      if (_isAbortError(error)) return;
+      _finishSearchDataLoading();
+    });
+}
+
+/**
+ * 画面全体の検索完了はdata/statすべてを待ち、統計パネルまで更新された状態で確定する。
+ */
+function _watchAllSearchRequestsCompletion(requests: Promise<void>[]): void {
+  Promise.all(requests)
+    .then(() => {
+      _finishSearchSuccessfully();
+    })
+    .catch((error: unknown) => {
+      _handleSearchRequestFailure(error);
+    });
+}
+
+/**
+ * 行loadingの終了条件を1箇所に寄せ、data取得完了と失敗時の扱いを揃える。
+ */
+function _finishSearchDataLoading(): void {
+  storeManager.setData('isSearchDataFetching', false);
+}
+
+/**
+ * 正常完了時だけ検索実行ロックを解除し、古いAbort済み検索が新しい検索状態を壊さないようにする。
+ */
+function _finishSearchSuccessfully(): void {
+  markSearchRequestFinished();
+  _updateAppState();
+}
+
+/**
+ * Abort以外の失敗だけを現在の検索失敗として扱い、UIのloadingとメッセージを確定する。
+ */
+function _handleSearchRequestFailure(error: unknown): void {
+  // AbortErrorは次の検索がloading状態を引き継ぐため、古いリクエスト側では何もしない。
+  if (_isAbortError(error)) return;
+
+  _finishSearchDataLoading();
+  markSearchRequestFinished();
+  storeManager.setData('searchMessages', { error: _getSearchErrorMessage(error) });
+}
+
+/**
+ * 中断された古い検索を通常エラーから分け、新しい検索のloading状態を誤って消さない。
+ */
+function _isAbortError(error: unknown): error is Error {
+  return error instanceof Error && error.name === 'AbortError';
+}
+
+/**
+ * Storeの検索メッセージは文字列だけを扱うため、未知の例外値を表示可能な形へ丸める。
+ */
+function _getSearchErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
 }
 
 /** 全リクエスト完了後に表示更新を確定させ、画面全体のloadingを終了する。 */
