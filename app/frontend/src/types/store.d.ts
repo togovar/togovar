@@ -20,6 +20,7 @@ import type {
 import type { ResultData } from './api';
 import type { ColumnConfig } from './components';
 import type { KaryotypeState } from './karyotype';
+import type { ConditionQuery } from './condition';
 
 /**
  * カリオタイプビューで表示中の染色体領域を管理する型。
@@ -58,8 +59,7 @@ export type StoreState = {
   isFetching: boolean;
   isStoreUpdating: boolean;
   selectedRow?: number;
-  // TODO: AdvancedSearchConditions の型を整理して具体的な型に置き換える
-  advancedSearchConditions?: unknown;
+  advancedSearchConditions?: ConditionQuery;
   advancedSearchURLTooLong?: boolean;
   advancedSearchRestoredFromURL?: boolean;
   searchMessages?: SearchMessages;

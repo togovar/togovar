@@ -2,6 +2,7 @@ import { storeManager } from '../../store/StoreManager';
 import ChromosomeView, { type SubBandEntry } from './ChromosomeView';
 import type { SimpleSearchCurrentConditions } from '../../types/search';
 import type { KaryotypeState } from '../../types';
+import type { ConditionQuery } from '../../types/condition';
 
 // csv-loader が TSV をパースして返す形式: 各行が文字列配列
 type TsvRow = string[];
@@ -202,7 +203,7 @@ export default class Karyotype {
   private maxLength: number | undefined;
   private _pendingSimpleSearchConditions: SimpleSearchCurrentConditions | null =
     null;
-  private _pendingAdvancedSearchConditions: unknown = null;
+  private _pendingAdvancedSearchConditions: ConditionQuery | undefined = undefined;
 
   /**
    * DOM 参照・Store バインド・イベント設定を行い、TSV の非同期読み込みを開始する。
@@ -256,7 +257,7 @@ export default class Karyotype {
       }
       if (this._pendingAdvancedSearchConditions) {
         this.advancedSearchConditions(this._pendingAdvancedSearchConditions);
-        this._pendingAdvancedSearchConditions = null;
+        this._pendingAdvancedSearchConditions = undefined;
       }
     });
 
@@ -362,7 +363,7 @@ export default class Karyotype {
    * 条件ツリーは OR/AND のネスト構造を持つため、再帰で全ノードを走査する。
    * データ未読込時は保留して、読込完了後に再実行する。
    */
-  advancedSearchConditions(conditions: unknown): void {
+  advancedSearchConditions(conditions: ConditionQuery | undefined): void {
     if (!this.chromosomeViews) {
       this._pendingAdvancedSearchConditions = conditions;
       return;

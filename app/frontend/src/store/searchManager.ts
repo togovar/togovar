@@ -7,6 +7,7 @@ import type {
   SimpleSearchCurrentConditions,
   SearchMode,
 } from '../types';
+import type { ConditionQuery } from '../types/condition';
 import {
   encodeConditionForURL,
   decodeConditionFromURL,
@@ -185,7 +186,7 @@ export function handleHistoryChange(e: PopStateEvent) {
     const condition = encoded
       ? decodeConditionFromURL(encoded)
       : _getConditionFromState(e.state);
-    storeManager.setData('advancedSearchConditions', condition ?? {});
+    storeManager.setData('advancedSearchConditions', condition ?? undefined);
     // false→trueのトグルでBuilderのsubscribeを確実に発火させる。
     // モード切替でBuilderがすでにロード済みの場合も再構築が必要なため常に実行する。
     storeManager.setData('advancedSearchRestoredFromURL', false);
@@ -221,15 +222,13 @@ export function handleHistoryChange(e: PopStateEvent) {
  * popstateのevent.stateからAdvanced Search条件を安全に取り出す。
  * URL長制限超過時にstateへ退避した advancedSearchConditions のみを返す。
  */
-function _getConditionFromState(
-  state: unknown
-): Record<string, unknown> | null {
+function _getConditionFromState(state: unknown): ConditionQuery | null {
   if (state === null || typeof state !== 'object' || Array.isArray(state))
     return null;
   const val = (state as Record<string, unknown>).advancedSearchConditions;
   if (val === null || typeof val !== 'object' || Array.isArray(val))
     return null;
-  return val as Record<string, unknown>;
+  return val as ConditionQuery;
 }
 
 /**
@@ -302,7 +301,7 @@ function _buildSimpleConditionsFromURL(
 //   Advanced Search: ネスト構造のためJSON+Base64を使用（URI encodeより~33%コンパクト）
 
 /** AdvancedSearch検索条件を設定し、必要に応じて検索を実行 */
-export function setAdvancedSearchCondition(newSearchConditions: unknown) {
+export function setAdvancedSearchCondition(newSearchConditions: ConditionQuery) {
   storeManager.setData('advancedSearchConditions', newSearchConditions);
   storeManager.setData('appStatus', 'searching');
 
@@ -314,12 +313,8 @@ export function setAdvancedSearchCondition(newSearchConditions: unknown) {
 
 export function reflectAdvancedSearchConditionToURI() {
   const conditions = storeManager.getData('advancedSearchConditions');
-  // home.js が初期値として {} をセットするため、空オブジェクトは「条件なし」として扱う。
   const hasConditions =
-    conditions !== null &&
-    conditions !== undefined &&
-    typeof conditions === 'object' &&
-    Object.keys(conditions as object).length > 0;
+    conditions !== undefined && Object.keys(conditions as object).length > 0;
   const encoded = hasConditions ? encodeConditionForURL(conditions) : null;
 
   let url: string;
