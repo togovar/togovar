@@ -15,12 +15,9 @@ export async function fetchSearchJSON(
     }
     return response.json();
   } catch (error) {
-    if (isSearchAbortError(error)) {
-      const abortError = new Error('ABORTED');
-      abortError.name = 'AbortError';
-      throw abortError;
+    if (!isSearchAbortError(error)) {
+      console.error(error);
     }
-    console.error(error);
     throw error;
   }
 }

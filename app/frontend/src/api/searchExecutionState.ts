@@ -50,8 +50,10 @@ export function prepareSearchExecution(
   if (hasSearchModeChanged(newSearchMode)) {
     isFirstTime = true;
     clearSearchRequestRanges();
-  } else if (shouldSkipSimpleSearchRange(offset, newSearchMode)) {
+  } else if (_isSimpleSearchRangeAlreadyRequested(offset, newSearchMode)) {
     return { shouldExecute: false, isFirstTime };
+  } else {
+    _registerSimpleSearchRange(offset, newSearchMode);
   }
 
   searchExecutionState.searchMode = newSearchMode || null;
@@ -139,21 +141,22 @@ function hasSearchModeChanged(nextSearchMode: string): boolean {
 }
 
 /**
- * simple検索の仮想スクロールでは同じページ範囲の再取得を避け、連続スクロール時の無駄fetchを減らす。
+ * simple検索で同じページ範囲がすでに取得済みかを確認する（副作用なし）。
  */
-function shouldSkipSimpleSearchRange(
+function _isSimpleSearchRangeAlreadyRequested(
   offset: number,
   searchMode: string
 ): boolean {
   if (searchMode !== 'simple') return false;
+  return searchExecutionState.requestedRanges.has(getSimpleSearchRangeKey(offset));
+}
 
-  const rangeKey = getSimpleSearchRangeKey(offset);
-  if (searchExecutionState.requestedRanges.has(rangeKey)) {
-    return true;
-  }
-
-  searchExecutionState.requestedRanges.add(rangeKey);
-  return false;
+/**
+ * simple検索のページ範囲を取得済みとして登録する。
+ */
+function _registerSimpleSearchRange(offset: number, searchMode: string): void {
+  if (searchMode !== 'simple') return;
+  searchExecutionState.requestedRanges.add(getSimpleSearchRangeKey(offset));
 }
 
 /**

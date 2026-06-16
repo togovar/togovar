@@ -42,12 +42,13 @@ export function applySearchResponse(
  */
 function applySearchResultsResponse(json: unknown): void {
   const searchResults = toSearchResults(json);
-  const rows = searchResults?.data ?? [];
-  const offset = searchResults?.scroll.offset ?? 0;
-
   if (!searchResults) {
     console.error('[search] Unexpected result shape (no data array):', json);
+    return;
   }
+
+  const rows = searchResults.data;
+  const offset = searchResults.scroll.offset;
 
   // 実際に取得したデータ件数を下限として numberOfRecords を更新する。
   // max_rows はフィルタ前の件数を返す場合があり、統計レスポンス前に使うと

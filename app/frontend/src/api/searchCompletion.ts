@@ -49,7 +49,7 @@ function watchSearchDataCompletion(
   executionId: number
 ): void {
   watchSettledPromises(dataRequests, (results) => {
-    if (!shouldHandleSearchSettlement(executionId)) return;
+    if (!isCurrentSearchExecution(executionId)) return;
     if (hasOnlyAbortFailures(results)) return;
     finishSearchDataLoading();
   });
@@ -63,7 +63,7 @@ function watchAllSearchRequestsCompletion(
   executionId: number
 ): void {
   watchSettledPromises(requests, (results) => {
-    if (!shouldHandleSearchSettlement(executionId)) return;
+    if (!isCurrentSearchExecution(executionId)) return;
 
     const failedResult = getFirstNonAbortFailure(results);
     if (failedResult) {
@@ -86,7 +86,7 @@ function finishSearchDataLoading(): void {
  * 正常完了時だけ検索実行ロックを解除し、古いAbort済み検索が新しい検索状態を壊さないようにする。
  */
 function finalizeSearchSuccess(executionId: number): void {
-  if (!shouldHandleSearchSettlement(executionId)) return;
+  if (!isCurrentSearchExecution(executionId)) return;
   markSearchRequestFinished();
   storeManager.publish('searchResults');
   storeManager.setData('appLoadingStatus', 'normal');
@@ -110,13 +110,6 @@ function watchSettledPromises(
   onSettled: (results: PromiseSettledResult<void>[]) => void
 ): void {
   Promise.allSettled(requests).then(onSettled);
-}
-
-/**
- * data系と全体完了系の両方で現在の検索世代だけを扱い、古い検索の後着完了を無視する。
- */
-function shouldHandleSearchSettlement(executionId: number): boolean {
-  return isCurrentSearchExecution(executionId);
 }
 
 /**

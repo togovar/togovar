@@ -31,13 +31,8 @@ function _setSimpleSearchConditions(
 ) {
   const updatedConditions = {
     ...storeManager.getData('simpleSearchConditions'),
-  };
-  Object.keys(newSearchConditions).forEach((conditionKey) => {
-    const key = conditionKey as keyof SimpleSearchCurrentConditions;
-    (updatedConditions as Record<keyof SimpleSearchCurrentConditions, unknown>)[
-      key
-    ] = newSearchConditions[key];
-  });
+    ...newSearchConditions,
+  } as SimpleSearchCurrentConditions;
   storeManager.setData('simpleSearchConditions', updatedConditions);
 
   if (storeManager.getData('searchMode') === 'simple') {

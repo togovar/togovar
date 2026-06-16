@@ -1,5 +1,6 @@
 import debounce from 'lodash/debounce';
 import type { FetchOption } from '../types';
+import { storeManager } from '../store/StoreManager';
 import {
   finishSearchWithoutRequests,
   startSearchRequestLoading,
@@ -52,8 +53,19 @@ function _prepareSearchRun(
 
   startSearchRequestLoading();
 
-  const apiEndpoints = determineSearchEndpoints(offset, execution.isFirstTime);
-  const requestOptions = getSearchRequestOptions(execution.signal);
+  const searchMode = storeManager.getData('searchMode');
+  const apiEndpoints = determineSearchEndpoints(
+    searchMode,
+    offset,
+    execution.isFirstTime,
+    storeManager.getData('simpleSearchConditions')
+  );
+  const requestOptions = getSearchRequestOptions(
+    searchMode,
+    storeManager.getData('offset'),
+    storeManager.getData('advancedSearchConditions'),
+    execution.signal
+  );
 
   return {
     executionId: execution.executionId,

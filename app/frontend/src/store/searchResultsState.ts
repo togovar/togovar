@@ -95,11 +95,11 @@ export function applyMergedSearchResults(params: {
  */
 export function getSearchRecordByDisplayIndex(
   searchResults: SearchResultSlot[],
-  displayIndex: number,
+  pageRowIndex: number,
   offset: number,
   numberOfRecords: number
 ): SearchRecordLookupResult {
-  const recordIndex = offset + displayIndex;
+  const recordIndex = offset + pageRowIndex;
 
   if (recordIndex >= numberOfRecords) {
     return 'out of range';

@@ -1,9 +1,9 @@
 import * as qs from 'qs';
 import { API_URL } from '../global';
-import { storeManager } from '../store/StoreManager';
 import { stripAdvancedSearchMetadata } from '../store/advancedSearchURL';
 import { extractSearchCondition } from '../store/simpleSearchConditions';
-import type { FetchOption } from '../types';
+import type { FetchOption, SimpleSearchCurrentConditions } from '../types';
+import type { ConditionQuery } from '../types/query';
 
 export const SEARCH_RESULT_LIMIT = 100;
 
@@ -11,17 +11,19 @@ export const SEARCH_RESULT_LIMIT = 100;
  * 検索モードごとのAPI仕様差をここへ閉じ込め、searchExecutor.tsを実行管理に集中させる。
  */
 export function determineSearchEndpoints(
+  searchMode: string,
   offset: number,
-  isFirstTime: boolean
+  isFirstTime: boolean,
+  simpleSearchConditions: SimpleSearchCurrentConditions
 ): string[] {
   let basePath: string;
 
-  switch (storeManager.getData('searchMode')) {
+  switch (searchMode) {
     case 'simple': {
       // Simple searchの場合のみLIMITでの調整を行う
       const offsetStart = offset - (offset % SEARCH_RESULT_LIMIT);
       const conditions = qs.stringify(
-        extractSearchCondition(storeManager.getData('simpleSearchConditions'))
+        extractSearchCondition(simpleSearchConditions)
       );
       basePath = `${API_URL}/search?offset=${offsetStart}${
         conditions ? '&' + conditions : ''
@@ -56,8 +58,13 @@ export function isDataRequestEndpoint(endpoint: string): boolean {
 /**
  * fetchへ渡すmethod/body/signalを、現在の検索モードに応じて作る。
  */
-export function getSearchRequestOptions(signal: AbortSignal): FetchOption {
-  if (storeManager.getData('searchMode') === 'simple') {
+export function getSearchRequestOptions(
+  searchMode: string,
+  storeOffset: number,
+  advancedSearchConditions: ConditionQuery | undefined,
+  signal: AbortSignal
+): FetchOption {
+  if (searchMode === 'simple') {
     return {
       method: 'GET',
       headers: {
@@ -70,15 +77,11 @@ export function getSearchRequestOptions(signal: AbortSignal): FetchOption {
   }
 
   const body: Partial<{ offset: number; query: Record<string, unknown> }> = {
-    offset: calculateAdvancedSearchOffset(
-      storeManager.getData('offset'),
-      SEARCH_RESULT_LIMIT
-    ),
+    offset: calculateAdvancedSearchOffset(storeOffset, SEARCH_RESULT_LIMIT),
   };
 
-  const advConditions = storeManager.getData('advancedSearchConditions');
-  if (advConditions && Object.keys(advConditions as object).length > 0) {
-    body.query = stripAdvancedSearchMetadata(advConditions) as Record<
+  if (advancedSearchConditions && Object.keys(advancedSearchConditions).length > 0) {
+    body.query = stripAdvancedSearchMetadata(advancedSearchConditions) as Record<
       string,
       unknown
     >;
