@@ -6,7 +6,6 @@ import type {
   SearchMessages,
   SearchStatus,
   ColumnConfig,
-  ResultsRecord,
 } from '../../types';
 
 interface SelectionState {
@@ -228,30 +227,14 @@ export class ResultsViewDataManager {
     const rowCount = storeManager.getData('rowCount');
     const chromosomePositions: { [key: string]: number[] } = {};
 
-    // Collect chromosome positions from each row's record
     for (let i = 0; i < rowCount; i++) {
-      const record = storeManager.getRecordByIndex(i) as ResultsRecord;
-
-      if (this._isValidRecord(record)) {
+      const record = storeManager.getRecordByIndex(i);
+      if (typeof record !== 'string') {
         (chromosomePositions[record.chromosome] ??= []).push(record.start);
       }
     }
 
     return this._convertToRegions(chromosomePositions);
-  }
-
-  /**
-   * Checks if a record is valid and conforms to the expected structure.
-   * @param record - The record object to validate.
-   * @returns True if the record is valid, false otherwise.
-   */
-  private _isValidRecord(record: unknown): record is ResultsRecord {
-    if (record === null || typeof record !== 'object') {
-      return false;
-    }
-
-    const obj = record as Record<string, unknown>;
-    return typeof obj.chromosome === 'string' && typeof obj.start === 'number';
   }
 
   /**
