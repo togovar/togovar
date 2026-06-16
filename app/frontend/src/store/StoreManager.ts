@@ -36,7 +36,6 @@ class StoreManager {
    * アプリ全体の状態オブジェクト。外部からはgetData/setDataのみを通じてアクセスする。
    */
   private _state: StoreState = {
-    karyotype: '',
     searchMode: '',
     simpleSearchConditionsMaster: [],
     simpleSearchConditions: {},

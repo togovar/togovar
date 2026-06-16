@@ -14,9 +14,12 @@ import type {
   MasterConditions,
   SimpleSearchCurrentConditions,
   SearchMode,
+  SearchMessages,
+  SearchStatus,
 } from './search';
 import type { ResultData } from './api';
 import type { ColumnConfig } from './components';
+import type { KaryotypeState } from './karyotype';
 
 /**
  * カリオタイプビューで表示中の染色体領域を管理する型。
@@ -34,24 +37,12 @@ export type DisplayingRegions = {
 // ============================================
 
 /**
- * 検索APIから取得するレコード数の集計。
- * StoreState 内でのみ参照するため export しない。
- * search.d.ts にも SearchStatus が存在するため、名前衝突を避けて StoreSearchStatus とする。
- */
-type StoreSearchStatus = {
-  available: number;
-  filtered: number;
-  total: number;
-};
-
-/**
  * アプリ全体の状態を1つのオブジェクトで表す。
  * unknown 型の TODO フィールドは、該当APIレスポンスの型定義が確定次第、具体型へ置き換える。
  * optional フィールドは初期化前や未使用状態を undefined で表すために省略可にしている。
  */
 export type StoreState = {
-  // TODO: KaryotypeState を types/ へ export して具体的な型に置き換える
-  karyotype: unknown;
+  karyotype?: KaryotypeState;
   /** '' は初期化前のセンチネル値。setSearchModeFromHistory が呼ばれるまでの一時的な状態 */
   searchMode: SearchMode | '';
   simpleSearchConditionsMaster: MasterConditions[];
@@ -71,14 +62,12 @@ export type StoreState = {
   advancedSearchConditions?: unknown;
   advancedSearchURLTooLong?: boolean;
   advancedSearchRestoredFromURL?: boolean;
-  // TODO: searchMessages の形（オブジェクト or 空文字）を統一して具体的な型に置き換える
-  searchMessages?: unknown;
-  searchStatus?: StoreSearchStatus;
-  // TODO: statistics 系は API レスポンスの型定義が揃い次第具体的な型に置き換える
-  statisticsDataset?: unknown;
-  statisticsSignificance?: unknown;
-  statisticsType?: unknown;
-  statisticsConsequence?: unknown;
+  searchMessages?: SearchMessages;
+  searchStatus?: SearchStatus;
+  statisticsDataset?: Record<string, number>;
+  statisticsSignificance?: Record<string, number>;
+  statisticsType?: Record<string, number>;
+  statisticsConsequence?: Record<string, number>;
   showModal?: boolean;
   /** DisplayingRegions と同一構造。カリオタイプビューと検索条件復元の両方から参照する */
   displayingRegionsOnChromosome?: DisplayingRegions;

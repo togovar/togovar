@@ -40,3 +40,7 @@ export * from './advancedSearchConditions';
 // ============================================
 export * from './condition';
 export * from './conditionRestore';
+// ============================================
+// Karyotype Types
+// ============================================
+export * from './karyotype';

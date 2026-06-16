@@ -1,31 +1,10 @@
 import { storeManager } from '../../store/StoreManager';
 import ChromosomeView, { type SubBandEntry } from './ChromosomeView';
 import type { SimpleSearchCurrentConditions } from '../../types/search';
+import type { KaryotypeState } from '../../types';
 
 // csv-loader が TSV をパースして返す形式: 各行が文字列配列
 type TsvRow = string[];
-
-/** 参照ゲノムごとの染色体両端座標 */
-interface ChromosomeRegion {
-  GRCh37: [number, number];
-  GRCh38: [number, number];
-}
-
-/** 各染色体の選択状態と座標範囲 */
-interface ChromosomeConfig {
-  selected: boolean;
-  region: ChromosomeRegion;
-}
-
-/** localStorage と Store で共有するカリオタイプ設定 */
-interface KaryotypeState {
-  isOpened: boolean;
-  isShowBand: boolean;
-  height: number;
-  reference: 'GRCh37' | 'GRCh38';
-  version: number;
-  chromosomes: Record<string, ChromosomeConfig>;
-}
 
 /** 染色体上の位置：単一座標または範囲 */
 interface LocationEntry {
@@ -235,8 +214,8 @@ export default class Karyotype {
       '.content > .chromosomes'
     )!;
 
-    storeManager.setData('karyotype', karyotype);
-    storeManager.subscribe('karyotype', (v) => this.karyotype(v as KaryotypeState));
+    storeManager.setData('karyotype', karyotype ?? undefined);
+    storeManager.subscribe('karyotype', (v) => { if (v) this.karyotype(v); });
     storeManager.subscribe('simpleSearchConditions', (v) => this.simpleSearchConditions(v));
     storeManager.subscribe('advancedSearchConditions', (v) => this.advancedSearchConditions(v));
 

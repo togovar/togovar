@@ -62,12 +62,12 @@ export class ResultsView {
   private _boundResizeFallbackHandler: (() => void) | null = null;
 
   /** unsubscribeで同一参照が必要なため、束縛済みコールバックをフィールドに保持する。 */
-  private _onSearchStatus = (v: StoreState['searchStatus']) => this.searchStatus(v as SearchStatus);
+  private _onSearchStatus = (v: StoreState['searchStatus']) => { if (v) this.searchStatus(v); };
   private _onSearchResults = (v: StoreState['searchResults']) => this.searchResults(v);
   private _onColumns = (v: StoreState['columns']) => this.columns(v);
   private _onOffset = (v: StoreState['offset']) => this.offset(v);
   private _onKaryotype = (v: StoreState['karyotype']) => this.karyotype(v);
-  private _onSearchMessages = (v: StoreState['searchMessages']) => this.searchMessages(v as SearchMessages);
+  private _onSearchMessages = (v: StoreState['searchMessages']) => this.searchMessages(v ?? {});
 
   /**
    * ResultsView のコンストラクタ

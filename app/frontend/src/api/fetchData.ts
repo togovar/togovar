@@ -246,7 +246,7 @@ async function _fetchData(endpoint: string, options: FetchOption) {
         error: jsonResponse.error?.join?.('<br>'),
       });
     } else {
-      storeManager.setData('searchMessages', '');
+      storeManager.setData('searchMessages', {});
     }
   } catch (error) {
     console.error(error);

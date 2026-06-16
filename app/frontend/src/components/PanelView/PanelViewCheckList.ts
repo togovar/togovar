@@ -162,13 +162,13 @@ export default class PanelViewCheckList extends PanelView {
    * statisticsType が指定されている場合は統計情報の更新も購読する。
    */
   private _bindStore(statisticsType?: StatisticsType): void {
-    storeManager.subscribe('simpleSearchConditions', (v) => this.simpleSearchConditions(v as unknown as Record<string, Record<string, string>>));
+    storeManager.subscribe('simpleSearchConditions', (v) => this.simpleSearchConditions(v));
 
     if (statisticsType) {
       // bind APIではthis[statisticsType]を動的に生成していたが、
       // subscribeでは直接コールバックを渡せるため動的プロパティ付与が不要になる。
       storeManager.subscribe(statisticsType, (v) =>
-        this._updateStatistics(v as Record<string, number> | null)
+        this._updateStatistics(v ?? null)
       );
     }
   }
@@ -276,10 +276,9 @@ export default class PanelViewCheckList extends PanelView {
   /**
    * ストアの simpleSearchConditions が更新されたときに UI に反映する。
    */
-  simpleSearchConditions(
-    conditions: Record<string, Record<string, string>>
-  ): void {
-    const kindConditions = conditions[this.kind] ?? {};
+  simpleSearchConditions(conditions: SimpleSearchCurrentConditions): void {
+    const kindConditions =
+      (conditions as Record<string, Record<string, string> | undefined>)[this.kind] ?? {};
 
     if (Object.keys(kindConditions).length === 0) {
       // デフォルト or Clear → 全チェックなし

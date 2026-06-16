@@ -102,8 +102,8 @@ export default class PanelViewFilterConsequence extends PanelView {
       });
     }
 
-    storeManager.subscribe('simpleSearchConditions', (v) => this.simpleSearchConditions(v as unknown as Record<string, Record<string, string>>));
-    storeManager.subscribe('statisticsConsequence', (v) => this.statisticsConsequence(v as Record<string, number> | null));
+    storeManager.subscribe('simpleSearchConditions', (v) => this.simpleSearchConditions(v));
+    storeManager.subscribe('statisticsConsequence', (v) => this.statisticsConsequence(v ?? null));
   }
 
   // ----------------------------------------
@@ -239,9 +239,7 @@ export default class PanelViewFilterConsequence extends PanelView {
   // ----------------------------------------
 
   /** simpleSearchConditions ストア更新時に呼ばれる */
-  simpleSearchConditions(
-    conditions: Record<string, Record<string, string>>
-  ): void {
+  simpleSearchConditions(conditions: SimpleSearchCurrentConditions): void {
     const kindConditions = conditions[KIND_OF_CONDITION] ?? {};
 
     if (Object.keys(kindConditions).length === 0) {
