@@ -4,6 +4,12 @@ import {
   loadColumnsFromStorage,
   saveColumnsToStorage,
 } from '../columns/columnStorage';
+import {
+  getSearchRecordByDisplayIndex,
+  getSelectedSearchRecord,
+  mergeSearchResults,
+  type SearchRecordLookupResult,
+} from './searchResultsState';
 import type { ResultData, SearchMode } from '../types';
 import type { StoreState } from '../types/storeState';
 
@@ -164,22 +170,14 @@ class StoreManager {
   setResults(records: ResultData[], offset: number) {
     this.setData('isSearchResultsUpdating', true);
 
-    // numberOfRecords はプリミティブなので deepCopy コストゼロ
-    const updatedResults = Array(this._state.numberOfRecords).fill(null);
-
-    // 仮想スクロールで前後ページのデータを保持するため既存データを引き継ぐ。
-    // getData() を経由すると O(n) の deepCopy が走るため、_state を直接参照して回避する。
-    this._state.searchResults.forEach((record, index) => {
-      if (record) updatedResults[index] = record;
-    });
-
-    records.forEach((record, index) => {
-      updatedResults[offset + index] = record;
-    });
-
     // updatedResults は常に新規構築のため isEqual チェックと structuredClone は不要。
     // setData を経由せず直接代入し、publish を一度だけ呼ぶことで二重通知を防ぐ。
-    this._state.searchResults = updatedResults;
+    this._state.searchResults = mergeSearchResults(
+      this._state.searchResults,
+      records,
+      offset,
+      this._state.numberOfRecords
+    );
     this.publish('searchResults');
 
     // isSearchDataFetchingはdata=1リクエストの状態なので、Store配列更新だけを担うここでは触らない。
@@ -192,16 +190,15 @@ class StoreManager {
    * データが未取得（null）の場合は 'loading' を返すだけで fetch は起動しない。
    * fetch のトリガーは呼び出し元が searchManager.requestNextPage() 経由で行う。
    */
-  getRecordByIndex(index: number): ResultData | 'loading' | 'out of range' {
+  getRecordByIndex(index: number): SearchRecordLookupResult {
     if (this.getData('isSearchResultsUpdating')) return 'loading';
-    const recordIndex = this.getData('offset') + index;
-
-    if (recordIndex < this._state.numberOfRecords) {
-      const record = this._state.searchResults[recordIndex];
-      if (record) return this._deepCopy(record);
-      return 'loading';
-    }
-    return 'out of range';
+    const result = getSearchRecordByDisplayIndex(
+      this._state.searchResults,
+      index,
+      this._state.offset,
+      this._state.numberOfRecords
+    );
+    return typeof result === 'string' ? result : this._deepCopy(result);
   }
 
   /**
@@ -209,13 +206,11 @@ class StoreManager {
    * deepCopyしないのは読み取り専用として扱うため（変更はsetDataを通す）。
    */
   getSelectedRecord() {
-    if (this._state.selectedRow !== undefined) {
-      return this._state.searchResults[
-        this._state.offset + this._state.selectedRow
-      ];
-    } else {
-      return null;
-    }
+    return getSelectedSearchRecord(
+      this._state.searchResults,
+      this._state.offset,
+      this._state.selectedRow
+    );
   }
 
   // ------------------------------

@@ -104,6 +104,7 @@ app/frontend/
 - 検索条件のブラウザURL反映（`history.pushState`、Simple/Advanced SearchのURL表現、URL長制限時のstate退避）は `store/searchURL.ts` に置き、`searchManager.ts` は検索開始タイミングとStore更新に集中させる。
 - popstate時のURL/stateからの検索条件復元は `store/searchHistory.ts` に置く。
 - Simple Search条件のdefault差分抽出は `store/simpleSearchConditions.ts` に置く。`api/fetchData.ts` から `searchManager.ts` を import すると循環依存になるため避ける。
+- 検索結果配列のマージ・表示indexからのレコード取得・選択行レコード取得は `store/searchResultsState.ts` に置き、`StoreManager.ts` はStore公開APIとpublish順序の管理に集中させる。
 - コンポーネントやViewから直接URLやfetchの仕様を増やす前に、既存のStore/API層へ寄せられるか確認する。
 - 戻る/進む、URL貼り付け、モード切り替えでは、Store更新と検索実行が重複しやすい。変更時は初期表示・タブ切替・履歴操作を分けて考える。
 - searchMode は内部リセットと検索開始副作用の順序が重要なため、通常操作では `storeManager.setSearchMode(mode)` を使う。
