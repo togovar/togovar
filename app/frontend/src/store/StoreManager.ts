@@ -18,7 +18,7 @@ class StoreManager {
    * subscribeで登録されたコールバックのMap。
    * キーはStoreStateのキー名で、値の変化があるたびに対応するSetの全コールバックを呼ぶ。
    */
-  private _listeners = new Map<string, Set<StoreListener>>();
+  private _listeners = new Map<keyof StoreState, Set<StoreListener>>();
 
   /**
    * popstate経由のモード切替時にreflect*ToURIをスキップするためのフラグ。
@@ -53,15 +53,14 @@ class StoreManager {
 
   constructor() {
     this._state.columns = loadColumnsFromStorage();
-    this._initSearchCondition();
+    this._setupSearchModeSubscriber();
   }
 
   /**
-   * isFetchingの初期化とsearchModeの状態リセットハンドラを登録する。
-   * popstateリスナーとDOM/URL/API側の副作用は searchManager.initSearchHandlers() で別途登録する。
+   * searchMode 変化時に状態リセットを行う内部 subscriber を登録する。
+   * DOM/URL/API 側の副作用は searchManager.initSearchHandlers() で別途登録する。
    */
-  private _initSearchCondition() {
-    this.setData('isFetching', false);
+  private _setupSearchModeSubscriber() {
     this.subscribe('searchMode', this.searchMode.bind(this));
   }
 
@@ -197,7 +196,7 @@ class StoreManager {
    * isStoreUpdating中は中途状態を返さないようloadingを返す。
    * recordIndexのデータがnullの場合はexecuteSearchを呼んで後続ページを取得する。
    */
-  getRecordByIndex(index: number) {
+  getRecordByIndex(index: number): ResultData | 'loading' | 'out of range' {
     if (this.getData<boolean>('isStoreUpdating')) return 'loading';
     const recordIndex = this.getData<number>('offset') + index;
 

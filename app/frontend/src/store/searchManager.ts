@@ -76,10 +76,8 @@ export function setSimpleSearchCondition<
 
 /** シンプル検索条件を設定し、必要に応じて検索を開始 */
 function _setSimpleSearchConditions(
-  newSearchConditions: Partial<SimpleSearchCurrentConditions>,
-  isFromHistory?: boolean
+  newSearchConditions: Partial<SimpleSearchCurrentConditions>
 ) {
-  // 検索条件を更新
   const updatedConditions = {
     ...storeManager.getData('simpleSearchConditions'),
   };
@@ -89,8 +87,7 @@ function _setSimpleSearchConditions(
   });
   storeManager.setData('simpleSearchConditions', updatedConditions);
 
-  // 現在のモードがsimpleで、履歴からの呼び出しでない場合のみURLを更新
-  if (!isFromHistory && storeManager.getData('searchMode') === 'simple') {
+  if (storeManager.getData('searchMode') === 'simple') {
     reflectSimpleSearchConditionToURI();
   }
 
