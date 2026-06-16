@@ -66,15 +66,7 @@ function _executeSearch(offset = 0, isFirstTime = false): void {
 
 /** 初回検索を過去結果から独立させるため、結果Storeとスクロール取得範囲を初期化する。 */
 function _resetSearchResults() {
-  storeManager.setData('numberOfRecords', 0);
-  storeManager.setData('offset', 0);
-  storeManager.setData('rowCount', 0);
-  storeManager.setData('isSearchDataFetching', false);
-  storeManager.setData('searchResults', []);
-  storeManager.resetColumnWidths();
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('results-column-widths-reset'));
-  }
+  storeManager.resetSearchResultsForNewSearch();
   clearSearchRequestRanges();
 }
 

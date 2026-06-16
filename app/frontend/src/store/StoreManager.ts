@@ -120,6 +120,21 @@ class StoreManager {
   }
 
   /**
+   * 新規検索では過去結果を表示しないため、結果Storeと列幅の表示状態をまとめて初期化する。
+   */
+  resetSearchResultsForNewSearch() {
+    this.setData('numberOfRecords', 0);
+    this.setData('offset', 0);
+    this.setData('rowCount', 0);
+    this.setData('isSearchDataFetching', false);
+    this.setData('searchResults', []);
+    this.resetColumnWidths();
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('results-column-widths-reset'));
+    }
+  }
+
+  /**
    * Storeのキーに対してコールバックを登録する。
    * setData / publish のたびに登録済みの全コールバックが呼ばれる。
    */
