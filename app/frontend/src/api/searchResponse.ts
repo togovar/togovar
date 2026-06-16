@@ -1,12 +1,23 @@
 import { storeManager } from '../store/StoreManager';
 import { API_URL } from '../global';
 import type { ScrollData, SearchResults, SearchStatistics } from '../types';
-import { getCurrentSearchMode } from './searchExecutionState';
+import {
+  getCurrentSearchMode,
+  isCurrentSearchExecution,
+} from './searchExecutionState';
 
 /**
  * endpointの種別を見てStore反映先を選び、fetchData.tsからレスポンスURL解析を隠す。
  */
-export function applySearchResponse(endpoint: string, json: unknown): void {
+export function applySearchResponse(
+  endpoint: string,
+  json: unknown,
+  executionId: number
+): void {
+  if (!isCurrentSearchExecution(executionId)) {
+    return;
+  }
+
   // 現在の検索モードと一致する場合のみ結果を処理
   if (getCurrentSearchMode() !== storeManager.getData('searchMode')) {
     return;

@@ -1,6 +1,7 @@
 import { storeManager } from '../store/StoreManager';
 import {
   isSearchAbortError,
+  isCurrentSearchExecution,
   markSearchRequestFinished,
   markSearchRequestStarted,
 } from './searchExecutionState';
@@ -22,33 +23,45 @@ export function startSearchRequestLoading(): void {
 /**
  * data取得と全体完了を別々に監視し、行loadingと画面全体loadingの責務を混ぜない。
  */
-export function watchSearchRequestCompletion(requests: SearchRequest[]): void {
+export function watchSearchRequestCompletion(
+  requests: SearchRequest[],
+  executionId: number
+): void {
   const dataRequests = requests
     .filter(({ endpoint }) => isDataRequestEndpoint(endpoint))
     .map(({ promise }) => promise);
 
-  watchSearchDataCompletion(dataRequests);
-  watchAllSearchRequestsCompletion(requests.map(({ promise }) => promise));
+  watchSearchDataCompletion(dataRequests, executionId);
+  watchAllSearchRequestsCompletion(
+    requests.map(({ promise }) => promise),
+    executionId
+  );
 }
 
 /**
  * endpointが生成されない検索でも完了状態を揃えるため、空検索の終了処理を共通化する。
  */
-export function finishSearchWithoutRequests(): void {
+export function finishSearchWithoutRequests(executionId: number): void {
+  if (!isCurrentSearchExecution(executionId)) return;
   finishSearchDataLoading();
-  finishSearchSuccessfully();
+  finishSearchSuccessfully(executionId);
 }
 
 /**
  * Resultsの行loadingはdata=1レスポンスだけに連動させ、統計取得の遅延から切り離す。
  */
-function watchSearchDataCompletion(dataRequests: Promise<void>[]): void {
+function watchSearchDataCompletion(
+  dataRequests: Promise<void>[],
+  executionId: number
+): void {
   Promise.all(dataRequests)
     .then(() => {
+      if (!isCurrentSearchExecution(executionId)) return;
       finishSearchDataLoading();
     })
     .catch((error: unknown) => {
       if (isSearchAbortError(error)) return;
+      if (!isCurrentSearchExecution(executionId)) return;
       finishSearchDataLoading();
     });
 }
@@ -56,13 +69,16 @@ function watchSearchDataCompletion(dataRequests: Promise<void>[]): void {
 /**
  * 画面全体の検索完了はdata/statすべてを待ち、統計パネルまで更新された状態で確定する。
  */
-function watchAllSearchRequestsCompletion(requests: Promise<void>[]): void {
+function watchAllSearchRequestsCompletion(
+  requests: Promise<void>[],
+  executionId: number
+): void {
   Promise.all(requests)
     .then(() => {
-      finishSearchSuccessfully();
+      finishSearchSuccessfully(executionId);
     })
     .catch((error: unknown) => {
-      handleSearchRequestFailure(error);
+      handleSearchRequestFailure(error, executionId);
     });
 }
 
@@ -76,7 +92,8 @@ function finishSearchDataLoading(): void {
 /**
  * 正常完了時だけ検索実行ロックを解除し、古いAbort済み検索が新しい検索状態を壊さないようにする。
  */
-function finishSearchSuccessfully(): void {
+function finishSearchSuccessfully(executionId: number): void {
+  if (!isCurrentSearchExecution(executionId)) return;
   markSearchRequestFinished();
   updateAppState();
 }
@@ -84,9 +101,10 @@ function finishSearchSuccessfully(): void {
 /**
  * Abort以外の失敗だけを現在の検索失敗として扱い、UIのloadingとメッセージを確定する。
  */
-function handleSearchRequestFailure(error: unknown): void {
+function handleSearchRequestFailure(error: unknown, executionId: number): void {
   // AbortErrorは次の検索がloading状態を引き継ぐため、古いリクエスト側では何もしない。
   if (isSearchAbortError(error)) return;
+  if (!isCurrentSearchExecution(executionId)) return;
 
   finishSearchDataLoading();
   markSearchRequestFinished();

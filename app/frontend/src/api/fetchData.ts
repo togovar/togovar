@@ -14,6 +14,7 @@ import {
 } from './searchRequest';
 import { applySearchResponse } from './searchResponse';
 import {
+  isCurrentSearchExecution,
   prepareSearchExecution,
   resetSearchExecutionForNewSearch,
 } from './searchExecutionState';
@@ -31,6 +32,7 @@ function _executeSearch(offset = 0, isFirstTime = false): void {
   }
   isFirstTime = execution.isFirstTime;
   const signal = execution.signal;
+  const executionId = execution.executionId;
 
   // 初回検索時のデータリセット
   if (isFirstTime) {
@@ -46,13 +48,17 @@ function _executeSearch(offset = 0, isFirstTime = false): void {
 
   // API リクエストオプションを設定
   const requestOptions = getSearchRequestOptions(signal);
-  const requests = _createSearchRequests(apiEndpoints, requestOptions);
+  const requests = _createSearchRequests(
+    apiEndpoints,
+    requestOptions,
+    executionId
+  );
 
   // データ取得
   if (requests.length > 0) {
-    watchSearchRequestCompletion(requests);
+    watchSearchRequestCompletion(requests, executionId);
   } else {
-    finishSearchWithoutRequests();
+    finishSearchWithoutRequests(executionId);
   }
 }
 
@@ -61,17 +67,24 @@ function _executeSearch(offset = 0, isFirstTime = false): void {
  */
 function _createSearchRequests(
   endpoints: string[],
-  options: FetchOption
+  options: FetchOption,
+  executionId: number
 ): SearchRequest[] {
   return endpoints.map((endpoint) => ({
     endpoint,
-    promise: _fetchData(endpoint, options),
+    promise: _fetchData(endpoint, options, executionId),
   }));
 }
 
 /** 通信結果の反映先をendpoint種別で分け、検索フローからレスポンス詳細を隠す。 */
-async function _fetchData(endpoint: string, options: FetchOption) {
+async function _fetchData(
+  endpoint: string,
+  options: FetchOption,
+  executionId: number
+) {
   const jsonResponse = await fetchSearchJSON(endpoint, options);
-  applySearchResponse(endpoint, jsonResponse);
-  applySearchMessages(jsonResponse);
+  applySearchResponse(endpoint, jsonResponse, executionId);
+  if (isCurrentSearchExecution(executionId)) {
+    applySearchMessages(jsonResponse);
+  }
 }

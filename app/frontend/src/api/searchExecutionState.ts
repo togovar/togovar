@@ -8,6 +8,7 @@ type SearchExecutionPreparation =
       shouldExecute: true;
       isFirstTime: boolean;
       signal: AbortSignal;
+      executionId: number;
     }
   | {
       shouldExecute: false;
@@ -16,6 +17,7 @@ type SearchExecutionPreparation =
 
 let currentAbortController: AbortController | null = null;
 let currentSearchMode: ActiveSearchMode = null;
+let currentExecutionId = 0;
 let isRequestInProgress = false;
 const lastRequestRanges = new Set<string>();
 
@@ -54,11 +56,13 @@ export function prepareSearchExecution(
 
   currentSearchMode = newSearchMode || null;
   currentAbortController = new AbortController();
+  currentExecutionId += 1;
 
   return {
     shouldExecute: true,
     isFirstTime,
     signal: currentAbortController.signal,
+    executionId: currentExecutionId,
   };
 }
 
@@ -67,6 +71,13 @@ export function prepareSearchExecution(
  */
 export function getCurrentSearchMode(): ActiveSearchMode {
   return currentSearchMode;
+}
+
+/**
+ * 同一モード内の条件変更でも古いレスポンスを捨てるため、現在の検索世代かを判定する。
+ */
+export function isCurrentSearchExecution(executionId: number): boolean {
+  return executionId === currentExecutionId;
 }
 
 /**
