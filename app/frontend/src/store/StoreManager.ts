@@ -65,12 +65,11 @@ class StoreManager {
   }
 
   /**
-   * 呼び出し側がStoreの内部オブジェクトを意図せず変更しないようにdeepCopyして返す。
-   * 型パラメータTは呼び出し側で指定する前提で、内部ではas unknown as Tでキャストする。
+   * keyからStoreState[K]を推論して返す。
+   * 呼び出し側がStoreの内部オブジェクトを意図せず変更しないようにdeepCopyして渡す。
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getData<T = any>(key: keyof StoreState): T {
-    return this._deepCopy(this._state[key]) as unknown as T;
+  getData<K extends keyof StoreState>(key: K): StoreState[K] {
+    return this._deepCopy(this._state[key]);
   }
 
   /**
@@ -197,13 +196,13 @@ class StoreManager {
    * recordIndexのデータがnullの場合はexecuteSearchを呼んで後続ページを取得する。
    */
   getRecordByIndex(index: number): ResultData | 'loading' | 'out of range' {
-    if (this.getData<boolean>('isStoreUpdating')) return 'loading';
-    const recordIndex = this.getData<number>('offset') + index;
+    if (this.getData('isStoreUpdating')) return 'loading';
+    const recordIndex = this.getData('offset') + index;
 
     if (recordIndex < this._state.numberOfRecords) {
       const record = this._state.searchResults[recordIndex];
       if (record) return this._deepCopy(record);
-      executeSearch(this.getData<number>('offset') + index);
+      executeSearch(this.getData('offset') + index);
       return 'loading';
     }
     return 'out of range';

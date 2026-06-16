@@ -10,7 +10,7 @@ import type {
 } from '../../types';
 
 interface SelectionState {
-  currentIndex: number;
+  currentIndex: number | undefined;
   rowCount: number;
   offset: number;
   numberOfRecords: number;
@@ -321,7 +321,7 @@ export class ResultsViewDataManager {
    * @returns The calculated new index for the selected row.
    */
   private _calculateNewIndex(state: SelectionState, direction: number): number {
-    const newIndex = state.currentIndex + direction;
+    const newIndex = (state.currentIndex ?? 0) + direction;
     return Math.max(0, Math.min(newIndex, state.rowCount - 1));
   }
 

@@ -217,8 +217,7 @@ export class ResultsColumnUpdater {
   static updateVariantType(element: HTMLDivElement | null, value: string) {
     if (!element) return;
 
-    const master: TypeMasterItem[] =
-      getSimpleSearchConditionMaster('type').items;
+    const master = getSimpleSearchConditionMaster('type')!.items as TypeMasterItem[];
     element.textContent = master.find((item) => item.id === value)?.label || '';
   }
 
@@ -263,8 +262,7 @@ export class ResultsColumnUpdater {
     tdFrequencies: TdFrequencies,
     frequencies: Frequency[]
   ) {
-    const master: DatasetMasterItem[] =
-      getSimpleSearchConditionMaster('dataset').items;
+    const master = getSimpleSearchConditionMaster('dataset')!.items as DatasetMasterItem[];
 
     master
       .filter((dataset) => dataset.has_freq)
@@ -301,8 +299,7 @@ export class ResultsColumnUpdater {
       return;
     }
 
-    const master: ConsequenceMasterItem[] =
-      getSimpleSearchConditionMaster('consequence').items;
+    const master = getSimpleSearchConditionMaster('consequence')!.items as ConsequenceMasterItem[];
     const uniqueConsequences = Array.from(
       new Set(transcripts.flatMap((transcript) => transcript.consequence))
     );

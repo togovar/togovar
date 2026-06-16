@@ -37,7 +37,7 @@ class SimpleSearchView extends LitElement {
   // State Properties
   // ============================================================================
   @state() _value: string = ''; // 選択されたサジェストの値
-  @state() _term: string = getSimpleSearchCondition('term') || ''; // 検索キーワード
+  @state() _term: string = (getSimpleSearchCondition('term') as string) || ''; // 検索キーワード
   @state() _hideSuggestions: boolean = true; // サジェストを非表示にするかどうか
 
   // ============================================================================

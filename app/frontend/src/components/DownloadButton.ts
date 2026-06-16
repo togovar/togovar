@@ -55,7 +55,7 @@ export default class DownloadButton {
       return;
     }
 
-    const searchMode = storeManager.getData<SearchMode>('searchMode');
+    const searchMode = storeManager.getData('searchMode');
     switch (searchMode) {
       case 'simple':
         this.#downloadFromSimpleSearch(type);

@@ -92,7 +92,7 @@ export default class PanelViewCheckList extends PanelView {
     super(elm, kind);
 
     const conditionMaster = storeManager
-      .getData<MasterConditions[]>('simpleSearchConditionsMaster')
+      .getData('simpleSearchConditionsMaster')
       .find((c: MasterConditions) => c.id === this.kind);
 
     if (!conditionMaster) {

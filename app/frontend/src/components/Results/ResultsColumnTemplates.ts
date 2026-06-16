@@ -57,8 +57,7 @@ export const COLUMN_TEMPLATES = {
  * @returns Generated HTML table cell string
  */
 export function createFrequencyColumnHTML(): string {
-  const master: DatasetMasterItem[] =
-    getSimpleSearchConditionMaster('dataset').items;
+  const master = getSimpleSearchConditionMaster('dataset')!.items as DatasetMasterItem[];
   const frequencyElements = master
     .filter((dataset) => dataset.has_freq)
     .map(

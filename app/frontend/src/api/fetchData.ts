@@ -35,7 +35,7 @@ export const executeSearch = (() => {
 
     if (_currentSearchMode && _currentSearchMode !== newSearchMode) {
       // mode切替時
-      _currentSearchMode = newSearchMode;
+      _currentSearchMode = newSearchMode || null;
       isFirstTime = true; // データリセットのため
       lastRequestRanges.clear(); // モード切り替え時にクリア
     } else {
@@ -54,7 +54,7 @@ export const executeSearch = (() => {
     }
 
     // 現在の検索モードを保存
-    _currentSearchMode = newSearchMode;
+    _currentSearchMode = newSearchMode || null;
 
     // 新しい AbortController を作成
     currentAbortController = new AbortController();
@@ -191,13 +191,9 @@ function _getRequestOptions(signal: AbortSignal): FetchOption {
     offset: _calculateOffset(storeManager.getData('offset'), LIMIT),
   };
 
-  if (
-    storeManager.getData('advancedSearchConditions') &&
-    Object.keys(storeManager.getData('advancedSearchConditions')).length > 0
-  ) {
-    body.query = stripAdvancedSearchMetadata(
-      storeManager.getData('advancedSearchConditions')
-    ) as Record<string, unknown>;
+  const advConditions = storeManager.getData('advancedSearchConditions');
+  if (advConditions && Object.keys(advConditions as object).length > 0) {
+    body.query = stripAdvancedSearchMetadata(advConditions) as Record<string, unknown>;
   }
 
   return {
@@ -287,7 +283,7 @@ function _processSearchResults(json: SearchResults) {
   // データのない行がローディング表示されてしまうため使用しない。
   // 統計レスポンス（_processStatistics）が正確な総件数を上書きする。
   // 仮想スクロール中は既存の numberOfRecords を保持するため Math.max を使用する。
-  const currentCount = storeManager.getData<number>('numberOfRecords');
+  const currentCount = storeManager.getData('numberOfRecords');
   storeManager.setData('numberOfRecords', Math.max(currentCount, offset + rows.length));
   storeManager.setResults(rows, offset);
 }

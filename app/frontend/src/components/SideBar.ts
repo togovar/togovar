@@ -28,7 +28,7 @@ export default class SideBar {
     );
 
     storeManager.subscribe('selectedRow', (v) => this.selectedRow(v));
-    this.selectedRow(storeManager.getData<SelectedRowIndex>('selectedRow'));
+    this.selectedRow(storeManager.getData('selectedRow'));
 
     requestAnimationFrame(() => {
       this._body.classList.add('-sidebar-ready');

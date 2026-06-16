@@ -43,8 +43,8 @@ export default class PanelViewFilterConsequence extends PanelView {
   constructor(elm: Element) {
     super(elm, 'consequence');
 
-    const conditionMaster = getSimpleSearchConditionMaster('consequence');
-    const grouping = getSimpleSearchConditionMaster('consequence_grouping')
+    const conditionMaster = getSimpleSearchConditionMaster('consequence')!;
+    const grouping = getSimpleSearchConditionMaster('consequence_grouping')!
       .items as Array<ItemItemClass | string>;
 
     // GUI 生成

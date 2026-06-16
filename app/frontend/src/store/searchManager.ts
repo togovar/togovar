@@ -83,7 +83,7 @@ function _setSimpleSearchConditions(
   };
   Object.keys(newSearchConditions).forEach((conditionKey) => {
     const key = conditionKey as keyof SimpleSearchCurrentConditions;
-    updatedConditions[key] = newSearchConditions[key];
+    (updatedConditions as Record<keyof SimpleSearchCurrentConditions, unknown>)[key] = newSearchConditions[key];
   });
   storeManager.setData('simpleSearchConditions', updatedConditions);
 
@@ -97,7 +97,7 @@ function _setSimpleSearchConditions(
 
 /** 指定された検索条件キーに対応する現在の検索条件を取得する */
 export function getSimpleSearchCondition(key: MasterConditionId) {
-  return storeManager.getData('simpleSearchConditions')?.[key];
+  return (storeManager.getData('simpleSearchConditions') as Record<string, unknown>)?.[key];
 }
 
 /** 指定された検索条件キーに対応するマスター検索条件を取得する */
