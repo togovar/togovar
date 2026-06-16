@@ -81,7 +81,7 @@ class StoreManager {
         // searchMode変化時は外部subscriberへ通知する前に内部状態をリセットする。
         // subscribeによる自己購読だと Set の挿入順に依存するため、直接呼び出しで順序を明示する。
         if (key === 'searchMode') {
-          this.searchMode(nextValue as SearchMode | '');
+          this._resetSearchStateForMode(nextValue as SearchMode | '');
         }
         this.publish(key);
       }
@@ -222,11 +222,18 @@ class StoreManager {
   // ------------------------------
 
   /**
+   * searchMode は内部リセットと searchManager の副作用順序が重要なため、専用入口に集約する。
+   */
+  setSearchMode(mode: SearchMode) {
+    this.setData('searchMode', mode);
+  }
+
+  /**
    * searchMode 変化時にStore内部状態を先にリセットする。
    * DOM操作・URL管理・API呼び出しは publish 後の searchManager 側に寄せる（責務分離）。
    * ''（空文字）はStoreの初期化前センチネルのため何もしない。
    */
-  private searchMode(mode: SearchMode | '') {
+  private _resetSearchStateForMode(mode: SearchMode | '') {
     if (!mode) return;
     this.setData('isStoreUpdating', true);
     try {
@@ -248,7 +255,7 @@ class StoreManager {
   setSearchModeFromHistory(mode: SearchMode) {
     this._fromHistory = true;
     try {
-      this.setData('searchMode', mode);
+      this.setSearchMode(mode);
     } finally {
       this._fromHistory = false;
     }

@@ -282,7 +282,7 @@ function initSearchInputs(): void {
         const mode = (e.currentTarget as HTMLLIElement).dataset.target;
         if (mode !== 'simple' && mode !== 'advanced') return;
 
-        storeManager.setData('searchMode', mode);
+        storeManager.setSearchMode(mode);
 
         if (mode === 'advanced') {
           loadAdvancedSearchBuilderView();
