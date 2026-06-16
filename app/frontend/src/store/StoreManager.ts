@@ -79,33 +79,14 @@ class StoreManager {
    */
   setData<T extends keyof StoreState>(key: T, newValue: StoreState[T]) {
     const oldValue = this._state[key];
-    const nextValue =
-      key === 'columns'
-        ? (normalizeColumnConfigs(
-            newValue as StoreState['columns']
-          ) as StoreState[T])
-        : newValue;
+    const normalizedValue = this._normalizeBeforeStoreUpdate(key, newValue);
 
-    if (typeof nextValue !== 'object' || nextValue === null) {
-      if (!Object.is(oldValue, nextValue)) {
-        this._state[key] = nextValue;
-        // searchMode変化時は外部subscriberへ通知する前に内部状態をリセットする。
-        // subscribeによる自己購読だと Set の挿入順に依存するため、直接呼び出しで順序を明示する。
-        if (key === 'searchMode') {
-          this._resetSearchStateForMode(nextValue as SearchMode | '');
-        }
-        this.publish(key);
-      }
+    if (this._isPrimitiveValue(normalizedValue)) {
+      this._setPrimitiveValueIfChanged(key, oldValue, normalizedValue);
       return;
     }
 
-    if (!isEqual(oldValue, nextValue)) {
-      this._state[key] = structuredClone(nextValue);
-      if (key === 'columns') {
-        saveColumnsToStorage(this._state.columns);
-      }
-      this.publish(key);
-    }
+    this._setObjectValueIfChanged(key, oldValue, normalizedValue);
   }
 
   /**
@@ -187,6 +168,84 @@ class StoreManager {
   private _deepCopy<T>(value: T): T {
     if (value === null || typeof value !== 'object') return value;
     return structuredClone(value);
+  }
+
+  /**
+   * columnsだけ保存前の正規形へ揃え、setData本体にキー別の特殊ルールを広げないようにする。
+   */
+  private _normalizeBeforeStoreUpdate<T extends keyof StoreState>(
+    key: T,
+    newValue: StoreState[T]
+  ): StoreState[T] {
+    if (key !== 'columns') return newValue;
+
+    return normalizeColumnConfigs(
+      newValue as StoreState['columns']
+    ) as StoreState[T];
+  }
+
+  /**
+   * Store更新経路を分けるため、primitive/null をオブジェクト更新ロジックから明確に切り離す。
+   */
+  private _isPrimitiveValue(value: unknown): boolean {
+    return typeof value !== 'object' || value === null;
+  }
+
+  /**
+   * primitive更新時の差分判定とsearchMode専用副作用をまとめ、publish前の順序を固定する。
+   */
+  private _setPrimitiveValueIfChanged<T extends keyof StoreState>(
+    key: T,
+    oldValue: StoreState[T],
+    nextValue: StoreState[T]
+  ): void {
+    if (Object.is(oldValue, nextValue)) {
+      return;
+    }
+
+    this._state[key] = nextValue;
+    this._runStoreSideEffectsBeforePublish(key, nextValue);
+    this.publish(key);
+  }
+
+  /**
+   * object更新時の比較・複製・永続化をまとめ、mutable参照がStoreへ残る経路を減らす。
+   */
+  private _setObjectValueIfChanged<T extends keyof StoreState>(
+    key: T,
+    oldValue: StoreState[T],
+    nextValue: StoreState[T]
+  ): void {
+    if (isEqual(oldValue, nextValue)) {
+      return;
+    }
+
+    this._state[key] = structuredClone(nextValue);
+    this._persistStoreDataAfterUpdate(key);
+    this.publish(key);
+  }
+
+  /**
+   * publish前に必要なStore内部副作用をここへ閉じ込め、setData本体から条件分岐を追い出す。
+   */
+  private _runStoreSideEffectsBeforePublish<T extends keyof StoreState>(
+    key: T,
+    nextValue: StoreState[T]
+  ): void {
+    // searchMode変化時は外部subscriberへ通知する前に内部状態をリセットする。
+    // subscribeによる自己購読だと Set の挿入順に依存するため、直接呼び出しで順序を明示する。
+    if (key === 'searchMode') {
+      this._resetSearchStateForMode(nextValue as SearchMode | '');
+    }
+  }
+
+  /**
+   * 更新後に保存が必要なキーだけをここで扱い、永続化ルールをsetData本体から切り離す。
+   */
+  private _persistStoreDataAfterUpdate<T extends keyof StoreState>(key: T): void {
+    if (key === 'columns') {
+      saveColumnsToStorage(this._state.columns);
+    }
   }
 
   // ------------------------------

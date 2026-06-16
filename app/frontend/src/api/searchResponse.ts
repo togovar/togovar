@@ -1,11 +1,22 @@
 import { storeManager } from '../store/StoreManager';
 import { API_URL } from '../global';
 import type { ScrollData, SearchResults, SearchStatistics } from '../types';
+import type { StoreState } from '../types/storeState';
 import { getNextSearchResultCount } from '../store/searchResultsState';
 import {
   getCurrentSearchMode,
   isCurrentSearchExecution,
 } from './searchExecutionState';
+
+type StatisticsStoreUpdate = Pick<
+  StoreState,
+  | 'searchStatus'
+  | 'numberOfRecords'
+  | 'statisticsDataset'
+  | 'statisticsSignificance'
+  | 'statisticsType'
+  | 'statisticsConsequence'
+>;
 
 /**
  * endpointの種別を見てStore反映先を選び、searchExecutor.tsからレスポンスURL解析を隠す。
@@ -15,14 +26,7 @@ export function applySearchResponse(
   json: unknown,
   executionId: number
 ): void {
-  if (!isCurrentSearchExecution(executionId)) {
-    return;
-  }
-
-  // 現在の検索モードと一致する場合のみ結果を処理
-  if (getCurrentSearchMode() !== storeManager.getData('searchMode')) {
-    return;
-  }
+  if (!shouldApplySearchResponse(executionId)) return;
 
   const searchParams = new URL(endpoint, API_URL).searchParams;
   if (searchParams.get('data') === '1') {
@@ -68,27 +72,8 @@ function applySearchStatisticsResponse(json: unknown): void {
     return;
   }
 
-  const available = Math.min(
-    searchStatistics.statistics.filtered,
-    searchStatistics.scroll.max_rows
-  );
-  storeManager.setData('searchStatus', {
-    available,
-    filtered: searchStatistics.statistics.filtered,
-    total: searchStatistics.statistics.total,
-  });
-  storeManager.setData('numberOfRecords', available);
-
-  storeManager.setData('statisticsDataset', searchStatistics.statistics.dataset);
-  storeManager.setData(
-    'statisticsSignificance',
-    searchStatistics.statistics.significance
-  );
-  storeManager.setData('statisticsType', searchStatistics.statistics.type);
-  storeManager.setData(
-    'statisticsConsequence',
-    searchStatistics.statistics.consequence
-  );
+  const statisticsStoreUpdate = buildStatisticsStoreUpdate(searchStatistics);
+  applyStatisticsStoreUpdate(statisticsStoreUpdate);
 }
 
 /**
@@ -128,4 +113,66 @@ function isScrollData(value: unknown): value is ScrollData {
  */
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * 古い検索やモード不一致のレスポンスを入口で止め、各反映関数に世代判定を持ち込まないようにする。
+ */
+function shouldApplySearchResponse(executionId: number): boolean {
+  if (!isCurrentSearchExecution(executionId)) {
+    return false;
+  }
+
+  return getCurrentSearchMode() === storeManager.getData('searchMode');
+}
+
+/**
+ * 統計レスポンスから必要なStore値だけを抜き出し、UI反映の材料を一目で追える形にする。
+ */
+function buildStatisticsStoreUpdate(
+  searchStatistics: SearchStatistics
+): StatisticsStoreUpdate {
+  const available = Math.min(
+    searchStatistics.statistics.filtered,
+    searchStatistics.scroll.max_rows
+  );
+
+  return {
+    searchStatus: {
+      available,
+      filtered: searchStatistics.statistics.filtered,
+      total: searchStatistics.statistics.total,
+    },
+    numberOfRecords: available,
+    statisticsDataset: searchStatistics.statistics.dataset,
+    statisticsSignificance: searchStatistics.statistics.significance,
+    statisticsType: searchStatistics.statistics.type,
+    statisticsConsequence: searchStatistics.statistics.consequence,
+  };
+}
+
+/**
+ * 統計Store更新の並びを1箇所に固定し、反映項目の増減時に見落としにくくする。
+ */
+function applyStatisticsStoreUpdate(
+  statisticsStoreUpdate: StatisticsStoreUpdate
+): void {
+  storeManager.setData('searchStatus', statisticsStoreUpdate.searchStatus);
+  storeManager.setData(
+    'numberOfRecords',
+    statisticsStoreUpdate.numberOfRecords
+  );
+  storeManager.setData(
+    'statisticsDataset',
+    statisticsStoreUpdate.statisticsDataset
+  );
+  storeManager.setData(
+    'statisticsSignificance',
+    statisticsStoreUpdate.statisticsSignificance
+  );
+  storeManager.setData('statisticsType', statisticsStoreUpdate.statisticsType);
+  storeManager.setData(
+    'statisticsConsequence',
+    statisticsStoreUpdate.statisticsConsequence
+  );
 }
