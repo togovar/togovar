@@ -27,24 +27,24 @@ class StoreManager {
   /**
    * StoreStateのキーごとに購読値の型を保持し、publish時の値型取り違えを防ぐ。
    */
-  private _listeners: StoreListenerMap = {};
+  private listeners: StoreListenerMap = {};
 
   /**
    * popstate経由のモード切替時にreflect*ToURIをスキップするためのフラグ。
    * setSearchModeFromHistoryとsearchModeの組み合わせでpushState二重発火を防ぐ。
    * searchManager の subscriber が fromHistory getter 経由で読む。
    */
-  private _fromHistory = false;
+  private isFromHistory = false;
 
   /** searchManager の searchMode subscriber が URL 更新をスキップするか判定するために公開する。 */
   get fromHistory(): boolean {
-    return this._fromHistory;
+    return this.isFromHistory;
   }
 
   /**
    * アプリ全体の状態オブジェクト。外部からはgetData/setDataのみを通じてアクセスする。
    */
-  private _state: StoreState = {
+  private state: StoreState = {
     searchMode: '',
     simpleSearchConditionsMaster: [],
     simpleSearchConditions: {},
@@ -62,7 +62,7 @@ class StoreManager {
   };
 
   constructor() {
-    this._state.columns = loadColumnsFromStorage();
+    this.state.columns = loadColumnsFromStorage();
   }
 
   /**
@@ -70,7 +70,7 @@ class StoreManager {
    * 呼び出し側がStoreの内部オブジェクトを意図せず変更しないようにdeepCopyして渡す。
    */
   getData<K extends keyof StoreState>(key: K): StoreState[K] {
-    return this._deepCopy(this._state[key]);
+    return this.deepCopy(this.state[key]);
   }
 
   /**
@@ -78,15 +78,15 @@ class StoreManager {
    * プリミティブはObject.is、オブジェクトはisEqualで差分検出して不要なpublishをスキップする。
    */
   setData<T extends keyof StoreState>(key: T, newValue: StoreState[T]) {
-    const oldValue = this._state[key];
-    const normalizedValue = this._normalizeBeforeStoreUpdate(key, newValue);
+    const oldValue = this.state[key];
+    const normalizedValue = this.normalizeBeforeStoreUpdate(key, newValue);
 
-    if (this._isPrimitiveValue(normalizedValue)) {
-      this._setPrimitiveValueIfChanged(key, oldValue, normalizedValue);
+    if (this.isPrimitiveValue(normalizedValue)) {
+      this.setPrimitiveValueIfChanged(key, oldValue, normalizedValue);
       return;
     }
 
-    this._setObjectValueIfChanged(key, oldValue, normalizedValue);
+    this.setObjectValueIfChanged(key, oldValue, normalizedValue);
   }
 
   /**
@@ -94,7 +94,7 @@ class StoreManager {
    * 列の表示設定を壊さずに幅だけ初期化するユースケースのための専用メソッド。
    */
   resetColumnWidths() {
-    const resetColumns = this._state.columns.map((column) => ({
+    const resetColumns = this.state.columns.map((column) => ({
       id: column.id,
       isUsed: column.isUsed,
       width: getInitialColumnWidth(column.id),
@@ -108,7 +108,7 @@ class StoreManager {
    */
   resetSearchResultsForNewSearch() {
     const resetState = createResetSearchResultsState(
-      this._state.resultsResetVersion
+      this.state.resultsResetVersion
     );
     this.setData('numberOfRecords', resetState.numberOfRecords);
     this.setData('offset', resetState.offset);
@@ -127,7 +127,7 @@ class StoreManager {
     key: T,
     callback: (value: StoreState[T]) => void
   ) {
-    this._getListeners(key).add(callback);
+    this.getListeners(key).add(callback);
   }
 
   /**
@@ -137,45 +137,45 @@ class StoreManager {
     key: T,
     callback: (value: StoreState[T]) => void
   ) {
-    this._listeners[key]?.delete(callback);
+    this.listeners[key]?.delete(callback);
   }
 
   /**
-   * _state の参照を直接渡すとコールバック内での変更がStoreを汚染し得るため、基本はdeepCopyして渡す。
+   * state の参照を直接渡すとコールバック内での変更がStoreを汚染し得るため、基本はdeepCopyして渡す。
    * ただし searchResults は setResults() で毎回新規構築された配列が代入されており、
    * publish のたびに structuredClone するとスクロール・ページング時に大きなCPU/メモリ負荷になる。
    * そのため searchResults だけは参照をそのまま渡す（購読側は読み取り専用として扱うこと）。
    */
   publish<T extends keyof StoreState>(key: T) {
-    const value = this._state[key];
+    const value = this.state[key];
     if (key === 'searchResults') {
-      this._listeners[key]?.forEach((callback) =>
+      this.listeners[key]?.forEach((callback) =>
         callback(value as StoreState[T])
       );
       return;
     }
-    this._listeners[key]?.forEach((callback) =>
-      callback(this._deepCopy(value))
+    this.listeners[key]?.forEach((callback) =>
+      callback(this.deepCopy(value))
     );
   }
 
   /**
    * 購読Setの生成箇所を1つに寄せ、subscribe側で型キャストせずに登録できるようにする。
    */
-  private _getListeners<T extends keyof StoreState>(
+  private getListeners<T extends keyof StoreState>(
     key: T
   ): Set<StoreListener<T>> {
-    if (!this._listeners[key]) {
-      this._listeners[key] = new Set<StoreListener<T>>() as StoreListenerMap[T];
+    if (!this.listeners[key]) {
+      this.listeners[key] = new Set<StoreListener<T>>() as StoreListenerMap[T];
     }
-    return this._listeners[key] as Set<StoreListener<T>>;
+    return this.listeners[key] as Set<StoreListener<T>>;
   }
 
   /**
    * nullとプリミティブはstructuredCloneをスキップして早期リターンする。
    * getDataやpublish経由でStoreの値が外部から変更されないよう保護するために使う。
    */
-  private _deepCopy<T>(value: T): T {
+  private deepCopy<T>(value: T): T {
     if (value === null || typeof value !== 'object') return value;
     return structuredClone(value);
   }
@@ -183,7 +183,7 @@ class StoreManager {
   /**
    * columnsだけ保存前の正規形へ揃え、setData本体にキー別の特殊ルールを広げないようにする。
    */
-  private _normalizeBeforeStoreUpdate<T extends keyof StoreState>(
+  private normalizeBeforeStoreUpdate<T extends keyof StoreState>(
     key: T,
     newValue: StoreState[T]
   ): StoreState[T] {
@@ -197,14 +197,14 @@ class StoreManager {
   /**
    * Store更新経路を分けるため、primitive/null をオブジェクト更新ロジックから明確に切り離す。
    */
-  private _isPrimitiveValue(value: unknown): boolean {
+  private isPrimitiveValue(value: unknown): boolean {
     return typeof value !== 'object' || value === null;
   }
 
   /**
    * primitive更新時の差分判定とsearchMode専用副作用をまとめ、publish前の順序を固定する。
    */
-  private _setPrimitiveValueIfChanged<T extends keyof StoreState>(
+  private setPrimitiveValueIfChanged<T extends keyof StoreState>(
     key: T,
     oldValue: StoreState[T],
     nextValue: StoreState[T]
@@ -213,15 +213,15 @@ class StoreManager {
       return;
     }
 
-    this._state[key] = nextValue;
-    this._runStoreSideEffectsBeforePublish(key, nextValue);
+    this.state[key] = nextValue;
+    this.runStoreSideEffectsBeforePublish(key, nextValue);
     this.publish(key);
   }
 
   /**
    * object更新時の比較・複製・永続化をまとめ、mutable参照がStoreへ残る経路を減らす。
    */
-  private _setObjectValueIfChanged<T extends keyof StoreState>(
+  private setObjectValueIfChanged<T extends keyof StoreState>(
     key: T,
     oldValue: StoreState[T],
     nextValue: StoreState[T]
@@ -230,31 +230,31 @@ class StoreManager {
       return;
     }
 
-    this._state[key] = structuredClone(nextValue);
-    this._persistStoreDataAfterUpdate(key);
+    this.state[key] = structuredClone(nextValue);
+    this.persistStoreDataAfterUpdate(key);
     this.publish(key);
   }
 
   /**
    * publish前に必要なStore内部副作用をここへ閉じ込め、setData本体から条件分岐を追い出す。
    */
-  private _runStoreSideEffectsBeforePublish<T extends keyof StoreState>(
+  private runStoreSideEffectsBeforePublish<T extends keyof StoreState>(
     key: T,
     nextValue: StoreState[T]
   ): void {
     // searchMode変化時は外部subscriberへ通知する前に内部状態をリセットする。
     // subscribeによる自己購読だと Set の挿入順に依存するため、直接呼び出しで順序を明示する。
     if (key === 'searchMode') {
-      this._resetSearchStateForMode(nextValue as SearchMode | '');
+      this.resetSearchStateForMode(nextValue as SearchMode | '');
     }
   }
 
   /**
    * 更新後に保存が必要なキーだけをここで扱い、永続化ルールをsetData本体から切り離す。
    */
-  private _persistStoreDataAfterUpdate<T extends keyof StoreState>(key: T): void {
+  private persistStoreDataAfterUpdate<T extends keyof StoreState>(key: T): void {
     if (key === 'columns') {
-      saveColumnsToStorage(this._state.columns);
+      saveColumnsToStorage(this.state.columns);
     }
   }
 
@@ -268,16 +268,16 @@ class StoreManager {
    */
   setResults(records: ResultData[], offset: number) {
     applyMergedSearchResults({
-      currentResults: this._state.searchResults,
+      currentResults: this.state.searchResults,
       records,
       offset,
-      numberOfRecords: this._state.numberOfRecords,
+      numberOfRecords: this.state.numberOfRecords,
       setUpdating: (isUpdating) =>
         this.setData('isSearchResultsUpdating', isUpdating),
       updateResults: (nextResults) => {
         // updatedResults は常に新規構築のため isEqual チェックと structuredClone は不要。
         // setData を経由せず直接代入し、publish を一度だけ呼ぶことで二重通知を防ぐ。
-        this._state.searchResults = nextResults;
+        this.state.searchResults = nextResults;
       },
       // isSearchDataFetchingはdata=1リクエストの状態なので、Store配列更新だけを担うここでは触らない。
       publishResults: () => this.publish('searchResults'),
@@ -293,12 +293,12 @@ class StoreManager {
   getRecordByIndex(index: number): SearchRecordLookupResult {
     if (this.getData('isSearchResultsUpdating')) return 'loading';
     const result = getSearchRecordByDisplayIndex(
-      this._state.searchResults,
+      this.state.searchResults,
       index,
-      this._state.offset,
-      this._state.numberOfRecords
+      this.state.offset,
+      this.state.numberOfRecords
     );
-    return typeof result === 'string' ? result : this._deepCopy(result);
+    return typeof result === 'string' ? result : this.deepCopy(result);
   }
 
   /**
@@ -307,9 +307,9 @@ class StoreManager {
    */
   getSelectedRecord() {
     return getSelectedSearchRecord(
-      this._state.searchResults,
-      this._state.offset,
-      this._state.selectedRow
+      this.state.searchResults,
+      this.state.offset,
+      this.state.selectedRow
     );
   }
 
@@ -329,7 +329,7 @@ class StoreManager {
    * DOM操作・URL管理・API呼び出しは publish 後の searchManager 側に寄せる（責務分離）。
    * ''（空文字）はStoreの初期化前センチネルのため何もしない。
    */
-  private _resetSearchStateForMode(mode: SearchMode | '') {
+  private resetSearchStateForMode(mode: SearchMode | '') {
     if (!mode) return;
     this.setData('isSearchResultsUpdating', true);
     try {
@@ -345,15 +345,15 @@ class StoreManager {
 
   /**
    * popstate中にsetData('searchMode')を直接呼ぶとreflect*ToURIがpushStateを発火して
-   * ブラウザ履歴が壊れる。_fromHistoryフラグでURIへの反映をスキップするために別メソッドを用意した。
+   * ブラウザ履歴が壊れる。isFromHistoryフラグでURIへの反映をスキップするために別メソッドを用意した。
    * 初期ロードでも同じ理由で使う（URLは正しいのにpushStateすると履歴エントリが乱れるため）。
    */
   setSearchModeFromHistory(mode: SearchMode) {
-    this._fromHistory = true;
+    this.isFromHistory = true;
     try {
       this.setSearchMode(mode);
     } finally {
-      this._fromHistory = false;
+      this.isFromHistory = false;
     }
   }
 }
