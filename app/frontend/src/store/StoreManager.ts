@@ -13,7 +13,10 @@ import {
 import type { ResultData, SearchMode } from '../types';
 import type { StoreState } from '../types/storeState';
 
-type StoreListener = (value: unknown) => void;
+type StoreListener<K extends keyof StoreState> = (value: StoreState[K]) => void;
+type StoreListenerMap = {
+  [K in keyof StoreState]?: Set<StoreListener<K>>;
+};
 
 /**
  * アプリ全体の状態を一元管理するシングルトンStore。
@@ -21,10 +24,9 @@ type StoreListener = (value: unknown) => void;
  */
 class StoreManager {
   /**
-   * subscribeで登録されたコールバックのMap。
-   * キーはStoreStateのキー名で、値の変化があるたびに対応するSetの全コールバックを呼ぶ。
+   * StoreStateのキーごとに購読値の型を保持し、publish時の値型取り違えを防ぐ。
    */
-  private _listeners = new Map<keyof StoreState, Set<StoreListener>>();
+  private _listeners: StoreListenerMap = {};
 
   /**
    * popstate経由のモード切替時にreflect*ToURIをスキップするためのフラグ。
@@ -125,10 +127,7 @@ class StoreManager {
     key: T,
     callback: (value: StoreState[T]) => void
   ) {
-    if (!this._listeners.has(key)) {
-      this._listeners.set(key, new Set());
-    }
-    this._listeners.get(key)?.add(callback as unknown as StoreListener);
+    this._getListeners(key).add(callback);
   }
 
   /**
@@ -138,7 +137,7 @@ class StoreManager {
     key: T,
     callback: (value: StoreState[T]) => void
   ) {
-    this._listeners.get(key)?.delete(callback as unknown as StoreListener);
+    this._listeners[key]?.delete(callback);
   }
 
   /**
@@ -146,8 +145,20 @@ class StoreManager {
    */
   publish<T extends keyof StoreState>(key: T) {
     this._listeners
-      .get(key)
+      [key]
       ?.forEach((callback) => callback(this._deepCopy(this._state[key])));
+  }
+
+  /**
+   * 購読Setの生成箇所を1つに寄せ、subscribe側で型キャストせずに登録できるようにする。
+   */
+  private _getListeners<T extends keyof StoreState>(
+    key: T
+  ): Set<StoreListener<T>> {
+    if (!this._listeners[key]) {
+      this._listeners[key] = new Set<StoreListener<T>>() as StoreListenerMap[T];
+    }
+    return this._listeners[key] as Set<StoreListener<T>>;
   }
 
   /**
