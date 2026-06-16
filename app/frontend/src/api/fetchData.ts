@@ -4,6 +4,7 @@ import type { FetchOption } from '../types';
 import {
   finishSearchWithoutRequests,
   startSearchRequestLoading,
+  type SearchRequest,
   watchSearchRequestCompletion,
 } from './searchCompletion';
 import { fetchSearchJSON } from './searchFetch';
@@ -46,13 +47,10 @@ function _executeSearch(offset = 0, isFirstTime = false): void {
 
   // API リクエストオプションを設定
   const requestOptions = getSearchRequestOptions(signal);
+  const requests = _createSearchRequests(apiEndpoints, requestOptions);
 
   // データ取得
-  if (apiEndpoints && apiEndpoints.length > 0) {
-    const requests = apiEndpoints.map((endpoint) => ({
-      endpoint,
-      promise: _fetchData(endpoint, requestOptions),
-    }));
+  if (requests.length > 0) {
     watchSearchRequestCompletion(requests);
   } else {
     finishSearchWithoutRequests();
@@ -63,6 +61,19 @@ function _executeSearch(offset = 0, isFirstTime = false): void {
 function _resetSearchResults() {
   storeManager.resetSearchResultsForNewSearch();
   clearSearchRequestRanges();
+}
+
+/**
+ * endpoint生成とfetch開始の接続点を名前で示し、executeSearch本体を検索フローだけに集中させる。
+ */
+function _createSearchRequests(
+  endpoints: string[],
+  options: FetchOption
+): SearchRequest[] {
+  return endpoints.map((endpoint) => ({
+    endpoint,
+    promise: _fetchData(endpoint, options),
+  }));
 }
 
 /** 通信結果の反映先をendpoint種別で分け、検索フローからレスポンス詳細を隠す。 */
