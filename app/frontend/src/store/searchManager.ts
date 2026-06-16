@@ -1,4 +1,3 @@
-import * as qs from 'qs';
 import { executeSearch } from '../api/fetchData';
 import { storeManager } from './StoreManager';
 import type {
@@ -8,13 +7,12 @@ import type {
   SearchMode,
 } from '../types';
 import type { ConditionQuery } from '../types/query';
+import { decodeConditionFromURL } from './advancedSearchURL';
 import {
-  encodeConditionForURL,
-  decodeConditionFromURL,
-} from './advancedSearchURL';
-import { extractSearchCondition } from './simpleSearchConditions';
-
-let _currentUrlParams = qs.parse(window.location.search.substring(1));
+  parseSearchURLParams,
+  reflectAdvancedSearchConditionToURI,
+  reflectSimpleSearchConditionToURI,
+} from './searchURL';
 
 // Simple Search ----------------------------------------
 /** SimpleSearchの検索条件を設定 */
@@ -40,7 +38,7 @@ function _setSimpleSearchConditions(
   storeManager.setData('simpleSearchConditions', updatedConditions);
 
   if (storeManager.getData('searchMode') === 'simple') {
-    reflectSimpleSearchConditionToURI();
+    reflectSimpleSearchConditionToURI(updatedConditions);
   }
 
   storeManager.setData('appLoadingStatus', 'searching');
@@ -59,42 +57,6 @@ export function getSimpleSearchConditionMaster(key: MasterConditionId) {
   return storeManager
     .getData('simpleSearchConditionsMaster')
     .find((condition: MasterConditions) => condition.id === key);
-}
-
-/** 現在のSimple Searchの条件をURLパラメータに反映する */
-export function reflectSimpleSearchConditionToURI() {
-  // デフォルト値と異なる検索条件を抽出
-  const currentConditions = storeManager.getData('simpleSearchConditions');
-  const diffConditions = extractSearchCondition(currentConditions);
-
-  // 現在のterm値を保存（一時変数）
-  const currentTerm = currentConditions.term || '';
-
-  // 検索条件が空の場合は、URLパラメータを完全にクリア
-  if (Object.keys(diffConditions).length === 0 && currentTerm === '') {
-    _currentUrlParams = {
-      mode: 'simple',
-    };
-  } else {
-    // 現在のURLパラメータを保持しながら更新
-    _currentUrlParams = {
-      mode: 'simple',
-      ...diffConditions,
-    };
-
-    // 常にtermパラメータを正しく維持
-    if (currentTerm !== '') {
-      _currentUrlParams.term = currentTerm;
-    } else {
-      delete _currentUrlParams.term;
-    }
-  }
-
-  //URLを更新 (ブラウザの履歴に新しい状態を追加)
-  const newUrl = `${window.location.origin}${
-    window.location.pathname
-  }?${qs.stringify(_currentUrlParams)}`;
-  window.history.pushState(_currentUrlParams, '', newUrl);
 }
 
 export function resetSimpleSearchConditions() {
@@ -124,7 +86,7 @@ export function resetSimpleSearchConditions() {
 
 /** ブラウザの「戻る」「進む」ボタンが押されたときに検索条件を更新 */
 export function handleHistoryChange(e: PopStateEvent) {
-  const urlParams = qs.parse(window.location.search.substring(1));
+  const urlParams = parseSearchURLParams();
   const mode = urlParams.mode as string | undefined;
   const currentMode = storeManager.getData('searchMode');
 
@@ -190,7 +152,7 @@ function _getConditionFromState(state: unknown): ConditionQuery | null {
  * mode・qなど非条件キーは除外する。
  */
 function _buildSimpleConditionsFromURL(
-  urlParams: ReturnType<typeof qs.parse>
+  urlParams: Record<string, unknown>
 ): SimpleSearchCurrentConditions {
   const master: MasterConditions[] =
     storeManager.getData('simpleSearchConditionsMaster') ?? [];
@@ -218,41 +180,6 @@ function _buildSimpleConditionsFromURL(
   return conditions as SimpleSearchCurrentConditions;
 }
 
-// Advanced Search ----------------------------------------
-//
-// ## Advanced Search URL仕様
-//
-// ### URLフォーマット
-//   条件あり: ?mode=advanced&q=<Base64エンコードされたJSON>
-//   条件なし: ?mode=advanced
-//
-// ### エンコード方式
-//   条件オブジェクト → JSON.stringify() → btoa() (Base64) → encodeURIComponent() → `q` パラメータ
-//   例: { and: [{ gene: { relation: "eq", terms: [123] } }] }
-//       → '{"and":[{"gene":{"relation":"eq","terms":[123]}}]}'
-//       → "eyJhbmQiOlt7Imdlbm..."
-//
-// ### デコード方式
-//   `q` パラメータ → decode済み文字列 → atob() → JSON.parse() → 条件オブジェクトとして復元
-//
-// ### 文字数制限
-//   - Raw JSON (btoa前) が 2000文字以内の場合のみ `q` パラメータをURLに付与する
-//   - 2000文字を超える場合: URLは `?mode=advanced` のみとし、ユーザーに通知する
-//   - 実用上限の目安: 条件15〜20個、ネスト3段階程度まで
-//
-// ### 制限超過時の動作
-//   1. URLには `?mode=advanced` のみをセット（条件はURLに乗せない）
-//   2. ユーザーへ「条件が複雑すぎるためURLで共有できません」と通知（TODO: 実装）
-//   3. 検索自体は正常に実行される
-//
-// ### ページ読み込み時の復元
-//   1. initializeApp() で `?q=` を読み取り、デコードしてストアに保存
-//   2. AdvancedSearchBuilderView の初期化時にストアから条件を読み取り、Viewを再構築
-//
-// ### Simple Searchとの比較
-//   Simple Search: qs.stringify() でフラットなkey=valueをURLに展開
-//   Advanced Search: ネスト構造のためJSON+Base64を使用（URI encodeより~33%コンパクト）
-
 /** AdvancedSearch検索条件を設定し、必要に応じて検索を実行 */
 export function setAdvancedSearchCondition(
   newSearchConditions: ConditionQuery
@@ -260,55 +187,18 @@ export function setAdvancedSearchCondition(
   storeManager.setData('advancedSearchConditions', newSearchConditions);
   storeManager.setData('appLoadingStatus', 'searching');
 
-  // URLパラメータを更新
-  reflectAdvancedSearchConditionToURI();
+  _reflectAdvancedSearchConditionToURI();
 
   executeSearch(0, true);
 }
 
-export function reflectAdvancedSearchConditionToURI() {
+/**
+ * URL長制限の判定結果だけStoreへ戻し、URL生成自体はsearchURL.tsへ委譲する。
+ */
+function _reflectAdvancedSearchConditionToURI() {
   const conditions = storeManager.getData('advancedSearchConditions');
-  const hasConditions =
-    conditions !== undefined && Object.keys(conditions as object).length > 0;
-  const encoded = hasConditions ? encodeConditionForURL(conditions) : null;
-
-  let url: string;
-  if (encoded !== null) {
-    // 条件をBase64エンコードしてURLに付与
-    url = `${window.location.origin}${
-      window.location.pathname
-    }?mode=advanced&q=${encodeURIComponent(encoded)}`;
-    _currentUrlParams = { mode: 'advanced', q: encoded };
-  } else {
-    // 条件なし、または2000文字超過のためURLには mode のみ
-    url = `${window.location.origin}${window.location.pathname}?mode=advanced`;
-    _currentUrlParams = { mode: 'advanced' };
-  }
-
-  // 条件が2000文字以内に収まるようになった場合にフラグを戻す。
-  // hasConditions があるのにencodedがnullの場合のみ超過扱い。
-  storeManager.setData(
-    'advancedSearchURLTooLong',
-    hasConditions && encoded === null
-  );
-
-  // URL長制限超過時はqパラメータに条件を乗せられないため、popstate時に復元できるよう
-  // historyのstateに条件を退避する。
-  const state =
-    hasConditions && encoded === null
-      ? { ..._currentUrlParams, advancedSearchConditions: conditions }
-      : _currentUrlParams;
-  try {
-    window.history.pushState(state, '', url);
-  } catch {
-    // stateが大きすぎて失敗した場合は条件退避を諦めてURLのみ更新する。
-    // そのpushStateも失敗する環境ではURL更新自体を諦めて検索のみ継続する。
-    try {
-      window.history.pushState(_currentUrlParams, '', url);
-    } catch {
-      // do nothing
-    }
-  }
+  const { isURLTooLong } = reflectAdvancedSearchConditionToURI(conditions);
+  storeManager.setData('advancedSearchURLTooLong', isURLTooLong);
 }
 
 // ================================================================
@@ -331,12 +221,16 @@ function _handleSearchModeChange(mode: SearchMode | ''): void {
   switch (mode) {
     case 'simple':
       // popstate経由のときはURLがすでに確定済みのためpushStateしない
-      if (!storeManager.fromHistory) reflectSimpleSearchConditionToURI();
+      if (!storeManager.fromHistory) {
+        reflectSimpleSearchConditionToURI(
+          storeManager.getData('simpleSearchConditions')
+        );
+      }
       // パネルUIをモード切替後の条件で再描画させるために強制 publish する
       storeManager.publish('simpleSearchConditions');
       break;
     case 'advanced':
-      if (!storeManager.fromHistory) reflectAdvancedSearchConditionToURI();
+      if (!storeManager.fromHistory) _reflectAdvancedSearchConditionToURI();
       break;
   }
 

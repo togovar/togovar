@@ -99,6 +99,7 @@ app/frontend/
 - API通信は `app/frontend/src/api/fetchData.ts` など既存API層に合わせる。
 - 検索リクエストのURL・HTTPオプション生成は `app/frontend/src/api/searchRequest.ts` に置き、`fetchData.ts` は取得実行、レスポンス処理、Store反映に集中させる。
 - StoreはAPIを直接呼ばない。仮想スクロールで未取得ページが必要な場合も、コンポーネントから `searchManager.requestNextPage()` を呼び、fetch の起動は `searchManager` / `api/fetchData.ts` 側へ集約する。
+- 検索条件のブラウザURL反映（`history.pushState`、Simple/Advanced SearchのURL表現、URL長制限時のstate退避）は `store/searchURL.ts` に置き、`searchManager.ts` は検索開始タイミングとStore更新に集中させる。
 - Simple Search条件のdefault差分抽出は `store/simpleSearchConditions.ts` に置く。`api/fetchData.ts` から `searchManager.ts` を import すると循環依存になるため避ける。
 - コンポーネントやViewから直接URLやfetchの仕様を増やす前に、既存のStore/API層へ寄せられるか確認する。
 - 戻る/進む、URL貼り付け、モード切り替えでは、Store更新と検索実行が重複しやすい。変更時は初期表示・タブ切替・履歴操作を分けて考える。
