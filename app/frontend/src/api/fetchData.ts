@@ -1,4 +1,3 @@
-import { storeManager } from '../store/StoreManager';
 import debounce from 'lodash/debounce';
 import type { FetchOption } from '../types';
 import {
@@ -15,8 +14,8 @@ import {
 } from './searchRequest';
 import { applySearchResponse } from './searchResponse';
 import {
-  clearSearchRequestRanges,
   prepareSearchExecution,
+  resetSearchExecutionForNewSearch,
 } from './searchExecutionState';
 
 /** 検索開始の入口を1つにし、連続操作時のAPI多重発火をdebounceで抑える。 */
@@ -35,7 +34,7 @@ function _executeSearch(offset = 0, isFirstTime = false): void {
 
   // 初回検索時のデータリセット
   if (isFirstTime) {
-    _resetSearchResults();
+    resetSearchExecutionForNewSearch();
   }
 
   // Resultsの行loadingは検索結果dataの取得中だけに連動させる。
@@ -55,12 +54,6 @@ function _executeSearch(offset = 0, isFirstTime = false): void {
   } else {
     finishSearchWithoutRequests();
   }
-}
-
-/** 初回検索を過去結果から独立させるため、結果Storeとスクロール取得範囲を初期化する。 */
-function _resetSearchResults() {
-  storeManager.resetSearchResultsForNewSearch();
-  clearSearchRequestRanges();
 }
 
 /**

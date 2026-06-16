@@ -77,6 +77,14 @@ export function clearSearchRequestRanges(): void {
 }
 
 /**
+ * 初回検索を過去結果から独立させるため、表示Storeと取得済みrangeを同時に初期化する。
+ */
+export function resetSearchExecutionForNewSearch(): void {
+  storeManager.resetSearchResultsForNewSearch();
+  clearSearchRequestRanges();
+}
+
+/**
  * fetchData.tsから検索開始を明示し、完了前の追加スクロール取得を抑止する。
  */
 export function markSearchRequestStarted(): void {
