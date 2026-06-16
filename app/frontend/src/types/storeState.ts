@@ -54,6 +54,11 @@ export type StoreState = {
   offset: number;
   rowCount: number;
   /**
+   * 検索リセット単位で単調増加させ、列幅自動調整の内部キャッシュ解除をStore経由で通知する。
+   * DOMイベントへ依存せず、Results系コンポーネントが同じ状態変化を購読できるようにする。
+   */
+  resultsResetVersion: number;
+  /**
    * 画面全体の検索フェーズを1箇所で表し、全体ローディング表示の判定を単純にする。
    * Results内の行loadingではなく、LoadingIndicatorの表示制御に使う。
    */

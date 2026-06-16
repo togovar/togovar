@@ -43,7 +43,7 @@ export function prepareSearchExecution(
     currentSearchMode = newSearchMode || null;
     isFirstTime = true;
     clearSearchRequestRanges();
-  } else if (storeManager.getData('searchMode') === 'simple') {
+  } else if (newSearchMode === 'simple') {
     const offsetStart = offset - (offset % SEARCH_RESULT_LIMIT);
     const rangeKey = `${offsetStart}-${offsetStart + SEARCH_RESULT_LIMIT}`;
 
@@ -83,7 +83,7 @@ export function isCurrentSearchExecution(executionId: number): boolean {
 /**
  * 検索リセット時に取得済みrangeも破棄し、次の検索で先頭ページを必ず取り直す。
  */
-export function clearSearchRequestRanges(): void {
+function clearSearchRequestRanges(): void {
   lastRequestRanges.clear();
 }
 

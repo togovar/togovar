@@ -52,6 +52,7 @@ class StoreManager {
     numberOfRecords: 0,
     offset: 0,
     rowCount: 0,
+    resultsResetVersion: 0,
     appLoadingStatus: 'preparing',
     isLogin: false,
     isSearchDataFetching: false,
@@ -121,6 +122,7 @@ class StoreManager {
 
   /**
    * 新規検索では過去結果を表示しないため、結果Storeと列幅の表示状態をまとめて初期化する。
+   * Results系の内部キャッシュ解除も必要なため、DOMイベントではなくversion更新で通知する。
    */
   resetSearchResultsForNewSearch() {
     this.setData('numberOfRecords', 0);
@@ -129,9 +131,7 @@ class StoreManager {
     this.setData('isSearchDataFetching', false);
     this.setData('searchResults', []);
     this.resetColumnWidths();
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('results-column-widths-reset'));
-    }
+    this.setData('resultsResetVersion', this._state.resultsResetVersion + 1);
   }
 
   /**
