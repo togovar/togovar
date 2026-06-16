@@ -89,3 +89,10 @@ export function markSearchRequestStarted(): void {
 export function markSearchRequestFinished(): void {
   isRequestInProgress = false;
 }
+
+/**
+ * Abort済みの古い検索だけを通常エラーから分け、後続検索のloading状態を守る。
+ */
+export function isSearchAbortError(error: unknown): error is Error {
+  return error instanceof Error && error.name === 'AbortError';
+}

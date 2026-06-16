@@ -1,5 +1,8 @@
 import { storeManager } from '../store/StoreManager';
-import { markSearchRequestFinished } from './searchExecutionState';
+import {
+  isSearchAbortError,
+  markSearchRequestFinished,
+} from './searchExecutionState';
 import { isDataRequestEndpoint } from './searchRequest';
 
 export type SearchRequest = {
@@ -36,7 +39,7 @@ function watchSearchDataCompletion(dataRequests: Promise<void>[]): void {
       finishSearchDataLoading();
     })
     .catch((error: unknown) => {
-      if (isAbortError(error)) return;
+      if (isSearchAbortError(error)) return;
       finishSearchDataLoading();
     });
 }
@@ -74,18 +77,11 @@ function finishSearchSuccessfully(): void {
  */
 function handleSearchRequestFailure(error: unknown): void {
   // AbortErrorは次の検索がloading状態を引き継ぐため、古いリクエスト側では何もしない。
-  if (isAbortError(error)) return;
+  if (isSearchAbortError(error)) return;
 
   finishSearchDataLoading();
   markSearchRequestFinished();
   storeManager.setData('searchMessages', { error: getSearchErrorMessage(error) });
-}
-
-/**
- * 中断された古い検索を通常エラーから分け、新しい検索のloading状態を誤って消さない。
- */
-function isAbortError(error: unknown): error is Error {
-  return error instanceof Error && error.name === 'AbortError';
 }
 
 /**
