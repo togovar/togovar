@@ -141,12 +141,22 @@ class StoreManager {
   }
 
   /**
-   * _state の生参照を渡すとコールバック内での変更がStoreを直接汚染するため、deepCopyして渡す。
+   * _state の参照を直接渡すとコールバック内での変更がStoreを汚染し得るため、基本はdeepCopyして渡す。
+   * ただし searchResults は setResults() で毎回新規構築された配列が代入されており、
+   * publish のたびに structuredClone するとスクロール・ページング時に大きなCPU/メモリ負荷になる。
+   * そのため searchResults だけは参照をそのまま渡す（購読側は読み取り専用として扱うこと）。
    */
   publish<T extends keyof StoreState>(key: T) {
-    this._listeners
-      [key]
-      ?.forEach((callback) => callback(this._deepCopy(this._state[key])));
+    const value = this._state[key];
+    if (key === 'searchResults') {
+      this._listeners[key]?.forEach((callback) =>
+        callback(value as StoreState[T])
+      );
+      return;
+    }
+    this._listeners[key]?.forEach((callback) =>
+      callback(this._deepCopy(value))
+    );
   }
 
   /**

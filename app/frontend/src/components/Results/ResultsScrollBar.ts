@@ -266,7 +266,10 @@ export class ResultsScrollBar {
    * 負値や非数値がスクロール計算に混入するとサムが消えたりジャンプするため、
    * Storeから取得した数値をデフォルト値付きで安全に返す。
    */
-  private _getStoreData(key: keyof StoreState, defaultValue: number): number {
+  private _getStoreData(
+    key: 'rowCount' | 'numberOfRecords' | 'offset',
+    defaultValue: number
+  ): number {
     const value = storeManager.getData(key);
     return typeof value === 'number' && value >= 0 ? value : defaultValue;
   }
