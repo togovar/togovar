@@ -46,6 +46,7 @@ export default class DownloadButton {
       this.#updateAvailability()
     );
     storeManager.subscribe('searchStatus', () => this.#updateAvailability());
+    storeManager.subscribe('appLoadingStatus', () => this.#updateAvailability());
     this.#updateAvailability();
   }
 
@@ -67,10 +68,14 @@ export default class DownloadButton {
   /** Storeの検索条件と件数から、ダウンロードUIの有効/無効を決める */
   #updateAvailability(): void {
     const hasConditions = this.#hasSearchConditions();
-    const filteredCount = storeManager.getData('searchStatus')?.filtered ?? 0;
+    const searchStatus = storeManager.getData('searchStatus');
+    const filteredCount = searchStatus?.filtered;
+    const hasValidCount = typeof filteredCount === 'number';
+    const isSearching = storeManager.getData('appLoadingStatus') === 'searching';
     const isLimitExceeded =
-      hasConditions && filteredCount > DOWNLOAD_VARIANT_LIMIT;
-    const isAvailable = hasConditions && !isLimitExceeded;
+      hasConditions && hasValidCount && filteredCount > DOWNLOAD_VARIANT_LIMIT;
+    const isAvailable =
+      hasConditions && hasValidCount && !isSearching && !isLimitExceeded;
     const disabledReason = this.#getDisabledReason(
       hasConditions,
       isLimitExceeded

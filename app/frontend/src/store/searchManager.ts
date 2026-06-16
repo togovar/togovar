@@ -126,7 +126,9 @@ export function handleHistoryChange(e: PopStateEvent) {
 export function setAdvancedSearchCondition(
   newSearchConditions: ConditionQuery
 ) {
-  storeManager.setData('advancedSearchConditions', newSearchConditions);
+  const normalizedConditions =
+    Object.keys(newSearchConditions).length === 0 ? undefined : newSearchConditions;
+  storeManager.setData('advancedSearchConditions', normalizedConditions);
 
   _reflectAdvancedSearchConditionToURI();
 

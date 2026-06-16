@@ -80,7 +80,7 @@ export function getSearchRequestOptions(
     offset: calculateAdvancedSearchOffset(storeOffset, SEARCH_RESULT_LIMIT),
   };
 
-  if (advancedSearchConditions && Object.keys(advancedSearchConditions).length > 0) {
+  if (advancedSearchConditions) {
     body.query = stripAdvancedSearchMetadata(advancedSearchConditions) as Record<
       string,
       unknown

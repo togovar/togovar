@@ -28,8 +28,10 @@ export function decodeConditionFromURL(
 ): ConditionQuery | null {
   try {
     const parsed = JSON.parse(atob(encoded.replace(/ /g, '+')));
-    // 配列やプリミティブはAPIのquery bodyに流れると不正リクエストになるため弾く。
-    return isPlainObject(parsed) ? (parsed as ConditionQuery) : null;
+    // 配列・プリミティブはAPIのquery bodyに流れると不正リクエストになるため弾く。
+    // 空オブジェクトは「条件なし」センチネル(undefined)と整合させるため null を返す。
+    if (!isPlainObject(parsed) || Object.keys(parsed).length === 0) return null;
+    return parsed as ConditionQuery;
   } catch {
     return null;
   }
