@@ -1,6 +1,8 @@
 import { storeManager } from '../store/StoreManager';
 import debounce from 'lodash/debounce';
 import type { FetchOption } from '../types';
+import { fetchSearchJSON } from './searchFetch';
+import { applySearchMessages } from './searchMessages';
 import {
   determineSearchEndpoints,
   getSearchRequestOptions,
@@ -18,7 +20,7 @@ import {
   prepareSearchExecution,
 } from './searchExecutionState';
 
-/** 検索を実行するメソッド（データ取得 & 更新） */
+/** 検索開始の入口を1つにし、連続操作時のAPI多重発火をdebounceで抑える。 */
 export const executeSearch = (() => {
   return debounce((offset = 0, isFirstTime = false) => {
     const execution = prepareSearchExecution(offset, isFirstTime);
@@ -83,7 +85,7 @@ export const executeSearch = (() => {
   }, 300);
 })();
 
-/** 初回検索時のデータをリセット */
+/** 初回検索を過去結果から独立させるため、結果Storeとスクロール取得範囲を初期化する。 */
 function _resetSearchResults() {
   storeManager.setData('numberOfRecords', 0);
   storeManager.setData('offset', 0);
@@ -97,61 +99,26 @@ function _resetSearchResults() {
   clearSearchRequestRanges();
 }
 
-/** データを取得して結果を更新 */
+/** 通信結果の反映先をendpoint種別で分け、検索フローからレスポンス詳細を隠す。 */
 async function _fetchData(endpoint: string, options: FetchOption) {
-  try {
-    const response = await fetch(endpoint, options);
-    if (!response.ok) {
-      throw new Error(_getErrorMessage(response.status));
-    }
-    const jsonResponse = await response.json();
-    const url = new URL(endpoint);
-    const queryParams = Object.fromEntries(url.searchParams.entries());
+  const jsonResponse = await fetchSearchJSON(endpoint, options);
+  const url = new URL(endpoint);
+  const queryParams = Object.fromEntries(url.searchParams.entries());
 
-    // 現在の検索モードと一致する場合のみ結果を処理
-    if (getCurrentSearchMode() === storeManager.getData('searchMode')) {
-      if (queryParams.data === '1') {
-        applySearchResultsResponse(jsonResponse);
-      }
-      if (queryParams.stat === '1') {
-        applySearchStatisticsResponse(jsonResponse);
-      }
+  // 現在の検索モードと一致する場合のみ結果を処理
+  if (getCurrentSearchMode() === storeManager.getData('searchMode')) {
+    if (queryParams.data === '1') {
+      applySearchResultsResponse(jsonResponse);
     }
-
-    if (jsonResponse.notice || jsonResponse.warning || jsonResponse.error) {
-      storeManager.setData('searchMessages', {
-        notice: jsonResponse.notice?.join?.('<br>'),
-        warning: jsonResponse.warning?.join?.('<br>'),
-        error: jsonResponse.error?.join?.('<br>'),
-      });
-    } else {
-      storeManager.setData('searchMessages', {});
+    if (queryParams.stat === '1') {
+      applySearchStatisticsResponse(jsonResponse);
     }
-  } catch (error) {
-    console.error(error);
-    if (error instanceof Error && error.name === 'AbortError') {
-      // AbortErrorの場合はエラーオブジェクトを投げる
-      const abortError = new Error('ABORTED');
-      abortError.name = 'AbortError';
-      throw abortError;
-    }
-    throw error;
   }
+
+  applySearchMessages(jsonResponse);
 }
 
-/** HTTP ステータスコードに応じたエラーメッセージを取得 */
-function _getErrorMessage(statusCode: number): string {
-  const errorTypes: Record<number, string> = {
-    400: 'INVALID_REQUEST',
-    401: 'UNAUTHORIZED',
-    404: 'NOT_FOUND',
-    500: 'INTERNAL_SERVER_ERROR',
-    502: 'BAD_GATEWAY',
-  };
-  return errorTypes[statusCode] || 'UNKNOWN_ERROR';
-}
-
-/** 検索状態を更新し、条件が変わっていた場合は再検索 */
+/** 全リクエスト完了後に表示更新を確定させ、画面全体のloadingを終了する。 */
 async function _updateAppState() {
   // searchResults を publish し表示を更新する。
   // offset/rowCount/numberOfRecords の同期はそれぞれの setData が publish 済みのため不要。
