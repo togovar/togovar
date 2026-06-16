@@ -222,11 +222,11 @@ class StoreManager {
   // ------------------------------
 
   /**
-   * searchMode 変化時に状態をリセットする subscriber。
-   * DOM操作・URL管理・API呼び出しは searchManager の subscriber が担う（責務分離）。
+   * searchMode 変化時にStore内部状態を先にリセットする。
+   * DOM操作・URL管理・API呼び出しは publish 後の searchManager 側に寄せる（責務分離）。
    * ''（空文字）はStoreの初期化前センチネルのため何もしない。
    */
-  searchMode(mode: SearchMode | '') {
+  private searchMode(mode: SearchMode | '') {
     if (!mode) return;
     this.setData('isStoreUpdating', true);
     try {

@@ -2,7 +2,7 @@
  * Advanced Search クエリ型定義（Store/API向け）
  *
  * StoreやAPIリクエストで扱う条件クエリの構造を定義する。
- * UIビルダー型（BuildContext, EditorCtorなど）は condition.d.ts に分離されている。
+ * UIビルダー型（BuildContext, EditorCtorなど）は conditionBuilder.d.ts に分離されている。
  *
  * PredictionKey だけは PredictionDatasets.ts の const から派生するため、
  * components/ への参照が1箇所残る。その他のコンポーネント依存はない。

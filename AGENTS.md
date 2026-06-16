@@ -97,13 +97,14 @@ app/frontend/
 - アプリ状態は `app/frontend/src/store/StoreManager.ts` を正として扱う。
 - 検索条件のURL反映や初期復元は `app/frontend/src/store/searchManager.ts` と `initializeApp.ts` を確認する。
 - API通信は `app/frontend/src/api/fetchData.ts` など既存API層に合わせる。
+- StoreはAPIを直接呼ばない。仮想スクロールで未取得ページが必要な場合も、コンポーネントから `searchManager.requestNextPage()` を呼び、fetch の起動は `searchManager` / `api/fetchData.ts` 側へ集約する。
 - コンポーネントやViewから直接URLやfetchの仕様を増やす前に、既存のStore/API層へ寄せられるか確認する。
 - 戻る/進む、URL貼り付け、モード切り替えでは、Store更新と検索実行が重複しやすい。変更時は初期表示・タブ切替・履歴操作を分けて考える。
 - popstate ハンドラ内での `storeManager.setData('searchMode', ...)` は `pushState` を発火させてしまう。`setSearchModeFromHistory(mode)` を使うことで、popstate 中の pushState を防ぐ。
 
 ## Advanced Search 型ファイルの分担
 
-`types/condition.d.ts` と `types/query.d.ts` は役割が異なる。混在させない。
+`types/conditionBuilder.d.ts`、`types/conditionDefinition.d.ts`、`types/query.d.ts` は役割が異なる。混在させない。
 
 | ファイル | 役割 | 主な型 |
 | --- | --- | --- |

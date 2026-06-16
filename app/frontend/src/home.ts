@@ -118,7 +118,7 @@ function readyInitialSearch(callback: () => void): void {
       : {};
   storeManager.setData('simpleSearchConditions', simpleSearchConditions);
 
-  // searchModeを最後にセットしてサブスクライバ（executeSearch）を発火する。
+  // searchModeを最後にセットし、条件が揃った状態で検索開始の副作用を発火する。
   // 初期ロード時はURLがすでに正しいためsetSearchModeFromHistoryを使い、
   // pushStateによる「ユーザー操作なし履歴エントリ」警告を防ぐ。
   storeManager.setSearchModeFromHistory(searchMode);

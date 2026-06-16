@@ -362,7 +362,7 @@ export function reflectAdvancedSearchConditionToURI() {
 
 /**
  * searchMode 変化時に DOM・URL・API の副作用を実行する subscriber。
- * 状態リセットは StoreManager.searchMode() が先に実行するため、
+ * Store内部の状態リセットは publish 前に実行されるため、
  * この関数はリセット後の状態を前提に動作する。
  * storeManager.fromHistory が true のとき（popstate経由）は URL 更新をスキップする。
  */
