@@ -1,6 +1,32 @@
 import type { ResultData } from '../types';
+import type { StoreState } from '../types/storeState';
 
 export type SearchRecordLookupResult = ResultData | 'loading' | 'out of range';
+export type SearchResultsResetState = Pick<
+  StoreState,
+  | 'numberOfRecords'
+  | 'offset'
+  | 'rowCount'
+  | 'isSearchDataFetching'
+  | 'searchResults'
+  | 'resultsResetVersion'
+>;
+
+/**
+ * 新規検索開始時の検索結果関連Store初期値を1箇所に寄せ、reset項目の増減漏れを防ぐ。
+ */
+export function createResetSearchResultsState(
+  currentResultsResetVersion: number
+): SearchResultsResetState {
+  return {
+    numberOfRecords: 0,
+    offset: 0,
+    rowCount: 0,
+    isSearchDataFetching: false,
+    searchResults: [],
+    resultsResetVersion: currentResultsResetVersion + 1,
+  };
+}
 
 /**
  * 仮想スクロール用の疎な検索結果配列を作り直し、既存ページと新規ページを同じ配列へ合成する。

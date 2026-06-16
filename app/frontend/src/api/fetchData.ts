@@ -27,39 +27,57 @@ export const executeSearch = debounce(_executeSearch, 300);
  */
 function _executeSearch(offset = 0, isFirstTime = false): void {
   const execution = prepareSearchExecution(offset, isFirstTime);
-  if (!execution.shouldExecute) {
-    return;
-  }
-  isFirstTime = execution.isFirstTime;
-  const signal = execution.signal;
-  const executionId = execution.executionId;
+  if (!execution.shouldExecute) return;
 
-  // 初回検索時のデータリセット
-  if (isFirstTime) {
+  const searchRun = _prepareSearchRun(offset, execution);
+  _runSearchRequests(searchRun.requests, searchRun.executionId);
+}
+
+/**
+ * 検索1回分の実行材料をここでまとめ、_executeSearch本体を開始判定だけに集中させる。
+ */
+function _prepareSearchRun(
+  offset: number,
+  execution: Extract<
+    ReturnType<typeof prepareSearchExecution>,
+    { shouldExecute: true }
+  >
+): {
+  executionId: number;
+  requests: SearchRequest[];
+} {
+  if (execution.isFirstTime) {
     resetSearchExecutionForNewSearch();
   }
 
-  // Resultsの行loadingは検索結果dataの取得中だけに連動させる。
-  // 統計取得の遅延で行loadingが残らないよう、解除はdata=1リクエスト完了時に行う。
   startSearchRequestLoading();
 
-  // API のエンドポイントを取得
-  const apiEndpoints = determineSearchEndpoints(offset, isFirstTime);
+  const apiEndpoints = determineSearchEndpoints(offset, execution.isFirstTime);
+  const requestOptions = getSearchRequestOptions(execution.signal);
 
-  // API リクエストオプションを設定
-  const requestOptions = getSearchRequestOptions(signal);
-  const requests = _createSearchRequests(
-    apiEndpoints,
-    requestOptions,
-    executionId
-  );
+  return {
+    executionId: execution.executionId,
+    requests: _createSearchRequests(
+      apiEndpoints,
+      requestOptions,
+      execution.executionId
+    ),
+  };
+}
 
-  // データ取得
+/**
+ * 実行準備済みのrequest群をここで完了監視へ渡し、空検索時の終了処理も同じ入口に揃える。
+ */
+function _runSearchRequests(
+  requests: SearchRequest[],
+  executionId: number
+): void {
   if (requests.length > 0) {
     watchSearchRequestCompletion(requests, executionId);
-  } else {
-    finishSearchWithoutRequests(executionId);
+    return;
   }
+
+  finishSearchWithoutRequests(executionId);
 }
 
 /**

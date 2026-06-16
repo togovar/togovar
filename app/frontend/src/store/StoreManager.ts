@@ -5,6 +5,7 @@ import {
   saveColumnsToStorage,
 } from '../columns/columnStorage';
 import {
+  createResetSearchResultsState,
   getSearchRecordByDisplayIndex,
   getSelectedSearchRecord,
   mergeSearchResults,
@@ -125,13 +126,16 @@ class StoreManager {
    * Results系の内部キャッシュ解除も必要なため、DOMイベントではなくversion更新で通知する。
    */
   resetSearchResultsForNewSearch() {
-    this.setData('numberOfRecords', 0);
-    this.setData('offset', 0);
-    this.setData('rowCount', 0);
-    this.setData('isSearchDataFetching', false);
-    this.setData('searchResults', []);
+    const resetState = createResetSearchResultsState(
+      this._state.resultsResetVersion
+    );
+    this.setData('numberOfRecords', resetState.numberOfRecords);
+    this.setData('offset', resetState.offset);
+    this.setData('rowCount', resetState.rowCount);
+    this.setData('isSearchDataFetching', resetState.isSearchDataFetching);
+    this.setData('searchResults', resetState.searchResults);
     this.resetColumnWidths();
-    this.setData('resultsResetVersion', this._state.resultsResetVersion + 1);
+    this.setData('resultsResetVersion', resetState.resultsResetVersion);
   }
 
   /**

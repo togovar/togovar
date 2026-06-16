@@ -27,15 +27,9 @@ export function watchSearchRequestCompletion(
   requests: SearchRequest[],
   executionId: number
 ): void {
-  const dataRequests = requests
-    .filter(({ endpoint }) => isDataRequestEndpoint(endpoint))
-    .map(({ promise }) => promise);
-
-  watchSearchDataCompletion(dataRequests, executionId);
-  watchAllSearchRequestsCompletion(
-    requests.map(({ promise }) => promise),
-    executionId
-  );
+  const requestGroups = classifySearchRequests(requests);
+  watchSearchDataCompletion(requestGroups.dataRequests, executionId);
+  watchAllSearchRequestsCompletion(requestGroups.allRequests, executionId);
 }
 
 /**
@@ -44,7 +38,7 @@ export function watchSearchRequestCompletion(
 export function finishSearchWithoutRequests(executionId: number): void {
   if (!isCurrentSearchExecution(executionId)) return;
   finishSearchDataLoading();
-  finishSearchSuccessfully(executionId);
+  finalizeSearchSuccess(executionId);
 }
 
 /**
@@ -54,16 +48,11 @@ function watchSearchDataCompletion(
   dataRequests: Promise<void>[],
   executionId: number
 ): void {
-  Promise.all(dataRequests)
-    .then(() => {
-      if (!isCurrentSearchExecution(executionId)) return;
-      finishSearchDataLoading();
-    })
-    .catch((error: unknown) => {
-      if (isSearchAbortError(error)) return;
-      if (!isCurrentSearchExecution(executionId)) return;
-      finishSearchDataLoading();
-    });
+  watchSettledPromises(dataRequests, (results) => {
+    if (!shouldHandleSearchSettlement(executionId)) return;
+    if (hasOnlyAbortFailures(results)) return;
+    finishSearchDataLoading();
+  });
 }
 
 /**
@@ -73,13 +62,17 @@ function watchAllSearchRequestsCompletion(
   requests: Promise<void>[],
   executionId: number
 ): void {
-  Promise.all(requests)
-    .then(() => {
-      finishSearchSuccessfully(executionId);
-    })
-    .catch((error: unknown) => {
-      handleSearchRequestFailure(error, executionId);
-    });
+  watchSettledPromises(requests, (results) => {
+    if (!shouldHandleSearchSettlement(executionId)) return;
+
+    const failedResult = getFirstNonAbortFailure(results);
+    if (failedResult) {
+      finalizeSearchFailure(failedResult.reason);
+      return;
+    }
+
+    finalizeSearchSuccess(executionId);
+  });
 }
 
 /**
@@ -92,23 +85,82 @@ function finishSearchDataLoading(): void {
 /**
  * 正常完了時だけ検索実行ロックを解除し、古いAbort済み検索が新しい検索状態を壊さないようにする。
  */
-function finishSearchSuccessfully(executionId: number): void {
-  if (!isCurrentSearchExecution(executionId)) return;
+function finalizeSearchSuccess(executionId: number): void {
+  if (!shouldHandleSearchSettlement(executionId)) return;
   markSearchRequestFinished();
-  updateAppState();
+  storeManager.publish('searchResults');
+  storeManager.setData('appLoadingStatus', 'normal');
 }
 
 /**
  * Abort以外の失敗だけを現在の検索失敗として扱い、UIのloadingとメッセージを確定する。
  */
-function handleSearchRequestFailure(error: unknown, executionId: number): void {
-  // AbortErrorは次の検索がloading状態を引き継ぐため、古いリクエスト側では何もしない。
-  if (isSearchAbortError(error)) return;
-  if (!isCurrentSearchExecution(executionId)) return;
-
+function finalizeSearchFailure(error: unknown): void {
   finishSearchDataLoading();
   markSearchRequestFinished();
   storeManager.setData('searchMessages', { error: getSearchErrorMessage(error) });
+}
+
+/**
+ * data系と全体完了系で同じPromise配列の待機方法を共有し、Abortや失敗の判定基準を揃える。
+ */
+function watchSettledPromises(
+  requests: Promise<void>[],
+  onSettled: (results: PromiseSettledResult<void>[]) => void
+): void {
+  Promise.allSettled(requests).then(onSettled);
+}
+
+/**
+ * data系と全体完了系の両方で現在の検索世代だけを扱い、古い検索の後着完了を無視する。
+ */
+function shouldHandleSearchSettlement(executionId: number): boolean {
+  return isCurrentSearchExecution(executionId);
+}
+
+/**
+ * data取得完了監視ではAbortだけの失敗を次検索への切替とみなし、旧検索側でloadingを触らない。
+ */
+function hasOnlyAbortFailures(
+  results: PromiseSettledResult<void>[]
+): boolean {
+  return (
+    results.some((result) => result.status === 'rejected') &&
+    results.every(
+      (result) =>
+        result.status === 'fulfilled' ||
+        isSearchAbortError(result.reason)
+    )
+  );
+}
+
+/**
+ * 全体完了時は最初の実エラーだけを拾い、Abortを除いた失敗だけをUIエラーとして扱う。
+ */
+function getFirstNonAbortFailure(
+  results: PromiseSettledResult<void>[]
+): PromiseRejectedResult | null {
+  return (
+    results.find(
+      (result): result is PromiseRejectedResult =>
+        result.status === 'rejected' && !isSearchAbortError(result.reason)
+    ) ?? null
+  );
+}
+
+/**
+ * data系と全体完了系で同じ抽出ロジックを使い、endpoint判定の責務を呼び出し側へ漏らさない。
+ */
+function classifySearchRequests(requests: SearchRequest[]): {
+  dataRequests: Promise<void>[];
+  allRequests: Promise<void>[];
+} {
+  return {
+    dataRequests: requests
+      .filter(({ endpoint }) => isDataRequestEndpoint(endpoint))
+      .map(({ promise }) => promise),
+    allRequests: requests.map(({ promise }) => promise),
+  };
 }
 
 /**
@@ -117,16 +169,4 @@ function handleSearchRequestFailure(error: unknown, executionId: number): void {
 function getSearchErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
   return String(error);
-}
-
-/**
- * 全リクエスト完了後に表示更新を確定させ、画面全体のloadingを終了する。
- */
-function updateAppState(): void {
-  // searchResults を publish し表示を更新する。
-  // offset/rowCount/numberOfRecords の同期はそれぞれの setData が publish 済みのため不要。
-  storeManager.publish('searchResults');
-
-  // 最後にステータスを更新
-  storeManager.setData('appLoadingStatus', 'normal');
 }
