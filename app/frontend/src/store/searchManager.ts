@@ -390,6 +390,14 @@ function _handleSearchModeChange(mode: SearchMode | ''): void {
 }
 
 /**
+ * 仮想スクロールが未取得ページに到達したときにコンポーネントから呼ぶ。
+ * Store は API を直接呼ばない設計のため、fetch のトリガーはここに集約する。
+ */
+export function requestNextPage(recordIndex: number): void {
+  executeSearch(recordIndex);
+}
+
+/**
  * searchMode subscriber と popstate リスナーを登録する初期化関数。
  * initializeApp() の冒頭で一度だけ呼ぶこと。
  * StoreManager のコンストラクタから searchManager への循環インポートを

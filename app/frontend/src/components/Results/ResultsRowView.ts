@@ -1,5 +1,6 @@
 import { COLUMNS, getOrderedColumns } from '../../columns';
 import { storeManager } from '../../store/StoreManager';
+import { requestNextPage } from '../../store/searchManager';
 import type {
   ResultData,
   Column,
@@ -149,6 +150,11 @@ export class ResultsRowView {
 
     const result = storeManager.getRecordByIndex(this.index);
     if (!result || result === 'loading' || result === 'out of range') {
+      if (result === 'loading') {
+        // データが未取得のページに到達した → 後続ページを取得する。
+        // isStoreUpdating=false は直上と getRecordByIndex 内でチェック済み。
+        requestNextPage(storeManager.getData('offset') + this.index);
+      }
       return this._setLoadingState();
     }
 

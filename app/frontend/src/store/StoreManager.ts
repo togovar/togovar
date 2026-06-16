@@ -1,5 +1,4 @@
 import isEqual from 'lodash/isEqual';
-import { executeSearch } from '../api/fetchData';
 import { getInitialColumnWidth, normalizeColumnConfigs } from '../columns';
 import {
   loadColumnsFromStorage,
@@ -189,7 +188,8 @@ class StoreManager {
   /**
    * 仮想スクロールの行がデータを要求するときに呼ばれる。
    * isStoreUpdating中は中途状態を返さないようloadingを返す。
-   * recordIndexのデータがnullの場合はexecuteSearchを呼んで後続ページを取得する。
+   * データが未取得（null）の場合は 'loading' を返すだけで fetch は起動しない。
+   * fetch のトリガーは呼び出し元が searchManager.requestNextPage() 経由で行う。
    */
   getRecordByIndex(index: number): ResultData | 'loading' | 'out of range' {
     if (this.getData('isStoreUpdating')) return 'loading';
@@ -198,7 +198,6 @@ class StoreManager {
     if (recordIndex < this._state.numberOfRecords) {
       const record = this._state.searchResults[recordIndex];
       if (record) return this._deepCopy(record);
-      executeSearch(this.getData('offset') + index);
       return 'loading';
     }
     return 'out of range';
