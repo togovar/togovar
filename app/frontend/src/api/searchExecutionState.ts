@@ -32,7 +32,7 @@ const searchExecutionState: SearchExecutionState = {
 };
 
 /**
- * 検索実行前のキャンセル・重複range判定を一箇所に集め、fetchData.tsの分岐を減らす。
+ * 検索実行前のキャンセル・重複range判定を一箇所に集め、searchExecutor.tsの分岐を減らす。
  */
 export function prepareSearchExecution(
   offset: number,
@@ -96,7 +96,7 @@ export function resetSearchExecutionForNewSearch(): void {
 }
 
 /**
- * fetchData.tsから検索開始を明示し、完了前の追加スクロール取得を抑止する。
+ * searchExecutor.tsから検索開始を明示し、完了前の追加スクロール取得を抑止する。
  */
 export function markSearchRequestStarted(): void {
   searchExecutionState.isSearchRequestInProgress = true;

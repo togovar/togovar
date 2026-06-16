@@ -96,18 +96,18 @@ app/frontend/
 
 - アプリ状態は `app/frontend/src/store/StoreManager.ts` を正として扱う。
 - 検索条件のURL反映や初期復元は `app/frontend/src/store/searchManager.ts` と `initializeApp.ts` を確認する。
-- API通信は `app/frontend/src/api/fetchData.ts` など既存API層に合わせる。
-- 検索リクエストのURL・HTTPオプション生成は `app/frontend/src/api/searchRequest.ts` に置き、`fetchData.ts` は取得実行、レスポンス処理、Store反映に集中させる。
+- API通信は `app/frontend/src/api/searchExecutor.ts` など既存API層に合わせる。
+- 検索リクエストのURL・HTTPオプション生成は `app/frontend/src/api/searchRequest.ts` に置き、`searchExecutor.ts` は取得実行、レスポンス処理、Store反映に集中させる。
 - 検索実行中のAbortController、進行中フラグ、取得済みrange管理、初回検索リセットは `app/frontend/src/api/searchExecutionState.ts` に置く。
 - 連続検索では同じsearchModeでも古いレスポンスが遅れて返ることがある。Store反映やloading解除前に `searchExecutionState.ts` の検索世代判定を使い、現在の検索か確認する。
 - 検索APIリクエスト開始/完了時のloading制御、Abort時の無視、全体完了時のStore更新は `app/frontend/src/api/searchCompletion.ts` に置く。
 - 検索APIのHTTP fetchとHTTPステータスのエラーコード変換は `app/frontend/src/api/searchFetch.ts` に置く。
-- 検索APIレスポンスのdata/stat判定とStore反映は `app/frontend/src/api/searchResponse.ts` に置き、`fetchData.ts` は通信フローに集中させる。
+- 検索APIレスポンスのdata/stat判定とStore反映は `app/frontend/src/api/searchResponse.ts` に置き、`searchExecutor.ts` は通信フローに集中させる。
 - 検索APIレスポンス内のnotice/warning/errorのStore反映は `app/frontend/src/api/searchMessages.ts` に置く。
-- StoreはAPIを直接呼ばない。仮想スクロールで未取得ページが必要な場合も、コンポーネントから `searchManager.requestNextPage()` を呼び、fetch の起動は `searchManager` / `api/fetchData.ts` 側へ集約する。
+- StoreはAPIを直接呼ばない。仮想スクロールで未取得ページが必要な場合も、コンポーネントから `searchManager.requestNextPage()` を呼び、fetch の起動は `searchManager` / `api/searchExecutor.ts` 側へ集約する。
 - 検索条件のブラウザURL反映（`history.pushState`、Simple/Advanced SearchのURL表現、URL長制限時のstate退避）は `store/searchURL.ts` に置き、`searchManager.ts` は検索開始タイミングとStore更新に集中させる。
 - popstate時のURL/stateからの検索条件復元は `store/searchHistory.ts` に置く。
-- Simple Search条件のdefault差分抽出は `store/simpleSearchConditions.ts` に置く。`api/fetchData.ts` から `searchManager.ts` を import すると循環依存になるため避ける。
+- Simple Search条件のdefault差分抽出は `store/simpleSearchConditions.ts` に置く。`api/searchExecutor.ts` から `searchManager.ts` を import すると循環依存になるため避ける。
 - 検索結果配列のマージ・新規検索時の結果Store初期値・表示indexからのレコード取得・選択行レコード取得は `store/searchResultsState.ts` に置き、`StoreManager.ts` はStore公開APIとpublish順序の管理に集中させる。
 - コンポーネントやViewから直接URLやfetchの仕様を増やす前に、既存のStore/API層へ寄せられるか確認する。
 - 戻る/進む、URL貼り付け、モード切り替えでは、Store更新と検索実行が重複しやすい。変更時は初期表示・タブ切替・履歴操作を分けて考える。

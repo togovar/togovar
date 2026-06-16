@@ -1,13 +1,14 @@
 import { storeManager } from '../store/StoreManager';
 import { API_URL } from '../global';
 import type { ScrollData, SearchResults, SearchStatistics } from '../types';
+import { getNextSearchResultCount } from '../store/searchResultsState';
 import {
   getCurrentSearchMode,
   isCurrentSearchExecution,
 } from './searchExecutionState';
 
 /**
- * endpointの種別を見てStore反映先を選び、fetchData.tsからレスポンスURL解析を隠す。
+ * endpointの種別を見てStore反映先を選び、searchExecutor.tsからレスポンスURL解析を隠す。
  */
 export function applySearchResponse(
   endpoint: string,
@@ -33,7 +34,7 @@ export function applySearchResponse(
 }
 
 /**
- * data=1レスポンスをStoreへ反映し、fetchData.tsを通信フロー管理に集中させる。
+ * data=1レスポンスをStoreへ反映し、searchExecutor.tsを通信フロー管理に集中させる。
  */
 function applySearchResultsResponse(json: unknown): void {
   const searchResults = toSearchResults(json);
@@ -52,7 +53,7 @@ function applySearchResultsResponse(json: unknown): void {
   const currentCount = storeManager.getData('numberOfRecords');
   storeManager.setData(
     'numberOfRecords',
-    Math.max(currentCount, offset + rows.length)
+    getNextSearchResultCount(currentCount, rows.length, offset)
   );
   storeManager.setResults(rows, offset);
 }

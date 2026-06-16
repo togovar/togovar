@@ -8,7 +8,7 @@ import type { FetchOption } from '../types';
 export const SEARCH_RESULT_LIMIT = 100;
 
 /**
- * 検索モードごとのAPI仕様差をここへ閉じ込め、fetchData.tsを実行管理に集中させる。
+ * 検索モードごとのAPI仕様差をここへ閉じ込め、searchExecutor.tsを実行管理に集中させる。
  */
 export function determineSearchEndpoints(
   offset: number,

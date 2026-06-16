@@ -5,10 +5,10 @@ import {
   saveColumnsToStorage,
 } from '../columns/columnStorage';
 import {
+  applyMergedSearchResults,
   createResetSearchResultsState,
   getSearchRecordByDisplayIndex,
   getSelectedSearchRecord,
-  mergeSearchResults,
   type SearchRecordLookupResult,
 } from './searchResultsState';
 import type { ResultData, SearchMode } from '../types';
@@ -198,20 +198,21 @@ class StoreManager {
    * API通信状態ではなく、searchResults配列の組み替え中だけ描画を止めるためのフラグとして扱う。
    */
   setResults(records: ResultData[], offset: number) {
-    this.setData('isSearchResultsUpdating', true);
-
-    // updatedResults は常に新規構築のため isEqual チェックと structuredClone は不要。
-    // setData を経由せず直接代入し、publish を一度だけ呼ぶことで二重通知を防ぐ。
-    this._state.searchResults = mergeSearchResults(
-      this._state.searchResults,
+    applyMergedSearchResults({
+      currentResults: this._state.searchResults,
       records,
       offset,
-      this._state.numberOfRecords
-    );
-    this.publish('searchResults');
-
-    // isSearchDataFetchingはdata=1リクエストの状態なので、Store配列更新だけを担うここでは触らない。
-    this.setData('isSearchResultsUpdating', false);
+      numberOfRecords: this._state.numberOfRecords,
+      setUpdating: (isUpdating) =>
+        this.setData('isSearchResultsUpdating', isUpdating),
+      updateResults: (nextResults) => {
+        // updatedResults は常に新規構築のため isEqual チェックと structuredClone は不要。
+        // setData を経由せず直接代入し、publish を一度だけ呼ぶことで二重通知を防ぐ。
+        this._state.searchResults = nextResults;
+      },
+      // isSearchDataFetchingはdata=1リクエストの状態なので、Store配列更新だけを担うここでは触らない。
+      publishResults: () => this.publish('searchResults'),
+    });
   }
 
   /**

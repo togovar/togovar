@@ -29,6 +29,17 @@ export function createResetSearchResultsState(
 }
 
 /**
+ * dataレスポンス到着時の最小総件数をここで計算し、Store更新前の件数ルールを1箇所に保つ。
+ */
+export function getNextSearchResultCount(
+  currentNumberOfRecords: number,
+  fetchedRowCount: number,
+  offset: number
+): number {
+  return Math.max(currentNumberOfRecords, offset + fetchedRowCount);
+}
+
+/**
  * 仮想スクロール用の疎な検索結果配列を作り直し、既存ページと新規ページを同じ配列へ合成する。
  */
 export function mergeSearchResults(
@@ -48,6 +59,34 @@ export function mergeSearchResults(
   });
 
   return updatedResults;
+}
+
+/**
+ * 結果配列更新中のフラグ制御とpublish順序を定型化し、StoreManager側の手続き重複を減らす。
+ */
+export function applyMergedSearchResults(params: {
+  currentResults: ResultData[];
+  records: ResultData[];
+  offset: number;
+  numberOfRecords: number;
+  setUpdating(isUpdating: boolean): void;
+  updateResults(nextResults: ResultData[]): void;
+  publishResults(): void;
+}): void {
+  params.setUpdating(true);
+  try {
+    params.updateResults(
+      mergeSearchResults(
+        params.currentResults,
+        params.records,
+        params.offset,
+        params.numberOfRecords
+      )
+    );
+    params.publishResults();
+  } finally {
+    params.setUpdating(false);
+  }
 }
 
 /**

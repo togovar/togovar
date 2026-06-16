@@ -1,4 +1,4 @@
-import { executeSearch } from '../api/fetchData';
+import { executeSearch } from '../api/searchExecutor';
 import { storeManager } from './StoreManager';
 import type {
   MasterConditions,
