@@ -7,7 +7,10 @@ import type {
   SearchMode,
 } from '../types';
 import type { ConditionQuery } from '../types/query';
-import { decodeConditionFromURL } from './advancedSearchURL';
+import {
+  buildSimpleConditionsFromURL,
+  getAdvancedConditionFromHistory,
+} from './searchHistory';
 import {
   parseSearchURLParams,
   reflectAdvancedSearchConditionToURI,
@@ -93,14 +96,8 @@ export function handleHistoryChange(e: PopStateEvent) {
   if (mode === 'advanced') {
     // Advanced Searchの戻る/進むでURLのqパラメータを再デコードしてストアへ反映する。
     // initializeApp()は初回ロード時にしか呼ばれないため、popstate時にこちらで再デコードする。
-    // qs.parseは同名パラメータが複数あるとstring[]を返すため、先頭要素のみ使う。
-    const qParam = urlParams.q;
-    const first = Array.isArray(qParam) ? qParam[0] : qParam;
-    const encoded = typeof first === 'string' ? first : undefined;
     // URL長制限超過で q が省略された履歴エントリに戻った場合は event.state から復元する。
-    const condition = encoded
-      ? decodeConditionFromURL(encoded)
-      : _getConditionFromState(e.state);
+    const condition = getAdvancedConditionFromHistory(urlParams, e.state);
     storeManager.setData('advancedSearchConditions', condition ?? undefined);
     // false→trueのトグルでBuilderのsubscribeを確実に発火させる。
     // モード切替でBuilderがすでにロード済みの場合も再構築が必要なため常に実行する。
@@ -119,7 +116,10 @@ export function handleHistoryChange(e: PopStateEvent) {
     // URLを正本としてSimple Search条件を丸ごと構築し直す。
     // urlParamsにはmode等の非条件キーが含まれるため、マスターに存在するキーのみを適用する。
     // URLにない条件はマスターのデフォルト値に戻すことで、履歴移動後に古い条件が残るのを防ぐ。
-    const fullConditions = _buildSimpleConditionsFromURL(urlParams);
+    const fullConditions = buildSimpleConditionsFromURL(
+      urlParams,
+      storeManager.getData('simpleSearchConditionsMaster') ?? []
+    );
     storeManager.setData('simpleSearchConditions', fullConditions);
 
     if (currentMode === 'simple') {
@@ -131,53 +131,6 @@ export function handleHistoryChange(e: PopStateEvent) {
       storeManager.setSearchModeFromHistory('simple');
     }
   }
-}
-
-/**
- * popstateのevent.stateからAdvanced Search条件を安全に取り出す。
- * URL長制限超過時にstateへ退避した advancedSearchConditions のみを返す。
- */
-function _getConditionFromState(state: unknown): ConditionQuery | null {
-  if (state === null || typeof state !== 'object' || Array.isArray(state))
-    return null;
-  const val = (state as Record<string, unknown>).advancedSearchConditions;
-  if (val === null || typeof val !== 'object' || Array.isArray(val))
-    return null;
-  return val as ConditionQuery;
-}
-
-/**
- * URLパラメータからSimpleSearch条件を構築する。
- * マスターのデフォルト値をベースに、URLに含まれるマスター条件キーのみを上書きする。
- * mode・qなど非条件キーは除外する。
- */
-function _buildSimpleConditionsFromURL(
-  urlParams: Record<string, unknown>
-): SimpleSearchCurrentConditions {
-  const master: MasterConditions[] =
-    storeManager.getData('simpleSearchConditionsMaster') ?? [];
-  const conditionIds = new Set(master.map((c) => c.id));
-
-  const conditions: Record<string, unknown> = {};
-  for (const cond of master) {
-    switch (cond.type) {
-      case 'string':
-      case 'boolean':
-        conditions[cond.id] = cond.default;
-        break;
-      case 'array':
-        conditions[cond.id] = {};
-        break;
-    }
-  }
-
-  for (const [key, value] of Object.entries(urlParams)) {
-    if (conditionIds.has(key as MasterConditionId)) {
-      conditions[key] = value;
-    }
-  }
-
-  return conditions as SimpleSearchCurrentConditions;
 }
 
 /** AdvancedSearch検索条件を設定し、必要に応じて検索を実行 */
