@@ -34,7 +34,7 @@ export * from './report';
 // ============================================
 // AdvancedSearchConditions Types
 // ============================================
-export * from './advancedSearchConditions';
+export * from './conditionDefinition';
 // ============================================
 // Condition Types
 // ============================================

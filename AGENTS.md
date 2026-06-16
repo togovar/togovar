@@ -108,11 +108,12 @@ app/frontend/
 | ファイル | 役割 | 主な型 |
 | --- | --- | --- |
 | `types/query.d.ts` | Store/API層向け。コンポーネント依存を持たない（PredictionKey のみ例外） | `ConditionQuery`, `ConditionLeaf`, 各Leaf型, `ScoreRange`, `Inequality`, `Relation` |
-| `types/condition.d.ts` | UIビルダー向け。コンポーネントを import する | `BuildContext`, `BuilderMap`, `ConditionValueEditor`, `EditorCtor`, `PredictionChangeDetail` |
+| `types/conditionBuilder.d.ts` | UIビルダー向け。コンポーネントを import する | `BuildContext`, `BuilderMap`, `ConditionValueEditor`, `EditorCtor`, `PredictionChangeDetail` |
+| `types/conditionDefinition.d.ts` | 条件UIマスタデータ向け。`advanced_search_conditions.json` の型 | `ConditionDefinition`, `AdvancedConditionMap`, `GRChConditions`, `TreeNode` |
 
 - `ConditionQuery` は Advanced Search の Store 値の正規型。`storeManager.getData('advancedSearchConditions')` は `ConditionQuery | undefined` を返す。
 - `undefined` は「条件なし」を表すセンチネル値であり、`{}` は使わない。
-- Store/API層（`store/`, `Karyotype.ts` など）から `ConditionQuery` を参照するときは `types/query.d.ts` を直接 import する。`types/condition.d.ts` は参照しない。
+- Store/API層（`store/`, `Karyotype.ts` など）から `ConditionQuery` を参照するときは `types/query.d.ts` を直接 import する。`types/conditionBuilder.d.ts` は参照しない。
 - `GeneLeaf.gene.labels` はURL復元用のUIメタ情報。API送信前に `stripAdvancedSearchMetadata()` で除去する。
 
 ## TypeScript / JavaScript 方針
