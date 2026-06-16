@@ -1,12 +1,14 @@
 import { storeManager } from '../store/StoreManager';
-import * as qs from 'qs';
 import debounce from 'lodash/debounce';
-import { API_URL } from '../global';
-import { stripAdvancedSearchMetadata } from '../store/advancedSearchURL';
 import { extractSearchCondition } from '../store/simpleSearchConditions';
 import type { FetchOption, SearchResults, SearchStatistics } from '../types';
+import {
+  determineSearchEndpoints,
+  getSearchRequestOptions,
+  isDataRequestEndpoint,
+  SEARCH_RESULT_LIMIT,
+} from './searchRequest';
 
-const LIMIT = 100;
 const DOWNLOAD_VARIANT_LIMIT = 100000;
 const DOWNLOAD_VARIANT_LIMIT_TEXT = new Intl.NumberFormat('en-US').format(
   DOWNLOAD_VARIANT_LIMIT
@@ -41,8 +43,8 @@ export const executeSearch = (() => {
       lastRequestRanges.clear(); // モード切り替え時にクリア
     } else {
       // スクロール時
-      const offsetStart = offset - (offset % LIMIT);
-      const rangeKey = `${offsetStart}-${offsetStart + LIMIT}`;
+      const offsetStart = offset - (offset % SEARCH_RESULT_LIMIT);
+      const rangeKey = `${offsetStart}-${offsetStart + SEARCH_RESULT_LIMIT}`;
 
       if (storeManager.getData('searchMode') === 'simple') {
         // 未取得の範囲の場合のみリクエスト
@@ -72,10 +74,10 @@ export const executeSearch = (() => {
     isRequestInProgress = true;
 
     // API のエンドポイントを取得
-    const apiEndpoints = _determineSearchEndpoints(offset, isFirstTime);
+    const apiEndpoints = determineSearchEndpoints(offset, isFirstTime);
 
     // API リクエストオプションを設定
-    const requestOptions = _getRequestOptions(signal);
+    const requestOptions = getSearchRequestOptions(signal);
 
     // データ取得
     if (apiEndpoints && apiEndpoints.length > 0) {
@@ -84,7 +86,7 @@ export const executeSearch = (() => {
         promise: _fetchData(endpoint, requestOptions),
       }));
       const dataRequests = requests
-        .filter(({ endpoint }) => _isDataRequestEndpoint(endpoint))
+        .filter(({ endpoint }) => isDataRequestEndpoint(endpoint))
         .map(({ promise }) => promise);
 
       Promise.all(dataRequests)
@@ -128,91 +130,6 @@ function _resetSearchResults() {
     window.dispatchEvent(new CustomEvent('results-column-widths-reset'));
   }
   lastRequestRanges.clear(); // データリセット時にクリア
-}
-
-/** 検索用 API のエンドポイントを取得 */
-function _determineSearchEndpoints(
-  offset: number,
-  isFirstTime: boolean
-): string[] {
-  let basePath: string;
-
-  switch (storeManager.getData('searchMode')) {
-    case 'simple': {
-      // Simple searchの場合のみLIMITでの調整を行う
-      const offsetStart = offset - (offset % LIMIT);
-      const conditions = qs.stringify(
-        extractSearchCondition(storeManager.getData('simpleSearchConditions'))
-      );
-      basePath = `${API_URL}/search?offset=${offsetStart}${
-        conditions ? '&' + conditions : ''
-      }`;
-
-      return isFirstTime
-        ? [`${basePath}&stat=0&data=1`, `${basePath}&stat=1&data=0`]
-        : [`${basePath}&stat=0&data=1`];
-    }
-
-    case 'advanced': {
-      // Advanced searchの場合は元のoffsetをそのまま使用
-      basePath = `${API_URL}/api/search/variant`;
-
-      return isFirstTime
-        ? [`${basePath}?stat=0&data=1`, `${basePath}?stat=1&data=0`]
-        : [`${basePath}?stat=0&data=1`];
-    }
-
-    default:
-      return [];
-  }
-}
-
-/** 結果行のloading解除を統計取得ではなくdata取得に合わせるため、endpointの役割を判定する */
-function _isDataRequestEndpoint(endpoint: string): boolean {
-  return new URL(endpoint, API_URL).searchParams.get('data') === '1';
-}
-
-/** API リクエストのオプションを作成 */
-function _getRequestOptions(signal: AbortSignal): FetchOption {
-  if (storeManager.getData('searchMode') === 'simple') {
-    // Simple search のリクエストオプション
-    return {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      mode: 'cors',
-      signal: signal,
-    };
-  }
-
-  // Advanced search のリクエストオプション
-  const body: Partial<{ offset: number; query: Record<string, unknown> }> = {
-    offset: _calculateOffset(storeManager.getData('offset'), LIMIT),
-  };
-
-  const advConditions = storeManager.getData('advancedSearchConditions');
-  if (advConditions && Object.keys(advConditions as object).length > 0) {
-    body.query = stripAdvancedSearchMetadata(advConditions) as Record<string, unknown>;
-  }
-
-  return {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    mode: 'cors',
-    signal: signal,
-    body: JSON.stringify(body),
-  };
-}
-
-function _calculateOffset(offset: number, limit: number): number {
-  const roundedOffset =
-    Math.round(offset / (limit / 2)) * (limit / 2) - limit / 4;
-  return Math.max(0, roundedOffset);
 }
 
 /** データを取得して結果を更新 */
@@ -285,7 +202,10 @@ function _processSearchResults(json: SearchResults) {
   // 統計レスポンス（_processStatistics）が正確な総件数を上書きする。
   // 仮想スクロール中は既存の numberOfRecords を保持するため Math.max を使用する。
   const currentCount = storeManager.getData('numberOfRecords');
-  storeManager.setData('numberOfRecords', Math.max(currentCount, offset + rows.length));
+  storeManager.setData(
+    'numberOfRecords',
+    Math.max(currentCount, offset + rows.length)
+  );
   storeManager.setResults(rows, offset);
 }
 
