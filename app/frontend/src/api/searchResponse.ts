@@ -1,10 +1,30 @@
 import { storeManager } from '../store/StoreManager';
+import { API_URL } from '../global';
 import type { ScrollData, SearchResults, SearchStatistics } from '../types';
+import { getCurrentSearchMode } from './searchExecutionState';
+
+/**
+ * endpointの種別を見てStore反映先を選び、fetchData.tsからレスポンスURL解析を隠す。
+ */
+export function applySearchResponse(endpoint: string, json: unknown): void {
+  // 現在の検索モードと一致する場合のみ結果を処理
+  if (getCurrentSearchMode() !== storeManager.getData('searchMode')) {
+    return;
+  }
+
+  const searchParams = new URL(endpoint, API_URL).searchParams;
+  if (searchParams.get('data') === '1') {
+    applySearchResultsResponse(json);
+  }
+  if (searchParams.get('stat') === '1') {
+    applySearchStatisticsResponse(json);
+  }
+}
 
 /**
  * data=1レスポンスをStoreへ反映し、fetchData.tsを通信フロー管理に集中させる。
  */
-export function applySearchResultsResponse(json: unknown): void {
+function applySearchResultsResponse(json: unknown): void {
   const searchResults = toSearchResults(json);
   const rows = searchResults?.data ?? [];
   const offset = searchResults?.scroll.offset ?? 0;
@@ -29,7 +49,7 @@ export function applySearchResultsResponse(json: unknown): void {
 /**
  * stat=1レスポンスをStoreへ反映し、件数表示と統計パネルの入力をまとめて更新する。
  */
-export function applySearchStatisticsResponse(json: unknown): void {
+function applySearchStatisticsResponse(json: unknown): void {
   const searchStatistics = toSearchStatistics(json);
   if (!searchStatistics) {
     console.error('[search] Unexpected statistics shape:', json);

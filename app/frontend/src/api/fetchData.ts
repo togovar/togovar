@@ -12,13 +12,9 @@ import {
   determineSearchEndpoints,
   getSearchRequestOptions,
 } from './searchRequest';
-import {
-  applySearchResultsResponse,
-  applySearchStatisticsResponse,
-} from './searchResponse';
+import { applySearchResponse } from './searchResponse';
 import {
   clearSearchRequestRanges,
-  getCurrentSearchMode,
   prepareSearchExecution,
 } from './searchExecutionState';
 
@@ -72,18 +68,6 @@ function _resetSearchResults() {
 /** 通信結果の反映先をendpoint種別で分け、検索フローからレスポンス詳細を隠す。 */
 async function _fetchData(endpoint: string, options: FetchOption) {
   const jsonResponse = await fetchSearchJSON(endpoint, options);
-  const url = new URL(endpoint);
-  const queryParams = Object.fromEntries(url.searchParams.entries());
-
-  // 現在の検索モードと一致する場合のみ結果を処理
-  if (getCurrentSearchMode() === storeManager.getData('searchMode')) {
-    if (queryParams.data === '1') {
-      applySearchResultsResponse(jsonResponse);
-    }
-    if (queryParams.stat === '1') {
-      applySearchStatisticsResponse(jsonResponse);
-    }
-  }
-
+  applySearchResponse(endpoint, jsonResponse);
   applySearchMessages(jsonResponse);
 }
