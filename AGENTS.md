@@ -99,7 +99,7 @@ app/frontend/
 - API通信は `app/frontend/src/api/fetchData.ts` など既存API層に合わせる。
 - 検索リクエストのURL・HTTPオプション生成は `app/frontend/src/api/searchRequest.ts` に置き、`fetchData.ts` は取得実行、レスポンス処理、Store反映に集中させる。
 - 検索実行中のAbortController、進行中フラグ、取得済みrange管理は `app/frontend/src/api/searchExecutionState.ts` に置く。
-- 検索APIリクエスト完了後のloading解除、Abort時の無視、全体完了時のStore更新は `app/frontend/src/api/searchCompletion.ts` に置く。
+- 検索APIリクエスト開始/完了時のloading制御、Abort時の無視、全体完了時のStore更新は `app/frontend/src/api/searchCompletion.ts` に置く。
 - 検索APIのHTTP fetchとHTTPステータスのエラーコード変換は `app/frontend/src/api/searchFetch.ts` に置く。
 - 検索APIレスポンスのStore反映は `app/frontend/src/api/searchResponse.ts` に置き、`fetchData.ts` は通信フローとレスポンス種別の振り分けに集中させる。
 - 検索APIレスポンス内のnotice/warning/errorのStore反映は `app/frontend/src/api/searchMessages.ts` に置く。

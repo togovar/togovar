@@ -3,6 +3,7 @@ import debounce from 'lodash/debounce';
 import type { FetchOption } from '../types';
 import {
   finishSearchWithoutRequests,
+  startSearchRequestLoading,
   watchSearchRequestCompletion,
 } from './searchCompletion';
 import { fetchSearchJSON } from './searchFetch';
@@ -18,7 +19,6 @@ import {
 import {
   clearSearchRequestRanges,
   getCurrentSearchMode,
-  markSearchRequestStarted,
   prepareSearchExecution,
 } from './searchExecutionState';
 
@@ -43,8 +43,7 @@ function _executeSearch(offset = 0, isFirstTime = false): void {
 
   // Resultsの行loadingは検索結果dataの取得中だけに連動させる。
   // 統計取得の遅延で行loadingが残らないよう、解除はdata=1リクエスト完了時に行う。
-  storeManager.setData('isSearchDataFetching', true);
-  markSearchRequestStarted();
+  startSearchRequestLoading();
 
   // API のエンドポイントを取得
   const apiEndpoints = determineSearchEndpoints(offset, isFirstTime);

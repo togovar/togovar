@@ -2,6 +2,7 @@ import { storeManager } from '../store/StoreManager';
 import {
   isSearchAbortError,
   markSearchRequestFinished,
+  markSearchRequestStarted,
 } from './searchExecutionState';
 import { isDataRequestEndpoint } from './searchRequest';
 
@@ -9,6 +10,14 @@ export type SearchRequest = {
   endpoint: string;
   promise: Promise<void>;
 };
+
+/**
+ * data取得開始と追加取得ロック開始を同時に行い、開始/完了のloading制御を同じ場所へ寄せる。
+ */
+export function startSearchRequestLoading(): void {
+  storeManager.setData('isSearchDataFetching', true);
+  markSearchRequestStarted();
+}
 
 /**
  * data取得と全体完了を別々に監視し、行loadingと画面全体loadingの責務を混ぜない。
