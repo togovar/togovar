@@ -53,15 +53,6 @@ class StoreManager {
 
   constructor() {
     this._state.columns = loadColumnsFromStorage();
-    this._setupSearchModeSubscriber();
-  }
-
-  /**
-   * searchMode 変化時に状態リセットを行う内部 subscriber を登録する。
-   * DOM/URL/API 側の副作用は searchManager.initSearchHandlers() で別途登録する。
-   */
-  private _setupSearchModeSubscriber() {
-    this.subscribe('searchMode', this.searchMode.bind(this));
   }
 
   /**
@@ -88,6 +79,11 @@ class StoreManager {
     if (typeof nextValue !== 'object' || nextValue === null) {
       if (!Object.is(oldValue, nextValue)) {
         this._state[key] = nextValue;
+        // searchMode変化時は外部subscriberへ通知する前に内部状態をリセットする。
+        // subscribeによる自己購読だと Set の挿入順に依存するため、直接呼び出しで順序を明示する。
+        if (key === 'searchMode') {
+          this.searchMode(nextValue as SearchMode | '');
+        }
         this.publish(key);
       }
       return;
