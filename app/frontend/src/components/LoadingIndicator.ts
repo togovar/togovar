@@ -1,23 +1,27 @@
 import { storeManager } from '../store/StoreManager';
-import type { StoreState } from '../types/store';
+import type { StoreState } from '../types/storeState';
 
 export default class LoadingIndicator {
   private readonly elm: HTMLElement;
 
   /**
-   * appStatusの変化を受け取るためStoreに購読登録し、初期値を即時反映する。
+   * appLoadingStatusの変化を受け取るためStoreに購読登録し、初期値を即時反映する。
    */
   constructor(elm: HTMLElement) {
     this.elm = elm;
-    storeManager.subscribe('appStatus', (v) => this.appStatus(v));
-    this.appStatus(storeManager.getData('appStatus'));
+    storeManager.subscribe('appLoadingStatus', (v) =>
+      this._updateAppLoadingStatus(v)
+    );
+    this._updateAppLoadingStatus(storeManager.getData('appLoadingStatus'));
   }
 
   /**
-   * appStatusが'searching'のときだけローディング表示し、それ以外は隠す。
+   * 全体loadingはappLoadingStatusだけを見て、Results内の行loading用フラグと責務を分ける。
    * 将来のステータス追加に備えてswitchで受け、defaultで確実に非表示にする。
    */
-  appStatus(status: StoreState['appStatus']): void {
+  private _updateAppLoadingStatus(
+    status: StoreState['appLoadingStatus']
+  ): void {
     switch (status) {
       case 'searching':
         this.elm.classList.remove('-hidden');

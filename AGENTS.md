@@ -104,7 +104,7 @@ app/frontend/
 - 戻る/進む、URL貼り付け、モード切り替えでは、Store更新と検索実行が重複しやすい。変更時は初期表示・タブ切替・履歴操作を分けて考える。
 - searchMode は内部リセットと検索開始副作用の順序が重要なため、通常操作では `storeManager.setSearchMode(mode)` を使う。
 - popstate ハンドラ内での searchMode 変更は `pushState` を発火させてしまう。`setSearchModeFromHistory(mode)` を使うことで、popstate 中の pushState を防ぐ。
-- `appStatus` は画面全体の検索状態、`isFetching` は検索結果 data 取得中、`isStoreUpdating` は検索結果配列の同期更新中を表す。意味を混ぜず、loading 表示を変更する場合はどの状態を見るべきか先に確認する。
+- `appLoadingStatus` は画面全体の検索状態、`isSearchDataFetching` は検索結果 data 取得中、`isSearchResultsUpdating` は検索結果配列の同期更新中を表す。意味を混ぜず、loading 表示を変更する場合はどの状態を見るべきか先に確認する。
 
 ## Advanced Search 型ファイルの分担
 

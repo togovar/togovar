@@ -2,11 +2,11 @@ import { storeManager } from '../../store/StoreManager';
 import type { ResultsRowView } from './ResultsRowView';
 import { ResultsViewDisplayManager } from './ResultsViewDisplayManager';
 import type {
-  DisplayingRegions,
   SearchMessages,
   SearchStatus,
   ColumnConfig,
 } from '../../types';
+import type { DisplayingRegions } from '../../types/storeState';
 
 interface SelectionState {
   currentIndex: number | undefined;
@@ -214,8 +214,8 @@ export class ResultsViewDataManager {
    */
   private _shouldSkipOffsetUpdate(): boolean {
     return (
-      storeManager.getData('isStoreUpdating') ||
-      storeManager.getData('isFetching')
+      storeManager.getData('isSearchResultsUpdating') ||
+      storeManager.getData('isSearchDataFetching')
     );
   }
 

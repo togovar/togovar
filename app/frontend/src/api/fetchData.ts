@@ -69,8 +69,9 @@ export const executeSearch = (() => {
       lastRequestRanges.clear(); // リセット時にクリア
     }
 
-    // フェッチフラグを設定
-    storeManager.setData('isFetching', true);
+    // Resultsの行loadingは検索結果dataの取得中だけに連動させる。
+    // 統計取得の遅延で行loadingが残らないよう、解除はdata=1リクエスト完了時に行う。
+    storeManager.setData('isSearchDataFetching', true);
     isRequestInProgress = true;
 
     // API のエンドポイントを取得
@@ -91,12 +92,12 @@ export const executeSearch = (() => {
 
       Promise.all(dataRequests)
         .then(() => {
-          // 結果テーブルのloadingは行データの到着に合わせ、統計取得の遅延に引きずられないようにする。
-          storeManager.setData('isFetching', false);
+          // Resultsの行loadingは統計ではなくdata=1レスポンスの到着に合わせて解除する。
+          storeManager.setData('isSearchDataFetching', false);
         })
         .catch((error) => {
           if (error instanceof Error && error.name === 'AbortError') return;
-          storeManager.setData('isFetching', false);
+          storeManager.setData('isSearchDataFetching', false);
         });
 
       Promise.all(requests.map(({ promise }) => promise))
@@ -105,14 +106,14 @@ export const executeSearch = (() => {
           _updateAppState();
         })
         .catch((error) => {
-          // AbortErrorの場合はローディング状態を維持
+          // AbortErrorは次の検索がisSearchDataFetchingを引き継ぐため、古いリクエスト側では解除しない。
           if (error instanceof Error && error.name === 'AbortError') return;
-          storeManager.setData('isFetching', false);
+          storeManager.setData('isSearchDataFetching', false);
           isRequestInProgress = false;
           storeManager.setData('searchMessages', { error });
         });
     } else {
-      storeManager.setData('isFetching', false);
+      storeManager.setData('isSearchDataFetching', false);
       isRequestInProgress = false;
     }
   }, 300);
@@ -123,7 +124,7 @@ function _resetSearchResults() {
   storeManager.setData('numberOfRecords', 0);
   storeManager.setData('offset', 0);
   storeManager.setData('rowCount', 0);
-  storeManager.setData('isFetching', false);
+  storeManager.setData('isSearchDataFetching', false);
   storeManager.setData('searchResults', []);
   storeManager.resetColumnWidths();
   if (typeof window !== 'undefined') {
@@ -270,7 +271,7 @@ async function _updateAppState() {
   storeManager.publish('searchResults');
 
   // 最後にステータスを更新
-  storeManager.setData('appStatus', 'normal');
+  storeManager.setData('appLoadingStatus', 'normal');
 }
 
 /** ダウンロードボタンの有効/無効状態を更新 */

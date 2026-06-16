@@ -4,7 +4,8 @@ import {
   loadColumnsFromStorage,
   saveColumnsToStorage,
 } from '../columns/columnStorage';
-import type { StoreState, ResultData, SearchMode } from '../types';
+import type { ResultData, SearchMode } from '../types';
+import type { StoreState } from '../types/storeState';
 
 type StoreListener = (value: unknown) => void;
 
@@ -43,10 +44,10 @@ class StoreManager {
     numberOfRecords: 0,
     offset: 0,
     rowCount: 0,
-    appStatus: 'preparing',
+    appLoadingStatus: 'preparing',
     isLogin: false,
-    isFetching: false,
-    isStoreUpdating: false,
+    isSearchDataFetching: false,
+    isSearchResultsUpdating: false,
     displayingRegionsOnChromosome: {},
   };
 
@@ -138,9 +139,9 @@ class StoreManager {
    * _state の生参照を渡すとコールバック内での変更がStoreを直接汚染するため、deepCopyして渡す。
    */
   publish<T extends keyof StoreState>(key: T) {
-    this._listeners.get(key)?.forEach((callback) =>
-      callback(this._deepCopy(this._state[key]))
-    );
+    this._listeners
+      .get(key)
+      ?.forEach((callback) => callback(this._deepCopy(this._state[key])));
   }
 
   /**
@@ -157,11 +158,11 @@ class StoreManager {
   // ------------------------------
 
   /**
-   * isStoreUpdating=trueで行の中途表示を防いでから既存データと新データをマージする。
-   * スクロール中に古いデータと新データが混在して見えないよう更新を一括で行う設計にしている。
+   * isSearchResultsUpdating=trueで行の中途表示を防いでから既存データと新データをマージする。
+   * API通信状態ではなく、searchResults配列の組み替え中だけ描画を止めるためのフラグとして扱う。
    */
   setResults(records: ResultData[], offset: number) {
-    this.setData('isStoreUpdating', true);
+    this.setData('isSearchResultsUpdating', true);
 
     // numberOfRecords はプリミティブなので deepCopy コストゼロ
     const updatedResults = Array(this._state.numberOfRecords).fill(null);
@@ -181,18 +182,18 @@ class StoreManager {
     this._state.searchResults = updatedResults;
     this.publish('searchResults');
 
-    // isFetchingはdata/statリクエスト全体の完了後にexecuteSearch側で解除するため、ここでは触らない
-    this.setData('isStoreUpdating', false);
+    // isSearchDataFetchingはdata=1リクエストの状態なので、Store配列更新だけを担うここでは触らない。
+    this.setData('isSearchResultsUpdating', false);
   }
 
   /**
    * 仮想スクロールの行がデータを要求するときに呼ばれる。
-   * isStoreUpdating中は中途状態を返さないようloadingを返す。
+   * isSearchResultsUpdating中は中途状態を返さないようloadingを返す。
    * データが未取得（null）の場合は 'loading' を返すだけで fetch は起動しない。
    * fetch のトリガーは呼び出し元が searchManager.requestNextPage() 経由で行う。
    */
   getRecordByIndex(index: number): ResultData | 'loading' | 'out of range' {
-    if (this.getData('isStoreUpdating')) return 'loading';
+    if (this.getData('isSearchResultsUpdating')) return 'loading';
     const recordIndex = this.getData('offset') + index;
 
     if (recordIndex < this._state.numberOfRecords) {
@@ -235,7 +236,7 @@ class StoreManager {
    */
   private _resetSearchStateForMode(mode: SearchMode | '') {
     if (!mode) return;
-    this.setData('isStoreUpdating', true);
+    this.setData('isSearchResultsUpdating', true);
     try {
       this.setData('offset', 0);
       this.setData('selectedRow', undefined);
@@ -243,7 +244,7 @@ class StoreManager {
       this.setData('numberOfRecords', 0);
       this.setData('rowCount', 0);
     } finally {
-      this.setData('isStoreUpdating', false);
+      this.setData('isSearchResultsUpdating', false);
     }
   }
 

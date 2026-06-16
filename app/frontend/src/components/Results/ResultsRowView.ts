@@ -123,23 +123,23 @@ export class ResultsRowView {
   // ================================================================
 
   /**
-   * isFetching / isStoreUpdating / rowCount / データの順に状態を確認し、
+   * data取得中 / Store配列更新中 / rowCount / データの順に状態を確認し、
    * 最も早い段階で不要な処理を打ち切ることで描画コストを抑える。
    */
   updateTableRow() {
     if (this._isDestroyed) return;
 
-    // 初回fetch（numberOfRecords === 0）はまだ表示できるデータがないため行を非表示にする。
-    // スクロール中の追加fetch（numberOfRecords > 0）は既存データが見えているため
-    // out-of-rangeにせずloadingGIFを維持する（この後の isStoreUpdating / result チェックに委ねる）。
+    // 初回data取得（numberOfRecords === 0）はまだ表示できるデータがないため行を非表示にする。
+    // スクロール中の追加data取得（numberOfRecords > 0）は既存データが見えているため
+    // out-of-rangeにせずloadingGIFを維持する（この後の isSearchResultsUpdating / result チェックに委ねる）。
     if (
-      storeManager.getData('isFetching') &&
+      storeManager.getData('isSearchDataFetching') &&
       storeManager.getData('numberOfRecords') === 0
     ) {
       return this._setOutOfRangeState();
     }
 
-    if (storeManager.getData('isStoreUpdating')) {
+    if (storeManager.getData('isSearchResultsUpdating')) {
       return this._setLoadingState();
     }
 
@@ -152,7 +152,7 @@ export class ResultsRowView {
     if (!result || result === 'loading' || result === 'out of range') {
       if (result === 'loading') {
         // データが未取得のページに到達した → 後続ページを取得する。
-        // isStoreUpdating=false は直上と getRecordByIndex 内でチェック済み。
+        // isSearchResultsUpdating=false は直上と getRecordByIndex 内でチェック済み。
         requestNextPage(storeManager.getData('offset') + this.index);
       }
       return this._setLoadingState();

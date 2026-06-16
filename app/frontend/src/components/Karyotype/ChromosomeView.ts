@@ -1,6 +1,6 @@
 import { storeManager } from '../../store/StoreManager';
 import { setSimpleSearchCondition } from '../../store/searchManager';
-import type { DisplayingRegions } from '../../types/store';
+import type { DisplayingRegions } from '../../types/storeState';
 
 // 染色体棒の描画幅とSVG上下余白（px）。
 // CSSではなくJSでSVG座標を計算するため定数として保持する。

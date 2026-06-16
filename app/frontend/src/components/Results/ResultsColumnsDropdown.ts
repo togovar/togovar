@@ -4,7 +4,8 @@ import {
   normalizeColumnConfigs,
 } from '../../columns';
 import { storeManager } from '../../store/StoreManager';
-import type { ColumnConfig, StoreState } from '../../types';
+import type { ColumnConfig } from '../../types';
+import type { StoreState } from '../../types/storeState';
 
 /** 列ドロップダウンの HTML セレクタマップ */
 const SELECTORS = {

@@ -7,7 +7,8 @@ import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
 import { ResultsViewDataManager } from './ResultsViewDataManager';
 import { ResultsColumnAutoSizer } from './ResultsColumnAutoSizer';
 import { ResultsColumnResizeController } from './ResultsColumnResizeController';
-import type { SearchMessages, SearchStatus, ColumnConfig, StoreState } from '../../types';
+import type { SearchMessages, SearchStatus, ColumnConfig } from '../../types';
+import type { StoreState } from '../../types/storeState';
 import { isTouchDevice } from '../../utils/deviceDetection';
 
 /** テーブル関連の DOM セレクタマップ */

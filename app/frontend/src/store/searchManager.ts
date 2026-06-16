@@ -33,7 +33,9 @@ function _setSimpleSearchConditions(
   };
   Object.keys(newSearchConditions).forEach((conditionKey) => {
     const key = conditionKey as keyof SimpleSearchCurrentConditions;
-    (updatedConditions as Record<keyof SimpleSearchCurrentConditions, unknown>)[key] = newSearchConditions[key];
+    (updatedConditions as Record<keyof SimpleSearchCurrentConditions, unknown>)[
+      key
+    ] = newSearchConditions[key];
   });
   storeManager.setData('simpleSearchConditions', updatedConditions);
 
@@ -41,13 +43,15 @@ function _setSimpleSearchConditions(
     reflectSimpleSearchConditionToURI();
   }
 
-  storeManager.setData('appStatus', 'searching');
+  storeManager.setData('appLoadingStatus', 'searching');
   executeSearch(0, true);
 }
 
 /** 指定された検索条件キーに対応する現在の検索条件を取得する */
 export function getSimpleSearchCondition(key: MasterConditionId) {
-  return (storeManager.getData('simpleSearchConditions') as Record<string, unknown>)?.[key];
+  return (
+    storeManager.getData('simpleSearchConditions') as Record<string, unknown>
+  )?.[key];
 }
 
 /** 指定された検索条件キーに対応するマスター検索条件を取得する */
@@ -143,7 +147,7 @@ export function handleHistoryChange(e: PopStateEvent) {
 
     if (currentMode === 'advanced') {
       // 同一モード内の移動: searchModeサブスクライバは発火しないため直接検索を実行する。
-      storeManager.setData('appStatus', 'searching');
+      storeManager.setData('appLoadingStatus', 'searching');
       executeSearch(0, true);
     } else {
       // モード切替: setSearchModeFromHistoryでreflect*ToURIをスキップしながらモードを切替える。
@@ -158,7 +162,7 @@ export function handleHistoryChange(e: PopStateEvent) {
 
     if (currentMode === 'simple') {
       // 同一モード内の移動: searchModeサブスクライバは発火しないため直接検索を実行する。
-      storeManager.setData('appStatus', 'searching');
+      storeManager.setData('appLoadingStatus', 'searching');
       executeSearch(0, true);
     } else {
       // モード切替: setSearchModeFromHistoryでreflect*ToURIをスキップしながらモードを切替える。
@@ -250,9 +254,11 @@ function _buildSimpleConditionsFromURL(
 //   Advanced Search: ネスト構造のためJSON+Base64を使用（URI encodeより~33%コンパクト）
 
 /** AdvancedSearch検索条件を設定し、必要に応じて検索を実行 */
-export function setAdvancedSearchCondition(newSearchConditions: ConditionQuery) {
+export function setAdvancedSearchCondition(
+  newSearchConditions: ConditionQuery
+) {
   storeManager.setData('advancedSearchConditions', newSearchConditions);
-  storeManager.setData('appStatus', 'searching');
+  storeManager.setData('appLoadingStatus', 'searching');
 
   // URLパラメータを更新
   reflectAdvancedSearchConditionToURI();
@@ -334,7 +340,7 @@ function _handleSearchModeChange(mode: SearchMode | ''): void {
       break;
   }
 
-  storeManager.setData('appStatus', 'searching');
+  storeManager.setData('appLoadingStatus', 'searching');
   executeSearch(0, true);
 }
 

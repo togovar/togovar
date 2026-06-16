@@ -1,6 +1,7 @@
 import { storeManager } from '../../store/StoreManager';
 import { TR_HEIGHT } from '../../global';
-import type { DragEventUI, StoreState } from '../../types';
+import type { DragEventUI } from '../../types';
+import type { StoreState } from '../../types/storeState';
 import {
   calculateNewScrollPosition,
   constrainRowOffsetToValidRange,

@@ -53,11 +53,22 @@ export type StoreState = {
   numberOfRecords: number;
   offset: number;
   rowCount: number;
-  /** 初期化・検索中・通常の3フェーズを文字列で管理し、UI側でのガード処理を単純化する */
-  appStatus: 'preparing' | 'searching' | 'normal';
+  /**
+   * 画面全体の検索フェーズを1箇所で表し、全体ローディング表示の判定を単純にする。
+   * Results内の行loadingではなく、LoadingIndicatorの表示制御に使う。
+   */
+  appLoadingStatus: 'preparing' | 'searching' | 'normal';
   isLogin: boolean;
-  isFetching: boolean;
-  isStoreUpdating: boolean;
+  /**
+   * 検索結果のdata=1リクエスト中かを表し、Resultsの行loadingと描画待機に使う。
+   * stat=1のみの統計取得やStore配列マージ中かどうかは、この値では表さない。
+   */
+  isSearchDataFetching: boolean;
+  /**
+   * searchResults配列を同期更新している間だけtrueにし、中途半端な行描画を防ぐ。
+   * API通信中かどうかではなく、Store内部の配列更新ガードとして扱う。
+   */
+  isSearchResultsUpdating: boolean;
   selectedRow?: number;
   advancedSearchConditions?: ConditionQuery;
   advancedSearchURLTooLong?: boolean;

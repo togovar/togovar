@@ -1,5 +1,5 @@
 import { getDefaultColumnConfigs, normalizeColumnConfigs } from '.';
-import type { StoreState } from '../types';
+import type { StoreState } from '../types/storeState';
 
 const COLUMNS_STORAGE_KEY = 'columns';
 

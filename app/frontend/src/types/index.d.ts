@@ -9,7 +9,7 @@
 // ============================================
 // Store & State Management Types
 // ============================================
-export * from './store';
+export * from './storeState';
 
 // ============================================
 // Search & Query Types

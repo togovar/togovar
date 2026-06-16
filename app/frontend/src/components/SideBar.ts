@@ -1,6 +1,6 @@
 import { storeManager } from '../store/StoreManager';
 import { resetSimpleSearchConditions } from '../store/searchManager';
-import type { StoreState } from '../types';
+import type { StoreState } from '../types/storeState';
 import { selectRequired } from '../utils/dom/select';
 
 const SELECTORS = {
