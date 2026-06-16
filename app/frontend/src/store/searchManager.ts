@@ -44,8 +44,7 @@ function _setSimpleSearchConditions(
     reflectSimpleSearchConditionToURI(updatedConditions);
   }
 
-  storeManager.setData('appLoadingStatus', 'searching');
-  executeSearch(0, true);
+  _requestInitialSearch();
 }
 
 /** 指定された検索条件キーに対応する現在の検索条件を取得する */
@@ -106,8 +105,7 @@ export function handleHistoryChange(e: PopStateEvent) {
 
     if (currentMode === 'advanced') {
       // 同一モード内の移動: searchModeサブスクライバは発火しないため直接検索を実行する。
-      storeManager.setData('appLoadingStatus', 'searching');
-      executeSearch(0, true);
+      _requestInitialSearch();
     } else {
       // モード切替: setSearchModeFromHistoryでreflect*ToURIをスキップしながらモードを切替える。
       storeManager.setSearchModeFromHistory('advanced');
@@ -124,8 +122,7 @@ export function handleHistoryChange(e: PopStateEvent) {
 
     if (currentMode === 'simple') {
       // 同一モード内の移動: searchModeサブスクライバは発火しないため直接検索を実行する。
-      storeManager.setData('appLoadingStatus', 'searching');
-      executeSearch(0, true);
+      _requestInitialSearch();
     } else {
       // モード切替: setSearchModeFromHistoryでreflect*ToURIをスキップしながらモードを切替える。
       storeManager.setSearchModeFromHistory('simple');
@@ -138,11 +135,10 @@ export function setAdvancedSearchCondition(
   newSearchConditions: ConditionQuery
 ) {
   storeManager.setData('advancedSearchConditions', newSearchConditions);
-  storeManager.setData('appLoadingStatus', 'searching');
 
   _reflectAdvancedSearchConditionToURI();
 
-  executeSearch(0, true);
+  _requestInitialSearch();
 }
 
 /**
@@ -187,8 +183,7 @@ function _handleSearchModeChange(mode: SearchMode | ''): void {
       break;
   }
 
-  storeManager.setData('appLoadingStatus', 'searching');
-  executeSearch(0, true);
+  _requestInitialSearch();
 }
 
 /**
@@ -197,6 +192,14 @@ function _handleSearchModeChange(mode: SearchMode | ''): void {
  */
 export function requestNextPage(recordIndex: number): void {
   executeSearch(recordIndex);
+}
+
+/**
+ * 条件変更や履歴復元では先頭ページから取り直すため、全体loadingと初回検索を必ずセットで開始する。
+ */
+function _requestInitialSearch(): void {
+  storeManager.setData('appLoadingStatus', 'searching');
+  executeSearch(0, true);
 }
 
 /**

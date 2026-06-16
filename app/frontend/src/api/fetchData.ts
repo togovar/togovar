@@ -26,44 +26,47 @@ type SearchRequest = {
 };
 
 /** 検索開始の入口を1つにし、連続操作時のAPI多重発火をdebounceで抑える。 */
-export const executeSearch = (() => {
-  return debounce((offset = 0, isFirstTime = false) => {
-    const execution = prepareSearchExecution(offset, isFirstTime);
-    if (!execution.shouldExecute) {
-      return;
-    }
-    isFirstTime = execution.isFirstTime;
-    const signal = execution.signal;
+export const executeSearch = debounce(_executeSearch, 300);
 
-    // 初回検索時のデータリセット
-    if (isFirstTime) {
-      _resetSearchResults();
-    }
+/**
+ * debounceの外へ実処理を出し、検索準備・API起動・完了監視の流れを追いやすくする。
+ */
+function _executeSearch(offset = 0, isFirstTime = false): void {
+  const execution = prepareSearchExecution(offset, isFirstTime);
+  if (!execution.shouldExecute) {
+    return;
+  }
+  isFirstTime = execution.isFirstTime;
+  const signal = execution.signal;
 
-    // Resultsの行loadingは検索結果dataの取得中だけに連動させる。
-    // 統計取得の遅延で行loadingが残らないよう、解除はdata=1リクエスト完了時に行う。
-    storeManager.setData('isSearchDataFetching', true);
-    markSearchRequestStarted();
+  // 初回検索時のデータリセット
+  if (isFirstTime) {
+    _resetSearchResults();
+  }
 
-    // API のエンドポイントを取得
-    const apiEndpoints = determineSearchEndpoints(offset, isFirstTime);
+  // Resultsの行loadingは検索結果dataの取得中だけに連動させる。
+  // 統計取得の遅延で行loadingが残らないよう、解除はdata=1リクエスト完了時に行う。
+  storeManager.setData('isSearchDataFetching', true);
+  markSearchRequestStarted();
 
-    // API リクエストオプションを設定
-    const requestOptions = getSearchRequestOptions(signal);
+  // API のエンドポイントを取得
+  const apiEndpoints = determineSearchEndpoints(offset, isFirstTime);
 
-    // データ取得
-    if (apiEndpoints && apiEndpoints.length > 0) {
-      const requests = apiEndpoints.map((endpoint) => ({
-        endpoint,
-        promise: _fetchData(endpoint, requestOptions),
-      }));
-      _watchSearchRequestCompletion(requests);
-    } else {
-      _finishSearchDataLoading();
-      _finishSearchSuccessfully();
-    }
-  }, 300);
-})();
+  // API リクエストオプションを設定
+  const requestOptions = getSearchRequestOptions(signal);
+
+  // データ取得
+  if (apiEndpoints && apiEndpoints.length > 0) {
+    const requests = apiEndpoints.map((endpoint) => ({
+      endpoint,
+      promise: _fetchData(endpoint, requestOptions),
+    }));
+    _watchSearchRequestCompletion(requests);
+  } else {
+    _finishSearchDataLoading();
+    _finishSearchSuccessfully();
+  }
+}
 
 /** 初回検索を過去結果から独立させるため、結果Storeとスクロール取得範囲を初期化する。 */
 function _resetSearchResults() {
