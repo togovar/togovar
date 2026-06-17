@@ -13,6 +13,12 @@ export class ResultsViewDisplayManager {
   private stylesheetVars: HTMLStyleElement;
   private tableContainer: HTMLElement | null;
   private columnStyleSignature = '';
+  private rowUpdateFrameId: number | null = null;
+  private pendingRenderReason: ResultsRenderReason = 'layout';
+  private pendingIsTouchDevice = false;
+  private pendingSetTouchElementsPointerEvents:
+    | ((_enabled: boolean) => void)
+    | null = null;
 
   constructor(tbody: HTMLElement, stylesheet: HTMLStyleElement) {
     this.tbody = tbody;
@@ -82,8 +88,29 @@ export class ResultsViewDisplayManager {
     this.applyColumnStyles(columns);
   }
 
-  /** stylesheetVars を DOM から除去する。DataManager の destroy 時に呼ぶこと。 */
+  /**
+   * offset連続更新を1フレームにまとめ、スクロール中の同期DOM更新を避ける。
+   */
+  requestRowsUpdate(
+    isTouchDevice: boolean,
+    setTouchElementsPointerEvents: (_enabled: boolean) => void,
+    renderReason: ResultsRenderReason = 'layout'
+  ): void {
+    this.updateRowsWithAnimation(
+      isTouchDevice,
+      setTouchElementsPointerEvents,
+      renderReason
+    );
+  }
+
+  /** 行Viewと遅延描画を残すと破棄後にStore参照が続くため、まとめて解除する。 */
   destroy(): void {
+    if (this.rowUpdateFrameId !== null) {
+      cancelAnimationFrame(this.rowUpdateFrameId);
+      this.rowUpdateFrameId = null;
+    }
+    this.rows.forEach((row) => row.destroy());
+    this.rows = [];
     this.stylesheetVars.remove();
   }
 
@@ -159,15 +186,32 @@ export class ResultsViewDisplayManager {
     setTouchElementsPointerEvents: (_enabled: boolean) => void,
     renderReason: ResultsRenderReason
   ): void {
-    requestAnimationFrame(() => {
+    this.pendingIsTouchDevice = isTouchDevice;
+    this.pendingSetTouchElementsPointerEvents = setTouchElementsPointerEvents;
+    this.pendingRenderReason =
+      this.pendingRenderReason === 'searchResults' ? 'searchResults' : renderReason;
+
+    if (this.rowUpdateFrameId !== null) return;
+
+    this.rowUpdateFrameId = requestAnimationFrame(() => {
+      const shouldResetTouchPointerEvents = this.pendingIsTouchDevice;
+      const pointerEventsCallback = this.pendingSetTouchElementsPointerEvents;
+      const nextRenderReason = this.pendingRenderReason;
+
+      this.rowUpdateFrameId = null;
+      this.pendingRenderReason = 'layout';
+      this.pendingSetTouchElementsPointerEvents = null;
+
       this.rows.forEach((row) => row.updateTableRow());
 
-      if (isTouchDevice) {
-        setTouchElementsPointerEvents(false);
+      if (shouldResetTouchPointerEvents && pointerEventsCallback) {
+        pointerEventsCallback(false);
       }
 
       window.dispatchEvent(
-        new CustomEvent('togovar:results-rendered', { detail: { reason: renderReason } })
+        new CustomEvent('togovar:results-rendered', {
+          detail: { reason: nextRenderReason },
+        })
       );
     });
   }

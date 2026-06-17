@@ -83,7 +83,21 @@ export class ResultsViewDataManager {
   // Offset and Selection Handling
   // ========================================
 
-  handleOffsetChange(_offset: number): void {
+  /**
+   * offset変更時の行再描画はDisplayManagerへ集約し、行ごとの同期購読を避ける。
+   */
+  handleOffsetChange(
+    _offset: number,
+    isTouchDevice: boolean,
+    setTouchElementsPointerEvents: (_enabled: boolean) => void
+  ): void {
+    if (this.isDestroyed) return;
+
+    this.displayManager.requestRowsUpdate(
+      isTouchDevice,
+      setTouchElementsPointerEvents
+    );
+
     if (this.shouldSkipOffsetUpdate()) return;
 
     const displayingRegions = this.calculateDisplayingRegions();

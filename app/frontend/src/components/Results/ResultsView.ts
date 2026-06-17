@@ -125,7 +125,11 @@ export class ResultsView {
 
   /** Store の offset 変化を受けて DataManager へ委譲する。 */
   offset(offset: number): void {
-    this.dataManager.handleOffsetChange(offset);
+    this.dataManager.handleOffsetChange(
+      offset,
+      isTouchDevice(),
+      this.touchHandler.setElementsInteractable.bind(this.touchHandler)
+    );
   }
 
   /** Store の searchMessages 変化を受けて DataManager へ委譲する。 */

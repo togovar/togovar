@@ -289,16 +289,16 @@ class StoreManager {
    * isSearchResultsUpdating中は中途状態を返さないようloadingを返す。
    * データが未取得（null）の場合は 'loading' を返すだけで fetch は起動しない。
    * fetch のトリガーは呼び出し元が searchManager.requestNextPage() 経由で行う。
+   * スクロール中に全表示行で呼ばれるため、結果レコードはcloneせず読み取り専用として返す。
    */
   getRecordByIndex(index: number): SearchRecordLookupResult {
     if (this.getData('isSearchResultsUpdating')) return 'loading';
-    const result = getSearchRecordByDisplayIndex(
+    return getSearchRecordByDisplayIndex(
       this.state.searchResults,
       index,
       this.state.offset,
       this.state.numberOfRecords
     );
-    return typeof result === 'string' ? result : this.deepCopy(result);
   }
 
   /**
