@@ -248,8 +248,8 @@ export default class ChromosomeView {
       case 'advanced': {
         const targetElement = document
           .getElementById('AdvancedSearchBuilderView')
-          ?.querySelector(
-            ':scope > .inner > .advanced-search-condition-group-view.-root > .advanced-search-toolbar > ul > li > ul > li[data-condition="location"]'
+          ?.querySelector<HTMLElement>(
+            '.advanced-search-condition-group-view.-root > .advanced-search-toolbar button[data-condition="location"]'
           );
         if (targetElement) {
           targetElement.dispatchEvent(
