@@ -670,7 +670,9 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
       };
     }
 
-    if (this._filtered) {
+    // setValues() で明示的にセットされた場合のみ同期する。
+    // デフォルト値 false（新規条件追加時）でチェックボックスが上書きされるのを防ぐ。
+    if (this._filtered && freqCountView.filteredExplicitlySet) {
       this._filtered.checked = freqCountView.filtered;
     }
   }
