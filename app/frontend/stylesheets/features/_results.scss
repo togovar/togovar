@@ -276,11 +276,11 @@
 
               &.-locked {
                 cursor: default;
-                background: #f3f3f3;
+                background: var(--color-bg-locked);
                 opacity: 0.75;
 
                 &:hover {
-                  background: #f3f3f3;
+                  background: var(--color-bg-locked);
                 }
 
                 > .drag-handle {
@@ -322,7 +322,7 @@
                 }
 
                 &.-locked:hover {
-                  background: #f3f3f3;
+                  background: var(--color-bg-locked);
                 }
 
                 > .drag-handle {

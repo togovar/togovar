@@ -171,19 +171,26 @@ app/frontend/
 - UI状態は、可能なら既存の `data-*` 属性や状態クラスを利用する。
 - `tr` に `border` を使うテーブルは、そのテーブルに `border-collapse: collapse` を明示する。
 
+### CSS カスタムプロパティ
+
+デザイントークン（色・サイズ・z-index・アニメーション時間など）はすべて CSS カスタムプロパティとして `foundation/_variables.scss` の `:root` ブロックで定義されている。
+
+- **既存の CSS カスタムプロパティを優先して使う。** 新しい色や寸法を追加するときは、まず `_variables.scss` に CSS カスタムプロパティとして定義してから `var(--)` で参照する。
+- SCSS 変数（`$VAR`）を新たにデザイン値として作らない。ファイルローカルな計算（`calc()` の一時変数など）は許容する。
+- `color.adjust()` など SCSS の色関数はコンパイル時に解決されるため、CSS カスタムプロパティを引数に渡せない。派生色が必要な場合は `_variables.scss` 側でリテラル値を使って事前計算し CSS カスタムプロパティとして公開する。
+- 半透明色は `color-mix(in srgb, var(--color-xxx) 30%, transparent)` で表現する。
+- `rgba(black, 0.2)` のような SCSS 固有の色指定は使わない。`rgba(0, 0, 0, 0.2)` または `rgb(0 0 0 / 0.2)` を使う。
+
 ### Sass の書き方
 
 - **`@import` は廃止済み。** 全ファイルで `@use` / `@forward` へ移行済み。新規ファイルでも `@import` は使わない。
-- 変数・ミックスインは `foundation/_index.scss` が `@forward` で一括公開している。各パーシャルは先頭で `@use '../foundation' as *`（または `../../foundation`）を宣言して使う。
-  - `features/` → `@use '../foundation' as *`
-  - `object/component/` → `@use '../../foundation' as *`
-  - `layout/` → `@use '../foundation' as *`
-  - `web-components/` → `@use '../foundation' as *`
+- `foundation/_mixins.scss` のミックスイン（`sprite`・`input-number`・`panel-view-heading`）を使うファイルだけが `@use '../foundation' as *` を宣言する。CSS カスタムプロパティのみ使うファイルは `@use` 不要。
+  - ミックスインを使う場合: `features/` → `@use '../foundation' as *` / `object/component/` → `@use '../../foundation' as *`
+  - ミックスインを使わない場合: `@use` 宣言なし（`var(--)` は `@use` なしで使える）
 - CSS 出力を持つファイル（`foundation/base`・`reset`・`font-awesome`）は `main.scss` のみが `@use` する。パーシャル側は `@use` しない。
 - ミックスインは `foundation/_mixins.scss` に定義する（`sprite`・`input-number`・`panel-view-heading` など）。
 - `@extend` はモジュール境界をまたげない。代わりに `@mixin` を使う。
-- `sass:color` モジュールは `foundation/_variables.scss` 内部で使う。パーシャル側で `color.adjust()` を直接使う場合は、そのファイルで `@use 'sass:color'` を追加する。
-- `rgba(black, 0.2)` のような SCSS 固有の色指定は既存コードに残っているが、新規では `rgba(0, 0, 0, 0.2)` または CSS の `rgb(0 0 0 / 0.2)` 構文を使う。
+- `sass:color` モジュールは `foundation/_variables.scss` 内部でのみ使う。パーシャル側では使わない。
 
 ## コメント規約
 

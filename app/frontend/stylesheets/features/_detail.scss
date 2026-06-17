@@ -593,7 +593,7 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
             }
 
             &.-selected {
-              background-color: #f0f0ef;
+              background-color: var(--color-bg-subtle);
 
               > .arrow {
                 opacity: 1;

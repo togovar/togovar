@@ -128,7 +128,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
       padding-right: 8px;
       font-size: 12px;
       color: var(--color-black);
-      background-color: #f0f0ef;
+      background-color: var(--color-bg-subtle);
       border-radius: $CORNER_RADIUS;
 
       > .classification {
@@ -990,14 +990,14 @@ $OPACITY_DISABLED: 0.8;
       font-size: 12px;
       font-weight: bold;
       list-style: none;
-      background: #e2e2e2;
+      background: var(--color-bg-tab);
 
       li {
         a {
           display: block;
           padding: 3px 8px;
           margin-top: 5px;
-          color: #444;
+          color: var(--color-black);
           text-decoration: none;
           outline: none;
           border-radius: 7px 7px 0 0;
