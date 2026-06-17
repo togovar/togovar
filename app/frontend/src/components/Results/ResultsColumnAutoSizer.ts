@@ -14,47 +14,32 @@ const AUTO_SIZE_EXTRA_WIDTH = 4;
  * DOMの実測値を使ってレンダリング後に動的に確定する。
  */
 export class ResultsColumnAutoSizer {
-  /** autoSize の対象行を含む tbody 要素 */
-  private _tbody: HTMLElement;
+  private tbody: HTMLElement;
   /** 同じ検索結果に対する二重実行を防ぐための署名キャッシュ */
-  private _autoSizedResultSignature = '';
+  private autoSizedResultSignature = '';
   /** ユーザーが手動でリサイズした列は自動調整から除外するためにIDを保持する */
-  private _resizedColumnIds = new Set<string>();
-  private _boundAutoSizeResultColumns: (_event: Event) => void;
-  private _boundResetAutoSizeState: (
-    _version: number
-  ) => void;
+  private resizedColumnIds = new Set<string>();
+  private boundAutoSizeResultColumns: (_event: Event) => void;
+  private boundResetAutoSizeState: (_version: number) => void;
   /** getBoundingClientRect はDOMに配置されていないと0を返すため、非表示テーブルで計測する */
-  private _measuringTable: HTMLTableElement | null = null;
-  private _measuringRow: HTMLTableRowElement | null = null;
+  private measuringTable: HTMLTableElement | null = null;
+  private measuringRow: HTMLTableRowElement | null = null;
 
   constructor(tbody: HTMLElement) {
-    this._tbody = tbody;
-    this._boundAutoSizeResultColumns = this.autoSizeResultColumns.bind(this);
-    this._boundResetAutoSizeState = () => this.resetAutoSizeState();
-    window.addEventListener(
-      'togovar:results-rendered',
-      this._boundAutoSizeResultColumns
-    );
-    storeManager.subscribe(
-      'resultsResetVersion',
-      this._boundResetAutoSizeState
-    );
+    this.tbody = tbody;
+    this.boundAutoSizeResultColumns = this.autoSizeResultColumns.bind(this);
+    this.boundResetAutoSizeState = () => this.resetAutoSizeState();
+    window.addEventListener('togovar:results-rendered', this.boundAutoSizeResultColumns);
+    storeManager.subscribe('resultsResetVersion', this.boundResetAutoSizeState);
   }
 
   /** イベントリスナーと計測用DOMを同時に破棄し、メモリリークを防ぐ。 */
   destroy(): void {
-    window.removeEventListener(
-      'togovar:results-rendered',
-      this._boundAutoSizeResultColumns
-    );
-    storeManager.unsubscribe(
-      'resultsResetVersion',
-      this._boundResetAutoSizeState
-    );
-    this._measuringTable?.remove();
-    this._measuringTable = null;
-    this._measuringRow = null;
+    window.removeEventListener('togovar:results-rendered', this.boundAutoSizeResultColumns);
+    storeManager.unsubscribe('resultsResetVersion', this.boundResetAutoSizeState);
+    this.measuringTable?.remove();
+    this.measuringTable = null;
+    this.measuringRow = null;
   }
 
   /**
@@ -67,7 +52,7 @@ export class ResultsColumnAutoSizer {
     const column = columns.find((c) => c.id === columnId);
     if (!column || !column.isUsed || usesInitialColumnWidth(columnId)) return;
 
-    const contentWidth = this._measureColumnContentWidth(columnId);
+    const contentWidth = this.measureColumnContentWidth(columnId);
     const width =
       contentWidth <= 0
         ? getMinColumnWidth()
@@ -81,33 +66,30 @@ export class ResultsColumnAutoSizer {
 
   /** 列リセット時に署名とリサイズ記録を同時にクリアして次回自動調整を有効にする。 */
   resetAutoSizeState(): void {
-    this._autoSizedResultSignature = '';
-    this._resizedColumnIds.clear();
+    this.autoSizedResultSignature = '';
+    this.resizedColumnIds.clear();
   }
 
   /** 検索条件変更だけで結果が変わっていない場合に再調整を強制するための署名クリア。 */
   resetSignature(): void {
-    this._autoSizedResultSignature = '';
+    this.autoSizedResultSignature = '';
   }
 
   /** ユーザーが手動でリサイズした列を記録し、自動調整による上書きを防ぐ。 */
   markColumnResized(columnId: string): void {
-    this._resizedColumnIds.add(columnId);
+    this.resizedColumnIds.add(columnId);
   }
 
   /**
    * 全列幅を初期値に戻し、次回の自動調整を有効にする。
-   * ユーザーのリサイズ操作もリセットされるため、resetAutoSizeState も呼ぶ。
    */
   resetColumnWidths(): void {
     this.resetAutoSizeState();
 
-    const columns = normalizeColumnConfigs(storeManager.getData('columns')).map(
-      (column) => ({
-        ...column,
-        width: getInitialColumnWidth(column.id),
-      })
-    );
+    const columns = normalizeColumnConfigs(storeManager.getData('columns')).map((column) => ({
+      ...column,
+      width: getInitialColumnWidth(column.id),
+    }));
 
     storeManager.setData('columns', columns);
   }
@@ -117,10 +99,7 @@ export class ResultsColumnAutoSizer {
    * ページ送りや再描画ごとに呼ばれるが、署名が同じなら処理をスキップして無駄な再計測を防ぐ。
    */
   autoSizeResultColumns(event?: Event): void {
-    if (
-      event instanceof CustomEvent &&
-      event.detail?.reason !== 'searchResults'
-    ) {
+    if (event instanceof CustomEvent && event.detail?.reason !== 'searchResults') {
       return;
     }
 
@@ -128,25 +107,18 @@ export class ResultsColumnAutoSizer {
       return;
     }
 
-    const resultSignature = this._getResultSignature();
-    if (
-      !resultSignature ||
-      resultSignature === this._autoSizedResultSignature
-    ) {
+    const resultSignature = this.getResultSignature();
+    if (!resultSignature || resultSignature === this.autoSizedResultSignature) {
       return;
     }
 
     const columns = normalizeColumnConfigs(storeManager.getData('columns'));
     const nextColumns = columns.map((column) => {
-      if (
-        !column.isUsed ||
-        usesInitialColumnWidth(column.id) ||
-        this._resizedColumnIds.has(column.id)
-      ) {
+      if (!column.isUsed || usesInitialColumnWidth(column.id) || this.resizedColumnIds.has(column.id)) {
         return column;
       }
 
-      const contentWidth = this._measureColumnContentWidth(column.id);
+      const contentWidth = this.measureColumnContentWidth(column.id);
       if (contentWidth <= 0) {
         return { ...column, width: getMinColumnWidth() };
       }
@@ -154,14 +126,14 @@ export class ResultsColumnAutoSizer {
       return { ...column, width: Math.max(getMinColumnWidth(), contentWidth) };
     });
 
-    this._autoSizedResultSignature = resultSignature;
+    this.autoSizedResultSignature = resultSignature;
     storeManager.setData('columns', nextColumns);
   }
 
   /**
    * 結果セット全体をシリアライズすると重いため、先頭IDと総件数の組み合わせで差分を検出する。
    */
-  private _getResultSignature(): string {
+  private getResultSignature(): string {
     const results = storeManager.getData('searchResults');
     const numberOfRecords = storeManager.getData('numberOfRecords');
 
@@ -175,14 +147,13 @@ export class ResultsColumnAutoSizer {
 
   /**
    * 指定列のセル群から最大コンテンツ幅を実測して返す。
-   * 計測対象セルの抽出と幅計算を1パスにまとめ、_getMeasureTarget の二重呼び出しを避ける。
    */
-  private _measureColumnContentWidth(columnId: string): number {
+  private measureColumnContentWidth(columnId: string): number {
     const cellsWithContent = Array.from(
-      this._tbody.querySelectorAll<HTMLTableCellElement>(`td.${columnId}`)
+      this.tbody.querySelectorAll<HTMLTableCellElement>(`td.${columnId}`)
     ).flatMap((cell) => {
       if (cell.offsetParent === null) return [];
-      const content = this._getMeasureTarget(cell, columnId);
+      const content = this.getMeasureTarget(cell, columnId);
       if (!content?.textContent?.trim()) return [];
       return [{ cell, content }];
     });
@@ -197,7 +168,7 @@ export class ResultsColumnAutoSizer {
             parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
 
           return (
-            this._measureContentBoxWidth(cell, content) +
+            this.measureContentBoxWidth(cell, content) +
             horizontalPadding +
             AUTO_SIZE_EXTRA_WIDTH
           );
@@ -209,41 +180,32 @@ export class ResultsColumnAutoSizer {
   /**
    * コンテンツの実際の描画幅を複数手法で取得する。
    * 制約なし計測が取れればそれを優先し、取れない場合は RangeAPI と scrollWidth で補完する。
-   * Range はインラインテキストに有効で、scrollWidth はオーバーフロー要素に有効なためどちらも試す。
    */
-  private _measureContentBoxWidth(
+  private measureContentBoxWidth(
     cell: HTMLTableCellElement,
     content: HTMLElement
   ): number {
-    const unconstrainedWidth = this._measureUnconstrainedContentWidth(
-      cell,
-      content
-    );
+    const unconstrainedWidth = this.measureUnconstrainedContentWidth(cell, content);
     if (unconstrainedWidth > 0) {
       return unconstrainedWidth;
     }
 
-    const rangeWidth = this._measureRangeWidth(cell, content);
+    const rangeWidth = this.measureRangeWidth(cell, content);
     if (content === cell) {
       return rangeWidth;
     }
 
-    return Math.max(
-      rangeWidth,
-      content.scrollWidth,
-      content.getBoundingClientRect().width
-    );
+    return Math.max(rangeWidth, content.scrollWidth, content.getBoundingClientRect().width);
   }
 
   /**
    * セルを非表示の計測用テーブルにクローンして幅の制約を外し、コンテンツ本来の幅を得る。
-   * 計測後すぐ子要素を除去して次の計測に再利用できるようにする。
    */
-  private _measureUnconstrainedContentWidth(
+  private measureUnconstrainedContentWidth(
     cell: HTMLTableCellElement,
     content: HTMLElement
   ): number {
-    const measuringRow = this._getMeasuringRow();
+    const measuringRow = this.getMeasuringRow();
     const measuringCell = cell.cloneNode(false) as HTMLTableCellElement;
 
     measuringCell.style.width = 'auto';
@@ -255,10 +217,7 @@ export class ResultsColumnAutoSizer {
 
     if (content === cell) {
       Array.from(cell.childNodes).forEach((node) => {
-        if (
-          node instanceof HTMLElement &&
-          node.classList.contains('resize-bar')
-        ) {
+        if (node instanceof HTMLElement && node.classList.contains('resize-bar')) {
           return;
         }
         measuringCell.appendChild(node.cloneNode(true));
@@ -281,11 +240,10 @@ export class ResultsColumnAutoSizer {
 
   /**
    * 計測用テーブルをキャッシュして再利用するため、DOMへの追加は初回のみにする。
-   * テーブルがDOMから切り離されていた場合も再生成して正確なレイアウトを保証する。
    */
-  private _getMeasuringRow(): HTMLTableRowElement {
-    if (this._measuringRow && this._measuringTable?.isConnected) {
-      return this._measuringRow;
+  private getMeasuringRow(): HTMLTableRowElement {
+    if (this.measuringRow && this.measuringTable?.isConnected) {
+      return this.measuringRow;
     }
 
     const table = document.createElement('table');
@@ -305,28 +263,21 @@ export class ResultsColumnAutoSizer {
     table.appendChild(tbody);
     document.body.appendChild(table);
 
-    this._measuringTable = table;
-    this._measuringRow = row;
+    this.measuringTable = table;
+    this.measuringRow = row;
 
     return row;
   }
 
   /**
    * Range API でコンテンツノードを囲んで幅を取得する。
-   * getBoundingClientRect より精度が高いケースがあるため、フォールバック計測に使う。
    */
-  private _measureRangeWidth(
-    cell: HTMLTableCellElement,
-    content: HTMLElement
-  ): number {
+  private measureRangeWidth(cell: HTMLTableCellElement, content: HTMLElement): number {
     const range = document.createRange();
 
     if (content === cell) {
       const contentNodes = Array.from(cell.childNodes).filter(
-        (node) =>
-          !(
-            node instanceof HTMLElement && node.classList.contains('resize-bar')
-          )
+        (node) => !(node instanceof HTMLElement && node.classList.contains('resize-bar'))
       );
 
       if (contentNodes.length === 0) return 0;
@@ -342,12 +293,8 @@ export class ResultsColumnAutoSizer {
 
   /**
    * 列IDによってセル内の計測対象サブ要素を切り替える。
-   * セル全体ではなくラベル要素だけを計測することで、パディングや装飾の過大評価を防ぐ。
    */
-  private _getMeasureTarget(
-    cell: HTMLTableCellElement,
-    columnId: string
-  ): HTMLElement {
+  private getMeasureTarget(cell: HTMLTableCellElement, columnId: string): HTMLElement {
     const selectorByColumn: Record<string, string> = {
       ref_alt: '.ref-alt',
       position: '.chromosome-position',
