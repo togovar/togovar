@@ -377,7 +377,6 @@
   white-space: nowrap;
   // tr の border-bottom を有効にするために必要（separate モデルでは tr の border は無視される）
   border-collapse: collapse;
-  border-right: solid var(--padding-side) white;
 
   // ---------------------------------------------------------------------------
   // テーブルヘッダー (thead)
@@ -512,7 +511,8 @@
           padding-left: 5px;
           font-weight: normal;
           line-height: 1;
-          border-left: solid 1px color-mix(in srgb, var(--color-black) 50%, transparent);
+          border-left: solid 1px
+            color-mix(in srgb, var(--color-black) 50%, transparent);
         }
       }
     }
@@ -846,7 +846,8 @@
             display: block;
             height: 11px;
             content: '';
-            border-left: solid 1px color-mix(in srgb, var(--color-black) 50%, transparent);
+            border-left: solid 1px
+              color-mix(in srgb, var(--color-black) 50%, transparent);
             transform: rotate(-20deg) translateY(-6px);
           }
         }
@@ -859,12 +860,20 @@
 
       // ホバー時の背景色
       &:hover {
-        background-color: color-mix(in srgb, var(--color-selected) 20%, transparent);
+        background-color: color-mix(
+          in srgb,
+          var(--color-selected) 20%,
+          transparent
+        );
       }
 
       // 選択行の背景色
       &.-selected {
-        background-color: color-mix(in srgb, var(--color-selected) 40%, transparent);
+        background-color: color-mix(
+          in srgb,
+          var(--color-selected) 40%,
+          transparent
+        );
       }
 
       // ローディング中: ローディング GIF を全体に表示
@@ -958,13 +967,21 @@ body[data-column-resizing='true'] {
 
     &.ui-draggable-dragging {
       cursor: grabbing;
-      background-color: color-mix(in srgb, var(--color-key-dark1) 50%, transparent);
+      background-color: color-mix(
+        in srgb,
+        var(--color-key-dark1) 50%,
+        transparent
+      );
     }
   }
 
   &:hover {
     > .bar {
-      background-color: color-mix(in srgb, var(--color-key-dark1) 50%, transparent);
+      background-color: color-mix(
+        in srgb,
+        var(--color-key-dark1) 50%,
+        transparent
+      );
 
       > .indicator {
         opacity: 1;
@@ -1562,7 +1579,9 @@ $COLOR_ALT_TEXT: #c52543;
   position: fixed;
   // 閉じた状態: ドロワーのタブ部分だけを画面下から出す
   // bottom の負値 = ドロワー展開高さ分だけ画面外にオフセット
-  bottom: calc(var(--height-bottom-drawer) - var(--height-bottom-drawer-opened));
+  bottom: calc(
+    var(--height-bottom-drawer) - var(--height-bottom-drawer-opened)
+  );
   z-index: var(--z-index-drawer);
   width: 100%;
   color: white;
@@ -1662,7 +1681,10 @@ $COLOR_ALT_TEXT: #c52543;
       // box-sizing: content-box で padding を高さ計算から除外し、
       // JS 側の height 計算と合わせる
       box-sizing: content-box;
-      height: calc(var(--height-bottom-drawer-opened) - var(--height-bottom-drawer) - 10px - 16px);
+      height: calc(
+        var(--height-bottom-drawer-opened) - var(--height-bottom-drawer) -
+          10px - 16px
+      );
       padding: 10px var(--padding-side) 16px;
       overflow-x: auto;
       text-align: center;

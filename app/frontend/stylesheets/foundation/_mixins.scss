@@ -1,5 +1,3 @@
-@use 'variables' as *;
-
 // CSS スプライト画像の配置ヘルパー
 @mixin sprite($width, $height, $x, $y) {
   background-image: url('../images/csssprite.png');
