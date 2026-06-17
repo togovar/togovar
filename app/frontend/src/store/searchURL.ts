@@ -1,5 +1,5 @@
 import * as qs from 'qs';
-import type { ConditionQuery, SimpleSearchCurrentConditions } from '../types';
+import type { ConditionQuery, MasterConditions, SimpleSearchCurrentConditions } from '../types';
 import { encodeConditionForURL } from './advancedSearchURL';
 import { extractSearchCondition } from './simpleSearchConditions';
 
@@ -30,9 +30,10 @@ let currentUrlParams: SearchUrlParams = qs.parse(
  * Simple Search条件のURL表現をここに閉じ込め、検索開始ロジックからpushStateを分離する。
  */
 export function reflectSimpleSearchConditionToURI(
-  currentConditions: SimpleSearchCurrentConditions
+  currentConditions: SimpleSearchCurrentConditions,
+  masterConditions: MasterConditions[]
 ): void {
-  const diffConditions = extractSearchCondition(currentConditions);
+  const diffConditions = extractSearchCondition(currentConditions, masterConditions);
   const currentTerm = currentConditions.term || '';
 
   if (Object.keys(diffConditions).length === 0 && currentTerm === '') {
@@ -61,8 +62,8 @@ export function reflectSimpleSearchConditionToURI(
 export function reflectAdvancedSearchConditionToURI(
   conditions: ConditionQuery | undefined
 ): { isURLTooLong: boolean } {
-  const hasConditions =
-    conditions !== undefined && Object.keys(conditions as object).length > 0;
+  // conditions は setAdvancedSearchCondition で {} → undefined に正規化されるため、存在確認だけで十分。
+  const hasConditions = conditions !== undefined;
   const encoded = hasConditions ? encodeConditionForURL(conditions) : null;
 
   let url: string;

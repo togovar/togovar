@@ -88,7 +88,8 @@ export default class DownloadButton {
     switch (storeManager.getData('searchMode')) {
       case 'simple': {
         const simpleConditions = storeManager.getData('simpleSearchConditions');
-        return Object.keys(extractSearchCondition(simpleConditions)).length > 0;
+        const master = storeManager.getData('simpleSearchConditionsMaster');
+        return Object.keys(extractSearchCondition(simpleConditions, master)).length > 0;
       }
       case 'advanced':
         // advancedSearchConditions は {} を使わず undefined をセンチネルとするため、存在確認だけで十分
@@ -144,7 +145,8 @@ export default class DownloadButton {
 
   private downloadFromSimpleSearch(type: DownloadFileType): void {
     const simpleConditions = storeManager.getData('simpleSearchConditions');
-    const query = qs.stringify(extractSearchCondition(simpleConditions));
+    const master = storeManager.getData('simpleSearchConditionsMaster');
+    const query = qs.stringify(extractSearchCondition(simpleConditions, master));
     const anchor = document.createElement('a');
     anchor.href = `${this.path}.${type}${query ? `?${query}` : ''}`;
     anchor.click();

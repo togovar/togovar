@@ -11,10 +11,14 @@ type SearchMessageResponse = {
  * APIレスポンス内のnotice/warning/errorだけをStoreへ反映し、検索結果処理と分離する。
  */
 export function applySearchMessages(jsonResponse: unknown): void {
-  if (!isSearchMessageResponse(jsonResponse)) {
-    storeManager.setData('searchMessages', {});
-    return;
-  }
+  storeManager.setData('searchMessages', buildSearchMessages(jsonResponse));
+}
+
+/**
+ * レスポンスからメッセージを組み立て、メッセージがなければ空を返す純粋な変換関数。
+ */
+function buildSearchMessages(jsonResponse: unknown): SearchMessages {
+  if (!isSearchMessageResponse(jsonResponse)) return {};
 
   const messages: SearchMessages = {
     notice: joinMessage(jsonResponse.notice),
@@ -22,11 +26,7 @@ export function applySearchMessages(jsonResponse: unknown): void {
     error: joinMessage(jsonResponse.error),
   };
 
-  if (messages.notice || messages.warning || messages.error) {
-    storeManager.setData('searchMessages', messages);
-  } else {
-    storeManager.setData('searchMessages', {});
-  }
+  return messages.notice || messages.warning || messages.error ? messages : {};
 }
 
 /**

@@ -38,7 +38,7 @@ declare global {
 }
 
 // モジュール起動時に一度だけURLを解析し、全初期化関数で参照できるようにする。
-const _currentUrlParams = qs.parse(window.location.search.substring(1));
+const currentUrlParams = qs.parse(window.location.search.substring(1));
 
 // ページライフサイクルをまたいでインスタンスを管理する変数。
 // pagehide時にdestroy/disposeを呼ぶためモジュールスコープで保持する。
@@ -113,7 +113,8 @@ function readyInitialSearch(callback: () => void): void {
   const simpleSearchConditions =
     searchMode === 'simple'
       ? extractSearchCondition(
-          _currentUrlParams as SimpleSearchCurrentConditions
+          currentUrlParams as SimpleSearchCurrentConditions,
+          storeManager.getData('simpleSearchConditionsMaster')
         )
       : {};
   storeManager.setData('simpleSearchConditions', simpleSearchConditions);

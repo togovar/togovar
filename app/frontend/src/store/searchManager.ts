@@ -22,11 +22,11 @@ import {
 export function setSimpleSearchCondition<
   K extends keyof SimpleSearchCurrentConditions,
 >(conditionKey: K, conditionValue: SimpleSearchCurrentConditions[K]) {
-  _setSimpleSearchConditions({ [conditionKey]: conditionValue });
+  setSimpleSearchConditions({ [conditionKey]: conditionValue });
 }
 
 /** シンプル検索条件を設定し、必要に応じて検索を開始 */
-function _setSimpleSearchConditions(
+function setSimpleSearchConditions(
   newSearchConditions: Partial<SimpleSearchCurrentConditions>
 ) {
   const updatedConditions = {
@@ -36,10 +36,13 @@ function _setSimpleSearchConditions(
   storeManager.setData('simpleSearchConditions', updatedConditions);
 
   if (storeManager.getData('searchMode') === 'simple') {
-    reflectSimpleSearchConditionToURI(updatedConditions);
+    reflectSimpleSearchConditionToURI(
+      updatedConditions,
+      storeManager.getData('simpleSearchConditionsMaster')
+    );
   }
 
-  _requestInitialSearch();
+  requestInitialSearch();
 }
 
 /** 指定された検索条件キーに対応する現在の検索条件を取得する */
@@ -78,7 +81,7 @@ export function resetSimpleSearchConditions() {
         break;
     }
   }
-  _setSimpleSearchConditions(resetConditions);
+  setSimpleSearchConditions(resetConditions);
 }
 
 /** ブラウザの「戻る」「進む」ボタンが押されたときに検索条件を更新 */
@@ -93,11 +96,11 @@ export function handleHistoryChange(e: PopStateEvent) {
     // URL長制限超過で q が省略された履歴エントリに戻った場合は event.state から復元する。
     const condition = getAdvancedConditionFromHistory(urlParams, e.state);
     storeManager.setData('advancedSearchConditions', condition ?? undefined);
-    _triggerAdvancedSearchRestore();
+    triggerAdvancedSearchRestore();
 
     if (currentMode === 'advanced') {
       // 同一モード内の移動: searchModeサブスクライバは発火しないため直接検索を実行する。
-      _requestInitialSearch();
+      requestInitialSearch();
     } else {
       // モード切替: setSearchModeFromHistoryでreflect*ToURIをスキップしながらモードを切替える。
       storeManager.setSearchModeFromHistory('advanced');
@@ -114,7 +117,7 @@ export function handleHistoryChange(e: PopStateEvent) {
 
     if (currentMode === 'simple') {
       // 同一モード内の移動: searchModeサブスクライバは発火しないため直接検索を実行する。
-      _requestInitialSearch();
+      requestInitialSearch();
     } else {
       // モード切替: setSearchModeFromHistoryでreflect*ToURIをスキップしながらモードを切替える。
       storeManager.setSearchModeFromHistory('simple');
@@ -130,15 +133,16 @@ export function setAdvancedSearchCondition(
     Object.keys(newSearchConditions).length === 0 ? undefined : newSearchConditions;
   storeManager.setData('advancedSearchConditions', normalizedConditions);
 
-  _reflectAdvancedSearchConditionToURI();
+  updateAdvancedURLState();
 
-  _requestInitialSearch();
+  requestInitialSearch();
 }
 
 /**
  * URL長制限の判定結果だけStoreへ戻し、URL生成自体はsearchURL.tsへ委譲する。
+ * reflectAdvancedSearchConditionToURI (searchURL.ts) と同名衝突を避けるため別名にしている。
  */
-function _reflectAdvancedSearchConditionToURI() {
+function updateAdvancedURLState() {
   const conditions = storeManager.getData('advancedSearchConditions');
   const { isURLTooLong } = reflectAdvancedSearchConditionToURI(conditions);
   storeManager.setData('advancedSearchURLTooLong', isURLTooLong);
@@ -147,7 +151,7 @@ function _reflectAdvancedSearchConditionToURI() {
 /**
  * false→trueのトグル理由を名前で表し、URL復元後にBuilder再構築が必要な意図を隠さないようにする。
  */
-function _triggerAdvancedSearchRestore(): void {
+function triggerAdvancedSearchRestore(): void {
   // モード切替でBuilderがすでにロード済みの場合も再構築が必要なため、毎回トグルで通知する。
   storeManager.setData('advancedSearchRestoredFromURL', false);
   storeManager.setData('advancedSearchRestoredFromURL', true);
@@ -163,7 +167,7 @@ function _triggerAdvancedSearchRestore(): void {
  * この関数はリセット後の状態を前提に動作する。
  * storeManager.fromHistory が true のとき（popstate経由）は URL 更新をスキップする。
  */
-function _handleSearchModeChange(mode: SearchMode | ''): void {
+function handleSearchModeChange(mode: SearchMode | ''): void {
   if (!mode) return;
 
   if (typeof document !== 'undefined') {
@@ -175,18 +179,19 @@ function _handleSearchModeChange(mode: SearchMode | ''): void {
       // popstate経由のときはURLがすでに確定済みのためpushStateしない
       if (!storeManager.fromHistory) {
         reflectSimpleSearchConditionToURI(
-          storeManager.getData('simpleSearchConditions')
+          storeManager.getData('simpleSearchConditions'),
+          storeManager.getData('simpleSearchConditionsMaster')
         );
       }
       // パネルUIをモード切替後の条件で再描画させるために強制 publish する
       storeManager.publish('simpleSearchConditions');
       break;
     case 'advanced':
-      if (!storeManager.fromHistory) _reflectAdvancedSearchConditionToURI();
+      if (!storeManager.fromHistory) updateAdvancedURLState();
       break;
   }
 
-  _requestInitialSearch();
+  requestInitialSearch();
 }
 
 /**
@@ -200,7 +205,7 @@ export function requestNextPage(recordIndex: number): void {
 /**
  * 条件変更や履歴復元では先頭ページから取り直すため、全体loadingと初回検索を必ずセットで開始する。
  */
-function _requestInitialSearch(): void {
+function requestInitialSearch(): void {
   storeManager.setData('appLoadingStatus', 'searching');
   executeSearch(0, true);
 }
@@ -212,7 +217,7 @@ function _requestInitialSearch(): void {
  * 断ち切るために、明示的な呼び出し方式にしている。
  */
 export function initSearchHandlers(): void {
-  storeManager.subscribe('searchMode', _handleSearchModeChange);
+  storeManager.subscribe('searchMode', handleSearchModeChange);
   if (typeof window !== 'undefined' && window.addEventListener) {
     window.addEventListener('popstate', handleHistoryChange);
   }

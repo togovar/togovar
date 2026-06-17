@@ -2,7 +2,7 @@ import * as qs from 'qs';
 import { API_URL } from '../global';
 import { stripAdvancedSearchMetadata } from '../store/advancedSearchURL';
 import { extractSearchCondition } from '../store/simpleSearchConditions';
-import type { FetchOption, SimpleSearchCurrentConditions } from '../types';
+import type { FetchOption, MasterConditions, SimpleSearchCurrentConditions } from '../types';
 import type { ConditionQuery } from '../types/query';
 
 export const SEARCH_RESULT_LIMIT = 100;
@@ -14,7 +14,8 @@ export function determineSearchEndpoints(
   searchMode: string,
   offset: number,
   isFirstTime: boolean,
-  simpleSearchConditions: SimpleSearchCurrentConditions
+  simpleSearchConditions: SimpleSearchCurrentConditions,
+  masterConditions: MasterConditions[]
 ): string[] {
   let basePath: string;
 
@@ -23,7 +24,7 @@ export function determineSearchEndpoints(
       // Simple searchの場合のみLIMITでの調整を行う
       const offsetStart = offset - (offset % SEARCH_RESULT_LIMIT);
       const conditions = qs.stringify(
-        extractSearchCondition(simpleSearchConditions)
+        extractSearchCondition(simpleSearchConditions, masterConditions)
       );
       basePath = `${API_URL}/search?offset=${offsetStart}${
         conditions ? '&' + conditions : ''

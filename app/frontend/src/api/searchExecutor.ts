@@ -58,7 +58,8 @@ function _prepareSearchRun(
     searchMode,
     offset,
     execution.isFirstTime,
-    storeManager.getData('simpleSearchConditions')
+    storeManager.getData('simpleSearchConditions'),
+    storeManager.getData('simpleSearchConditionsMaster')
   );
   const requestOptions = getSearchRequestOptions(
     searchMode,

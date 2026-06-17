@@ -1,4 +1,3 @@
-import { storeManager } from './StoreManager';
 import type {
   MasterConditionId,
   MasterConditions,
@@ -9,15 +8,12 @@ import type {
  * Simple SearchのURL/API送信用条件だけを取り出すため、マスター定義のdefaultと比較する。
  */
 export function extractSearchCondition(
-  currentConditions: SimpleSearchCurrentConditions = {} as SimpleSearchCurrentConditions
+  currentConditions: SimpleSearchCurrentConditions = {} as SimpleSearchCurrentConditions,
+  masterConditions: MasterConditions[]
 ): Record<string, unknown> {
-  const masterSearchConditions: MasterConditions[] = storeManager.getData(
-    'simpleSearchConditionsMaster'
-  );
-
   const diffConditions: Record<string, unknown> = {};
   const conditionMap = new Map(
-    masterSearchConditions.map((condition) => [condition.id, condition])
+    masterConditions.map((condition) => [condition.id, condition])
   );
 
   for (const [conditionKey, conditionValue] of Object.entries(
