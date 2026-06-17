@@ -34,7 +34,7 @@ export default class ChromosomeView {
   private readonly _svg: SVGSVGElement;
   private readonly _displayRegion: HTMLElement;
   private _subbands: SVGGElement[];
-  private _bands: NodeListOf<SVGGElement>;
+  private _bands: SVGGElement[];
 
   /**
    * 染色体棒SVGをelmに描画し、クリックイベントとStore購読を設定する。
@@ -73,11 +73,7 @@ export default class ChromosomeView {
     // 隣接するサブバンドが同じ主バンドに属する場合は end を延ばして結合する。
     const lowMap = map.reduce<BandEntry[]>((acc, subBand) => {
       if (acc.length === 0 || acc[acc.length - 1].band !== subBand.band) {
-        acc.push({
-          band: subBand.band,
-          start: subBand.start,
-          end: subBand.end,
-        });
+        acc.push({ band: subBand.band, start: subBand.start, end: subBand.end });
       } else {
         acc[acc.length - 1].end = subBand.end;
       }
@@ -96,8 +92,41 @@ export default class ChromosomeView {
     const rate = chromosomeHeight / this._length;
     this._svg.style.height = `${chromosomeHeight + PADDING * 2}px`;
 
-    // SVG の defs にグラデーション定義を書き、各バンドの染色パターンを url(#...) で参照する。
-    let html = `
+    this._svg.innerHTML = this._buildSVGInnerHTML(lowMap, rate);
+
+    this._subbands = Array.from(
+      this._svg.querySelectorAll<SVGGElement>('g.subband')
+    );
+    this._bands = Array.from(
+      this._svg.querySelectorAll<SVGGElement>('g.band')
+    );
+
+    this._setupEventListeners();
+
+    // displayingRegionsOnChromosome の変化を受け取るために購読登録する。
+    storeManager.subscribe('displayingRegionsOnChromosome', (v) =>
+      this.displayingRegionsOnChromosome(v!)
+    );
+  }
+
+  /**
+   * SVG全体のinnerHTMLを構築する。
+   * defs → サブバンド → バンドラベルの順に連結する。
+   */
+  private _buildSVGInnerHTML(lowMap: BandEntry[], rate: number): string {
+    return (
+      ChromosomeView._buildGradientDefs() +
+      this._buildSubbandElements(rate) +
+      this._buildBandElements(lowMap, rate)
+    );
+  }
+
+  /**
+   * グラデーション定義を文字列で返す。
+   * 全インスタンスで同一内容のためstaticメソッドとして切り出す。
+   */
+  private static _buildGradientDefs(): string {
+    return `
       <defs>
         <lineargradient id="chromosome-gneg">
           <stop offset="0" stop-color="#A6A6A6"/>
@@ -143,10 +172,16 @@ export default class ChromosomeView {
         </lineargradient>
       </defs>
     `;
+  }
 
-    // サブバンドを rect として描画する。クリック領域と染色パターンの両方を担う。
-    for (const subBand of this._map) {
-      html += `
+  /**
+   * サブバンドのrect要素群を文字列で生成する。
+   * クリック領域と染色パターンの両方を担う。
+   */
+  private _buildSubbandElements(rate: number): string {
+    return this._map
+      .map(
+        (subBand) => `
       <g
         class="subband"
         data-band="${subBand.band}"
@@ -162,12 +197,20 @@ export default class ChromosomeView {
           height="${Math.ceil((subBand.end - subBand.start) * rate)}"
           width="${WIDTH}"
         />
-      </g>`;
-    }
+      </g>`
+      )
+      .join('');
+  }
 
-    // 主バンドのラベルと目盛線を rect の右隣に描画する。
-    for (const band of lowMap) {
-      html += `
+  /**
+   * 主バンドのラベルと目盛線要素群を文字列で生成する。
+   * rect の右隣に描画するため translate で横にオフセットする。
+   */
+  private _buildBandElements(lowMap: BandEntry[], rate: number): string {
+    return lowMap
+      .map((band) => {
+        const height = (band.end - band.start) * rate;
+        return `
       <g
         class="band"
         data-band="${band.band}"
@@ -175,20 +218,18 @@ export default class ChromosomeView {
         data-end="${band.end}"
         transform="translate(${WIDTH + 4.5}, ${PADDING + band.start * rate - 0.5})"
         >
-        <text x="8" y="${
-          (band.end - band.start) * rate * 0.5 + 3
-        }" class="bandtext">${band.band}</text>
-        <path d="M0,1 V${(band.end - band.start) * rate - 1} M0,${Math.round(
-          (band.end - band.start) * rate * 0.5
-        )} H8" class="line" />
-      </g>
-      `;
-    }
-    this._svg.innerHTML = html + '</g>';
+        <text x="8" y="${height * 0.5 + 3}" class="bandtext">${band.band}</text>
+        <path d="M0,1 V${height - 1} M0,${Math.round(height * 0.5)} H8" class="line" />
+      </g>`;
+      })
+      .join('');
+  }
 
-    // displayingRegionsOnChromosome の変化を受け取るために購読登録する。
-    storeManager.subscribe('displayingRegionsOnChromosome', (v) => this.displayingRegionsOnChromosome(v!));
-
+  /**
+   * 染色体番号・サブバンド・バンドへのクリック/ホバーイベントをまとめて登録する。
+   * SVG innerHTML 設定後に呼ぶ必要があるため、コンストラクタ末尾で呼ぶ。
+   */
+  private _setupEventListeners(): void {
     // 染色体番号クリックで染色体全体を検索条件に設定する。
     this._elm
       .querySelector<HTMLElement>(':scope > .upper > .no')!
@@ -197,9 +238,6 @@ export default class ChromosomeView {
       });
 
     // サブバンドのクリックでそのサブバンドの範囲を検索条件に設定する。
-    this._subbands = Array.from(
-      this._svg.querySelectorAll<SVGGElement>('g.subband')
-    );
     this._subbands.forEach((subband) => {
       subband.addEventListener('click', () => {
         this._selectBand(
@@ -212,7 +250,6 @@ export default class ChromosomeView {
 
     // 主バンドのクリックでその範囲を検索条件に設定し、
     // ホバーで配下のサブバンドをハイライトする。
-    this._bands = this._svg.querySelectorAll<SVGGElement>('g.band');
     this._bands.forEach((band) => {
       if (!band.dataset.start) return;
       const start = Number(band.dataset.start);
