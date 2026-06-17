@@ -171,8 +171,7 @@ export class AdvancedSearchBuilderView {
   /** URLなどからストアへ復元済みの条件を、Builderの表示へ反映する。 */
   private async _restoreConditionFromStore(): Promise<void> {
     const query = storeManager.getData('advancedSearchConditions');
-    if (!query || typeof query !== 'object' || Object.keys(query).length === 0)
-      return;
+    if (query === undefined || Object.keys(query).length === 0) return;
 
     await restoreAdvancedSearchCondition(this._rootGroup, query);
     this.onSelectionChange([]);

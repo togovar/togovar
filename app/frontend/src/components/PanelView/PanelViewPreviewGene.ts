@@ -16,8 +16,8 @@ export default class PanelViewPreviewGene extends PanelView {
    */
   constructor(elm: Element) {
     super(elm, 'preview-gene');
-    storeManager.bind('selectedRow', this);
-    storeManager.bind('offset', this);
+    storeManager.subscribe('selectedRow', () => this.selectedRow());
+    storeManager.subscribe('offset', () => this.offset());
     this._table = this.elm.querySelector<Element>(
       '.content > .right-headline'
     )!;

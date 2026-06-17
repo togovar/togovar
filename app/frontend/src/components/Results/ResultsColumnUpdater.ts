@@ -209,7 +209,7 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Variant Type列を更新する。
+   * マスター未ロード時も結果行の描画を止めないため、取得できたラベルだけを表示する。
    *
    * @param element - 更新対象のdiv要素
    * @param value - バリアントタイプID
@@ -217,9 +217,10 @@ export class ResultsColumnUpdater {
   static updateVariantType(element: HTMLDivElement | null, value: string) {
     if (!element) return;
 
-    const master: TypeMasterItem[] =
-      getSimpleSearchConditionMaster('type').items;
-    element.textContent = master.find((item) => item.id === value)?.label || '';
+    const master = getSimpleSearchConditionMaster('type')?.items as
+      | TypeMasterItem[]
+      | undefined;
+    element.textContent = master?.find((item) => item.id === value)?.label || '';
   }
 
   /**
@@ -254,7 +255,7 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Alt frequency列を更新する。
+   * datasetマスター未ロード時も結果行描画を止めないため、取得できた頻度要素だけを更新する。
    *
    * @param tdFrequencies - データセットIDごとの頻度表示要素
    * @param frequencies - 頻度データの配列
@@ -263,8 +264,10 @@ export class ResultsColumnUpdater {
     tdFrequencies: TdFrequencies,
     frequencies: Frequency[]
   ) {
-    const master: DatasetMasterItem[] =
-      getSimpleSearchConditionMaster('dataset').items;
+    const master =
+      (getSimpleSearchConditionMaster('dataset')?.items as
+        | DatasetMasterItem[]
+        | undefined) ?? [];
 
     master
       .filter((dataset) => dataset.has_freq)
@@ -280,7 +283,7 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * Consequence列を更新する。
+   * consequenceマスター欠落時も結果行描画を継続し、解決できるラベルだけを表示する。
    *
    * @param tdConsequence - Consequence列のtd要素
    * @param tdConsequenceItem - Consequence名を表示するdiv要素
@@ -301,8 +304,10 @@ export class ResultsColumnUpdater {
       return;
     }
 
-    const master: ConsequenceMasterItem[] =
-      getSimpleSearchConditionMaster('consequence').items;
+    const master =
+      (getSimpleSearchConditionMaster('consequence')?.items as
+        | ConsequenceMasterItem[]
+        | undefined) ?? [];
     const uniqueConsequences = Array.from(
       new Set(transcripts.flatMap((transcript) => transcript.consequence))
     );

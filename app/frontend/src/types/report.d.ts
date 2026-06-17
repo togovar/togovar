@@ -1,55 +1,64 @@
 /**
- * Report System Type Definitions
+ * レポートページの型定義
  *
- * This module contains type definitions for:
- * - Report page configurations and layouts
- * - Stanza component definitions and settings
- * - Environment and API endpoint configurations
- * - Report generation and rendering types
- * - Dynamic content loading and management
+ * variant / gene / disease レポートページで使うStanza設定と
+ * ルーティング情報の型を管理する。
  */
 
 // ============================================
-// Environment & Configuration Types
+// 環境・エンドポイント設定
 // ============================================
 
 /**
- * Environment configuration interface defining all endpoint URLs and settings
- * used by the stanza components.
+ * Stanzaコンポーネントが参照するAPIエンドポイントと設定値をまとめた型。
+ * global.d.ts の定数とは別で、Stanzaに渡すオブジェクトとして使う。
  */
 export interface EnvironmentConfig {
-  readonly TOGOVAR_FRONTEND_API_URL: string; // Base API URL for TogoVar services
-  readonly TOGOVAR_FRONTEND_REFERENCE: string; // Reference genome assembly (GRCh37/GRCh38)
-  readonly TOGOVAR_STANZA_SPARQL: string; // SPARQL endpoint URL for semantic queries
-  readonly TOGOVAR_STANZA_SPARQLIST: string; // SPARQLiST endpoint URL for predefined queries
-  readonly TOGOVAR_STANZA_SEARCH: string; // Search endpoint URL for variant searches
-  readonly TOGOVAR_STANZA_JBROWSE: string; // JBrowse genomic browser endpoint URL
+  readonly TOGOVAR_FRONTEND_API_URL: string;
+  readonly TOGOVAR_FRONTEND_REFERENCE: string;
+  readonly TOGOVAR_STANZA_SPARQL: string;
+  readonly TOGOVAR_STANZA_SPARQLIST: string;
+  readonly TOGOVAR_STANZA_SEARCH: string;
+  readonly TOGOVAR_STANZA_JBROWSE: string;
 }
 
+// ============================================
+// Stanza設定
+// ============================================
+
 /**
- * Configuration for a single stanza component, defining its behavior and placement.
+ * Stanzaコンポーネント1つ分の設定。
+ * scriptUrl を省略すると、デフォルトのStanza配信URLを使う。
+ * references を指定すると、現在の参照ゲノムが一致するときだけ描画する。
  */
 export interface StanzaConfig {
-  id: string; // Unique identifier for the stanza component
-  targetSelector: string; // CSS selector for the DOM element where the stanza will be rendered
-  scriptUrl?: string; // Optional custom source URL for the stanza JavaScript file
-  options?: Record<string, unknown>; // Optional configuration options passed to the stanza component
-  references?: string[]; // Optional array of reference genome assemblies (e.g., ["GRCh38"]) - stanza will only render if current reference matches
+  id: string;
+  targetSelector: string;
+  scriptUrl?: string;
+  options?: Record<string, unknown>;
+  references?: string[];
 }
 
 /**
- * Report page configuration containing all stanzas and base options for a specific report type.
+ * レポートページ1種別分の設定。
+ * stanza 配列に並べた順に描画される。
+ * id は URL パスから取得するレポート識別子のキー名（省略時は 'id'）。
  */
 export interface ReportConfig {
-  base_options?: Record<string, unknown>; // Base options applied to all stanzas in this report
-  stanza?: StanzaConfig[]; // Array of stanza configurations to render on this report page
-  id?: string; // Key name for the report identifier (default: 'id')
+  base_options?: Record<string, unknown>;
+  stanza?: StanzaConfig[];
+  id?: string;
 }
 
+// ============================================
+// ルーティング
+// ============================================
+
 /**
- * Route parsing result containing report type and identifier.
+ * URLパスを解析した結果。
+ * reportType は variant / gene / disease など、reportId はそれぞれの識別子。
  */
 export interface RouteInfo {
-  reportType: string; // Type of report (variant, gene, disease, etc.)
-  reportId: string; // Unique identifier for the specific report item
+  reportType: string;
+  reportId: string;
 }

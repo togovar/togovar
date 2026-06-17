@@ -19,8 +19,8 @@ export default class PanelViewPreviewConsequence extends PanelView {
    */
   constructor(elm: Element) {
     super(elm, 'preview-consequence');
-    storeManager.bind('selectedRow', this);
-    storeManager.bind('offset', this);
+    storeManager.subscribe('selectedRow', () => this.selectedRow());
+    storeManager.subscribe('offset', () => this.offset());
     this._content = this.elm.querySelector('.content')!;
   }
 

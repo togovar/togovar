@@ -18,7 +18,7 @@ const canHandleModalKeyDown = (): boolean => {
 
 /** モーダル編集中は行選択側のショートカットと競合するため、行選択のキー処理を止める。 */
 const canHandleSelectedRowKeyDown = (): boolean => {
-  return !storeManager.getData<boolean>('showModal');
+  return !storeManager.getData('showModal');
 };
 
 /** キーボード操作の競合を避けるため、対象UIが現在キー入力を処理してよいかをStore状態から判定する。 */

@@ -9,7 +9,7 @@ import type {
   ConditionDefinition,
   ConsequenceNodeBase,
   TreeCondition,
-} from '../../../types/advancedSearchConditions';
+} from '../../../types/conditionDefinition';
 
 // _data の各要素は ConsequenceNodeBase にチェック状態フラグを付与した形。
 type ColumnDatum = ConsequenceNodeBase & { checked: boolean };

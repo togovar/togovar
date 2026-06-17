@@ -1,35 +1,19 @@
-import type {
-  ConditionTypeValue,
-  FrequencyDataset,
-  GenotypeKey,
-  SignificanceTerm,
-} from '../definition';
-import type { NoRelationType } from '../conditions';
-import type { ConditionItemView } from '../components/Condition/ConditionItemView';
-import type ConditionValues from '../components/Condition/ConditionValues';
-import type { ConditionItemValueView } from '../components/Condition/ConditionItemValueView';
+/**
+ * Advanced Search クエリ型定義（Store/API向け）
+ *
+ * StoreやAPIリクエストで扱う条件クエリの構造を定義する。
+ * UIビルダー型（BuildContext, EditorCtorなど）は conditionBuilder.d.ts に分離されている。
+ *
+ * PredictionKey だけは PredictionDatasets.ts の const から派生するため、
+ * components/ への参照が1箇所残る。その他のコンポーネント依存はない。
+ */
+
+import type { FrequencyDataset, GenotypeKey, SignificanceTerm } from '../definition';
 import type { PredictionKey } from '../components/Condition/ConditionPathogenicityPredictionSearch/PredictionDatasets';
-
-// ───────────────────────────────────────────────────────────────────────────
-// Builder
-// ───────────────────────────────────────────────────────────────────────────
-/** Context object passed to query builders */
-type BuildContext<T extends ConditionTypeValue> = {
-  type: T;
-  values: ConditionItemValueView[];
-  valuesContainer: HTMLDivElement;
-} & (T extends NoRelationType
-  ? { relation?: undefined }
-  : { relation: Relation });
-
-type BuilderMap = {
-  [K in ConditionTypeValue]?: (ctx: BuildContext<K>) => ConditionQuery;
-};
 
 // ───────────────────────────────────────────────────────────────────────────
 // Query
 // ───────────────────────────────────────────────────────────────────────────
-// Union type representing all possible condition query structures
 type ConditionLeaf =
   | SignificanceLeaf
   | FrequencyLeaf
@@ -139,15 +123,6 @@ type PredictionLeaf = {
 
 type PredictionQueryLocal = PredictionLeaf | { or: PredictionLeaf[] };
 
-interface PredictionChangeDetail {
-  dataset: PredictionKey;
-  values: [number, number];
-  inequalitySigns: [Inequality, Inequality];
-  unassignedChecks?: string[];
-  includeUnassigned?: boolean;
-  includeUnknown?: boolean;
-}
-
 // ───────────────────────────────────────────────────────────────────────────
 // ID Query
 // ───────────────────────────────────────────────────────────────────────────
@@ -170,7 +145,7 @@ type DefaultLeaf =
   | { type: { relation: Relation; terms: string[] } };
 
 // ───────────────────────────────────────────────────────────────────────────
-//
+// Shared Utilities
 // ───────────────────────────────────────────────────────────────────────────
 type ScoreRange =
   // pairs
@@ -185,44 +160,3 @@ type ScoreRange =
   | { lt: number; gte?: never; gt?: never; lte?: never };
 
 type Inequality = 'gt' | 'gte' | 'lt' | 'lte';
-// ───────────────────────────────────────────────────────────────────────────
-//
-// ───────────────────────────────────────────────────────────────────────────
-/** Command identifiers handled by the toolbar. */
-type Command = 'add-condition' | 'group' | 'ungroup' | 'delete';
-
-type CommandDef = Readonly<{
-  command: Command;
-  label: string;
-  // TODO: Key codes (display only). Currently informational; no keybindings here.
-  shortcut: number[];
-}>;
-
-/** Logical operator used to combine child conditions. */
-type LogicalOperator = 'and' | 'or';
-
-/** Minimal interface all editors must satisfy. */
-interface ConditionValueEditor {
-  keepLastValues(): void; // Capture current state when editing begins
-  restore(): void; // Restore captured state when user cancels
-  readonly isValid: boolean; // Whether this editor currently has a valid value
-  applyOptions(options: unknown): void; // Apply initial options (e.g., from karyotype selection)
-}
-
-/** Constructor signature for editor classes. */
-type EditorCtor = new (
-  host: ConditionValues,
-  view: ConditionItemView
-) => ConditionValueEditor;
-
-// ───────────────────────────────────────────────────────────────────────────
-//
-// ───────────────────────────────────────────────────────────────────────────
-type EditorSectionClassName =
-  | 'columns-editor-view' // dataset, consequence, genotype
-  | 'frequency-count-editor-view' // dataset, genotype
-  | 'clinical-significance-view' // significance
-  | 'text-field-editor-view' // disease, gene, variant id
-  | 'location-editor-view' // location
-  | 'pathogenicity-editor-view' // pathogenicity
-  | 'checkboxes-editor-view'; // variant type
