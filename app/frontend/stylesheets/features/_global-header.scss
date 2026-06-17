@@ -197,3 +197,85 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
 }
 
 /* stylelint-enable no-descending-specificity */
+
+
+// ナビゲーションメニューボタン (.menu-button)
+// グローバルヘッダーの li 要素に適用するピル形状のボタン
+// .-current で選択状態のボーダーとカラーを表示する
+.menu-button {
+  display: inline-block;
+  height: $HEIGHT_NAVIGATION_ITEM;
+  line-height: $HEIGHT_NAVIGATION_ITEM;
+  border-radius: $HEIGHT_NAVIGATION_ITEM * 0.5;
+  padding: 0 8px;
+
+  &.-current {
+    border: solid 1px $COLOR_KEY_DARK1;
+    color: $COLOR_KEY_DARK1;
+  }
+
+  &:hover {
+    color: $COLOR_KEY_DARK1;
+  }
+}
+
+
+// 言語切り替えスイッチ (.languageswitcher)
+// EN/JA の2択をピルボタン形式で表示する。選択中の言語は背景色とボーダーで強調される。
+// グローバルヘッダー内の li.menu-button.languageswitcher に配置して使用する。
+.languageswitcher {
+  display: flex;
+
+  &::before {
+    content: '';
+    position: relative;
+    left: 25px;
+    width: 1px;
+    border-right: 1px solid $COLOR_KEY_DARK2;
+  }
+
+  &.en {
+    a.en {
+      background-color: $COLOR_KEY_DARK1_30;
+      color: $COLOR_KEY_DARK2;
+      border: 1px solid $COLOR_KEY_DARK2;
+      border-right: none;
+    }
+    a.ja {
+      color: $COLOR_GRAY;
+      border: 1px solid $COLOR_GRAY;
+      border-left: none;
+    }
+  }
+
+  &.ja {
+    a.ja {
+      background-color: $COLOR_KEY_DARK1_30;
+      color: $COLOR_KEY_DARK2;
+      border: 1px solid $COLOR_KEY_DARK2;
+      border-left: none;
+    }
+    a.en {
+      color: $COLOR_GRAY;
+      border: 1px solid $COLOR_GRAY;
+      border-right: none;
+    }
+  }
+
+  a {
+    line-height: 1.5;
+    text-align: center;
+    font-size: 12px;
+    width: 24px;
+    text-decoration: none;
+
+    &.en {
+      border-radius: 20px 0 0 20px;
+      border-right: 1px solid $COLOR_KEY_DARK2;
+    }
+
+    &.ja {
+      border-radius: 0 20px 20px 0;
+    }
+  }
+}

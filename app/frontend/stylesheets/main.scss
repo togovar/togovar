@@ -6,28 +6,23 @@
 @import 'layout/layout';
 
 // 汎用UIコンポーネント — 特定画面に依存しない再利用可能なパーツ
-@import 'object/component/above-headline';
 @import 'object/component/button-view';
 @import 'object/component/collapse-view';
-@import 'object/component/common-document';
-@import 'object/component/css-sprite';
-@import 'object/component/drawer-view';
+@import 'object/component/variant-icon';
 @import 'object/component/dropdown-view';
 @import 'object/component/floating-info';
 @import 'object/component/form-parts';
 @import 'object/component/logical-operator-switch';
-@import 'object/component/menu-button';
 @import 'object/component/module-tabs-view';
 @import 'object/component/page-index';
 @import 'object/component/panel-view';
 @import 'object/component/question-answer';
 @import 'object/component/range-slider';
 @import 'object/component/right-headline';
-@import 'object/component/selection-area';
-@import 'object/component/toggle-switcher';
 
 // 画面別スタイル — 各機能ページ固有のコンポーネントをまとめたもの
 @import 'features/activity-indicator';
+@import 'features/document';
 @import 'features/advanced-search';
 @import 'features/detail';
 @import 'features/detail-header';

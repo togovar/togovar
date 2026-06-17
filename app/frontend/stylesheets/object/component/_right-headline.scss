@@ -12,7 +12,7 @@
         text-align: right;
         padding-right: 0.5em;
 
-        @extend .panel-view-heading;
+        @extend %panel-view-heading;
 
         &:after {
           content: ":";

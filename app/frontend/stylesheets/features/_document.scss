@@ -1,3 +1,10 @@
+// =============================================================================
+// 静的ドキュメントページ (About・Help・FAQ など)
+// 統合元: object/component/_common-document.scss
+// =============================================================================
+
+// content-width: コンテンツ幅を $WIDTH_MIN に揃えて中央揃えにするミックスイン
+// 画面幅が広くてもコンテンツが広がりすぎないよう制限する
 @mixin content-width {
   margin: 0 auto;
   width: $WIDTH_MIN - $PADDING_SIDE - $PADDING_SIDE;
@@ -5,6 +12,8 @@
   padding-right: $PADDING_SIDE;
 }
 
+// ドキュメントページ共通レイアウト (.common-document)
+// About・Policy・Help などの静的コンテンツページのルートコンテナ
 .common-document {
   > .header {
     background: $GRADIENT_HEADING;
@@ -38,6 +47,7 @@
         padding-bottom: 60px;
         position: relative;
 
+        // 最後のセクション下部にアクセントカラーの区切り線を引く
         &:after {
           content: "";
           display: block;
@@ -70,7 +80,6 @@
         width: 100%;
         font-size: 14px;
         line-height: 1.2;
-
         // tr の border-bottom を有効にするために必要（separate モデルでは tr の border は無視される）
         border-collapse: collapse;
 
@@ -136,6 +145,7 @@
           position: relative;
           padding: 4px 0 4px 2em;
 
+          // カウンターを丸バッジとして表示する
           &:before {
             content: counters(item, ".") " ";
             counter-increment: item;
@@ -185,6 +195,7 @@
       }
     }
 
+    // 2段組レイアウト — About などの説明文ページで使用
     &.-two-columns {
       > .section {
         column-count: 2;
@@ -207,6 +218,7 @@
     }
   }
 
+  // ドキュメントページ内に埋め込まれた結果テーブルはホバーハイライトを無効化する
   .results-view {
     > tbody {
       > tr {
