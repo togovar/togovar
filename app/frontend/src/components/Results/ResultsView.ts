@@ -1,5 +1,6 @@
 import { storeManager } from '../../store/StoreManager';
 import { getOrderedColumns } from '../../columns';
+import { TR_HEIGHT } from '../../global';
 import { ResultsScrollBar } from './ResultsScrollBar';
 import { ResultsColumnsDropdown } from './ResultsColumnsDropdown';
 import { keyDownEvent } from '../../utils/keyDownEvent';
@@ -22,209 +23,126 @@ const SELECTORS = {
   COLUMNS_DROPDOWN: '.columns-dropdown',
 } as const;
 
-
 /**
- * 検索結果テーブルビューを管理するクラス
- * - 行の描画、スクロール、タッチ操作、列管理を統合制御
- * - store の変更を監視し、自動的に UI を更新
+ * 検索結果テーブルビューを管理するクラス。
+ * 行の描画・スクロール・タッチ操作・列管理を統合制御し、
+ * Store の変更を監視して自動的に UI を更新する。
  */
 export class ResultsView {
-  /** ルート要素 */
   private elm: HTMLElement;
-  /** タッチ操作ハンドラー */
   private touchHandler!: ResultsViewTouchHandler;
-  /** スクロールバーコンポーネント */
   private scrollBar!: ResultsScrollBar;
-  /** テーブルデータと描画管理 */
   private dataManager!: ResultsViewDataManager;
-  /** テーブルヘッダー要素 */
   private thead!: HTMLElement;
-  /** テーブルボディ要素 */
   private tbody!: HTMLElement;
-  /** テーブルコンテナ要素 */
   private tablecontainer!: HTMLElement;
-  /** 列管理ドロップダウンコンポーネント */
   private columnsDropdown!: ResultsColumnsDropdown;
-  /** バインドされたキーボードイベントハンドラー */
-  private _boundKeydownHandler!: (_e: KeyboardEvent) => void;
-  /** バインドされたホイールイベントハンドラー */
-  private _boundWheelHandler!: EventListener;
-  /** ブラウザに応じたホイールイベント名 */
-  private _wheelEventName = '';
-  /** バインドされた検索モード変更ハンドラー */
-  private _boundSearchModeHandler!: (_newMode: unknown) => void;
-  /** 動的に作成した列表示制御用スタイル要素 */
-  private _stylesheet!: HTMLStyleElement;
   private columnAutoSizer!: ResultsColumnAutoSizer;
   private columnResizeController!: ResultsColumnResizeController;
-  private _resizeObserver: ResizeObserver | null = null;
-  private _mutationObserver: MutationObserver | null = null;
-  private _resizeFrameId: number | null = null;
-  private _boundResizeFallbackHandler: (() => void) | null = null;
+  private stylesheet!: HTMLStyleElement;
 
-  /** unsubscribeで同一参照が必要なため、束縛済みコールバックをフィールドに保持する。 */
-  private _onSearchStatus = (v: StoreState['searchStatus']) => { if (v) this.searchStatus(v); };
-  private _onSearchResults = (v: StoreState['searchResults']) => this.searchResults(v);
-  private _onColumns = (v: StoreState['columns']) => this.columns(v);
-  private _onOffset = (v: StoreState['offset']) => this.offset(v);
-  private _onKaryotype = (v: StoreState['karyotype']) => this.karyotype(v);
-  private _onSearchMessages = (v: StoreState['searchMessages']) => this.searchMessages(v ?? {});
+  private boundKeydownHandler!: (_e: KeyboardEvent) => void;
+  private boundWheelHandler!: EventListener;
+  private boundSearchModeHandler!: (_newMode: unknown) => void;
+  private boundResizeFallbackHandler: (() => void) | null = null;
+  private wheelEventName = '';
+  private resizeObserver: ResizeObserver | null = null;
+  private mutationObserver: MutationObserver | null = null;
+  private resizeFrameId: number | null = null;
 
-  /**
-   * ResultsView のコンストラクタ
-   * - DOM 要素を初期化
-   * - store バインドを設定
-   * - 各コンポーネント（スクロールバー、タッチハンドラー、データマネージャー）を初期化
-   * @param elm 検索結果表示用のルート要素
-   */
+  // unsubscribe で同一参照が必要なため、束縛済みコールバックをフィールドに保持する
+  private onSearchStatus = (v: StoreState['searchStatus']) => { if (v) this.searchStatus(v); };
+  private onSearchResults = (v: StoreState['searchResults']) => this.searchResults(v);
+  private onColumns = (v: StoreState['columns']) => this.columns(v);
+  private onOffset = (v: StoreState['offset']) => this.offset(v);
+  private onKaryotype = (v: StoreState['karyotype']) => this.karyotype(v);
+  private onSearchMessages = (v: StoreState['searchMessages']) => this.searchMessages(v ?? {});
+
   constructor(elm: HTMLElement) {
     this.elm = elm;
 
-    // DOM 要素の取得
     const { status, messages, thead, tbody, tablecontainer, columnsDropdown } =
-      this._getDOMElements();
+      this.getDOMElements();
     this.thead = thead;
     this.tbody = tbody;
     this.tablecontainer = tablecontainer;
 
-    // Store マネージャーへのバインド（変更監視）
-    this._connectToStoreManager();
+    this.connectToStoreManager();
+    this.configureScrollBar();
+    this.initializeTableHeader(thead, storeManager.getData('columns'));
+    this.stylesheet = this.createStylesheet();
 
-    // UI コンポーネントの初期化
-    this._configureScrollBar();
-    this._initializeTableHeader(thead, storeManager.getData('columns'));
-    this._stylesheet = this._createStylesheet();
-
-    // イベントハンドラー・コンポーネントの初期化
-    this._initializeComponentHandlers(status, messages, this._stylesheet);
+    this.initializeComponentHandlers(status, messages, this.stylesheet);
     this.columnsDropdown = new ResultsColumnsDropdown(columnsDropdown);
 
-    // 初期表示設定
-    this._configureInitialState();
-
-    // Search mode リスナー初期化
-    this._initializeSearchModeListener();
-
-    // 表示領域の変化に追従して仮想行数を再計算
-    this._observeDisplaySize();
+    this.configureInitialState();
+    this.initializeSearchModeListener();
+    this.observeDisplaySize();
   }
 
-  // ========================================
+  // ================================================================
   // Public Methods
-  // ========================================
+  // ================================================================
 
-  /**
-   * インスタンスをクリーンアップ
-   * - 全スコープのイベントリスナー・バインディングを削除
-   * - 子コンポーネント（ScrollBar、TouchHandler、DataManager、ColumnsDropdown）を破棄
-   * - メモリリーク防止のため、ResultsView 削除時は必ず呼び出す
-   */
+  /** 全イベントリスナーと子コンポーネントを破棄してメモリリークを防ぐ。 */
   destroy(): void {
-    // ScrollBar コンポーネントの破棄
-    if (this.scrollBar) {
-      this.scrollBar.destroy();
+    this.scrollBar?.destroy();
+    this.touchHandler?.destroy();
+    this.dataManager?.destroy();
+    this.columnsDropdown?.destroy();
+    this.columnResizeController?.destroy();
+    this.columnAutoSizer?.destroy();
+
+    storeManager.unsubscribe('searchStatus', this.onSearchStatus);
+    storeManager.unsubscribe('searchResults', this.onSearchResults);
+    storeManager.unsubscribe('columns', this.onColumns);
+    storeManager.unsubscribe('offset', this.onOffset);
+    storeManager.unsubscribe('karyotype', this.onKaryotype);
+    storeManager.unsubscribe('searchMessages', this.onSearchMessages);
+    storeManager.unsubscribe('searchMode', this.boundSearchModeHandler);
+
+    document.removeEventListener('keydown', this.boundKeydownHandler);
+
+    if (this.wheelEventName && this.boundWheelHandler) {
+      this.tbody.removeEventListener(this.wheelEventName, this.boundWheelHandler);
     }
 
-    // Clean up TouchHandler component
-    if (this.touchHandler) {
-      this.touchHandler.destroy();
-    }
+    this.stylesheet?.remove();
 
-    // Clean up DataManager component
-    if (this.dataManager) {
-      this.dataManager.destroy();
+    this.resizeObserver?.disconnect();
+    this.mutationObserver?.disconnect();
+    if (this.boundResizeFallbackHandler) {
+      window.removeEventListener('resize', this.boundResizeFallbackHandler);
     }
-
-    if (this.columnsDropdown) {
-      this.columnsDropdown.destroy();
+    if (this.resizeFrameId !== null) {
+      cancelAnimationFrame(this.resizeFrameId);
     }
-
-    if (this.columnResizeController) {
-      this.columnResizeController.destroy();
-    }
-
-    if (this.columnAutoSizer) {
-      this.columnAutoSizer.destroy();
-    }
-
-    storeManager.unsubscribe('searchStatus', this._onSearchStatus);
-    storeManager.unsubscribe('searchResults', this._onSearchResults);
-    storeManager.unsubscribe('columns', this._onColumns);
-    storeManager.unsubscribe('offset', this._onOffset);
-    storeManager.unsubscribe('karyotype', this._onKaryotype);
-    storeManager.unsubscribe('searchMessages', this._onSearchMessages);
-    storeManager.unsubscribe('searchMode', this._boundSearchModeHandler);
-
-    // Remove keydown event listener
-    document.removeEventListener('keydown', this._boundKeydownHandler);
-
-    if (this._wheelEventName && this._boundWheelHandler) {
-      this.tbody.removeEventListener(
-        this._wheelEventName,
-        this._boundWheelHandler
-      );
-    }
-
-    if (this._stylesheet) {
-      this._stylesheet.remove();
-    }
-
-    this._resizeObserver?.disconnect();
-    this._mutationObserver?.disconnect();
-    if (this._boundResizeFallbackHandler) {
-      window.removeEventListener('resize', this._boundResizeFallbackHandler);
-    }
-    if (this._resizeFrameId !== null) {
-      cancelAnimationFrame(this._resizeFrameId);
-    }
-    this._resizeObserver = null;
-    this._mutationObserver = null;
-    this._resizeFrameId = null;
-    this._boundResizeFallbackHandler = null;
+    this.resizeObserver = null;
+    this.mutationObserver = null;
+    this.resizeFrameId = null;
+    this.boundResizeFallbackHandler = null;
   }
 
-  /**
-   * テーブルスクロール位置（オフセット）を更新
-   * - store から呼ばれるコールバック
-   * - DataManager に処理を委譲
-   * @param offset 新しいオフセット値
-   */
+  /** Store の offset 変化を受けて DataManager へ委譲する。 */
   offset(offset: number): void {
     this.dataManager.handleOffsetChange(offset);
   }
 
-  /**
-   * 検索メッセージを表示更新
-   * - store から呼ばれるコールバック
-   * - DataManager に処理を委譲
-   * @param messages メッセージオブジェクト
-   */
+  /** Store の searchMessages 変化を受けて DataManager へ委譲する。 */
   searchMessages(messages: SearchMessages): void {
     this.dataManager.handleSearchMessages(messages);
   }
 
-  /**
-   * 検索ステータスを表示更新
-   * - store から呼ばれるコールバック
-   * - DataManager に処理を委譲
-   * @param status ステータスオブジェクト
-   */
+  /** Store の searchStatus 変化を受けて DataManager へ委譲する。 */
   searchStatus(status: SearchStatus): void {
     this.dataManager.handleSearchStatus(status);
   }
 
-  /**
-   * 検索結果テーブルを描画更新
-   * - store から呼ばれるコールバック
-   * - DataManager に処理を委譲
-   * - タッチデバイス判定を含める
-   * @param results 検索結果
-   */
+  /** Store の searchResults 変化を受けてテーブル行を再描画する。 */
   searchResults(results: unknown): void {
     if (!Array.isArray(results) || results.length === 0) {
       this.columnAutoSizer.resetSignature();
     }
-
     this.dataManager.handleSearchResults(
       results,
       isTouchDevice(),
@@ -232,23 +150,14 @@ export class ResultsView {
     );
   }
 
-  /**
-   * テーブルヘッダー（列）を再構成
-   * - store から呼ばれるコールバック
-   * - 列の表示/非表示、順序変更に対応
-   * - ヘッダーと本体の行セルを同期
-   * @param columns 列設定配列
-   */
+  /** Store の columns 変化を受けてヘッダーを再構築し表示サイズを再計算する。 */
   columns(columns: ColumnConfig[]): void {
-    this._initializeTableHeader(this.thead, columns);
+    this.initializeTableHeader(this.thead, columns);
     this.dataManager.handleColumnsChange(columns);
     this.updateDisplaySize();
   }
 
-  /**
-   * テーブル表示サイズを更新（外部からの呼び出し用）
-   * - ウィンドウリサイズ時など
-   */
+  /** 表示サイズを再計算する（ウィンドウリサイズなど外部からの呼び出し用）。 */
   updateDisplaySize(): void {
     this.dataManager.updateDisplaySize(
       isTouchDevice(),
@@ -256,62 +165,41 @@ export class ResultsView {
     );
   }
 
-  /**
-   * 核型変更時の処理
-   * - store から呼ばれるコールバック
-   * - 表示サイズ再計算をトリガー
-   * @param _karyotype 核型データ（_prefix は使用しないことを示す）
-   */
+  /** Store の karyotype 変化を受けて表示サイズを再計算する。 */
   karyotype(_karyotype: unknown): void {
     this.updateDisplaySize();
   }
 
-  // ========================================
+  // ================================================================
   // Private Methods
-  // ========================================
+  // ================================================================
 
-  /**
-   * 必要な DOM 要素を取得
-   * - ヘッダー・ステータス・メッセージ・テーブル・列ドロップダウン
-   * @returns DOM 要素オブジェクト
-   */
-  private _getDOMElements() {
-    const status = this.elm.querySelector(SELECTORS.STATUS) as HTMLElement;
-    const messages = this.elm.querySelector(SELECTORS.MESSAGES) as HTMLElement;
-    const thead = this.elm.querySelector(SELECTORS.TABLE_THEAD) as HTMLElement;
-    const tbody = this.elm.querySelector(SELECTORS.TABLE_TBODY) as HTMLElement;
-    const tablecontainer = this.elm.querySelector(
-      SELECTORS.TABLE_CONTAINER
-    ) as HTMLElement;
-    const columnsDropdown = this.elm.querySelector(
-      SELECTORS.COLUMNS_DROPDOWN
-    ) as HTMLElement;
-
-    return { status, messages, thead, tbody, tablecontainer, columnsDropdown };
+  /** 必要な DOM 要素をまとめて取得する。 */
+  private getDOMElements() {
+    return {
+      status: this.elm.querySelector(SELECTORS.STATUS) as HTMLElement,
+      messages: this.elm.querySelector(SELECTORS.MESSAGES) as HTMLElement,
+      thead: this.elm.querySelector(SELECTORS.TABLE_THEAD) as HTMLElement,
+      tbody: this.elm.querySelector(SELECTORS.TABLE_TBODY) as HTMLElement,
+      tablecontainer: this.elm.querySelector(SELECTORS.TABLE_CONTAINER) as HTMLElement,
+      columnsDropdown: this.elm.querySelector(SELECTORS.COLUMNS_DROPDOWN) as HTMLElement,
+    };
   }
 
-  /**
-   * ストアマネージャーに接続
-   * - 全ての store バインディングを設定
-   * - キーボードイベントリスナーを登録
-   */
-  private _connectToStoreManager(): void {
-    storeManager.subscribe('searchStatus', this._onSearchStatus);
-    storeManager.subscribe('searchResults', this._onSearchResults);
-    storeManager.subscribe('columns', this._onColumns);
-    storeManager.subscribe('offset', this._onOffset);
-    storeManager.subscribe('karyotype', this._onKaryotype);
-    storeManager.subscribe('searchMessages', this._onSearchMessages);
-    this._boundKeydownHandler = this._keydown.bind(this);
-    document.addEventListener('keydown', this._boundKeydownHandler);
+  /** Store へ購読登録してキーボードイベントリスナーを設定する。 */
+  private connectToStoreManager(): void {
+    storeManager.subscribe('searchStatus', this.onSearchStatus);
+    storeManager.subscribe('searchResults', this.onSearchResults);
+    storeManager.subscribe('columns', this.onColumns);
+    storeManager.subscribe('offset', this.onOffset);
+    storeManager.subscribe('karyotype', this.onKaryotype);
+    storeManager.subscribe('searchMessages', this.onSearchMessages);
+    this.boundKeydownHandler = this.keydown.bind(this);
+    document.addEventListener('keydown', this.boundKeydownHandler);
   }
 
-  /**
-   * スクロールバーコンポーネントを設定
-   * - テーブルコンテナの直後に scroll-bar 要素を挿入
-   * - ResultsScrollBar インスタンスを初期化
-   */
-  private _configureScrollBar(): void {
+  /** テーブルコンテナの直後に scroll-bar 要素を挿入して ResultsScrollBar を初期化する。 */
+  private configureScrollBar(): void {
     this.elm
       .querySelector(SELECTORS.TABLE_CONTAINER)!
       .insertAdjacentHTML('afterend', '<div class="scroll-bar"></div>');
@@ -321,70 +209,40 @@ export class ResultsView {
   }
 
   /**
-   * テーブルヘッダーを描画
-   * - store.columns を表示順に並べ替え
-   * - 各列ごとに th 要素を生成
-   * - tooltip ID を設定（アクセシビリティ対応）
-   * @param thead テーブルヘッダー要素
-   * @param columns 列設定配列
+   * テーブルヘッダーを描画する。
+   * 列の順序・リサイズバーの有無が変わっていない場合は再描画をスキップする。
    */
-  private _initializeTableHeader(
-    thead: HTMLElement,
-    columns: ColumnConfig[]
-  ): void {
+  private initializeTableHeader(thead: HTMLElement, columns: ColumnConfig[]): void {
     const orderedColumns = getOrderedColumns(columns);
     const currentColumnIds = Array.from(thead.querySelectorAll('th')).map(
-      (th) =>
-        orderedColumns.find((column) => th.classList.contains(column.id))?.id
+      (th) => orderedColumns.find((col) => th.classList.contains(col.id))?.id
     );
-    const nextColumnIds = orderedColumns.map((column) => column.id);
-    const resizeBarCount = orderedColumns.filter(
-      (column) => column.resizable !== false
-    ).length;
-    const hasResizeBars =
-      thead.querySelectorAll('.resize-bar').length === resizeBarCount;
+    const nextColumnIds = orderedColumns.map((col) => col.id);
+    const resizeBarCount = orderedColumns.filter((col) => col.resizable !== false).length;
+    const hasResizeBars = thead.querySelectorAll('.resize-bar').length === resizeBarCount;
 
-    if (
-      hasResizeBars &&
-      currentColumnIds.join(',') === nextColumnIds.join(',')
-    ) {
-      return;
-    }
+    if (hasResizeBars && currentColumnIds.join(',') === nextColumnIds.join(',')) return;
 
     thead.innerHTML = `<tr>${orderedColumns
       .map(
-        (column) =>
-          `<th class="${column.id}" data-column-id="${column.id}">` +
-          `<span data-tooltip-id="table-header-${column.id}">${column.label}</span>` +
-          (column.resizable === false
-            ? ''
-            : '<div class="resize-bar" aria-hidden="true"></div>') +
+        (col) =>
+          `<th class="${col.id}" data-column-id="${col.id}">` +
+          `<span data-tooltip-id="table-header-${col.id}">${col.label}</span>` +
+          (col.resizable === false ? '' : '<div class="resize-bar" aria-hidden="true"></div>') +
           '</th>'
       )
       .join('')}</tr>`;
   }
 
-  /**
-   * スタイルシートを作成
-   * - 動的に生成される CSS を head に追加
-   * @returns 作成されたスタイルシート要素
-   */
-  private _createStylesheet(): HTMLStyleElement {
+  /** 列表示制御用のスタイル要素を head に追加して返す。 */
+  private createStylesheet(): HTMLStyleElement {
     const stylesheet = document.createElement('style');
     document.getElementsByTagName('head')[0].appendChild(stylesheet);
     return stylesheet;
   }
 
-  /**
-   * コンポーネントハンドラーを初期化
-   * - タッチイベント処理（ResultsViewTouchHandler）
-   * - データ管理・行描画（ResultsViewDataManager）
-   * - 各ハンドラーを store バインディングに登録
-   * @param status ステータス表示要素
-   * @param messages メッセージ表示要素
-   * @param stylesheet 動的 CSS シートの参照
-   */
-  private _initializeComponentHandlers(
+  /** タッチハンドラー・DataManager を初期化してイベントを設定する。 */
+  private initializeComponentHandlers(
     status: HTMLElement,
     messages: HTMLElement,
     stylesheet: HTMLStyleElement
@@ -401,30 +259,18 @@ export class ResultsView {
       this.tbody,
       stylesheet
     );
-
-    // イベントハンドラー設定
-    this._configureEventHandlers();
+    this.configureEventHandlers();
   }
 
-  /**
-   * 初期表示状態を設定
-   * - 列設定を DataManager に反映
-   * - タッチデバイス判定で pointer-events を初期化
-   */
-  private _configureInitialState(): void {
-    // DataManager に初期列設定を通知
+  /** DataManager に初期列設定を通知し、デバイス種別に応じて pointer-events を設定する。 */
+  private configureInitialState(): void {
     this.dataManager.handleColumnsChange(storeManager.getData('columns'));
-
-    // PC では pointer-events を有効化、タッチデバイスは後で有効化
     this.touchHandler.setElementsInteractable(!isTouchDevice());
   }
 
   /**
-   * ブラウザで利用可能なホイールイベント名を取得
-   * - 標準：wheel
-   * - IE/古いブラウザ：mousewheel
-   * - Firefox 3.5 以前：DOMMouseScroll
-   * @returns イベント名
+   * ブラウザで利用可能なホイールイベント名を返す。
+   * 標準は 'wheel'、古い IE/Firefox は 'mousewheel'/'DOMMouseScroll'。
    */
   private getWheelEventName(): string {
     return 'onwheel' in document
@@ -434,17 +280,11 @@ export class ResultsView {
         : 'DOMMouseScroll';
   }
 
-  /**
-   * イベントハンドラーを設定
-   * - ホイールスクロール処理（PC）
-   * - タッチスクロール処理（モバイル）
-   * - スクロールバーのコールバック設定
-   */
-  private _configureEventHandlers(): void {
-    // PC 用ホイールイベント
-    this._wheelEventName = this.getWheelEventName();
-    this._boundWheelHandler = this._scroll.bind(this) as EventListener;
-    this.tbody.addEventListener(this._wheelEventName, this._boundWheelHandler);
+  /** ホイール・タッチ・列リサイズの各イベントハンドラーを設定する。 */
+  private configureEventHandlers(): void {
+    this.wheelEventName = this.getWheelEventName();
+    this.boundWheelHandler = this.scroll.bind(this) as EventListener;
+    this.tbody.addEventListener(this.wheelEventName, this.boundWheelHandler);
 
     this.columnAutoSizer = new ResultsColumnAutoSizer(this.tbody);
     this.columnResizeController = new ResultsColumnResizeController({
@@ -452,19 +292,18 @@ export class ResultsView {
       tbody: this.tbody,
       tablecontainer: this.tablecontainer,
       autoSizer: this.columnAutoSizer,
-      previewColumns: (columns) => {
-        this.dataManager.handleColumnsChange(columns);
-      },
+      previewColumns: (columns) => this.dataManager.handleColumnsChange(columns),
     });
 
-    // タッチハンドラーのスクロールコールバック設定
+    // タッチ開始時の offset を固定することで、スワイプ中の誤差積み上がりを防ぐ
+    let touchStartOffset = 0;
     this.touchHandler.setScrollCallbacks({
       onScrollStart: () => {
+        touchStartOffset = storeManager.getData('offset') || 0;
         this.scrollBar.setActive();
       },
       onScroll: (deltaY) => {
-        const currentOffset = storeManager.getData('offset') || 0;
-        this.scrollBar.handleScrollWithFeedback(deltaY, currentOffset);
+        this.scrollBar.handleScrollWithFeedback(deltaY, touchStartOffset);
       },
       onScrollEnd: () => {
         this.scrollBar.setInactive();
@@ -473,91 +312,73 @@ export class ResultsView {
   }
 
   /**
-   * ホイールスクロールイベント処理
-   * - テーブルのスクロール位置を更新
-   * - スクロールバーのビジュアルフィードバック
-   * @param e ホイールイベント
+   * ホイールスクロールを処理する。
+   * deltaMode を正規化して Firefox（ライン単位）やページ単位にも対応する。
    */
-  private _scroll(e: WheelEvent): void {
+  private scroll(e: WheelEvent): void {
     e.stopPropagation();
-    // 垂直スクロール以外は処理しない
     if (e.deltaY === 0) return;
 
-    this.scrollBar.handleScroll(e.deltaY);
+    let delta = e.deltaY;
+    if (e.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+      delta = e.deltaY * TR_HEIGHT;
+    } else if (e.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+      delta = e.deltaY * storeManager.getData('rowCount') * TR_HEIGHT;
+    }
+
+    this.scrollBar.handleScroll(delta);
   }
 
-  /**
-   * キーボード入力処理
-   * - 矢印キー（上下）：行選択の移動
-   * - Escape：選択解除
-   * @param e キーボードイベント
-   */
-  private _keydown(e: KeyboardEvent): void {
+  /** 矢印キーで行選択を移動し、Escape で選択解除する。 */
+  private keydown(e: KeyboardEvent): void {
     if (storeManager.getData('selectedRow') === undefined) return;
+    if (!keyDownEvent('selectedRow')) return;
 
-    if (keyDownEvent('selectedRow')) {
-      switch (e.key) {
-        case 'ArrowUp': // ↑ キー
-          this.dataManager.shiftSelectedRow(-1);
-          break;
-        case 'ArrowDown': // ↓ キー
-          this.dataManager.shiftSelectedRow(1);
-          break;
-        case 'Escape': // 選択を解除
-          storeManager.setData('selectedRow', undefined);
-          break;
-      }
+    switch (e.key) {
+      case 'ArrowUp':
+        this.dataManager.shiftSelectedRow(-1);
+        break;
+      case 'ArrowDown':
+        this.dataManager.shiftSelectedRow(1);
+        break;
+      case 'Escape':
+        storeManager.setData('selectedRow', undefined);
+        break;
     }
   }
 
-  /**
-   * 検索モード変更リスナーを初期化
-   * - 検索モード切り替え時にスクロール位置をリセット
-   */
-  private _initializeSearchModeListener(): void {
-    this._boundSearchModeHandler = (_newMode) => {
-      // 検索モード変更時にスクロール位置をリセット
-      this.scrollBar.resetScrollPosition();
-    };
-    storeManager.subscribe('searchMode', this._boundSearchModeHandler);
+  /** 検索モード切り替え時にスクロール位置をリセットするリスナーを登録する。 */
+  private initializeSearchModeListener(): void {
+    this.boundSearchModeHandler = () => this.scrollBar.resetScrollPosition();
+    storeManager.subscribe('searchMode', this.boundSearchModeHandler);
   }
 
   /**
-   * ResultsViewの高さはCSS flexで決まるため、自身の実寸変化を監視して行数だけJSで再計算する。
+   * ResultsView の高さは CSS flex で決まるため、
+   * 自身の実寸変化を監視して仮想行数だけを JS で再計算する。
    */
-  private _observeDisplaySize(): void {
+  private observeDisplaySize(): void {
     if (typeof ResizeObserver === 'undefined') {
-      this._boundResizeFallbackHandler = () => {
-        this._scheduleDisplaySizeUpdate();
-      };
-      window.addEventListener('resize', this._boundResizeFallbackHandler);
-      // ResizeObserver 非対応時の追加フォールバック:
-      // タブ切替・Drawer 開閉など「ウィンドウサイズが変わらないレイアウト変化」は
-      // window.resize では検出できないため、body の class / data-search-mode 変化を監視する。
-      this._mutationObserver = new MutationObserver(() => {
-        this._scheduleDisplaySizeUpdate();
-      });
-      this._mutationObserver.observe(document.body, {
+      this.boundResizeFallbackHandler = () => this.scheduleDisplaySizeUpdate();
+      window.addEventListener('resize', this.boundResizeFallbackHandler);
+      // タブ切替・Drawer 開閉など window.resize では検出できないレイアウト変化にも対応する
+      this.mutationObserver = new MutationObserver(() => this.scheduleDisplaySizeUpdate());
+      this.mutationObserver.observe(document.body, {
         attributes: true,
         attributeFilter: ['class', 'data-search-mode'],
       });
       return;
     }
 
-    this._resizeObserver = new ResizeObserver(() => {
-      this._scheduleDisplaySizeUpdate();
-    });
-    this._resizeObserver.observe(this.elm);
+    this.resizeObserver = new ResizeObserver(() => this.scheduleDisplaySizeUpdate());
+    this.resizeObserver.observe(this.elm);
   }
 
-  /**
-   * ResizeObserverは連続発火しやすいため、行数再計算を次フレームにまとめる。
-   */
-  private _scheduleDisplaySizeUpdate(): void {
-    if (this._resizeFrameId !== null) return;
-
-    this._resizeFrameId = requestAnimationFrame(() => {
-      this._resizeFrameId = null;
+  /** ResizeObserver の連続発火をまとめ、行数再計算を次フレームに遅延する。 */
+  private scheduleDisplaySizeUpdate(): void {
+    if (this.resizeFrameId !== null) return;
+    this.resizeFrameId = requestAnimationFrame(() => {
+      this.resizeFrameId = null;
       this.updateDisplaySize();
     });
   }

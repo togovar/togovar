@@ -181,12 +181,7 @@ export class ResultsScrollBar {
       return;
     }
 
-    const newOffset = calculateTouchBasedRowOffset(
-      deltaY,
-      touchStartOffset,
-      visibleRowCount,
-      totalRecordCount
-    );
+    const newOffset = calculateTouchBasedRowOffset(deltaY, touchStartOffset);
     const boundedOffset = constrainRowOffsetToValidRange(
       newOffset,
       visibleRowCount,
