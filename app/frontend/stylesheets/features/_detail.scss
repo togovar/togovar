@@ -93,14 +93,27 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
       }
     }
 
+    // TODO: .filteredregion と .selectedregion はスタイルが定義されているが、
+    // .-shown クラスを付与したり top/height を更新するJSコードが存在しないため常に非表示。
+    // 未実装の機能か、過去に削除された機能の残骸と思われる。
+    // 実装する場合はChromosomeView.ts側でStoreから位置を受け取る仕組みを追加すること。
+    // 不要であればHTML要素（ChromosomeView.ts）とこのスタイルを合わせて削除すること。
     > .filteredregion {
-      background-color: color-mix(in srgb, var(--color-selected) 40%, transparent);
+      background-color: color-mix(
+        in srgb,
+        var(--color-selected) 40%,
+        transparent
+      );
     }
 
     > .displayregion {
       left: ($CHROM_WIDTH_VIEW - $CHROM_WIDTH_INDICATOR2) * 0.5;
       // 表示範囲はフィルター範囲より細く、別の中央揃え計算が必要
       width: $CHROM_WIDTH_INDICATOR2;
+      // 検索結果全体が染色体上のどこに分布しているかを示す枠。
+      // 結果テーブルのoffset（スクロール位置）変化時に ResultsViewDataManager が
+      // 全レコードのstart位置min〜maxを計算してStoreに書き込み、
+      // ChromosomeView.displayingRegionsOnChromosome() が .-shown を付与して表示する。
       border: solid 1px var(--color-selected);
       border-radius: 2px;
     }
@@ -204,8 +217,13 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
       }
     }
 
+    // TODO: .selectedregion は上記と同様に未実装/残骸のスタイル。上のTODO参照。
     > .selectedregion {
-      background-color: color-mix(in srgb, var(--color-selected) 15%, transparent);
+      background-color: color-mix(
+        in srgb,
+        var(--color-selected) 15%,
+        transparent
+      );
       border-radius: 1px;
     }
   }
@@ -223,6 +241,7 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
     }
 
     > .lower {
+      // TODO: .filteredregion と .selectedregion は未実装/残骸。上のTODO参照。
       > .filteredregion,
       > .displayregion,
       > .selectedregion {
@@ -581,7 +600,8 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
               width: 0;
               height: 0;
               cursor: pointer;
-              border-color: transparent transparent transparent var(--color-black);
+              border-color: transparent transparent transparent
+                var(--color-black);
               border-style: solid;
               border-width: 4px 0 4px 6px;
               opacity: 0.2;

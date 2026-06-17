@@ -53,6 +53,11 @@ export default class ChromosomeView {
     this._map = map;
     this._elm = elm;
 
+    // TODO: .selectedregion と .filteredregion はSCSSにスタイルが定義されているが、
+    // .-shown クラスを付与したり top/height を更新するJSコードが存在しないため常に非表示。
+    // 未実装の機能か、過去に削除された機能の残骸と思われる。
+    // 実装する場合は displayregion と同様にStoreから位置を受け取る仕組みが必要。
+    // 不要であればHTML要素とSCSSの両方を削除すること。
     this._elm.innerHTML = `
       <div class="upper">
         <p class="no">${this._no}</p>
@@ -73,7 +78,11 @@ export default class ChromosomeView {
     // 隣接するサブバンドが同じ主バンドに属する場合は end を延ばして結合する。
     const lowMap = map.reduce<BandEntry[]>((acc, subBand) => {
       if (acc.length === 0 || acc[acc.length - 1].band !== subBand.band) {
-        acc.push({ band: subBand.band, start: subBand.start, end: subBand.end });
+        acc.push({
+          band: subBand.band,
+          start: subBand.start,
+          end: subBand.end,
+        });
       } else {
         acc[acc.length - 1].end = subBand.end;
       }
@@ -97,9 +106,7 @@ export default class ChromosomeView {
     this._subbands = Array.from(
       this._svg.querySelectorAll<SVGGElement>('g.subband')
     );
-    this._bands = Array.from(
-      this._svg.querySelectorAll<SVGGElement>('g.band')
-    );
+    this._bands = Array.from(this._svg.querySelectorAll<SVGGElement>('g.band'));
 
     this._setupEventListeners();
 
@@ -305,6 +312,11 @@ export default class ChromosomeView {
   /**
    * Storeから表示領域が更新されたとき、該当染色体の displayregion の位置・高さを更新する。
    * 全染色体分のデータが来るため、自身の染色体番号(_no)に対応するエントリだけを使う。
+   *
+   * 呼ばれるタイミング: 結果テーブルのoffset（スクロール位置）が変化したとき。
+   * ResultsViewDataManager.handleOffsetChange() が全レコードのstart位置min〜maxを計算し
+   * 'displayingRegionsOnChromosome' としてStoreに書き込むことでこのメソッドが発火する。
+   * つまり displayregion は「検索結果が染色体上のどこに分布しているか」を示す。
    */
   displayingRegionsOnChromosome(displayingRegions: DisplayingRegions): void {
     const region = displayingRegions[this._no];
