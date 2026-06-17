@@ -50,10 +50,10 @@ export function prepareSearchExecution(
   if (hasSearchModeChanged(newSearchMode)) {
     isFirstTime = true;
     clearSearchRequestRanges();
-  } else if (_isSimpleSearchRangeAlreadyRequested(offset, newSearchMode)) {
+  } else if (isSimpleSearchRangeAlreadyRequested(offset, newSearchMode)) {
     return { shouldExecute: false, isFirstTime };
   } else {
-    _registerSimpleSearchRange(offset, newSearchMode);
+    registerSimpleSearchRange(offset, newSearchMode);
   }
 
   searchExecutionState.searchMode = newSearchMode || null;
@@ -143,7 +143,7 @@ function hasSearchModeChanged(nextSearchMode: string): boolean {
 /**
  * simple検索で同じページ範囲がすでに取得済みかを確認する（副作用なし）。
  */
-function _isSimpleSearchRangeAlreadyRequested(
+function isSimpleSearchRangeAlreadyRequested(
   offset: number,
   searchMode: string
 ): boolean {
@@ -154,7 +154,7 @@ function _isSimpleSearchRangeAlreadyRequested(
 /**
  * simple検索のページ範囲を取得済みとして登録する。
  */
-function _registerSimpleSearchRange(offset: number, searchMode: string): void {
+function registerSimpleSearchRange(offset: number, searchMode: string): void {
   if (searchMode !== 'simple') return;
   searchExecutionState.requestedRanges.add(getSimpleSearchRangeKey(offset));
 }
