@@ -62,7 +62,7 @@ export default class PanelViewFilterAlternateAlleleFrequency extends PanelView {
       .querySelector<HTMLElement>('.range-selector-view')!
       .appendChild(rangeSlider);
 
-    storeManager.bind('simpleSearchConditions', this);
+    storeManager.subscribe('simpleSearchConditions', (v) => this.simpleSearchConditions(v));
   }
 
   /**

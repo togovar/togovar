@@ -1,31 +1,11 @@
 import { storeManager } from '../../store/StoreManager';
 import ChromosomeView, { type SubBandEntry } from './ChromosomeView';
 import type { SimpleSearchCurrentConditions } from '../../types/search';
+import type { KaryotypeState } from '../../types';
+import type { ConditionQuery } from '../../types/query';
 
 // csv-loader が TSV をパースして返す形式: 各行が文字列配列
 type TsvRow = string[];
-
-/** 参照ゲノムごとの染色体両端座標 */
-interface ChromosomeRegion {
-  GRCh37: [number, number];
-  GRCh38: [number, number];
-}
-
-/** 各染色体の選択状態と座標範囲 */
-interface ChromosomeConfig {
-  selected: boolean;
-  region: ChromosomeRegion;
-}
-
-/** localStorage と Store で共有するカリオタイプ設定 */
-interface KaryotypeState {
-  isOpened: boolean;
-  isShowBand: boolean;
-  height: number;
-  reference: 'GRCh37' | 'GRCh38';
-  version: number;
-  chromosomes: Record<string, ChromosomeConfig>;
-}
 
 /** 染色体上の位置：単一座標または範囲 */
 interface LocationEntry {
@@ -223,7 +203,7 @@ export default class Karyotype {
   private maxLength: number | undefined;
   private _pendingSimpleSearchConditions: SimpleSearchCurrentConditions | null =
     null;
-  private _pendingAdvancedSearchConditions: unknown = null;
+  private _pendingAdvancedSearchConditions: ConditionQuery | undefined = undefined;
 
   /**
    * DOM 参照・Store バインド・イベント設定を行い、TSV の非同期読み込みを開始する。
@@ -235,10 +215,10 @@ export default class Karyotype {
       '.content > .chromosomes'
     )!;
 
-    storeManager.setData('karyotype', karyotype);
-    storeManager.bind('karyotype', this);
-    storeManager.bind('simpleSearchConditions', this);
-    storeManager.bind('advancedSearchConditions', this);
+    storeManager.setData('karyotype', karyotype ?? undefined);
+    storeManager.subscribe('karyotype', (v) => { if (v) this.karyotype(v); });
+    storeManager.subscribe('simpleSearchConditions', (v) => this.simpleSearchConditions(v));
+    storeManager.subscribe('advancedSearchConditions', (v) => this.advancedSearchConditions(v));
 
     // ヘッダークリックで開閉状態をトグルする
     elm.querySelector<HTMLElement>('.header')!.addEventListener('click', () => {
@@ -277,7 +257,7 @@ export default class Karyotype {
       }
       if (this._pendingAdvancedSearchConditions) {
         this.advancedSearchConditions(this._pendingAdvancedSearchConditions);
-        this._pendingAdvancedSearchConditions = null;
+        this._pendingAdvancedSearchConditions = undefined;
       }
     });
 
@@ -383,7 +363,7 @@ export default class Karyotype {
    * 条件ツリーは OR/AND のネスト構造を持つため、再帰で全ノードを走査する。
    * データ未読込時は保留して、読込完了後に再実行する。
    */
-  advancedSearchConditions(conditions: unknown): void {
+  advancedSearchConditions(conditions: ConditionQuery | undefined): void {
     if (!this.chromosomeViews) {
       this._pendingAdvancedSearchConditions = conditions;
       return;

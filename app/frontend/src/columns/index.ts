@@ -1,4 +1,4 @@
-import type { Column, ColumnConfig } from './types';
+import type { Column, ColumnConfig } from '../types';
 
 const MIN_COLUMN_WIDTH = 48;
 const FIXED_INITIAL_WIDTH_COLUMN_IDS = new Set([

@@ -129,9 +129,9 @@ export type ResultData = {
   external_link: ExternalLink;
   significance: Significance[];
   most_severe_consequence: string;
-  sift: number;
-  polyphen: number;
-  alphamissense: number;
+  sift: number | null;
+  polyphen: number | null;
+  alphamissense: number | null;
   transcripts: Transcript[];
   frequencies: Frequency[];
 };
@@ -223,18 +223,3 @@ export type Frequency = {
 export type TdFrequencies = Record<string, FrequencyElement>;
 export type FrequencyElement = FrequencyBlockElement;
 
-// ============================================
-// Results 表示・処理の型
-// ============================================
-
-/**
- * Results テーブルの行データ型。
- * chromosome と start は必須だが、その他の表示カラムはAPIレスポンスの構造が確定していないため
- * index signatureで受けている。
- * TODO: APIレスポンスの実際のキーを調査して具体的な型に置き換える
- */
-export type ResultsRecord = {
-  chromosome: string;
-  start: number;
-  [key: string]: unknown;
-};

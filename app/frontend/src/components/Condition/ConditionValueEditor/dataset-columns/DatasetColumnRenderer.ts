@@ -1,7 +1,7 @@
 import type { HierarchyNode } from 'd3-hierarchy';
 import { createEl } from '../../../../utils/dom/createEl';
 import { CONDITION_TYPE } from '../../../../definition';
-import { storeManager } from '../../../../store/StoreManager';
+import { fetchLoginStatus } from '../../../../auth/authService';
 import type { UiNode } from './types';
 
 /**
@@ -119,7 +119,7 @@ export class DatasetColumnRenderer {
 
   /** JGAデータセットへのアクセスにログインが必要なことをユーザーへ案内するカラムを追加する。 */
   async addLoginPromptColumn(columnsContainer: HTMLElement): Promise<void> {
-    await storeManager.fetchLoginStatus();
+    await fetchLoginStatus();
 
     const loginPromptColumn = createEl('div', {
       class: 'column',

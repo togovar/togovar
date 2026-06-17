@@ -2,15 +2,14 @@ import { storeManager } from '../../store/StoreManager';
 import type { ResultsRowView } from './ResultsRowView';
 import { ResultsViewDisplayManager } from './ResultsViewDisplayManager';
 import type {
-  DisplayingRegions,
   SearchMessages,
   SearchStatus,
   ColumnConfig,
-  ResultsRecord,
 } from '../../types';
+import type { DisplayingRegions } from '../../types/storeState';
 
 interface SelectionState {
-  currentIndex: number;
+  currentIndex: number | undefined;
   rowCount: number;
   offset: number;
   numberOfRecords: number;
@@ -215,8 +214,8 @@ export class ResultsViewDataManager {
    */
   private _shouldSkipOffsetUpdate(): boolean {
     return (
-      storeManager.getData('isStoreUpdating') ||
-      storeManager.getData('isFetching')
+      storeManager.getData('isSearchResultsUpdating') ||
+      storeManager.getData('isSearchDataFetching')
     );
   }
 
@@ -228,30 +227,14 @@ export class ResultsViewDataManager {
     const rowCount = storeManager.getData('rowCount');
     const chromosomePositions: { [key: string]: number[] } = {};
 
-    // Collect chromosome positions from each row's record
     for (let i = 0; i < rowCount; i++) {
-      const record = storeManager.getRecordByIndex(i) as ResultsRecord;
-
-      if (this._isValidRecord(record)) {
+      const record = storeManager.getRecordByIndex(i);
+      if (typeof record !== 'string') {
         (chromosomePositions[record.chromosome] ??= []).push(record.start);
       }
     }
 
     return this._convertToRegions(chromosomePositions);
-  }
-
-  /**
-   * Checks if a record is valid and conforms to the expected structure.
-   * @param record - The record object to validate.
-   * @returns True if the record is valid, false otherwise.
-   */
-  private _isValidRecord(record: unknown): record is ResultsRecord {
-    if (record === null || typeof record !== 'object') {
-      return false;
-    }
-
-    const obj = record as Record<string, unknown>;
-    return typeof obj.chromosome === 'string' && typeof obj.start === 'number';
   }
 
   /**
@@ -321,7 +304,7 @@ export class ResultsViewDataManager {
    * @returns The calculated new index for the selected row.
    */
   private _calculateNewIndex(state: SelectionState, direction: number): number {
-    const newIndex = state.currentIndex + direction;
+    const newIndex = (state.currentIndex ?? 0) + direction;
     return Math.max(0, Math.min(newIndex, state.rowCount - 1));
   }
 

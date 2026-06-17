@@ -31,8 +31,8 @@ export default class PanelViewPreviewAlternateAlleleFrequencies extends PanelVie
   constructor(elm: Element) {
     super(elm, 'frequencies');
 
-    storeManager.bind('selectedRow', this);
-    storeManager.bind('offset', this);
+    storeManager.subscribe('selectedRow', () => this.selectedRow());
+    storeManager.subscribe('offset', () => this.offset());
 
     const master = getSimpleSearchConditionMaster('dataset');
     this._master = master?.items ?? [];

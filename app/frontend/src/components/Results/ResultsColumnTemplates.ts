@@ -1,26 +1,16 @@
-/**
- * Results Column Templates
- *
- * This module provides HTML templates and utilities for generating
- * table column content in the search results display. It includes:
- * - Column HTML templates for consistent table structure
- * - Dynamic frequency column generation based on dataset configuration
- * - Constants for display formatting and limits
- */
-
 import { getSimpleSearchConditionMaster } from '../../store/searchManager';
-import type { DatasetMasterItem } from '../../types';
+import type { MasterConditionItem } from '../../types';
 
-/** Maximum length of array to display in Ref/Alt column */
+type FrequencyDatasetItem = MasterConditionItem & {
+  id: string;
+  has_freq: true;
+};
+
+/** Ref/Alt列は長い配列を省略表示するため、表示する最大文字数を共有する。 */
 export const REF_ALT_SHOW_LENGTH = 4;
 
-// ============================================
-// Column Template Definitions
-// ============================================
-
 /**
- * HTML templates for each column defined as constants
- * Provides HTML structure corresponding to each table column
+ * ResultsRowViewで固定DOM行を再利用するため、列ごとの最小HTMLを定数で共有する。
  */
 export const COLUMN_TEMPLATES = {
   togovar_id: '<td class="togovar_id"></td>',
@@ -43,24 +33,13 @@ export const COLUMN_TEMPLATES = {
     '<td class="polyphen"><div class="variant-function" data-function=""></div></td>',
 } as const;
 
-// ============================================
-// Dynamic Template Generation
-// ============================================
-
 /**
- * Dynamically generates HTML for Alt frequency column
+ * datasetマスター未ロード時もResults行のHTML生成を止めないため、空の頻度セルへフォールバックする。
  *
- * Retrieves datasets with frequency data from the dataset master,
- * and generates frequency-block-view elements
- * corresponding to each dataset
- *
- * @returns Generated HTML table cell string
+ * @returns 生成したHTMLテーブルセル文字列
  */
 export function createFrequencyColumnHTML(): string {
-  const master: DatasetMasterItem[] =
-    getSimpleSearchConditionMaster('dataset').items;
-  const frequencyElements = master
-    .filter((dataset) => dataset.has_freq)
+  const frequencyElements = getFrequencyDatasetItems()
     .map(
       (dataset) =>
         `<frequency-block-view
@@ -70,4 +49,21 @@ export function createFrequencyColumnHTML(): string {
     .join('');
 
   return `<td class="alt_frequency">${frequencyElements}</td>`;
+}
+
+/**
+ * datasetマスターは初期化順で未取得になり得るため、頻度表示に使える項目だけを安全に返す。
+ */
+function getFrequencyDatasetItems(): FrequencyDatasetItem[] {
+  const items = getSimpleSearchConditionMaster('dataset')?.items ?? [];
+  return items.filter(isFrequencyDatasetItem);
+}
+
+/**
+ * search.d.ts上は汎用マスター項目なので、頻度datasetとして必要なshapeだけをここで絞り込む。
+ */
+function isFrequencyDatasetItem(
+  item: MasterConditionItem
+): item is FrequencyDatasetItem {
+  return typeof item.id === 'string' && item.has_freq === true;
 }

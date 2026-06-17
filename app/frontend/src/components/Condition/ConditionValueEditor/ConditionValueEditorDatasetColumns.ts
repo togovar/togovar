@@ -3,6 +3,7 @@ import type { ConditionItemView } from '../ConditionItemView';
 import { ConditionValueEditor } from './ConditionValueEditor';
 import type ConditionValues from '../ConditionValues';
 import { storeManager } from '../../../store/StoreManager';
+import { fetchLoginStatus } from '../../../auth/authService';
 
 import { DatasetTreeDataProcessor } from './dataset-columns/DatasetTreeDataProcessor';
 import { DatasetColumnRenderer } from './dataset-columns/DatasetColumnRenderer';
@@ -83,7 +84,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
    * 認証が必要なデータセットの表示制御がログイン状態に依存するため非同期で待つ。
    */
   private async _initializeWithLoginStatus(): Promise<void> {
-    await storeManager.fetchLoginStatus();
+    await fetchLoginStatus();
     this._renderInitialColumn();
   }
 

@@ -18,7 +18,7 @@ export default class PanelViewFilterVariantCallingQuality extends PanelView {
   constructor(elm: Element) {
     super(elm, 'quality');
 
-    storeManager.bind('simpleSearchConditions', this);
+    storeManager.subscribe('simpleSearchConditions', (v) => this.simpleSearchConditions(v));
 
     this._checkbox = this.elm.querySelector<HTMLInputElement>(
       '.content > label > input'

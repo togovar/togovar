@@ -18,7 +18,7 @@ import PanelViewPreviewConsequence from './components/PanelView/PanelViewPreview
 import PanelViewPreviewClinicalSignificance from './components/PanelView/PanelViewPreviewClinicalSignificance';
 import FloatingInfo from './components/FloatingInfo';
 import qs from 'qs';
-import { extractSearchCondition } from './store/searchManager';
+import { extractSearchCondition } from './store/simpleSearchConditions';
 import { initializeApp } from './store/initializeApp';
 import { selectRequired } from './utils/dom/select';
 import type {
@@ -38,7 +38,7 @@ declare global {
 }
 
 // モジュール起動時に一度だけURLを解析し、全初期化関数で参照できるようにする。
-const _currentUrlParams = qs.parse(window.location.search.substring(1));
+const currentUrlParams = qs.parse(window.location.search.substring(1));
 
 // ページライフサイクルをまたいでインスタンスを管理する変数。
 // pagehide時にdestroy/disposeを呼ぶためモジュールスコープで保持する。
@@ -113,12 +113,13 @@ function readyInitialSearch(callback: () => void): void {
   const simpleSearchConditions =
     searchMode === 'simple'
       ? extractSearchCondition(
-          _currentUrlParams as SimpleSearchCurrentConditions
+          currentUrlParams as SimpleSearchCurrentConditions,
+          storeManager.getData('simpleSearchConditionsMaster')
         )
       : {};
   storeManager.setData('simpleSearchConditions', simpleSearchConditions);
 
-  // searchModeを最後にセットしてサブスクライバ（executeSearch）を発火する。
+  // searchModeを最後にセットし、条件が揃った状態で検索開始の副作用を発火する。
   // 初期ロード時はURLがすでに正しいためsetSearchModeFromHistoryを使い、
   // pushStateによる「ユーザー操作なし履歴エントリ」警告を防ぐ。
   storeManager.setSearchModeFromHistory(searchMode);
@@ -282,7 +283,7 @@ function initSearchInputs(): void {
         const mode = (e.currentTarget as HTMLLIElement).dataset.target;
         if (mode !== 'simple' && mode !== 'advanced') return;
 
-        storeManager.setData('searchMode', mode);
+        storeManager.setSearchMode(mode);
 
         if (mode === 'advanced') {
           loadAdvancedSearchBuilderView();
