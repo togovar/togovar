@@ -11,7 +11,7 @@ import {
   PREDICTIONS,
 } from './PredictionDatasets';
 import { setInequalitySign } from './setInequalitySign';
-import Styles from '../../../../stylesheets/object/component/prediction-value-view.scss';
+import Styles from '../../../../stylesheets/web-components/prediction-value-view.scss';
 import type {
   ScoreOrUnassignedFor,
   PredictionQueryLocal,

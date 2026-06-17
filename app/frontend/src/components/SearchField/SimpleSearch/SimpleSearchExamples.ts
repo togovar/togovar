@@ -3,7 +3,7 @@ import type { CSSResultGroup, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 
-import Styles from '../../../../stylesheets/object/component/simple-search-examples.scss';
+import Styles from '../../../../stylesheets/web-components/simple-search-examples.scss';
 import type { ExampleItem, ExampleSelectedDetail } from './SimpleSearchTypes';
 
 /** SimpleSearchExamples - Simple検索用の例表示コンポーネント */

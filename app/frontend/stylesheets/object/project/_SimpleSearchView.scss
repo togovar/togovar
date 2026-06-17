@@ -3,7 +3,8 @@
 // ⚠ simple-search-view は Lit Shadow DOM でレンダリングしているため、
 //   旧ライト DOM 向けの .search-field-view / .fieldcontainer / .examples
 //   へのセレクターは Shadow DOM 境界を越えられず無効。
-//   それらのスタイルは simple-search-view.scss / simple-search-examples.scss へ移管済み。
+//   それらのスタイルは web-components/simple-search-view.scss /
+//   web-components/simple-search-examples.scss へ移管済み。
 //   ここには外側コンテナの構造と CLS 防止の min-height のみを置く。
 
 #SearchInputView {
@@ -15,7 +16,7 @@
 
 // <simple-search-view>（Lit カスタム要素）を包むホスト要素。
 // padding は .sectionscontainer の teal 背景との間隔を作るためだけに残す。
-// 内部のレイアウトは simple-search-view.scss で管理する。
+// 内部のレイアウトは web-components/simple-search-view.scss で管理する。
 #SimpleSearchView {
   padding: 14px;
 }

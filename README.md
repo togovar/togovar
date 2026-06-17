@@ -47,6 +47,7 @@ app/frontend/
     types/       グローバル型定義
     utils/       汎用ヘルパー
   stylesheets/   SCSS
+    web-components/  Lit/Web Components が直接 import する Shadow DOM 用SCSS
   views/         Pugテンプレート
 dist/             ビルド出力
 ```

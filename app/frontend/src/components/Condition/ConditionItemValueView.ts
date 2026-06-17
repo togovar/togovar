@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import './FrequencyCountValueView'; // for embedding
 import './ConditionPathogenicityPredictionSearch/PredictionValueView'; // for embedding
 import type { ConditionTypeValue } from '../../definition';
-import Style from '../../../stylesheets/object/component/condition-item-value-view.scss';
+import Style from '../../../stylesheets/web-components/condition-item-value-view.scss';
 
 @customElement('condition-item-value-view')
 export class ConditionItemValueView extends LitElement {

@@ -8,7 +8,7 @@ import { getSimpleSearchCondition } from '../../../store/searchManager';
 import { SimpleSearchController } from './SimpleSearchController';
 import { SimpleSearchEventHandlers } from './SimpleSearchEventHandlers';
 import { EXAMPLES, SEARCH_FIELD_CONFIG } from './SimpleSearchConstants';
-import Styles from '../../../../stylesheets/object/component/simple-search-view.scss';
+import Styles from '../../../../stylesheets/web-components/simple-search-view.scss';
 
 /**
  * SimpleSearchView - シンプル検索のメインコンポーネント

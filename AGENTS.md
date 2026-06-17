@@ -57,10 +57,12 @@ app/frontend/
     types/       グローバル型定義
     utils/       汎用ヘルパー
   stylesheets/   SCSS
+    web-components/  Lit/Web Components が直接 import する Shadow DOM 用SCSS
   views/         Pugテンプレート
 ```
 
 - UIクラス・Web Componentsは `app/frontend/src/components/` に置く。Lit使用の有無では分けない。
+- Lit/Web Components が直接 import するSCSSは `app/frontend/stylesheets/web-components/` に置く。
 - Advanced Search 本体の制御ファイルは `app/frontend/src/components/AdvancedSearch/` に置く。
 - StoreやURL反映など、アプリ状態に関わる処理は `app/frontend/src/store/` に置く。
 - DOM生成の小さな共通処理は `app/frontend/src/utils/dom/` の既存ヘルパーを優先する。
@@ -145,7 +147,7 @@ app/frontend/
 ## スタイル方針
 
 - SCSSは `app/frontend/stylesheets/` の既存レイヤー構成に合わせる。
-- コンポーネント固有のSCSSは、既存のWeb Component内 import と同じ形に合わせる。
+- Web Component内で直接 import するSCSSは `app/frontend/stylesheets/web-components/` に置く。
 - 既存CSSに異なる書き方があっても、関連する変更範囲だけ段階的に整える。
 - UI状態は、可能なら既存の `data-*` 属性や状態クラスを利用する。
 - セレクターを追加する前に、既存の `object/component` / `object/project` に同じ責務のスタイルがないか確認する。
