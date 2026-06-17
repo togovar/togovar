@@ -28,7 +28,6 @@ export class ResultsRowView {
    * unsubscribeで同一参照が必要なため、束縛済みコールバックをフィールドに保持する。
    */
   private onSelectedRow = (v: number | undefined) => this.selectedRow(v);
-  private onOffset = () => this.offset();
 
   /**
    * prepareTableDataでHTML生成直後に一括取得し、updateTableRowで毎回querySelectorを
@@ -60,8 +59,8 @@ export class ResultsRowView {
   polyphenFunction: HTMLDivElement | null = null;
 
   /**
-   * offsetとselectedRowの変化を受け取って行を再描画するためStoreにバインドする。
-   * 個別バインドにしているのは行インデックスに応じたデータを独立して取得・表示するため。
+   * 選択状態は行ごとにclassを切り替えるだけで済むため、selectedRowだけを購読する。
+   * offsetによる再描画は親側でまとめ、スクロール中の購読コールバック増加を避ける。
    */
   constructor(index: number) {
     this.index = index;
@@ -69,7 +68,6 @@ export class ResultsRowView {
     this.tr = this.createTableRow();
 
     storeManager.subscribe('selectedRow', this.onSelectedRow);
-    storeManager.subscribe('offset', this.onOffset);
   }
 
   // ================================================================
@@ -84,7 +82,6 @@ export class ResultsRowView {
     if (this.isDestroyed) return;
 
     storeManager.unsubscribe('selectedRow', this.onSelectedRow);
-    storeManager.unsubscribe('offset', this.onOffset);
 
     if (this.tr && this.tr.parentNode) {
       this.tr.parentNode.removeChild(this.tr);
@@ -179,14 +176,6 @@ export class ResultsRowView {
     if (this.isDestroyed) return;
     this.selected = selectedIndex === this.index;
     this.tr.classList.toggle('-selected', this.selected);
-  }
-
-  /**
-   * offsetが変わると表示すべきデータが変わるため、行全体を再評価する。
-   */
-  offset() {
-    if (this.isDestroyed) return;
-    this.updateTableRow();
   }
 
   // ================================================================

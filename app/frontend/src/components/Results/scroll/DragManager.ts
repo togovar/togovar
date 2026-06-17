@@ -6,301 +6,247 @@ import type {
 import { supportsMouseInteraction } from '../../../utils/deviceDetection';
 
 /**
- * Class that manages drag functionality with support for both mouse and touch interactions
+ * マウスとタッチ両方のドラッグ操作を管理するクラス。
+ * スクロールバーのドラッグに特化し、座標計算とイベント管理を担う。
  */
 export class DragManager {
-  // Constants
-  private static readonly TOUCH_EVENT_OPTIONS: TouchEventOptions = {
-    passive: false,
-  };
+  private static readonly TOUCH_EVENT_OPTIONS: TouchEventOptions = { passive: false };
 
-  // State management
-  private _mouseDragState: DragState | undefined;
-  private _isTouchDragging: boolean = false;
-  private _touchStartY: number = 0;
-  private _touchStartTop: number = 0;
+  private mouseDragState: DragState | undefined;
+  private isTouchDragging = false;
+  private touchStartY = 0;
+  private touchStartTop = 0;
 
-  // DOM elements and callbacks
-  private readonly _scrollBarElement: HTMLElement;
-  private readonly _container: HTMLElement;
-  private readonly _onDragCallback: (_top: number) => void;
-  private readonly _onVisualStateChange: (_isDragging: boolean) => void;
+  private readonly scrollBarElement: HTMLElement;
+  private readonly container: HTMLElement;
+  private readonly onDragCallback: (_top: number) => void;
+  private readonly onVisualStateChange: (_isDragging: boolean) => void;
 
-  // Event handlers (bound methods for proper cleanup)
-  private readonly _boundMouseDown: (_e: MouseEvent) => void;
-  private readonly _boundMouseMove: (_e: MouseEvent) => void;
-  private readonly _boundMouseUp: () => void;
-  private readonly _boundTouchStart: (_e: TouchEvent) => void;
-  private readonly _boundTouchMove: (_e: TouchEvent) => void;
-  private readonly _boundTouchEnd: (_e: TouchEvent) => void;
+  // removeEventListener で同一参照が必要なため、束縛済みハンドラーをフィールドに保持する
+  private readonly boundMouseDown: (_e: MouseEvent) => void;
+  private readonly boundMouseMove: (_e: MouseEvent) => void;
+  private readonly boundMouseUp: () => void;
+  private readonly boundTouchStart: (_e: TouchEvent) => void;
+  private readonly boundTouchMove: (_e: TouchEvent) => void;
+  private readonly boundTouchEnd: (_e: TouchEvent) => void;
 
   constructor(config: DragManagerConfig) {
-    this._scrollBarElement = config.scrollBarElement;
-    this._container = config.container;
-    this._onDragCallback = config.onDragCallback;
-    this._onVisualStateChange = config.onVisualStateChange;
+    this.scrollBarElement = config.scrollBarElement;
+    this.container = config.container;
+    this.onDragCallback = config.onDragCallback;
+    this.onVisualStateChange = config.onVisualStateChange;
 
-    // Bind event handlers once for better performance and cleanup
-    this._boundMouseDown = this._onMouseDown.bind(this);
-    this._boundMouseMove = this._onMouseMove.bind(this);
-    this._boundMouseUp = this._onMouseUp.bind(this);
-    this._boundTouchStart = this._onTouchStart.bind(this);
-    this._boundTouchMove = this._onTouchMove.bind(this);
-    this._boundTouchEnd = this._onTouchEnd.bind(this);
+    this.boundMouseDown = this.handleMouseDown.bind(this);
+    this.boundMouseMove = this.handleMouseMove.bind(this);
+    this.boundMouseUp = this.handleMouseUp.bind(this);
+    this.boundTouchStart = this.handleTouchStart.bind(this);
+    this.boundTouchMove = this.handleTouchMove.bind(this);
+    this.boundTouchEnd = this.handleTouchEnd.bind(this);
   }
 
-  // ========================================
-  // Lifecycle Management
-  // ========================================
+  // ================================================================
+  // ライフサイクル管理
+  // ================================================================
 
   /**
-   * Initialize drag functionality by setting up event listeners
-   * Automatically detects device capabilities and configures appropriate interaction methods
+   * デバイス種別を判定してマウスまたはタッチのイベントリスナーを登録する。
    */
   initializeDragManager(): void {
-    if (this._supportsMouseInteraction()) {
-      this._initializeMouseDrag();
+    if (supportsMouseInteraction()) {
+      this.initializeMouseDrag();
     }
-    this._initializeTouchDrag();
+    this.initializeTouchDrag();
   }
 
   /**
-   * Clean up all event listeners and reset internal state
-   * Call this method when the component is no longer needed to prevent memory leaks
+   * 全イベントリスナーを解除して内部状態をリセットする。
    */
   destroyDragManager(): void {
-    this._removeMouseEventListeners();
-    this._removeTouchEventListeners();
-    this._resetState();
+    this.removeMouseEventListeners();
+    this.removeTouchEventListeners();
+    this.resetState();
   }
 
-  // ========================================
-  // Device Detection Methods
-  // ========================================
+  // ================================================================
+  // マウスドラッグ
+  // ================================================================
 
   /**
-   * Check if device supports mouse interaction using shared utility
-   *
-   * @returns true for desktop/laptop with mouse/trackpad, false for touch-only devices
-   * @example
-   * Desktop with mouse: true
-   * Laptop with trackpad: true
-   * Tablet: false
-   * Smartphone: false
+   * マウスドラッグ状態オブジェクトを初期化し、リスナーを登録する。
+   * mousemove/mouseup はスクロールバー外でも追従する必要があるため document に登録する。
    */
-  private _supportsMouseInteraction(): boolean {
-    return supportsMouseInteraction();
-  }
-
-  // ========================================
-  // Mouse Drag Implementation
-  // ========================================
-
-  /**
-   * Initialize mouse drag functionality
-   */
-  private _initializeMouseDrag(): void {
-    this._mouseDragState = {
-      isDragging: false,
-      startY: 0,
-      startTop: 0,
-    };
-
-    this._attachMouseEventListeners();
+  private initializeMouseDrag(): void {
+    this.mouseDragState = { isDragging: false, startY: 0, startTop: 0 };
+    this.attachMouseEventListeners();
   }
 
   /**
-   * Attach mouse event listeners
+   * mousedown はスクロールバー上、move/up は document に登録してドラッグ中のカーソル追従を保証する。
    */
-  private _attachMouseEventListeners(): void {
-    this._scrollBarElement.addEventListener('mousedown', this._boundMouseDown);
-    document.addEventListener('mousemove', this._boundMouseMove);
-    document.addEventListener('mouseup', this._boundMouseUp);
+  private attachMouseEventListeners(): void {
+    this.scrollBarElement.addEventListener('mousedown', this.boundMouseDown);
+    document.addEventListener('mousemove', this.boundMouseMove);
+    document.addEventListener('mouseup', this.boundMouseUp);
   }
 
   /**
-   * Remove mouse event listeners safely
-   * This method is safe to call multiple times
+   * removeEventListener は登録時と同じ参照が必要なため、boundXxx フィールドで解除する。
    */
-  private _removeMouseEventListeners(): void {
-    // Remove event listener from scrollbar element
-    this._scrollBarElement.removeEventListener(
-      'mousedown',
-      this._boundMouseDown
-    );
-
-    // Remove document-level event listeners (important)
-    document.removeEventListener('mousemove', this._boundMouseMove);
-    document.removeEventListener('mouseup', this._boundMouseUp);
+  private removeMouseEventListeners(): void {
+    this.scrollBarElement.removeEventListener('mousedown', this.boundMouseDown);
+    document.removeEventListener('mousemove', this.boundMouseMove);
+    document.removeEventListener('mouseup', this.boundMouseUp);
   }
 
-  // ========================================
-  // Mouse Event Handlers
-  // ========================================
-
   /**
-   * Mouse down event handler
+   * ドラッグ開始時点の座標とスクロールバー位置を記録し、以降の move で差分計算できるようにする。
    */
-  private _onMouseDown(e: MouseEvent): void {
-    if (!this._mouseDragState) return;
+  private handleMouseDown(e: MouseEvent): void {
+    if (!this.mouseDragState) return;
 
     e.preventDefault();
-    this._mouseDragState.isDragging = true;
-    this._mouseDragState.startY = e.clientY;
-    this._mouseDragState.startTop = this._getCurrentScrollBarTop();
+    this.mouseDragState.isDragging = true;
+    this.mouseDragState.startY = e.clientY;
+    this.mouseDragState.startTop = this.getCurrentScrollBarTop();
 
-    this._onVisualStateChange(true);
+    this.onVisualStateChange(true);
   }
 
   /**
-   * Mouse move event handler
+   * 開始位置との差分だけ top を動かすことで、クリック位置を起点にした自然なドラッグを実現する。
    */
-  private _onMouseMove(e: MouseEvent): void {
-    if (!this._mouseDragState?.isDragging) return;
+  private handleMouseMove(e: MouseEvent): void {
+    if (!this.mouseDragState?.isDragging) return;
 
     e.preventDefault();
 
-    const deltaY = e.clientY - this._mouseDragState.startY;
-    const newTop = this._mouseDragState.startTop + deltaY;
-    const constrainedTop = this._constrainPositionWithinBounds(newTop);
+    const deltaY = e.clientY - this.mouseDragState.startY;
+    const newTop = this.mouseDragState.startTop + deltaY;
 
-    this._onDragCallback(constrainedTop);
+    this.onDragCallback(this.constrainPositionWithinBounds(newTop));
   }
 
   /**
-   * Mouse up event handler
+   * isDragging フラグをクリアしてドラッグ終了を通知する。
+   * mouseup が document に登録されているため、スクロールバー外で離しても確実に終了できる。
    */
-  private _onMouseUp(): void {
-    if (!this._mouseDragState?.isDragging) return;
+  private handleMouseUp(): void {
+    if (!this.mouseDragState?.isDragging) return;
 
-    this._mouseDragState.isDragging = false;
-    this._onVisualStateChange(false);
+    this.mouseDragState.isDragging = false;
+    this.onVisualStateChange(false);
   }
 
-  // ========================================
-  // Touch Drag Implementation
-  // ========================================
+  // ================================================================
+  // タッチドラッグ
+  // ================================================================
 
   /**
-   * Initialize touch drag functionality
+   * タッチドラッグはマウスと異なりデバイス非依存で常に登録する。
    */
-  private _initializeTouchDrag(): void {
-    this._attachTouchEventListeners();
+  private initializeTouchDrag(): void {
+    this.attachTouchEventListeners();
   }
 
   /**
-   * Attach touch event listeners
+   * passive: false でスクロールバードラッグ中のページスクロールを抑制する。
    */
-  private _attachTouchEventListeners(): void {
-    this._scrollBarElement.addEventListener(
+  private attachTouchEventListeners(): void {
+    this.scrollBarElement.addEventListener(
       'touchstart',
-      this._boundTouchStart,
+      this.boundTouchStart,
       DragManager.TOUCH_EVENT_OPTIONS
     );
-    this._scrollBarElement.addEventListener(
+    this.scrollBarElement.addEventListener(
       'touchmove',
-      this._boundTouchMove,
+      this.boundTouchMove,
       DragManager.TOUCH_EVENT_OPTIONS
     );
-    this._scrollBarElement.addEventListener(
+    this.scrollBarElement.addEventListener(
       'touchend',
-      this._boundTouchEnd,
+      this.boundTouchEnd,
       DragManager.TOUCH_EVENT_OPTIONS
     );
   }
 
   /**
-   * Remove touch event listeners
+   * addEventListener と同じ参照・オプションで登録したリスナーを解除する。
    */
-  private _removeTouchEventListeners(): void {
-    this._scrollBarElement.removeEventListener(
-      'touchstart',
-      this._boundTouchStart
-    );
-    this._scrollBarElement.removeEventListener(
-      'touchmove',
-      this._boundTouchMove
-    );
-    this._scrollBarElement.removeEventListener('touchend', this._boundTouchEnd);
+  private removeTouchEventListeners(): void {
+    this.scrollBarElement.removeEventListener('touchstart', this.boundTouchStart);
+    this.scrollBarElement.removeEventListener('touchmove', this.boundTouchMove);
+    this.scrollBarElement.removeEventListener('touchend', this.boundTouchEnd);
   }
 
-  // ========================================
-  // Touch Event Handlers
-  // ========================================
-
   /**
-   * Touch start event handler
+   * タッチ開始時の指の位置とスクロールバー位置を記録し、move での差分計算の基点にする。
    */
-  private _onTouchStart(e: TouchEvent): void {
+  private handleTouchStart(e: TouchEvent): void {
     e.preventDefault();
-    this._isTouchDragging = true;
-    this._touchStartY = e.touches[0].clientY;
-    this._touchStartTop = this._getCurrentScrollBarTop();
+    this.isTouchDragging = true;
+    this.touchStartY = e.touches[0].clientY;
+    this.touchStartTop = this.getCurrentScrollBarTop();
 
-    this._onVisualStateChange(true);
+    this.onVisualStateChange(true);
   }
 
   /**
-   * Touch move event handler
+   * 開始位置との差分を加算してスクロールバーを指に追従させる。
    */
-  private _onTouchMove(e: TouchEvent): void {
-    if (!this._isTouchDragging) return;
+  private handleTouchMove(e: TouchEvent): void {
+    if (!this.isTouchDragging) return;
     e.preventDefault();
 
-    const currentY = e.touches[0].clientY;
-    const deltaY = currentY - this._touchStartY;
-    const newTop = this._touchStartTop + deltaY;
-    const constrainedTop = this._constrainPositionWithinBounds(newTop);
+    const deltaY = e.touches[0].clientY - this.touchStartY;
+    const newTop = this.touchStartTop + deltaY;
 
-    this._onDragCallback(constrainedTop);
+    this.onDragCallback(this.constrainPositionWithinBounds(newTop));
   }
 
   /**
-   * Touch end event handler
+   * タッチ終了でドラッグフラグをクリアし、視覚状態をドラッグ解除に戻す。
    */
-  private _onTouchEnd(e: TouchEvent): void {
-    if (!this._isTouchDragging) return;
+  private handleTouchEnd(e: TouchEvent): void {
+    if (!this.isTouchDragging) return;
     e.preventDefault();
 
-    this._isTouchDragging = false;
-    this._onVisualStateChange(false);
+    this.isTouchDragging = false;
+    this.onVisualStateChange(false);
   }
 
-  // ========================================
-  // Position Management
-  // ========================================
+  // ================================================================
+  // 座標管理
+  // ================================================================
 
   /**
-   * Get current scrollbar top position
+   * style.top は文字列で格納されているため数値化して返す。未設定なら 0 とする。
    */
-  private _getCurrentScrollBarTop(): number {
-    return parseInt(this._scrollBarElement.style.top) || 0;
+  private getCurrentScrollBarTop(): number {
+    return parseInt(this.scrollBarElement.style.top) || 0;
   }
 
   /**
-   * Constrain position within bounds
+   * スクロールバーがコンテナからはみ出さないよう top 値を制約する。
    */
-  private _constrainPositionWithinBounds(newTop: number): number {
-    const maxTop =
-      this._container.offsetHeight - this._scrollBarElement.offsetHeight;
+  private constrainPositionWithinBounds(newTop: number): number {
+    const maxTop = this.container.offsetHeight - this.scrollBarElement.offsetHeight;
     return Math.max(0, Math.min(newTop, maxTop));
   }
 
-  // ========================================
-  // State Management
-  // ========================================
+  // ================================================================
+  // 状態リセット
+  // ================================================================
 
   /**
-   * Reset internal state without affecting DOM elements
-   * This method only clears internal tracking variables
+   * destroy 時に中途半端なドラッグ状態が残らないよう全フィールドを初期値に戻す。
    */
-  private _resetState(): void {
-    if (this._mouseDragState) {
-      this._mouseDragState.isDragging = false;
-      this._mouseDragState = undefined;
+  private resetState(): void {
+    if (this.mouseDragState) {
+      this.mouseDragState.isDragging = false;
+      this.mouseDragState = undefined;
     }
-    this._isTouchDragging = false;
-    this._touchStartY = 0;
-    this._touchStartTop = 0;
+    this.isTouchDragging = false;
+    this.touchStartY = 0;
+    this.touchStartTop = 0;
   }
 }
