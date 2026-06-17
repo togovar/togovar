@@ -1,31 +1,33 @@
 import type { ScrollBarCalculation } from '../../../types';
 
+// ドラッグ状態の自動解除までの待機時間（ms）
 const RELEASE_DURATION = 2000;
 
 /**
- * Class responsible for DOM manipulation and rendering of scrollbars
+ * スクロールバーの DOM 操作と描画を担うクラス。
+ * 座標計算は scrollCalculator に委譲し、このクラスはスタイル適用とクラス操作のみを行う。
  */
 export class ScrollBarRenderer {
-  // Constants
+  // CSS クラス定数
   private static readonly CLASS_CURSOR_GRAB = 'grab';
   private static readonly CLASS_CURSOR_GRABBING = 'grabbing';
-
   private static readonly CLASS_ACTIVE = '-active';
   private static readonly CLASS_DRAGGING = '-dragging';
   private static readonly CLASS_DISABLED = '-disabled';
-
   private static readonly CLASS_BAR = 'bar';
   private static readonly CLASS_POSITION = 'position';
   private static readonly CLASS_TOTAL = 'total';
 
-  // Instance Properties
-  private _releaseTimeoutId: number | undefined;
+  private readonly container: HTMLElement;
+  private readonly scrollBarElement: HTMLElement;
+  private readonly positionLabel: HTMLElement;
+  private readonly totalLabel: HTMLElement;
 
-  // DOM elements
-  private readonly _container: HTMLElement;
-  private readonly _scrollBarElement: HTMLElement;
-  private readonly _positionLabel: HTMLElement;
-  private readonly _totalLabel: HTMLElement;
+  // 同じ値での DOM 更新を避けるためのキャッシュ
+  private lastPositionValue = -1;
+  private lastTotalValue = -1;
+
+  private releaseTimeoutId: number | undefined;
 
   constructor(
     container: HTMLElement,
@@ -33,39 +35,30 @@ export class ScrollBarRenderer {
     positionLabel: HTMLElement,
     totalLabel: HTMLElement
   ) {
-    this._container = container;
-    this._scrollBarElement = scrollBarElement;
-    this._positionLabel = positionLabel;
-    this._totalLabel = totalLabel;
+    this.container = container;
+    this.scrollBarElement = scrollBarElement;
+    this.positionLabel = positionLabel;
+    this.totalLabel = totalLabel;
   }
 
-  // ========================================
-  // DOM Initialization
-  // ========================================
+  // ================================================================
+  // DOM 初期化（static）
+  // ================================================================
 
-  /**
-   * Create and inject HTML structure for scrollbar into container
-   * @param container - Container element where scrollbar HTML will be inserted
-   */
+  /** スクロールバーの HTML 構造をコンテナへ挿入する。 */
   static createScrollBarHTML(container: HTMLElement): void {
     container.insertAdjacentHTML(
       'beforeend',
-      `
-      <div class="${ScrollBarRenderer.CLASS_BAR}">
+      `<div class="${ScrollBarRenderer.CLASS_BAR}">
         <div class="indicator">
           <span class="${ScrollBarRenderer.CLASS_POSITION}">1</span>
           <span class="${ScrollBarRenderer.CLASS_TOTAL}"></span>
         </div>
-      </div>
-      `
+      </div>`
     );
   }
 
-  /**
-   * Initialize and validate required DOM elements from container
-   * @param container - Container element containing the scrollbar structure
-   * @returns Object containing validated scrollbar DOM elements
-   */
+  /** コンテナからスクロールバーに必要な DOM 要素を取得して返す。 */
   static initializeElements(container: HTMLElement) {
     const scrollBar = container.querySelector(
       `.${ScrollBarRenderer.CLASS_BAR}`
@@ -80,177 +73,145 @@ export class ScrollBarRenderer {
     return { scrollBar, position, total };
   }
 
-  // ========================================
-  // Label Update
-  // ========================================
+  // ================================================================
+  // ラベル更新
+  // ================================================================
 
   /**
-   * Update position label display
-   * @param offset - Offset value
+   * 現在位置ラベルを更新する。
+   * 値が変わっていない場合は DOM を触らずスキップし、不要なレイアウト再計算を防ぐ。
    */
   updatePositionLabel(offset: number): void {
-    this._positionLabel.textContent = String(offset + 1);
+    const value = offset + 1;
+    if (value === this.lastPositionValue) return;
+    this.lastPositionValue = value;
+    this.positionLabel.textContent = String(value);
   }
 
   /**
-   * Update total label
-   * @param numberOfRecords - Total number of records
+   * 総件数ラベルを更新する。
+   * 値が変わっていない場合は DOM を触らずスキップし、不要なレイアウト再計算を防ぐ。
    */
   updateTotalLabel(numberOfRecords: number): void {
-    this._totalLabel.textContent = numberOfRecords.toLocaleString();
+    if (numberOfRecords === this.lastTotalValue) return;
+    this.lastTotalValue = numberOfRecords;
+    this.totalLabel.textContent = numberOfRecords.toLocaleString();
   }
 
-  // ========================================
-  // Position & Size Styling
-  // ========================================
+  // ================================================================
+  // 位置・サイズのスタイル適用
+  // ================================================================
 
   /**
-   * Apply scrollbar styles with calculation results
-   * @param calculation - Calculation results
-   * @param offset - Offset value
+   * タッチスクロール中のリアルタイムフィードバック用にスクロールバーを更新する。
+   * active クラスと position ラベルも同時に反映する。
    */
-  applyScrollBarStyles(
-    calculation: ScrollBarCalculation,
-    offset: number
-  ): void {
-    // Apply bar styles
-    this._scrollBarElement.style.height = `${calculation.barHeight}px`;
-    this._scrollBarElement.style.top = `${calculation.barTop}px`;
-
-    // Update position display
+  applyScrollBarStyles(calculation: ScrollBarCalculation, offset: number): void {
+    this.scrollBarElement.style.height = `${calculation.barHeight}px`;
+    this.scrollBarElement.style.top = `${calculation.barTop}px`;
     this.updatePositionLabel(offset);
-
-    // Maintain active state
-    this._container.classList.add(ScrollBarRenderer.CLASS_ACTIVE);
+    this.container.classList.add(ScrollBarRenderer.CLASS_ACTIVE);
   }
 
   /**
-   * Update scrollbar visual state and disabled status
-   * @param calculation - Calculation results
-   * @param rowCount - Number of visible rows
-   * @param numberOfRecords - Total number of records
+   * Store の値変化（offset・件数・行数）に応じてスクロールバーを同期する。
+   * ドラッグ状態を起動してラベルを表示し、スクロール停止後 RELEASE_DURATION で自動解除する。
    */
   updateScrollBarVisualState(
     calculation: ScrollBarCalculation,
     rowCount: number,
     numberOfRecords: number
   ): void {
-    this._scrollBarElement.style.height = `${calculation.barHeight}px`;
-    this._scrollBarElement.style.top = `${calculation.barTop}px`;
+    this.scrollBarElement.style.height = `${calculation.barHeight}px`;
+    this.scrollBarElement.style.top = `${calculation.barTop}px`;
 
-    // Show dragging state when scrollbar updates due to data changes
-    // This provides visual feedback that the scrollbar position/size changed
-    // Auto-release ensures the feedback disappears after users have time to notice
     this.activateDragStateWithAutoRelease();
 
     if (rowCount === 0 || numberOfRecords === rowCount) {
-      this._scrollBarElement.classList.add(ScrollBarRenderer.CLASS_DISABLED);
+      this.scrollBarElement.classList.add(ScrollBarRenderer.CLASS_DISABLED);
     } else {
-      this._scrollBarElement.classList.remove(ScrollBarRenderer.CLASS_DISABLED);
+      this.scrollBarElement.classList.remove(ScrollBarRenderer.CLASS_DISABLED);
     }
   }
 
-  /**
-   * Update scrollbar position (top style)
-   * @param top - Top position in pixels
-   */
+  /** スクロールバーの top 位置だけを更新する（ドラッグ中の位置追従用）。 */
   updateScrollBarPosition(top: number): void {
-    this._scrollBarElement.style.top = `${top}px`;
+    this.scrollBarElement.style.top = `${top}px`;
   }
 
-  // ========================================
-  // Active State Management
-  // ========================================
+  // ================================================================
+  // active 状態管理
+  // ================================================================
 
-  /**
-   * Set scrollbar as active
-   */
+  /** スクロールバーを active 状態にする（タッチスクロール開始時）。 */
   setActive(): void {
-    this._container.classList.add(ScrollBarRenderer.CLASS_ACTIVE);
+    this.container.classList.add(ScrollBarRenderer.CLASS_ACTIVE);
   }
 
-  /**
-   * Set scrollbar as inactive
-   */
+  /** スクロールバーの active 状態を解除する（タッチスクロール終了時）。 */
   setInactive(): void {
-    this._container.classList.remove(ScrollBarRenderer.CLASS_ACTIVE);
+    this.container.classList.remove(ScrollBarRenderer.CLASS_ACTIVE);
   }
 
-  // ========================================
-  // Drag State Management
-  // ========================================
+  // ================================================================
+  // ドラッグ状態管理
+  // ================================================================
 
   /**
-   * Update dragging state
-   * @param isDragging - Whether currently dragging
+   * ドラッグの開始・終了に応じてスクロールバーの見た目を切り替える。
+   * 終了時は一定時間後に自動解除して視覚フィードバックを残す。
    */
   updateDraggingState(isDragging: boolean): void {
     if (isDragging) {
-      // User started dragging: immediately show dragging state
-      this._container.classList.add(ScrollBarRenderer.CLASS_DRAGGING);
-      this._container.classList.add(ScrollBarRenderer.CLASS_ACTIVE);
+      this.container.classList.add(ScrollBarRenderer.CLASS_DRAGGING);
+      this.container.classList.add(ScrollBarRenderer.CLASS_ACTIVE);
     } else {
-      // User stopped dragging: use auto-release to provide visual feedback
       this.activateDragStateWithAutoRelease();
     }
   }
 
   /**
-   * Activate dragging visual state and schedule its automatic release
-   * Sets the dragging state immediately and schedules removal after delay
+   * ドラッグ状態を即座に表示し、RELEASE_DURATION 後に自動解除する。
+   * 既存タイマーはリセットして多重起動を防ぐ。
    */
   activateDragStateWithAutoRelease(): void {
-    // Clear any existing timeout to prevent multiple timers running simultaneously
-    if (this._releaseTimeoutId !== undefined) {
-      window.clearTimeout(this._releaseTimeoutId);
+    if (this.releaseTimeoutId !== undefined) {
+      window.clearTimeout(this.releaseTimeoutId);
     }
 
-    // Immediately show dragging state for instant visual feedback
-    // This must happen before setTimeout to ensure users see immediate response
-    this._container.classList.add(ScrollBarRenderer.CLASS_DRAGGING);
+    this.container.classList.add(ScrollBarRenderer.CLASS_DRAGGING);
 
-    // Schedule automatic removal of dragging state after delay
-    // This provides visual feedback time for users to notice the change
-    // while ensuring the UI returns to normal state automatically
-    this._releaseTimeoutId = window.setTimeout(() => {
-      // Remove dragging state to return scrollbar to normal visual appearance
-      this._container.classList.remove(ScrollBarRenderer.CLASS_DRAGGING);
-      // Clear the timeout ID after execution to maintain clean state
-      this._releaseTimeoutId = undefined;
+    this.releaseTimeoutId = window.setTimeout(() => {
+      this.container.classList.remove(ScrollBarRenderer.CLASS_DRAGGING);
+      this.releaseTimeoutId = undefined;
     }, RELEASE_DURATION);
   }
 
-  /**
-   * Update cursor style for drag operations
-   * @param isDragging - Whether currently dragging
-   */
+  // ================================================================
+  // カーソルスタイル
+  // ================================================================
+
+  /** ドラッグ中かどうかに応じてカーソルを grabbing / grab に切り替える。 */
   updateCursorStyle(isDragging: boolean): void {
-    this._scrollBarElement.style.cursor = isDragging
+    this.scrollBarElement.style.cursor = isDragging
       ? ScrollBarRenderer.CLASS_CURSOR_GRABBING
       : ScrollBarRenderer.CLASS_CURSOR_GRAB;
   }
 
-  /**
-   * Reset cursor style to default
-   */
+  /** カーソルを grab（初期状態）にリセットする。 */
   resetCursorStyle(): void {
-    this._scrollBarElement.style.cursor = ScrollBarRenderer.CLASS_CURSOR_GRAB;
+    this.scrollBarElement.style.cursor = ScrollBarRenderer.CLASS_CURSOR_GRAB;
   }
 
-  // ========================================
-  // Cleanup
-  // ========================================
+  // ================================================================
+  // クリーンアップ
+  // ================================================================
 
-  /**
-   * Clean up all timeouts and timers
-   * Call this method when the renderer is no longer needed
-   */
+  /** 実行中のタイマーをすべてキャンセルする。コンポーネント破棄時に必ず呼ぶこと。 */
   clearAllTimeouts(): void {
-    if (this._releaseTimeoutId !== undefined) {
-      window.clearTimeout(this._releaseTimeoutId);
-      // CRITICAL: Reset to undefined to prevent memory leaks and state confusion
-      // Without this, the timeout ID remains in memory and state checks become unreliable
-      this._releaseTimeoutId = undefined;
+    if (this.releaseTimeoutId !== undefined) {
+      window.clearTimeout(this.releaseTimeoutId);
+      this.releaseTimeoutId = undefined;
     }
   }
 }
