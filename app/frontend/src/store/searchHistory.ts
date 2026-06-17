@@ -66,5 +66,11 @@ function getConditionFromHistoryState(state: unknown): ConditionQuery | null {
     return null;
   }
 
+  // 空オブジェクトは「条件なし」センチネル(undefined)と整合させるため null を返す。
+  // decodeConditionFromURL も同様に正規化している。
+  if (Object.keys(val as Record<string, unknown>).length === 0) {
+    return null;
+  }
+
   return val as ConditionQuery;
 }
