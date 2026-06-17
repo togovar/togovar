@@ -326,10 +326,11 @@ export class ResultsView {
     e.stopPropagation();
     if (e.deltaY === 0) return;
 
+    // WheelEvent が未定義の古いブラウザでも安全なよう、数値で比較する（LINE=1, PAGE=2）
     let delta = e.deltaY;
-    if (e.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+    if (e.deltaMode === 1) {
       delta = e.deltaY * TR_HEIGHT;
-    } else if (e.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+    } else if (e.deltaMode === 2) {
       delta = e.deltaY * storeManager.getData('rowCount') * TR_HEIGHT;
     }
 
