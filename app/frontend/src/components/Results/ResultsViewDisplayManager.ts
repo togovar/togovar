@@ -48,16 +48,18 @@ export class ResultsViewDisplayManager {
   }
 
   /**
-   * Store更新中の中途半端なデータで行を描画しないよう、更新完了後に検索結果を反映する。
+   * data取得中またはStore配列更新中の中途状態を避け、完了後に検索結果を描画する。
    */
   handleSearchResults(
     isTouchDevice: boolean,
     setTouchElementsPointerEvents: (_enabled: boolean) => void
   ): void {
-    const isUpdating = storeManager.getData('isStoreUpdating');
-    const isFetching = storeManager.getData('isFetching');
+    const isSearchResultsUpdating = storeManager.getData(
+      'isSearchResultsUpdating'
+    );
+    const isSearchDataFetching = storeManager.getData('isSearchDataFetching');
 
-    if (isUpdating || isFetching) {
+    if (isSearchResultsUpdating || isSearchDataFetching) {
       requestAnimationFrame(() =>
         this.handleSearchResults(isTouchDevice, setTouchElementsPointerEvents)
       );
@@ -89,10 +91,10 @@ export class ResultsViewDisplayManager {
   // ========================================
 
   /**
-   * 取得中の検索結果で表示行数を更新するとちらつくため、fetch中は更新を待つ。
+   * data取得中はResults側の行描画を待たせ、未取得行のloading増殖を防ぐ。
    */
   private _shouldSkipUpdate(): boolean {
-    return storeManager.getData('isFetching');
+    return storeManager.getData('isSearchDataFetching');
   }
 
   /**

@@ -96,10 +96,39 @@ app/frontend/
 
 - アプリ状態は `app/frontend/src/store/StoreManager.ts` を正として扱う。
 - 検索条件のURL反映や初期復元は `app/frontend/src/store/searchManager.ts` と `initializeApp.ts` を確認する。
-- API通信は `app/frontend/src/api/fetchData.ts` など既存API層に合わせる。
+- API通信は `app/frontend/src/api/searchExecutor.ts` など既存API層に合わせる。
+- 検索リクエストのURL・HTTPオプション生成は `app/frontend/src/api/searchRequest.ts` に置き、`searchExecutor.ts` は取得実行、レスポンス処理、Store反映に集中させる。
+- 検索実行中のAbortController、進行中フラグ、取得済みrange管理、初回検索リセットは `app/frontend/src/api/searchExecutionState.ts` に置く。
+- 連続検索では同じsearchModeでも古いレスポンスが遅れて返ることがある。Store反映やloading解除前に `searchExecutionState.ts` の検索世代判定を使い、現在の検索か確認する。
+- 検索APIリクエスト開始/完了時のloading制御、Abort時の無視、全体完了時のStore更新は `app/frontend/src/api/searchCompletion.ts` に置く。
+- 検索APIのHTTP fetchとHTTPステータスのエラーコード変換は `app/frontend/src/api/searchFetch.ts` に置く。
+- 検索APIレスポンスのdata/stat判定とStore反映は `app/frontend/src/api/searchResponse.ts` に置き、`searchExecutor.ts` は通信フローに集中させる。
+- 検索APIレスポンス内のnotice/warning/errorのStore反映は `app/frontend/src/api/searchMessages.ts` に置く。
+- StoreはAPIを直接呼ばない。仮想スクロールで未取得ページが必要な場合も、コンポーネントから `searchManager.requestNextPage()` を呼び、fetch の起動は `searchManager` / `api/searchExecutor.ts` 側へ集約する。
+- 検索条件のブラウザURL反映（`history.pushState`、Simple/Advanced SearchのURL表現、URL長制限時のstate退避）は `store/searchURL.ts` に置き、`searchManager.ts` は検索開始タイミングとStore更新に集中させる。
+- popstate時のURL/stateからの検索条件復元は `store/searchHistory.ts` に置く。
+- Simple Search条件のdefault差分抽出は `store/simpleSearchConditions.ts` に置く。`api/searchExecutor.ts` から `searchManager.ts` を import すると循環依存になるため避ける。
+- 検索結果配列のマージ・新規検索時の結果Store初期値・表示indexからのレコード取得・選択行レコード取得は `store/searchResultsState.ts` に置き、`StoreManager.ts` はStore公開APIとpublish順序の管理に集中させる。
 - コンポーネントやViewから直接URLやfetchの仕様を増やす前に、既存のStore/API層へ寄せられるか確認する。
 - 戻る/進む、URL貼り付け、モード切り替えでは、Store更新と検索実行が重複しやすい。変更時は初期表示・タブ切替・履歴操作を分けて考える。
-- popstate ハンドラ内での `storeManager.setData('searchMode', ...)` は `pushState` を発火させてしまう。`setSearchModeFromHistory(mode)` を使うことで、popstate 中の pushState を防ぐ。
+- searchMode は内部リセットと検索開始副作用の順序が重要なため、通常操作では `storeManager.setSearchMode(mode)` を使う。
+- popstate ハンドラ内での searchMode 変更は `pushState` を発火させてしまう。`setSearchModeFromHistory(mode)` を使うことで、popstate 中の pushState を防ぐ。
+- `appLoadingStatus` は画面全体の検索状態、`isSearchDataFetching` は検索結果 data 取得中、`isSearchResultsUpdating` は検索結果配列の同期更新中を表す。意味を混ぜず、loading 表示を変更する場合はどの状態を見るべきか先に確認する。
+
+## Advanced Search 型ファイルの分担
+
+`types/conditionBuilder.d.ts`、`types/conditionDefinition.d.ts`、`types/query.d.ts` は役割が異なる。混在させない。
+
+| ファイル | 役割 | 主な型 |
+| --- | --- | --- |
+| `types/query.d.ts` | Store/API層向け。コンポーネント依存を持たない（PredictionKey のみ例外） | `ConditionQuery`, `ConditionLeaf`, 各Leaf型, `ScoreRange`, `Inequality`, `Relation` |
+| `types/conditionBuilder.d.ts` | UIビルダー向け。コンポーネントを import する | `BuildContext`, `BuilderMap`, `ConditionValueEditor`, `EditorCtor`, `PredictionChangeDetail` |
+| `types/conditionDefinition.d.ts` | 条件UIマスタデータ向け。`advanced_search_conditions.json` の型 | `ConditionDefinition`, `AdvancedConditionMap`, `GRChConditions`, `TreeNode` |
+
+- `ConditionQuery` は Advanced Search の Store 値の正規型。`storeManager.getData('advancedSearchConditions')` は `ConditionQuery | undefined` を返す。
+- `undefined` は「条件なし」を表すセンチネル値であり、`{}` は使わない。
+- Store/API層（`store/`, `Karyotype.ts` など）から `ConditionQuery` を参照するときは `types/query.d.ts` を直接 import する。`types/conditionBuilder.d.ts` は参照しない。
+- `GeneLeaf.gene.labels` はURL復元用のUIメタ情報。API送信前に `stripAdvancedSearchMetadata()` で除去する。
 
 ## TypeScript / JavaScript 方針
 

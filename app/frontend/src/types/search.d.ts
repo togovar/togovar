@@ -120,4 +120,5 @@ export type SearchMessages = {
 export type SearchStatus = {
   available: number;
   filtered: number;
+  total: number;
 };

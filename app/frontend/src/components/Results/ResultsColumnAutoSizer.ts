@@ -21,7 +21,9 @@ export class ResultsColumnAutoSizer {
   /** ユーザーが手動でリサイズした列は自動調整から除外するためにIDを保持する */
   private _resizedColumnIds = new Set<string>();
   private _boundAutoSizeResultColumns: (_event: Event) => void;
-  private _boundResetAutoSizeState: () => void;
+  private _boundResetAutoSizeState: (
+    _version: number
+  ) => void;
   /** getBoundingClientRect はDOMに配置されていないと0を返すため、非表示テーブルで計測する */
   private _measuringTable: HTMLTableElement | null = null;
   private _measuringRow: HTMLTableRowElement | null = null;
@@ -29,13 +31,13 @@ export class ResultsColumnAutoSizer {
   constructor(tbody: HTMLElement) {
     this._tbody = tbody;
     this._boundAutoSizeResultColumns = this.autoSizeResultColumns.bind(this);
-    this._boundResetAutoSizeState = this.resetAutoSizeState.bind(this);
+    this._boundResetAutoSizeState = () => this.resetAutoSizeState();
     window.addEventListener(
       'togovar:results-rendered',
       this._boundAutoSizeResultColumns
     );
-    window.addEventListener(
-      'results-column-widths-reset',
+    storeManager.subscribe(
+      'resultsResetVersion',
       this._boundResetAutoSizeState
     );
   }
@@ -46,8 +48,8 @@ export class ResultsColumnAutoSizer {
       'togovar:results-rendered',
       this._boundAutoSizeResultColumns
     );
-    window.removeEventListener(
-      'results-column-widths-reset',
+    storeManager.unsubscribe(
+      'resultsResetVersion',
       this._boundResetAutoSizeState
     );
     this._measuringTable?.remove();

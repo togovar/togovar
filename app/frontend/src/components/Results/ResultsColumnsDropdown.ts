@@ -5,6 +5,7 @@ import {
 } from '../../columns';
 import { storeManager } from '../../store/StoreManager';
 import type { ColumnConfig } from '../../types';
+import type { StoreState } from '../../types/storeState';
 
 /** 列ドロップダウンの HTML セレクタマップ */
 const SELECTORS = {
@@ -44,6 +45,7 @@ export class ResultsColumnsDropdown {
   private readonly _eventAbortController = new AbortController();
   private readonly _boundDocumentClick: (_event: MouseEvent) => void;
   private readonly _boundDocumentKeydown: (_event: KeyboardEvent) => void;
+  private readonly _onColumns = (v: StoreState['columns']) => this.columns(v);
 
   constructor(root: HTMLElement) {
     this._root = root;
@@ -55,7 +57,7 @@ export class ResultsColumnsDropdown {
 
     this._toggle(false);
     this._bindEvents();
-    storeManager.bind('columns', this);
+    storeManager.subscribe('columns', this._onColumns);
     this.columns(storeManager.getData('columns'));
   }
 
@@ -63,7 +65,7 @@ export class ResultsColumnsDropdown {
    * インスタンスを破棄（イベントリスナー削除、store バインド解除）
    */
   destroy(): void {
-    storeManager.unbind('columns', this);
+    storeManager.unsubscribe('columns', this._onColumns);
     this._clearPendingLongPress?.();
     this._cancelHoverClose();
     this._eventAbortController.abort();

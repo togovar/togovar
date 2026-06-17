@@ -1,3 +1,5 @@
+import type { ConditionQuery } from '../types/query';
+
 /** Advanced Search条件のURLエンコード上限（Raw JSON文字数） */
 export const ADVANCED_SEARCH_URL_MAX_JSON_LENGTH = 2000;
 
@@ -23,11 +25,13 @@ export function encodeConditionForURL(query: unknown): string | null {
  */
 export function decodeConditionFromURL(
   encoded: string
-): Record<string, unknown> | null {
+): ConditionQuery | null {
   try {
     const parsed = JSON.parse(atob(encoded.replace(/ /g, '+')));
-    // 配列やプリミティブはAPIのquery bodyに流れると不正リクエストになるため弾く。
-    return isPlainObject(parsed) ? parsed : null;
+    // 配列・プリミティブはAPIのquery bodyに流れると不正リクエストになるため弾く。
+    // 空オブジェクトは「条件なし」センチネル(undefined)と整合させるため null を返す。
+    if (!isPlainObject(parsed) || Object.keys(parsed).length === 0) return null;
+    return parsed as ConditionQuery;
   } catch {
     return null;
   }

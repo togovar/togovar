@@ -1,6 +1,6 @@
 import { storeManager } from '../../store/StoreManager';
 import { setSimpleSearchCondition } from '../../store/searchManager';
-import type { DisplayingRegions } from '../../types/store';
+import type { DisplayingRegions } from '../../types/storeState';
 
 // 染色体棒の描画幅とSVG上下余白（px）。
 // CSSではなくJSでSVG座標を計算するため定数として保持する。
@@ -186,8 +186,8 @@ export default class ChromosomeView {
     }
     this._svg.innerHTML = html + '</g>';
 
-    // displayingRegionsOnChromosome の変化を受け取るためにバインドする。
-    storeManager.bind('displayingRegionsOnChromosome', this);
+    // displayingRegionsOnChromosome の変化を受け取るために購読登録する。
+    storeManager.subscribe('displayingRegionsOnChromosome', (v) => this.displayingRegionsOnChromosome(v!));
 
     // 染色体番号クリックで染色体全体を検索条件に設定する。
     this._elm

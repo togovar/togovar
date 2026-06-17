@@ -1,6 +1,6 @@
 import { storeManager } from '../store/StoreManager';
 import { resetSimpleSearchConditions } from '../store/searchManager';
-import type { StoreState } from '../types';
+import type { StoreState } from '../types/storeState';
 import { selectRequired } from '../utils/dom/select';
 
 const SELECTORS = {
@@ -16,7 +16,7 @@ export default class SideBar {
   private readonly _previews: HTMLElement;
 
   /**
-   * StoreManagerの旧bind APIから呼ばれるViewとして、必要なDOM参照を初期化時に確定する。
+   * selectedRowの変化を受け取るためStoreに購読登録し、初期値を即時反映する。
    */
   constructor(elm: HTMLElement) {
     this._elm = elm;
@@ -27,8 +27,8 @@ export default class SideBar {
       'SideBar'
     );
 
-    storeManager.bind('selectedRow', this);
-    this.selectedRow(storeManager.getData<SelectedRowIndex>('selectedRow'));
+    storeManager.subscribe('selectedRow', (v) => this.selectedRow(v));
+    this.selectedRow(storeManager.getData('selectedRow'));
 
     requestAnimationFrame(() => {
       this._body.classList.add('-sidebar-ready');

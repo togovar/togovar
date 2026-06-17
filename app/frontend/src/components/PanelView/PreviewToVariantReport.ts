@@ -18,8 +18,8 @@ export default class PreviewToVariantReport extends PanelView {
    */
   constructor(elm: Element) {
     super(elm, 'preview-to-variant-report');
-    storeManager.bind('selectedRow', this);
-    storeManager.bind('offset', this);
+    storeManager.subscribe('selectedRow', () => this.selectedRow());
+    storeManager.subscribe('offset', () => this.offset());
     this._title = this.elm.querySelector<Element>('.title')!;
   }
 

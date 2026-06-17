@@ -1,5 +1,6 @@
 import type { FrequencyCountValueView } from '../components/Condition/FrequencyCountValueView';
-import type { SignificanceSource } from './condition';
+import type { SignificanceSource } from './query';
+import type { PredictionKey } from '../components/Condition/ConditionPathogenicityPredictionSearch/PredictionDatasets';
 
 // FrequencyCountValueView の setValues 第2引数を型として使うことで、
 // UIコンポーネント側のシグネチャ変更が自動的にここへ伝播する。
@@ -27,7 +28,7 @@ export type RestoredConditionValue = Readonly<{
 }>;
 
 export type RestoredPredictionValue = Readonly<{
-  dataset: 'alphamissense' | 'sift' | 'polyphen';
+  dataset: PredictionKey;
   values: [number, number];
   inequalitySigns: ['gte' | 'gt', 'lte' | 'lt'];
   includeUnassigned: boolean;

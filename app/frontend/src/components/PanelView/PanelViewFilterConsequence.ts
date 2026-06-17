@@ -43,8 +43,8 @@ export default class PanelViewFilterConsequence extends PanelView {
   constructor(elm: Element) {
     super(elm, 'consequence');
 
-    const conditionMaster = getSimpleSearchConditionMaster('consequence');
-    const grouping = getSimpleSearchConditionMaster('consequence_grouping')
+    const conditionMaster = getSimpleSearchConditionMaster('consequence')!;
+    const grouping = getSimpleSearchConditionMaster('consequence_grouping')!
       .items as Array<ItemItemClass | string>;
 
     // GUI 生成
@@ -102,8 +102,8 @@ export default class PanelViewFilterConsequence extends PanelView {
       });
     }
 
-    storeManager.bind('simpleSearchConditions', this);
-    storeManager.bind('statisticsConsequence', this);
+    storeManager.subscribe('simpleSearchConditions', (v) => this.simpleSearchConditions(v));
+    storeManager.subscribe('statisticsConsequence', (v) => this.statisticsConsequence(v ?? null));
   }
 
   // ----------------------------------------
@@ -239,9 +239,7 @@ export default class PanelViewFilterConsequence extends PanelView {
   // ----------------------------------------
 
   /** simpleSearchConditions ストア更新時に呼ばれる */
-  simpleSearchConditions(
-    conditions: Record<string, Record<string, string>>
-  ): void {
+  simpleSearchConditions(conditions: SimpleSearchCurrentConditions): void {
     const kindConditions = conditions[KIND_OF_CONDITION] ?? {};
 
     if (Object.keys(kindConditions).length === 0) {

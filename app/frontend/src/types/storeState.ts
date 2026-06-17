@@ -14,9 +14,13 @@ import type {
   MasterConditions,
   SimpleSearchCurrentConditions,
   SearchMode,
+  SearchMessages,
+  SearchStatus,
 } from './search';
 import type { ResultData } from './api';
 import type { ColumnConfig } from './components';
+import type { KaryotypeState } from './karyotype';
+import type { ConditionQuery } from './query';
 
 /**
  * カリオタイプビューで表示中の染色体領域を管理する型。
@@ -34,51 +38,52 @@ export type DisplayingRegions = {
 // ============================================
 
 /**
- * 検索APIから取得するレコード数の集計。
- * StoreState 内でのみ参照するため export しない。
- * search.d.ts にも SearchStatus が存在するため、名前衝突を避けて StoreSearchStatus とする。
- */
-type StoreSearchStatus = {
-  available: number;
-  filtered: number;
-  total: number;
-};
-
-/**
  * アプリ全体の状態を1つのオブジェクトで表す。
  * unknown 型の TODO フィールドは、該当APIレスポンスの型定義が確定次第、具体型へ置き換える。
  * optional フィールドは初期化前や未使用状態を undefined で表すために省略可にしている。
  */
 export type StoreState = {
-  // TODO: KaryotypeState を types/ へ export して具体的な型に置き換える
-  karyotype: unknown;
+  karyotype?: KaryotypeState;
   /** '' は初期化前のセンチネル値。setSearchModeFromHistory が呼ばれるまでの一時的な状態 */
   searchMode: SearchMode | '';
   simpleSearchConditionsMaster: MasterConditions[];
   simpleSearchConditions: SimpleSearchCurrentConditions;
   columns: ColumnConfig[];
-  searchResults: ResultData[];
+  searchResults: (ResultData | null)[];
   numberOfRecords: number;
   offset: number;
   rowCount: number;
-  /** 初期化・検索中・通常の3フェーズを文字列で管理し、UI側でのガード処理を単純化する */
-  appStatus: 'preparing' | 'searching' | 'normal';
+  /**
+   * 検索リセット単位で単調増加させ、列幅自動調整の内部キャッシュ解除をStore経由で通知する。
+   * DOMイベントへ依存せず、Results系コンポーネントが同じ状態変化を購読できるようにする。
+   */
+  resultsResetVersion: number;
+  /**
+   * 画面全体の検索フェーズを1箇所で表し、全体ローディング表示の判定を単純にする。
+   * Results内の行loadingではなく、LoadingIndicatorの表示制御に使う。
+   */
+  appLoadingStatus: 'preparing' | 'searching' | 'normal';
   isLogin: boolean;
-  isFetching: boolean;
-  isStoreUpdating: boolean;
+  /**
+   * 検索結果のdata=1リクエスト中かを表し、Resultsの行loadingと描画待機に使う。
+   * stat=1のみの統計取得やStore配列マージ中かどうかは、この値では表さない。
+   */
+  isSearchDataFetching: boolean;
+  /**
+   * searchResults配列を同期更新している間だけtrueにし、中途半端な行描画を防ぐ。
+   * API通信中かどうかではなく、Store内部の配列更新ガードとして扱う。
+   */
+  isSearchResultsUpdating: boolean;
   selectedRow?: number;
-  // TODO: AdvancedSearchConditions の型を整理して具体的な型に置き換える
-  advancedSearchConditions?: unknown;
+  advancedSearchConditions?: ConditionQuery;
   advancedSearchURLTooLong?: boolean;
   advancedSearchRestoredFromURL?: boolean;
-  // TODO: searchMessages の形（オブジェクト or 空文字）を統一して具体的な型に置き換える
-  searchMessages?: unknown;
-  searchStatus?: StoreSearchStatus;
-  // TODO: statistics 系は API レスポンスの型定義が揃い次第具体的な型に置き換える
-  statisticsDataset?: unknown;
-  statisticsSignificance?: unknown;
-  statisticsType?: unknown;
-  statisticsConsequence?: unknown;
+  searchMessages?: SearchMessages;
+  searchStatus?: SearchStatus;
+  statisticsDataset?: Record<string, number>;
+  statisticsSignificance?: Record<string, number>;
+  statisticsType?: Record<string, number>;
+  statisticsConsequence?: Record<string, number>;
   showModal?: boolean;
   /** DisplayingRegions と同一構造。カリオタイプビューと検索条件復元の両方から参照する */
   displayingRegionsOnChromosome?: DisplayingRegions;
