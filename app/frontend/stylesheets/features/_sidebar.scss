@@ -8,13 +8,16 @@
   width: calc(var(--width-sidebar) * 2);
   height: 100%;
   min-height: 0;
-  padding: 0 var(--padding-sidebar-side);
+  // 右パディングを省いてスクロールバーを .LayoutAside の右端に寄せる。
+  padding: 0 0 0 var(--padding-sidebar-side);
   overflow-x: hidden;
   overflow-y: hidden;
   overscroll-behavior: contain;
   white-space: nowrap;
   box-shadow: 2px 0 3px rgba(0, 0, 0, 0.2) inset;
-  transform: translateX(-297px);
+  // -310px = 第1パネル幅 (width-sidebar - padding-sidebar-side = 285) + パネル間マージン (25)
+  // 第2パネルを第1パネルと同じ左余白 (padding-sidebar-side) で表示するオフセット。
+  transform: translateX(-310px);
 
   body.-sidebar-ready & {
     transition: transform var(--gui-duration);
@@ -23,9 +26,9 @@
   > .sidebarcontent {
     box-sizing: border-box;
     display: inline-block;
-    width: calc(var(--width-sidebar) - var(--padding-sidebar-side) * 2);
+    width: calc(var(--width-sidebar) - var(--padding-sidebar-side));
     height: 100%;
-    padding: 5px 0 15px;
+    padding: 5px var(--padding-sidebar-side) 15px 0;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
