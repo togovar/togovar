@@ -148,12 +148,30 @@ app/frontend/
 
 ### ディレクトリ・配置
 
-- SCSSは `app/frontend/stylesheets/` の既存レイヤー構成（FLOCSS）に合わせる。
-  - `foundation/` — リセット・変数・ベース
-  - `layout/` — ページレイアウト
-  - `object/component/` — 汎用UIコンポーネント（特定画面に依存しないもの）
-  - `features/` — 画面・機能固有のスタイル
-- Web Component内で直接 import するSCSSは `app/frontend/stylesheets/web-components/` に置く。
+SCSSは `app/frontend/stylesheets/` の FLOCSS レイヤー構成に合わせる。
+
+| ディレクトリ | 置くもの | 置かないもの |
+| --- | --- | --- |
+| `foundation/` | デザイントークン（CSS カスタムプロパティ）、ミックスイン、HTMLタグのデフォルトスタイル、リセット | 特定コンポーネントや画面のスタイル |
+| `layout/` | ページ骨格（`#Layout`・`aside`・`main` の幅・高さ・配置） | 個々のUIパーツの見た目 |
+| `object/component/` | 複数の画面で再利用される汎用UIパーツ | 1つの画面・機能だけで使うスタイル |
+| `features/` | 特定の画面や機能に紐づくスタイル | 別の画面でも使える汎用パーツ |
+| `web-components/` | Lit要素が JS から直接 `import` するSCSSファイル（Shadow DOM 内に適用） | ライトDOM側のスタイル |
+
+**どのディレクトリに入れるかの判断フロー:**
+
+1. Lit要素の Shadow DOM 内か？ → `web-components/`
+2. ページ全体の骨格（幅・高さ・グリッド配置）か？ → `layout/`
+3. 複数の画面で使われる（または使われうる）UIパーツか？ → `object/component/`
+4. 特定の画面・機能専用か？ → `features/`
+5. 色・サイズ・z-index などのデザイン値か？ → `foundation/_variables.scss` に CSS カスタムプロパティとして追加
+
+**各ディレクトリの実例:**
+
+- `object/component/` — `_button-view.scss`, `_panel-view.scss`, `_dropdown-view.scss`, `_range-slider.scss`, `_form-parts.scss`
+- `features/` — `_results.scss`（検索結果画面）, `_detail.scss`（詳細画面）, `_global-header.scss`（ヘッダー）
+- `web-components/` — `tab-view.scss`, `prediction-range-slider.scss`, `frequency-block-view.scss`
+
 - セレクターを追加する前に、既存の `object/component/` や `features/` に同じ責務のスタイルがないか確認する。
 - `app/frontend/stylesheets/foundation/_reset.scss` は**変更禁止**。Josh W. Comeau's CSS Reset の定義をそのまま維持する。
 
