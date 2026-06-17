@@ -7,10 +7,10 @@
 
 #DetailHeader {
   position: sticky;
-  top: $HEIGHT_GLOBAL_MENU;
-  z-index: $Z_INDEX_DETAIL_HEADER;
-  padding: 10px $PADDING_SIDE 10px $PADDING_REPORT_LEFT;
-  background: $GRADIENT_HEADING_SEMITRANSPARENT;
+  top: var(--height-global-menu);
+  z-index: var(--z-index-detail-header);
+  padding: 10px var(--padding-side) 10px var(--padding-report-left);
+  background: var(--gradient-heading-semitransparent);
 
   .title-wrapper {
     display: inline-block;

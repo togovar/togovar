@@ -5,8 +5,8 @@
   padding: 12px 18px;
   margin: 0;
   list-style: none;
-  background-color: rgba($COLOR_KEY, 0.1);
-  border: solid 1px $COLOR_KEY;
+  background-color: color-mix(in srgb, var(--color-key) 10%, transparent);
+  border: solid 1px var(--color-key);
   column-count: 2;
 
   > .category {
@@ -35,11 +35,11 @@
         line-height: 18px;
 
         > .link {
-          color: $COLOR_BLACK;
+          color: var(--color-black);
           text-decoration: none;
 
           &:hover {
-            color: $COLOR_KEY;
+            color: var(--color-key);
           }
 
           &::after {
@@ -73,7 +73,7 @@
               color: white;
               text-align: center;
               content: 'Q';
-              background-color: $COLOR_KEY_DARK1;
+              background-color: var(--color-key-dark1);
               border-radius: 8px;
             }
           }

@@ -7,25 +7,25 @@
 
 #SideBar {
   box-sizing: border-box;
-  width: $WIDTH_SIDEBAR * 2;
+  width: calc(var(--width-sidebar) * 2);
   height: 100%;
   min-height: 0;
-  padding: 0 $PADDING_SIDEBAR_SIDE;
+  padding: 0 var(--padding-sidebar-side);
   overflow-x: hidden;
   overflow-y: hidden;
   overscroll-behavior: contain;
   white-space: nowrap;
-  box-shadow: 2px 0 3px rgba(black, 0.2) inset;
+  box-shadow: 2px 0 3px rgba(0, 0, 0, 0.2) inset;
   transform: translateX(-297px);
 
   body.-sidebar-ready & {
-    transition: transform $GUI_DURATION;
+    transition: transform var(--gui-duration);
   }
 
   > .sidebarcontent {
     box-sizing: border-box;
     display: inline-block;
-    width: $WIDTH_SIDEBAR - $PADDING_SIDEBAR_SIDE * 2;
+    width: calc(var(--width-sidebar) - var(--padding-sidebar-side) * 2);
     height: 100%;
     padding: 5px 0 15px;
     overflow-x: hidden;

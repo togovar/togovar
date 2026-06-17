@@ -9,12 +9,12 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: $Z_INDEX_ACTIVITY_INDICATOR;
+  z-index: var(--z-index-activity-indicator);
   width: 100%;
   height: 100%;
   pointer-events: none;
-  background: url(../images/loading.gif) no-repeat 50% 50% rgba(black, 0.05);
-  transition: opacity $TRANSITION_DURATION;
+  background: url(../images/loading.gif) no-repeat 50% 50% rgba(0, 0, 0, 0.05);
+  transition: opacity var(--transition-duration);
 
   &.-hidden {
     pointer-events: none;

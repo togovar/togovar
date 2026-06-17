@@ -6,7 +6,7 @@
   > .collapsebutton {
     position: absolute;
     cursor: pointer;
-    transition: top $GUI_DURATION;
+    transition: top var(--gui-duration);
 
     &::before {
       display: block;
@@ -21,7 +21,7 @@
       border-left-width: 0.1rem;
       transform: rotate(45deg);
       transform-origin: 25% 50%;
-      transition: transform $GUI_DURATION;
+      transition: transform var(--gui-duration);
     }
   }
 
@@ -42,7 +42,7 @@
       &::before {
         border-top: 4px solid transparent;
         border-bottom: 4px solid transparent;
-        border-left: 5px solid $COLOR_BLACK;
+        border-left: 5px solid var(--color-black);
         transform: rotate(90deg);
       }
     }

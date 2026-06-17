@@ -29,7 +29,7 @@ $SEARCH_FIELD_SIZE: 30px;
         line-height: $SEARCH_FIELD_SIZE;
         vertical-align: top;
         outline: none;
-        border: solid 1px $COLOR_KEY_DARK2;
+        border: solid 1px var(--color-key-dark2);
         border-radius: $SEARCH_FIELD_SIZE * 0.5;
         opacity: 0.9;
 
@@ -46,9 +46,9 @@ $SEARCH_FIELD_SIZE: 30px;
         margin-right: -4px;
         text-indent: -9999px;
         background-color: white;
-        border: solid 1px $COLOR_KEY_DARK1;
+        border: solid 1px var(--color-key-dark1);
         border-radius: 100%;
-        box-shadow: 0 1px 1px rgba(black, 0.2);
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 
         &::before,
         &::after {
@@ -63,7 +63,7 @@ $SEARCH_FIELD_SIZE: 30px;
           left: 6px;
           width: 12px;
           height: 12px;
-          border: solid 2px $COLOR_KEY_DARK1;
+          border: solid 2px var(--color-key-dark1);
           border-radius: 6px;
         }
 
@@ -72,7 +72,7 @@ $SEARCH_FIELD_SIZE: 30px;
           top: 16px;
           left: 17px;
           height: 5px;
-          border-left: solid 2px $COLOR_KEY_DARK1;
+          border-left: solid 2px var(--color-key-dark1);
           transform: rotate(-45deg);
         }
       }
@@ -90,15 +90,15 @@ $SEARCH_FIELD_SIZE: 30px;
       cursor: pointer;
       border-radius: 8px;
       transition:
-        background-color $GUI_DURATION,
-        box-shadow $GUI_DURATION;
+        background-color var(--gui-duration),
+        box-shadow var(--gui-duration);
 
       > dt,
       > dd {
         display: inline-block;
         margin-bottom: 0;
         color: white;
-        transition: color $GUI_DURATION;
+        transition: color var(--gui-duration);
       }
 
       > dt {
@@ -111,7 +111,7 @@ $SEARCH_FIELD_SIZE: 30px;
       }
 
       &:hover {
-        background-color: $COLOR_KEY_DARK2;
+        background-color: var(--color-key-dark2);
       }
     }
   }
@@ -123,20 +123,20 @@ $SEARCH_FIELD_SIZE: 30px;
 
 // 検索候補ドロップダウン (.suggest-view)
 // 入力中にリアルタイムで候補を表示する絶対配置のパネル
-// $SUGGEST_PADDING_SIDE: 候補リストの左右余白（グローバルの $PADDING_SIDE と区別するために独自変数）
+// $SUGGEST_PADDING_SIDE: 候補リストの左右余白（グローバルの var(--padding-side) と区別するために独自変数）
 $SUGGEST_PADDING_SIDE: 14px;
 
 .suggest-view {
-  z-index: $Z_INDEX_SUGGEST_VIEW;
+  z-index: var(--z-index-suggest-view);
   display: flex;
   font-size: 14px;
-  color: $COLOR_BLACK;
+  color: var(--color-black);
   background-color: white;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 
   > .column {
     + .column {
-      border-left: solid 1px $COLOR_SEPARATOR_SUB;
+      border-left: solid 1px var(--color-separator-sub);
     }
 
     > .title {
@@ -145,7 +145,7 @@ $SUGGEST_PADDING_SIDE: 14px;
       font-size: 12px;
       font-weight: normal;
       line-height: 16px;
-      color: $COLOR_KEY_DARK1;
+      color: var(--color-key-dark1);
 
       &::first-letter {
         text-transform: capitalize;
@@ -161,7 +161,7 @@ $SUGGEST_PADDING_SIDE: 14px;
       width: 20rem;
       height: 5rem;
       padding: 0 $SUGGEST_PADDING_SIDE;
-      color: $COLOR_GRAY;
+      color: var(--color-gray);
     }
 
     > .loading {
@@ -189,7 +189,7 @@ $SUGGEST_PADDING_SIDE: 14px;
         padding: 0 $SUGGEST_PADDING_SIDE;
         line-height: 26px;
         cursor: pointer;
-        transition: background-color $GUI_DURATION;
+        transition: background-color var(--gui-duration);
 
         // 検索クエリとマッチした部分をハイライトする
         > em {
@@ -203,7 +203,7 @@ $SUGGEST_PADDING_SIDE: 14px;
         }
 
         &:hover {
-          background-color: rgba($COLOR_SELECTED, 0.2);
+          background-color: color-mix(in srgb, var(--color-selected) 20%, transparent);
         }
 
         &.-disabled {
@@ -217,11 +217,11 @@ $SUGGEST_PADDING_SIDE: 14px;
         > .sub {
           padding-left: 0.5em;
           font-size: 12px;
-          color: rgba($COLOR_BLACK, 0.5);
+          color: color-mix(in srgb, var(--color-black) 50%, transparent);
         }
 
         &.-selected {
-          background-color: rgba($COLOR_SELECTED, 1);
+          background-color: var(--color-selected);
         }
       }
 

@@ -10,10 +10,10 @@ html {
 
 body {
   // height: 100%
-  padding-top: $HEIGHT_GLOBAL_MENU + $HEIGHT_NBDC_COMMON_HEADER !important;
+  padding-top: calc(var(--height-global-menu) + var(--height-nbdc-common-header)) !important;
   font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
   font-size: 10px;
-  color: $COLOR_BLACK;
+  color: var(--color-black);
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 
@@ -55,10 +55,6 @@ body {
   }
 }
 
-[draggable='true'] {
-  -khtml-user-drag: element;
-}
-
 // Web Component の margin はライトDOM側の型セレクターで定義する。
 // :host { margin } は _reset.scss の * { margin: 0 } に上書きされるため、
 // 外部スタイルから明示的に設定することで隙間を保証する。
@@ -67,16 +63,16 @@ frequency-block-view {
 }
 
 a {
-  color: $COLOR_KEY_DARK3;
+  color: var(--color-key-dark3);
 
   &:link {
-    color: $COLOR_KEY_DARK3;
+    color: var(--color-key-dark3);
     text-decoration: underline;
   }
 
   &:active,
   &:hover {
-    color: $COLOR_KEY_DARK1;
+    color: var(--color-key-dark1);
   }
 }
 
@@ -123,7 +119,7 @@ select {
 ::placeholder,
 *::part(input-field)::placeholder {
   font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
-  color: $COLOR_GRAY;
+  color: var(--color-gray);
 }
 
 .unimplemented {

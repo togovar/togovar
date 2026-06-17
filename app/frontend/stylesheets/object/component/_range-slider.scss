@@ -68,7 +68,7 @@ range-slider::part(scale) {
     display: block;
     height: 14px;
     content: '';
-    border-left: dotted 1px $COLOR_SEPARATOR;
+    border-left: dotted 1px var(--color-separator);
   }
 }
 

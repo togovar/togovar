@@ -20,7 +20,7 @@
   border-left: dotted 0.5px var(--color-separator);
 }
 
-@media (-webkit-min-device-pixel-ratio: 2) {
+@media (resolution: 2dppx) {
   :host > .frequencygraph > .scale {
     border-left: dotted 1px var(--color-separator);
   }

@@ -20,11 +20,11 @@
   --padding-side: calc(
     var(--height-advanced-search-condition-values-container) * 0.5
   );
-  color: $COLOR_BLACK;
-  border-top: solid 1px $COLOR_SEPARATOR;
+  color: var(--color-black);
+  border-top: solid 1px var(--color-separator);
 
   > .sections {
-    border-bottom: solid 1px $COLOR_SEPARATOR;
+    border-bottom: solid 1px var(--color-separator);
 
     > section {
       > header {
@@ -94,7 +94,7 @@
 // ローカル変数はこのブロック直前に置いて使用箇所を明示する
 // =============================================================================
 
-$HEIGHT: $HEIGHT_ADVANCED_SEARCH_CONDITION;
+$HEIGHT: var(--height-advanced-search-condition);
 $HEIGHT_RELATION: 16px;
 $HEIGHT_VALUE: 18px;
 $PADDING_VALUES: calc(($HEIGHT - $HEIGHT_VALUE) / 2);
@@ -118,7 +118,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
     position: relative;
     background-color: white;
     border-radius: $CORNER_RADIUS;
-    box-shadow: 0 1px 1px rgba(black, 0.3);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
 
     > .summary {
       display: flex;
@@ -127,7 +127,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
       // summaryは分類・関係・値・操作ボタンを1行に並べる本体部分。
       padding-right: 8px;
       font-size: 12px;
-      color: $COLOR_BLACK;
+      color: var(--color-black);
       background-color: #f0f0ef;
       border-radius: $CORNER_RADIUS;
 
@@ -139,7 +139,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
         line-height: $HEIGHT;
         color: white;
         cursor: grab;
-        background-color: $COLOR_BLACK;
+        background-color: var(--color-black);
         border-top-left-radius: $CORNER_RADIUS;
         border-bottom-left-radius: $CORNER_RADIUS;
       }
@@ -213,7 +213,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
       border-top: none;
       border-bottom-right-radius: $CORNER_RADIUS;
       border-bottom-left-radius: $CORNER_RADIUS;
-      transition: height $GUI_DURATION;
+      transition: height var(--gui-duration);
     }
   }
 
@@ -224,15 +224,15 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
     width: 100vw;
     height: 100vh;
     pointer-events: none;
-    background: $BACKDROP_BG;
+    background: var(--backdrop-bg);
     opacity: 0;
-    transition: opacity $TRANSITION_DURATION;
+    transition: opacity var(--transition-duration);
   }
 
   &.-editing {
     // 編集中は行本体をバックドロップより前面に出し、値タグごとの削除ボタンを表示する。
     > .body {
-      z-index: $Z_INDEX_EDITING_CONDITION + 1;
+      z-index: calc(var(--z-index-editing-condition) + 1);
 
       > .summary {
         border-radius: $CORNER_RADIUS $CORNER_RADIUS 0;
@@ -260,7 +260,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
     }
 
     > .bg {
-      z-index: $Z_INDEX_EDITING_CONDITION;
+      z-index: var(--z-index-editing-condition);
       pointer-events: auto;
       opacity: 1;
     }
@@ -276,7 +276,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
           z-index: 1;
           height: $HEIGHT_RELATION;
           cursor: pointer;
-          background-color: $COLOR_KEY_DARK1;
+          background-color: var(--color-key-dark1);
           border-radius: 3px;
 
           &::before,
@@ -304,11 +304,11 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
     > .body {
       > .summary {
         > .classification {
-          background-color: $COLOR_DISABLE_DEEP;
+          background-color: var(--color-disable-deep);
         }
 
         > .relation {
-          background-color: $COLOR_DISABLE;
+          background-color: var(--color-disable);
 
           &::after {
             top: 2px;
@@ -333,7 +333,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
       height: 100%;
       pointer-events: none;
       content: '';
-      border: solid 2px $COLOR_SELECTED;
+      border: solid 2px var(--color-selected);
       border-radius: $CORNER_RADIUS;
     }
   }
@@ -351,7 +351,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
               font-weight: bold;
 
               &.mgend {
-                color: $COLOR_DATASET_DISEASE_MGEND;
+                color: var(--color-dataset-disease-mgend);
               }
             }
           }
@@ -364,7 +364,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
               font-weight: bold;
 
               &.clinvar {
-                color: $COLOR_DATASET_DISEASE_CLINVAR;
+                color: var(--color-dataset-disease-clinvar);
               }
             }
           }
@@ -382,8 +382,8 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
   position: relative;
   margin: 0 calc(var(--padding-group) * -1 - 1px) 3px 0;
   background-color: white;
-  border: solid 1px $COLOR_KEY_DARK3;
-  box-shadow: $SHADOW_DEPTH1;
+  border: solid 1px var(--color-key-dark3);
+  box-shadow: var(--shadow-depth1);
 
   > .logical-operator-switch {
     position: absolute;
@@ -415,7 +415,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
       height: 100%;
       pointer-events: none;
       content: '';
-      border: solid 2px $COLOR_SELECTED;
+      border: solid 2px var(--color-selected);
     }
   }
 
@@ -429,7 +429,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
         display: block;
         height: 18px;
         line-height: 12px;
-        color: $COLOR_BLACK;
+        color: var(--color-black);
         text-align: center;
         content: 'Please add a search condition from below menu';
       }
@@ -449,7 +449,7 @@ $OPACITY_DISABLED: 0.8;
   font-size: 12px;
   line-height: 14px;
   color: white;
-  background-color: $COLOR_KEY_DARK3;
+  background-color: var(--color-key-dark3);
 
   .command {
     margin: 0;
@@ -482,7 +482,7 @@ $OPACITY_DISABLED: 0.8;
         padding: 4px 8px 3px;
         margin-bottom: 0;
         cursor: pointer;
-        transition: background-color $GUI_DURATION;
+        transition: background-color var(--gui-duration);
       }
 
       .shortcut {
@@ -493,7 +493,7 @@ $OPACITY_DISABLED: 0.8;
         font-size: 10px;
         font-weight: bold;
         line-height: 12px;
-        color: $COLOR_KEY_DARK3;
+        color: var(--color-key-dark3);
         background-color: white;
         border-radius: 2px;
 
@@ -515,7 +515,7 @@ $OPACITY_DISABLED: 0.8;
 
       &:hover {
         > p {
-          background-color: $COLOR_KEY_DARK1;
+          background-color: var(--color-key-dark1);
         }
       }
 
@@ -540,20 +540,20 @@ $OPACITY_DISABLED: 0.8;
 
         > ul {
           position: absolute;
-          z-index: $Z_INDEX_ADVANCED_SEARCH_MENU;
+          z-index: var(--z-index-advanced-search-menu);
           padding: 0 0 2px;
           white-space: nowrap;
           pointer-events: none;
           list-style: none;
-          background-color: $COLOR_KEY_DARK3;
+          background-color: var(--color-key-dark3);
           opacity: 0;
           transform: translateY(-10px);
           transition:
-            opacity $GUI_DURATION,
-            transform $GUI_DURATION;
+            opacity var(--gui-duration),
+            transform var(--gui-duration);
 
           > li {
-            transition: background-color $GUI_DURATION;
+            transition: background-color var(--gui-duration);
 
             > .command {
               display: flex;
@@ -561,12 +561,12 @@ $OPACITY_DISABLED: 0.8;
               width: 100%;
               padding: 4px 8px;
               margin-bottom: 0;
-              transition: background-color $GUI_DURATION;
+              transition: background-color var(--gui-duration);
             }
 
             &:hover {
               > .command {
-                background-color: $COLOR_KEY_DARK1;
+                background-color: var(--color-key-dark1);
               }
             }
           }
@@ -590,7 +590,7 @@ $OPACITY_DISABLED: 0.8;
           opacity: 1;
 
           &:hover {
-            background-color: $COLOR_KEY_DARK1;
+            background-color: var(--color-key-dark1);
           }
         }
 
@@ -600,7 +600,7 @@ $OPACITY_DISABLED: 0.8;
             opacity: 1;
 
             &:hover {
-              background-color: $COLOR_KEY_DARK1;
+              background-color: var(--color-key-dark1);
             }
           }
         }
@@ -611,7 +611,7 @@ $OPACITY_DISABLED: 0.8;
             opacity: 1;
 
             &:hover {
-              background-color: $COLOR_KEY_DARK1;
+              background-color: var(--color-key-dark1);
             }
           }
         }
@@ -622,7 +622,7 @@ $OPACITY_DISABLED: 0.8;
             opacity: 1;
 
             &:hover {
-              background-color: $COLOR_KEY_DARK1;
+              background-color: var(--color-key-dark1);
             }
           }
         }
@@ -633,7 +633,7 @@ $OPACITY_DISABLED: 0.8;
             opacity: 1;
 
             &:hover {
-              background-color: $COLOR_KEY_DARK1;
+              background-color: var(--color-key-dark1);
             }
           }
         }
@@ -660,7 +660,7 @@ $OPACITY_DISABLED: 0.8;
 #AdvancedSearchBuilderView {
   --padding-group: 6px;
   --height-toolbar: 14px;
-  padding: 14px $PADDING_SIDE 14px;
+  padding: 14px var(--padding-side) 14px;
   user-select: none;
 
   > .inner {
@@ -697,7 +697,7 @@ $OPACITY_DISABLED: 0.8;
 .checkboxes-editor-view {
   > .buttons {
     padding: 4px var(--padding-side);
-    border-bottom: dotted 1px $COLOR_SEPARATOR_SUB;
+    border-bottom: dotted 1px var(--color-separator-sub);
   }
 
   > .checkboxes {
@@ -727,9 +727,9 @@ $OPACITY_DISABLED: 0.8;
 // パネルの左右余白を負のマージンで打ち消し、横幅いっぱいに広げる。
 .checklist-values {
   padding-inline-start: 0;
-  margin-right: -$PADDING_PANEL_VIEW;
+  margin-right: -var(--padding-panel-view);
   margin-bottom: 0;
-  margin-left: -$PADDING_PANEL_VIEW;
+  margin-left: -var(--padding-panel-view);
 
   // float を持つ子要素があるため、クリアフィックスで親の高さを確保する。
   &::after {
@@ -749,7 +749,7 @@ $OPACITY_DISABLED: 0.8;
     align-items: center;
     justify-content: space-between;
     min-height: 24px;
-    padding: 2px $PADDING_PANEL_VIEW;
+    padding: 2px var(--padding-panel-view);
     // 親（#SideBar）に white-space: nowrap が設定されているため、ここで明示的に折り返しを許可する。
     white-space: normal;
 
@@ -820,7 +820,7 @@ $OPACITY_DISABLED: 0.8;
     > hr {
       margin: 0;
       border: none;
-      border-top: solid 1px $COLOR_SEPARATOR_SUB;
+      border-top: solid 1px var(--color-separator-sub);
     }
 
     // セパレーター直後のアイテムは区切り線との視覚的な距離を確保する。
@@ -835,7 +835,7 @@ $OPACITY_DISABLED: 0.8;
 .clinical-significance-view {
   > .buttons {
     padding: 4px var(--padding-side);
-    border-bottom: dotted 1px $COLOR_SEPARATOR_SUB;
+    border-bottom: dotted 1px var(--color-separator-sub);
   }
 
   > .dataset-title {
@@ -845,16 +845,16 @@ $OPACITY_DISABLED: 0.8;
     font-weight: bold;
 
     &.clinvar {
-      color: $COLOR_DATASET_DISEASE_CLINVAR;
+      color: var(--color-dataset-disease-clinvar);
     }
     &.mgend {
-      color: $COLOR_DATASET_DISEASE_MGEND;
+      color: var(--color-dataset-disease-mgend);
     }
   }
 
   > hr {
     margin: 0;
-    border: dotted 1px $COLOR_SEPARATOR_SUB;
+    border: dotted 1px var(--color-separator-sub);
   }
 
   > .checkboxes {
@@ -1151,7 +1151,7 @@ $OPACITY_DISABLED: 0.8;
 
 #AdvancedSearchView {
   .search-field-view {
-    padding: 14px $PADDING_SIDE;
+    padding: 14px var(--padding-side);
 
     > .fieldcontainer {
       > .field {

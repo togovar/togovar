@@ -19,7 +19,7 @@ $SIZE: 30px;
         line-height: $SIZE;
         vertical-align: center;
         outline: none;
-        border: solid 1px $COLOR_KEY_DARK2;
+        border: solid 1px var(--color-key-dark2);
         border-radius: $SIZE * 0.5;
         box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
         opacity: 0.9;

@@ -3,7 +3,7 @@
 .logical-operator-switch {
   padding: 0.1em 0.3em;
   line-height: 1;
-  color: $COLOR_KEY_DARK3;
+  color: var(--color-key-dark3);
   cursor: pointer;
   border-radius: 0.75em;
 
@@ -69,6 +69,6 @@
 
   &:hover {
     color: white;
-    background-color: $COLOR_KEY_DARK3;
+    background-color: var(--color-key-dark3);
   }
 }

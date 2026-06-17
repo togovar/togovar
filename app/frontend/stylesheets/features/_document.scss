@@ -5,12 +5,12 @@
 // 統合元: object/component/_common-document.scss
 // =============================================================================
 
-// content-width: コンテンツ幅を $WIDTH_MIN に揃えて中央揃えにするミックスイン
+// content-width: コンテンツ幅を var(--width-min) に揃えて中央揃えにするミックスイン
 // 画面幅が広くてもコンテンツが広がりすぎないよう制限する
 @mixin content-width {
-  width: $WIDTH_MIN - $PADDING_SIDE - $PADDING_SIDE;
-  padding-right: $PADDING_SIDE;
-  padding-left: $PADDING_SIDE;
+  width: calc(var(--width-min) - var(--padding-side) * 2);
+  padding-right: var(--padding-side);
+  padding-left: var(--padding-side);
   margin: 0 auto;
 }
 
@@ -18,10 +18,10 @@
 // About・Policy・Help などの静的コンテンツページのルートコンテナ
 .common-document {
   > .header {
-    min-width: $WIDTH_MIN - $PADDING_SIDE - $PADDING_SIDE;
+    min-width: calc(var(--width-min) - var(--padding-side) * 2);
     padding: 27px 0 10px;
     color: white;
-    background: $GRADIENT_HEADING;
+    background: var(--gradient-heading);
 
     > .title {
       font-size: 21px;
@@ -58,14 +58,14 @@
           width: calc(100% + 8px);
           height: 2px;
           content: '';
-          background-color: $COLOR_KEY_DARK1;
+          background-color: var(--color-key-dark1);
         }
       }
 
       > .sectiontitle {
         position: relative;
         font-size: 18px;
-        color: $COLOR_KEY_DARK3;
+        color: var(--color-key-dark3);
 
         &::before,
         &::after {
@@ -94,19 +94,19 @@
 
         > thead {
           > tr {
-            border-bottom: solid 1px $COLOR_BLACK;
+            border-bottom: solid 1px var(--color-black);
           }
         }
 
         > tbody {
           > tr {
-            border-bottom: solid 1px rgba($COLOR_BLACK, 0.4);
+            border-bottom: solid 1px color-mix(in srgb, var(--color-black) 40%, transparent);
           }
         }
 
         > tfoot {
           > tr {
-            border-top: solid 1px $COLOR_BLACK;
+            border-top: solid 1px var(--color-black);
           }
         }
       }
@@ -134,7 +134,7 @@
             width: 5px;
             height: 5px;
             content: '';
-            background-color: $COLOR_KEY;
+            background-color: var(--color-key);
             border-radius: 100%;
           }
         }
@@ -163,7 +163,7 @@
             text-align: center;
             content: counters(item, '.') ' ';
             counter-increment: item;
-            background-color: $COLOR_KEY;
+            background-color: var(--color-key);
             border-radius: 9px;
           }
 
@@ -174,7 +174,7 @@
           > .heading {
             font-size: 14px;
             line-height: 1.6;
-            color: $COLOR_KEY_DARK1;
+            color: var(--color-key-dark1);
           }
 
           .subsection {
@@ -184,7 +184,7 @@
             > .subheading {
               font-size: 12px;
               line-height: 1.2;
-              color: $COLOR_BLACK;
+              color: var(--color-black);
             }
           }
         }
@@ -209,7 +209,7 @@
         widows: 2;
         orphans: 2;
         column-count: 2;
-        column-rule: solid 1px rgba($COLOR_KEY, 0.6);
+        column-rule: solid 1px color-mix(in srgb, var(--color-key) 60%, transparent);
 
         > .sectiontitle {
           column-span: all;

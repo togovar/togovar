@@ -5,18 +5,18 @@
   font-size: 12px;
   background-color: white;
   border-radius: 5px;
-  box-shadow: 0 2px 2px rgba(black, 0.3);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
 
   > .title {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px $PADDING_PANEL_VIEW 6px;
+    padding: 8px var(--padding-panel-view) 6px;
     margin-bottom: 0;
     font-size: 14px;
     font-weight: bold;
     line-height: 16px;
-    border-bottom: solid 1px $COLOR_SEPARATOR;
+    border-bottom: solid 1px var(--color-separator);
 
     > .clear-button {
       z-index: 1;
@@ -32,12 +32,12 @@
       width: 7px;
       height: 7px;
       content: '';
-      border-top: solid 1px $COLOR_BLACK;
-      border-left: solid 1px $COLOR_BLACK;
+      border-top: solid 1px var(--color-black);
+      border-left: solid 1px var(--color-black);
       transform: rotate(45deg);
       transition:
-        transform $GUI_DURATION,
-        top $GUI_DURATION;
+        transform var(--gui-duration),
+        top var(--gui-duration);
     }
   }
 
@@ -51,7 +51,7 @@
   }
 
   > .content {
-    padding: 6px $PADDING_PANEL_VIEW 10px;
+    padding: 6px var(--padding-panel-view) 10px;
   }
 
   + .panel-view {
@@ -88,7 +88,7 @@
       display: block;
       padding-bottom: 10px;
       margin: (-8px) 0 0;
-      color: $COLOR_GRAY;
+      color: var(--color-gray);
       text-align: center;
       content: 'Not found';
     }
@@ -117,24 +117,24 @@
   }
 
   &.-emphasize {
-    background: $GRADIENT_HEADING;
-    transition: background-color $GUI_DURATION;
+    background: var(--gradient-heading);
+    transition: background-color var(--gui-duration);
 
     &.-disable {
       color: white;
-      background: $GRADIENT_HEADING_DISABLE;
+      background: var(--gradient-heading-disable);
     }
 
     &:hover {
-      background-color: $COLOR_KEY_DARK1;
+      background-color: var(--color-key-dark1);
     }
 
     > .title {
       > a,
       span {
         display: block;
-        padding: 8px $PADDING_PANEL_VIEW 6px;
-        margin: (-8px) (-$PADDING_PANEL_VIEW) -6px;
+        padding: 8px var(--padding-panel-view) 6px;
+        margin: (-8px) (-var(--padding-panel-view)) -6px;
         color: white;
         text-decoration: none;
 

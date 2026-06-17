@@ -123,7 +123,7 @@ $GUI_DURATION: 0.2s;
 $TRANSITION_DURATION: 0.5s;
 
 // effect
-$SHADOW_DEPTH1: 0 1px 1px rgba(black, 0.3);
+$SHADOW_DEPTH1: 0 1px 1px rgba(0, 0, 0, 0.3);
 
 :root {
   // color
@@ -133,12 +133,14 @@ $SHADOW_DEPTH1: 0 1px 1px rgba(black, 0.3);
   --color-key-dark3: #{$COLOR_KEY_DARK3};
   --color-black: #{$COLOR_BLACK};
   --color-gray: #{$COLOR_GRAY};
+  --color-gray-light: #{color.adjust($COLOR_GRAY, $lightness: 10%)};
   --color-pale-gray: #{$COLOR_PALE_GRAY};
   --color-light-gray: #{$COLOR_LIGHT_GRAY};
   --color-darker-gray: #{$COLOR_DARKER_GRAY};
   --color-selected: #{$COLOR_SELECTED};
   --color-selected-hover: #{$COLOR_SELECTED_HOVER};
   --color-selected-light: #{$COLOR_SELECTED_LIGHT};
+  --color-selected-lighter: #{color.adjust($COLOR_SELECTED, $lightness: 30%)};
   --color-singleton: #{$COLOR_SINGLETON};
   --color-homozygote: #{$COLOR_SIGN_DANGEROUS};
   --color-suggest: #{$COLOR_SUGGEST};
@@ -149,6 +151,8 @@ $SHADOW_DEPTH1: 0 1px 1px rgba(black, 0.3);
   // color: mutation
   --color-mutation-ref: #{$COLOR_REF};
   --color-mutation-alt: #{$COLOR_ALT};
+  --color-mutation-ref-bg: #{color.adjust($COLOR_REF, $lightness: 48%, $saturation: -10%)};
+  --color-mutation-alt-bg: #{color.adjust($COLOR_ALT, $lightness: 24%, $saturation: -10%)};
   // color: datasets
   --color-dataset-gemj: #{$COLOR_DATASET_GEM_J};
   --color-dataset-gemj-light: #{$COLOR_DATASET_GEM_J_LIGHT};
@@ -169,12 +173,15 @@ $SHADOW_DEPTH1: 0 1px 1px rgba(black, 0.3);
   --color-sign-safe-light: #{$COLOR_SIGN_SAFE_LIGHT};
   --color-sign-normal: #{$COLOR_SIGN_NORMAL};
   --color-sign-normal-light: #{$COLOR_SIGN_NORMAL_LIGHT};
+  --color-sign-normal-dark: #{color.adjust($COLOR_SIGN_NORMAL, $lightness: -2%)};
   --color-sign-warning: #{$COLOR_SIGN_WARNING};
   --color-sign-warning-light: #{$COLOR_SIGN_WARNING_LIGHT};
+  --color-sign-warning-dark: #{color.adjust($COLOR_SIGN_WARNING, $lightness: -2%)};
   --color-sign-lowdangerous: #{$COLOR_SIGN_LOWDANGEROUS};
   --color-sign-lowdangerous-light: #{$COLOR_SIGN_LOWDANGEROUS_LIGHT};
   --color-sign-dangerous: #{$COLOR_SIGN_DANGEROUS};
   --color-sign-dangerous-light: #{$COLOR_SIGN_DANGEROUS_LIGHT};
+  --color-sign-dangerous-dark: #{color.adjust($COLOR_SIGN_DANGEROUS, $lightness: -2%)};
   --color-sign-modifier: #{$COLOR_SIGN_MODIFIER};
   --color-sign-modifier-light: #{$COLOR_SIGN_MODIFIER_LIGHT};
   --color-sign-other: #{$COLOR_SIGN_OTHER};
@@ -182,11 +189,42 @@ $SHADOW_DEPTH1: 0 1px 1px rgba(black, 0.3);
   --color-sign-unknown: #{$COLOR_SIGN_UNKNOWN};
   --color-sign-unknown-light: #{$COLOR_SIGN_UNKNOWN_LIGHT};
 
-  // geometric
+  // color: dataset (既存の上位分類に含まれないもの)
+  --color-dataset-disease: #{$COLOR_SIGN_DANGEROUS};
+  --color-dataset-disease-mgend: #{$COLOR_DATASET_DISEASE_MGEND};
+  --color-dataset-disease-clinvar: #{$COLOR_DATASET_DISEASE_CLINVAR};
+
+  // gradient / backdrop
+  --gradient-heading: #{$GRADIENT_HEADING};
+  --gradient-heading-semitransparent: #{$GRADIENT_HEADING_SEMITRANSPARENT};
+  --gradient-heading-disable: #{$GRADIENT_HEADING_DISABLE};
+  --backdrop-bg: #{$BACKDROP_BG};
+
+  // geometry
+  --padding-side: #{$PADDING_SIDE};
+  --padding-sidebar-side: #{$PADDING_SIDEBAR_SIDE};
+  --padding-report-left: #{$PADDING_REPORT_LEFT};
+  --padding-panel-view: #{$PADDING_PANEL_VIEW};
+  --width-min: #{$WIDTH_MIN};
+  --width-sidebar: #{$WIDTH_SIDEBAR};
+  --height-nbdc-common-header: #{$HEIGHT_NBDC_COMMON_HEADER};
+  --height-nbdc-common-footer: #{$HEIGHT_NBDC_COMMON_FOOTER};
+  --height-navigation-item: #{$HEIGHT_NAVIGATION_ITEM};
+  --height-global-menu: #{$HEIGHT_GLOBAL_MENU};
+  --height-bottom-drawer: #{$HEIGHT_BOTTOM_DRAWER};
+  --height-bottom-drawer-opened: #{$HEIGHT_BOTTOM_DRAWER_OPENED};
+  --height-advanced-search-condition: #{$HEIGHT_ADVANCED_SEARCH_CONDITION};
   --height-inline: 18px;
   --height-advanced-search-condition-values-container: 24px;
   --height-advanced-search-condition-value: 18px;
   --left-advanced-search-condition-graph: 142px;
+
+  // time
+  --gui-duration: #{$GUI_DURATION};
+  --transition-duration: #{$TRANSITION_DURATION};
+
+  // effect
+  --shadow-depth1: #{$SHADOW_DEPTH1};
 
   // z-index
   --z-index-base: 10000;

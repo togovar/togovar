@@ -1,12 +1,12 @@
 @use '../foundation' as *;
 
 .title {
-  padding: 5px $PADDING_SIDE 0;
+  padding: 5px var(--padding-side) 0;
   margin: 4px 0 0;
   font-size: 12px;
   font-weight: normal;
   line-height: 16px;
-  color: $COLOR_KEY_DARK1;
+  color: var(--color-key-dark1);
   &::first-letter {
     text-transform: capitalize;
   }
@@ -21,10 +21,10 @@
 
   > .item {
     height: 24px;
-    padding: 0 $PADDING_SIDE;
+    padding: 0 var(--padding-side);
     line-height: 24px;
     cursor: pointer;
-    transition: background-color $GUI_DURATION;
+    transition: background-color var(--gui-duration);
     > em {
       font-style: normal;
       background-color: var(--color-suggest);
@@ -35,7 +35,7 @@
     }
 
     &:hover {
-      background-color: rgba($COLOR_SELECTED, 0.2);
+      background-color: color-mix(in srgb, var(--color-selected) 20%, transparent);
     }
 
     &.-disabled {
@@ -47,16 +47,16 @@
     > .sub {
       padding-left: 0.5em;
       font-size: 12px;
-      color: rgba($COLOR_BLACK, 0.5);
+      color: color-mix(in srgb, var(--color-black) 50%, transparent);
     }
 
     &.-selected {
-      background-color: rgba($COLOR_SELECTED, 1);
+      background-color: var(--color-selected);
     }
 
     &.-empty {
       padding: 0.5rem;
-      color: rgba($COLOR_BLACK, 0.5);
+      color: color-mix(in srgb, var(--color-black) 50%, transparent);
       text-align: center;
     }
   }

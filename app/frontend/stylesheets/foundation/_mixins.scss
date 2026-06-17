@@ -15,7 +15,7 @@
   line-height: 18px;
   text-align: right;
   outline: none;
-  border: solid 1px $COLOR_GRAY;
+  border: solid 1px var(--color-gray);
   border-radius: 9px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
 }
@@ -23,5 +23,5 @@
 // パネルビューの小見出し共通スタイル（.panel-view-heading）
 @mixin panel-view-heading {
   font-size: 10px;
-  color: $COLOR_GRAY;
+  color: var(--color-gray);
 }

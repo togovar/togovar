@@ -1,4 +1,3 @@
-@use 'sass:color';
 @use '../foundation' as *;
 @use '../object/component/dropdown-view' as *;
 
@@ -82,14 +81,14 @@
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
-  padding: 10px $PADDING_SIDE 0;
+  padding: 10px var(--padding-side) 0;
 
   // テーブル検索結果が見つからない場合のメッセージ
   &.-not-found::after {
     display: block;
     font-size: 14px;
     line-height: 64px;
-    color: $COLOR_GRAY;
+    color: var(--color-gray);
     text-align: center;
     content: 'Not found';
   }
@@ -182,7 +181,7 @@
 
         > .download-disabled-reason {
           font-weight: 300;
-          color: $COLOR_BLACK;
+          color: var(--color-black);
           opacity: 0.9;
         }
       }
@@ -350,7 +349,7 @@
     min-height: 0;
     padding-bottom: 0;
     margin-top: -15px;
-    margin-right: -$PADDING_SIDE;
+    margin-right: -var(--padding-side);
     overflow-x: auto;
     overflow-y: hidden;
     overscroll-behavior: contain;
@@ -378,14 +377,14 @@
   white-space: nowrap;
   // tr の border-bottom を有効にするために必要（separate モデルでは tr の border は無視される）
   border-collapse: collapse;
-  border-right: solid $PADDING_SIDE white;
+  border-right: solid var(--padding-side) white;
 
   // ---------------------------------------------------------------------------
   // テーブルヘッダー (thead)
   // ---------------------------------------------------------------------------
   > thead {
     > tr {
-      border-bottom: solid 2px $COLOR_BLACK;
+      border-bottom: solid 2px var(--color-black);
 
       > th {
         position: relative;
@@ -513,7 +512,7 @@
           padding-left: 5px;
           font-weight: normal;
           line-height: 1;
-          border-left: solid 1px rgba($COLOR_BLACK, 0.5);
+          border-left: solid 1px color-mix(in srgb, var(--color-black) 50%, transparent);
         }
       }
     }
@@ -525,8 +524,8 @@
   > tbody {
     > tr {
       height: 27px;
-      border-bottom: solid 1px $COLOR_SEPARATOR;
-      transition: background $GUI_DURATION;
+      border-bottom: solid 1px var(--color-separator);
+      transition: background var(--gui-duration);
 
       > td {
         position: relative;
@@ -628,8 +627,8 @@
             line-height: 14px;
             vertical-align: middle;
             content: '+' attr(data-remains);
-            background-color: color.adjust($COLOR_GRAY, $lightness: 35%);
-            border: solid 1px $COLOR_GRAY;
+            background-color: var(--color-light-gray);
+            border: solid 1px var(--color-gray);
             border-radius: 7px;
           }
 
@@ -723,8 +722,8 @@
               line-height: 14px;
               vertical-align: middle;
               white-space: nowrap;
-              background-color: color.adjust($COLOR_GRAY, $lightness: 35%);
-              border: solid 1px $COLOR_GRAY;
+              background-color: var(--color-light-gray);
+              border: solid 1px var(--color-gray);
               border-radius: 7px;
 
               // 件数が 0 または空のときは非表示
@@ -794,8 +793,8 @@
             line-height: 14px;
             vertical-align: middle;
             white-space: nowrap;
-            background-color: color.adjust($COLOR_GRAY, $lightness: 35%);
-            border: solid 1px $COLOR_GRAY;
+            background-color: var(--color-light-gray);
+            border: solid 1px var(--color-gray);
             border-radius: 7px;
 
             &:empty,
@@ -819,8 +818,8 @@
           line-height: 14px;
           vertical-align: middle;
           content: '+' attr(data-remains);
-          background-color: color.adjust($COLOR_GRAY, $lightness: 35%);
-          border: solid 1px $COLOR_GRAY;
+          background-color: var(--color-light-gray);
+          border: solid 1px var(--color-gray);
           border-radius: 7px;
         }
 
@@ -837,7 +836,7 @@
         // セパレーター列（斜線で列グループを区切る）
         &.separator {
           position: relative;
-          color: $COLOR_KEY;
+          color: var(--color-key);
           border-bottom: solid 1px white;
 
           &::before {
@@ -847,7 +846,7 @@
             display: block;
             height: 11px;
             content: '';
-            border-left: solid 1px rgba($COLOR_BLACK, 0.5);
+            border-left: solid 1px color-mix(in srgb, var(--color-black) 50%, transparent);
             transform: rotate(-20deg) translateY(-6px);
           }
         }
@@ -860,19 +859,19 @@
 
       // ホバー時の背景色
       &:hover {
-        background-color: rgba($COLOR_SELECTED, 0.2);
+        background-color: color-mix(in srgb, var(--color-selected) 20%, transparent);
       }
 
       // 選択行の背景色
       &.-selected {
-        background-color: rgba($COLOR_SELECTED, 0.4);
+        background-color: color-mix(in srgb, var(--color-selected) 40%, transparent);
       }
 
       // ローディング中: ローディング GIF を全体に表示
       &.-loading > td {
         background:
           url(../images/loading.gif) no-repeat 50% 50%,
-          rgba(black, 0.05);
+          rgba(0, 0, 0, 0.05);
         background-size: 30px 10px;
       }
 
@@ -909,10 +908,10 @@ body[data-column-resizing='true'] {
     width: 8px;
     height: 100px;
     cursor: grab;
-    background-color: rgba($COLOR_GRAY, 0.5);
+    background-color: color-mix(in srgb, var(--color-gray) 50%, transparent);
     border-radius: 4px;
     opacity: 1;
-    transition: background-color $GUI_DURATION;
+    transition: background-color var(--gui-duration);
 
     > .indicator {
       position: absolute;
@@ -924,10 +923,10 @@ body[data-column-resizing='true'] {
       color: white;
       white-space: nowrap;
       pointer-events: none;
-      background-color: $COLOR_KEY_DARK1;
+      background-color: var(--color-key-dark1);
       border-radius: 9px;
       opacity: 0;
-      transition: opacity $TRANSITION_DURATION;
+      transition: opacity var(--transition-duration);
 
       &::after {
         position: absolute;
@@ -937,7 +936,7 @@ body[data-column-resizing='true'] {
         content: '';
         border-top: solid 4px transparent;
         border-bottom: solid 4px transparent;
-        border-left: solid 9px $COLOR_KEY_DARK1;
+        border-left: solid 9px var(--color-key-dark1);
       }
 
       > .position {
@@ -959,13 +958,13 @@ body[data-column-resizing='true'] {
 
     &.ui-draggable-dragging {
       cursor: grabbing;
-      background-color: rgba($COLOR_KEY_DARK1, 0.5);
+      background-color: color-mix(in srgb, var(--color-key-dark1) 50%, transparent);
     }
   }
 
   &:hover {
     > .bar {
-      background-color: rgba($COLOR_KEY_DARK1, 0.5);
+      background-color: color-mix(in srgb, var(--color-key-dark1) 50%, transparent);
 
       > .indicator {
         opacity: 1;
@@ -989,15 +988,15 @@ body[data-column-resizing='true'] {
 .row-indicator {
   position: absolute;
   right: -14px;
-  z-index: $Z_INDEX_ROW_INDICATOR;
+  z-index: var(--z-index-row-indicator);
   width: 14px;
   height: 27px;
   overflow: hidden;
   opacity: 0;
   transform: translateY(77px);
   transition:
-    opacity $GUI_DURATION,
-    top $GUI_DURATION;
+    opacity var(--gui-duration),
+    top var(--gui-duration);
 
   &::before,
   &::after {
@@ -1019,7 +1018,7 @@ body[data-column-resizing='true'] {
     top: 5px;
     border-top: solid 8px transparent;
     border-bottom: solid 8px transparent;
-    border-left: solid 9px color.adjust($COLOR_SELECTED, $lightness: 30%);
+    border-left: solid 9px var(--color-selected-lighter);
   }
 
   &.-shown {
@@ -1045,7 +1044,7 @@ body[data-column-resizing='true'] {
 // 臨床的意義バッジ (.clinical-significance)
 // data-value 属性で P/LP/LB/B などの解釈種別を受け取り、色付きバッジを ::before で描画する
 .clinical-significance {
-  color: $COLOR_KEY_DARK3;
+  color: var(--color-key-dark3);
 
   &::before {
     display: inline-block;
@@ -1075,53 +1074,53 @@ body[data-column-resizing='true'] {
 
   &[data-value='P']::before,
   &[data-value='LP']::before {
-    color: $COLOR_SIGN_DANGEROUS;
-    background-color: $COLOR_SIGN_DANGEROUS_LIGHT;
-    border-color: $COLOR_SIGN_DANGEROUS;
+    color: var(--color-sign-dangerous);
+    background-color: var(--color-sign-dangerous-light);
+    border-color: var(--color-sign-dangerous);
   }
 
   &[data-value='PLP']::before,
   &[data-value='LPLP']::before {
-    color: $COLOR_SIGN_LOWDANGEROUS;
-    background-color: $COLOR_SIGN_LOWDANGEROUS_LIGHT;
-    border-color: $COLOR_SIGN_LOWDANGEROUS;
+    color: var(--color-sign-lowdangerous);
+    background-color: var(--color-sign-lowdangerous-light);
+    border-color: var(--color-sign-lowdangerous);
   }
 
   &[data-value='ERA']::before,
   &[data-value='LRA']::before,
   &[data-value='URA']::before {
-    color: $COLOR_SIGN_WARNING;
+    color: var(--color-sign-warning);
     content: 'RA';
-    background-color: $COLOR_SIGN_WARNING_LIGHT;
-    border-color: $COLOR_SIGN_WARNING;
+    background-color: var(--color-sign-warning-light);
+    border-color: var(--color-sign-warning);
   }
 
   &[data-value='US']::before {
-    color: $COLOR_SIGN_UNKNOWN;
+    color: var(--color-sign-unknown);
     content: 'US';
-    background-color: $COLOR_SIGN_UNKNOWN_LIGHT;
-    border-color: $COLOR_SIGN_UNKNOWN;
+    background-color: var(--color-sign-unknown-light);
+    border-color: var(--color-sign-unknown);
   }
 
   &[data-value='LB']::before {
-    color: $COLOR_SIGN_NORMAL;
+    color: var(--color-sign-normal);
     content: 'LB';
-    background-color: $COLOR_SIGN_NORMAL_LIGHT;
-    border-color: $COLOR_SIGN_NORMAL;
+    background-color: var(--color-sign-normal-light);
+    border-color: var(--color-sign-normal);
   }
 
   &[data-value='B']::before {
-    color: $COLOR_SIGN_SAFE;
+    color: var(--color-sign-safe);
     content: 'B';
-    background-color: $COLOR_SIGN_SAFE_LIGHT;
-    border-color: $COLOR_SIGN_SAFE;
+    background-color: var(--color-sign-safe-light);
+    border-color: var(--color-sign-safe);
   }
 
   &[data-value='CI']::before {
-    color: $COLOR_SIGN_MODIFIER;
+    color: var(--color-sign-modifier);
     content: 'CI';
-    background-color: $COLOR_SIGN_MODIFIER_LIGHT;
-    border-color: $COLOR_SIGN_MODIFIER;
+    background-color: var(--color-sign-modifier-light);
+    border-color: var(--color-sign-modifier);
   }
 
   &[data-value='DR']::before {
@@ -1150,9 +1149,9 @@ body[data-column-resizing='true'] {
   &[data-value='PR'],
   &[data-value='AF'] {
     &::before {
-      color: $COLOR_SIGN_OTHER;
-      background-color: $COLOR_SIGN_OTHER_LIGHT;
-      border-color: $COLOR_SIGN_OTHER;
+      color: var(--color-sign-other);
+      background-color: var(--color-sign-other-light);
+      border-color: var(--color-sign-other);
     }
   }
 
@@ -1169,9 +1168,9 @@ body[data-column-resizing='true'] {
   &[data-value='O']::before,
   &[data-value='NP']::before,
   &[data-value='AN']::before {
-    color: $COLOR_GRAY;
+    color: var(--color-gray);
     background-color: white;
-    border-color: $COLOR_GRAY;
+    border-color: var(--color-gray);
   }
 }
 
@@ -1188,16 +1187,16 @@ body[data-column-resizing='true'] {
   }
 
   &.-low::before {
-    background-color: $COLOR_SIGN_SAFE;
+    background-color: var(--color-sign-safe);
   }
   &.-moderate::before {
-    background-color: $COLOR_SIGN_NORMAL;
+    background-color: var(--color-sign-normal);
   }
   &.-high::before {
-    background-color: $COLOR_SIGN_DANGEROUS;
+    background-color: var(--color-sign-dangerous);
   }
   &.-modifier::before {
-    background-color: $COLOR_SIGN_MODIFIER;
+    background-color: var(--color-sign-modifier);
   }
 }
 
@@ -1245,45 +1244,45 @@ body[data-column-resizing='true'] {
   &[data-dataset='jga_wes'],
   &[data-dataset='jga_snp'] {
     &::before {
-      color: $COLOR_DATASET_JGA;
+      color: var(--color-dataset-jga);
     }
   }
 
   &[data-dataset='tommo'] {
     &::before {
-      color: $COLOR_DATASET_TOMMO;
+      color: var(--color-dataset-tommo);
     }
   }
 
   &[data-dataset='hgvd'],
   &[data-dataset='mgend'] {
     &::before {
-      color: $COLOR_DATASET_HGVD;
+      color: var(--color-dataset-hgvd);
     }
   }
 
   &[data-dataset='ncbn'] {
     &::before {
-      color: $COLOR_DATASET_NCBN;
+      color: var(--color-dataset-ncbn);
     }
   }
 
   &[data-dataset='gem_j_wga'] {
     &::before {
-      color: $COLOR_DATASET_GEM_J;
+      color: var(--color-dataset-gemj);
     }
   }
 
   &[data-dataset='bbj'] {
     &::before {
-      color: $COLOR_DATASET_BBJ;
+      color: var(--color-dataset-bbj);
     }
   }
 
   &[data-dataset='gnomad_genomes'],
   &[data-dataset='gnomad_exomes'] {
     &::before {
-      color: $COLOR_DATASET_FOREIGN;
+      color: var(--color-dataset-foreign);
     }
   }
 
@@ -1294,13 +1293,13 @@ body[data-column-resizing='true'] {
       font-family: 'Font Awesome 7 Free', sans-serif;
       font-size: 14px;
       font-weight: 900;
-      color: $COLOR_DATASET_DISEASE;
+      color: var(--color-sign-dangerous);
       content: var(--icon-plus);
     }
 
     > .properties {
       &::before {
-        color: $COLOR_DATASET_DISEASE;
+        color: var(--color-sign-dangerous);
         content: 'Disease';
       }
     }
@@ -1349,12 +1348,12 @@ body[data-column-resizing='true'] {
       margin-left: 0.25em;
       font-family: 'Font Awesome 7 Free', sans-serif;
       font-weight: 900;
-      color: color.adjust($COLOR_GRAY, $lightness: 10%);
+      color: var(--color-gray-light);
     }
   }
 
   &[href]:not([href='']):hover::after {
-    color: $COLOR_KEY;
+    color: var(--color-key);
   }
 
   &.-internal {
@@ -1378,9 +1377,9 @@ body[data-column-resizing='true'] {
 
 // Ref/Alt アレル表示 (.ref-alt)
 // REF を左・ALT を右に並べ、塩基数が多い場合は bp バッジで要約する
-$COLOR_REF_BG: color.adjust($COLOR_REF, $lightness: 48%, $saturation: -10%);
-$COLOR_ALT_BG: color.adjust($COLOR_ALT, $lightness: 24%, $saturation: -10%);
-$COLOR_REF_TEXT: $COLOR_KEY_DARK2;
+$COLOR_REF_BG: var(--color-mutation-ref-bg);
+$COLOR_ALT_BG: var(--color-mutation-alt-bg);
+$COLOR_REF_TEXT: var(--color-key-dark2);
 $COLOR_ALT_TEXT: #c52543;
 
 .ref-alt {
@@ -1429,14 +1428,14 @@ $COLOR_ALT_TEXT: #c52543;
     padding-right: 4px;
     color: $COLOR_REF_TEXT;
     background-color: $COLOR_REF_BG;
-    border-top: solid 1px $COLOR_REF;
-    border-bottom: solid 1px $COLOR_REF;
-    border-left: solid 1px $COLOR_REF;
+    border-top: solid 1px var(--color-mutation-ref);
+    border-bottom: solid 1px var(--color-mutation-ref);
+    border-left: solid 1px var(--color-mutation-ref);
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
 
     &[data-sum]::after {
-      background-color: $COLOR_REF;
+      background-color: var(--color-mutation-ref);
     }
   }
 
@@ -1444,14 +1443,14 @@ $COLOR_ALT_TEXT: #c52543;
     padding-left: 9px;
     color: $COLOR_ALT_TEXT;
     background-color: $COLOR_ALT_BG;
-    border-top: solid 1px $COLOR_ALT;
-    border-right: solid 1px $COLOR_ALT;
-    border-bottom: solid 1px $COLOR_ALT;
+    border-top: solid 1px var(--color-mutation-alt);
+    border-right: solid 1px var(--color-mutation-alt);
+    border-bottom: solid 1px var(--color-mutation-alt);
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
 
     &[data-sum]::after {
-      background-color: $COLOR_ALT;
+      background-color: var(--color-mutation-alt);
     }
   }
 
@@ -1471,7 +1470,7 @@ $COLOR_ALT_TEXT: #c52543;
       right: -6px;
       border-top: 9px solid transparent;
       border-bottom: 9px solid transparent;
-      border-left: 6px solid $COLOR_REF;
+      border-left: 6px solid var(--color-mutation-ref);
     }
 
     &::after {
@@ -1493,8 +1492,8 @@ $COLOR_ALT_TEXT: #c52543;
   font-size: 10px;
   line-height: 14px;
   vertical-align: middle;
-  background-color: color.adjust($COLOR_GRAY, $lightness: 35%);
-  border: solid 1px $COLOR_GRAY;
+  background-color: var(--color-light-gray);
+  border: solid 1px var(--color-gray);
   border-radius: 7px;
 
   &::before {
@@ -1508,7 +1507,7 @@ $COLOR_ALT_TEXT: #c52543;
   &.-null,
   &.-undefined {
     font-style: oblique;
-    color: rgba($COLOR_BLACK, 0.5);
+    color: color-mix(in srgb, var(--color-black) 50%, transparent);
   }
 }
 
@@ -1522,27 +1521,27 @@ $COLOR_ALT_TEXT: #c52543;
 
   &[data-function='T'],
   &[data-function='B'] {
-    background-color: $COLOR_SIGN_SAFE;
+    background-color: var(--color-sign-safe);
   }
   &[data-function='LB'] {
-    background-color: $COLOR_SIGN_NORMAL;
+    background-color: var(--color-sign-normal);
   }
   &[data-function='POSSD'],
   &[data-function='LP'] {
-    background-color: $COLOR_SIGN_WARNING;
+    background-color: var(--color-sign-warning);
   }
   &[data-function='D'],
   &[data-function='PROBD'] {
-    background-color: $COLOR_SIGN_DANGEROUS;
+    background-color: var(--color-sign-dangerous);
   }
 
   &[data-function='U'] {
-    color: $COLOR_BLACK;
-    background-color: $COLOR_LIGHT_GRAY;
+    color: var(--color-black);
+    background-color: var(--color-light-gray);
   }
 
   &[data-function='A'] {
-    background-color: $COLOR_SIGN_UNKNOWN;
+    background-color: var(--color-sign-unknown);
   }
 }
 
@@ -1559,34 +1558,28 @@ $COLOR_ALT_TEXT: #c52543;
 // .-drawer-opened クラスが body に付与されると bottom アニメーションで引き上がる。
 // =============================================================================
 
-// ドロワーを開いたときに染色体コンテナとして使える高さを計算する
-$HEIGHT_CHROMOSOME_CONTAINER: $HEIGHT_BOTTOM_DRAWER_OPENED -
-  $HEIGHT_BOTTOM_DRAWER;
-// カリオタイプ図の上下余白
-$TOP_CHROMOSOME: 10px;
-$BOTTOM_CHROMOSOME: 16px;
-
 .drawer-view {
   position: fixed;
   // 閉じた状態: ドロワーのタブ部分だけを画面下から出す
-  bottom: $HEIGHT_BOTTOM_DRAWER - $HEIGHT_BOTTOM_DRAWER_OPENED;
-  z-index: $Z_INDEX_DRAWER;
+  // bottom の負値 = ドロワー展開高さ分だけ画面外にオフセット
+  bottom: calc(var(--height-bottom-drawer) - var(--height-bottom-drawer-opened));
+  z-index: var(--z-index-drawer);
   width: 100%;
   color: white;
-  background-color: $COLOR_BLACK;
-  transition: bottom $TRANSITION_DURATION;
+  background-color: var(--color-black);
+  transition: bottom var(--transition-duration);
 
   .-drawer-opened & {
     bottom: 0;
   }
 
   > .header {
-    height: $HEIGHT_BOTTOM_DRAWER;
-    padding: 0 #{$PADDING_SIDE - 2px};
-    line-height: $HEIGHT_BOTTOM_DRAWER;
+    height: var(--height-bottom-drawer);
+    padding: 0 calc(var(--padding-side) - 2px);
+    line-height: var(--height-bottom-drawer);
     cursor: pointer;
-    border-top: solid 1px rgba(white, 0.4);
-    border-bottom: solid 1px rgba(black, 0.2);
+    border-top: solid 1px rgba(255, 255, 255, 0.4);
+    border-bottom: solid 1px rgba(0, 0, 0, 0.2);
 
     > .mark {
       position: relative;
@@ -1621,7 +1614,7 @@ $BOTTOM_CHROMOSOME: 16px;
   > .configuration {
     position: absolute;
     top: 5px;
-    right: $PADDING_SIDE - 2px;
+    right: calc(var(--padding-side) - 2px);
     max-width: calc(100vw - 120px);
     overflow-x: auto;
     font-size: 12px;
@@ -1630,7 +1623,7 @@ $BOTTOM_CHROMOSOME: 16px;
     // 閉じた状態はクリックできないよう pointer-events を切る
     pointer-events: none;
     opacity: 0;
-    transition: opacity $TRANSITION_DURATION;
+    transition: opacity var(--transition-duration);
 
     .-drawer-opened & {
       pointer-events: auto;
@@ -1645,18 +1638,18 @@ $BOTTOM_CHROMOSOME: 16px;
       }
 
       > .togglebuttons {
-        background-color: rgba(black, 0.5);
+        background-color: rgba(0, 0, 0, 0.5);
 
         > .button {
           &:hover {
-            color: $COLOR_KEY;
+            color: var(--color-key);
           }
         }
       }
 
       > .select {
         color: white;
-        background-color: rgba(black, 0.5);
+        background-color: rgba(0, 0, 0, 0.5);
       }
     }
   }
@@ -1669,9 +1662,8 @@ $BOTTOM_CHROMOSOME: 16px;
       // box-sizing: content-box で padding を高さ計算から除外し、
       // JS 側の height 計算と合わせる
       box-sizing: content-box;
-      height: $HEIGHT_CHROMOSOME_CONTAINER - $TOP_CHROMOSOME -
-        $BOTTOM_CHROMOSOME;
-      padding: $TOP_CHROMOSOME $PADDING_SIDE $BOTTOM_CHROMOSOME;
+      height: calc(var(--height-bottom-drawer-opened) - var(--height-bottom-drawer) - 10px - 16px);
+      padding: 10px var(--padding-side) 16px;
       overflow-x: auto;
       text-align: center;
       white-space: nowrap;
@@ -1687,7 +1679,7 @@ $BOTTOM_CHROMOSOME: 16px;
 // 選択領域ハイライト (.selection-area)
 // 染色体カリオタイプなどでドラッグ選択した矩形領域を視覚的に示す
 .selection-area {
-  background-color: rgba($COLOR_SELECTED, 0.2);
-  border: solid 1px $COLOR_SELECTED;
+  background-color: color-mix(in srgb, var(--color-selected) 20%, transparent);
+  border: solid 1px var(--color-selected);
   border-radius: 2px;
 }

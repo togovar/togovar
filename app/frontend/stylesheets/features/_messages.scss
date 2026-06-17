@@ -1,4 +1,3 @@
-@use 'sass:color';
 @use '../foundation' as *;
 
 // =============================================================================
@@ -29,31 +28,31 @@
     }
 
     &.-error {
-      background-color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: 30%);
-      border-color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: -2%);
+      background-color: var(--color-sign-dangerous-light);
+      border-color: var(--color-sign-dangerous-dark);
 
       &::before {
-        color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: -2%);
+        color: var(--color-sign-dangerous-dark);
         content: var(--icon-xmark);
       }
     }
 
     &.-warning {
-      background-color: color.adjust($COLOR_SIGN_WARNING, $lightness: 45%);
-      border-color: color.adjust($COLOR_SIGN_WARNING, $lightness: -2%);
+      background-color: var(--color-sign-warning-light);
+      border-color: var(--color-sign-warning-dark);
 
       &::before {
-        color: color.adjust($COLOR_SIGN_WARNING, $lightness: -2%);
+        color: var(--color-sign-warning-dark);
         content: var(--icon-triangle-exclamation);
       }
     }
 
     &.-notice {
-      background-color: color.adjust($COLOR_SIGN_NORMAL, $lightness: 42%);
-      border-color: color.adjust($COLOR_SIGN_NORMAL, $lightness: -2%);
+      background-color: var(--color-sign-normal-light);
+      border-color: var(--color-sign-normal-dark);
 
       &::before {
-        color: color.adjust($COLOR_SIGN_NORMAL, $lightness: -2%);
+        color: var(--color-sign-normal-dark);
         content: var(--icon-circle-info);
       }
     }

@@ -11,7 +11,7 @@
   margin: 0;
   color: white;
   white-space: normal;
-  background-color: $COLOR_BLACK;
+  background-color: var(--color-black);
   border: 1px solid white;
   border-radius: 7px;
   opacity: 1;
@@ -51,7 +51,7 @@
       &::before {
         top: 0;
         left: 0;
-        border-top: 6px solid $COLOR_BLACK;
+        border-top: 6px solid var(--color-black);
         border-right: 6px solid transparent;
         border-left: 6px solid transparent;
       }
@@ -61,7 +61,7 @@
         left: 1px;
         width: 10px;
         height: 2px;
-        background-color: $COLOR_BLACK;
+        background-color: var(--color-black);
       }
     }
   }
@@ -72,7 +72,7 @@
         bottom: 0;
         left: 0;
         border-right: 6px solid transparent;
-        border-bottom: 6px solid $COLOR_BLACK;
+        border-bottom: 6px solid var(--color-black);
         border-left: 6px solid transparent;
       }
 
@@ -81,7 +81,7 @@
         left: 1px;
         width: 10px;
         height: 2px;
-        background-color: $COLOR_BLACK;
+        background-color: var(--color-black);
       }
     }
   }
@@ -96,7 +96,7 @@
         left: 0;
         border-top: 6px solid transparent;
         border-bottom: 6px solid transparent;
-        border-left: 6px solid $COLOR_BLACK;
+        border-left: 6px solid var(--color-black);
       }
 
       &::after {
@@ -104,7 +104,7 @@
         left: -1px;
         width: 2px;
         height: 10px;
-        background-color: $COLOR_BLACK;
+        background-color: var(--color-black);
       }
     }
   }
@@ -118,7 +118,7 @@
         top: 0;
         right: 0;
         border-top: 6px solid transparent;
-        border-right: 6px solid $COLOR_BLACK;
+        border-right: 6px solid var(--color-black);
         border-bottom: 6px solid transparent;
       }
 
@@ -127,7 +127,7 @@
         right: -1px;
         width: 2px;
         height: 10px;
-        background-color: $COLOR_BLACK;
+        background-color: var(--color-black);
       }
     }
   }

@@ -26,7 +26,7 @@
   }
 }
 
-@media (-webkit-min-device-pixel-ratio: 2) {
+@media (resolution: 2dppx) {
   :host > .pathogenicity-graph > .ruler > .scale {
     border-left: dotted 1px var(--color-separator);
   }

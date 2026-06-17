@@ -46,7 +46,7 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
   height: 100%;
   text-align: left;
   // 幅はバンドラベル表示の切り替えでアニメーション変化する
-  transition: width $GUI_DURATION;
+  transition: width var(--gui-duration);
 
   > .upper {
     height: $CHROM_HEIGHT_UPPER;
@@ -63,10 +63,10 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
       line-height: $CHROM_SIZE_NUMBER;
       text-align: center;
       cursor: pointer;
-      background-color: rgba(black, 0.25);
+      background-color: rgba(0, 0, 0, 0.25);
       // 正円にするために高さの半分を指定
       border-radius: $CHROM_SIZE_NUMBER * 0.5;
-      transition: left $GUI_DURATION;
+      transition: left var(--gui-duration);
     }
   }
 
@@ -83,10 +83,10 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
       width: $CHROM_WIDTH_INDICATOR1;
       opacity: 0;
       transition:
-        opacity $GUI_DURATION,
-        height $GUI_DURATION,
-        top $GUI_DURATION,
-        left $GUI_DURATION;
+        opacity var(--gui-duration),
+        height var(--gui-duration),
+        top var(--gui-duration),
+        left var(--gui-duration);
 
       &.-shown {
         opacity: 1;
@@ -94,14 +94,14 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
     }
 
     > .filteredregion {
-      background-color: rgba($COLOR_SELECTED, 0.4);
+      background-color: color-mix(in srgb, var(--color-selected) 40%, transparent);
     }
 
     > .displayregion {
       left: ($CHROM_WIDTH_VIEW - $CHROM_WIDTH_INDICATOR2) * 0.5;
       // 表示範囲はフィルター範囲より細く、別の中央揃え計算が必要
       width: $CHROM_WIDTH_INDICATOR2;
-      border: solid 1px $COLOR_SELECTED;
+      border: solid 1px var(--color-selected);
       border-radius: 2px;
     }
 
@@ -111,10 +111,10 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
       display: block;
       width: $CHROM_WIDTH_CHROMOSOME;
       // SVG 要素に影を付けるため CSS filter を使用（box-shadow は SVG に効かない）
-      filter: drop-shadow(0 4px 4px rgba(black, 0.5));
+      filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.5));
       transition:
-        width $GUI_DURATION,
-        left $GUI_DURATION;
+        width var(--gui-duration),
+        left var(--gui-duration);
 
       > .subband {
         cursor: pointer;
@@ -133,7 +133,7 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
           // url(#id) は同一SVG内のグラデーション要素への参照であり、hex色ではない
           // Stylelint v17 が url() 内の # をhex色と誤判定するため、このブロックのみ無効化する
           fill: url(#chromosome-gneg);
-          transition: fill $GUI_DURATION;
+          transition: fill var(--gui-duration);
 
           &.acen {
             fill: url(#chromosome-acen);
@@ -164,7 +164,7 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
           opacity: 1;
 
           > .subbandrect {
-            fill: $COLOR_SELECTED;
+            fill: var(--color-selected);
           }
         }
       }
@@ -195,17 +195,17 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
 
         &:hover {
           > .bandtext {
-            fill: $COLOR_SELECTED;
+            fill: var(--color-selected);
           }
           > .line {
-            stroke: $COLOR_SELECTED;
+            stroke: var(--color-selected);
           }
         }
       }
     }
 
     > .selectedregion {
-      background-color: rgba($COLOR_SELECTED, 0.15);
+      background-color: color-mix(in srgb, var(--color-selected) 15%, transparent);
       border-radius: 1px;
     }
   }
@@ -294,10 +294,10 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
         font-size: 12px;
 
         &.mgend {
-          color: $COLOR_DATASET_DISEASE_MGEND;
+          color: var(--color-dataset-disease-mgend);
         }
         &.clinvar {
-          color: $COLOR_DATASET_DISEASE_CLINVAR;
+          color: var(--color-dataset-disease-clinvar);
         }
       }
 
@@ -329,7 +329,7 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
   > .stanza {
     margin-bottom: 20px;
     background: white;
-    box-shadow: 0 2px 2px rgba(black, 0.2);
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 
     // 各 stanza の最小高さ — CLS 防止のため描画前にスペースを確保する
     // gene page
@@ -464,13 +464,13 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
 
         &.alt {
           font-weight: bold;
-          color: $COLOR_ALT;
+          color: var(--color-mutation-alt);
 
           // "alt / total" の区切り文字を疑似要素で追加する
           &::after {
             margin-left: 0.5em;
             font-size: 10px;
-            color: $COLOR_BLACK;
+            color: var(--color-black);
             content: '/';
           }
         }
@@ -518,11 +518,11 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
       font-weight: bold;
 
       > .mgend {
-        color: $COLOR_DATASET_DISEASE_MGEND;
+        color: var(--color-dataset-disease-mgend);
       }
 
       > .clinvar {
-        color: $COLOR_DATASET_DISEASE_CLINVAR;
+        color: var(--color-dataset-disease-clinvar);
       }
     }
   }
@@ -530,7 +530,7 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
   + .above-headline {
     padding-top: 6px;
     margin-top: 8px;
-    border-top: solid 1px $COLOR_SEPARATOR;
+    border-top: solid 1px var(--color-separator);
   }
 }
 
@@ -549,7 +549,7 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
         max-height: 200px;
         padding: 4px 0;
         overflow-y: auto;
-        border-right: solid 1px $COLOR_SEPARATOR;
+        border-right: solid 1px var(--color-separator);
 
         > .messages-view {
           margin-left: 4px;
@@ -581,11 +581,11 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
               width: 0;
               height: 0;
               cursor: pointer;
-              border-color: transparent transparent transparent $COLOR_BLACK;
+              border-color: transparent transparent transparent var(--color-black);
               border-style: solid;
               border-width: 4px 0 4px 6px;
               opacity: 0.2;
-              transition: opacity $GUI_DURATION;
+              transition: opacity var(--gui-duration);
 
               &:hover {
                 opacity: 1;
@@ -621,7 +621,7 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
                   font-family: 'Font Awesome 7 Free', sans-serif;
                   font-size: 12px;
                   font-weight: 900;
-                  color: $COLOR_BLACK;
+                  color: var(--color-black);
                   content: var(--icon-lock);
                   opacity: 0.4;
                 }

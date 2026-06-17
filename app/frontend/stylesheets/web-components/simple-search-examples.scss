@@ -18,7 +18,7 @@ dl {
     display: inline-block;
     margin-bottom: 0;
     color: white;
-    transition: color $GUI_DURATION;
+    transition: color var(--gui-duration);
   }
 
   > dt {
@@ -39,11 +39,11 @@ dl {
       background: transparent;
       border: 0;
       border-radius: 8px;
-      transition: background-color $GUI_DURATION;
+      transition: background-color var(--gui-duration);
 
       &:hover,
       &:focus-visible {
-        background-color: $COLOR_KEY_DARK2;
+        background-color: var(--color-key-dark2);
       }
     }
   }

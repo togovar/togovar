@@ -7,18 +7,18 @@
 
 /* stylelint-disable no-descending-specificity */
 
-$PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
-
 #GlobalHeader {
+  --padding-right-elements: calc((var(--height-global-menu) - var(--height-navigation-item)) * 0.5);
+
   position: fixed;
-  top: $HEIGHT_NBDC_COMMON_HEADER;
-  z-index: $Z_INDEX_GLOBAL_HEADER;
+  top: var(--height-nbdc-common-header);
+  z-index: var(--z-index-global-header);
   display: flex;
   justify-content: space-between;
   width: 100%;
-  height: $HEIGHT_GLOBAL_MENU;
+  height: var(--height-global-menu);
   background-color: white;
-  box-shadow: 0 2px 2px rgba(black, 0.2);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 
   > .right {
     position: relative;
@@ -31,11 +31,11 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
 
         > .menu {
           display: flex;
-          padding: $PADDING_RIGHT_ELEMENTS - 1px 8px;
+          padding: calc(var(--padding-right-elements) - 1px) 8px;
           margin: 0;
 
           > li.menu-button {
-            color: $COLOR_BLACK;
+            color: var(--color-black);
 
             &.config {
               cursor: pointer;
@@ -44,17 +44,17 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
             &.login {
               > a:where(.link) {
                 min-width: 30px;
-                color: $COLOR_BLACK;
+                color: var(--color-black);
                 text-decoration: none;
 
                 &:hover {
-                  color: $COLOR_KEY_DARK1;
+                  color: var(--color-key-dark1);
                 }
               }
             }
 
             &:hover {
-              color: $COLOR_KEY_DARK1;
+              color: var(--color-key-dark1);
             }
 
             > a:where(.link) {
@@ -64,24 +64,24 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
           }
 
           + .menu {
-            border-left: solid 1px $COLOR_SEPARATOR;
+            border-left: solid 1px var(--color-separator);
           }
 
           &.navigation {
             > .item {
               > a:where(.link) {
-                color: $COLOR_BLACK;
+                color: var(--color-black);
                 text-decoration: none;
 
                 &:hover {
-                  color: $COLOR_KEY_DARK1;
+                  color: var(--color-key-dark1);
                   text-decoration: none;
                 }
               }
 
               &.-current {
                 > :where(.link) {
-                  color: $COLOR_KEY_DARK1;
+                  color: var(--color-key-dark1);
                 }
               }
             }
@@ -127,7 +127,7 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
             padding: 10px;
 
             + .menu {
-              border-top: solid 1px $COLOR_SEPARATOR;
+              border-top: solid 1px var(--color-separator);
               border-left: none;
             }
 
@@ -145,7 +145,7 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
       }
 
       &:hover {
-        color: $COLOR_KEY_DARK1;
+        color: var(--color-key-dark1);
 
         > nav.menus-view {
           > .menu-wrapper {
@@ -160,7 +160,7 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
     position: relative;
     top: -2px;
     display: flex;
-    padding: 10px $PADDING_SIDE;
+    padding: 10px var(--padding-side);
 
     > h1.heading {
       :where(.link) {
@@ -205,18 +205,18 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
 // .-current で選択状態のボーダーとカラーを表示する
 .menu-button {
   display: inline-block;
-  height: $HEIGHT_NAVIGATION_ITEM;
+  height: var(--height-navigation-item);
   padding: 0 8px;
-  line-height: $HEIGHT_NAVIGATION_ITEM;
-  border-radius: $HEIGHT_NAVIGATION_ITEM * 0.5;
+  line-height: var(--height-navigation-item);
+  border-radius: calc(var(--height-navigation-item) * 0.5);
 
   &.-current {
-    color: $COLOR_KEY_DARK1;
-    border: solid 1px $COLOR_KEY_DARK1;
+    color: var(--color-key-dark1);
+    border: solid 1px var(--color-key-dark1);
   }
 
   &:hover {
-    color: $COLOR_KEY_DARK1;
+    color: var(--color-key-dark1);
   }
 }
 
@@ -231,33 +231,33 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
     left: 25px;
     width: 1px;
     content: '';
-    border-right: 1px solid $COLOR_KEY_DARK2;
+    border-right: 1px solid var(--color-key-dark2);
   }
 
   &.en {
     a.en {
-      color: $COLOR_KEY_DARK2;
-      background-color: $COLOR_KEY_DARK1_30;
-      border: 1px solid $COLOR_KEY_DARK2;
+      color: var(--color-key-dark2);
+      background-color: color-mix(in srgb, var(--color-key-dark1) 30%, transparent);
+      border: 1px solid var(--color-key-dark2);
       border-right: none;
     }
     a.ja {
-      color: $COLOR_GRAY;
-      border: 1px solid $COLOR_GRAY;
+      color: var(--color-gray);
+      border: 1px solid var(--color-gray);
       border-left: none;
     }
   }
 
   &.ja {
     a.ja {
-      color: $COLOR_KEY_DARK2;
-      background-color: $COLOR_KEY_DARK1_30;
-      border: 1px solid $COLOR_KEY_DARK2;
+      color: var(--color-key-dark2);
+      background-color: color-mix(in srgb, var(--color-key-dark1) 30%, transparent);
+      border: 1px solid var(--color-key-dark2);
       border-left: none;
     }
     a.en {
-      color: $COLOR_GRAY;
-      border: 1px solid $COLOR_GRAY;
+      color: var(--color-gray);
+      border: 1px solid var(--color-gray);
       border-right: none;
     }
   }
@@ -270,7 +270,7 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
     text-decoration: none;
 
     &.en {
-      border-right: 1px solid $COLOR_KEY_DARK2;
+      border-right: 1px solid var(--color-key-dark2);
       border-radius: 20px 0 0 20px;
     }
 

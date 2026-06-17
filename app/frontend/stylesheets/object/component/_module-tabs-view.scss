@@ -1,20 +1,20 @@
 @use '../../foundation' as *;
 
 // タブとコンテンツ切り替えの共通ビュー
-// タブナビゲーション領域は $COLOR_KEY_DARK2 で統一し、ページのヘッダー層として視覚的に区別する。
+// タブナビゲーション領域は var(--color-key-dark2) で統一し、ページのヘッダー層として視覚的に区別する。
 .module-tabs-view {
   color: #fff;
-  background-color: $COLOR_KEY_DARK2;
+  background-color: var(--color-key-dark2);
 
   > .tabscontainer {
     > ul {
-      padding: 4px $PADDING_SIDE 0;
+      padding: 4px var(--padding-side) 0;
       margin: 0;
 
       > li {
         // 非選択タブは opacity: .8 で控えめにし、選択中・ホバー状態との対比でアクティブ状態を伝える。
         position: relative;
-        z-index: $Z_INDEX_MODULE_TABS_VIEW;
+        z-index: var(--z-index-module-tabs-view);
         display: inline-block;
         padding: 2px 12px 0;
         font-size: 14px;
@@ -24,13 +24,13 @@
         border-radius: 3px 3px 0 0;
         opacity: 0.8;
         transition:
-          background-color $GUI_DURATION,
-          opacity $GUI_DURATION;
+          background-color var(--gui-duration),
+          opacity var(--gui-duration);
 
         // ホバーと選択状態を揃えることで、クリック可能であることをホバー時に事前提示する。
         &.-current,
         &:hover {
-          background-color: $COLOR_KEY_DARK1;
+          background-color: var(--color-key-dark1);
           opacity: 1;
         }
       }
@@ -41,7 +41,7 @@
     // 非表示セクション（position: absolute）の包含ブロックとして機能させるために position: relative が必要。
     // これがないと非表示セクションが上位へ脱出し、別の要素に重なる。
     position: relative;
-    background-color: $COLOR_KEY_DARK1;
+    background-color: var(--color-key-dark1);
 
     > .section {
       position: absolute;
@@ -58,17 +58,17 @@
 
   // ネストしたタブ（一段深い階層）は内側の色に合わせ、色でネスト深さを表現する。
   &.-depth1 {
-    background-color: $COLOR_KEY_DARK1;
+    background-color: var(--color-key-dark1);
 
     > .tabscontainer > ul > li {
       &.-current,
       &:hover {
-        background-color: $COLOR_KEY;
+        background-color: var(--color-key);
       }
     }
 
     > .sectionscontainer {
-      background-color: $COLOR_KEY;
+      background-color: var(--color-key);
     }
   }
 

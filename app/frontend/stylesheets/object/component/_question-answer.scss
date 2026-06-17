@@ -1,8 +1,8 @@
 @use '../../foundation' as *;
 
 .question-answer {
-  padding-top: $HEIGHT_GLOBAL_MENU + 8px;
-  margin-top: -$HEIGHT_GLOBAL_MENU - 8px;
+  padding-top: calc(var(--height-global-menu) + 8px);
+  margin-top: calc(-1 * var(--height-global-menu) - 8px);
   margin-bottom: 1em;
 
   > .question,
@@ -33,16 +33,16 @@
       top: 3px;
       color: white;
       content: 'Q';
-      background-color: $COLOR_KEY_DARK1;
+      background-color: var(--color-key-dark1);
     }
   }
 
   > .answer {
     &::before {
       top: 2px;
-      color: $COLOR_KEY_DARK1;
+      color: var(--color-key-dark1);
       content: 'A';
-      border: solid 1px $COLOR_KEY_DARK1;
+      border: solid 1px var(--color-key-dark1);
     }
 
     > div,
