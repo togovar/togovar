@@ -80,7 +80,9 @@
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
-  padding: 10px var(--padding-side) 0;
+  // padding-right を持たないことで scroll-bar の right: 0 が .LayoutMain の右端と一致する。
+  // padding-right があると scroll-bar が sidebar 境界より内側（テーブル上）にずれて白く見えるため除外。
+  padding: 10px 0 0 var(--padding-side);
 
   // テーブル検索結果が見つからない場合のメッセージ
   &.-not-found::after {
@@ -100,6 +102,8 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    // #ResultsView から padding-right を外したため、ヘッダー側で右余白を確保する。
+    padding-right: var(--padding-side);
     white-space: nowrap;
 
     // ヘッダー左側：見出し・結果件数
@@ -346,9 +350,10 @@
   > .tablecontainer {
     flex: 1 1 auto;
     min-height: 0;
+    // 右端にスクロールしたとき内容が sidebar 境界に張り付かないよう余白を確保する。
+    padding-right: var(--padding-side);
     padding-bottom: 0;
     margin-top: -15px;
-    margin-right: -var(--padding-side);
     overflow-x: auto;
     overflow-y: hidden;
     overscroll-behavior: contain;
@@ -904,7 +909,7 @@ body[data-column-resizing='true'] {
 
 .scroll-bar {
   position: absolute;
-  top: 77px;
+  top: 95px;
   right: 0;
   z-index: 10;
   width: 16px;
