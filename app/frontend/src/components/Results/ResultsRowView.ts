@@ -22,16 +22,16 @@ export class ResultsRowView {
   index: number;
   selected: boolean;
   tr: HTMLTableRowElement;
-  private _isDestroyed = false;
+  private isDestroyed = false;
 
   /**
    * unsubscribeで同一参照が必要なため、束縛済みコールバックをフィールドに保持する。
    */
-  private _onSelectedRow = (v: number | undefined) => this.selectedRow(v);
-  private _onOffset = () => this.offset();
+  private onSelectedRow = (v: number | undefined) => this.selectedRow(v);
+  private onOffset = () => this.offset();
 
   /**
-   * _prepareTableDataでHTML生成直後に一括取得し、updateTableRowで毎回querySelectorを
+   * prepareTableDataでHTML生成直後に一括取得し、updateTableRowで毎回querySelectorを
    * 実行しないよう保持する。
    */
   togovarIdCell: HTMLTableCellElement | null = null;
@@ -66,10 +66,10 @@ export class ResultsRowView {
   constructor(index: number) {
     this.index = index;
     this.selected = false;
-    this.tr = this._createTableRow();
+    this.tr = this.createTableRow();
 
-    storeManager.subscribe('selectedRow', this._onSelectedRow);
-    storeManager.subscribe('offset', this._onOffset);
+    storeManager.subscribe('selectedRow', this.onSelectedRow);
+    storeManager.subscribe('offset', this.onOffset);
   }
 
   // ================================================================
@@ -81,10 +81,10 @@ export class ResultsRowView {
    * 必ずStoreからunbindしてDOMも切り離す。
    */
   destroy(): void {
-    if (this._isDestroyed) return;
+    if (this.isDestroyed) return;
 
-    storeManager.unsubscribe('selectedRow', this._onSelectedRow);
-    storeManager.unsubscribe('offset', this._onOffset);
+    storeManager.unsubscribe('selectedRow', this.onSelectedRow);
+    storeManager.unsubscribe('offset', this.onOffset);
 
     if (this.tr && this.tr.parentNode) {
       this.tr.parentNode.removeChild(this.tr);
@@ -115,7 +115,7 @@ export class ResultsRowView {
     this.siftFunction = null;
     this.polyphenFunction = null;
 
-    this._isDestroyed = true;
+    this.isDestroyed = true;
   }
 
   // ================================================================
@@ -127,7 +127,7 @@ export class ResultsRowView {
    * 最も早い段階で不要な処理を打ち切ることで描画コストを抑える。
    */
   updateTableRow() {
-    if (this._isDestroyed) return;
+    if (this.isDestroyed) return;
 
     // 初回data取得（numberOfRecords === 0）はまだ表示できるデータがないため行を非表示にする。
     // スクロール中の追加data取得（numberOfRecords > 0）は既存データが見えているため
@@ -136,31 +136,35 @@ export class ResultsRowView {
       storeManager.getData('isSearchDataFetching') &&
       storeManager.getData('numberOfRecords') === 0
     ) {
-      return this._setOutOfRangeState();
+      return this.setOutOfRangeState();
     }
 
     if (storeManager.getData('isSearchResultsUpdating')) {
-      return this._setLoadingState();
+      return this.setLoadingState();
     }
 
     const rowCount = storeManager.getData('rowCount');
     if (rowCount <= this.index) {
-      return this._setOutOfRangeState();
+      return this.setOutOfRangeState();
     }
 
     const result = storeManager.getRecordByIndex(this.index);
-    if (!result || result === 'loading' || result === 'out of range') {
-      if (result === 'loading') {
-        // データが未取得のページに到達した → 後続ページを取得する。
-        // isSearchResultsUpdating=false は直上と getRecordByIndex 内でチェック済み。
-        requestNextPage(storeManager.getData('offset') + this.index);
-      }
-      return this._setLoadingState();
+    if (result === 'out of range') {
+      return this.setOutOfRangeState();
+    }
+    if (result === 'loading') {
+      // データが未取得のページに到達した → 後続ページを取得する。
+      // isSearchResultsUpdating=false は直上と getRecordByIndex 内でチェック済み。
+      requestNextPage(storeManager.getData('offset') + this.index);
+      return this.setLoadingState();
+    }
+    if (!result) {
+      return this.setLoadingState();
     }
 
-    const columns = this._getCurrentColumns();
-    this._prepareTableData(columns);
-    columns.forEach((column) => this._updateColumnContent(column, result));
+    const columns = this.getCurrentColumns();
+    this.prepareTableData(columns);
+    columns.forEach((column) => this.updateColumnContent(column, result));
     this.tr.classList.remove('-loading', '-out-of-range');
   }
 
@@ -172,7 +176,7 @@ export class ResultsRowView {
    * 選択状態はCSSクラスだけで表現できるため、データの再描画は行わずclassToggleのみ行う。
    */
   selectedRow(selectedIndex: number | undefined) {
-    if (this._isDestroyed) return;
+    if (this.isDestroyed) return;
     this.selected = selectedIndex === this.index;
     this.tr.classList.toggle('-selected', this.selected);
   }
@@ -181,7 +185,7 @@ export class ResultsRowView {
    * offsetが変わると表示すべきデータが変わるため、行全体を再評価する。
    */
   offset() {
-    if (this._isDestroyed) return;
+    if (this.isDestroyed) return;
     this.updateTableRow();
   }
 
@@ -192,11 +196,11 @@ export class ResultsRowView {
   /**
    * 生成直後はStoreからデータを受け取っていないため、初期状態を-loadingにして白紙を防ぐ。
    */
-  private _createTableRow(): HTMLTableRowElement {
+  private createTableRow(): HTMLTableRowElement {
     const tr = document.createElement('tr');
     tr.classList.add('-loading');
     tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
-    tr.addEventListener('click', this._handleRowClick.bind(this));
+    tr.addEventListener('click', this.handleRowClick.bind(this));
     return tr;
   }
 
@@ -204,7 +208,7 @@ export class ResultsRowView {
    * スクロール中のデータ未到着行にローディングGIFを見せるために使う。
    * 以前のデータが残ったままだとレイアウトが崩れるためinnerHTMLもリセットする。
    */
-  private _setLoadingState() {
+  private setLoadingState() {
     this.tr.classList.remove('-out-of-range');
     this.tr.classList.add('-loading');
     this.tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
@@ -214,7 +218,7 @@ export class ResultsRowView {
    * 表示行数の範囲外・初回fetchのデータ未着行を完全に隠すために使う。
    * display:noneはSCSSの-out-of-rangeクラスが担い、クラスの付け外しで制御する。
    */
-  private _setOutOfRangeState() {
+  private setOutOfRangeState() {
     this.tr.classList.remove('-loading');
     this.tr.classList.add('-out-of-range');
     this.tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
@@ -227,15 +231,15 @@ export class ResultsRowView {
   /**
    * HTML生成とDOMキャッシュ取得を分離して、生成処理とキャッシュ処理の責務を明確にする。
    */
-  private _prepareTableData(columns: Column[]) {
-    this.tr.innerHTML = this._createTableCellHTML(columns);
-    this._cacheTableCells();
+  private prepareTableData(columns: Column[]) {
+    this.tr.innerHTML = this.createTableCellHTML(columns);
+    this.cacheTableCells();
   }
 
   /**
    * 列の有効/無効・順序がStoreから動的に変わるため、固定HTMLではなく毎回生成する。
    */
-  private _createTableCellHTML(columns: Column[]): string {
+  private createTableCellHTML(columns: Column[]): string {
     return columns
       .map((column) => {
         const resizeBar =
@@ -244,9 +248,9 @@ export class ResultsRowView {
             : `<div class="resize-bar" data-column-id="${column.id}" aria-hidden="true"></div>`;
 
         if (column.id === 'alt_frequency') {
-          return this._appendResizeBar(createFrequencyColumnHTML(), resizeBar);
+          return this.appendResizeBar(createFrequencyColumnHTML(), resizeBar);
         }
-        return this._appendResizeBar(
+        return this.appendResizeBar(
           (COLUMN_TEMPLATES as Record<string, string>)[column.id] || '',
           resizeBar
         );
@@ -258,7 +262,7 @@ export class ResultsRowView {
    * 既存のカラムテンプレートHTML文字列を変更せずにリサイズバーを</td>直前へ注入するため
    * 文字列置換で挿入する。
    */
-  private _appendResizeBar(cellHTML: string, resizeBar: string): string {
+  private appendResizeBar(cellHTML: string, resizeBar: string): string {
     if (!cellHTML) return '';
     return cellHTML.replace('</td>', `${resizeBar}</td>`);
   }
@@ -266,7 +270,7 @@ export class ResultsRowView {
   /**
    * store.columnsは順序が保証されないためgetOrderedColumnsで表示順を正規化して返す。
    */
-  private _getCurrentColumns() {
+  private getCurrentColumns() {
     return getOrderedColumns(storeManager.getData('columns'));
   }
 
@@ -279,16 +283,16 @@ export class ResultsRowView {
    * HTML生成後に一度だけまとめて取得してフィールドに保持する。
    * 周波数・機能予測系は構造が異なるため3つのメソッドに分けている。
    */
-  private _cacheTableCells() {
-    this._cacheBasicElements();
-    this._cacheFrequencyElements();
-    this._cacheFunctionElements();
+  private cacheTableCells() {
+    this.cacheBasicElements();
+    this.cacheFrequencyElements();
+    this.cacheFunctionElements();
   }
 
   /**
    * 各セルはネストが浅くquerySelectorで一意に取れるため、列ごとに直接取得する。
    */
-  private _cacheBasicElements() {
+  private cacheBasicElements() {
     this.togovarIdCell = this.tr.querySelector('td.togovar_id');
 
     this.refsnpCell = this.tr.querySelector('td.refsnp_id');
@@ -340,7 +344,7 @@ export class ResultsRowView {
    * frequency-block-viewは複数あり、データセット名をキーにすることで
    * 後からO(1)で対象要素を更新できる。
    */
-  private _cacheFrequencyElements() {
+  private cacheFrequencyElements() {
     this.frequencyElements = {};
     this.tr
       .querySelectorAll('td.alt_frequency > frequency-block-view')
@@ -357,7 +361,7 @@ export class ResultsRowView {
    * 予測系カラムはすべて同じHTML構造（td.xxx > .variant-function）を持つため、
    * カラムIDで識別してまとめてキャッシュする。
    */
-  private _cacheFunctionElements() {
+  private cacheFunctionElements() {
     const tdAlphaMissense = this.tr.querySelector('td.alphamissense');
     this.alphaMissenseFunction =
       tdAlphaMissense?.querySelector('.variant-function') || null;
@@ -378,7 +382,7 @@ export class ResultsRowView {
    * 列IDをキーにしたディスパッチテーブルにすることで、列追加時の変更箇所を局所化する。
    * 対応するハンドラが存在しない列IDは?. で安全にスキップする。
    */
-  private _updateColumnContent(column: Column, result: ResultData) {
+  private updateColumnContent(column: Column, result: ResultData) {
     const columnHandlers: Record<string, () => void> = {
       togovar_id: () =>
         ResultsColumnUpdater.updateTogovarId(
@@ -459,7 +463,7 @@ export class ResultsRowView {
    * tapCompletedイベントはタッチデバイスのスクロール制御（ResultsViewTouchHandler）が
    * タップ完了を検知するために使う。
    */
-  private _handleRowClick(): void {
+  private handleRowClick(): void {
     storeManager.setData('selectedRow', this.selected ? undefined : this.index);
 
     const tapCompletedEvent = new CustomEvent('tapCompleted', {
