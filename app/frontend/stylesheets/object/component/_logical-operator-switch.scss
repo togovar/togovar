@@ -1,40 +1,40 @@
 .logical-operator-switch {
   padding: 0.1em 0.3em;
-  border-radius: 0.75em;
   line-height: 1;
   color: $COLOR_KEY_DARK3;
   cursor: pointer;
+  border-radius: 0.75em;
 
   &[data-operator='and'],
   &[data-operator='or'] {
     &::before {
-      vertical-align: middle;
       display: inline-block;
+      vertical-align: middle;
     }
 
     &::after {
-      font-weight: bold;
-      bottom: -0.1em;
       position: relative;
+      bottom: -0.1em;
+      font-weight: bold;
     }
   }
 
   &[data-operator='and'] {
     &::before {
-      content: '';
-      background-color: currentColor;
-      -webkit-mask-image: url('../src/assets/icons/logical-and.svg');
-      -webkit-mask-position: center;
-      -webkit-mask-repeat: no-repeat;
-      -webkit-mask-size: contain;
-      mask-image: url('../src/assets/icons/logical-and.svg');
-      mask-position: center;
-      mask-repeat: no-repeat;
-      mask-size: contain;
       width: 14px;
       height: 14px;
       margin-right: 0.2em;
       letter-spacing: 0;
+      content: '';
+      background-color: currentColor;
+      -webkit-mask-image: url('../src/assets/icons/logical-and.svg');
+      mask-image: url('../src/assets/icons/logical-and.svg');
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+      -webkit-mask-size: contain;
+      mask-size: contain;
     }
 
     &::after {
@@ -44,20 +44,20 @@
 
   &[data-operator='or'] {
     &::before {
-      content: '';
-      background-color: currentColor;
-      -webkit-mask-image: url('../src/assets/icons/logical-or.svg');
-      -webkit-mask-position: center;
-      -webkit-mask-repeat: no-repeat;
-      -webkit-mask-size: contain;
-      mask-image: url('../src/assets/icons/logical-or.svg');
-      mask-position: center;
-      mask-repeat: no-repeat;
-      mask-size: contain;
       width: 14px;
       height: 14px;
       margin-right: 0.2em;
       letter-spacing: 0;
+      content: '';
+      background-color: currentColor;
+      -webkit-mask-image: url('../src/assets/icons/logical-or.svg');
+      mask-image: url('../src/assets/icons/logical-or.svg');
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+      -webkit-mask-size: contain;
+      mask-size: contain;
     }
 
     &::after {

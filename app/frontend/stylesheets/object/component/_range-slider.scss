@@ -12,13 +12,13 @@ range-slider::part(label) {
 }
 
 range-slider::part(meter) {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 250px;
-  z-index: 1;
   min-height: 24px;
-  margin-top: 0.25em;
   padding: 0 $PADDING_METER;
-  position: relative;
+  margin-top: 0.25em;
 }
 
 range-slider::part(div-input) {
@@ -40,12 +40,12 @@ range-slider::part(num-input) {
 }
 
 range-slider::part(checkbox-label) {
-  margin-left: 8px;
-  margin-bottom: 0;
-  min-height: 24px;
   display: inline-flex;
-  align-items: center;
   gap: 4px;
+  align-items: center;
+  min-height: 24px;
+  margin-bottom: 0;
+  margin-left: 8px;
 }
 
 range-slider::part(ruler) {
@@ -60,23 +60,23 @@ range-slider::part(scale) {
   transform: translateY(13px);
 
   &::before {
-    content: '';
-    border-left: dotted 1px $COLOR_SEPARATOR;
-    height: 14px;
+    position: absolute;
     top: -16px;
     left: 0.5em;
     display: block;
-    position: absolute;
+    height: 14px;
+    content: '';
+    border-left: dotted 1px $COLOR_SEPARATOR;
   }
 }
 
 range-slider::part(meter-container) {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 24px;
-  position: relative;
 }
 
 range-slider::part(slider-track) {
@@ -85,19 +85,19 @@ range-slider::part(slider-track) {
 }
 
 range-slider::part(slider) {
-  -webkit-appearance: none;
-  appearance: none;
+  position: absolute;
   width: 100%;
   min-height: 24px;
-  position: absolute;
   margin: auto;
-  background-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
   pointer-events: none;
+  background-color: transparent;
 }
 
 range-slider::part(match) {
-  text-align: center;
   margin-left: 1em;
+  text-align: center;
 }
 
 range-slider::part(scale-vertical) {

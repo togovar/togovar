@@ -1,53 +1,69 @@
 .button-view {
+  position: relative;
   padding: 0 0.8em;
-  border: none;
+  font-weight: bold;
   line-height: 1.6;
+  color: white;
+  cursor: pointer;
+  background: linear-gradient(
+    to bottom,
+    var(--color-key),
+    var(--color-key-dark1)
+  );
+  border: none;
   border-radius: 0.8em;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  position: relative;
-  background: linear-gradient(to bottom, var(--color-key), var(--color-key-dark1));
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
 
   &.-weak {
     color: var(--color-black);
-    background: linear-gradient(to bottom, var(--color-pale-gray), var(--color-light-gray));
+    background: linear-gradient(
+      to bottom,
+      var(--color-pale-gray),
+      var(--color-light-gray)
+    );
   }
 
   &.-negative {
-    background: linear-gradient(to bottom, var(--color-disable), var(--color-disable-deep));
+    background: linear-gradient(
+      to bottom,
+      var(--color-disable),
+      var(--color-disable-deep)
+    );
   }
 
   &.-dropdown {
-    background: linear-gradient(to bottom, var(--color-key-dark1), var(--color-key-dark3));
-    color: white;
-    line-height: 20px;
-    cursor: pointer;
     padding-right: 1.4em;
+    line-height: 20px;
+    color: white;
+    cursor: pointer;
+    background: linear-gradient(
+      to bottom,
+      var(--color-key-dark1),
+      var(--color-key-dark3)
+    );
 
     &:after {
-      content: "";
       position: absolute;
       top: 50%;
       right: 0.36rem;
       width: 0;
       height: 0;
-      border-left: 0.25rem solid transparent;
-      border-right: 0.25rem solid transparent;
+      content: '';
       border-top: 0.32rem solid currentColor;
+      border-right: 0.25rem solid transparent;
+      border-left: 0.25rem solid transparent;
       transform: translateY(-50%);
     }
   }
 
   &.-disabled,
   &:disabled {
-    opacity: 0.4;
     pointer-events: none;
+    opacity: 0.4;
   }
 
   &:hover {
-    transform: translateY(0.5px);
     box-shadow: 0 0 1px rgba(0, 0, 0, 0.8);
+    transform: translateY(0.5px);
   }
 }

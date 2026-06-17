@@ -4,6 +4,7 @@ const config: Config = {
   extends: [
     'stylelint-config-recommended',
     'stylelint-config-recommended-scss',
+    'stylelint-config-recess-order',
   ],
   rules: {
     // プロジェクト独自の命名規則（BEMベース）があり、

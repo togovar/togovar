@@ -40,16 +40,16 @@
 
   // フィルタ・プレビューを表示する固定幅サイドバー列。
   > .LayoutAside {
-    width: $WIDTH_SIDEBAR;
-    // 親の flex stretch に依存せず明示することで、コンテンツが少ない場合も背景色が欠けない。
-    height: 100%;
-    min-height: 0;
-    background-color: $COLOR_KEY_DARK3;
-    overflow: hidden;
     // 内部の絶対配置要素（折りたたみボタンなど）の包含ブロックにする。
     position: relative;
     // グローバルヘッダー（z-index-global-header: base + 200）の下に収まるよう base + 100 にする。
     z-index: var(--z-index-layout-aside);
+    width: $WIDTH_SIDEBAR;
+    // 親の flex stretch に依存せず明示することで、コンテンツが少ない場合も背景色が欠けない。
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    background-color: $COLOR_KEY_DARK3;
     // 右端の内側シャドウでメインコンテンツとの境界に奥行きを出す。
     box-shadow: 2px 0 2px rgba(black, 0.2) inset;
 

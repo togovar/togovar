@@ -1,41 +1,44 @@
 .right-headline {
   > tbody {
     > tr {
-      > th, > td {
-        line-height: 14px;
-        vertical-align: top;
+      > th,
+      > td {
         padding-top: 2px;
         padding-bottom: 2px;
+        line-height: 14px;
+        vertical-align: top;
       }
 
       > th {
-        text-align: right;
         padding-right: 0.5em;
+        text-align: right;
 
         @extend %panel-view-heading;
 
         &:after {
-          content: ":";
+          content: ':';
         }
       }
 
       &:first-child {
-        > th, > td {
+        > th,
+        > td {
           padding-top: 6px;
         }
       }
 
       &:last-child {
-        > th, > td {
+        > th,
+        > td {
           padding-bottom: 6px;
         }
       }
 
       > td {
         > ul {
-          margin-bottom: 0;
           padding-block-start: 0;
           padding-inline-start: 0;
+          margin-bottom: 0;
 
           > li {
             display: block;

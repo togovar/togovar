@@ -32,9 +32,9 @@ $frequency-marker-gap: 1px;
   display: inline-block;
   width: $vertical-graph-width;
   height: $vertical-graph-height;
+  font-size: 0;
   // margin-right は _base.scss の型セレクターで定義（:host への外部リセット対策）
   vertical-align: middle;
-  font-size: 0;
   background-color: white;
   border: solid 1px var(--frequency-dataset-color);
 }
@@ -94,8 +94,8 @@ $frequency-marker-gap: 1px;
 
 // データなし（na）はグレーで表示
 :host([data-frequency='na']) {
-  border-color: $frequency-na-border;
   background-color: $frequency-na-background;
+  border-color: $frequency-na-border;
 }
 
 // シングルトン（アレルカウント=1）は専用カラーで強調

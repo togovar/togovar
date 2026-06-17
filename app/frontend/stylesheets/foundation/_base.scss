@@ -7,13 +7,13 @@
 
 @mixin input-number {
   display: inline-block;
-  text-align: right;
-  line-height: 18px;
   padding: 0 0 0 8px;
-  border-radius: 9px;
-  border: solid 1px $COLOR_GRAY;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
+  line-height: 18px;
+  text-align: right;
   outline: none;
+  border: solid 1px $COLOR_GRAY;
+  border-radius: 9px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
 }
 
 html {
@@ -25,11 +25,11 @@ html {
 }
 
 body {
-  font-size: 10px;
-  font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
-  color: $COLOR_BLACK;
   // height: 100%
   padding-top: $HEIGHT_GLOBAL_MENU + $HEIGHT_NBDC_COMMON_HEADER !important;
+  font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
+  font-size: 10px;
+  color: $COLOR_BLACK;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 
@@ -51,8 +51,8 @@ body {
     #SearchResultsView #RowIndicator,
     #SearchResultsView .LayoutAside,
     #Karyotype {
-      opacity: 0;
       pointer-events: none;
+      opacity: 0;
     }
   }
 
@@ -107,15 +107,15 @@ input {
   &[type='password'],
   &[type='number'] {
     --font-size: 12px;
-    font-size: var(--font-size);
     display: inline-block;
-    line-height: var(--height-inline);
     padding: 0 0.75em;
+    font-size: var(--font-size);
+    line-height: var(--height-inline);
+    outline: none;
+    border: solid 1px var(--color-gray);
     // padding: 0 0 0 8px
     border-radius: calc(var(--height-inline) * 0.5);
-    border: solid 1px var(--color-gray);
     box-shadow: 0 1px 1px rgb(0 0 0 / 20%) inset;
-    outline: none;
   }
 
   &[type='number'] {
@@ -138,13 +138,13 @@ select {
 
 ::placeholder,
 *::part(input-field)::placeholder {
-  color: $COLOR_GRAY;
   font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
+  color: $COLOR_GRAY;
 }
 
 .unimplemented {
-  color: red;
   margin-bottom: 0;
+  color: red;
 
   &:before {
     content: 'unimplemented: ';

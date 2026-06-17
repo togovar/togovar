@@ -6,7 +6,6 @@
 //   object/component/_suggest-view.scss      … 検索候補ドロップダウン
 // =============================================================================
 
-
 // 検索フィールドビュー (.search-field-view)
 // テキスト入力欄・虫眼鏡ボタン・入力例リストをまとめたコンテナ
 // $SEARCH_FIELD_SIZE: 入力欄と虫眼鏡ボタンの共通サイズ（高さ・幅）
@@ -20,16 +19,16 @@ $SEARCH_FIELD_SIZE: 30px;
     > .field {
       margin-bottom: 4px;
 
-      > input[type="text"] {
+      > input[type='text'] {
         width: 100%;
-        line-height: $SEARCH_FIELD_SIZE;
         height: $SEARCH_FIELD_SIZE;
+        padding: 0 12px;
+        font-size: 12px;
+        line-height: $SEARCH_FIELD_SIZE;
+        vertical-align: top;
+        outline: none;
         border: solid 1px $COLOR_KEY_DARK2;
         border-radius: $SEARCH_FIELD_SIZE * 0.5;
-        padding: 0 12px;
-        vertical-align: top;
-        font-size: 12px;
-        outline: none;
         opacity: 0.9;
 
         &:focus {
@@ -39,39 +38,40 @@ $SEARCH_FIELD_SIZE: 30px;
 
       // 虫眼鏡ボタン — CSS のみで虫眼鏡アイコンを描画する（画像不使用）
       > button {
+        position: relative;
         width: $SEARCH_FIELD_SIZE;
         height: $SEARCH_FIELD_SIZE;
+        margin-right: -4px;
+        text-indent: -9999px;
+        background-color: white;
         border: solid 1px $COLOR_KEY_DARK1;
         border-radius: 100%;
-        margin-right: -4px;
-        position: relative;
-        background-color: white;
-        text-indent: -9999px;
         box-shadow: 0 1px 1px rgba(black, 0.2);
 
-        &:before, &:after {
-          content: "";
-          display: block;
+        &:before,
+        &:after {
           position: absolute;
+          display: block;
+          content: '';
         }
 
         // レンズ部分（円）
         &:before {
+          top: 6px;
+          left: 6px;
           width: 12px;
           height: 12px;
           border: solid 2px $COLOR_KEY_DARK1;
           border-radius: 6px;
-          top: 6px;
-          left: 6px;
         }
 
         // 柄の部分（斜め線）
         &:after {
+          top: 16px;
+          left: 17px;
           height: 5px;
           border-left: solid 2px $COLOR_KEY_DARK1;
           transform: rotate(-45deg);
-          top: 16px;
-          left: 17px;
         }
       }
     }
@@ -80,16 +80,19 @@ $SEARCH_FIELD_SIZE: 30px;
   // 入力例リスト — クリックで例文を入力欄に挿入する
   > .examples {
     > dl {
+      display: inline-block;
+      padding: 0 0.5em;
+      margin-bottom: 0;
       font-size: 12px;
       line-height: 16px;
-      margin-bottom: 0;
-      padding: 0 0.5em;
-      display: inline-block;
-      border-radius: 8px;
       cursor: pointer;
-      transition: background-color $GUI_DURATION, box-shadow $GUI_DURATION;
+      border-radius: 8px;
+      transition:
+        background-color $GUI_DURATION,
+        box-shadow $GUI_DURATION;
 
-      > dt, > dd {
+      > dt,
+      > dd {
         display: inline-block;
         margin-bottom: 0;
         color: white;
@@ -101,7 +104,7 @@ $SEARCH_FIELD_SIZE: 30px;
         opacity: 0.6;
 
         &:after {
-          content: ":";
+          content: ':';
         }
       }
 
@@ -116,19 +119,18 @@ $SEARCH_FIELD_SIZE: 30px;
   }
 }
 
-
 // 検索候補ドロップダウン (.suggest-view)
 // 入力中にリアルタイムで候補を表示する絶対配置のパネル
 // $SUGGEST_PADDING_SIDE: 候補リストの左右余白（グローバルの $PADDING_SIDE と区別するために独自変数）
 $SUGGEST_PADDING_SIDE: 14px;
 
 .suggest-view {
-  background-color: white;
   z-index: $Z_INDEX_SUGGEST_VIEW;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   display: flex;
   font-size: 14px;
   color: $COLOR_BLACK;
+  background-color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 
   > .column {
     + .column {
@@ -136,12 +138,12 @@ $SUGGEST_PADDING_SIDE: 14px;
     }
 
     > .title {
-      color: $COLOR_KEY_DARK1;
+      padding: 5px $SUGGEST_PADDING_SIDE 0;
+      margin: 4px 0 0;
       font-size: 12px;
       font-weight: normal;
       line-height: 16px;
-      margin: 4px 0 0;
-      padding: 5px $SUGGEST_PADDING_SIDE 0;
+      color: $COLOR_KEY_DARK1;
 
       &:first-letter {
         text-transform: capitalize;
@@ -149,22 +151,23 @@ $SUGGEST_PADDING_SIDE: 14px;
     }
 
     // 候補なし・ローディング・エラーは中央揃えで同サイズのプレースホルダーを使う
-    > .empty, > .error {
-      padding: 0 $SUGGEST_PADDING_SIDE;
-      height: 5rem;
-      width: 20rem;
-      color: $COLOR_GRAY;
+    > .empty,
+    > .error {
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      width: 20rem;
+      height: 5rem;
+      padding: 0 $SUGGEST_PADDING_SIDE;
+      color: $COLOR_GRAY;
     }
 
     > .loading {
       display: flex;
-      justify-content: center;
       align-items: center;
-      height: 5rem;
+      justify-content: center;
       width: 20rem;
+      height: 5rem;
 
       > span {
         display: block;
@@ -175,26 +178,26 @@ $SUGGEST_PADDING_SIDE: 14px;
     }
 
     > .list {
-      margin: 10px 0;
       padding-left: 0;
-      list-style: none;
+      margin: 10px 0;
       overflow-y: auto;
+      list-style: none;
 
       > .item {
-        cursor: pointer;
         padding: 0 $SUGGEST_PADDING_SIDE;
         line-height: 26px;
+        cursor: pointer;
         transition: background-color $GUI_DURATION;
 
         // 検索クエリとマッチした部分をハイライトする
         > em {
-          background-color: var(--color-suggest);
           font-style: normal;
+          background-color: var(--color-suggest);
         }
 
         &:first-child {
-          padding-top: 4px;
           height: 30px;
+          padding-top: 4px;
         }
 
         &:hover {
@@ -211,8 +214,8 @@ $SUGGEST_PADDING_SIDE: 14px;
 
         > .sub {
           padding-left: 0.5em;
-          color: rgba($COLOR_BLACK, 0.5);
           font-size: 12px;
+          color: rgba($COLOR_BLACK, 0.5);
         }
 
         &.-selected {
@@ -222,13 +225,13 @@ $SUGGEST_PADDING_SIDE: 14px;
 
       .loading {
         position: absolute;
-        width: 100%;
-        height: 100%;
         top: 0;
         left: 0;
         display: flex;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
 
         > span {
           display: block;

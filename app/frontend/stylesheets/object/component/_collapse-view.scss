@@ -2,23 +2,23 @@
   position: relative;
 
   > .collapsebutton {
-    cursor: pointer;
     position: absolute;
+    cursor: pointer;
     transition: top $GUI_DURATION;
 
     &:before {
-      content: "";
       display: block;
       width: 7px;
       height: 7px;
-      border-top-width: 0.1rem;
-      border-left-width: 0.1rem;
-      border-style: solid;
+      content: '';
       border-color: #fff;
+      border-style: solid;
+      border-top-width: 0.1rem;
       border-right: none;
       border-bottom: none;
-      transform-origin: 25% 50%;
+      border-left-width: 0.1rem;
       transform: rotate(45deg);
+      transform-origin: 25% 50%;
       transition: transform $GUI_DURATION;
     }
   }
@@ -38,10 +38,10 @@
   &.-hierarchic {
     > .collapsebutton {
       &:before {
-        transform: rotate(90deg);
         border-top: 4px solid transparent;
-        border-left: 5px solid $COLOR_BLACK;
         border-bottom: 4px solid transparent;
+        border-left: 5px solid $COLOR_BLACK;
+        transform: rotate(90deg);
       }
     }
 
@@ -58,15 +58,15 @@
     }
 
     &.-unstructured {
-      &[data-collapse-depth="1"] {
+      &[data-collapse-depth='1'] {
         margin-left: 12px;
       }
 
-      &[data-collapse-depth="2"] {
+      &[data-collapse-depth='2'] {
         margin-left: 24px;
       }
 
-      &[data-collapse-depth="3"] {
+      &[data-collapse-depth='3'] {
         margin-left: 36px;
       }
     }

@@ -6,23 +6,23 @@ $SIZE: 30px;
   box-sizing: border-box;
   > .field {
     position: relative;
-    margin-bottom: 4px;
     height: $SIZE;
+    margin-bottom: 4px;
 
     > .input-form {
       > .searchfield[type='text'] {
-        font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
         box-sizing: border-box;
         width: 100%;
+        padding: 0 12px;
+        font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
+        font-size: 12px;
         line-height: $SIZE;
+        vertical-align: center;
+        outline: none;
         border: solid 1px $COLOR_KEY_DARK2;
         border-radius: $SIZE * 0.5;
-        padding: 0 12px;
-        vertical-align: center;
-        font-size: 12px;
-        outline: none;
-        opacity: 0.9;
         box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
+        opacity: 0.9;
         &:focus {
           opacity: 1;
         }
@@ -33,17 +33,17 @@ $SIZE: 30px;
         top: 6px;
         right: 23px;
         color: var(--color-gray);
-        border: none;
-        background-color: transparent;
         cursor: pointer;
+        background-color: transparent;
+        border: none;
 
         &:after {
-          font-family: 'Font Awesome 7 Free', sans-serif;
-          font-weight: 900;
-          content: var(--icon-xmark);
           position: absolute;
           top: 2px;
+          font-family: 'Font Awesome 7 Free', sans-serif;
           font-size: 1rem;
+          font-weight: 900;
+          content: var(--icon-xmark);
         }
       }
 

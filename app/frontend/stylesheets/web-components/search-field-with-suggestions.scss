@@ -9,14 +9,14 @@
   position: absolute;
   top: 100%;
   left: 14px;
-  display: flex;
   z-index: $Z_INDEX_SUGGEST_VIEW;
-  color: $COLOR_BLACK;
-  font-size: 14px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  background-color: white;
-  max-width: 50%;
+  display: flex;
   min-width: fit-content;
+  max-width: 50%;
+  font-size: 14px;
+  color: $COLOR_BLACK;
+  background-color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   > .column {
     + .column {
       border-left: solid 1px $COLOR_SEPARATOR_SUB;

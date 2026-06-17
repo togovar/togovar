@@ -8,20 +8,20 @@
 $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
 
 #GlobalHeader {
-  display: flex;
-  justify-content: space-between;
-  height: $HEIGHT_GLOBAL_MENU;
-  background-color: white;
   position: fixed;
-  box-shadow: 0 2px 2px rgba(black, 0.2);
-  width: 100%;
   top: $HEIGHT_NBDC_COMMON_HEADER;
   z-index: $Z_INDEX_GLOBAL_HEADER;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: $HEIGHT_GLOBAL_MENU;
+  background-color: white;
+  box-shadow: 0 2px 2px rgba(black, 0.2);
 
   > .right {
     position: relative;
-    font-size: 14px;
     align-self: center;
+    font-size: 14px;
 
     nav.menus-view {
       > .menu-wrapper {
@@ -95,30 +95,30 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
         height: 16px;
 
         &::before {
-          content: var(--icon-bars);
-          font-family: 'Font Awesome 7 Free', sans-serif;
-          font-weight: 900;
-          font-size: 16px;
           display: inline-block;
           width: 16px;
+          font-family: 'Font Awesome 7 Free', sans-serif;
+          font-size: 16px;
+          font-weight: 900;
+          content: var(--icon-bars);
         }
       }
 
       > nav.menus-view {
-        display: block;
         position: absolute;
         top: 15px;
         right: 15px;
+        display: block;
 
         > .menu-wrapper {
-          display: none;
           position: relative;
-          gap: 0;
           top: 5px;
+          display: none;
           flex-direction: column;
+          gap: 0;
+          width: 150px;
           background-color: white;
           box-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-          width: 150px;
 
           ul.menu {
             flex-direction: column;
@@ -130,8 +130,8 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
             }
 
             li.menu-button {
-              line-height: 20px;
               padding-left: 5px;
+              line-height: 20px;
 
               &.languageswitcher {
                 padding-left: 1px;
@@ -155,21 +155,21 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
   }
 
   > .left {
-    display: flex;
     position: relative;
-    padding: 10px $PADDING_SIDE;
     top: -2px;
+    display: flex;
+    padding: 10px $PADDING_SIDE;
 
     > h1.heading {
       :where(.link) {
         text-decoration: none;
 
         .logotype {
-          width: 101px;
-          height: 31px;
-          display: block;
           position: relative;
           left: -5px;
+          display: block;
+          width: 101px;
+          height: 31px;
           margin-right: 0.3rem;
         }
       }
@@ -198,27 +198,25 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
 
 /* stylelint-enable no-descending-specificity */
 
-
 // ナビゲーションメニューボタン (.menu-button)
 // グローバルヘッダーの li 要素に適用するピル形状のボタン
 // .-current で選択状態のボーダーとカラーを表示する
 .menu-button {
   display: inline-block;
   height: $HEIGHT_NAVIGATION_ITEM;
+  padding: 0 8px;
   line-height: $HEIGHT_NAVIGATION_ITEM;
   border-radius: $HEIGHT_NAVIGATION_ITEM * 0.5;
-  padding: 0 8px;
 
   &.-current {
-    border: solid 1px $COLOR_KEY_DARK1;
     color: $COLOR_KEY_DARK1;
+    border: solid 1px $COLOR_KEY_DARK1;
   }
 
   &:hover {
     color: $COLOR_KEY_DARK1;
   }
 }
-
 
 // 言語切り替えスイッチ (.languageswitcher)
 // EN/JA の2択をピルボタン形式で表示する。選択中の言語は背景色とボーダーで強調される。
@@ -227,17 +225,17 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
   display: flex;
 
   &::before {
-    content: '';
     position: relative;
     left: 25px;
     width: 1px;
+    content: '';
     border-right: 1px solid $COLOR_KEY_DARK2;
   }
 
   &.en {
     a.en {
-      background-color: $COLOR_KEY_DARK1_30;
       color: $COLOR_KEY_DARK2;
+      background-color: $COLOR_KEY_DARK1_30;
       border: 1px solid $COLOR_KEY_DARK2;
       border-right: none;
     }
@@ -250,8 +248,8 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
 
   &.ja {
     a.ja {
-      background-color: $COLOR_KEY_DARK1_30;
       color: $COLOR_KEY_DARK2;
+      background-color: $COLOR_KEY_DARK1_30;
       border: 1px solid $COLOR_KEY_DARK2;
       border-left: none;
     }
@@ -263,15 +261,15 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
   }
 
   a {
+    width: 24px;
+    font-size: 12px;
     line-height: 1.5;
     text-align: center;
-    font-size: 12px;
-    width: 24px;
     text-decoration: none;
 
     &.en {
-      border-radius: 20px 0 0 20px;
       border-right: 1px solid $COLOR_KEY_DARK2;
+      border-radius: 20px 0 0 20px;
     }
 
     &.ja {

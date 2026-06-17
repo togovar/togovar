@@ -1,27 +1,29 @@
 // タブとコンテンツ切り替えの共通ビュー
 // タブナビゲーション領域は $COLOR_KEY_DARK2 で統一し、ページのヘッダー層として視覚的に区別する。
 .module-tabs-view {
-  background-color: $COLOR_KEY_DARK2;
   color: #fff;
+  background-color: $COLOR_KEY_DARK2;
 
   > .tabscontainer {
     > ul {
-      margin: 0;
       padding: 4px $PADDING_SIDE 0;
+      margin: 0;
 
       > li {
         // 非選択タブは opacity: .8 で控えめにし、選択中・ホバー状態との対比でアクティブ状態を伝える。
         position: relative;
         z-index: $Z_INDEX_MODULE_TABS_VIEW;
         display: inline-block;
+        padding: 2px 12px 0;
         font-size: 14px;
         font-weight: bold;
         line-height: 24px;
-        padding: 2px 12px 0;
-        opacity: .8;
-        border-radius: 3px 3px 0 0;
         cursor: pointer;
-        transition: background-color $GUI_DURATION, opacity $GUI_DURATION;
+        border-radius: 3px 3px 0 0;
+        opacity: 0.8;
+        transition:
+          background-color $GUI_DURATION,
+          opacity $GUI_DURATION;
 
         // ホバーと選択状態を揃えることで、クリック可能であることをホバー時に事前提示する。
         &.-current,
@@ -40,14 +42,14 @@
     background-color: $COLOR_KEY_DARK1;
 
     > .section {
+      position: absolute;
       // 非アクティブセクションをフロー外に置くことで、.sectionscontainer の高さをアクティブな1セクション分に保つ。
       visibility: hidden;
-      position: absolute;
 
       // アクティブセクションだけをフローに戻し、.sectionscontainer の高さに反映させる。
       &.-current {
-        visibility: visible;
         position: static;
+        visibility: visible;
       }
     }
   }

@@ -6,11 +6,11 @@
   white-space: nowrap;
 }
 :host > .frequencygraph {
+  position: relative;
   width: 100px;
   height: 3.5px;
-  background-color: var(--color-darker-gray);
-  position: relative;
   margin-right: 4px;
+  background-color: var(--color-darker-gray);
 }
 
 :host > .frequencygraph > .scale {
@@ -58,8 +58,8 @@
 }
 
 :host > .range {
-  margin-right: 0.6em;
   width: 8.8em;
+  margin-right: 0.6em;
 }
 :host > .range > .from,
 :host > .range > .to {
