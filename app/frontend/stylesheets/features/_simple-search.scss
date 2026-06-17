@@ -1,11 +1,12 @@
-// SimpleSearch の外側コンテナとホスト要素のスタイル
-
+// =============================================================================
+// シンプル検索 (#SearchInputView / #SimpleSearchView)
+// 統合元: object/project/_SimpleSearchView.scss
+//
 // ⚠ simple-search-view は Lit Shadow DOM でレンダリングしているため、
-//   旧ライト DOM 向けの .search-field-view / .fieldcontainer / .examples
-//   へのセレクターは Shadow DOM 境界を越えられず無効。
-//   それらのスタイルは web-components/simple-search-view.scss /
-//   web-components/simple-search-examples.scss へ移管済み。
+//   旧ライト DOM 向けのセレクターは Shadow DOM 境界を越えられず無効。
+//   それらのスタイルは web-components/ へ移管済み。
 //   ここには外側コンテナの構造と CLS 防止の min-height のみを置く。
+// =============================================================================
 
 #SearchInputView {
   > .sectionscontainer {

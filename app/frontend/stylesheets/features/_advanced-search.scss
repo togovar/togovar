@@ -1,0 +1,700 @@
+// =============================================================================
+// AdvancedSearch 機能 — 高度検索条件ビルダー全体のスタイル
+//
+// 統合元:
+//   object/component/_advanced-search-condition-editor-view.scss … 条件エディター
+//   object/component/_advanced-search-condition-item-view.scss   … 条件行
+//   object/component/_advanced-search-condition-group-view.scss  … 条件グループ
+//   object/component/_advanced-search-toolbar.scss               … ツールバー
+//   object/project/_AdvancedSearchBuilderView.scss               … ビルダー外枠
+//   object/project/_AdvancedSearchView.scss                      … 最外コンテナ
+// =============================================================================
+
+
+// =============================================================================
+// 条件エディター (.advanced-search-condition-editor-view)
+// 条件行の下部に展開するフォームパネル
+// =============================================================================
+
+.advanced-search-condition-editor-view {
+  --padding-side: calc(var(--height-advanced-search-condition-values-container) * .5);
+  border-top: solid 1px $COLOR_SEPARATOR;
+  color: $COLOR_BLACK;
+
+  > .sections {
+    border-bottom: solid 1px $COLOR_SEPARATOR;
+
+    > section {
+      > header {
+        padding: 0 var(--padding-side);
+        background-color: #cdcdcc;
+        font-weight: bold;
+      }
+
+      > .body {
+        padding: 4px var(--padding-side);
+
+        &[data-type="clinical-significance"] {
+          padding-top: 2px;
+        }
+
+        > .row {
+          display: flex;
+          place-items: center;
+        }
+
+        label {
+          margin-bottom: 0;
+        }
+
+        .container {
+          position: relative;
+
+          > .loading {
+            z-index: 9;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            > span {
+              display: block;
+              width: 100%;
+              height: 100%;
+              background: url(../images/loading.gif) no-repeat 50% 50%;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  > .buttons {
+    padding: 3px 0 4px;
+    text-align: center;
+
+    > .button-view {
+      display: inline-block;
+
+      &:nth-child(1) {
+        margin-right: 5px;
+      }
+    }
+  }
+}
+
+
+// =============================================================================
+// 条件行 (.advanced-search-condition-item-view)
+// ローカル変数はこのブロック直前に置いて使用箇所を明示する
+// =============================================================================
+
+$HEIGHT: $HEIGHT_ADVANCED_SEARCH_CONDITION;
+$HEIGHT_RELATION: 16px;
+$HEIGHT_VALUE: 18px;
+$PADDING_VALUES: calc(($HEIGHT - $HEIGHT_VALUE) / 2);
+$CORNER_RADIUS: calc($HEIGHT / 2);
+
+.advanced-search-condition-item-view {
+  // 条件行の高さは周辺コンポーネントも参照するため、CSS変数で値ラベル側へ共有する。
+  --padding-values-vertical: calc((var(--height-advanced-search-condition-values-container) - var(--height-advanced-search-condition-value)) * 0.5);
+
+  margin-bottom: 3px;
+  position: relative;
+
+  > .body {
+    border-radius: $CORNER_RADIUS;
+    background-color: white;
+    box-shadow: 0 1px 1px rgba(black, 0.3);
+    position: relative;
+
+    > .summary {
+      // summaryは分類・関係・値・操作ボタンを1行に並べる本体部分。
+      padding-right: 8px;
+      color: $COLOR_BLACK;
+      background-color: #F0F0EF;
+      font-size: 12px;
+      display: flex;
+      align-items: stretch;
+      min-height: $HEIGHT;
+      border-radius: $CORNER_RADIUS;
+
+      > .classification {
+        background-color: $COLOR_BLACK;
+        color: white;
+        line-height: $HEIGHT;
+        padding: 0 0 0 $CORNER_RADIUS;
+        width: 188px;
+        min-width: 188px;
+        cursor: grab;
+        font-weight: bold;
+        border-top-left-radius: $CORNER_RADIUS;
+        border-bottom-left-radius: $CORNER_RADIUS;
+      }
+
+      > .relation {
+        // 関係アイコンは分類ラベルと値エリアの境界に重ねるため、負の横マージンで中央へ寄せる。
+        margin: #{calc(($HEIGHT - $HEIGHT_RELATION) / 2)} #{calc(-1 * $HEIGHT_RELATION / 2)};
+        width: $HEIGHT_RELATION;
+        min-width: $HEIGHT_RELATION;
+      }
+
+      > .values-container {
+        // 値が多い条件でも行全体を押し広げすぎないよう、値エリアだけをスクロール可能にする。
+        flex-grow: 1;
+        padding: var(--padding-values-vertical) $CORNER_RADIUS var(--padding-values-vertical) 16px;
+        flex-wrap: wrap;
+        align-items: center;
+        position: relative;
+        overflow: auto;
+        max-height: 100px;
+
+        &::-webkit-scrollbar {
+          -webkit-appearance: none;
+          width: 7px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          border-radius: 4px;
+          background-color: rgba(0, 0, 0, 0.5);
+          -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+        }
+      }
+
+      > .buttons {
+        display: flex;
+
+        > button {
+          border: none;
+          padding: 0 4px;
+          opacity: 0.4;
+
+          &:hover {
+            opacity: 1;
+          }
+
+          &::before {
+            font-family: 'Font Awesome 7 Free', sans-serif;
+            font-weight: 900;
+          }
+        }
+
+        > .edit {
+          &::before {
+            content: var(--icon-pencil);
+          }
+        }
+
+        > .delete {
+          &::before {
+            content: var(--icon-xmark);
+          }
+        }
+      }
+    }
+
+    > .advanced-search-condition-editor-view {
+      display: none;
+      border-top: none;
+      background-color: white;
+      height: 0;
+      transition: height $GUI_DURATION;
+      border-bottom-left-radius: $CORNER_RADIUS;
+      border-bottom-right-radius: $CORNER_RADIUS;
+    }
+  }
+
+  > .bg {
+    background: $BACKDROP_BG;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity $TRANSITION_DURATION;
+  }
+
+  &.-editing {
+    // 編集中は行本体をバックドロップより前面に出し、値タグごとの削除ボタンを表示する。
+    > .body {
+      z-index: $Z_INDEX_EDITING_CONDITION + 1;
+
+      > .summary {
+        border-radius: $CORNER_RADIUS $CORNER_RADIUS 0;
+
+        > .classification {
+          border-bottom-left-radius: 0;
+        }
+
+        > .buttons {
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        > .values-container {
+          > condition-item-value-view::part(delete-tag-btn) {
+            display: inline-flex;
+          }
+        }
+      }
+
+      > .advanced-search-condition-editor-view {
+        display: block;
+        height: auto;
+      }
+    }
+
+    > .bg {
+      pointer-events: auto;
+      opacity: 1;
+      z-index: $Z_INDEX_EDITING_CONDITION;
+    }
+  }
+
+  &[data-relation='eq'],
+  &[data-relation='ne'] {
+    // eq/neは専用の小さなアイコンで関係種別を示す。
+    > .body {
+      > .summary {
+        > .relation {
+          background-color: $COLOR_KEY_DARK1;
+          height: $HEIGHT_RELATION;
+          border-radius: 3px;
+          position: relative;
+          cursor: pointer;
+          z-index: 1;
+
+          &::before,
+          &::after {
+            content: '';
+            display: block;
+            position: absolute;
+          }
+
+          &::before {
+            width: 8px;
+            height: 2px;
+            top: 5px;
+            left: 4px;
+            background-color: white;
+            box-shadow: 0 4px white;
+          }
+        }
+      }
+    }
+  }
+
+  &[data-relation='ne'] {
+    // neは否定を示す斜線と無効色で、eqとの差を視覚的に出す。
+    > .body {
+      > .summary {
+        > .classification {
+          background-color: $COLOR_DISABLE_DEEP;
+        }
+
+        > .relation {
+          background-color: $COLOR_DISABLE;
+
+          &::after {
+            height: 12px;
+            border-left: solid 1px white;
+            transform: rotate(-20deg);
+            top: 2px;
+            left: 6.5px;
+          }
+        }
+      }
+    }
+  }
+
+  &[aria-selected='true'] {
+    // 選択状態の枠線はレイアウトに影響しないよう疑似要素で重ねる。
+    &::after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: solid 2px $COLOR_SELECTED;
+      border-radius: $CORNER_RADIUS;
+      pointer-events: none;
+    }
+  }
+
+  &[data-classification='significance'] {
+    // 疾患系の値はデータセット名と値を並べて見せるため、専用wrapperの幅を揃える。
+    > .body {
+      > .summary {
+        > .values-container {
+          > .mgend-wrapper {
+            display: flex;
+
+            > span {
+              font-weight: bold;
+              min-width: 45px;
+
+              &.mgend {
+                color: $COLOR_DATASET_DISEASE_MGEND;
+              }
+            }
+          }
+
+          > .clinvar-wrapper {
+            display: flex;
+
+            > span {
+              font-weight: bold;
+              min-width: 45px;
+
+              &.clinvar {
+                color: $COLOR_DATASET_DISEASE_CLINVAR;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+// =============================================================================
+// 条件グループ (.advanced-search-condition-group-view)
+// =============================================================================
+
+.advanced-search-condition-group-view {
+  margin: 0 calc(var(--padding-group) * -1 - 1px) 3px 0;
+  border: solid 1px $COLOR_KEY_DARK3;
+  background-color: white;
+  position: relative;
+  box-shadow: $SHADOW_DEPTH1;
+
+  > .logical-operator-switch {
+    position: absolute;
+    top: 5px;
+    left: 20px;
+    transform: rotate(90deg);
+    transform-origin: 0% 0%;
+  }
+
+  > .container {
+    padding: var(--padding-group) var(--padding-group) calc(var(--padding-group) - 2px) 22px;
+  }
+
+  &[data-number-of-child="0"], &[data-number-of-child="1"] {
+    > .logical-operator-switch {
+      visibility: hidden;
+    }
+  }
+
+  &[aria-selected="true"] {
+    &::after {
+      content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: solid 2px $COLOR_SELECTED;
+      pointer-events: none;
+    }
+  }
+
+  &.-root {
+    padding-bottom: calc(var(--height-toolbar) + 1px);
+
+    &[data-number-of-child="0"] {
+      &::before {
+        content: "Please add a search condition from below menu";
+        display: block;
+        text-align: center;
+        color: $COLOR_BLACK;
+        line-height: 12px;
+        position: relative;
+        top: 10px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+
+// =============================================================================
+// ツールバー (.advanced-search-toolbar)
+// =============================================================================
+
+$OPACITY_DISABLED: 0.8;
+
+.advanced-search-toolbar {
+  margin: 0 0 calc(var(--height-toolbar) * -1 - 1px) 0;
+  padding: 2px 6px;
+  background-color: $COLOR_KEY_DARK3;
+  color: white;
+  font-size: 12px;
+  line-height: 14px;
+
+  .command {
+    -webkit-appearance: none;
+    appearance: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    margin: 0;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  > ul {
+    margin: 0;
+    display: flex;
+    list-style: none;
+    padding-left: 0;
+    white-space: nowrap;
+
+    > li {
+      > .command {
+        padding: 4px 8px 3px;
+      }
+
+      > p {
+        padding: 4px 8px 3px;
+        margin-bottom: 0;
+        cursor: pointer;
+        transition: background-color $GUI_DURATION;
+      }
+
+      .shortcut {
+        background-color: white;
+        color: $COLOR_KEY_DARK3;
+        font-weight: bold;
+        font-size: 10px;
+        height: 12px;
+        line-height: 12px;
+        padding: 0 3px;
+        border-radius: 2px;
+        margin-left: 4px;
+        display: none;
+
+        > .char {
+          &.-command {
+            &::before {
+              [data-os="mac"] & {
+                content: "⌘";
+              }
+
+              [data-os="windows"] & {
+                font-weight: normal;
+                content: "ctrl ";
+              }
+            }
+          }
+        }
+      }
+
+      &:hover {
+        > p {
+          background-color: $COLOR_KEY_DARK1;
+        }
+      }
+
+      &.-haschild {
+        position: relative;
+
+        body[data-dragging="true"] & {
+          pointer-events: none;
+        }
+
+        > p {
+          &::after {
+            content: "";
+            display: inline-block;
+            border-style: solid;
+            border-width: 4px 3px 0 3px;
+            border-color: white transparent transparent transparent;
+            vertical-align: middle;
+            margin-left: 4px;
+          }
+        }
+
+        > ul {
+          position: absolute;
+          pointer-events: none;
+          background-color: $COLOR_KEY_DARK3;
+          opacity: 0;
+          z-index: $Z_INDEX_ADVANCED_SEARCH_MENU;
+          transform: translateY(-10px);
+          transition: opacity $GUI_DURATION, transform $GUI_DURATION;
+          padding: 0 0 2px;
+          white-space: nowrap;
+          list-style: none;
+
+          > li {
+            transition: background-color $GUI_DURATION;
+
+            > .command {
+              display: flex;
+              align-items: center;
+              width: 100%;
+              margin-bottom: 0;
+              padding: 4px 8px;
+              transition: background-color $GUI_DURATION;
+            }
+
+            &:hover {
+              > .command {
+                background-color: $COLOR_KEY_DARK1;
+              }
+            }
+          }
+        }
+
+        &:hover {
+          > ul {
+            pointer-events: auto;
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      }
+
+      > .command {
+        opacity: $OPACITY_DISABLED;
+        pointer-events: none;
+
+        &.-enabled {
+          opacity: 1;
+          pointer-events: auto;
+
+          &:hover {
+            background-color: $COLOR_KEY_DARK1;
+          }
+        }
+
+        &[data-command="group"] {
+          #AdvancedSearchBuilderView[data-can-group="true"] & {
+            opacity: 1;
+            pointer-events: auto;
+
+            &:hover {
+              background-color: $COLOR_KEY_DARK1;
+            }
+          }
+        }
+
+        &[data-command="ungroup"] {
+          #AdvancedSearchBuilderView[data-can-ungroup="true"] & {
+            opacity: 1;
+            pointer-events: auto;
+
+            &:hover {
+              background-color: $COLOR_KEY_DARK1;
+            }
+          }
+        }
+
+        &[data-command="copy"] {
+          #AdvancedSearchBuilderView[data-can-copy="true"] & {
+            opacity: 1;
+            pointer-events: auto;
+
+            &:hover {
+              background-color: $COLOR_KEY_DARK1;
+            }
+          }
+        }
+
+        &[data-command="delete"] {
+          #AdvancedSearchBuilderView[data-can-delete="true"] & {
+            opacity: 1;
+            pointer-events: auto;
+
+            &:hover {
+              background-color: $COLOR_KEY_DARK1;
+            }
+          }
+        }
+      }
+
+      &.buttoncontainer {
+        flex-grow: 1;
+        text-align: right;
+
+        > .button-view {
+          position: relative;
+          top: 1px;
+        }
+      }
+    }
+  }
+}
+
+
+// =============================================================================
+// ビルダー外枠 (#AdvancedSearchBuilderView)
+// --padding-group / --height-toolbar は子コンポーネントへ渡す CSS カスタムプロパティ
+// =============================================================================
+
+#AdvancedSearchBuilderView {
+  --padding-group: 6px;
+  --height-toolbar: 14px;
+  padding: 14px $PADDING_SIDE 14px;
+  user-select: none;
+
+  > .inner {
+    .advanced-search-condition-item-view {
+      + .advanced-search-condition-group-view {
+        margin-top: 5px;
+      }
+    }
+
+    .advanced-search-condition-group-view {
+      + .advanced-search-condition-item-view {
+        margin-top: 5px;
+      }
+    }
+  }
+}
+
+
+// =============================================================================
+// 最外コンテナ (#AdvancedSearchView)
+// =============================================================================
+
+#AdvancedSearchView {
+  .search-field-view {
+    padding: 14px $PADDING_SIDE;
+
+    > .fieldcontainer {
+      > .field {
+        margin: 0;
+
+        > button {
+          display: none;
+        }
+      }
+    }
+  }
+
+  &.-current {
+    .search-field-view {
+      > .suggest-view {
+        top: 44px;
+        left: 25px;
+      }
+    }
+  }
+}
