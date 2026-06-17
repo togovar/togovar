@@ -14,7 +14,7 @@
     line-height: 18px;
     text-align: right;
     outline: none;
-    border: solid 1px #94928d;
+    border: solid 1px var(--color-gray);
     border-radius: 9px;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
   }
@@ -27,7 +27,7 @@
     color: #fff;
     appearance: none;
     cursor: pointer;
-    background-color: #117f93;
+    background-color: var(--color-key-dark1);
     border: none;
     border-radius: 3px;
   }
@@ -84,12 +84,12 @@
       margin-left: 5px;
       font-size: 0.6rem;
       cursor: pointer;
-      border: 0.5px solid #444;
+      border: 0.5px solid var(--color-black);
       border-radius: 8px;
 
       &:hover {
         color: #fff;
-        background-color: #444;
+        background-color: var(--color-black);
       }
 
       &:active {

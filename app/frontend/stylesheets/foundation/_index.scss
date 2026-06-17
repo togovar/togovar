@@ -1,4 +1,5 @@
-// foundation の変数とミックスインを一括公開する。
+// foundation のミックスインを一括公開する。
+// _variables.scss は SCSS メンバーを持たず CSS 出力（:root）のみのため @use で取り込む。
 // CSS 出力を持つ base / reset / font-awesome はここに含めない（main.scss で順序を制御する）。
-@forward 'variables';
+@use 'variables';
 @forward 'mixins';
