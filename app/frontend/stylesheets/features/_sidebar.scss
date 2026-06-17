@@ -5,7 +5,9 @@
 
 #SideBar {
   box-sizing: border-box;
-  width: calc(var(--width-sidebar) * 2);
+  // 右パディング削除分 (padding-sidebar-side) を幅に加算して第2パネルのスクロールバーが
+  // #SideBar の overflow:hidden に切り取られないようにする。
+  width: calc(var(--width-sidebar) * 2 + var(--padding-sidebar-side));
   height: 100%;
   min-height: 0;
   // 右パディングを省いてスクロールバーを .LayoutAside の右端に寄せる。
