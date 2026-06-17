@@ -7,7 +7,7 @@
   font-weight: normal;
   line-height: 16px;
   color: $COLOR_KEY_DARK1;
-  &:first-letter {
+  &::first-letter {
     text-transform: capitalize;
   }
 }

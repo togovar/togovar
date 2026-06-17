@@ -146,7 +146,7 @@ select {
   margin-bottom: 0;
   color: red;
 
-  &:before {
+  &::before {
     content: 'unimplemented: ';
   }
 }

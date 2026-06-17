@@ -42,7 +42,7 @@
       var(--color-key-dark3)
     );
 
-    &:after {
+    &::after {
       position: absolute;
       top: 50%;
       right: 0.36rem;

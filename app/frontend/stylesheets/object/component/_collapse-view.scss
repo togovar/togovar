@@ -6,7 +6,7 @@
     cursor: pointer;
     transition: top $GUI_DURATION;
 
-    &:before {
+    &::before {
       display: block;
       width: 7px;
       height: 7px;
@@ -25,7 +25,7 @@
 
   &.-collapsed {
     > .collapsebutton {
-      &:before {
+      &::before {
         transform: rotate(225deg);
       }
     }
@@ -37,7 +37,7 @@
 
   &.-hierarchic {
     > .collapsebutton {
-      &:before {
+      &::before {
         border-top: 4px solid transparent;
         border-bottom: 4px solid transparent;
         border-left: 5px solid $COLOR_BLACK;
@@ -51,7 +51,7 @@
 
     &.-collapsed {
       > .collapsebutton {
-        &:before {
+        &::before {
           transform: rotate(0deg);
         }
       }

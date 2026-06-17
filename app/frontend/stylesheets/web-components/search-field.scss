@@ -37,7 +37,7 @@ $SIZE: 30px;
         background-color: transparent;
         border: none;
 
-        &:after {
+        &::after {
           position: absolute;
           top: 2px;
           font-family: 'Font Awesome 7 Free', sans-serif;

@@ -23,7 +23,7 @@ dl {
 
   > dt {
     font-weight: 300;
-    &:after {
+    &::after {
       content: ':';
     }
   }

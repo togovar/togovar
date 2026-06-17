@@ -48,7 +48,7 @@
         padding-bottom: 60px;
 
         // 最後のセクション下部にアクセントカラーの区切り線を引く
-        &:after {
+        &::after {
           position: absolute;
           bottom: 0;
           left: -4px;
@@ -65,8 +65,8 @@
         font-size: 18px;
         color: $COLOR_KEY_DARK3;
 
-        &:before,
-        &:after {
+        &::before,
+        &::after {
           position: absolute;
           display: block;
           content: '';
@@ -124,7 +124,7 @@
           padding: 4px 0 4px 1em;
           line-height: 1.6;
 
-          &:before {
+          &::before {
             position: relative;
             top: -3px;
             left: -7px;
@@ -148,7 +148,7 @@
           padding: 4px 0 4px 2em;
 
           // カウンターを丸バッジとして表示する
-          &:before {
+          &::before {
             position: absolute;
             top: 7px;
             right: calc(100% - 21px);

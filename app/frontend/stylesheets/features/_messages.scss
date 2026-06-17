@@ -17,7 +17,7 @@
     border-width: 1px;
     border-radius: 4px;
 
-    &:before {
+    &::before {
       position: absolute;
       top: 50%;
       left: 6px;
@@ -31,7 +31,7 @@
       background-color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: 30%);
       border-color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: -2%);
 
-      &:before {
+      &::before {
         color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: -2%);
         content: var(--icon-xmark);
       }
@@ -41,7 +41,7 @@
       background-color: color.adjust($COLOR_SIGN_WARNING, $lightness: 45%);
       border-color: color.adjust($COLOR_SIGN_WARNING, $lightness: -2%);
 
-      &:before {
+      &::before {
         color: color.adjust($COLOR_SIGN_WARNING, $lightness: -2%);
         content: var(--icon-triangle-exclamation);
       }
@@ -51,7 +51,7 @@
       background-color: color.adjust($COLOR_SIGN_NORMAL, $lightness: 42%);
       border-color: color.adjust($COLOR_SIGN_NORMAL, $lightness: -2%);
 
-      &:before {
+      &::before {
         color: color.adjust($COLOR_SIGN_NORMAL, $lightness: -2%);
         content: var(--icon-circle-info);
       }

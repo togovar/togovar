@@ -48,15 +48,15 @@ $SEARCH_FIELD_SIZE: 30px;
         border-radius: 100%;
         box-shadow: 0 1px 1px rgba(black, 0.2);
 
-        &:before,
-        &:after {
+        &::before,
+        &::after {
           position: absolute;
           display: block;
           content: '';
         }
 
         // レンズ部分（円）
-        &:before {
+        &::before {
           top: 6px;
           left: 6px;
           width: 12px;
@@ -66,7 +66,7 @@ $SEARCH_FIELD_SIZE: 30px;
         }
 
         // 柄の部分（斜め線）
-        &:after {
+        &::after {
           top: 16px;
           left: 17px;
           height: 5px;
@@ -103,7 +103,7 @@ $SEARCH_FIELD_SIZE: 30px;
         font-weight: normal;
         opacity: 0.6;
 
-        &:after {
+        &::after {
           content: ':';
         }
       }
@@ -145,7 +145,7 @@ $SUGGEST_PADDING_SIDE: 14px;
       line-height: 16px;
       color: $COLOR_KEY_DARK1;
 
-      &:first-letter {
+      &::first-letter {
         text-transform: capitalize;
       }
     }

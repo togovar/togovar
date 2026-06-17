@@ -188,7 +188,7 @@ $PADDING_RIGHT_ELEMENTS: ($HEIGHT_GLOBAL_MENU - $HEIGHT_NAVIGATION_ITEM) * 0.5;
       > button.button {
         font-weight: normal;
 
-        &:after {
+        &::after {
           right: 8px;
         }
       }

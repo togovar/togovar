@@ -20,6 +20,10 @@ const config: Config = {
     // ブラウザ固有の疑似クラス（:focus-visible など）を誤検出しないよう有効にする
     'selector-pseudo-class-no-unknown': true,
 
+    // 疑似要素は :: （ダブルコロン）を使う。: （シングルコロン）は疑似クラス専用。
+    // ::before / ::after / ::first-letter など全て対象
+    'selector-pseudo-element-colon-notation': 'double',
+
     // コメント前の空行ルールがプロジェクトの既存スタイルと合わないため無効にする
     'comment-empty-line-before': null,
 

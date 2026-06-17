@@ -146,13 +146,36 @@ app/frontend/
 
 ## スタイル方針
 
-- SCSSは `app/frontend/stylesheets/` の既存レイヤー構成に合わせる。
+### ディレクトリ・配置
+
+- SCSSは `app/frontend/stylesheets/` の既存レイヤー構成（FLOCSS）に合わせる。
+  - `foundation/` — リセット・変数・ベース
+  - `layout/` — ページレイアウト
+  - `object/component/` — 汎用UIコンポーネント（特定画面に依存しないもの）
+  - `features/` — 画面・機能固有のスタイル
 - Web Component内で直接 import するSCSSは `app/frontend/stylesheets/web-components/` に置く。
-- 既存CSSに異なる書き方があっても、関連する変更範囲だけ段階的に整える。
-- UI状態は、可能なら既存の `data-*` 属性や状態クラスを利用する。
-- セレクターを追加する前に、既存の `object/component` / `object/project` に同じ責務のスタイルがないか確認する。
+- セレクターを追加する前に、既存の `object/component/` や `features/` に同じ責務のスタイルがないか確認する。
 - `app/frontend/stylesheets/foundation/_reset.scss` は**変更禁止**。Josh W. Comeau's CSS Reset の定義をそのまま維持する。
-- `tr` に `border` を使うテーブルは、必ずそのテーブルのセレクター自身に `border-collapse: collapse` を明示する。`_reset.scss` には書けないため各コンポーネントで対応する。
+
+### 書き方のルール
+
+- 疑似要素は `::before` / `::after` / `::first-letter` のように **ダブルコロン** で書く。シングルコロン（`:before`）は疑似クラス専用。stylelint で強制している。
+- プロパティの並び順は **stylelint-config-recess-order** に従う（位置 → ボックスモデル → タイポグラフィ → 装飾 → トランジション）。`stylelint --fix` で自動修正できる。
+- ベンダープレフィックスは**必要な場合だけ**書く。
+  - `-webkit-overflow-scrolling` — 廃止済み。書かない。
+  - `-webkit-box-shadow` — 不要。`box-shadow` のみでよい。
+  - `-webkit-user-select` — 不要。`user-select` のみでよい。
+  - `-moz-appearance` — 不要。`appearance` のみでよい。
+  - `-webkit-appearance` — `input[type="range"]` など Safari が標準プロパティに非対応な箇所のみ残す。
+  - `-webkit-mask-*` / `-webkit-font-smoothing` — まだ有効。残す。
+- UI状態は、可能なら既存の `data-*` 属性や状態クラスを利用する。
+- `tr` に `border` を使うテーブルは、そのテーブルに `border-collapse: collapse` を明示する。
+
+### Sass の書き方
+
+- 現在は `@import` でグローバル変数を共有している。新規ファイルでも同じ方式に合わせる。
+- Dart Sass では `@import` は非推奨（`@use` / `@forward` が推奨）。将来的な移行を視野に入れ、新しい変数・ミックスインを `@import` に依存した暗黙グローバルとして増やさない。
+- `rgba(black, 0.2)` のような SCSS 固有の色指定は既存コードに残っているが、新規では `rgba(0, 0, 0, 0.2)` または CSS の `rgb(0 0 0 / 0.2)` 構文を使う。
 
 ## コメント規約
 

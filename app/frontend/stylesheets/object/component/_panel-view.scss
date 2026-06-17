@@ -22,7 +22,7 @@
       font-size: 11px;
     }
 
-    &:after {
+    &::after {
       position: absolute;
       top: 16px;
       right: 12px;
@@ -75,14 +75,14 @@
     > .title {
       cursor: inherit;
 
-      &:after {
+      &::after {
         display: none;
       }
     }
   }
 
   &.-notfound {
-    &:after {
+    &::after {
       display: block;
       padding-bottom: 10px;
       margin: (-8px) 0 0;
@@ -96,7 +96,7 @@
     > .title {
       border-bottom: none;
 
-      &:after {
+      &::after {
         top: 12px;
         transform: rotate(225deg);
       }
@@ -107,7 +107,7 @@
     }
 
     &.-notfound {
-      &:after {
+      &::after {
         display: none;
         content: '';
       }
@@ -137,7 +137,7 @@
         text-decoration: none;
 
         &.hyper-text {
-          &:after {
+          &::after {
             color: white;
           }
         }

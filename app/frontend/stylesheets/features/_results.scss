@@ -239,7 +239,6 @@
           > .columns-dropdown-list {
             padding: 0;
             margin: 0;
-            -webkit-user-select: none;
             user-select: none;
             list-style: none;
 
@@ -354,7 +353,6 @@
     overflow-y: hidden;
     overscroll-behavior: contain;
     touch-action: pan-x pan-y;
-    -webkit-overflow-scrolling: touch;
 
     > .results-view {
       > thead {
@@ -493,7 +491,7 @@
         &.separator {
           border-bottom: solid 2px white;
 
-          &:before {
+          &::before {
             display: block;
             width: 28px;
             content: '';
@@ -840,7 +838,7 @@
           color: $COLOR_KEY;
           border-bottom: solid 1px white;
 
-          &:before {
+          &::before {
             position: absolute;
             top: 50%;
             left: 18px;
@@ -929,7 +927,7 @@ body[data-column-resizing='true'] {
       opacity: 0;
       transition: opacity $TRANSITION_DURATION;
 
-      &:after {
+      &::after {
         position: absolute;
         top: 5px;
         right: -7px;
@@ -947,7 +945,7 @@ body[data-column-resizing='true'] {
       > .total {
         opacity: 0.75;
 
-        &:before {
+        &::before {
           content: '/ ';
         }
       }
@@ -999,14 +997,14 @@ body[data-column-resizing='true'] {
     opacity $GUI_DURATION,
     top $GUI_DURATION;
 
-  &:before,
-  &:after {
+  &::before,
+  &::after {
     position: absolute;
     display: block;
     content: '';
   }
 
-  &:before {
+  &::before {
     top: 6px;
     border-top: solid 8px transparent;
     border-bottom: solid 8px transparent;
@@ -1015,7 +1013,7 @@ body[data-column-resizing='true'] {
     filter: blur(1px);
   }
 
-  &:after {
+  &::after {
     top: 5px;
     border-top: solid 8px transparent;
     border-bottom: solid 8px transparent;
@@ -1047,7 +1045,7 @@ body[data-column-resizing='true'] {
 .clinical-significance {
   color: $COLOR_KEY_DARK3;
 
-  &:before {
+  &::before {
     display: inline-block;
     width: 18px;
     height: 18px;
@@ -1063,83 +1061,83 @@ body[data-column-resizing='true'] {
     border-radius: 9px;
   }
 
-  &[data-value='P']:before,
-  &[data-value='PLP']:before {
+  &[data-value='P']::before,
+  &[data-value='PLP']::before {
     content: 'P';
   }
 
-  &[data-value='LP']:before,
-  &[data-value='LPLP']:before {
+  &[data-value='LP']::before,
+  &[data-value='LPLP']::before {
     content: 'LP';
   }
 
-  &[data-value='P']:before,
-  &[data-value='LP']:before {
+  &[data-value='P']::before,
+  &[data-value='LP']::before {
     color: $COLOR_SIGN_DANGEROUS;
     background-color: $COLOR_SIGN_DANGEROUS_LIGHT;
     border-color: $COLOR_SIGN_DANGEROUS;
   }
 
-  &[data-value='PLP']:before,
-  &[data-value='LPLP']:before {
+  &[data-value='PLP']::before,
+  &[data-value='LPLP']::before {
     color: $COLOR_SIGN_LOWDANGEROUS;
     background-color: $COLOR_SIGN_LOWDANGEROUS_LIGHT;
     border-color: $COLOR_SIGN_LOWDANGEROUS;
   }
 
-  &[data-value='ERA']:before,
-  &[data-value='LRA']:before,
-  &[data-value='URA']:before {
+  &[data-value='ERA']::before,
+  &[data-value='LRA']::before,
+  &[data-value='URA']::before {
     color: $COLOR_SIGN_WARNING;
     content: 'RA';
     background-color: $COLOR_SIGN_WARNING_LIGHT;
     border-color: $COLOR_SIGN_WARNING;
   }
 
-  &[data-value='US']:before {
+  &[data-value='US']::before {
     color: $COLOR_SIGN_UNKNOWN;
     content: 'US';
     background-color: $COLOR_SIGN_UNKNOWN_LIGHT;
     border-color: $COLOR_SIGN_UNKNOWN;
   }
 
-  &[data-value='LB']:before {
+  &[data-value='LB']::before {
     color: $COLOR_SIGN_NORMAL;
     content: 'LB';
     background-color: $COLOR_SIGN_NORMAL_LIGHT;
     border-color: $COLOR_SIGN_NORMAL;
   }
 
-  &[data-value='B']:before {
+  &[data-value='B']::before {
     color: $COLOR_SIGN_SAFE;
     content: 'B';
     background-color: $COLOR_SIGN_SAFE_LIGHT;
     border-color: $COLOR_SIGN_SAFE;
   }
 
-  &[data-value='CI']:before {
+  &[data-value='CI']::before {
     color: $COLOR_SIGN_MODIFIER;
     content: 'CI';
     background-color: $COLOR_SIGN_MODIFIER_LIGHT;
     border-color: $COLOR_SIGN_MODIFIER;
   }
 
-  &[data-value='DR']:before {
+  &[data-value='DR']::before {
     content: 'DR';
   }
-  &[data-value='CS']:before {
+  &[data-value='CS']::before {
     content: 'CS';
   }
-  &[data-value='RF']:before {
+  &[data-value='RF']::before {
     content: 'RF';
   }
-  &[data-value='A']:before {
+  &[data-value='A']::before {
     content: 'A';
   }
-  &[data-value='PR']:before {
+  &[data-value='PR']::before {
     content: 'PR';
   }
-  &[data-value='AF']:before {
+  &[data-value='AF']::before {
     content: 'AF';
   }
 
@@ -1149,26 +1147,26 @@ body[data-column-resizing='true'] {
   &[data-value='A'],
   &[data-value='PR'],
   &[data-value='AF'] {
-    &:before {
+    &::before {
       color: $COLOR_SIGN_OTHER;
       background-color: $COLOR_SIGN_OTHER_LIGHT;
       border-color: $COLOR_SIGN_OTHER;
     }
   }
 
-  &[data-value='O']:before {
+  &[data-value='O']::before {
     content: 'O';
   }
-  &[data-value='NP']:before {
+  &[data-value='NP']::before {
     content: 'NP';
   }
-  &[data-value='AN']:before {
+  &[data-value='AN']::before {
     content: 'AN';
   }
 
-  &[data-value='O']:before,
-  &[data-value='NP']:before,
-  &[data-value='AN']:before {
+  &[data-value='O']::before,
+  &[data-value='NP']::before,
+  &[data-value='AN']::before {
     color: $COLOR_GRAY;
     background-color: white;
     border-color: $COLOR_GRAY;
@@ -1178,7 +1176,7 @@ body[data-column-resizing='true'] {
 // 影響種別ドット (.consequence-item)
 // バリアントの影響レベル（high/moderate/low/modifier）を色付き円で示す
 .consequence-item {
-  &:before {
+  &::before {
     display: inline-block;
     width: 9px;
     height: 9px;
@@ -1187,16 +1185,16 @@ body[data-column-resizing='true'] {
     border-radius: 100%;
   }
 
-  &.-low:before {
+  &.-low::before {
     background-color: $COLOR_SIGN_SAFE;
   }
-  &.-moderate:before {
+  &.-moderate::before {
     background-color: $COLOR_SIGN_NORMAL;
   }
-  &.-high:before {
+  &.-high::before {
     background-color: $COLOR_SIGN_DANGEROUS;
   }
-  &.-modifier:before {
+  &.-modifier::before {
     background-color: $COLOR_SIGN_MODIFIER;
   }
 }
@@ -1209,7 +1207,7 @@ body[data-column-resizing='true'] {
   font-family: 'Font Awesome 7 Free', sans-serif;
   font-weight: 900;
 
-  &:before {
+  &::before {
     position: relative;
     left: 2px;
     display: inline-block;
@@ -1244,45 +1242,45 @@ body[data-column-resizing='true'] {
   &[data-dataset='jga_wgs'],
   &[data-dataset='jga_wes'],
   &[data-dataset='jga_snp'] {
-    &:before {
+    &::before {
       color: $COLOR_DATASET_JGA;
     }
   }
 
   &[data-dataset='tommo'] {
-    &:before {
+    &::before {
       color: $COLOR_DATASET_TOMMO;
     }
   }
 
   &[data-dataset='hgvd'],
   &[data-dataset='mgend'] {
-    &:before {
+    &::before {
       color: $COLOR_DATASET_HGVD;
     }
   }
 
   &[data-dataset='ncbn'] {
-    &:before {
+    &::before {
       color: $COLOR_DATASET_NCBN;
     }
   }
 
   &[data-dataset='gem_j_wga'] {
-    &:before {
+    &::before {
       color: $COLOR_DATASET_GEM_J;
     }
   }
 
   &[data-dataset='bbj'] {
-    &:before {
+    &::before {
       color: $COLOR_DATASET_BBJ;
     }
   }
 
   &[data-dataset='gnomad_genomes'],
   &[data-dataset='gnomad_exomes'] {
-    &:before {
+    &::before {
       color: $COLOR_DATASET_FOREIGN;
     }
   }
@@ -1344,7 +1342,7 @@ body[data-column-resizing='true'] {
 // .-internal: 内部リンク（右矢印）、.-external: 外部リンク（外部リンクアイコン）
 .hyper-text {
   &[href]:not([href='']) {
-    &:after {
+    &::after {
       display: inline-block;
       margin-left: 0.25em;
       font-family: 'Font Awesome 7 Free', sans-serif;
@@ -1353,13 +1351,13 @@ body[data-column-resizing='true'] {
     }
   }
 
-  &[href]:not([href='']):hover:after {
+  &[href]:not([href='']):hover::after {
     color: $COLOR_KEY;
   }
 
   &.-internal {
     &[href]:not([href='']) {
-      &:after {
+      &::after {
         font-size: 0.8em;
         content: var(--icon-circle-arrow-right);
       }
@@ -1368,7 +1366,7 @@ body[data-column-resizing='true'] {
 
   &.-external {
     &[href]:not([href='']) {
-      &:after {
+      &::after {
         font-size: 0.7em;
         content: var(--icon-arrow-up-right-from-square);
       }
@@ -1397,7 +1395,7 @@ $COLOR_ALT_TEXT: #c52543;
 
     // 塩基数が多い場合は data-sum 属性の値を bp バッジとして ::after で表示する
     &[data-sum] {
-      &:after {
+      &::after {
         position: relative;
         display: inline-block;
         padding: 0 4px;
@@ -1418,7 +1416,7 @@ $COLOR_ALT_TEXT: #c52543;
     &[data-sum='2'],
     &[data-sum='3'],
     &[data-sum='4'] {
-      &:after {
+      &::after {
         display: none;
       }
     }
@@ -1435,7 +1433,7 @@ $COLOR_ALT_TEXT: #c52543;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
 
-    &[data-sum]:after {
+    &[data-sum]::after {
       background-color: $COLOR_REF;
     }
   }
@@ -1450,7 +1448,7 @@ $COLOR_ALT_TEXT: #c52543;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
 
-    &[data-sum]:after {
+    &[data-sum]::after {
       background-color: $COLOR_ALT;
     }
   }
@@ -1459,14 +1457,14 @@ $COLOR_ALT_TEXT: #c52543;
   > .arrow {
     position: relative;
 
-    &:before,
-    &:after {
+    &::before,
+    &::after {
       position: absolute;
       display: inline-block;
       content: '';
     }
 
-    &:before {
+    &::before {
       top: 0;
       right: -6px;
       border-top: 9px solid transparent;
@@ -1474,7 +1472,7 @@ $COLOR_ALT_TEXT: #c52543;
       border-left: 6px solid $COLOR_REF;
     }
 
-    &:after {
+    &::after {
       top: 1px;
       right: -5px;
       border-top: 8px solid transparent;
@@ -1497,7 +1495,7 @@ $COLOR_ALT_TEXT: #c52543;
   border: solid 1px $COLOR_GRAY;
   border-radius: 7px;
 
-  &:before {
+  &::before {
     content: '+';
   }
 }

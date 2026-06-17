@@ -20,7 +20,7 @@
   > .chromosome {
     font-weight: bold;
 
-    &:after {
+    &::after {
       content: ': ';
     }
   }
@@ -465,7 +465,7 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
           color: $COLOR_ALT;
 
           // "alt / total" の区切り文字を疑似要素で追加する
-          &:after {
+          &::after {
             margin-left: 0.5em;
             font-size: 10px;
             color: $COLOR_BLACK;

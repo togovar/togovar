@@ -14,15 +14,15 @@ button {
   border-radius: 100%;
   box-shadow: 0 1px 1px rgba(black, 0.2);
 
-  &:before,
-  &:after {
+  &::before,
+  &::after {
     position: absolute;
     box-sizing: border-box;
     display: block;
     content: '';
   }
 
-  &:before {
+  &::before {
     top: 6px;
     left: 6px;
     width: 12px;
@@ -31,7 +31,7 @@ button {
     border-radius: 6px;
   }
 
-  &:after {
+  &::after {
     top: 16px;
     left: 17px;
     height: 5px;
