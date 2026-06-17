@@ -122,11 +122,3 @@ select {
   color: var(--color-gray);
 }
 
-.unimplemented {
-  margin-bottom: 0;
-  color: red;
-
-  &::before {
-    content: 'unimplemented: ';
-  }
-}

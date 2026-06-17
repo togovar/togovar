@@ -32,6 +32,8 @@
   // color: mutation
   --color-mutation-ref: #249eb3;
   --color-mutation-alt: #ff6682;
+  --color-mutation-ref-text: var(--color-key-dark2);
+  --color-mutation-alt-text: #c52543;
   --color-mutation-ref-bg: #{color.adjust(
       #249eb3,
       $lightness: 48%,

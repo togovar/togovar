@@ -1,5 +1,3 @@
-@use '../../foundation' as *;
-
 // タブとコンテンツ切り替えの共通ビュー
 // タブナビゲーション領域は var(--color-key-dark2) で統一し、ページのヘッダー層として視覚的に区別する。
 .module-tabs-view {

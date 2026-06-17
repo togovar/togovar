@@ -1,5 +1,3 @@
-@use '../foundation' as *;
-
 // ページの骨格となるレイアウト定義。flex チェーンの全体像：
 //   body (flex column, height: 100vh)
 //   └─ .LayoutMainAside (flex: 1 1 auto) ← このファイル

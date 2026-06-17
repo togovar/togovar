@@ -1394,10 +1394,6 @@ body[data-column-resizing='true'] {
 
 // Ref/Alt アレル表示 (.ref-alt)
 // REF を左・ALT を右に並べ、塩基数が多い場合は bp バッジで要約する
-$COLOR_REF_BG: var(--color-mutation-ref-bg);
-$COLOR_ALT_BG: var(--color-mutation-alt-bg);
-$COLOR_REF_TEXT: var(--color-key-dark2);
-$COLOR_ALT_TEXT: #c52543;
 
 .ref-alt {
   display: flex;
@@ -1443,8 +1439,8 @@ $COLOR_ALT_TEXT: #c52543;
   > .ref {
     position: relative;
     padding-right: 4px;
-    color: $COLOR_REF_TEXT;
-    background-color: $COLOR_REF_BG;
+    color: var(--color-mutation-ref-text);
+    background-color: var(--color-mutation-ref-bg);
     border-top: solid 1px var(--color-mutation-ref);
     border-bottom: solid 1px var(--color-mutation-ref);
     border-left: solid 1px var(--color-mutation-ref);
@@ -1458,8 +1454,8 @@ $COLOR_ALT_TEXT: #c52543;
 
   > .alt {
     padding-left: 9px;
-    color: $COLOR_ALT_TEXT;
-    background-color: $COLOR_ALT_BG;
+    color: var(--color-mutation-alt-text);
+    background-color: var(--color-mutation-alt-bg);
     border-top: solid 1px var(--color-mutation-alt);
     border-right: solid 1px var(--color-mutation-alt);
     border-bottom: solid 1px var(--color-mutation-alt);
@@ -1495,7 +1491,7 @@ $COLOR_ALT_TEXT: #c52543;
       right: -5px;
       border-top: 8px solid transparent;
       border-bottom: 8px solid transparent;
-      border-left: 6px solid $COLOR_REF_BG;
+      border-left: 6px solid var(--color-mutation-ref-bg);
     }
   }
 }
