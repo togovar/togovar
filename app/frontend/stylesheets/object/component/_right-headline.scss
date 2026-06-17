@@ -1,3 +1,5 @@
+@use '../../foundation' as *;
+
 .right-headline {
   > tbody {
     > tr {
@@ -13,7 +15,7 @@
         padding-right: 0.5em;
         text-align: right;
 
-        @extend %panel-view-heading;
+        @include panel-view-heading;
 
         &::after {
           content: ':';

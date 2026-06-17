@@ -1,36 +1,37 @@
-@import 'foundation/font-awesome';
-@import 'foundation/variables';
-@import 'foundation/reset';
-@import 'foundation/base';
+// foundation — CSS 出力を持つファイルのみ明示的に読み込む。
+// 変数・ミックスインは各パーシャルが @use '../foundation' as * で個別に宣言する。
+@use 'foundation/font-awesome';
+@use 'foundation/reset';
+@use 'foundation/base';
 
-@import 'layout/layout';
+@use 'layout/layout';
 
 // 汎用UIコンポーネント — 特定画面に依存しない再利用可能なパーツ
-@import 'object/component/button-view';
-@import 'object/component/collapse-view';
-@import 'object/component/variant-icon';
-@import 'object/component/dropdown-view';
-@import 'object/component/floating-info';
-@import 'object/component/form-parts';
-@import 'object/component/logical-operator-switch';
-@import 'object/component/module-tabs-view';
-@import 'object/component/page-index';
-@import 'object/component/panel-view';
-@import 'object/component/question-answer';
-@import 'object/component/range-slider';
-@import 'object/component/right-headline';
+@use 'object/component/button-view';
+@use 'object/component/collapse-view';
+@use 'object/component/variant-icon';
+@use 'object/component/dropdown-view';
+@use 'object/component/floating-info';
+@use 'object/component/form-parts';
+@use 'object/component/logical-operator-switch';
+@use 'object/component/module-tabs-view';
+@use 'object/component/page-index';
+@use 'object/component/panel-view';
+@use 'object/component/question-answer';
+@use 'object/component/range-slider';
+@use 'object/component/right-headline';
 
 // 画面別スタイル — 各機能ページ固有のコンポーネントをまとめたもの
-@import 'features/activity-indicator';
-@import 'features/document';
-@import 'features/advanced-search';
-@import 'features/detail';
-@import 'features/detail-header';
-@import 'features/global-header';
-@import 'features/messages';
-@import 'features/results';
-@import 'features/search-field';
-@import 'features/sidebar';
-@import 'features/simple-search';
+@use 'features/activity-indicator';
+@use 'features/document';
+@use 'features/advanced-search';
+@use 'features/detail';
+@use 'features/detail-header';
+@use 'features/global-header';
+@use 'features/messages';
+@use 'features/results';
+@use 'features/search-field';
+@use 'features/sidebar';
+@use 'features/simple-search';
 
-@import 'object/utility/helper';
+@use 'object/utility/helper';

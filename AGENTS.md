@@ -173,8 +173,16 @@ app/frontend/
 
 ### Sass の書き方
 
-- 現在は `@import` でグローバル変数を共有している。新規ファイルでも同じ方式に合わせる。
-- Dart Sass では `@import` は非推奨（`@use` / `@forward` が推奨）。将来的な移行を視野に入れ、新しい変数・ミックスインを `@import` に依存した暗黙グローバルとして増やさない。
+- **`@import` は廃止済み。** 全ファイルで `@use` / `@forward` へ移行済み。新規ファイルでも `@import` は使わない。
+- 変数・ミックスインは `foundation/_index.scss` が `@forward` で一括公開している。各パーシャルは先頭で `@use '../foundation' as *`（または `../../foundation`）を宣言して使う。
+  - `features/` → `@use '../foundation' as *`
+  - `object/component/` → `@use '../../foundation' as *`
+  - `layout/` → `@use '../foundation' as *`
+  - `web-components/` → `@use '../foundation' as *`
+- CSS 出力を持つファイル（`foundation/base`・`reset`・`font-awesome`）は `main.scss` のみが `@use` する。パーシャル側は `@use` しない。
+- ミックスインは `foundation/_mixins.scss` に定義する（`sprite`・`input-number`・`panel-view-heading` など）。
+- `@extend` はモジュール境界をまたげない。代わりに `@mixin` を使う。
+- `sass:color` モジュールは `foundation/_variables.scss` 内部で使う。パーシャル側で `color.adjust()` を直接使う場合は、そのファイルで `@use 'sass:color'` を追加する。
 - `rgba(black, 0.2)` のような SCSS 固有の色指定は既存コードに残っているが、新規では `rgba(0, 0, 0, 0.2)` または CSS の `rgb(0 0 0 / 0.2)` 構文を使う。
 
 ## コメント規約

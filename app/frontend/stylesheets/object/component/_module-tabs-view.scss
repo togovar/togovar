@@ -1,3 +1,5 @@
+@use '../../foundation' as *;
+
 // タブとコンテンツ切り替えの共通ビュー
 // タブナビゲーション領域は $COLOR_KEY_DARK2 で統一し、ページのヘッダー層として視覚的に区別する。
 .module-tabs-view {

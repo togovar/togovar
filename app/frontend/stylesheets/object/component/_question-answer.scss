@@ -1,3 +1,5 @@
+@use '../../foundation' as *;
+
 .question-answer {
   padding-top: $HEIGHT_GLOBAL_MENU + 8px;
   margin-top: -$HEIGHT_GLOBAL_MENU - 8px;

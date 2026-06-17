@@ -1,4 +1,6 @@
 @use 'sass:color';
+@use '../foundation' as *;
+@use '../object/component/dropdown-view' as *;
 
 // =============================================================================
 // Results 機能 — 検索結果テーブル全体のスタイル

@@ -1,4 +1,4 @@
-@use '../foundation/_variables.scss' as *;
+@use '../foundation' as *;
 :host {
   display: flex;
   flex-wrap: wrap;

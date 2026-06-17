@@ -1,6 +1,6 @@
 $SIZE: 30px;
 
-@use '../foundation/_variables.scss' as *;
+@use '../foundation' as *;
 
 .fieldcontainer {
   box-sizing: border-box;

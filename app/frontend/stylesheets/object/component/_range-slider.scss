@@ -1,3 +1,5 @@
+@use '../../foundation' as *;
+
 $PADDING_METER: 8px;
 
 range-slider::part(wrapper) {

@@ -1,3 +1,5 @@
+@use '../../foundation' as *;
+
 .panel-view {
   position: relative;
   font-size: 12px;
@@ -156,12 +158,6 @@ body[data-search-mode='advanced'] {
   }
 }
 
-// %panel-view-heading: @extend で再利用するためのプレースホルダー
-%panel-view-heading {
-  font-size: 10px;
-  color: $COLOR_GRAY;
-}
-
 .panel-view-heading {
-  @extend %panel-view-heading;
+  @include panel-view-heading;
 }
