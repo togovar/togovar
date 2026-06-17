@@ -1,0 +1,32 @@
+.range-inputs-view {
+  display: flex;
+  place-items: center;
+
+  > .line {
+    display: inline-block;
+    width: 0.4em;
+    margin: 0 0.5em;
+    height: 1px;
+    position: relative;
+
+    &::before {
+      content: "";
+      display: block;
+      width: 100%;
+      border-top: solid 1px black;
+      position: relative;
+      top: 1px;
+    }
+  }
+
+  &[data-type="single_position"] {
+    > .line {
+      opacity: 0.2;
+    }
+
+    > input.end {
+      opacity: 0.2;
+      pointer-events: none;
+    }
+  }
+}

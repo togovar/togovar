@@ -1,0 +1,55 @@
+@use "sass:color";
+
+#Messages,
+.messages-view {
+  padding-right: 10px;
+
+  > .message {
+    padding: 4px 6px 4px 20px;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    position: relative;
+
+    &:before {
+      // stylelint-disable-next-line font-family-no-missing-generic-family-keyword
+      font-family: 'Font Awesome 7 Free';
+      font-weight: 900;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 6px;
+    }
+
+    &.-error {
+      border-color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: -2%);
+      background-color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: 30%);
+
+      &:before {
+        content: var(--icon-xmark);
+        color: color.adjust($COLOR_SIGN_DANGEROUS, $lightness: -2%);
+      }
+    }
+
+    &.-warning {
+      border-color: color.adjust($COLOR_SIGN_WARNING, $lightness: -2%);
+      background-color: color.adjust($COLOR_SIGN_WARNING, $lightness: 45%);
+
+      &:before {
+        content: var(--icon-triangle-exclamation);
+        color: color.adjust($COLOR_SIGN_WARNING, $lightness: -2%);
+      }
+    }
+
+    &.-notice {
+      border-color: color.adjust($COLOR_SIGN_NORMAL, $lightness: -2%);
+      background-color: color.adjust($COLOR_SIGN_NORMAL, $lightness: 42%);
+
+      &:before {
+        content: var(--icon-circle-info);
+        color: color.adjust($COLOR_SIGN_NORMAL, $lightness: -2%);
+      }
+    }
+  }
+}

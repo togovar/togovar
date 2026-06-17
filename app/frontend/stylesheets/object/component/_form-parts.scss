@@ -1,0 +1,59 @@
+$HEIGHT: 20px;
+
+.form-parts {
+  > * {
+    display: inline-block;
+  }
+
+  > .label {
+    margin-right: 0.5em;
+  }
+
+  > .togglebuttons {
+    display: inline-block;
+    height: $HEIGHT;
+    line-height: 1;
+    border-radius: $HEIGHT * 0.5;
+    background-color: $COLOR_LIGHT_GRAY;
+    padding: 1px;
+    margin-left: -2px;
+
+    > .button {
+      display: inline-block;
+      padding: 0 10px;
+      font-weight: bold;
+      color: $COLOR_GRAY;
+      cursor: pointer;
+      border: solid 1px transparent;
+      border-radius: 9px;
+      line-height: 16px;
+      transition: background-color $GUI_DURATION;
+
+      &:hover {
+        color: $COLOR_KEY_DARK3;
+      }
+
+      &.-current {
+        background-color: white;
+        color: $COLOR_KEY_DARK1;
+        border-color: $COLOR_KEY;
+        box-shadow: 0 1px 2px rgba(black, 0.2);
+      }
+    }
+  }
+
+  > .select {
+    height: $HEIGHT - 2px;
+    line-height: 1;
+    border: none;
+  }
+
+  > .input {
+    height: $HEIGHT - 2px;
+    line-height: 1;
+    border-radius: $HEIGHT * 0.5;
+    border: none;
+    padding: 0px 8px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3) inset;
+  }
+}

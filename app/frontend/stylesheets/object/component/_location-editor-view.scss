@@ -1,0 +1,15 @@
+.location-editor-view {
+  > .body {
+    > .row {
+      line-height: var(--height-inline);
+      column-gap: 5px;
+
+      > label.chromosome {
+        > .label {
+          margin-right: 3px;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}

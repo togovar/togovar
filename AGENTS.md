@@ -12,7 +12,7 @@
 ## 作業ルール
 
 - `AGENTS.md` だけを根拠にせず、変更前に必ず該当ファイルと周辺の呼び出し元を読む。
-- 既存の設計、命名、TypeScript/JavaScript混在方針、Sass/SCSS構成、Store/API層の使い方に合わせる。
+- 既存の設計、命名、TypeScript/JavaScript混在方針、SCSS構成、Store/API層の使い方に合わせる。
 - ユーザーの未コミット変更を勝手に戻さない。
 - 生成物や依存関係の大きな更新は、明確に必要な場合だけ行う。
 - 依存を移動・追加・削除する場合は、実行時依存かビルド時依存かを確認し、`package.json` と `package-lock.json` を揃える。
@@ -23,7 +23,7 @@
 | ---------------- | ---------------------------------------------- |
 | フロントエンド   | TypeScript / JavaScript / Lit / Web Components |
 | ビルド           | Webpack 5 / ts-loader                          |
-| スタイル         | Sass / SCSS / CSS                              |
+| スタイル         | SCSS / CSS                                     |
 | テンプレート     | Pug                                            |
 | サーバー         | nginx などの静的ファイルサーバー               |
 | バックエンド連携 | TogoVar API                                    |
@@ -56,7 +56,7 @@ app/frontend/
     store/       StoreManagerと検索条件管理
     types/       グローバル型定義
     utils/       汎用ヘルパー
-  stylesheets/   Sass/SCSS
+  stylesheets/   SCSS
   views/         Pugテンプレート
 ```
 
@@ -65,7 +65,7 @@ app/frontend/
 - StoreやURL反映など、アプリ状態に関わる処理は `app/frontend/src/store/` に置く。
 - DOM生成の小さな共通処理は `app/frontend/src/utils/dom/` の既存ヘルパーを優先する。
 - 参照ゲノム別の検索条件マスタは `app/frontend/assets/GRCh37` / `app/frontend/assets/GRCh38` を確認する。
-- PugテンプレートやSass/SCSSの構成を変える場合は、関連する `app/frontend/views/` と `app/frontend/stylesheets/` の両方を確認する。
+- PugテンプレートやSCSSの構成を変える場合は、関連する `app/frontend/views/` と `app/frontend/stylesheets/` の両方を確認する。
 
 ## デプロイ / 配信方針
 
@@ -144,7 +144,7 @@ app/frontend/
 
 ## スタイル方針
 
-- Sass/SCSSは `app/frontend/stylesheets/` の既存レイヤー構成に合わせる。
+- SCSSは `app/frontend/stylesheets/` の既存レイヤー構成に合わせる。
 - コンポーネント固有のSCSSは、既存のWeb Component内 import と同じ形に合わせる。
 - 既存CSSに異なる書き方があっても、関連する変更範囲だけ段階的に整える。
 - UI状態は、可能なら既存の `data-*` 属性や状態クラスを利用する。

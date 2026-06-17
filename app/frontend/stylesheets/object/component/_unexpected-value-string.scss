@@ -1,0 +1,11 @@
+.unexpected-value-string {
+  &.-null {
+    color: rgba($COLOR_BLACK, 0.5);
+    font-style: oblique;
+  }
+
+  &.-undefined {
+    color: rgba($COLOR_BLACK, 0.5);
+    font-style: oblique;
+  }
+}

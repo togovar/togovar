@@ -24,7 +24,7 @@ AIエージェント向けの作業指示・設計ルールは [AGENTS.md](./AGE
 | -------------- | ---------------------------------------------- |
 | フロントエンド | TypeScript / JavaScript / Lit / Web Components |
 | ビルド         | Webpack 5 / ts-loader                          |
-| スタイル       | Sass / SCSS / CSS                              |
+| スタイル       | SCSS / CSS                                     |
 | テンプレート   | Pug                                            |
 | サーバー       | nginx（静的ファイル配信）                      |
 | API連携        | TogoVar API                                    |
@@ -46,7 +46,7 @@ app/frontend/
     store/       StoreManager、検索条件、URL反映
     types/       グローバル型定義
     utils/       汎用ヘルパー
-  stylesheets/   Sass / SCSS
+  stylesheets/   SCSS
   views/         Pugテンプレート
 dist/             ビルド出力
 ```
@@ -162,7 +162,7 @@ npm run typecheck
 
 補足:
 
-- `npm run lint` は JavaScript/TypeScript と Sass/CSS の lint をまとめて実行します。
+- `npm run lint` は JavaScript/TypeScript と SCSS/CSS の lint をまとめて実行します。
 - `npm run typecheck` は TypeScript の型チェックのみを実行します（ビルドは行いません）。
 - 環境によって `node` / `npm` が PATH に無い場合があります。その場合は Node.js 22.x を有効化してください。
 
