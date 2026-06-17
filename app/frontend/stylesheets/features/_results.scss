@@ -1,9 +1,379 @@
 @use 'sass:color';
 
 // =============================================================================
-// 検索結果テーブル (.results-view)
+// Results 機能 — 検索結果テーブル全体のスタイル
+// 統合元:
+//   object/project/_ResultsView.scss          … ビュールートと外枠レイアウト
+//   object/project/_ResultsColumnsDropdown.scss … 列表示切替ドロップダウン
+//   object/component/_results-view.scss        … テーブル本体 (.results-view)
+//   object/component/_scroll-bar.scss          … 仮想スクロールバー
+//   object/component/_row-indicator.scss       … 選択行インジケーター
+// =============================================================================
+
+
+// =============================================================================
+// 列ドロップダウン共通ミックスイン
+// .columns-dropdown-item と .columns-dropdown-item.-drag-ghost の両方で使用する
+// =============================================================================
+
+@mixin columns-dropdown-item-base {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  margin: 0;
+  background: white;
+}
+
+@mixin columns-dropdown-drag-handle {
+  flex: 0 0 auto;
+  width: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::before {
+    content: var(--icon-grip-vertical);
+    font-family: 'Font Awesome 7 Free', sans-serif;
+    font-weight: 900;
+    color: var(--color-gray);
+    font-size: 8px;
+  }
+}
+
+@mixin columns-dropdown-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  color: var(--color-black);
+  padding: 4px 0;
+
+  > input {
+    margin: 0;
+  }
+}
+
+// ドラッグゴーストは body 直下に追加されるため、#ResultsView の外で定義する。
+.columns-dropdown-item.-drag-ghost {
+  @include columns-dropdown-item-base;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  border-radius: 4px;
+
+  > .drag-handle {
+    @include columns-dropdown-drag-handle;
+  }
+
+  > label {
+    @include columns-dropdown-label;
+    pointer-events: none;
+  }
+}
+
+
+// =============================================================================
+// ビュールートと外枠レイアウト (#ResultsView)
+// =============================================================================
+
+#ResultsView {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 10px $PADDING_SIDE 0;
+  position: relative;
+
+  // テーブル検索結果が見つからない場合のメッセージ
+  &.-not-found::after {
+    content: 'Not found';
+    text-align: center;
+    display: block;
+    font-size: 14px;
+    line-height: 64px;
+    color: $COLOR_GRAY;
+  }
+
+  // ========================
+  // ヘッダー領域
+  // ========================
+  > .header {
+    white-space: nowrap;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    // ヘッダー左側：見出し・結果件数
+    > .left {
+      > .heading {
+        display: inline-block;
+        font-size: 16px;
+        margin-right: 8px;
+        margin-bottom: -2px;
+      }
+
+      > .status {
+        display: inline-block;
+        font-size: 12px;
+        min-width: 12em;
+
+        > .highlight {
+          font-size: 16px;
+        }
+      }
+    }
+
+    // ヘッダー右側：操作ボタン・ドロップダウン
+    /* stylelint-disable no-descending-specificity */
+    > .right {
+      position: relative;
+      top: 4px;
+      min-height: 16px;
+      list-style: none;
+      display: flex;
+      gap: 5px;
+      align-items: flex-start;
+      padding: 0 0 18px;
+      margin: 0;
+      z-index: var(--z-index-base);
+
+      > .text {
+        font-size: 12px;
+        font-weight: bold;
+        padding-right: 3px;
+      }
+
+      // ダウンロードボタングループ（複数ボタンを角丸でグループ化）
+      > .download-buttons {
+        display: flex;
+        gap: 0;
+
+        > .button-view {
+          border-radius: 0;
+
+          // ボタン間の線と下のシャドウ
+          box-shadow:
+            inset -1px 0 0 rgba(255, 255, 255, 0.22),
+            0 1px 2px rgba(0, 0, 0, 0.22);
+
+          &:first-child {
+            border-top-left-radius: 0.9em;
+            border-bottom-left-radius: 0.9em;
+          }
+
+          &:last-child {
+            border-top-right-radius: 0.9em;
+            border-bottom-right-radius: 0.9em;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+          }
+        }
+      }
+
+      > .download-disabled-reason-item {
+        position: absolute;
+        top: calc(100% - 16px);
+        right: 0;
+        max-width: min(100%, 320px);
+        margin: 0;
+        font-size: 11px;
+        line-height: 1.25;
+        text-align: right;
+
+        > .download-disabled-reason {
+          font-weight: 300;
+          opacity: 0.9;
+          color: $COLOR_BLACK;
+        }
+      }
+
+      > li {
+        > .button-view {
+          &:active {
+            background: var(--color-key-dark1);
+            transform: translateY(0.5px);
+          }
+
+          body[data-download-available] & {
+            opacity: 1;
+            pointer-events: auto;
+          }
+        }
+      }
+
+      // ========================
+      // 列表示切替ドロップダウン (.columns-dropdown)
+      // ========================
+      > .columns-dropdown {
+        position: relative;
+
+        > .columns-dropdown-button {
+          line-height: 1.6;
+          min-width: 60px;
+
+          &::after {
+            border-left-width: 0.2rem;
+            border-right-width: 0.2rem;
+            border-top-width: 0.26rem;
+          }
+
+          &:hover {
+            transform: none;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+          }
+
+          &:active {
+            background: linear-gradient(
+              to bottom,
+              var(--color-key-dark1),
+              var(--color-key-dark3)
+            );
+          }
+        }
+
+        > .columns-dropdown-menu {
+          @include dropdown-view-list-panel;
+
+          position: absolute;
+          right: 0;
+          min-width: 170px;
+
+          > .columns-dropdown-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            user-select: none;
+            -webkit-user-select: none;
+
+            > .columns-dropdown-item {
+              @include columns-dropdown-item-base;
+              cursor: grab;
+              transition: background-color 0.12s ease;
+
+              &:hover {
+                background: var(--color-selected-hover);
+              }
+
+              &.-dragging-hidden {
+                visibility: hidden;
+                pointer-events: none;
+              }
+
+              > .drag-handle {
+                @include columns-dropdown-drag-handle;
+                cursor: grab;
+              }
+
+              > .lock {
+                margin-left: auto;
+              }
+
+              > label {
+                @include columns-dropdown-label;
+                cursor: pointer;
+
+                > input {
+                  cursor: pointer;
+                }
+              }
+
+              &.-locked {
+                background: #f3f3f3;
+                cursor: default;
+                opacity: 0.75;
+
+                &:hover {
+                  background: #f3f3f3;
+                }
+
+                > .drag-handle {
+                  visibility: hidden;
+                }
+
+                > label {
+                  color: var(--color-gray);
+                  cursor: default;
+
+                  > input {
+                    cursor: default;
+                  }
+                }
+
+                > .lock {
+                  &::before {
+                    content: var(--icon-lock);
+                    font-family: 'Font Awesome 7 Free', sans-serif;
+                    font-weight: 900;
+                    color: var(--color-gray);
+                    font-size: 10px;
+                  }
+                }
+              }
+            }
+
+            &.-is-dragging {
+              > .columns-dropdown-item {
+                position: relative;
+                cursor: grabbing;
+                transition: none;
+                box-shadow:
+                  0 -1px 0 white,
+                  0 1px 0 white;
+
+                &:not(.-locked):hover {
+                  background: white;
+                }
+
+                &.-locked:hover {
+                  background: #f3f3f3;
+                }
+
+                > .drag-handle {
+                  cursor: grabbing;
+                }
+              }
+            }
+          }
+        }
+
+        &.-open {
+          > .columns-dropdown-menu {
+            @include dropdown-view-list-open;
+          }
+        }
+      }
+    }
+    /* stylelint-enable no-descending-specificity */
+  }
+
+  > .tablecontainer {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin-top: -15px;
+    margin-right: -$PADDING_SIDE;
+    padding-bottom: 0;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y;
+
+    > .results-view {
+      > thead {
+        > tr {
+          height: 64px;
+        }
+      }
+    }
+  }
+}
+
+
+// =============================================================================
+// 検索結果テーブル本体 (.results-view)
 // 仮想スクロール方式のバリアント一覧テーブル全体のスタイル定義
 // =============================================================================
+
 .results-view {
   white-space: nowrap;
   font-size: 14px;
@@ -517,11 +887,145 @@
   }
 }
 
-// =============================================================================
 // 列幅リサイズ中のグローバルスタイル
 // ドラッグ中はページ全体のカーソルをリサイズ形状に固定し、テキスト選択を無効化
-// =============================================================================
 body[data-column-resizing='true'] {
   cursor: col-resize;
   user-select: none;
+}
+
+
+// =============================================================================
+// 仮想スクロールバー (.scroll-bar)
+// =============================================================================
+
+.scroll-bar {
+  position: absolute;
+  top: 77px;
+  right: 0;
+  width: 16px;
+  height: calc(100% - 96px);
+  z-index: 10;
+
+  > .bar {
+    position: absolute;
+    width: 8px;
+    left: 5px;
+    height: 100px;
+    border-radius: 4px;
+    cursor: grab;
+    background-color: rgba($COLOR_GRAY, 0.5);
+    opacity: 1;
+    transition: background-color $GUI_DURATION;
+
+    > .indicator {
+      position: absolute;
+      background-color: $COLOR_KEY_DARK1;
+      color: white;
+      font-size: 12px;
+      line-height: 18px;
+      border-radius: 9px;
+      padding: 0 10px;
+      white-space: nowrap;
+      top: calc(50% - 9px);
+      right: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity $TRANSITION_DURATION;
+
+      &:after {
+        content: "";
+        display: block;
+        position: absolute;
+        border-left: solid 9px $COLOR_KEY_DARK1;
+        border-top: solid 4px transparent;
+        border-bottom: solid 4px transparent;
+        top: 5px;
+        right: -7px;
+      }
+
+      > .position {
+        font-weight: bold;
+      }
+
+      > .total {
+        opacity: 0.75;
+
+        &:before {
+          content: "/ ";
+        }
+      }
+    }
+
+    &.-disabled {
+      display: none;
+    }
+
+    &.ui-draggable-dragging {
+      cursor: grabbing;
+      background-color: rgba($COLOR_KEY_DARK1, 0.5);
+    }
+  }
+
+  &:hover {
+    > .bar {
+      background-color: rgba($COLOR_KEY_DARK1, 0.5);
+
+      > .indicator {
+        opacity: 1;
+      }
+    }
+  }
+
+  &.-dragging {
+    > .bar {
+      > .indicator {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+
+// =============================================================================
+// 選択行インジケーター (.row-indicator)
+// =============================================================================
+
+.row-indicator {
+  width: 14px;
+  height: 27px;
+  position: absolute;
+  right: -14px;
+  transform: translateY(77px);
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity $GUI_DURATION, top $GUI_DURATION;
+  z-index: $Z_INDEX_ROW_INDICATOR;
+
+  &:before,
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+  }
+
+  &:before {
+    border-left: solid 9px black;
+    border-top: solid 8px transparent;
+    border-bottom: solid 8px transparent;
+    top: 6px;
+    filter: blur(1px);
+    opacity: 0.4;
+  }
+
+  &:after {
+    border-left: solid 9px color.adjust($COLOR_SELECTED, $lightness: 30%);
+    border-top: solid 8px transparent;
+    border-bottom: solid 8px transparent;
+    top: 5px;
+  }
+
+  &.-shown {
+    opacity: 1;
+  }
 }
