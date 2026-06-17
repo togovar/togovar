@@ -1029,3 +1029,438 @@ body[data-column-resizing='true'] {
     opacity: 1;
   }
 }
+
+
+// =============================================================================
+// バリアント表示パーツ
+// 検索結果テーブルおよびバリアント詳細ページで共通使用する表示要素
+// 統合元:
+//   object/component/_clinical-significance.scss  … 臨床的意義バッジ
+//   object/component/_consequence-item.scss        … 影響種別ドット
+//   object/component/_dataset-icon.scss            … データセットアイコン
+//   object/component/_hyper-text.scss              … テキストリンク矢印
+//   object/component/_ref-alt.scss                 … Ref/Alt アレル表示
+//   object/component/_remains-count.scss           … +N バッジ
+//   object/component/_unexpected-value-string.scss … null/undefined 表示
+//   object/component/_variant-function.scss        … 機能予測スコアバッジ
+//   object/component/_variant-type.scss            … バリアント種別テキスト
+// =============================================================================
+
+
+// 臨床的意義バッジ (.clinical-significance)
+// data-value 属性で P/LP/LB/B などの解釈種別を受け取り、色付きバッジを ::before で描画する
+.clinical-significance {
+  color: $COLOR_KEY_DARK3;
+
+  &:before {
+    width: 18px;
+    line-height: 18px;
+    height: 18px;
+    display: inline-block;
+    margin-right: 3px;
+    border-radius: 9px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+    text-align: center;
+    font-size: 10px;
+    font-weight: bold;
+    vertical-align: top;
+  }
+
+  &[data-value="P"]:before, &[data-value="PLP"]:before {
+    content: "P";
+  }
+
+  &[data-value="LP"]:before, &[data-value="LPLP"]:before {
+    content: "LP";
+  }
+
+  &[data-value="P"]:before, &[data-value="LP"]:before {
+    color: $COLOR_SIGN_DANGEROUS;
+    border-color: $COLOR_SIGN_DANGEROUS;
+    background-color: $COLOR_SIGN_DANGEROUS_LIGHT;
+  }
+
+  &[data-value="PLP"]:before, &[data-value="LPLP"]:before {
+    color: $COLOR_SIGN_LOWDANGEROUS;
+    border-color: $COLOR_SIGN_LOWDANGEROUS;
+    background-color: $COLOR_SIGN_LOWDANGEROUS_LIGHT;
+  }
+
+  &[data-value="ERA"]:before, &[data-value="LRA"]:before, &[data-value="URA"]:before {
+    content: "RA";
+    color: $COLOR_SIGN_WARNING;
+    border-color: $COLOR_SIGN_WARNING;
+    background-color: $COLOR_SIGN_WARNING_LIGHT;
+  }
+
+  &[data-value="US"]:before {
+    content: "US";
+    color: $COLOR_SIGN_UNKNOWN;
+    border-color: $COLOR_SIGN_UNKNOWN;
+    background-color: $COLOR_SIGN_UNKNOWN_LIGHT;
+  }
+
+  &[data-value="LB"]:before {
+    content: "LB";
+    color: $COLOR_SIGN_NORMAL;
+    border-color: $COLOR_SIGN_NORMAL;
+    background-color: $COLOR_SIGN_NORMAL_LIGHT;
+  }
+
+  &[data-value="B"]:before {
+    content: "B";
+    color: $COLOR_SIGN_SAFE;
+    border-color: $COLOR_SIGN_SAFE;
+    background-color: $COLOR_SIGN_SAFE_LIGHT;
+  }
+
+  &[data-value="CI"]:before {
+    content: "CI";
+    color: $COLOR_SIGN_MODIFIER;
+    border-color: $COLOR_SIGN_MODIFIER;
+    background-color: $COLOR_SIGN_MODIFIER_LIGHT;
+  }
+
+  &[data-value="DR"]:before { content: "DR"; }
+  &[data-value="CS"]:before { content: "CS"; }
+  &[data-value="RF"]:before { content: "RF"; }
+  &[data-value="A"]:before  { content: "A"; }
+  &[data-value="PR"]:before { content: "PR"; }
+  &[data-value="AF"]:before { content: "AF"; }
+
+  &[data-value="DR"], &[data-value="CS"], &[data-value="RF"],
+  &[data-value="A"], &[data-value="PR"], &[data-value="AF"] {
+    &:before {
+      color: $COLOR_SIGN_OTHER;
+      border-color: $COLOR_SIGN_OTHER;
+      background-color: $COLOR_SIGN_OTHER_LIGHT;
+    }
+  }
+
+  &[data-value="O"]:before  { content: "O"; }
+  &[data-value="NP"]:before { content: "NP"; }
+  &[data-value="AN"]:before { content: "AN"; }
+
+  &[data-value="O"]:before, &[data-value="NP"]:before, &[data-value="AN"]:before {
+    color: $COLOR_GRAY;
+    border-color: $COLOR_GRAY;
+    background-color: white;
+  }
+}
+
+
+// 影響種別ドット (.consequence-item)
+// バリアントの影響レベル（high/moderate/low/modifier）を色付き円で示す
+.consequence-item {
+  &:before {
+    content: "";
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 100%;
+    margin-right: 4px;
+  }
+
+  &.-low:before      { background-color: $COLOR_SIGN_SAFE; }
+  &.-moderate:before { background-color: $COLOR_SIGN_NORMAL; }
+  &.-high:before     { background-color: $COLOR_SIGN_DANGEROUS; }
+  &.-modifier:before { background-color: $COLOR_SIGN_MODIFIER; }
+}
+
+
+// データセットアイコン (.dataset-icon)
+// Font Awesome のデータベースアイコンにデータセット種別の色とラベルを組み合わせる
+.dataset-icon {
+  height: 18px;
+  font-family: "Font Awesome 7 Free", sans-serif;
+  font-weight: 900;
+  position: relative;
+
+  &:before {
+    content: var(--icon-database);
+    margin-right: 2px;
+    position: relative;
+    left: 2px;
+    display: inline-block;
+    height: 18px;
+  }
+
+  > .properties {
+    font-size: 10px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    font-family: "Roboto Condensed", "Arial Narrow", Arial, sans-serif;
+    font-weight: normal;
+    line-height: 9px;
+    position: relative;
+    left: -2px;
+    top: -1px;
+    vertical-align: middle;
+    height: 20px;
+    transform: scale(0.9);
+
+    &::before, &::after {
+      display: block;
+      height: 10px;
+    }
+  }
+
+  // データセット別アイコン色
+  &[data-dataset="jga_wgs"], &[data-dataset="jga_wes"], &[data-dataset="jga_snp"] {
+    &:before { color: $COLOR_DATASET_JGA; }
+  }
+
+  &[data-dataset="tommo"] {
+    &:before { color: $COLOR_DATASET_TOMMO; }
+  }
+
+  &[data-dataset="hgvd"], &[data-dataset="mgend"] {
+    &:before { color: $COLOR_DATASET_HGVD; }
+  }
+
+  &[data-dataset="ncbn"] {
+    &:before { color: $COLOR_DATASET_NCBN; }
+  }
+
+  &[data-dataset="gem_j_wga"] {
+    &:before { color: $COLOR_DATASET_GEM_J; }
+  }
+
+  &[data-dataset="bbj"] {
+    &:before { color: $COLOR_DATASET_BBJ; }
+  }
+
+  &[data-dataset="gnomad_genomes"], &[data-dataset="gnomad_exomes"] {
+    &:before { color: $COLOR_DATASET_FOREIGN; }
+  }
+
+  // 疾患系データセット（mgend/clinvar）はプラスアイコンに置き換え
+  &[data-dataset="mgend"], &[data-dataset="clinvar"] {
+    &::before {
+      content: var(--icon-plus);
+      font-family: "Font Awesome 7 Free", sans-serif;
+      font-weight: 900;
+      color: $COLOR_DATASET_DISEASE;
+      font-size: 14px;
+    }
+
+    > .properties {
+      &::before {
+        color: $COLOR_DATASET_DISEASE;
+        content: "Disease";
+      }
+    }
+  }
+
+  // シーケンス種別ラベル
+  &[data-dataset="jga_wgs"], &[data-dataset="tommo"], &[data-dataset="ncbn"],
+  &[data-dataset="gem_j_wga"], &[data-dataset="gnomad_genomes"] {
+    > .properties { &::after { content: "WGS"; } }
+  }
+
+  &[data-dataset="jga_wes"], &[data-dataset="hgvd"], &[data-dataset="gnomad_exomes"] {
+    > .properties { &::after { content: "WES"; } }
+  }
+
+  &[data-dataset="jga_snp"], &[data-dataset="bbj"] {
+    > .properties { &::after { content: "SNP"; } }
+  }
+}
+
+
+// テキストリンク矢印 (.hyper-text)
+// href 属性がある要素に::after で矢印アイコンを付与する
+// .-internal: 内部リンク（右矢印）、.-external: 外部リンク（外部リンクアイコン）
+.hyper-text {
+  &[href]:not([href=""]) {
+    &:after {
+      font-family: 'Font Awesome 7 Free', sans-serif;
+      font-weight: 900;
+      display: inline-block;
+      margin-left: 0.25em;
+      color: color.adjust($COLOR_GRAY, $lightness: 10%);
+    }
+  }
+
+  &[href]:not([href=""]):hover:after {
+    color: $COLOR_KEY;
+  }
+
+  &.-internal {
+    &[href]:not([href=""]) {
+      &:after {
+        content: var(--icon-circle-arrow-right);
+        font-size: 0.8em;
+      }
+    }
+  }
+
+  &.-external {
+    &[href]:not([href=""]) {
+      &:after {
+        content: var(--icon-arrow-up-right-from-square);
+        font-size: 0.7em;
+      }
+    }
+  }
+}
+
+
+// Ref/Alt アレル表示 (.ref-alt)
+// REF を左・ALT を右に並べ、塩基数が多い場合は bp バッジで要約する
+$COLOR_REF_BG: color.adjust($COLOR_REF, $lightness: 48%, $saturation: -10%);
+$COLOR_ALT_BG: color.adjust($COLOR_ALT, $lightness: 24%, $saturation: -10%);
+$COLOR_REF_TEXT: $COLOR_KEY_DARK2;
+$COLOR_ALT_TEXT: #c52543;
+
+.ref-alt {
+  font-weight: bold;
+  display: flex;
+
+  > .ref,
+  > .alt {
+    display: inline-block;
+    line-height: 18px;
+    height: 18px;
+    padding: 0 6px;
+    vertical-align: middle;
+
+    // 塩基数が多い場合は data-sum 属性の値を bp バッジとして ::after で表示する
+    &[data-sum] {
+      &:after {
+        color: white;
+        font-size: 10px;
+        display: inline-block;
+        line-height: 12px;
+        padding: 0 4px;
+        border-radius: 6px;
+        vertical-align: middle;
+        font-weight: lighter;
+        margin: 0 -3px 4px 3px;
+        position: relative;
+        content: attr(data-sum) "bp";
+      }
+    }
+
+    // 短い塩基（4bp 以下）はそのまま文字で表示するためバッジを非表示にする
+    &[data-sum="0"], &[data-sum="1"], &[data-sum="2"],
+    &[data-sum="3"], &[data-sum="4"] {
+      &:after { display: none; }
+    }
+  }
+
+  > .ref {
+    border-left: solid 1px $COLOR_REF;
+    border-top: solid 1px $COLOR_REF;
+    border-bottom: solid 1px $COLOR_REF;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    color: $COLOR_REF_TEXT;
+    background-color: $COLOR_REF_BG;
+    position: relative;
+    padding-right: 4px;
+
+    &[data-sum]:after { background-color: $COLOR_REF; }
+  }
+
+  > .alt {
+    border-right: solid 1px $COLOR_ALT;
+    border-top: solid 1px $COLOR_ALT;
+    border-bottom: solid 1px $COLOR_ALT;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    color: $COLOR_ALT_TEXT;
+    background-color: $COLOR_ALT_BG;
+    padding-left: 9px;
+
+    &[data-sum]:after { background-color: $COLOR_ALT; }
+  }
+
+  // REF と ALT の境界を示す矢印（border trick で描画）
+  > .arrow {
+    position: relative;
+
+    &:before, &:after {
+      content: "";
+      display: inline-block;
+      position: absolute;
+    }
+
+    &:before {
+      border-top: 9px solid transparent;
+      border-bottom: 9px solid transparent;
+      border-left: 6px solid $COLOR_REF;
+      top: 0;
+      right: -6px;
+    }
+
+    &:after {
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 6px solid $COLOR_REF_BG;
+      top: 1px;
+      right: -5px;
+    }
+  }
+}
+
+
+// +N バッジ (.remains-count)
+// 「他にN件」を示す小さな丸バッジ。前に "+" を付けて件数を表示する
+.remains-count {
+  display: inline-block;
+  font-size: 10px;
+  line-height: 14px;
+  border: solid 1px $COLOR_GRAY;
+  border-radius: 7px;
+  background-color: color.adjust($COLOR_GRAY, $lightness: 35%);
+  padding: 0 4px;
+  margin-left: 4px;
+  vertical-align: middle;
+
+  &:before {
+    content: "+";
+  }
+}
+
+
+// null/undefined 表示 (.unexpected-value-string)
+// データが欠落していることをユーザーに伝えるためのスタイル
+.unexpected-value-string {
+  &.-null, &.-undefined {
+    color: rgba($COLOR_BLACK, 0.5);
+    font-style: oblique;
+  }
+}
+
+
+// 機能予測スコアバッジ (.variant-function)
+// AlphaMissense・SIFT・PolyPhen の予測結果を色分けしたカプセル型で表示する
+.variant-function {
+  color: white;
+  border-radius: 9px;
+  padding: 0 8px;
+  display: inline-block;
+
+  &[data-function="T"], &[data-function="B"]     { background-color: $COLOR_SIGN_SAFE; }
+  &[data-function="LB"]                          { background-color: $COLOR_SIGN_NORMAL; }
+  &[data-function="POSSD"], &[data-function="LP"] { background-color: $COLOR_SIGN_WARNING; }
+  &[data-function="D"], &[data-function="PROBD"]  { background-color: $COLOR_SIGN_DANGEROUS; }
+
+  &[data-function="U"] {
+    color: $COLOR_BLACK;
+    background-color: $COLOR_LIGHT_GRAY;
+  }
+
+  &[data-function="A"] { background-color: $COLOR_SIGN_UNKNOWN; }
+}
+
+
+// バリアント種別テキスト (.variant-type)
+// 種別（SNV/Indel など）を太字で強調表示する
+.variant-type {
+  font-weight: bold;
+}

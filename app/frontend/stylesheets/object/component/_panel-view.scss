@@ -153,7 +153,12 @@ body[data-search-mode="advanced"] {
   }
 }
 
-.panel-view-heading {
+// %panel-view-heading: @extend で再利用するためのプレースホルダー
+%panel-view-heading {
   font-size: 10px;
   color: $COLOR_GRAY;
+}
+
+.panel-view-heading {
+  @extend %panel-view-heading;
 }

@@ -1,0 +1,503 @@
+// =============================================================================
+// バリアント・遺伝子・疾患 詳細ページ
+// 統合元:
+//   object/component/_chromosome-position.scss … 染色体位置テキスト表示
+//   object/component/_chromosome-view.scss      … 染色体グラフィック
+//   object/component/_stanza-view.scss          … Stanza（外部コンポーネント）ラッパー
+//   object/component/_stanza-title-wrapper.scss … Stanza ヘッダー
+//   object/component/_frequency-detail.scss     … 頻度詳細テーブル
+//   object/component/_columns-editor-view.scss  … 列選択エディター
+// =============================================================================
+
+
+// 染色体位置テキスト表示 (.chromosome-position)
+// 「chr: 座標」形式で染色体番号と座標を並べて表示する
+.chromosome-position {
+  > .chromosome, > .coordinate {
+    display: inline;
+  }
+
+  > .chromosome {
+    font-weight: bold;
+
+    &:after {
+      content: ": ";
+    }
+  }
+}
+
+
+// 染色体グラフィック (.chromosome-view)
+// カリオタイプ図の各部位サイズは CSS と JS で共有するため固定値で管理する
+$CHROM_SIZE_NUMBER: 18px;
+$CHROM_HEIGHT_UPPER: 18px;
+$CHROM_WIDTH_VIEW: 36px;
+$CHROM_WIDTH_CHROMOSOME: 12px;
+// インジケーター2種は幅が異なり、それぞれ中央揃えで計算するために分けている
+$CHROM_WIDTH_INDICATOR1: 36px;
+$CHROM_WIDTH_INDICATOR2: 28px;
+// バンドラベル表示時に横幅を拡張する量
+$CHROM_WIDTH_BAND_LABEL: 32px;
+
+.chromosome-view {
+  height: 100%;
+  width: $CHROM_WIDTH_VIEW;
+  position: relative;
+  text-align: left;
+  // 幅はバンドラベル表示の切り替えでアニメーション変化する
+  transition: width $GUI_DURATION;
+
+  > .upper {
+    height: $CHROM_HEIGHT_UPPER;
+
+    > .no {
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+      width: $CHROM_SIZE_NUMBER;
+      height: $CHROM_SIZE_NUMBER;
+      line-height: $CHROM_SIZE_NUMBER;
+      // 正円にするために高さの半分を指定
+      border-radius: $CHROM_SIZE_NUMBER * 0.5;
+      display: inline-block;
+      background-color: rgba(black, 0.25);
+      position: relative;
+      // ビュー幅に対して常に中央に来るよう計算する
+      left: ($CHROM_WIDTH_VIEW - $CHROM_SIZE_NUMBER) * 0.5;
+      transition: left $GUI_DURATION;
+      cursor: pointer;
+    }
+  }
+
+  > .lower {
+    position: relative;
+
+    // フィルター・表示範囲・選択範囲の3種インジケーターは初期非表示
+    // .-shown クラスが付与されたときだけ opacity でフェードインする
+    > .filteredregion,
+    > .displayregion,
+    > .selectedregion {
+      position: absolute;
+      width: $CHROM_WIDTH_INDICATOR1;
+      left: ($CHROM_WIDTH_VIEW - $CHROM_WIDTH_INDICATOR1) * 0.5;
+      opacity: 0;
+      transition:
+        opacity $GUI_DURATION,
+        height $GUI_DURATION,
+        top $GUI_DURATION,
+        left $GUI_DURATION;
+
+      &.-shown {
+        opacity: 1;
+      }
+    }
+
+    > .filteredregion {
+      background-color: rgba($COLOR_SELECTED, 0.4);
+    }
+
+    > .displayregion {
+      border: solid 1px $COLOR_SELECTED;
+      border-radius: 2px;
+      // 表示範囲はフィルター範囲より細く、別の中央揃え計算が必要
+      width: $CHROM_WIDTH_INDICATOR2;
+      left: ($CHROM_WIDTH_VIEW - $CHROM_WIDTH_INDICATOR2) * 0.5;
+    }
+
+    > .chromosome {
+      width: $CHROM_WIDTH_CHROMOSOME;
+      display: block;
+      position: relative;
+      left: ($CHROM_WIDTH_VIEW - $CHROM_WIDTH_CHROMOSOME) * 0.5;
+      // SVG 要素に影を付けるため CSS filter を使用（box-shadow は SVG に効かない）
+      filter: drop-shadow(0 4px 4px rgba(black, 0.5));
+      transition:
+        width $GUI_DURATION,
+        left $GUI_DURATION;
+
+      > .subband {
+        cursor: pointer;
+
+        // 染色体選択モード中は選択対象外のバンドを薄く表示し、選択可能なものを強調する
+        [data-is-selecting-chromosome='true'] & {
+          opacity: 0.3;
+        }
+
+        &.-selected {
+          opacity: 1;
+        }
+
+        > .subbandrect {
+          /* stylelint-disable color-no-invalid-hex */
+          // url(#id) は同一SVG内のグラデーション要素への参照であり、hex色ではない
+          // Stylelint v17 が url() 内の # をhex色と誤判定するため、このブロックのみ無効化する
+          fill: url(#chromosome-gneg);
+          transition: fill $GUI_DURATION;
+
+          &.acen    { fill: url(#chromosome-acen); }
+          &.gpos25  { fill: url(#chromosome-gpos25); }
+          &.gpos50  { fill: url(#chromosome-gpos50); }
+          &.gpos75  { fill: url(#chromosome-gpos75); }
+          &.gpos100 { fill: url(#chromosome-gpos100); }
+          &.gvar    { fill: url(#chromosome-gpos100); }
+          &.stalk   { fill: url(#chromosome-stalk); }
+          /* stylelint-enable color-no-invalid-hex */
+        }
+
+        &:hover,
+        &.-hover {
+          opacity: 1;
+
+          > .subbandrect {
+            fill: $COLOR_SELECTED;
+          }
+        }
+      }
+
+      > .band {
+        cursor: pointer;
+
+        [data-is-selecting-chromosome='true'] & {
+          opacity: 0.3;
+        }
+
+        &:hover, &.-selected {
+          opacity: 1;
+        }
+
+        > .bandtext {
+          font-size: 12px;
+          line-height: 12px;
+          fill: white;
+        }
+
+        > .line {
+          stroke: white;
+          stroke-width: 0.5px;
+          fill: transparent;
+        }
+
+        &:hover {
+          > .bandtext { fill: $COLOR_SELECTED; }
+          > .line { stroke: $COLOR_SELECTED; }
+        }
+      }
+    }
+
+    > .selectedregion {
+      background-color: rgba($COLOR_SELECTED, 0.15);
+      border-radius: 1px;
+    }
+  }
+}
+
+// バンドラベル表示モード時の幅拡張
+// .-show-band-label は Karyotype.js 側で付与される状態クラス
+.-show-band-label {
+  .chromosome-view {
+    width: $CHROM_WIDTH_VIEW + $CHROM_WIDTH_BAND_LABEL;
+
+    > .upper > .no {
+      left: ($CHROM_WIDTH_VIEW + $CHROM_WIDTH_BAND_LABEL - $CHROM_SIZE_NUMBER) * 0.5;
+    }
+
+    > .lower {
+      > .filteredregion,
+      > .displayregion,
+      > .selectedregion {
+        left: ($CHROM_WIDTH_VIEW + $CHROM_WIDTH_BAND_LABEL - $CHROM_WIDTH_INDICATOR1) * 0.5;
+      }
+
+      > .displayregion {
+        left: ($CHROM_WIDTH_VIEW + $CHROM_WIDTH_BAND_LABEL - $CHROM_WIDTH_INDICATOR2) * 0.5;
+      }
+
+      > .chromosome {
+        width: $CHROM_WIDTH_CHROMOSOME + $CHROM_WIDTH_BAND_LABEL;
+        left: ($CHROM_WIDTH_VIEW + $CHROM_WIDTH_BAND_LABEL - $CHROM_WIDTH_CHROMOSOME) * 0.5;
+      }
+    }
+  }
+}
+
+
+// Stanza ラッパー (.stanza-view)
+// TogoStanza の外部コンポーネントを囲む共通コンテナ。
+// min-height はスタンザのコンテンツが描画される前のレイアウトシフト（CLS）を防ぐ。
+.stanza-view {
+  scroll-margin-top: 120px;
+
+  > .titlelink-wrapper {
+    margin-left: -15px;
+    margin-bottom: 4px;
+
+    > .titlelink {
+      display: inline-block;
+      width: 11px;
+      // stylelint-disable-next-line font-family-no-missing-generic-family-keyword
+      font-family: "Font Awesome 7 Free";
+      font-weight: 900;
+      text-decoration: none;
+      font-size: 0.7rem;
+      margin-right: 2px;
+      transform: translateY(-2px);
+      vertical-align: bottom;
+      color: var(--color-gray);
+    }
+
+    &:hover {
+      .titlelink::before {
+        content: var(--icon-link);
+      }
+    }
+
+    > .title {
+      display: inline-block;
+      margin: 0;
+      font-size: 16px;
+      line-height: 18px;
+
+      > span {
+        margin-left: 8px;
+        font-size: 12px;
+
+        &.mgend  { color: $COLOR_DATASET_DISEASE_MGEND; }
+        &.clinvar { color: $COLOR_DATASET_DISEASE_CLINVAR; }
+      }
+
+      > .floating-info-trigger {
+        position: relative;
+        top: 1px;
+        display: inline-block;
+        margin-left: 2px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--color-gray);
+        // stylelint-disable-next-line font-family-no-missing-generic-family-keyword
+        font-family: "Font Awesome 7 Free";
+        font-weight: 900;
+        font-size: 12px;
+        line-height: 1;
+        vertical-align: 1px;
+        cursor: help;
+        appearance: none;
+
+        &::before {
+          content: var(--icon-circle-info);
+        }
+      }
+    }
+  }
+
+  > .stanza {
+    background: white;
+    box-shadow: 0 2px 2px rgba(black, 0.2);
+    margin-bottom: 20px;
+
+    // 各 stanza の最小高さ — CLS 防止のため描画前にスペースを確保する
+    // gene page
+    &#gene-summary            { min-height: 71px; }
+    &#gene-mgend              { min-height: 50px; }
+    &#gene-clinvar            { min-height: 280px; }
+    &#gene-gwas               { min-height: 61px; }
+    &#gene-mogplus            { min-height: 212px; }
+    &#gene-genomic-context    { min-height: 638px; }
+    &#gene-protein-browser    { min-height: 303px; overflow: visible; }
+    &#gene-protein-structure  { min-height: 679px; }
+    &#gene-variant            { min-height: 515px; }
+
+    togostanza-gene-protein-structure {
+      --togostanza-iframe-max-width: '';
+    }
+
+    // variant page
+    &#variant-summary                   { min-height: 50px; }
+    &#variant-other-overlapping-variants { min-height: 60px; }
+    &#variant-mgend                     { min-height: 50px; }
+    &#variant-clinvar                   { min-height: 50px; }
+    &#variant-gwas                      { min-height: 85px; }
+    &#variant-genomic-context           { min-height: 608px; }
+    &#variant-gene                      { min-height: 64px; }
+    &#variant-transcript                { min-height: 60px; }
+    &#variant-publication               { min-height: 125px; }
+
+    // disease page
+    &#disease-summary  { min-height: 103px; }
+    &#disease-mgend    { min-height: 50px; }
+    &#disease-clinvar  { min-height: 161px; }
+    &#disease-gwas     { min-height: 85px; }
+  }
+}
+
+
+// Stanza ヘッダー (.title-wrapper)
+// gene/disease ページの stanza タイトル領域の最小高さを確保し CLS を防ぐ
+.title-wrapper {
+  > .stanza {
+    &#gene-header, &#disease-header {
+      min-height: 48px;
+    }
+  }
+}
+
+
+// 頻度詳細テーブル (.frequency-detail)
+// データセット別のアレル頻度・カウントを一覧表示するテーブル
+.frequency-detail {
+  width: 100%;
+  // tr の border-bottom を有効にするために必要（separate モデルでは tr の border は無視される）
+  border-collapse: collapse;
+
+  > thead {
+    > tr {
+      > th {
+        @extend %panel-view-heading;
+      }
+    }
+  }
+
+  > tbody {
+    > tr {
+      > td {
+        line-height: 18px;
+
+        &:first-child {
+          font-weight: bold;
+        }
+
+        .dataset-icon {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: 0.2em;
+
+          > .properties {
+            width: inherit;
+          }
+        }
+
+        &.alt, &.total, &.frequency {
+          text-align: right;
+        }
+
+        &.alt {
+          font-weight: bold;
+          color: $COLOR_ALT;
+
+          // "alt / total" の区切り文字を疑似要素で追加する
+          &:after {
+            content: "/";
+            font-size: 10px;
+            color: $COLOR_BLACK;
+            margin-left: 0.5em;
+          }
+        }
+
+        &.frequency {
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}
+
+
+// 列選択エディター (.columns-editor-view)
+// 詳細ページで表示する列を複数列のカスケードから選択させる
+.columns-editor-view {
+  > .body {
+    padding: 0 !important;
+    display: flex;
+    overflow: auto;
+
+    > .columns {
+      display: flex;
+
+      > .column {
+        padding: 4px 0;
+        max-height: 200px;
+        overflow-y: auto;
+        border-right: solid 1px $COLOR_SEPARATOR;
+
+        > .messages-view {
+          margin-left: 4px;
+          font-size: 12px;
+
+          > .note {
+            padding-left: 24px;
+          }
+        }
+
+        > ul {
+          margin: 0;
+          padding: 0;
+
+          > li {
+            padding-left: 12px;
+            padding-right: 18px;
+            position: relative;
+            list-style: none;
+            font-size: 14px;
+            line-height: 24px;
+            white-space: nowrap;
+
+            > .arrow {
+              display: block;
+              position: absolute;
+              top: 7px;
+              right: 6px;
+              width: 0;
+              height: 0;
+              border-style: solid;
+              border-width: 4px 0 4px 6px;
+              border-color: transparent transparent transparent $COLOR_BLACK;
+              opacity: 0.2;
+              transition: opacity $GUI_DURATION;
+              cursor: pointer;
+
+              &:hover {
+                opacity: 1;
+              }
+            }
+
+            &.-selected {
+              background-color: #f0f0ef;
+
+              > .arrow {
+                opacity: 1;
+              }
+            }
+
+            > label {
+              margin-bottom: 0;
+
+              > input {
+                vertical-align: middle;
+              }
+
+              > .dataset-icon {
+                margin-right: 4px;
+              }
+
+              > span {
+                font-weight: bold;
+              }
+
+              > .lock {
+                &::before {
+                  content: var(--icon-lock);
+                  font-family: "Font Awesome 7 Free", sans-serif;
+                  font-weight: 900;
+                  color: $COLOR_BLACK;
+                  opacity: 0.4;
+                  font-size: 12px;
+                  margin-right: 4px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
