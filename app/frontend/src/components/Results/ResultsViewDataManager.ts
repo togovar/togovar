@@ -1,5 +1,4 @@
 import { storeManager } from '../../store/StoreManager';
-import type { ResultsRowView } from './ResultsRowView';
 import { ResultsViewDisplayManager } from './ResultsViewDisplayManager';
 import type {
   SearchMessages,
@@ -17,7 +16,6 @@ interface SelectionState {
 
 export class ResultsViewDataManager {
   private container: HTMLElement;
-  private rows: ResultsRowView[] = [];
   private status: HTMLElement;
   private messages: HTMLElement;
   private isDestroyed = false;
@@ -124,13 +122,6 @@ export class ResultsViewDataManager {
 
   destroy(): void {
     if (this.isDestroyed) return;
-
-    this.rows.forEach((row) => {
-      if (row && typeof row.destroy === 'function') {
-        row.destroy();
-      }
-    });
-    this.rows = [];
 
     this.displayManager.destroy();
     this.isDestroyed = true;

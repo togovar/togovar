@@ -71,23 +71,36 @@ export class DragManager {
   // マウスドラッグ
   // ================================================================
 
+  /**
+   * マウスドラッグ状態オブジェクトを初期化し、リスナーを登録する。
+   * mousemove/mouseup はスクロールバー外でも追従する必要があるため document に登録する。
+   */
   private initializeMouseDrag(): void {
     this.mouseDragState = { isDragging: false, startY: 0, startTop: 0 };
     this.attachMouseEventListeners();
   }
 
+  /**
+   * mousedown はスクロールバー上、move/up は document に登録してドラッグ中のカーソル追従を保証する。
+   */
   private attachMouseEventListeners(): void {
     this.scrollBarElement.addEventListener('mousedown', this.boundMouseDown);
     document.addEventListener('mousemove', this.boundMouseMove);
     document.addEventListener('mouseup', this.boundMouseUp);
   }
 
+  /**
+   * removeEventListener は登録時と同じ参照が必要なため、boundXxx フィールドで解除する。
+   */
   private removeMouseEventListeners(): void {
     this.scrollBarElement.removeEventListener('mousedown', this.boundMouseDown);
     document.removeEventListener('mousemove', this.boundMouseMove);
     document.removeEventListener('mouseup', this.boundMouseUp);
   }
 
+  /**
+   * ドラッグ開始時点の座標とスクロールバー位置を記録し、以降の move で差分計算できるようにする。
+   */
   private handleMouseDown(e: MouseEvent): void {
     if (!this.mouseDragState) return;
 
@@ -99,6 +112,9 @@ export class DragManager {
     this.onVisualStateChange(true);
   }
 
+  /**
+   * 開始位置との差分だけ top を動かすことで、クリック位置を起点にした自然なドラッグを実現する。
+   */
   private handleMouseMove(e: MouseEvent): void {
     if (!this.mouseDragState?.isDragging) return;
 
@@ -110,6 +126,10 @@ export class DragManager {
     this.onDragCallback(this.constrainPositionWithinBounds(newTop));
   }
 
+  /**
+   * isDragging フラグをクリアしてドラッグ終了を通知する。
+   * mouseup が document に登録されているため、スクロールバー外で離しても確実に終了できる。
+   */
   private handleMouseUp(): void {
     if (!this.mouseDragState?.isDragging) return;
 
@@ -121,10 +141,16 @@ export class DragManager {
   // タッチドラッグ
   // ================================================================
 
+  /**
+   * タッチドラッグはマウスと異なりデバイス非依存で常に登録する。
+   */
   private initializeTouchDrag(): void {
     this.attachTouchEventListeners();
   }
 
+  /**
+   * passive: false でスクロールバードラッグ中のページスクロールを抑制する。
+   */
   private attachTouchEventListeners(): void {
     this.scrollBarElement.addEventListener(
       'touchstart',
@@ -143,12 +169,18 @@ export class DragManager {
     );
   }
 
+  /**
+   * addEventListener と同じ参照・オプションで登録したリスナーを解除する。
+   */
   private removeTouchEventListeners(): void {
     this.scrollBarElement.removeEventListener('touchstart', this.boundTouchStart);
     this.scrollBarElement.removeEventListener('touchmove', this.boundTouchMove);
     this.scrollBarElement.removeEventListener('touchend', this.boundTouchEnd);
   }
 
+  /**
+   * タッチ開始時の指の位置とスクロールバー位置を記録し、move での差分計算の基点にする。
+   */
   private handleTouchStart(e: TouchEvent): void {
     e.preventDefault();
     this.isTouchDragging = true;
@@ -158,6 +190,9 @@ export class DragManager {
     this.onVisualStateChange(true);
   }
 
+  /**
+   * 開始位置との差分を加算してスクロールバーを指に追従させる。
+   */
   private handleTouchMove(e: TouchEvent): void {
     if (!this.isTouchDragging) return;
     e.preventDefault();
@@ -168,6 +203,9 @@ export class DragManager {
     this.onDragCallback(this.constrainPositionWithinBounds(newTop));
   }
 
+  /**
+   * タッチ終了でドラッグフラグをクリアし、視覚状態をドラッグ解除に戻す。
+   */
   private handleTouchEnd(e: TouchEvent): void {
     if (!this.isTouchDragging) return;
     e.preventDefault();
@@ -180,6 +218,9 @@ export class DragManager {
   // 座標管理
   // ================================================================
 
+  /**
+   * style.top は文字列で格納されているため数値化して返す。未設定なら 0 とする。
+   */
   private getCurrentScrollBarTop(): number {
     return parseInt(this.scrollBarElement.style.top) || 0;
   }
@@ -196,6 +237,9 @@ export class DragManager {
   // 状態リセット
   // ================================================================
 
+  /**
+   * destroy 時に中途半端なドラッグ状態が残らないよう全フィールドを初期値に戻す。
+   */
   private resetState(): void {
     if (this.mouseDragState) {
       this.mouseDragState.isDragging = false;
