@@ -49,6 +49,9 @@ export class ResultsView {
   private resizeObserver: ResizeObserver | null = null;
   private mutationObserver: MutationObserver | null = null;
   private resizeFrameId: number | null = null;
+  // スクロール中に offset 更新のたびに .bind() が呼ばれないよう、安定参照としてフィールドに保持する
+  private readonly setInteractable = (enabled: boolean) =>
+    this.touchHandler.setElementsInteractable(enabled);
 
   // unsubscribe で同一参照が必要なため、束縛済みコールバックをフィールドに保持する
   private onSearchStatus = (v: StoreState['searchStatus']) => { if (v) this.searchStatus(v); };
@@ -128,7 +131,7 @@ export class ResultsView {
     this.dataManager.handleOffsetChange(
       offset,
       isTouchDevice(),
-      this.touchHandler.setElementsInteractable.bind(this.touchHandler)
+      this.setInteractable
     );
   }
 
@@ -150,7 +153,7 @@ export class ResultsView {
     this.dataManager.handleSearchResults(
       results,
       isTouchDevice(),
-      this.touchHandler.setElementsInteractable.bind(this.touchHandler)
+      this.setInteractable
     );
   }
 
@@ -165,7 +168,7 @@ export class ResultsView {
   updateDisplaySize(): void {
     this.dataManager.updateDisplaySize(
       isTouchDevice(),
-      this.touchHandler.setElementsInteractable.bind(this.touchHandler)
+      this.setInteractable
     );
   }
 
