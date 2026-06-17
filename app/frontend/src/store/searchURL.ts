@@ -126,6 +126,9 @@ function pushAdvancedSearchUrl(state: SearchUrlParams, url: string): void {
  */
 function updateSearchHistory(state: SearchUrlParams, url: string): void {
   if (isSameDocumentUrl(url)) {
+    // URL長制限などでURLが変わらない場合でも、history.state は最新条件へ更新する必要がある。
+    // pushState は重複URLで DevTools 警告が出るため replaceState で state だけ更新する。
+    window.history.replaceState(state, '', url);
     return;
   }
 
