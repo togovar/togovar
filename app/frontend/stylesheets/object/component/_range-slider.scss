@@ -5,6 +5,7 @@ $PADDING_METER: 8px;
 range-slider::part(wrapper) {
   display: flex;
   flex-wrap: wrap;
+  row-gap: 5px;
   column-gap: 2em;
 }
 
@@ -19,8 +20,7 @@ range-slider::part(meter) {
   max-width: 250px;
   min-height: 24px;
   padding: 0 $PADDING_METER;
-  margin-top: 7px;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
 }
 
 range-slider::part(div-input) {
