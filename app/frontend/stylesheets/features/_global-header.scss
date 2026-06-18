@@ -240,9 +240,9 @@
     }
 
     // ──────────────────────────────────────────────────
-    // モバイル用ハンバーガーメニュー（max-width: 1170px）
+    // モバイル用ハンバーガーメニュー（max-width: 1120px）
     // ──────────────────────────────────────────────────
-    @media (max-width: 1170px) {
+    @media (max-width: 1120px) {
       // ハンバーガーアイコン（≡ 三本線）
       > .menu-bar {
         width: 31px;
@@ -261,8 +261,8 @@
       // ドロップダウンの起点：ハンバーガーアイコン直下に絶対配置
       > nav.menus-view {
         position: absolute;
-        top: 15px;
-        right: 15px;
+        top: 20px;
+        right: 8px;
         display: block;
 
         // ドロップダウンパネル本体（Columns・GRCh と共通のパネルスタイル）
@@ -271,11 +271,13 @@
 
           // フロー外に置いてレイアウトに影響しないよう absolute にする
           position: absolute;
-          top: 2px;
+          top: 0;
           right: 0;
           display: flex;
           flex-direction: column;
           width: 90px;
+
+          padding: 4px 0;
 
           // リサイズ時のちらつきを防ぐため transition を無効化する。
           // （JS なしの CSS のみでは breakpoint 切替時の opacity アニメーションを抑制できないため）
@@ -298,7 +300,7 @@
               display: block;
               height: auto;
               padding: 0;
-              line-height: unset;
+              line-height: 1.4;
               border-radius: 0;
 
               // .-current のピル枠線をドロップダウン内では非表示
