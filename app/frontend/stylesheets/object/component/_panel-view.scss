@@ -1,6 +1,8 @@
 .panel-view {
   // .title::after（絶対配置のシェブロン）の基点として機能させるため relative にする
   position: relative;
+  // <a> など inline 要素をルートに使う場合でも block として描画されるよう明示する
+  display: block;
   font-size: 12px;
   background-color: white;
   border-radius: 5px;
@@ -192,35 +194,46 @@
     }
   }
 
-  // クリックでリンク先へ遷移するタイトルパネル（グラデーション背景）
+  // パネル全体が <a> 要素のリンクになる場合のスタイル（グラデーション背景）
+  // <a> のデフォルトスタイル（青文字・下線）を打ち消す必要があるためここで明示する
   &.-emphasize {
+    color: white;
+    text-decoration: none;
     background: var(--gradient-heading);
-    transition: background-color var(--gui-duration);
+    transition:
+      background-color var(--gui-duration),
+      box-shadow var(--gui-duration),
+      transform var(--gui-duration);
 
+    // バリアント未選択時：href なしのためクリック不可、グレーアウト
     &.-disable {
-      color: white;
       background: var(--gradient-heading-disable);
     }
 
-    &:hover {
+    // .-disable（href なし）のときはホバー効果を出さない
+    &:not(.-disable):hover {
       background-color: var(--color-key-dark1);
+      box-shadow: 0 0 1px rgb(0 0 0 / 0.8);
+      transform: translateY(0.5px);
     }
 
-    > .title {
-      // h タグの padding を除去し a 側にのみ持たせることでクリック領域をタイトル全体に広げる
-      padding: 0;
-
-      > a,
-      span {
-        display: block;
-        padding: 8px var(--padding-panel-view) 6px;
-        color: white;
-        text-decoration: none;
-
-        &.hyper-text {
-          &::after {
-            color: white;
-          }
+    // アクティブ時（href あり）は .title::after を矢印アイコンに切り替える
+    // .-cannotcollapse の display: none より詳細度が高いため上書きできる
+    &:not(.-disable) {
+      > .title {
+        &::after {
+          position: static;
+          display: inline-block;
+          width: auto;
+          height: auto;
+          margin-left: 0.25em;
+          font-family: 'Font Awesome 7 Free', sans-serif;
+          font-size: 0.8em;
+          font-weight: 900;
+          content: var(--icon-circle-arrow-right);
+          border: none;
+          transform: none;
+          transition: none;
         }
       }
     }
