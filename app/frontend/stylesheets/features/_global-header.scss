@@ -275,7 +275,7 @@
           right: 0;
           display: flex;
           flex-direction: column;
-          width: 100px;
+          width: 90px;
 
           // リサイズ時のちらつきを防ぐため transition を無効化する。
           // （JS なしの CSS のみでは breakpoint 切替時の opacity アニメーションを抑制できないため）
