@@ -3,10 +3,17 @@
 // 統合元: object/project/_GlobalHeader.scss
 // =============================================================================
 
-/* stylelint-disable no-descending-specificity */
+@use '../object/component/dropdown-view' as *;
+
+// =============================================================================
+// グローバルヘッダー本体
+// =============================================================================
 
 #GlobalHeader {
-  --padding-right-elements: calc((var(--height-global-menu) - var(--height-navigation-item)) * 0.5);
+  // ヘッダー高さとナビアイテム高さの差分から上下パディングを均等計算
+  --padding-right-elements: calc(
+    (var(--height-global-menu) - var(--height-navigation-item)) * 0.5
+  );
 
   position: fixed;
   top: var(--height-nbdc-common-header);
@@ -18,148 +25,93 @@
   background-color: white;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 
-  > .right {
-    position: relative;
-    align-self: center;
-    font-size: 14px;
+  // ──────────────────────────────────────────────────
+  // 言語切り替えスイッチ (.languageswitcher)
+  // EN/JA の2択をピルボタン形式で表示する。選択中の言語は背景色とボーダーで強調する。
+  // ──────────────────────────────────────────────────
+  .languageswitcher {
+    display: flex;
 
-    nav.menus-view {
-      > .menu-wrapper {
-        display: flex;
+    // EN と JA の間の縦区切り線
+    &::before {
+      position: relative;
+      left: 25px;
+      width: 1px;
+      content: '';
+      border-right: 1px solid var(--color-key-dark2);
+    }
 
-        > .menu {
-          display: flex;
-          padding: calc(var(--padding-right-elements) - 1px) 8px;
-          margin: 0;
+    // EN 選択中：EN ボタンを強調、JA ボタンをグレーに
+    &.en {
+      a.en {
+        color: var(--color-key-dark2);
+        background-color: color-mix(
+          in srgb,
+          var(--color-key-dark1) 30%,
+          transparent
+        );
+        border: 1px solid var(--color-key-dark2);
+        border-right: none;
+      }
 
-          > li.menu-button {
-            color: var(--color-black);
-
-            &.config {
-              cursor: pointer;
-            }
-
-            &.login {
-              > a:where(.link) {
-                min-width: 30px;
-                color: var(--color-black);
-                text-decoration: none;
-
-                &:hover {
-                  color: var(--color-key-dark1);
-                }
-              }
-            }
-
-            &:hover {
-              color: var(--color-key-dark1);
-            }
-
-            > a:where(.link) {
-              display: block;
-              width: 100%;
-            }
-          }
-
-          + .menu {
-            border-left: solid 1px var(--color-separator);
-          }
-
-          &.navigation {
-            > .item {
-              > a:where(.link) {
-                color: var(--color-black);
-                text-decoration: none;
-
-                &:hover {
-                  color: var(--color-key-dark1);
-                  text-decoration: none;
-                }
-              }
-
-              &.-current {
-                > :where(.link) {
-                  color: var(--color-key-dark1);
-                }
-              }
-            }
-          }
-        }
+      a.ja {
+        color: var(--color-gray);
+        border: 1px solid var(--color-gray);
+        border-left: none;
       }
     }
 
-    @media (max-width: 1170px) {
-      position: relative;
-      > .menu-bar {
-        width: 31px;
-        height: 16px;
-
-        &::before {
-          display: inline-block;
-          width: 16px;
-          font-family: 'Font Awesome 7 Free', sans-serif;
-          font-size: 16px;
-          font-weight: 900;
-          content: var(--icon-bars);
-        }
+    // JA 選択中：JA ボタンを強調、EN ボタンをグレーに
+    &.ja {
+      a.ja {
+        color: var(--color-key-dark2);
+        background-color: color-mix(
+          in srgb,
+          var(--color-key-dark1) 30%,
+          transparent
+        );
+        border: 1px solid var(--color-key-dark2);
+        border-left: none;
       }
 
-      > nav.menus-view {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        display: block;
+      a.en {
+        color: var(--color-gray);
+        border: 1px solid var(--color-gray);
+        border-right: none;
+      }
+    }
 
-        > .menu-wrapper {
-          position: relative;
-          top: 5px;
-          display: none;
-          flex-direction: column;
-          gap: 0;
-          width: 150px;
-          background-color: white;
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    // 各言語ボタン共通スタイル
+    a {
+      width: 24px;
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: center;
+      text-decoration: none;
 
-          ul.menu {
-            flex-direction: column;
-            padding: 10px;
-
-            + .menu {
-              border-top: solid 1px var(--color-separator);
-              border-left: none;
-            }
-
-            li.menu-button {
-              padding-left: 5px;
-              line-height: 20px;
-
-              &.languageswitcher {
-                padding-left: 1px;
-                margin-bottom: 6px;
-              }
-            }
-          }
-        }
+      // EN ボタン：左側の角丸
+      &.en {
+        border-right: 1px solid var(--color-key-dark2);
+        border-radius: 20px 0 0 20px;
       }
 
-      &:hover {
-        color: var(--color-key-dark1);
-
-        > nav.menus-view {
-          > .menu-wrapper {
-            display: block;
-          }
-        }
+      // JA ボタン：右側の角丸
+      &.ja {
+        border-radius: 0 20px 20px 0;
       }
     }
   }
 
+  // ──────────────────────────────────────────────────
+  // 左側エリア（ロゴ・GRCh バージョン切り替え）
+  // ──────────────────────────────────────────────────
   > .left {
     position: relative;
     top: -2px;
     display: flex;
     padding: 10px var(--padding-side);
 
+    // ロゴ画像リンク
     > h1.heading {
       :where(.link) {
         text-decoration: none;
@@ -175,16 +127,19 @@
       }
     }
 
+    // サマリーテキスト
     span.summary {
       padding-top: 8px;
       font-size: 12px;
       font-weight: normal;
     }
 
+    // GRCh バージョン切り替えドロップダウン
     nav.dropdown-view {
       padding-top: 6px;
       padding-left: 8px;
 
+      // ドロップダウン矢印の位置調整
       > button.button {
         font-weight: normal;
 
@@ -194,86 +149,209 @@
       }
     }
   }
-}
 
-/* stylelint-enable no-descending-specificity */
-
-// ナビゲーションメニューボタン (.menu-button)
-// グローバルヘッダーの li 要素に適用するピル形状のボタン
-// .-current で選択状態のボーダーとカラーを表示する
-.menu-button {
-  display: inline-block;
-  height: var(--height-navigation-item);
-  padding: 0 8px;
-  line-height: var(--height-navigation-item);
-  border-radius: calc(var(--height-navigation-item) * 0.5);
-
-  &.-current {
-    color: var(--color-key-dark1);
-    border: solid 1px var(--color-key-dark1);
-  }
-
-  &:hover {
-    color: var(--color-key-dark1);
-  }
-}
-
-// 言語切り替えスイッチ (.languageswitcher)
-// EN/JA の2択をピルボタン形式で表示する。選択中の言語は背景色とボーダーで強調される。
-// グローバルヘッダー内の li.menu-button.languageswitcher に配置して使用する。
-.languageswitcher {
-  display: flex;
-
-  &::before {
+  // ──────────────────────────────────────────────────
+  // 右側エリア（ナビゲーション・ログイン・言語切り替え）
+  // ──────────────────────────────────────────────────
+  > .right {
     position: relative;
-    left: 25px;
-    width: 1px;
-    content: '';
-    border-right: 1px solid var(--color-key-dark2);
-  }
+    align-self: center;
+    font-size: 14px;
 
-  &.en {
-    a.en {
-      color: var(--color-key-dark2);
-      background-color: color-mix(in srgb, var(--color-key-dark1) 30%, transparent);
-      border: 1px solid var(--color-key-dark2);
-      border-right: none;
-    }
-    a.ja {
-      color: var(--color-gray);
-      border: 1px solid var(--color-gray);
-      border-left: none;
-    }
-  }
+    // デスクトップ用ナビゲーション：フレックスで横並び表示
+    nav.menus-view {
+      > .menu-wrapper {
+        display: flex;
 
-  &.ja {
-    a.ja {
-      color: var(--color-key-dark2);
-      background-color: color-mix(in srgb, var(--color-key-dark1) 30%, transparent);
-      border: 1px solid var(--color-key-dark2);
-      border-left: none;
-    }
-    a.en {
-      color: var(--color-gray);
-      border: 1px solid var(--color-gray);
-      border-right: none;
-    }
-  }
+        // メニューグループ（ul.menu）
+        > .menu {
+          display: flex;
+          padding: calc(var(--padding-right-elements) - 1px) 8px;
+          margin: 0;
 
-  a {
-    width: 24px;
-    font-size: 12px;
-    line-height: 1.5;
-    text-align: center;
-    text-decoration: none;
+          // 各ナビボタン（li.menu-button）
+          // ピル形状（inline-block・固定高・丸角）とデスクトップ用のカラーを設定する。
+          > li.menu-button {
+            display: inline-block;
+            height: var(--height-navigation-item);
+            padding: 0 8px;
+            line-height: var(--height-navigation-item);
+            color: var(--color-black);
+            border-radius: calc(var(--height-navigation-item) * 0.5);
 
-    &.en {
-      border-right: 1px solid var(--color-key-dark2);
-      border-radius: 20px 0 0 20px;
+            // 設定ボタン
+            &.config {
+              cursor: pointer;
+            }
+
+            // ログインボタン：テキストリンクスタイル
+            &.login {
+              > a:where(.link) {
+                min-width: 30px;
+                color: var(--color-black);
+                text-decoration: none;
+
+                &:hover {
+                  color: var(--color-key-dark1);
+                }
+              }
+            }
+
+            // 現在ページ：ピル枠線と文字色で選択状態を表示
+            &.-current {
+              color: var(--color-key-dark1);
+              border: solid 1px var(--color-key-dark1);
+            }
+
+            &:hover {
+              color: var(--color-key-dark1);
+            }
+
+            // 言語切り替え：ピルの inline-block を flex に切り替える
+            &.languageswitcher {
+              display: flex;
+            }
+
+            // リンク要素をブロックにしてクリック領域を li 全体に広げる
+            > a:where(.link) {
+              display: block;
+              width: 100%;
+            }
+          }
+
+          // 隣接するメニューグループの左区切り線
+          + .menu {
+            border-left: solid 1px var(--color-separator);
+          }
+
+          // ページナビゲーション（.navigation）固有のリンクスタイル
+          &.navigation {
+            > .item {
+              > a:where(.link) {
+                color: var(--color-black);
+                text-decoration: none;
+
+                &:hover {
+                  color: var(--color-key-dark1);
+                  text-decoration: none;
+                }
+              }
+
+              // 現在ページのリンク文字色
+              &.-current {
+                > :where(.link) {
+                  color: var(--color-key-dark1);
+                }
+              }
+            }
+          }
+        }
+      }
     }
 
-    &.ja {
-      border-radius: 0 20px 20px 0;
+    // ──────────────────────────────────────────────────
+    // モバイル用ハンバーガーメニュー（max-width: 1170px）
+    // ──────────────────────────────────────────────────
+    @media (max-width: 1170px) {
+      position: relative;
+
+      // ハンバーガーアイコン（≡ 三本線）
+      > .menu-bar {
+        width: 31px;
+        height: 16px;
+
+        &::before {
+          display: inline-block;
+          width: 16px;
+          font-family: 'Font Awesome 7 Free', sans-serif;
+          font-size: 16px;
+          font-weight: 900;
+          content: var(--icon-bars);
+        }
+      }
+
+      // ドロップダウンの起点：ハンバーガーアイコン直下に絶対配置
+      > nav.menus-view {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        display: block;
+
+        // ドロップダウンパネル本体（Columns・GRCh と共通のパネルスタイル）
+        > .menu-wrapper {
+          @include dropdown-view-list-panel;
+
+          // フロー外に置いてレイアウトに影響しないよう absolute にする
+          position: absolute;
+          top: 5px;
+          right: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+          width: 150px;
+          // GRCh に合わせて上下パディングを詰める
+          padding: 4px 0;
+
+          // メニューグループ（ul.menu）：縦積みに切り替え
+          ul.menu {
+            flex-direction: column;
+            padding: 0;
+
+            // メニューグループ間の区切り線（縦方向から横方向に変更）
+            + .menu {
+              border-top: solid 1px var(--color-separator);
+              border-left: none;
+            }
+
+            // ナビゲーション項目（li.menu-button）
+            // デスクトップのピルスタイルをドロップダウン用にリセットする。
+            li.menu-button {
+              display: block;
+              height: auto;
+              padding: 0;
+              line-height: unset;
+              border-radius: 0;
+
+              // .-current のピル枠線をドロップダウン内では非表示
+              &.-current {
+                font-weight: bold;
+                border: none;
+              }
+
+              // リンクにパディングとホバー背景色を付与
+              > a:where(.link) {
+                display: block;
+                padding: 3px 10px;
+                color: var(--color-black);
+                text-decoration: none;
+
+                &:hover {
+                  color: var(--color-black);
+                  background-color: var(--color-selected-hover);
+                }
+              }
+
+              // 言語切り替え：display:block の上書きを戻し flex を再適用
+              &.languageswitcher {
+                display: flex;
+                padding: 4px 10px;
+                margin-bottom: 0;
+              }
+            }
+          }
+        }
+      }
+
+      // .right ホバーでドロップダウンを表示
+      &:hover {
+        color: var(--color-key-dark1);
+
+        > nav.menus-view {
+          > .menu-wrapper {
+            @include dropdown-view-list-open;
+          }
+        }
+      }
     }
   }
 }
