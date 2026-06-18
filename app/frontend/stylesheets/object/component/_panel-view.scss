@@ -297,7 +297,7 @@
     &:not(.-disable):hover {
       background-color: var(--color-key-dark1);
       box-shadow: 0 0 1px rgb(0 0 0 / 0.8);
-      transform: translateY(0.5px);
+      transform: translateY(1px);
     }
 
     // アクティブ時（href あり）は .title::after を矢印アイコンに切り替える
