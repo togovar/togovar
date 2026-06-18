@@ -61,7 +61,7 @@
 
     // ──────────────────────────────────────────────────
     // プロパティリスト（.property-list）
-    // ラベル（dt）＋値（dd）ペアの一覧。panel-view 内でのみ使用するためここに配置する。
+    // ラベル（dt）＋値（dd）ペアの一覧。
     // ──────────────────────────────────────────────────
 
     // すべての dt が同じ列幅を共有するために grid を使う
@@ -132,6 +132,71 @@
             > li {
               display: block;
               word-break: break-all;
+            }
+          }
+        }
+      }
+    }
+
+    // ──────────────────────────────────────────────────
+    // データセット別アレル頻度テーブル（.frequency-table）
+    // ──────────────────────────────────────────────────
+
+    > .frequency-table {
+      width: 100%;
+      // tr の border-bottom を有効にするために必要（separate モデルでは tr の border は無視される）
+      border-collapse: collapse;
+
+      > thead {
+        > tr {
+          > th {
+            font-size: 10px;
+            color: var(--color-gray);
+            text-align: left;
+          }
+        }
+      }
+
+      > tbody {
+        > tr {
+          > td {
+            line-height: 18px;
+
+            &:first-child {
+              font-weight: bold;
+            }
+
+            .dataset-icon {
+              display: inline-block;
+              margin-right: 0.2em;
+              vertical-align: middle;
+
+              > .properties {
+                width: inherit;
+              }
+            }
+
+            &.alt,
+            &.total,
+            &.frequency {
+              text-align: right;
+            }
+
+            &.alt {
+              font-weight: bold;
+              color: var(--color-mutation-alt);
+
+              // "alt / total" の区切り文字を疑似要素で追加する
+              &::after {
+                margin-left: 0.5em;
+                font-size: 10px;
+                color: var(--color-black);
+                content: '/';
+              }
+            }
+
+            &.frequency {
+              font-weight: bold;
             }
           }
         }

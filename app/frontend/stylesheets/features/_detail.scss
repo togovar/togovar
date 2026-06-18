@@ -5,7 +5,7 @@
 //   object/component/_chromosome-view.scss      … 染色体グラフィック
 //   object/component/_stanza-view.scss          … Stanza（外部コンポーネント）ラッパー
 //   object/component/_stanza-title-wrapper.scss … Stanza ヘッダー
-//   object/component/_frequency-detail.scss     … 頻度詳細テーブル
+//   object/component/_panel-view.scss           … .frequency-table（panel-view 内の頻度テーブル）
 //   object/component/_columns-editor-view.scss  … 列選択エディター
 // =============================================================================
 
@@ -435,68 +435,6 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
     &#gene-header,
     &#disease-header {
       min-height: 48px;
-    }
-  }
-}
-
-// 頻度詳細テーブル (.frequency-detail)
-// データセット別のアレル頻度・カウントを一覧表示するテーブル
-.frequency-detail {
-  width: 100%;
-  // tr の border-bottom を有効にするために必要（separate モデルでは tr の border は無視される）
-  border-collapse: collapse;
-
-  > thead {
-    > tr {
-      > th {
-        font-size: 10px;
-        color: var(--color-gray);
-      }
-    }
-  }
-
-  > tbody {
-    > tr {
-      > td {
-        line-height: 18px;
-
-        &:first-child {
-          font-weight: bold;
-        }
-
-        .dataset-icon {
-          display: inline-block;
-          margin-right: 0.2em;
-          vertical-align: middle;
-
-          > .properties {
-            width: inherit;
-          }
-        }
-
-        &.alt,
-        &.total,
-        &.frequency {
-          text-align: right;
-        }
-
-        &.alt {
-          font-weight: bold;
-          color: var(--color-mutation-alt);
-
-          // "alt / total" の区切り文字を疑似要素で追加する
-          &::after {
-            margin-left: 0.5em;
-            font-size: 10px;
-            color: var(--color-black);
-            content: '/';
-          }
-        }
-
-        &.frequency {
-          font-weight: bold;
-        }
-      }
     }
   }
 }
