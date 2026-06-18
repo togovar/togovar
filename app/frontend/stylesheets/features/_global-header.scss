@@ -1,8 +1,8 @@
+@use '../object/component/dropdown-view' as *;
+
 // =============================================================================
 // グローバルヘッダー (#GlobalHeader)
 // =============================================================================
-
-@use '../object/component/dropdown-view' as *;
 
 #GlobalHeader {
   // ヘッダー高さとナビアイテム高さの差分から上下パディングを均等計算
@@ -243,8 +243,6 @@
     // モバイル用ハンバーガーメニュー（max-width: 1170px）
     // ──────────────────────────────────────────────────
     @media (max-width: 1170px) {
-      position: relative;
-
       // ハンバーガーアイコン（≡ 三本線）
       > .menu-bar {
         width: 31px;
@@ -273,14 +271,11 @@
 
           // フロー外に置いてレイアウトに影響しないよう absolute にする
           position: absolute;
-          top: 5px;
+          top: 2px;
           right: 0;
           display: flex;
           flex-direction: column;
-          gap: 0;
-          width: 150px;
-          // GRCh に合わせて上下パディングを詰める
-          padding: 4px 0;
+          width: 100px;
 
           // メニューグループ（ul.menu）：縦積みに切り替え
           ul.menu {
@@ -304,6 +299,7 @@
 
               // .-current のピル枠線をドロップダウン内では非表示
               &.-current {
+                font-weight: bold;
                 border: none;
               }
 
@@ -324,7 +320,6 @@
               &.languageswitcher {
                 display: flex;
                 padding: 4px 10px;
-                margin-bottom: 0;
               }
             }
           }

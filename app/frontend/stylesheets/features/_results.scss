@@ -233,6 +233,9 @@
           }
         }
 
+        // GRCh・ナビゲーションは CSS :hover で開閉するが、このドロップダウンは JS 制御。
+        // hidden / inert / aria-hidden の切り替えや、ドラッグ中の状態管理が必要なため。
+        // 開閉は ResultsColumnsDropdown.ts の mouseenter / mouseleave イベントと .-open クラスで行う。
         > .columns-dropdown-menu {
           @include dropdown-view-list-panel;
 
@@ -337,6 +340,7 @@
           }
         }
 
+        // JS が mouseenter で .-open を付与し、mouseleave で外す（ResultsColumnsDropdown.ts）
         &.-open {
           > .columns-dropdown-menu {
             @include dropdown-view-list-open;
