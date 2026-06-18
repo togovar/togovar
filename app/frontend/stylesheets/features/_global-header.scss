@@ -1,13 +1,8 @@
 // =============================================================================
 // グローバルヘッダー (#GlobalHeader)
-// 統合元: object/project/_GlobalHeader.scss
 // =============================================================================
 
 @use '../object/component/dropdown-view' as *;
-
-// =============================================================================
-// グローバルヘッダー本体
-// =============================================================================
 
 #GlobalHeader {
   // ヘッダー高さとナビアイテム高さの差分から上下パディングを均等計算
@@ -24,83 +19,6 @@
   height: var(--height-global-menu);
   background-color: white;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-
-  // ──────────────────────────────────────────────────
-  // 言語切り替えスイッチ (.languageswitcher)
-  // EN/JA の2択をピルボタン形式で表示する。選択中の言語は背景色とボーダーで強調する。
-  // ──────────────────────────────────────────────────
-  .languageswitcher {
-    display: flex;
-
-    // EN と JA の間の縦区切り線
-    &::before {
-      position: relative;
-      left: 25px;
-      width: 1px;
-      content: '';
-      border-right: 1px solid var(--color-key-dark2);
-    }
-
-    // EN 選択中：EN ボタンを強調、JA ボタンをグレーに
-    &.en {
-      a.en {
-        color: var(--color-key-dark2);
-        background-color: color-mix(
-          in srgb,
-          var(--color-key-dark1) 30%,
-          transparent
-        );
-        border: 1px solid var(--color-key-dark2);
-        border-right: none;
-      }
-
-      a.ja {
-        color: var(--color-gray);
-        border: 1px solid var(--color-gray);
-        border-left: none;
-      }
-    }
-
-    // JA 選択中：JA ボタンを強調、EN ボタンをグレーに
-    &.ja {
-      a.ja {
-        color: var(--color-key-dark2);
-        background-color: color-mix(
-          in srgb,
-          var(--color-key-dark1) 30%,
-          transparent
-        );
-        border: 1px solid var(--color-key-dark2);
-        border-left: none;
-      }
-
-      a.en {
-        color: var(--color-gray);
-        border: 1px solid var(--color-gray);
-        border-right: none;
-      }
-    }
-
-    // 各言語ボタン共通スタイル
-    a {
-      width: 24px;
-      font-size: 12px;
-      line-height: 1.5;
-      text-align: center;
-      text-decoration: none;
-
-      // EN ボタン：左側の角丸
-      &.en {
-        border-right: 1px solid var(--color-key-dark2);
-        border-radius: 20px 0 0 20px;
-      }
-
-      // JA ボタン：右側の角丸
-      &.ja {
-        border-radius: 0 20px 20px 0;
-      }
-    }
-  }
 
   // ──────────────────────────────────────────────────
   // 左側エリア（ロゴ・GRCh バージョン切り替え）
@@ -207,9 +125,81 @@
               color: var(--color-key-dark1);
             }
 
-            // 言語切り替え：ピルの inline-block を flex に切り替える
+            // ──────────────────────────────────────────────────
+            // 言語切り替え（li.menu-button.languageswitcher）
+            // ピルの inline-block を flex に切り替えて EN/JA ボタンを横並びにする。
+            // ──────────────────────────────────────────────────
             &.languageswitcher {
               display: flex;
+
+              // EN と JA の間の縦区切り線
+              &::before {
+                position: relative;
+                left: 25px;
+                width: 1px;
+                content: '';
+                border-right: 1px solid var(--color-key-dark2);
+              }
+
+              // 各言語ボタン共通スタイル
+              a {
+                width: 24px;
+                font-size: 12px;
+                line-height: 1.5;
+                text-align: center;
+                text-decoration: none;
+
+                // EN ボタン：左側の角丸
+                &.en {
+                  border-right: 1px solid var(--color-key-dark2);
+                  border-radius: 20px 0 0 20px;
+                }
+
+                // JA ボタン：右側の角丸
+                &.ja {
+                  border-radius: 0 20px 20px 0;
+                }
+              }
+
+              // EN 選択中：EN ボタンを強調、JA ボタンをグレーに
+              &.en {
+                a.en {
+                  color: var(--color-key-dark2);
+                  background-color: color-mix(
+                    in srgb,
+                    var(--color-key-dark1) 30%,
+                    transparent
+                  );
+                  border: 1px solid var(--color-key-dark2);
+                  border-right: none;
+                }
+
+                a.ja {
+                  color: var(--color-gray);
+                  border: 1px solid var(--color-gray);
+                  border-left: none;
+                }
+              }
+
+              // JA 選択中：JA ボタンを強調、EN ボタンをグレーに
+              &.ja {
+                a.ja {
+                  color: var(--color-key-dark2);
+                  background-color: color-mix(
+                    in srgb,
+                    var(--color-key-dark1) 30%,
+                    transparent
+                  );
+                  border: 1px solid var(--color-key-dark2);
+                  border-left: none;
+                }
+
+                a.en {
+                  color: var(--color-gray);
+                  border: 1px solid var(--color-gray);
+                  border-right: none;
+                }
+              }
             }
 
             // リンク要素をブロックにしてクリック領域を li 全体に広げる
@@ -314,7 +304,6 @@
 
               // .-current のピル枠線をドロップダウン内では非表示
               &.-current {
-                font-weight: bold;
                 border: none;
               }
 
