@@ -29,6 +29,8 @@
 | バックエンド連携 | TogoVar API                                    |
 | パッケージ       | npm                                            |
 
+- **Bootstrap は使用していない。** CSS フレームワークとしての Bootstrap は一切依存していない。`h3` などのデフォルト margin は `foundation/_reset.scss` の `*:not(dialog) { margin: 0 }` でリセット済みのため、Bootstrap 打ち消しを理由にした `margin-bottom: 0` は不要。
+
 - Node.js は `22.x` 前提。`.nvmrc` と `package.json` の `engines.node` を確認する。
 - `tsconfig.json` は `strict: true` かつ `allowJs: true`。既存JSとTSが共存しているため、周辺ファイルの粒度に合わせて変更する。
 - 型チェックは `npm run typecheck`（= `tsc --noEmit`）で確認する。
@@ -121,11 +123,11 @@ app/frontend/
 
 `types/conditionBuilder.d.ts`、`types/conditionDefinition.d.ts`、`types/query.d.ts` は役割が異なる。混在させない。
 
-| ファイル | 役割 | 主な型 |
-| --- | --- | --- |
-| `types/query.d.ts` | Store/API層向け。コンポーネント依存を持たない（PredictionKey のみ例外） | `ConditionQuery`, `ConditionLeaf`, 各Leaf型, `ScoreRange`, `Inequality`, `Relation` |
-| `types/conditionBuilder.d.ts` | UIビルダー向け。コンポーネントを import する | `BuildContext`, `BuilderMap`, `ConditionValueEditor`, `EditorCtor`, `PredictionChangeDetail` |
-| `types/conditionDefinition.d.ts` | 条件UIマスタデータ向け。`advanced_search_conditions.json` の型 | `ConditionDefinition`, `AdvancedConditionMap`, `GRChConditions`, `TreeNode` |
+| ファイル                         | 役割                                                                    | 主な型                                                                                       |
+| -------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `types/query.d.ts`               | Store/API層向け。コンポーネント依存を持たない（PredictionKey のみ例外） | `ConditionQuery`, `ConditionLeaf`, 各Leaf型, `ScoreRange`, `Inequality`, `Relation`          |
+| `types/conditionBuilder.d.ts`    | UIビルダー向け。コンポーネントを import する                            | `BuildContext`, `BuilderMap`, `ConditionValueEditor`, `EditorCtor`, `PredictionChangeDetail` |
+| `types/conditionDefinition.d.ts` | 条件UIマスタデータ向け。`advanced_search_conditions.json` の型          | `ConditionDefinition`, `AdvancedConditionMap`, `GRChConditions`, `TreeNode`                  |
 
 - `ConditionQuery` は Advanced Search の Store 値の正規型。`storeManager.getData('advancedSearchConditions')` は `ConditionQuery | undefined` を返す。
 - `undefined` は「条件なし」を表すセンチネル値であり、`{}` は使わない。
@@ -150,13 +152,13 @@ app/frontend/
 
 SCSSは `app/frontend/stylesheets/` の FLOCSS レイヤー構成に合わせる。
 
-| ディレクトリ | 置くもの | 置かないもの |
-| --- | --- | --- |
-| `foundation/` | デザイントークン（CSS カスタムプロパティ）、ミックスイン、HTMLタグのデフォルトスタイル、リセット | 特定コンポーネントや画面のスタイル |
-| `layout/` | ページ骨格（`#Layout`・`aside`・`main` の幅・高さ・配置） | 個々のUIパーツの見た目 |
-| `object/component/` | 複数の画面で再利用される汎用UIパーツ | 1つの画面・機能だけで使うスタイル |
-| `features/` | 特定の画面や機能に紐づくスタイル | 別の画面でも使える汎用パーツ |
-| `web-components/` | Lit要素が JS から直接 `import` するSCSSファイル（Shadow DOM 内に適用） | ライトDOM側のスタイル |
+| ディレクトリ        | 置くもの                                                                                         | 置かないもの                       |
+| ------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| `foundation/`       | デザイントークン（CSS カスタムプロパティ）、ミックスイン、HTMLタグのデフォルトスタイル、リセット | 特定コンポーネントや画面のスタイル |
+| `layout/`           | ページ骨格（`#Layout`・`aside`・`main` の幅・高さ・配置）                                        | 個々のUIパーツの見た目             |
+| `object/component/` | 複数の画面で再利用される汎用UIパーツ                                                             | 1つの画面・機能だけで使うスタイル  |
+| `features/`         | 特定の画面や機能に紐づくスタイル                                                                 | 別の画面でも使える汎用パーツ       |
+| `web-components/`   | Lit要素が JS から直接 `import` するSCSSファイル（Shadow DOM 内に適用）                           | ライトDOM側のスタイル              |
 
 **どのディレクトリに入れるかの判断フロー:**
 
@@ -187,6 +189,7 @@ SCSSは `app/frontend/stylesheets/` の FLOCSS レイヤー構成に合わせる
   - `-webkit-appearance` — `input[type="range"]` など Safari が標準プロパティに非対応な箇所のみ残す。
   - `-webkit-mask-*` / `-webkit-font-smoothing` — まだ有効。残す。
 - UI状態は、可能なら既存の `data-*` 属性や状態クラスを利用する。
+- 折りたたみ UI は **ネイティブ `<details>/<summary>`** で実装する。JS による開閉クラス付与（旧 `CollapseView.ts`）は削除済み。CSS アニメーションは `details[open] > summary::before { transform: rotate(90deg) }` のパターンで対応する。
 - `tr` に `border` を使うテーブルは、そのテーブルに `border-collapse: collapse` を明示する。
 - 大きなセレクタブロック内のサブセクションは `// ──────────────────────────────────────────────────` の区切り線と日本語の見出しコメントでグループ分けする。
 - コンポーネント専用のスタイルは、グローバルなルールとして外に出さず、そのセレクタブロック内に直接書く。低詳細度セレクタは高詳細度セレクタより先に定義する（stylelint の `no-descending-specificity` で強制済み）。
@@ -204,11 +207,11 @@ SCSSは `app/frontend/stylesheets/` の FLOCSS レイヤー構成に合わせる
 ### Sass の書き方
 
 - **`@import` は廃止済み。** 全ファイルで `@use` / `@forward` へ移行済み。新規ファイルでも `@import` は使わない。
-- `foundation/_mixins.scss` のミックスイン（`sprite`・`input-number`・`panel-view-heading`）を使うファイルだけが `@use '../foundation' as *` を宣言する。CSS カスタムプロパティのみ使うファイルは `@use` 不要。
+- `foundation/_mixins.scss` のミックスイン（`sprite`・`input-number`）を使うファイルだけが `@use '../foundation' as *` を宣言する。CSS カスタムプロパティのみ使うファイルは `@use` 不要。
   - ミックスインを使う場合: `features/` → `@use '../foundation' as *` / `object/component/` → `@use '../../foundation' as *`
   - ミックスインを使わない場合: `@use` 宣言なし（`var(--)` は `@use` なしで使える）
 - CSS 出力を持つファイル（`foundation/base`・`reset`・`font-awesome`）は `main.scss` のみが `@use` する。パーシャル側は `@use` しない。
-- ミックスインは `foundation/_mixins.scss` に定義する（`sprite`・`input-number`・`panel-view-heading` など）。
+- ミックスインは `foundation/_mixins.scss` に定義する（`sprite`・`input-number` など）。
 - `@extend` はモジュール境界をまたげない。代わりに `@mixin` を使う。
 - `sass:color` モジュールは `foundation/_variables.scss` 内部でのみ使う。パーシャル側では使わない。
 

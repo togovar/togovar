@@ -50,7 +50,7 @@ app/frontend/
     main.scss          エントリポイント。全ファイルを正しい順序で @use する
     foundation/        ベース層（変更頻度低）
       _variables.scss  デザイントークン。色・サイズ・z-index などを :root の CSS カスタムプロパティとして定義
-      _mixins.scss     再利用ミックスイン（sprite・input-number・panel-view-heading）
+      _mixins.scss     再利用ミックスイン（sprite・input-number）
       _base.scss       HTML タグのデフォルトスタイル（body・a・input など）
       _reset.scss      CSS リセット（変更禁止）
     layout/            ページ骨格（#Layout・aside・main の配置）

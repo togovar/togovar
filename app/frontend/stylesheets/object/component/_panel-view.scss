@@ -1,5 +1,3 @@
-@use '../../foundation' as *;
-
 .panel-view {
   // .title::after（絶対配置のシェブロン）の基点として機能させるため relative にする
   position: relative;
@@ -17,10 +15,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 8px var(--padding-panel-view) 6px;
-    // h タグ（Bootstrap）のデフォルト margin を打ち消す
-    margin-bottom: 0;
     font-size: 14px;
-    font-weight: bold;
     line-height: 16px;
     border-bottom: solid 1px var(--color-separator);
 
@@ -63,27 +58,21 @@
     padding: 6px var(--padding-panel-view) 10px;
 
     // ──────────────────────────────────────────────────
-    // ラベル＋値リスト（.right-headline）
-    // panel-view のコンテンツ内でのみ使用するため、ここに配置する。
+    // プロパティリスト（.property-list）
+    // ラベル（dt）＋値（dd）ペアの一覧。panel-view 内でのみ使用するためここに配置する。
     // ──────────────────────────────────────────────────
 
-    // ラベル（dt）と値（dd）を横並びにするため div を flex コンテナにする。
-    // dl/dt/dd はデフォルトで縦積みになるため明示が必要。
-    > .right-headline {
+    // dl/dt/dd はデフォルトで縦積みになるため、div を flex コンテナにして横並びにする
+    > .property-list {
       > div {
         display: flex;
         align-items: flex-start;
         padding-top: 2px;
-        padding-bottom: 2px;
+        padding-bottom: 6px;
         line-height: 14px;
 
-        // グループ先頭の余白（table の :first-child tr に相当）
         &:first-child {
           padding-top: 6px;
-        }
-
-        &:last-child {
-          padding-bottom: 6px;
         }
 
         // 複数グループがある場合、2つ目以降のグループ先頭に付与するクラス
@@ -97,22 +86,22 @@
           padding-bottom: 6px;
         }
 
-        // ラベル列（旧 th）
+        // ラベル列：右揃えで固定幅、コロン付き
         > dt {
           flex-shrink: 0;
           padding-right: 0.5em;
+          font-size: 10px;
+          font-weight: bold;
+          color: var(--color-gray);
           text-align: right;
-
-          @include panel-view-heading;
 
           &::after {
             content: ':';
           }
         }
 
-        // 値列（旧 dd）
+        // 値列：ブラウザデフォルトの左マージンを打ち消す
         > dd {
-          // ブラウザデフォルトの左マージンを打ち消す
           margin: 0;
 
           > ul {
@@ -139,8 +128,6 @@
     gap: 4px;
     align-items: center;
     min-height: 24px;
-    // Bootstrap のデフォルト margin を打ち消す
-    margin-bottom: 0;
 
     > input[type='checkbox'],
     > input[type='radio'] {
@@ -250,8 +237,4 @@ body[data-search-mode='advanced'] {
       }
     }
   }
-}
-
-.panel-view-heading {
-  @include panel-view-heading;
 }

@@ -1,5 +1,3 @@
-@use '../foundation' as *;
-
 // =============================================================================
 // バリアント・遺伝子・疾患 詳細ページ
 // 統合元:
@@ -451,7 +449,8 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
   > thead {
     > tr {
       > th {
-        @include panel-view-heading;
+        font-size: 10px;
+        color: var(--color-gray);
       }
     }
   }

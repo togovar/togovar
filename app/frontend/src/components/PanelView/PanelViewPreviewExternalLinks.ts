@@ -25,7 +25,7 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
     super(elm, 'preview-external-links');
     storeManager.subscribe('selectedRow', () => this.selectedRow());
     storeManager.subscribe('offset', () => this.offset());
-    this._dl = this.elm.querySelector<Element>('.content > .right-headline')!;
+    this._dl = this.elm.querySelector<Element>('.content > .property-list')!;
   }
 
   /**
