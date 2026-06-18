@@ -348,6 +348,7 @@
   }
 
   > .tablecontainer {
+    position: relative;
     flex: 1 1 auto;
     min-height: 0;
     // 右端にスクロールしたとき内容が sidebar 境界に張り付かないよう余白を確保する。

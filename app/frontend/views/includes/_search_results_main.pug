@@ -76,6 +76,8 @@ main#SearchResultsView.LayoutMainAside
 
       //- 仮想スクロール用テーブルコンテナ（行の表示/非表示切り替えは JS が制御）
       .tablecontainer
+        //- tablecontainer を基準にローディングアイコンを絶対配置する
+        include _loading_indicator
         table.results-view
           thead
             //-
