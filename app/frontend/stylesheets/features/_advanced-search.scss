@@ -17,6 +17,7 @@
 // =============================================================================
 
 .advanced-search-condition-editor-view {
+  // 条件行の角丸半径と内側の左右位置を揃えるため、値コンテナ高さの半径分をパディングにする
   --padding-side: calc(
     var(--height-advanced-search-condition-values-container) * 0.5
   );
@@ -96,12 +97,10 @@
 
 $HEIGHT: var(--height-advanced-search-condition);
 $HEIGHT_RELATION: 16px;
-$HEIGHT_VALUE: 18px;
-$PADDING_VALUES: calc(($HEIGHT - $HEIGHT_VALUE) / 2);
 $CORNER_RADIUS: calc($HEIGHT / 2);
 
 .advanced-search-condition-item-view {
-  // 条件行の高さは周辺コンポーネントも参照するため、CSS変数で値ラベル側へ共有する。
+  // 条件行の高さは周辺コンポーネントも参照するため、CSS変数で値ラベル側へ共有する
   --padding-values-vertical: calc(
     (
         var(--height-advanced-search-condition-values-container) - var(
@@ -111,7 +110,6 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
       0.5
   );
   position: relative;
-
   margin-bottom: 3px;
 
   > .body {
@@ -122,9 +120,9 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
 
     > .summary {
       display: flex;
+      // stretch にして分類・値・ボタン各ブロックの高さを揃える
       align-items: stretch;
       min-height: $HEIGHT;
-      // summaryは分類・関係・値・操作ボタンを1行に並べる本体部分。
       padding-right: 8px;
       font-size: 12px;
       color: var(--color-black);
@@ -135,6 +133,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
         width: 188px;
         min-width: 188px;
         padding: 0 0 0 $CORNER_RADIUS;
+        // ドラッグ＆ドロップ可能な条件ラベルであることをカーソルで示す
         font-weight: bold;
         line-height: $HEIGHT;
         color: white;
@@ -147,16 +146,18 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
       > .relation {
         width: $HEIGHT_RELATION;
         min-width: $HEIGHT_RELATION;
-        // 関係アイコンは分類ラベルと値エリアの境界に重ねるため、負の横マージンで中央へ寄せる。
+        // 関係アイコンは分類ラベルと値エリアの境界に重ねるため負の横マージンで中央へ寄せる
         margin: #{calc(($HEIGHT - $HEIGHT_RELATION) / 2)}
           #{calc(-1 * $HEIGHT_RELATION / 2)};
       }
 
       > .values-container {
         position: relative;
-        // 値が多い条件でも行全体を押し広げすぎないよう、値エリアだけをスクロール可能にする。
+        display: flex;
+        // 値が多い条件でも行全体を押し広げすぎないよう、値エリアだけをスクロール可能にする
         flex-grow: 1;
         flex-wrap: wrap;
+        row-gap: 2px;
         align-items: center;
         max-height: 100px;
         padding: var(--padding-values-vertical) $CORNER_RADIUS
@@ -217,6 +218,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
     }
   }
 
+  // 編集中に条件行以外を暗くするバックドロップ
   > .bg {
     position: fixed;
     top: 0;
@@ -230,7 +232,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
   }
 
   &.-editing {
-    // 編集中は行本体をバックドロップより前面に出し、値タグごとの削除ボタンを表示する。
+    // 編集中は行本体をバックドロップより前面に出し、値タグごとの削除ボタンを表示する
     > .body {
       z-index: calc(var(--z-index-editing-condition) + 1);
 
@@ -268,7 +270,6 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
 
   &[data-relation='eq'],
   &[data-relation='ne'] {
-    // eq/neは専用の小さなアイコンで関係種別を示す。
     > .body {
       > .summary {
         > .relation {
@@ -286,6 +287,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
             content: '';
           }
 
+          // イコール記号（＝）を2本の横線で表現する
           &::before {
             top: 5px;
             left: 4px;
@@ -300,7 +302,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
   }
 
   &[data-relation='ne'] {
-    // neは否定を示す斜線と無効色で、eqとの差を視覚的に出す。
+    // ne（否定）は斜線と無効色で eq との差を視覚的に出す
     > .body {
       > .summary {
         > .classification {
@@ -310,6 +312,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
         > .relation {
           background-color: var(--color-disable);
 
+          // 取消線で否定を表現する
           &::after {
             top: 2px;
             left: 6.5px;
@@ -323,7 +326,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
   }
 
   &[aria-selected='true'] {
-    // 選択状態の枠線はレイアウトに影響しないよう疑似要素で重ねる。
+    // 選択状態の枠線はレイアウトに影響しないよう疑似要素で重ねる
     &::after {
       position: absolute;
       top: 0;
@@ -339,7 +342,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
   }
 
   &[data-classification='significance'] {
-    // 疾患系の値はデータセット名と値を並べて見せるため、専用wrapperの幅を揃える。
+    // 疾患系の値はデータセット名と値を並べるため専用 wrapper の幅を揃える
     > .body {
       > .summary {
         > .values-container {
@@ -385,6 +388,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
   border: solid 1px var(--color-key-dark3);
   box-shadow: var(--shadow-depth1);
 
+  // AND/OR 切り替えスイッチを条件グループ左辺（縦軸）に沿って縦置きする
   > .logical-operator-switch {
     position: absolute;
     top: 5px;
@@ -398,6 +402,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
       calc(var(--padding-group) - 2px) 22px;
   }
 
+  // 子要素が 0〜1 件のときは論理演算子が意味をなさないため非表示にする
   &[data-number-of-child='0'],
   &[data-number-of-child='1'] {
     > .logical-operator-switch {
@@ -441,16 +446,19 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
 // ツールバー (.advanced-search-toolbar)
 // =============================================================================
 
+// 無効コマンドの透過度（有効時は opacity: 1 で上書きする）
 $OPACITY_DISABLED: 0.8;
 
 .advanced-search-toolbar {
   padding: 2px 6px;
+  // ビルダーコンテナに下から重なるよう負マージンで上にずらす
   margin: 0 0 calc(var(--height-toolbar) * -1 - 1px) 0;
   font-size: 12px;
   line-height: 14px;
   color: white;
   background-color: var(--color-key-dark3);
 
+  // button のデフォルトスタイル（枠・背景・フォント）をリセットして .command ベースに統一する
   .command {
     margin: 0;
     font: inherit;
@@ -527,6 +535,7 @@ $OPACITY_DISABLED: 0.8;
         }
 
         > p {
+          // 子メニューの存在を▼で示す
           &::after {
             display: inline-block;
             margin-left: 4px;
@@ -664,6 +673,7 @@ $OPACITY_DISABLED: 0.8;
   user-select: none;
 
   > .inner {
+    // 条件行とグループが混在するとき、異種要素間に余白を確保する
     .advanced-search-condition-item-view {
       + .advanced-search-condition-group-view {
         margin-top: 5px;
@@ -693,7 +703,7 @@ $OPACITY_DISABLED: 0.8;
 // =============================================================================
 
 // チェックボックス一覧エディター (.checkboxes-editor-view)
-// 条件エディターパネル内のチェックボックスグループを水平並びで表示する
+// 条件エディターパネル内のチェックボックスを水平並びで表示する
 .checkboxes-editor-view {
   > .buttons {
     padding: 4px var(--padding-side);
@@ -723,15 +733,15 @@ $OPACITY_DISABLED: 0.8;
 }
 
 // サイドバー用チェックリスト (.checklist-values)
-// サイドバーのフィルターパネルで使うチェックリスト。
-// パネルの左右余白を負のマージンで打ち消し、横幅いっぱいに広げる。
+// パネルの左右余白を負のマージンで打ち消し、横幅いっぱいに広げる
 .checklist-values {
   padding-inline-start: 0;
-  margin-right: -var(--padding-panel-view);
+  // calc(-1 * var(...)) で CSS カスタムプロパティを負値化する（-var(...) は無効な構文）
+  margin-right: calc(-1 * var(--padding-panel-view));
   margin-bottom: 0;
-  margin-left: -var(--padding-panel-view);
+  margin-left: calc(-1 * var(--padding-panel-view));
 
-  // float を持つ子要素があるため、クリアフィックスで親の高さを確保する。
+  // float 子要素を持つためクリアフィックスで高さを確保する
   &::after {
     clear: both;
     display: block;
@@ -749,7 +759,7 @@ $OPACITY_DISABLED: 0.8;
     align-items: center;
     justify-content: space-between;
     min-height: 24px;
-    // 親（#SideBar）に white-space: nowrap が設定されているため、ここで明示的に折り返しを許可する。
+    // 親（#SideBar）に white-space: nowrap が設定されているため明示的に折り返しを許可する
     white-space: normal;
 
     > .label {
@@ -771,7 +781,7 @@ $OPACITY_DISABLED: 0.8;
       }
 
       > .dataset-icon {
-        // FilterDatasets コンテキストではアイコン幅を固定し、ラベルの左端を揃える。
+        // FilterDatasets コンテキストではアイコン幅を固定してラベルの左端を揃える
         #FilterDatasets & {
           width: 56px;
 
@@ -787,7 +797,7 @@ $OPACITY_DISABLED: 0.8;
         height: 13px;
         margin: 0;
 
-        // Advanced モードでは条件選択UIに統一するため、チェックボックスを非表示にする。
+        // Advanced モードでは条件選択 UI に統一するためチェックボックスを非表示にする
         body[data-search-mode='advanced'] & {
           display: none;
         }
@@ -807,7 +817,7 @@ $OPACITY_DISABLED: 0.8;
 
       details {
         > summary {
-          // summary のデフォルトマーカーを非表示にし、::before で三角アイコンに置き換える
+          // summary のデフォルトマーカーを非表示にし ::before の三角アイコンに置き換える
           position: absolute;
           top: 6px;
           left: -7px;
@@ -832,12 +842,11 @@ $OPACITY_DISABLED: 0.8;
           }
         }
 
-        // details が開いたとき三角を ▼ に回転する
         &[open] > summary::before {
           transform: rotate(90deg);
         }
 
-        // 子リストを親リストと同様に負マージンで全幅に広げたうえで左インデントを加える
+        // 子リストを親と同様に全幅に広げたうえで左インデントを加える
         > ul.checklist-values {
           padding-left: 1rem;
         }
@@ -846,7 +855,7 @@ $OPACITY_DISABLED: 0.8;
   }
 
   > .separator {
-    // .panel-view > .content の水平パディング分だけ外側に広げてパネル端まで届かせる。
+    // .panel-view > .content の水平パディング分だけ外側に広げてパネル端まで届かせる
     height: 0;
     padding: 3px 0;
     margin-right: calc(-1 * var(--padding-panel-view));
@@ -857,7 +866,6 @@ $OPACITY_DISABLED: 0.8;
       border-top: solid 1px rgba(0, 0, 0, 0.05);
     }
 
-    // セパレーター直後のアイテムは区切り線との視覚的な距離を確保する。
     + .item {
       margin-top: 4px;
     }
@@ -881,6 +889,7 @@ $OPACITY_DISABLED: 0.8;
     &.clinvar {
       color: var(--color-dataset-disease-clinvar);
     }
+
     &.mgend {
       color: var(--color-dataset-disease-mgend);
     }
@@ -964,7 +973,7 @@ $OPACITY_DISABLED: 0.8;
         }
       }
 
-      // MGeND の各解釈種別も同様に固定配置する
+      // MGeND の各解釈種別を固定配置する
       &[data-source='mgend'] {
         &[data-value='PLP'] {
           grid-area: 1 / 1;
@@ -1000,7 +1009,6 @@ $OPACITY_DISABLED: 0.8;
 }
 
 // 疾患検索条件 (#ConditionDiseaseSearch)
-// 疾患名検索フィールドの上部余白を調整する
 #ConditionDiseaseSearch {
   > .container {
     margin-top: 0.5rem;
@@ -1012,6 +1020,8 @@ $OPACITY_DISABLED: 0.8;
 .pathogenicity-editor-view {
   &[data-condition-type='pathogenicity_prediction'] {
     .body {
+      // prediction-value-view の描画領域を確保するため下パディングが必要。
+      // 条件エディター側の .body > padding を上書きするため !important を使用する
       padding: 0 0 75px 0 !important;
     }
 
@@ -1126,7 +1136,6 @@ $OPACITY_DISABLED: 0.8;
 }
 
 // 染色体位置条件エディター (.location-editor-view)
-// 染色体番号選択と座標入力欄のレイアウトを調整する
 .location-editor-view {
   > .body {
     > .row {
@@ -1144,7 +1153,7 @@ $OPACITY_DISABLED: 0.8;
 }
 
 // 数値範囲入力ペア (.range-inputs-view)
-// 最小値〜最大値を「─」で繋いで並べる。single_position モードでは終端を薄く表示する
+// 最小値〜最大値を「─」で繋いで並べる
 .range-inputs-view {
   display: flex;
   place-items: center;

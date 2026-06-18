@@ -2,13 +2,15 @@
   --height-container: var(--height-advanced-search-condition-values-container);
   --height: var(--height-advanced-search-condition-value);
   display: inline-block;
+
   > .condition-item-value-container {
     display: flex;
     gap: 20px;
     justify-content: space-between;
   }
+
   .inner {
-    // 削除ボタン付きのタグでも文字とアイコンの縦位置がずれないよう、タグ内部をflexで中央揃えにする。
+    // 削除ボタン付きのタグでも文字とアイコンの縦位置がずれないよう flex で中央揃えにする
     display: inline-flex;
     gap: 0.2em;
     align-items: center;
@@ -23,20 +25,25 @@
   }
 }
 
-// dataset/genotypeはタグの横に頻度バーを重ねて表示する。
+// dataset/genotype: タグの横に頻度バーを絶対配置で重ねて表示する
 :host([data-condition-type='dataset']),
 :host([data-condition-type='genotype']) {
   position: relative;
   display: block;
-  // dataset/genotypeは同じfrequency-count-value-viewを使うため、bar開始位置も揃える。
+  // flex コンテナ内でも1行を占有して縦スタックを維持するため width: 100% を指定する
+  width: 100%;
+
+  // dataset/genotype は同じ frequency-count-value-view を使うため bar 開始位置も揃える
   frequency-count-value-view {
     position: absolute;
     top: 50%;
     left: var(--left-advanced-search-condition-graph);
     transform: translateY(-50%);
   }
+
   .inner {
     min-width: 50px;
+
     &::before {
       margin-right: 4px;
       font-family: 'Font Awesome 7 Free', sans-serif;
@@ -45,7 +52,8 @@
     }
   }
 }
-// significanceは先頭の略称バッジとラベルを同じタグ内に収める。
+
+// significance: 先頭の略称バッジとラベルを同じタグ内に収める
 :host([data-condition-type='significance']) {
   .inner {
     &::before {
@@ -57,14 +65,17 @@
     }
   }
 }
-// pathogenicity_predictionは子コンポーネント側で見た目を持つため、通常タグの枠を外す。
+
+// pathogenicity_prediction: 子コンポーネント側で見た目を持つため通常タグの枠を外す
 :host([data-condition-type='pathogenicity_prediction']) {
   position: relative;
-  // dataset/genotypeと同様に、グラフコンポーネントを縦中央に揃えるため50%+translateYを使う。
+
+  // dataset/genotype と同様にグラフコンポーネントを縦中央に揃える
   prediction-value-view {
     top: 50%;
     transform: translateY(-50%);
   }
+
   .inner {
     padding: 0;
     background-color: transparent;
@@ -72,16 +83,21 @@
   }
 }
 
-// dataset/genotypeのデータセット種別ごとに、既存の色変数へ合わせる。
+// ──────────────────────────────────────────────────
+// dataset/genotype: データセット種別ごとの色
+// ──────────────────────────────────────────────────
+
 :host([data-condition-type='dataset'][data-value='gem_j_wga']) {
   .inner {
     background-color: var(--color-dataset-gemj-light);
     border-color: var(--color-dataset-gemj);
+
     &::before {
       color: var(--color-dataset-gemj);
     }
   }
 }
+
 :host([data-condition-type='dataset'][data-value^='jga_wgs']),
 :host([data-condition-type='dataset'][data-value='jga_wes']),
 :host([data-condition-type='dataset'][data-value='jga_snp']),
@@ -93,245 +109,275 @@
   .inner {
     background-color: var(--color-dataset-jga-light);
     border-color: var(--color-dataset-jga);
+
     &::before {
       color: var(--color-dataset-jga);
     }
   }
 }
+
 :host([data-condition-type='dataset'][data-value='hgvd']) {
   .inner {
     background-color: var(--color-dataset-hgvd-light);
     border-color: var(--color-dataset-hgvd);
+
     &::before {
       color: var(--color-dataset-hgvd);
     }
   }
 }
+
 :host([data-condition-type='dataset'][data-value='tommo']) {
   .inner {
     background-color: var(--color-dataset-tommo-light);
     border-color: var(--color-dataset-tommo);
+
     &::before {
       color: var(--color-dataset-tommo);
     }
   }
 }
+
 :host([data-condition-type='dataset'][data-value^='ncbn']),
 :host([data-condition-type='genotype'][data-value^='ncbn']) {
   .inner {
     background-color: var(--color-dataset-ncbn-light);
     border-color: var(--color-dataset-ncbn);
+
     &::before {
       color: var(--color-dataset-ncbn);
     }
   }
 }
+
 :host([data-condition-type='dataset'][data-value^='gnomad_genomes']),
 :host([data-condition-type='dataset'][data-value^='gnomad_exomes']) {
   .inner {
     background-color: var(--color-dataset-foreign-light);
     border-color: var(--color-dataset-foreign);
+
     &::before {
       color: var(--color-dataset-foreign);
     }
   }
 }
 
-// Clinical significanceは値コードごとに表示ラベルと色を割り当てる。
+// ──────────────────────────────────────────────────
+// significance: 値コードごとの色と略称バッジ
+// ──────────────────────────────────────────────────
+
 :host([data-condition-type='significance'][data-value='P']) {
   .inner {
     background-color: var(--color-sign-dangerous-light);
     border-color: var(--color-sign-dangerous);
+
     &::before {
       color: var(--color-sign-dangerous);
       content: 'P';
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='LP']) {
   .inner {
     background-color: var(--color-sign-dangerous-light);
     border-color: var(--color-sign-dangerous);
+
     &::before {
       color: var(--color-sign-dangerous);
       content: 'LP';
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='PLP']) {
   .inner {
     background-color: var(--color-sign-lowdangerous-light);
     border-color: var(--color-sign-lowdangerous);
+
     &::before {
       color: var(--color-sign-lowdangerous);
       content: 'P';
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='LPLP']) {
   .inner {
     background-color: var(--color-sign-lowdangerous-light);
     border-color: var(--color-sign-lowdangerous);
+
     &::before {
       color: var(--color-sign-lowdangerous);
       content: 'LP';
     }
   }
 }
-:host([data-condition-type='significance'][data-value='ERA']) {
-  .inner {
-    background-color: var(--color-sign-warning-light);
-    border-color: var(--color-sign-warning);
-    &::before {
-      color: var(--color-sign-warning);
-      content: 'RA';
-    }
-  }
-}
-:host([data-condition-type='significance'][data-value='LRA']) {
-  .inner {
-    background-color: var(--color-sign-warning-light);
-    border-color: var(--color-sign-warning);
-    &::before {
-      color: var(--color-sign-warning);
-      content: 'RA';
-    }
-  }
-}
+
+// ERA/LRA/URA はすべて同色・同バッジ（'RA'）のためまとめる
+:host([data-condition-type='significance'][data-value='ERA']),
+:host([data-condition-type='significance'][data-value='LRA']),
 :host([data-condition-type='significance'][data-value='URA']) {
   .inner {
     background-color: var(--color-sign-warning-light);
     border-color: var(--color-sign-warning);
+
     &::before {
       color: var(--color-sign-warning);
       content: 'RA';
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='US']) {
   .inner {
     background-color: var(--color-sign-unknown-light);
     border-color: var(--color-sign-unknown);
+
     &::before {
       color: var(--color-sign-unknown);
       content: 'US';
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='LB']) {
   .inner {
     background-color: var(--color-sign-normal-light);
     border-color: var(--color-sign-normal);
+
     &::before {
       color: var(--color-sign-normal);
       content: 'LB';
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='B']) {
   .inner {
     background-color: var(--color-sign-safe-light);
     border-color: var(--color-sign-safe);
+
     &::before {
       color: var(--color-sign-safe);
       content: 'B';
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='CI']) {
   .inner {
     background-color: var(--color-sign-modifier-light);
     border-color: var(--color-sign-modifier);
+
     &::before {
       color: var(--color-sign-modifier);
       content: 'CI';
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='DR']) {
   .inner {
     background-color: var(--color-sign-other-light);
     border-color: var(--color-sign-other);
+
     &::before {
       color: var(--color-sign-other);
       content: 'DR';
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='CS']) {
   .inner {
     background-color: var(--color-sign-other-light);
     border-color: var(--color-sign-other);
+
     &::before {
       color: var(--color-sign-other);
       content: 'CS';
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='RF']) {
   .inner {
     background-color: var(--color-sign-other-light);
     border-color: var(--color-sign-other);
+
     &::before {
       color: var(--color-sign-other);
       content: 'RF';
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='A']) {
   .inner {
     background-color: var(--color-sign-other-light);
     border-color: var(--color-sign-other);
+
     &::before {
       color: var(--color-sign-other);
       content: 'A';
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='PR']) {
   .inner {
     background-color: var(--color-sign-other-light);
     border-color: var(--color-sign-other);
+
     &::before {
       color: var(--color-sign-other);
       content: 'PR';
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='AF']) {
   .inner {
     background-color: var(--color-sign-other-light);
     border-color: var(--color-sign-other);
+
     &::before {
       color: var(--color-sign-other);
       content: 'AF';
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='O']) {
   .inner {
     background-color: white;
     border-color: var(--color-gray);
+
     &::before {
       content: 'O';
       border-color: var(--color-gray);
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='NP']) {
   .inner {
     background-color: white;
     border-color: var(--color-gray);
+
     &::before {
       content: 'NP';
       border-color: var(--color-gray);
     }
   }
 }
+
 :host([data-condition-type='significance'][data-value='AN']) {
   .inner {
     background-color: white;
     border-color: var(--color-gray);
+
     &::before {
       content: 'AN';
       border-color: var(--color-gray);
@@ -339,7 +385,9 @@
   }
 }
 
-// 削除ボタンは編集中だけ外側の::part指定で表示し、表示時はタグ内で中央に揃える。
+// 削除ボタンは編集中だけ外側の ::part 指定で inline-flex に切り替えて表示する
+// display: none の状態でも align-items/justify-content を定義しておくことで
+// ::part で表示を切り替えた際に即座に有効になる
 button.delete {
   position: relative;
   display: none;
