@@ -277,6 +277,10 @@
           flex-direction: column;
           width: 100px;
 
+          // リサイズ時のちらつきを防ぐため transition を無効化する。
+          // （JS なしの CSS のみでは breakpoint 切替時の opacity アニメーションを抑制できないため）
+          transition: none;
+
           // メニューグループ（ul.menu）：縦積みに切り替え
           ul.menu {
             flex-direction: column;
@@ -319,7 +323,7 @@
               // 言語切り替え：display:block の上書きを戻し flex を再適用
               &.languageswitcher {
                 display: flex;
-                padding: 4px 10px;
+                padding: 4px 6px;
               }
             }
           }

@@ -71,11 +71,11 @@ header#GlobalHeader
               a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else
           ul.menu
+            li.menu-button.login
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
+
             li.menu-button.languageswitcher(class={"en": locals.language === "en" , "ja": locals.language === "ja"})
               a.language.en(href=`/doc/${locals.currentPage}`)
                 | en
               a.language.ja(href=`/doc/ja/${locals.currentPage}`)
                 | ja
-
-            li.menu-button.login 
-              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
