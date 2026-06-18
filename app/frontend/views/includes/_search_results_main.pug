@@ -18,22 +18,16 @@
     //- Simple Search のコンテンツは JS が動的に挿入する（初期は空）
     #SimpleSearchView.section(data-tab-id="simple")
 
-    //-
-      Advanced Search のコンテンツ領域
-      .collapse-view を併用することで、条件ビルダーの折りたたみ（.-collapsed）に対応する。
-      .collapsecontent が非表示になると #AdvancedSearchBuilderView ごと消え、
-      .sectionscontainer の高さが縮小し main#SearchResultsView が上に詰まる。
-    #AdvancedSearchView.section.collapse-view(data-tab-id="advanced")
-      .collapsecontent
-
-        //-
-          条件ビルダーのルートコンテナ
-          .section クラスは JS の条件管理コードから参照されるが、
-          module-tabs-view の > .section ルール（直接子セレクター）には該当しないため
-          position:absolute は適用されない。
-        #AdvancedSearchBuilderView.section
-          //- 条件行・グループは JS（AdvancedSearchBuilderView.ts）が .inner に動的挿入する
-          .inner
+    //- Advanced Search のコンテンツ領域
+    #AdvancedSearchView.section(data-tab-id="advanced")
+      //-
+        条件ビルダーのルートコンテナ
+        .section クラスは JS の条件管理コードから参照されるが、
+        module-tabs-view の > .section ルール（直接子セレクター）には該当しないため
+        position:absolute は適用されない。
+      #AdvancedSearchBuilderView.section
+        //- 条件行・グループは JS（AdvancedSearchBuilderView.ts）が .inner に動的挿入する
+        .inner
 
 //-
   検索結果エリア

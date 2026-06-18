@@ -70,19 +70,4 @@
     }
   }
 
-  // .collapsebutton（絶対配置）の基点として position: relative が必要。
-  &.collapse-view {
-    position: relative;
-
-    > .collapsebutton {
-      top: 16px;
-      left: 5px;
-    }
-
-    &.-collapsed {
-      .collapsebutton {
-        top: 13px;
-      }
-    }
-  }
 }

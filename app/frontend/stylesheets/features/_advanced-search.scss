@@ -801,12 +801,46 @@ $OPACITY_DISABLED: 0.8;
       line-height: 18px;
     }
 
-    &.collapse-view {
+    // グループ行は details/summary でツリーを開閉するため block レイアウトに切り替える
+    &.-hierarchic {
       display: block;
 
-      > .collapsebutton {
-        top: 6px;
-        left: -7px;
+      details {
+        > summary {
+          // summary のデフォルトマーカーを非表示にし、::before で三角アイコンに置き換える
+          position: absolute;
+          top: 6px;
+          left: -7px;
+          cursor: pointer;
+          list-style: none;
+
+          &::-webkit-details-marker {
+            display: none;
+          }
+
+          &::before {
+            display: block;
+            width: 0;
+            height: 0;
+            content: '';
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+            border-left: 5px solid var(--color-black);
+            // 閉じた状態（▶）をデフォルトとし、[open] で回転して ▼ にする
+            transform: rotate(0deg);
+            transition: transform var(--gui-duration);
+          }
+        }
+
+        // details が開いたとき三角を ▼ に回転する
+        &[open] > summary::before {
+          transform: rotate(90deg);
+        }
+
+        // 子リストを親リストと同様に負マージンで全幅に広げたうえで左インデントを加える
+        > ul.checklist-values {
+          padding-left: 1rem;
+        }
       }
     }
   }
