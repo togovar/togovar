@@ -58,154 +58,6 @@
 
   > .content {
     padding: 6px var(--padding-panel-view) 10px;
-
-    // ──────────────────────────────────────────────────
-    // プロパティリスト（.property-list）
-    // ラベル（dt）＋値（dd）ペアの一覧。
-    // ──────────────────────────────────────────────────
-
-    // すべての dt が同じ列幅を共有するために grid を使う
-    // flex を行ごとに使う構造では列幅が行間で揃わないため grid が必要
-    > .property-list {
-      display: grid;
-      grid-template-columns: max-content 1fr;
-      align-items: start;
-
-      > div {
-        // div を透過させて dt/dd をグリッドの直接子にする
-        // これによりすべての dt が同じ grid column を占め、コロンが縦に揃う
-        display: contents;
-
-        > dt,
-        > dd {
-          padding-top: 2px;
-          padding-bottom: 6px;
-          line-height: 14px;
-        }
-
-        &:first-child {
-          > dt,
-          > dd {
-            padding-top: 6px;
-          }
-        }
-
-        // 複数グループがある場合、2つ目以降のグループ先頭に付与するクラス
-        &.-group-start {
-          > dt,
-          > dd {
-            padding-top: 6px;
-            border-top: solid 1px var(--color-separator-sub);
-          }
-        }
-
-        // .-group-start の直前要素にも下余白を付与する（CSS :has が必要）
-        &:has(+ .-group-start) {
-          > dt,
-          > dd {
-            padding-bottom: 6px;
-          }
-        }
-
-        // ラベル列：最長ラベルに合わせた列幅に右揃えでコロンを揃える
-        > dt {
-          padding-right: 0.5em;
-          font-size: 10px;
-          font-weight: bold;
-          color: var(--color-gray);
-          text-align: right;
-
-          &::after {
-            content: ':';
-          }
-        }
-
-        // 値列：ブラウザデフォルトの左マージンを打ち消す
-        > dd {
-          margin: 0;
-
-          > ul {
-            padding-block-start: 0;
-            padding-inline-start: 0;
-            margin-bottom: 0;
-
-            > li {
-              display: block;
-              word-break: break-all;
-            }
-          }
-        }
-      }
-    }
-
-    // ──────────────────────────────────────────────────
-    // データセット別アレル頻度テーブル（.frequency-table）
-    // ──────────────────────────────────────────────────
-
-    > .frequency-table {
-      width: 100%;
-      // tr の border-bottom を有効にするために必要（separate モデルでは tr の border は無視される）
-      border-collapse: collapse;
-
-      > thead {
-        > tr {
-          > th {
-            font-size: 10px;
-            color: var(--color-gray);
-            text-align: left;
-          }
-        }
-      }
-
-      > tbody {
-        > tr {
-          > td {
-            line-height: 18px;
-
-            &:first-child {
-              font-weight: bold;
-            }
-
-            .dataset-icon {
-              display: inline-block;
-              margin-right: 0.2em;
-              vertical-align: middle;
-
-              > .properties {
-                width: inherit;
-              }
-            }
-
-            &.alt,
-            &.total,
-            &.frequency {
-              text-align: right;
-            }
-
-            &.alt {
-              font-weight: bold;
-              color: var(--color-mutation-alt);
-
-              // "alt / total" の区切り文字を疑似要素で追加する
-              &::after {
-                margin-left: 0.5em;
-                font-size: 10px;
-                color: var(--color-black);
-                content: '/';
-              }
-            }
-
-            &.frequency {
-              font-weight: bold;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  + .panel-view {
-    margin-top: 5px;
   }
 
   label {
@@ -220,6 +72,10 @@
       height: 13px;
       margin: 0;
     }
+  }
+
+  + .panel-view {
+    margin-top: 5px;
   }
 
   // ──────────────────────────────────────────────────
@@ -318,18 +174,6 @@
           transform: none;
           transition: none;
         }
-      }
-    }
-  }
-}
-
-// Advanced Search モードでは条件パネルのクリアボタンを非表示にする
-// Advanced Search は条件ビルダーで管理するため、パネル単位のクリアは不要
-body[data-search-mode='advanced'] {
-  .panel-view {
-    > .title {
-      > .clear-button {
-        display: none;
       }
     }
   }
