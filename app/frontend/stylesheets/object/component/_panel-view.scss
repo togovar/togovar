@@ -64,33 +64,51 @@
     // ラベル（dt）＋値（dd）ペアの一覧。panel-view 内でのみ使用するためここに配置する。
     // ──────────────────────────────────────────────────
 
-    // dl/dt/dd はデフォルトで縦積みになるため、div を flex コンテナにして横並びにする
+    // すべての dt が同じ列幅を共有するために grid を使う
+    // flex を行ごとに使う構造では列幅が行間で揃わないため grid が必要
     > .property-list {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      align-items: start;
+
       > div {
-        display: flex;
-        align-items: flex-start;
-        padding-top: 2px;
-        padding-bottom: 6px;
-        line-height: 14px;
+        // div を透過させて dt/dd をグリッドの直接子にする
+        // これによりすべての dt が同じ grid column を占め、コロンが縦に揃う
+        display: contents;
+
+        > dt,
+        > dd {
+          padding-top: 2px;
+          padding-bottom: 6px;
+          line-height: 14px;
+        }
 
         &:first-child {
-          padding-top: 6px;
+          > dt,
+          > dd {
+            padding-top: 6px;
+          }
         }
 
         // 複数グループがある場合、2つ目以降のグループ先頭に付与するクラス
         &.-group-start {
-          padding-top: 6px;
-          border-top: solid 1px var(--color-separator-sub);
+          > dt,
+          > dd {
+            padding-top: 6px;
+            border-top: solid 1px var(--color-separator-sub);
+          }
         }
 
         // .-group-start の直前要素にも下余白を付与する（CSS :has が必要）
         &:has(+ .-group-start) {
-          padding-bottom: 6px;
+          > dt,
+          > dd {
+            padding-bottom: 6px;
+          }
         }
 
-        // ラベル列：右揃えで固定幅、コロン付き
+        // ラベル列：最長ラベルに合わせた列幅に右揃えでコロンを揃える
         > dt {
-          flex-shrink: 0;
           padding-right: 0.5em;
           font-size: 10px;
           font-weight: bold;
