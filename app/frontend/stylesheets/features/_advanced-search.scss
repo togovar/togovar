@@ -348,6 +348,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
         > .values-container {
           > .mgend-wrapper {
             display: flex;
+            flex-basis: 100%;
 
             > span {
               min-width: 45px;
@@ -361,6 +362,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
 
           > .clinvar-wrapper {
             display: flex;
+            flex-basis: 100%;
 
             > span {
               min-width: 45px;

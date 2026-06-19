@@ -71,8 +71,6 @@
 :host([data-condition-type='significance']) {
   .inner {
     &::before {
-      position: relative;
-      top: -1px;
       margin-right: 4px;
       margin-left: -2px;
       font-size: 10px;
