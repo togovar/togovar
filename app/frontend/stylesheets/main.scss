@@ -20,16 +20,16 @@
 @use 'object/component/range-slider';
 
 // 画面別スタイル — 各機能ページ固有のコンポーネントをまとめたもの
-@use 'features/activity-indicator';
-@use 'features/document';
-@use 'features/advanced-search';
-@use 'features/detail';
-@use 'features/detail-header';
-@use 'features/global-header';
-@use 'features/messages';
-@use 'features/results';
-@use 'features/search-field';
-@use 'features/sidebar';
-@use 'features/simple-search';
+@use 'object/project/activity-indicator';
+@use 'object/project/document';
+@use 'object/project/advanced-search';
+@use 'object/project/detail';
+@use 'object/project/detail-header';
+@use 'object/project/global-header';
+@use 'object/project/messages';
+@use 'object/project/results';
+@use 'object/project/search-field';
+@use 'object/project/sidebar';
+@use 'object/project/simple-search';
 
 @use 'object/utility/helper';
