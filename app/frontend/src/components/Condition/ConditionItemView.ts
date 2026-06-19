@@ -90,6 +90,7 @@ export class ConditionItemView extends BaseConditionView {
     this._toggleGlobalKeydown(false);
     this._events.abort();
     storeManager.setData('showModal', false);
+    this._conditionValues?.destroy();
     super.remove();
   }
 
@@ -408,14 +409,14 @@ export class ConditionItemView extends BaseConditionView {
       if (this._isFirstTime) {
         this.remove();
       } else {
-        this._revertChanges();
+        this.revertChanges();
         this.doneEditing();
       }
     }
   };
 
   /** 編集をキャンセルするときにエディタの値とrelationを直前の確定値へ戻す。 */
-  private _revertChanges(): void {
+  revertChanges(): void {
     for (const editor of this._conditionValues.editors) editor.restore();
     this._setRelation(
       this._relationSupported ? this._keepLastRelation : undefined
