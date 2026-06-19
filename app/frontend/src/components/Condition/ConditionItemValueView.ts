@@ -14,6 +14,40 @@ export class ConditionItemValueView extends LitElement {
   @property({ type: String }) value: string = '';
   @property({ type: Boolean }) deleteButton: boolean = false;
 
+  /**
+   * レンダリング後に `.inner` の幅を計測し、同じ `.values-container` 内の全
+   * condition-item-value-view の最大幅を `--left-advanced-search-condition-graph`
+   * としてコンテナに設定する。CSS カスタムプロパティはシャドウ境界を越えて継承されるため、
+   * 各コンポーネント内の `frequency-count-value-view` の開始位置が自動的に揃う。
+   */
+  protected override updated(): void {
+    if (this.conditionType !== 'dataset' && this.conditionType !== 'genotype') return;
+    requestAnimationFrame(() => {
+      this._alignFrequencyBarStart();
+    });
+  }
+
+  private _alignFrequencyBarStart(): void {
+    const valuesContainer = this.closest<HTMLElement>('.values-container');
+    if (!valuesContainer) return;
+
+    let maxWidth = 0;
+    for (const view of valuesContainer.querySelectorAll('condition-item-value-view')) {
+      const inner = view.shadowRoot?.querySelector<HTMLElement>('.inner');
+      if (!inner) continue;
+      maxWidth = Math.max(maxWidth, inner.scrollWidth);
+    }
+
+    if (maxWidth === 0) return;
+
+    // .inner の右端から頻度バーまでの最小余白（px）
+    const GAP = 8;
+    valuesContainer.style.setProperty(
+      '--left-advanced-search-condition-graph',
+      `${Math.ceil(maxWidth) + GAP}px`
+    );
+  }
+
   private _handleDelete(e: Event): void {
     e.stopPropagation();
     this.dispatchEvent(

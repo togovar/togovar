@@ -6,7 +6,6 @@
   > .condition-item-value-container {
     display: flex;
     gap: 20px;
-    justify-content: space-between;
   }
 
   .inner {
@@ -25,24 +24,30 @@
   }
 }
 
-// dataset/genotype: タグの横に頻度バーを絶対配置で重ねて表示する
+// dataset/genotype: タグと頻度バーを2列グリッドで横並びにする
+// 絶対配置にすると overflow: auto の親でもスクロール幅に反映されないため通常フローを使う
 :host([data-condition-type='dataset']),
 :host([data-condition-type='genotype']) {
-  position: relative;
-  display: block;
-  // flex コンテナ内でも1行を占有して縦スタックを維持するため width: 100% を指定する
-  width: 100%;
+  // flex-basis: 100% で .values-container（flex-wrap: wrap）の1行を占有して縦スタックさせる
+  // min-width: max-content がコンテンツ幅を下限として保ち、親の overflow: auto でスクロール可能にする
+  flex-basis: 100%;
+  min-width: max-content;
 
-  // dataset/genotype は同じ frequency-count-value-view を使うため bar 開始位置も揃える
-  frequency-count-value-view {
-    position: absolute;
-    top: 50%;
-    left: var(--left-advanced-search-condition-graph);
-    transform: translateY(-50%);
+  // :host に grid を適用すると frequency-count-value-view の描画に影響するため
+  // 内側の .condition-item-value-container にグリッドを適用する
+  > .condition-item-value-container {
+    display: grid;
+    // 第1列: 最大ラベル幅に揃えた固定幅（JS が --left-advanced-search-condition-graph を動的に更新）
+    // 第2列: 頻度グラフのコンテンツ幅（max-content で縮まない）
+    grid-template-columns: var(--left-advanced-search-condition-graph, 142px) max-content;
+    column-gap: 0;
+    align-items: center;
   }
 
   .inner {
-    min-width: 50px;
+    // グリッド第1列内でコンテンツ幅に収める（列幅まで引き伸ばさない）
+    justify-self: start;
+    white-space: nowrap;
 
     &::before {
       margin-right: 4px;
