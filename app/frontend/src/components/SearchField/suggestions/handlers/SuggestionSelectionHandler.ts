@@ -24,12 +24,12 @@ export class SuggestionSelectionHandler {
     const rawLabel =
       suggestion[this.host._searchFieldOptions.valueMappings.labelKey];
 
-    // インデックス署名がunknownのため、string型へ絞り込んでからフォーマットに渡す
+    // rawValue は数値の場合もあるため（gene id など）、String() で文字列化してからフォーマットに渡す
     this.host.value = this._formatSuggestionValue(
-      typeof rawValue === 'string' ? rawValue : ''
+      rawValue != null ? String(rawValue) : ''
     );
     this.host.label = this._formatSuggestionValue(
-      typeof rawLabel === 'string' ? rawLabel : ''
+      rawLabel != null ? String(rawLabel) : ''
     );
 
     this.host.suppressSuggestions = true;

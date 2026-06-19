@@ -46,7 +46,7 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     this._searchFieldView.addEventListener(
       'new-suggestion-selected',
       (e: Event) => {
-        const customEvent = e as CustomEvent<{ id: number; label: string }>;
+        const customEvent = e as CustomEvent<{ id: string; label: string }>;
         this._handleSuggestSelect(customEvent);
       }
     );
@@ -80,9 +80,9 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
    * isOnly=true で既存value-viewを上書きすることで、遺伝子は常に1件だけ選択できるようにする。
    */
   private _handleSuggestSelect = (
-    e: CustomEvent<{ id: number; label: string }>
+    e: CustomEvent<{ id: string; label: string }>
   ): void => {
-    this._value = String(e.detail.id);
+    this._value = e.detail.id;
     this._label = e.detail.label;
     this.addValueView(this._value, this._label, true, false);
 
