@@ -177,7 +177,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   /** セクションDOM・レンジスライダーを生成して初期化する。 */
   private _initializeComponent(): void {
     this.createSectionEl('frequency-count-editor-view', () => [
-      createEl('header', { text: 'Specify range' }),
+      createEl('header', { class: 'section-header', text: 'Specify range' }),
       createEl('div', {
         class: 'section-content',
         children: this._createBodyElements(this._radioGroupName),

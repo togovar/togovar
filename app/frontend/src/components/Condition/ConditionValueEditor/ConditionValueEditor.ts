@@ -34,7 +34,7 @@ export abstract class ConditionValueEditor {
     content: SectionContent
   ): HTMLElement {
     const sectionEl = createEl('section', {
-      class: className,
+      class: [className, 'editor-panel'],
       dataset: { conditionType: String(this.conditionType) },
     });
 

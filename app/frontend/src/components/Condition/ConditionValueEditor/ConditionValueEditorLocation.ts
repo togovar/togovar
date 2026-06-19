@@ -143,7 +143,7 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
     const positionInputRow = this._createPositionInputRow();
 
     this.createSectionEl('location-editor-view', [
-      createEl('header', { text: `Set ${this.conditionType}` }),
+      createEl('header', { class: 'section-header', text: `Set ${this.conditionType}` }),
       createEl('div', {
         class: 'section-content',
         children: [modeToggleRow, positionInputRow],

@@ -38,7 +38,7 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
   /** セクションDOMを生成し、disease-search コンポーネントを body 要素へ配置する。 */
   private _initializeElements(): void {
     this.createSectionEl('text-field-editor-view', () => [
-      createEl('header', { text: `Select ${this.conditionType}` }),
+      createEl('header', { class: 'section-header', text: `Select ${this.conditionType}` }),
       createEl('div', { class: 'section-content' }),
     ]);
 

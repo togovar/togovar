@@ -25,7 +25,7 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     super(conditionValues, conditionItemView);
 
     this.createSectionEl('text-field-editor-view', () => [
-      createEl('header', { text: `Search for ${this.conditionType}` }),
+      createEl('header', { class: 'section-header', text: `Search for ${this.conditionType}` }),
       createEl('div', { class: 'section-content' }),
     ]);
 

@@ -24,11 +24,11 @@
   color: var(--color-black);
   border-top: solid 1px var(--color-separator);
 
-  > .sections {
+  > .condition-sections {
     border-bottom: solid 1px var(--color-separator);
 
-    > section {
-      > header {
+    > .editor-panel {
+      > .section-header {
         padding: 0 var(--padding-side);
         font-weight: bold;
         background-color: #cdcdcc;

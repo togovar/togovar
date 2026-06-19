@@ -103,7 +103,7 @@ export default class ConditionValues {
    */
   private _buildDOM(): void {
     const sections = (this._sectionsEl = createEl('div', {
-      class: 'sections',
+      class: 'condition-sections',
     }));
 
     const buttons = createEl('div', {

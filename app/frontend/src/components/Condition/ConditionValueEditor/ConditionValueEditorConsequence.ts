@@ -43,7 +43,7 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
       this.conditionType === CONDITION_TYPE.consequence;
 
     this.createSectionEl('columns-editor-view', () => [
-      createEl('header', { text: `Select ${this.conditionType}` }),
+      createEl('header', { class: 'section-header', text: `Select ${this.conditionType}` }),
       createEl('div', {
         class: 'section-content',
         children: [

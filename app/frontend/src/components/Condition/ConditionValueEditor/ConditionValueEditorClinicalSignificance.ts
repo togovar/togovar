@@ -49,7 +49,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
     }
 
     this.createSectionEl('clinical-significance-view', () => [
-      createEl('header', { text: LABELS.selectHeader(this.conditionType) }),
+      createEl('header', { class: 'section-header', text: LABELS.selectHeader(this.conditionType) }),
       createEl('div', {
         class: 'buttons',
         children: [

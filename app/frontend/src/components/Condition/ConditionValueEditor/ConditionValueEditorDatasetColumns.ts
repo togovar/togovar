@@ -132,7 +132,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
    */
   private _initializeUI(): void {
     this.createSectionEl('columns-editor-view', () => [
-      createEl('header', { text: `Select ${this.conditionType}` }),
+      createEl('header', { class: 'section-header', text: `Select ${this.conditionType}` }),
       createEl('div', {
         class: 'section-content',
         children: [createEl('div', { class: 'columns' })],
