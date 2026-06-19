@@ -47,11 +47,11 @@
       // 各ブロックの高さを揃えるため stretch を使う
       // align-items: stretch;
       // min-height: var(--height-advanced-search-condition);
-      // padding-right: 8px;
+      padding-right: 8px;
       font-size: 12px;
       color: var(--color-black);
       background-color: var(--color-bg-subtle);
-      // border-radius: var(--corner-radius);
+      border-radius: var(--corner-radius);
 
       // 条件種別ラベル（黒背景・白文字・グラブカーソルでD&D可能を示す）
       > .condition-label {
