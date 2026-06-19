@@ -361,11 +361,11 @@ export class ConditionItemView extends BaseConditionView {
       : null;
 
     this._summaryEl = createEl('div', {
-      class: 'summary',
+      class: 'condition-header',
       children: [
         // TODO: In the future, implement drag-and-drop ordering.
         (this._classificationEl = createEl('div', {
-          class: 'classification',
+          class: 'condition-label',
           text: cond.label,
         })),
         ...(relationChild ? [relationChild] : []),
