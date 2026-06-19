@@ -51,7 +51,7 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
       }),
 
       createEl('ul', {
-        class: ['checkboxes', 'body'],
+        class: ['checkboxes', 'section-content'],
         children: master.values.map((item) =>
           createEl('li', {
             dataset: { value: item.value },

@@ -120,12 +120,12 @@ export abstract class ConditionValueEditor {
 
   /**
    * エディタのメインコンテンツ領域。
-   * createEl で .body クラスを持つ要素として必ず生成するため、selectRequired で確実に取得できる。
+   * createEl で .section-content クラスを持つ要素として必ず生成するため、selectRequired で確実に取得できる。
    */
   protected get bodyEl(): HTMLElement {
     return selectRequired<HTMLElement>(
       this.sectionEl,
-      ':scope > .body',
+      ':scope > .section-content',
       'ConditionValueEditor.bodyEl'
     );
   }

@@ -45,7 +45,7 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
     this.createSectionEl('columns-editor-view', () => [
       createEl('header', { text: `Select ${this.conditionType}` }),
       createEl('div', {
-        class: 'body',
+        class: 'section-content',
         children: [
           createEl('div', { class: 'columns' }),
           // CSS レイアウト上の空き領域として確保する（説明テキスト表示用）。

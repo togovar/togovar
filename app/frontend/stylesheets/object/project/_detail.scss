@@ -492,7 +492,7 @@ $CHROM_WIDTH_BAND_LABEL: 32px;
 // 列選択エディター (.columns-editor-view)
 // 詳細ページで表示する列を複数列のカスケードから選択させる
 .columns-editor-view {
-  > .body {
+  > .section-content {
     display: flex;
     padding: 0 !important;
     overflow: auto;

@@ -19,7 +19,7 @@ export class ConditionValueEditorVariantID extends ConditionValueEditor {
 
     this.createSectionEl('text-field-editor-view', () => [
       createEl('header', { text: `Search for ${this.conditionType}` }),
-      createEl('div', { class: 'body' }),
+      createEl('div', { class: 'section-content' }),
     ]);
 
     this._searchFieldView = new SearchField(

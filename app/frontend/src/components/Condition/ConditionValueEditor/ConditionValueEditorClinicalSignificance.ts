@@ -68,7 +68,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
         text: LABELS.mgend,
       }),
       (this._mgendUl = createEl('ul', {
-        class: ['checkboxes', 'body'],
+        class: ['checkboxes', 'section-content'],
         dataset: { type: 'clinical-significance', source: 'mgend' },
       })),
       createEl('hr'),
@@ -77,7 +77,7 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
         text: LABELS.clinvar,
       }),
       (this._clinvarUl = createEl('ul', {
-        class: ['checkboxes', 'body'],
+        class: ['checkboxes', 'section-content'],
         dataset: { type: 'clinical-significance', source: 'clinvar' },
       })),
     ]);

@@ -179,7 +179,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     this.createSectionEl('frequency-count-editor-view', () => [
       createEl('header', { text: 'Specify range' }),
       createEl('div', {
-        class: 'body',
+        class: 'section-content',
         children: this._createBodyElements(this._radioGroupName),
       }),
     ]);

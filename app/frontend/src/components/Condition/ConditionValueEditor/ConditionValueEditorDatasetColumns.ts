@@ -134,7 +134,7 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
     this.createSectionEl('columns-editor-view', () => [
       createEl('header', { text: `Select ${this.conditionType}` }),
       createEl('div', {
-        class: 'body',
+        class: 'section-content',
         children: [createEl('div', { class: 'columns' })],
       }),
     ]);

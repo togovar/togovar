@@ -393,7 +393,7 @@ export class ConditionItemView extends BaseConditionView {
     });
 
     const body = createEl('div', {
-      class: 'body',
+      class: 'section-content',
       children: [
         this._summaryEl,
         (this._editorEl = createEl('div', {

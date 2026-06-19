@@ -34,7 +34,7 @@
         background-color: #cdcdcc;
       }
 
-      > .body {
+      > .section-content {
         padding: 4px var(--padding-side);
 
         &[data-type='clinical-significance'] {
@@ -44,10 +44,6 @@
         > .row {
           display: flex;
           place-items: center;
-        }
-
-        label {
-          margin-bottom: 0;
         }
 
         .container {
@@ -112,7 +108,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
   position: relative;
   margin-bottom: 3px;
 
-  > .body {
+  > .section-content {
     position: relative;
     background-color: white;
     border-radius: $CORNER_RADIUS;
@@ -232,7 +228,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
 
   &.-editing {
     // 編集中は行本体をバックドロップより前面に出し、値タグごとの削除ボタンを表示する
-    > .body {
+    > .section-content {
       z-index: calc(var(--z-index-editing-condition) + 1);
 
       > .summary {
@@ -269,7 +265,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
 
   &[data-relation='eq'],
   &[data-relation='ne'] {
-    > .body {
+    > .section-content {
       > .summary {
         > .relation {
           position: relative;
@@ -302,7 +298,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
 
   &[data-relation='ne'] {
     // ne（否定）は斜線と無効色で eq との差を視覚的に出す
-    > .body {
+    > .section-content {
       > .summary {
         > .classification {
           background-color: var(--color-disable-deep);
@@ -342,7 +338,7 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
 
   &[data-classification='significance'] {
     // 疾患系の値はデータセット名と値を並べるため専用 wrapper の幅を揃える
-    > .body {
+    > .section-content {
       > .summary {
         > .values-container {
           > .mgend-wrapper {
@@ -880,9 +876,9 @@ $OPACITY_DISABLED: 0.8;
 // AlphaMissense などの予測ツール別タブで閾値を選択させる
 .pathogenicity-editor-view {
   &[data-condition-type='pathogenicity_prediction'] {
-    .body {
+    .section-content {
       // prediction-value-view の描画領域を確保するため下パディングが必要。
-      // 条件エディター側の .body > padding を上書きするため !important を使用する
+      // 条件エディター側の .section-content > padding を上書きするため !important を使用する
       padding: 0 0 75px 0 !important;
     }
 
@@ -923,7 +919,7 @@ $OPACITY_DISABLED: 0.8;
 // 頻度・カウント条件エディター (.frequency-count-editor-view)
 // 頻度レンジ選択と個体数カウント入力の切り替えを制御する
 .frequency-count-editor-view {
-  > .body {
+  > .section-content {
     > section {
       + section {
         margin-top: 5px;
@@ -998,7 +994,7 @@ $OPACITY_DISABLED: 0.8;
 
 // 染色体位置条件エディター (.location-editor-view)
 .location-editor-view {
-  > .body {
+  > .section-content {
     > .row {
       column-gap: 5px;
       line-height: var(--height-inline);

@@ -145,7 +145,7 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
     this.createSectionEl('location-editor-view', [
       createEl('header', { text: `Set ${this.conditionType}` }),
       createEl('div', {
-        class: 'body',
+        class: 'section-content',
         children: [modeToggleRow, positionInputRow],
       }),
     ]);
