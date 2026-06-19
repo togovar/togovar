@@ -79,10 +79,16 @@ export class ScrollBarRenderer {
 
   /**
    * 現在位置ラベルを更新する。
+   * 表示値はビューポートの最終行番号（offset + visibleRowCount）とし、
+   * 最下部では totalRecordCount と一致する。
    * 値が変わっていない場合は DOM を触らずスキップし、不要なレイアウト再計算を防ぐ。
    */
-  updatePositionLabel(offset: number): void {
-    const value = offset + 1;
+  updatePositionLabel(
+    offset: number,
+    visibleRowCount: number,
+    totalRecordCount: number
+  ): void {
+    const value = Math.min(offset + visibleRowCount, totalRecordCount);
     if (value === this.lastPositionValue) return;
     this.lastPositionValue = value;
     this.positionLabel.textContent = String(value);
@@ -106,10 +112,15 @@ export class ScrollBarRenderer {
    * タッチスクロール中のリアルタイムフィードバック用にスクロールバーを更新する。
    * active クラスと position ラベルも同時に反映する。
    */
-  applyScrollBarStyles(calculation: ScrollBarCalculation, offset: number): void {
+  applyScrollBarStyles(
+    calculation: ScrollBarCalculation,
+    offset: number,
+    visibleRowCount: number,
+    totalRecordCount: number
+  ): void {
     this.scrollBarElement.style.height = `${calculation.barHeight}px`;
     this.scrollBarElement.style.top = `${calculation.barTop}px`;
-    this.updatePositionLabel(offset);
+    this.updatePositionLabel(offset, visibleRowCount, totalRecordCount);
     this.container.classList.add(ScrollBarRenderer.CLASS_ACTIVE);
   }
 

@@ -94,7 +94,9 @@ export class ResultsScrollBar {
    * 同期を省くと次のwheelイベントで古い座標から計算が始まり、意図しない位置ジャンプが起きる。
    */
   offset(offset: number): void {
-    this.renderer.updatePositionLabel(offset);
+    const visibleRowCount = this.getStoreData('rowCount', 0);
+    const totalRecordCount = this.getStoreData('numberOfRecords', 0);
+    this.renderer.updatePositionLabel(offset, visibleRowCount, totalRecordCount);
     this.synchronizeScrollBarWithStore();
     this.lastScrollPosition = offset * TR_HEIGHT;
 
@@ -239,7 +241,7 @@ export class ResultsScrollBar {
       visibleRowCount,
       totalRecordCount
     );
-    this.renderer.applyScrollBarStyles(calculation, offset);
+    this.renderer.applyScrollBarStyles(calculation, offset, visibleRowCount, totalRecordCount);
   }
 
   /**
@@ -335,10 +337,14 @@ export class ResultsScrollBar {
       return;
     }
 
-    const availableHeight = visibleRowCount * TR_HEIGHT;
-    const offsetRate = ui.position.top / availableHeight;
+    // calculateScrollbarDimensions の逆変換: barTop = offset/maxOffset * availableScrollSpace
+    // → offset = top / availableScrollSpace * maxOffset
+    const viewportHeight = visibleRowCount * TR_HEIGHT;
+    const scrollbarHeight = this.scrollBarElement.offsetHeight;
+    const availableScrollSpace = Math.max(1, viewportHeight - scrollbarHeight);
+    const maxOffset = Math.max(0, totalRecordCount - visibleRowCount);
 
-    let offset = Math.ceil(offsetRate * totalRecordCount);
+    let offset = Math.round((ui.position.top / availableScrollSpace) * maxOffset);
     offset = constrainRowOffsetToValidRange(
       offset,
       visibleRowCount,
