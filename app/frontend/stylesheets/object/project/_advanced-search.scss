@@ -895,44 +895,12 @@ $OPACITY_DISABLED: 0.8;
 
 // 病原性予測条件 (.pathogenicity-editor-view)
 // AlphaMissense などの予測ツール別タブで閾値を選択させる
+// タブUIのスタイルは Shadow DOM 内で完結するため tab-view.scss で管理する
 .pathogenicity-editor-view {
-  &[data-condition-type='pathogenicity_prediction'] {
-    .section-content {
-      // prediction-value-view の描画領域を確保するため下パディングが必要。
-      // 条件エディター側の .section-content > padding を上書きするため !important を使用する
-      padding: 0 0 75px 0 !important;
-    }
-
-    ul[role='tablist'] {
-      display: flex;
-      gap: 0.1rem;
-      padding: 0;
-      padding-left: 10px;
-      margin: 0;
-      font-size: 12px;
-      font-weight: bold;
-      list-style: none;
-      background: var(--color-bg-tab);
-
-      li {
-        a {
-          display: block;
-          padding: 3px 8px;
-          margin-top: 5px;
-          color: var(--color-black);
-          text-decoration: none;
-          outline: none;
-          border-radius: 7px 7px 0 0;
-
-          &[aria-selected='true'] {
-            background-color: #fff;
-          }
-        }
-      }
-    }
-
-    .tabs-panels {
-      padding: 10px;
+  &[data-condition-type='pathogenicity_prediction'].editor-panel {
+    > .section-content {
+      // prediction-value-view の描画領域を確保するため下パディングが必要
+      padding: 0 0 75px 0;
     }
   }
 }
