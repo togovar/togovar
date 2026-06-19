@@ -8,26 +8,20 @@ import {
 } from '../../conditions';
 import { ADVANCED_CONDITIONS } from '../../global';
 
-import {
-  CONDITION_NODE_KIND,
-  CONDITION_TYPE,
-  type ConditionTypeValue,
-} from '../../definition';
+import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../../definition';
 import { keyDownEvent } from '../../utils/keyDownEvent';
 import { buildQueryFragment } from './queryBuilders';
 import { createEl } from '../../utils/dom/createEl';
+import { ConditionItemHydrator } from './ConditionItemHydrator';
 import type { AdvancedSearchBuilderView } from '../AdvancedSearch/AdvancedSearchBuilderView';
 import type { ConditionGroupView } from './ConditionGroupView';
 import type {
   ConditionQuery,
   Relation,
   ConditionDefinition,
-  SignificanceSource,
   RestoredConditionValue,
 } from '../../types';
 import type { ConditionItemValueView } from './ConditionItemValueView';
-import type { FrequencyCountValueView } from './FrequencyCountValueView';
-import type { PredictionValueView } from './ConditionPathogenicityPredictionSearch/PredictionValueView';
 
 /**
  * 1条件行の View。編集・削除・relation切り替えのイベントと、
@@ -43,13 +37,13 @@ export class ConditionItemView extends BaseConditionView {
   // Escapeでキャンセルするときに戻すための直前のrelation値。
   private _keepLastRelation: Relation = 'eq';
 
-  private _summaryEl!: HTMLDivElement;
+  private _conditionHeaderEl!: HTMLDivElement;
   private _relationEl!: HTMLDivElement;
   private _valuesContainerEl!: HTMLDivElement;
   private _btnEdit!: HTMLButtonElement;
   private _btnDelete!: HTMLButtonElement;
   private _editorEl!: HTMLDivElement;
-  private _classificationEl!: HTMLDivElement;
+  private _conditionLabelEl!: HTMLDivElement;
 
   private _conditionValues!: ConditionValues;
 
@@ -100,8 +94,8 @@ export class ConditionItemView extends BaseConditionView {
   }
 
   updateClassificationText(newText: string): void {
-    if (this._classificationEl) {
-      this._classificationEl.textContent = newText;
+    if (this._conditionLabelEl) {
+      this._conditionLabelEl.textContent = newText;
     }
   }
 
@@ -127,14 +121,11 @@ export class ConditionItemView extends BaseConditionView {
     // 保持しないとEsc/Cancelでeqにリセットされてしまう。
     if (this._relationSupported)
       this._keepLastRelation = options.relation ?? 'eq';
-    this._valuesContainerEl.replaceChildren();
 
-    for (const value of options.values) {
-      const valueView = this._createRestoredValueView(value);
-      this._appendRestoredValueView(valueView, value);
-      await this._hydrateNestedValueView(valueView, value);
-      await this._hydratePredictionValueView(valueView, value);
-    }
+    await new ConditionItemHydrator(
+      this._conditionType,
+      this._valuesContainerEl
+    ).hydrate(options.values);
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -160,133 +151,6 @@ export class ConditionItemView extends BaseConditionView {
   /** CancelやEscapeで元に戻すrelationの基準値。編集確定時・hydrate時に更新する。 */
   get keepLastRelation(): Relation {
     return this._keepLastRelation;
-  }
-
-  // ───────────────────────────────────────────────────────────────────────────
-  // Restore helpers（hydration）
-  // ───────────────────────────────────────────────────────────────────────────
-
-  private _createRestoredValueView(
-    value: RestoredConditionValue
-  ): ConditionItemValueView {
-    const valueView = document.createElement(
-      'condition-item-value-view'
-    ) as ConditionItemValueView;
-    valueView.conditionType = this._conditionType;
-    valueView.value = value.value;
-    valueView.label = value.label;
-    valueView.deleteButton = this._conditionType === CONDITION_TYPE.variant_id;
-    return valueView;
-  }
-
-  private _appendRestoredValueView(
-    valueView: ConditionItemValueView,
-    value: RestoredConditionValue
-  ): void {
-    if (this._conditionType === CONDITION_TYPE.significance && value.source) {
-      this._getSignificanceValueContainer(value.source).append(valueView);
-      return;
-    }
-
-    this._valuesContainerEl.append(valueView);
-  }
-
-  /**
-   * significanceはsource（mgend/clinvar）ごとにラベル付きラッパーを持つ。
-   * ラッパーがなければ生成して追加し、あればそれを返す。
-   * source別に条件値をグループ化するためのDOM構造をここで遅延生成する。
-   */
-  private _getSignificanceValueContainer(
-    source: SignificanceSource
-  ): HTMLElement {
-    const wrapperClass = `${source}-wrapper`;
-    const conditionWrapperClass = `${source}-condition-wrapper`;
-
-    const existing = this._valuesContainerEl.querySelector<HTMLElement>(
-      `.${wrapperClass} > .${conditionWrapperClass}`
-    );
-    if (existing) return existing;
-
-    const outer = document.createElement('div');
-    outer.classList.add(wrapperClass);
-
-    const label = document.createElement('span');
-    label.classList.add(source);
-    label.textContent = source === 'mgend' ? 'MGeND' : 'Clinvar';
-
-    const container = document.createElement('div');
-    container.classList.add(conditionWrapperClass);
-
-    outer.append(label, container);
-    this._valuesContainerEl.append(outer);
-    return container;
-  }
-
-  /**
-   * frequency値をLit要素へ注入する。
-   * condition-item-value-view はLitコンポーネントのため、
-   * updateComplete を待たないとshadowRootが未構築で要素が見つからない。
-   */
-  private async _hydrateNestedValueView(
-    valueView: ConditionItemValueView,
-    value: RestoredConditionValue
-  ): Promise<void> {
-    if (!value.frequency) return;
-
-    await valueView.updateComplete;
-    const frequencyValueView =
-      valueView.shadowRoot?.querySelector<FrequencyCountValueView>(
-        'frequency-count-value-view'
-      );
-    if (!frequencyValueView) return;
-
-    const frequency = value.frequency;
-    frequencyValueView.setValues(
-      frequency.conditionType,
-      frequency.mode,
-      frequency.from,
-      frequency.to,
-      frequency.invert,
-      frequency.filtered
-    );
-  }
-
-  /**
-   * prediction値をLit要素へ注入する。
-   * prediction-value-view 自体もLitコンポーネントのため、
-   * 2段階のupdateComplete待機が必要になる。
-   *
-   * await の間にエディタ内スライダーの初回レンダリングイベント（set-prediction-values）が
-   * 発火し、valueView の label/value を 'AlphaMissense' に上書きすることがある。
-   * setValues 後に再設定することで正しいラベルを保証する。
-   */
-  private async _hydratePredictionValueView(
-    valueView: ConditionItemValueView,
-    value: RestoredConditionValue
-  ): Promise<void> {
-    if (!value.prediction) return;
-
-    await valueView.updateComplete;
-    const predictionValueView =
-      valueView.shadowRoot?.querySelector<PredictionValueView>(
-        'prediction-value-view'
-      );
-    if (!predictionValueView) return;
-
-    await predictionValueView.updateComplete;
-
-    const prediction = value.prediction;
-    predictionValueView.setValues(
-      prediction.dataset,
-      prediction.values,
-      prediction.inequalitySigns,
-      prediction.includeUnassigned,
-      prediction.includeUnknown
-    );
-
-    // スライダーの初回レンダリングイベントが上書きした場合に備えて再設定する。
-    valueView.value = value.value;
-    valueView.label = value.label;
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -360,11 +224,11 @@ export class ConditionItemView extends BaseConditionView {
         }))
       : null;
 
-    this._summaryEl = createEl('div', {
+    this._conditionHeaderEl = createEl('div', {
       class: 'condition-header',
       children: [
         // TODO: In the future, implement drag-and-drop ordering.
-        (this._classificationEl = createEl('div', {
+        (this._conditionLabelEl = createEl('div', {
           class: 'condition-label',
           text: cond.label,
         })),
@@ -395,7 +259,7 @@ export class ConditionItemView extends BaseConditionView {
     const body = createEl('div', {
       class: 'condition-card',
       children: [
-        this._summaryEl,
+        this._conditionHeaderEl,
         (this._editorEl = createEl('div', {
           class: 'advanced-search-condition-editor-view',
         })),
@@ -459,8 +323,8 @@ export class ConditionItemView extends BaseConditionView {
       );
     }
 
-    // summary 背景クリックで選択トグル。ボタンやrelation要素は上記で処理済みなので除外。
-    this._summaryEl.addEventListener(
+    // condition-header 背景クリックで選択トグル。ボタンやrelation要素は上記で処理済みなので除外。
+    this._conditionHeaderEl.addEventListener(
       'click',
       (e) => {
         const t = e.target as Element;
