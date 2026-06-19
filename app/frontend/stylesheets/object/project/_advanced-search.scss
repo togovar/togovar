@@ -13,15 +13,21 @@
 
 // =============================================================================
 // 条件行 (.advanced-search-condition-item-view)
+// 各検索条件を1行で表示する丸角カードコンポーネント。
+// 条件名ラベル・値タグ・eq/ne トグル・編集削除ボタンを横並びに配置し、
+// 編集モード時はカード下部にエディタパネルを展開する。
 // ローカル変数はこのブロック直前に置いて使用箇所を明示する
 // =============================================================================
 
-$HEIGHT: var(--height-advanced-search-condition);
-$HEIGHT_RELATION: 16px;
-$CORNER_RADIUS: calc($HEIGHT / 2);
+// 条件行全体の高さ（CSS変数で外部から指定）
+$condition-height: var(--height-advanced-search-condition);
+// eq/ne トグルアイコンの正方形サイズ
+$relation-icon-size: 16px;
+// カードの角丸半径（高さの半分で完全な半円にする）
+$corner-radius: calc($condition-height / 2);
 
 .advanced-search-condition-item-view {
-  // 条件行の高さは周辺コンポーネントも参照するため、CSS変数で値ラベル側へ共有する
+  // 値タグの上下パディング：値コンテナと値タグの高さ差を均等に割り当てる
   --padding-values-vertical: calc(
     (
         var(--height-advanced-search-condition-values-container) - var(
@@ -33,54 +39,58 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
   position: relative;
   margin-bottom: 3px;
 
+  // ── 白いカード（サマリー行＋エディタパネルを内包する丸角カード）────────────
   > .condition-card {
     position: relative;
     background-color: white;
-    border-radius: $CORNER_RADIUS;
+    border-radius: $corner-radius;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
 
+    // ── サマリー行（条件名・トグル・値タグ・操作ボタンを1行に並べる）─────────
     > .summary {
       display: flex;
-      // stretch にして分類・値・ボタン各ブロックの高さを揃える
+      // 各ブロックの高さを揃えるため stretch を使う
       align-items: stretch;
-      min-height: $HEIGHT;
+      min-height: $condition-height;
       padding-right: 8px;
       font-size: 12px;
       color: var(--color-black);
       background-color: var(--color-bg-subtle);
-      border-radius: $CORNER_RADIUS;
+      border-radius: $corner-radius;
 
+      // 条件種別ラベル（黒背景・白文字・グラブカーソルでD&D可能を示す）
       > .classification {
         width: 188px;
         min-width: 188px;
-        padding: 0 0 0 $CORNER_RADIUS;
-        // ドラッグ＆ドロップ可能な条件ラベルであることをカーソルで示す
+        padding: 0 0 0 $corner-radius;
         font-weight: bold;
-        line-height: $HEIGHT;
+        line-height: $condition-height;
         color: white;
         cursor: grab;
         background-color: var(--color-black);
-        border-top-left-radius: $CORNER_RADIUS;
-        border-bottom-left-radius: $CORNER_RADIUS;
+        border-top-left-radius: $corner-radius;
+        border-bottom-left-radius: $corner-radius;
       }
 
-      > .relation {
-        width: $HEIGHT_RELATION;
-        min-width: $HEIGHT_RELATION;
-        // 関係アイコンは分類ラベルと値エリアの境界に重ねるため負の横マージンで中央へ寄せる
-        margin: #{calc(($HEIGHT - $HEIGHT_RELATION) / 2)}
-          #{calc(-1 * $HEIGHT_RELATION / 2)};
+      // eq/ne 切り替えトグルボタン
+      // 分類ラベルと値エリアの境界に重ねるため、負のマージンで垂直中央へ引き込む
+      > .relation-toggle {
+        width: $relation-icon-size;
+        min-width: $relation-icon-size;
+        margin: #{calc(($condition-height - $relation-icon-size) / 2)}
+          #{calc(-1 * $relation-icon-size / 2)};
       }
 
+      // 選択済み値タグを横に並べるスクロール可能エリア
       > .values-container {
         position: relative;
         display: flex;
-        // 値が多い条件でも行全体を押し広げすぎないよう、値エリアだけをスクロール可能にする
         flex-grow: 1;
         flex-wrap: wrap;
         align-items: center;
+        // 値が多い条件でも行全体を押し広げすぎないよう、値エリアだけをスクロール可能にする
         max-height: 100px;
-        padding: var(--padding-values-vertical) $CORNER_RADIUS
+        padding: var(--padding-values-vertical) $corner-radius
           var(--padding-values-vertical) 16px;
         overflow: auto;
 
@@ -95,7 +105,8 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
         }
       }
 
-      > .buttons {
+      // 編集・削除ボタン群（通常時は半透明、ホバーで不透明）
+      > .item-actions {
         display: flex;
 
         > button {
@@ -127,19 +138,20 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
       }
     }
 
+    // エディタパネル（編集モード時に展開、通常時は非表示）
     > .advanced-search-condition-editor-view {
       display: none;
       height: 0;
       background-color: white;
       border-top: none;
-      border-bottom-right-radius: $CORNER_RADIUS;
-      border-bottom-left-radius: $CORNER_RADIUS;
+      border-bottom-right-radius: $corner-radius;
+      border-bottom-left-radius: $corner-radius;
       transition: height var(--gui-duration);
     }
   }
 
-  // 編集中に条件行以外を暗くするバックドロップ
-  > .bg {
+  // 編集モード時に画面全体を覆う半透明バックドロップ（編集中の条件行を前面に浮かせる）
+  > .backdrop {
     position: fixed;
     top: 0;
     left: 0;
@@ -151,23 +163,27 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
     transition: opacity var(--transition-duration);
   }
 
+  // ── 編集モード（.-editing）────────────────────────────────────────────────
   &.-editing {
-    // 編集中は行本体をバックドロップより前面に出し、値タグごとの削除ボタンを表示する
+    // カードをバックドロップより前面に出し、値タグの削除ボタンを表示する
     > .condition-card {
       z-index: calc(var(--z-index-editing-condition) + 1);
 
       > .summary {
-        border-radius: $CORNER_RADIUS $CORNER_RADIUS 0;
+        // 下側の角丸を外してエディタパネルとシームレスにつなぐ
+        border-radius: $corner-radius $corner-radius 0;
 
         > .classification {
           border-bottom-left-radius: 0;
         }
 
-        > .buttons {
+        // 操作ボタンは編集中に操作できないよう非表示にする
+        > .item-actions {
           pointer-events: none;
           opacity: 0;
         }
 
+        // 値タグの削除ボタンを編集中のみ表示する
         > .values-container {
           > condition-item-value-view::part(delete-tag-btn) {
             display: inline-flex;
@@ -181,21 +197,24 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
       }
     }
 
-    > .bg {
+    // バックドロップを表示して他の条件行を暗くする
+    > .backdrop {
       z-index: var(--z-index-editing-condition);
       pointer-events: auto;
       opacity: 1;
     }
   }
 
+  // ── 関係演算子（eq/ne）────────────────────────────────────────────────────
+  // eq と ne で共通：トグルボタンをアクティブ表示にしてイコール記号を描画する
   &[data-relation='eq'],
   &[data-relation='ne'] {
     > .condition-card {
       > .summary {
-        > .relation {
+        > .relation-toggle {
           position: relative;
           z-index: 1;
-          height: $HEIGHT_RELATION;
+          height: $relation-icon-size;
           cursor: pointer;
           background-color: var(--color-key-dark1);
           border-radius: 3px;
@@ -221,18 +240,18 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
     }
   }
 
+  // ne のみ：無効色＋取消線で「否定」を視覚的に区別する
   &[data-relation='ne'] {
-    // ne（否定）は斜線と無効色で eq との差を視覚的に出す
     > .condition-card {
       > .summary {
         > .classification {
           background-color: var(--color-disable-deep);
         }
 
-        > .relation {
+        > .relation-toggle {
           background-color: var(--color-disable);
 
-          // 取消線で否定を表現する
+          // 斜め取消線で否定を表現する
           &::after {
             top: 2px;
             left: 6.5px;
@@ -245,8 +264,9 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
     }
   }
 
+  // ── 選択状態────────────────────────────────────────────────────────────────
+  // レイアウトに影響しないよう疑似要素で枠線を重ねる
   &[aria-selected='true'] {
-    // 選択状態の枠線はレイアウトに影響しないよう疑似要素で重ねる
     &::after {
       position: absolute;
       top: 0;
@@ -257,12 +277,13 @@ $CORNER_RADIUS: calc($HEIGHT / 2);
       pointer-events: none;
       content: '';
       border: solid 2px var(--color-selected);
-      border-radius: $CORNER_RADIUS;
+      border-radius: $corner-radius;
     }
   }
 
+  // ── 臨床的意義条件（data-classification="significance"）────────────────────
+  // MGeND・ClinVar のデータソース名ラベルと値タグを横並びにするため幅を固定する
   &[data-classification='significance'] {
-    // 疾患系の値はデータセット名と値を並べるため専用 wrapper の幅を揃える
     > .condition-card {
       > .summary {
         > .values-container {

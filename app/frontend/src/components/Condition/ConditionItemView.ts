@@ -335,8 +335,8 @@ export class ConditionItemView extends BaseConditionView {
       delete this.rootEl.dataset.relation;
     }
 
-    const { body, bg } = this._generateDOM();
-    this.rootEl.replaceChildren(body, bg);
+    const { body, backdrop } = this._generateDOM();
+    this.rootEl.replaceChildren(body, backdrop);
     this._setRelation(this._readRelation());
   }
 
@@ -344,14 +344,14 @@ export class ConditionItemView extends BaseConditionView {
    * createEl でDOM構造を一括生成し、頻繁にアクセスするノードを直接参照としてキャッシュする。
    * querySelector で毎回探索するよりもパフォーマンスとコードの可読性が向上する。
    */
-  private _generateDOM(): { body: HTMLDivElement; bg: HTMLDivElement } {
+  private _generateDOM(): { body: HTMLDivElement; backdrop: HTMLDivElement } {
     const cond = ADVANCED_CONDITIONS[
       this._conditionType
     ] as ConditionDefinition;
 
     const relationChild = this._relationSupported
       ? (this._relationEl = createEl('div', {
-          class: 'relation',
+          class: 'relation-toggle',
           attrs: {
             role: 'button',
             'aria-label': 'Toggle relation',
@@ -373,7 +373,7 @@ export class ConditionItemView extends BaseConditionView {
           class: 'values-container',
         })),
         createEl('div', {
-          class: 'buttons',
+          class: 'item-actions',
           children: [
             (this._btnEdit = createEl('button', {
               class: 'edit',
@@ -402,8 +402,8 @@ export class ConditionItemView extends BaseConditionView {
       ],
     });
 
-    const bg = createEl('div', { class: 'bg' });
-    return { body, bg };
+    const backdrop = createEl('div', { class: 'backdrop' });
+    return { body, backdrop };
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -464,7 +464,7 @@ export class ConditionItemView extends BaseConditionView {
       'click',
       (e) => {
         const t = e.target as Element;
-        if (t.closest('button, .relation')) return;
+        if (t.closest('button, .relation-toggle')) return;
         this._toggleSelection(e);
       },
       { signal }
