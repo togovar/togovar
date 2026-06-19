@@ -81,6 +81,54 @@
               2
           )
           calc(-1 * var(--relation-icon-size) / 2);
+
+        @at-root {
+          // eq と ne で共通：トグルボタンをアクティブ表示にしてイコール記号を描画する
+          .advanced-search-condition-item-view[data-relation='eq'],
+          .advanced-search-condition-item-view[data-relation='ne'] {
+            > .condition-card > .condition-header > .relation-toggle {
+              position: relative;
+              z-index: 1;
+              height: var(--relation-icon-size);
+              cursor: pointer;
+              background-color: var(--color-key-dark1);
+              border-radius: 3px;
+
+              &::before,
+              &::after {
+                position: absolute;
+                display: block;
+                content: '';
+              }
+
+              // イコール記号（＝）を2本の横線で表現する
+              &::before {
+                top: 5px;
+                left: 4px;
+                width: 8px;
+                height: 2px;
+                background-color: white;
+                box-shadow: 0 4px white;
+              }
+            }
+          }
+
+          // ne のみ：無効色＋取消線で「否定」を視覚的に区別する
+          .advanced-search-condition-item-view[data-relation='ne'] {
+            > .condition-card > .condition-header > .relation-toggle {
+              background-color: var(--color-disable);
+
+              // 斜め取消線で否定を表現する
+              &::after {
+                top: 2px;
+                left: 6.5px;
+                height: 12px;
+                border-left: solid 1px white;
+                transform: rotate(-20deg);
+              }
+            }
+          }
+        }
       }
 
       // 選択済み値タグを横に並べるスクロール可能エリア
@@ -207,60 +255,12 @@
     }
   }
 
-  // ── 関係演算子（eq/ne）────────────────────────────────────────────────────
-  // eq と ne で共通：トグルボタンをアクティブ表示にしてイコール記号を描画する
-  &[data-relation='eq'],
-  &[data-relation='ne'] {
-    > .condition-card {
-      > .condition-header {
-        > .relation-toggle {
-          position: relative;
-          z-index: 1;
-          height: var(--relation-icon-size);
-          cursor: pointer;
-          background-color: var(--color-key-dark1);
-          border-radius: 3px;
-
-          &::before,
-          &::after {
-            position: absolute;
-            display: block;
-            content: '';
-          }
-
-          // イコール記号（＝）を2本の横線で表現する
-          &::before {
-            top: 5px;
-            left: 4px;
-            width: 8px;
-            height: 2px;
-            background-color: white;
-            box-shadow: 0 4px white;
-          }
-        }
-      }
-    }
-  }
-
-  // ne のみ：無効色＋取消線で「否定」を視覚的に区別する
+  // ne のみ：ラベルに無効色を適用して「否定」を視覚的に区別する
   &[data-relation='ne'] {
     > .condition-card {
       > .condition-header {
         > .condition-label {
           background-color: var(--color-disable-deep);
-        }
-
-        > .relation-toggle {
-          background-color: var(--color-disable);
-
-          // 斜め取消線で否定を表現する
-          &::after {
-            top: 2px;
-            left: 6.5px;
-            height: 12px;
-            border-left: solid 1px white;
-            transform: rotate(-20deg);
-          }
         }
       }
     }
