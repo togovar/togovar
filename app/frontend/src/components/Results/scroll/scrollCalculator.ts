@@ -88,23 +88,26 @@ export function constrainRowOffsetToValidRange(
 
 /**
  * 現在のスクロール状態からスクロールバーの表示プロパティを計算する。
+ * containerHeight には実際の DOM 高さ（container.offsetHeight）を渡すこと。
+ * visibleRowCount * TR_HEIGHT ではなく実 DOM 高さを使うことで、
+ * ドラッグ時の constrainPositionWithinBounds（container.offsetHeight 基準）と一致する。
  * コンテンツ量に関わらず最低高さ（MIN_SCROLLBAR_HEIGHT）を保証する。
  */
 export function calculateScrollbarDimensions(
   currentRowOffset: number,
   visibleRowCount: number,
-  totalRecordCount: number
+  totalRecordCount: number,
+  containerHeight: number
 ): ScrollBarCalculation {
-  const totalContentHeight = totalRecordCount * TR_HEIGHT;
-  const viewportHeight = visibleRowCount * TR_HEIGHT;
-  const visibilityRatio = viewportHeight / totalContentHeight;
+  const visibilityRatio =
+    totalRecordCount === 0 ? 1 : visibleRowCount / totalRecordCount;
 
   const scrollbarHeight = Math.max(
-    Math.ceil(viewportHeight * visibilityRatio),
+    Math.ceil(containerHeight * visibilityRatio),
     MIN_SCROLLBAR_HEIGHT
   );
 
-  const availableScrollSpace = viewportHeight - scrollbarHeight;
+  const availableScrollSpace = containerHeight - scrollbarHeight;
   // offset/maxOffset の比率でマッピングすることで、maxOffset 到達時に
   // barTop = availableScrollSpace（物理的に底に接する）を保証する
   const maxOffset = Math.max(0, totalRecordCount - visibleRowCount);

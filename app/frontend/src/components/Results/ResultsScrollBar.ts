@@ -239,7 +239,8 @@ export class ResultsScrollBar {
     const calculation = calculateScrollbarDimensions(
       offset,
       visibleRowCount,
-      totalRecordCount
+      totalRecordCount,
+      this.container.offsetHeight
     );
     this.renderer.applyScrollBarStyles(calculation, offset, visibleRowCount, totalRecordCount);
   }
@@ -300,7 +301,8 @@ export class ResultsScrollBar {
     const calculation = calculateScrollbarDimensions(
       offset,
       visibleRowCount,
-      totalRecordCount
+      totalRecordCount,
+      this.container.offsetHeight
     );
 
     this.renderer.updateScrollBarVisualState(
@@ -339,9 +341,9 @@ export class ResultsScrollBar {
 
     // calculateScrollbarDimensions の逆変換: barTop = offset/maxOffset * availableScrollSpace
     // → offset = top / availableScrollSpace * maxOffset
-    const viewportHeight = visibleRowCount * TR_HEIGHT;
+    // container.offsetHeight を使うことで DragManager の constrainPositionWithinBounds と一致する
     const scrollbarHeight = this.scrollBarElement.offsetHeight;
-    const availableScrollSpace = Math.max(1, viewportHeight - scrollbarHeight);
+    const availableScrollSpace = Math.max(1, this.container.offsetHeight - scrollbarHeight);
     const maxOffset = Math.max(0, totalRecordCount - visibleRowCount);
 
     let offset = Math.round((ui.position.top / availableScrollSpace) * maxOffset);

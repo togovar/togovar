@@ -79,16 +79,16 @@ export class ScrollBarRenderer {
 
   /**
    * 現在位置ラベルを更新する。
-   * 表示値はビューポートの最終行番号（offset + visibleRowCount）とし、
-   * 最下部では totalRecordCount と一致する。
+   * 表示値はビューポートの先頭行番号（offset + 1、1始まり）とし、
+   * 先頭では 1 と一致する。
    * 値が変わっていない場合は DOM を触らずスキップし、不要なレイアウト再計算を防ぐ。
    */
   updatePositionLabel(
     offset: number,
-    visibleRowCount: number,
+    _visibleRowCount: number,
     totalRecordCount: number
   ): void {
-    const value = Math.min(offset + visibleRowCount, totalRecordCount);
+    const value = totalRecordCount === 0 ? 0 : offset + 1;
     if (value === this.lastPositionValue) return;
     this.lastPositionValue = value;
     this.positionLabel.textContent = String(value);
