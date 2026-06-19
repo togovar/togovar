@@ -275,6 +275,15 @@
     }
   }
 
+  // ── Consequence 条件（data-classification="consequence"）────────────────────
+  // タグが折り返したときの行間を確保する
+  // .values-container 全体に row-gap を付けると dataset 型の行間も広がるため、consequence のみに限定する
+  &[data-classification='consequence'] {
+    > .condition-card > .condition-header > .values-container {
+      row-gap: 3px;
+    }
+  }
+
   // ── 臨床的意義条件（data-classification="significance"）────────────────────
   // MGeND・ClinVar のデータソース名ラベルと値タグを横並びにするため幅を固定する
   &[data-classification='significance'] {
