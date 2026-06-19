@@ -85,13 +85,18 @@
   padding: 10px 0 0 var(--padding-side);
 
   // テーブル検索結果が見つからない場合のメッセージ
-  &.-not-found::after {
+  // .tablecontainer は position: relative を持つため、そこを基準に絶対配置して tbody エリア中央に表示する
+  &.-not-found > .tablecontainer::after {
+    position: absolute;
+    top: 25%;
+    left: 50%;
     display: block;
     font-size: 14px;
-    line-height: 64px;
     color: var(--color-gray);
     text-align: center;
+    pointer-events: none;
     content: 'Not found';
+    transform: translate(-50%, -50%);
   }
 
   // ========================
