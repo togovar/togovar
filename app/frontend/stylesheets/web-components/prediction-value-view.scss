@@ -1,7 +1,4 @@
 :host {
-  position: absolute;
-  top: 0;
-  left: var(--left-advanced-search-condition-graph);
   display: flex;
   align-items: center;
   white-space: nowrap;
@@ -14,7 +11,10 @@
   background-color: var(--color-darker-gray);
 
   > .ruler {
+    padding: 0;
+    margin: 0;
     list-style: none;
+
     > .scale {
       position: absolute;
       top: -1px;

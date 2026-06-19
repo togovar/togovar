@@ -24,21 +24,22 @@
   }
 }
 
-// dataset/genotype: タグと頻度バーを2列グリッドで横並びにする
+// dataset/genotype/pathogenicity_prediction: タグとグラフを2列グリッドで横並びにする
 // 絶対配置にすると overflow: auto の親でもスクロール幅に反映されないため通常フローを使う
 :host([data-condition-type='dataset']),
-:host([data-condition-type='genotype']) {
+:host([data-condition-type='genotype']),
+:host([data-condition-type='pathogenicity_prediction']) {
   // flex-basis: 100% で .values-container（flex-wrap: wrap）の1行を占有して縦スタックさせる
   // min-width: max-content がコンテンツ幅を下限として保ち、親の overflow: auto でスクロール可能にする
   flex-basis: 100%;
   min-width: max-content;
 
-  // :host に grid を適用すると frequency-count-value-view の描画に影響するため
+  // :host に grid を適用すると子コンポーネントの描画に影響するため
   // 内側の .condition-item-value-container にグリッドを適用する
   > .condition-item-value-container {
     display: grid;
     // 第1列: 最大ラベル幅に揃えた固定幅（JS が --left-advanced-search-condition-graph を動的に更新）
-    // 第2列: 頻度グラフのコンテンツ幅（max-content で縮まない）
+    // 第2列: グラフのコンテンツ幅（max-content で縮まない）
     grid-template-columns: var(
         --left-advanced-search-condition-graph,
         150px
@@ -51,7 +52,12 @@
     // グリッド第1列内でコンテンツ幅に収める（列幅まで引き伸ばさない）
     justify-self: start;
     white-space: nowrap;
+  }
+}
 
+:host([data-condition-type='dataset']),
+:host([data-condition-type='genotype']) {
+  .inner {
     &::before {
       margin-right: 4px;
       font-family: 'Font Awesome 7 Free', sans-serif;
@@ -76,14 +82,6 @@
 
 // pathogenicity_prediction: 子コンポーネント側で見た目を持つため通常タグの枠を外す
 :host([data-condition-type='pathogenicity_prediction']) {
-  position: relative;
-
-  // dataset/genotype と同様にグラフコンポーネントを縦中央に揃える
-  prediction-value-view {
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
   .inner {
     padding: 0;
     background-color: transparent;
