@@ -21,7 +21,8 @@ export class ConditionItemValueView extends LitElement {
    * 各コンポーネント内の `frequency-count-value-view` の開始位置が自動的に揃う。
    */
   protected override updated(): void {
-    if (this.conditionType !== 'dataset' && this.conditionType !== 'genotype') return;
+    if (this.conditionType !== 'dataset' && this.conditionType !== 'genotype')
+      return;
     requestAnimationFrame(() => {
       this._alignFrequencyBarStart();
     });
@@ -32,7 +33,9 @@ export class ConditionItemValueView extends LitElement {
     if (!valuesContainer) return;
 
     let maxWidth = 0;
-    for (const view of valuesContainer.querySelectorAll('condition-item-value-view')) {
+    for (const view of valuesContainer.querySelectorAll(
+      'condition-item-value-view'
+    )) {
       const inner = view.shadowRoot?.querySelector<HTMLElement>('.inner');
       if (!inner) continue;
       maxWidth = Math.max(maxWidth, inner.scrollWidth);
@@ -42,9 +45,12 @@ export class ConditionItemValueView extends LitElement {
 
     // .inner の右端から頻度バーまでの最小余白（px）
     const GAP = 8;
+    // values-container の padding-left（16px）と合わせて frequency-count-value-view が
+    // values-container 左端から最低 200px の位置になるよう下限を設ける
+    const MIN_COLUMN = 150;
     valuesContainer.style.setProperty(
       '--left-advanced-search-condition-graph',
-      `${Math.ceil(maxWidth) + GAP}px`
+      `${Math.max(Math.ceil(maxWidth) + GAP, MIN_COLUMN)}px`
     );
   }
 

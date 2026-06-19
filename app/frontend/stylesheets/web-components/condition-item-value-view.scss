@@ -39,7 +39,10 @@
     display: grid;
     // 第1列: 最大ラベル幅に揃えた固定幅（JS が --left-advanced-search-condition-graph を動的に更新）
     // 第2列: 頻度グラフのコンテンツ幅（max-content で縮まない）
-    grid-template-columns: var(--left-advanced-search-condition-graph, 142px) max-content;
+    grid-template-columns: var(
+        --left-advanced-search-condition-graph,
+        150px
+      ) max-content;
     column-gap: 0;
     align-items: center;
   }
