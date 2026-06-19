@@ -44,9 +44,6 @@
     // ── サマリー行（条件名・トグル・値タグ・操作ボタンを1行に並べる）─────────
     > .condition-header {
       display: flex;
-      // 各ブロックの高さを揃えるため stretch を使う
-      // align-items: stretch;
-      // min-height: var(--height-advanced-search-condition);
       padding-right: 8px;
       font-size: 12px;
       color: var(--color-black);
