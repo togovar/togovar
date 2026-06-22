@@ -20,10 +20,11 @@
 
 // 画面別スタイル — 各機能ページ固有のコンポーネントをまとめたもの
 @use 'object/project/activity-indicator';
-@use 'object/project/document';
 @use 'object/project/advanced-search';
+@use 'object/project/chromosome';
+@use 'object/project/columns-editor';
 @use 'object/project/detail';
-@use 'object/project/detail-header';
+@use 'object/project/document';
 @use 'object/project/global-header';
 @use 'object/project/messages';
 @use 'object/project/results';
