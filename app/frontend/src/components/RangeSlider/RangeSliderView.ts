@@ -75,31 +75,33 @@ export class RangeSlider extends LitElement {
     return html`
       <div class="wrapper" part="wrapper">
         <div class="input" part="div-input">
-          <input
-            class="from"
-            name="lower-limit"
-            part="num-input limit-input"
-            type="number"
-            title="Lower limit"
-            .min=${String(this._state.min)}
-            .max=${String(this._state.max)}
-            .step=${this._inputStep}
-            .value=${formatInputValue(this._state.from)}
-            @input=${this._fromInput}
-          />
-          ~
-          <input
-            class="to"
-            name="upper-limit"
-            part="num-input limit-input"
-            type="number"
-            title="Upper limit"
-            .min=${String(this._state.min)}
-            .max=${String(this._state.max)}
-            .step=${this._inputStep}
-            .value=${formatInputValue(this._state.to)}
-            @input=${this._toInput}
-          />
+          <span class="limit-inputs" part="limit-inputs">
+            <input
+              class="from"
+              name="lower-limit"
+              part="num-input limit-input"
+              type="number"
+              title="Lower limit"
+              .min=${String(this._state.min)}
+              .max=${String(this._state.max)}
+              .step=${this._inputStep}
+              .value=${formatInputValue(this._state.from)}
+              @input=${this._fromInput}
+            />
+            ~
+            <input
+              class="to"
+              name="upper-limit"
+              part="num-input limit-input"
+              type="number"
+              title="Upper limit"
+              .min=${String(this._state.min)}
+              .max=${String(this._state.max)}
+              .step=${this._inputStep}
+              .value=${formatInputValue(this._state.to)}
+              @input=${this._toInput}
+            />
+          </span>
           <label class="checkbox-label" part="checkbox-label label">
             <input
               class="invert"

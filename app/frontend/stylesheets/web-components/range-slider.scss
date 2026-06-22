@@ -1,13 +1,5 @@
 @use '../foundation' as *;
 
-:host {
-  display: block;
-}
-
-* {
-  box-sizing: border-box;
-}
-
 .wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -16,13 +8,24 @@
 }
 
 .input {
+  display: inline-flex;
+  // justify-content: space-between;
+  gap: 15px;
+  align-items: center;
+  width: 100%;
+  max-width: 250px;
   text-align: center;
+}
+
+.limit-inputs {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
 }
 
 .from,
 .to {
   width: 5em;
-  margin-right: 3px;
   font-size: inherit;
   @include input-number;
 }
@@ -31,21 +34,13 @@
   display: inline-flex;
   gap: 4px;
   align-items: center;
-  min-height: 24px;
   margin-bottom: 0;
-  margin-left: 8px;
-}
-
-.match label,
-.checkbox-label {
-  margin: 0;
 }
 
 .invert {
   width: 13px;
   height: 13px;
   margin: 0;
-  vertical-align: middle;
 }
 
 .meter {
@@ -160,8 +155,21 @@ input[type='range']::-webkit-slider-thumb {
 }
 
 .match {
-  margin-left: 1em;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: 5px;
   text-align: center;
+}
+
+.match label {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.match input[type='radio'] {
+  margin: 0;
 }
 
 :host([data-thumb='1-lower']) {
