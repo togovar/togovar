@@ -579,6 +579,8 @@ $OPACITY_DISABLED: 0.8;
         > ul {
           position: absolute;
           z-index: var(--z-index-advanced-search-menu);
+          // visibility: hidden でタブ順からも除外する（opacity: 0 だけではフォーカス可能なまま）
+          visibility: hidden;
           padding: 0 0 2px;
           white-space: nowrap;
           pointer-events: none;
@@ -588,7 +590,8 @@ $OPACITY_DISABLED: 0.8;
           transform: translateY(-10px);
           transition:
             opacity var(--gui-duration),
-            transform var(--gui-duration);
+            transform var(--gui-duration),
+            visibility var(--gui-duration);
 
           > li {
             transition: background-color var(--gui-duration);
@@ -612,6 +615,7 @@ $OPACITY_DISABLED: 0.8;
 
         &:hover {
           > ul {
+            visibility: visible;
             pointer-events: auto;
             opacity: 1;
             transform: translateY(0);
