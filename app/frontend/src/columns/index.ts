@@ -19,7 +19,7 @@ export const COLUMNS = [
   {
     label: 'Alt frequency',
     id: 'alt_frequency',
-    defaultWidth: 120,
+    defaultWidth: 160,
     resizable: false,
   },
   { label: 'Consequence', id: 'consequence', defaultWidth: 176 },

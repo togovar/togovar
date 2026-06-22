@@ -53,6 +53,20 @@
         "has_freq": true
       },
       {
+        "id": "jogo",
+        "label": "JoGo",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
+        "id": "tommo_jsv1",
+        "label": "ToMMo JSV1",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
         "id": "gnomad_genomes",
         "label": "gnomAD genomes",
         "type": "boolean",
@@ -62,6 +76,13 @@
       {
         "id": "gnomad_exomes",
         "label": "gnomAD exomes",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
+        "id": "gnomad_sv",
+        "label": "gnomAD SV",
         "type": "boolean",
         "default": "1",
         "has_freq": true
@@ -152,6 +173,24 @@
       {
         "id": "SO_1000002",
         "label": "Substitution",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "SO_1000035",
+        "label": "Duplication",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "SO_1000036",
+        "label": "Inversion",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "SO_0001021",
+        "label": "Breakend",
         "type": "boolean",
         "default": "1"
       }

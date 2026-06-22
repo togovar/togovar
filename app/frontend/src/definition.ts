@@ -42,8 +42,11 @@ export const FREQUENCY_DATASETS = [
   'jga_snp',
   'tommo',
   'ncbn',
+  'jogo',
+  'tommo_jsv1',
   'gnomad_genomes',
   'gnomad_exomes',
+  'gnomad_sv',
 ] as const;
 export type FrequencyDataset = (typeof FREQUENCY_DATASETS)[number];
 
