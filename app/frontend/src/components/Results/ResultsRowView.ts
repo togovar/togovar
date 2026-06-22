@@ -13,6 +13,65 @@ import {
 } from './ResultsColumnTemplates';
 import { ResultsColumnUpdater } from './ResultsColumnUpdater';
 
+type ResultsRowCells = {
+  togovarIdCell: HTMLTableCellElement | null;
+  refsnpCell: HTMLTableCellElement | null;
+  refsnpContent: HTMLDivElement | null;
+  refsnpRemains: HTMLSpanElement | null;
+  positionChromosome: HTMLDivElement | null;
+  positionCoordinate: HTMLDivElement | null;
+  refElement: HTMLSpanElement | null;
+  altElement: HTMLSpanElement | null;
+  typeElement: HTMLDivElement | null;
+  geneCell: HTMLTableCellElement | null;
+  geneContent: HTMLDivElement | null;
+  geneRemains: HTMLSpanElement | null;
+  frequencyElements: TdFrequencies;
+  consequenceCell: HTMLTableCellElement | null;
+  consequenceContent: HTMLDivElement | null;
+  consequenceItem: HTMLDivElement | null;
+  consequenceRemains: HTMLSpanElement | null;
+  clinicalContainer: HTMLDivElement | null;
+  clinicalSignificance: HTMLDivElement | null;
+  clinicalRemains: HTMLSpanElement | null;
+  clinicalIcon: HTMLSpanElement | null;
+  alphaMissenseFunction: HTMLDivElement | null;
+  siftFunction: HTMLDivElement | null;
+  polyphenFunction: HTMLDivElement | null;
+};
+
+/**
+ * 行DOMを破棄・再生成した直後に古い参照を残さないため、セル参照の初期値を1箇所で作る。
+ */
+function createEmptyCells(): ResultsRowCells {
+  return {
+    togovarIdCell: null,
+    refsnpCell: null,
+    refsnpContent: null,
+    refsnpRemains: null,
+    positionChromosome: null,
+    positionCoordinate: null,
+    refElement: null,
+    altElement: null,
+    typeElement: null,
+    geneCell: null,
+    geneContent: null,
+    geneRemains: null,
+    frequencyElements: {},
+    consequenceCell: null,
+    consequenceContent: null,
+    consequenceItem: null,
+    consequenceRemains: null,
+    clinicalContainer: null,
+    clinicalSignificance: null,
+    clinicalRemains: null,
+    clinicalIcon: null,
+    alphaMissenseFunction: null,
+    siftFunction: null,
+    polyphenFunction: null,
+  };
+}
+
 /**
  * 仮想スクロールにおける1行分のView。
  * 固定DOM行を使い回し、offset変化のたびにデータをStoreから引いて表示を切り替えることで
@@ -33,30 +92,85 @@ export class ResultsRowView {
    * prepareTableDataでHTML生成直後に一括取得し、updateTableRowで毎回querySelectorを
    * 実行しないよう保持する。
    */
-  togovarIdCell: HTMLTableCellElement | null = null;
-  refsnpCell: HTMLTableCellElement | null = null;
-  refsnpContent: HTMLDivElement | null = null;
-  refsnpRemains: HTMLSpanElement | null = null;
-  positionChromosome: HTMLDivElement | null = null;
-  positionCoordinate: HTMLDivElement | null = null;
-  refElement: HTMLSpanElement | null = null;
-  altElement: HTMLSpanElement | null = null;
-  typeElement: HTMLDivElement | null = null;
-  geneCell: HTMLTableCellElement | null = null;
-  geneContent: HTMLDivElement | null = null;
-  geneRemains: HTMLSpanElement | null = null;
-  frequencyElements: TdFrequencies = {};
-  consequenceCell: HTMLTableCellElement | null = null;
-  consequenceContent: HTMLDivElement | null = null;
-  consequenceItem: HTMLDivElement | null = null;
-  consequenceRemains: HTMLSpanElement | null = null;
-  clinicalContainer: HTMLDivElement | null = null;
-  clinicalSignificance: HTMLDivElement | null = null;
-  clinicalRemains: HTMLSpanElement | null = null;
-  clinicalIcon: HTMLSpanElement | null = null;
-  alphaMissenseFunction: HTMLDivElement | null = null;
-  siftFunction: HTMLDivElement | null = null;
-  polyphenFunction: HTMLDivElement | null = null;
+  private cells = createEmptyCells();
+
+  /**
+   * 列更新時に毎回ハンドラ表を作らないため、行インスタンスごとに一度だけ束縛する。
+   */
+  private readonly columnContentUpdaters: Record<
+    string,
+    (result: ResultData) => void
+  > = {
+    togovar_id: (result) =>
+      ResultsColumnUpdater.updateTogovarId(
+        this.cells.togovarIdCell,
+        result.id,
+        `/variant/${result.id}`
+      ),
+    refsnp_id: (result) =>
+      ResultsColumnUpdater.updateRefSNP(
+        this.cells.refsnpContent,
+        this.cells.refsnpRemains,
+        result.existing_variations
+      ),
+    position: (result) =>
+      ResultsColumnUpdater.updatePosition(
+        this.cells.positionChromosome,
+        this.cells.positionCoordinate,
+        result.chromosome,
+        result.position
+      ),
+    ref_alt: (result) =>
+      ResultsColumnUpdater.updateRefAlt(
+        this.cells.refElement,
+        this.cells.altElement,
+        result.reference,
+        result.alternate
+      ),
+    type: (result) =>
+      ResultsColumnUpdater.updateVariantType(
+        this.cells.typeElement,
+        result.type
+      ),
+    gene: (result) =>
+      ResultsColumnUpdater.updateGene(
+        this.cells.geneContent,
+        this.cells.geneRemains,
+        result.genes ?? []
+      ),
+    alt_frequency: (result) =>
+      ResultsColumnUpdater.updateAltFrequency(
+        this.cells.frequencyElements,
+        result.frequencies
+      ),
+    consequence: (result) =>
+      ResultsColumnUpdater.updateConsequence(
+        this.cells.consequenceItem,
+        this.cells.consequenceRemains,
+        result.most_severe_consequence,
+        result.transcripts ?? []
+      ),
+    clinical_significance: (result) =>
+      ResultsColumnUpdater.updateClinicalSignificance(
+        this.cells.clinicalSignificance,
+        this.cells.clinicalContainer,
+        this.cells.clinicalRemains,
+        this.cells.clinicalIcon,
+        result.significance
+      ),
+    alphamissense: (result) =>
+      ResultsColumnUpdater.updateAlphaMissense(
+        this.cells.alphaMissenseFunction,
+        result.alphamissense
+      ),
+    sift: (result) =>
+      ResultsColumnUpdater.updateSift(this.cells.siftFunction, result.sift),
+    polyphen: (result) =>
+      ResultsColumnUpdater.updatePolyphen(
+        this.cells.polyphenFunction,
+        result.polyphen
+      ),
+  };
 
   /**
    * 選択状態は行ごとにclassを切り替えるだけで済むため、selectedRowだけを購読する。
@@ -87,30 +201,7 @@ export class ResultsRowView {
       this.tr.parentNode.removeChild(this.tr);
     }
 
-    this.togovarIdCell = null;
-    this.refsnpCell = null;
-    this.refsnpContent = null;
-    this.refsnpRemains = null;
-    this.positionChromosome = null;
-    this.positionCoordinate = null;
-    this.refElement = null;
-    this.altElement = null;
-    this.typeElement = null;
-    this.geneCell = null;
-    this.geneContent = null;
-    this.geneRemains = null;
-    this.frequencyElements = {};
-    this.consequenceCell = null;
-    this.consequenceContent = null;
-    this.consequenceItem = null;
-    this.consequenceRemains = null;
-    this.clinicalContainer = null;
-    this.clinicalSignificance = null;
-    this.clinicalRemains = null;
-    this.clinicalIcon = null;
-    this.alphaMissenseFunction = null;
-    this.siftFunction = null;
-    this.polyphenFunction = null;
+    this.cells = createEmptyCells();
 
     this.isDestroyed = true;
   }
@@ -282,37 +373,41 @@ export class ResultsRowView {
    * 各セルはネストが浅くquerySelectorで一意に取れるため、列ごとに直接取得する。
    */
   private cacheBasicElements() {
-    this.togovarIdCell = this.tr.querySelector('td.togovar_id');
+    this.cells.togovarIdCell = this.tr.querySelector('td.togovar_id');
 
-    this.refsnpCell = this.tr.querySelector('td.refsnp_id');
-    this.refsnpContent =
-      this.refsnpCell?.querySelector('.remains-content') || null;
-    this.refsnpRemains =
-      this.refsnpCell?.querySelector('.remains-badge') || null;
+    this.cells.refsnpCell = this.tr.querySelector('td.refsnp_id');
+    this.cells.refsnpContent =
+      this.cells.refsnpCell?.querySelector('.remains-content') || null;
+    this.cells.refsnpRemains =
+      this.cells.refsnpCell?.querySelector('.remains-badge') || null;
 
     const tdPosition = this.tr.querySelector(
       'td.position > .chromosome-position'
     );
-    this.positionChromosome = tdPosition?.querySelector('.chromosome') || null;
-    this.positionCoordinate = tdPosition?.querySelector('.coordinate') || null;
+    this.cells.positionChromosome =
+      tdPosition?.querySelector('.chromosome') || null;
+    this.cells.positionCoordinate =
+      tdPosition?.querySelector('.coordinate') || null;
 
     const tdRefAlt = this.tr.querySelector('td.ref_alt > .ref-alt');
-    this.refElement = tdRefAlt?.querySelector('span.ref') || null;
-    this.altElement = tdRefAlt?.querySelector('span.alt') || null;
+    this.cells.refElement = tdRefAlt?.querySelector('span.ref') || null;
+    this.cells.altElement = tdRefAlt?.querySelector('span.alt') || null;
 
-    this.typeElement = this.tr.querySelector('td.type > .variant-type');
+    this.cells.typeElement = this.tr.querySelector('td.type > .variant-type');
 
-    this.geneCell = this.tr.querySelector('td.gene');
-    this.geneContent = this.geneCell?.querySelector('.remains-content') || null;
-    this.geneRemains = this.geneCell?.querySelector('.remains-badge') || null;
+    this.cells.geneCell = this.tr.querySelector('td.gene');
+    this.cells.geneContent =
+      this.cells.geneCell?.querySelector('.remains-content') || null;
+    this.cells.geneRemains =
+      this.cells.geneCell?.querySelector('.remains-badge') || null;
 
-    this.consequenceCell = this.tr.querySelector('td.consequence');
-    this.consequenceContent =
-      this.consequenceCell?.querySelector('.remains-content') || null;
-    this.consequenceItem =
-      this.consequenceCell?.querySelector('.consequence-item') || null;
-    this.consequenceRemains =
-      this.consequenceCell?.querySelector('.remains-badge') || null;
+    this.cells.consequenceCell = this.tr.querySelector('td.consequence');
+    this.cells.consequenceContent =
+      this.cells.consequenceCell?.querySelector('.remains-content') || null;
+    this.cells.consequenceItem =
+      this.cells.consequenceCell?.querySelector('.consequence-item') || null;
+    this.cells.consequenceRemains =
+      this.cells.consequenceCell?.querySelector('.remains-badge') || null;
 
     const tdClinical = this.tr.querySelector<HTMLTableCellElement>(
       'td.clinical_significance'
@@ -321,12 +416,12 @@ export class ResultsRowView {
       tdClinical?.querySelector<HTMLDivElement>(
         '.clinical-significance-flex'
       ) || null;
-    this.clinicalContainer = clinicalFlex;
-    this.clinicalSignificance =
+    this.cells.clinicalContainer = clinicalFlex;
+    this.cells.clinicalSignificance =
       tdClinical?.querySelector('.clinical-significance') || null;
-    this.clinicalRemains =
+    this.cells.clinicalRemains =
       tdClinical?.querySelector('.clinical-remains') || null;
-    this.clinicalIcon = tdClinical?.querySelector('span.icon') || null;
+    this.cells.clinicalIcon = tdClinical?.querySelector('span.icon') || null;
   }
 
   /**
@@ -334,14 +429,14 @@ export class ResultsRowView {
    * 後からO(1)で対象要素を更新できる。
    */
   private cacheFrequencyElements() {
-    this.frequencyElements = {};
+    this.cells.frequencyElements = {};
     this.tr
       .querySelectorAll('td.alt_frequency > frequency-block-view')
       .forEach((elm) => {
         const element = elm as FrequencyElement;
         const datasetId = element.dataset.dataset;
         if (datasetId) {
-          this.frequencyElements[datasetId] = element;
+          this.cells.frequencyElements[datasetId] = element;
         }
       });
   }
@@ -352,14 +447,15 @@ export class ResultsRowView {
    */
   private cacheFunctionElements() {
     const tdAlphaMissense = this.tr.querySelector('td.alphamissense');
-    this.alphaMissenseFunction =
+    this.cells.alphaMissenseFunction =
       tdAlphaMissense?.querySelector('.variant-function') || null;
 
     const tdSift = this.tr.querySelector('td.sift');
-    this.siftFunction = tdSift?.querySelector('.variant-function') || null;
+    this.cells.siftFunction =
+      tdSift?.querySelector('.variant-function') || null;
 
     const tdPolyphen = this.tr.querySelector('td.polyphen');
-    this.polyphenFunction =
+    this.cells.polyphenFunction =
       tdPolyphen?.querySelector('.variant-function') || null;
   }
 
@@ -372,75 +468,7 @@ export class ResultsRowView {
    * 対応するハンドラが存在しない列IDは?. で安全にスキップする。
    */
   private updateColumnContent(column: Column, result: ResultData) {
-    const columnHandlers: Record<string, () => void> = {
-      togovar_id: () =>
-        ResultsColumnUpdater.updateTogovarId(
-          this.togovarIdCell,
-          result.id,
-          `/variant/${result.id}`
-        ),
-      refsnp_id: () =>
-        ResultsColumnUpdater.updateRefSNP(
-          this.refsnpContent,
-          this.refsnpRemains,
-          result.existing_variations
-        ),
-      position: () =>
-        ResultsColumnUpdater.updatePosition(
-          this.positionChromosome,
-          this.positionCoordinate,
-          result.chromosome,
-          result.position
-        ),
-      ref_alt: () =>
-        ResultsColumnUpdater.updateRefAlt(
-          this.refElement,
-          this.altElement,
-          result.reference,
-          result.alternate
-        ),
-      type: () =>
-        ResultsColumnUpdater.updateVariantType(this.typeElement, result.type),
-      gene: () =>
-        ResultsColumnUpdater.updateGene(
-          this.geneContent,
-          this.geneRemains,
-          result.genes ?? []
-        ),
-      alt_frequency: () =>
-        ResultsColumnUpdater.updateAltFrequency(
-          this.frequencyElements,
-          result.frequencies
-        ),
-      consequence: () =>
-        ResultsColumnUpdater.updateConsequence(
-          this.consequenceItem,
-          this.consequenceRemains,
-          result.most_severe_consequence,
-          result.transcripts ?? []
-        ),
-      clinical_significance: () =>
-        ResultsColumnUpdater.updateClinicalSignificance(
-          this.clinicalSignificance,
-          this.clinicalContainer,
-          this.clinicalRemains,
-          this.clinicalIcon,
-          result.significance
-        ),
-      alphamissense: () =>
-        ResultsColumnUpdater.updateAlphaMissense(
-          this.alphaMissenseFunction,
-          result.alphamissense
-        ),
-      sift: () =>
-        ResultsColumnUpdater.updateSift(this.siftFunction, result.sift),
-      polyphen: () =>
-        ResultsColumnUpdater.updatePolyphen(
-          this.polyphenFunction,
-          result.polyphen
-        ),
-    };
-    columnHandlers[column.id]?.();
+    this.columnContentUpdaters[column.id]?.(result);
   }
 
   // ================================================================
