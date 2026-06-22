@@ -405,7 +405,7 @@ export class ResultsRowView {
         ResultsColumnUpdater.updateGene(
           this.geneContent,
           this.geneRemains,
-          result.genes
+          result.genes ?? []
         ),
       alt_frequency: () =>
         ResultsColumnUpdater.updateAltFrequency(
@@ -417,7 +417,7 @@ export class ResultsRowView {
           this.consequenceItem,
           this.consequenceRemains,
           result.most_severe_consequence,
-          result.transcripts
+          result.transcripts ?? []
         ),
       clinical_significance: () =>
         ResultsColumnUpdater.updateClinicalSignificance(

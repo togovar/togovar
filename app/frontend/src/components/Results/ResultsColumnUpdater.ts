@@ -236,20 +236,22 @@ export class ResultsColumnUpdater {
   ) {
     if (!tdGene || !tdGeneRemains) return;
 
-    if (!symbols || symbols.length === 0) {
+    const validSymbols = Array.isArray(symbols) ? symbols.filter(Boolean) : [];
+
+    if (validSymbols.length === 0) {
       this.updateRemainsBadge(tdGeneRemains, 0);
       this.resetAnchor(tdGene);
       return;
     }
 
     // 画面には先頭の遺伝子だけを表示し、残りの件数はdata-remainsに保持する。
-    this.updateRemainsBadge(tdGeneRemains, symbols.length - 1);
+    this.updateRemainsBadge(tdGeneRemains, validSymbols.length - 1);
     this.updateAnchor(
       tdGene,
       'hyper-text -internal',
-      `/gene/${symbols[0].id}`,
-      symbols[0].name,
-      `View gene ${symbols[0].name} details`,
+      `/gene/${validSymbols[0].id}`,
+      validSymbols[0].name,
+      `View gene ${validSymbols[0].name} details`,
       tdGeneRemains
     );
   }
