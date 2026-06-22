@@ -57,7 +57,8 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
     const record = storeManager.getSelectedRecord();
     if (!record) return;
 
-    const { external_links } = record;
+    // API移行中にexternal_link/external_linksが混在しても、プレビュー表示を止めない。
+    const external_links = record.external_links ?? record.external_link;
     if (!external_links) return;
     const list: LinkListEntry[] = [
       ...(external_links.dbsnp?.map((item) =>

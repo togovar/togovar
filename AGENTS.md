@@ -108,6 +108,9 @@ app/frontend/
 - 検索APIのHTTP fetchとHTTPステータスのエラーコード変換は `app/frontend/src/api/searchFetch.ts` に置く。
 - 検索APIレスポンスのdata/stat判定とStore反映は `app/frontend/src/api/searchResponse.ts` に置き、`searchExecutor.ts` は通信フローに集中させる。
 - 検索APIレスポンス内のnotice/warning/errorのStore反映は `app/frontend/src/api/searchMessages.ts` に置く。
+- Simple Search の結果レスポンスでは、`genes` は巨大SV対策として `{ total, items? }` 形式を正とする。`items` は省略され得るため、Results列やプレビューパネルでは `total` と `items` を分けて扱う。
+- API移行中に `external_link` と `external_links` が混在する可能性がある。表示側では新仕様の `external_links` を優先し、必要な範囲で旧 `external_link` へフォールバックする。
+- GRCh38のSimple Search dataset/filter/frequency表示は `app/frontend/assets/GRCh38/search_conditions.json` の dataset items を正として扱う。APIレスポンスの `frequencies[].source` が増えた場合は、このマスターへの追加要否を確認する。
 - StoreはAPIを直接呼ばない。仮想スクロールで未取得ページが必要な場合も、コンポーネントから `searchManager.requestNextPage()` を呼び、fetch の起動は `searchManager` / `api/searchExecutor.ts` 側へ集約する。
 - 検索条件のブラウザURL反映（`history.pushState`、Simple/Advanced SearchのURL表現、URL長制限時のstate退避）は `store/searchURL.ts` に置き、`searchManager.ts` は検索開始タイミングとStore更新に集中させる。
 - popstate時のURL/stateからの検索条件復元は `store/searchHistory.ts` に置く。

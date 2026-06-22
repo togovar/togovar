@@ -2,15 +2,34 @@ import PanelView from './PanelView';
 import { storeManager } from '../../store/StoreManager';
 import { createEl } from '../../utils/dom/createEl';
 import { selectRequired } from '../../utils/dom/select';
-import type { GeneSymbol } from '../../types';
+import type { GeneSymbol, GeneSummary } from '../../types';
+
+type NormalizedGeneSummary = {
+  total: number;
+  items: GeneSymbol[];
+};
 
 /**
  * APIやStoreに配列以外のgenesが入ってもプレビュー描画を止めないため、表示可能な配列だけを通す。
  */
-function getGeneSymbols(value: unknown): GeneSymbol[] {
-  if (!Array.isArray(value)) return [];
+function getGeneSummary(value: unknown): NormalizedGeneSummary {
+  if (Array.isArray(value)) {
+    const items = value.filter(isGeneSymbol);
+    return { total: items.length, items };
+  }
 
-  return value.filter(isGeneSymbol);
+  if (!isGeneSummary(value)) {
+    return { total: 0, items: [] };
+  }
+
+  const items = Array.isArray(value.items)
+    ? value.items.filter(isGeneSymbol)
+    : [];
+
+  return {
+    total: Math.max(items.length, value.total),
+    items,
+  };
 }
 
 /**
@@ -30,6 +49,17 @@ function isGeneSymbol(value: unknown): value is GeneSymbol {
 
   const symbol = value as Partial<GeneSymbol>;
   return typeof symbol.name === 'string' && symbol.id !== undefined;
+}
+
+/**
+ * 新APIのgenesは巨大SV対策でtotal/itemsに分かれるため、総数だけでも利用できるshapeか確認する。
+ */
+function isGeneSummary(value: unknown): value is GeneSummary {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return false;
+  }
+
+  return typeof (value as Partial<GeneSummary>).total === 'number';
 }
 
 /**
@@ -85,18 +115,31 @@ export default class PanelViewPreviewGene extends PanelView {
     }
 
     const record = storeManager.getSelectedRecord();
-    const geneSymbols = getGeneSymbols(record?.genes);
-    if (geneSymbols.length === 0) {
+    const geneSummary = getGeneSummary(record?.genes);
+    if (geneSummary.total === 0 && geneSummary.items.length === 0) {
       this._dl.replaceChildren();
       return;
     }
 
     this._dl.replaceChildren(
-      ...geneSymbols.flatMap((symbol, index) =>
-        this._createGeneRows(symbol, index)
+      this._createTotalRow(geneSummary.total),
+      ...geneSummary.items.flatMap((symbol, index) =>
+        this._createGeneRows(symbol, index + 1)
       )
     );
     this.elm.classList.remove('-notfound');
+  }
+
+  /**
+   * itemsが省略されたSVでも関連遺伝子数を確認できるよう、総数は常に先頭に表示する。
+   */
+  private _createTotalRow(total: number): HTMLDivElement {
+    return createEl('div', {
+      children: [
+        createEl('dt', { text: 'Total' }),
+        createEl('dd', { text: total.toLocaleString() }),
+      ],
+    });
   }
 
   /**

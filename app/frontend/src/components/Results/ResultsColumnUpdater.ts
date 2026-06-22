@@ -4,12 +4,18 @@ import type {
   TypeMasterItem,
   ConsequenceMasterItem,
   GeneSymbol,
+  GeneSummary,
   Frequency,
   TdFrequencies,
   Transcript,
   Significance,
 } from '../../types';
 import { REF_ALT_SHOW_LENGTH } from './ResultsColumnTemplates';
+
+type NormalizedGeneSummary = {
+  total: number;
+  items: GeneSymbol[];
+};
 
 /**
  * 検索結果テーブルの各列に、バリアント情報を反映するためのユーティリティクラス。
@@ -25,6 +31,35 @@ export class ResultsColumnUpdater {
    */
   static resetAnchor(cell: HTMLElement) {
     cell.querySelector('a.hyper-text')?.remove();
+  }
+
+  /**
+   * リンクにしない補助テキストを再描画時に残さないため、専用classの要素だけを削除する。
+   */
+  static resetInlineText(cell: HTMLElement, className: string) {
+    cell.querySelector(`.${className}`)?.remove();
+  }
+
+  /**
+   * hrefなしのa要素を避けつつ、remainsバッジの直前へ通常テキストを差し込む。
+   */
+  static updateInlineText(
+    cell: HTMLElement,
+    className: string,
+    text: string,
+    insertBefore?: Element | null
+  ) {
+    this.resetInlineText(cell, className);
+
+    const span = document.createElement('span');
+    span.className = className;
+    span.textContent = text;
+
+    if (insertBefore) {
+      cell.insertBefore(span, insertBefore);
+    } else {
+      cell.appendChild(span);
+    }
   }
 
   /**
@@ -227,25 +262,35 @@ export class ResultsColumnUpdater {
    * Gene列を更新する。
    *
    * @param tdGene - Gene列のtd要素
-   * @param symbols - 遺伝子シンボルの配列
+   * @param genes - 遺伝子の総数と表示用items
    */
   static updateGene(
     tdGene: HTMLDivElement | null,
     tdGeneRemains: HTMLSpanElement | null,
-    symbols: GeneSymbol[]
+    genes: GeneSummary | GeneSymbol[] | undefined
   ) {
     if (!tdGene || !tdGeneRemains) return;
 
-    const validSymbols = Array.isArray(symbols) ? symbols.filter(Boolean) : [];
+    const geneSummary = this.normalizeGeneSummary(genes);
+    const validSymbols = geneSummary.items.filter(Boolean);
+    this.resetInlineText(tdGene, 'gene-count-text');
 
     if (validSymbols.length === 0) {
       this.updateRemainsBadge(tdGeneRemains, 0);
       this.resetAnchor(tdGene);
+      if (geneSummary.total > 0) {
+        this.updateInlineText(
+          tdGene,
+          'gene-count-text',
+          `${geneSummary.total.toLocaleString()} genes`,
+          tdGeneRemains
+        );
+      }
       return;
     }
 
-    // 画面には先頭の遺伝子だけを表示し、残りの件数はdata-remainsに保持する。
-    this.updateRemainsBadge(tdGeneRemains, validSymbols.length - 1);
+    // 画面には先頭の遺伝子だけを表示し、APIが返した総遺伝子数との差分をdata-remainsに保持する。
+    this.updateRemainsBadge(tdGeneRemains, Math.max(0, geneSummary.total - 1));
     this.updateAnchor(
       tdGene,
       'hyper-text -internal',
@@ -254,6 +299,24 @@ export class ResultsColumnUpdater {
       `View gene ${validSymbols[0].name} details`,
       tdGeneRemains
     );
+  }
+
+  /**
+   * ステージング移行中の旧配列レスポンスでも表示を止めないため、GeneSummaryへ正規化する。
+   */
+  static normalizeGeneSummary(
+    genes: GeneSummary | GeneSymbol[] | undefined
+  ): NormalizedGeneSummary {
+    if (Array.isArray(genes)) {
+      return { total: genes.length, items: genes };
+    }
+
+    const items = Array.isArray(genes?.items) ? genes.items : [];
+
+    return {
+      total: Math.max(items.length, genes?.total ?? 0),
+      items,
+    };
   }
 
   /**

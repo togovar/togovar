@@ -125,8 +125,9 @@ export type ResultData = {
   reference: string;
   alternate: string;
   existing_variations: string[];
-  genes: GeneSymbol[];
-  external_links: ExternalLink;
+  genes: GeneSummary;
+  external_links?: ExternalLink;
+  external_link?: ExternalLink;
   significance: Significance[];
   most_severe_consequence: string;
   sift: number | null;
@@ -136,6 +137,15 @@ export type ResultData = {
   sscv_db?: SscvDbItem[];
   transcripts: Transcript[];
   frequencies: Frequency[];
+};
+
+/**
+ * バリアントに関連する遺伝子一覧。
+ * SVでは件数が巨大になり得るため、APIは総数と表示用itemsを分けて返す。
+ */
+export type GeneSummary = {
+  total: number;
+  items?: GeneSymbol[];
 };
 
 /**
@@ -230,4 +240,3 @@ export type Frequency = {
  */
 export type TdFrequencies = Record<string, FrequencyElement>;
 export type FrequencyElement = FrequencyBlockElement;
-

@@ -258,13 +258,15 @@ app/frontend/assets/GRCh38/search_conditions.json
 主な関連ファイル:
 
 ```txt
-app/frontend/src/api/fetchData.ts
+app/frontend/src/api/searchExecutor.ts
+app/frontend/src/api/searchRequest.ts
+app/frontend/src/api/searchResponse.ts
 app/frontend/src/components/DownloadButton.ts
 app/frontend/src/global.ts
 ```
 
-- Simple Search は GET リクエストで検索条件をクエリパラメータに展開します。
-- Advanced Search は POST リクエストで `body.query` に条件オブジェクトを入れます。
+- Simple Search は現在、GET リクエストで検索条件をクエリパラメータに展開します。
+- Advanced Search は `/api/search/variant` へ POST し、`body.query` に条件オブジェクトを入れます。
 - ダウンロードは現在の検索モードに応じて、Simple / Advanced の条件を送ります。
 
 ## ドキュメントページ
