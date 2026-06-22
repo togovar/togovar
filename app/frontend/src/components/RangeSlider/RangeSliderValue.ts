@@ -6,11 +6,6 @@ export function parseNumber(value: string | number, fallback: number): number {
   return Number.isNaN(parsedValue) ? fallback : parsedValue;
 }
 
-/** range input のvalue属性は小数3桁で揃える既存表示を保つ。 */
-export function formatSliderValue(value: string): string {
-  return parseNumber(value, 0).toFixed(3);
-}
-
 /** booleanと文字列の両方で渡されるinvert値をbooleanに正規化する。 */
 export function toInvertValue(value: unknown): boolean {
   if (typeof value === 'boolean') return value;

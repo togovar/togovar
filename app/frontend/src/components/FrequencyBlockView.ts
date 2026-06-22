@@ -6,7 +6,7 @@ import {
 } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import type { Frequency } from '../types/api';
-import Styles from '../../stylesheets/object/component/frequency-block-view.scss';
+import Styles from '../../stylesheets/web-components/frequency-block-view.scss';
 
 /** CSSが表示するブロック数を決定するためのカテゴリラベル */
 type LogFrequencyLabel =

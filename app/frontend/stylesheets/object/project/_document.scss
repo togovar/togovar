@@ -1,0 +1,233 @@
+// =============================================================================
+// 静的ドキュメントページ (About・Help・FAQ など)
+// 統合元: object/component/_common-document.scss
+// =============================================================================
+
+// content-width: コンテンツ幅を var(--width-min) に揃えて中央揃えにするミックスイン
+// 画面幅が広くてもコンテンツが広がりすぎないよう制限する
+@mixin content-width {
+  width: calc(var(--width-min) - var(--padding-side) * 2);
+  padding-right: var(--padding-side);
+  padding-left: var(--padding-side);
+  margin: 0 auto;
+}
+
+// ドキュメントページ共通レイアウト (.common-document)
+// About・Policy・Help などの静的コンテンツページのルートコンテナ
+.common-document {
+  > .header {
+    min-width: calc(var(--width-min) - var(--padding-side) * 2);
+    padding: 27px 0 10px;
+    color: white;
+    background: var(--gradient-heading);
+
+    > .title {
+      font-size: 21px;
+      line-height: 27px;
+
+      @include content-width;
+    }
+  }
+
+  > .contents {
+    padding: 24px 0 36px;
+    font-size: 14px;
+    line-height: 1.8;
+
+    @include content-width;
+
+    + .contents {
+      margin-top: -36px;
+    }
+
+    > .section {
+      padding: 24px 0;
+
+      &:last-child {
+        position: relative;
+        padding-bottom: 60px;
+
+        // 最後のセクション下部にアクセントカラーの区切り線を引く
+        &::after {
+          position: absolute;
+          bottom: 0;
+          left: -4px;
+          display: block;
+          width: calc(100% + 8px);
+          height: 2px;
+          content: '';
+          background-color: var(--color-key-dark1);
+        }
+      }
+
+      > .sectiontitle {
+        position: relative;
+        font-size: 18px;
+        color: var(--color-key-dark3);
+
+        &::before,
+        &::after {
+          position: absolute;
+          display: block;
+          content: '';
+        }
+
+        &#diseases_jgad000123 {
+          scroll-margin-top: 50px;
+        }
+      }
+
+      .table {
+        width: 100%;
+        font-size: 14px;
+        line-height: 1.2;
+        // tr の border-bottom を有効にするために必要（separate モデルでは tr の border は無視される）
+        border-collapse: collapse;
+
+        th,
+        td {
+          padding: 4px 4px;
+          vertical-align: top;
+        }
+
+        > thead {
+          > tr {
+            border-bottom: solid 1px var(--color-black);
+          }
+        }
+
+        > tbody {
+          > tr {
+            border-bottom: solid 1px color-mix(in srgb, var(--color-black) 40%, transparent);
+          }
+        }
+
+        > tfoot {
+          > tr {
+            border-top: solid 1px var(--color-black);
+          }
+        }
+      }
+
+      .notice {
+        margin-top: 8px;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .unordered-list {
+        padding-inline-start: 0;
+        list-style: none;
+
+        > li {
+          position: relative;
+          padding: 4px 0 4px 1em;
+          line-height: 1.6;
+
+          &::before {
+            position: relative;
+            top: -3px;
+            left: -7px;
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            content: '';
+            background-color: var(--color-key);
+            border-radius: 100%;
+          }
+        }
+      }
+
+      .ordered-list {
+        padding-inline-start: 0;
+        list-style: none;
+        counter-reset: item;
+
+        > li {
+          position: relative;
+          padding: 4px 0 4px 2em;
+
+          // カウンターを丸バッジとして表示する
+          &::before {
+            position: absolute;
+            top: 7px;
+            right: calc(100% - 21px);
+            display: block;
+            height: 18px;
+            padding: 0 6px;
+            font-weight: bold;
+            line-height: 18px;
+            color: white;
+            text-align: center;
+            content: counters(item, '.') ' ';
+            counter-increment: item;
+            background-color: var(--color-key);
+            border-radius: 9px;
+          }
+
+          + li {
+            margin-top: 1em;
+          }
+
+          > .heading {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--color-key-dark1);
+          }
+
+          .subsection {
+            padding-top: 0.5em;
+            line-height: 1.4;
+
+            > .subheading {
+              font-size: 12px;
+              line-height: 1.2;
+              color: var(--color-black);
+            }
+          }
+        }
+      }
+
+      .variant-function {
+        line-height: 18px;
+      }
+
+      img {
+        max-width: 100%;
+      }
+    }
+
+    // 2段組レイアウト — About などの説明文ページで使用
+    &.-two-columns {
+      > .section {
+        column-gap: 4em;
+        text-align: justify;
+        hyphens: auto;
+        word-break: break-all;
+        widows: 2;
+        orphans: 2;
+        column-count: 2;
+        column-rule: solid 1px color-mix(in srgb, var(--color-key) 60%, transparent);
+
+        > .sectiontitle {
+          column-span: all;
+        }
+
+        .subsection {
+          break-inside: avoid;
+        }
+      }
+    }
+  }
+
+  // ドキュメントページ内に埋め込まれた結果テーブルはホバーハイライトを無効化する
+  .results-view {
+    > tbody {
+      > tr {
+        &:hover {
+          background-color: transparent;
+        }
+      }
+    }
+  }
+}

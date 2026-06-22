@@ -4,6 +4,7 @@ const config: Config = {
   extends: [
     'stylelint-config-recommended',
     'stylelint-config-recommended-scss',
+    'stylelint-config-recess-order',
   ],
   rules: {
     // プロジェクト独自の命名規則（BEMベース）があり、
@@ -13,11 +14,16 @@ const config: Config = {
     // クラスと同様に、ID セレクターもプロジェクト側の命名に委ねるため無効にする
     'selector-id-pattern': null,
 
-    // @use / @import どちらも混在しており、移行途中のため強制しない
+    // このルールは CSS @import の string/url 形式を制御するもので、
+    // Sass の @use / @import の使い分けには適用されないため無効にする
     'import-notation': null,
 
     // ブラウザ固有の疑似クラス（:focus-visible など）を誤検出しないよう有効にする
     'selector-pseudo-class-no-unknown': true,
+
+    // 疑似要素は :: （ダブルコロン）を使う。: （シングルコロン）は疑似クラス専用。
+    // ::before / ::after / ::first-letter など全て対象
+    'selector-pseudo-element-colon-notation': 'double',
 
     // コメント前の空行ルールがプロジェクトの既存スタイルと合わないため無効にする
     'comment-empty-line-before': null,
@@ -32,8 +38,8 @@ const config: Config = {
     // 長い演算式を改行で分割する記述が既存コードにあるため許容する
     'scss/operator-no-newline-after': null,
 
-    // アンダースコア付きパーシャル（_variables.scss など）を @use で読み込む
-    // 旧来の書き方が残っているため、先頭アンダースコアを警告しない
+    // @use 'partial' と書くのが正規形（アンダースコア・拡張子は省略）
+    // 旧来の @use '_variables.scss' 記述が残っていても許容する
     'scss/load-no-partial-leading-underscore': null,
   },
   overrides: [

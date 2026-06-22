@@ -1,6 +1,6 @@
 import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import Style from '../../../stylesheets/object/component/frequency-count-value-view.scss';
+import Style from '../../../stylesheets/web-components/frequency-count-value-view.scss';
 import type {
   ScoreRange,
   FrequencyLeaf,
@@ -41,6 +41,14 @@ export class FrequencyCountValueView extends LitElement {
   @property({ type: Number }) to: number | null = 1;
   @property({ type: Boolean }) invert: boolean = false;
   @property({ type: Boolean }) filtered: boolean = false;
+
+  // setValues() 経由で明示的にセットされたかどうか。
+  // デフォルト値 false と「URL復元で filtered=false に設定された」を区別するために使う。
+  private _filteredExplicitlySet = false;
+
+  get filteredExplicitlySet(): boolean {
+    return this._filteredExplicitlySet;
+  }
 
   private _bars: NodeListOf<HTMLElement> | undefined;
 
@@ -168,6 +176,7 @@ export class FrequencyCountValueView extends LitElement {
     this.to = to;
     this.invert = invert;
     this.filtered = filtered;
+    this._filteredExplicitlySet = true;
     this.dataset.mode = mode;
 
     this._updateBarVisualization();

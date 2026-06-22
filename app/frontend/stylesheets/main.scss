@@ -1,0 +1,35 @@
+// foundation — CSS 出力を持つファイルのみ明示的に読み込む。
+// 変数・ミックスインは各パーシャルが @use '../foundation' as * で個別に宣言する。
+@use 'foundation/font-awesome';
+@use 'foundation/reset';
+@use 'foundation/base';
+
+@use 'layout/layout';
+
+// 汎用UIコンポーネント — 特定画面に依存しない再利用可能なパーツ
+@use 'object/component/button-view';
+@use 'object/component/variant-icon';
+@use 'object/component/dropdown-view';
+@use 'object/component/floating-info';
+@use 'object/component/form-parts';
+@use 'object/component/logical-operator-switch';
+@use 'object/component/module-tabs-view';
+@use 'object/component/page-index';
+@use 'object/component/panel-view';
+@use 'object/component/question-answer';
+
+// 画面別スタイル — 各機能ページ固有のコンポーネントをまとめたもの
+@use 'object/project/loading-indicator';
+@use 'object/project/advanced-search';
+@use 'object/project/chromosome';
+@use 'object/project/columns-editor';
+@use 'object/project/detail';
+@use 'object/project/document';
+@use 'object/project/global-header';
+@use 'object/project/messages';
+@use 'object/project/results';
+@use 'object/project/search-field';
+@use 'object/project/sidebar';
+@use 'object/project/simple-search';
+
+@use 'object/utility/helper';

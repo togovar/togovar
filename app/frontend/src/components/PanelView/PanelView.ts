@@ -32,6 +32,9 @@ class PanelView {
     // ローカルストレージのキーはパネルごとに一意になるよう kind を付加する
     this.localStorageKey = 'panel_' + kind;
 
+    // -cannotcollapse パネルは開閉不可のため、localStorage の復元とクリックハンドラを登録しない
+    if (elm.classList.contains('-cannotcollapse')) return;
+
     // 前回のセッションで折りたたまれていた場合、初期表示も折りたたみ状態にする
     if (window.localStorage.getItem(this.localStorageKey) === 'collapsed') {
       elm.classList.add('-collapsed');

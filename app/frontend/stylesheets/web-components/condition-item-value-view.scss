@@ -1,0 +1,417 @@
+:host {
+  --height-container: var(--height-advanced-search-condition-values-container);
+  --height: var(--height-advanced-search-condition-value);
+  display: inline-block;
+
+  > .condition-item-value-container {
+    display: flex;
+    gap: 20px;
+  }
+
+  .inner {
+    // 削除ボタン付きのタグでも文字とアイコンの縦位置がずれないよう flex で中央揃えにする
+    display: inline-flex;
+    gap: 0.2em;
+    align-items: center;
+    align-self: center;
+    padding: 1px 10px 0 10px;
+    margin-right: 2px;
+    font-weight: bold;
+    line-height: 1;
+    background-color: white;
+    border: solid 1px var(--color-key-dark1);
+    border-radius: calc(var(--height) * 0.5);
+  }
+}
+
+// dataset/genotype/pathogenicity_prediction: タグとグラフを2列グリッドで横並びにする
+// 絶対配置にすると overflow: auto の親でもスクロール幅に反映されないため通常フローを使う
+:host([data-condition-type='dataset']),
+:host([data-condition-type='genotype']),
+:host([data-condition-type='pathogenicity_prediction']) {
+  // flex-basis: 100% で .values-container（flex-wrap: wrap）の1行を占有して縦スタックさせる
+  // min-width: max-content がコンテンツ幅を下限として保ち、親の overflow: auto でスクロール可能にする
+  flex-basis: 100%;
+  min-width: max-content;
+
+  // :host に grid を適用すると子コンポーネントの描画に影響するため
+  // 内側の .condition-item-value-container にグリッドを適用する
+  > .condition-item-value-container {
+    display: grid;
+    // 第1列: 最大ラベル幅に揃えた固定幅（JS が --left-advanced-search-condition-graph を動的に更新）
+    // 第2列: グラフのコンテンツ幅（max-content で縮まない）
+    grid-template-columns: var(
+        --left-advanced-search-condition-graph,
+        150px
+      ) max-content;
+    column-gap: 0;
+    align-items: center;
+  }
+
+  .inner {
+    // グリッド第1列内でコンテンツ幅に収める（列幅まで引き伸ばさない）
+    justify-self: start;
+    white-space: nowrap;
+  }
+}
+
+:host([data-condition-type='dataset']),
+:host([data-condition-type='genotype']) {
+  .inner {
+    &::before {
+      margin-right: 4px;
+      font-family: 'Font Awesome 7 Free', sans-serif;
+      font-weight: 900;
+      content: var(--icon-database);
+    }
+  }
+}
+
+// significance: 先頭の略称バッジとラベルを同じタグ内に収める
+:host([data-condition-type='significance']) {
+  .inner {
+    &::before {
+      margin-right: 4px;
+      margin-left: -2px;
+      font-size: 10px;
+    }
+  }
+}
+
+// pathogenicity_prediction: 子コンポーネント側で見た目を持つため通常タグの枠を外す
+:host([data-condition-type='pathogenicity_prediction']) {
+  .inner {
+    padding: 0;
+    background-color: transparent;
+    border: none;
+  }
+}
+
+// ──────────────────────────────────────────────────
+// dataset/genotype: データセット種別ごとの色
+// ──────────────────────────────────────────────────
+
+:host([data-condition-type='dataset'][data-value='gem_j_wga']) {
+  .inner {
+    background-color: var(--color-dataset-gemj-light);
+    border-color: var(--color-dataset-gemj);
+
+    &::before {
+      color: var(--color-dataset-gemj);
+    }
+  }
+}
+
+:host([data-condition-type='dataset'][data-value^='jga_wgs']),
+:host([data-condition-type='dataset'][data-value='jga_wes']),
+:host([data-condition-type='dataset'][data-value='jga_snp']),
+:host([data-condition-type='dataset'][data-value^='bbj_riken']),
+:host([data-condition-type='genotype'][data-value^='jga_wgs']),
+:host([data-condition-type='genotype'][data-value='jga_wes']),
+:host([data-condition-type='genotype'][data-value='jga_snp']),
+:host([data-condition-type='genotype'][data-value^='bbj_riken']) {
+  .inner {
+    background-color: var(--color-dataset-jga-light);
+    border-color: var(--color-dataset-jga);
+
+    &::before {
+      color: var(--color-dataset-jga);
+    }
+  }
+}
+
+:host([data-condition-type='dataset'][data-value='hgvd']) {
+  .inner {
+    background-color: var(--color-dataset-hgvd-light);
+    border-color: var(--color-dataset-hgvd);
+
+    &::before {
+      color: var(--color-dataset-hgvd);
+    }
+  }
+}
+
+:host([data-condition-type='dataset'][data-value='tommo']) {
+  .inner {
+    background-color: var(--color-dataset-tommo-light);
+    border-color: var(--color-dataset-tommo);
+
+    &::before {
+      color: var(--color-dataset-tommo);
+    }
+  }
+}
+
+:host([data-condition-type='dataset'][data-value^='ncbn']),
+:host([data-condition-type='genotype'][data-value^='ncbn']) {
+  .inner {
+    background-color: var(--color-dataset-ncbn-light);
+    border-color: var(--color-dataset-ncbn);
+
+    &::before {
+      color: var(--color-dataset-ncbn);
+    }
+  }
+}
+
+:host([data-condition-type='dataset'][data-value^='gnomad_genomes']),
+:host([data-condition-type='dataset'][data-value^='gnomad_exomes']) {
+  .inner {
+    background-color: var(--color-dataset-foreign-light);
+    border-color: var(--color-dataset-foreign);
+
+    &::before {
+      color: var(--color-dataset-foreign);
+    }
+  }
+}
+
+// ──────────────────────────────────────────────────
+// significance: 値コードごとの色と略称バッジ
+// ──────────────────────────────────────────────────
+
+:host([data-condition-type='significance'][data-value='P']) {
+  .inner {
+    background-color: var(--color-sign-dangerous-light);
+    border-color: var(--color-sign-dangerous);
+
+    &::before {
+      color: var(--color-sign-dangerous);
+      content: 'P';
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='LP']) {
+  .inner {
+    background-color: var(--color-sign-dangerous-light);
+    border-color: var(--color-sign-dangerous);
+
+    &::before {
+      color: var(--color-sign-dangerous);
+      content: 'LP';
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='PLP']) {
+  .inner {
+    background-color: var(--color-sign-lowdangerous-light);
+    border-color: var(--color-sign-lowdangerous);
+
+    &::before {
+      color: var(--color-sign-lowdangerous);
+      content: 'P';
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='LPLP']) {
+  .inner {
+    background-color: var(--color-sign-lowdangerous-light);
+    border-color: var(--color-sign-lowdangerous);
+
+    &::before {
+      color: var(--color-sign-lowdangerous);
+      content: 'LP';
+    }
+  }
+}
+
+// ERA/LRA/URA はすべて同色・同バッジ（'RA'）のためまとめる
+:host([data-condition-type='significance'][data-value='ERA']),
+:host([data-condition-type='significance'][data-value='LRA']),
+:host([data-condition-type='significance'][data-value='URA']) {
+  .inner {
+    background-color: var(--color-sign-warning-light);
+    border-color: var(--color-sign-warning);
+
+    &::before {
+      color: var(--color-sign-warning);
+      content: 'RA';
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='US']) {
+  .inner {
+    background-color: var(--color-sign-unknown-light);
+    border-color: var(--color-sign-unknown);
+
+    &::before {
+      color: var(--color-sign-unknown);
+      content: 'US';
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='LB']) {
+  .inner {
+    background-color: var(--color-sign-normal-light);
+    border-color: var(--color-sign-normal);
+
+    &::before {
+      color: var(--color-sign-normal);
+      content: 'LB';
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='B']) {
+  .inner {
+    background-color: var(--color-sign-safe-light);
+    border-color: var(--color-sign-safe);
+
+    &::before {
+      color: var(--color-sign-safe);
+      content: 'B';
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='CI']) {
+  .inner {
+    background-color: var(--color-sign-modifier-light);
+    border-color: var(--color-sign-modifier);
+
+    &::before {
+      color: var(--color-sign-modifier);
+      content: 'CI';
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='DR']) {
+  .inner {
+    background-color: var(--color-sign-other-light);
+    border-color: var(--color-sign-other);
+
+    &::before {
+      color: var(--color-sign-other);
+      content: 'DR';
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='CS']) {
+  .inner {
+    background-color: var(--color-sign-other-light);
+    border-color: var(--color-sign-other);
+
+    &::before {
+      color: var(--color-sign-other);
+      content: 'CS';
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='RF']) {
+  .inner {
+    background-color: var(--color-sign-other-light);
+    border-color: var(--color-sign-other);
+
+    &::before {
+      color: var(--color-sign-other);
+      content: 'RF';
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='A']) {
+  .inner {
+    background-color: var(--color-sign-other-light);
+    border-color: var(--color-sign-other);
+
+    &::before {
+      color: var(--color-sign-other);
+      content: 'A';
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='PR']) {
+  .inner {
+    background-color: var(--color-sign-other-light);
+    border-color: var(--color-sign-other);
+
+    &::before {
+      color: var(--color-sign-other);
+      content: 'PR';
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='AF']) {
+  .inner {
+    background-color: var(--color-sign-other-light);
+    border-color: var(--color-sign-other);
+
+    &::before {
+      color: var(--color-sign-other);
+      content: 'AF';
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='O']) {
+  .inner {
+    background-color: white;
+    border-color: var(--color-gray);
+
+    &::before {
+      content: 'O';
+      border-color: var(--color-gray);
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='NP']) {
+  .inner {
+    background-color: white;
+    border-color: var(--color-gray);
+
+    &::before {
+      content: 'NP';
+      border-color: var(--color-gray);
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='AN']) {
+  .inner {
+    background-color: white;
+    border-color: var(--color-gray);
+
+    &::before {
+      content: 'AN';
+      border-color: var(--color-gray);
+    }
+  }
+}
+
+// 削除ボタンは編集中だけ外側の ::part 指定で inline-flex に切り替えて表示する
+// display: none の状態でも align-items/justify-content を定義しておくことで
+// ::part で表示を切り替えた際に即座に有効になる
+button.delete {
+  position: relative;
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  padding: 0;
+  margin-right: -0.35em;
+  font-family: 'Font Awesome 7 Free', sans-serif;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--color-gray);
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+
+  &::before {
+    font-size: 0.8em;
+    content: var(--icon-xmark);
+  }
+}

@@ -170,7 +170,8 @@ const config = {
       { test: /\.js$/, resolve: { fullySpecified: false } },
       { test: /\.[tj]s$/, loader: 'ts-loader', exclude: /node_modules/ },
       {
-        test: /\.(sa|c)ss$/,
+        test: /\.(sc|c)ss$/,
+        issuer: /app\/frontend\/packs\//,
         use: [
           MiniCssExtractPlugin.loader,
           {
@@ -192,6 +193,7 @@ const config = {
       },
       {
         test: /\.scss$/,
+        issuer: /app\/frontend\/src\/components\//,
         use: [
           {
             loader: 'lit-scss-loader',

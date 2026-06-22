@@ -11,7 +11,7 @@ import type {
   UnassignedOption,
   PredictionChangeDetail,
 } from '../../../types';
-import Styles from '../../../../stylesheets/object/component/prediction-range-slider.scss';
+import Styles from '../../../../stylesheets/web-components/prediction-range-slider.scss';
 
 const SLIDER_CONFIG = {
   min: 0,
