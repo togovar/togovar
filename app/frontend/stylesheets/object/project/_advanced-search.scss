@@ -932,7 +932,9 @@ $OPACITY_DISABLED: 0.8;
       // 非アクティブな切り替えセクションは半透明で操作不可にする
       &.switching {
         > label {
-          margin-bottom: 4px;
+          display: flex;
+          column-gap: 2px;
+          margin-bottom: 2px;
 
           > span {
             font-weight: bold;
