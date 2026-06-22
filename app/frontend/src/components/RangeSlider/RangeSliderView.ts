@@ -9,7 +9,7 @@ import {
   METER_VERTICAL_CLASS,
   RANGE_CHANGED_EVENT,
 } from './RangeSliderConstants';
-import { createRulerScales, type RulerScale } from './RangeSliderTemplate';
+import { createRulerScales, type RulerScale } from './RangeSliderRuler';
 import {
   formatInputValue,
   formatSliderValue,
@@ -30,6 +30,23 @@ const DEFAULT_ORIENTATION = 'horizontal';
 export class RangeSlider extends LitElement {
   static styles = [Styles];
 
+  static properties = {
+    min: { type: String, noAccessor: true },
+    max: { type: String, noAccessor: true },
+    inputStep: { type: String, attribute: 'input-step', noAccessor: true },
+    sliderStep: { type: String, attribute: 'slider-step', noAccessor: true },
+    value1: { type: String, noAccessor: true },
+    value2: { type: String, noAccessor: true },
+    orientation: { type: String, noAccessor: true },
+    invert: { type: String, noAccessor: true },
+    match: { type: String, noAccessor: true },
+    rulerNumberOfSteps: {
+      type: String,
+      attribute: 'ruler-number-of-steps',
+      noAccessor: true,
+    },
+  };
+
   private _state: RangeSliderState;
   private _searchType: string | null = null;
   private _rulerScales: RulerScale[] = [];
@@ -47,25 +64,6 @@ export class RangeSlider extends LitElement {
   @query('.to') private to!: HTMLInputElement;
   @query('.invert') private invertChk!: HTMLInputElement;
   @query('.meter') private _meter!: HTMLElement;
-
-  /** 外部から属性で初期値や表示方向を渡せるよう、変更を監視する属性を明示する。 */
-  static get observedAttributes(): RangeSliderAttribute[] {
-    // Litのfinalizeで static styles を初期化する必要があるため、
-    // 手動属性管理でも super 側の getter を一度通す。
-    void super.observedAttributes;
-    return [
-      'min',
-      'max',
-      'input-step',
-      'slider-step',
-      'value1',
-      'value2',
-      'orientation',
-      'invert',
-      'match',
-      'ruler-number-of-steps',
-    ];
-  }
 
   constructor() {
     super();

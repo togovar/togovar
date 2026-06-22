@@ -15,10 +15,6 @@
   column-gap: 2em;
 }
 
-label {
-  margin: 0;
-}
-
 .input {
   text-align: center;
 }
@@ -38,6 +34,11 @@ label {
   min-height: 24px;
   margin-bottom: 0;
   margin-left: 8px;
+}
+
+.match label,
+.checkbox-label {
+  margin: 0;
 }
 
 .invert {
