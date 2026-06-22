@@ -1,5 +1,7 @@
 import PanelView from './PanelView';
 import { storeManager } from '../../store/StoreManager';
+import { createEl } from '../../utils/dom/createEl';
+import { selectRequired } from '../../utils/dom/select';
 import type { GeneSymbol } from '../../types';
 
 /**
@@ -9,6 +11,15 @@ function getGeneSymbols(value: unknown): GeneSymbol[] {
   if (!Array.isArray(value)) return [];
 
   return value.filter(isGeneSymbol);
+}
+
+/**
+ * synonymsも外部データ由来のため、表示に使える文字列配列だけへ絞り込む。
+ */
+function getSynonyms(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.filter((item): item is string => typeof item === 'string');
 }
 
 /**
@@ -22,29 +33,12 @@ function isGeneSymbol(value: unknown): value is GeneSymbol {
 }
 
 /**
- * innerHTMLへ挿入する値のXSSを避けるため、最低限の文字だけHTMLエスケープする。
- */
-function escapeHtml(value: string): string {
-  return value.replace(
-    /[&<>"']/g,
-    (ch) =>
-      ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;',
-      })[ch] as string
-  );
-}
-
-/**
  * 選択バリアントに関連する遺伝子シンボルをプレビュー表示するパネル。
  * Symbol（公式シンボル）と Alias（別名）を並べて表示する。
  */
 export default class PanelViewPreviewGene extends PanelView {
-  /** innerHTML で表示を更新する対象の dl 要素 */
-  private readonly _dl: Element;
+  /** DOM再構築の対象を限定し、パネル全体を触らずに表示だけ更新するため保持する。 */
+  private readonly _dl: HTMLElement;
 
   /**
    * kind を 'preview-gene' にする。
@@ -55,7 +49,11 @@ export default class PanelViewPreviewGene extends PanelView {
     super(elm, 'preview-gene');
     storeManager.subscribe('selectedRow', () => this.selectedRow());
     storeManager.subscribe('offset', () => this.offset());
-    this._dl = this.elm.querySelector<Element>('.content > .property-list')!;
+    this._dl = selectRequired<HTMLElement>(
+      this.elm,
+      '.content > .property-list',
+      'PanelViewPreviewGene'
+    );
   }
 
   /**
@@ -82,35 +80,71 @@ export default class PanelViewPreviewGene extends PanelView {
     this.elm.classList.add('-notfound');
 
     if (storeManager.getData('selectedRow') === undefined) {
-      this._dl.innerHTML = '';
+      this._dl.replaceChildren();
       return;
     }
 
     const record = storeManager.getSelectedRecord();
     const geneSymbols = getGeneSymbols(record?.genes);
     if (geneSymbols.length === 0) {
-      this._dl.innerHTML = '';
+      this._dl.replaceChildren();
       return;
     }
 
-    this._dl.innerHTML = geneSymbols
-      .map((symbol, index) => {
-        const name = escapeHtml(symbol.name);
-        // 2つ目以降の遺伝子グループには .-group-start を付与して区切り線と上余白を追加する
-        const groupStartClass = index > 0 ? ' class="-group-start"' : '';
-        const aliases =
-          !symbol.synonyms || symbol.synonyms.length === 0
-            ? ''
-            : `<div><dt>Alias</dt><dd>${symbol.synonyms.map(escapeHtml).join(', ')}</dd></div>`;
-        return (
-          `<div${groupStartClass}><dt>Symbol</dt><dd>` +
-          `<a href="/gene/${encodeURIComponent(String(symbol.id))}" target="_blank" rel="noopener noreferrer" class="hyper-text -internal">${name}</a>` +
-          `</dd></div>` +
-          aliases
-        );
-      })
-      .join('');
-
+    this._dl.replaceChildren(
+      ...geneSymbols.flatMap((symbol, index) =>
+        this._createGeneRows(symbol, index)
+      )
+    );
     this.elm.classList.remove('-notfound');
+  }
+
+  /**
+   * 遺伝子ごとの表示行をDOMとして組み立て、外部データをHTML文字列へ混ぜないようにする。
+   */
+  private _createGeneRows(symbol: GeneSymbol, index: number): HTMLDivElement[] {
+    const rows = [this._createSymbolRow(symbol, index)];
+    const aliases = getSynonyms(symbol.synonyms);
+
+    if (aliases.length > 0) {
+      rows.push(
+        createEl('div', {
+          children: [
+            createEl('dt', { text: 'Alias' }),
+            createEl('dd', { text: aliases.join(', ') }),
+          ],
+        })
+      );
+    }
+
+    return rows;
+  }
+
+  /**
+   * 公式シンボルは詳細ページへの導線になるため、リンク属性をここで一括設定する。
+   */
+  private _createSymbolRow(
+    symbol: GeneSymbol,
+    index: number
+  ): HTMLDivElement {
+    return createEl('div', {
+      class: index > 0 ? '-group-start' : '',
+      children: [
+        createEl('dt', { text: 'Symbol' }),
+        createEl('dd', {
+          children: [
+            createEl('a', {
+              class: 'hyper-text -internal',
+              attrs: {
+                href: `/gene/${encodeURIComponent(String(symbol.id))}`,
+                target: '_blank',
+                rel: 'noopener noreferrer',
+              },
+              text: symbol.name,
+            }),
+          ],
+        }),
+      ],
+    });
   }
 }
