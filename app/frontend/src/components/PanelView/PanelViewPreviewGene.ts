@@ -1,5 +1,42 @@
 import PanelView from './PanelView';
 import { storeManager } from '../../store/StoreManager';
+import type { GeneSymbol } from '../../types';
+
+/**
+ * APIやStoreに配列以外のgenesが入ってもプレビュー描画を止めないため、表示可能な配列だけを通す。
+ */
+function getGeneSymbols(value: unknown): GeneSymbol[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.filter(isGeneSymbol);
+}
+
+/**
+ * innerHTMLへ挿入する遺伝子情報は外部データ由来のため、表示に必要なshapeだけを確認する。
+ */
+function isGeneSymbol(value: unknown): value is GeneSymbol {
+  if (typeof value !== 'object' || value === null) return false;
+
+  const symbol = value as Partial<GeneSymbol>;
+  return typeof symbol.name === 'string' && symbol.id !== undefined;
+}
+
+/**
+ * innerHTMLへ挿入する値のXSSを避けるため、最低限の文字だけHTMLエスケープする。
+ */
+function escapeHtml(value: string): string {
+  return value.replace(
+    /[&<>"']/g,
+    (ch) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      })[ch] as string
+  );
+}
 
 /**
  * 選択バリアントに関連する遺伝子シンボルをプレビュー表示するパネル。
@@ -50,25 +87,13 @@ export default class PanelViewPreviewGene extends PanelView {
     }
 
     const record = storeManager.getSelectedRecord();
-    if (!record || !record.genes || record.genes.length === 0) {
+    const geneSymbols = getGeneSymbols(record?.genes);
+    if (geneSymbols.length === 0) {
       this._dl.innerHTML = '';
       return;
     }
 
-    /** innerHTML へ挿入する値の XSS を避けるため、最低限の文字だけ HTML エスケープする。 */
-    const escapeHtml = (value: string): string =>
-      value.replace(
-        /[&<>"']/g,
-        (ch) =>
-          ({
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;',
-          })[ch] as string
-      );
-    this._dl.innerHTML = record.genes
+    this._dl.innerHTML = geneSymbols
       .map((symbol, index) => {
         const name = escapeHtml(symbol.name);
         // 2つ目以降の遺伝子グループには .-group-start を付与して区切り線と上余白を追加する
