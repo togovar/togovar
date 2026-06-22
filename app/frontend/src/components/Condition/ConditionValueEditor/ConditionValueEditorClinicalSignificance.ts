@@ -15,7 +15,7 @@ const LABELS = {
   selectAll: 'Select all',
   clearAll: 'Clear all',
   mgend: 'MGeND',
-  clinvar: 'Clinvar',
+  clinvar: 'ClinVar',
 } as const;
 
 /**

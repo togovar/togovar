@@ -67,7 +67,7 @@ export class ConditionItemHydrator {
 
     const label = document.createElement('span');
     label.classList.add(source);
-    label.textContent = source === 'mgend' ? 'MGeND' : 'Clinvar';
+    label.textContent = source === 'mgend' ? 'MGeND' : 'ClinVar';
 
     const container = document.createElement('div');
     container.classList.add(conditionWrapperClass);

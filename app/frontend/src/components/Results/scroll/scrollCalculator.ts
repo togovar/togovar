@@ -102,12 +102,12 @@ export function calculateScrollbarDimensions(
   const visibilityRatio =
     totalRecordCount === 0 ? 1 : visibleRowCount / totalRecordCount;
 
-  const scrollbarHeight = Math.max(
-    Math.ceil(containerHeight * visibilityRatio),
-    MIN_SCROLLBAR_HEIGHT
+  const scrollbarHeight = Math.min(
+    Math.max(Math.ceil(containerHeight * visibilityRatio), MIN_SCROLLBAR_HEIGHT),
+    containerHeight
   );
 
-  const availableScrollSpace = containerHeight - scrollbarHeight;
+  const availableScrollSpace = Math.max(0, containerHeight - scrollbarHeight);
   // offset/maxOffset の比率でマッピングすることで、maxOffset 到達時に
   // barTop = availableScrollSpace（物理的に底に接する）を保証する
   const maxOffset = Math.max(0, totalRecordCount - visibleRowCount);
