@@ -439,6 +439,7 @@ export class RangeSlider extends LitElement {
   /** simple searchだけmatch UIを追加するため、通常利用では内部UIを露出しない。 */
   set searchType(value: string) {
     this._searchType = value;
+    this.dataset.searchType = value;
     this.requestUpdate();
   }
 

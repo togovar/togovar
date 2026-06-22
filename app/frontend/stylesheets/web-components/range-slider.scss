@@ -4,16 +4,14 @@
   display: flex;
   flex-wrap: wrap;
   row-gap: 5px;
-  column-gap: 2em;
+  column-gap: 8px;
 }
 
 .input {
   display: inline-flex;
-  // justify-content: space-between;
   gap: 15px;
   align-items: center;
-  width: 100%;
-  max-width: 250px;
+  width: fit-content;
   text-align: center;
 }
 
@@ -46,6 +44,7 @@
 .meter {
   position: relative;
   z-index: 1;
+  flex: 0 0 250px;
   width: 100%;
   max-width: 250px;
   min-height: 24px;
@@ -170,6 +169,28 @@ input[type='range']::-webkit-slider-thumb {
 
 .match input[type='radio'] {
   margin: 0;
+}
+
+:host([data-search-type='simple']) {
+  .wrapper {
+    column-gap: 2em;
+  }
+
+  .input {
+    justify-content: space-between;
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .meter {
+    flex: 0 1 250px;
+  }
+}
+
+:host([data-search-type='advanced']) {
+  .wrapper {
+    margin-top: -5px;
+  }
 }
 
 :host([data-thumb='1-lower']) {
