@@ -13,8 +13,8 @@ type LinkListEntry = {
  * dbSNP / MGeND / ClinVar / ToMMo / gnomAD の各データベースへのリンクを表示する。
  */
 export default class PanelViewPreviewExternalLinks extends PanelView {
-  /** innerHTML で表示を更新する対象のテーブル要素 */
-  private readonly _table: Element;
+  /** innerHTML で表示を更新する対象の dl 要素 */
+  private readonly _dl: Element;
 
   /**
    * kind を 'preview-external-links' にする。
@@ -25,7 +25,7 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
     super(elm, 'preview-external-links');
     storeManager.subscribe('selectedRow', () => this.selectedRow());
     storeManager.subscribe('offset', () => this.offset());
-    this._table = this.elm.querySelector<Element>('.content > .right-headline')!;
+    this._dl = this.elm.querySelector<Element>('.content > .property-list')!;
   }
 
   /**
@@ -50,7 +50,7 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
    */
   private _update(): void {
     this.elm.classList.add('-notfound');
-    this._table.innerHTML = '';
+    this._dl.innerHTML = '';
 
     if (storeManager.getData('selectedRow') === undefined) return;
 
@@ -88,9 +88,11 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
 
     if (list.length === 0) return;
 
-    this._table.innerHTML = `<tbody>${list
-      .map((entry) => `<tr><th>${entry.title}</th><td>${entry.content}</td></tr>`)
-      .join('')}</tbody>`;
+    this._dl.innerHTML = list
+      .map(
+        (entry) => `<div><dt>${entry.title}</dt><dd>${entry.content}</dd></div>`
+      )
+      .join('');
     this.elm.classList.remove('-notfound');
   }
 
@@ -108,7 +110,13 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
       value.replace(
         /[&<>"']/g,
         (ch) =>
-          ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch] as string)
+          ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+          })[ch] as string
       );
     const safeLabel = escapeHtml(String(label));
     let safeUrl = '';

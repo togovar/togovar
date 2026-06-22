@@ -4,12 +4,6 @@ declare module '*.scss' {
   export default content;
 }
 
-declare module '*.sass' {
-  import type { CSSResult } from 'lit';
-  const content: CSSResult;
-  export default content;
-}
-
 declare module '*.css' {
   import type { CSSResult } from 'lit';
   const content: CSSResult;

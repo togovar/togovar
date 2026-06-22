@@ -18,22 +18,16 @@
     //- Simple Search のコンテンツは JS が動的に挿入する（初期は空）
     #SimpleSearchView.section(data-tab-id="simple")
 
-    //-
-      Advanced Search のコンテンツ領域
-      .collapse-view を併用することで、条件ビルダーの折りたたみ（.-collapsed）に対応する。
-      .collapsecontent が非表示になると #AdvancedSearchBuilderView ごと消え、
-      .sectionscontainer の高さが縮小し main#SearchResultsView が上に詰まる。
-    #AdvancedSearchView.section.collapse-view(data-tab-id="advanced")
-      .collapsecontent
-
-        //-
-          条件ビルダーのルートコンテナ
-          .section クラスは JS の条件管理コードから参照されるが、
-          module-tabs-view の > .section ルール（直接子セレクター）には該当しないため
-          position:absolute は適用されない。
-        #AdvancedSearchBuilderView.section
-          //- 条件行・グループは JS（AdvancedSearchBuilderView.ts）が .inner に動的挿入する
-          .inner
+    //- Advanced Search のコンテンツ領域
+    #AdvancedSearchView.section(data-tab-id="advanced")
+      //-
+        条件ビルダーのルートコンテナ
+        .section クラスは JS の条件管理コードから参照されるが、
+        module-tabs-view の > .section ルール（直接子セレクター）には該当しないため
+        position:absolute は適用されない。
+      #AdvancedSearchBuilderView.section
+        //- 条件行・グループは JS（AdvancedSearchBuilderView.ts）が .inner に動的挿入する
+        .inner
 
 //-
   検索結果エリア
@@ -76,6 +70,8 @@ main#SearchResultsView.LayoutMainAside
 
       //- 仮想スクロール用テーブルコンテナ（行の表示/非表示切り替えは JS が制御）
       .tablecontainer
+        //- tablecontainer を基準にローディングアイコンを絶対配置する
+        include _loading_indicator
         table.results-view
           thead
             //-
@@ -121,23 +117,20 @@ main#SearchResultsView.LayoutMainAside
       //- バリアントプレビュー（行クリック時にサイドバーに展開される詳細情報）
       #Previews.sidebarcontent
         h2.title Preview
-        section#PreviewToVariantReport.panel-view.-cannotcollapse.-emphasize
-          h3.title
-            a.hyper-text.-internal(href='variant.html') Detailed variant report page
+        a#PreviewToVariantReport.panel-view.-cannotcollapse.-emphasize
+          h3.title Detailed variant report page
         section#PreviewGene.panel-view
           h3.title Genes
           .content
-            table.right-headline
-              tbody
+            dl.property-list
         section#PreviewExternalLinks.panel-view
           h3.title External links
           .content
-            table.right-headline
-              tbody
+            dl.property-list
         section#PreviewAlternateAlleleFrequencies.panel-view
           h3.title Alternate allele frequencies
           .content
-            table.frequency-detail
+            table.frequency-table
               thead
                 tr
                   th Dataset

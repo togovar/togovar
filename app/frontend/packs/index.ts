@@ -1,5 +1,5 @@
 // 全ページ共通スタイルシート。エントリポイントで一括ロードしてwebpackに依存関係を認識させる。
-import '../stylesheets/main.sass';
+import '../stylesheets/main.scss';
 
 // PAGEはWebpackのDefinePluginでHTMLテンプレートごとに埋め込まれるページ識別子。
 import { PAGE } from '../src/global';

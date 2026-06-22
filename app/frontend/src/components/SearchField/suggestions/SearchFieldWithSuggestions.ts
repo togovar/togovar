@@ -14,7 +14,7 @@ import { SuggestionKeyboardHandler } from './handlers/SuggestionKeyboardHandler'
 import { SuggestionSelectionHandler } from './handlers/SuggestionSelectionHandler';
 import { InputEventHandler } from './handlers/InputEventHandler';
 
-import Styles from '../../../../stylesheets/object/component/search-field-with-suggestions.scss';
+import Styles from '../../../../stylesheets/web-components/search-field-with-suggestions.scss';
 
 /**
  * APIレスポンスのキー名が変わっても一か所で対応できるよう、デフォルトのキーマッピングをconstで管理する

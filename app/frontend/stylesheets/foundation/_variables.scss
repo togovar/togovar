@@ -1,192 +1,137 @@
-// color
+// color.adjust() でコンパイル時に色を計算するためだけに使用
 @use 'sass:color';
-$COLOR_KEY: #62d5d9;
-$COLOR_KEY_DARK1: #117f93;
-$COLOR_KEY_DARK1_30: rgba($COLOR_KEY_DARK1, 0.3);
-$COLOR_KEY_DARK2: #0f6272;
-$COLOR_KEY_DARK3: #125263;
-
-$COLOR_SELECTED: #ffdd00;
-$COLOR_SELECTED_LIGHT: #fdfae5;
-$COLOR_SELECTED_HOVER: rgba($COLOR_SELECTED, 0.2);
-$COLOR_SINGLETON: color.adjust($COLOR_SELECTED, $lightness: 35%);
-$COLOR_SUGGEST: #ffff50;
-$COLOR_DISABLE_DEEP: #808080;
-$COLOR_DISABLE: #999999;
-
-$COLOR_BLACK: #444;
-$COLOR_GRAY: #94928d;
-$COLOR_PALE_GRAY: color.adjust($COLOR_GRAY, $lightness: 45%);
-$COLOR_LIGHT_GRAY: color.adjust($COLOR_GRAY, $lightness: 35%);
-$COLOR_DARKER_GRAY: #dbdbdb;
-$COLOR_SEPARATOR: rgba(0, 0, 0, 0.3);
-$COLOR_SEPARATOR_SUB: rgba(0, 0, 0, 0.2);
-
-$COLOR_REF: #249eb3;
-$COLOR_ALT: #ff6682;
-
-$COLOR_SIGN_SAFE: #04af58;
-$COLOR_SIGN_SAFE_LIGHT: color.adjust($COLOR_SIGN_SAFE, $lightness: 60%);
-$COLOR_SIGN_NORMAL: #9dcf3a;
-$COLOR_SIGN_NORMAL_LIGHT: color.adjust($COLOR_SIGN_NORMAL, $lightness: 42%);
-$COLOR_SIGN_WARNING: #ffae00;
-$COLOR_SIGN_WARNING_LIGHT: color.adjust($COLOR_SIGN_WARNING, $lightness: 45%);
-$COLOR_SIGN_LOWDANGEROUS: #ff953c;
-$COLOR_SIGN_LOWDANGEROUS_LIGHT: color.adjust(
-  $COLOR_SIGN_LOWDANGEROUS,
-  $lightness: 28%
-);
-$COLOR_SIGN_DANGEROUS: #ff5a54;
-$COLOR_SIGN_DANGEROUS_LIGHT: color.adjust(
-  $COLOR_SIGN_DANGEROUS,
-  $lightness: 30%
-);
-$COLOR_SIGN_MODIFIER: #c654ff;
-$COLOR_SIGN_MODIFIER_LIGHT: color.adjust($COLOR_SIGN_MODIFIER, $lightness: 30%);
-$COLOR_SIGN_OTHER: #9c8200;
-$COLOR_SIGN_OTHER_LIGHT: color.adjust($COLOR_SIGN_OTHER, $lightness: 60%);
-$COLOR_SIGN_UNKNOWN: #bbba7e;
-$COLOR_SIGN_UNKNOWN_LIGHT: color.adjust($COLOR_SIGN_UNKNOWN, $lightness: 35%);
-
-$COLOR_DATASET_JGA: $COLOR_KEY;
-$COLOR_DATASET_JGA_LIGHT: color.adjust($COLOR_DATASET_JGA, $lightness: 35%);
-$COLOR_DATASET_TOMMO: #ca678d;
-$COLOR_DATASET_TOMMO_LIGHT: color.adjust($COLOR_DATASET_TOMMO, $lightness: 50%);
-$COLOR_DATASET_HGVD: #005b80;
-$COLOR_DATASET_MGEND: $COLOR_DATASET_HGVD;
-$COLOR_DATASET_HGVD_LIGHT: color.adjust($COLOR_DATASET_HGVD, $lightness: 70%);
-$COLOR_DATASET_NCBN: #234b7c;
-$COLOR_DATASET_NCBN_LIGHT: color.adjust($COLOR_DATASET_NCBN, $lightness: 70%);
-$COLOR_DATASET_GEM_J: #dc2828;
-$COLOR_DATASET_GEM_J_LIGHT: color.adjust($COLOR_DATASET_GEM_J, $lightness: 45%);
-$COLOR_DATASET_BBJ: #ff993f;
-$COLOR_DATASET_BBJ_LIGHT: color.adjust($COLOR_DATASET_BBJ, $lightness: 35%);
-$COLOR_DATASET_DISEASE: $COLOR_SIGN_DANGEROUS;
-$COLOR_DATASET_DISEASE_MGEND: #6e5c9e;
-$COLOR_DATASET_DISEASE_CLINVAR: #20558a;
-$COLOR_DATASET_FOREIGN: #94928d;
-$COLOR_DATASET_FOREIGN_LIGHT: color.adjust(
-  $COLOR_DATASET_FOREIGN,
-  $lightness: 40%
-);
-
-$GRADIENT_HEADING: linear-gradient(to right, $COLOR_KEY_DARK1, $COLOR_KEY);
-$GRADIENT_HEADING_SEMITRANSPARENT: linear-gradient(
-  to right,
-  rgba($COLOR_KEY_DARK1, 0.9),
-  rgba($COLOR_KEY, 0.9)
-);
-$GRADIENT_HEADING_DISABLE: linear-gradient(
-  to right,
-  $COLOR_DISABLE_DEEP,
-  $COLOR_DISABLE
-);
-
-// geometry
-$PADDING_SIDE: 18px;
-$PADDING_SIDEBAR_SIDE: 15px;
-$PADDING_REPORT_LEFT: 25px;
-$PADDING_PANEL_VIEW: 10px;
-$WIDTH_MIN: 900px;
-$WIDTH_SIDEBAR: 300px;
-//$HEIGHT_NBDC_COMMON_HEADER: 24px;
-//$HEIGHT_NBDC_COMMON_FOOTER: 24px;
-$HEIGHT_NBDC_COMMON_HEADER: 0px;
-$HEIGHT_NBDC_COMMON_FOOTER: 0px;
-$HEIGHT_NAVIGATION_ITEM: 20px;
-$HEIGHT_GLOBAL_MENU: 50px;
-$HEIGHT_BOTTOM_DRAWER: 30px;
-$HEIGHT_BOTTOM_DRAWER_OPENED: 400px;
-$HEIGHT_ADVANCED_SEARCH_CONDITION: 24px;
-
-$Z_INDEX_BASE: 10000;
-$Z_INDEX_ROW_INDICATOR: $Z_INDEX_BASE + 100;
-$Z_INDEX_ADVANCED_SEARCH_MENU: $Z_INDEX_BASE + 100;
-$Z_INDEX_DETAIL_HEADER: $Z_INDEX_BASE + 100;
-$Z_INDEX_MODULE_TABS_VIEW: $Z_INDEX_BASE + 200;
-$Z_INDEX_GLOBAL_HEADER: $Z_INDEX_BASE + 200;
-$Z_INDEX_SUGGEST_VIEW: $Z_INDEX_BASE + 200;
-$Z_INDEX_DRAWER: $Z_INDEX_BASE + 300;
-$Z_INDEX_ACTIVITY_INDICATOR: $Z_INDEX_BASE + 400;
-$Z_INDEX_CONFIGURATION: $Z_INDEX_BASE + 500;
-$Z_INDEX_EDITING_CONDITION: $Z_INDEX_BASE + 500;
-
-$BACKDROP_BG: radial-gradient(
-  ellipse at center,
-  rgba($COLOR_KEY, 0.6) 10%,
-  rgba($COLOR_KEY, 0.8) 60%,
-  rgba($COLOR_KEY_DARK3, 1) 120%
-);
-
-// time
-$GUI_DURATION: 0.2s;
-$TRANSITION_DURATION: 0.5s;
-
-// effect
-$SHADOW_DEPTH1: 0 1px 1px rgba(black, 0.3);
 
 :root {
-  // color
-  --color-key: #{$COLOR_KEY};
-  --color-key-dark1: #{$COLOR_KEY_DARK1};
-  --color-key-dark2: #{$COLOR_KEY_DARK2};
-  --color-key-dark3: #{$COLOR_KEY_DARK3};
-  --color-black: #{$COLOR_BLACK};
-  --color-gray: #{$COLOR_GRAY};
-  --color-pale-gray: #{$COLOR_PALE_GRAY};
-  --color-light-gray: #{$COLOR_LIGHT_GRAY};
-  --color-darker-gray: #{$COLOR_DARKER_GRAY};
-  --color-selected: #{$COLOR_SELECTED};
-  --color-selected-hover: #{$COLOR_SELECTED_HOVER};
-  --color-selected-light: #{$COLOR_SELECTED_LIGHT};
-  --color-singleton: #{$COLOR_SINGLETON};
-  --color-homozygote: #{$COLOR_SIGN_DANGEROUS};
-  --color-suggest: #{$COLOR_SUGGEST};
-  --color-disable: #{$COLOR_DISABLE};
-  --color-disable-deep: #{$COLOR_DISABLE_DEEP};
-  --color-separator: #{$COLOR_SEPARATOR};
-  --color-separator-sub: #{$COLOR_SEPARATOR_SUB};
-  // color: mutation
-  --color-mutation-ref: #{$COLOR_REF};
-  --color-mutation-alt: #{$COLOR_ALT};
-  // color: datasets
-  --color-dataset-gemj: #{$COLOR_DATASET_GEM_J};
-  --color-dataset-gemj-light: #{$COLOR_DATASET_GEM_J_LIGHT};
-  --color-dataset-jga: #{$COLOR_DATASET_JGA};
-  --color-dataset-jga-light: #{$COLOR_DATASET_JGA_LIGHT};
-  --color-dataset-tommo: #{$COLOR_DATASET_TOMMO};
-  --color-dataset-tommo-light: #{$COLOR_DATASET_TOMMO_LIGHT};
-  --color-dataset-hgvd: #{$COLOR_DATASET_HGVD};
-  --color-dataset-hgvd-light: #{$COLOR_DATASET_HGVD_LIGHT};
-  --color-dataset-ncbn: #{$COLOR_DATASET_NCBN};
-  --color-dataset-ncbn-light: #{$COLOR_DATASET_NCBN_LIGHT};
-  --color-dataset-bbj: #{$COLOR_DATASET_BBJ};
-  --color-dataset-bbj-light: #{$COLOR_DATASET_BBJ_LIGHT};
-  --color-dataset-foreign: #{$COLOR_DATASET_FOREIGN};
-  --color-dataset-foreign-light: #{$COLOR_DATASET_FOREIGN_LIGHT};
-  // color: significance
-  --color-sign-safe: #{$COLOR_SIGN_SAFE};
-  --color-sign-safe-light: #{$COLOR_SIGN_SAFE_LIGHT};
-  --color-sign-normal: #{$COLOR_SIGN_NORMAL};
-  --color-sign-normal-light: #{$COLOR_SIGN_NORMAL_LIGHT};
-  --color-sign-warning: #{$COLOR_SIGN_WARNING};
-  --color-sign-warning-light: #{$COLOR_SIGN_WARNING_LIGHT};
-  --color-sign-lowdangerous: #{$COLOR_SIGN_LOWDANGEROUS};
-  --color-sign-lowdangerous-light: #{$COLOR_SIGN_LOWDANGEROUS_LIGHT};
-  --color-sign-dangerous: #{$COLOR_SIGN_DANGEROUS};
-  --color-sign-dangerous-light: #{$COLOR_SIGN_DANGEROUS_LIGHT};
-  --color-sign-modifier: #{$COLOR_SIGN_MODIFIER};
-  --color-sign-modifier-light: #{$COLOR_SIGN_MODIFIER_LIGHT};
-  --color-sign-other: #{$COLOR_SIGN_OTHER};
-  --color-sign-other-light: #{$COLOR_SIGN_OTHER_LIGHT};
-  --color-sign-unknown: #{$COLOR_SIGN_UNKNOWN};
-  --color-sign-unknown-light: #{$COLOR_SIGN_UNKNOWN_LIGHT};
+  // color: brand
+  --color-key: #62d5d9;
+  --color-key-dark1: #117f93;
+  --color-key-dark2: #0f6272;
+  --color-key-dark3: #125263;
 
-  // geometric
+  // color: base
+  --color-black: #444;
+  --color-gray: #94928d;
+  --color-gray-light: #{color.adjust(#94928d, $lightness: 10%)};
+  --color-pale-gray: #{color.adjust(#94928d, $lightness: 45%)};
+  --color-light-gray: #{color.adjust(#94928d, $lightness: 35%)};
+  --color-darker-gray: #dbdbdb;
+  --color-separator: rgba(0, 0, 0, 0.3);
+  --color-separator-sub: rgba(0, 0, 0, 0.2);
+
+  // color: surface (背景面)
+  --color-bg-subtle: #f0f0ef;
+  --color-bg-tab: #e2e2e2;
+  --color-bg-locked: #f3f3f3;
+
+  // color: selection / states
+  --color-selected: #ffdd00;
+  --color-selected-hover: rgba(255, 221, 0, 0.2);
+  --color-selected-light: #fdfae5;
+  --color-selected-lighter: #{color.adjust(#ffdd00, $lightness: 30%)};
+  --color-singleton: #{color.adjust(#ffdd00, $lightness: 35%)};
+  --color-homozygote: #ff5a54;
+  --color-suggest: #ffff50;
+  --color-disable: #999999;
+  --color-disable-deep: #808080;
+
+  // color: mutation
+  --color-mutation-ref: #249eb3;
+  --color-mutation-alt: #ff6682;
+  --color-mutation-ref-text: var(--color-key-dark2);
+  --color-mutation-alt-text: #c52543;
+  --color-mutation-ref-bg: #{color.adjust(
+      #249eb3,
+      $lightness: 48%,
+      $saturation: -10%
+    )};
+  --color-mutation-alt-bg: #{color.adjust(
+      #ff6682,
+      $lightness: 24%,
+      $saturation: -10%
+    )};
+
+  // color: datasets
+  --color-dataset-gemj: #dc2828;
+  --color-dataset-gemj-light: #{color.adjust(#dc2828, $lightness: 45%)};
+  --color-dataset-jga: #62d5d9;
+  --color-dataset-jga-light: #{color.adjust(#62d5d9, $lightness: 35%)};
+  --color-dataset-tommo: #ca678d;
+  --color-dataset-tommo-light: #{color.adjust(#ca678d, $lightness: 50%)};
+  --color-dataset-hgvd: #005b80;
+  --color-dataset-hgvd-light: #{color.adjust(#005b80, $lightness: 70%)};
+  --color-dataset-ncbn: #234b7c;
+  --color-dataset-ncbn-light: #{color.adjust(#234b7c, $lightness: 70%)};
+  --color-dataset-bbj: #ff993f;
+  --color-dataset-bbj-light: #{color.adjust(#ff993f, $lightness: 35%)};
+  --color-dataset-foreign: #94928d;
+  --color-dataset-foreign-light: #{color.adjust(#94928d, $lightness: 40%)};
+  --color-dataset-disease: #ff5a54;
+  --color-dataset-disease-mgend: #6e5c9e;
+  --color-dataset-disease-clinvar: #20558a;
+
+  // color: clinical significance
+  --color-sign-safe: #04af58;
+  --color-sign-safe-light: #{color.adjust(#04af58, $lightness: 60%)};
+  --color-sign-normal: #9dcf3a;
+  --color-sign-normal-light: #{color.adjust(#9dcf3a, $lightness: 42%)};
+  --color-sign-normal-dark: #{color.adjust(#9dcf3a, $lightness: -2%)};
+  --color-sign-warning: #ffae00;
+  --color-sign-warning-light: #{color.adjust(#ffae00, $lightness: 45%)};
+  --color-sign-warning-dark: #{color.adjust(#ffae00, $lightness: -2%)};
+  --color-sign-lowdangerous: #ff953c;
+  --color-sign-lowdangerous-light: #{color.adjust(#ff953c, $lightness: 28%)};
+  --color-sign-dangerous: #ff5a54;
+  --color-sign-dangerous-light: #{color.adjust(#ff5a54, $lightness: 30%)};
+  --color-sign-dangerous-dark: #{color.adjust(#ff5a54, $lightness: -2%)};
+  --color-sign-modifier: #c654ff;
+  --color-sign-modifier-light: #{color.adjust(#c654ff, $lightness: 30%)};
+  --color-sign-other: #9c8200;
+  --color-sign-other-light: #{color.adjust(#9c8200, $lightness: 60%)};
+  --color-sign-unknown: #bbba7e;
+  --color-sign-unknown-light: #{color.adjust(#bbba7e, $lightness: 35%)};
+
+  // gradient / backdrop
+  // #117f93 = rgb(17,127,147)  #62d5d9 = rgb(98,213,217)
+  --gradient-heading: linear-gradient(to right, #117f93, #62d5d9);
+  --gradient-heading-semitransparent: linear-gradient(
+    to right,
+    rgba(17, 127, 147, 0.9),
+    rgba(98, 213, 217, 0.9)
+  );
+  --gradient-heading-disable: linear-gradient(to right, #808080, #999999);
+  // #62d5d9 = rgb(98,213,217)  #125263 = rgb(18,82,99)
+  --backdrop-bg: radial-gradient(
+    ellipse at center,
+    rgba(98, 213, 217, 0.6) 10%,
+    rgba(98, 213, 217, 0.8) 60%,
+    #125263 120%
+  );
+
+  // geometry
+  --padding-side: 18px;
+  --padding-sidebar-side: 15px;
+  --padding-report-left: 25px;
+  --padding-panel-view: 10px;
+  --width-min: 900px;
+  --width-sidebar: 300px;
+  --height-nbdc-common-header: 0px;
+  --height-nbdc-common-footer: 0px;
+  --height-navigation-item: 20px;
+  --height-global-menu: 50px;
+  --height-bottom-drawer: 30px;
+  --height-bottom-drawer-opened: 400px;
+  --height-advanced-search-condition: 24px;
   --height-inline: 18px;
   --height-advanced-search-condition-values-container: 24px;
   --height-advanced-search-condition-value: 18px;
   --left-advanced-search-condition-graph: 142px;
+
+  // time
+  --gui-duration: 0.2s;
+  --transition-duration: 0.5s;
+
+  // effect
+  --shadow-depth1: 0 1px 1px rgba(0, 0, 0, 0.3);
 
   // z-index
   --z-index-base: 10000;
@@ -202,7 +147,7 @@ $SHADOW_DEPTH1: 0 1px 1px rgba(black, 0.3);
   --z-index-editing-condition: calc(var(--z-index-base) + 400);
   --z-index-activity-indicator: calc(var(--z-index-base) + 500);
 
-  // icon
+  // icon (Font Awesome 7 Free)
   --icon-plus: '\2b';
   --icon-check: '\f00c';
   --icon-xmark: '\f00d';
