@@ -10,11 +10,13 @@ import type { PredictionValueView } from './ConditionPathogenicityPredictionSear
  * 値の復元ロジックだけを担う。
  */
 export class ConditionItemHydrator {
+  /** URL復元時の値注入ロジックを ConditionItemView の状態管理から分離し、単体で再利用できるようにするため。 */
   constructor(
     private readonly conditionType: ConditionTypeValue,
     private readonly valuesContainerEl: HTMLDivElement
   ) {}
 
+  /** URL復元値から values-container を再構築し、Shadow DOM 内の frequency/prediction も updateComplete 待ちで確実に注入するため。 */
   async hydrate(values: RestoredConditionValue[]): Promise<void> {
     this.valuesContainerEl.replaceChildren();
     for (const value of values) {
@@ -25,6 +27,7 @@ export class ConditionItemHydrator {
     }
   }
 
+  /** 要素生成の責務を hydrate から切り出し、各プロパティ設定の見通しをよくするため。 */
   private _createValueView(
     value: RestoredConditionValue
   ): ConditionItemValueView {
@@ -38,6 +41,7 @@ export class ConditionItemHydrator {
     return valueView;
   }
 
+  /** significance のみ source ごとのラッパーへ振り分ける分岐を hydrate から分離するため。 */
   private _appendValueView(
     valueView: ConditionItemValueView,
     value: RestoredConditionValue
@@ -50,8 +54,8 @@ export class ConditionItemHydrator {
   }
 
   /**
-   * significanceはsource（mgend/clinvar）ごとにラベル付きラッパーを持つ。
-   * ラッパーがなければ生成して追加し、あればそれを返す。
+   * 同一 source の値を1つのラッパー要素にまとめて表示するため、既存ラッパーを再利用し、なければ生成する。
+   * ラベル（MGeND / ClinVar）もここで付与し、_appendValueView を単純に保つ。
    */
   private _getSignificanceContainer(source: SignificanceSource): HTMLElement {
     const wrapperClass = `${source}-wrapper`;

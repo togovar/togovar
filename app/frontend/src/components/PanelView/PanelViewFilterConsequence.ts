@@ -148,7 +148,7 @@ export default class PanelViewFilterConsequence extends PanelView {
         ${
           childItems
             ? `<details>
-                <summary></summary>
+                <summary aria-label="Toggle ${resolved.label}"></summary>
                 <ul class="checklist-values">
                   ${childItems.map((child) => this._render(conditionMaster, child)).join('')}
                 </ul>
