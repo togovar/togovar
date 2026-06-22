@@ -4,7 +4,9 @@ import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import Styles from '../../../stylesheets/web-components/range-slider.scss';
 import {
+  DEFAULT_INPUT_STEP,
   DEFAULT_RANGE_SLIDER_STATE,
+  DEFAULT_SLIDER_STEP,
   EVENT_DETAIL_KEYS,
   METER_VERTICAL_CLASS,
   RANGE_CHANGED_EVENT,
@@ -12,7 +14,6 @@ import {
 import { createRulerScales, type RulerScale } from './RangeSliderRuler';
 import {
   formatInputValue,
-  formatSliderValue,
   parseNumber,
   setRangeValue,
   toInvertValue,
@@ -200,12 +201,12 @@ export class RangeSlider extends LitElement {
 
   /** slider用stepは属性名が独自なので、未指定時の既定値をここで補完する。 */
   private get _sliderStep(): string {
-    return this.getAttribute('slider-step') ?? String(DEFAULT_RANGE_SLIDER_STATE['slider-step']);
+    return this.getAttribute('slider-step') ?? String(DEFAULT_SLIDER_STEP);
   }
 
   /** number input用stepも独自属性から読むため、render側で使える文字列へ正規化する。 */
   private get _inputStep(): string {
-    return this.getAttribute('input-step') ?? String(DEFAULT_RANGE_SLIDER_STATE['input-step']);
+    return this.getAttribute('input-step') ?? String(DEFAULT_INPUT_STEP);
   }
 
   /** 属性変更をフォーム部品と内部状態へ反映し、外部からの値更新でも表示を同期する。 */
@@ -220,37 +221,25 @@ export class RangeSlider extends LitElement {
 
     switch (name) {
       case 'min':
-        if (this._domReady) this._setInputProperty('min', newValue);
         this._state.min = parseNumber(newValue, this._state.min);
+        this._clampCurrentRange();
         break;
       case 'max':
-        if (this._domReady) this._setInputProperty('max', newValue);
         this._state.max = parseNumber(newValue, this._state.max);
+        this._clampCurrentRange();
         break;
       case 'slider-step':
-        if (this._domReady) {
-          this.slider1.step = newValue;
-          this.slider2.step = newValue;
-        }
+        this.requestUpdate();
         break;
       case 'input-step':
-        if (this._domReady) {
-          this.from.step = newValue;
-          this.to.step = newValue;
-        }
+        this.requestUpdate();
         break;
       case 'value1':
       case 'value2': {
         if (this._domReady) {
-          if (name === 'value1') {
-            this.slider1.value = formatSliderValue(newValue);
-          } else {
-            this.slider2.value = formatSliderValue(newValue);
-          }
-          this._syncStateFromSliderValues();
+          this._syncStateFromAttributeValues();
           if (this.isConnected) {
-            this._syncInputsFromState();
-            this._fireEvent();
+            this._commitStateChange({ fireEvent: true });
             return;
           }
         }
@@ -262,12 +251,10 @@ export class RangeSlider extends LitElement {
           this.invertChk.checked = invert;
           if (this.isConnected) {
             this._updateInvert(invert);
-          } else {
-            this._state.invert = invert;
+            return;
           }
-        } else {
-          this._state.invert = invert;
         }
+        this._state.invert = invert;
         break;
       }
       case 'ruler-number-of-steps':
@@ -288,15 +275,7 @@ export class RangeSlider extends LitElement {
         break;
     }
 
-    if (this._domReady) this._fillSlider();
-  }
-
-  /** min/maxは4つの入力要素で同じ値を使うため、属性反映の重複を避ける。 */
-  private _setInputProperty(propertyName: 'min' | 'max', value: string): void {
-    this.slider1[propertyName] = value;
-    this.slider2[propertyName] = value;
-    this.from[propertyName] = value;
-    this.to[propertyName] = value;
+    if (this._domReady) this._commitStateChange();
   }
 
   /** 2本のrange inputは順序が入れ替わるため、状態へ入れる前に必ずmin/maxで正規化する。 */
@@ -305,6 +284,12 @@ export class RangeSlider extends LitElement {
     const rawTo = Math.max(+this.slider1.value, +this.slider2.value);
     this._state.from = this._clampRangeValue(rawFrom);
     this._state.to = this._clampRangeValue(rawTo);
+  }
+
+  /** min/maxが変わったとき、既存の選択範囲が新しい範囲外へ残らないよう補正する。 */
+  private _clampCurrentRange(): void {
+    this._state.from = this._clampRangeValue(this._state.from);
+    this._state.to = this._clampRangeValue(this._state.to);
   }
 
   /** min/max変更時にも同じ補正を使えるよう、範囲内への丸めを小さく分離する。 */
@@ -335,8 +320,8 @@ export class RangeSlider extends LitElement {
 
   /** 選択範囲はCSSカスタムプロパティへ流し、実際の描画はSCSSに任せる。 */
   private _fillSlider(): void {
-    const val1 = Math.min(+this.slider1.value, +this.slider2.value);
-    const val2 = Math.max(+this.slider1.value, +this.slider2.value);
+    const val1 = Math.min(this._state.from, this._state.to);
+    const val2 = Math.max(this._state.from, this._state.to);
     const range = this._state.max - this._state.min || 1;
     const percentFrom = ((val1 - this._state.min) * 100) / range;
     const percentTo = ((val2 - this._state.min) * 100) / range;
@@ -353,7 +338,7 @@ export class RangeSlider extends LitElement {
    */
   private _drawThumbs(): void {
     this.dataset.thumb =
-      +this.slider1.value < +this.slider2.value ? '1-lower' : '2-lower';
+      this._state.from < this._state.to ? '1-lower' : '2-lower';
   }
 
   /** 外部コードが属性と同じ名前で最小値を読めるよう、既存APIを保つ。 */
@@ -501,10 +486,6 @@ export class RangeSlider extends LitElement {
       this.max ?? 1,
       DEFAULT_RANGE_SLIDER_STATE.max
     );
-    this._state.step = parseNumber(
-      this.getAttribute('step') ?? DEFAULT_RANGE_SLIDER_STATE.step,
-      DEFAULT_RANGE_SLIDER_STATE.step
-    );
     this._syncStateFromAttributeValues();
     this._state.invert = toInvertValue(this.getAttribute('invert'));
     this.rulerNumberOfSteps = DEFAULT_RANGE_SLIDER_STATE.rulerNumberOfSteps;
@@ -530,28 +511,30 @@ export class RangeSlider extends LitElement {
 
   /** イベント登録と初期描画を行う。状態確定後に呼ぶ。 */
   private _initUI(): void {
-    this._syncInputsFromState();
+    this._commitStateChange();
     this.invertChk.checked = this._state.invert;
     this._toggleOrientation(this.orientation ?? DEFAULT_ORIENTATION);
-    this._fillSlider();
     this._reRenderRuler();
     this._fireEvent();
+  }
+
+  /** state変更後の描画同期とイベント発火を1箇所に集約し、副作用の重複を避ける。 */
+  private _commitStateChange({ fireEvent = false } = {}): void {
+    this.requestUpdate();
+    this._syncInputsFromState();
+    if (fireEvent) this._fireEvent();
   }
 
   /** 範囲値の変更だけがrange-changedを発火するよう、状態更新の副作用を明示する。 */
   private _updateRangeValue(prop: 'from' | 'to', value: unknown): void {
     setRangeValue(this._state, prop, value);
-    this.requestUpdate();
-    this._syncInputsFromState();
-    this._fireEvent();
+    this._commitStateChange({ fireEvent: true });
   }
 
   /** invert変更時の同期とイベント発火を明示し、単なる代入に副作用を隠さない。 */
   private _updateInvert(value: unknown): void {
     this._state.invert = toInvertValue(value);
-    this.requestUpdate();
-    this._syncInputsFromState();
-    this._fireEvent();
+    this._commitStateChange({ fireEvent: true });
   }
 
   /**
@@ -587,16 +570,14 @@ export class RangeSlider extends LitElement {
   private _slider1VisualUpdate = (e: Event): void => {
     if (!(e.target instanceof HTMLInputElement)) return;
     setRangeValue(this._state, 'from', e.target.value);
-    this.requestUpdate();
-    this._syncInputsFromState();
+    this._commitStateChange();
   };
 
   /** lazy モード: ドラッグ中は視覚のみ更新し range-changed を発火しない。 */
   private _slider2VisualUpdate = (e: Event): void => {
     if (!(e.target instanceof HTMLInputElement)) return;
     setRangeValue(this._state, 'to', e.target.value);
-    this.requestUpdate();
-    this._syncInputsFromState();
+    this._commitStateChange();
   };
 
   /** lazy モード: スライダーを放したときだけ range-changed を発火する。 */
@@ -636,9 +617,7 @@ export class RangeSlider extends LitElement {
     if (!(e.target instanceof HTMLInputElement)) return;
 
     this._state.match = e.target.value;
-    this.requestUpdate();
-    this._syncInputsFromState();
-    this._fireEvent();
+    this._commitStateChange({ fireEvent: true });
   };
 
   /** Litのイベントバインディングに寄せているため、切断時はsuperへ任せる。 */

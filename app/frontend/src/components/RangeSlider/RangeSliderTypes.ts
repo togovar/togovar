@@ -11,9 +11,6 @@ export type RangeSliderState = {
   invert: boolean;
   min: number;
   max: number;
-  step: number;
-  'input-step': number;
-  'slider-step': number;
   match: string;
   rulerNumberOfSteps: number;
 };
