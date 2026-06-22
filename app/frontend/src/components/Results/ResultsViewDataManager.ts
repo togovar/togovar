@@ -99,9 +99,7 @@ export class ResultsViewDataManager {
     if (this.shouldSkipOffsetUpdate()) return;
 
     const displayingRegions = this.calculateDisplayingRegions();
-    if (Object.keys(displayingRegions).length > 0) {
-      storeManager.setData('displayingRegionsOnChromosome', displayingRegions);
-    }
+    storeManager.setData('displayingRegionsOnChromosome', displayingRegions);
   }
 
   shiftSelectedRow(direction: number): void {

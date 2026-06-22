@@ -177,9 +177,9 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
   /** セクションDOM・レンジスライダーを生成して初期化する。 */
   private _initializeComponent(): void {
     this.createSectionEl('frequency-count-editor-view', () => [
-      createEl('header', { text: 'Specify range' }),
+      createEl('header', { class: 'section-header', text: 'Specify range' }),
       createEl('div', {
-        class: 'body',
+        class: 'section-content',
         children: this._createBodyElements(this._radioGroupName),
       }),
     ]);
@@ -670,7 +670,9 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
       };
     }
 
-    if (this._filtered) {
+    // setValues() で明示的にセットされた場合のみ同期する。
+    // デフォルト値 false（新規条件追加時）でチェックボックスが上書きされるのを防ぐ。
+    if (this._filtered && freqCountView.filteredExplicitlySet) {
       this._filtered.checked = freqCountView.filtered;
     }
   }

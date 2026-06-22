@@ -6,8 +6,8 @@ import { storeManager } from '../../store/StoreManager';
  * Symbol（公式シンボル）と Alias（別名）を並べて表示する。
  */
 export default class PanelViewPreviewGene extends PanelView {
-  /** innerHTML で表示を更新する対象のテーブル要素 */
-  private readonly _table: Element;
+  /** innerHTML で表示を更新する対象の dl 要素 */
+  private readonly _dl: Element;
 
   /**
    * kind を 'preview-gene' にする。
@@ -18,9 +18,7 @@ export default class PanelViewPreviewGene extends PanelView {
     super(elm, 'preview-gene');
     storeManager.subscribe('selectedRow', () => this.selectedRow());
     storeManager.subscribe('offset', () => this.offset());
-    this._table = this.elm.querySelector<Element>(
-      '.content > .right-headline'
-    )!;
+    this._dl = this.elm.querySelector<Element>('.content > .property-list')!;
   }
 
   /**
@@ -47,13 +45,13 @@ export default class PanelViewPreviewGene extends PanelView {
     this.elm.classList.add('-notfound');
 
     if (storeManager.getData('selectedRow') === undefined) {
-      this._table.innerHTML = '';
+      this._dl.innerHTML = '';
       return;
     }
 
     const record = storeManager.getSelectedRecord();
     if (!record || !record.symbols || record.symbols.length === 0) {
-      this._table.innerHTML = '';
+      this._dl.innerHTML = '';
       return;
     }
 
@@ -70,20 +68,20 @@ export default class PanelViewPreviewGene extends PanelView {
             "'": '&#39;',
           })[ch] as string
       );
-    this._table.innerHTML = record.symbols
-      .map((symbol) => {
+    this._dl.innerHTML = record.symbols
+      .map((symbol, index) => {
         const name = escapeHtml(symbol.name);
+        // 2つ目以降の遺伝子グループには .-group-start を付与して区切り線と上余白を追加する
+        const groupStartClass = index > 0 ? ' class="-group-start"' : '';
         const aliases =
           symbol.synonyms.length === 0
             ? ''
-            : `<tr><th>Alias</th><td>${symbol.synonyms.map(escapeHtml).join(', ')}</td></tr>`;
+            : `<div><dt>Alias</dt><dd>${symbol.synonyms.map(escapeHtml).join(', ')}</dd></div>`;
         return (
-          `<tbody>` +
-          `<tr><th>Symbol</th><td>` +
+          `<div${groupStartClass}><dt>Symbol</dt><dd>` +
           `<a href="/gene/${encodeURIComponent(String(symbol.id))}" target="_blank" rel="noopener noreferrer" class="hyper-text -internal">${name}</a>` +
-          `</td></tr>` +
-          aliases +
-          `</tbody>`
+          `</dd></div>` +
+          aliases
         );
       })
       .join('');

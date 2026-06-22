@@ -1,0 +1,260 @@
+// =============================================================================
+// 詳細ページヘッダー・Stanza
+// 統合元:
+//   object/project/_DetailHeader.scss          … ページヘッダー固定バー
+//   object/component/_stanza-view.scss         … Stanza（外部コンポーネント）ラッパー
+//   object/component/_stanza-title-wrapper.scss … Stanza ヘッダー
+// =============================================================================
+
+#DetailHeader {
+  position: sticky;
+  top: var(--height-global-menu);
+  z-index: var(--z-index-detail-header);
+  padding: 10px var(--padding-side) 10px var(--padding-report-left);
+  background: var(--gradient-heading-semitransparent);
+
+  .title-wrapper {
+    display: inline-block;
+    padding-right: 20px;
+    vertical-align: bottom;
+
+    > .pagetype {
+      margin-bottom: 0;
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 16px;
+      color: var(--color-key-dark3);
+    }
+
+    > .title {
+      margin-bottom: 0;
+      font-size: 28px;
+      font-weight: bold;
+      line-height: 28px;
+      color: white;
+    }
+  }
+}
+
+// =============================================================================
+// Stanza ラッパー (.stanza-view)
+// TogoStanza の外部コンポーネントを囲む共通コンテナ。
+// min-height はスタンザのコンテンツが描画される前のレイアウトシフト（CLS）を防ぐ。
+// =============================================================================
+
+.stanza-view {
+  scroll-margin-top: 120px;
+
+  > .titlelink-wrapper {
+    margin-bottom: 4px;
+    margin-left: -15px;
+
+    > .titlelink {
+      display: inline-block;
+      width: 11px;
+      margin-right: 2px;
+      // stylelint-disable-next-line font-family-no-missing-generic-family-keyword
+      font-family: 'Font Awesome 7 Free';
+      font-size: 0.7rem;
+      font-weight: 900;
+      vertical-align: bottom;
+      color: var(--color-gray);
+      text-decoration: none;
+      transform: translateY(-2px);
+    }
+
+    &:hover {
+      .titlelink::before {
+        content: var(--icon-link);
+      }
+    }
+
+    > .title {
+      display: inline-block;
+      margin: 0;
+      font-size: 16px;
+      line-height: 18px;
+
+      > span {
+        margin-left: 8px;
+        font-size: 12px;
+
+        &.mgend {
+          color: var(--color-dataset-disease-mgend);
+        }
+        &.clinvar {
+          color: var(--color-dataset-disease-clinvar);
+        }
+      }
+
+      > .floating-info-trigger {
+        position: relative;
+        top: 1px;
+        display: inline-block;
+        padding: 0;
+        margin-left: 2px;
+        // stylelint-disable-next-line font-family-no-missing-generic-family-keyword
+        font-family: 'Font Awesome 7 Free';
+        font-size: 12px;
+        font-weight: 900;
+        line-height: 1;
+        vertical-align: 1px;
+        color: var(--color-gray);
+        appearance: none;
+        cursor: help;
+        background: transparent;
+        border: 0;
+
+        &::before {
+          content: var(--icon-circle-info);
+        }
+      }
+    }
+  }
+
+  > .stanza {
+    margin-bottom: 20px;
+    background: white;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+
+    // 各 stanza の最小高さ — CLS 防止のため描画前にスペースを確保する
+    // gene page
+    &#gene-summary {
+      min-height: 71px;
+    }
+    &#gene-mgend {
+      min-height: 50px;
+    }
+    &#gene-clinvar {
+      min-height: 280px;
+    }
+    &#gene-gwas {
+      min-height: 61px;
+    }
+    &#gene-mogplus {
+      min-height: 212px;
+    }
+    &#gene-genomic-context {
+      min-height: 638px;
+    }
+    &#gene-protein-browser {
+      min-height: 303px;
+      overflow: visible;
+    }
+    &#gene-protein-structure {
+      min-height: 679px;
+    }
+    &#gene-variant {
+      min-height: 515px;
+    }
+
+    togostanza-gene-protein-structure {
+      --togostanza-iframe-max-width: '';
+    }
+
+    // variant page
+    &#variant-summary {
+      min-height: 50px;
+    }
+    &#variant-other-overlapping-variants {
+      min-height: 60px;
+    }
+    &#variant-mgend {
+      min-height: 50px;
+    }
+    &#variant-clinvar {
+      min-height: 50px;
+    }
+    &#variant-gwas {
+      min-height: 85px;
+    }
+    &#variant-genomic-context {
+      min-height: 608px;
+    }
+    &#variant-gene {
+      min-height: 64px;
+    }
+    &#variant-transcript {
+      min-height: 60px;
+    }
+    &#variant-publication {
+      min-height: 125px;
+    }
+
+    // disease page
+    &#disease-summary {
+      min-height: 103px;
+    }
+    &#disease-mgend {
+      min-height: 50px;
+    }
+    &#disease-clinvar {
+      min-height: 161px;
+    }
+    &#disease-gwas {
+      min-height: 85px;
+    }
+  }
+}
+
+// Stanza ヘッダー (.title-wrapper)
+// gene/disease ページの stanza タイトル領域の最小高さを確保し CLS を防ぐ
+.title-wrapper {
+  > .stanza {
+    &#gene-header,
+    &#disease-header {
+      min-height: 48px;
+    }
+  }
+}
+
+// 疾患情報ヘッドライン (.above-headline)
+// 詳細ページの結果行上部に表示される疾患名・臨床的意義・疾患カテゴリのまとめ行
+// 複数の .above-headline が連続するときはセパレーターで区切る
+.above-headline {
+  margin-bottom: 0;
+
+  > dt {
+    padding: 2px 0;
+    font-size: 14px;
+    line-height: 16px;
+  }
+
+  > dd {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 0;
+    line-height: 16px;
+
+    > .clinical-significance {
+      display: inline-block;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    > .disease-category {
+      display: flex;
+      gap: 5px;
+      align-self: flex-end;
+      margin-right: 5px;
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: bold;
+
+      > .mgend {
+        color: var(--color-dataset-disease-mgend);
+      }
+
+      > .clinvar {
+        color: var(--color-dataset-disease-clinvar);
+      }
+    }
+  }
+
+  + .above-headline {
+    padding-top: 6px;
+    margin-top: 8px;
+    border-top: solid 1px var(--color-separator);
+  }
+}

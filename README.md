@@ -24,7 +24,7 @@ AIエージェント向けの作業指示・設計ルールは [AGENTS.md](./AGE
 | -------------- | ---------------------------------------------- |
 | フロントエンド | TypeScript / JavaScript / Lit / Web Components |
 | ビルド         | Webpack 5 / ts-loader                          |
-| スタイル       | Sass / SCSS / CSS                              |
+| スタイル       | SCSS / CSS                                     |
 | テンプレート   | Pug                                            |
 | サーバー       | nginx（静的ファイル配信）                      |
 | API連携        | TogoVar API                                    |
@@ -46,7 +46,22 @@ app/frontend/
     store/       StoreManager、検索条件、URL反映
     types/       グローバル型定義
     utils/       汎用ヘルパー
-  stylesheets/   Sass / SCSS
+  stylesheets/   SCSS（FLOCSS レイヤー構成）
+    main.scss          エントリポイント。全ファイルを正しい順序で @use する
+    foundation/        ベース層（変更頻度低）
+      _variables.scss  デザイントークン。色・サイズ・z-index などを :root の CSS カスタムプロパティとして定義
+      _mixins.scss     再利用ミックスイン（sprite・input-number）
+      _base.scss       HTML タグのデフォルトスタイル（body・a・input など）
+      _reset.scss      CSS リセット（変更禁止）
+    layout/            ページ骨格（#Layout・aside・main の配置）
+    object/
+      component/       汎用 UI パーツ。特定画面に依存せず複数画面で使われるもの
+                       例: button-view, panel-view, dropdown-view, range-slider
+      utility/         ヘルパークラス（状態・表示補助）
+    features/          画面・機能固有スタイル。1 つの画面・機能だけが使うもの
+                       例: _results.scss, _detail.scss, _global-header.scss
+    web-components/    Lit 要素が直接 import する Shadow DOM 用 SCSS
+                       例: tab-view, prediction-range-slider, frequency-block-view
   views/         Pugテンプレート
 dist/             ビルド出力
 ```
@@ -162,7 +177,7 @@ npm run typecheck
 
 補足:
 
-- `npm run lint` は JavaScript/TypeScript と Sass/CSS の lint をまとめて実行します。
+- `npm run lint` は JavaScript/TypeScript と SCSS/CSS の lint をまとめて実行します。
 - `npm run typecheck` は TypeScript の型チェックのみを実行します（ビルドは行いません）。
 - 環境によって `node` / `npm` が PATH に無い場合があります。その場合は Node.js 22.x を有効化してください。
 

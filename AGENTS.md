@@ -12,7 +12,7 @@
 ## 作業ルール
 
 - `AGENTS.md` だけを根拠にせず、変更前に必ず該当ファイルと周辺の呼び出し元を読む。
-- 既存の設計、命名、TypeScript/JavaScript混在方針、Sass/SCSS構成、Store/API層の使い方に合わせる。
+- 既存の設計、命名、TypeScript/JavaScript混在方針、SCSS構成、Store/API層の使い方に合わせる。
 - ユーザーの未コミット変更を勝手に戻さない。
 - 生成物や依存関係の大きな更新は、明確に必要な場合だけ行う。
 - 依存を移動・追加・削除する場合は、実行時依存かビルド時依存かを確認し、`package.json` と `package-lock.json` を揃える。
@@ -23,11 +23,13 @@
 | ---------------- | ---------------------------------------------- |
 | フロントエンド   | TypeScript / JavaScript / Lit / Web Components |
 | ビルド           | Webpack 5 / ts-loader                          |
-| スタイル         | Sass / SCSS / CSS                              |
+| スタイル         | SCSS / CSS                                     |
 | テンプレート     | Pug                                            |
 | サーバー         | nginx などの静的ファイルサーバー               |
 | バックエンド連携 | TogoVar API                                    |
 | パッケージ       | npm                                            |
+
+- **Bootstrap は使用していない。** CSS フレームワークとしての Bootstrap は一切依存していない。`h3` などのデフォルト margin は `foundation/_reset.scss` の `*:not(dialog) { margin: 0 }` でリセット済みのため、Bootstrap 打ち消しを理由にした `margin-bottom: 0` は不要。
 
 - Node.js は `22.x` 前提。`.nvmrc` と `package.json` の `engines.node` を確認する。
 - `tsconfig.json` は `strict: true` かつ `allowJs: true`。既存JSとTSが共存しているため、周辺ファイルの粒度に合わせて変更する。
@@ -56,16 +58,18 @@ app/frontend/
     store/       StoreManagerと検索条件管理
     types/       グローバル型定義
     utils/       汎用ヘルパー
-  stylesheets/   Sass/SCSS
+  stylesheets/   SCSS
+    web-components/  Lit/Web Components が直接 import する Shadow DOM 用SCSS
   views/         Pugテンプレート
 ```
 
 - UIクラス・Web Componentsは `app/frontend/src/components/` に置く。Lit使用の有無では分けない。
+- Lit/Web Components が直接 import するSCSSは `app/frontend/stylesheets/web-components/` に置く。
 - Advanced Search 本体の制御ファイルは `app/frontend/src/components/AdvancedSearch/` に置く。
 - StoreやURL反映など、アプリ状態に関わる処理は `app/frontend/src/store/` に置く。
 - DOM生成の小さな共通処理は `app/frontend/src/utils/dom/` の既存ヘルパーを優先する。
 - 参照ゲノム別の検索条件マスタは `app/frontend/assets/GRCh37` / `app/frontend/assets/GRCh38` を確認する。
-- PugテンプレートやSass/SCSSの構成を変える場合は、関連する `app/frontend/views/` と `app/frontend/stylesheets/` の両方を確認する。
+- PugテンプレートやSCSSの構成を変える場合は、関連する `app/frontend/views/` と `app/frontend/stylesheets/` の両方を確認する。
 
 ## デプロイ / 配信方針
 
@@ -119,11 +123,11 @@ app/frontend/
 
 `types/conditionBuilder.d.ts`、`types/conditionDefinition.d.ts`、`types/query.d.ts` は役割が異なる。混在させない。
 
-| ファイル | 役割 | 主な型 |
-| --- | --- | --- |
-| `types/query.d.ts` | Store/API層向け。コンポーネント依存を持たない（PredictionKey のみ例外） | `ConditionQuery`, `ConditionLeaf`, 各Leaf型, `ScoreRange`, `Inequality`, `Relation` |
-| `types/conditionBuilder.d.ts` | UIビルダー向け。コンポーネントを import する | `BuildContext`, `BuilderMap`, `ConditionValueEditor`, `EditorCtor`, `PredictionChangeDetail` |
-| `types/conditionDefinition.d.ts` | 条件UIマスタデータ向け。`advanced_search_conditions.json` の型 | `ConditionDefinition`, `AdvancedConditionMap`, `GRChConditions`, `TreeNode` |
+| ファイル                         | 役割                                                                    | 主な型                                                                                       |
+| -------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `types/query.d.ts`               | Store/API層向け。コンポーネント依存を持たない（PredictionKey のみ例外） | `ConditionQuery`, `ConditionLeaf`, 各Leaf型, `ScoreRange`, `Inequality`, `Relation`          |
+| `types/conditionBuilder.d.ts`    | UIビルダー向け。コンポーネントを import する                            | `BuildContext`, `BuilderMap`, `ConditionValueEditor`, `EditorCtor`, `PredictionChangeDetail` |
+| `types/conditionDefinition.d.ts` | 条件UIマスタデータ向け。`advanced_search_conditions.json` の型          | `ConditionDefinition`, `AdvancedConditionMap`, `GRChConditions`, `TreeNode`                  |
 
 - `ConditionQuery` は Advanced Search の Store 値の正規型。`storeManager.getData('advancedSearchConditions')` は `ConditionQuery | undefined` を返す。
 - `undefined` は「条件なし」を表すセンチネル値であり、`{}` は使わない。
@@ -144,13 +148,72 @@ app/frontend/
 
 ## スタイル方針
 
-- Sass/SCSSは `app/frontend/stylesheets/` の既存レイヤー構成に合わせる。
-- コンポーネント固有のSCSSは、既存のWeb Component内 import と同じ形に合わせる。
-- 既存CSSに異なる書き方があっても、関連する変更範囲だけ段階的に整える。
-- UI状態は、可能なら既存の `data-*` 属性や状態クラスを利用する。
-- セレクターを追加する前に、既存の `object/component` / `object/project` に同じ責務のスタイルがないか確認する。
+### ディレクトリ・配置
+
+SCSSは `app/frontend/stylesheets/` の FLOCSS レイヤー構成に合わせる。
+
+| ディレクトリ        | 置くもの                                                                                         | 置かないもの                       |
+| ------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| `foundation/`       | デザイントークン（CSS カスタムプロパティ）、ミックスイン、HTMLタグのデフォルトスタイル、リセット | 特定コンポーネントや画面のスタイル |
+| `layout/`           | ページ骨格（`#Layout`・`aside`・`main` の幅・高さ・配置）                                        | 個々のUIパーツの見た目             |
+| `object/component/` | 複数の画面で再利用される汎用UIパーツ                                                             | 1つの画面・機能だけで使うスタイル  |
+| `features/`         | 特定の画面や機能に紐づくスタイル                                                                 | 別の画面でも使える汎用パーツ       |
+| `web-components/`   | Lit要素が JS から直接 `import` するSCSSファイル（Shadow DOM 内に適用）                           | ライトDOM側のスタイル              |
+
+**どのディレクトリに入れるかの判断フロー:**
+
+1. Lit要素の Shadow DOM 内か？ → `web-components/`
+2. ページ全体の骨格（幅・高さ・グリッド配置）か？ → `layout/`
+3. 複数の画面で使われる（または使われうる）UIパーツか？ → `object/component/`
+4. 特定の画面・機能専用か？ → `features/`
+5. 色・サイズ・z-index などのデザイン値か？ → `foundation/_variables.scss` に CSS カスタムプロパティとして追加
+
+**各ディレクトリの実例:**
+
+- `object/component/` — `_button-view.scss`, `_panel-view.scss`, `_dropdown-view.scss`, `_range-slider.scss`, `_form-parts.scss`
+- `features/` — `_results.scss`（検索結果画面）, `_detail.scss`（詳細画面）, `_global-header.scss`（ヘッダー）
+- `web-components/` — `tab-view.scss`, `prediction-range-slider.scss`, `frequency-block-view.scss`
+
+- セレクターを追加する前に、既存の `object/component/` や `features/` に同じ責務のスタイルがないか確認する。
 - `app/frontend/stylesheets/foundation/_reset.scss` は**変更禁止**。Josh W. Comeau's CSS Reset の定義をそのまま維持する。
-- `tr` に `border` を使うテーブルは、必ずそのテーブルのセレクター自身に `border-collapse: collapse` を明示する。`_reset.scss` には書けないため各コンポーネントで対応する。
+
+### 書き方のルール
+
+- 疑似要素は `::before` / `::after` / `::first-letter` のように **ダブルコロン** で書く。シングルコロン（`:before`）は疑似クラス専用。stylelint で強制している。
+- プロパティの並び順は **stylelint-config-recess-order** に従う（位置 → ボックスモデル → タイポグラフィ → 装飾 → トランジション）。`stylelint --fix` で自動修正できる。
+- ベンダープレフィックスは**必要な場合だけ**書く。
+  - `-webkit-overflow-scrolling` — 廃止済み。書かない。
+  - `-webkit-box-shadow` — 不要。`box-shadow` のみでよい。
+  - `-webkit-user-select` — 不要。`user-select` のみでよい。
+  - `-moz-appearance` — 不要。`appearance` のみでよい。
+  - `-webkit-appearance` — `input[type="range"]` など Safari が標準プロパティに非対応な箇所のみ残す。
+  - `-webkit-mask-*` / `-webkit-font-smoothing` — まだ有効。残す。
+- UI状態は、可能なら既存の `data-*` 属性や状態クラスを利用する。
+- 折りたたみ UI は **ネイティブ `<details>/<summary>`** で実装する。JS による開閉クラス付与（旧 `CollapseView.ts`）は削除済み。CSS アニメーションは `details[open] > summary::before { transform: rotate(90deg) }` のパターンで対応する。
+- `tr` に `border` を使うテーブルは、そのテーブルに `border-collapse: collapse` を明示する。
+- 大きなセレクタブロック内のサブセクションは `// ──────────────────────────────────────────────────` の区切り線と日本語の見出しコメントでグループ分けする。
+- コンポーネント専用のスタイルは、グローバルなルールとして外に出さず、そのセレクタブロック内に直接書く。低詳細度セレクタは高詳細度セレクタより先に定義する（stylelint の `no-descending-specificity` で強制済み）。
+
+### CSS カスタムプロパティ
+
+デザイントークン（色・サイズ・z-index・アニメーション時間など）はすべて CSS カスタムプロパティとして `foundation/_variables.scss` の `:root` ブロックで定義されている。
+
+- **既存の CSS カスタムプロパティを優先して使う。** 新しい色や寸法を追加するときは、まず `_variables.scss` に CSS カスタムプロパティとして定義してから `var(--)` で参照する。
+- SCSS 変数（`$VAR`）を新たにデザイン値として作らない。ファイルローカルな計算（`calc()` の一時変数など）は許容する。
+- `color.adjust()` など SCSS の色関数はコンパイル時に解決されるため、CSS カスタムプロパティを引数に渡せない。派生色が必要な場合は `_variables.scss` 側でリテラル値を使って事前計算し CSS カスタムプロパティとして公開する。
+- 半透明色は `color-mix(in srgb, var(--color-xxx) 30%, transparent)` で表現する。
+- `rgba(black, 0.2)` のような SCSS 固有の色指定は使わない。`rgba(0, 0, 0, 0.2)` または `rgb(0 0 0 / 0.2)` を使う。
+
+### Sass の書き方
+
+- **`@import` は廃止済み。** 全ファイルで `@use` / `@forward` へ移行済み。新規ファイルでも `@import` は使わない。
+- `foundation/_mixins.scss` のミックスイン（`sprite`・`input-number`）を使うファイルだけが `@use '../foundation' as *` を宣言する。CSS カスタムプロパティのみ使うファイルは `@use` 不要。
+  - ミックスインを使う場合: `features/` → `@use '../foundation' as *` / `object/component/` → `@use '../../foundation' as *`
+  - ミックスインを使わない場合: `@use` 宣言なし（`var(--)` は `@use` なしで使える）
+- CSS 出力を持つファイル（`foundation/base`・`reset`・`font-awesome`）は `main.scss` のみが `@use` する。パーシャル側は `@use` しない。
+- ミックスインは `foundation/_mixins.scss` に定義する（`sprite`・`input-number` など）。
+- `@extend` はモジュール境界をまたげない。代わりに `@mixin` を使う。
+- `sass:color` モジュールは `foundation/_variables.scss` 内部でのみ使う。パーシャル側では使わない。
 
 ## コメント規約
 

@@ -38,7 +38,7 @@ export default class PanelViewPreviewAlternateAlleleFrequencies extends PanelVie
     this._master = master?.items ?? [];
 
     const tbody = this.elm.querySelector<HTMLTableSectionElement>(
-      '.frequency-detail > tbody'
+      '.frequency-table > tbody'
     )!;
 
     tbody.innerHTML = this._master

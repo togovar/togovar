@@ -115,6 +115,7 @@ class StoreManager {
     this.setData('rowCount', resetState.rowCount);
     this.setData('isSearchDataFetching', resetState.isSearchDataFetching);
     this.setData('searchResults', resetState.searchResults);
+    this.setData('displayingRegionsOnChromosome', {});
     this.resetColumnWidths();
     this.setData('resultsResetVersion', resetState.resultsResetVersion);
   }

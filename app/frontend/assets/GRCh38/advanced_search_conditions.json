@@ -937,7 +937,7 @@
         "clinvar": [
           {
             "value": "NC",
-            "label": "Not in Clinvar"
+            "label": "Not in ClinVar"
           },
           {
             "value": "P",

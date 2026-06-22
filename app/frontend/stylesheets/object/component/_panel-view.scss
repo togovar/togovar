@@ -1,0 +1,180 @@
+.panel-view {
+  // .title::after（絶対配置のシェブロン）の基点として機能させるため relative にする
+  position: relative;
+  // <a> など inline 要素をルートに使う場合でも block として描画されるよう明示する
+  display: block;
+  font-size: 12px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 2px rgb(0 0 0 / 0.3);
+
+  // ──────────────────────────────────────────────────
+  // ベース要素（タイトルバー・コンテンツ・ラベル）
+  // ──────────────────────────────────────────────────
+
+  > .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px var(--padding-panel-view) 6px;
+    font-size: 14px;
+    line-height: 16px;
+    border-bottom: solid 1px var(--color-separator);
+
+    > .clear-button {
+      // 右端のシェブロン（::after）より手前に表示するため z-index を付与する
+      z-index: 1;
+      margin-right: 16px;
+      font-size: 11px;
+    }
+
+    // 折りたたみ状態を示すシェブロン（▶）
+    // border-top + border-left を 45° 回転させた L 字形で CSS のみで矢印を描く
+    &::after {
+      position: absolute;
+      top: 16px;
+      right: 12px;
+      display: block;
+      width: 7px;
+      height: 7px;
+      content: '';
+      border-top: solid 1px var(--color-black);
+      border-left: solid 1px var(--color-black);
+      transform: rotate(45deg);
+      transition:
+        transform var(--gui-duration),
+        top var(--gui-duration);
+    }
+  }
+
+  > .close {
+    position: absolute;
+    top: 8px;
+    right: 7px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+
+  > .content {
+    padding: 6px var(--padding-panel-view) 10px;
+  }
+
+  label {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    min-height: 24px;
+
+    > input[type='checkbox'],
+    > input[type='radio'] {
+      width: 13px;
+      height: 13px;
+      margin: 0;
+    }
+  }
+
+  + .panel-view {
+    margin-top: 5px;
+  }
+
+  // ──────────────────────────────────────────────────
+  // 状態クラス
+  // ──────────────────────────────────────────────────
+
+  // 折りたたみ不可パネル：クリック不可とシェブロン非表示
+  &.-cannotcollapse {
+    > .title {
+      // 開閉できないため pointer カーソルを継承に戻す
+      cursor: inherit;
+
+      &::after {
+        display: none;
+      }
+    }
+  }
+
+  // 検索結果なし：::after 疑似要素で "Not found" を注入する
+  // コンポーネントの HTML を変えずにメッセージを差し込むため疑似要素を使う
+  &.-notfound {
+    &::after {
+      display: block;
+      padding-bottom: 10px;
+      // コンテンツ領域の上パディングを打ち消してタイトル直下に揃える
+      margin: (-8px) 0 0;
+      color: var(--color-gray);
+      text-align: center;
+      content: 'Not found';
+    }
+  }
+
+  &.-collapsed {
+    > .title {
+      // 折りたたんだ状態では区切り線不要
+      border-bottom: none;
+
+      // 基底の rotate(45deg) に 180° 加えてシェブロンを反転（▶ → ◀）し、閉じた状態を表現する
+      &::after {
+        top: 12px;
+        transform: rotate(225deg);
+      }
+    }
+
+    > .content {
+      display: none;
+    }
+
+    // 「検索結果なし」かつ折りたたみ中は "Not found" を隠す
+    &.-notfound {
+      &::after {
+        display: none;
+        content: '';
+      }
+    }
+  }
+
+  // パネル全体が <a> 要素のリンクになる場合のスタイル（グラデーション背景）
+  // <a> のデフォルトスタイル（青文字・下線）を打ち消す必要があるためここで明示する
+  &.-emphasize {
+    color: white;
+    text-decoration: none;
+    background: var(--gradient-heading);
+    transition:
+      background-color var(--gui-duration),
+      box-shadow var(--gui-duration),
+      transform var(--gui-duration);
+
+    // バリアント未選択時：href なしのためクリック不可、グレーアウト
+    &.-disable {
+      background: var(--gradient-heading-disable);
+    }
+
+    // .-disable（href なし）のときはホバー効果を出さない
+    &:not(.-disable):hover {
+      background-color: var(--color-key-dark1);
+      box-shadow: 0 0 1px rgb(0 0 0 / 0.8);
+      transform: translateY(1px);
+    }
+
+    // アクティブ時（href あり）は .title::after を矢印アイコンに切り替える
+    // .-cannotcollapse の display: none より詳細度が高いため上書きできる
+    &:not(.-disable) {
+      > .title {
+        &::after {
+          position: static;
+          display: inline-block;
+          width: auto;
+          height: auto;
+          margin-left: 0.25em;
+          font-family: 'Font Awesome 7 Free', sans-serif;
+          font-size: 0.8em;
+          font-weight: 900;
+          content: var(--icon-circle-arrow-right);
+          border: none;
+          transform: none;
+          transition: none;
+        }
+      }
+    }
+  }
+}

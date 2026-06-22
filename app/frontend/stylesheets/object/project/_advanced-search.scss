@@ -1,0 +1,1081 @@
+@use '../../foundation' as *;
+
+// =============================================================================
+// AdvancedSearch 機能 — 高度検索条件ビルダー全体のスタイル
+// 統合元:
+//   object/component/_advanced-search-condition-editor-view.scss … 条件エディター
+//   object/component/_advanced-search-condition-item-view.scss   … 条件行
+//   object/component/_advanced-search-condition-group-view.scss  … 条件グループ
+//   object/component/_advanced-search-toolbar.scss               … ツールバー
+//   object/project/_AdvancedSearchBuilderView.scss               … ビルダー外枠
+//   object/project/_AdvancedSearchView.scss                      … 最外コンテナ
+// =============================================================================
+
+// =============================================================================
+// 条件行 (.advanced-search-condition-item-view)
+// 各検索条件を1行で表示する丸角カードコンポーネント。
+// 条件名ラベル・値タグ・eq/ne トグル・編集削除ボタンを横並びに配置し、
+// 編集モード時はカード下部にエディタパネルを展開する。
+// =============================================================================
+
+.advanced-search-condition-item-view {
+  // --height-advanced-search-condition は外部（foundation）で定義された値を参照する
+  --corner-radius: calc(var(--height-advanced-search-condition) / 2);
+  --relation-icon-size: 16px;
+  // 値タグの上下パディング：値コンテナと値タグの高さ差を均等に割り当てる
+  --padding-values-vertical: calc(
+    (
+        var(--height-advanced-search-condition-values-container) - var(
+            --height-advanced-search-condition-value
+          )
+      ) *
+      0.5
+  );
+  position: relative;
+  margin-bottom: 3px;
+
+  // ── 白いカード（サマリー行＋エディタパネルを内包する丸角カード）────────────
+  > .condition-card {
+    position: relative;
+    background-color: white;
+    border-radius: var(--corner-radius);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+
+    // ── サマリー行（条件名・トグル・値タグ・操作ボタンを1行に並べる）─────────
+    > .condition-header {
+      display: flex;
+      padding-right: 8px;
+      font-size: 12px;
+      color: var(--color-black);
+      background-color: var(--color-bg-subtle);
+      border-radius: var(--corner-radius);
+
+      // 条件種別ラベル（黒背景・白文字・グラブカーソルでD&D可能を示す）
+      > .condition-label {
+        // width: 188px;
+        min-width: 188px;
+        padding: 0 0 0 var(--corner-radius);
+        font-weight: bold;
+        line-height: var(--height-advanced-search-condition);
+        color: white;
+        cursor: grab;
+        background-color: var(--color-black);
+        border-top-left-radius: var(--corner-radius);
+        border-bottom-left-radius: var(--corner-radius);
+      }
+
+      // eq/ne 切り替えトグルボタン
+      // 分類ラベルと値エリアの境界に重ねるため、負のマージンで垂直中央へ引き込む
+      > .relation-toggle {
+        width: var(--relation-icon-size);
+        min-width: var(--relation-icon-size);
+        margin: calc(
+            (
+                var(--height-advanced-search-condition) - var(
+                    --relation-icon-size
+                  )
+              ) /
+              2
+          )
+          calc(-1 * var(--relation-icon-size) / 2);
+
+        @at-root {
+          // eq と ne で共通：トグルボタンをアクティブ表示にしてイコール記号を描画する
+          .advanced-search-condition-item-view[data-relation='eq'],
+          .advanced-search-condition-item-view[data-relation='ne'] {
+            > .condition-card > .condition-header > .relation-toggle {
+              position: relative;
+              z-index: 1;
+              height: var(--relation-icon-size);
+              cursor: pointer;
+              background-color: var(--color-key-dark1);
+              border-radius: 3px;
+
+              &::before,
+              &::after {
+                position: absolute;
+                display: block;
+                content: '';
+              }
+
+              // イコール記号（＝）を2本の横線で表現する
+              &::before {
+                top: 5px;
+                left: 4px;
+                width: 8px;
+                height: 2px;
+                background-color: white;
+                box-shadow: 0 4px white;
+              }
+            }
+          }
+
+          // ne のみ：無効色＋取消線で「否定」を視覚的に区別する
+          .advanced-search-condition-item-view[data-relation='ne'] {
+            > .condition-card > .condition-header {
+              > .condition-label {
+                background-color: var(--color-disable-deep);
+              }
+
+              > .relation-toggle {
+                background-color: var(--color-disable);
+
+                // 斜め取消線で否定を表現する
+                &::after {
+                  top: 2px;
+                  left: 6.5px;
+                  height: 12px;
+                  border-left: solid 1px white;
+                  transform: rotate(-20deg);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // 選択済み値タグを横に並べるスクロール可能エリア
+      > .values-container {
+        position: relative;
+        display: flex;
+        flex-grow: 1;
+        flex-wrap: wrap;
+        align-items: center;
+        // 値が多い条件でも行全体を押し広げすぎないよう、値エリアだけをスクロール可能にする
+        max-height: 100px;
+        padding: var(--padding-values-vertical) var(--corner-radius)
+          var(--padding-values-vertical) 16px;
+        overflow: auto;
+
+        &::-webkit-scrollbar {
+          width: 7px;
+          height: 7px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background-color: rgba(0, 0, 0, 0.3);
+          border-radius: 4px;
+        }
+      }
+
+      // 編集・削除ボタン群（通常時は半透明、ホバーで不透明）
+      > .item-actions {
+        display: flex;
+
+        > button {
+          padding: 0 4px;
+          border: none;
+          opacity: 0.4;
+
+          &:hover {
+            opacity: 1;
+          }
+
+          &::before {
+            font-family: 'Font Awesome 7 Free', sans-serif;
+            font-weight: 900;
+          }
+        }
+
+        > .edit {
+          &::before {
+            content: var(--icon-pencil);
+          }
+        }
+
+        > .delete {
+          &::before {
+            content: var(--icon-xmark);
+          }
+        }
+      }
+    }
+
+    // エディタパネル（編集モード時に展開、通常時は非表示）
+    > .advanced-search-condition-editor-view {
+      display: none;
+      height: 0;
+      background-color: white;
+      border-top: none;
+      border-bottom-right-radius: var(--corner-radius);
+      border-bottom-left-radius: var(--corner-radius);
+      transition: height var(--gui-duration);
+    }
+  }
+
+  // 編集モード時に画面全体を覆う半透明バックドロップ（編集中の条件行を前面に浮かせる）
+  > .backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    background: var(--backdrop-bg);
+    opacity: 0;
+    transition: opacity var(--transition-duration);
+  }
+
+  // ── 編集モード（.-editing）────────────────────────────────────────────────
+  &.-editing {
+    // カードをバックドロップより前面に出し、値タグの削除ボタンを表示する
+    > .condition-card {
+      z-index: calc(var(--z-index-editing-condition) + 1);
+
+      > .condition-header {
+        // 下側の角丸を外してエディタパネルとシームレスにつなぐ
+        border-radius: var(--corner-radius) var(--corner-radius) 0;
+
+        > .condition-label {
+          border-bottom-left-radius: 0;
+        }
+
+        // 操作ボタンは編集中に操作できないよう非表示にする
+        > .item-actions {
+          pointer-events: none;
+          opacity: 0;
+        }
+
+        // 値タグの削除ボタンを編集中のみ表示する
+        > .values-container {
+          > condition-item-value-view::part(delete-tag-btn) {
+            display: inline-flex;
+          }
+        }
+      }
+
+      > .advanced-search-condition-editor-view {
+        display: block;
+        height: auto;
+      }
+    }
+
+    // バックドロップを表示して他の条件行を暗くする
+    > .backdrop {
+      z-index: var(--z-index-editing-condition);
+      pointer-events: auto;
+      opacity: 1;
+    }
+  }
+
+  // ── 選択状態（条件行カード）────────────────────────────────────────────────
+  // レイアウトに影響しないよう疑似要素で枠線を重ねる
+  &[aria-selected='true'] {
+    &::after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      content: '';
+      border: solid 2px var(--color-selected);
+      border-radius: var(--corner-radius);
+    }
+  }
+
+  // ── Consequence 条件（data-classification="consequence"）────────────────────
+  // タグが折り返したときの行間を確保する
+  // .values-container 全体に row-gap を付けると dataset 型の行間も広がるため、consequence のみに限定する
+  &[data-classification='consequence'] {
+    > .condition-card > .condition-header > .values-container {
+      row-gap: 3px;
+    }
+  }
+
+  // ── 臨床的意義条件（data-classification="significance"）────────────────────
+  // MGeND・ClinVar のデータソース名ラベルと値タグを横並びにするため幅を固定する
+  &[data-classification='significance'] {
+    > .condition-card {
+      > .condition-header {
+        > .values-container {
+          > .mgend-wrapper {
+            display: flex;
+            flex-basis: 100%;
+
+            > span {
+              min-width: 45px;
+              font-weight: bold;
+
+              &.mgend {
+                color: var(--color-dataset-disease-mgend);
+              }
+            }
+          }
+
+          > .clinvar-wrapper {
+            display: flex;
+            flex-basis: 100%;
+
+            > span {
+              min-width: 45px;
+              font-weight: bold;
+
+              &.clinvar {
+                color: var(--color-dataset-disease-clinvar);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// =============================================================================
+// 条件エディター (.advanced-search-condition-editor-view)
+// 条件行の下部に展開するフォームパネル
+// =============================================================================
+
+.advanced-search-condition-editor-view {
+  // 条件行の角丸半径と内側の左右位置を揃えるため、値コンテナ高さの半径分をパディングにする
+  --padding-side: calc(
+    var(--height-advanced-search-condition-values-container) * 0.5
+  );
+  color: var(--color-black);
+  border-top: solid 1px var(--color-separator);
+
+  > .condition-sections {
+    border-bottom: solid 1px var(--color-separator);
+
+    > .editor-panel {
+      > .section-header {
+        padding: 0 var(--padding-side);
+        font-weight: bold;
+        background-color: #cdcdcc;
+      }
+
+      > .section-content {
+        padding: 4px var(--padding-side);
+
+        // ConditionValueEditorClinicalSignificance の ul.section-content に付く
+        // data-type="clinical-significance" を対象に上パディングを縮小する
+        &[data-type='clinical-significance'] {
+          padding-top: 2px;
+        }
+
+        // ConditionValueEditorLocation のフォーム行（class="row"）を横並びにする
+        > .row {
+          display: flex;
+          place-items: center;
+        }
+
+        // ConditionDiseaseSearch（Light DOM）の div.container に対するスタイル。
+        // Shadow DOM を使わないため、このファイルのセレクターが直接届く
+        .container {
+          position: relative;
+
+          // データ取得中にオントロジービューの上に重ねて表示するローディングオーバーレイ
+          > .loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+
+            > span {
+              display: block;
+              width: 100%;
+              height: 100%;
+              background: url(../images/loading.gif) no-repeat 50% 50%;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  > .buttons {
+    padding: 3px 0 4px;
+    text-align: center;
+
+    > .button-view {
+      display: inline-block;
+
+      &:nth-child(1) {
+        margin-right: 5px;
+      }
+    }
+  }
+}
+
+// =============================================================================
+// 条件グループ (.advanced-search-condition-group-view)
+// =============================================================================
+
+.advanced-search-condition-group-view {
+  position: relative;
+  margin: 0 calc(var(--padding-group) * -1 - 1px) 3px 0;
+  background-color: white;
+  border: solid 1px var(--color-key-dark3);
+  box-shadow: var(--shadow-depth1);
+
+  // AND/OR 切り替えスイッチを条件グループ左辺（縦軸）に沿って縦置きする
+  > .logical-operator-switch {
+    position: absolute;
+    top: 5px;
+    left: 20px;
+    transform: rotate(90deg);
+    transform-origin: 0% 0%;
+  }
+
+  > .container {
+    padding: var(--padding-group) var(--padding-group)
+      calc(var(--padding-group) - 2px) 22px;
+  }
+
+  // 子要素が 0〜1 件のときは論理演算子が意味をなさないため非表示にする
+  &[data-number-of-child='0'],
+  &[data-number-of-child='1'] {
+    > .logical-operator-switch {
+      visibility: hidden;
+    }
+  }
+
+  // ── 選択状態（条件グループ枠）────────────────────────────────────────────────
+  // レイアウトに影響しないよう疑似要素で枠線を重ねる
+  &[aria-selected='true'] {
+    &::after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      content: '';
+      border: solid 2px var(--color-selected);
+    }
+  }
+
+  &.-root {
+    padding-bottom: calc(var(--height-toolbar) + 1px);
+
+    &[data-number-of-child='0'] {
+      &::before {
+        position: relative;
+        top: 10px;
+        display: block;
+        height: 18px;
+        line-height: 12px;
+        color: var(--color-black);
+        text-align: center;
+        content: 'Please add a search condition from below menu';
+      }
+    }
+  }
+}
+
+// =============================================================================
+// ツールバー (.advanced-search-toolbar)
+// =============================================================================
+
+// 無効コマンドの透過度（有効時は opacity: 1 で上書きする）
+$OPACITY_DISABLED: 0.8;
+
+.advanced-search-toolbar {
+  padding: 2px 6px;
+  // ビルダーコンテナに下から重なるよう負マージンで上にずらす
+  margin: 0 0 calc(var(--height-toolbar) * -1 - 1px) 0;
+  font-size: 12px;
+  line-height: 14px;
+  color: white;
+  background-color: var(--color-key-dark3);
+
+  // button のデフォルトスタイル（枠・背景・フォント）をリセットして .command ベースに統一する
+  .command {
+    margin: 0;
+    font: inherit;
+    line-height: inherit;
+    color: inherit;
+    text-align: left;
+    white-space: nowrap;
+    appearance: none;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  > ul {
+    display: flex;
+    padding-left: 0;
+    margin: 0;
+    white-space: nowrap;
+    list-style: none;
+
+    > li {
+      > .command {
+        padding: 4px 8px 3px;
+      }
+
+      > p {
+        padding: 4px 8px 3px;
+        margin-bottom: 0;
+        cursor: pointer;
+        transition: background-color var(--gui-duration);
+      }
+
+      .shortcut {
+        display: none;
+        height: 12px;
+        padding: 0 3px;
+        margin-left: 4px;
+        font-size: 10px;
+        font-weight: bold;
+        line-height: 12px;
+        color: var(--color-key-dark3);
+        background-color: white;
+        border-radius: 2px;
+
+        > .char {
+          &.-command {
+            &::before {
+              [data-os='mac'] & {
+                content: '⌘';
+              }
+
+              [data-os='windows'] & {
+                font-weight: normal;
+                content: 'ctrl ';
+              }
+            }
+          }
+        }
+      }
+
+      &:hover {
+        > p {
+          background-color: var(--color-key-dark1);
+        }
+      }
+
+      &.-haschild {
+        position: relative;
+
+        body[data-dragging='true'] & {
+          pointer-events: none;
+        }
+
+        > p {
+          // 子メニューの存在を▼で示す
+          &::after {
+            display: inline-block;
+            margin-left: 4px;
+            vertical-align: middle;
+            content: '';
+            border-color: white transparent transparent transparent;
+            border-style: solid;
+            border-width: 4px 3px 0 3px;
+          }
+        }
+
+        > ul {
+          position: absolute;
+          z-index: var(--z-index-advanced-search-menu);
+          // visibility: hidden でタブ順からも除外する（opacity: 0 だけではフォーカス可能なまま）
+          visibility: hidden;
+          padding: 0 0 2px;
+          white-space: nowrap;
+          pointer-events: none;
+          list-style: none;
+          background-color: var(--color-key-dark3);
+          opacity: 0;
+          transform: translateY(-10px);
+          transition:
+            opacity var(--gui-duration),
+            transform var(--gui-duration),
+            visibility var(--gui-duration);
+
+          > li {
+            transition: background-color var(--gui-duration);
+
+            > .command {
+              display: flex;
+              align-items: center;
+              width: 100%;
+              padding: 4px 8px;
+              margin-bottom: 0;
+              transition: background-color var(--gui-duration);
+            }
+
+            &:hover {
+              > .command {
+                background-color: var(--color-key-dark1);
+              }
+            }
+          }
+        }
+
+        &:hover {
+          > ul {
+            visibility: visible;
+            pointer-events: auto;
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      }
+
+      > .command {
+        pointer-events: none;
+        opacity: $OPACITY_DISABLED;
+
+        &.-enabled {
+          pointer-events: auto;
+          opacity: 1;
+
+          &:hover {
+            background-color: var(--color-key-dark1);
+          }
+        }
+
+        &[data-command='group'] {
+          #AdvancedSearchBuilderView[data-can-group='true'] & {
+            pointer-events: auto;
+            opacity: 1;
+
+            &:hover {
+              background-color: var(--color-key-dark1);
+            }
+          }
+        }
+
+        &[data-command='ungroup'] {
+          #AdvancedSearchBuilderView[data-can-ungroup='true'] & {
+            pointer-events: auto;
+            opacity: 1;
+
+            &:hover {
+              background-color: var(--color-key-dark1);
+            }
+          }
+        }
+
+        &[data-command='copy'] {
+          #AdvancedSearchBuilderView[data-can-copy='true'] & {
+            pointer-events: auto;
+            opacity: 1;
+
+            &:hover {
+              background-color: var(--color-key-dark1);
+            }
+          }
+        }
+
+        &[data-command='delete'] {
+          #AdvancedSearchBuilderView[data-can-delete='true'] & {
+            pointer-events: auto;
+            opacity: 1;
+
+            &:hover {
+              background-color: var(--color-key-dark1);
+            }
+          }
+        }
+      }
+
+      &.buttoncontainer {
+        flex-grow: 1;
+        text-align: right;
+
+        > .button-view {
+          position: relative;
+          top: 1px;
+        }
+      }
+    }
+  }
+}
+
+// =============================================================================
+// ビルダー外枠 (#AdvancedSearchBuilderView)
+// --padding-group / --height-toolbar は子コンポーネントへ渡す CSS カスタムプロパティ
+// =============================================================================
+
+#AdvancedSearchBuilderView {
+  --padding-group: 6px;
+  --height-toolbar: 14px;
+  padding: 14px var(--padding-side) 14px;
+  user-select: none;
+
+  > .inner {
+    // 条件行とグループが混在するとき、異種要素間に余白を確保する
+    .advanced-search-condition-item-view {
+      + .advanced-search-condition-group-view {
+        margin-top: 5px;
+      }
+    }
+
+    .advanced-search-condition-group-view {
+      + .advanced-search-condition-item-view {
+        margin-top: 5px;
+      }
+    }
+  }
+}
+
+// =============================================================================
+// 高度検索条件エディター専用パーツ
+// 条件エディターパネル内で使用する入力コンポーネント群
+// 統合元:
+//   object/component/_checkboxes-editor-view.scss          … チェックボックス一覧エディター
+//   object/component/_checklist-values.scss                … サイドバー用チェックリスト
+//   object/component/_condition-clinical-significance-view.scss … 臨床的意義条件選択
+//   object/component/_condition-disease-search.scss        … 疾患検索条件
+//   object/component/_condition-pathogenicity-view.scss    … 病原性予測条件
+//   object/component/_frequency-count-editor-view.scss     … 頻度・カウント条件エディター
+//   object/component/_location-editor-view.scss            … 染色体位置条件エディター
+//   object/component/_range-inputs-view.scss               … 数値範囲入力ペア
+// =============================================================================
+
+// チェックボックス一覧エディター (.checkboxes-editor-view)
+// 条件エディターパネル内のチェックボックスを水平並びで表示する
+.checkboxes-editor-view {
+  > .buttons {
+    padding: 4px var(--padding-side);
+    border-bottom: dotted 1px var(--color-separator-sub);
+  }
+
+  > .checkboxes {
+    margin: 0;
+    font-size: 14px;
+    line-height: 24px;
+
+    > li {
+      display: inline-block;
+      margin-right: 12px;
+      line-height: 18px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      > label {
+        margin-bottom: 0;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+// 臨床的意義条件選択 (.clinical-significance-view)
+// ClinVar/MGeND の解釈種別をグリッドレイアウトで選択させる
+.clinical-significance-view {
+  > .buttons {
+    padding: 4px var(--padding-side);
+    border-bottom: dotted 1px var(--color-separator-sub);
+  }
+
+  > .dataset-title {
+    padding-top: 2px;
+    padding-left: var(--padding-side);
+    font-size: 14px;
+    font-weight: bold;
+
+    &.clinvar {
+      color: var(--color-dataset-disease-clinvar);
+    }
+
+    &.mgend {
+      color: var(--color-dataset-disease-mgend);
+    }
+  }
+
+  > hr {
+    margin: 0;
+    border: dotted 1px var(--color-separator-sub);
+  }
+
+  > .checkboxes {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    row-gap: 3px;
+    margin: 0;
+    font-size: 14px;
+
+    > li {
+      display: inline-block;
+      margin-right: 5px;
+      line-height: 18px;
+
+      // ClinVar の各解釈種別を grid-area で列・行に固定配置する
+      &[data-source='clinvar'] {
+        &[data-value='LP'] {
+          grid-area: 2 / 1;
+        }
+        &[data-value='PLP'] {
+          grid-area: 3 / 1;
+        }
+        &[data-value='LPLP'] {
+          grid-area: 4 / 1;
+        }
+        &[data-value='ERA'] {
+          grid-area: 5 / 1;
+        }
+        &[data-value='LRA'] {
+          grid-area: 6 / 1;
+        }
+        &[data-value='URA'] {
+          grid-area: 7 / 1;
+        }
+        &[data-value='US'] {
+          grid-area: 1 / 2;
+        }
+        &[data-value='LB'] {
+          grid-area: 2 / 2;
+        }
+        &[data-value='B'] {
+          grid-area: 3 / 2;
+        }
+        &[data-value='CI'] {
+          grid-area: 4 / 2;
+        }
+        &[data-value='DR'] {
+          grid-area: 5 / 2;
+        }
+        &[data-value='CS'] {
+          grid-area: 6 / 2;
+        }
+        &[data-value='RF'] {
+          grid-area: 7 / 2;
+        }
+        &[data-value='A'] {
+          grid-area: 1 / 3;
+        }
+        &[data-value='PR'] {
+          grid-area: 2 / 3;
+        }
+        &[data-value='AF'] {
+          grid-area: 3 / 3;
+        }
+        &[data-value='O'] {
+          grid-area: 4 / 3;
+        }
+        &[data-value='NP'] {
+          grid-area: 5 / 3;
+        }
+        &[data-value='AN'] {
+          grid-area: 6 / 3;
+        }
+      }
+
+      // MGeND の各解釈種別を固定配置する
+      &[data-source='mgend'] {
+        &[data-value='PLP'] {
+          grid-area: 1 / 1;
+        }
+        &[data-value='LP'] {
+          grid-area: 2 / 1;
+        }
+        &[data-value='US'] {
+          grid-area: 3 / 1;
+        }
+        &[data-value='LB'] {
+          grid-area: 1 / 2;
+        }
+        &[data-value='B'] {
+          grid-area: 2 / 2;
+        }
+        &[data-value='DR'] {
+          grid-area: 3 / 2;
+        }
+        &[data-value='O'] {
+          grid-area: 1 / 3;
+        }
+        &[data-value='NP'] {
+          grid-area: 2 / 3;
+        }
+      }
+
+      > label {
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+// 疾患検索条件 (#ConditionDiseaseSearch)
+#ConditionDiseaseSearch {
+  > .container {
+    margin-top: 0.5rem;
+  }
+}
+
+// 病原性予測条件 (.pathogenicity-editor-view)
+// AlphaMissense などの予測ツール別タブで閾値を選択させる
+// タブUIのスタイルは Shadow DOM 内で完結するため tab-view.scss で管理する
+.pathogenicity-editor-view {
+  &[data-condition-type='pathogenicity_prediction'].editor-panel {
+    > .section-content {
+      // prediction-value-view の描画領域を確保するため下パディングが必要
+      padding: 0 0 75px 0;
+    }
+  }
+}
+
+// 頻度・カウント条件エディター (.frequency-count-editor-view)
+// 頻度レンジ選択と個体数カウント入力の切り替えを制御する
+.frequency-count-editor-view {
+  > .section-content {
+    > section {
+      + section {
+        margin-top: 5px;
+      }
+
+      // 非アクティブな切り替えセクションは半透明で操作不可にする
+      &.switching {
+        > label {
+          display: flex;
+          column-gap: 2px;
+          margin-bottom: 2px;
+
+          > span {
+            font-weight: bold;
+          }
+        }
+
+        > .input,
+        .input-container {
+          pointer-events: none;
+          opacity: 0.4;
+        }
+
+        &.-current {
+          > .input,
+          .input-container {
+            pointer-events: auto;
+            opacity: 1;
+          }
+        }
+      }
+
+      &.frequency {
+        > .range-selector-view {
+          > .input {
+            > label {
+              position: absolute;
+              left: 368px;
+            }
+          }
+        }
+      }
+
+      &.count {
+        > .input-container {
+          display: flex;
+          column-gap: 2em;
+          align-items: center;
+
+          > .input {
+            > input {
+              width: 5em;
+              margin-right: 3px;
+
+              @include input-number;
+            }
+          }
+
+          > .messages-view {
+            &.-hidden {
+              display: none;
+            }
+
+            > .message {
+              padding: 1px 6px 1px 20px;
+              margin-bottom: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// 染色体位置条件エディター (.location-editor-view)
+.location-editor-view {
+  > .section-content {
+    > .row {
+      column-gap: 5px;
+      line-height: var(--height-inline);
+
+      > label.chromosome {
+        > .label {
+          margin-right: 3px;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}
+
+// 数値範囲入力ペア (.range-inputs-view)
+// 最小値〜最大値を「─」で繋いで並べる
+.range-inputs-view {
+  display: flex;
+  place-items: center;
+
+  > .line {
+    position: relative;
+    display: inline-block;
+    width: 0.4em;
+    height: 1px;
+    margin: 0 0.5em;
+
+    &::before {
+      position: relative;
+      top: 1px;
+      display: block;
+      width: 100%;
+      content: '';
+      border-top: solid 1px black;
+    }
+  }
+
+  // 単一位置指定モードでは終端入力を薄くして操作を無効化する
+  &[data-type='single_position'] {
+    > .line {
+      opacity: 0.2;
+    }
+
+    > input.end {
+      pointer-events: none;
+      opacity: 0.2;
+    }
+  }
+}
+
+// =============================================================================
+// 最外コンテナ (#AdvancedSearchView)
+// =============================================================================
+
+#AdvancedSearchView {
+  .search-field-view {
+    padding: 14px var(--padding-side);
+
+    > .fieldcontainer {
+      > .field {
+        margin: 0;
+
+        > button {
+          display: none;
+        }
+      }
+    }
+  }
+
+  &.-current {
+    .search-field-view {
+      > .suggest-view {
+        top: 44px;
+        left: 25px;
+      }
+    }
+  }
+}

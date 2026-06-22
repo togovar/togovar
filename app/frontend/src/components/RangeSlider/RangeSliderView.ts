@@ -1,18 +1,19 @@
+import { LitElement, html, type TemplateResult } from 'lit';
+import { customElement, query } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
+import { styleMap } from 'lit/directives/style-map.js';
+import Styles from '../../../stylesheets/web-components/range-slider.scss';
 import {
+  DEFAULT_INPUT_STEP,
   DEFAULT_RANGE_SLIDER_STATE,
+  DEFAULT_SLIDER_STEP,
   EVENT_DETAIL_KEYS,
   METER_VERTICAL_CLASS,
   RANGE_CHANGED_EVENT,
 } from './RangeSliderConstants';
-import {
-  createRangeSliderTemplate,
-  createRulerScales,
-  createSearchTypeSimple,
-} from './RangeSliderTemplate';
-import { createThumbStyle, createTrackBackground } from './RangeSliderStyle';
+import { createRulerScales, type RulerScale } from './RangeSliderRuler';
 import {
   formatInputValue,
-  formatSliderValue,
   parseNumber,
   setRangeValue,
   toInvertValue,
@@ -23,66 +24,191 @@ import type {
   RangeSliderState,
 } from './RangeSliderTypes';
 
-const template = createRangeSliderTemplate();
+const DEFAULT_ORIENTATION = 'horizontal';
 
 /** 頻度条件UIから使うため、属性・数値入力・2本のrange inputを1つのWeb Componentにまとめる。 */
-export class RangeSlider extends HTMLElement {
-  private state: RangeSliderState;
-  private readonly shadow: ShadowRoot;
-  private readonly slider1: HTMLInputElement;
-  private readonly slider2: HTMLInputElement;
-  private readonly sliderTrack: HTMLElement;
-  private readonly from: HTMLInputElement;
-  private readonly to: HTMLInputElement;
-  private readonly invertChk: HTMLInputElement;
-  private readonly _meter: HTMLElement;
-  private readonly _ruler: HTMLElement;
-  private readonly _sliderTrackStyle: HTMLStyleElement;
+@customElement('range-slider')
+export class RangeSlider extends LitElement {
+  static styles = [Styles];
 
-  /** 外部から属性で初期値や表示方向を渡せるよう、変更を監視する属性を明示する。 */
-  static get observedAttributes(): RangeSliderAttribute[] {
-    return [
-      'min',
-      'max',
-      'input-step',
-      'slider-step',
-      'value1',
-      'value2',
-      'orientation',
-      'invert',
-      'match',
-      'ruler-number-of-steps',
-    ];
-  }
+  static properties = {
+    min: { type: String, noAccessor: true },
+    max: { type: String, noAccessor: true },
+    inputStep: { type: String, attribute: 'input-step', noAccessor: true },
+    sliderStep: { type: String, attribute: 'slider-step', noAccessor: true },
+    value1: { type: String, noAccessor: true },
+    value2: { type: String, noAccessor: true },
+    orientation: { type: String, noAccessor: true },
+    invert: { type: String, noAccessor: true },
+    match: { type: String, noAccessor: true },
+    rulerNumberOfSteps: {
+      type: String,
+      attribute: 'ruler-number-of-steps',
+      noAccessor: true,
+    },
+  };
 
-  /** Shadow DOM内で完結するUIとして扱うため、必要な要素参照と初期状態をまとめて作る。 */
+  private _state: RangeSliderState;
+  private _searchType: string | null = null;
+  private _rulerScales: RulerScale[] = [];
+
+  /**
+   * render() 完了前は @query でのDOM参照が null になるため、
+   * firstUpdated() 後にセットして DOM アクセスを保護する。
+   */
+  private _domReady = false;
+
+  @query('#slider-1') private slider1!: HTMLInputElement;
+  @query('#slider-2') private slider2!: HTMLInputElement;
+  @query('#slider-track') private sliderTrack!: HTMLElement;
+  @query('.from') private from!: HTMLInputElement;
+  @query('.to') private to!: HTMLInputElement;
+  @query('.invert') private invertChk!: HTMLInputElement;
+  @query('.meter') private _meter!: HTMLElement;
+
   constructor() {
     super();
-
-    this.state = { ...DEFAULT_RANGE_SLIDER_STATE };
-    this.shadow = this.attachShadow({ mode: 'open' });
-    this.shadow.appendChild(template.content.cloneNode(true));
-
-    this.slider1 = this._selectShadowElement<HTMLInputElement>('#slider-1');
-    this.slider2 = this._selectShadowElement<HTMLInputElement>('#slider-2');
-    this.sliderTrack = this._selectShadowElement<HTMLElement>('#slider-track');
-    this.from = this._selectShadowElement<HTMLInputElement>('.from');
-    this.to = this._selectShadowElement<HTMLInputElement>('.to');
-    this.invertChk = this._selectShadowElement<HTMLInputElement>('.invert');
-    this._meter = this._selectShadowElement<HTMLElement>('.meter');
-    this._ruler = this._selectShadowElement<HTMLElement>('.ruler');
-    this._sliderTrackStyle = this._selectShadowElement<HTMLStyleElement>(
-      "style[data='slider-track-style']"
-    );
+    this._state = { ...DEFAULT_RANGE_SLIDER_STATE };
   }
 
-  /** Shadow DOMのテンプレート不整合を早く検知するため、必須要素取得を共通化する。 */
-  private _selectShadowElement<T extends Element>(selector: string): T {
-    const element = this.shadow.querySelector<T>(selector);
-    if (!element) {
-      throw new Error(`RangeSlider template is missing ${selector}`);
-    }
-    return element;
+  render(): TemplateResult {
+    return html`
+      <div class="wrapper" part="wrapper">
+        <div class="input" part="div-input">
+          <span class="limit-inputs" part="limit-inputs">
+            <input
+              class="from"
+              name="lower-limit"
+              part="num-input limit-input"
+              type="number"
+              title="Lower limit"
+              .min=${String(this._state.min)}
+              .max=${String(this._state.max)}
+              .step=${this._inputStep}
+              .value=${formatInputValue(this._state.from)}
+              @input=${this._fromInput}
+            />
+            ~
+            <input
+              class="to"
+              name="upper-limit"
+              part="num-input limit-input"
+              type="number"
+              title="Upper limit"
+              .min=${String(this._state.min)}
+              .max=${String(this._state.max)}
+              .step=${this._inputStep}
+              .value=${formatInputValue(this._state.to)}
+              @input=${this._toInput}
+            />
+          </span>
+          <label class="checkbox-label" part="checkbox-label label">
+            <input
+              class="invert"
+              name="invert-range"
+              type="checkbox"
+              part="checkbox"
+              .checked=${this._state.invert}
+              @change=${this._invertChange}
+            />Invert range
+          </label>
+        </div>
+        <div class="meter" part="meter">
+          <div class="meter-container" part="meter-container">
+            <div class="slider-track" id="slider-track" part="slider-track">
+              <div class="ruler" part="ruler">
+                ${this._rulerScales.map((scale) => this._renderRulerScale(scale))}
+              </div>
+            </div>
+            <input
+              part="slider"
+              type="range"
+              name="slider-1"
+              id="slider-1"
+              aria-label="Lower range limit"
+              .min=${String(this._state.min)}
+              .max=${String(this._state.max)}
+              .step=${this._sliderStep}
+              .value=${String(Math.min(this._state.from, this._state.to))}
+              @input=${this.lazy ? this._slider1VisualUpdate : this._slider1Input}
+              @change=${this.lazy ? this._sliderLazyCommit : undefined}
+            />
+            <input
+              part="slider"
+              type="range"
+              name="slider-2"
+              id="slider-2"
+              aria-label="Upper range limit"
+              .min=${String(this._state.min)}
+              .max=${String(this._state.max)}
+              .step=${this._sliderStep}
+              .value=${String(Math.max(this._state.from, this._state.to))}
+              @input=${this.lazy ? this._slider2VisualUpdate : this._slider2Input}
+              @change=${this.lazy ? this._sliderLazyCommit : undefined}
+            />
+          </div>
+        </div>
+        ${this._renderMatchSelector()}
+      </div>
+    `;
+  }
+
+  /** 目盛りは状態から毎回同じ構造で描画し、DOMの手動生成を避ける。 */
+  private _renderRulerScale(scale: RulerScale): TemplateResult {
+    const classes = {
+      scale: true,
+      'scale-vertical': scale.vertical,
+    };
+
+    return html`
+      <div
+        class=${classMap(classes)}
+        part=${scale.vertical ? 'scale scale-vertical' : 'scale'}
+        style=${styleMap({ left: scale.left })}
+      >
+        ${scale.label}
+      </div>
+    `;
+  }
+
+  /** match切替は simple search だけで必要なため、Lit の条件付き描画に閉じ込める。 */
+  private _renderMatchSelector(): TemplateResult | null {
+    if (this._searchType !== 'simple') return null;
+
+    return html`
+      <div class="match" part="match" @click=${this._matchClick}>
+        <label part="match label">
+          <input
+            class="all"
+            name="match"
+            type="radio"
+            value="all"
+            .checked=${this._state.match === 'all'}
+          />
+          for all datasets
+        </label>
+        <label part="label">
+          <input
+            class="any"
+            name="match"
+            type="radio"
+            value="any"
+            .checked=${this._state.match !== 'all'}
+          />
+          for any dataset
+        </label>
+      </div>
+    `;
+  }
+
+  /** slider用stepは属性名が独自なので、未指定時の既定値をここで補完する。 */
+  private get _sliderStep(): string {
+    return this.getAttribute('slider-step') ?? String(DEFAULT_SLIDER_STEP);
+  }
+
+  /** number input用stepも独自属性から読むため、render側で使える文字列へ正規化する。 */
+  private get _inputStep(): string {
+    return this.getAttribute('input-step') ?? String(DEFAULT_INPUT_STEP);
   }
 
   /** 属性変更をフォーム部品と内部状態へ反映し、外部からの値更新でも表示を同期する。 */
@@ -91,78 +217,86 @@ export class RangeSlider extends HTMLElement {
     oldValue: string | null,
     newValue: string | null
   ): void {
+    // LitのReactive Propertyは使わず手動で属性同期するため、
+    // super呼び出しによる内部property変換を避ける。
     if (oldValue === newValue || newValue === null) return;
 
     switch (name) {
       case 'min':
-        this._setInputProperty('min', newValue);
-        this.state.min = parseNumber(newValue, this.state.min);
+        this._state.min = parseNumber(newValue, this._state.min);
+        this._clampCurrentRange();
         break;
       case 'max':
-        this._setInputProperty('max', newValue);
-        this.state.max = parseNumber(newValue, this.state.max);
+        this._state.max = parseNumber(newValue, this._state.max);
+        this._clampCurrentRange();
         break;
       case 'slider-step':
-        this.slider1.step = newValue;
-        this.slider2.step = newValue;
+        this.requestUpdate();
         break;
       case 'input-step':
-        this.from.step = newValue;
-        this.to.step = newValue;
+        this.requestUpdate();
         break;
       case 'value1':
       case 'value2': {
-        if (name === 'value1') {
-          this.slider1.value = formatSliderValue(newValue);
-        } else {
-          this.slider2.value = formatSliderValue(newValue);
-        }
-        const rawFrom = Math.min(+this.slider1.value, +this.slider2.value);
-        const rawTo = Math.max(+this.slider1.value, +this.slider2.value);
-        this.state.from = Math.min(Math.max(rawFrom, this.state.min), this.state.max);
-        this.state.to = Math.min(Math.max(rawTo, this.state.min), this.state.max);
-        if (this.isConnected) {
-          this._syncInputsFromState();
-          this._fireEvent();
-          return;
+        if (this._domReady) {
+          this._syncStateFromAttributeValues();
+          if (this.isConnected) {
+            this._commitStateChange({ fireEvent: true });
+            return;
+          }
         }
         break;
       }
       case 'invert': {
         const invert = toInvertValue(newValue);
-        this.invertChk.checked = invert;
-        if (this.isConnected) {
-          this._updateInvert(invert);
-        } else {
-          this.state.invert = invert;
+        if (this._domReady) {
+          this.invertChk.checked = invert;
+          if (this.isConnected) {
+            this._updateInvert(invert);
+            return;
+          }
         }
+        this._state.invert = invert;
         break;
       }
       case 'ruler-number-of-steps':
-        this.state.rulerNumberOfSteps = parseNumber(
+        this._state.rulerNumberOfSteps = parseNumber(
           newValue,
-          this.state.rulerNumberOfSteps
+          this._state.rulerNumberOfSteps
         );
-        this._reRenderRuler();
+        if (this._domReady) this._reRenderRuler();
         break;
       case 'match':
-        this.state.match = newValue;
+        this._state.match = newValue;
         break;
       case 'orientation':
-        this._toggleOrientation(newValue);
-        this._reRenderRuler();
+        if (this._domReady) {
+          this._toggleOrientation(newValue);
+          this._reRenderRuler();
+        }
         break;
     }
 
-    this._fillSlider();
+    if (this._domReady) this._commitStateChange();
   }
 
-  /** min/maxは4つの入力要素で同じ値を使うため、属性反映の重複を避ける。 */
-  private _setInputProperty(propertyName: 'min' | 'max', value: string): void {
-    this.slider1[propertyName] = value;
-    this.slider2[propertyName] = value;
-    this.from[propertyName] = value;
-    this.to[propertyName] = value;
+  /** 2本のrange inputは順序が入れ替わるため、状態へ入れる前に必ずmin/maxで正規化する。 */
+  private _syncStateFromSliderValues(): void {
+    const rawFrom = Math.min(+this.slider1.value, +this.slider2.value);
+    const rawTo = Math.max(+this.slider1.value, +this.slider2.value);
+    this._state.from = this._clampRangeValue(rawFrom);
+    this._state.to = this._clampRangeValue(rawTo);
+  }
+
+  /** min/maxが変わったとき、既存の選択範囲が新しい範囲外へ残らないよう補正する。 */
+  private _clampCurrentRange(): void {
+    this._state.from = this._clampRangeValue(this._state.from);
+    this._state.to = this._clampRangeValue(this._state.to);
+  }
+
+  /** min/max変更時にも同じ補正を使えるよう、範囲内への丸めを小さく分離する。 */
+  private _clampRangeValue(value: number): number {
+    return Math.min(Math.max(value, this._state.min), this._state.max);
   }
 
   /** 縦向き表示はCSSクラスだけで切り替え、値計算のロジックを増やさない。 */
@@ -177,35 +311,36 @@ export class RangeSlider extends HTMLElement {
 
   /** 目盛りはmin/max/分割数から毎回作り直し、属性変更後も表示と状態を一致させる。 */
   private _reRenderRuler(): void {
-    this._ruler.innerHTML = '';
-    createRulerScales(
-      this.state.min,
-      this.state.max,
-      this.state.rulerNumberOfSteps,
+    this._rulerScales = createRulerScales(
+      this._state.min,
+      this._state.max,
+      this._state.rulerNumberOfSteps,
       this.orientation
-    ).forEach((scale) => this._ruler.appendChild(scale));
+    );
+    this.requestUpdate();
   }
 
-  /** 選択範囲とinvert状態を背景グラデーションへ反映し、現在の条件を視覚化する。 */
+  /** 選択範囲はCSSカスタムプロパティへ流し、実際の描画はSCSSに任せる。 */
   private _fillSlider(): void {
-    const val1 = Math.min(+this.slider1.value, +this.slider2.value);
-    const val2 = Math.max(+this.slider1.value, +this.slider2.value);
-    this.sliderTrack.style.background = createTrackBackground({
-      from: val1,
-      to: val2,
-      min: this.state.min,
-      max: this.state.max,
-      inverted: this.state.invert,
-    });
+    const val1 = Math.min(this._state.from, this._state.to);
+    const val2 = Math.max(this._state.from, this._state.to);
+    const range = this._state.max - this._state.min || 1;
+    const percentFrom = ((val1 - this._state.min) * 100) / range;
+    const percentTo = ((val2 - this._state.min) * 100) / range;
+    this.sliderTrack.style.setProperty('--range-slider-from', `${percentFrom}%`);
+    this.sliderTrack.style.setProperty('--range-slider-to', `${percentTo}%`);
+    this.sliderTrack.toggleAttribute('data-inverted', this._state.invert);
 
     this._drawThumbs();
   }
 
-  /** 2つのつまみが重なっても境界が見えるよう、左右どちら側に線を出すかを値の大小で切り替える。 */
+  /**
+   * 2つのつまみが重なっても境界が見えるよう、左右どちら側に線を出すかを値の大小で決める。
+   * data-thumb 属性を介して SCSS の :host([data-thumb]) セレクタでスタイルを切り替える。
+   */
   private _drawThumbs(): void {
-    this._sliderTrackStyle.innerHTML = createThumbStyle(
-      +this.slider1.value < +this.slider2.value
-    );
+    this.dataset.thumb =
+      this._state.from < this._state.to ? '1-lower' : '2-lower';
   }
 
   /** 外部コードが属性と同じ名前で最小値を読めるよう、既存APIを保つ。 */
@@ -303,22 +438,9 @@ export class RangeSlider extends HTMLElement {
 
   /** simple searchだけmatch UIを追加するため、通常利用では内部UIを露出しない。 */
   set searchType(value: string) {
-    if (value !== 'simple') return;
-
-    const matchSelector = createSearchTypeSimple();
-    const currentMatch = this.state.match;
-    const initial = matchSelector.querySelector<HTMLInputElement>(
-      `input[name="match"][value="${currentMatch}"]`
-    );
-    if (initial) initial.checked = true;
-    this._selectShadowElement<HTMLElement>('.wrapper').appendChild(matchSelector);
-    matchSelector.addEventListener('click', (e) => {
-      if (!(e.target instanceof HTMLInputElement)) return;
-
-      this.state.match = e.target.value;
-      this._syncInputsFromState();
-      this._fireEvent();
-    });
+    this._searchType = value;
+    this.dataset.searchType = value;
+    this.requestUpdate();
   }
 
   /** invert変更も属性変更コールバックに集約し、checkboxと描画を同じ経路で同期する。 */
@@ -329,7 +451,7 @@ export class RangeSlider extends HTMLElement {
   /** 外部の条件エディタが必要な値だけを受け取れるよう、内部状態から公開detailを切り出す。 */
   private _fireEvent(): void {
     const eventData = Object.fromEntries(
-      Object.entries(this.state).filter(([key]) =>
+      Object.entries(this._state).filter(([key]) =>
         EVENT_DETAIL_KEYS.includes(key as (typeof EVENT_DETAIL_KEYS)[number])
       )
     ) as RangeSliderData;
@@ -342,57 +464,80 @@ export class RangeSlider extends HTMLElement {
     this.dispatchEvent(event);
   }
 
-  /** DOM接続後に属性から初期状態を確定し、入力イベントを登録して初期描画を行う。 */
-  connectedCallback(): void {
+  /** DOM構築完了後に属性から初期状態を確定し、入力イベントを登録して初期描画を行う。 */
+  protected override firstUpdated(): void {
+    this._domReady = true;
     this._initStateFromAttributes();
     this._initUI();
   }
 
   /** 属性から内部状態を初期化する。DOM操作を含まず、状態確定だけを行う。 */
   private _initStateFromAttributes(): void {
-    this.min = this.getAttribute('min') || 0;
-    this.max = this.getAttribute('max') || 1;
-    this.value1 = this.getAttribute('value1') || 0;
-    this.value2 = this.getAttribute('value2') || 1;
-    this.orientation = this.getAttribute('orientation') || 'horizontal';
-    const match = this.getAttribute('match') ?? this.getAttribute('simple-search');
-    this.state.match = match ?? DEFAULT_RANGE_SLIDER_STATE.match;
-    this.state.min = parseNumber(this.min ?? 0, DEFAULT_RANGE_SLIDER_STATE.min);
-    this.state.max = parseNumber(this.max ?? 1, DEFAULT_RANGE_SLIDER_STATE.max);
-    this.state.step = parseNumber(
-      this.getAttribute('step') ?? DEFAULT_RANGE_SLIDER_STATE.step,
-      DEFAULT_RANGE_SLIDER_STATE.step
+    this._applyDefaultAttribute('min', DEFAULT_RANGE_SLIDER_STATE.min);
+    this._applyDefaultAttribute('max', DEFAULT_RANGE_SLIDER_STATE.max);
+    this._applyDefaultAttribute('value1', DEFAULT_RANGE_SLIDER_STATE.from);
+    this._applyDefaultAttribute('value2', DEFAULT_RANGE_SLIDER_STATE.to);
+    this._applyDefaultAttribute('orientation', DEFAULT_ORIENTATION);
+    const match =
+      this.getAttribute('match') ?? this.getAttribute('simple-search');
+    this._state.match = match ?? DEFAULT_RANGE_SLIDER_STATE.match;
+    this._state.min = parseNumber(
+      this.min ?? 0,
+      DEFAULT_RANGE_SLIDER_STATE.min
     );
+    this._state.max = parseNumber(
+      this.max ?? 1,
+      DEFAULT_RANGE_SLIDER_STATE.max
+    );
+    this._syncStateFromAttributeValues();
+    this._state.invert = toInvertValue(this.getAttribute('invert'));
+    this.rulerNumberOfSteps = DEFAULT_RANGE_SLIDER_STATE.rulerNumberOfSteps;
+  }
+
+  /** 未指定属性だけを補完し、外部から明示された初期値を上書きしないようにする。 */
+  private _applyDefaultAttribute(
+    name: RangeSliderAttribute,
+    fallback: string | number
+  ): void {
+    if (this.getAttribute(name) === null) {
+      this.setAttribute(name, String(fallback));
+    }
+  }
+
+  /** 初期属性は文字列なので、数値化と範囲補正を状態更新前にまとめて行う。 */
+  private _syncStateFromAttributeValues(): void {
     const rawFrom = Math.min(+(this.value1 ?? 0), +(this.value2 ?? 1));
     const rawTo = Math.max(+(this.value1 ?? 0), +(this.value2 ?? 1));
-    this.state.from = Math.min(Math.max(rawFrom, this.state.min), this.state.max);
-    this.state.to = Math.min(Math.max(rawTo, this.state.min), this.state.max);
-    this.state.invert = toInvertValue(this.getAttribute('invert'));
-    this.rulerNumberOfSteps = DEFAULT_RANGE_SLIDER_STATE.rulerNumberOfSteps;
+    this._state.from = this._clampRangeValue(rawFrom);
+    this._state.to = this._clampRangeValue(rawTo);
   }
 
   /** イベント登録と初期描画を行う。状態確定後に呼ぶ。 */
   private _initUI(): void {
-    this._addEventListeners();
-    this.from.value = formatInputValue(this.state.from);
-    this.to.value = formatInputValue(this.state.to);
-    this._fillSlider();
+    this._commitStateChange();
+    this.invertChk.checked = this._state.invert;
+    this._toggleOrientation(this.orientation ?? DEFAULT_ORIENTATION);
     this._reRenderRuler();
     this._fireEvent();
   }
 
+  /** state変更後の描画同期とイベント発火を1箇所に集約し、副作用の重複を避ける。 */
+  private _commitStateChange({ fireEvent = false } = {}): void {
+    this.requestUpdate();
+    this._syncInputsFromState();
+    if (fireEvent) this._fireEvent();
+  }
+
   /** 範囲値の変更だけがrange-changedを発火するよう、状態更新の副作用を明示する。 */
   private _updateRangeValue(prop: 'from' | 'to', value: unknown): void {
-    setRangeValue(this.state, prop, value);
-    this._syncInputsFromState();
-    this._fireEvent();
+    setRangeValue(this._state, prop, value);
+    this._commitStateChange({ fireEvent: true });
   }
 
   /** invert変更時の同期とイベント発火を明示し、単なる代入に副作用を隠さない。 */
   private _updateInvert(value: unknown): void {
-    this.state.invert = toInvertValue(value);
-    this._syncInputsFromState();
-    this._fireEvent();
+    this._state.invert = toInvertValue(value);
+    this._commitStateChange({ fireEvent: true });
   }
 
   /**
@@ -412,22 +557,6 @@ export class RangeSlider extends HTMLElement {
     }
   }
 
-  /** イベント登録と解除の対応を保つため、接続時の登録処理を1箇所にまとめる。 */
-  private _addEventListeners(): void {
-    if (this.lazy) {
-      this.slider1.addEventListener('input', this._slider1VisualUpdate);
-      this.slider2.addEventListener('input', this._slider2VisualUpdate);
-      this.slider1.addEventListener('change', this._sliderLazyCommit);
-      this.slider2.addEventListener('change', this._sliderLazyCommit);
-    } else {
-      this.slider1.addEventListener('input', this._slider1Input);
-      this.slider2.addEventListener('input', this._slider2Input);
-    }
-    this.from.addEventListener('change', this._fromChange);
-    this.to.addEventListener('change', this._toChange);
-    this.invertChk.addEventListener('change', this._invertChange);
-  }
-
   /** 下限スライダー操作をstateへ通し、数値入力とイベント発火を同じ経路に揃える。 */
   private _slider1Input = (e: Event): void => {
     if (!(e.target instanceof HTMLInputElement)) return;
@@ -443,15 +572,15 @@ export class RangeSlider extends HTMLElement {
   /** lazy モード: ドラッグ中は視覚のみ更新し range-changed を発火しない。 */
   private _slider1VisualUpdate = (e: Event): void => {
     if (!(e.target instanceof HTMLInputElement)) return;
-    setRangeValue(this.state, 'from', e.target.value);
-    this._syncInputsFromState();
+    setRangeValue(this._state, 'from', e.target.value);
+    this._commitStateChange();
   };
 
   /** lazy モード: ドラッグ中は視覚のみ更新し range-changed を発火しない。 */
   private _slider2VisualUpdate = (e: Event): void => {
     if (!(e.target instanceof HTMLInputElement)) return;
-    setRangeValue(this.state, 'to', e.target.value);
-    this._syncInputsFromState();
+    setRangeValue(this._state, 'to', e.target.value);
+    this._commitStateChange();
   };
 
   /** lazy モード: スライダーを放したときだけ range-changed を発火する。 */
@@ -461,21 +590,21 @@ export class RangeSlider extends HTMLElement {
 
   /** stateを唯一の正とし、2本のスライダー・数値入力・背景描画を同期する。 */
   private _syncInputsFromState(): void {
-    this.slider1.value = String(Math.min(this.state.from, this.state.to));
-    this.slider2.value = String(Math.max(this.state.from, this.state.to));
-    this.from.value = formatInputValue(this.state.from);
-    this.to.value = formatInputValue(this.state.to);
+    this.slider1.value = String(Math.min(this._state.from, this._state.to));
+    this.slider2.value = String(Math.max(this._state.from, this._state.to));
+    this.from.value = formatInputValue(this._state.from);
+    this.to.value = formatInputValue(this._state.to);
     this._fillSlider();
   }
 
   /** 上限の手入力もstateへ通し、スライダー操作と同じ補正・イベント発火を使う。 */
-  private _toChange = (e: Event): void => {
+  private _toInput = (e: Event): void => {
     if (!(e.target instanceof HTMLInputElement)) return;
     this._updateRangeValue('to', e.target.value);
   };
 
   /** 下限の手入力もstateへ通し、スライダー操作と同じ補正・イベント発火を使う。 */
-  private _fromChange = (e: Event): void => {
+  private _fromInput = (e: Event): void => {
     if (!(e.target instanceof HTMLInputElement)) return;
     this._updateRangeValue('from', e.target.value);
   };
@@ -486,21 +615,16 @@ export class RangeSlider extends HTMLElement {
     this._updateInvert(e.target.checked);
   };
 
-  /** DOMから外れた後に古い要素参照へイベントが残らないよう、接続時の登録を解除する。 */
-  disconnectedCallback(): void {
-    if (this.lazy) {
-      this.slider1.removeEventListener('input', this._slider1VisualUpdate);
-      this.slider2.removeEventListener('input', this._slider2VisualUpdate);
-      this.slider1.removeEventListener('change', this._sliderLazyCommit);
-      this.slider2.removeEventListener('change', this._sliderLazyCommit);
-    } else {
-      this.slider1.removeEventListener('input', this._slider1Input);
-      this.slider2.removeEventListener('input', this._slider2Input);
-    }
-    this.from.removeEventListener('change', this._fromChange);
-    this.to.removeEventListener('change', this._toChange);
-    this.invertChk.removeEventListener('change', this._invertChange);
+  /** match radioはsimple search専用だが、状態同期とイベント発火は他の入力と同じ経路に揃える。 */
+  private _matchClick = (e: Event): void => {
+    if (!(e.target instanceof HTMLInputElement)) return;
+
+    this._state.match = e.target.value;
+    this._commitStateChange({ fireEvent: true });
+  };
+
+  /** Litのイベントバインディングに寄せているため、切断時はsuperへ任せる。 */
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
   }
 }
-
-customElements.define('range-slider', RangeSlider);

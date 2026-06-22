@@ -1,0 +1,383 @@
+// =============================================================================
+// サイドバー (#SideBar)
+// 統合元: object/project/_SideBar.scss
+// =============================================================================
+
+#SideBar {
+  // ── ベーススタイル ─────────────────────────────────────────────────────────
+
+  box-sizing: border-box;
+  // 右パディング削除分 (padding-sidebar-side) を幅に加算して第2パネルのスクロールバーが
+  // #SideBar の overflow:hidden に切り取られないようにする。
+  width: calc(var(--width-sidebar) * 2 + var(--padding-sidebar-side));
+  height: 100%;
+  min-height: 0;
+  // 右パディングを省いてスクロールバーを .LayoutAside の右端に寄せる。
+  padding: 0 0 0 var(--padding-sidebar-side);
+  overflow-x: hidden;
+  overflow-y: hidden;
+  overscroll-behavior: contain;
+  white-space: nowrap;
+  box-shadow: 2px 0 3px rgba(0, 0, 0, 0.2) inset;
+  // -310px = 第1パネル幅 (width-sidebar - padding-sidebar-side = 285) + パネル間マージン (25)
+  // 第2パネルを第1パネルと同じ左余白 (padding-sidebar-side) で表示するオフセット。
+  transform: translateX(-310px);
+
+  // ── サイドバーコンテンツ領域 ──────────────────────────────────────────────
+
+  > .sidebarcontent {
+    box-sizing: border-box;
+    display: inline-block;
+    width: calc(var(--width-sidebar) - var(--padding-sidebar-side));
+    height: 100%;
+    padding: 5px var(--padding-sidebar-side) 15px 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    vertical-align: top;
+    white-space: initial;
+
+    > .title {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+
+      > .simple {
+        body[data-search-mode='advanced'] & {
+          display: none;
+        }
+      }
+
+      > .advanced {
+        body[data-search-mode='simple'] & {
+          display: none;
+        }
+      }
+
+      > .button-view {
+        // stretch（デフォルト）で引き伸ばされないよう自身の高さを持たせる。
+        align-self: center;
+        height: 20px;
+        font-size: 12px;
+
+        body[data-search-mode='advanced'] & {
+          display: none;
+        }
+      }
+    }
+
+    + .sidebarcontent {
+      margin-left: 25px;
+    }
+  }
+
+  // ── 状態クラス ────────────────────────────────────────────────────────────
+
+  // JS が DOMContentLoaded 後に -sidebar-ready を付与することで
+  // 初期描画でトランジションが走らないようにする
+  body.-sidebar-ready & {
+    transition: transform var(--gui-duration);
+  }
+
+  // 行選択でプレビューパネルエリアをスライドイン
+  body.-rowselected & {
+    transform: translateX(0);
+  }
+
+  // ── プレビューパネル ──────────────────────────────────────────────────────
+
+  // dt/dd グリッド配置（使用パネル: #PreviewGene, #PreviewExternalLinks）
+  .property-list {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    align-items: start;
+
+    > div {
+      // div を透過させて dt/dd をグリッドの直接子にする
+      // これによりすべての dt が同じ grid column を占め、コロンが縦に揃う
+      display: contents;
+
+      > dt,
+      > dd {
+        padding-top: 2px;
+        padding-bottom: 6px;
+        line-height: 14px;
+      }
+
+      &:first-child {
+        > dt,
+        > dd {
+          padding-top: 6px;
+        }
+      }
+
+      // 複数グループがある場合、2つ目以降のグループ先頭に付与するクラス
+      &.-group-start {
+        > dt,
+        > dd {
+          padding-top: 6px;
+          border-top: solid 1px var(--color-separator-sub);
+        }
+      }
+
+      // .-group-start の直前要素にも下余白を付与する（CSS :has が必要）
+      &:has(+ .-group-start) {
+        > dt,
+        > dd {
+          padding-bottom: 6px;
+        }
+      }
+
+      // ラベル列：最長ラベルに合わせた列幅に右揃えでコロンを揃える
+      > dt {
+        padding-right: 0.5em;
+        font-size: 10px;
+        font-weight: bold;
+        color: var(--color-gray);
+        text-align: right;
+
+        &::after {
+          content: ':';
+        }
+      }
+
+      // 値列：ブラウザデフォルトの左マージンを打ち消す
+      > dd {
+        margin: 0;
+
+        > ul {
+          padding-block-start: 0;
+          padding-inline-start: 0;
+          margin-bottom: 0;
+
+          > li {
+            display: block;
+            word-break: break-all;
+          }
+        }
+      }
+    }
+  }
+
+  // アレル頻度テーブル
+  #PreviewAlternateAlleleFrequencies {
+    .frequency-table {
+      width: 100%;
+      // tr の border-bottom を有効にするために必要（separate モデルでは tr の border は無視される）
+      border-collapse: collapse;
+
+      > thead {
+        > tr {
+          > th {
+            font-size: 10px;
+            color: var(--color-gray);
+            text-align: left;
+          }
+        }
+      }
+
+      > tbody {
+        > tr {
+          > td {
+            line-height: 18px;
+
+            &:first-child {
+              font-weight: bold;
+            }
+
+            .dataset-icon {
+              display: inline-block;
+              margin-right: 0.2em;
+              vertical-align: middle;
+
+              > .properties {
+                width: inherit;
+              }
+            }
+
+            &.alt,
+            &.total,
+            &.frequency {
+              text-align: right;
+            }
+
+            &.alt {
+              font-weight: bold;
+              color: var(--color-mutation-alt);
+
+              // "alt / total" の区切り文字を疑似要素で追加する
+              &::after {
+                margin-left: 0.5em;
+                font-size: 10px;
+                color: var(--color-black);
+                content: '/';
+              }
+            }
+
+            &.frequency {
+              font-weight: bold;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ── フィルターパネル ──────────────────────────────────────────────────────
+
+  // Advanced Search モードではパネル単位のクリアボタンを非表示にする
+  // Advanced Search は条件ビルダーで管理するため、パネル単位のクリアは不要
+  // 使用パネル: #FilterDatasets, #FilterVariantType, #FilterConsequence,
+  //             #FilterClinicalSignificance, #FilterAlphaMissense, #FilterSIFT, #FilterPolyPhen
+  body[data-search-mode='advanced'] & {
+    .panel-view {
+      > .title {
+        > .clear-button {
+          display: none;
+        }
+      }
+    }
+  }
+
+  // チェックリスト
+  // 使用パネル: #FilterDatasets, #FilterVariantType, #FilterConsequence,
+  //             #FilterClinicalSignificance, #FilterAlphaMissense, #FilterSIFT, #FilterPolyPhen
+  .checklist-values {
+    padding-inline-start: 0;
+    margin-bottom: 0;
+
+    // float 子要素を持つためクリアフィックスで高さを確保する
+    &::after {
+      clear: both;
+      display: block;
+      content: '';
+    }
+
+    li {
+      position: relative;
+      clear: both;
+      list-style-type: none;
+    }
+
+    > .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 24px;
+      // white-space: nowrap の継承を上書きして折り返しを許可する
+      white-space: normal;
+
+      > .label {
+        display: flex;
+        gap: 0.3rem;
+        align-items: center;
+        min-height: 20px;
+        margin-bottom: 0;
+        font-weight: bold;
+        line-height: 14px;
+
+        > .dataset-icon,
+        > .variant-icon,
+        > .clinical-significance,
+        > .variant-function {
+          display: inline-block;
+          margin-left: -2px;
+          vertical-align: middle;
+        }
+
+        > input[type='checkbox'] {
+          width: 13px;
+          height: 13px;
+          margin: 0;
+
+          // Advanced モードでは条件選択 UI に統一するためチェックボックスを非表示にする
+          body[data-search-mode='advanced'] & {
+            display: none;
+          }
+        }
+      }
+
+      > .value {
+        float: right;
+        display: block;
+        padding-left: 1em;
+        line-height: 18px;
+      }
+
+      // グループ行は details/summary でツリーを開閉するため block レイアウトに切り替える
+      &.-hierarchic {
+        display: block;
+
+        details {
+          > summary {
+            // summary のデフォルトマーカーを非表示にし ::before の三角アイコンに置き換える
+            position: absolute;
+            top: 6px;
+            left: -7px;
+            cursor: pointer;
+            list-style: none;
+
+            &::-webkit-details-marker {
+              display: none;
+            }
+
+            &::before {
+              display: block;
+              width: 0;
+              height: 0;
+              content: '';
+              border-top: 4px solid transparent;
+              border-bottom: 4px solid transparent;
+              border-left: 5px solid var(--color-black);
+              // 閉じた状態（▶）をデフォルトとし、[open] で回転して ▼ にする
+              transform: rotate(0deg);
+              transition: transform var(--gui-duration);
+            }
+          }
+
+          &[open] > summary::before {
+            transform: rotate(90deg);
+          }
+
+          // 子リストを親と同様に全幅に広げたうえで左インデントを加える
+          > ul.checklist-values {
+            padding-left: 1rem;
+          }
+        }
+      }
+    }
+
+    > .separator {
+      // .panel-view > .content の水平パディング分だけ外側に広げてパネル端まで届かせる
+      height: 0;
+      padding: 3px 0;
+      margin-right: calc(-1 * var(--padding-panel-view));
+      margin-left: calc(-1 * var(--padding-panel-view));
+      line-height: 0;
+
+      > hr {
+        border-top: solid 1px rgba(0, 0, 0, 0.05);
+      }
+
+      + .item {
+        margin-top: 4px;
+      }
+    }
+  }
+
+  // データセットフィルターパネル（アイコン幅を固定してラベルの左端を揃える）
+  #FilterDatasets {
+    .checklist-values > .item > .label > .dataset-icon {
+      width: 56px;
+
+      &::before {
+        top: -2px;
+        width: 15px;
+      }
+    }
+  }
+}

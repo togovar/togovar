@@ -1,5 +1,4 @@
 import { CONDITION_TYPE, type ConditionTypeValue } from '../../definition';
-import { supportsRelation } from '../../conditions';
 import { createEl } from '../../utils/dom/createEl';
 import { ConditionValueEditorCheckboxes } from './ConditionValueEditor/ConditionValueEditorCheckboxes';
 import { ConditionValueEditorClinicalSignificance } from './ConditionValueEditor/ConditionValueEditorClinicalSignificance';
@@ -103,7 +102,7 @@ export default class ConditionValues {
    */
   private _buildDOM(): void {
     const sections = (this._sectionsEl = createEl('div', {
-      class: 'sections',
+      class: 'condition-sections',
     }));
 
     const buttons = createEl('div', {
@@ -151,15 +150,7 @@ export default class ConditionValues {
           return;
         }
         // 2回目以降のCancelはエディタ値とrelationを元に戻す。
-        for (const ed of this._editors) ed.restore();
-
-        if (supportsRelation(this._conditionView.conditionType)) {
-          this._conditionView.rootEl.dataset.relation =
-            this._conditionView.keepLastRelation;
-        } else {
-          delete this._conditionView.rootEl.dataset.relation;
-        }
-
+        this._conditionView.revertChanges();
         this._conditionView.doneEditing();
       },
       { signal }

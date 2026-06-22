@@ -1,0 +1,1717 @@
+@use '../component/dropdown-view' as *;
+
+// =============================================================================
+// Results 機能 — 検索結果テーブル全体のスタイル
+// 統合元:
+//   object/project/_ResultsView.scss          … ビュールートと外枠レイアウト
+//   object/project/_ResultsColumnsDropdown.scss … 列表示切替ドロップダウン
+//   object/component/_results-view.scss        … テーブル本体 (.results-view)
+//   object/component/_scroll-bar.scss          … 仮想スクロールバー
+//   object/component/_row-indicator.scss       … 選択行インジケーター
+// =============================================================================
+
+// =============================================================================
+// 列ドロップダウン共通ミックスイン
+// .columns-dropdown-item と .columns-dropdown-item.-drag-ghost の両方で使用する
+// =============================================================================
+
+@mixin columns-dropdown-item-base {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 0 14px;
+  margin: 0;
+  background: white;
+}
+
+@mixin columns-dropdown-drag-handle {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+
+  &::before {
+    font-family: 'Font Awesome 7 Free', sans-serif;
+    font-size: 8px;
+    font-weight: 900;
+    color: var(--color-gray);
+    content: var(--icon-grip-vertical);
+  }
+}
+
+@mixin columns-dropdown-label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  padding: 4px 0;
+  color: var(--color-black);
+
+  > input {
+    margin: 0;
+  }
+}
+
+// ドラッグゴーストは body 直下に追加されるため、#ResultsView の外で定義する。
+.columns-dropdown-item.-drag-ghost {
+  @include columns-dropdown-item-base;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+
+  > .drag-handle {
+    @include columns-dropdown-drag-handle;
+  }
+
+  > label {
+    @include columns-dropdown-label;
+    pointer-events: none;
+  }
+}
+
+// =============================================================================
+// ビュールートと外枠レイアウト (#ResultsView)
+// =============================================================================
+
+#ResultsView {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  // padding-right を持たないことで scroll-bar の right: 0 が .LayoutMain の右端と一致する。
+  // padding-right があると scroll-bar が sidebar 境界より内側（テーブル上）にずれて白く見えるため除外。
+  padding: 10px 0 0 var(--padding-side);
+
+  // テーブル検索結果が見つからない場合のメッセージ
+  // .tablecontainer は position: relative を持つため、そこを基準に絶対配置して tbody エリア中央に表示する
+  &.-not-found > .tablecontainer::after {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    display: block;
+    font-size: 14px;
+    color: var(--color-gray);
+    text-align: center;
+    pointer-events: none;
+    content: 'Not found';
+    transform: translate(-50%, -50%);
+  }
+
+  // ========================
+  // ヘッダー領域
+  // ========================
+  > .header {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    // #ResultsView から padding-right を外したため、ヘッダー側で右余白を確保する。
+    padding-right: var(--padding-side);
+    white-space: nowrap;
+
+    // ヘッダー左側：見出し・結果件数
+    > .left {
+      > .heading {
+        display: inline-block;
+        margin-right: 8px;
+        margin-bottom: -2px;
+        font-size: 16px;
+      }
+
+      > .status {
+        display: inline-block;
+        min-width: 12em;
+        font-size: 12px;
+
+        > .highlight {
+          font-size: 16px;
+        }
+      }
+    }
+
+    // ヘッダー右側：操作ボタン・ドロップダウン
+    /* stylelint-disable no-descending-specificity */
+    > .right {
+      position: relative;
+      top: 4px;
+      z-index: var(--z-index-base);
+      display: flex;
+      gap: 5px;
+      align-items: flex-start;
+      min-height: 16px;
+      padding: 0 0 18px;
+      margin: 0;
+      list-style: none;
+
+      > .text {
+        padding-right: 3px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      // ダウンロードボタングループ（複数ボタンを角丸でグループ化）
+      > .download-buttons {
+        display: flex;
+        gap: 0;
+
+        > .button-view {
+          border-radius: 0;
+
+          // ボタン間の線と下のシャドウ
+          box-shadow:
+            inset -1px 0 0 rgba(255, 255, 255, 0.22),
+            0 1px 2px rgba(0, 0, 0, 0.22);
+
+          &:first-child {
+            border-top-left-radius: 0.9em;
+            border-bottom-left-radius: 0.9em;
+          }
+
+          &:last-child {
+            border-top-right-radius: 0.9em;
+            border-bottom-right-radius: 0.9em;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+          }
+        }
+      }
+
+      > .download-disabled-reason-item {
+        position: absolute;
+        top: calc(100% - 16px);
+        right: 0;
+        max-width: min(100%, 320px);
+        margin: 0;
+        font-size: 11px;
+        line-height: 1.25;
+        text-align: right;
+
+        > .download-disabled-reason {
+          font-weight: 300;
+          color: var(--color-black);
+          opacity: 0.9;
+        }
+      }
+
+      > li {
+        > .button-view {
+          &:active {
+            background: var(--color-key-dark1);
+            transform: translateY(0.5px);
+          }
+
+          body[data-download-available] & {
+            pointer-events: auto;
+            opacity: 1;
+          }
+        }
+      }
+
+      // ========================
+      // 列表示切替ドロップダウン (.columns-dropdown)
+      // ========================
+      > .columns-dropdown {
+        position: relative;
+
+        > .columns-dropdown-button {
+          min-width: 60px;
+          line-height: 1.6;
+
+          &::after {
+            border-top-width: 0.26rem;
+            border-right-width: 0.2rem;
+            border-left-width: 0.2rem;
+          }
+
+          &:hover {
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            transform: none;
+          }
+
+          &:active {
+            background: linear-gradient(
+              to bottom,
+              var(--color-key-dark1),
+              var(--color-key-dark3)
+            );
+          }
+        }
+
+        // GRCh・ナビゲーションは CSS :hover で開閉するが、このドロップダウンは JS 制御。
+        // hidden / inert / aria-hidden の切り替えや、ドラッグ中の状態管理が必要なため。
+        // 開閉は ResultsColumnsDropdown.ts の mouseenter / mouseleave イベントと .-open クラスで行う。
+        > .columns-dropdown-menu {
+          @include dropdown-view-list-panel;
+
+          position: absolute;
+          right: 0;
+          min-width: 170px;
+
+          > .columns-dropdown-list {
+            padding: 0;
+            margin: 0;
+            user-select: none;
+            list-style: none;
+
+            > .columns-dropdown-item {
+              @include columns-dropdown-item-base;
+              cursor: grab;
+              transition: background-color 0.12s ease;
+
+              &:hover {
+                background: var(--color-selected-hover);
+              }
+
+              &.-dragging-hidden {
+                visibility: hidden;
+                pointer-events: none;
+              }
+
+              > .drag-handle {
+                @include columns-dropdown-drag-handle;
+                cursor: grab;
+              }
+
+              > .lock {
+                margin-left: auto;
+              }
+
+              > label {
+                @include columns-dropdown-label;
+                cursor: pointer;
+
+                > input {
+                  cursor: pointer;
+                }
+              }
+
+              &.-locked {
+                cursor: default;
+                background: var(--color-bg-locked);
+                opacity: 0.75;
+
+                &:hover {
+                  background: var(--color-bg-locked);
+                }
+
+                > .drag-handle {
+                  visibility: hidden;
+                }
+
+                > label {
+                  color: var(--color-gray);
+                  cursor: default;
+
+                  > input {
+                    cursor: default;
+                  }
+                }
+
+                > .lock {
+                  &::before {
+                    font-family: 'Font Awesome 7 Free', sans-serif;
+                    font-size: 10px;
+                    font-weight: 900;
+                    color: var(--color-gray);
+                    content: var(--icon-lock);
+                  }
+                }
+              }
+            }
+
+            &.-is-dragging {
+              > .columns-dropdown-item {
+                position: relative;
+                cursor: grabbing;
+                box-shadow:
+                  0 -1px 0 white,
+                  0 1px 0 white;
+                transition: none;
+
+                &:not(.-locked):hover {
+                  background: white;
+                }
+
+                &.-locked:hover {
+                  background: var(--color-bg-locked);
+                }
+
+                > .drag-handle {
+                  cursor: grabbing;
+                }
+              }
+            }
+          }
+        }
+
+        // JS が mouseenter で .-open を付与し、mouseleave で外す（ResultsColumnsDropdown.ts）
+        &.-open {
+          > .columns-dropdown-menu {
+            @include dropdown-view-list-open;
+          }
+        }
+      }
+    }
+    /* stylelint-enable no-descending-specificity */
+  }
+
+  > .tablecontainer {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    // 右端にスクロールしたとき内容が sidebar 境界に張り付かないよう余白を確保する。
+    padding-right: var(--padding-side);
+    padding-bottom: 0;
+    margin-top: -15px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y;
+
+    > .results-view {
+      > thead {
+        > tr {
+          height: 64px;
+        }
+      }
+    }
+  }
+}
+
+// =============================================================================
+// 検索結果テーブル本体 (.results-view)
+// 仮想スクロール方式のバリアント一覧テーブル全体のスタイル定義
+// =============================================================================
+
+.results-view {
+  width: 100%;
+  font-size: 14px;
+  line-height: 18px;
+  white-space: nowrap;
+  // tr の border-bottom を有効にするために必要（separate モデルでは tr の border は無視される）
+  border-collapse: collapse;
+
+  // ---------------------------------------------------------------------------
+  // テーブルヘッダー (thead)
+  // ---------------------------------------------------------------------------
+  > thead {
+    > tr {
+      border-bottom: solid 2px var(--color-black);
+
+      > th {
+        position: relative;
+
+        &.togovar_id {
+          width: 124px;
+          min-width: 124px;
+          max-width: 124px;
+        }
+
+        &.refsnp_id {
+          width: 116px;
+          min-width: 116px;
+          max-width: 116px;
+        }
+
+        &.position {
+          width: 164px;
+          min-width: 164px;
+          max-width: 164px;
+        }
+
+        &.ref_alt {
+          width: 104px;
+          min-width: 104px;
+          max-width: 104px;
+        }
+
+        &.type {
+          display: none;
+          width: 96px;
+          min-width: 96px;
+          max-width: 96px;
+        }
+
+        &.gene {
+          width: 116px;
+          min-width: 116px;
+          max-width: 116px;
+        }
+
+        &.alt_frequency {
+          width: 120px;
+          min-width: 120px;
+          max-width: 120px;
+        }
+
+        &.consequence {
+          width: 176px;
+          min-width: 176px;
+          max-width: 176px;
+        }
+
+        &.clinical_significance {
+          width: 276px;
+          min-width: 276px;
+          max-width: 276px;
+        }
+
+        &.alphamissense {
+          width: 71px;
+          min-width: 71px;
+          max-width: 71px;
+        }
+
+        &.sift {
+          width: 57px;
+          min-width: 57px;
+          max-width: 57px;
+        }
+
+        &.polyphen {
+          width: 70px;
+          min-width: 70px;
+          max-width: 70px;
+        }
+
+        // 列名テキスト（-20deg 傾けて縦に詰まったヘッダー内に収める）
+        > span {
+          position: absolute;
+          bottom: 0;
+          left: 9px;
+          display: inline-block;
+          font-size: 12px;
+          line-height: 1;
+          white-space: nowrap;
+          transform: rotate(-20deg);
+          transform-origin: 0 100%;
+        }
+
+        // 列幅リサイズ用ドラッグハンドル（th 側）
+        > .resize-bar {
+          position: absolute;
+          top: 0;
+          right: -4px;
+          z-index: 1;
+          display: block;
+          width: 8px;
+          height: 100%;
+          cursor: col-resize;
+          user-select: none;
+        }
+
+        // セパレーター列（列グループの区切り）
+        &.separator {
+          border-bottom: solid 2px white;
+
+          &::before {
+            display: block;
+            width: 28px;
+            content: '';
+          }
+        }
+      }
+
+      // グルーピング行（Alt frequency などの列グループ見出し）
+      &.groupingrow {
+        height: 4px;
+        border-bottom: none;
+
+        > th > span {
+          bottom: -51px;
+          left: 0;
+          padding-bottom: 15px;
+          padding-left: 5px;
+          font-weight: normal;
+          line-height: 1;
+          border-left: solid 1px
+            color-mix(in srgb, var(--color-black) 50%, transparent);
+        }
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // テーブルボディ (tbody)
+  // ---------------------------------------------------------------------------
+  > tbody {
+    > tr {
+      height: 27px;
+      border-bottom: solid 1px var(--color-separator);
+      transition: background var(--gui-duration);
+
+      > td {
+        position: relative;
+        min-width: 2em;
+        padding: 2px 10px 2px 6px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.togovar_id {
+          width: 124px;
+          min-width: 124px;
+          max-width: 124px;
+        }
+
+        &.refsnp_id {
+          width: 116px;
+          min-width: 116px;
+          max-width: 116px;
+        }
+
+        &.position {
+          width: 164px;
+          min-width: 164px;
+          max-width: 164px;
+        }
+
+        &.ref_alt {
+          width: 104px;
+          min-width: 104px;
+          max-width: 104px;
+        }
+
+        &.type {
+          width: 96px;
+          min-width: 96px;
+          max-width: 96px;
+        }
+
+        &.gene {
+          width: 116px;
+          min-width: 116px;
+          max-width: 116px;
+        }
+
+        &.alt_frequency {
+          width: 120px;
+          min-width: 120px;
+          max-width: 120px;
+        }
+
+        &.consequence {
+          width: 176px;
+          min-width: 176px;
+          max-width: 176px;
+        }
+
+        &.alphamissense {
+          width: 71px;
+          min-width: 71px;
+          max-width: 71px;
+        }
+
+        &.sift {
+          width: 57px;
+          min-width: 57px;
+          max-width: 57px;
+        }
+
+        &.polyphen {
+          width: 70px;
+          min-width: 70px;
+          max-width: 70px;
+        }
+
+        // 列幅リサイズ用ドラッグハンドル（td 側）
+        > .resize-bar {
+          position: absolute;
+          top: 0;
+          right: -4px;
+          z-index: 1;
+          display: block;
+          width: 8px;
+          height: 100%;
+          cursor: col-resize;
+          user-select: none;
+        }
+
+        // -------------------------------------------------------------------------
+        // アイコン要素（td の直接の子 .icon）
+        // Alt frequency など他列のアイコンに適用
+        // -------------------------------------------------------------------------
+        > .icon {
+          // 追加件数バッジ (::before)
+          &[data-remains]::before {
+            display: inline-block;
+            padding: 0 4px;
+            margin-left: 4px;
+            font-size: 10px;
+            line-height: 14px;
+            vertical-align: middle;
+            content: '+' attr(data-remains);
+            background-color: var(--color-light-gray);
+            border: solid 1px var(--color-gray);
+            border-radius: 7px;
+          }
+
+          &[data-remains='0']::before,
+          &[data-remains='']::before {
+            display: none;
+          }
+
+          // MGeND ロゴ (::after)
+          &[data-mgend='true']::after {
+            position: relative;
+            top: 3px;
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-left: 6px;
+            content: '';
+            background: url(../images/mgend-logo.png) no-repeat;
+            background-size: contain;
+          }
+        }
+
+        // インラインブロック表示要素の共通スタイル
+        > .consequence-item,
+        > .dataset-icon,
+        > .clinical-significance,
+        > .variant-function {
+          display: inline-block;
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          vertical-align: middle;
+        }
+
+        // テキストリンク要素
+        > .hyper-text {
+          display: inline-block;
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          vertical-align: middle;
+        }
+
+        // -------------------------------------------------------------------------
+        // Clinical significance 列
+        // td に直接 display:flex を適用すると box-shadow が破線になるブラウザ描画の問題があるため、
+        // 内部に flex wrapper div (.clinical-significance-flex) を設け、
+        // td 自体は display:table-cell のままにする。
+        // -------------------------------------------------------------------------
+        &.clinical_significance {
+          width: 276px;
+          min-width: 276px;
+          max-width: 276px;
+
+          > .clinical-significance-flex {
+            display: flex;
+            gap: 3px;
+            align-items: center;
+            height: 100%;
+            overflow: hidden;
+
+            // 解釈バッジ (Pathogenic / Likely benign など)
+            > .clinical-significance {
+              flex: 0 0 auto;
+              max-width: none;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              vertical-align: middle;
+            }
+
+            // 疾患名リンク（残りスペースを使い、幅不足時は末尾を省略）
+            > .hyper-text {
+              display: inline-block;
+              flex: 0 1 auto;
+              min-width: 0;
+              max-width: none;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+
+            // 追加件数バッジ (+N)
+            > .clinical-remains {
+              display: inline-block;
+              flex: 0 0 auto;
+              padding: 0 4px;
+              margin-left: 4px;
+              overflow: visible;
+              text-overflow: clip;
+              font-size: 10px;
+              line-height: 14px;
+              vertical-align: middle;
+              white-space: nowrap;
+              background-color: var(--color-light-gray);
+              border: solid 1px var(--color-gray);
+              border-radius: 7px;
+
+              // 件数が 0 または空のときは非表示
+              &[data-remains='0'],
+              &[data-remains=''] {
+                display: none;
+              }
+            }
+
+            // MGeND アイコン
+            // .clinical-significance-flex の子になったことで td > .icon の
+            // 直接子セレクタが効かないため、ここで完全に定義する
+            > .icon {
+              display: inline-block;
+              flex: 0 0 auto;
+              vertical-align: middle;
+
+              &[data-mgend='true']::after {
+                position: relative;
+                top: 3px;
+                display: inline-block;
+                width: 16px;
+                height: 16px;
+                margin-left: 6px;
+                content: '';
+                background: url(../images/mgend-logo.png) no-repeat;
+                background-size: contain;
+              }
+            }
+          }
+        }
+
+        // -------------------------------------------------------------------------
+        // RefSNP ID / Gene / Consequence 列
+        // .remains-content ラッパーで flex レイアウトを使用
+        // -------------------------------------------------------------------------
+        &.refsnp_id,
+        &.gene,
+        &.consequence {
+          > .remains-content {
+            display: flex;
+            align-items: center;
+            max-width: 100%;
+            overflow: hidden;
+          }
+
+          // テキスト・アイテム（縮小可、幅不足時は省略）
+          > .remains-content > .hyper-text,
+          > .remains-content > .consequence-item {
+            flex: 0 1 auto;
+            min-width: 0;
+            max-width: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          // 追加件数バッジ
+          > .remains-content > .remains-badge {
+            display: inline-block;
+            flex: 0 0 auto;
+            padding: 0 4px;
+            margin-left: 4px;
+            overflow: visible;
+            text-overflow: clip;
+            font-size: 10px;
+            line-height: 14px;
+            vertical-align: middle;
+            white-space: nowrap;
+            background-color: var(--color-light-gray);
+            border: solid 1px var(--color-gray);
+            border-radius: 7px;
+
+            &:empty,
+            &[data-remains='0'],
+            &[data-remains=''] {
+              display: none;
+            }
+          }
+        }
+
+        // -------------------------------------------------------------------------
+        // 汎用 +N バッジ（上記3列以外の列に data-remains 属性がある場合に適用）
+        // -------------------------------------------------------------------------
+        &:not(.clinical_significance):not(.refsnp_id):not(.gene):not(
+            .consequence
+          )[data-remains]::after {
+          display: inline-block;
+          padding: 0 4px;
+          margin-left: 4px;
+          font-size: 10px;
+          line-height: 14px;
+          vertical-align: middle;
+          content: '+' attr(data-remains);
+          background-color: var(--color-light-gray);
+          border: solid 1px var(--color-gray);
+          border-radius: 7px;
+        }
+
+        // 件数が 0 または空のときはバッジ非表示
+        &:not(.clinical_significance):not(.refsnp_id):not(.gene):not(
+            .consequence
+          )[data-remains='0']::after,
+        &:not(.clinical_significance):not(.refsnp_id):not(.gene):not(
+            .consequence
+          )[data-remains='']::after {
+          display: none;
+        }
+
+        // セパレーター列（斜線で列グループを区切る）
+        &.separator {
+          position: relative;
+          color: var(--color-key);
+          border-bottom: solid 1px white;
+
+          &::before {
+            position: absolute;
+            top: 50%;
+            left: 18px;
+            display: block;
+            height: 11px;
+            content: '';
+            border-left: solid 1px
+              color-mix(in srgb, var(--color-black) 50%, transparent);
+            transform: rotate(-20deg) translateY(-6px);
+          }
+        }
+
+        // 最終列の右パディング調整（resize-bar 分を相殺）
+        &:last-child {
+          padding-right: 6px;
+        }
+      }
+
+      // ホバー時の背景色
+      &:hover {
+        background-color: color-mix(
+          in srgb,
+          var(--color-selected) 20%,
+          transparent
+        );
+      }
+
+      // 選択行の背景色
+      &.-selected {
+        background-color: color-mix(
+          in srgb,
+          var(--color-selected) 40%,
+          transparent
+        );
+      }
+
+      // ローディング中: ローディング GIF を全体に表示
+      &.-loading > td {
+        background:
+          url(../images/loading.gif) no-repeat 50% 50%,
+          rgba(0, 0, 0, 0.05);
+        background-size: 30px 10px;
+      }
+
+      // 仮想スクロールの表示範囲外行は非表示
+      &.-out-of-range {
+        display: none;
+      }
+    }
+  }
+}
+
+// 列幅リサイズ中のグローバルスタイル
+// ドラッグ中はページ全体のカーソルをリサイズ形状に固定し、テキスト選択を無効化
+body[data-column-resizing='true'] {
+  cursor: col-resize;
+  user-select: none;
+}
+
+// =============================================================================
+// 仮想スクロールバー (.scroll-bar)
+// =============================================================================
+
+.scroll-bar {
+  position: absolute;
+  top: 95px;
+  right: 0;
+  z-index: 10;
+  width: 16px;
+  height: calc(100% - 96px);
+
+  > .bar {
+    position: absolute;
+    left: 5px;
+    width: 8px;
+    height: 100px;
+    cursor: grab;
+    background-color: color-mix(in srgb, var(--color-gray) 50%, transparent);
+    border-radius: 4px;
+    opacity: 1;
+    transition: background-color var(--gui-duration);
+
+    > .indicator {
+      position: absolute;
+      top: calc(50% - 9px);
+      right: 13px;
+      padding: 0 10px;
+      font-size: 12px;
+      line-height: 18px;
+      color: white;
+      white-space: nowrap;
+      pointer-events: none;
+      background-color: var(--color-key-dark1);
+      border-radius: 9px;
+      opacity: 0;
+      transition: opacity var(--transition-duration);
+
+      &::after {
+        position: absolute;
+        top: 5px;
+        right: -7px;
+        display: block;
+        content: '';
+        border-top: solid 4px transparent;
+        border-bottom: solid 4px transparent;
+        border-left: solid 9px var(--color-key-dark1);
+      }
+
+      > .position {
+        font-weight: bold;
+      }
+
+      > .total {
+        opacity: 0.75;
+
+        &::before {
+          content: '/ ';
+        }
+      }
+    }
+
+    &.-disabled {
+      display: none;
+    }
+
+    &.ui-draggable-dragging {
+      cursor: grabbing;
+      background-color: color-mix(
+        in srgb,
+        var(--color-key-dark1) 50%,
+        transparent
+      );
+    }
+  }
+
+  &:hover {
+    > .bar {
+      background-color: color-mix(
+        in srgb,
+        var(--color-key-dark1) 50%,
+        transparent
+      );
+
+      > .indicator {
+        opacity: 1;
+      }
+    }
+  }
+
+  &.-dragging {
+    > .bar {
+      > .indicator {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+// =============================================================================
+// 選択行インジケーター (.row-indicator)
+// =============================================================================
+
+.row-indicator {
+  position: absolute;
+  right: -14px;
+  z-index: var(--z-index-row-indicator);
+  width: 14px;
+  height: 27px;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(77px);
+  transition:
+    opacity var(--gui-duration),
+    top var(--gui-duration);
+
+  &::before,
+  &::after {
+    position: absolute;
+    display: block;
+    content: '';
+  }
+
+  &::before {
+    top: 6px;
+    border-top: solid 8px transparent;
+    border-bottom: solid 8px transparent;
+    border-left: solid 9px black;
+    opacity: 0.4;
+    filter: blur(1px);
+  }
+
+  &::after {
+    top: 5px;
+    border-top: solid 8px transparent;
+    border-bottom: solid 8px transparent;
+    border-left: solid 9px var(--color-selected-lighter);
+  }
+
+  &.-shown {
+    opacity: 1;
+  }
+}
+
+// =============================================================================
+// バリアント表示パーツ
+// 検索結果テーブルおよびバリアント詳細ページで共通使用する表示要素
+// 統合元:
+//   object/component/_clinical-significance.scss  … 臨床的意義バッジ
+//   object/component/_consequence-item.scss        … 影響種別ドット
+//   object/component/_dataset-icon.scss            … データセットアイコン
+//   object/component/_hyper-text.scss              … テキストリンク矢印
+//   object/component/_ref-alt.scss                 … Ref/Alt アレル表示
+//   object/component/_remains-count.scss           … +N バッジ
+//   object/component/_unexpected-value-string.scss … null/undefined 表示
+//   object/component/_variant-function.scss        … 機能予測スコアバッジ
+//   object/component/_variant-type.scss            … バリアント種別テキスト
+// =============================================================================
+
+// 臨床的意義バッジ (.clinical-significance)
+// data-value 属性で P/LP/LB/B などの解釈種別を受け取り、色付きバッジを ::before で描画する
+.clinical-significance {
+  color: var(--color-key-dark3);
+
+  &::before {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-right: 3px;
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 18px;
+    vertical-align: top;
+    text-align: center;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 9px;
+  }
+
+  &[data-value='P']::before,
+  &[data-value='PLP']::before {
+    content: 'P';
+  }
+
+  &[data-value='LP']::before,
+  &[data-value='LPLP']::before {
+    content: 'LP';
+  }
+
+  &[data-value='P']::before,
+  &[data-value='LP']::before {
+    color: var(--color-sign-dangerous);
+    background-color: var(--color-sign-dangerous-light);
+    border-color: var(--color-sign-dangerous);
+  }
+
+  &[data-value='PLP']::before,
+  &[data-value='LPLP']::before {
+    color: var(--color-sign-lowdangerous);
+    background-color: var(--color-sign-lowdangerous-light);
+    border-color: var(--color-sign-lowdangerous);
+  }
+
+  &[data-value='ERA']::before,
+  &[data-value='LRA']::before,
+  &[data-value='URA']::before {
+    color: var(--color-sign-warning);
+    content: 'RA';
+    background-color: var(--color-sign-warning-light);
+    border-color: var(--color-sign-warning);
+  }
+
+  &[data-value='US']::before {
+    color: var(--color-sign-unknown);
+    content: 'US';
+    background-color: var(--color-sign-unknown-light);
+    border-color: var(--color-sign-unknown);
+  }
+
+  &[data-value='LB']::before {
+    color: var(--color-sign-normal);
+    content: 'LB';
+    background-color: var(--color-sign-normal-light);
+    border-color: var(--color-sign-normal);
+  }
+
+  &[data-value='B']::before {
+    color: var(--color-sign-safe);
+    content: 'B';
+    background-color: var(--color-sign-safe-light);
+    border-color: var(--color-sign-safe);
+  }
+
+  &[data-value='CI']::before {
+    color: var(--color-sign-modifier);
+    content: 'CI';
+    background-color: var(--color-sign-modifier-light);
+    border-color: var(--color-sign-modifier);
+  }
+
+  &[data-value='DR']::before {
+    content: 'DR';
+  }
+  &[data-value='CS']::before {
+    content: 'CS';
+  }
+  &[data-value='RF']::before {
+    content: 'RF';
+  }
+  &[data-value='A']::before {
+    content: 'A';
+  }
+  &[data-value='PR']::before {
+    content: 'PR';
+  }
+  &[data-value='AF']::before {
+    content: 'AF';
+  }
+
+  &[data-value='DR'],
+  &[data-value='CS'],
+  &[data-value='RF'],
+  &[data-value='A'],
+  &[data-value='PR'],
+  &[data-value='AF'] {
+    &::before {
+      color: var(--color-sign-other);
+      background-color: var(--color-sign-other-light);
+      border-color: var(--color-sign-other);
+    }
+  }
+
+  &[data-value='O']::before {
+    content: 'O';
+  }
+  &[data-value='NP']::before {
+    content: 'NP';
+  }
+  &[data-value='AN']::before {
+    content: 'AN';
+  }
+
+  &[data-value='O']::before,
+  &[data-value='NP']::before,
+  &[data-value='AN']::before {
+    color: var(--color-gray);
+    background-color: white;
+    border-color: var(--color-gray);
+  }
+}
+
+// 影響種別ドット (.consequence-item)
+// バリアントの影響レベル（high/moderate/low/modifier）を色付き円で示す
+.consequence-item {
+  &::before {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    margin-right: 4px;
+    content: '';
+    border-radius: 100%;
+  }
+
+  &.-low::before {
+    background-color: var(--color-sign-safe);
+  }
+  &.-moderate::before {
+    background-color: var(--color-sign-normal);
+  }
+  &.-high::before {
+    background-color: var(--color-sign-dangerous);
+  }
+  &.-modifier::before {
+    background-color: var(--color-sign-modifier);
+  }
+}
+
+// データセットアイコン (.dataset-icon)
+// Font Awesome のデータベースアイコンにデータセット種別の色とラベルを組み合わせる
+.dataset-icon {
+  position: relative;
+  height: 18px;
+  font-family: 'Font Awesome 7 Free', sans-serif;
+  font-weight: 900;
+
+  &::before {
+    position: relative;
+    left: 2px;
+    display: inline-block;
+    height: 18px;
+    margin-right: 2px;
+    content: var(--icon-database);
+  }
+
+  > .properties {
+    position: relative;
+    top: -1px;
+    left: -2px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 20px;
+    font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: normal;
+    line-height: 9px;
+    vertical-align: middle;
+    transform: scale(0.9);
+
+    &::before,
+    &::after {
+      display: block;
+      height: 10px;
+    }
+  }
+
+  // データセット別アイコン色
+  &[data-dataset='jga_wgs'],
+  &[data-dataset='jga_wes'],
+  &[data-dataset='jga_snp'] {
+    &::before {
+      color: var(--color-dataset-jga);
+    }
+  }
+
+  &[data-dataset='tommo'] {
+    &::before {
+      color: var(--color-dataset-tommo);
+    }
+  }
+
+  &[data-dataset='hgvd'],
+  &[data-dataset='mgend'] {
+    &::before {
+      color: var(--color-dataset-hgvd);
+    }
+  }
+
+  &[data-dataset='ncbn'] {
+    &::before {
+      color: var(--color-dataset-ncbn);
+    }
+  }
+
+  &[data-dataset='gem_j_wga'] {
+    &::before {
+      color: var(--color-dataset-gemj);
+    }
+  }
+
+  &[data-dataset='bbj'] {
+    &::before {
+      color: var(--color-dataset-bbj);
+    }
+  }
+
+  &[data-dataset='gnomad_genomes'],
+  &[data-dataset='gnomad_exomes'] {
+    &::before {
+      color: var(--color-dataset-foreign);
+    }
+  }
+
+  // 疾患系データセット（mgend/clinvar）はプラスアイコンに置き換え
+  &[data-dataset='mgend'],
+  &[data-dataset='clinvar'] {
+    &::before {
+      font-family: 'Font Awesome 7 Free', sans-serif;
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--color-sign-dangerous);
+      content: var(--icon-plus);
+    }
+
+    > .properties {
+      &::before {
+        color: var(--color-sign-dangerous);
+        content: 'Disease';
+      }
+    }
+  }
+
+  // シーケンス種別ラベル
+  &[data-dataset='jga_wgs'],
+  &[data-dataset='tommo'],
+  &[data-dataset='ncbn'],
+  &[data-dataset='gem_j_wga'],
+  &[data-dataset='gnomad_genomes'] {
+    > .properties {
+      &::after {
+        content: 'WGS';
+      }
+    }
+  }
+
+  &[data-dataset='jga_wes'],
+  &[data-dataset='hgvd'],
+  &[data-dataset='gnomad_exomes'] {
+    > .properties {
+      &::after {
+        content: 'WES';
+      }
+    }
+  }
+
+  &[data-dataset='jga_snp'],
+  &[data-dataset='bbj'] {
+    > .properties {
+      &::after {
+        content: 'SNP';
+      }
+    }
+  }
+}
+
+// テキストリンク矢印 (.hyper-text)
+// href 属性がある要素に::after で矢印アイコンを付与する
+// .-internal: 内部リンク（右矢印）、.-external: 外部リンク（外部リンクアイコン）
+.hyper-text {
+  &[href]:not([href='']) {
+    &::after {
+      display: inline-block;
+      margin-left: 0.25em;
+      font-family: 'Font Awesome 7 Free', sans-serif;
+      font-weight: 900;
+      color: var(--color-gray-light);
+    }
+  }
+
+  &[href]:not([href='']):hover::after {
+    color: var(--color-key);
+  }
+
+  &.-internal {
+    &[href]:not([href='']) {
+      &::after {
+        font-size: 0.8em;
+        content: var(--icon-circle-arrow-right);
+      }
+    }
+  }
+
+  &.-external {
+    &[href]:not([href='']) {
+      &::after {
+        font-size: 0.7em;
+        content: var(--icon-arrow-up-right-from-square);
+      }
+    }
+  }
+}
+
+// Ref/Alt アレル表示 (.ref-alt)
+// REF を左・ALT を右に並べ、塩基数が多い場合は bp バッジで要約する
+
+.ref-alt {
+  display: flex;
+  font-weight: bold;
+
+  > .ref,
+  > .alt {
+    display: inline-block;
+    height: 18px;
+    padding: 0 6px;
+    line-height: 18px;
+    vertical-align: middle;
+
+    // 塩基数が多い場合は data-sum 属性の値を bp バッジとして ::after で表示する
+    &[data-sum] {
+      &::after {
+        position: relative;
+        display: inline-block;
+        padding: 0 4px;
+        margin: 0 -3px 4px 3px;
+        font-size: 10px;
+        font-weight: lighter;
+        line-height: 12px;
+        vertical-align: middle;
+        color: white;
+        content: attr(data-sum) 'bp';
+        border-radius: 6px;
+      }
+    }
+
+    // 短い塩基（4bp 以下）はそのまま文字で表示するためバッジを非表示にする
+    &[data-sum='0'],
+    &[data-sum='1'],
+    &[data-sum='2'],
+    &[data-sum='3'],
+    &[data-sum='4'] {
+      &::after {
+        display: none;
+      }
+    }
+  }
+
+  > .ref {
+    position: relative;
+    padding-right: 4px;
+    color: var(--color-mutation-ref-text);
+    background-color: var(--color-mutation-ref-bg);
+    border-top: solid 1px var(--color-mutation-ref);
+    border-bottom: solid 1px var(--color-mutation-ref);
+    border-left: solid 1px var(--color-mutation-ref);
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+
+    &[data-sum]::after {
+      background-color: var(--color-mutation-ref);
+    }
+  }
+
+  > .alt {
+    padding-left: 9px;
+    color: var(--color-mutation-alt-text);
+    background-color: var(--color-mutation-alt-bg);
+    border-top: solid 1px var(--color-mutation-alt);
+    border-right: solid 1px var(--color-mutation-alt);
+    border-bottom: solid 1px var(--color-mutation-alt);
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+
+    &[data-sum]::after {
+      background-color: var(--color-mutation-alt);
+    }
+  }
+
+  // REF と ALT の境界を示す矢印（border trick で描画）
+  > .arrow {
+    position: relative;
+
+    &::before,
+    &::after {
+      position: absolute;
+      display: inline-block;
+      content: '';
+    }
+
+    &::before {
+      top: 0;
+      right: -6px;
+      border-top: 9px solid transparent;
+      border-bottom: 9px solid transparent;
+      border-left: 6px solid var(--color-mutation-ref);
+    }
+
+    &::after {
+      top: 1px;
+      right: -5px;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 6px solid var(--color-mutation-ref-bg);
+    }
+  }
+}
+
+// +N バッジ (.remains-count)
+// 「他にN件」を示す小さな丸バッジ。前に "+" を付けて件数を表示する
+.remains-count {
+  display: inline-block;
+  padding: 0 4px;
+  margin-left: 4px;
+  font-size: 10px;
+  line-height: 14px;
+  vertical-align: middle;
+  background-color: var(--color-light-gray);
+  border: solid 1px var(--color-gray);
+  border-radius: 7px;
+
+  &::before {
+    content: '+';
+  }
+}
+
+// null/undefined 表示 (.unexpected-value-string)
+// データが欠落していることをユーザーに伝えるためのスタイル
+.unexpected-value-string {
+  &.-null,
+  &.-undefined {
+    font-style: oblique;
+    color: color-mix(in srgb, var(--color-black) 50%, transparent);
+  }
+}
+
+// 機能予測スコアバッジ (.variant-function)
+// AlphaMissense・SIFT・PolyPhen の予測結果を色分けしたカプセル型で表示する
+.variant-function {
+  display: inline-block;
+  padding: 0 8px;
+  color: white;
+  border-radius: 9px;
+
+  &[data-function='T'],
+  &[data-function='B'] {
+    background-color: var(--color-sign-safe);
+  }
+  &[data-function='LB'] {
+    background-color: var(--color-sign-normal);
+  }
+  &[data-function='POSSD'],
+  &[data-function='LP'] {
+    background-color: var(--color-sign-warning);
+  }
+  &[data-function='D'],
+  &[data-function='PROBD'] {
+    background-color: var(--color-sign-dangerous);
+  }
+
+  &[data-function='U'] {
+    color: var(--color-black);
+    background-color: var(--color-light-gray);
+  }
+
+  &[data-function='A'] {
+    background-color: var(--color-sign-unknown);
+  }
+}
+
+// バリアント種別テキスト (.variant-type)
+// 種別（SNV/Indel など）を太字で強調表示する
+.variant-type {
+  font-weight: bold;
+}
+
+// =============================================================================
+// 染色体カリオタイプ ドロワー (.drawer-view)
+// 画面下部に固定表示されるボトムドロワー。
+// 染色体カリオタイプ（.chromosome-view）を一覧表示し、領域選択フィルターを提供する。
+// .-drawer-opened クラスが body に付与されると bottom アニメーションで引き上がる。
+// =============================================================================
+
+.drawer-view {
+  position: fixed;
+  // 閉じた状態: ドロワーのタブ部分だけを画面下から出す
+  // bottom の負値 = ドロワー展開高さ分だけ画面外にオフセット
+  bottom: calc(
+    var(--height-bottom-drawer) - var(--height-bottom-drawer-opened)
+  );
+  z-index: var(--z-index-drawer);
+  width: 100%;
+  color: white;
+  background-color: var(--color-black);
+  transition: bottom var(--transition-duration);
+
+  .-drawer-opened & {
+    bottom: 0;
+  }
+
+  > .header {
+    height: var(--height-bottom-drawer);
+    padding: 0 calc(var(--padding-side) - 2px);
+    line-height: var(--height-bottom-drawer);
+    cursor: pointer;
+    border-top: solid 1px rgba(255, 255, 255, 0.4);
+    border-bottom: solid 1px rgba(0, 0, 0, 0.2);
+
+    > .mark {
+      position: relative;
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-top: -0.8em;
+      margin-right: 0.7em;
+      vertical-align: middle;
+      border-top: solid 1px white;
+      border-left: solid 1px white;
+      // 閉じた状態: 上向き三角（ドロワーが開くことを示す）
+      transform: rotate(225deg);
+      transition:
+        transform 0.2s,
+        top 0.2s;
+
+      .-drawer-opened & {
+        margin-top: -0.3em;
+        // 開いた状態: 下向き三角（ドロワーが閉じることを示す）
+        transform: rotate(45deg);
+      }
+    }
+
+    > .heading {
+      display: inline-block;
+      font-size: 15px;
+      font-weight: bold;
+    }
+  }
+
+  > .configuration {
+    position: absolute;
+    top: 5px;
+    right: calc(var(--padding-side) - 2px);
+    max-width: calc(100vw - 120px);
+    overflow-x: auto;
+    font-size: 12px;
+    text-align: right;
+    white-space: nowrap;
+    // 閉じた状態はクリックできないよう pointer-events を切る
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-duration);
+
+    .-drawer-opened & {
+      pointer-events: auto;
+      opacity: 1;
+    }
+
+    > .form-parts {
+      display: inline-block;
+
+      + .form-parts {
+        margin-left: 0.75em;
+      }
+
+      > .togglebuttons {
+        background-color: rgba(0, 0, 0, 0.5);
+
+        > .button {
+          &:hover {
+            color: var(--color-key);
+          }
+        }
+      }
+
+      > .select {
+        color: white;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+    }
+  }
+
+  > .content {
+    position: relative;
+    overflow: hidden;
+
+    > .chromosomes {
+      // box-sizing: content-box で padding を高さ計算から除外し、
+      // JS 側の height 計算と合わせる
+      box-sizing: content-box;
+      height: calc(
+        var(--height-bottom-drawer-opened) - var(--height-bottom-drawer) -
+          10px - 16px
+      );
+      padding: 10px var(--padding-side) 16px;
+      overflow-x: auto;
+      text-align: center;
+      white-space: nowrap;
+
+      > .chromosome-view {
+        display: inline-block;
+        vertical-align: top;
+      }
+    }
+  }
+}
+
+// 選択領域ハイライト (.selection-area)
+// 染色体カリオタイプなどでドラッグ選択した矩形領域を視覚的に示す
+.selection-area {
+  background-color: color-mix(in srgb, var(--color-selected) 20%, transparent);
+  border: solid 1px var(--color-selected);
+  border-radius: 2px;
+}

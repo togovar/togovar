@@ -53,10 +53,13 @@ export default class SideBar {
 
   /**
    * selectedRowはCSSだけでは参照できないStore状態なので、bodyの状態クラスへ橋渡しする。
+   * 行間を移動するたびに scrollTop をリセットすると Up/Down キー操作でぴょこぴょこ動くため、
+   * 「行なし → 行あり」（初回選択）のときのみプレビューを先頭に戻す。
    */
   selectedRow(index: SelectedRowIndex): void {
     const hasSelectedRow = index !== undefined;
-    if (hasSelectedRow) {
+    const wasSelected = this._body.classList.contains('-rowselected');
+    if (hasSelectedRow && !wasSelected) {
       this._previews.scrollTop = 0;
     }
     this._body.classList.toggle('-rowselected', hasSelectedRow);
