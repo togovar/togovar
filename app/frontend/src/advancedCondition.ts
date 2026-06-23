@@ -138,7 +138,7 @@ export type GenotypeKey = (typeof GENOTYPE_KEYS)[number];
  * 表示ラベルは参照ゲノム別JSON側を正とし、ここではAPIへ送るterm値だけを持つ。
  */
 export const SIGNIFICANCE_TERMS = [
-  'NC',
+  'NA',
   'P',
   'PLP',
   'LP',

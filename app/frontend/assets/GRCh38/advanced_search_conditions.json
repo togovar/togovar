@@ -998,8 +998,8 @@
       "values": {
         "clinvar": [
           {
-            "value": "NC",
-            "label": "Not in ClinVar"
+            "value": "NA",
+            "label": "Not available"
           },
           {
             "value": "P",

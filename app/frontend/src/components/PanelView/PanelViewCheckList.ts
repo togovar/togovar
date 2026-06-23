@@ -62,7 +62,7 @@ const ALPHAMISSENSE_LABELS: Record<string, string> = {
  * そのチェックボックスの value 属性のマッピング。
  */
 const UNASSIGNED_VALUE: Partial<Record<CheckListKind, string>> = {
-  significance: 'NC',
+  significance: 'NA',
   alphamissense: 'N',
   sift: 'N',
   polyphen: 'N',

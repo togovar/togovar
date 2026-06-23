@@ -202,8 +202,8 @@
     "type": "array",
     "items": [
       {
-        "id": "NC",
-        "label": "Unassigned",
+        "id": "NA",
+        "label": "Not available",
         "type": "boolean",
         "default": "1"
       },
