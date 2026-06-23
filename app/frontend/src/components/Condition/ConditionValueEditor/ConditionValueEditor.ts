@@ -1,7 +1,7 @@
 import { createEl } from '../../../utils/dom/createEl';
 import { selectRequired, selectOrNull } from '../../../utils/dom/select';
 import type { ConditionItemValueView } from '../ConditionItemValueView';
-import type { ConditionTypeValue } from '../../../definition';
+import type { AdvancedConditionTypeValue } from '../../../advancedCondition';
 import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';
 import type { EditorSectionClassName } from '../../../types';
@@ -144,7 +144,7 @@ export abstract class ConditionValueEditor {
    * 親行の conditionType を委譲取得する。
    * エディタが独自にキャッシュすると親との不整合が起きるため、都度取得する。
    */
-  protected get conditionType(): ConditionTypeValue {
+  protected get conditionType(): AdvancedConditionTypeValue {
     return this._conditionItemView.conditionType;
   }
 

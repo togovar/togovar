@@ -1,32 +1,28 @@
+import type { Reference } from './global';
+
 /**
- * Advanced Search の条件種別を、JSONマスタ・View・query builder の間で同じ値として扱うための共通ID。
- * 値は advanced_search_conditions.json の conditions キーや API query の意味に対応する。
+ * Advanced Search の実装が分岐に使う条件IDだけを定義する。
+ * 表示順・ラベル・選択肢は advanced_search_conditions.json を正とし、ここにはコードから直接参照するIDだけを置く。
  */
-export const CONDITION_TYPE = {
-  term: 'term',
+export const ADVANCED_CONDITION_TYPE = {
   dataset: 'dataset',
   genotype: 'genotype',
-  frequency: 'frequency',
   pathogenicity_prediction: 'pathogenicity_prediction',
-  quality: 'quality',
   type: 'type',
   significance: 'significance',
   consequence: 'consequence',
-  consequence_grouping: 'consequence_grouping',
-  sift: 'sift',
-  polyphen: 'polyphen',
-  adv_frequency: 'adv_frequency',
   disease: 'disease',
   gene_symbol: 'gene',
   variant_id: 'id',
   location: 'location',
 } as const;
 
-/** CONDITION_TYPE のキー名から値のunion型を作るため、keyofの中間型として分けている。 */
-type ConditionTypeKey = keyof typeof CONDITION_TYPE;
+/** ADVANCED_CONDITION_TYPE のキー名から値のunion型を作るため、keyofの中間型として分けている。 */
+type ConditionTypeKey = keyof typeof ADVANCED_CONDITION_TYPE;
 
 /** 条件種別を文字列のまま広げないため、Advanced Search 全体で使う条件IDをunion型にする。 */
-export type ConditionTypeValue = (typeof CONDITION_TYPE)[ConditionTypeKey];
+export type AdvancedConditionTypeValue =
+  (typeof ADVANCED_CONDITION_TYPE)[ConditionTypeKey];
 
 /** 条件候補の値と表示名を同じ形で受け渡すための最小単位。 */
 export type Option = Readonly<{ value: string; label: string }>;
@@ -39,8 +35,50 @@ export type ConditionMeta = Readonly<{
 
 /** すべての条件が固定候補を持つわけではないため、条件種別ごとの候補表をPartialで表す。 */
 export type ConditionOptionsMap = Readonly<
-  Partial<Record<ConditionTypeValue, ReadonlyArray<Option>>>
+  Partial<Record<AdvancedConditionTypeValue, ReadonlyArray<Option>>>
 >;
+
+/**
+ * relation を持たない条件を参照ゲノムごとに定義する。
+ * UI と query builder の両方が同じ判定を使うため、条件ID定義と同じファイルに置く。
+ */
+const NO_RELATION_BY_REF = {
+  GRCh37: {
+    dataset: true,
+    genotype: true,
+    pathogenicity_prediction: true,
+    id: true,
+    location: true,
+  },
+  GRCh38: {
+    dataset: true,
+    genotype: true,
+    pathogenicity_prediction: true,
+    id: true,
+    location: true,
+  },
+} as const satisfies Record<
+  Reference,
+  Readonly<Partial<Record<AdvancedConditionTypeValue, true>>>
+>;
+
+/** relationなしでqueryを組み立てる条件を型として切り出し、BuildContextの分岐に使う。 */
+export type NoRelationType = keyof (typeof NO_RELATION_BY_REF)[Reference];
+
+/** relationありの条件だけを型として切り出し、ConditionItemViewで安全にrelationを渡す。 */
+export type KeysWithRelation = Exclude<
+  AdvancedConditionTypeValue,
+  NoRelationType
+>;
+
+/**
+ * 条件行がrelation UIを出すべきかを、現在の参照ゲノム設定に合わせて判定する。
+ * 型ガードにすることで、呼び出し側がrelationあり/なしのBuildContextを組み立てやすくする。
+ */
+export const supportsRelation = <T extends AdvancedConditionTypeValue>(
+  t: T
+): t is Exclude<T, NoRelationType> =>
+  !((t as NoRelationType) in NO_RELATION_BY_REF[TOGOVAR_FRONTEND_REFERENCE]);
 
 /**
  * Advanced Search Builder のノード種別を数値で持ち、条件行とグループ行を軽く比較できるようにする。
@@ -59,14 +97,16 @@ export const CONDITION_NODE_KIND = {
 export const FREQUENCY_DATASETS = [
   'gem_j_wga',
   'jga_wgs',
+  'bbj1k',
+  'bbj2k',
   'jga_wes',
   'jga_snp',
   'tommo',
   'ncbn',
-  'jogo',
-  'tommo_jsv1',
   'gnomad_genomes',
   'gnomad_exomes',
+  'jogo',
+  'tommo_jsv1',
   'gnomad_sv',
 ] as const;
 

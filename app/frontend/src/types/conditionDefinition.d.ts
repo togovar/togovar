@@ -4,11 +4,11 @@
  * `assets/GRCh3{7,8}/advanced_search_conditions.json` を読み込んだ結果の型を定義する。
  * 検索APIに送るクエリ構造（ConditionQuery など）は query.d.ts に分離されている。
  *
- * 条件種別（ConditionTypeValue）ごとにUI描画の方法が異なるため、
+ * 条件種別（AdvancedConditionTypeValue）ごとにUI描画の方法が異なるため、
  * `type` フィールドで分岐できる discriminated union を使う。
  */
 
-import type { ConditionTypeValue } from '../definition';
+import type { AdvancedConditionTypeValue } from '../advancedCondition';
 import type { SignificanceSource } from './query';
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -164,7 +164,7 @@ export type ConditionDefinition =
 type AdvancedConditionMap = Partial<
   Record<
     Exclude<
-      ConditionTypeValue,
+      AdvancedConditionTypeValue,
       | 'dataset'
       | 'genotype'
       | 'location'

@@ -1,4 +1,7 @@
-import { CONDITION_TYPE, type ConditionTypeValue } from '../../definition';
+import {
+  ADVANCED_CONDITION_TYPE,
+  type AdvancedConditionTypeValue,
+} from '../../advancedCondition';
 import type { RestoredConditionValue, SignificanceSource } from '../../types';
 import type { ConditionItemValueView } from './ConditionItemValueView';
 import type { FrequencyCountValueView } from './FrequencyCountValueView';
@@ -12,7 +15,7 @@ import type { PredictionValueView } from './ConditionPathogenicityPredictionSear
 export class ConditionItemHydrator {
   /** URL復元時の値注入ロジックを ConditionItemView の状態管理から分離し、単体で再利用できるようにするため。 */
   constructor(
-    private readonly conditionType: ConditionTypeValue,
+    private readonly conditionType: AdvancedConditionTypeValue,
     private readonly valuesContainerEl: HTMLDivElement
   ) {}
 
@@ -37,7 +40,7 @@ export class ConditionItemHydrator {
     valueView.conditionType = this.conditionType;
     valueView.value = value.value;
     valueView.label = value.label;
-    valueView.deleteButton = this.conditionType === CONDITION_TYPE.variant_id;
+    valueView.deleteButton = this.conditionType === ADVANCED_CONDITION_TYPE.variant_id;
     return valueView;
   }
 
@@ -46,7 +49,7 @@ export class ConditionItemHydrator {
     valueView: ConditionItemValueView,
     value: RestoredConditionValue
   ): void {
-    if (this.conditionType === CONDITION_TYPE.significance && value.source) {
+    if (this.conditionType === ADVANCED_CONDITION_TYPE.significance && value.source) {
       this._getSignificanceContainer(value.source).append(valueView);
       return;
     }

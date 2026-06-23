@@ -1,6 +1,6 @@
 import type { AdvancedSearchBuilderView } from '../AdvancedSearch/AdvancedSearchBuilderView';
-import type { ConditionTypeValue } from '../../definition';
-import { CONDITION_NODE_KIND } from '../../definition';
+import type { AdvancedConditionTypeValue } from '../../advancedCondition';
+import { CONDITION_NODE_KIND } from '../../advancedCondition';
 
 /** グループと条件行の両方が実装する公開インターフェース。 */
 export interface ConditionView {
@@ -41,7 +41,7 @@ export interface GroupView extends ConditionView {
   addConditionViews(_conditionViews: Node[], _referenceElm: Node | null): void;
   /** 新しい条件行を追加する。 */
   addNewConditionItem(
-    _conditionType: ConditionTypeValue,
+    _conditionType: AdvancedConditionTypeValue,
     _referenceElm?: Node | null,
     _options?: unknown
   ): ConditionView;

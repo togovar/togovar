@@ -1,6 +1,6 @@
 import { ConditionValueEditor } from './ConditionValueEditor';
 import { ADVANCED_CONDITIONS } from '../../../global';
-import { CONDITION_TYPE } from '../../../definition';
+import { ADVANCED_CONDITION_TYPE } from '../../../advancedCondition';
 import { createEl } from '../../../utils/dom/createEl';
 import { selectRequired, selectOrNull } from '../../../utils/dom/select';
 import type ConditionValues from '../ConditionValues';
@@ -40,7 +40,7 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
     this._data = this._prepareData();
     // consequence 以外に親連動が必要な条件種別は現状存在しないため、直接比較する。
     this._selectionDependedOnParent =
-      this.conditionType === CONDITION_TYPE.consequence;
+      this.conditionType === ADVANCED_CONDITION_TYPE.consequence;
 
     this.createSectionEl('columns-editor-view', () => [
       createEl('header', { class: 'section-header', text: `Select ${this.conditionType}` }),

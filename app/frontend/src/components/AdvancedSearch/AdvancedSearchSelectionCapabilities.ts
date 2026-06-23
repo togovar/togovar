@@ -1,4 +1,4 @@
-import { CONDITION_NODE_KIND } from '../../definition';
+import { CONDITION_NODE_KIND } from '../../advancedCondition';
 import type { ConditionView, GroupView } from '../Condition/ConditionView';
 
 export type SelectionCapabilities = Readonly<{

@@ -8,7 +8,11 @@
  * components/ への参照が1箇所残る。その他のコンポーネント依存はない。
  */
 
-import type { FrequencyDataset, GenotypeKey, SignificanceTerm } from '../definition';
+import type {
+  FrequencyDataset,
+  GenotypeKey,
+  SignificanceTerm,
+} from '../advancedCondition';
 import type { PredictionKey } from '../components/Condition/ConditionPathogenicityPredictionSearch/PredictionDatasets';
 
 // ───────────────────────────────────────────────────────────────────────────

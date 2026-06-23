@@ -1,4 +1,7 @@
-import { CONDITION_TYPE, type ConditionTypeValue } from '../../definition';
+import {
+  ADVANCED_CONDITION_TYPE,
+  type AdvancedConditionTypeValue,
+} from '../../advancedCondition';
 import type { ConditionGroupView } from '../Condition/ConditionGroupView';
 import type { LogicalOperator } from '../../types';
 import {
@@ -128,15 +131,15 @@ async function toRestoredItem(
 
   if (Array.isArray(query.id)) {
     return {
-      conditionType: CONDITION_TYPE.variant_id,
+      conditionType: ADVANCED_CONDITION_TYPE.variant_id,
       values: query.id.map((id) => makeValue(String(id))),
     };
   }
 
   for (const conditionType of [
-    CONDITION_TYPE.type,
-    CONDITION_TYPE.consequence,
-    CONDITION_TYPE.disease,
+    ADVANCED_CONDITION_TYPE.type,
+    ADVANCED_CONDITION_TYPE.consequence,
+    ADVANCED_CONDITION_TYPE.disease,
   ] as const) {
     const leaf = query[conditionType];
     if (isQueryObject(leaf)) {
@@ -167,14 +170,14 @@ function restoreLocationItem(location: QueryObject): RestoredItem | null {
   if (!value) return null;
 
   return {
-    conditionType: CONDITION_TYPE.location,
+    conditionType: ADVANCED_CONDITION_TYPE.location,
     values: [makeValue(value)],
   };
 }
 
 /** relationとtermsを持つ標準的な条件を、共通の表示値配列へ戻す。 */
 function restoreTermItem(
-  conditionType: ConditionTypeValue,
+  conditionType: AdvancedConditionTypeValue,
   leaf: QueryObject
 ): RestoredItem | null {
   const terms = leaf.terms;

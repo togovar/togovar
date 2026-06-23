@@ -1,7 +1,7 @@
 import { ADVANCED_CONDITIONS } from '../../global';
 import { createEl } from '../../utils/dom/createEl';
 import type { AdvancedSearchBuilderView } from './AdvancedSearchBuilderView';
-import type { ConditionTypeValue } from '../../definition';
+import type { AdvancedConditionTypeValue } from '../../advancedCondition';
 import type { Command, CommandDef } from '../../types';
 
 const COMMANDS: ReadonlyArray<CommandDef> = [
@@ -164,7 +164,7 @@ export class AdvancedSearchToolbar {
     if (cmdEl instanceof HTMLButtonElement && cmdEl.disabled) return;
 
     const command = cmdEl.dataset.command as Command | undefined;
-    const condition = cmdEl.dataset.condition as ConditionTypeValue | undefined;
+    const condition = cmdEl.dataset.condition as AdvancedConditionTypeValue | undefined;
     if (!command) return;
 
     this._handleCommand(command, condition, e);
@@ -189,7 +189,7 @@ export class AdvancedSearchToolbar {
 
       const command = cmdEl.dataset.command as Command | undefined;
       const condition = cmdEl.dataset.condition as
-        | ConditionTypeValue
+        | AdvancedConditionTypeValue
         | undefined;
       if (!command) return;
 
@@ -212,7 +212,7 @@ export class AdvancedSearchToolbar {
    */
   private _handleCommand(
     command: Command,
-    conditionType: ConditionTypeValue | undefined,
+    conditionType: AdvancedConditionTypeValue | undefined,
     event?: Event
   ): void {
     switch (command) {

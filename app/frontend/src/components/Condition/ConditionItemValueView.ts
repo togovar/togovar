@@ -2,7 +2,7 @@ import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import './FrequencyCountValueView'; // for embedding
 import './ConditionPathogenicityPredictionSearch/PredictionValueView'; // for embedding
-import type { ConditionTypeValue } from '../../definition';
+import type { AdvancedConditionTypeValue } from '../../advancedCondition';
 import Style from '../../../stylesheets/web-components/condition-item-value-view.scss';
 
 @customElement('condition-item-value-view')
@@ -10,7 +10,7 @@ export class ConditionItemValueView extends LitElement {
   static styles = [Style];
 
   @property({ type: String }) label: string = '';
-  @property({ type: String }) conditionType: ConditionTypeValue | undefined;
+  @property({ type: String }) conditionType: AdvancedConditionTypeValue | undefined;
   @property({ type: String }) value: string = '';
   @property({ type: Boolean }) deleteButton: boolean = false;
 

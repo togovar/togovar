@@ -1,6 +1,6 @@
 import type { HierarchyNode } from 'd3-hierarchy';
 import { hierarchy } from 'd3-hierarchy';
-import { CONDITION_TYPE } from '../../../../definition';
+import { ADVANCED_CONDITION_TYPE } from '../../../../advancedCondition';
 import { ADVANCED_CONDITIONS } from '../../../../global';
 import type { TreeNode } from '../../../../types';
 import type { UiNode } from './types';
@@ -46,8 +46,8 @@ export class DatasetTreeDataProcessor {
    */
   prepareHierarchicalData(conditionType: string): HierarchyNode<UiNode> {
     switch (conditionType) {
-      case CONDITION_TYPE.dataset:
-      case CONDITION_TYPE.genotype: {
+      case ADVANCED_CONDITION_TYPE.dataset:
+      case ADVANCED_CONDITION_TYPE.genotype: {
         const conditionDefinition = ADVANCED_CONDITIONS[conditionType];
         if (!conditionDefinition || !('values' in conditionDefinition)) {
           throw new Error(

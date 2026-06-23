@@ -1,4 +1,7 @@
-import { CONDITION_TYPE, type ConditionTypeValue } from '../../../definition';
+import {
+  ADVANCED_CONDITION_TYPE,
+  type AdvancedConditionTypeValue,
+} from '../../../advancedCondition';
 import { buildDatasetQuery } from './dataset';
 import { buildSignificanceQuery } from './significance';
 import { buildGeneQuery } from './gene';
@@ -16,20 +19,20 @@ import type {
 // 条件種別ごとの専用ビルダーを宣言的に管理する。
 // 新しい条件種別を追加するときはここへ追記するだけで済む。
 const BUILDERS: BuilderMap = {
-  [CONDITION_TYPE.dataset]: buildDatasetQuery,
-  [CONDITION_TYPE.significance]: buildSignificanceQuery,
-  [CONDITION_TYPE.gene_symbol]: buildGeneQuery,
-  [CONDITION_TYPE.genotype]: buildDatasetQuery,
-  [CONDITION_TYPE.location]: buildLocationQuery,
-  [CONDITION_TYPE.pathogenicity_prediction]: buildPathogenicityQuery,
-  [CONDITION_TYPE.variant_id]: buildVariantIdQuery,
+  [ADVANCED_CONDITION_TYPE.dataset]: buildDatasetQuery,
+  [ADVANCED_CONDITION_TYPE.significance]: buildSignificanceQuery,
+  [ADVANCED_CONDITION_TYPE.gene_symbol]: buildGeneQuery,
+  [ADVANCED_CONDITION_TYPE.genotype]: buildDatasetQuery,
+  [ADVANCED_CONDITION_TYPE.location]: buildLocationQuery,
+  [ADVANCED_CONDITION_TYPE.pathogenicity_prediction]: buildPathogenicityQuery,
+  [ADVANCED_CONDITION_TYPE.variant_id]: buildVariantIdQuery,
 };
 
 /**
  * 条件種別に対応するビルダーへディスパッチし、クエリフラグメントを返す。
  * BUILDERS に登録されていない種別は buildDefaultQuery へフォールバックする。
  */
-export function buildQueryFragment<T extends ConditionTypeValue>(
+export function buildQueryFragment<T extends AdvancedConditionTypeValue>(
   ctx: BuildContext<T>
 ): ConditionQuery {
   const b = BUILDERS[ctx.type] as

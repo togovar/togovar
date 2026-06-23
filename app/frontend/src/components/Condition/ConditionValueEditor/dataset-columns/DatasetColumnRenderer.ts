@@ -1,6 +1,6 @@
 import type { HierarchyNode } from 'd3-hierarchy';
 import { createEl } from '../../../../utils/dom/createEl';
-import { CONDITION_TYPE } from '../../../../definition';
+import { ADVANCED_CONDITION_TYPE } from '../../../../advancedCondition';
 import { fetchLoginStatus } from '../../../../auth/authService';
 import type { UiNode } from './types';
 
@@ -167,8 +167,8 @@ export class DatasetColumnRenderer {
     conditionType: string
   ): boolean {
     return (
-      (conditionType === CONDITION_TYPE.dataset ||
-        conditionType === CONDITION_TYPE.genotype) &&
+      (conditionType === ADVANCED_CONDITION_TYPE.dataset ||
+        conditionType === ADVANCED_CONDITION_TYPE.genotype) &&
       datasetNode.depth === 1
     );
   }

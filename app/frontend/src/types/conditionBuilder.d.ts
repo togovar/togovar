@@ -6,8 +6,10 @@
  * query.d.ts に分離されており、ここでは参照のみ行う。
  */
 
-import type { ConditionTypeValue } from '../definition';
-import type { NoRelationType } from '../conditions';
+import type {
+  AdvancedConditionTypeValue,
+  NoRelationType,
+} from '../advancedCondition';
 import type { ConditionItemView } from '../components/Condition/ConditionItemView';
 import type ConditionValues from '../components/Condition/ConditionValues';
 import type { ConditionItemValueView } from '../components/Condition/ConditionItemValueView';
@@ -17,8 +19,8 @@ import type { ConditionQuery, Relation, Inequality } from './query';
 // ───────────────────────────────────────────────────────────────────────────
 // Builder
 // ───────────────────────────────────────────────────────────────────────────
-/** Context object passed to query builders */
-type BuildContext<T extends ConditionTypeValue> = {
+/** query builder が条件種別に応じた入力値を受け取れるよう、条件IDを型引数で保持する。 */
+type BuildContext<T extends AdvancedConditionTypeValue> = {
   type: T;
   values: ConditionItemValueView[];
   valuesContainer: HTMLDivElement;
@@ -26,8 +28,20 @@ type BuildContext<T extends ConditionTypeValue> = {
   ? { relation?: undefined }
   : { relation: Relation });
 
+/**
+ * dataset と genotype は同じ頻度/件数UIを使うため、1つのビルダーで両方を受け取れる型にする。
+ * 他の条件はキーごとに専用の BuildContext を渡す。
+ */
+type BuilderContextType<K extends AdvancedConditionTypeValue> = K extends
+  | 'dataset'
+  | 'genotype'
+  ? 'dataset' | 'genotype'
+  : K;
+
 type BuilderMap = {
-  [K in ConditionTypeValue]?: (ctx: BuildContext<K>) => ConditionQuery;
+  [K in AdvancedConditionTypeValue]?: (
+    ctx: BuildContext<BuilderContextType<K>>
+  ) => ConditionQuery;
 };
 
 // ───────────────────────────────────────────────────────────────────────────
