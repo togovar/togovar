@@ -268,8 +268,8 @@
         "default": "1"
       },
       {
-        "id": "CI",
-        "label": "Conflicting interpretations of pathogenicity",
+        "id": "CC",
+        "label": "Conflicting classifications of pathogenicity",
         "type": "boolean",
         "default": "1"
       },

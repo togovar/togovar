@@ -1042,8 +1042,8 @@
             "label": "Benign"
           },
           {
-            "value": "CI",
-            "label": "Conflicting interpretations of pathogenicity"
+            "value": "CC",
+            "label": "Conflicting classifications of pathogenicity"
           },
           {
             "value": "DR",

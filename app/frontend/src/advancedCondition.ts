@@ -154,7 +154,7 @@ export const SIGNIFICANCE_TERMS = [
   'PR',
   'B',
   'LB',
-  'CI',
+  'CC',
   'AN',
   'O',
   'US',

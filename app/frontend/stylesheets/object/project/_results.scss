@@ -1147,9 +1147,9 @@ body[data-column-resizing='true'] {
     border-color: var(--color-sign-safe);
   }
 
-  &[data-value='CI']::before {
+  &[data-value='CC']::before {
     color: var(--color-sign-modifier);
-    content: 'CI';
+    content: 'CC';
     background-color: var(--color-sign-modifier-light);
     border-color: var(--color-sign-modifier);
   }
