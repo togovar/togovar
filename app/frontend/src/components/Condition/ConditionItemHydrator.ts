@@ -49,7 +49,7 @@ export class ConditionItemHydrator {
     valueView: ConditionItemValueView,
     value: RestoredConditionValue
   ): void {
-    if (this.conditionType === ADVANCED_CONDITION_TYPE.significance && value.source) {
+    if (this.conditionType === ADVANCED_CONDITION_TYPE.clinical_significance && value.source) {
       this._getSignificanceContainer(value.source).append(valueView);
       return;
     }

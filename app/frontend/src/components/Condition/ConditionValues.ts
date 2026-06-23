@@ -21,9 +21,9 @@ import type { ConditionValueEditor, EditorCtor } from '../../types';
 const EDITOR_REGISTRY: Readonly<
   Partial<Record<AdvancedConditionTypeValue, EditorCtor[]>>
 > = {
-  [ADVANCED_CONDITION_TYPE.type]: [ConditionValueEditorCheckboxes],
-  [ADVANCED_CONDITION_TYPE.significance]: [ConditionValueEditorClinicalSignificance],
-  [ADVANCED_CONDITION_TYPE.consequence]: [ConditionValueEditorConsequence],
+  [ADVANCED_CONDITION_TYPE.variant_type]: [ConditionValueEditorCheckboxes],
+  [ADVANCED_CONDITION_TYPE.clinical_significance]: [ConditionValueEditorClinicalSignificance],
+  [ADVANCED_CONDITION_TYPE.variant_consequence]: [ConditionValueEditorConsequence],
   [ADVANCED_CONDITION_TYPE.dataset]: [
     ConditionValueEditorDatasetColumns,
     ConditionValueEditorFrequencyCount,

@@ -40,7 +40,7 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
     this._data = this._prepareData();
     // consequence 以外に親連動が必要な条件種別は現状存在しないため、直接比較する。
     this._selectionDependedOnParent =
-      this.conditionType === ADVANCED_CONDITION_TYPE.consequence;
+      this.conditionType === ADVANCED_CONDITION_TYPE.variant_consequence;
 
     this.createSectionEl('columns-editor-view', () => [
       createEl('header', { class: 'section-header', text: `Select ${this.conditionType}` }),

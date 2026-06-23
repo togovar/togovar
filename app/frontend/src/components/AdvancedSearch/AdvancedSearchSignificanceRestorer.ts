@@ -39,7 +39,7 @@ export function restoreSignificanceItem(
 
   const relation = significance.relation === 'ne' ? 'ne' : 'eq';
   return {
-    conditionType: ADVANCED_CONDITION_TYPE.significance,
+    conditionType: ADVANCED_CONDITION_TYPE.clinical_significance,
     relation,
     values: sources.flatMap((source) =>
       terms.map((term) => {
@@ -47,7 +47,7 @@ export function restoreSignificanceItem(
         return {
           ...makeValue(
             value,
-            findConditionLabel(ADVANCED_CONDITION_TYPE.significance, value)
+            findConditionLabel(ADVANCED_CONDITION_TYPE.clinical_significance, value)
           ),
           source,
         };
@@ -88,7 +88,7 @@ export function toMergedSignificanceItem(
   const expectedOperator = relation === 'ne' ? 'and' : 'or';
   const canMerge = items.every(
     (item) =>
-      item.conditionType === ADVANCED_CONDITION_TYPE.significance &&
+      item.conditionType === ADVANCED_CONDITION_TYPE.clinical_significance &&
       item.relation === relation
   );
   if (!relation || logical.operator !== expectedOperator || !canMerge) {
@@ -96,7 +96,7 @@ export function toMergedSignificanceItem(
   }
 
   return {
-    conditionType: ADVANCED_CONDITION_TYPE.significance,
+    conditionType: ADVANCED_CONDITION_TYPE.clinical_significance,
     relation,
     values: items.flatMap((item) => item.values),
   };

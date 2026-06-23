@@ -5,16 +5,18 @@ import type { Reference } from './global';
  * 表示順・ラベル・選択肢は advanced_search_conditions.json を正とし、ここにはコードから直接参照するIDだけを置く。
  */
 export const ADVANCED_CONDITION_TYPE = {
-  dataset: 'dataset',
-  genotype: 'genotype',
-  pathogenicity_prediction: 'pathogenicity_prediction',
-  type: 'type',
-  significance: 'significance',
-  consequence: 'consequence',
-  disease: 'disease',
-  gene_symbol: 'gene',
   variant_id: 'id',
   location: 'location',
+  variant_type: 'type',
+  variant_consequence: 'consequence',
+  dataset: 'dataset',
+  genotype: 'genotype',
+  clinical_significance: 'significance',
+  sscv_db: 'sscv_db',
+  pathogenicity_prediction: 'pathogenicity_prediction',
+  cadd_phred: 'cadd_phred',
+  gene_symbol: 'gene',
+  disease: 'disease',
 } as const;
 
 /** ADVANCED_CONDITION_TYPE のキー名から値のunion型を作るため、keyofの中間型として分けている。 */

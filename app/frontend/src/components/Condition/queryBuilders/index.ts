@@ -20,7 +20,7 @@ import type {
 // 新しい条件種別を追加するときはここへ追記するだけで済む。
 const BUILDERS: BuilderMap = {
   [ADVANCED_CONDITION_TYPE.dataset]: buildDatasetQuery,
-  [ADVANCED_CONDITION_TYPE.significance]: buildSignificanceQuery,
+  [ADVANCED_CONDITION_TYPE.clinical_significance]: buildSignificanceQuery,
   [ADVANCED_CONDITION_TYPE.gene_symbol]: buildGeneQuery,
   [ADVANCED_CONDITION_TYPE.genotype]: buildDatasetQuery,
   [ADVANCED_CONDITION_TYPE.location]: buildLocationQuery,

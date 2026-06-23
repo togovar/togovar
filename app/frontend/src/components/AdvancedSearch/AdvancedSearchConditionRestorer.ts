@@ -137,8 +137,8 @@ async function toRestoredItem(
   }
 
   for (const conditionType of [
-    ADVANCED_CONDITION_TYPE.type,
-    ADVANCED_CONDITION_TYPE.consequence,
+    ADVANCED_CONDITION_TYPE.variant_type,
+    ADVANCED_CONDITION_TYPE.variant_consequence,
     ADVANCED_CONDITION_TYPE.disease,
   ] as const) {
     const leaf = query[conditionType];
