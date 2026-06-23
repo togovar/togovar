@@ -1080,6 +1080,22 @@
           {
             "value": "AN",
             "label": "Association not found"
+          },
+          {
+            "value": "NC",
+            "label": "No classification"
+          },
+          {
+            "value": "VH",
+            "label": "VUS-high"
+          },
+          {
+            "value": "VM",
+            "label": "VUS-mid"
+          },
+          {
+            "value": "VL",
+            "label": "VUS-low"
           }
         ],
         "mgend": [

@@ -169,51 +169,19 @@
 // significance: 値コードごとの色と略称バッジ
 // ──────────────────────────────────────────────────
 
-:host([data-condition-type='significance'][data-value='P']) {
-  .inner {
-    background-color: var(--color-sign-dangerous-light);
-    border-color: var(--color-sign-dangerous);
+// --- content（バッジ略称）---
 
-    &::before {
-      color: var(--color-sign-dangerous);
-      content: 'P';
-    }
-  }
-}
-
-:host([data-condition-type='significance'][data-value='LP']) {
-  .inner {
-    background-color: var(--color-sign-dangerous-light);
-    border-color: var(--color-sign-dangerous);
-
-    &::before {
-      color: var(--color-sign-dangerous);
-      content: 'LP';
-    }
-  }
-}
-
+:host([data-condition-type='significance'][data-value='P']),
 :host([data-condition-type='significance'][data-value='PLP']) {
-  .inner {
-    background-color: var(--color-sign-lowdangerous-light);
-    border-color: var(--color-sign-lowdangerous);
-
-    &::before {
-      color: var(--color-sign-lowdangerous);
-      content: 'P';
-    }
+  .inner::before {
+    content: 'P';
   }
 }
 
+:host([data-condition-type='significance'][data-value='LP']),
 :host([data-condition-type='significance'][data-value='LPLP']) {
-  .inner {
-    background-color: var(--color-sign-lowdangerous-light);
-    border-color: var(--color-sign-lowdangerous);
-
-    &::before {
-      color: var(--color-sign-lowdangerous);
-      content: 'LP';
-    }
+  .inner::before {
+    content: 'LP';
   }
 }
 
@@ -221,13 +189,129 @@
 :host([data-condition-type='significance'][data-value='ERA']),
 :host([data-condition-type='significance'][data-value='LRA']),
 :host([data-condition-type='significance'][data-value='URA']) {
+  .inner::before {
+    content: 'RA';
+  }
+}
+
+:host([data-condition-type='significance'][data-value='US']) {
+  .inner::before {
+    content: 'US';
+  }
+}
+:host([data-condition-type='significance'][data-value='LB']) {
+  .inner::before {
+    content: 'LB';
+  }
+}
+:host([data-condition-type='significance'][data-value='B']) {
+  .inner::before {
+    content: 'B';
+  }
+}
+:host([data-condition-type='significance'][data-value='CC']) {
+  .inner::before {
+    content: 'CC';
+  }
+}
+:host([data-condition-type='significance'][data-value='DR']) {
+  .inner::before {
+    content: 'DR';
+  }
+}
+:host([data-condition-type='significance'][data-value='CS']) {
+  .inner::before {
+    content: 'CS';
+  }
+}
+:host([data-condition-type='significance'][data-value='RF']) {
+  .inner::before {
+    content: 'RF';
+  }
+}
+:host([data-condition-type='significance'][data-value='A']) {
+  .inner::before {
+    content: 'A';
+  }
+}
+:host([data-condition-type='significance'][data-value='PR']) {
+  .inner::before {
+    content: 'PR';
+  }
+}
+:host([data-condition-type='significance'][data-value='AF']) {
+  .inner::before {
+    content: 'AF';
+  }
+}
+:host([data-condition-type='significance'][data-value='O']) {
+  .inner::before {
+    content: 'O';
+  }
+}
+:host([data-condition-type='significance'][data-value='NP']) {
+  .inner::before {
+    content: 'NP';
+  }
+}
+:host([data-condition-type='significance'][data-value='AN']) {
+  .inner::before {
+    content: 'AN';
+  }
+}
+:host([data-condition-type='significance'][data-value='NC']) {
+  .inner::before {
+    content: 'NC';
+  }
+}
+:host([data-condition-type='significance'][data-value='VH']) {
+  .inner::before {
+    content: 'VH';
+  }
+}
+:host([data-condition-type='significance'][data-value='VM']) {
+  .inner::before {
+    content: 'VM';
+  }
+}
+:host([data-condition-type='significance'][data-value='VL']) {
+  .inner::before {
+    content: 'VL';
+  }
+}
+
+// --- color（テーマ色）---
+
+:host([data-condition-type='significance'][data-value='P']),
+:host([data-condition-type='significance'][data-value='LP']) {
+  .inner {
+    background-color: var(--color-sign-dangerous-light);
+    border-color: var(--color-sign-dangerous);
+    &::before {
+      color: var(--color-sign-dangerous);
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='PLP']),
+:host([data-condition-type='significance'][data-value='LPLP']) {
+  .inner {
+    background-color: var(--color-sign-lowdangerous-light);
+    border-color: var(--color-sign-lowdangerous);
+    &::before {
+      color: var(--color-sign-lowdangerous);
+    }
+  }
+}
+
+:host([data-condition-type='significance'][data-value='ERA']),
+:host([data-condition-type='significance'][data-value='LRA']),
+:host([data-condition-type='significance'][data-value='URA']) {
   .inner {
     background-color: var(--color-sign-warning-light);
     border-color: var(--color-sign-warning);
-
     &::before {
       color: var(--color-sign-warning);
-      content: 'RA';
     }
   }
 }
@@ -236,10 +320,8 @@
   .inner {
     background-color: var(--color-sign-unknown-light);
     border-color: var(--color-sign-unknown);
-
     &::before {
       color: var(--color-sign-unknown);
-      content: 'US';
     }
   }
 }
@@ -248,10 +330,8 @@
   .inner {
     background-color: var(--color-sign-normal-light);
     border-color: var(--color-sign-normal);
-
     &::before {
       color: var(--color-sign-normal);
-      content: 'LB';
     }
   }
 }
@@ -260,10 +340,8 @@
   .inner {
     background-color: var(--color-sign-safe-light);
     border-color: var(--color-sign-safe);
-
     &::before {
       color: var(--color-sign-safe);
-      content: 'B';
     }
   }
 }
@@ -272,117 +350,39 @@
   .inner {
     background-color: var(--color-sign-modifier-light);
     border-color: var(--color-sign-modifier);
-
     &::before {
       color: var(--color-sign-modifier);
-      content: 'CC';
     }
   }
 }
 
-:host([data-condition-type='significance'][data-value='DR']) {
-  .inner {
-    background-color: var(--color-sign-other-light);
-    border-color: var(--color-sign-other);
-
-    &::before {
-      color: var(--color-sign-other);
-      content: 'DR';
-    }
-  }
-}
-
-:host([data-condition-type='significance'][data-value='CS']) {
-  .inner {
-    background-color: var(--color-sign-other-light);
-    border-color: var(--color-sign-other);
-
-    &::before {
-      color: var(--color-sign-other);
-      content: 'CS';
-    }
-  }
-}
-
-:host([data-condition-type='significance'][data-value='RF']) {
-  .inner {
-    background-color: var(--color-sign-other-light);
-    border-color: var(--color-sign-other);
-
-    &::before {
-      color: var(--color-sign-other);
-      content: 'RF';
-    }
-  }
-}
-
-:host([data-condition-type='significance'][data-value='A']) {
-  .inner {
-    background-color: var(--color-sign-other-light);
-    border-color: var(--color-sign-other);
-
-    &::before {
-      color: var(--color-sign-other);
-      content: 'A';
-    }
-  }
-}
-
-:host([data-condition-type='significance'][data-value='PR']) {
-  .inner {
-    background-color: var(--color-sign-other-light);
-    border-color: var(--color-sign-other);
-
-    &::before {
-      color: var(--color-sign-other);
-      content: 'PR';
-    }
-  }
-}
-
+:host([data-condition-type='significance'][data-value='DR']),
+:host([data-condition-type='significance'][data-value='CS']),
+:host([data-condition-type='significance'][data-value='RF']),
+:host([data-condition-type='significance'][data-value='A']),
+:host([data-condition-type='significance'][data-value='PR']),
 :host([data-condition-type='significance'][data-value='AF']) {
   .inner {
     background-color: var(--color-sign-other-light);
     border-color: var(--color-sign-other);
-
     &::before {
       color: var(--color-sign-other);
-      content: 'AF';
     }
   }
 }
 
-:host([data-condition-type='significance'][data-value='O']) {
+:host([data-condition-type='significance'][data-value='O']),
+:host([data-condition-type='significance'][data-value='NP']),
+:host([data-condition-type='significance'][data-value='AN']),
+:host([data-condition-type='significance'][data-value='NC']),
+:host([data-condition-type='significance'][data-value='VH']),
+:host([data-condition-type='significance'][data-value='VM']),
+:host([data-condition-type='significance'][data-value='VL']) {
   .inner {
     background-color: white;
     border-color: var(--color-gray);
-
     &::before {
-      content: 'O';
-      border-color: var(--color-gray);
-    }
-  }
-}
-
-:host([data-condition-type='significance'][data-value='NP']) {
-  .inner {
-    background-color: white;
-    border-color: var(--color-gray);
-
-    &::before {
-      content: 'NP';
-      border-color: var(--color-gray);
-    }
-  }
-}
-
-:host([data-condition-type='significance'][data-value='AN']) {
-  .inner {
-    background-color: white;
-    border-color: var(--color-gray);
-
-    &::before {
-      content: 'AN';
+      color: var(--color-gray);
       border-color: var(--color-gray);
     }
   }

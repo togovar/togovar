@@ -159,6 +159,10 @@ export const SIGNIFICANCE_TERMS = [
   'O',
   'US',
   'NP',
+  'NC',
+  'VH',
+  'VM',
+  'VL',
 ] as const;
 
 /** significance term を任意文字列にしないため、SIGNIFICANCE_TERMS からunion型を作る。 */
