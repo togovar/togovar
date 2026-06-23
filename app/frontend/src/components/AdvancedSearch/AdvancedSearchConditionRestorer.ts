@@ -140,6 +140,7 @@ async function toRestoredItem(
     ADVANCED_CONDITION_TYPE.variant_type,
     ADVANCED_CONDITION_TYPE.variant_consequence,
     ADVANCED_CONDITION_TYPE.disease,
+    ADVANCED_CONDITION_TYPE.sscv_db,
   ] as const) {
     const leaf = query[conditionType];
     if (isQueryObject(leaf)) {

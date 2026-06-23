@@ -14,14 +14,9 @@ import type {
 import Styles from '../../../../stylesheets/web-components/prediction-range-slider.scss';
 
 const SLIDER_CONFIG = {
-  min: 0,
-  max: 1,
-  step: 0.01,
   numberOfScales: 10,
   sliderWidth: 247.5,
 } as const;
-const SCALE_INTERVAL =
-  (SLIDER_CONFIG.max - SLIDER_CONFIG.min) / SLIDER_CONFIG.numberOfScales;
 
 /** Class to create a PredictionRangeSlider */
 @customElement('prediction-range-slider')
@@ -33,10 +28,14 @@ export class PredictionRangeSlider extends LitElement {
   predictionScoreName: PredictionKey = 'alphamissense';
 
   @property({ type: Number, reflect: true, attribute: 'data-min-value' })
-  minValue: number = SLIDER_CONFIG.min;
+  minValue: number = 0;
 
   @property({ type: Number, reflect: true, attribute: 'data-max-value' })
-  maxValue: number = SLIDER_CONFIG.max;
+  maxValue: number = 1;
+
+  @property({ type: Number }) scoreMin = 0;
+  @property({ type: Number }) scoreMax = 1;
+  @property({ type: Number }) scoreStep = 0.01;
 
   @property({
     type: String,
@@ -127,23 +126,23 @@ export class PredictionRangeSlider extends LitElement {
 
     if (target.className === 'from') {
       secondaryInputs[0].value = String(minValue);
-      this._range.style.left = minValue * 100 + '%';
+      this._range.style.left = this._valueToPercent(minValue) + '%';
 
       if (minValue > maxValue) {
         maxValue = parseFloat(primaryInputs[0].value);
         primaryInputs[1].value = String(maxValue);
         secondaryInputs[1].value = String(maxValue);
-        this._range.style.right = 100 - maxValue * 100 + '%';
+        this._range.style.right = 100 - this._valueToPercent(maxValue) + '%';
       }
     } else {
       secondaryInputs[1].value = String(maxValue);
-      this._range.style.right = 100 - maxValue * 100 + '%';
+      this._range.style.right = 100 - this._valueToPercent(maxValue) + '%';
 
       if (maxValue < minValue) {
         minValue = parseFloat(primaryInputs[1].value);
         primaryInputs[0].value = String(minValue);
         secondaryInputs[0].value = String(minValue);
-        this._range.style.left = minValue * 100 + '%';
+        this._range.style.left = this._valueToPercent(minValue) + '%';
       }
     }
 
@@ -174,8 +173,8 @@ export class PredictionRangeSlider extends LitElement {
     setInequalitySign(this._inequalitySign[0], minInequalitySign);
     setInequalitySign(this._inequalitySign[1], maxInequalitySign);
 
-    this._range.style.left = minValue * 100 + '%';
-    this._range.style.right = 100 - maxValue * 100 + '%';
+    this._range.style.left = this._valueToPercent(minValue) + '%';
+    this._range.style.right = 100 - this._valueToPercent(maxValue) + '%';
     this._range.style.backgroundImage = createGradientSlider(
       this.activeDataset,
       this._range,
@@ -237,9 +236,9 @@ export class PredictionRangeSlider extends LitElement {
         class=${className}
         title=${title}
         .value=${String(value)}
-        min=${SLIDER_CONFIG.min}
-        max=${SLIDER_CONFIG.max}
-        step=${SLIDER_CONFIG.step}
+        min=${this.scoreMin}
+        max=${this.scoreMax}
+        step=${this.scoreStep}
         @input=${(e: Event) =>
           this._handleSliderValues(e, this._numberInput, this._rangeInput)}
       />
@@ -251,9 +250,9 @@ export class PredictionRangeSlider extends LitElement {
         name=${`${this.predictionScoreName}-${className}-range`}
         class=${className}
         .value=${String(value)}
-        min=${SLIDER_CONFIG.min}
-        max=${SLIDER_CONFIG.max}
-        step=${SLIDER_CONFIG.step}
+        min=${this.scoreMin}
+        max=${this.scoreMax}
+        step=${this.scoreStep}
         @input=${(e: Event) =>
           this._handleSliderValues(e, this._rangeInput, this._numberInput)}
       />
@@ -290,11 +289,11 @@ export class PredictionRangeSlider extends LitElement {
 
     return html`
       <div class="number-input">
-        ${createNumberInput('from', 'Lower limit', SLIDER_CONFIG.min)}
+        ${createNumberInput('from', 'Lower limit', this.minValue)}
         ${createInequalitySignButton('gte')}
         <span>Prediction score</span>
         ${createInequalitySignButton('lte')}
-        ${createNumberInput('to', 'Upper limit', SLIDER_CONFIG.max)}
+        ${createNumberInput('to', 'Upper limit', this.maxValue)}
         ${createLabelCheckboxes()}
       </div>
 
@@ -309,7 +308,7 @@ export class PredictionRangeSlider extends LitElement {
                 style="left: calc(${(i * 100) /
                 SLIDER_CONFIG.numberOfScales}% - 0.3rem)"
               >
-                ${(SCALE_INTERVAL * i).toFixed(1)}
+                ${this._formatScaleValue(i)}
               </li>`
           )}
         </ul>
@@ -320,7 +319,7 @@ export class PredictionRangeSlider extends LitElement {
               <div
                 class="threshold-line"
                 style="height:${(arr.length - i) * 20 +
-                10}px; left:${details.min * 100}%;"
+                10}px; left:${this._valueToPercent(details.min)}%;"
               ></div>
               <button
                 type="button"
@@ -329,7 +328,7 @@ export class PredictionRangeSlider extends LitElement {
                 data-max-value=${details.max}
                 data-min-inequality-sign=${details.minInequalitySign}
                 data-max-inequality-sign=${details.maxInequalitySign}
-                style="left:${details.min * 100}%; top:${(arr.length - i) *
+                style="left:${this._valueToPercent(details.min)}%; top:${(arr.length - i) *
                 20}px;"
                 @click=${this._handleThresholdButton}
               >
@@ -341,9 +340,24 @@ export class PredictionRangeSlider extends LitElement {
       </div>
 
       <div class="range-input">
-        ${createRangeInput('from', SLIDER_CONFIG.min)}
-        ${createRangeInput('to', SLIDER_CONFIG.max)}
+        ${createRangeInput('from', this.minValue)}
+        ${createRangeInput('to', this.maxValue)}
       </div>
     `;
+  }
+
+  /** CADD PHRED のように0-1以外のスコアでもバー位置を正しく出すため、値を%へ正規化する。 */
+  private _valueToPercent(value: number): number {
+    const width = this.scoreMax - this.scoreMin;
+    if (width <= 0) return 0;
+    return ((value - this.scoreMin) / width) * 100;
+  }
+
+  /** スコア範囲ごとの目盛り値を生成する。小数スコアとPHREDスコアの両方を読みやすく表示するため。 */
+  private _formatScaleValue(index: number): string {
+    const value =
+      this.scoreMin +
+      ((this.scoreMax - this.scoreMin) / SLIDER_CONFIG.numberOfScales) * index;
+    return this.scoreStep >= 1 ? String(Math.round(value)) : value.toFixed(1);
   }
 }

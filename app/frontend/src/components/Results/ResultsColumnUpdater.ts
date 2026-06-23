@@ -374,7 +374,7 @@ export class ResultsColumnUpdater {
         | ConsequenceMasterItem[]
         | undefined) ?? [];
     const uniqueConsequences = Array.from(
-      new Set(transcripts.flatMap((transcript) => transcript.consequence))
+      new Set(transcripts.flatMap((transcript) => transcript.consequence ?? []))
     );
 
     this.updateRemainsBadge(

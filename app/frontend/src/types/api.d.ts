@@ -135,7 +135,7 @@ export type ResultData = {
   alphamissense: number | null;
   cadd_phred?: number;
   sscv_db?: SscvDbItem[];
-  transcripts: Transcript[];
+  transcripts?: Transcript[];
   frequencies: Frequency[];
 };
 
@@ -209,7 +209,7 @@ export type Transcript = {
   symbol: { source: string; label: string };
   sift: number;
   transcript_id: string;
-  consequence: string[];
+  consequence?: string[];
   consequence_type: string;
   hgvs_p: string;
   hgvs_c: string;

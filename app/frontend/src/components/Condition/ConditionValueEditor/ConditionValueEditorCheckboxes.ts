@@ -5,9 +5,12 @@ import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';
 import type { ConditionItemValueView } from '../ConditionItemValueView';
 
+type CheckboxItem = Readonly<{ value: string; label: string }>;
+type CheckboxMaster = Readonly<{ values: readonly CheckboxItem[] }>;
+
 /**
  * フラット列挙型条件（Variant type など）向けのチェックボックスエディタ。
- * ADVANCED_CONDITIONS.type のフラット values をそのままチェックボックスとして描画し、
+ * ADVANCED_CONDITIONS[this.conditionType] のフラット values をそのままチェックボックスとして描画し、
  * condition-item-value-view と同期する。
  *
  * 前提:
@@ -28,9 +31,9 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
   ) {
     super(conditionValues, conditionView);
 
-    const master = ADVANCED_CONDITIONS.type;
-    if (!master) {
-      throw new Error('type condition not found');
+    const master = ADVANCED_CONDITIONS[this.conditionType];
+    if (!isCheckboxMaster(master)) {
+      throw new Error(`${this.conditionType} condition values not found`);
     }
 
     this.createSectionEl('checkboxes-editor-view', () => [
@@ -143,4 +146,21 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
 
     this.notifyValidity();
   }
+}
+
+/** フラットな values 配列を持つ条件だけをチェックボックスエディタで扱う。 */
+function isCheckboxMaster(value: unknown): value is CheckboxMaster {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'values' in value &&
+    Array.isArray(value.values) &&
+    value.values.every(
+      (item) =>
+        typeof item === 'object' &&
+        item !== null &&
+        typeof item.value === 'string' &&
+        typeof item.label === 'string'
+    )
+  );
 }

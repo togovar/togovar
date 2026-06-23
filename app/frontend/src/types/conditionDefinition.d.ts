@@ -180,6 +180,7 @@ type AdvancedConditionMap = Partial<
   location?: LocationCondition;
   pathogenicity_prediction?: PathogenicityPredictionCondition;
   significance?: SignificanceCondition;
+  sscv_db?: CheckboxesCondition;
   type?: CheckboxesCondition;
 };
 

@@ -78,8 +78,8 @@ export class PredictionValueView extends LitElement {
   }
 
   private _setBarStyles(): void {
-    this._bar.style.left = this._values[0] * 100 + '%';
-    this._bar.style.right = 100 - this._values[1] * 100 + '%';
+    this._bar.style.left = this._valueToPercent(this._values[0]) + '%';
+    this._bar.style.right = 100 - this._valueToPercent(this._values[1]) + '%';
     this._bar.style.backgroundImage = createGradientSlider(
       this._activeDataset,
       this._bar,
@@ -219,5 +219,13 @@ export class PredictionValueView extends LitElement {
       return !(this._includeUnassigned || this._includeUnknown);
     }
     return !this._includeUnassigned;
+  }
+
+  /** 0-1以外のスコア範囲でも表示バーを正しく配置するため、datasetごとの範囲で正規化する。 */
+  private _valueToPercent(value: number): number {
+    const prediction = PREDICTIONS[this._dataset];
+    const width = prediction.scoreMax - prediction.scoreMin;
+    if (width <= 0) return 0;
+    return ((value - prediction.scoreMin) / width) * 100;
   }
 }

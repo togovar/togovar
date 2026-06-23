@@ -8,6 +8,14 @@ interface ThresholdEntry {
   maxInequalitySign: Inequality;
 }
 export type Threshold = Record<string, ThresholdEntry>;
+type PredictionConfig = Readonly<{
+  label: string;
+  scoreMin: number;
+  scoreMax: number;
+  scoreStep: number;
+  unassignedLists: readonly ['unassigned'] | readonly ['unassigned', 'unknown'];
+  threshold: Threshold;
+}>;
 
 export const ALPHAMISSENSE_THRESHOLD = {
   'Likely benign': {
@@ -75,22 +83,39 @@ const POLYPHEN_THRESHOLD = {
 } as const satisfies Threshold;
 
 export const PREDICTIONS = {
+  cadd_phred: {
+    label: 'CADD PHRED',
+    scoreMin: 0,
+    scoreMax: 60,
+    scoreStep: 1,
+    unassignedLists: ['unassigned'],
+    threshold: {},
+  },
   alphamissense: {
     label: 'AlphaMissense',
+    scoreMin: 0,
+    scoreMax: 1,
+    scoreStep: 0.01,
     unassignedLists: ['unassigned'],
     threshold: ALPHAMISSENSE_THRESHOLD,
   },
   sift: {
     label: 'SIFT',
+    scoreMin: 0,
+    scoreMax: 1,
+    scoreStep: 0.01,
     unassignedLists: ['unassigned'],
     threshold: SIFT_THRESHOLD,
   },
   polyphen: {
     label: 'PolyPhen',
+    scoreMin: 0,
+    scoreMax: 1,
+    scoreStep: 0.01,
     unassignedLists: ['unassigned', 'unknown'],
     threshold: POLYPHEN_THRESHOLD,
   },
-} as const;
+} as const satisfies Record<string, PredictionConfig>;
 
 export type PredictionKey = keyof typeof PREDICTIONS;
 export type PredictionLabel =

@@ -31,6 +31,14 @@
           ]
         },
         {
+          "value": "bbj1k",
+          "label": "BBJ1K"
+        },
+        {
+          "value": "bbj2k",
+          "label": "BBJ2K"
+        },
+        {
           "value": "jga_wes",
           "label": "JGA-WES"
         },
@@ -2246,6 +2254,28 @@
     "pathogenicity_prediction": {
       "label": "Pathogenicity prediction",
       "type": "peculiar"
+    },
+    "sscv_db": {
+      "label": "SSCV DB",
+      "type": "enumeration",
+      "values": [
+        {
+          "value": "PEL",
+          "label": "Partial exon loss"
+        },
+        {
+          "value": "CEI",
+          "label": "Cryptic exon inclusion"
+        },
+        {
+          "value": "EE",
+          "label": "Exon extension"
+        },
+        {
+          "value": "A",
+          "label": "Ambiguous"
+        }
+      ]
     },
     "id": {
       "label": "Variant ID",

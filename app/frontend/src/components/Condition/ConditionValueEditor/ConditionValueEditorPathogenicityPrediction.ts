@@ -13,15 +13,21 @@ import type { PredictionValueView } from '../ConditionPathogenicityPredictionSea
 import type { Inequality, PredictionChangeDetail } from '../../../types';
 import type { TabView } from '../ConditionPathogenicityPredictionSearch/TabView';
 
+const DEFAULT_PREDICTION_KEY: PredictionKey = 'cadd_phred';
+const DEFAULT_PREDICTION = PREDICTIONS[DEFAULT_PREDICTION_KEY];
+
 /**
  * Pathogenicity prediction 条件のエディタ。
  * tab-view でデータセット（AlphaMissense/SIFT/PolyPhen 等）を切り替え、
  * スコア範囲と不等号を設定して prediction-value-view へ反映する。
  */
 export class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
-  private _dataset: PredictionKey = 'alphamissense';
-  private _label: PredictionLabel = 'AlphaMissense';
-  private _values: [number, number] = [0, 1];
+  private _dataset: PredictionKey = DEFAULT_PREDICTION_KEY;
+  private _label: PredictionLabel = DEFAULT_PREDICTION.label;
+  private _values: [number, number] = [
+    DEFAULT_PREDICTION.scoreMin,
+    DEFAULT_PREDICTION.scoreMax,
+  ];
   private _inequalitySigns: [Inequality, Inequality] = ['gte', 'lte'];
   private _includeUnassigned = false;
   private _includeUnknown = false;
@@ -34,9 +40,9 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
     includeUnassigned: boolean;
     includeUnknown: boolean;
   } = {
-    dataset: 'alphamissense',
-    label: 'AlphaMissense',
-    values: [0, 1],
+    dataset: DEFAULT_PREDICTION_KEY,
+    label: DEFAULT_PREDICTION.label,
+    values: [DEFAULT_PREDICTION.scoreMin, DEFAULT_PREDICTION.scoreMax],
     inequalitySigns: ['gte', 'lte'],
     includeUnassigned: false,
     includeUnknown: false,
@@ -119,9 +125,9 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
    * constructor が肥大化しないよう責務を分割するため。
    */
   private _initializeDefaultValues() {
-    this._dataset = 'alphamissense';
-    this._label = 'AlphaMissense';
-    this._values = [0, 1];
+    this._dataset = DEFAULT_PREDICTION_KEY;
+    this._label = DEFAULT_PREDICTION.label;
+    this._values = [DEFAULT_PREDICTION.scoreMin, DEFAULT_PREDICTION.scoreMax];
     this._inequalitySigns = ['gte', 'lte'];
     this._includeUnassigned = false;
     this._includeUnknown = false;

@@ -89,8 +89,11 @@ export class TabView extends LitElement {
               id=${key}
               aria-labelledby=${`tab-${key}`}
               .predictionScoreName=${key}
-              .minValue=${0}
-              .maxValue=${1}
+              .scoreMin=${details.scoreMin}
+              .scoreMax=${details.scoreMax}
+              .scoreStep=${details.scoreStep}
+              .minValue=${details.scoreMin}
+              .maxValue=${details.scoreMax}
               .minInequalitySign=${'gte'}
               .maxInequalitySign=${'lte'}
               .activeDataset=${details.threshold}

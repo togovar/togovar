@@ -22,6 +22,7 @@ const EDITOR_REGISTRY: Readonly<
   Partial<Record<AdvancedConditionTypeValue, EditorCtor[]>>
 > = {
   [ADVANCED_CONDITION_TYPE.variant_type]: [ConditionValueEditorCheckboxes],
+  [ADVANCED_CONDITION_TYPE.sscv_db]: [ConditionValueEditorCheckboxes],
   [ADVANCED_CONDITION_TYPE.clinical_significance]: [ConditionValueEditorClinicalSignificance],
   [ADVANCED_CONDITION_TYPE.variant_consequence]: [ConditionValueEditorConsequence],
   [ADVANCED_CONDITION_TYPE.dataset]: [

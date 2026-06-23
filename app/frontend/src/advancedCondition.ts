@@ -14,7 +14,6 @@ export const ADVANCED_CONDITION_TYPE = {
   clinical_significance: 'significance',
   sscv_db: 'sscv_db',
   pathogenicity_prediction: 'pathogenicity_prediction',
-  cadd_phred: 'cadd_phred',
   gene_symbol: 'gene',
   disease: 'disease',
 } as const;

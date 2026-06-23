@@ -204,11 +204,16 @@ function _toRestoredPredictionValue(
   dataset: PredictionKey,
   score: unknown
 ): RestoredPredictionValue | null {
+  const prediction = PREDICTIONS[dataset];
+
   // scoreがオブジェクト: rangeモード（gte/gt + lte/lt の数値指定）
   if (isQueryObject(score)) {
     return {
       dataset,
-      values: [getRangeStart(score) ?? 0, getRangeEnd(score) ?? 1],
+      values: [
+        getRangeStart(score) ?? prediction.scoreMin,
+        getRangeEnd(score) ?? prediction.scoreMax,
+      ],
       inequalitySigns: [_getLeftInequality(score), _getRightInequality(score)],
       includeUnassigned: false,
       includeUnknown: false,
@@ -219,7 +224,7 @@ function _toRestoredPredictionValue(
   if (Array.isArray(score)) {
     return {
       dataset,
-      values: [0, 0],
+      values: [prediction.scoreMin, prediction.scoreMin],
       inequalitySigns: ['gt', 'lt'],
       includeUnassigned: score.includes('unassigned'),
       includeUnknown: score.includes('unknown'),

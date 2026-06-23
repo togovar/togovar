@@ -51,7 +51,8 @@ export default class PanelViewPreviewConsequence extends PanelView {
     if (storeManager.getData('selectedRow') === undefined) return;
 
     const record = storeManager.getSelectedRecord();
-    if (!record || record.transcripts.length === 0) return;
+    const transcripts = record?.transcripts ?? [];
+    if (transcripts.length === 0) return;
 
     const master = getSimpleSearchConditionMaster('consequence');
     if (!master || !master.items) return;
@@ -59,7 +60,7 @@ export default class PanelViewPreviewConsequence extends PanelView {
 
     // 全 Transcript の consequence 配列を展開して重複を除去する
     const accessions = Array.from(
-      new Set(record.transcripts.flatMap((t) => t.consequence))
+      new Set(transcripts.flatMap((t) => t.consequence ?? []))
     );
 
     // アクセッションに対応するマスターアイテムを取得し、未定義のものを除去する
