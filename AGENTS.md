@@ -136,6 +136,7 @@ app/frontend/
 - `undefined` は「条件なし」を表すセンチネル値であり、`{}` は使わない。
 - Store/API層（`store/`, `Karyotype.ts` など）から `ConditionQuery` を参照するときは `types/query.d.ts` を直接 import する。`types/conditionBuilder.d.ts` は参照しない。
 - `GeneLeaf.gene.labels` はURL復元用のUIメタ情報。API送信前に `stripAdvancedSearchMetadata()` で除去する。
+- `app/frontend/src/definition.ts` は Advanced Search のクエリ型で使う共有定数を置く場所。`FREQUENCY_DATASETS` は `FrequencyDataset` 型の元になるため、`advanced_search_conditions.json` の dataset 条件に検索可能datasetを追加した場合は、同じ値をここにも追加する。Simple Search の `search_conditions.json` だけを変える場合は、通常 `definition.ts` の更新は不要。
 
 ## TypeScript / JavaScript 方針
 

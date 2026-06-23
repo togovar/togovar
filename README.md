@@ -251,6 +251,11 @@ app/frontend/assets/GRCh37/search_conditions.json
 app/frontend/assets/GRCh38/search_conditions.json
 ```
 
+Advanced Search の一部の選択肢は、TypeScript のクエリ型でも扱います。
+`app/frontend/src/definition.ts` の `FREQUENCY_DATASETS` は dataset 条件で使える値の型定義元です。
+`advanced_search_conditions.json` に dataset を追加した場合は、必要に応じて `definition.ts` も更新します。
+Simple Search の `search_conditions.json` だけを変更する場合は、通常 `definition.ts` の更新は不要です。
+
 ## API通信
 
 検索とダウンロードは TogoVar API にリクエストします。
