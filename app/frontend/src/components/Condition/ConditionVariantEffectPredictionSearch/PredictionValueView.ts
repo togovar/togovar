@@ -58,7 +58,12 @@ export class PredictionValueView extends LitElement {
     includeUnknown: boolean // for polyphen
   ): void {
     this._dataset = dataset;
-    this._values = values;
+    // 範囲外の値をクランプすることで表示数値とクエリの両方が scoreMin〜scoreMax に収まるようにするため
+    const { scoreMin, scoreMax } = PREDICTIONS[dataset];
+    this._values = [
+      Math.max(scoreMin, Math.min(scoreMax, values[0])),
+      Math.max(scoreMin, Math.min(scoreMax, values[1])),
+    ];
     this._inequalitySigns = inequalitySigns;
     this._includeUnassigned = includeUnassigned;
     this._includeUnknown = includeUnknown; // for polyphen
@@ -224,11 +229,18 @@ export class PredictionValueView extends LitElement {
     return !this._includeUnassigned;
   }
 
-  /** 0-1以外のスコア範囲でも表示バーを正しく配置するため、datasetごとの範囲で正規化する。 */
+  /**
+   * 0-1以外のスコア範囲でも表示バーを正しく配置するため、datasetごとの範囲で正規化する。
+   * 範囲外の値もクランプすることでバーがグラフ外にはみ出ないようにするため。
+   */
   private _valueToPercent(value: number): number {
     const prediction = PREDICTIONS[this._dataset];
     const width = prediction.scoreMax - prediction.scoreMin;
     if (width <= 0) return 0;
-    return ((value - prediction.scoreMin) / width) * 100;
+    const clamped = Math.max(
+      prediction.scoreMin,
+      Math.min(prediction.scoreMax, value)
+    );
+    return ((clamped - prediction.scoreMin) / width) * 100;
   }
 }

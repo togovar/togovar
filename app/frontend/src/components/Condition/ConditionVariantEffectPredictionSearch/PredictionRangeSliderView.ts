@@ -130,15 +130,25 @@ export class PredictionRangeSlider extends LitElement {
   }
 
   /**
-   * number input からフォーカスが外れたとき、空欄なら下限・上限値に補完してスライダーと同期する。
-   * 入力途中の空欄状態を許容しつつ、最終的に NaN がバー位置やクエリに残らないようにするため。
+   * number input からフォーカスが外れたとき、空欄または範囲外なら有効な境界値に補完してスライダーと同期する。
+   * 入力途中の暫定値を許容しつつ、最終的に NaN や範囲外の値がバー位置やクエリに残らないようにするため。
    */
   private handleNumberInputBlur = (e: Event) => {
     const input = e.currentTarget as HTMLInputElement;
-    if (!isNaN(parseFloat(input.value))) return;
-    input.value = String(
-      input.className === 'from' ? this.scoreMin : this.scoreMax
-    );
+    const value = parseFloat(input.value);
+    const isFrom = input.className === 'from';
+
+    let corrected: number | null = null;
+    if (isNaN(value)) {
+      corrected = isFrom ? this.scoreMin : this.scoreMax;
+    } else if (value < this.scoreMin) {
+      corrected = this.scoreMin;
+    } else if (value > this.scoreMax) {
+      corrected = this.scoreMax;
+    }
+
+    if (corrected === null) return;
+    input.value = String(corrected);
     input.dispatchEvent(new Event('input'));
   };
 
@@ -372,11 +382,15 @@ export class PredictionRangeSlider extends LitElement {
     `;
   }
 
-  /** CADD PHRED のように0-1以外のスコアでもバー位置を正しく出すため、値を%へ正規化する。 */
+  /**
+   * CADD PHRED のように0-1以外のスコアでもバー位置を正しく出すため、値を%へ正規化する。
+   * 範囲外の値もクランプすることでバーがスライダー外にはみ出ないようにするため。
+   */
   private valueToPercent(value: number): number {
     const width = this.scoreMax - this.scoreMin;
     if (width <= 0) return 0;
-    return ((value - this.scoreMin) / width) * 100;
+    const clamped = Math.max(this.scoreMin, Math.min(this.scoreMax, value));
+    return ((clamped - this.scoreMin) / width) * 100;
   }
 
   /**
