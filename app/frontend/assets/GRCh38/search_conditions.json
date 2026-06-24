@@ -186,7 +186,7 @@
       },
       {
         "id": "SO_1000002",
-        "label": "Substitution",
+        "label": "MNV",
         "type": "boolean",
         "default": "1"
       },

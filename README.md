@@ -181,16 +181,16 @@ npm run typecheck
 - `npm run typecheck` は TypeScript の型チェックのみを実行します（ビルドは行いません）。
 - 環境によって `node` / `npm` が PATH に無い場合があります。その場合は Node.js 22.x を有効化してください。
 
-### Consequence データの整合性チェック
+### API 仕様との整合性チェック
 
-`search_conditions.json`・`advanced_search_conditions.json` の consequence 定義を変更した場合、または TogoVar API の仕様が更新された場合は、以下を実行してください。
+`search_conditions.json`・`advanced_search_conditions.json` の consequence または type 定義を変更した場合、または TogoVar API の仕様が更新された場合は、以下を実行してください。
 
 ```bash
-python3 scripts/check_consequence.py              # GRCh38（デフォルト）
-python3 scripts/check_consequence.py --build GRCh37
+python3 scripts/check_conditions.py              # GRCh38（デフォルト）
+python3 scripts/check_conditions.py --build GRCh37
 ```
 
-`scripts/GRCh38/openapi.yaml`（TogoVar API の Swagger 仕様）から consequence term を自動抽出し、`search_conditions.json` と `advanced_search_conditions.json` の両方と整合性を検証します。API 仕様が変わった場合は `openapi.yaml` を差し替えてからこのスクリプトを実行してください。Python 3 標準ライブラリのみで動作します（追加インストール不要）。
+`scripts/GRCh38/openapi.yaml`（TogoVar API の Swagger 仕様）から consequence・type の両 term を自動抽出し、`search_conditions.json` と `advanced_search_conditions.json` の両方と整合性を検証します。API 仕様が変わった場合は `openapi.yaml` を差し替えてからこのスクリプトを実行してください。Python 3 標準ライブラリのみで動作します（追加インストール不要）。
 
 ## Advanced Search
 
