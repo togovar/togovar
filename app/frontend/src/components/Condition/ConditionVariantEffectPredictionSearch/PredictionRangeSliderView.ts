@@ -13,10 +13,7 @@ import type {
 } from '../../../types';
 import Styles from '../../../../stylesheets/web-components/prediction-range-slider.scss';
 
-const SLIDER_CONFIG = {
-  numberOfScales: 10,
-  sliderWidth: 247.5,
-} as const;
+const SLIDER_WIDTH = 247.5;
 
 /** Class to create a PredictionRangeSlider */
 @customElement('prediction-range-slider')
@@ -36,6 +33,9 @@ export class PredictionRangeSlider extends LitElement {
   @property({ type: Number }) scoreMin = 0;
   @property({ type: Number }) scoreMax = 1;
   @property({ type: Number }) scoreStep = 0.01;
+  @property({ type: Number }) numberOfScales = 10;
+  @property({ type: String }) scoreLabel = 'Prediction score';
+  @property({ type: Boolean }) showThreshold = true;
 
   @property({
     type: String,
@@ -83,7 +83,9 @@ export class PredictionRangeSlider extends LitElement {
     this._range.style.backgroundImage = createGradientSlider(
       this.activeDataset,
       this._range,
-      SLIDER_CONFIG.sliderWidth
+      SLIDER_WIDTH,
+      this.scoreMin,
+      this.scoreMax
     );
   }
 
@@ -149,7 +151,9 @@ export class PredictionRangeSlider extends LitElement {
     this._range.style.backgroundImage = createGradientSlider(
       this.activeDataset,
       this._range,
-      SLIDER_CONFIG.sliderWidth
+      SLIDER_WIDTH,
+      this.scoreMin,
+      this.scoreMax
     );
     [this.minValue, this.maxValue] = [minValue, maxValue];
   }
@@ -178,7 +182,9 @@ export class PredictionRangeSlider extends LitElement {
     this._range.style.backgroundImage = createGradientSlider(
       this.activeDataset,
       this._range,
-      SLIDER_CONFIG.sliderWidth
+      SLIDER_WIDTH,
+      this.scoreMin,
+      this.scoreMax
     );
 
     this.minValue = minValue;
@@ -291,7 +297,7 @@ export class PredictionRangeSlider extends LitElement {
       <div class="number-input">
         ${createNumberInput('from', 'Lower limit', this.minValue)}
         ${createInequalitySignButton('gte')}
-        <span>Prediction score</span>
+        <span>${this.scoreLabel}</span>
         ${createInequalitySignButton('lte')}
         ${createNumberInput('to', 'Upper limit', this.maxValue)}
         ${createLabelCheckboxes()}
@@ -301,12 +307,11 @@ export class PredictionRangeSlider extends LitElement {
         <div class="bar"></div>
         <ul class="ruler">
           ${map(
-            range(SLIDER_CONFIG.numberOfScales + 1),
+            range(this.numberOfScales + 1),
             (i) =>
               html`<li
                 class="scale"
-                style="left: calc(${(i * 100) /
-                SLIDER_CONFIG.numberOfScales}% - 0.3rem)"
+                style="left: calc(${(i * 100) / this.numberOfScales}% - 0.3rem)"
               >
                 ${this._formatScaleValue(i)}
               </li>`
@@ -314,28 +319,31 @@ export class PredictionRangeSlider extends LitElement {
         </ul>
 
         <div class="threshold">
-          ${Object.entries(this.activeDataset).map(
-            ([key, details], i, arr) => html`
-              <div
-                class="threshold-line"
-                style="height:${(arr.length - i) * 20 +
-                10}px; left:${this._valueToPercent(details.min)}%;"
-              ></div>
-              <button
-                type="button"
-                class="threshold-button"
-                data-min-value=${details.min}
-                data-max-value=${details.max}
-                data-min-inequality-sign=${details.minInequalitySign}
-                data-max-inequality-sign=${details.maxInequalitySign}
-                style="left:${this._valueToPercent(details.min)}%; top:${(arr.length - i) *
-                20}px;"
-                @click=${this._handleThresholdButton}
-              >
-                ${key}
-              </button>
-            `
-          )}
+          ${this.showThreshold
+            ? Object.entries(this.activeDataset).map(
+                ([key, details], i, arr) => html`
+                  <div
+                    class="threshold-line"
+                    style="height:${(arr.length - i) * 20 +
+                    10}px; left:${this._valueToPercent(details.min)}%;"
+                  ></div>
+                  <button
+                    type="button"
+                    class="threshold-button"
+                    data-min-value=${details.min}
+                    data-max-value=${details.max}
+                    data-min-inequality-sign=${details.minInequalitySign}
+                    data-max-inequality-sign=${details.maxInequalitySign}
+                    style="left:${this._valueToPercent(
+                      details.min
+                    )}%; top:${(arr.length - i) * 20}px;"
+                    @click=${this._handleThresholdButton}
+                  >
+                    ${key}
+                  </button>
+                `
+              )
+            : ''}
         </div>
       </div>
 
@@ -357,7 +365,7 @@ export class PredictionRangeSlider extends LitElement {
   private _formatScaleValue(index: number): string {
     const value =
       this.scoreMin +
-      ((this.scoreMax - this.scoreMin) / SLIDER_CONFIG.numberOfScales) * index;
-    return this.scoreStep >= 1 ? String(Math.round(value)) : value.toFixed(1);
+      ((this.scoreMax - this.scoreMin) / this.numberOfScales) * index;
+    return Number.isInteger(value) ? String(value) : value.toFixed(1);
   }
 }

@@ -148,7 +148,7 @@ export class ConditionValueEditorVariantEffectPrediction extends ConditionValueE
   private _initializeUI() {
     this.createSectionEl(
       'variant-effect-prediction-editor-view',
-      `<header class="section-header">Select prediction</header><div class="section-content"></div>`
+      `<header class="section-header">Select score</header><div class="section-content"></div>`
     );
     this._tabsContainer =
       this.sectionEl.querySelector<HTMLDivElement>('.section-content')!;

@@ -92,6 +92,9 @@ export class TabView extends LitElement {
               .scoreMin=${details.scoreMin}
               .scoreMax=${details.scoreMax}
               .scoreStep=${details.scoreStep}
+              .numberOfScales=${details.numberOfScales}
+              .scoreLabel=${details.scoreLabel}
+              .showThreshold=${details.showThreshold}
               .minValue=${details.scoreMin}
               .maxValue=${details.scoreMax}
               .minInequalitySign=${'gte'}

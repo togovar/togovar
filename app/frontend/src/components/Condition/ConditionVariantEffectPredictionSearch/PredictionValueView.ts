@@ -80,10 +80,13 @@ export class PredictionValueView extends LitElement {
   private _setBarStyles(): void {
     this._bar.style.left = this._valueToPercent(this._values[0]) + '%';
     this._bar.style.right = 100 - this._valueToPercent(this._values[1]) + '%';
+    const prediction = PREDICTIONS[this._dataset];
     this._bar.style.backgroundImage = createGradientSlider(
       this._activeDataset,
       this._bar,
-      SLIDER_CONFIG.sliderWidth
+      SLIDER_CONFIG.sliderWidth,
+      prediction.scoreMin,
+      prediction.scoreMax
     );
   }
 
@@ -108,7 +111,7 @@ export class PredictionValueView extends LitElement {
       <div class="range">
         <span class="from">${this._values[0]}</span>
         <span class="inequality-sign" data-inequality-sign="gte">&#8804;</span>
-        <span class="text">Prediction score</span>
+        <span class="text">${PREDICTIONS[this._dataset].scoreLabel}</span>
         <span class="inequality-sign" data-inequality-sign="lte">&#8804;</span>
         <span class="to">${this._values[1]}</span>
         <span class="text">

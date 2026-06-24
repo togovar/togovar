@@ -585,15 +585,15 @@ export class ResultsColumnUpdater {
 
   /**
    * CADDスコア（Phred）を更新する。
-   * 閾値: phred ≥30 → 'D'（高病原性）、20–29 → 'POSSD'（中程度）、<20 → 'T'（低リスク）
+   * 閾値はスライダーの色区分と合わせている: ≥20 → 'D'（赤）、≥10 → 'POSSD'（橙）、<10 → 'T'（緑）
    *
    * @param element - 更新対象のdiv要素
    * @param score - CADD phredスコア
    */
   static updateCadd(element: HTMLDivElement | null, score: number | undefined) {
     this.updateFunctionPrediction(element, score ?? null, (s) => {
-      if (s >= 30) return 'D';
-      if (s >= 20) return 'POSSD';
+      if (s >= 20) return 'D';
+      if (s >= 10) return 'POSSD';
       return 'T';
     });
   }
