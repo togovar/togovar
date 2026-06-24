@@ -27,6 +27,14 @@
             {
               "value": "jga_wgs.jgad000689",
               "label": "Normal tissues from gastrointestinal chronic inflammatory (JGAD000689)"
+            },
+            {
+              "value": "jga_wgs.jgad000758",
+              "label": "WGS for 1,026 individuals from BioBank Japan (JGAD000758)"
+            },
+            {
+              "value": "jga_wgs.jgad000868",
+              "label": "WGS for 1,964 individuals from BioBank Japan (JGAD000868)"
             }
           ]
         },
@@ -1490,6 +1498,14 @@
             {
               "value": "jga_wgs.jgad000689",
               "label": "Normal tissues from gastrointestinal chronic inflammatory (JGAD000689)"
+            },
+            {
+              "value": "jga_wgs.jgad000758",
+              "label": "WGS for 1,026 individuals from BioBank Japan (JGAD000758)"
+            },
+            {
+              "value": "jga_wgs.jgad000868",
+              "label": "WGS for 1,964 individuals from BioBank Japan (JGAD000868)"
             }
           ]
         },

@@ -7,17 +7,25 @@ scripts/<BUILD>/openapi.yaml（Swagger仕様）から以下を自動抽出し、
 
   - VariantConsequence.consequence.terms.enum → consequence チェック
   - VariantType.type.terms.enum              → type チェック
+  - ClinicalSignificance.terms.enum          → significance チェック
+  - SSCVDB.terms.enum                        → sscv_db チェック
+  - Dataset.name.enum                        → dataset / genotype チェック
 
 使い方:
-  python3 scripts/check_consequence.py              # GRCh38（デフォルト）
-  python3 scripts/check_consequence.py --build GRCh37
+  python3 scripts/check_conditions.py              # GRCh38（デフォルト）
+  python3 scripts/check_conditions.py --build GRCh37
 
 対象ファイル（GRCh38 の場合）:
   scripts/GRCh38/openapi.yaml
   app/frontend/assets/GRCh38/search_conditions.json
   app/frontend/assets/GRCh38/advanced_search_conditions.json
 
-仕様が更新されたら scripts/<BUILD>/openapi.yaml を差し替えるだけでよい。
+制約:
+  - dataset の表示ラベルおよびツリー構造（親子関係）は仕様に含まれないため手動管理。
+  - significance.mgend は clinvar のサブセット（仕様未定義）のため余分チェックのみ。
+  - genotype はデータセットのサブセットのため余分チェックのみ。
+
+仕様が更新されたら scripts/<BUILD>/openapi.yaml を差し替えて本スクリプトを実行すること。
 """
 
 import argparse
@@ -232,6 +240,165 @@ def check_type_asc(asc_path: Path, spec_labels: set[str]) -> list[str]:
 
 
 # ──────────────────────────────────────────────────
+# ClinicalSignificance チェック
+# ──────────────────────────────────────────────────
+
+def load_significance_terms(yaml_path: Path) -> set[str]:
+    """
+    openapi.yaml の ClinicalSignificance.terms.enum から短縮キー（大文字のみ）を抽出する。
+    enum は短縮キーと snake_case が交互に並ぶ（NA/not_available, P/pathogenic …）。
+    大文字アルファベットのみの値が短縮キー。
+    """
+    text = yaml_path.read_text()
+    match = re.search(
+        r'ClinicalSignificance:.*?(?=\n    [A-Z][A-Za-z]+:|\Z)',
+        text,
+        re.DOTALL,
+    )
+    if not match:
+        sys.exit(f"ERROR: {yaml_path} に ClinicalSignificance が見つかりません")
+
+    values = re.findall(r'^\s+-\s+(\S+)', match.group(0), re.MULTILINE)
+    keys = {v for v in values if re.match(r'^[A-Z]+$', v)}
+    if not keys:
+        sys.exit(f"ERROR: {yaml_path} の ClinicalSignificance から terms を抽出できませんでした")
+    return keys
+
+
+def check_significance_asc(asc_path: Path, spec_clinvar_keys: set[str]) -> list[str]:
+    """
+    advanced_search_conditions.json の significance.values.clinvar を仕様と完全照合する。
+    mgend は clinvar のサブセット（仕様未定義）のため、仕様外の値のみチェックする。
+    """
+    errors = []
+    data = json.loads(asc_path.read_text())
+    sig_values = data.get("conditions", {}).get("significance", {}).get("values", {})
+
+    clinvar = sig_values.get("clinvar", [])
+    if not clinvar:
+        return [f"[{asc_path.name}] significance.values.clinvar が見つからない"]
+    json_clinvar = {item["value"] for item in clinvar if "value" in item}
+    for m in sorted(spec_clinvar_keys - json_clinvar):
+        errors.append(f"[{asc_path.name}] significance.values.clinvar に不足: {m}")
+    for e in sorted(json_clinvar - spec_clinvar_keys):
+        errors.append(f"[{asc_path.name}] significance.values.clinvar に余分: {e}")
+
+    mgend = sig_values.get("mgend", [])
+    json_mgend = {item["value"] for item in mgend if "value" in item}
+    for e in sorted(json_mgend - spec_clinvar_keys):
+        errors.append(f"[{asc_path.name}] significance.values.mgend に仕様外の値: {e}")
+
+    return errors
+
+
+# ──────────────────────────────────────────────────
+# SSCV DB チェック
+# ──────────────────────────────────────────────────
+
+def load_sscvdb_terms(yaml_path: Path) -> set[str]:
+    """
+    openapi.yaml の SSCVDB.terms.enum から短縮キー（大文字のみ）を抽出する。
+    """
+    text = yaml_path.read_text()
+    match = re.search(
+        r'SSCVDB:.*?(?=\n    [A-Z][A-Za-z]+:|\Z)',
+        text,
+        re.DOTALL,
+    )
+    if not match:
+        sys.exit(f"ERROR: {yaml_path} に SSCVDB が見つかりません")
+
+    values = re.findall(r'^\s+-\s+(\S+)', match.group(0), re.MULTILINE)
+    keys = {v for v in values if re.match(r'^[A-Z]+$', v)}
+    if not keys:
+        sys.exit(f"ERROR: {yaml_path} の SSCVDB から terms を抽出できませんでした")
+    return keys
+
+
+def check_sscvdb_asc(asc_path: Path, spec_keys: set[str]) -> list[str]:
+    """
+    advanced_search_conditions.json の sscv_db.values を仕様と照合する。
+    """
+    errors = []
+    data = json.loads(asc_path.read_text())
+    values = data.get("conditions", {}).get("sscv_db", {}).get("values", [])
+    if not values:
+        return [f"[{asc_path.name}] sscv_db.values が見つからない"]
+
+    json_keys = {item["value"] for item in values if "value" in item}
+    for m in sorted(spec_keys - json_keys):
+        errors.append(f"[{asc_path.name}] sscv_db.values に不足: {m}")
+    for e in sorted(json_keys - spec_keys):
+        errors.append(f"[{asc_path.name}] sscv_db.values に余分: {e}")
+
+    return errors
+
+
+# ──────────────────────────────────────────────────
+# Dataset / Genotype チェック
+# ──────────────────────────────────────────────────
+
+def load_dataset_names(yaml_path: Path) -> set[str]:
+    """
+    openapi.yaml の Dataset.name.enum からデータセット名を抽出する。
+    enum 値は 12 スペースインデント。required の '- name' は 8 スペースのため除外される。
+    """
+    text = yaml_path.read_text()
+    match = re.search(
+        r'\n    Dataset:.*?(?=\n    [A-Z][A-Za-z]+:|\Z)',
+        text,
+        re.DOTALL,
+    )
+    if not match:
+        sys.exit(f"ERROR: {yaml_path} に Dataset が見つかりません")
+
+    names = re.findall(r'^ {12,}-\s+(\S+)', match.group(0), re.MULTILINE)
+    if not names:
+        sys.exit(f"ERROR: {yaml_path} の Dataset から enum を抽出できませんでした")
+    return set(names)
+
+
+def _collect_values_recursive(items: list) -> set[str]:
+    """ネストした値ツリーから 'value' フィールドを再帰的に収集する。"""
+    result = set()
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        if "value" in item:
+            result.add(item["value"])
+        if "children" in item:
+            result |= _collect_values_recursive(item["children"])
+    return result
+
+
+def check_dataset_condition_asc(
+    asc_path: Path,
+    spec_datasets: set[str],
+    condition_key: str,
+    check_missing: bool = True,
+) -> list[str]:
+    """
+    advanced_search_conditions.json の dataset または genotype の全 value を仕様と照合する。
+    check_missing=False のときは余分チェックのみ（genotype はサブセットのため）。
+    """
+    errors = []
+    data = json.loads(asc_path.read_text())
+    items = data.get("conditions", {}).get(condition_key, {}).get("values", [])
+    if not items:
+        return [f"[{asc_path.name}] {condition_key}.values が見つからない"]
+
+    json_datasets = _collect_values_recursive(items)
+
+    if check_missing:
+        for m in sorted(spec_datasets - json_datasets):
+            errors.append(f"[{asc_path.name}] {condition_key}.values に不足: {m}")
+    for e in sorted(json_datasets - spec_datasets):
+        errors.append(f"[{asc_path.name}] {condition_key}.values に仕様外の値: {e}")
+
+    return errors
+
+
+# ──────────────────────────────────────────────────
 # メイン
 # ──────────────────────────────────────────────────
 
@@ -247,19 +414,37 @@ def main():
     consequence_terms = load_consequence_terms(yaml_path)
     consequence_so_ids = {so for so, _ in consequence_terms}
     consequence_snakes = {snake for _, snake in consequence_terms}
-    print(f"VariantConsequence: {len(consequence_terms)} 件の term を読み込みました")
+    print(f"VariantConsequence:   {len(consequence_terms)} 件の term を読み込みました")
 
     # Variant Type
     type_terms = load_variant_type_terms(yaml_path)
     type_so_ids = {so for so, _ in type_terms}
     type_labels = {label for _, label in type_terms}
-    print(f"VariantType:        {len(type_terms)} 件の term を読み込みました\n")
+    print(f"VariantType:          {len(type_terms)} 件の term を読み込みました")
+
+    # Clinical Significance
+    significance_keys = load_significance_terms(yaml_path)
+    print(f"ClinicalSignificance: {len(significance_keys)} 件の term を読み込みました")
+
+    # SSCV DB
+    sscvdb_keys = load_sscvdb_terms(yaml_path)
+    print(f"SSCVDB:               {len(sscvdb_keys)} 件の term を読み込みました")
+
+    # Dataset
+    dataset_names = load_dataset_names(yaml_path)
+    print(f"Dataset:              {len(dataset_names)} 件のデータセット名を読み込みました\n")
 
     errors = []
     errors += check_consequence_sc(sc_path, consequence_so_ids)
     errors += check_consequence_asc(asc_path, consequence_snakes)
     errors += check_type_sc(sc_path, type_so_ids)
     errors += check_type_asc(asc_path, type_labels)
+    errors += check_significance_asc(asc_path, significance_keys)
+    errors += check_sscvdb_asc(asc_path, sscvdb_keys)
+    # dataset: 完全一致チェック（不足・余分の両方）
+    errors += check_dataset_condition_asc(asc_path, dataset_names, "dataset", check_missing=True)
+    # genotype: サブセットのため余分チェックのみ
+    errors += check_dataset_condition_asc(asc_path, dataset_names, "genotype", check_missing=False)
 
     if errors:
         print("❌ エラーが見つかりました:\n")
@@ -268,8 +453,14 @@ def main():
         print(f"\n合計: {len(errors)} 件")
         sys.exit(1)
     else:
-        total = len(consequence_terms) + len(type_terms)
-        print(f"✅ 問題なし — consequence {len(consequence_terms)} 件 + type {len(type_terms)} 件、すべて整合しています")
+        print(
+            f"✅ 問題なし — "
+            f"consequence {len(consequence_terms)} 件 + "
+            f"type {len(type_terms)} 件 + "
+            f"significance {len(significance_keys)} 件 + "
+            f"sscv_db {len(sscvdb_keys)} 件 + "
+            f"dataset {len(dataset_names)} 件、すべて整合しています"
+        )
         sys.exit(0)
 
 
