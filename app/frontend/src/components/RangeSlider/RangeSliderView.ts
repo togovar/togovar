@@ -57,6 +57,8 @@ export class RangeSlider extends LitElement {
    * firstUpdated() 後にセットして DOM アクセスを保護する。
    */
   private _domReady = false;
+  /** willUpdate() での初期化を1回だけ行うためのフラグ。 */
+  private _stateInitialized = false;
 
   @query('#slider-1') private slider1!: HTMLInputElement;
   @query('#slider-2') private slider2!: HTMLInputElement;
@@ -464,11 +466,34 @@ export class RangeSlider extends LitElement {
     this.dispatchEvent(event);
   }
 
-  /** DOM構築完了後に属性から初期状態を確定し、入力イベントを登録して初期描画を行う。 */
+  /**
+   * 最初のレンダー前に1回だけ _state と _rulerScales を確定する。
+   * firstUpdated() より前に呼ばれるため、@query DOM 参照は使えない。
+   * ここで状態を確定することで firstUpdated() での requestUpdate() 呼び出しをなくし、
+   * Lit の「更新完了後に再更新をスケジュール」警告を解消する。
+   */
+  protected override willUpdate(): void {
+    if (this._stateInitialized) return;
+    this._stateInitialized = true;
+    this._initStateFromAttributes();
+    this._rulerScales = createRulerScales(
+      this._state.min,
+      this._state.max,
+      this._state.rulerNumberOfSteps,
+      this.orientation
+    );
+  }
+
+  /**
+   * DOM構築完了後に @query 依存の初期化だけを行う。
+   * willUpdate() で状態確定済みのため requestUpdate() は不要。
+   */
   protected override firstUpdated(): void {
     this._domReady = true;
-    this._initStateFromAttributes();
-    this._initUI();
+    this._syncInputsFromState();
+    this.invertChk.checked = this._state.invert;
+    this._toggleOrientation(this.orientation ?? DEFAULT_ORIENTATION);
+    this._fireEvent();
   }
 
   /** 属性から内部状態を初期化する。DOM操作を含まず、状態確定だけを行う。 */

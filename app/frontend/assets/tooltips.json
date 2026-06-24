@@ -28,15 +28,21 @@
     "content": "Frequency indicator representing alternate allele frequencies",
     "url": "/doc/help#s1"
   },
-  {
-    "id": "variant-frequency",
-    "content": "Why do allele frequencies differ between datasets within the Japanese ancestral group?",
-    "url": "/doc/help#d9"
-  },
+
   {
     "id": "table-header-consequence",
     "content": "Variant consequence detected by Variant Effect Predictor (VEP)",
     "url": "/doc/help#d5"
+  },
+  {
+    "id": "table-header-cadd",
+    "content": "CADD (Combined Annotation Dependent Depletion) phred-scaled score for predicting the deleteriousness of a variant",
+    "url": "/doc/help#d6"
+  },
+  {
+    "id": "table-header-alphamissense",
+    "content": "Prediction of functional effects of a nonsynonymous variant by the AlphaMissense program.",
+    "url": "/doc/help#d6"
   },
   {
     "id": "table-header-sift",
@@ -49,13 +55,17 @@
     "url": "/doc/help#d6"
   },
   {
-    "id": "table-header-alphamissense",
-    "content": "Prediction of functional effects of a nonsynonymous variant by the AlphaMissense program.",
-    "url": "/doc/help#d6"
+    "id": "table-header-splicingvariant",
+    "content": "Prediction of splicing effects of a variant by the SSCV DB (Splicing Site Creation Variant Database)"
   },
   {
     "id": "table-header-clinical_significance",
     "content": "Clinical significance provided by ClinVar",
     "url": "/doc/help#d7"
+  },
+  {
+    "id": "variant-frequency",
+    "content": "Why do allele frequencies differ between datasets within the Japanese ancestral group?",
+    "url": "/doc/help#d9"
   }
 ]

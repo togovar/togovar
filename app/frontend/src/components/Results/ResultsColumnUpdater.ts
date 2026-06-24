@@ -648,11 +648,11 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * スプライシング予測（SSCVDB）列を更新する。
+   * スプライシング予測（SSCV DB）列を更新する。
    * 1バリアントに複数エントリが返るケースはほぼないため先頭の predicted_splicing_type のみ表示する。
    *
    * @param element - 予測タイプ表示div要素
-   * @param items - SSCVDB予測結果の配列
+   * @param items - SSCV DB予測結果の配列
    */
   static updateSplicingVariant(
     element: HTMLDivElement | null,
@@ -660,7 +660,10 @@ export class ResultsColumnUpdater {
   ) {
     if (!element) return;
     if (process.env.NODE_ENV !== 'production' && items && items.length > 1) {
-      console.warn('[ResultsColumnUpdater] sscv_db が複数件返っています。remains バッジの追加を検討してください。', items);
+      console.warn(
+        '[ResultsColumnUpdater] sscv_db が複数件返っています。remains バッジの追加を検討してください。',
+        items
+      );
     }
     element.textContent = items?.[0]?.predicted_splicing_type ?? '';
   }
