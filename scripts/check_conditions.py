@@ -9,7 +9,7 @@ scripts/<BUILD>/openapi.yaml（Swagger仕様）から以下を自動抽出し、
   - VariantConsequence.consequence.terms.enum → consequence チェック
   - VariantType.type.terms.enum              → type チェック
   - ClinicalSignificance.terms.enum          → significance チェック
-  - SSCVDB.terms.enum                        → sscv_db チェック
+  - SSCVDB.terms.enum                        → sscv_db / splicingvariant チェック
   - Dataset.name.enum                        → dataset / genotype チェック
 
 使い方:
@@ -21,18 +21,37 @@ scripts/<BUILD>/openapi.yaml（Swagger仕様）から以下を自動抽出し、
   app/frontend/assets/GRCh38/search_conditions.json
   app/frontend/assets/GRCh38/advanced_search_conditions.json
 
+チェック対象（search_conditions.json）:
+  - dataset.items（has_freq:true のもの）: 仕様外の値がないか確認（余分チェックのみ）
+  - type.items:          SO ID の完全一致
+  - significance.items:  短縮キーの完全一致
+  - consequence.items:   SO ID の完全一致 + consequence_grouping の網羅性
+  - splicingvariant.items: N（Unassigned）を除いた完全一致
+
+チェック対象（advanced_search_conditions.json）:
+  - dataset.values:    完全一致（不足・余分の両方）
+  - significance.values.clinvar: 完全一致
+  - significance.values.mgend:   余分チェックのみ（clinvar のサブセット）
+  - consequence.values: snake_case 名の完全一致 + 親子関係の整合性
+  - genotype.values:   余分チェックのみ（dataset のサブセット）
+  - sscv_db.values:    完全一致
+  - type.values:       完全一致
+
 制約:
   - dataset の表示ラベルおよびツリー構造（親子関係）は仕様に含まれないため手動管理。
+  - search_conditions.json の dataset は top-level のみ（サブデータセット不要）のため不足チェックなし。
+  - splicingvariant の N（Unassigned）は UI専用値のため仕様外だが意図的な追加。
   - significance.mgend は clinvar のサブセット（仕様未定義）のため余分チェックのみ。
   - genotype はデータセットのサブセットのため余分チェックのみ。
 
 【重要】このスクリプトは検証のみを行い、JSONファイルを自動更新しません。
   openapi.yaml に新しいデータセットや値が追加された場合は、
-  advanced_search_conditions.json を手動で編集してから本スクリプトで整合性を確認してください。
+  各 JSON ファイルを手動で編集してから本スクリプトで整合性を確認してください。
 
   手動編集が必要なファイル:
+    app/frontend/assets/GRCh38/search_conditions.json
     app/frontend/assets/GRCh38/advanced_search_conditions.json
-    app/frontend/assets/GRCh37/advanced_search_conditions.json（GRCh37の場合）
+    （GRCh37 の場合は GRCh37/ 以下の同名ファイル）
 
 仕様が更新されたら scripts/<BUILD>/openapi.yaml を差し替えて本スクリプトを実行すること。
 """
@@ -197,6 +216,110 @@ def check_consequence_asc(asc_path: Path, spec_snakes: set[str]) -> list[str]:
                 errors.append(
                     f"[{asc_path.name}] id:{v['id']} ({v.get('label')}) の children に存在しないID: {child_id}"
                 )
+
+    return errors
+
+
+# ──────────────────────────────────────────────────
+# search_conditions.json 専用チェック
+# ──────────────────────────────────────────────────
+
+def check_structure_sc(sc_path: Path) -> list[str]:
+    """
+    search_conditions.json の全セクションについて存在と items の構成を確認する。
+    API仕様に対応する enum がないセクション（term/frequency/quality/cadd/alphamissense/sift/polyphen/consequence_grouping）が対象。
+    cadd/alphamissense/sift/polyphen の items は予測ツール固有の UI カテゴリのため仕様外だが、
+    意図しない削除・名前変更を検出するために期待値を固定して照合する。
+    """
+    EXPECTED: dict[str, set[str] | None] = {
+        "term":               None,                        # items なし（フリーテキスト）
+        "frequency":          {"from", "to", "invert", "match"},
+        "quality":            None,                        # items なし（boolean フラグ）
+        "consequence_grouping": None,                      # items の中身は check_consequence_sc で確認済み
+        "cadd":               {"N", "D", "POSSD", "T"},
+        "alphamissense":      {"N", "LP", "A", "LB"},
+        "sift":               {"N", "D", "T"},
+        "polyphen":           {"N", "PROBD", "POSSD", "B", "U"},
+    }
+
+    errors = []
+    data = json.loads(sc_path.read_text())
+
+    for sid, expected_ids in EXPECTED.items():
+        section = next((c for c in data if c["id"] == sid), None)
+        if not section:
+            errors.append(f"[{sc_path.name}] {sid} セクションが見つからない")
+            continue
+        if expected_ids is None:
+            continue
+        actual_ids = {item["id"] for item in section.get("items", []) if "id" in item}
+        for m in sorted(expected_ids - actual_ids):
+            errors.append(f"[{sc_path.name}] {sid}.items に不足: {m}")
+        for e in sorted(actual_ids - expected_ids):
+            errors.append(f"[{sc_path.name}] {sid}.items に余分: {e}")
+
+    return errors
+
+
+def check_dataset_sc(sc_path: Path, spec_datasets: set[str]) -> list[str]:
+    """
+    search_conditions.json の dataset.items のうち has_freq:true のものが
+    仕様の Dataset.name.enum に含まれるか確認する（余分チェックのみ）。
+    Simple Search は top-level dataset のみ使用するため不足チェックは行わない。
+    mgend / clinvar は has_freq:false のため自動除外される。
+    """
+    errors = []
+    data = json.loads(sc_path.read_text())
+
+    dataset = next((c for c in data if c["id"] == "dataset"), None)
+    if not dataset:
+        return [f"[{sc_path.name}] dataset セクションが見つからない"]
+
+    freq_ids = {item["id"] for item in dataset.get("items", []) if item.get("has_freq")}
+    for e in sorted(freq_ids - spec_datasets):
+        errors.append(f"[{sc_path.name}] dataset.items に仕様外の値: {e}")
+
+    return errors
+
+
+def check_significance_sc(sc_path: Path, spec_keys: set[str]) -> list[str]:
+    """
+    search_conditions.json の significance.items と仕様の ClinicalSignificance 短縮キーを照合する。
+    """
+    errors = []
+    data = json.loads(sc_path.read_text())
+
+    sig = next((c for c in data if c["id"] == "significance"), None)
+    if not sig:
+        return [f"[{sc_path.name}] significance セクションが見つからない"]
+
+    json_keys = {item["id"] for item in sig.get("items", [])}
+    for m in sorted(spec_keys - json_keys):
+        errors.append(f"[{sc_path.name}] significance.items に不足: {m}")
+    for e in sorted(json_keys - spec_keys):
+        errors.append(f"[{sc_path.name}] significance.items に余分: {e}")
+
+    return errors
+
+
+def check_sscvdb_sc(sc_path: Path, spec_keys: set[str]) -> list[str]:
+    """
+    search_conditions.json の splicingvariant.items と仕様の SSCVDB 短縮キーを照合する。
+    'N'（Unassigned = SSCV DB に未登録）は UI専用値のため仕様外だが意図的な追加として除外する。
+    """
+    EXCLUDED = {'N'}
+    errors = []
+    data = json.loads(sc_path.read_text())
+
+    sscv = next((c for c in data if c["id"] == "splicingvariant"), None)
+    if not sscv:
+        return [f"[{sc_path.name}] splicingvariant セクションが見つからない"]
+
+    json_keys = {item["id"] for item in sscv.get("items", [])} - EXCLUDED
+    for m in sorted(spec_keys - json_keys):
+        errors.append(f"[{sc_path.name}] splicingvariant.items に不足: {m}")
+    for e in sorted(json_keys - spec_keys):
+        errors.append(f"[{sc_path.name}] splicingvariant.items に余分: {e}")
 
     return errors
 
@@ -420,46 +543,65 @@ def main():
     yaml_path, sc_path, asc_path = resolve_paths(build)
 
     # 仕様から各セクションの term を読み込む
-    dataset_names    = load_dataset_names(yaml_path)
-    significance_keys = load_significance_terms(yaml_path)
-    consequence_terms = load_consequence_terms(yaml_path)
+    dataset_names      = load_dataset_names(yaml_path)
+    significance_keys  = load_significance_terms(yaml_path)
+    consequence_terms  = load_consequence_terms(yaml_path)
     consequence_so_ids = {so for so, _ in consequence_terms}
     consequence_snakes = {snake for _, snake in consequence_terms}
-    sscvdb_keys      = load_sscvdb_terms(yaml_path)
-    type_terms       = load_variant_type_terms(yaml_path)
-    type_so_ids      = {so for so, _ in type_terms}
-    type_labels      = {label for _, label in type_terms}
+    sscvdb_keys        = load_sscvdb_terms(yaml_path)
+    type_terms         = load_variant_type_terms(yaml_path)
+    type_so_ids        = {so for so, _ in type_terms}
+    type_labels        = {label for _, label in type_terms}
 
-    # JSON の conditions 順に合わせて読み込み件数を表示
-    print(f"dataset:                  {len(dataset_names)} 件のデータセット名を読み込みました")
-    print(f"significance:             {len(significance_keys)} 件の term を読み込みました")
-    print(f"consequence:              {len(consequence_terms)} 件の term を読み込みました")
-    print(f"disease:                  チェック対象外（仕様に enum なし）")
-    print(f"gene:                     チェック対象外（仕様に enum なし）")
-    print(f"genotype:                 dataset のサブセット（余分チェックのみ）")
-    print(f"location:                 チェック対象外（仕様に enum なし）")
-    print(f"sscv_db:                  {len(sscvdb_keys)} 件の term を読み込みました")
-    print(f"variant_effect_prediction: チェック対象外（仕様に enum なし）")
-    print(f"id:                       チェック対象外（仕様に enum なし）")
-    print(f"type:                     {len(type_terms)} 件の term を読み込みました")
+    print("[仕様読み込み]")
+    print(f"  dataset:      {len(dataset_names)} 件")
+    print(f"  significance: {len(significance_keys)} 件")
+    print(f"  consequence:  {len(consequence_terms)} 件")
+    print(f"  sscv_db:      {len(sscvdb_keys)} 件")
+    print(f"  type:         {len(type_terms)} 件")
     print()
 
-    # JSON の conditions 順にチェックを実行
+    print(f"[{sc_path.name}]")
+    print(f"  term:                存在確認のみ")
+    print(f"  dataset:             余分チェックのみ（has_freq:true のデータセットを確認）")
+    print(f"  frequency:           存在・items 構造確認（from/to/invert/match）")
+    print(f"  quality:             存在確認のみ")
+    print(f"  type:                {len(type_so_ids)} 件（SO ID）")
+    print(f"  significance:        {len(significance_keys)} 件")
+    print(f"  consequence:         {len(consequence_so_ids)} 件（SO ID）")
+    print(f"  consequence_grouping: 存在確認（SO ID 網羅性は consequence チェック内）")
+    print(f"  cadd:                存在・items 構造確認（N/D/POSSD/T）")
+    print(f"  alphamissense:       存在・items 構造確認（N/LP/A/LB）")
+    print(f"  sift:                存在・items 構造確認（N/D/T）")
+    print(f"  polyphen:            存在・items 構造確認（N/PROBD/POSSD/B/U）")
+    print(f"  splicingvariant:     {len(sscvdb_keys)} 件（N=Unassigned 除く）")
+    print()
+
+    print(f"[{asc_path.name}]")
+    print(f"  dataset:      {len(dataset_names)} 件（完全一致）")
+    print(f"  significance: {len(significance_keys)} 件（clinvar 完全一致、mgend 余分のみ）")
+    print(f"  consequence:  {len(consequence_snakes)} 件（snake_case + 親子関係）")
+    print(f"  genotype:     余分チェックのみ（dataset のサブセット）")
+    print(f"  sscv_db:      {len(sscvdb_keys)} 件")
+    print(f"  type:         {len(type_labels)} 件")
+    print()
+
     errors = []
-    # dataset: 完全一致チェック（不足・余分の両方）
-    errors += check_dataset_condition_asc(asc_path, dataset_names, "dataset", check_missing=True)
-    # significance
-    errors += check_significance_asc(asc_path, significance_keys)
-    # consequence
-    errors += check_consequence_sc(sc_path, consequence_so_ids)
-    errors += check_consequence_asc(asc_path, consequence_snakes)
-    # disease / gene / location / variant_effect_prediction / id: チェック対象外
-    # genotype: サブセットのため余分チェックのみ
-    errors += check_dataset_condition_asc(asc_path, dataset_names, "genotype", check_missing=False)
-    # sscv_db
-    errors += check_sscvdb_asc(asc_path, sscvdb_keys)
-    # type
+
+    # search_conditions.json チェック
+    errors += check_structure_sc(sc_path)           # term/frequency/quality/consequence_grouping/cadd/alphamissense/sift/polyphen
+    errors += check_dataset_sc(sc_path, dataset_names)
     errors += check_type_sc(sc_path, type_so_ids)
+    errors += check_significance_sc(sc_path, significance_keys)
+    errors += check_consequence_sc(sc_path, consequence_so_ids)
+    errors += check_sscvdb_sc(sc_path, sscvdb_keys)
+
+    # advanced_search_conditions.json チェック（conditions の順）
+    errors += check_dataset_condition_asc(asc_path, dataset_names, "dataset", check_missing=True)
+    errors += check_significance_asc(asc_path, significance_keys)
+    errors += check_consequence_asc(asc_path, consequence_snakes)
+    errors += check_dataset_condition_asc(asc_path, dataset_names, "genotype", check_missing=False)
+    errors += check_sscvdb_asc(asc_path, sscvdb_keys)
     errors += check_type_asc(asc_path, type_labels)
 
     if errors:
