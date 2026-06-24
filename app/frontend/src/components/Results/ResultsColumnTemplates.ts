@@ -33,7 +33,7 @@ export const COLUMN_TEMPLATES = {
   polyphen:
     '<td class="polyphen"><div class="variant-function" data-function=""></div></td>',
   splicingvariant:
-    '<td class="splicingvariant"><div class="splicingvariant-item"></div></td>',
+    '<td class="splicingvariant"><a class="splicingvariant-item hyper-text -external" target="_blank" rel="noopener noreferrer"></a></td>',
 } as const;
 
 /**

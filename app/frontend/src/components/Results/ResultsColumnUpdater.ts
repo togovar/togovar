@@ -10,6 +10,7 @@ import type {
   Transcript,
   Significance,
   SscvDbItem,
+  ExternalLinkItem,
 } from '../../types';
 import { REF_ALT_SHOW_LENGTH } from './ResultsColumnTemplates';
 
@@ -655,8 +656,9 @@ export class ResultsColumnUpdater {
    * @param items - SSCV DB予測結果の配列
    */
   static updateSplicingVariant(
-    element: HTMLDivElement | null,
-    items: SscvDbItem[] | undefined
+    element: HTMLAnchorElement | null,
+    items: SscvDbItem[] | undefined,
+    links: ExternalLinkItem[] | undefined
   ) {
     if (!element) return;
     if (process.env.NODE_ENV !== 'production' && items && items.length > 1) {
@@ -665,6 +667,13 @@ export class ResultsColumnUpdater {
         items
       );
     }
-    element.textContent = items?.[0]?.predicted_splicing_type ?? '';
+    const text = items?.[0]?.predicted_splicing_type ?? '';
+    const url = links?.[0]?.xref ?? '';
+    element.textContent = text;
+    if (text && url) {
+      element.href = url;
+    } else {
+      element.removeAttribute('href');
+    }
   }
 }

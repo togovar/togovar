@@ -83,7 +83,7 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
         this._createLinkEntry('gnomAD SV', item.title, item.xref)
       ) ?? []),
       ...(external_links.sscv_db?.map((item) =>
-        this._createLinkEntry('SSCV-DB', item.title, item.xref)
+        this._createLinkEntry('SSCV DB', item.title, item.xref)
       ) ?? []),
     ];
 

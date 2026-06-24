@@ -39,7 +39,7 @@ type ResultsRowCells = {
   alphaMissenseFunction: HTMLDivElement | null;
   siftFunction: HTMLDivElement | null;
   polyphenFunction: HTMLDivElement | null;
-  splicingVariantItem: HTMLDivElement | null;
+  splicingVariantItem: HTMLAnchorElement | null;
 };
 
 /**
@@ -179,7 +179,8 @@ export class ResultsRowView {
     splicingvariant: (result) =>
       ResultsColumnUpdater.updateSplicingVariant(
         this.cells.splicingVariantItem,
-        result.sscv_db
+        result.sscv_db,
+        result.external_links?.sscv_db
       ),
   };
 
