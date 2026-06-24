@@ -9,6 +9,7 @@ import type {
   TdFrequencies,
   Transcript,
   Significance,
+  SscvDbItem,
 } from '../../types';
 import { REF_ALT_SHOW_LENGTH } from './ResultsColumnTemplates';
 
@@ -255,7 +256,8 @@ export class ResultsColumnUpdater {
     const master = getSimpleSearchConditionMaster('type')?.items as
       | TypeMasterItem[]
       | undefined;
-    element.textContent = master?.find((item) => item.id === value)?.label || '';
+    element.textContent =
+      master?.find((item) => item.id === value)?.label || '';
   }
 
   /**
@@ -581,12 +583,30 @@ export class ResultsColumnUpdater {
   }
 
   /**
+   * CADDスコア（Phred）を更新する。
+   * 閾値: phred ≥30 → 'D'（高病原性）、20–29 → 'POSSD'（中程度）、<20 → 'T'（低リスク）
+   *
+   * @param element - 更新対象のdiv要素
+   * @param score - CADD phredスコア
+   */
+  static updateCadd(element: HTMLDivElement | null, score: number | undefined) {
+    this.updateFunctionPrediction(element, score ?? null, (s) => {
+      if (s >= 30) return 'D';
+      if (s >= 20) return 'POSSD';
+      return 'T';
+    });
+  }
+
+  /**
    * AlphaMissenseスコアを更新する。
    *
    * @param element - 更新対象のdiv要素
    * @param score - AlphaMissenseスコア
    */
-  static updateAlphaMissense(element: HTMLDivElement | null, score: number | null | undefined) {
+  static updateAlphaMissense(
+    element: HTMLDivElement | null,
+    score: number | null | undefined
+  ) {
     this.updateFunctionPrediction(element, score, (s) => {
       if (s < 0.34) return 'LB';
       if (s > 0.564) return 'LP';
@@ -600,8 +620,13 @@ export class ResultsColumnUpdater {
    * @param element - 更新対象のdiv要素
    * @param score - SIFTスコア
    */
-  static updateSift(element: HTMLDivElement | null, score: number | null | undefined) {
-    this.updateFunctionPrediction(element, score, (s) => (s >= 0.05 ? 'T' : 'D'));
+  static updateSift(
+    element: HTMLDivElement | null,
+    score: number | null | undefined
+  ) {
+    this.updateFunctionPrediction(element, score, (s) =>
+      s >= 0.05 ? 'T' : 'D'
+    );
   }
 
   /**
@@ -610,12 +635,33 @@ export class ResultsColumnUpdater {
    * @param element - 更新対象のdiv要素
    * @param score - PolyPhenスコア
    */
-  static updatePolyphen(element: HTMLDivElement | null, score: number | null | undefined) {
+  static updatePolyphen(
+    element: HTMLDivElement | null,
+    score: number | null | undefined
+  ) {
     this.updateFunctionPrediction(element, score, (s) => {
       if (s > 0.908) return 'PROBD';
       if (s > 0.446) return 'POSSD';
       if (s >= 0) return 'B';
       return 'U';
     });
+  }
+
+  /**
+   * スプライシング予測（SSCVDB）列を更新する。
+   * 1バリアントに複数エントリが返るケースはほぼないため先頭の predicted_splicing_type のみ表示する。
+   *
+   * @param element - 予測タイプ表示div要素
+   * @param items - SSCVDB予測結果の配列
+   */
+  static updateSplicingVariant(
+    element: HTMLDivElement | null,
+    items: SscvDbItem[] | undefined
+  ) {
+    if (!element) return;
+    if (process.env.NODE_ENV !== 'production' && items && items.length > 1) {
+      console.warn('[ResultsColumnUpdater] sscv_db が複数件返っています。remains バッジの追加を検討してください。', items);
+    }
+    element.textContent = items?.[0]?.predicted_splicing_type ?? '';
   }
 }

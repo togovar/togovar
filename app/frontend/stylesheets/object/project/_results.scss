@@ -457,6 +457,12 @@
           max-width: 276px;
         }
 
+        &.cadd {
+          width: 70px;
+          min-width: 70px;
+          max-width: 70px;
+        }
+
         &.alphamissense {
           width: 71px;
           min-width: 71px;
@@ -473,6 +479,12 @@
           width: 70px;
           min-width: 70px;
           max-width: 70px;
+        }
+
+        &.splicingvariant {
+          width: 140px;
+          min-width: 140px;
+          max-width: 140px;
         }
 
         // 列名テキスト（-20deg 傾けて縦に詰まったヘッダー内に収める）
@@ -596,6 +608,12 @@
           max-width: 176px;
         }
 
+        &.cadd {
+          width: 70px;
+          min-width: 70px;
+          max-width: 70px;
+        }
+
         &.alphamissense {
           width: 71px;
           min-width: 71px;
@@ -612,6 +630,12 @@
           width: 70px;
           min-width: 70px;
           max-width: 70px;
+        }
+
+        &.splicingvariant {
+          width: 140px;
+          min-width: 140px;
+          max-width: 140px;
         }
 
         // 列幅リサイズ用ドラッグハンドル（td 側）

@@ -35,9 +35,11 @@ type ResultsRowCells = {
   clinicalSignificance: HTMLDivElement | null;
   clinicalRemains: HTMLSpanElement | null;
   clinicalIcon: HTMLSpanElement | null;
+  caddFunction: HTMLDivElement | null;
   alphaMissenseFunction: HTMLDivElement | null;
   siftFunction: HTMLDivElement | null;
   polyphenFunction: HTMLDivElement | null;
+  splicingVariantItem: HTMLDivElement | null;
 };
 
 /**
@@ -66,9 +68,11 @@ function createEmptyCells(): ResultsRowCells {
     clinicalSignificance: null,
     clinicalRemains: null,
     clinicalIcon: null,
+    caddFunction: null,
     alphaMissenseFunction: null,
     siftFunction: null,
     polyphenFunction: null,
+    splicingVariantItem: null,
   };
 }
 
@@ -158,6 +162,8 @@ export class ResultsRowView {
         this.cells.clinicalIcon,
         result.significance
       ),
+    cadd: (result) =>
+      ResultsColumnUpdater.updateCadd(this.cells.caddFunction, result.cadd_phred),
     alphamissense: (result) =>
       ResultsColumnUpdater.updateAlphaMissense(
         this.cells.alphaMissenseFunction,
@@ -169,6 +175,11 @@ export class ResultsRowView {
       ResultsColumnUpdater.updatePolyphen(
         this.cells.polyphenFunction,
         result.polyphen
+      ),
+    splicingvariant: (result) =>
+      ResultsColumnUpdater.updateSplicingVariant(
+        this.cells.splicingVariantItem,
+        result.sscv_db
       ),
   };
 
@@ -446,6 +457,10 @@ export class ResultsRowView {
    * カラムIDで識別してまとめてキャッシュする。
    */
   private cacheFunctionElements() {
+    const tdCadd = this.tr.querySelector('td.cadd');
+    this.cells.caddFunction =
+      tdCadd?.querySelector('.variant-function') || null;
+
     const tdAlphaMissense = this.tr.querySelector('td.alphamissense');
     this.cells.alphaMissenseFunction =
       tdAlphaMissense?.querySelector('.variant-function') || null;
@@ -457,6 +472,10 @@ export class ResultsRowView {
     const tdPolyphen = this.tr.querySelector('td.polyphen');
     this.cells.polyphenFunction =
       tdPolyphen?.querySelector('.variant-function') || null;
+
+    const tdSplicingVariant = this.tr.querySelector('td.splicingvariant');
+    this.cells.splicingVariantItem =
+      tdSplicingVariant?.querySelector('.splicingvariant-item') || null;
   }
 
   // ================================================================
