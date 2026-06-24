@@ -241,6 +241,10 @@ function initSidebar(): void {
     selectRequired<HTMLElement>(document, '#FilterPolyPhen'),
     'polyphen'
   );
+  new PanelViewCheckList(
+    selectRequired<HTMLElement>(document, '#FilterSplicingVariant'),
+    'splicingvariant'
+  );
 }
 
 /**

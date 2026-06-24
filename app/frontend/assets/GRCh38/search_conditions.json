@@ -856,5 +856,42 @@
         "default": "1"
       }
     ]
+  },
+  {
+    "id": "splicingvariant",
+    "label": "Splicing variant (SSCVDB)",
+    "type": "array",
+    "items": [
+      {
+        "id": "N",
+        "label": "Unassigned",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "PEL",
+        "label": "Partial exon loss",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "CEI",
+        "label": "Cryptic exon inclusion",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "EE",
+        "label": "Exon extension",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "A",
+        "label": "Ambiguous",
+        "type": "boolean",
+        "default": "1"
+      }
+    ]
   }
 ]
