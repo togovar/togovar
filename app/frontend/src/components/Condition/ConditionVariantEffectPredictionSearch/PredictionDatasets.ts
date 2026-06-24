@@ -109,17 +109,17 @@ export const ALPHAMISSENSE_THRESHOLD = {
 /**
  * SIFT スコア (0–1) の色区分。
  * SIFT はスコアが低いほど有害なため、他ツールと色の対応が逆になる。
- * 閾値: <0.05 → Deleterious（緑表示は低スコア側）。
+ * 閾値: <0.05 → Deleterious（危険色は低スコア側）。
  */
 const SIFT_THRESHOLD = {
-  Tolerated: {
+  Deleterious: {
     color: 'var(--color-sign-dangerous)',
     min: 0,
     max: 0.05,
     minInequalitySign: 'gte',
     maxInequalitySign: 'lt',
   },
-  Deleterious: {
+  Tolerated: {
     color: 'var(--color-sign-safe)',
     min: 0.05,
     max: 1,
