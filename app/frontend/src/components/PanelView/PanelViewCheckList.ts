@@ -48,7 +48,7 @@ type StatisticsType =
 // スコアラベルの定数
 // ----------------------------------------
 
-/** CADD phred スコアのラベル（D=≥20, POSSD=≥10, T=<10）。data-function は既存CSS色クラスを流用する。 */
+/** CADD PHRED スコアのラベル（D=≥20, POSSD=≥10, T=<10）。data-function は既存CSS色クラスを流用する。 */
 const CADD_LABELS: Record<string, string> = {
   D: '&ge; 20',
   POSSD: '&ge; 10',

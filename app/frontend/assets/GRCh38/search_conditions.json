@@ -735,7 +735,7 @@
   },
   {
     "id": "cadd",
-    "label": "CADD (phred score)",
+    "label": "CADD (PHRED score)",
     "type": "array",
     "items": [
       {

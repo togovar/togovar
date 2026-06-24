@@ -361,11 +361,23 @@ export class PredictionRangeSlider extends LitElement {
     return ((value - this.scoreMin) / width) * 100;
   }
 
-  /** スコア範囲ごとの目盛り値を生成する。小数スコアとPHREDスコアの両方を読みやすく表示するため。 */
+  /**
+   * スコア範囲ごとの目盛り値を生成する。小数スコアとPHREDスコアの両方を読みやすく表示するため。
+   * CADD (scoreMax > 1) は最後の目盛りのみ上限値をそのまま使い、それ以外は自然刻みで四捨五入して整数表示する。
+   * 例: 0–99 を 10 分割した場合、9.9 刻みを 10 単位に丸めて 0, 10, 20, …, 90, 99 と表示する。
+   */
   private _formatScaleValue(index: number): string {
     const value =
       this.scoreMin +
       ((this.scoreMax - this.scoreMin) / this.numberOfScales) * index;
+    if (this.scoreMax > 1) {
+      if (index === this.numberOfScales) return String(this.scoreMax);
+      const step = Math.max(
+        1,
+        Math.round((this.scoreMax - this.scoreMin) / this.numberOfScales)
+      );
+      return String(Math.round(value / step) * step);
+    }
     return Number.isInteger(value) ? String(value) : value.toFixed(1);
   }
 }

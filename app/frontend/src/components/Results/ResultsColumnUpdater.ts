@@ -584,11 +584,11 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * CADDスコア（Phred）を更新する。
+   * CADDスコア（PHRED）を更新する。
    * 閾値はスライダーの色区分と合わせている: ≥20 → 'D'（赤）、≥10 → 'POSSD'（橙）、<10 → 'T'（緑）
    *
    * @param element - 更新対象のdiv要素
-   * @param score - CADD phredスコア
+   * @param score - CADD PHREDスコア
    */
   static updateCadd(element: HTMLDivElement | null, score: number | undefined) {
     this.updateFunctionPrediction(element, score ?? null, (s) => {

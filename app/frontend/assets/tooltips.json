@@ -36,7 +36,7 @@
   },
   {
     "id": "table-header-cadd",
-    "content": "CADD (Combined Annotation Dependent Depletion) phred-scaled score for predicting the deleteriousness of a variant",
+    "content": "CADD (Combined Annotation Dependent Depletion) PHRED-scaled score for predicting the deleteriousness of a variant",
     "url": "/doc/help#d6"
   },
   {

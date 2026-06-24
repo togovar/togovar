@@ -30,7 +30,7 @@ export const COLUMNS = [
     defaultWidth: 276,
   },
   {
-    label: 'CADD (phred score)',
+    label: 'CADD (PHRED score)',
     id: 'cadd',
     defaultWidth: 70,
     resizable: false,

@@ -29,9 +29,9 @@ type PredictionConfig = Readonly<{
   scoreMax: number;
   /** 数値入力・スライダーの刻み幅。 */
   scoreStep: number;
-  /** 目盛りの分割数。値域が広い CADD は 8（0–40 を 5 刻み）、0–1 スコアは 10。 */
+  /** 目盛りの分割数。CADD は 10（0–99 を 10 刻み）、0–1 スコアは 10。 */
   numberOfScales: number;
-  /** スライダー中央のスコア種別ラベル。CADD は "Phred score"、その他は "Prediction score"。 */
+  /** スライダー中央のスコア種別ラベル。CADD は "PHRED score"、その他は "Prediction score"。 */
   scoreLabel: string;
   /**
    * threshold-button / threshold-line を表示するか。
@@ -49,7 +49,7 @@ type PredictionConfig = Readonly<{
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * CADD Phred スコア (0–40) の色区分。
+ * CADD PHRED スコア (0–99) の色区分。
  * Results バッジの閾値（<10 緑・10–20 橙・≥20 赤）と合わせている。
  * パネルの sign 色変数を参照することで、テーマ変更時も追従する。
  */
@@ -71,7 +71,7 @@ export const CADD_THRESHOLD = {
   Dangerous: {
     color: 'var(--color-sign-dangerous)',
     min: 20,
-    max: 40,
+    max: 99,
     minInequalitySign: 'gt',
     maxInequalitySign: 'lte',
   },
@@ -166,12 +166,12 @@ const POLYPHEN_THRESHOLD = {
  */
 export const PREDICTIONS = {
   cadd_phred: {
-    label: 'CADD (phred score)',
+    label: 'CADD (PHRED score)',
     scoreMin: 0,
-    scoreMax: 40,
+    scoreMax: 99,
     scoreStep: 0.1,
-    numberOfScales: 8,
-    scoreLabel: 'Phred score',
+    numberOfScales: 10,
+    scoreLabel: 'PHRED score',
     showThreshold: false,
     unassignedLists: ['unassigned'],
     threshold: CADD_THRESHOLD,
