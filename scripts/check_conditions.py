@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """
 API仕様整合性チェックスクリプト
 
@@ -24,6 +25,14 @@ scripts/<BUILD>/openapi.yaml（Swagger仕様）から以下を自動抽出し、
   - dataset の表示ラベルおよびツリー構造（親子関係）は仕様に含まれないため手動管理。
   - significance.mgend は clinvar のサブセット（仕様未定義）のため余分チェックのみ。
   - genotype はデータセットのサブセットのため余分チェックのみ。
+
+【重要】このスクリプトは検証のみを行い、JSONファイルを自動更新しません。
+  openapi.yaml に新しいデータセットや値が追加された場合は、
+  advanced_search_conditions.json を手動で編集してから本スクリプトで整合性を確認してください。
+
+  手動編集が必要なファイル:
+    app/frontend/assets/GRCh38/advanced_search_conditions.json
+    app/frontend/assets/GRCh37/advanced_search_conditions.json（GRCh37の場合）
 
 仕様が更新されたら scripts/<BUILD>/openapi.yaml を差し替えて本スクリプトを実行すること。
 """
@@ -410,41 +419,48 @@ def main():
 
     yaml_path, sc_path, asc_path = resolve_paths(build)
 
-    # Consequence
+    # 仕様から各セクションの term を読み込む
+    dataset_names    = load_dataset_names(yaml_path)
+    significance_keys = load_significance_terms(yaml_path)
     consequence_terms = load_consequence_terms(yaml_path)
     consequence_so_ids = {so for so, _ in consequence_terms}
     consequence_snakes = {snake for _, snake in consequence_terms}
-    print(f"VariantConsequence:   {len(consequence_terms)} 件の term を読み込みました")
+    sscvdb_keys      = load_sscvdb_terms(yaml_path)
+    type_terms       = load_variant_type_terms(yaml_path)
+    type_so_ids      = {so for so, _ in type_terms}
+    type_labels      = {label for _, label in type_terms}
 
-    # Variant Type
-    type_terms = load_variant_type_terms(yaml_path)
-    type_so_ids = {so for so, _ in type_terms}
-    type_labels = {label for _, label in type_terms}
-    print(f"VariantType:          {len(type_terms)} 件の term を読み込みました")
+    # JSON の conditions 順に合わせて読み込み件数を表示
+    print(f"dataset:                  {len(dataset_names)} 件のデータセット名を読み込みました")
+    print(f"significance:             {len(significance_keys)} 件の term を読み込みました")
+    print(f"consequence:              {len(consequence_terms)} 件の term を読み込みました")
+    print(f"disease:                  チェック対象外（仕様に enum なし）")
+    print(f"gene:                     チェック対象外（仕様に enum なし）")
+    print(f"genotype:                 dataset のサブセット（余分チェックのみ）")
+    print(f"location:                 チェック対象外（仕様に enum なし）")
+    print(f"sscv_db:                  {len(sscvdb_keys)} 件の term を読み込みました")
+    print(f"variant_effect_prediction: チェック対象外（仕様に enum なし）")
+    print(f"id:                       チェック対象外（仕様に enum なし）")
+    print(f"type:                     {len(type_terms)} 件の term を読み込みました")
+    print()
 
-    # Clinical Significance
-    significance_keys = load_significance_terms(yaml_path)
-    print(f"ClinicalSignificance: {len(significance_keys)} 件の term を読み込みました")
-
-    # SSCV DB
-    sscvdb_keys = load_sscvdb_terms(yaml_path)
-    print(f"SSCVDB:               {len(sscvdb_keys)} 件の term を読み込みました")
-
-    # Dataset
-    dataset_names = load_dataset_names(yaml_path)
-    print(f"Dataset:              {len(dataset_names)} 件のデータセット名を読み込みました\n")
-
+    # JSON の conditions 順にチェックを実行
     errors = []
-    errors += check_consequence_sc(sc_path, consequence_so_ids)
-    errors += check_consequence_asc(asc_path, consequence_snakes)
-    errors += check_type_sc(sc_path, type_so_ids)
-    errors += check_type_asc(asc_path, type_labels)
-    errors += check_significance_asc(asc_path, significance_keys)
-    errors += check_sscvdb_asc(asc_path, sscvdb_keys)
     # dataset: 完全一致チェック（不足・余分の両方）
     errors += check_dataset_condition_asc(asc_path, dataset_names, "dataset", check_missing=True)
+    # significance
+    errors += check_significance_asc(asc_path, significance_keys)
+    # consequence
+    errors += check_consequence_sc(sc_path, consequence_so_ids)
+    errors += check_consequence_asc(asc_path, consequence_snakes)
+    # disease / gene / location / variant_effect_prediction / id: チェック対象外
     # genotype: サブセットのため余分チェックのみ
     errors += check_dataset_condition_asc(asc_path, dataset_names, "genotype", check_missing=False)
+    # sscv_db
+    errors += check_sscvdb_asc(asc_path, sscvdb_keys)
+    # type
+    errors += check_type_sc(sc_path, type_so_ids)
+    errors += check_type_asc(asc_path, type_labels)
 
     if errors:
         print("❌ エラーが見つかりました:\n")
@@ -455,11 +471,11 @@ def main():
     else:
         print(
             f"✅ 問題なし — "
-            f"consequence {len(consequence_terms)} 件 + "
-            f"type {len(type_terms)} 件 + "
+            f"dataset {len(dataset_names)} 件 + "
             f"significance {len(significance_keys)} 件 + "
+            f"consequence {len(consequence_terms)} 件 + "
             f"sscv_db {len(sscvdb_keys)} 件 + "
-            f"dataset {len(dataset_names)} 件、すべて整合しています"
+            f"type {len(type_terms)} 件、すべて整合しています"
         )
         sys.exit(0)
 
