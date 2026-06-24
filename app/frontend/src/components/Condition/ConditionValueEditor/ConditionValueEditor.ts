@@ -173,7 +173,7 @@ export abstract class ConditionValueEditor {
 
   /**
    * OKボタンの活性状態を現在の isValid から更新する。
-   * 全サブクラスの _update 末尾で呼ぶことで、同じ1行の重複をなくすため。
+   * 全サブクラスの update 末尾で呼ぶことで、同じ1行の重複をなくすため。
    */
   protected notifyValidity(): void {
     this.conditionValues.update(this.isValid);
