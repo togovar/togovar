@@ -13,7 +13,7 @@ import type {
   GenotypeKey,
   SignificanceTerm,
 } from '../advancedCondition';
-import type { PredictionKey } from '../components/Condition/ConditionPathogenicityPredictionSearch/PredictionDatasets';
+import type { PredictionKey } from '../components/Condition/ConditionVariantEffectPredictionSearch/PredictionDatasets';
 
 // ───────────────────────────────────────────────────────────────────────────
 // Query

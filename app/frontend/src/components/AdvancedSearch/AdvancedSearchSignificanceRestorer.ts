@@ -2,7 +2,7 @@ import { ADVANCED_CONDITION_TYPE } from '../../advancedCondition';
 import {
   PREDICTIONS,
   type PredictionKey,
-} from '../Condition/ConditionPathogenicityPredictionSearch/PredictionDatasets';
+} from '../Condition/ConditionVariantEffectPredictionSearch/PredictionDatasets';
 import type { RestoredPredictionValue } from '../../types';
 import type {
   Inequality,
@@ -103,7 +103,7 @@ export function toMergedSignificanceItem(
 }
 
 /**
- * Pathogenicity predictionはquery key（alphamissense/sift/polyphen）から
+ * Variant effect predictionはquery key（alphamissense/sift/polyphen）から
  * 共通の条件行へ戻す。scoreがオブジェクトならrangeモード、配列ならcategoryモード。
  */
 export function restorePredictionItem(query: QueryObject): RestoredItem | null {
@@ -117,7 +117,7 @@ export function restorePredictionItem(query: QueryObject): RestoredItem | null {
   if (!prediction) return null;
 
   return {
-    conditionType: ADVANCED_CONDITION_TYPE.pathogenicity_prediction,
+    conditionType: ADVANCED_CONDITION_TYPE.variant_effect_prediction,
     values: [
       {
         value: predictionKey,
@@ -129,7 +129,7 @@ export function restorePredictionItem(query: QueryObject): RestoredItem | null {
 }
 
 /**
- * Pathogenicity predictionでUnassigned/Unknownとrangeを同時に選ぶと、
+ * Variant effect predictionでUnassigned/Unknownとrangeを同時に選ぶと、
  * queryは { or: [category leaf, range leaf] } になる。これを1条件行へ戻す。
  */
 export function toMergedPredictionItem(
@@ -159,7 +159,7 @@ export function toMergedPredictionItem(
   );
 
   return {
-    conditionType: ADVANCED_CONDITION_TYPE.pathogenicity_prediction,
+    conditionType: ADVANCED_CONDITION_TYPE.variant_effect_prediction,
     values: [
       {
         value: dataset,

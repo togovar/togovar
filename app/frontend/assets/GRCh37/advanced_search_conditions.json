@@ -1889,8 +1889,8 @@
       "label": "Location",
       "type": "peculiar"
     },
-    "pathogenicity_prediction": {
-      "label": "Pathogenicity prediction",
+    "variant_effect_prediction": {
+      "label": "Variant effect prediction",
       "type": "peculiar"
     },
     "type": {

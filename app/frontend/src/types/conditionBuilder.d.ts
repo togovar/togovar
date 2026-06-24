@@ -13,7 +13,7 @@ import type {
 import type { ConditionItemView } from '../components/Condition/ConditionItemView';
 import type ConditionValues from '../components/Condition/ConditionValues';
 import type { ConditionItemValueView } from '../components/Condition/ConditionItemValueView';
-import type { PredictionKey } from '../components/Condition/ConditionPathogenicityPredictionSearch/PredictionDatasets';
+import type { PredictionKey } from '../components/Condition/ConditionVariantEffectPredictionSearch/PredictionDatasets';
 import type { ConditionQuery, Relation, Inequality } from './query';
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -99,5 +99,5 @@ type EditorSectionClassName =
   | 'clinical-significance-view' // significance
   | 'text-field-editor-view' // disease, gene, variant id
   | 'location-editor-view' // location
-  | 'pathogenicity-editor-view' // pathogenicity
+  | 'variant-effect-prediction-editor-view' // variant effect prediction
   | 'checkboxes-editor-view'; // variant type

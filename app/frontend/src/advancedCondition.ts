@@ -13,7 +13,7 @@ export const ADVANCED_CONDITION_TYPE = {
   genotype: 'genotype',
   clinical_significance: 'significance',
   sscv_db: 'sscv_db',
-  pathogenicity_prediction: 'pathogenicity_prediction',
+  variant_effect_prediction: 'variant_effect_prediction',
   gene_symbol: 'gene',
   disease: 'disease',
 } as const;
@@ -47,14 +47,14 @@ const NO_RELATION_BY_REF = {
   GRCh37: {
     dataset: true,
     genotype: true,
-    pathogenicity_prediction: true,
+    variant_effect_prediction: true,
     id: true,
     location: true,
   },
   GRCh38: {
     dataset: true,
     genotype: true,
-    pathogenicity_prediction: true,
+    variant_effect_prediction: true,
     id: true,
     location: true,
   },

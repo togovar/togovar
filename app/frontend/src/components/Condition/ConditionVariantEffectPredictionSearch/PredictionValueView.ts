@@ -89,7 +89,7 @@ export class PredictionValueView extends LitElement {
 
   render(): TemplateResult {
     return html`
-      <div class="pathogenicity-graph">
+      <div class="prediction-graph">
         <div class="bar"></div>
         <ul class="ruler">
           ${map(

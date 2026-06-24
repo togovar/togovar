@@ -6,7 +6,7 @@ import { buildDatasetQuery } from './dataset';
 import { buildSignificanceQuery } from './significance';
 import { buildGeneQuery } from './gene';
 import { buildLocationQuery } from './location';
-import { buildPathogenicityQuery } from './pathogenicity';
+import { buildVariantEffectPredictionQuery } from './variantEffectPrediction';
 import { buildVariantIdQuery } from './variantId';
 import { buildDefaultQuery } from './default';
 import type {
@@ -24,7 +24,7 @@ const BUILDERS: BuilderMap = {
   [ADVANCED_CONDITION_TYPE.gene_symbol]: buildGeneQuery,
   [ADVANCED_CONDITION_TYPE.genotype]: buildDatasetQuery,
   [ADVANCED_CONDITION_TYPE.location]: buildLocationQuery,
-  [ADVANCED_CONDITION_TYPE.pathogenicity_prediction]: buildPathogenicityQuery,
+  [ADVANCED_CONDITION_TYPE.variant_effect_prediction]: buildVariantEffectPredictionQuery,
   [ADVANCED_CONDITION_TYPE.variant_id]: buildVariantIdQuery,
 };
 

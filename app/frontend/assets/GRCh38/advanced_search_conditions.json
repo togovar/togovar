@@ -2301,10 +2301,6 @@
       "label": "Location",
       "type": "peculiar"
     },
-    "pathogenicity_prediction": {
-      "label": "Pathogenicity prediction",
-      "type": "peculiar"
-    },
     "sscv_db": {
       "label": "Splicing variant",
       "type": "enumeration",
@@ -2326,6 +2322,10 @@
           "label": "Ambiguous"
         }
       ]
+    },
+    "variant_effect_prediction": {
+      "label": "Variant effect prediction",
+      "type": "peculiar"
     },
     "id": {
       "label": "Variant ID",

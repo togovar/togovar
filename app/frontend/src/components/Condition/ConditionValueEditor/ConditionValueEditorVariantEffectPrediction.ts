@@ -1,27 +1,27 @@
 import { ConditionValueEditor } from './ConditionValueEditor';
-import '../ConditionPathogenicityPredictionSearch/TabView';
-import '../ConditionPathogenicityPredictionSearch/PredictionRangeSliderView';
+import '../ConditionVariantEffectPredictionSearch/TabView';
+import '../ConditionVariantEffectPredictionSearch/PredictionRangeSliderView';
 import type {
   PredictionKey,
   PredictionLabel,
-} from '../ConditionPathogenicityPredictionSearch/PredictionDatasets';
-import { PREDICTIONS } from '../ConditionPathogenicityPredictionSearch/PredictionDatasets';
+} from '../ConditionVariantEffectPredictionSearch/PredictionDatasets';
+import { PREDICTIONS } from '../ConditionVariantEffectPredictionSearch/PredictionDatasets';
 import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';
 import type { ConditionItemValueView } from '../ConditionItemValueView';
-import type { PredictionValueView } from '../ConditionPathogenicityPredictionSearch/PredictionValueView';
+import type { PredictionValueView } from '../ConditionVariantEffectPredictionSearch/PredictionValueView';
 import type { Inequality, PredictionChangeDetail } from '../../../types';
-import type { TabView } from '../ConditionPathogenicityPredictionSearch/TabView';
+import type { TabView } from '../ConditionVariantEffectPredictionSearch/TabView';
 
 const DEFAULT_PREDICTION_KEY: PredictionKey = 'cadd_phred';
 const DEFAULT_PREDICTION = PREDICTIONS[DEFAULT_PREDICTION_KEY];
 
 /**
- * Pathogenicity prediction 条件のエディタ。
+ * Variant effect prediction 条件のエディタ。
  * tab-view でデータセット（AlphaMissense/SIFT/PolyPhen 等）を切り替え、
  * スコア範囲と不等号を設定して prediction-value-view へ反映する。
  */
-export class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
+export class ConditionValueEditorVariantEffectPrediction extends ConditionValueEditor {
   private _dataset: PredictionKey = DEFAULT_PREDICTION_KEY;
   private _label: PredictionLabel = DEFAULT_PREDICTION.label;
   private _values: [number, number] = [
@@ -147,7 +147,7 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
    */
   private _initializeUI() {
     this.createSectionEl(
-      'pathogenicity-editor-view',
+      'variant-effect-prediction-editor-view',
       `<header class="section-header">Select prediction</header><div class="section-content"></div>`
     );
     this._tabsContainer =

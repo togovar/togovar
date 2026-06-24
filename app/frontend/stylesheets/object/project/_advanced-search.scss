@@ -729,7 +729,7 @@ $OPACITY_DISABLED: 0.8;
 //   object/component/_checklist-values.scss                … サイドバー用チェックリスト
 //   object/component/_condition-clinical-significance-view.scss … 臨床的意義条件選択
 //   object/component/_condition-disease-search.scss        … 疾患検索条件
-//   object/component/_condition-pathogenicity-view.scss    … 病原性予測条件
+//   object/component/_condition-variant-effect-prediction-view.scss … バリアント効果予測条件
 //   object/component/_frequency-count-editor-view.scss     … 頻度・カウント条件エディター
 //   object/component/_location-editor-view.scss            … 染色体位置条件エディター
 //   object/component/_range-inputs-view.scss               … 数値範囲入力ペア
@@ -908,11 +908,11 @@ $OPACITY_DISABLED: 0.8;
   }
 }
 
-// 病原性予測条件 (.pathogenicity-editor-view)
+// バリアント効果予測条件 (.variant-effect-prediction-editor-view)
 // AlphaMissense などの予測ツール別タブで閾値を選択させる
 // タブUIのスタイルは Shadow DOM 内で完結するため tab-view.scss で管理する
-.pathogenicity-editor-view {
-  &[data-condition-type='pathogenicity_prediction'].editor-panel {
+.variant-effect-prediction-editor-view {
+  &[data-condition-type='variant_effect_prediction'].editor-panel {
     > .section-content {
       // prediction-value-view の描画領域を確保するため下パディングが必要
       padding: 0 0 75px 0;

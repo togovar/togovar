@@ -11,7 +11,7 @@ import { ConditionValueEditorDisease } from './ConditionValueEditor/ConditionVal
 import { ConditionValueEditorFrequencyCount } from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
 import { ConditionValueEditorGene } from './ConditionValueEditor/ConditionValueEditorGene';
 import { ConditionValueEditorLocation } from './ConditionValueEditor/ConditionValueEditorLocation';
-import { ConditionValueEditorPathogenicityPrediction } from './ConditionValueEditor/ConditionValueEditorPathogenicityPrediction';
+import { ConditionValueEditorVariantEffectPrediction } from './ConditionValueEditor/ConditionValueEditorVariantEffectPrediction';
 import { ConditionValueEditorVariantID } from './ConditionValueEditor/ConditionValueEditorVariantID';
 import type { ConditionItemView } from './ConditionItemView';
 import type { ConditionValueEditor, EditorCtor } from '../../types';
@@ -23,8 +23,12 @@ const EDITOR_REGISTRY: Readonly<
 > = {
   [ADVANCED_CONDITION_TYPE.variant_type]: [ConditionValueEditorCheckboxes],
   [ADVANCED_CONDITION_TYPE.sscv_db]: [ConditionValueEditorCheckboxes],
-  [ADVANCED_CONDITION_TYPE.clinical_significance]: [ConditionValueEditorClinicalSignificance],
-  [ADVANCED_CONDITION_TYPE.variant_consequence]: [ConditionValueEditorConsequence],
+  [ADVANCED_CONDITION_TYPE.clinical_significance]: [
+    ConditionValueEditorClinicalSignificance,
+  ],
+  [ADVANCED_CONDITION_TYPE.variant_consequence]: [
+    ConditionValueEditorConsequence,
+  ],
   [ADVANCED_CONDITION_TYPE.dataset]: [
     ConditionValueEditorDatasetColumns,
     ConditionValueEditorFrequencyCount,
@@ -35,8 +39,8 @@ const EDITOR_REGISTRY: Readonly<
   ],
   [ADVANCED_CONDITION_TYPE.disease]: [ConditionValueEditorDisease],
   [ADVANCED_CONDITION_TYPE.gene_symbol]: [ConditionValueEditorGene],
-  [ADVANCED_CONDITION_TYPE.pathogenicity_prediction]: [
-    ConditionValueEditorPathogenicityPrediction,
+  [ADVANCED_CONDITION_TYPE.variant_effect_prediction]: [
+    ConditionValueEditorVariantEffectPrediction,
   ],
   [ADVANCED_CONDITION_TYPE.variant_id]: [ConditionValueEditorVariantID],
   [ADVANCED_CONDITION_TYPE.location]: [ConditionValueEditorLocation],
@@ -88,7 +92,8 @@ export default class ConditionValues {
     const t = this._conditionView.conditionType;
     const allEditorsValid = this._editors.every((e) => e.isValid);
     const requireAll =
-      t === ADVANCED_CONDITION_TYPE.dataset || t === ADVANCED_CONDITION_TYPE.genotype;
+      t === ADVANCED_CONDITION_TYPE.dataset ||
+      t === ADVANCED_CONDITION_TYPE.genotype;
 
     const finalValid = requireAll
       ? allEditorsValid

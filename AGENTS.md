@@ -48,7 +48,7 @@ app/frontend/
       AdvancedSearch/   Advanced Search全体制御
       Condition/        条件入力UI・クエリ変換
         ConditionDiseaseSearch/                  疾患検索Lit要素
-        ConditionPathogenicityPredictionSearch/  病原性予測検索Lit要素
+        ConditionVariantEffectPredictionSearch/   バリアント効果予測検索Lit要素
         ConditionValueEditor/                    条件値入力UI
         queryBuilders/                           条件→APIクエリ変換
       Karyotype/        染色体ビジュアライズ
