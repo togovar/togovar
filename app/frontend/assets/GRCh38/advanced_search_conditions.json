@@ -31,14 +31,6 @@
           ]
         },
         {
-          "value": "bbj1k",
-          "label": "BBJ1K"
-        },
-        {
-          "value": "bbj2k",
-          "label": "BBJ2K"
-        },
-        {
           "value": "jga_wes",
           "label": "JGA-WES"
         },
@@ -721,8 +713,20 @@
           ]
         },
         {
+          "value": "bbj1k",
+          "label": "BBJ1K"
+        },
+        {
+          "value": "bbj2k",
+          "label": "BBJ2K"
+        },
+        {
           "value": "tommo",
           "label": "ToMMo 54KJPN"
+        },
+        {
+          "value": "tommo_jsv1",
+          "label": "ToMMo JSV1"
         },
         {
           "value": "ncbn",
@@ -849,6 +853,10 @@
           ]
         },
         {
+          "value": "jogo",
+          "label": "JoGo"
+        },
+        {
           "value": "gnomad_genomes",
           "label": "gnomAD Genomes",
           "children": [
@@ -935,14 +943,6 @@
               "label": "South Asian"
             }
           ]
-        },
-        {
-          "value": "jogo",
-          "label": "JoGo"
-        },
-        {
-          "value": "tommo_jsv1",
-          "label": "ToMMo JSV1"
         },
         {
           "value": "gnomad_sv",

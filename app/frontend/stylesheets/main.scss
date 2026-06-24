@@ -8,6 +8,8 @@
 
 // 汎用UIコンポーネント — 特定画面に依存しない再利用可能なパーツ
 @use 'object/component/button-view';
+@use 'object/component/clinical-significance';
+@use 'object/component/dataset-icon';
 @use 'object/component/variant-icon';
 @use 'object/component/dropdown-view';
 @use 'object/component/floating-info';

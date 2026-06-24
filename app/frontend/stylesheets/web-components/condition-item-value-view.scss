@@ -119,6 +119,29 @@
   }
 }
 
+:host([data-condition-type='dataset'][data-value='bbj1k']),
+:host([data-condition-type='dataset'][data-value='bbj2k']) {
+  .inner {
+    background-color: var(--color-dataset-bbj-light);
+    border-color: var(--color-dataset-bbj);
+
+    &::before {
+      color: var(--color-dataset-bbj);
+    }
+  }
+}
+
+:host([data-condition-type='dataset'][data-value^='tommo']) {
+  .inner {
+    background-color: var(--color-dataset-tommo-light);
+    border-color: var(--color-dataset-tommo);
+
+    &::before {
+      color: var(--color-dataset-tommo);
+    }
+  }
+}
+
 :host([data-condition-type='dataset'][data-value='hgvd']) {
   .inner {
     background-color: var(--color-dataset-hgvd-light);
@@ -126,17 +149,6 @@
 
     &::before {
       color: var(--color-dataset-hgvd);
-    }
-  }
-}
-
-:host([data-condition-type='dataset'][data-value='tommo']) {
-  .inner {
-    background-color: var(--color-dataset-tommo-light);
-    border-color: var(--color-dataset-tommo);
-
-    &::before {
-      color: var(--color-dataset-tommo);
     }
   }
 }
@@ -153,8 +165,20 @@
   }
 }
 
+:host([data-condition-type='dataset'][data-value^='jogo']) {
+  .inner {
+    background-color: var(--color-dataset-jogo-light);
+    border-color: var(--color-dataset-jogo);
+
+    &::before {
+      color: var(--color-dataset-jogo);
+    }
+  }
+}
+
 :host([data-condition-type='dataset'][data-value^='gnomad_genomes']),
-:host([data-condition-type='dataset'][data-value^='gnomad_exomes']) {
+:host([data-condition-type='dataset'][data-value^='gnomad_exomes']),
+:host([data-condition-type='dataset'][data-value^='gnomad_sv']) {
   .inner {
     background-color: var(--color-dataset-foreign-light);
     border-color: var(--color-dataset-foreign);
