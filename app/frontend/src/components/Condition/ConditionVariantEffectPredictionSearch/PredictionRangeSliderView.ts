@@ -72,17 +72,17 @@ export class PredictionRangeSlider extends LitElement {
   > = {};
 
   @queryAll('.number-input > input[type="number"]')
-  private _numberInput!: NodeListOf<HTMLInputElement>;
+  private numberInput!: NodeListOf<HTMLInputElement>;
   @queryAll('.range-input  > input[type="range"]')
-  private _rangeInput!: NodeListOf<HTMLInputElement>;
+  private rangeInput!: NodeListOf<HTMLInputElement>;
   @queryAll('.number-input .inequality-sign')
-  private _inequalitySign!: NodeListOf<HTMLButtonElement>;
-  @query('.slider .bar') private _range!: HTMLDivElement;
+  private inequalitySign!: NodeListOf<HTMLButtonElement>;
+  @query('.slider .bar') private bar!: HTMLDivElement;
 
   firstUpdated(): void {
-    this._range.style.backgroundImage = createGradientSlider(
+    this.bar.style.backgroundImage = createGradientSlider(
       this.activeDataset,
-      this._range,
+      this.bar,
       SLIDER_WIDTH,
       this.scoreMin,
       this.scoreMax
@@ -116,7 +116,20 @@ export class PredictionRangeSlider extends LitElement {
     }
   }
 
-  private _handleSliderValues(
+  /**
+   * number input からフォーカスが外れたとき、空欄なら下限・上限値に補完してスライダーと同期する。
+   * 入力途中の空欄状態を許容しつつ、最終的に NaN がバー位置やクエリに残らないようにするため。
+   */
+  private handleNumberInputBlur = (e: Event) => {
+    const input = e.currentTarget as HTMLInputElement;
+    if (!isNaN(parseFloat(input.value))) return;
+    input.value = String(
+      input.className === 'from' ? this.scoreMin : this.scoreMax
+    );
+    input.dispatchEvent(new Event('input'));
+  };
+
+  private handleSliderValues(
     e: Event,
     primaryInputs: NodeListOf<HTMLInputElement>,
     secondaryInputs: NodeListOf<HTMLInputElement>
@@ -126,31 +139,35 @@ export class PredictionRangeSlider extends LitElement {
 
     const target = e.target as HTMLInputElement;
 
+    // 編集中フィールドが空欄の場合は blur 時に補完するため、ここでは更新しない
+    if (target.className === 'from' && isNaN(minValue)) return;
+    if (target.className !== 'from' && isNaN(maxValue)) return;
+
     if (target.className === 'from') {
       secondaryInputs[0].value = String(minValue);
-      this._range.style.left = this._valueToPercent(minValue) + '%';
+      this.bar.style.left = this.valueToPercent(minValue) + '%';
 
       if (minValue > maxValue) {
         maxValue = parseFloat(primaryInputs[0].value);
         primaryInputs[1].value = String(maxValue);
         secondaryInputs[1].value = String(maxValue);
-        this._range.style.right = 100 - this._valueToPercent(maxValue) + '%';
+        this.bar.style.right = 100 - this.valueToPercent(maxValue) + '%';
       }
     } else {
       secondaryInputs[1].value = String(maxValue);
-      this._range.style.right = 100 - this._valueToPercent(maxValue) + '%';
+      this.bar.style.right = 100 - this.valueToPercent(maxValue) + '%';
 
       if (maxValue < minValue) {
         minValue = parseFloat(primaryInputs[1].value);
         primaryInputs[0].value = String(minValue);
         secondaryInputs[0].value = String(minValue);
-        this._range.style.left = this._valueToPercent(minValue) + '%';
+        this.bar.style.left = this.valueToPercent(minValue) + '%';
       }
     }
 
-    this._range.style.backgroundImage = createGradientSlider(
+    this.bar.style.backgroundImage = createGradientSlider(
       this.activeDataset,
-      this._range,
+      this.bar,
       SLIDER_WIDTH,
       this.scoreMin,
       this.scoreMax
@@ -158,30 +175,30 @@ export class PredictionRangeSlider extends LitElement {
     [this.minValue, this.maxValue] = [minValue, maxValue];
   }
 
-  private _handleThresholdButton = (e: Event) => {
+  private handleThresholdButton = (e: Event) => {
     const btn = e.currentTarget as HTMLButtonElement;
     const minValue = parseFloat(btn.dataset.minValue!);
     const maxValue = parseFloat(btn.dataset.maxValue!);
     const minInequalitySign = btn.dataset.minInequalitySign as Inequality;
     const maxInequalitySign = btn.dataset.maxInequalitySign as Inequality;
 
-    [this._rangeInput[0].value, this._numberInput[0].value] = [
+    [this.rangeInput[0].value, this.numberInput[0].value] = [
       String(minValue),
       String(minValue),
     ];
-    [this._rangeInput[1].value, this._numberInput[1].value] = [
+    [this.rangeInput[1].value, this.numberInput[1].value] = [
       String(maxValue),
       String(maxValue),
     ];
 
-    setInequalitySign(this._inequalitySign[0], minInequalitySign);
-    setInequalitySign(this._inequalitySign[1], maxInequalitySign);
+    setInequalitySign(this.inequalitySign[0], minInequalitySign);
+    setInequalitySign(this.inequalitySign[1], maxInequalitySign);
 
-    this._range.style.left = this._valueToPercent(minValue) + '%';
-    this._range.style.right = 100 - this._valueToPercent(maxValue) + '%';
-    this._range.style.backgroundImage = createGradientSlider(
+    this.bar.style.left = this.valueToPercent(minValue) + '%';
+    this.bar.style.right = 100 - this.valueToPercent(maxValue) + '%';
+    this.bar.style.backgroundImage = createGradientSlider(
       this.activeDataset,
-      this._range,
+      this.bar,
       SLIDER_WIDTH,
       this.scoreMin,
       this.scoreMax
@@ -193,7 +210,7 @@ export class PredictionRangeSlider extends LitElement {
     this.maxInequalitySign = maxInequalitySign;
   };
 
-  private _handleInequalitySign(e: Event) {
+  private handleInequalitySign(e: Event) {
     const btn = e.currentTarget as HTMLButtonElement;
     const prev = btn.dataset.inequalitySign as Inequality;
     const next = toggleInequality(prev);
@@ -207,7 +224,7 @@ export class PredictionRangeSlider extends LitElement {
   }
 
   // Checkbox → Reflected as boolean
-  private _handleLabelCheckbox(e: Event) {
+  private handleLabelCheckbox(e: Event) {
     const input = e.currentTarget as HTMLInputElement;
     const name = input.dataset.name as UnassignedOption | undefined;
     if (!name) return;
@@ -215,19 +232,6 @@ export class PredictionRangeSlider extends LitElement {
 
     if (name === 'unassigned') this.includeUnassigned = checked;
     if (name === 'unknown') this.includeUnknown = checked;
-  }
-
-  private _switchInequalitySign(sign: Inequality) {
-    switch (sign) {
-      case 'gte':
-        return { newSign: 'gt' as Inequality, newHtml: '&#60;' };
-      case 'gt':
-        return { newSign: 'gte' as Inequality, newHtml: '&#8804;' };
-      case 'lte':
-        return { newSign: 'lt' as Inequality, newHtml: '&#60;' };
-      case 'lt':
-        return { newSign: 'lte' as Inequality, newHtml: '&#8804;' };
-    }
   }
 
   render() {
@@ -246,7 +250,8 @@ export class PredictionRangeSlider extends LitElement {
         max=${this.scoreMax}
         step=${this.scoreStep}
         @input=${(e: Event) =>
-          this._handleSliderValues(e, this._numberInput, this._rangeInput)}
+          this.handleSliderValues(e, this.numberInput, this.rangeInput)}
+        @blur=${this.handleNumberInputBlur}
       />
     `;
 
@@ -260,7 +265,7 @@ export class PredictionRangeSlider extends LitElement {
         max=${this.scoreMax}
         step=${this.scoreStep}
         @input=${(e: Event) =>
-          this._handleSliderValues(e, this._rangeInput, this._numberInput)}
+          this.handleSliderValues(e, this.rangeInput, this.numberInput)}
       />
     `;
 
@@ -269,7 +274,7 @@ export class PredictionRangeSlider extends LitElement {
         class="inequality-sign"
         type="button"
         data-inequality-sign=${inequalitySign}
-        @click=${(e: Event) => this._handleInequalitySign(e)}
+        @click=${(e: Event) => this.handleInequalitySign(e)}
       >
         &#8804;
       </button>
@@ -286,7 +291,7 @@ export class PredictionRangeSlider extends LitElement {
             id=${id}
             data-name=${list}
             .checked=${checked}
-            @change=${(e: Event) => this._handleLabelCheckbox(e)}
+            @change=${(e: Event) => this.handleLabelCheckbox(e)}
           />
           <label for=${id}>${capitalizeFirstLetter(list)}</label>
         `;
@@ -313,7 +318,7 @@ export class PredictionRangeSlider extends LitElement {
                 class="scale"
                 style="left: calc(${(i * 100) / this.numberOfScales}% - 0.3rem)"
               >
-                ${this._formatScaleValue(i)}
+                ${this.formatScaleValue(i)}
               </li>`
           )}
         </ul>
@@ -325,7 +330,7 @@ export class PredictionRangeSlider extends LitElement {
                   <div
                     class="threshold-line"
                     style="height:${(arr.length - i) * 20 +
-                    10}px; left:${this._valueToPercent(details.min)}%;"
+                    10}px; left:${this.valueToPercent(details.min)}%;"
                   ></div>
                   <button
                     type="button"
@@ -334,10 +339,10 @@ export class PredictionRangeSlider extends LitElement {
                     data-max-value=${details.max}
                     data-min-inequality-sign=${details.minInequalitySign}
                     data-max-inequality-sign=${details.maxInequalitySign}
-                    style="left:${this._valueToPercent(
+                    style="left:${this.valueToPercent(
                       details.min
                     )}%; top:${(arr.length - i) * 20}px;"
-                    @click=${this._handleThresholdButton}
+                    @click=${this.handleThresholdButton}
                   >
                     ${key}
                   </button>
@@ -355,7 +360,7 @@ export class PredictionRangeSlider extends LitElement {
   }
 
   /** CADD PHRED のように0-1以外のスコアでもバー位置を正しく出すため、値を%へ正規化する。 */
-  private _valueToPercent(value: number): number {
+  private valueToPercent(value: number): number {
     const width = this.scoreMax - this.scoreMin;
     if (width <= 0) return 0;
     return ((value - this.scoreMin) / width) * 100;
@@ -366,7 +371,7 @@ export class PredictionRangeSlider extends LitElement {
    * CADD (scoreMax > 1) は最後の目盛りのみ上限値をそのまま使い、それ以外は自然刻みで四捨五入して整数表示する。
    * 例: 0–99 を 10 分割した場合、9.9 刻みを 10 単位に丸めて 0, 10, 20, …, 90, 99 と表示する。
    */
-  private _formatScaleValue(index: number): string {
+  private formatScaleValue(index: number): string {
     const value =
       this.scoreMin +
       ((this.scoreMax - this.scoreMin) / this.numberOfScales) * index;
