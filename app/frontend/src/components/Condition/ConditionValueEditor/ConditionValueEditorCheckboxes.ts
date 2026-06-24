@@ -37,7 +37,7 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
     }
 
     this.createSectionEl('checkboxes-editor-view', () => [
-      createEl('header', { class: 'section-header', text: `Select ${this.conditionType}` }),
+      createEl('header', { class: 'section-header', text: 'Select values' }),
 
       createEl('div', {
         class: 'buttons',

@@ -2306,7 +2306,7 @@
       "type": "peculiar"
     },
     "sscv_db": {
-      "label": "SSCV DB",
+      "label": "Splicing variant",
       "type": "enumeration",
       "values": [
         {
