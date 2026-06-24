@@ -30,6 +30,7 @@ export type MasterConditionId =
   | 'significance'
   | 'consequence'
   | 'consequence_grouping'
+  | 'cadd'
   | 'alphamissense'
   | 'sift'
   | 'polyphen';
@@ -72,6 +73,7 @@ export type SimpleSearchCurrentConditions = {
   type?: Record<string, string>; // { "SO_0001483": "1", ... }
   consequence?: Record<string, string>; // { "SO_0001580": "1", ... }
   significance?: Record<string, string>; // { "NA": "1", ... }
+  cadd?: Record<string, string>; // { "N": "1", "D": "1", "POSSD": "1", "T": "1" }
   alphamissense?: Record<string, string>; // { "N": "1", "LP": "1", ... }
   sift?: Record<string, string>; // { "N": "1", "D": "1", ... }
   polyphen?: Record<string, string>; // { "N": "1", "PROBD": "1", ... }

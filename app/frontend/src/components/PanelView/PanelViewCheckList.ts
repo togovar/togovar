@@ -23,7 +23,13 @@ type InputValueEntry = {
 /** チェックリスト形式のパネルで使用される kind の値 */
 type CheckListKind = Extract<
   MasterConditionId,
-  'dataset' | 'type' | 'significance' | 'alphamissense' | 'sift' | 'polyphen'
+  | 'dataset'
+  | 'type'
+  | 'significance'
+  | 'cadd'
+  | 'alphamissense'
+  | 'sift'
+  | 'polyphen'
 >;
 
 /** 統計情報のストアキー */
@@ -35,6 +41,19 @@ type StatisticsType =
 // ----------------------------------------
 // スコアラベルの定数
 // ----------------------------------------
+/** CADD phred スコアのラベル（D=≥20, POSSD=≥10, T=<10）。data-function は既存CSS色クラスを流用する。 */
+const CADD_LABELS: Record<string, string> = {
+  D: '&ge; 20',
+  POSSD: '&ge; 10',
+  T: '&lt; 10',
+};
+
+/** AlphaMissense スコアのラベル */
+const ALPHAMISSENSE_LABELS: Record<string, string> = {
+  LP: '&gt; 0.564',
+  A: '&ge; 0.340',
+  LB: '&lt; 0.340',
+};
 
 /** SIFT スコアのラベル */
 const SIFT_LABELS: Record<string, string> = {
@@ -50,19 +69,13 @@ const POLYPHEN_LABELS: Record<string, string> = {
   U: 'Unknown',
 };
 
-/** AlphaMissense スコアのラベル */
-const ALPHAMISSENSE_LABELS: Record<string, string> = {
-  LP: '&gt; 0.564',
-  A: '&ge; 0.340',
-  LB: '&lt; 0.340',
-};
-
 /**
  * "Unassigned" チェックボックスを持つ kind と、
  * そのチェックボックスの value 属性のマッピング。
  */
 const UNASSIGNED_VALUE: Partial<Record<CheckListKind, string>> = {
   significance: 'NA',
+  cadd: 'N',
   alphamissense: 'N',
   sift: 'N',
   polyphen: 'N',
@@ -162,7 +175,9 @@ export default class PanelViewCheckList extends PanelView {
    * statisticsType が指定されている場合は統計情報の更新も購読する。
    */
   private _bindStore(statisticsType?: StatisticsType): void {
-    storeManager.subscribe('simpleSearchConditions', (v) => this.simpleSearchConditions(v));
+    storeManager.subscribe('simpleSearchConditions', (v) =>
+      this.simpleSearchConditions(v)
+    );
 
     if (statisticsType) {
       // bind APIではthis[statisticsType]を動的に生成していたが、
@@ -238,12 +253,14 @@ export default class PanelViewCheckList extends PanelView {
         return `<div class="dataset-icon" data-dataset="${id}"><div class="properties"></div></div>`;
       case 'significance':
         return `<div class="clinical-significance" data-value="${id}"></div>`;
+      case 'cadd':
+        return `<div class="variant-function _width_5em _align-center" data-function="${id}">${CADD_LABELS[id] ?? ''}</div>`;
+      case 'alphamissense':
+        return `<div class="variant-function _width_5em _align-center" data-function="${id}">${ALPHAMISSENSE_LABELS[id] ?? ''}</div>`;
       case 'sift':
         return `<div class="variant-function _width_5em _align-center" data-function="${id}">${SIFT_LABELS[id] ?? ''}</div>`;
       case 'polyphen':
         return `<div class="variant-function _width_5em _align-center" data-function="${id}">${POLYPHEN_LABELS[id] ?? ''}</div>`;
-      case 'alphamissense':
-        return `<div class="variant-function _width_5em _align-center" data-function="${id}">${ALPHAMISSENSE_LABELS[id] ?? ''}</div>`;
       default:
         return '';
     }
@@ -278,7 +295,9 @@ export default class PanelViewCheckList extends PanelView {
    */
   simpleSearchConditions(conditions: SimpleSearchCurrentConditions): void {
     const kindConditions =
-      (conditions as Record<string, Record<string, string> | undefined>)[this.kind] ?? {};
+      (conditions as Record<string, Record<string, string> | undefined>)[
+        this.kind
+      ] ?? {};
 
     if (Object.keys(kindConditions).length === 0) {
       // デフォルト or Clear → 全チェックなし

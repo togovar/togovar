@@ -226,16 +226,20 @@ function initSidebar(): void {
     selectRequired<HTMLElement>(document, '#FilterConsequence')
   );
   new PanelViewCheckList(
+    selectRequired<HTMLElement>(document, '#FilterCADD'),
+    'cadd'
+  );
+  new PanelViewCheckList(
+    selectRequired<HTMLElement>(document, '#FilterAlphaMissense'),
+    'alphamissense'
+  );
+  new PanelViewCheckList(
     selectRequired<HTMLElement>(document, '#FilterSIFT'),
     'sift'
   );
   new PanelViewCheckList(
     selectRequired<HTMLElement>(document, '#FilterPolyPhen'),
     'polyphen'
-  );
-  new PanelViewCheckList(
-    selectRequired<HTMLElement>(document, '#FilterAlphaMissense'),
-    'alphamissense'
   );
 }
 

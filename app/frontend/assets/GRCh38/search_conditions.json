@@ -734,6 +734,37 @@
     ]
   },
   {
+    "id": "cadd",
+    "label": "CADD (phred score)",
+    "type": "array",
+    "items": [
+      {
+        "id": "N",
+        "label": "Unassigned",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "D",
+        "label": "",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "POSSD",
+        "label": "",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "T",
+        "label": "",
+        "type": "boolean",
+        "default": "1"
+      }
+    ]
+  },
+  {
     "id": "alphamissense",
     "label": "AlphaMissense",
     "type": "array",
