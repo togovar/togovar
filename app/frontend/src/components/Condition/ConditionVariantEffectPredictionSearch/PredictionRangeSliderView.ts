@@ -114,6 +114,19 @@ export class PredictionRangeSlider extends LitElement {
         })
       );
     }
+
+    // restoreTab など外部からのプロパティ変更時にもバー位置を正しく反映するため
+    if ((changed.has('minValue') || changed.has('maxValue')) && this.bar) {
+      this.bar.style.left = this.valueToPercent(this.minValue) + '%';
+      this.bar.style.right = 100 - this.valueToPercent(this.maxValue) + '%';
+      this.bar.style.backgroundImage = createGradientSlider(
+        this.activeDataset,
+        this.bar,
+        SLIDER_WIDTH,
+        this.scoreMin,
+        this.scoreMax
+      );
+    }
   }
 
   /**

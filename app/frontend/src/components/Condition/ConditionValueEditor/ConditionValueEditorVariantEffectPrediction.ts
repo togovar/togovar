@@ -66,6 +66,8 @@ export class ConditionValueEditorVariantEffectPrediction extends ConditionValueE
   /**
    * Cancel時に戻す基準として、shadow DOM内の prediction-value-view の現在値を保存する。
    * shadow DOM を経由するため、value-view が未更新のタイミングでも正確な値が取れる。
+   * 同時に tab-view のアクティブタブを現在の dataset に合わせて復元する。
+   * URL復元後に edit ボタンを押したとき、最初のタブ（CADD）ではなく保存された条件のタブが開くようにするため。
    */
   keepLastValues() {
     this.valuesContainerEl
@@ -92,6 +94,8 @@ export class ConditionValueEditorVariantEffectPrediction extends ConditionValueE
             includeUnassigned,
             includeUnknown,
           };
+          const tabView = this._tabsContainer.querySelector<TabView>('tab-view');
+          tabView?.restoreTab(dataset, values, inequalitySigns, includeUnassigned, includeUnknown);
         }
       });
   }
