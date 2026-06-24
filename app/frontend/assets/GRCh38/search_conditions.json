@@ -623,6 +623,41 @@
         "type": "boolean",
         "default": "1",
         "description": "A sequence variant where at least one base in the start codon is changed, but the start remains"
+      },
+      {
+        "id": "SO_0001787",
+        "label": "Splice donor 5th base variant",
+        "type": "boolean",
+        "default": "1",
+        "description": "A sequence variant that falls in the region between the 5th and 6th base of the 5' end of an intron"
+      },
+      {
+        "id": "SO_0002170",
+        "label": "Splice donor region variant",
+        "type": "boolean",
+        "default": "1",
+        "description": "A sequence variant that falls in the region between the 3rd and 6th base of the 5' end of an intron"
+      },
+      {
+        "id": "SO_0002169",
+        "label": "Splice polypyrimidine tract variant",
+        "type": "boolean",
+        "default": "1",
+        "description": "A sequence variant that falls in the polypyrimidine tract at the 3' end of an intron"
+      },
+      {
+        "id": "SO_0001968",
+        "label": "Coding transcript variant",
+        "type": "boolean",
+        "default": "1",
+        "description": "A transcript variant of a protein coding gene"
+      },
+      {
+        "id": "SO_0001060",
+        "label": "Sequence variant",
+        "type": "boolean",
+        "default": "1",
+        "description": "A sequence_variant is a non exact copy of a sequence_feature or genome exhibiting one or more sequence_alteration"
       }
     ]
   },
@@ -665,10 +700,18 @@
           },
           {
             "label": "Splice variant",
-            "items": ["SO_0001574", "SO_0001575", "SO_0001630"]
+            "items": [
+              "SO_0001574",
+              "SO_0001575",
+              "SO_0001630",
+              "SO_0001787",
+              "SO_0002170",
+              "SO_0002169"
+            ]
           },
           "SO_0001893",
-          "SO_0001889"
+          "SO_0001889",
+          "SO_0001968"
         ]
       },
       {
@@ -686,7 +729,8 @@
       {
         "label": "Intergenic variant",
         "items": ["SO_0001632", "SO_0001628", "SO_0001631"]
-      }
+      },
+      "SO_0001060"
     ]
   },
   {

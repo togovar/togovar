@@ -1141,7 +1141,7 @@
         {
           "id": 1,
           "label": "Transcript variant",
-          "children": [2, 19, 25, 29, 30]
+          "children": [2, 19, 25, 29, 30, 46]
         },
         {
           "id": 2,
@@ -1305,7 +1305,7 @@
         {
           "id": 25,
           "label": "Splice variant",
-          "children": [26, 27, 28],
+          "children": [26, 27, 28, 43, 44, 45],
           "parent": 1
         },
         {
@@ -1422,6 +1422,40 @@
           "label": "Upstream gene variant",
           "description": "A sequence variant located 5' of a gene",
           "parent": 39
+        },
+        {
+          "id": 43,
+          "value": "splice_donor_5th_base_variant",
+          "label": "Splice donor 5th base variant",
+          "description": "A sequence variant that falls in the region between the 5th and 6th base of the 5' end of an intron",
+          "parent": 25
+        },
+        {
+          "id": 44,
+          "value": "splice_donor_region_variant",
+          "label": "Splice donor region variant",
+          "description": "A sequence variant that falls in the region between the 3rd and 6th base of the 5' end of an intron",
+          "parent": 25
+        },
+        {
+          "id": 45,
+          "value": "splice_polypyrimidine_tract_variant",
+          "label": "Splice polypyrimidine tract variant",
+          "description": "A sequence variant that falls in the polypyrimidine tract at the 3' end of an intron",
+          "parent": 25
+        },
+        {
+          "id": 46,
+          "value": "coding_transcript_variant",
+          "label": "Coding transcript variant",
+          "description": "A transcript variant of a protein coding gene",
+          "parent": 1
+        },
+        {
+          "id": 47,
+          "value": "sequence_variant",
+          "label": "Sequence variant",
+          "description": "A non exact copy of a sequence_feature or genome exhibiting one or more sequence_alteration"
         }
       ]
     },

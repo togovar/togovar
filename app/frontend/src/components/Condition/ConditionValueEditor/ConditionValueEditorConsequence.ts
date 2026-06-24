@@ -181,7 +181,7 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
     if (item.parent !== undefined) dataset.parent = String(item.parent);
 
     const input = createEl('input', { attrs: { type: 'checkbox' } });
-    const label = createEl('label', { children: [input, ' ', item.label] });
+    const label = createEl('label', { children: [input, createEl('span', { text: item.label })] });
 
     const li = createEl('li', { dataset });
     li.append(label);

@@ -255,3 +255,13 @@ npm run typecheck
 - このリポジトリには `npm run check` は定義されていない。
 - 環境によって `node` / `npm` がPATHに無い場合がある。その場合は実行できなかったことを報告する。
 - Rails/バックエンド側を触った場合は、READMEのBackend手順と既存のRubyコマンドを確認する。
+
+### Consequence データを変更した場合の追加確認
+
+`search_conditions.json`・`advanced_search_conditions.json` の consequence 定義を変更した場合、または `scripts/GRCh38/openapi.yaml` を更新した場合は、以下も実行する。
+
+```bash
+python3 scripts/check_consequence.py
+```
+
+`openapi.yaml`（TogoVar API の Swagger 仕様）を正として、consequence の SO ID・スネークケース名・consequence_grouping・ツリーの親子関係をまとめて検証する。Python 3 のみで動作する（追加インストール不要）。エラーが出た場合は両 JSON を修正してから再確認する。
