@@ -53,7 +53,7 @@ block content
                 li.item.-question
                   a.link(href='#d6') How do you calculate the value of Clinical significance?
                 li.item.-question
-                  a.link(href='#d7') What are AlphaMissense, SIFT and PolyPhen?
+                  a.link(href='#d7') What are CADD, AlphaMissense, SIFT and PolyPhen?
                 li.item.-question
                   a.link(href='#d8') Was a liftover tool used for generating variant data?
                 li.item.-question
@@ -233,16 +233,35 @@ block content
                 |
                 | are displayed.
           #d7.question-answer
-            h4.question What are AlphaMissense, SIFT and Polyphen?
+            h4.question What are CADD, AlphaMissense, SIFT and PolyPhen?
             .answer
               p
-                | AlphaMissense, SIFT and PolyPhen predict the impact of variants on protein function when an amino acid sequence is altered.
-                | These programs were performed using
+                | The following scores are used to predict the potential impact of variants and are calculated using
                 |
                 a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html')
                   | Variant Effect Predictor (VEP)
-                | . The icons below represent the threshold scores used for qualitative predictions.
+                | . CADD scores the deleteriousness of any type of variant, while AlphaMissense, SIFT and PolyPhen
+                | specifically predict the impact on protein function when an amino acid sequence is altered.
+                | The icons below represent the threshold scores used for qualitative predictions.
               ul.unordered-list._margin-bottom._align-left
+                li
+                  strong CADD (PHRED score)
+                  br
+                  div
+                    .variant-function._width_5em._align-center(data-function='D') &ge; 20
+                  div
+                    .variant-function._width_5em._align-center(data-function='POSSD') &ge; 10
+                  div
+                    .variant-function._width_5em._align-center(data-function='T') &lt; 10
+                  span
+                    | CADD (Combined Annotation Dependent Depletion) integrates diverse genomic annotations to score
+                    | the deleteriousness of any type of variant. Unlike the other tools listed here, CADD is not limited
+                    | to missense variants. PHRED-scaled scores &ge; 20 indicate the top 1% and scores &ge; 10 indicate
+                    | the top 10% of deleterious variants genome-wide. See
+                    |
+                  a.hyper-text.-external(target='_blank', href='https://cadd.gs.washington.edu/info') CADD
+                  |
+                  | for details.
                 li
                   strong AlphaMissense
                   br

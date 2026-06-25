@@ -359,6 +359,7 @@ export default class FloatingInfo {
         return 'Read frequency help';
       case 'table-header-consequence':
         return 'Read consequence help';
+      case 'table-header-cadd':
       case 'table-header-sift':
       case 'table-header-polyphen':
       case 'table-header-alphamissense':

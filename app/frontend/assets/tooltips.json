@@ -36,22 +36,23 @@
   },
   {
     "id": "table-header-cadd",
-    "content": "CADD (Combined Annotation Dependent Depletion) PHRED-scaled score for predicting the deleteriousness of a variant"
+    "content": "CADD (Combined Annotation Dependent Depletion) PHRED-scaled score for predicting the deleteriousness of a variant",
+    "url": "/doc/help#d7"
   },
   {
     "id": "table-header-alphamissense",
     "content": "Prediction of functional effects of a nonsynonymous variant by the AlphaMissense program.",
-    "url": "/doc/help#d6"
+    "url": "/doc/help#d7"
   },
   {
     "id": "table-header-sift",
     "content": "Prediction of functional effects of a nonsynonymous variant by the Sorting Intolerant From Tolerant (SIFT) program",
-    "url": "/doc/help#d6"
+    "url": "/doc/help#d7"
   },
   {
     "id": "table-header-polyphen",
     "content": "Prediction of functional effects of a nonsynonymous variant by the PolyPhen-2 (Polymorphism Phenotyping v2) program",
-    "url": "/doc/help#d6"
+    "url": "/doc/help#d7"
   },
   {
     "id": "table-header-splicingvariant",
