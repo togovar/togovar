@@ -22,7 +22,7 @@ export class PredictionRangeSlider extends LitElement {
 
   /** dataset name (= prediction key) */
   @property({ type: String, reflect: true, attribute: 'data-dataset' })
-  predictionScoreName: PredictionKey = 'alphamissense';
+  predictionScoreName: PredictionKey = 'cadd_phred';
 
   @property({ type: Number, reflect: true, attribute: 'data-min-value' })
   minValue: number = 0;
