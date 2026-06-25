@@ -419,11 +419,27 @@ block content
                     frequency-block-view(data-dataset="ncbn" data-frequency="≥0.5")
                     | &nbsp; NCBN
                     br
+                    frequency-block-view(data-dataset="bbj1k" data-frequency="≥0.5")
+                    | &nbsp; BBJ1K
+                    br
+                    frequency-block-view(data-dataset="bbj2k" data-frequency="≥0.5")
+                    | &nbsp; BBJ2K
+                    br
+                    frequency-block-view(data-dataset="tommo_jsv1" data-frequency="≥0.5")
+                    | &nbsp; ToMMo JSV1
+                    br
+                    frequency-block-view(data-dataset="jogo" data-frequency="≥0.5")
+                    | &nbsp; JoGo
+                    br
                   frequency-block-view(data-dataset="gnomad_genomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD genomes
                   br
                   frequency-block-view(data-dataset="gnomad_exomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD exomes
+                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                    br
+                    frequency-block-view(data-dataset="gnomad_sv" data-frequency="≥0.5")
+                    | &nbsp; gnomAD SV
 
           #s2.question-answer._column-span-all
             h4.question
