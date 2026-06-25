@@ -23,6 +23,7 @@
 // 画面別スタイル — 各機能ページ固有のコンポーネントをまとめたもの
 @use 'object/project/loading-indicator';
 @use 'object/project/advanced-search';
+@use 'object/project/advanced-search-editor-panels';
 @use 'object/project/chromosome';
 @use 'object/project/columns-editor';
 @use 'object/project/detail';

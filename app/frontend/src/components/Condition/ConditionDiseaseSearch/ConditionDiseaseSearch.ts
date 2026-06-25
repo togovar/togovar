@@ -57,13 +57,8 @@ export class ConditionDiseaseSearch extends LitElement {
     return this;
   }
 
-  /**
-   * id 属性を設定してスクリーンリーダーや CSS セレクターからの参照を可能にする。
-   * 既存の id を上書きしないことで、複数インスタンスが存在する場合の id 重複を防ぐ。
-   */
   override connectedCallback(): void {
     super.connectedCallback();
-    if (!this.id) this.id = 'ConditionDiseaseSearch';
   }
 
   /**
