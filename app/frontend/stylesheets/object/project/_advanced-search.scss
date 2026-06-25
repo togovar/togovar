@@ -739,6 +739,8 @@ $OPACITY_DISABLED: 0.8;
 // 条件エディターパネル内のチェックボックスを水平並びで表示する
 .checkboxes-editor-view {
   > .buttons {
+    display: flex;
+    gap: 5px;
     padding: 4px var(--padding-side);
     border-bottom: dotted 1px var(--color-separator-sub);
   }
