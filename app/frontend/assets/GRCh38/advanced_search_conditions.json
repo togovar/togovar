@@ -1159,6 +1159,27 @@
           ]
         },
         {
+          "id": "SO_0001893",
+          "value": "SO_0001893",
+          "label": "Transcript ablation",
+          "description": "A feature ablation whereby the deleted region includes a transcript feature",
+          "parent": "group:transcript_variant"
+        },
+        {
+          "id": "SO_0001889",
+          "value": "SO_0001889",
+          "label": "Transcript amplification",
+          "description": "A feature amplification of a region containing a transcript",
+          "parent": "group:transcript_variant"
+        },
+        {
+          "id": "SO_0001968",
+          "value": "SO_0001968",
+          "label": "Coding transcript variant",
+          "description": "A transcript variant of a protein coding gene",
+          "parent": "group:transcript_variant"
+        },
+        {
           "id": "group:coding_variant",
           "label": "Coding variant",
           "parent": "group:transcript_variant",
@@ -1375,18 +1396,25 @@
           "parent": "group:splice_variant"
         },
         {
-          "id": "SO_0001893",
-          "value": "SO_0001893",
-          "label": "Transcript ablation",
-          "description": "A feature ablation whereby the deleted region includes a transcript feature",
-          "parent": "group:transcript_variant"
+          "id": "SO_0001787",
+          "value": "SO_0001787",
+          "label": "Splice donor 5th base variant",
+          "description": "A sequence variant that falls in the region between the 5th and 6th base of the 5' end of an intron",
+          "parent": "group:splice_variant"
         },
         {
-          "id": "SO_0001889",
-          "value": "SO_0001889",
-          "label": "Transcript amplification",
-          "description": "A feature amplification of a region containing a transcript",
-          "parent": "group:transcript_variant"
+          "id": "SO_0002170",
+          "value": "SO_0002170",
+          "label": "Splice donor region variant",
+          "description": "A sequence variant that falls in the region between the 3rd and 6th base of the 5' end of an intron",
+          "parent": "group:splice_variant"
+        },
+        {
+          "id": "SO_0002169",
+          "value": "SO_0002169",
+          "label": "Splice polypyrimidine tract variant",
+          "description": "A sequence variant that falls in the polypyrimidine tract at the 3' end of an intron",
+          "parent": "group:splice_variant"
         },
         {
           "id": "group:regulatory_variant",
@@ -1479,34 +1507,6 @@
           "label": "Upstream gene variant",
           "description": "A sequence variant located 5' of a gene",
           "parent": "group:intergenic_variant"
-        },
-        {
-          "id": "SO_0001787",
-          "value": "SO_0001787",
-          "label": "Splice donor 5th base variant",
-          "description": "A sequence variant that falls in the region between the 5th and 6th base of the 5' end of an intron",
-          "parent": "group:splice_variant"
-        },
-        {
-          "id": "SO_0002170",
-          "value": "SO_0002170",
-          "label": "Splice donor region variant",
-          "description": "A sequence variant that falls in the region between the 3rd and 6th base of the 5' end of an intron",
-          "parent": "group:splice_variant"
-        },
-        {
-          "id": "SO_0002169",
-          "value": "SO_0002169",
-          "label": "Splice polypyrimidine tract variant",
-          "description": "A sequence variant that falls in the polypyrimidine tract at the 3' end of an intron",
-          "parent": "group:splice_variant"
-        },
-        {
-          "id": "SO_0001968",
-          "value": "SO_0001968",
-          "label": "Coding transcript variant",
-          "description": "A transcript variant of a protein coding gene",
-          "parent": "group:transcript_variant"
         },
         {
           "id": "SO_0001060",

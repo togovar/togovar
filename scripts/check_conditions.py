@@ -225,23 +225,25 @@ def check_consequence_asc(asc_path: Path, spec_so_ids: set[str]) -> list[str]:
 # search_conditions.json 専用チェック
 # ──────────────────────────────────────────────────
 
-def check_structure_sc(sc_path: Path) -> list[str]:
+def check_structure_sc(sc_path: Path, has_cadd: bool = True) -> list[str]:
     """
     search_conditions.json の全セクションについて存在と items の構成を確認する。
     API仕様に対応する enum がないセクション（term/frequency/quality/cadd/alphamissense/sift/polyphen/consequence_grouping）が対象。
     cadd/alphamissense/sift/polyphen の items は予測ツール固有の UI カテゴリのため仕様外だが、
     意図しない削除・名前変更を検出するために期待値を固定して照合する。
+    cadd は GRCh38 のみ存在するため has_cadd=False（GRCh37）の場合はスキップする。
     """
     EXPECTED: dict[str, set[str] | None] = {
         "term":               None,                        # items なし（フリーテキスト）
         "frequency":          {"from", "to", "invert", "match"},
         "quality":            None,                        # items なし（boolean フラグ）
         "consequence_grouping": None,                      # items の中身は check_consequence_sc で確認済み
-        "cadd":               {"N", "D", "POSSD", "T"},
         "alphamissense":      {"N", "LP", "A", "LB"},
         "sift":               {"N", "D", "T"},
         "polyphen":           {"N", "PROBD", "POSSD", "B", "U"},
     }
+    if has_cadd:
+        EXPECTED["cadd"] = {"N", "D", "POSSD", "T"}
 
     errors = []
     data = json.loads(sc_path.read_text())
@@ -428,9 +430,10 @@ def check_significance_asc(asc_path: Path, spec_clinvar_keys: set[str]) -> list[
 # SSCV DB チェック
 # ──────────────────────────────────────────────────
 
-def load_sscvdb_terms(yaml_path: Path) -> set[str]:
+def load_sscvdb_terms(yaml_path: Path) -> set[str] | None:
     """
     openapi.yaml の SSCVDB.terms.enum から短縮キー（大文字のみ）を抽出する。
+    SSCVDB が存在しない場合（GRCh37 など）は None を返す。
     """
     text = yaml_path.read_text()
     match = re.search(
@@ -439,7 +442,7 @@ def load_sscvdb_terms(yaml_path: Path) -> set[str]:
         re.DOTALL,
     )
     if not match:
-        sys.exit(f"ERROR: {yaml_path} に SSCVDB が見つかりません")
+        return None
 
     values = re.findall(r'^\s+-\s+(\S+)', match.group(0), re.MULTILINE)
     keys = {v for v in values if re.match(r'^[A-Z]+$', v)}
@@ -554,11 +557,16 @@ def main():
     type_so_ids        = {so for so, _ in type_terms}
     type_labels        = {label for _, label in type_terms}
 
+    # GRCh37 には SSCVDB（splicingvariant/sscv_db）および cadd が存在しない
+    has_sscvdb = sscvdb_keys is not None
+    has_cadd   = build == "GRCh38"
+
     print("[仕様読み込み]")
     print(f"  dataset:      {len(dataset_names)} 件")
     print(f"  significance: {len(significance_keys)} 件")
     print(f"  consequence:  {len(consequence_terms)} 件")
-    print(f"  sscv_db:      {len(sscvdb_keys)} 件")
+    if has_sscvdb:
+        print(f"  sscv_db:      {len(sscvdb_keys)} 件")
     print(f"  type:         {len(type_terms)} 件")
     print()
 
@@ -571,11 +579,13 @@ def main():
     print(f"  significance:        {len(significance_keys)} 件")
     print(f"  consequence:         {len(consequence_so_ids)} 件（SO ID）")
     print(f"  consequence_grouping: 存在確認（SO ID 網羅性は consequence チェック内）")
-    print(f"  cadd:                存在・items 構造確認（N/D/POSSD/T）")
+    if has_cadd:
+        print(f"  cadd:                存在・items 構造確認（N/D/POSSD/T）")
     print(f"  alphamissense:       存在・items 構造確認（N/LP/A/LB）")
     print(f"  sift:                存在・items 構造確認（N/D/T）")
     print(f"  polyphen:            存在・items 構造確認（N/PROBD/POSSD/B/U）")
-    print(f"  splicingvariant:     {len(sscvdb_keys)} 件（N=Unassigned 除く）")
+    if has_sscvdb:
+        print(f"  splicingvariant:     {len(sscvdb_keys)} 件（N=Unassigned 除く）")
     print()
 
     print(f"[{asc_path.name}]")
@@ -583,27 +593,39 @@ def main():
     print(f"  significance: {len(significance_keys)} 件（clinvar 完全一致、mgend 余分のみ）")
     print(f"  consequence:  {len(consequence_snakes)} 件（snake_case + 親子関係）")
     print(f"  genotype:     余分チェックのみ（dataset のサブセット）")
-    print(f"  sscv_db:      {len(sscvdb_keys)} 件")
+    if has_sscvdb:
+        print(f"  sscv_db:      {len(sscvdb_keys)} 件")
     print(f"  type:         {len(type_labels)} 件")
     print()
 
     errors = []
 
     # search_conditions.json チェック
-    errors += check_structure_sc(sc_path)           # term/frequency/quality/consequence_grouping/cadd/alphamissense/sift/polyphen
+    errors += check_structure_sc(sc_path, has_cadd=has_cadd)
     errors += check_dataset_sc(sc_path, dataset_names)
     errors += check_type_sc(sc_path, type_so_ids)
     errors += check_significance_sc(sc_path, significance_keys)
     errors += check_consequence_sc(sc_path, consequence_so_ids)
-    errors += check_sscvdb_sc(sc_path, sscvdb_keys)
+    if has_sscvdb:
+        errors += check_sscvdb_sc(sc_path, sscvdb_keys)
 
     # advanced_search_conditions.json チェック（conditions の順）
     errors += check_dataset_condition_asc(asc_path, dataset_names, "dataset", check_missing=True)
     errors += check_significance_asc(asc_path, significance_keys)
     errors += check_consequence_asc(asc_path, consequence_so_ids)
     errors += check_dataset_condition_asc(asc_path, dataset_names, "genotype", check_missing=False)
-    errors += check_sscvdb_asc(asc_path, sscvdb_keys)
+    if has_sscvdb:
+        errors += check_sscvdb_asc(asc_path, sscvdb_keys)
     errors += check_type_asc(asc_path, type_labels)
+
+    summary_parts = [
+        f"dataset {len(dataset_names)} 件",
+        f"significance {len(significance_keys)} 件",
+        f"consequence {len(consequence_terms)} 件",
+    ]
+    if has_sscvdb:
+        summary_parts.append(f"sscv_db {len(sscvdb_keys)} 件")
+    summary_parts.append(f"type {len(type_terms)} 件")
 
     if errors:
         print("❌ エラーが見つかりました:\n")
@@ -612,14 +634,7 @@ def main():
         print(f"\n合計: {len(errors)} 件")
         sys.exit(1)
     else:
-        print(
-            f"✅ 問題なし — "
-            f"dataset {len(dataset_names)} 件 + "
-            f"significance {len(significance_keys)} 件 + "
-            f"consequence {len(consequence_terms)} 件 + "
-            f"sscv_db {len(sscvdb_keys)} 件 + "
-            f"type {len(type_terms)} 件、すべて整合しています"
-        )
+        print(f"✅ 問題なし — {' + '.join(summary_parts)}、すべて整合しています")
         sys.exit(0)
 
 
