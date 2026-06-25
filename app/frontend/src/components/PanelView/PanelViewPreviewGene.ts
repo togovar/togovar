@@ -48,7 +48,7 @@ function isGeneSymbol(value: unknown): value is GeneSymbol {
   if (typeof value !== 'object' || value === null) return false;
 
   const symbol = value as Partial<GeneSymbol>;
-  return typeof symbol.name === 'string' && symbol.id !== undefined;
+  return typeof symbol.name === 'string' && typeof symbol.id === 'number';
 }
 
 /**
