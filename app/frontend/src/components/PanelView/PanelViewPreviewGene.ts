@@ -68,7 +68,7 @@ function isGeneSummary(value: unknown): value is GeneSummary {
  */
 export default class PanelViewPreviewGene extends PanelView {
   /** DOM再構築の対象を限定し、パネル全体を触らずに表示だけ更新するため保持する。 */
-  private readonly _dl: HTMLElement;
+  private readonly listEl: HTMLElement;
 
   /**
    * kind を 'preview-gene' にする。
@@ -79,7 +79,7 @@ export default class PanelViewPreviewGene extends PanelView {
     super(elm, 'preview-gene');
     storeManager.subscribe('selectedRow', () => this.selectedRow());
     storeManager.subscribe('offset', () => this.offset());
-    this._dl = selectRequired<HTMLElement>(
+    this.listEl = selectRequired<HTMLElement>(
       this.elm,
       '.content > .property-list',
       'PanelViewPreviewGene'
@@ -88,10 +88,10 @@ export default class PanelViewPreviewGene extends PanelView {
 
   /**
    * 選択行が変わったときに storeManager から呼ばれるコールバック。
-   * 表示更新は _update に委譲し、このメソッドはトリガーとしてのみ機能させる。
+   * 表示更新は update に委譲し、このメソッドはトリガーとしてのみ機能させる。
    */
   selectedRow(): void {
-    this._update();
+    this.update();
   }
 
   /**
@@ -99,32 +99,34 @@ export default class PanelViewPreviewGene extends PanelView {
    * ページ送りで選択行のバリアントが変わるため、表示を更新する。
    */
   offset(): void {
-    this._update();
+    this.update();
   }
 
   /**
    * 選択中バリアントの遺伝子シンボルを一覧表示する。
    * 選択行が未定義またはシンボルが空のときは '-notfound' クラスで非表示にする。
    */
-  private _update(): void {
+  private update(): void {
     this.elm.classList.add('-notfound');
 
     if (storeManager.getData('selectedRow') === undefined) {
-      this._dl.replaceChildren();
+      this.listEl.replaceChildren();
       return;
     }
 
     const record = storeManager.getSelectedRecord();
     const geneSummary = getGeneSummary(record?.genes);
     if (geneSummary.total === 0 && geneSummary.items.length === 0) {
-      this._dl.replaceChildren();
+      this.listEl.replaceChildren();
       return;
     }
 
-    this._dl.replaceChildren(
-      this._createTotalRow(geneSummary.total),
+    this.listEl.replaceChildren(
+      ...(geneSummary.total > geneSummary.items.length
+        ? [this.createTotalRow(geneSummary.total)]
+        : []),
       ...geneSummary.items.flatMap((symbol, index) =>
-        this._createGeneRows(symbol, index + 1)
+        this.createGeneRows(symbol, index)
       )
     );
     this.elm.classList.remove('-notfound');
@@ -133,7 +135,7 @@ export default class PanelViewPreviewGene extends PanelView {
   /**
    * itemsが省略されたSVでも関連遺伝子数を確認できるよう、総数は常に先頭に表示する。
    */
-  private _createTotalRow(total: number): HTMLDivElement {
+  private createTotalRow(total: number): HTMLDivElement {
     return createEl('div', {
       children: [
         createEl('dt', { text: 'Total' }),
@@ -145,8 +147,8 @@ export default class PanelViewPreviewGene extends PanelView {
   /**
    * 遺伝子ごとの表示行をDOMとして組み立て、外部データをHTML文字列へ混ぜないようにする。
    */
-  private _createGeneRows(symbol: GeneSymbol, index: number): HTMLDivElement[] {
-    const rows = [this._createSymbolRow(symbol, index)];
+  private createGeneRows(symbol: GeneSymbol, index: number): HTMLDivElement[] {
+    const rows = [this.createSymbolRow(symbol, index)];
     const aliases = getSynonyms(symbol.synonyms);
 
     if (aliases.length > 0) {
@@ -165,8 +167,10 @@ export default class PanelViewPreviewGene extends PanelView {
 
   /**
    * 公式シンボルは詳細ページへの導線になるため、リンク属性をここで一括設定する。
+   * index > 0（2件目以降）のときは '-group-start' で遺伝子間にセパレーターを引く。
+   * 最初の遺伝子は Total 行との間を createTotalRow 側の区切りに任せる。
    */
-  private _createSymbolRow(
+  private createSymbolRow(
     symbol: GeneSymbol,
     index: number
   ): HTMLDivElement {
