@@ -152,9 +152,11 @@ export class DatasetColumnRenderer {
     datasetNode: HierarchyNode<UiNode>,
     userIsLoggedIn: boolean
   ): boolean {
+    const PUBLIC_JGA_WGS_DATASETS = ['jga_wgs.jgad000758', 'jga_wgs.jgad000868'];
     return (
       userIsLoggedIn === false &&
-      (datasetNode.data.value?.includes('jga_wgs.') ?? false)
+      (datasetNode.data.value?.includes('jga_wgs.') ?? false) &&
+      !PUBLIC_JGA_WGS_DATASETS.includes(datasetNode.data.value ?? '')
     );
   }
 
