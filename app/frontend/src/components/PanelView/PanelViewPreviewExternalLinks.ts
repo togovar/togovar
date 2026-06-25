@@ -64,23 +64,24 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
       ...(external_links.dbsnp?.map((item) =>
         this._createLinkEntry('refSNP', item.title, item.xref)
       ) ?? []),
+      ...(external_links.tommo?.map((item) =>
+        this._createLinkEntry('ToMMo', item.title, item.xref)
+      ) ?? []),
+      ...(external_links.jogo?.map((item) =>
+        this._createLinkEntry('JoGo', item.title, item.xref)
+      ) ?? []),
+      ...(external_links.gnomad?.map((item) =>
+        this._createLinkEntry('gnomAD', item.title, item.xref)
+      ) ?? []),
+      ...(external_links.gnomad_sv?.map((item) =>
+        this._createLinkEntry('gnomAD SV', item.title, item.xref)
+      ) ?? []),
+
       ...(external_links.mgend?.map((item) =>
         this._createLinkEntry('MGeND', item.title, item.xref)
       ) ?? []),
       ...(external_links.clinvar?.map((item) =>
         this._createLinkEntry('ClinVar', item.title, item.xref)
-      ) ?? []),
-      ...(external_links.tommo?.map((item) =>
-        this._createLinkEntry('ToMMo', item.title, item.xref)
-      ) ?? []),
-      ...(external_links.gnomad?.map((item) =>
-        this._createLinkEntry('gnomAD', item.title, item.xref)
-      ) ?? []),
-      ...(external_links.jogo?.map((item) =>
-        this._createLinkEntry('JoGo', item.title, item.xref)
-      ) ?? []),
-      ...(external_links.gnomad_sv?.map((item) =>
-        this._createLinkEntry('gnomAD SV', item.title, item.xref)
       ) ?? []),
       ...(external_links.sscv_db?.map((item) =>
         this._createLinkEntry('SSCV DB', item.title, item.xref)
