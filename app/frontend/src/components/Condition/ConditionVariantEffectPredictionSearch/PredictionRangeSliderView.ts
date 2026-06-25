@@ -115,6 +115,15 @@ export class PredictionRangeSlider extends LitElement {
       );
     }
 
+    // restoreTab など外部からのプロパティ変更時にも不等号ボタンを正しく反映するため
+    if (
+      (changed.has('minInequalitySign') || changed.has('maxInequalitySign')) &&
+      this.inequalitySign?.length >= 2
+    ) {
+      setInequalitySign(this.inequalitySign[0], this.minInequalitySign);
+      setInequalitySign(this.inequalitySign[1], this.maxInequalitySign);
+    }
+
     // restoreTab など外部からのプロパティ変更時にもバー位置を正しく反映するため
     if ((changed.has('minValue') || changed.has('maxValue')) && this.bar) {
       this.bar.style.left = this.valueToPercent(this.minValue) + '%';
