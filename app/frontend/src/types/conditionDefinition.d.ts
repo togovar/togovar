@@ -111,17 +111,18 @@ interface CheckboxesCondition {
  * consequence ツリーの各ノード。
  * children は ID 配列で参照するため、TreeNode のような再帰ではなくフラット配列で持つ。
  * 描画時に ID を辿ってツリーを再構成する。
+ * リーフノードの id は SO term ID（例: "SO_0001580"）、グループノードは "group:xxx" 形式の文字列。
  */
 export interface ConsequenceNodeBase {
-  id: number;
+  id: string;
   label: string;
-  parent?: number;
-  children?: number[];
+  parent?: string;
+  children?: string[];
   value?: string;
   description?: string;
 }
 
-/** consequence 選択条件。数値IDで参照するツリー構造を持つ。 */
+/** consequence 選択条件。文字列IDで参照するツリー構造を持つ。 */
 export interface TreeCondition {
   label: string;
   type: 'tree';

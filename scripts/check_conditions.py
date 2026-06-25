@@ -190,7 +190,7 @@ def check_consequence_sc(sc_path: Path, spec_so_ids: set[str]) -> list[str]:
     return errors
 
 
-def check_consequence_asc(asc_path: Path, spec_snakes: set[str]) -> list[str]:
+def check_consequence_asc(asc_path: Path, spec_so_ids: set[str]) -> list[str]:
     errors = []
     data = json.loads(asc_path.read_text())
 
@@ -198,10 +198,11 @@ def check_consequence_asc(asc_path: Path, spec_snakes: set[str]) -> list[str]:
     if not values:
         return [f"[{asc_path.name}] consequence.values が見つからない"]
 
-    json_snakes = {v["value"] for v in values if "value" in v}
-    for m in sorted(spec_snakes - json_snakes):
+    # value フィールドは SO term ID（例: "SO_0001580"）
+    json_so_ids = {v["value"] for v in values if "value" in v}
+    for m in sorted(spec_so_ids - json_so_ids):
         errors.append(f"[{asc_path.name}] consequence.values に不足: {m}")
-    for e in sorted(json_snakes - spec_snakes):
+    for e in sorted(json_so_ids - spec_so_ids):
         errors.append(f"[{asc_path.name}] consequence.values に余分: {e}")
 
     all_ids = {v["id"] for v in values}
@@ -599,7 +600,7 @@ def main():
     # advanced_search_conditions.json チェック（conditions の順）
     errors += check_dataset_condition_asc(asc_path, dataset_names, "dataset", check_missing=True)
     errors += check_significance_asc(asc_path, significance_keys)
-    errors += check_consequence_asc(asc_path, consequence_snakes)
+    errors += check_consequence_asc(asc_path, consequence_so_ids)
     errors += check_dataset_condition_asc(asc_path, dataset_names, "genotype", check_missing=False)
     errors += check_sscvdb_asc(asc_path, sscvdb_keys)
     errors += check_type_asc(asc_path, type_labels)

@@ -96,7 +96,7 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
    * 指定した親IDの子アイテムでカラムDOMを生成して追加する。
    * parentId が undefined のときはルートレベルを表示する（初回描画用）。
    */
-  private drawColumn(parentId?: number): void {
+  private drawColumn(parentId?: string): void {
     const items = this.getItems(parentId);
 
     // depth は既存カラム数から算出し、削除対象の判定に使う。
@@ -119,7 +119,7 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
       input.addEventListener('change', (e) => {
         const li = (e.target as Element).closest('li');
         if (!li) return;
-        const datum = this.data.find((d) => d.id === Number(li.dataset.id));
+        const datum = this.data.find((d) => d.id === li.dataset.id);
         if (!datum) return;
         datum.checked = input.checked;
         // 親連動が有効な場合は子孫にも checked を伝播させる。
@@ -150,7 +150,7 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
             col.remove();
         }
         li.classList.add('-selected');
-        this.drawColumn(Number(arrow.dataset.id));
+        this.drawColumn(arrow.dataset.id);
       });
       // tabindex 付与後もキーボード（Enter/Space）で操作できるようにする。
       arrow.addEventListener('keydown', (e) => {
@@ -229,7 +229,7 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
    * 指定した親IDで data をフィルタして子アイテムを返す。
    * parentId が undefined のときは parent が未定義のルートアイテムを返す。
    */
-  private getItems(parentId?: number): ColumnDatum[] {
+  private getItems(parentId?: string): ColumnDatum[] {
     return this.data.filter((datum) => datum.parent === parentId);
   }
 
@@ -237,7 +237,7 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
    * 親連動選択が有効なとき、指定IDの子孫すべてに checked を伝播させる。
    * consequence カテゴリ選択で配下の variant を一括選択するために再帰する。
    */
-  private updateChildren(id: number, checked: boolean): void {
+  private updateChildren(id: string, checked: boolean): void {
     if (!this.selectionDependsOnParent) return;
     const children = this.data.filter((datum) => datum.parent === id);
     children.forEach((child) => {
