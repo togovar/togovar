@@ -99,7 +99,7 @@ const UNASSIGNED_VALUE: Partial<Record<CheckListKind, string>> = {
  */
 export default class PanelViewCheckList extends PanelView {
   /** key: チェックボックスの value 属性 → { input要素, 件数表示span } */
-  private _entries: Record<string, CheckboxEntry> = {};
+  private checkboxEntries: Record<string, CheckboxEntry> = {};
 
   /**
    * @param elm - パネルのルート要素
@@ -123,11 +123,11 @@ export default class PanelViewCheckList extends PanelView {
       );
     }
 
-    this._createGUI(conditionMaster);
-    this._initEntries();
-    this._changeFilter();
-    this._bindEvents();
-    this._bindStore(statisticsType);
+    this.buildChecklist(conditionMaster);
+    this.initCheckboxEntries();
+    this.applyFilter();
+    this.bindEvents();
+    this.subscribeStore(statisticsType);
   }
 
   // ----------------------------------------
@@ -135,7 +135,7 @@ export default class PanelViewCheckList extends PanelView {
   // ----------------------------------------
 
   /** DOM から input 要素への参照を収集し、URL パラメータから初期状態を復元する */
-  private _initEntries(): void {
+  private initCheckboxEntries(): void {
     const condition = getSimpleSearchCondition(
       this.kind as MasterConditionId
     ) as Record<string, string> | undefined;
@@ -148,7 +148,7 @@ export default class PanelViewCheckList extends PanelView {
         '.content > .checklist-values > .item > .label > input'
       )
       .forEach((input) => {
-        this._entries[input.value] = {
+        this.checkboxEntries[input.value] = {
           input,
           countDisplay: (input.parentNode as Element)
             .nextElementSibling as Element,
@@ -162,9 +162,9 @@ export default class PanelViewCheckList extends PanelView {
   }
 
   /** 各チェックボックスに change イベントを登録する */
-  private _bindEvents(): void {
-    for (const entry of Object.values(this._entries)) {
-      entry.input.addEventListener('change', this._changeFilter.bind(this));
+  private bindEvents(): void {
+    for (const entry of Object.values(this.checkboxEntries)) {
+      entry.input.addEventListener('change', this.applyFilter.bind(this));
     }
 
     // Clear ボタン: 全チェックを外してフィルターリセット
@@ -172,10 +172,10 @@ export default class PanelViewCheckList extends PanelView {
     if (clearBtn) {
       clearBtn.addEventListener('click', (e) => {
         e.stopPropagation(); // パネル開閉を発火させない
-        for (const entry of Object.values(this._entries)) {
+        for (const entry of Object.values(this.checkboxEntries)) {
           entry.input.checked = false;
         }
-        this._changeFilter();
+        this.applyFilter();
       });
     }
   }
@@ -184,14 +184,14 @@ export default class PanelViewCheckList extends PanelView {
    * ストアの変更購読を登録する。
    * statisticsType が指定されている場合は統計情報の更新も購読する。
    */
-  private _bindStore(statisticsType?: StatisticsType): void {
+  private subscribeStore(statisticsType?: StatisticsType): void {
     storeManager.subscribe('simpleSearchConditions', (v) =>
       this.simpleSearchConditions(v)
     );
 
     if (statisticsType) {
       storeManager.subscribe(statisticsType, (v) =>
-        this._updateStatistics(v ?? null)
+        this.updateStatistics(v ?? null)
       );
     }
   }
@@ -201,24 +201,26 @@ export default class PanelViewCheckList extends PanelView {
   // ----------------------------------------
 
   /** チェックボックス一覧の HTML を生成して DOM に挿入する */
-  private _createGUI(conditionMaster: MasterConditions): void {
+  private buildChecklist(conditionMaster: MasterConditions): void {
     const unassignedValue = UNASSIGNED_VALUE[this.kind as CheckListKind];
 
     let html = '';
 
+    const masterItems = conditionMaster.items ?? [];
+
     // significance / cadd / alphamissense / sift / polyphen は
     // マスターデータとは別に "Unassigned" チェックボックスを先頭に追加する
     if (unassignedValue) {
-      html += this._buildUnassignedItemHtml(unassignedValue);
+      const unassignedLabel =
+        masterItems.find((item) => item.id === unassignedValue)?.label ?? 'Unassigned';
+      html += this.buildUnassignedItemHtml(unassignedValue, unassignedLabel);
     }
-
-    const masterItems = conditionMaster.items ?? [];
     const filteredItems = unassignedValue
       ? masterItems.filter((item) => item.id !== unassignedValue)
       : masterItems;
 
     html += filteredItems
-      .map((item) => this._buildMasterItemHtml(item.id!, item.label))
+      .map((item) => this.buildMasterItemHtml(item.id!, item.label))
       .join('');
 
     this.elm
@@ -227,12 +229,12 @@ export default class PanelViewCheckList extends PanelView {
   }
 
   /** "Unassigned" チェックボックスの HTML を返す */
-  private _buildUnassignedItemHtml(checkboxValue: string): string {
+  private buildUnassignedItemHtml(checkboxValue: string, label: string): string {
     return `
     <li class="item">
       <label class="label">
         <input type="checkbox" value="${checkboxValue}">
-        Unassigned
+        ${label}
       </label>
       <span class="count-display"></span>
     </li>
@@ -241,12 +243,12 @@ export default class PanelViewCheckList extends PanelView {
   }
 
   /** マスターデータの 1 アイテム分のチェックボックス HTML を返す */
-  private _buildMasterItemHtml(id: string, label: string): string {
+  private buildMasterItemHtml(id: string, label: string): string {
     return `
     <li class="item">
       <label class="label">
         <input type="checkbox" value="${id}">
-        ${this._buildKindSpecificHtml(id)}
+        ${this.buildKindSpecificHtml(id)}
         ${label}
       </label>
       <span class="count-display"></span>
@@ -255,7 +257,7 @@ export default class PanelViewCheckList extends PanelView {
   }
 
   /** kind ごとのアイコン・スコア表示 HTML を返す */
-  private _buildKindSpecificHtml(id: string): string {
+  private buildKindSpecificHtml(id: string): string {
     switch (this.kind) {
       case 'dataset':
         return `<div class="dataset-icon" data-dataset="${id}"><div class="properties"></div></div>`;
@@ -279,8 +281,8 @@ export default class PanelViewCheckList extends PanelView {
   // ----------------------------------------
 
   /** チェックボックスが変更されたときにフィルター状態を更新する */
-  private _changeFilter(_e?: Event): void {
-    const entries = Object.entries(this._entries);
+  private applyFilter(_e?: Event): void {
+    const entries = Object.entries(this.checkboxEntries);
 
     const anyChecked = entries.some(([, entry]) => entry.input.checked);
     const checked: Record<string, string> = {};
@@ -307,27 +309,27 @@ export default class PanelViewCheckList extends PanelView {
 
     if (Object.keys(kindConditions).length === 0) {
       // デフォルト or Clear → 全チェックなし
-      for (const entry of Object.values(this._entries)) {
+      for (const entry of Object.values(this.checkboxEntries)) {
         entry.input.checked = false;
       }
     } else {
       // URLに存在しないキー = チェックあり（除外指定されていない）
       // URLに =0 があるキー = チェックなし
-      for (const [key, entry] of Object.entries(this._entries)) {
+      for (const [key, entry] of Object.entries(this.checkboxEntries)) {
         entry.input.checked = kindConditions[key] !== '0';
       }
     }
   }
 
   /** 統計情報が更新されたときに件数表示を更新する */
-  private _updateStatistics(values: Record<string, number> | null): void {
+  private updateStatistics(values: Record<string, number> | null): void {
     if (values) {
-      for (const [key, entry] of Object.entries(this._entries)) {
+      for (const [key, entry] of Object.entries(this.checkboxEntries)) {
         const count = values[key] ?? 0;
         entry.countDisplay.textContent = count.toLocaleString();
       }
     } else {
-      for (const entry of Object.values(this._entries)) {
+      for (const entry of Object.values(this.checkboxEntries)) {
         entry.countDisplay.textContent = 'N/A';
       }
     }
