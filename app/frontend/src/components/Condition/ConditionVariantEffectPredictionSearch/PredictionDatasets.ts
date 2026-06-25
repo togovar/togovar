@@ -66,13 +66,13 @@ export const CADD_THRESHOLD = {
     min: 10,
     max: 20,
     minInequalitySign: 'gte',
-    maxInequalitySign: 'lte',
+    maxInequalitySign: 'lt',
   },
   Dangerous: {
     color: 'var(--color-sign-dangerous)',
     min: 20,
     max: 99,
-    minInequalitySign: 'gt',
+    minInequalitySign: 'gte',
     maxInequalitySign: 'lte',
   },
 } as const satisfies Threshold;
