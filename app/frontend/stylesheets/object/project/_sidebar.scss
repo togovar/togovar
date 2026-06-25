@@ -291,6 +291,11 @@
         font-weight: bold;
         line-height: 14px;
 
+        // Advanced Searchでは統計表示専用にし、非表示checkboxへのlabelクリックを発火させない
+        body[data-search-mode='advanced'] & {
+          pointer-events: none;
+        }
+
         > .dataset-icon,
         > .variant-icon,
         > .clinical-significance,
