@@ -11,18 +11,18 @@ import type { UiNode } from './types';
  * イベント処理や状態管理は親クラスへ委ねる。
  */
 export class DatasetColumnRenderer {
-  private readonly _instancePrefix: string;
+  private readonly checkboxIdPrefix: string;
 
   /**
    * 同一ページに複数インスタンスが存在する場合でもcheckboxのidが重複しないよう、
    * インスタンスごとにプレフィックスを付ける。
    */
   constructor(
-    instancePrefix: string = `${Date.now()}-${Math.random()
+    checkboxIdPrefix: string = `${Date.now()}-${Math.random()
       .toString(36)
       .substring(2, 9)}`
   ) {
-    this._instancePrefix = instancePrefix;
+    this.checkboxIdPrefix = checkboxIdPrefix;
   }
 
   /** 指定ノード配列からカラム用リスト要素を生成する。 */
@@ -33,31 +33,28 @@ export class DatasetColumnRenderer {
   ): HTMLUListElement {
     return createEl('ul', {
       children: datasetNodes.map((datasetNode) =>
-        this._createListItemElement(datasetNode, userIsLoggedIn, conditionType)
+        this.buildListItem(datasetNode, userIsLoggedIn, conditionType)
       ),
     });
   }
 
   /** 1ノード分のリストアイテム要素を生成する。 */
-  private _createListItemElement(
+  private buildListItem(
     datasetNode: HierarchyNode<UiNode>,
     userIsLoggedIn: boolean,
     conditionType: string
   ): HTMLLIElement {
-    const uniqueCheckboxId = `checkbox-${this._instancePrefix}-${datasetNode.data.id}`;
+    const uniqueCheckboxId = `checkbox-${this.checkboxIdPrefix}-${datasetNode.data.id}`;
 
     // 未ログイン状態でJGAデータセットはロックアイコンを表示し、誤操作を防ぐ。
-    const selectionElement = this._shouldShowLockIcon(
-      datasetNode,
-      userIsLoggedIn
-    )
+    const selectionElement = this.showsLockIcon(datasetNode, userIsLoggedIn)
       ? createEl('span', { class: 'lock' })
       : createEl('input', {
           attrs: { type: 'checkbox', id: uniqueCheckboxId },
           domProps: { value: datasetNode.data.id },
         });
 
-    const categoryIcon = this._shouldShowDatasetIcon(datasetNode, conditionType)
+    const categoryIcon = this.showsDatasetIcon(datasetNode, conditionType)
       ? createEl('span', {
           class: 'dataset-icon',
           dataset: datasetNode.data.value
@@ -148,7 +145,7 @@ export class DatasetColumnRenderer {
   }
 
   /** 未ログイン状態でJGAデータセットを表示する場合だけロックアイコンを使う。 */
-  private _shouldShowLockIcon(
+  private showsLockIcon(
     datasetNode: HierarchyNode<UiNode>,
     userIsLoggedIn: boolean
   ): boolean {
@@ -164,7 +161,7 @@ export class DatasetColumnRenderer {
    * dataset/genotypeカテゴリの第1階層にのみデータセットアイコンを表示する。
    * depth === 1（rootの直下）に限定することで、下位カテゴリのアイコン重複を防ぐ。
    */
-  private _shouldShowDatasetIcon(
+  private showsDatasetIcon(
     datasetNode: HierarchyNode<UiNode>,
     conditionType: string
   ): boolean {
