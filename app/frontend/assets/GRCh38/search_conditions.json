@@ -217,7 +217,7 @@
     "items": [
       {
         "id": "NA",
-        "label": "Not available",
+        "label": "Unassigned",
         "type": "boolean",
         "default": "1"
       },
