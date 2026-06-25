@@ -226,11 +226,21 @@ export default class ConditionValueEditorConsequence extends ConditionValueEdito
   }
 
   /**
-   * 指定した親IDで data をフィルタして子アイテムを返す。
-   * parentId が undefined のときは parent が未定義のルートアイテムを返す。
+   * ツリー定義のchildren順を表示順として尊重し、Panel側と同じ分類優先の並びを保つ。
+   * parentId が undefined のときはvaluesに記載されたルート順をそのまま返す。
    */
   private getItems(parentId?: string): ColumnDatum[] {
-    return this.data.filter((datum) => datum.parent === parentId);
+    if (parentId === undefined) {
+      return this.data.filter((datum) => datum.parent === undefined);
+    }
+
+    const parent = this.data.find((datum) => datum.id === parentId);
+    if (!parent?.children) return [];
+
+    return parent.children.flatMap((childId) => {
+      const child = this.data.find((datum) => datum.id === childId);
+      return child ? [child] : [];
+    });
   }
 
   /**
