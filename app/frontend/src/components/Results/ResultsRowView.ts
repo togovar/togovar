@@ -180,7 +180,7 @@ export class ResultsRowView {
       ResultsColumnUpdater.updateSplicingVariant(
         this.cells.splicingVariantItem,
         result.sscv_db,
-        result.external_links?.sscv_db
+        result.external_links?.sscv_db ?? result.external_link?.sscv_db
       ),
   };
 

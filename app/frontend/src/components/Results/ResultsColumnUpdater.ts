@@ -668,10 +668,19 @@ export class ResultsColumnUpdater {
       );
     }
     const text = items?.[0]?.predicted_splicing_type ?? '';
-    const url = links?.[0]?.xref ?? '';
+    const rawUrl = links?.[0]?.xref ?? '';
     element.textContent = text;
-    if (text && url) {
-      element.href = url;
+    let safeUrl = '';
+    try {
+      const parsed = new URL(String(rawUrl), window.location.href);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+        safeUrl = parsed.toString();
+      }
+    } catch {
+      // ignore invalid URLs
+    }
+    if (text && safeUrl) {
+      element.href = safeUrl;
     } else {
       element.removeAttribute('href');
     }
