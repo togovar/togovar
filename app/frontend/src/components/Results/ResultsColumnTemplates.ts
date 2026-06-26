@@ -26,12 +26,13 @@ export const COLUMN_TEMPLATES = {
     '<td class="consequence"><div class="remains-content"><div class="consequence-item"></div><span class="remains-badge" data-remains=""></span></div></td>',
   clinical_significance:
     '<td class="clinical_significance"><div class="clinical-significance-flex"><div class="clinical-significance" data-value=""></div><span class="clinical-remains" data-remains=""></span><span class="icon" data-mgend=""></span></div></td>',
-  cadd: '<td class="cadd"><div class="variant-function" data-function=""></div></td>',
+  cadd:
+    '<td class="cadd"><div class="variant-effect-prediction-badge" data-function=""></div></td>',
   alphamissense:
-    '<td class="alphamissense"><div class="variant-function" data-function=""></div></td>',
-  sift: '<td class="sift"><div class="variant-function" data-function=""></div></td>',
+    '<td class="alphamissense"><div class="variant-effect-prediction-badge" data-function=""></div></td>',
+  sift: '<td class="sift"><div class="variant-effect-prediction-badge" data-function=""></div></td>',
   polyphen:
-    '<td class="polyphen"><div class="variant-function" data-function=""></div></td>',
+    '<td class="polyphen"><div class="variant-effect-prediction-badge" data-function=""></div></td>',
   splicingvariant: '<td class="splicingvariant"></td>',
 } as const;
 

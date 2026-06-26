@@ -19,6 +19,7 @@
 @use 'object/component/page-index';
 @use 'object/component/panel-view';
 @use 'object/component/question-answer';
+@use 'object/component/variant-effect-prediction-badge';
 
 // 画面別スタイル — 各機能ページ固有のコンポーネントをまとめたもの
 @use 'object/project/loading-indicator';

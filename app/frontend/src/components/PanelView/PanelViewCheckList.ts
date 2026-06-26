@@ -48,7 +48,7 @@ type StatisticsType =
 // スコアラベルの定数
 // ----------------------------------------
 
-/** CADD PHRED スコアのラベル（D=≥20, POSSD=≥10, T=<10）。data-function は既存CSS色クラスを流用する。 */
+/** CADD PHRED スコアのラベル（D=≥20, POSSD=≥10, T=<10）。data-function は共通バッジCSSの色分けに使う。 */
 const CADD_LABELS: Record<string, string> = {
   D: '&ge; 20',
   POSSD: '&ge; 10',
@@ -264,13 +264,13 @@ export default class PanelViewCheckList extends PanelView {
       case 'significance':
         return `<div class="clinical-significance" data-value="${id}"></div>`;
       case 'cadd':
-        return `<div class="variant-function _width_5em _align-center" data-function="${id}">${CADD_LABELS[id] ?? ''}</div>`;
+        return `<div class="variant-effect-prediction-badge _width_5em _align-center" data-function="${id}">${CADD_LABELS[id] ?? ''}</div>`;
       case 'alphamissense':
-        return `<div class="variant-function _width_5em _align-center" data-function="${id}">${ALPHAMISSENSE_LABELS[id] ?? ''}</div>`;
+        return `<div class="variant-effect-prediction-badge _width_5em _align-center" data-function="${id}">${ALPHAMISSENSE_LABELS[id] ?? ''}</div>`;
       case 'sift':
-        return `<div class="variant-function _width_5em _align-center" data-function="${id}">${SIFT_LABELS[id] ?? ''}</div>`;
+        return `<div class="variant-effect-prediction-badge _width_5em _align-center" data-function="${id}">${SIFT_LABELS[id] ?? ''}</div>`;
       case 'polyphen':
-        return `<div class="variant-function _width_5em _align-center" data-function="${id}">${POLYPHEN_LABELS[id] ?? ''}</div>`;
+        return `<div class="variant-effect-prediction-badge _width_5em _align-center" data-function="${id}">${POLYPHEN_LABELS[id] ?? ''}</div>`;
       default:
         return '';
     }

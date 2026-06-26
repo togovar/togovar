@@ -693,7 +693,7 @@
         > .consequence-item,
         > .dataset-icon,
         > .clinical-significance,
-        > .variant-function {
+        > .variant-effect-prediction-badge {
           display: inline-block;
           max-width: 100%;
           overflow: hidden;
@@ -1090,7 +1090,6 @@ body[data-column-resizing='true'] {
 //   object/component/_ref-alt.scss                 … Ref/Alt アレル表示
 //   object/component/_remains-count.scss           … +N バッジ
 //   object/component/_unexpected-value-string.scss … null/undefined 表示
-//   object/component/_variant-function.scss        … 機能予測スコアバッジ
 //   object/component/_variant-type.scss            … バリアント種別テキスト
 // =============================================================================
 
@@ -1286,41 +1285,6 @@ body[data-column-resizing='true'] {
   &.-undefined {
     font-style: oblique;
     color: color-mix(in srgb, var(--color-black) 50%, transparent);
-  }
-}
-
-// 機能予測スコアバッジ (.variant-function)
-// AlphaMissense・SIFT・PolyPhen の予測結果を色分けしたカプセル型で表示する
-.variant-function {
-  display: inline-block;
-  padding: 0 8px;
-  font-weight: bold;
-  color: white;
-  border-radius: 9px;
-
-  &[data-function='T'],
-  &[data-function='B'] {
-    background-color: var(--color-sign-safe);
-  }
-  &[data-function='LB'] {
-    background-color: var(--color-sign-normal);
-  }
-  &[data-function='POSSD'],
-  &[data-function='LP'] {
-    background-color: var(--color-sign-warning);
-  }
-  &[data-function='D'],
-  &[data-function='PROBD'] {
-    background-color: var(--color-sign-dangerous);
-  }
-
-  &[data-function='U'] {
-    color: var(--color-black);
-    background-color: var(--color-light-gray);
-  }
-
-  &[data-function='A'] {
-    background-color: var(--color-sign-unknown);
   }
 }
 

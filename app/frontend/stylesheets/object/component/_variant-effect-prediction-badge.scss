@@ -1,0 +1,36 @@
+// Variant Effect Prediction の分類表示はResults/Sidebar/Documentで共通なので、見た目を1箇所に集約する。
+.variant-effect-prediction-badge {
+  display: inline-block;
+  padding: 0 8px;
+  font-weight: bold;
+  color: white;
+  border-radius: 9px;
+
+  &[data-function='T'],
+  &[data-function='B'] {
+    background-color: var(--color-sign-safe);
+  }
+
+  &[data-function='LB'] {
+    background-color: var(--color-sign-normal);
+  }
+
+  &[data-function='POSSD'],
+  &[data-function='LP'] {
+    background-color: var(--color-sign-warning);
+  }
+
+  &[data-function='D'],
+  &[data-function='PROBD'] {
+    background-color: var(--color-sign-dangerous);
+  }
+
+  &[data-function='U'] {
+    color: var(--color-black);
+    background-color: var(--color-light-gray);
+  }
+
+  &[data-function='A'] {
+    background-color: var(--color-sign-unknown);
+  }
+}

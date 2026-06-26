@@ -199,11 +199,11 @@ block content
                   strong CADD (PHRED score)
                   br
                   div
-                    .variant-function._width_5em._align-center(data-function='D') &ge; 20
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='D') &ge; 20
                   div
-                    .variant-function._width_5em._align-center(data-function='POSSD') &ge; 10
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='POSSD') &ge; 10
                   div
-                    .variant-function._width_5em._align-center(data-function='T') &lt; 10
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='T') &lt; 10
                   span
                     | CADD (Combined Annotation Dependent Depletion) は、多様なゲノムアノテーションを統合して、あらゆるタイプのバリアントの有害性をスコア化するツールです。
                     | ここに挙げた他のツールとは異なり、CADDはミスセンス変異に限定されません。
@@ -215,13 +215,13 @@ block content
                   strong AlphaMissense
                   br
                   div
-                    .variant-function._width_5em._align-center(data-function='LP') &gt; 0.564
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='LP') &gt; 0.564
                     span._margin-left Likely pathogenic
                   div
-                    .variant-function._width_5em._align-center(data-function='A') &ge; 0.340
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='A') &ge; 0.340
                     span._margin-left Ambiguous
                   div
-                    .variant-function._width_5em._align-center(data-function='LB') &lt; 0.340
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='LB') &lt; 0.340
                     span._margin-left Likely benign
                   span 「Likely pathogenic（おそらく病原性あり）」と 「Likely benign"（おそらく良性）」のスコアの閾値は、それぞれ病原性および良性のClinVarバリアントを90%の精度で分類できるように選ばれました。詳細は
                   a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/docs/tools/vep/script/vep_plugins.html#alphamissense') AlphaMissense in VEP Plugins
@@ -230,10 +230,10 @@ block content
                   strong SIFT
                   br
                   div
-                    .variant-function._width_5em._align-center(data-function='D') &lt; 0.05
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='D') &lt; 0.05
                     span._margin-left Deleterious
                   div
-                    .variant-function._width_5em._align-center(data-function='T') &ge; 0.05
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='T') &ge; 0.05
                     span._margin-left Tolerated
                   span このスコアはアミノ酸の置換が許容される確率を正規化して示したものです。スコアがゼロに近い場合、その置換が有害である可能性が高いと考えられます。このスコアに基づいて定性的な予測が行われます。
                     | 0.05未満のスコアを持つ置換は「有害 (Deleterious)」と分類され、それ以外のスコアは「容認 (Tolerated)」とされます。詳細は
@@ -243,16 +243,16 @@ block content
                   strong PolyPhen
                   br
                   div
-                    .variant-function._width_5em._align-center(data-function='PROBD') &gt; 0.908
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='PROBD') &gt; 0.908
                     span._margin-left Probably Damaging
                   div
-                    .variant-function._width_5em._align-center(data-function='POSSD') &gt; 0.446
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='POSSD') &gt; 0.446
                     span._margin-left Possibly Damaging
                   div
-                    .variant-function._width_5em._align-center(data-function='B') &le; 0.446
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='B') &le; 0.446
                     span._margin-left Benign
                   div
-                    .variant-function._width_5em._align-center(data-function='U') Unknown
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='U') Unknown
                     span._margin-left Unknown
                   span 推定偽陽性率（FPR）が5%以下の事後確率スコアを持つバリアントは、「Probably Damaging (おそらく有害)」と予測されます。
                     | FPRが10%以下の場合は「Possible Damaging (有害の可能性あり)」とされ、FPRが10%を超えるバリアントは「良性 (Benign)」と分類されます。詳細は

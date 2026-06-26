@@ -454,25 +454,26 @@ export class ResultsRowView {
   }
 
   /**
-   * 予測系カラムはすべて同じHTML構造（td.xxx > .variant-function）を持つため、
+   * 予測系カラムはすべて同じHTML構造（td.xxx > .variant-effect-prediction-badge）を持つため、
    * カラムIDで識別してまとめてキャッシュする。
    */
   private cacheFunctionElements() {
     const tdCadd = this.tr.querySelector('td.cadd');
     this.cells.caddFunction =
-      tdCadd?.querySelector('.variant-function') || null;
+      tdCadd?.querySelector('.variant-effect-prediction-badge') || null;
 
     const tdAlphaMissense = this.tr.querySelector('td.alphamissense');
     this.cells.alphaMissenseFunction =
-      tdAlphaMissense?.querySelector('.variant-function') || null;
+      tdAlphaMissense?.querySelector('.variant-effect-prediction-badge') ||
+      null;
 
     const tdSift = this.tr.querySelector('td.sift');
     this.cells.siftFunction =
-      tdSift?.querySelector('.variant-function') || null;
+      tdSift?.querySelector('.variant-effect-prediction-badge') || null;
 
     const tdPolyphen = this.tr.querySelector('td.polyphen');
     this.cells.polyphenFunction =
-      tdPolyphen?.querySelector('.variant-function') || null;
+      tdPolyphen?.querySelector('.variant-effect-prediction-badge') || null;
 
     this.cells.splicingVariantCell = this.tr.querySelector('td.splicingvariant');
   }
