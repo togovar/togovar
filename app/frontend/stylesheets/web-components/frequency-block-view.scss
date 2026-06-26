@@ -46,7 +46,11 @@ $frequency-marker-gap: 1px;
   --frequency-dataset-color: var(--color-dataset-jga);
 }
 
-:host([data-dataset='tommo']) {
+:host([data-dataset^='bbj']) {
+  --frequency-dataset-color: var(--color-dataset-bbj);
+}
+
+:host([data-dataset^='tommo']) {
   --frequency-dataset-color: var(--color-dataset-tommo);
 }
 
@@ -58,8 +62,8 @@ $frequency-marker-gap: 1px;
   --frequency-dataset-color: var(--color-dataset-ncbn);
 }
 
-:host([data-dataset='bbj']) {
-  --frequency-dataset-color: var(--color-dataset-bbj);
+:host([data-dataset='jogo']) {
+  --frequency-dataset-color: var(--color-dataset-jogo);
 }
 
 // ブロックは ::before で repeating-linear-gradient を使って描画

@@ -53,11 +53,13 @@ block content
                 li.item.-question
                   a.link(href='#d6') How do you calculate the value of Clinical significance?
                 li.item.-question
-                  a.link(href='#d7') What are AlphaMissense, SIFT and PolyPhen?
+                  a.link(href='#d7') What are CADD, AlphaMissense, SIFT and PolyPhen?
                 li.item.-question
                   a.link(href='#d8') Was a liftover tool used for generating variant data?
                 li.item.-question
                   a.link(href='#d9') Why do allele frequencies differ between datasets even within the same Japanese ancestry group?
+                li.item.-question
+                  a.link(href='#d10') What is SSCV DB?
             li.category
               h3.categorytitle About the TogoVar search system
               ul.categorylist
@@ -108,9 +110,9 @@ block content
                 | See
                 |
                 a(href='https://togotv.dbcls.jp/en/') TogoTV
-                | . Videos on TogoVar are
+                | . Videos on TogoVar are available at
                 |
-                a(href='https://togotv.dbcls.jp/en/result.html?type=manual&lang=en&page=1&query=TogoVar') here
+                a(href='https://togotv.dbcls.jp/en/result.html?type=manual&lang=en&page=1&query=TogoVar') TogoVar videos on TogoTV
                 | .
 
         section.section
@@ -233,27 +235,46 @@ block content
                 |
                 | are displayed.
           #d7.question-answer
-            h4.question What are AlphaMissense, SIFT and Polyphen?
+            h4.question What are CADD, AlphaMissense, SIFT and PolyPhen?
             .answer
               p
-                | AlphaMissense, SIFT and PolyPhen predict the impact of variants on protein function when an amino acid sequence is altered.
-                | These programs were performed using
+                | The following scores are used to predict the potential impact of variants and are calculated using
                 |
                 a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html')
                   | Variant Effect Predictor (VEP)
-                | . The icons below represent the threshold scores used for qualitative predictions.
+                | . CADD scores the deleteriousness of any type of variant, while AlphaMissense, SIFT and PolyPhen
+                | specifically predict the impact on protein function when an amino acid sequence is altered.
+                | The icons below represent the threshold scores used for qualitative predictions.
               ul.unordered-list._margin-bottom._align-left
+                li
+                  strong CADD (PHRED score)
+                  br
+                  div
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='D') &ge; 20
+                  div
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='POSSD') &ge; 10
+                  div
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='T') &lt; 10
+                  span
+                    | CADD (Combined Annotation Dependent Depletion) integrates diverse genomic annotations to score
+                    | the deleteriousness of any type of variant. Unlike the other tools listed here, CADD is not limited
+                    | to missense variants. PHRED-scaled scores &ge; 20 indicate the top 1% and scores &ge; 10 indicate
+                    | the top 10% of deleterious variants genome-wide. See
+                    |
+                  a.hyper-text.-external(target='_blank', href='https://cadd.gs.washington.edu/info') CADD
+                  |
+                  | for details.
                 li
                   strong AlphaMissense
                   br
                   div
-                    .variant-function._width_5em._align-center(data-function='LP') &gt; 0.564
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='LP') &gt; 0.564
                     span._margin-left Likely pathogenic
                   div
-                    .variant-function._width_5em._align-center(data-function='A') &ge; 0.340
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='A') &ge; 0.340
                     span._margin-left Ambiguous
                   div
-                    .variant-function._width_5em._align-center(data-function='LB') &lt; 0.340
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='LB') &lt; 0.340
                     span._margin-left Likely benign
                   span The score thresholds for "Likely pathogenic" and "Likely benign" were chosen to classify pathogenic and benign ClinVar variants with 90% precision, respectively. See
                     |
@@ -265,10 +286,10 @@ block content
                   strong SIFT
                   br
                   div
-                    .variant-function._width_5em._align-center(data-function='D') &lt; 0.05
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='D') &lt; 0.05
                     span._margin-left Deleterious
                   div
-                    .variant-function._width_5em._align-center(data-function='T') &ge; 0.05
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='T') &ge; 0.05
                     span._margin-left Tolerated
                   span The score represents the normalized probability of an amino acid change being tolerated. Scores closer to zero indicate a higher likelihood of the change being deleterious.
                     |
@@ -281,16 +302,16 @@ block content
                   strong PolyPhen
                   br
                   div
-                    .variant-function._width_5em._align-center(data-function='PROBD') &gt; 0.908
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='PROBD') &gt; 0.908
                     span._margin-left Probably Damaging
                   div
-                    .variant-function._width_5em._align-center(data-function='POSSD') &gt; 0.446
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='POSSD') &gt; 0.446
                     span._margin-left Possibly Damaging
                   div
-                    .variant-function._width_5em._align-center(data-function='B') &le; 0.446
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='B') &le; 0.446
                     span._margin-left Benign
                   div
-                    .variant-function._width_5em._align-center(data-function='U') Unknown
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='U') Unknown
                     span._margin-left Unknown
                   span Variants are predicted as "Probably Damaging" if they have posterior probability scores indicating an estimated false positive rate (FPR) of 5% or below.
                     |
@@ -326,6 +347,11 @@ block content
                 | Reference:
                 br
                 | Sakaue S. et al. Dimensionality reduction reveals fine-scale structure in the Japanese population with consequences for polygenic risk prediction. Nature Communications, 2020.
+          #d10.question-answer
+            h4.question What is SSCV DB?
+            .answer
+              p
+                | SSCV DB is a database of splice-site creating variants (SSCVs) identified from publicly available transcriptome sequencing data. SSCVs are variants that may create new splice sites and potentially cause aberrant splicing. In TogoVar, the predicted splicing type registered in SSCV DB is shown with a link to the corresponding SSCV DB record.
 
         section.section
           h3.sectiontitle About the TogoVar search system
@@ -376,15 +402,22 @@ block content
                   frequency-block-view(data-dataset="gem_j_wga" data-frequency="≥0.5")
                   | &nbsp; GEM-J WGA
                   br
-                  frequency-block-view(data-dataset="jga_snp" data-frequency="≥0.5")
-                  | &nbsp; JGA-SNP
-                  br
-                  frequency-block-view(data-dataset="jga_wes" data-frequency="≥0.5")
-                  | &nbsp; JGA-WES
-                  br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
                     frequency-block-view(data-dataset="jga_wgs" data-frequency="≥0.5")
                     | &nbsp; JGA-WGS
+                    br
+                  frequency-block-view(data-dataset="jga_wes" data-frequency="≥0.5")
+                  | &nbsp; JGA-WES
+                  br
+                  frequency-block-view(data-dataset="jga_snp" data-frequency="≥0.5")
+                  | &nbsp; JGA-SNP
+                  br
+                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                    frequency-block-view(data-dataset="bbj1k" data-frequency="≥0.5")
+                    | &nbsp; BBJ1K
+                    br
+                    frequency-block-view(data-dataset="bbj2k" data-frequency="≥0.5")
+                    | &nbsp; BBJ2K
                     br
                   frequency-block-view(data-dataset="tommo" data-frequency="≥0.5")
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
@@ -392,19 +425,29 @@ block content
                   else if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
                     | &nbsp; ToMMo 54KJPN
                   br
+                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                    frequency-block-view(data-dataset="tommo_jsv1" data-frequency="≥0.5")
+                    | &nbsp; ToMMo JSV1
+                    br
+                    frequency-block-view(data-dataset="ncbn" data-frequency="≥0.5")
+                    | &nbsp; NCBN
+                    br
+                    frequency-block-view(data-dataset="jogo" data-frequency="≥0.5")
+                    | &nbsp; JoGo
+                    br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
                     frequency-block-view(data-dataset="hgvd" data-frequency="≥0.5")
                     | &nbsp; HGVD
-                    br
-                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    frequency-block-view(data-dataset="ncbn" data-frequency="≥0.5")
-                    | &nbsp; NCBN
                     br
                   frequency-block-view(data-dataset="gnomad_genomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD genomes
                   br
                   frequency-block-view(data-dataset="gnomad_exomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD exomes
+                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                    br
+                    frequency-block-view(data-dataset="gnomad_sv" data-frequency="≥0.5")
+                    | &nbsp; gnomAD SV
 
           #s2.question-answer._column-span-all
             h4.question

@@ -1,27 +1,33 @@
 import { ConditionValueEditor } from './ConditionValueEditor';
-import '../ConditionPathogenicityPredictionSearch/TabView';
-import '../ConditionPathogenicityPredictionSearch/PredictionRangeSliderView';
+import '../ConditionVariantEffectPredictionSearch/TabView';
+import '../ConditionVariantEffectPredictionSearch/PredictionRangeSliderView';
 import type {
   PredictionKey,
   PredictionLabel,
-} from '../ConditionPathogenicityPredictionSearch/PredictionDatasets';
-import { PREDICTIONS } from '../ConditionPathogenicityPredictionSearch/PredictionDatasets';
+} from '../ConditionVariantEffectPredictionSearch/PredictionDatasets';
+import { PREDICTIONS } from '../ConditionVariantEffectPredictionSearch/PredictionDatasets';
 import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';
 import type { ConditionItemValueView } from '../ConditionItemValueView';
-import type { PredictionValueView } from '../ConditionPathogenicityPredictionSearch/PredictionValueView';
+import type { PredictionValueView } from '../ConditionVariantEffectPredictionSearch/PredictionValueView';
 import type { Inequality, PredictionChangeDetail } from '../../../types';
-import type { TabView } from '../ConditionPathogenicityPredictionSearch/TabView';
+import type { TabView } from '../ConditionVariantEffectPredictionSearch/TabView';
+
+const DEFAULT_PREDICTION_KEY: PredictionKey = 'cadd_phred';
+const DEFAULT_PREDICTION = PREDICTIONS[DEFAULT_PREDICTION_KEY];
 
 /**
- * Pathogenicity prediction 条件のエディタ。
+ * Variant effect prediction 条件のエディタ。
  * tab-view でデータセット（AlphaMissense/SIFT/PolyPhen 等）を切り替え、
  * スコア範囲と不等号を設定して prediction-value-view へ反映する。
  */
-export class ConditionValueEditorPathogenicityPrediction extends ConditionValueEditor {
-  private _dataset: PredictionKey = 'alphamissense';
-  private _label: PredictionLabel = 'AlphaMissense';
-  private _values: [number, number] = [0, 1];
+export class ConditionValueEditorVariantEffectPrediction extends ConditionValueEditor {
+  private _dataset: PredictionKey = DEFAULT_PREDICTION_KEY;
+  private _label: PredictionLabel = DEFAULT_PREDICTION.label;
+  private _values: [number, number] = [
+    DEFAULT_PREDICTION.scoreMin,
+    DEFAULT_PREDICTION.scoreMax,
+  ];
   private _inequalitySigns: [Inequality, Inequality] = ['gte', 'lte'];
   private _includeUnassigned = false;
   private _includeUnknown = false;
@@ -34,9 +40,9 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
     includeUnassigned: boolean;
     includeUnknown: boolean;
   } = {
-    dataset: 'alphamissense',
-    label: 'AlphaMissense',
-    values: [0, 1],
+    dataset: DEFAULT_PREDICTION_KEY,
+    label: DEFAULT_PREDICTION.label,
+    values: [DEFAULT_PREDICTION.scoreMin, DEFAULT_PREDICTION.scoreMax],
     inequalitySigns: ['gte', 'lte'],
     includeUnassigned: false,
     includeUnknown: false,
@@ -60,6 +66,8 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
   /**
    * Cancel時に戻す基準として、shadow DOM内の prediction-value-view の現在値を保存する。
    * shadow DOM を経由するため、value-view が未更新のタイミングでも正確な値が取れる。
+   * 同時に tab-view のアクティブタブを現在の dataset に合わせて復元する。
+   * URL復元後に edit ボタンを押したとき、最初のタブ（CADD）ではなく保存された条件のタブが開くようにするため。
    */
   keepLastValues() {
     this.valuesContainerEl
@@ -86,6 +94,8 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
             includeUnassigned,
             includeUnknown,
           };
+          const tabView = this._tabsContainer.querySelector<TabView>('tab-view');
+          tabView?.restoreTab(dataset, values, inequalitySigns, includeUnassigned, includeUnknown);
         }
       });
   }
@@ -119,9 +129,9 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
    * constructor が肥大化しないよう責務を分割するため。
    */
   private _initializeDefaultValues() {
-    this._dataset = 'alphamissense';
-    this._label = 'AlphaMissense';
-    this._values = [0, 1];
+    this._dataset = DEFAULT_PREDICTION_KEY;
+    this._label = DEFAULT_PREDICTION.label;
+    this._values = [DEFAULT_PREDICTION.scoreMin, DEFAULT_PREDICTION.scoreMax];
     this._inequalitySigns = ['gte', 'lte'];
     this._includeUnassigned = false;
     this._includeUnknown = false;
@@ -141,8 +151,8 @@ export class ConditionValueEditorPathogenicityPrediction extends ConditionValueE
    */
   private _initializeUI() {
     this.createSectionEl(
-      'pathogenicity-editor-view',
-      `<header class="section-header">Select prediction</header><div class="section-content"></div>`
+      'variant-effect-prediction-editor-view',
+      `<header class="section-header">Select score</header><div class="section-content"></div>`
     );
     this._tabsContainer =
       this.sectionEl.querySelector<HTMLDivElement>('.section-content')!;

@@ -14,19 +14,31 @@ import type {
 // 型定義
 // ----------------------------------------
 
-/** 各チェックボックスの input 要素と件数表示 span を保持する型 */
-type InputValueEntry = {
+/** チェックボックスの input 要素と、隣接する件数表示 span を保持する型 */
+type CheckboxEntry = {
   input: HTMLInputElement;
-  value: Element;
+  /** <span class="count-display"> — 件数を表示する要素 */
+  countDisplay: Element;
 };
 
 /** チェックリスト形式のパネルで使用される kind の値 */
 type CheckListKind = Extract<
   MasterConditionId,
-  'dataset' | 'type' | 'significance' | 'alphamissense' | 'sift' | 'polyphen'
+  | 'dataset'
+  | 'type'
+  | 'significance'
+  | 'cadd'
+  | 'alphamissense'
+  | 'sift'
+  | 'polyphen'
+  | 'splicingvariant'
 >;
 
-/** 統計情報のストアキー */
+/**
+ * 統計情報のストアキー。
+ * API の StatisticsData が返す件数は dataset / type / significance / consequence の 4 種類のみ。
+ * alphamissense / sift / polyphen / cadd の件数はバックエンドが未対応のため統計表示できない。
+ */
 type StatisticsType =
   | 'statisticsDataset'
   | 'statisticsType'
@@ -35,6 +47,20 @@ type StatisticsType =
 // ----------------------------------------
 // スコアラベルの定数
 // ----------------------------------------
+
+/** CADD PHRED スコアのラベル（D=≥20, POSSD=≥10, T=<10）。data-function は共通バッジCSSの色分けに使う。 */
+const CADD_LABELS: Record<string, string> = {
+  D: '&ge; 20',
+  POSSD: '&ge; 10',
+  T: '&lt; 10',
+};
+
+/** AlphaMissense スコアのラベル */
+const ALPHAMISSENSE_LABELS: Record<string, string> = {
+  LP: '&gt; 0.564',
+  A: '&ge; 0.340',
+  LB: '&lt; 0.340',
+};
 
 /** SIFT スコアのラベル */
 const SIFT_LABELS: Record<string, string> = {
@@ -50,22 +76,17 @@ const POLYPHEN_LABELS: Record<string, string> = {
   U: 'Unknown',
 };
 
-/** AlphaMissense スコアのラベル */
-const ALPHAMISSENSE_LABELS: Record<string, string> = {
-  LP: '&gt; 0.564',
-  A: '&ge; 0.340',
-  LB: '&lt; 0.340',
-};
-
 /**
  * "Unassigned" チェックボックスを持つ kind と、
  * そのチェックボックスの value 属性のマッピング。
  */
 const UNASSIGNED_VALUE: Partial<Record<CheckListKind, string>> = {
-  significance: 'NC',
+  significance: 'NA',
+  cadd: 'N',
   alphamissense: 'N',
   sift: 'N',
   polyphen: 'N',
+  splicingvariant: 'N',
 };
 
 // ----------------------------------------
@@ -74,14 +95,15 @@ const UNASSIGNED_VALUE: Partial<Record<CheckListKind, string>> = {
 
 /**
  * チェックリスト形式のフィルターパネル。
- * Dataset / Variant type / Clinical significance / SIFT / PolyPhen / AlphaMissense で使用される。
+ * Dataset / Variant type / Clinical significance / CADD / SIFT / PolyPhen / AlphaMissense / Splicing variant で使用される。
  */
 export default class PanelViewCheckList extends PanelView {
-  /** key: チェックボックスの value 属性 → { input要素, 件数span } */
-  private _inputsValues: Record<string, InputValueEntry> = {};
+  /** key: チェックボックスの value 属性 → { input要素, 件数表示span } */
+  private checkboxEntries: Record<string, CheckboxEntry> = {};
+
   /**
    * @param elm - パネルのルート要素
-   * @param kind - パネル種別ID (dataset | type | significance | sift | polyphen | alphamissense)
+   * @param kind - パネル種別ID (dataset | type | significance | cadd | sift | polyphen | alphamissense | splicingvariant)
    * @param statisticsType - 統計情報のストアキー (省略時は統計表示なし)
    */
   constructor(
@@ -101,11 +123,11 @@ export default class PanelViewCheckList extends PanelView {
       );
     }
 
-    this._createGUI(conditionMaster);
-    this._initInputsValues();
-    this._changeFilter();
-    this._bindEvents();
-    this._bindStore(statisticsType);
+    this.buildChecklist(conditionMaster);
+    this.initCheckboxEntries();
+    this.applyFilter();
+    this.bindEvents();
+    this.subscribeStore(statisticsType);
   }
 
   // ----------------------------------------
@@ -113,7 +135,7 @@ export default class PanelViewCheckList extends PanelView {
   // ----------------------------------------
 
   /** DOM から input 要素への参照を収集し、URL パラメータから初期状態を復元する */
-  private _initInputsValues(): void {
+  private initCheckboxEntries(): void {
     const condition = getSimpleSearchCondition(
       this.kind as MasterConditionId
     ) as Record<string, string> | undefined;
@@ -126,9 +148,10 @@ export default class PanelViewCheckList extends PanelView {
         '.content > .checklist-values > .item > .label > input'
       )
       .forEach((input) => {
-        this._inputsValues[input.value] = {
+        this.checkboxEntries[input.value] = {
           input,
-          value: (input.parentNode as Element).nextElementSibling as Element,
+          countDisplay: (input.parentNode as Element)
+            .nextElementSibling as Element,
         };
         if (hasActiveFilter) {
           // フィルター有効時: '0' = 未チェック、conditionにないアイテムはチェック済み
@@ -139,9 +162,9 @@ export default class PanelViewCheckList extends PanelView {
   }
 
   /** 各チェックボックスに change イベントを登録する */
-  private _bindEvents(): void {
-    for (const entry of Object.values(this._inputsValues)) {
-      entry.input.addEventListener('change', this._changeFilter.bind(this));
+  private bindEvents(): void {
+    for (const entry of Object.values(this.checkboxEntries)) {
+      entry.input.addEventListener('change', this.applyFilter.bind(this));
     }
 
     // Clear ボタン: 全チェックを外してフィルターリセット
@@ -149,10 +172,10 @@ export default class PanelViewCheckList extends PanelView {
     if (clearBtn) {
       clearBtn.addEventListener('click', (e) => {
         e.stopPropagation(); // パネル開閉を発火させない
-        for (const entry of Object.values(this._inputsValues)) {
+        for (const entry of Object.values(this.checkboxEntries)) {
           entry.input.checked = false;
         }
-        this._changeFilter();
+        this.applyFilter();
       });
     }
   }
@@ -161,14 +184,14 @@ export default class PanelViewCheckList extends PanelView {
    * ストアの変更購読を登録する。
    * statisticsType が指定されている場合は統計情報の更新も購読する。
    */
-  private _bindStore(statisticsType?: StatisticsType): void {
-    storeManager.subscribe('simpleSearchConditions', (v) => this.simpleSearchConditions(v));
+  private subscribeStore(statisticsType?: StatisticsType): void {
+    storeManager.subscribe('simpleSearchConditions', (v) =>
+      this.simpleSearchConditions(v)
+    );
 
     if (statisticsType) {
-      // bind APIではthis[statisticsType]を動的に生成していたが、
-      // subscribeでは直接コールバックを渡せるため動的プロパティ付与が不要になる。
       storeManager.subscribe(statisticsType, (v) =>
-        this._updateStatistics(v ?? null)
+        this.updateStatistics(v ?? null)
       );
     }
   }
@@ -178,24 +201,26 @@ export default class PanelViewCheckList extends PanelView {
   // ----------------------------------------
 
   /** チェックボックス一覧の HTML を生成して DOM に挿入する */
-  private _createGUI(conditionMaster: MasterConditions): void {
+  private buildChecklist(conditionMaster: MasterConditions): void {
     const unassignedValue = UNASSIGNED_VALUE[this.kind as CheckListKind];
 
     let html = '';
 
-    // significance / alphamissense / sift / polyphen は
+    const masterItems = conditionMaster.items ?? [];
+
+    // significance / cadd / alphamissense / sift / polyphen は
     // マスターデータとは別に "Unassigned" チェックボックスを先頭に追加する
     if (unassignedValue) {
-      html += this._buildUnassignedItemHtml(unassignedValue);
+      const unassignedLabel =
+        masterItems.find((item) => item.id === unassignedValue)?.label ?? 'Unassigned';
+      html += this.buildUnassignedItemHtml(unassignedValue, unassignedLabel);
     }
-
-    const masterItems = conditionMaster.items ?? [];
     const filteredItems = unassignedValue
       ? masterItems.filter((item) => item.id !== unassignedValue)
       : masterItems;
 
     html += filteredItems
-      .map((item) => this._buildMasterItemHtml(item.id!, item.label))
+      .map((item) => this.buildMasterItemHtml(item.id!, item.label))
       .join('');
 
     this.elm
@@ -204,46 +229,48 @@ export default class PanelViewCheckList extends PanelView {
   }
 
   /** "Unassigned" チェックボックスの HTML を返す */
-  private _buildUnassignedItemHtml(value: string): string {
+  private buildUnassignedItemHtml(checkboxValue: string, label: string): string {
     return `
     <li class="item">
       <label class="label">
-        <input type="checkbox" value="${value}">
-        Unassigned
+        <input type="checkbox" value="${checkboxValue}">
+        ${label}
       </label>
-      <span class="value"></span>
+      <span class="count-display"></span>
     </li>
     <li class="separator"><hr></li>
     `;
   }
 
   /** マスターデータの 1 アイテム分のチェックボックス HTML を返す */
-  private _buildMasterItemHtml(id: string, label: string): string {
+  private buildMasterItemHtml(id: string, label: string): string {
     return `
     <li class="item">
       <label class="label">
         <input type="checkbox" value="${id}">
-        ${this._buildKindSpecificHtml(id)}
+        ${this.buildKindSpecificHtml(id)}
         ${label}
       </label>
-      <span class="value"></span>
+      <span class="count-display"></span>
     </li>
     `;
   }
 
   /** kind ごとのアイコン・スコア表示 HTML を返す */
-  private _buildKindSpecificHtml(id: string): string {
+  private buildKindSpecificHtml(id: string): string {
     switch (this.kind) {
       case 'dataset':
         return `<div class="dataset-icon" data-dataset="${id}"><div class="properties"></div></div>`;
       case 'significance':
         return `<div class="clinical-significance" data-value="${id}"></div>`;
-      case 'sift':
-        return `<div class="variant-function _width_5em _align-center" data-function="${id}">${SIFT_LABELS[id] ?? ''}</div>`;
-      case 'polyphen':
-        return `<div class="variant-function _width_5em _align-center" data-function="${id}">${POLYPHEN_LABELS[id] ?? ''}</div>`;
+      case 'cadd':
+        return `<div class="variant-effect-prediction-badge _width_5em _align-center" data-function="${id}">${CADD_LABELS[id] ?? ''}</div>`;
       case 'alphamissense':
-        return `<div class="variant-function _width_5em _align-center" data-function="${id}">${ALPHAMISSENSE_LABELS[id] ?? ''}</div>`;
+        return `<div class="variant-effect-prediction-badge _width_5em _align-center" data-function="${id}">${ALPHAMISSENSE_LABELS[id] ?? ''}</div>`;
+      case 'sift':
+        return `<div class="variant-effect-prediction-badge _width_5em _align-center" data-function="${id}">${SIFT_LABELS[id] ?? ''}</div>`;
+      case 'polyphen':
+        return `<div class="variant-effect-prediction-badge _width_5em _align-center" data-function="${id}">${POLYPHEN_LABELS[id] ?? ''}</div>`;
       default:
         return '';
     }
@@ -254,8 +281,8 @@ export default class PanelViewCheckList extends PanelView {
   // ----------------------------------------
 
   /** チェックボックスが変更されたときにフィルター状態を更新する */
-  private _changeFilter(_e?: Event): void {
-    const entries = Object.entries(this._inputsValues);
+  private applyFilter(_e?: Event): void {
+    const entries = Object.entries(this.checkboxEntries);
 
     const anyChecked = entries.some(([, entry]) => entry.input.checked);
     const checked: Record<string, string> = {};
@@ -273,39 +300,37 @@ export default class PanelViewCheckList extends PanelView {
     );
   }
 
-  /**
-   * ストアの simpleSearchConditions が更新されたときに UI に反映する。
-   */
+  /** ストアの simpleSearchConditions が更新されたときに UI に反映する */
   simpleSearchConditions(conditions: SimpleSearchCurrentConditions): void {
     const kindConditions =
-      (conditions as Record<string, Record<string, string> | undefined>)[this.kind] ?? {};
+      (conditions as Record<string, Record<string, string> | undefined>)[
+        this.kind
+      ] ?? {};
 
     if (Object.keys(kindConditions).length === 0) {
       // デフォルト or Clear → 全チェックなし
-      for (const entry of Object.values(this._inputsValues)) {
+      for (const entry of Object.values(this.checkboxEntries)) {
         entry.input.checked = false;
       }
     } else {
       // URLに存在しないキー = チェックあり（除外指定されていない）
       // URLに =0 があるキー = チェックなし
-      for (const [key, entry] of Object.entries(this._inputsValues)) {
+      for (const [key, entry] of Object.entries(this.checkboxEntries)) {
         entry.input.checked = kindConditions[key] !== '0';
       }
     }
   }
 
-  /**
-   * 統計情報が更新されたときに件数表示を更新する。
-   */
-  private _updateStatistics(values: Record<string, number> | null): void {
+  /** 統計情報が更新されたときに件数表示を更新する */
+  private updateStatistics(values: Record<string, number> | null): void {
     if (values) {
-      for (const [key, entry] of Object.entries(this._inputsValues)) {
+      for (const [key, entry] of Object.entries(this.checkboxEntries)) {
         const count = values[key] ?? 0;
-        entry.value.textContent = count.toLocaleString();
+        entry.countDisplay.textContent = count.toLocaleString();
       }
     } else {
-      for (const entry of Object.values(this._inputsValues)) {
-        entry.value.textContent = 'N/A';
+      for (const entry of Object.values(this.checkboxEntries)) {
+        entry.countDisplay.textContent = 'N/A';
       }
     }
   }

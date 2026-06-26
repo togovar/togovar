@@ -1,0 +1,149 @@
+// データセットアイコン (.dataset-icon)
+// Font Awesome のデータベースアイコンにデータセット種別の色とラベルを組み合わせる
+.dataset-icon {
+  position: relative;
+  height: 18px;
+  font-family: 'Font Awesome 7 Free', sans-serif;
+  font-weight: 900;
+
+  &::before {
+    position: relative;
+    left: 2px;
+    display: inline-block;
+    height: 18px;
+    margin-right: 2px;
+    content: var(--icon-database);
+  }
+
+  > .properties {
+    position: relative;
+    top: -1px;
+    left: -2px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 20px;
+    font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: normal;
+    line-height: 9px;
+    vertical-align: middle;
+    transform: scale(0.9);
+
+    &::before,
+    &::after {
+      display: block;
+      height: 10px;
+    }
+  }
+
+  // シーケンス種別ラベル
+  &[data-dataset='gem_j_wga'],
+  &[data-dataset='jga_wgs'],
+  &[data-dataset='bbj1k'],
+  &[data-dataset='bbj2k'],
+  &[data-dataset='tommo'],
+  &[data-dataset='tommo_jsv1'],
+  &[data-dataset='ncbn'],
+  &[data-dataset='jogo'],
+  &[data-dataset='gnomad_genomes'],
+  &[data-dataset='gnomad_sv'] {
+    > .properties {
+      &::after {
+        content: 'WGS';
+      }
+    }
+  }
+
+  &[data-dataset='jga_wes'],
+  &[data-dataset='hgvd'],
+  &[data-dataset='gnomad_exomes'] {
+    > .properties {
+      &::after {
+        content: 'WES';
+      }
+    }
+  }
+
+  &[data-dataset='jga_snp'] {
+    > .properties {
+      &::after {
+        content: 'SNP';
+      }
+    }
+  }
+
+  // データセット別アイコン色
+  &[data-dataset='gem_j_wga'] {
+    &::before {
+      color: var(--color-dataset-gemj);
+    }
+  }
+
+  &[data-dataset='jga_wgs'],
+  &[data-dataset='jga_wes'],
+  &[data-dataset='jga_snp'] {
+    &::before {
+      color: var(--color-dataset-jga);
+    }
+  }
+
+  &[data-dataset='bbj1k'],
+  &[data-dataset='bbj2k'] {
+    &::before {
+      color: var(--color-dataset-bbj);
+    }
+  }
+
+  &[data-dataset='tommo'],
+  &[data-dataset='tommo_jsv1'] {
+    &::before {
+      color: var(--color-dataset-tommo);
+    }
+  }
+
+  &[data-dataset='hgvd'],
+  &[data-dataset='mgend'] {
+    &::before {
+      color: var(--color-dataset-hgvd);
+    }
+  }
+
+  &[data-dataset='ncbn'] {
+    &::before {
+      color: var(--color-dataset-ncbn);
+    }
+  }
+  &[data-dataset='jogo'] {
+    &::before {
+      color: var(--color-dataset-jogo);
+    }
+  }
+
+  &[data-dataset='gnomad_genomes'],
+  &[data-dataset='gnomad_exomes'],
+  &[data-dataset='gnomad_sv'] {
+    &::before {
+      color: var(--color-dataset-foreign);
+    }
+  }
+
+  // 疾患系データセット（mgend/clinvar）はプラスアイコンに置き換え
+  &[data-dataset='mgend'],
+  &[data-dataset='clinvar'] {
+    &::before {
+      font-family: 'Font Awesome 7 Free', sans-serif;
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--color-sign-dangerous);
+      content: var(--icon-plus);
+    }
+
+    > .properties {
+      &::before {
+        color: var(--color-sign-dangerous);
+        content: 'Disease';
+      }
+    }
+  }
+}

@@ -181,6 +181,17 @@ npm run typecheck
 - `npm run typecheck` は TypeScript の型チェックのみを実行します（ビルドは行いません）。
 - 環境によって `node` / `npm` が PATH に無い場合があります。その場合は Node.js 22.x を有効化してください。
 
+### API 仕様との整合性チェック
+
+`search_conditions.json`・`advanced_search_conditions.json` の consequence または type 定義を変更した場合、または TogoVar API の仕様が更新された場合は、以下を実行してください。
+
+```bash
+python3 scripts/check_conditions.py              # GRCh38（デフォルト）
+python3 scripts/check_conditions.py --build GRCh37
+```
+
+`scripts/GRCh38/openapi.yaml`（TogoVar API の Swagger 仕様）から consequence・type の両 term を自動抽出し、`search_conditions.json` と `advanced_search_conditions.json` の両方と整合性を検証します。API 仕様が変わった場合は `openapi.yaml` を差し替えてからこのスクリプトを実行してください。Python 3 標準ライブラリのみで動作します（追加インストール不要）。
+
 ## Advanced Search
 
 Advanced Search は、条件行と AND/OR グループを組み合わせて検索クエリを作ります。
@@ -251,6 +262,26 @@ app/frontend/assets/GRCh37/search_conditions.json
 app/frontend/assets/GRCh38/search_conditions.json
 ```
 
+Advanced Search の一部の選択肢は、TypeScript のクエリ型でも扱います。
+`app/frontend/src/advancedCondition.ts` は Advanced Search 条件ID、relation可否、dataset名などの型定義元です。
+`advanced_search_conditions.json` に dataset を追加した場合は、必要に応じて `advancedCondition.ts` の `FREQUENCY_DATASETS` も更新します。
+Simple Search の `search_conditions.json` だけを変更する場合は、通常 `advancedCondition.ts` の更新は不要です。
+
+### advanced_search_conditions.json の構造
+
+各条件には `"type"` フィールドがあり、フロントエンドのUI描画方法を決定します。このフィールドは手動設定が必要です。
+
+| type | UI | 該当条件 |
+| ------------- | ------------------------------------------- | ------------------------------------- |
+| `"peculiar"`  | 専用の特殊UI（ツリー選択・座標入力・スライダー）| dataset, genotype, location, variant_effect_prediction |
+| `"enumeration"` | チェックボックスのリスト | significance, sscv_db, type |
+| `"tree"` | 文字列IDで参照する階層ツリー | consequence |
+| `"text"` | テキスト入力 | disease, gene, id |
+
+`"genotype"` 条件には、ジェノタイプカウント検索（Alt/Alt・Ref/Alt・Ref/Ref の件数絞り込み）をサポートするデータセットのみを列挙します。gnomAD や GEM-J WGA など対応していないデータセットは含まれないため、`"dataset"` 条件のサブセットになります。
+
+`"dataset"` と `"genotype"` の `values` はツリー構造（`children` を持つ入れ子）で、**ラベルとツリー構造は手動管理**です。`openapi.yaml` が持つのは値キー（`value` フィールド）のみです。整合性の確認には `python3 scripts/check_conditions.py` を使います。
+
 ## API通信
 
 検索とダウンロードは TogoVar API にリクエストします。
@@ -258,13 +289,15 @@ app/frontend/assets/GRCh38/search_conditions.json
 主な関連ファイル:
 
 ```txt
-app/frontend/src/api/fetchData.ts
+app/frontend/src/api/searchExecutor.ts
+app/frontend/src/api/searchRequest.ts
+app/frontend/src/api/searchResponse.ts
 app/frontend/src/components/DownloadButton.ts
 app/frontend/src/global.ts
 ```
 
-- Simple Search は GET リクエストで検索条件をクエリパラメータに展開します。
-- Advanced Search は POST リクエストで `body.query` に条件オブジェクトを入れます。
+- Simple Search は現在、GET リクエストで検索条件をクエリパラメータに展開します。
+- Advanced Search は `/api/search/variant` へ POST し、`body.query` に条件オブジェクトを入れます。
 - ダウンロードは現在の検索モードに応じて、Simple / Advanced の条件を送ります。
 
 ## ドキュメントページ

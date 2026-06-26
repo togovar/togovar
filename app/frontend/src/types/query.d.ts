@@ -8,8 +8,12 @@
  * components/ への参照が1箇所残る。その他のコンポーネント依存はない。
  */
 
-import type { FrequencyDataset, GenotypeKey, SignificanceTerm } from '../definition';
-import type { PredictionKey } from '../components/Condition/ConditionPathogenicityPredictionSearch/PredictionDatasets';
+import type {
+  FrequencyDataset,
+  GenotypeKey,
+  SignificanceTerm,
+} from '../advancedCondition';
+import type { PredictionKey } from '../components/Condition/ConditionVariantEffectPredictionSearch/PredictionDatasets';
 
 // ───────────────────────────────────────────────────────────────────────────
 // Query
@@ -133,7 +137,7 @@ interface IdLeaf {
 // ───────────────────────────────────────────────────────────────────────────
 // Default Query
 // ───────────────────────────────────────────────────────────────────────────
-type DefaultQueryKey = 'consequence' | 'disease' | 'type';
+type DefaultQueryKey = 'consequence' | 'disease' | 'sscv_db' | 'type';
 
 type DefaultQueryOf<K extends DefaultQueryKey> = {
   [P in K]: { relation: Relation; terms: string[] };
@@ -142,6 +146,7 @@ type DefaultQueryOf<K extends DefaultQueryKey> = {
 type DefaultLeaf =
   | { consequence: { relation: Relation; terms: string[] } }
   | { disease: { relation: Relation; terms: string[] } }
+  | { sscv_db: { relation: Relation; terms: string[] } }
   | { type: { relation: Relation; terms: string[] } };
 
 // ───────────────────────────────────────────────────────────────────────────

@@ -112,6 +112,24 @@ html(data-page=locals.currentPage, lang=lang)
           console.error('Error fetching auth status:', error);
         }
       })();
+      (function() {
+        // ハッシュはブラウザ側にしか存在しないため、クライアントで言語切替リンクに付与する。
+        // hashchange にも対応し、ページ内スクロール後に切替しても正しく引き継ぐ。
+        var syncLangSwitcherHash = function() {
+          var hash = window.location.hash;
+          var links = document.querySelectorAll('.languageswitcher a.language');
+          for (var i = 0; i < links.length; i++) {
+            var base = links[i].href.split('#')[0];
+            links[i].href = hash ? base + hash : base;
+          }
+        };
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', syncLangSwitcherHash, { once: true });
+        } else {
+          syncLangSwitcherHash();
+        }
+        window.addEventListener('hashchange', syncLangSwitcherHash);
+      })();
 
     block head
   body

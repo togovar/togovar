@@ -48,7 +48,7 @@ app/frontend/
       AdvancedSearch/   Advanced Search全体制御
       Condition/        条件入力UI・クエリ変換
         ConditionDiseaseSearch/                  疾患検索Lit要素
-        ConditionPathogenicityPredictionSearch/  病原性予測検索Lit要素
+        ConditionVariantEffectPredictionSearch/   バリアント効果予測検索Lit要素
         ConditionValueEditor/                    条件値入力UI
         queryBuilders/                           条件→APIクエリ変換
       Karyotype/        染色体ビジュアライズ
@@ -108,6 +108,9 @@ app/frontend/
 - 検索APIのHTTP fetchとHTTPステータスのエラーコード変換は `app/frontend/src/api/searchFetch.ts` に置く。
 - 検索APIレスポンスのdata/stat判定とStore反映は `app/frontend/src/api/searchResponse.ts` に置き、`searchExecutor.ts` は通信フローに集中させる。
 - 検索APIレスポンス内のnotice/warning/errorのStore反映は `app/frontend/src/api/searchMessages.ts` に置く。
+- Simple Search の結果レスポンスでは、`genes` は巨大SV対策として `{ total, items? }` 形式を正とする。`items` は省略され得るため、Results列やプレビューパネルでは `total` と `items` を分けて扱う。
+- API移行中に `external_link` と `external_links` が混在する可能性がある。表示側では新仕様の `external_links` を優先し、必要な範囲で旧 `external_link` へフォールバックする。
+- GRCh38のSimple Search dataset/filter/frequency表示は `app/frontend/assets/GRCh38/search_conditions.json` の dataset items を正として扱う。APIレスポンスの `frequencies[].source` が増えた場合は、このマスターへの追加要否を確認する。
 - StoreはAPIを直接呼ばない。仮想スクロールで未取得ページが必要な場合も、コンポーネントから `searchManager.requestNextPage()` を呼び、fetch の起動は `searchManager` / `api/searchExecutor.ts` 側へ集約する。
 - 検索条件のブラウザURL反映（`history.pushState`、Simple/Advanced SearchのURL表現、URL長制限時のstate退避）は `store/searchURL.ts` に置き、`searchManager.ts` は検索開始タイミングとStore更新に集中させる。
 - popstate時のURL/stateからの検索条件復元は `store/searchHistory.ts` に置く。
@@ -133,6 +136,7 @@ app/frontend/
 - `undefined` は「条件なし」を表すセンチネル値であり、`{}` は使わない。
 - Store/API層（`store/`, `Karyotype.ts` など）から `ConditionQuery` を参照するときは `types/query.d.ts` を直接 import する。`types/conditionBuilder.d.ts` は参照しない。
 - `GeneLeaf.gene.labels` はURL復元用のUIメタ情報。API送信前に `stripAdvancedSearchMetadata()` で除去する。
+- `app/frontend/src/advancedCondition.ts` は Advanced Search の条件ID、relation可否、クエリ型で使う共有定数を置く場所。`FREQUENCY_DATASETS` は `FrequencyDataset` 型の元になるため、`advanced_search_conditions.json` の dataset 条件に検索可能datasetを追加した場合は、同じ値をここにも追加する。Simple Search の `search_conditions.json` だけを変える場合は、通常 `advancedCondition.ts` の更新は不要。
 
 ## TypeScript / JavaScript 方針
 
@@ -251,3 +255,30 @@ npm run typecheck
 - このリポジトリには `npm run check` は定義されていない。
 - 環境によって `node` / `npm` がPATHに無い場合がある。その場合は実行できなかったことを報告する。
 - Rails/バックエンド側を触った場合は、READMEのBackend手順と既存のRubyコマンドを確認する。
+
+### 検索条件データを変更した場合の追加確認
+
+`search_conditions.json`・`advanced_search_conditions.json` の consequence または type 定義を変更した場合、または `scripts/GRCh38/openapi.yaml` を更新した場合は、以下も実行する。
+
+```bash
+python3 scripts/check_conditions.py
+```
+
+`openapi.yaml`（TogoVar API の Swagger 仕様）を正として、consequence / type の SO ID・ラベル・consequence_grouping・ツリーの親子関係をまとめて検証する。Python 3 のみで動作する（追加インストール不要）。エラーが出た場合は両 JSON を修正してから再確認する。
+
+このスクリプトは**検証のみ**を行い、JSON ファイルを自動更新しない。新しいデータセットや値が仕様に追加された場合は、先に JSON を手動で編集してからスクリプトで確認する。
+
+### advanced_search_conditions.json の構造ルール
+
+各条件の `"type"` フィールドはフロントエンドのUI描画方法を決める識別子。手動設定が必要。
+
+| type            | UI                                               | 該当条件                                               |
+| --------------- | ------------------------------------------------ | ------------------------------------------------------ |
+| `"peculiar"`    | 専用の特殊UI（ツリー選択・座標入力・スライダー） | dataset, genotype, location, variant_effect_prediction |
+| `"enumeration"` | チェックボックスのリスト                         | significance, sscv_db, type                            |
+| `"tree"`        | 文字列IDで参照する階層ツリー                     | consequence                                            |
+| `"text"`        | テキスト入力                                     | disease, gene, id                                      |
+
+`"genotype"` 条件には、ジェノタイプカウント検索（aac/arc/rrc = Alt/Alt・Ref/Alt・Ref/Ref）をサポートするデータセットのみ列挙する。すべてのデータセットが対応しているわけではないため、`"dataset"` のサブセットになる。チェックスクリプトは genotype に対して「仕様外の値が含まれていないか」のみ検証し、「dataset にあるのに genotype にない」はエラーとしない（意図的な省略のため）。
+
+`"dataset"` と `"genotype"` の `values` は階層ツリー構造（`children` を持つ入れ子）で、**ラベルとツリー構造は手動管理**。`openapi.yaml` から取得できるのは値キー（`value` フィールド）のみ。

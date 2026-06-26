@@ -7,7 +7,7 @@ import type {
   FrequencyQuery,
   GenotypeCount,
 } from '../../types';
-import type { FrequencyDataset, GenotypeKey } from '../../definition';
+import type { FrequencyDataset, GenotypeKey } from '../../advancedCondition';
 
 // Display mode constants definition
 export const MODE = {

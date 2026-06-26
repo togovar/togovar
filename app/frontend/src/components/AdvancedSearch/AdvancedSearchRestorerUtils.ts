@@ -1,5 +1,5 @@
 import { ADVANCED_CONDITIONS } from '../../global';
-import type { ConditionTypeValue } from '../../definition';
+import type { AdvancedConditionTypeValue } from '../../advancedCondition';
 import type { RestoredConditionValue } from '../../types';
 import type { Relation } from '../../types';
 
@@ -11,7 +11,7 @@ export type QueryObject = Record<string, unknown>;
  * relation は eq/ne を持つ条件だけがセットする。
  */
 export type RestoredItem = Readonly<{
-  conditionType: ConditionTypeValue;
+  conditionType: AdvancedConditionTypeValue;
   relation?: Relation;
   values: RestoredConditionValue[];
 }>;
@@ -59,7 +59,7 @@ export function getString(value: unknown): string | null {
  * URL復元後に生のIDをそのまま表示しないよう、通常操作時と近い見た目へ戻す。
  */
 export function findConditionLabel(
-  conditionType: ConditionTypeValue,
+  conditionType: AdvancedConditionTypeValue,
   value: string
 ): string {
   const condition = ADVANCED_CONDITIONS[conditionType];

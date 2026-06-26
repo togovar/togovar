@@ -2,13 +2,13 @@ import { BaseConditionView } from './ConditionView';
 import ConditionValues from './ConditionValues';
 import { storeManager } from '../../store/StoreManager';
 import {
+  CONDITION_NODE_KIND,
+  type AdvancedConditionTypeValue,
   supportsRelation,
   type NoRelationType,
   type KeysWithRelation,
-} from '../../conditions';
+} from '../../advancedCondition';
 import { ADVANCED_CONDITIONS } from '../../global';
-
-import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../../definition';
 import { keyDownEvent } from '../../utils/keyDownEvent';
 import { buildQueryFragment } from './queryBuilders';
 import { createEl } from '../../utils/dom/createEl';
@@ -30,7 +30,7 @@ import type { ConditionItemValueView } from './ConditionItemValueView';
 export class ConditionItemView extends BaseConditionView {
   readonly conditionNodeKind = CONDITION_NODE_KIND.condition;
 
-  private readonly _conditionType: ConditionTypeValue;
+  private readonly _conditionType: AdvancedConditionTypeValue;
   private readonly _relationSupported: boolean;
 
   private _isFirstTime = true;
@@ -53,7 +53,7 @@ export class ConditionItemView extends BaseConditionView {
   constructor(
     builder: AdvancedSearchBuilderView,
     parentGroup: ConditionGroupView,
-    conditionType: ConditionTypeValue,
+    conditionType: AdvancedConditionTypeValue,
     referenceElm: Node | null = null,
     options?: unknown
   ) {
@@ -134,7 +134,7 @@ export class ConditionItemView extends BaseConditionView {
   // ───────────────────────────────────────────────────────────────────────────
 
   /** この条件行が対象とする条件種別。生成後は変わらないためreadonlyで保持する。 */
-  get conditionType(): ConditionTypeValue {
+  get conditionType(): AdvancedConditionTypeValue {
     return this._conditionType;
   }
   /** 条件値要素（condition-item-value-view）を並べるコンテナ。エディタが値を追加・取得するために参照する。 */

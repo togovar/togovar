@@ -3,7 +3,7 @@
   align-items: center;
   white-space: nowrap;
 }
-:host > .pathogenicity-graph {
+:host > .prediction-graph {
   position: relative;
   width: 100px;
   height: 3.5px;
@@ -25,12 +25,12 @@
 }
 
 @media (resolution: 2dppx) {
-  :host > .pathogenicity-graph > .ruler > .scale {
+  :host > .prediction-graph > .ruler > .scale {
     border-left: dotted 1px var(--color-separator);
   }
 }
 
-:host > .pathogenicity-graph > .bar {
+:host > .prediction-graph > .bar {
   position: absolute;
   height: 100%;
   background-color: var(--color-gray);

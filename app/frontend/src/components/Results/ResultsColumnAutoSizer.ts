@@ -298,9 +298,9 @@ export class ResultsColumnAutoSizer {
     const selectorByColumn: Record<string, string> = {
       ref_alt: '.ref-alt',
       position: '.chromosome-position',
-      alphamissense: '.variant-function',
-      sift: '.variant-function',
-      polyphen: '.variant-function',
+      alphamissense: '.variant-effect-prediction-badge',
+      sift: '.variant-effect-prediction-badge',
+      polyphen: '.variant-effect-prediction-badge',
     };
 
     return cell.querySelector<HTMLElement>(selectorByColumn[columnId]) || cell;

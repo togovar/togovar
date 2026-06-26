@@ -6,7 +6,7 @@ import {
 } from './ConditionView';
 import { ConditionItemView } from './ConditionItemView';
 import type { AdvancedSearchBuilderView } from '../AdvancedSearch/AdvancedSearchBuilderView';
-import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../../definition';
+import { CONDITION_NODE_KIND, type AdvancedConditionTypeValue } from '../../advancedCondition';
 import type { ConditionQuery, LogicalOperator } from '../../types';
 import { createEl } from '../../utils/dom/createEl';
 
@@ -73,7 +73,7 @@ export class ConditionGroupView extends BaseConditionView implements GroupView {
 
   /** 指定した条件種別の新しい条件行をこのグループ内に追加する。 */
   addNewConditionItem(
-    conditionType: ConditionTypeValue,
+    conditionType: AdvancedConditionTypeValue,
     referenceElm: Node | null = null,
     options?: unknown
   ): ConditionItemView {

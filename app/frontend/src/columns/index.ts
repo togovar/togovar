@@ -3,6 +3,7 @@ import type { Column, ColumnConfig } from '../types';
 const MIN_COLUMN_WIDTH = 48;
 const FIXED_INITIAL_WIDTH_COLUMN_IDS = new Set([
   'alt_frequency',
+  'cadd',
   'alphamissense',
   'sift',
   'polyphen',
@@ -19,7 +20,7 @@ export const COLUMNS = [
   {
     label: 'Alt frequency',
     id: 'alt_frequency',
-    defaultWidth: 120,
+    defaultWidth: 185,
     resizable: false,
   },
   { label: 'Consequence', id: 'consequence', defaultWidth: 176 },
@@ -29,13 +30,24 @@ export const COLUMNS = [
     defaultWidth: 276,
   },
   {
-    label: 'AlphaMissense',
-    id: 'alphamissense',
-    defaultWidth: 71,
+    label: 'CADD (PHRED score)',
+    id: 'cadd',
+    defaultWidth: 67,
     resizable: false,
   },
-  { label: 'SIFT', id: 'sift', defaultWidth: 57, resizable: false },
-  { label: 'PolyPhen', id: 'polyphen', defaultWidth: 90, resizable: false },
+  {
+    label: 'AlphaMissense',
+    id: 'alphamissense',
+    defaultWidth: 74,
+    resizable: false,
+  },
+  { label: 'SIFT', id: 'sift', defaultWidth: 62, resizable: false },
+  { label: 'PolyPhen', id: 'polyphen', defaultWidth: 85, resizable: false },
+  {
+    label: 'Splicing variant (SSCV DB)',
+    id: 'splicingvariant',
+    defaultWidth: 140,
+  },
 ];
 
 /** 列 ID から列定義オブジェクトへの高速マップ */

@@ -4,7 +4,7 @@ import { ConditionGroupView } from '../Condition/ConditionGroupView';
 import { type ConditionView, isGroupView } from '../Condition/ConditionView';
 import { AdvancedSearchToolbar } from './AdvancedSearchToolbar';
 import { AdvancedSearchSelection } from './AdvancedSearchSelection';
-import { CONDITION_NODE_KIND, type ConditionTypeValue } from '../../definition';
+import { CONDITION_NODE_KIND, type AdvancedConditionTypeValue } from '../../advancedCondition';
 import { selectRequired } from '../../utils/dom/select';
 import {
   getSelectionCapabilities,
@@ -185,7 +185,7 @@ export class AdvancedSearchBuilderView {
    *
    * @param options 初期値。例: karyotype 選択から渡される { chr, start, end }
    */
-  addCondition(conditionType: ConditionTypeValue, options?: unknown): void {
+  addCondition(conditionType: AdvancedConditionTypeValue, options?: unknown): void {
     const selected = this._selection.getSelectedConditionViews();
     const target = selected.length > 0 ? selected[0] : this._rootGroup;
 

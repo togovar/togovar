@@ -16,11 +16,15 @@ import type {
 // 型定義
 // ----------------------------------------
 
-type InputValueEntry = {
+type CheckboxEntry = {
   input: HTMLInputElement;
-  value: Element;
-  /** 入れ子構造を持つグループノードの場合、配下のリーフキー一覧 */
-  values?: string[];
+  /** <span class="count-display"> — 件数を表示する要素 */
+  countDisplay: Element;
+  /**
+   * グループノードの場合のみ存在する。
+   * チェック連動・フィルター集計の対象となる配下リーフの value キー一覧。
+   */
+  leafKeys?: string[];
 };
 
 // ----------------------------------------
@@ -37,7 +41,7 @@ const KIND_OF_CONDITION = 'consequence' as const;
  * Consequence フィルターパネル（階層チェックリスト）。
  */
 export default class PanelViewFilterConsequence extends PanelView {
-  private _inputsValues: Record<string, InputValueEntry> = {};
+  private _entries: Record<string, CheckboxEntry> = {};
 
   constructor(elm: Element) {
     super(elm, 'consequence');
@@ -46,10 +50,18 @@ export default class PanelViewFilterConsequence extends PanelView {
     const grouping = getSimpleSearchConditionMaster('consequence_grouping')!
       .items as Array<ItemItemClass | string>;
 
-    // GUI 生成
     this._createGUI(conditionMaster, grouping);
+    this._initEntries(grouping);
+    this._bindEvents(elm);
+    this._bindStore();
+  }
 
-    // input 要素への参照を収集
+  // ----------------------------------------
+  // 初期化処理
+  // ----------------------------------------
+
+  /** DOM から input 要素への参照を収集し、URL パラメータから初期状態を復元する */
+  private _initEntries(grouping: Array<ItemItemClass | string>): void {
     const condition = getSimpleSearchCondition(KIND_OF_CONDITION) as
       | Record<string, string>
       | undefined;
@@ -57,13 +69,13 @@ export default class PanelViewFilterConsequence extends PanelView {
     const hasActiveFilter =
       condition !== undefined && Object.keys(condition).length > 0;
 
-    this._inputsValues = {};
     this.elm
       .querySelectorAll<HTMLInputElement>('.content > .checklist-values input')
       .forEach((input) => {
-        this._inputsValues[input.value] = {
+        this._entries[input.value] = {
           input,
-          value: (input.parentNode as Element).nextElementSibling as Element,
+          countDisplay: (input.parentNode as Element)
+            .nextElementSibling as Element,
         };
         if (hasActiveFilter) {
           // フィルター有効時: '0' = 未チェック、conditionにないアイテムはチェック済み
@@ -72,30 +84,31 @@ export default class PanelViewFilterConsequence extends PanelView {
         // condition が undefined または空 → チェックなし（フィルターなし）
       });
 
-    // 入れ子グループの子キーを収集
-    this._collectGroupValues(grouping);
+    this._collectLeafKeys(grouping);
     this._updateNestedCheckboxes();
+  }
 
-    // イベント登録
-    for (const key of Object.keys(this._inputsValues)) {
-      this._inputsValues[key].input.addEventListener(
-        'change',
-        this._changeFilter.bind(this)
-      );
+  /** 各チェックボックスと Clear ボタンにイベントを登録する */
+  private _bindEvents(elm: Element): void {
+    for (const entry of Object.values(this._entries)) {
+      entry.input.addEventListener('change', this._changeFilter.bind(this));
     }
 
-    // Clear ボタン
     const clearBtn = elm.querySelector<HTMLButtonElement>('.clear-button');
     if (clearBtn) {
       clearBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        for (const entry of Object.values(this._inputsValues)) {
+        e.stopPropagation(); // パネル開閉を発火させない
+        for (const entry of Object.values(this._entries)) {
           entry.input.checked = false;
         }
-        this._changeFilter(null);
+        this._updateNestedCheckboxes();
+        this._changeFilter();
       });
     }
+  }
 
+  /** ストアの変更購読を登録する */
+  private _bindStore(): void {
     storeManager.subscribe('simpleSearchConditions', (v) =>
       this.simpleSearchConditions(v)
     );
@@ -136,15 +149,15 @@ export default class PanelViewFilterConsequence extends PanelView {
       : conditionMaster.items!.find((c) => c.id === item)!;
 
     const childItems = hasChildren ? (item as ItemItemClass).items : undefined;
-    const value = resolved.id ? resolved.id : resolved.label;
+    const checkboxValue = resolved.id ? resolved.id : resolved.label;
 
     return `
       <li class="item${hasChildren ? ' -hierarchic' : ''}"${hasChildren ? ` data-group="${resolved.label}"` : ''}>
         <label class="label">
-          <input type="checkbox" value="${value}" data-has-children="${childItems ? 'true' : 'false'}">
+          <input type="checkbox" value="${checkboxValue}" data-has-children="${childItems ? 'true' : 'false'}">
           ${resolved.label}
         </label>
-        <span class="value"></span>
+        <span class="count-display"></span>
         ${
           childItems
             ? `<details>
@@ -152,7 +165,7 @@ export default class PanelViewFilterConsequence extends PanelView {
                 <ul class="checklist-values">
                   ${childItems.map((child) => this._render(conditionMaster, child)).join('')}
                 </ul>
-               </details>`
+              </details>`
             : ''
         }
       </li>
@@ -163,23 +176,23 @@ export default class PanelViewFilterConsequence extends PanelView {
   // 入れ子グループのリーフキー収集
   // ----------------------------------------
 
-  private _collectGroupValues(items: Array<ItemItemClass | string>): string[] {
+  /** グループノードの `leafKeys` に配下のリーフ value キーを再帰的に収集する */
+  private _collectLeafKeys(items: Array<ItemItemClass | string>): string[] {
     const leafKeys: string[] = [];
     for (const item of items) {
       if (typeof item === 'object') {
-        const childLeaves = this._collectGroupValues(
+        const childLeaves = this._collectLeafKeys(
           item.items as Array<ItemItemClass | string>
         );
         const groupKey = (item as unknown as { label: string }).label;
-        if (this._inputsValues[groupKey]) {
-          this._inputsValues[groupKey].values = childLeaves;
+        if (this._entries[groupKey]) {
+          this._entries[groupKey].leafKeys = childLeaves;
         }
         leafKeys.push(...childLeaves);
       } else {
         leafKeys.push(item);
       }
     }
-    // ルートの呼び出し元（all グループ）への参照は不要なので返すだけ
     return leafKeys;
   }
 
@@ -187,21 +200,21 @@ export default class PanelViewFilterConsequence extends PanelView {
   // イベント・ストア処理
   // ----------------------------------------
 
-  private _changeFilter(e: Event | null): void {
-    if (e && (e.target as HTMLInputElement).dataset.hasChildren === 'true') {
-      // グループチェックボックス → 配下のリーフを連動
-      const target = e.target as HTMLInputElement;
-      for (const leafKey of this._inputsValues[target.value].values ?? []) {
-        this._inputsValues[leafKey].input.checked = target.checked;
+  private _changeFilter(_e?: Event): void {
+    if (_e) {
+      const target = _e.target as HTMLInputElement;
+      if (target.dataset.hasChildren === 'true') {
+        // グループチェックボックス → 配下のリーフを連動
+        for (const leafKey of this._entries[target.value].leafKeys ?? []) {
+          this._entries[leafKey].input.checked = target.checked;
+        }
       }
-      this._updateNestedCheckboxes();
-    } else if (e) {
       this._updateNestedCheckboxes();
     }
 
     // リーフのみ対象にして checked を構築
-    const leafEntries = Object.entries(this._inputsValues).filter(
-      ([, entry]) => entry.values === undefined
+    const leafEntries = Object.entries(this._entries).filter(
+      ([, entry]) => entry.leafKeys === undefined
     );
 
     const anyChecked = leafEntries.some(([, entry]) => entry.input.checked);
@@ -224,10 +237,10 @@ export default class PanelViewFilterConsequence extends PanelView {
 
   /** グループノードのチェック状態を配下のリーフに基づいて更新する */
   private _updateNestedCheckboxes(): void {
-    for (const [, entry] of Object.entries(this._inputsValues)) {
-      if (entry.values) {
-        entry.input.checked = entry.values.every(
-          (leafKey) => this._inputsValues[leafKey].input.checked
+    for (const entry of Object.values(this._entries)) {
+      if (entry.leafKeys) {
+        entry.input.checked = entry.leafKeys.every(
+          (leafKey) => this._entries[leafKey].input.checked
         );
       }
     }
@@ -243,13 +256,13 @@ export default class PanelViewFilterConsequence extends PanelView {
 
     if (Object.keys(kindConditions).length === 0) {
       // デフォルト or Clear → 全チェックなし
-      for (const entry of Object.values(this._inputsValues)) {
+      for (const entry of Object.values(this._entries)) {
         entry.input.checked = false;
       }
     } else {
       // URLに存在しないキー = チェックあり（除外指定されていない）
       // URLに =0 があるキー = チェックなし
-      for (const [key, entry] of Object.entries(this._inputsValues)) {
+      for (const [key, entry] of Object.entries(this._entries)) {
         entry.input.checked = kindConditions[key] !== '0';
       }
     }
@@ -258,18 +271,11 @@ export default class PanelViewFilterConsequence extends PanelView {
 
   /** statisticsConsequence ストア更新時に呼ばれる */
   statisticsConsequence(values: Record<string, number> | null): void {
-    if (values) {
-      for (const [key, entry] of Object.entries(this._inputsValues)) {
-        if (entry.values === undefined) {
-          entry.value.textContent = (values[key] ?? 0).toLocaleString();
-        }
-      }
-    } else {
-      for (const [, entry] of Object.entries(this._inputsValues)) {
-        if (entry.values === undefined) {
-          entry.value.textContent = '0';
-        }
-      }
+    for (const [key, entry] of Object.entries(this._entries)) {
+      if (entry.leafKeys !== undefined) continue; // グループノードは件数表示しない
+      entry.countDisplay.textContent = values
+        ? (values[key] ?? 0).toLocaleString()
+        : '0';
     }
   }
 }

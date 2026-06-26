@@ -1,4 +1,4 @@
-import { CONDITION_TYPE, type FrequencyDataset } from '../../definition';
+import { ADVANCED_CONDITION_TYPE, type FrequencyDataset } from '../../advancedCondition';
 import type { RestoredFrequencyMode } from '../../types';
 import type { LogicalOperator } from '../../types';
 import {
@@ -78,13 +78,13 @@ function _restoreInvertedDatasetFrequencyItem(
   if (from === null || to === null) return null;
 
   return {
-    conditionType: CONDITION_TYPE.dataset,
+    conditionType: ADVANCED_CONDITION_TYPE.dataset,
     values: [
       {
         value: left.name,
-        label: findConditionLabel(CONDITION_TYPE.dataset, left.name),
+        label: findConditionLabel(ADVANCED_CONDITION_TYPE.dataset, left.name),
         frequency: {
-          conditionType: CONDITION_TYPE.dataset,
+          conditionType: ADVANCED_CONDITION_TYPE.dataset,
           mode: 'frequency',
           from,
           to,
@@ -143,8 +143,8 @@ export function restoreFrequencyItem(
   const genotype = frequency.genotype;
   const isGenotype = isQueryObject(genotype);
   const conditionType = isGenotype
-    ? CONDITION_TYPE.genotype
-    : CONDITION_TYPE.dataset;
+    ? ADVANCED_CONDITION_TYPE.genotype
+    : ADVANCED_CONDITION_TYPE.dataset;
 
   const mode = _getFrequencyMode(frequency, genotype);
   const range = _getFrequencyRange(frequency, genotype);

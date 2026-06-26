@@ -4,11 +4,11 @@
  * `assets/GRCh3{7,8}/advanced_search_conditions.json` を読み込んだ結果の型を定義する。
  * 検索APIに送るクエリ構造（ConditionQuery など）は query.d.ts に分離されている。
  *
- * 条件種別（ConditionTypeValue）ごとにUI描画の方法が異なるため、
+ * 条件種別（AdvancedConditionTypeValue）ごとにUI描画の方法が異なるため、
  * `type` フィールドで分岐できる discriminated union を使う。
  */
 
-import type { ConditionTypeValue } from '../definition';
+import type { AdvancedConditionTypeValue } from '../advancedCondition';
 import type { SignificanceSource } from './query';
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -43,7 +43,7 @@ export type PeculiarWithTreeKeys = 'dataset' | 'genotype';
  * 値を持たない peculiar 条件のキー一覧。
  * UIは値リストではなくキー自体から描画内容を決定する。
  */
-export type PeculiarEmptyKeys = 'location' | 'pathogenicity_prediction';
+export type PeculiarEmptyKeys = 'location' | 'variant_effect_prediction';
 
 /** データセット選択条件。階層ツリーで選択する peculiar 型。 */
 export interface DatasetCondition {
@@ -66,7 +66,7 @@ export interface LocationCondition {
 }
 
 /** 病原性予測条件。値リストを持たず、UIがスライダーを提供する。 */
-export interface PathogenicityPredictionCondition {
+export interface VariantEffectPredictionCondition {
   label: string;
   type: 'peculiar';
 }
@@ -111,17 +111,18 @@ interface CheckboxesCondition {
  * consequence ツリーの各ノード。
  * children は ID 配列で参照するため、TreeNode のような再帰ではなくフラット配列で持つ。
  * 描画時に ID を辿ってツリーを再構成する。
+ * リーフノードの id は SO term ID（例: "SO_0001580"）、グループノードは "group:xxx" 形式の文字列。
  */
 export interface ConsequenceNodeBase {
-  id: number;
+  id: string;
   label: string;
-  parent?: number;
-  children?: number[];
+  parent?: string;
+  children?: string[];
   value?: string;
   description?: string;
 }
 
-/** consequence 選択条件。数値IDで参照するツリー構造を持つ。 */
+/** consequence 選択条件。文字列IDで参照するツリー構造を持つ。 */
 export interface TreeCondition {
   label: string;
   type: 'tree';
@@ -150,7 +151,7 @@ export type ConditionDefinition =
   | DatasetCondition
   | GenotypeCondition
   | LocationCondition
-  | PathogenicityPredictionCondition
+  | VariantEffectPredictionCondition
   | TreeCondition
   | TextCondition
   | SignificanceCondition
@@ -164,11 +165,11 @@ export type ConditionDefinition =
 type AdvancedConditionMap = Partial<
   Record<
     Exclude<
-      ConditionTypeValue,
+      AdvancedConditionTypeValue,
       | 'dataset'
       | 'genotype'
       | 'location'
-      | 'pathogenicity_prediction'
+      | 'variant_effect_prediction'
       | 'significance'
       | 'type'
     >,
@@ -178,8 +179,9 @@ type AdvancedConditionMap = Partial<
   dataset?: DatasetCondition;
   genotype?: GenotypeCondition;
   location?: LocationCondition;
-  pathogenicity_prediction?: PathogenicityPredictionCondition;
+  variant_effect_prediction?: VariantEffectPredictionCondition;
   significance?: SignificanceCondition;
+  sscv_db?: CheckboxesCondition;
   type?: CheckboxesCondition;
 };
 

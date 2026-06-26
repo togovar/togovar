@@ -161,7 +161,9 @@
                 }
               }
 
-              // EN 選択中：EN ボタンを強調、JA ボタンをグレーに
+              // EN 選択中：EN ボタンを強調、JA ボタンは枠のみ
+              // 非アクティブに --color-gray を使うと白背景で約2.9:1しか確保できず WCAG AA(4.5:1)を下回るため、
+              // --color-key-dark2 に変更して白背景でも約7:1のコントラストを確保する。
               &.en {
                 a.en {
                   color: var(--color-key-dark2);
@@ -175,13 +177,14 @@
                 }
 
                 a.ja {
-                  color: var(--color-gray);
-                  border: 1px solid var(--color-gray);
+                  color: var(--color-key-dark2);
+                  border: 1px solid var(--color-key-dark2);
                   border-left: none;
                 }
               }
 
-              // JA 選択中：JA ボタンを強調、EN ボタンをグレーに
+              // JA 選択中：JA ボタンを強調、EN ボタンは枠のみ
+              // 同上の理由で非アクティブに --color-key-dark2 を使用する。
               &.ja {
                 a.ja {
                   color: var(--color-key-dark2);
@@ -195,8 +198,8 @@
                 }
 
                 a.en {
-                  color: var(--color-gray);
-                  border: 1px solid var(--color-gray);
+                  color: var(--color-key-dark2);
+                  border: 1px solid var(--color-key-dark2);
                   border-right: none;
                 }
               }

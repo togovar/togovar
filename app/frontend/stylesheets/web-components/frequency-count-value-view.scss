@@ -45,7 +45,14 @@
   }
 }
 
-:host([data-dataset='tommo']) > .frequencygraph > .bar {
+:host([data-dataset='bbj1k']),
+:host([data-dataset='bbj2k']) {
+  .frequencygraph > .bar {
+    background-color: var(--color-dataset-bbj);
+  }
+}
+
+:host([data-dataset^='tommo']) > .frequencygraph > .bar {
   background-color: var(--color-dataset-tommo);
 }
 
@@ -55,6 +62,10 @@
 
 :host([data-dataset^='ncbn']) > .frequencygraph > .bar {
   background-color: var(--color-dataset-ncbn);
+}
+
+:host([data-dataset='jogo']) > .frequencygraph > .bar {
+  background-color: var(--color-dataset-jogo);
 }
 
 :host > .range {
