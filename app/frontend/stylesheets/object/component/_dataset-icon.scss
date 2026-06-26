@@ -65,8 +65,7 @@
     }
   }
 
-  &[data-dataset='jga_snp'],
-  &[data-dataset='bbj'] {
+  &[data-dataset='jga_snp'] {
     > .properties {
       &::after {
         content: 'SNP';

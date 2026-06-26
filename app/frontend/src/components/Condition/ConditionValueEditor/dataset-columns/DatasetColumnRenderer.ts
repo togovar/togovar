@@ -4,6 +4,8 @@ import { ADVANCED_CONDITION_TYPE } from '../../../../advancedCondition';
 import { fetchLoginStatus } from '../../../../auth/authService';
 import type { UiNode } from './types';
 
+const PUBLIC_JGA_WGS_DATASETS = new Set(['jga_wgs.jgad000758', 'jga_wgs.jgad000868']);
+
 /**
  * データセットカラムUIのDOM要素を生成する。
  *
@@ -149,11 +151,10 @@ export class DatasetColumnRenderer {
     datasetNode: HierarchyNode<UiNode>,
     userIsLoggedIn: boolean
   ): boolean {
-    const PUBLIC_JGA_WGS_DATASETS = ['jga_wgs.jgad000758', 'jga_wgs.jgad000868'];
     return (
       userIsLoggedIn === false &&
       (datasetNode.data.value?.includes('jga_wgs.') ?? false) &&
-      !PUBLIC_JGA_WGS_DATASETS.includes(datasetNode.data.value ?? '')
+      !PUBLIC_JGA_WGS_DATASETS.has(datasetNode.data.value ?? '')
     );
   }
 
