@@ -32,17 +32,17 @@ export const COLUMNS = [
   {
     label: 'CADD (PHRED score)',
     id: 'cadd',
-    defaultWidth: 65,
+    defaultWidth: 67,
     resizable: false,
   },
   {
     label: 'AlphaMissense',
     id: 'alphamissense',
-    defaultWidth: 72,
+    defaultWidth: 74,
     resizable: false,
   },
-  { label: 'SIFT', id: 'sift', defaultWidth: 60, resizable: false },
-  { label: 'PolyPhen', id: 'polyphen', defaultWidth: 83, resizable: false },
+  { label: 'SIFT', id: 'sift', defaultWidth: 62, resizable: false },
+  { label: 'PolyPhen', id: 'polyphen', defaultWidth: 85, resizable: false },
   {
     label: 'Splicing variant (SSCV DB)',
     id: 'splicingvariant',
