@@ -35,6 +35,11 @@
     "url": "/doc/help#d5"
   },
   {
+    "id": "table-header-clinical_significance",
+    "content": "Clinical significance provided by ClinVar",
+    "url": "/doc/help#d6"
+  },
+  {
     "id": "table-header-cadd",
     "content": "CADD (Combined Annotation Dependent Depletion) PHRED-scaled score for predicting the deleteriousness of a variant",
     "url": "/doc/help#d7"
@@ -58,11 +63,6 @@
     "id": "table-header-splicingvariant",
     "content": "Prediction of splicing effects of a variant by the SSCV DB (Splicing Site Creation Variant Database)",
     "url": "/doc/help#d10"
-  },
-  {
-    "id": "table-header-clinical_significance",
-    "content": "Clinical significance provided by ClinVar",
-    "url": "/doc/help#d7"
   },
   {
     "id": "variant-frequency",

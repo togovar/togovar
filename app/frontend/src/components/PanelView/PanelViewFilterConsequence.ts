@@ -102,6 +102,7 @@ export default class PanelViewFilterConsequence extends PanelView {
         for (const entry of Object.values(this._entries)) {
           entry.input.checked = false;
         }
+        this._updateNestedCheckboxes();
         this._changeFilter();
       });
     }
