@@ -225,10 +225,12 @@ function initSidebar(): void {
   new PanelViewFilterConsequence(
     selectRequired<HTMLElement>(document, '#FilterConsequence')
   );
-  new PanelViewCheckList(
-    selectRequired<HTMLElement>(document, '#FilterCADD'),
-    'cadd'
-  );
+  if (TOGOVAR_FRONTEND_REFERENCE === 'GRCh38') {
+    new PanelViewCheckList(
+      selectRequired<HTMLElement>(document, '#FilterCADD'),
+      'cadd'
+    );
+  }
   new PanelViewCheckList(
     selectRequired<HTMLElement>(document, '#FilterAlphaMissense'),
     'alphamissense'
@@ -241,10 +243,12 @@ function initSidebar(): void {
     selectRequired<HTMLElement>(document, '#FilterPolyPhen'),
     'polyphen'
   );
-  new PanelViewCheckList(
-    selectRequired<HTMLElement>(document, '#FilterSplicingVariant'),
-    'splicingvariant'
-  );
+  if (TOGOVAR_FRONTEND_REFERENCE === 'GRCh38') {
+    new PanelViewCheckList(
+      selectRequired<HTMLElement>(document, '#FilterSplicingVariant'),
+      'splicingvariant'
+    );
+  }
 }
 
 /**
