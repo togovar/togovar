@@ -336,15 +336,22 @@ block content
                   frequency-block-view(data-dataset="gem_j_wga" data-frequency="≥0.5")
                   | &nbsp; GEM-J WGA
                   br
-                  frequency-block-view(data-dataset="jga_snp" data-frequency="≥0.5")
-                  | &nbsp; JGA-SNP
-                  br
-                  frequency-block-view(data-dataset="jga_wes" data-frequency="≥0.5")
-                  | &nbsp; JGA-WES
-                  br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
                     frequency-block-view(data-dataset="jga_wgs" data-frequency="≥0.5")
                     | &nbsp; JGA-WGS
+                    br
+                  frequency-block-view(data-dataset="jga_wes" data-frequency="≥0.5")
+                  | &nbsp; JGA-WES
+                  br
+                  frequency-block-view(data-dataset="jga_snp" data-frequency="≥0.5")
+                  | &nbsp; JGA-SNP
+                  br
+                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                    frequency-block-view(data-dataset="bbj1k" data-frequency="≥0.5")
+                    | &nbsp; BBJ1K
+                    br
+                    frequency-block-view(data-dataset="bbj2k" data-frequency="≥0.5")
+                    | &nbsp; BBJ2K
                     br
                   frequency-block-view(data-dataset="tommo" data-frequency="≥0.5")
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
@@ -352,25 +359,19 @@ block content
                   else if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
                     | &nbsp; ToMMo 54KJPN
                   br
-                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
-                    frequency-block-view(data-dataset="hgvd" data-frequency="≥0.5")
-                    | &nbsp; HGVD
-                    br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    frequency-block-view(data-dataset="ncbn" data-frequency="≥0.5")
-                    | &nbsp; NCBN
-                    br
-                    frequency-block-view(data-dataset="bbj1k" data-frequency="≥0.5")
-                    | &nbsp; BBJ1K
-                    br
-                    frequency-block-view(data-dataset="bbj2k" data-frequency="≥0.5")
-                    | &nbsp; BBJ2K
-                    br
                     frequency-block-view(data-dataset="tommo_jsv1" data-frequency="≥0.5")
                     | &nbsp; ToMMo JSV1
                     br
+                    frequency-block-view(data-dataset="ncbn" data-frequency="≥0.5")
+                    | &nbsp; NCBN
+                    br
                     frequency-block-view(data-dataset="jogo" data-frequency="≥0.5")
                     | &nbsp; JoGo
+                    br
+                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
+                    frequency-block-view(data-dataset="hgvd" data-frequency="≥0.5")
+                    | &nbsp; HGVD
                     br
                   frequency-block-view(data-dataset="gnomad_genomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD genomes
