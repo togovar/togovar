@@ -87,7 +87,25 @@
   } catch (error) {
     console.error('Error fetching auth status:', error);
   }
-})();</script><link href="/css/main-85c1b9cebc7b7b141e20.css" rel="stylesheet"><script src="/js/report-9228928ffddda869dedd.js"></script><script>window.addEventListener('DOMContentLoaded', () => {
+})();
+(function() {
+  // ハッシュはブラウザ側にしか存在しないため、クライアントで言語切替リンクに付与する。
+  // hashchange にも対応し、ページ内スクロール後に切替しても正しく引き継ぐ。
+  var syncLangSwitcherHash = function() {
+    var hash = window.location.hash;
+    var links = document.querySelectorAll('.languageswitcher a.language');
+    for (var i = 0; i < links.length; i++) {
+      var base = links[i].href.split('#')[0];
+      links[i].href = hash ? base + hash : base;
+    }
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', syncLangSwitcherHash, { once: true });
+  } else {
+    syncLangSwitcherHash();
+  }
+  window.addEventListener('hashchange', syncLangSwitcherHash);
+})();</script><link href="/css/main-f57f4adaf1ab7ed2a030.css" rel="stylesheet"><script src="/js/report-499df3389b496bf96403.js"></script><script>window.addEventListener('DOMContentLoaded', () => {
   window.scrollTo(0, 0);
 
   const hash = window.location.hash;
