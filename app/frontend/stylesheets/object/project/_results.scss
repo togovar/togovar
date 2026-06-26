@@ -1094,7 +1094,6 @@ body[data-column-resizing='true'] {
 //   object/component/_variant-type.scss            … バリアント種別テキスト
 // =============================================================================
 
-
 // 影響種別ドット (.consequence-item)
 // バリアントの影響レベル（high/moderate/low/modifier）を色付き円で示す
 .consequence-item {
@@ -1120,7 +1119,6 @@ body[data-column-resizing='true'] {
     background-color: var(--color-sign-modifier);
   }
 }
-
 
 // テキストリンク矢印 (.hyper-text)
 // href 属性がある要素に::after で矢印アイコンを付与する
@@ -1296,6 +1294,7 @@ body[data-column-resizing='true'] {
 .variant-function {
   display: inline-block;
   padding: 0 8px;
+  font-weight: bold;
   color: white;
   border-radius: 9px;
 

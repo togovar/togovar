@@ -157,7 +157,12 @@
         display: flex;
 
         > button {
-          padding: 0 4px;
+          display: inline-grid;
+          place-items: center;
+          min-width: 25px;
+          min-height: 25px;
+          padding: 0;
+          cursor: pointer;
           border: none;
           opacity: 0.4;
 
