@@ -25,9 +25,9 @@ const SLIDER_CONFIG = {
 } as const;
 
 const makeLeaf = <K extends PredictionKey>(
-  k: K,
+  key: K,
   score: ScoreOrUnassignedFor<K>
-) => ({ [k]: { score } }) as { [P in K]: { score: ScoreOrUnassignedFor<P> } };
+) => ({ [key]: { score } }) as { [P in K]: { score: ScoreOrUnassignedFor<P> } };
 
 @customElement('prediction-value-view')
 export class PredictionValueView extends LitElement {
@@ -40,33 +40,33 @@ export class PredictionValueView extends LitElement {
   @state() private inequalitySigns: [Inequality, Inequality] = ['gte', 'lte'];
 
   @state() private includeUnassigned = false;
-  @state() private includeUnknown = false; // for polyphen
+  @state() private includeUnknown = false; // polyphen のみ使用
 
-  // Threshold data used for gradient generation
+  // グラデーション生成に使う閾値データ
   @state() private activeThreshold: Threshold = CADD_THRESHOLD;
 
   @query('.bar') private barEl!: HTMLDivElement;
   @queryAll('.inequality-sign')
   private inequalitySignEls!: NodeListOf<HTMLElement>;
 
-  /** Inject UI values from outside */
+  /** 外部（親コンポーネント）からスコア範囲・不等号・ラベル選択状態を一括で設定するため。 */
   setValues(
-    dataset: PredictionKey,
+    predictionKey: PredictionKey,
     values: [number, number],
     inequalitySigns: [Inequality, Inequality],
     includeUnassigned: boolean,
-    includeUnknown: boolean // for polyphen
+    includeUnknown: boolean // polyphen のみ使用
   ): void {
-    this.predictionKey = dataset;
+    this.predictionKey = predictionKey;
     // 範囲外の値をクランプすることで表示数値とクエリの両方が scoreMin〜scoreMax に収まるようにするため
-    const { scoreMin, scoreMax } = PREDICTIONS[dataset];
+    const { scoreMin, scoreMax } = PREDICTIONS[predictionKey];
     this.scoreValues = [
       Math.max(scoreMin, Math.min(scoreMax, values[0])),
       Math.max(scoreMin, Math.min(scoreMax, values[1])),
     ];
     this.inequalitySigns = inequalitySigns;
     this.includeUnassigned = includeUnassigned;
-    this.includeUnknown = includeUnknown; // for polyphen
+    this.includeUnknown = includeUnknown;
 
     this.predictionLabel = PREDICTIONS[this.predictionKey].label;
     this.activeThreshold = PREDICTIONS[this.predictionKey].threshold;
@@ -82,6 +82,7 @@ export class PredictionValueView extends LitElement {
     setInequalitySign(this.inequalitySignEls[1], this.inequalitySigns[1]);
   }
 
+  /** スコア値と不等号の変更をバーの位置・グラデーションへ即時反映するため、値変更のたびに呼ぶ。 */
   private syncBarStyle(): void {
     this.barEl.style.left = this.valueToPercent(this.scoreValues[0]) + '%';
     this.barEl.style.right = 100 - this.valueToPercent(this.scoreValues[1]) + '%';
@@ -131,14 +132,14 @@ export class PredictionValueView extends LitElement {
     `;
   }
 
-  /** Return the current value for UI display */
+  /** 編集中のUI状態を外部コンポーネントが取得できるよう値をまとめて返すため。 */
   get conditionValues(): {
     dataset: PredictionKey;
     label: PredictionLabel;
     values: [number, number];
     inequalitySigns: [Inequality, Inequality];
     includeUnassigned: boolean;
-    includeUnknown: boolean; // for polyphen
+    includeUnknown: boolean; // polyphen のみ使用
   } {
     return {
       dataset: this.predictionKey,
@@ -146,16 +147,15 @@ export class PredictionValueView extends LitElement {
       values: this.scoreValues,
       inequalitySigns: this.inequalitySigns,
       includeUnassigned: this.includeUnassigned,
-      includeUnknown: this.includeUnknown, // for polyphen
+      includeUnknown: this.includeUnknown,
     };
   }
 
-  /** Return the query shape
-   * Either single or OR (allowing ScoreRange | string[] to match API specs) */
+  /** スコア範囲とラベル選択の組み合わせをAPIクエリ形式（単一LeafまたはOR）に変換するため。 */
   get queryValue(): PredictionQueryLocal {
     const key = this.predictionKey;
 
-    // No Unassigned check, range only
+    // ラベル未選択の場合はスコア範囲のみをクエリにする
     if (this.isNoLabelSelected()) {
       return makeLeaf(
         key,
@@ -163,48 +163,47 @@ export class PredictionValueView extends LitElement {
       );
     }
 
-    // Point & Non-inclusive pair → Unassigned only
+    // from === to かつ非包含（gt/lt）の場合、スコア範囲が空集合になるためラベルのみのクエリにする
     const [from, to] = this.scoreValues;
-    const [left, right] = this.inequalitySigns;
-    const isPointNonInclusive =
-      from === to && (left === 'gt' || right === 'lt');
-    if (isPointNonInclusive) {
+    const [leftSign, rightSign] = this.inequalitySigns;
+    const isEmptyRange = from === to && (leftSign === 'gt' || rightSign === 'lt');
+    if (isEmptyRange) {
       return makeLeaf(key, this.labelScoreFor(key));
     }
 
-    // Otherwise → Unassigned OR Range
-    const leafUnassigned = makeLeaf(key, this.labelScoreFor(key));
-    const leafRange = makeLeaf(
+    // ラベル選択あり + 有効なスコア範囲の場合は OR 結合でクエリを生成する
+    const labelLeaf = makeLeaf(key, this.labelScoreFor(key));
+    const rangeLeaf = makeLeaf(
       key,
       this.toScoreRange(this.scoreValues, this.inequalitySigns)
     );
-    return { or: [leafUnassigned, leafRange] };
+    return { or: [labelLeaf, rangeLeaf] };
   }
 
-  /** [from,to] & inequality sign → Normalized to ScoreRange */
+  /** [from, to] と不等号の組み合わせを API の ScoreRange 形式に変換するため。 */
   private toScoreRange(
     [from, to]: [number, number],
-    [left, right]: [Inequality, Inequality]
+    [leftSign, rightSign]: [Inequality, Inequality]
   ): ScoreRange {
-    if (left === 'gte' && right === 'lte') return { gte: from, lte: to };
-    if (left === 'gte' && right === 'lt') return { gte: from, lt: to };
-    if (left === 'gt' && right === 'lte') return { gt: from, lte: to };
-    if (left === 'gt' && right === 'lt') return { gt: from, lt: to };
+    if (leftSign === 'gte' && rightSign === 'lte') return { gte: from, lte: to };
+    if (leftSign === 'gte' && rightSign === 'lt') return { gte: from, lt: to };
+    if (leftSign === 'gt' && rightSign === 'lte') return { gt: from, lte: to };
+    if (leftSign === 'gt' && rightSign === 'lt') return { gt: from, lt: to };
 
-    // If only one side is permitted, add as needed.
-    if (left === 'gte') return { gte: from };
-    if (left === 'gt') return { gt: from };
-    if (right === 'lte') return { lte: to };
-    if (right === 'lt') return { lt: to };
+    // 片側のみ不等号が有効な場合
+    if (leftSign === 'gte') return { gte: from };
+    if (leftSign === 'gt') return { gt: from };
+    if (rightSign === 'lte') return { lte: to };
+    if (rightSign === 'lt') return { lt: to };
 
     throw new Error('Invalid inequality signs');
   }
 
-  // Generates and returns a key-dependent array of unassigned labels.
+  /** データセット種別によって使えるラベル（unassigned/unknown）が異なるため、キーごとに配列を生成する。 */
   private labelScoreFor<K extends PredictionKey>(
-    k: K
+    key: K
   ): ScoreOrUnassignedFor<K> {
-    if (k === 'polyphen') {
+    if (key === 'polyphen') {
       if (this.includeUnassigned && this.includeUnknown) {
         return ['unassigned', 'unknown'] as const as ScoreOrUnassignedFor<K>;
       }
@@ -221,7 +220,7 @@ export class PredictionValueView extends LitElement {
     return ['unassigned'] as const as ScoreOrUnassignedFor<K>;
   }
 
-  // Determine whether nothing has been selected
+  /** ラベルが1つも選ばれていないかを判定するため。polyphenはUnknownも選択肢に含まれるので条件が異なる。 */
   private isNoLabelSelected(): boolean {
     if (this.predictionKey === 'polyphen') {
       return !(this.includeUnassigned || this.includeUnknown);
