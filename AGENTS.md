@@ -276,7 +276,7 @@ python3 scripts/check_conditions.py
 | --------------- | ------------------------------------------------ | ------------------------------------------------------ |
 | `"peculiar"`    | 専用の特殊UI（ツリー選択・座標入力・スライダー） | dataset, genotype, location, variant_effect_prediction |
 | `"enumeration"` | チェックボックスのリスト                         | significance, sscv_db, type                            |
-| `"tree"`        | 数値IDで参照する階層ツリー                       | consequence                                            |
+| `"tree"`        | 文字列IDで参照する階層ツリー                     | consequence                                            |
 | `"text"`        | テキスト入力                                     | disease, gene, id                                      |
 
 `"genotype"` 条件には、ジェノタイプカウント検索（aac/arc/rrc = Alt/Alt・Ref/Alt・Ref/Ref）をサポートするデータセットのみ列挙する。すべてのデータセットが対応しているわけではないため、`"dataset"` のサブセットになる。チェックスクリプトは genotype に対して「仕様外の値が含まれていないか」のみ検証し、「dataset にあるのに genotype にない」はエラーとしない（意図的な省略のため）。
