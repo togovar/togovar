@@ -52,7 +52,6 @@ export default class PanelViewFilterConsequence extends PanelView {
 
     this._createGUI(conditionMaster, grouping);
     this._initEntries(grouping);
-    this._changeFilter();
     this._bindEvents(elm);
     this._bindStore();
   }
