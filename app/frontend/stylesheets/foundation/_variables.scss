@@ -55,14 +55,16 @@
   --color-dataset-gemj-light: #{color.adjust(#dc2828, $lightness: 45%)};
   --color-dataset-jga: #62d5d9;
   --color-dataset-jga-light: #{color.adjust(#62d5d9, $lightness: 35%)};
+  --color-dataset-bbj: #ff993f;
+  --color-dataset-bbj-light: #{color.adjust(#ff993f, $lightness: 35%)};
   --color-dataset-tommo: #ca678d;
   --color-dataset-tommo-light: #{color.adjust(#ca678d, $lightness: 50%)};
   --color-dataset-hgvd: #005b80;
   --color-dataset-hgvd-light: #{color.adjust(#005b80, $lightness: 70%)};
   --color-dataset-ncbn: #234b7c;
   --color-dataset-ncbn-light: #{color.adjust(#234b7c, $lightness: 70%)};
-  --color-dataset-bbj: #ff993f;
-  --color-dataset-bbj-light: #{color.adjust(#ff993f, $lightness: 35%)};
+  --color-dataset-jogo: #83063f;
+  --color-dataset-jogo-light: #{color.adjust(#83063f, $lightness: 70%)};
   --color-dataset-foreign: #94928d;
   --color-dataset-foreign-light: #{color.adjust(#94928d, $lightness: 40%)};
   --color-dataset-disease: #ff5a54;

@@ -23,7 +23,7 @@ export class ConditionDiseaseSearch extends LitElement {
    * ローディング表示に 200ms の遅延を設けるためのタイマー。
    * 即時表示するとちらつきが起きるため、短い通信ではスピナーを出さない。
    */
-  private _timer: ReturnType<typeof setTimeout> | null = null;
+  private loadingTimer: ReturnType<typeof setTimeout> | null = null;
 
   /**
    * 選択中の疾患 ID を condition-disease-ontology-view に渡して表示を同期するため reflect: true にする。
@@ -58,23 +58,14 @@ export class ConditionDiseaseSearch extends LitElement {
   }
 
   /**
-   * id 属性を設定してスクリーンリーダーや CSS セレクターからの参照を可能にする。
-   * 既存の id を上書きしないことで、複数インスタンスが存在する場合の id 重複を防ぐ。
-   */
-  override connectedCallback(): void {
-    super.connectedCallback();
-    if (!this.id) this.id = 'ConditionDiseaseSearch';
-  }
-
-  /**
    * 切り離し時にローディングタイマーをキャンセルする。
    * タイマーが残ったまま要素が破棄されると、切り離し後に loading が true へ更新され得るため。
    */
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    if (this._timer !== null) {
-      clearTimeout(this._timer);
-      this._timer = null;
+    if (this.loadingTimer !== null) {
+      clearTimeout(this.loadingTimer);
+      this.loadingTimer = null;
     }
   }
 
@@ -83,7 +74,7 @@ export class ConditionDiseaseSearch extends LitElement {
    * 上がってきたときの統合ハンドラ。diseaseId を更新して disease-selected を再発火する。
    * 2つのイベント経路を1メソッドで処理することで重複ロジックを排除するため。
    */
-  private _changeDiseaseEventHandler(e: Event): void {
+  private handleDiseaseChange(e: Event): void {
     e.stopPropagation();
     const { id, label } = (e as CustomEvent<DiseaseEventDetail>).detail;
     this.diseaseId = id;
@@ -100,12 +91,12 @@ export class ConditionDiseaseSearch extends LitElement {
    * API 呼び出し開始時に 200ms のウォームアップ遅延後にスピナーを表示する。
    * 短い通信でちらつきが起きないよう、即時表示を避けるため。
    */
-  private _loadingStartedHandler(e: Event): void {
+  private handleLoadingStarted(e: Event): void {
     e.stopPropagation();
-    if (this._timer !== null) {
-      clearTimeout(this._timer);
+    if (this.loadingTimer !== null) {
+      clearTimeout(this.loadingTimer);
     }
-    this._timer = setTimeout(() => {
+    this.loadingTimer = setTimeout(() => {
       this.loading = true;
     }, 200);
   }
@@ -114,17 +105,17 @@ export class ConditionDiseaseSearch extends LitElement {
    * API 呼び出し完了時にスピナーを消し、遅延タイマーをキャンセルする。
    * タイマーが残ったまま通信が完了するとスピナーが後から現れる不整合を防ぐため。
    */
-  private _loadingEndedHandler(e: Event): void {
+  private handleLoadingEnded(e: Event): void {
     e.stopPropagation();
     this.loading = false;
-    if (this._timer !== null) {
-      clearTimeout(this._timer);
-      this._timer = null;
+    if (this.loadingTimer !== null) {
+      clearTimeout(this.loadingTimer);
+      this.loadingTimer = null;
     }
   }
 
   /** SearchFieldWithSuggestions の options は参照同一性で更新判定されるため、毎回オブジェクトを生成しない。 */
-  private static readonly _SUGGEST_OPTIONS = {
+  private static readonly SUGGEST_OPTIONS = {
     valueMappings: { valueKey: 'id', labelKey: 'label' },
   } as const;
 
@@ -134,9 +125,9 @@ export class ConditionDiseaseSearch extends LitElement {
       <search-field-with-suggestions
         .suggestAPIURL=${suggestAPI}
         .suggestAPIQueryParam=${'term'}
-        .options=${ConditionDiseaseSearch._SUGGEST_OPTIONS}
+        .options=${ConditionDiseaseSearch.SUGGEST_OPTIONS}
         .placeholder=${'Breast-ovarian cancer, familial 2'}
-        @new-suggestion-selected=${this._changeDiseaseEventHandler}
+        @new-suggestion-selected=${this.handleDiseaseChange}
       ></search-field-with-suggestions>
 
       <div class="container">
@@ -145,10 +136,10 @@ export class ConditionDiseaseSearch extends LitElement {
           : nothing}
 
         <condition-disease-ontology-view
-          ._id=${this.diseaseId}
-          @disease-selected=${this._changeDiseaseEventHandler}
-          @loading-started=${this._loadingStartedHandler}
-          @loading-ended=${this._loadingEndedHandler}
+          .diseaseId=${this.diseaseId}
+          @disease-selected=${this.handleDiseaseChange}
+          @loading-started=${this.handleLoadingStarted}
+          @loading-ended=${this.handleLoadingEnded}
         ></condition-disease-ontology-view>
       </div>
     `;

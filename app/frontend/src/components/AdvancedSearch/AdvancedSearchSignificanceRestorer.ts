@@ -1,8 +1,8 @@
-import { CONDITION_TYPE } from '../../definition';
+import { ADVANCED_CONDITION_TYPE } from '../../advancedCondition';
 import {
   PREDICTIONS,
   type PredictionKey,
-} from '../Condition/ConditionPathogenicityPredictionSearch/PredictionDatasets';
+} from '../Condition/ConditionVariantEffectPredictionSearch/PredictionDatasets';
 import type { RestoredPredictionValue } from '../../types';
 import type {
   Inequality,
@@ -39,7 +39,7 @@ export function restoreSignificanceItem(
 
   const relation = significance.relation === 'ne' ? 'ne' : 'eq';
   return {
-    conditionType: CONDITION_TYPE.significance,
+    conditionType: ADVANCED_CONDITION_TYPE.clinical_significance,
     relation,
     values: sources.flatMap((source) =>
       terms.map((term) => {
@@ -47,7 +47,7 @@ export function restoreSignificanceItem(
         return {
           ...makeValue(
             value,
-            findConditionLabel(CONDITION_TYPE.significance, value)
+            findConditionLabel(ADVANCED_CONDITION_TYPE.clinical_significance, value)
           ),
           source,
         };
@@ -88,7 +88,7 @@ export function toMergedSignificanceItem(
   const expectedOperator = relation === 'ne' ? 'and' : 'or';
   const canMerge = items.every(
     (item) =>
-      item.conditionType === CONDITION_TYPE.significance &&
+      item.conditionType === ADVANCED_CONDITION_TYPE.clinical_significance &&
       item.relation === relation
   );
   if (!relation || logical.operator !== expectedOperator || !canMerge) {
@@ -96,14 +96,14 @@ export function toMergedSignificanceItem(
   }
 
   return {
-    conditionType: CONDITION_TYPE.significance,
+    conditionType: ADVANCED_CONDITION_TYPE.clinical_significance,
     relation,
     values: items.flatMap((item) => item.values),
   };
 }
 
 /**
- * Pathogenicity predictionはquery key（alphamissense/sift/polyphen）から
+ * Variant effect predictionはquery key（alphamissense/sift/polyphen）から
  * 共通の条件行へ戻す。scoreがオブジェクトならrangeモード、配列ならcategoryモード。
  */
 export function restorePredictionItem(query: QueryObject): RestoredItem | null {
@@ -117,7 +117,7 @@ export function restorePredictionItem(query: QueryObject): RestoredItem | null {
   if (!prediction) return null;
 
   return {
-    conditionType: CONDITION_TYPE.pathogenicity_prediction,
+    conditionType: ADVANCED_CONDITION_TYPE.variant_effect_prediction,
     values: [
       {
         value: predictionKey,
@@ -129,7 +129,7 @@ export function restorePredictionItem(query: QueryObject): RestoredItem | null {
 }
 
 /**
- * Pathogenicity predictionでUnassigned/Unknownとrangeを同時に選ぶと、
+ * Variant effect predictionでUnassigned/Unknownとrangeを同時に選ぶと、
  * queryは { or: [category leaf, range leaf] } になる。これを1条件行へ戻す。
  */
 export function toMergedPredictionItem(
@@ -159,7 +159,7 @@ export function toMergedPredictionItem(
   );
 
   return {
-    conditionType: CONDITION_TYPE.pathogenicity_prediction,
+    conditionType: ADVANCED_CONDITION_TYPE.variant_effect_prediction,
     values: [
       {
         value: dataset,
@@ -204,11 +204,16 @@ function _toRestoredPredictionValue(
   dataset: PredictionKey,
   score: unknown
 ): RestoredPredictionValue | null {
+  const prediction = PREDICTIONS[dataset];
+
   // scoreがオブジェクト: rangeモード（gte/gt + lte/lt の数値指定）
   if (isQueryObject(score)) {
     return {
       dataset,
-      values: [getRangeStart(score) ?? 0, getRangeEnd(score) ?? 1],
+      values: [
+        getRangeStart(score) ?? prediction.scoreMin,
+        getRangeEnd(score) ?? prediction.scoreMax,
+      ],
       inequalitySigns: [_getLeftInequality(score), _getRightInequality(score)],
       includeUnassigned: false,
       includeUnknown: false,
@@ -219,7 +224,7 @@ function _toRestoredPredictionValue(
   if (Array.isArray(score)) {
     return {
       dataset,
-      values: [0, 0],
+      values: [prediction.scoreMin, prediction.scoreMin],
       inequalitySigns: ['gt', 'lt'],
       includeUnassigned: score.includes('unassigned'),
       includeUnknown: score.includes('unknown'),

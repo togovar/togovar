@@ -213,15 +213,15 @@ export class ConditionValueEditorClinicalSignificance extends ConditionValueEdit
   }
 
   /**
-   * ClinVar の 'NC' をUIから除外するための前処理。
-   * APIの仕様として NC（No criteria provided）はURLクエリに含めないため除外する。
+   * ClinVar の 'NA' をUIから除外するための前処理。
+   * APIの仕様として NA（Not available）はURLクエリに含めないため除外する。
    */
   private _filterValues(
     values: ReadonlyArray<EnumerationItem>,
     source: SignificanceSource
   ): EnumerationItem[] {
     if (this.conditionType === 'significance' && source === 'clinvar') {
-      return values.filter((v) => v.value !== 'NC');
+      return values.filter((v) => v.value !== 'NA');
     }
     return Array.from(values);
   }

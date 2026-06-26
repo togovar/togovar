@@ -18,29 +18,29 @@ import {
 } from './searchURL';
 
 // Simple Search ----------------------------------------
-/** SimpleSearchの検索条件を設定 */
+/** Advanced Search中の表示用統計パネルからSimple条件が誤更新されないよう、入口を共通化する。 */
 export function setSimpleSearchCondition<
   K extends keyof SimpleSearchCurrentConditions,
 >(conditionKey: K, conditionValue: SimpleSearchCurrentConditions[K]) {
   setSimpleSearchConditions({ [conditionKey]: conditionValue });
 }
 
-/** シンプル検索条件を設定し、必要に応じて検索を開始 */
+/** Simple Searchの操作だけが条件更新と検索開始へ進むよう、モード境界をここで保証する。 */
 function setSimpleSearchConditions(
   newSearchConditions: Partial<SimpleSearchCurrentConditions>
 ) {
+  if (storeManager.getData('searchMode') !== 'simple') return;
+
   const updatedConditions = {
     ...storeManager.getData('simpleSearchConditions'),
     ...newSearchConditions,
   } as SimpleSearchCurrentConditions;
   storeManager.setData('simpleSearchConditions', updatedConditions);
 
-  if (storeManager.getData('searchMode') === 'simple') {
-    reflectSimpleSearchConditionToURI(
-      updatedConditions,
-      storeManager.getData('simpleSearchConditionsMaster')
-    );
-  }
+  reflectSimpleSearchConditionToURI(
+    updatedConditions,
+    storeManager.getData('simpleSearchConditionsMaster')
+  );
 
   requestInitialSearch();
 }

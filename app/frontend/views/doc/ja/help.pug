@@ -51,11 +51,13 @@ block content
                 li.item.-question
                   a.link(href='#d6') Clinical Significanceの値はどのように計算していますか。
                 li.item.-question
-                  a.link(href='#d7') AlphaMissense、SIFT、PolyPhenとは何ですか。
+                  a.link(href='#d7') CADD、AlphaMissense、SIFT、PolyPhenとは何ですか。
                 li.item.-question
                   a.link(href='#d8') バリアントデータ作成時にリフトオーバツールを利用しましたか。
                 li.item.-question
                   a.link(href='#d9') 同じ日本人祖先集団内であっても、データセット毎にアレル頻度が異なるのはなぜですか。
+                li.item.-question
+                  a.link(href='#d10') SSCV DBとは何ですか。
             li.category
               h3.categorytitle TogoVar検索システムに関して
               ul.categorylist
@@ -90,8 +92,8 @@ block content
               p
                 a(href='https://togotv.dbcls.jp/') TogoTV
                 | をご覧ください。TogoVarに関する動画は
-                a(href='https://togotv.dbcls.jp/result.html?type=manual&page=1&query=TogoVar') こちら
-                | です。
+                a(href='https://togotv.dbcls.jp/result.html?type=manual&page=1&query=TogoVar') TogoVarの動画一覧（TogoTV）
+                | をご覧ください。
         section.section
           h3.sectiontitle 利用条件に関して
           #t1.question-answer
@@ -187,25 +189,41 @@ block content
                 | を表示しています。
 
           #d7.question-answer
-            h4.question AlphaMissense、SIFT、PolyPhenとは何ですか。
+            h4.question CADD、AlphaMissense、SIFT、PolyPhenとは何ですか。
             .answer
               p
-                | AlphaMissense、SIFTおよびPolyPhenはアミノ酸配列が変更された際のタンパク質の機能への影響を予測します。これらのプログラムは
+                | 以下のスコアはバリアントの潜在的な影響を予測するために使用され、
                 a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html')
                   | Variant Effect Predictor (VEP)
-                | を使用して計算しました。以下のアイコンは定性的予測に使用される閾値スコアを表しています。
+                | を使用して計算しました。CADDはあらゆるタイプのバリアントの有害性をスコア化します。一方、AlphaMissense、SIFTおよびPolyPhenは、アミノ酸配列が変更された際のタンパク質の機能への影響を特異的に予測します。以下のアイコンは定性的予測に使用される閾値スコアを表しています。
               ul.unordered-list._margin-bottom._align-left
+                li
+                  strong CADD (PHRED score)
+                  br
+                  div
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='D') &ge; 20
+                  div
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='POSSD') &ge; 10
+                  div
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='T') &lt; 10
+                  span
+                    | CADD (Combined Annotation Dependent Depletion) は、多様なゲノムアノテーションを統合して、あらゆるタイプのバリアントの有害性をスコア化するツールです。
+                    | ここに挙げた他のツールとは異なり、CADDはミスセンス変異に限定されません。
+                    | PHREDスケールスコアが&ge;20のバリアントはゲノム全体で有害なバリアントの上位1%に、&ge;10は上位10%に相当します。詳細は
+                    |
+                  a.hyper-text.-external(target='_blank', href='https://cadd.gs.washington.edu/info') CADD
+                  | を参照ください。
                 li
                   strong AlphaMissense
                   br
                   div
-                    .variant-function._width_5em._align-center(data-function='LP') &gt; 0.564
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='LP') &gt; 0.564
                     span._margin-left Likely pathogenic
                   div
-                    .variant-function._width_5em._align-center(data-function='A') &ge; 0.340
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='A') &ge; 0.340
                     span._margin-left Ambiguous
                   div
-                    .variant-function._width_5em._align-center(data-function='LB') &lt; 0.340
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='LB') &lt; 0.340
                     span._margin-left Likely benign
                   span 「Likely pathogenic（おそらく病原性あり）」と 「Likely benign"（おそらく良性）」のスコアの閾値は、それぞれ病原性および良性のClinVarバリアントを90%の精度で分類できるように選ばれました。詳細は
                   a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/docs/tools/vep/script/vep_plugins.html#alphamissense') AlphaMissense in VEP Plugins
@@ -214,10 +232,10 @@ block content
                   strong SIFT
                   br
                   div
-                    .variant-function._width_5em._align-center(data-function='D') &lt; 0.05
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='D') &lt; 0.05
                     span._margin-left Deleterious
                   div
-                    .variant-function._width_5em._align-center(data-function='T') &ge; 0.05
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='T') &ge; 0.05
                     span._margin-left Tolerated
                   span このスコアはアミノ酸の置換が許容される確率を正規化して示したものです。スコアがゼロに近い場合、その置換が有害である可能性が高いと考えられます。このスコアに基づいて定性的な予測が行われます。
                     | 0.05未満のスコアを持つ置換は「有害 (Deleterious)」と分類され、それ以外のスコアは「容認 (Tolerated)」とされます。詳細は
@@ -227,16 +245,16 @@ block content
                   strong PolyPhen
                   br
                   div
-                    .variant-function._width_5em._align-center(data-function='PROBD') &gt; 0.908
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='PROBD') &gt; 0.908
                     span._margin-left Probably Damaging
                   div
-                    .variant-function._width_5em._align-center(data-function='POSSD') &gt; 0.446
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='POSSD') &gt; 0.446
                     span._margin-left Possibly Damaging
                   div
-                    .variant-function._width_5em._align-center(data-function='B') &le; 0.446
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='B') &le; 0.446
                     span._margin-left Benign
                   div
-                    .variant-function._width_5em._align-center(data-function='U') Unknown
+                    .variant-effect-prediction-badge._width_5em._align-center(data-function='U') Unknown
                     span._margin-left Unknown
                   span 推定偽陽性率（FPR）が5%以下の事後確率スコアを持つバリアントは、「Probably Damaging (おそらく有害)」と予測されます。
                     | FPRが10%以下の場合は「Possible Damaging (有害の可能性あり)」とされ、FPRが10%を超えるバリアントは「良性 (Benign)」と分類されます。詳細は
@@ -265,6 +283,11 @@ block content
                 | 参考文献:
                 br
                 | Sakaue S. et al. Dimensionality reduction reveals fine-scale structure in the Japanese population with consequences for polygenic risk prediction. Nature Communications, 2020.
+          #d10.question-answer
+            h4.question SSCV DBとは何ですか。
+            .answer
+              p
+                | SSCV DBは、公開トランスクリプトームシーケンスデータを用いて、splice-site creating variant（SSCV）を収集したデータベースです。SSCVは、新たなスプライス部位を作ることで異常なスプライシングを引き起こす可能性のあるバリアントです。TogoVarでは、SSCV DBに登録されている予測スプライシングタイプを表示し、該当するSSCV DBのレコードへリンクしています。
 
         section.section
           h3.sectiontitle TogoVarの検索システムに関して
@@ -313,15 +336,22 @@ block content
                   frequency-block-view(data-dataset="gem_j_wga" data-frequency="≥0.5")
                   | &nbsp; GEM-J WGA
                   br
-                  frequency-block-view(data-dataset="jga_snp" data-frequency="≥0.5")
-                  | &nbsp; JGA-SNP
-                  br
-                  frequency-block-view(data-dataset="jga_wes" data-frequency="≥0.5")
-                  | &nbsp; JGA-WES
-                  br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
                     frequency-block-view(data-dataset="jga_wgs" data-frequency="≥0.5")
                     | &nbsp; JGA-WGS
+                    br
+                  frequency-block-view(data-dataset="jga_wes" data-frequency="≥0.5")
+                  | &nbsp; JGA-WES
+                  br
+                  frequency-block-view(data-dataset="jga_snp" data-frequency="≥0.5")
+                  | &nbsp; JGA-SNP
+                  br
+                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                    frequency-block-view(data-dataset="bbj1k" data-frequency="≥0.5")
+                    | &nbsp; BBJ1K
+                    br
+                    frequency-block-view(data-dataset="bbj2k" data-frequency="≥0.5")
+                    | &nbsp; BBJ2K
                     br
                   frequency-block-view(data-dataset="tommo" data-frequency="≥0.5")
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
@@ -329,19 +359,29 @@ block content
                   else if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
                     | &nbsp; ToMMo 54KJPN
                   br
+                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                    frequency-block-view(data-dataset="tommo_jsv1" data-frequency="≥0.5")
+                    | &nbsp; ToMMo JSV1
+                    br
+                    frequency-block-view(data-dataset="ncbn" data-frequency="≥0.5")
+                    | &nbsp; NCBN
+                    br
+                    frequency-block-view(data-dataset="jogo" data-frequency="≥0.5")
+                    | &nbsp; JoGo
+                    br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
                     frequency-block-view(data-dataset="hgvd" data-frequency="≥0.5")
                     | &nbsp; HGVD
-                    br
-                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    frequency-block-view(data-dataset="ncbn" data-frequency="≥0.5")
-                    | &nbsp; NCBN
                     br
                   frequency-block-view(data-dataset="gnomad_genomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD genomes
                   br
                   frequency-block-view(data-dataset="gnomad_exomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD exomes
+                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                    br
+                    frequency-block-view(data-dataset="gnomad_sv" data-frequency="≥0.5")
+                    | &nbsp; gnomAD SV
 
           #s2.question-answer._column-span-all
             h4.question バリアントタイプごとにPosition、Ref、Altはそれぞれどのように記述されますか。

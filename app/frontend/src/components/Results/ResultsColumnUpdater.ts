@@ -4,12 +4,20 @@ import type {
   TypeMasterItem,
   ConsequenceMasterItem,
   GeneSymbol,
+  GeneSummary,
   Frequency,
   TdFrequencies,
   Transcript,
   Significance,
+  SscvDbItem,
+  ExternalLinkItem,
 } from '../../types';
 import { REF_ALT_SHOW_LENGTH } from './ResultsColumnTemplates';
+
+type NormalizedGeneSummary = {
+  total: number;
+  items: GeneSymbol[];
+};
 
 /**
  * 検索結果テーブルの各列に、バリアント情報を反映するためのユーティリティクラス。
@@ -25,6 +33,35 @@ export class ResultsColumnUpdater {
    */
   static resetAnchor(cell: HTMLElement) {
     cell.querySelector('a.hyper-text')?.remove();
+  }
+
+  /**
+   * リンクにしない補助テキストを再描画時に残さないため、専用classの要素だけを削除する。
+   */
+  static resetInlineText(cell: HTMLElement, className: string) {
+    cell.querySelector(`.${className}`)?.remove();
+  }
+
+  /**
+   * hrefなしのa要素を避けつつ、remainsバッジの直前へ通常テキストを差し込む。
+   */
+  static updateInlineText(
+    cell: HTMLElement,
+    className: string,
+    text: string,
+    insertBefore?: Element | null
+  ) {
+    this.resetInlineText(cell, className);
+
+    const span = document.createElement('span');
+    span.className = className;
+    span.textContent = text;
+
+    if (insertBefore) {
+      cell.insertBefore(span, insertBefore);
+    } else {
+      cell.appendChild(span);
+    }
   }
 
   /**
@@ -220,38 +257,69 @@ export class ResultsColumnUpdater {
     const master = getSimpleSearchConditionMaster('type')?.items as
       | TypeMasterItem[]
       | undefined;
-    element.textContent = master?.find((item) => item.id === value)?.label || '';
+    element.textContent =
+      master?.find((item) => item.id === value)?.label || '';
   }
 
   /**
    * Gene列を更新する。
    *
    * @param tdGene - Gene列のtd要素
-   * @param symbols - 遺伝子シンボルの配列
+   * @param genes - 遺伝子の総数と表示用items
    */
   static updateGene(
     tdGene: HTMLDivElement | null,
     tdGeneRemains: HTMLSpanElement | null,
-    symbols: GeneSymbol[]
+    genes: GeneSummary | GeneSymbol[] | undefined
   ) {
     if (!tdGene || !tdGeneRemains) return;
 
-    if (!symbols || symbols.length === 0) {
+    const geneSummary = this.normalizeGeneSummary(genes);
+    const validSymbols = geneSummary.items.filter(Boolean);
+    this.resetInlineText(tdGene, 'gene-count-text');
+
+    if (validSymbols.length === 0) {
       this.updateRemainsBadge(tdGeneRemains, 0);
       this.resetAnchor(tdGene);
+      if (geneSummary.total > 0) {
+        this.updateInlineText(
+          tdGene,
+          'gene-count-text',
+          `${geneSummary.total.toLocaleString()} genes`,
+          tdGeneRemains
+        );
+      }
       return;
     }
 
-    // 画面には先頭の遺伝子だけを表示し、残りの件数はdata-remainsに保持する。
-    this.updateRemainsBadge(tdGeneRemains, symbols.length - 1);
+    // 画面には先頭の遺伝子だけを表示し、APIが返した総遺伝子数との差分をdata-remainsに保持する。
+    this.updateRemainsBadge(tdGeneRemains, Math.max(0, geneSummary.total - 1));
     this.updateAnchor(
       tdGene,
       'hyper-text -internal',
-      `/gene/${symbols[0].id}`,
-      symbols[0].name,
-      `View gene ${symbols[0].name} details`,
+      `/gene/${validSymbols[0].id}`,
+      validSymbols[0].name,
+      `View gene ${validSymbols[0].name} details`,
       tdGeneRemains
     );
+  }
+
+  /**
+   * ステージング移行中の旧配列レスポンスでも表示を止めないため、GeneSummaryへ正規化する。
+   */
+  static normalizeGeneSummary(
+    genes: GeneSummary | GeneSymbol[] | undefined
+  ): NormalizedGeneSummary {
+    if (Array.isArray(genes)) {
+      return { total: genes.length, items: genes };
+    }
+
+    const items = Array.isArray(genes?.items) ? genes.items : [];
+
+    return {
+      total: Math.max(items.length, genes?.total ?? 0),
+      items,
+    };
   }
 
   /**
@@ -309,7 +377,7 @@ export class ResultsColumnUpdater {
         | ConsequenceMasterItem[]
         | undefined) ?? [];
     const uniqueConsequences = Array.from(
-      new Set(transcripts.flatMap((transcript) => transcript.consequence))
+      new Set(transcripts.flatMap((transcript) => transcript.consequence ?? []))
     );
 
     this.updateRemainsBadge(
@@ -516,12 +584,30 @@ export class ResultsColumnUpdater {
   }
 
   /**
+   * CADDスコア（PHRED）を更新する。
+   * 閾値はスライダーの色区分と合わせている: ≥20 → 'D'（赤）、≥10 → 'POSSD'（橙）、<10 → 'T'（緑）
+   *
+   * @param element - 更新対象のdiv要素
+   * @param score - CADD PHREDスコア
+   */
+  static updateCadd(element: HTMLDivElement | null, score: number | undefined) {
+    this.updateFunctionPrediction(element, score ?? null, (s) => {
+      if (s >= 20) return 'D';
+      if (s >= 10) return 'POSSD';
+      return 'T';
+    });
+  }
+
+  /**
    * AlphaMissenseスコアを更新する。
    *
    * @param element - 更新対象のdiv要素
    * @param score - AlphaMissenseスコア
    */
-  static updateAlphaMissense(element: HTMLDivElement | null, score: number | null | undefined) {
+  static updateAlphaMissense(
+    element: HTMLDivElement | null,
+    score: number | null | undefined
+  ) {
     this.updateFunctionPrediction(element, score, (s) => {
       if (s < 0.34) return 'LB';
       if (s > 0.564) return 'LP';
@@ -535,8 +621,13 @@ export class ResultsColumnUpdater {
    * @param element - 更新対象のdiv要素
    * @param score - SIFTスコア
    */
-  static updateSift(element: HTMLDivElement | null, score: number | null | undefined) {
-    this.updateFunctionPrediction(element, score, (s) => (s >= 0.05 ? 'T' : 'D'));
+  static updateSift(
+    element: HTMLDivElement | null,
+    score: number | null | undefined
+  ) {
+    this.updateFunctionPrediction(element, score, (s) =>
+      s >= 0.05 ? 'T' : 'D'
+    );
   }
 
   /**
@@ -545,12 +636,67 @@ export class ResultsColumnUpdater {
    * @param element - 更新対象のdiv要素
    * @param score - PolyPhenスコア
    */
-  static updatePolyphen(element: HTMLDivElement | null, score: number | null | undefined) {
+  static updatePolyphen(
+    element: HTMLDivElement | null,
+    score: number | null | undefined
+  ) {
     this.updateFunctionPrediction(element, score, (s) => {
       if (s > 0.908) return 'PROBD';
       if (s > 0.446) return 'POSSD';
       if (s >= 0) return 'B';
       return 'U';
     });
+  }
+
+  /**
+   * hrefなしの空リンクをDOMに残さないため、リンク化できる場合だけa要素を生成する。
+   * 1バリアントに複数エントリが返るケースはほぼないため先頭の predicted_splicing_type のみ表示する。
+   *
+   * @param cell - スプライシング予測表示セル
+   * @param items - SSCV DB予測結果の配列
+   * @param links - SSCV DB外部リンク候補
+   */
+  static updateSplicingVariant(
+    cell: HTMLTableCellElement | null,
+    items: SscvDbItem[] | undefined,
+    links: ExternalLinkItem[] | undefined
+  ) {
+    if (!cell) return;
+    if (process.env.NODE_ENV !== 'production' && items && items.length > 1) {
+      console.warn(
+        '[ResultsColumnUpdater] sscv_db が複数件返っています。remains バッジの追加を検討してください。',
+        items
+      );
+    }
+    const text = items?.[0]?.predicted_splicing_type ?? '';
+    const rawUrl = links?.[0]?.xref ?? '';
+
+    this.resetAnchor(cell);
+    this.resetInlineText(cell, 'splicingvariant-item');
+
+    if (!text) return;
+
+    let safeUrl = '';
+    if (rawUrl) {
+      try {
+        const parsed = new URL(String(rawUrl), window.location.href);
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+          safeUrl = parsed.toString();
+        }
+      } catch {
+        // ignore invalid URLs
+      }
+    }
+    if (text && safeUrl) {
+      this.updateAnchor(
+        cell,
+        'splicingvariant-item hyper-text -external',
+        safeUrl,
+        text,
+        `Open SSCV DB record ${text}`
+      );
+    } else {
+      this.updateInlineText(cell, 'splicingvariant-item', text);
+    }
   }
 }

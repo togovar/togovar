@@ -88,12 +88,8 @@ export class ConditionDiseaseOntologyView extends LitElement {
   /** カラム間のギャップ（px）。clipWidth から3カラム分の幅を引いた残りの半分。 */
   private gap: number = 0;
 
-  /**
-   * 現在実行中のスライドアニメーション。
-   * onfinish でカラム構成をリセットするために保持する。
-   * HTMLElement.animate() メソッドとの名前衝突を避けるため _slideAnimation とする。
-   */
-  private _slideAnimation: Animation | null = null;
+  /** 現在実行中のスライドアニメーション。onfinish でカラム構成をリセットするために保持する。 */
+  private slideAnimation: Animation | null = null;
 
   /** column-click 時にクリックされたカードの DOMRect。FLIP アニメーションのヒーロー起点に使う。 */
   private scrolledRect: DOMRect | null = null;
@@ -129,58 +125,58 @@ export class ConditionDiseaseOntologyView extends LitElement {
   // ── リアクティブプロパティ ────────────────────────────────────────────────
 
   /**
-   * API から取得したノードデータ。変更時に willUpdate → render の順で表示を更新する。
+   * API から取得した現在表示中のノードデータ。変更時に willUpdate → render の順で表示を更新する。
    * state にして属性観察を省略するのは、OntologyNode を属性値で表現できないため。
    */
-  @state() private data: OntologyNode = { id: '' };
+  @state() private currentNode: OntologyNode = { id: '' };
 
   /**
    * 表示中のカラム役割配列。3カラム（通常）↔ 4カラム（遷移中）を切り替えることで
    * スライドアニメーションを実現する。
    */
-  @state() private _columns: ColumnRole[] = ['parents', 'hero', 'children'];
+  @state() private visibleColumns: ColumnRole[] = ['parents', 'hero', 'children'];
 
-  // ── _id の getter / setter ───────────────────────────────────────────────
+  // ── diseaseId の getter / setter ─────────────────────────────────────────
 
-  /** _id プロパティのバッキングフィールド */
-  private _idValue: string = '';
+  /** diseaseId プロパティのバッキングフィールド */
+  private selectedDiseaseId: string = '';
 
   /**
-   * 親テンプレートから ._id=${diseaseId} で設定されるプロパティ。
+   * 親テンプレートから .diseaseId=${diseaseId} で設定されるプロパティ。
    * setter で ID が変わったときだけ API を呼び出し、二重フェッチを防ぐ。
    * @property を使わず plain getter/setter にするのは、属性観察が不要で
-   * リアクティブな再描画は data の変化で十分なため。
+   * リアクティブな再描画は currentNode の変化で十分なため。
    */
-  get _id(): string {
-    return this._idValue;
+  get diseaseId(): string {
+    return this.selectedDiseaseId;
   }
-  set _id(id: string) {
-    this._idValue = id;
+  set diseaseId(id: string) {
+    this.selectedDiseaseId = id;
     // DOM 接続前は firstUpdated() に初期フェッチを委譲し、二重リクエストを防ぐ
-    if (this.isConnected && this.data?.id !== id) {
-      this._fetchNode(id);
+    if (this.isConnected && this.currentNode?.id !== id) {
+      this.fetchNode(id);
     }
   }
 
   // ── Lit ライフサイクル ────────────────────────────────────────────────────
 
   /**
-   * data 変化時にアニメーション用の前後カラムデータを準備し、
-   * _columns 変化時にカラム幅・ギャップ・スライド量を再計算する。
+   * currentNode 変化時にアニメーション用の前後カラムデータを準備し、
+   * visibleColumns 変化時にカラム幅・ギャップ・スライド量を再計算する。
    * render 前に呼ばれるため、非リアクティブなフィールドをここで更新する。
    */
   override willUpdate(changedProperties: PropertyValues): void {
-    if (changedProperties.has('data')) {
-      const prevData = changedProperties.get('data') as OntologyNode | undefined;
-      if (prevData && this.data.id && prevData.id !== this.data.id) {
-        this.dataColumns._parents = prevData.parents ?? [DUMMY_NODE];
-        this.dataColumns._children = prevData.children ?? [DUMMY_NODE];
+    if (changedProperties.has('currentNode')) {
+      const prevNode = changedProperties.get('currentNode') as OntologyNode | undefined;
+      if (prevNode && this.currentNode.id && prevNode.id !== this.currentNode.id) {
+        this.dataColumns._parents = prevNode.parents ?? [DUMMY_NODE];
+        this.dataColumns._children = prevNode.children ?? [DUMMY_NODE];
 
-        if (this._columns.length === 4) {
+        if (this.visibleColumns.length === 4) {
           let movement: '' | 'left' | 'right' = '';
-          if (this._columns.includes('_parents')) {
+          if (this.visibleColumns.includes('_parents')) {
             movement = 'left';
-          } else if (this._columns.includes('_children')) {
+          } else if (this.visibleColumns.includes('_children')) {
             movement = 'right';
           }
 
@@ -190,15 +186,15 @@ export class ConditionDiseaseOntologyView extends LitElement {
             this.dataColumns.hero = this.dataColumns._parents;
           }
         } else {
-          this.dataColumns.hero = [this.data];
+          this.dataColumns.hero = [this.currentNode];
         }
 
-        this.dataColumns.parents = this.data.parents ?? [];
-        this.dataColumns.children = this.data.children ?? [];
+        this.dataColumns.parents = this.currentNode.parents ?? [];
+        this.dataColumns.children = this.currentNode.children ?? [];
       }
     }
 
-    if (changedProperties.has('_columns')) {
+    if (changedProperties.has('visibleColumns')) {
       const nodeRect = this.nodeRef.value?.getBoundingClientRect();
       const clipRect = this.clipRef.value?.getBoundingClientRect();
 
@@ -211,8 +207,8 @@ export class ConditionDiseaseOntologyView extends LitElement {
       }
 
       this.flexWidth =
-        this._columns.length === 4
-          ? `${this.nodeWidth * this._columns.length + (this._columns.length - 1) * this.gap}px`
+        this.visibleColumns.length === 4
+          ? `${this.nodeWidth * this.visibleColumns.length + (this.visibleColumns.length - 1) * this.gap}px`
           : '100%';
 
       this.deltaWidth = this.nodeWidth + this.gap;
@@ -222,39 +218,39 @@ export class ConditionDiseaseOntologyView extends LitElement {
   /**
    * 初回レンダリング後に初期ノードを取得する。
    * firstUpdated は DOM が確定してから呼ばれるため、ref が取得できる最初のタイミング。
-   * _fetchNode を経由することで loading-started/ended と disease-selected を確実に発火させる。
+   * fetchNode を経由することで loading-started/ended と disease-selected を確実に発火させる。
    * setter からの二重フェッチは cachedAxios がキャッシュで吸収する。
    */
   override firstUpdated(_changedProperties: PropertyValues): void {
-    if (this._idValue) {
-      this._fetchNode(this._idValue);
+    if (this.selectedDiseaseId) {
+      this.fetchNode(this.selectedDiseaseId);
     }
   }
 
   /**
    * movement の値に応じてフレックスコンテナをスライドアニメーションさせる。
-   * アニメーション完了後に _columns を3カラムに戻し movement をリセットする。
+   * アニメーション完了後に visibleColumns を3カラムに戻し movement をリセットする。
    */
   override updated(_changedProperties: PropertyValues): void {
     if (!this.flexRef.value) return;
 
     if (this.movement === 'left') {
-      this._slideAnimation = this.flexRef.value.animate(
+      this.slideAnimation = this.flexRef.value.animate(
         [{ transform: 'translateX(0)' }, { transform: `translateX(${-this.deltaWidth}px)` }],
         this.animationOptions
       );
     } else if (this.movement === 'right') {
-      this._slideAnimation = this.flexRef.value.animate(
+      this.slideAnimation = this.flexRef.value.animate(
         [{ transform: `translateX(${-this.deltaWidth}px)` }, { transform: 'translateX(0)' }],
         this.animationOptions
       );
     }
 
-    if (this._slideAnimation) {
-      this._slideAnimation.onfinish = () => {
+    if (this.slideAnimation) {
+      this.slideAnimation.onfinish = () => {
         this.movement = '';
-        this._columns = ['parents', 'hero', 'children'];
-        this._slideAnimation = null;
+        this.visibleColumns = ['parents', 'hero', 'children'];
+        this.slideAnimation = null;
       };
     }
   }
@@ -265,12 +261,12 @@ export class ConditionDiseaseOntologyView extends LitElement {
       <div class="clip" ${ref(this.clipRef)}>
         <div
           class="flex"
-          @column-click=${this._handleClick}
+          @column-click=${this.handleClick}
           style="width: ${this.flexWidth}"
           ${ref(this.flexRef)}
         >
           ${repeat(
-            this._columns,
+            this.visibleColumns,
             (column) => column,
             (column) => html`
               <ontology-column
@@ -279,7 +275,7 @@ export class ConditionDiseaseOntologyView extends LitElement {
                   ? this.dataColumns[column]
                   : [DUMMY_NODE]}
                 ${ref(this.nodeRef)}
-                .heroId=${column === 'hero' ? this.data.id : undefined}
+                .heroId=${column === 'hero' ? this.currentNode.id : undefined}
                 .scrolledHeroRect=${this.scrolledRect}
                 .animationOptions=${this.animationOptions}
               ></ontology-column>
@@ -297,7 +293,7 @@ export class ConditionDiseaseOntologyView extends LitElement {
    * ローディング状態の管理を親（ConditionDiseaseSearch）に委譲することで
    * このコンポーネントはデータ取得のみに専念できる。
    */
-  private _loadingStarted(): void {
+  private notifyLoadingStarted(): void {
     this.dispatchEvent(
       new CustomEvent('loading-started', { bubbles: true, composed: true })
     );
@@ -307,13 +303,13 @@ export class ConditionDiseaseOntologyView extends LitElement {
    * データ取得完了後に disease-selected と loading-ended を発火する。
    * データがある場合のみ disease-selected を発火し、選択確定を親に伝える。
    */
-  private _loadingEnded(): void {
-    if (this.data.id) {
-      const raw = this.data.label ?? '';
+  private notifyLoadingEnded(): void {
+    if (this.currentNode.id) {
+      const raw = this.currentNode.label ?? '';
       const label = raw.charAt(0).toUpperCase() + raw.slice(1);
       this.dispatchEvent(
         new CustomEvent('disease-selected', {
-          detail: { id: this.data.id, label },
+          detail: { id: this.currentNode.id, label },
           bubbles: true,
           composed: true,
         })
@@ -326,16 +322,17 @@ export class ConditionDiseaseOntologyView extends LitElement {
   }
 
   /**
-   * 指定 ID のノードデータを API から取得して data を更新する。
-   * セッターと firstUpdated の両方から呼ばれるため、重複フェッチは cachedAxios がキャッシュで吸収する。
+   * 指定 ID のノードデータを API から取得して currentNode を更新する。
+   * setter と firstUpdated の両方から呼ばれるため、重複フェッチは cachedAxios がキャッシュで吸収する。
    */
-  private _fetchNode(id: string): void {
-    this._loadingStarted();
+  private fetchNode(id: string): void {
+    if (!id) return;
+    this.notifyLoadingStarted();
     this.api
       .get<OntologyNode>(`/disease?node=${id}`)
       .then(({ data }) => {
-        this.data = data;
-        this._loadingEnded();
+        this.currentNode = data;
+        this.notifyLoadingEnded();
       })
       .catch((error) => {
         console.error(
@@ -353,27 +350,28 @@ export class ConditionDiseaseOntologyView extends LitElement {
    * hero カラムのクリックは無視し、parents / children のみ遷移対象にすることで
    * 現在選択中のノードに対する再取得を防ぐ。
    */
-  private _handleClick(e: Event): void {
+  private handleClick(e: Event): void {
     if (!(e.target instanceof Column)) return;
     const column = e.target;
     if (column.role !== 'parents' && column.role !== 'children') return;
 
     const event = e as CustomEvent<ColumnClickDetail>;
-    this.scrolledRect = event.detail?.rect ?? null;
-    this._loadingStarted();
+    if (!event.detail?.id) return;
+    this.scrolledRect = event.detail.rect ?? null;
+    this.notifyLoadingStarted();
 
     this.api
       .get<OntologyNode>(`/disease?node=${event.detail.id}`)
       .then(({ data }) => {
-        this.data = data;
-        this._loadingEnded();
+        this.currentNode = data;
+        this.notifyLoadingEnded();
         void this.updateComplete.then(() => {
           if (event.detail.role === 'children') {
             this.movement = 'left';
-            this._columns = ['_parents', 'parents', 'hero', 'children'];
+            this.visibleColumns = ['_parents', 'parents', 'hero', 'children'];
           } else if (event.detail.role === 'parents') {
             this.movement = 'right';
-            this._columns = ['parents', 'hero', 'children', '_children'];
+            this.visibleColumns = ['parents', 'hero', 'children', '_children'];
           }
         });
       })

@@ -1,4 +1,4 @@
-import { CONDITION_TYPE } from '../../definition';
+import { ADVANCED_CONDITION_TYPE } from '../../advancedCondition';
 import { API_URL } from '../../global';
 import { axios } from '../../utils/cachedAxios';
 import {
@@ -32,7 +32,7 @@ export async function restoreGeneItem(
   );
 
   return {
-    conditionType: CONDITION_TYPE.gene_symbol,
+    conditionType: ADVANCED_CONDITION_TYPE.gene_symbol,
     relation,
     values,
   };
@@ -49,7 +49,7 @@ function _getGeneLabelFromQuery(
 
 /** labels がない場合のフォールバック。gene_symbol APIでIDからsymbolを引き直す。 */
 async function _findGeneSymbolLabel(geneId: string): Promise<string | null> {
-  const url = new URL(`${API_URL}/api/search/${CONDITION_TYPE.gene_symbol}`);
+  const url = new URL(`${API_URL}/api/search/${ADVANCED_CONDITION_TYPE.gene_symbol}`);
   url.searchParams.set('term', geneId);
 
   try {

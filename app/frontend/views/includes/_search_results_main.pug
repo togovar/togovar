@@ -185,6 +185,13 @@ main#SearchResultsView.LayoutMainAside
             button.clear-button.button-view Clear
           .content
             ul.checklist-values
+        if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+          section#FilterCADD.panel-view
+            h3.title
+              | CADD (PHRED score)
+              button.clear-button.button-view Clear
+            .content
+              ul.checklist-values
         section#FilterAlphaMissense.panel-view
           h3.title
             | AlphaMissense
@@ -203,3 +210,10 @@ main#SearchResultsView.LayoutMainAside
             button.clear-button.button-view Clear
           .content
             ul.checklist-values
+        if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+          section#FilterSplicingVariant.panel-view
+            h3.title
+              | Splicing variant (SSCV DB)
+              button.clear-button.button-view Clear
+            .content
+              ul.checklist-values

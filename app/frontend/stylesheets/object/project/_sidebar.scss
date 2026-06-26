@@ -232,7 +232,7 @@
   // Advanced Search モードではパネル単位のクリアボタンを非表示にする
   // Advanced Search は条件ビルダーで管理するため、パネル単位のクリアは不要
   // 使用パネル: #FilterDatasets, #FilterVariantType, #FilterConsequence,
-  //             #FilterClinicalSignificance, #FilterAlphaMissense, #FilterSIFT, #FilterPolyPhen
+  //             #FilterClinicalSignificance, #FilterCADD, #FilterAlphaMissense, #FilterSIFT, #FilterPolyPhen
   body[data-search-mode='advanced'] & {
     .panel-view {
       > .title {
@@ -240,6 +240,17 @@
           display: none;
         }
       }
+    }
+
+    // Simple Search 専用のフィルターパネルを Advanced Search モードで非表示にする
+    #FilterAlternateAlleleFrequency,
+    #FilterVariantCallingQuality,
+    #FilterCADD,
+    #FilterSIFT,
+    #FilterPolyPhen,
+    #FilterAlphaMissense,
+    #FilterSplicingVariant {
+      display: none;
     }
   }
 
@@ -280,10 +291,15 @@
         font-weight: bold;
         line-height: 14px;
 
+        // Advanced Searchでは統計表示専用にし、非表示checkboxへのlabelクリックを発火させない
+        body[data-search-mode='advanced'] & {
+          pointer-events: none;
+        }
+
         > .dataset-icon,
         > .variant-icon,
         > .clinical-significance,
-        > .variant-function {
+        > .variant-effect-prediction-badge {
           display: inline-block;
           margin-left: -2px;
           vertical-align: middle;
@@ -301,7 +317,7 @@
         }
       }
 
-      > .value {
+      > .count-display {
         float: right;
         display: block;
         padding-left: 1em;

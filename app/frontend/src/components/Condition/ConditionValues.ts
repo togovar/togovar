@@ -1,4 +1,7 @@
-import { CONDITION_TYPE, type ConditionTypeValue } from '../../definition';
+import {
+  ADVANCED_CONDITION_TYPE,
+  type AdvancedConditionTypeValue,
+} from '../../advancedCondition';
 import { createEl } from '../../utils/dom/createEl';
 import { ConditionValueEditorCheckboxes } from './ConditionValueEditor/ConditionValueEditorCheckboxes';
 import { ConditionValueEditorClinicalSignificance } from './ConditionValueEditor/ConditionValueEditorClinicalSignificance';
@@ -8,7 +11,7 @@ import { ConditionValueEditorDisease } from './ConditionValueEditor/ConditionVal
 import { ConditionValueEditorFrequencyCount } from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
 import { ConditionValueEditorGene } from './ConditionValueEditor/ConditionValueEditorGene';
 import { ConditionValueEditorLocation } from './ConditionValueEditor/ConditionValueEditorLocation';
-import { ConditionValueEditorPathogenicityPrediction } from './ConditionValueEditor/ConditionValueEditorPathogenicityPrediction';
+import { ConditionValueEditorVariantEffectPrediction } from './ConditionValueEditor/ConditionValueEditorVariantEffectPrediction';
 import { ConditionValueEditorVariantID } from './ConditionValueEditor/ConditionValueEditorVariantID';
 import type { ConditionItemView } from './ConditionItemView';
 import type { ConditionValueEditor, EditorCtor } from '../../types';
@@ -16,26 +19,31 @@ import type { ConditionValueEditor, EditorCtor } from '../../types';
 // 条件種別ごとに使用するエディタを宣言的に管理する。
 // 新しい条件種別を追加するときはここへ追記するだけで済む。
 const EDITOR_REGISTRY: Readonly<
-  Partial<Record<ConditionTypeValue, EditorCtor[]>>
+  Partial<Record<AdvancedConditionTypeValue, EditorCtor[]>>
 > = {
-  [CONDITION_TYPE.type]: [ConditionValueEditorCheckboxes],
-  [CONDITION_TYPE.significance]: [ConditionValueEditorClinicalSignificance],
-  [CONDITION_TYPE.consequence]: [ConditionValueEditorConsequence],
-  [CONDITION_TYPE.dataset]: [
+  [ADVANCED_CONDITION_TYPE.variant_type]: [ConditionValueEditorCheckboxes],
+  [ADVANCED_CONDITION_TYPE.sscv_db]: [ConditionValueEditorCheckboxes],
+  [ADVANCED_CONDITION_TYPE.clinical_significance]: [
+    ConditionValueEditorClinicalSignificance,
+  ],
+  [ADVANCED_CONDITION_TYPE.variant_consequence]: [
+    ConditionValueEditorConsequence,
+  ],
+  [ADVANCED_CONDITION_TYPE.dataset]: [
     ConditionValueEditorDatasetColumns,
     ConditionValueEditorFrequencyCount,
   ],
-  [CONDITION_TYPE.genotype]: [
+  [ADVANCED_CONDITION_TYPE.genotype]: [
     ConditionValueEditorDatasetColumns,
     ConditionValueEditorFrequencyCount,
   ],
-  [CONDITION_TYPE.disease]: [ConditionValueEditorDisease],
-  [CONDITION_TYPE.gene_symbol]: [ConditionValueEditorGene],
-  [CONDITION_TYPE.pathogenicity_prediction]: [
-    ConditionValueEditorPathogenicityPrediction,
+  [ADVANCED_CONDITION_TYPE.disease]: [ConditionValueEditorDisease],
+  [ADVANCED_CONDITION_TYPE.gene_symbol]: [ConditionValueEditorGene],
+  [ADVANCED_CONDITION_TYPE.variant_effect_prediction]: [
+    ConditionValueEditorVariantEffectPrediction,
   ],
-  [CONDITION_TYPE.variant_id]: [ConditionValueEditorVariantID],
-  [CONDITION_TYPE.location]: [ConditionValueEditorLocation],
+  [ADVANCED_CONDITION_TYPE.variant_id]: [ConditionValueEditorVariantID],
+  [ADVANCED_CONDITION_TYPE.location]: [ConditionValueEditorLocation],
 };
 
 /**
@@ -84,7 +92,8 @@ export default class ConditionValues {
     const t = this._conditionView.conditionType;
     const allEditorsValid = this._editors.every((e) => e.isValid);
     const requireAll =
-      t === CONDITION_TYPE.dataset || t === CONDITION_TYPE.genotype;
+      t === ADVANCED_CONDITION_TYPE.dataset ||
+      t === ADVANCED_CONDITION_TYPE.genotype;
 
     const finalValid = requireAll
       ? allEditorsValid
@@ -161,7 +170,7 @@ export default class ConditionValues {
    * 条件種別に対応するエディタをインスタンス化する。
    * EDITOR_REGISTRY に登録のない種別はエディタなし（空配列）で動作する。
    */
-  private _instantiateEditorsFor(type: ConditionTypeValue): void {
+  private _instantiateEditorsFor(type: AdvancedConditionTypeValue): void {
     const ctors = EDITOR_REGISTRY[type] ?? [];
     this._editors = ctors.map((Ctor) => new Ctor(this, this._conditionView));
 

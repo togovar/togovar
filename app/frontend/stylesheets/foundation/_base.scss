@@ -40,15 +40,6 @@ body {
     }
   }
 
-  &[data-search-mode='advanced'] {
-    #FilterAlternateAlleleFrequency,
-    #FilterVariantCallingQuality,
-    #FilterSIFT,
-    #FilterPolyPhen,
-    #FilterAlphaMissense {
-      display: none;
-    }
-  }
 
   &[data-dragging='true'] {
     user-select: none;
