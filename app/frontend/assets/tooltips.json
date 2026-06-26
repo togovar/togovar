@@ -56,7 +56,8 @@
   },
   {
     "id": "table-header-splicingvariant",
-    "content": "Prediction of splicing effects of a variant by the SSCV DB (Splicing Site Creation Variant Database)"
+    "content": "Prediction of splicing effects of a variant by the SSCV DB (Splicing Site Creation Variant Database)",
+    "url": "/doc/help#d10"
   },
   {
     "id": "table-header-clinical_significance",
