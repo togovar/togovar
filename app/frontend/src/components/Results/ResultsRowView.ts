@@ -39,7 +39,7 @@ type ResultsRowCells = {
   alphaMissenseFunction: HTMLDivElement | null;
   siftFunction: HTMLDivElement | null;
   polyphenFunction: HTMLDivElement | null;
-  splicingVariantItem: HTMLAnchorElement | null;
+  splicingVariantCell: HTMLTableCellElement | null;
 };
 
 /**
@@ -72,7 +72,7 @@ function createEmptyCells(): ResultsRowCells {
     alphaMissenseFunction: null,
     siftFunction: null,
     polyphenFunction: null,
-    splicingVariantItem: null,
+    splicingVariantCell: null,
   };
 }
 
@@ -178,7 +178,7 @@ export class ResultsRowView {
       ),
     splicingvariant: (result) =>
       ResultsColumnUpdater.updateSplicingVariant(
-        this.cells.splicingVariantItem,
+        this.cells.splicingVariantCell,
         result.sscv_db,
         result.external_links?.sscv_db ?? result.external_link?.sscv_db
       ),
@@ -474,9 +474,7 @@ export class ResultsRowView {
     this.cells.polyphenFunction =
       tdPolyphen?.querySelector('.variant-function') || null;
 
-    const tdSplicingVariant = this.tr.querySelector('td.splicingvariant');
-    this.cells.splicingVariantItem =
-      tdSplicingVariant?.querySelector('.splicingvariant-item') || null;
+    this.cells.splicingVariantCell = this.tr.querySelector('td.splicingvariant');
   }
 
   // ================================================================

@@ -649,18 +649,19 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * スプライシング予測（SSCV DB）列を更新する。
+   * hrefなしの空リンクをDOMに残さないため、リンク化できる場合だけa要素を生成する。
    * 1バリアントに複数エントリが返るケースはほぼないため先頭の predicted_splicing_type のみ表示する。
    *
-   * @param element - 予測タイプ表示div要素
+   * @param cell - スプライシング予測表示セル
    * @param items - SSCV DB予測結果の配列
+   * @param links - SSCV DB外部リンク候補
    */
   static updateSplicingVariant(
-    element: HTMLAnchorElement | null,
+    cell: HTMLTableCellElement | null,
     items: SscvDbItem[] | undefined,
     links: ExternalLinkItem[] | undefined
   ) {
-    if (!element) return;
+    if (!cell) return;
     if (process.env.NODE_ENV !== 'production' && items && items.length > 1) {
       console.warn(
         '[ResultsColumnUpdater] sscv_db が複数件返っています。remains バッジの追加を検討してください。',
@@ -669,7 +670,12 @@ export class ResultsColumnUpdater {
     }
     const text = items?.[0]?.predicted_splicing_type ?? '';
     const rawUrl = links?.[0]?.xref ?? '';
-    element.textContent = text;
+
+    this.resetAnchor(cell);
+    this.resetInlineText(cell, 'splicingvariant-item');
+
+    if (!text) return;
+
     let safeUrl = '';
     try {
       const parsed = new URL(String(rawUrl), window.location.href);
@@ -680,9 +686,15 @@ export class ResultsColumnUpdater {
       // ignore invalid URLs
     }
     if (text && safeUrl) {
-      element.href = safeUrl;
+      this.updateAnchor(
+        cell,
+        'splicingvariant-item hyper-text -external',
+        safeUrl,
+        text,
+        `Open SSCV DB record ${text}`
+      );
     } else {
-      element.removeAttribute('href');
+      this.updateInlineText(cell, 'splicingvariant-item', text);
     }
   }
 }
