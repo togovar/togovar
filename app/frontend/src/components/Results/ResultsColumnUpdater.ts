@@ -677,13 +677,15 @@ export class ResultsColumnUpdater {
     if (!text) return;
 
     let safeUrl = '';
-    try {
-      const parsed = new URL(String(rawUrl), window.location.href);
-      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
-        safeUrl = parsed.toString();
+    if (rawUrl) {
+      try {
+        const parsed = new URL(String(rawUrl), window.location.href);
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+          safeUrl = parsed.toString();
+        }
+      } catch {
+        // ignore invalid URLs
       }
-    } catch {
-      // ignore invalid URLs
     }
     if (text && safeUrl) {
       this.updateAnchor(
