@@ -62,18 +62,21 @@ html(data-page=locals.currentPage, lang=lang)
             window.location.hostname === '127.0.0.1' ||
             window.location.hostname === '::1'
           ) {
-            // localでは実認証を行わないが、UI確認のため ?auth=login でLogout表示を再現できるようにする。
+            // localでは実認証を行わないため、Login/Logoutクリックで ?auth=login を切り替えて認証UIを確認できるようにする。
             const localAuthPreview = new URLSearchParams(window.location.search).get('auth');
             const localIsLogin = localAuthPreview === 'login';
             const localLabel = localIsLogin ? "Logout" : "Login";
-            loginMenu.href = '#';
-            loginMenu.setAttribute('aria-disabled', 'true');
-            loginMenu.setAttribute('tabindex', '-1');
+            const localAuthUrl = new URL(window.location.href);
+            if (localIsLogin) {
+              localAuthUrl.searchParams.delete('auth');
+            } else {
+              localAuthUrl.searchParams.set('auth', 'login');
+            }
+            loginMenu.href = localAuthUrl.toString();
+            loginMenu.removeAttribute('aria-disabled');
+            loginMenu.removeAttribute('tabindex');
             loginMenu.setAttribute('aria-label', localLabel);
             loginMenu.textContent = localLabel;
-            loginMenu.addEventListener('click', function(event) {
-              event.preventDefault();
-            });
             return;
           }
 
