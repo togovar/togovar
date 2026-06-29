@@ -41,10 +41,7 @@ export async function fetchLoginStatus(): Promise<void> {
       }
     }
   } catch (error) {
-    if (
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1'
-    ) {
+    if (isLocalDevelopmentHost(window.location.hostname)) {
       console.warn('Failed to fetch auth status:', error);
     }
     storeManager.setData('isLogin', false);
