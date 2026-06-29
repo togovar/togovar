@@ -16,7 +16,7 @@ export function isDatasetLockedForAnonymousUser(
 ): boolean {
   return (
     userIsLoggedIn === false &&
-    (datasetNode.value?.includes('jga_wgs.') ?? false) &&
+    (datasetNode.value?.startsWith('jga_wgs.') ?? false) &&
     !PUBLIC_JGA_WGS_DATASETS.has(datasetNode.value ?? '')
   );
 }
