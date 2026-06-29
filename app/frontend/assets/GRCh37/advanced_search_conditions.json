@@ -1113,11 +1113,7 @@
           "id": "group:splice_variant",
           "label": "Splice variant",
           "parent": "group:transcript_variant",
-          "children": [
-            "SO_0001574",
-            "SO_0001575",
-            "SO_0001630"
-          ]
+          "children": ["SO_0001574", "SO_0001575", "SO_0001630"]
         },
         {
           "id": "SO_0001574",
@@ -1205,11 +1201,7 @@
         {
           "id": "group:intergenic_variant",
           "label": "Intergenic variant",
-          "children": [
-            "SO_0001632",
-            "SO_0001628",
-            "SO_0001631"
-          ]
+          "children": ["SO_0001632", "SO_0001628", "SO_0001631"]
         },
         {
           "id": "SO_0001632",
@@ -1233,6 +1225,10 @@
           "parent": "group:intergenic_variant"
         }
       ]
+    },
+    "deleteriousness_prediction": {
+      "label": "Deleteriousness prediction",
+      "type": "peculiar"
     },
     "disease": {
       "label": "Disease",
@@ -1932,10 +1928,6 @@
     },
     "location": {
       "label": "Location",
-      "type": "peculiar"
-    },
-    "variant_effect_prediction": {
-      "label": "Variant effect prediction",
       "type": "peculiar"
     },
     "type": {

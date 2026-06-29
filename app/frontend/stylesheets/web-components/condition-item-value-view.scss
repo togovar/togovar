@@ -24,11 +24,11 @@
   }
 }
 
-// dataset/genotype/variant_effect_prediction: タグとグラフを2列グリッドで横並びにする
+// dataset/genotype/deleteriousness_prediction: タグとグラフを2列グリッドで横並びにする
 // 絶対配置にすると overflow: auto の親でもスクロール幅に反映されないため通常フローを使う
 :host([data-condition-type='dataset']),
 :host([data-condition-type='genotype']),
-:host([data-condition-type='variant_effect_prediction']) {
+:host([data-condition-type='deleteriousness_prediction']) {
   // flex-basis: 100% で .values-container（flex-wrap: wrap）の1行を占有して縦スタックさせる
   // min-width: max-content がコンテンツ幅を下限として保ち、親の overflow: auto でスクロール可能にする
   flex-basis: 100%;
@@ -77,8 +77,8 @@
   }
 }
 
-// variant_effect_prediction: 子コンポーネント側で見た目を持つため通常タグの枠を外す
-:host([data-condition-type='variant_effect_prediction']) {
+// deleteriousness_prediction: 子コンポーネント側で見た目を持つため通常タグの枠を外す
+:host([data-condition-type='deleteriousness_prediction']) {
   .inner {
     padding: 0;
     background-color: transparent;

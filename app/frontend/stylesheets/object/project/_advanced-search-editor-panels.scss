@@ -196,13 +196,13 @@ condition-disease-search {
 }
 
 // =============================================================================
-// バリアント効果予測条件 (.variant-effect-prediction-editor-view)
+// 有害性予測条件 (.deleteriousness-prediction-editor-view)
 // CADD / AlphaMissense / SIFT / PolyPhen などの予測ツール別タブで閾値を選択させるパネル
 // タブ UI のスタイルは Shadow DOM 内で完結するため tab-view.scss で管理する
 // =============================================================================
 
-.variant-effect-prediction-editor-view {
-  &[data-condition-type='variant_effect_prediction'].editor-panel {
+.deleteriousness-prediction-editor-view {
+  &[data-condition-type='deleteriousness_prediction'].editor-panel {
     > .section-content {
       // prediction-value-view の描画領域を確保するため下パディングが必要
       padding: 0 0 75px 0;

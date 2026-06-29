@@ -43,7 +43,7 @@ export type PeculiarWithTreeKeys = 'dataset' | 'genotype';
  * 値を持たない peculiar 条件のキー一覧。
  * UIは値リストではなくキー自体から描画内容を決定する。
  */
-export type PeculiarEmptyKeys = 'location' | 'variant_effect_prediction';
+export type PeculiarEmptyKeys = 'location' | 'deleteriousness_prediction';
 
 /** データセット選択条件。階層ツリーで選択する peculiar 型。 */
 export interface DatasetCondition {
@@ -169,7 +169,7 @@ type AdvancedConditionMap = Partial<
       | 'dataset'
       | 'genotype'
       | 'location'
-      | 'variant_effect_prediction'
+      | 'deleteriousness_prediction'
       | 'significance'
       | 'type'
     >,
@@ -179,7 +179,7 @@ type AdvancedConditionMap = Partial<
   dataset?: DatasetCondition;
   genotype?: GenotypeCondition;
   location?: LocationCondition;
-  variant_effect_prediction?: VariantEffectPredictionCondition;
+  deleteriousness_prediction?: VariantEffectPredictionCondition;
   significance?: SignificanceCondition;
   sscv_db?: CheckboxesCondition;
   type?: CheckboxesCondition;

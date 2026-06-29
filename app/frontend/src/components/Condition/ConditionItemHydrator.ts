@@ -5,7 +5,7 @@ import {
 import type { RestoredConditionValue, SignificanceSource } from '../../types';
 import type { ConditionItemValueView } from './ConditionItemValueView';
 import type { FrequencyCountValueView } from './FrequencyCountValueView';
-import type { PredictionValueView } from './ConditionVariantEffectPredictionSearch/PredictionValueView';
+import type { PredictionValueView } from './ConditionDeleteriousnessPredictionSearch/PredictionValueView';
 
 /**
  * URLから復元した条件値を values-container へ注入するクラス。

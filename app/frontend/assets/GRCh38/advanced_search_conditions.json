@@ -1481,11 +1481,7 @@
         {
           "id": "group:intergenic_variant",
           "label": "Intergenic variant",
-          "children": [
-            "SO_0001632",
-            "SO_0001628",
-            "SO_0001631"
-          ]
+          "children": ["SO_0001632", "SO_0001628", "SO_0001631"]
         },
         {
           "id": "SO_0001632",
@@ -1515,6 +1511,10 @@
           "description": "A non exact copy of a sequence_feature or genome exhibiting one or more sequence_alteration"
         }
       ]
+    },
+    "deleteriousness_prediction": {
+      "label": "Deleteriousness prediction",
+      "type": "peculiar"
     },
     "disease": {
       "label": "Disease",
@@ -2387,10 +2387,6 @@
           "label": "Ambiguous"
         }
       ]
-    },
-    "variant_effect_prediction": {
-      "label": "Variant effect prediction",
-      "type": "peculiar"
     },
     "id": {
       "label": "Variant ID",

@@ -24,7 +24,7 @@ const BUILDERS: BuilderMap = {
   [ADVANCED_CONDITION_TYPE.gene_symbol]: buildGeneQuery,
   [ADVANCED_CONDITION_TYPE.genotype]: buildDatasetQuery,
   [ADVANCED_CONDITION_TYPE.location]: buildLocationQuery,
-  [ADVANCED_CONDITION_TYPE.variant_effect_prediction]: buildVariantEffectPredictionQuery,
+  [ADVANCED_CONDITION_TYPE.deleteriousness_prediction]: buildVariantEffectPredictionQuery,
   [ADVANCED_CONDITION_TYPE.variant_id]: buildVariantIdQuery,
 };
 
