@@ -89,6 +89,9 @@
 
       // ClinVar の各解釈種別を grid-area で列・行に固定配置する
       &[data-source='clinvar'] {
+        &[data-value='P'] {
+          grid-area: 1 / 1;
+        }
         &[data-value='LP'] {
           grid-area: 2 / 1;
         }
@@ -110,41 +113,53 @@
         &[data-value='US'] {
           grid-area: 8 / 1;
         }
-        &[data-value='LB'] {
+        &[data-value='VH'] {
           grid-area: 1 / 2;
         }
-        &[data-value='B'] {
+        &[data-value='VM'] {
           grid-area: 2 / 2;
         }
-        &[data-value='CC'] {
+        &[data-value='VL'] {
           grid-area: 3 / 2;
         }
-        &[data-value='DR'] {
+        &[data-value='LB'] {
           grid-area: 4 / 2;
         }
-        &[data-value='CS'] {
+        &[data-value='B'] {
           grid-area: 5 / 2;
         }
-        &[data-value='RF'] {
+        &[data-value='CC'] {
           grid-area: 6 / 2;
         }
-        &[data-value='A'] {
+        &[data-value='DR'] {
           grid-area: 7 / 2;
         }
-        &[data-value='PR'] {
+        &[data-value='CS'] {
           grid-area: 8 / 2;
         }
-        &[data-value='AF'] {
+        &[data-value='RF'] {
           grid-area: 1 / 3;
         }
-        &[data-value='O'] {
+        &[data-value='A'] {
           grid-area: 2 / 3;
         }
-        &[data-value='NP'] {
+        &[data-value='PR'] {
           grid-area: 3 / 3;
         }
-        &[data-value='AN'] {
+        &[data-value='AF'] {
           grid-area: 4 / 3;
+        }
+        &[data-value='O'] {
+          grid-area: 5 / 3;
+        }
+        &[data-value='NP'] {
+          grid-area: 6 / 3;
+        }
+        &[data-value='NC'] {
+          grid-area: 7 / 3;
+        }
+        &[data-value='AN'] {
+          grid-area: 8 / 3;
         }
       }
 
@@ -196,13 +211,13 @@ condition-disease-search {
 }
 
 // =============================================================================
-// バリアント効果予測条件 (.variant-effect-prediction-editor-view)
+// 有害性予測条件 (.deleteriousness-prediction-editor-view)
 // CADD / AlphaMissense / SIFT / PolyPhen などの予測ツール別タブで閾値を選択させるパネル
 // タブ UI のスタイルは Shadow DOM 内で完結するため tab-view.scss で管理する
 // =============================================================================
 
-.variant-effect-prediction-editor-view {
-  &[data-condition-type='variant_effect_prediction'].editor-panel {
+.deleteriousness-prediction-editor-view {
+  &[data-condition-type='deleteriousness_prediction'].editor-panel {
     > .section-content {
       // prediction-value-view の描画領域を確保するため下パディングが必要
       padding: 0 0 75px 0;

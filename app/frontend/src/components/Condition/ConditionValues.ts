@@ -11,7 +11,7 @@ import { ConditionValueEditorDisease } from './ConditionValueEditor/ConditionVal
 import { ConditionValueEditorFrequencyCount } from './ConditionValueEditor/ConditionValueEditorFrequencyCount';
 import { ConditionValueEditorGene } from './ConditionValueEditor/ConditionValueEditorGene';
 import { ConditionValueEditorLocation } from './ConditionValueEditor/ConditionValueEditorLocation';
-import { ConditionValueEditorVariantEffectPrediction } from './ConditionValueEditor/ConditionValueEditorVariantEffectPrediction';
+import { ConditionValueEditorDeleteriousnessPrediction } from './ConditionValueEditor/ConditionValueEditorDeleteriousnessPrediction';
 import { ConditionValueEditorVariantID } from './ConditionValueEditor/ConditionValueEditorVariantID';
 import type { ConditionItemView } from './ConditionItemView';
 import type { ConditionValueEditor, EditorCtor } from '../../types';
@@ -39,8 +39,8 @@ const EDITOR_REGISTRY: Readonly<
   ],
   [ADVANCED_CONDITION_TYPE.disease]: [ConditionValueEditorDisease],
   [ADVANCED_CONDITION_TYPE.gene_symbol]: [ConditionValueEditorGene],
-  [ADVANCED_CONDITION_TYPE.variant_effect_prediction]: [
-    ConditionValueEditorVariantEffectPrediction,
+  [ADVANCED_CONDITION_TYPE.deleteriousness_prediction]: [
+    ConditionValueEditorDeleteriousnessPrediction,
   ],
   [ADVANCED_CONDITION_TYPE.variant_id]: [ConditionValueEditorVariantID],
   [ADVANCED_CONDITION_TYPE.location]: [ConditionValueEditorLocation],

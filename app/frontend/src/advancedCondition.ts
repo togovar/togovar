@@ -13,7 +13,7 @@ export const ADVANCED_CONDITION_TYPE = {
   genotype: 'genotype',
   clinical_significance: 'significance',
   sscv_db: 'sscv_db',
-  variant_effect_prediction: 'variant_effect_prediction',
+  deleteriousness_prediction: 'deleteriousness_prediction',
   gene_symbol: 'gene',
   disease: 'disease',
 } as const;
@@ -47,14 +47,14 @@ const NO_RELATION_BY_REF = {
   GRCh37: {
     dataset: true,
     genotype: true,
-    variant_effect_prediction: true,
+    deleteriousness_prediction: true,
     id: true,
     location: true,
   },
   GRCh38: {
     dataset: true,
     genotype: true,
-    variant_effect_prediction: true,
+    deleteriousness_prediction: true,
     id: true,
     location: true,
   },
@@ -108,7 +108,6 @@ export const FREQUENCY_DATASETS = [
   'gnomad_exomes',
   'jogo',
   'tommo_jsv1',
-  'gnomad_sv',
 ] as const;
 
 /** Advanced Search の dataset.name を任意文字列にしないため、FREQUENCY_DATASETS からunion型を作る。 */
