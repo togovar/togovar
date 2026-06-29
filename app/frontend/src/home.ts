@@ -245,7 +245,7 @@ function initSidebar(): void {
   );
   if (TOGOVAR_FRONTEND_REFERENCE === 'GRCh38') {
     new PanelViewCheckList(
-      selectRequired<HTMLElement>(document, '#FilterSplicingVariant'),
+      selectRequired<HTMLElement>(document, '#FilterSpliceSiteCreation'),
       'splicingvariant'
     );
   }

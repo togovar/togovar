@@ -44,8 +44,8 @@ export const COLUMNS = [
   { label: 'SIFT', id: 'sift', defaultWidth: 62, resizable: false },
   { label: 'PolyPhen', id: 'polyphen', defaultWidth: 85, resizable: false },
   {
-    label: 'Splicing variant (SSCV DB)',
-    id: 'splicingvariant',
+    label: 'Splice-site creation',
+    id: 'splice-site-creation',
     defaultWidth: 140,
   },
 ];

@@ -2,6 +2,7 @@ import { storeManager } from '../store/StoreManager';
 import { SEARCH_RESULT_LIMIT } from './searchRequest';
 
 type ActiveSearchMode = 'simple' | 'advanced' | null;
+export type SearchOrigin = 'user' | 'history' | 'system' | 'pagination';
 
 type SearchExecutionPreparation =
   | {
@@ -18,6 +19,7 @@ type SearchExecutionPreparation =
 type SearchExecutionState = {
   abortController: AbortController | null;
   searchMode: ActiveSearchMode;
+  searchOrigin: SearchOrigin;
   executionId: number;
   isSearchRequestInProgress: boolean;
   requestedRanges: Set<string>;
@@ -26,6 +28,7 @@ type SearchExecutionState = {
 const searchExecutionState: SearchExecutionState = {
   abortController: null,
   searchMode: null,
+  searchOrigin: 'system',
   executionId: 0,
   isSearchRequestInProgress: false,
   requestedRanges: new Set<string>(),
@@ -36,33 +39,35 @@ const searchExecutionState: SearchExecutionState = {
  */
 export function prepareSearchExecution(
   offset: number,
-  requestedFirstTime: boolean
+  isInitialSearchRequested: boolean,
+  searchOrigin: SearchOrigin
 ): SearchExecutionPreparation {
-  if (searchExecutionState.isSearchRequestInProgress && !requestedFirstTime) {
-    return { shouldExecute: false, isFirstTime: requestedFirstTime };
+  if (searchExecutionState.isSearchRequestInProgress && !isInitialSearchRequested) {
+    return { shouldExecute: false, isFirstTime: isInitialSearchRequested };
   }
 
-  let isFirstTime = requestedFirstTime;
+  let shouldResetForInitialSearch = isInitialSearchRequested;
   const newSearchMode = storeManager.getData('searchMode');
 
   abortCurrentSearchRequest();
 
   if (hasSearchModeChanged(newSearchMode)) {
-    isFirstTime = true;
+    shouldResetForInitialSearch = true;
     clearSearchRequestRanges();
   } else if (isSimpleSearchRangeAlreadyRequested(offset, newSearchMode)) {
-    return { shouldExecute: false, isFirstTime };
+    return { shouldExecute: false, isFirstTime: shouldResetForInitialSearch };
   } else {
     registerSimpleSearchRange(offset, newSearchMode);
   }
 
   searchExecutionState.searchMode = newSearchMode || null;
+  searchExecutionState.searchOrigin = searchOrigin;
   searchExecutionState.abortController = new AbortController();
   searchExecutionState.executionId += 1;
 
   return {
     shouldExecute: true,
-    isFirstTime,
+    isFirstTime: shouldResetForInitialSearch,
     signal: searchExecutionState.abortController.signal,
     executionId: searchExecutionState.executionId,
   };
@@ -73,6 +78,22 @@ export function prepareSearchExecution(
  */
 export function getCurrentSearchMode(): ActiveSearchMode {
   return searchExecutionState.searchMode;
+}
+
+/**
+ * 1件自動遷移をユーザー操作の検索だけに限定するため、現在の検索発火元を公開する。
+ */
+export function getCurrentSearchOrigin(): SearchOrigin {
+  return searchExecutionState.searchOrigin;
+}
+
+/**
+ * debounceで検索開始が遅れる間も、履歴操作のレスポンス自動遷移を先に止めるため発火元だけ更新する。
+ */
+export function markSearchOriginBeforeDebounce(
+  searchOrigin: SearchOrigin
+): void {
+  searchExecutionState.searchOrigin = searchOrigin;
 }
 
 /**

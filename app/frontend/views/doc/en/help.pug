@@ -235,16 +235,16 @@ block content
                 |
                 | are displayed.
           #d7.question-answer
-            h4.question What are CADD, AlphaMissense, SIFT and PolyPhen?
+            h4.question What are CADD, AlphaMissense, SIFT, and PolyPhen?
             .answer
               p
-                | The following scores are used to predict the potential impact of variants and are calculated using
+                | The following scores are used to predict the potential impact of variants and were annotated using
                 |
                 a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html')
                   | Variant Effect Predictor (VEP)
-                | . CADD scores the deleteriousness of any type of variant, while AlphaMissense, SIFT and PolyPhen
-                | specifically predict the impact on protein function when an amino acid sequence is altered.
-                | The icons below represent the threshold scores used for qualitative predictions.
+                | . CADD scores the deleteriousness of a wide range of variants, while AlphaMissense, SIFT, and PolyPhen
+                | specifically predict the impact of amino acid substitutions on protein function.
+                | The icons below indicate the score thresholds used for qualitative predictions.
               ul.unordered-list._margin-bottom._align-left
                 li
                   strong CADD (PHRED score)
@@ -257,9 +257,9 @@ block content
                     .variant-effect-prediction-badge._width_5em._align-center(data-function='T') &lt; 10
                   span
                     | CADD (Combined Annotation Dependent Depletion) integrates diverse genomic annotations to score
-                    | the deleteriousness of any type of variant. Unlike the other tools listed here, CADD is not limited
-                    | to missense variants. PHRED-scaled scores &ge; 20 indicate the top 1% and scores &ge; 10 indicate
-                    | the top 10% of deleterious variants genome-wide. See
+                    | the deleteriousness of a wide range of variants. Unlike the other tools listed here, CADD is not limited
+                    | to missense variants. PHRED-scaled scores &ge; 10 and &ge; 20 correspond approximately to the top 10%
+                    | and top 1% of variants ranked by predicted deleteriousness across the genome, respectively. See
                     |
                   a.hyper-text.-external(target='_blank', href='https://cadd.gs.washington.edu/info') CADD
                   |
@@ -412,13 +412,6 @@ block content
                   frequency-block-view(data-dataset="jga_snp" data-frequency="≥0.5")
                   | &nbsp; JGA-SNP
                   br
-                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    frequency-block-view(data-dataset="bbj1k" data-frequency="≥0.5")
-                    | &nbsp; BBJ1K
-                    br
-                    frequency-block-view(data-dataset="bbj2k" data-frequency="≥0.5")
-                    | &nbsp; BBJ2K
-                    br
                   frequency-block-view(data-dataset="tommo" data-frequency="≥0.5")
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
                     | &nbsp; ToMMo 8.3KJPN
@@ -432,6 +425,12 @@ block content
                     frequency-block-view(data-dataset="ncbn" data-frequency="≥0.5")
                     | &nbsp; NCBN
                     br
+                    frequency-block-view(data-dataset="bbj1k" data-frequency="≥0.5")
+                    | &nbsp; BBJ1K
+                    br
+                    frequency-block-view(data-dataset="bbj2k" data-frequency="≥0.5")
+                    | &nbsp; BBJ2K
+                    br
                     frequency-block-view(data-dataset="jogo" data-frequency="≥0.5")
                     | &nbsp; JoGo
                     br
@@ -444,10 +443,6 @@ block content
                   br
                   frequency-block-view(data-dataset="gnomad_exomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD exomes
-                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    br
-                    frequency-block-view(data-dataset="gnomad_sv" data-frequency="≥0.5")
-                    | &nbsp; gnomAD SV
 
           #s2.question-answer._column-span-all
             h4.question

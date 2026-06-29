@@ -95,7 +95,7 @@ const UNASSIGNED_VALUE: Partial<Record<CheckListKind, string>> = {
 
 /**
  * チェックリスト形式のフィルターパネル。
- * Dataset / Variant type / Clinical significance / CADD / SIFT / PolyPhen / AlphaMissense / Splicing variant で使用される。
+ * Dataset / Variant type / Clinical significance / CADD / SIFT / PolyPhen / AlphaMissense / Splice-site creation で使用される。
  */
 export default class PanelViewCheckList extends PanelView {
   /** key: チェックボックスの value 属性 → { input要素, 件数表示span } */
@@ -103,7 +103,7 @@ export default class PanelViewCheckList extends PanelView {
 
   /**
    * @param elm - パネルのルート要素
-   * @param kind - パネル種別ID (dataset | type | significance | cadd | sift | polyphen | alphamissense | splicingvariant)
+   * @param kind - パネル種別ID (dataset | type | significance | cadd | sift | polyphen | alphamissense | splicingvariant ※APIキー)
    * @param statisticsType - 統計情報のストアキー (省略時は統計表示なし)
    */
   constructor(
@@ -125,7 +125,6 @@ export default class PanelViewCheckList extends PanelView {
 
     this.buildChecklist(conditionMaster);
     this.initCheckboxEntries();
-    this.applyFilter();
     this.bindEvents();
     this.subscribeStore(statisticsType);
   }

@@ -39,20 +39,6 @@
         "has_freq": true
       },
       {
-        "id": "bbj1k",
-        "label": "BBJ1K",
-        "type": "boolean",
-        "default": "1",
-        "has_freq": true
-      },
-      {
-        "id": "bbj2k",
-        "label": "BBJ2K",
-        "type": "boolean",
-        "default": "1",
-        "has_freq": true
-      },
-      {
         "id": "tommo",
         "label": "ToMMo 54KJPN",
         "type": "boolean",
@@ -74,6 +60,20 @@
         "has_freq": true
       },
       {
+        "id": "bbj1k",
+        "label": "BBJ1K",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
+        "id": "bbj2k",
+        "label": "BBJ2K",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
         "id": "jogo",
         "label": "JoGo",
         "type": "boolean",
@@ -90,13 +90,6 @@
       {
         "id": "gnomad_exomes",
         "label": "gnomAD exomes",
-        "type": "boolean",
-        "default": "1",
-        "has_freq": true
-      },
-      {
-        "id": "gnomad_sv",
-        "label": "gnomAD SV",
         "type": "boolean",
         "default": "1",
         "has_freq": true
@@ -270,6 +263,24 @@
         "default": "1"
       },
       {
+        "id": "VH",
+        "label": "VUS-high",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "VM",
+        "label": "VUS-mid",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "VL",
+        "label": "VUS-low",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
         "id": "LB",
         "label": "Likely benign",
         "type": "boolean",
@@ -336,32 +347,14 @@
         "default": "1"
       },
       {
-        "id": "AN",
-        "label": "Association not found",
-        "type": "boolean",
-        "default": "1"
-      },
-      {
         "id": "NC",
         "label": "No classification",
         "type": "boolean",
         "default": "1"
       },
       {
-        "id": "VH",
-        "label": "VUS-high",
-        "type": "boolean",
-        "default": "1"
-      },
-      {
-        "id": "VM",
-        "label": "VUS-mid",
-        "type": "boolean",
-        "default": "1"
-      },
-      {
-        "id": "VL",
-        "label": "VUS-low",
+        "id": "AN",
+        "label": "Association not found",
         "type": "boolean",
         "default": "1"
       }
@@ -859,7 +852,7 @@
   },
   {
     "id": "splicingvariant",
-    "label": "Splicing variant (SSCV DB)",
+    "label": "Splice-site creation",
     "type": "array",
     "items": [
       {

@@ -1,4 +1,9 @@
 import { executeSearch } from '../api/searchExecutor';
+import { clearSingleVariantRedirectCandidates } from '../api/searchResponse';
+import {
+  markSearchOriginBeforeDebounce,
+  type SearchOrigin,
+} from '../api/searchExecutionState';
 import { storeManager } from './StoreManager';
 import type {
   MasterConditions,
@@ -17,18 +22,25 @@ import {
   reflectSimpleSearchConditionToURI,
 } from './searchURL';
 
-// Simple Search ----------------------------------------
-/** Advanced Search中の表示用統計パネルからSimple条件が誤更新されないよう、入口を共通化する。 */
+// ================================================================
+// Simple Search 条件更新
+// ================================================================
+
+/**
+ * Simple Search中のユーザー操作だけを検索条件更新として扱うため、公開入口を1つに絞る。
+ */
 export function setSimpleSearchCondition<
   K extends keyof SimpleSearchCurrentConditions,
->(conditionKey: K, conditionValue: SimpleSearchCurrentConditions[K]) {
-  setSimpleSearchConditions({ [conditionKey]: conditionValue });
+>(conditionKey: K, conditionValue: SimpleSearchCurrentConditions[K]): void {
+  applySimpleSearchConditionPatch({ [conditionKey]: conditionValue });
 }
 
-/** Simple Searchの操作だけが条件更新と検索開始へ進むよう、モード境界をここで保証する。 */
-function setSimpleSearchConditions(
+/**
+ * Simple Search以外の画面から誤って検索が走らないよう、モード確認後に条件・URL・検索をまとめて更新する。
+ */
+function applySimpleSearchConditionPatch(
   newSearchConditions: Partial<SimpleSearchCurrentConditions>
-) {
+): void {
   if (storeManager.getData('searchMode') !== 'simple') return;
 
   const updatedConditions = {
@@ -42,24 +54,40 @@ function setSimpleSearchConditions(
     storeManager.getData('simpleSearchConditionsMaster')
   );
 
-  requestInitialSearch();
+  requestInitialSearch('user');
 }
 
-/** 指定された検索条件キーに対応する現在の検索条件を取得する */
-export function getSimpleSearchCondition(key: MasterConditionId) {
+/**
+ * UI部品がStore全体を意識せず現在値だけ読めるよう、条件キー単位の取得に閉じ込める。
+ */
+export function getSimpleSearchCondition(key: MasterConditionId): unknown {
   return (
     storeManager.getData('simpleSearchConditions') as Record<string, unknown>
   )?.[key];
 }
 
-/** 指定された検索条件キーに対応するマスター検索条件を取得する */
-export function getSimpleSearchConditionMaster(key: MasterConditionId) {
+/**
+ * 表示やフィルター変換がマスター配列の探索方法へ依存しないよう、条件定義の取得をここに集約する。
+ */
+export function getSimpleSearchConditionMaster(
+  key: MasterConditionId
+): MasterConditions | undefined {
   return storeManager
     .getData('simpleSearchConditionsMaster')
     .find((condition: MasterConditions) => condition.id === key);
 }
 
-export function resetSimpleSearchConditions() {
+/**
+ * 検索語は残してフィルターだけ初期化するため、マスター定義から条件型ごとのリセット値を作る。
+ */
+export function resetSimpleSearchConditions(): void {
+  applySimpleSearchConditionPatch(createSimpleSearchResetConditions());
+}
+
+/**
+ * リセット時の値生成を分離し、boolean/string/array条件の初期化規則を読みやすく保つ。
+ */
+function createSimpleSearchResetConditions(): Partial<SimpleSearchCurrentConditions> {
   const simpleSearchConditionsMaster = storeManager.getData(
     'simpleSearchConditionsMaster'
   );
@@ -81,78 +109,110 @@ export function resetSimpleSearchConditions() {
         break;
     }
   }
-  setSimpleSearchConditions(resetConditions);
+  return resetConditions;
 }
 
-/** ブラウザの「戻る」「進む」ボタンが押されたときに検索条件を更新 */
-export function handleHistoryChange(e: PopStateEvent) {
+// ================================================================
+// ブラウザ履歴からの復元
+// ================================================================
+
+/**
+ * ブラウザの戻る/進むではURLを正本として復元し、自動遷移は必ず無効化する。
+ */
+export function handleHistoryChange(e: PopStateEvent): void {
+  prepareHistoryNavigationSearch();
+
   const urlParams = parseSearchURLParams();
   const mode = urlParams.mode as string | undefined;
   const currentMode = storeManager.getData('searchMode');
 
   if (mode === 'advanced') {
-    // Advanced Searchの戻る/進むでURLのqパラメータを再デコードしてストアへ反映する。
-    // initializeApp()は初回ロード時にしか呼ばれないため、popstate時にこちらで再デコードする。
-    // URL長制限超過で q が省略された履歴エントリに戻った場合は event.state から復元する。
-    const condition = getAdvancedConditionFromHistory(urlParams, e.state);
-    storeManager.setData('advancedSearchConditions', condition ?? undefined);
-    triggerAdvancedSearchRestore();
-
-    if (currentMode === 'advanced') {
-      // 同一モード内の移動: searchModeサブスクライバは発火しないため直接検索を実行する。
-      requestInitialSearch();
-    } else {
-      // モード切替: setSearchModeFromHistoryでreflect*ToURIをスキップしながらモードを切替える。
-      storeManager.setSearchModeFromHistory('advanced');
-    }
-  } else {
-    // URLを正本としてSimple Search条件を丸ごと構築し直す。
-    // urlParamsにはmode等の非条件キーが含まれるため、マスターに存在するキーのみを適用する。
-    // URLにない条件はマスターのデフォルト値に戻すことで、履歴移動後に古い条件が残るのを防ぐ。
-    const fullConditions = buildSimpleConditionsFromURL(
-      urlParams,
-      storeManager.getData('simpleSearchConditionsMaster') ?? []
-    );
-    storeManager.setData('simpleSearchConditions', fullConditions);
-
-    if (currentMode === 'simple') {
-      // 同一モード内の移動: searchModeサブスクライバは発火しないため直接検索を実行する。
-      requestInitialSearch();
-    } else {
-      // モード切替: setSearchModeFromHistoryでreflect*ToURIをスキップしながらモードを切替える。
-      storeManager.setSearchModeFromHistory('simple');
-    }
+    restoreAdvancedSearchFromHistory(urlParams, e.state, currentMode);
+    return;
   }
+
+  restoreSimpleSearchFromHistory(urlParams, currentMode);
 }
 
-/** AdvancedSearch検索条件を設定し、必要に応じて検索を実行 */
+/**
+ * Advanced Searchの履歴復元ではURL長制限時のhistory.state退避も読む必要があるため、専用手順に分ける。
+ */
+function restoreAdvancedSearchFromHistory(
+  urlParams: Record<string, unknown>,
+  historyState: unknown,
+  currentMode: SearchMode | ''
+): void {
+  const restoredCondition = getAdvancedConditionFromHistory(
+    urlParams,
+    historyState
+  );
+  storeManager.setData('advancedSearchConditions', restoredCondition ?? undefined);
+  notifyAdvancedSearchBuilderRestored();
+  continueHistorySearchInMode('advanced', currentMode);
+}
+
+/**
+ * Simple Searchの履歴復元ではURLにない条件をデフォルトへ戻し、前の絞り込み残りを防ぐ。
+ */
+function restoreSimpleSearchFromHistory(
+  urlParams: Record<string, unknown>,
+  currentMode: SearchMode | ''
+): void {
+  const restoredConditions = buildSimpleConditionsFromURL(
+    urlParams,
+    storeManager.getData('simpleSearchConditionsMaster') ?? []
+  );
+  storeManager.setData('simpleSearchConditions', restoredConditions);
+  continueHistorySearchInMode('simple', currentMode);
+}
+
+/**
+ * 同一モードではsubscriberが発火しないため直接検索し、モード切替ではStoreManagerの履歴専用APIに任せる。
+ */
+function continueHistorySearchInMode(
+  restoredMode: SearchMode,
+  currentMode: SearchMode | ''
+): void {
+  if (currentMode === restoredMode) {
+    requestInitialSearch('history');
+    return;
+  }
+
+  storeManager.setSearchModeFromHistory(restoredMode);
+}
+
+// ================================================================
+// Advanced Search 条件更新
+// ================================================================
+
+/**
+ * Advanced Searchの空条件はundefinedへ正規化し、Store/API/URLの「条件なし」表現を揃える。
+ */
 export function setAdvancedSearchCondition(
   newSearchConditions: ConditionQuery
-) {
+): void {
   const normalizedConditions =
     Object.keys(newSearchConditions).length === 0 ? undefined : newSearchConditions;
   storeManager.setData('advancedSearchConditions', normalizedConditions);
 
-  updateAdvancedURLState();
+  reflectCurrentAdvancedConditionToUrl();
 
-  requestInitialSearch();
+  requestInitialSearch('user');
 }
 
 /**
- * URL長制限の判定結果だけStoreへ戻し、URL生成自体はsearchURL.tsへ委譲する。
- * reflectAdvancedSearchConditionToURI (searchURL.ts) と同名衝突を避けるため別名にしている。
+ * URL生成はsearchURL.tsへ委譲し、Advanced Search画面が必要とするURL長制限フラグだけStoreへ戻す。
  */
-function updateAdvancedURLState() {
+function reflectCurrentAdvancedConditionToUrl(): void {
   const conditions = storeManager.getData('advancedSearchConditions');
   const { isURLTooLong } = reflectAdvancedSearchConditionToURI(conditions);
   storeManager.setData('advancedSearchURLTooLong', isURLTooLong);
 }
 
 /**
- * false→trueのトグル理由を名前で表し、URL復元後にBuilder再構築が必要な意図を隠さないようにする。
+ * URL復元後は同じtrue値でもBuilder再構築が必要なため、false→trueのトグルで通知する。
  */
-function triggerAdvancedSearchRestore(): void {
-  // モード切替でBuilderがすでにロード済みの場合も再構築が必要なため、毎回トグルで通知する。
+function notifyAdvancedSearchBuilderRestored(): void {
   storeManager.setData('advancedSearchRestoredFromURL', false);
   storeManager.setData('advancedSearchRestoredFromURL', true);
 }
@@ -162,36 +222,53 @@ function triggerAdvancedSearchRestore(): void {
 // ================================================================
 
 /**
- * searchMode 変化時に DOM・URL・API の副作用を実行する subscriber。
- * Store内部の状態リセットは publish 前に実行されるため、
- * この関数はリセット後の状態を前提に動作する。
- * storeManager.fromHistory が true のとき（popstate経由）は URL 更新をスキップする。
+ * searchMode変更時の副作用をここに集め、StoreManager本体がURL/API層を直接知らずに済むようにする。
  */
 function handleSearchModeChange(mode: SearchMode | ''): void {
   if (!mode) return;
 
-  if (typeof document !== 'undefined') {
-    document.body.dataset.searchMode = mode;
-  }
+  reflectSearchModeToBodyDataset(mode);
 
   switch (mode) {
     case 'simple':
-      // popstate経由のときはURLがすでに確定済みのためpushStateしない
-      if (!storeManager.fromHistory) {
-        reflectSimpleSearchConditionToURI(
-          storeManager.getData('simpleSearchConditions'),
-          storeManager.getData('simpleSearchConditionsMaster')
-        );
-      }
-      // パネルUIをモード切替後の条件で再描画させるために強制 publish する
-      storeManager.publish('simpleSearchConditions');
+      handleSimpleModeSelected();
       break;
     case 'advanced':
-      if (!storeManager.fromHistory) updateAdvancedURLState();
+      handleAdvancedModeSelected();
       break;
   }
 
-  requestInitialSearch();
+  requestInitialSearch(storeManager.fromHistory ? 'history' : 'system');
+}
+
+/**
+ * CSSや表示切替がStoreを読まずに済むよう、現在モードをbodyのdata属性へ反映する。
+ */
+function reflectSearchModeToBodyDataset(mode: SearchMode): void {
+  if (typeof document === 'undefined') return;
+  document.body.dataset.searchMode = mode;
+}
+
+/**
+ * Simple Searchへ切り替える時はURL反映と条件UIの再描画通知を同じ順序で行う。
+ */
+function handleSimpleModeSelected(): void {
+  if (!storeManager.fromHistory) {
+    reflectSimpleSearchConditionToURI(
+      storeManager.getData('simpleSearchConditions'),
+      storeManager.getData('simpleSearchConditionsMaster')
+    );
+  }
+
+  storeManager.publish('simpleSearchConditions');
+}
+
+/**
+ * Advanced Searchへ切り替える時は履歴復元中のpushStateを避け、それ以外はURL共有状態を更新する。
+ */
+function handleAdvancedModeSelected(): void {
+  if (storeManager.fromHistory) return;
+  reflectCurrentAdvancedConditionToUrl();
 }
 
 /**
@@ -199,26 +276,54 @@ function handleSearchModeChange(mode: SearchMode | ''): void {
  * Store は API を直接呼ばない設計のため、fetch のトリガーはここに集約する。
  */
 export function requestNextPage(recordIndex: number): void {
-  executeSearch(recordIndex);
+  executeSearch(recordIndex, false, 'pagination');
 }
 
 /**
- * 条件変更や履歴復元では先頭ページから取り直すため、全体loadingと初回検索を必ずセットで開始する。
+ * 条件変更や履歴復元では先頭ページから取り直すため、loading表示と初回検索を同じ入口で開始する。
  */
-function requestInitialSearch(): void {
+function requestInitialSearch(searchOrigin: SearchOrigin): void {
+  prepareSearchOriginBeforeDebouncedRequest(searchOrigin);
   storeManager.setData('appLoadingStatus', 'searching');
-  executeSearch(0, true);
+  executeSearch(0, true, searchOrigin);
 }
 
 /**
- * searchMode subscriber と popstate リスナーを登録する初期化関数。
- * initializeApp() の冒頭で一度だけ呼ぶこと。
- * StoreManager のコンストラクタから searchManager への循環インポートを
- * 断ち切るために、明示的な呼び出し方式にしている。
+ * debounce中の古いレスポンスも正しい起点で判定できるよう、検索開始前に発火元を先に共有する。
+ */
+function prepareSearchOriginBeforeDebouncedRequest(
+  searchOrigin: SearchOrigin
+): void {
+  markSearchOriginBeforeDebounce(searchOrigin);
+  if (searchOrigin === 'history') {
+    prepareHistoryNavigationSearch();
+  }
+}
+
+/**
+ * ブラウザ操作では前回の1件検索候補を再利用しないよう、履歴由来の状態へ切り替えて保留検索も止める。
+ */
+function prepareHistoryNavigationSearch(): void {
+  markSearchOriginBeforeDebounce('history');
+  executeSearch.cancel();
+  clearSingleVariantRedirectCandidates();
+}
+
+/**
+ * bfcacheから戻った検索画面ではpopstateを通らない場合があるため、pageshowで履歴由来に切り替える。
+ */
+function handlePageShow(event: PageTransitionEvent): void {
+  if (!event.persisted) return;
+  prepareHistoryNavigationSearch();
+}
+
+/**
+ * StoreManagerからの循環importを避けるため、initializeApp()から明示的に副作用ハンドラを登録する。
  */
 export function initSearchHandlers(): void {
   storeManager.subscribe('searchMode', handleSearchModeChange);
   if (typeof window !== 'undefined' && window.addEventListener) {
     window.addEventListener('popstate', handleHistoryChange);
+    window.addEventListener('pageshow', handlePageShow);
   }
 }

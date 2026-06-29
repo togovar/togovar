@@ -27,7 +27,7 @@ export function watchSearchRequestCompletion(
   requests: SearchRequest[],
   executionId: number
 ): void {
-  const requestGroups = classifySearchRequests(requests);
+  const requestGroups = splitSearchRequestsByResponseType(requests);
   watchSearchDataCompletion(requestGroups.dataRequests, executionId);
   watchAllSearchRequestsCompletion(requestGroups.allRequests, executionId);
 }
@@ -48,9 +48,9 @@ function watchSearchDataCompletion(
   dataRequests: Promise<void>[],
   executionId: number
 ): void {
-  watchSettledPromises(dataRequests, (results) => {
+  onRequestsSettled(dataRequests, (results) => {
     if (!isCurrentSearchExecution(executionId)) return;
-    if (hasOnlyAbortFailures(results)) return;
+    if (isOnlyAbortFailure(results)) return;
     finishSearchDataLoading();
   });
 }
@@ -62,7 +62,7 @@ function watchAllSearchRequestsCompletion(
   requests: Promise<void>[],
   executionId: number
 ): void {
-  watchSettledPromises(requests, (results) => {
+  onRequestsSettled(requests, (results) => {
     if (!isCurrentSearchExecution(executionId)) return;
 
     const failedResult = getFirstNonAbortFailure(results);
@@ -105,7 +105,7 @@ function finalizeSearchFailure(error: unknown): void {
 /**
  * data系と全体完了系で同じPromise配列の待機方法を共有し、Abortや失敗の判定基準を揃える。
  */
-function watchSettledPromises(
+function onRequestsSettled(
   requests: Promise<void>[],
   onSettled: (results: PromiseSettledResult<void>[]) => void
 ): void {
@@ -115,7 +115,7 @@ function watchSettledPromises(
 /**
  * data取得完了監視ではAbortだけの失敗を次検索への切替とみなし、旧検索側でloadingを触らない。
  */
-function hasOnlyAbortFailures(
+function isOnlyAbortFailure(
   results: PromiseSettledResult<void>[]
 ): boolean {
   return (
@@ -145,7 +145,7 @@ function getFirstNonAbortFailure(
 /**
  * data系と全体完了系で同じ抽出ロジックを使い、endpoint判定の責務を呼び出し側へ漏らさない。
  */
-function classifySearchRequests(requests: SearchRequest[]): {
+function splitSearchRequestsByResponseType(requests: SearchRequest[]): {
   dataRequests: Promise<void>[];
   allRequests: Promise<void>[];
 } {

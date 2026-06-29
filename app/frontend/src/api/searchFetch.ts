@@ -11,7 +11,7 @@ export async function fetchSearchJSON(
   try {
     const response = await fetch(endpoint, options);
     if (!response.ok) {
-      throw new Error(getSearchHTTPErrorMessage(response.status));
+      throw new Error(toSearchErrorCode(response.status));
     }
     return response.json();
   } catch (error) {
@@ -25,13 +25,13 @@ export async function fetchSearchJSON(
 /**
  * HTTPステータスを既存UIが扱っている検索エラーコードへ変換する。
  */
-function getSearchHTTPErrorMessage(statusCode: number): string {
-  const errorTypes: Record<number, string> = {
+function toSearchErrorCode(statusCode: number): string {
+  const errorCodeByStatus: Record<number, string> = {
     400: 'INVALID_REQUEST',
     401: 'UNAUTHORIZED',
     404: 'NOT_FOUND',
     500: 'INTERNAL_SERVER_ERROR',
     502: 'BAD_GATEWAY',
   };
-  return errorTypes[statusCode] || 'UNKNOWN_ERROR';
+  return errorCodeByStatus[statusCode] || 'UNKNOWN_ERROR';
 }
