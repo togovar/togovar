@@ -996,6 +996,18 @@
             "label": "Uncertain significance"
           },
           {
+            "value": "VH",
+            "label": "VUS-high"
+          },
+          {
+            "value": "VM",
+            "label": "VUS-mid"
+          },
+          {
+            "value": "VL",
+            "label": "VUS-low"
+          },
+          {
             "value": "LB",
             "label": "Likely benign"
           },
@@ -1040,24 +1052,12 @@
             "label": "Not provided"
           },
           {
-            "value": "AN",
-            "label": "Association not found"
-          },
-          {
             "value": "NC",
             "label": "No classification"
           },
           {
-            "value": "VH",
-            "label": "VUS-high"
-          },
-          {
-            "value": "VM",
-            "label": "VUS-mid"
-          },
-          {
-            "value": "VL",
-            "label": "VUS-low"
+            "value": "AN",
+            "label": "Association not found"
           }
         ],
         "mgend": [

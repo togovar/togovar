@@ -222,6 +222,21 @@
     content: 'US';
   }
 }
+:host([data-condition-type='significance'][data-value='VH']) {
+  .inner::before {
+    content: 'VH';
+  }
+}
+:host([data-condition-type='significance'][data-value='VM']) {
+  .inner::before {
+    content: 'VM';
+  }
+}
+:host([data-condition-type='significance'][data-value='VL']) {
+  .inner::before {
+    content: 'VL';
+  }
+}
 :host([data-condition-type='significance'][data-value='LB']) {
   .inner::before {
     content: 'LB';
@@ -277,29 +292,14 @@
     content: 'NP';
   }
 }
-:host([data-condition-type='significance'][data-value='AN']) {
-  .inner::before {
-    content: 'AN';
-  }
-}
 :host([data-condition-type='significance'][data-value='NC']) {
   .inner::before {
     content: 'NC';
   }
 }
-:host([data-condition-type='significance'][data-value='VH']) {
+:host([data-condition-type='significance'][data-value='AN']) {
   .inner::before {
-    content: 'VH';
-  }
-}
-:host([data-condition-type='significance'][data-value='VM']) {
-  .inner::before {
-    content: 'VM';
-  }
-}
-:host([data-condition-type='significance'][data-value='VL']) {
-  .inner::before {
-    content: 'VL';
+    content: 'AN';
   }
 }
 
@@ -339,7 +339,10 @@
   }
 }
 
-:host([data-condition-type='significance'][data-value='US']) {
+:host([data-condition-type='significance'][data-value='US']),
+:host([data-condition-type='significance'][data-value='VH']),
+:host([data-condition-type='significance'][data-value='VM']),
+:host([data-condition-type='significance'][data-value='VL']) {
   .inner {
     background-color: var(--color-sign-unknown-light);
     border-color: var(--color-sign-unknown);
@@ -396,11 +399,8 @@
 
 :host([data-condition-type='significance'][data-value='O']),
 :host([data-condition-type='significance'][data-value='NP']),
-:host([data-condition-type='significance'][data-value='AN']),
 :host([data-condition-type='significance'][data-value='NC']),
-:host([data-condition-type='significance'][data-value='VH']),
-:host([data-condition-type='significance'][data-value='VM']),
-:host([data-condition-type='significance'][data-value='VL']) {
+:host([data-condition-type='significance'][data-value='AN']) {
   .inner {
     background-color: white;
     border-color: var(--color-gray);

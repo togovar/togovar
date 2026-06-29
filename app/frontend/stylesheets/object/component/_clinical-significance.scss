@@ -22,33 +22,73 @@
   // --- content（バッジ略称）---
 
   &[data-value='P']::before,
-  &[data-value='PLP']::before    { content: 'P';  }
+  &[data-value='PLP']::before {
+    content: 'P';
+  }
 
   &[data-value='LP']::before,
-  &[data-value='LPLP']::before   { content: 'LP'; }
+  &[data-value='LPLP']::before {
+    content: 'LP';
+  }
 
   // ERA/LRA/URA はすべて同色・同バッジ（'RA'）のためまとめる
   &[data-value='ERA']::before,
   &[data-value='LRA']::before,
-  &[data-value='URA']::before    { content: 'RA'; }
+  &[data-value='URA']::before {
+    content: 'RA';
+  }
 
-  &[data-value='US']::before  { content: 'US'; }
-  &[data-value='LB']::before  { content: 'LB'; }
-  &[data-value='B']::before   { content: 'B';  }
-  &[data-value='CC']::before  { content: 'CC'; }
-  &[data-value='DR']::before  { content: 'DR'; }
-  &[data-value='CS']::before  { content: 'CS'; }
-  &[data-value='RF']::before  { content: 'RF'; }
-  &[data-value='A']::before   { content: 'A';  }
-  &[data-value='PR']::before  { content: 'PR'; }
-  &[data-value='AF']::before  { content: 'AF'; }
-  &[data-value='O']::before   { content: 'O';  }
-  &[data-value='NP']::before  { content: 'NP'; }
-  &[data-value='AN']::before  { content: 'AN'; }
-  &[data-value='NC']::before  { content: 'NC'; }
-  &[data-value='VH']::before  { content: 'VH'; }
-  &[data-value='VM']::before  { content: 'VM'; }
-  &[data-value='VL']::before  { content: 'VL'; }
+  &[data-value='US']::before {
+    content: 'US';
+  }
+  &[data-value='VH']::before {
+    content: 'VH';
+  }
+  &[data-value='VM']::before {
+    content: 'VM';
+  }
+  &[data-value='VL']::before {
+    content: 'VL';
+  }
+  &[data-value='LB']::before {
+    content: 'LB';
+  }
+  &[data-value='B']::before {
+    content: 'B';
+  }
+  &[data-value='CC']::before {
+    content: 'CC';
+  }
+  &[data-value='DR']::before {
+    content: 'DR';
+  }
+  &[data-value='CS']::before {
+    content: 'CS';
+  }
+  &[data-value='RF']::before {
+    content: 'RF';
+  }
+  &[data-value='A']::before {
+    content: 'A';
+  }
+  &[data-value='PR']::before {
+    content: 'PR';
+  }
+  &[data-value='AF']::before {
+    content: 'AF';
+  }
+  &[data-value='O']::before {
+    content: 'O';
+  }
+  &[data-value='NP']::before {
+    content: 'NP';
+  }
+  &[data-value='NC']::before {
+    content: 'NC';
+  }
+  &[data-value='AN']::before {
+    content: 'AN';
+  }
 
   // --- color（テーマ色）---
 
@@ -74,7 +114,10 @@
     border-color: var(--color-sign-warning);
   }
 
-  &[data-value='US']::before {
+  &[data-value='US']::before,
+  &[data-value='VH']::before,
+  &[data-value='VM']::before,
+  &[data-value='VL']::before {
     color: var(--color-sign-unknown);
     background-color: var(--color-sign-unknown-light);
     border-color: var(--color-sign-unknown);
@@ -111,11 +154,8 @@
 
   &[data-value='O']::before,
   &[data-value='NP']::before,
-  &[data-value='AN']::before,
   &[data-value='NC']::before,
-  &[data-value='VH']::before,
-  &[data-value='VM']::before,
-  &[data-value='VL']::before {
+  &[data-value='AN']::before {
     color: var(--color-gray);
     background-color: white;
     border-color: var(--color-gray);

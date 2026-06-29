@@ -263,6 +263,24 @@
         "default": "1"
       },
       {
+        "id": "VH",
+        "label": "VUS-high",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "VM",
+        "label": "VUS-mid",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "VL",
+        "label": "VUS-low",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
         "id": "LB",
         "label": "Likely benign",
         "type": "boolean",
@@ -329,32 +347,14 @@
         "default": "1"
       },
       {
-        "id": "AN",
-        "label": "Association not found",
-        "type": "boolean",
-        "default": "1"
-      },
-      {
         "id": "NC",
         "label": "No classification",
         "type": "boolean",
         "default": "1"
       },
       {
-        "id": "VH",
-        "label": "VUS-high",
-        "type": "boolean",
-        "default": "1"
-      },
-      {
-        "id": "VM",
-        "label": "VUS-mid",
-        "type": "boolean",
-        "default": "1"
-      },
-      {
-        "id": "VL",
-        "label": "VUS-low",
+        "id": "AN",
+        "label": "Association not found",
         "type": "boolean",
         "default": "1"
       }
