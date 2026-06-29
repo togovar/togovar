@@ -13,8 +13,12 @@ export async function fetchLoginStatus(): Promise<void> {
       return;
     }
 
-    if (window.location.origin === 'http://localhost:8000') {
-      storeManager.setData('isLogin', false);
+    if (isLocalDevelopmentHost(window.location.hostname)) {
+      // ?auth=login でログイン時UIを確認できるようにする。
+      const localAuthPreview = new URLSearchParams(window.location.search).get(
+        'auth'
+      );
+      storeManager.setData('isLogin', localAuthPreview === 'login');
       return;
     }
 
@@ -37,12 +41,16 @@ export async function fetchLoginStatus(): Promise<void> {
       }
     }
   } catch (error) {
-    if (
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1'
-    ) {
+    if (isLocalDevelopmentHost(window.location.hostname)) {
       console.warn('Failed to fetch auth status:', error);
     }
     storeManager.setData('isLogin', false);
   }
+}
+
+/**
+ * localでは実認証を行わないため、ポートに依存せず開発用ログインプレビューを有効にする。
+ */
+function isLocalDevelopmentHost(hostname: string): boolean {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
 }

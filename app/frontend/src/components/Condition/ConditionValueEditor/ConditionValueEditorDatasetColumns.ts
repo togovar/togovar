@@ -10,6 +10,7 @@ import { DatasetColumnRenderer } from './dataset-columns/DatasetColumnRenderer';
 import { DatasetColumnEventHandler } from './dataset-columns/DatasetColumnEventHandler';
 import { DatasetCheckStateManager } from './dataset-columns/DatasetCheckStateManager';
 import { DatasetValueViewManager } from './dataset-columns/DatasetValueViewManager';
+import { isDatasetLockedForAnonymousUser } from './dataset-columns/datasetAccess';
 import type { UiNode } from './dataset-columns/types';
 import { createEl } from '../../../utils/dom/createEl';
 import { selectRequired } from '../../../utils/dom/select';
@@ -105,14 +106,20 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
    * 子孫・祖先の状態も同時に再計算することで、部分選択（indeterminate）を正しく復元する。
    */
   restore(): void {
+    const userIsLoggedIn = storeManager.getData('isLogin');
     this._dataProcessor.resetAllCheckStates(this._data);
     this._dataProcessor.restoreCheckedStates(
       this._data,
       this._lastValueViews,
       (node, checked) =>
-        this._checkStateManager.updateChildrenCheckState(node, checked),
+        this._checkStateManager.updateChildrenCheckState(
+          node,
+          checked,
+          userIsLoggedIn
+        ),
       (node, checked) =>
-        this._checkStateManager.updateParentCheckState(node, checked)
+        this._checkStateManager.updateParentCheckState(node, checked),
+      (node) => !isDatasetLockedForAnonymousUser(node.data, userIsLoggedIn)
     );
     this._updateUI();
   }
@@ -132,7 +139,10 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
    */
   private _initializeUI(): void {
     this.createSectionEl('columns-editor-view', () => [
-      createEl('header', { class: 'section-header', text: `Select ${this.conditionType}` }),
+      createEl('header', {
+        class: 'section-header',
+        text: `Select ${this.conditionType}`,
+      }),
       createEl('div', {
         class: 'section-content',
         children: [createEl('div', { class: 'columns' })],
@@ -237,7 +247,11 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
       column,
       this._data,
       (node, checked) =>
-        this._checkStateManager.updateChildrenCheckState(node, checked),
+        this._checkStateManager.updateChildrenCheckState(
+          node,
+          checked,
+          userIsLoggedIn
+        ),
       (node, checked) =>
         this._checkStateManager.updateParentCheckState(node, checked),
       () => {

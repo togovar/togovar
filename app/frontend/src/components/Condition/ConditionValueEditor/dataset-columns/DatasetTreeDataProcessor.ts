@@ -87,6 +87,7 @@ export class DatasetTreeDataProcessor {
   /**
    * 保存済みの選択値をツリーへ復元する。
    * キャンセル時に編集前の状態へ戻すために使う。
+   * canRestoreSelectionで認証状態に合わない保存値を除外し、匿名ユーザーにロック対象が混入しないようにする。
    */
   restoreCheckedStates(
     datasetTree: HierarchyNode<UiNode>,
@@ -97,18 +98,23 @@ export class DatasetTreeDataProcessor {
     ) => void,
     updateParentStates: (
       node: HierarchyNode<UiNode>,
-      isSelected: boolean
-    ) => void
+      isSelected?: boolean
+    ) => void,
+    canRestoreSelection: (node: HierarchyNode<UiNode>) => boolean = () => true
   ): void {
     for (const savedSelection of savedSelections) {
       const nodeToRestore = datasetTree.find(
         (datasetNode) => datasetNode.data.value === savedSelection.value
       );
       if (!nodeToRestore) continue;
+      if (!canRestoreSelection(nodeToRestore)) continue;
 
       nodeToRestore.data.checked = true;
       propagateToChildren(nodeToRestore, true);
-      updateParentStates(nodeToRestore, true);
+      updateParentStates(
+        nodeToRestore,
+        nodeToRestore.children ? undefined : true
+      );
     }
   }
 }
