@@ -14,7 +14,11 @@ export async function fetchLoginStatus(): Promise<void> {
     }
 
     if (window.location.origin === 'http://localhost:8000') {
-      storeManager.setData('isLogin', false);
+      // ?auth=login でログイン時UIを確認できるようにする。
+      const localAuthPreview = new URLSearchParams(window.location.search).get(
+        'auth'
+      );
+      storeManager.setData('isLogin', localAuthPreview === 'login');
       return;
     }
 
