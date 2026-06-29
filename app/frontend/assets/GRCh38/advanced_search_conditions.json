@@ -951,52 +951,6 @@
               "label": "South Asian"
             }
           ]
-        },
-        {
-          "value": "gnomad_sv",
-          "label": "gnomAD SV",
-          "children": [
-            {
-              "value": "gnomad_sv.afr",
-              "label": "African/African American"
-            },
-            {
-              "value": "gnomad_sv.ami",
-              "label": "Amish"
-            },
-            {
-              "value": "gnomad_sv.amr",
-              "label": "Admixed American"
-            },
-            {
-              "value": "gnomad_sv.asj",
-              "label": "Ashkenazi Jewish"
-            },
-            {
-              "value": "gnomad_sv.eas",
-              "label": "East Asian"
-            },
-            {
-              "value": "gnomad_sv.fin",
-              "label": "European (Finnish)"
-            },
-            {
-              "value": "gnomad_sv.mid",
-              "label": "Middle Eastern"
-            },
-            {
-              "value": "gnomad_sv.nfe",
-              "label": "European (non-Finnish)"
-            },
-            {
-              "value": "gnomad_sv.rmi",
-              "label": "Remaining"
-            },
-            {
-              "value": "gnomad_sv.sas",
-              "label": "South Asian"
-            }
-          ]
         }
       ]
     },

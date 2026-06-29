@@ -108,7 +108,6 @@ export const FREQUENCY_DATASETS = [
   'gnomad_exomes',
   'jogo',
   'tommo_jsv1',
-  'gnomad_sv',
 ] as const;
 
 /** Advanced Search の dataset.name を任意文字列にしないため、FREQUENCY_DATASETS からunion型を作る。 */

@@ -95,13 +95,6 @@
         "has_freq": true
       },
       {
-        "id": "gnomad_sv",
-        "label": "gnomAD SV",
-        "type": "boolean",
-        "default": "1",
-        "has_freq": true
-      },
-      {
         "id": "mgend",
         "label": "MGeND",
         "type": "boolean",
