@@ -110,7 +110,11 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
       this._data,
       this._lastValueViews,
       (node, checked) =>
-        this._checkStateManager.updateChildrenCheckState(node, checked),
+        this._checkStateManager.updateChildrenCheckState(
+          node,
+          checked,
+          storeManager.getData('isLogin')
+        ),
       (node, checked) =>
         this._checkStateManager.updateParentCheckState(node, checked)
     );
@@ -237,7 +241,11 @@ export class ConditionValueEditorDatasetColumns extends ConditionValueEditor {
       column,
       this._data,
       (node, checked) =>
-        this._checkStateManager.updateChildrenCheckState(node, checked),
+        this._checkStateManager.updateChildrenCheckState(
+          node,
+          checked,
+          userIsLoggedIn
+        ),
       (node, checked) =>
         this._checkStateManager.updateParentCheckState(node, checked),
       () => {

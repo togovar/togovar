@@ -23,13 +23,12 @@ export class DatasetColumnEventHandler {
     ) => void,
     updateParentStates: (
       node: HierarchyNode<UiNode>,
-      isSelected: boolean
+      isSelected?: boolean
     ) => void,
     refreshUserInterface: () => void
   ): void {
     columnElement.addEventListener('change', (event) => {
       const clickedCheckbox = event.target as HTMLInputElement;
-      const isNowSelected = clickedCheckbox.checked;
       const listItemElement = clickedCheckbox.closest('li');
       if (!listItemElement || !listItemElement.dataset.id) return;
 
@@ -39,16 +38,36 @@ export class DatasetColumnEventHandler {
       );
       if (!clickedDatasetNode) return;
 
-      if (clickedDatasetNode.children) {
-        propagateToChildren(clickedDatasetNode, isNowSelected);
-      }
+      const nextSelectionState = this.getNextSelectionState(
+        clickedDatasetNode,
+        clickedCheckbox
+      );
 
-      if (clickedDatasetNode.parent) {
-        updateParentStates(clickedDatasetNode, isNowSelected);
+      if (clickedDatasetNode.children) {
+        propagateToChildren(clickedDatasetNode, nextSelectionState);
+        updateParentStates(clickedDatasetNode);
+      } else if (clickedDatasetNode.parent) {
+        updateParentStates(clickedDatasetNode, nextSelectionState);
       }
 
       refreshUserInterface();
     });
+  }
+
+  /**
+   * ロックされた子を含む親はindeterminateになり得るため、親だけはDOMではなくデータ状態から次の選択を決める。
+   */
+  private getNextSelectionState(
+    clickedDatasetNode: HierarchyNode<UiNode>,
+    clickedCheckbox: HTMLInputElement
+  ): boolean {
+    if (!clickedDatasetNode.children) {
+      return clickedCheckbox.checked;
+    }
+
+    return !(
+      clickedDatasetNode.data.checked || clickedDatasetNode.data.indeterminate
+    );
   }
 
   /** カラムのarrow要素にクリックリスナーを登録する。 */

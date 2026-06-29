@@ -3,8 +3,7 @@ import { createEl } from '../../../../utils/dom/createEl';
 import { ADVANCED_CONDITION_TYPE } from '../../../../advancedCondition';
 import { fetchLoginStatus } from '../../../../auth/authService';
 import type { UiNode } from './types';
-
-const PUBLIC_JGA_WGS_DATASETS = new Set(['jga_wgs.jgad000758', 'jga_wgs.jgad000868']);
+import { isDatasetLockedForAnonymousUser } from './datasetAccess';
 
 /**
  * データセットカラムUIのDOM要素を生成する。
@@ -151,11 +150,7 @@ export class DatasetColumnRenderer {
     datasetNode: HierarchyNode<UiNode>,
     userIsLoggedIn: boolean
   ): boolean {
-    return (
-      userIsLoggedIn === false &&
-      (datasetNode.data.value?.includes('jga_wgs.') ?? false) &&
-      !PUBLIC_JGA_WGS_DATASETS.has(datasetNode.data.value ?? '')
-    );
+    return isDatasetLockedForAnonymousUser(datasetNode.data, userIsLoggedIn);
   }
 
   /**
