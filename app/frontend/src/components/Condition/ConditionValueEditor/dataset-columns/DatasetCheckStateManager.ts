@@ -1,5 +1,6 @@
 import type { HierarchyNode } from 'd3-hierarchy';
 import type { UiNode } from './types';
+import { isDatasetLockedForAnonymousUser } from './datasetAccess';
 
 /**
  * チェックボックス選択状態の親子間整合性を管理する。
@@ -11,11 +12,18 @@ export class DatasetCheckStateManager {
   /** 親ノードのチェック状態を全子孫へ伝播させる。 */
   updateChildrenCheckState(
     parentNode: HierarchyNode<UiNode>,
-    isSelected: boolean
+    isSelected: boolean,
+    userIsLoggedIn: boolean
   ): void {
     if (!parentNode.children || parentNode.children.length === 0) return;
 
     parentNode.descendants().forEach((descendant) => {
+      if (isDatasetLockedForAnonymousUser(descendant.data, userIsLoggedIn)) {
+        descendant.data.checked = false;
+        descendant.data.indeterminate = false;
+        return;
+      }
+
       descendant.data.checked = isSelected;
       descendant.data.indeterminate = false;
     });
