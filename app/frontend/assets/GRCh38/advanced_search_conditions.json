@@ -30,11 +30,11 @@
             },
             {
               "value": "jga_wgs.jgad000758",
-              "label": "WGS for 1,026 individuals from BioBank Japan (JGAD000758)"
+              "label": "WGS for 1,026 individuals from BioBank Japan (JGAD000758, BBJ1K)"
             },
             {
               "value": "jga_wgs.jgad000868",
-              "label": "WGS for 1,964 individuals from BioBank Japan (JGAD000868)"
+              "label": "WGS for 1,964 individuals from BioBank Japan (JGAD000868, BBJ2K)"
             }
           ]
         },
@@ -721,14 +721,6 @@
           ]
         },
         {
-          "value": "bbj1k",
-          "label": "BBJ1K"
-        },
-        {
-          "value": "bbj2k",
-          "label": "BBJ2K"
-        },
-        {
           "value": "tommo",
           "label": "ToMMo 54KJPN"
         },
@@ -859,6 +851,14 @@
               "label": "Yoruba in Ibadan, Nigeria"
             }
           ]
+        },
+        {
+          "value": "bbj1k",
+          "label": "BBJ1K"
+        },
+        {
+          "value": "bbj2k",
+          "label": "BBJ2K"
         },
         {
           "value": "jogo",
@@ -1504,11 +1504,11 @@
             },
             {
               "value": "jga_wgs.jgad000758",
-              "label": "WGS for 1,026 individuals from BioBank Japan (JGAD000758)"
+              "label": "WGS for 1,026 individuals from BioBank Japan (JGAD000758, BBJ1K)"
             },
             {
               "value": "jga_wgs.jgad000868",
-              "label": "WGS for 1,964 individuals from BioBank Japan (JGAD000868)"
+              "label": "WGS for 1,964 individuals from BioBank Japan (JGAD000868, BBJ2K)"
             }
           ]
         },

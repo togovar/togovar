@@ -39,20 +39,6 @@
         "has_freq": true
       },
       {
-        "id": "bbj1k",
-        "label": "BBJ1K",
-        "type": "boolean",
-        "default": "1",
-        "has_freq": true
-      },
-      {
-        "id": "bbj2k",
-        "label": "BBJ2K",
-        "type": "boolean",
-        "default": "1",
-        "has_freq": true
-      },
-      {
         "id": "tommo",
         "label": "ToMMo 54KJPN",
         "type": "boolean",
@@ -69,6 +55,20 @@
       {
         "id": "ncbn",
         "label": "NCBN",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
+        "id": "bbj1k",
+        "label": "BBJ1K",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
+        "id": "bbj2k",
+        "label": "BBJ2K",
         "type": "boolean",
         "default": "1",
         "has_freq": true

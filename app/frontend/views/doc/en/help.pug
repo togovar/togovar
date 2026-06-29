@@ -412,13 +412,6 @@ block content
                   frequency-block-view(data-dataset="jga_snp" data-frequency="≥0.5")
                   | &nbsp; JGA-SNP
                   br
-                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    frequency-block-view(data-dataset="bbj1k" data-frequency="≥0.5")
-                    | &nbsp; BBJ1K
-                    br
-                    frequency-block-view(data-dataset="bbj2k" data-frequency="≥0.5")
-                    | &nbsp; BBJ2K
-                    br
                   frequency-block-view(data-dataset="tommo" data-frequency="≥0.5")
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
                     | &nbsp; ToMMo 8.3KJPN
@@ -431,6 +424,12 @@ block content
                     br
                     frequency-block-view(data-dataset="ncbn" data-frequency="≥0.5")
                     | &nbsp; NCBN
+                    br
+                    frequency-block-view(data-dataset="bbj1k" data-frequency="≥0.5")
+                    | &nbsp; BBJ1K
+                    br
+                    frequency-block-view(data-dataset="bbj2k" data-frequency="≥0.5")
+                    | &nbsp; BBJ2K
                     br
                     frequency-block-view(data-dataset="jogo" data-frequency="≥0.5")
                     | &nbsp; JoGo
