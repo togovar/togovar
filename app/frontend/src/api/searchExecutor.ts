@@ -18,6 +18,7 @@ import {
   isCurrentSearchExecution,
   prepareSearchExecution,
   resetSearchExecutionForNewSearch,
+  type SearchOrigin,
 } from './searchExecutionState';
 
 /** 検索開始の入口を1つにし、連続操作時のAPI多重発火をdebounceで抑える。 */
@@ -26,8 +27,12 @@ export const executeSearch = debounce(executeSearchImpl, 300);
 /**
  * debounceの外へ実処理を出し、検索準備・API起動・完了監視の流れを追いやすくする。
  */
-function executeSearchImpl(offset = 0, isFirstTime = false): void {
-  const execution = prepareSearchExecution(offset, isFirstTime);
+function executeSearchImpl(
+  offset = 0,
+  isFirstTime = false,
+  searchOrigin: SearchOrigin = 'system'
+): void {
+  const execution = prepareSearchExecution(offset, isFirstTime, searchOrigin);
   if (!execution.shouldExecute) return;
 
   const searchRun = prepareSearchRun(offset, execution);

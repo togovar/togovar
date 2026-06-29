@@ -2,6 +2,7 @@ import { storeManager } from '../store/StoreManager';
 import { SEARCH_RESULT_LIMIT } from './searchRequest';
 
 type ActiveSearchMode = 'simple' | 'advanced' | null;
+export type SearchOrigin = 'user' | 'history' | 'system' | 'pagination';
 
 type SearchExecutionPreparation =
   | {
@@ -18,6 +19,7 @@ type SearchExecutionPreparation =
 type SearchExecutionState = {
   abortController: AbortController | null;
   searchMode: ActiveSearchMode;
+  searchOrigin: SearchOrigin;
   executionId: number;
   isSearchRequestInProgress: boolean;
   requestedRanges: Set<string>;
@@ -26,6 +28,7 @@ type SearchExecutionState = {
 const searchExecutionState: SearchExecutionState = {
   abortController: null,
   searchMode: null,
+  searchOrigin: 'system',
   executionId: 0,
   isSearchRequestInProgress: false,
   requestedRanges: new Set<string>(),
@@ -36,7 +39,8 @@ const searchExecutionState: SearchExecutionState = {
  */
 export function prepareSearchExecution(
   offset: number,
-  requestedFirstTime: boolean
+  requestedFirstTime: boolean,
+  searchOrigin: SearchOrigin
 ): SearchExecutionPreparation {
   if (searchExecutionState.isSearchRequestInProgress && !requestedFirstTime) {
     return { shouldExecute: false, isFirstTime: requestedFirstTime };
@@ -57,6 +61,7 @@ export function prepareSearchExecution(
   }
 
   searchExecutionState.searchMode = newSearchMode || null;
+  searchExecutionState.searchOrigin = searchOrigin;
   searchExecutionState.abortController = new AbortController();
   searchExecutionState.executionId += 1;
 
@@ -73,6 +78,13 @@ export function prepareSearchExecution(
  */
 export function getCurrentSearchMode(): ActiveSearchMode {
   return searchExecutionState.searchMode;
+}
+
+/**
+ * 1件自動遷移をユーザー操作の検索だけに限定するため、現在の検索発火元を公開する。
+ */
+export function getCurrentSearchOrigin(): SearchOrigin {
+  return searchExecutionState.searchOrigin;
 }
 
 /**

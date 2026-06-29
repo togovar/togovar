@@ -1,4 +1,5 @@
 import { executeSearch } from '../api/searchExecutor';
+import type { SearchOrigin } from '../api/searchExecutionState';
 import { storeManager } from './StoreManager';
 import type {
   MasterConditions,
@@ -42,7 +43,7 @@ function setSimpleSearchConditions(
     storeManager.getData('simpleSearchConditionsMaster')
   );
 
-  requestInitialSearch();
+  requestInitialSearch('user');
 }
 
 /** 指定された検索条件キーに対応する現在の検索条件を取得する */
@@ -100,7 +101,7 @@ export function handleHistoryChange(e: PopStateEvent) {
 
     if (currentMode === 'advanced') {
       // 同一モード内の移動: searchModeサブスクライバは発火しないため直接検索を実行する。
-      requestInitialSearch();
+      requestInitialSearch('history');
     } else {
       // モード切替: setSearchModeFromHistoryでreflect*ToURIをスキップしながらモードを切替える。
       storeManager.setSearchModeFromHistory('advanced');
@@ -117,7 +118,7 @@ export function handleHistoryChange(e: PopStateEvent) {
 
     if (currentMode === 'simple') {
       // 同一モード内の移動: searchModeサブスクライバは発火しないため直接検索を実行する。
-      requestInitialSearch();
+      requestInitialSearch('history');
     } else {
       // モード切替: setSearchModeFromHistoryでreflect*ToURIをスキップしながらモードを切替える。
       storeManager.setSearchModeFromHistory('simple');
@@ -135,7 +136,7 @@ export function setAdvancedSearchCondition(
 
   updateAdvancedURLState();
 
-  requestInitialSearch();
+  requestInitialSearch('user');
 }
 
 /**
@@ -191,7 +192,7 @@ function handleSearchModeChange(mode: SearchMode | ''): void {
       break;
   }
 
-  requestInitialSearch();
+  requestInitialSearch(storeManager.fromHistory ? 'history' : 'system');
 }
 
 /**
@@ -199,15 +200,15 @@ function handleSearchModeChange(mode: SearchMode | ''): void {
  * Store は API を直接呼ばない設計のため、fetch のトリガーはここに集約する。
  */
 export function requestNextPage(recordIndex: number): void {
-  executeSearch(recordIndex);
+  executeSearch(recordIndex, false, 'pagination');
 }
 
 /**
  * 条件変更や履歴復元では先頭ページから取り直すため、全体loadingと初回検索を必ずセットで開始する。
  */
-function requestInitialSearch(): void {
+function requestInitialSearch(searchOrigin: SearchOrigin): void {
   storeManager.setData('appLoadingStatus', 'searching');
-  executeSearch(0, true);
+  executeSearch(0, true, searchOrigin);
 }
 
 /**
