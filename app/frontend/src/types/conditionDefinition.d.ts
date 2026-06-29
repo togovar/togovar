@@ -65,8 +65,8 @@ export interface LocationCondition {
   type: 'peculiar';
 }
 
-/** 病原性予測条件。値リストを持たず、UIがスライダーを提供する。 */
-export interface VariantEffectPredictionCondition {
+/** 有害性予測条件。値リストを持たず、UIがスライダーを提供する。 */
+export interface DeleteriousnessPredictionCondition {
   label: string;
   type: 'peculiar';
 }
@@ -151,7 +151,7 @@ export type ConditionDefinition =
   | DatasetCondition
   | GenotypeCondition
   | LocationCondition
-  | VariantEffectPredictionCondition
+  | DeleteriousnessPredictionCondition
   | TreeCondition
   | TextCondition
   | SignificanceCondition
@@ -179,7 +179,7 @@ type AdvancedConditionMap = Partial<
   dataset?: DatasetCondition;
   genotype?: GenotypeCondition;
   location?: LocationCondition;
-  deleteriousness_prediction?: VariantEffectPredictionCondition;
+  deleteriousness_prediction?: DeleteriousnessPredictionCondition;
   significance?: SignificanceCondition;
   sscv_db?: CheckboxesCondition;
   type?: CheckboxesCondition;

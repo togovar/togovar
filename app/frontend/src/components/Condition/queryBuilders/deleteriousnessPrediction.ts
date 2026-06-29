@@ -18,7 +18,7 @@ function getPrediction(el: ConditionItemValueView): PredictionValueView | null {
  * スコア範囲・inequalitySigns は prediction-value-view が保持しているため
  * DOM から queryValue を取り出してそのまま返す。
  */
-export function buildVariantEffectPredictionQuery(
+export function buildDeleteriousnessPredictionQuery(
   ctx: BuildContext<'deleteriousness_prediction'>
 ): PredictionQueryLocal {
   const predictionValueEl = getPrediction(ctx.values[0]);
