@@ -2367,7 +2367,7 @@
       "type": "peculiar"
     },
     "sscv_db": {
-      "label": "Splicing variant (SSCV DB)",
+      "label": "Splice-site creation",
       "type": "enumeration",
       "values": [
         {

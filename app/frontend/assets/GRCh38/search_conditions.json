@@ -859,7 +859,7 @@
   },
   {
     "id": "splicingvariant",
-    "label": "Splicing variant (SSCV DB)",
+    "label": "Splice-site creation",
     "type": "array",
     "items": [
       {

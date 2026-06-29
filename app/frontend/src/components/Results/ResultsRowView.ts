@@ -39,7 +39,7 @@ type ResultsRowCells = {
   alphaMissenseFunction: HTMLDivElement | null;
   siftFunction: HTMLDivElement | null;
   polyphenFunction: HTMLDivElement | null;
-  splicingVariantCell: HTMLTableCellElement | null;
+  spliceSiteCreationCell: HTMLTableCellElement | null;
 };
 
 /**
@@ -72,7 +72,7 @@ function createEmptyCells(): ResultsRowCells {
     alphaMissenseFunction: null,
     siftFunction: null,
     polyphenFunction: null,
-    splicingVariantCell: null,
+    spliceSiteCreationCell: null,
   };
 }
 
@@ -176,9 +176,9 @@ export class ResultsRowView {
         this.cells.polyphenFunction,
         result.polyphen
       ),
-    splicingvariant: (result) =>
-      ResultsColumnUpdater.updateSplicingVariant(
-        this.cells.splicingVariantCell,
+    'splice-site-creation': (result) =>
+      ResultsColumnUpdater.updateSpliceSiteCreation(
+        this.cells.spliceSiteCreationCell,
         result.sscv_db,
         result.external_links?.sscv_db ?? result.external_link?.sscv_db
       ),
@@ -475,7 +475,7 @@ export class ResultsRowView {
     this.cells.polyphenFunction =
       tdPolyphen?.querySelector('.variant-effect-prediction-badge') || null;
 
-    this.cells.splicingVariantCell = this.tr.querySelector('td.splicingvariant');
+    this.cells.spliceSiteCreationCell = this.tr.querySelector('td.splice-site-creation');
   }
 
   // ================================================================
