@@ -13,7 +13,7 @@ export async function fetchLoginStatus(): Promise<void> {
       return;
     }
 
-    if (window.location.origin === 'http://localhost:8000') {
+    if (isLocalDevelopmentHost(window.location.hostname)) {
       // ?auth=login でログイン時UIを確認できるようにする。
       const localAuthPreview = new URLSearchParams(window.location.search).get(
         'auth'
@@ -49,4 +49,11 @@ export async function fetchLoginStatus(): Promise<void> {
     }
     storeManager.setData('isLogin', false);
   }
+}
+
+/**
+ * localでは実認証を行わないため、ポートに依存せず開発用ログインプレビューを有効にする。
+ */
+function isLocalDevelopmentHost(hostname: string): boolean {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
 }
