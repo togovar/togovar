@@ -88,6 +88,15 @@ export function getCurrentSearchOrigin(): SearchOrigin {
 }
 
 /**
+ * debounceで検索開始が遅れる間も、履歴操作のレスポンス自動遷移を先に止めるため発火元だけ更新する。
+ */
+export function markSearchOriginBeforeDebounce(
+  searchOrigin: SearchOrigin
+): void {
+  searchExecutionState.searchOrigin = searchOrigin;
+}
+
+/**
  * 同一モード内の条件変更でも古いレスポンスを捨てるため、現在の検索世代かを判定する。
  */
 export function isCurrentSearchExecution(executionId: number): boolean {

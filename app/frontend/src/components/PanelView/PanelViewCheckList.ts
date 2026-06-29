@@ -125,7 +125,6 @@ export default class PanelViewCheckList extends PanelView {
 
     this.buildChecklist(conditionMaster);
     this.initCheckboxEntries();
-    this.applyFilter();
     this.bindEvents();
     this.subscribeStore(statisticsType);
   }

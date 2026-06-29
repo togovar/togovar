@@ -150,6 +150,14 @@ let singleVariantRedirectStatistics: { key: string; isSingle: boolean } | null =
   null;
 
 /**
+ * bfcache復元や履歴操作で前回検索の1件遷移候補を再利用しないよう、保持中の候補を破棄する。
+ */
+export function clearSingleVariantRedirectCandidates(): void {
+  singleVariantRedirectData = null;
+  singleVariantRedirectStatistics = null;
+}
+
+/**
  * Simple/Advanced Searchの初回dataレスポンスから、1件遷移に使える行だけを候補として保持する。
  */
 function rememberSingleVariantRedirectData(
@@ -209,11 +217,14 @@ function redirectToSingleVariantIfReady(): boolean {
   }
 
   if (getCurrentSearchOrigin() !== 'user') {
+    clearSingleVariantRedirectCandidates();
     return false;
   }
 
+  const variantId = singleVariantRedirectData.row.id;
+  clearSingleVariantRedirectCandidates();
   window.location.assign(
-    `/variant/${encodeURIComponent(singleVariantRedirectData.row.id)}`
+    `/variant/${encodeURIComponent(variantId)}`
   );
   return true;
 }
