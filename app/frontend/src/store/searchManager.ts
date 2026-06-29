@@ -311,10 +311,13 @@ function prepareHistoryNavigationSearch(): void {
 
 /**
  * bfcacheから戻った検索画面ではpopstateを通らない場合があるため、pageshowで履歴由来に切り替える。
+ * popstateがpageshowより先に発火したブラウザではexecuteSearch.cancel()により検索が止まるため、
+ * pageshowでも必ず再起動することで発火順に依存しない動作を保証する。
  */
 function handlePageShow(event: PageTransitionEvent): void {
   if (!event.persisted) return;
   prepareHistoryNavigationSearch();
+  requestInitialSearch('history');
 }
 
 /**
