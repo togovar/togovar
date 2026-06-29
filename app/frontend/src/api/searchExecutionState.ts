@@ -39,23 +39,23 @@ const searchExecutionState: SearchExecutionState = {
  */
 export function prepareSearchExecution(
   offset: number,
-  requestedFirstTime: boolean,
+  isInitialSearchRequested: boolean,
   searchOrigin: SearchOrigin
 ): SearchExecutionPreparation {
-  if (searchExecutionState.isSearchRequestInProgress && !requestedFirstTime) {
-    return { shouldExecute: false, isFirstTime: requestedFirstTime };
+  if (searchExecutionState.isSearchRequestInProgress && !isInitialSearchRequested) {
+    return { shouldExecute: false, isFirstTime: isInitialSearchRequested };
   }
 
-  let isFirstTime = requestedFirstTime;
+  let shouldResetForInitialSearch = isInitialSearchRequested;
   const newSearchMode = storeManager.getData('searchMode');
 
   abortCurrentSearchRequest();
 
   if (hasSearchModeChanged(newSearchMode)) {
-    isFirstTime = true;
+    shouldResetForInitialSearch = true;
     clearSearchRequestRanges();
   } else if (isSimpleSearchRangeAlreadyRequested(offset, newSearchMode)) {
-    return { shouldExecute: false, isFirstTime };
+    return { shouldExecute: false, isFirstTime: shouldResetForInitialSearch };
   } else {
     registerSimpleSearchRange(offset, newSearchMode);
   }
@@ -67,7 +67,7 @@ export function prepareSearchExecution(
 
   return {
     shouldExecute: true,
-    isFirstTime,
+    isFirstTime: shouldResetForInitialSearch,
     signal: searchExecutionState.abortController.signal,
     executionId: searchExecutionState.executionId,
   };

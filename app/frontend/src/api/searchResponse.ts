@@ -32,7 +32,7 @@ export function applySearchResponse(
   const endpointUrl = new URL(endpoint, API_URL);
   const searchParams = endpointUrl.searchParams;
   if (searchParams.get('data') === '1') {
-    applySearchResultsResponse(json, endpointUrl, executionId);
+    applySearchDataResponse(json, endpointUrl, executionId);
   }
   if (searchParams.get('stat') === '1') {
     applySearchStatisticsResponse(json, endpointUrl, executionId);
@@ -42,21 +42,21 @@ export function applySearchResponse(
 /**
  * data=1レスポンスをStoreへ反映し、searchExecutor.tsを通信フロー管理に集中させる。
  */
-function applySearchResultsResponse(
+function applySearchDataResponse(
   json: unknown,
   endpointUrl: URL,
   executionId: number
 ): void {
-  const searchResults = toSearchResults(json);
-  if (!searchResults) {
+  const dataResponse = parseSearchDataResponse(json);
+  if (!dataResponse) {
     console.error('[search] Unexpected result shape (no data array):', json);
     return;
   }
 
-  const rows = searchResults.data;
-  const offset = searchResults.scroll.offset;
+  const rows = dataResponse.data;
+  const offset = dataResponse.scroll.offset;
 
-  rememberSingleVariantDataCandidate(endpointUrl, offset, rows, executionId);
+  rememberSingleVariantRedirectData(endpointUrl, offset, rows, executionId);
   if (redirectToSingleVariantIfReady()) {
     return;
   }
@@ -88,7 +88,7 @@ function applySearchStatisticsResponse(
     return;
   }
 
-  rememberSingleVariantStatisticsCandidate(
+  rememberSingleVariantRedirectStatistics(
     endpointUrl,
     searchStatistics,
     executionId
@@ -104,7 +104,7 @@ function applySearchStatisticsResponse(
 /**
  * API境界ではunknownを受け、Store更新前に検索結果として最低限の形を確認する。
  */
-function toSearchResults(value: unknown): SearchResults | null {
+function parseSearchDataResponse(value: unknown): SearchResults | null {
   if (!isPlainObject(value)) return null;
   if (!Array.isArray(value.data)) return null;
   if (!isScrollData(value.scroll)) return null;
@@ -142,28 +142,28 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 
 type SingleVariantCandidateRow = SearchResults['data'][number];
 
-let singleVariantDataCandidate:
-  | { key: string; row: SingleVariantCandidateRow | null }
-  | null = null;
-let singleVariantStatisticsCandidate:
-  | { key: string; isSingle: boolean }
-  | null = null;
+let singleVariantRedirectData: {
+  key: string;
+  row: SingleVariantCandidateRow | null;
+} | null = null;
+let singleVariantRedirectStatistics: { key: string; isSingle: boolean } | null =
+  null;
 
 /**
  * Simple/Advanced Searchの初回dataレスポンスから、1件遷移に使える行だけを候補として保持する。
  */
-function rememberSingleVariantDataCandidate(
+function rememberSingleVariantRedirectData(
   endpointUrl: URL,
   offset: number,
   rows: SearchResults['data'],
   executionId: number
 ): void {
-  if (!isSingleVariantAutoRedirectEndpoint(endpointUrl) || offset !== 0) {
+  if (!isVariantSearchEndpoint(endpointUrl) || offset !== 0) {
     return;
   }
 
-  singleVariantDataCandidate = {
-    key: createInitialSearchKey(endpointUrl, executionId),
+  singleVariantRedirectData = {
+    key: createSearchResponsePairKey(endpointUrl, executionId),
     row: rows.length === 1 ? rows[0] : null,
   };
 }
@@ -171,13 +171,13 @@ function rememberSingleVariantDataCandidate(
 /**
  * 統計レスポンスを正として「検索結果が1件か」を保持し、dataレスポンスの行IDと突き合わせる。
  */
-function rememberSingleVariantStatisticsCandidate(
+function rememberSingleVariantRedirectStatistics(
   endpointUrl: URL,
   searchStatistics: SearchStatistics,
   executionId: number
 ): void {
   if (
-    !isSingleVariantAutoRedirectEndpoint(endpointUrl) ||
+    !isVariantSearchEndpoint(endpointUrl) ||
     searchStatistics.scroll.offset !== 0
   ) {
     return;
@@ -188,8 +188,8 @@ function rememberSingleVariantStatisticsCandidate(
     searchStatistics.scroll.max_rows
   );
 
-  singleVariantStatisticsCandidate = {
-    key: createInitialSearchKey(endpointUrl, executionId),
+  singleVariantRedirectStatistics = {
+    key: createSearchResponsePairKey(endpointUrl, executionId),
     isSingle: available === 1,
   };
 }
@@ -199,11 +199,11 @@ function rememberSingleVariantStatisticsCandidate(
  */
 function redirectToSingleVariantIfReady(): boolean {
   if (
-    !singleVariantDataCandidate ||
-    !singleVariantStatisticsCandidate ||
-    singleVariantDataCandidate.key !== singleVariantStatisticsCandidate.key ||
-    !singleVariantDataCandidate.row ||
-    !singleVariantStatisticsCandidate.isSingle
+    !singleVariantRedirectData ||
+    !singleVariantRedirectStatistics ||
+    singleVariantRedirectData.key !== singleVariantRedirectStatistics.key ||
+    !singleVariantRedirectData.row ||
+    !singleVariantRedirectStatistics.isSingle
   ) {
     return false;
   }
@@ -213,7 +213,7 @@ function redirectToSingleVariantIfReady(): boolean {
   }
 
   window.location.assign(
-    `/variant/${encodeURIComponent(singleVariantDataCandidate.row.id)}`
+    `/variant/${encodeURIComponent(singleVariantRedirectData.row.id)}`
   );
   return true;
 }
@@ -221,7 +221,7 @@ function redirectToSingleVariantIfReady(): boolean {
 /**
  * Simple SearchとAdvanced Searchの検索APIだけを1件自動遷移の対象にする。
  */
-function isSingleVariantAutoRedirectEndpoint(endpointUrl: URL): boolean {
+function isVariantSearchEndpoint(endpointUrl: URL): boolean {
   return (
     endpointUrl.pathname === '/search' ||
     endpointUrl.pathname === '/api/search/variant'
@@ -231,7 +231,10 @@ function isSingleVariantAutoRedirectEndpoint(endpointUrl: URL): boolean {
 /**
  * data/stat差分のパラメータを除いて、同じ検索実行内のレスポンスか比較する。
  */
-function createInitialSearchKey(endpointUrl: URL, executionId: number): string {
+function createSearchResponsePairKey(
+  endpointUrl: URL,
+  executionId: number
+): string {
   const params = new URLSearchParams(endpointUrl.searchParams);
   params.delete('data');
   params.delete('stat');
@@ -295,8 +298,5 @@ function applyStatisticsStoreUpdate(
   storeManager.setData('statisticsDataset', statisticsDataset);
   storeManager.setData('statisticsSignificance', statisticsSignificance);
   storeManager.setData('statisticsType', statisticsType);
-  storeManager.setData(
-    'statisticsConsequence',
-    statisticsConsequence
-  );
+  storeManager.setData('statisticsConsequence', statisticsConsequence);
 }
