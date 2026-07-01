@@ -580,7 +580,7 @@
             ]
           },
           {
-            "label": "Splice variant",
+            "label": "Splicing variant(SO:0001568)",
             "items": ["SO_0001574", "SO_0001575", "SO_0001630"]
           },
           "SO_0001893",

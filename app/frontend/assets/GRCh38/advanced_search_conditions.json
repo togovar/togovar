@@ -1108,8 +1108,7 @@
             "group:non_coding_variant",
             "group:splice_variant",
             "SO_0001893",
-            "SO_0001889",
-            "SO_0001968"
+            "SO_0001889"
           ]
         },
         {
@@ -1127,17 +1126,11 @@
           "parent": "group:transcript_variant"
         },
         {
-          "id": "SO_0001968",
-          "value": "SO_0001968",
-          "label": "Coding transcript variant",
-          "description": "A transcript variant of a protein coding gene",
-          "parent": "group:transcript_variant"
-        },
-        {
           "id": "group:coding_variant",
           "label": "Coding variant",
           "parent": "group:transcript_variant",
           "children": [
+            "SO_0001968",
             "SO_0001580",
             "SO_0001907",
             "SO_0001906",
@@ -1155,6 +1148,13 @@
             "SO_0002019",
             "SO_0001567"
           ]
+        },
+        {
+          "id": "SO_0001968",
+          "value": "SO_0001968",
+          "label": "Coding transcript variant",
+          "description": "A transcript variant of a protein coding gene",
+          "parent": "group:coding_variant"
         },
         {
           "id": "SO_0001580",
@@ -1317,7 +1317,7 @@
         },
         {
           "id": "group:splice_variant",
-          "label": "Splice variant",
+          "label": "Splicing variant(SO:0001568)",
           "parent": "group:transcript_variant",
           "children": [
             "SO_0001574",

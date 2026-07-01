@@ -1111,7 +1111,7 @@
         },
         {
           "id": "group:splice_variant",
-          "label": "Splice variant",
+          "label": "Splicing variant(SO:0001568)",
           "parent": "group:transcript_variant",
           "children": ["SO_0001574", "SO_0001575", "SO_0001630"]
         },
