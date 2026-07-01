@@ -182,24 +182,6 @@
         "label": "MNV",
         "type": "boolean",
         "default": "1"
-      },
-      {
-        "id": "SO_1000035",
-        "label": "Duplication",
-        "type": "boolean",
-        "default": "1"
-      },
-      {
-        "id": "SO_1000036",
-        "label": "Inversion",
-        "type": "boolean",
-        "default": "1"
-      },
-      {
-        "id": "SO_0001021",
-        "label": "Breakend",
-        "type": "boolean",
-        "default": "1"
       }
     ]
   },

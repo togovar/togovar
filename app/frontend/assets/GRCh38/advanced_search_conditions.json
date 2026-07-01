@@ -2369,18 +2369,6 @@
         {
           "value": "mnv",
           "label": "MNV"
-        },
-        {
-          "value": "dup",
-          "label": "Duplication"
-        },
-        {
-          "value": "inv",
-          "label": "Inversion"
-        },
-        {
-          "value": "bnd",
-          "label": "Breakend"
         }
       ]
     }
