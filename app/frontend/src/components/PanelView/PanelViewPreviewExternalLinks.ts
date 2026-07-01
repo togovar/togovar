@@ -73,9 +73,6 @@ export default class PanelViewPreviewExternalLinks extends PanelView {
       ...(external_links.gnomad?.map((item) =>
         this._createLinkEntry('gnomAD', item.title, item.xref)
       ) ?? []),
-      ...(external_links.gnomad_sv?.map((item) =>
-        this._createLinkEntry('gnomAD SV', item.title, item.xref)
-      ) ?? []),
       ...(external_links.mgend?.map((item) =>
         this._createLinkEntry('MGeND', item.title, item.xref)
       ) ?? []),
