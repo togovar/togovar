@@ -30,11 +30,11 @@
             },
             {
               "value": "jga_wgs.jgad000758",
-              "label": "WGS for 1,026 individuals from BioBank Japan (JGAD000758)"
+              "label": "WGS for 1,026 individuals from BioBank Japan (JGAD000758, BBJ1K)"
             },
             {
               "value": "jga_wgs.jgad000868",
-              "label": "WGS for 1,964 individuals from BioBank Japan (JGAD000868)"
+              "label": "WGS for 1,964 individuals from BioBank Japan (JGAD000868, BBJ2K)"
             }
           ]
         },
@@ -721,16 +721,8 @@
           ]
         },
         {
-          "value": "bbj1k",
-          "label": "BBJ1K"
-        },
-        {
-          "value": "bbj2k",
-          "label": "BBJ2K"
-        },
-        {
           "value": "tommo",
-          "label": "ToMMo 54KJPN"
+          "label": "ToMMo 61KJPN"
         },
         {
           "value": "tommo_jsv1",
@@ -861,6 +853,14 @@
           ]
         },
         {
+          "value": "bbj1k",
+          "label": "BBJ1K"
+        },
+        {
+          "value": "bbj2k",
+          "label": "BBJ2K"
+        },
+        {
           "value": "jogo",
           "label": "JoGo"
         },
@@ -951,52 +951,6 @@
               "label": "South Asian"
             }
           ]
-        },
-        {
-          "value": "gnomad_sv",
-          "label": "gnomAD SV",
-          "children": [
-            {
-              "value": "gnomad_sv.afr",
-              "label": "African/African American"
-            },
-            {
-              "value": "gnomad_sv.ami",
-              "label": "Amish"
-            },
-            {
-              "value": "gnomad_sv.amr",
-              "label": "Admixed American"
-            },
-            {
-              "value": "gnomad_sv.asj",
-              "label": "Ashkenazi Jewish"
-            },
-            {
-              "value": "gnomad_sv.eas",
-              "label": "East Asian"
-            },
-            {
-              "value": "gnomad_sv.fin",
-              "label": "European (Finnish)"
-            },
-            {
-              "value": "gnomad_sv.mid",
-              "label": "Middle Eastern"
-            },
-            {
-              "value": "gnomad_sv.nfe",
-              "label": "European (non-Finnish)"
-            },
-            {
-              "value": "gnomad_sv.rmi",
-              "label": "Remaining"
-            },
-            {
-              "value": "gnomad_sv.sas",
-              "label": "South Asian"
-            }
-          ]
         }
       ]
     },
@@ -1040,6 +994,18 @@
           {
             "value": "US",
             "label": "Uncertain significance"
+          },
+          {
+            "value": "VH",
+            "label": "VUS-high"
+          },
+          {
+            "value": "VM",
+            "label": "VUS-mid"
+          },
+          {
+            "value": "VL",
+            "label": "VUS-low"
           },
           {
             "value": "LB",
@@ -1086,24 +1052,12 @@
             "label": "Not provided"
           },
           {
-            "value": "AN",
-            "label": "Association not found"
-          },
-          {
             "value": "NC",
             "label": "No classification"
           },
           {
-            "value": "VH",
-            "label": "VUS-high"
-          },
-          {
-            "value": "VM",
-            "label": "VUS-mid"
-          },
-          {
-            "value": "VL",
-            "label": "VUS-low"
+            "value": "AN",
+            "label": "Association not found"
           }
         ],
         "mgend": [
@@ -1154,8 +1108,7 @@
             "group:non_coding_variant",
             "group:splice_variant",
             "SO_0001893",
-            "SO_0001889",
-            "SO_0001968"
+            "SO_0001889"
           ]
         },
         {
@@ -1173,17 +1126,11 @@
           "parent": "group:transcript_variant"
         },
         {
-          "id": "SO_0001968",
-          "value": "SO_0001968",
-          "label": "Coding transcript variant",
-          "description": "A transcript variant of a protein coding gene",
-          "parent": "group:transcript_variant"
-        },
-        {
           "id": "group:coding_variant",
           "label": "Coding variant",
           "parent": "group:transcript_variant",
           "children": [
+            "SO_0001968",
             "SO_0001580",
             "SO_0001907",
             "SO_0001906",
@@ -1201,6 +1148,13 @@
             "SO_0002019",
             "SO_0001567"
           ]
+        },
+        {
+          "id": "SO_0001968",
+          "value": "SO_0001968",
+          "label": "Coding transcript variant",
+          "description": "A transcript variant of a protein coding gene",
+          "parent": "group:coding_variant"
         },
         {
           "id": "SO_0001580",
@@ -1363,7 +1317,7 @@
         },
         {
           "id": "group:splice_variant",
-          "label": "Splice variant",
+          "label": "Splicing variant(SO:0001568)",
           "parent": "group:transcript_variant",
           "children": [
             "SO_0001574",
@@ -1481,11 +1435,7 @@
         {
           "id": "group:intergenic_variant",
           "label": "Intergenic variant",
-          "children": [
-            "SO_0001632",
-            "SO_0001628",
-            "SO_0001631"
-          ]
+          "children": ["SO_0001632", "SO_0001628", "SO_0001631"]
         },
         {
           "id": "SO_0001632",
@@ -1515,6 +1465,10 @@
           "description": "A non exact copy of a sequence_feature or genome exhibiting one or more sequence_alteration"
         }
       ]
+    },
+    "deleteriousness_prediction": {
+      "label": "Deleteriousness prediction",
+      "type": "peculiar"
     },
     "disease": {
       "label": "Disease",
@@ -1550,11 +1504,11 @@
             },
             {
               "value": "jga_wgs.jgad000758",
-              "label": "WGS for 1,026 individuals from BioBank Japan (JGAD000758)"
+              "label": "WGS for 1,026 individuals from BioBank Japan (JGAD000758, BBJ1K)"
             },
             {
               "value": "jga_wgs.jgad000868",
-              "label": "WGS for 1,964 individuals from BioBank Japan (JGAD000868)"
+              "label": "WGS for 1,964 individuals from BioBank Japan (JGAD000868, BBJ2K)"
             }
           ]
         },
@@ -2367,7 +2321,7 @@
       "type": "peculiar"
     },
     "sscv_db": {
-      "label": "Splicing variant (SSCV DB)",
+      "label": "Splice-site creation",
       "type": "enumeration",
       "values": [
         {
@@ -2387,10 +2341,6 @@
           "label": "Ambiguous"
         }
       ]
-    },
-    "variant_effect_prediction": {
-      "label": "Variant effect prediction",
-      "type": "peculiar"
     },
     "id": {
       "label": "Variant ID",
@@ -2419,18 +2369,6 @@
         {
           "value": "mnv",
           "label": "MNV"
-        },
-        {
-          "value": "dup",
-          "label": "Duplication"
-        },
-        {
-          "value": "inv",
-          "label": "Inversion"
-        },
-        {
-          "value": "bnd",
-          "label": "Breakend"
         }
       ]
     }

@@ -192,10 +192,10 @@ block content
             h4.question CADD、AlphaMissense、SIFT、PolyPhenとは何ですか。
             .answer
               p
-                | 以下のスコアはバリアントの潜在的な影響を予測するために使用され、
+                | 以下のスコアは、バリアントの潜在的な影響を予測するために用いられ、
                 a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/protein_function.html')
-                  | Variant Effect Predictor (VEP)
-                | を使用して計算しました。CADDはあらゆるタイプのバリアントの有害性をスコア化します。一方、AlphaMissense、SIFTおよびPolyPhenは、アミノ酸配列が変更された際のタンパク質の機能への影響を特異的に予測します。以下のアイコンは定性的予測に使用される閾値スコアを表しています。
+                  | Variant Effect Predictor（VEP）
+                | を用いて注釈付けされています。CADDは幅広い種類のバリアントについて有害性をスコア化する一方、AlphaMissense、SIFT、PolyPhenは、特にアミノ酸置換がタンパク質機能に与える影響を予測します。以下のアイコンは、定性的な予測に用いられるスコア閾値を示しています。
               ul.unordered-list._margin-bottom._align-left
                 li
                   strong CADD (PHRED score)
@@ -207,9 +207,9 @@ block content
                   div
                     .variant-effect-prediction-badge._width_5em._align-center(data-function='T') &lt; 10
                   span
-                    | CADD (Combined Annotation Dependent Depletion) は、多様なゲノムアノテーションを統合して、あらゆるタイプのバリアントの有害性をスコア化するツールです。
-                    | ここに挙げた他のツールとは異なり、CADDはミスセンス変異に限定されません。
-                    | PHREDスケールスコアが&ge;20のバリアントはゲノム全体で有害なバリアントの上位1%に、&ge;10は上位10%に相当します。詳細は
+                    | CADD（Combined Annotation Dependent Depletion）は、多様なゲノム注釈情報を統合し、幅広い種類のバリアントについて有害性をスコア化します。
+                    | ここに挙げた他のツールとは異なり、CADD はミスセンスバリアントに限定されません。
+                    | PHRED スケール化スコアが 10 以上および 20 以上の場合、それぞれ、ゲノム全体において予測有害性に基づいて順位づけられたバリアントの上位約 10% および上位約 1% に相当します。詳細は
                     |
                   a.hyper-text.-external(target='_blank', href='https://cadd.gs.washington.edu/info') CADD
                   | を参照ください。
@@ -346,18 +346,11 @@ block content
                   frequency-block-view(data-dataset="jga_snp" data-frequency="≥0.5")
                   | &nbsp; JGA-SNP
                   br
-                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    frequency-block-view(data-dataset="bbj1k" data-frequency="≥0.5")
-                    | &nbsp; BBJ1K
-                    br
-                    frequency-block-view(data-dataset="bbj2k" data-frequency="≥0.5")
-                    | &nbsp; BBJ2K
-                    br
                   frequency-block-view(data-dataset="tommo" data-frequency="≥0.5")
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh37"
                     | &nbsp; ToMMo 8.3KJPN
                   else if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    | &nbsp; ToMMo 54KJPN
+                    | &nbsp; ToMMo 61KJPN
                   br
                   if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
                     frequency-block-view(data-dataset="tommo_jsv1" data-frequency="≥0.5")
@@ -365,6 +358,12 @@ block content
                     br
                     frequency-block-view(data-dataset="ncbn" data-frequency="≥0.5")
                     | &nbsp; NCBN
+                    br
+                    frequency-block-view(data-dataset="bbj1k" data-frequency="≥0.5")
+                    | &nbsp; BBJ1K
+                    br
+                    frequency-block-view(data-dataset="bbj2k" data-frequency="≥0.5")
+                    | &nbsp; BBJ2K
                     br
                     frequency-block-view(data-dataset="jogo" data-frequency="≥0.5")
                     | &nbsp; JoGo
@@ -378,10 +377,6 @@ block content
                   br
                   frequency-block-view(data-dataset="gnomad_exomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD exomes
-                  if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-                    br
-                    frequency-block-view(data-dataset="gnomad_sv" data-frequency="≥0.5")
-                    | &nbsp; gnomAD SV
 
           #s2.question-answer._column-span-all
             h4.question バリアントタイプごとにPosition、Ref、Altはそれぞれどのように記述されますか。

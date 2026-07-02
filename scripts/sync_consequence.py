@@ -56,7 +56,6 @@ GROUPS: list[dict] = [
             "group:splice_variant",
             "SO_0001893",  # transcript_ablation
             "SO_0001889",  # transcript_amplification
-            "SO_0001968",  # coding_transcript_variant (GRCh38 only)
         ],
     },
     {
@@ -64,6 +63,7 @@ GROUPS: list[dict] = [
         "label": "Coding variant",
         "parent": "group:transcript_variant",
         "children": [
+            "SO_0001968",  # coding_transcript_variant (GRCh38 only)
             "SO_0001580",  # coding_sequence_variant
             "SO_0001907",  # feature_elongation
             "SO_0001906",  # feature_truncation
@@ -96,7 +96,7 @@ GROUPS: list[dict] = [
     },
     {
         "id": "group:splice_variant",
-        "label": "Splice variant",
+        "label": "Splicing variant(SO:0001568)",
         "parent": "group:transcript_variant",
         "children": [
             "SO_0001574",  # splice_acceptor_variant
