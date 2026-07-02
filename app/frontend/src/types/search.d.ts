@@ -34,7 +34,7 @@ export type MasterConditionId =
   | 'alphamissense'
   | 'sift'
   | 'polyphen'
-  | 'splicingvariant';
+  | 'sscv_db';
 
 export type MasterConditionType = 'array' | 'boolean' | 'string';
 
@@ -78,7 +78,7 @@ export type SimpleSearchCurrentConditions = {
   alphamissense?: Record<string, string>; // { "N": "1", "LP": "1", ... }
   sift?: Record<string, string>; // { "N": "1", "D": "1", ... }
   polyphen?: Record<string, string>; // { "N": "1", "PROBD": "1", ... }
-  splicingvariant?: Record<string, string>; // { "N": "1", "PEL": "1", "CEI": "1", "EE": "1", "A": "1" }
+  sscv_db?: Record<string, string>; // { "NA": "1", "PEL": "1", "CEI": "1", "EE": "1", "A": "1" }
 };
 
 // ============================================

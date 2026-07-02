@@ -833,12 +833,12 @@
     ]
   },
   {
-    "id": "splicingvariant",
+    "id": "sscv_db",
     "label": "Splice-site creation",
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"

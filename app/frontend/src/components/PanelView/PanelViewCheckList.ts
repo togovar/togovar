@@ -31,7 +31,7 @@ type CheckListKind = Extract<
   | 'alphamissense'
   | 'sift'
   | 'polyphen'
-  | 'splicingvariant'
+  | 'sscv_db'
 >;
 
 /**
@@ -86,7 +86,7 @@ const UNASSIGNED_VALUE: Partial<Record<CheckListKind, string>> = {
   alphamissense: 'N',
   sift: 'N',
   polyphen: 'N',
-  splicingvariant: 'N',
+  sscv_db: 'NA',
 };
 
 // ----------------------------------------
@@ -103,7 +103,7 @@ export default class PanelViewCheckList extends PanelView {
 
   /**
    * @param elm - パネルのルート要素
-   * @param kind - パネル種別ID (dataset | type | significance | cadd | sift | polyphen | alphamissense | splicingvariant ※APIキー)
+   * @param kind - パネル種別ID (dataset | type | significance | cadd | sift | polyphen | alphamissense | sscv_db ※APIキー)
    * @param statisticsType - 統計情報のストアキー (省略時は統計表示なし)
    */
   constructor(

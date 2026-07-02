@@ -9,7 +9,7 @@ scripts/<BUILD>/openapi.yaml（Swagger仕様）から以下を自動抽出し、
   - VariantConsequence.consequence.terms.enum → consequence チェック
   - VariantType.type.terms.enum              → type チェック
   - ClinicalSignificance.terms.enum          → significance チェック
-  - SSCVDB.terms.enum                        → sscv_db / splicingvariant チェック
+  - SSCVDB.terms.enum                        → sscv_db チェック
   - Dataset.name.enum                        → dataset / genotype チェック
 
 使い方:
@@ -26,7 +26,7 @@ scripts/<BUILD>/openapi.yaml（Swagger仕様）から以下を自動抽出し、
   - type.items:          SO ID の完全一致
   - significance.items:  短縮キーの完全一致
   - consequence.items:   SO ID の完全一致 + consequence_grouping の網羅性
-  - splicingvariant.items: N（Unassigned）を除いた完全一致
+  - sscv_db.items:       NA（Unassigned）を除いた完全一致
 
 チェック対象（advanced_search_conditions.json）:
   - dataset.values:    完全一致（不足・余分の両方）
@@ -40,7 +40,7 @@ scripts/<BUILD>/openapi.yaml（Swagger仕様）から以下を自動抽出し、
 制約:
   - dataset の表示ラベルおよびツリー構造（親子関係）は仕様に含まれないため手動管理。
   - search_conditions.json の dataset は top-level のみ（サブデータセット不要）のため不足チェックなし。
-  - splicingvariant の N（Unassigned）は UI専用値のため仕様外だが意図的な追加。
+  - sscv_db の NA（Unassigned）は UI専用値のため仕様外だが意図的な追加。
   - significance.mgend は clinvar のサブセット（仕様未定義）のため余分チェックのみ。
   - genotype はデータセットのサブセットのため余分チェックのみ。
 
@@ -307,22 +307,22 @@ def check_significance_sc(sc_path: Path, spec_keys: set[str]) -> list[str]:
 
 def check_sscvdb_sc(sc_path: Path, spec_keys: set[str]) -> list[str]:
     """
-    search_conditions.json の splicingvariant.items と仕様の SSCVDB 短縮キーを照合する。
-    'N'（Unassigned = SSCV DB に未登録）は UI専用値のため仕様外だが意図的な追加として除外する。
+    search_conditions.json の sscv_db.items と仕様の SSCVDB 短縮キーを照合する。
+    'NA'（Unassigned = SSCV DB に未登録）は UI専用値のため仕様外だが意図的な追加として除外する。
     """
-    EXCLUDED = {'N'}
+    EXCLUDED = {'NA'}
     errors = []
     data = json.loads(sc_path.read_text())
 
-    sscv = next((c for c in data if c["id"] == "splicingvariant"), None)
+    sscv = next((c for c in data if c["id"] == "sscv_db"), None)
     if not sscv:
-        return [f"[{sc_path.name}] splicingvariant セクションが見つからない"]
+        return [f"[{sc_path.name}] sscv_db セクションが見つからない"]
 
     json_keys = {item["id"] for item in sscv.get("items", [])} - EXCLUDED
     for m in sorted(spec_keys - json_keys):
-        errors.append(f"[{sc_path.name}] splicingvariant.items に不足: {m}")
+        errors.append(f"[{sc_path.name}] sscv_db.items に不足: {m}")
     for e in sorted(json_keys - spec_keys):
-        errors.append(f"[{sc_path.name}] splicingvariant.items に余分: {e}")
+        errors.append(f"[{sc_path.name}] sscv_db.items に余分: {e}")
 
     return errors
 
@@ -557,7 +557,7 @@ def main():
     type_so_ids        = {so for so, _ in type_terms}
     type_labels        = {label for _, label in type_terms}
 
-    # GRCh37 には SSCVDB（splicingvariant/sscv_db）および cadd が存在しない
+    # GRCh37 には SSCVDB（sscv_db）および cadd が存在しない
     has_sscvdb = sscvdb_keys is not None
     has_cadd   = build == "GRCh38"
 
@@ -585,7 +585,7 @@ def main():
     print(f"  sift:                存在・items 構造確認（N/D/T）")
     print(f"  polyphen:            存在・items 構造確認（N/PROBD/POSSD/B/U）")
     if has_sscvdb:
-        print(f"  splicingvariant:     {len(sscvdb_keys)} 件（N=Unassigned 除く）")
+        print(f"  sscv_db:             {len(sscvdb_keys)} 件（NA=Unassigned 除く）")
     print()
 
     print(f"[{asc_path.name}]")
