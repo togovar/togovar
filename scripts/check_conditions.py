@@ -228,22 +228,22 @@ def check_consequence_asc(asc_path: Path, spec_so_ids: set[str]) -> list[str]:
 def check_structure_sc(sc_path: Path, has_cadd: bool = True) -> list[str]:
     """
     search_conditions.json の全セクションについて存在と items の構成を確認する。
-    API仕様に対応する enum がないセクション（term/frequency/quality/cadd/alphamissense/sift/polyphen/consequence_grouping）が対象。
-    cadd/alphamissense/sift/polyphen の items は予測ツール固有の UI カテゴリのため仕様外だが、
+    API仕様に対応する enum がないセクション（term/frequency/quality/cadd_phred/alphamissense/sift/polyphen/consequence_grouping）が対象。
+    cadd_phred/alphamissense/sift/polyphen の items は予測ツール固有の UI カテゴリのため仕様外だが、
     意図しない削除・名前変更を検出するために期待値を固定して照合する。
-    cadd は GRCh38 のみ存在するため has_cadd=False（GRCh37）の場合はスキップする。
+    cadd_phred は GRCh38 のみ存在するため has_cadd=False（GRCh37）の場合はスキップする。
     """
     EXPECTED: dict[str, set[str] | None] = {
         "term":               None,                        # items なし（フリーテキスト）
         "frequency":          {"from", "to", "invert", "match"},
         "quality":            None,                        # items なし（boolean フラグ）
         "consequence_grouping": None,                      # items の中身は check_consequence_sc で確認済み
-        "alphamissense":      {"N", "LP", "A", "LB"},
-        "sift":               {"N", "D", "T"},
-        "polyphen":           {"N", "PROBD", "POSSD", "B", "U"},
+        "alphamissense":      {"NA", "LP", "A", "LB"},
+        "sift":               {"NA", "D", "T"},
+        "polyphen":           {"NA", "PROBD", "POSSD", "B", "U"},
     }
     if has_cadd:
-        EXPECTED["cadd"] = {"N", "D", "POSSD", "T"}
+        EXPECTED["cadd_phred"] = {"NA", "P0", "P10", "P20"}
 
     errors = []
     data = json.loads(sc_path.read_text())
@@ -557,7 +557,7 @@ def main():
     type_so_ids        = {so for so, _ in type_terms}
     type_labels        = {label for _, label in type_terms}
 
-    # GRCh37 には SSCVDB（sscv_db）および cadd が存在しない
+    # GRCh37 には SSCVDB（sscv_db）および cadd_phred が存在しない
     has_sscvdb = sscvdb_keys is not None
     has_cadd   = build == "GRCh38"
 
@@ -580,10 +580,10 @@ def main():
     print(f"  consequence:         {len(consequence_so_ids)} 件（SO ID）")
     print(f"  consequence_grouping: 存在確認（SO ID 網羅性は consequence チェック内）")
     if has_cadd:
-        print(f"  cadd:                存在・items 構造確認（N/D/POSSD/T）")
-    print(f"  alphamissense:       存在・items 構造確認（N/LP/A/LB）")
-    print(f"  sift:                存在・items 構造確認（N/D/T）")
-    print(f"  polyphen:            存在・items 構造確認（N/PROBD/POSSD/B/U）")
+        print(f"  cadd_phred:          存在・items 構造確認（NA/P0/P10/P20）")
+    print(f"  alphamissense:       存在・items 構造確認（NA/LP/A/LB）")
+    print(f"  sift:                存在・items 構造確認（NA/D/T）")
+    print(f"  polyphen:            存在・items 構造確認（NA/PROBD/POSSD/B/U）")
     if has_sscvdb:
         print(f"  sscv_db:             {len(sscvdb_keys)} 件（NA=Unassigned 除く）")
     print()

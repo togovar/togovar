@@ -709,30 +709,30 @@
     ]
   },
   {
-    "id": "cadd",
+    "id": "cadd_phred",
     "label": "CADD (PHRED score)",
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
       },
       {
-        "id": "D",
+        "id": "P20",
         "label": "",
         "type": "boolean",
         "default": "1"
       },
       {
-        "id": "POSSD",
+        "id": "P10",
         "label": "",
         "type": "boolean",
         "default": "1"
       },
       {
-        "id": "T",
+        "id": "P0",
         "label": "",
         "type": "boolean",
         "default": "1"
@@ -745,7 +745,7 @@
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
@@ -776,7 +776,7 @@
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
@@ -801,7 +801,7 @@
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"

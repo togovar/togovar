@@ -27,7 +27,7 @@ type CheckListKind = Extract<
   | 'dataset'
   | 'type'
   | 'significance'
-  | 'cadd'
+  | 'cadd_phred'
   | 'alphamissense'
   | 'sift'
   | 'polyphen'
@@ -37,7 +37,7 @@ type CheckListKind = Extract<
 /**
  * 統計情報のストアキー。
  * API の StatisticsData が返す件数は dataset / type / significance / consequence の 4 種類のみ。
- * alphamissense / sift / polyphen / cadd の件数はバックエンドが未対応のため統計表示できない。
+ * alphamissense / sift / polyphen / cadd_phred の件数はバックエンドが未対応のため統計表示できない。
  */
 type StatisticsType =
   | 'statisticsDataset'
@@ -48,11 +48,11 @@ type StatisticsType =
 // スコアラベルの定数
 // ----------------------------------------
 
-/** CADD PHRED スコアのラベル（D=≥20, POSSD=≥10, T=<10）。data-function は共通バッジCSSの色分けに使う。 */
+/** CADD PHRED スコアのラベル（P20=≥20, P10=≥10, P0=<10）。data-function は共通バッジCSSの色分けに使う。 */
 const CADD_LABELS: Record<string, string> = {
-  D: '&ge; 20',
-  POSSD: '&ge; 10',
-  T: '&lt; 10',
+  P20: '&ge; 20',
+  P10: '&ge; 10',
+  P0: '&lt; 10',
 };
 
 /** AlphaMissense スコアのラベル */
@@ -82,10 +82,10 @@ const POLYPHEN_LABELS: Record<string, string> = {
  */
 const UNASSIGNED_VALUE: Partial<Record<CheckListKind, string>> = {
   significance: 'NA',
-  cadd: 'N',
-  alphamissense: 'N',
-  sift: 'N',
-  polyphen: 'N',
+  cadd_phred: 'NA',
+  alphamissense: 'NA',
+  sift: 'NA',
+  polyphen: 'NA',
   sscv_db: 'NA',
 };
 
@@ -103,7 +103,7 @@ export default class PanelViewCheckList extends PanelView {
 
   /**
    * @param elm - パネルのルート要素
-   * @param kind - パネル種別ID (dataset | type | significance | cadd | sift | polyphen | alphamissense | sscv_db ※APIキー)
+   * @param kind - パネル種別ID (dataset | type | significance | cadd_phred | sift | polyphen | alphamissense | sscv_db ※APIキー)
    * @param statisticsType - 統計情報のストアキー (省略時は統計表示なし)
    */
   constructor(
@@ -208,11 +208,12 @@ export default class PanelViewCheckList extends PanelView {
 
     const masterItems = conditionMaster.items ?? [];
 
-    // significance / cadd / alphamissense / sift / polyphen は
+    // significance / cadd_phred / alphamissense / sift / polyphen は
     // マスターデータとは別に "Unassigned" チェックボックスを先頭に追加する
     if (unassignedValue) {
       const unassignedLabel =
-        masterItems.find((item) => item.id === unassignedValue)?.label ?? 'Unassigned';
+        masterItems.find((item) => item.id === unassignedValue)?.label ??
+        'Unassigned';
       html += this.buildUnassignedItemHtml(unassignedValue, unassignedLabel);
     }
     const filteredItems = unassignedValue
@@ -229,7 +230,10 @@ export default class PanelViewCheckList extends PanelView {
   }
 
   /** "Unassigned" チェックボックスの HTML を返す */
-  private buildUnassignedItemHtml(checkboxValue: string, label: string): string {
+  private buildUnassignedItemHtml(
+    checkboxValue: string,
+    label: string
+  ): string {
     return `
     <li class="item">
       <label class="label">
@@ -263,7 +267,7 @@ export default class PanelViewCheckList extends PanelView {
         return `<div class="dataset-icon" data-dataset="${id}"><div class="properties"></div></div>`;
       case 'significance':
         return `<div class="clinical-significance" data-value="${id}"></div>`;
-      case 'cadd':
+      case 'cadd_phred':
         return `<div class="variant-effect-prediction-badge _width_5em _align-center" data-function="${id}">${CADD_LABELS[id] ?? ''}</div>`;
       case 'alphamissense':
         return `<div class="variant-effect-prediction-badge _width_5em _align-center" data-function="${id}">${ALPHAMISSENSE_LABELS[id] ?? ''}</div>`;

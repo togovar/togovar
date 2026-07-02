@@ -611,7 +611,7 @@
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
@@ -642,7 +642,7 @@
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
@@ -667,7 +667,7 @@
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
