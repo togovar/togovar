@@ -138,7 +138,8 @@ export function handleHistoryChange(e: PopStateEvent): void {
  * qs.parse()は?mode=a&mode=bのような重複パラメータを配列で返すため、比較前に先頭要素へ正規化する。
  */
 function normalizeModeParam(rawMode: unknown): string | undefined {
-  return Array.isArray(rawMode) ? (rawMode[0] as string | undefined) : (rawMode as string | undefined);
+  const candidate = Array.isArray(rawMode) ? rawMode[0] : rawMode;
+  return typeof candidate === 'string' ? candidate : undefined;
 }
 
 /**
@@ -153,7 +154,10 @@ function restoreAdvancedSearchFromHistory(
     urlParams,
     historyState
   );
-  storeManager.setData('advancedSearchConditions', restoredCondition ?? undefined);
+  storeManager.setData(
+    'advancedSearchConditions',
+    restoredCondition ?? undefined
+  );
   notifyAdvancedSearchBuilderRestored();
   continueHistorySearchInMode('advanced', currentMode);
 }
@@ -199,7 +203,9 @@ export function setAdvancedSearchCondition(
   newSearchConditions: ConditionQuery
 ): void {
   const normalizedConditions =
-    Object.keys(newSearchConditions).length === 0 ? undefined : newSearchConditions;
+    Object.keys(newSearchConditions).length === 0
+      ? undefined
+      : newSearchConditions;
   storeManager.setData('advancedSearchConditions', normalizedConditions);
 
   reflectCurrentAdvancedConditionToUrl();

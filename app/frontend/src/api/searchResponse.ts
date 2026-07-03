@@ -223,9 +223,8 @@ function redirectToSingleVariantIfReady(): boolean {
 
   const variantId = singleVariantRedirectData.row.id;
   clearSingleVariantRedirectCandidates();
-  window.location.assign(
-    `/variant/${encodeURIComponent(variantId)}`
-  );
+  if (typeof window === 'undefined') return false;
+  window.location.assign(`/variant/${encodeURIComponent(variantId)}`);
   return true;
 }
 
