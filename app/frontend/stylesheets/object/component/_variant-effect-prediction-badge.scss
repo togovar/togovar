@@ -5,7 +5,8 @@
   border-radius: 9px;
 
   &[data-function='T'],
-  &[data-function='B'] {
+  &[data-function='B'],
+  &[data-function='P0'] {
     background-color: var(--color-sign-safe);
   }
 
@@ -14,12 +15,14 @@
   }
 
   &[data-function='POSSD'],
-  &[data-function='LP'] {
+  &[data-function='LP'],
+  &[data-function='P10'] {
     background-color: var(--color-sign-warning);
   }
 
   &[data-function='D'],
-  &[data-function='PROBD'] {
+  &[data-function='PROBD'],
+  &[data-function='P20'] {
     background-color: var(--color-sign-dangerous);
   }
 
