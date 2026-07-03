@@ -44,6 +44,7 @@ class SimpleSearchView extends LitElement {
     this._eventHandlers = new SimpleSearchEventHandlers(this, this._controller);
   }
 
+  /** Karyotype選択など外部からの条件変更をinputへ反映するため、表示中だけ購読する。 */
   connectedCallback(): void {
     super.connectedCallback();
     storeManager.subscribe(
@@ -52,6 +53,7 @@ class SimpleSearchView extends LitElement {
     );
   }
 
+  /** 要素破棄後もハンドラが残り続けるメモリリークを防ぐため、購読をここで解除する。 */
   disconnectedCallback(): void {
     storeManager.unsubscribe(
       'simpleSearchConditions',
