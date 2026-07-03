@@ -4,7 +4,6 @@ import type { ScrollData, SearchResults, SearchStatistics } from '../types';
 import type { StoreState } from '../types/storeState';
 import { getNextSearchResultCount } from '../store/searchResultsState';
 import {
-  getCurrentSearchExecutionId,
   getCurrentSearchMode,
   getCurrentSearchOrigin,
   isCurrentSearchExecution,
@@ -217,7 +216,7 @@ function redirectToSingleVariantIfReady(): boolean {
     return false;
   }
 
-  if (getCurrentSearchOrigin() !== 'user' && !isEligibleInitialLoadRedirect()) {
+  if (getCurrentSearchOrigin() !== 'user') {
     clearSingleVariantRedirectCandidates();
     return false;
   }
@@ -227,33 +226,6 @@ function redirectToSingleVariantIfReady(): boolean {
   if (typeof window === 'undefined') return false;
   window.location.assign(`/variant/${encodeURIComponent(variantId)}`);
   return true;
-}
-
-/**
- * ブックマーク/共有URLからの初回ロードで1件ヒットした場合もリダイレクト対象に含める。
- * ページ生涯最初の検索（executionId===1）かつ戻る/進む由来ではない場合だけ許可し、
- * bfcache復元や履歴操作からの再遷移ループは除外する。
- */
-function isEligibleInitialLoadRedirect(): boolean {
-  return getCurrentSearchExecutionId() === 1 && isFreshPageNavigation();
-}
-
-/**
- * Navigation Timing APIでback_forward（戻る/進む）由来のロードを除外し、
- * navigate/reload（直接アクセス・再読み込み）だけを初回リダイレクト対象と判定する。
- */
-function isFreshPageNavigation(): boolean {
-  if (
-    typeof performance === 'undefined' ||
-    typeof performance.getEntriesByType !== 'function'
-  ) {
-    return false;
-  }
-
-  const [entry] = performance.getEntriesByType(
-    'navigation'
-  ) as PerformanceNavigationTiming[];
-  return entry?.type === 'navigate' || entry?.type === 'reload';
 }
 
 /**
