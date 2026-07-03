@@ -42,14 +42,6 @@ class SimpleSearchView extends LitElement {
     // コントローラーとイベントハンドラーを初期化
     this._controller = new SimpleSearchController(this);
     this._eventHandlers = new SimpleSearchEventHandlers(this, this._controller);
-
-    // Karyotype選択など外部からtermが変わったときにinputへ反映する
-    storeManager.subscribe('simpleSearchConditions', (v) => {
-      const term = ((v as Record<string, unknown>)?.term as string) ?? '';
-      if (term !== this._term) {
-        this._term = term;
-      }
-    });
   }
 
   connectedCallback(): void {
