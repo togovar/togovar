@@ -9,6 +9,7 @@ import { storeManager } from '../../../store/StoreManager';
 import { SimpleSearchController } from './SimpleSearchController';
 import { SimpleSearchEventHandlers } from './SimpleSearchEventHandlers';
 import { EXAMPLES, SEARCH_FIELD_CONFIG } from './SimpleSearchConstants';
+import type { SimpleSearchCurrentConditions } from '../../../types';
 import Styles from '../../../../stylesheets/web-components/simple-search-view.scss';
 
 /**
@@ -21,6 +22,15 @@ class SimpleSearchView extends LitElement {
 
   private _controller: SimpleSearchController;
   private _eventHandlers: SimpleSearchEventHandlers;
+  private _boundSimpleSearchConditionsHandler = (
+    conditions: SimpleSearchCurrentConditions
+  ): void => {
+    this._term = conditions.term || '';
+    if (!this._term) {
+      this._value = '';
+      this._hideSuggestions = true;
+    }
+  };
 
   constructor() {
     super();
@@ -32,14 +42,24 @@ class SimpleSearchView extends LitElement {
     // コントローラーとイベントハンドラーを初期化
     this._controller = new SimpleSearchController(this);
     this._eventHandlers = new SimpleSearchEventHandlers(this, this._controller);
+  }
 
-    // Karyotype選択など外部からtermが変わったときにinputへ反映する
-    storeManager.subscribe('simpleSearchConditions', (v) => {
-      const term = ((v as Record<string, unknown>)?.term as string) ?? '';
-      if (term !== this._term) {
-        this._term = term;
-      }
-    });
+  /** Karyotype選択など外部からの条件変更をinputへ反映するため、表示中だけ購読する。 */
+  connectedCallback(): void {
+    super.connectedCallback();
+    storeManager.subscribe(
+      'simpleSearchConditions',
+      this._boundSimpleSearchConditionsHandler
+    );
+  }
+
+  /** 要素破棄後もハンドラが残り続けるメモリリークを防ぐため、購読をここで解除する。 */
+  disconnectedCallback(): void {
+    storeManager.unsubscribe(
+      'simpleSearchConditions',
+      this._boundSimpleSearchConditionsHandler
+    );
+    super.disconnectedCallback();
   }
 
   // ============================================================================

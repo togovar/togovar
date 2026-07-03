@@ -11,19 +11,19 @@ type SearchMessageResponse = {
  * APIレスポンス内のnotice/warning/errorだけをStoreへ反映し、検索結果処理と分離する。
  */
 export function applySearchMessages(jsonResponse: unknown): void {
-  storeManager.setData('searchMessages', buildSearchMessages(jsonResponse));
+  storeManager.setData('searchMessages', normalizeSearchMessages(jsonResponse));
 }
 
 /**
- * レスポンスからメッセージを組み立て、メッセージがなければ空を返す純粋な変換関数。
+ * Storeには表示可能な文字列だけを入れたいので、APIの配列形式をここで正規化する。
  */
-function buildSearchMessages(jsonResponse: unknown): SearchMessages {
+function normalizeSearchMessages(jsonResponse: unknown): SearchMessages {
   if (!isSearchMessageResponse(jsonResponse)) return {};
 
   const messages: SearchMessages = {
-    notice: joinMessage(jsonResponse.notice),
-    warning: joinMessage(jsonResponse.warning),
-    error: joinMessage(jsonResponse.error),
+    notice: joinApiMessagesForHtml(jsonResponse.notice),
+    warning: joinApiMessagesForHtml(jsonResponse.warning),
+    error: joinApiMessagesForHtml(jsonResponse.error),
   };
 
   return messages.notice || messages.warning || messages.error ? messages : {};
@@ -45,7 +45,7 @@ function isSearchMessageResponse(value: unknown): value is SearchMessageResponse
 /**
  * UI側は文字列を購読するため、APIの複数メッセージを既存表示形式へ変換する。
  */
-function joinMessage(messages: string[] | undefined): string | undefined {
+function joinApiMessagesForHtml(messages: string[] | undefined): string | undefined {
   return messages?.join('<br>');
 }
 
