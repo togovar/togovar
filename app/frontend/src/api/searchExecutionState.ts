@@ -88,14 +88,6 @@ export function getCurrentSearchOrigin(): SearchOrigin {
 }
 
 /**
- * ブックマーク/共有URLからの初回ロードを判定するため、現在の検索世代番号を公開する。
- * ページ生涯で最初に実行される検索は必ず1になる。
- */
-export function getCurrentSearchExecutionId(): number {
-  return searchExecutionState.executionId;
-}
-
-/**
  * debounceで検索開始が遅れる間も、履歴操作のレスポンス自動遷移を先に止めるため発火元だけ更新する。
  */
 export function markSearchOriginBeforeDebounce(
