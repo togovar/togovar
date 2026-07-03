@@ -123,7 +123,7 @@ export function handleHistoryChange(e: PopStateEvent): void {
   prepareHistoryNavigationSearch();
 
   const urlParams = parseSearchURLParams();
-  const mode = urlParams.mode as string | undefined;
+  const mode = normalizeModeParam(urlParams.mode);
   const currentMode = storeManager.getData('searchMode');
 
   if (mode === 'advanced') {
@@ -132,6 +132,13 @@ export function handleHistoryChange(e: PopStateEvent): void {
   }
 
   restoreSimpleSearchFromHistory(urlParams, currentMode);
+}
+
+/**
+ * qs.parse()は?mode=a&mode=bのような重複パラメータを配列で返すため、比較前に先頭要素へ正規化する。
+ */
+function normalizeModeParam(rawMode: unknown): string | undefined {
+  return Array.isArray(rawMode) ? (rawMode[0] as string | undefined) : (rawMode as string | undefined);
 }
 
 /**
