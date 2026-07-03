@@ -233,8 +233,8 @@ function redirectToSingleVariantIfReady(): boolean {
  */
 function isVariantSearchEndpoint(endpointUrl: URL): boolean {
   return (
-    endpointUrl.pathname === '/search' ||
-    endpointUrl.pathname === '/api/search/variant'
+    endpointUrl.pathname.endsWith('/search') ||
+    endpointUrl.pathname.endsWith('/api/search/variant')
   );
 }
 
