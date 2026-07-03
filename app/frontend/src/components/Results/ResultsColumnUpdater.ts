@@ -13,6 +13,11 @@ import type {
   ExternalLinkItem,
 } from '../../types';
 import { REF_ALT_SHOW_LENGTH } from './ResultsColumnTemplates';
+import {
+  getVariantIdentifier,
+  getVariantReportPath,
+  type VariantLocusFields,
+} from '../../utils/variantPath';
 
 type NormalizedGeneSummary = {
   total: number;
@@ -69,7 +74,6 @@ export class ResultsColumnUpdater {
    */
   static ensureAnchor(
     cell: HTMLElement,
-    className: string,
     insertBefore?: Element | null
   ) {
     const currentAnchor = cell.querySelector<HTMLAnchorElement>('a.hyper-text');
@@ -78,7 +82,6 @@ export class ResultsColumnUpdater {
 
     const anchor = document.createElement('a');
 
-    anchor.className = className;
     anchor.target = '_blank';
     anchor.rel = 'noopener noreferrer';
 
@@ -92,7 +95,9 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * セル内のa要素にリンク先、表示文字列、スクリーンリーダー向けラベルを設定する。
+   * セル内のa要素にクラス・リンク先・表示文字列・スクリーンリーダー向けラベルを設定する。
+   * 仮想スクロールでa要素が別データの行へ使い回されるため、既存要素の再利用時もclassNameを
+   * 毎回上書きする（ensureAnchor内では新規作成時にしか設定できないため）。
    */
   static updateAnchor(
     cell: HTMLElement,
@@ -102,39 +107,49 @@ export class ResultsColumnUpdater {
     label: string,
     insertBefore?: Element | null
   ) {
-    const anchor = this.ensureAnchor(cell, className, insertBefore);
+    const anchor = this.ensureAnchor(cell, insertBefore);
 
+    anchor.className = className;
     anchor.setAttribute('href', url);
     anchor.textContent = text;
     anchor.setAttribute('aria-label', label);
+
+    return anchor;
   }
 
   /**
    * TogoVar ID列を更新する。
+   * TogoVar ID (tgvid) が無いバリアントも variant page へ遷移できるよう、
+   * その場合は chromosome-position-reference-alternate 形式のURLへ、
+   * テキストの代わりにアイコンのみのリンクとして表示する。
    *
    * @param cell - TogoVar ID列のtd要素
-   * @param value - 表示するTogoVar ID
-   * @param url - バリアント詳細ページのURL
+   * @param result - id/chromosome/position/reference/alternateを持つ結果行データ
    */
   static updateTogovarId(
     cell: HTMLTableCellElement | null,
-    value: string,
-    url: string
+    result: VariantLocusFields
   ) {
-    if (!cell || !value) {
-      if (cell) {
-        this.resetAnchor(cell);
-      }
-      return;
-    }
+    if (!cell) return;
 
-    this.updateAnchor(
+    const { value, isTogovarId } = getVariantIdentifier(result);
+    const url = getVariantReportPath(result);
+    const label = `View variant ${value} details`;
+
+    const anchor = this.updateAnchor(
       cell,
-      'hyper-text -internal',
+      isTogovarId ? 'hyper-text -internal' : 'hyper-text -internal -icon-only',
       url,
-      value,
-      `View variant ${value} details`
+      isTogovarId ? value : '',
+      label
     );
+
+    // アイコンのみ表示のためテキストからは分からず、hover時のツールチップで補う
+    if (isTogovarId) {
+      anchor.removeAttribute('title');
+    } else {
+      anchor.title = label;
+    }
   }
 
   /**

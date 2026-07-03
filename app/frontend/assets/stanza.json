@@ -1,6 +1,7 @@
 {
   "variant": {
     "id": "tgv_id",
+    "fallback_id": "variant",
     "base_options": {
       "sparqlist": "$TOGOVAR_STANZA_SPARQLIST"
     },
@@ -55,7 +56,7 @@
         "references": ["GRCh37", "GRCh38"],
         "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
         "options": {
-          "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_gwas?tgv_id=${tgv_id}",
+          "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_gwas?${id_param}=${id_value}",
           "data-type": "json",
           "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
           "page-size_option": "5,10,20,50,100",

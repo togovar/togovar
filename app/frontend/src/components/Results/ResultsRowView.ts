@@ -106,11 +106,7 @@ export class ResultsRowView {
     (result: ResultData) => void
   > = {
     togovar_id: (result) =>
-      ResultsColumnUpdater.updateTogovarId(
-        this.cells.togovarIdCell,
-        result.id,
-        `/variant/${result.id}`
-      ),
+      ResultsColumnUpdater.updateTogovarId(this.cells.togovarIdCell, result),
     refsnp_id: (result) =>
       ResultsColumnUpdater.updateRefSNP(
         this.cells.refsnpContent,

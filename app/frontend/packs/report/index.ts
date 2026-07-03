@@ -438,12 +438,12 @@ class StanzaManager {
  */
 class ReportApp {
   /**
-   * Initializes the report application and renders all configured stanzas.
+   * variant page が chr-pos-ref-alt 形式のURLでもtgvidへ解決してから描画できるよう、非同期化している。
    *
    * This is the main entry point that coordinates the entire report rendering process.
    * It handles error cases gracefully and provides detailed logging for debugging.
    */
-  static initialize(): void {
+  static async initialize(): Promise<void> {
     const routeInfo = this._parseCurrentRoute();
     const reportConfig = this._getReportConfig(routeInfo.reportType);
 
@@ -454,18 +454,105 @@ class ReportApp {
       return;
     }
 
-    const baseOptions = this._prepareBaseOptions(
-      reportConfig,
-      routeInfo.reportId
+    const { reportId, idKey } = await this._resolveRouteId(
+      routeInfo,
+      reportConfig
     );
 
-    this._updatePageElements(routeInfo.reportId);
-    this._renderAllStanzas(
-      reportConfig.stanza || [],
-      baseOptions,
-      routeInfo.reportId,
-      reportConfig.id
-    );
+    const baseOptions = this._prepareBaseOptions(reportConfig, reportId, idKey);
+
+    this._updatePageElements(reportId);
+    this._renderAllStanzas(reportConfig.stanza || [], baseOptions, reportId, idKey);
+  }
+
+  /** tgvid形式かどうかの判定に使う。tgv-prefix + 数字のみを既存tgvidとみなす。 */
+  private static readonly TGV_ID_PATTERN = /^tgv\d+$/i;
+
+  /** chr-pos-ref-alt形式のURLをパースするための正規表現。染色体名・REF・ALTにハイフンは含まれない前提。 */
+  private static readonly VARIANT_LOCUS_PATTERN =
+    /^([^-]+)-(\d+)-([^-]+)-([^-]+)$/;
+
+  /**
+   * variant pageのURLがtgvid形式でない場合、chr-pos-ref-altから検索APIでtgvidを解決する。
+   * バックエンドは tgvid にマップできない chr-pos-ref-alt を404にしており、リダイレクトへ倒すと
+   * 無限ループになるため、この解決はフロント側だけで完結させる（URLの書き換えは行わない）。
+   *
+   * @returns 解決できた場合は tgvid、できなかった場合は元のlocus文字列と、それぞれに応じたidKey
+   */
+  private static async _resolveRouteId(
+    routeInfo: RouteInfo,
+    reportConfig: ReportConfig
+  ): Promise<{ reportId: string; idKey: string }> {
+    const defaultIdKey = reportConfig.id || 'id';
+
+    if (
+      routeInfo.reportType !== 'variant' ||
+      this.TGV_ID_PATTERN.test(routeInfo.reportId)
+    ) {
+      return { reportId: routeInfo.reportId, idKey: defaultIdKey };
+    }
+
+    const locusMatch = routeInfo.reportId.match(this.VARIANT_LOCUS_PATTERN);
+
+    if (!locusMatch) {
+      return { reportId: routeInfo.reportId, idKey: defaultIdKey };
+    }
+
+    const [, chromosome, position, reference, alternate] = locusMatch;
+    const tgvId = await this._fetchTgvId({
+      chromosome,
+      position: Number(position),
+      reference,
+      alternate,
+    });
+
+    if (tgvId) {
+      return { reportId: tgvId, idKey: defaultIdKey };
+    }
+
+    return {
+      reportId: routeInfo.reportId,
+      idKey: reportConfig.fallback_id || 'variant',
+    };
+  }
+
+  /**
+   * chr-pos-ref-altからtgvidを検索する。見つからない場合やAPIエラー時はnullを返し、
+   * 呼び出し元でlocusベースのフォールバック表示へ倒せるようにする。
+   */
+  private static async _fetchTgvId(variant: {
+    chromosome: string;
+    position: number;
+    reference: string;
+    alternate: string;
+  }): Promise<string | null> {
+    try {
+      const response = await fetch(
+        `${ENV_CONFIG.TOGOVAR_FRONTEND_API_URL}/api/search/variant?stat=0`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          mode: 'cors',
+          body: JSON.stringify({ query: { variant } }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Unexpected response status: ${response.status}`);
+      }
+
+      const result = (await response.json()) as {
+        data?: Array<{ id: string }>;
+      };
+
+      return result.data?.[0]?.id ?? null;
+    } catch (error) {
+      console.error('Failed to resolve TogoVar ID from variant locus', error);
+      return null;
+    }
   }
 
   /**
@@ -504,32 +591,30 @@ class ReportApp {
   }
 
   /**
-   * Prepares base options that will be applied to all stanzas in the report.
-   *
-   * Base options include common configuration like endpoints and the report ID
-   * mapped to the appropriate key name (configurable per report type).
+   * idKeyを呼び出し元(_resolveRouteId)から明示的に受け取る。tgvid解決の成否によって
+   * 'tgv_id' と fallback_id('variant' など)が切り替わるため、ここでは導出しない。
    *
    * @param reportConfig - Configuration for the current report type
    * @param reportId - Identifier for the specific report item
+   * @param idKey - Attribute key name used to expose the report ID to stanzas
    * @returns Base options object ready for stanza application
    *
    * @example
    * ```typescript
-   * const config = { base_options: { sparqlist: "/api" }, id: "tgv_id" };
-   * const options = ReportApp._prepareBaseOptions(config, "tgv123456");
+   * const config = { base_options: { sparqlist: "/api" } };
+   * const options = ReportApp._prepareBaseOptions(config, "tgv123456", "tgv_id");
    * // Returns: { sparqlist: "/api", tgv_id: "tgv123456" }
    * ```
    */
   private static _prepareBaseOptions(
     reportConfig: ReportConfig,
-    reportId: string
+    reportId: string,
+    idKey: string
   ): Record<string, unknown> {
     const baseOptions = reportConfig.base_options
       ? { ...reportConfig.base_options }
       : {};
 
-    // Add the report ID using the configured key name (default: 'id')
-    const idKey = reportConfig.id || 'id';
     baseOptions[idKey] = reportId;
 
     return baseOptions;
@@ -596,7 +681,10 @@ class ReportApp {
   }
 
   /**
-   * Processes template variables in stanza options, replacing placeholders with actual values.
+   * idKeyNameはtgvid解決の成否で'tgv_id'/'variant'などに切り替わるため、
+   * stanza.jsonがキー名を直書きできるよう`${id_param}`/`${id_value}`という
+   * 固定トークンも合わせて置換する（idKeyName側の置換だけだと、未解決時に
+   * stanza.json上のリテラルなクエリキー名との組み合わせが崩れるため）。
    *
    * Supports template syntax like `${report_id}` or `$report_id` where the variable
    * name matches the configured ID key for the report type.
@@ -629,21 +717,30 @@ class ReportApp {
     const processedStanzaConfig: StanzaConfig = { ...stanzaConfig };
     processedStanzaConfig.options = { ...stanzaConfig.options };
 
+    const tokens: Array<[string, string]> = [
+      [idKeyName, reportId],
+      ['id_param', idKeyName],
+      ['id_value', reportId],
+    ];
+
     // Process each option value for template variables
     for (const [optionKey, optionValue] of Object.entries(
       processedStanzaConfig.options
     )) {
-      if (typeof optionValue === 'string' && optionValue.includes('$')) {
-        // Replace both ${var} and $var syntax
-        const templateVariablePattern = new RegExp(
-          `\\$(${idKeyName}|{${idKeyName}})`,
-          'g'
-        );
-        processedStanzaConfig.options[optionKey] = optionValue.replace(
-          templateVariablePattern,
-          reportId
-        );
+      if (typeof optionValue !== 'string' || !optionValue.includes('$')) {
+        continue;
       }
+
+      // 置換文字列に$&や$1などが含まれていても特殊構文として解釈されないよう、
+      // 第2引数はコールバック形式で渡す
+      processedStanzaConfig.options[optionKey] = tokens.reduce(
+        (value, [tokenName, tokenValue]) =>
+          value.replace(
+            new RegExp(`\\$(${tokenName}|{${tokenName}})`, 'g'),
+            () => tokenValue
+          ),
+        optionValue
+      );
     }
 
     return processedStanzaConfig;
