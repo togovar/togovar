@@ -299,6 +299,12 @@ function requestInitialSearch(searchOrigin: SearchOrigin): void {
   prepareSearchOriginBeforeDebouncedRequest(searchOrigin);
   storeManager.setData('appLoadingStatus', 'searching');
   executeSearch(0, true, searchOrigin);
+
+  // 履歴復元はdebounce待機中に前回検索のexecutionId/abortが更新されないため、
+  // 即時flushして古いレスポンスがStoreへ紛れ込む隙をなくす。
+  if (searchOrigin === 'history') {
+    executeSearch.flush();
+  }
 }
 
 /**
@@ -329,7 +335,6 @@ function prepareHistoryNavigationSearch(): void {
  */
 function handlePageShow(event: PageTransitionEvent): void {
   if (!event.persisted) return;
-  prepareHistoryNavigationSearch();
   requestInitialSearch('history');
 }
 
