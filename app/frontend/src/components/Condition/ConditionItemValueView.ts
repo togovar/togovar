@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import './FrequencyCountValueView'; // for embedding
-import './ConditionVariantEffectPredictionSearch/PredictionValueView'; // for embedding
+import './ConditionDeleteriousnessPredictionSearch/PredictionValueView'; // for embedding
 import type { AdvancedConditionTypeValue } from '../../advancedCondition';
 import Style from '../../../stylesheets/web-components/condition-item-value-view.scss';
 
@@ -23,7 +23,7 @@ export class ConditionItemValueView extends LitElement {
     if (
       this.conditionType !== 'dataset' &&
       this.conditionType !== 'genotype' &&
-      this.conditionType !== 'variant_effect_prediction'
+      this.conditionType !== 'deleteriousness_prediction'
     )
       return;
     requestAnimationFrame(() => {
@@ -92,7 +92,7 @@ export class ConditionItemValueView extends LitElement {
         <frequency-count-value-view data-dataset="${this.value}">
         </frequency-count-value-view>
       `;
-    } else if (this.conditionType === 'variant_effect_prediction') {
+    } else if (this.conditionType === 'deleteriousness_prediction') {
       option = html`
         <prediction-value-view data-dataset="${this.value}">
         </prediction-value-view>

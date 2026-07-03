@@ -366,7 +366,7 @@ export default class FloatingInfo {
       case 'table-header-polyphen':
       case 'table-header-alphamissense':
         return 'Read prediction help';
-      case 'table-header-splicingvariant':
+      case 'table-header-splice-site-creation':
         return 'Read SSCV DB help';
       default:
         return 'Read related help';

@@ -402,6 +402,12 @@
       > th {
         position: relative;
 
+        // -------------------------------------------------------------------------
+        // 列幅定義（th 側）
+        // th と td は別要素のため、同じ列クラスに対して th / td 両方に幅を指定する必要がある。
+        // td 側の列幅定義は tbody > tr > td セクションに同様のブロックがある。
+        // -------------------------------------------------------------------------
+
         &.togovar_id {
           width: 124px;
           min-width: 124px;
@@ -481,7 +487,7 @@
           max-width: 70px;
         }
 
-        &.splicingvariant {
+        &.splice-site-creation {
           width: 140px;
           min-width: 140px;
           max-width: 140px;
@@ -560,6 +566,12 @@
         overflow: hidden;
         text-overflow: ellipsis;
 
+        // -------------------------------------------------------------------------
+        // 列幅定義（td 側）
+        // th と td は別要素のため、同じ列クラスに対して th / td 両方に幅を指定する必要がある。
+        // th 側の列幅定義は thead > tr > th セクションに同様のブロックがある。
+        // -------------------------------------------------------------------------
+
         &.togovar_id {
           width: 124px;
           min-width: 124px;
@@ -632,7 +644,7 @@
           max-width: 70px;
         }
 
-        &.splicingvariant {
+        &.splice-site-creation {
           width: 140px;
           min-width: 140px;
           max-width: 140px;

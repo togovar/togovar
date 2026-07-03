@@ -30,11 +30,11 @@ export type MasterConditionId =
   | 'significance'
   | 'consequence'
   | 'consequence_grouping'
-  | 'cadd'
+  | 'cadd_phred'
   | 'alphamissense'
   | 'sift'
   | 'polyphen'
-  | 'splicingvariant';
+  | 'sscv_db';
 
 export type MasterConditionType = 'array' | 'boolean' | 'string';
 
@@ -74,11 +74,11 @@ export type SimpleSearchCurrentConditions = {
   type?: Record<string, string>; // { "SO_0001483": "1", ... }
   consequence?: Record<string, string>; // { "SO_0001580": "1", ... }
   significance?: Record<string, string>; // { "NA": "1", ... }
-  cadd?: Record<string, string>; // { "N": "1", "D": "1", "POSSD": "1", "T": "1" }
-  alphamissense?: Record<string, string>; // { "N": "1", "LP": "1", ... }
-  sift?: Record<string, string>; // { "N": "1", "D": "1", ... }
-  polyphen?: Record<string, string>; // { "N": "1", "PROBD": "1", ... }
-  splicingvariant?: Record<string, string>; // { "N": "1", "PEL": "1", "CEI": "1", "EE": "1", "A": "1" }
+  cadd_phred?: Record<string, string>; // { "NA": "1", "P0": "1", "P10": "1", "P20": "1" }
+  alphamissense?: Record<string, string>; // { "NA": "1", "LP": "1", ... }
+  sift?: Record<string, string>; // { "NA": "1", "D": "1", ... }
+  polyphen?: Record<string, string>; // { "NA": "1", "PROBD": "1", ... }
+  sscv_db?: Record<string, string>; // { "NA": "1", "PEL": "1", "CEI": "1", "EE": "1", "A": "1" }
 };
 
 // ============================================

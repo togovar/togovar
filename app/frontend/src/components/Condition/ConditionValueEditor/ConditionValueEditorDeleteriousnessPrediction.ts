@@ -1,27 +1,27 @@
 import { ConditionValueEditor } from './ConditionValueEditor';
-import '../ConditionVariantEffectPredictionSearch/TabView';
-import '../ConditionVariantEffectPredictionSearch/PredictionRangeSliderView';
+import '../ConditionDeleteriousnessPredictionSearch/TabView';
+import '../ConditionDeleteriousnessPredictionSearch/PredictionRangeSliderView';
 import type {
   PredictionKey,
   PredictionLabel,
-} from '../ConditionVariantEffectPredictionSearch/PredictionDatasets';
-import { PREDICTIONS } from '../ConditionVariantEffectPredictionSearch/PredictionDatasets';
+} from '../ConditionDeleteriousnessPredictionSearch/PredictionDatasets';
+import { PREDICTIONS } from '../ConditionDeleteriousnessPredictionSearch/PredictionDatasets';
 import type ConditionValues from '../ConditionValues';
 import type { ConditionItemView } from '../ConditionItemView';
 import type { ConditionItemValueView } from '../ConditionItemValueView';
-import type { PredictionValueView } from '../ConditionVariantEffectPredictionSearch/PredictionValueView';
+import type { PredictionValueView } from '../ConditionDeleteriousnessPredictionSearch/PredictionValueView';
 import type { Inequality, PredictionChangeDetail } from '../../../types';
-import type { TabView } from '../ConditionVariantEffectPredictionSearch/TabView';
+import type { TabView } from '../ConditionDeleteriousnessPredictionSearch/TabView';
 
 const DEFAULT_PREDICTION_KEY: PredictionKey = 'cadd_phred';
 const DEFAULT_PREDICTION = PREDICTIONS[DEFAULT_PREDICTION_KEY];
 
 /**
- * Variant effect prediction 条件のエディタ。
+ * Deleteriousness prediction 条件のエディタ。
  * tab-view でデータセット（AlphaMissense/SIFT/PolyPhen 等）を切り替え、
  * スコア範囲と不等号を設定して prediction-value-view へ反映する。
  */
-export class ConditionValueEditorVariantEffectPrediction extends ConditionValueEditor {
+export class ConditionValueEditorDeleteriousnessPrediction extends ConditionValueEditor {
   private _dataset: PredictionKey = DEFAULT_PREDICTION_KEY;
   private _label: PredictionLabel = DEFAULT_PREDICTION.label;
   private _values: [number, number] = [
@@ -151,7 +151,7 @@ export class ConditionValueEditorVariantEffectPrediction extends ConditionValueE
    */
   private _initializeUI() {
     this.createSectionEl(
-      'variant-effect-prediction-editor-view',
+      'deleteriousness-prediction-editor-view',
       `<header class="section-header">Select score</header><div class="section-content"></div>`
     );
     this._tabsContainer =

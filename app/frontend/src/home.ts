@@ -228,7 +228,7 @@ function initSidebar(): void {
   if (TOGOVAR_FRONTEND_REFERENCE === 'GRCh38') {
     new PanelViewCheckList(
       selectRequired<HTMLElement>(document, '#FilterCADD'),
-      'cadd'
+      'cadd_phred'
     );
   }
   new PanelViewCheckList(
@@ -245,8 +245,8 @@ function initSidebar(): void {
   );
   if (TOGOVAR_FRONTEND_REFERENCE === 'GRCh38') {
     new PanelViewCheckList(
-      selectRequired<HTMLElement>(document, '#FilterSplicingVariant'),
-      'splicingvariant'
+      selectRequired<HTMLElement>(document, '#FilterSpliceSiteCreation'),
+      'sscv_db'
     );
   }
 }

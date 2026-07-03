@@ -652,11 +652,11 @@ export class ResultsColumnUpdater {
    * hrefなしの空リンクをDOMに残さないため、リンク化できる場合だけa要素を生成する。
    * 1バリアントに複数エントリが返るケースはほぼないため先頭の predicted_splicing_type のみ表示する。
    *
-   * @param cell - スプライシング予測表示セル
+   * @param cell - スプライスサイト生成予測表示セル
    * @param items - SSCV DB予測結果の配列
    * @param links - SSCV DB外部リンク候補
    */
-  static updateSplicingVariant(
+  static updateSpliceSiteCreation(
     cell: HTMLTableCellElement | null,
     items: SscvDbItem[] | undefined,
     links: ExternalLinkItem[] | undefined
@@ -672,7 +672,7 @@ export class ResultsColumnUpdater {
     const rawUrl = links?.[0]?.xref ?? '';
 
     this.resetAnchor(cell);
-    this.resetInlineText(cell, 'splicingvariant-item');
+    this.resetInlineText(cell, 'splice-site-creation-item');
 
     if (!text) return;
 
@@ -690,13 +690,13 @@ export class ResultsColumnUpdater {
     if (text && safeUrl) {
       this.updateAnchor(
         cell,
-        'splicingvariant-item hyper-text -external',
+        'splice-site-creation-item hyper-text -external',
         safeUrl,
         text,
         `Open SSCV DB record ${text}`
       );
     } else {
-      this.updateInlineText(cell, 'splicingvariant-item', text);
+      this.updateInlineText(cell, 'splice-site-creation-item', text);
     }
   }
 }

@@ -36,8 +36,16 @@ export class ConditionValueEditorCheckboxes extends ConditionValueEditor {
       throw new Error(`${this.conditionType} condition values not found`);
     }
 
+    // 条件種別ごとに選択対象が異なるため、見出しを切り替える
+    const headerText =
+      this.conditionType === 'sscv_db'
+        ? 'Select predicted splicing type in SSCV DB'
+        : this.conditionType === 'type'
+        ? 'Select type'
+        : 'Select values';
+
     this.createSectionEl('checkboxes-editor-view', () => [
-      createEl('header', { class: 'section-header', text: 'Select values' }),
+      createEl('header', { class: 'section-header', text: headerText }),
 
       createEl('div', {
         class: 'buttons',

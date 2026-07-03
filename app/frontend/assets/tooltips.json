@@ -60,8 +60,8 @@
     "url": "/doc/help#d7"
   },
   {
-    "id": "table-header-splicingvariant",
-    "content": "Prediction of splicing effects of a variant by the SSCV DB (Splicing Site Creation Variant Database)",
+    "id": "table-header-splice-site-creation",
+    "content": "Splice-site creating variants (SSCVs) identified by SSCV DB from publicly available transcriptome sequencing data",
     "url": "/doc/help#d10"
   },
   {

@@ -1,6 +1,6 @@
 import type { FrequencyCountValueView } from '../components/Condition/FrequencyCountValueView';
 import type { SignificanceSource } from './query';
-import type { PredictionKey } from '../components/Condition/ConditionVariantEffectPredictionSearch/PredictionDatasets';
+import type { PredictionKey } from '../components/Condition/ConditionDeleteriousnessPredictionSearch/PredictionDatasets';
 
 // FrequencyCountValueView の setValues 第2引数を型として使うことで、
 // UIコンポーネント側のシグネチャ変更が自動的にここへ伝播する。

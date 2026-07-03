@@ -48,7 +48,7 @@ app/frontend/
       AdvancedSearch/   Advanced Search全体制御
       Condition/        条件入力UI・クエリ変換
         ConditionDiseaseSearch/                  疾患検索Lit要素
-        ConditionVariantEffectPredictionSearch/   バリアント効果予測検索Lit要素
+        ConditionDeleteriousnessPredictionSearch/  有害性予測検索Lit要素
         ConditionValueEditor/                    条件値入力UI
         queryBuilders/                           条件→APIクエリ変換
       Karyotype/        染色体ビジュアライズ
@@ -274,7 +274,7 @@ python3 scripts/check_conditions.py
 
 | type            | UI                                               | 該当条件                                               |
 | --------------- | ------------------------------------------------ | ------------------------------------------------------ |
-| `"peculiar"`    | 専用の特殊UI（ツリー選択・座標入力・スライダー） | dataset, genotype, location, variant_effect_prediction |
+| `"peculiar"`    | 専用の特殊UI（ツリー選択・座標入力・スライダー） | dataset, genotype, location, deleteriousness_prediction |
 | `"enumeration"` | チェックボックスのリスト                         | significance, sscv_db, type                            |
 | `"tree"`        | 文字列IDで参照する階層ツリー                     | consequence                                            |
 | `"text"`        | テキスト入力                                     | disease, gene, id                                      |

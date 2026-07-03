@@ -46,8 +46,7 @@
   &[data-dataset='tommo_jsv1'],
   &[data-dataset='ncbn'],
   &[data-dataset='jogo'],
-  &[data-dataset='gnomad_genomes'],
-  &[data-dataset='gnomad_sv'] {
+  &[data-dataset='gnomad_genomes'] {
     > .properties {
       &::after {
         content: 'WGS';
@@ -121,8 +120,7 @@
   }
 
   &[data-dataset='gnomad_genomes'],
-  &[data-dataset='gnomad_exomes'],
-  &[data-dataset='gnomad_sv'] {
+  &[data-dataset='gnomad_exomes'] {
     &::before {
       color: var(--color-dataset-foreign);
     }

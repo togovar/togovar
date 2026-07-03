@@ -39,22 +39,8 @@
         "has_freq": true
       },
       {
-        "id": "bbj1k",
-        "label": "BBJ1K",
-        "type": "boolean",
-        "default": "1",
-        "has_freq": true
-      },
-      {
-        "id": "bbj2k",
-        "label": "BBJ2K",
-        "type": "boolean",
-        "default": "1",
-        "has_freq": true
-      },
-      {
         "id": "tommo",
-        "label": "ToMMo 54KJPN",
+        "label": "ToMMo 61KJPN",
         "type": "boolean",
         "default": "1",
         "has_freq": true
@@ -69,6 +55,20 @@
       {
         "id": "ncbn",
         "label": "NCBN",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
+        "id": "bbj1k",
+        "label": "BBJ1K",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
+        "id": "bbj2k",
+        "label": "BBJ2K",
         "type": "boolean",
         "default": "1",
         "has_freq": true
@@ -90,13 +90,6 @@
       {
         "id": "gnomad_exomes",
         "label": "gnomAD exomes",
-        "type": "boolean",
-        "default": "1",
-        "has_freq": true
-      },
-      {
-        "id": "gnomad_sv",
-        "label": "gnomAD SV",
         "type": "boolean",
         "default": "1",
         "has_freq": true
@@ -189,24 +182,6 @@
         "label": "MNV",
         "type": "boolean",
         "default": "1"
-      },
-      {
-        "id": "SO_1000035",
-        "label": "Duplication",
-        "type": "boolean",
-        "default": "1"
-      },
-      {
-        "id": "SO_1000036",
-        "label": "Inversion",
-        "type": "boolean",
-        "default": "1"
-      },
-      {
-        "id": "SO_0001021",
-        "label": "Breakend",
-        "type": "boolean",
-        "default": "1"
       }
     ]
   },
@@ -266,6 +241,24 @@
       {
         "id": "US",
         "label": "Uncertain significance",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "VH",
+        "label": "VUS-high",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "VM",
+        "label": "VUS-mid",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "VL",
+        "label": "VUS-low",
         "type": "boolean",
         "default": "1"
       },
@@ -336,32 +329,14 @@
         "default": "1"
       },
       {
-        "id": "AN",
-        "label": "Association not found",
-        "type": "boolean",
-        "default": "1"
-      },
-      {
         "id": "NC",
         "label": "No classification",
         "type": "boolean",
         "default": "1"
       },
       {
-        "id": "VH",
-        "label": "VUS-high",
-        "type": "boolean",
-        "default": "1"
-      },
-      {
-        "id": "VM",
-        "label": "VUS-mid",
-        "type": "boolean",
-        "default": "1"
-      },
-      {
-        "id": "VL",
-        "label": "VUS-low",
+        "id": "AN",
+        "label": "Association not found",
         "type": "boolean",
         "default": "1"
       }
@@ -670,6 +645,7 @@
           {
             "label": "Coding variant",
             "items": [
+              "SO_0001968",
               "SO_0001580",
               "SO_0001907",
               "SO_0001906",
@@ -699,7 +675,7 @@
             ]
           },
           {
-            "label": "Splice variant",
+            "label": "Splicing variant(SO:0001568)",
             "items": [
               "SO_0001574",
               "SO_0001575",
@@ -710,8 +686,7 @@
             ]
           },
           "SO_0001893",
-          "SO_0001889",
-          "SO_0001968"
+          "SO_0001889"
         ]
       },
       {
@@ -734,30 +709,30 @@
     ]
   },
   {
-    "id": "cadd",
+    "id": "cadd_phred",
     "label": "CADD (PHRED score)",
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
       },
       {
-        "id": "D",
+        "id": "P20",
         "label": "",
         "type": "boolean",
         "default": "1"
       },
       {
-        "id": "POSSD",
+        "id": "P10",
         "label": "",
         "type": "boolean",
         "default": "1"
       },
       {
-        "id": "T",
+        "id": "P0",
         "label": "",
         "type": "boolean",
         "default": "1"
@@ -770,7 +745,7 @@
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
@@ -801,7 +776,7 @@
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
@@ -826,7 +801,7 @@
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
@@ -858,12 +833,12 @@
     ]
   },
   {
-    "id": "splicingvariant",
-    "label": "Splicing variant (SSCV DB)",
+    "id": "sscv_db",
+    "label": "Splice-site creation",
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
