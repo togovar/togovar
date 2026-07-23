@@ -17,6 +17,30 @@
 - 生成物や依存関係の大きな更新は、明確に必要な場合だけ行う。
 - 依存を移動・追加・削除する場合は、実行時依存かビルド時依存かを確認し、`package.json` と `package-lock.json` を揃える。
 
+## コミットメッセージ
+
+- コミットメッセージは Conventional Commits 形式 `<type>: <description>` に従う。
+- description（説明文）は英語で書く。
+
+よく使う type:
+
+- `feat`: 新機能
+- `fix`: バグ修正
+- `refactor`: 挙動を変えないコード変更
+- `style`: フォーマット・CSSのみの変更（ロジック変更なし）
+- `docs`: ドキュメントのみの変更
+- `chore`: ツール・設定・依存関係の変更
+- `test`: テストの追加・修正
+
+ルール:
+
+- 小文字・命令形で書く（例: "added" ではなく "add"）
+- スコープを括弧で付けない
+- 文末にピリオドを付けない
+- description は72文字以内に収める
+
+例: `fix: correct rowspan calculation in ClinVar table`
+
 ## 技術スタック
 
 | レイヤー         | 技術                                           |
