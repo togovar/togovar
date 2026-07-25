@@ -60,7 +60,7 @@
     "mini-css-extract-plugin": "^2.6.0",
     "minimist": "^1.2.6",
     "popper.js": "^1.16.1",
-    "postcss": "^8.4.31",
+    "postcss": "^8.5.18",
     "postcss-cssnext": "^3.1.0",
     "postcss-import": "^14.0.1",
     "pug": "^2.0.4",
@@ -97,7 +97,7 @@
     "stylelint-scss": "^5.0.1",
     "typescript": "^5.9.2",
     "webpack-dev-middleware": "^5.3.4",
-    "webpack-dev-server": "^5.2.5",
+    "webpack-dev-server": "^6.0.0",
     "webpack-hot-middleware": "^2.25.0"
   },
   "engines": {
