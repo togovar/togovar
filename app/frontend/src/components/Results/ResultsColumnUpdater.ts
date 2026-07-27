@@ -121,7 +121,7 @@ export class ResultsColumnUpdater {
    * TogoVar ID列を更新する。
    * TogoVar ID (tgvid) が無いバリアントも variant page へ遷移できるよう、
    * その場合は chromosome-position-reference-alternate 形式のURLへ、
-   * テキストの代わりにアイコンのみのリンクとして表示する。
+   * 代替識別子として同じ形式のリンクテキストを表示する。
    *
    * @param cell - TogoVar ID列のtd要素
    * @param result - id/chromosome/position/reference/alternateを持つ結果行データ
@@ -138,13 +138,15 @@ export class ResultsColumnUpdater {
 
     const anchor = this.updateAnchor(
       cell,
-      isTogovarId ? 'hyper-text -internal' : 'hyper-text -internal -icon-only',
+      isTogovarId
+        ? 'hyper-text -internal'
+        : 'hyper-text -internal -missing-togovar-id',
       url,
-      isTogovarId ? value : '',
+      value,
       label
     );
 
-    // アイコンのみ表示のためテキストからは分からず、hover時のツールチップで補う
+    // locus形式は長くなり得るため、hover時に省略なしの値を確認できるようにする。
     if (isTogovarId) {
       anchor.removeAttribute('title');
     } else {

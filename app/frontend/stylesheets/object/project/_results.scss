@@ -1167,6 +1167,17 @@ body[data-column-resizing='true'] {
     }
   }
 
+  // tgvid が無い行は通常のIDリンクより控えめにしつつ、遷移できることは維持する。
+  &.-missing-togovar-id {
+    display: inline-block;
+    width: calc(var(--results-column-togovar_id-width, 124px) - 16px);
+    max-width: calc(var(--results-column-togovar_id-width, 124px) - 16px);
+    overflow: hidden;
+    color: var(--color-gray);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   // アイコンのみ表示（TogoVar ID が無いバリアントなど、テキストの代わりに
   // クリックしたくなるアイコンだけを見せたい場合の修飾子）
   // グリフだけだとタップ領域が狭いため、a要素自体に余白を持たせて当たり判定を広げる

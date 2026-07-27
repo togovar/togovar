@@ -7,6 +7,9 @@ import {
 } from '../../columns';
 
 const AUTO_SIZE_EXTRA_WIDTH = 4;
+const INITIAL_AUTO_SIZE_MAX_WIDTH_BY_COLUMN: Readonly<Record<string, number>> = {
+  togovar_id: 150,
+};
 
 /**
  * 検索結果テーブルの各列幅をコンテンツの実測値に合わせて自動調整するクラス。
@@ -53,10 +56,7 @@ export class ResultsColumnAutoSizer {
     if (!column || !column.isUsed || usesInitialColumnWidth(columnId)) return;
 
     const contentWidth = this.measureColumnContentWidth(columnId);
-    const width =
-      contentWidth <= 0
-        ? getMinColumnWidth()
-        : Math.max(getMinColumnWidth(), contentWidth);
+    const width = this.getAutoSizeWidth(columnId, contentWidth, false);
 
     storeManager.setData(
       'columns',
@@ -123,7 +123,7 @@ export class ResultsColumnAutoSizer {
         return { ...column, width: getMinColumnWidth() };
       }
 
-      return { ...column, width: Math.max(getMinColumnWidth(), contentWidth) };
+      return { ...column, width: this.getAutoSizeWidth(column.id, contentWidth, true) };
     });
 
     this.autoSizedResultSignature = resultSignature;
@@ -143,6 +143,27 @@ export class ResultsColumnAutoSizer {
 
     const firstResult = results[0] as { id?: unknown };
     return `${numberOfRecords}:${String(firstResult?.id || '')}`;
+  }
+
+  /**
+   * 初期表示だけ列幅を抑え、ダブルクリック時は内容全体へ広げられる余地を残す。
+   */
+  private getAutoSizeWidth(
+    columnId: string,
+    contentWidth: number,
+    shouldApplyInitialMaxWidth: boolean
+  ): number {
+    const minWidth = getMinColumnWidth();
+    const width = contentWidth <= 0 ? minWidth : Math.max(minWidth, contentWidth);
+    const maxWidth = shouldApplyInitialMaxWidth
+      ? INITIAL_AUTO_SIZE_MAX_WIDTH_BY_COLUMN[columnId]
+      : undefined;
+
+    if (maxWidth === undefined) {
+      return width;
+    }
+
+    return Math.max(minWidth, Math.min(width, maxWidth));
   }
 
   /**
@@ -227,6 +248,8 @@ export class ResultsColumnAutoSizer {
     }
 
     measuringCell.querySelectorAll<HTMLElement>('*').forEach((element) => {
+      element.style.width = 'auto';
+      element.style.minWidth = '0';
       element.style.maxWidth = 'none';
       element.style.overflow = 'visible';
       element.style.textOverflow = 'clip';

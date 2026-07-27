@@ -593,6 +593,7 @@ class ReportApp {
   /**
    * idKeyを呼び出し元(_resolveRouteId)から明示的に受け取る。tgvid解決の成否によって
    * 'tgv_id' と fallback_id('variant' など)が切り替わるため、ここでは導出しない。
+   * fallback_idがあるレポートでは未使用側も空文字で渡し、Stanza側のlength判定を安定させる。
    *
    * @param reportConfig - Configuration for the current report type
    * @param reportId - Identifier for the specific report item
@@ -614,6 +615,11 @@ class ReportApp {
     const baseOptions = reportConfig.base_options
       ? { ...reportConfig.base_options }
       : {};
+
+    if (reportConfig.id && reportConfig.fallback_id) {
+      baseOptions[reportConfig.id] = '';
+      baseOptions[reportConfig.fallback_id] = '';
+    }
 
     baseOptions[idKey] = reportId;
 
