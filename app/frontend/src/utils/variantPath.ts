@@ -25,7 +25,33 @@ export function getVariantIdentifier(result: VariantLocusFields): {
   };
 }
 
+/**
+ * ハイフン区切りのlocus URLを安全に復元できるよう、区切り文字に使うハイフンも明示的にエンコードする。
+ */
+function encodeVariantPathComponent(value: string | number): string {
+  return encodeURIComponent(String(value)).replace(/-/g, '%2D');
+}
+
+/**
+ * locus形式のURLパスセグメントを組み立てる。
+ * 表示用の識別子とは異なり、各要素を個別にエンコードしてからハイフンで結合する。
+ */
+function getVariantLocusPathSegment(result: VariantLocusFields): string {
+  return [
+    result.chromosome,
+    result.position,
+    result.reference,
+    result.alternate,
+  ]
+    .map(encodeVariantPathComponent)
+    .join('-');
+}
+
 /** variant page への相対パスを組み立てる。tgvid が無い場合は locus 形式のパスになる。 */
 export function getVariantReportPath(result: VariantLocusFields): string {
-  return `/variant/${getVariantIdentifier(result).value}`;
+  if (result.id) {
+    return `/variant/${encodeURIComponent(result.id)}`;
+  }
+
+  return `/variant/${getVariantLocusPathSegment(result)}`;
 }

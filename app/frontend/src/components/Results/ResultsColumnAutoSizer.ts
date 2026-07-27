@@ -5,6 +5,10 @@ import {
   normalizeColumnConfigs,
   usesInitialColumnWidth,
 } from '../../columns';
+import {
+  getVariantIdentifier,
+  type VariantLocusFields,
+} from '../../utils/variantPath';
 
 const AUTO_SIZE_EXTRA_WIDTH = 4;
 const INITIAL_AUTO_SIZE_MAX_WIDTH_BY_COLUMN: Readonly<Record<string, number>> = {
@@ -141,8 +145,12 @@ export class ResultsColumnAutoSizer {
       return '';
     }
 
-    const firstResult = results[0] as { id?: unknown };
-    return `${numberOfRecords}:${String(firstResult?.id || '')}`;
+    const firstResult = results[0] as VariantLocusFields | null | undefined;
+    const firstResultIdentifier = firstResult
+      ? getVariantIdentifier(firstResult).value
+      : '';
+
+    return `${numberOfRecords}:${firstResultIdentifier}`;
   }
 
   /**

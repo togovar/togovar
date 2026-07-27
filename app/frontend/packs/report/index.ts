@@ -468,7 +468,7 @@ class ReportApp {
   /** tgvid形式かどうかの判定に使う。tgv-prefix + 数字のみを既存tgvidとみなす。 */
   private static readonly TGV_ID_PATTERN = /^tgv\d+$/i;
 
-  /** chr-pos-ref-alt形式のURLをパースするための正規表現。染色体名・REF・ALTにハイフンは含まれない前提。 */
+  /** chr-pos-ref-alt形式のURLをパースするための正規表現。各要素内のハイフンはURLエンコード済みである前提。 */
   private static readonly VARIANT_LOCUS_PATTERN =
     /^([^-]+)-(\d+)-([^-]+)-([^-]+)$/;
 
@@ -492,28 +492,71 @@ class ReportApp {
       return { reportId: routeInfo.reportId, idKey: defaultIdKey };
     }
 
-    const locusMatch = routeInfo.reportId.match(this.VARIANT_LOCUS_PATTERN);
+    const variant = this._parseVariantLocusRouteId(routeInfo.reportId);
 
-    if (!locusMatch) {
+    if (!variant) {
       return { reportId: routeInfo.reportId, idKey: defaultIdKey };
     }
 
-    const [, chromosome, position, reference, alternate] = locusMatch;
-    const tgvId = await this._fetchTgvId({
-      chromosome,
-      position: Number(position),
-      reference,
-      alternate,
-    });
+    const tgvId = await this._fetchTgvId(variant);
 
     if (tgvId) {
       return { reportId: tgvId, idKey: defaultIdKey };
     }
 
     return {
-      reportId: routeInfo.reportId,
+      reportId: this._formatVariantLocusId(variant),
       idKey: reportConfig.fallback_id || 'variant',
     };
+  }
+
+  /**
+   * URLエンコードされたlocus要素を個別に戻すことで、REF/ALTに予約文字が含まれてもAPI条件へ戻せるようにする。
+   */
+  private static _parseVariantLocusRouteId(routeId: string):
+    | {
+        chromosome: string;
+        position: number;
+        reference: string;
+        alternate: string;
+      }
+    | null {
+    const locusMatch = routeId.match(this.VARIANT_LOCUS_PATTERN);
+
+    if (!locusMatch) {
+      return null;
+    }
+
+    try {
+      const [, chromosome, position, reference, alternate] = locusMatch;
+      const parsedPosition = Number(position);
+
+      if (!Number.isFinite(parsedPosition)) {
+        return null;
+      }
+
+      return {
+        chromosome: decodeURIComponent(chromosome),
+        position: parsedPosition,
+        reference: decodeURIComponent(reference),
+        alternate: decodeURIComponent(alternate),
+      };
+    } catch (error) {
+      console.error('Failed to decode variant locus from route', error);
+      return null;
+    }
+  }
+
+  /**
+   * tgvid未解決時も画面表示とfallback_id属性には人間が読めるlocus文字列を渡す。
+   */
+  private static _formatVariantLocusId(variant: {
+    chromosome: string;
+    position: number;
+    reference: string;
+    alternate: string;
+  }): string {
+    return `${variant.chromosome}-${variant.position}-${variant.reference}-${variant.alternate}`;
   }
 
   /**
@@ -528,7 +571,7 @@ class ReportApp {
   }): Promise<string | null> {
     try {
       const response = await fetch(
-        `${ENV_CONFIG.TOGOVAR_FRONTEND_API_URL}/api/search/variant?stat=0`,
+        `${ENV_CONFIG.TOGOVAR_FRONTEND_API_URL}/api/search/variant?stat=0&data=1&limit=1000`,
         {
           method: 'POST',
           headers: {
@@ -536,7 +579,14 @@ class ReportApp {
             Accept: 'application/json',
           },
           mode: 'cors',
-          body: JSON.stringify({ query: { variant } }),
+          body: JSON.stringify({
+            query: {
+              location: {
+                chromosome: variant.chromosome,
+                position: variant.position,
+              },
+            },
+          }),
         }
       );
 
@@ -545,10 +595,22 @@ class ReportApp {
       }
 
       const result = (await response.json()) as {
-        data?: Array<{ id: string }>;
+        data?: Array<{
+          id?: string;
+          reference?: string;
+          alternate?: string;
+          alternative?: string;
+        }>;
       };
+      const matchedVariant = result.data?.find((item) => {
+        const alternate = item.alternate ?? item.alternative;
+        return (
+          item.reference === variant.reference &&
+          alternate === variant.alternate
+        );
+      });
 
-      return result.data?.[0]?.id ?? null;
+      return matchedVariant?.id ?? null;
     } catch (error) {
       console.error('Failed to resolve TogoVar ID from variant locus', error);
       return null;
