@@ -649,6 +649,7 @@ export class ConditionValueEditorFrequencyCount extends ConditionValueEditor {
     freqCountView: FrequencyCountValueView
   ): void {
     if (this._hasUserChangedCondition) return;
+    if (!freqCountView.dataset.mode) return;
 
     const mode = freqCountView.mode as ModeType;
     this._mode = mode;
