@@ -462,7 +462,12 @@ class ReportApp {
     const baseOptions = this._prepareBaseOptions(reportConfig, reportId, idKey);
 
     this._updatePageElements(reportId);
-    this._renderAllStanzas(reportConfig.stanza || [], baseOptions, reportId, idKey);
+    this._renderAllStanzas(
+      reportConfig.stanza || [],
+      baseOptions,
+      reportId,
+      idKey
+    );
   }
 
   /** tgvid形式かどうかの判定に使う。tgv-prefix + 数字のみを既存tgvidとみなす。 */
@@ -471,6 +476,10 @@ class ReportApp {
   /** chr-pos-ref-alt形式のURLをパースするための正規表現。各要素内のハイフンはURLエンコード済みである前提。 */
   private static readonly VARIANT_LOCUS_PATTERN =
     /^([^-]+)-(\d+)-([^-]+)-([^-]+)$/;
+  /** 1回のAPI取得件数は仕様上1000が上限のため、tgvid解決も同じ単位でページングする。 */
+  private static readonly TGV_ID_RESOLUTION_LIMIT = 1000;
+  /** 想定外のレスポンスで無限に辿らないよう、search-afterページングの安全上限を置く。 */
+  private static readonly TGV_ID_RESOLUTION_MAX_PAGES = 100;
 
   /**
    * variant pageのURLがtgvid形式でない場合、chr-pos-ref-altから検索APIでtgvidを解決する。
@@ -513,14 +522,12 @@ class ReportApp {
   /**
    * URLエンコードされたlocus要素を個別に戻すことで、REF/ALTに予約文字が含まれてもAPI条件へ戻せるようにする。
    */
-  private static _parseVariantLocusRouteId(routeId: string):
-    | {
-        chromosome: string;
-        position: number;
-        reference: string;
-        alternate: string;
-      }
-    | null {
+  private static _parseVariantLocusRouteId(routeId: string): {
+    chromosome: string;
+    position: number;
+    reference: string;
+    alternate: string;
+  } | null {
     const locusMatch = routeId.match(this.VARIANT_LOCUS_PATTERN);
 
     if (!locusMatch) {
@@ -570,51 +577,156 @@ class ReportApp {
     alternate: string;
   }): Promise<string | null> {
     try {
-      const response = await fetch(
-        `${ENV_CONFIG.TOGOVAR_FRONTEND_API_URL}/api/search/variant?stat=0&data=1&limit=1000`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-          mode: 'cors',
-          body: JSON.stringify({
-            query: {
-              location: {
-                chromosome: variant.chromosome,
-                position: variant.position,
-              },
-            },
-          }),
-        }
-      );
+      let offset: [string, number, string, string] | undefined;
 
-      if (!response.ok) {
-        throw new Error(`Unexpected response status: ${response.status}`);
+      for (let page = 0; page < this.TGV_ID_RESOLUTION_MAX_PAGES; page += 1) {
+        const result = await this._fetchVariantResolutionPage(variant, offset);
+        const matchedVariant = result.data.find((item) =>
+          this._isSameVariantAllele(item, variant)
+        );
+
+        if (matchedVariant?.id) {
+          return matchedVariant.id;
+        }
+
+        if (result.data.length < this.TGV_ID_RESOLUTION_LIMIT) {
+          return null;
+        }
+
+        offset = this._getNextVariantResolutionOffset(result.data);
+
+        if (!offset) {
+          return null;
+        }
       }
 
-      const result = (await response.json()) as {
-        data?: Array<{
-          id?: string;
-          reference?: string;
-          alternate?: string;
-          alternative?: string;
-        }>;
-      };
-      const matchedVariant = result.data?.find((item) => {
-        const alternate = item.alternate ?? item.alternative;
-        return (
-          item.reference === variant.reference &&
-          alternate === variant.alternate
-        );
-      });
-
-      return matchedVariant?.id ?? null;
+      console.error(
+        'Stopped TogoVar ID resolution because page limit was reached'
+      );
+      return null;
     } catch (error) {
       console.error('Failed to resolve TogoVar ID from variant locus', error);
       return null;
     }
+  }
+
+  /**
+   * location条件だけでは同一座標の候補が1000件を超える可能性があるため、
+   * search-after用offsetを渡せる形で1ページずつ取得する。
+   */
+  private static async _fetchVariantResolutionPage(
+    variant: {
+      chromosome: string;
+      position: number;
+    },
+    offset?: [string, number, string, string]
+  ): Promise<{
+    data: Array<{
+      id?: string;
+      chromosome?: string;
+      position?: number;
+      reference?: string;
+      alternate?: string;
+      alternative?: string;
+    }>;
+  }> {
+    const body: {
+      query: {
+        location: {
+          chromosome: string;
+          position: number;
+        };
+      };
+      offset?: [string, number, string, string];
+    } = {
+      query: {
+        location: {
+          chromosome: variant.chromosome,
+          position: variant.position,
+        },
+      },
+    };
+
+    if (offset) {
+      body.offset = offset;
+    }
+
+    const response = await fetch(
+      `${ENV_CONFIG.TOGOVAR_FRONTEND_API_URL}/api/search/variant?stat=0&data=1&limit=${this.TGV_ID_RESOLUTION_LIMIT}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        mode: 'cors',
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Unexpected response status: ${response.status}`);
+    }
+
+    const result = (await response.json()) as {
+      data?: Array<{
+        id?: string;
+        chromosome?: string;
+        position?: number;
+        reference?: string;
+        alternate?: string;
+        alternative?: string;
+      }>;
+    };
+
+    return { data: result.data ?? [] };
+  }
+
+  /**
+   * APIレスポンスではalternate/alternativeが移行中で混在し得るため、両方を同じALTとして比較する。
+   */
+  private static _isSameVariantAllele(
+    item: {
+      reference?: string;
+      alternate?: string;
+      alternative?: string;
+    },
+    variant: {
+      reference: string;
+      alternate: string;
+    }
+  ): boolean {
+    const alternate = item.alternate ?? item.alternative;
+    return (
+      item.reference === variant.reference && alternate === variant.alternate
+    );
+  }
+
+  /**
+   * 1000件ちょうど返った場合は続きがあり得るため、最後の行をsearch-after offsetに変換する。
+   */
+  private static _getNextVariantResolutionOffset(
+    data: Array<{
+      chromosome?: string;
+      position?: number;
+      reference?: string;
+      alternate?: string;
+      alternative?: string;
+    }>
+  ): [string, number, string, string] | undefined {
+    const last = data[data.length - 1];
+    const alternate = last?.alternate ?? last?.alternative;
+
+    if (
+      !last?.chromosome ||
+      typeof last.position !== 'number' ||
+      !last.reference ||
+      !alternate
+    ) {
+      return undefined;
+    }
+
+    return [last.chromosome, last.position, last.reference, alternate];
   }
 
   /**
@@ -788,7 +900,7 @@ class ReportApp {
     const tokens: Array<[string, string]> = [
       [idKeyName, reportId],
       ['id_param', idKeyName],
-      ['id_value', reportId],
+      ['id_value', encodeURIComponent(reportId)],
     ];
 
     // Process each option value for template variables

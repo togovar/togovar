@@ -3,6 +3,7 @@ import { API_URL } from '../global';
 import type { ScrollData, SearchResults, SearchStatistics } from '../types';
 import type { StoreState } from '../types/storeState';
 import { getNextSearchResultCount } from '../store/searchResultsState';
+import { getVariantReportPath } from '../utils/variantPath';
 import {
   getCurrentSearchMode,
   getCurrentSearchOrigin,
@@ -221,10 +222,10 @@ function redirectToSingleVariantIfReady(): boolean {
     return false;
   }
 
-  const variantId = singleVariantRedirectData.row.id;
+  const variantPath = getVariantReportPath(singleVariantRedirectData.row);
   clearSingleVariantRedirectCandidates();
   if (typeof window === 'undefined') return false;
-  window.location.assign(`/variant/${encodeURIComponent(variantId)}`);
+  window.location.assign(variantPath);
   return true;
 }
 
