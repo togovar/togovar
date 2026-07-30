@@ -11,7 +11,7 @@ const FIXED_INITIAL_WIDTH_COLUMN_IDS = new Set([
 
 /** 検索結果テーブルで利用可能な全列の定義（TogoVar ID は常に先頭・固定） */
 export const COLUMNS = [
-  { label: 'TogoVar ID', id: 'togovar_id', defaultWidth: 124 },
+  { label: 'TogoVar ID', id: 'togovar_id', defaultWidth: 150 },
   { label: 'RefSNP ID', id: 'refsnp_id', defaultWidth: 116 },
   { label: 'Position', id: 'position', defaultWidth: 164 },
   { label: 'Ref / Alt', id: 'ref_alt', defaultWidth: 104 },
