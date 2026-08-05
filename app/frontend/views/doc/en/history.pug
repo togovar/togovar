@@ -16,6 +16,45 @@ block content
         h2.title Update history
       .contents
         section.section
+          //- Replace “XX” when the release date is confirmed.
+          h3.sectiontitle 2026/8/XX
+          ul.unordered-list
+            li
+              strong Datasets:
+              | New frequency datasets were added to GRCh38, and existing datasets were updated.
+              ul.unordered-list
+                li
+                  | Allele and genotype frequencies were added for
+                  |
+                  a.hyper-text.-internal(href='/doc/datasets/bbj1k') BBJ1K
+                  | (WGS of 1,026 BioBank Japan participants) and
+                  |
+                  a.hyper-text.-internal(href='/doc/datasets/bbj2k') BBJ2K
+                  | (WGS of 1,964 BioBank Japan participants).
+                li
+                  a.hyper-text.-internal(href='/doc/datasets/tommo_jsv1') ToMMo JSV1
+                  | , a structural-variant frequency dataset based on long-read WGS of 222 Japanese individuals, was added.
+                li
+                  | Information derived from
+                  |
+                  a.hyper-text.-internal(href='/doc/datasets/jogo') JoGo 1.0
+                  | , a human gene haplotype database based on long-read WGS, was added.
+                li ToMMo 54KJPN was updated to 61KJPN (61,424 individuals).
+                li
+                  a.hyper-text.-internal(href='/doc/datasets/jga_wgs') JGA-WGS
+                  | now includes two datasets derived from BBJ1K and BBJ2K, for a total of six datasets and 3,068 individuals.
+            li
+              strong Simple/Advanced Search:
+              | CADD (PHRED score) and predicted splicing types from SSCV DB were added as search filters and result fields.
+            li
+              strong Advanced Search:
+              | Genotype-count searches for Alt/Alt, Alt/Ref, and Hemi_Alt were added for JGA-WGS, JGA-SNP, and NCBN.
+            li
+              strong Advanced Search:
+              | Search conditions can now be shared in the URL and restored with the browser Back and Forward buttons.
+            li
+              strong Search results:
+              | In addition to showing or hiding columns, you can now reorder them by dragging and dropping items in the column menu.
           h3.sectiontitle 2025/6/4
           ul.unordered-list
             li

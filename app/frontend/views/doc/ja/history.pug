@@ -16,6 +16,40 @@ block content
         h2.title 更新履歴
       .contents
         section.section
+          //- リリース日が確定したら「XX」を置き換える。
+          h3.sectiontitle 2026/8/XX
+          ul.unordered-list
+            li
+              strong データセット：
+              | GRCh38版に新しい頻度データセットを追加し、既存データセットを更新しました。
+              ul.unordered-list
+                li
+                  a.hyper-text.-internal(href='/doc/ja/datasets/bbj1k') BBJ1K
+                  | （バイオバンク・ジャパンの1,026名のWGS）および
+                  a.hyper-text.-internal(href='/doc/ja/datasets/bbj2k') BBJ2K
+                  | （同1,964名のWGS）のアレル頻度・ジェノタイプ頻度を追加しました。
+                li
+                  a.hyper-text.-internal(href='/doc/ja/datasets/tommo_jsv1') ToMMo JSV1
+                  | （長鎖型WGSによる日本人222名の構造多型頻度）を追加しました。
+                li
+                  a.hyper-text.-internal(href='/doc/ja/datasets/jogo') JoGo 1.0
+                  | （長鎖型WGSに基づくヒト遺伝子ハプロタイプデータベース）由来の情報を追加しました。
+                li ToMMo 54KJPNを61KJPN（61,424名）へ更新しました。
+                li
+                  a.hyper-text.-internal(href='/doc/ja/datasets/jga_wgs') JGA-WGS
+                  | にBBJ1K・BBJ2K由来の2データセットを追加し、合計6データセット、3,068名としました。
+            li
+              strong Simple/Advanced Search：
+              | CADD（PHRED score）とSSCV DBの予測スプライシングタイプを、検索条件および検索結果の表示項目に追加しました。
+            li
+              strong Advanced Search：
+              | JGA-WGS、JGA-SNP、NCBNを対象に、Alt/Alt・Alt/Ref・Hemi_Altのジェノタイプ数による検索を追加しました。
+            li
+              strong Advanced Search：
+              | 検索条件をURLで共有できるようにし、ブラウザの「戻る」「進む」から検索条件と結果を復元できるようにしました。
+            li
+              strong 検索結果：
+              | 列の表示・非表示に加え、列選択メニュー内のドラッグ＆ドロップで表示順を変更できるようにしました。
           h3.sectiontitle 2025/6/4
           ul.unordered-list
             li

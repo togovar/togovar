@@ -60,11 +60,11 @@ article.common-document
             td._align-center ✔
             td._align-center ✔
             td._align-center
-              span(style='margin-left:45px;') 78
+              span(style='margin-left:45px;') 3,068
             td._align-center
-              span(style='margin-left:13px;') 20,822,413
+              | データセットごとに異なる
             td._align-center
-              a(href="/doc/ja/datasets/jga_wgs#jga_datasets") 4データセット
+              a(href="/doc/ja/datasets/jga_wgs#jga_datasets") 6データセット
           tr
             td
               a(href="/doc/ja/datasets/jga_snp") JGA-SNP
@@ -137,7 +137,7 @@ article.common-document
               | 759,336,320
             td Broad Institute
             td v4.1
-                    tr
+          tr
             td
               a(href="/doc/ja/datasets/ncbn") NCBN
             td._align-left WGS
@@ -152,7 +152,31 @@ article.common-document
             td 2024/6/28
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-54kjpn-20230626-af_snvindelall')
+              a(href="/doc/ja/datasets/bbj1k") BBJ1K
+            td._align-left WGS
+            td._align-center
+            td._align-left 日本人
+            td._align-center
+            td._align-center ✔
+            td._align-center 1,026
+            td._align-center 17,167,510
+            td バイオバンク・ジャパン
+            td JGAD000867
+          tr
+            td
+              a(href="/doc/ja/datasets/bbj2k") BBJ2K
+            td._align-left WGS
+            td._align-center
+            td._align-left 日本人
+            td._align-center
+            td._align-center ✔
+            td._align-center 1,964
+            td._align-center 21,596,248
+            td バイオバンク・ジャパン
+            td JGAD000868
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-61kjpn-20250616-af_snvindelall')
                 | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN-SNV/INDEL Allele Frequency Panel(#{ GLOBALS.TOMMO_VERSION }KJPN)
             td._align-left WGS
             td._align-center
@@ -160,13 +184,37 @@ article.common-document
             td._align-center ✔
             td._align-center
             td._align-center
-              span(style='margin-left:4px;') 54,302
-            td._align-center
-              | 252,777,334
+              span(style='margin-left:4px;') 61,424
+            td._align-center —
             td 東北メディカル・メガバンク機構
-            td v20230626
+            td v20250616
+          tr
+            td
+              a(href="/doc/ja/datasets/tommo_jsv1") ToMMo JSV1
+            td._align-left long-read WGS
+            td._align-center
+            td._align-left 日本人
+            td._align-center ✔
+            td._align-center
+            td._align-center 222
+            td._align-center —
+            td 東北メディカル・メガバンク機構
+            td v20211208
+          tr
+            td
+              a(href="/doc/ja/datasets/jogo") JoGo
+            td._align-left long-read WGS
+            td._align-center
+            td._align-left 複数
+            td._align-center ✔
+            td._align-center
+            td._align-center 258
+            td._align-center —
+            td JoGoプロジェクト
+            td JoGo 1.0
       p.notice
-        | 注：#{ GLOBALS.TOMMO_VERSION }KJPNの内訳はSNVs(Autosome, chrX(PAR1+PAR2+XTR)およびchrMT)ならびにINDELs(AutosomeおよびchrX(PAR1+PAR2+XTR))です。
+        | 注：BBJ1KおよびBBJ2Kの「アレル数」欄には、TogoVarに収録されているバリアント数を記載しています。
+        | ToMMo JSV1およびJoGoは構造多型・ハプロタイプを含むため、短鎖バリアントのアレル数とは区別しています。
     section.section
       h3.sectiontitle バリアント頻度以外のデータ
       table.table

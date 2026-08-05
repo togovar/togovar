@@ -1,0 +1,64 @@
+article.common-document
+  header.header
+    h2.title BBJ1K dataset
+  .contents
+    section.section
+      h3.sectiontitle Summary
+      p.body
+        | BBJ1K contains allele and genotype frequencies derived from whole-genome sequencing (WGS) data
+        | for 1,026 participants enrolled in
+        |
+        a.hyper-text.-external(target='_blank', href='https://biobankjp.org/english/index.html') BioBank Japan
+        | between fiscal years 2003 and 2007. TogoVar provides the frequencies on GRCh38.
+      ul.unordered-list
+        li Sample size: 1,026
+        li Reference genome: GRCh38
+        li Number of variants in TogoVar: 17,167,510
+        li
+          | Source data:
+          |
+          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000220') JGAD000220
+        li
+          | Joint-called WGS data:
+          |
+          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000758') JGAD000758
+        li
+          | GRCh38 imputation reference panel:
+          |
+          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000867') JGAD000867
+
+    section.section
+      h3.sectiontitle Data processing
+      p.body
+        | The NBDC Human Database processed and quality-controlled the per-sample WGS data from the 1,026 participants
+        | in JGAD000220, then performed joint calling separately for autosomes and chrX PAR regions, female chrX
+        | non-PAR regions, and male chrXY non-PAR regions.
+      ul.unordered-list
+        li Per-sample processing: January 16, 2022
+        li Quality control: February 24, 2022
+        li Joint calling for autosomes and chrX PAR regions: January 30, 2023
+        li Joint calling for female chrX non-PAR regions: February 25, 2023
+        li Joint calling for male chrXY non-PAR regions: March 2, 2023
+      p.body
+        | See the NBDC Human Database page for
+        |
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/processed-data-wgs') processed whole-genome sequencing data
+        | for the source dataset and processing dates.
+
+    section.section
+      h3.sectiontitle Related processed data
+      p.body
+        | JGAD000758 is also included in TogoVar as a dataset-specific frequency under JGA-WGS. A GRCh38 imputation
+        | reference panel from the same 1,026 participants (JGAD000867) is listed on the NBDC Human Database page for
+        |
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/processed-data-imputation') processed imputation reference data
+        | .
+
+    section.section
+      h3.sectiontitle Terms of use
+      p.body
+        | Aggregated frequencies in TogoVar are publicly viewable. To use the source data or controlled-access
+        | processed data, specify JGAD000220 and the relevant processed dataset ID when applying through
+        |
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/data-use') Data Use
+        | .

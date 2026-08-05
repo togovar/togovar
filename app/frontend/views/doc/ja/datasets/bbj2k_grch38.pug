@@ -1,0 +1,46 @@
+article.common-document
+  header.header
+    h2.title BBJ2Kデータセット
+  .contents
+    section.section
+      h3.sectiontitle 概要
+      p.body
+        | BBJ2Kは、
+        a.hyper-text.-external(target='_blank', href='https://biobankjp.org/') バイオバンク・ジャパン
+        | の1,964名の全ゲノムシークエンス（WGS）データから作成された、
+        | 日本人集団のアレル頻度およびジェノタイプ頻度データセットです。
+        | TogoVarではGRCh38上の頻度情報として収録しています。
+      ul.unordered-list
+        li サンプルサイズ：1,964
+        li 参照ゲノム：GRCh38
+        li TogoVar収録バリアント数：21,596,248
+        li
+          | 元データ：
+          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000495') JGAD000495
+        li
+          | 加工データ：
+          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000868') JGAD000868
+
+    section.section
+      h3.sectiontitle データ加工
+      p.body
+        | NBDCヒトデータベースでは、バイオバンク・ジャパンの1,964名のWGSデータを加工し、
+        | GRCh38のimputation reference panel（GRCh38.BBJ2K.tar.gz）として2024/8/8に公開しています。
+        | 元データはJGAD000495、加工データはJGAD000868です。
+      p.body
+        | 対象データセットと加工日の詳細は、NBDCヒトデータベースの
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/processed-data-imputation') 加工済みデータ一覧（Imputation reference）
+        | をご覧ください。
+
+    section.section
+      h3.sectiontitle JGA-WGSとの関係
+      p.body
+        | 加工データJGAD000868は、TogoVarのJGA-WGSデータセットでもデータセット別頻度として収録しています。
+
+    section.section
+      h3.sectiontitle 利用条件
+      p.body
+        | TogoVarに収録された集計済み頻度は公開情報として閲覧できます。
+        | 元データまたは制限公開の加工データを利用する場合は、元データJGAD000495と加工データJGAD000868を指定して
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/data-use') NBDCヒトデータベースへ利用申請
+        | してください。
