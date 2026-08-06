@@ -16,6 +16,7 @@ const env = dotenv.config().parsed || {};
 Object.assign(process.env, env);
 
 const LOCAL_SPARQLIST_PROXY_PATH = '/sparqlist';
+const DEFAULT_DEV_SERVER_ORIGIN = 'http://localhost:8000';
 
 // 開発時にローカルSPARQListへ直接fetchするとCORSで失敗しやすいため、同一オリジンproxyへ寄せる。
 function shouldUseLocalSparqlistProxy(endpoint) {
@@ -35,9 +36,16 @@ function shouldUseLocalSparqlistProxy(endpoint) {
 function getSparqlistEndpoint() {
   const endpoint = process.env.TOGOVAR_ENDPOINT_SPARQLIST;
 
-  return shouldUseLocalSparqlistProxy(endpoint)
-    ? LOCAL_SPARQLIST_PROXY_PATH
-    : endpoint;
+  if (!shouldUseLocalSparqlistProxy(endpoint)) {
+    return endpoint;
+  }
+
+  const siteOrigin = process.env.TOGOVAR_SITE_ORIGIN || DEFAULT_DEV_SERVER_ORIGIN;
+
+  return new URL(LOCAL_SPARQLIST_PROXY_PATH, siteOrigin).href.replace(
+    /\/$/,
+    ''
+  );
 }
 
 const STRUCTURED_DATA_TEMPLATE_PATH = path.resolve(

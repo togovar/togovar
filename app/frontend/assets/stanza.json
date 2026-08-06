@@ -143,6 +143,42 @@
         }
       },
       {
+        "id": "pagination-table",
+        "targetSelector": "#variant-cross-species",
+        "references": ["GRCh38"],
+        "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
+        "options": {
+          "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_cross_species?${id_param}=${id_value}",
+          "data-type": "json",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
+          "page-size_option": "5,10,20,50,100",
+          "message-not_found": "No data.",
+          "columns": [
+            {
+              "id": "species",
+              "label": "Species"
+            },
+            {
+              "id": "ref_genome",
+              "label": "RefGenome"
+            },
+            {
+              "id": "chr_pos_ref_alt",
+              "label": "Chr-pos-ref-alt"
+            },
+            {
+              "id": "source",
+              "label": "Source",
+              "link": "source_url"
+            },
+            {
+              "id": "remark",
+              "label": "Remark"
+            }
+          ]
+        }
+      },
+      {
         "id": "variant-genomic-context",
         "targetSelector": "#variant-genomic-context",
         "references": ["GRCh37", "GRCh38"],
