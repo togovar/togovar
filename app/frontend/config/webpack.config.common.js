@@ -15,6 +15,31 @@ const __dirname = path.dirname(__filename);
 const env = dotenv.config().parsed || {};
 Object.assign(process.env, env);
 
+const LOCAL_SPARQLIST_PROXY_PATH = '/sparqlist';
+
+// 開発時にローカルSPARQListへ直接fetchするとCORSで失敗しやすいため、同一オリジンproxyへ寄せる。
+function shouldUseLocalSparqlistProxy(endpoint) {
+  if (process.env.NODE_ENV !== 'development' || !endpoint) {
+    return false;
+  }
+
+  try {
+    const url = new URL(endpoint);
+    return ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+  } catch {
+    return false;
+  }
+}
+
+// stanzaへ渡すURLはブラウザ視点のURLにする。実際の転送先はwebpack-dev-server側で設定する。
+function getSparqlistEndpoint() {
+  const endpoint = process.env.TOGOVAR_ENDPOINT_SPARQLIST;
+
+  return shouldUseLocalSparqlistProxy(endpoint)
+    ? LOCAL_SPARQLIST_PROXY_PATH
+    : endpoint;
+}
+
 const STRUCTURED_DATA_TEMPLATE_PATH = path.resolve(
   __dirname,
   '../assets/togovar.jsonld'
@@ -289,7 +314,7 @@ const config = {
         process.env.TOGOVAR_ENDPOINT_SPARQL
       ),
       TOGOVAR_ENDPOINT_SPARQLIST: JSON.stringify(
-        process.env.TOGOVAR_ENDPOINT_SPARQLIST
+        getSparqlistEndpoint()
       ),
       TOGOVAR_ENDPOINT_SEARCH: JSON.stringify(
         process.env.TOGOVAR_ENDPOINT_SEARCH

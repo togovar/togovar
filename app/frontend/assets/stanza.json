@@ -20,6 +20,15 @@
         "references": ["GRCh37", "GRCh38"]
       },
       {
+        "id": "variant-links",
+        "targetSelector": "#variant-links",
+        "references": ["GRCh37", "GRCh38"],
+        "options": {
+          "data-url": "${TOGOVAR_FRONTEND_API_URL}/api/search/variant",
+          "assembly": "$TOGOVAR_FRONTEND_REFERENCE"
+        }
+      },
+      {
         "id": "variant-other-overlapping-variants",
         "targetSelector": "#variant-other-overlapping-variants",
         "references": ["GRCh37", "GRCh38"],

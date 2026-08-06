@@ -928,6 +928,130 @@ class ReportApp {
 }
 
 // ============================================================================
+// Title Link Clipboard
+// ============================================================================
+
+/**
+ * セクション見出しのリンクアイコンをクリックしたときに、共有用URLをクリップボードへ保存する。
+ */
+class TitleLinkClipboard {
+  /**
+   * Pug側の各見出しへ個別に処理を書かず、reportページ共通の挙動として一括で設定する。
+   */
+  static initialize(): void {
+    document
+      .querySelectorAll<HTMLAnchorElement>('.titlelink-wrapper > .titlelink')
+      .forEach((titleLink) => {
+        titleLink.addEventListener('click', (event) => {
+          event.preventDefault();
+          void this._handleTitleLinkClick(titleLink);
+        });
+
+        titleLink.setAttribute('aria-label', 'Copy link to this section');
+        titleLink.title = 'Copy link to this section';
+      });
+  }
+
+  /**
+   * アンカー本来のURL更新とスクロールを維持しつつ、共有用URLもコピーする。
+   */
+  private static async _handleTitleLinkClick(
+    titleLink: HTMLAnchorElement
+  ): Promise<void> {
+    const titleLinkUrl = this._buildTitleLinkUrl(titleLink);
+
+    this._updateCurrentUrl(titleLinkUrl);
+    this._scrollToLinkedSection(titleLink);
+
+    try {
+      await this._writeTextToClipboard(titleLinkUrl);
+      this._markAsCopied(titleLink);
+    } catch (error) {
+      console.error('Failed to copy title link URL', error);
+    }
+  }
+
+  /**
+   * 相対hashだけのhrefでも、variant/gene/disease ID を含む完全なURLとしてコピーできるようにする。
+   */
+  private static _buildTitleLinkUrl(titleLink: HTMLAnchorElement): string {
+    const url = new URL(window.location.href);
+
+    url.hash = titleLink.hash;
+
+    return url.href;
+  }
+
+  /**
+   * preventDefault後もアドレスバーにsection id付きURLを残せるよう、履歴へ明示的に積む。
+   */
+  private static _updateCurrentUrl(url: string): void {
+    window.history.pushState(null, '', url);
+  }
+
+  /**
+   * JS側でクリックを処理するため、アンカーの標準スクロール相当の動きを補う。
+   */
+  private static _scrollToLinkedSection(titleLink: HTMLAnchorElement): void {
+    const targetId = decodeURIComponent(titleLink.hash.slice(1));
+    const targetElement = document.getElementById(targetId);
+
+    targetElement?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  /**
+   * Clipboard API が使えない環境でもコピー操作を試せるよう、従来APIへフォールバックする。
+   */
+  private static async _writeTextToClipboard(text: string): Promise<void> {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    this._writeTextToClipboardWithTextarea(text);
+  }
+
+  /**
+   * 非表示textareaを選択してコピーすることで、古いブラウザでも同じ操作に近づける。
+   */
+  private static _writeTextToClipboardWithTextarea(text: string): void {
+    const textarea = document.createElement('textarea');
+
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.top = '0';
+    textarea.style.left = '0';
+    textarea.style.opacity = '0';
+
+    document.body.appendChild(textarea);
+    textarea.select();
+
+    const didCopy = document.execCommand('copy');
+    textarea.remove();
+
+    if (!didCopy) {
+      throw new Error('Copy command was rejected');
+    }
+  }
+
+  /**
+   * コピーできたことを短時間だけ状態として残し、スクリーンリーダーにも操作結果が伝わるようにする。
+   */
+  private static _markAsCopied(titleLink: HTMLAnchorElement): void {
+    titleLink.dataset.copied = 'true';
+    titleLink.setAttribute('aria-label', 'Copied section link');
+    titleLink.title = 'Copied section link';
+
+    window.setTimeout(() => {
+      titleLink.removeAttribute('data-copied');
+      titleLink.setAttribute('aria-label', 'Copy link to this section');
+      titleLink.title = 'Copy link to this section';
+    }, 1200);
+  }
+}
+
+// ============================================================================
 // Application Bootstrap
 // ============================================================================
 
@@ -946,6 +1070,7 @@ class DOMReadyHandler {
       // DOM is already loaded, start immediately
       ReportApp.initialize();
       new FloatingInfo();
+      TitleLinkClipboard.initialize();
       return;
     }
 
@@ -953,6 +1078,7 @@ class DOMReadyHandler {
     document.addEventListener('DOMContentLoaded', () => {
       ReportApp.initialize();
       new FloatingInfo();
+      TitleLinkClipboard.initialize();
     });
   }
 }
