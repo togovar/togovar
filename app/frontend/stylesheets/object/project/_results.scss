@@ -1235,7 +1235,7 @@ body[data-column-resizing='true'] {
   justify-content: center;
   width: 19px;
   height: 19px;
-  color: var(--color-key-dark1);
+  color: var(--color-key-dark3);
   text-decoration: none;
 
   &::before {
@@ -1249,7 +1249,7 @@ body[data-column-resizing='true'] {
 
   &:hover,
   &:focus-visible {
-    color: var(--color-key);
+    color: var(--color-key-dark1);
   }
 
   &:focus-visible {
