@@ -408,12 +408,6 @@
         // td 側の列幅定義は tbody > tr > td セクションに同様のブロックがある。
         // -------------------------------------------------------------------------
 
-        &.report {
-          width: 72px;
-          min-width: 72px;
-          max-width: 72px;
-        }
-
         &.togovar_id {
           width: 150px;
           min-width: 150px;
@@ -579,9 +573,6 @@
         // -------------------------------------------------------------------------
 
         &.report {
-          width: 72px;
-          min-width: 72px;
-          max-width: 72px;
           padding-right: 6px;
           text-align: center;
         }
