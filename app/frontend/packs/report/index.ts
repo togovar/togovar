@@ -930,8 +930,12 @@ class TitleLinkClipboard {
    */
   private static async _writeTextToClipboard(text: string): Promise<void> {
     if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-      return;
+      try {
+        await navigator.clipboard.writeText(text);
+        return;
+      } catch {
+        // 権限拒否や非セキュアコンテキストでは、従来APIで再試行する。
+      }
     }
 
     this._writeTextToClipboardWithTextarea(text);

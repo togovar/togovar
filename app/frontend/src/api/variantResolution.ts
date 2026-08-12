@@ -25,17 +25,17 @@ type VariantResolutionRequestBody = {
   query: {
     location: VariantResolutionLocus;
   };
+  limit: number;
   offset?: VariantResolutionOffset;
 };
 
 /**
  * レポート画面に検索APIのURL仕様を漏らさないよう、tgvid解決用エンドポイントをここで組み立てる。
  */
-function buildVariantResolutionEndpoint(apiBaseUrl: string, limit: number): string {
+function buildVariantResolutionEndpoint(apiBaseUrl: string): string {
   const params = new URLSearchParams({
     stat: '0',
     data: '1',
-    limit: String(limit),
   });
 
   return `${apiBaseUrl}/api/search/variant?${params.toString()}`;
@@ -47,7 +47,8 @@ function buildVariantResolutionEndpoint(apiBaseUrl: string, limit: number): stri
 function getVariantResolutionRequestOptions(
   variant: VariantResolutionLocus,
   offset: VariantResolutionOffset | undefined,
-  signal: AbortSignal
+  signal: AbortSignal,
+  limit: number
 ): AdvancedSearchFetchOption {
   const body: VariantResolutionRequestBody = {
     query: {
@@ -56,6 +57,7 @@ function getVariantResolutionRequestOptions(
         position: variant.position,
       },
     },
+    limit,
   };
 
   if (offset) {
@@ -85,8 +87,8 @@ export async function fetchVariantResolutionPage(
   limit: number
 ): Promise<VariantResolutionPage> {
   const result = (await fetchSearchJSON(
-    buildVariantResolutionEndpoint(apiBaseUrl, limit),
-    getVariantResolutionRequestOptions(variant, offset, signal)
+    buildVariantResolutionEndpoint(apiBaseUrl),
+    getVariantResolutionRequestOptions(variant, offset, signal, limit)
   )) as {
     data?: VariantResolutionPageItem[];
   };
