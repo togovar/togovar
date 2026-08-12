@@ -431,8 +431,10 @@ class ReportApp {
     /^([^-]+)-(\d+)-([^-]+)-([^-]+)$/;
   /** 1回のAPI取得件数は仕様上1000が上限のため、tgvid解決も同じ単位でページングする。 */
   private static readonly TGV_ID_RESOLUTION_LIMIT = 1000;
-  /** 想定外のレスポンスで無限に辿らないよう、search-afterページングの安全上限を置く。 */
-  private static readonly TGV_ID_RESOLUTION_MAX_PAGES = 100;
+  /** 初期描画を長時間止めないよう、tgvid解決で辿るページ数を必要最小限に抑える。 */
+  private static readonly TGV_ID_RESOLUTION_MAX_PAGES = 3;
+  /** API遅延時はlocus表示へ倒し、レポートページ全体の描画待ちを短くする。 */
+  private static readonly TGV_ID_RESOLUTION_TIMEOUT_MS = 1500;
 
   /**
    * variant pageのURLがtgvid形式でない場合、chr-pos-ref-altから検索APIでtgvidを解決する。
@@ -540,11 +542,20 @@ class ReportApp {
     reference: string;
     alternate: string;
   }): Promise<string | null> {
+    const abortController = new AbortController();
+    const timeoutId = window.setTimeout(() => {
+      abortController.abort();
+    }, this.TGV_ID_RESOLUTION_TIMEOUT_MS);
+
     try {
       let offset: [string, number, string, string] | undefined;
 
       for (let page = 0; page < this.TGV_ID_RESOLUTION_MAX_PAGES; page += 1) {
-        const result = await this._fetchVariantResolutionPage(variant, offset);
+        const result = await this._fetchVariantResolutionPage(
+          variant,
+          offset,
+          abortController.signal
+        );
         const matchedVariant = result.data.find((item) =>
           this._isSameVariantAllele(item, variant)
         );
@@ -569,8 +580,15 @@ class ReportApp {
       );
       return null;
     } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        console.error('Timed out while resolving TogoVar ID from variant locus');
+        return null;
+      }
+
       console.error('Failed to resolve TogoVar ID from variant locus', error);
       return null;
+    } finally {
+      window.clearTimeout(timeoutId);
     }
   }
 
@@ -583,7 +601,8 @@ class ReportApp {
       chromosome: string;
       position: number;
     },
-    offset?: [string, number, string, string]
+    offset: [string, number, string, string] | undefined,
+    signal: AbortSignal
   ): Promise<{
     data: Array<{
       id?: string;
@@ -624,6 +643,7 @@ class ReportApp {
           Accept: 'application/json',
         },
         mode: 'cors',
+        signal,
         body: JSON.stringify(body),
       }
     );

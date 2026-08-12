@@ -1,10 +1,19 @@
-import type { ResultData } from '../types';
-
 /** variant page への導線を組み立てるのに必要な最小限のフィールド */
-export type VariantLocusFields = Pick<
-  ResultData,
-  'id' | 'chromosome' | 'position' | 'reference' | 'alternate'
->;
+export type VariantLocusFields = {
+  id?: string;
+  chromosome: string;
+  position: number;
+  reference: string;
+  alternate?: string;
+  alternative?: string;
+};
+
+/**
+ * API移行中に alternate / alternative が混在しても、URL生成側の分岐を増やさず同じALTとして扱う。
+ */
+function getVariantAlternate(result: VariantLocusFields): string {
+  return result.alternate ?? result.alternative ?? '';
+}
 
 /**
  * バリアントの識別子を取得する。
@@ -19,8 +28,10 @@ export function getVariantIdentifier(result: VariantLocusFields): {
     return { value: result.id, isTogovarId: true };
   }
 
+  const alternate = getVariantAlternate(result);
+
   return {
-    value: `${result.chromosome}-${result.position}-${result.reference}-${result.alternate}`,
+    value: `${result.chromosome}-${result.position}-${result.reference}-${alternate}`,
     isTogovarId: false,
   };
 }
@@ -41,7 +52,7 @@ function getVariantLocusPathSegment(result: VariantLocusFields): string {
     result.chromosome,
     result.position,
     result.reference,
-    result.alternate,
+    getVariantAlternate(result),
   ]
     .map(encodeVariantPathComponent)
     .join('-');
