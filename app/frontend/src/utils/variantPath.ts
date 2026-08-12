@@ -16,9 +16,8 @@ function getVariantAlternate(result: VariantLocusFields): string {
 }
 
 /**
- * バリアントの識別子を取得する。
- * TogoVar ID (tgvid) が無いバリアントも variant page へ遷移できるよう、
- * その場合は chromosome-position-reference-alternate を代替識別子として組み立てる。
+ * TogoVar IDがないバリアントからもレポートへ遷移できるよう、locusを代替識別子として返す。
+ * TogoVar ID (tgvid) がある場合は既存の表示・遷移の互換性を優先する。
  */
 export function getVariantIdentifier(result: VariantLocusFields): {
   value: string;
@@ -44,8 +43,8 @@ function encodeVariantPathComponent(value: string | number): string {
 }
 
 /**
- * locus形式のURLパスセグメントを組み立てる。
- * 表示用の識別子とは異なり、各要素を個別にエンコードしてからハイフンで結合する。
+ * locus形式のURLを安全に扱えるよう、表示用識別子とは別にパス専用のセグメントを作る。
+ * 各要素を個別にエンコードしてからハイフンで結合する。
  */
 function getVariantLocusPathSegment(result: VariantLocusFields): string {
   return [
@@ -58,7 +57,7 @@ function getVariantLocusPathSegment(result: VariantLocusFields): string {
     .join('-');
 }
 
-/** variant page への相対パスを組み立てる。tgvid が無い場合は locus 形式のパスになる。 */
+/** TogoVar IDがない検索結果も開けるよう、tgvidまたはlocus形式でvariant pageへの相対パスを作る。 */
 export function getVariantReportPath(result: VariantLocusFields): string {
   if (result.id) {
     return `/variant/${encodeURIComponent(result.id)}`;

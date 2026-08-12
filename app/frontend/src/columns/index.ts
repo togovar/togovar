@@ -199,12 +199,14 @@ export function usesInitialColumnWidth(columnId: string): boolean {
   return FIXED_INITIAL_WIDTH_COLUMN_IDS.has(columnId);
 }
 
+/** 固定列の追加時に判定箇所が分散しないよう、LOCKED_COLUMN_IDSを唯一の判定元にする。 */
 function isLockedColumnId(columnId: string): boolean {
   return LOCKED_COLUMN_IDS.includes(
     columnId as (typeof LOCKED_COLUMN_IDS)[number]
   );
 }
 
+/** 固定列を常に先頭かつ表示状態に保つため、正規化後の列順をここで補正する。 */
 function moveLockedColumnsToFront(columns: ColumnConfig[]): ColumnConfig[] {
   const remainingColumns = columns.filter(
     (column) => !isLockedColumnId(column.id)
