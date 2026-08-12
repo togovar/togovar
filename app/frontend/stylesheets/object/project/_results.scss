@@ -1212,7 +1212,9 @@ body[data-column-resizing='true'] {
   }
 
   &:focus-visible {
-    outline: none;
+    outline: 2px solid var(--color-key-dark1);
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 }
 

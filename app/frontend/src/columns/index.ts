@@ -12,7 +12,7 @@ const FIXED_INITIAL_WIDTH_COLUMN_IDS = new Set([
 
 /** 検索結果テーブルで利用可能な全列の定義（Report と TogoVar ID は常に先頭側へ固定） */
 export const COLUMNS = [
-  { label: 'Report', id: 'report', defaultWidth: 72, resizable: false },
+  { label: 'Report', id: 'report', defaultWidth: 50, resizable: false },
   { label: 'TogoVar ID', id: 'togovar_id', defaultWidth: 150 },
   { label: 'RefSNP ID', id: 'refsnp_id', defaultWidth: 116 },
   { label: 'Position', id: 'position', defaultWidth: 164 },
