@@ -37,7 +37,7 @@ export class ResultsColumnUpdater {
    * 値がない場合はa要素自体をDOMに置かない。
    */
   static resetAnchor(cell: HTMLElement) {
-    cell.querySelector('a.hyper-text')?.remove();
+    cell.querySelector('a')?.remove();
   }
 
   /**
@@ -71,12 +71,15 @@ export class ResultsColumnUpdater {
 
   /**
    * セル内のa要素を取得し、存在しない場合は作成する。
+   * 管理対象セルにはこの仕組みで作るa要素以外は含まれないため、class名に関わらず
+   * セル内の最初のa要素を既存アンカーとみなす（class名で絞ると、hyper-text以外の
+   * classを持つアンカー（例: variant-report-link）で再利用に失敗し、要素が増殖する）。
    */
   static ensureAnchor(
     cell: HTMLElement,
     insertBefore?: Element | null
   ) {
-    const currentAnchor = cell.querySelector<HTMLAnchorElement>('a.hyper-text');
+    const currentAnchor = cell.querySelector<HTMLAnchorElement>('a');
 
     if (currentAnchor) return currentAnchor;
 
