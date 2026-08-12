@@ -103,6 +103,14 @@ app/frontend/
 - Express削除により、CSP/HSTS/COOPなどのセキュリティヘッダーはこのリポジトリ内では付与されない。配信側（nginx/CDN/edge/外部Docker設定）で管理する前提で、ヘッダー方針を変える場合はREADMEと外部デプロイ設定の確認を促す。
 - `__CSP_NONCE__` のようなサーバー差し替え前提のプレースホルダーは使わない。静的配信で必要なCSPは nonce 注入ではなく、配信側のCSP設計として扱う。
 
+## レポートページ / Stanza 方針
+
+- レポートページのStanza定義は `app/frontend/assets/stanza.json` を正として扱う。
+- `scriptUrl` を省略したStanzaは `TOGOVAR_FRONTEND_STANZA_URL` または既定のStanza配信URLから読み込まれる。未公開Stanzaを追加する場合は、読み込み失敗時に空のsectionが残らないことを確認する。
+- variant page では、tgvidに解決できないlocus URLの場合、`fallback_id`（通常 `variant`）で動作できるStanzaだけを表示する。
+- locus fallbackに対応したStanzaには `supportsFallbackId: true` を付ける。Stanza側が `tgv_id` のみを参照する場合は付けない。
+- `supportsFallbackId` は一時的な公開待ちフラグではなく、そのStanzaが `fallback_id` で動作できるかを表す互換性フラグとして扱う。
+
 ## Advanced Search 方針
 
 - Advanced Search のUIは主に以下で構成される。

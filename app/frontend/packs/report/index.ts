@@ -266,7 +266,10 @@ class StanzaManager {
       return;
     }
 
-    this._loadStanzaScript(scriptUrl || `${STANZA_PATH}/${id}.js`);
+    this._loadStanzaScript(
+      scriptUrl || `${STANZA_PATH}/${id}.js`,
+      targetSelector
+    );
     this._createAndInsertStanzaElement(
       id,
       targetSelector,
@@ -302,13 +305,34 @@ class StanzaManager {
    * レポートごとに必要なStanzaだけを読み込めるよう、script要素を動的に追加する。
    *
    * @param scriptSourceUrl StanzaのJavaScriptファイルURL
+   * @param targetSelector 読み込み失敗時に非表示にするStanza挿入先
    */
-  private static _loadStanzaScript(scriptSourceUrl: string): void {
+  private static _loadStanzaScript(
+    scriptSourceUrl: string,
+    targetSelector: string
+  ): void {
     const scriptElement = document.createElement('script');
     scriptElement.type = 'module';
     scriptElement.src = scriptSourceUrl;
     scriptElement.async = true;
+    scriptElement.addEventListener('error', () => {
+      console.error(`Failed to load stanza script: ${scriptSourceUrl}`);
+      this.hideStanzaSection(targetSelector);
+    });
     document.head.appendChild(scriptElement);
+  }
+
+  /**
+   * 読み込めないStanzaや現在のID形式に非対応のStanzaは、空の枠を残さずsectionごと非表示にする。
+   */
+  static hideStanzaSection(targetSelector: string): void {
+    const targetElement = document.querySelector(targetSelector);
+    const parentSection = targetElement?.closest('section.stanza-view');
+    const elementToHide = parentSection || targetElement;
+
+    if (elementToHide instanceof HTMLElement) {
+      elementToHide.style.display = 'none';
+    }
   }
 
   /**
@@ -425,7 +449,8 @@ class ReportApp {
       reportConfig.stanza || [],
       baseOptions,
       reportId,
-      idKey
+      idKey,
+      reportConfig.id || 'id'
     );
   }
 
@@ -734,23 +759,22 @@ class ReportApp {
     stanzas: StanzaConfig[],
     baseOptions: Record<string, unknown>,
     reportId: string,
-    idKey: string = 'id'
+    idKey: string = 'id',
+    primaryIdKey: string = 'id'
   ): void {
     const currentReference = ENV_CONFIG.TOGOVAR_FRONTEND_REFERENCE;
+    const usesFallbackId = idKey !== primaryIdKey;
 
     stanzas.forEach((stanza) => {
       // referencesが指定されているStanzaは、現在の参照ゲノムに合うものだけ表示する。
       if (stanza.references && !stanza.references.includes(currentReference)) {
         // Stanza本体だけでなく見出しを含むsectionごと隠す。
-        const targetElement = document.querySelector(stanza.targetSelector);
-        if (targetElement) {
-          const parentSection = targetElement.closest(
-            'section.stanza-view'
-          ) as HTMLElement;
-          if (parentSection) {
-            parentSection.style.display = 'none';
-          }
-        }
+        StanzaManager.hideStanzaSection(stanza.targetSelector);
+        return;
+      }
+
+      if (usesFallbackId && !stanza.supportsFallbackId) {
+        StanzaManager.hideStanzaSection(stanza.targetSelector);
         return;
       }
 
