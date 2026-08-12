@@ -14,6 +14,7 @@ import {
 import { ResultsColumnUpdater } from './ResultsColumnUpdater';
 
 type ResultsRowCells = {
+  reportCell: HTMLTableCellElement | null;
   togovarIdCell: HTMLTableCellElement | null;
   refsnpCell: HTMLTableCellElement | null;
   refsnpContent: HTMLDivElement | null;
@@ -47,6 +48,7 @@ type ResultsRowCells = {
  */
 function createEmptyCells(): ResultsRowCells {
   return {
+    reportCell: null,
     togovarIdCell: null,
     refsnpCell: null,
     refsnpContent: null,
@@ -105,6 +107,8 @@ export class ResultsRowView {
     string,
     (result: ResultData) => void
   > = {
+    report: (result) =>
+      ResultsColumnUpdater.updateVariantReport(this.cells.reportCell, result),
     togovar_id: (result) =>
       ResultsColumnUpdater.updateTogovarId(this.cells.togovarIdCell, result),
     refsnp_id: (result) =>
@@ -381,6 +385,7 @@ export class ResultsRowView {
    * 各セルはネストが浅くquerySelectorで一意に取れるため、列ごとに直接取得する。
    */
   private cacheBasicElements() {
+    this.cells.reportCell = this.tr.querySelector('td.report');
     this.cells.togovarIdCell = this.tr.querySelector('td.togovar_id');
 
     this.cells.refsnpCell = this.tr.querySelector('td.refsnp_id');

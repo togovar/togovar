@@ -118,10 +118,31 @@ export class ResultsColumnUpdater {
   }
 
   /**
+   * Variant report への導線をTogoVar ID列から独立させ、ID表示自体は純粋なテキストにする。
+   */
+  static updateVariantReport(
+    cell: HTMLTableCellElement | null,
+    result: VariantLocusFields
+  ) {
+    if (!cell) return;
+
+    const { value } = getVariantIdentifier(result);
+    const url = getVariantReportPath(result);
+
+    const anchor = this.updateAnchor(
+      cell,
+      'variant-report-link',
+      url,
+      '',
+      `Open variant report for ${value}`
+    );
+
+    anchor.title = 'Open variant report';
+  }
+
+  /**
    * TogoVar ID列を更新する。
-   * TogoVar ID (tgvid) が無いバリアントも variant page へ遷移できるよう、
-   * その場合は chromosome-position-reference-alternate 形式のURLへ、
-   * 代替識別子として同じ形式のリンクテキストを表示する。
+   * Report列を詳細ページへの導線にするため、この列ではtgvidだけを非リンクテキストで表示する。
    *
    * @param cell - TogoVar ID列のtd要素
    * @param result - id/chromosome/position/reference/alternateを持つ結果行データ
@@ -132,26 +153,8 @@ export class ResultsColumnUpdater {
   ) {
     if (!cell) return;
 
-    const { value, isTogovarId } = getVariantIdentifier(result);
-    const url = getVariantReportPath(result);
-    const label = `View variant ${value} details`;
-
-    const anchor = this.updateAnchor(
-      cell,
-      isTogovarId
-        ? 'hyper-text -internal'
-        : 'hyper-text -internal -missing-togovar-id',
-      url,
-      value,
-      label
-    );
-
-    // locus形式は長くなり得るため、hover時に省略なしの値を確認できるようにする。
-    if (isTogovarId) {
-      anchor.removeAttribute('title');
-    } else {
-      anchor.title = label;
-    }
+    this.resetAnchor(cell);
+    this.updateInlineText(cell, 'togovar-id-text', result.id ?? '');
   }
 
   /**

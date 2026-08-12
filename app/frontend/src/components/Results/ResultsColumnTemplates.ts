@@ -13,6 +13,7 @@ export const REF_ALT_SHOW_LENGTH = 4;
  * ResultsRowViewで固定DOM行を再利用するため、列ごとの最小HTMLを定数で共有する。
  */
 export const COLUMN_TEMPLATES = {
+  report: '<td class="report"></td>',
   togovar_id: '<td class="togovar_id"></td>',
   refsnp_id:
     '<td class="refsnp_id"><div class="remains-content"><span class="remains-badge" data-remains=""></span></div></td>',

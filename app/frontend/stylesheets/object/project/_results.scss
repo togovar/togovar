@@ -408,6 +408,12 @@
         // td 側の列幅定義は tbody > tr > td セクションに同様のブロックがある。
         // -------------------------------------------------------------------------
 
+        &.report {
+          width: 72px;
+          min-width: 72px;
+          max-width: 72px;
+        }
+
         &.togovar_id {
           width: 150px;
           min-width: 150px;
@@ -571,6 +577,14 @@
         // th と td は別要素のため、同じ列クラスに対して th / td 両方に幅を指定する必要がある。
         // th 側の列幅定義は thead > tr > th セクションに同様のブロックがある。
         // -------------------------------------------------------------------------
+
+        &.report {
+          width: 72px;
+          min-width: 72px;
+          max-width: 72px;
+          padding-right: 6px;
+          text-align: center;
+        }
 
         &.togovar_id {
           width: 150px;
@@ -1208,6 +1222,38 @@ body[data-column-resizing='true'] {
     &[href]:not([href='']):hover::after {
       color: var(--color-key-dark1);
     }
+  }
+}
+
+// Variant report アイコンリンク
+// TogoVar ID列から詳細ページ導線を分離するため、Report列ではテキストではなく専用アイコンだけを表示する
+.variant-report-link {
+  position: relative;
+  top: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  color: var(--color-key-dark1);
+  text-decoration: none;
+
+  &::before {
+    display: block;
+    width: 19px;
+    height: 19px;
+    content: '';
+    background-color: currentcolor;
+    mask: url(../images/icon-variant-report.svg) center / contain no-repeat;
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-key);
+  }
+
+  &:focus-visible {
+    outline: none;
   }
 }
 

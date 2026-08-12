@@ -9,8 +9,9 @@ const FIXED_INITIAL_WIDTH_COLUMN_IDS = new Set([
   'polyphen',
 ]);
 
-/** 検索結果テーブルで利用可能な全列の定義（TogoVar ID は常に先頭・固定） */
+/** 検索結果テーブルで利用可能な全列の定義（Report と TogoVar ID は常に先頭側へ固定） */
 export const COLUMNS = [
+  { label: 'Report', id: 'report', defaultWidth: 72, resizable: false },
   { label: 'TogoVar ID', id: 'togovar_id', defaultWidth: 150 },
   { label: 'RefSNP ID', id: 'refsnp_id', defaultWidth: 116 },
   { label: 'Position', id: 'position', defaultWidth: 164 },
@@ -53,8 +54,8 @@ export const COLUMNS = [
 /** 列 ID から列定義オブジェクトへの高速マップ */
 const COLUMN_MAP = new Map(COLUMNS.map((column) => [column.id, column]));
 
-/** 常に先頭に固定される列の ID（TogoVar ID） */
-export const LOCKED_COLUMN_ID = 'togovar_id';
+/** 常に先頭に固定される列の ID（Report と TogoVar ID） */
+export const LOCKED_COLUMN_IDS = ['report', 'togovar_id'] as const;
 
 /** 値が有効な列設定かどうかを判定 */
 function isColumnConfig(value: unknown): value is ColumnConfig {
@@ -137,7 +138,7 @@ export function normalizeColumnConfigs(
 
     normalized.push({
       id: column.id,
-      isUsed: column.id === LOCKED_COLUMN_ID ? true : column.isUsed,
+      isUsed: isLockedColumnId(column.id) ? true : column.isUsed,
       width: normalizeColumnWidth(column.id, column.width),
     });
     usedIds.add(column.id);
@@ -151,18 +152,7 @@ export function normalizeColumnConfigs(
     normalized.push(column);
   });
 
-  const lockedIndex = normalized.findIndex(
-    (column) => column.id === LOCKED_COLUMN_ID
-  );
-
-  if (lockedIndex === -1) {
-    normalized.unshift({ id: LOCKED_COLUMN_ID, isUsed: true });
-    return normalized;
-  }
-
-  const [lockedColumn] = normalized.splice(lockedIndex, 1);
-  normalized.unshift({ ...lockedColumn, isUsed: true });
-  return normalized;
+  return moveLockedColumnsToFront(normalized);
 }
 
 /**
@@ -206,4 +196,24 @@ export function isColumnResizable(columnId: string): boolean {
 
 export function usesInitialColumnWidth(columnId: string): boolean {
   return FIXED_INITIAL_WIDTH_COLUMN_IDS.has(columnId);
+}
+
+function isLockedColumnId(columnId: string): boolean {
+  return LOCKED_COLUMN_IDS.includes(
+    columnId as (typeof LOCKED_COLUMN_IDS)[number]
+  );
+}
+
+function moveLockedColumnsToFront(columns: ColumnConfig[]): ColumnConfig[] {
+  const remainingColumns = columns.filter(
+    (column) => !isLockedColumnId(column.id)
+  );
+  const lockedColumns = LOCKED_COLUMN_IDS.map((columnId) => {
+    const column = columns.find((item) => item.id === columnId);
+    return column
+      ? { ...column, isUsed: true }
+      : { id: columnId, isUsed: true, width: getInitialColumnWidth(columnId) };
+  });
+
+  return [...lockedColumns, ...remainingColumns];
 }

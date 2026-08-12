@@ -1,6 +1,6 @@
 import {
   getColumnLabel,
-  LOCKED_COLUMN_ID,
+  LOCKED_COLUMN_IDS,
   normalizeColumnConfigs,
 } from '../../columns';
 import { storeManager } from '../../store/StoreManager';
@@ -27,7 +27,7 @@ const HOVER_CLOSE_DELAY_MS = 120;
  * 機能：
  * - チェックボックスで列の表示/非表示を制御
  * - ドラッグ&ドロップで列の順序を並び替え
- * - TogoVar ID 列は常に先頭に固定（ドラッグ禁止、チェック常時有効）
+ * - Report / TogoVar ID 列は常に先頭側に固定（ドラッグ禁止、チェック常時有効）
  * - UI 操作が store.columns に自動反映
  */
 export class ResultsColumnsDropdown {
@@ -161,8 +161,8 @@ export class ResultsColumnsDropdown {
         }
 
         const target = event.target;
-        // 固定列（TogoVar ID）はチェック状態の変更を無視
-        if (target.value === LOCKED_COLUMN_ID) {
+        // 固定列はチェック状態の変更を無視
+        if (this.isLockedColumn(target.value)) {
           return;
         }
 
@@ -199,7 +199,7 @@ export class ResultsColumnsDropdown {
         }
 
         const item = target.closest(SELECTORS.ITEM) as HTMLElement | null;
-        if (!item || item.dataset.columnId === LOCKED_COLUMN_ID) {
+        if (!item || this.isLockedColumn(item.dataset.columnId)) {
           return;
         }
 
@@ -263,7 +263,7 @@ export class ResultsColumnsDropdown {
   private render(columns: ColumnConfig[]): void {
     this.list.innerHTML = columns
       .map((column) => {
-        const isLocked = column.id === LOCKED_COLUMN_ID;
+        const isLocked = this.isLockedColumn(column.id);
         return `
           <li class="columns-dropdown-item${isLocked ? ' -locked' : ''}" data-column-id="${column.id}">
             <span class="drag-handle" aria-hidden="true"></span>
@@ -353,7 +353,7 @@ export class ResultsColumnsDropdown {
         return;
       }
 
-      const isTargetLocked = target.dataset.columnId === LOCKED_COLUMN_ID;
+      const isTargetLocked = this.isLockedColumn(target.dataset.columnId);
       const rect = target.getBoundingClientRect();
       const shouldInsertAfter = isTargetLocked
         ? true
@@ -532,5 +532,14 @@ export class ResultsColumnsDropdown {
     if (event.key === 'Escape') {
       this.toggle(false);
     }
+  }
+
+  /**
+   * 固定列は表示・順序をユーザー操作で崩せないよう、UI操作の各入口で共通判定する。
+   */
+  private isLockedColumn(columnId: string | undefined): boolean {
+    return LOCKED_COLUMN_IDS.includes(
+      columnId as (typeof LOCKED_COLUMN_IDS)[number]
+    );
   }
 }
