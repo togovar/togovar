@@ -432,9 +432,9 @@ class ReportApp {
   /** tgvid形式かどうかの判定に使う。tgv-prefix + 数字のみを既存tgvidとみなす。 */
   private static readonly TGV_ID_PATTERN = /^tgv\d+$/i;
 
-  /** chr-pos-ref-alt形式のURLをパースするための正規表現。各要素内のハイフンはURLエンコード済みである前提。 */
+  /** chr-pos-ref-alt形式のURLをパースするための正規表現。REF/ALTは空文字のSV表現も許容する。 */
   private static readonly VARIANT_LOCUS_PATTERN =
-    /^([^-]+)-(\d+)-([^-]+)-([^-]+)$/;
+    /^([^-]+)-(\d+)-([^-]*)-([^-]*)$/;
   /** 1回のAPI取得件数は仕様上1000が上限のため、tgvid解決も同じ単位でページングする。 */
   private static readonly TGV_ID_RESOLUTION_LIMIT = 1000;
   /** 初期描画を長時間止めないよう、tgvid解決で辿るページ数を必要最小限に抑える。 */
@@ -628,8 +628,8 @@ class ReportApp {
     if (
       !last?.chromosome ||
       typeof last.position !== 'number' ||
-      !last.reference ||
-      !alternate
+      typeof last.reference !== 'string' ||
+      typeof alternate !== 'string'
     ) {
       return undefined;
     }

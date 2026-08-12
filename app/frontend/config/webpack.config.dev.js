@@ -1,45 +1,12 @@
 import { merge } from 'webpack-merge';
 import commonConfig from './webpack.config.common.js';
-
-const LOCAL_SPARQLIST_PROXY_PATH = '/sparqlist';
-
-// ローカルSPARQListはCORS設定なしで動かすことがあるため、開発サーバーから同一オリジンで中継する。
-function createLocalSparqlistProxy() {
-  const endpoint = process.env.TOGOVAR_ENDPOINT_SPARQLIST;
-
-  if (!endpoint) {
-    return [];
-  }
-
-  try {
-    const endpointUrl = new URL(endpoint);
-
-    if (!['localhost', '127.0.0.1', '[::1]'].includes(endpointUrl.hostname)) {
-      return [];
-    }
-
-    const endpointPath = endpointUrl.pathname.replace(/\/$/, '');
-
-    return [
-      {
-        context: [LOCAL_SPARQLIST_PROXY_PATH],
-        target: endpointUrl.origin,
-        changeOrigin: true,
-        pathRewrite: {
-          [`^${LOCAL_SPARQLIST_PROXY_PATH}`]: endpointPath,
-        },
-      },
-    ];
-  } catch {
-    return [];
-  }
-}
+import { createLocalSparqlistProxy } from './sparqlistProxy.js';
 
 export default merge(commonConfig, {
   mode: 'development',
   devtool: 'inline-source-map',
   devServer: {
-    proxy: createLocalSparqlistProxy(),
+    proxy: createLocalSparqlistProxy(process.env.TOGOVAR_ENDPOINT_SPARQLIST),
     historyApiFallback: {
       rewrites: [
         { from: /^\/variant(?:\/.*)?$/, to: '/variant/index.html' },

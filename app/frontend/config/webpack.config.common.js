@@ -7,6 +7,10 @@ import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import dotenv from 'dotenv';
 import { getSiteOrigin } from './siteOrigin.js';
+import {
+  LOCAL_SPARQLIST_PROXY_PATH,
+  shouldUseLocalSparqlistProxy,
+} from './sparqlistProxy.js';
 
 // ESM では __dirname が使えないため、import.meta.url から再現する。
 const __filename = fileURLToPath(import.meta.url);
@@ -14,22 +18,6 @@ const __dirname = path.dirname(__filename);
 
 const env = dotenv.config().parsed || {};
 Object.assign(process.env, env);
-
-const LOCAL_SPARQLIST_PROXY_PATH = '/sparqlist';
-
-// 開発時にローカルSPARQListへ直接fetchするとCORSで失敗しやすいため、同一オリジンproxyへ寄せる。
-function shouldUseLocalSparqlistProxy(endpoint) {
-  if (process.env.NODE_ENV !== 'development' || !endpoint) {
-    return false;
-  }
-
-  try {
-    const url = new URL(endpoint);
-    return ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
-  } catch {
-    return false;
-  }
-}
 
 // stanzaへ渡すURLはブラウザ視点のURLにする。実際の転送先はwebpack-dev-server側で設定する。
 function getSparqlistEndpoint() {
