@@ -1,4 +1,10 @@
 import stanzaConfigJson from '../../assets/stanza.json';
+import {
+  fetchVariantResolutionPage,
+  type VariantResolutionOffset,
+  type VariantResolutionPage,
+  type VariantResolutionPageItem,
+} from '../../src/api/variantResolution';
 import FloatingInfo from '../../src/components/FloatingInfo';
 
 /**
@@ -548,13 +554,15 @@ class ReportApp {
     }, this.TGV_ID_RESOLUTION_TIMEOUT_MS);
 
     try {
-      let offset: [string, number, string, string] | undefined;
+      let offset: VariantResolutionOffset | undefined;
 
       for (let page = 0; page < this.TGV_ID_RESOLUTION_MAX_PAGES; page += 1) {
-        const result = await this._fetchVariantResolutionPage(
+        const result = await fetchVariantResolutionPage(
+          ENV_CONFIG.TOGOVAR_FRONTEND_API_URL,
           variant,
           offset,
-          abortController.signal
+          abortController.signal,
+          this.TGV_ID_RESOLUTION_LIMIT
         );
         const matchedVariant = result.data.find((item) =>
           this._isSameVariantAllele(item, variant)
@@ -593,88 +601,10 @@ class ReportApp {
   }
 
   /**
-   * location条件だけでは同一座標の候補が1000件を超える可能性があるため、
-   * search-after用offsetを渡せる形で1ページずつ取得する。
-   */
-  private static async _fetchVariantResolutionPage(
-    variant: {
-      chromosome: string;
-      position: number;
-    },
-    offset: [string, number, string, string] | undefined,
-    signal: AbortSignal
-  ): Promise<{
-    data: Array<{
-      id?: string;
-      chromosome?: string;
-      position?: number;
-      reference?: string;
-      alternate?: string;
-      alternative?: string;
-    }>;
-  }> {
-    const body: {
-      query: {
-        location: {
-          chromosome: string;
-          position: number;
-        };
-      };
-      offset?: [string, number, string, string];
-    } = {
-      query: {
-        location: {
-          chromosome: variant.chromosome,
-          position: variant.position,
-        },
-      },
-    };
-
-    if (offset) {
-      body.offset = offset;
-    }
-
-    const response = await fetch(
-      `${ENV_CONFIG.TOGOVAR_FRONTEND_API_URL}/api/search/variant?stat=0&data=1&limit=${this.TGV_ID_RESOLUTION_LIMIT}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        mode: 'cors',
-        signal,
-        body: JSON.stringify(body),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Unexpected response status: ${response.status}`);
-    }
-
-    const result = (await response.json()) as {
-      data?: Array<{
-        id?: string;
-        chromosome?: string;
-        position?: number;
-        reference?: string;
-        alternate?: string;
-        alternative?: string;
-      }>;
-    };
-
-    return { data: result.data ?? [] };
-  }
-
-  /**
    * APIレスポンスではalternate/alternativeが移行中で混在し得るため、両方を同じALTとして比較する。
    */
   private static _isSameVariantAllele(
-    item: {
-      reference?: string;
-      alternate?: string;
-      alternative?: string;
-    },
+    item: VariantResolutionPageItem,
     variant: {
       reference: string;
       alternate: string;
@@ -690,14 +620,8 @@ class ReportApp {
    * 1000件ちょうど返った場合は続きがあり得るため、最後の行をsearch-after offsetに変換する。
    */
   private static _getNextVariantResolutionOffset(
-    data: Array<{
-      chromosome?: string;
-      position?: number;
-      reference?: string;
-      alternate?: string;
-      alternative?: string;
-    }>
-  ): [string, number, string, string] | undefined {
+    data: VariantResolutionPage['data']
+  ): VariantResolutionOffset | undefined {
     const last = data[data.length - 1];
     const alternate = last?.alternate ?? last?.alternative;
 
