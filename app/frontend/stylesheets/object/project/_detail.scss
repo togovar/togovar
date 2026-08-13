@@ -27,11 +27,13 @@
     }
 
     > .title {
+      max-width: calc(100vw - var(--padding-side) - var(--padding-report-left));
       margin-bottom: 0;
       font-size: 28px;
       font-weight: bold;
       line-height: 28px;
       color: white;
+      overflow-wrap: anywhere;
     }
   }
 }
