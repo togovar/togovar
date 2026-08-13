@@ -52,10 +52,10 @@
     > .titlelink {
       display: inline-block;
       width: 11px;
-      margin-right: 2px;
+      margin-right: 3px;
       // stylelint-disable-next-line font-family-no-missing-generic-family-keyword
       font-family: 'Font Awesome 7 Free';
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 900;
       vertical-align: bottom;
       color: var(--color-gray);
@@ -65,7 +65,9 @@
 
     &:hover {
       .titlelink::before {
+        display: inline-block;
         content: var(--icon-link);
+        transform: rotate(-20deg);
       }
     }
 
