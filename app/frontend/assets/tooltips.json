@@ -1,5 +1,9 @@
 [
   {
+    "id": "table-header-report",
+    "content": "Link to the variant report page"
+  },
+  {
     "id": "table-header-togovar_id",
     "content": "TogoVar identifier assigned to variants observed in Japanese populations"
   },
