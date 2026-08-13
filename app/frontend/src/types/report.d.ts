@@ -30,7 +30,6 @@ export interface EnvironmentConfig {
  * Stanzaコンポーネント1つ分の設定。
  * scriptUrl を省略すると、デフォルトのStanza配信URLを使う。
  * references を指定すると、現在の参照ゲノムが一致するときだけ描画する。
- * supportsFallbackId は、tgvid未解決時のfallback_idでも動作するStanzaだけに付ける。
  */
 export interface StanzaConfig {
   id: string;
@@ -38,7 +37,6 @@ export interface StanzaConfig {
   scriptUrl?: string;
   options?: Record<string, unknown>;
   references?: string[];
-  supportsFallbackId?: boolean;
 }
 
 /**

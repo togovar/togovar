@@ -23,7 +23,6 @@
         "id": "variant-links",
         "targetSelector": "#variant-links",
         "references": ["GRCh37", "GRCh38"],
-        "supportsFallbackId": true,
         "options": {
           "data-url": "${TOGOVAR_FRONTEND_API_URL}/api/search/variant",
           "assembly": "$TOGOVAR_FRONTEND_REFERENCE"

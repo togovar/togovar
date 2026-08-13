@@ -449,8 +449,7 @@ class ReportApp {
       reportConfig.stanza || [],
       baseOptions,
       reportId,
-      idKey,
-      reportConfig.id || 'id'
+      idKey
     );
   }
 
@@ -759,21 +758,14 @@ class ReportApp {
     stanzas: StanzaConfig[],
     baseOptions: Record<string, unknown>,
     reportId: string,
-    idKey: string = 'id',
-    primaryIdKey: string = 'id'
+    idKey: string = 'id'
   ): void {
     const currentReference = ENV_CONFIG.TOGOVAR_FRONTEND_REFERENCE;
-    const usesFallbackId = idKey !== primaryIdKey;
 
     stanzas.forEach((stanza) => {
       // referencesが指定されているStanzaは、現在の参照ゲノムに合うものだけ表示する。
       if (stanza.references && !stanza.references.includes(currentReference)) {
         // Stanza本体だけでなく見出しを含むsectionごと隠す。
-        StanzaManager.hideStanzaSection(stanza.targetSelector);
-        return;
-      }
-
-      if (usesFallbackId && !stanza.supportsFallbackId) {
         StanzaManager.hideStanzaSection(stanza.targetSelector);
         return;
       }
