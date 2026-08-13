@@ -11,6 +11,7 @@
         "targetSelector": "#variant-header",
         "references": ["GRCh37", "GRCh38"],
         "options": {
+          "data-url": "${TOGOVAR_FRONTEND_API_URL}/api/search/variant",
           "togostanza-menu-placement": "none"
         }
       },
@@ -201,7 +202,10 @@
       {
         "id": "variant-publication",
         "targetSelector": "#variant-publication",
-        "references": ["GRCh37", "GRCh38"]
+        "references": ["GRCh37", "GRCh38"],
+        "options": {
+          "data-url": "${TOGOVAR_FRONTEND_API_URL}/api/search/variant"
+        }
       }
     ]
   },
