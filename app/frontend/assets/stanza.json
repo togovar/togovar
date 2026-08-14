@@ -484,7 +484,7 @@
         "references": ["GRCh37", "GRCh38"],
         "options": {
           "hgnc_id": "${hgnc_id}",
-          "jpost_endpoint": "https://ts.glycosmos.org/sparql",
+          "jpost_endpoint": "https://tools.jpostdb.org/proxy/sparql",
           "glycosmos_endpoint": "https://ts.glycosmos.org/sparql"
         }
       },
