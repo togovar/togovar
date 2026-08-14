@@ -1,6 +1,6 @@
 import {
   getColumnLabel,
-  LOCKED_COLUMN_IDS,
+  isLockedColumnId,
   normalizeColumnConfigs,
 } from '../../columns';
 import { storeManager } from '../../store/StoreManager';
@@ -162,7 +162,7 @@ export class ResultsColumnsDropdown {
 
         const target = event.target;
         // 固定列はチェック状態の変更を無視
-        if (this.isLockedColumn(target.value)) {
+        if (isLockedColumnId(target.value)) {
           return;
         }
 
@@ -199,7 +199,7 @@ export class ResultsColumnsDropdown {
         }
 
         const item = target.closest(SELECTORS.ITEM) as HTMLElement | null;
-        if (!item || this.isLockedColumn(item.dataset.columnId)) {
+        if (!item || isLockedColumnId(item.dataset.columnId)) {
           return;
         }
 
@@ -263,7 +263,7 @@ export class ResultsColumnsDropdown {
   private render(columns: ColumnConfig[]): void {
     this.list.innerHTML = columns
       .map((column) => {
-        const isLocked = this.isLockedColumn(column.id);
+        const isLocked = isLockedColumnId(column.id);
         return `
           <li class="columns-dropdown-item${isLocked ? ' -locked' : ''}" data-column-id="${column.id}">
             <span class="drag-handle" aria-hidden="true"></span>
@@ -353,7 +353,7 @@ export class ResultsColumnsDropdown {
         return;
       }
 
-      const isTargetLocked = this.isLockedColumn(target.dataset.columnId);
+      const isTargetLocked = isLockedColumnId(target.dataset.columnId);
       const rect = target.getBoundingClientRect();
       const shouldInsertAfter = isTargetLocked
         ? true
@@ -534,12 +534,4 @@ export class ResultsColumnsDropdown {
     }
   }
 
-  /**
-   * 固定列は表示・順序をユーザー操作で崩せないよう、UI操作の各入口で共通判定する。
-   */
-  private isLockedColumn(columnId: string | undefined): boolean {
-    return LOCKED_COLUMN_IDS.includes(
-      columnId as (typeof LOCKED_COLUMN_IDS)[number]
-    );
-  }
 }

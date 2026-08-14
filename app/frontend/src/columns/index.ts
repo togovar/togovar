@@ -200,7 +200,11 @@ export function usesInitialColumnWidth(columnId: string): boolean {
 }
 
 /** 固定列の追加時に判定箇所が分散しないよう、LOCKED_COLUMN_IDSを唯一の判定元にする。 */
-function isLockedColumnId(columnId: string): boolean {
+export function isLockedColumnId(columnId: string | undefined): boolean {
+  if (!columnId) {
+    return false;
+  }
+
   return LOCKED_COLUMN_IDS.includes(
     columnId as (typeof LOCKED_COLUMN_IDS)[number]
   );
