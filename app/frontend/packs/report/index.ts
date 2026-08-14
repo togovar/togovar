@@ -178,7 +178,12 @@ class OptionFormatter {
     const formattedAttributes: Record<string, string> = {};
 
     for (const [attributeName, attributeValue] of Object.entries(options)) {
-      if (attributeValue && typeof attributeValue === 'object') {
+      if (this._isDataUrl(attributeName, attributeValue)) {
+        // pagination-tableのloadDataはnew URL()を使うため、相対URLを絶対URLへ正規化する。
+        formattedAttributes[attributeName] = this._formatDataUrl(
+          attributeValue
+        );
+      } else if (attributeValue && typeof attributeValue === 'object') {
         // オブジェクト値は属性へ直接渡せないため、JSON文字列にする。
         formattedAttributes[attributeName] = JSON.stringify(attributeValue);
       } else if (this._isUrl(attributeValue)) {
@@ -203,6 +208,38 @@ class OptionFormatter {
    */
   private static _isUrl(value: unknown): value is string {
     return typeof value === 'string' && /^https?:\/\//.test(value);
+  }
+
+  /**
+   * MetaStanzaのdata-url処理は絶対URL前提のため、data-urlだけ専用整形へ回す。
+   *
+   * @param attributeName 判定対象の属性名
+   * @param value 判定対象の値
+   * @returns data-url文字列ならtrue
+   */
+  private static _isDataUrl(
+    attributeName: string,
+    value: unknown
+  ): value is string {
+    return attributeName === 'data-url' && typeof value === 'string';
+  }
+
+  /**
+   * 空値を持つクエリもSPARQListでは意味があるため、data-urlでは空値を保持したまま絶対URL化する。
+   *
+   * @param urlString 整形対象のdata-url
+   * @returns 相対URLなら現在originを補った絶対URL
+   */
+  private static _formatDataUrl(urlString: string): string {
+    const url = new URL(urlString, window.location.origin);
+
+    url.search = [...url.searchParams]
+      .map(
+        ([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+      )
+      .join('&');
+
+    return url.href;
   }
 
   /**
@@ -773,7 +810,8 @@ class ReportApp {
       const processedStanza = this._processStanzaTemplateVariables(
         stanza,
         reportId,
-        idKey
+        idKey,
+        baseOptions
       );
       StanzaManager.createStanzaAndInsertIntoDOM(processedStanza, baseOptions);
     });
@@ -790,6 +828,7 @@ class ReportApp {
    * @param stanzaConfig 置換前のStanza設定
    * @param reportId テンプレート変数へ代入する値
    * @param idKeyName テンプレート内で探す変数名
+   * @param baseOptions Stanza属性として渡す共通値。data-url内のtgv_id/variantなどにも使う。
    * @returns テンプレート変数を解決したStanza設定
    *
    * @example
@@ -799,14 +838,15 @@ class ReportApp {
    *   targetSelector: "#summary",
    *   options: { url: "/api/variant/${tgv_id}" }
    * };
-   * const processed = ReportApp._processStanzaTemplateVariables(stanza, "tgv123456", "tgv_id");
+   * const processed = ReportApp._processStanzaTemplateVariables(stanza, "tgv123456", "tgv_id", { tgv_id: "tgv123456" });
    * // 結果: { ...stanza, options: { url: "/api/variant/tgv123456" } }
    * ```
    */
   private static _processStanzaTemplateVariables(
     stanzaConfig: StanzaConfig,
     reportId: string,
-    idKeyName: string
+    idKeyName: string,
+    baseOptions: Record<string, unknown> = {}
   ): StanzaConfig {
     if (!stanzaConfig.options) {
       return stanzaConfig;
@@ -815,11 +855,11 @@ class ReportApp {
     const processedStanzaConfig: StanzaConfig = { ...stanzaConfig };
     processedStanzaConfig.options = { ...stanzaConfig.options };
 
-    const tokens: Array<[string, string]> = [
-      [idKeyName, reportId],
-      ['id_param', idKeyName],
-      ['id_value', encodeURIComponent(reportId)],
-    ];
+    const tokens = this._buildStanzaTemplateTokens(
+      reportId,
+      idKeyName,
+      baseOptions
+    );
 
     // option値のうち、テンプレート変数を含む文字列だけを置換対象にする。
     for (const [optionKey, optionValue] of Object.entries(
@@ -842,6 +882,40 @@ class ReportApp {
     }
 
     return processedStanzaConfig;
+  }
+
+  /**
+   * locus URL由来のvariant値がある場合は、SPARQListのtgvid検索失敗を避けるためvariant条件を優先する。
+   */
+  private static _buildStanzaTemplateTokens(
+    reportId: string,
+    idKeyName: string,
+    baseOptions: Record<string, unknown>
+  ): Array<[string, string]> {
+    const tokens: Array<[string, string]> = Object.entries(baseOptions).map(
+      ([key, value]) => [key, String(value)]
+    );
+
+    const variantValue =
+      typeof baseOptions.variant === 'string' ? baseOptions.variant : '';
+
+    const variantOrIdQuery = variantValue
+      ? new URLSearchParams({
+          tgv_id: '',
+          variant: variantValue,
+        }).toString()
+      : new URLSearchParams({
+          [idKeyName]: reportId,
+        }).toString();
+
+    tokens.push(
+      [idKeyName, reportId],
+      ['id_param', idKeyName],
+      ['id_value', encodeURIComponent(reportId)],
+      ['variant_or_id_query', variantOrIdQuery]
+    );
+
+    return tokens;
   }
 }
 
