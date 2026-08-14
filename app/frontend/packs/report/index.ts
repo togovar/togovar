@@ -500,8 +500,8 @@ class ReportApp {
   private static readonly TGV_ID_RESOLUTION_LIMIT = 1000;
   /** 初期描画を長時間止めないよう、tgvid解決で辿るページ数を必要最小限に抑える。 */
   private static readonly TGV_ID_RESOLUTION_MAX_PAGES = 3;
-  /** API遅延時はlocus表示へ倒し、レポートページ全体の描画待ちを短くする。 */
-  private static readonly TGV_ID_RESOLUTION_TIMEOUT_MS = 1500;
+  /** API遅延時も数ページ分の解決を待てるよう、レポート全体を止めすぎない範囲で余裕を持たせる。 */
+  private static readonly TGV_ID_RESOLUTION_TIMEOUT_MS = 5000;
 
   /**
    * variant pageのURLがtgvid形式でない場合、chr-pos-ref-altから検索APIでtgvidを解決する。
@@ -654,7 +654,6 @@ class ReportApp {
         return null;
       }
 
-      console.error('Failed to resolve TogoVar ID from variant locus', error);
       return null;
     } finally {
       window.clearTimeout(timeoutId);
@@ -885,7 +884,8 @@ class ReportApp {
   }
 
   /**
-   * locus URL由来のvariant値がある場合は、SPARQListのtgvid検索失敗を避けるためvariant条件を優先する。
+   * locus URL由来のvariant値がある場合は、tgvid解決後もSPARQList互換性のためvariant条件を優先する。
+   * pagination-table系の一部SPARQListは、解決済みtgvidよりchr-pos-ref-alt指定の方が安定して結果を返すため。
    */
   private static _buildStanzaTemplateTokens(
     reportId: string,
@@ -899,7 +899,7 @@ class ReportApp {
     const variantValue =
       typeof baseOptions.variant === 'string' ? baseOptions.variant : '';
 
-    const variantOrIdQuery = variantValue
+    const variantFirstQuery = variantValue
       ? new URLSearchParams({
           tgv_id: '',
           variant: variantValue,
@@ -912,7 +912,8 @@ class ReportApp {
       [idKeyName, reportId],
       ['id_param', idKeyName],
       ['id_value', encodeURIComponent(reportId)],
-      ['variant_or_id_query', variantOrIdQuery]
+      ['variant_first_query', variantFirstQuery],
+      ['variant_or_id_query', variantFirstQuery]
     );
 
     return tokens;

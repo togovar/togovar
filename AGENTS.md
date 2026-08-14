@@ -108,6 +108,8 @@ app/frontend/
 - レポートページのStanza定義は `app/frontend/assets/stanza.json` を正として扱う。
 - `scriptUrl` を省略したStanzaは `TOGOVAR_FRONTEND_STANZA_URL` または既定のStanza配信URLから読み込まれる。未公開Stanzaを追加する場合は、読み込み失敗時に空のsectionが残らないことを確認する。
 - variant page では、tgvidに解決できないlocus URLの場合も、既存Stanzaの表示可否を勝手に絞らない。Stanza側のfallback対応状況を変える場合は、表示範囲と空リクエストの扱いを個別に確認する。
+- variant page の chr-pos-ref-alt fallback では、TogoVar側は共通属性として `tgv_id` と `variant` の両方を渡す。`data-url` を持たないStanzaでも、Stanza側が `variant` 属性に対応していればfallback対象になるため、`stanza.json` だけで未対応と判断しない。
+- pagination-table向けの `${variant_first_query}` は、locus URL由来の場合にtgvid解決へ成功していても `variant` 条件を優先する。SPARQList側でtgvid指定が安定しないAPIだけに使い、通常のStanzaへ安易に流用しない。
 
 ## Advanced Search 方針
 

@@ -66,7 +66,7 @@
         "references": ["GRCh37", "GRCh38"],
         "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
         "options": {
-          "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_gwas?${variant_or_id_query}",
+          "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_gwas?${variant_first_query}",
           "data-type": "json",
           "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
           "page-size_option": "5,10,20,50,100",
@@ -149,7 +149,7 @@
         "references": ["GRCh38"],
         "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
         "options": {
-          "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_cross_species?${variant_or_id_query}",
+          "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_cross_species?${variant_first_query}",
           "data-type": "json",
           "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
           "page-size_option": "5,10,20,50,100",
