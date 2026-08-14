@@ -146,7 +146,7 @@
       {
         "id": "pagination-table",
         "targetSelector": "#variant-cross-species",
-        "references": ["GRCh38"],
+        "references": ["GRCh37", "GRCh38"],
         "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
         "options": {
           "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_cross_species?${variant_first_query}",
