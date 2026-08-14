@@ -1,10 +1,12 @@
 import { merge } from 'webpack-merge';
 import commonConfig from './webpack.config.common.js';
+import { createLocalSparqlistProxy } from './sparqlistProxy.js';
 
 export default merge(commonConfig, {
   mode: 'development',
   devtool: 'inline-source-map',
   devServer: {
+    proxy: createLocalSparqlistProxy(process.env.TOGOVAR_ENDPOINT_SPARQLIST),
     historyApiFallback: {
       rewrites: [
         { from: /^\/variant(?:\/.*)?$/, to: '/variant/index.html' },

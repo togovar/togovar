@@ -13,6 +13,11 @@ import type {
   ExternalLinkItem,
 } from '../../types';
 import { REF_ALT_SHOW_LENGTH } from './ResultsColumnTemplates';
+import {
+  getVariantIdentifier,
+  getVariantReportPath,
+  type VariantLocusFields,
+} from '../../utils/variantPath';
 
 type NormalizedGeneSummary = {
   total: number;
@@ -32,7 +37,7 @@ export class ResultsColumnUpdater {
    * 値がない場合はa要素自体をDOMに置かない。
    */
   static resetAnchor(cell: HTMLElement) {
-    cell.querySelector('a.hyper-text')?.remove();
+    cell.querySelector('a')?.remove();
   }
 
   /**
@@ -66,19 +71,20 @@ export class ResultsColumnUpdater {
 
   /**
    * セル内のa要素を取得し、存在しない場合は作成する。
+   * 管理対象セルにはこの仕組みで作るa要素以外は含まれないため、class名に関わらず
+   * セル内の最初のa要素を既存アンカーとみなす（class名で絞ると、hyper-text以外の
+   * classを持つアンカー（例: variant-report-link）で再利用に失敗し、要素が増殖する）。
    */
   static ensureAnchor(
     cell: HTMLElement,
-    className: string,
     insertBefore?: Element | null
   ) {
-    const currentAnchor = cell.querySelector<HTMLAnchorElement>('a.hyper-text');
+    const currentAnchor = cell.querySelector<HTMLAnchorElement>('a');
 
     if (currentAnchor) return currentAnchor;
 
     const anchor = document.createElement('a');
 
-    anchor.className = className;
     anchor.target = '_blank';
     anchor.rel = 'noopener noreferrer';
 
@@ -92,7 +98,9 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * セル内のa要素にリンク先、表示文字列、スクリーンリーダー向けラベルを設定する。
+   * セル内のa要素にクラス・リンク先・表示文字列・スクリーンリーダー向けラベルを設定する。
+   * 仮想スクロールでa要素が別データの行へ使い回されるため、既存要素の再利用時もclassNameを
+   * 毎回上書きする（ensureAnchor内では新規作成時にしか設定できないため）。
    */
   static updateAnchor(
     cell: HTMLElement,
@@ -102,39 +110,54 @@ export class ResultsColumnUpdater {
     label: string,
     insertBefore?: Element | null
   ) {
-    const anchor = this.ensureAnchor(cell, className, insertBefore);
+    const anchor = this.ensureAnchor(cell, insertBefore);
 
+    anchor.className = className;
     anchor.setAttribute('href', url);
     anchor.textContent = text;
     anchor.setAttribute('aria-label', label);
+
+    return anchor;
+  }
+
+  /**
+   * Variant report への導線をTogoVar ID列から独立させ、ID表示自体は純粋なテキストにする。
+   */
+  static updateVariantReport(
+    cell: HTMLTableCellElement | null,
+    result: VariantLocusFields
+  ) {
+    if (!cell) return;
+
+    const { value } = getVariantIdentifier(result);
+    const url = getVariantReportPath(result);
+
+    const anchor = this.updateAnchor(
+      cell,
+      'variant-report-link',
+      url,
+      '',
+      `Open variant report for ${value}`
+    );
+
+    anchor.title = 'Open variant report';
   }
 
   /**
    * TogoVar ID列を更新する。
+   * Report列を詳細ページへの導線にするため、この列ではtgvidだけを非リンクテキストで表示する。
    *
    * @param cell - TogoVar ID列のtd要素
-   * @param value - 表示するTogoVar ID
-   * @param url - バリアント詳細ページのURL
+   * @param result - id/chromosome/position/reference/alternateを持つ結果行データ
    */
   static updateTogovarId(
     cell: HTMLTableCellElement | null,
-    value: string,
-    url: string
+    result: VariantLocusFields
   ) {
-    if (!cell || !value) {
-      if (cell) {
-        this.resetAnchor(cell);
-      }
-      return;
-    }
+    if (!cell) return;
 
-    this.updateAnchor(
-      cell,
-      'hyper-text -internal',
-      url,
-      value,
-      `View variant ${value} details`
-    );
+    this.resetAnchor(cell);
+    this.updateInlineText(cell, 'togovar-id-text', result.id ?? '');
   }
 
   /**

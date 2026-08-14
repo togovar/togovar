@@ -7,6 +7,10 @@ import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import dotenv from 'dotenv';
 import { getSiteOrigin } from './siteOrigin.js';
+import {
+  LOCAL_SPARQLIST_PROXY_PATH,
+  shouldUseLocalSparqlistProxy,
+} from './sparqlistProxy.js';
 
 // ESM では __dirname が使えないため、import.meta.url から再現する。
 const __filename = fileURLToPath(import.meta.url);
@@ -14,6 +18,17 @@ const __dirname = path.dirname(__filename);
 
 const env = dotenv.config().parsed || {};
 Object.assign(process.env, env);
+
+// stanzaへ渡すURLはブラウザ視点のURLにする。実際の転送先はwebpack-dev-server側で設定する。
+function getSparqlistEndpoint() {
+  const endpoint = process.env.TOGOVAR_ENDPOINT_SPARQLIST;
+
+  if (!shouldUseLocalSparqlistProxy(endpoint)) {
+    return endpoint;
+  }
+
+  return LOCAL_SPARQLIST_PROXY_PATH;
+}
 
 const STRUCTURED_DATA_TEMPLATE_PATH = path.resolve(
   __dirname,
@@ -289,7 +304,7 @@ const config = {
         process.env.TOGOVAR_ENDPOINT_SPARQL
       ),
       TOGOVAR_ENDPOINT_SPARQLIST: JSON.stringify(
-        process.env.TOGOVAR_ENDPOINT_SPARQLIST
+        getSparqlistEndpoint()
       ),
       TOGOVAR_ENDPOINT_SEARCH: JSON.stringify(
         process.env.TOGOVAR_ENDPOINT_SEARCH

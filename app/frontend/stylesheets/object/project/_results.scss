@@ -409,9 +409,9 @@
         // -------------------------------------------------------------------------
 
         &.togovar_id {
-          width: 124px;
-          min-width: 124px;
-          max-width: 124px;
+          width: 150px;
+          min-width: 150px;
+          max-width: 150px;
         }
 
         &.refsnp_id {
@@ -572,10 +572,17 @@
         // th 側の列幅定義は thead > tr > th セクションに同様のブロックがある。
         // -------------------------------------------------------------------------
 
+        &.report {
+          padding-right: 6px;
+          text-align: center;
+        }
+
         &.togovar_id {
-          width: 124px;
-          min-width: 124px;
-          max-width: 124px;
+          width: 150px;
+          min-width: 150px;
+          max-width: 150px;
+          overflow: visible;
+          text-overflow: clip;
         }
 
         &.refsnp_id {
@@ -1165,6 +1172,41 @@ body[data-column-resizing='true'] {
         content: var(--icon-arrow-up-right-from-square);
       }
     }
+  }
+}
+
+// Variant report アイコンリンク
+// TogoVar ID列から詳細ページ導線を分離するため、Report列ではテキストではなく専用アイコンだけを表示する
+.variant-report-link {
+  position: relative;
+  top: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  color: var(--color-key-dark3);
+  text-decoration: none;
+
+  &::before {
+    display: block;
+    width: 19px;
+    height: 19px;
+    content: '';
+    background-color: currentcolor;
+    -webkit-mask: url(../images/icon-variant-report.svg) center / contain no-repeat;
+    mask: url(../images/icon-variant-report.svg) center / contain no-repeat;
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-key-dark1);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-key-dark1);
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 }
 

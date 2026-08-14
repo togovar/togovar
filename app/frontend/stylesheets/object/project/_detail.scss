@@ -27,11 +27,13 @@
     }
 
     > .title {
+      max-width: calc(100vw - var(--padding-side) - var(--padding-report-left));
       margin-bottom: 0;
       font-size: 28px;
       font-weight: bold;
       line-height: 28px;
       color: white;
+      overflow-wrap: anywhere;
     }
   }
 }
@@ -52,10 +54,10 @@
     > .titlelink {
       display: inline-block;
       width: 11px;
-      margin-right: 2px;
+      margin-right: 3px;
       // stylelint-disable-next-line font-family-no-missing-generic-family-keyword
       font-family: 'Font Awesome 7 Free';
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 900;
       vertical-align: bottom;
       color: var(--color-gray);
@@ -65,7 +67,9 @@
 
     &:hover {
       .titlelink::before {
+        display: inline-block;
         content: var(--icon-link);
+        transform: rotate(-20deg);
       }
     }
 
@@ -167,6 +171,9 @@
     }
     &#variant-gwas {
       min-height: 85px;
+    }
+    &#variant-cross-species {
+      min-height: 60px;
     }
     &#variant-genomic-context {
       min-height: 608px;

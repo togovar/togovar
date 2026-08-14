@@ -43,11 +43,14 @@ export interface StanzaConfig {
  * レポートページ1種別分の設定。
  * stanza 配列に並べた順に描画される。
  * id は URL パスから取得するレポート識別子のキー名（省略時は 'id'）。
+ * fallback_id は、URL上のIDが本来の識別子形式に解決できなかった場合に、
+ * 代わりに使う識別子のキー名（variant ページの chr-pos-ref-alt など）。
  */
 export interface ReportConfig {
   base_options?: Record<string, unknown>;
   stanza?: StanzaConfig[];
   id?: string;
+  fallback_id?: string;
 }
 
 // ============================================

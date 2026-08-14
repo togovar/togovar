@@ -113,6 +113,8 @@ TOGOVAR_ENDPOINT_SEARCH=https://grch38.togovar.org/search
 TOGOVAR_ENDPOINT_JBROWSE=https://grch38.togovar.org/jbrowse
 ```
 
+開発サーバーでは、`TOGOVAR_ENDPOINT_SPARQLIST` に `http://localhost:3000` などのローカルURLを指定した場合、ブラウザへは `/sparqlist` として渡し、webpack-dev-server がローカルSPARQListへプロキシします。これにより、stanza からの取得時に `localhost:8000` と `localhost:3000` のオリジン差で CORS エラーになることを避けます。
+
 よく使う最小構成は以下です。
 
 ```dotenv

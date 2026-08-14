@@ -1,5 +1,6 @@
 import PanelView from './PanelView';
 import { storeManager } from '../../store/StoreManager';
+import { getVariantReportPath } from '../../utils/variantPath';
 
 /**
  * 選択バリアントのバリアント詳細レポートページへのリンクを表示するパネル。
@@ -32,15 +33,16 @@ export default class PreviewToVariantReport extends PanelView {
   /**
    * 選択中バリアントの ID を使って外側の <a> の href を更新する。
    * 子要素ではなくルート要素の href を切り替えることでパネル全体がリンクになる。
+   * TogoVar ID (tgvid) が無いバリアントも variant page へ遷移できるよう、
+   * その場合は chromosome-position-reference-alternate 形式のURLへリンクする。
    */
   private _update(): void {
     const selectedRow = storeManager.getData('selectedRow');
     const record =
       selectedRow !== undefined ? storeManager.getSelectedRecord() : null;
 
-    if (record && record.id) {
-      (this.elm as HTMLAnchorElement).href =
-        `/variant/${encodeURIComponent(record.id)}`;
+    if (record) {
+      (this.elm as HTMLAnchorElement).href = getVariantReportPath(record);
       this.elm.classList.remove('-disable');
       return;
     }

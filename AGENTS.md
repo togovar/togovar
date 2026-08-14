@@ -17,6 +17,30 @@
 - 生成物や依存関係の大きな更新は、明確に必要な場合だけ行う。
 - 依存を移動・追加・削除する場合は、実行時依存かビルド時依存かを確認し、`package.json` と `package-lock.json` を揃える。
 
+## コミットメッセージ
+
+- コミットメッセージは Conventional Commits 形式 `<type>: <description>` に従う。
+- description（説明文）は英語で書く。
+
+よく使う type:
+
+- `feat`: 新機能
+- `fix`: バグ修正
+- `refactor`: 挙動を変えないコード変更
+- `style`: フォーマット・CSSのみの変更（ロジック変更なし）
+- `docs`: ドキュメントのみの変更
+- `chore`: ツール・設定・依存関係の変更
+- `test`: テストの追加・修正
+
+ルール:
+
+- 小文字・命令形で書く（例: "added" ではなく "add"）
+- スコープを括弧で付けない
+- 文末にピリオドを付けない
+- description は72文字以内に収める
+
+例: `fix: correct rowspan calculation in ClinVar table`
+
 ## 技術スタック
 
 | レイヤー         | 技術                                           |
@@ -78,6 +102,14 @@ app/frontend/
 - フロントエンド用 Express サーバー（`app/frontend/server/`）は削除済み。ビルド出力のみが成果物。
 - Express削除により、CSP/HSTS/COOPなどのセキュリティヘッダーはこのリポジトリ内では付与されない。配信側（nginx/CDN/edge/外部Docker設定）で管理する前提で、ヘッダー方針を変える場合はREADMEと外部デプロイ設定の確認を促す。
 - `__CSP_NONCE__` のようなサーバー差し替え前提のプレースホルダーは使わない。静的配信で必要なCSPは nonce 注入ではなく、配信側のCSP設計として扱う。
+
+## レポートページ / Stanza 方針
+
+- レポートページのStanza定義は `app/frontend/assets/stanza.json` を正として扱う。
+- `scriptUrl` を省略したStanzaは `TOGOVAR_FRONTEND_STANZA_URL` または既定のStanza配信URLから読み込まれる。未公開Stanzaを追加する場合は、読み込み失敗時に空のsectionが残らないことを確認する。
+- variant page では、tgvidに解決できないlocus URLの場合も、既存Stanzaの表示可否を勝手に絞らない。Stanza側のfallback対応状況を変える場合は、表示範囲と空リクエストの扱いを個別に確認する。
+- variant page の chr-pos-ref-alt fallback では、TogoVar側は共通属性として `tgv_id` と `variant` の両方を渡す。`data-url` を持たないStanzaでも、Stanza側が `variant` 属性に対応していればfallback対象になるため、`stanza.json` だけで未対応と判断しない。
+- pagination-table向けの `${variant_first_query}` は、locus URL由来の場合にtgvid解決へ成功していても `variant` 条件を優先する。SPARQList側でtgvid指定が安定しないAPIだけに使い、通常のStanzaへ安易に流用しない。
 
 ## Advanced Search 方針
 

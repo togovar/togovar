@@ -115,7 +115,7 @@ export type Column = {
  * TogoVar API の /search レスポンスの data 配列の各要素に対応する。
  */
 export type ResultData = {
-  id: string;
+  id?: string;
   sv?: boolean;
   type: string;
   chromosome: string;

@@ -1,6 +1,7 @@
 {
   "variant": {
     "id": "tgv_id",
+    "fallback_id": "variant",
     "base_options": {
       "sparqlist": "$TOGOVAR_STANZA_SPARQLIST"
     },
@@ -10,6 +11,7 @@
         "targetSelector": "#variant-header",
         "references": ["GRCh37", "GRCh38"],
         "options": {
+          "data-url": "${TOGOVAR_FRONTEND_API_URL}/api/search/variant",
           "togostanza-menu-placement": "none"
         }
       },
@@ -17,6 +19,15 @@
         "id": "variant-summary",
         "targetSelector": "#variant-summary",
         "references": ["GRCh37", "GRCh38"]
+      },
+      {
+        "id": "variant-links",
+        "targetSelector": "#variant-links",
+        "references": ["GRCh37", "GRCh38"],
+        "options": {
+          "data-url": "${TOGOVAR_FRONTEND_API_URL}/api/search/variant",
+          "assembly": "$TOGOVAR_FRONTEND_REFERENCE"
+        }
       },
       {
         "id": "variant-other-overlapping-variants",
@@ -55,7 +66,7 @@
         "references": ["GRCh37", "GRCh38"],
         "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
         "options": {
-          "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_gwas?tgv_id=${tgv_id}",
+          "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_gwas?${variant_first_query}",
           "data-type": "json",
           "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
           "page-size_option": "5,10,20,50,100",
@@ -133,6 +144,42 @@
         }
       },
       {
+        "id": "pagination-table",
+        "targetSelector": "#variant-cross-species",
+        "references": ["GRCh37", "GRCh38"],
+        "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
+        "options": {
+          "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_cross_species?${variant_first_query}",
+          "data-type": "json",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
+          "page-size_option": "5,10,20,50,100",
+          "message-not_found": "No data.",
+          "columns": [
+            {
+              "id": "species",
+              "label": "Species"
+            },
+            {
+              "id": "ref_genome",
+              "label": "RefGenome"
+            },
+            {
+              "id": "chr_pos_ref_alt",
+              "label": "Chr-pos-ref-alt"
+            },
+            {
+              "id": "source",
+              "label": "Source",
+              "link": "source_url"
+            },
+            {
+              "id": "remark",
+              "label": "Remark"
+            }
+          ]
+        }
+      },
+      {
         "id": "variant-genomic-context",
         "targetSelector": "#variant-genomic-context",
         "references": ["GRCh37", "GRCh38"],
@@ -155,7 +202,10 @@
       {
         "id": "variant-publication",
         "targetSelector": "#variant-publication",
-        "references": ["GRCh37", "GRCh38"]
+        "references": ["GRCh37", "GRCh38"],
+        "options": {
+          "data-url": "${TOGOVAR_FRONTEND_API_URL}/api/search/variant"
+        }
       }
     ]
   },
@@ -434,7 +484,7 @@
         "references": ["GRCh37", "GRCh38"],
         "options": {
           "hgnc_id": "${hgnc_id}",
-          "jpost_endpoint": "https://ts.glycosmos.org/sparql",
+          "jpost_endpoint": "https://tools.jpostdb.org/proxy/sparql",
           "glycosmos_endpoint": "https://ts.glycosmos.org/sparql"
         }
       },
