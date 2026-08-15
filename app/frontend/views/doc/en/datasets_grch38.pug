@@ -74,11 +74,14 @@ article.common-document
             td._align-center
               a(href="/doc/datasets/jga_wgs#jga_datasets") 6 datasets
       p.notice
-        | Note: The “Number of alternate alleles” values were obtained from TogoVar API stats without applying the quality filter.
+        | Notes:
         br
-        | ∗1：fastq/bam/cel files and/or lists of genotype data etc.
+        | • The “Number of alternate alleles” values were obtained from TogoVar API stats without applying the quality filter.
         br
-        | ∗2：
+        | • ∗1: fastq/bam/cel files and/or lists of genotype data etc.
+        br
+        | • ∗2:
+        |
         a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
           | Japanese Genotype-phenotype Archive (JGA)
         |  /
@@ -202,12 +205,14 @@ article.common-document
             td._align-right 16,187,634
             td JoGo project
             td JoGo 1.0
-      .notice
-        p Notes:
-        ul.unordered-list
-          li The “Number of alternate alleles” values were obtained from TogoVar API stats without applying the quality filter.
-          li ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN consists of SNVs (autosomes, chrX [PAR1 and PAR2], and chrMT) and INDELs (autosomes and chrX [PAR1 and PAR2]).
-          li ToMMo JSV1 and JoGo include structural variants of 51 bp or longer.
+      p.notice
+        | Notes:
+        br
+        | • The “Number of alternate alleles” values were obtained from TogoVar API stats without applying the quality filter.
+        br
+        | • ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN consists of SNVs (autosomes, chrX [PAR1 and PAR2], and chrMT) and INDELs (autosomes and chrX [PAR1 and PAR2]).
+        br
+        | • ToMMo JSV1 and JoGo include structural variants of 51 bp or longer.
     section.section
       h3.sectiontitle
         | Non-variant frequency datasets
@@ -285,12 +290,14 @@ article.common-document
             td Information on papers in which the names of variants appear
             td NCBI
       p.notice
-        | Note: TogoVar obtained ClinVar variants from
+        | Notes:
+        br
+        | • TogoVar obtained ClinVar variants from
         |
         a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/') the VCF file
-        | that contains only variants for which GRCh38 positions were determined.
+        |  that contains only variants for which GRCh38 positions were determined.
         br
-        | Note: Disease names in MGeND were mapped to MedGen using a proprietary method, so they may not match the disease names listed in MGeND.
+        | • Disease names in MGeND were mapped to MedGen using a proprietary method, so they may not match the disease names listed in MGeND.
     section.section
       h3.sectiontitle Tools for data processing
       table.table

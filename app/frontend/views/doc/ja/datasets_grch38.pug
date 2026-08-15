@@ -72,9 +72,11 @@ article.common-document
             td._align-center
               a(href="/doc/ja/datasets/jga_snp#jga_datasets") 3データセット
       p.notice
-        | 注：「代替アレル数」は、quality filterを適用せず、TogoVar APIのstatsから取得した値です。
+        | 注：
         br
-        | ∗1：
+        | ・「代替アレル数」は、quality filterを適用せず、TogoVar APIのstatsから取得した値です。
+        br
+        | ・∗1：
         a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
           | Japanese Genotype-phenotype Archive (JGA)
         |  /
@@ -82,7 +84,7 @@ article.common-document
         a.hyper-text.-external(target='_blank', href='https://gr-sharingdbs.dbcls.jp/agd')
           | AMED Genome group sharing Database (AGD)
         br
-        | ∗2：fastq/bam/celファイルやgenotype data一覧など
+        | ・∗2：fastq/bam/celファイルやgenotype data一覧など
     section.section
       h3.sectiontitle その他のバリアント頻度データ
       table.table._column-span-all
@@ -202,12 +204,14 @@ article.common-document
             td._align-right 16,187,634
             td JoGoプロジェクト
             td JoGo 1.0
-      .notice
-        p 注：
-        ul.unordered-list
-          li 「代替アレル数」は、quality filterを適用せず、TogoVar APIのstatsから取得した値です。
-          li ToMMo #{ GLOBALS.TOMMO_VERSION }KJPNの内訳は、SNV（Autosome、chrX（PAR1+PAR2）およびchrMT）ならびにINDEL（AutosomeおよびchrX（PAR1+PAR2））です。
-          li ToMMo JSV1およびJoGoには51 bp以上の構造多型が含まれます。
+      p.notice
+        | 注：
+        br
+        | ・「代替アレル数」は、quality filterを適用せず、TogoVar APIのstatsから取得した値です。
+        br
+        | ・ToMMo #{ GLOBALS.TOMMO_VERSION }KJPNの内訳は、SNV（Autosome、chrX（PAR1+PAR2）およびchrMT）ならびにINDEL（AutosomeおよびchrX（PAR1+PAR2））です。
+        br
+        | ・ToMMo JSV1およびJoGoには51 bp以上の構造多型が含まれます。
     section.section
       h3.sectiontitle バリアント頻度以外のデータ
       table.table
@@ -286,11 +290,13 @@ article.common-document
             td バリアント名が出現する文献情報
             td NCBI
       p.notice
-        | 注：ClinVarはGRCh38上の位置が決定しているバリアントのみを含む
+        | 注：
+        br
+        | ・ClinVarはGRCh38上の位置が決定しているバリアントのみを含む
         a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/') VCFファイル
         | からデータを取得しています。
         br
-        | 注：MGeNDの疾患名を独自の方法でMedGenにマッピングしていますので、MGeNDに記載されている疾患名と一致しない場合があります。
+        | ・MGeNDの疾患名を独自の方法でMedGenにマッピングしていますので、MGeNDに記載されている疾患名と一致しない場合があります。
     section.section
       h3.sectiontitle データ加工に利用したツール
       table.table
