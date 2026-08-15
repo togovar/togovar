@@ -33,7 +33,7 @@ article.common-document
             td._align-center
             td._align-right 7,609
             td._align-right
-              | 95,555,740
+              | 95,495,574
             td._align-center
               a(href="/doc/datasets/gem_j_wga#jga_datasets") 6 datasets
           tr
@@ -57,7 +57,7 @@ article.common-document
             td._align-center ✔
             td._align-center ✔
             td._align-right 125
-            td._align-right 4,668,805
+            td._align-right 4,668,075
             td._align-center
               a(href="/doc/datasets/jga_wes#jga_datasets") 7 datasets
           tr
@@ -74,7 +74,9 @@ article.common-document
             td._align-center
               a(href="/doc/datasets/jga_wgs#jga_datasets") 6 datasets
       p.notice
-        | Note: For JGA-WGS, the “Number of alternate alleles” is the number of unique alternate alleles detected across the six datasets.
+        | Note: The “Number of alternate alleles” values were obtained from TogoVar API stats without applying the quality filter.
+        br
+        | For JGA-WGS, the value is the number of unique alternate alleles detected across the six datasets.
         br
         | ∗1：fastq/bam/cel files and/or lists of genotype data etc.
         br
@@ -175,7 +177,7 @@ article.common-document
             td._align-center ✔
             td._align-center
             td._align-right 61,424
-            td._align-right —
+            td._align-right 435,605,171
             td Tohoku Medical Megabank Organization
             td v20250616
           tr
@@ -187,7 +189,7 @@ article.common-document
             td._align-center ✔
             td._align-center
             td._align-right 222
-            td._align-right —
+            td._align-right 72,342
             td Tohoku Medical Megabank Organization
             td v20211208
           tr
@@ -199,12 +201,13 @@ article.common-document
             td._align-center ✔
             td._align-center
             td._align-right 258
-            td._align-right —
+            td._align-right 16,187,634
             td JoGo project
             td JoGo 1.0
       p.notice
-        | Note: For BBJ1K and BBJ2K, the “Number of alternate alleles” column shows the number of alternate alleles searchable by dataset through the TogoVar API.
-        | ToMMo JSV1 and JoGo include structural variants or haplotypes and are therefore not shown as short-variant allele counts.
+        | Note: The “Number of alternate alleles” values were obtained from TogoVar API stats without applying the quality filter.
+        br
+        | ToMMo JSV1 and JoGo include alternate alleles derived from structural variants and haplotypes, so their contents differ from datasets containing only short variants.
     section.section
       h3.sectiontitle
         | Non-variant frequency datasets

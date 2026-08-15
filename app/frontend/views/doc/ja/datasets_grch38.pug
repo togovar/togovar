@@ -32,7 +32,7 @@ article.common-document
             td._align-center ✔
             td._align-center
             td._align-right 7,609
-            td._align-right 95,555,740
+            td._align-right 95,495,574
             td._align-center
               a(href="/doc/ja/datasets/gem_j_wga#jga_datasets") 6データセット
           tr
@@ -44,7 +44,7 @@ article.common-document
             td._align-center ✔
             td._align-center ✔
             td._align-right 125
-            td._align-right 4,668,805
+            td._align-right 4,668,075
             td._align-center
               a(href="/doc/ja/datasets/jga_wes#jga_datasets") 7データセット
           tr
@@ -72,7 +72,9 @@ article.common-document
             td._align-center
               a(href="/doc/ja/datasets/jga_snp#jga_datasets") 3データセット
       p.notice
-        | 注：JGA-WGSの「代替アレル数」は、6データセットを横断して重複を除いた代替アレル数です。
+        | 注：「代替アレル数」は、quality filterを適用せず、TogoVar APIのstatsから取得した値です。
+        br
+        | JGA-WGSの「代替アレル数」は、6データセットを横断して重複を除いた代替アレル数です。
         br
         | ∗1：
         a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
@@ -175,7 +177,7 @@ article.common-document
             td._align-center ✔
             td._align-center
             td._align-right 61,424
-            td._align-right —
+            td._align-right 435,605,171
             td 東北メディカル・メガバンク機構
             td v20250616
           tr
@@ -187,7 +189,7 @@ article.common-document
             td._align-center ✔
             td._align-center
             td._align-right 222
-            td._align-right —
+            td._align-right 72,342
             td 東北メディカル・メガバンク機構
             td v20211208
           tr
@@ -199,12 +201,13 @@ article.common-document
             td._align-center ✔
             td._align-center
             td._align-right 258
-            td._align-right —
+            td._align-right 16,187,634
             td JoGoプロジェクト
             td JoGo 1.0
       p.notice
-        | 注：BBJ1KおよびBBJ2Kの「代替アレル数」欄には、TogoVar APIで各データセットを指定して検索できる代替アレル数を記載しています。
-        | ToMMo JSV1およびJoGoは構造多型・ハプロタイプを含むため、短鎖バリアントの代替アレル数とは区別しています。
+        | 注：「代替アレル数」は、quality filterを適用せず、TogoVar APIのstatsから取得した値です。
+        br
+        | ToMMo JSV1およびJoGoには構造多型・ハプロタイプ由来の代替アレルが含まれるため、短鎖バリアントのみのデータセットとは内容が異なります。
     section.section
       h3.sectiontitle バリアント頻度以外のデータ
       table.table
