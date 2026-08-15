@@ -76,8 +76,6 @@ article.common-document
       p.notice
         | Note: The “Number of alternate alleles” values were obtained from TogoVar API stats without applying the quality filter.
         br
-        | For JGA-WGS, the value is the number of unique alternate alleles detected across the six datasets.
-        br
         | ∗1：fastq/bam/cel files and/or lists of genotype data etc.
         br
         | ∗2：
@@ -135,7 +133,7 @@ article.common-document
             td
               a(href="/doc/datasets/ncbn") NCBN
             td._align-left WGS
-            td._align-center ✔
+            td._align-center
             td Mixed
             td._align-center ✔
             td._align-center ✔
@@ -207,7 +205,7 @@ article.common-document
       p.notice
         | Note: The “Number of alternate alleles” values were obtained from TogoVar API stats without applying the quality filter.
         br
-        | ToMMo JSV1 and JoGo include alternate alleles derived from structural variants and haplotypes, so their contents differ from datasets containing only short variants.
+        | ToMMo JSV1 and JoGo include structural variants of 51 bp or longer.
     section.section
       h3.sectiontitle
         | Non-variant frequency datasets
