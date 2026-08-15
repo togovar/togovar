@@ -202,10 +202,12 @@ article.common-document
             td._align-right 16,187,634
             td JoGo project
             td JoGo 1.0
-      p.notice
-        | Note: The “Number of alternate alleles” values were obtained from TogoVar API stats without applying the quality filter.
-        br
-        | ToMMo JSV1 and JoGo include structural variants of 51 bp or longer.
+      .notice
+        p Notes:
+        ul.unordered-list
+          li The “Number of alternate alleles” values were obtained from TogoVar API stats without applying the quality filter.
+          li ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN consists of SNVs (autosomes, chrX [PAR1 and PAR2], and chrMT) and INDELs (autosomes and chrX [PAR1 and PAR2]).
+          li ToMMo JSV1 and JoGo include structural variants of 51 bp or longer.
     section.section
       h3.sectiontitle
         | Non-variant frequency datasets

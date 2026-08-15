@@ -202,10 +202,12 @@ article.common-document
             td._align-right 16,187,634
             td JoGoプロジェクト
             td JoGo 1.0
-      p.notice
-        | 注：「代替アレル数」は、quality filterを適用せず、TogoVar APIのstatsから取得した値です。
-        br
-        | ToMMo JSV1およびJoGoには51 bp以上の構造多型が含まれます。
+      .notice
+        p 注：
+        ul.unordered-list
+          li 「代替アレル数」は、quality filterを適用せず、TogoVar APIのstatsから取得した値です。
+          li ToMMo #{ GLOBALS.TOMMO_VERSION }KJPNの内訳は、SNV（Autosome、chrX（PAR1+PAR2）およびchrMT）ならびにINDEL（AutosomeおよびchrX（PAR1+PAR2））です。
+          li ToMMo JSV1およびJoGoには51 bp以上の構造多型が含まれます。
     section.section
       h3.sectiontitle バリアント頻度以外のデータ
       table.table
