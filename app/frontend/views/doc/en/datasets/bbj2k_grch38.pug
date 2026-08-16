@@ -5,46 +5,58 @@ article.common-document
     section.section
       h3.sectiontitle Summary
       p.body
-        | BBJ2K contains allele and genotype frequencies derived from whole-genome sequencing (WGS) data
-        | for 1,964 participants in
+        | BBJ2K is the name used in TogoVar for the dataset-specific allele frequencies and genotype counts for
+        |
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000868') JGAD000868
+        |  in
+        |
+        a.hyper-text.-internal(href='/doc/datasets/jga_wgs') JGA-WGS
+        | . These aggregate data for the Japanese population were obtained by reanalyzing individual-level
+        | WGS data registered in the
+        |
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/') NBDC Human Database
+        | /
+        a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index-e.html') Japanese Genotype-phenotype Archive (JGA)
+        |  for 1,964 participants in
         |
         a.hyper-text.-external(target='_blank', href='https://biobankjp.org/english/index.html') BioBank Japan
-        | . TogoVar provides the frequencies on GRCh38.
+        | . TogoVar provides these data on GRCh38.
       ul.unordered-list
         li Sample size: 1,964
         li Reference genome: GRCh38
         li Number of alternate alleles searchable in TogoVar: 55,344,184
         li
-          | Source data:
+          | Individual-level WGS data before processing:
           |
           a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000495') JGAD000495
+
+    section.section
+      h3.sectiontitle Data processing method
+      ul.unordered-list
         li
-          | Processed data:
+          | Explanation:
           |
-          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000868') JGAD000868
+          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/whole-genome-sequencing') Whole genome sequencing analysis data (germline)
+        li
+          | Workflow Source Code (jga-analysis):
+          |
+          a.hyper-text.-external(target='_blank', href='https://github.com/ddbj/jga-analysis') https://github.com/ddbj/jga-analysis
 
     section.section
-      h3.sectiontitle Data processing
+      h3.sectiontitle Relationship between dataset IDs
       p.body
-        | The NBDC Human Database processed WGS data from 1,964 BioBank Japan participants and released a GRCh38
-        | imputation reference panel (GRCh38.BBJ2K.tar.gz) on August 8, 2024. The source dataset is JGAD000495,
-        | and the processed dataset is JGAD000868.
-      p.body
-        | See the NBDC Human Database page for
+        | The WGS data from the same 1,964 participants have separate dataset IDs for different processing stages:
         |
-        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/processed-data-imputation') processed imputation reference data
-        | for the source dataset and processing date.
-
-    section.section
-      h3.sectiontitle Relationship to JGA-WGS
-      p.body
-        | JGAD000868 is also included in TogoVar as a dataset-specific frequency under JGA-WGS.
-
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000495') JGAD000495
+        |  for the individual-level WGS data before processing and
+        |
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000868') JGAD000868
+        |  for the GRCh38 imputation reference panel.
     section.section
       h3.sectiontitle Terms of use
       p.body
-        | Aggregated frequencies in TogoVar are publicly viewable. To use the source data or controlled-access
-        | processed data, specify JGAD000495 and JGAD000868 when applying through
+        | Aggregated frequencies in TogoVar are publicly viewable. To use the individual-level WGS data before processing
+        | or controlled-access processed data, specify JGAD000495 and JGAD000868 when applying through
         |
         a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/data-use') Data Use
         | .

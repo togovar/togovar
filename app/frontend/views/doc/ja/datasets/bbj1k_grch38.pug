@@ -5,53 +5,51 @@ article.common-document
     section.section
       h3.sectiontitle 概要
       p.body
-        | BBJ1Kは、2003年度から2007年度に
+        | BBJ1Kは、
+        a.hyper-text.-internal(href='/doc/ja/datasets/jga_wgs') JGA-WGS
+        | に含まれる
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000758') JGAD000758
+        | のデータセット別のアレル頻度およびジェノタイプ数を、TogoVarで表示する際の名称です。これらは、2003年度から2007年度に
         a.hyper-text.-external(target='_blank', href='https://biobankjp.org/') バイオバンク・ジャパン
-        | に登録された1,026名の全ゲノムシークエンス（WGS）データから作成された、
-        | 日本人集団のアレル頻度およびジェノタイプ頻度データセットです。
-        | TogoVarではGRCh38上の頻度情報として収録しています。
+        | に登録された1,026名について、
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/') NBDCヒトデータベース
+        | /
+        a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html') Japanese Genotype-phenotype Archive（JGA）
+        | に登録された個人レベルWGSデータを再解析・集約して得られた、日本人集団の集計情報です。
       ul.unordered-list
         li サンプルサイズ：1,026
         li 参照ゲノム：GRCh38
         li TogoVarで検索可能な代替アレル数：44,694,482
         li
-          | 元データ：
+          | 加工前の個人レベルWGSデータ：
           a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000220') JGAD000220
-        li
-          | WGS joint-call加工データ：
-          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000758') JGAD000758
-        li
-          | GRCh38 imputation reference panel：
-          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000867') JGAD000867
 
     section.section
-      h3.sectiontitle データ加工
-      p.body
-        | NBDCヒトデータベースでは、JGAD000220の1,026名について検体ごとのWGSデータ加工と品質管理を実施し、
-        | 常染色体・chrX PAR領域、女性のchrX non-PAR領域、男性のchrXY non-PAR領域に分けてjoint callを行っています。
+      h3.sectiontitle データ加工手法
       ul.unordered-list
-        li 検体ごとのデータ加工：2022/1/16
-        li 品質管理：2022/2/24
-        li 常染色体・chrX PAR領域のjoint call：2023/1/30
-        li 女性のchrX non-PAR領域のjoint call：2023/2/25
-        li 男性のchrXY non-PAR領域のjoint call：2023/3/2
-      p.body
-        | 対象データセットと加工日の詳細は、NBDCヒトデータベースの
-        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/processed-data-wgs') 加工済みデータ一覧（Whole Genome Sequencing解析）
-        | をご覧ください。
+        li
+          | 説明：
+          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/whole-genome-sequencing') 生殖系列（germline）の全ゲノムシークエンスデータの加工
+        li
+          | ワークフローソースコード（jga-analysis）：
+          a.hyper-text.-external(target='_blank', href='https://github.com/ddbj/jga-analysis') https://github.com/ddbj/jga-analysis
 
     section.section
-      h3.sectiontitle 関連する加工データ
+      h3.sectiontitle データセットIDの関係
       p.body
-        | JGAD000758はTogoVarのJGA-WGSにもデータセット別頻度として収録しています。
-        | また、同じ1,026名から作成されたGRCh38のimputation reference panel（JGAD000867）は、
-        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/processed-data-imputation') NBDCヒトデータベースの加工済みデータ一覧（Imputation reference）
-        | で案内されています。
+        | 同じ1,026名のWGSデータには、加工段階に応じて、加工前の個人レベルWGSデータ（
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000220') JGAD000220
+        | ）とjoint-call済みWGSデータ（
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000758') JGAD000758
+        | ）に別のデータセットIDが付与されています。
+        | GRCh38 imputation reference panelは、別途
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000867') JGAD000867
+        | として登録されています。
 
     section.section
       h3.sectiontitle 利用条件
       p.body
         | TogoVarに収録された集計済み頻度は公開情報として閲覧できます。
-        | 元データまたは制限公開の加工データを利用する場合は、元データJGAD000220と利用する加工データのIDを指定して
+        | 加工前の個人レベルWGSデータまたは制限公開の加工データを利用する場合は、JGAD000220と利用する加工データのIDを指定して
         a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/data-use') NBDCヒトデータベースへ利用申請
         | してください。
