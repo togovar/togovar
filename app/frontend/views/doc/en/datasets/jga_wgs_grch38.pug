@@ -22,7 +22,7 @@ article.common-document
       ul.unordered-list
         li Version: 2026.1
         li Sample size: 3,068
-        li Number of unique alternate alleles detected across the six datasets: 72,383,609
+        li Number of alternate alleles searchable in TogoVar: 72,383,609 (deduplicated across the six datasets)
 
     section.section
       h3.sectiontitle Terms of use
@@ -89,7 +89,7 @@ article.common-document
     section.section
       h3#jga_datasets.sectiontitle Included controlled-access datasets
       p
-        | By specifying the JGAID, you can apply for data use to
+        | By specifying both the individual-level WGS and processed aggregate VCF dataset IDs, you can apply for data use to
         |
         a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/data-use')
           | the NBDC Human database
@@ -97,7 +97,8 @@ article.common-document
       table.table._column-span-all
         thead
           tr
-            th JGAID
+            th Individual-level WGS
+            th Processed aggregate VCF
             th Human DB ID
             th Study title
             th Participants
@@ -109,6 +110,9 @@ article.common-document
         tbody
           tr
             td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000252')
+                | JGAD000252
+            td
               a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000670')
                 | JGAD000670
             td
@@ -119,6 +123,9 @@ article.common-document
             td._align-right 21
             td Takashi Kono
           tr
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000335')
+                | JGAD000335
             td
               a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000687')
                 | JGAD000687
@@ -132,6 +139,9 @@ article.common-document
             td Toshiro Sato
           tr
             td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000234')
+                | JGAD000234
+            td
               a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000688')
                 | JGAD000688
             td
@@ -142,6 +152,9 @@ article.common-document
             td._align-right 33
             td Hidewaki Nakagawa
           tr
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000235')
+                | JGAD000235
             td
               a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000689')
                 | JGAD000689
@@ -154,6 +167,9 @@ article.common-document
             td Hidewaki Nakagawa
           tr
             td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000220')
+                | JGAD000220
+            td
               a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000758')
                 | JGAD000758
             td
@@ -163,6 +179,9 @@ article.common-document
             td._align-right 1,026
             td Michiaki Kubo
           tr
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000495')
+                | JGAD000495
             td
               a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000868')
                 | JGAD000868
@@ -174,5 +193,6 @@ article.common-document
             td Michiaki Kubo
         tfoot
           tr
-            th._align-center(colspan='4') Total
+            th._align-center(colspan='5') Total
             td._align-right 3,068
+            th
