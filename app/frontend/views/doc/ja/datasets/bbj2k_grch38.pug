@@ -5,24 +5,21 @@ article.common-document
     section.section
       h3.sectiontitle 概要
       p.body
-        | BBJ2Kは、
-        a.hyper-text.-internal(href='/doc/ja/datasets/jga_wgs') JGA-WGS
-        | に含まれる
-        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000868') JGAD000868
-        | のデータセット別のアレル頻度およびジェノタイプ数を、TogoVarで表示する際の名称です。これらは、
-        a.hyper-text.-external(target='_blank', href='https://biobankjp.org/') バイオバンク・ジャパン
-        | の1,964名について、
         a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/') NBDCヒトデータベース
         | /
         a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html') Japanese Genotype-phenotype Archive（JGA）
-        | に登録された個人レベルWGSデータを再解析・集約して得られた、日本人集団の集計情報です。
+        | では、
+        a.hyper-text.-external(target='_blank', href='https://biobankjp.org/') バイオバンク・ジャパン
+        | の1,964名の個人レベルWGSデータ（
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000495') JGAD000495
+        | ）を再解析し、個人ごとのジェノタイプを含むjoint-call済みのaggregate VCFデータ（
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000868') JGAD000868
+        | ）を作成しました。TogoVarでは、JGAD000868から算出したアレル頻度とジェノタイプ数を、
+        a.hyper-text.-internal(href='/doc/ja/datasets/jga_wgs') JGA-WGS
+        | 内のデータセット別頻度「BBJ2K」として収録しています。
       ul.unordered-list
         li サンプルサイズ：1,964
-        li 参照ゲノム：GRCh38
         li TogoVarで検索可能な代替アレル数：55,344,184
-        li
-          | 加工前の個人レベルWGSデータ：
-          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000495') JGAD000495
 
     section.section
       h3.sectiontitle データ加工手法
@@ -35,17 +32,69 @@ article.common-document
           a.hyper-text.-external(target='_blank', href='https://github.com/ddbj/jga-analysis') https://github.com/ddbj/jga-analysis
 
     section.section
-      h3.sectiontitle データセットIDの関係
-      p.body
-        | 同じ1,964名のWGSデータには、加工段階に応じて、加工前の個人レベルWGSデータ（
-        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000495') JGAD000495
-        | ）とGRCh38 imputation reference panel（
-        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000868') JGAD000868
-        | ）に別のデータセットIDが付与されています。
-    section.section
       h3.sectiontitle 利用条件
-      p.body
-        | TogoVarに収録された集計済み頻度は公開情報として閲覧できます。
-        | 加工前の個人レベルWGSデータまたは制限公開の加工データを利用する場合は、JGAD000495とJGAD000868を指定して
-        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/data-use') NBDCヒトデータベースへ利用申請
-        | してください。
+      .subsection
+        h4.heading データ利用者の権利
+        p.body
+          a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/guidelines/data-sharing-guidelines')
+            | NBDCヒトデータ共有ガイドライン
+          | の「5-2. データ利用者の権利」の「5-2-1. 非制限公開データ」に準拠します。
+        ol.ordered-list
+          li データ利用者は、『NBDCヒトデータベース』のデータを利用した研究成果をデータ利用者の責務を遵守する限り自由に発表できる。
+          li データ利用者は、『NBDCヒトデータベース』のデータを利用した研究結果をもとにした知的財産権をデータ利用者の責務を遵守する限り自由に取得できる。
+      .subsection
+        h4.heading データ利用者の責務
+        p.body
+          | NBDCヒトデータ共有ガイドラインの「5-3. データ利用者の責務」の「5-3-1. 非制限公開データ」を準用します。再配布に関しては、制限公開データを二次加工したデータであるため、制限公開データのルールを適用します。
+        ol.ordered-list
+          li データ利用に際してのデータの品質・内容・科学的妥当性については、利用者の責任と判断のもとで活用すること。
+          li
+            | データ利用者は、下記の事項を遵守すること。
+            ul.unordered-list
+              li 研究利用への限定
+              li 個人同定の禁止
+              li 再配布の禁止
+          li
+            | 公衆利用（例：データを利用して論文等で発表する場合など）の際は以下の引用を付与してください。
+            p
+              | Variant dataset aggregated from NGS data in
+              |
+              a(target='_blank', href='https://humandbs.dbcls.jp/') NBDC Human Database
+              |  /
+              |
+              a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
+                | JGA
+                | [Internet]. Kashiwa: Database Center for Life Science, Joint Support-Center for Data Science Research,
+              |
+              | Research Organization of Information and Systems; [2024] - . BBJ2K dataset; [cited YYYY Mmm DD]. Available from:
+              |
+              a(href='https://grch38.togovar.org/doc/datasets/bbj2k') https://grch38.togovar.org/doc/datasets/bbj2k
+
+    section.section
+      h3#jga_datasets.sectiontitle 含まれる制限公開データセット一覧
+      p
+        | 個人レベルWGSと加工後aggregate VCFのデータセットIDを指定して
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/data-use') NBDCヒトデータベースにデータ利用申請
+        | できます。
+      table.table._column-span-all
+        thead
+          tr
+            th 個人レベルWGS
+            th 加工後aggregate VCF
+            th ヒトDB
+            th 研究題目
+            th 対象集団
+            th サンプルサイズ
+            th データ提供者
+        tbody
+          tr
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000495') JGAD000495
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000868') JGAD000868
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/research/hum0014') hum0014
+            td オーダーメイド医療の実現プログラム
+            td 心筋梗塞患者1,765名（ICD10：I21）および認知症患者199名（ICD10：F00-03）
+            td._align-right 1,964
+            td 久保 充明
