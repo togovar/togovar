@@ -115,6 +115,14 @@
         line-height: 1.4;
       }
 
+      .attribution-template {
+        padding: 12px 16px;
+        margin-top: 8px;
+        overflow-wrap: anywhere;
+        background-color: color-mix(in srgb, var(--color-key) 10%, transparent);
+        border-left: solid 3px var(--color-key);
+      }
+
       .unordered-list {
         padding-inline-start: 0;
         list-style: none;
