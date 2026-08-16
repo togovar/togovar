@@ -19,8 +19,8 @@ article.common-document
             th(style='white-space: nowrap;')._align-center 対象集団
             th(style='white-space: nowrap;')._align-center 健常者
             th(style='white-space: nowrap;')._align-center 罹患者
-            th(style='white-space: nowrap;')._align-right サンプル数
-            th(style='white-space: nowrap;')._align-right TogoVarで検索可能な代替アレル数
+            th(style='white-space: nowrap;')._align-right サンプルサイズ
+            th(style='white-space: nowrap;')._align-right 代替アレル数
             th 含まれる制限公開データセット
         tbody
           tr
@@ -74,7 +74,7 @@ article.common-document
       p.notice
         | 注：
         br
-        | ・「TogoVarで検索可能な代替アレル数」は、quality filterを適用せず、TogoVar APIのstatsから取得した値です。
+        | ・「代替アレル数」は、quality filterを適用せず、TogoVar APIのstatsから取得した値です。
         br
         | ・∗1：
         a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
@@ -96,9 +96,9 @@ article.common-document
             th(style='white-space: nowrap;')._align-center 対象集団
             th(style='white-space: nowrap;')._align-center 健常者
             th(style='white-space: nowrap;')._align-center 罹患者
-            th(style='white-space: nowrap;')._align-right サンプル数
+            th(style='white-space: nowrap;')._align-right サンプルサイズ
             th._align-right
-              | TogoVarで検索可能な代替アレル数
+              | 代替アレル数
             th 作成者
             th
               | バージョン/最終更新日
@@ -154,7 +154,8 @@ article.common-document
             td._align-right 1,026
             td._align-right 44,694,482
             td バイオバンク・ジャパン
-            td JGAD000758
+            td
+              a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000758') JGAD000758
           tr
             td
               a(href="/doc/ja/datasets/bbj2k") BBJ2K
@@ -166,7 +167,8 @@ article.common-document
             td._align-right 1,964
             td._align-right 55,344,184
             td バイオバンク・ジャパン
-            td JGAD000868
+            td
+              a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000868') JGAD000868
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-61kjpn-20250616-af_snvindelall')
@@ -207,7 +209,7 @@ article.common-document
       p.notice
         | 注：
         br
-        | ・「TogoVarで検索可能な代替アレル数」は、quality filterを適用せず、TogoVar APIのstatsから取得した値です。
+        | ・「代替アレル数」は、quality filterを適用せず、TogoVar APIのstatsから取得した値です。
         br
         | ・ToMMo #{ GLOBALS.TOMMO_VERSION }KJPNの内訳は、SNV（Autosome、chrX（PAR1+PAR2）およびchrMT）ならびにINDEL（AutosomeおよびchrX（PAR1+PAR2））です。
         br
