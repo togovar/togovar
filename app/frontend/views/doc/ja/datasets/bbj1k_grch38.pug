@@ -5,17 +5,16 @@ article.common-document
     section.section
       h3.sectiontitle 概要
       p.body
-        | BBJ1Kは、
-        a.hyper-text.-internal(href='/doc/ja/datasets/jga_wgs') JGA-WGS
-        | に含まれる
-        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000758') JGAD000758
-        | のデータセット別のアレル頻度およびジェノタイプ数を、TogoVarで表示する際の名称です。これらは、2003年度から2007年度に
-        a.hyper-text.-external(target='_blank', href='https://biobankjp.org/') バイオバンク・ジャパン
-        | に登録された1,026名について、
         a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/') NBDCヒトデータベース
         | /
         a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html') Japanese Genotype-phenotype Archive（JGA）
-        | に登録された個人レベルWGSデータを再解析・集約して得られた、日本人集団の集計情報です。
+        | では、2003年度から2007年度に
+        a.hyper-text.-external(target='_blank', href='https://biobankjp.org/') バイオバンク・ジャパン
+        | に登録された1,026名のWGSデータを再解析し、個人ごとのジェノタイプを含むjoint-call済みのaggregate VCFデータ（
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000758') JGAD000758
+        | ）を作成しました。TogoVarでは、JGAD000758から算出したアレル頻度とジェノタイプ数を、
+        a.hyper-text.-internal(href='/doc/ja/datasets/jga_wgs') JGA-WGS
+        | 内のデータセット別頻度「BBJ1K」として収録しています。
       ul.unordered-list
         li サンプルサイズ：1,026
         li 参照ゲノム：GRCh38
@@ -35,14 +34,9 @@ article.common-document
           a.hyper-text.-external(target='_blank', href='https://github.com/ddbj/jga-analysis') https://github.com/ddbj/jga-analysis
 
     section.section
-      h3.sectiontitle データセットIDの関係
+      h3.sectiontitle 関連データ
       p.body
-        | 同じ1,026名のWGSデータには、加工段階に応じて、加工前の個人レベルWGSデータ（
-        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000220') JGAD000220
-        | ）とjoint-call済みWGSデータ（
-        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000758') JGAD000758
-        | ）に別のデータセットIDが付与されています。
-        | GRCh38 imputation reference panelは、別途
+        | 同じ1,026名から作成されたGRCh38 imputation reference panelは、
         a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/ja/dataset/JGAD000867') JGAD000867
         | として登録されています。
 

@@ -5,22 +5,22 @@ article.common-document
     section.section
       h3.sectiontitle Summary
       p.body
-        | BBJ1K is the name used in TogoVar for the dataset-specific allele frequencies and genotype counts for
-        |
-        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000758') JGAD000758
-        |  in
-        |
-        a.hyper-text.-internal(href='/doc/datasets/jga_wgs') JGA-WGS
-        | . These aggregate data for the Japanese population were obtained by reanalyzing individual-level
-        | WGS data registered in the
+        | The
         |
         a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/') NBDC Human Database
         | /
         a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index-e.html') Japanese Genotype-phenotype Archive (JGA)
-        |  for 1,026 participants enrolled in
+        |  reanalyzed WGS data from 1,026 participants enrolled in
         |
         a.hyper-text.-external(target='_blank', href='https://biobankjp.org/english/index.html') BioBank Japan
-        |  between fiscal years 2003 and 2007. TogoVar provides these data on GRCh38.
+        |  between fiscal years 2003 and 2007 and produced
+        |
+        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000758') JGAD000758
+        | , a joint-called aggregate VCF dataset containing individual-level genotypes. TogoVar provides the allele
+        | frequencies and genotype counts calculated from JGAD000758 as the dataset-specific frequency dataset “BBJ1K” in
+        |
+        a.hyper-text.-internal(href='/doc/datasets/jga_wgs') JGA-WGS
+        | .
       ul.unordered-list
         li Sample size: 1,026
         li Reference genome: GRCh38
@@ -43,16 +43,9 @@ article.common-document
           a.hyper-text.-external(target='_blank', href='https://github.com/ddbj/jga-analysis') https://github.com/ddbj/jga-analysis
 
     section.section
-      h3.sectiontitle Relationship between dataset IDs
+      h3.sectiontitle Related data
       p.body
-        | The WGS data from the same 1,026 participants have separate dataset IDs for different processing stages:
-        |
-        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000220') JGAD000220
-        |  for the individual-level WGS data before processing and
-        |
-        a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000758') JGAD000758
-        |  for the joint-called WGS data.
-        | The GRCh38 imputation reference panel is registered separately as
+        | The GRCh38 imputation reference panel created from the same 1,026 participants is registered as
         |
         a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000867') JGAD000867
         | .
