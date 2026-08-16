@@ -16,120 +16,151 @@ block content
         h2.title 利用条件
       .contents
         section.section
+          h3.sectiontitle 利用条件の概要
+          p.body TogoVarは、どなたでも閲覧・検索できます。TogoVarから取得した情報を利用する場合は、その情報が次のどちらに該当するかを確認してください。
+          ul.unordered-list
+            li
+              strong TogoVar独自部分:
+              |  TogoVarが独自に作成し、権利を有する説明文、メタデータ、データベースの選択・配列・構造には、
+              a.hyper-text.-external(target='_blank', href='https://creativecommons.org/licenses/by/4.0/deed.ja') Creative Commons Attribution 4.0 International（CC BY 4.0）
+              |  が適用されます。
+            li
+              strong 第三者由来データ:
+              |  TogoVarに収録された各提供元のデータには、それぞれの提供元が定める利用条件が適用されます。
+          p.body CC BY 4.0は、TogoVarが権利を有する範囲にのみ適用されます。第三者由来データの利用条件と異なる場合は、当該データの提供元が定める利用条件に従ってください。
+
+        section.section
+          h3#togovar-license.sectiontitle TogoVar独自部分のライセンス
           p.body
-            | 当データベース(以下、データベース)は、
-            a.hyper-text.-external(target='_blank', href='http://opendatacommons.org/licenses/odbl/1.0/')
-              | Open Database License(ODbL)
-            | の下で利用可能です。
-          p.body あなたは自由に
+            | TogoVarが独自に作成し、権利を有する説明文、メタデータ、データベースの選択・配列・構造は、
+            a.hyper-text.-external(target='_blank', href='https://creativecommons.org/licenses/by/4.0/deed.ja') CC BY 4.0
+            |  の下で利用できます。
+          p.body CC BY 4.0の範囲では、商用・非商用を問わず、次のことができます。
           ul.unordered-list
             li
               strong 共有:
-              |  データベースを複製、頒布及び利用することができます。
-            li
-              strong 創作:
-              |  データベースから著作物を製作することができます。
+              |  複製し、再配布できます。
             li
               strong 翻案:
-              |  データベースへの改変、変形及び加工ができます。
-          p.body あなたの従うべき条件は以下の通りです。
+              |  改変し、別の資料やデータベースに組み込めます。
+          p.body 利用時には、次の条件を守ってください。
           ul.unordered-list
             li
               strong 表示:
-              |  あなたはデータベースを公衆利用する場合、又はデータベースから著作物を製作する場合にはODbLで指定された方式に従い、帰属（クレジット）表示をしなければなりません。データベースを利用若しくは再頒布する場合、又はデータベースから著作物を製作する場合、あなたは、あなたのデータベースのライセンスを他者に対して明示するとともに、原データベース上のあらゆる通告を保持しておく必要があります。
+              |  TogoVarを出典として示し、CC BY 4.0へのリンクを付けてください。
             li
-              strong 継承:
-              |  あなたは、本データベースの翻案版、又は翻案版データベースから製作した著作物を公開利用する場合、その翻案版データベースもODbLに基づき提供しなければなりません。
-            li
-              strong キープ・オープン:
-              |  あなたは、データベース、又はデータベースの翻案版を再頒布する場合、それらに制限をかける技術的手段（DRMなど）を用いることができます。ただし、あなたは、当該手段を使用していないバージョンも再頒布しなければなりません。
-          p.body データベースに取り込まれた各データ（コンテンツ）の利用にあたっては、下記のデータの輩出元のライセンスに従ってください。
-          ul.unordered-list
-            li
-              | ClinVar:
-              |
-              a(target='_blank', href='https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/') https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/
-            li
-              | Colil:
-              |
-              a(target='_blank', href='https://colil.dbcls.jp/portal/') https://colil.dbcls.jp/portal/
-            li
-              | GEM-J WGA:
-              |
-              a(target='_blank', href='/doc/ja/datasets/gem_j_wga#terms') http://togovar.org/doc/ja/datasets/gem_j_wga#terms
-            li
-              | gnomAD:
-              |
-              a(target='_blank', href='https://gnomad.broadinstitute.org/terms') https://gnomad.broadinstitute.org/terms
-            li
-              | GWAS Catalog:
-              |
-              a(target='_blank', href='https://www.ebi.ac.uk/gwas/docs/about') https://www.ebi.ac.uk/gwas/docs/about
-            li
-              | HGNC:
-              |
-              a(target='_blank', href='https://www.genenames.org/about/license/') https://www.genenames.org/about/license/
-            li
-              | HGVD:
-              |
-              a(target='_blank', href='http://www.hgvd.genome.med.kyoto-u.ac.jp/about.html') http://www.hgvd.genome.med.kyoto-u.ac.jp/about.html
-            li
-              | JGA-SNP dataset:
-              |
-              a(href='/doc/ja/datasets/jga_snp') https://togovar.org/doc/ja/datasets/jga_snp
-            li
-              | JGA-WES dataset:
-              |
-              a(href='/doc/ja/datasets/jga_wes') https://togovar.org/doc/ja/datasets/jga_wes
-            li
-              | JGA-WGS dataset:
-              |
-              a(href='/doc/ja/datasets/jga_wgs') https://togovar.org/doc/ja/datasets/jga_wgs
-            li
-              | LitVar:
-              |
-              a(target='_blank', href='https://www.ncbi.nlm.nih.gov/home/about/policies/') https://www.ncbi.nlm.nih.gov/home/about/policies/
-            li
-              | MGeND:
-              |
-              a(target='_blank', href='https://mgend.ncgm.go.jp/about?lang=ja#data-link') https://mgend.ncgm.go.jp/about?lang=ja#data-link
-            li
-              | PubTator Central:
-              |
-              a(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/README.txt') https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/README.txt
-            li
-              | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN Allele Frequency Panel:
-              |
-              a(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/help/conditions-of-use') https://jmorp.megabank.tohoku.ac.jp/help/conditions-of-use
+              strong 変更の明示:
+              |  内容を変更した場合は、その旨を示してください。
+          h4.heading クレジット表示例
           p.body
-            | 上記は
-            a(target='_blank', href='https://opendatacommons.org/licenses/odbl/summary/') 一般の人に読みやすいようにした要約
-            | です。日本語訳は
-            a(target='_blank', href='https://wiki.openstreetmap.org/wiki/OSMFJ/ODbL/1.0/summary')
-              | OpenStreetMap Japan(OSMJ)による日本語試訳
-            | を参考にしました。
-            br
-            | 適用される実際のライセンス条件については、
-            a(target='_blank', href='http://opendatacommons.org/licenses/odbl/1.0/')
-              | ODbL 1.0ライセンス契約の全文
-            | （OSMJによる日本語試訳は
-            a(target='_blank', href='https://docs.google.com/file/d/0BxvlrTvfS0RAN01oZ1dJa3g0aUU/edit') こちら
-            | )を参照してください。
-            br
-            | また、帰属表示は
-            a(href='#credit') 帰属（クレジット）表示例
-            | を参考にしてください。
-            br
-            | ライセンス表示は、
-            a(href='#license') ODbLライセンスの採用例
-            | の表記を参考にしてください。
+            | TogoVar（Database Center for Life Science）、
+            a.hyper-text.-external(target='_blank', href='https://creativecommons.org/licenses/by/4.0/deed.ja') CC BY 4.0
+          p.body このライセンスは、第三者由来データ、第三者の商標・ロゴ、その他TogoVarが権利を有しないものには適用されません。
 
         section.section
-          h3#credit.sectiontitle 帰属（クレジット）の表示例
+          h3#third-party-data.sectiontitle 第三者由来データの利用条件
+          p.body TogoVarは、各提供元から取得したデータを統合して提供しています。これらのデータを利用するときは、下表の利用条件または提供元情報を確認してください。TogoVarは、第三者が有する権利について利用許諾を行うものではありません。
+          table.table._column-span-all
+            thead
+              tr
+                th データ
+                th 利用条件・提供元情報
+            tbody
+              tr
+                td BBJ1K
+                td
+                  a(href='/doc/ja/datasets/bbj1k') TogoVarデータセット説明
+              tr
+                td BBJ2K
+                td
+                  a(href='/doc/ja/datasets/bbj2k') TogoVarデータセット説明
+              tr
+                td CADD
+                td
+                  a.hyper-text.-external(target='_blank', href='https://cadd.bihealth.org/impressum') CADD License
+              tr
+                td ClinVar
+                td
+                  a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/') Maintenance and use of ClinVar data
+              tr
+                td Colil
+                td
+                  a.hyper-text.-external(target='_blank', href='https://colil.dbcls.jp/portal/') Colil
+              tr
+                td Ensembl / Variant Effect Predictor（VEP）
+                td
+                  a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/about/legal/disclaimer.html') Ensembl Disclaimer
+              tr
+                td GEM-J WGA
+                td
+                  a(href='/doc/ja/datasets/gem_j_wga#terms') TogoVarデータセット説明
+              tr
+                td gnomAD
+                td
+                  a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/terms') gnomAD Terms and Data Information
+              tr
+                td Genome Reference Consortium（GRCh38）
+                td
+                  a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh38') Human Genome Assembly GRCh38
+              tr
+                td GWAS Catalog
+                td
+                  a.hyper-text.-external(target='_blank', href='https://www.ebi.ac.uk/gwas/docs/about') About the GWAS Catalog
+              tr
+                td HGNC
+                td
+                  a.hyper-text.-external(target='_blank', href='https://www.genenames.org/about/license/') HGNC License
+              tr
+                td HGVD
+                td
+                  a.hyper-text.-external(target='_blank', href='http://www.hgvd.genome.med.kyoto-u.ac.jp/about.html') About HGVD
+              tr
+                td JGA-SNP
+                td
+                  a(href='/doc/ja/datasets/jga_snp') TogoVarデータセット説明
+              tr
+                td JGA-WES
+                td
+                  a(href='/doc/ja/datasets/jga_wes') TogoVarデータセット説明
+              tr
+                td JGA-WGS
+                td
+                  a(href='/doc/ja/datasets/jga_wgs') TogoVarデータセット説明
+              tr
+                td JoGo
+                td
+                  a.hyper-text.-external(target='_blank', href='https://jogo.csml.org/') JoGo
+              tr
+                td LitVar、MedGen、PubMed
+                td
+                  a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/home/about/policies/') NCBI Website and Data Usage Policies and Disclaimers
+              tr
+                td MGeND
+                td
+                  a.hyper-text.-external(target='_blank', href='https://mgend.ncgm.go.jp/ja/about#data-link') MGeNDデータ利用について
+              tr
+                td NCBN
+                td
+                  a(href='/doc/ja/datasets/ncbn#terms') TogoVarデータセット説明
+              tr
+                td PubTator3
+                td
+                  a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTator3/') PubTator3
+              tr
+                td SSCV DB
+                td
+                  a.hyper-text.-external(target='_blank', href='https://sscvdb.io/') SSCV DB
+              tr
+                td ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN、ToMMo JSV1
+                td
+                  a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/help/conditions-of-use') jMorp Conditions of Use
+
+        section.section
+          h3#credit.sectiontitle 帰属（クレジット）表示と引用
           ol.ordered-list
             li
               h4.heading TogoVarデータベースの利用に対する引用方法
-              .body 以下の論文を引用をしてください。
+              .body 以下の論文を引用してください。
               .subsection
               | Mitsuhashi N, Toyo-Oka L, Katayama T, Kawashima M, Kawashima S, Miyazaki K, Takagi T. TogoVar: A comprehensive Japanese genetic variation database. Hum Genome Var. 2022 Dec 12;9(1):44.
               | doi:
@@ -320,17 +351,18 @@ block content
                     | https://doi.org/10.1038/s41439-019-0084-4
               .subsection
                 h5.subheading
-                  | PubTator Central [利用条件:
+                  | PubTator3 [利用条件・提供元情報:
                   |
-                  a(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/README.txt')
-                    | https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/README.txt
+                  a(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTator3/')
+                    | https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTator3/
                   | ]
                 .body
-                  | Wei CH, Allot A, Leaman R, Lu Z. PubTator central: automated concept annotation for biomedical full text articles.
-                  | Nucleic Acids Res. 2019 Jul 2;47(W1):W587-W593.
+                  | Wei CH, Allot A, Lai PT, Leaman R, Tian S, Luo L, Jin Q, Wang Z, Chen Q, Lu Z.
+                  | PubTator 3.0: an AI-powered literature resource for unlocking biomedical knowledge.
+                  | Nucleic Acids Res. 2024;52(W1):W540-W546.
                   |
-                  a(target='_blank', href='https://doi.org/10.1093/nar/gkz389')
-                    | https://doi.org/10.1093/nar/gkz389
+                  a(target='_blank', href='https://doi.org/10.1093/nar/gkae235')
+                    | https://doi.org/10.1093/nar/gkae235
               .subsection
                 h5.subheading
                   | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN Allele Frequency Panel (#{ GLOBALS.TOMMO_VERSION }KJPN)
@@ -345,10 +377,3 @@ block content
                   |
                   a(target='_blank', href='https://doi.org/10.1093/nar/gkaa1034')
                     | https://doi.org/10.1093/nar/gkaa1034
-        section.section
-          h3#license.sectiontitle ODbLライセンスの採用例
-          ul.unordered-list
-            li
-              a(target='_blank', href='https://www.openstreetmap.org/copyright/') Open Street Map
-            li
-              a(target='_blank', href='https://opencorporates.com/info/licence') Open Corporates
