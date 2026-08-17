@@ -17,20 +17,20 @@ block content
       .contents
         section.section
           h3.sectiontitle
-            | All variants in TogoVar
+            | Download complete data files
           ul
             li
               | Allele frequencies
               ul
                 li
-                  | GRCh38：
+                  | GRCh38:&#32;
                   a(href='/downloads/release/current/grch38/frequency/vcf') VCF format
                   |
                   | (
                   a(href='/downloads/release/current/grch38/frequency/README.txt') README
                   | )
                 li
-                  | GRCh37：
+                  | GRCh37:&#32;
                   a(href='/downloads/release/current/grch37/frequency/vcf') VCF format
                   |
                   | (
@@ -40,26 +40,96 @@ block content
               | Annotation
               ul
                 li
-                  | GRCh38：
-                  a(href='/downloads/release/current/grch38/annotation') tab-separated text
+                  | GRCh38:&#32;
+                  a(href='/downloads/release/current/grch38/annotation/tsv/') TSV format
                   |
                   | (
                   a(href='/downloads/release/current/grch38/annotation/README.txt') README
-                  | )
+                  | ),
+                  |
+                  a(href='/downloads/release/current/grch38/annotation/json_tsv/') JSON-in-TSV format
                 li
-                  | GRCh37：
-                  a(href='/downloads/release/current/grch37/annotation') tab-separated text
+                  | GRCh37:&#32;
+                  a(href='/downloads/release/current/grch37/annotation/tsv/') TSV format
                   |
                   | (
                   a(href='/downloads/release/current/grch37/annotation/README.txt') README
-                  | )
+                  | ),
+                  |
+                  a(href='/downloads/release/current/grch37/annotation/json_tsv/') JSON-in-TSV format
           p
-          | Last updated：2024/12/3
-          br
-          | The allele frequencies were aggregated by
-          |
-          a(href='/doc/datasets/') dataset
-          | .
-          | Previous releases are
-          |
-          a(href='/downloads/release') here.
+            //- Replace “X” when the release date is confirmed.
+            | Last updated: 2026/8/X
+            br
+            | The allele frequencies were aggregated by
+            |
+            a(href='/doc/datasets/') dataset
+            | .
+            | Previous releases are
+            |
+            a(href='/downloads/release') here.
+        section.section
+          h3.sectiontitle Retrieve a specified region from a URL with tabix or bcftools
+          p
+            | Each file has a tabix index (
+            code .tbi
+            | ). By passing a file URL and a region to a
+            |
+            a.hyper-text.-external(target='_blank', href='https://www.htslib.org/doc/tabix.html') tabix
+            | -compatible tool, you can retrieve only the required region without first downloading an entire chromosome file.
+          h4.download-command-title Retrieve allele frequencies from VCF
+          p
+            | You can pass the URL of a BGZF-compressed VCF directly to
+            |
+            a.hyper-text.-external(target='_blank', href='https://samtools.github.io/bcftools/bcftools.html#view') bcftools view
+            | . Use
+            |
+            code -r
+            | &#32;to specify the region and
+            |
+            code -H
+            | &#32;to omit the VCF header. The following JGA-WGS example uses
+            |
+            code chr12
+            | &#32;to match the chromosome name stored in the VCF.
+          pre.download-command
+            code.
+              $ bcftools view -H \
+                -r 'chr12:111803962-111803962' \
+                'https://grch38.togovar.org/downloads/release/current/grch38/frequency/vcf/jga_wgs/jga_wgs.chr12.grch38.vcf.gz'
+
+              # Example output
+              chr12	111803962	.	G	A	.	PASS	AC=1784;AN=6136;AAC=276;ARC=1232;AOC=0;RRC=1560;ROC=0;OOC=0
+          h4.download-command-title Retrieve annotations as JSON
+          p
+            | For GRCh37 and GRCh38 JSON-in-TSV files, you can use
+            | &#32;tabix to retrieve annotations for a specified region. The output has three columns: chromosome, position, and JSON. Add
+            |
+            code cut -f3
+            | &#32;to print only the JSON column. Do not include the
+            |
+            code chr
+            | &#32;prefix in the region's chromosome name. The following example uses
+            |
+            a.hyper-text.-external(target='_blank', href='https://jqlang.org/') jq
+            | &#32;to select and format key fields from the response. The conventional TSV format remains available.
+          p
+            strong GRCh38 example (chr12:111803962)
+          pre.download-command
+            code.
+              $ tabix \
+                'https://grch38.togovar.org/downloads/release/current/grch38/annotation/json_tsv/chr12_molecular_annotation_json.tsv.gz' \
+                '12:111803962-111803962' \
+                | cut -f3 \
+                | jq '{id, type, chromosome, position, reference, alternate, most_severe_consequence}'
+
+              # Example output
+              {
+                "id": 47264307,
+                "type": "SNV",
+                "chromosome": "12",
+                "position": 111803962,
+                "reference": "G",
+                "alternate": "A",
+                "most_severe_consequence": "missense_variant"
+              }

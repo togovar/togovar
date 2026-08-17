@@ -127,6 +127,24 @@
         margin-top: 8px;
       }
 
+      .download-command-title {
+        margin-top: 16px;
+        font-size: 14px;
+        color: var(--color-key-dark1);
+      }
+
+      // 大容量ファイル向けのコマンドを改行せずコピーできるよう、横スクロール可能な表示にする
+      .download-command {
+        padding: 12px 16px;
+        margin: 8px 0 16px;
+        overflow-x: auto;
+        font-family: monospace;
+        line-height: 1.5;
+        white-space: pre;
+        background-color: color-mix(in srgb, var(--color-key) 6%, transparent);
+        border: solid 1px color-mix(in srgb, var(--color-black) 20%, transparent);
+      }
+
       .unordered-list {
         padding-inline-start: 0;
         list-style: none;
