@@ -86,14 +86,15 @@ block content
                 th データ
                 th 利用条件・提供元情報
             tbody
-              tr
-                td BBJ1K
-                td
-                  a(href='/doc/ja/datasets/bbj1k') TogoVarデータセット説明
-              tr
-                td BBJ2K
-                td
-                  a(href='/doc/ja/datasets/bbj2k') TogoVarデータセット説明
+              if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                tr
+                  td BBJ1K
+                  td
+                    a(href='/doc/ja/datasets/bbj1k') TogoVarデータセット説明
+                tr
+                  td BBJ2K
+                  td
+                    a(href='/doc/ja/datasets/bbj2k') TogoVarデータセット説明
               tr
                 td CADD
                 td
@@ -119,9 +120,9 @@ block content
                 td
                   a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/terms') gnomAD Terms and Data Information
               tr
-                td Genome Reference Consortium（GRCh38）
+                td Genome Reference Consortium（#{ TOGOVAR_FRONTEND_REFERENCE }）
                 td
-                  a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh38') Human Genome Assembly GRCh38
+                  a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/grc/human/data?asm=' + TOGOVAR_FRONTEND_REFERENCE) Human Genome Assembly #{ TOGOVAR_FRONTEND_REFERENCE }
               tr
                 td GWAS Catalog
                 td
@@ -133,7 +134,7 @@ block content
               tr
                 td HGVD
                 td
-                  a.hyper-text.-external(target='_blank', href='http://www.hgvd.genome.med.kyoto-u.ac.jp/about.html') About HGVD
+                  a.hyper-text.-external(target='_blank', href='https://www.hgvd.genome.med.kyoto-u.ac.jp/about.html') About HGVD
               tr
                 td JGA-SNP
                 td
@@ -142,14 +143,15 @@ block content
                 td JGA-WES
                 td
                   a(href='/doc/ja/datasets/jga_wes') TogoVarデータセット説明
-              tr
-                td JGA-WGS
-                td
-                  a(href='/doc/ja/datasets/jga_wgs') TogoVarデータセット説明
-              tr
-                td JoGo
-                td
-                  a.hyper-text.-external(target='_blank', href='https://jogo.csml.org/license') JoGo License
+              if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                tr
+                  td JGA-WGS
+                  td
+                    a(href='/doc/ja/datasets/jga_wgs') TogoVarデータセット説明
+                tr
+                  td JoGo
+                  td
+                    a.hyper-text.-external(target='_blank', href='https://jogo.csml.org/license') JoGo License
               tr
                 td LitVar、MedGen、PubMed
                 td
@@ -158,10 +160,11 @@ block content
                 td MGeND
                 td
                   a.hyper-text.-external(target='_blank', href='https://mgend.jihs.go.jp/about?lang=ja#data-link') MGeNDデータ利用について
-              tr
-                td NCBN
-                td
-                  a(href='/doc/ja/datasets/ncbn#terms') TogoVarデータセット説明
+              if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                tr
+                  td NCBN
+                  td
+                    a(href='/doc/ja/datasets/ncbn#terms') TogoVarデータセット説明
               tr
                 td PubTator3
                 td
@@ -171,6 +174,9 @@ block content
                 td
                   a.hyper-text.-external(target='_blank', href='https://sscvdb.io/') SSCV DB
               tr
-                td ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN、ToMMo JSV1
+                if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
+                  td ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN、ToMMo JSV1
+                else
+                  td ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN
                 td
                   a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/help/conditions-of-use') jMorp Conditions of Use
