@@ -381,7 +381,7 @@ block content
           #s2.question-answer._column-span-all
             h4.question バリアントタイプごとにPosition、Ref、Altはそれぞれどのように記述されますか。
             .answer
-              p 以下に、各バリアントタイプ毎の例を示します。染色体の最初の塩基の位置は1です。
+              p 以下に、TogoVarで採用しているVCF表記による各バリアントタイプの例を示します。染色体の最初の塩基の位置は1です。
               table.results-view
                 thead
                   tr
@@ -422,9 +422,9 @@ block content
                         .coordinate 111786238
                     td
                       .ref-alt
-                        span.ref
+                        span.ref T
                         span.arrow
-                        span.alt G
+                        span.alt TG
                     td 12番染色体111786238番目と111786239番目の塩基の間に塩基Gが挿入された
                   tr
                     td
@@ -434,32 +434,28 @@ block content
                     td
                       .chromosome-position
                         .chromosome 12
-                        .coordinate 111778836
+                        .coordinate 111778835
                     td
                       .ref-alt
-                        span.ref A
+                        span.ref GA
                         span.arrow
-                        span.alt
+                        span.alt G
                     td 12番染色体111778836番目の塩基Aが欠失した
           #s3.question-answer._column-span-all
             h4.question TogoVarでは、どのようにバリアントを表記していますか。
             .answer
               p
-                | TogoVarでは、ゲノム上の位置及びreference allele、alternate allele、ヒトゲノム標準配列のビルド番号の組み合わせでバリアントを一意に識別します。TogoVar及びdbSNP、
-                a.hyper-text.-external(target='_blank', href='https://samtools.github.io/hts-specs/VCFv4.2.pdf') VCF
-                | 、
-                a.hyper-text.-external(target='_blank', href='http://varnomen.hgvs.org/bg-material/simple/#types-of-variants') HGVS
-                | での表記例を下の表に示しています。
+                | TogoVarでは#[a.hyper-text.-external(target='_blank', href='https://samtools.github.io/hts-specs/VCFv4.2.pdf') VCF]と同様に、ヒトゲノム標準配列のビルド番号、染色体、ゲノム上の位置（POS）、reference allele（REF）、alternate allele（ALT）の組み合わせでバリアントを一意に識別します。挿入・欠失もVCFの表記規則に従います。TogoVar / VCF、dbSNP、#[a.hyper-text.-external(target='_blank', href='https://varnomen.hgvs.org/') HGVS]の表記例を下の表に示します。
               table.results-view
                 thead
                   tr.groupingrow
                     th(colspan='2')
-                    th(colspan='4')
+                    th
                       p TogoVar
                     th(colspan='4')
-                      p dbSNP
+                      p TogoVar / VCF
                     th(colspan='4')
-                      p VCF
+                      p dbSNP
                     th
                       p HGVS
                   tr
@@ -470,7 +466,9 @@ block content
                     th
                       p Position (GRCh38)
                     th
-                      p Ref / Alt
+                      p Ref
+                    th
+                      p Alt
                     th.separator
                     th
                       p ID
@@ -478,13 +476,6 @@ block content
                       p Position (GRCh38)
                     th
                       p Alleles
-                    th.separator
-                    th
-                      p Position
-                    th
-                      p Ref
-                    th
-                      p Alt
                     th.separator
                     th
                 tbody
@@ -498,33 +489,21 @@ block content
                       .chromosome-position
                         .chromosome 12
                         .coordinate 111767141
-                    td
-                      .ref-alt
-                        span.ref C
-                        span.arrow
-                        span.alt A
+                    td C
+                    td A
                     td.separator(rowspan='2')
                     td(rowspan='2')
                       a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs567143183') rs567143183
                     td(rowspan='2') chr12:111767141
                     td C&gt;A
                     td.separator(rowspan='2')
-                    td(rowspan='2') 12:111767141
-                    td C
-                    td A
-                    td.separator(rowspan='2')
                     td 12:g.111767141:C&gt;A
                   tr
                     td
                       a(target='_blank', href='/variant/tgv47263142') tgv47263142
-                    td
-                      .ref-alt
-                        span.ref C
-                        span.arrow
-                        span.alt G
-                    td C&gt;G
                     td C
                     td G
+                    td C&gt;G
                     td 12:g.111767141:C&gt;G
                   tr
                     td
@@ -536,20 +515,13 @@ block content
                       .chromosome-position
                         .chromosome 12
                         .coordinate 111786238
-                    td
-                      .ref-alt
-                        span.ref
-                        span.arrow
-                        span.alt G
+                    td T
+                    td TG
                     td.separator
                     td
                       a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs534925026') rs534925026
                     td chr12:111786238
                     td insG
-                    td.separator
-                    td 12:111786238
-                    td T
-                    td TG
                     td.separator
                     td 12:g.111786238_111786239insG
                   tr
@@ -561,21 +533,14 @@ block content
                     td
                       .chromosome-position
                         .chromosome 12
-                        .coordinate 111778836
-                    td
-                      .ref-alt
-                        span.ref A
-                        span.arrow
-                        span.alt
+                        .coordinate 111778835
+                    td GA
+                    td G
                     td.separator
                     td
                       a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs766411401') rs766411401
                     td chr12:111778836-111778847
                     td delA
-                    td.separator
-                    td 12:111778835
-                    td GA
-                    td G
                     td.separator
                     td 12:g.111778847del
           #s4.question-answer._column-span-all
