@@ -1,0 +1,88 @@
+// =============================================================================
+// 更新履歴ページ
+// =============================================================================
+
+.history-document {
+  > .contents {
+    > .section {
+      display: grid;
+      grid-template-columns: 140px minmax(0, 1fr);
+      column-gap: 12px;
+      align-items: start;
+      padding-top: 16px;
+
+      // 日付と変更内容を横にそろえ、長い履歴から目的のリリースを探しやすくする
+      > .sectiontitle {
+        padding: 12px 0;
+        font-size: 15px;
+        line-height: 1.4;
+        border-top: solid 2px color-mix(in srgb, var(--color-key) 45%, transparent);
+
+        > .release-date,
+        > .release-number {
+          display: block;
+        }
+
+        > .release-number {
+          margin-top: 2px;
+          font-size: 12px;
+          font-weight: normal;
+          color: var(--color-gray);
+        }
+      }
+
+      // リリースごとの内容をひとまとまりにしつつ、縦方向の一覧性を保つ
+      > .sectiontitle + .unordered-list {
+        padding: 8px 16px;
+        margin-bottom: 20px;
+        background-color: color-mix(in srgb, var(--color-key) 4%, transparent);
+        border-top: solid 2px color-mix(in srgb, var(--color-key) 45%, transparent);
+
+        > li {
+          padding: 7px 0 7px 16px;
+          line-height: 1.65;
+
+          &::before {
+            position: absolute;
+            top: 15px;
+            left: 2px;
+          }
+
+          + li {
+            border-top: solid 1px color-mix(in srgb, var(--color-black) 12%, transparent);
+          }
+
+          // 項目種別を短い見出しとして認識しやすくする
+          > strong:first-child {
+            display: inline-block;
+            padding: 0 6px;
+            font-size: 12px;
+            line-height: 1.7;
+            color: var(--color-key-dark1);
+            background-color: color-mix(in srgb, var(--color-key) 12%, transparent);
+            border-radius: 3px;
+          }
+
+          // 詳細項目は左罫線でまとめ、上位項目との階層を明確にする
+          > .unordered-list {
+            padding: 4px 0 2px 14px;
+            margin: 5px 0 0 2px;
+            border-left: solid 2px color-mix(in srgb, var(--color-key) 24%, transparent);
+
+            > li {
+              padding: 3px 0 3px 14px;
+
+              &::before {
+                position: absolute;
+                top: 11px;
+                left: 1px;
+                width: 4px;
+                height: 4px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

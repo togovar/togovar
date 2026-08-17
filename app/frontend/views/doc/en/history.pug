@@ -11,13 +11,15 @@ block head
 
 block content
   main
-    article.common-document
+    article.common-document.history-document
       header.header
         h2.title Update history
       .contents
         section.section
           //- Replace “X” when the release date is confirmed.
-          h3.sectiontitle 2026/8/X (Release: 2026.1)
+          h3.sectiontitle
+            span.release-date 2026/8/X
+            span.release-number Release: 2026.1
           ul.unordered-list
             li
               strong Datasets:
@@ -76,7 +78,9 @@ block content
               |
               a.hyper-text.-internal(href='/doc/terms#togovar-license') CC BY 4.0
               | . Terms specified by each provider continue to apply to third-party data.
-          h3.sectiontitle 2025/6/4 (Release: 2025.1)
+          h3.sectiontitle
+            span.release-date 2025/6/4
+            span.release-number Release: 2025.1
           ul.unordered-list
             li
               strong Gene page:
@@ -147,7 +151,9 @@ block content
                       |
                       |
                       a.hyper-text.-internal(href='/gene/ALDH2') https://grch38.togovar.org/gene/ALDH2
-          h3.sectiontitle 2024/12/3 (Release: 2024.2)
+          h3.sectiontitle
+            span.release-date 2024/12/3
+            span.release-number Release: 2024.2
           ul.unordered-list
             li
               strong Datasets:
@@ -217,7 +223,9 @@ block content
                   |
                   a.hyper-text.-external(target='_blank', href='https://alphafold.ebi.ac.uk/') AlphaFold
                   | . Please note that the displayed structures do not account for the effects of the variant.
-          h3.sectiontitle 2024/6/27 (Release: 2024.1)
+          h3.sectiontitle
+            span.release-date 2024/6/27
+            span.release-number Release: 2024.1
           ul.unordered-list
             li
               strong Datasets:
