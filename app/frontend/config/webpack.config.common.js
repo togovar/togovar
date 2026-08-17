@@ -333,7 +333,6 @@ const pages = (function (assembly) {
         'downloads',
         'help',
         'history',
-        'policy',
         'terms',
       ];
     case 'GRCh38':
@@ -352,7 +351,6 @@ const pages = (function (assembly) {
         'downloads',
         'help',
         'history',
-        'policy',
         'terms',
       ];
     default:
@@ -372,7 +370,6 @@ const pages = (function (assembly) {
         'downloads',
         'help',
         'history',
-        'policy',
         'terms',
       ];
   }
