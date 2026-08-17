@@ -66,6 +66,8 @@ block content
                     | What does the frequency indicator in the Frequency column of the search
                     | results represent?
                 li.item.-question
+                  a.link(href='#s8') What is the difference between alternate allele frequency and genotype counts?
+                li.item.-question
                   a.link(href='#s2')
                     | For each variant type, how is the position, reference and alternate allele
                     | described respectively?
@@ -444,6 +446,14 @@ block content
                   br
                   frequency-block-view(data-dataset="gnomad_exomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD exomes
+
+          #s8.question-answer._column-span-all
+            h4.question What is the difference between alternate allele frequency and genotype counts?
+            .answer
+              p
+                | In the #[a.hyper-text.-external(target='_blank', href='https://samtools.github.io/hts-specs/VCFv4.2.pdf') VCF specification], AC (allele count) is the number of copies of each ALT allele in called genotypes, AF (allele frequency) is its frequency, and AN is the total number of called alleles. Genotype counts are the numbers of individuals with each genotype, such as Ref/Ref, Ref/Alt, or Alt/Alt. In other words, AF and AC are measured at the allele level, whereas genotype counts are measured at the individual level.
+              p
+                | For introductory explanations, see the #[a.hyper-text.-external(target='_blank', href='https://www.genome.gov/genetics-glossary/Allele') NHGRI definition of allele] and the #[a.hyper-text.-external(target='_blank', href='https://www.genome.gov/genetics-glossary/genotype') NHGRI definition of genotype].
 
           #s2.question-answer._column-span-all
             h4.question

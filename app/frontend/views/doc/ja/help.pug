@@ -64,6 +64,8 @@ block content
                 li.item.-question
                   a.link(href='#s1') 検索結果のFrequency列に表示される頻度メーターは何を表現していますか。
                 li.item.-question
+                  a.link(href='#s8') 代替アレル頻度とジェノタイプ数は何が違いますか。
+                li.item.-question
                   a.link(href='#s2') バリアントタイプごとにPosition、Ref、Altはそれぞれどのように記述されますか。
                 li.item.-question
                   a.link(href='#s3') TogoVarでは、どのようにバリアントを表記していますか。
@@ -384,6 +386,14 @@ block content
                   br
                   frequency-block-view(data-dataset="gnomad_exomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD exomes
+
+          #s8.question-answer._column-span-all
+            h4.question 代替アレル頻度とジェノタイプ数は何が違いますか。
+            .answer
+              p
+                | #[a.hyper-text.-external(target='_blank', href='https://samtools.github.io/hts-specs/VCFv4.2.pdf') VCF仕様]では、AC（allele count）は各サンプルのジェノタイプに含まれるALT（代替）アレルの数を集計した値、AF（allele frequency）はその頻度、ANは各サンプルのジェノタイプに含まれる全アレル数を表します。ジェノタイプ数（genotype counts）は、Ref/Ref、Ref/Alt、Alt/Altなど、各ジェノタイプに該当する個人の人数です。つまり、AFとACはアレル単位、ジェノタイプ数は個人単位の値です。
+              p
+                | 用語の入門的な説明は、#[a.hyper-text.-external(target='_blank', href='https://www.genome.gov/genetics-glossary/Allele') NHGRIのalleleの定義]および#[a.hyper-text.-external(target='_blank', href='https://www.genome.gov/genetics-glossary/genotype') genotypeの定義]を参照してください。
 
           #s2.question-answer._column-span-all
             h4.question バリアントタイプごとにPosition、Ref、Altはそれぞれどのように記述されますか。
