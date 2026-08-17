@@ -159,6 +159,13 @@
         border: solid 1px color-mix(in srgb, var(--color-black) 20%, transparent);
       }
 
+      .search-population-sets {
+        padding: 4px 12px;
+        margin: 8px 0 16px;
+        background-color: color-mix(in srgb, var(--color-key) 6%, transparent);
+        border: solid 1px color-mix(in srgb, var(--color-black) 20%, transparent);
+      }
+
       .unordered-list {
         padding-inline-start: 0;
         list-style: none;
