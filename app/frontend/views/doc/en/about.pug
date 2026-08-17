@@ -22,14 +22,8 @@ block content
             | disease information associated with them.
           p.body
             | TogoVar provides variant frequencies in the Japanese population that have been aggregated across research
-            | projects.
-            if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
-              | Three
-            else
-              | Two
-            | 
-            | available datasets,
-            |
+            | projects. Among the frequency datasets in TogoVar,
+            | &#32;
             if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
               a(href='./datasets/jga_wgs') JGA-WGS
               | ,
@@ -39,7 +33,7 @@ block content
             | and
             |
             a(href='/doc/datasets/jga_snp') JGA-SNP
-            | , are obtained by aggregating individual genomic data that have been registered in
+            |  are obtained by aggregating individual-level genomic data that have been registered in
             |
             a(target='_blank', href='https://humandbs.dbcls.jp/en/') the NBDC Human Database
             |  /
@@ -48,19 +42,20 @@ block content
               | Japanese Genotype-phenotype Archive (JGA)
             | . In addition, TogoVar integrates
             |
-            a(href='/doc/datasets') information related to genotypes or phenotypes
-            |  that has been compiled independently in a variety of different databases and provides information for
-            | interpreting variants in a one-stop, easy-to-understand manner.
+            a(href='/doc/datasets') disease associations, functional consequences, deleteriousness predictions, literature, and other information
+            |  compiled independently in a variety of databases, providing one-stop access to information for interpreting
+            | variants in an easy-to-understand manner.
           p.body
             | TogoVar is developed and operated by
             |
             a(target='_blank', href='https://dbcls.rois.ac.jp/index-en.html')
-              | Database Center for Life Science (DBCLS), Joint Support-Center for Data Science Research, Research
-              | Organization of Information and Systems (ROIS)
-            | , and supported by
+              | Database Division for Life Science (DBCLS), BioData Science Initiative (BSI), National Institute of
+              | Genetics (NIG), Research Organization of Information and Systems (ROIS)
+            | , as part of
             |
-            a(target='_blank', href='https://biosciencedbc.jp/en')
-              | Department of NBDC Program, Japan Science and Technology Agency (JST)
+            a(target='_blank', href='https://www.mext.go.jp/content/20251121-mxt_life-000046001_5.pdf')
+              | the National Life Science Database Project (NLDP) of the Ministry of Education, Culture, Sports,
+              | Science and Technology (MEXT)
             | .
           p.body
             | See also the paper below,
