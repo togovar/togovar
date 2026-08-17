@@ -153,7 +153,7 @@
           "data-type": "json",
           "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
           "page-size_option": "5,10,20,50,100",
-          "message-not_found": "No data.",
+          "message-not_found": "No data",
           "columns": [
             {
               "id": "species",
