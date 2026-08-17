@@ -47,9 +47,9 @@ block content
                 li.item.-question
                   a.link(href='#d4') TogoVarで対象としているバリアントの種類は何ですか。
                 li.item.-question
-                  a.link(href='#d5') Consequenceの値はどのように計算していますか。
+                  a.link(href='#d5') Consequenceの値はどこから取得していますか。
                 li.item.-question
-                  a.link(href='#d6') Clinical Significanceの値はどのように計算していますか。
+                  a.link(href='#d6') Clinical Significanceの値はどこから取得していますか。
                 li.item.-question
                   a.link(href='#d7') CADD、AlphaMissense、SIFT、PolyPhenとは何ですか。
                 li.item.-question
@@ -113,7 +113,7 @@ block content
             h4.question 商用利用は可能でしょうか。
             .answer
               p
-                | TogoVarのwebサイトの閲覧や公開予定のdockerイメージは商用利用可能です。TogoVarが取り込んでいる第三者作成データに関してはそれそれの利用条件に従ってください。詳しくは
+                | TogoVarのWebサイトおよびTogoVar独自部分は、CC BY 4.0の条件に従って商用利用できます。TogoVarが取り込んでいる第三者作成データについては、それぞれの利用条件に従ってください。詳しくは
                 a(href='./terms') Terms
                 | をご覧ください。
 
@@ -157,28 +157,31 @@ block content
             h4.question バリアントの検出の際に使用したソフトウェアおよび品質管理の方法を教えてください。
             .answer
               p
-                a(href='./datasets/analysis') TogoVarデータセット作成方法
-                | を参照ください。
+                | 使用したソフトウェアや品質管理方法はデータセットごとに異なります。各データセットの「データ加工手法」を
+                a(href='./datasets') TogoVar収録データセット一覧
+                | から参照してください。JGA-WESについては、
+                a(href='./datasets/analysis') JGA-WESのデータ加工手法
+                | に詳しく記載しています。
           #d4.question-answer
             h4.question TogoVarで対象としているバリアントの種類は何ですか。
             .answer
               p
                 | SNV、Insertion、Deletion、Indel、Substitutionの5種類です。
-                a.hyper-text.-external(target='_blank', href='http://varnomen.hgvs.org/bg-material/simple/#types-of-variants')
+                a.hyper-text.-external(target='_blank', href='https://hgvs-nomenclature.org/stable/background/simple/')
                   | HGVSがType of variantsに列挙した5種類
-                | のうち、DuplicationはInsertionに、DeletionとInsertionの長さが同じIndelはSubstitionに分類されています。なお、バリアントの種類の特定には、
+                | のうち、DuplicationはInsertionに、DeletionとInsertionの長さが同じIndelはSubstitutionに分類されています。なお、バリアントの種類の特定には、
                 a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/vep')
                   | Variant Effect Predictor (VEP)
                 | を利用しています。
           #d5.question-answer
-            h4.question Consequenceの値はどのように計算していますか。
+            h4.question Consequenceの値はどこから取得していますか。
             .answer
               p
                 a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/predicted_data.html#consequences')
                   | Variant Effect Predictor (VEP)のvariant consequence
-                | の値を表示しています。１バリアントに対応するトランスクリプトが複数ある場合は、一番重大なconsequenceのみを表示している場合があります。
+                | の値を表示しています。1バリアントに対応するトランスクリプトが複数ある場合は、最も重大なconsequenceのみを表示している場合があります。
           #d6.question-answer
-            h4.question Clinical Significanceの値はどのように計算していますか。
+            h4.question Clinical Significanceの値はどこから取得していますか。
             .answer
               p
                 a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv')
@@ -584,65 +587,45 @@ block content
             .answer
               p
                 | はい。
-                a.hyper-text.-external(target='_blank', href='/?mode=advanced') Advanced search
+                a.hyper-text.-internal(href='/?mode=advanced') Advanced search
                 | による検索が可能です。
-                p
+              p
                 | 代替アレル頻度の比較対象のバリアントは以下の通りです。
-                ul.unordered-list
-                  li 日本人集団はGEM-J WGAまたは8.3KJPNのいずれかに含まれるバリアント
-                  li gnomADはgnomaAD genomesまたはexomesのいずれかに含まれるバリアント
-                p
+              ul.unordered-list
+                li 日本人集団はGEM-J WGAまたはToMMo #{ GLOBALS.TOMMO_VERSION }KJPNのいずれかに含まれるバリアント
+                li その他の集団はgnomAD genomesまたはgnomAD exomesのいずれかに含まれるバリアント
+              p
                 | 日本人集団の代替アレル頻度が0.3以上、gnomAD集団は0.05以下のバリアントを検索します。
-                ol.ordered-list
-                  li 画面上部のAdvanced searchタブを選択します。
-                    img(src=require("../../../images/help-image1.png") alt="help-image1")
-                  li Add conditionメニューからAlternate allele frequency/countを選択します。
-                    p
-                      img(src=require("../../../images/help-image2.png") alt="help-image2" width="241")
-                  li 以下の画面でデータセット(GEM-J WGA)と代替アレル頻度(>=0.3)を指定します。代替アレル数でも指定できます。
-                    img(src=require("../../../images/help-image3.png") alt="help-image3")
-                  li OKボタンを押下します。検索条件が設定されました。
-                    img(src=require("../../../images/help-image4.png") alt="help-image4")
-                  li 同様の手順でデータセットToMMo 8.3KJPN、gnomAD genomes、gnomAD exomesについても検索条件を設定します。
-                    img(src=require("../../../images/help-image5.png") alt="help-image5")
-                  li 日本人集団（GEM-J WGAとToMMo 8.3KJPN)の検索条件をOR結合にします。
-                    ol.ordered-list
-                      li GEM-J WGAとToMMo 8.3KJPNの検索条件をクリックして選択します。選択状態では黄枠で囲まれます。
-                        img(src=require("../../../images/help-image6.png") alt="help-image6")
-                      li Groupメニューを選択します。選択した２つがOR条件になります。なお、AND条件に変更する場合は、左端のORアイコンをクリックします。
-                        img(src=require("../../../images/help-image7.png") alt="help-image7")
-                      li 同様にgnomAD genomesとgnomAD exomesもOR条件にします。
-                        img(src=require("../../../images/help-image8.png") alt="help-image8")
-                p
+              ol.ordered-list
+                li Advanced searchタブを選択します。
+                li Add conditionメニューからAlternate allele frequency/countを選び、GEM-J WGAの代替アレル頻度を0.3以上に設定します。
+                li 同様に、ToMMo #{ GLOBALS.TOMMO_VERSION }KJPNを0.3以上、gnomAD genomesとgnomAD exomesを0.05以下に設定します。
+                li GEM-J WGAとToMMo #{ GLOBALS.TOMMO_VERSION }KJPNの条件を選択し、GroupメニューでOR結合します。
+                li gnomAD genomesとgnomAD exomesの条件もOR結合し、2つのグループ全体をAND結合にします。
+              p
                 | 最終的には以下の検索条件になります。
-                p
-                | ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo 8.3KJPN) &gt;= 0.3))
+              p
+                | ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN) &gt;= 0.3))
                 br
                 |  AND
                 br
-                |  (freq(gnomAD genomes) &lt;= 0.05) OR (freq(gnomAD exomes) &lt;= 0.05))
-                p
+                |  ((freq(gnomAD genomes) &lt;= 0.05) OR (freq(gnomAD exomes) &lt;= 0.05))
+              p
                 | 検索条件が変更される度に検索が自動的に実行され、条件に合致するバリアントの一覧が更新されます。
-                img(src=require("../../../images/help-image9.webp") alt="help-image9")
-                p
+              p
                 | メニューの機能
-                ul.unordered-list
-                  li Add condition: 検索条件を追加します。
-                  li Group: 選択された検索条件(黄枠表示)をOR条件で結合します。ORアイコンをクリックするとAND結合に変更できます。
-                  li Ungroup：結合された検索条件を分離します。Groupとは反対の操作です。
-                  li Delete:選択した 検索条件を削除します。
-                p
+              ul.unordered-list
+                li Add condition: 検索条件を追加します。
+                li Group: 選択した検索条件をOR条件で結合します。ORアイコンをクリックするとAND結合に変更できます。
+                li Ungroup: 結合した検索条件を分離します。
+                li Delete: 選択した検索条件を削除します。
+              p
                 | アイコンの機能
-                ul.unordered-list
-                  li
-                    img(src=require("../../../images/help-pencil.png") alt="help-pencil")
-                    | ：検索条件を編集します。
-                  li
-                    img(src=require("../../../images/help-cross.png") alt="help-cross")
-                    | ：検索条件を削除します。
+              ul.unordered-list
+                li 鉛筆アイコン: 検索条件を編集します。
+                li ×アイコン: 検索条件を削除します。
           #s7.question-answer._column-span-all
             h4.question GRCh37、GRCh38のどちらの位置でもバリアントを検索できますか。
             .answer
               p
-              | はい。 リファレンス配列のバージョンはヘッダに表示されます。クリックして切り替えられます。
-              img(src=require("../../../images/help-image10.png") alt="help-image10")
+                | はい。参照配列のバージョンはヘッダーに表示され、クリックして切り替えられます。
