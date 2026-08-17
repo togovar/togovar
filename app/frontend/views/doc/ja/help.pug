@@ -587,43 +587,67 @@ block content
             .answer
               p
                 | はい。
-                a.hyper-text.-internal(href='/?mode=advanced') Advanced search
+                a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/?mode=advanced') Advanced search
                 | による検索が可能です。
+              p.notice
+                | 以下は
+                a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/') GRCh37版（grch37.togovar.org）
+                | の画面を使った例です。ToMMo 8.3KJPNはGRCh37版に収録されているデータセットです。
               p
                 | 代替アレル頻度の比較対象のバリアントは以下の通りです。
               ul.unordered-list
-                li 日本人集団はGEM-J WGAまたはToMMo #{ GLOBALS.TOMMO_VERSION }KJPNのいずれかに含まれるバリアント
+                li 日本人集団はGEM-J WGAまたはToMMo 8.3KJPNのいずれかに含まれるバリアント
                 li その他の集団はgnomAD genomesまたはgnomAD exomesのいずれかに含まれるバリアント
               p
                 | 日本人集団の代替アレル頻度が0.3以上、gnomAD集団は0.05以下のバリアントを検索します。
               ol.ordered-list
-                li Advanced searchタブを選択します。
-                li Add conditionメニューからAlternate allele frequency/countを選び、GEM-J WGAの代替アレル頻度を0.3以上に設定します。
-                li 同様に、ToMMo #{ GLOBALS.TOMMO_VERSION }KJPNを0.3以上、gnomAD genomesとgnomAD exomesを0.05以下に設定します。
-                li GEM-J WGAとToMMo #{ GLOBALS.TOMMO_VERSION }KJPNの条件を選択し、GroupメニューでOR結合します。
-                li gnomAD genomesとgnomAD exomesの条件もOR結合し、2つのグループ全体をAND結合にします。
+                li
+                  | 画面上部のAdvanced searchタブを選択します（
+                  a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/') GRCh37版のホーム画面
+                  | ）。
+                  img(src=require("../../../images/help-image1.png") alt="Advanced searchタブの選択")
+                li Add conditionメニューからAlternate allele frequency/countを選択します。
+                  p
+                    img(src=require("../../../images/help-image2.png") alt="Alternate allele frequency/countの選択" width="241")
+                li 以下の画面でデータセット（GEM-J WGA）と代替アレル頻度（>= 0.3）を指定します。代替アレル数でも指定できます。
+                  img(src=require("../../../images/help-image3.png") alt="データセットと代替アレル頻度の指定")
+                li OKボタンを押下します。検索条件が設定されました。
+                  img(src=require("../../../images/help-image4.png") alt="検索条件の設定")
+                li 同様の手順でデータセットToMMo 8.3KJPN、gnomAD genomes、gnomAD exomesについても検索条件を設定します。
+                  img(src=require("../../../images/help-image5.png") alt="各データセットの検索条件")
+                li 日本人集団（GEM-J WGAとToMMo 8.3KJPN）の検索条件をOR結合にします。
+                  ol.ordered-list
+                    li GEM-J WGAとToMMo 8.3KJPNの検索条件をクリックして選択します。選択状態では黄枠で囲まれます。
+                      img(src=require("../../../images/help-image6.png") alt="日本人集団の検索条件の選択")
+                    li Groupメニューを選択します。選択した2つがOR条件になります。AND条件に変更する場合は、左端のORアイコンをクリックします。
+                      img(src=require("../../../images/help-image7.png") alt="検索条件のOR結合")
+                    li 同様にgnomAD genomesとgnomAD exomesもOR条件にします。
+                      img(src=require("../../../images/help-image8.png") alt="gnomAD検索条件のOR結合")
               p
                 | 最終的には以下の検索条件になります。
               p
-                | ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN) &gt;= 0.3))
+                | ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo 8.3KJPN) &gt;= 0.3))
                 br
-                |  AND
+                | AND
                 br
-                |  ((freq(gnomAD genomes) &lt;= 0.05) OR (freq(gnomAD exomes) &lt;= 0.05))
+                | ((freq(gnomAD genomes) &lt;= 0.05) OR (freq(gnomAD exomes) &lt;= 0.05))
               p
                 | 検索条件が変更される度に検索が自動的に実行され、条件に合致するバリアントの一覧が更新されます。
-              p
-                | メニューの機能
+              img(src=require("../../../images/help-image9.webp") alt="検索結果と検索条件")
+              p メニューの機能
               ul.unordered-list
                 li Add condition: 検索条件を追加します。
                 li Group: 選択した検索条件をOR条件で結合します。ORアイコンをクリックするとAND結合に変更できます。
                 li Ungroup: 結合した検索条件を分離します。
                 li Delete: 選択した検索条件を削除します。
-              p
-                | アイコンの機能
+              p アイコンの機能
               ul.unordered-list
-                li 鉛筆アイコン: 検索条件を編集します。
-                li ×アイコン: 検索条件を削除します。
+                li
+                  img(src=require("../../../images/help-pencil.png") alt="検索条件を編集するアイコン")
+                  | ：検索条件を編集します。
+                li
+                  img(src=require("../../../images/help-cross.png") alt="検索条件を削除するアイコン")
+                  | ：検索条件を削除します。
           #s7.question-answer._column-span-all
             h4.question GRCh37、GRCh38のどちらの位置でもバリアントを検索できますか。
             .answer

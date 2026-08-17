@@ -656,42 +656,64 @@ block content
             .answer
               p
                 | Yes. You can search by
-                a.hyper-text.-internal(href='/?mode=advanced') Advanced search
+                a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/?mode=advanced') Advanced search
                 | .
+              p.notice
+                | The following example uses the GRCh37 version of the site (
+                a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/') grch37.togovar.org
+                | ). ToMMo 8.3KJPN is a dataset included in the GRCh37 version.
               p
                 | Variant sets for comparison of alternate allele frequencies are as follows:
               ul.unordered-list
-                li For Japanese populations, variants included in either GEM-J WGA or ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN
+                li For Japanese populations, variants included in either GEM-J WGA or ToMMo 8.3KJPN
                 li For other populations, variants included in either gnomAD genomes or gnomAD exomes
               p
                 | This example searches for variants with an alternate allele frequency of at least 0.3 in Japanese populations and at most 0.05 in gnomAD populations.
               ol.ordered-list
-                li Select the Advanced search tab.
-                li From the Add condition menu, select Alternate allele frequency/count and set the GEM-J WGA alternate allele frequency to at least 0.3.
-                li Add conditions of at least 0.3 for ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN and at most 0.05 for both gnomAD genomes and gnomAD exomes.
-                li Select the GEM-J WGA and ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN conditions, and combine them with OR using the Group menu.
-                li Combine the gnomAD genomes and gnomAD exomes conditions with OR, and combine the two groups with AND.
+                li Select the Advanced search tab at the top of the
+                  a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/')  GRCh37 home page
+                  img(src=require("../../../images/help-image1.png") alt="Selecting the Advanced search tab")
+                li Select Alternate allele frequency/count from the Add condition menu.
+                  p
+                    img(src=require("../../../images/help-image2.png") alt="Selecting Alternate allele frequency/count" width="241")
+                li Specify GEM-J WGA and an alternate allele frequency of at least 0.3. You can also specify the number of alternate alleles.
+                  img(src=require("../../../images/help-image3.png") alt="Specifying a dataset and alternate allele frequency")
+                li Click OK to set the search condition.
+                  img(src=require("../../../images/help-image4.png") alt="Setting a search condition")
+                li In the same way, set conditions for ToMMo 8.3KJPN, gnomAD genomes, and gnomAD exomes.
+                  img(src=require("../../../images/help-image5.png") alt="Conditions for each dataset")
+                li Combine the Japanese population conditions for GEM-J WGA and ToMMo 8.3KJPN with OR.
+                  ol.ordered-list
+                    li Select the GEM-J WGA and ToMMo 8.3KJPN conditions. Selected conditions are enclosed by yellow borders.
+                      img(src=require("../../../images/help-image6.png") alt="Selecting Japanese population conditions")
+                    li Select Group. The two selected conditions are combined with OR. To change it to AND, click the OR icon on the left.
+                      img(src=require("../../../images/help-image7.png") alt="Combining conditions with OR")
+                    li Combine the gnomAD genomes and gnomAD exomes conditions with OR in the same way.
+                      img(src=require("../../../images/help-image8.png") alt="Combining gnomAD conditions with OR")
               p The final search criteria are as follows:
               p
-                | ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN) &gt;= 0.3))
+                | ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo 8.3KJPN) &gt;= 0.3))
                 br
                 | AND
                 br
                 | ((freq(gnomAD genomes) &lt;= 0.05) OR (freq(gnomAD exomes) &lt;= 0.05))
               p
                 | Each time search criteria is changed, the search is automatically executed and a list of variants that match the criteria is refreshed.
-              p
-                | Functions in the menu bar
+              img(src=require("../../../images/help-image9.webp") alt="Search results and search conditions")
+              p Functions in the menu bar
               ul.unordered-list
                 li Add condition: Add search criteria to the query builder.
                 li Group: Combine selected search criteria with OR. Click the OR icon to change it to AND.
                 li Ungroup: Separate grouped search criteria.
                 li Delete: Delete selected search criteria.
-              p
-                | Meaning of the icons
+              p Meaning of the icons
               ul.unordered-list
-                li Pencil icon: Edit search criteria.
-                li × icon: Delete search criteria.
+                li
+                  img(src=require("../../../images/help-pencil.png") alt="Edit search criteria icon")
+                  | : Edit search criteria.
+                li
+                  img(src=require("../../../images/help-cross.png") alt="Delete search criteria icon")
+                  | : Delete search criteria.
           #s7.question-answer._column-span-all
             h4.question Can I search for variants by both positions on GRCh38 and GRCh37?
             .answer
