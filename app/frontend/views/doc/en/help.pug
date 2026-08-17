@@ -521,7 +521,7 @@ block content
                     th(colspan='2')
                     th
                       p TogoVar
-                    th(colspan='4')
+                    th(colspan='3')
                       p TogoVar / VCF
                     th(colspan='4')
                       p dbSNP
@@ -535,9 +535,7 @@ block content
                     th
                       p Position (GRCh38)
                     th
-                      p Ref
-                    th
-                      p Alt
+                      p Ref / Alt
                     th.separator
                     th
                       p ID
@@ -558,8 +556,11 @@ block content
                       .chromosome-position
                         .chromosome 12
                         .coordinate 111767141
-                    td C
-                    td A
+                    td
+                      .ref-alt
+                        span.ref C
+                        span.arrow
+                        span.alt A
                     td.separator(rowspan='2')
                     td(rowspan='2')
                       a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs567143183') rs567143183
@@ -570,8 +571,11 @@ block content
                   tr
                     td
                       a(target='_blank', href='/variant/tgv47263142') tgv47263142
-                    td C
-                    td G
+                    td
+                      .ref-alt
+                        span.ref C
+                        span.arrow
+                        span.alt G
                     td C&gt;G
                     td 12:g.111767141:C&gt;G
                   tr
@@ -584,8 +588,11 @@ block content
                       .chromosome-position
                         .chromosome 12
                         .coordinate 111786238
-                    td T
-                    td TG
+                    td
+                      .ref-alt
+                        span.ref T
+                        span.arrow
+                        span.alt TG
                     td.separator
                     td
                       a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs534925026') rs534925026
@@ -603,8 +610,11 @@ block content
                       .chromosome-position
                         .chromosome 12
                         .coordinate 111778835
-                    td GA
-                    td G
+                    td
+                      .ref-alt
+                        span.ref GA
+                        span.arrow
+                        span.alt G
                     td.separator
                     td
                       a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs766411401') rs766411401
