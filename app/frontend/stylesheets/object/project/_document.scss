@@ -113,6 +113,11 @@
         margin-top: 8px;
         font-size: 12px;
         line-height: 1.4;
+
+        &.-normal {
+          font-size: inherit;
+          line-height: inherit;
+        }
       }
 
       .attribution-template {
