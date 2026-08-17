@@ -150,6 +150,15 @@
         border: solid 1px color-mix(in srgb, var(--color-black) 20%, transparent);
       }
 
+      .search-criteria {
+        padding: 8px 12px;
+        margin: 8px 0 16px;
+        font-family: monospace;
+        line-height: 1.5;
+        background-color: color-mix(in srgb, var(--color-key) 6%, transparent);
+        border: solid 1px color-mix(in srgb, var(--color-black) 20%, transparent);
+      }
+
       .unordered-list {
         padding-inline-start: 0;
         list-style: none;
