@@ -30,9 +30,9 @@ block content
               h3.categorytitle About the terms of use
               ul.categorylist
                 li.item.-question
-                  a.link(href='#t1') Can I use the TogoVar for free?
+                  a.link(href='#t1') Can I use TogoVar for free?
                 li.item.-question
-                  a.link(href='#t2') How to cite the TogoVar database in my publication?
+                  a.link(href='#t2') How should I cite TogoVar in my publication?
                 li.item.-question
                   a.link(href='#t3') Can I use it for commercial purposes?
             li.category
@@ -43,15 +43,13 @@ block content
                 li.item.-question
                   a.link(href='#d2') Are the data linked with information about gene expression and proteins?
                 li.item.-question
-                  a.link(href='#d3')
-                    | What software is used for detecting variants and how you manage the
-                    | quality?
+                  a.link(href='#d3') What software is used to detect variants, and how is data quality managed?
                 li.item.-question
                   a.link(href='#d4') What are the targeted variant types for TogoVar?
                 li.item.-question
-                  a.link(href='#d5') How do you calculate the Consequence value?
+                  a.link(href='#d5') Where does TogoVar obtain consequence annotations?
                 li.item.-question
-                  a.link(href='#d6') How do you calculate the value of Clinical significance?
+                  a.link(href='#d6') Where does TogoVar obtain clinical significance annotations?
                 li.item.-question
                   a.link(href='#d7') What are CADD, AlphaMissense, SIFT and PolyPhen?
                 li.item.-question
@@ -68,17 +66,19 @@ block content
                     | What does the frequency indicator in the Frequency column of the search
                     | results represent?
                 li.item.-question
+                  a.link(href='#s8') What is the difference between alternate allele frequency and genotype counts?
+                li.item.-question
                   a.link(href='#s2')
                     | For each variant type, how is the position, reference and alternate allele
                     | described respectively?
                 li.item.-question
-                  a.link(href='#s3') In TogoVar, how is the variant described?
+                  a.link(href='#s3') How are variants represented in TogoVar?
                 li.item.-question
                   a.link(href='#s4') Can I search by HGVS description (e.g. ALDH2:p.Glu504Lys)?
                 li.item.-question
                   a.link(href='#s5') What can I do with the Advanced search?
                 li.item.-question
-                  a.link(href='#s6') Can I search for variants with different alternate allele frequencies between Japanese and other populations?
+                  a.link(href='#s6') Can I search for variants with higher alternate allele frequencies in Japanese populations than in other populations?
                 li.item.-question
                   a.link(href='#s7') Can I search for variants by both positions on GRCh38 and GRCh37?
 
@@ -118,15 +118,15 @@ block content
         section.section
           h3.sectiontitle About the terms of use
           #t1.question-answer
-            h4.question Can I use the TogoVar for free?
+            h4.question Can I use TogoVar for free?
             .answer
               p
-                | You can use the TogoVar service for free. For the use of the database, refer to the
+                | You can use TogoVar for free. For the use of the database, refer to the
                 |
                 a(href='/doc/terms') Terms
                 | .
           #t2.question-answer
-            h4.question How to cite the TogoVar database in my publication?
+            h4.question How should I cite TogoVar in my publication?
             .answer
               p
                 | Refer to the attribution (credit) display examples in
@@ -137,10 +137,8 @@ block content
             h4.question Can I use it for commercial purposes?
             .answer
               p
-                | You are free to browse the TogoVar websites and use the docker images to be released for commercial
-                | purposes.
-                | For data created by third parties and imported in TogoVar, please follow the terms of use of each
-                | organization.
+                | The TogoVar website and TogoVar-original materials may be used commercially under the terms of CC BY 4.0.
+                | For third-party data incorporated into TogoVar, follow the terms specified by each provider.
                 | For more details, refer to
                 |
                 a(href='/doc/terms') Terms
@@ -188,12 +186,13 @@ block content
                 | ).
                 | Because TogoVar is built on RDF, it can be readily extended to link with gene expression and other RDF-based resources, and we plan to expand these links step by step.
           #d3.question-answer
-            h4.question What software is used for detecting variants and how you manage the quality?
+            h4.question What software is used to detect variants, and how is data quality managed?
             .answer
               p
-                | Refer to
-                |
-                a(href='/doc/datasets/analysis') How JGA dataset was generated
+                | The software and quality-control methods differ by dataset. See “Data processing method” for each dataset from the
+                a(href='/doc/datasets') TogoVar datasets page
+                | . Details for JGA-WES are provided on the
+                a(href='/doc/datasets/analysis') JGA-WES data processing method page
                 | .
           #d4.question-answer
             h4.question What are the targeted variant types for TogoVar?
@@ -201,7 +200,7 @@ block content
               p
                 | There are five targeted variant types for TogoVar: SNV, Insertion, Deletion, Indel, and Substitution. Of
                 |
-                a.hyper-text.-external(target='_blank', href='http://varnomen.hgvs.org/bg-material/simple/#types-of-variants')
+                a.hyper-text.-external(target='_blank', href='https://hgvs-nomenclature.org/stable/background/simple/')
                   | 5 types that HGVS enumerated as the types of variants
                 | , Duplication is classified as Insertion, and Indels, for which the lengths of Insertion and Deletion
                 | are the same, are classified as Substitution. To identify the type of the variant,
@@ -210,7 +209,7 @@ block content
                   | Variant Effect Predictor (VEP)
                 |  is used.
           #d5.question-answer
-            h4.question How do you calculate the Consequence value?
+            h4.question Where does TogoVar obtain consequence annotations?
             .answer
               p
                 | The value of variant consequence in
@@ -220,7 +219,7 @@ block content
                 |  is displayed. If there are multiple transcripts for a single variant, only the most critical
                 | consequence may be displayed.
           #d6.question-answer
-            h4.question How do you calculate the value of Clinical significance?
+            h4.question Where does TogoVar obtain clinical significance annotations?
             .answer
               p
                 | The value of
@@ -230,7 +229,7 @@ block content
                 |
                 | and
                 |
-                a.hyper-text.-external(target='_blank', href='https://mgend.ncgm.go.jp/about?lang=en#interpretation-link')
+                a.hyper-text.-external(target='_blank', href='https://mgend.jihs.go.jp/about#interpretation-link')
                   | clinical significance in MGeND
                 |
                 | are displayed.
@@ -261,7 +260,7 @@ block content
                     | to missense variants. PHRED-scaled scores &ge; 10 and &ge; 20 correspond approximately to the top 10%
                     | and top 1% of variants ranked by predicted deleteriousness across the genome, respectively. See
                     |
-                  a.hyper-text.-external(target='_blank', href='https://cadd.gs.washington.edu/info') CADD
+                  a.hyper-text.-external(target='_blank', href='https://cadd.bihealth.org/') CADD
                   |
                   | for details.
                 li
@@ -351,7 +350,11 @@ block content
             h4.question What is SSCV DB?
             .answer
               p
-                | SSCV DB is a database of splice-site creating variants (SSCVs) identified from publicly available transcriptome sequencing data. SSCVs are variants that may create new splice sites and potentially cause aberrant splicing. In TogoVar, the predicted splicing type registered in SSCV DB is shown with a link to the corresponding SSCV DB record.
+                | #[a.hyper-text.-external(target='_blank', href='https://sscvdb.io/') SSCV DB] is a database of splice-site creating variants (SSCVs) identified from publicly available transcriptome sequencing data. SSCVs are variants that may create new splice sites and potentially cause aberrant splicing. In TogoVar, the predicted splicing type registered in SSCV DB is shown with a link to the corresponding SSCV DB record.
+              p
+                | Reference:
+                br
+                | Iida N, Okada A, Kobayashi Y, Chiba K, Yatabe Y, Shiraishi Y. Systematically developing a registry of splice-site creating variants utilizing massive publicly available transcriptome sequence data. Nat Commun. 2025;16:426. DOI: #[a.hyper-text.-external(target='_blank', href='https://doi.org/10.1038/s41467-024-55185-y') 10.1038/s41467-024-55185-y]. PMID: #[a.hyper-text.-external(target='_blank', href='https://pubmed.ncbi.nlm.nih.gov/39788962/') 39788962].
 
         section.section
           h3.sectiontitle About the TogoVar search system
@@ -444,12 +447,20 @@ block content
                   frequency-block-view(data-dataset="gnomad_exomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD exomes
 
+          #s8.question-answer._column-span-all
+            h4.question What is the difference between alternate allele frequency and genotype counts?
+            .answer
+              p
+                | In the #[a.hyper-text.-external(target='_blank', href='https://samtools.github.io/hts-specs/VCFv4.2.pdf') VCF specification], AC (allele count) is the number of copies of each ALT allele in called genotypes, AF (allele frequency) is its frequency, and AN is the total number of called alleles. Genotype counts are the numbers of individuals with each genotype, such as Ref/Ref, Ref/Alt, or Alt/Alt. In other words, AF and AC are measured at the allele level, whereas genotype counts are measured at the individual level.
+              p
+                | For introductory explanations, see the #[a.hyper-text.-external(target='_blank', href='https://www.genome.gov/genetics-glossary/Allele') NHGRI definition of allele] and the #[a.hyper-text.-external(target='_blank', href='https://www.genome.gov/genetics-glossary/genotype') NHGRI definition of genotype].
+
           #s2.question-answer._column-span-all
             h4.question
               | For each variant type, how is the position, reference and alternate allele described respectively?
             .answer
               p
-                | An example for each variant type is shown below. Note that the position of the first base in the
+                | Examples in the VCF representation used by TogoVar are shown below. Note that the position of the first base in the
                 | chromosome is 1.
               table.results-view
                 thead
@@ -491,9 +502,9 @@ block content
                         .coordinate 111786238
                     td
                       .ref-alt
-                        span.ref
+                        span.ref T
                         span.arrow
-                        span.alt G
+                        span.alt TG
                     td A base G was inserted between the 111786238th and 111786239th bases in chromosome 12.
                   tr
                     td
@@ -503,36 +514,28 @@ block content
                     td
                       .chromosome-position
                         .chromosome 12
-                        .coordinate 111778836
+                        .coordinate 111778835
                     td
                       .ref-alt
-                        span.ref A
+                        span.ref GA
                         span.arrow
-                        span.alt
-                    td The 111778836th base A in Chromosome 1 was deleted.
+                        span.alt G
+                    td The 111778836th base A in chromosome 12 was deleted.
           #s3.question-answer._column-span-all
-            h4.question In TogoVar, how is the variant described?
+            h4.question How are variants represented in TogoVar?
             .answer
               p
-                | A. In TogoVar a variant is identified as a set of its genomic position, reference and alternative
-                | allele and human genome build. Examples of variant notations in TogoVar, dbSNP,
-                |
-                a.hyper-text.-external(target='_blank', href='https://samtools.github.io/hts-specs/VCFv4.2.pdf') VCF
-                |  and
-                |
-                a.hyper-text.-external(target='_blank', href='http://varnomen.hgvs.org/bg-material/simple/#types-of-variants')
-                  | HGVS
-                |  are shown below.
+                | TogoVar uses #[a.hyper-text.-external(target='_blank', href='https://samtools.github.io/hts-specs/VCFv4.2.pdf') VCF] notation: a variant is uniquely identified by its human genome build, chromosome, genomic position (POS), reference allele (REF), and alternate allele (ALT). Insertions and deletions also follow the VCF representation rules. Examples of variant notations in TogoVar / VCF, dbSNP, and #[a.hyper-text.-external(target='_blank', href='https://varnomen.hgvs.org/') HGVS] are shown below.
               table.results-view
                 thead
                   tr.groupingrow
                     th(colspan='2')
-                    th(colspan='4')
+                    th
                       p TogoVar
+                    th(colspan='3')
+                      p TogoVar / VCF
                     th(colspan='4')
                       p dbSNP
-                    th(colspan='4')
-                      p VCF
                     th
                       p HGVS
                   tr
@@ -551,13 +554,6 @@ block content
                       p Position (GRCh38)
                     th
                       p Alleles
-                    th.separator
-                    th
-                      p Position
-                    th
-                      p Ref
-                    th
-                      p Alt
                     th.separator
                     th
                 tbody
@@ -582,10 +578,6 @@ block content
                     td(rowspan='2') chr12:111767141
                     td C&gt;A
                     td.separator(rowspan='2')
-                    td(rowspan='2') 12:111767141
-                    td C
-                    td A
-                    td.separator(rowspan='2')
                     td 12:g.111767141:C&gt;A
                   tr
                     td
@@ -596,8 +588,6 @@ block content
                         span.arrow
                         span.alt G
                     td C&gt;G
-                    td C
-                    td G
                     td 12:g.111767141:C&gt;G
                   tr
                     td
@@ -611,18 +601,14 @@ block content
                         .coordinate 111786238
                     td
                       .ref-alt
-                        span.ref
+                        span.ref T
                         span.arrow
-                        span.alt G
+                        span.alt TG
                     td.separator
                     td
                       a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs534925026') rs534925026
                     td chr12:111786238
                     td insG
-                    td.separator
-                    td 12:111786238
-                    td T
-                    td TG
                     td.separator
                     td 12:g.111786238_111786239insG
                   tr
@@ -634,21 +620,17 @@ block content
                     td
                       .chromosome-position
                         .chromosome 12
-                        .coordinate 111778836
+                        .coordinate 111778835
                     td
                       .ref-alt
-                        span.ref A
+                        span.ref GA
                         span.arrow
-                        span.alt
+                        span.alt G
                     td.separator
                     td
                       a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs766411401') rs766411401
                     td chr12:111778836-111778847
                     td delA
-                    td.separator
-                    td 12:111778835
-                    td GA
-                    td G
                     td.separator
                     td 12:g.111778847del
           #s4.question-answer._column-span-all
@@ -676,73 +658,77 @@ block content
               p
                 |You can build a query with an alternate allele frequency, clinical significance,
                 | and other search criteria combined with the AND and/or OR operator. See
-                a.link(href='#s6') "Q: Can I search for variants with different alternate allele frequencies between Japanese and other populations?"
+                a.link(href='#s6') "Q: Can I search for variants with higher alternate allele frequencies in Japanese populations than in other populations?"
                 |
                 |for usage.
           #s6.question-answer._column-span-all
-            h4.question Can I search for variants with different alternate allele frequencies between Japanese and other populations?
+            h4.question Can I search for variants with higher alternate allele frequencies in Japanese populations than in other populations?
             .answer
               p
-                | Yes. You can search by
-                a.hyper-text.-external(target='_blank', href='/?mode=advanced')  Advanced search
-                p
+                | Yes. Use
+                a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/?mode=advanced') Advanced search
+                | .
+              p.notice.-normal
+                | The following example uses the GRCh37 version of the site (
+                a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/') grch37.togovar.org
+                | ). ToMMo 8.3KJPN is a dataset included in the GRCh37 version.
+              p
                 | Variant sets for comparison of alternate allele frequencies are as follows:
+              .search-population-sets
                 ul.unordered-list
-                  li For Japanese populations, variants included in either GEM-J WGA or 8.3KJPN
-                  li For gnomAD populations,  variants included in either gnomAD genomes or gnomAD exomes
+                  li For Japanese populations, variants included in either GEM-J WGA or ToMMo 8.3KJPN
+                  li For other populations, variants included in either gnomAD genomes or gnomAD exomes
+              p
+                | This example searches for variants with an alternate allele frequency of at least 0.3 in Japanese populations and at most 0.05 in gnomAD populations.
+              ol.ordered-list
+                li Select the Advanced search tab at the top of the
+                  a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/')  GRCh37 home page
+                  img(src=require("../../../images/help-image1.png") alt="Selecting the Advanced search tab")
+                li Select Alternate allele frequency/count from the Add condition menu.
+                  p
+                    img(src=require("../../../images/help-image2.png") alt="Selecting Alternate allele frequency/count" width="241")
+                li Specify GEM-J WGA and an alternate allele frequency of at least 0.3. You can also specify the number of alternate alleles.
+                  img(src=require("../../../images/help-image3.png") alt="Specifying a dataset and alternate allele frequency")
+                li Click OK to set the search condition.
+                  img(src=require("../../../images/help-image4.png") alt="Setting a search condition")
+                li In the same way, set conditions for ToMMo 8.3KJPN, gnomAD genomes, and gnomAD exomes.
+                  img(src=require("../../../images/help-image5.png") alt="Conditions for each dataset")
+                li Combine the Japanese population conditions for GEM-J WGA and ToMMo 8.3KJPN with OR.
+                  ol.ordered-list
+                    li Select the GEM-J WGA and ToMMo 8.3KJPN conditions. Selected conditions are enclosed by yellow borders.
+                      img(src=require("../../../images/help-image6.png") alt="Selecting Japanese population conditions")
+                    li Select the Group menu. The two selected conditions are combined with OR. To change it to AND, click the OR icon on the left.
+                      img(src=require("../../../images/help-image7.png") alt="Combining conditions with OR")
+                    li Combine the gnomAD genomes and gnomAD exomes conditions with OR in the same way.
+                      img(src=require("../../../images/help-image8.png") alt="Combining gnomAD conditions with OR")
+              p The final search criteria are as follows:
+              .search-criteria
                 p
-                | We will search for variants with an alternate allele frequency greater than 0.3 for Japanese populations and less than 0.05 for gnomAD populations.
-                ol.ordered-list
-                  li Select the Advanced search tab at the top of
-                    a.hyper-text.-external(target='_blank', href='https://togovar-stg.biosciencedbc.jp')  the home page.
-                    img(src=require("../../../images/help-image1.png") alt="help-image1")
-                  li Select the Alternate allele frequency/count at the Add condition menu.
-                    p
-                      img(src=require("../../../images/help-image2.png") alt="help-image2" width="241")
-                  li Specify a dataset (GEM-J WGA) and an alternate allele frequency (>= 0.3). You can also specify the number of alternate alleles.
-                    img(src=require("../../../images/help-image3.png") alt="help-image3")
-                  li Click the OK button. The search criteria has been set.
-                    img(src=require("../../../images/help-image4.png") alt="help-image4")
-                  li In the same procedures, enter search criteria for the datasets, ToMMo 8.3KJPN, gnomAD genomes and gnomAD exomes.
-                    img(src=require("../../../images/help-image5.png") alt="help-image5")
-                  li Join the search criteria for Japanese populations, GEM-J WGA and ToMMo 8.3KJPN, with the OR operator.
-                    ol.ordered-list
-                      li Select the search criteria for GEM-J WGA and ToMMo 8.3KJPN. The selected criteria is enclosed by yellow borders.
-                        img(src=require("../../../images/help-image6.png") alt="help-image6")
-                      li Select the Group menu. The selected criteria are joined with the OR operator. To change to the AND operator, click the OR icon.
-                        img(src=require("../../../images/help-image7.png") alt="help-image7")
-                  li In the same procedures, the search criteria for the gnomAD genomes and gnomAD exomes are joined with the OR operator.
-                    img(src=require("../../../images/help-image8.png") alt="help-image8")
-                p
-                | The final search criteria is as follows:
-                p
-                | ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo 8.3KJPN) &gt;= 0.3))
-                br
-                | AND
-                br
-                | (freq(gnomAD genomes) &lt;= 0.05) OR (freq(gnomAD exomes) &lt;= 0.05))
-                p
+                  | ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo 8.3KJPN) &gt;= 0.3))
+                  br
+                  | AND
+                  br
+                  | ((freq(gnomAD genomes) &lt;= 0.05) OR (freq(gnomAD exomes) &lt;= 0.05))
+              p
                 | Each time search criteria is changed, the search is automatically executed and a list of variants that match the criteria is refreshed.
-                img(src=require("../../../images/help-image9.webp") alt="help-image9")
-                p
-                | Functions in the menu bar
-                ul.unordered-list
-                  li Add condition: Add search criteria to the query builder.
-                  li Group: Combine selected search criteria indicated by yellow borders with the OR operators. Note: click the OR icon to change to the AND operator.
-                  li Ungroup: Separate joined search criteria. This is a reverse operation of the Group menu.
-                  li Delete: Delete selected search criteria indicated by yellow borders.
-                p
-                | Meaning of the icons
-                ul.unordered-list
-                  li
-                    img(src=require("../../../images/help-pencil.png") alt="help-pencil")
-                    | ：Edit search criteria
-                  li
-                    img(src=require("../../../images/help-cross.png") alt="help-cross")
-                    | ：Delete search criteria
+              img(src=require("../../../images/help-image9.webp") alt="Search results and search conditions")
+              p Functions in the menu bar
+              ul.unordered-list
+                li Add condition: Add search criteria to the query builder.
+                li Group: Combine selected search criteria with OR. Click the OR icon to change it to AND.
+                li Ungroup: Separate grouped search criteria.
+                li Delete: Delete selected search criteria.
+              p Meaning of the icons
+              ul.unordered-list
+                li
+                  img(src=require("../../../images/help-pencil.png") alt="Edit search criteria icon" width="24" height="24")
+                  | : Edit search criteria.
+                li
+                  img(src=require("../../../images/help-cross.png") alt="Delete search criteria icon" width="24" height="24")
+                  | : Delete search criteria.
           #s7.question-answer._column-span-all
             h4.question Can I search for variants by both positions on GRCh38 and GRCh37?
             .answer
               p
-              | Yes. The version number of the reference sequence is displayed at the header. Click the version number to switch to the other.
-              img(src=require("../../../images/help-image10.png") alt="help-image10")
+                | Yes. The reference assembly is shown in the header. Click it to switch between GRCh37 and GRCh38.
+              img(src=require("../../../images/help-image10.png") alt="Switching the reference assembly" width="600")

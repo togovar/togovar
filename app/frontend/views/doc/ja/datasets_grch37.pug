@@ -18,9 +18,9 @@ article.common-document
             th(style='white-space: nowrap;') 対象集団
             th(style='white-space: nowrap;') 健常者
             th(style='white-space: nowrap;') 罹患者
-            th(style='white-space: nowrap;') サンプル数
+            th(style='white-space: nowrap;') サンプルサイズ
             th(style='white-space: nowrap;')
-              | バリアント数
+              | 代替アレル数
               br
               | (座位数)
             th 含まれる制限公開データセット
@@ -85,9 +85,9 @@ article.common-document
             th(style='white-space: nowrap;') 対象集団
             th(style='white-space: nowrap;') 健常者
             th(style='white-space: nowrap;') 罹患者
-            th(style='white-space: nowrap;') サンプル数
+            th(style='white-space: nowrap;') サンプルサイズ
             th
-              | アレル数
+              | 代替アレル数
               br
               | (座位数)
             th 作成者
@@ -126,7 +126,7 @@ article.common-document
             td v2.1.1
           tr
             td
-              a.hyper-text.-external(target='_blank', href='http://www.hgvd.genome.med.kyoto-u.ac.jp/download.html')
+              a.hyper-text.-external(target='_blank', href='https://www.hgvd.genome.med.kyoto-u.ac.jp/download.html')
                 | Human Genetic Variation Database (HGVD)
             td._align-left WES
             td._align-left 日本人
@@ -160,7 +160,7 @@ article.common-document
       p.notice
         | 注：#{ GLOBALS.TOMMO_VERSION }KJPNの内訳はSNV(Autosome、chrX(PAR1+PAR2+XTR)およびchrMT)ならびにINDEL(AutosomeおよびchrX(PAR1+PAR2+XTR))です。
     section.section
-      h3.sectiontitle バリアント頻度以外のデータ
+      h3#non-variant-frequency-datasets.sectiontitle バリアント頻度以外のデータ
       table.table
         thead
           tr
@@ -217,11 +217,11 @@ article.common-document
             td NCBI
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://mgend.ncgm.go.jp/')
+              a.hyper-text.-external(target='_blank', href='https://mgend.jihs.go.jp/')
                 | MGeND
             td 2024/03/08
             td 日本人集団から収集されたバリアントの臨床的意義
-            td NCGM
+            td JIHS
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pubmed/')

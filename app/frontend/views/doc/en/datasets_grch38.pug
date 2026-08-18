@@ -19,8 +19,8 @@ article.common-document
             th Target population
             th Healthy subjects
             th Affected subjects
-            th Sample size
-            th Number of alleles
+            th._align-right Sample size
+            th._align-right Number of alternate alleles
             th Included controlled-access datasets
         tbody
           tr
@@ -31,10 +31,9 @@ article.common-document
             td Japanese
             td._align-center ✔
             td._align-center
-            td._align-center
-              span(style='margin-left:35px;') 7,609
-            td._align-center
-              | 95,555,740
+            td._align-right 7,609
+            td._align-right
+              | 95,495,574
             td._align-center
               a(href="/doc/datasets/gem_j_wga#jga_datasets") 6 datasets
           tr
@@ -45,10 +44,8 @@ article.common-document
             td Japanese
             td._align-center ✔
             td._align-center ✔
-            td._align-center
-              span(style='margin-left:15px;') 183,884
-            td._align-center
-              span(style='margin-left:10px;') 1,249,671
+            td._align-right 183,884
+            td._align-right 1,249,671
             td._align-center
               a(href="/doc/datasets/jga_snp#jga_datasets") 3 datasets
           tr
@@ -59,11 +56,8 @@ article.common-document
             td Japanese
             td._align-center ✔
             td._align-center ✔
-            td._align-center
-              span(style='margin-left:40px;') 125
-            td._align-center
-              span(style='margin-left:10px;') 4,668,805
-              br
+            td._align-right 125
+            td._align-right 4,668,075
             td._align-center
               a(href="/doc/datasets/jga_wes#jga_datasets") 7 datasets
           tr
@@ -74,16 +68,20 @@ article.common-document
             td Japanese
             td._align-center ✔
             td._align-center ✔
+            td._align-right 3,068
+            td._align-right
+              | 72,383,609
             td._align-center
-              span(style='margin-left:45px;') 78
-            td._align-center
-              span(style='margin-left:4px;') 20,822,413
-            td._align-center
-              a(href="/doc/datasets/jga_wgs#jga_datasets") 4 datasets
+              a(href="/doc/datasets/jga_wgs#jga_datasets") 6 datasets
       p.notice
-        | ∗1：fastq/bam/cel files and/or lists of genotype data etc.
+        | Notes:
         br
-        | ∗2：
+        | • The “Number of alternate alleles” values were obtained from TogoVar API stats without applying the quality filter.
+        br
+        | • ∗1: fastq/bam/cel files and/or lists of genotype data etc.
+        br
+        | • ∗2:
+        |
         a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
           | Japanese Genotype-phenotype Archive (JGA)
         |  /
@@ -101,8 +99,8 @@ article.common-document
             th Target population
             th Healthy subjects
             th Affected subjects
-            th Sample size
-            th Number of alleles
+            th._align-right Sample size
+            th._align-right Number of alternate alleles
             th Author
             th Version/Last updated
         tbody
@@ -115,9 +113,8 @@ article.common-document
             td._align-left Mixed
             td._align-center ✔
             td._align-center ✔
-            td._align-center
-              span(style='margin-left:3px;') 730,947
-            td._align-center
+            td._align-right 730,947
+            td._align-right
               | 183,717,261
             td Broad Institute
             td v4.1
@@ -130,9 +127,8 @@ article.common-document
             td._align-left Mixed
             td._align-center ✔
             td._align-center ✔
-            td._align-center
-              span(style='margin-left:10px;') 76,215
-            td._align-center
+            td._align-right 76,215
+            td._align-right
               | 759,336,320
             td Broad Institute
             td v4.1
@@ -140,35 +136,87 @@ article.common-document
             td
               a(href="/doc/datasets/ncbn") NCBN
             td._align-left WGS
-            td._align-center ✔
+            td._align-center
             td Mixed
             td._align-center ✔
             td._align-center ✔
-            td._align-center
-              span(style='margin-left:9px;') JPN:9,290 1KGP:2,504
-            td._align-center 215,729,032
+            td._align-right JPN:9,290 1KGP:2,504
+            td._align-right 215,729,032
             td National Center Biobank Network (NCBN)
             td 2024/6/28
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-54kjpn-20230626-af_snvindelall')
+              a(href="/doc/datasets/bbj1k") BBJ1K
+            td._align-left WGS
+            td._align-center
+            td._align-left Japanese
+            td._align-center
+            td._align-center ✔
+            td._align-right 1,026
+            td._align-right 44,694,482
+            td BioBank Japan
+            td
+              a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000758') JGAD000758
+          tr
+            td
+              a(href="/doc/datasets/bbj2k") BBJ2K
+            td._align-left WGS
+            td._align-center
+            td._align-left Japanese
+            td._align-center
+            td._align-center ✔
+            td._align-right 1,964
+            td._align-right 55,344,184
+            td BioBank Japan
+            td
+              a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000868') JGAD000868
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-61kjpn-20250616-af_snvindelall')
                 | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN Allele Frequency Panel(#{ GLOBALS.TOMMO_VERSION }KJPN)
             td._align-left WGS
             td._align-center
             td._align-left Japanese
             td._align-center ✔
             td._align-center
-            td._align-center
-              span(style='margin-left:10px;') 54,302
-            td._align-center
-              | 252,777,334
+            td._align-right 61,424
+            td._align-right 435,605,171
             td Tohoku Medical Megabank Organization
-            td v20230626
+            td v20250616
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-jsv1-20211208-af') ToMMo JSV1
+            td._align-left long-read WGS
+            td._align-center
+            td._align-left Japanese
+            td._align-center ✔
+            td._align-center
+            td._align-right 222
+            td._align-right 72,342
+            td Tohoku Medical Megabank Organization
+            td v20211208
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://jogo.csml.org/') JoGo
+            td._align-left long-read WGS
+            td._align-center
+            td._align-left Mixed
+            td._align-center ✔
+            td._align-center
+            td._align-right 258
+            td._align-right 16,187,634
+            td JoGo project
+            td JoGo 1.0
       p.notice
-        | Note: #{ GLOBALS.TOMMO_VERSION }KJPN consists of SNVs (Autosome, chrX(PAR1+PAR2+XTR) and chrMT) and INDELs (Autosome and
-        | chrX(PAR1+PAR2+XTR)).
+        | Notes:
+        br
+        | • The “Number of alternate alleles” values were obtained from TogoVar API stats without applying the quality filter.
+        br
+        | • ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN consists of SNVs (autosomes, chrX [PAR1 and PAR2], and chrMT) and INDELs (autosomes and chrX [PAR1 and PAR2]).
+        br
+        | • ToMMo JSV1 and JoGo include structural variants of 51 bp or longer.
     section.section
-      h3.sectiontitle
+      h3#non-variant-frequency-datasets.sectiontitle
         | Non-variant frequency datasets
       table.table
         thead
@@ -181,7 +229,7 @@ article.common-document
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/clinvar/') ClinVar
-            td 2024/10/03
+            td 2026/07/02
             td Clinical significance of variants
             td NCBI
           tr
@@ -201,14 +249,14 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://www.ebi.ac.uk/gwas/docs/file-downloads')
                 | GWAS Catalog
-            td 2024/10/15
+            td 2025/11/12
             td Catalog of human genome-wide association studies
             td NHGRI-EBI
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/hgnc_complete_set.txt')
                 | HGNC symbol report
-            td 2024/08/27
+            td 2026/07/07
             td Approved human gene nomenclature and associated gene information
             td HGNC
           tr
@@ -221,35 +269,43 @@ article.common-document
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/medgen') MedGen
-            td 2024/10/15
+            td 2026/07/07
             td Information about conditions and phenotypes related to Medical Genetics
             td NCBI
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://mgend.ncgm.go.jp/') MGeND
-            td 2024/03/08
+              a.hyper-text.-external(target='_blank', href='https://mgend.jihs.go.jp/') MGeND
+            td 2025/09/12
             td Clinical significance of variants collected from the Japanese population
-            td NCGM
+            td JIHS
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pubmed/')
                 | PubMed
-            td 2024/10/14
+            td 2026/07/10
             td Information on papers
             td NCBI
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/') PubTator Central
-            td 2024/01/04
+              a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTator3/') PubTator3
+            td 2026/07/13
             td Information on papers in which the names of variants appear
             td NCBI
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://sscvdb.io/') SSCV DB
+            td v1.1 (2026/06/17)
+            td Predicted splicing types of splice-site creating variants (SSCVs) identified from publicly available transcriptome sequencing data
+            td NCC
       p.notice
-        | Note: TogoVar obtained ClinVar variants from
+        | Notes:
+        br
+        | • TogoVar obtained ClinVar variants from
         |
         a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/') the VCF file
-        | that contains only variants for which GRCh38 positions were determined.
+        |  that contains only variants for which GRCh38 positions were determined.
         br
-        | Note: Disease names in MGeND were mapped to MedGen using a proprietary method, so they may not match the disease names listed in MGeND.
+        | • Disease names in MGeND were mapped to MedGen using a proprietary method, so they may not match the disease names listed in MGeND.
     section.section
       h3.sectiontitle Tools for data processing
       table.table
@@ -289,12 +345,12 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/index.html')
                 | Variant Effect Predictor (VEP)
-            td Ensembl release 112
+            td Ensembl release 116
             td
               | Add
               |
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/script/vep_cache.html#cache_content')
                 |
-                | Annotations like gene names, consequences or deleterious predictions (AlphaMissense, SIFT and Polyphen)
+                | annotations such as gene names, consequences, and deleteriousness predictions (CADD, AlphaMissense, SIFT, and PolyPhen)
               |  to variants
             td EMBL-EBI

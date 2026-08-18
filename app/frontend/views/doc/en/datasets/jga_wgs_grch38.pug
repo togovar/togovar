@@ -20,9 +20,9 @@ article.common-document
         a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/data-use') Data Use (NBDC Human Database)
         |.
       ul.unordered-list
-        li Version/Last update: 2024/12/3
-        li Sample size: 78
-        li Number of detected variants (alternate alleles): 20,822,413
+        li Version: 2026.1
+        li Sample size: 3,068
+        li Number of alternate alleles searchable in TogoVar: 72,383,609 (deduplicated across the six datasets)
 
     section.section
       h3.sectiontitle Terms of use
@@ -67,29 +67,22 @@ article.common-document
                 | NBDC Human Database
               | /
               a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index-e.html') JGA
-              | [Internet]. Kashiwa: Database Center for Life Science, Joint Support-Center for Data Science Research,
+              |  [Internet]. Kashiwa: Database Division for Life Science (DBCLS), BioData Science Initiative (BSI), National Institute of Genetics (NIG),
               |
               | Research Organization of Information and Systems; [2024] - . JGA-WGS dataset; [cited YYYY Mmm DD]. Available from:
               |
-              a(href='https://grch37.togovar.org/doc/datasets/jga_wgs') https://grch37.togovar.org/doc/datasets/jga_wgs
+              a(href='https://grch38.togovar.org/doc/datasets/jga_wgs') https://grch38.togovar.org/doc/datasets/jga_wgs
 
     section.section
-      h3.sectiontitle Data analysis method
-      p.body
+      h3.sectiontitle Data processing method
       ol.unordered-list
-        li Explanation:
-          |
-          |
-          a(href='https://humandbs.dbcls.jp/en/whole-genome-sequencing') Whole genome sequencing analysis data (germline)
-        li Workflow Source Code (jga-analysis):
-          |
-          |
-          a(href='https://github.com/ddbj/jga-analysis') https://github.com/ddbj/jga-analysis
+        li Explanation: #[a(href='https://humandbs.dbcls.jp/en/whole-genome-sequencing') Whole genome sequencing data processing (germline)]
+        li Workflow Source Code (jga-analysis): #[a(href='https://github.com/ddbj/jga-analysis') https://github.com/ddbj/jga-analysis]
 
     section.section
       h3#jga_datasets.sectiontitle Included controlled-access datasets
       p
-        | By specifying the JGAID, you can apply for data use to
+        | By specifying both the individual-level WGS and processed aggregate VCF dataset IDs, you can apply for data use to
         |
         a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/data-use')
           | the NBDC Human database
@@ -97,7 +90,8 @@ article.common-document
       table.table._column-span-all
         thead
           tr
-            th JGAID
+            th Individual-level WGS
+            th Processed aggregate VCF
             th Human DB ID
             th Study title
             th Participants
@@ -109,22 +103,27 @@ article.common-document
         tbody
           tr
             td
-              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000670')
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000252')
+                | JGAD000252
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000670')
                 | JGAD000670
             td
-              a(target='_blank', href='https://humandbs.dbcls.jp/en/hum0068-v3') hum0068
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/research/hum0068') hum0068
             td
-              | 
-              | Cancer genomics for elucidation of molecular mechanisms of carcinogenecis and progression in lung cancer 
+              | Cancer genomics for elucidation of molecular mechanisms of carcinogenesis and progression in lung cancer
             td WGS data of the matched control (germline)
             td._align-right 21
             td Takashi Kono
           tr
             td
-              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000687')
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000335')
+                | JGAD000335
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000687')
                 | JGAD000687
             td
-              a(target='_blank', href='https://humandbs.dbcls.jp/en/hum00201-v1') hum0201
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/research/hum0201') hum0201
             td Collection and transfer of human tumor samples and research using genomic information<br>
               Transfer of existing samples and research using genomic information<br>
               Research of searching gene mutations in gastrointestinal chronic inflammatory diseases
@@ -133,10 +132,13 @@ article.common-document
             td Toshiro Sato
           tr
             td
-              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000688')
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000234')
+                | JGAD000234
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000688')
                 | JGAD000688
             td
-              a(target='_blank', href='https://humandbs.dbcls.jp/en/hum0161-v2') hum0161
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/research/hum0161') hum0161
             td
               | Genome sequencing analysis for hepatoblastoma
             td WGS data of the matched control (germline)
@@ -144,16 +146,46 @@ article.common-document
             td Hidewaki Nakagawa
           tr
             td
-              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000689')
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000235')
+                | JGAD000235
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000689')
                 | JGAD000689
             td
-              a(target='_blank', href='https://humandbs.dbcls.jp/en/hum0159-v2') hum0159
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/research/hum0159') hum0159
             td
               | Genome sequencing analysis for colorectal cancer
             td WGS data of the matched control (germline)
             td._align-right 10
             td Hidewaki Nakagawa
+          tr
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000220')
+                | JGAD000220
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000758')
+                | JGAD000758
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/research/hum0014') hum0014
+            td Bio Bank Japan project
+            td Participants with 47 diseases registered in BioBank Japan between FY2003 and FY2007
+            td._align-right 1,026
+            td Michiaki Kubo
+          tr
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000495')
+                | JGAD000495
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000868')
+                | JGAD000868
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/en/research/hum0014') hum0014
+            td Bio Bank Japan project
+            td 1,765 myocardial infarction patients (ICD10: I21) and 199 dementia patients (ICD10: F00-03)
+            td._align-right 1,964
+            td Michiaki Kubo
         tfoot
           tr
-            th._align-center(colspan='4') Total
-            td._align-right 78
+            th._align-center(colspan='5') Total
+            td._align-right 3,068
+            th

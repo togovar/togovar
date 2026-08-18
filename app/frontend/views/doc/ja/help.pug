@@ -47,9 +47,9 @@ block content
                 li.item.-question
                   a.link(href='#d4') TogoVarで対象としているバリアントの種類は何ですか。
                 li.item.-question
-                  a.link(href='#d5') Consequenceの値はどのように計算していますか。
+                  a.link(href='#d5') Consequenceの値はどこから取得していますか。
                 li.item.-question
-                  a.link(href='#d6') Clinical Significanceの値はどのように計算していますか。
+                  a.link(href='#d6') Clinical Significanceの値はどこから取得していますか。
                 li.item.-question
                   a.link(href='#d7') CADD、AlphaMissense、SIFT、PolyPhenとは何ですか。
                 li.item.-question
@@ -64,6 +64,8 @@ block content
                 li.item.-question
                   a.link(href='#s1') 検索結果のFrequency列に表示される頻度メーターは何を表現していますか。
                 li.item.-question
+                  a.link(href='#s8') 代替アレル頻度とジェノタイプ数は何が違いますか。
+                li.item.-question
                   a.link(href='#s2') バリアントタイプごとにPosition、Ref、Altはそれぞれどのように記述されますか。
                 li.item.-question
                   a.link(href='#s3') TogoVarでは、どのようにバリアントを表記していますか。
@@ -72,7 +74,7 @@ block content
                 li.item.-question
                   a.link(href='#s5') Advanced searchでできることは何ですか。
                 li.item.-question
-                  a.link(href='#s6') 日本人集団とその他の集団で代替アレル頻度が異なるバリアントを検索できますか。
+                  a.link(href='#s6') 日本人集団で代替アレル頻度が高く、その他の集団で低いバリアントを検索できますか。
                 li.item.-question
                   a.link(href='#s7') GRCh37、GRCh38のどちらの位置でもバリアントを検索できますか。
 
@@ -113,7 +115,7 @@ block content
             h4.question 商用利用は可能でしょうか。
             .answer
               p
-                | TogoVarのwebサイトの閲覧や公開予定のdockerイメージは商用利用可能です。TogoVarが取り込んでいる第三者作成データに関してはそれそれの利用条件に従ってください。詳しくは
+                | TogoVarのWebサイトおよびTogoVar独自部分は、CC BY 4.0の条件に従って商用利用できます。TogoVarが取り込んでいる第三者作成データについては、それぞれの利用条件に従ってください。詳しくは
                 a(href='./terms') Terms
                 | をご覧ください。
 
@@ -157,34 +159,37 @@ block content
             h4.question バリアントの検出の際に使用したソフトウェアおよび品質管理の方法を教えてください。
             .answer
               p
-                a(href='./datasets/analysis') TogoVarデータセット作成方法
-                | を参照ください。
+                | 使用したソフトウェアや品質管理方法はデータセットごとに異なります。各データセットの「データ加工手法」を
+                a(href='./datasets') TogoVar収録データセット一覧
+                | から参照してください。JGA-WESについては、
+                a(href='./datasets/analysis') JGA-WESのデータ加工手法
+                | に詳しく記載しています。
           #d4.question-answer
             h4.question TogoVarで対象としているバリアントの種類は何ですか。
             .answer
               p
                 | SNV、Insertion、Deletion、Indel、Substitutionの5種類です。
-                a.hyper-text.-external(target='_blank', href='http://varnomen.hgvs.org/bg-material/simple/#types-of-variants')
+                a.hyper-text.-external(target='_blank', href='https://hgvs-nomenclature.org/stable/background/simple/')
                   | HGVSがType of variantsに列挙した5種類
-                | のうち、DuplicationはInsertionに、DeletionとInsertionの長さが同じIndelはSubstitionに分類されています。なお、バリアントの種類の特定には、
+                | のうち、DuplicationはInsertionに、DeletionとInsertionの長さが同じIndelはSubstitutionに分類されています。なお、バリアントの種類の特定には、
                 a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/vep')
                   | Variant Effect Predictor (VEP)
                 | を利用しています。
           #d5.question-answer
-            h4.question Consequenceの値はどのように計算していますか。
+            h4.question Consequenceの値はどこから取得していますか。
             .answer
               p
                 a.hyper-text.-external(target='_blank', href='https://asia.ensembl.org/info/genome/variation/prediction/predicted_data.html#consequences')
                   | Variant Effect Predictor (VEP)のvariant consequence
-                | の値を表示しています。１バリアントに対応するトランスクリプトが複数ある場合は、一番重大なconsequenceのみを表示している場合があります。
+                | の値を表示しています。1バリアントに対応するトランスクリプトが複数ある場合は、最も重大なconsequenceのみを表示している場合があります。
           #d6.question-answer
-            h4.question Clinical Significanceの値はどのように計算していますか。
+            h4.question Clinical Significanceの値はどこから取得していますか。
             .answer
               p
                 a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/#clinsig_options_scv')
                   | ClinVarのclinical significance
                 | および
-                a.hyper-text.-external(target='_blank', href='https://mgend.ncgm.go.jp/about?lang=ja#interpretation-link')
+                a.hyper-text.-external(target='_blank', href='https://mgend.jihs.go.jp/about?lang=ja#interpretation-link')
                   | MGeNDのclinical significance
                 | を表示しています。
 
@@ -211,7 +216,7 @@ block content
                     | ここに挙げた他のツールとは異なり、CADD はミスセンスバリアントに限定されません。
                     | PHRED スケール化スコアが 10 以上および 20 以上の場合、それぞれ、ゲノム全体において予測有害性に基づいて順位づけられたバリアントの上位約 10% および上位約 1% に相当します。詳細は
                     |
-                  a.hyper-text.-external(target='_blank', href='https://cadd.gs.washington.edu/info') CADD
+                  a.hyper-text.-external(target='_blank', href='https://cadd.bihealth.org/') CADD
                   | を参照ください。
                 li
                   strong AlphaMissense
@@ -287,7 +292,11 @@ block content
             h4.question SSCV DBとは何ですか。
             .answer
               p
-                | SSCV DBは、公開トランスクリプトームシーケンスデータを用いて、splice-site creating variant（SSCV）を収集したデータベースです。SSCVは、新たなスプライス部位を作ることで異常なスプライシングを引き起こす可能性のあるバリアントです。TogoVarでは、SSCV DBに登録されている予測スプライシングタイプを表示し、該当するSSCV DBのレコードへリンクしています。
+                | #[a.hyper-text.-external(target='_blank', href='https://sscvdb.io/') SSCV DB]は、公開トランスクリプトームシーケンスデータを用いて、splice-site creating variant（SSCV）を収集したデータベースです。SSCVは、新たなスプライス部位を作ることで異常なスプライシングを引き起こす可能性のあるバリアントです。TogoVarでは、SSCV DBに登録されている予測スプライシングタイプを表示し、該当するSSCV DBのレコードへリンクしています。
+              p
+                | 参考文献：
+                br
+                | Iida N, Okada A, Kobayashi Y, Chiba K, Yatabe Y, Shiraishi Y. Systematically developing a registry of splice-site creating variants utilizing massive publicly available transcriptome sequence data. Nat Commun. 2025;16:426. DOI: #[a.hyper-text.-external(target='_blank', href='https://doi.org/10.1038/s41467-024-55185-y') 10.1038/s41467-024-55185-y]. PMID: #[a.hyper-text.-external(target='_blank', href='https://pubmed.ncbi.nlm.nih.gov/39788962/') 39788962].
 
         section.section
           h3.sectiontitle TogoVarの検索システムに関して
@@ -378,10 +387,18 @@ block content
                   frequency-block-view(data-dataset="gnomad_exomes" data-frequency="≥0.5")
                   | &nbsp; gnomAD exomes
 
+          #s8.question-answer._column-span-all
+            h4.question 代替アレル頻度とジェノタイプ数は何が違いますか。
+            .answer
+              p
+                | #[a.hyper-text.-external(target='_blank', href='https://samtools.github.io/hts-specs/VCFv4.2.pdf') VCF仕様]では、AC（allele count）は各サンプルのジェノタイプに含まれるALT（代替）アレルの数を集計した値、AF（allele frequency）はその頻度、ANは各サンプルのジェノタイプに含まれる全アレル数を表します。ジェノタイプ数（genotype counts）は、Ref/Ref、Ref/Alt、Alt/Altなど、各ジェノタイプに該当する個人の人数です。つまり、AFとACはアレル単位、ジェノタイプ数は個人単位の値です。
+              p
+                | 用語の入門的な説明は、#[a.hyper-text.-external(target='_blank', href='https://www.genome.gov/genetics-glossary/Allele') NHGRIのalleleの定義]および#[a.hyper-text.-external(target='_blank', href='https://www.genome.gov/genetics-glossary/genotype') genotypeの定義]を参照してください。
+
           #s2.question-answer._column-span-all
             h4.question バリアントタイプごとにPosition、Ref、Altはそれぞれどのように記述されますか。
             .answer
-              p 以下に、各バリアントタイプ毎の例を示します。染色体の最初の塩基の位置は1です。
+              p 以下に、TogoVarで採用しているVCF表記による各バリアントタイプの例を示します。染色体の最初の塩基の位置は1です。
               table.results-view
                 thead
                   tr
@@ -422,9 +439,9 @@ block content
                         .coordinate 111786238
                     td
                       .ref-alt
-                        span.ref
+                        span.ref T
                         span.arrow
-                        span.alt G
+                        span.alt TG
                     td 12番染色体111786238番目と111786239番目の塩基の間に塩基Gが挿入された
                   tr
                     td
@@ -434,32 +451,28 @@ block content
                     td
                       .chromosome-position
                         .chromosome 12
-                        .coordinate 111778836
+                        .coordinate 111778835
                     td
                       .ref-alt
-                        span.ref A
+                        span.ref GA
                         span.arrow
-                        span.alt
+                        span.alt G
                     td 12番染色体111778836番目の塩基Aが欠失した
           #s3.question-answer._column-span-all
             h4.question TogoVarでは、どのようにバリアントを表記していますか。
             .answer
               p
-                | TogoVarでは、ゲノム上の位置及びreference allele、alternate allele、ヒトゲノム標準配列のビルド番号の組み合わせでバリアントを一意に識別します。TogoVar及びdbSNP、
-                a.hyper-text.-external(target='_blank', href='https://samtools.github.io/hts-specs/VCFv4.2.pdf') VCF
-                | 、
-                a.hyper-text.-external(target='_blank', href='http://varnomen.hgvs.org/bg-material/simple/#types-of-variants') HGVS
-                | での表記例を下の表に示しています。
+                | TogoVarでは#[a.hyper-text.-external(target='_blank', href='https://samtools.github.io/hts-specs/VCFv4.2.pdf') VCF]と同様に、ヒトゲノム標準配列のビルド番号、染色体、ゲノム上の位置（POS）、reference allele（REF）、alternate allele（ALT）の組み合わせでバリアントを一意に識別します。挿入・欠失もVCFの表記規則に従います。TogoVar / VCF、dbSNP、#[a.hyper-text.-external(target='_blank', href='https://varnomen.hgvs.org/') HGVS]の表記例を下の表に示します。
               table.results-view
                 thead
                   tr.groupingrow
                     th(colspan='2')
-                    th(colspan='4')
+                    th
                       p TogoVar
+                    th(colspan='3')
+                      p TogoVar / VCF
                     th(colspan='4')
                       p dbSNP
-                    th(colspan='4')
-                      p VCF
                     th
                       p HGVS
                   tr
@@ -478,13 +491,6 @@ block content
                       p Position (GRCh38)
                     th
                       p Alleles
-                    th.separator
-                    th
-                      p Position
-                    th
-                      p Ref
-                    th
-                      p Alt
                     th.separator
                     th
                 tbody
@@ -509,10 +515,6 @@ block content
                     td(rowspan='2') chr12:111767141
                     td C&gt;A
                     td.separator(rowspan='2')
-                    td(rowspan='2') 12:111767141
-                    td C
-                    td A
-                    td.separator(rowspan='2')
                     td 12:g.111767141:C&gt;A
                   tr
                     td
@@ -523,8 +525,6 @@ block content
                         span.arrow
                         span.alt G
                     td C&gt;G
-                    td C
-                    td G
                     td 12:g.111767141:C&gt;G
                   tr
                     td
@@ -538,18 +538,14 @@ block content
                         .coordinate 111786238
                     td
                       .ref-alt
-                        span.ref
+                        span.ref T
                         span.arrow
-                        span.alt G
+                        span.alt TG
                     td.separator
                     td
                       a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs534925026') rs534925026
                     td chr12:111786238
                     td insG
-                    td.separator
-                    td 12:111786238
-                    td T
-                    td TG
                     td.separator
                     td 12:g.111786238_111786239insG
                   tr
@@ -561,21 +557,17 @@ block content
                     td
                       .chromosome-position
                         .chromosome 12
-                        .coordinate 111778836
+                        .coordinate 111778835
                     td
                       .ref-alt
-                        span.ref A
+                        span.ref GA
                         span.arrow
-                        span.alt
+                        span.alt G
                     td.separator
                     td
                       a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/snp/rs766411401') rs766411401
                     td chr12:111778836-111778847
                     td delA
-                    td.separator
-                    td 12:111778835
-                    td GA
-                    td G
                     td.separator
                     td 12:g.111778847del
           #s4.question-answer._column-span-all
@@ -598,72 +590,79 @@ block content
             .answer
               p
                 |代替アレル頻度やClinical significanceなどの検索条件をANDやORで結合したクエリーを作成できます。使い方は、
-                a.link(href='#s6') Q:日本人集団とその他の集団で代替アレル頻度が異なるバリアントを検索できますか
+                a.link(href='#s6') Q:日本人集団で代替アレル頻度が高く、その他の集団で低いバリアントを検索できますか
                 |をご覧ください。
           #s6.question-answer._column-span-all
-            h4.question 日本人集団とその他の集団で代替アレル頻度が異なるバリアントを検索できますか。
+            h4.question 日本人集団で代替アレル頻度が高く、その他の集団で低いバリアントを検索できますか。
             .answer
               p
                 | はい。
-                a.hyper-text.-external(target='_blank', href='/?mode=advanced') Advanced search
+                a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/?mode=advanced') Advanced search
                 | による検索が可能です。
-                p
+              p.notice.-normal
+                | 以下は
+                a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/') GRCh37版（grch37.togovar.org）
+                | の画面を使った例です。ToMMo 8.3KJPNはGRCh37版に収録されているデータセットです。
+              p
                 | 代替アレル頻度の比較対象のバリアントは以下の通りです。
+              .search-population-sets
                 ul.unordered-list
-                  li 日本人集団はGEM-J WGAまたは8.3KJPNのいずれかに含まれるバリアント
-                  li gnomADはgnomaAD genomesまたはexomesのいずれかに含まれるバリアント
-                p
+                  li 日本人集団はGEM-J WGAまたはToMMo 8.3KJPNのいずれかに含まれるバリアント
+                  li その他の集団はgnomAD genomesまたはgnomAD exomesのいずれかに含まれるバリアント
+              p
                 | 日本人集団の代替アレル頻度が0.3以上、gnomAD集団は0.05以下のバリアントを検索します。
-                ol.ordered-list
-                  li 画面上部のAdvanced searchタブを選択します。
-                    img(src=require("../../../images/help-image1.png") alt="help-image1")
-                  li Add conditionメニューからAlternate allele frequency/countを選択します。
-                    p
-                      img(src=require("../../../images/help-image2.png") alt="help-image2" width="241")
-                  li 以下の画面でデータセット(GEM-J WGA)と代替アレル頻度(>=0.3)を指定します。代替アレル数でも指定できます。
-                    img(src=require("../../../images/help-image3.png") alt="help-image3")
-                  li OKボタンを押下します。検索条件が設定されました。
-                    img(src=require("../../../images/help-image4.png") alt="help-image4")
-                  li 同様の手順でデータセットToMMo 8.3KJPN、gnomAD genomes、gnomAD exomesについても検索条件を設定します。
-                    img(src=require("../../../images/help-image5.png") alt="help-image5")
-                  li 日本人集団（GEM-J WGAとToMMo 8.3KJPN)の検索条件をOR結合にします。
-                    ol.ordered-list
-                      li GEM-J WGAとToMMo 8.3KJPNの検索条件をクリックして選択します。選択状態では黄枠で囲まれます。
-                        img(src=require("../../../images/help-image6.png") alt="help-image6")
-                      li Groupメニューを選択します。選択した２つがOR条件になります。なお、AND条件に変更する場合は、左端のORアイコンをクリックします。
-                        img(src=require("../../../images/help-image7.png") alt="help-image7")
-                      li 同様にgnomAD genomesとgnomAD exomesもOR条件にします。
-                        img(src=require("../../../images/help-image8.png") alt="help-image8")
-                p
+              ol.ordered-list
+                li
+                  | 画面上部のAdvanced searchタブを選択します（
+                  a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/') GRCh37版のホーム画面
+                  | ）。
+                  img(src=require("../../../images/help-image1.png") alt="Advanced searchタブの選択")
+                li Add conditionメニューからAlternate allele frequency/countを選択します。
+                  p
+                    img(src=require("../../../images/help-image2.png") alt="Alternate allele frequency/countの選択" width="241")
+                li 以下の画面でデータセット（GEM-J WGA）と代替アレル頻度（>= 0.3）を指定します。代替アレル数でも指定できます。
+                  img(src=require("../../../images/help-image3.png") alt="データセットと代替アレル頻度の指定")
+                li OKボタンを押下します。検索条件が設定されました。
+                  img(src=require("../../../images/help-image4.png") alt="検索条件の設定")
+                li 同様の手順でデータセットToMMo 8.3KJPN、gnomAD genomes、gnomAD exomesについても検索条件を設定します。
+                  img(src=require("../../../images/help-image5.png") alt="各データセットの検索条件")
+                li 日本人集団（GEM-J WGAとToMMo 8.3KJPN）の検索条件をOR結合にします。
+                  ol.ordered-list
+                    li GEM-J WGAとToMMo 8.3KJPNの検索条件をクリックして選択します。選択状態では黄枠で囲まれます。
+                      img(src=require("../../../images/help-image6.png") alt="日本人集団の検索条件の選択")
+                    li Groupメニューを選択します。選択した2つがOR条件になります。AND条件に変更する場合は、左端のORアイコンをクリックします。
+                      img(src=require("../../../images/help-image7.png") alt="検索条件のOR結合")
+                    li 同様にgnomAD genomesとgnomAD exomesもOR条件にします。
+                      img(src=require("../../../images/help-image8.png") alt="gnomAD検索条件のOR結合")
+              p
                 | 最終的には以下の検索条件になります。
+              .search-criteria
                 p
-                | ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo 8.3KJPN) &gt;= 0.3))
-                br
-                |  AND
-                br
-                |  (freq(gnomAD genomes) &lt;= 0.05) OR (freq(gnomAD exomes) &lt;= 0.05))
-                p
+                  | ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo 8.3KJPN) &gt;= 0.3))
+                  br
+                  | AND
+                  br
+                  | ((freq(gnomAD genomes) &lt;= 0.05) OR (freq(gnomAD exomes) &lt;= 0.05))
+              p
                 | 検索条件が変更される度に検索が自動的に実行され、条件に合致するバリアントの一覧が更新されます。
-                img(src=require("../../../images/help-image9.webp") alt="help-image9")
-                p
-                | メニューの機能
-                ul.unordered-list
-                  li Add condition: 検索条件を追加します。
-                  li Group: 選択された検索条件(黄枠表示)をOR条件で結合します。ORアイコンをクリックするとAND結合に変更できます。
-                  li Ungroup：結合された検索条件を分離します。Groupとは反対の操作です。
-                  li Delete:選択した 検索条件を削除します。
-                p
-                | アイコンの機能
-                ul.unordered-list
-                  li
-                    img(src=require("../../../images/help-pencil.png") alt="help-pencil")
-                    | ：検索条件を編集します。
-                  li
-                    img(src=require("../../../images/help-cross.png") alt="help-cross")
-                    | ：検索条件を削除します。
+              img(src=require("../../../images/help-image9.webp") alt="検索結果と検索条件")
+              p メニューの機能
+              ul.unordered-list
+                li Add condition: 検索条件を追加します。
+                li Group: 選択した検索条件をOR条件で結合します。ORアイコンをクリックするとAND結合に変更できます。
+                li Ungroup: 結合した検索条件を分離します。
+                li Delete: 選択した検索条件を削除します。
+              p アイコンの機能
+              ul.unordered-list
+                li
+                  img(src=require("../../../images/help-pencil.png") alt="検索条件を編集するアイコン" width="24" height="24")
+                  | ：検索条件を編集します。
+                li
+                  img(src=require("../../../images/help-cross.png") alt="検索条件を削除するアイコン" width="24" height="24")
+                  | ：検索条件を削除します。
           #s7.question-answer._column-span-all
             h4.question GRCh37、GRCh38のどちらの位置でもバリアントを検索できますか。
             .answer
               p
-              | はい。 リファレンス配列のバージョンはヘッダに表示されます。クリックして切り替えられます。
-              img(src=require("../../../images/help-image10.png") alt="help-image10")
+                | はい。参照配列のバージョンはヘッダーに表示され、クリックして切り替えられます。
+              img(src=require("../../../images/help-image10.png") alt="参照ゲノムの切り替え" width="600")

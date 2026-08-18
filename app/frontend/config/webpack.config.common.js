@@ -333,7 +333,6 @@ const pages = (function (assembly) {
         'downloads',
         'help',
         'history',
-        'policy',
         'terms',
       ];
     case 'GRCh38':
@@ -342,6 +341,8 @@ const pages = (function (assembly) {
         'contact',
         'datasets',
         'datasets/analysis',
+        'datasets/bbj1k',
+        'datasets/bbj2k',
         'datasets/gem_j_wga',
         'datasets/jga_wes',
         'datasets/jga_wgs',
@@ -350,7 +351,6 @@ const pages = (function (assembly) {
         'downloads',
         'help',
         'history',
-        'policy',
         'terms',
       ];
     default:
@@ -360,6 +360,8 @@ const pages = (function (assembly) {
         'contact',
         'datasets',
         'datasets/analysis',
+        'datasets/bbj1k',
+        'datasets/bbj2k',
         'datasets/gem_j_wga',
         'datasets/jga_wes',
         'datasets/jga_wgs',
@@ -368,7 +370,6 @@ const pages = (function (assembly) {
         'downloads',
         'help',
         'history',
-        'policy',
         'terms',
       ];
   }

@@ -19,8 +19,8 @@ article.common-document
             th(style='white-space: nowrap;')._align-center 対象集団
             th(style='white-space: nowrap;')._align-center 健常者
             th(style='white-space: nowrap;')._align-center 罹患者
-            th(style='white-space: nowrap;')._align-center サンプル数
-            th(style='white-space: nowrap;')._align-center アレル数
+            th(style='white-space: nowrap;')._align-right サンプルサイズ
+            th(style='white-space: nowrap;')._align-right 代替アレル数
             th 含まれる制限公開データセット
         tbody
           tr
@@ -31,10 +31,8 @@ article.common-document
             td 日本人
             td._align-center ✔
             td._align-center
-            td._align-center
-              span(style='margin-left:35px;') 7,609
-            td._align-center
-              span(style='margin-left:5px;') 95,555,740
+            td._align-right 7,609
+            td._align-right 95,495,574
             td._align-center
               a(href="/doc/ja/datasets/gem_j_wga#jga_datasets") 6データセット
           tr
@@ -45,10 +43,8 @@ article.common-document
             td 日本人
             td._align-center ✔
             td._align-center ✔
-            td._align-center
-              span(style='margin-left:45px;') 125
-            td._align-center
-              span(style='margin-left:13px;') 4,668,805
+            td._align-right 125
+            td._align-right 4,668,075
             td._align-center
               a(href="/doc/ja/datasets/jga_wes#jga_datasets") 7データセット
           tr
@@ -59,12 +55,10 @@ article.common-document
             td 日本人
             td._align-center ✔
             td._align-center ✔
+            td._align-right 3,068
+            td._align-right 72,383,609
             td._align-center
-              span(style='margin-left:45px;') 78
-            td._align-center
-              span(style='margin-left:13px;') 20,822,413
-            td._align-center
-              a(href="/doc/ja/datasets/jga_wgs#jga_datasets") 4データセット
+              a(href="/doc/ja/datasets/jga_wgs#jga_datasets") 6データセット
           tr
             td
               a(href="/doc/ja/datasets/jga_snp") JGA-SNP
@@ -73,14 +67,16 @@ article.common-document
             td 日本人
             td._align-center ✔
             td._align-center ✔
-            td._align-center
-              span(style='margin-left:25px;') 183,884
-            td._align-center
-              span(style='margin-left:13px;') 1,249,671
+            td._align-right 183,884
+            td._align-right 1,249,671
             td._align-center
               a(href="/doc/ja/datasets/jga_snp#jga_datasets") 3データセット
       p.notice
-        | ∗1：
+        | 注：
+        br
+        | ・「代替アレル数」は、quality filterを適用せず、TogoVar APIのstatsから取得した値です。
+        br
+        | ・∗1：
         a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
           | Japanese Genotype-phenotype Archive (JGA)
         |  /
@@ -88,7 +84,7 @@ article.common-document
         a.hyper-text.-external(target='_blank', href='https://gr-sharingdbs.dbcls.jp/agd')
           | AMED Genome group sharing Database (AGD)
         br
-        | ∗2：fastq/bam/celファイルやgenotype data一覧など
+        | ・∗2：fastq/bam/celファイルやgenotype data一覧など
     section.section
       h3.sectiontitle その他のバリアント頻度データ
       table.table._column-span-all
@@ -100,9 +96,9 @@ article.common-document
             th(style='white-space: nowrap;')._align-center 対象集団
             th(style='white-space: nowrap;')._align-center 健常者
             th(style='white-space: nowrap;')._align-center 罹患者
-            th(style='white-space: nowrap;')._align-center サンプル数
-            th._align-center
-              | アレル数
+            th(style='white-space: nowrap;')._align-right サンプルサイズ
+            th._align-right
+              | 代替アレル数
             th 作成者
             th
               | バージョン/最終更新日
@@ -116,9 +112,8 @@ article.common-document
             td._align-left 複数
             td._align-center ✔
             td._align-center ✔
-            td._align-center
-              span(style='margin-left:0px;') 730,947
-            td._align-center
+            td._align-right 730,947
+            td._align-right
               | 183,717,261
             td Broad Institute
             td v4.1
@@ -131,13 +126,12 @@ article.common-document
             td._align-left 複数
             td._align-center ✔
             td._align-center ✔
-            td._align-center
-              span(style='margin-left:3px;') 76,215
-            td._align-center
+            td._align-right 76,215
+            td._align-right
               | 759,336,320
             td Broad Institute
             td v4.1
-                    tr
+          tr
             td
               a(href="/doc/ja/datasets/ncbn") NCBN
             td._align-left WGS
@@ -145,30 +139,83 @@ article.common-document
             td 複数
             td._align-center ✔
             td._align-center ✔
-            td._align-center
-              span(style='margin-left:-10px;') 日本人：9,290 1KGP：2,504
-            td._align-center 215,729,032
+            td._align-right 日本人：9,290 1KGP：2,504
+            td._align-right 215,729,032
             td ナショナルセンター バイオバンクネットワーク
             td 2024/6/28
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-54kjpn-20230626-af_snvindelall')
+              a(href="/doc/ja/datasets/bbj1k") BBJ1K
+            td._align-left WGS
+            td._align-center
+            td._align-left 日本人
+            td._align-center
+            td._align-center ✔
+            td._align-right 1,026
+            td._align-right 44,694,482
+            td バイオバンク・ジャパン
+            td
+              a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000758') JGAD000758
+          tr
+            td
+              a(href="/doc/ja/datasets/bbj2k") BBJ2K
+            td._align-left WGS
+            td._align-center
+            td._align-left 日本人
+            td._align-center
+            td._align-center ✔
+            td._align-right 1,964
+            td._align-right 55,344,184
+            td バイオバンク・ジャパン
+            td
+              a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000868') JGAD000868
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-61kjpn-20250616-af_snvindelall')
                 | ToMMo #{ GLOBALS.TOMMO_VERSION }KJPN-SNV/INDEL Allele Frequency Panel(#{ GLOBALS.TOMMO_VERSION }KJPN)
             td._align-left WGS
             td._align-center
             td._align-left 日本人
             td._align-center ✔
             td._align-center
-            td._align-center
-              span(style='margin-left:4px;') 54,302
-            td._align-center
-              | 252,777,334
+            td._align-right 61,424
+            td._align-right 435,605,171
             td 東北メディカル・メガバンク機構
-            td v20230626
+            td v20250616
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-jsv1-20211208-af') ToMMo JSV1
+            td._align-left long-read WGS
+            td._align-center
+            td._align-left 日本人
+            td._align-center ✔
+            td._align-center
+            td._align-right 222
+            td._align-right 72,342
+            td 東北メディカル・メガバンク機構
+            td v20211208
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://jogo.csml.org/') JoGo
+            td._align-left long-read WGS
+            td._align-center
+            td._align-left 複数
+            td._align-center ✔
+            td._align-center
+            td._align-right 258
+            td._align-right 16,187,634
+            td JoGoプロジェクト
+            td JoGo 1.0
       p.notice
-        | 注：#{ GLOBALS.TOMMO_VERSION }KJPNの内訳はSNVs(Autosome, chrX(PAR1+PAR2+XTR)およびchrMT)ならびにINDELs(AutosomeおよびchrX(PAR1+PAR2+XTR))です。
+        | 注：
+        br
+        | ・「代替アレル数」は、quality filterを適用せず、TogoVar APIのstatsから取得した値です。
+        br
+        | ・ToMMo #{ GLOBALS.TOMMO_VERSION }KJPNの内訳は、SNV（Autosome、chrX（PAR1+PAR2）およびchrMT）ならびにINDEL（AutosomeおよびchrX（PAR1+PAR2））です。
+        br
+        | ・ToMMo JSV1およびJoGoには51 bp以上の構造多型が含まれます。
     section.section
-      h3.sectiontitle バリアント頻度以外のデータ
+      h3#non-variant-frequency-datasets.sectiontitle バリアント頻度以外のデータ
       table.table
         thead
           tr
@@ -180,7 +227,7 @@ article.common-document
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/clinvar/') ClinVar
-            td 2024/10/03
+            td 2026/07/02
             td バリアントの臨床的意義
             td NCBI
           tr
@@ -200,14 +247,14 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://www.ebi.ac.uk/gwas/docs/file-downloads')
                 | GWAS Catalog
-            td 2024/10/15
+            td 2025/11/12
             td ゲノムワイド関連解析(GWAS)情報
             td NHGRI-EBI
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/hgnc_complete_set.txt')
                 | HGNC symbol report
-            td 2024/08/27
+            td 2026/07/07
             td 遺伝子シンボルや関連リソースの情報
             td HGNC
           tr
@@ -220,36 +267,44 @@ article.common-document
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/medgen') MedGen
-            td 2024/10/15
+            td 2026/07/07
             td 遺伝医学に関連する症状や表現型に関する情報を集約したポータルデータベース
             td NCBI
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://mgend.ncgm.go.jp/')
+              a.hyper-text.-external(target='_blank', href='https://mgend.jihs.go.jp/')
                 | MGeND
-            td 2024/03/08
+            td 2025/09/12
             td 日本人集団から収集されたバリアントの臨床的意義
-            td NCGM
+            td JIHS
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pubmed/')
                 | PubMed
-            td 2024/10/14
+            td 2026/07/10
             td 文献情報
             td NCBI
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTatorCentral/')
-                | PubTator Central
-            td 2024/01/04
+              a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTator3/')
+                | PubTator3
+            td 2026/07/13
             td バリアント名が出現する文献情報
             td NCBI
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://sscvdb.io/') SSCV DB
+            td v1.1（2026/06/17）
+            td 公開トランスクリプトームシーケンスデータから同定されたsplice-site creating variant（SSCV）の予測スプライシングタイプ
+            td NCC
       p.notice
-        | 注：ClinVarはGRCh38上の位置が決定しているバリアントのみを含む
-        a.hyper-text.-external(target='_blank', href='ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/') VCFファイル
+        | 注：
+        br
+        | ・ClinVarはGRCh38上の位置が決定しているバリアントのみを含む
+        a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/') VCFファイル
         | からデータを取得しています。
         br
-        | 注：MGeNDの疾患名を独自の方法でMedGenにマッピングしていますので、MGeNDに記載されている疾患名と一致しない場合があります。
+        | ・MGeNDの疾患名を独自の方法でMedGenにマッピングしていますので、MGeNDに記載されている疾患名と一致しない場合があります。
     section.section
       h3.sectiontitle データ加工に利用したツール
       table.table
@@ -289,10 +344,10 @@ article.common-document
             td
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/index.html')
                 | Variant Effect Predictor (VEP)
-            td Ensembl rel. 112
+            td Ensembl rel. 116
             td
               | バリアントに
               a.hyper-text.-external(target='_blank', href='https://www.ensembl.org/info/docs/tools/vep/script/vep_cache.html#cache_content')
-                | 遺伝子名、Consequence、有害性予測(AlphaMissense, SIFT, PolyPhen)等
+                | 遺伝子名、Consequence、有害性予測(CADD, AlphaMissense, SIFT, PolyPhen)等
               | をアノテーション
             td EMBL-EBI

@@ -1,10 +1,9 @@
 block variables
   include ../includes/_globals
-  - lang = locals.language ? locals.language : "en";
   - scrollDelay = 500
 
 doctype html
-html(data-page=locals.currentPage, lang=lang)
+html(data-page=locals.currentPage, lang=locals.language ? locals.language : "en")
   head
     title= locals.title ? locals.title : "TogoVar"
     meta(charset="utf-8")
