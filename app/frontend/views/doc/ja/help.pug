@@ -599,13 +599,13 @@ block content
                 | はい。
                 a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/?mode=advanced') Advanced search
                 | による検索が可能です。
-              p.notice.-normal
+              p.body
                 | 以下は
                 a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/') GRCh37版（grch37.togovar.org）
                 | の画面を使った例です。ToMMo 8.3KJPNはGRCh37版に収録されているデータセットです。
               p
                 | 代替アレル頻度の比較対象のバリアントは以下の通りです。
-              .search-population-sets
+              .document-block
                 ul.unordered-list
                   li 日本人集団はGEM-J WGAまたはToMMo 8.3KJPNのいずれかに含まれるバリアント
                   li その他の集団はgnomAD genomesまたはgnomAD exomesのいずれかに含まれるバリアント
@@ -636,13 +636,10 @@ block content
                       img(src=require("../../../images/help-image8.png") alt="gnomAD検索条件のOR結合")
               p
                 | 最終的には以下の検索条件になります。
-              .search-criteria
-                p
-                  | ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo 8.3KJPN) &gt;= 0.3))
-                  br
-                  | AND
-                  br
-                  | ((freq(gnomAD genomes) &lt;= 0.05) OR (freq(gnomAD exomes) &lt;= 0.05))
+              pre.document-block.-code.
+                ((freq(GEM-J WGA) >= 0.3) OR (freq(ToMMo 8.3KJPN) >= 0.3))
+                AND
+                ((freq(gnomAD genomes) <= 0.05) OR (freq(gnomAD exomes) <= 0.05))
               p
                 | 検索条件が変更される度に検索が自動的に実行され、条件に合致するバリアントの一覧が更新されます。
               img(src=require("../../../images/help-image9.webp") alt="検索結果と検索条件")
