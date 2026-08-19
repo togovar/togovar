@@ -15,12 +15,12 @@ block content
       header.header
         h2.title 更新履歴
       .contents
-        section.section
+        section.section.timeline
           //- リリース日が確定したら「X」を置き換える。
-          h3.sectiontitle
-            span.release-date 2026/8/X
-            span.release-number リリース: 2026.1
-          ul.unordered-list
+          h3.sectiontitle.heading
+            span.date 2026/8/X
+            span.number リリース: 2026.1
+          ul.unordered-list.items
             li
               strong Datasets:
               |  GRCh38版に新しい頻度データセットを追加し、既存データセットを更新しました。
@@ -66,10 +66,10 @@ block content
               | から
               a.hyper-text.-internal(href='/doc/ja/terms#togovar-license') CC BY 4.0
               | へ変更しました。第三者由来データには、引き続き各提供元の利用条件が適用されます。
-          h3.sectiontitle
-            span.release-date 2025/6/4
-            span.release-number リリース: 2025.1
-          ul.unordered-list
+          h3.sectiontitle.heading
+            span.date 2025/6/4
+            span.number リリース: 2025.1
+          ul.unordered-list.items
             li
               strong Gene page:
               |  #[a.hyper-text.-external(href='https://molossinus.brc.riken.jp/mogplus/') MoG+ (Mouse genome database with high added value)]を新たに追加しました。
@@ -122,10 +122,10 @@ block content
                     ul.unordered-list
                       li 例：
                         a.hyper-text.-internal(href='/gene/ALDH2') https://grch38.togovar.org/gene/ALDH2
-          h3.sectiontitle
-            span.release-date 2024/12/3
-            span.release-number リリース: 2024.2
-          ul.unordered-list
+          h3.sectiontitle.heading
+            span.date 2024/12/3
+            span.number リリース: 2024.2
+          ul.unordered-list.items
             li
               strong Datasets:
               |  #[a.hyper-text.-external(href='https://mgend.jihs.go.jp/') MGeND (Medical Genomics Japan Variant Database)]からの臨床的意義を新たに追加しました。
@@ -168,10 +168,10 @@ block content
                   | に登録されている構造または
                   a.hyper-text.-external(href='https://alphafold.ebi.ac.uk/') AlphaFold
                   | で予測した構造を選択できます。なお、表示される構造にはバリアントの影響は考慮されていません。
-          h3.sectiontitle
-            span.release-date 2024/6/27
-            span.release-number リリース: 2024.1
-          ul.unordered-list
+          h3.sectiontitle.heading
+            span.date 2024/6/27
+            span.number リリース: 2024.1
+          ul.unordered-list.items
             li
               strong Datasets:
               |  #[a.hyper-text.-internal(href='datasets/jga_snp#diseases_jgad000123') 45疾患]のアレル頻度およびgenotype count（疾患別ならびに男女別）を、疾患ごとの情報として
@@ -202,8 +202,8 @@ block content
                 li 頻度は各バリアントレポートページの「frequency」&gt; Dataset「NCBN」 &gt; Population「Total」を展開すると表示できます (
                   a.hyper-text.-internal(href='/variant/tgv80918483#frequency') tgv80918483の例
                   | )。Advanced searchの「Alternate allele frequency/count」では集団別の頻度を条件にバリアントを検索できます。
-          h3.sectiontitle 2024/2/28
-          ul.unordered-list
+          h3.sectiontitle.heading 2024/2/28
+          ul.unordered-list.items
             li
               strong Simple/Advanced search:
               |  #[a.hyper-text.-external(href='https://github.com/google-deepmind/alphamissense') AlphaMissense](
@@ -212,8 +212,8 @@ block content
             li
               strong Datasets:
               |  #[a.hyper-text.-external(href='https://gnomad.broadinstitute.org/') Genome Aggregation Database (gnomAD)]をバージョン4.0に更新しました。
-          h3.sectiontitle 2023/11/16
-          ul.unordered-list
+          h3.sectiontitle.heading 2023/11/16
+          ul.unordered-list.items
             li
               strong Datasets:
               |  ToMMo 14KJPNをToMMo 54KJPN (
@@ -228,8 +228,8 @@ block content
               a.hyper-text.-external(href='https://samtools.github.io/hts-specs/VCFv4.4.pdf')
                 | VCF形式
               | でダウンロードできるようになりました。
-          h3.sectiontitle 2023/7/14
-          ul.unordered-list
+          h3.sectiontitle.heading 2023/7/14
+          ul.unordered-list.items
             li
               strong Simple/Advanced search:
               |  検索結果をJSON、CSV、TSV形式でダウンロードできるようになりました。
@@ -240,8 +240,8 @@ block content
               | の疾患名で検索できます。検索対象には疾患オントロジー
               a.hyper-text.-external(href='https://monarchinitiative.org/') Mondo
               | 上の下位概念の疾患も含まれます。
-          h3.sectiontitle 2022/11/1
-          ul.unordered-list
+          h3.sectiontitle.heading 2022/11/1
+          ul.unordered-list.items
             li
               strong URL:
               |  TogoVarのURLが
@@ -280,8 +280,8 @@ block content
               | から
               a.hyper-text.-external(href='https://dbcls.rois.ac.jp') 大学共同利用機関法人 情報・システム研究機構 データサイエンス共同利用基盤施設ライフサイエンス統合データベースセンター（DBCLS）
               | に変わりました。
-          h3.sectiontitle 2022/8/5
-          ul.unordered-list
+          h3.sectiontitle.heading 2022/8/5
+          ul.unordered-list.items
             li
               strong Advanced search:
               |  #[a.hyper-text.-internal(href='/?mode=advanced') Advanced search]を公開しました。
@@ -298,8 +298,8 @@ block content
             li
               strong TogoVar API:
               |  #[a.hyper-text.-internal(href='/api') TogoVar API version 0.91]を公開しました。
-          h3.sectiontitle 2021/12/16
-          ul.unordered-list
+          h3.sectiontitle.heading 2021/12/16
+          ul.unordered-list.items
             li
               strong Datasets:
               |  ToMMo 4.7KJPNをToMMo 8.3KJPN (
@@ -310,8 +310,8 @@ block content
               |  ExACをgnomAD v2.1.1 (
               a.hyper-text.-external(href='https://gnomad.broadinstitute.org/downloads') The Genome Aggregation Database
               | )に更新しました。
-          h3.sectiontitle 2020/10/22
-          ul.unordered-list
+          h3.sectiontitle.heading 2020/10/22
+          ul.unordered-list.items
             li
               strong Keyword search:
               |  #[a.hyper-text.-external(target='_blank', href='https://varnomen.hgvs.org/') Human Genome Variation Society (HGVS) 表記](例：
@@ -319,8 +319,8 @@ block content
               | 、
               a(target='_blank', href='/?term=ALDH2%3Ac.1510G%3EA') ALDH2:p.Glu504Lys
               | )で検索可能になりました。
-          h3.sectiontitle 2020/7/27
-          ul.unordered-list
+          h3.sectiontitle.heading 2020/7/27
+          ul.unordered-list.items
             li
               strong Datasets:
               |  新たなデータセットとしてGEM-J WGA (
@@ -331,8 +331,8 @@ block content
             li
               strong Usability:
               |  Karyotypeによる検索ができるようになりました。
-          h3.sectiontitle 2019/7/25
-          ul.unordered-list
+          h3.sectiontitle.heading 2019/7/25
+          ul.unordered-list.items
             li
               strong Keyword search:
               |  HGNC Gene Symbolの別名（例：PD-1、p53）で検索できるようになりました。
@@ -358,8 +358,8 @@ block content
             li
               strong Usability:
               |  ユーザーインターフェースを改善して使いやすくしました。
-          h3.sectiontitle 2018/6/7
-          ul.unordered-list
+          h3.sectiontitle.heading 2018/6/7
+          ul.unordered-list.items
             li
               | TogoVarの公開を開始しました。詳細は
               a.hyper-text.-external(href='https://www.jst.go.jp/pr/announce/20180607/index.html') プレスリリース

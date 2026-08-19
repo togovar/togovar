@@ -637,9 +637,9 @@ block content
               p
                 | 最終的には以下の検索条件になります。
               pre.document-block.-code.
-                ((freq(GEM-J WGA) >= 0.3) OR (freq(ToMMo 8.3KJPN) >= 0.3))
+                ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo 8.3KJPN) &gt;= 0.3))
                 AND
-                ((freq(gnomAD genomes) <= 0.05) OR (freq(gnomAD exomes) <= 0.05))
+                ((freq(gnomAD genomes) &lt;= 0.05) OR (freq(gnomAD exomes) &lt;= 0.05))
               p
                 | 検索条件が変更される度に検索が自動的に実行され、条件に合致するバリアントの一覧が更新されます。
               img(src=require("../../../images/help-image9.webp") alt="検索結果と検索条件")

@@ -15,12 +15,12 @@ block content
       header.header
         h2.title Update history
       .contents
-        section.section
+        section.section.timeline
           //- Replace “X” when the release date is confirmed.
-          h3.sectiontitle
-            span.release-date 2026/8/X
-            span.release-number Release: 2026.1
-          ul.unordered-list
+          h3.sectiontitle.heading
+            span.date 2026/8/X
+            span.number Release: 2026.1
+          ul.unordered-list.items
             li
               strong Datasets:
               |  New frequency datasets were added to GRCh38, and existing datasets were updated.
@@ -73,10 +73,10 @@ block content
               |
               a.hyper-text.-internal(href='/doc/terms#togovar-license') CC BY 4.0
               | . Terms specified by each provider continue to apply to third-party data.
-          h3.sectiontitle
-            span.release-date 2025/6/4
-            span.release-number Release: 2025.1
-          ul.unordered-list
+          h3.sectiontitle.heading
+            span.date 2025/6/4
+            span.number Release: 2025.1
+          ul.unordered-list.items
             li
               strong Gene page:
               |  #[a.hyper-text.-external(href='https://molossinus.brc.riken.jp/mogplus/') MoG+ (Mouse genome database with high added value)] was newly added.
@@ -143,10 +143,10 @@ block content
                       |
                       |
                       a.hyper-text.-internal(href='/gene/ALDH2') https://grch38.togovar.org/gene/ALDH2
-          h3.sectiontitle
-            span.release-date 2024/12/3
-            span.release-number Release: 2024.2
-          ul.unordered-list
+          h3.sectiontitle.heading
+            span.date 2024/12/3
+            span.number Release: 2024.2
+          ul.unordered-list.items
             li
               strong Datasets:
               |
@@ -215,10 +215,10 @@ block content
                   |
                   a.hyper-text.-external(target='_blank', href='https://alphafold.ebi.ac.uk/') AlphaFold
                   | . Please note that the displayed structures do not account for the effects of the variant.
-          h3.sectiontitle
-            span.release-date 2024/6/27
-            span.release-number Release: 2024.1
-          ul.unordered-list
+          h3.sectiontitle.heading
+            span.date 2024/6/27
+            span.number Release: 2024.1
+          ul.unordered-list.items
             li
               strong Datasets:
               |
@@ -268,8 +268,8 @@ block content
                   a.hyper-text.-internal(href='/variant/tgv80918483#frequency') tgv80918483
                   | ).
                   | You can search for variants based on the population-specific frequencies using the “Alternate allele frequency/count” in the Advanced search.
-          h3.sectiontitle 2024/2/28
-          ul.unordered-list
+          h3.sectiontitle.heading 2024/2/28
+          ul.unordered-list.items
             li
               strong Simple/Advanced search:
               |
@@ -287,8 +287,8 @@ block content
               a.hyper-text.-external(href='https://gnomad.broadinstitute.org/') The Genome Aggregation Database (gnomAD)
               |
               | was updated to version 4.0.
-          h3.sectiontitle 2023/11/16
-          ul.unordered-list
+          h3.sectiontitle.heading 2023/11/16
+          ul.unordered-list.items
             li
               strong Datasets:
               |
@@ -309,8 +309,8 @@ block content
               a.hyper-text.-external(href='https://samtools.github.io/hts-specs/VCFv4.4.pdf')
                 | VCF format
               |  as well as tab-separated format.
-          h3.sectiontitle 2023/7/14
-          ul.unordered-list
+          h3.sectiontitle.heading 2023/7/14
+          ul.unordered-list.items
             li
               strong Simple/Advanced search:
               |
@@ -325,8 +325,8 @@ block content
               |
               a.hyper-text.-external(href='https://monarchinitiative.org/') the Mondo disease ontology
               | .
-          h3.sectiontitle 2022/11/1
-          ul.unordered-list
+          h3.sectiontitle.heading 2022/11/1
+          ul.unordered-list.items
             li
               strong URL:
               |
@@ -372,8 +372,8 @@ block content
               |  to
               |
               a.hyper-text.-external(href='https://dbcls.rois.ac.jp') Database Center for Life Science, Joint Support-Center for Data Science Research, Research Organization of Information and Systems (DBCLS).
-          h3.sectiontitle 2022/8/5
-          ul.unordered-list
+          h3.sectiontitle.heading 2022/8/5
+          ul.unordered-list.items
             li
               strong Advanced search:
               |  #[a.hyper-text.-internal(href='/?mode=advanced') Advanced search] was released.
@@ -395,8 +395,8 @@ block content
             li
               strong TogoVar API:
               |  #[a.hyper-text.-internal(href='/api') TogoVar API version 0.91] was released.
-          h3.sectiontitle 2021/12/16
-          ul.unordered-list
+          h3.sectiontitle.heading 2021/12/16
+          ul.unordered-list.items
             li
               strong Datasets:
               |  ToMMo 4.7KJPN was updated to ToMMo 8.3KJPN (
@@ -405,16 +405,16 @@ block content
               strong Datasets:
               |  ExAC was updated to gnomAD v2.1.1 (
               a.hyper-text.-external(href='https://gnomad.broadinstitute.org/downloads') The Genome Aggregation Database).
-          h3.sectiontitle 2020/10/22
-          ul.unordered-list
+          h3.sectiontitle.heading 2020/10/22
+          ul.unordered-list.items
             li
               strong Keyword search:
               |  You can search TogoVar by
               |
               a.hyper-text.-external(target='_blank', href='https://varnomen.hgvs.org/') Human Genome Variation Society (HGVS) description
               |  (e.g. #[a(target='_blank', href='/?term=ALDH2%3Ac.1510G%3EA') ALDH2:c.1510G&gt;A] or #[a(target='_blank', href='/?term=ALDH2%3Ac.1510G%3EA') ALDH2:p.Glu504Lys]).
-          h3.sectiontitle 2020/7/27
-          ul.unordered-list
+          h3.sectiontitle.heading 2020/7/27
+          ul.unordered-list.items
             li
               strong Datasets:
               |  The new dataset,
@@ -426,8 +426,8 @@ block content
             li
               strong Usability:
               |  You can search the variants on Karyotype image.
-          h3.sectiontitle 2019/7/25
-          ul.unordered-list
+          h3.sectiontitle.heading 2019/7/25
+          ul.unordered-list.items
             li
               strong Keyword search:
               |  You can search TogoVar by an alias name of HGNC Gene Symbol (e.g. PD-1, p53).
@@ -455,8 +455,8 @@ block content
             li
               strong Usability:
               |  The user interface was refined for easier use.
-          h3.sectiontitle 2018/6/7
-          ul.unordered-list
+          h3.sectiontitle.heading 2018/6/7
+          ul.unordered-list.items
             li
               | TogoVar has been released. See
               |

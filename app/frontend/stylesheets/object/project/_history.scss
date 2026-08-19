@@ -4,7 +4,7 @@
 
 .history-document {
   > .contents {
-    > .section {
+    > .timeline {
       display: grid;
       grid-template-columns: 140px minmax(0, 1fr);
       column-gap: 12px;
@@ -12,18 +12,18 @@
       padding-top: 16px;
 
       // 日付と変更内容を横にそろえ、長い履歴から目的のリリースを探しやすくする
-      > .sectiontitle {
+      > .heading {
         padding: 12px 0;
         font-size: 15px;
         line-height: 1.4;
         border-top: solid 2px color-mix(in srgb, var(--color-key) 45%, transparent);
 
-        > .release-date,
-        > .release-number {
+        > .date,
+        > .number {
           display: block;
         }
 
-        > .release-number {
+        > .number {
           margin-top: 2px;
           font-size: 12px;
           font-weight: normal;
@@ -32,7 +32,7 @@
       }
 
       // リリースごとの内容をひとまとまりにしつつ、縦方向の一覧性を保つ
-      > .sectiontitle + .unordered-list {
+      > .items {
         padding: 8px 16px;
         margin-bottom: 20px;
         background-color: color-mix(in srgb, var(--color-key) 4%, transparent);
