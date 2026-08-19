@@ -215,6 +215,14 @@ SCSSは `app/frontend/stylesheets/` の FLOCSS レイヤー構成に合わせる
 
 ### 書き方のルール
 
+- CSSクラスの命名は [RSCSS](https://ricostacruz.com/rscss/) を基本方針にする。既存コードと衝突する場合は既存規約を優先し、大きなリネームは別差分に分ける。
+  - コンポーネント名は2語以上の kebab-case にする。例: `.button-view`, `.document-block`, `.search-form`
+  - コンポーネント内の要素名は1語にする。複数語が必要な場合は原則として連結する。例: `.title`, `.action`, `.firstname`
+  - 要素セレクターは、可能な範囲で `> .element` の子セレクターを使い、入れ子コンポーネントへ意図せず影響しないようにする。
+  - variant / modifier は `.-name` 形式にする。例: `.document-block.-code`, `.button-view.-primary`
+  - helper / utility は `._name` 形式にし、汎用的な上書き用途に限定する。増やしすぎない。
+  - tag selector に依存せず、できるだけ class selector で意味を表す。ただし `pre.document-block.-code` のように、HTML要素の意味と見た目の責務が一致する場合は許容する。
+  - ネストは深くしすぎない。原則としてコンポーネント直下の要素と modifier を中心にし、孫要素へ深く到達するセレクターは避ける。
 - 疑似要素は `::before` / `::after` / `::first-letter` のように **ダブルコロン** で書く。シングルコロン（`:before`）は疑似クラス専用。stylelint で強制している。
 - プロパティの並び順は **stylelint-config-recess-order** に従う（位置 → ボックスモデル → タイポグラフィ → 装飾 → トランジション）。`stylelint --fix` で自動修正できる。
 - ベンダープレフィックスは**必要な場合だけ**書く。
