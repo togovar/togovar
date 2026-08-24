@@ -771,12 +771,12 @@ class ReportApp {
   }
 
   /**
-   * Pugテンプレート側に個別ロジックを書かずに済むよう、report_id表示箇所をまとめて更新する。
+   * Pugテンプレート側に個別ロジックを書かずに済むよう、report-id表示箇所をまとめて更新する。
    *
    * @param reportId ページ上に表示するレポート識別子
    */
   private static _updatePageElements(reportId: string): void {
-    const reportIdElements = document.querySelectorAll('.report_id');
+    const reportIdElements = document.querySelectorAll('.report-id');
     reportIdElements.forEach((element) => {
       element.textContent = reportId;
     });
