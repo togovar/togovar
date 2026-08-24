@@ -668,13 +668,13 @@ block content
                 | Yes. Use
                 a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/?mode=advanced') Advanced search
                 | .
-              p.notice.-normal
+              p.body
                 | The following example uses the GRCh37 version of the site (
                 a.hyper-text.-external(target='_blank', href='https://grch37.togovar.org/') grch37.togovar.org
                 | ). ToMMo 8.3KJPN is a dataset included in the GRCh37 version.
               p
                 | Variant sets for comparison of alternate allele frequencies are as follows:
-              .search-population-sets
+              .document-block
                 ul.unordered-list
                   li For Japanese populations, variants included in either GEM-J WGA or ToMMo 8.3KJPN
                   li For other populations, variants included in either gnomAD genomes or gnomAD exomes
@@ -702,13 +702,10 @@ block content
                     li Combine the gnomAD genomes and gnomAD exomes conditions with OR in the same way.
                       img(src=require("../../../images/help-image8.png") alt="Combining gnomAD conditions with OR")
               p The final search criteria are as follows:
-              .search-criteria
-                p
-                  | ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo 8.3KJPN) &gt;= 0.3))
-                  br
-                  | AND
-                  br
-                  | ((freq(gnomAD genomes) &lt;= 0.05) OR (freq(gnomAD exomes) &lt;= 0.05))
+              pre.document-block.-code.
+                ((freq(GEM-J WGA) &gt;= 0.3) OR (freq(ToMMo 8.3KJPN) &gt;= 0.3))
+                AND
+                ((freq(gnomAD genomes) &lt;= 0.05) OR (freq(gnomAD exomes) &lt;= 0.05))
               p
                 | Each time search criteria is changed, the search is automatically executed and a list of variants that match the criteria is refreshed.
               img(src=require("../../../images/help-image9.webp") alt="Search results and search conditions")

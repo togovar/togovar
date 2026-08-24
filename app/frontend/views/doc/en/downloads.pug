@@ -77,7 +77,7 @@ block content
             |
             a.hyper-text.-external(target='_blank', href='https://www.htslib.org/doc/tabix.html') tabix
             | -compatible tool, you can retrieve only the required region without first downloading an entire chromosome file.
-          h4.download-command-title Retrieve allele frequencies from VCF
+          h4 Retrieve allele frequencies from VCF
           p
             | You can pass the URL of a BGZF-compressed VCF directly to
             |
@@ -92,7 +92,7 @@ block content
             |
             code chr12
             | &#32;to match the chromosome name stored in the VCF.
-          pre.download-command
+          pre.document-block.-code
             code.
               $ bcftools view -H \
                 -r 'chr12:111803962-111803962' \
@@ -100,7 +100,7 @@ block content
 
               # Example output
               chr12	111803962	.	G	A	.	PASS	AC=1784;AN=6136;AAC=276;ARC=1232;AOC=0;RRC=1560;ROC=0;OOC=0
-          h4.download-command-title Retrieve annotations as JSON
+          h4 Retrieve annotations as JSON
           p
             | For GRCh37 and GRCh38 JSON-in-TSV files, you can use
             | &#32;tabix to retrieve annotations for a specified region. The output has three columns: chromosome, position, and JSON. Add
@@ -115,7 +115,7 @@ block content
             | &#32;to select and format key fields from the response. The conventional TSV format remains available.
           p
             strong GRCh38 example (chr12:111803962)
-          pre.download-command
+          pre.document-block.-code
             code.
               $ tabix \
                 'https://grch38.togovar.org/downloads/release/current/grch38/annotation/json_tsv/chr12_molecular_annotation_json.tsv.gz' \
