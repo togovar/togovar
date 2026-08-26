@@ -525,6 +525,11 @@
           "page-size": 100,
           "columns": [
             {
+              "id": "report",
+              "label": "Report",
+              "escape": false
+            },
+            {
               "id": "id",
               "label": "TogoVar ID",
               "escape": false
@@ -546,12 +551,7 @@
             },
             {
               "id": "type",
-              "label": "Type",
-              "escape": false
-            },
-            {
-              "id": "symbols",
-              "label": "Gene",
+              "label": "Variant type",
               "escape": false
             },
             {
