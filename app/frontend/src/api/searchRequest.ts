@@ -11,6 +11,15 @@ import type { ConditionQuery } from '../types/query';
 
 export const SEARCH_RESULT_LIMIT = 100;
 
+const VARIANT_TYPE_API_TERM_BY_UI_TERM: Readonly<Record<string, string>> = {
+  snv: 'SNV',
+  ins: 'INS',
+  del: 'DEL',
+  indel: 'INDEL',
+  mnv: 'MNV',
+  sub: 'SUB',
+};
+
 /**
  * 検索モードごとのAPI仕様差をここへ閉じ込め、searchExecutor.tsを実行管理に集中させる。
  */
@@ -150,10 +159,61 @@ function buildAdvancedSearchRequestBody(
   };
 
   if (advancedSearchConditions) {
-    body.query = stripAdvancedSearchMetadata(
-      advancedSearchConditions
+    body.query = normalizeAdvancedSearchQueryForAPI(
+      stripAdvancedSearchMetadata(advancedSearchConditions)
     ) as Record<string, unknown>;
   }
 
   return body;
+}
+
+/**
+ * UIとURLでは小文字のtype値を維持し、API送信時だけOpenAPIのenumに合わせる。
+ */
+function normalizeAdvancedSearchQueryForAPI(query: unknown): unknown {
+  if (Array.isArray(query)) {
+    return query.map((item) => normalizeAdvancedSearchQueryForAPI(item));
+  }
+
+  if (!isPlainObject(query)) return query;
+
+  const next: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(query)) {
+    next[key] =
+      key === 'type'
+        ? normalizeVariantTypeQuery(value)
+        : normalizeAdvancedSearchQueryForAPI(value);
+  }
+
+  return next;
+}
+
+/**
+ * Variant typeだけはUI定義値とAPI enumの表記が異なるため、termsを送信形式へ寄せる。
+ */
+function normalizeVariantTypeQuery(value: unknown): unknown {
+  if (!isPlainObject(value)) return value;
+
+  const next: Record<string, unknown> = {};
+  for (const [key, child] of Object.entries(value)) {
+    if (key === 'terms' && Array.isArray(child)) {
+      next[key] = child.map((term) => normalizeVariantTypeTerm(term));
+    } else {
+      next[key] = normalizeAdvancedSearchQueryForAPI(child);
+    }
+  }
+
+  return next;
+}
+
+/**
+ * 既存URLに含まれる小文字type値も検索APIで受け付けられるように変換する。
+ */
+function normalizeVariantTypeTerm(term: unknown): unknown {
+  if (typeof term !== 'string') return term;
+  return VARIANT_TYPE_API_TERM_BY_UI_TERM[term] ?? term;
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
