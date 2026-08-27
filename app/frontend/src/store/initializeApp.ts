@@ -1,5 +1,9 @@
 import { storeManager } from './StoreManager';
-import { decodeConditionFromURL } from './advancedSearchURL';
+import {
+  ADVANCED_SEARCH_URL_RESTORE_WARNING,
+  decodeConditionFromURLParamsWithStatus,
+  type AdvancedSearchURLDecodeResult,
+} from './advancedSearchURL';
 import { initSearchHandlers } from './searchManager';
 
 /**
@@ -7,7 +11,7 @@ import { initSearchHandlers } from './searchManager';
  * searchModeはここでセットしない。条件がストアに揃った後で呼び出し元がセットし、
  * Store内部リセット後にsearchManager側の副作用ハンドラが検索を開始する。
  */
-export function initializeApp(): 'simple' | 'advanced' {
+export async function initializeApp(): Promise<'simple' | 'advanced'> {
   // searchMode subscriber と popstate リスナーを登録する。
   // storeManager.setSearchModeFromHistory() が呼ばれる前に必ず実行する必要がある。
   initSearchHandlers();
@@ -15,16 +19,35 @@ export function initializeApp(): 'simple' | 'advanced' {
   const urlMode = searchParams.get('mode');
 
   if (urlMode === 'advanced') {
-    const encodedCondition = searchParams.get('q');
-    if (encodedCondition) {
-      const condition = decodeConditionFromURL(encodedCondition);
-      if (condition !== null) {
-        storeManager.setData('advancedSearchConditions', condition);
-        storeManager.setData('advancedSearchRestoredFromURL', true);
-      }
+    const result = await decodeConditionFromURLParamsWithStatus({
+      q: searchParams.get('q'),
+      qz: searchParams.get('qz'),
+    });
+    updateAdvancedSearchURLRestoreWarning(result);
+    const condition = result.condition;
+    if (condition !== null) {
+      storeManager.setData('advancedSearchConditions', condition);
+      storeManager.setData('advancedSearchRestoredFromURL', true);
     }
     return 'advanced';
   } else {
     return 'simple';
   }
+}
+
+/**
+ * qzだけの共有URLが復元できなかった場合、空条件で黙って検索されないよう警告を残す。
+ */
+export function updateAdvancedSearchURLRestoreWarning(
+  result: AdvancedSearchURLDecodeResult
+): void {
+  const shouldWarn =
+    result.hasCompressedParam &&
+    !result.hasLegacyParam &&
+    !result.restoredFromCompressed &&
+    !result.restoredFromLegacy;
+  storeManager.setData(
+    'advancedSearchURLRestoreWarning',
+    shouldWarn ? ADVANCED_SEARCH_URL_RESTORE_WARNING : undefined
+  );
 }

@@ -1,30 +1,38 @@
 import * as qs from 'qs';
 import type { ConditionQuery, MasterConditions, SimpleSearchCurrentConditions } from '../types';
-import { encodeConditionForURL } from './advancedSearchURL';
+import { encodeConditionForBestURL } from './advancedSearchURL';
 import { extractSearchCondition } from './simpleSearchConditions';
 
 type SearchUrlParams = Record<string, unknown>;
+type AdvancedSearchURLReflectionResult = {
+  isURLTooLong: boolean;
+  isStale: boolean;
+};
 
 let currentUrlParams: SearchUrlParams = qs.parse(
   window.location.search.substring(1)
 );
+let advancedUrlReflectionId = 0;
 
 // ## Advanced Search URL仕様
 //
 // ### URLフォーマット
 //   条件あり: ?mode=advanced&q=<Base64エンコードされたJSON>
+//   圧縮版: ?mode=advanced&qz=<deflate-raw圧縮後にBase64URLエンコードされたJSON>
 //   条件なし: ?mode=advanced
 //
 // ### エンコード方式
 //   条件オブジェクト → JSON.stringify() → btoa() (Base64) → encodeURIComponent() → `q` パラメータ
+//   長い条件では CompressionStream(deflate-raw) → Base64URL → `qz` パラメータ
 //
 // ### 文字数制限
-//   - Raw JSON (btoa前) が2000文字以内の場合のみ `q` パラメータをURLに付与する
-//   - 2000文字を超える場合はURLを `?mode=advanced` のみにし、条件はhistory.stateへ退避する
+//   - Raw JSON が2000文字以内の場合は従来の `q` を候補にする
+//   - CompressionStream対応環境ではRaw JSON 20000文字以内を `qz` の候補にする
+//   - どちらも使えない場合はURLを `?mode=advanced` のみにし、条件はhistory.stateへ退避する
 //
 // ### Simple Searchとの比較
 //   Simple Search: qs.stringify() でフラットなkey=valueをURLに展開
-//   Advanced Search: ネスト構造のためJSON+Base64を使用（URI encodeより~33%コンパクト）
+//   Advanced Search: ネスト構造のためJSON+Base64または圧縮JSON+Base64URLを使用
 
 /**
  * Simple Search条件のURL表現をここに閉じ込め、検索開始ロジックからpushStateを分離する。
@@ -59,19 +67,25 @@ export function reflectSimpleSearchConditionToURI(
 /**
  * Advanced Search条件のURL表現と履歴state退避をここに集約し、長すぎる条件だけ呼び出し元へ返す。
  */
-export function reflectAdvancedSearchConditionToURI(
+export async function reflectAdvancedSearchConditionToURI(
   conditions: ConditionQuery | undefined
-): { isURLTooLong: boolean } {
+): Promise<AdvancedSearchURLReflectionResult> {
+  const reflectionId = ++advancedUrlReflectionId;
   // conditions は setAdvancedSearchCondition で {} → undefined に正規化されるため、存在確認だけで十分。
   const hasConditions = conditions !== undefined;
-  const encoded = hasConditions ? encodeConditionForURL(conditions) : null;
+  const encoded = hasConditions
+    ? await encodeConditionForBestURL(conditions)
+    : null;
+  if (reflectionId !== advancedUrlReflectionId) {
+    return { isURLTooLong: false, isStale: true };
+  }
 
   let url: string;
   if (encoded !== null) {
-    url = `${window.location.origin}${
-      window.location.pathname
-    }?mode=advanced&q=${encodeURIComponent(encoded)}`;
-    currentUrlParams = { mode: 'advanced', q: encoded };
+    const params = new URLSearchParams({ mode: 'advanced' });
+    params.set(encoded.name, encoded.value);
+    url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+    currentUrlParams = { mode: 'advanced', [encoded.name]: encoded.value };
   } else {
     url = `${window.location.origin}${window.location.pathname}?mode=advanced`;
     currentUrlParams = { mode: 'advanced' };
@@ -85,7 +99,7 @@ export function reflectAdvancedSearchConditionToURI(
 
   pushAdvancedSearchUrl(state, url);
 
-  return { isURLTooLong };
+  return { isURLTooLong, isStale: false };
 }
 
 /**

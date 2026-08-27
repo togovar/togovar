@@ -98,7 +98,7 @@ function setUserAgent(): void {
  * サブスクライバが正しい条件で初回検索を発火できる順序を保証する。
  * StoreManagerの依存順（master → condition → mode）を一箇所で管理するため。
  */
-function readyInitialSearch(callback: () => void): void {
+async function readyInitialSearch(callback: () => void): Promise<void> {
   const simpleSearchConditionsMaster = loadSearchConditionsMaster();
   Object.freeze(simpleSearchConditionsMaster);
   storeManager.setData(
@@ -107,7 +107,7 @@ function readyInitialSearch(callback: () => void): void {
   );
 
   // URLパラメータからAdvanced条件をStoreへ反映し、searchModeを取得する。
-  const searchMode = initializeApp();
+  const searchMode = await initializeApp();
 
   // Simple Searchの初期条件のみURLから復元する。Advanced側はinitializeApp内で処理済み。
   const simpleSearchConditions =

@@ -119,7 +119,7 @@ function createSimpleSearchResetConditions(): Partial<SimpleSearchCurrentConditi
 /**
  * ブラウザの戻る/進むではURLを正本として復元し、自動遷移は必ず無効化する。
  */
-export function handleHistoryChange(e: PopStateEvent): void {
+export async function handleHistoryChange(e: PopStateEvent): Promise<void> {
   prepareHistoryNavigationSearch();
 
   const urlParams = parseSearchURLParams();
@@ -127,7 +127,7 @@ export function handleHistoryChange(e: PopStateEvent): void {
   const currentMode = storeManager.getData('searchMode');
 
   if (mode === 'advanced') {
-    restoreAdvancedSearchFromHistory(urlParams, e.state, currentMode);
+    await restoreAdvancedSearchFromHistory(urlParams, e.state, currentMode);
     return;
   }
 
@@ -149,17 +149,18 @@ function restoreAdvancedSearchFromHistory(
   urlParams: Record<string, unknown>,
   historyState: unknown,
   currentMode: SearchMode | ''
-): void {
-  const restoredCondition = getAdvancedConditionFromHistory(
+): Promise<void> {
+  return getAdvancedConditionFromHistory(
     urlParams,
     historyState
-  );
-  storeManager.setData(
-    'advancedSearchConditions',
-    restoredCondition ?? undefined
-  );
-  notifyAdvancedSearchBuilderRestored();
-  continueHistorySearchInMode('advanced', currentMode);
+  ).then((restoredCondition) => {
+    storeManager.setData(
+      'advancedSearchConditions',
+      restoredCondition ?? undefined
+    );
+    notifyAdvancedSearchBuilderRestored();
+    continueHistorySearchInMode('advanced', currentMode);
+  });
 }
 
 /**
@@ -218,8 +219,12 @@ export function setAdvancedSearchCondition(
  */
 function reflectCurrentAdvancedConditionToUrl(): void {
   const conditions = storeManager.getData('advancedSearchConditions');
-  const { isURLTooLong } = reflectAdvancedSearchConditionToURI(conditions);
-  storeManager.setData('advancedSearchURLTooLong', isURLTooLong);
+  void reflectAdvancedSearchConditionToURI(conditions).then(
+    ({ isURLTooLong, isStale }) => {
+      if (isStale) return;
+      storeManager.setData('advancedSearchURLTooLong', isURLTooLong);
+    }
+  );
 }
 
 /**
