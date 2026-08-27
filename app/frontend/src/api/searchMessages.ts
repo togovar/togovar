@@ -11,7 +11,10 @@ type SearchMessageResponse = {
  * APIレスポンス内のnotice/warning/errorだけをStoreへ反映し、検索結果処理と分離する。
  */
 export function applySearchMessages(jsonResponse: unknown): void {
-  storeManager.setData('searchMessages', normalizeSearchMessages(jsonResponse));
+  storeManager.setData(
+    'searchMessages',
+    mergeURLRestoreWarning(normalizeSearchMessages(jsonResponse))
+  );
 }
 
 /**
@@ -27,6 +30,19 @@ function normalizeSearchMessages(jsonResponse: unknown): SearchMessages {
   };
 
   return messages.notice || messages.warning || messages.error ? messages : {};
+}
+
+/**
+ * qz共有URLの復元失敗はAPIレスポンス由来ではないため、APIメッセージへ合成して表示を維持する。
+ */
+function mergeURLRestoreWarning(messages: SearchMessages): SearchMessages {
+  const warning = storeManager.getData('advancedSearchURLRestoreWarning');
+  if (!warning) return messages;
+
+  return {
+    ...messages,
+    warning: messages.warning ? `${warning}<br>${messages.warning}` : warning,
+  };
 }
 
 /**

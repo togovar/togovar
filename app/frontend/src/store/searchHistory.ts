@@ -4,7 +4,15 @@ import type {
   SimpleSearchCurrentConditions,
 } from '../types';
 import type { ConditionQuery } from '../types/query';
-import { decodeConditionFromURL } from './advancedSearchURL';
+import {
+  decodeConditionFromURLParamsWithStatus,
+  shouldWarnAdvancedSearchURLRestoreFailure,
+} from './advancedSearchURL';
+
+export type AdvancedSearchHistoryRestoreResult = {
+  condition: ConditionQuery | null;
+  shouldWarn: boolean;
+};
 
 /**
  * popstate時のURL/state解釈をここへ閉じ込め、searchManager.tsを検索開始判断に集中させる。
@@ -12,14 +20,15 @@ import { decodeConditionFromURL } from './advancedSearchURL';
 export function getAdvancedConditionFromHistory(
   urlParams: Record<string, unknown>,
   state: unknown
-): ConditionQuery | null {
-  const qParam = urlParams.q;
-  const first = Array.isArray(qParam) ? qParam[0] : qParam;
-  const encoded = typeof first === 'string' ? first : undefined;
-
-  return encoded
-    ? decodeConditionFromURL(encoded)
-    : getConditionFromHistoryState(state);
+): Promise<AdvancedSearchHistoryRestoreResult> {
+  return decodeConditionFromURLParamsWithStatus(urlParams).then((result) => {
+    const condition = result.condition ?? getConditionFromHistoryState(state);
+    const shouldWarn = shouldWarnAdvancedSearchURLRestoreFailure(
+      result,
+      condition
+    );
+    return { condition, shouldWarn };
+  });
 }
 
 /**
