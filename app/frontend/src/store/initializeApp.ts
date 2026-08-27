@@ -2,6 +2,7 @@ import { storeManager } from './StoreManager';
 import {
   ADVANCED_SEARCH_URL_RESTORE_WARNING,
   decodeConditionFromURLParamsWithStatus,
+  shouldWarnAdvancedSearchURLRestoreFailure,
   type AdvancedSearchURLDecodeResult,
 } from './advancedSearchURL';
 import { initSearchHandlers } from './searchManager';
@@ -41,11 +42,10 @@ export async function initializeApp(): Promise<'simple' | 'advanced'> {
 export function updateAdvancedSearchURLRestoreWarning(
   result: AdvancedSearchURLDecodeResult
 ): void {
-  const shouldWarn =
-    result.hasCompressedParam &&
-    !result.hasLegacyParam &&
-    !result.restoredFromCompressed &&
-    !result.restoredFromLegacy;
+  const shouldWarn = shouldWarnAdvancedSearchURLRestoreFailure(
+    result,
+    result.condition
+  );
   storeManager.setData(
     'advancedSearchURLRestoreWarning',
     shouldWarn ? ADVANCED_SEARCH_URL_RESTORE_WARNING : undefined

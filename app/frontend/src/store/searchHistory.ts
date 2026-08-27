@@ -4,11 +4,15 @@ import type {
   SimpleSearchCurrentConditions,
 } from '../types';
 import type { ConditionQuery } from '../types/query';
-import { storeManager } from './StoreManager';
 import {
-  ADVANCED_SEARCH_URL_RESTORE_WARNING,
   decodeConditionFromURLParamsWithStatus,
+  shouldWarnAdvancedSearchURLRestoreFailure,
 } from './advancedSearchURL';
+
+export type AdvancedSearchHistoryRestoreResult = {
+  condition: ConditionQuery | null;
+  shouldWarn: boolean;
+};
 
 /**
  * popstate時のURL/state解釈をここへ閉じ込め、searchManager.tsを検索開始判断に集中させる。
@@ -16,19 +20,14 @@ import {
 export function getAdvancedConditionFromHistory(
   urlParams: Record<string, unknown>,
   state: unknown
-): Promise<ConditionQuery | null> {
+): Promise<AdvancedSearchHistoryRestoreResult> {
   return decodeConditionFromURLParamsWithStatus(urlParams).then((result) => {
     const condition = result.condition ?? getConditionFromHistoryState(state);
-    const shouldWarn =
-      result.hasCompressedParam &&
-      !result.hasLegacyParam &&
-      result.condition === null &&
-      condition === null;
-    storeManager.setData(
-      'advancedSearchURLRestoreWarning',
-      shouldWarn ? ADVANCED_SEARCH_URL_RESTORE_WARNING : undefined
+    const shouldWarn = shouldWarnAdvancedSearchURLRestoreFailure(
+      result,
+      condition
     );
-    return condition;
+    return { condition, shouldWarn };
   });
 }
 

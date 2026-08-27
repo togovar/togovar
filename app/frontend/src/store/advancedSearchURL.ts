@@ -145,6 +145,21 @@ export async function decodeConditionFromURLParamsWithStatus(params: {
 }
 
 /**
+ * qzを含む共有URLがどの経路でも復元できなかった場合だけ、ユーザーへ警告する。
+ */
+export function shouldWarnAdvancedSearchURLRestoreFailure(
+  result: AdvancedSearchURLDecodeResult,
+  restoredCondition: ConditionQuery | null
+): boolean {
+  return (
+    result.hasCompressedParam &&
+    !result.restoredFromCompressed &&
+    !result.restoredFromLegacy &&
+    restoredCondition === null
+  );
+}
+
+/**
  * qzは圧縮済みバイト列のBase64URL表現なので、Base64URL復元後に展開してJSONとして読む。
  */
 async function decodeCompressedConditionFromURL(
