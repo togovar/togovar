@@ -5,6 +5,8 @@ export const ADVANCED_SEARCH_URL_MAX_JSON_LENGTH = 2000;
 export const ADVANCED_SEARCH_URL_RESTORE_WARNING =
   'Could not restore the shared Advanced Search URL. Your browser may not support compressed URL parameters.';
 const ADVANCED_SEARCH_COMPRESSED_URL_MAX_JSON_LENGTH = 20000;
+const ADVANCED_SEARCH_DECOMPRESSED_BYTE_MAX_LENGTH =
+  ADVANCED_SEARCH_COMPRESSED_URL_MAX_JSON_LENGTH * 4;
 const ADVANCED_SEARCH_COMPRESSED_PARAM_MAX_LENGTH = 20000;
 const ADVANCED_SEARCH_COMPRESSION_FORMAT = 'deflate-raw';
 
@@ -179,7 +181,10 @@ async function decodeCompressedConditionFromURL(
       .pipeThrough(
         new DecompressionStream(ADVANCED_SEARCH_COMPRESSION_FORMAT)
       );
-    const bytes = new Uint8Array(await new Response(stream).arrayBuffer());
+    const bytes = await readLimitedStream(
+      stream,
+      ADVANCED_SEARCH_DECOMPRESSED_BYTE_MAX_LENGTH
+    );
     const json = new TextDecoder().decode(bytes);
     if (json.length > ADVANCED_SEARCH_COMPRESSED_URL_MAX_JSON_LENGTH) {
       return null;
@@ -268,6 +273,54 @@ function base64URLToBytes(value: string): Uint8Array {
   const binary = atob(base64);
 
   return Uint8Array.from(binary, (char) => char.charCodeAt(0));
+}
+
+/**
+ * 展開後サイズを読み取り中に制限し、巨大な圧縮入力でタブのメモリを使い切らないようにする。
+ */
+async function readLimitedStream(
+  stream: ReadableStream<Uint8Array>,
+  maxBytes: number
+): Promise<Uint8Array> {
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalLength = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      totalLength += value.byteLength;
+      if (totalLength > maxBytes) {
+        await reader.cancel('Decompressed Advanced Search URL is too large.');
+        throw new Error('Decompressed Advanced Search URL is too large.');
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  return concatenateUint8Arrays(chunks, totalLength);
+}
+
+/**
+ * ReadableStreamのchunk配列を一つのUint8Arrayへまとめ、TextDecoderへ渡せる形にする。
+ */
+function concatenateUint8Arrays(
+  chunks: Uint8Array[],
+  totalLength: number
+): Uint8Array {
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+
+  for (const chunk of chunks) {
+    result.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  return result;
 }
 
 /**

@@ -17,10 +17,10 @@
   background: var(--gradient-heading-semitransparent);
 
   .title-wrapper {
-    flex: 0 0 auto;
     display: inline-block;
-    padding-right: 20px;
+    flex: 0 0 auto;
     min-width: 0;
+    padding-right: 20px;
     vertical-align: bottom;
 
     &:first-child {

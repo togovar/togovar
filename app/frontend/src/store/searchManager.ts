@@ -142,7 +142,6 @@ export async function handleHistoryChange(e: PopStateEvent): Promise<void> {
     return;
   }
 
-  if (!isCurrentHistoryRestore(restoreId)) return;
   restoreSimpleSearchFromHistory(urlParams, currentMode);
 }
 
