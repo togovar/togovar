@@ -8,6 +8,7 @@ const ADVANCED_SEARCH_COMPRESSED_URL_MAX_JSON_LENGTH = 20000;
 const ADVANCED_SEARCH_DECOMPRESSED_BYTE_MAX_LENGTH =
   ADVANCED_SEARCH_COMPRESSED_URL_MAX_JSON_LENGTH * 4;
 const ADVANCED_SEARCH_COMPRESSED_PARAM_MAX_LENGTH = 20000;
+const ADVANCED_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH = 600;
 const ADVANCED_SEARCH_COMPRESSION_FORMAT = 'deflate-raw';
 
 type AdvancedSearchURLParam = {
@@ -46,6 +47,13 @@ export async function encodeConditionForBestURL(
   query: unknown
 ): Promise<AdvancedSearchURLParam | null> {
   const legacy = encodeConditionForURL(query);
+  if (
+    legacy !== null &&
+    legacy.length <= ADVANCED_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH
+  ) {
+    return { name: 'q', value: legacy };
+  }
+
   const compressed = await encodeConditionForCompressedURL(query);
 
   if (legacy === null && compressed === null) return null;

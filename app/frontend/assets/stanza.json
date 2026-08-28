@@ -197,7 +197,10 @@
       {
         "id": "variant-transcript",
         "targetSelector": "#variant-transcript",
-        "references": ["GRCh37", "GRCh38"]
+        "references": ["GRCh37", "GRCh38"],
+        "options": {
+          "assembly": "$TOGOVAR_FRONTEND_REFERENCE"
+        }
       },
       {
         "id": "variant-publication",
