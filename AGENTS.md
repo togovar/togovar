@@ -122,7 +122,7 @@ app/frontend/
   - `components/Condition/ConditionValues.ts` と `components/Condition/ConditionValueEditor/*`: 条件入力UI
 - 条件の検索クエリ化は `components/Condition/queryBuilders/` に集約する。
 - Advanced Search のURL共有は、従来形式 `?mode=advanced&q=<Base64 JSON>` と圧縮形式 `?mode=advanced&qz=<deflate-raw + Base64URL JSON>` を扱う。
-- encode/decode処理は `app/frontend/src/store/advancedSearchURL.ts` に集約する。URL生成時は `encodeConditionForBestURL()` を使い、短い条件では `q`、圧縮した方が短い条件では `qz` を選ぶ。
+- encode/decode処理は `app/frontend/src/store/advancedSearchURL.ts` に集約する。URL生成時は `encodeConditionForBestURL()` を使い、短い条件では圧縮を試さず `q`、長い条件では圧縮結果を比較して短い方を選ぶ。
 - `q` は既存URL互換のため残す。復元時は `qz` を優先し、読めない場合は `q` へフォールバックする。
 - `qz` はブラウザ標準の `CompressionStream` / `DecompressionStream` を使う。追加ライブラリは使わない。非対応環境でURLを生成する場合は従来の `q` 形式へフォールバックする。
 - Advanced Search のURL処理は非同期になっているため、初期復元や `popstate` 復元ではデコード完了後に検索を開始する。
