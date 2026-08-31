@@ -11,8 +11,6 @@ import {
 
 /** Advanced Search条件のURLエンコード上限（Raw JSON文字数） */
 const ADVANCED_SEARCH_URL_MAX_JSON_LENGTH = 2000;
-export const ADVANCED_SEARCH_URL_RESTORE_WARNING =
-  'Could not restore the shared Advanced Search URL. Your browser may not support compressed URL parameters.';
 const ADVANCED_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH = 400;
 
 export type AdvancedSearchURLDecodeResult = {

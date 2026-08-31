@@ -14,8 +14,6 @@ import {
   type SearchURLParam,
 } from './searchURLCodec';
 
-export const SIMPLE_SEARCH_URL_RESTORE_WARNING =
-  'Could not restore the shared Simple Search URL. The URL may be corrupted, or your browser may not support compressed URL parameters.'
 const SIMPLE_SEARCH_URL_MAX_JSON_LENGTH = 2000;
 const SIMPLE_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH = 400;
 

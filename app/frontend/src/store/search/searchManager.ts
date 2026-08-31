@@ -12,7 +12,6 @@ import type {
   SearchMode,
 } from '../../types';
 import type { ConditionQuery } from '../../types/query';
-import { ADVANCED_SEARCH_URL_RESTORE_WARNING } from './advancedSearchURL';
 import {
   buildSimpleConditionsFromURL,
   getAdvancedConditionFromHistory,
@@ -23,7 +22,7 @@ import {
   reflectAdvancedSearchConditionToURI,
   reflectSimpleSearchConditionToURI,
 } from './searchURL';
-import { SIMPLE_SEARCH_URL_RESTORE_WARNING } from './simpleSearchURL';
+import { SEARCH_URL_RESTORE_WARNING } from './searchURLCodec';
 
 let historyRestoreId = 0;
 
@@ -172,9 +171,7 @@ function restoreAdvancedSearchFromHistory(
     (restoreResult) => {
       if (!isCurrentHistoryRestore(restoreId)) return;
       setSearchURLRestoreWarning(
-        restoreResult.shouldWarn
-          ? ADVANCED_SEARCH_URL_RESTORE_WARNING
-          : undefined
+        restoreResult.shouldWarn ? SEARCH_URL_RESTORE_WARNING : undefined
       );
       storeManager.setData('searchURLTooLong', restoreResult.isURLTooLong);
       storeManager.setData(
@@ -204,9 +201,7 @@ async function restoreSimpleSearchFromHistory(
   );
   if (!isCurrentHistoryRestore(restoreId)) return;
   setSearchURLRestoreWarning(
-    restoreResult.shouldWarn
-      ? SIMPLE_SEARCH_URL_RESTORE_WARNING
-      : undefined
+    restoreResult.shouldWarn ? SEARCH_URL_RESTORE_WARNING : undefined
   );
   storeManager.setData('searchURLTooLong', restoreResult.isURLTooLong);
   storeManager.setData('simpleSearchConditions', restoreResult.conditions);

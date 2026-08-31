@@ -1,12 +1,14 @@
 import { storeManager } from '../StoreManager';
 import {
-  ADVANCED_SEARCH_URL_RESTORE_WARNING,
   decodeConditionFromURLParamsWithStatus,
   shouldWarnAdvancedSearchURLRestoreFailure,
   type AdvancedSearchURLDecodeResult,
 } from './advancedSearchURL';
 import { initSearchHandlers } from './searchManager';
-import { getObjectFromHistoryState } from './searchURLCodec';
+import {
+  getObjectFromHistoryState,
+  SEARCH_URL_RESTORE_WARNING,
+} from './searchURLCodec';
 import type { ConditionQuery } from '../../types/query';
 
 /**
@@ -60,6 +62,6 @@ export function updateAdvancedSearchURLRestoreWarning(
     restoredCondition === null;
   storeManager.setData(
     'searchURLRestoreWarning',
-    shouldWarn ? ADVANCED_SEARCH_URL_RESTORE_WARNING : undefined
+    shouldWarn ? SEARCH_URL_RESTORE_WARNING : undefined
   );
 }

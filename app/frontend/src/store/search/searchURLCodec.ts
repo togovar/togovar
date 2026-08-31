@@ -13,6 +13,13 @@ export type SearchURLParam = {
 };
 
 /**
+ * Simple/Advancedとも復元失敗の原因は「URL破損」と「圧縮非対応」のどちらもあり得るため、
+ * 一方だけに原因を限定しない共通文言にする。
+ */
+export const SEARCH_URL_RESTORE_WARNING =
+  'Could not restore the shared search URL. The URL may be corrupted, or your browser may not support compressed URL parameters.';
+
+/**
  * qzの生成手順を共通化し、Simple/Advanced Searchで圧縮方式がずれないようにする。
  */
 export async function encodeJSONToCompressedURL(
