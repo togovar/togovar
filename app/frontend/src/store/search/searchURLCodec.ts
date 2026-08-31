@@ -77,6 +77,20 @@ export function isPlainObject(value: unknown): value is Record<string, unknown> 
 }
 
 /**
+ * URL長制限で退避したhistory.stateから条件を安全に取り出す。
+ * 空オブジェクトは「条件なし」センチネルと整合させるためnullを返す。
+ */
+export function getObjectFromHistoryState<T>(
+  state: unknown,
+  key: string
+): T | null {
+  if (!isPlainObject(state)) return null;
+  const value = state[key];
+  if (!isPlainObject(value) || Object.keys(value).length === 0) return null;
+  return value as T;
+}
+
+/**
  * btoaは文字列をLatin-1として扱うため、UTF-8バイト列を小分けにして安全に渡す。
  */
 export function bytesToBase64(bytes: Uint8Array): string {

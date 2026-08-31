@@ -18,6 +18,7 @@ const ADVANCED_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH = 400;
 export type AdvancedSearchURLDecodeResult = {
   condition: ConditionQuery | null;
   hasCompressedParam: boolean;
+  hasLegacyParam: boolean;
   restoredFromCompressed: boolean;
   restoredFromLegacy: boolean;
 };
@@ -114,36 +115,39 @@ export async function decodeConditionFromURLParamsWithStatus(params: {
   qz?: unknown;
 }): Promise<AdvancedSearchURLDecodeResult> {
   const compressed = getFirstString(params.qz);
+  const legacy = getFirstString(params.q);
+
   if (compressed) {
     const condition = await decodeCompressedConditionFromURL(compressed);
     if (condition !== null) {
       return {
         condition,
         hasCompressedParam: true,
+        hasLegacyParam: legacy !== undefined,
         restoredFromCompressed: true,
         restoredFromLegacy: false,
       };
     }
   }
 
-  const legacy = getFirstString(params.q);
   const legacyCondition = legacy ? decodeConditionFromURL(legacy) : null;
   return {
     condition: legacyCondition,
     hasCompressedParam: compressed !== undefined,
+    hasLegacyParam: legacy !== undefined,
     restoredFromCompressed: false,
     restoredFromLegacy: legacyCondition !== null,
   };
 }
 
 /**
- * qzを含む共有URLがどの経路でも復元できなかった場合だけ、ユーザーへ警告する。
+ * q/qzいずれかを含む共有URLがどの経路でも復元できなかった場合だけ、ユーザーへ警告する。
  */
 export function shouldWarnAdvancedSearchURLRestoreFailure(
   result: AdvancedSearchURLDecodeResult
 ): boolean {
   return (
-    result.hasCompressedParam &&
+    (result.hasCompressedParam || result.hasLegacyParam) &&
     !result.restoredFromCompressed &&
     !result.restoredFromLegacy
   );

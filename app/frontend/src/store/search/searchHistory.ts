@@ -8,6 +8,7 @@ import {
   decodeConditionFromURLParamsWithStatus,
   shouldWarnAdvancedSearchURLRestoreFailure,
 } from './advancedSearchURL';
+import { getObjectFromHistoryState } from './searchURLCodec';
 import {
   createDefaultSimpleConditions,
   decodeSimpleConditionFromURLParamsWithStatus,
@@ -17,31 +18,48 @@ import {
 export type AdvancedSearchHistoryRestoreResult = {
   condition: ConditionQuery | null;
   shouldWarn: boolean;
+  /** URLではなくhistory.stateから復元できた場合はtrue。共有URLは依然として条件を表せていない。 */
+  isURLTooLong: boolean;
 };
 
 export type SimpleSearchHistoryRestoreResult = {
   conditions: SimpleSearchCurrentConditions;
   shouldWarn: boolean;
+  isURLTooLong: boolean;
 };
 
 /**
- * popstate時のURL解釈をここへ閉じ込め、searchManager.tsを検索開始判断に集中させる。
+ * popstate時のURL/state解釈をここへ閉じ込め、searchManager.tsを検索開始判断に集中させる。
+ * URLへ載せられなかった条件はhistory.stateへ退避しているため、URLで復元できない場合はそちらも読む。
  */
 export function getAdvancedConditionFromHistory(
-  urlParams: Record<string, unknown>
+  urlParams: Record<string, unknown>,
+  historyState: unknown
 ): Promise<AdvancedSearchHistoryRestoreResult> {
   return decodeConditionFromURLParamsWithStatus(urlParams).then((result) => {
-    const shouldWarn = shouldWarnAdvancedSearchURLRestoreFailure(result);
-    return { condition: result.condition, shouldWarn };
+    const stashedCondition = getObjectFromHistoryState<ConditionQuery>(
+      historyState,
+      'advancedSearchConditions'
+    );
+    const condition = result.condition ?? stashedCondition;
+    const shouldWarn =
+      shouldWarnAdvancedSearchURLRestoreFailure(result) && condition === null;
+    return {
+      condition,
+      shouldWarn,
+      isURLTooLong: result.condition === null && stashedCondition !== null,
+    };
   });
 }
 
 /**
  * URLパラメータからSimple Search条件を復元し、URLにない条件はマスターのデフォルトへ戻す。
+ * URLへ載せられなかった条件はhistory.stateへ退避しているため、URLで復元できない場合はそちらも読む。
  */
 export async function buildSimpleConditionsFromURL(
   urlParams: Record<string, unknown>,
-  master: MasterConditions[]
+  master: MasterConditions[],
+  historyState?: unknown
 ): Promise<SimpleSearchHistoryRestoreResult> {
   const result = await decodeSimpleConditionFromURLParamsWithStatus(
     urlParams,
@@ -54,6 +72,23 @@ export async function buildSimpleConditionsFromURL(
         ...result.condition,
       } as SimpleSearchCurrentConditions,
       shouldWarn: false,
+      isURLTooLong: false,
+    };
+  }
+
+  const stashedConditions =
+    getObjectFromHistoryState<SimpleSearchCurrentConditions>(
+      historyState,
+      'simpleSearchConditions'
+    );
+  if (stashedConditions !== null) {
+    return {
+      conditions: {
+        ...createDefaultSimpleConditions(master),
+        ...stashedConditions,
+      } as SimpleSearchCurrentConditions,
+      shouldWarn: false,
+      isURLTooLong: true,
     };
   }
 
@@ -74,6 +109,7 @@ export async function buildSimpleConditionsFromURL(
       result,
       hasLegacyFlatSearchParams(urlParams, conditionIds)
     ),
+    isURLTooLong: false,
   };
 }
 

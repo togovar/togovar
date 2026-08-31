@@ -129,7 +129,7 @@ function createSimpleSearchResetConditions(): Partial<SimpleSearchCurrentConditi
 /**
  * ブラウザの戻る/進むではURLを正本として復元し、自動遷移は必ず無効化する。
  */
-export async function handleHistoryChange(_e: PopStateEvent): Promise<void> {
+export async function handleHistoryChange(e: PopStateEvent): Promise<void> {
   prepareHistoryNavigationSearch();
   const restoreId = invalidatePendingHistoryRestore();
   invalidatePendingSearchURLReflection();
@@ -139,11 +139,16 @@ export async function handleHistoryChange(_e: PopStateEvent): Promise<void> {
   const currentMode = storeManager.getData('searchMode');
 
   if (mode === 'advanced') {
-    await restoreAdvancedSearchFromHistory(urlParams, currentMode, restoreId);
+    await restoreAdvancedSearchFromHistory(
+      urlParams,
+      e.state,
+      currentMode,
+      restoreId
+    );
     return;
   }
 
-  await restoreSimpleSearchFromHistory(urlParams, currentMode, restoreId);
+  await restoreSimpleSearchFromHistory(urlParams, e.state, currentMode, restoreId);
 }
 
 /**
@@ -155,40 +160,47 @@ function normalizeModeParam(rawMode: unknown): string | undefined {
 }
 
 /**
- * Advanced Searchの履歴復元用の専用手順。Simple Search側と処理内容を揃えている。
+ * Advanced Searchの履歴復元ではURL長制限時のhistory.state退避も読む必要があるため、専用手順に分ける。
  */
 function restoreAdvancedSearchFromHistory(
   urlParams: Record<string, unknown>,
+  historyState: unknown,
   currentMode: SearchMode | '',
   restoreId: number
 ): Promise<void> {
-  return getAdvancedConditionFromHistory(urlParams).then((restoreResult) => {
-    if (!isCurrentHistoryRestore(restoreId)) return;
-    setSearchURLRestoreWarning(
-      restoreResult.shouldWarn ? ADVANCED_SEARCH_URL_RESTORE_WARNING : undefined
-    );
-    // 履歴から復元した条件は必ずURL（またはその不在）に由来するため、too-long状態は残らない。
-    storeManager.setData('searchURLTooLong', false);
-    storeManager.setData(
-      'advancedSearchConditions',
-      restoreResult.condition ?? undefined
-    );
-    notifyAdvancedSearchBuilderRestored();
-    continueHistorySearchInMode('advanced', currentMode);
-  });
+  return getAdvancedConditionFromHistory(urlParams, historyState).then(
+    (restoreResult) => {
+      if (!isCurrentHistoryRestore(restoreId)) return;
+      setSearchURLRestoreWarning(
+        restoreResult.shouldWarn
+          ? ADVANCED_SEARCH_URL_RESTORE_WARNING
+          : undefined
+      );
+      storeManager.setData('searchURLTooLong', restoreResult.isURLTooLong);
+      storeManager.setData(
+        'advancedSearchConditions',
+        restoreResult.condition ?? undefined
+      );
+      notifyAdvancedSearchBuilderRestored();
+      continueHistorySearchInMode('advanced', currentMode);
+    }
+  );
 }
 
 /**
  * Simple Searchの履歴復元ではURLにない条件をデフォルトへ戻し、前の絞り込み残りを防ぐ。
+ * URL長制限時のhistory.state退避も、Advanced Search同様にここで読む。
  */
 async function restoreSimpleSearchFromHistory(
   urlParams: Record<string, unknown>,
+  historyState: unknown,
   currentMode: SearchMode | '',
   restoreId: number
 ): Promise<void> {
   const restoreResult = await buildSimpleConditionsFromURL(
     urlParams,
-    storeManager.getData('simpleSearchConditionsMaster') ?? []
+    storeManager.getData('simpleSearchConditionsMaster') ?? [],
+    historyState
   );
   if (!isCurrentHistoryRestore(restoreId)) return;
   setSearchURLRestoreWarning(
@@ -196,8 +208,7 @@ async function restoreSimpleSearchFromHistory(
       ? SIMPLE_SEARCH_URL_RESTORE_WARNING
       : undefined
   );
-  // 履歴から復元した条件は必ずURL（またはその不在）に由来するため、too-long状態は残らない。
-  storeManager.setData('searchURLTooLong', false);
+  storeManager.setData('searchURLTooLong', restoreResult.isURLTooLong);
   storeManager.setData('simpleSearchConditions', restoreResult.conditions);
   continueHistorySearchInMode('simple', currentMode);
 }

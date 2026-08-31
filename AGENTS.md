@@ -129,7 +129,7 @@ app/frontend/
 - `q` / `qz` は共有URL専用の表現であり、Advanced Search のAPIリクエストは引き続きPOST bodyで送る。
 - Simple Search のURL共有は `?mode=simple&q=<Base64 JSON>` と `?mode=simple&qz=<deflate-raw + Base64URL JSON>` を使う。新規発行URLは400文字を超える場合に圧縮版も比較し、短い方を選ぶ。復元時は互換性維持のため従来のフラットなURLクエリも受け付ける。
 - Simple Search の `q` / `qz` encode/decode処理は `app/frontend/src/store/search/simpleSearchURL.ts` に置く。URLに載せる値はマスター定義との差分だけにし、APIリクエストは引き続きGETクエリとして送る。
-- Simple/Advancedとも、`q` / `qz` どちらにも収まらない場合はURLへ条件を載せず `?mode=xxx` のみにする。history.stateへの退避は行わない（検索自体はStoreの条件で継続実行される）。この場合 `searchManager.ts` が共通の `searchURLTooLong` フラグをStoreへセットし、`api/searchMessages.ts` の `mergeSearchURLTooLongWarning()` が `searchURLRestoreWarning` と同じ経路（`searchMessages.warning` → 検索結果画面のメッセージ表示）で警告を合成する。
+- Simple/Advancedとも、`q` / `qz` どちらにも収まらない場合はURLへ条件を載せず `?mode=xxx` のみにし、条件は `history.pushState`/`replaceState` の第1引数（`history.state`）へ退避する。共有URL自体には載らないが、同一ブラウザでの戻る/進む・リロードでは `window.history.state` から条件を復元できる。この場合 `searchManager.ts` が共通の `searchURLTooLong` フラグをStoreへセットし、`api/searchMessages.ts` の `mergeSearchURLTooLongWarning()` が `searchURLRestoreWarning` と同じ経路（`searchMessages.warning` → 検索結果画面のメッセージ表示）で警告を合成する。history.stateへの退避と読み取りは `store/search/searchURL.ts`（退避）・`store/search/searchHistory.ts`（復元）・`store/search/searchURLCodec.ts` の `getObjectFromHistoryState()` に集約する。
 - URLから復元した条件をViewへ戻す処理は `components/AdvancedSearch/AdvancedSearchConditionRestorer.ts` を確認する。
 - Base64はURL中で壊れやすいため、生成時は `encodeURIComponent` を通す。
 - `setAdvancedSearchCondition()` は検索条件をStoreへ保存し、URLへ反映し、検索を実行する。呼び出しタイミングを増やす場合は二重検索に注意する。
@@ -151,7 +151,7 @@ app/frontend/
 - API移行中に `external_link` と `external_links` が混在する可能性がある。表示側では新仕様の `external_links` を優先し、必要な範囲で旧 `external_link` へフォールバックする。
 - GRCh38のSimple Search dataset/filter/frequency表示は `app/frontend/assets/GRCh38/search_conditions.json` の dataset items を正として扱う。APIレスポンスの `frequencies[].source` が増えた場合は、このマスターへの追加要否を確認する。
 - StoreはAPIを直接呼ばない。仮想スクロールで未取得ページが必要な場合も、コンポーネントから `searchManager.requestNextPage()` を呼び、fetch の起動は `searchManager` / `api/searchExecutor.ts` 側へ集約する。
-- 検索条件のブラウザURL反映（`history.pushState`、Simple/Advanced SearchのURL表現）は `store/search/searchURL.ts` に置き、`searchManager.ts` は検索開始タイミングとStore更新に集中させる。
+- 検索条件のブラウザURL反映（`history.pushState`、Simple/Advanced SearchのURL表現、URL長制限時のstate退避）は `store/search/searchURL.ts` に置き、`searchManager.ts` は検索開始タイミングとStore更新に集中させる。
 - popstate時のURL/stateからの検索条件復元は `store/search/searchHistory.ts` に置く。
 - Simple Search条件のdefault差分抽出は `store/search/simpleSearchConditions.ts` に置く。`api/searchExecutor.ts` から `searchManager.ts` を import すると循環依存になるため避ける。
 - 検索結果配列のマージ・新規検索時の結果Store初期値・表示indexからのレコード取得・選択行レコード取得は `store/search/searchResultsState.ts` に置き、`StoreManager.ts` はStore公開APIとpublish順序の管理に集中させる。

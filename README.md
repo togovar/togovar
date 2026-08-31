@@ -230,7 +230,7 @@ Advanced Search の条件は URL に保存できます。長い条件では圧�
 4. ページ読み込み時に `qz` または `q` をデコードして Store へ復元する
 5. `AdvancedSearchConditionRestorer` が Store の条件を UI へ戻す
 
-URLに載せられないほど条件が長い場合、検索自体は実行しますが URL には `?mode=advanced` のみを反映します。
+URLに載せられないほど条件が長い場合、検索自体は実行しますが URL には `?mode=advanced` のみを反映し、条件は `history.state`（ブラウザの戻る/進む用の内部状態）へ退避します。共有URL自体には載りませんが、同一ブラウザでの戻る/進む・リロードでは条件を復元できます。
 
 ## Simple Search
 
@@ -243,7 +243,7 @@ Simple Search の共有URLは、検索条件を `q` または `qz` パラメー�
 
 新規に発行するURLは、短い条件では `q` 形式、400文字を超える条件では圧縮版 `qz` と比較して短い方を使います。互換性維持のため、従来のフラットなURLクエリも読み込み時には復元できます。
 
-URLに載せられないほど条件が長い場合、検索自体は実行しますが URL には `?mode=simple` のみを反映します。
+URLに載せられないほど条件が長い場合、検索自体は実行しますが URL には `?mode=simple` のみを反映し、Advanced Searchと同様に条件は `history.state` へ退避します。
 
 主な関連ファイル:
 

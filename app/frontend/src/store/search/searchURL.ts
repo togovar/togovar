@@ -32,15 +32,17 @@ let searchUrlReflectionId = 0;
 // ### 文字数制限
 //   - Raw JSON が2000文字以内の場合は従来の `q` を候補にする
 //   - CompressionStream対応環境ではRaw JSON 20000文字以内を `qz` の候補にする
-//   - どちらも使えない場合は条件を諦め、URLを `?mode=advanced` のみにする（history.stateへの退避はしない）
+//   - どちらも使えない場合はURLを `?mode=advanced` のみにし、条件はhistory.stateへ退避する
 //
 // ### Simple Searchとの比較
 //   Simple Search: 差分条件をJSON+Base64または圧縮JSON+Base64URLで格納
 //   Advanced Search: ネスト構造のためJSON+Base64または圧縮JSON+Base64URLを使用
-//   どちらもURLに載せられない場合の挙動は同じ（`?mode=xxx` のみにし、`searchURLTooLong` で呼び出し元へ通知する）
+//   どちらもURLに載せられない場合の挙動は同じ（`?mode=xxx` のみにし、条件をhistory.stateへ退避、
+//   `searchURLTooLong` で呼び出し元へ通知する）
 
 /**
  * Simple Search条件のURL表現をここに閉じ込め、検索開始ロジックからpushStateを分離する。
+ * URLに載せられない場合は条件をhistory.stateへ退避し、popstate復元時に読めるようにする。
  */
 export async function reflectSimpleSearchConditionToURI(
   currentConditions: SimpleSearchCurrentConditions,
@@ -54,14 +56,17 @@ export async function reflectSimpleSearchConditionToURI(
   }
 
   currentUrlParams = buildModeUrlParams('simple', encoded);
-  pushSearchUrl(currentUrlParams);
+  const isURLTooLong = hasConditions && encoded === null;
+  const state = isURLTooLong
+    ? { ...currentUrlParams, simpleSearchConditions: currentConditions }
+    : currentUrlParams;
+  pushSearchUrl(state, currentUrlParams);
 
-  return { isURLTooLong: hasConditions && encoded === null, isStale: false };
+  return { isURLTooLong, isStale: false };
 }
 
 /**
- * Advanced Search条件のURL表現をここに集約し、長すぎる条件だけ呼び出し元へ通知する。
- * URLに載せられない場合は条件を諦め、`?mode=advanced` のみを反映する（history.stateへの退避はしない）。
+ * Advanced Search条件のURL表現と履歴state退避をここに集約し、長すぎる条件だけ呼び出し元へ通知する。
  */
 export async function reflectAdvancedSearchConditionToURI(
   conditions: ConditionQuery | undefined
@@ -77,9 +82,14 @@ export async function reflectAdvancedSearchConditionToURI(
   }
 
   currentUrlParams = buildModeUrlParams('advanced', encoded);
-  pushSearchUrl(currentUrlParams);
+  const isURLTooLong = hasConditions && encoded === null;
+  const state =
+    isURLTooLong && conditions
+      ? { ...currentUrlParams, advancedSearchConditions: conditions }
+      : currentUrlParams;
+  pushSearchUrl(state, currentUrlParams);
 
-  return { isURLTooLong: hasConditions && encoded === null, isStale: false };
+  return { isURLTooLong, isStale: false };
 }
 
 /**
@@ -110,12 +120,24 @@ export function invalidatePendingSearchURLReflection(): number {
 
 /**
  * 同一URLの重複履歴と未操作時のskippable履歴を避け、Simple Searchの戻る挙動を自然に保つ。
+ * URL長制限時はstateへ条件を退避するため、状態更新に失敗した場合のフォールバックを持つ。
  */
-function pushSearchUrl(params: SearchUrlParams): void {
+function pushSearchUrl(
+  state: SearchUrlParams,
+  urlParams: SearchUrlParams = state
+): void {
   const newUrl = `${window.location.origin}${
     window.location.pathname
-  }?${qs.stringify(params)}`;
-  updateSearchHistory(params, newUrl);
+  }?${qs.stringify(urlParams)}`;
+  try {
+    updateSearchHistory(state, newUrl);
+  } catch {
+    try {
+      updateSearchHistory(urlParams, newUrl);
+    } catch {
+      // URL更新に失敗しても検索自体は継続できるため、ここでは何もしない。
+    }
+  }
 }
 
 /**

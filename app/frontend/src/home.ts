@@ -105,11 +105,13 @@ async function readyInitialSearch(callback: () => void): Promise<void> {
   const searchMode = await initializeApp();
 
   // Simple Searchの初期条件のみURLから復元する。Advanced側はinitializeApp内で処理済み。
+  // URL長制限時にhistory.stateへ退避した条件は、リロード後もwindow.history.stateから読める。
   const simpleSearchRestoreResult =
     searchMode === 'simple'
       ? await buildSimpleConditionsFromURL(
           parseSearchURLParams(),
-          storeManager.getData('simpleSearchConditionsMaster')
+          storeManager.getData('simpleSearchConditionsMaster'),
+          window.history.state
         )
       : undefined;
   storeManager.setData(
@@ -121,6 +123,9 @@ async function readyInitialSearch(callback: () => void): Promise<void> {
       'searchURLRestoreWarning',
       SIMPLE_SEARCH_URL_RESTORE_WARNING
     );
+  }
+  if (simpleSearchRestoreResult?.isURLTooLong) {
+    storeManager.setData('searchURLTooLong', true);
   }
 
   // searchModeを最後にセットし、条件が揃った状態で検索開始の副作用を発火する。
