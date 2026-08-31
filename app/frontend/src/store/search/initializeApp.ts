@@ -42,10 +42,7 @@ export async function initializeApp(): Promise<'simple' | 'advanced'> {
 export function updateAdvancedSearchURLRestoreWarning(
   result: AdvancedSearchURLDecodeResult
 ): void {
-  const shouldWarn = shouldWarnAdvancedSearchURLRestoreFailure(
-    result,
-    result.condition
-  );
+  const shouldWarn = shouldWarnAdvancedSearchURLRestoreFailure(result);
   storeManager.setData(
     'searchURLRestoreWarning',
     shouldWarn ? ADVANCED_SEARCH_URL_RESTORE_WARNING : undefined

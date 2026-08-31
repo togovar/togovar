@@ -22,7 +22,6 @@ const SIMPLE_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH = 400;
 export type SimpleSearchURLDecodeResult = {
   condition: Partial<SimpleSearchCurrentConditions> | null;
   hasCompressedParam: boolean;
-  hasLegacyParam: boolean;
   restoredFromCompressed: boolean;
   restoredFromLegacy: boolean;
 };
@@ -101,7 +100,8 @@ export function decodeSimpleConditionFromURL(
     const parsed = JSON.parse(
       new TextDecoder('utf-8', { fatal: true }).decode(base64ToBytes(encoded))
     );
-    if (!isPlainObject(parsed)) return null;
+    // 空オブジェクトは通常のencode経路では発生しないため、Advanced Search同様「復元失敗」扱いにする。
+    if (!isPlainObject(parsed) || Object.keys(parsed).length === 0) return null;
 
     return pickKnownSimpleConditions(parsed, masterConditions);
   } catch {
@@ -126,7 +126,6 @@ export async function decodeSimpleConditionFromURLParamsWithStatus(
       return {
         condition: decoded,
         hasCompressedParam: true,
-        hasLegacyParam: getFirstString(params.q) !== undefined,
         restoredFromCompressed: true,
         restoredFromLegacy: false,
       };
@@ -141,7 +140,6 @@ export async function decodeSimpleConditionFromURLParamsWithStatus(
   return {
     condition: legacyCondition,
     hasCompressedParam: compressed !== undefined,
-    hasLegacyParam: legacy !== undefined,
     restoredFromCompressed: false,
     restoredFromLegacy: legacyCondition !== null,
   };
@@ -173,7 +171,7 @@ async function decodeCompressedSimpleConditionFromURL(
     encoded,
     'Decompressed Simple Search URL is too large.'
   );
-  if (!isPlainObject(parsed)) return null;
+  if (!isPlainObject(parsed) || Object.keys(parsed).length === 0) return null;
 
   return pickKnownSimpleConditions(parsed, masterConditions);
 }

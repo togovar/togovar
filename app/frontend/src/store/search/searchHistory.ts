@@ -31,10 +31,7 @@ export function getAdvancedConditionFromHistory(
   urlParams: Record<string, unknown>
 ): Promise<AdvancedSearchHistoryRestoreResult> {
   return decodeConditionFromURLParamsWithStatus(urlParams).then((result) => {
-    const shouldWarn = shouldWarnAdvancedSearchURLRestoreFailure(
-      result,
-      result.condition
-    );
+    const shouldWarn = shouldWarnAdvancedSearchURLRestoreFailure(result);
     return { condition: result.condition, shouldWarn };
   });
 }

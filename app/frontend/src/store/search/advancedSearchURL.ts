@@ -10,7 +10,7 @@ import {
 } from './searchURLCodec';
 
 /** Advanced Search条件のURLエンコード上限（Raw JSON文字数） */
-export const ADVANCED_SEARCH_URL_MAX_JSON_LENGTH = 2000;
+const ADVANCED_SEARCH_URL_MAX_JSON_LENGTH = 2000;
 export const ADVANCED_SEARCH_URL_RESTORE_WARNING =
   'Could not restore the shared Advanced Search URL. Your browser may not support compressed URL parameters.';
 const ADVANCED_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH = 400;
@@ -18,7 +18,6 @@ const ADVANCED_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH = 400;
 export type AdvancedSearchURLDecodeResult = {
   condition: ConditionQuery | null;
   hasCompressedParam: boolean;
-  hasLegacyParam: boolean;
   restoredFromCompressed: boolean;
   restoredFromLegacy: boolean;
 };
@@ -108,16 +107,6 @@ function decodeLegacyLatin1ConditionFromURL(
 }
 
 /**
- * URLのAdvanced Search条件は圧縮版qzを優先し、既存URL互換のため従来qへフォールバックする。
- */
-export async function decodeConditionFromURLParams(params: {
-  q?: unknown;
-  qz?: unknown;
-}): Promise<ConditionQuery | null> {
-  return (await decodeConditionFromURLParamsWithStatus(params)).condition;
-}
-
-/**
  * qz復元失敗時にUI警告を出すため、条件本体だけでなく復元経路も返す。
  */
 export async function decodeConditionFromURLParamsWithStatus(params: {
@@ -131,7 +120,6 @@ export async function decodeConditionFromURLParamsWithStatus(params: {
       return {
         condition,
         hasCompressedParam: true,
-        hasLegacyParam: getFirstString(params.q) !== undefined,
         restoredFromCompressed: true,
         restoredFromLegacy: false,
       };
@@ -143,7 +131,6 @@ export async function decodeConditionFromURLParamsWithStatus(params: {
   return {
     condition: legacyCondition,
     hasCompressedParam: compressed !== undefined,
-    hasLegacyParam: legacy !== undefined,
     restoredFromCompressed: false,
     restoredFromLegacy: legacyCondition !== null,
   };
@@ -153,14 +140,12 @@ export async function decodeConditionFromURLParamsWithStatus(params: {
  * qzを含む共有URLがどの経路でも復元できなかった場合だけ、ユーザーへ警告する。
  */
 export function shouldWarnAdvancedSearchURLRestoreFailure(
-  result: AdvancedSearchURLDecodeResult,
-  restoredCondition: ConditionQuery | null
+  result: AdvancedSearchURLDecodeResult
 ): boolean {
   return (
     result.hasCompressedParam &&
     !result.restoredFromCompressed &&
-    !result.restoredFromLegacy &&
-    restoredCondition === null
+    !result.restoredFromLegacy
   );
 }
 
