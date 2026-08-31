@@ -6,42 +6,18 @@ import type {
 import { extractSearchCondition } from './simpleSearchConditions';
 import {
   base64ToBytes,
-  bytesToBase64,
   decodeCompressedURLToJSON,
-  encodeJSONToCompressedURL,
-  getFirstString,
+  decodeSearchURLParamsWithStatus,
+  encodeJSONToBestURLParam,
   isPlainObject,
+  shouldWarnSearchURLRestoreFailure,
+  type SearchURLDecodeResult,
   type SearchURLParam,
 } from './searchURLCodec';
 
-const SIMPLE_SEARCH_URL_MAX_JSON_LENGTH = 2000;
-const SIMPLE_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH = 400;
-
-export type SimpleSearchURLDecodeResult = {
-  condition: Partial<SimpleSearchCurrentConditions> | null;
-  hasCompressedParam: boolean;
-  hasLegacyParam: boolean;
-  restoredFromCompressed: boolean;
-  restoredFromLegacy: boolean;
-};
-
-/**
- * Simple Searchの共有URLは短く保ちたいが、日本語検索語も壊さず復元できる必要がある。
- * 差分条件だけをJSON化し、UTF-8バイト列としてBase64へ変換する。
- */
-export function encodeSimpleConditionForURL(
-  diffConditions: Record<string, unknown>
-): string | null {
-  try {
-    const json = JSON.stringify(diffConditions);
-    if (typeof json !== 'string') return null;
-    if (json.length > SIMPLE_SEARCH_URL_MAX_JSON_LENGTH) return null;
-
-    return bytesToBase64(new TextEncoder().encode(json));
-  } catch {
-    return null;
-  }
-}
+export type SimpleSearchURLDecodeResult = SearchURLDecodeResult<
+  Partial<SimpleSearchCurrentConditions>
+>;
 
 export type SimpleSearchURLEncodeResult = {
   param: SearchURLParam | null;
@@ -50,7 +26,9 @@ export type SimpleSearchURLEncodeResult = {
 };
 
 /**
- * Simple Search条件を共有URLへ載せるため、短い条件は従来Base64、長い条件は圧縮Base64URLを優先する。
+ * Simple Search条件を共有URLへ載せるため、差分条件だけを抽出し、
+ * 短い条件は従来Base64、長い条件は圧縮Base64URLを優先する。
+ * q/qzどちらを選ぶかの判断はAdvanced Searchと共通のため `searchURLCodec.ts` に委譲する。
  */
 export async function encodeSimpleConditionForBestURL(
   currentConditions: SimpleSearchCurrentConditions,
@@ -64,26 +42,10 @@ export async function encodeSimpleConditionForBestURL(
     return { param: null, hasConditions: false };
   }
 
-  const legacy = encodeSimpleConditionForURL(diffConditions);
-  if (
-    legacy !== null &&
-    legacy.length <= SIMPLE_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH
-  ) {
-    return { param: { name: 'q', value: legacy }, hasConditions: true };
-  }
-
-  const compressed = await encodeJSONToCompressedURL(diffConditions);
-
-  if (legacy === null && compressed === null) {
-    return { param: null, hasConditions: true };
-  }
-  if (legacy === null) {
-    return { param: { name: 'qz', value: compressed! }, hasConditions: true };
-  }
-  if (compressed === null || legacy.length <= compressed.length) {
-    return { param: { name: 'q', value: legacy }, hasConditions: true };
-  }
-  return { param: { name: 'qz', value: compressed }, hasConditions: true };
+  return {
+    param: await encodeJSONToBestURLParam(diffConditions),
+    hasConditions: true,
+  };
 }
 
 /**
@@ -109,42 +71,19 @@ export function decodeSimpleConditionFromURL(
 }
 
 /**
+ * qzを優先しqへフォールバックする復元手順はAdvanced Searchと共通のため `searchURLCodec.ts` に委譲する。
  * qz復元失敗時にUI警告を出すため、条件本体だけでなく復元経路も返す。
  */
-export async function decodeSimpleConditionFromURLParamsWithStatus(
+export function decodeSimpleConditionFromURLParamsWithStatus(
   params: Record<string, unknown>,
   masterConditions: MasterConditions[]
 ): Promise<SimpleSearchURLDecodeResult> {
-  const compressed = getFirstString(params.qz);
-  const legacy = getFirstString(params.q);
-
-  if (compressed !== undefined) {
-    const decoded = await decodeCompressedSimpleConditionFromURL(
-      compressed,
-      masterConditions
-    );
-    if (decoded !== null) {
-      return {
-        condition: decoded,
-        hasCompressedParam: true,
-        hasLegacyParam: legacy !== undefined,
-        restoredFromCompressed: true,
-        restoredFromLegacy: false,
-      };
-    }
-  }
-
-  const legacyCondition = decodeSimpleConditionFromURL(
-    legacy,
-    masterConditions
+  return decodeSearchURLParamsWithStatus(
+    params,
+    (encoded) =>
+      decodeCompressedSimpleConditionFromURL(encoded, masterConditions),
+    (encoded) => decodeSimpleConditionFromURL(encoded, masterConditions)
   );
-  return {
-    condition: legacyCondition,
-    hasCompressedParam: compressed !== undefined,
-    hasLegacyParam: legacy !== undefined,
-    restoredFromCompressed: false,
-    restoredFromLegacy: legacyCondition !== null,
-  };
 }
 
 /**
@@ -154,12 +93,7 @@ export function shouldWarnSimpleSearchURLRestoreFailure(
   result: SimpleSearchURLDecodeResult,
   hasLegacyFlatParams: boolean
 ): boolean {
-  return (
-    (result.hasCompressedParam || result.hasLegacyParam) &&
-    !result.restoredFromCompressed &&
-    !result.restoredFromLegacy &&
-    !hasLegacyFlatParams
-  );
+  return shouldWarnSearchURLRestoreFailure(result, hasLegacyFlatParams);
 }
 
 /**
