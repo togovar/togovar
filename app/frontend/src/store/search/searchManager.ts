@@ -59,7 +59,10 @@ function applySimpleSearchConditionPatch(
   void reflectSimpleSearchConditionToURI(
     updatedConditions,
     storeManager.getData('simpleSearchConditionsMaster')
-  );
+  ).then(({ isURLTooLong, isStale }) => {
+    if (isStale) return;
+    storeManager.setData('searchURLTooLong', isURLTooLong);
+  });
 
   requestInitialSearch('user');
 }
@@ -136,12 +139,7 @@ export async function handleHistoryChange(e: PopStateEvent): Promise<void> {
   const currentMode = storeManager.getData('searchMode');
 
   if (mode === 'advanced') {
-    await restoreAdvancedSearchFromHistory(
-      urlParams,
-      e.state,
-      currentMode,
-      restoreId
-    );
+    await restoreAdvancedSearchFromHistory(urlParams, currentMode, restoreId);
     return;
   }
 
@@ -157,18 +155,14 @@ function normalizeModeParam(rawMode: unknown): string | undefined {
 }
 
 /**
- * Advanced Searchの履歴復元ではURL長制限時のhistory.state退避も読む必要があるため、専用手順に分ける。
+ * Advanced Searchの履歴復元用の専用手順。Simple Search側と処理内容を揃えている。
  */
 function restoreAdvancedSearchFromHistory(
   urlParams: Record<string, unknown>,
-  historyState: unknown,
   currentMode: SearchMode | '',
   restoreId: number
 ): Promise<void> {
-  return getAdvancedConditionFromHistory(
-    urlParams,
-    historyState
-  ).then((restoreResult) => {
+  return getAdvancedConditionFromHistory(urlParams).then((restoreResult) => {
     if (!isCurrentHistoryRestore(restoreId)) return;
     setSearchURLRestoreWarning(
       restoreResult.shouldWarn ? ADVANCED_SEARCH_URL_RESTORE_WARNING : undefined
@@ -272,14 +266,15 @@ function invalidatePendingHistoryRestore(): number {
 }
 
 /**
- * URL生成はsearchURL.tsへ委譲し、Advanced Search画面が必要とするURL長制限フラグだけStoreへ戻す。
+ * URL生成はsearchURL.tsへ委譲し、画面が必要とするURL長制限フラグだけStoreへ戻す。
+ * Simple Search側（applySimpleSearchConditionPatch/handleSimpleModeSelected）も同じフラグを共有する。
  */
 function reflectCurrentAdvancedConditionToUrl(): void {
   const conditions = storeManager.getData('advancedSearchConditions');
   void reflectAdvancedSearchConditionToURI(conditions).then(
     ({ isURLTooLong, isStale }) => {
       if (isStale) return;
-      storeManager.setData('advancedSearchURLTooLong', isURLTooLong);
+      storeManager.setData('searchURLTooLong', isURLTooLong);
     }
   );
 }
@@ -335,7 +330,10 @@ function handleSimpleModeSelected(): void {
     void reflectSimpleSearchConditionToURI(
       storeManager.getData('simpleSearchConditions'),
       storeManager.getData('simpleSearchConditionsMaster')
-    );
+    ).then(({ isURLTooLong, isStale }) => {
+      if (isStale) return;
+      storeManager.setData('searchURLTooLong', isURLTooLong);
+    });
   }
 
   storeManager.publish('simpleSearchConditions');

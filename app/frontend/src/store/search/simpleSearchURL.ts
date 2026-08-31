@@ -32,27 +32,24 @@ export type SimpleSearchURLDecodeResult = {
  * 差分条件だけをJSON化し、UTF-8バイト列としてBase64へ変換する。
  */
 export function encodeSimpleConditionForURL(
-  currentConditions: SimpleSearchCurrentConditions,
-  masterConditions: MasterConditions[]
+  diffConditions: Record<string, unknown>
 ): string | null {
-  const diffConditions = extractSearchCondition(
-    currentConditions,
-    masterConditions
-  );
-  if (Object.keys(diffConditions).length === 0) return null;
-
   try {
     const json = JSON.stringify(diffConditions);
     if (typeof json !== 'string') return null;
     if (json.length > SIMPLE_SEARCH_URL_MAX_JSON_LENGTH) return null;
 
-    return bytesToBase64(
-      new TextEncoder().encode(json)
-    );
+    return bytesToBase64(new TextEncoder().encode(json));
   } catch {
     return null;
   }
 }
+
+export type SimpleSearchURLEncodeResult = {
+  param: SearchURLParam | null;
+  /** 差分条件が1つもない（=URLに載せる必要がない）場合はfalse。長さ超過とURL不要を区別するために使う。 */
+  hasConditions: boolean;
+};
 
 /**
  * Simple Search条件を共有URLへ載せるため、短い条件は従来Base64、長い条件は圧縮Base64URLを優先する。
@@ -60,45 +57,35 @@ export function encodeSimpleConditionForURL(
 export async function encodeSimpleConditionForBestURL(
   currentConditions: SimpleSearchCurrentConditions,
   masterConditions: MasterConditions[]
-): Promise<SearchURLParam | null> {
-  const legacy = encodeSimpleConditionForURL(
-    currentConditions,
-    masterConditions
-  );
-  if (
-    legacy !== null &&
-    legacy.length <= SIMPLE_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH
-  ) {
-    return { name: 'q', value: legacy };
-  }
-
-  const compressed = await encodeSimpleConditionForCompressedURL(
-    currentConditions,
-    masterConditions
-  );
-
-  if (legacy === null && compressed === null) return null;
-  if (legacy === null) return { name: 'qz', value: compressed! };
-  if (compressed === null || legacy.length <= compressed.length) {
-    return { name: 'q', value: legacy };
-  }
-  return { name: 'qz', value: compressed };
-}
-
-/**
- * URL長を抑えるため、Compression Streams API対応ブラウザでは差分条件JSONを圧縮する。
- */
-async function encodeSimpleConditionForCompressedURL(
-  currentConditions: SimpleSearchCurrentConditions,
-  masterConditions: MasterConditions[]
-): Promise<string | null> {
+): Promise<SimpleSearchURLEncodeResult> {
   const diffConditions = extractSearchCondition(
     currentConditions,
     masterConditions
   );
-  if (Object.keys(diffConditions).length === 0) return null;
+  if (Object.keys(diffConditions).length === 0) {
+    return { param: null, hasConditions: false };
+  }
 
-  return encodeJSONToCompressedURL(diffConditions);
+  const legacy = encodeSimpleConditionForURL(diffConditions);
+  if (
+    legacy !== null &&
+    legacy.length <= SIMPLE_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH
+  ) {
+    return { param: { name: 'q', value: legacy }, hasConditions: true };
+  }
+
+  const compressed = await encodeJSONToCompressedURL(diffConditions);
+
+  if (legacy === null && compressed === null) {
+    return { param: null, hasConditions: true };
+  }
+  if (legacy === null) {
+    return { param: { name: 'qz', value: compressed! }, hasConditions: true };
+  }
+  if (compressed === null || legacy.length <= compressed.length) {
+    return { param: { name: 'q', value: legacy }, hasConditions: true };
+  }
+  return { param: { name: 'qz', value: compressed }, hasConditions: true };
 }
 
 /**
