@@ -122,13 +122,14 @@ app/frontend/
   - `components/Condition/ConditionValues.ts` と `components/Condition/ConditionValueEditor/*`: 条件入力UI
 - 条件の検索クエリ化は `components/Condition/queryBuilders/` に集約する。
 - Advanced Search のURL共有は、従来形式 `?mode=advanced&q=<Base64 JSON>` と圧縮形式 `?mode=advanced&qz=<deflate-raw + Base64URL JSON>` を扱う。
-- encode/decode処理は `app/frontend/src/store/search/advancedSearchURL.ts` に集約する。URL生成時は `encodeConditionForBestURL()` を使い、短い条件では圧縮を試さず `q`、長い条件では圧縮結果を比較して短い方を選ぶ。
+- encode/decode処理は `app/frontend/src/store/search/advancedSearchURL.ts` に集約する。URL生成時は `encodeConditionForBestURL()` を使い、400文字以下の短い条件では圧縮を試さず `q`、長い条件では圧縮結果を比較して短い方を選ぶ。
 - `q` は既存URL互換のため残す。復元時は `qz` を優先し、読めない場合は `q` へフォールバックする。
 - `qz` はブラウザ標準の `CompressionStream` / `DecompressionStream` を使う。追加ライブラリは使わない。非対応環境でURLを生成する場合は従来の `q` 形式へフォールバックする。
 - Advanced Search のURL処理は非同期になっているため、初期復元や `popstate` 復元ではデコード完了後に検索を開始する。
 - `q` / `qz` は共有URL専用の表現であり、Advanced Search のAPIリクエストは引き続きPOST bodyで送る。
-- Simple Search のURL共有は `?mode=simple&q=<Base64 JSON>` と `?mode=simple&qz=<deflate-raw + Base64URL JSON>` を使う。新規発行URLは300文字を超える場合に圧縮版も比較し、短い方を選ぶ。復元時は互換性維持のため従来のフラットなURLクエリも受け付ける。
+- Simple Search のURL共有は `?mode=simple&q=<Base64 JSON>` と `?mode=simple&qz=<deflate-raw + Base64URL JSON>` を使う。新規発行URLは400文字を超える場合に圧縮版も比較し、短い方を選ぶ。復元時は互換性維持のため従来のフラットなURLクエリも受け付ける。
 - Simple Search の `q` / `qz` encode/decode処理は `app/frontend/src/store/search/simpleSearchURL.ts` に置く。URLに載せる値はマスター定義との差分だけにし、APIリクエストは引き続きGETクエリとして送る。
+- Simple Search はURL長超過時の `history.state` 退避を現時点では持たない。`q` / `qz` どちらにも収まらない場合はURLへ条件を載せない。必要になった場合は Advanced Search と同様の退避・警告設計を追加する。
 - URLから復元した条件をViewへ戻す処理は `components/AdvancedSearch/AdvancedSearchConditionRestorer.ts` を確認する。
 - Base64はURL中で壊れやすいため、生成時は `encodeURIComponent` を通す。
 - `setAdvancedSearchCondition()` は検索条件をStoreへ保存し、URLへ反映し、検索を実行する。呼び出しタイミングを増やす場合は二重検索に注意する。

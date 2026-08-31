@@ -20,6 +20,7 @@ import FloatingInfo from './components/FloatingInfo';
 import { initializeApp } from './store/search/initializeApp';
 import { buildSimpleConditionsFromURL } from './store/search/searchHistory';
 import { parseSearchURLParams } from './store/search/searchURL';
+import { SIMPLE_SEARCH_URL_RESTORE_WARNING } from './store/search/simpleSearchURL';
 import { selectRequired } from './utils/dom/select';
 import type { MasterConditions } from './types/search';
 import type { AdvancedSearchBuilderView as AdvancedSearchBuilderViewType } from './components/AdvancedSearch/AdvancedSearchBuilderView';
@@ -104,14 +105,23 @@ async function readyInitialSearch(callback: () => void): Promise<void> {
   const searchMode = await initializeApp();
 
   // Simple Searchの初期条件のみURLから復元する。Advanced側はinitializeApp内で処理済み。
-  const simpleSearchConditions =
+  const simpleSearchRestoreResult =
     searchMode === 'simple'
       ? await buildSimpleConditionsFromURL(
           parseSearchURLParams(),
           storeManager.getData('simpleSearchConditionsMaster')
         )
-      : {};
-  storeManager.setData('simpleSearchConditions', simpleSearchConditions);
+      : undefined;
+  storeManager.setData(
+    'simpleSearchConditions',
+    simpleSearchRestoreResult?.conditions ?? {}
+  );
+  if (simpleSearchRestoreResult?.shouldWarn) {
+    storeManager.setData(
+      'searchURLRestoreWarning',
+      SIMPLE_SEARCH_URL_RESTORE_WARNING
+    );
+  }
 
   // searchModeを最後にセットし、条件が揃った状態で検索開始の副作用を発火する。
   // 初期ロード時はURLがすでに正しいためsetSearchModeFromHistoryを使い、

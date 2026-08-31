@@ -33,10 +33,10 @@ function normalizeSearchMessages(jsonResponse: unknown): SearchMessages {
 }
 
 /**
- * qz共有URLの復元失敗はAPIレスポンス由来ではないため、APIメッセージへ合成して表示を維持する。
+ * 共有URLの復元失敗はAPIレスポンス由来ではないため、APIメッセージへ合成して表示を維持する。
  */
 function mergeURLRestoreWarning(messages: SearchMessages): SearchMessages {
-  const warning = storeManager.getData('advancedSearchURLRestoreWarning');
+  const warning = storeManager.getData('searchURLRestoreWarning');
   if (!warning) return messages;
 
   return {

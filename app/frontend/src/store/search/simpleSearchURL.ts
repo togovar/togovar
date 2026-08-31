@@ -10,10 +10,22 @@ import {
   decodeCompressedURLToJSON,
   encodeJSONToCompressedURL,
   getFirstString,
-  SEARCH_URL_COMPRESSION_MIN_LEGACY_LENGTH,
   isPlainObject,
   type SearchURLParam,
 } from './searchURLCodec';
+
+export const SIMPLE_SEARCH_URL_RESTORE_WARNING =
+  'Could not restore the shared Simple Search URL. Your browser may not support compressed URL parameters.';
+const SIMPLE_SEARCH_URL_MAX_JSON_LENGTH = 2000;
+const SIMPLE_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH = 400;
+
+export type SimpleSearchURLDecodeResult = {
+  condition: Partial<SimpleSearchCurrentConditions> | null;
+  hasCompressedParam: boolean;
+  hasLegacyParam: boolean;
+  restoredFromCompressed: boolean;
+  restoredFromLegacy: boolean;
+};
 
 /**
  * Simple Searchの共有URLは短く保ちたいが、日本語検索語も壊さず復元できる必要がある。
@@ -30,8 +42,12 @@ export function encodeSimpleConditionForURL(
   if (Object.keys(diffConditions).length === 0) return null;
 
   try {
+    const json = JSON.stringify(diffConditions);
+    if (typeof json !== 'string') return null;
+    if (json.length > SIMPLE_SEARCH_URL_MAX_JSON_LENGTH) return null;
+
     return bytesToBase64(
-      new TextEncoder().encode(JSON.stringify(diffConditions))
+      new TextEncoder().encode(json)
     );
   } catch {
     return null;
@@ -51,7 +67,7 @@ export async function encodeSimpleConditionForBestURL(
   );
   if (
     legacy !== null &&
-    legacy.length <= SEARCH_URL_COMPRESSION_MIN_LEGACY_LENGTH
+    legacy.length <= SIMPLE_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH
   ) {
     return { name: 'q', value: legacy };
   }
@@ -95,7 +111,9 @@ export function decodeSimpleConditionFromURL(
   if (typeof encoded !== 'string' || encoded === '') return null;
 
   try {
-    const parsed = JSON.parse(new TextDecoder().decode(base64ToBytes(encoded)));
+    const parsed = JSON.parse(
+      new TextDecoder('utf-8', { fatal: true }).decode(base64ToBytes(encoded))
+    );
     if (!isPlainObject(parsed)) return null;
 
     return pickKnownSimpleConditions(parsed, masterConditions);
@@ -105,22 +123,56 @@ export function decodeSimpleConditionFromURL(
 }
 
 /**
- * Simple SearchのURL条件は圧縮版qzを優先し、既存qと従来フラットURLの互換性を残す。
+ * qz復元失敗時にUI警告を出すため、条件本体だけでなく復元経路も返す。
  */
-export async function decodeSimpleConditionFromURLParams(
+export async function decodeSimpleConditionFromURLParamsWithStatus(
   params: Record<string, unknown>,
   masterConditions: MasterConditions[]
-): Promise<Partial<SimpleSearchCurrentConditions> | null> {
+): Promise<SimpleSearchURLDecodeResult> {
   const compressed = getFirstString(params.qz);
   if (compressed !== undefined) {
     const decoded = await decodeCompressedSimpleConditionFromURL(
       compressed,
       masterConditions
     );
-    if (decoded !== null) return decoded;
+    if (decoded !== null) {
+      return {
+        condition: decoded,
+        hasCompressedParam: true,
+        hasLegacyParam: getFirstString(params.q) !== undefined,
+        restoredFromCompressed: true,
+        restoredFromLegacy: false,
+      };
+    }
   }
 
-  return decodeSimpleConditionFromURL(params.q, masterConditions);
+  const legacy = getFirstString(params.q);
+  const legacyCondition = decodeSimpleConditionFromURL(
+    legacy,
+    masterConditions
+  );
+  return {
+    condition: legacyCondition,
+    hasCompressedParam: compressed !== undefined,
+    hasLegacyParam: legacy !== undefined,
+    restoredFromCompressed: false,
+    restoredFromLegacy: legacyCondition !== null,
+  };
+}
+
+/**
+ * qzを含む共有URLがq/qzどちらでも復元できず、従来フラットURLでもない場合だけ警告する。
+ */
+export function shouldWarnSimpleSearchURLRestoreFailure(
+  result: SimpleSearchURLDecodeResult,
+  hasLegacyFlatParams: boolean
+): boolean {
+  return (
+    result.hasCompressedParam &&
+    !result.restoredFromCompressed &&
+    !result.restoredFromLegacy &&
+    !hasLegacyFlatParams
+  );
 }
 
 /**

@@ -16,8 +16,7 @@ type AdvancedSearchURLReflectionResult = {
 let currentUrlParams: SearchUrlParams = qs.parse(
   window.location.search.substring(1)
 );
-let simpleUrlReflectionId = 0;
-let advancedUrlReflectionId = 0;
+let searchUrlReflectionId = 0;
 
 // ## Advanced Search URL仕様
 //
@@ -27,7 +26,7 @@ let advancedUrlReflectionId = 0;
 //   条件なし: ?mode=advanced
 //
 // ### エンコード方式
-//   条件オブジェクト → JSON.stringify() → btoa() (Base64) → encodeURIComponent() → `q` パラメータ
+//   条件オブジェクト → JSON.stringify() → UTF-8 → Base64 → `q` パラメータ
 //   長い条件では CompressionStream(deflate-raw) → Base64URL → `qz` パラメータ
 //
 // ### 文字数制限
@@ -46,12 +45,12 @@ export async function reflectSimpleSearchConditionToURI(
   currentConditions: SimpleSearchCurrentConditions,
   masterConditions: MasterConditions[]
 ): Promise<void> {
-  const reflectionId = ++simpleUrlReflectionId;
+  const reflectionId = invalidatePendingSearchURLReflection();
   const encoded = await encodeSimpleConditionForBestURL(
     currentConditions,
     masterConditions
   );
-  if (reflectionId !== simpleUrlReflectionId) return;
+  if (reflectionId !== searchUrlReflectionId) return;
 
   if (encoded === null) {
     currentUrlParams = {
@@ -73,13 +72,13 @@ export async function reflectSimpleSearchConditionToURI(
 export async function reflectAdvancedSearchConditionToURI(
   conditions: ConditionQuery | undefined
 ): Promise<AdvancedSearchURLReflectionResult> {
-  const reflectionId = ++advancedUrlReflectionId;
+  const reflectionId = invalidatePendingSearchURLReflection();
   // conditions は setAdvancedSearchCondition で {} → undefined に正規化されるため、存在確認だけで十分。
   const hasConditions = conditions !== undefined;
   const encoded = hasConditions
     ? await encodeConditionForBestURL(conditions)
     : null;
-  if (reflectionId !== advancedUrlReflectionId) {
+  if (reflectionId !== searchUrlReflectionId) {
     return { isURLTooLong: false, isStale: true };
   }
 
@@ -111,6 +110,14 @@ export async function reflectAdvancedSearchConditionToURI(
 export function parseSearchURLParams(): ReturnType<typeof qs.parse> {
   currentUrlParams = qs.parse(window.location.search.substring(1));
   return currentUrlParams;
+}
+
+/**
+ * Simple/AdvancedのURL反映は同じURLを書き換えるため、検索種別をまたいで古い非同期反映を無効化する。
+ */
+export function invalidatePendingSearchURLReflection(): number {
+  searchUrlReflectionId += 1;
+  return searchUrlReflectionId;
 }
 
 /**

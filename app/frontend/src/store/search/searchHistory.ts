@@ -10,11 +10,17 @@ import {
 } from './advancedSearchURL';
 import {
   createDefaultSimpleConditions,
-  decodeSimpleConditionFromURLParams,
+  decodeSimpleConditionFromURLParamsWithStatus,
+  shouldWarnSimpleSearchURLRestoreFailure,
 } from './simpleSearchURL';
 
 export type AdvancedSearchHistoryRestoreResult = {
   condition: ConditionQuery | null;
+  shouldWarn: boolean;
+};
+
+export type SimpleSearchHistoryRestoreResult = {
+  conditions: SimpleSearchCurrentConditions;
   shouldWarn: boolean;
 };
 
@@ -41,16 +47,19 @@ export function getAdvancedConditionFromHistory(
 export async function buildSimpleConditionsFromURL(
   urlParams: Record<string, unknown>,
   master: MasterConditions[]
-): Promise<SimpleSearchCurrentConditions> {
-  const encodedConditions = await decodeSimpleConditionFromURLParams(
+): Promise<SimpleSearchHistoryRestoreResult> {
+  const result = await decodeSimpleConditionFromURLParamsWithStatus(
     urlParams,
     master
   );
-  if (encodedConditions !== null) {
+  if (result.condition !== null) {
     return {
-      ...createDefaultSimpleConditions(master),
-      ...encodedConditions,
-    } as SimpleSearchCurrentConditions;
+      conditions: {
+        ...createDefaultSimpleConditions(master),
+        ...result.condition,
+      } as SimpleSearchCurrentConditions,
+      shouldWarn: false,
+    };
   }
 
   const conditionIds = new Set(master.map((c) => c.id));
@@ -64,7 +73,25 @@ export async function buildSimpleConditionsFromURL(
     }
   }
 
-  return conditions as SimpleSearchCurrentConditions;
+  return {
+    conditions: conditions as SimpleSearchCurrentConditions,
+    shouldWarn: shouldWarnSimpleSearchURLRestoreFailure(
+      result,
+      hasLegacyFlatSearchParams(urlParams, conditionIds)
+    ),
+  };
+}
+
+/**
+ * q/qz以前のSimple Search共有URLが含まれる場合は、その復元を優先して警告対象から外す。
+ */
+function hasLegacyFlatSearchParams(
+  urlParams: Record<string, unknown>,
+  conditionIds: Set<MasterConditionId>
+): boolean {
+  return Object.keys(urlParams).some((key) =>
+    conditionIds.has(key as MasterConditionId)
+  );
 }
 
 /**

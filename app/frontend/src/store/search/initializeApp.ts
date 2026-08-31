@@ -37,7 +37,7 @@ export async function initializeApp(): Promise<'simple' | 'advanced'> {
 }
 
 /**
- * qzだけの共有URLが復元できなかった場合、空条件で黙って検索されないよう警告を残す。
+ * Advanced Searchのqz共有URLが復元できなかった場合、空条件で黙って検索されないよう警告を残す。
  */
 export function updateAdvancedSearchURLRestoreWarning(
   result: AdvancedSearchURLDecodeResult
@@ -47,7 +47,7 @@ export function updateAdvancedSearchURLRestoreWarning(
     result.condition
   );
   storeManager.setData(
-    'advancedSearchURLRestoreWarning',
+    'searchURLRestoreWarning',
     shouldWarn ? ADVANCED_SEARCH_URL_RESTORE_WARNING : undefined
   );
 }

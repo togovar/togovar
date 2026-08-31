@@ -1,10 +1,11 @@
 import type { ConditionQuery } from '../../types/query';
 import {
+  base64ToBytes,
+  bytesToBase64,
   decodeCompressedURLToJSON,
   encodeJSONToCompressedURL,
   getFirstString,
   isPlainObject,
-  SEARCH_URL_COMPRESSION_MIN_LEGACY_LENGTH,
   type SearchURLParam,
 } from './searchURLCodec';
 
@@ -12,6 +13,7 @@ import {
 export const ADVANCED_SEARCH_URL_MAX_JSON_LENGTH = 2000;
 export const ADVANCED_SEARCH_URL_RESTORE_WARNING =
   'Could not restore the shared Advanced Search URL. Your browser may not support compressed URL parameters.';
+const ADVANCED_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH = 400;
 
 export type AdvancedSearchURLDecodeResult = {
   condition: ConditionQuery | null;
@@ -23,7 +25,7 @@ export type AdvancedSearchURLDecodeResult = {
 
 /**
  * Advanced Search条件をURLの `q` パラメータ用にエンコードする。
- * JSON.stringify → btoa (Base64) の順で変換する。
+ * JSON.stringify → UTF-8 → Base64 の順で変換する。
  * Raw JSONが上限を超える、またはエンコードに失敗した場合は null を返す。
  */
 export function encodeConditionForURL(query: unknown): string | null {
@@ -31,7 +33,7 @@ export function encodeConditionForURL(query: unknown): string | null {
     const json = JSON.stringify(query);
     if (typeof json !== 'string') return null;
     if (json.length > ADVANCED_SEARCH_URL_MAX_JSON_LENGTH) return null;
-    return btoa(json);
+    return bytesToBase64(new TextEncoder().encode(json));
   } catch {
     return null;
   }
@@ -46,7 +48,7 @@ export async function encodeConditionForBestURL(
   const legacy = encodeConditionForURL(query);
   if (
     legacy !== null &&
-    legacy.length <= SEARCH_URL_COMPRESSION_MIN_LEGACY_LENGTH
+    legacy.length <= ADVANCED_SEARCH_COMPRESSION_MIN_LEGACY_LENGTH
   ) {
     return { name: 'q', value: legacy };
   }
@@ -78,9 +80,26 @@ export function decodeConditionFromURL(
   encoded: string
 ): ConditionQuery | null {
   try {
-    const parsed = JSON.parse(atob(encoded.replace(/ /g, '+')));
+    const parsed = JSON.parse(
+      new TextDecoder('utf-8', { fatal: true }).decode(base64ToBytes(encoded))
+    );
     // 配列・プリミティブはAPIのquery bodyに流れると不正リクエストになるため弾く。
     // 空オブジェクトは「条件なし」センチネル(undefined)と整合させるため null を返す。
+    if (!isPlainObject(parsed) || Object.keys(parsed).length === 0) return null;
+    return parsed as ConditionQuery;
+  } catch {
+    return decodeLegacyLatin1ConditionFromURL(encoded);
+  }
+}
+
+/**
+ * 既存共有URLはbtoa(JSON文字列)で作られているため、UTF-8復元に失敗した場合だけ旧方式を読む。
+ */
+function decodeLegacyLatin1ConditionFromURL(
+  encoded: string
+): ConditionQuery | null {
+  try {
+    const parsed = JSON.parse(atob(encoded.replace(/ /g, '+')));
     if (!isPlainObject(parsed) || Object.keys(parsed).length === 0) return null;
     return parsed as ConditionQuery;
   } catch {

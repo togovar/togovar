@@ -19,9 +19,11 @@ import {
 } from './searchHistory';
 import {
   parseSearchURLParams,
+  invalidatePendingSearchURLReflection,
   reflectAdvancedSearchConditionToURI,
   reflectSimpleSearchConditionToURI,
 } from './searchURL';
+import { SIMPLE_SEARCH_URL_RESTORE_WARNING } from './simpleSearchURL';
 
 let historyRestoreId = 0;
 
@@ -46,7 +48,7 @@ function applySimpleSearchConditionPatch(
 ): void {
   if (storeManager.getData('searchMode') !== 'simple') return;
   invalidatePendingHistoryRestore();
-  clearAdvancedSearchURLRestoreWarning();
+  clearSearchURLRestoreWarning();
 
   const updatedConditions = {
     ...storeManager.getData('simpleSearchConditions'),
@@ -127,6 +129,7 @@ function createSimpleSearchResetConditions(): Partial<SimpleSearchCurrentConditi
 export async function handleHistoryChange(e: PopStateEvent): Promise<void> {
   prepareHistoryNavigationSearch();
   const restoreId = invalidatePendingHistoryRestore();
+  invalidatePendingSearchURLReflection();
 
   const urlParams = parseSearchURLParams();
   const mode = normalizeModeParam(urlParams.mode);
@@ -167,7 +170,9 @@ function restoreAdvancedSearchFromHistory(
     historyState
   ).then((restoreResult) => {
     if (!isCurrentHistoryRestore(restoreId)) return;
-    setAdvancedSearchURLRestoreWarning(restoreResult.shouldWarn);
+    setSearchURLRestoreWarning(
+      restoreResult.shouldWarn ? ADVANCED_SEARCH_URL_RESTORE_WARNING : undefined
+    );
     storeManager.setData(
       'advancedSearchConditions',
       restoreResult.condition ?? undefined
@@ -185,13 +190,17 @@ async function restoreSimpleSearchFromHistory(
   currentMode: SearchMode | '',
   restoreId: number
 ): Promise<void> {
-  const restoredConditions = await buildSimpleConditionsFromURL(
+  const restoreResult = await buildSimpleConditionsFromURL(
     urlParams,
     storeManager.getData('simpleSearchConditionsMaster') ?? []
   );
   if (!isCurrentHistoryRestore(restoreId)) return;
-  clearAdvancedSearchURLRestoreWarning();
-  storeManager.setData('simpleSearchConditions', restoredConditions);
+  setSearchURLRestoreWarning(
+    restoreResult.shouldWarn
+      ? SIMPLE_SEARCH_URL_RESTORE_WARNING
+      : undefined
+  );
+  storeManager.setData('simpleSearchConditions', restoreResult.conditions);
   continueHistorySearchInMode('simple', currentMode);
 }
 
@@ -221,7 +230,7 @@ export function setAdvancedSearchCondition(
   newSearchConditions: ConditionQuery
 ): void {
   invalidatePendingHistoryRestore();
-  clearAdvancedSearchURLRestoreWarning();
+  clearSearchURLRestoreWarning();
   const normalizedConditions =
     Object.keys(newSearchConditions).length === 0
       ? undefined
@@ -234,20 +243,17 @@ export function setAdvancedSearchCondition(
 }
 
 /**
- * qz復元失敗の警告は、その後の通常操作や別履歴復元へ持ち越さない。
+ * 共有URL復元失敗の警告は、その後の通常操作や別履歴復元へ持ち越さない。
  */
-function clearAdvancedSearchURLRestoreWarning(): void {
-  setAdvancedSearchURLRestoreWarning(false);
+function clearSearchURLRestoreWarning(): void {
+  setSearchURLRestoreWarning(undefined);
 }
 
 /**
- * 復元警告の文言を一箇所で扱い、boolean判定と表示文言の散在を避ける。
+ * 復元警告のStore反映を一箇所で扱い、表示文言の書き込み口を増やさない。
  */
-function setAdvancedSearchURLRestoreWarning(shouldWarn: boolean): void {
-  storeManager.setData(
-    'advancedSearchURLRestoreWarning',
-    shouldWarn ? ADVANCED_SEARCH_URL_RESTORE_WARNING : undefined
-  );
+function setSearchURLRestoreWarning(warning: string | undefined): void {
+  storeManager.setData('searchURLRestoreWarning', warning);
 }
 
 /**
@@ -298,7 +304,7 @@ function handleSearchModeChange(mode: SearchMode | ''): void {
 
   reflectSearchModeToBodyDataset(mode);
   if (!storeManager.fromHistory) {
-    clearAdvancedSearchURLRestoreWarning();
+    clearSearchURLRestoreWarning();
   }
 
   switch (mode) {

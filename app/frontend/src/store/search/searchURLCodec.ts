@@ -2,7 +2,6 @@
  * URL共有値の圧縮形式を揃え、Simple/Advanced Searchで別々の実装を持たないようにする。
  */
 export const SEARCH_URL_COMPRESSION_FORMAT = 'deflate-raw';
-export const SEARCH_URL_COMPRESSION_MIN_LEGACY_LENGTH = 300;
 export const SEARCH_URL_COMPRESSED_MAX_JSON_LENGTH = 20000;
 export const SEARCH_URL_DECOMPRESSED_BYTE_MAX_LENGTH =
   SEARCH_URL_COMPRESSED_MAX_JSON_LENGTH * 4;
