@@ -1,17 +1,17 @@
-import { executeSearch } from '../api/searchExecutor';
-import { clearSingleVariantRedirectCandidates } from '../api/searchResponse';
+import { executeSearch } from '../../api/searchExecutor';
+import { clearSingleVariantRedirectCandidates } from '../../api/searchResponse';
 import {
   markSearchOriginBeforeDebounce,
   type SearchOrigin,
-} from '../api/searchExecutionState';
-import { storeManager } from './StoreManager';
+} from '../../api/searchExecutionState';
+import { storeManager } from '../StoreManager';
 import type {
   MasterConditions,
   MasterConditionId,
   SimpleSearchCurrentConditions,
   SearchMode,
-} from '../types';
-import type { ConditionQuery } from '../types/query';
+} from '../../types';
+import type { ConditionQuery } from '../../types/query';
 import { ADVANCED_SEARCH_URL_RESTORE_WARNING } from './advancedSearchURL';
 import {
   buildSimpleConditionsFromURL,
@@ -19,9 +19,11 @@ import {
 } from './searchHistory';
 import {
   parseSearchURLParams,
+  invalidatePendingSearchURLReflection,
   reflectAdvancedSearchConditionToURI,
   reflectSimpleSearchConditionToURI,
 } from './searchURL';
+import { SIMPLE_SEARCH_URL_RESTORE_WARNING } from './simpleSearchURL';
 
 let historyRestoreId = 0;
 
@@ -46,7 +48,7 @@ function applySimpleSearchConditionPatch(
 ): void {
   if (storeManager.getData('searchMode') !== 'simple') return;
   invalidatePendingHistoryRestore();
-  clearAdvancedSearchURLRestoreWarning();
+  clearSearchURLRestoreWarning();
 
   const updatedConditions = {
     ...storeManager.getData('simpleSearchConditions'),
@@ -54,10 +56,13 @@ function applySimpleSearchConditionPatch(
   } as SimpleSearchCurrentConditions;
   storeManager.setData('simpleSearchConditions', updatedConditions);
 
-  reflectSimpleSearchConditionToURI(
+  void reflectSimpleSearchConditionToURI(
     updatedConditions,
     storeManager.getData('simpleSearchConditionsMaster')
-  );
+  ).then(({ isURLTooLong, isStale }) => {
+    if (isStale) return;
+    storeManager.setData('searchURLTooLong', isURLTooLong);
+  });
 
   requestInitialSearch('user');
 }
@@ -127,6 +132,7 @@ function createSimpleSearchResetConditions(): Partial<SimpleSearchCurrentConditi
 export async function handleHistoryChange(e: PopStateEvent): Promise<void> {
   prepareHistoryNavigationSearch();
   const restoreId = invalidatePendingHistoryRestore();
+  invalidatePendingSearchURLReflection();
 
   const urlParams = parseSearchURLParams();
   const mode = normalizeModeParam(urlParams.mode);
@@ -142,7 +148,7 @@ export async function handleHistoryChange(e: PopStateEvent): Promise<void> {
     return;
   }
 
-  restoreSimpleSearchFromHistory(urlParams, currentMode);
+  await restoreSimpleSearchFromHistory(urlParams, e.state, currentMode, restoreId);
 }
 
 /**
@@ -162,34 +168,48 @@ function restoreAdvancedSearchFromHistory(
   currentMode: SearchMode | '',
   restoreId: number
 ): Promise<void> {
-  return getAdvancedConditionFromHistory(
-    urlParams,
-    historyState
-  ).then((restoreResult) => {
-    if (!isCurrentHistoryRestore(restoreId)) return;
-    setAdvancedSearchURLRestoreWarning(restoreResult.shouldWarn);
-    storeManager.setData(
-      'advancedSearchConditions',
-      restoreResult.condition ?? undefined
-    );
-    notifyAdvancedSearchBuilderRestored();
-    continueHistorySearchInMode('advanced', currentMode);
-  });
+  return getAdvancedConditionFromHistory(urlParams, historyState).then(
+    (restoreResult) => {
+      if (!isCurrentHistoryRestore(restoreId)) return;
+      setSearchURLRestoreWarning(
+        restoreResult.shouldWarn
+          ? ADVANCED_SEARCH_URL_RESTORE_WARNING
+          : undefined
+      );
+      storeManager.setData('searchURLTooLong', restoreResult.isURLTooLong);
+      storeManager.setData(
+        'advancedSearchConditions',
+        restoreResult.condition ?? undefined
+      );
+      notifyAdvancedSearchBuilderRestored();
+      continueHistorySearchInMode('advanced', currentMode);
+    }
+  );
 }
 
 /**
  * Simple Searchの履歴復元ではURLにない条件をデフォルトへ戻し、前の絞り込み残りを防ぐ。
+ * URL長制限時のhistory.state退避も、Advanced Search同様にここで読む。
  */
-function restoreSimpleSearchFromHistory(
+async function restoreSimpleSearchFromHistory(
   urlParams: Record<string, unknown>,
-  currentMode: SearchMode | ''
-): void {
-  clearAdvancedSearchURLRestoreWarning();
-  const restoredConditions = buildSimpleConditionsFromURL(
+  historyState: unknown,
+  currentMode: SearchMode | '',
+  restoreId: number
+): Promise<void> {
+  const restoreResult = await buildSimpleConditionsFromURL(
     urlParams,
-    storeManager.getData('simpleSearchConditionsMaster') ?? []
+    storeManager.getData('simpleSearchConditionsMaster') ?? [],
+    historyState
   );
-  storeManager.setData('simpleSearchConditions', restoredConditions);
+  if (!isCurrentHistoryRestore(restoreId)) return;
+  setSearchURLRestoreWarning(
+    restoreResult.shouldWarn
+      ? SIMPLE_SEARCH_URL_RESTORE_WARNING
+      : undefined
+  );
+  storeManager.setData('searchURLTooLong', restoreResult.isURLTooLong);
+  storeManager.setData('simpleSearchConditions', restoreResult.conditions);
   continueHistorySearchInMode('simple', currentMode);
 }
 
@@ -219,7 +239,7 @@ export function setAdvancedSearchCondition(
   newSearchConditions: ConditionQuery
 ): void {
   invalidatePendingHistoryRestore();
-  clearAdvancedSearchURLRestoreWarning();
+  clearSearchURLRestoreWarning();
   const normalizedConditions =
     Object.keys(newSearchConditions).length === 0
       ? undefined
@@ -232,20 +252,17 @@ export function setAdvancedSearchCondition(
 }
 
 /**
- * qz復元失敗の警告は、その後の通常操作や別履歴復元へ持ち越さない。
+ * 共有URL復元失敗の警告は、その後の通常操作や別履歴復元へ持ち越さない。
  */
-function clearAdvancedSearchURLRestoreWarning(): void {
-  setAdvancedSearchURLRestoreWarning(false);
+function clearSearchURLRestoreWarning(): void {
+  setSearchURLRestoreWarning(undefined);
 }
 
 /**
- * 復元警告の文言を一箇所で扱い、boolean判定と表示文言の散在を避ける。
+ * 復元警告のStore反映を一箇所で扱い、表示文言の書き込み口を増やさない。
  */
-function setAdvancedSearchURLRestoreWarning(shouldWarn: boolean): void {
-  storeManager.setData(
-    'advancedSearchURLRestoreWarning',
-    shouldWarn ? ADVANCED_SEARCH_URL_RESTORE_WARNING : undefined
-  );
+function setSearchURLRestoreWarning(warning: string | undefined): void {
+  storeManager.setData('searchURLRestoreWarning', warning);
 }
 
 /**
@@ -264,14 +281,15 @@ function invalidatePendingHistoryRestore(): number {
 }
 
 /**
- * URL生成はsearchURL.tsへ委譲し、Advanced Search画面が必要とするURL長制限フラグだけStoreへ戻す。
+ * URL生成はsearchURL.tsへ委譲し、画面が必要とするURL長制限フラグだけStoreへ戻す。
+ * Simple Search側（applySimpleSearchConditionPatch/handleSimpleModeSelected）も同じフラグを共有する。
  */
 function reflectCurrentAdvancedConditionToUrl(): void {
   const conditions = storeManager.getData('advancedSearchConditions');
   void reflectAdvancedSearchConditionToURI(conditions).then(
     ({ isURLTooLong, isStale }) => {
       if (isStale) return;
-      storeManager.setData('advancedSearchURLTooLong', isURLTooLong);
+      storeManager.setData('searchURLTooLong', isURLTooLong);
     }
   );
 }
@@ -296,7 +314,7 @@ function handleSearchModeChange(mode: SearchMode | ''): void {
 
   reflectSearchModeToBodyDataset(mode);
   if (!storeManager.fromHistory) {
-    clearAdvancedSearchURLRestoreWarning();
+    clearSearchURLRestoreWarning();
   }
 
   switch (mode) {
@@ -324,10 +342,13 @@ function reflectSearchModeToBodyDataset(mode: SearchMode): void {
  */
 function handleSimpleModeSelected(): void {
   if (!storeManager.fromHistory) {
-    reflectSimpleSearchConditionToURI(
+    void reflectSimpleSearchConditionToURI(
       storeManager.getData('simpleSearchConditions'),
       storeManager.getData('simpleSearchConditionsMaster')
-    );
+    ).then(({ isURLTooLong, isStale }) => {
+      if (isStale) return;
+      storeManager.setData('searchURLTooLong', isURLTooLong);
+    });
   }
 
   storeManager.publish('simpleSearchConditions');

@@ -209,32 +209,41 @@ app/frontend/src/components/AdvancedSearch/AdvancedSearchToolbar.ts
 app/frontend/src/components/AdvancedSearch/AdvancedSearchConditionRestorer.ts
 app/frontend/src/components/Condition/
 app/frontend/src/components/Condition/queryBuilders/
-app/frontend/src/store/searchManager.ts
-app/frontend/src/store/advancedSearchURL.ts
+app/frontend/src/store/search/searchManager.ts
+app/frontend/src/store/search/advancedSearchURL.ts
 ```
 
 ### URL共有
 
-Advanced Search の条件は URL に保存できます。
+Advanced Search の条件は URL に保存できます。長い条件では圧縮形式の `qz` を使用します。
 
 ```txt
 /?mode=advanced&q=<Base64 encoded JSON>
+/?mode=advanced&qz=<compressed Base64URL JSON>
 ```
 
 処理の流れ:
 
 1. 条件オブジェクトを `JSON.stringify()` する
-2. `btoa()` で Base64 へ変換する
-3. `encodeURIComponent()` して `q` パラメータへ入れる
-4. ページ読み込み時に `q` をデコードして Store へ復元する
+2. 400文字以下の短い条件は Base64 へ変換して `q` パラメータへ入れる
+3. 長い条件はブラウザ標準の Compression Streams API で圧縮し、Base64URL へ変換して `qz` パラメータへ入れる
+4. ページ読み込み時に `qz` または `q` をデコードして Store へ復元する
 5. `AdvancedSearchConditionRestorer` が Store の条件を UI へ戻す
 
-URLに載せる条件JSONは 2000 文字を上限にしています。
-上限を超えた場合、検索自体は実行しますが URL には `?mode=advanced` のみを反映します。
+URLに載せられないほど条件が長い場合、検索自体は実行しますが URL には `?mode=advanced` のみを反映し、条件は `history.state`（ブラウザの戻る/進む用の内部状態）へ退避します。共有URL自体には載りませんが、同一ブラウザでの戻る/進む・リロードでは条件を復元できます。
 
 ## Simple Search
 
-Simple Search の条件は、フラットなURLクエリとして反映されます。
+Simple Search の共有URLは、検索条件を `q` または `qz` パラメータへエンコードして反映します。
+
+```txt
+/?mode=simple&q=<Base64 encoded JSON>
+/?mode=simple&qz=<compressed Base64URL JSON>
+```
+
+新規に発行するURLは、短い条件では `q` 形式、400文字を超える条件では圧縮版 `qz` と比較して短い方を使います。互換性維持のため、従来のフラットなURLクエリも読み込み時には復元できます。
+
+URLに載せられないほど条件が長い場合、検索自体は実行しますが URL には `?mode=simple` のみを反映し、Advanced Searchと同様に条件は `history.state` へ退避します。
 
 主な関連ファイル:
 
@@ -242,8 +251,11 @@ Simple Search の条件は、フラットなURLクエリとして反映されま
 app/frontend/src/components/SearchField/
 app/frontend/src/components/SideBar.ts
 app/frontend/src/components/PanelView/
-app/frontend/src/store/searchManager.ts
-app/frontend/src/api/fetchData.ts
+app/frontend/src/store/search/searchManager.ts
+app/frontend/src/store/search/searchURL.ts
+app/frontend/src/store/search/searchHistory.ts
+app/frontend/src/store/search/simpleSearchURL.ts
+app/frontend/src/api/searchExecutor.ts
 ```
 
 Simple Search と Advanced Search はどちらも `StoreManager` を経由して検索状態を更新し、`executeSearch()` で API リクエストを行います。

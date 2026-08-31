@@ -7,13 +7,18 @@ type SearchMessageResponse = {
   error?: string[];
 };
 
+const SEARCH_URL_TOO_LONG_WARNING =
+  'The search conditions are too long to include in the shared URL. The shared URL will only reflect the search mode.';
+
 /**
  * APIレスポンス内のnotice/warning/errorだけをStoreへ反映し、検索結果処理と分離する。
  */
 export function applySearchMessages(jsonResponse: unknown): void {
   storeManager.setData(
     'searchMessages',
-    mergeURLRestoreWarning(normalizeSearchMessages(jsonResponse))
+    mergeSearchURLTooLongWarning(
+      mergeURLRestoreWarning(normalizeSearchMessages(jsonResponse))
+    )
   );
 }
 
@@ -33,12 +38,28 @@ function normalizeSearchMessages(jsonResponse: unknown): SearchMessages {
 }
 
 /**
- * qz共有URLの復元失敗はAPIレスポンス由来ではないため、APIメッセージへ合成して表示を維持する。
+ * 共有URLの復元失敗はAPIレスポンス由来ではないため、APIメッセージへ合成して表示を維持する。
  */
 function mergeURLRestoreWarning(messages: SearchMessages): SearchMessages {
-  const warning = storeManager.getData('advancedSearchURLRestoreWarning');
+  const warning = storeManager.getData('searchURLRestoreWarning');
   if (!warning) return messages;
 
+  return appendWarning(messages, warning);
+}
+
+/**
+ * Simple/Advancedとも条件が長すぎてURLへ載せられなかった場合、共有URLが不完全であることをその場で伝える。
+ */
+function mergeSearchURLTooLongWarning(messages: SearchMessages): SearchMessages {
+  if (!storeManager.getData('searchURLTooLong')) return messages;
+
+  return appendWarning(messages, SEARCH_URL_TOO_LONG_WARNING);
+}
+
+/**
+ * URL関連の警告はAPIメッセージより先に読ませたいため、常に先頭へ追加する。
+ */
+function appendWarning(messages: SearchMessages, warning: string): SearchMessages {
   return {
     ...messages,
     warning: messages.warning ? `${warning}<br>${messages.warning}` : warning,

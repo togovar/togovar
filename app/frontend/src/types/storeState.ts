@@ -76,8 +76,8 @@ export type StoreState = {
   isSearchResultsUpdating: boolean;
   selectedRow?: number;
   advancedSearchConditions?: ConditionQuery;
-  advancedSearchURLTooLong?: boolean;
-  advancedSearchURLRestoreWarning?: string;
+  searchURLTooLong?: boolean;
+  searchURLRestoreWarning?: string;
   advancedSearchRestoredFromURL?: boolean;
   searchMessages?: SearchMessages;
   searchStatus?: SearchStatus;

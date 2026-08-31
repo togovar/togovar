@@ -1,4 +1,4 @@
-import { storeManager } from './StoreManager';
+import { storeManager } from '../StoreManager';
 import {
   ADVANCED_SEARCH_URL_RESTORE_WARNING,
   decodeConditionFromURLParamsWithStatus,
@@ -6,6 +6,8 @@ import {
   type AdvancedSearchURLDecodeResult,
 } from './advancedSearchURL';
 import { initSearchHandlers } from './searchManager';
+import { getObjectFromHistoryState } from './searchURLCodec';
+import type { ConditionQuery } from '../../types/query';
 
 /**
  * URLのクエリパラメータを解析してストアへ反映し、検索モードを返す。
@@ -24,8 +26,17 @@ export async function initializeApp(): Promise<'simple' | 'advanced'> {
       q: searchParams.get('q'),
       qz: searchParams.get('qz'),
     });
-    updateAdvancedSearchURLRestoreWarning(result);
-    const condition = result.condition;
+    // URL長制限時にhistory.stateへ退避した条件は、リロード後もwindow.history.stateから読める。
+    const stashedCondition = getObjectFromHistoryState<ConditionQuery>(
+      window.history.state,
+      'advancedSearchConditions'
+    );
+    const condition = result.condition ?? stashedCondition;
+    updateAdvancedSearchURLRestoreWarning(result, condition);
+    storeManager.setData(
+      'searchURLTooLong',
+      result.condition === null && stashedCondition !== null
+    );
     if (condition !== null) {
       storeManager.setData('advancedSearchConditions', condition);
       storeManager.setData('advancedSearchRestoredFromURL', true);
@@ -37,17 +48,18 @@ export async function initializeApp(): Promise<'simple' | 'advanced'> {
 }
 
 /**
- * qzだけの共有URLが復元できなかった場合、空条件で黙って検索されないよう警告を残す。
+ * Advanced Searchの共有URLが復元できなかった場合、空条件で黙って検索されないよう警告を残す。
+ * history.stateから復元できた場合はURL自体は不完全でも条件は失われていないため警告しない。
  */
 export function updateAdvancedSearchURLRestoreWarning(
-  result: AdvancedSearchURLDecodeResult
+  result: AdvancedSearchURLDecodeResult,
+  restoredCondition: ConditionQuery | null
 ): void {
-  const shouldWarn = shouldWarnAdvancedSearchURLRestoreFailure(
-    result,
-    result.condition
-  );
+  const shouldWarn =
+    shouldWarnAdvancedSearchURLRestoreFailure(result) &&
+    restoredCondition === null;
   storeManager.setData(
-    'advancedSearchURLRestoreWarning',
+    'searchURLRestoreWarning',
     shouldWarn ? ADVANCED_SEARCH_URL_RESTORE_WARNING : undefined
   );
 }

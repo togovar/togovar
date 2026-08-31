@@ -1,5 +1,5 @@
-import type { ResultData } from '../types';
-import type { StoreState } from '../types/storeState';
+import type { ResultData } from '../../types';
+import type { StoreState } from '../../types/storeState';
 
 export type SearchResultSlot = ResultData | null;
 export type SearchRecordLookupResult = ResultData | 'loading' | 'out of range';

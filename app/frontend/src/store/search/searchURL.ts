@@ -1,10 +1,14 @@
 import * as qs from 'qs';
-import type { ConditionQuery, MasterConditions, SimpleSearchCurrentConditions } from '../types';
+import type {
+  ConditionQuery,
+  MasterConditions,
+  SimpleSearchCurrentConditions,
+} from '../../types';
 import { encodeConditionForBestURL } from './advancedSearchURL';
-import { extractSearchCondition } from './simpleSearchConditions';
+import { encodeSimpleConditionForBestURL } from './simpleSearchURL';
 
 type SearchUrlParams = Record<string, unknown>;
-type AdvancedSearchURLReflectionResult = {
+export type SearchURLReflectionResult = {
   isURLTooLong: boolean;
   isStale: boolean;
 };
@@ -12,7 +16,7 @@ type AdvancedSearchURLReflectionResult = {
 let currentUrlParams: SearchUrlParams = qs.parse(
   window.location.search.substring(1)
 );
-let advancedUrlReflectionId = 0;
+let searchUrlReflectionId = 0;
 
 // ## Advanced Search URL仕様
 //
@@ -22,7 +26,7 @@ let advancedUrlReflectionId = 0;
 //   条件なし: ?mode=advanced
 //
 // ### エンコード方式
-//   条件オブジェクト → JSON.stringify() → btoa() (Base64) → encodeURIComponent() → `q` パラメータ
+//   条件オブジェクト → JSON.stringify() → UTF-8 → Base64 → `q` パラメータ
 //   長い条件では CompressionStream(deflate-raw) → Base64URL → `qz` パラメータ
 //
 // ### 文字数制限
@@ -31,75 +35,71 @@ let advancedUrlReflectionId = 0;
 //   - どちらも使えない場合はURLを `?mode=advanced` のみにし、条件はhistory.stateへ退避する
 //
 // ### Simple Searchとの比較
-//   Simple Search: qs.stringify() でフラットなkey=valueをURLに展開
+//   Simple Search: 差分条件をJSON+Base64または圧縮JSON+Base64URLで格納
 //   Advanced Search: ネスト構造のためJSON+Base64または圧縮JSON+Base64URLを使用
+//   どちらもURLに載せられない場合の挙動は同じ（`?mode=xxx` のみにし、条件をhistory.stateへ退避、
+//   `searchURLTooLong` で呼び出し元へ通知する）
 
 /**
  * Simple Search条件のURL表現をここに閉じ込め、検索開始ロジックからpushStateを分離する。
+ * URLに載せられない場合は条件をhistory.stateへ退避し、popstate復元時に読めるようにする。
  */
-export function reflectSimpleSearchConditionToURI(
+export async function reflectSimpleSearchConditionToURI(
   currentConditions: SimpleSearchCurrentConditions,
   masterConditions: MasterConditions[]
-): void {
-  const diffConditions = extractSearchCondition(currentConditions, masterConditions);
-  const currentTerm = currentConditions.term || '';
-
-  if (Object.keys(diffConditions).length === 0 && currentTerm === '') {
-    currentUrlParams = {
-      mode: 'simple',
-    };
-  } else {
-    currentUrlParams = {
-      mode: 'simple',
-      ...diffConditions,
-    };
-
-    if (currentTerm !== '') {
-      currentUrlParams.term = currentTerm;
-    } else {
-      delete currentUrlParams.term;
-    }
+): Promise<SearchURLReflectionResult> {
+  const reflectionId = invalidatePendingSearchURLReflection();
+  const { param: encoded, hasConditions } =
+    await encodeSimpleConditionForBestURL(currentConditions, masterConditions);
+  if (reflectionId !== searchUrlReflectionId) {
+    return { isURLTooLong: false, isStale: true };
   }
 
-  pushSearchUrl(currentUrlParams);
+  currentUrlParams = buildModeUrlParams('simple', encoded);
+  const isURLTooLong = hasConditions && encoded === null;
+  const state = isURLTooLong
+    ? { ...currentUrlParams, simpleSearchConditions: currentConditions }
+    : currentUrlParams;
+  pushSearchUrl(state, currentUrlParams);
+
+  return { isURLTooLong, isStale: false };
 }
 
 /**
- * Advanced Search条件のURL表現と履歴state退避をここに集約し、長すぎる条件だけ呼び出し元へ返す。
+ * Advanced Search条件のURL表現と履歴state退避をここに集約し、長すぎる条件だけ呼び出し元へ通知する。
  */
 export async function reflectAdvancedSearchConditionToURI(
   conditions: ConditionQuery | undefined
-): Promise<AdvancedSearchURLReflectionResult> {
-  const reflectionId = ++advancedUrlReflectionId;
+): Promise<SearchURLReflectionResult> {
+  const reflectionId = invalidatePendingSearchURLReflection();
   // conditions は setAdvancedSearchCondition で {} → undefined に正規化されるため、存在確認だけで十分。
   const hasConditions = conditions !== undefined;
   const encoded = hasConditions
     ? await encodeConditionForBestURL(conditions)
     : null;
-  if (reflectionId !== advancedUrlReflectionId) {
+  if (reflectionId !== searchUrlReflectionId) {
     return { isURLTooLong: false, isStale: true };
   }
 
-  let url: string;
-  if (encoded !== null) {
-    const params = new URLSearchParams({ mode: 'advanced' });
-    params.set(encoded.name, encoded.value);
-    url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
-    currentUrlParams = { mode: 'advanced', [encoded.name]: encoded.value };
-  } else {
-    url = `${window.location.origin}${window.location.pathname}?mode=advanced`;
-    currentUrlParams = { mode: 'advanced' };
-  }
-
+  currentUrlParams = buildModeUrlParams('advanced', encoded);
   const isURLTooLong = hasConditions && encoded === null;
   const state =
     isURLTooLong && conditions
       ? { ...currentUrlParams, advancedSearchConditions: conditions }
       : currentUrlParams;
-
-  pushAdvancedSearchUrl(state, url);
+  pushSearchUrl(state, currentUrlParams);
 
   return { isURLTooLong, isStale: false };
+}
+
+/**
+ * Simple/Advancedとも「載らなければmodeのみ」で揃えるため、URLパラメータの組み立てを共通化する。
+ */
+function buildModeUrlParams(
+  mode: 'simple' | 'advanced',
+  encoded: { name: 'q' | 'qz'; value: string } | null
+): SearchUrlParams {
+  return encoded === null ? { mode } : { mode, [encoded.name]: encoded.value };
 }
 
 /**
@@ -111,24 +111,29 @@ export function parseSearchURLParams(): ReturnType<typeof qs.parse> {
 }
 
 /**
- * 同一URLの重複履歴と未操作時のskippable履歴を避け、Simple Searchの戻る挙動を自然に保つ。
+ * Simple/AdvancedのURL反映は同じURLを書き換えるため、検索種別をまたいで古い非同期反映を無効化する。
  */
-function pushSearchUrl(params: SearchUrlParams): void {
-  const newUrl = `${window.location.origin}${
-    window.location.pathname
-  }?${qs.stringify(params)}`;
-  updateSearchHistory(params, newUrl);
+export function invalidatePendingSearchURLReflection(): number {
+  searchUrlReflectionId += 1;
+  return searchUrlReflectionId;
 }
 
 /**
- * Advanced SearchはURL長制限時にstateへ条件を退避するため、履歴更新失敗時のフォールバックを持つ。
+ * 同一URLの重複履歴と未操作時のskippable履歴を避け、Simple Searchの戻る挙動を自然に保つ。
+ * URL長制限時はstateへ条件を退避するため、状態更新に失敗した場合のフォールバックを持つ。
  */
-function pushAdvancedSearchUrl(state: SearchUrlParams, url: string): void {
+function pushSearchUrl(
+  state: SearchUrlParams,
+  urlParams: SearchUrlParams = state
+): void {
+  const newUrl = `${window.location.origin}${
+    window.location.pathname
+  }?${qs.stringify(urlParams)}`;
   try {
-    updateSearchHistory(state, url);
+    updateSearchHistory(state, newUrl);
   } catch {
     try {
-      updateSearchHistory(currentUrlParams, url);
+      updateSearchHistory(urlParams, newUrl);
     } catch {
       // URL更新に失敗しても検索自体は継続できるため、ここでは何もしない。
     }

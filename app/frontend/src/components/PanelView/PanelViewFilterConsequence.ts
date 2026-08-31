@@ -4,7 +4,7 @@ import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
   getSimpleSearchConditionMaster,
-} from '../../store/searchManager';
+} from '../../store/search/searchManager';
 import type {
   MasterConditions,
   MasterConditionItem,

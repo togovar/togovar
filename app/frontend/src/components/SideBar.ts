@@ -1,5 +1,5 @@
 import { storeManager } from '../store/StoreManager';
-import { resetSimpleSearchConditions } from '../store/searchManager';
+import { resetSimpleSearchConditions } from '../store/search/searchManager';
 import type { StoreState } from '../types/storeState';
 import { selectRequired } from '../utils/dom/select';
 

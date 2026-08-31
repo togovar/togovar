@@ -1,6 +1,6 @@
 import { COLUMNS, getOrderedColumns } from '../../columns';
 import { storeManager } from '../../store/StoreManager';
-import { requestNextPage } from '../../store/searchManager';
+import { requestNextPage } from '../../store/search/searchManager';
 import type {
   ResultData,
   Column,

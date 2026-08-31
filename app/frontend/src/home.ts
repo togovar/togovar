@@ -17,14 +17,12 @@ import PanelViewPreviewAlternateAlleleFrequencies from './components/PanelView/P
 import PanelViewPreviewConsequence from './components/PanelView/PanelViewPreviewConsequence';
 import PanelViewPreviewClinicalSignificance from './components/PanelView/PanelViewPreviewClinicalSignificance';
 import FloatingInfo from './components/FloatingInfo';
-import qs from 'qs';
-import { extractSearchCondition } from './store/simpleSearchConditions';
-import { initializeApp } from './store/initializeApp';
+import { initializeApp } from './store/search/initializeApp';
+import { buildSimpleConditionsFromURL } from './store/search/searchHistory';
+import { parseSearchURLParams } from './store/search/searchURL';
+import { SIMPLE_SEARCH_URL_RESTORE_WARNING } from './store/search/simpleSearchURL';
 import { selectRequired } from './utils/dom/select';
-import type {
-  MasterConditions,
-  SimpleSearchCurrentConditions,
-} from './types/search';
+import type { MasterConditions } from './types/search';
 import type { AdvancedSearchBuilderView as AdvancedSearchBuilderViewType } from './components/AdvancedSearch/AdvancedSearchBuilderView';
 
 // webpackのrequire()をTypeScriptで使うための型宣言（FloatingInfo.tsと同じパターン）。
@@ -36,9 +34,6 @@ declare global {
     cleanupTogovar?: () => void;
   }
 }
-
-// モジュール起動時に一度だけURLを解析し、全初期化関数で参照できるようにする。
-const currentUrlParams = qs.parse(window.location.search.substring(1));
 
 // ページライフサイクルをまたいでインスタンスを管理する変数。
 // pagehide時にdestroy/disposeを呼ぶためモジュールスコープで保持する。
@@ -110,14 +105,28 @@ async function readyInitialSearch(callback: () => void): Promise<void> {
   const searchMode = await initializeApp();
 
   // Simple Searchの初期条件のみURLから復元する。Advanced側はinitializeApp内で処理済み。
-  const simpleSearchConditions =
+  // URL長制限時にhistory.stateへ退避した条件は、リロード後もwindow.history.stateから読める。
+  const simpleSearchRestoreResult =
     searchMode === 'simple'
-      ? extractSearchCondition(
-          currentUrlParams as SimpleSearchCurrentConditions,
-          storeManager.getData('simpleSearchConditionsMaster')
+      ? await buildSimpleConditionsFromURL(
+          parseSearchURLParams(),
+          storeManager.getData('simpleSearchConditionsMaster'),
+          window.history.state
         )
-      : {};
-  storeManager.setData('simpleSearchConditions', simpleSearchConditions);
+      : undefined;
+  storeManager.setData(
+    'simpleSearchConditions',
+    simpleSearchRestoreResult?.conditions ?? {}
+  );
+  if (simpleSearchRestoreResult?.shouldWarn) {
+    storeManager.setData(
+      'searchURLRestoreWarning',
+      SIMPLE_SEARCH_URL_RESTORE_WARNING
+    );
+  }
+  if (simpleSearchRestoreResult?.isURLTooLong) {
+    storeManager.setData('searchURLTooLong', true);
+  }
 
   // searchModeを最後にセットし、条件が揃った状態で検索開始の副作用を発火する。
   // 初期ロード時はURLがすでに正しいためsetSearchModeFromHistoryを使い、
