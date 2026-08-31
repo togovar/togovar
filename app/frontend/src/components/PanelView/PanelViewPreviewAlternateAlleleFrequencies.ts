@@ -1,6 +1,6 @@
 import PanelView from './PanelView';
 import { storeManager } from '../../store/StoreManager';
-import { getSimpleSearchConditionMaster } from '../../store/searchManager';
+import { getSimpleSearchConditionMaster } from '../../store/search/searchManager';
 import type { MasterConditionItem } from '../../types';
 
 /** アレル頻度の表示桁数。小数点以下4桁を上限として丸める。 */

@@ -3,7 +3,7 @@ import { storeManager } from '../../store/StoreManager';
 import {
   setSimpleSearchCondition,
   getSimpleSearchCondition,
-} from '../../store/searchManager';
+} from '../../store/search/searchManager';
 import type { SimpleSearchCurrentConditions } from '../../types';
 
 /**

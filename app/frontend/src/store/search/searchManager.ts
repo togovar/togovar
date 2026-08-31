@@ -1,17 +1,17 @@
-import { executeSearch } from '../api/searchExecutor';
-import { clearSingleVariantRedirectCandidates } from '../api/searchResponse';
+import { executeSearch } from '../../api/searchExecutor';
+import { clearSingleVariantRedirectCandidates } from '../../api/searchResponse';
 import {
   markSearchOriginBeforeDebounce,
   type SearchOrigin,
-} from '../api/searchExecutionState';
-import { storeManager } from './StoreManager';
+} from '../../api/searchExecutionState';
+import { storeManager } from '../StoreManager';
 import type {
   MasterConditions,
   MasterConditionId,
   SimpleSearchCurrentConditions,
   SearchMode,
-} from '../types';
-import type { ConditionQuery } from '../types/query';
+} from '../../types';
+import type { ConditionQuery } from '../../types/query';
 import { ADVANCED_SEARCH_URL_RESTORE_WARNING } from './advancedSearchURL';
 import {
   buildSimpleConditionsFromURL,
@@ -54,7 +54,7 @@ function applySimpleSearchConditionPatch(
   } as SimpleSearchCurrentConditions;
   storeManager.setData('simpleSearchConditions', updatedConditions);
 
-  reflectSimpleSearchConditionToURI(
+  void reflectSimpleSearchConditionToURI(
     updatedConditions,
     storeManager.getData('simpleSearchConditionsMaster')
   );
@@ -142,7 +142,7 @@ export async function handleHistoryChange(e: PopStateEvent): Promise<void> {
     return;
   }
 
-  restoreSimpleSearchFromHistory(urlParams, currentMode);
+  await restoreSimpleSearchFromHistory(urlParams, currentMode, restoreId);
 }
 
 /**
@@ -180,15 +180,17 @@ function restoreAdvancedSearchFromHistory(
 /**
  * Simple Searchの履歴復元ではURLにない条件をデフォルトへ戻し、前の絞り込み残りを防ぐ。
  */
-function restoreSimpleSearchFromHistory(
+async function restoreSimpleSearchFromHistory(
   urlParams: Record<string, unknown>,
-  currentMode: SearchMode | ''
-): void {
-  clearAdvancedSearchURLRestoreWarning();
-  const restoredConditions = buildSimpleConditionsFromURL(
+  currentMode: SearchMode | '',
+  restoreId: number
+): Promise<void> {
+  const restoredConditions = await buildSimpleConditionsFromURL(
     urlParams,
     storeManager.getData('simpleSearchConditionsMaster') ?? []
   );
+  if (!isCurrentHistoryRestore(restoreId)) return;
+  clearAdvancedSearchURLRestoreWarning();
   storeManager.setData('simpleSearchConditions', restoredConditions);
   continueHistorySearchInMode('simple', currentMode);
 }
@@ -324,7 +326,7 @@ function reflectSearchModeToBodyDataset(mode: SearchMode): void {
  */
 function handleSimpleModeSelected(): void {
   if (!storeManager.fromHistory) {
-    reflectSimpleSearchConditionToURI(
+    void reflectSimpleSearchConditionToURI(
       storeManager.getData('simpleSearchConditions'),
       storeManager.getData('simpleSearchConditionsMaster')
     );

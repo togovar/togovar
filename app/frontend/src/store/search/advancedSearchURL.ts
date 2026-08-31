@@ -1,0 +1,179 @@
+import type { ConditionQuery } from '../../types/query';
+import {
+  decodeCompressedURLToJSON,
+  encodeJSONToCompressedURL,
+  getFirstString,
+  isPlainObject,
+  SEARCH_URL_COMPRESSION_MIN_LEGACY_LENGTH,
+  type SearchURLParam,
+} from './searchURLCodec';
+
+/** Advanced Search条件のURLエンコード上限（Raw JSON文字数） */
+export const ADVANCED_SEARCH_URL_MAX_JSON_LENGTH = 2000;
+export const ADVANCED_SEARCH_URL_RESTORE_WARNING =
+  'Could not restore the shared Advanced Search URL. Your browser may not support compressed URL parameters.';
+
+export type AdvancedSearchURLDecodeResult = {
+  condition: ConditionQuery | null;
+  hasCompressedParam: boolean;
+  hasLegacyParam: boolean;
+  restoredFromCompressed: boolean;
+  restoredFromLegacy: boolean;
+};
+
+/**
+ * Advanced Search条件をURLの `q` パラメータ用にエンコードする。
+ * JSON.stringify → btoa (Base64) の順で変換する。
+ * Raw JSONが上限を超える、またはエンコードに失敗した場合は null を返す。
+ */
+export function encodeConditionForURL(query: unknown): string | null {
+  try {
+    const json = JSON.stringify(query);
+    if (typeof json !== 'string') return null;
+    if (json.length > ADVANCED_SEARCH_URL_MAX_JSON_LENGTH) return null;
+    return btoa(json);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Advanced Search条件を共有URLへ載せるため、短い条件は従来Base64、長い条件は圧縮Base64URLを優先する。
+ */
+export async function encodeConditionForBestURL(
+  query: unknown
+): Promise<SearchURLParam | null> {
+  const legacy = encodeConditionForURL(query);
+  if (
+    legacy !== null &&
+    legacy.length <= SEARCH_URL_COMPRESSION_MIN_LEGACY_LENGTH
+  ) {
+    return { name: 'q', value: legacy };
+  }
+
+  const compressed = await encodeConditionForCompressedURL(query);
+
+  if (legacy === null && compressed === null) return null;
+  if (legacy === null) return { name: 'qz', value: compressed! };
+  if (compressed === null || legacy.length <= compressed.length) {
+    return { name: 'q', value: legacy };
+  }
+  return { name: 'qz', value: compressed };
+}
+
+/**
+ * URL長を抑えるため、Compression Streams API対応ブラウザではJSONをdeflate-raw圧縮してBase64URL化する。
+ */
+async function encodeConditionForCompressedURL(
+  query: unknown
+): Promise<string | null> {
+  return encodeJSONToCompressedURL(query);
+}
+
+/**
+ * URLの `q` パラメータをAdvanced Search条件にデコードする。
+ * 既存のURL互換のため、`+` が空白に変換されたケースも補正する。
+ */
+export function decodeConditionFromURL(
+  encoded: string
+): ConditionQuery | null {
+  try {
+    const parsed = JSON.parse(atob(encoded.replace(/ /g, '+')));
+    // 配列・プリミティブはAPIのquery bodyに流れると不正リクエストになるため弾く。
+    // 空オブジェクトは「条件なし」センチネル(undefined)と整合させるため null を返す。
+    if (!isPlainObject(parsed) || Object.keys(parsed).length === 0) return null;
+    return parsed as ConditionQuery;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * URLのAdvanced Search条件は圧縮版qzを優先し、既存URL互換のため従来qへフォールバックする。
+ */
+export async function decodeConditionFromURLParams(params: {
+  q?: unknown;
+  qz?: unknown;
+}): Promise<ConditionQuery | null> {
+  return (await decodeConditionFromURLParamsWithStatus(params)).condition;
+}
+
+/**
+ * qz復元失敗時にUI警告を出すため、条件本体だけでなく復元経路も返す。
+ */
+export async function decodeConditionFromURLParamsWithStatus(params: {
+  q?: unknown;
+  qz?: unknown;
+}): Promise<AdvancedSearchURLDecodeResult> {
+  const compressed = getFirstString(params.qz);
+  if (compressed) {
+    const condition = await decodeCompressedConditionFromURL(compressed);
+    if (condition !== null) {
+      return {
+        condition,
+        hasCompressedParam: true,
+        hasLegacyParam: getFirstString(params.q) !== undefined,
+        restoredFromCompressed: true,
+        restoredFromLegacy: false,
+      };
+    }
+  }
+
+  const legacy = getFirstString(params.q);
+  const legacyCondition = legacy ? decodeConditionFromURL(legacy) : null;
+  return {
+    condition: legacyCondition,
+    hasCompressedParam: compressed !== undefined,
+    hasLegacyParam: legacy !== undefined,
+    restoredFromCompressed: false,
+    restoredFromLegacy: legacyCondition !== null,
+  };
+}
+
+/**
+ * qzを含む共有URLがどの経路でも復元できなかった場合だけ、ユーザーへ警告する。
+ */
+export function shouldWarnAdvancedSearchURLRestoreFailure(
+  result: AdvancedSearchURLDecodeResult,
+  restoredCondition: ConditionQuery | null
+): boolean {
+  return (
+    result.hasCompressedParam &&
+    !result.restoredFromCompressed &&
+    !result.restoredFromLegacy &&
+    restoredCondition === null
+  );
+}
+
+/**
+ * qzは圧縮済みバイト列のBase64URL表現なので、Base64URL復元後に展開してJSONとして読む。
+ */
+async function decodeCompressedConditionFromURL(
+  encoded: string
+): Promise<ConditionQuery | null> {
+  const parsed = await decodeCompressedURLToJSON(
+    encoded,
+    'Decompressed Advanced Search URL is too large.'
+  );
+  if (!isPlainObject(parsed) || Object.keys(parsed).length === 0) return null;
+  return parsed as ConditionQuery;
+}
+
+/**
+ * URL/画面復元用のメタ情報を取り除き、検索APIへ送れるqueryだけにする。
+ * 現在はGene symbolの表示名(labels)だけが対象。
+ */
+export function stripAdvancedSearchMetadata(query: unknown): unknown {
+  if (Array.isArray(query)) {
+    return query.map((item) => stripAdvancedSearchMetadata(item));
+  }
+
+  if (!isPlainObject(query)) return query;
+
+  const next: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(query)) {
+    if (key === 'labels') continue;
+    next[key] = stripAdvancedSearchMetadata(value);
+  }
+  return next;
+}

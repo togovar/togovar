@@ -1,7 +1,7 @@
 import * as qs from 'qs';
 import { API_URL } from '../global';
-import { stripAdvancedSearchMetadata } from '../store/advancedSearchURL';
-import { extractSearchCondition } from '../store/simpleSearchConditions';
+import { stripAdvancedSearchMetadata } from '../store/search/advancedSearchURL';
+import { extractSearchCondition } from '../store/search/simpleSearchConditions';
 import type {
   FetchOption,
   MasterConditions,

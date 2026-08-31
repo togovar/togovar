@@ -1,6 +1,6 @@
 import PanelView from './PanelView';
 import { storeManager } from '../../store/StoreManager';
-import { getSimpleSearchConditionMaster } from '../../store/searchManager';
+import { getSimpleSearchConditionMaster } from '../../store/search/searchManager';
 import type { MasterConditionItem } from '../../types';
 
 /**

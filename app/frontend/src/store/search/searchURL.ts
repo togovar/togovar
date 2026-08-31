@@ -1,7 +1,11 @@
 import * as qs from 'qs';
-import type { ConditionQuery, MasterConditions, SimpleSearchCurrentConditions } from '../types';
+import type {
+  ConditionQuery,
+  MasterConditions,
+  SimpleSearchCurrentConditions,
+} from '../../types';
 import { encodeConditionForBestURL } from './advancedSearchURL';
-import { extractSearchCondition } from './simpleSearchConditions';
+import { encodeSimpleConditionForBestURL } from './simpleSearchURL';
 
 type SearchUrlParams = Record<string, unknown>;
 type AdvancedSearchURLReflectionResult = {
@@ -12,6 +16,7 @@ type AdvancedSearchURLReflectionResult = {
 let currentUrlParams: SearchUrlParams = qs.parse(
   window.location.search.substring(1)
 );
+let simpleUrlReflectionId = 0;
 let advancedUrlReflectionId = 0;
 
 // ## Advanced Search URL仕様
@@ -31,34 +36,32 @@ let advancedUrlReflectionId = 0;
 //   - どちらも使えない場合はURLを `?mode=advanced` のみにし、条件はhistory.stateへ退避する
 //
 // ### Simple Searchとの比較
-//   Simple Search: qs.stringify() でフラットなkey=valueをURLに展開
+//   Simple Search: 差分条件をJSON+Base64または圧縮JSON+Base64URLで格納
 //   Advanced Search: ネスト構造のためJSON+Base64または圧縮JSON+Base64URLを使用
 
 /**
  * Simple Search条件のURL表現をここに閉じ込め、検索開始ロジックからpushStateを分離する。
  */
-export function reflectSimpleSearchConditionToURI(
+export async function reflectSimpleSearchConditionToURI(
   currentConditions: SimpleSearchCurrentConditions,
   masterConditions: MasterConditions[]
-): void {
-  const diffConditions = extractSearchCondition(currentConditions, masterConditions);
-  const currentTerm = currentConditions.term || '';
+): Promise<void> {
+  const reflectionId = ++simpleUrlReflectionId;
+  const encoded = await encodeSimpleConditionForBestURL(
+    currentConditions,
+    masterConditions
+  );
+  if (reflectionId !== simpleUrlReflectionId) return;
 
-  if (Object.keys(diffConditions).length === 0 && currentTerm === '') {
+  if (encoded === null) {
     currentUrlParams = {
       mode: 'simple',
     };
   } else {
     currentUrlParams = {
       mode: 'simple',
-      ...diffConditions,
+      [encoded.name]: encoded.value,
     };
-
-    if (currentTerm !== '') {
-      currentUrlParams.term = currentTerm;
-    } else {
-      delete currentUrlParams.term;
-    }
   }
 
   pushSearchUrl(currentUrlParams);

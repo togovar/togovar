@@ -1,4 +1,4 @@
-import { setAdvancedSearchCondition } from '../../store/searchManager';
+import { setAdvancedSearchCondition } from '../../store/search/searchManager';
 import { storeManager } from '../../store/StoreManager';
 import { ConditionGroupView } from '../Condition/ConditionGroupView';
 import { type ConditionView, isGroupView } from '../Condition/ConditionView';

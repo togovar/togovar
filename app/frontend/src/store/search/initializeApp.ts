@@ -1,4 +1,4 @@
-import { storeManager } from './StoreManager';
+import { storeManager } from '../StoreManager';
 import {
   ADVANCED_SEARCH_URL_RESTORE_WARNING,
   decodeConditionFromURLParamsWithStatus,

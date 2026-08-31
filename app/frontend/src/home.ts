@@ -17,14 +17,11 @@ import PanelViewPreviewAlternateAlleleFrequencies from './components/PanelView/P
 import PanelViewPreviewConsequence from './components/PanelView/PanelViewPreviewConsequence';
 import PanelViewPreviewClinicalSignificance from './components/PanelView/PanelViewPreviewClinicalSignificance';
 import FloatingInfo from './components/FloatingInfo';
-import qs from 'qs';
-import { extractSearchCondition } from './store/simpleSearchConditions';
-import { initializeApp } from './store/initializeApp';
+import { initializeApp } from './store/search/initializeApp';
+import { buildSimpleConditionsFromURL } from './store/search/searchHistory';
+import { parseSearchURLParams } from './store/search/searchURL';
 import { selectRequired } from './utils/dom/select';
-import type {
-  MasterConditions,
-  SimpleSearchCurrentConditions,
-} from './types/search';
+import type { MasterConditions } from './types/search';
 import type { AdvancedSearchBuilderView as AdvancedSearchBuilderViewType } from './components/AdvancedSearch/AdvancedSearchBuilderView';
 
 // webpackのrequire()をTypeScriptで使うための型宣言（FloatingInfo.tsと同じパターン）。
@@ -36,9 +33,6 @@ declare global {
     cleanupTogovar?: () => void;
   }
 }
-
-// モジュール起動時に一度だけURLを解析し、全初期化関数で参照できるようにする。
-const currentUrlParams = qs.parse(window.location.search.substring(1));
 
 // ページライフサイクルをまたいでインスタンスを管理する変数。
 // pagehide時にdestroy/disposeを呼ぶためモジュールスコープで保持する。
@@ -112,8 +106,8 @@ async function readyInitialSearch(callback: () => void): Promise<void> {
   // Simple Searchの初期条件のみURLから復元する。Advanced側はinitializeApp内で処理済み。
   const simpleSearchConditions =
     searchMode === 'simple'
-      ? extractSearchCondition(
-          currentUrlParams as SimpleSearchCurrentConditions,
+      ? await buildSimpleConditionsFromURL(
+          parseSearchURLParams(),
           storeManager.getData('simpleSearchConditionsMaster')
         )
       : {};

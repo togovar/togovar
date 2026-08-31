@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import '../suggestions/SearchFieldWithSuggestions';
 import './SimpleSearchExamples';
 import './SimpleSearchButton';
-import { getSimpleSearchCondition } from '../../../store/searchManager';
+import { getSimpleSearchCondition } from '../../../store/search/searchManager';
 import { storeManager } from '../../../store/StoreManager';
 import { SimpleSearchController } from './SimpleSearchController';
 import { SimpleSearchEventHandlers } from './SimpleSearchEventHandlers';

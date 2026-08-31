@@ -1,5 +1,5 @@
 import { storeManager } from '../../store/StoreManager';
-import { setSimpleSearchCondition } from '../../store/searchManager';
+import { setSimpleSearchCondition } from '../../store/search/searchManager';
 import type { DisplayingRegions } from '../../types/storeState';
 
 // 染色体棒の描画幅とSVG上下余白（px）。

@@ -1,4 +1,4 @@
-import { setSimpleSearchCondition } from '../../../store/searchManager';
+import { setSimpleSearchCondition } from '../../../store/search/searchManager';
 import { storeManager } from '../../../store/StoreManager';
 import { CHROMOSOME_PATTERN } from './SimpleSearchConstants';
 import type {

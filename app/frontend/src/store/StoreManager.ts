@@ -10,7 +10,7 @@ import {
   getSearchRecordByDisplayIndex,
   getSelectedSearchRecord,
   type SearchRecordLookupResult,
-} from './searchResultsState';
+} from './search/searchResultsState';
 import type { ResultData, SearchMode } from '../types';
 import type { StoreState } from '../types/storeState';
 

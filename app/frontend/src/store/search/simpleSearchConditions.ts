@@ -2,7 +2,7 @@ import type {
   MasterConditionId,
   MasterConditions,
   SimpleSearchCurrentConditions,
-} from '../types';
+} from '../../types';
 
 /**
  * Simple SearchのURL/API送信用条件だけを取り出すため、マスター定義のdefaultと比較する。

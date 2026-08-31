@@ -2,12 +2,16 @@ import type {
   MasterConditionId,
   MasterConditions,
   SimpleSearchCurrentConditions,
-} from '../types';
-import type { ConditionQuery } from '../types/query';
+} from '../../types';
+import type { ConditionQuery } from '../../types/query';
 import {
   decodeConditionFromURLParamsWithStatus,
   shouldWarnAdvancedSearchURLRestoreFailure,
 } from './advancedSearchURL';
+import {
+  createDefaultSimpleConditions,
+  decodeSimpleConditionFromURLParams,
+} from './simpleSearchURL';
 
 export type AdvancedSearchHistoryRestoreResult = {
   condition: ConditionQuery | null;
@@ -34,24 +38,25 @@ export function getAdvancedConditionFromHistory(
 /**
  * URLパラメータからSimple Search条件を復元し、URLにない条件はマスターのデフォルトへ戻す。
  */
-export function buildSimpleConditionsFromURL(
+export async function buildSimpleConditionsFromURL(
   urlParams: Record<string, unknown>,
   master: MasterConditions[]
-): SimpleSearchCurrentConditions {
+): Promise<SimpleSearchCurrentConditions> {
+  const encodedConditions = await decodeSimpleConditionFromURLParams(
+    urlParams,
+    master
+  );
+  if (encodedConditions !== null) {
+    return {
+      ...createDefaultSimpleConditions(master),
+      ...encodedConditions,
+    } as SimpleSearchCurrentConditions;
+  }
+
   const conditionIds = new Set(master.map((c) => c.id));
 
-  const conditions: Record<string, unknown> = {};
-  for (const cond of master) {
-    switch (cond.type) {
-      case 'string':
-      case 'boolean':
-        conditions[cond.id] = cond.default;
-        break;
-      case 'array':
-        conditions[cond.id] = {};
-        break;
-    }
-  }
+  const conditions: Record<string, unknown> =
+    createDefaultSimpleConditions(master);
 
   for (const [key, value] of Object.entries(urlParams)) {
     if (conditionIds.has(key as MasterConditionId)) {
