@@ -20,7 +20,7 @@ import FloatingInfo from './components/FloatingInfo';
 import { initializeApp } from './store/search/initializeApp';
 import { buildSimpleConditionsFromURL } from './store/search/searchHistory';
 import { parseSearchURLParams } from './store/search/searchURL';
-import { SIMPLE_SEARCH_URL_RESTORE_WARNING } from './store/search/simpleSearchURL';
+import { SEARCH_URL_RESTORE_WARNING } from './store/search/searchURLCodec';
 import { selectRequired } from './utils/dom/select';
 import type { MasterConditions } from './types/search';
 import type { AdvancedSearchBuilderView as AdvancedSearchBuilderViewType } from './components/AdvancedSearch/AdvancedSearchBuilderView';
@@ -119,10 +119,7 @@ async function readyInitialSearch(callback: () => void): Promise<void> {
     simpleSearchRestoreResult?.conditions ?? {}
   );
   if (simpleSearchRestoreResult?.shouldWarn) {
-    storeManager.setData(
-      'searchURLRestoreWarning',
-      SIMPLE_SEARCH_URL_RESTORE_WARNING
-    );
+    storeManager.setData('searchURLRestoreWarning', SEARCH_URL_RESTORE_WARNING);
   }
   if (simpleSearchRestoreResult?.isURLTooLong) {
     storeManager.setData('searchURLTooLong', true);

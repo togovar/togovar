@@ -13,6 +13,121 @@ export type SearchURLParam = {
 };
 
 /**
+ * Simple/Advancedとも復元失敗の原因は「URL破損」と「圧縮非対応」のどちらもあり得るため、
+ * 一方だけに原因を限定しない共通文言にする。
+ */
+export const SEARCH_URL_RESTORE_WARNING =
+  'Could not restore the shared search URL. The URL may be corrupted, or your browser may not support compressed URL parameters.';
+
+/** 非圧縮`q`パラメータのURLエンコード上限（Raw JSON文字数）。Simple/Advancedで共通のルール。 */
+export const SEARCH_URL_LEGACY_MAX_JSON_LENGTH = 2000;
+/** この長さ以下ならBase64が圧縮より確実に短いため、圧縮を試さず`q`を採用する閾値。 */
+export const SEARCH_URL_COMPRESSION_MIN_LEGACY_LENGTH = 400;
+
+/**
+ * Simple/Advancedとも復元結果の形が同じ（成功した条件と、どの経路で復元できたかのフラグ）なので、
+ * 条件の型だけを差し替えられるジェネリック型にする。
+ */
+export type SearchURLDecodeResult<T> = {
+  condition: T | null;
+  hasCompressedParam: boolean;
+  hasLegacyParam: boolean;
+  restoredFromCompressed: boolean;
+  restoredFromLegacy: boolean;
+};
+
+/**
+ * JSON.stringify → UTF-8 → Base64 という`q`パラメータの生成手順を共通化する。
+ */
+export function encodeJSONToLegacyURL(
+  value: unknown,
+  maxJSONLength = SEARCH_URL_LEGACY_MAX_JSON_LENGTH
+): string | null {
+  try {
+    const json = JSON.stringify(value);
+    if (typeof json !== 'string') return null;
+    if (json.length > maxJSONLength) return null;
+    return bytesToBase64(new TextEncoder().encode(json));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 「短い条件は非圧縮`q`、長い条件は`q`/`qz`を比較して短い方を選ぶ」という判断をSimple/Advancedで共通化する。
+ */
+export async function encodeJSONToBestURLParam(
+  value: unknown,
+  maxLegacyJSONLength = SEARCH_URL_LEGACY_MAX_JSON_LENGTH,
+  minLegacyLength = SEARCH_URL_COMPRESSION_MIN_LEGACY_LENGTH
+): Promise<SearchURLParam | null> {
+  const legacy = encodeJSONToLegacyURL(value, maxLegacyJSONLength);
+  if (legacy !== null && legacy.length <= minLegacyLength) {
+    return { name: 'q', value: legacy };
+  }
+
+  const compressed = await encodeJSONToCompressedURL(value);
+
+  if (legacy === null && compressed === null) return null;
+  if (legacy === null) return { name: 'qz', value: compressed! };
+  if (compressed === null || legacy.length <= compressed.length) {
+    return { name: 'q', value: legacy };
+  }
+  return { name: 'qz', value: compressed };
+}
+
+/**
+ * 「qzを優先し、復元できなければqへフォールバックし、復元経路フラグを組み立てる」手順を共通化する。
+ * 条件の解釈（型変換・許可キーの絞り込みなど）はSimple/Advancedそれぞれ異なるため、コールバックで渡す。
+ */
+export async function decodeSearchURLParamsWithStatus<T>(
+  params: { q?: unknown; qz?: unknown },
+  decodeCompressed: (encoded: string) => Promise<T | null>,
+  decodeLegacy: (encoded: string) => T | null
+): Promise<SearchURLDecodeResult<T>> {
+  const compressed = getFirstString(params.qz);
+  const legacy = getFirstString(params.q);
+
+  if (compressed !== undefined) {
+    const condition = await decodeCompressed(compressed);
+    if (condition !== null) {
+      return {
+        condition,
+        hasCompressedParam: true,
+        hasLegacyParam: legacy !== undefined,
+        restoredFromCompressed: true,
+        restoredFromLegacy: false,
+      };
+    }
+  }
+
+  const legacyCondition = legacy !== undefined ? decodeLegacy(legacy) : null;
+  return {
+    condition: legacyCondition,
+    hasCompressedParam: compressed !== undefined,
+    hasLegacyParam: legacy !== undefined,
+    restoredFromCompressed: false,
+    restoredFromLegacy: legacyCondition !== null,
+  };
+}
+
+/**
+ * q/qzいずれかを含む共有URLがどの経路でも復元できなかった場合だけ警告する。
+ * Simple Searchは旧フラットURLで復元できた場合も警告対象から外すため、`suppress`で追加抑制できる。
+ */
+export function shouldWarnSearchURLRestoreFailure(
+  result: SearchURLDecodeResult<unknown>,
+  suppress = false
+): boolean {
+  return (
+    (result.hasCompressedParam || result.hasLegacyParam) &&
+    !result.restoredFromCompressed &&
+    !result.restoredFromLegacy &&
+    !suppress
+  );
+}
+
+/**
  * qzの生成手順を共通化し、Simple/Advanced Searchで圧縮方式がずれないようにする。
  */
 export async function encodeJSONToCompressedURL(
@@ -72,7 +187,9 @@ export async function decodeCompressedURLToJSON(
 /**
  * URL由来のJSONはunknownとして扱い、配列やnullを条件オブジェクトとして誤採用しないようにする。
  */
-export function isPlainObject(value: unknown): value is Record<string, unknown> {
+export function isPlainObject(
+  value: unknown
+): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
