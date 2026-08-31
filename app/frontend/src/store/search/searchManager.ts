@@ -129,7 +129,7 @@ function createSimpleSearchResetConditions(): Partial<SimpleSearchCurrentConditi
 /**
  * ブラウザの戻る/進むではURLを正本として復元し、自動遷移は必ず無効化する。
  */
-export async function handleHistoryChange(e: PopStateEvent): Promise<void> {
+export async function handleHistoryChange(_e: PopStateEvent): Promise<void> {
   prepareHistoryNavigationSearch();
   const restoreId = invalidatePendingHistoryRestore();
   invalidatePendingSearchURLReflection();
