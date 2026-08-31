@@ -167,6 +167,8 @@ function restoreAdvancedSearchFromHistory(
     setSearchURLRestoreWarning(
       restoreResult.shouldWarn ? ADVANCED_SEARCH_URL_RESTORE_WARNING : undefined
     );
+    // 履歴から復元した条件は必ずURL（またはその不在）に由来するため、too-long状態は残らない。
+    storeManager.setData('searchURLTooLong', false);
     storeManager.setData(
       'advancedSearchConditions',
       restoreResult.condition ?? undefined
@@ -194,6 +196,8 @@ async function restoreSimpleSearchFromHistory(
       ? SIMPLE_SEARCH_URL_RESTORE_WARNING
       : undefined
   );
+  // 履歴から復元した条件は必ずURL（またはその不在）に由来するため、too-long状態は残らない。
+  storeManager.setData('searchURLTooLong', false);
   storeManager.setData('simpleSearchConditions', restoreResult.conditions);
   continueHistorySearchInMode('simple', currentMode);
 }
