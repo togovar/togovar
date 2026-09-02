@@ -4,8 +4,9 @@ import type {
   MasterConditions,
   SimpleSearchCurrentConditions,
 } from '../../types';
-import { encodeConditionForBestURL } from './advancedSearchURL';
-import { encodeSimpleConditionForBestURL } from './simpleSearchURL';
+import { encodeConditionForCompressedURL } from './advancedSearchURL';
+import { encodeSimpleConditionForCompressedURL } from './simpleSearchURL';
+import type { SearchURLParam } from './searchURLCodec';
 
 type SearchUrlParams = Record<string, unknown>;
 export type SearchURLReflectionResult = {
@@ -21,22 +22,19 @@ let searchUrlReflectionId = 0;
 // ## Advanced Search URL仕様
 //
 // ### URLフォーマット
-//   条件あり: ?mode=advanced&q=<Base64エンコードされたJSON>
-//   圧縮版: ?mode=advanced&qz=<deflate-raw圧縮後にBase64URLエンコードされたJSON>
+//   条件あり: ?mode=advanced&qz=<deflate-raw圧縮後にBase64URLエンコードされたJSON>
 //   条件なし: ?mode=advanced
 //
 // ### エンコード方式
-//   条件オブジェクト → JSON.stringify() → UTF-8 → Base64 → `q` パラメータ
-//   長い条件では CompressionStream(deflate-raw) → Base64URL → `qz` パラメータ
+//   条件オブジェクト → JSON.stringify() → CompressionStream(deflate-raw) → Base64URL → `qz` パラメータ
 //
 // ### 文字数制限
-//   - Raw JSON が2000文字以内の場合は従来の `q` を候補にする
 //   - CompressionStream対応環境ではRaw JSON 20000文字以内を `qz` の候補にする
-//   - どちらも使えない場合はURLを `?mode=advanced` のみにし、条件はhistory.stateへ退避する
+//   - 非対応環境、または上限を超える場合はURLを `?mode=advanced` のみにし、条件はhistory.stateへ退避する
 //
 // ### Simple Searchとの比較
-//   Simple Search: 差分条件をJSON+Base64または圧縮JSON+Base64URLで格納
-//   Advanced Search: ネスト構造のためJSON+Base64または圧縮JSON+Base64URLを使用
+//   Simple Search: 差分条件を圧縮JSON+Base64URLで格納
+//   Advanced Search: ネスト構造のため圧縮JSON+Base64URLを使用
 //   どちらもURLに載せられない場合の挙動は同じ（`?mode=xxx` のみにし、条件をhistory.stateへ退避、
 //   `searchURLTooLong` で呼び出し元へ通知する）
 
@@ -50,7 +48,10 @@ export async function reflectSimpleSearchConditionToURI(
 ): Promise<SearchURLReflectionResult> {
   const reflectionId = invalidatePendingSearchURLReflection();
   const { param: encoded, hasConditions } =
-    await encodeSimpleConditionForBestURL(currentConditions, masterConditions);
+    await encodeSimpleConditionForCompressedURL(
+      currentConditions,
+      masterConditions
+    );
   if (reflectionId !== searchUrlReflectionId) {
     return { isURLTooLong: false, isStale: true };
   }
@@ -75,7 +76,7 @@ export async function reflectAdvancedSearchConditionToURI(
   // conditions は setAdvancedSearchCondition で {} → undefined に正規化されるため、存在確認だけで十分。
   const hasConditions = conditions !== undefined;
   const encoded = hasConditions
-    ? await encodeConditionForBestURL(conditions)
+    ? await encodeConditionForCompressedURL(conditions)
     : null;
   if (reflectionId !== searchUrlReflectionId) {
     return { isURLTooLong: false, isStale: true };
@@ -97,7 +98,7 @@ export async function reflectAdvancedSearchConditionToURI(
  */
 function buildModeUrlParams(
   mode: 'simple' | 'advanced',
-  encoded: { name: 'q' | 'qz'; value: string } | null
+  encoded: SearchURLParam | null
 ): SearchUrlParams {
   return encoded === null ? { mode } : { mode, [encoded.name]: encoded.value };
 }

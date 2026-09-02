@@ -25,7 +25,6 @@ export async function initializeApp(): Promise<'simple' | 'advanced'> {
 
   if (urlMode === 'advanced') {
     const result = await decodeConditionFromURLParamsWithStatus({
-      q: searchParams.get('q'),
       qz: searchParams.get('qz'),
     });
     // URL長制限時にhistory.stateへ退避した条件は、リロード後もwindow.history.stateから読める。

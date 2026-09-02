@@ -5,10 +5,9 @@ import type {
 } from '../../types';
 import { extractSearchCondition } from './simpleSearchConditions';
 import {
-  base64ToBytes,
   decodeCompressedURLToJSON,
   decodeSearchURLParamsWithStatus,
-  encodeJSONToBestURLParam,
+  encodeJSONToQzParam,
   isPlainObject,
   shouldWarnSearchURLRestoreFailure,
   type SearchURLDecodeResult,
@@ -26,11 +25,10 @@ export type SimpleSearchURLEncodeResult = {
 };
 
 /**
- * Simple Search条件を共有URLへ載せるため、差分条件だけを抽出し、
- * 短い条件は従来Base64、長い条件は圧縮Base64URLを優先する。
- * q/qzどちらを選ぶかの判断はAdvanced Searchと共通のため `searchURLCodec.ts` に委譲する。
+ * Simple Search条件を共有URLへ載せるため、差分条件だけを抽出し、常に圧縮Base64URL（`qz`）でエンコードする。
+ * エンコード手順自体はAdvanced Searchと共通のため `searchURLCodec.ts` に委譲する。
  */
-export async function encodeSimpleConditionForBestURL(
+export async function encodeSimpleConditionForCompressedURL(
   currentConditions: SimpleSearchCurrentConditions,
   masterConditions: MasterConditions[]
 ): Promise<SimpleSearchURLEncodeResult> {
@@ -43,51 +41,26 @@ export async function encodeSimpleConditionForBestURL(
   }
 
   return {
-    param: await encodeJSONToBestURLParam(diffConditions),
+    param: await encodeJSONToQzParam(diffConditions),
     hasConditions: true,
   };
 }
 
 /**
- * URLのqは外部共有値なので、マスターに存在するキーだけをSimple Search条件として採用する。
- */
-export function decodeSimpleConditionFromURL(
-  encoded: unknown,
-  masterConditions: MasterConditions[]
-): Partial<SimpleSearchCurrentConditions> | null {
-  if (typeof encoded !== 'string' || encoded === '') return null;
-
-  try {
-    const parsed = JSON.parse(
-      new TextDecoder('utf-8', { fatal: true }).decode(base64ToBytes(encoded))
-    );
-    // 空オブジェクトは通常のencode経路では発生しないため、Advanced Search同様「復元失敗」扱いにする。
-    if (!isPlainObject(parsed) || Object.keys(parsed).length === 0) return null;
-
-    return pickKnownSimpleConditions(parsed, masterConditions);
-  } catch {
-    return null;
-  }
-}
-
-/**
- * qzを優先しqへフォールバックする復元手順はAdvanced Searchと共通のため `searchURLCodec.ts` に委譲する。
- * qz復元失敗時にUI警告を出すため、条件本体だけでなく復元経路も返す。
+ * qzの復元手順はAdvanced Searchと共通のため `searchURLCodec.ts` に委譲する。
+ * 復元失敗時にUI警告を出すため、条件本体だけでなく復元経路も返す。
  */
 export function decodeSimpleConditionFromURLParamsWithStatus(
   params: Record<string, unknown>,
   masterConditions: MasterConditions[]
 ): Promise<SimpleSearchURLDecodeResult> {
-  return decodeSearchURLParamsWithStatus(
-    params,
-    (encoded) =>
-      decodeCompressedSimpleConditionFromURL(encoded, masterConditions),
-    (encoded) => decodeSimpleConditionFromURL(encoded, masterConditions)
+  return decodeSearchURLParamsWithStatus(params, (encoded) =>
+    decodeCompressedSimpleConditionFromURL(encoded, masterConditions)
   );
 }
 
 /**
- * q/qzいずれかを含む共有URLがどちらでも復元できず、従来フラットURLでもない場合だけ警告する。
+ * qzを含む共有URLが復元できず、従来フラットURLでもない場合だけ警告する。
  */
 export function shouldWarnSimpleSearchURLRestoreFailure(
   result: SimpleSearchURLDecodeResult,

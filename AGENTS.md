@@ -121,17 +121,16 @@ app/frontend/
   - `components/Condition/ConditionItemView.ts`: 1条件行
   - `components/Condition/ConditionValues.ts` と `components/Condition/ConditionValueEditor/*`: 条件入力UI
 - 条件の検索クエリ化は `components/Condition/queryBuilders/` に集約する。
-- Advanced Search のURL共有は、従来形式 `?mode=advanced&q=<Base64 JSON>` と圧縮形式 `?mode=advanced&qz=<deflate-raw + Base64URL JSON>` を扱う。
-- encode/decode処理は `app/frontend/src/store/search/advancedSearchURL.ts` に集約する。URL生成時は `encodeConditionForBestURL()` を使い、400文字以下の短い条件では圧縮を試さず `q`、長い条件では圧縮結果を比較して短い方を選ぶ。
-- `q` は既存URL互換のため残す。復元時は `qz` を優先し、読めない場合は `q` へフォールバックする。
-- `qz` はブラウザ標準の `CompressionStream` / `DecompressionStream` を使う。追加ライブラリは使わない。非対応環境でURLを生成する場合は従来の `q` 形式へフォールバックする。
+- Advanced Search のURL共有は、圧縮形式 `?mode=advanced&qz=<deflate-raw + Base64URL JSON>` のみを扱う。
+- encode/decode処理は `app/frontend/src/store/search/advancedSearchURL.ts` に集約する。URL生成時は `encodeConditionForCompressedURL()` を使い、常に圧縮して `qz` を発行する。
+- `qz` はブラウザ標準の `CompressionStream` / `DecompressionStream` を使う。追加ライブラリは使わない。非対応環境や上限超過でエンコードできない場合はURLへ条件を載せず、history.stateへ退避する。
 - Advanced Search のURL処理は非同期になっているため、初期復元や `popstate` 復元ではデコード完了後に検索を開始する。
-- `q` / `qz` は共有URL専用の表現であり、Advanced Search のAPIリクエストは引き続きPOST bodyで送る。
-- Simple Search のURL共有は `?mode=simple&q=<Base64 JSON>` と `?mode=simple&qz=<deflate-raw + Base64URL JSON>` を使う。新規発行URLは400文字を超える場合に圧縮版も比較し、短い方を選ぶ。復元時は互換性維持のため従来のフラットなURLクエリも受け付ける。
-- Simple Search の `q` / `qz` encode/decode処理は `app/frontend/src/store/search/simpleSearchURL.ts` に置く。URLに載せる値はマスター定義との差分だけにし、APIリクエストは引き続きGETクエリとして送る。
-- Simple/Advancedとも、`q` / `qz` どちらにも収まらない場合はURLへ条件を載せず `?mode=xxx` のみにし、条件は `history.pushState`/`replaceState` の第1引数（`history.state`）へ退避する。共有URL自体には載らないが、同一ブラウザでの戻る/進む・リロードでは `window.history.state` から条件を復元できる。この場合 `searchManager.ts` が共通の `searchURLTooLong` フラグをStoreへセットし、`api/searchMessages.ts` の `mergeSearchURLTooLongWarning()` が `searchURLRestoreWarning` と同じ経路（`searchMessages.warning` → 検索結果画面のメッセージ表示）で警告を合成する。history.stateへの退避と読み取りは `store/search/searchURL.ts`（退避）・`store/search/searchHistory.ts`（復元）・`store/search/searchURLCodec.ts` の `getObjectFromHistoryState()` に集約する。
+- `qz` は共有URL専用の表現であり、Advanced Search のAPIリクエストは引き続きPOST bodyで送る。
+- Simple Search のURL共有は `?mode=simple&qz=<deflate-raw + Base64URL JSON>` のみを使う。`qz` 導入以前のフラットなURLクエリ（例: `dataset[jga_wgs]=0`）は互換性維持のため引き続き受け付ける。
+- Simple Search の `qz` encode/decode処理は `app/frontend/src/store/search/simpleSearchURL.ts` に置く。URLに載せる値はマスター定義との差分だけにし、APIリクエストは引き続きGETクエリとして送る。
+- Simple/Advancedとも、`qz` に収まらない場合はURLへ条件を載せず `?mode=xxx` のみにし、条件は `history.pushState`/`replaceState` の第1引数（`history.state`）へ退避する。共有URL自体には載らないが、同一ブラウザでの戻る/進む・リロードでは `window.history.state` から条件を復元できる。この場合 `searchManager.ts` が共通の `searchURLTooLong` フラグをStoreへセットし、`api/searchMessages.ts` の `mergeSearchURLTooLongWarning()` が `searchURLRestoreWarning` と同じ経路（`searchMessages.warning` → 検索結果画面のメッセージ表示）で警告を合成する。history.stateへの退避と読み取りは `store/search/searchURL.ts`（退避）・`store/search/searchHistory.ts`（復元）・`store/search/searchURLCodec.ts` の `getObjectFromHistoryState()` に集約する。
 - URLから復元した条件をViewへ戻す処理は `components/AdvancedSearch/AdvancedSearchConditionRestorer.ts` を確認する。
-- Base64はURL中で壊れやすいため、生成時は `encodeURIComponent` を通す。
+- `qz` は `+` `/` `=` を含まないBase64URLとして生成するため、生Base64と違いURL中で壊れない。URLへの埋め込みは `qs.stringify()` が担うため、個別に `encodeURIComponent` を呼ぶ必要はない。
 - `setAdvancedSearchCondition()` は検索条件をStoreへ保存し、URLへ反映し、検索を実行する。呼び出しタイミングを増やす場合は二重検索に注意する。
 - 条件UIを変更した場合は、検索クエリ、URL共有、URL復元の3点が同じ構造を扱えるか確認する。
 

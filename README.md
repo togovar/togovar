@@ -215,35 +215,32 @@ app/frontend/src/store/search/advancedSearchURL.ts
 
 ### URL共有
 
-Advanced Search の条件は URL に保存できます。長い条件では圧縮形式の `qz` を使用します。
+Advanced Search の条件は URL に保存できます。常に圧縮形式の `qz` を使用します。
 
 ```txt
-/?mode=advanced&q=<Base64 encoded JSON>
 /?mode=advanced&qz=<compressed Base64URL JSON>
 ```
 
 処理の流れ:
 
 1. 条件オブジェクトを `JSON.stringify()` する
-2. 400文字以下の短い条件は Base64 へ変換して `q` パラメータへ入れる
-3. 長い条件はブラウザ標準の Compression Streams API で圧縮し、Base64URL へ変換して `qz` パラメータへ入れる
-4. ページ読み込み時に `qz` または `q` をデコードして Store へ復元する
-5. `AdvancedSearchConditionRestorer` が Store の条件を UI へ戻す
+2. ブラウザ標準の Compression Streams API で圧縮し、Base64URL へ変換して `qz` パラメータへ入れる
+3. ページ読み込み時に `qz` をデコードして Store へ復元する
+4. `AdvancedSearchConditionRestorer` が Store の条件を UI へ戻す
 
-URLに載せられないほど条件が長い場合、検索自体は実行しますが URL には `?mode=advanced` のみを反映し、条件は `history.state`（ブラウザの戻る/進む用の内部状態）へ退避します。共有URL自体には載りませんが、同一ブラウザでの戻る/進む・リロードでは条件を復元できます。
+条件が長すぎる場合、またはブラウザが Compression Streams API に対応しておらず `qz` を発行できない場合、検索自体は実行しますが URL には `?mode=advanced` のみを反映し、条件は `history.state`（ブラウザの戻る/進む用の内部状態）へ退避します。共有URL自体には載りませんが、同一ブラウザでの戻る/進む・リロードでは条件を復元できます。
 
 ## Simple Search
 
-Simple Search の共有URLは、検索条件を `q` または `qz` パラメータへエンコードして反映します。
+Simple Search の共有URLは、検索条件を `qz` パラメータへエンコードして反映します。
 
 ```txt
-/?mode=simple&q=<Base64 encoded JSON>
 /?mode=simple&qz=<compressed Base64URL JSON>
 ```
 
-新規に発行するURLは、短い条件では `q` 形式、400文字を超える条件では圧縮版 `qz` と比較して短い方を使います。互換性維持のため、従来のフラットなURLクエリも読み込み時には復元できます。
+`qz` 導入以前のフラットなURLクエリ（例: `dataset[jga_wgs]=0`）は、互換性維持のため読み込み時には引き続き復元できます。
 
-URLに載せられないほど条件が長い場合、検索自体は実行しますが URL には `?mode=simple` のみを反映し、Advanced Searchと同様に条件は `history.state` へ退避します。
+条件が長すぎる場合、またはブラウザが Compression Streams API に対応しておらず `qz` を発行できない場合、検索自体は実行しますが URL には `?mode=simple` のみを反映し、Advanced Searchと同様に条件は `history.state` へ退避します。
 
 主な関連ファイル:
 
