@@ -8,7 +8,7 @@ export const SEARCH_URL_DECOMPRESSED_BYTE_MAX_LENGTH =
 export const SEARCH_URL_COMPRESSED_PARAM_MAX_LENGTH = 20000;
 
 export type SearchURLParam = {
-  name: 'q' | 'qz';
+  name: 'qz';
   value: string;
 };
 
@@ -19,100 +19,48 @@ export type SearchURLParam = {
 export const SEARCH_URL_RESTORE_WARNING =
   'Could not restore the shared search URL. The URL may be corrupted, or your browser may not support compressed URL parameters.';
 
-/** 非圧縮`q`パラメータのURLエンコード上限（Raw JSON文字数）。Simple/Advancedで共通のルール。 */
-export const SEARCH_URL_LEGACY_MAX_JSON_LENGTH = 2000;
-/** この長さ以下ならBase64が圧縮より確実に短いため、圧縮を試さず`q`を採用する閾値。 */
-export const SEARCH_URL_COMPRESSION_MIN_LEGACY_LENGTH = 400;
-
 /**
- * Simple/Advancedとも復元結果の形が同じ（成功した条件と、どの経路で復元できたかのフラグ）なので、
+ * Simple/Advancedとも復元結果の形が同じ（成功した条件と、`qz`から復元できたかのフラグ）なので、
  * 条件の型だけを差し替えられるジェネリック型にする。
  */
 export type SearchURLDecodeResult<T> = {
   condition: T | null;
   hasCompressedParam: boolean;
-  hasLegacyParam: boolean;
   restoredFromCompressed: boolean;
-  restoredFromLegacy: boolean;
 };
 
 /**
- * JSON.stringify → UTF-8 → Base64 という`q`パラメータの生成手順を共通化する。
+ * 共有URLは常に圧縮`qz`だけを発行する。圧縮できない場合（非対応ブラウザ・上限超過）はnullを返し、
+ * 呼び出し元はURLへ条件を載せずhistory.stateへ退避する。
  */
-export function encodeJSONToLegacyURL(
-  value: unknown,
-  maxJSONLength = SEARCH_URL_LEGACY_MAX_JSON_LENGTH
-): string | null {
-  try {
-    const json = JSON.stringify(value);
-    if (typeof json !== 'string') return null;
-    if (json.length > maxJSONLength) return null;
-    return bytesToBase64(new TextEncoder().encode(json));
-  } catch {
-    return null;
-  }
-}
-
-/**
- * 「短い条件は非圧縮`q`、長い条件は`q`/`qz`を比較して短い方を選ぶ」という判断をSimple/Advancedで共通化する。
- */
-export async function encodeJSONToBestURLParam(
-  value: unknown,
-  maxLegacyJSONLength = SEARCH_URL_LEGACY_MAX_JSON_LENGTH,
-  minLegacyLength = SEARCH_URL_COMPRESSION_MIN_LEGACY_LENGTH
+export async function encodeJSONToQzParam(
+  value: unknown
 ): Promise<SearchURLParam | null> {
-  const legacy = encodeJSONToLegacyURL(value, maxLegacyJSONLength);
-  if (legacy !== null && legacy.length <= minLegacyLength) {
-    return { name: 'q', value: legacy };
-  }
-
   const compressed = await encodeJSONToCompressedURL(value);
-
-  if (legacy === null && compressed === null) return null;
-  if (legacy === null) return { name: 'qz', value: compressed! };
-  if (compressed === null || legacy.length <= compressed.length) {
-    return { name: 'q', value: legacy };
-  }
-  return { name: 'qz', value: compressed };
+  return compressed === null ? null : { name: 'qz', value: compressed };
 }
 
 /**
- * 「qzを優先し、復元できなければqへフォールバックし、復元経路フラグを組み立てる」手順を共通化する。
+ * 「qzを復元し、復元経路フラグを組み立てる」手順を共通化する。
  * 条件の解釈（型変換・許可キーの絞り込みなど）はSimple/Advancedそれぞれ異なるため、コールバックで渡す。
  */
 export async function decodeSearchURLParamsWithStatus<T>(
-  params: { q?: unknown; qz?: unknown },
-  decodeCompressed: (encoded: string) => Promise<T | null>,
-  decodeLegacy: (encoded: string) => T | null
+  params: { qz?: unknown },
+  decodeCompressed: (encoded: string) => Promise<T | null>
 ): Promise<SearchURLDecodeResult<T>> {
   const compressed = getFirstString(params.qz);
-  const legacy = getFirstString(params.q);
+  const condition =
+    compressed !== undefined ? await decodeCompressed(compressed) : null;
 
-  if (compressed !== undefined) {
-    const condition = await decodeCompressed(compressed);
-    if (condition !== null) {
-      return {
-        condition,
-        hasCompressedParam: true,
-        hasLegacyParam: legacy !== undefined,
-        restoredFromCompressed: true,
-        restoredFromLegacy: false,
-      };
-    }
-  }
-
-  const legacyCondition = legacy !== undefined ? decodeLegacy(legacy) : null;
   return {
-    condition: legacyCondition,
+    condition,
     hasCompressedParam: compressed !== undefined,
-    hasLegacyParam: legacy !== undefined,
-    restoredFromCompressed: false,
-    restoredFromLegacy: legacyCondition !== null,
+    restoredFromCompressed: condition !== null,
   };
 }
 
 /**
- * q/qzいずれかを含む共有URLがどの経路でも復元できなかった場合だけ警告する。
+ * qzを含む共有URLが復元できなかった場合だけ警告する。
  * Simple Searchは旧フラットURLで復元できた場合も警告対象から外すため、`suppress`で追加抑制できる。
  */
 export function shouldWarnSearchURLRestoreFailure(
@@ -120,10 +68,7 @@ export function shouldWarnSearchURLRestoreFailure(
   suppress = false
 ): boolean {
   return (
-    (result.hasCompressedParam || result.hasLegacyParam) &&
-    !result.restoredFromCompressed &&
-    !result.restoredFromLegacy &&
-    !suppress
+    result.hasCompressedParam && !result.restoredFromCompressed && !suppress
   );
 }
 
@@ -318,7 +263,8 @@ export function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
 }
 
 /**
- * Compression Streams API非対応ブラウザでは従来q形式へフォールバックするため、実行前に機能検出する。
+ * Compression Streams API非対応ブラウザでは`qz`を発行できないため、実行前に機能検出する。
+ * 非対応の場合はURLへ条件を載せずhistory.stateへ退避する。
  */
 export function canUseCompressionStreams(): boolean {
   return (
