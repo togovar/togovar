@@ -8,7 +8,7 @@ export const SEARCH_URL_DECOMPRESSED_BYTE_MAX_LENGTH =
 export const SEARCH_URL_COMPRESSED_PARAM_MAX_LENGTH = 20000;
 
 export type SearchURLParam = {
-  name: 'qz';
+  name: 'qz' | 'filter';
   value: string;
 };
 
@@ -30,14 +30,24 @@ export type SearchURLDecodeResult<T> = {
 };
 
 /**
- * 共有URLは常に圧縮`qz`だけを発行する。圧縮できない場合（非対応ブラウザ・上限超過）はnullを返し、
- * 呼び出し元はURLへ条件を載せずhistory.stateへ退避する。
+ * qz発行の既存呼び出し口を残し、Advanced Search側のURL処理を変更せずに保つ。
  */
 export async function encodeJSONToQzParam(
   value: unknown
 ): Promise<SearchURLParam | null> {
+  return encodeJSONToCompressedParam(value);
+}
+
+/**
+ * 共有URLは圧縮パラメータだけを発行する。圧縮できない場合（非対応ブラウザ・上限超過）はnullを返し、
+ * 呼び出し元はURLへ条件を載せずhistory.stateへ退避する。
+ */
+export async function encodeJSONToCompressedParam(
+  value: unknown,
+  name: SearchURLParam['name'] = 'qz'
+): Promise<SearchURLParam | null> {
   const compressed = await encodeJSONToCompressedURL(value);
-  return compressed === null ? null : { name: 'qz', value: compressed };
+  return compressed === null ? null : { name, value: compressed };
 }
 
 /**

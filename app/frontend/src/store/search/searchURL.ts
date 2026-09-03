@@ -5,7 +5,7 @@ import type {
   SimpleSearchCurrentConditions,
 } from '../../types';
 import { encodeConditionForCompressedURL } from './advancedSearchURL';
-import { encodeSimpleConditionForCompressedURL } from './simpleSearchURL';
+import { encodeSimpleConditionForURLParams } from './simpleSearchURL';
 import type { SearchURLParam } from './searchURLCodec';
 
 type SearchUrlParams = Record<string, unknown>;
@@ -33,7 +33,7 @@ let searchUrlReflectionId = 0;
 //   - 非対応環境、または上限を超える場合はURLを `?mode=advanced` のみにし、条件はhistory.stateへ退避する
 //
 // ### Simple Searchとの比較
-//   Simple Search: 差分条件を圧縮JSON+Base64URLで格納
+//   Simple Search: キーワードはterm、フィルタ差分はfilterの圧縮JSON+Base64URLで格納
 //   Advanced Search: ネスト構造のため圧縮JSON+Base64URLを使用
 //   どちらもURLに載せられない場合の挙動は同じ（`?mode=xxx` のみにし、条件をhistory.stateへ退避、
 //   `searchURLTooLong` で呼び出し元へ通知する）
@@ -47,8 +47,8 @@ export async function reflectSimpleSearchConditionToURI(
   masterConditions: MasterConditions[]
 ): Promise<SearchURLReflectionResult> {
   const reflectionId = invalidatePendingSearchURLReflection();
-  const { param: encoded, hasConditions } =
-    await encodeSimpleConditionForCompressedURL(
+  const { params, hasFilterConditions } =
+    await encodeSimpleConditionForURLParams(
       currentConditions,
       masterConditions
     );
@@ -56,8 +56,8 @@ export async function reflectSimpleSearchConditionToURI(
     return { isURLTooLong: false, isStale: true };
   }
 
-  currentUrlParams = buildModeUrlParams('simple', encoded);
-  const isURLTooLong = hasConditions && encoded === null;
+  currentUrlParams = { mode: 'simple', ...params };
+  const isURLTooLong = hasFilterConditions && params.filter === undefined;
   const state = isURLTooLong
     ? { ...currentUrlParams, simpleSearchConditions: currentConditions }
     : currentUrlParams;

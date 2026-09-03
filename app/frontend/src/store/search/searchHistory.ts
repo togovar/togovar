@@ -65,23 +65,12 @@ export async function buildSimpleConditionsFromURL(
     urlParams,
     master
   );
-  if (result.condition !== null) {
-    return {
-      conditions: {
-        ...createDefaultSimpleConditions(master),
-        ...result.condition,
-      } as SimpleSearchCurrentConditions,
-      shouldWarn: false,
-      isURLTooLong: false,
-    };
-  }
-
   const stashedConditions =
     getObjectFromHistoryState<SimpleSearchCurrentConditions>(
       historyState,
       'simpleSearchConditions'
     );
-  if (stashedConditions !== null) {
+  if (!result.restoredFromCompressed && stashedConditions !== null) {
     return {
       conditions: {
         ...createDefaultSimpleConditions(master),
@@ -89,6 +78,20 @@ export async function buildSimpleConditionsFromURL(
       } as SimpleSearchCurrentConditions,
       shouldWarn: false,
       isURLTooLong: true,
+    };
+  }
+
+  if (result.condition !== null) {
+    return {
+      conditions: {
+        ...createDefaultSimpleConditions(master),
+        ...result.condition,
+      } as SimpleSearchCurrentConditions,
+      shouldWarn: shouldWarnSimpleSearchURLRestoreFailure(
+        result,
+        hasLegacyFlatSearchParams(urlParams, new Set(master.map((c) => c.id)))
+      ),
+      isURLTooLong: false,
     };
   }
 
@@ -114,13 +117,13 @@ export async function buildSimpleConditionsFromURL(
 }
 
 /**
- * q/qz以前のSimple Search共有URLが含まれる場合は、その復元を優先して警告対象から外す。
+ * filter以前のSimple Search共有URLが含まれる場合は、その復元を優先して警告対象から外す。
  */
 function hasLegacyFlatSearchParams(
   urlParams: Record<string, unknown>,
   conditionIds: Set<MasterConditionId>
 ): boolean {
-  return Object.keys(urlParams).some((key) =>
-    conditionIds.has(key as MasterConditionId)
+  return Object.keys(urlParams).some(
+    (key) => key !== 'term' && conditionIds.has(key as MasterConditionId)
   );
 }
