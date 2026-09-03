@@ -18,8 +18,6 @@ body {
   -webkit-font-smoothing: antialiased;
 
   [data-page='home'] & {
-    display: flex;
-    flex-direction: column;
     height: 100vh;
     overflow: hidden;
   }
@@ -44,6 +42,16 @@ body {
   &[data-dragging='true'] {
     user-select: none;
   }
+}
+
+// ブラウザや拡張機能が body 直下へ要素を注入しても(例: Chromeの広告関連トピック通知など)、
+// #SearchInputView / #SearchResultsView の高さ配分が影響を受けないよう、
+// flexコンテナを body ではなく専用の #AppLayout に持たせて隔離する。
+#AppLayout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
 // Web Component の margin はライトDOM側の型セレクターで定義する。

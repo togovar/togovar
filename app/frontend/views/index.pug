@@ -15,5 +15,11 @@ block head
     script(type="text/javascript", src=js, defer)
 
 block content
-  include includes/_search_results_main
+  //-
+    ブラウザや拡張機能が body 直下に要素を注入すると(例: Chromeの広告関連トピック通知など)、
+    body 自体を flex column にしている場合その要素も flex の分配対象になり、
+    #SearchResultsView の高さが奪われて画面下端に隙間ができる。
+    #AppLayout でこの2要素だけを囲み、flexコンテナをbodyから切り離すことで影響を遮断する。
+  #AppLayout
+    include includes/_search_results_main
   include includes/_karyotype
