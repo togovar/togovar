@@ -1,11 +1,15 @@
 // ページの骨格となるレイアウト定義。flex チェーンの全体像：
-//   body (flex column, height: 100vh)
+//   #AppLayout (flex column, height: 100%) ← _base.scss
+//   ├─ #SearchInputView
 //   └─ .LayoutMainAside (flex: 1 1 auto) ← このファイル
 //       ├─ .LayoutMain   (flex column)   ← このファイル
-//       │   └─ #SearchInputView, #ResultsView など
+//       │   └─ #ResultsView など
 //       └─ .LayoutAside                  ← このファイル
+// #AppLayout はbody直下ではなく専用のflexコンテナにすることで、
+// ブラウザ等がbody直下へ注入する要素(例: Chromeの広告関連トピック通知など)が
+// flexの分配に混ざって .LayoutMainAside の高さを奪わないようにしている。
 
-// body の flex column で #SearchInputView タブバーの下から画面下端までを占有する。
+// #AppLayout の flex column で #SearchInputView タブバーの下から画面下端までを占有する。
 .LayoutMainAside {
   display: flex;
   flex: 1 1 auto;
