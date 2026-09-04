@@ -8,7 +8,7 @@ type SearchMessageResponse = {
 };
 
 const SEARCH_URL_TOO_LONG_WARNING =
-  'The search conditions could not be included in the shared URL (they may be too long, or your browser may not support compressed URL parameters). The shared URL will only reflect the search mode.';
+  'The search conditions could not be fully included in the shared URL (they may be too long, or your browser may not support compressed URL parameters). The shared URL may only partially reflect the search conditions.';
 
 /**
  * APIレスポンス内のnotice/warning/errorだけをStoreへ反映し、検索結果処理と分離する。
