@@ -242,7 +242,7 @@ Simple Search の共有URLは、キーワードを `term` パラメータへそ�
 
 従来のフラットなURLクエリ（例: `dataset[jga_wgs]=0`）は、互換性維持のため読み込み時には引き続き復元できます。
 
-フィルタ条件が長すぎる場合、またはブラウザが Compression Streams API に対応しておらず `filter` を発行できない場合、検索自体は実行しますが URL には `?mode=simple` と `term` のみを反映し、Advanced Searchと同様に条件全体は `history.state` へ退避します。
+フィルタ条件が長すぎる場合、またはブラウザが Compression Streams API に対応しておらず `filter` を発行できない場合、検索自体は実行しますが URL には `?mode=simple` と `term` のみを反映し、Advanced Searchと同様に条件全体は `history.state` へ退避します。`term` 自体が長すぎる場合は `term` もURLには反映されず、`?mode=simple` のみになります。
 
 主な関連ファイル:
 

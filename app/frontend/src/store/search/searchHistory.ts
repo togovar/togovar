@@ -83,7 +83,7 @@ export async function buildSimpleConditionsFromURL(
         ...stashedConditions,
         ...(result.condition ?? {}),
       } as SimpleSearchCurrentConditions,
-      shouldWarn: false,
+      shouldWarn: result.hasCompressedParam && !result.restoredFromCompressed,
       isURLTooLong: true,
     };
   }
