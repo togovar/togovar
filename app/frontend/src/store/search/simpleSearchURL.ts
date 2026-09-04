@@ -6,12 +6,11 @@ import type {
 import { extractSearchCondition } from './simpleSearchConditions';
 import {
   decodeCompressedURLToJSON,
-  decodeSearchURLParamsWithStatus,
-  encodeJSONToQzParam,
+  encodeJSONToCompressedParam,
+  getFirstString,
   isPlainObject,
   shouldWarnSearchURLRestoreFailure,
   type SearchURLDecodeResult,
-  type SearchURLParam,
 } from './searchURLCodec';
 
 export type SimpleSearchURLDecodeResult = SearchURLDecodeResult<
@@ -19,16 +18,22 @@ export type SimpleSearchURLDecodeResult = SearchURLDecodeResult<
 >;
 
 export type SimpleSearchURLEncodeResult = {
-  param: SearchURLParam | null;
-  /** 差分条件が1つもない（=URLに載せる必要がない）場合はfalse。長さ超過とURL不要を区別するために使う。 */
-  hasConditions: boolean;
+  params: Record<string, string>;
+  /** URLだけでは復元できない条件がある場合、history.state退避を呼び出し元へ求める。 */
+  hasOmittedConditions: boolean;
 };
 
 /**
- * Simple Search条件を共有URLへ載せるため、差分条件だけを抽出し、常に圧縮Base64URL（`qz`）でエンコードする。
- * エンコード手順自体はAdvanced Searchと共通のため `searchURLCodec.ts` に委譲する。
+ * termは圧縮せず生文字列のままURLへ載せるため、圧縮後データ用の上限とは別の、
+ * 実URLとして壊れない小さめの上限を設ける。
  */
-export async function encodeSimpleConditionForCompressedURL(
+const SIMPLE_SEARCH_TERM_MAX_LENGTH = 500;
+
+/**
+ * キーワードは可読な`term`として残し、フィルタ条件だけを圧縮して共有URLを短くする。
+ * 圧縮エンコード手順自体はAdvanced Searchと共通のため `searchURLCodec.ts` に委譲する。
+ */
+export async function encodeSimpleConditionForURLParams(
   currentConditions: SimpleSearchCurrentConditions,
   masterConditions: MasterConditions[]
 ): Promise<SimpleSearchURLEncodeResult> {
@@ -36,31 +41,50 @@ export async function encodeSimpleConditionForCompressedURL(
     currentConditions,
     masterConditions
   );
-  if (Object.keys(diffConditions).length === 0) {
-    return { param: null, hasConditions: false };
+  const params: Record<string, string> = {};
+  let hasOmittedConditions = false;
+  const term = diffConditions.term;
+  if (typeof term === 'string' && term !== '') {
+    if (canReflectReadableTerm(term)) {
+      params.term = term;
+    } else {
+      hasOmittedConditions = true;
+    }
   }
 
-  return {
-    param: await encodeJSONToQzParam(diffConditions),
-    hasConditions: true,
-  };
+  const filterConditions = omitTermCondition(diffConditions);
+  if (Object.keys(filterConditions).length === 0) {
+    return { params, hasOmittedConditions };
+  }
+
+  const filter = await encodeJSONToCompressedParam(filterConditions, 'filter');
+  if (filter !== null) {
+    params[filter.name] = filter.value;
+  } else {
+    hasOmittedConditions = true;
+  }
+
+  return { params, hasOmittedConditions };
 }
 
 /**
- * qzの復元手順はAdvanced Searchと共通のため `searchURLCodec.ts` に委譲する。
- * 復元失敗時にUI警告を出すため、条件本体だけでなく復元経路も返す。
+ * termはURL上で読める値として扱い、filterだけを圧縮条件として復元する。
+ * 旧フラットURLは別経路で読むため、ここでは新形式の圧縮フィルタだけを扱う。
  */
 export function decodeSimpleConditionFromURLParamsWithStatus(
   params: Record<string, unknown>,
   masterConditions: MasterConditions[]
 ): Promise<SimpleSearchURLDecodeResult> {
-  return decodeSearchURLParamsWithStatus(params, (encoded) =>
-    decodeCompressedSimpleConditionFromURL(encoded, masterConditions)
+  return decodeSimpleFilterParamsWithStatus(params, masterConditions).then(
+    (result) => ({
+      ...result,
+      condition: mergeTermParam(result.condition, params),
+    })
   );
 }
 
 /**
- * qzを含む共有URLが復元できず、従来フラットURLでもない場合だけ警告する。
+ * filterを含む共有URLが復元できず、従来フラットURLでもない場合だけ警告する。
  */
 export function shouldWarnSimpleSearchURLRestoreFailure(
   result: SimpleSearchURLDecodeResult,
@@ -70,7 +94,7 @@ export function shouldWarnSimpleSearchURLRestoreFailure(
 }
 
 /**
- * qzは圧縮済みバイト列のBase64URL表現なので、展開後にJSONとして読む。
+ * filterは圧縮済みバイト列のBase64URL表現なので、展開後にJSONとして読む。
  */
 async function decodeCompressedSimpleConditionFromURL(
   encoded: string,
@@ -83,6 +107,41 @@ async function decodeCompressedSimpleConditionFromURL(
   if (!isPlainObject(parsed) || Object.keys(parsed).length === 0) return null;
 
   return pickKnownSimpleConditions(parsed, masterConditions);
+}
+
+/**
+ * filterの復元状態を同じ形で返し、警告表示の判定を共通化しやすくする。
+ */
+async function decodeSimpleFilterParamsWithStatus(
+  params: Record<string, unknown>,
+  masterConditions: MasterConditions[]
+): Promise<SimpleSearchURLDecodeResult> {
+  const compressed = getFirstString(params.filter);
+  const condition =
+    compressed !== undefined
+      ? await decodeCompressedSimpleConditionFromURL(
+          compressed,
+          masterConditions
+        )
+      : null;
+
+  return {
+    condition,
+    hasCompressedParam: compressed !== undefined,
+    restoredFromCompressed: condition !== null,
+  };
+}
+
+/**
+ * termは圧縮せずURLへ出すため、圧縮フィルタの復元結果へ後から合成する。
+ */
+function mergeTermParam(
+  condition: Partial<SimpleSearchCurrentConditions> | null,
+  params: Record<string, unknown>
+): Partial<SimpleSearchCurrentConditions> | null {
+  const term = getFirstString(params.term);
+  if (term === undefined) return condition;
+  return { ...(condition ?? {}), term };
 }
 
 /**
@@ -125,4 +184,32 @@ function pickKnownSimpleConditions(
   }
 
   return conditions as Partial<SimpleSearchCurrentConditions>;
+}
+
+/**
+ * termは個別URLパラメータで表すため、圧縮対象のフィルタ条件から除外する。
+ */
+function omitTermCondition(
+  conditions: Record<string, unknown>
+): Record<string, unknown> {
+  const filterConditions: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(conditions)) {
+    if (key !== 'term') {
+      filterConditions[key] = value;
+    }
+  }
+  return filterConditions;
+}
+
+/**
+ * termは圧縮パラメータを通らないため、単独でもURLを壊さない長さに制限する。
+ * 不対サロゲートを含む文字列ではencodeURIComponentが例外を投げるため、
+ * その場合もURLへ載せられない扱いにする。
+ */
+function canReflectReadableTerm(term: string): boolean {
+  try {
+    return encodeURIComponent(term).length <= SIMPLE_SEARCH_TERM_MAX_LENGTH;
+  } catch {
+    return false;
+  }
 }

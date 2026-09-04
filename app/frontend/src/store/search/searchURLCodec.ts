@@ -8,7 +8,7 @@ export const SEARCH_URL_DECOMPRESSED_BYTE_MAX_LENGTH =
 export const SEARCH_URL_COMPRESSED_PARAM_MAX_LENGTH = 20000;
 
 export type SearchURLParam = {
-  name: 'qz';
+  name: 'qz' | 'filter';
   value: string;
 };
 
@@ -30,14 +30,24 @@ export type SearchURLDecodeResult<T> = {
 };
 
 /**
- * 共有URLは常に圧縮`qz`だけを発行する。圧縮できない場合（非対応ブラウザ・上限超過）はnullを返し、
- * 呼び出し元はURLへ条件を載せずhistory.stateへ退避する。
+ * qz発行の既存呼び出し口を残し、Advanced Search側のURL処理を変更せずに保つ。
  */
 export async function encodeJSONToQzParam(
   value: unknown
 ): Promise<SearchURLParam | null> {
+  return encodeJSONToCompressedParam(value);
+}
+
+/**
+ * 共有URLは圧縮パラメータだけを発行する。圧縮できない場合（非対応ブラウザ・上限超過）はnullを返し、
+ * 呼び出し元はURLへ条件を載せずhistory.stateへ退避する。
+ */
+export async function encodeJSONToCompressedParam(
+  value: unknown,
+  name: SearchURLParam['name'] = 'qz'
+): Promise<SearchURLParam | null> {
   const compressed = await encodeJSONToCompressedURL(value);
-  return compressed === null ? null : { name: 'qz', value: compressed };
+  return compressed === null ? null : { name, value: compressed };
 }
 
 /**
@@ -60,7 +70,7 @@ export async function decodeSearchURLParamsWithStatus<T>(
 }
 
 /**
- * qzを含む共有URLが復元できなかった場合だけ警告する。
+ * 圧縮パラメータを含む共有URLが復元できなかった場合だけ警告する。
  * Simple Searchは旧フラットURLで復元できた場合も警告対象から外すため、`suppress`で追加抑制できる。
  */
 export function shouldWarnSearchURLRestoreFailure(
@@ -263,7 +273,7 @@ export function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
 }
 
 /**
- * Compression Streams API非対応ブラウザでは`qz`を発行できないため、実行前に機能検出する。
+ * Compression Streams API非対応ブラウザでは圧縮パラメータを発行できないため、実行前に機能検出する。
  * 非対応の場合はURLへ条件を載せずhistory.stateへ退避する。
  */
 export function canUseCompressionStreams(): boolean {

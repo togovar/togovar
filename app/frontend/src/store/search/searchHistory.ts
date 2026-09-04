@@ -65,62 +65,72 @@ export async function buildSimpleConditionsFromURL(
     urlParams,
     master
   );
-  if (result.condition !== null) {
-    return {
-      conditions: {
-        ...createDefaultSimpleConditions(master),
-        ...result.condition,
-      } as SimpleSearchCurrentConditions,
-      shouldWarn: false,
-      isURLTooLong: false,
-    };
-  }
-
+  const conditionIds = new Set(master.map((c) => c.id));
+  const legacyFlatConditions = extractLegacyFlatSearchConditions(
+    urlParams,
+    conditionIds
+  );
+  const hasLegacyFlatParams = Object.keys(legacyFlatConditions).length > 0;
   const stashedConditions =
     getObjectFromHistoryState<SimpleSearchCurrentConditions>(
       historyState,
       'simpleSearchConditions'
     );
-  if (stashedConditions !== null) {
+  if (!hasLegacyFlatParams && stashedConditions !== null) {
     return {
       conditions: {
         ...createDefaultSimpleConditions(master),
         ...stashedConditions,
+        ...(result.condition ?? {}),
       } as SimpleSearchCurrentConditions,
-      shouldWarn: false,
+      shouldWarn: result.hasCompressedParam && !result.restoredFromCompressed,
       isURLTooLong: true,
     };
   }
 
-  const conditionIds = new Set(master.map((c) => c.id));
+  if (result.condition !== null) {
+    return {
+      conditions: {
+        ...createDefaultSimpleConditions(master),
+        ...legacyFlatConditions,
+        ...result.condition,
+      } as SimpleSearchCurrentConditions,
+      shouldWarn: shouldWarnSimpleSearchURLRestoreFailure(
+        result,
+        hasLegacyFlatParams
+      ),
+      isURLTooLong: false,
+    };
+  }
 
   const conditions: Record<string, unknown> =
     createDefaultSimpleConditions(master);
 
-  for (const [key, value] of Object.entries(urlParams)) {
-    if (conditionIds.has(key as MasterConditionId)) {
-      conditions[key] = value;
-    }
-  }
+  Object.assign(conditions, legacyFlatConditions);
 
   return {
     conditions: conditions as SimpleSearchCurrentConditions,
     shouldWarn: shouldWarnSimpleSearchURLRestoreFailure(
       result,
-      hasLegacyFlatSearchParams(urlParams, conditionIds)
+      hasLegacyFlatParams
     ),
     isURLTooLong: false,
   };
 }
 
 /**
- * q/qz以前のSimple Search共有URLが含まれる場合は、その復元を優先して警告対象から外す。
+ * termとは別に渡された旧フラット形式のSimple Search条件だけを抽出する。
  */
-function hasLegacyFlatSearchParams(
+function extractLegacyFlatSearchConditions(
   urlParams: Record<string, unknown>,
   conditionIds: Set<MasterConditionId>
-): boolean {
-  return Object.keys(urlParams).some((key) =>
-    conditionIds.has(key as MasterConditionId)
-  );
+): Partial<SimpleSearchCurrentConditions> {
+  const conditions: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(urlParams)) {
+    if (key !== 'term' && conditionIds.has(key as MasterConditionId)) {
+      conditions[key] = value;
+    }
+  }
+
+  return conditions as Partial<SimpleSearchCurrentConditions>;
 }
