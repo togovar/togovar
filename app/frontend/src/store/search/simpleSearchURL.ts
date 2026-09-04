@@ -203,7 +203,13 @@ function omitTermCondition(
 
 /**
  * termは圧縮パラメータを通らないため、単独でもURLを壊さない長さに制限する。
+ * 不対サロゲートを含む文字列ではencodeURIComponentが例外を投げるため、
+ * その場合もURLへ載せられない扱いにする。
  */
 function canReflectReadableTerm(term: string): boolean {
-  return encodeURIComponent(term).length <= SIMPLE_SEARCH_TERM_MAX_LENGTH;
+  try {
+    return encodeURIComponent(term).length <= SIMPLE_SEARCH_TERM_MAX_LENGTH;
+  } catch {
+    return false;
+  }
 }
