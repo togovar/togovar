@@ -47,7 +47,7 @@ export async function reflectSimpleSearchConditionToURI(
   masterConditions: MasterConditions[]
 ): Promise<SearchURLReflectionResult> {
   const reflectionId = invalidatePendingSearchURLReflection();
-  const { params, hasFilterConditions } =
+  const { params, hasOmittedConditions } =
     await encodeSimpleConditionForURLParams(
       currentConditions,
       masterConditions
@@ -57,8 +57,8 @@ export async function reflectSimpleSearchConditionToURI(
   }
 
   currentUrlParams = { mode: 'simple', ...params };
-  const isURLTooLong = hasFilterConditions && params.filter === undefined;
-  const state = isURLTooLong
+  const isURLTooLong = hasOmittedConditions;
+  const state = hasOmittedConditions
     ? { ...currentUrlParams, simpleSearchConditions: currentConditions }
     : currentUrlParams;
   pushSearchUrl(state, currentUrlParams);

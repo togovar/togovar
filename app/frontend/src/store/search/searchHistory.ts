@@ -76,15 +76,12 @@ export async function buildSimpleConditionsFromURL(
       historyState,
       'simpleSearchConditions'
     );
-  if (
-    !result.hasCompressedParam &&
-    !hasLegacyFlatParams &&
-    stashedConditions !== null
-  ) {
+  if (!hasLegacyFlatParams && stashedConditions !== null) {
     return {
       conditions: {
         ...createDefaultSimpleConditions(master),
         ...stashedConditions,
+        ...(result.condition ?? {}),
       } as SimpleSearchCurrentConditions,
       shouldWarn: false,
       isURLTooLong: true,

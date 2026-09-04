@@ -9,6 +9,7 @@ import {
   encodeJSONToCompressedParam,
   getFirstString,
   isPlainObject,
+  SEARCH_URL_COMPRESSED_PARAM_MAX_LENGTH,
   shouldWarnSearchURLRestoreFailure,
   type SearchURLDecodeResult,
 } from './searchURLCodec';
@@ -21,6 +22,8 @@ export type SimpleSearchURLEncodeResult = {
   params: Record<string, string>;
   /** フィルタ条件が1つもない（=URLに載せる必要がない）場合はfalse。長さ超過とURL不要を区別するために使う。 */
   hasFilterConditions: boolean;
+  /** URLだけでは復元できない条件がある場合、history.state退避を呼び出し元へ求める。 */
+  hasOmittedConditions: boolean;
 };
 
 /**
@@ -36,22 +39,29 @@ export async function encodeSimpleConditionForURLParams(
     masterConditions
   );
   const params: Record<string, string> = {};
+  let hasOmittedConditions = false;
   const term = diffConditions.term;
   if (typeof term === 'string' && term !== '') {
-    params.term = term;
+    if (canReflectReadableTerm(term)) {
+      params.term = term;
+    } else {
+      hasOmittedConditions = true;
+    }
   }
 
   const filterConditions = omitTermCondition(diffConditions);
   if (Object.keys(filterConditions).length === 0) {
-    return { params, hasFilterConditions: false };
+    return { params, hasFilterConditions: false, hasOmittedConditions };
   }
 
   const filter = await encodeJSONToCompressedParam(filterConditions, 'filter');
   if (filter !== null) {
     params[filter.name] = filter.value;
+  } else {
+    hasOmittedConditions = true;
   }
 
-  return { params, hasFilterConditions: true };
+  return { params, hasFilterConditions: true, hasOmittedConditions };
 }
 
 /**
@@ -186,4 +196,13 @@ function omitTermCondition(
     }
   }
   return filterConditions;
+}
+
+/**
+ * termは圧縮パラメータを通らないため、単独でもURLを壊さない長さに制限する。
+ */
+function canReflectReadableTerm(term: string): boolean {
+  return (
+    encodeURIComponent(term).length <= SEARCH_URL_COMPRESSED_PARAM_MAX_LENGTH
+  );
 }
