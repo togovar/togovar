@@ -81,7 +81,7 @@ export function shouldWarnSimpleSearchURLRestoreFailure(
 }
 
 /**
- * qzは圧縮済みバイト列のBase64URL表現なので、展開後にJSONとして読む。
+ * filterは圧縮済みバイト列のBase64URL表現なので、展開後にJSONとして読む。
  */
 async function decodeCompressedSimpleConditionFromURL(
   encoded: string,

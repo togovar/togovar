@@ -70,7 +70,7 @@ export async function decodeSearchURLParamsWithStatus<T>(
 }
 
 /**
- * qzを含む共有URLが復元できなかった場合だけ警告する。
+ * 圧縮パラメータを含む共有URLが復元できなかった場合だけ警告する。
  * Simple Searchは旧フラットURLで復元できた場合も警告対象から外すため、`suppress`で追加抑制できる。
  */
 export function shouldWarnSearchURLRestoreFailure(
@@ -273,7 +273,7 @@ export function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
 }
 
 /**
- * Compression Streams API非対応ブラウザでは`qz`を発行できないため、実行前に機能検出する。
+ * Compression Streams API非対応ブラウザでは圧縮パラメータを発行できないため、実行前に機能検出する。
  * 非対応の場合はURLへ条件を載せずhistory.stateへ退避する。
  */
 export function canUseCompressionStreams(): boolean {

@@ -70,7 +70,7 @@ export async function buildSimpleConditionsFromURL(
       historyState,
       'simpleSearchConditions'
     );
-  if (!result.restoredFromCompressed && stashedConditions !== null) {
+  if (!result.hasCompressedParam && stashedConditions !== null) {
     return {
       conditions: {
         ...createDefaultSimpleConditions(master),
