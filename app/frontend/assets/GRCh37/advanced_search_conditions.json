@@ -1919,6 +1919,78 @@
               ]
             }
           ]
+        },
+        {
+          "value": "gnomad_genomes",
+          "label": "gnomAD Genomes",
+          "children": [
+            {
+              "value": "gnomad_genomes.afr",
+              "label": "African/African American"
+            },
+            {
+              "value": "gnomad_genomes.amr",
+              "label": "Admixed American"
+            },
+            {
+              "value": "gnomad_genomes.asj",
+              "label": "Ashkenazi Jewish"
+            },
+            {
+              "value": "gnomad_genomes.eas",
+              "label": "East Asian"
+            },
+            {
+              "value": "gnomad_genomes.fin",
+              "label": "European (Finnish)"
+            },
+            {
+              "value": "gnomad_genomes.nfe",
+              "label": "European (non-Finnish)"
+            },
+            {
+              "value": "gnomad_genomes.oth",
+              "label": "Remaining individuals"
+            }
+          ]
+        },
+        {
+          "value": "gnomad_exomes",
+          "label": "gnomAD Exomes",
+          "children": [
+            {
+              "value": "gnomad_exomes.afr",
+              "label": "African/African American"
+            },
+            {
+              "value": "gnomad_exomes.amr",
+              "label": "Admixed American"
+            },
+            {
+              "value": "gnomad_exomes.asj",
+              "label": "Ashkenazi Jewish"
+            },
+            {
+              "value": "gnomad_exomes.eas",
+              "label": "East Asian"
+            },
+            {
+              "value": "gnomad_exomes.fin",
+              "label": "European (Finnish)"
+            },
+            {
+              "value": "gnomad_exomes.nfe",
+              "label": "European (non-Finnish)"
+            },
+            {
+              "value": "gnomad_exomes.oth",
+              "label": "Remaining individuals"
+            },
+            {
+              "value": "gnomad_exomes.sas",
+              "label": "South Asian"
+            }
+          ]
         }
       ]
     },

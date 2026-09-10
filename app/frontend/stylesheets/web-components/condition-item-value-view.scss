@@ -177,7 +177,9 @@
 }
 
 :host([data-condition-type='dataset'][data-value^='gnomad_genomes']),
-:host([data-condition-type='dataset'][data-value^='gnomad_exomes']) {
+:host([data-condition-type='dataset'][data-value^='gnomad_exomes']),
+:host([data-condition-type='genotype'][data-value^='gnomad_genomes']),
+:host([data-condition-type='genotype'][data-value^='gnomad_exomes']) {
   .inner {
     background-color: var(--color-dataset-foreign-light);
     border-color: var(--color-dataset-foreign);
