@@ -1,6 +1,6 @@
 import { setSimpleSearchCondition } from '../../../store/search/searchManager';
 import { storeManager } from '../../../store/StoreManager';
-import { CHROMOSOME_PATTERN } from './SimpleSearchConstants';
+import { normalizeChromosomeTerm } from './SimpleSearchConstants';
 import type {
   SimpleSearchHost,
   SuggestionItem,
@@ -23,15 +23,7 @@ export class SimpleSearchController {
    * @param term - 検索語
    */
   search(term: string): void {
-    if (CHROMOSOME_PATTERN.test(term)) {
-      term = term.replace(/Chr|ch|Cr|cs/i, '').toUpperCase();
-
-      if (term.includes('M:')) {
-        term = term.replace('M:', 'MT:');
-      }
-    }
-
-    setSimpleSearchCondition('term', term);
+    setSimpleSearchCondition('term', normalizeChromosomeTerm(term));
   }
 
   /**

@@ -138,3 +138,24 @@ export const SEARCH_FIELD_CONFIG: SearchFieldConfig = {
 
 /** 染色体パターンの正規表現 */
 export const CHROMOSOME_PATTERN: RegExp = /([1-9]|1[0-9]|2[0-2]|X|Y|M|MT):\d+/i;
+
+/**
+ * 染色体名の表記をリファレンスゲノムのESインデックスに合わせて正規化する。
+ * GRCh38は染色体名が"M"のみ、GRCh37は"M"と"MT"の両方を持つため、
+ * GRCh38ではMTをMへ寄せ、GRCh37は従来通りMをMTへ寄せる。
+ * URL直読み込み・popstate復元など、検索ボックスの入力を経由しない経路でも
+ * 実際にAPIへ渡す直前（searchRequest.ts）で必ず通るようにする。
+ */
+export function normalizeChromosomeTerm(term: string): string {
+  if (!CHROMOSOME_PATTERN.test(term)) return term;
+
+  const normalized = term.replace(/Chr|ch|Cr|cs/i, '').toUpperCase();
+
+  if (TOGOVAR_FRONTEND_REFERENCE === 'GRCh38') {
+    return normalized.replace('MT:', 'M:');
+  }
+
+  return normalized.includes('M:')
+    ? normalized.replace('M:', 'MT:')
+    : normalized;
+}
