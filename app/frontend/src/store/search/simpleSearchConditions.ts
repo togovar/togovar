@@ -19,12 +19,10 @@ const CHROMOSOME_PATTERN: RegExp =
  * "MT"("ClinVar")に分かれて登録されているため、どちらか一方へ寄せてしまうと
  * 常に片方のデータセットへ到達できなくなる。そのためGRCh37では変換せず、
  * ユーザーが入力した表記のままAPIへ渡す。
- * extractSearchCondition（本ファイル）が検索API・ダウンロード・共有URLの
- * 全生成経路で共有される唯一の抽出口のため、ここで正規化することで
- * updateTerm()等が正規化前の生のtermをStoreへ書き込んでいても、
- * 実際にAPI/URLへ渡る値は必ず正規化される。
- * searchManager.ts/searchHistory.tsもStore書き込み時点の値を揃えるために
- * 同じ関数を呼ぶが、正規化は冪等なのでどちらで呼んでも結果は変わらない。
+ * extractSearchCondition（本ファイル）は検索API・ダウンロードAPI・URLのfilter条件で使う
+ * 送信用条件の抽出口のため、Storeに正規化前のtermが残っていても送信用の値はここで揃える。
+ * Simple Search URLの可読なtermパラメータだけは、検索ボックス表示と共有URLを一致させるため
+ * simpleSearchURL.ts側でStoreの生のtermをそのまま使う。
  */
 export function normalizeChromosomeTerm(term: string): string {
   if (!CHROMOSOME_PATTERN.test(term)) return term;
@@ -40,8 +38,8 @@ export function normalizeChromosomeTerm(term: string): string {
 
 /**
  * Simple SearchのURL/API送信用条件だけを取り出すため、マスター定義のdefaultと比較する。
- * 検索API・ダウンロードAPI・共有URLパラメータの生成が最終的にすべてここを通るため、
- * termの染色体表記正規化もここで行い、Store側の正規化漏れがあっても送信内容を保証する。
+ * 検索API・ダウンロードAPI・URLのfilter条件では、termの染色体表記正規化もここで行う。
+ * URL上で読めるtermパラメータは表示表記を保つため、simpleSearchURL.tsで別途扱う。
  */
 export function extractSearchCondition(
   currentConditions: SimpleSearchCurrentConditions = {} as SimpleSearchCurrentConditions,
