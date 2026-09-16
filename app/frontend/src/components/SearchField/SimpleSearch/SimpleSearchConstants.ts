@@ -141,8 +141,11 @@ export const CHROMOSOME_PATTERN: RegExp = /([1-9]|1[0-9]|2[0-2]|X|Y|M|MT):\d+/i;
 
 /**
  * 染色体名の表記をリファレンスゲノムのESインデックスに合わせて正規化する。
- * GRCh38は染色体名が"M"のみ、GRCh37は"M"と"MT"の両方を持つため、
- * GRCh38ではMTをMへ寄せ、GRCh37は従来通りMをMTへ寄せる。
+ * GRCh38は染色体名が"M"のみのためMTをMへ寄せる。
+ * GRCh37はデータセットによって"M"("JGA-WES"/"JGA-SNP"/"MGeND"等)と
+ * "MT"("ClinVar")に分かれて登録されているため、どちらか一方へ寄せてしまうと
+ * 常に片方のデータセットへ到達できなくなる。そのためGRCh37では変換せず、
+ * ユーザーが入力した表記のままAPIへ渡す。
  * URL直読み込み・popstate復元など、検索ボックスの入力を経由しない経路でも
  * 実際にAPIへ渡す直前（searchRequest.ts）で必ず通るようにする。
  */
@@ -155,7 +158,5 @@ export function normalizeChromosomeTerm(term: string): string {
     return normalized.replace('MT:', 'M:');
   }
 
-  return normalized.includes('M:')
-    ? normalized.replace('M:', 'MT:')
-    : normalized;
+  return normalized;
 }
