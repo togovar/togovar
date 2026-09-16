@@ -1,6 +1,5 @@
 import { setSimpleSearchCondition } from '../../../store/search/searchManager';
 import { storeManager } from '../../../store/StoreManager';
-import { normalizeChromosomeTerm } from './SimpleSearchConstants';
 import type {
   SimpleSearchHost,
   SuggestionItem,
@@ -19,11 +18,11 @@ export class SimpleSearchController {
 
   /**
    * 検索処理
-   * 染色体パターンの正規化も行う
+   * 染色体表記の正規化はsetSimpleSearchCondition側で行う
    * @param term - 検索語
    */
   search(term: string): void {
-    setSimpleSearchCondition('term', normalizeChromosomeTerm(term));
+    setSimpleSearchCondition('term', term);
   }
 
   /**

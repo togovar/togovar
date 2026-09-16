@@ -4,6 +4,7 @@ import type {
   SimpleSearchCurrentConditions,
 } from '../../types';
 import type { ConditionQuery } from '../../types/query';
+import { normalizeChromosomeTerm } from '../../components/SearchField/SimpleSearch/SimpleSearchConstants';
 import {
   decodeConditionFromURLParamsWithStatus,
   shouldWarnAdvancedSearchURLRestoreFailure,
@@ -78,11 +79,11 @@ export async function buildSimpleConditionsFromURL(
     );
   if (!hasLegacyFlatParams && stashedConditions !== null) {
     return {
-      conditions: {
+      conditions: normalizeConditionsTerm({
         ...createDefaultSimpleConditions(master),
         ...stashedConditions,
         ...(result.condition ?? {}),
-      } as SimpleSearchCurrentConditions,
+      } as SimpleSearchCurrentConditions),
       shouldWarn: result.hasCompressedParam && !result.restoredFromCompressed,
       isURLTooLong: true,
     };
@@ -90,11 +91,11 @@ export async function buildSimpleConditionsFromURL(
 
   if (result.condition !== null) {
     return {
-      conditions: {
+      conditions: normalizeConditionsTerm({
         ...createDefaultSimpleConditions(master),
         ...legacyFlatConditions,
         ...result.condition,
-      } as SimpleSearchCurrentConditions,
+      } as SimpleSearchCurrentConditions),
       shouldWarn: shouldWarnSimpleSearchURLRestoreFailure(
         result,
         hasLegacyFlatParams
@@ -109,13 +110,26 @@ export async function buildSimpleConditionsFromURL(
   Object.assign(conditions, legacyFlatConditions);
 
   return {
-    conditions: conditions as SimpleSearchCurrentConditions,
+    conditions: normalizeConditionsTerm(
+      conditions as SimpleSearchCurrentConditions
+    ),
     shouldWarn: shouldWarnSimpleSearchURLRestoreFailure(
       result,
       hasLegacyFlatParams
     ),
     isURLTooLong: false,
   };
+}
+
+/**
+ * URL直読み込み・popstate復元はsetSimpleSearchCondition({@link searchManager.ts})を
+ * 経由しないため、ここでも染色体表記のtermを正規化して両経路の結果を一致させる。
+ */
+function normalizeConditionsTerm(
+  conditions: SimpleSearchCurrentConditions
+): SimpleSearchCurrentConditions {
+  if (typeof conditions.term !== 'string') return conditions;
+  return { ...conditions, term: normalizeChromosomeTerm(conditions.term) };
 }
 
 /**

@@ -1,6 +1,5 @@
 import * as qs from 'qs';
 import { API_URL } from '../global';
-import { normalizeChromosomeTerm } from '../components/SearchField/SimpleSearch/SimpleSearchConstants';
 import { stripAdvancedSearchMetadata } from '../store/search/advancedSearchURL';
 import { extractSearchCondition } from '../store/search/simpleSearchConditions';
 import type {
@@ -120,10 +119,6 @@ function buildSimpleSearchBaseUrl(
     simpleSearchConditions,
     masterConditions
   );
-  // URL直読み込み・popstate復元など、検索ボックスを経由しない経路のtermもここで正規化する。
-  if (typeof condition.term === 'string') {
-    condition.term = normalizeChromosomeTerm(condition.term);
-  }
   const queryString = qs.stringify(condition);
 
   return `${API_URL}/search?offset=${offsetStart}${

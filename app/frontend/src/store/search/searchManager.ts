@@ -5,6 +5,7 @@ import {
   type SearchOrigin,
 } from '../../api/searchExecutionState';
 import { storeManager } from '../StoreManager';
+import { normalizeChromosomeTerm } from '../../components/SearchField/SimpleSearch/SimpleSearchConstants';
 import type {
   MasterConditions,
   MasterConditionId,
@@ -49,9 +50,19 @@ function applySimpleSearchConditionPatch(
   invalidatePendingHistoryRestore();
   clearSearchURLRestoreWarning();
 
+  // 染色体イデオグラムのクリックなど、検索ボックスを経由しない経路もここを必ず通るため、
+  // termの染色体表記正規化はこの唯一の公開入口で行う。
+  const normalizedConditions =
+    typeof newSearchConditions.term === 'string'
+      ? {
+          ...newSearchConditions,
+          term: normalizeChromosomeTerm(newSearchConditions.term),
+        }
+      : newSearchConditions;
+
   const updatedConditions = {
     ...storeManager.getData('simpleSearchConditions'),
-    ...newSearchConditions,
+    ...normalizedConditions,
   } as SimpleSearchCurrentConditions;
   storeManager.setData('simpleSearchConditions', updatedConditions);
 
