@@ -136,8 +136,13 @@ export const SEARCH_FIELD_CONFIG: SearchFieldConfig = {
   },
 };
 
-/** 染色体パターンの正規表現 */
-export const CHROMOSOME_PATTERN: RegExp = /([1-9]|1[0-9]|2[0-2]|X|Y|M|MT):\d+/i;
+/**
+ * 染色体パターンの正規表現。
+ * 先頭アンカーなしだと"foo1:123"のような無関係な検索語の一部にもマッチしてしまうため、
+ * 先頭（"chr"等の接頭辞は許容）だけを対象にする。
+ */
+export const CHROMOSOME_PATTERN: RegExp =
+  /^(?:Chr|ch|Cr|cs)?([1-9]|1[0-9]|2[0-2]|X|Y|M|MT):\d+/i;
 
 /**
  * 染色体名の表記をリファレンスゲノムのESインデックスに合わせて正規化する。
@@ -155,10 +160,10 @@ export const CHROMOSOME_PATTERN: RegExp = /([1-9]|1[0-9]|2[0-2]|X|Y|M|MT):\d+/i;
 export function normalizeChromosomeTerm(term: string): string {
   if (!CHROMOSOME_PATTERN.test(term)) return term;
 
-  const normalized = term.replace(/Chr|ch|Cr|cs/i, '').toUpperCase();
+  const normalized = term.replace(/^(?:Chr|ch|Cr|cs)/i, '').toUpperCase();
 
   if (TOGOVAR_FRONTEND_REFERENCE === 'GRCh38') {
-    return normalized.replace('MT:', 'M:');
+    return normalized.replace(/^MT:/, 'M:');
   }
 
   return normalized;
