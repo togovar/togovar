@@ -14,6 +14,7 @@ import type {
 } from '../../types';
 import { REF_ALT_SHOW_LENGTH } from './ResultsColumnTemplates';
 import {
+  exceedsReportLinkLength,
   getVariantIdentifier,
   getVariantReportPath,
   type VariantLocusFields,
@@ -122,12 +123,19 @@ export class ResultsColumnUpdater {
 
   /**
    * Variant report への導線をTogoVar ID列から独立させ、ID表示自体は純粋なテキストにする。
+   * REF/ALTの長いSVはlocus形式のReport URLが長大化しミドルウェアの上限を超えるため、
+   * 2026.1リリースではREPORT_LINK_MAX_LENGTHを超えるバリアントはリンク自体を出さない。
    */
   static updateVariantReport(
     cell: HTMLTableCellElement | null,
     result: VariantLocusFields
   ) {
     if (!cell) return;
+
+    if (exceedsReportLinkLength(result)) {
+      this.resetAnchor(cell);
+      return;
+    }
 
     const { value } = getVariantIdentifier(result);
     const url = getVariantReportPath(result);
