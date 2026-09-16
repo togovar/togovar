@@ -10,12 +10,15 @@ import '../ConditionItemValueView';
 // Constants
 // ============================================================================
 
+// GRCh37はミトコンドリアがデータセットにより"M"("JGA-WES"/"JGA-SNP"/"MGeND"等)と
+// "MT"("ClinVar")に分かれて登録されているため、両方を選択肢として出す。
+// GRCh38は"M"のみのESインデックスへbuildLocationQuery側で変換するため"MT"のみで足りる。
 const CHROMOSOME_OPTIONS = [
   '',
   ...[...Array(22)].map((_, index) => String(index + 1)),
   'X',
   'Y',
-  'MT',
+  ...(TOGOVAR_FRONTEND_REFERENCE === 'GRCh37' ? ['M', 'MT'] : ['MT']),
 ];
 
 const INPUT_MODE = {

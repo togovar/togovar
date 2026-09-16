@@ -146,8 +146,11 @@ export const CHROMOSOME_PATTERN: RegExp = /([1-9]|1[0-9]|2[0-2]|X|Y|M|MT):\d+/i;
  * "MT"("ClinVar")に分かれて登録されているため、どちらか一方へ寄せてしまうと
  * 常に片方のデータセットへ到達できなくなる。そのためGRCh37では変換せず、
  * ユーザーが入力した表記のままAPIへ渡す。
- * URL直読み込み・popstate復元など、検索ボックスの入力を経由しない経路でも
- * 実際にAPIへ渡す直前（searchRequest.ts）で必ず通るようにする。
+ * 呼び出し口はsetSimpleSearchCondition（searchManager.ts）と
+ * buildSimpleConditionsFromURL（searchHistory.ts）の2箇所で、
+ * 検索ボックス入力・URL直読み込み・popstate復元のいずれもこのどちらかを
+ * 経由してStoreへ書き込まれるため、両方を通すことで正規化を保証する。
+ * termを書き込む経路を新設する場合はここも通すこと。
  */
 export function normalizeChromosomeTerm(term: string): string {
   if (!CHROMOSOME_PATTERN.test(term)) return term;
