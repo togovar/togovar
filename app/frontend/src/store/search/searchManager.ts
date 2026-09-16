@@ -5,7 +5,6 @@ import {
   type SearchOrigin,
 } from '../../api/searchExecutionState';
 import { storeManager } from '../StoreManager';
-import { normalizeChromosomeTerm } from './simpleSearchConditions';
 import type {
   MasterConditions,
   MasterConditionId,
@@ -50,26 +49,17 @@ function applySimpleSearchConditionPatch(
   invalidatePendingHistoryRestore();
   clearSearchURLRestoreWarning();
 
-  // updateTerm()（入力中の一時反映）はここを経由せずStoreへ生のtermを書き込むため、
-  // フィルタだけの変更でも、マージ後にStoreへ残っている可能性のあるtermを正規化し直す必要がある。
-  // 染色体イデオグラムのクリックなど、検索ボックスを経由しない経路もここを必ず通るため、
-  // termの染色体表記正規化はマージ後のこの唯一の公開入口で行う。
+  // Storeのtermは検索ボックス表示にも使うため、入力・URL復元時の表記をそのまま残す。
+  // API送信とURL生成に必要な染色体表記の正規化はextractSearchCondition側で行う。
   const mergedConditions = {
     ...storeManager.getData('simpleSearchConditions'),
     ...newSearchConditions,
   } as SimpleSearchCurrentConditions;
 
-  const updatedConditions =
-    typeof mergedConditions.term === 'string'
-      ? {
-          ...mergedConditions,
-          term: normalizeChromosomeTerm(mergedConditions.term),
-        }
-      : mergedConditions;
-  storeManager.setData('simpleSearchConditions', updatedConditions);
+  storeManager.setData('simpleSearchConditions', mergedConditions);
 
   void reflectSimpleSearchConditionToURI(
-    updatedConditions,
+    mergedConditions,
     storeManager.getData('simpleSearchConditionsMaster')
   ).then(({ isURLTooLong, isStale }) => {
     if (isStale) return;
