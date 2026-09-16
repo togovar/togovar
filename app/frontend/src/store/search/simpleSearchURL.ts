@@ -31,6 +31,7 @@ const SIMPLE_SEARCH_TERM_MAX_LENGTH = 500;
 
 /**
  * キーワードは可読な`term`として残し、フィルタ条件だけを圧縮して共有URLを短くする。
+ * termは検索ボックス表示と共有URLの表記を揃えるため、API用の染色体正規化前の値を使う。
  * 圧縮エンコード手順自体はAdvanced Searchと共通のため `searchURLCodec.ts` に委譲する。
  */
 export async function encodeSimpleConditionForURLParams(
@@ -43,7 +44,7 @@ export async function encodeSimpleConditionForURLParams(
   );
   const params: Record<string, string> = {};
   let hasOmittedConditions = false;
-  const term = diffConditions.term;
+  const term = currentConditions.term;
   if (typeof term === 'string' && term !== '') {
     if (canReflectReadableTerm(term)) {
       params.term = term;

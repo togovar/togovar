@@ -12,13 +12,13 @@ import '../ConditionItemValueView';
 
 // GRCh37はミトコンドリアがデータセットにより"M"("JGA-WES"/"JGA-SNP"/"MGeND"等)と
 // "MT"("ClinVar")に分かれて登録されているため、両方を選択肢として出す。
-// GRCh38は"M"のみのESインデックスへbuildLocationQuery側で変換するため"MT"のみで足りる。
+// GRCh38は"M"のみのESインデックスに合わせ、UIでも"M"だけを選択肢として出す。
 const CHROMOSOME_OPTIONS = [
   '',
   ...[...Array(22)].map((_, index) => String(index + 1)),
   'X',
   'Y',
-  ...(TOGOVAR_FRONTEND_REFERENCE === 'GRCh37' ? ['M', 'MT'] : ['MT']),
+  ...(TOGOVAR_FRONTEND_REFERENCE === 'GRCh37' ? ['M', 'MT'] : ['M']),
 ];
 
 const INPUT_MODE = {
@@ -326,8 +326,7 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
 
   /**
    * パース結果を chromosome/start/end の各UIフィールドに適用する。
-   * GRCh38はbuildLocationQuery側で"MT"を"M"へ変換して保存しているため、
-   * 復元時はここで"MT"へ戻してからプルダウンの選択肢と照合する。
+   * 古い共有URLなどに残るGRCh38の"MT"は、現在のプルダウン選択肢に合わせて"M"へ寄せる。
    */
   private _applyParsedLocation(parsed: {
     chromosome: string;
@@ -335,8 +334,8 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
     end?: string;
   }): void {
     const displayChromosome =
-      TOGOVAR_FRONTEND_REFERENCE === 'GRCh38' && parsed.chromosome === 'M'
-        ? 'MT'
+      TOGOVAR_FRONTEND_REFERENCE === 'GRCh38' && parsed.chromosome === 'MT'
+        ? 'M'
         : parsed.chromosome;
     if (CHROMOSOME_OPTIONS.includes(displayChromosome)) {
       this._chromosomeSelect.value = displayChromosome;
@@ -488,7 +487,10 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
     const start = opts.start;
     const end = opts.end;
 
-    const chrStr = String(chr);
+    const chrStr =
+      TOGOVAR_FRONTEND_REFERENCE === 'GRCh38' && String(chr) === 'MT'
+        ? 'M'
+        : String(chr);
     if (!chrStr) return;
 
     const startNum =

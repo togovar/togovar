@@ -25,7 +25,7 @@ export function buildLocationQuery(
   const [, chromosomeRaw, startStr, endStr] = m;
 
   const chromosomeInput = chromosomeRaw.trim();
-  // GRCh38 の ES インデックスは染色体名が "M" のみのため MT表記をMへ変換する。
+  // GRCh38 の ES インデックスは染色体名が "M" のみのため、古いMT表記もMへ変換する。
   // GRCh37 は "MT" をそのまま持つため変換しない。
   const chromosome =
     TOGOVAR_FRONTEND_REFERENCE === 'GRCh38' && chromosomeInput === 'MT'
