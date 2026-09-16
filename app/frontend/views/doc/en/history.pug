@@ -16,10 +16,9 @@ block content
         h2.title Update history
       .contents
         section.section.timeline
-          //- Replace “X” when the release date is confirmed.
           .release
             h3.sectiontitle.heading
-              span.date 2026/8/X
+              span.date 2026/9/18
               span.number Release: 2026.1
             ul.unordered-list.items
               li
@@ -41,7 +40,7 @@ block content
                     a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-jsv1-20211208-af') ToMMo JSV1
                     | , a structural-variant frequency dataset based on long-read WGS of 222 Japanese individuals, was added.
                   li
-                    | Alternate allele frequencies including structural variants derived from
+                    | Allele frequencies including structural variants derived from
                     |
                     a.hyper-text.-external(target='_blank', href='https://jogo.csml.org/') JoGo 1.0
                     | , a human gene haplotype database based on long-read WGS, were added.
@@ -49,7 +48,7 @@ block content
                     | ToMMo 54KJPN was updated to
                     |
                     a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-61kjpn-20250616-af_snvindelall') 61KJPN
-                    |  (61,424 individuals).
+                    |  (61,424 individuals). Allele frequencies for the mitochondrial genome are planned for the next release.
               li
                 strong Simple/Advanced Search:
                 |  #[a.hyper-text.-external(target='_blank', href='https://cadd.bihealth.org/') CADD] (PHRED score) and predicted splicing types from #[a.hyper-text.-external(target='_blank', href='https://sscvdb.io/') SSCV DB] were added as search filters and result fields.
@@ -62,6 +61,9 @@ block content
               li
                 strong Search results:
                 |  In addition to showing or hiding columns, you can now reorder them by dragging and dropping items in the column menu.
+              li
+                strong Variant page:
+                |  Snippets were added to some publications.
               li
                 strong Downloads:
                 |  A tabix-indexed TSV representation containing JSON annotations was added for GRCh37 and GRCh38. You can retrieve annotations for a specified region as JSON without first downloading an entire chromosome file. The conventional TSV representation remains available.

@@ -16,10 +16,9 @@ block content
         h2.title 更新履歴
       .contents
         section.section.timeline
-          //- リリース日が確定したら「X」を置き換える。
           .release
             h3.sectiontitle.heading
-              span.date 2026/9
+              span.date 2026/9/18
               span.number リリース: 2026.1
             ul.unordered-list.items
               li
@@ -38,11 +37,11 @@ block content
                     | （長鎖型WGSによる日本人222名の構造多型頻度）を追加しました。
                   li
                     a.hyper-text.-external(target='_blank', href='https://jogo.csml.org/') JoGo 1.0
-                    | （長鎖型WGSに基づくヒト遺伝子ハプロタイプデータベース）由来の構造多型を含む代替アレル頻度を追加しました。
+                    | （長鎖型WGSに基づくヒト遺伝子ハプロタイプデータベース）由来の構造多型を含むアレル頻度を追加しました。
                   li
                     | ToMMo 54KJPNを
                     a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-61kjpn-20250616-af_snvindelall') 61KJPN
-                    | （61,424名）へ更新しました。
+                    | （61,424名）へ更新しました。ミトコンリアルゲノムのアレル頻度は次のリリースで追加予定です。
               li
                 strong Simple/Advanced Search:
                 |  #[a.hyper-text.-external(target='_blank', href='https://cadd.bihealth.org/') CADD]（PHRED score）と
@@ -57,6 +56,9 @@ block content
               li
                 strong Search results:
                 |  列の表示・非表示に加え、列選択メニュー内のドラッグ＆ドロップで表示順を変更できるようにしました。
+              li
+                strong Variant page:
+                |  publicationsの一部にスニペットを追加しました。
               li
                 strong Downloads:
                 |  GRCh37およびGRCh38のアノテーションデータにJSONを格納したtabix対応TSVを追加しました。染色体ごとのファイル全体を事前にダウンロードせず、指定した領域のアノテーションをJSONとして取得できます。従来のTSV形式も引き続き提供します。
