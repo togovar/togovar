@@ -1,6 +1,7 @@
 import { storeManager } from '../StoreManager';
 import {
   decodeConditionFromURLParamsWithStatus,
+  normalizeAdvancedSearchCondition,
   shouldWarnAdvancedSearchURLRestoreFailure,
   type AdvancedSearchURLDecodeResult,
 } from './advancedSearchURL';
@@ -32,7 +33,9 @@ export async function initializeApp(): Promise<'simple' | 'advanced'> {
       window.history.state,
       'advancedSearchConditions'
     );
-    const condition = result.condition ?? stashedCondition;
+    const condition = normalizeAdvancedSearchCondition(
+      result.condition ?? stashedCondition
+    );
     updateAdvancedSearchURLRestoreWarning(result, condition);
     storeManager.setData(
       'searchURLTooLong',

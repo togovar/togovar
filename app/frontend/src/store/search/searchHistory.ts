@@ -7,6 +7,7 @@ import type { ConditionQuery } from '../../types/query';
 import { normalizeChromosomeTerm } from '../../components/SearchField/SimpleSearch/SimpleSearchConstants';
 import {
   decodeConditionFromURLParamsWithStatus,
+  normalizeAdvancedSearchCondition,
   shouldWarnAdvancedSearchURLRestoreFailure,
 } from './advancedSearchURL';
 import { getObjectFromHistoryState } from './searchURLCodec';
@@ -42,7 +43,9 @@ export function getAdvancedConditionFromHistory(
       historyState,
       'advancedSearchConditions'
     );
-    const condition = result.condition ?? stashedCondition;
+    const condition = normalizeAdvancedSearchCondition(
+      result.condition ?? stashedCondition
+    );
     const shouldWarn =
       shouldWarnAdvancedSearchURLRestoreFailure(result) && condition === null;
     return {

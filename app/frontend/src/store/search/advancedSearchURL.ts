@@ -59,6 +59,43 @@ async function decodeCompressedConditionFromURL(
 }
 
 /**
+ * URL/history.stateから復元したqueryのlocationリーフを、現在のリファレンスゲノムのESインデックスに合わせて正規化する。
+ * GRCh38はbuildLocationQuery側（queryBuilders/location.ts）で"MT"を"M"へ変換して保存する仕様のため、
+ * それより前に発行された共有URLやhistory.stateに残る古い"MT"表記のままだと、
+ * バッジ表示は正しく見えても検索APIへは"MT"のまま送られて0件になってしまう。
+ * and/orでネストした条件木を再帰的にたどり、location leafだけを書き換える。
+ */
+export function normalizeAdvancedSearchCondition(
+  query: ConditionQuery | null
+): ConditionQuery | null {
+  if (query === null) return null;
+  return normalizeQueryNode(query) as ConditionQuery;
+}
+
+/** queryノード1つを見て、論理グループなら子へ再帰し、location leafならchromosomeを書き換える。 */
+function normalizeQueryNode(node: unknown): unknown {
+  if (!isPlainObject(node)) return node;
+
+  if (Array.isArray(node.and)) {
+    return { ...node, and: node.and.map(normalizeQueryNode) };
+  }
+  if (Array.isArray(node.or)) {
+    return { ...node, or: node.or.map(normalizeQueryNode) };
+  }
+
+  const location = node.location;
+  if (
+    TOGOVAR_FRONTEND_REFERENCE === 'GRCh38' &&
+    isPlainObject(location) &&
+    location.chromosome === 'MT'
+  ) {
+    return { ...node, location: { ...location, chromosome: 'M' } };
+  }
+
+  return node;
+}
+
+/**
  * URL/画面復元用のメタ情報を取り除き、検索APIへ送れるqueryだけにする。
  * 現在はGene symbolの表示名(labels)だけが対象。
  */
