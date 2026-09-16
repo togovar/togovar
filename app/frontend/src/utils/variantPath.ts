@@ -28,6 +28,18 @@ function getRawVariantLocusLength(result: VariantLocusFields): number {
 }
 
 /**
+ * 巨大SVで署名文字列が肥大化しないよう、配列の端だけを差分検出に使う。
+ */
+function getBoundedSequenceSignature(sequence: string): string {
+  const edgeLength = 8;
+  if (sequence.length <= edgeLength * 2) return sequence;
+
+  return `${sequence.length}:${sequence.slice(0, edgeLength)}:${sequence.slice(
+    -edgeLength
+  )}`;
+}
+
+/**
  * TogoVar IDがないバリアントからもレポートへ遷移できるよう、locusを代替識別子として返す。
  * TogoVar ID (tgvid) がある場合は既存の表示・遷移の互換性を優先する。
  */
@@ -58,8 +70,8 @@ export function getVariantResultSignature(result: VariantLocusFields): string {
   return [
     result.chromosome,
     result.position,
-    result.reference.length,
-    alternate.length,
+    getBoundedSequenceSignature(result.reference),
+    getBoundedSequenceSignature(alternate),
   ].join(':');
 }
 
@@ -115,8 +127,9 @@ export function exceedsReportLinkLength(result: VariantLocusFields): boolean {
 export function getVariantReportPathWithinLength(
   result: VariantLocusFields
 ): string | null {
-  if (result.id) return getVariantReportPath(result);
-  if (getRawVariantLocusLength(result) > REPORT_LINK_MAX_LENGTH) return null;
+  if (!result.id && getRawVariantLocusLength(result) > REPORT_LINK_MAX_LENGTH) {
+    return null;
+  }
 
   const reportPath = getVariantReportPath(result);
   return reportPath.length > REPORT_LINK_MAX_LENGTH ? null : reportPath;
