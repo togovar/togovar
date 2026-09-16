@@ -69,8 +69,8 @@ export function getVariantReportPath(result: VariantLocusFields): string {
 /**
  * search結果からReportリンクを出す上限（bp）。
  * locus形式のURLはREF/ALTの塩基配列をそのままパスへ埋め込むため、大きなSVでは
- * URL長が各種ミドルウェアの上限を超えてしまう。2026.1リリースではtgvidの有無を問わず、
- * この上限を超えるバリアントはsearch結果からReportへのリンク（アイコン）を出さない。
+ * URL長が各種ミドルウェアの上限を超えてしまう。tgvidがあるバリアントは短いURLで遷移できるため、
+ * この上限はtgvidがないlocus形式のReportリンクだけに適用する。
  */
 export const REPORT_LINK_MAX_LENGTH = 10000;
 
@@ -83,7 +83,8 @@ function getVariantSequenceLength(result: VariantLocusFields): number {
   return Math.max(result.reference.length, getVariantAlternate(result).length);
 }
 
-/** REPORT_LINK_MAX_LENGTHを超えるバリアントかどうかを判定する。 */
+/** tgvidがないlocus URLだけを対象に、Reportリンクを出せる長さかどうかを判定する。 */
 export function exceedsReportLinkLength(result: VariantLocusFields): boolean {
+  if (result.id) return false;
   return getVariantSequenceLength(result) > REPORT_LINK_MAX_LENGTH;
 }

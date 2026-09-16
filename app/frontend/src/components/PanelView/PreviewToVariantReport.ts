@@ -1,6 +1,9 @@
 import PanelView from './PanelView';
 import { storeManager } from '../../store/StoreManager';
-import { getVariantReportPath } from '../../utils/variantPath';
+import {
+  exceedsReportLinkLength,
+  getVariantReportPath,
+} from '../../utils/variantPath';
 
 /**
  * 選択バリアントのバリアント詳細レポートページへのリンクを表示するパネル。
@@ -41,7 +44,7 @@ export default class PreviewToVariantReport extends PanelView {
     const record =
       selectedRow !== undefined ? storeManager.getSelectedRecord() : null;
 
-    if (record) {
+    if (record && !exceedsReportLinkLength(record)) {
       (this.elm as HTMLAnchorElement).href = getVariantReportPath(record);
       this.elm.classList.remove('-disable');
       return;

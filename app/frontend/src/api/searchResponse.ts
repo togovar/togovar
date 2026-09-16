@@ -3,7 +3,10 @@ import { API_URL } from '../global';
 import type { ScrollData, SearchResults, SearchStatistics } from '../types';
 import type { StoreState } from '../types/storeState';
 import { getNextSearchResultCount } from '../store/search/searchResultsState';
-import { getVariantReportPath } from '../utils/variantPath';
+import {
+  exceedsReportLinkLength,
+  getVariantReportPath,
+} from '../utils/variantPath';
 import {
   getCurrentSearchMode,
   getCurrentSearchOrigin,
@@ -218,6 +221,11 @@ function redirectToSingleVariantIfReady(): boolean {
   }
 
   if (getCurrentSearchOrigin() !== 'user') {
+    clearSingleVariantRedirectCandidates();
+    return false;
+  }
+
+  if (exceedsReportLinkLength(singleVariantRedirectData.row)) {
     clearSingleVariantRedirectCandidates();
     return false;
   }
