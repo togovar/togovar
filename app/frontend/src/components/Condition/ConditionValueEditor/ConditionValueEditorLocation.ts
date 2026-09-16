@@ -373,12 +373,15 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
   /**
    * カリオタイプデータから現在の染色体の最大座標を取得する。
    * 入力値の上限チェックに使うため、取得できない場合は null を返して制約なしとする。
+   * カリオタイプデータはミトコンドリアを"MT"キーでのみ持つため、
+   * GRCh37限定の選択肢"M"はここで"MT"へ読み替える。
    */
   private _getChromosomeMaxPosition(): number | null {
     if (!this._karyotypeData?.reference) return null;
 
     const chromosome = this._chromosomeSelect.value;
-    const chromosomeInfo = this._karyotypeData.chromosomes?.[chromosome];
+    const chromosomeKey = chromosome === 'M' ? 'MT' : chromosome;
+    const chromosomeInfo = this._karyotypeData.chromosomes?.[chromosomeKey];
 
     if (!chromosomeInfo?.region) return null;
 
