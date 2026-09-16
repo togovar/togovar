@@ -72,7 +72,11 @@ export function normalizeAdvancedSearchCondition(
   return normalizeQueryNode(query) as ConditionQuery;
 }
 
-/** queryノード1つを見て、論理グループなら子へ再帰し、location leafならchromosomeを書き換える。 */
+/**
+ * location leafはand/orで任意の深さにネストされうるため、トップレベルだけの正規化では
+ * OR/AND配下に埋もれたlocationを取り残してしまう。そのため論理グループなら子へ再帰し、
+ * location leafに到達した時点でchromosomeを書き換える。
+ */
 function normalizeQueryNode(node: unknown): unknown {
   if (!isPlainObject(node)) return node;
 
