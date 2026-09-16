@@ -10,12 +10,15 @@ import '../ConditionItemValueView';
 // Constants
 // ============================================================================
 
+// GRCh37はミトコンドリアがデータセットにより"M"("JGA-WES"/"JGA-SNP"/"MGeND"等)と
+// "MT"("ClinVar")に分かれて登録されているため、両方を選択肢として出す。
+// GRCh38は"M"のみのESインデックスへbuildLocationQuery側で変換するため"MT"のみで足りる。
 const CHROMOSOME_OPTIONS = [
   '',
   ...[...Array(22)].map((_, index) => String(index + 1)),
   'X',
   'Y',
-  'MT',
+  ...(TOGOVAR_FRONTEND_REFERENCE === 'GRCh37' ? ['M', 'MT'] : ['MT']),
 ];
 
 const INPUT_MODE = {
@@ -321,14 +324,22 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
     return { chromosome, start, end };
   }
 
-  /** パース結果を chromosome/start/end の各UIフィールドに適用する。 */
+  /**
+   * パース結果を chromosome/start/end の各UIフィールドに適用する。
+   * GRCh38はbuildLocationQuery側で"MT"を"M"へ変換して保存しているため、
+   * 復元時はここで"MT"へ戻してからプルダウンの選択肢と照合する。
+   */
   private _applyParsedLocation(parsed: {
     chromosome: string;
     start: string;
     end?: string;
   }): void {
-    if (CHROMOSOME_OPTIONS.includes(parsed.chromosome)) {
-      this._chromosomeSelect.value = parsed.chromosome;
+    const displayChromosome =
+      TOGOVAR_FRONTEND_REFERENCE === 'GRCh38' && parsed.chromosome === 'M'
+        ? 'MT'
+        : parsed.chromosome;
+    if (CHROMOSOME_OPTIONS.includes(displayChromosome)) {
+      this._chromosomeSelect.value = displayChromosome;
     }
 
     this._startPositionInput.value = parsed.start;
@@ -370,12 +381,15 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
   /**
    * カリオタイプデータから現在の染色体の最大座標を取得する。
    * 入力値の上限チェックに使うため、取得できない場合は null を返して制約なしとする。
+   * カリオタイプデータはミトコンドリアを"MT"キーでのみ持つため、
+   * GRCh37限定の選択肢"M"はここで"MT"へ読み替える。
    */
   private _getChromosomeMaxPosition(): number | null {
     if (!this._karyotypeData?.reference) return null;
 
     const chromosome = this._chromosomeSelect.value;
-    const chromosomeInfo = this._karyotypeData.chromosomes?.[chromosome];
+    const chromosomeKey = chromosome === 'M' ? 'MT' : chromosome;
+    const chromosomeInfo = this._karyotypeData.chromosomes?.[chromosomeKey];
 
     if (!chromosomeInfo?.region) return null;
 

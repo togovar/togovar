@@ -115,9 +115,11 @@ function buildSimpleSearchBaseUrl(
   masterConditions: MasterConditions[]
 ): string {
   const offsetStart = offset - (offset % SEARCH_RESULT_LIMIT);
-  const queryString = qs.stringify(
-    extractSearchCondition(simpleSearchConditions, masterConditions)
+  const condition = extractSearchCondition(
+    simpleSearchConditions,
+    masterConditions
   );
+  const queryString = qs.stringify(condition);
 
   return `${API_URL}/search?offset=${offsetStart}${
     queryString ? '&' + queryString : ''

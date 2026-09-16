@@ -1,6 +1,7 @@
 import { setSimpleSearchCondition } from '../../../store/search/searchManager';
+import { normalizeChromosomeTerm } from '../../../store/search/simpleSearchConditions';
 import { storeManager } from '../../../store/StoreManager';
-import { CHROMOSOME_PATTERN } from './SimpleSearchConstants';
+import { toDisplayChromosomeTerm } from './SimpleSearchConstants';
 import type {
   SimpleSearchHost,
   SuggestionItem,
@@ -19,18 +20,14 @@ export class SimpleSearchController {
 
   /**
    * 検索処理
-   * 染色体パターンの正規化も行う
+   * Store/APIへ渡す正規化はsetSimpleSearchCondition側で行うが、
+   * StoreManager.setDataは正規化後の値が変化前と一致する場合publishを省略するため、
+   * 表示側の更新をそれに委ねると入力欄がMT表記へ戻らないことがある。
+   * そのため表示用の値はここでhostへ直接反映し、Storeの通知有無に依存しないようにする。
    * @param term - 検索語
    */
   search(term: string): void {
-    if (CHROMOSOME_PATTERN.test(term)) {
-      term = term.replace(/Chr|ch|Cr|cs/i, '').toUpperCase();
-
-      if (term.includes('M:')) {
-        term = term.replace('M:', 'MT:');
-      }
-    }
-
+    this.host._term = toDisplayChromosomeTerm(normalizeChromosomeTerm(term));
     setSimpleSearchCondition('term', term);
   }
 

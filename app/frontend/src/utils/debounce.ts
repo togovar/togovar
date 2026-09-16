@@ -11,7 +11,11 @@ export function debounce<This, Args extends unknown[]>(
     }
 
     timeout = globalThis.setTimeout(() => {
-      void func.apply(this, args);
+      // funcの戻り値(Promiseの場合)を誰も購読していないと、rejectがunhandled
+      // rejectionとして扱われてしまう(例: 開発サーバーのエラーオーバーレイ)。
+      Promise.resolve(func.apply(this, args)).catch((error: unknown) => {
+        console.error(error);
+      });
     }, ms);
   };
 }

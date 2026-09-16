@@ -8,7 +8,11 @@ import { getSimpleSearchCondition } from '../../../store/search/searchManager';
 import { storeManager } from '../../../store/StoreManager';
 import { SimpleSearchController } from './SimpleSearchController';
 import { SimpleSearchEventHandlers } from './SimpleSearchEventHandlers';
-import { EXAMPLES, SEARCH_FIELD_CONFIG } from './SimpleSearchConstants';
+import {
+  EXAMPLES,
+  SEARCH_FIELD_CONFIG,
+  toDisplayChromosomeTerm,
+} from './SimpleSearchConstants';
 import type { SimpleSearchCurrentConditions } from '../../../types';
 import Styles from '../../../../stylesheets/web-components/simple-search-view.scss';
 
@@ -25,7 +29,7 @@ class SimpleSearchView extends LitElement {
   private _boundSimpleSearchConditionsHandler = (
     conditions: SimpleSearchCurrentConditions
   ): void => {
-    this._term = conditions.term || '';
+    this._term = toDisplayChromosomeTerm(conditions.term || '');
     if (!this._term) {
       this._value = '';
       this._hideSuggestions = true;
@@ -66,7 +70,9 @@ class SimpleSearchView extends LitElement {
   // State Properties
   // ============================================================================
   @state() _value: string = ''; // 選択されたサジェストの値
-  @state() _term: string = (getSimpleSearchCondition('term') as string) || ''; // 検索キーワード
+  @state() _term: string = toDisplayChromosomeTerm(
+    (getSimpleSearchCondition('term') as string) || ''
+  ); // 検索キーワード
   @state() _hideSuggestions: boolean = true; // サジェストを非表示にするかどうか
 
   // ============================================================================

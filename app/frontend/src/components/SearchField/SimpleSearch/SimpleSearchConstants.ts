@@ -136,5 +136,19 @@ export const SEARCH_FIELD_CONFIG: SearchFieldConfig = {
   },
 };
 
-/** 染色体パターンの正規表現 */
-export const CHROMOSOME_PATTERN: RegExp = /([1-9]|1[0-9]|2[0-2]|X|Y|M|MT):\d+/i;
+/**
+ * normalizeChromosomeTerm（store/search/simpleSearchConditions.ts）が書き込む"M:"表記を、
+ * 検索ボックス表示用に"MT:"へ戻す。
+ * Storeのtermは検索API・共有URLと表示(検索ボックス/カリオタイプ由来の検索)を兼ねているため、
+ * "M:"のまま表示すると、Location条件やAdvanced Search復元で徹底している
+ * 「表示は常にMT、Mへの変換はAPI/内部表現限定」という規則と食い違ってしまう。
+ * そのためStoreの値自体は変えず、SimpleSearchViewが画面へ反映する直前だけここで変換する。
+ * "M:"の後に数字が続く場合だけを対象にすることで、"M:ABC"のような
+ * 染色体位置ではないtermを入力中に書き換えてしまわないようにする。
+ */
+export function toDisplayChromosomeTerm(term: string): string {
+  if (TOGOVAR_FRONTEND_REFERENCE !== 'GRCh38') return term;
+  if (!/^M:\d/.test(term)) return term;
+
+  return term.replace(/^M:/, 'MT:');
+}
