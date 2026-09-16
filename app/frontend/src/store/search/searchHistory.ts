@@ -4,7 +4,7 @@ import type {
   SimpleSearchCurrentConditions,
 } from '../../types';
 import type { ConditionQuery } from '../../types/query';
-import { normalizeChromosomeTerm } from '../../components/SearchField/SimpleSearch/SimpleSearchConstants';
+import { normalizeChromosomeTerm } from './simpleSearchConditions';
 import {
   decodeConditionFromURLParamsWithStatus,
   normalizeAdvancedSearchCondition,

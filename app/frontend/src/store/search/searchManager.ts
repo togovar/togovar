@@ -5,7 +5,7 @@ import {
   type SearchOrigin,
 } from '../../api/searchExecutionState';
 import { storeManager } from '../StoreManager';
-import { normalizeChromosomeTerm } from '../../components/SearchField/SimpleSearch/SimpleSearchConstants';
+import { normalizeChromosomeTerm } from './simpleSearchConditions';
 import type {
   MasterConditions,
   MasterConditionId,

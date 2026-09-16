@@ -137,48 +137,18 @@ export const SEARCH_FIELD_CONFIG: SearchFieldConfig = {
 };
 
 /**
- * 染色体パターンの正規表現。
- * 先頭アンカーなしだと"foo1:123"のような無関係な検索語の一部にもマッチしてしまうため、
- * 先頭（"chr"等の接頭辞は許容）だけを対象にする。
- */
-export const CHROMOSOME_PATTERN: RegExp =
-  /^(?:Chr|ch|Cr|cs)?([1-9]|1[0-9]|2[0-2]|X|Y|M|MT):\d+/i;
-
-/**
- * 染色体名の表記をリファレンスゲノムのESインデックスに合わせて正規化する。
- * GRCh38は染色体名が"M"のみのためMTをMへ寄せる。
- * GRCh37はデータセットによって"M"("JGA-WES"/"JGA-SNP"/"MGeND"等)と
- * "MT"("ClinVar")に分かれて登録されているため、どちらか一方へ寄せてしまうと
- * 常に片方のデータセットへ到達できなくなる。そのためGRCh37では変換せず、
- * ユーザーが入力した表記のままAPIへ渡す。
- * 呼び出し口はsetSimpleSearchCondition（searchManager.ts）と
- * buildSimpleConditionsFromURL（searchHistory.ts）の2箇所で、
- * 検索ボックス入力・URL直読み込み・popstate復元のいずれもこのどちらかを
- * 経由してStoreへ書き込まれるため、両方を通すことで正規化を保証する。
- * termを書き込む経路を新設する場合はここも通すこと。
- */
-export function normalizeChromosomeTerm(term: string): string {
-  if (!CHROMOSOME_PATTERN.test(term)) return term;
-
-  const normalized = term.replace(/^(?:Chr|ch|Cr|cs)/i, '').toUpperCase();
-
-  if (TOGOVAR_FRONTEND_REFERENCE === 'GRCh38') {
-    return normalized.replace(/^MT:/, 'M:');
-  }
-
-  return normalized;
-}
-
-/**
- * normalizeChromosomeTermでStoreへ書き込んだ"M:"表記を、検索ボックス表示用に"MT:"へ戻す。
+ * normalizeChromosomeTerm（store/search/simpleSearchConditions.ts）が書き込む"M:"表記を、
+ * 検索ボックス表示用に"MT:"へ戻す。
  * Storeのtermは検索API・共有URLと表示(検索ボックス/カリオタイプ由来の検索)を兼ねているため、
  * "M:"のまま表示すると、Location条件やAdvanced Search復元で徹底している
  * 「表示は常にMT、Mへの変換はAPI/内部表現限定」という規則と食い違ってしまう。
  * そのためStoreの値自体は変えず、SimpleSearchViewが画面へ反映する直前だけここで変換する。
+ * "M:"の後に数字が続く場合だけを対象にすることで、"M:ABC"のような
+ * 染色体位置ではないtermを入力中に書き換えてしまわないようにする。
  */
 export function toDisplayChromosomeTerm(term: string): string {
   if (TOGOVAR_FRONTEND_REFERENCE !== 'GRCh38') return term;
-  if (!/^M:/.test(term)) return term;
+  if (!/^M:\d/.test(term)) return term;
 
   return term.replace(/^M:/, 'MT:');
 }
