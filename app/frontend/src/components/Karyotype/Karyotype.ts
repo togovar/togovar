@@ -162,7 +162,9 @@ const DEFAULT: KaryotypeState = {
 
 // region 文字列 "chr:start-end" または "chr:pos" にマッチする正規表現
 // GRCh38はnormalizeChromosomeTerm側で"MT"を"M"へ寄せて保存するため、"M"単体も許容する。
-const REGEXP = /([1-9]|1\d|2[0-2]|X|Y|M|MT):(\d+)-?(\d+)?/;
+// 先頭アンカーなしだと"FOOM:123"のような無関係な検索語の一部にもマッチしてしまうため、
+// 先頭（"chr"等の接頭辞は許容）だけを対象にする。normalizeChromosomeTermのCHROMOSOME_PATTERNと同じ規則。
+const REGEXP = /^(?:Chr|ch|Cr|cs)?([1-9]|1\d|2[0-2]|X|Y|M|MT):(\d+)-?(\d+)?/i;
 
 // localStorage に null が格納されている場合 JSON.parse('null') → null と同じ挙動にする
 let karyotype = JSON.parse(
@@ -345,7 +347,7 @@ export default class Karyotype {
       return;
     }
 
-    const chr = result[1];
+    const chr = result[1].toUpperCase();
     const start = Number(result[2]);
     const end = result[3] ? Number(result[3]) : undefined;
 
