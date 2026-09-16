@@ -324,14 +324,22 @@ export class ConditionValueEditorLocation extends ConditionValueEditor {
     return { chromosome, start, end };
   }
 
-  /** パース結果を chromosome/start/end の各UIフィールドに適用する。 */
+  /**
+   * パース結果を chromosome/start/end の各UIフィールドに適用する。
+   * GRCh38はbuildLocationQuery側で"MT"を"M"へ変換して保存しているため、
+   * 復元時はここで"MT"へ戻してからプルダウンの選択肢と照合する。
+   */
   private _applyParsedLocation(parsed: {
     chromosome: string;
     start: string;
     end?: string;
   }): void {
-    if (CHROMOSOME_OPTIONS.includes(parsed.chromosome)) {
-      this._chromosomeSelect.value = parsed.chromosome;
+    const displayChromosome =
+      TOGOVAR_FRONTEND_REFERENCE === 'GRCh38' && parsed.chromosome === 'M'
+        ? 'MT'
+        : parsed.chromosome;
+    if (CHROMOSOME_OPTIONS.includes(displayChromosome)) {
+      this._chromosomeSelect.value = displayChromosome;
     }
 
     this._startPositionInput.value = parsed.start;
