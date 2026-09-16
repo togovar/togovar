@@ -16,6 +16,34 @@ function getVariantAlternate(result: VariantLocusFields): string {
 }
 
 /**
+ * 文字単位の事前判定で巨大SVのURL生成コストを避けるため、locus構成要素の素の長さを合算する。
+ */
+function getRawVariantLocusLength(result: VariantLocusFields): number {
+  return (
+    String(result.chromosome).length +
+    String(result.position).length +
+    result.reference.length +
+    getVariantAlternate(result).length
+  );
+}
+
+/**
+ * 巨大SVで署名文字列が肥大化しないよう、配列全体を固定長のハッシュへ畳み込む。
+ */
+function getSequenceDigestSignature(sequence: string): string {
+  let hash = 0xcbf29ce484222325n;
+  const prime = 0x100000001b3n;
+  const mask = 0xffffffffffffffffn;
+
+  for (let i = 0; i < sequence.length; i += 1) {
+    hash ^= BigInt(sequence.charCodeAt(i));
+    hash = (hash * prime) & mask;
+  }
+
+  return `${sequence.length}:${hash.toString(16).padStart(16, '0')}`;
+}
+
+/**
  * TogoVar IDがないバリアントからもレポートへ遷移できるよう、locusを代替識別子として返す。
  * TogoVar ID (tgvid) がある場合は既存の表示・遷移の互換性を優先する。
  */
@@ -33,6 +61,22 @@ export function getVariantIdentifier(result: VariantLocusFields): {
     value: `${result.chromosome}-${result.position}-${result.reference}-${alternate}`,
     isTogovarId: false,
   };
+}
+
+/**
+ * 巨大SVでも列幅自動調整の差分検出で長大なREF/ALT文字列を組み立てないよう、短い署名だけ返す。
+ */
+export function getVariantResultSignature(result: VariantLocusFields): string {
+  if (result.id) return result.id;
+
+  const alternate = getVariantAlternate(result);
+
+  return [
+    result.chromosome,
+    result.position,
+    getSequenceDigestSignature(result.reference),
+    getSequenceDigestSignature(alternate),
+  ].join(':');
 }
 
 /**
@@ -64,4 +108,33 @@ export function getVariantReportPath(result: VariantLocusFields): string {
   }
 
   return `/variant/${getVariantLocusPathSegment(result)}`;
+}
+
+/**
+ * search結果からReportリンクを出す上限（URL文字数）。
+ * locus形式のURLはREF/ALTの塩基配列をそのままパスへ埋め込むため、大きなSVでは
+ * URL長が各種ミドルウェアの上限を超えてしまう。tgvidがあるバリアントは短いURLで遷移できるため、
+ * この上限はtgvidがないlocus形式のReportリンクだけに適用する。
+ */
+export const REPORT_LINK_MAX_LENGTH = 10000;
+
+/**
+ * 実際に発行するURL長で判定し、REF+ALT合算やpercent-encoding分の超過も取りこぼさない。
+ */
+export function exceedsReportLinkLength(result: VariantLocusFields): boolean {
+  return getVariantReportPathWithinLength(result) === null;
+}
+
+/**
+ * 長さ判定後に同じURLを使えるよう、上限内のReport URLだけを返す。
+ */
+export function getVariantReportPathWithinLength(
+  result: VariantLocusFields
+): string | null {
+  if (!result.id && getRawVariantLocusLength(result) > REPORT_LINK_MAX_LENGTH) {
+    return null;
+  }
+
+  const reportPath = getVariantReportPath(result);
+  return reportPath.length > REPORT_LINK_MAX_LENGTH ? null : reportPath;
 }

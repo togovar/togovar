@@ -3,7 +3,7 @@ import { API_URL } from '../global';
 import type { ScrollData, SearchResults, SearchStatistics } from '../types';
 import type { StoreState } from '../types/storeState';
 import { getNextSearchResultCount } from '../store/search/searchResultsState';
-import { getVariantReportPath } from '../utils/variantPath';
+import { getVariantReportPathWithinLength } from '../utils/variantPath';
 import {
   getCurrentSearchMode,
   getCurrentSearchOrigin,
@@ -222,7 +222,15 @@ function redirectToSingleVariantIfReady(): boolean {
     return false;
   }
 
-  const variantPath = getVariantReportPath(singleVariantRedirectData.row);
+  const variantPath = getVariantReportPathWithinLength(
+    singleVariantRedirectData.row
+  );
+
+  if (!variantPath) {
+    clearSingleVariantRedirectCandidates();
+    return false;
+  }
+
   clearSingleVariantRedirectCandidates();
   if (typeof window === 'undefined') return false;
   window.location.assign(variantPath);
