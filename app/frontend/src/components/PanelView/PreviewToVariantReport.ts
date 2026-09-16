@@ -5,10 +5,14 @@ import {
   getVariantReportPath,
 } from '../../utils/variantPath';
 
+const DEFAULT_LINK_LABEL = 'Detailed variant report page';
+const LONG_LOCUS_DISABLED_LABEL =
+  'Detailed variant report page is unavailable because this locus URL is too long';
+
 /**
  * 選択バリアントのバリアント詳細レポートページへのリンクを表示するパネル。
  * パネル全体が <a> 要素のため、バリアント選択時は href をセットしてパネル全体をリンク化する。
- * 未選択時は href を除去して .-disable でグレーアウトする。
+ * 未選択時や長すぎるlocusでは href を除去して .-disable でグレーアウトする。
  */
 export default class PreviewToVariantReport extends PanelView {
   constructor(elm: Element) {
@@ -44,13 +48,29 @@ export default class PreviewToVariantReport extends PanelView {
     const record =
       selectedRow !== undefined ? storeManager.getSelectedRecord() : null;
 
-    if (record && !exceedsReportLinkLength(record)) {
-      (this.elm as HTMLAnchorElement).href = getVariantReportPath(record);
-      this.elm.classList.remove('-disable');
+    if (!record) {
+      this.disableLink(DEFAULT_LINK_LABEL);
       return;
     }
 
+    if (exceedsReportLinkLength(record)) {
+      this.disableLink(LONG_LOCUS_DISABLED_LABEL);
+      return;
+    }
+
+    (this.elm as HTMLAnchorElement).href = getVariantReportPath(record);
+    this.elm.setAttribute('aria-disabled', 'false');
+    this.elm.setAttribute('title', DEFAULT_LINK_LABEL);
+    this.elm.classList.remove('-disable');
+  }
+
+  /**
+   * 無効理由ごとに支援技術とツールチップへ同じ状態を渡すため、href除去処理を集約する。
+   */
+  private disableLink(label: string): void {
     this.elm.removeAttribute('href');
+    this.elm.setAttribute('aria-disabled', 'true');
+    this.elm.setAttribute('title', label);
     this.elm.classList.add('-disable');
   }
 }

@@ -16,6 +16,18 @@ function getVariantAlternate(result: VariantLocusFields): string {
 }
 
 /**
+ * 文字単位の事前判定で巨大SVのURL生成コストを避けるため、locus構成要素の素の長さを合算する。
+ */
+function getRawVariantLocusLength(result: VariantLocusFields): number {
+  return (
+    String(result.chromosome).length +
+    String(result.position).length +
+    result.reference.length +
+    getVariantAlternate(result).length
+  );
+}
+
+/**
  * TogoVar IDがないバリアントからもレポートへ遷移できるよう、locusを代替識別子として返す。
  * TogoVar ID (tgvid) がある場合は既存の表示・遷移の互換性を優先する。
  */
@@ -79,5 +91,6 @@ export const REPORT_LINK_MAX_LENGTH = 10000;
  */
 export function exceedsReportLinkLength(result: VariantLocusFields): boolean {
   if (result.id) return false;
+  if (getRawVariantLocusLength(result) > REPORT_LINK_MAX_LENGTH) return true;
   return getVariantReportPath(result).length > REPORT_LINK_MAX_LENGTH;
 }
