@@ -157,16 +157,15 @@ async function toRestoredItem(
 
 /**
  * API用のlocation queryを、Location editorが扱う "chr:start-end" 形式へ戻す。
- * GRCh38はbuildLocationQuery側で"MT"を"M"へ変換して保存しているため、
- * 表示用にはここで"MT"へ戻して、通常操作時のバッジ表示と一致させる。
+ * GRCh38はUIでも"M"表示に揃えるため、古い共有URLなどに残る"MT"だけ"M"へ寄せる。
  */
 function restoreLocationItem(location: QueryObject): RestoredItem | null {
   const chromosome = location.chromosome;
   if (typeof chromosome !== 'string') return null;
 
   const displayChromosome =
-    TOGOVAR_FRONTEND_REFERENCE === 'GRCh38' && chromosome === 'M'
-      ? 'MT'
+    TOGOVAR_FRONTEND_REFERENCE === 'GRCh38' && chromosome === 'MT'
+      ? 'M'
       : chromosome;
 
   const position = location.position;
