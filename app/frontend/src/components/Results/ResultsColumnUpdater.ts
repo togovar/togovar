@@ -14,9 +14,8 @@ import type {
 } from '../../types';
 import { REF_ALT_SHOW_LENGTH } from './ResultsColumnTemplates';
 import {
-  exceedsReportLinkLength,
   getVariantIdentifier,
-  getVariantReportPath,
+  getVariantReportPathWithinLength,
   type VariantLocusFields,
 } from '../../utils/variantPath';
 
@@ -132,13 +131,14 @@ export class ResultsColumnUpdater {
   ) {
     if (!cell) return;
 
-    if (exceedsReportLinkLength(result)) {
+    const url = getVariantReportPathWithinLength(result);
+
+    if (!url) {
       this.resetAnchor(cell);
       return;
     }
 
     const { value } = getVariantIdentifier(result);
-    const url = getVariantReportPath(result);
 
     const anchor = this.updateAnchor(
       cell,

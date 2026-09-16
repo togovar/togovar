@@ -90,7 +90,18 @@ export const REPORT_LINK_MAX_LENGTH = 10000;
  * 実際に発行するURL長で判定し、REF+ALT合算やpercent-encoding分の超過も取りこぼさない。
  */
 export function exceedsReportLinkLength(result: VariantLocusFields): boolean {
-  if (result.id) return false;
-  if (getRawVariantLocusLength(result) > REPORT_LINK_MAX_LENGTH) return true;
-  return getVariantReportPath(result).length > REPORT_LINK_MAX_LENGTH;
+  return getVariantReportPathWithinLength(result) === null;
+}
+
+/**
+ * 長さ判定後に同じURLを使えるよう、上限内のReport URLだけを返す。
+ */
+export function getVariantReportPathWithinLength(
+  result: VariantLocusFields
+): string | null {
+  if (result.id) return getVariantReportPath(result);
+  if (getRawVariantLocusLength(result) > REPORT_LINK_MAX_LENGTH) return null;
+
+  const reportPath = getVariantReportPath(result);
+  return reportPath.length > REPORT_LINK_MAX_LENGTH ? null : reportPath;
 }

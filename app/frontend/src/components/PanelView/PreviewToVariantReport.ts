@@ -1,9 +1,6 @@
 import PanelView from './PanelView';
 import { storeManager } from '../../store/StoreManager';
-import {
-  exceedsReportLinkLength,
-  getVariantReportPath,
-} from '../../utils/variantPath';
+import { getVariantReportPathWithinLength } from '../../utils/variantPath';
 
 const DEFAULT_LINK_LABEL = 'Detailed variant report page';
 const LONG_LOCUS_DISABLED_LABEL =
@@ -53,12 +50,14 @@ export default class PreviewToVariantReport extends PanelView {
       return;
     }
 
-    if (exceedsReportLinkLength(record)) {
+    const reportPath = getVariantReportPathWithinLength(record);
+
+    if (!reportPath) {
       this.disableLink(LONG_LOCUS_DISABLED_LABEL);
       return;
     }
 
-    (this.elm as HTMLAnchorElement).href = getVariantReportPath(record);
+    (this.elm as HTMLAnchorElement).href = reportPath;
     this.elm.setAttribute('aria-disabled', 'false');
     this.elm.setAttribute('title', DEFAULT_LINK_LABEL);
     this.elm.classList.remove('-disable');
