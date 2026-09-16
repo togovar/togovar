@@ -163,3 +163,17 @@ export function normalizeChromosomeTerm(term: string): string {
 
   return normalized;
 }
+
+/**
+ * normalizeChromosomeTermでStoreへ書き込んだ"M:"表記を、検索ボックス表示用に"MT:"へ戻す。
+ * Storeのtermは検索API・共有URLと表示(検索ボックス/カリオタイプ由来の検索)を兼ねているため、
+ * "M:"のまま表示すると、Location条件やAdvanced Search復元で徹底している
+ * 「表示は常にMT、Mへの変換はAPI/内部表現限定」という規則と食い違ってしまう。
+ * そのためStoreの値自体は変えず、SimpleSearchViewが画面へ反映する直前だけここで変換する。
+ */
+export function toDisplayChromosomeTerm(term: string): string {
+  if (TOGOVAR_FRONTEND_REFERENCE !== 'GRCh38') return term;
+  if (!/^M:/.test(term)) return term;
+
+  return term.replace(/^M:/, 'MT:');
+}
