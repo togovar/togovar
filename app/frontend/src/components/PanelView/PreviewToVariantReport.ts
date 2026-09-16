@@ -60,6 +60,7 @@ export default class PreviewToVariantReport extends PanelView {
     (this.elm as HTMLAnchorElement).href = reportPath;
     this.elm.setAttribute('aria-disabled', 'false');
     this.elm.setAttribute('title', DEFAULT_LINK_LABEL);
+    this.elm.setAttribute('aria-label', DEFAULT_LINK_LABEL);
     this.elm.classList.remove('-disable');
   }
 
@@ -70,6 +71,7 @@ export default class PreviewToVariantReport extends PanelView {
     this.elm.removeAttribute('href');
     this.elm.setAttribute('aria-disabled', 'true');
     this.elm.setAttribute('title', label);
+    this.elm.setAttribute('aria-label', label);
     this.elm.classList.add('-disable');
   }
 }

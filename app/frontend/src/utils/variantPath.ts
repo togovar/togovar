@@ -28,15 +28,19 @@ function getRawVariantLocusLength(result: VariantLocusFields): number {
 }
 
 /**
- * 巨大SVで署名文字列が肥大化しないよう、配列の端だけを差分検出に使う。
+ * 巨大SVで署名文字列が肥大化しないよう、配列全体を固定長のハッシュへ畳み込む。
  */
-function getBoundedSequenceSignature(sequence: string): string {
-  const edgeLength = 8;
-  if (sequence.length <= edgeLength * 2) return sequence;
+function getSequenceDigestSignature(sequence: string): string {
+  let hash = 0xcbf29ce484222325n;
+  const prime = 0x100000001b3n;
+  const mask = 0xffffffffffffffffn;
 
-  return `${sequence.length}:${sequence.slice(0, edgeLength)}:${sequence.slice(
-    -edgeLength
-  )}`;
+  for (let i = 0; i < sequence.length; i += 1) {
+    hash ^= BigInt(sequence.charCodeAt(i));
+    hash = (hash * prime) & mask;
+  }
+
+  return `${sequence.length}:${hash.toString(16).padStart(16, '0')}`;
 }
 
 /**
@@ -70,8 +74,8 @@ export function getVariantResultSignature(result: VariantLocusFields): string {
   return [
     result.chromosome,
     result.position,
-    getBoundedSequenceSignature(result.reference),
-    getBoundedSequenceSignature(alternate),
+    getSequenceDigestSignature(result.reference),
+    getSequenceDigestSignature(alternate),
   ].join(':');
 }
 
