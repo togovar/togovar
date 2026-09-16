@@ -161,7 +161,8 @@ const DEFAULT: KaryotypeState = {
 };
 
 // region 文字列 "chr:start-end" または "chr:pos" にマッチする正規表現
-const REGEXP = /([1-9]|1\d|2[0-2]|X|Y|MT):(\d+)-?(\d+)?/;
+// GRCh38はnormalizeChromosomeTerm側で"MT"を"M"へ寄せて保存するため、"M"単体も許容する。
+const REGEXP = /([1-9]|1\d|2[0-2]|X|Y|M|MT):(\d+)-?(\d+)?/;
 
 // localStorage に null が格納されている場合 JSON.parse('null') → null と同じ挙動にする
 let karyotype = JSON.parse(
@@ -384,6 +385,8 @@ export default class Karyotype {
   /**
    * 収集した location 一覧を染色体番号ごとに Map で集約し、各 ChromosomeView に渡す。
    * 単一座標は [pos, pos] に正規化して PositionRange 型に統一する。
+   * ChromosomeViewはミトコンドリアを"MT"キーでのみ持つため、
+   * GRCh38のLocation条件やGRCh37の"M"選択肢に由来する"M"はここで"MT"へ読み替える。
    */
   private _updateLocations(locations: LocationEntry[]): void {
     this.elm.dataset.isSelectingChromosome = String(locations.length > 0);
@@ -391,13 +394,15 @@ export default class Karyotype {
 
     const byChromosome = new Map<string, [number, number][]>();
     for (const location of locations) {
+      const chromosome =
+        location.chromosome === 'M' ? 'MT' : location.chromosome;
       const range: [number, number] =
         typeof location.position === 'number'
           ? [location.position, location.position]
           : [location.position.gte, location.position.lte];
-      const existing = byChromosome.get(location.chromosome) ?? [];
+      const existing = byChromosome.get(chromosome) ?? [];
       existing.push(range);
-      byChromosome.set(location.chromosome, existing);
+      byChromosome.set(chromosome, existing);
     }
 
     this.chromosomeViews.forEach((view) => {
