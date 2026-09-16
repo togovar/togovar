@@ -6,7 +6,7 @@ import {
   usesInitialColumnWidth,
 } from '../../columns';
 import {
-  getVariantIdentifier,
+  getVariantResultSignature,
   type VariantLocusFields,
 } from '../../utils/variantPath';
 
@@ -146,11 +146,11 @@ export class ResultsColumnAutoSizer {
     }
 
     const firstResult = results[0] as VariantLocusFields | null | undefined;
-    const firstResultIdentifier = firstResult
-      ? getVariantIdentifier(firstResult).value
+    const firstResultSignature = firstResult
+      ? getVariantResultSignature(firstResult)
       : '';
 
-    return `${numberOfRecords}:${firstResultIdentifier}`;
+    return `${numberOfRecords}:${firstResultSignature}`;
   }
 
   /**

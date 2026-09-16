@@ -48,6 +48,22 @@ export function getVariantIdentifier(result: VariantLocusFields): {
 }
 
 /**
+ * 巨大SVでも列幅自動調整の差分検出で長大なREF/ALT文字列を組み立てないよう、短い署名だけ返す。
+ */
+export function getVariantResultSignature(result: VariantLocusFields): string {
+  if (result.id) return result.id;
+
+  const alternate = getVariantAlternate(result);
+
+  return [
+    result.chromosome,
+    result.position,
+    result.reference.length,
+    alternate.length,
+  ].join(':');
+}
+
+/**
  * ハイフン区切りのlocus URLを安全に復元できるよう、区切り文字に使うハイフンも明示的にエンコードする。
  */
 function encodeVariantPathComponent(value: string | number): string {
