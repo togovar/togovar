@@ -303,10 +303,7 @@ class StanzaManager {
       return;
     }
 
-    this._loadStanzaScript(
-      scriptUrl || `${STANZA_PATH}/${id}.js`,
-      targetSelector
-    );
+    this._loadStanzaScript(scriptUrl || `${STANZA_PATH}/${id}.js`);
     this._createAndInsertStanzaElement(
       id,
       targetSelector,
@@ -342,25 +339,20 @@ class StanzaManager {
    * レポートごとに必要なStanzaだけを読み込めるよう、script要素を動的に追加する。
    *
    * @param scriptSourceUrl StanzaのJavaScriptファイルURL
-   * @param targetSelector 読み込み失敗時に非表示にするStanza挿入先
    */
-  private static _loadStanzaScript(
-    scriptSourceUrl: string,
-    targetSelector: string
-  ): void {
+  private static _loadStanzaScript(scriptSourceUrl: string): void {
     const scriptElement = document.createElement('script');
     scriptElement.type = 'module';
     scriptElement.src = scriptSourceUrl;
     scriptElement.async = true;
     scriptElement.addEventListener('error', () => {
       console.error(`Failed to load stanza script: ${scriptSourceUrl}`);
-      this.hideStanzaSection(targetSelector);
     });
     document.head.appendChild(scriptElement);
   }
 
   /**
-   * 読み込めないStanzaや現在のID形式に非対応のStanzaは、空の枠を残さずsectionごと非表示にする。
+   * 現在の参照ゲノムに非対応のStanzaは、空の枠を残さずsectionごと非表示にする。
    */
   static hideStanzaSection(targetSelector: string): void {
     const targetElement = document.querySelector(targetSelector);
