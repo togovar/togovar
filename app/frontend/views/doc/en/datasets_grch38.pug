@@ -106,6 +106,32 @@ article.common-document
         tbody
           tr
             td
+              a(href="/doc/datasets/bbj1k") BBJ1K
+            td._align-left WGS
+            td._align-center
+            td._align-left Japanese
+            td._align-center
+            td._align-center ✔
+            td._align-right 1,026
+            td._align-right 44,694,482
+            td BioBank Japan
+            td
+              a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000758') JGAD000758
+          tr
+            td
+              a(href="/doc/datasets/bbj2k") BBJ2K
+            td._align-left WGS
+            td._align-center
+            td._align-left Japanese
+            td._align-center
+            td._align-center ✔
+            td._align-right 1,964
+            td._align-right 55,344,184
+            td BioBank Japan
+            td
+              a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000868') JGAD000868
+          tr
+            td
               a.hyper-text.-external(target='_blank', href='https://gnomad.broadinstitute.org/downloads#v4')
                 | Genome Aggregation Database (gnomAD) exomes
             td._align-left WES
@@ -134,7 +160,21 @@ article.common-document
             td v4.1
           tr
             td
-              a(href="/doc/datasets/ncbn") NCBN
+              a.hyper-text.-external(target='_blank', href='https://jogo.csml.org/')
+                | Joint Open Genome and Omics Platform (JoGo)
+            td._align-left long-read WGS
+            td._align-center
+            td._align-left Mixed
+            td._align-center ✔
+            td._align-center
+            td._align-right 258
+            td._align-right 16,187,634
+            td JoGo project
+            td JoGo 1.0
+          tr
+            td
+              a(href="/doc/datasets/ncbn")
+                | NCBN
             td._align-left WGS
             td._align-center
             td Mixed
@@ -144,32 +184,6 @@ article.common-document
             td._align-right 215,729,032
             td National Center Biobank Network (NCBN)
             td 2024/6/28
-          tr
-            td
-              a(href="/doc/datasets/bbj1k") BBJ1K
-            td._align-left WGS
-            td._align-center
-            td._align-left Japanese
-            td._align-center
-            td._align-center ✔
-            td._align-right 1,026
-            td._align-right 44,694,482
-            td BioBank Japan
-            td
-              a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000758') JGAD000758
-          tr
-            td
-              a(href="/doc/datasets/bbj2k") BBJ2K
-            td._align-left WGS
-            td._align-center
-            td._align-left Japanese
-            td._align-center
-            td._align-center ✔
-            td._align-right 1,964
-            td._align-right 55,344,184
-            td BioBank Japan
-            td
-              a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/en/dataset/JGAD000868') JGAD000868
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-61kjpn-20250616-af_snvindelall')
@@ -185,7 +199,8 @@ article.common-document
             td v20250616
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-jsv1-20211208-af') ToMMo JSV1
+              a.hyper-text.-external(target='_blank', href='https://jmorp.megabank.tohoku.ac.jp/downloads/tommo-jsv1-20211208-af')
+                | ToMMo JSV1
             td._align-left long-read WGS
             td._align-center
             td._align-left Japanese
@@ -195,18 +210,6 @@ article.common-document
             td._align-right 72,342
             td Tohoku Medical Megabank Organization
             td v20211208
-          tr
-            td
-              a.hyper-text.-external(target='_blank', href='https://jogo.csml.org/') JoGo
-            td._align-left long-read WGS
-            td._align-center
-            td._align-left Mixed
-            td._align-center ✔
-            td._align-center
-            td._align-right 258
-            td._align-right 16,187,634
-            td JoGo project
-            td JoGo 1.0
       p.notice
         | Notes:
         br
@@ -216,8 +219,8 @@ article.common-document
         br
         | • ToMMo JSV1 and JoGo include structural variants of 51 bp or longer.
     section.section
-      h3#non-variant-frequency-datasets.sectiontitle
-        | Non-variant frequency datasets
+      h3#other-annotation-and-reference-datasets.sectiontitle
+        | Other annotation and reference datasets
       table.table
         thead
           tr
@@ -235,9 +238,16 @@ article.common-document
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.dbcls.jp/colil') Colil
-            td Obtained by API
+            td Retrieved via API
             td Information on citation relationships in life sciences literature
             td DBCLS
+          tr
+            td
+              a(href="https://glycosmos.org/" target="_blank" rel="noopener noreferrer")
+                | GlyCosmos portal
+            td Retrieved via API
+            td Glycan-related information, including glycans, glycoproteins, and glycan-related genes
+            td GlyCosmos Portal
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh38.p13')
@@ -261,23 +271,39 @@ article.common-document
             td HGNC
           tr
             td
+              a(href="https://repository.jpostdb.org/" target="_blank" rel="noopener noreferrer")
+                | jPOST Repository
+            td Retrieved via API
+            td Raw and processed data from mass spectrometry-based proteomics
+            td jPOST Project
+          tr
+            td
               a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/research/litvar2/api')
                 | LitVar
-            td Obtained by API
+            td Retrieved via API
             td Information on papers in which the names of variants appear
             td NCBI
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/medgen') MedGen
+              a.hyper-text.-external(target='_blank', href='https://www.ncbi.nlm.nih.gov/medgen')
+                | MedGen
             td 2026/07/07
             td Information about conditions and phenotypes related to Medical Genetics
             td NCBI
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://mgend.jihs.go.jp/') MGeND
+              a.hyper-text.-external(target='_blank', href='https://mgend.jihs.go.jp/')
+                | MGeND
             td 2025/09/12
             td Clinical significance of variants collected from the Japanese population
             td JIHS
+          tr
+            td
+              a.hyper-text.-external(target='_blank', href='https://molossinus.brc.riken.jp/mogplus21/')
+                | MoG+
+            td v2.1
+            td Genomic variation among mouse strains
+            td RIKEN
           tr
             td
               a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pubmed/')
@@ -287,13 +313,15 @@ article.common-document
             td NCBI
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTator3/') PubTator3
+              a.hyper-text.-external(target='_blank', href='https://ftp.ncbi.nlm.nih.gov/pub/lu/PubTator3/')
+                | PubTator3
             td 2026/07/13
             td Information on papers in which the names of variants appear
             td NCBI
           tr
             td
-              a.hyper-text.-external(target='_blank', href='https://sscvdb.io/') SSCV DB
+              a.hyper-text.-external(target='_blank', href='https://sscvdb.io/')
+                |SSCV DB
             td v1.1 (2026/06/17)
             td Predicted splicing types of splice-site creating variants (SSCVs) identified from publicly available transcriptome sequencing data
             td NCC
