@@ -55,7 +55,7 @@
 
 - **Bootstrap は使用していない。** CSS フレームワークとしての Bootstrap は一切依存していない。`h3` などのデフォルト margin は `foundation/_reset.scss` の `*:not(dialog) { margin: 0 }` でリセット済みのため、Bootstrap 打ち消しを理由にした `margin-bottom: 0` は不要。
 
-- Node.js は `22.x` 前提。`.nvmrc` と `package.json` の `engines.node` を確認する。
+- Node.js は `22.x`（22.15.0 以上）前提。`webpack-dev-server` v6 の要件。`.nvmrc` と `package.json` の `engines.node` を確認する。
 - `tsconfig.json` は `strict: true` かつ `allowJs: true`。既存JSとTSが共存しているため、周辺ファイルの粒度に合わせて変更する。
 - 型チェックは `npm run typecheck`（= `tsc --noEmit`）で確認する。
 

@@ -72,17 +72,18 @@ CSSクラスの命名は RSCSS を基本方針にしています。具体的な�
 
 ### 必要なもの
 
-- Node.js 22.x
+- Node.js 22.15.0 以上の 22.x
 - npm
 
-Node.js のバージョンは `.nvmrc` と `package.json` の `engines.node` で 22.x に固定しています。
-バージョン管理ツールを使っている場合は、プロジェクトルートで以下を実行してください。
+Node.js のバージョンは `.nvmrc` と `package.json` の `engines.node` で 22.x（22.15.0 以上）に固定しています。
+`webpack-dev-server` v6 が Node.js 22.15.0 以上を必要とするため、22.14 以前の 22.x では `npm run dev` が動きません。
+バージョン管理ツールを使っている場合は、プロジェクトルートで以下を実行してください（最新の 22.x がインストールされます）。
 
-| Tool | Command        | URL                           |
-| ---- | -------------- | ----------------------------- |
-| nvm  | `nvm use`      | https://github.com/nvm-sh/nvm |
-| fnm  | `fnm use`      | https://github.com/Schniz/fnm |
-| mise | `mise install` | https://github.com/jdx/mise   |
+| Tool | Command                     | URL                           |
+| ---- | --------------------------- | ----------------------------- |
+| nvm  | `nvm install`               | https://github.com/nvm-sh/nvm |
+| fnm  | `fnm install && fnm use`    | https://github.com/Schniz/fnm |
+| mise | `mise install`              | https://github.com/jdx/mise   |
 
 ### セットアップ
 
@@ -183,7 +184,7 @@ npm run typecheck
 
 - `npm run lint` は JavaScript/TypeScript と SCSS/CSS の lint をまとめて実行します。
 - `npm run typecheck` は TypeScript の型チェックのみを実行します（ビルドは行いません）。
-- 環境によって `node` / `npm` が PATH に無い場合があります。その場合は Node.js 22.x を有効化してください。
+- 環境によって `node` / `npm` が PATH に無い場合があります。その場合は Node.js 22.x（22.15.0 以上）を有効化してください。
 
 ### API 仕様との整合性チェック
 
