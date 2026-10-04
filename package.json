@@ -70,11 +70,11 @@
     "typescript-eslint": "^8.61.0",
     "webpack": "~5.105.0",
     "webpack-cli": "^5.0.0",
-    "webpack-dev-server": "^5.2.5",
+    "webpack-dev-server": "^6.0.0",
     "webpack-manifest-plugin": "^5.0.0",
     "webpack-merge": "^5.0.9"
   },
   "engines": {
-    "node": "22.x"
+    "node": "^22.15.0"
   }
 }
