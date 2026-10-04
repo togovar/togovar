@@ -23,13 +23,13 @@
     "@floating-ui/dom": "^1.7.6",
     "@fortawesome/fontawesome-free": "^7.2.0",
     "@lit-labs/task": "^2.0.0",
-    "axios": "^1.15.0",
+    "axios": "^1.18.1",
     "axios-cache-interceptor": "^1.11.1",
     "cross-env": "^7.0.2",
     "d3-hierarchy": "^3.1.2",
     "lit": "^2.8.0",
     "lodash": "^4.18.1",
-    "qs": "^6.14.2"
+    "qs": "^6.16.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
@@ -52,7 +52,7 @@
     "jiti": "^2.7.0",
     "lit-scss-loader": "^2.0.1",
     "mini-css-extract-plugin": "^2.6.0",
-    "postcss": "^8.4.31",
+    "postcss": "^8.5.23",
     "postcss-sass": "^0.5.0",
     "prettier": "^3.8.4",
     "pug": "^3.0.4",
