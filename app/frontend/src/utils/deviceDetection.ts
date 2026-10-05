@@ -1,87 +1,30 @@
-/**
- * Device detection utilities
- * Provides consistent device capability detection across the application
- */
+const MOUSE_INTERACTION_MEDIA_QUERY = '(hover: hover) and (pointer: fine)';
 
-/**
- * Detects if the device supports mouse interaction (hover and fine pointer)
- *
- * Uses CSS Media Queries to detect:
- * - hover capability (can hover over elements)
- * - fine pointer precision (mouse/trackpad vs finger touch)
- *
- * @returns true for desktop/laptop with mouse/trackpad, false for touch-only devices
- *
- * @example
- * ```typescript
- * if (supportsMouseInteraction()) {
- *   // Enable hover effects, precise drag operations
- * } else {
- *   // Enable touch-optimized UI
- * }
- * ```
- */
+/** ホバーと細かいポインター操作を前提にできるUIだけを有効化するため、CSS Media Queriesで判定する。 */
 export function supportsMouseInteraction(): boolean {
-  return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  return window.matchMedia(MOUSE_INTERACTION_MEDIA_QUERY).matches;
 }
 
-/**
- * Detects if the device should use touch-optimized UI
- *
- * This is the inverse of supportsMouseInteraction() - devices that lack
- * hover capability or fine pointer precision should use touch-optimized interfaces.
- *
- * @returns true for touch devices (tablets, smartphones), false for mouse/trackpad devices
- *
- * @example
- * ```typescript
- * if (isTouchDevice()) {
- *   // Use larger touch targets, disable hover states
- * } else {
- *   // Use precise mouse interactions
- * }
- * ```
- */
+/** タッチ向けUIへ切り替える判断を、マウス操作に適した環境かどうかの反転として統一する。 */
 export function isTouchDevice(): boolean {
   return !supportsMouseInteraction();
 }
 
-/**
- * Detects if touch events are supported by the browser/device
- *
- * This checks for the presence of touch APIs, but doesn't indicate
- * whether touch is the primary input method. Use isTouchDevice() for UI decisions.
- *
- * @returns true if touch events are available
- */
+/** 主入力方式ではなくタッチイベントAPIの有無だけを知りたい箇所向けに、低レベルな判定を分けている。 */
 export function hasTouchSupport(): boolean {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }
 
-/**
- * Device capability detection result
- */
 export interface DeviceCapabilities {
-  /** Whether the device supports mouse interaction (hover + fine pointer) */
+  /** ホバーと細かいポインター操作を前提にできるかどうか。 */
   supportsMouseInteraction: boolean;
-  /** Whether the device should use touch-optimized UI */
+  /** タッチ向けUIへ切り替えるべきかどうか。 */
   isTouchDevice: boolean;
-  /** Whether touch events are supported */
+  /** タッチイベントAPIを利用できるかどうか。 */
   hasTouchSupport: boolean;
 }
 
-/**
- * Gets comprehensive device capability information
- *
- * @returns Object containing all device capability flags
- *
- * @example
- * ```typescript
- * const capabilities = getDeviceCapabilities();
- * console.log(capabilities);
- * // { supportsMouseInteraction: false, isTouchDevice: true, hasTouchSupport: true }
- * ```
- */
+/** 同じタイミングで複数のデバイス能力を参照する箇所が、判定関数を個別に呼ばずに済むよう集約する。 */
 export function getDeviceCapabilities(): DeviceCapabilities {
   return {
     supportsMouseInteraction: supportsMouseInteraction(),

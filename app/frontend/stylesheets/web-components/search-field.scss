@@ -1,0 +1,54 @@
+$SIZE: 30px;
+
+
+.fieldcontainer {
+  box-sizing: border-box;
+  > .field {
+    position: relative;
+    height: $SIZE;
+    margin-bottom: 4px;
+
+    > .input-form {
+      > .searchfield[type='text'] {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0 12px;
+        font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
+        font-size: 12px;
+        line-height: $SIZE;
+        vertical-align: center;
+        outline: none;
+        border: solid 1px var(--color-key-dark2);
+        border-radius: $SIZE * 0.5;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
+        opacity: 0.9;
+        &:focus {
+          opacity: 1;
+        }
+      }
+
+      > .delete {
+        position: absolute;
+        top: 6px;
+        right: 23px;
+        color: var(--color-gray);
+        cursor: pointer;
+        background-color: transparent;
+        border: none;
+
+        &::after {
+          position: absolute;
+          top: 2px;
+          font-family: 'Font Awesome 7 Free', sans-serif;
+          font-size: 1rem;
+          font-weight: 900;
+          content: var(--icon-xmark);
+        }
+      }
+
+      .searchfield:not(:valid) ~ .delete {
+        display: none;
+      }
+    }
+  }
+}

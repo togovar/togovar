@@ -1,6 +1,7 @@
 {
   "variant": {
     "id": "tgv_id",
+    "fallback_id": "variant",
     "base_options": {
       "sparqlist": "$TOGOVAR_STANZA_SPARQLIST"
     },
@@ -10,6 +11,7 @@
         "targetSelector": "#variant-header",
         "references": ["GRCh37", "GRCh38"],
         "options": {
+          "data-url": "${TOGOVAR_FRONTEND_API_URL}/api/search/variant",
           "togostanza-menu-placement": "none"
         }
       },
@@ -17,6 +19,15 @@
         "id": "variant-summary",
         "targetSelector": "#variant-summary",
         "references": ["GRCh37", "GRCh38"]
+      },
+      {
+        "id": "variant-links",
+        "targetSelector": "#variant-links",
+        "references": ["GRCh37", "GRCh38"],
+        "options": {
+          "data-url": "${TOGOVAR_FRONTEND_API_URL}/api/search/variant",
+          "assembly": "$TOGOVAR_FRONTEND_REFERENCE"
+        }
       },
       {
         "id": "variant-other-overlapping-variants",
@@ -55,7 +66,7 @@
         "references": ["GRCh37", "GRCh38"],
         "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
         "options": {
-          "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_gwas?tgv_id=${tgv_id}",
+          "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_gwas?${variant_first_query}",
           "data-type": "json",
           "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
           "page-size_option": "5,10,20,50,100",
@@ -133,6 +144,42 @@
         }
       },
       {
+        "id": "pagination-table",
+        "targetSelector": "#variant-cross-species",
+        "references": ["GRCh37", "GRCh38"],
+        "scriptUrl": "https://togostanza.github.io/metastanza-devel/pagination-table.js",
+        "options": {
+          "data-url": "${TOGOVAR_STANZA_SPARQLIST}/api/variant_cross_species?${variant_first_query}",
+          "data-type": "json",
+          "togostanza-custom_css_url": "https://togostanza.github.io/togostanza-themes/contrib/togovar.css?20260109",
+          "page-size_option": "5,10,20,50,100",
+          "message-not_found": "No data",
+          "columns": [
+            {
+              "id": "species",
+              "label": "Species"
+            },
+            {
+              "id": "ref_genome",
+              "label": "RefGenome"
+            },
+            {
+              "id": "chr_pos_ref_alt",
+              "label": "Chr-pos-ref-alt"
+            },
+            {
+              "id": "source",
+              "label": "Source",
+              "link": "source_url"
+            },
+            {
+              "id": "remark",
+              "label": "Remark"
+            }
+          ]
+        }
+      },
+      {
         "id": "variant-genomic-context",
         "targetSelector": "#variant-genomic-context",
         "references": ["GRCh37", "GRCh38"],
@@ -150,12 +197,18 @@
       {
         "id": "variant-transcript",
         "targetSelector": "#variant-transcript",
-        "references": ["GRCh37", "GRCh38"]
+        "references": ["GRCh37", "GRCh38"],
+        "options": {
+          "assembly": "$TOGOVAR_FRONTEND_REFERENCE"
+        }
       },
       {
         "id": "variant-publication",
         "targetSelector": "#variant-publication",
-        "references": ["GRCh37", "GRCh38"]
+        "references": ["GRCh37", "GRCh38"],
+        "options": {
+          "data-url": "${TOGOVAR_FRONTEND_API_URL}/api/search/variant"
+        }
       }
     ]
   },
@@ -475,6 +528,11 @@
           "page-size": 100,
           "columns": [
             {
+              "id": "report",
+              "label": "Report",
+              "escape": false
+            },
+            {
               "id": "id",
               "label": "TogoVar ID",
               "escape": false
@@ -496,12 +554,7 @@
             },
             {
               "id": "type",
-              "label": "Type",
-              "escape": false
-            },
-            {
-              "id": "symbols",
-              "label": "Gene",
+              "label": "Variant type",
               "escape": false
             },
             {
@@ -515,6 +568,21 @@
               "escape": false
             },
             {
+              "id": "significance",
+              "label": "Clinical significance",
+              "escape": false
+            },
+            {
+              "id": "cadd_phred",
+              "label": "CADD (PHRED score)",
+              "escape": false
+            },
+            {
+              "id": "alphamissense",
+              "label": "AlphaMissense",
+              "escape": false
+            },
+            {
               "id": "sift",
               "label": "SIFT",
               "escape": false
@@ -525,8 +593,8 @@
               "escape": false
             },
             {
-              "id": "significance",
-              "label": "Clinical significance",
+              "id": "sscv_db",
+              "label": "Splice-site creation",
               "escape": false
             }
           ]

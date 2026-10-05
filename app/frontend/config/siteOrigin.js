@@ -21,8 +21,4 @@ function getSiteOrigin(env = process.env) {
   return getDefaultSiteOrigin(env.TOGOVAR_REFERENCE || DEFAULT_REFERENCE);
 }
 
-module.exports = {
-  DEFAULT_REFERENCE,
-  SITE_ORIGINS,
-  getSiteOrigin,
-};
+export { DEFAULT_REFERENCE, SITE_ORIGINS, getSiteOrigin };

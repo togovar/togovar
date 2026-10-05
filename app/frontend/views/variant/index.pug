@@ -3,14 +3,13 @@ extend ../layouts/application
 append variables
   - locals.currentPage = "variant";
   - locals.description = "TogoVar variant report pages provide allele frequencies, clinical significance, consequences, genes, transcripts, publications, and genomic context for human variants.";
-  - locals.canonicalUrl = "__TOGOVAR_CANONICAL_URL__";
 
 block head
   each css in htmlWebpackPlugin.files.css.filter(x => x.match(/^\/css\/main-/))
     link(href=css, rel="stylesheet")
   each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/report-/))
-    script(type="text/javascript", src=js, nonce="__CSP_NONCE__")
-  script(nonce="__CSP_NONCE__").
+    script(type="text/javascript", src=js)
+  script.
     window.addEventListener('DOMContentLoaded', () => {
       window.scrollTo(0, 0);
 
@@ -31,7 +30,7 @@ block content
   header#DetailHeader
     .title-wrapper
       p.pagetype Variant report
-      h2.title.report_id
+      h2.title.-report-id
 
     .title-wrapper
       #variant-header
@@ -39,6 +38,13 @@ block content
   main#ReportMain.LayoutReport
     section.stanza-view
       #variant-summary.stanza
+
+    section.stanza-view#links
+      .titlelink-wrapper
+        a.titlelink(href="#links")
+        h3.title
+          | Links
+      #variant-links.stanza
 
     section.stanza-view#other-overlapping-variants
       .titlelink-wrapper
@@ -81,6 +87,13 @@ block content
         h3.title
           | Genome-wide association study
       #variant-gwas.stanza
+
+    section.stanza-view#cross-species
+      .titlelink-wrapper
+        a.titlelink(href="#cross-species")
+        h3.title
+          | Cross species
+      #variant-cross-species.stanza
 
     section.stanza-view#genomic-context
       .titlelink-wrapper

@@ -1,10 +1,12 @@
 - const navLink = (page) => `/doc/${locals.language && locals.language !== "en" ? `${locals.language}/${page}` : page}`
+- const apiUrl = typeof TOGOVAR_FRONTEND_API_URL !== "undefined" ? TOGOVAR_FRONTEND_API_URL : null
+- const apiDocLink = apiUrl ? `${apiUrl.replace(/\/$/, "")}/api/index.html` : "/api/index.html"
 
 header#GlobalHeader
   .left
     h1.heading
       a.link(href="/")
-        img.logotype(src=require("../../images/logotype.svg").default width="101" height="31" alt="TOGO VAR")
+        img.logotype(src=require("../../images/logotype.svg") width="101" height="31" alt="TOGO VAR")
     span.summary A comprehensive Japanese genetic variation database
 
     nav.dropdown-view
@@ -16,11 +18,11 @@ header#GlobalHeader
               when 'GRCh37'
                 a.link.-active GRCh37
               when 'GRCh38'
-                a.link(href="http://grch37.togovar.org/") GRCh37
+                a.link(href="https://grch37.togovar.org/") GRCh37
           li.item
             case TOGOVAR_FRONTEND_REFERENCE
               when 'GRCh37'
-                a.link(href="http://grch38.togovar.org/") GRCh38
+                a.link(href="https://grch38.togovar.org/") GRCh38
               when 'GRCh38'
                 a.link.-active GRCh38
   .right
@@ -35,7 +37,7 @@ header#GlobalHeader
           li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^downloads/)})
             a.link(href=navLink("downloads")) Downloads
           li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^api/)})
-            a.link(href="/api" target="_blank") API
+            a.link(href=apiDocLink target="_blank" rel="noopener noreferrer") API
           li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^terms/)})
             a.link(href=navLink("terms")) Terms
           li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^contact/)})
@@ -50,30 +52,30 @@ header#GlobalHeader
         if locals.currentPage === "home"
           ul.menu
             li.menu-button.login 
-              a.link(href="/auth/login" aria-label="Login")
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else if locals.currentPage === "404"
           ul.menu
             li.menu-button.login
-              a.link(href="/auth/login" aria-label="Login")
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else if locals.currentPage === "variant"
           ul.menu
             li.menu-button.login 
-              a.link(href="/auth/login" aria-label="Login")
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else if locals.currentPage === "gene"
           ul.menu
             li.menu-button.login 
-              a.link(href="/auth/login" aria-label="Login")
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else if locals.currentPage === "disease"
           ul.menu
             li.menu-button.login 
-              a.link(href="/auth/login" aria-label="Login")
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
         else
           ul.menu
+            li.menu-button.login
+              a.link(href="/auth/login" data-login-href="/auth/login" aria-label="Login") Login
+
             li.menu-button.languageswitcher(class={"en": locals.language === "en" , "ja": locals.language === "ja"})
               a.language.en(href=`/doc/${locals.currentPage}`)
                 | en
               a.language.ja(href=`/doc/ja/${locals.currentPage}`)
                 | ja
-
-            li.menu-button.login 
-              a.link(href="/auth/login" aria-label="Login")

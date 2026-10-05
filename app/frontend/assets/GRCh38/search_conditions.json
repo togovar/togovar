@@ -40,7 +40,14 @@
       },
       {
         "id": "tommo",
-        "label": "ToMMo 54KJPN",
+        "label": "ToMMo 61KJPN",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
+        "id": "tommo_jsv1",
+        "label": "ToMMo JSV1",
         "type": "boolean",
         "default": "1",
         "has_freq": true
@@ -48,6 +55,27 @@
       {
         "id": "ncbn",
         "label": "NCBN",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
+        "id": "bbj1k",
+        "label": "BBJ1K",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
+        "id": "bbj2k",
+        "label": "BBJ2K",
+        "type": "boolean",
+        "default": "1",
+        "has_freq": true
+      },
+      {
+        "id": "jogo",
+        "label": "JoGo",
         "type": "boolean",
         "default": "1",
         "has_freq": true
@@ -151,7 +179,7 @@
       },
       {
         "id": "SO_1000002",
-        "label": "Substitution",
+        "label": "MNV",
         "type": "boolean",
         "default": "1"
       }
@@ -163,7 +191,7 @@
     "type": "array",
     "items": [
       {
-        "id": "NC",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
@@ -217,6 +245,24 @@
         "default": "1"
       },
       {
+        "id": "VH",
+        "label": "VUS-high",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "VM",
+        "label": "VUS-mid",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "VL",
+        "label": "VUS-low",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
         "id": "LB",
         "label": "Likely benign",
         "type": "boolean",
@@ -229,8 +275,8 @@
         "default": "1"
       },
       {
-        "id": "CI",
-        "label": "Conflicting interpretations of pathogenicity",
+        "id": "CC",
+        "label": "Conflicting classifications of pathogenicity",
         "type": "boolean",
         "default": "1"
       },
@@ -279,6 +325,12 @@
       {
         "id": "NP",
         "label": "Not provided",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "NC",
+        "label": "No classification",
         "type": "boolean",
         "default": "1"
       },
@@ -546,6 +598,41 @@
         "type": "boolean",
         "default": "1",
         "description": "A sequence variant where at least one base in the start codon is changed, but the start remains"
+      },
+      {
+        "id": "SO_0001787",
+        "label": "Splice donor 5th base variant",
+        "type": "boolean",
+        "default": "1",
+        "description": "A sequence variant that falls in the region between the 5th and 6th base of the 5' end of an intron"
+      },
+      {
+        "id": "SO_0002170",
+        "label": "Splice donor region variant",
+        "type": "boolean",
+        "default": "1",
+        "description": "A sequence variant that falls in the region between the 3rd and 6th base of the 5' end of an intron"
+      },
+      {
+        "id": "SO_0002169",
+        "label": "Splice polypyrimidine tract variant",
+        "type": "boolean",
+        "default": "1",
+        "description": "A sequence variant that falls in the polypyrimidine tract at the 3' end of an intron"
+      },
+      {
+        "id": "SO_0001968",
+        "label": "Coding transcript variant",
+        "type": "boolean",
+        "default": "1",
+        "description": "A transcript variant of a protein coding gene"
+      },
+      {
+        "id": "SO_0001060",
+        "label": "Sequence variant",
+        "type": "boolean",
+        "default": "1",
+        "description": "A sequence_variant is a non exact copy of a sequence_feature or genome exhibiting one or more sequence_alteration"
       }
     ]
   },
@@ -558,6 +645,7 @@
           {
             "label": "Coding variant",
             "items": [
+              "SO_0001968",
               "SO_0001580",
               "SO_0001907",
               "SO_0001906",
@@ -587,8 +675,15 @@
             ]
           },
           {
-            "label": "Splice variant",
-            "items": ["SO_0001574", "SO_0001575", "SO_0001630"]
+            "label": "Splicing variant(SO:0001568)",
+            "items": [
+              "SO_0001574",
+              "SO_0001575",
+              "SO_0001630",
+              "SO_0001787",
+              "SO_0002170",
+              "SO_0002169"
+            ]
           },
           "SO_0001893",
           "SO_0001889"
@@ -609,6 +704,38 @@
       {
         "label": "Intergenic variant",
         "items": ["SO_0001632", "SO_0001628", "SO_0001631"]
+      },
+      "SO_0001060"
+    ]
+  },
+  {
+    "id": "cadd_phred",
+    "label": "CADD (PHRED score)",
+    "type": "array",
+    "items": [
+      {
+        "id": "NA",
+        "label": "Unassigned",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "P20",
+        "label": "",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "P10",
+        "label": "",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "P0",
+        "label": "",
+        "type": "boolean",
+        "default": "1"
       }
     ]
   },
@@ -618,7 +745,7 @@
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
@@ -649,7 +776,7 @@
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
@@ -674,7 +801,7 @@
     "type": "array",
     "items": [
       {
-        "id": "N",
+        "id": "NA",
         "label": "Unassigned",
         "type": "boolean",
         "default": "1"
@@ -700,6 +827,43 @@
       {
         "id": "U",
         "label": "Unknown",
+        "type": "boolean",
+        "default": "1"
+      }
+    ]
+  },
+  {
+    "id": "sscv_db",
+    "label": "Splice-site creation",
+    "type": "array",
+    "items": [
+      {
+        "id": "NA",
+        "label": "Unassigned",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "PEL",
+        "label": "Partial exon loss",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "CEI",
+        "label": "Cryptic exon inclusion",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "EE",
+        "label": "Exon extension",
+        "type": "boolean",
+        "default": "1"
+      },
+      {
+        "id": "A",
+        "label": "Ambiguous",
         "type": "boolean",
         "default": "1"
       }

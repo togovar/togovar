@@ -14,15 +14,13 @@ article.common-document
         a.hyper-text.-external(href='https://biobankjp.org/') バイオバンク・ジャパン
         | と
         a.hyper-text.-external(href='https://www.ims.riken.jp/') 理化学研究所
-        | が実施した182,557人のSNPアレイによるジェノタイピングから得られた45疾患の男女別のアレル頻度およびgenotype countを2024年6月に追加しました。なお、Alternate allele数が5以下のバリアントは含まれていません。GRCh38のデータは
+        | が実施した182,557人のSNPアレイによるジェノタイピングから得られた45疾患の男女別のアレル頻度およびジェノタイプ数を2024年6月に追加しました。なお、Alternate allele数が5以下のバリアントは含まれていません。GRCh38のデータは
         a(target='_blank', href='https://github.com/informationsea/transanno') transanno
         | を用いてGRCh37のデータをリフトオーバーして作成しています。
       ul.unordered-list
         li バージョン/最終更新日：2024/6/28
         li サンプルサイズ：183,884
-        li 検出バリアント（代替アレル）数：1,966,919
-        li 除外後バリアント数：1,249,724
-        li GRCh37データをGRCh38にリフトオーバーした後のバリアント数：1,244,838
+        li TogoVarで検索可能な代替アレル数：1,249,671
 
     section.section
       h3.sectiontitle 利用条件
@@ -54,7 +52,7 @@ article.common-document
               a(target='_blank', href='https://humandbs.dbcls.jp/') NBDCヒトデータベース
               | /
               a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html') JGA
-              |  [Internet]. Kashiwa: Database Center for Life Science, Joint Support-Center for Data Science Research,
+              |  [Internet]. Kashiwa: Database Division for Life Science (DBCLS), BioData Science Initiative (BSI), National Institute of Genetics (NIG),
               |
               | Research Organization of Information and Systems; [2018] - . JGA-SNP dataset; [cited YYYY Mmm DD]. Available from:
               |
@@ -75,7 +73,7 @@ article.common-document
             th ヒトDB
             th 研究題目
             th 対象集団
-            th サンプル数
+            th サンプルサイズ
             th データ提供者
         tbody
           tr

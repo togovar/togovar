@@ -1,0 +1,30 @@
+:host ul[role='tablist'] {
+  display: flex;
+  gap: 0.1rem;
+  padding: 0;
+  padding-left: 10px;
+  margin: 0;
+  font-size: 12px;
+  font-weight: bold;
+  list-style: none;
+  background: var(--color-bg-tab);
+  li {
+    list-style: none;
+    a {
+      display: block;
+      padding: 3px 8px;
+      margin-top: 5px;
+      color: var(--color-black);
+      text-decoration: none;
+      outline: none;
+      border-radius: 7px 7px 0 0;
+      &[aria-selected='true'] {
+        background-color: #fff;
+      }
+    }
+  }
+}
+
+:host .tab-panel {
+  padding: 10px;
+}

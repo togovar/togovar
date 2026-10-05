@@ -1,0 +1,82 @@
+.page-index {
+  column-gap: 4em;
+  padding: 12px 18px;
+  margin: 0;
+  list-style: none;
+  background-color: color-mix(in srgb, var(--color-key) 10%, transparent);
+  border: solid 1px var(--color-key);
+  column-count: 2;
+
+  > .category {
+    break-inside: avoid;
+
+    + .category {
+      margin-top: 12px;
+    }
+
+    > .categorytitle {
+      padding: 4px 0;
+      margin-bottom: 0;
+      font-size: 16px;
+      line-height: 20px;
+    }
+
+    > .categorylist {
+      padding-inline-start: 0;
+      list-style: none;
+
+      > .item {
+        position: relative;
+        padding: 4px 0;
+        overflow: hidden;
+        font-size: 14px;
+        line-height: 18px;
+
+        > .link {
+          color: var(--color-black);
+          text-decoration: none;
+
+          &:hover {
+            color: var(--color-key);
+          }
+
+          &::after {
+            position: relative;
+            top: 0;
+            display: inline-block;
+            margin-left: 3px;
+            font-family: 'Font Awesome 7 Free', sans-serif;
+            font-size: 10px;
+            font-weight: 900;
+            vertical-align: middle;
+            content: var(--icon-arrow-down);
+            opacity: 0.8;
+          }
+        }
+
+        &.-question {
+          padding-left: 20px;
+
+          > .link {
+            &::before {
+              position: absolute;
+              top: 5px;
+              left: 0;
+              display: block;
+              width: 16px;
+              height: 16px;
+              font-size: 12px;
+              font-weight: bold;
+              line-height: 16px;
+              color: white;
+              text-align: center;
+              content: 'Q';
+              background-color: var(--color-key-dark1);
+              border-radius: 8px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

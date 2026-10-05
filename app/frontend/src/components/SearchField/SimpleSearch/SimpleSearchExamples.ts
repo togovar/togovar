@@ -3,7 +3,7 @@ import type { CSSResultGroup, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 
-import Styles from '../../../../stylesheets/object/component/simple-search-examples.scss';
+import Styles from '../../../../stylesheets/web-components/simple-search-examples.scss';
 import type { ExampleItem, ExampleSelectedDetail } from './SimpleSearchTypes';
 
 /** SimpleSearchExamples - Simple検索用の例表示コンポーネント */
@@ -45,29 +45,26 @@ export default class SimpleSearchExamples extends LitElement {
 
   render(): TemplateResult {
     return html`
-      ${map(
-        this.examples,
-        (example: ExampleItem) => {
-          const values = this.getValues(example);
-          return html`<dl>
-            <dt>${example.key}</dt>
-            <dd>
-              ${map(
-                values,
-                (value, index) =>
-                  html`${index > 0 ? ', ' : ''}<button
-                      type="button"
-                      data-key=${example.key}
-                      data-value=${value}
-                      @click=${this.handleClick}
-                    >
-                      ${value}
-                    </button>`
-              )}
-            </dd>
-          </dl>`;
-        }
-      )}
+      ${map(this.examples, (example: ExampleItem) => {
+        const values = this.getValues(example);
+        return html`<dl>
+          <dt>${example.key}</dt>
+          <dd>
+            ${map(
+              values,
+              (value, index) =>
+                html`${index > 0 ? ', ' : ''}<button
+                    type="button"
+                    data-key=${example.key}
+                    data-value=${value}
+                    @click=${this.handleClick}
+                  >
+                    ${value}
+                  </button>`
+            )}
+          </dd>
+        </dl>`;
+      })}
     `;
   }
 }

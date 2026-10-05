@@ -1,6 +1,6 @@
-import { setSimpleSearchCondition } from '../../../store/searchManager';
+import { setSimpleSearchCondition } from '../../../store/search/searchManager';
 import { storeManager } from '../../../store/StoreManager';
-import { CHROMOSOME_PATTERN } from './SimpleSearchConstants';
+import { toDisplayChromosomeTerm } from './SimpleSearchConstants';
 import type {
   SimpleSearchHost,
   SuggestionItem,
@@ -19,18 +19,12 @@ export class SimpleSearchController {
 
   /**
    * 検索処理
-   * 染色体パターンの正規化も行う
+   * Storeの通知有無に依存せず、検索ボックスにはユーザーが指定した表記をそのまま残す。
+   * API送信用の染色体表記正規化はextractSearchCondition側へ閉じ込める。
    * @param term - 検索語
    */
   search(term: string): void {
-    if (CHROMOSOME_PATTERN.test(term)) {
-      term = term.replace(/Chr|ch|Cr|cs/i, '').toUpperCase();
-
-      if (term.includes('M:')) {
-        term = term.replace('M:', 'MT:');
-      }
-    }
-
+    this.host._term = toDisplayChromosomeTerm(term);
     setSimpleSearchCondition('term', term);
   }
 
