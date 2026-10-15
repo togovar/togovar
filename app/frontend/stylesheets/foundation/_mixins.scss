@@ -7,7 +7,7 @@
 }
 
 // Firefoxの数値入力のスピンボタンの幅。非表示時もこの幅を空けておき、hover時に数字が動かないようにする。
-$firefox-number-spin-button-width: 14px;
+$firefox-number-spin-button-width: 18px;
 
 // 数値入力フィールドの共通スタイル
 @mixin input-number {
@@ -34,4 +34,3 @@ $firefox-number-spin-button-width: 14px;
     }
   }
 }
-
