@@ -1,5 +1,25 @@
 @use '../foundation' as *;
 
+// 2本のrange inputを重ねるため、input本体はpointer-events: noneにして、つまみだけ操作できるようにする。
+// Chrome/Safari(::-webkit-slider-thumb)とFirefox(::-moz-range-thumb)はセレクタをまとめると
+// 片方のブラウザでルール全体が無効になるため、mixinで共通化して別々に書く。
+@mixin range-thumb {
+  width: 3px;
+  height: 1em;
+  pointer-events: auto;
+  cursor: col-resize;
+  background-color: transparent;
+  border: none;
+  border-top: solid 1px rgb(0 0 0 / 50%);
+  border-bottom: solid 1px rgb(0 0 0 / 50%);
+  border-radius: 0;
+}
+
+@mixin range-thumb-edge($side, $offset) {
+  border-#{$side}: 1px solid rgb(0 0 0 / 50%);
+  transform: translateX($offset);
+}
+
 .wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -23,7 +43,11 @@
 
 .from,
 .to {
-  width: 5em;
+  // Shadow DOM内ではリセットのbox-sizingが効かないため、ここでborder-boxにする。
+  // Firefoxでスピンボタンの表示に合わせて右余白が変わっても、枠の大きさが変わらないようにするため。
+  // 幅は従来の見た目（中身5em + 左余白8px + 枠線2px）に合わせる。
+  box-sizing: border-box;
+  width: calc(5em + 10px);
   font-size: inherit;
   @include input-number;
 }
@@ -112,15 +136,18 @@ input[type='range']::-webkit-slider-runnable-track {
 }
 
 input[type='range']::-webkit-slider-thumb {
-  width: 3px;
-  height: 1em;
   margin-top: -0.2em;
   -webkit-appearance: none;
-  pointer-events: auto;
-  cursor: col-resize;
+  @include range-thumb;
+}
+
+input[type='range']::-moz-range-track {
+  height: 8px;
   background-color: transparent;
-  border-top: solid 1px rgb(0 0 0 / 50%);
-  border-bottom: solid 1px rgb(0 0 0 / 50%);
+}
+
+input[type='range']::-moz-range-thumb {
+  @include range-thumb;
 }
 
 .ruler {
@@ -195,24 +222,36 @@ input[type='range']::-webkit-slider-thumb {
 
 :host([data-thumb='1-lower']) {
   #slider-1::-webkit-slider-thumb {
-    border-right: 1px solid rgb(0 0 0 / 50%);
-    transform: translateX(-1.5px);
+    @include range-thumb-edge(right, -1.5px);
+  }
+
+  #slider-1::-moz-range-thumb {
+    @include range-thumb-edge(right, -1.5px);
   }
 
   #slider-2::-webkit-slider-thumb {
-    border-left: 1px solid rgb(0 0 0 / 50%);
-    transform: translateX(1.5px);
+    @include range-thumb-edge(left, 1.5px);
+  }
+
+  #slider-2::-moz-range-thumb {
+    @include range-thumb-edge(left, 1.5px);
   }
 }
 
 :host([data-thumb='2-lower']) {
   #slider-2::-webkit-slider-thumb {
-    border-right: 1px solid rgb(0 0 0 / 50%);
-    transform: translateX(-1.5px);
+    @include range-thumb-edge(right, -1.5px);
+  }
+
+  #slider-2::-moz-range-thumb {
+    @include range-thumb-edge(right, -1.5px);
   }
 
   #slider-1::-webkit-slider-thumb {
-    border-left: 1px solid rgb(0 0 0 / 50%);
-    transform: translateX(1.5px);
+    @include range-thumb-edge(left, 1.5px);
+  }
+
+  #slider-1::-moz-range-thumb {
+    @include range-thumb-edge(left, 1.5px);
   }
 }
