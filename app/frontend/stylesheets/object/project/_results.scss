@@ -1186,14 +1186,18 @@ body[data-column-resizing='true'] {
   color: var(--color-key-dark3);
   text-decoration: none;
 
+  // Safariはマスクが要素内の半端な位置(約1.9px)に置かれると、アイコンの左端の線を欠けて描画する。
+  // 左右にpaddingを取り、マスクをcontent-box基準にすることで、アイコンの左端を整数位置(2px)にそろえる。
   &::before {
+    box-sizing: border-box;
     display: block;
     width: 19px;
     height: 19px;
+    padding: 0 2px;
     content: '';
     background-color: currentcolor;
-    -webkit-mask: url(../src/assets/icons/icon-variant-report.svg) center / contain no-repeat;
-    mask: url(../src/assets/icons/icon-variant-report.svg) center / contain no-repeat;
+    -webkit-mask: url(../src/assets/icons/icon-variant-report.svg) center / contain no-repeat content-box border-box;
+    mask: url(../src/assets/icons/icon-variant-report.svg) center / contain no-repeat content-box border-box;
   }
 
   &:hover,
