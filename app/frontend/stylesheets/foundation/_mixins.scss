@@ -6,6 +6,9 @@
   background-size: 200px 60px;
 }
 
+// Firefoxの数値入力のスピンボタンの幅。非表示時もこの幅を空けておき、hover時に数字が動かないようにする。
+$firefox-number-spin-button-width: 18px;
+
 // 数値入力フィールドの共通スタイル
 @mixin input-number {
   display: inline-block;
@@ -16,5 +19,18 @@
   border: solid 1px var(--color-gray);
   border-radius: 9px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
-}
 
+  // Firefoxはスピンボタンを常に表示し、右端いっぱいに描画して角丸からはみ出すため、
+  // Chromeと同じくhover・focus時だけ表示する。非表示時はスピンボタンの幅を余白で確保し、
+  // 表示・非表示で数字の位置が変わらないようにする。
+  @supports selector(::-moz-range-thumb) {
+    padding-right: calc(4px + #{$firefox-number-spin-button-width});
+    appearance: textfield;
+
+    &:hover,
+    &:focus {
+      padding-right: 4px;
+      appearance: auto;
+    }
+  }
+}
