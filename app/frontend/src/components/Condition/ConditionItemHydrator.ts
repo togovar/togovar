@@ -40,7 +40,10 @@ export class ConditionItemHydrator {
     valueView.conditionType = this.conditionType;
     valueView.value = value.value;
     valueView.label = value.label;
-    valueView.deleteButton = this.conditionType === ADVANCED_CONDITION_TYPE.variant_id;
+    // 複数の値を追加して個別に削除できる条件は、復元時も削除ボタンを付ける。
+    valueView.deleteButton =
+      this.conditionType === ADVANCED_CONDITION_TYPE.variant_id ||
+      this.conditionType === ADVANCED_CONDITION_TYPE.gene_symbol;
     return valueView;
   }
 

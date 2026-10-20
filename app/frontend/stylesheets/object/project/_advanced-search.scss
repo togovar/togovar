@@ -150,6 +150,39 @@
           background-color: rgba(0, 0, 0, 0.3);
           border-radius: 4px;
         }
+
+        // Gene symbol を gene ID に変換している間の仮の値タグ
+        // 本物の値タグ（condition-item-value-view）と同じ形にし、点線と回転アイコンで処理中であることを示す
+        > .pending-value-view {
+          display: inline-flex;
+          gap: 0.4em;
+          align-items: center;
+          padding: 1px 10px 0 10px;
+          margin-right: 2px;
+          font-weight: bold;
+          line-height: 1;
+          color: var(--color-gray);
+          background-color: white;
+          border: dashed 1px var(--color-gray);
+          border-radius: calc(var(--height-advanced-search-condition-value) * 0.5);
+
+          &::after {
+            box-sizing: border-box;
+            width: 0.9em;
+            height: 0.9em;
+            content: '';
+            border: solid 2px var(--color-light-gray);
+            border-top-color: var(--color-key-dark1);
+            border-radius: 50%;
+            animation: pending-value-spin 0.8s linear infinite;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            &::after {
+              animation: none;
+            }
+          }
+        }
       }
 
       // 編集・削除ボタン群（通常時は半透明、ホバーで不透明）
@@ -746,5 +779,12 @@ $OPACITY_DISABLED: 0.8;
         left: 25px;
       }
     }
+  }
+}
+
+// Gene symbol の仮の値タグ（.pending-value-view）の回転アイコン
+@keyframes pending-value-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
