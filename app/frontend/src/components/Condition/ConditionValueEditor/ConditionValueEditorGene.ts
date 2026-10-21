@@ -27,10 +27,10 @@ type GeneLookupResult =
   | { status: 'error' };
 
 /**
- * gene ID への変換リクエスト1件のタイムアウト（ミリ秒）。
- * 変換中はOK・Cancel・Escapeを止めるため、応答のないリクエストでモーダルから出られなくならないようにする。
+ * 大量入力でも編集操作を長時間止めないよう、待機中の項目を含むバッチ全体の制限時間を設ける。
+ * 期限後は未処理のシンボルも入力欄へ戻し、再試行できるようにする。
  */
-const GENE_LOOKUP_TIMEOUT_MS = 10_000;
+const GENE_LOOKUP_BATCH_TIMEOUT_MS = 10_000;
 
 /** 見つからなかったシンボルをメッセージに並べる上限。大量に貼り付けたときにメッセージが長くなりすぎないようにする。 */
 const MAX_SYMBOLS_IN_MESSAGE = 10;
@@ -225,12 +225,13 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     this.valuesContainerEl.append(...pendingEls);
 
     try {
+      const deadline = Date.now() + GENE_LOOKUP_BATCH_TIMEOUT_MS;
       const results = await mapWithConcurrency(
         symbols,
         MAX_CONCURRENT_GENE_LOOKUPS,
         async (symbol) => ({
           symbol,
-          result: await this._findGeneBySymbol(symbol),
+          result: await this._findGeneBySymbol(symbol, deadline),
         })
       );
 
@@ -353,15 +354,34 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     return rest > 0 ? `${shown}, and ${rest} more` : shown;
   }
 
-  /** サジェストAPIの結果から、シンボルが完全一致（大文字・小文字は区別しない）する遺伝子を探す。 */
-  private async _findGeneBySymbol(symbol: string): Promise<GeneLookupResult> {
+  /** バッチの共通期限内だけ照会し、待機項目が多くても編集操作の再開を遅らせない。 */
+  private async _findGeneBySymbol(
+    symbol: string,
+    deadline: number
+  ): Promise<GeneLookupResult> {
+    const remainingMs = deadline - Date.now();
+    if (remainingMs <= 0) return { status: 'error' };
+
     const url = new URL(`${API_URL}/api/search/${this.conditionType}`);
     url.searchParams.set('term', symbol);
+    const controller = new AbortController();
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
     try {
-      const { data } = await axios.get(url.toString(), {
-        timeout: GENE_LOOKUP_TIMEOUT_MS,
+      // Axiosの通信前にキャッシュ層で待たされる場合も、共通期限で打ち切る。
+      const timeout = new Promise<never>((_resolve, reject) => {
+        timeoutId = setTimeout(() => {
+          controller.abort();
+          reject(new Error('Gene symbol lookup batch timed out'));
+        }, remainingMs);
       });
+      const { data } = await Promise.race([
+        axios.get<unknown>(url.toString(), {
+          timeout: remainingMs,
+          signal: controller.signal,
+        }),
+        timeout,
+      ]);
       const suggestions: GeneSuggestion[] = Array.isArray(data) ? data : [];
       const upperSymbol = symbol.toUpperCase();
       const gene = suggestions.find(
@@ -371,6 +391,8 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     } catch (error) {
       console.error(`Failed to find gene symbol: ${symbol}`, error);
       return { status: 'error' };
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
