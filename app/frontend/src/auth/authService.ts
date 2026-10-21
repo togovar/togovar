@@ -43,7 +43,7 @@ export async function fetchLoginStatus(): Promise<void> {
       storeManager.setData('isLogin', false);
     }
   } catch (error) {
-    if (isLocalDevelopmentHost(window.location.hostname)) {
+    if (typeof window !== 'undefined' && isLocalDevelopmentHost(window.location.hostname)) {
       console.warn('Failed to fetch auth status:', error);
     }
     storeManager.setData('isLogin', false);
