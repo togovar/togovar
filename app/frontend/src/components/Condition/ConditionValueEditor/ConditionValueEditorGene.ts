@@ -153,7 +153,7 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     });
 
     // 区切り文字を含む＝複数入力中は、1件分の候補一覧が入力の邪魔になるため表示しない。
-    // ユーザーの入力時だけ切り替え、追加後に入力欄を書き換えたときに古い候補が出ないようにする。
+    // ユーザー入力では現在の値に合わせて切り替え、失敗した値の復元時は別途候補を閉じる。
     this._searchFieldView.addEventListener('input-change', (e: Event) => {
       const customEvent = e as CustomEvent<string>;
       this._searchFieldView.hideSuggestions = hasMultipleSearchTerms(
@@ -267,6 +267,11 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
       this._searchFieldView.term = [...unresolved, this._searchFieldView.term]
         .filter((term) => term.length > 0)
         .join(' ');
+      // 復元ではinput-changeが発火しないため、古い候補の選択で未解決の入力を失わないよう閉じる。
+      if (hasMultipleSearchTerms(this._searchFieldView.term)) {
+        this._searchFieldView.hideSuggestions = true;
+        this._searchFieldView.closeSuggestions();
+      }
       this._showLookupMessages(notFound, failed);
       this.notifyValidity();
     } finally {
