@@ -362,3 +362,50 @@ condition-disease-search {
     }
   }
 }
+
+// =============================================================================
+// Gene symbol / Variant ID エディター (.text-field-editor-view > .input-row)
+// Enter キーを知らなくても追加できるよう、入力欄の横に Add ボタンを並べる
+// （Disease エディターも .text-field-editor-view を使うが、.input-row を持たないため影響しない）
+// =============================================================================
+
+.text-field-editor-view {
+  > .section-content {
+    > .input-row {
+      // 入力欄の下には margin-bottom があるため、中央ぞろえだとボタンが下にずれる。上ぞろえで入力欄と高さを合わせる。
+      --input-row-field-height: 30px; // web-components/search-field.scss の $SIZE と同じ値
+
+      display: flex;
+      column-gap: 6px;
+      align-items: flex-start;
+
+      > search-field,
+      > search-field-with-suggestions {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      // 入力欄と同じ高さ・角丸にして、押しやすい大きさにする
+      > .button-view {
+        flex: 0 0 auto;
+        min-width: 64px;
+        height: var(--input-row-field-height);
+        padding: 0 1.2em;
+        font-size: 13px;
+        line-height: 1;
+        border-radius: calc(var(--input-row-field-height) * 0.5);
+      }
+    }
+
+    // 追加できなかった Gene symbol の理由（見つからない・通信エラー）
+    > .messages-view {
+      &.-hidden {
+        display: none;
+      }
+
+      > .message:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

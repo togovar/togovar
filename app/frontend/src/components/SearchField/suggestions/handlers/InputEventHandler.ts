@@ -54,10 +54,12 @@ export class InputEventHandler {
   /** フォーカスインイベントを処理 - 条件を満たす場合サジェストを表示 */
   handleFocusIn = (): void => {
     // ユーザーが実際に入力を行った場合のみサジェストを表示
+    // 親が候補一覧を隠しているときは表示状態にしない。見えない候補がEscapeなどのキー操作を止めてしまうため。
     if (
       this.host.term?.length > 3 &&
       !this.host.suppressSuggestions &&
-      this.host.hasUserInput
+      this.host.hasUserInput &&
+      !this.host.hideSuggestions
     ) {
       this.host.showControllerSuggestions();
     }

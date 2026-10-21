@@ -150,6 +150,39 @@
           background-color: rgba(0, 0, 0, 0.3);
           border-radius: 4px;
         }
+
+        // Gene symbol を gene ID に変換している間の仮の値タグ
+        // 本物の値タグ（condition-item-value-view）と同じ形にし、点線と回転アイコンで処理中であることを示す
+        > .pending-value-view {
+          display: inline-flex;
+          gap: 0.4em;
+          align-items: center;
+          padding: 1px 10px 0 10px;
+          margin-right: 2px;
+          font-weight: bold;
+          line-height: 1;
+          color: var(--color-gray);
+          background-color: white;
+          border: dashed 1px var(--color-gray);
+          border-radius: calc(var(--height-advanced-search-condition-value) * 0.5);
+
+          &::after {
+            box-sizing: border-box;
+            width: 0.9em;
+            height: 0.9em;
+            content: '';
+            border: solid 2px var(--color-light-gray);
+            border-top-color: var(--color-key-dark1);
+            border-radius: 50%;
+            animation: pending-value-spin 0.8s linear infinite;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            &::after {
+              animation: none;
+            }
+          }
+        }
       }
 
       // 編集・削除ボタン群（通常時は半透明、ホバーで不透明）
@@ -389,15 +422,35 @@
     }
   }
 
+  // OK / Cancel のフッター
+  // 編集パネルは画面幅に合わせて横に広がり、右寄せだと入力欄から遠くなるため中央に置く。
+  // 並びは一般的なダイアログと同じく、決定ボタン（OK）を右側にする。
   > .buttons {
-    padding: 3px 0 4px;
-    text-align: center;
+    --editor-button-height: 28px;
+
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    padding: 6px var(--padding-side);
 
     > .button-view {
-      display: inline-block;
+      min-width: 72px;
+      height: var(--editor-button-height);
+      padding: 0 1.2em;
+      font-size: 13px;
+      line-height: 1;
+      border-radius: calc(var(--editor-button-height) * 0.5);
 
-      &:nth-child(1) {
-        margin-right: 5px;
+      // Cancel は OK より目立たないよう、白地に枠線だけの控えめな見た目にする
+      &.-secondary {
+        color: var(--color-black);
+        background: white;
+        border: solid 1px var(--color-gray);
+        box-shadow: none;
+
+        &:hover {
+          background: var(--color-pale-gray);
+        }
       }
     }
   }
@@ -746,5 +799,12 @@ $OPACITY_DISABLED: 0.8;
         left: 25px;
       }
     }
+  }
+}
+
+// Gene symbol の仮の値タグ（.pending-value-view）の回転アイコン
+@keyframes pending-value-spin {
+  to {
+    transform: rotate(360deg);
   }
 }

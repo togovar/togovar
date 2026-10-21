@@ -70,11 +70,12 @@ export abstract class ConditionValueEditor {
     isOnly = false,
     showDeleteButton = false
   ): ConditionItemValueView {
-    const selector = isOnly ? '' : `[data-value="${value}"]`;
-    let valueView = selectOrNull<ConditionItemValueView>(
-      this.valuesContainerEl,
-      `condition-item-value-view${selector}`
-    );
+    let valueView = isOnly
+      ? selectOrNull<ConditionItemValueView>(
+          this.valuesContainerEl,
+          'condition-item-value-view'
+        )
+      : this._findValueView(value);
 
     if (!valueView) {
       // HTMLElementTagNameMap の拡張が効いていれば、型は自動的に ConditionItemValueView
@@ -91,16 +92,25 @@ export abstract class ConditionValueEditor {
   }
 
   /**
+   * value が一致するvalue-viewを探す。
+   * data-value 属性は value-view の描画時に付くため、続けて追加した直後は属性がまだなく重複を見逃す。
+   * そのため属性ではなく value プロパティで比較する。値に " などが含まれてもセレクタが壊れない利点もある。
+   */
+  private _findValueView(value: string): ConditionItemValueView | null {
+    const views =
+      this.valuesContainerEl.querySelectorAll<ConditionItemValueView>(
+        'condition-item-value-view'
+      );
+    return Array.from(views).find((view) => view.value === value) ?? null;
+  }
+
+  /**
    * 値が空文字のときはセレクタなしで全件削除し、値がある場合は該当するものだけ削除する。
    * 呼び出し元が値の有無を気にせずに使えるよう2パターンをここで吸収するため。
    */
   protected removeValueView(value: string): void {
     if (value) {
-      const view = selectOrNull<ConditionItemValueView>(
-        this.valuesContainerEl,
-        `condition-item-value-view[data-value="${value}"]`
-      );
-      if (view) view.remove();
+      this._findValueView(value)?.remove();
     } else {
       this.valuesContainerEl
         .querySelectorAll<ConditionItemValueView>('condition-item-value-view')

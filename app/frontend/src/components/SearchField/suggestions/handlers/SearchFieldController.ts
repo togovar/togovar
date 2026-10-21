@@ -25,7 +25,14 @@ export class SearchFieldController {
       debounce(async (dependencies: readonly unknown[]) => {
         const term = dependencies[0] as string;
         // ユーザーが実際に入力を行った場合のみAPI呼び出しを実行
-        if (term && term.length >= 3 && this.host.hasUserInput) {
+        // 親が候補一覧を隠しているときは、表示しない候補のために長い入力でAPIを呼ばない。
+        // 呼ぶと showSuggestions が true になり、見えない候補がEscapeなどのキー操作を止めてしまう。
+        if (
+          term &&
+          term.length >= 3 &&
+          this.host.hasUserInput &&
+          !this.host.hideSuggestions
+        ) {
           // サジェストを表示状態にする
           this.host.showSuggestions = true;
 
@@ -43,6 +50,14 @@ export class SearchFieldController {
 
           try {
             const { data } = await axios.get(this._getSuggestURL(term));
+            // 古い入力への応答で候補を復活させず、追加後や複数入力中の候補選択も防ぐ。
+            if (
+              term !== this.host.term ||
+              !this.host.hasUserInput ||
+              this.host.hideSuggestions
+            ) {
+              return {};
+            }
             let dataToReturn: { [key: string]: SuggestionData[] };
 
             // Make suggestion data same format for simple & gene etc search
@@ -60,6 +75,14 @@ export class SearchFieldController {
             this.host.hasApiResponse = true;
             return dataToReturn;
           } catch (error) {
+            // 古い通信の失敗で現在の入力の読み込み状態を上書きしない。
+            if (
+              term !== this.host.term ||
+              !this.host.hasUserInput ||
+              this.host.hideSuggestions
+            ) {
+              return {};
+            }
             this.host.hasApiResponse = true; // エラーでもレスポンスは受信したとみなす
             throw error;
           }
