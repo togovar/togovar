@@ -36,7 +36,9 @@ export function insertPastedTextKeepingLineBreaks(e: ClipboardEvent): void {
   e.preventDefault();
   const start = input.selectionStart ?? input.value.length;
   const end = input.selectionEnd ?? input.value.length;
-  input.setRangeText(text.replace(/[\r\n]+/g, ' ').trim(), start, end, 'end');
+  // trim すると先頭・末尾の改行が消え、カーソル前後の既存の値と連結されてしまうため空白のまま残す。
+  // 余分な空白は splitSearchTerms が区切りとして読み飛ばす。
+  input.setRangeText(text.replace(/[\r\n]+/g, ' '), start, end, 'end');
   // 値の変更を SearchField に伝えるため、通常の入力と同じ input イベントを発火する。
   input.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
 }

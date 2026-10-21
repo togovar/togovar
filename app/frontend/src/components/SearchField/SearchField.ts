@@ -61,6 +61,11 @@ class SearchField extends LitElement {
     }
   }
 
+  /** Shadow DOM 内の input にフォーカスする。親から入力欄へフォーカスを戻すときに使う。 */
+  focusInput(): void {
+    this._inputRef.value?.focus();
+  }
+
   /** If url has a value, put the value in input (simple search)
    * @private */
   private _handleLoad = (): void => {

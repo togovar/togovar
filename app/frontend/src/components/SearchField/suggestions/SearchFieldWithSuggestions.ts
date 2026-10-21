@@ -8,6 +8,7 @@ import { customElement, state, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 
 import '../SearchField';
+import type SearchField from '../SearchField';
 import './SearchFieldSuggestionsList';
 import { SearchFieldController } from './handlers/SearchFieldController';
 import { SuggestionKeyboardHandler } from './handlers/SuggestionKeyboardHandler';
@@ -250,6 +251,11 @@ class SearchFieldWithSuggestions extends LitElement {
   /** 入力リセット時のサジェスト非表示と入力クリアをインプットハンドラへ委譲する */
   handleInputReset = (): void => {
     return this._inputHandler.handleInputReset();
+  };
+
+  /** 内部の search-field の入力欄にフォーカスする。親エディタが入力欄へフォーカスを戻すときに使う。 */
+  focusInput = (): void => {
+    this.renderRoot.querySelector<SearchField>('search-field')?.focusInput();
   };
 
   /** ハンドラから直接呼べるようthisコンテキストを保持したままサジェストを非表示にする */

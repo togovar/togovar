@@ -25,7 +25,14 @@ export class SearchFieldController {
       debounce(async (dependencies: readonly unknown[]) => {
         const term = dependencies[0] as string;
         // ユーザーが実際に入力を行った場合のみAPI呼び出しを実行
-        if (term && term.length >= 3 && this.host.hasUserInput) {
+        // 親が候補一覧を隠しているときは、表示しない候補のために長い入力でAPIを呼ばない。
+        // 呼ぶと showSuggestions が true になり、見えない候補がEscapeなどのキー操作を止めてしまう。
+        if (
+          term &&
+          term.length >= 3 &&
+          this.host.hasUserInput &&
+          !this.host.hideSuggestions
+        ) {
           // サジェストを表示状態にする
           this.host.showSuggestions = true;
 

@@ -101,9 +101,9 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
       text: 'Add',
       attrs: { type: 'button' },
     });
+    // Enterと同じ処理を通し、候補一覧を閉じて再表示も止めたうえで search-term-enter で追加する。
     this._addButtonEl.addEventListener('click', () => {
-      this._searchFieldView.hideSuggestionsMethod();
-      void this._addTypedSymbols(this._searchFieldView.term);
+      this._searchFieldView.executeSearchWithoutSuggestion();
     });
     inputRowEl.append(this._addButtonEl);
 
@@ -220,6 +220,8 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
         .filter(({ gene }) => !gene)
         .map(({ symbol }) => symbol);
       // 変換中に入力された文字は消さず、見つからなかったシンボルの後ろに残す。
+      // プログラムで書き戻した値でサジェストAPIを呼ばないよう、ユーザー入力扱いを解除する。
+      this._searchFieldView.hasUserInput = false;
       this._searchFieldView.term = [...notFound, this._searchFieldView.term]
         .filter((term) => term.length > 0)
         .join(' ');
@@ -228,6 +230,7 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
       // 置き換えなかった仮の値タグ（見つからない・追加済み・エラー）を残さない。
       pendingEls.forEach((pendingEl) => pendingEl.remove());
       this._setAdding(false);
+      this._restoreFocusIfLost();
     }
   }
 
@@ -251,6 +254,18 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     this._isAdding = isAdding;
     this._addButtonEl.disabled = isAdding;
     this.conditionValues.setBusy(isAdding);
+  }
+
+  /**
+   * Addボタンは変換中に押せなくするため、押した直後にフォーカスが外れてしまう。
+   * 見つからなかったシンボルを直して続けて追加できるよう、フォーカスが外れたときだけ入力欄へ戻す。
+   * 変換中にユーザーが別の場所へ移したフォーカスは奪わない。
+   */
+  private _restoreFocusIfLost(): void {
+    const active = document.activeElement;
+    if (!active || active === document.body || active === this._addButtonEl) {
+      this._searchFieldView.focusInput();
+    }
   }
 
   /** サジェストAPIの結果から、シンボルが完全一致（大文字・小文字は区別しない）する遺伝子を探す。 */
