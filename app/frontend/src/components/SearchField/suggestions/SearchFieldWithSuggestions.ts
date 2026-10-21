@@ -75,6 +75,7 @@ export interface SearchFieldHost extends ReactiveControllerHost {
   label: string;
   term: string;
   showSuggestions: boolean;
+  hideSuggestions: boolean;
   suppressSuggestions: boolean;
   hasApiResponse: boolean;
   hasUserInput: boolean;

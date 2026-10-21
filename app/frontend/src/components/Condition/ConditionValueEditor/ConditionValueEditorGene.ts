@@ -18,6 +18,36 @@ const GENE_SYMBOL_PLACEHOLDER =
 type GeneSuggestion = { id: number | string; symbol: string };
 
 /**
+ * gene ID への変換で同時に送るリクエストの上限。
+ * Excel から数百件を貼り付けたときに、APIへ一度に大量のリクエストを送らないようにする。
+ * API は HTTP/2 で1本の接続に多数のリクエストを並べられるため、処理速度を優先して多めにしている。
+ */
+const MAX_CONCURRENT_GENE_LOOKUPS = 20;
+
+/**
+ * items を最大 concurrency 件ずつ並行して処理し、結果を items と同じ順で返す。
+ * 空いた枠から順に次の item を処理するため、遅いリクエストがあっても全体は止まらない。
+ */
+async function mapWithConcurrency<T, R>(
+  items: readonly T[],
+  concurrency: number,
+  fn: (item: T) => Promise<R>
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let nextIndex = 0;
+  const worker = async (): Promise<void> => {
+    while (nextIndex < items.length) {
+      const index = nextIndex++;
+      results[index] = await fn(items[index]);
+    }
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, items.length) }, worker)
+  );
+  return results;
+}
+
+/**
  * Gene Symbol の複数入力エディタ。
  * サジェスト選択、またはEnterキー・Addボタンで入力欄の値を区切り文字で分割して追加し、削除ボタンで個別削除できる。
  * APIは gene ID で検索するため、Enterで入力したシンボルはサジェストAPIで gene ID に変換する。
@@ -163,11 +193,13 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     this.valuesContainerEl.append(...pendingEls);
 
     try {
-      const results = await Promise.all(
-        symbols.map(async (symbol) => ({
+      const results = await mapWithConcurrency(
+        symbols,
+        MAX_CONCURRENT_GENE_LOOKUPS,
+        async (symbol) => ({
           symbol,
           gene: await this._findGeneBySymbol(symbol),
-        }))
+        })
       );
 
       // 仮の値タグを、同じ位置で本物の値タグに置き換える。

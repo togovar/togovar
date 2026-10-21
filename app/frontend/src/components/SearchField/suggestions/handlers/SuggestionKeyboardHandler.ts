@@ -108,7 +108,12 @@ export class SuggestionKeyboardHandler {
 
   /** Enterキーの処理 - 選択または検索実行 */
   private _handleEnter(): void {
-    if (this.host.showSuggestions && this.host.currentSuggestionIndex !== -1) {
+    // 親が候補一覧を隠しているときは、矢印キーで選んだ見えない候補を確定しない。
+    if (
+      this.host.showSuggestions &&
+      !this.host.hideSuggestions &&
+      this.host.currentSuggestionIndex !== -1
+    ) {
       // サジェストが選択されている場合：ホストに委譲
       this.host.selectCurrentSuggestion();
     } else {
