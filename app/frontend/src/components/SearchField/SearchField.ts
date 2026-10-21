@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ref, createRef } from 'lit/directives/ref.js';
 import type { Ref } from 'lit/directives/ref.js';
-import Style from '../../../stylesheets/object/component/search-field.scss';
+import Style from '../../../stylesheets/web-components/search-field.scss';
 
 /** Class to create a only search field */
 @customElement('search-field')
@@ -115,6 +115,8 @@ class SearchField extends LitElement {
               part="input-field"
               ${ref(this._inputRef)}
               type="text"
+              name="q"
+              autocomplete="off"
               .placeholder=${this.placeholder}
               @input=${this._handleInput}
               required

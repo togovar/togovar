@@ -136,5 +136,10 @@ export const SEARCH_FIELD_CONFIG: SearchFieldConfig = {
   },
 };
 
-/** 染色体パターンの正規表現 */
-export const CHROMOSOME_PATTERN: RegExp = /([1-9]|1[0-9]|2[0-2]|X|Y|M|MT):\d+/i;
+/**
+ * 検索ボックスはStoreのtermをそのまま表示し、URL復元時の表記を勝手に戻さない。
+ * GRCh38の検索API向け正規化はextractSearchCondition側で行い、表示側はM/MTどちらも保持する。
+ */
+export function toDisplayChromosomeTerm(term: string): string {
+  return term;
+}

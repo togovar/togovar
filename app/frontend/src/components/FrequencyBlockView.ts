@@ -6,7 +6,7 @@ import {
 } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import type { Frequency } from '../types/api';
-import Styles from '../../stylesheets/object/component/frequency-block-view.scss';
+import Styles from '../../stylesheets/web-components/frequency-block-view.scss';
 
 /** CSSが表示するブロック数を決定するためのカテゴリラベル */
 type LogFrequencyLabel =
@@ -24,9 +24,7 @@ type LogFrequencyLabel =
  * このラベルは `data-frequency` 属性にセットされ、
  * SCSSのセレクタが何個のブロックを表示するかを制御する。
  */
-const getLogFrequencyLabel = (
-  frequency?: Frequency
-): LogFrequencyLabel => {
+const getLogFrequencyLabel = (frequency?: Frequency): LogFrequencyLabel => {
   if (!frequency) return 'na';
 
   const { af: alleleFrequency } = frequency;

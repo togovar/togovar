@@ -1,36 +1,60 @@
-/** Base props for element creation. */
+/**
+ * createEl に渡せるプロパティの基底型。
+ * 同一要素への複数の設定方法（class/attrs/dataset/domProps）を分離することで、
+ * 設定の種類ごとに型安全さを維持するため。
+ */
 type BaseProps<E extends HTMLElement> = {
-  /** CSS class names.
-   *  - string: whitespace-separated, e.g. "btn btn-primary"
-   *  - string[]: ["btn", "btn-primary"] (handy for conditional classes)
+  /**
+   * CSSクラス名。
+   * string[] を受け付けることで、条件クラスの動的結合を呼び出し側で書きやすくするため。
+   * - string: スペース区切り "btn btn-primary"
+   * - string[]: ["btn", "btn-primary"]
    */
   class?: string | ReadonlyArray<string>;
 
-  /** Plain HTML attributes (string values), e.g. id, type, role, aria-*. */
+  /**
+   * HTML属性（文字列値）。aria-* など属性名をキャメルケースに変換できないものを
+   * dataset とは別フィールドで受け取るため。
+   */
   attrs?: Record<string, string>;
 
-  /** data-* attributes via dataset (camelCase -> data-). */
+  /**
+   * data-* 属性（dataset経由）。
+   * HTMLのdataset APIがキャメルケースを自動変換するため、attrs と分けて専用で管理する。
+   */
   dataset?: Record<string, string>;
 
-  /** Direct assignment to DOM properties (NOT attributes),
-   *  typed to the concrete element (e.g. input.value, img.src, a.href,
-   *  hidden/tabIndex/spellcheck as booleans/numbers). */
+  /**
+   * DOM プロパティへの直接代入（属性ではなくプロパティとして設定する必要があるもの用）。
+   * input.value や hidden のようにsetAttributeでは動作しないものを型安全に扱うため。
+   */
   domProps?: Partial<E>;
 
-  /** Sets textContent (inserted before children). */
+  /**
+   * textContent に設定するテキスト。
+   * children より先に適用することで、テキストが最初に来る DOM 順序を保証するため。
+   */
   text?: string;
 
-  /** Ordered children: Nodes or strings (strings become Text nodes). */
+  /**
+   * 子ノード（Node または string）。
+   * string を受け付けることで、呼び出し側で document.createTextNode を書く手間を省くため。
+   */
   children?: ReadonlyArray<Node | string>;
 };
 
+/**
+ * 型安全な DOM 要素生成ヘルパー。
+ * document.createElement + classList + setAttribute の繰り返しコードを
+ * 1関数にまとめ、生成コードの散在を防ぐため。
+ */
 export function createEl<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   props: BaseProps<HTMLElementTagNameMap[K]> = {}
 ): HTMLElementTagNameMap[K] {
   const el = document.createElement(tag) as HTMLElementTagNameMap[K];
 
-  // classes (string or string[])
+  // 空トークンを除外してから classList に追加する（空文字はDOMExceptionになるため）。
   if (props.class) {
     if (typeof props.class === 'string') {
       const tokens = props.class.trim().split(/\s+/).filter(Boolean);
@@ -41,29 +65,26 @@ export function createEl<K extends keyof HTMLElementTagNameMap>(
     }
   }
 
-  //  attributes (string values)
   if (props.attrs) {
     for (const [k, v] of Object.entries(props.attrs)) {
       el.setAttribute(k, v);
     }
   }
 
-  //  dataset -> data-*
   if (props.dataset) {
     for (const [k, v] of Object.entries(props.dataset)) {
       (el.dataset as DOMStringMap)[k] = v;
     }
   }
 
-  // strongly-typed DOM properties (element-specific)
+  // Object.assign で DOM プロパティへ一括代入する。
   if (props.domProps) Object.assign(el, props.domProps);
 
-  //  text first, then children
+  // text は children より先に設定して順序を固定する。
   if (props.text != null) {
     el.textContent = props.text;
   }
 
-  // children in order (Node or string)
   if (props.children) {
     for (const c of props.children) {
       el.appendChild(

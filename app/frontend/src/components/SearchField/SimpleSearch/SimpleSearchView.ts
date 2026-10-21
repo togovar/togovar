@@ -4,11 +4,17 @@ import { customElement, state } from 'lit/decorators.js';
 import '../suggestions/SearchFieldWithSuggestions';
 import './SimpleSearchExamples';
 import './SimpleSearchButton';
-import { getSimpleSearchCondition } from '../../../store/searchManager';
+import { getSimpleSearchCondition } from '../../../store/search/searchManager';
+import { storeManager } from '../../../store/StoreManager';
 import { SimpleSearchController } from './SimpleSearchController';
 import { SimpleSearchEventHandlers } from './SimpleSearchEventHandlers';
-import { EXAMPLES, SEARCH_FIELD_CONFIG } from './SimpleSearchConstants';
-import Styles from '../../../../stylesheets/object/component/simple-search-view.scss';
+import {
+  EXAMPLES,
+  SEARCH_FIELD_CONFIG,
+  toDisplayChromosomeTerm,
+} from './SimpleSearchConstants';
+import type { SimpleSearchCurrentConditions } from '../../../types';
+import Styles from '../../../../stylesheets/web-components/simple-search-view.scss';
 
 /**
  * SimpleSearchView - シンプル検索のメインコンポーネント
@@ -20,6 +26,15 @@ class SimpleSearchView extends LitElement {
 
   private _controller: SimpleSearchController;
   private _eventHandlers: SimpleSearchEventHandlers;
+  private _boundSimpleSearchConditionsHandler = (
+    conditions: SimpleSearchCurrentConditions
+  ): void => {
+    this._term = toDisplayChromosomeTerm(conditions.term || '');
+    if (!this._term) {
+      this._value = '';
+      this._hideSuggestions = true;
+    }
+  };
 
   constructor() {
     super();
@@ -33,11 +48,31 @@ class SimpleSearchView extends LitElement {
     this._eventHandlers = new SimpleSearchEventHandlers(this, this._controller);
   }
 
+  /** Karyotype選択など外部からの条件変更をinputへ反映するため、表示中だけ購読する。 */
+  connectedCallback(): void {
+    super.connectedCallback();
+    storeManager.subscribe(
+      'simpleSearchConditions',
+      this._boundSimpleSearchConditionsHandler
+    );
+  }
+
+  /** 要素破棄後もハンドラが残り続けるメモリリークを防ぐため、購読をここで解除する。 */
+  disconnectedCallback(): void {
+    storeManager.unsubscribe(
+      'simpleSearchConditions',
+      this._boundSimpleSearchConditionsHandler
+    );
+    super.disconnectedCallback();
+  }
+
   // ============================================================================
   // State Properties
   // ============================================================================
   @state() _value: string = ''; // 選択されたサジェストの値
-  @state() _term: string = getSimpleSearchCondition('term') || ''; // 検索キーワード
+  @state() _term: string = toDisplayChromosomeTerm(
+    (getSimpleSearchCondition('term') as string) || ''
+  ); // 検索キーワード
   @state() _hideSuggestions: boolean = true; // サジェストを非表示にするかどうか
 
   // ============================================================================

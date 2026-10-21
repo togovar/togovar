@@ -95,10 +95,7 @@ export interface TouchState {
   startY: number;
   startX: number;
   startTime: number;
-  lastY: number;
-  lastX: number;
   distance: number;
-  duration: number;
   isScrolling: boolean;
 }
 

@@ -1,0 +1,23 @@
+:host {
+  position: relative;
+  display: block;
+}
+
+.suggestions-container {
+  position: absolute;
+  top: 100%;
+  left: 14px;
+  z-index: var(--z-index-suggest-view);
+  display: flex;
+  min-width: fit-content;
+  max-width: 50%;
+  font-size: 14px;
+  color: var(--color-black);
+  background-color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  > .column {
+    + .column {
+      border-left: solid 1px var(--color-separator-sub);
+    }
+  }
+}
