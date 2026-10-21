@@ -18,6 +18,24 @@ const GENE_SYMBOL_PLACEHOLDER =
 type GeneSuggestion = { id: number | string; symbol: string };
 
 /**
+ * シンボル1件の変換結果。
+ * 見つからなかった場合と通信エラーの場合で、ユーザーに伝える内容（綴りの確認か再試行か）が違うため区別する。
+ */
+type GeneLookupResult =
+  | { status: 'found'; gene: GeneSuggestion }
+  | { status: 'not_found' }
+  | { status: 'error' };
+
+/**
+ * gene ID への変換リクエスト1件のタイムアウト（ミリ秒）。
+ * 変換中はOK・Cancel・Escapeを止めるため、応答のないリクエストでモーダルから出られなくならないようにする。
+ */
+const GENE_LOOKUP_TIMEOUT_MS = 10_000;
+
+/** 見つからなかったシンボルをメッセージに並べる上限。大量に貼り付けたときにメッセージが長くなりすぎないようにする。 */
+const MAX_SYMBOLS_IN_MESSAGE = 10;
+
+/**
  * gene ID への変換で同時に送るリクエストの上限。
  * Excel から数百件を貼り付けたときに、APIへ一度に大量のリクエストを送らないようにする。
  * API は HTTP/2 で1本の接続に多数のリクエストを並べられるため、処理速度を優先して多めにしている。
@@ -55,6 +73,8 @@ async function mapWithConcurrency<T, R>(
 export class ConditionValueEditorGene extends ConditionValueEditor {
   private _searchFieldView!: SearchFieldWithSuggestions;
   private _addButtonEl!: HTMLButtonElement;
+  /** 追加できなかったシンボルの理由（見つからない・通信エラー）を表示する領域。 */
+  private _messagesEl!: HTMLDivElement;
   private _lastValueViews: ConditionItemValueView[] = [];
   /** gene ID への変換中か。変換中にEnter・Addを重ねて押しても二重に追加しないために使う。 */
   private _isAdding = false;
@@ -107,6 +127,13 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     });
     inputRowEl.append(this._addButtonEl);
 
+    // 変換が終わったときに読み上げられるよう、status ロールにしておく。
+    this._messagesEl = createEl('div', {
+      class: ['messages-view', '-hidden'],
+      attrs: { role: 'status' },
+    });
+    this.bodyEl.append(this._messagesEl);
+
     this._searchFieldView.addEventListener(
       'new-suggestion-selected',
       (e: Event) => {
@@ -150,6 +177,8 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
   /** Cancel時に戻す基準として現在のvalue-view一覧をDOMノードごと保存する。 */
   keepLastValues(): void {
     this._lastValueViews = this.conditionItemValueViews;
+    // 編集を開き直したときに、前回の編集のメッセージを残さない。
+    this._showLookupMessages([], []);
   }
 
   /** 現在のvalue-viewを全削除してスナップショットを再挿入する。 */
@@ -175,7 +204,7 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
    * Enter・Addで入力されたシンボルを区切り文字で分割し、サジェストAPIで gene ID に変換して追加する。
    * 変換にはAPIの応答を待つため、押した直後に入力欄を空にしてAddボタンを押せなくし、
    * 重ねて押されても二重に追加しないようにする。処理中であることは仮の値タグで示す。
-   * 見つからなかったシンボルは、どれが追加できなかったか分かるよう入力欄に戻す。
+   * 見つからなかった・通信エラーで変換できなかったシンボルは、入力欄に戻して理由をメッセージで示す。
    */
   private async _addTypedSymbols(text: string): Promise<void> {
     if (this._isAdding) return;
@@ -185,6 +214,7 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
 
     this._setAdding(true);
     this._searchFieldView.term = '';
+    this._showLookupMessages([], []);
 
     // 結果が出る値エリアにすぐ仮の値タグを並べ、追加処理中であることを示す。
     const pendingEls = symbols.map((symbol) =>
@@ -198,33 +228,46 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
         MAX_CONCURRENT_GENE_LOOKUPS,
         async (symbol) => ({
           symbol,
-          gene: await this._findGeneBySymbol(symbol),
+          result: await this._findGeneBySymbol(symbol),
         })
       );
 
       // 仮の値タグを、同じ位置で本物の値タグに置き換える。
       // 既に追加済みの遺伝子は二重に並べないよう、仮の値タグを消すだけにする。
-      results.forEach(({ gene }, index) => {
+      results.forEach(({ result }, index) => {
         const pendingEl = pendingEls[index];
-        if (!gene) return;
+        if (result.status !== 'found') return;
 
-        const geneId = String(gene.id);
+        const geneId = String(result.gene.id);
         const exists = this.conditionItemValueViews.some(
           (view) => view.value === geneId
         );
-        const valueView = this.addValueView(geneId, gene.symbol, false, true);
+        const valueView = this.addValueView(
+          geneId,
+          result.gene.symbol,
+          false,
+          true
+        );
         if (!exists) pendingEl.replaceWith(valueView);
       });
 
       const notFound = results
-        .filter(({ gene }) => !gene)
+        .filter(({ result }) => result.status === 'not_found')
         .map(({ symbol }) => symbol);
-      // 変換中に入力された文字は消さず、見つからなかったシンボルの後ろに残す。
+      const failed = results
+        .filter(({ result }) => result.status === 'error')
+        .map(({ symbol }) => symbol);
+      // 追加できなかったシンボルは、直したり再試行したりできるよう入力順のまま入力欄に戻す。
+      const unresolved = results
+        .filter(({ result }) => result.status !== 'found')
+        .map(({ symbol }) => symbol);
+      // 変換中に入力された文字は消さず、戻したシンボルの後ろに残す。
       // プログラムで書き戻した値でサジェストAPIを呼ばないよう、ユーザー入力扱いを解除する。
       this._searchFieldView.hasUserInput = false;
-      this._searchFieldView.term = [...notFound, this._searchFieldView.term]
+      this._searchFieldView.term = [...unresolved, this._searchFieldView.term]
         .filter((term) => term.length > 0)
         .join(' ');
+      this._showLookupMessages(notFound, failed);
       this.notifyValidity();
     } finally {
       // 置き換えなかった仮の値タグ（見つからない・追加済み・エラー）を残さない。
@@ -268,25 +311,59 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     }
   }
 
+  /**
+   * 追加できなかったシンボルを理由ごとにメッセージで示す。どちらも空ならメッセージ領域を隠す。
+   * 見つからないものは綴りの確認を、通信エラーのものは再試行を促すため、別のメッセージにする。
+   */
+  private _showLookupMessages(notFound: string[], failed: string[]): void {
+    const messageEls: HTMLElement[] = [];
+
+    if (notFound.length > 0) {
+      messageEls.push(
+        createEl('div', {
+          class: ['message', '-warning'],
+          text: `Gene symbol not found: ${this._formatSymbolList(notFound)}`,
+        })
+      );
+    }
+    if (failed.length > 0) {
+      messageEls.push(
+        createEl('div', {
+          class: ['message', '-error'],
+          text: `Could not look up ${failed.length} gene symbol(s) due to a network or server error. Please try again.`,
+        })
+      );
+    }
+
+    this._messagesEl.replaceChildren(...messageEls);
+    this._messagesEl.classList.toggle('-hidden', messageEls.length === 0);
+  }
+
+  /** シンボルをカンマ区切りで並べ、上限を超えた分は件数だけ示す。 */
+  private _formatSymbolList(symbols: string[]): string {
+    const shown = symbols.slice(0, MAX_SYMBOLS_IN_MESSAGE).join(', ');
+    const rest = symbols.length - MAX_SYMBOLS_IN_MESSAGE;
+    return rest > 0 ? `${shown}, and ${rest} more` : shown;
+  }
+
   /** サジェストAPIの結果から、シンボルが完全一致（大文字・小文字は区別しない）する遺伝子を探す。 */
-  private async _findGeneBySymbol(
-    symbol: string
-  ): Promise<GeneSuggestion | null> {
+  private async _findGeneBySymbol(symbol: string): Promise<GeneLookupResult> {
     const url = new URL(`${API_URL}/api/search/${this.conditionType}`);
     url.searchParams.set('term', symbol);
 
     try {
-      const { data } = await axios.get(url.toString());
+      const { data } = await axios.get(url.toString(), {
+        timeout: GENE_LOOKUP_TIMEOUT_MS,
+      });
       const suggestions: GeneSuggestion[] = Array.isArray(data) ? data : [];
       const upperSymbol = symbol.toUpperCase();
-      return (
-        suggestions.find(
-          (suggestion) => suggestion.symbol?.toUpperCase() === upperSymbol
-        ) ?? null
+      const gene = suggestions.find(
+        (suggestion) => suggestion.symbol?.toUpperCase() === upperSymbol
       );
+      return gene ? { status: 'found', gene } : { status: 'not_found' };
     } catch (error) {
       console.error(`Failed to find gene symbol: ${symbol}`, error);
-      return null;
+      return { status: 'error' };
     }
   }
 

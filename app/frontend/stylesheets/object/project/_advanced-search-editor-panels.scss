@@ -396,5 +396,16 @@ condition-disease-search {
         border-radius: calc(var(--input-row-field-height) * 0.5);
       }
     }
+
+    // 追加できなかった Gene symbol の理由（見つからない・通信エラー）
+    > .messages-view {
+      &.-hidden {
+        display: none;
+      }
+
+      > .message:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
 }
