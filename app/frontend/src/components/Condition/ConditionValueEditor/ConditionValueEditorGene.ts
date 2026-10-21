@@ -159,6 +159,8 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
       this._searchFieldView.hideSuggestions = hasMultipleSearchTerms(
         String(customEvent.detail ?? '')
       );
+      this._searchFieldView.clearControllerSuggestData();
+      this._searchFieldView.resetKeyboardSelection();
     });
 
     this.valuesContainerEl?.addEventListener(

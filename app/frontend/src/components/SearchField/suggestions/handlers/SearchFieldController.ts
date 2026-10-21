@@ -50,6 +50,14 @@ export class SearchFieldController {
 
           try {
             const { data } = await axios.get(this._getSuggestURL(term));
+            // 古い入力への応答で候補を復活させず、追加後や複数入力中の候補選択も防ぐ。
+            if (
+              term !== this.host.term ||
+              !this.host.hasUserInput ||
+              this.host.hideSuggestions
+            ) {
+              return {};
+            }
             let dataToReturn: { [key: string]: SuggestionData[] };
 
             // Make suggestion data same format for simple & gene etc search
@@ -67,6 +75,14 @@ export class SearchFieldController {
             this.host.hasApiResponse = true;
             return dataToReturn;
           } catch (error) {
+            // 古い通信の失敗で現在の入力の読み込み状態を上書きしない。
+            if (
+              term !== this.host.term ||
+              !this.host.hasUserInput ||
+              this.host.hideSuggestions
+            ) {
+              return {};
+            }
             this.host.hasApiResponse = true; // エラーでもレスポンスは受信したとみなす
             throw error;
           }
