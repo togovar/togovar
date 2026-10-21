@@ -37,12 +37,10 @@ export async function fetchLoginStatus(): Promise<void> {
 
     clearTimeout(timeoutId);
 
-    if (response instanceof Response) {
-      if (response.status === 200 || response.status === 403) {
-        storeManager.setData('isLogin', true);
-      } else {
-        storeManager.setData('isLogin', false);
-      }
+    if (response.status === 200 || response.status === 403) {
+      storeManager.setData('isLogin', true);
+    } else {
+      storeManager.setData('isLogin', false);
     }
   } catch (error) {
     if (isLocalDevelopmentHost(window.location.hostname)) {
