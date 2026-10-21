@@ -9,7 +9,7 @@ article.common-document
         | /
         a.hyper-text.-external(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html')
           | Japanese Genotype-phenotype Archive(JGA)
-        | に登録されている個人レベルの全ゲノム配列データを再解析して検出したバリアントを集約した頻度データです。２次データ作成の許諾が得られたJGAデータが集約対象です。
+        | に登録されている個人レベルの全ゲノム配列データを再解析して検出したバリアントを集約した頻度データです。2次データ作成の許諾が得られたJGAデータが集約対象です。
         | なお、データセット単位のアレル頻度やジェノタイプ数を閲覧するには、NBDCヒトデータベースの制限公開データを閲覧するためのアカウントが必要です。
         | アカウントの取得には、
         a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/data-use') データの利用 (NBDCヒトデータベース)
@@ -17,9 +17,9 @@ article.common-document
 
         
       ul.unordered-list
-        li バージョン/最終更新日：2024/12/3
-        li サンプルサイズ：78
-        li 検出バリアント（代替アレル）数：20,822,413
+        li バージョン：2026.1
+        li サンプルサイズ：3,068（6データセットの合計）
+        li TogoVarで検索可能な代替アレル数：72,383,609（6データセットを横断して重複排除）
 
     section.section
       h3.sectiontitle 利用条件
@@ -52,81 +52,107 @@ article.common-document
               a(target='_blank', href='https://humandbs.dbcls.jp/') NBDC Human Database
               |  /
               |
-              a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html') JGA            
-                | [Internet]. Kashiwa: Database Center for Life Science, Joint Support-Center for Data Science Research,
+              a(target='_blank', href='https://www.ddbj.nig.ac.jp/jga/index.html') JGA
+              |  [Internet]. Kashiwa: Database Division for Life Science (DBCLS), BioData Science Initiative (BSI), National Institute of Genetics (NIG),
               |
               | Research Organization of Information and Systems; [2024] - . JGA-WGS dataset; [cited YYYY Mmm DD]. Available from:
               |
               a(href='https://grch38.togovar.org/doc/datasets/jga_wgs') https://grch38.togovar.org/doc/datasets/jga_wgs
 
     section.section
-      h3.sectiontitle データ解析手法
+      h3.sectiontitle データ加工手法
       p.body
         a(href='https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels') GATK best practice - Germline short variant discovery (SNPs + Indels)
         | に則り加工しております。
-        ol.unordered-list
-          li 説明：
-            |
-            |
-            a(href='https://humandbs.dbcls.jp/whole-genome-sequencing') 生殖系列（germline）の全ゲノムシークエンスデータの加工
-          li ワークフローソースコード (jga-analysis)：
-            |
-            |
-            a(href='https://github.com/ddbj/jga-analysis') https://github.com/ddbj/jga-analysis
+      ol.unordered-list
+        li 説明：#[a(href='https://humandbs.dbcls.jp/whole-genome-sequencing') 生殖系列（germline）の全ゲノムシークエンスデータの加工]
+        li ワークフローソースコード (jga-analysis)：#[a(href='https://github.com/ddbj/jga-analysis') https://github.com/ddbj/jga-analysis]
 
     section.section
       h3#jga_datasets.sectiontitle 含まれる制限公開データセット一覧
       p
-        | データセットIDを指定して
+        | 個人レベルWGSと加工後aggregate VCFのデータセットIDを指定して
         a.hyper-text.-external(target='_blank', href='https://humandbs.dbcls.jp/data-use') NBDCヒトデータベースにデータ利用申請
         | できます。
       table.table._column-span-all
         thead
           tr
-            th データセットID
+            th 個人レベルWGS
+            th 加工後aggregate VCF
             th ヒトDB
             th 研究題目
             th 対象集団
-            th サンプル数
+            th サンプルサイズ
             th データ提供者
         tbody
           tr
             td
-              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000670') JGAD000670
+              a(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000252') JGAD000252
             td
-              a(target='_blank', href='https://humandbs.dbcls.jp/hum0068-v9') hum00068
+              a(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000670') JGAD000670
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/research/hum0068') hum0068
             td ゲノム解析に基づく肺がんの発生・進展の分子機構の解明
             td 非腫瘍組織由来検体（Germline）
             td._align-right 21
             td 河野 隆志
           tr
             td
-              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000687') JGAD000687
+              a(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000335') JGAD000335
             td
-              a(target='_blank', href='https://humandbs.dbcls.jp/hum0201-v1') hum0201
+              a(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000687') JGAD000687
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/research/hum0201') hum0201
             td ヒト腫瘍試料の収集・分譲とゲノム情報を利用した研究<br>既存試料の分譲とゲノム情報を利用した研究<br>消化器慢性炎症性疾患における遺伝子変異の検索
             td 非腫瘍組織由来検体（Germline）
             td._align-right 14
             td 佐藤 俊朗
           tr
             td
-              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000688') JGAD000688
+              a(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000234') JGAD000234
             td
-              a(target='_blank', href='https://humandbs.dbcls.jp/hum0161-v2') hum0161
+              a(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000688') JGAD000688
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/research/hum0161') hum0161
             td シークエンス解析によるがんゲノム研究：肝芽腫
             td 非腫瘍組織由来検体（Germline）
             td._align-right 33
             td 中川 英刀
           tr
             td
-              a(target='_blank', href='https://ddbj.nig.ac.jp/resource/jga-dataset/JGAD000689') JGAD000689
+              a(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000235') JGAD000235
             td
-              a(target='_blank', href='https://humandbs.dbcls.jp/hum0159-v2') hum0159
+              a(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000689') JGAD000689
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/research/hum0159') hum0159
             td シークエンス解析によるがんゲノム研究：大腸がん
             td 非腫瘍組織由来検体（Germline）
             td._align-right 10
             td 中川 英刀
+          tr
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000220') JGAD000220
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000758') JGAD000758
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/research/hum0014') hum0014
+            td オーダーメイド医療の実現プログラム
+            td 2003年度から2007年度にバイオバンク・ジャパンに登録された47疾患患者
+            td._align-right 1,026
+            td 久保 充明
+          tr
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000495') JGAD000495
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/dataset/JGAD000868') JGAD000868
+            td
+              a(target='_blank', href='https://humandbs.dbcls.jp/research/hum0014') hum0014
+            td オーダーメイド医療の実現プログラム
+            td 心筋梗塞患者1,765名（ICD10：I21）および認知症患者199名（ICD10：F00-03）
+            td._align-right 1,964
+            td 久保 充明
         tfoot
           tr
-            th._align-center(colspan='4') 合計
-            th._align-right 78
+            th._align-center(colspan='5') 合計
+            th._align-right 3,068
+            th
