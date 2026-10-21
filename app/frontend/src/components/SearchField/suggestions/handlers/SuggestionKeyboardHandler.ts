@@ -9,8 +9,10 @@ export class SuggestionKeyboardHandler {
     this.host = host;
   }
 
-  /** キーボードイベント（ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Enter, Escape）を処理 */
+  /** IMEの変換確定で検索や候補選択を実行しないよう、Enterの処理前に変換中か判定する。 */
   handleUpDownKeys = (e: KeyboardEvent): void => {
+    if (e.key === 'Enter' && e.isComposing) return;
+
     const arrowKeys: string[] = [
       'ArrowUp',
       'ArrowDown',
