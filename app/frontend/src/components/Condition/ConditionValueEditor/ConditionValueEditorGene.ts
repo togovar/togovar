@@ -270,9 +270,13 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
       this._searchFieldView.term = [...unresolved, this._searchFieldView.term]
         .filter((term) => term.length > 0)
         .join(' ');
-      // 復元ではinput-changeが発火しないため、古い候補の選択で未解決の入力を失わないよう閉じる。
-      if (hasMultipleSearchTerms(this._searchFieldView.term)) {
-        this._searchFieldView.hideSuggestions = true;
+      // 復元ではinput-changeが発火しないため、古い候補を消して現在の件数に非表示状態を合わせる。
+      this._searchFieldView.clearControllerSuggestData();
+      this._searchFieldView.resetKeyboardSelection();
+      this._searchFieldView.hideSuggestions = hasMultipleSearchTerms(
+        this._searchFieldView.term
+      );
+      if (this._searchFieldView.hideSuggestions) {
         this._searchFieldView.closeSuggestions();
       }
       this._showLookupMessages(notFound, failed);
