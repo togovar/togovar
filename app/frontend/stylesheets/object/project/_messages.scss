@@ -1,0 +1,58 @@
+// =============================================================================
+// メッセージ表示 (#Messages / .messages-view)
+// 統合元: object/project/_Messages.scss
+// =============================================================================
+
+#Messages,
+.messages-view {
+  padding-right: 10px;
+
+  > .message {
+    position: relative;
+    padding: 4px 6px 4px 20px;
+    margin-bottom: 4px;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 4px;
+
+    &::before {
+      position: absolute;
+      top: 50%;
+      left: 6px;
+      // stylelint-disable-next-line font-family-no-missing-generic-family-keyword
+      font-family: 'Font Awesome 7 Free';
+      font-weight: 900;
+      transform: translateY(-50%);
+    }
+
+    &.-error {
+      background-color: var(--color-sign-dangerous-light);
+      border-color: var(--color-sign-dangerous-dark);
+
+      &::before {
+        color: var(--color-sign-dangerous-dark);
+        content: var(--icon-xmark);
+      }
+    }
+
+    &.-warning {
+      background-color: var(--color-sign-warning-light);
+      border-color: var(--color-sign-warning-dark);
+
+      &::before {
+        color: var(--color-sign-warning-dark);
+        content: var(--icon-triangle-exclamation);
+      }
+    }
+
+    &.-notice {
+      background-color: var(--color-sign-normal-light);
+      border-color: var(--color-sign-normal-dark);
+
+      &::before {
+        color: var(--color-sign-normal-dark);
+        content: var(--icon-circle-info);
+      }
+    }
+  }
+}
