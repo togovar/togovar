@@ -25,11 +25,15 @@ export async function fetchLoginStatus(): Promise<void> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const response = await fetch(`${window.location.origin}/auth/status`, {
-      signal: controller.signal,
-    }).catch(() => {
+    let response: Response;
+    try {
+      response = await fetch(`${window.location.origin}/auth/status`, {
+        signal: controller.signal,
+      });
+    } catch (error) {
+      clearTimeout(timeoutId);
       throw new Error('Request failed or timed out');
-    });
+    }
 
     clearTimeout(timeoutId);
 
