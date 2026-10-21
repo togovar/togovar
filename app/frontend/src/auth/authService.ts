@@ -37,7 +37,7 @@ export async function fetchLoginStatus(): Promise<void> {
 
     clearTimeout(timeoutId);
 
-    if (response.status === 200 || response.status === 403) {
+    if (response.status === 200) {
       storeManager.setData('isLogin', true);
     } else {
       storeManager.setData('isLogin', false);
