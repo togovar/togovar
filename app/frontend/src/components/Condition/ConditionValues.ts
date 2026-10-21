@@ -62,6 +62,8 @@ export default class ConditionValues {
   private _okButtonEl!: HTMLButtonElement;
   private _cancelButtonEl!: HTMLButtonElement;
   private _options?: unknown;
+  /** エディタが非同期処理中か。処理中にOK・Cancelで閉じると、処理後に値が書き換わってしまうため使う。 */
+  private _isBusy = false;
 
   constructor(conditionView: ConditionItemView, options?: unknown) {
     this._conditionView = conditionView;
@@ -99,6 +101,21 @@ export default class ConditionValues {
       ? allEditorsValid
       : (isValidHint ?? allEditorsValid);
     this._setOkEnabled(finalValid);
+  }
+
+  /**
+   * エディタの非同期処理中はOK・Cancelを押せなくする。
+   * 閉じた後に処理が終わると、確定した検索条件やCancelで戻した値に後から値が追加されてしまうため。
+   */
+  setBusy(isBusy: boolean): void {
+    this._isBusy = isBusy;
+    this._cancelButtonEl.disabled = isBusy;
+    this._recomputeValidity();
+  }
+
+  /** Escapeキーでの取り消しも処理中は止めるため、ConditionItemView から参照する。 */
+  get isBusy(): boolean {
+    return this._isBusy;
   }
 
   // ─────────────────────────────────────────────────────────
@@ -192,9 +209,9 @@ export default class ConditionValues {
     this.update();
   }
 
-  /** OKボタンの disabled 属性を切り替えてユーザーが押せる状態かを制御する。 */
+  /** OKボタンの disabled 属性を切り替えてユーザーが押せる状態かを制御する。処理中は常に押せなくする。 */
   private _setOkEnabled(enabled: boolean): void {
-    if (enabled) {
+    if (enabled && !this._isBusy) {
       this._okButtonEl.removeAttribute('disabled');
     } else {
       this._okButtonEl.setAttribute('disabled', '');

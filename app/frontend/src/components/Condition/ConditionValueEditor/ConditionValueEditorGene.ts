@@ -13,7 +13,7 @@ import {
 } from '../../../utils/searchTerms';
 
 const GENE_SYMBOL_PLACEHOLDER =
-  'Type or paste gene symbol(s) separated by a comma, newline, vertical bar(|), semi-colon(;), space, or tab (e.g. BRCA2, ALDH)';
+  'Type or paste gene symbol(s) separated by a comma, newline, vertical bar(|), semi-colon(;), space, or tab (e.g. BRCA2, ALDH2)';
 
 type GeneSuggestion = { id: number | string; symbol: string };
 
@@ -143,8 +143,8 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
 
   /**
    * Enter・Addで入力されたシンボルを区切り文字で分割し、サジェストAPIで gene ID に変換して追加する。
-   * 変換にはAPIの応答を待つため、押した直後に入力欄を空にしてボタンを「Adding…」にし、
-   * 処理中であることを示すとともに、重ねて押されても二重に追加しないようにする。
+   * 変換にはAPIの応答を待つため、押した直後に入力欄を空にしてAddボタンを押せなくし、
+   * 重ねて押されても二重に追加しないようにする。処理中であることは仮の値タグで示す。
    * 見つからなかったシンボルは、どれが追加できなかったか分かるよう入力欄に戻す。
    */
   private async _addTypedSymbols(text: string): Promise<void> {
@@ -211,11 +211,14 @@ export class ConditionValueEditorGene extends ConditionValueEditor {
     });
   }
 
-  /** 変換中はAddボタンを押せなくし、表示を「Adding…」に変えて処理中であることを示す。 */
+  /**
+   * 変換中はAddボタンを押せなくする。ボタンの幅が変わらないよう、ラベルは「Add」のままにする。
+   * OK・Cancelも押せなくし、閉じた後に値が追加されて表示と検索条件がずれないようにする。
+   */
   private _setAdding(isAdding: boolean): void {
     this._isAdding = isAdding;
     this._addButtonEl.disabled = isAdding;
-    this._addButtonEl.textContent = isAdding ? 'Adding…' : 'Add';
+    this.conditionValues.setBusy(isAdding);
   }
 
   /** サジェストAPIの結果から、シンボルが完全一致（大文字・小文字は区別しない）する遺伝子を探す。 */

@@ -405,6 +405,8 @@ export class ConditionItemView extends BaseConditionView {
    */
   private readonly _keydownEscapeEvent = (e: KeyboardEvent) => {
     if (e.key !== 'Escape' || !storeManager.getData('showModal')) return;
+    // エディタの処理中に取り消すと、処理後に値が追加されて取り消しが効かないため無視する。
+    if (this._conditionValues.isBusy) return;
     if (keyDownEvent('showModal')) {
       if (this._isFirstTime) {
         this.remove();
