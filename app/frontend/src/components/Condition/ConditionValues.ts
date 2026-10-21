@@ -108,6 +108,7 @@ export default class ConditionValues {
   /**
    * 編集パネルのDOM構造（sections + OK/Cancelボタン）を生成する。
    * OKボタンは初期状態では disabled にしておき、エディタが有効になるまで押せないようにする。
+   * 決定ボタン（OK）を右端に置く一般的なダイアログの並びにするため、Cancel → OK の順で並べる。
    */
   private _buildDOM(): void {
     const sections = (this._sectionsEl = createEl('div', {
@@ -117,15 +118,15 @@ export default class ConditionValues {
     const buttons = createEl('div', {
       class: 'buttons',
       children: [
+        (this._cancelButtonEl = createEl('button', {
+          class: ['button-view', '-secondary'],
+          text: 'Cancel',
+          attrs: { type: 'button' },
+        })),
         (this._okButtonEl = createEl('button', {
           class: ['button-view'],
           text: 'OK',
           attrs: { type: 'button', disabled: '' },
-        })),
-        (this._cancelButtonEl = createEl('button', {
-          class: ['button-view', '-negative'],
-          text: 'Cancel',
-          attrs: { type: 'button' },
         })),
       ],
     });
