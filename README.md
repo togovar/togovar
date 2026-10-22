@@ -72,13 +72,13 @@ CSSクラスの命名は RSCSS を基本方針にしています。具体的な�
 
 ### 必要なもの
 
-- Node.js 22.15.0 以上の 22.x
+- Node.js 22.23.4 以上の 22.x
 - npm
 
-Node.js のバージョンは `.nvmrc` と `package.json` の `engines.node` で 22.x（22.15.0 以上）に固定しています。
+Node.js の開発・CI環境は `.nvmrc` で 22.23.4 に固定し、`package.json` の `engines.node` で 22.23.4 以上の 22.x を指定しています。nvm を使う場合は `nvm install && nvm use` でインストールして切り替えてください。
 `webpack-dev-server` v6 が Node.js 22.15.0 以上を必要とするため、22.14 以前の 22.x では `npm run dev` が動きません。
 `.npmrc` で `engine-strict=true` を設定しているため、古いバージョンでは `npm ci` / `npm install` が `EBADENGINE` エラーで止まります。その場合は Node.js を更新してください。
-バージョン管理ツールを使っている場合は、プロジェクトルートで以下を実行してください（最新の 22.x がインストールされます）。
+バージョン管理ツールを使っている場合は、プロジェクトルートで以下を実行してください（`.nvmrc` で指定したバージョンがインストールされます）。
 
 | Tool | Command                     | URL                           |
 | ---- | --------------------------- | ----------------------------- |
@@ -185,7 +185,7 @@ npm run typecheck
 
 - `npm run lint` は JavaScript/TypeScript と SCSS/CSS の lint をまとめて実行します。
 - `npm run typecheck` は TypeScript の型チェックのみを実行します（ビルドは行いません）。
-- 環境によって `node` / `npm` が PATH に無い場合があります。その場合は Node.js 22.x（22.15.0 以上）を有効化してください。
+- 環境によって `node` / `npm` が PATH に無い場合があります。その場合は Node.js 22.x（22.23.4 以上）を有効化してください。
 
 ### API 仕様との整合性チェック
 
