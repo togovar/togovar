@@ -72,13 +72,13 @@ CSSクラスの命名は RSCSS を基本方針にしています。具体的な�
 
 ### 必要なもの
 
-- Node.js 22.15.0 以上の 22.x
+- Node.js 22.23.4 以上の 22.x
 - npm
 
-Node.js のバージョンは `.nvmrc` と `package.json` の `engines.node` で 22.x（22.15.0 以上）に固定しています。
+Node.js の開発・CI環境は `.nvmrc` で 22.23.4 に固定し、`package.json` の `engines.node` で 22.23.4 以上の 22.x を指定しています。nvm を使う場合は `nvm install && nvm use` でインストールして切り替えてください。
 `webpack-dev-server` v6 が Node.js 22.15.0 以上を必要とするため、22.14 以前の 22.x では `npm run dev` が動きません。
 `.npmrc` で `engine-strict=true` を設定しているため、古いバージョンでは `npm ci` / `npm install` が `EBADENGINE` エラーで止まります。その場合は Node.js を更新してください。
-バージョン管理ツールを使っている場合は、プロジェクトルートで以下を実行してください（最新の 22.x がインストールされます）。
+バージョン管理ツールを使っている場合は、プロジェクトルートで以下を実行してください（`.nvmrc` で指定したバージョンがインストールされます）。
 
 | Tool | Command                     | URL                           |
 | ---- | --------------------------- | ----------------------------- |
@@ -283,6 +283,8 @@ Advanced Search の一部の選択肢は、TypeScript のクエリ型でも扱�
 `app/frontend/src/advancedCondition.ts` は Advanced Search 条件ID、relation可否、dataset名などの型定義元です。
 `advanced_search_conditions.json` に dataset を追加した場合は、必要に応じて `advancedCondition.ts` の `FREQUENCY_DATASETS` も更新します。
 Simple Search の `search_conditions.json` だけを変更する場合は、通常 `advancedCondition.ts` の更新は不要です。
+
+GRCh38 の Variant type は Duplication・Inversion・Breakend を含みます。
 
 ### advanced_search_conditions.json の構造
 
