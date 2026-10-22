@@ -1,8 +1,8 @@
 import { storeManager } from '../store/StoreManager';
 
 /**
- * 認証ステータスエンドポイントを叩き、isLogin をStoreに書き込む。
- * localhost環境ではCORSエラーになるため未ログイン扱いにする。
+ * ヘッダーとデータセット操作の表示を揃えるため、同じ認証ステータス判定をStoreに反映する。
+ * localhost環境では実認証を行わず、authクエリでログイン表示を確認できるようにする。
  * 403もログイン済みとして扱うのは、ステージング/本番でステータスエンドポイントへの
  * アクセス権がセッションに関係なく制限される場合があるため。
  */
@@ -30,14 +30,14 @@ export async function fetchLoginStatus(): Promise<void> {
       response = await fetch(`${window.location.origin}/auth/status`, {
         signal: controller.signal,
       });
-    } catch (error) {
+    } catch {
       clearTimeout(timeoutId);
       throw new Error('Request failed or timed out');
     }
 
     clearTimeout(timeoutId);
 
-    if (response.status === 200) {
+    if (response.status === 200 || response.status === 403) {
       storeManager.setData('isLogin', true);
     } else {
       storeManager.setData('isLogin', false);
