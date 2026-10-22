@@ -55,7 +55,7 @@
 
 - **Bootstrap は使用していない。** CSS フレームワークとしての Bootstrap は一切依存していない。`h3` などのデフォルト margin は `foundation/_reset.scss` の `*:not(dialog) { margin: 0 }` でリセット済みのため、Bootstrap 打ち消しを理由にした `margin-bottom: 0` は不要。
 
-- Node.js は `22.x`（22.15.0 以上）前提。`webpack-dev-server` v6 の要件。`.nvmrc` と `package.json` の `engines.node` を確認する。
+- Node.js は `22.x`（22.23.4 以上）前提。セキュリティ修正済みのバージョンを使い、`.nvmrc` と `package.json` の `engines.node` を確認する。
 - `tsconfig.json` は `strict: true` かつ `allowJs: true`。既存JSとTSが共存しているため、周辺ファイルの粒度に合わせて変更する。
 - 型チェックは `npm run typecheck`（= `tsc --noEmit`）で確認する。
 
@@ -106,8 +106,7 @@ app/frontend/
 ## レポートページ / Stanza 方針
 
 - レポートページのStanza定義は `app/frontend/assets/stanza.json` を正として扱う。
-- `scriptUrl` を省略したStanzaは `TOGOVAR_FRONTEND_STANZA_URL` または既定のStanza配信URLから読み込まれる。
-- Stanzaのscriptが取得できない場合（404、ネットワークエラー、CSPによるブロックなど）でも、sectionは非表示・削除せずに残す（お客様の指示）。読み込み失敗を理由に `hideStanzaSection` を呼んだり、`min-height` の確保をやめたりしない。sectionを隠すのは、`references` で現在の参照ゲノムに非対応のStanzaの場合だけとする。
+- `scriptUrl` を省略したStanzaは `TOGOVAR_FRONTEND_STANZA_URL` または既定のStanza配信URLから読み込まれる。未公開Stanzaを追加する場合は、読み込み失敗時に空のsectionが残らないことを確認する。
 - variant page では、tgvidに解決できないlocus URLの場合も、既存Stanzaの表示可否を勝手に絞らない。Stanza側のfallback対応状況を変える場合は、表示範囲と空リクエストの扱いを個別に確認する。
 - variant page の chr-pos-ref-alt fallback では、TogoVar側は共通属性として `tgv_id` と `variant` の両方を渡す。`data-url` を持たないStanzaでも、Stanza側が `variant` 属性に対応していればfallback対象になるため、`stanza.json` だけで未対応と判断しない。
 - pagination-table向けの `${variant_first_query}` は、locus URL由来の場合にtgvid解決へ成功していても `variant` 条件を優先する。SPARQList側でtgvid指定が安定しないAPIだけに使い、通常のStanzaへ安易に流用しない。
