@@ -185,7 +185,7 @@ npm run typecheck
 
 - `npm run lint` は JavaScript/TypeScript と SCSS/CSS の lint をまとめて実行します。
 - `npm run typecheck` は TypeScript の型チェックのみを実行します（ビルドは行いません）。
-- 環境によって `node` / `npm` が PATH に無い場合があります。その場合は Node.js 22.x（22.15.0 以上）を有効化してください。
+- 環境によって `node` / `npm` が PATH に無い場合があります。その場合は Node.js 22.x（22.23.4 以上）を有効化してください。
 
 ### API 仕様との整合性チェック
 
@@ -283,8 +283,6 @@ Advanced Search の一部の選択肢は、TypeScript のクエリ型でも扱�
 `app/frontend/src/advancedCondition.ts` は Advanced Search 条件ID、relation可否、dataset名などの型定義元です。
 `advanced_search_conditions.json` に dataset を追加した場合は、必要に応じて `advancedCondition.ts` の `FREQUENCY_DATASETS` も更新します。
 Simple Search の `search_conditions.json` だけを変更する場合は、通常 `advancedCondition.ts` の更新は不要です。
-
-GRCh38 の Variant type は Duplication・Inversion・Breakend を含みます。
 
 ### advanced_search_conditions.json の構造
 
