@@ -13,7 +13,8 @@
     background: var(--color-button-primary-hover);
   }
 
-  &.-weak {
+  &.-weak,
+  &.-secondary {
     color: var(--color-button-muted-text);
     background: var(--color-button-muted);
     border-color: var(--color-button-muted-border);

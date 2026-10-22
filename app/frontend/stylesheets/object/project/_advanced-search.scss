@@ -441,17 +441,6 @@
       line-height: 1;
       border-radius: calc(var(--editor-button-height) * 0.5);
 
-      // Cancel は OK より目立たないよう、白地に枠線だけの控えめな見た目にする
-      &.-secondary {
-        color: var(--color-black);
-        background: white;
-        border: solid 1px var(--color-gray);
-        box-shadow: none;
-
-        &:hover {
-          background: var(--color-pale-gray);
-        }
-      }
     }
   }
 }
