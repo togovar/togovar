@@ -3,44 +3,45 @@
   padding: 0 0.8em;
   font-weight: bold;
   line-height: 1.6;
-  color: white;
+  color: var(--color-button-primary-text);
   cursor: pointer;
-  background: linear-gradient(
-    to bottom,
-    var(--color-key),
-    var(--color-key-dark1)
-  );
-  border: none;
+  background: var(--color-button-primary);
+  border: solid 1px transparent;
   border-radius: 0.8em;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+  &:hover {
+    background: var(--color-button-primary-hover);
+  }
 
   &.-weak {
-    color: var(--color-black);
-    background: linear-gradient(
-      to bottom,
-      var(--color-pale-gray),
-      var(--color-light-gray)
-    );
+    color: var(--color-button-muted-text);
+    background: var(--color-button-muted);
+    border-color: var(--color-button-muted-border);
+
+    &:hover {
+      background: var(--color-button-muted-hover);
+    }
   }
 
   &.-negative {
-    background: linear-gradient(
-      to bottom,
-      var(--color-disable),
-      var(--color-disable-deep)
-    );
+    color: var(--color-button-primary-text);
+    background: var(--color-disable);
+
+    &:hover {
+      background: var(--color-disable-deep);
+    }
   }
 
   &.-dropdown {
     padding-right: 1.4em;
     line-height: 20px;
-    color: white;
+    color: var(--color-button-primary-text);
     cursor: pointer;
-    background: linear-gradient(
-      to bottom,
-      var(--color-key-dark1),
-      var(--color-key-dark3)
-    );
+    background: var(--color-button-dropdown);
+
+    &:hover {
+      background: var(--color-button-dropdown-hover);
+    }
 
     &::after {
       position: absolute;
@@ -58,12 +59,9 @@
 
   &.-disabled,
   &:disabled {
+    color: var(--color-button-disabled-text);
     pointer-events: none;
-    opacity: 0.4;
-  }
-
-  &:hover {
-    box-shadow: 0 0 1px rgba(0, 0, 0, 0.8);
-    transform: translateY(0.5px);
+    background: var(--color-button-disabled);
+    border-color: var(--color-button-disabled-border);
   }
 }
