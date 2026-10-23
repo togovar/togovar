@@ -83,13 +83,14 @@
       padding: 3px;
       margin-left: 5px;
       font-size: 0.6rem;
+      color: var(--color-button-muted-text);
       cursor: pointer;
-      border: 0.5px solid var(--color-black);
+      background-color: var(--color-button-muted);
+      border: 0.5px solid var(--color-button-muted-border);
       border-radius: 8px;
 
       &:hover {
-        color: #fff;
-        background-color: var(--color-black);
+        background-color: var(--color-button-muted-hover);
       }
 
       &:active {

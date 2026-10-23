@@ -57,7 +57,7 @@ main#SearchResultsView.LayoutMainAside
             button#DownloadTsv.button-view.-disabled(data-filetype="txt") TSV
           li.columns-dropdown
             //- aria-expanded は JS がドロップダウン開閉に合わせて更新する
-            button.columns-dropdown-button.button-view.-dropdown(type='button' aria-expanded='false') Columns
+            button.columns-dropdown-button.button-view(type='button' aria-expanded='false') Columns
             //- hidden / aria-hidden / inert でスクリーンリーダーと Tab フォーカスから除外する
             .columns-dropdown-menu(hidden aria-hidden='true' inert)
               ul.columns-dropdown-list
@@ -150,11 +150,11 @@ main#SearchResultsView.LayoutMainAside
         h2.title
           span.simple Statistics / Filters
           span.advanced Statistics
-          button.button-view Clear all
+          button.button-view.-weak Clear all
         section#FilterDatasets.panel-view
           h3.title
             | Dataset
-            button.clear-button.button-view Clear
+            button.clear-button.button-view.-weak Clear
           .content
             ul.checklist-values
         section#FilterAlternateAlleleFrequency.panel-view
@@ -170,50 +170,50 @@ main#SearchResultsView.LayoutMainAside
         section#FilterVariantType.panel-view
           h3.title
             | Variant type
-            button.clear-button.button-view Clear
+            button.clear-button.button-view.-weak Clear
           .content
             ul.checklist-values
         section#FilterConsequence.panel-view
           h3.title
             | Consequence
-            button.clear-button.button-view Clear
+            button.clear-button.button-view.-weak Clear
           .content
             ul.checklist-values
         section#FilterClinicalSignificance.panel-view
           h3.title
             | Clinical significance
-            button.clear-button.button-view Clear
+            button.clear-button.button-view.-weak Clear
           .content
             ul.checklist-values
         if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
           section#FilterCADD.panel-view
             h3.title
               | CADD (PHRED score)
-              button.clear-button.button-view Clear
+              button.clear-button.button-view.-weak Clear
             .content
               ul.checklist-values
         section#FilterAlphaMissense.panel-view
           h3.title
             | AlphaMissense
-            button.clear-button.button-view Clear
+            button.clear-button.button-view.-weak Clear
           .content
             ul.checklist-values
         section#FilterSIFT.panel-view
           h3.title
             | SIFT
-            button.clear-button.button-view Clear
+            button.clear-button.button-view.-weak Clear
           .content
             ul.checklist-values
         section#FilterPolyPhen.panel-view
           h3.title
             | PolyPhen
-            button.clear-button.button-view Clear
+            button.clear-button.button-view.-weak Clear
           .content
             ul.checklist-values
         if TOGOVAR_FRONTEND_REFERENCE === "GRCh38"
           section#FilterSpliceSiteCreation.panel-view
             h3.title
               | Splice-site creation (SSCV DB)
-              button.clear-button.button-view Clear
+              button.clear-button.button-view.-weak Clear
             .content
               ul.checklist-values
