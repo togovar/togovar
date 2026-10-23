@@ -670,10 +670,11 @@
             margin-left: 4px;
             font-size: 10px;
             line-height: 14px;
+            color: var(--color-neutral-text);
             vertical-align: middle;
             content: '+' attr(data-remains);
-            background-color: var(--color-light-gray);
-            border: solid 1px var(--color-gray);
+            background-color: var(--color-neutral-background);
+            border: solid 1px var(--color-neutral-border);
             border-radius: 7px;
           }
 
@@ -765,10 +766,11 @@
               text-overflow: clip;
               font-size: 10px;
               line-height: 14px;
+              color: var(--color-neutral-text);
               vertical-align: middle;
               white-space: nowrap;
-              background-color: var(--color-light-gray);
-              border: solid 1px var(--color-gray);
+              background-color: var(--color-neutral-background);
+              border: solid 1px var(--color-neutral-border);
               border-radius: 7px;
 
               // 件数が 0 または空のときは非表示
@@ -836,10 +838,11 @@
             text-overflow: clip;
             font-size: 10px;
             line-height: 14px;
+            color: var(--color-neutral-text);
             vertical-align: middle;
             white-space: nowrap;
-            background-color: var(--color-light-gray);
-            border: solid 1px var(--color-gray);
+            background-color: var(--color-neutral-background);
+            border: solid 1px var(--color-neutral-border);
             border-radius: 7px;
 
             &:empty,
@@ -861,10 +864,11 @@
           margin-left: 4px;
           font-size: 10px;
           line-height: 14px;
+          color: var(--color-neutral-text);
           vertical-align: middle;
           content: '+' attr(data-remains);
-          background-color: var(--color-light-gray);
-          border: solid 1px var(--color-gray);
+          background-color: var(--color-neutral-background);
+          border: solid 1px var(--color-neutral-border);
           border-radius: 7px;
         }
 
