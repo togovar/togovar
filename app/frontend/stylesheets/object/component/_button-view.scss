@@ -33,31 +33,6 @@
     }
   }
 
-  &.-dropdown {
-    padding-right: 1.4em;
-    line-height: 20px;
-    color: var(--color-button-primary-text);
-    cursor: pointer;
-    background: var(--color-button-dropdown);
-
-    &:hover {
-      background: var(--color-button-dropdown-hover);
-    }
-
-    &::after {
-      position: absolute;
-      top: 50%;
-      right: 0.36rem;
-      width: 0;
-      height: 0;
-      content: '';
-      border-top: 0.32rem solid currentColor;
-      border-right: 0.25rem solid transparent;
-      border-left: 0.25rem solid transparent;
-      transform: translateY(-50%);
-    }
-  }
-
   &.-disabled,
   &:disabled {
     color: var(--color-button-disabled-text);

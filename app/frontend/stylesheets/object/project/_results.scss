@@ -212,6 +212,8 @@
         position: relative;
 
         > .columns-dropdown-button {
+          @include dropdown-view-trigger;
+
           min-width: 60px;
           line-height: 1.6;
 

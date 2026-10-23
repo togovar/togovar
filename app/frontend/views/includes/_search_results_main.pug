@@ -57,7 +57,7 @@ main#SearchResultsView.LayoutMainAside
             button#DownloadTsv.button-view.-disabled(data-filetype="txt") TSV
           li.columns-dropdown
             //- aria-expanded は JS がドロップダウン開閉に合わせて更新する
-            button.columns-dropdown-button.button-view.-dropdown(type='button' aria-expanded='false') Columns
+            button.columns-dropdown-button.button-view(type='button' aria-expanded='false') Columns
             //- hidden / aria-hidden / inert でスクリーンリーダーと Tab フォーカスから除外する
             .columns-dropdown-menu(hidden aria-hidden='true' inert)
               ul.columns-dropdown-list
