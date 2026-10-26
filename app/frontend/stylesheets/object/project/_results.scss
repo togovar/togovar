@@ -159,10 +159,8 @@
         > .button-view {
           border-radius: 0;
 
-          // ボタン間の線と下のシャドウ
-          box-shadow:
-            inset -1px 0 0 rgba(255, 255, 255, 0.22),
-            0 1px 2px rgba(0, 0, 0, 0.22);
+          // 単色でも隣り合うボタンを区別できるよう、区切り線だけを残す。
+          box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.22);
 
           &:first-child {
             border-top-left-radius: 0.9em;
@@ -172,7 +170,7 @@
           &:last-child {
             border-top-right-radius: 0.9em;
             border-bottom-right-radius: 0.9em;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+            box-shadow: none;
           }
         }
       }
@@ -197,8 +195,7 @@
       > li {
         > .button-view {
           &:active {
-            background: var(--color-key-dark1);
-            transform: translateY(0.5px);
+            background: var(--color-button-primary-hover);
           }
 
           body[data-download-available] & {
@@ -215,6 +212,8 @@
         position: relative;
 
         > .columns-dropdown-button {
+          @include dropdown-view-trigger;
+
           min-width: 60px;
           line-height: 1.6;
 
@@ -224,17 +223,8 @@
             border-left-width: 0.2rem;
           }
 
-          &:hover {
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-            transform: none;
-          }
-
           &:active {
-            background: linear-gradient(
-              to bottom,
-              var(--color-key-dark1),
-              var(--color-key-dark3)
-            );
+            background: var(--color-button-dropdown-hover);
           }
         }
 
@@ -680,10 +670,11 @@
             margin-left: 4px;
             font-size: 10px;
             line-height: 14px;
+            color: var(--color-neutral-text);
             vertical-align: middle;
             content: '+' attr(data-remains);
-            background-color: var(--color-light-gray);
-            border: solid 1px var(--color-gray);
+            background-color: var(--color-neutral-background);
+            border: solid 1px var(--color-neutral-border);
             border-radius: 7px;
           }
 
@@ -775,10 +766,11 @@
               text-overflow: clip;
               font-size: 10px;
               line-height: 14px;
+              color: var(--color-neutral-text);
               vertical-align: middle;
               white-space: nowrap;
-              background-color: var(--color-light-gray);
-              border: solid 1px var(--color-gray);
+              background-color: var(--color-neutral-background);
+              border: solid 1px var(--color-neutral-border);
               border-radius: 7px;
 
               // 件数が 0 または空のときは非表示
@@ -846,10 +838,11 @@
             text-overflow: clip;
             font-size: 10px;
             line-height: 14px;
+            color: var(--color-neutral-text);
             vertical-align: middle;
             white-space: nowrap;
-            background-color: var(--color-light-gray);
-            border: solid 1px var(--color-gray);
+            background-color: var(--color-neutral-background);
+            border: solid 1px var(--color-neutral-border);
             border-radius: 7px;
 
             &:empty,
@@ -871,10 +864,11 @@
           margin-left: 4px;
           font-size: 10px;
           line-height: 14px;
+          color: var(--color-neutral-text);
           vertical-align: middle;
           content: '+' attr(data-remains);
-          background-color: var(--color-light-gray);
-          border: solid 1px var(--color-gray);
+          background-color: var(--color-neutral-background);
+          border: solid 1px var(--color-neutral-border);
           border-radius: 7px;
         }
 

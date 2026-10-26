@@ -1,3 +1,31 @@
+// 開閉方法が異なるGRChとColumnsでも、トリガーの配色と矢印を同じ責務で管理する。
+@mixin dropdown-view-trigger {
+  padding-right: 1.4em;
+  line-height: 20px;
+
+  &:not(:disabled, .-disabled) {
+    color: var(--color-button-primary-text);
+    background: var(--color-button-dropdown);
+
+    &:hover {
+      background: var(--color-button-dropdown-hover);
+    }
+  }
+
+  &::after {
+    position: absolute;
+    top: 50%;
+    right: 0.36rem;
+    width: 0;
+    height: 0;
+    content: '';
+    border-top: 0.32rem solid currentColor;
+    border-right: 0.25rem solid transparent;
+    border-left: 0.25rem solid transparent;
+    transform: translateY(-50%);
+  }
+}
+
 @mixin dropdown-view-list-panel {
   padding: 8px 0;
   margin: 0;
@@ -24,6 +52,10 @@
 
 .dropdown-view {
   font-size: 14px;
+
+  > .button {
+    @include dropdown-view-trigger;
+  }
 
   > .selectshow {
     position: relative;

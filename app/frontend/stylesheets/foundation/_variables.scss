@@ -8,6 +8,20 @@
   --color-key-dark2: #0f6272;
   --color-key-dark3: #125263;
 
+  // color: buttons
+  --color-button-primary: #317681;
+  --color-button-primary-hover: #285f68;
+  --color-button-primary-text: #fff;
+  --color-button-dropdown: #264d56;
+  --color-button-dropdown-hover: #1b3c43;
+  --color-button-muted: var(--color-neutral-background);
+  --color-button-muted-hover: #dedede;
+  --color-button-muted-text: var(--color-neutral-text);
+  --color-button-muted-border: var(--color-neutral-border);
+  --color-button-disabled: #f4f4f4;
+  --color-button-disabled-text: #9b9b9b;
+  --color-button-disabled-border: #e3e3e3;
+
   // color: base
   --color-black: #444;
   --color-gray: #94928d;
@@ -17,6 +31,11 @@
   --color-darker-gray: #dbdbdb;
   --color-separator: rgba(0, 0, 0, 0.3);
   --color-separator-sub: rgba(0, 0, 0, 0.2);
+
+  // ボタンと件数バッジの配色を揃えつつ、用途ごとのスタイルは分離する。
+  --color-neutral-background: #ededed;
+  --color-neutral-text: #444444;
+  --color-neutral-border: #b8b8b8;
 
   // color: surface (背景面)
   --color-bg-subtle: #f0f0ef;
