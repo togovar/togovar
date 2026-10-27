@@ -472,6 +472,18 @@
         }
       },
       {
+        "id": "gene-cre",
+        "targetSelector": "#gene-cre",
+        "references": ["GRCh38"],
+        "scriptUrl": "https://togovar.github.io/stanza/gene-cre.js",
+        "options": {
+          "sparqlist": "https://sparql-support.dbcls.jp/sparqlist",
+          "togovar": "$TOGOVAR_FRONTEND_API_URL",
+          "mogplus_version": "mogplus21",
+          "axis": "genome"
+        }
+      },
+      {
         "id": "gene-genomic-context",
         "targetSelector": "#gene-genomic-context",
         "references": ["GRCh37", "GRCh38"],
