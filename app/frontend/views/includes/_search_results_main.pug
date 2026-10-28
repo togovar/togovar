@@ -49,6 +49,8 @@ main#SearchResultsView.LayoutMainAside
         .left
           h2.heading Results
           .status Loading results...
+          //- 検索語・条件が遺伝子/疾患に一致したときだけ、レポートページへのリンクを JS が挿入する
+          nav.report-links(aria-label='Related report pages' hidden)
         ul.right
           li.text Download
           li.download-buttons

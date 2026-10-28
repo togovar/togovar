@@ -8,6 +8,7 @@ import { ResultsViewTouchHandler } from './ResultsViewTouchHandler';
 import { ResultsViewDataManager } from './ResultsViewDataManager';
 import { ResultsColumnAutoSizer } from './ResultsColumnAutoSizer';
 import { ResultsColumnResizeController } from './ResultsColumnResizeController';
+import { ResultsReportLinks } from './ResultsReportLinks';
 import type { SearchMessages, SearchStatus, ColumnConfig } from '../../types';
 import type { StoreState } from '../../types/storeState';
 import { isTouchDevice } from '../../utils/deviceDetection';
@@ -15,6 +16,7 @@ import { isTouchDevice } from '../../utils/deviceDetection';
 /** テーブル関連の DOM セレクタマップ */
 const SELECTORS = {
   STATUS: 'header.header > .left > .status',
+  REPORT_LINKS: 'header.header > .left > .report-links',
   MESSAGES: '#Messages',
   TABLE_CONTAINER: '.tablecontainer',
   TABLE_THEAD: '.tablecontainer > table.results-view > thead',
@@ -39,6 +41,7 @@ export class ResultsView {
   private columnsDropdown!: ResultsColumnsDropdown;
   private columnAutoSizer!: ResultsColumnAutoSizer;
   private columnResizeController!: ResultsColumnResizeController;
+  private reportLinks: ResultsReportLinks | null = null;
   private stylesheet!: HTMLStyleElement;
 
   private boundKeydownHandler!: (_e: KeyboardEvent) => void;
@@ -77,6 +80,11 @@ export class ResultsView {
 
     this.initializeComponentHandlers(status, messages, this.stylesheet);
     this.columnsDropdown = new ResultsColumnsDropdown(columnsDropdown);
+    // テンプレートに枠が無いページでも結果表示を止めないよう、要素がある場合だけ初期化する
+    const reportLinksContainer = this.elm.querySelector<HTMLElement>(SELECTORS.REPORT_LINKS);
+    if (reportLinksContainer) {
+      this.reportLinks = new ResultsReportLinks(reportLinksContainer);
+    }
 
     this.configureInitialState();
     this.initializeSearchModeListener();
@@ -95,6 +103,7 @@ export class ResultsView {
     this.columnsDropdown?.destroy();
     this.columnResizeController?.destroy();
     this.columnAutoSizer?.destroy();
+    this.reportLinks?.destroy();
 
     storeManager.unsubscribe('searchStatus', this.onSearchStatus);
     storeManager.unsubscribe('searchResults', this.onSearchResults);

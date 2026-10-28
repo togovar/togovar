@@ -129,6 +129,40 @@
           font-size: 16px;
         }
       }
+
+      // 検索した遺伝子・疾患のレポートページへのリンク（該当が無いときは hidden）
+      > .report-links {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: 12px;
+        // リンクが多い場合に折り返せるよう、ヘッダーの nowrap を打ち消す
+        white-space: normal;
+
+        &[hidden] {
+          display: none;
+        }
+
+        > .group {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 2px;
+          align-items: baseline;
+
+          > .label {
+            font-weight: bold;
+          }
+
+          > .hyper-text {
+            position: relative;
+            z-index: var(--z-index-base);
+          }
+
+          > .more {
+            color: var(--color-gray);
+          }
+        }
+      }
     }
 
     // ヘッダー右側：操作ボタン・ドロップダウン
@@ -367,6 +401,7 @@
       }
     }
   }
+
 }
 
 // =============================================================================
