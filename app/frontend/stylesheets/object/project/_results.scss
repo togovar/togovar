@@ -158,6 +158,10 @@
             z-index: var(--z-index-base);
           }
 
+          > .hyper-text + .hyper-text {
+            margin-left: var(--spacing-results-report-link);
+          }
+
           > .more {
             color: var(--color-gray);
           }
