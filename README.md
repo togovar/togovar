@@ -57,9 +57,9 @@ app/frontend/
     object/
       component/       汎用 UI パーツ。特定画面に依存せず複数画面で使われるもの
                        例: button-view, panel-view, dropdown-view, range-slider
-      utility/         ヘルパークラス（状態・表示補助）
-    features/          画面・機能固有スタイル。1 つの画面・機能だけが使うもの
+      project/         画面・機能固有スタイル
                        例: _results.scss, _detail.scss, _global-header.scss
+      utility/         ヘルパークラス（状態・表示補助）
     web-components/    Lit 要素が直接 import する Shadow DOM 用 SCSS
                        例: tab-view, prediction-range-slider, frequency-block-view
   views/         Pugテンプレート
@@ -168,6 +168,7 @@ GitHub Pages ワークフロー（`.github/workflows/publish.yml`）も `npm run
 変更後は可能な範囲で以下を実行してください。
 
 ```bash
+npm run typecheck
 npm run lint
 npm run build
 ```
@@ -195,7 +196,15 @@ python3 scripts/check_conditions.py              # GRCh38（デフォルト）
 python3 scripts/check_conditions.py --build GRCh37
 ```
 
-`scripts/GRCh38/openapi.yaml`（TogoVar API の Swagger 仕様）から consequence・type の両 term を自動抽出し、`search_conditions.json` と `advanced_search_conditions.json` の両方と整合性を検証します。API 仕様が変わった場合は `openapi.yaml` を差し替えてからこのスクリプトを実行してください。Python 3 標準ライブラリのみで動作します（追加インストール不要）。
+参照ゲノム別の `scripts/<BUILD>/openapi.yaml`（TogoVar API の Swagger 仕様）を使い、consequence・type・significance・sscv_db・dataset、およびgenotypeのデータセット定義を検証します。GRCh38はデフォルト、GRCh37は `--build GRCh37` で選択します。API仕様が変わった場合は、対象ゲノムの仕様ファイルとJSONを手動で更新してから検証してください。スクリプトはJSONを自動更新せず、Python 3標準ライブラリのみで動作します。
+
+## 検索結果画面
+
+- Columnsメニューで列の表示・非表示と並び順を変更できます。
+- 列境界のドラッグで幅を変更し、ダブルクリックで内容に合わせて調整できます。一部の列は初期幅を維持します。自動調整では、手動変更した列幅を優先します。
+- ダウンロードには検索条件が必要です。検索結果総件数が100,000件を超える場合はボタンを無効にし、理由を表示します。画面に取得できる件数とは別の上限です。
+- 利用者の検索操作で結果が1件になった場合は、バリアント詳細ページへ自動遷移します。遷移先URLを生成できない場合は一覧に留まります。戻る操作や初期表示・履歴復元では再度自動遷移しません。
+- TogoVar IDがないバリアントは、染色体・座標・REF・ALTによるlocus形式のURLで詳細ページを開きます。表示できる情報は、各Stanzaとデータ提供APIの対応状況に依存します。
 
 ## Advanced Search
 
@@ -231,6 +240,8 @@ Advanced Search の条件は URL に保存できます。常に圧縮形式の `
 
 条件が長すぎる場合、またはブラウザが Compression Streams API に対応しておらず `qz` を発行できない場合、検索自体は実行しますが URL には `?mode=advanced` のみを反映し、条件は `history.state`（ブラウザの戻る/進む用の内部状態）へ退避します。共有URL自体には載りませんが、同一ブラウザでの戻る/進む・リロードでは条件を復元できます。
 
+URLに保存できなかった場合は警告を表示します。`history.state`は共有URLの一部ではないため、別のブラウザで開いても退避した条件は復元されません。URLで共有するのは検索条件であり、データ更新や認証状態によって検索結果は変わる場合があります。
+
 ## Simple Search
 
 Simple Search の共有URLは、キーワードを `term` パラメータへそのまま反映し、フィルタ条件だけを圧縮形式の `filter` パラメータへ反映します。
@@ -244,6 +255,8 @@ Simple Search の共有URLは、キーワードを `term` パラメータへそ�
 従来のフラットなURLクエリ（例: `dataset[jga_wgs]=0`）は、互換性維持のため読み込み時には引き続き復元できます。
 
 フィルタ条件が長すぎる場合、またはブラウザが Compression Streams API に対応しておらず `filter` を発行できない場合、検索自体は実行しますが URL には `?mode=simple` と `term` のみを反映し、Advanced Searchと同様に条件全体は `history.state` へ退避します。`term` 自体が長すぎる場合は `term` はURLには反映されません（`filter` は生成できれば反映されます）。`term` と `filter` のどちらもURLに載せられない場合は `?mode=simple` のみになります。
+
+チェックボックス形式のフィルターは、すべて未選択の場合に「絞り込みなし」として扱います。各フィルターパネルはタイトルから折りたためます。これはサイドバー全体の幅を縮小する機能とは異なります。
 
 主な関連ファイル:
 
@@ -289,12 +302,12 @@ Simple Search の `search_conditions.json` だけを変更する場合は、通�
 
 | type | UI | 該当条件 |
 | ------------- | ------------------------------------------- | ------------------------------------- |
-| `"peculiar"`  | 専用の特殊UI（ツリー選択・座標入力・スライダー）| dataset, genotype, location, variant_effect_prediction |
+| `"peculiar"`  | 専用の特殊UI（ツリー選択・座標入力・スライダー）| dataset, genotype, location, deleteriousness_prediction |
 | `"enumeration"` | チェックボックスのリスト | significance, sscv_db, type |
 | `"tree"` | 文字列IDで参照する階層ツリー | consequence |
 | `"text"` | テキスト入力 | disease, gene, id |
 
-`"genotype"` 条件には、ジェノタイプカウント検索（Alt/Alt・Ref/Alt・Ref/Ref の件数絞り込み）をサポートするデータセットのみを列挙します。gnomAD や GEM-J WGA など対応していないデータセットは含まれないため、`"dataset"` 条件のサブセットになります。
+`"genotype"` 条件には、ジェノタイプカウント検索をサポートするデータセットのみを列挙し、`"dataset"` 条件のサブセットとします。現在の入力UIはAlt/Alt（`aac`）・Alt/Ref（`arc`）・Hemi_Alt（`hac`）に対応しています。APIやクエリ型の対応項目と、UIで入力できる項目は区別してください。
 
 `"dataset"` と `"genotype"` の `values` はツリー構造（`children` を持つ入れ子）で、**ラベルとツリー構造は手動管理**です。`openapi.yaml` が持つのは値キー（`value` フィールド）のみです。整合性の確認には `python3 scripts/check_conditions.py` を使います。
 
@@ -327,6 +340,18 @@ app/frontend/views/doc/ja/
 
 Webpack設定で、`TOGOVAR_REFERENCE` に応じたページ一覧を `dist/doc/...` へ生成します。
 英語ページは `/doc/{name}/`、日本語ページは `/doc/ja/{name}/` に出力されます。
+
+## レポートページと外部Stanza
+
+Stanzaの定義は `app/frontend/assets/stanza.json` にあります。`scriptUrl`がある場合はそのURLを使い、省略時は `TOGOVAR_FRONTEND_STANZA_URL`、未設定なら `https://togovar.github.io/stanza` から読み込みます。`references`で対象外になっている参照ゲノムではセクションを非表示にしますが、scriptの読み込み失敗だけではセクションを隠しません。
+
+CREはGRCh38のみが対象で、scriptとSPARQListの配信先を個別に指定しています。共通の環境変数を変更しても、明示された配信先は切り替わりません。
+
+レポートのpagination-tableは外部Stanzaです。表示・検索・ソート用JSONの拡張には、Stanza本体とデータ提供APIの対応確認が必要で、このリポジトリの設定変更だけでは完結しません。
+
+## Issue管理
+
+未実装項目・仕様確認・受入確認はGitHub Issuesで管理し、READMEやAGENTSには進捗表を持たせません。登録前の整理用として [Issue案](docs/issue-drafts.md) を用意しています。コード上の実装、対象ブランチへの取り込み、実画面での確認、本番反映は別々に記録してください。
 
 ## Docker
 

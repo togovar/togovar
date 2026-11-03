@@ -8,6 +8,7 @@
 - `README.md`: アプリ概要、開発手順、環境変数、起動手順、デプロイ手順、画面説明、トラブルシューティングを書く。
 - 技術スタック、ディレクトリ構成、URL仕様、検索条件データ構造、API方針を変えた場合は、`AGENTS.md` と `README.md` の更新要否を確認する。
 - 小さなUI調整や一時的な実験だけなら、ドキュメント更新は必須ではない。
+- 未実装項目・進捗・受入確認はGitHub Issuesで管理する。未確定仕様や別ブランチだけの実装を、現在の実装済みルールとして記載しない。
 
 ## 作業ルール
 
@@ -135,6 +136,14 @@ app/frontend/
 - `setAdvancedSearchCondition()` は検索条件をStoreへ保存し、URLへ反映し、検索を実行する。呼び出しタイミングを増やす場合は二重検索に注意する。
 - 条件UIを変更した場合は、検索クエリ、URL共有、URL復元の3点が同じ構造を扱えるか確認する。
 
+## 検索結果UI 方針
+
+- ダウンロード可否の件数判定は `components/DownloadButton.ts` の検索結果総件数（`searchStatus.filtered`）を使う。画面に取得できる件数とは区別し、100,000件ちょうどは上限超過にしない。
+- 検索結果上部へGene/Diseaseレポートリンクを実装する場合は、結果に含まれる全遺伝子・全疾患の一覧ではなく、検索語・検索条件に対応する導線とする。Advanced Searchの除外条件（`ne`）はリンク対象にしない。
+- 1件検索時の自動遷移は `api/searchResponse.ts` で同じ検索世代のdata/stat両方を確認して行う。戻る操作で再度詳細へ飛ばないよう、履歴復元・初期表示由来の検索では自動遷移しない。TogoVar IDなしの遷移先も `utils/variantPath.ts` の共通処理で生成する。
+- 列の表示・順序・幅は既存の列設定と `components/Results/ResultsColumnAutoSizer.ts` などの専用クラスを使う。自動幅調整で利用者が手動指定した幅を上書きしない。
+- レポートのpagination-tableは `assets/stanza.json` で外部Stanzaを読み込む構成であり、検索結果一覧の仮想スクロールテーブルとは別物。JSON形式の拡張では、Stanza本体とデータ提供APIの変更対象リポジトリを確認し、このリポジトリの設定変更だけで対応済みと判断しない。
+
 ## Store / API 方針
 
 - アプリ状態は `app/frontend/src/store/StoreManager.ts` を正として扱う。
@@ -200,7 +209,7 @@ SCSSは `app/frontend/stylesheets/` の FLOCSS レイヤー構成に合わせる
 | `foundation/`       | デザイントークン（CSS カスタムプロパティ）、ミックスイン、HTMLタグのデフォルトスタイル、リセット | 特定コンポーネントや画面のスタイル |
 | `layout/`           | ページ骨格（`#Layout`・`aside`・`main` の幅・高さ・配置）                                        | 個々のUIパーツの見た目             |
 | `object/component/` | 複数の画面で再利用される汎用UIパーツ                                                             | 1つの画面・機能だけで使うスタイル  |
-| `features/`         | 特定の画面や機能に紐づくスタイル                                                                 | 別の画面でも使える汎用パーツ       |
+| `object/project/`   | 特定の画面や機能に紐づくスタイル                                                                 | 別の画面でも使える汎用パーツ       |
 | `web-components/`   | Lit要素が JS から直接 `import` するSCSSファイル（Shadow DOM 内に適用）                           | ライトDOM側のスタイル              |
 
 **どのディレクトリに入れるかの判断フロー:**
@@ -208,16 +217,16 @@ SCSSは `app/frontend/stylesheets/` の FLOCSS レイヤー構成に合わせる
 1. Lit要素の Shadow DOM 内か？ → `web-components/`
 2. ページ全体の骨格（幅・高さ・グリッド配置）か？ → `layout/`
 3. 複数の画面で使われる（または使われうる）UIパーツか？ → `object/component/`
-4. 特定の画面・機能専用か？ → `features/`
+4. 特定の画面・機能専用か？ → `object/project/`
 5. 色・サイズ・z-index などのデザイン値か？ → `foundation/_variables.scss` に CSS カスタムプロパティとして追加
 
 **各ディレクトリの実例:**
 
 - `object/component/` — `_button-view.scss`, `_panel-view.scss`, `_dropdown-view.scss`, `_range-slider.scss`, `_form-parts.scss`
-- `features/` — `_results.scss`（検索結果画面）, `_detail.scss`（詳細画面）, `_global-header.scss`（ヘッダー）
+- `object/project/` — `_results.scss`（検索結果画面）, `_detail.scss`（詳細画面）, `_global-header.scss`（ヘッダー）
 - `web-components/` — `tab-view.scss`, `prediction-range-slider.scss`, `frequency-block-view.scss`
 
-- セレクターを追加する前に、既存の `object/component/` や `features/` に同じ責務のスタイルがないか確認する。
+- セレクターを追加する前に、既存の `object/component/` や `object/project/` に同じ責務のスタイルがないか確認する。
 - `app/frontend/stylesheets/foundation/_reset.scss` は**変更禁止**。Josh W. Comeau's CSS Reset の定義をそのまま維持する。
 
 ### 書き方のルール
@@ -240,7 +249,7 @@ SCSSは `app/frontend/stylesheets/` の FLOCSS レイヤー構成に合わせる
   - `-webkit-appearance` — `input[type="range"]` など Safari が標準プロパティに非対応な箇所のみ残す。
   - `-webkit-mask-*` / `-webkit-font-smoothing` — まだ有効。残す。
 - UI状態は、可能なら既存の `data-*` 属性や状態クラスを利用する。
-- 折りたたみ UI は **ネイティブ `<details>/<summary>`** で実装する。JS による開閉クラス付与（旧 `CollapseView.ts`）は削除済み。CSS アニメーションは `details[open] > summary::before { transform: rotate(90deg) }` のパターンで対応する。
+- 新規の折りたたみUIは原則としてネイティブ `<details>/<summary>` を使う。既存のFilterパネルは `components/PanelView/PanelView.ts` のクラス切替と状態保存を使っているため、旧 `CollapseView.ts` の削除とは区別し、文書との整合だけを理由に一括移行しない。
 - `tr` に `border` を使うテーブルは、そのテーブルに `border-collapse: collapse` を明示する。
 - 大きなセレクタブロック内のサブセクションは `// ──────────────────────────────────────────────────` の区切り線と日本語の見出しコメントでグループ分けする。
 - コンポーネント専用のスタイルは、グローバルなルールとして外に出さず、そのセレクタブロック内に直接書く。低詳細度セレクタは高詳細度セレクタより先に定義する（stylelint の `no-descending-specificity` で強制済み）。
@@ -259,7 +268,7 @@ SCSSは `app/frontend/stylesheets/` の FLOCSS レイヤー構成に合わせる
 
 - **`@import` は廃止済み。** 全ファイルで `@use` / `@forward` へ移行済み。新規ファイルでも `@import` は使わない。
 - `foundation/_mixins.scss` のミックスイン（`sprite`・`input-number`）を使うファイルだけが `@use '../foundation' as *` を宣言する。CSS カスタムプロパティのみ使うファイルは `@use` 不要。
-  - ミックスインを使う場合: `features/` → `@use '../foundation' as *` / `object/component/` → `@use '../../foundation' as *`
+  - ミックスインを使う場合: `object/project/` と `object/component/` → `@use '../../foundation' as *`
   - ミックスインを使わない場合: `@use` 宣言なし（`var(--)` は `@use` なしで使える）
 - CSS 出力を持つファイル（`foundation/base`・`reset`・`font-awesome`）は `main.scss` のみが `@use` する。パーシャル側は `@use` しない。
 - ミックスインは `foundation/_mixins.scss` に定義する（`sprite`・`input-number` など）。
@@ -301,14 +310,15 @@ npm run typecheck
 
 - このリポジトリには `npm run check` は定義されていない。
 - 環境によって `node` / `npm` がPATHに無い場合がある。その場合は実行できなかったことを報告する。
-- Rails/バックエンド側を触った場合は、READMEのBackend手順と既存のRubyコマンドを確認する。
+- 外部のバックエンドやStanza本体の変更が必要な場合は、対象リポジトリと担当者を確認し、そちらの手順で検証する。このREADMEにバックエンドのセットアップ手順があるとは仮定しない。
 
 ### 検索条件データを変更した場合の追加確認
 
-`search_conditions.json`・`advanced_search_conditions.json` の consequence または type 定義を変更した場合、または `scripts/GRCh38/openapi.yaml` を更新した場合は、以下も実行する。
+`search_conditions.json`・`advanced_search_conditions.json` の検証対象定義（consequence・type・significance・sscv_db・dataset・genotype）や、参照ゲノム別の `scripts/<BUILD>/openapi.yaml` を変更した場合は、対象ゲノムについて以下も実行する。
 
 ```bash
 python3 scripts/check_conditions.py
+python3 scripts/check_conditions.py --build GRCh37
 ```
 
 `openapi.yaml`（TogoVar API の Swagger 仕様）を正として、consequence / type の SO ID・ラベル・consequence_grouping・ツリーの親子関係をまとめて検証する。Python 3 のみで動作する（追加インストール不要）。エラーが出た場合は両 JSON を修正してから再確認する。
@@ -326,6 +336,6 @@ python3 scripts/check_conditions.py
 | `"tree"`        | 文字列IDで参照する階層ツリー                     | consequence                                            |
 | `"text"`        | テキスト入力                                     | disease, gene, id                                      |
 
-`"genotype"` 条件には、ジェノタイプカウント検索（aac/arc/rrc = Alt/Alt・Ref/Alt・Ref/Ref）をサポートするデータセットのみ列挙する。すべてのデータセットが対応しているわけではないため、`"dataset"` のサブセットになる。チェックスクリプトは genotype に対して「仕様外の値が含まれていないか」のみ検証し、「dataset にあるのに genotype にない」はエラーとしない（意図的な省略のため）。
+`"genotype"` 条件には、ジェノタイプカウント検索をサポートするデータセットのみ列挙する。現在の入力UIのキーは `aac`（Alt/Alt）・`arc`（Alt/Ref）・`hac`（Hemi_Alt）で、API・クエリ型のキー全体とは区別する。すべてのデータセットが対応しているわけではないため、`"dataset"` のサブセットになる。チェックスクリプトは genotype に対して「仕様外の値が含まれていないか」のみ検証し、「dataset にあるのに genotype にない」はエラーとしない（意図的な省略のため）。
 
 `"dataset"` と `"genotype"` の `values` は階層ツリー構造（`children` を持つ入れ子）で、**ラベルとツリー構造は手動管理**。`openapi.yaml` から取得できるのは値キー（`value` フィールド）のみ。
