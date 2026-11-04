@@ -1,5 +1,6 @@
 import { ADVANCED_CONDITION_TYPE } from '../../advancedCondition';
 import { fetchDiseaseNode } from '../../api/diseaseInspect';
+import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
 import { makeValue, type QueryObject, type RestoredItem } from './AdvancedSearchRestorerUtils';
 
 /**
@@ -34,7 +35,7 @@ async function _findDiseaseLabel(id: string): Promise<string | null> {
   try {
     const { label } = await fetchDiseaseNode(id);
     if (!label) return null;
-    return label.charAt(0).toUpperCase() + label.slice(1);
+    return capitalizeFirstLetter(label);
   } catch (_error) {
     return null;
   }

@@ -1,6 +1,7 @@
 import type { GeneSymbol, ResultData } from '../../types';
 import type { ConditionQuery } from '../../types/query';
 import type { DiseaseNodeSummary } from '../../api/diseaseInspect';
+import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
 
 /** 検索結果ヘッダーに並べる Gene/Disease レポートへのリンク1件分。 */
 export type ReportLink = {
@@ -198,7 +199,10 @@ export async function resolveAdvancedSearchReportLinks(
         if (!node.cui) return null;
         return {
           kind: 'disease',
-          label: node.label ?? medgenNames.get(node.cui) ?? term,
+          // 条件チップと同じ表記にするため、API の疾患名は先頭を大文字に揃える
+          label: node.label
+            ? capitalizeFirstLetter(node.label)
+            : (medgenNames.get(node.cui) ?? term),
           href: `/disease/${encodeURIComponent(node.cui)}`,
         };
       } catch {
