@@ -99,7 +99,7 @@ export class ResultsReportLinks {
         );
         const remains = items.length - MAX_LINKS_PER_KIND;
         const more =
-          remains > 0 ? [createEl('span', { class: 'more', text: `+${remains} more` })] : [];
+          remains > 0 ? [createEl('span', { class: 'remains-badge', text: `+${remains}` })] : [];
 
         return createEl('div', {
           class: 'group',

@@ -162,9 +162,6 @@
             margin-left: var(--spacing-results-report-link);
           }
 
-          > .more {
-            color: var(--color-gray);
-          }
         }
       }
     }
@@ -867,29 +864,6 @@
             white-space: nowrap;
           }
 
-          // 追加件数バッジ
-          > .remains-content > .remains-badge {
-            display: inline-block;
-            flex: 0 0 auto;
-            padding: 0 4px;
-            margin-left: 4px;
-            overflow: visible;
-            text-overflow: clip;
-            font-size: 10px;
-            line-height: 14px;
-            vertical-align: middle;
-            color: var(--color-neutral-text);
-            white-space: nowrap;
-            background-color: var(--color-neutral-background);
-            border: solid 1px var(--color-neutral-border);
-            border-radius: 7px;
-
-            &:empty,
-            &[data-remains='0'],
-            &[data-remains=''] {
-              display: none;
-            }
-          }
         }
 
         // -------------------------------------------------------------------------
