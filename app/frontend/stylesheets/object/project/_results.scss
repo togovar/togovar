@@ -146,7 +146,7 @@
         > .group {
           display: flex;
           flex-wrap: wrap;
-          gap: 2px;
+          gap: var(--spacing-results-report-link);
           align-items: baseline;
 
           > .label {
@@ -158,10 +158,10 @@
             z-index: var(--z-index-base);
           }
 
-          > .hyper-text + .hyper-text {
-            margin-left: var(--spacing-results-report-link);
+          // 間隔は gap で揃えるため、バッジ自身の左マージンは打ち消す
+          > .remains-badge {
+            margin-left: 0;
           }
-
         }
       }
     }
@@ -402,7 +402,6 @@
       }
     }
   }
-
 }
 
 // =============================================================================
@@ -863,7 +862,6 @@
             text-overflow: ellipsis;
             white-space: nowrap;
           }
-
         }
 
         // -------------------------------------------------------------------------
