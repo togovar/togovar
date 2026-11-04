@@ -1,6 +1,7 @@
 import { storeManager } from '../../store/StoreManager';
 import { fetchDiseaseNode } from '../../api/diseaseInspect';
 import { createEl } from '../../utils/dom/createEl';
+import type { StoreState } from '../../types/storeState';
 import {
   collectSimpleSearchReportLinks,
   resolveAdvancedSearchReportLinks,
@@ -24,6 +25,10 @@ export class ResultsReportLinks {
   private frameId: number | null = null;
   // Advanced Search の疾患変換は非同期のため、古い検索の結果で上書きしないよう世代を数える
   private generation = 0;
+  // スクロールでページが追加されるたびにリンクが入れ替わらないよう、Simple Search では検索ごとに結果を固定する
+  private simpleSearchSnapshot: { key: string; links: ReportLink[] } | null = null;
+  // 内容が同じなら DOM を作り直さず、リンクに当たっているキーボードフォーカスを維持する
+  private renderedKey: string | null = null;
 
   // unsubscribe で同一参照が必要なため、束縛済みコールバックをフィールドに保持する
   private readonly onStoreChange = () => this.scheduleUpdate();
@@ -71,18 +76,40 @@ export class ResultsReportLinks {
         fetchDiseaseNode
       );
     } else {
-      links = collectSimpleSearchReportLinks(
-        storeManager.getData('simpleSearchConditions')?.term,
-        results
-      );
+      links = this.getSimpleSearchLinks(results);
     }
 
     if (generation !== this.generation) return;
     this.render(links);
   }
 
+  /**
+   * Simple Search の結果APIは一致した遺伝子・疾患を返さないため、最初に届いた結果から推定し、
+   * 同じ検索の間はその結果を使い続ける。後続ページにしか無い遺伝子・疾患は対象外になる（ベストエフォート）。
+   * 新規検索では resultsResetVersion が進み結果が空に戻るため、それを検索の区切りとして扱う。
+   */
+  private getSimpleSearchLinks(results: StoreState['searchResults']): ReportLink[] {
+    const loaded = results.some((result) => result !== null);
+    if (!loaded) {
+      this.simpleSearchSnapshot = null;
+      return [];
+    }
+
+    const term = storeManager.getData('simpleSearchConditions')?.term;
+    const key = `${storeManager.getData('resultsResetVersion')}\n${term ?? ''}`;
+    if (this.simpleSearchSnapshot?.key === key) return this.simpleSearchSnapshot.links;
+
+    const links = collectSimpleSearchReportLinks(term, results);
+    this.simpleSearchSnapshot = { key, links };
+    return links;
+  }
+
   /** 遺伝子と疾患を種類ごとの行に分けて並べ、該当が無ければ領域ごと隠す。 */
   private render(links: ReportLink[]): void {
+    const key = JSON.stringify(links.map(({ kind, label, href }) => [kind, label, href]));
+    if (key === this.renderedKey) return;
+    this.renderedKey = key;
+
     const groups = (['gene', 'disease'] as const)
       .map((kind) => ({ kind, items: links.filter((link) => link.kind === kind) }))
       .filter(({ items }) => items.length > 0)
@@ -98,8 +125,19 @@ export class ResultsReportLinks {
           })
         );
         const remains = items.length - MAX_LINKS_PER_KIND;
+        // 省略分は展開しないため、"+N" だけでは伝わらない意味を title / aria-label で補う
+        const moreLabel = `${remains} more ${kind} ${remains === 1 ? 'report' : 'reports'}`;
         const more =
-          remains > 0 ? [createEl('span', { class: 'remains-badge', text: `+${remains}` })] : [];
+          remains > 0
+            ? [
+                createEl('span', {
+                  class: 'remains-badge',
+                  // span の aria-label は読まれない環境があるため、role="img" を付けて名前として扱わせる
+                  attrs: { role: 'img', title: moreLabel, 'aria-label': moreLabel },
+                  text: `+${remains}`,
+                }),
+              ]
+            : [];
 
         return createEl('div', {
           class: 'group',
