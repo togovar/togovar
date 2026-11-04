@@ -9,6 +9,7 @@ import {
   restoreFrequencyItem,
 } from './AdvancedSearchFrequencyRestorer';
 import { restoreGeneItem } from './AdvancedSearchGeneRestorer';
+import { restoreDiseaseItem } from './AdvancedSearchDiseaseRestorer';
 import {
   restoreSignificanceItem,
   restorePredictionItem,
@@ -129,6 +130,10 @@ async function toRestoredItem(
     return restoreGeneItem(query.gene);
   }
 
+  if (isQueryObject(query.disease)) {
+    return restoreDiseaseItem(query.disease);
+  }
+
   if (Array.isArray(query.id)) {
     return {
       conditionType: ADVANCED_CONDITION_TYPE.variant_id,
@@ -139,7 +144,6 @@ async function toRestoredItem(
   for (const conditionType of [
     ADVANCED_CONDITION_TYPE.variant_type,
     ADVANCED_CONDITION_TYPE.variant_consequence,
-    ADVANCED_CONDITION_TYPE.disease,
     ADVANCED_CONDITION_TYPE.sscv_db,
   ] as const) {
     const leaf = query[conditionType];
