@@ -66,6 +66,8 @@ function buildMedgenNameMap(results: ResultData[]): Map<string, string> {
       for (const condition of significance.conditions ?? []) {
         if (
           condition.medgen &&
+          // 文字列 "undefined" が入っていても /disease/undefined へのリンクを作らないよう除外する
+          condition.medgen !== 'undefined' &&
           condition.name &&
           !PLACEHOLDER_CONDITION_NAMES.has(condition.name.toLowerCase()) &&
           !names.has(condition.medgen)
