@@ -10,6 +10,7 @@ import { Column } from './ConditionDiseaseSearchColumn';
 import type { OntologyNode } from './ConditionDiseaseSearchOntologyCard';
 
 import { cachedAxios } from '../../../utils/cachedAxios';
+import { capitalizeFirstLetter } from '../../../utils/capitalizeFirstLetter';
 import { API_URL } from '../../../global';
 
 /**
@@ -305,8 +306,7 @@ export class ConditionDiseaseOntologyView extends LitElement {
    */
   private notifyLoadingEnded(): void {
     if (this.currentNode.id) {
-      const raw = this.currentNode.label ?? '';
-      const label = raw.charAt(0).toUpperCase() + raw.slice(1);
+      const label = capitalizeFirstLetter(this.currentNode.label ?? '');
       this.dispatchEvent(
         new CustomEvent('disease-selected', {
           detail: { id: this.currentNode.id, label },

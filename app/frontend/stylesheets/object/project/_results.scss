@@ -126,7 +126,42 @@
         font-size: 12px;
 
         > .highlight {
-          font-size: 16px;
+          font-weight: bold;
+        }
+      }
+
+      // 検索した遺伝子・疾患のレポートページへのリンク（該当が無いときは hidden）
+      > .report-links {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: 12px;
+        // リンクが多い場合に折り返せるよう、ヘッダーの nowrap を打ち消す
+        white-space: normal;
+
+        &[hidden] {
+          display: none;
+        }
+
+        > .group {
+          display: flex;
+          flex-wrap: wrap;
+          gap: var(--spacing-results-report-link);
+          align-items: baseline;
+
+          > .label {
+            font-weight: bold;
+          }
+
+          > .hyper-text {
+            position: relative;
+            z-index: var(--z-index-base);
+          }
+
+          // 間隔は gap で揃えるため、バッジ自身の左マージンは打ち消す
+          > .remains-badge {
+            margin-left: 0;
+          }
         }
       }
     }
@@ -670,8 +705,8 @@
             margin-left: 4px;
             font-size: 10px;
             line-height: 14px;
-            color: var(--color-neutral-text);
             vertical-align: middle;
+            color: var(--color-neutral-text);
             content: '+' attr(data-remains);
             background-color: var(--color-neutral-background);
             border: solid 1px var(--color-neutral-border);
@@ -766,8 +801,8 @@
               text-overflow: clip;
               font-size: 10px;
               line-height: 14px;
-              color: var(--color-neutral-text);
               vertical-align: middle;
+              color: var(--color-neutral-text);
               white-space: nowrap;
               background-color: var(--color-neutral-background);
               border: solid 1px var(--color-neutral-border);
@@ -827,30 +862,6 @@
             text-overflow: ellipsis;
             white-space: nowrap;
           }
-
-          // 追加件数バッジ
-          > .remains-content > .remains-badge {
-            display: inline-block;
-            flex: 0 0 auto;
-            padding: 0 4px;
-            margin-left: 4px;
-            overflow: visible;
-            text-overflow: clip;
-            font-size: 10px;
-            line-height: 14px;
-            color: var(--color-neutral-text);
-            vertical-align: middle;
-            white-space: nowrap;
-            background-color: var(--color-neutral-background);
-            border: solid 1px var(--color-neutral-border);
-            border-radius: 7px;
-
-            &:empty,
-            &[data-remains='0'],
-            &[data-remains=''] {
-              display: none;
-            }
-          }
         }
 
         // -------------------------------------------------------------------------
@@ -864,8 +875,8 @@
           margin-left: 4px;
           font-size: 10px;
           line-height: 14px;
-          color: var(--color-neutral-text);
           vertical-align: middle;
+          color: var(--color-neutral-text);
           content: '+' attr(data-remains);
           background-color: var(--color-neutral-background);
           border: solid 1px var(--color-neutral-border);

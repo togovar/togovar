@@ -24,6 +24,9 @@ export class ConditionItemHydrator {
     this.valuesContainerEl.replaceChildren();
     for (const value of values) {
       const valueView = this._createValueView(value);
+      // 値の追加より前に await を挟まないこと。Disease エディタは検索UIの初期選択イベント時点で
+      // 復元値が DOM にある前提で上書きを防いでおり（ConditionValueEditorDisease
+      // の _syncInitialSelectionWithRestoredValue）、await を挟むとルート疾患で上書きされ得る。
       this._appendValueView(valueView, value);
       await this._hydrateFrequency(valueView, value);
       await this._hydratePrediction(valueView, value);

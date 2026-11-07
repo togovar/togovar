@@ -19,6 +19,8 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
   private _data: DiseaseData = { id: null, label: null };
   private _lastValues: DiseaseData = { id: null, label: null };
   private _conditionElem!: ConditionDiseaseSearch;
+  // 検索UIは初期表示でルート疾患を自動選択するため、最初の選択イベントだけ URL 復元値との突き合わせに使う
+  private _hasHandledInitialSelection = false;
 
   /**
    * DOM生成・検索UIの配置・イベント登録をまとめる。
@@ -63,11 +65,31 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
     const customEvent = e as CustomEvent<DiseaseSelectionEventDetail>;
     const { id, label } = customEvent.detail;
 
+    if (this._syncInitialSelectionWithRestoredValue(id)) return;
+
     if (id) {
       this._selectDisease({ id, label });
     } else {
       this._clearSelection();
     }
+  }
+
+  /**
+   * URL 復元では、検索UIが初期表示のルート疾患（MONDO_0000001）を読み込み終える前に値が注入される。
+   * その後に届く初期選択イベントをそのまま反映すると復元値がルート疾患で上書きされ、
+   * 再検索や URL 更新で条件まで書き換わってしまうため、検索UIの表示を復元値へ合わせ直す。
+   * 合わせ直した後の選択イベントで、MONDO ID のままだった表示名も正式名に置き換わる。
+   * @returns 初期選択イベントを破棄した場合は true
+   */
+  private _syncInitialSelectionWithRestoredValue(selectedId: string): boolean {
+    if (this._hasHandledInitialSelection) return false;
+    this._hasHandledInitialSelection = true;
+
+    const restoredId = this.conditionItemValueViews[0]?.value;
+    if (!restoredId || restoredId === selectedId) return false;
+
+    this._conditionElem.diseaseId = restoredId;
+    return true;
   }
 
   // ───────────────────────────────────────────────────────────────────────────
