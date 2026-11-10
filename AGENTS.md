@@ -267,8 +267,8 @@ SCSSは `app/frontend/stylesheets/` の FLOCSS レイヤー構成に合わせる
 ### Sass の書き方
 
 - **`@import` は廃止済み。** 全ファイルで `@use` / `@forward` へ移行済み。新規ファイルでも `@import` は使わない。
-- `foundation/_mixins.scss` のミックスイン（`sprite`・`input-number`）を使うファイルだけが `@use '../foundation' as *` を宣言する。CSS カスタムプロパティのみ使うファイルは `@use` 不要。
-  - ミックスインを使う場合: `object/project/` と `object/component/` → `@use '../../foundation' as *`
+- `foundation/_mixins.scss` のミックスイン（`sprite`・`input-number`）を使うファイルだけが `foundation` を `@use ... as *` で読み込む。CSS カスタムプロパティのみ使うファイルは `@use` 不要。
+  - ミックスインを使う場合: `object/project/` と `object/component/` → `@use '../../foundation' as *`、`web-components/` と `layout/` → `@use '../foundation' as *`
   - ミックスインを使わない場合: `@use` 宣言なし（`var(--)` は `@use` なしで使える）
 - CSS 出力を持つファイル（`foundation/base`・`reset`・`font-awesome`）は `main.scss` のみが `@use` する。パーシャル側は `@use` しない。
 - ミックスインは `foundation/_mixins.scss` に定義する（`sprite`・`input-number` など）。
@@ -321,7 +321,7 @@ python3 scripts/check_conditions.py
 python3 scripts/check_conditions.py --build GRCh37
 ```
 
-`openapi.yaml`（TogoVar API の Swagger 仕様）を正として、consequence / type の SO ID・ラベル・consequence_grouping・ツリーの親子関係をまとめて検証する。Python 3 のみで動作する（追加インストール不要）。エラーが出た場合は両 JSON を修正してから再確認する。
+`openapi.yaml`（TogoVar API の Swagger 仕様）を正として、consequence / type の SO ID・ラベル・consequence_grouping・ツリーの親子関係に加え、significance・sscv_db・dataset・genotype の値キーをまとめて検証する。Python 3 のみで動作する（追加インストール不要）。エラーが出た場合は両 JSON を修正してから再確認する。
 
 このスクリプトは**検証のみ**を行い、JSON ファイルを自動更新しない。新しいデータセットや値が仕様に追加された場合は、先に JSON を手動で編集してからスクリプトで確認する。
 
@@ -332,7 +332,7 @@ python3 scripts/check_conditions.py --build GRCh37
 | type            | UI                                               | 該当条件                                               |
 | --------------- | ------------------------------------------------ | ------------------------------------------------------ |
 | `"peculiar"`    | 専用の特殊UI（ツリー選択・座標入力・スライダー） | dataset, genotype, location, deleteriousness_prediction |
-| `"enumeration"` | チェックボックスのリスト                         | significance, sscv_db, type                            |
+| `"enumeration"` | チェックボックスのリスト                         | significance, sscv_db（GRCh38のみ）, type              |
 | `"tree"`        | 文字列IDで参照する階層ツリー                     | consequence                                            |
 | `"text"`        | テキスト入力                                     | disease, gene, id                                      |
 

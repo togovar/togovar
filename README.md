@@ -189,7 +189,7 @@ npm run typecheck
 
 ### API 仕様との整合性チェック
 
-`search_conditions.json`・`advanced_search_conditions.json` の consequence または type 定義を変更した場合、または TogoVar API の仕様が更新された場合は、以下を実行してください。
+`search_conditions.json`・`advanced_search_conditions.json` の検証対象定義（consequence・type・significance・sscv_db・dataset・genotype）を変更した場合、または TogoVar API の仕様（参照ゲノム別の `openapi.yaml`）が更新された場合は、以下を実行してください。
 
 ```bash
 python3 scripts/check_conditions.py              # GRCh38（デフォルト）
@@ -304,7 +304,7 @@ Simple Search の `search_conditions.json` だけを変更する場合は、通�
 | type | UI | 該当条件 |
 | ------------- | ------------------------------------------- | ------------------------------------- |
 | `"peculiar"`  | 専用の特殊UI（ツリー選択・座標入力・スライダー）| dataset, genotype, location, deleteriousness_prediction |
-| `"enumeration"` | チェックボックスのリスト | significance, sscv_db, type |
+| `"enumeration"` | チェックボックスのリスト | significance, sscv_db（GRCh38のみ）, type |
 | `"tree"` | 文字列IDで参照する階層ツリー | consequence |
 | `"text"` | テキスト入力 | disease, gene, id |
 
