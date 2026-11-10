@@ -153,14 +153,11 @@
             font-weight: bold;
           }
 
+          // 遺伝子名・疾患名は検索結果表（.results-view）と同じ大きさにして読みやすくする
           > .hyper-text {
             position: relative;
             z-index: var(--z-index-base);
-          }
-
-          // 間隔は gap で揃えるため、バッジ自身の左マージンは打ち消す
-          > .remains-badge {
-            margin-left: 0;
+            font-size: 14px;
           }
         }
       }
@@ -1148,7 +1145,7 @@ body[data-column-resizing='true'] {
   &[href]:not([href='']) {
     &::after {
       display: inline-block;
-      margin-left: 0.25em;
+      margin-left: 0.3em;
       font-family: 'Font Awesome 7 Free', sans-serif;
       font-weight: 900;
       color: var(--color-gray-light);
