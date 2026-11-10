@@ -85,9 +85,13 @@ export class ConditionValueEditorDisease extends ConditionValueEditor {
     if (this._hasHandledInitialSelection) return false;
     this._hasHandledInitialSelection = true;
 
-    const restoredId = this.conditionItemValueViews[0]?.value;
+    const restoredView = this.conditionItemValueViews[0];
+    const restoredId = restoredView?.value;
     if (!restoredId || restoredId === selectedId) return false;
 
+    // 復元IDの取得に失敗すると選択イベントが届かないため、先に復元値で状態を確定させ、
+    // 編集→Cancel で元の条件に戻せるようにする。取得に成功すれば次の選択イベントで上書きされる。
+    this._data = { id: restoredId, label: restoredView?.label || restoredId };
     this._conditionElem.diseaseId = restoredId;
     return true;
   }
