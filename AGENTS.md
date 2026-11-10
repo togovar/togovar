@@ -139,7 +139,7 @@ app/frontend/
 ## 検索結果UI 方針
 
 - ダウンロード可否の件数判定は `components/DownloadButton.ts` の検索結果総件数（`searchStatus.filtered`）を使う。画面に取得できる件数とは区別し、100,000件ちょうどは上限超過にしない。
-- 検索結果上部へGene/Diseaseレポートリンクを実装する場合は、結果に含まれる全遺伝子・全疾患の一覧ではなく、検索語・検索条件に対応する導線とする。Advanced Searchの除外条件（`ne`）はリンク対象にしない。
+- 検索結果上部のGene/Diseaseレポートリンクは `components/Results/ResultsReportLinks.ts`（表示）と `reportLinkResolvers.ts`（リンクの判定）で生成する。結果に含まれる全遺伝子・全疾患の一覧ではなく、検索語・検索条件に対応する導線とする。Advanced Searchの除外条件（`ne`）はリンク対象にしない。
 - 1件検索時の自動遷移は `api/searchResponse.ts` で同じ検索世代のdata/stat両方を確認して行う。戻る操作で再度詳細へ飛ばないよう、履歴復元・初期表示由来の検索では自動遷移しない。TogoVar IDなしの遷移先も `utils/variantPath.ts` の共通処理で生成する。
 - 列の表示・順序・幅は既存の列設定と `components/Results/ResultsColumnAutoSizer.ts` などの専用クラスを使う。自動幅調整で利用者が手動指定した幅を上書きしない。
 - レポートのpagination-tableは `assets/stanza.json` で外部Stanzaを読み込む構成であり、検索結果一覧の仮想スクロールテーブルとは別物。JSON形式の拡張では、Stanza本体とデータ提供APIの変更対象リポジトリを確認し、このリポジトリの設定変更だけで対応済みと判断しない。
