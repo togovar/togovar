@@ -160,6 +160,11 @@
   --z-index-base: 10000;
   --z-index-layout-aside: calc(var(--z-index-base) + 100);
   --z-index-row-indicator: calc(var(--z-index-base) + 100);
+  // 検索結果ヘッダーの Download・Columns。後ろに並ぶレポートリンク（z-index-base）より上で、
+  // Advanced Search の Add condition メニューなど他のメニューより下に置く
+  --z-index-results-header-actions: calc(var(--z-index-base) + 1);
+  // 省略されたレポートリンクの一覧。検索結果表の上に重なるため、行インジケーターより手前に出す
+  --z-index-results-report-links-panel: calc(var(--z-index-base) + 150);
   --z-index-advanced-search-menu: calc(var(--z-index-base) + 100);
   --z-index-detail-header: calc(var(--z-index-base) + 100);
   --z-index-module-tabs-view: calc(var(--z-index-base) + 200);

@@ -16,7 +16,7 @@ import { isTouchDevice } from '../../utils/deviceDetection';
 /** テーブル関連の DOM セレクタマップ */
 const SELECTORS = {
   STATUS: 'header.header > .left > .status',
-  REPORT_LINKS: 'header.header > .left > .report-links',
+  REPORT_LINKS: 'header.header > .report-links',
   MESSAGES: '#Messages',
   TABLE_CONTAINER: '.tablecontainer',
   TABLE_THEAD: '.tablecontainer > table.results-view > thead',
