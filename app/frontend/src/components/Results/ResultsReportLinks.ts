@@ -16,8 +16,6 @@ const MORE_PANEL_ID = 'ResultsReportLinksMore';
 // Columns ドロップダウンと同じく、ボタンとパネルの隙間をまたぐ間は閉じないよう少し待つ
 const HOVER_CLOSE_DELAY_MS = 120;
 const MORE_BUTTON_SELECTOR = '.group > .more';
-// 空きが極端に少ないときでも、一覧が数件分は見えてスクロールできる高さを残す
-const MORE_PANEL_MIN_HEIGHT_PX = 60;
 // パネル下端と、画面下端や Karyotype バーとの間に空ける余白
 const MORE_PANEL_BOTTOM_MARGIN_PX = 8;
 
@@ -325,7 +323,8 @@ export class ResultsReportLinks {
     }
 
     const available = visibleBottom - panel.getBoundingClientRect().top - MORE_PANEL_BOTTOM_MARGIN_PX;
-    const height = Math.max(MORE_PANEL_MIN_HEIGHT_PX, Math.floor(available));
+    // 見える範囲を超えた部分はスクロールしても表示されないため、空きが少なくても見える範囲に収める
+    const height = Math.max(0, Math.floor(available));
     if (Number.isNaN(cssMaxHeight) || height < cssMaxHeight) {
       panel.style.maxHeight = `${height}px`;
     }
