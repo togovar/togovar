@@ -211,6 +211,7 @@
 
       // 省略されたリンクの一覧。.group の overflow: hidden で切られないよう行の外に置き、
       // 件数が多くても画面を覆わないよう高さに上限を付けてパネル内をスクロールさせる。
+      // 用語を途中で折り返さないため、ヘッダーの white-space: nowrap をあえて受け継いでいる（長い名前はパネル内で横スクロール）。
       > .more-panel {
         position: absolute;
         z-index: var(--z-index-results-report-links-panel);
