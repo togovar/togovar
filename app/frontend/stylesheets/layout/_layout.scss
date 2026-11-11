@@ -33,12 +33,22 @@
     min-height: 0;
     // サイドバーの開閉アニメーション中に内側コンテンツがはみ出さないよう隠す。
     overflow: hidden;
+
     // サイドバー幅の変化にスムーズに追従させるため width をトランジション対象にする。
-    transition: width var(--gui-duration);
+    // 保存済みの折りたたみ状態を復元する初期描画では動かさないよう、準備完了後だけ遷移させる。
+    body.-sidebar-ready & {
+      transition: width var(--gui-duration);
+    }
 
     // 行選択でサイドバーが再表示されるとき通常幅に戻す。
     body.-rowselected & {
       width: calc(100% - var(--width-sidebar));
+    }
+
+    // サイドバー折りたたみ時はレール幅だけ残して結果テーブルを広げる。
+    // -rowselected より後ろに置き、両方付いたときも折りたたみ幅を優先させる。
+    body.-sidebar-collapsed & {
+      width: calc(100% - var(--width-sidebar-collapsed));
     }
   }
 
@@ -59,6 +69,15 @@
 
     body.-rowselected & {
       width: var(--width-sidebar);
+    }
+
+    // 初期描画（保存済みの折りたたみ状態の復元）でアニメーションさせないため、準備完了後だけ遷移させる。
+    body.-sidebar-ready & {
+      transition: width var(--gui-duration);
+    }
+
+    body.-sidebar-collapsed & {
+      width: var(--width-sidebar-collapsed);
     }
   }
 }

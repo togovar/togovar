@@ -58,14 +58,23 @@
         }
       }
 
-      > .button-view {
+      .button-view {
         // stretch（デフォルト）で引き伸ばされないよう自身の高さを持たせる。
         align-self: center;
         height: 20px;
         font-size: 12px;
+      }
 
-        body[data-search-mode='advanced'] & {
-          display: none;
+      // Clear all と Close を右端にまとめ、space-between で離れないようにする。
+      > .actions {
+        display: flex;
+        gap: 4px;
+        align-self: center;
+
+        > .button-view:not(.sidebar-close) {
+          body[data-search-mode='advanced'] & {
+            display: none;
+          }
         }
       }
     }
@@ -86,6 +95,11 @@
   // 行選択でプレビューパネルエリアをスライドイン
   body.-rowselected & {
     transform: translateX(0);
+  }
+
+  // 折りたたみ時はレールだけを見せる。幅の縮小中に中身が崩れて見えないよう非表示にする。
+  body.-sidebar-collapsed & {
+    visibility: hidden;
   }
 
   // ── プレビューパネル ──────────────────────────────────────────────────────
@@ -395,5 +409,92 @@
         width: 15px;
       }
     }
+  }
+}
+
+// =============================================================================
+// サイドバー折りたたみ（.sidebar-rail / .sidebar-close）
+// 開閉状態は SideBar.ts が body.-sidebar-collapsed で管理する。
+// =============================================================================
+
+// 折りたたみ時に .LayoutAside 全高を占める縦長の「開く」ボタン。
+// 何のパネルが隠れているか分かるよう、アイコンと縦書きラベルを出す。
+.sidebar-rail {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 12px 0;
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  background: none;
+  border: none;
+  transition: background-color var(--gui-duration);
+
+  body.-sidebar-collapsed & {
+    display: flex;
+  }
+
+  &:hover {
+    background-color: color-mix(in srgb, white 10%, transparent);
+  }
+
+  > .icon {
+    &::before {
+      font-family: 'Font Awesome 7 Free', sans-serif;
+      font-weight: 900;
+      content: var(--icon-filter);
+
+      body.-rowselected & {
+        content: var(--icon-eye);
+      }
+    }
+  }
+
+  > .label {
+    letter-spacing: 0.05em;
+    writing-mode: vertical-rl;
+  }
+
+  // 行選択中はプレビュー面、それ以外はフィルタ面が隠れているので、その名前を出す。
+  > .filters {
+    body.-rowselected & {
+      display: none;
+    }
+
+    > .simple {
+      body[data-search-mode='advanced'] & {
+        display: none;
+      }
+    }
+
+    > .advanced {
+      body[data-search-mode='simple'] & {
+        display: none;
+      }
+    }
+  }
+
+  > .preview {
+    display: none;
+
+    body.-rowselected & {
+      display: inline;
+    }
+  }
+}
+
+// 各パネル見出しの「Close」。nanbyodata の目次と同様に「‹ Close」で閉じる方向を示す。
+.sidebar-close {
+  &::before {
+    margin-right: 0.3em;
+    font-family: 'Font Awesome 7 Free', sans-serif;
+    font-size: 0.8em;
+    font-weight: 900;
+    content: var(--icon-chevron-left);
   }
 }
