@@ -108,8 +108,16 @@
     flex-wrap: wrap;
     justify-content: space-between;
     // #ResultsView から padding-right を外したため、ヘッダー側で右余白を確保する。
+    // 表との余白は .right ではなくヘッダーで取る。.right に持たせると、
+    // 下の行に置いたレポートリンクとの間にも余白が入ってしまうため。
     padding-right: var(--padding-side);
+    padding-bottom: 18px;
     white-space: nowrap;
+
+    // レポートリンク表示時は、従来どおりリンクの直下から表を始める
+    &:has(> .report-links:not([hidden])) {
+      padding-bottom: 0;
+    }
 
     // ヘッダー左側：見出し・結果件数
     > .left {
@@ -129,36 +137,58 @@
           font-weight: bold;
         }
       }
+    }
 
-      // 検索した遺伝子・疾患のレポートページへのリンク（該当が無いときは hidden）
-      > .report-links {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        font-size: 12px;
-        // リンクが多い場合に折り返せるよう、ヘッダーの nowrap を打ち消す
-        white-space: normal;
+    // 検索した遺伝子・疾患のレポートページへのリンク（該当が無いときは hidden）。
+    // .left/.right の下の行にヘッダー全幅で置き、サイドバーの手前まで使ってから ellipsis させる。
+    > .report-links {
+      display: flex;
+      flex: 1 0 100%;
+      flex-direction: column;
+      // 行間は .right の margin-top と同じ 4px にそろえる。ヘッダーの row-gap にすると
+      // .right が折り返したときに margin-top と重なって Results → Download だけ広がるため、ここで取る。
+      gap: 4px;
+      min-width: 0;
+      // 右端はヘッダーの右余白の内側（Columns ボタンの右端）にそろえ、「…」もそこからはみ出さない
+      margin-top: 4px;
+      font-size: 12px;
 
-        &[hidden] {
-          display: none;
+      &[hidden] {
+        display: none;
+      }
+
+      // 折り返さず1行に固定する。収まらないリンクは ResultsReportLinks.fitGroups() が
+      // 末尾から丸ごと hidden にし、クリックできない .ellipsis を代わりに表示する。
+      // （CSS の text-overflow だと、隠れたリンクが透明なままクリックできてしまうため使わない）
+      > .group {
+        overflow: hidden;
+        // .ellipsis をリンクと同じ大きさで表示するため、行全体をリンクと同じ 14px にする
+        font-size: 14px;
+        white-space: nowrap;
+
+        > .label {
+          font-size: 12px;
+          font-weight: bold;
         }
 
-        > .group {
-          display: flex;
-          flex-wrap: wrap;
-          gap: var(--spacing-results-report-link);
-          align-items: baseline;
+        // 遺伝子名・疾患名は検索結果表（.results-view）と同じ大きさにして読みやすくする
+        > .hyper-text {
+          position: relative;
+          z-index: var(--z-index-base);
+          // 文字の途中で折れたり切れたりせず、アイコンと1かたまりで扱われるようにする
+          display: inline-block;
+          margin-left: var(--spacing-results-report-link);
+          font-size: 14px;
 
-          > .label {
-            font-weight: bold;
+          // display 指定が hidden 属性の UA スタイルより強いため、明示的に隠す
+          &[hidden] {
+            display: none;
           }
+        }
 
-          // 遺伝子名・疾患名は検索結果表（.results-view）と同じ大きさにして読みやすくする
-          > .hyper-text {
-            position: relative;
-            z-index: var(--z-index-base);
-            font-size: 14px;
-          }
+        > .ellipsis {
+          margin-left: var(--spacing-results-report-link);
+          cursor: default;
         }
       }
     }
@@ -167,14 +197,15 @@
     /* stylelint-disable no-descending-specificity */
     > .right {
       position: relative;
-      top: 4px;
       z-index: var(--z-index-base);
       display: flex;
       gap: 5px;
       align-items: flex-start;
       min-height: 16px;
-      padding: 0 0 18px;
-      margin: 0;
+      padding: 0;
+      // 見出しと高さを揃えるための下げ幅。top で動かすとレイアウト上の高さに含まれず、
+      // 狭い画面で折り返したときに下のレポートリンクへ重なるため margin で取る。
+      margin: 4px 0 0;
       list-style: none;
 
       > .text {

@@ -8,8 +8,8 @@ import {
   type ReportLink,
 } from './reportLinkResolvers';
 
-// 疾患カテゴリなどで条件値が多い場合にヘッダーが膨らみすぎないよう、表示件数を絞る
-const MAX_LINKS_PER_KIND = 10;
+// 表示幅に収まらない分は fitGroups() で省略するが、疾患カテゴリ展開などで DOM が膨らみすぎないよう上限を置く
+const MAX_LINKS_PER_KIND = 100;
 
 const GROUP_LABELS: Record<ReportLink['kind'], string> = {
   gene: 'Gene report:',
@@ -29,6 +29,9 @@ export class ResultsReportLinks {
   private simpleSearchSnapshot: { key: string; links: ReportLink[] } | null = null;
   // 内容が同じなら DOM を作り直さず、リンクに当たっているキーボードフォーカスを維持する
   private renderedKey: string | null = null;
+  // 幅の変化でリンクの収まり方が変わるため、コンテナの幅を監視して省略をやり直す
+  private resizeObserver: ResizeObserver | null = null;
+  private fitFrameId: number | null = null;
 
   // unsubscribe で同一参照が必要なため、束縛済みコールバックをフィールドに保持する
   private readonly onStoreChange = () => this.scheduleUpdate();
@@ -40,6 +43,12 @@ export class ResultsReportLinks {
     storeManager.subscribe('simpleSearchConditions', this.onStoreChange);
     storeManager.subscribe('advancedSearchConditions', this.onStoreChange);
     storeManager.subscribe('searchResults', this.onStoreChange);
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => this.scheduleFit());
+      this.resizeObserver.observe(container);
+    }
+    // アイコンフォント読み込み後にリンク幅が変わるため、読み込み完了時にも省略をやり直す
+    void document.fonts?.ready.then(() => this.scheduleFit());
     this.scheduleUpdate();
   }
 
@@ -49,9 +58,46 @@ export class ResultsReportLinks {
     storeManager.unsubscribe('simpleSearchConditions', this.onStoreChange);
     storeManager.unsubscribe('advancedSearchConditions', this.onStoreChange);
     storeManager.unsubscribe('searchResults', this.onStoreChange);
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
     if (this.frameId !== null) cancelAnimationFrame(this.frameId);
     this.frameId = null;
+    if (this.fitFrameId !== null) cancelAnimationFrame(this.fitFrameId);
+    this.fitFrameId = null;
     this.generation++;
+  }
+
+  /** リサイズ中は連続で通知が来るため、次フレームにまとめて1回だけ省略を計算する。 */
+  private scheduleFit(): void {
+    if (this.fitFrameId !== null) return;
+    this.fitFrameId = requestAnimationFrame(() => {
+      this.fitFrameId = null;
+      this.fitGroups();
+    });
+  }
+
+  /**
+   * 1行に収まらないリンクを末尾から丸ごと非表示にし、代わりにクリックできない「…」を出す。
+   * CSS の text-overflow では隠れたリンクが透明なままクリック・フォーカスできてしまうため、JS で hidden にする。
+   */
+  private fitGroups(): void {
+    if (this.container.hidden) return;
+    for (const group of this.container.querySelectorAll<HTMLElement>(':scope > .group')) {
+      const anchors = Array.from(group.querySelectorAll<HTMLElement>(':scope > .hyper-text'));
+      const ellipsis = group.querySelector<HTMLElement>(':scope > .ellipsis');
+      if (!ellipsis) continue;
+
+      anchors.forEach((anchor) => (anchor.hidden = false));
+      ellipsis.hidden = true;
+      if (group.scrollWidth <= group.clientWidth) continue;
+
+      // 「…」の幅も含めて収まるまで、末尾のリンクから順に隠す
+      ellipsis.hidden = false;
+      for (let i = anchors.length - 1; i >= 0; i--) {
+        anchors[i].hidden = true;
+        if (group.scrollWidth <= group.clientWidth) break;
+      }
+    }
   }
 
   /** スクロールによるページ追加などで結果が連続更新されるため、次フレームにまとめて1回だけ再計算する。 */
@@ -104,7 +150,10 @@ export class ResultsReportLinks {
     return links;
   }
 
-  /** 遺伝子と疾患を種類ごとの行に分けて並べ、該当が無ければ領域ごと隠す。 */
+  /**
+   * 遺伝子と疾患を種類ごとの行に分けて並べ、該当が無ければ領域ごと隠す。
+   * 各行は1行固定で、幅に収まらない分は fitGroups() でリンク単位に省略する。
+   */
   private render(links: ReportLink[]): void {
     const key = JSON.stringify(links.map(({ kind, label, href }) => [kind, label, href]));
     if (key === this.renderedKey) return;
@@ -114,7 +163,8 @@ export class ResultsReportLinks {
       .map((kind) => ({ kind, items: links.filter((link) => link.kind === kind) }))
       .filter(({ items }) => items.length > 0)
       .map(({ kind, items }) => {
-        const anchors = items.slice(0, MAX_LINKS_PER_KIND).map((link) =>
+        const visibleItems = items.slice(0, MAX_LINKS_PER_KIND);
+        const anchors = visibleItems.map((link) =>
           createEl('a', {
             class: 'hyper-text -internal',
             attrs: {
@@ -124,29 +174,23 @@ export class ResultsReportLinks {
             text: link.label,
           })
         );
-        const remains = items.length - MAX_LINKS_PER_KIND;
-        // 省略分は展開しないため、"+N" だけでは伝わらない意味を title / aria-label で補う
-        const moreLabel = `${remains} more ${kind} ${remains === 1 ? 'report' : 'reports'}`;
-        const more =
-          remains > 0
-            ? [
-                createEl('span', {
-                  class: 'remains-badge',
-                  // span の aria-label は読まれない環境があるため、role="img" を付けて名前として扱わせる
-                  attrs: { role: 'img', title: moreLabel, 'aria-label': moreLabel },
-                  text: `+${remains}`,
-                }),
-              ]
-            : [];
 
         return createEl('div', {
           class: 'group',
           dataset: { kind },
-          children: [createEl('span', { class: 'label', text: GROUP_LABELS[kind] }), ...anchors, ...more],
+          // ellipsis で隠れた分もマウスオーバーで確認できるよう、全ラベルを title に入れる
+          attrs: { title: visibleItems.map((link) => link.label).join(', ') },
+          children: [
+            createEl('span', { class: 'label', text: GROUP_LABELS[kind] }),
+            ...anchors,
+            // 省略時だけ fitGroups() が表示する。全件は title で読めるため、読み上げからは外す
+            createEl('span', { class: 'ellipsis', attrs: { 'aria-hidden': 'true' }, domProps: { hidden: true }, text: '…' }),
+          ],
         });
       });
 
     this.container.replaceChildren(...groups);
     this.container.hidden = groups.length === 0;
+    this.fitGroups();
   }
 }

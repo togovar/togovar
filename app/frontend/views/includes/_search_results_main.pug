@@ -49,8 +49,6 @@ main#SearchResultsView.LayoutMainAside
         .left
           h2.heading Results
           .status Loading results...
-          //- 検索語・条件が遺伝子/疾患に一致したときだけ、レポートページへのリンクを JS が挿入する
-          nav.report-links(aria-label='Related report pages' hidden)
         ul.right
           li.text Download
           li.download-buttons
@@ -66,6 +64,10 @@ main#SearchResultsView.LayoutMainAside
           //- ダウンロード不可の理由（条件未入力など）を aria-live で読み上げる
           li.download-disabled-reason-item(hidden)
             span#DownloadDisabledReason.download-disabled-reason(role='status' aria-live='polite' hidden)
+        //-
+          検索語・条件が遺伝子/疾患に一致したときだけ、レポートページへのリンクを JS が挿入する。
+          .left 内ではなくヘッダー直下に置き、Download ボタンの下まで全幅を使えるようにする。
+        nav.report-links(aria-label='Related report pages' hidden)
 
       //- 検索状態メッセージ（ローディング中・件数ゼロ・エラーなど）を JS が挿入する
       #Messages
