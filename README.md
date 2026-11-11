@@ -352,7 +352,7 @@ CREはGRCh38のみが対象で、scriptとSPARQListの配信先を個別に指�
 
 ## Issue管理
 
-未実装項目・仕様確認・受入確認はGitHub Issuesで管理し、READMEやAGENTSには進捗表を持たせません。コード上の実装、対象ブランチへの取り込み、実画面での確認、本番反映は別々に記録してください。
+未実装項目・仕様確認・受入確認はtogovar/meeting の GitHub Issuesで管理し、READMEやAGENTSには進捗表を持たせません。コード上の実装、対象ブランチへの取り込み、実画面での確認、本番反映は別々に記録してください。
 
 ## Docker
 
