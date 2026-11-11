@@ -142,6 +142,8 @@
     // 検索した遺伝子・疾患のレポートページへのリンク（該当が無いときは hidden）。
     // .left/.right の下の行にヘッダー全幅で置き、サイドバーの手前まで使ってから ellipsis させる。
     > .report-links {
+      // 省略リンク一覧（.more-panel）を「…」の位置に合わせて絶対配置する基準にする
+      position: relative;
       display: flex;
       flex: 1 0 100%;
       flex-direction: column;
@@ -158,7 +160,7 @@
       }
 
       // 折り返さず1行に固定する。収まらないリンクは ResultsReportLinks.fitGroups() が
-      // 末尾から丸ごと hidden にし、クリックできない .ellipsis を代わりに表示する。
+      // 末尾から丸ごと hidden にし、代わりに .ellipsis ボタンを表示する。
       // （CSS の text-overflow だと、隠れたリンクが透明なままクリックできてしまうため使わない）
       > .group {
         overflow: hidden;
@@ -186,18 +188,85 @@
           }
         }
 
+        // hover / focus で隠れたリンクの一覧（.more-panel）を開くボタン
         > .ellipsis {
+          // 表の斜めの列名がヘッダー側へ食い込んで重なり、hover / クリックを奪うため、リンクと同じく手前に出す
+          position: relative;
+          z-index: var(--z-index-base);
+          padding: 0 4px;
           margin-left: var(--spacing-results-report-link);
-          cursor: default;
+          font: inherit;
+          line-height: 1.2;
+          color: inherit;
+          cursor: pointer;
+          background: none;
+          border: none;
+          border-radius: 4px;
+
+          &:hover,
+          &[aria-expanded='true'] {
+            // 同じヘッダーの Columns メニュー項目のホバー色にそろえる
+            background: var(--color-selected-hover);
+          }
         }
       }
+
+      // 省略されたリンクの一覧。.group の overflow: hidden で切られないよう行の外に置き、
+      // 件数が多くても画面を覆わないよう高さに上限を付けてパネル内をスクロールさせる。
+      > .more-panel {
+        position: absolute;
+        z-index: var(--z-index-results-report-links-panel);
+        max-width: 100%;
+        max-height: 240px;
+        padding: 6px 0;
+        overflow-y: auto;
+        // 一覧の端までスクロールしたとき、その先のページや表へスクロールが伝わらないようにする
+        overscroll-behavior: contain;
+        font-size: 14px;
+        background: white;
+        border-radius: 5px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+
+        &[hidden] {
+          display: none;
+        }
+
+        > .list {
+          padding: 0;
+          margin: 0;
+          list-style: none;
+
+          > .item {
+            padding: 2px 12px;
+
+            &:hover {
+              background: var(--color-selected-hover);
+            }
+          }
+
+          // 上限（MAX_LINKS_PER_KIND）を超えて描画していない件数の注記
+          > .note {
+            padding: 2px 12px;
+            font-size: 12px;
+            color: var(--color-gray);
+          }
+        }
+      }
+    }
+
+    // Download の注意書き（絶対配置）はレポートリンク行の上に重なるため、表示中はその高さ分リンクを下げる。
+    // 注意書きの高さ（11px × line-height 1.25 + 上の隙間 2px）に、行間 4px 程度を足した値。
+    &:has(> .right > .download-disabled-reason-item:not([hidden])) > .report-links {
+      margin-top: 20px;
     }
 
     // ヘッダー右側：操作ボタン・ドロップダウン
     /* stylelint-disable no-descending-specificity */
     > .right {
       position: relative;
-      z-index: var(--z-index-base);
+      // 後ろに並ぶレポートリンク（z-index-base）より手前に出し、Columns メニューが下に潜らないようにする。
+      // 上げすぎると Advanced Search の Add condition メニューの上に出てしまうため、+1 に留める
+      z-index: var(--z-index-results-header-actions);
       display: flex;
       gap: 5px;
       align-items: flex-start;
@@ -238,9 +307,11 @@
         }
       }
 
+      // ボタンの下に絶対配置する。レポートリンクが無いときはヘッダーの下余白 18px の中に収まり、
+      // あるときはヘッダー側の :has() でリンク行を下げて重ならないようにする。
       > .download-disabled-reason-item {
         position: absolute;
-        top: calc(100% - 16px);
+        top: calc(100% + 2px);
         right: 0;
         max-width: min(100%, 320px);
         margin: 0;
