@@ -11,11 +11,15 @@ import {
 // 表示幅に収まらない分は fitGroups() で省略するが、疾患カテゴリ展開などで DOM が膨らみすぎないよう上限を置く
 const MAX_LINKS_PER_KIND = 100;
 
-// 「…」ボタンの aria-controls から参照するため、省略リンク一覧パネルの id を固定する
+// 「+N」ボタンの aria-controls から参照するため、省略リンク一覧パネルの id を固定する
 const MORE_PANEL_ID = 'ResultsReportLinksMore';
 // Columns ドロップダウンと同じく、ボタンとパネルの隙間をまたぐ間は閉じないよう少し待つ
 const HOVER_CLOSE_DELAY_MS = 120;
-const ELLIPSIS_SELECTOR = '.group > .ellipsis';
+const MORE_BUTTON_SELECTOR = '.group > .more';
+// 空きが極端に少ないときでも、一覧が数件分は見えてスクロールできる高さを残す
+const MORE_PANEL_MIN_HEIGHT_PX = 60;
+// パネル下端と、画面下端や Karyotype バーとの間に空ける余白
+const MORE_PANEL_BOTTOM_MARGIN_PX = 8;
 
 const GROUP_LABELS: Record<ReportLink['kind'], string> = {
   gene: 'Gene report:',
@@ -41,10 +45,10 @@ export class ResultsReportLinks {
   // 省略されたリンクの一覧パネル。行の overflow: hidden に切られないよう、行の外（コンテナ直下）に置く
   private readonly morePanel: HTMLElement;
   private readonly moreList: HTMLElement;
-  // パネルを開いた「…」ボタン。閉じたときにフォーカスを戻すため保持する
+  // パネルを開いた「+N」ボタン。閉じたときにフォーカスを戻すため保持する
   private moreButton: HTMLButtonElement | null = null;
   private hoverCloseTimer: number | null = null;
-  // Esc で閉じてフォーカスを「…」へ戻すとき、focusin で再び開かないようにする
+  // Esc で閉じてフォーカスを「+N」へ戻すとき、focusin で再び開かないようにする
   private suppressFocusOpen = false;
   private readonly eventAbortController = new AbortController();
 
@@ -102,7 +106,7 @@ export class ResultsReportLinks {
   }
 
   /**
-   * 1行に収まらないリンクを末尾から丸ごと非表示にし、代わりに「…」ボタンを出す。
+   * 1行に収まらないリンクを末尾から丸ごと非表示にし、代わりに隠れた件数を示す「+N」ボタンを出す。
    * CSS の text-overflow では隠れたリンクが透明なままクリック・フォーカスできてしまうため、JS で hidden にする。
    */
   private fitGroups(): void {
@@ -111,28 +115,33 @@ export class ResultsReportLinks {
     this.closeMorePanel(false);
     for (const group of this.container.querySelectorAll<HTMLElement>(':scope > .group')) {
       const anchors = Array.from(group.querySelectorAll<HTMLElement>(':scope > .hyper-text'));
-      const ellipsis = group.querySelector<HTMLButtonElement>(':scope > .ellipsis');
-      if (!ellipsis) continue;
+      const moreButton = group.querySelector<HTMLButtonElement>(':scope > .more');
+      if (!moreButton) continue;
 
       anchors.forEach((anchor) => (anchor.hidden = false));
-      ellipsis.hidden = true;
-      // 上限で最初から描画していない分があれば、幅に収まっていても「…」から辿れるようにする
-      const notRendered = Number(group.dataset.total) - anchors.length;
-      if (group.scrollWidth <= group.clientWidth && notRendered <= 0) continue;
+      moreButton.hidden = true;
+      // 上限で最初から描画していない分があれば、幅に収まっていても「+N」から辿れるようにする
+      const notRendered = Math.max(Number(group.dataset.total) - anchors.length, 0);
+      if (group.scrollWidth <= group.clientWidth && notRendered === 0) continue;
 
-      // 「…」の幅も含めて収まるまで、末尾のリンクから順に隠す
-      ellipsis.hidden = false;
+      // 件数の桁が増えるとボタン幅も変わるため、1件隠すごとに表示を更新してから収まりを判定する
       let hiddenCount = 0;
+      const updateCount = (): void => {
+        moreButton.textContent = `+${hiddenCount + notRendered}`;
+      };
+      moreButton.hidden = false;
+      updateCount();
       for (let i = anchors.length - 1; i >= 0; i--) {
         if (group.scrollWidth <= group.clientWidth) break;
         anchors[i].hidden = true;
         hiddenCount++;
+        updateCount();
       }
 
-      const more = hiddenCount + Math.max(notRendered, 0);
+      const more = hiddenCount + notRendered;
       const label = `Show ${more} more ${group.dataset.kind} ${more === 1 ? 'report' : 'reports'}`;
-      ellipsis.title = label;
-      ellipsis.setAttribute('aria-label', label);
+      moreButton.title = label;
+      moreButton.setAttribute('aria-label', label);
     }
   }
 
@@ -143,12 +152,12 @@ export class ResultsReportLinks {
   private bindMoreEvents(): void {
     const { signal } = this.eventAbortController;
 
-    // hover：「…」に乗ったら開き、パネルへ移動している間は閉じない
+    // hover：「+N」に乗ったら開き、パネルへ移動している間は閉じない
     this.container.addEventListener(
       'mouseover',
       (event) => {
         const target = event.target as Element | null;
-        const button = target?.closest<HTMLButtonElement>(ELLIPSIS_SELECTOR);
+        const button = target?.closest<HTMLButtonElement>(MORE_BUTTON_SELECTOR);
         if (button) {
           this.cancelHoverClose();
           if (this.moreButton !== button) this.openMorePanel(button);
@@ -178,7 +187,7 @@ export class ResultsReportLinks {
     this.container.addEventListener(
       'click',
       (event) => {
-        const button = (event.target as Element | null)?.closest<HTMLButtonElement>(ELLIPSIS_SELECTOR);
+        const button = (event.target as Element | null)?.closest<HTMLButtonElement>(MORE_BUTTON_SELECTOR);
         if (!button) return;
         this.cancelHoverClose();
         if (this.moreButton !== button) this.openMorePanel(button);
@@ -191,7 +200,7 @@ export class ResultsReportLinks {
       'focusin',
       (event) => {
         const target = event.target as Element | null;
-        const button = target?.closest<HTMLButtonElement>(ELLIPSIS_SELECTOR);
+        const button = target?.closest<HTMLButtonElement>(MORE_BUTTON_SELECTOR);
         if (button) {
           if (this.suppressFocusOpen) return;
           this.cancelHoverClose();
@@ -239,7 +248,7 @@ export class ResultsReportLinks {
     );
   }
 
-  /** hover / focus の判定で、開いている「…」とパネルを1つの領域として扱うため。 */
+  /** hover / focus の判定で、開いている「+N」とパネルを1つの領域として扱うため。 */
   private isInMoreArea(node: Node): boolean {
     return !!this.moreButton && (this.moreButton.contains(node) || this.morePanel.contains(node));
   }
@@ -261,7 +270,7 @@ export class ResultsReportLinks {
   }
 
   /**
-   * hover / focus / クリックされた「…」の行で隠れているリンクを一覧に複製し、ボタンの下に表示する。
+   * hover / focus / クリックされた「+N」の行で隠れているリンクを一覧に複製し、ボタンの下に表示する。
    * 行の DOM を動かすと省略計算が崩れるため、リンクは移動せず複製する。
    */
   private openMorePanel(button: HTMLButtonElement): void {
@@ -291,9 +300,38 @@ export class ResultsReportLinks {
     const maxLeft = this.container.clientWidth - this.morePanel.offsetWidth;
     this.morePanel.style.top = `${group.offsetTop + group.offsetHeight + 2}px`;
     this.morePanel.style.left = `${Math.max(0, Math.min(button.offsetLeft, maxLeft))}px`;
+    this.fitMorePanelHeight();
   }
 
-  /** 一覧を閉じる。Esc で閉じたときはキーボード操作を続けられるよう、フォーカスを「…」へ戻す。 */
+  /**
+   * 固定の max-height だと、パネルの下の空きが少ないときに末尾が Karyotype バーや表示領域の端に隠れて
+   * スクロールでも辿れなくなるため、開くたびに見えている範囲へ高さを収める。
+   * CSS の max-height は上限としてそのまま使い、それより狭い場合だけ縮める。
+   */
+  private fitMorePanelHeight(): void {
+    const panel = this.morePanel;
+    panel.style.maxHeight = '';
+    const cssMaxHeight = parseFloat(getComputedStyle(panel).maxHeight);
+
+    let visibleBottom = window.innerHeight;
+    // .LayoutMain は overflow: hidden のため、その下端より下は描画されない
+    const main = this.container.closest<HTMLElement>('.LayoutMain');
+    if (main) visibleBottom = Math.min(visibleBottom, main.getBoundingClientRect().bottom);
+    // 画面下の Karyotype ドロワーはパネルより手前に重なるため、その上端までに収める
+    // （非表示で大きさが 0 のときは top が 0 になり高さを潰してしまうため除外する）
+    const karyotypeRect = document.getElementById('Karyotype')?.getBoundingClientRect();
+    if (karyotypeRect && karyotypeRect.height > 0) {
+      visibleBottom = Math.min(visibleBottom, karyotypeRect.top);
+    }
+
+    const available = visibleBottom - panel.getBoundingClientRect().top - MORE_PANEL_BOTTOM_MARGIN_PX;
+    const height = Math.max(MORE_PANEL_MIN_HEIGHT_PX, Math.floor(available));
+    if (Number.isNaN(cssMaxHeight) || height < cssMaxHeight) {
+      panel.style.maxHeight = `${height}px`;
+    }
+  }
+
+  /** 一覧を閉じる。Esc で閉じたときはキーボード操作を続けられるよう、フォーカスを「+N」へ戻す。 */
   private closeMorePanel(restoreFocus: boolean): void {
     this.cancelHoverClose();
     const button = this.moreButton;
@@ -390,12 +428,12 @@ export class ResultsReportLinks {
           children: [
             createEl('span', { class: 'label', text: GROUP_LABELS[kind] }),
             ...anchors,
-            // 省略時だけ fitGroups() が表示し、hover / focus で隠れたリンクの一覧を開く
+            // 省略時だけ fitGroups() が件数を入れて表示し、hover / focus で隠れたリンクの一覧を開く。
+            // 見た目は検索結果表のセルの「+N」と同じ remains-badge にそろえる
             createEl('button', {
-              class: 'ellipsis',
+              class: 'remains-badge more',
               attrs: { type: 'button', 'aria-expanded': 'false', 'aria-controls': MORE_PANEL_ID },
               domProps: { hidden: true },
-              text: '…',
             }),
           ],
         });

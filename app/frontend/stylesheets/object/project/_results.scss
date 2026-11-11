@@ -160,16 +160,13 @@
       }
 
       // 折り返さず1行に固定する。収まらないリンクは ResultsReportLinks.fitGroups() が
-      // 末尾から丸ごと hidden にし、代わりに .ellipsis ボタンを表示する。
+      // 末尾から丸ごと hidden にし、代わりに隠れた件数を示す .more（+N）ボタンを表示する。
       // （CSS の text-overflow だと、隠れたリンクが透明なままクリックできてしまうため使わない）
       > .group {
         overflow: hidden;
-        // .ellipsis をリンクと同じ大きさで表示するため、行全体をリンクと同じ 14px にする
-        font-size: 14px;
         white-space: nowrap;
 
         > .label {
-          font-size: 12px;
           font-weight: bold;
         }
 
@@ -188,25 +185,26 @@
           }
         }
 
-        // hover / focus で隠れたリンクの一覧（.more-panel）を開くボタン
-        > .ellipsis {
+        // hover / focus で隠れたリンクの一覧（.more-panel）を開く「+N」ボタン。
+        // 見た目は共通の .remains-badge（検索結果表のセルの +N）を使い、ボタンとして必要な分だけ上書きする
+        > .more {
           // 表の斜めの列名がヘッダー側へ食い込んで重なり、hover / クリックを奪うため、リンクと同じく手前に出す
           position: relative;
           z-index: var(--z-index-base);
-          padding: 0 4px;
           margin-left: var(--spacing-results-report-link);
-          font: inherit;
-          line-height: 1.2;
-          color: inherit;
+          // button 要素は UA の既定フォントになるため、周りの文字と同じ書体にする
+          font-family: inherit;
           cursor: pointer;
-          background: none;
-          border: none;
-          border-radius: 4px;
+
+          // .remains-badge の display 指定が hidden 属性の UA スタイルより強いため、明示的に隠す
+          &[hidden] {
+            display: none;
+          }
 
           &:hover,
           &[aria-expanded='true'] {
-            // 同じヘッダーの Columns メニュー項目のホバー色にそろえる
-            background: var(--color-selected-hover);
+            // バッジの背景（neutral-background = button-muted）に対応する既存のホバー色を使う
+            background-color: var(--color-button-muted-hover);
           }
         }
       }
