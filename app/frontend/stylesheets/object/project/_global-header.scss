@@ -76,6 +76,15 @@
     align-self: center;
     font-size: 14px;
 
+    > .menu-bar {
+      display: none;
+      padding: 0;
+      color: var(--color-key-dark1);
+      cursor: pointer;
+      background: transparent;
+      border: none;
+    }
+
     // デスクトップ用ナビゲーション：フレックスで横並び表示
     nav.menus-view {
       > .menu-wrapper {
@@ -248,6 +257,7 @@
     @media (max-width: 1120px) {
       // ハンバーガーアイコン（≡ 三本線）
       > .menu-bar {
+        display: block;
         width: 31px;
         height: 16px;
 
@@ -282,8 +292,11 @@
 
           padding: 4px 0;
 
-          // リサイズ時のちらつきを防ぐため transition を無効化する。
-          // （JS なしの CSS のみでは breakpoint 切替時の opacity アニメーションを抑制できないため）
+          &[hidden] {
+            display: none;
+          }
+
+          // 横並び表示との切替時にパネルがちらつかないよう、境界でのアニメーションを抑える。
           transition: none;
 
           // メニューグループ（ul.menu）：縦積みに切り替え
@@ -335,8 +348,8 @@
         }
       }
 
-      // .right ホバーでドロップダウンを表示
-      &:hover {
+      // JS の共通開閉処理に合わせ、hover だけでなく focus / タッチでも表示する。
+      &.-open {
         color: var(--color-key-dark1);
 
         > nav.menus-view {

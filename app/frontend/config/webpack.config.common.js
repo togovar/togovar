@@ -153,6 +153,7 @@ class StaticSeoFilesPlugin {
 
 const config = {
   entry: {
+    header: './app/frontend/packs/header.ts',
     main: './app/frontend/packs/index.ts',
     report: './app/frontend/packs/report/index.ts',
   },

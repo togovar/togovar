@@ -374,6 +374,10 @@
           position: absolute;
           right: 0;
           min-width: 170px;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          // 並び替えでブラウザが scrollTop を補正すると、ドラッグ位置がずれるため無効にする。
+          overflow-anchor: none;
 
           > .columns-dropdown-list {
             padding: 0;

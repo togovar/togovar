@@ -1,8 +1,10 @@
+import { HoverDropdown } from '../HoverDropdown';
 import {
   getColumnLabel,
   isLockedColumnId,
   normalizeColumnConfigs,
 } from '../../columns';
+import { fitResultsPanelHeight } from './fitResultsPanelHeight';
 import { storeManager } from '../../store/StoreManager';
 import type { ColumnConfig } from '../../types';
 import type { StoreState } from '../../types/storeState';
@@ -19,7 +21,8 @@ const SELECTORS = {
 const LONG_PRESS_MS = 150;
 const DRAG_START_MOVE_THRESHOLD_PX = 6;
 const DRAG_REORDER_ANIMATION_MS = 80;
-const HOVER_CLOSE_DELAY_MS = 120;
+const AUTO_SCROLL_EDGE_PX = 32;
+const AUTO_SCROLL_SPEED_PX_PER_SECOND = 360;
 
 /**
  * 検索結果テーブルの列表示/非表示・ドラッグ並び替え機能を提供するドロップダウン
@@ -32,7 +35,7 @@ const HOVER_CLOSE_DELAY_MS = 120;
  */
 export class ResultsColumnsDropdown {
   private readonly root: HTMLElement;
-  private readonly button: HTMLButtonElement;
+  private readonly dropdown: HoverDropdown;
   private readonly menu: HTMLElement;
   private readonly list: HTMLElement;
   private draggingElement: HTMLElement | null = null;
@@ -41,37 +44,49 @@ export class ResultsColumnsDropdown {
   private clearPendingLongPress: (() => void) | null = null;
   private cleanupDragListeners: (() => void) | null = null;
   private suppressNextListClick = false;
-  private hoverCloseTimer: number | null = null;
   private readonly eventAbortController = new AbortController();
-  private readonly boundDocumentClick: (_event: MouseEvent) => void;
-  private readonly boundDocumentKeydown: (_event: KeyboardEvent) => void;
   private readonly onColumns = (v: StoreState['columns']) => this.columns(v);
 
+  /** 列設定の変更とメニュー操作を同じインスタンスで管理するため、初期表示時に購読する。 */
   constructor(root: HTMLElement) {
     this.root = root;
-    this.button = root.querySelector(SELECTORS.BUTTON) as HTMLButtonElement;
     this.menu = root.querySelector(SELECTORS.MENU) as HTMLElement;
     this.list = root.querySelector(SELECTORS.LIST) as HTMLElement;
-    this.boundDocumentClick = this.handleDocumentClick.bind(this);
-    this.boundDocumentKeydown = this.handleDocumentKeydown.bind(this);
-
-    this.toggle(false);
+    this.dropdown = new HoverDropdown({
+      container: root,
+      triggerSelector: SELECTORS.BUTTON,
+      panel: this.menu,
+      canClose: () => !this.draggingElement,
+      onOpen: () => {
+        root.classList.add('-open');
+        fitResultsPanelHeight(this.menu);
+      },
+      onClose: () => {
+        this.clearPendingLongPress?.();
+        this.cleanupDragListeners?.();
+        if (this.draggingElement) {
+          this.commitCurrentOrder();
+          this.clearDragState();
+        }
+        root.classList.remove('-open');
+      },
+    });
     this.bindEvents();
     storeManager.subscribe('columns', this.onColumns);
     this.columns(storeManager.getData('columns'));
   }
 
   /**
-   * インスタンスを破棄（イベントリスナー削除、store バインド解除）
+   * 破棄後に列設定の更新やドラッグが残らないよう、購読とイベントを解放する。
    */
   destroy(): void {
     storeManager.unsubscribe('columns', this.onColumns);
     this.clearPendingLongPress?.();
-    this.cancelHoverClose();
     this.eventAbortController.abort();
     this.cleanupDragListeners?.();
     this.suppressNextListClick = false;
     this.clearDragState();
+    this.dropdown.destroy();
   }
 
   /**
@@ -82,57 +97,10 @@ export class ResultsColumnsDropdown {
   }
 
   /**
-   * 全イベントリスナーをセットアップ
+   * 開閉は共通クラスに任せ、列設定の変更とドラッグだけをこのリストで受け付ける。
    */
   private bindEvents(): void {
     const { signal } = this.eventAbortController;
-
-    // hover：ドロップダウンメニューを開く
-    this.root.addEventListener(
-      'mouseenter',
-      () => {
-        this.cancelHoverClose();
-        this.toggle(true);
-      },
-      { signal }
-    );
-
-    // hover 解除：メニューとの隙間をまたぐため少し遅らせて閉じる
-    this.root.addEventListener(
-      'mouseleave',
-      () => {
-        this.scheduleHoverClose();
-      },
-      { signal }
-    );
-
-    // キーボード操作では focus で開き、フォーカスが外れたら閉じる
-    this.root.addEventListener(
-      'focusin',
-      () => {
-        this.cancelHoverClose();
-        this.toggle(true);
-      },
-      { signal }
-    );
-
-    this.root.addEventListener(
-      'focusout',
-      () => {
-        window.setTimeout(() => {
-          const activeElement = document.activeElement;
-          if (
-            this.root.matches(':hover') ||
-            (activeElement instanceof Node && this.root.contains(activeElement))
-          ) {
-            return;
-          }
-
-          this.toggle(false);
-        }, 0);
-      },
-      { signal }
-    );
 
     // ドラッグ終了後に発火する click で checkbox が誤って切り替わるのを防ぐ
     this.list.addEventListener(
@@ -251,10 +219,7 @@ export class ResultsColumnsDropdown {
       { signal }
     );
 
-    // ドキュメントクリック：範囲外クリックでドロップダウンを閉じる
-    document.addEventListener('click', this.boundDocumentClick, { signal });
-    // Escape キー：ドロップダウンを閉じる
-    document.addEventListener('keydown', this.boundDocumentKeydown, { signal });
+
   }
 
   /**
@@ -296,13 +261,14 @@ export class ResultsColumnsDropdown {
   }
 
   /**
-   * 実ドラッグ処理を開始
+   * スクロール領域の外でも位置を追跡できるよう、ドラッグを document のマウスイベントで管理する。
    */
   private beginDrag(
     item: HTMLElement,
     startClientX: number,
     startClientY: number
   ): void {
+    this.dropdown.cancelClose();
     this.draggingElement = item;
     this.suppressNextListClick = true;
     this.list.classList.add('-is-dragging');
@@ -333,31 +299,35 @@ export class ResultsColumnsDropdown {
     const offsetX = startClientX - itemRect.left;
     const offsetY = startClientY - itemRect.top;
 
-    const onMouseMove = (e: MouseEvent): void => {
-      if (!this.draggingElement) {
-        return;
-      }
+    let clientX = startClientX;
+    let clientY = startClientY;
+    let frameId: number | null = null;
+    let previousTime: number | null = null;
 
-      // ゴーストをカーソルに追従
-      if (this.ghostElement) {
-        this.ghostElement.style.left = `${e.clientX - offsetX}px`;
-        this.ghostElement.style.top = `${e.clientY - offsetY}px`;
-      }
-
-      const target =
-        e.target instanceof Element
-          ? (e.target.closest(SELECTORS.ITEM) as HTMLElement | null)
-          : null;
-
-      if (!target || target === this.draggingElement) {
-        return;
-      }
+    /** スクロールでポインター直下の項目が変わるため、イベントの target ではなく現在の座標から挿入先を探す。 */
+    const reorderAtPointer = (): void => {
+      if (!this.draggingElement) return;
+      const menuRect = this.menu.getBoundingClientRect();
+      if (clientX < menuRect.left || clientX >= menuRect.right) return;
+      // 端の外側でもドラッグを続けられるよう、ヒットテストだけをメニュー内に収める。
+      const menuStyle = getComputedStyle(this.menu);
+      const hitTop = menuRect.top + parseFloat(menuStyle.paddingTop) + 1;
+      const hitBottom = menuRect.bottom - parseFloat(menuStyle.paddingBottom) - 1;
+      const hitY = Math.max(hitTop, Math.min(clientY, hitBottom));
+      const target = document.elementFromPoint(clientX, hitY)?.closest<HTMLElement>(SELECTORS.ITEM);
+      if (!target || !this.list.contains(target) || target === this.draggingElement) return;
 
       const isTargetLocked = isLockedColumnId(target.dataset.columnId);
+      // 固定列同士の間へは挿入せず、固定列の後ろにある最初の可動位置を保つ。
+      if (isTargetLocked && isLockedColumnId((target.nextElementSibling as HTMLElement | null)?.dataset.columnId)) return;
       const rect = target.getBoundingClientRect();
       const shouldInsertAfter = isTargetLocked
         ? true
-        : e.clientY > rect.top + rect.height / 2;
+        : hitY > rect.top + rect.height / 2;
+      // 同じ挿入位置で FLIP を繰り返すと、アニメーションとスクロールが干渉するため省く。
+      if (shouldInsertAfter
+        ? target.nextElementSibling === this.draggingElement
+        : target.previousElementSibling === this.draggingElement) return;
 
       // FLIP：移動前の各アイテムの Y 座標を記録
       const items = Array.from(
@@ -388,23 +358,54 @@ export class ResultsColumnsDropdown {
       });
     };
 
+    /** ポインターが静止していても端でスクロールし続けるよう、ドラッグ中はフレームごとに位置を更新する。 */
+    const updateDrag = (time: number): void => {
+      const elapsed = previousTime === null ? 0 : Math.min(time - previousTime, 32);
+      previousTime = time;
+      const rect = this.menu.getBoundingClientRect();
+      if (clientX >= rect.left && clientX < rect.right) {
+        const edge = Math.min(AUTO_SCROLL_EDGE_PX, rect.height / 2);
+        const direction = clientY < rect.top + edge ? -1 : clientY > rect.bottom - edge ? 1 : 0;
+        this.menu.scrollTop += direction * AUTO_SCROLL_SPEED_PX_PER_SECOND * elapsed / 1000;
+      }
+      reorderAtPointer();
+      frameId = requestAnimationFrame(updateDrag);
+    };
+
+    /** ゴーストは viewport 座標に固定し、メニューのスクロールによるずれを防ぐ。 */
+    const onMouseMove = (event: MouseEvent): void => {
+      clientX = event.clientX;
+      clientY = event.clientY;
+      if (this.ghostElement) {
+        this.ghostElement.style.left = `${clientX - offsetX}px`;
+        this.ghostElement.style.top = `${clientY - offsetY}px`;
+      }
+    };
+
     const dragAbortController = new AbortController();
+    /** 閉じる・破棄・マウスを離す場合のすべてで、スクロールと document の監視を終了する。 */
     const cleanupDragListeners = (): void => {
       dragAbortController.abort();
+      if (frameId !== null) cancelAnimationFrame(frameId);
       if (this.cleanupDragListeners === cleanupDragListeners) {
         this.cleanupDragListeners = null;
       }
     };
 
+    /** 並び替えを確定してから通常の hover 制御へ戻し、ドラッグ後の誤クリックを防ぐ。 */
     const onMouseUp = (): void => {
       cleanupDragListeners();
       this.commitCurrentOrder();
       this.clearDragState();
+      if (!this.root.matches(':hover') && !this.root.contains(document.activeElement)) {
+        this.dropdown.scheduleClose();
+      }
       window.setTimeout(() => {
         this.suppressNextListClick = false;
       }, 0);
     };
 
+    frameId = requestAnimationFrame(updateDrag);
     this.cleanupDragListeners = cleanupDragListeners;
     document.addEventListener('mousemove', onMouseMove, {
       signal: dragAbortController.signal,
@@ -458,80 +459,4 @@ export class ResultsColumnsDropdown {
     this.draggingCursorStyleEl.remove();
     this.draggingCursorStyleEl = null;
   }
-
-  /** hover 解除後、少し遅らせてドロップダウンを閉じる */
-  private scheduleHoverClose(): void {
-    this.cancelHoverClose();
-    this.hoverCloseTimer = window.setTimeout(() => {
-      this.hoverCloseTimer = null;
-      this.toggle(false);
-    }, HOVER_CLOSE_DELAY_MS);
-  }
-
-  /** hover クローズ予約をキャンセル */
-  private cancelHoverClose(): void {
-    if (this.hoverCloseTimer === null) {
-      return;
-    }
-
-    window.clearTimeout(this.hoverCloseTimer);
-    this.hoverCloseTimer = null;
-  }
-
-  /**
-   * ドロップダウンメニューの開閉を切り替え
-   */
-  private toggle(forceOpen?: boolean): void {
-    const shouldOpen = forceOpen ?? !this.root.classList.contains('-open');
-    this.root.classList.toggle('-open', shouldOpen);
-    this.button.setAttribute('aria-expanded', String(shouldOpen));
-    this.menu.setAttribute('aria-hidden', String(!shouldOpen));
-
-    if (shouldOpen) {
-      // opacity アニメーション開始前に hidden を解除してメニューを DOM に戻す。
-      this.menu.hidden = false;
-      this.menu.removeAttribute('inert');
-      // inert 非対応ブラウザ向け: フォーカス制御を復元する。
-      this.menu
-        .querySelectorAll<HTMLInputElement>(SELECTORS.INPUT)
-        .forEach((input) => input.removeAttribute('tabindex'));
-    } else {
-      this.menu.setAttribute('inert', '');
-      // inert 非対応ブラウザ向け: フェードアウト中も Tab フォーカスがチェックボックスに入らないよう即座に遮断する。
-      this.menu
-        .querySelectorAll<HTMLInputElement>(SELECTORS.INPUT)
-        .forEach((input) => input.setAttribute('tabindex', '-1'));
-      // 既に hidden（display:none）なら transitionend は発火しないため即座に終了する。
-      if (this.menu.hidden) {
-        return;
-      }
-      // CSS transition 完了後に hidden を設定する。
-      this.menu.addEventListener(
-        'transitionend',
-        () => {
-          if (!this.root.classList.contains('-open')) {
-            this.menu.hidden = true;
-          }
-        },
-        { once: true }
-      );
-    }
-  }
-
-  /** ドロップダウン範囲外がクリックされた場合、メニューを自動クローズ */
-  private handleDocumentClick(event: MouseEvent): void {
-    if (event.target instanceof Node && this.root.contains(event.target)) {
-      return;
-    }
-
-    this.toggle(false);
-  }
-
-  /** Escape キー：ドロップダウンメニューを閉じる */
-  private handleDocumentKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Escape') {
-      this.toggle(false);
-    }
-  }
-
 }

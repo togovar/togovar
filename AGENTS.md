@@ -95,6 +95,7 @@ app/frontend/
   views/         Pugテンプレート
 ```
 
+- ヘッダーの共通初期化は `packs/header.ts` を入口とし、`views/layouts/application.pug` から全ページで読み込む。Home以外では `main` が読み込まれるとは限らないため、ヘッダー操作を `packs/index.ts` に置かない。
 - UIクラス・Web Componentsは `app/frontend/src/components/` に置く。Lit使用の有無では分けない。
 - Lit/Web Components が直接 import するSCSSは `app/frontend/stylesheets/web-components/` に置く。
 - Advanced Search 本体の制御ファイルは `app/frontend/src/components/AdvancedSearch/` に置く。

@@ -10,9 +10,9 @@ header#GlobalHeader
     span.summary A comprehensive Japanese genetic variation database
 
     nav.dropdown-view
-      button.button.button-view #{TOGOVAR_FRONTEND_REFERENCE}
+      button.button.button-view(type='button' aria-expanded='false' aria-controls='ReferenceMenu') #{TOGOVAR_FRONTEND_REFERENCE}
       .selectshow
-        ul.list
+        ul#ReferenceMenu.list(hidden inert)
           li.item
             case TOGOVAR_FRONTEND_REFERENCE
               when 'GRCh37'
@@ -26,9 +26,9 @@ header#GlobalHeader
               when 'GRCh38'
                 a.link.-active GRCh38
   .right
-    .menu-bar
+    button.menu-bar(type='button' aria-label='Navigation' aria-expanded='false' aria-controls='NavigationMenu')
     nav.menus-view
-      .menu-wrapper
+      #NavigationMenu.menu-wrapper
         ul.menu.navigation
           li.item.menu-button(class={"-current": locals.currentPage && locals.currentPage.match(/^home/)})
             a.link(href="/") Home
