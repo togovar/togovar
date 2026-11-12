@@ -86,9 +86,11 @@
 
   // テーブル検索結果が見つからない場合のメッセージ
   // .tablecontainer は position: relative を持つため、そこを基準に絶対配置して tbody エリア中央に表示する
+  // 幅を狭めるとヘッダー（Download・レポートリンク）が折り返して .tablecontainer が低くなり、
+  // 25% だけでは thead（高さ 64px）に重なるため、thead 直下より上には来ないよう下限を設ける。
   &.-not-found > .tablecontainer::after {
     position: absolute;
-    top: 25%;
+    top: max(25%, 64px + 32px);
     left: 50%;
     display: block;
     font-size: 14px;
