@@ -39,7 +39,7 @@ AIエージェント向けの作業指示・設計ルールは [AGENTS.md](./AGE
 app/frontend/
   assets/        参照ゲノム別JSON、karyotype.tsv、stanza設定など
   config/        Webpack設定、サイトURL生成設定
-  packs/         Webpackエントリポイント
+  packs/         Webpackエントリポイント（header.ts: 全ページ共通ヘッダー、index.ts: 主にHome、report/index.ts: レポート）
   src/
     api/         API通信
     components/  UIコンポーネント・画面部品
@@ -132,6 +132,8 @@ TOGOVAR_REFERENCE=GRCh38
 ```bash
 npm run dev
 ```
+
+`app/frontend/config/` の Webpack 設定（エントリポイントなど）を変更した場合は、開発サーバーを停止して `npm run dev` で再起動してください。起動済みのサーバーには設定変更が自動反映されません。
 
 起動後、以下の URL にアクセスしてください。
 

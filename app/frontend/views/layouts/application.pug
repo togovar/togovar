@@ -133,6 +133,9 @@ html(data-page=locals.currentPage, lang=locals.language ? locals.language : "en"
         window.addEventListener('hashchange', syncLangSwitcherHash);
       })();
 
+    //- ページ固有の JS を読まない Downloads や 404 でも、ヘッダー操作を有効にする。
+    each js in htmlWebpackPlugin.files.js.filter(x => x.match(/^\/js\/header-/))
+      script(type="text/javascript", src=js, defer)
     block head
   body
     include ../includes/_global_header

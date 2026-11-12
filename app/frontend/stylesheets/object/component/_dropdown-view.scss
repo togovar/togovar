@@ -1,4 +1,4 @@
-// 開閉方法が異なるGRChとColumnsでも、トリガーの配色と矢印を同じ責務で管理する。
+// GRCh と Columns のトリガーの配色と矢印を同じ責務で管理する。
 @mixin dropdown-view-trigger {
   padding-right: 1.4em;
   line-height: 20px;
@@ -61,6 +61,7 @@
     position: relative;
     top: -20px;
     height: 20px;
+    pointer-events: none;
     cursor: pointer;
     transition: background-color 0.16s ease;
 
@@ -104,13 +105,9 @@
         }
       }
     }
+  }
 
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-
-      > .list {
-        @include dropdown-view-list-open;
-      }
-    }
+  &.-open > .selectshow > .list {
+    @include dropdown-view-list-open;
   }
 }
