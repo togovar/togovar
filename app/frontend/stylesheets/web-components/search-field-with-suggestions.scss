@@ -11,10 +11,17 @@
   display: flex;
   min-width: fit-content;
   max-width: 50%;
+  // 角丸の外へ一覧のスクロールバーや選択行の背景がはみ出さないよう切り取る
+  overflow: hidden;
   font-size: 14px;
+  // 置かれる場所（Simple Search ヘッダー・Advanced Search の条件パネル）の行の高さを受け継がず、
+  // 折り返した候補名が読みやすい倍率に固定する（reset.scss の body と同じ 1.5）
+  line-height: 1.5;
   color: var(--color-black);
   background-color: white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  // レポートリンク一覧（_results.scss の .more-panel）と同じ角丸・影にそろえる
+  border-radius: 5px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
   > .column {
     + .column {
       border-left: solid 1px var(--color-separator-sub);

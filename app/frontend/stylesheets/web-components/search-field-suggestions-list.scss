@@ -1,6 +1,10 @@
+// 見た目は検索結果ヘッダーのレポートリンク一覧（object/project/_results.scss の .more-panel）にそろえる。
+// 外枠（角丸・影）は親の search-field-with-suggestions.scss の .suggestions-container が持つ。
+// Shadow DOM には foundation/_reset.scss が届かないため、h3 / ul の UA 既定 margin はここで消す。
+
 .title {
-  padding: 5px var(--padding-side) 0;
-  margin: 4px 0 0;
+  padding: 8px 12px 0;
+  margin: 0;
   font-size: 12px;
   font-weight: normal;
   line-height: 16px;
@@ -12,15 +16,17 @@
 
 .list {
   max-height: 300px;
-  padding-left: 0;
-  margin: 10px 0;
-  overflow-y: scroll;
+  padding: 6px 0;
+  margin: 0;
+  overflow-y: auto;
+  // 一覧の端までスクロールしたとき、その先のページへスクロールが伝わらないようにする
+  overscroll-behavior: contain;
   list-style: none;
 
+  // 長い疾患名は折り返して表示する。高さを固定すると2行目が次の候補に重なるため、
+  // height / line-height は指定せず、上下の padding だけで行の間隔を取る。
   > .item {
-    height: 24px;
-    padding: 0 var(--padding-side);
-    line-height: 24px;
+    padding: 2px 12px;
     cursor: pointer;
     transition: background-color var(--gui-duration);
     > em {
@@ -28,12 +34,8 @@
       background-color: var(--color-suggest);
     }
 
-    &:first-child {
-      padding-top: 4px;
-    }
-
     &:hover {
-      background-color: color-mix(in srgb, var(--color-selected) 20%, transparent);
+      background-color: var(--color-selected-hover);
     }
 
     &.-disabled {
@@ -53,7 +55,7 @@
     }
 
     &.-empty {
-      padding: 0.5rem;
+      padding: 0.5rem 12px;
       color: color-mix(in srgb, var(--color-black) 50%, transparent);
       text-align: center;
     }
