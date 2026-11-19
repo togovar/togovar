@@ -118,7 +118,7 @@ main#SearchResultsView.LayoutMainAside
   .LayoutAside
     //- 折りたたみ時だけ表示される縦長の開くボタン（SideBar.ts が開閉状態を管理）
     button.sidebar-rail(type="button", aria-controls="SideBar", aria-expanded="true", aria-label="Open sidebar")
-      span.icon(aria-hidden="true")
+      span.chevron(aria-hidden="true")
       span.label.filters
         span.simple Filters
         span.advanced Statistics
@@ -129,8 +129,8 @@ main#SearchResultsView.LayoutMainAside
       //- バリアントプレビュー（行クリック時にサイドバーに展開される詳細情報）
       #Previews.sidebarcontent
         h2.title
+          button.sidebar-close(type="button", aria-controls="SideBar", aria-expanded="true", aria-label="Close sidebar", title="Close sidebar")
           | Preview
-          button.sidebar-close.button-view.-weak(type="button", aria-controls="SideBar", aria-expanded="true") Close
         a#PreviewToVariantReport.panel-view.-cannotcollapse.-emphasize
           h3.title Detailed variant report page
         section#PreviewGene.panel-view
@@ -162,11 +162,10 @@ main#SearchResultsView.LayoutMainAside
       //- 絞り込みフィルター群（Simple モード時のみ表示される項目も含む）
       #Filters.sidebarcontent
         h2.title
+          button.sidebar-close(type="button", aria-controls="SideBar", aria-expanded="true", aria-label="Close sidebar", title="Close sidebar")
           span.simple Statistics / Filters
           span.advanced Statistics
-          span.actions
-            button.button-view.-weak Clear all
-            button.sidebar-close.button-view.-weak(type="button", aria-controls="SideBar", aria-expanded="true") Close
+          button.button-view.-weak Clear all
         section#FilterDatasets.panel-view
           h3.title
             | Dataset

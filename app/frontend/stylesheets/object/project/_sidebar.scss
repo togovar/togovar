@@ -40,7 +40,8 @@
     > .title {
       position: relative;
       display: flex;
-      justify-content: space-between;
+      gap: 4px;
+      align-items: center;
       margin-bottom: 5px;
       font-size: 16px;
       font-weight: bold;
@@ -58,23 +59,14 @@
         }
       }
 
-      .button-view {
-        // stretch（デフォルト）で引き伸ばされないよう自身の高さを持たせる。
-        align-self: center;
+      // 開閉アイコン＋タイトルを左に寄せ、Clear all だけを右端へ送る。
+      > .button-view {
         height: 20px;
+        margin-left: auto;
         font-size: 12px;
-      }
 
-      // Clear all と Close を右端にまとめ、space-between で離れないようにする。
-      > .actions {
-        display: flex;
-        gap: 4px;
-        align-self: center;
-
-        > .button-view:not(.sidebar-close) {
-          body[data-search-mode='advanced'] & {
-            display: none;
-          }
+        body[data-search-mode='advanced'] & {
+          display: none;
         }
       }
     }
@@ -418,11 +410,11 @@
 // =============================================================================
 
 // 折りたたみ時に .LayoutAside 全高を占める縦長の「開く」ボタン。
-// 何のパネルが隠れているか分かるよう、アイコンと縦書きラベルを出す。
+// 何のパネルが隠れているか分かるよう縦書きラベルを出す。アイコンはラベルと重複するため置かない。
 .sidebar-rail {
   display: none;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
   align-items: center;
   width: 100%;
   height: 100%;
@@ -443,16 +435,29 @@
     background-color: color-mix(in srgb, white 10%, transparent);
   }
 
-  > .icon {
+  // 見出し左の「‹」（閉じる）と対になる「›」で、押すと開くことを示す。
+  // .sidebar-close と同じく、hover で明るくなり開く方向（右）へ少し動かして反応を揃える。
+  > .chevron {
+    font-size: 12px;
+    opacity: 0.7;
+    // Font Awesome の「›」はグリフ内で右寄りに見えるため、見た目の中心へ1px戻す。
+    // transform とは別プロパティなので、hover 時の translateX と合成される。
+    translate: -1px 0;
+    transition:
+      opacity var(--gui-duration),
+      transform var(--gui-duration);
+
     &::before {
       font-family: 'Font Awesome 7 Free', sans-serif;
       font-weight: 900;
-      content: var(--icon-filter);
-
-      body.-rowselected & {
-        content: var(--icon-eye);
-      }
+      content: var(--icon-chevron-right);
     }
+  }
+
+  &:hover > .chevron,
+  &:focus-visible > .chevron {
+    opacity: 1;
+    transform: translateX(2px);
   }
 
   > .label {
@@ -488,13 +493,43 @@
   }
 }
 
-// 各パネル見出しの「Close」。nanbyodata の目次と同様に「‹ Close」で閉じる方向を示す。
+// 各パネル見出しの左に置く開閉アイコン。ボタン枠を出さず「‹」だけで閉じる方向を示す。
+// hover で背景の四角を出すと周囲のボタンと浮くため、明るさと左への小さな移動だけで反応させる。
 .sidebar-close {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 20px;
+  padding: 0;
+  font-size: 12px;
+  color: white;
+  cursor: pointer;
+  background: none;
+  border: none;
+  opacity: 0.7;
+  transition: opacity var(--gui-duration);
+
   &::before {
-    margin-right: 0.3em;
     font-family: 'Font Awesome 7 Free', sans-serif;
-    font-size: 0.8em;
     font-weight: 900;
     content: var(--icon-chevron-left);
+    transition: transform var(--gui-duration);
+  }
+
+  &:hover,
+  &:focus-visible {
+    opacity: 1;
+
+    &::before {
+      transform: translateX(-2px);
+    }
+  }
+
+  // マウス操作では枠を出さず、キーボード操作時だけ現在位置が分かるようにする。
+  &:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 1px;
   }
 }
