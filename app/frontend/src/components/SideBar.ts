@@ -11,6 +11,7 @@ const SELECTORS = {
 } as const;
 
 const COLLAPSED_CLASS = '-sidebar-collapsed';
+// index.pug のインラインスクリプトが描画前に同じキーを読むため、変更時は両方を揃える。
 const COLLAPSED_STORAGE_KEY = 'sidebar_collapsed';
 
 type SelectedRowIndex = StoreState['selectedRow'];
