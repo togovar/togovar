@@ -5,8 +5,7 @@ import { selectRequired } from '../utils/dom/select';
 
 const SELECTORS = {
   previews: '#Previews',
-  resetButton:
-    '#Filters > .title > .actions > .button-view:not(.sidebar-close)',
+  resetButton: '#Filters > .title > .button-view',
   rail: '.sidebar-rail',
   closeButtons: '.sidebar-close',
 } as const;
