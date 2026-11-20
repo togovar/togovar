@@ -66,6 +66,19 @@ export class HoverDropdown {
       },
       { signal, passive: true }
     );
+    container.addEventListener(
+      'mouseout',
+      (event) => {
+        // 保留中に動かさず外へ出た場合、古い保留が残って次の判定を紛らわしくしないよう解除する。
+        if (
+          event.relatedTarget instanceof Node &&
+          container.contains(event.relatedTarget)
+        )
+          return;
+        this.pendingHover = false;
+      },
+      { signal }
+    );
     container.addEventListener('focusin', enter, { signal });
     // タッチで先行する mouseover の直後に閉じないよう、クリックは開く操作に限定する。
     container.addEventListener('click', enter, { signal });
