@@ -38,7 +38,8 @@ export default class SideBar {
   private readonly _elm: HTMLElement;
   private readonly _body: HTMLElement;
   private readonly _previews: HTMLElement;
-  private readonly _toggleButtons: HTMLButtonElement[];
+  private readonly _rail: HTMLButtonElement;
+  private readonly _closeButtons: HTMLButtonElement[];
 
   /**
    * selectedRowの変化を受け取るためStoreに購読登録し、初期値を即時反映する。
@@ -54,18 +55,17 @@ export default class SideBar {
 
     // レールは #SideBar の外（.LayoutAside 直下）に置いているため親要素から探す。
     const container = this._elm.parentElement ?? document;
-    const rail = selectRequired<HTMLButtonElement>(
+    this._rail = selectRequired<HTMLButtonElement>(
       container,
       SELECTORS.rail,
       'SideBar'
     );
-    const closeButtons = Array.from(
+    this._closeButtons = Array.from(
       this._elm.querySelectorAll<HTMLButtonElement>(SELECTORS.closeButtons)
     );
-    this._toggleButtons = [rail, ...closeButtons];
 
     // 開閉ボタンの aria-expanded を初期表示から正しくするため、保存済みの開閉状態を先に復元する。
-    this._setupCollapse(rail, closeButtons);
+    this._setupCollapse();
 
     storeManager.subscribe('selectedRow', (v) => this.selectedRow(v));
     this.selectedRow(storeManager.getData('selectedRow'));
@@ -94,34 +94,46 @@ export default class SideBar {
   /**
    * 結果テーブルを広く使いたい利用者の選択をリロード後も保つため、localStorageから開閉状態を復元する。
    */
-  private _setupCollapse(
-    rail: HTMLButtonElement,
-    closeButtons: HTMLButtonElement[]
-  ): void {
+  private _setupCollapse(): void {
     this._applyCollapsed(readCollapsed());
 
-    rail.addEventListener('click', () => this.setCollapsed(false));
-    closeButtons.forEach((button) => {
+    this._rail.addEventListener('click', () => this.setCollapsed(false));
+    this._closeButtons.forEach((button) => {
       button.addEventListener('click', () => this.setCollapsed(true));
     });
   }
 
   /**
    * 利用者操作による開閉は次回表示でも維持したいので、状態反映と同時に保存する。
+   * 押したボタン自体が隠れる（inert / display: none）ため、フォーカスを反対側のボタンへ移して見失わないようにする。
    */
   setCollapsed(collapsed: boolean): void {
     this._applyCollapsed(collapsed);
     writeCollapsed(collapsed);
+
+    const next = collapsed ? this._rail : this._visibleCloseButton();
+    // パネルを下へスクロールしていた場合に、見出しのボタンまで勝手に戻さないようにする。
+    next?.focus({ preventScroll: true });
+  }
+
+  /**
+   * #SideBar は Preview と Filters を横に並べてスライド表示しているため、いま見えている面の Close を選ぶ。
+   */
+  private _visibleCloseButton(): HTMLButtonElement | undefined {
+    const showsPreview = this._body.classList.contains('-rowselected');
+    return this._closeButtons.find(
+      (button) => this._previews.contains(button) === showsPreview
+    );
   }
 
   /**
    * 開閉状態はCSS（幅・表示切替）とa11y属性の両方に効くため、bodyクラス・aria・inertを1か所で同期する。
-   * 閉じている間の #SideBar は inert にして、見えないフィルタへTabフォーカスが入らないようにする。
+   * CSSの visibility: hidden でもフォーカスは外れるが、スタイル未適用時でも見えないフィルタへTabで入らないよう inert も付ける。
    */
   private _applyCollapsed(collapsed: boolean): void {
     this._body.classList.toggle(COLLAPSED_CLASS, collapsed);
     this._elm.inert = collapsed;
-    this._toggleButtons.forEach((button) => {
+    [this._rail, ...this._closeButtons].forEach((button) => {
       button.setAttribute('aria-expanded', String(!collapsed));
     });
   }
