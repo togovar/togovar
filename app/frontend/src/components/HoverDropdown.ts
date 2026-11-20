@@ -15,6 +15,8 @@ export class HoverDropdown {
   private closeTimer: number | null = null;
   private focusTimer: number | null = null;
   private suppressFocusOpen = false;
+  private lastPointer: { x: number; y: number } | null = null;
+  private pendingHover = false;
   private readonly events = new AbortController();
 
   /** 内容の生成やドラッグは呼び出し元に残し、hover・focus・クリックの判定を一箇所で揃える。 */
@@ -32,7 +34,54 @@ export class HoverDropdown {
       if (trigger && container.contains(trigger)) this.open(trigger);
       else if (panel.contains(event.target)) this.cancelClose();
     };
-    container.addEventListener('mouseover', enter, { signal });
+    // サイドバー開閉やスクロールで静止したカーソルの下にボタンが来ても mouseover が届くため、
+    // 実際にマウスが動いたときだけ開く。レイアウト由来の進入は次の mousemove まで保留する。
+    document.addEventListener(
+      'mousemove',
+      (event) => {
+        this.lastPointer = { x: event.clientX, y: event.clientY };
+      },
+      { signal, passive: true }
+    );
+    container.addEventListener(
+      'mouseover',
+      (event) => {
+        if (this.isStationaryPointer(event)) {
+          this.pendingHover = true;
+          return;
+        }
+        this.pendingHover = false;
+        enter(event);
+      },
+      { signal }
+    );
+    container.addEventListener(
+      'mousemove',
+      (event) => {
+        // ブラウザによってはレイアウト変化後に座標の変わらない mousemove を送るため、ここでも移動を確かめる。
+        // container の処理は document より先に動くので、lastPointer はまだ前回の座標のまま比べられる。
+        // lastPointer が未記録なのはページで最初の mousemove のときだけなので、実際の移動として扱う。
+        // こうしないと、読み込み後の最初の hover で mouseover・mousemove とも止まり、もう一度動かすまで開かない。
+        if (!this.pendingHover) return;
+        if (this.lastPointer && this.isStationaryPointer(event)) return;
+        this.pendingHover = false;
+        enter(event);
+      },
+      { signal, passive: true }
+    );
+    container.addEventListener(
+      'mouseout',
+      (event) => {
+        // 保留中に動かさず外へ出た場合、古い保留が残って次の判定を紛らわしくしないよう解除する。
+        if (
+          event.relatedTarget instanceof Node &&
+          container.contains(event.relatedTarget)
+        )
+          return;
+        this.pendingHover = false;
+      },
+      { signal }
+    );
     container.addEventListener('focusin', enter, { signal });
     // タッチで先行する mouseover の直後に閉じないよう、クリックは開く操作に限定する。
     container.addEventListener('click', enter, { signal });
@@ -83,6 +132,17 @@ export class HoverDropdown {
       },
       { signal }
     );
+  }
+
+  /**
+   * レイアウト変化で発生した mouseover を利用者の hover と区別するため、直前の mousemove と座標を比べる。
+   * 本当にマウスを動かして入った場合、mouseover は mousemove より先に届くので座標が一致しない。
+   * 座標が未記録のときは区別できないため、mouseover では保留側に倒し、直後の mousemove で開く。
+   */
+  private isStationaryPointer(event: MouseEvent): boolean {
+    const last = this.lastPointer;
+    if (!last) return true;
+    return last.x === event.clientX && last.y === event.clientY;
   }
 
   /** パネルまでの隙間や子要素への移動で閉じないよう、ボタンとパネルを一つの領域として扱う。 */
