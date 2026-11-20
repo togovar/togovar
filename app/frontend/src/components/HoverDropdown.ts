@@ -60,7 +60,10 @@ export class HoverDropdown {
       (event) => {
         // ブラウザによってはレイアウト変化後に座標の変わらない mousemove を送るため、ここでも移動を確かめる。
         // container の処理は document より先に動くので、lastPointer はまだ前回の座標のまま比べられる。
-        if (!this.pendingHover || this.isStationaryPointer(event)) return;
+        // lastPointer が未記録なのはページで最初の mousemove のときだけなので、実際の移動として扱う。
+        // こうしないと、読み込み後の最初の hover で mouseover・mousemove とも止まり、もう一度動かすまで開かない。
+        if (!this.pendingHover) return;
+        if (this.lastPointer && this.isStationaryPointer(event)) return;
         this.pendingHover = false;
         enter(event);
       },
@@ -134,6 +137,7 @@ export class HoverDropdown {
   /**
    * レイアウト変化で発生した mouseover を利用者の hover と区別するため、直前の mousemove と座標を比べる。
    * 本当にマウスを動かして入った場合、mouseover は mousemove より先に届くので座標が一致しない。
+   * 座標が未記録のときは区別できないため、mouseover では保留側に倒し、直後の mousemove で開く。
    */
   private isStationaryPointer(event: MouseEvent): boolean {
     const last = this.lastPointer;
