@@ -16,6 +16,24 @@ const COLLAPSED_STORAGE_KEY = 'sidebar_collapsed';
 
 type SelectedRowIndex = StoreState['selectedRow'];
 
+/** Cookie禁止などで localStorage が使えない環境でもサイドバーを動かすため、読み込み失敗は「開いた状態」として扱う。 */
+function readCollapsed(): boolean {
+  try {
+    return window.localStorage.getItem(COLLAPSED_STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+/** 保存は「次回も同じ状態にする」ための補助なので、失敗しても開閉操作自体は止めない。 */
+function writeCollapsed(collapsed: boolean): void {
+  try {
+    window.localStorage.setItem(COLLAPSED_STORAGE_KEY, String(collapsed));
+  } catch {
+    // 保存できない環境では、今回の表示中だけ状態を保つ。
+  }
+}
+
 export default class SideBar {
   private readonly _elm: HTMLElement;
   private readonly _body: HTMLElement;
@@ -80,8 +98,7 @@ export default class SideBar {
     rail: HTMLButtonElement,
     closeButtons: HTMLButtonElement[]
   ): void {
-    const stored = window.localStorage.getItem(COLLAPSED_STORAGE_KEY);
-    this._applyCollapsed(stored === 'true');
+    this._applyCollapsed(readCollapsed());
 
     rail.addEventListener('click', () => this.setCollapsed(false));
     closeButtons.forEach((button) => {
@@ -94,7 +111,7 @@ export default class SideBar {
    */
   setCollapsed(collapsed: boolean): void {
     this._applyCollapsed(collapsed);
-    window.localStorage.setItem(COLLAPSED_STORAGE_KEY, String(collapsed));
+    writeCollapsed(collapsed);
   }
 
   /**
