@@ -86,8 +86,11 @@
 
   // JS が DOMContentLoaded 後に -sidebar-ready を付与することで
   // 初期描画でトランジションが走らないようにする
+  // サイドバー全体が横に動くため、動きを減らす設定の利用者には切り替えだけを行う。
   body.-sidebar-ready & {
-    transition: transform var(--gui-duration);
+    @media (prefers-reduced-motion: no-preference) {
+      transition: transform var(--gui-duration);
+    }
   }
 
   // 行選択でプレビューパネルエリアをスライドイン
@@ -462,10 +465,14 @@
     }
   }
 
+  // 動きを減らす設定の利用者には、移動させず明るさの変化だけで反応を示す。
   &:hover > .chevron,
   &:focus-visible > .chevron {
     opacity: 1;
-    transform: translateX(2px);
+
+    @media (prefers-reduced-motion: no-preference) {
+      transform: translateX(2px);
+    }
   }
 
   > .label {
@@ -530,8 +537,11 @@
   &:focus-visible {
     opacity: 1;
 
+    // .sidebar-rail と同じく、動きを減らす設定では明るさの変化だけにする。
     &::before {
-      transform: translateX(-2px);
+      @media (prefers-reduced-motion: no-preference) {
+        transform: translateX(-2px);
+      }
     }
   }
 
