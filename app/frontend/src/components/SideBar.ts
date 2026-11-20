@@ -5,6 +5,7 @@ import { selectRequired } from '../utils/dom/select';
 
 const SELECTORS = {
   previews: '#Previews',
+  filters: '#Filters',
   resetButton: '#Filters > .title > .button-view',
   rail: '.sidebar-rail',
   closeButtons: '.sidebar-close',
@@ -38,6 +39,7 @@ export default class SideBar {
   private readonly _elm: HTMLElement;
   private readonly _body: HTMLElement;
   private readonly _previews: HTMLElement;
+  private readonly _filters: HTMLElement;
   private readonly _rail: HTMLButtonElement;
   private readonly _closeButtons: HTMLButtonElement[];
 
@@ -50,6 +52,11 @@ export default class SideBar {
     this._previews = selectRequired<HTMLElement>(
       this._elm,
       SELECTORS.previews,
+      'SideBar'
+    );
+    this._filters = selectRequired<HTMLElement>(
+      this._elm,
+      SELECTORS.filters,
       'SideBar'
     );
 
@@ -151,6 +158,28 @@ export default class SideBar {
     if (hasSelectedRow && !wasSelected) {
       this._previews.scrollTop = 0;
     }
+    // inert を付けるとフォーカスが body へ外れるため、切り替え前に「去る面にフォーカスがあったか」を記録する。
+    // 折りたたみ中は #SideBar 全体が inert で中にフォーカスがないため、ここで勝手に開くことはない。
+    const outgoing = wasSelected ? this._previews : this._filters;
+    const hadFocus =
+      hasSelectedRow !== wasSelected &&
+      outgoing.contains(document.activeElement);
+
     this._body.classList.toggle('-rowselected', hasSelectedRow);
+    this._syncActivePanel();
+
+    if (hadFocus) {
+      // Escape で選択解除したときなどに、画面外へ滑り出た面へフォーカスが取り残されないようにする。
+      this._visibleCloseButton()?.focus({ preventScroll: true });
+    }
+  }
+
+  /**
+   * Preview と Filters は横並びで片方を画面外へずらしているだけなので、見えない面へ Tab で入らないよう inert にする。
+   */
+  private _syncActivePanel(): void {
+    const showsPreview = this._body.classList.contains('-rowselected');
+    this._previews.inert = !showsPreview;
+    this._filters.inert = showsPreview;
   }
 }
