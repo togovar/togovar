@@ -46,7 +46,7 @@ export default class SideBar {
     );
     this._toggleButtons = [rail, ...closeButtons];
 
-    // 初回の selectedRow 反映で自動展開が走る前に、保存済みの開閉状態を復元しておく。
+    // 開閉ボタンの aria-expanded を初期表示から正しくするため、保存済みの開閉状態を先に復元する。
     this._setupCollapse(rail, closeButtons);
 
     storeManager.subscribe('selectedRow', (v) => this.selectedRow(v));
@@ -110,24 +110,17 @@ export default class SideBar {
   }
 
   /**
-   * 折りたたみ状態かどうかはbodyクラスを正とし、別途フラグを持って状態がずれるのを防ぐ。
-   */
-  private get _isCollapsed(): boolean {
-    return this._body.classList.contains(COLLAPSED_CLASS);
-  }
-
-  /**
    * selectedRowはCSSだけでは参照できないStore状態なので、bodyの状態クラスへ橋渡しする。
    * 行間を移動するたびに scrollTop をリセットすると Up/Down キー操作でぴょこぴょこ動くため、
    * 「行なし → 行あり」（初回選択）のときのみプレビューを先頭に戻す。
-   * 行クリックはプレビューを見たい意思表示なので、折りたたみ中でも初回選択時だけ自動で開く。
+   * 折りたたみは利用者の明示的な操作なので、行選択では自動で開かない（レールのラベルだけ Preview に切り替わる）。
+   * 閉じたときの面によって行クリックの結果が変わると分かりにくいため、開閉はレールと Close だけで行う。
    */
   selectedRow(index: SelectedRowIndex): void {
     const hasSelectedRow = index !== undefined;
     const wasSelected = this._body.classList.contains('-rowselected');
     if (hasSelectedRow && !wasSelected) {
       this._previews.scrollTop = 0;
-      if (this._isCollapsed) this.setCollapsed(false);
     }
     this._body.classList.toggle('-rowselected', hasSelectedRow);
   }
