@@ -58,7 +58,9 @@ export class HoverDropdown {
     container.addEventListener(
       'mousemove',
       (event) => {
-        if (!this.pendingHover) return;
+        // ブラウザによってはレイアウト変化後に座標の変わらない mousemove を送るため、ここでも移動を確かめる。
+        // container の処理は document より先に動くので、lastPointer はまだ前回の座標のまま比べられる。
+        if (!this.pendingHover || this.isStationaryPointer(event)) return;
         this.pendingHover = false;
         enter(event);
       },

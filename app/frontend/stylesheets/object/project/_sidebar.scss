@@ -47,15 +47,21 @@
       font-weight: bold;
       color: white;
 
-      > .simple {
-        body[data-search-mode='advanced'] & {
-          display: none;
-        }
-      }
+      // 開閉ボタンを h2 の外に出したため、見た目は .title 側の文字設定を引き継ぐ。
+      > .heading {
+        font-size: inherit;
+        font-weight: inherit;
 
-      > .advanced {
-        body[data-search-mode='simple'] & {
-          display: none;
+        > .simple {
+          body[data-search-mode='advanced'] & {
+            display: none;
+          }
+        }
+
+        > .advanced {
+          body[data-search-mode='simple'] & {
+            display: none;
+          }
         }
       }
 
@@ -416,7 +422,9 @@
   flex-direction: column;
   gap: 5px;
   align-items: center;
-  width: 100%;
+  // 100% にすると閉じるアニメーション中に広い幅から縮み、中央寄せのラベルが横へ流れて見える。
+  // 折りたたみ後の幅に固定して、アニメーション中も最終位置に表示する。
+  width: var(--width-sidebar-collapsed);
   height: 100%;
   padding: 12px 0;
   font-size: 13px;
