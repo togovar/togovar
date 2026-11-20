@@ -446,6 +446,13 @@
     background-color: color-mix(in srgb, white 10%, transparent);
   }
 
+  // Close を押すとフォーカスがレールへ移るため、.sidebar-close と同じ枠でキーボード操作時の位置を示す。
+  // .LayoutAside の overflow: hidden で外側の枠が切れないよう、内側に描く。
+  &:focus-visible {
+    outline: 2px solid white;
+    outline-offset: -2px;
+  }
+
   // 見出し左の「‹」（閉じる）と対になる「›」で、押すと開くことを示す。
   // .sidebar-close と同じく、hover で明るくなり開く方向（右）へ少し動かして反応を揃える。
   > .chevron {

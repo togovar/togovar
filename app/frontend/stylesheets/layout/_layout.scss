@@ -36,7 +36,7 @@
 
     // サイドバー幅の変化にスムーズに追従させるため width をトランジション対象にする。
     // 保存済みの折りたたみ状態を復元する初期描画では動かさないよう、準備完了後だけ遷移させる。
-    // 画面の大部分が横に動くため、OS で「視差効果を減らす」を選んだ利用者には動かさない。
+    // 画面の大部分が横に動くため、OS で動きを減らす設定（macOS では「視差効果を減らす」）を選んだ利用者には動かさない。
     body.-sidebar-ready & {
       @media (prefers-reduced-motion: no-preference) {
         transition: width var(--gui-duration);
