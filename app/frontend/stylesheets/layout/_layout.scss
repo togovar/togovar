@@ -36,8 +36,11 @@
 
     // サイドバー幅の変化にスムーズに追従させるため width をトランジション対象にする。
     // 保存済みの折りたたみ状態を復元する初期描画では動かさないよう、準備完了後だけ遷移させる。
+    // 画面の大部分が横に動くため、OS で「視差効果を減らす」を選んだ利用者には動かさない。
     body.-sidebar-ready & {
-      transition: width var(--gui-duration);
+      @media (prefers-reduced-motion: no-preference) {
+        transition: width var(--gui-duration);
+      }
     }
 
     // 行選択でサイドバーが再表示されるとき通常幅に戻す。
@@ -72,8 +75,11 @@
     }
 
     // 初期描画（保存済みの折りたたみ状態の復元）でアニメーションさせないため、準備完了後だけ遷移させる。
+    // .LayoutMain と同じく、動きを減らす設定の利用者には動かさない。
     body.-sidebar-ready & {
-      transition: width var(--gui-duration);
+      @media (prefers-reduced-motion: no-preference) {
+        transition: width var(--gui-duration);
+      }
     }
 
     body.-sidebar-collapsed & {
