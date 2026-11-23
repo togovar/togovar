@@ -26,6 +26,29 @@ const REMAINS_NOUNS = {
   consequence: { one: 'consequence', other: 'consequences' },
 } as const;
 
+/** 表のセルと「+N」の一覧（ResultsRemainsDropdown）でリンク先がずれないよう、dbSNP の URL を1か所で作る。 */
+export function getDbsnpUrl(id: string): string {
+  return `https://identifiers.org/dbsnp/${encodeURIComponent(id)}`;
+}
+
+/** 表のセルと「+N」の一覧でリンク先がずれないよう、Gene レポートのパスを1か所で作る。 */
+export function getGeneReportPath(id: GeneSymbol['id']): string {
+  return `/gene/${encodeURIComponent(String(id))}`;
+}
+
+/**
+ * バッジの件数と一覧の中身を同じ規則にするため、セルに見えている most_severe 以外の Consequence を重複なしで返す。
+ * most_severe が transcripts に含まれない場合も、件数が一覧より1件少なくならないよう ID で除外する。
+ */
+export function getOtherConsequenceIds(
+  mostConsequence: string,
+  transcripts: Transcript[]
+): string[] {
+  return Array.from(
+    new Set(transcripts.flatMap((transcript) => transcript.consequence ?? []))
+  ).filter((id) => id !== mostConsequence);
+}
+
 type NormalizedGeneSummary = {
   total: number;
   items: GeneSymbol[];
@@ -199,7 +222,7 @@ export class ResultsColumnUpdater {
     this.updateAnchor(
       tdRS,
       'hyper-text -external',
-      `https://identifiers.org/dbsnp/${values[0]}`,
+      getDbsnpUrl(values[0]),
       values[0],
       `Open dbSNP record ${values[0]}`,
       tdRSRemains
@@ -339,7 +362,7 @@ export class ResultsColumnUpdater {
     this.updateAnchor(
       tdGene,
       'hyper-text -internal',
-      `/gene/${validSymbols[0].id}`,
+      getGeneReportPath(validSymbols[0].id),
       validSymbols[0].name,
       `View gene ${validSymbols[0].name} details`,
       tdGeneRemains
@@ -418,13 +441,9 @@ export class ResultsColumnUpdater {
       (getSimpleSearchConditionMaster('consequence')?.items as
         | ConsequenceMasterItem[]
         | undefined) ?? [];
-    const uniqueConsequences = Array.from(
-      new Set(transcripts.flatMap((transcript) => transcript.consequence ?? []))
-    );
-
     this.updateRemainsBadge(
       tdConsequenceRemains,
-      uniqueConsequences.length - 1,
+      getOtherConsequenceIds(mostConsequence, transcripts).length,
       REMAINS_NOUNS.consequence
     );
     tdConsequenceItem.textContent =

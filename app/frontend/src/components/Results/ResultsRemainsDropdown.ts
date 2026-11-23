@@ -3,7 +3,12 @@ import { storeManager } from '../../store/StoreManager';
 import { getSimpleSearchConditionMaster } from '../../store/search/searchManager';
 import { createEl } from '../../utils/dom/createEl';
 import { fitResultsPanelHeight } from './fitResultsPanelHeight';
-import { ResultsColumnUpdater } from './ResultsColumnUpdater';
+import {
+  ResultsColumnUpdater,
+  getDbsnpUrl,
+  getGeneReportPath,
+  getOtherConsequenceIds,
+} from './ResultsColumnUpdater';
 import { REMAINS_PANEL_ID } from './ResultsColumnTemplates';
 import type { ConsequenceMasterItem, ResultData } from '../../types';
 
@@ -72,6 +77,17 @@ export class ResultsRemainsDropdown {
       .querySelector<HTMLElement>('.tablecontainer')
       ?.addEventListener('scroll', this.onTableChange, { passive: true, signal });
     root.addEventListener('keydown', (event) => this.handleTab(event), { signal });
+    // 列幅ドラッグ中は Store の columns を通さずプレビューするため、掴んだ時点で閉じる。
+    // ResultsColumnResizeController が thead / tbody で伝播を止めるので、capture で先に受け取る
+    root.addEventListener(
+      'pointerdown',
+      (event) => {
+        if (event.target instanceof Element && event.target.closest('.resize-bar')) {
+          this.dropdown.close();
+        }
+      },
+      { capture: true, signal }
+    );
     storeManager.subscribe('offset', this.onTableChange);
     storeManager.subscribe('columns', this.onTableChange);
     storeManager.subscribe('searchResults', this.onSearchResults);
@@ -181,7 +197,7 @@ function getRemainingItems(
     return {
       items: (record.existing_variations ?? []).slice(1).map((id) => ({
         label: id,
-        href: `https://identifiers.org/dbsnp/${id}`,
+        href: getDbsnpUrl(id),
         external: true,
       })),
       more: 0,
@@ -193,7 +209,7 @@ function getRemainingItems(
     const summary = ResultsColumnUpdater.normalizeGeneSummary(record.genes);
     const symbols = summary.items.filter(Boolean);
     return {
-      items: symbols.slice(1).map((gene) => ({ label: gene.name, href: `/gene/${gene.id}` })),
+      items: symbols.slice(1).map((gene) => ({ label: gene.name, href: getGeneReportPath(gene.id) })),
       more: Math.max(0, summary.total - Math.max(symbols.length, 1)),
     };
   }
@@ -201,9 +217,7 @@ function getRemainingItems(
   if (td.classList.contains('consequence')) {
     const master =
       (getSimpleSearchConditionMaster('consequence')?.items as ConsequenceMasterItem[] | undefined) ?? [];
-    const ids = Array.from(
-      new Set((record.transcripts ?? []).flatMap((transcript) => transcript.consequence ?? []))
-    ).filter((id) => id !== record.most_severe_consequence);
+    const ids = getOtherConsequenceIds(record.most_severe_consequence, record.transcripts ?? []);
     return {
       items: ids.map((id) => ({ label: master.find((item) => item.id === id)?.label || id })),
       more: 0,
