@@ -19,6 +19,36 @@ import {
   type VariantLocusFields,
 } from '../../utils/variantPath';
 
+// 「+N」ボタンの読み上げラベル用。列ごとに何の件数かを伝える
+const REMAINS_NOUNS = {
+  refsnp: { one: 'RefSNP ID', other: 'RefSNP IDs' },
+  gene: { one: 'gene', other: 'genes' },
+  consequence: { one: 'consequence', other: 'consequences' },
+} as const;
+
+/** 表のセルと「+N」の一覧（ResultsRemainsDropdown）でリンク先がずれないよう、dbSNP の URL を1か所で作る。 */
+export function getDbsnpUrl(id: string): string {
+  return `https://identifiers.org/dbsnp/${encodeURIComponent(id)}`;
+}
+
+/** 表のセルと「+N」の一覧でリンク先がずれないよう、Gene レポートのパスを1か所で作る。 */
+export function getGeneReportPath(id: GeneSymbol['id']): string {
+  return `/gene/${encodeURIComponent(String(id))}`;
+}
+
+/**
+ * バッジの件数と一覧の中身を同じ規則にするため、セルに見えている most_severe 以外の Consequence を重複なしで返す。
+ * most_severe が transcripts に含まれない場合も、件数が一覧より1件少なくならないよう ID で除外する。
+ */
+export function getOtherConsequenceIds(
+  mostConsequence: string,
+  transcripts: Transcript[]
+): string[] {
+  return Array.from(
+    new Set(transcripts.flatMap((transcript) => transcript.consequence ?? []))
+  ).filter((id) => id !== mostConsequence);
+}
+
 type NormalizedGeneSummary = {
   total: number;
   items: GeneSymbol[];
@@ -176,7 +206,7 @@ export class ResultsColumnUpdater {
    */
   static updateRefSNP(
     tdRS: HTMLDivElement | null,
-    tdRSRemains: HTMLSpanElement | null,
+    tdRSRemains: HTMLElement | null,
     values: string[]
   ) {
     if (!tdRS || !tdRSRemains) return;
@@ -188,11 +218,11 @@ export class ResultsColumnUpdater {
     }
 
     // 画面には先頭のrsIDだけを表示し、残りの件数はdata-remainsに保持する。
-    this.updateRemainsBadge(tdRSRemains, values.length - 1);
+    this.updateRemainsBadge(tdRSRemains, values.length - 1, REMAINS_NOUNS.refsnp);
     this.updateAnchor(
       tdRS,
       'hyper-text -external',
-      `https://identifiers.org/dbsnp/${values[0]}`,
+      getDbsnpUrl(values[0]),
       values[0],
       `Open dbSNP record ${values[0]}`,
       tdRSRemains
@@ -300,7 +330,7 @@ export class ResultsColumnUpdater {
    */
   static updateGene(
     tdGene: HTMLDivElement | null,
-    tdGeneRemains: HTMLSpanElement | null,
+    tdGeneRemains: HTMLElement | null,
     genes: GeneSummary | GeneSymbol[] | undefined
   ) {
     if (!tdGene || !tdGeneRemains) return;
@@ -324,11 +354,15 @@ export class ResultsColumnUpdater {
     }
 
     // 画面には先頭の遺伝子だけを表示し、APIが返した総遺伝子数との差分をdata-remainsに保持する。
-    this.updateRemainsBadge(tdGeneRemains, Math.max(0, geneSummary.total - 1));
+    this.updateRemainsBadge(
+      tdGeneRemains,
+      Math.max(0, geneSummary.total - 1),
+      REMAINS_NOUNS.gene
+    );
     this.updateAnchor(
       tdGene,
       'hyper-text -internal',
-      `/gene/${validSymbols[0].id}`,
+      getGeneReportPath(validSymbols[0].id),
       validSymbols[0].name,
       `View gene ${validSymbols[0].name} details`,
       tdGeneRemains
@@ -391,7 +425,7 @@ export class ResultsColumnUpdater {
    */
   static updateConsequence(
     tdConsequenceItem: HTMLDivElement | null,
-    tdConsequenceRemains: HTMLSpanElement | null,
+    tdConsequenceRemains: HTMLElement | null,
     mostConsequence: string,
     transcripts: Transcript[]
   ) {
@@ -407,13 +441,10 @@ export class ResultsColumnUpdater {
       (getSimpleSearchConditionMaster('consequence')?.items as
         | ConsequenceMasterItem[]
         | undefined) ?? [];
-    const uniqueConsequences = Array.from(
-      new Set(transcripts.flatMap((transcript) => transcript.consequence ?? []))
-    );
-
     this.updateRemainsBadge(
       tdConsequenceRemains,
-      uniqueConsequences.length - 1
+      getOtherConsequenceIds(mostConsequence, transcripts).length,
+      REMAINS_NOUNS.consequence
     );
     tdConsequenceItem.textContent =
       master.find((consequence) => consequence.id === mostConsequence)?.label ||
@@ -421,14 +452,29 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * 追加件数バッジを更新する。
+   * 「+N」だけでは何の件数か読み上げで伝わらないため、件数と一緒に一覧を開くボタンのラベルも更新する。
    *
    * @param element - 追加件数表示要素
    * @param remains - 追加件数
+   * @param noun - ラベルに使う値の種類（単数形・複数形）
    */
-  static updateRemainsBadge(element: HTMLSpanElement, remains: number) {
+  static updateRemainsBadge(
+    element: HTMLElement,
+    remains: number,
+    noun: { one: string; other: string } = { one: 'item', other: 'items' }
+  ) {
     element.dataset.remains = remains.toString();
     element.textContent = remains > 0 ? `+${remains}` : '';
+    // 見えている「+N」を読み上げ名の先頭に含め、音声入力でも同じ名前で押せるようにする（WCAG 2.5.3）。
+    // hover では一覧パネルが開くため、重なって出る title は付けない
+    if (remains > 0) {
+      element.setAttribute(
+        'aria-label',
+        `+${remains} more ${remains === 1 ? noun.one : noun.other}`
+      );
+    } else {
+      element.removeAttribute('aria-label');
+    }
   }
 
   /**

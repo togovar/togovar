@@ -19,7 +19,7 @@
   line-height: 1.5;
   color: var(--color-black);
   background-color: white;
-  // レポートリンク一覧（_results.scss の .more-panel）と同じ角丸・影にそろえる
+  // 省略値の一覧（_remains-panel.scss の .remains-panel）と同じ角丸・影にそろえる
   border-radius: 5px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
   > .column {

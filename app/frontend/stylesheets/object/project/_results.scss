@@ -190,71 +190,17 @@
         }
 
         // hover / focus で隠れたリンクの一覧（.more-panel）を開く「+N」ボタン。
-        // 見た目は共通の .remains-badge（検索結果表のセルの +N）を使い、ボタンとして必要な分だけ上書きする
+        // 見た目とボタンとしての上書きは共通の .remains-badge が持つ
         > .more {
           // 表の斜めの列名がヘッダー側へ食い込んで重なり、hover / クリックを奪うため、リンクと同じく手前に出す
           position: relative;
           z-index: var(--z-index-base);
           margin-left: var(--spacing-results-report-link);
-          // button 要素は UA の既定フォントになるため、周りの文字と同じ書体にする
-          font-family: inherit;
-          cursor: pointer;
-
-          // .remains-badge の display 指定が hidden 属性の UA スタイルより強いため、明示的に隠す
-          &[hidden] {
-            display: none;
-          }
-
-          &:hover,
-          &[aria-expanded='true'] {
-            // バッジの背景（neutral-background = button-muted）に対応する既存のホバー色を使う
-            background-color: var(--color-button-muted-hover);
-          }
         }
       }
 
-      // 省略されたリンクの一覧。.group の overflow: hidden で切られないよう行の外に置き、
-      // 件数が多くても画面を覆わないよう高さに上限を付けてパネル内をスクロールさせる。
-      // 用語を途中で折り返さないため、ヘッダーの white-space: nowrap をあえて受け継いでいる（長い名前はパネル内で横スクロール）。
-      > .more-panel {
-        position: absolute;
-        z-index: var(--z-index-results-report-links-panel);
-        max-width: 100%;
-        max-height: 240px;
-        padding: 6px 0;
-        overflow-y: auto;
-        // 一覧の端までスクロールしたとき、その先のページや表へスクロールが伝わらないようにする
-        overscroll-behavior: contain;
-        font-size: 14px;
-        background: white;
-        border-radius: 5px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
-
-        &[hidden] {
-          display: none;
-        }
-
-        > .list {
-          padding: 0;
-          margin: 0;
-          list-style: none;
-
-          > .item {
-            padding: 2px 12px;
-
-            &:hover {
-              background: var(--color-selected-hover);
-            }
-          }
-
-          // 上限（MAX_LINKS_PER_KIND）を超えて描画していない件数の注記
-          > .note {
-            padding: 2px 12px;
-            font-size: 12px;
-            color: var(--color-gray);
-          }
-        }
-      }
+      // 省略されたリンクの一覧の見た目は共通の .remains-panel が持つ。
+      // .group の overflow: hidden で切られないよう行の外（このコンテナ直下）に置いている
     }
 
     // Download の注意書き（絶対配置）はレポートリンク行の上に重なるため、表示中はその高さ分リンクを下げる。

@@ -19,4 +19,24 @@
   &[data-remains=''] {
     display: none;
   }
+
+  // ──────────────────────────────────────────────────
+  // hover / focus で残りの一覧（.remains-panel）を開くボタン
+  // ──────────────────────────────────────────────────
+  &:is(button) {
+    // button 要素は UA の既定フォントになるため、周りの文字と同じ書体にする
+    font-family: inherit;
+    cursor: pointer;
+
+    // display 指定が hidden 属性の UA スタイルより強いため、明示的に隠す
+    &[hidden] {
+      display: none;
+    }
+
+    &:hover,
+    &[aria-expanded='true'] {
+      // バッジの背景（neutral-background = button-muted）に対応する既存のホバー色を使う
+      background-color: var(--color-button-muted-hover);
+    }
+  }
 }

@@ -18,7 +18,7 @@ type ResultsRowCells = {
   togovarIdCell: HTMLTableCellElement | null;
   refsnpCell: HTMLTableCellElement | null;
   refsnpContent: HTMLDivElement | null;
-  refsnpRemains: HTMLSpanElement | null;
+  refsnpRemains: HTMLElement | null;
   positionChromosome: HTMLDivElement | null;
   positionCoordinate: HTMLDivElement | null;
   refElement: HTMLSpanElement | null;
@@ -26,12 +26,12 @@ type ResultsRowCells = {
   typeElement: HTMLDivElement | null;
   geneCell: HTMLTableCellElement | null;
   geneContent: HTMLDivElement | null;
-  geneRemains: HTMLSpanElement | null;
+  geneRemains: HTMLElement | null;
   frequencyElements: TdFrequencies;
   consequenceCell: HTMLTableCellElement | null;
   consequenceContent: HTMLDivElement | null;
   consequenceItem: HTMLDivElement | null;
-  consequenceRemains: HTMLSpanElement | null;
+  consequenceRemains: HTMLElement | null;
   clinicalContainer: HTMLDivElement | null;
   clinicalSignificance: HTMLDivElement | null;
   clinicalRemains: HTMLSpanElement | null;
@@ -292,6 +292,8 @@ export class ResultsRowView {
     const tr = document.createElement('tr');
     tr.classList.add('-loading');
     tr.innerHTML = `<td colspan="${COLUMNS.length}"></td>`;
+    // 行DOMは使い回されるため、セルの「+N」一覧（ResultsRemainsDropdown）が表示中のレコードを引けるよう index を持たせる
+    tr.dataset.rowIndex = String(this.index);
     tr.addEventListener('click', this.handleRowClick.bind(this));
     return tr;
   }
@@ -500,7 +502,10 @@ export class ResultsRowView {
    * tapCompletedイベントはタッチデバイスのスクロール制御（ResultsViewTouchHandler）が
    * タップ完了を検知するために使う。
    */
-  private handleRowClick(): void {
+  private handleRowClick(event: MouseEvent): void {
+    // 「+N」のクリックは一覧を開く操作のため、行の選択は切り替えない
+    if (event.target instanceof Element && event.target.closest('.remains-badge')) return;
+
     storeManager.setData('selectedRow', this.selected ? undefined : this.index);
 
     const tapCompletedEvent = new CustomEvent('tapCompleted', {
