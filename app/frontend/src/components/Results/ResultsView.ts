@@ -363,6 +363,8 @@ export class ResultsView {
         this.dataManager.shiftSelectedRow(1);
         break;
       case 'Escape':
+        // 「+N」の一覧が開いているときの Escape は一覧を閉じる操作なので、行選択は残す
+        if (this.remainsDropdown?.isOpen()) break;
         storeManager.setData('selectedRow', undefined);
         break;
     }

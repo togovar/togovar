@@ -1,4 +1,4 @@
-// 見た目は検索結果ヘッダーのレポートリンク一覧（object/project/_results.scss の .more-panel）にそろえる。
+// 見た目は「+N」から開く省略値の一覧（object/component/_remains-panel.scss の .remains-panel）にそろえる。
 // 外枠（角丸・影）は親の search-field-with-suggestions.scss の .suggestions-container が持つ。
 // Shadow DOM には foundation/_reset.scss が届かないため、h3 / ul の UA 既定 margin はここで消す。
 

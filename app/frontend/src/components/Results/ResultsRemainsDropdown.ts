@@ -25,9 +25,24 @@ export class ResultsRemainsDropdown {
   private readonly panel: HTMLElement;
   private readonly list: HTMLElement;
   private readonly dropdown: HoverDropdown;
+  private readonly events = new AbortController();
+  // 結果の更新で行の中身が変わったかを判定するため、開いている対象を覚えておく
+  private trigger: HTMLElement | null = null;
+  private record: ResultData | null = null;
 
-  // スクロール・列変更・結果更新で行の中身が入れ替わり、開いていた一覧の対象が無くなるため閉じる
+  // 縦横スクロール・列変更で行の中身やバッジの位置が変わり、開いていた一覧の対象を見失うため閉じる
   private readonly onTableChange = () => this.dropdown.close();
+
+  /**
+   * 先読みしたページの到着でも searchResults は通知されるため、開いている行のレコードが変わったときだけ閉じる。
+   * 通知中は isSearchResultsUpdating が true で getRecordByIndex が 'loading' を返すので、更新完了後に確かめる。
+   */
+  private readonly onSearchResults = () => {
+    if (!this.trigger) return;
+    queueMicrotask(() => {
+      if (this.trigger && this.lookupRecord(this.trigger) !== this.record) this.dropdown.close();
+    });
+  };
 
   /** パネルを #ResultsView 直下に置き、表の overflow に切られないようにする。 */
   constructor(root: HTMLElement) {
@@ -45,29 +60,77 @@ export class ResultsRemainsDropdown {
       triggerSelector: TRIGGER_SELECTOR,
       panel: this.panel,
       onOpen: (trigger) => this.open(trigger),
-      onClose: () => this.list.replaceChildren(),
+      onClose: () => {
+        this.trigger = null;
+        this.record = null;
+        this.list.replaceChildren();
+      },
     });
+    const { signal } = this.events;
+    // 横スクロールでは offset が変わらず、パネルだけ元の位置に残ってしまうため閉じる
+    root
+      .querySelector<HTMLElement>('.tablecontainer')
+      ?.addEventListener('scroll', this.onTableChange, { passive: true, signal });
+    root.addEventListener('keydown', (event) => this.handleTab(event), { signal });
     storeManager.subscribe('offset', this.onTableChange);
     storeManager.subscribe('columns', this.onTableChange);
-    storeManager.subscribe('searchResults', this.onTableChange);
+    storeManager.subscribe('searchResults', this.onSearchResults);
+  }
+
+  /** ResultsView の Escape（行選択の解除）が一覧を閉じる操作と重ならないよう、開いているかを公開する。 */
+  isOpen(): boolean {
+    return this.trigger !== null;
   }
 
   /** ResultsView の破棄に合わせて購読とパネルを解放する。 */
   destroy(): void {
     storeManager.unsubscribe('offset', this.onTableChange);
     storeManager.unsubscribe('columns', this.onTableChange);
-    storeManager.unsubscribe('searchResults', this.onTableChange);
+    storeManager.unsubscribe('searchResults', this.onSearchResults);
+    this.events.abort();
     this.dropdown.destroy();
     this.panel.remove();
   }
 
+  /**
+   * パネルは表の外（#ResultsView の末尾）にあり、Tab の既定の順では「+N」の次に来ないため、
+   * 開いている間だけ「+N」とパネル内のリンクの間を Tab / Shift+Tab でつなぐ。
+   */
+  private handleTab(event: KeyboardEvent): void {
+    const trigger = this.trigger;
+    if (event.key !== 'Tab' || !trigger) return;
+    const links = Array.from(this.panel.querySelectorAll<HTMLElement>('a[href]'));
+    if (links.length === 0) return;
+    const active = document.activeElement;
+
+    if (active === trigger && !event.shiftKey) {
+      event.preventDefault();
+      links[0].focus();
+    } else if (active === links[0] && event.shiftKey) {
+      event.preventDefault();
+      trigger.focus();
+    } else if (active === links[links.length - 1] && !event.shiftKey) {
+      // 既定の Tab 移動はフォーカス中の要素から次を探すため、閉じて「+N」へ戻してから既定動作に任せ、
+      // 表の中で「+N」の次の要素へ進ませる
+      this.dropdown.close(true);
+    }
+  }
+
+  /** 行DOMは使い回されるため、行の index から現在表示中のレコードを引き直す。 */
+  private lookupRecord(trigger: HTMLElement): ResultData | null {
+    const index = Number(trigger.closest<HTMLTableRowElement>('tr')?.dataset.rowIndex);
+    if (!Number.isInteger(index)) return null;
+    const record = storeManager.getRecordByIndex(index);
+    return record && typeof record !== 'string' ? record : null;
+  }
+
   /** 行の index からレコードを引き直し、列に応じた一覧を作ってバッジの近くに出す。 */
   private open(trigger: HTMLElement): void {
-    const tr = trigger.closest<HTMLTableRowElement>('tr');
+    this.trigger = trigger;
     const td = trigger.closest<HTMLTableCellElement>('td');
-    const index = Number(tr?.dataset.rowIndex);
-    const record = Number.isInteger(index) ? storeManager.getRecordByIndex(index) : null;
-    if (!td || !record || typeof record === 'string') {
+    const record = this.lookupRecord(trigger);
+    this.record = record;
+    if (!td || !record) {
       this.list.replaceChildren();
       return;
     }
@@ -99,7 +162,8 @@ export class ResultsRemainsDropdown {
     fitResultsPanelHeight(this.panel);
     const naturalHeight = this.panel.scrollHeight;
     const roomBelow = this.panel.clientHeight;
-    const roomAbove = badgeRect.top - rootRect.top - PANEL_GAP_PX;
+    // ページが縦にスクロールしていると #ResultsView の上端が画面外にあるため、画面の上端でも切る
+    const roomAbove = badgeRect.top - Math.max(rootRect.top, 0) - PANEL_GAP_PX;
     if (roomBelow >= Math.min(naturalHeight, MIN_PANEL_HEIGHT_PX) || roomAbove <= roomBelow) return;
 
     const height = Math.min(naturalHeight, roomAbove);

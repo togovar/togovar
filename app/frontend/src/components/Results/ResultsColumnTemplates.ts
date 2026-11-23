@@ -13,7 +13,7 @@ export const REF_ALT_SHOW_LENGTH = 4;
 export const REMAINS_PANEL_ID = 'ResultsRemainsPanel';
 
 // hover / focus / クリックで残りの値の一覧を開くため、キーボードでも届く button にする。
-// 件数が無いときは中身が空になり、.remains-badge:empty で隠れる。
+// 件数が無いときは中身が空・data-remains が 0 になり、.remains-badge の CSS で隠れる。
 const REMAINS_BADGE = `<button type="button" class="remains-badge" data-remains="" aria-expanded="false" aria-controls="${REMAINS_PANEL_ID}"></button>`;
 
 /**

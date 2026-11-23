@@ -446,12 +446,14 @@ export class ResultsColumnUpdater {
   ) {
     element.dataset.remains = remains.toString();
     element.textContent = remains > 0 ? `+${remains}` : '';
+    // 見えている「+N」を読み上げ名の先頭に含め、音声入力でも同じ名前で押せるようにする（WCAG 2.5.3）。
+    // hover では一覧パネルが開くため、重なって出る title は付けない
     if (remains > 0) {
-      const label = `Show ${remains} more ${remains === 1 ? noun.one : noun.other}`;
-      element.title = label;
-      element.setAttribute('aria-label', label);
+      element.setAttribute(
+        'aria-label',
+        `+${remains} more ${remains === 1 ? noun.one : noun.other}`
+      );
     } else {
-      element.removeAttribute('title');
       element.removeAttribute('aria-label');
     }
   }
