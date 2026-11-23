@@ -146,17 +146,22 @@ export class ResultsRemainsDropdown {
     const td = trigger.closest<HTMLTableCellElement>('td');
     const record = this.lookupRecord(trigger);
     this.record = record;
-    if (!td || !record) {
-      this.list.replaceChildren();
-      return;
+    const rows: HTMLElement[] = [];
+    if (td && record) {
+      const { items, more } = getRemainingItems(td, record);
+      rows.push(
+        ...items.map((item) =>
+          createEl('li', { class: 'item', children: [createItemContent(item)] })
+        )
+      );
+      if (more > 0) {
+        rows.push(createEl('li', { class: 'note', text: `and ${more.toLocaleString()} more` }));
+      }
     }
-
-    const { items, more } = getRemainingItems(td, record);
-    const rows: HTMLElement[] = items.map((item) =>
-      createEl('li', { class: 'item', children: [createItemContent(item)] })
-    );
-    if (more > 0) {
-      rows.push(createEl('li', { class: 'note', text: `and ${more.toLocaleString()} more` }));
+    // 取得中の行やデータの食い違いで出す値が無いとき、影と余白だけの空の箱が見えないよう開かずに閉じる
+    if (rows.length === 0) {
+      this.dropdown.close();
+      return;
     }
     this.list.replaceChildren(...rows);
     this.place(trigger);
