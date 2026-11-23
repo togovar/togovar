@@ -19,6 +19,13 @@ import {
   type VariantLocusFields,
 } from '../../utils/variantPath';
 
+// 「+N」ボタンの読み上げラベル用。列ごとに何の件数かを伝える
+const REMAINS_NOUNS = {
+  refsnp: { one: 'RefSNP ID', other: 'RefSNP IDs' },
+  gene: { one: 'gene', other: 'genes' },
+  consequence: { one: 'consequence', other: 'consequences' },
+} as const;
+
 type NormalizedGeneSummary = {
   total: number;
   items: GeneSymbol[];
@@ -176,7 +183,7 @@ export class ResultsColumnUpdater {
    */
   static updateRefSNP(
     tdRS: HTMLDivElement | null,
-    tdRSRemains: HTMLSpanElement | null,
+    tdRSRemains: HTMLElement | null,
     values: string[]
   ) {
     if (!tdRS || !tdRSRemains) return;
@@ -188,7 +195,7 @@ export class ResultsColumnUpdater {
     }
 
     // 画面には先頭のrsIDだけを表示し、残りの件数はdata-remainsに保持する。
-    this.updateRemainsBadge(tdRSRemains, values.length - 1);
+    this.updateRemainsBadge(tdRSRemains, values.length - 1, REMAINS_NOUNS.refsnp);
     this.updateAnchor(
       tdRS,
       'hyper-text -external',
@@ -300,7 +307,7 @@ export class ResultsColumnUpdater {
    */
   static updateGene(
     tdGene: HTMLDivElement | null,
-    tdGeneRemains: HTMLSpanElement | null,
+    tdGeneRemains: HTMLElement | null,
     genes: GeneSummary | GeneSymbol[] | undefined
   ) {
     if (!tdGene || !tdGeneRemains) return;
@@ -324,7 +331,11 @@ export class ResultsColumnUpdater {
     }
 
     // 画面には先頭の遺伝子だけを表示し、APIが返した総遺伝子数との差分をdata-remainsに保持する。
-    this.updateRemainsBadge(tdGeneRemains, Math.max(0, geneSummary.total - 1));
+    this.updateRemainsBadge(
+      tdGeneRemains,
+      Math.max(0, geneSummary.total - 1),
+      REMAINS_NOUNS.gene
+    );
     this.updateAnchor(
       tdGene,
       'hyper-text -internal',
@@ -391,7 +402,7 @@ export class ResultsColumnUpdater {
    */
   static updateConsequence(
     tdConsequenceItem: HTMLDivElement | null,
-    tdConsequenceRemains: HTMLSpanElement | null,
+    tdConsequenceRemains: HTMLElement | null,
     mostConsequence: string,
     transcripts: Transcript[]
   ) {
@@ -413,7 +424,8 @@ export class ResultsColumnUpdater {
 
     this.updateRemainsBadge(
       tdConsequenceRemains,
-      uniqueConsequences.length - 1
+      uniqueConsequences.length - 1,
+      REMAINS_NOUNS.consequence
     );
     tdConsequenceItem.textContent =
       master.find((consequence) => consequence.id === mostConsequence)?.label ||
@@ -421,14 +433,27 @@ export class ResultsColumnUpdater {
   }
 
   /**
-   * 追加件数バッジを更新する。
+   * 「+N」だけでは何の件数か読み上げで伝わらないため、件数と一緒に一覧を開くボタンのラベルも更新する。
    *
    * @param element - 追加件数表示要素
    * @param remains - 追加件数
+   * @param noun - ラベルに使う値の種類（単数形・複数形）
    */
-  static updateRemainsBadge(element: HTMLSpanElement, remains: number) {
+  static updateRemainsBadge(
+    element: HTMLElement,
+    remains: number,
+    noun: { one: string; other: string } = { one: 'item', other: 'items' }
+  ) {
     element.dataset.remains = remains.toString();
     element.textContent = remains > 0 ? `+${remains}` : '';
+    if (remains > 0) {
+      const label = `Show ${remains} more ${remains === 1 ? noun.one : noun.other}`;
+      element.title = label;
+      element.setAttribute('aria-label', label);
+    } else {
+      element.removeAttribute('title');
+      element.removeAttribute('aria-label');
+    }
   }
 
   /**

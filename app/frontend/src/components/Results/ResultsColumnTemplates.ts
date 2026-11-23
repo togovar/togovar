@@ -9,6 +9,13 @@ type FrequencyDatasetItem = MasterConditionItem & {
 /** Ref/Alt列は長い配列を省略表示するため、表示する最大文字数を共有する。 */
 export const REF_ALT_SHOW_LENGTH = 4;
 
+/** セルの「+N」から開く一覧パネル（ResultsRemainsDropdown）を aria-controls で指すため、id を共有する。 */
+export const REMAINS_PANEL_ID = 'ResultsRemainsPanel';
+
+// hover / focus / クリックで残りの値の一覧を開くため、キーボードでも届く button にする。
+// 件数が無いときは中身が空になり、.remains-badge:empty で隠れる。
+const REMAINS_BADGE = `<button type="button" class="remains-badge" data-remains="" aria-expanded="false" aria-controls="${REMAINS_PANEL_ID}"></button>`;
+
 /**
  * ResultsRowViewで固定DOM行を再利用するため、列ごとの最小HTMLを定数で共有する。
  */
@@ -16,15 +23,15 @@ export const COLUMN_TEMPLATES = {
   report: '<td class="report"></td>',
   togovar_id: '<td class="togovar_id"></td>',
   refsnp_id:
-    '<td class="refsnp_id"><div class="remains-content"><span class="remains-badge" data-remains=""></span></div></td>',
+    `<td class="refsnp_id"><div class="remains-content">${REMAINS_BADGE}</div></td>`,
   position:
     '<td class="position"><div class="chromosome-position"><div class="chromosome"></div><div class="coordinate"></div></div></td>',
   ref_alt:
     '<td class="ref_alt"><div class="ref-alt"><span class="ref" data-sum=""></span><span class="arrow"></span><span class="alt" data-sum=""><span class="sum"></span></span></div></td>',
   type: '<td class="type"><div class="variant-type"></div></td>',
-  gene: '<td class="gene"><div class="remains-content"><span class="remains-badge" data-remains=""></span></div></td>',
+  gene: `<td class="gene"><div class="remains-content">${REMAINS_BADGE}</div></td>`,
   consequence:
-    '<td class="consequence"><div class="remains-content"><div class="consequence-item"></div><span class="remains-badge" data-remains=""></span></div></td>',
+    `<td class="consequence"><div class="remains-content"><div class="consequence-item"></div>${REMAINS_BADGE}</div></td>`,
   clinical_significance:
     '<td class="clinical_significance"><div class="clinical-significance-flex"><div class="clinical-significance" data-value=""></div><span class="clinical-remains" data-remains=""></span><span class="icon" data-mgend=""></span></div></td>',
   cadd:

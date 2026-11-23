@@ -9,6 +9,7 @@ import { ResultsViewDataManager } from './ResultsViewDataManager';
 import { ResultsColumnAutoSizer } from './ResultsColumnAutoSizer';
 import { ResultsColumnResizeController } from './ResultsColumnResizeController';
 import { ResultsReportLinks } from './ResultsReportLinks';
+import { ResultsRemainsDropdown } from './ResultsRemainsDropdown';
 import type { SearchMessages, SearchStatus, ColumnConfig } from '../../types';
 import type { StoreState } from '../../types/storeState';
 import { isTouchDevice } from '../../utils/deviceDetection';
@@ -42,6 +43,7 @@ export class ResultsView {
   private columnAutoSizer!: ResultsColumnAutoSizer;
   private columnResizeController!: ResultsColumnResizeController;
   private reportLinks: ResultsReportLinks | null = null;
+  private remainsDropdown!: ResultsRemainsDropdown;
   private stylesheet!: HTMLStyleElement;
 
   private boundKeydownHandler!: (_e: KeyboardEvent) => void;
@@ -80,6 +82,7 @@ export class ResultsView {
 
     this.initializeComponentHandlers(status, messages, this.stylesheet);
     this.columnsDropdown = new ResultsColumnsDropdown(columnsDropdown);
+    this.remainsDropdown = new ResultsRemainsDropdown(this.elm);
     // テンプレートに枠が無いページでも結果表示を止めないよう、要素がある場合だけ初期化する
     const reportLinksContainer = this.elm.querySelector<HTMLElement>(SELECTORS.REPORT_LINKS);
     if (reportLinksContainer) {
@@ -104,6 +107,7 @@ export class ResultsView {
     this.columnResizeController?.destroy();
     this.columnAutoSizer?.destroy();
     this.reportLinks?.destroy();
+    this.remainsDropdown?.destroy();
 
     storeManager.unsubscribe('searchStatus', this.onSearchStatus);
     storeManager.unsubscribe('searchResults', this.onSearchResults);

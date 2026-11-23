@@ -1,0 +1,46 @@
+// 「+N」（.remains-badge）から開く、省略された値の一覧パネル。
+// 位置（top / left）は JS がバッジの近くに設定するため、ここでは見た目と高さの上限だけを持つ。
+// 件数が多くても画面を覆わないよう高さに上限を付けてパネル内をスクロールさせる。
+// 用語を途中で折り返さないため nowrap にする（長い名前はパネル内で横スクロール）。
+.remains-panel {
+  position: absolute;
+  z-index: var(--z-index-results-remains-panel);
+  max-width: 100%;
+  max-height: 240px;
+  padding: 6px 0;
+  overflow-y: auto;
+  // 一覧の端までスクロールしたとき、その先のページや表へスクロールが伝わらないようにする
+  overscroll-behavior: contain;
+  font-size: 14px;
+  line-height: 18px;
+  white-space: nowrap;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+
+  &[hidden] {
+    display: none;
+  }
+
+  > .list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+
+    > .item {
+      padding: 2px 12px;
+
+      // クリックできると誤解させないよう、リンクを持つ行だけ hover で色を付ける（Consequence は文字だけ）
+      &:has(> a):hover {
+        background: var(--color-selected-hover);
+      }
+    }
+
+    // 一覧に出しきれない件数（上限超過・API が値を省略した分）の注記
+    > .note {
+      padding: 2px 12px;
+      font-size: 12px;
+      color: var(--color-gray);
+    }
+  }
+}

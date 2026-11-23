@@ -51,7 +51,7 @@ export class ResultsReportLinks {
     this.container = container;
     this.moreList = createEl('ul', { class: 'list' });
     this.morePanel = createEl('div', {
-      class: 'more-panel',
+      class: 'more-panel remains-panel',
       attrs: { id: MORE_PANEL_ID },
       domProps: { hidden: true },
       children: [this.moreList],
