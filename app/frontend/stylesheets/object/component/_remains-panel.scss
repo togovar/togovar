@@ -40,9 +40,16 @@
         background: var(--color-selected-hover);
       }
 
+      // 一覧はメニューとして読ませたいため、検索候補の一覧と同じく下線と矢印アイコンは付けない。
+      // 行の hover 色と a:hover の文字色で、クリックできることは伝わる
       > .hyper-text {
         display: block;
         padding: 2px 12px;
+        text-decoration: none;
+
+        &::after {
+          display: none;
+        }
       }
     }
 
