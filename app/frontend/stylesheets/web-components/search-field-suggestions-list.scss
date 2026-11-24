@@ -28,19 +28,24 @@
   > .item {
     padding: 2px 12px;
     cursor: pointer;
-    transition: background-color var(--gui-duration);
+    transition:
+      color var(--gui-duration),
+      background-color var(--gui-duration);
     > em {
       font-style: normal;
       background-color: var(--color-suggest);
     }
 
+    // 「+N」の一覧のリンク（foundation/_base.scss の a:hover）と同じく、hover で文字も緑にしてクリックできることを伝える
     &:hover {
+      color: var(--color-key-dark1);
       background-color: var(--color-selected-hover);
     }
 
     &.-disabled {
       cursor: auto;
       &:hover {
+        color: inherit;
         background-color: inherit;
       }
     }
