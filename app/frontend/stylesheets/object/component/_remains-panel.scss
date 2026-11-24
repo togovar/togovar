@@ -30,9 +30,26 @@
     > .item {
       padding: 2px 12px;
 
+      // リンクを持つ行は、hover で色が付く行全体をクリックで遷移できるよう、余白をリンク側へ移す
+      &:has(> .hyper-text) {
+        padding: 0;
+      }
+
       // クリックできると誤解させないよう、リンクを持つ行だけ hover で色を付ける（Consequence は文字だけ）
-      &:has(> a):hover {
+      &:has(> .hyper-text):hover {
         background: var(--color-selected-hover);
+      }
+
+      // 一覧はメニューとして読ませたいため、検索候補の一覧と同じく下線と矢印アイコンは付けない。
+      // 行の hover 色と a:hover の文字色で、クリックできることは伝わる
+      > .hyper-text {
+        display: block;
+        padding: 2px 12px;
+        text-decoration: none;
+
+        &::after {
+          display: none;
+        }
       }
     }
 
