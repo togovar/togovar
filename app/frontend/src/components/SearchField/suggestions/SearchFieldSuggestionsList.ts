@@ -33,8 +33,11 @@ class SearchFieldSuggestionsList extends LitElement {
   /** エイリアス等の補足テキストを取得するデータキー名 */
   @property() subTextKey: string = '';
 
-  /** シンプル検索時の列見出しテキスト */
-  @property() title: string = '';
+  /**
+   * シンプル検索時の列見出しテキスト。
+   * HTML 標準の title 属性と同じ名前にすると、要素に title が付いて hover でブラウザのツールチップが出るため heading にする。
+   */
+  @property({ attribute: false }) heading: string = '';
 
   /** APIレスポンス受信済みかどうか */
   @property({ type: Boolean }) hasApiResponse: boolean = false;
@@ -61,7 +64,7 @@ class SearchFieldSuggestionsList extends LitElement {
 
   render(): TemplateResult {
     return html`
-      ${this.title ? html`<h3 class="title">${this.title}</h3>` : nothing}
+      ${this.heading ? html`<h3 class="title">${this.heading}</h3>` : nothing}
       <ul class="list">
         ${!this.hasApiResponse
           ? nothing

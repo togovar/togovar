@@ -374,7 +374,7 @@ class SearchFieldWithSuggestions extends LitElement {
                         .subTextKey=${this._searchFieldOptions?.valueMappings
                           ?.aliasOfKey}
                         .hasApiResponse=${this.hasApiResponse}
-                        title=${this._searchFieldOptions?.titleMappings?.[key]}
+                        .heading=${this._searchFieldOptions?.titleMappings?.[key] ?? ''}
                         @suggestion-selected=${this.handleSuggestionSelected}
                       ></search-field-suggestions-list>
                     </div>
