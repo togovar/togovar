@@ -20,6 +20,10 @@ const PANEL_GAP_PX = 2;
 
 type PanelItem = { label: string; href?: string; external?: boolean };
 
+// 「+N」を持つ列。td のクラス名（ResultsColumnTemplates）と同じ値にする
+const REMAINS_COLUMNS = ['refsnp_id', 'gene', 'consequence'] as const;
+type RemainsColumn = (typeof REMAINS_COLUMNS)[number];
+
 /**
  * 検索結果表のセルの「+N」を hover / focus したときに、表示しきれなかった値の一覧を開く。
  * 表は overflow で切られるうえ行DOMが仮想スクロールで使い回されるため、パネルは表の外に1つだけ置き、
@@ -34,6 +38,13 @@ export class ResultsRemainsDropdown {
   // 結果の更新で行の中身が変わったかを判定するため、開いている対象を覚えておく
   private trigger: HTMLElement | null = null;
   private record: ResultData | null = null;
+  // 再描画で作り直されたバッジを探し直すため、開いている行・列を覚えておく。
+  // tr.innerHTML の置き換えで外れたバッジは tr の子孫でなくなり closest('tr') が null になるため、
+  // 行の index はバッジが DOM にある open() の時点で保存する
+  private rowIndex: number | null = null;
+  private column: RemainsColumn | null = null;
+  // 再描画でフォーカス中のバッジが外れると activeElement が body に落ちるため、直前にフォーカスがあったかを覚えておく
+  private triggerFocused = false;
 
   // 縦横スクロール・列変更で行の中身やバッジの位置が変わり、開いていた一覧の対象を見失うため閉じる
   private readonly onTableChange = () => this.dropdown.close();
@@ -45,8 +56,29 @@ export class ResultsRemainsDropdown {
   private readonly onSearchResults = () => {
     if (!this.trigger) return;
     queueMicrotask(() => {
-      if (this.trigger && this.lookupRecord(this.trigger) !== this.record) this.dropdown.close();
+      if (this.trigger && lookupRecordAt(this.rowIndex) !== this.record) this.dropdown.close();
     });
+  };
+
+  /**
+   * searchResults の通知後や表示サイズの変化で、行は次のフレームに tr.innerHTML ごと作り直される。
+   * 開いていたバッジが DOM から外れたままだと Esc / Tab のフォーカス移動が効かないため、
+   * 同じ行・同じ列の新しいバッジへ付け替え、見つからなければ閉じる。
+   */
+  private readonly onResultsRendered = () => {
+    const trigger = this.trigger;
+    if (!trigger || trigger.isConnected) return;
+
+    const next = this.findReplacementTrigger();
+    if (!next) {
+      this.dropdown.close();
+      return;
+    }
+    this.dropdown.replaceTrigger(next);
+    this.trigger = next;
+    this.place(next);
+    const active = document.activeElement;
+    if (this.triggerFocused && (!active || active === document.body)) next.focus();
   };
 
   /** パネルを #ResultsView 直下に置き、表の overflow に切られないようにする。 */
@@ -68,6 +100,9 @@ export class ResultsRemainsDropdown {
       onClose: () => {
         this.trigger = null;
         this.record = null;
+        this.rowIndex = null;
+        this.column = null;
+        this.triggerFocused = false;
         this.list.replaceChildren();
       },
     });
@@ -88,6 +123,15 @@ export class ResultsRemainsDropdown {
       },
       { capture: true, signal }
     );
+    // 要素が外れても focusin は他で起きないため、最後にフォーカスを受けたのがバッジかどうかで判定できる
+    document.addEventListener(
+      'focusin',
+      (event) => {
+        this.triggerFocused = this.trigger !== null && event.target === this.trigger;
+      },
+      { signal }
+    );
+    window.addEventListener('togovar:results-rendered', this.onResultsRendered, { signal });
     storeManager.subscribe('offset', this.onTableChange);
     storeManager.subscribe('columns', this.onTableChange);
     storeManager.subscribe('searchResults', this.onSearchResults);
@@ -132,23 +176,34 @@ export class ResultsRemainsDropdown {
     }
   }
 
-  /** 行DOMは使い回されるため、行の index から現在表示中のレコードを引き直す。 */
-  private lookupRecord(trigger: HTMLElement): ResultData | null {
-    const index = Number(trigger.closest<HTMLTableRowElement>('tr')?.dataset.rowIndex);
-    if (!Number.isInteger(index)) return null;
-    const record = storeManager.getRecordByIndex(index);
-    return record && typeof record !== 'string' ? record : null;
+  /**
+   * 行DOMは index ごとに使い回されるため、open() で保存した行 index と列から新しいバッジを探す。
+   * 行の中身が別のレコードに変わっていたり、件数が無くなっていたりしたら、付け替えずに閉じさせる。
+   */
+  private findReplacementTrigger(): HTMLElement | null {
+    if (this.rowIndex === null || !this.column) return null;
+    const next = this.root.querySelector<HTMLElement>(
+      `.tablecontainer > table > tbody > tr[data-row-index="${this.rowIndex}"] > td.${this.column} .remains-badge`
+    );
+    if (!next || !next.textContent) return null;
+    return lookupRecordAt(this.rowIndex) === this.record ? next : null;
   }
 
   /** 行の index からレコードを引き直し、列に応じた一覧を作ってバッジの近くに出す。 */
   private open(trigger: HTMLElement): void {
     this.trigger = trigger;
+    // focusin より先に開く経路（hover・クリック）もあるため、開いた時点のフォーカスも見ておく
+    this.triggerFocused = document.activeElement === trigger;
     const td = trigger.closest<HTMLTableCellElement>('td');
-    const record = this.lookupRecord(trigger);
+    // バッジが DOM にある今のうちに行 index を読む（再描画後は tr をたどれなくなる）
+    const index = Number(trigger.closest<HTMLTableRowElement>('tr')?.dataset.rowIndex);
+    this.rowIndex = Number.isInteger(index) ? index : null;
+    const record = lookupRecordAt(this.rowIndex);
     this.record = record;
+    this.column = td ? getRemainsColumn(td) : null;
     const rows: HTMLElement[] = [];
-    if (td && record) {
-      const { items, more } = getRemainingItems(td, record);
+    if (td && record && this.column) {
+      const { items, more } = getRemainingItems(this.column, record);
       rows.push(
         ...items.map((item) =>
           createEl('li', { class: 'item', children: [createItemContent(item)] })
@@ -193,12 +248,24 @@ export class ResultsRemainsDropdown {
   }
 }
 
+/** 行DOMは使い回されるため、行の index から現在表示中のレコードを引き直す。取得中・範囲外は null にする。 */
+function lookupRecordAt(index: number | null): ResultData | null {
+  if (index === null) return null;
+  const record = storeManager.getRecordByIndex(index);
+  return record && typeof record !== 'string' ? record : null;
+}
+
+/** 再描画後に同じ列のバッジを探し直せるよう、td のクラス名から「+N」を持つ列を判定する。 */
+function getRemainsColumn(td: HTMLTableCellElement): RemainsColumn | null {
+  return REMAINS_COLUMNS.find((column) => td.classList.contains(column)) ?? null;
+}
+
 /** セルの表示と同じ規則で並べ、先頭（セルに見えている1件）を除いた残りを返す。 */
 function getRemainingItems(
-  td: HTMLTableCellElement,
+  column: RemainsColumn,
   record: ResultData
 ): { items: PanelItem[]; more: number } {
-  if (td.classList.contains('refsnp_id')) {
+  if (column === 'refsnp_id') {
     return {
       items: (record.existing_variations ?? []).slice(1).map((id) => ({
         label: id,
@@ -209,7 +276,7 @@ function getRemainingItems(
     };
   }
 
-  if (td.classList.contains('gene')) {
+  if (column === 'gene') {
     // 巨大SVでは items が省略・一部だけになるため、total との差は件数だけ示す
     const summary = ResultsColumnUpdater.normalizeGeneSummary(record.genes);
     const symbols = summary.items.filter(Boolean);
@@ -219,17 +286,13 @@ function getRemainingItems(
     };
   }
 
-  if (td.classList.contains('consequence')) {
-    const master =
-      (getSimpleSearchConditionMaster('consequence')?.items as ConsequenceMasterItem[] | undefined) ?? [];
-    const ids = getOtherConsequenceIds(record.most_severe_consequence, record.transcripts ?? []);
-    return {
-      items: ids.map((id) => ({ label: master.find((item) => item.id === id)?.label || id })),
-      more: 0,
-    };
-  }
-
-  return { items: [], more: 0 };
+  const master =
+    (getSimpleSearchConditionMaster('consequence')?.items as ConsequenceMasterItem[] | undefined) ?? [];
+  const ids = getOtherConsequenceIds(record.most_severe_consequence, record.transcripts ?? []);
+  return {
+    items: ids.map((id) => ({ label: master.find((item) => item.id === id)?.label || id })),
+    more: 0,
+  };
 }
 
 /** リンク先がある値は表のセルと同じリンクにし、無い値（Consequence）は文字だけにする。 */

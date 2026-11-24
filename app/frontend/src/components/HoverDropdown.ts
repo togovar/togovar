@@ -108,6 +108,17 @@ export class HoverDropdown {
     this.options.onOpen?.(trigger);
   }
 
+  /**
+   * 再描画でボタンの DOM だけが作り直されたとき、パネルの内容を作り直さずに新しいボタンへ付け替える。
+   * 外れた古いボタンを持ったままだと、Esc でのフォーカス戻しや hover 判定が効かなくなるため。
+   */
+  replaceTrigger(trigger: HTMLElement): void {
+    if (!this.trigger || this.trigger === trigger) return;
+    this.trigger.setAttribute('aria-expanded', 'false');
+    this.trigger = trigger;
+    trigger.setAttribute('aria-expanded', 'true');
+  }
+
   /** Esc の後に操作を続けられるよう、要求された場合だけ元のボタンへフォーカスを戻す。 */
   close(restoreFocus = false): void {
     this.cancelClose();
