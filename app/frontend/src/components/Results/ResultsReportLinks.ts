@@ -135,9 +135,12 @@ export class ResultsReportLinks {
       }
 
       const more = hiddenCount + notRendered;
-      const label = `Show ${more} more ${group.dataset.kind} ${more === 1 ? 'report' : 'reports'}`;
-      moreButton.title = label;
-      moreButton.setAttribute('aria-label', label);
+      // hover では一覧パネルが開くため、パネルに重なって出る title は付けず、読み上げ用の aria-label だけにする。
+      // 見えている「+N」を読み上げ名の先頭に含め、音声入力でも同じ名前で押せるようにする（WCAG 2.5.3）
+      moreButton.setAttribute(
+        'aria-label',
+        `+${more} more ${group.dataset.kind} ${more === 1 ? 'report' : 'reports'}`
+      );
     }
   }
 
