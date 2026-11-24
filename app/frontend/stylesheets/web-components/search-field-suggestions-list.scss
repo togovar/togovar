@@ -55,7 +55,9 @@
       color: color-mix(in srgb, var(--color-black) 50%, transparent);
     }
 
+    // キーボードで選択中の行にマウスが乗ると :hover の緑が重なり、濃い黄色の上で読みにくくなるため、文字は親の黒に戻す
     &.-selected {
+      color: inherit;
       background-color: var(--color-selected);
     }
 
