@@ -38,7 +38,10 @@ export class ResultsRemainsDropdown {
   // 結果の更新で行の中身が変わったかを判定するため、開いている対象を覚えておく
   private trigger: HTMLElement | null = null;
   private record: ResultData | null = null;
-  // 再描画で作り直されたバッジを探し直すため、開いている列を覚えておく
+  // 再描画で作り直されたバッジを探し直すため、開いている行・列を覚えておく。
+  // tr.innerHTML の置き換えで外れたバッジは tr の子孫でなくなり closest('tr') が null になるため、
+  // 行の index はバッジが DOM にある open() の時点で保存する
+  private rowIndex: number | null = null;
   private column: RemainsColumn | null = null;
   // 再描画でフォーカス中のバッジが外れると activeElement が body に落ちるため、直前にフォーカスがあったかを覚えておく
   private triggerFocused = false;
@@ -53,7 +56,7 @@ export class ResultsRemainsDropdown {
   private readonly onSearchResults = () => {
     if (!this.trigger) return;
     queueMicrotask(() => {
-      if (this.trigger && this.lookupRecord(this.trigger) !== this.record) this.dropdown.close();
+      if (this.trigger && lookupRecordAt(this.rowIndex) !== this.record) this.dropdown.close();
     });
   };
 
@@ -66,7 +69,7 @@ export class ResultsRemainsDropdown {
     const trigger = this.trigger;
     if (!trigger || trigger.isConnected) return;
 
-    const next = this.findReplacementTrigger(trigger);
+    const next = this.findReplacementTrigger();
     if (!next) {
       this.dropdown.close();
       return;
@@ -97,6 +100,7 @@ export class ResultsRemainsDropdown {
       onClose: () => {
         this.trigger = null;
         this.record = null;
+        this.rowIndex = null;
         this.column = null;
         this.triggerFocused = false;
         this.list.replaceChildren();
@@ -172,26 +176,17 @@ export class ResultsRemainsDropdown {
     }
   }
 
-  /** 行DOMは使い回されるため、行の index から現在表示中のレコードを引き直す。 */
-  private lookupRecord(trigger: HTMLElement): ResultData | null {
-    const index = Number(trigger.closest<HTMLTableRowElement>('tr')?.dataset.rowIndex);
-    if (!Number.isInteger(index)) return null;
-    const record = storeManager.getRecordByIndex(index);
-    return record && typeof record !== 'string' ? record : null;
-  }
-
   /**
-   * 行DOMは index ごとに使い回されるため、同じ data-row-index の行の同じ列から新しいバッジを探す。
+   * 行DOMは index ごとに使い回されるため、open() で保存した行 index と列から新しいバッジを探す。
    * 行の中身が別のレコードに変わっていたり、件数が無くなっていたりしたら、付け替えずに閉じさせる。
    */
-  private findReplacementTrigger(trigger: HTMLElement): HTMLElement | null {
-    const rowIndex = trigger.closest<HTMLTableRowElement>('tr')?.dataset.rowIndex;
-    if (rowIndex === undefined || !this.column) return null;
+  private findReplacementTrigger(): HTMLElement | null {
+    if (this.rowIndex === null || !this.column) return null;
     const next = this.root.querySelector<HTMLElement>(
-      `.tablecontainer > table > tbody > tr[data-row-index="${rowIndex}"] > td.${this.column} .remains-badge`
+      `.tablecontainer > table > tbody > tr[data-row-index="${this.rowIndex}"] > td.${this.column} .remains-badge`
     );
     if (!next || !next.textContent) return null;
-    return this.lookupRecord(next) === this.record ? next : null;
+    return lookupRecordAt(this.rowIndex) === this.record ? next : null;
   }
 
   /** 行の index からレコードを引き直し、列に応じた一覧を作ってバッジの近くに出す。 */
@@ -200,7 +195,10 @@ export class ResultsRemainsDropdown {
     // focusin より先に開く経路（hover・クリック）もあるため、開いた時点のフォーカスも見ておく
     this.triggerFocused = document.activeElement === trigger;
     const td = trigger.closest<HTMLTableCellElement>('td');
-    const record = this.lookupRecord(trigger);
+    // バッジが DOM にある今のうちに行 index を読む（再描画後は tr をたどれなくなる）
+    const index = Number(trigger.closest<HTMLTableRowElement>('tr')?.dataset.rowIndex);
+    this.rowIndex = Number.isInteger(index) ? index : null;
+    const record = lookupRecordAt(this.rowIndex);
     this.record = record;
     this.column = td ? getRemainsColumn(td) : null;
     const rows: HTMLElement[] = [];
@@ -248,6 +246,13 @@ export class ResultsRemainsDropdown {
     this.panel.style.maxHeight = `${height}px`;
     this.panel.style.top = `${badgeRect.top - rootRect.top - PANEL_GAP_PX - height}px`;
   }
+}
+
+/** 行DOMは使い回されるため、行の index から現在表示中のレコードを引き直す。取得中・範囲外は null にする。 */
+function lookupRecordAt(index: number | null): ResultData | null {
+  if (index === null) return null;
+  const record = storeManager.getRecordByIndex(index);
+  return record && typeof record !== 'string' ? record : null;
 }
 
 /** 再描画後に同じ列のバッジを探し直せるよう、td のクラス名から「+N」を持つ列を判定する。 */
