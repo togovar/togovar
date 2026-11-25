@@ -152,6 +152,12 @@ app/frontend/
 - 列の表示・順序・幅は既存の列設定と `components/Results/ResultsColumnAutoSizer.ts` などの専用クラスを使う。自動幅調整で利用者が手動指定した幅を上書きしない。
 - レポートのpagination-tableは `assets/stanza.json` で外部Stanzaを読み込む構成であり、検索結果一覧の仮想スクロールテーブルとは別物。JSON形式の拡張では、Stanza本体とデータ提供APIの変更対象リポジトリを確認し、このリポジトリの設定変更だけで対応済みと判断しない。
 
+## サイドバー折りたたみ 方針
+
+- 開閉状態は `components/SideBar.ts` が `body.-sidebar-collapsed` で管理し、localStorage の `sidebar_collapsed` に保存する。描画前に復元するため、`views/index.pug` のインラインスクリプトも同じキーを読む。キー名を変えるときは `SideBar.ts` の `COLLAPSED_STORAGE_KEY` と両方を変える。
+- 行を選んでもサイドバーは自動で開かない。開閉はレール（`.sidebar-rail`）とClose（`.sidebar-close`）だけで行う。
+- 幅・transformのトランジションは `body.-sidebar-ready` が付いた後だけ有効にし、`prefers-reduced-motion: no-preference` の場合に限る。保存済み状態の復元時にアニメーションさせないため、この条件を外さない。
+
 ## Store / API 方針
 
 - アプリ状態は `app/frontend/src/store/StoreManager.ts` を正として扱う。

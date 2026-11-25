@@ -40,28 +40,35 @@
     > .title {
       position: relative;
       display: flex;
-      justify-content: space-between;
+      gap: 4px;
+      align-items: center;
       margin-bottom: 5px;
       font-size: 16px;
       font-weight: bold;
       color: white;
 
-      > .simple {
-        body[data-search-mode='advanced'] & {
-          display: none;
+      // 開閉ボタンを h2 の外に出したため、見た目は .title 側の文字設定を引き継ぐ。
+      > .heading {
+        font-size: inherit;
+        font-weight: inherit;
+
+        > .simple {
+          body[data-search-mode='advanced'] & {
+            display: none;
+          }
+        }
+
+        > .advanced {
+          body[data-search-mode='simple'] & {
+            display: none;
+          }
         }
       }
 
-      > .advanced {
-        body[data-search-mode='simple'] & {
-          display: none;
-        }
-      }
-
+      // 開閉アイコン＋タイトルを左に寄せ、Clear all だけを右端へ送る。
       > .button-view {
-        // stretch（デフォルト）で引き伸ばされないよう自身の高さを持たせる。
-        align-self: center;
         height: 20px;
+        margin-left: auto;
         font-size: 12px;
 
         body[data-search-mode='advanced'] & {
@@ -79,13 +86,21 @@
 
   // JS が DOMContentLoaded 後に -sidebar-ready を付与することで
   // 初期描画でトランジションが走らないようにする
+  // サイドバー全体が横に動くため、動きを減らす設定の利用者には切り替えだけを行う。
   body.-sidebar-ready & {
-    transition: transform var(--gui-duration);
+    @media (prefers-reduced-motion: no-preference) {
+      transition: transform var(--gui-duration);
+    }
   }
 
   // 行選択でプレビューパネルエリアをスライドイン
   body.-rowselected & {
     transform: translateX(0);
+  }
+
+  // 折りたたみ時はレールだけを見せる。幅の縮小中に中身が崩れて見えないよう非表示にする。
+  body.-sidebar-collapsed & {
+    visibility: hidden;
   }
 
   // ── プレビューパネル ──────────────────────────────────────────────────────
@@ -395,5 +410,151 @@
         width: 15px;
       }
     }
+  }
+}
+
+// =============================================================================
+// サイドバー折りたたみ（.sidebar-rail / .sidebar-close）
+// 開閉状態は SideBar.ts が body.-sidebar-collapsed で管理する。
+// =============================================================================
+
+// 折りたたみ時に .LayoutAside 全高を占める縦長の「開く」ボタン。
+// 何のパネルが隠れているか分かるよう縦書きラベルを出す。アイコンはラベルと重複するため置かない。
+.sidebar-rail {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  // 100% にすると閉じるアニメーション中に広い幅から縮み、中央寄せのラベルが横へ流れて見える。
+  // 折りたたみ後の幅に固定して、アニメーション中も最終位置に表示する。
+  width: var(--width-sidebar-collapsed);
+  height: 100%;
+  padding: 12px 0;
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  background: none;
+  border: none;
+  transition: background-color var(--gui-duration);
+
+  body.-sidebar-collapsed & {
+    display: flex;
+  }
+
+  &:hover {
+    background-color: color-mix(in srgb, white 10%, transparent);
+  }
+
+  // Close を押すとフォーカスがレールへ移るため、.sidebar-close と同じ枠でキーボード操作時の位置を示す。
+  // .LayoutAside の overflow: hidden で外側の枠が切れないよう、内側に描く。
+  &:focus-visible {
+    outline: 2px solid white;
+    outline-offset: -2px;
+  }
+
+  // 見出し左の「‹」（閉じる）と対になる「›」で、押すと開くことを示す。
+  // .sidebar-close と同じく、hover で明るくなり開く方向（右）へ少し動かして反応を揃える。
+  > .chevron {
+    font-size: 12px;
+    opacity: 0.7;
+    // Font Awesome の「›」はグリフ内で右寄りに見えるため、見た目の中心へ1px戻す。
+    // transform とは別プロパティなので、hover 時の translateX と合成される。
+    translate: -1px 0;
+    transition:
+      opacity var(--gui-duration),
+      transform var(--gui-duration);
+
+    &::before {
+      font-family: 'Font Awesome 7 Free', sans-serif;
+      font-weight: 900;
+      content: var(--icon-chevron-right);
+    }
+  }
+
+  // 動きを減らす設定の利用者には、移動させず明るさの変化だけで反応を示す。
+  &:hover > .chevron,
+  &:focus-visible > .chevron {
+    opacity: 1;
+
+    @media (prefers-reduced-motion: no-preference) {
+      transform: translateX(2px);
+    }
+  }
+
+  > .label {
+    letter-spacing: 0.05em;
+    writing-mode: vertical-rl;
+  }
+
+  // 行選択中はプレビュー面、それ以外はフィルタ面が隠れているので、その名前を出す。
+  > .filters {
+    body.-rowselected & {
+      display: none;
+    }
+
+    > .simple {
+      body[data-search-mode='advanced'] & {
+        display: none;
+      }
+    }
+
+    > .advanced {
+      body[data-search-mode='simple'] & {
+        display: none;
+      }
+    }
+  }
+
+  > .preview {
+    display: none;
+
+    body.-rowselected & {
+      display: inline;
+    }
+  }
+}
+
+// 各パネル見出しの左に置く開閉アイコン。ボタン枠を出さず「‹」だけで閉じる方向を示す。
+// hover で背景の四角を出すと周囲のボタンと浮くため、明るさと左への小さな移動だけで反応させる。
+.sidebar-close {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 20px;
+  padding: 0;
+  font-size: 12px;
+  color: white;
+  cursor: pointer;
+  background: none;
+  border: none;
+  opacity: 0.7;
+  transition: opacity var(--gui-duration);
+
+  &::before {
+    font-family: 'Font Awesome 7 Free', sans-serif;
+    font-weight: 900;
+    content: var(--icon-chevron-left);
+    transition: transform var(--gui-duration);
+  }
+
+  &:hover,
+  &:focus-visible {
+    opacity: 1;
+
+    // .sidebar-rail と同じく、動きを減らす設定では明るさの変化だけにする。
+    &::before {
+      @media (prefers-reduced-motion: no-preference) {
+        transform: translateX(-2px);
+      }
+    }
+  }
+
+  // マウス操作では枠を出さず、キーボード操作時だけ現在位置が分かるようにする。
+  &:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 1px;
   }
 }
